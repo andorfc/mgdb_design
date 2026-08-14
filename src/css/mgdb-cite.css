@@ -1,0 +1,87 @@
+/* How to cite MaizeGDB. Scoped under .mgdb-cite-page; uses the shared tokens. */
+
+/* The one citation most readers came for, so it gets the strongest treatment
+   on the page short of the header itself. */
+.mgdb-cite-page .mgdb-cite-primary {
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-left: 6px solid var(--mgdb-green);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-cite-page .mgdb-cite-primary-text {
+  max-width: var(--mgdb-measure);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-lg);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-cite-page .mgdb-cite-primary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-4);
+}
+
+/* Category groups ---------------------------------------------------------- */
+
+.mgdb-cite-page .mgdb-cite-group { margin-top: var(--mgdb-space-6); }
+
+.mgdb-cite-page .mgdb-cite-group h3 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: baseline;
+  padding-bottom: var(--mgdb-space-2);
+  border-bottom: 2px solid var(--mgdb-line);
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-cite-page .mgdb-cite-group-count {
+  padding: 1px 9px;
+  border-radius: 999px;
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.mgdb-cite-page .mgdb-cite-year {
+  margin-top: var(--mgdb-space-5);
+  color: var(--mgdb-wine);
+  font-size: var(--mgdb-text-base);
+  font-weight: 800;
+  letter-spacing: .04em;
+}
+
+/* Citations are dense reference text. A hanging indent makes each entry's
+   first line stand out so the list can be scanned by author. */
+.mgdb-cite-page .mgdb-cite-entry {
+  max-width: 88ch;
+  padding-left: 1.5em;
+  margin-top: var(--mgdb-space-3);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-base);
+  line-height: var(--mgdb-leading);
+  text-indent: -1.5em;
+}
+
+.mgdb-cite-page .mgdb-cite-entry a {
+  color: var(--mgdb-burgundy);
+  overflow-wrap: anywhere;
+}
+
+/* Search highlight, matching the header suggestions. */
+.mgdb-cite-page mark { background: #fdf0c4; color: inherit; font-weight: 700; }
+
+/* A group whose entries are all filtered out should disappear with them. */
+.mgdb-cite-page .mgdb-cite-group[hidden],
+.mgdb-cite-page .mgdb-cite-year[hidden] { display: none !important; }
+
+.mgdb-cite-page .mgdb-search-row .mgdb-field:first-child { flex: 3 1 22rem; }
+.mgdb-cite-page .mgdb-search-row .mgdb-field { flex: 1 1 10rem; }
+
+@media (max-width: 767px) {
+  .mgdb-cite-page .mgdb-cite-entry { padding-left: 1.1em; text-indent: -1.1em; }
+}
