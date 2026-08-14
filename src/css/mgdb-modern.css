@@ -223,20 +223,20 @@ body.mgdb-modern {
 .mgdb-modern #content { flex: 1 1 auto; }
 .mgdb-modern .mgdb-site-footer { margin-top: 0; }
 
-/* Legacy #content is `width: 1080px; margin: 0 100px`, which sums to the 1280px
-   wrapper. Reproducing that as a centred max-width keeps modernized pages
-   aligned with the site header at desktop widths while letting them go
-   edge-to-edge once the viewport is narrower than the content column. */
+/* One rail for the whole page.
+
+   The header, nav, content, and footer all sit inside #wrapper and each add the
+   same --mgdb-gutter, so they share a left and right edge: content lines up with
+   the MaizeGDB logo on the left and the end of the search field on the right.
+   Legacy #content is `width: 1080px; margin: 0 100px`, which inset the content
+   about 100px from the header and read as a wide empty margin. */
 .mgdb-modern #content {
   width: 100%;
-  max-width: 1080px;
+  max-width: none;
   min-height: 0;
   margin-inline: auto;
   padding-inline: 0;
 }
-
-/* Data-dense pages can opt out of the 1080px column and use the full wrapper. */
-.mgdb-modern.mgdb-wide #content { max-width: none; }
 
 /* The shell nests content in layout tables; let them collapse when narrow.
    border-spacing must be zeroed too, or the default 2px pushes the row past
@@ -853,10 +853,12 @@ body.mgdb-modern {
   background: linear-gradient(135deg, #16351f, #24502c 60%, #2f6134);
 }
 
+/* The bar shares the page rail, so it starts under the logo and ends under the
+   search field rather than being inset inside them. */
 .mgdb-site-nav #menu_bar,
 .mgdb-site-nav .menu {
   width: 100%;
-  max-width: var(--mgdb-max-width);
+  max-width: none;
   margin-inline: auto;
 }
 
@@ -905,6 +907,13 @@ body.mgdb-modern {
 .mgdb-site-footer :focus-visible { outline: 3px solid var(--mgdb-gold); outline-offset: 2px; }
 
 @media (max-width: 767px) {
+  /* .mgdb-page tightens its padding at this breakpoint to win back width on a
+     phone. The chrome has to tighten with it or the rail breaks and the logo no
+     longer lines up with the content beneath it. */
+  .mgdb-site-header,
+  .mgdb-site-nav,
+  .mgdb-site-footer { padding-inline: var(--mgdb-space-4); }
+
   .mgdb-site-header-inner { gap: var(--mgdb-space-3); }
   .mgdb-site-brand img { width: 180px; }
   .mgdb-site-search { flex: 1 1 100%; max-width: none; }

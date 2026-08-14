@@ -483,10 +483,12 @@
    below adapts that to narrow viewports; none of it exists upstream.
    ========================================================================== */
 
-/* The bar itself must be fluid or it forces the page to scroll sideways. */
+/* The bar itself must be fluid or it forces the page to scroll sideways. No
+   max-width: it shares the page rail set by .mgdb-site-nav's padding, so it
+   starts under the logo and ends under the search field. */
 .mgdb-modern #menu_bar {
   width: 100%;
-  max-width: 1080px;
+  max-width: none;
   margin-inline: auto;
 }
 
