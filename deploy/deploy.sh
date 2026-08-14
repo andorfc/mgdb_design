@@ -14,8 +14,19 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-HOST="development-server"
-WEBROOT="/var/www/claude/html"
+
+# Host and web root live in an untracked local file so they stay out of the
+# repository. See deploy/config.example.sh.
+CONFIG="${REPO_ROOT}/deploy/config.local.sh"
+if [ ! -f "$CONFIG" ]; then
+  echo "missing $CONFIG — copy deploy/config.example.sh and fill it in" >&2
+  exit 2
+fi
+# shellcheck source=/dev/null
+. "$CONFIG"
+: "${HOST:?HOST not set in deploy/config.local.sh}"
+: "${WEBROOT:?WEBROOT not set in deploy/config.local.sh}"
+
 MANIFEST="${REPO_ROOT}/deploy/manifest.txt"
 STAMP="$(date +%Y%m%d-%H%M%S)"
 BACKUP_DIR="${REPO_ROOT}/backups/${STAMP}"

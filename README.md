@@ -3,8 +3,8 @@
 Modernization of MaizeGDB pages against the Page Modernization Standard, built
 and verified on the `claude` development instance.
 
-- Development host: `dev8.usda.iastate.edu` (`ssh development-server`)
-- Web root: `/var/www/claude/html`
+- Development host and web root: configured locally in `deploy/config.local.sh`
+  (copy `deploy/config.example.sh`). Kept out of the repository.
 - Development URL: <https://claude.maizegdb.org/>
 - Pattern library: <https://claude.maizegdb.org/pattern_library/>
 
@@ -44,7 +44,7 @@ target into `backups/<timestamp>/`, so a rollback is always available.
 ## Rollback
 
 ```bash
-scp backups/<timestamp>/css/mgdb-modern.css development-server:/var/www/claude/html/css/mgdb-modern.css
+scp backups/<timestamp>/css/mgdb-modern.css development-server:<webroot>/css/mgdb-modern.css
 ```
 
 To roll back the shell entirely, restore `lib/Bauplan.php` from the earliest

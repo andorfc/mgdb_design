@@ -83,9 +83,9 @@ Status values: `proposed` · `approved` · `implemented` · `rejected` · `defer
 
 - **Date:** 2026-08-14
 - **Affected component:** `templates/maizegdb-main.bau`
-- **Current limitation:** Every page loads jQuery 1.8.0 (2012) and jQuery UI 1.9.0 from a public CDN, plus NGL 0.10.4 from `unpkg`. jQuery 1.8.0 carries known XSS advisories and is long out of support. Third-party CDNs are also a page-load dependency and an availability risk.
+- **Current limitation:** Every page loads jQuery, jQuery UI, and NGL from public CDNs. The jQuery major version in use predates 2013 and is no longer security-supported; advisories affecting that line are publicly catalogued and apply here. Third-party CDNs are also a page-load dependency and an availability risk. Exact versions are visible in `templates/maizegdb-main.bau` on the instance and are deliberately not restated here.
 - **Proposed change:** Plan an upgrade path (jQuery 3.x with `jquery-migrate`, or removal where unused) and self-host the libraries.
-- **Expected benefit:** Removes known-vulnerable code; removes external runtime dependencies; improves load reliability.
+- **Expected benefit:** Removes unsupported code paths; removes external runtime dependencies; improves load reliability.
 - **Risk and rollback:** High — a jQuery major-version upgrade affects 308 controllers and must be staged and regression-tested. Not required for the redesign; recorded for planning.
 - **Required administrator:** MaizeGDB application maintainer + security review
 - **Status:** proposed — informational, not blocking

@@ -1,21 +1,26 @@
 # MaizeGDB Redesign — Baseline Audit
 
 Date: 2026-08-14
-Instance audited: `dev8.usda.iastate.edu` → `https://claude.maizegdb.org/`
+Instance audited: the development instance (`development-server` ssh alias; see
+`deploy/config.local.sh`)
 Reference page: `/maize_meeting/`
+
+Server paths below are written relative to the instance web root, referred to as
+`<webroot>`. The concrete host and path are kept in the untracked local deploy
+configuration rather than in this repository.
 
 ## Application architecture
 
 | Layer | Location | Notes |
 | --- | --- | --- |
-| Page controller | `/var/www/claude/html/<section>/index.php` | Plain PHP 8.2.28; builds a `Bauplan` object, registers CSS/JS, loads templates, calls `publish()` |
-| Template engine | `/var/www/claude/html/lib/Bauplan.php` + `lib/libbau/` | In-house engine, `.bau` files, `$$SYNTAX-LEVEL 2` |
+| Page controller | `<webroot>/<section>/index.php` | Plain PHP 8.2.28; builds a `Bauplan` object, registers CSS/JS, loads templates, calls `publish()` |
+| Template engine | `<webroot>/lib/Bauplan.php` + `lib/libbau/` | In-house engine, `.bau` files, `$$SYNTAX-LEVEL 2` |
 | Global shell | `templates/maizegdb-main.bau` | Header, logo, search box, megamenu, `*(body)` slot, footer |
 | Page body | `templates/static/<page>.bau` | Loaded over HTTP via `loadRemote($root_url_private . '/templates/static/<page>.bau')` |
 | Page CSS | `/css/<page>.css` | One file per page, 72 files total |
 | Page JS | `/js/<page>.js` | |
 | Charting | `/js/lib/plotly/plotly-2.25.2.min.js` | Served locally, already pinned |
-| Config | `/var/www/claude/conf/mgdb.conf`, `conf/db.conf` | Contains DB credentials — never copy into the repo |
+| Config | `<instance-conf>/mgdb.conf`, `conf/db.conf` | Contains DB credentials — never copy into the repo |
 
 Scale: 308 controller PHP files, 743 `.bau` templates, 72 CSS files.
 
@@ -99,20 +104,20 @@ The spec requires "avoid body text smaller than approximately 16px unless space 
 genuinely constrained." The current exemplar does not meet this, and neither does
 the site baseline. This is also the single largest Section 508 / WCAG gap.
 
-### 6. Unpinned third-party scripts on every page
+### 6. Out-of-support third-party scripts on every page
 
-`templates/maizegdb-main.bau` loads jQuery 1.8.0 (2012) and jQuery UI 1.9.0 from
-`cdnjs`, NGL 0.10.4 from `unpkg`, plus two Atlassian issue-collector scripts.
-jQuery 1.8.0 has known XSS advisories. Versions are pinned in the URL, but the
-libraries themselves are long out of support.
+`templates/maizegdb-main.bau` loads jQuery, jQuery UI, and NGL from public CDNs,
+plus two Atlassian issue-collector scripts. The versions are pinned in the URL,
+but several are more than a decade old and no longer receive security support.
 
-Not blocking for the redesign, but worth recording.
+Not blocking for the redesign. Tracked as AD-005; specifics are recorded there
+for the maintainers rather than in this summary.
 
 ## Deployment constraints
 
-- `git` is **not installed** on the dev server. The repo is therefore local
-  (`/Users/carsonandorf/Documents/ClaudeCode/maizegdb-redesign`) and files are
-  pushed with `deploy/deploy.sh` over `ssh`/`scp`.
+- `git` is **not installed** on the dev server. The repository therefore lives on
+  the developer workstation and files are pushed with `deploy/deploy.sh` over
+  `ssh`/`scp`.
 - `rsync` is **not installed** either; `scp` and `tar` are available.
 - The webroot is group-writable by `mgdbadmin`; the account is a member, so
   direct writes work.
