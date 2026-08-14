@@ -1,0 +1,132 @@
+$$SYNTAX-LEVEL 2
+*(maizegdb-main 
+  {
+   include-css: /css/index.css | 
+   include-css: /css/background_static.css |
+   include-css: /css/megamenu.css |
+   include-css: /ie/ie6.css |
+   include-css: /tools/shadowbox/shadowbox-3.0.3/shadowbox.css |
+   
+   include-js: https\://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.0/jquery.min.js |
+   include-js: https\://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.9.0/jquery-ui.min.js | 
+   include-js: https\://unpkg.com/ngl@0.10.4/dist/ngl.js | 
+   include-js: /js/api_js.js |
+   include-js: /tools/shadowbox/shadowbox-3.0.3/shadowbox.js |
+   include-js: https\://maizegdb.atlassian.net/s/d41d8cd98f00b204e9800998ecf8427e-T/-3o5b4z/b/5/c95134bc67d3a521bb3f4331beb9b804/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin\:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin\:issuecollector.js?locale=en-US&collectorId=883299e6 | 
+   include-js: https\://maizegdb.atlassian.net/s/d41d8cd98f00b204e9800998ecf8427e-T/tod1zk/b/5/c95134bc67d3a521bb3f4331beb9b804/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin\:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin\:issuecollector.js?locale=en-US&collectorId=dddb1a6c
+  }
+  
+  @(lambda {display: off}
+    ;; 'lambda' 'get()' won't call this section.
+    ;; Useful for declaring variables with default values used in multiple places.
+    $(image-dir {default: /images})
+  )
+  
+  <div id="wrapper">
+    <table><tr><td width="100%">
+    <div id="$(logo-id)">
+      <table width='100%'>
+        <tr>
+          <td valign='top'>
+            <a href="$(server-url)"  id="logo_link">MaizeGDB</a>
+          </td>
+          <td valign='top'>
+            *(top-right-menu {load: templates/home/top-right-menu.bau}
+              &(lambda
+                $image_dir  = $this->reflect(\)->upstream('maizegdb-main'\)->get('image-dir'\);
+                $server_url = $this->reflect(\)->upstream('maizegdb-main'\)->get('server-url'\);
+          
+                $loaded = $this->reflect(\)->_parent(\);
+                if ($loaded->has('image-dir'\)\)
+                  $loaded->get('image-dir'\)->replace($image_dir->value(\)\); 
+                if ($loaded->has('server-url'\)\)
+                  $loaded->get('server-url'\)->replace($server_url->value(\)\);
+              )
+            )
+            <br><br><br>
+            *(search-box {load: templates/home/search-box.bau}
+              &(lambda
+                $image_dir  = $this->reflect(\)->upstream('maizegdb-main'\)->get('image-dir'\);
+                $server_url = $this->reflect(\)->upstream('maizegdb-main'\)->get('server-url'\);
+          
+                $loaded = $this->reflect(\)->_parent(\);
+                if ($loaded->has('image-dir'\)\)
+                  $loaded->get('image-dir'\)->replace($image_dir->value(\)\); 
+                if ($loaded->has('server-url'\)\)
+                  $loaded->get('server-url'\)->replace($server_url->value(\)\);
+              )
+                         
+            )
+          </td>
+        </tr>
+      </table>
+    </div>
+    *(megamenu)
+    <br>
+    <div id="whitecurve">
+      <img id="content_top" width="100%" src="$(image-dir)/content_top.png">
+    </div>
+      <div id="content">
+<!--
+        <div id="red_background" style="font-weight: bold; margin-top: 0px; width: 95%">
+        </div>
+-->
+        *(body)
+      </div>
+      <div id="whitecurve">
+        <img id="content_bottom" width="100%" src="$(image-dir)/content_bottom.png">
+      </div>
+      <br>
+      <div id="footer">
+        <div align="center">
+          <table border="0" cellpadding="0" cellspacing="0">
+            <tr>
+              <td>
+                <ul id="footer_menu" class="menu menu_green" style='height:40px;'>
+                  <li id="nodrop" class="nodrop"><a class="nodrop" href="$(server-url)/contact">$(footer_contact)</a></li>
+                  <li id="nodrop" class="nodrop"><a class="nodrop" href="$(server-url)/cite">$(footer_cite)</a></li>
+                  <li style="float:right">
+                    <a href="http://www.usda.gov/"><img src="/images/USDA.png" alt="USDA" border=0 height="30px"></a>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+          </table>
+          <br>
+        </div>
+      </div> 
+    </td></tr></table>
+  </div>
+
+  <script type="text/javascript">
+    window.ATL_JQ_PAGE_PROPS = {
+  	  '883299e6': {  // feedback
+  	    "triggerFunction": function(showCollectorDialog\) {
+          //Requires that jQuery is available! 
+          jQuery(".feedback-form"\).click(function(e\) {
+            debugger;
+			      e.preventDefault(\);
+			      showCollectorDialog(\);
+		      }\);
+	      },
+	      fieldValues: {
+	        recordWebInfo: '1', // field Name
+          recordWebInfoConsent: ['1'] // field Id
+	      }
+	    },
+	    'dddb1a6c': {  // gene model
+        "triggerFunction": function(showCollectorDialog\) {
+          jQuery(".trigger_gene_model_issue_form"\).click(function(e\) {
+            e.preventDefault(\);
+            showCollectorDialog(\);
+          }\);
+        },
+        fieldValues: {
+	        recordWebInfo: '1', // field Name
+          recordWebInfoConsent: ['1'], // field Id
+        }
+      }
+    };
+	</script>
+)
+
