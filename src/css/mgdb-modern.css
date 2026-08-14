@@ -110,6 +110,7 @@
 
   /* Layout */
   --mgdb-max-width: 1280px;
+  --mgdb-page-blue: #0641a5;   /* the original MaizeGDB page ground */
   --mgdb-gutter: var(--mgdb-space-5);
   --mgdb-tap-target: 44px;      /* WCAG 2.5.8 minimum */
 }
@@ -195,11 +196,32 @@
    legacy page reflows. See ADMIN_DEPENDENCIES.md AD-003.
    -------------------------------------------------------------------------- */
 
+/* The MaizeGDB blue page ground, kept from the original site. Legacy pages get
+   it from css/background_static.css, which modern pages do not load, so it is
+   set on the body here. With no background on <html> the body's paints the
+   whole canvas, so this covers the viewport at any scroll position. */
+body.mgdb-modern {
+  margin: 0;
+  background: var(--mgdb-page-blue);
+}
+
+/* The white page card. A flex column with min-height 100vh so a short page
+   still fills the viewport and drops its footer to the bottom, while a long
+   page simply grows — no gap of blue under the footer either way. */
 .mgdb-modern #wrapper {
+  display: flex;
   width: 100%;
   max-width: var(--mgdb-max-width);
+  min-height: 100vh;
+  flex-direction: column;
   margin-inline: auto;
+  background: var(--mgdb-surface);
+  box-shadow: 0 0 34px rgba(4, 26, 66, .34);
 }
+
+/* Takes the slack so the footer stays at the bottom on short pages. */
+.mgdb-modern #content { flex: 1 1 auto; }
+.mgdb-modern .mgdb-site-footer { margin-top: 0; }
 
 /* Legacy #content is `width: 1080px; margin: 0 100px`, which sums to the 1280px
    wrapper. Reproducing that as a centred max-width keeps modernized pages
@@ -822,9 +844,25 @@
 
 /* Modern site navigation -------------------------------------------------- */
 
-.mgdb-site-nav { background: var(--mgdb-green-dark); }
-.mgdb-site-nav .menu,
-.mgdb-site-nav #menu_bar { margin-inline: auto; background: none; }
+/* The nav wrapper is only a positioning band. The mega menu draws its own
+   rounded bar, so giving this element a background too produced the doubled
+   layer visible in review — a green slab behind a slightly different green
+   pill. It stays transparent and inherits the header's ground instead. */
+.mgdb-site-nav {
+  padding: 0 var(--mgdb-gutter) var(--mgdb-space-3);
+  background: linear-gradient(135deg, #16351f, #24502c 60%, #2f6134);
+}
+
+.mgdb-site-nav #menu_bar,
+.mgdb-site-nav .menu {
+  width: 100%;
+  max-width: var(--mgdb-max-width);
+  margin-inline: auto;
+}
+
+/* The header and nav are one continuous green field; the header's own bottom
+   padding would otherwise show as a seam between them. */
+.mgdb-site-header { padding-bottom: var(--mgdb-space-3); }
 
 /* Modern footer ----------------------------------------------------------- */
 

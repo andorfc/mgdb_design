@@ -1,0 +1,77 @@
+$$SYNTAX-LEVEL 2
+
+UNUSED
+
+*(blast {include-js: js/blast.js}
+  
+    <a href="#" class="drop">$(blast_name)</a><!-- Begin BLAST Item -->
+    <span id="blast_menu"><div class="dropdown_3columns "><!-- Begin BLAST container -->
+        <div class="col_3 firstcolumn">
+        <h2 class="blast">BLAST at MaizeGDB</h2>
+           <div class="col_1 firstcolumn" style="padding-right: 10px;">
+             <ul class="greybox">
+               <li><a href="$(blast_url)">BLAST</a></li>
+              </ul>
+             </div>
+             <div style="font-size: 12px;">
+              <b>BLAST</b> allows you to simultaneously BLAST datasets at many different websites.
+             </div>
+             <div class="col_1 firstcolumn" style="padding-right: 10px;">
+              <ul class="greybox">
+                <li><a href="/popcorn/search/sequence_search/home.php?a=SEQUENCE_SEARCH_UI">Search by sequence</a></li>
+               </ul>
+             </div>
+             <div style="font-size: 12px;">
+              <b>Search by sequence</b> allows you to find resources like seed stocks and literature based on a sequence input.
+             </div>
+             
+<!--
+            <form method="post" target="_blank" ACTION="/popcorn/search/sequence_search/home.php?a=BLAST_UI" 
+                  ENCTYPE="application/x-www-form-urlencoded">
+                <h2 class="blast">BLAST at MaizeGDB</h2>
+                <table>
+                    <tr>
+                        <td>
+                            <a href="/popcorn/search/sequence_search/home.php?a=BLAST_UI">MaizeGDB BLAST page</a><br><br>
+                        </td>
+                        
+                    </tr>
+                    <tr><th><label for="3">Database</label></th></tr>
+                    <tr>
+                        <td>
+                            <SELECT class="blast" ID="3" NAME="selected_datasets"> 
+                                <OPTION SELECTED VALUE="MaizeGDB--ZmB73_v2--B73 RefGen_v2 (MGSC\)--B73 Reference Genome, assembly B73 RefGen_v2--27">B73 RefGen_v2
+                                <OPTION VALUE="MaizeGDB--maize_v2.supermasked--B73 RefGen_v2 supermasked (Freeling lab, UC-Berkeley, 5/2010\)--Masked assembly sequences: The genome is first masked to 50X where each chromosome is BLASTed against all chromosomes. Any bp that is covered more than 50X is changed to &quot;N.&quot; The masked genome is then BLASTed against itself. Any bp that is covered more than 50X is changed to &quot;N.&quot;--28">B73 RefGen_v2 Super Masked
+                                <OPTION VALUE="MaizeGDB--ZmB73_AGPv1--B73 RefGen_v1 (MGSC\)--B73 Reference Genome, assembly B73 RefGen_v1.--25">B73 RefGen_v1
+                                <OPTION VALUE="101">B73 RefGen_v1 Masked
+                                <OPTION VALUE="102">B73 RefGen_v1 Super Masked
+                                <OPTION VALUE="10">BACs
+                                <OPTION VALUE="2">EST
+                                <OPTION VALUE="3">GSS
+                                <OPTION VALUE="5">MaizeNucleotide
+                            </SELECT>
+                        </td>
+                        <td>
+                            <input type="hidden" name="a" value="BLAST_UI">
+                            <input type="hidden" name="seq_type" value="nucleotide">
+                        </td>
+                    </tr>
+                    <tr><td><label for="5">Sequence</label></td></tr>
+                    <tr>
+                        <td>
+                            <textarea class="searchtools_big" cols="40" rows="10" name="sequence" ID="5"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <INPUT TYPE="submit" NAME="action" VALUE="BLAST!">&nbsp;&nbsp;
+                            <INPUT TYPE="reset" NAME="rs" VALUE="Clear">&nbsp;&nbsp;<a href="javascript:changeExample('CN844532'\)">(see an example\)</a>
+                        </td>
+                    </tr>
+                </table>
+            </form>-->
+        </div>
+    </div>
+   </span>
+   <!-- End BLAST container -->
+)

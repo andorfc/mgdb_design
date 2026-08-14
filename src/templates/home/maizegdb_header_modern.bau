@@ -1,0 +1,136 @@
+$$SYNTAX-LEVEL 2
+*(maizegdb_header_modern {include-js: /js/google_analytics.js}
+  @(lambda {display: off}
+      $(image-dir {default: /images})
+      $(icon-dir {default: /icon})
+  )
+
+<!-- $(gbrowse_url) -->
+
+  <ul id="menu_bar" class="menu menu_green">
+    <li id="nodrop">
+        <a href="/">$(home_name)</a>
+    </li>
+    
+    <li class="mega-has-dropdown">
+      *(about-item {load: templates/home/megamenu_modern/about.bau}
+        ;; manually pass scoped variables for now
+        &(lambda
+          $image_dir = $this->reflect(\)->upstream('maizegdb_header_modern'\)->get('image-dir'\);
+          $icon_dir  = $this->reflect(\)->upstream('maizegdb_header_modern'\)->get('icon-dir'\);
+          
+          $loaded = $this->reflect(\)->_parent(\);
+          if ($loaded->has('image-dir'\)\)
+            $loaded->get('image-dir'\)->replace($image_dir->value(\)\); 
+          if ($loaded->has('icon-dir'\)\)
+            $loaded->get('icon-dir'\)->replace($icon_dir->value(\)\);
+        )
+      )
+    </li>
+    <li class="fullwidth mega-community-item mega-has-dropdown">
+      *(community-item {load: templates/home/megamenu_modern/community.bau}
+        &(lambda
+          $image_dir = $this->reflect(\)->upstream('maizegdb_header_modern'\)->get('image-dir'\);
+          $icon_dir  = $this->reflect(\)->upstream('maizegdb_header_modern'\)->get('icon-dir'\);
+          
+          $loaded = $this->reflect(\)->_parent(\);
+          if ($loaded->has('image-dir'\)\)
+            $loaded->get('image-dir'\)->replace($image_dir->value(\)\); 
+          if ($loaded->has('icon-dir'\)\)
+            $loaded->get('icon-dir'\)->replace($icon_dir->value(\)\);
+        )
+      )
+    </li>
+
+    <li class="mega-has-dropdown">
+      *(genomes-item {load: templates/home/megamenu_modern/genomes.bau}
+        &(lambda
+          $image_dir = $this->reflect(\)->upstream('maizegdb_header_modern'\)->get('image-dir'\);
+          $icon_dir  = $this->reflect(\)->upstream('maizegdb_header_modern'\)->get('icon-dir'\);
+          
+          $loaded = $this->reflect(\)->_parent(\);
+          if ($loaded->has('image-dir'\)\)
+            $loaded->get('image-dir'\)->replace($image_dir->value(\)\); 
+          if ($loaded->has('icon-dir'\)\)
+            $loaded->get('icon-dir'\)->replace($icon_dir->value(\)\);
+        )
+      )
+    </li>
+      
+    <li class="fullwidth mega-tools-item mega-has-dropdown">
+      *(tools-item {load: templates/home/megamenu_modern/tools.bau}
+        &(lambda
+          $image_dir = $this->reflect(\)->upstream('maizegdb_header_modern'\)->get('image-dir'\);
+          $icon_dir  = $this->reflect(\)->upstream('maizegdb_header_modern'\)->get('icon-dir'\);
+          
+          $loaded = $this->reflect(\)->_parent(\);
+          if ($loaded->has('image-dir'\)\)
+            $loaded->get('image-dir'\)->replace($image_dir->value(\)\); 
+          if ($loaded->has('icon-dir'\)\)
+            $loaded->get('icon-dir'\)->replace($icon_dir->value(\)\);
+        )
+      )
+    </li>
+      
+    <li class="fullwidth mega-data-centers-item mega-has-dropdown">
+      *(data-centers-item {load: templates/home/megamenu_modern/data-centers.bau}
+        &(lambda
+          $image_dir = $this->reflect(\)->upstream('maizegdb_header_modern'\)->get('image-dir'\);
+          $icon_dir  = $this->reflect(\)->upstream('maizegdb_header_modern'\)->get('icon-dir'\);
+          
+          $loaded = $this->reflect(\)->_parent(\);
+          if ($loaded->has('image-dir'\)\)
+            $loaded->get('image-dir'\)->replace($image_dir->value(\)\); 
+          if ($loaded->has('icon-dir'\)\)
+            $loaded->get('icon-dir'\)->replace($icon_dir->value(\)\);
+        )
+      )
+    </li>
+    
+   <li>
+    *(sitemap-item {load: templates/home/megamenu_modern/sitemap.bau}
+      &(lambda
+        $image_dir = $this->reflect(\)->upstream('maizegdb_header_modern'\)->get('image-dir'\);
+        $icon_dir  = $this->reflect(\)->upstream('maizegdb_header_modern'\)->get('icon-dir'\);
+        
+        $loaded = $this->reflect(\)->_parent(\);
+        if ($loaded->has('image-dir'\)\)
+          $loaded->get('image-dir'\)->replace($image_dir->value(\)\); 
+        if ($loaded->has('icon-dir'\)\)
+          $loaded->get('icon-dir'\)->replace($icon_dir->value(\)\);
+      )
+    )
+    </li>
+     
+    <li class="right">
+      *(feedback-item {load: templates/home/megamenu_modern/feedback.bau}
+        &(lambda
+          $image_dir = $this->reflect(\)->upstream('maizegdb_header_modern'\)->get('image-dir'\);
+          $icon_dir  = $this->reflect(\)->upstream('maizegdb_header_modern'\)->get('icon-dir'\);
+          
+          $loaded = $this->reflect(\)->_parent(\);
+          if ($loaded->has('image-dir'\)\)
+            $loaded->get('image-dir'\)->replace($image_dir->value(\)\); 
+          if ($loaded->has('icon-dir'\)\)
+            $loaded->get('icon-dir'\)->replace($icon_dir->value(\)\);
+        )
+      )
+    </li>
+
+    <li class="mega-search-legacy" aria-hidden="true">
+      *(search-item {load: templates/home/megamenu_modern/search.bau}
+        &(lambda
+          $image_dir = $this->reflect(\)->upstream('maizegdb_header_modern'\)->get('image-dir'\);
+          $icon_dir  = $this->reflect(\)->upstream('maizegdb_header_modern'\)->get('icon-dir'\);
+
+          $loaded = $this->reflect(\)->_parent(\);
+          if ($loaded->has('image-dir'\)\)
+            $loaded->get('image-dir'\)->replace($image_dir->value(\)\);
+          if ($loaded->has('icon-dir'\)\)
+            $loaded->get('icon-dir'\)->replace($icon_dir->value(\)\);
+        )
+      )
+    </li>
+
+  </ul>
+)

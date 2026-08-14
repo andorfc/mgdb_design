@@ -1,0 +1,570 @@
+/* ==========================================================================
+   MaizeGDB Modern — mega menu
+   --------------------------------------------------------------------------
+   Ported from the mega-menu work in the MaizeGDB website repository, scoped
+   under .mgdb-modern so legacy pages keep the original menu exactly as it is.
+
+   Paired with templates/home/megamenu_modern/*.bau, which supply the .mega-*
+   markup these rules style. The legacy templates in templates/home/megamenu/
+   are untouched.
+   ========================================================================== */
+
+
+/*  _______________________________________
+
+    06 MODERN MAIZEGDB MEGA MENU
+    Scoped to the main header so legacy footer menus keep their layout.
+    _______________________________________  */
+
+.mgdb-modern #menu_bar {
+	display:flex;
+	align-items:center;
+	box-sizing:border-box;
+	width:1080px;
+	height:42px;
+	padding:0 10px;
+	border:1px solid rgba(255,255,255,.25);
+	border-radius:11px;
+	background:linear-gradient(to bottom, #658c26 0%, #354914 100%);
+	box-shadow:0 5px 16px rgba(22,52,9,.18), inset 0 1px 0 rgba(255,255,255,.18);
+}
+
+.mgdb-modern #menu_bar > li,
+.mgdb-modern #menu_bar > li.right {
+	float:none;
+	display:block;
+	margin:0 2px;
+	border:0;
+	border-radius:7px;
+}
+
+.mgdb-modern #menu_bar > li.right {
+	margin-left:auto;
+}
+
+.mgdb-modern #menu_bar > li.right:hover,
+.mgdb-modern #menu_bar > li.right:focus-within {
+	margin-left:auto;
+	margin-right:2px;
+}
+
+.mgdb-modern #menu_bar > li.mega-search-legacy {
+	display:none;
+}
+
+.mgdb-modern #menu_bar > li.fullwidth {
+	position:relative !important;
+}
+
+/* Keep hover active while the pointer crosses from a trigger to its panel. */
+.mgdb-modern #menu_bar > li.mega-has-dropdown:after {
+	content:"";
+	position:absolute;
+	left:-3px;
+	right:-3px;
+	top:100%;
+	height:10px;
+	pointer-events:auto;
+}
+
+.mgdb-modern #menu_bar > li > a {
+	box-sizing:border-box;
+	min-height:34px;
+	padding:7px 10px;
+	border:1px solid transparent;
+	border-radius:7px;
+	color:#fff;
+	font-size:13px;
+	font-weight:600;
+	line-height:18px;
+	letter-spacing:.01em;
+	text-shadow:none;
+	white-space:nowrap;
+}
+
+.mgdb-modern #menu_bar > li > a.drop {
+	padding-right:25px;
+	background:none;
+}
+
+.mgdb-modern #menu_bar > li > a.drop:after {
+	content:"";
+	position:absolute;
+	top:50%;
+	right:9px;
+	width:6px;
+	height:6px;
+	margin-top:-5px;
+	border-right:2px solid rgba(255,255,255,.75);
+	border-bottom:2px solid rgba(255,255,255,.75);
+	transform:rotate(45deg);
+	transition:transform .16s ease, margin .16s ease;
+}
+
+.mgdb-modern #menu_bar > li:hover,
+.mgdb-modern #menu_bar > li:focus-within {
+	margin:0 2px;
+	border:0;
+	border-radius:7px;
+	background:rgba(255,255,255,.14);
+}
+
+.mgdb-modern #menu_bar > li:hover > a,
+.mgdb-modern #menu_bar > li:focus-within > a {
+	padding:7px 10px;
+	border:1px solid rgba(255,255,255,.18);
+	border-radius:7px;
+	color:#fff;
+	background:rgba(255,255,255,.06);
+}
+
+.mgdb-modern #menu_bar > li:hover > a.drop,
+.mgdb-modern #menu_bar > li:focus-within > a.drop {
+	padding-right:25px;
+	background:none;
+}
+
+.mgdb-modern #menu_bar > li:hover > a.drop:after,
+.mgdb-modern #menu_bar > li:focus-within > a.drop:after {
+	margin-top:-1px;
+	transform:rotate(225deg);
+}
+
+.mgdb-modern #menu_bar .mega-explore-link {
+	color:#fff4bd;
+}
+
+.mgdb-modern #menu_bar .mega-feedback-link {
+	margin-left:4px;
+	border-color:rgba(168,207,255,.62);
+	background:#185fa6;
+}
+
+.mgdb-modern #menu_bar > li:hover .mega-feedback-link,
+.mgdb-modern #menu_bar > li:focus-within .mega-feedback-link {
+	border-color:#d9eaff;
+	background:#0d4e8d;
+}
+
+.mgdb-modern #menu_bar .mega-dropdown {
+	box-sizing:border-box;
+	margin:0;
+	padding:0;
+	overflow:hidden;
+	border:1px solid #cbd6c5;
+	border-radius:12px;
+	background:#fff;
+	box-shadow:0 20px 46px rgba(20,43,13,.22), 0 4px 12px rgba(20,43,13,.12);
+	color:#263522;
+	font-family:Arial, Helvetica, sans-serif;
+}
+
+.mgdb-modern #menu_bar .mega-dropdown-about,
+.mgdb-modern #menu_bar .mega-dropdown-genomes {
+	width:765px;
+}
+
+.mgdb-modern #menu_bar > li:hover .mega-dropdown,
+.mgdb-modern #menu_bar > li:focus-within .mega-dropdown {
+	top:37px;
+}
+
+.mgdb-modern #menu_bar > li:hover .mega-dropdown-about,
+.mgdb-modern #menu_bar > li:focus-within .mega-dropdown-about,
+.mgdb-modern #menu_bar > li:hover .mega-dropdown-genomes,
+.mgdb-modern #menu_bar > li:focus-within .mega-dropdown-genomes {
+	left:-1px;
+}
+
+.mgdb-modern #menu_bar > li:hover .dropdown_fullwidth,
+.mgdb-modern #menu_bar > li:focus-within .dropdown_fullwidth {
+	top:37px;
+}
+
+.mgdb-modern #menu_bar > li.mega-community-item:hover .dropdown_fullwidth,
+.mgdb-modern #menu_bar > li.mega-community-item:focus-within .dropdown_fullwidth {
+	left:-143px;
+}
+
+.mgdb-modern #menu_bar > li.mega-tools-item:hover .dropdown_fullwidth,
+.mgdb-modern #menu_bar > li.mega-tools-item:focus-within .dropdown_fullwidth {
+	left:-367px;
+}
+
+.mgdb-modern #menu_bar > li.mega-data-centers-item:hover .dropdown_fullwidth,
+.mgdb-modern #menu_bar > li.mega-data-centers-item:focus-within .dropdown_fullwidth {
+	left:-442px;
+}
+
+.mgdb-modern #menu_bar .mega-panel-heading {
+	box-sizing:border-box;
+	padding:20px 22px 16px;
+	border-bottom:1px solid #e4eae0;
+	background:linear-gradient(135deg, #f8fbf5 0%, #eef5e9 100%);
+}
+
+.mgdb-modern #menu_bar .mega-panel-heading-row {
+	display:flex;
+	align-items:center;
+	justify-content:space-between;
+	gap:20px;
+}
+
+.mgdb-modern #menu_bar .mega-eyebrow {
+	display:block;
+	margin-bottom:4px;
+	color:#557b2b;
+	font-size:10px;
+	font-weight:800;
+	line-height:14px;
+	letter-spacing:.13em;
+	text-transform:uppercase;
+}
+
+.mgdb-modern #menu_bar .mega-panel-heading h2,
+.mgdb-modern #menu_bar .mega-panel-heading h3,
+.mgdb-modern #menu_bar .mega-group h3,
+.mgdb-modern #menu_bar .mega-feature h3 {
+	margin:0;
+	padding:0;
+	border:0;
+	color:#203d17;
+	font-family:Arial, Helvetica, sans-serif;
+	font-weight:700;
+	text-shadow:none;
+}
+
+.mgdb-modern #menu_bar .mega-panel-heading h2 {
+	font-size:20px;
+	line-height:25px;
+}
+
+.mgdb-modern #menu_bar .mega-panel-heading p {
+	max-width:600px;
+	margin:5px 0 0;
+	color:#576453;
+	font-size:12px;
+	line-height:18px;
+}
+
+.mgdb-modern #menu_bar .mega-heading-action,
+.mgdb-modern #menu_bar li:hover div .mega-heading-action {
+	display:inline-flex;
+	align-items:center;
+	flex:0 0 auto;
+	gap:6px;
+	padding:8px 12px;
+	border:1px solid #b8cbaa;
+	border-radius:7px;
+	color:#315f19;
+	background:#fff;
+	font-size:11px;
+	font-weight:700;
+	line-height:15px;
+}
+
+.mgdb-modern #menu_bar li:hover div .mega-heading-action:hover,
+.mgdb-modern #menu_bar .mega-heading-action:focus {
+	border-color:#6d963d;
+	color:#244c10;
+	background:#f7fbf4;
+}
+
+.mgdb-modern #menu_bar .mega-grid {
+	display:grid;
+	box-sizing:border-box;
+	gap:16px;
+	padding:18px 20px 20px;
+}
+
+.mgdb-modern #menu_bar .mega-grid-3 {
+	grid-template-columns:repeat(3, minmax(0, 1fr));
+}
+
+.mgdb-modern #menu_bar .mega-grid-4 {
+	grid-template-columns:repeat(4, minmax(0, 1fr));
+}
+
+.mgdb-modern #menu_bar .mega-grid-tools {
+	grid-template-columns:1.08fr repeat(3, 1fr);
+}
+
+.mgdb-modern #menu_bar .mega-group {
+	min-width:0;
+}
+
+.mgdb-modern #menu_bar .mega-group h3 {
+	margin:0 0 8px;
+	padding:0 4px 8px;
+	border-bottom:2px solid #d9e6d1;
+	color:#355c20;
+	font-size:12px;
+	line-height:17px;
+	letter-spacing:.02em;
+}
+
+.mgdb-modern #menu_bar .mega-group > a,
+.mgdb-modern #menu_bar li:hover div .mega-group > a {
+	display:flex;
+	flex-direction:column;
+	box-sizing:border-box;
+	margin:1px 0;
+	padding:7px 8px;
+	border:0;
+	border-radius:7px;
+	color:#263522;
+	line-height:16px;
+	text-decoration:none;
+}
+
+.mgdb-modern #menu_bar .mega-group > a strong {
+	color:#244c18;
+	font-size:12px;
+	font-weight:700;
+	line-height:16px;
+}
+
+.mgdb-modern #menu_bar .mega-group > a span {
+	margin-top:1px;
+	color:#687365;
+	font-size:10px;
+	line-height:14px;
+}
+
+.mgdb-modern #menu_bar li:hover div .mega-group > a:hover,
+.mgdb-modern #menu_bar .mega-group > a:focus {
+	color:#173b0b;
+	background:#eef6e9;
+}
+
+.mgdb-modern #menu_bar .mega-compact-groups .mega-group > a,
+.mgdb-modern #menu_bar li:hover div .mega-compact-groups .mega-group > a {
+	padding-top:5px;
+	padding-bottom:5px;
+}
+
+.mgdb-modern #menu_bar .mega-feature {
+	box-sizing:border-box;
+	min-width:0;
+	padding:16px;
+	border:1px solid #cbdcc0;
+	border-radius:10px;
+	background:#f3f8ef;
+}
+
+.mgdb-modern #menu_bar .mega-feature-blue {
+	border-color:#c5d8eb;
+	background:linear-gradient(145deg, #edf6fd 0%, #e4f0fa 100%);
+}
+
+.mgdb-modern #menu_bar .mega-feature .mega-badge {
+	display:inline-block;
+	margin-bottom:9px;
+	padding:3px 7px;
+	border-radius:999px;
+	color:#315f19;
+	background:#dcebcf;
+	font-size:9px;
+	font-weight:800;
+	line-height:13px;
+	letter-spacing:.08em;
+	text-transform:uppercase;
+}
+
+.mgdb-modern #menu_bar .mega-feature-blue .mega-badge {
+	color:#15548a;
+	background:#cfe4f5;
+}
+
+.mgdb-modern #menu_bar .mega-feature h3 {
+	margin-bottom:5px;
+	font-size:16px;
+	line-height:21px;
+}
+
+.mgdb-modern #menu_bar .mega-feature p {
+	margin:0 0 12px;
+	color:#556351;
+	font-size:11px;
+	line-height:17px;
+}
+
+.mgdb-modern #menu_bar .mega-feature-link,
+.mgdb-modern #menu_bar li:hover div .mega-feature-link {
+	display:flex;
+	align-items:center;
+	justify-content:space-between;
+	box-sizing:border-box;
+	width:100%;
+	padding:8px 10px;
+	border:0;
+	border-radius:7px;
+	color:#fff;
+	background:#3f7424;
+	font-size:11px;
+	font-weight:700;
+	line-height:15px;
+}
+
+.mgdb-modern #menu_bar .mega-feature-blue .mega-feature-link,
+.mgdb-modern #menu_bar li:hover div .mega-feature-blue .mega-feature-link {
+	background:#1a67a5;
+}
+
+.mgdb-modern #menu_bar li:hover div .mega-feature-link:hover,
+.mgdb-modern #menu_bar .mega-feature-link:focus {
+	color:#fff;
+	background:#2e5c17;
+}
+
+.mgdb-modern #menu_bar li:hover div .mega-feature-blue .mega-feature-link:hover,
+.mgdb-modern #menu_bar .mega-feature-blue .mega-feature-link:focus {
+	background:#10558e;
+}
+
+.mgdb-modern #menu_bar .mega-secondary-link,
+.mgdb-modern #menu_bar li:hover div .mega-secondary-link {
+	display:block;
+	margin-top:8px;
+	padding:0;
+	border:0;
+	color:#496941;
+	font-size:10px;
+	font-weight:600;
+	line-height:14px;
+}
+
+.mgdb-modern #menu_bar li:hover div .mega-secondary-link:hover,
+.mgdb-modern #menu_bar .mega-secondary-link:focus {
+	color:#245116;
+	text-decoration:underline;
+}
+
+.mgdb-modern #menu_bar .mega-panel-footer {
+	display:flex;
+	align-items:center;
+	padding:11px 22px;
+	border-top:1px solid #e1e8dd;
+	background:#f8faf7;
+}
+
+.mgdb-modern #menu_bar .mega-panel-footer-split {
+	justify-content:space-between;
+}
+
+.mgdb-modern #menu_bar .mega-panel-footer a,
+.mgdb-modern #menu_bar li:hover div .mega-panel-footer a {
+	display:inline-flex;
+	gap:6px;
+	padding:0;
+	border:0;
+	color:#32611b;
+	font-size:10px;
+	font-weight:700;
+	line-height:14px;
+}
+
+.mgdb-modern #menu_bar li:hover div .mega-panel-footer a:hover,
+.mgdb-modern #menu_bar .mega-panel-footer a:focus {
+	color:#173f08;
+	text-decoration:underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mgdb-modern #menu_bar > li > a.drop:after {
+		transition:none;
+	}
+}
+
+/* ==========================================================================
+   Responsive behaviour
+
+   The ported rules assume the original fixed 1080px desktop bar. Everything
+   below adapts that to narrow viewports; none of it exists upstream.
+   ========================================================================== */
+
+/* The bar itself must be fluid or it forces the page to scroll sideways. */
+.mgdb-modern #menu_bar {
+  width: 100%;
+  max-width: 1080px;
+  margin-inline: auto;
+}
+
+/* Panels are 765-920px wide and would overhang a laptop viewport once the bar
+   stops being exactly 1080px. Cap them and let tall ones scroll. */
+.mgdb-modern #menu_bar [class*="dropdown_"] {
+  max-width: calc(100vw - 2rem);
+  max-height: calc(100vh - 9rem);
+  overflow-y: auto;
+}
+
+@media (max-width: 900px) {
+  /* Below the drawer breakpoint the bar becomes a stacked list, so the flex
+     row, fixed height, pill radius, and shadow all come off. */
+  .mgdb-modern #menu_bar {
+    display: block;
+    height: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  .mgdb-modern #menu_bar[data-mgdb-nav="collapsed"] { display: none; }
+
+  .mgdb-modern #menu_bar > li,
+  .mgdb-modern #menu_bar > li.right {
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, .18);
+  }
+
+  /* margin-left:auto pushes Feedback and Search right on desktop; in a stacked
+     list that would leave a gap instead. */
+  .mgdb-modern #menu_bar > li.right,
+  .mgdb-modern #menu_bar > li.right:hover,
+  .mgdb-modern #menu_bar > li.right:focus-within { margin-left: 0; }
+
+  .mgdb-modern #menu_bar > li > a,
+  .mgdb-modern #menu_bar .mega-feedback-link {
+    display: block;
+    width: 100%;
+    min-height: var(--mgdb-tap-target);
+    padding: var(--mgdb-space-3) var(--mgdb-space-4);
+    border-radius: 0;
+    font-size: var(--mgdb-text-base);
+    text-align: left;
+  }
+
+  /* Panels stack inline beneath their trigger rather than floating over it. */
+  .mgdb-modern #menu_bar > li:hover [class*="dropdown_"],
+  .mgdb-modern #menu_bar > li:focus-within [class*="dropdown_"] {
+    position: static;
+    left: auto !important;
+    top: auto !important;
+    width: 100%;
+    max-width: 100%;
+    max-height: none;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  /* The panels are multi-column grids at desktop width. */
+  .mgdb-modern #menu_bar .mega-panel-body,
+  .mgdb-modern #menu_bar .mega-panel-columns,
+  .mgdb-modern #menu_bar .mega-panel-heading-row {
+    display: block;
+  }
+
+  .mgdb-modern #menu_bar [class*="col_"],
+  .mgdb-modern #menu_bar .mega-group,
+  .mgdb-modern #menu_bar .mega-feature {
+    width: 100%;
+    float: none;
+    margin: 0 0 var(--mgdb-space-3);
+  }
+}

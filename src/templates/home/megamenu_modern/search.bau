@@ -1,0 +1,66 @@
+$$SYNTAX-LEVEL 2
+*(search {include-js: /js/search.js}
+
+<!--
+	<a href="#" onclick="open_main_search(\);">$(search_name)</a>
+-->    
+    
+    <div id="search_box" style="display: none;"> <center>
+     <a href="#" id = "hideme" onclick="document.getElementById('hideme'\).style.display = 'none';"> Hide me! </a>
+      <form action="javascript:run_main_searchbox(document.getElementById('search'\).value, document.getElementById('showlist1'\).value\)">
+        <table align="right" cellpadding=0 cellspacing=0>
+            <tr valign="center">
+                <td valign='center'>
+                    <table cellpadding=0 cellspacing=6>
+                      <tr>
+                          <td>
+                                <input id="search" type="text" name="search" onclick="this.select(\)" value="Search" />
+                            </td>
+                            <td rowspan=2 valign='center' align='center' style="width: 25px;">
+                                <div align="center">
+                                   <input id="search_img" onclick = "run_main_searchbox(document.getElementById('search'\).value, document.getElementById('showlist1'\).value\)" type="image" name="search" src="$(image-dir)/search.png" border="0">
+                                   <img id="loader_img" style="display: none;" src="$(image-dir)/ajax-loader-small.gif">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="1">
+                                <select name="show" class="small" id="showlist1">
+                                    <option value="anything" selected="selected">all data</option>
+                                    <option value="goog">all static web pages</option>
+                                    <option value="gene_product">gene products</option>
+                                    <option value="refgenv2">genome browser</option>
+                                    <option value="refgenv2">&nbsp;-&nbsp;B73 RefGen_v2</option>
+                                    <option value="agp">&nbsp;-&nbsp;B73 RefGen_v1</option>
+<!--                                  <option value="gb">&nbsp;-&nbsp;BAC-based</option>
+                                      <option value="go">GO terms</option> -->
+                                    <option value="locus">loci</option>
+                                    <option value="map">maps</option>
+<!--                                  <option value="mp">metabolic pathways</option> -->
+                                    <option value="person">people/organizations</option>
+                                    <option value="phenotype">phenotypes/mutants</option>
+                                    <option value="marker" >probes/markers</option>
+                                    <option value="bac">&nbsp;-&nbsp;BACs</option>
+                                    <option value="est">&nbsp;-&nbsp;ESTs</option>
+<!--                                    <option value="snp">&nbsp;-&nbsp;Mo17 SNP</option> -->
+                                    <option value="overgo">&nbsp;-&nbsp;overgos</option>
+                                    <option value="ssr">&nbsp;-&nbsp;SSRs</option>
+                                    <option value="qtl">QTL experiments</option>
+                                    <option value="reference">references</option>
+<--                                    <option value="sequence">sequences</option>-->
+                                    <option value="stock">stocks</option>
+                                    <option value="qtltrait">traits</option>
+                                    <option value="variation">variations/alleles</option>
+                                    <option value="id">i.d. number</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        
+    </form> </center>
+  </div>
+
+)
