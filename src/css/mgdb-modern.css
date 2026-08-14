@@ -46,6 +46,9 @@
   --mgdb-green: #285d46;         /* 7.9:1 on white */
   --mgdb-green-dark: #174634;    /* 10.7:1 on white */
   --mgdb-green-soft: #edf6f1;
+  --mgdb-leaf: #4c7038;          /* 5.7:1 on white — headings on basic pages */
+  --mgdb-wine: #7a2c43;          /* 9.3:1 on white — eyebrows on basic pages */
+  --mgdb-sage: #f3f6f0;          /* basic-page header panel */
 
   /* Neutrals */
   --mgdb-ink: #1f2723;           /* 15.3:1 on white — body text */
@@ -472,6 +475,419 @@
 }
 
 /* --------------------------------------------------------------------------
+   3c. Modern site header, search, and footer
+
+   Used by templates/maizegdb-main-modern.bau. The legacy chrome rules in 3b
+   still apply to modern pages that use the original shell.
+   -------------------------------------------------------------------------- */
+
+.mgdb-site-header {
+  /* megamenu.css uses z-index values up to 98999. The header has to sit above
+     them or the nav bar paints over the open suggestions panel. The megamenu
+     panels open downward, away from the header, so they are unaffected. */
+  position: relative;
+  z-index: 99000;
+  padding: var(--mgdb-space-4) var(--mgdb-gutter);
+  background: linear-gradient(135deg, #16351f, #24502c 60%, #2f6134);
+}
+
+.mgdb-site-header-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4) var(--mgdb-space-6);
+  align-items: center;
+  justify-content: space-between;
+  max-width: var(--mgdb-max-width);
+  margin-inline: auto;
+}
+
+.mgdb-site-brand { flex: 0 0 auto; line-height: 0; }
+.mgdb-site-brand img { width: 232px; max-width: 100%; height: auto; }
+.mgdb-site-brand:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
+
+.mgdb-site-search { position: relative; flex: 1 1 30rem; min-width: 0; max-width: 40rem; }
+
+/* Search shell ------------------------------------------------------------ */
+
+.mgdb-search-form { position: relative; margin: 0; }
+
+.mgdb-search-shell {
+  display: grid;
+  grid-template-columns: minmax(9rem, 12rem) minmax(0, 1fr) 3.25rem;
+  align-items: stretch;
+  height: 48px;
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  box-shadow: 0 6px 16px rgba(9, 30, 14, .28);
+}
+
+.mgdb-search-category { position: relative; min-width: 0; }
+
+/* The native select stays in the DOM and is what submits; it is only hidden
+   once the scripted listbox is ready, so the form still works without JS. */
+.mgdb-search-native {
+  width: 100%;
+  height: 48px;
+  padding: 0 var(--mgdb-space-3);
+  border: 0;
+  border-right: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius) 0 0 var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-search-category.is-ready .mgdb-search-native {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.mgdb-search-category-button {
+  display: none;
+  width: 100%;
+  height: 48px;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  padding: 0 var(--mgdb-space-3);
+  border: 0;
+  border-right: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius) 0 0 var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mgdb-search-category.is-ready .mgdb-search-category-button { display: flex; }
+.mgdb-search-category-button:hover { background: var(--mgdb-green-soft); }
+.mgdb-search-category-button:focus-visible { outline: 3px solid var(--mgdb-focus); outline-offset: -3px; }
+
+.mgdb-search-category-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mgdb-search-chevron {
+  width: 8px;
+  height: 8px;
+  margin-left: auto;
+  border-right: 2px solid var(--mgdb-muted);
+  border-bottom: 2px solid var(--mgdb-muted);
+  transform: translateY(-2px) rotate(45deg);
+}
+
+.mgdb-search-category.is-open .mgdb-search-chevron { transform: translateY(2px) rotate(225deg); }
+
+.mgdb-search-menu {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 6px);
+  left: 0;
+  width: max(100%, 15rem);
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: var(--mgdb-space-1);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-lg);
+}
+
+.mgdb-search-menu[hidden] { display: none !important; }
+
+.mgdb-search-menu button {
+  display: flex;
+  width: 100%;
+  min-height: 38px;
+  align-items: center;
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  border: 0;
+  border-radius: var(--mgdb-radius-sm);
+  background: none;
+  color: var(--mgdb-ink);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  text-align: left;
+  cursor: pointer;
+}
+
+.mgdb-search-menu button strong { font-weight: 600; }
+.mgdb-search-menu button:hover,
+.mgdb-search-menu button:focus-visible { outline: none; background: var(--mgdb-green-soft); }
+
+.mgdb-search-menu button[aria-selected="true"] {
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-search-menu button[aria-selected="true"] strong { font-weight: 800; }
+/* A check marks the current category, so selection is not colour-only. */
+.mgdb-search-menu button[aria-selected="true"]::after { margin-left: auto; content: "\2713"; font-weight: 900; }
+
+.mgdb-search-query { min-width: 0; }
+
+.mgdb-search-input {
+  width: 100%;
+  height: 48px;
+  padding: 0 var(--mgdb-space-4);
+  border: 0;
+  background: transparent;
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  /* 16px keeps iOS from zooming the page when the field takes focus. */
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-search-input::placeholder { color: #6b7369; opacity: 1; }
+.mgdb-search-input:focus { outline: none; box-shadow: inset 0 -3px 0 var(--mgdb-gold); }
+.mgdb-search-input::-webkit-search-cancel-button { cursor: pointer; }
+
+.mgdb-search-submit {
+  display: grid;
+  width: 3.25rem;
+  height: 48px;
+  place-items: center;
+  border: 0;
+  border-radius: 0 var(--mgdb-radius) var(--mgdb-radius) 0;
+  background: var(--mgdb-green-dark);
+  cursor: pointer;
+}
+
+.mgdb-search-submit:hover { background: #0f3325; }
+.mgdb-search-submit:focus-visible { outline: 3px solid var(--mgdb-gold); outline-offset: -3px; }
+
+/* Magnifier drawn in CSS so the control needs no image request. */
+.mgdb-search-submit-icon {
+  position: relative;
+  display: block;
+  width: 18px;
+  height: 18px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+}
+
+.mgdb-search-submit-icon::after {
+  position: absolute;
+  right: -6px;
+  bottom: -4px;
+  width: 9px;
+  height: 3px;
+  border-radius: 2px;
+  background: #fff;
+  content: "";
+  transform: rotate(45deg);
+  transform-origin: left center;
+}
+
+/* Suggestions panel ------------------------------------------------------- */
+
+.mgdb-suggestions {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--mgdb-line);
+  border-top: 4px solid var(--mgdb-green);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-lg);
+  color: var(--mgdb-ink);
+  text-align: left;
+}
+
+.mgdb-suggestions[hidden] { display: none !important; }
+
+.mgdb-suggestions-content {
+  max-height: min(60vh, 26rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.mgdb-suggestions-heading {
+  display: flex;
+  gap: var(--mgdb-space-3);
+  align-items: baseline;
+  justify-content: space-between;
+  padding: var(--mgdb-space-2) var(--mgdb-space-4);
+  border-bottom: 1px solid var(--mgdb-line-soft);
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 800;
+}
+
+.mgdb-suggestions-count { color: var(--mgdb-muted); font-weight: 600; }
+
+.mgdb-suggestion {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-bottom: 1px solid var(--mgdb-line-soft);
+  background: none;
+  color: var(--mgdb-ink) !important;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.mgdb-suggestion:last-child { border-bottom: 0; }
+
+/* aria-selected is what the arrow keys move; mirror it visually and make the
+   hover state match so pointer and keyboard read the same. */
+.mgdb-suggestion:hover,
+.mgdb-suggestion[aria-selected="true"] { background: var(--mgdb-green-soft); }
+.mgdb-suggestion[aria-selected="true"] { box-shadow: inset 3px 0 0 var(--mgdb-green-dark); }
+
+.mgdb-suggestion-copy { min-width: 0; }
+.mgdb-suggestion-copy strong { display: block; font-size: var(--mgdb-text-base); font-weight: 700; }
+.mgdb-suggestion-copy small {
+  display: block;
+  overflow: hidden;
+  margin-top: 2px;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mgdb-suggestion mark { background: #fdf0c4; color: inherit; font-weight: 800; }
+
+.mgdb-suggestion-badge {
+  flex: none;
+  padding: 2px 8px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.mgdb-suggestion-top {
+  border-left: 4px solid var(--mgdb-green);
+  background: linear-gradient(90deg, var(--mgdb-green-soft), var(--mgdb-surface) 70%);
+}
+
+.mgdb-suggestion-top .mgdb-suggestion-badge {
+  border-color: var(--mgdb-green);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-suggestion-recent { width: 100%; border: 0; border-bottom: 1px solid var(--mgdb-line-soft); }
+.mgdb-suggestion-recent small { display: block; margin-top: 2px; color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+
+.mgdb-suggestions-message {
+  display: flex;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  padding: var(--mgdb-space-5) var(--mgdb-space-4);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-suggestions-footer {
+  display: block;
+  width: 100%;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 0;
+  border-top: 1px solid var(--mgdb-line);
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-green-dark);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mgdb-suggestions-footer::before { content: "\21B5  "; }
+.mgdb-suggestions-footer:hover { background: var(--mgdb-green-soft); }
+.mgdb-suggestions-footer[hidden] { display: none !important; }
+
+/* Modern site navigation -------------------------------------------------- */
+
+.mgdb-site-nav { background: var(--mgdb-green-dark); }
+.mgdb-site-nav .menu,
+.mgdb-site-nav #menu_bar { margin-inline: auto; background: none; }
+
+/* Modern footer ----------------------------------------------------------- */
+
+.mgdb-site-footer {
+  margin-top: var(--mgdb-space-8);
+  padding: var(--mgdb-space-5) var(--mgdb-gutter);
+  border-top: 4px solid var(--mgdb-gold);
+  background: #16351f;
+  color: #fff;
+}
+
+.mgdb-site-footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4) var(--mgdb-space-6);
+  align-items: center;
+  justify-content: space-between;
+  max-width: var(--mgdb-max-width);
+  margin-inline: auto;
+}
+
+.mgdb-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mgdb-footer-links a {
+  display: inline-flex;
+  min-height: var(--mgdb-tap-target);
+  align-items: center;
+  color: #fff !important;
+  font-size: var(--mgdb-text-base);
+  font-weight: 600;
+}
+
+.mgdb-site-footer :focus-visible { outline: 3px solid var(--mgdb-gold); outline-offset: 2px; }
+
+@media (max-width: 767px) {
+  .mgdb-site-header-inner { gap: var(--mgdb-space-3); }
+  .mgdb-site-brand img { width: 180px; }
+  .mgdb-site-search { flex: 1 1 100%; max-width: none; }
+  /* Stack the shell so the category control and the field each get full width
+     rather than squeezing to unusable widths. */
+  .mgdb-search-shell {
+    grid-template-columns: minmax(0, 1fr) 3.25rem;
+    height: auto;
+  }
+  .mgdb-search-category { grid-column: 1 / -1; }
+  .mgdb-search-native,
+  .mgdb-search-category-button {
+    border-right: 0;
+    border-bottom: 1px solid var(--mgdb-line);
+    border-radius: var(--mgdb-radius) var(--mgdb-radius) 0 0;
+  }
+  .mgdb-search-submit { border-radius: 0 0 var(--mgdb-radius) 0; }
+  .mgdb-site-footer-inner { justify-content: center; text-align: center; }
+}
+
+/* --------------------------------------------------------------------------
    4. Typography
    -------------------------------------------------------------------------- */
 
@@ -657,10 +1073,10 @@
   z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--mgdb-space-3);
+  gap: var(--mgdb-space-2);
   align-items: center;
   justify-content: center;
-  padding: var(--mgdb-space-6) var(--mgdb-space-5);
+  padding: var(--mgdb-space-4) var(--mgdb-space-4);
   border-right: 1px solid rgba(255, 255, 255, .45);
   background: linear-gradient(145deg, rgba(255, 252, 244, .98), rgba(249, 231, 188, .96));
   text-align: center;
@@ -669,7 +1085,7 @@
 /* multiply drops the white matte that ships with most MaizeGDB emblem PNGs so
    they sit on the cream panel without a visible box. */
 .mgdb-hero-emblem img {
-  width: min(100%, 150px);
+  width: min(100%, 104px);
   mix-blend-mode: multiply;
 }
 
@@ -694,14 +1110,15 @@
   min-width: 0;
   flex-direction: column;
   justify-content: center;
-  padding: var(--mgdb-space-6) var(--mgdb-space-7);
+  padding: var(--mgdb-space-5) var(--mgdb-space-6);
 }
 
 .mgdb-hero .mgdb-eyebrow { color: #ffe6a9; }
 
 .mgdb-hero h1 {
-  margin: var(--mgdb-space-2) 0 var(--mgdb-space-3);
+  margin: var(--mgdb-space-1) 0 var(--mgdb-space-2);
   color: #fff;
+  font-size: clamp(1.625rem, 1.1rem + 1.8vw, 2rem);
 }
 
 .mgdb-hero-tagline {
@@ -713,7 +1130,7 @@
 
 .mgdb-hero-description {
   max-width: var(--mgdb-measure);
-  margin-top: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-2);
   color: #fdf1e2;      /* 9.6:1 on the darkest gradient stop */
   font-size: var(--mgdb-text-base);
 }
@@ -722,7 +1139,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-3);
-  margin-top: var(--mgdb-space-5);
+  margin-top: var(--mgdb-space-4);
 }
 
 .mgdb-hero .mgdb-button-primary { background: #fff; color: var(--mgdb-burgundy) !important; }
@@ -736,32 +1153,131 @@
 
 .mgdb-hero :focus-visible { outline-color: #fff; }
 
-/* Optional highlight strip inside the hero (next event, current release…). */
-.mgdb-hero-highlight {
-  display: flex;
-  flex-wrap: wrap;
+/* --------------------------------------------------------------------------
+   7b. Basic information page header
+
+   For prose-led pages (newsletter archive, about, documentation). A light card
+   with a gold spine, a subject icon, and a short description. Quieter and
+   shallower than the data-centre hero.
+   -------------------------------------------------------------------------- */
+
+.mgdb-hero-basic {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
   gap: var(--mgdb-space-5);
   align-items: center;
-  margin-top: var(--mgdb-space-5);
-  padding: var(--mgdb-space-3) var(--mgdb-space-4);
-  border: 1px solid rgba(255, 255, 255, .25);
-  border-radius: var(--mgdb-radius);
-  background: rgba(44, 12, 13, .28);
+  padding: var(--mgdb-space-5) var(--mgdb-space-6);
+  border: 1px solid var(--mgdb-line-soft);
+  border-left: 8px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-sage);
 }
 
-.mgdb-hero-highlight dt {
-  color: #ffd99a;
+.mgdb-hero-basic-icon {
+  display: grid;
+  width: 84px;
+  height: 84px;
+  place-items: center;
+  color: var(--mgdb-gold-dark);
+}
+
+.mgdb-hero-basic-icon svg,
+.mgdb-hero-basic-icon img { width: 100%; height: auto; }
+
+.mgdb-hero-basic .mgdb-eyebrow {
+  margin-bottom: var(--mgdb-space-1);
+  color: var(--mgdb-wine);
+}
+
+/* h2 is accepted so the pattern library can demonstrate this header without
+   introducing a second h1 on the page. Real pages use h1. */
+.mgdb-hero-basic h1,
+.mgdb-hero-basic h2 {
+  margin-bottom: var(--mgdb-space-3);
+  color: var(--mgdb-leaf);
+  font-size: clamp(1.625rem, 1.1rem + 1.9vw, 2.125rem);
+}
+
+.mgdb-hero-basic > div > p {
+  max-width: var(--mgdb-measure);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-base);
+}
+
+/* --------------------------------------------------------------------------
+   7c. Record page header
+
+   For gene models, maps, references, stocks — anything where the reader wants
+   the identifier and its key facts immediately and nothing else. Deliberately
+   the shallowest of the three: a rule, a name, and an inline fact row.
+   -------------------------------------------------------------------------- */
+
+.mgdb-hero-record {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3) var(--mgdb-space-6);
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: var(--mgdb-space-4);
+  border-bottom: 3px solid var(--mgdb-green-dark);
+}
+
+.mgdb-hero-record > div:first-child { min-width: 0; flex: 1 1 26rem; }
+
+.mgdb-hero-record .mgdb-eyebrow { color: var(--mgdb-wine); }
+
+.mgdb-hero-record h1,
+.mgdb-hero-record h2 {
+  color: var(--mgdb-green-dark);
+  font-size: clamp(1.5rem, 1.1rem + 1.5vw, 1.875rem);
+  /* Identifiers are read character by character; keep them unambiguous. */
+  font-variant-ligatures: none;
+}
+
+.mgdb-hero-record .mgdb-record-id {
+  font-family: var(--mgdb-font-mono);
+  font-size: .92em;
+}
+
+/* Utilities used by the pattern library and prose pages. */
+.mgdb-leaf-heading { color: var(--mgdb-leaf); }
+.mgdb-spaced { margin-top: var(--mgdb-space-6); }
+
+/* Inline key facts. A definition list so the pairing is programmatic. */
+.mgdb-record-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-5);
+  margin-top: var(--mgdb-space-3);
+}
+
+.mgdb-record-facts > div { display: flex; gap: var(--mgdb-space-2); align-items: baseline; }
+
+.mgdb-record-facts dt {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+}
+
+.mgdb-record-facts dd {
+  margin: 0;
+  color: var(--mgdb-ink);
   font-size: var(--mgdb-text-sm);
   font-weight: 700;
-  letter-spacing: .05em;
-  text-transform: uppercase;
 }
 
-.mgdb-hero-highlight dd {
-  margin: var(--mgdb-space-1) 0 0;
-  color: #fff;
-  font-size: var(--mgdb-text-base);
-  font-weight: 700;
+.mgdb-record-facts dd.mgdb-record-id { font-family: var(--mgdb-font-mono); }
+
+.mgdb-hero-record-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-hero-record-actions .mgdb-button {
+  min-height: 38px;
+  padding-inline: var(--mgdb-space-4);
+  font-size: var(--mgdb-text-sm);
 }
 
 /* --------------------------------------------------------------------------
@@ -851,6 +1367,55 @@
 /* Whole-card link variant. */
 a.mgdb-metric { color: var(--mgdb-ink) !important; text-decoration: none; }
 a.mgdb-metric:hover { border-color: var(--mgdb-gold-dark); background: var(--mgdb-surface-alt); }
+
+/* Quiet metric — value over label, no icon or tone border. Pairs with the
+   basic-page header on prose-led pages where the figures are supporting
+   context rather than the point of the page. */
+.mgdb-metric-quiet {
+  display: block;
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-metric-quiet .mgdb-metric-value {
+  color: var(--mgdb-leaf);
+  font-size: var(--mgdb-text-xl);
+}
+
+.mgdb-metric-quiet p {
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-base);
+}
+
+/* Supporting note beside prose. The green cap marks it as secondary to the
+   main column without relying on colour alone — it is also a distinct card. */
+.mgdb-aside-card {
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line-soft);
+  border-top: 4px solid var(--mgdb-green-dark);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-sage);
+}
+
+.mgdb-aside-card h2,
+.mgdb-aside-card h3 {
+  margin-bottom: var(--mgdb-space-2);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-lg);
+}
+
+.mgdb-aside-card p { color: var(--mgdb-muted); }
+
+/* Prose page layout: main column plus a narrower supporting column. */
+.mgdb-prose-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
+  gap: var(--mgdb-space-6);
+  align-items: start;
+}
 
 /* --------------------------------------------------------------------------
    9. Section headings
@@ -1373,9 +1938,10 @@ a.mgdb-card h3 { text-decoration: underline; }
    -------------------------------------------------------------------------- */
 
 @media (max-width: 1023px) {
-  .mgdb-hero { grid-template-columns: minmax(160px, 25%) minmax(0, 1fr); }
-  .mgdb-hero-body { padding: var(--mgdb-space-5); }
-  .mgdb-resource-panel { grid-template-columns: 1fr; }
+  .mgdb-hero { grid-template-columns: minmax(150px, 25%) minmax(0, 1fr); }
+  .mgdb-hero-body { padding: var(--mgdb-space-4) var(--mgdb-space-5); }
+  .mgdb-resource-panel,
+  .mgdb-prose-layout { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 767px) {
@@ -1393,9 +1959,22 @@ a.mgdb-card h3 { text-decoration: underline; }
     border-bottom: 1px solid rgba(255, 255, 255, .45);
     text-align: left;
   }
-  .mgdb-hero-emblem img { width: 56px; }
+  .mgdb-hero-emblem img { width: 52px; }
   .mgdb-hero-emblem strong { min-width: 0; flex: 1 1 auto; }
   .mgdb-hero-emblem > span { flex: 1 0 100%; }
+
+  /* The basic-page icon is decorative context; the heading matters more at
+     phone width, so stack rather than shrink the text column. */
+  .mgdb-hero-basic {
+    grid-template-columns: 1fr;
+    gap: var(--mgdb-space-3);
+    padding: var(--mgdb-space-4) var(--mgdb-space-5);
+    border-left-width: 6px;
+  }
+  .mgdb-hero-basic-icon { width: 56px; height: 56px; }
+
+  .mgdb-hero-record { display: block; }
+  .mgdb-hero-record-actions { margin-top: var(--mgdb-space-4); }
   .mgdb-chart-grid { grid-template-columns: 1fr; }
   .mgdb-section-heading { display: block; }
   .mgdb-section-heading > p { max-width: none; margin-top: var(--mgdb-space-2); }

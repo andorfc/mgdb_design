@@ -19,14 +19,81 @@ $$SYNTAX-LEVEL 2
       <p class="mgdb-hero-tagline">The reusable building blocks for modernized MaizeGDB pages.</p>
       <p class="mgdb-hero-description">This reference renders every component defined in the shared stylesheet so that spacing, contrast, keyboard behavior, and responsive breakpoints can be verified in one place before a pattern is applied to a production page.</p>
       <div class="mgdb-hero-actions">
-        <a class="mgdb-button mgdb-button-primary" href="#pattern-dashboard">View components</a>
+        <a class="mgdb-button mgdb-button-primary" href="#pattern-headers">View components</a>
         <a class="mgdb-button mgdb-button-secondary" href="#pattern-tokens">Design tokens</a>
       </div>
-      <dl class="mgdb-hero-highlight">
-        <div><dt>Stylesheet</dt><dd>/css/mgdb-modern.css</dd></div>
-        <div><dt>Behavior</dt><dd>/js/mgdb-modern.js</dd></div>
-        <div><dt>Body text floor</dt><dd>16px</dd></div>
-      </dl>
+    </div>
+  </section>
+
+  <section id="pattern-headers" aria-labelledby="pattern-headers-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Page identity</span>
+        <h2 id="pattern-headers-title">Header variants</h2>
+      </div>
+      <p>Three headers for three kinds of page. Each carries one h1; only the depth and emphasis differ.</p>
+    </div>
+
+    <h3>Data centre &mdash; two-tone</h3>
+    <p class="mgdb-section-intro">Used above. The emblem panel and gradient body give data centres a distinct identity. Kept shallow so the summary dashboard stays visible without scrolling.</p>
+
+    <h3 class="mgdb-spaced">Basic information page</h3>
+    <p class="mgdb-section-intro">For prose-led pages such as archives, about pages, and documentation. A light panel with a gold spine and a subject icon.</p>
+    <div class="mgdb-hero-basic">
+      <span class="mgdb-hero-basic-icon" aria-hidden="true">
+        <svg viewBox="0 0 84 84" role="presentation" focusable="false">
+          <rect x="14" y="40" width="13" height="30" rx="3" fill="currentColor" />
+          <rect x="35" y="18" width="13" height="52" rx="3" fill="currentColor" />
+          <rect x="56" y="31" width="13" height="39" rx="3" fill="currentColor" />
+          <rect x="10" y="72" width="64" height="5" rx="2.5" fill="#2f5e2a" />
+        </svg>
+      </span>
+      <div>
+        <span class="mgdb-eyebrow">Maize Genetics Cooperation</span>
+        <h2>Maize Newsletter archive</h2>
+        <p>The Maize Genetics Cooperation Newsletter &#40;MNL&#41; documents working research, observations, and community information shared across maize science.</p>
+      </div>
+    </div>
+    <p class="mgdb-small mgdb-muted">Shown with <code>h2</code> here so the pattern library keeps a single <code>h1</code>. On a real page this is the <code>h1</code>.</p>
+
+    <div class="mgdb-metric-grid mgdb-spaced">
+      <article class="mgdb-metric-quiet"><strong class="mgdb-metric-value">94</strong><p>archived volumes</p></article>
+      <article class="mgdb-metric-quiet"><strong class="mgdb-metric-value">1929&ndash;2020</strong><p>publication years represented</p></article>
+      <article class="mgdb-metric-quiet"><strong class="mgdb-metric-value">2015</strong><p>fully electronic publishing began</p></article>
+      <article class="mgdb-metric-quiet"><strong class="mgdb-metric-value">1</strong><p>long-running community record</p></article>
+    </div>
+
+    <div class="mgdb-prose-layout mgdb-spaced">
+      <div class="mgdb-prose">
+        <h3 class="mgdb-leaf-heading">About the newsletter</h3>
+        <p>The Maize Genetics Cooperation Newsletter has been published since 1929 and became fully electronic with Volume 89 &#40;2015&#41;. It is a compendium of notes and information on active research for the maize community.</p>
+        <p>Articles submitted to the newsletter are not formal references without the author&rsquo;s consent.</p>
+      </div>
+      <aside class="mgdb-aside-card">
+        <h3>Archive use</h3>
+        <p>Volumes open on the MNL archive site in a new tab.</p>
+      </aside>
+    </div>
+
+    <h3 class="mgdb-spaced">Record page</h3>
+    <p class="mgdb-section-intro">For gene models, maps, references, and stocks. The identifier and its key facts come first; nothing competes with them.</p>
+    <div class="mgdb-hero-record">
+      <div>
+        <span class="mgdb-eyebrow">Gene model &middot; B73 v5</span>
+        <h2><span class="mgdb-record-id">Zm00001eb000010</span></h2>
+        <dl class="mgdb-record-facts">
+          <div><dt>Locus</dt><dd>b1</dd></div>
+          <div><dt>Chromosome</dt><dd>2</dd></div>
+          <div><dt>Coordinates</dt><dd class="mgdb-record-id">2:24,517,-24,900</dd></div>
+          <div><dt>Strand</dt><dd>+</dd></div>
+          <div><dt>Transcripts</dt><dd>4</dd></div>
+        </dl>
+      </div>
+      <div class="mgdb-hero-record-actions">
+        <a class="mgdb-button mgdb-button-primary" href="#pattern-headers">Genome browser</a>
+        <a class="mgdb-button mgdb-button-secondary" href="#pattern-headers">BLAST</a>
+        <a class="mgdb-button mgdb-button-quiet" href="#pattern-headers">Download FASTA</a>
+      </div>
     </div>
   </section>
 

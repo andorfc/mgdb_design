@@ -1,0 +1,67 @@
+$$SYNTAX-LEVEL 2
+*(maizegdb-main-modern
+  {
+   include-css: /css/megamenu.css |
+   include-js: https\://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.0/jquery.min.js |
+   include-js: /js/api_js.js
+  }
+
+  @(lambda {display: off}
+    $(image-dir {default: /images})
+  )
+
+  ;; translation.php calls get()->replace() on every variable below, and
+  ;; Nary::get() throws when an identifier is missing. Declaring them inside an
+  ;; HTML comment keeps them resolvable without rendering anything — the same
+  ;; idiom used by templates/home/maizegdb_header.bau for $(gbrowse_url).
+  <!-- $(topright_download) $(topright_preferences) $(topright_login) $(topright_logout) $(translate_wording) $(translate_site) $(logo-id) $(search_name) $(search_value) -->
+
+  <a class="mgdb-skip-link" href="#mgdb-main">Skip to main content</a>
+
+  <div id="wrapper">
+    <header class="mgdb-site-header">
+      <div class="mgdb-site-header-inner">
+        <a class="mgdb-site-brand" href="$(server-url)">
+          <img src="$(image-dir)/logo.png" alt="MaizeGDB — Maize Genetics and Genomics Database" />
+        </a>
+        <div class="mgdb-site-search">
+          *(search-box {load: templates/home/search-box-modern.bau}
+            &(lambda
+              $image_dir  = $this->reflect(\)->upstream('maizegdb-main-modern'\)->get('image-dir'\);
+              $server_url = $this->reflect(\)->upstream('maizegdb-main-modern'\)->get('server-url'\);
+
+              $loaded = $this->reflect(\)->_parent(\);
+              if ($loaded->has('image-dir'\)\)
+                $loaded->get('image-dir'\)->replace($image_dir->value(\)\);
+              if ($loaded->has('server-url'\)\)
+                $loaded->get('server-url'\)->replace($server_url->value(\)\);
+            )
+          )
+        </div>
+      </div>
+    </header>
+
+    <nav class="mgdb-site-nav" aria-label="Main">
+      *(megamenu)
+    </nav>
+
+    <div id="content">
+      <div id="mgdb-main">
+        *(body)
+      </div>
+    </div>
+
+    <footer class="mgdb-site-footer">
+      <div class="mgdb-site-footer-inner">
+        <ul class="mgdb-footer-links">
+          <li><a href="$(server-url)/contact">$(footer_contact)</a></li>
+          <li><a href="$(server-url)/cite">$(footer_cite)</a></li>
+          <li><a href="https\://download.maizegdb.org">Download</a></li>
+        </ul>
+        <a class="mgdb-footer-usda" href="https\://www.usda.gov/">
+          <img src="/images/USDA.png" alt="United States Department of Agriculture" height="34" />
+        </a>
+      </div>
+    </footer>
+  </div>
+)

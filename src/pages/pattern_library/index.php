@@ -34,17 +34,12 @@ $bauplan->head('<meta name="robots" content="noindex">');
 
 $cwd = getcwd();
 chdir('../');
-$mgdb = $bauplan->template()->load('templates/maizegdb-main.bau');
+$mgdb = $bauplan->template()->load('templates/maizegdb-main-modern.bau');
 $mgdb->get('megamenu')->load('templates/home/maizegdb_header.bau');
 chdir($cwd);
 
 $mgdb->get('image-dir')->replace($system['image_url']);
 $mgdb->get('server-url')->replace($system['root_url']);
-
-if ($username && $password && $userid) {
-    $mgdb->get('logout')->toggle();
-    $mgdb->get('username')->replace($username);
-}
 
 $mgdb->get('body')->loadRemote($system['root_url_private'] . '/templates/static/mgdb_pattern_library.bau');
 

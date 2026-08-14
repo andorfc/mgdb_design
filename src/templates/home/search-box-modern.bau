@@ -1,0 +1,79 @@
+$$SYNTAX-LEVEL 2
+*(search-box-modern
+{
+  include-js: /js/mgdb-search.js
+}
+<form id="global_search_form" class="mgdb-search-form" method="POST" action="/search_engine/searchall" role="search">
+  <input type="hidden" id="global_search_source" name="global_search_source" value="search_box">
+
+  <div class="mgdb-search-shell">
+    <div class="mgdb-search-category" data-search-category>
+      <label class="mgdb-visually-hidden" for="global_search_type">Search category</label>
+      <select id="global_search_type" name="global_search_type" class="mgdb-search-native">
+        <option value="anything" selected="selected">All data</option>
+        <option value="gene_product">Genes</option>
+        <option value="gene_model">Gene models</option>
+        <option value="genome">Genomes</option>
+        <option value="locus">Loci</option>
+        <option value="probe">Markers</option>
+        <option value="qtl_exp">QTL experiments</option>
+        <option value="stock">Stocks</option>
+        <option value="reference">References</option>
+        <option value="term">Traits</option>
+        <option value="phenotype">Phenotypes / mutants</option>
+        <option value="variation">Variations / alleles</option>
+        <option value="map">Maps</option>
+        <option value="person">People / organizations</option>
+        <option value="id">MaizeGDB ID</option>
+        <option value="goog">Static web pages</option>
+      </select>
+
+      <button class="mgdb-search-category-button" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="mgdb-search-menu">
+        <span class="mgdb-search-category-label">
+          <span class="mgdb-visually-hidden">Search category: </span><span data-search-category-label>All data</span>
+        </span>
+        <span class="mgdb-search-chevron" aria-hidden="true"></span>
+      </button>
+
+      <div id="mgdb-search-menu" class="mgdb-search-menu" role="listbox" aria-label="Search category" hidden>
+        <button type="button" role="option" aria-selected="true"  data-value="anything"><strong>All data</strong></button>
+        <button type="button" role="option" aria-selected="false" data-value="gene_product"><strong>Genes</strong></button>
+        <button type="button" role="option" aria-selected="false" data-value="gene_model"><strong>Gene models</strong></button>
+        <button type="button" role="option" aria-selected="false" data-value="genome"><strong>Genomes</strong></button>
+        <button type="button" role="option" aria-selected="false" data-value="locus"><strong>Loci</strong></button>
+        <button type="button" role="option" aria-selected="false" data-value="probe"><strong>Markers</strong></button>
+        <button type="button" role="option" aria-selected="false" data-value="qtl_exp"><strong>QTL experiments</strong></button>
+        <button type="button" role="option" aria-selected="false" data-value="stock"><strong>Stocks</strong></button>
+        <button type="button" role="option" aria-selected="false" data-value="reference"><strong>References</strong></button>
+        <button type="button" role="option" aria-selected="false" data-value="term"><strong>Traits</strong></button>
+        <button type="button" role="option" aria-selected="false" data-value="phenotype"><strong>Phenotypes / mutants</strong></button>
+        <button type="button" role="option" aria-selected="false" data-value="variation"><strong>Variations / alleles</strong></button>
+        <button type="button" role="option" aria-selected="false" data-value="map"><strong>Maps</strong></button>
+        <button type="button" role="option" aria-selected="false" data-value="person"><strong>People / organizations</strong></button>
+        <button type="button" role="option" aria-selected="false" data-value="id"><strong>MaizeGDB ID</strong></button>
+        <button type="button" role="option" aria-selected="false" data-value="goog"><strong>Static web pages</strong></button>
+      </div>
+    </div>
+
+    <div class="mgdb-search-query">
+      <label class="mgdb-visually-hidden" for="global_search_term">Search MaizeGDB</label>
+      <input id="global_search_term" class="mgdb-search-input" type="search" name="global_search_term"
+             placeholder="Search genes, loci, markers, stocks, QTL&hellip;"
+             autocomplete="off" autocapitalize="off" spellcheck="false"
+             role="combobox" aria-autocomplete="list" aria-controls="mgdb-search-suggestions" aria-expanded="false" required>
+    </div>
+
+    <button class="mgdb-search-submit" type="submit">
+      <span class="mgdb-search-submit-icon" aria-hidden="true"></span>
+      <span class="mgdb-visually-hidden">Search</span>
+    </button>
+  </div>
+
+  <div id="mgdb-search-suggestions" class="mgdb-suggestions" role="listbox" aria-label="Search suggestions" hidden>
+    <div class="mgdb-suggestions-content" data-suggestions-content></div>
+    <button class="mgdb-suggestions-footer" type="submit" data-suggestions-footer hidden></button>
+  </div>
+
+  <p id="mgdb-search-status" class="mgdb-visually-hidden" role="status" aria-live="polite"></p>
+</form>
+)
