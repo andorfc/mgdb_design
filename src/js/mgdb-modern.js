@@ -1,7 +1,7 @@
 /* ==========================================================================
    MaizeGDB Modern — shared behavior
    --------------------------------------------------------------------------
-   Companion to /css/mgdb-modern.css. No dependencies: the shell's jQuery 1.8
+   Companion to /css/mgdb-modern.css. No dependencies: the legacy jQuery in the shell
    is deliberately not used here.
 
    Everything is progressive enhancement. If this file fails to load, pages

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Deploy repo files to the MaizeGDB dev instance (dev8 / claude.maizegdb.org).
+# Deploy repo files to the MaizeGDB development instance.
 #
 # Every deploy first copies the current server version of each target into
 # backups/<timestamp>/ so a rollback is always possible. rsync is not installed
