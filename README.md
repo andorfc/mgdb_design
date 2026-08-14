@@ -83,7 +83,15 @@ introducing new colors or spacing values.
 ## Conventions this codebase relies on
 
 - `.bau` templates escape literal parentheses as `\(` and `\)`. An unescaped
-  `)` terminates the template block.
+  `)` terminates the template block. This bites most often in inline
+  `style="…"` attributes containing `var(--token)` and in `https://` URLs
+  (write `https\://`). Prefer a class over an inline style and the problem
+  does not arise.
+- `translation.php` calls `$mgdb->get('…')->replace(…)` for a fixed set of
+  variables, and `Nary::get()` throws on a missing identifier. A replacement
+  shell must declare every one of them, even the ones it does not render.
+  Declaring them inside an HTML comment is the idiom already used by
+  `templates/home/maizegdb_header.bau`.
 - Page bodies are fetched over HTTP by `loadRemote()`, so a template must be
   reachable under `/templates/static/` on the same host.
 - Cache busting uses `filemtime()` appended as `?v=`; keep that pattern.
