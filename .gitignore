@@ -5,3 +5,8 @@ tmp/
 # Never commit server configuration — it contains database credentials.
 **/mgdb.conf
 **/db.conf
+
+# Per-deploy snapshots. These are machine-local rollback artifacts and one is
+# written on every deploy, so versioning them just accumulates duplicates.
+# The pristine pre-redesign originals are tracked in reference/ instead.
+backups/
