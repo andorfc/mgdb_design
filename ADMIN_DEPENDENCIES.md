@@ -64,6 +64,21 @@ Status values: `proposed` · `approved` · `implemented` · `rejected` · `defer
 
 ---
 
+## AD-008 — `genome_information.release_date` is free text and mostly empty
+
+- **Date:** 2026-08-14
+- **Affected component:** `chado.genome_information.release_date`, surfaced by the Genome Center (`/genome`)
+- **Current limitation:** The column is stored as text with no format constraint, and 116 of the 160 completed assemblies have no value at all. Among the values present, the formats vary widely: `2008`, `2018-10-01`, `5/30/2016`, `19-Nov-25`, `1st of February 2017 (pre-release)`, and `11/19/202525`, the last of which appears to be a typo.
+- **Impact:** A release timeline cannot be computed from the database. The Genome Center's growth chart therefore uses a curated historical series maintained for the redesign, and the page states this next to the chart rather than implying the figure is derived from the data. Any future work wanting release dates — sorting assemblies by age, "recently added" listings, release cadence reporting — is blocked on the same problem.
+- **Proposed change:** Normalize the column to a `date` type, or add a parallel typed column populated from the existing values where they can be interpreted unambiguously and left null where they cannot. Correct the `11/19/202525` value. Consider a check constraint or an application-level validator so new entries stay parseable.
+- **Expected benefit:** Makes the release history reportable, and lets the growth chart be driven by the database instead of a maintained-by-hand series.
+- **Risk and rollback:** Low if a parallel typed column is added rather than converting in place, since nothing currently reads the column for computation. Converting in place needs a check for other consumers first.
+- **Required administrator:** database administrator, plus a curator to adjudicate ambiguous or missing dates
+- **Status:** proposed — the page works correctly without it and is explicit about the provenance
+- **Validation:** confirm every non-null value parses to a date; compare a computed year-by-year count against the curated series and reconcile differences before switching the chart over.
+
+---
+
 ## AD-007 — Partial index on the curation filter used by header autocomplete
 
 - **Date:** 2026-08-14

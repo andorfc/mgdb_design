@@ -71,6 +71,7 @@ immediately. Where a file was overwritten, restore it from
 | Page | Route | New controller | Originals archived in |
 | --- | --- | --- | --- |
 | How to cite MaizeGDB | `/cite` | `controllers/cite.php` | `legacy/cite/` |
+| Genome Center | `/genome` | `controllers/genome/genome_center_modern.php` | `legacy/genome/` |
 
 `/cite` had no top-level controller, so `controller.php` fell through to
 `redirect.php`, which found `controllers/about/cite.php`. Because
@@ -80,6 +81,12 @@ immediately. Where a file was overwritten, restore it from
 
 Note that `/about/cite` is a second route to the same content and still serves
 the original page.
+
+`/genome` is different: `controllers/genome.php` already existed and also serves
+every genome sub-page, so it could not simply be shadowed. A guard at the top of
+that file routes the bare `/genome` route to the modern controller and lets
+every sub-page — assembly records, project pages, the browser tutorial — fall
+through to the original code untouched. Rollback is deleting that guard.
 
 ## Modernizing a page
 
