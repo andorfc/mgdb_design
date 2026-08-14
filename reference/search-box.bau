@@ -1,0 +1,70 @@
+$$SYNTAX-LEVEL 2
+*(search-box 
+{
+  include-js: /js/search.js |
+  include-js: /js/search_engine.js
+}
+<div id="search_box2" style="">
+  <form id="global_search_form" method="POST" action="/search_engine/searchall">
+    <table align="right" class="header_search_table" cellpadding=0 cellspacing=0 >
+      <input type="hidden" id="global_search_source" name="global_search_source" value="search_box">
+      <tr valign="center">
+        <td>
+          <img class="left-fix" src="$(image-dir)/searchbox_left.png">
+        </td>
+        <td valign='center' class="header_search_table_background" >
+          <table cellpadding=0 cellspacing=6>
+            <tr>
+              <td class="header_search_table_background">
+                <input id="global_search_term" type="text" name="global_search_term" 
+                       onclick="this.select(\)" placeholder="$(search_value)">
+              </td>
+              <td rowspan=2 valign='center' align='center' class="header_search_table_background" style="width: 25px;">
+                <div align="center">
+                  <img id="search_img" style="cursor: pointer;" type="image" name="search_img" 
+                     src="$(image-dir)/search.png" border="0"
+                     onclick="javascript: \$('#global_search_form'\).trigger('submit'\)">
+                  <img id="loader_img" style="display: none;" src="$(image-dir)/ajax-loader-small.gif">
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <select id="global_search_type" name="global_search_type" class="small">
+<!-- RETIRED                  <option value="fast">quick search</option> -->
+                  <option value="anything" selected="selected">all data</option>
+                  <option value="goog">all static web pages</option>
+                  <option value="gene_product">gene products</option>
+                  <option value="gene_model">gene models</option>
+                  <option value="genome">genomes</option>
+                  <option value="locus">loci</option>
+<!-- RETIRED                  <option value="4">locus lookup</option> -->
+                  <option value="map">maps</option>
+                  <option value="person">people/organizations</option>
+                  <option value="phenotype">phenotypes/mutants</option>
+                  <option value="probe" >probes/markers</option>
+<!-- RETIRED                  <option value="9">&nbsp;-&nbsp;BACs</option> -->
+<!-- RETIRED                  <option value="18">&nbsp;-&nbsp;clones</option> -->
+<!-- RETIRED                  <option value="13">&nbsp;-&nbsp;ESTs</option> -->
+<!-- RETIRED                  <option value="12">&nbsp;-&nbsp;overgos</option> -->
+<!-- RETIRED                  <option value="11">&nbsp;-&nbsp;SSRs</option> -->
+<!-- RETIRED                  <option value="6" >projects</option> -->
+                  <option value="qtl_exp">QTL experiments</option>
+                  <option value="reference">references</option>
+                  <option value="stock">stocks</option>
+                  <option value="term">traits</option>
+                  <option value="variation">variations/alleles</option>
+                  <option value="id">i.d. number</option>
+                </select>
+              </td>
+            </tr>
+          </table>
+        </td>
+        <td>
+          <img src="$(image-dir)/searchbox_right.png">
+        </td>
+      </tr>
+    </table>
+  </form>
+</div>
+)

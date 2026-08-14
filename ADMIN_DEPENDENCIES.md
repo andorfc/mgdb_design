@@ -64,6 +64,21 @@ Status values: `proposed` · `approved` · `implemented` · `rejected` · `defer
 
 ---
 
+## AD-006 — Global megamenu cannot be opened with a keyboard
+
+- **Date:** 2026-08-14
+- **Affected component:** `css/megamenu.css` (lines ~144–215), `templates/home/maizegdb_header.bau` — every MaizeGDB page
+- **Current limitation:** Dropdown panels are hidden with `left: -999em` and revealed only by `.menu li:hover`. Matching `.menu li:focus` rules exist, but `<li>` elements carry no `tabindex`, so they can never receive focus and those rules never apply. There is no `:focus-within` rule. Verified in-browser: with the "About" trigger focused by keyboard, its panel remains at `left: -13986px`.
+- **Impact:** The entire site navigation is unreachable by keyboard and by switch or voice control. This is a WCAG 2.1 Level A failure (2.1.1 Keyboard) and a Section 508 conformance failure on every page.
+- **Proposed change:** Add `:focus-within` rules alongside the existing `:hover` rules, and add `aria-haspopup` / `aria-expanded` state plus Escape-to-close via a small script. Both are additive; no existing markup or menu content needs to change.
+- **Expected benefit:** Restores keyboard operation of the primary navigation sitewide.
+- **Risk and rollback:** Low — additive CSS and JS only. Rollback by removing the added rules.
+- **Required administrator:** MaizeGDB application maintainer (only for the sitewide rollout; modernized pages are already covered by the scoped fix in `css/mgdb-modern.css`)
+- **Status:** proposed for sitewide rollout — fix implemented and scoped to `.mgdb-modern` pages
+- **Validation:** Tab to each top-level menu item and confirm its panel appears, that all panel links are reachable in order, and that Escape closes the panel and returns focus to the trigger.
+
+---
+
 ## AD-005 — Review out-of-support third-party libraries in the global shell
 
 - **Date:** 2026-08-14

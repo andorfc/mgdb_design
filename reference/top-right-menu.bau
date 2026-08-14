@@ -1,0 +1,47 @@
+$$SYNTAX-LEVEL 2
+*(top-right-menu
+  <table align="right" class="header_table" cellpadding=0 cellspacing=0 >
+    <tr valign="center">
+      <td>
+        <img class="left-fix" src="$(image-dir)/top_menu_left.png" border=0>
+      </td>
+      <!--
+      <td valign='center' class="header_table_background">
+        <a style="cursor: pointer;" onclick="location.href='http://' + '$(translate_site)' + window.location.pathname">$(translate_wording)</a>
+      </td>
+        <td valign='center' class="header_table_background">
+        &nbsp;&nbsp;
+      </td>
+      -->
+      <td valign='center' class="header_table_background">
+        <img src="$(image-dir)/download_icon.png">
+      </td>
+      <td valign='center' class="header_table_background">
+        <a href="https://download.maizegdb.org">$(topright_download)</a>
+      </td>
+      <td valign='center' class="header_table_background">
+        &nbsp;&nbsp;
+      </td>
+      <!--<td valign='center' class="header_table_background">
+        <img src="$(image-dir)/login_icon.png">
+      </td>
+      <td valign='center' class="header_table_background">
+        @(login
+          <a href="$(server-url)/login">$(topright_login)</a>
+        )
+        @(logout {display: off | bind: login}
+          ;; bind: toggle this with login section
+          <b>Logged in as $(username)</b>
+<!--          | <a href="$(server-url)/preferences/">$(topright_preferences)</a>
+          | <a href="$(server-url)/logout">$(topright_logout)</a>&nbsp;
+        )
+      </td>-->
+      <td valign='center' class="header_table_background">
+        &nbsp;&nbsp;
+      </td>
+      <td>
+        <img src="$(image-dir)/top_menu_right.png" border=0>
+      </td>
+    </tr>
+  </table>
+)

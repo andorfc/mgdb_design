@@ -34,7 +34,9 @@ while read -r local remote; do
   [ -f "$src" ] || { echo "missing local file: $src" >&2; exit 1; }
 
   # Back up the existing server copy when one exists.
-  if ssh "$HOST" "test -f '${WEBROOT}/${remote}'"; then
+  # -n is required: without it ssh consumes the manifest from stdin and the
+  # loop silently stops after the first entry.
+  if ssh -n "$HOST" "test -f '${WEBROOT}/${remote}'"; then
     mkdir -p "${BACKUP_DIR}/$(dirname "$remote")"
     scp -q "${HOST}:${WEBROOT}/${remote}" "${BACKUP_DIR}/${remote}"
     echo "  backed up ${remote}"
@@ -42,7 +44,7 @@ while read -r local remote; do
     echo "  no existing ${remote} on server (new file)"
   fi
 
-  ssh "$HOST" "mkdir -p '${WEBROOT}/$(dirname "$remote")'"
+  ssh -n "$HOST" "mkdir -p '${WEBROOT}/$(dirname "$remote")'"
   scp -q "$src" "${HOST}:${WEBROOT}/${remote}"
   echo "deployed ${local} -> ${WEBROOT}/${remote}"
   deployed=$((deployed + 1))
