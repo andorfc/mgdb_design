@@ -75,6 +75,53 @@ $sql_progress = "
     ORDER BY gi.assembly";
 $progress_rows = get_all_rows(make_query($DBConn, $sql_progress));
 
+/* ---- render helpers ------------------------------------------------------ */
+
+function gcEsc($value) {
+    return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
+}
+
+/*
+ * Assembly quality.
+ *
+ * The genome_information.quality column is blank for 145 of the 160 completed
+ * assemblies, so it cannot drive this column. The assembly name does carry the
+ * designation, following the community naming convention, and is populated for
+ * every row: Zm-B73-REFERENCE-NAM-5.0, Ab-Traiperm_572-DRAFT-PanAnd-1.0.
+ *
+ * Derived here rather than read from the column:
+ *   Zm-B73-REFERENCE-NAM-5.0  Representative — the B73 reference assembly
+ *   name contains REFERENCE   Reference
+ *   name contains DRAFT       Draft
+ *   otherwise                 Not reported
+ *
+ * The Representative test is an exact match on purpose. A looser pattern would
+ * also catch Zm-B73_AB10-REFERENCE-NAM-1.0, which is the abnormal-10 assembly
+ * and belongs under Reference.
+ */
+define('GC_REPRESENTATIVE_ASSEMBLY', 'Zm-B73-REFERENCE-NAM-5.0');
+
+function gcQualityLabel($assembly) {
+    $name = trim((string)$assembly);
+    if ($name === GC_REPRESENTATIVE_ASSEMBLY)   { return 'Representative'; }
+    if (stripos($name, 'REFERENCE') !== false)  { return 'Reference'; }
+    if (stripos($name, 'DRAFT') !== false)      { return 'Draft'; }
+    return '';
+}
+
+function gcQuality($assembly) {
+    $label = gcQualityLabel($assembly);
+    if ($label === '') {
+        // Say so rather than leaving an empty cell, which in a scientific table
+        // would read as a measured value of nothing.
+        return '<span class="mgdb-muted">Not reported</span>';
+    }
+    $tone = ($label === 'Representative') ? 'mgdb-pill-ok'
+          : (($label === 'Reference') ? 'mgdb-pill-info' : 'mgdb-pill-warn');
+    return '<span class="mgdb-pill ' . $tone . '">' . $label . '</span>';
+}
+
+
 /* Tally. */
 $group_counts = array();
 $species_seen = array();
@@ -90,26 +137,21 @@ $total_progress   = count($progress_rows);
 
 $reference_count = 0;
 foreach ($rows as $row) {
-    if (strcasecmp(trim((string)$row['quality']), 'Reference') === 0) { $reference_count++; }
+    // Counted from the same derivation the table column uses, so the metric and
+    // the rows below it can never disagree.
+    $label = gcQualityLabel($row['assembly']);
+    if ($label === 'Reference' || $label === 'Representative') { $reference_count++; }
 }
 
-/* ---- render helpers ------------------------------------------------------ */
-
-function gcEsc($value) {
-    return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
-}
-
-/* Quality is frequently blank in the source data. Say so rather than leaving an
-   empty cell, which would read as a value of nothing in a scientific table. */
-function gcQuality($quality) {
-    $q = trim((string)$quality);
-    if ($q === '') {
-        return '<span class="mgdb-muted">Not reported</span>';
-    }
-    $tone = (strcasecmp($q, 'Reference') === 0) ? 'mgdb-pill-ok'
-          : ((strcasecmp($q, 'Draft') === 0) ? 'mgdb-pill-warn' : 'mgdb-pill-info');
-    return '<span class="mgdb-pill ' . $tone . '">' . gcEsc($q) . '</span>';
-}
+/* The B73 reference assembly leads the table; everything else keeps the
+   database's assembly-name ordering. A user sorting a column overrides this,
+   which is the expected behaviour for a pinned row. */
+usort($rows, function ($a, $b) {
+    $pinA = (trim((string)$a['assembly']) === GC_REPRESENTATIVE_ASSEMBLY) ? 0 : 1;
+    $pinB = (trim((string)$b['assembly']) === GC_REPRESENTATIVE_ASSEMBLY) ? 0 : 1;
+    if ($pinA !== $pinB) { return $pinA - $pinB; }
+    return strcasecmp((string)$a['assembly'], (string)$b['assembly']);
+});
 
 $table_rows = '';
 foreach ($rows as $row) {
@@ -128,7 +170,7 @@ foreach ($rows as $row) {
       . '<th scope="row"><a href="' . gcEsc($assembly_link) . '">' . gcEsc($row['assembly']) . '</a></th>'
       . '<td>' . gcEsc($row['cultivar']) . '</td>'
       . '<td><i>' . ($species !== '' ? gcEsc($species) : '<span class="mgdb-muted">Not reported</span>') . '</i></td>'
-      . '<td>' . gcQuality($row['quality']) . '</td>'
+      . '<td>' . gcQuality($row['assembly']) . '</td>'
       . '<td>' . ($row['accession'] !== '' && $row['accession'] !== null
                     ? '<a href="https://www.ncbi.nlm.nih.gov/bioproject/' . gcEsc($row['accession']) . '">' . gcEsc($row['accession']) . '</a>'
                     : '<span class="mgdb-muted">Not reported</span>') . '</td>'
