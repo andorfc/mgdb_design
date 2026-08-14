@@ -1,0 +1,442 @@
+/* ==========================================================================
+   AI and machine learning resources (/ai)
+   --------------------------------------------------------------------------
+   The layout and interaction come from the AI page in the MaizeGDB website
+   repository. Everything here is restyled onto the shared tokens so the page
+   matches the rest of the redesign rather than carrying its own palette and
+   type scale. Scoped under .mgdb-ai-page.
+   ========================================================================== */
+
+/* Hero --------------------------------------------------------------------- */
+
+.mgdb-ai-page .ai-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+  gap: var(--mgdb-space-6);
+  align-items: center;
+  padding: var(--mgdb-space-6);
+  border-radius: var(--mgdb-radius-lg);
+  background: linear-gradient(135deg, #16351f, #24502c 58%, #2f6134);
+  color: #fff;
+  box-shadow: var(--mgdb-shadow-lg);
+}
+
+.mgdb-ai-page .ai-hero .mgdb-eyebrow { color: #ffe6a9; }
+
+.mgdb-ai-page .ai-hero h1 {
+  margin: var(--mgdb-space-2) 0 var(--mgdb-space-3);
+  color: #fff;
+  font-size: clamp(1.75rem, 1.1rem + 2.2vw, 2.5rem);
+}
+
+.mgdb-ai-page .ai-hero-copy > p {
+  max-width: var(--mgdb-measure);
+  color: #eaf3e6;
+  font-size: var(--mgdb-text-lg);
+}
+
+.mgdb-ai-page .ai-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-ai-page .ai-hero .mgdb-button-primary { background: #fff; color: var(--mgdb-green-dark) !important; }
+.mgdb-ai-page .ai-hero .mgdb-button-primary:hover { background: #eaf3e6; }
+.mgdb-ai-page .ai-hero .mgdb-button-secondary {
+  border-color: rgba(255, 255, 255, .7);
+  background: rgba(255, 255, 255, .1);
+  color: #fff !important;
+}
+.mgdb-ai-page .ai-hero .mgdb-button-secondary:hover { background: rgba(255, 255, 255, .2); }
+.mgdb-ai-page .ai-hero :focus-visible { outline-color: #fff; }
+
+/* The resource map: five areas the page covers, in a 2-2-1 grid. */
+.mgdb-ai-page .ai-hero-map {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--mgdb-space-2);
+  padding: var(--mgdb-space-3);
+  border: 1px solid rgba(255, 255, 255, .2);
+  border-radius: var(--mgdb-radius);
+  background: rgba(0, 0, 0, .18);
+}
+
+.mgdb-ai-page .ai-hero-map > div {
+  padding: var(--mgdb-space-3);
+  border-radius: var(--mgdb-radius-sm);
+  background: rgba(255, 255, 255, .07);
+}
+
+.mgdb-ai-page .ai-hero-map > div:last-child { grid-column: 1 / -1; }
+.mgdb-ai-page .ai-hero-map strong { display: block; color: #fff; font-size: var(--mgdb-text-base); }
+.mgdb-ai-page .ai-hero-map span { display: block; margin-top: 2px; color: #cfe3c8; font-size: var(--mgdb-text-sm); }
+
+/* Section navigation reuses the genome page's sticky tab treatment. */
+.mgdb-ai-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  padding: var(--mgdb-space-2) 0;
+  background: var(--mgdb-surface);
+}
+
+.mgdb-ai-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.mgdb-ai-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
+.mgdb-ai-page .mgdb-section-tabs a.is-current {
+  border-color: var(--mgdb-green-dark);
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+  background: var(--mgdb-green-dark);
+  color: #fff !important;
+}
+
+.mgdb-ai-page > section { margin-top: var(--mgdb-space-7); scroll-margin-top: 4.5rem; }
+
+/* Featured tool ------------------------------------------------------------ */
+
+.mgdb-ai-page .ai-featured {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+  gap: var(--mgdb-space-6);
+  padding: var(--mgdb-space-6);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow);
+}
+
+.mgdb-ai-page .ai-new-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border: 1px solid var(--mgdb-gold-dark);
+  border-radius: 999px;
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 800;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.mgdb-ai-page .ai-product-name {
+  display: flex;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  margin-top: var(--mgdb-space-4);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xl);
+  font-weight: 800;
+}
+
+.mgdb-ai-page .ai-product-mark {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-green-dark);
+  color: #fff;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 900;
+}
+
+.mgdb-ai-page .ai-featured h2 { margin-top: var(--mgdb-space-3); color: var(--mgdb-green-dark); }
+.mgdb-ai-page .ai-featured-copy > p { margin-top: var(--mgdb-space-3); color: var(--mgdb-ink-soft); }
+
+.mgdb-ai-page .ai-feature-list { margin-top: var(--mgdb-space-4); padding: 0; list-style: none; }
+.mgdb-ai-page .ai-feature-list li { position: relative; padding-left: 1.75rem; }
+.mgdb-ai-page .ai-feature-list li + li { margin-top: var(--mgdb-space-3); }
+
+/* A check marks each capability; it is decorative, the text carries meaning. */
+.mgdb-ai-page .ai-feature-list li::before {
+  position: absolute;
+  top: .15em;
+  left: 0;
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  content: "\2713";
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.mgdb-ai-page .ai-feature-list strong { display: block; color: var(--mgdb-ink); }
+.mgdb-ai-page .ai-feature-list span { display: block; margin-top: 2px; color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+
+.mgdb-ai-page .ai-feature-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+  align-items: center;
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-ai-page .ai-text-link { color: var(--mgdb-green-dark); font-weight: 700; }
+
+/* Connected workflow panel. */
+.mgdb-ai-page .ai-workflow {
+  padding: var(--mgdb-space-5);
+  border-radius: var(--mgdb-radius);
+  background: linear-gradient(150deg, #14301c, #1f452a);
+  color: #fff;
+}
+
+.mgdb-ai-page .ai-workflow-heading span {
+  display: block;
+  color: #ffd99a;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 800;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.mgdb-ai-page .ai-workflow-heading strong {
+  display: block;
+  margin-top: var(--mgdb-space-1);
+  font-size: var(--mgdb-text-lg);
+}
+
+.mgdb-ai-page .ai-workflow ol {
+  margin-top: var(--mgdb-space-4);
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+
+.mgdb-ai-page .ai-workflow li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  padding: var(--mgdb-space-3);
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: var(--mgdb-radius-sm);
+  background: rgba(255, 255, 255, .06);
+}
+
+.mgdb-ai-page .ai-workflow li + li { margin-top: var(--mgdb-space-2); }
+.mgdb-ai-page .ai-workflow li > span { color: #ffd99a; font-size: var(--mgdb-text-sm); font-weight: 900; }
+.mgdb-ai-page .ai-workflow strong { display: block; font-size: var(--mgdb-text-base); }
+.mgdb-ai-page .ai-workflow small { display: block; margin-top: 2px; color: #cfe3c8; font-size: var(--mgdb-text-sm); }
+
+.mgdb-ai-page .ai-suite-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-ai-page .ai-suite-list span {
+  padding: 2px 9px;
+  border: 1px solid rgba(255, 255, 255, .25);
+  border-radius: 999px;
+  font-size: var(--mgdb-text-sm);
+}
+
+/* Resource finder ---------------------------------------------------------- */
+
+.mgdb-ai-page .ai-resource-finder {
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-ai-page .ai-resource-search { display: flex; flex-wrap: wrap; gap: var(--mgdb-space-3); align-items: flex-end; }
+.mgdb-ai-page .ai-resource-search > label { flex: 1 1 20rem; min-width: 0; }
+
+.mgdb-ai-page .ai-resource-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-top: var(--mgdb-space-4);
+}
+
+/* Category buttons match the shared filter chip, including the check that
+   keeps the pressed state from depending on colour alone. */
+.mgdb-ai-page .ai-resource-filters button {
+  min-height: 36px;
+  padding: var(--mgdb-space-1) var(--mgdb-space-4);
+  border: 1px solid #c7bda8;
+  border-radius: 999px;
+  background: var(--mgdb-surface);
+  color: var(--mgdb-burgundy);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-ai-page .ai-resource-filters button:hover { background: var(--mgdb-gold-soft); }
+.mgdb-ai-page .ai-resource-filters button[aria-pressed="true"] {
+  border-color: var(--mgdb-burgundy);
+  border-width: 2px;
+  background: var(--mgdb-burgundy);
+  color: #fff;
+}
+.mgdb-ai-page .ai-resource-filters button[aria-pressed="true"]::before { content: "\2713 "; }
+
+.mgdb-ai-page #ai-resource-count {
+  margin-left: auto;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+/* Resource cards ----------------------------------------------------------- */
+
+.mgdb-ai-page .ai-section-heading { margin-bottom: var(--mgdb-space-4); }
+.mgdb-ai-page .ai-section-heading h2 { color: var(--mgdb-green-dark); }
+.mgdb-ai-page .ai-section-heading p { max-width: var(--mgdb-measure); margin-top: var(--mgdb-space-2); color: var(--mgdb-muted); }
+
+.mgdb-ai-page .ai-section-tinted {
+  padding: var(--mgdb-space-6) var(--mgdb-space-5);
+  border-top: 1px solid var(--mgdb-line-soft);
+  border-bottom: 1px solid var(--mgdb-line-soft);
+  background: linear-gradient(180deg, var(--mgdb-surface-alt), var(--mgdb-surface));
+}
+
+.mgdb-ai-page .ai-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-ai-page .ai-resource-card {
+  display: flex;
+  flex-direction: column;
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-ai-page .ai-resource-card h3 { margin-top: var(--mgdb-space-3); color: var(--mgdb-green-dark); font-size: var(--mgdb-text-lg); }
+.mgdb-ai-page .ai-resource-card p { margin-top: var(--mgdb-space-2); color: var(--mgdb-ink-soft); font-size: var(--mgdb-text-base); }
+
+.mgdb-ai-page .ai-card-type {
+  color: var(--mgdb-red);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.mgdb-ai-page .ai-card-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+/* Icon tints. Decorative only — every card states its type in text. */
+.mgdb-ai-page .ai-icon-gold  { background: var(--mgdb-gold-soft); color: var(--mgdb-gold-dark); }
+.mgdb-ai-page .ai-icon-blue  { background: var(--mgdb-status-info-soft); color: var(--mgdb-status-info); }
+.mgdb-ai-page .ai-icon-teal  { background: var(--mgdb-green-soft); color: var(--mgdb-green); }
+.mgdb-ai-page .ai-icon-green { background: var(--mgdb-green-soft); color: var(--mgdb-green-dark); }
+
+.mgdb-ai-page .ai-tags { display: flex; flex-wrap: wrap; gap: var(--mgdb-space-2); margin-top: var(--mgdb-space-3); }
+
+.mgdb-ai-page .ai-tags span {
+  padding: 2px 9px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.mgdb-ai-page .ai-card-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  margin-top: auto;
+  padding-top: var(--mgdb-space-4);
+}
+
+.mgdb-ai-page .ai-card-links a { color: var(--mgdb-burgundy); font-size: var(--mgdb-text-sm); font-weight: 700; }
+.mgdb-ai-page .ai-data-label { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+.mgdb-ai-page .ai-section-cta { margin-top: var(--mgdb-space-4); }
+
+/* Publications ------------------------------------------------------------- */
+
+.mgdb-ai-page .ai-publication-list { display: grid; gap: var(--mgdb-space-4); }
+
+.mgdb-ai-page .ai-featured-paper {
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-left: 6px solid var(--mgdb-green);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-ai-page .ai-featured-paper h3 { color: var(--mgdb-green-dark); font-size: var(--mgdb-text-lg); }
+.mgdb-ai-page .ai-featured-paper p { margin-top: var(--mgdb-space-2); color: var(--mgdb-ink); line-height: var(--mgdb-leading); }
+
+.mgdb-ai-page .ai-copy-citation {
+  min-height: 38px;
+  margin-top: var(--mgdb-space-3);
+  padding: var(--mgdb-space-1) var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-green-dark);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-green-dark);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-ai-page .ai-copy-citation:hover { background: var(--mgdb-green-soft); }
+
+/* Responsive --------------------------------------------------------------- */
+
+@media (max-width: 1023px) {
+  .mgdb-ai-page .ai-hero,
+  .mgdb-ai-page .ai-featured { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 767px) {
+  .mgdb-ai-page .ai-hero,
+  .mgdb-ai-page .ai-featured { padding: var(--mgdb-space-5) var(--mgdb-space-4); }
+  .mgdb-ai-page .ai-hero-map { grid-template-columns: 1fr; }
+  .mgdb-ai-page .ai-section-tinted { padding-inline: var(--mgdb-space-4); }
+  .mgdb-ai-page .mgdb-section-tabs {
+    position: static;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+  .mgdb-ai-page .mgdb-section-tabs a { white-space: nowrap; }
+  .mgdb-ai-page #ai-resource-count { width: 100%; margin-left: 0; }
+  .mgdb-ai-page .ai-hero-actions .mgdb-button { width: 100%; }
+}

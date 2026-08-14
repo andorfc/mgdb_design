@@ -1,0 +1,337 @@
+$$SYNTAX-LEVEL 2
+*(ai
+<style>
+  #content { min-height: 680px; }
+
+  /* Basic styles for the carousel container */
+  .carousel-container {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      overflow: hidden;
+      position: relative;
+  }
+
+  /* Style for the carousel images */
+  .carousel-image {
+      width: 100%;
+      display: none;
+  }
+
+  /* Style for the description container */
+  .description-container {
+      background-color: rgba(0, 0, 0, 0.9\);
+      color: white;
+      text-align: center;
+      padding: 8px;
+  }
+
+  /* Style for the navigation arrows */
+  .carousel-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%\);
+      cursor: pointer;
+      font-size: 24px;
+      color: white;
+      background-color: rgba(0, 0, 0, 0.8\);
+      padding: 8px 16px;
+      border-radius: 50%;
+      z-index: 1;
+  }
+
+  .prev-arrow {
+      left: 10px;
+  }
+
+  .next-arrow {
+      right: 10px;
+  }
+
+  /* Style for the description container below the image */
+  .description-below {
+      margin-top: 10px;
+  }
+</style>
+
+<table width=100% cellpadding=0 cellspacing=0>
+  <tr>
+    <td>
+      <div id="centercolumn_record">
+        <div class='navarea'>
+          <font size="1">
+            <span class='underlinedlink' align=right>
+              <a href='/'>Home</a> > Artificial Intelligence and Machine Learning
+            </span>
+          </font>
+        </div>
+        <br>
+        <table width='100%'  cellpadding=0 cellspacing=0>
+          <tr valign='center' class='green_curve_background'>
+            <td align='left'>
+              <img src='/images/header_left.gif'></img>
+            </td>
+            <td width='97%' valign='center' class='green_curve_background'>
+              Artificial Intelligence and Machine Learning Resources at MaizeGDB
+            </td>
+            <td align='right'>
+              <img src='/images/header_right.gif'></img>
+            </td>
+          </tr>
+        </table>
+
+        <div id='ai_content'>
+        <br>
+          <table>
+            <tr valign='top'>
+              <td valign='top'>
+                <table>
+                  <tr valign='top'>
+                    <td valign='top'>
+                      <h3>MaizeGDB Tools</h3>
+                      <br>
+                      <div style="margin-left: 10px">
+                        <a href="https://feta.maizegdb.org">FETA</a>: 
+                        A suite of tools for exploring gene functional enrichment in 
+                        <i>Zea mays</i> and related species.
+                        <br><br>
+                        <a href="https://maizegdb.org/effect/maize_v2/">PanEffect</a>:
+                        This tool visualizes the potential effects of missense variants based on (1\) all possible amino acid substitutions for proteins in the B73 genome and (2\) the predicted impacts across the natural variation in the maize pan-genome.
+                        <br><br>
+                        <a href="https://wgs.maizegdb.org/ ">SNPversity 2</a>:
+                        Creates a VCF file based on a given region of the B73 genome and a subset 
+                        from thousands of diverse maize accessions. SNPversity 2 links to PanEffect 
+                        to predict missense variants from WGS SNPs
+                        <br><br>
+
+                        <a href="https://www.maizegdb.org/data_center/protein_structure">Protein Structure Resources</a>
+                        <ul>
+                        <li style="margin-left: 20px"><a href="https://www.maizegdb.org/foldseek">Foldseek Search</a>: This tool takes a given B73 gene model and finds the top protein structure hits (using FoldSeek\) against the the proteomes of Arabidopsis thaliana (Arabidopsis\), Glycine max (Soybean\), Oryza sativa (Asian rice\), Sorghum bicolor, Zea mays (Maize\),  Homo sapiens (Human\), Saccharomyces cerevisiae (Budding yeast\), and Schizosaccharomyces pombe (Fission yeast\).</li>
+                        <li style="margin-left: 20px"><a href="https://www.maizegdb.org/fatcat">FATCAT Comparison</a>: This tool shows the structural alignments between a query maize protein with the top hits from the sequence-based tool Diamond and two structural alignment tools FoldSeek and FATCAT, based on structure alignments against the following four plant proteomes: Arabidopsis thaliana (Arabidopsis\), Glycine max (Soybean\), Oryza sativa (Asian rice\), and Sorghum bicolor (Sorghum\). </li>
+                        </ul>
+                        <br>
+                        <a href="https://mfs.maizegdb.org/">Maize Feature Store</a>:
+                        The Maize feature store is a centralized repository of maize data sets formatted to be used as gene-based features for machine learning applications.
+                        <br><br>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <h3>Downloads</h3>
+                      <br>
+                      <a href="https://iastate.app.box.com/v/maizegdb-public/folder/362582785407">All AI-ready data downloads</a>
+                      <br><br>
+                      <a href="https://iastate.app.box.com/v/maizegdb-public/folder/362581854753">Core-60 Feature Vector</a>
+                      <ul>
+                        <li style="margin-left: 20px">Genomes analyzed: B73 v5</li>
+                        <li style="margin-left: 20px">
+                          Methodology: A dataset of essential metadata comprising approximately 60 
+                          genetic and genomic attributes for each B73 and NAM gene annotation. 
+                          Reference <a href="https://doi.org/10.1093/genetics/iyag005">Haley et al. (2026\)</a>
+                          for more information on how the dataset was assembled.
+                        </li>
+                      </ul>
+                      <br>
+                      <a href="https://iastate.app.box.com/v/maizegdb-public/folder/362581772989">Extended-17k Feature Vector</a>
+                      <ul>
+                        <li style="margin-left: 20px">Genomes analyzed: B73 v5</li>
+                        <li style="margin-left: 20px">
+                          Methodology: An expansive dataset of comprising approximately 17,000 
+                          genetic and genomic attributes for each B73 gene annotation.
+                        </li>
+                      </ul>
+                      <br>
+                      <a href="https://download.maizegdb.org/GeneFunction_and_Expression/Pannzer_GO_Terms/">Gene Ontology (GO\) Terms</a>:
+                      <ul>
+                        <li style="margin-left: 20px">Genomes analyzed: B73 v4, B73 v5, Mo17 (CAU\), W22, and the 25 NAM founder genomes.</li>
+                        <li style="margin-left: 20px">Methodology: Used Pannzer, a machine-learning tool, to predict Gene Ontology terms and Uniprot descriptions.</li>
+                      </ul>
+                      <br>
+                      <a href="https://iastate.app.box.com/v/maizegdb-public/folder/362581211707">MaizeGDB Curated Literature Dataset</a>
+                      <ul>
+                        <li style="margin-left: 20px">Genomes analyzed: B73 v5, v4</li>
+                        <li style="margin-left: 20px">
+                          Methodology: A dataset of manuscripts having manual annotations collected 
+                          over the past 20+ years from data curators at MaizeGDB and within the 
+                          maize community. Reference 
+                          <a href="https://doi.org/10.1093/genetics/iyag005">Haley et al. (2026\)</a> 
+                          for more information on how the dataset was assembled.
+                        </li>
+                      <ul>
+                      <br>
+                      <a href="https://iastate.app.box.com/v/maizegdb-public/folder/362582492660">AlphaFold2 Protein Structures</a>
+                      <ul>
+                        <li style="margin-left: 20px">Genomes analyzed: B73 v5, W22, and the 25 NAM founder genomes.</li>
+                        <li style="margin-left: 20px">
+                          Methodology: Predicted the 3D protein structures utilizing the 
+                          AlphaFold2 pipeline.
+                        </li>
+                      </ul>
+                      <br>
+                      <a href="https://download.maizegdb.org/GeneFunction_and_Expression/FASSO_AlphaFold_Orthologs/">Functional Annotations</a>:
+                      <ul>
+                        <li style="margin-left: 20px">Genome analyzed: B73 v5.</li>
+                        <li style="margin-left: 20px">Inferred UniProt annotations based on sequence homology using Diamond, along with structure alignment via FoldSeek and FATCAT. Utilized the FASSO pipeline to merge results and predict potential orthologs and functional annotations.</li>
+                      </ul>
+                      <br>
+                      <a href="https://download.maizegdb.org/GeneFunction_and_Expression/E2P2_pathways/">Metabolic Pathways</a>:
+                      <ul>
+                        <li style="margin-left: 20px">Genomes analyzed: B73 v5 and the 25 NAM founder genomes.</li>
+                        <li style="margin-left: 20px">Methodology: Employed the E2P2 pipeline on official protein annotations to anticipate enzymatic function. Pathway assignments were determined using data from CornCyc, AraCyc, and OryzaCyc. Assignments were validated with SAVI validation lists for evidence codes.</li>
+                      </ul>
+                      <br>
+                       <a href="https://iastate.app.box.com/v/maizegdb-public/folder/362582591980">Protein Embeddings</a>:
+                        <ul>
+                        <li style="margin-left: 20px">Genomes analyzed: B73 v5 and the 25 NAM founder genomes.</li>
+                        <li style="margin-left: 20px">Methodology: Computed protein embeddings using three distinct protein language models (pLM\): ESM, ProtBERT, and T5. Data is stored in both .h5 and .npy formats.</li>
+                        </ul>
+
+                      <br>
+                       <a href="https://iastate.app.box.com/v/maizegdb-public/folder/362581729713">Protein Structures</a>:
+                        <ul>
+                        <li style="margin-left: 20px">Genomes analyzed: B73 v5, W22, and the 25 NAM founder genomes.</li>
+                        <li style="margin-left: 20px">Methodology: Predicted the 3D protein structures utilizing the ESMFold pipeline.</li>
+                        </ul>
+
+                      <br>
+                       <a href="https://iastate.app.box.com/v/maizegdb-public/folder/362583128761">Variant Effect Scores</a>:
+                        <ul>
+                        <li style="margin-left: 20px">Genomes analyzed: B73 v4, B73 v5, W22, the NAM founder genomes, and 25 other maize genomes.</li>
+                        <li style="margin-left: 20px">Methodology: Used the esm-variants tool, which operates on the ESM protein language model, to predict variant effect scores. This tool calculates scores based on the log-likelihood ratio difference between the variant and its wild type.</li>
+                        </ul>
+                        <br>
+                    </td>
+                  </tr>
+
+              <tr>
+                <td>
+                  <h3>Source Code</h3>
+                  <br>
+                  <a target="_blank" href="https://github.com/Maize-Genetics-and-Genomics-Database/SNPversity2.0">SNPversity 2.0</a>:
+                  Scripts and pipelines used for processing VCF files and integrating 
+                  variant effect scores (e.g. from PlantCAD, ESM-variants\) into SNPversity.
+                  <br><br>
+                  <a target="_blank" href="https://github.com/Maize-Genetics-and-Genomics-Database/Plant-Embedding-Generator">Plant-Embedding-Generator</a>: 
+                  Workflows demonstrating how to use protein language model embeddings and 
+                  perform homology searches.
+                  <br><br>
+          <!--
+                  <a target="_blank" href="https://github.com/Maize-Genetics-and-Genomics-Database/CrossFoldDB">CrossFoldDB</a>: 
+                  Framework for performing and storing precomputed FoldSeek protein 
+                  structure alignments across related species and reference outgroups and 
+                  creating a webpage to display search results.
+                  <br><br>
+          -->
+                  <a target="_blank" href="https://github.com/Maize-Genetics-and-Genomics-Database/PlantCAD-SeqTracks">PlantCAD-SeqTracks</a>: 
+                  Notebooks and scripts for generating DNA embeddings, scoring variants, 
+                  and visualizing model outputs using PlantCAD and DNABERT.
+                  <br><br>
+                  <a target="_blank" href="https://github.com/Maize-Genetics-and-Genomics-Database/FASSO">FASSO</a>: 
+                  Functional Annotations by Combining Sequence and Structure Orthology.  
+                  FASSO generates structure-based orthologs by combining three methods 
+                  (Diamond, FoldSeek, and Fatcat\) and assigns UniProt function annotations.
+                  <br><br>
+                  <a target="_blank" href="https://github.com/Maize-Genetics-and-Genomics-Database/PanEffect">PanEffect</a>: 
+                  PanEffect is a JavaScript framework to explore variant effects across 
+                  a pangenome. The tool has two views that allows a user to (1\) explore 
+                  all possible amino acid substitutions and their variant effects for a 
+                  reference genome, and (2\) view the natural variation and their effects 
+                  across a pangenome.
+                  <br><br>
+                </td>
+              </tr>
+            <tr>
+              <td>
+                <h3>Publications</h3>
+                <br>
+                Haley OC, Tibbs-Cortes LE, Harding SF, Poretsky E, Cannon EK, Portwood JL,
+                Gardiner JM, Sen TZ, Kim H, Woodhouse MR, Andorf CM. (2026\). Delivering 
+                artificial intelligence–ready genomics with the Maize Genetics and Genomics 
+                Database. Genetics. 
+                <a href="https://doi.org/10.1093/genetics/iyag005">https://doi.org/10.1093/genetics/iyag005</a>
+                <br><br>
+                Sen S, Woodhouse MR, Portwood JL, Andorf CM, Maize Feature Store: A centralized 
+                resource to manage and analyze curated maize multi-omics features for machine 
+                learning applications. (2023\). Database. 
+                <a href="https://doi.org/10.1093/database/baad078">https://doi.org/10.1093/database/baad078</a>
+                <br><br>
+                Andorf CM, Haley OC, Hayford RK, Portwood JL, Sen S, Cannon EK, Gardiner JM, Woodhouse MR. (2023\). PanEffect: A pan-genome visualization tool for variant effects in maize. In bioRxiv (p. 2023.09.25.559155\). <a target="_blank" href="https://doi.org/10.1101/2023.09.25.559155">https://doi.org/10.1101/2023.09.25.559155</a>.
+                <br><br>
+                Woodhouse MR, Portwood JL, Sen S, Hayford RK, Gardiner JM, Cannon EK, Harper LC, Andorf CM. (2023\). Maize Protein Structure Resources at the Maize Genetics and Genomics Database. Genetics. <a target="_blank" href="https://doi.org/10.1093/genetics/iyad016">https://doi.org/10.1093/genetics/iyad016</a>.
+                <br><br>
+                Andorf CM,  Sen S, Hayford RK, Portwood JL, Cannon EK, Harper LC, Gardiner JM, Sen TZ, Woodhouse MR. (2022\) FASSO: An AlphaFold based method to assign functional annotations by combining sequence and structure orthology. In bioRxiv (p. 2022.11.10.516002\) doi: <a target="_blank" href="https://doi.org/10.1101/2022.11.10.516002">https://doi.org/10.1101/2022.11.10.516002</a>.
+                <br><br>
+                Cho KT, Sen TZ, Andorf CM. (2022\) Predicting Tissue-Specific mRNA and Protein Abundance in Maize: A Machine Learning Approach. Frontiers in artificial intelligence. 26 May 2022 Sec. AI in Food, Agriculture and Water. doi: <a target="_blank" href="https://doi.org/10.3389/frai.2022.830170">https://doi.org/10.3389/frai.2022.830170</a>.
+                <br>
+              </td>
+            </tr>
+                </table>
+              </td>
+              <td width="450px" align="center" valign="top">
+                <div class="carousel-container" valign='top'>
+                    <img class="carousel-image" src="/images/paneffect_b73.png" alt="Image 1">
+                    <img class="carousel-image" src="/images/paneffect_pan.png" alt="Image 2">
+                    <img class="carousel-image" src="/images/foldseek_part1.png" alt="Image 3">
+                    <img class="carousel-image" src="/images/foldseek_part2.png" alt="Image 4">
+                    <img class="carousel-image" src="/images/fatcat.png" alt="Image 5">
+                    <img class="carousel-image" src="/images/mfs.png" alt="Image 6">
+                    <div class="description-container description-below"></div>
+                    <div class="carousel-arrow prev-arrow" onclick="prevImage(\)"><</div>
+                    <div class="carousel-arrow next-arrow" onclick="nextImage(\)">></div>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </td>
+  </tr>
+</table>
+
+<script>
+    // JavaScript code for the carousel
+    const images = document.querySelectorAll('.carousel-image'\);
+    const descriptionContainer = document.querySelector('.description-container'\);
+
+    let currentIndex = 0;
+
+    function showImage(index\) {
+        images.forEach((image, i\) => {
+            if (i === index\) {
+                image.style.display = 'block';
+            } else {
+                image.style.display = 'none';
+            }
+        }\);
+    }
+
+    function showDescription(index\) {
+        const descriptions = [
+        'PanEffect Tool - Variant Effects in B73: This view provides a visualization of the variant effects of all possible amino acid substitutions in the B73 maize line.',
+        'PanEffect Tool - Variant Effects in the pan-genome: This view shows the effects of naturally occurring variations on maize proteins from across the pan-genome',
+        'FoldSeek Search Part #1: The FoldSeek Search tool provides an overview of the predicted protein structures for each maize gene model and protein search results against 8 proteomes.',
+        'FoldSeek Search Part #2: The FoldSeek Search tool provides an overview of the predicted protein structures for each maize gene modeland protein search results against 8 proteomes.',
+        'FATCAT Comparisions: The FATCAT tool compares the protein structures of ortholog predictions from three tools (DIAMOND, FoldSeek, FATCAT\).',
+        'Maize Feature Store: The Maize Feature Stores lets a user explore thousands of gene features and perform exploratory analysis.',
+        ];
+        descriptionContainer.textContent = descriptions[index];
+    }
+
+    function nextImage(\) {
+        currentIndex = (currentIndex + 1\) % images.length;
+        showImage(currentIndex\);
+        showDescription(currentIndex\);
+    }
+
+    function prevImage(\) {
+        currentIndex = (currentIndex - 1 + images.length\) % images.length;
+        showImage(currentIndex\);
+        showDescription(currentIndex\);
+    }
+
+    // Initial display
+    showImage(currentIndex\);
+    showDescription(currentIndex\);
+</script>
+)

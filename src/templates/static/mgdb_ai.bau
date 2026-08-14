@@ -1,0 +1,153 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-ai
+<main class="mgdb-page mgdb-ai-page" id="mgdb-ai-main">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">›</span><span>AI and machine learning</span>
+  </nav>
+
+  <section class="ai-hero" aria-labelledby="ai-page-title">
+    <div class="ai-hero-copy">
+      <span class="mgdb-eyebrow">MaizeGDB computational resources</span>
+      <h1 id="ai-page-title">Move from maize variation to biological insight.</h1>
+      <p>Explore variants, predicted effects, protein structures, functional annotations, and machine-learning-ready datasets built for maize research.</p>
+      <div class="ai-hero-actions">
+        <a class="mgdb-button mgdb-button-primary" href="https\://snptools.maizegdb.org/" target="_blank" rel="noopener">Launch SNPTools <span aria-hidden="true">↗</span></a>
+        <a class="mgdb-button mgdb-button-secondary" href="#ai-data">Browse AI-ready data <span aria-hidden="true">↓</span></a>
+      </div>
+    </div>
+    <div class="ai-hero-map" aria-label="Resource areas available on this page">
+      <div><strong>Variation</strong><span>Search and compare SNPs</span></div>
+      <div><strong>Effects</strong><span>Prioritize predicted impacts</span></div>
+      <div><strong>Function</strong><span>Connect genes to evidence</span></div>
+      <div><strong>Structure</strong><span>Explore predicted proteins</span></div>
+      <div><strong>AI data</strong><span>Build reproducible models</span></div>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="AI resource sections">
+    <a href="#ai-featured">Featured tool</a>
+    <a href="#ai-tools">Analysis tools</a>
+    <a href="#ai-data">AI-ready data</a>
+    <a href="#ai-code">Source code</a>
+    <a href="#ai-publications">Publications</a>
+  </nav>
+
+  <section id="ai-featured" class="ai-featured" aria-labelledby="ai-featured-title">
+    <div class="ai-featured-copy">
+      <span class="ai-new-badge">New featured resource</span>
+      <div class="ai-product-name"><span class="ai-product-mark" aria-hidden="true">SNP</span><span>SNPTools</span></div>
+      <h2 id="ai-featured-title">One workspace for maize SNP discovery and interpretation.</h2>
+      <p>SNPTools brings variant search, visualization, comparison, functional interpretation, and downstream analysis into a connected MaizeGDB toolkit.</p>
+      <ul class="ai-feature-list">
+        <li><strong>Build targeted variant views</strong><span>Select a B73 v5 interval or gene model and choose accessions from diverse maize datasets.</span></li>
+        <li><strong>Inspect richer evidence</strong><span>Review alleles, predicted effects, and DNA or protein language-model scores in an interactive table.</span></li>
+        <li><strong>Keep analysis moving</strong><span>Download VCF output or send a selection to comparison, impact, function, structure, tree, and PanEffect workflows.</span></li>
+      </ul>
+      <div class="ai-feature-actions">
+        <a class="mgdb-button mgdb-button-primary" href="https\://snptools.maizegdb.org/" target="_blank" rel="noopener">Open SNPTools <span aria-hidden="true">↗</span></a>
+        <a class="ai-text-link" href="https\://snptools.maizegdb.org/#help" target="_blank" rel="noopener">Help and FAQ <span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+    <div class="ai-workflow" aria-label="SNPTools workflow">
+      <div class="ai-workflow-heading"><span>Connected workflow</span><strong>Start with a region. Continue with evidence.</strong></div>
+      <ol>
+        <li><span>01</span><div><strong>Choose</strong><small>Dataset, interval, gene, and accessions</small></div></li>
+        <li><span>02</span><div><strong>Explore</strong><small>Variants, alleles, effects, and model scores</small></div></li>
+        <li><span>03</span><div><strong>Compare</strong><small>Accessions, functional evidence, and relationships</small></div></li>
+        <li><span>04</span><div><strong>Export</strong><small>Download a focused VCF or continue in another tool</small></div></li>
+      </ol>
+      <div class="ai-suite-list" aria-label="SNPTools applications">
+        <span>SNPVersity</span><span>SNPImpact</span><span>SNPFunction</span><span>SNPFold</span><span>SNPCompare</span><span>SNPTree</span><span>PanEffect</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="ai-resource-finder" aria-labelledby="ai-resource-finder-title">
+    <div>
+      <span class="mgdb-eyebrow">Resource finder</span>
+      <h2 id="ai-resource-finder-title">Find the right starting point</h2>
+      <p>Search across tools, datasets, and open-source workflows on this page.</p>
+    </div>
+    <div class="ai-resource-search"><span aria-hidden="true">⌕</span><label class="mgdb-visually-hidden" for="ai-resource-query">Search resources</label><input id="ai-resource-query" type="search" placeholder="Try variants, protein structure, GO terms…" autocomplete="off"><button id="ai-resource-clear" type="button" hidden>Clear</button></div>
+    <div class="ai-resource-filters" aria-label="Filter resource cards">
+      <button type="button" class="is-active" data-ai-filter="all">All</button>
+      <button type="button" data-ai-filter="tool">Tools</button>
+      <button type="button" data-ai-filter="data">Data</button>
+      <button type="button" data-ai-filter="code">Code</button>
+      <span id="ai-resource-count" aria-live="polite"></span>
+    </div>
+  </section>
+
+  <section id="ai-tools" class="ai-section" aria-labelledby="ai-tools-title">
+    <div class="ai-section-heading"><div><span class="mgdb-eyebrow">Analyze and interpret</span><h2 id="ai-tools-title">MaizeGDB analysis tools</h2></div><p>Purpose-built interfaces for functional enrichment, variant effects, structure, and machine-learning features.</p></div>
+    <div class="ai-card-grid ai-card-grid-tools">
+      <article class="ai-resource-card ai-tool-card" data-ai-resource data-ai-category="tool" data-ai-search="FETA functional enrichment genes gene ontology zea mays">
+        <span class="ai-card-icon ai-icon-green" aria-hidden="true">ƒ</span><span class="ai-card-type">Functional enrichment</span><h3>FETA</h3><p>Explore gene functional enrichment in <i>Zea mays</i> and related species.</p><a href="https\://feta.maizegdb.org" target="_blank" rel="noopener">Open FETA <span aria-hidden="true">↗</span></a>
+      </article>
+      <article class="ai-resource-card ai-tool-card" data-ai-resource data-ai-category="tool" data-ai-search="PanEffect missense amino acid substitution variant effects pangenome B73">
+        <span class="ai-card-icon ai-icon-blue" aria-hidden="true">Δ</span><span class="ai-card-type">Variant effects</span><h3>PanEffect</h3><p>Visualize predicted missense effects for B73 substitutions and natural variation across the maize pan-genome.</p><a href="/effect/maize_v2/">Open PanEffect <span aria-hidden="true">→</span></a>
+      </article>
+      <article class="ai-resource-card ai-tool-card" data-ai-resource data-ai-category="tool" data-ai-search="protein structure Foldseek FATCAT Diamond comparison predicted proteins">
+        <span class="ai-card-icon ai-icon-gold" aria-hidden="true">⌁</span><span class="ai-card-type">Protein structure</span><h3>Structure resources</h3><p>View predicted maize structures, search proteomes with Foldseek, and compare ortholog predictions with FATCAT.</p><div class="ai-card-links"><a href="/data_center/protein_structure">Browse structures</a><a href="/foldseek">Foldseek</a><a href="/fatcat">FATCAT</a></div>
+      </article>
+      <article class="ai-resource-card ai-tool-card" data-ai-resource data-ai-category="tool" data-ai-search="Maize Feature Store machine learning gene features multiomics data exploration MFS">
+        <span class="ai-card-icon ai-icon-teal" aria-hidden="true">▦</span><span class="ai-card-type">Machine-learning features</span><h3>Maize Feature Store</h3><p>Explore centralized, gene-based maize features prepared for machine-learning applications.</p><a href="https\://mfs.maizegdb.org/" target="_blank" rel="noopener">Open Feature Store <span aria-hidden="true">↗</span></a>
+      </article>
+    </div>
+  </section>
+
+  <section id="ai-data" class="ai-section ai-section-tinted" aria-labelledby="ai-data-title">
+    <div class="ai-section-heading"><div><span class="mgdb-eyebrow">Download and reuse</span><h2 id="ai-data-title">AI-ready datasets</h2></div><div><p>Curated and computed resources for modeling, annotation, and reproducible analysis.</p><a class="ai-section-cta" href="https\://iastate.app.box.com/v/maizegdb-public/folder/362582785407" target="_blank" rel="noopener">Browse all downloads ↗</a></div></div>
+    <div class="ai-card-grid ai-card-grid-data">
+      <article class="ai-resource-card ai-data-card" data-ai-resource data-ai-category="data" data-ai-search="Core-60 feature vector B73 NAM essential metadata 60 features Haley">
+        <span class="ai-data-label">Feature vectors</span><h3>Core-60</h3><p>A compact set of approximately 60 genetic and genomic attributes for B73 and NAM gene annotations.</p><div class="ai-tags"><span>B73 v5</span><span>NAM genes</span></div><a href="https\://iastate.app.box.com/v/maizegdb-public/folder/362581854753" target="_blank" rel="noopener">Download dataset ↗</a>
+      </article>
+      <article class="ai-resource-card ai-data-card" data-ai-resource data-ai-category="data" data-ai-search="Extended-17k feature vector B73 gene attributes machine learning 17000">
+        <span class="ai-data-label">Feature vectors</span><h3>Extended-17k</h3><p>An expansive collection of approximately 17,000 genetic and genomic attributes for each B73 gene annotation.</p><div class="ai-tags"><span>B73 v5</span><span>High dimensional</span></div><a href="https\://iastate.app.box.com/v/maizegdb-public/folder/362581772989" target="_blank" rel="noopener">Download dataset ↗</a>
+      </article>
+      <article class="ai-resource-card ai-data-card" data-ai-resource data-ai-category="data" data-ai-search="GO gene ontology Pannzer UniProt functional annotations FASSO ortholog Diamond Foldseek FATCAT">
+        <span class="ai-data-label">Functional annotation</span><h3>Gene function predictions</h3><p>Machine-learning GO predictions plus sequence- and structure-informed UniProt annotations.</p><div class="ai-card-links"><a href="https\://download.maizegdb.org/GeneFunction_and_Expression/Pannzer_GO_Terms/" target="_blank" rel="noopener">GO terms</a><a href="https\://download.maizegdb.org/GeneFunction_and_Expression/FASSO_AlphaFold_Orthologs/" target="_blank" rel="noopener">FASSO annotations</a></div>
+      </article>
+      <article class="ai-resource-card ai-data-card" data-ai-resource data-ai-category="data" data-ai-search="curated literature manuscripts manual annotation gene publication B73">
+        <span class="ai-data-label">Training and evaluation</span><h3>Curated literature</h3><p>More than two decades of curator- and community-supplied manuscript annotations linked to maize records.</p><div class="ai-tags"><span>B73 v5</span><span>B73 v4</span></div><a href="https\://iastate.app.box.com/v/maizegdb-public/folder/362581211707" target="_blank" rel="noopener">Download dataset ↗</a>
+      </article>
+      <article class="ai-resource-card ai-data-card" data-ai-resource data-ai-category="data" data-ai-search="AlphaFold2 ESMFold protein structures embeddings ESM ProtBERT T5 language model NAM W22">
+        <span class="ai-data-label">Protein representations</span><h3>Structures and embeddings</h3><p>AlphaFold2 and ESMFold structures plus ESM, ProtBERT, and T5 protein-language-model embeddings.</p><div class="ai-card-links"><a href="https\://iastate.app.box.com/v/maizegdb-public/folder/362582492660" target="_blank" rel="noopener">AlphaFold2</a><a href="https\://iastate.app.box.com/v/maizegdb-public/folder/362581729713" target="_blank" rel="noopener">ESMFold</a><a href="https\://iastate.app.box.com/v/maizegdb-public/folder/362582591980" target="_blank" rel="noopener">Embeddings</a></div>
+      </article>
+      <article class="ai-resource-card ai-data-card" data-ai-resource data-ai-category="data" data-ai-search="variant effect scores esm variants protein language model PlantCAD B73 W22 NAM genomes">
+        <span class="ai-data-label">Variant prioritization</span><h3>Variant effect scores</h3><p>ESM protein-language-model scores for substitutions across B73, W22, NAM founders, and additional maize genomes.</p><div class="ai-tags"><span>Pan-genome</span><span>ESM variants</span></div><a href="https\://iastate.app.box.com/v/maizegdb-public/folder/362583128761" target="_blank" rel="noopener">Download scores ↗</a>
+      </article>
+      <article class="ai-resource-card ai-data-card" data-ai-resource data-ai-category="data" data-ai-search="metabolic pathways E2P2 CornCyc AraCyc OryzaCyc SAVI B73 NAM">
+        <span class="ai-data-label">Pathway annotation</span><h3>Metabolic pathways</h3><p>E2P2 enzyme predictions and validated pathway assignments using CornCyc, AraCyc, OryzaCyc, and SAVI evidence.</p><div class="ai-tags"><span>B73 v5</span><span>NAM founders</span></div><a href="https\://download.maizegdb.org/GeneFunction_and_Expression/E2P2_pathways/" target="_blank" rel="noopener">Download pathways ↗</a>
+      </article>
+    </div>
+  </section>
+
+  <section id="ai-code" class="ai-section" aria-labelledby="ai-code-title">
+    <div class="ai-section-heading"><div><span class="mgdb-eyebrow">Inspect and extend</span><h2 id="ai-code-title">Open-source workflows</h2></div><p>Code used to process variants, generate embeddings, score sequences, and assign function.</p></div>
+    <div class="ai-card-grid ai-card-grid-code">
+      <article class="ai-resource-card ai-code-card" data-ai-resource data-ai-category="code" data-ai-search="SNPversity source VCF variant effect scores PlantCAD ESM variants"><h3>SNPversity 2.0</h3><p>VCF processing and integration of variant-effect scores.</p><a href="https\://github.com/Maize-Genetics-and-Genomics-Database/SNPversity2.0" target="_blank" rel="noopener">View on GitHub ↗</a></article>
+      <article class="ai-resource-card ai-code-card" data-ai-resource data-ai-category="code" data-ai-search="Plant Embedding Generator protein language model homology search"><h3>Plant Embedding Generator</h3><p>Protein-language-model embeddings and homology-search workflows.</p><a href="https\://github.com/Maize-Genetics-and-Genomics-Database/Plant-Embedding-Generator" target="_blank" rel="noopener">View on GitHub ↗</a></article>
+      <article class="ai-resource-card ai-code-card" data-ai-resource data-ai-category="code" data-ai-search="PlantCAD SeqTracks DNA embeddings DNABERT variant scoring visualization"><h3>PlantCAD SeqTracks</h3><p>DNA embeddings, variant scoring, and model-output visualization notebooks.</p><a href="https\://github.com/Maize-Genetics-and-Genomics-Database/PlantCAD-SeqTracks" target="_blank" rel="noopener">View on GitHub ↗</a></article>
+      <article class="ai-resource-card ai-code-card" data-ai-resource data-ai-category="code" data-ai-search="FASSO functional annotation Diamond Foldseek FATCAT UniProt ortholog"><h3>FASSO</h3><p>Functional annotation from combined sequence and structure orthology.</p><a href="https\://github.com/Maize-Genetics-and-Genomics-Database/FASSO" target="_blank" rel="noopener">View on GitHub ↗</a></article>
+      <article class="ai-resource-card ai-code-card" data-ai-resource data-ai-category="code" data-ai-search="PanEffect source variant effects pangenome amino acid substitutions"><h3>PanEffect</h3><p>A JavaScript framework for exploring predicted effects across a pan-genome.</p><a href="https\://github.com/Maize-Genetics-and-Genomics-Database/PanEffect" target="_blank" rel="noopener">View on GitHub ↗</a></article>
+    </div>
+  </section>
+
+  <div id="ai-no-results" class="mgdb-empty" hidden><strong>No resources matched that search.</strong><span>Try a broader term or show all resource types.</span><button type="button" id="ai-no-results-reset">Reset resource finder</button></div>
+
+  <section id="ai-publications" class="ai-section ai-publications" aria-labelledby="ai-publications-title">
+    <div class="ai-section-heading"><div><span class="mgdb-eyebrow">Methods and context</span><h2 id="ai-publications-title">Key publications</h2></div><p>Use these papers to understand and cite the datasets and methods behind MaizeGDB AI resources.</p></div>
+    <article class="ai-featured-paper">
+      <span>Featured · 2026</span><h3>Delivering artificial intelligence–ready genomics with the Maize Genetics and Genomics Database</h3><p id="ai-citation-haley">Haley OC, Tibbs-Cortes LE, Harding SF, Poretsky E, Cannon EK, Portwood JL, Gardiner JM, Sen TZ, Kim H, Woodhouse MR, Andorf CM. &#40;2026&#41;. <i>Genetics</i>. doi:10.1093/genetics/iyag005.</p><div><a href="https\://doi.org/10.1093/genetics/iyag005" target="_blank" rel="noopener">Read the paper ↗</a><button type="button" class="ai-copy-citation" data-copy-target="ai-citation-haley">Copy citation</button></div>
+    </article>
+    <div class="ai-publication-list">
+      <article><span>Feature store · 2023</span><h3>Maize Feature Store: A centralized resource to manage and analyze curated maize multi-omics features</h3><p id="ai-citation-mfs">Sen S, Woodhouse MR, Portwood JL, Andorf CM. &#40;2023&#41;. <i>Database</i>. doi:10.1093/database/baad078.</p><div><a href="https\://doi.org/10.1093/database/baad078" target="_blank" rel="noopener">DOI ↗</a><button type="button" class="ai-copy-citation" data-copy-target="ai-citation-mfs">Copy</button></div></article>
+      <article><span>Variant effects · 2023</span><h3>PanEffect: A pan-genome visualization tool for variant effects in maize</h3><p id="ai-citation-paneffect">Andorf CM, Haley OC, Hayford RK, Portwood JL, Sen S, Cannon EK, Gardiner JM, Woodhouse MR. &#40;2023&#41;. <i>bioRxiv</i>. doi:10.1101/2023.09.25.559155.</p><div><a href="https\://doi.org/10.1101/2023.09.25.559155" target="_blank" rel="noopener">DOI ↗</a><button type="button" class="ai-copy-citation" data-copy-target="ai-citation-paneffect">Copy</button></div></article>
+      <article><span>Protein structure · 2023</span><h3>Maize Protein Structure Resources at the Maize Genetics and Genomics Database</h3><p id="ai-citation-structure">Woodhouse MR, Portwood JL, Sen S, Hayford RK, Gardiner JM, Cannon EK, Harper LC, Andorf CM. &#40;2023&#41;. <i>Genetics</i>. doi:10.1093/genetics/iyad016.</p><div><a href="https\://doi.org/10.1093/genetics/iyad016" target="_blank" rel="noopener">DOI ↗</a><button type="button" class="ai-copy-citation" data-copy-target="ai-citation-structure">Copy</button></div></article>
+      <article><span>Functional annotation · 2022</span><h3>FASSO: An AlphaFold based method to assign functional annotations</h3><p id="ai-citation-fasso">Andorf CM, Sen S, Hayford RK, Portwood JL, Cannon EK, Harper LC, Gardiner JM, Sen TZ, Woodhouse MR. &#40;2022&#41;. <i>bioRxiv</i>. doi:10.1101/2022.11.10.516002.</p><div><a href="https\://doi.org/10.1101/2022.11.10.516002" target="_blank" rel="noopener">DOI ↗</a><button type="button" class="ai-copy-citation" data-copy-target="ai-citation-fasso">Copy</button></div></article>
+      <article><span>Machine learning · 2022</span><h3>Predicting Tissue-Specific mRNA and Protein Abundance in Maize</h3><p id="ai-citation-expression">Cho KT, Sen TZ, Andorf CM. &#40;2022&#41;. <i>Frontiers in Artificial Intelligence</i>. doi:10.3389/frai.2022.830170.</p><div><a href="https\://doi.org/10.3389/frai.2022.830170" target="_blank" rel="noopener">DOI ↗</a><button type="button" class="ai-copy-citation" data-copy-target="ai-citation-expression">Copy</button></div></article>
+    </div>
+  </section>
+</main>
+)
