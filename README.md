@@ -51,6 +51,36 @@ To roll back the shell entirely, restore `lib/Bauplan.php` from the earliest
 backup directory. Because the modernized shell is opt-in, restoring it only
 affects pages that call `modern()`.
 
+## Replacing a page (standing policy)
+
+Modernized pages replace the real route rather than living at a parallel
+`*_modern` URL. Before replacing one:
+
+1. **Archive the originals** into `legacy/<page>/` in this repository — the
+   controller, every template it loads, and its stylesheet. These are files the
+   redesign shadows rather than overwrites, so `deploy/deploy.sh`'s automatic
+   backup would not capture them.
+2. Add the new controller and assets to `deploy/manifest.txt` and deploy.
+3. Verify the real route serves the new page and that no legacy markup remains.
+
+Rollback is per page. Where the new controller *shadows* the old one (nothing
+was overwritten), deleting the new controller restores the original route
+immediately. Where a file was overwritten, restore it from
+`backups/<timestamp>/`, or from `legacy/<page>/` for the pre-redesign version.
+
+| Page | Route | New controller | Originals archived in |
+| --- | --- | --- | --- |
+| How to cite MaizeGDB | `/cite` | `controllers/cite.php` | `legacy/cite/` |
+
+`/cite` had no top-level controller, so `controller.php` fell through to
+`redirect.php`, which found `controllers/about/cite.php`. Because
+`controller.php` checks `controllers/<CONTROLLER>.php` first, adding
+`controllers/cite.php` takes the route without touching anything under
+`controllers/about/` or `templates/about/`.
+
+Note that `/about/cite` is a second route to the same content and still serves
+the original page.
+
 ## Modernizing a page
 
 **1. Opt the controller in to the modern shell.**
