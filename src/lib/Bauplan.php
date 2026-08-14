@@ -152,6 +152,46 @@ class Bauplan {
 		return $html;
 	}
 
+	//
+	// Append a cache-busting token to a locally served asset.
+	//
+	// Assets registered from a controller could always be versioned by hand,
+	// but assets declared with 'include-css:' / 'include-js:' inside a .bau
+	// template are plain strings that no PHP ever touches, so they were served
+	// from a stable URL and stuck in the CDN cache for the full max-age after a
+	// deploy. Versioning here covers both routes.
+	//
+	// The token is the file's modification time, which changes on every deploy.
+	// Left untouched: absolute URLs to other hosts, protocol-relative URLs,
+	// anything that already carries a query string, and paths with no matching
+	// file on disk.
+	//
+	private function assetVersion($path) {
+		if (!is_string($path) || $path === '') {
+			return $path;
+		}
+		// Another host, protocol-relative, or already versioned by the caller.
+		if (strpos($path, '//') !== false || strpos($path, '?') !== false) {
+			return $path;
+		}
+		// Only site-absolute paths can be resolved against the document root.
+		if ($path[0] !== '/') {
+			return $path;
+		}
+
+		$file = $_SERVER['DOCUMENT_ROOT'] . $path;
+		if (!is_file($file)) {
+			return $path;
+		}
+
+		$mtime = @filemtime($file);
+		if (!$mtime) {
+			return $path;
+		}
+
+		return $path . '?v=' . $mtime;
+	}
+
 	public function includeCss($css_path) {
 		$resource = new Resource($css_path, "<link rel='stylesheet' type='text/css' href='$css_path'/>");
 
@@ -187,11 +227,33 @@ class Bauplan {
 		return $this->resourceIncrement;
 	}
 
+	//
+	// Rewrite href/src attributes in an emitted resource tag so locally served
+	// stylesheets and scripts carry a cache-busting token.
+	//
+	// This runs at emit time rather than in includeCss()/includeScript() for two
+	// reasons. Assets declared with 'include-css:' / 'include-js:' inside a .bau
+	// template never pass through those methods -- they arrive via the template's
+	// own resource manifest -- so versioning there would miss them, which is the
+	// case that kept a stale /js/mgdb-search.js in the CDN cache. Rewriting the
+	// tag also leaves the manifest key untouched, so a script registered by both
+	// a controller and a template still de-duplicates to a single tag.
+	//
+	private function versionMarkup($html) {
+		return preg_replace_callback(
+			"/(href|src)='([^']+)'/",
+			function($matches) {
+				return $matches[1] . "='" . $this->assetVersion($matches[2]) . "'";
+			},
+			$html
+		);
+	}
+
 	private function scriptsToString() {
 		$string = "";
 		$this->resourceManifest->merge($this->template->_resourceManifest());
 		foreach ($this->resourceManifest->items() as $resource) {
-			$string .= $resource->value() . "\n";
+			$string .= $this->versionMarkup($resource->value()) . "\n";
 		}
 
 		return $string;

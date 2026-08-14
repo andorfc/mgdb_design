@@ -24,11 +24,11 @@ $bauplan->modern();
 
 $bauplan->preHTML('<meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
 $bauplan->includeCss('/css/static.css');
-$bauplan->includeCss('/css/mgdb-modern.css?v=' . filemtime($system['root_dir'] . '/css/mgdb-modern.css'));
+$bauplan->includeCss('/css/mgdb-modern.css');
 $bauplan->includeScript('/js/lib/plotly/plotly-2.25.2.min.js');
-$bauplan->includeScript('/js/mgdb-modern.js?v=' . filemtime($system['root_dir'] . '/js/mgdb-modern.js'));
-$bauplan->includeScript('/js/mgdb-chrome.js?v=' . filemtime($system['root_dir'] . '/js/mgdb-chrome.js'));
-$bauplan->includeScript('/js/mgdb-pattern-library.js?v=' . filemtime($system['root_dir'] . '/js/mgdb-pattern-library.js'));
+$bauplan->includeScript('/js/mgdb-modern.js');
+$bauplan->includeScript('/js/mgdb-chrome.js');
+$bauplan->includeScript('/js/mgdb-pattern-library.js');
 $bauplan->head('<meta name="description" content="Internal reference rendering every shared interface component used by modernized MaizeGDB pages.">');
 $bauplan->head('<meta name="robots" content="noindex">');
 

@@ -16,12 +16,12 @@ $bauplan->modern();
 
 $bauplan->preHTML('<meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
 $bauplan->includeCss('/css/static.css');
-$bauplan->includeCss('/css/mgdb-modern.css?v=' . filemtime($system['root_dir'] . '/css/mgdb-modern.css'));
-$bauplan->includeCss('/css/mgdb-genomes.css?v=' . filemtime($system['root_dir'] . '/css/mgdb-genomes.css'));
+$bauplan->includeCss('/css/mgdb-modern.css');
+$bauplan->includeCss('/css/mgdb-genomes.css');
 $bauplan->includeScript('/js/lib/plotly/plotly-2.25.2.min.js');
-$bauplan->includeScript('/js/mgdb-modern.js?v=' . filemtime($system['root_dir'] . '/js/mgdb-modern.js'));
-$bauplan->includeScript('/js/mgdb-chrome.js?v=' . filemtime($system['root_dir'] . '/js/mgdb-chrome.js'));
-$bauplan->includeScript('/js/mgdb-genomes.js?v=' . filemtime($system['root_dir'] . '/js/mgdb-genomes.js'));
+$bauplan->includeScript('/js/mgdb-modern.js');
+$bauplan->includeScript('/js/mgdb-chrome.js');
+$bauplan->includeScript('/js/mgdb-genomes.js');
 $bauplan->head('<meta name="description" content="Genome assemblies hosted at MaizeGDB: the hosted collection, how it has grown since 2008, an assembly explorer, and the tools built on these genomes.">');
 
 $cwd = getcwd();
