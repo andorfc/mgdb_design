@@ -159,6 +159,12 @@
 .mgdb-page img,
 .mgdb-page svg { max-width: 100%; }
 
+/* Any component class that sets `display` outranks the user-agent
+   `[hidden] { display: none }` rule, which would silently break every
+   show/hide in mgdb-modern.js. Restate it with enough weight to win. */
+.mgdb-page [hidden],
+.mgdb-modern [hidden] { display: none !important; }
+
 .mgdb-page img { height: auto; }
 
 .mgdb-page hr {
