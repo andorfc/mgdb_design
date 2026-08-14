@@ -1,0 +1,251 @@
+$$SYNTAX-LEVEL 2
+*(reference-results
+  @(no-term {display: off}
+    <br><b>You did not provide a search term.</b><br>
+  )
+  @(no-results {display: off}
+    <br>
+    <table cellpadding=8 cellspacing=3 width="100%" 
+           summary="A table containing the main page content.">
+      <tr>
+        <td width="100%">
+          @(exact_person-none {display: off}
+            <p>
+              <b>Exact Person Match</b> You will likely want to look at the
+              <a href="/person?id=$(person_id)">
+                <b>complete publication record of $(person_name)</b>.
+              </a>
+              This includes MaizeGDB's complete publication record for this person
+              $(publications).
+            </p>
+            <br>
+          )
+          @(exact_person_matches-none {display:off}
+             <p>
+               <b>Exact Person Matches!</b>  You will likely want to see
+               <a href="/person?term=$(term)"> 
+                 <b> $(person_count) exact person records</b>
+               </a>
+               matching your search term; these records will provide more 
+               complete and correct reference information for the authors 
+               than you'll find here. 
+             </p>
+             <br>
+          ) 
+          
+          <p><b>Reference Search Results - Complete List</b></p>
+          <p>There are no references matching your search criteria. You searched 
+            using the term $(term), for which we have no matches. 
+          </p>
+        </td>
+      </tr>
+    </table>
+  )
+
+  @(multi-results {display: off}
+    <table cellpadding=8 cellspacing=3 width="100%" summary="A table containing the main page content.">
+      <tr>
+        <td width="100%">
+          @(results_unpaged
+          <p style="margin-bottom: 8px;">
+            <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+              Reference Search Results - Complete List
+            </span>
+          </p>
+          Here are the <b>$(count)</b> results matching the term 
+          <b>$(term)</b>.
+          )
+          @(results_limited_unpaged {bind: results_unpaged | display: off}
+           <p style="margin-bottom: 8px;">
+            <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+                Reference Search Results - Limited List
+            </span>
+          </p>
+           The number of references matching the term <b>$(term)</b> exceeded the search limit, <span style="color:red;"> and so only the first <b>$(limit)</b> results are shown</span>.
+           Please refine your search to narrow down your results or adjust the search limit above.
+           ) 
+          @(exact_person {display: off}
+            <p>
+             <b>Exact Person Match!</b> You will likely want to look at the
+             <a href="/person?id=$(person_id)">
+               <b>complete publication record of $(person_name)</b>.
+             </a>
+             This includes MaizeGDB's complete publication record for this person's
+             $(publications).
+           </p>
+          )
+          @(exact_person_matches {display:off}
+             <p>
+               <b>Exact Person Matches!</b>  You will likely want to see
+               <a href="/person?term=$(term)"> 
+                 <b> $(person_count) exact person records</b>
+               </a>
+               matching your search term; these records will provide more 
+               complete and correct reference information for the authors 
+               than you'll find here. 
+             </p>
+          )      
+          <br>
+          <br>
+          
+          <a href="javascript:doDownload('/search/reference/reference_results.php', '$(url_term)', 'References.txt'\)">Download the full list of results</a>
+          <br>
+          
+          <table width="100%" cellpadding=0 cellspacing=0>
+            @(reference-row
+            <tr>
+              <td>
+                <a href="/data_center/reference?id=$(id)"><b>$(title)</b></a><br>
+                $(name)<br>
+                $(abstract)<br>
+              <td>
+            </tr>
+            )
+          </table>
+        </td>
+      <tr>
+    </table>
+  )
+  
+  @(multi-results-paged {display: off}
+    <table cellpadding=8 cellspacing=3 width="100%" summary="A table containing the main page content.">
+      <tr>
+        <td width="100%">
+             
+          @(results
+            <p style="margin-bottom: 8px;">
+              <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+                Reference Search Results - Complete List
+              </span>
+            </p>
+            There are <b>$(count)</b> references matching your term <b>$(term)</b>, which is summarized below.
+          )
+          @(results_limited {bind: results | display: off}
+            <p style="margin-bottom: 8px;">
+              <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+                Reference Search Results - Limited List
+              </span>
+            </p>
+            The number of references matching the term <b>$(term)</b> exceeded the search limit, <span style="color:red;"> and so only the first <b>$(limit)</b> results are shown</span>.
+            Please refine your search to narrow down your results or adjust the search limit above. 
+          )  
+           
+          @(exact_person-paged {display: off}
+            <p>
+              <b>Exact Person Match!</b> You will likely want to look at the
+              <a href="/person?id=$(person_id)">
+                <b>complete publication record of $(person_name)</b>.
+              </a>
+              This includes MaizeGDB's complete publication record for this person
+              $(publications).
+            </p>
+          )
+          @(exact_person_matches-paged {display:off}
+             <p>
+               <b>Exact Person Matches!</b>  You will likely want to see
+               <a href="/person?term=$(term)"> 
+                 <b> $(person_count) exact person records</b>
+               </a>
+               matching your search term; these records will provide more 
+               complete and correct reference information for the authors 
+               than you'll find here. 
+             </p>
+          ) 
+          
+          <a href="javascript:doDownload('/search/reference/reference_results.php', '$(url_term)', 'References.txt'\)">Download the full list of results</a>
+          <br>
+
+          <input type="hidden" name="$(div)_rows" id="$(div)_rows" value="$(rows)">
+          <div name="download_status_div" id="download_status_div"></div>
+          <iframe name="download_iframe" id="download_iframe" width=0 height=0 style="border:none"></iframe>
+          <br>
+          
+<!-- new style paging -->
+          <table cellspacing=5 cellpadding=5>
+            <tr>
+              <td style="vertical-align:bottom; width:32px; height: 36.4px;">
+                <a href="javascript:prevPage(\)" name="prevpage" id="prevpage">
+                  <img style='border:0px' src='/images/corn-icon-prev.png'>
+                </a>
+              </td>
+              <td>
+                <form action="javascript:goToPage(document.getElementById('pagenum'\).value, 'reference_results_page', $(pagecount)\)" 
+                      name='pagenumform' id='pagenumform'>
+                  Page 
+                  <input type='text' size=2 maxlength=3 name='pagenum' 
+                         id='pagenum' value='1'>
+                  of $(pagecount)
+                </form>
+              </td>
+              <td style="vertical-align:top;">
+                <a href="javascript:nextPage($(pagecount)\)" name="nextpage" id="nextpage">
+                  <img style='border:0px' src='/images/corn-icon-next.png'>
+                </a>
+              </td> 
+            </tr>
+          </table>
+<!-- -->
+          @(pages
+            <div class="resultdiv" name="reference_results_page$(pagenum)" 
+                 id="reference_results_page$(pagenum)" style="display:$(displayval)">
+              <table width="100%" cellpadding="7" cellspacing="7">
+                <tr>
+                  <td>
+                    <b>Results $(startnum) - $(endnum)</b> out of <b>$(total)</b>
+                  </td>
+                </tr>         
+<!-- old style paging                
+                <tr>
+                  <td>
+                     <table>
+                     <tr>
+                      <td style="vertical-align:bottom; width:32px; height: 36.4px;">
+                       $(prev-page) 
+                      </td>
+                      <td> $(page-list) </td>
+                      <td style="vertical-align:top;">
+                       $(next-page)
+                      </td> 
+                     </tr>
+                    </table>
+                  <td>
+                <tr>
+-->                
+                <tr>
+                  <td>
+                    <div name="reference_results_list$(pagenum)" 
+                         id="reference_results_list$(pagenum)">
+                         @(loading_page
+                       <center><img src='/images/cornloading_trans.gif'></center>
+                      )
+                      <table>
+                      @(reference-page-row
+                        <tr>
+                         <td>
+                            <a href="/data_center/reference?id=$(id)"><b>$(title)</b></a><br>
+                            $(name)<br>
+                            $(abstract)<br>
+                         </td>
+                        </tr>
+                      )
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          )
+          <script language="javascript">
+            getSearchData('reference', 'reference_results_list2', '$(term)', 2\);
+          </script>
+        </td>
+      <tr>
+    </table>
+  )
+  @(open_shadowbox {display: off}
+      <script language="javascript">
+        open_shadowbox('reference', '$(term)', 'html'\);
+      </script>
+    )
+ 
+)

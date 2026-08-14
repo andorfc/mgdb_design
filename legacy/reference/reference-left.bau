@@ -1,0 +1,178 @@
+*(reference-left
+  <div id="datacenter_left_col">
+    <p style="margin-bottom: 8px;">
+      <span style="font-family: Verdana, Arial, sans-serif; font-size: 110%; font-weight: bold; margin-bottom: 6px;">
+        Reference Research Tools
+      </span>
+    </p>
+    <p>
+      <b>Editorial Board Picks</b>  
+      <a href="/hot_new_papers">These papers</a> were selected by the 
+      MaizeGDB editorial board as papers of interest to maize researchers!
+    </p>
+    <br>
+    <p>
+      <b>Maize Newsletters</b>: An online archive of 
+      <a href="/mnl">maize newsletters</a> is available.
+    </p>
+    <br>
+<!-- SIMPLE SEARCH -->
+    <div id="search_lite_green_background" width="100%">
+      <p>
+        <b>Simple Reference Search</b>: Search hand-curated references at MaizeGDB.
+        This search form allows you to just enter basic info (such as the last 
+        name of the primary author, or a portion of the title\) to quickly 
+        retrieve the desired reference.
+      </p>
+      <br>
+      <form name='n1' method="get" action="javascript:getSearchData('reference', 'simple_results', document.getElementById('refterm'\).value\);" class="tiny">
+        <input type="text" name="term" id="refterm" size="20"  value="$(term)" class="quick_search">
+        <input type="submit"  name="button"  value="Submit" class="button">
+        (see a <a href="#simple" onClick="document.getElementById('refterm'\).value = 'Walbot mutator'">sample reference search</a>\)<br>
+        @(limits
+           *(adjust_limits #load: templates/data_center/set_search_limit.bau#)
+        )
+        <input type="hidden" id="pagesize" name="pagesize" value=5>
+      </form>
+      <br>
+      <p>
+        The above sample search would detect papers by Walbot discussing Mutator. 
+        Other interesting searches include <b>Chandler transposable elements</b>,
+        <b>sh1</b>, or countless others.
+      </p>
+      <br>
+      <p>
+        This search can be executed on every page on the site with the search box 
+        the upper right corner. Choose "reference" from the drop-down menu,
+        enter your search term in the field, and hit return to find the reference 
+        you're looking for.
+      </p>
+      <br>
+    
+      <div id="simple_results"></div>
+    
+    </div>
+    
+<!-- PUBMED SEARCH -->
+    <div id="datacenter_gray_background" width="100%">
+      <p>
+        <b>PubMed Search</b>: We spend time actively curating our references,
+        relating them to author records and in many cases extracting data from 
+        the references. Thus, we may not have the most recent references for a
+        given topic. If we don't have the reference(s\) you are looking for, use 
+        PubMed's <a href="https://www.ncbi.nlm.nih.gov/pubmed">simple</a>,
+        <a href="https://www.ncbi.nlm.nih.gov/research/pubtator/">keyword search (PubTator\)</a>, 
+        or
+        <a href="https://www.ncbi.nlm.nih.gov/pubmed/advanced">advanced search</a>.
+      </p>
+    </div>
+    
+<!-- ABSTRACT SEARCH -->
+    <div id="datacenter_green_background" width ="100%">
+      <p>
+        <b>Reference Abstract Search</b>: This search allows you to dig through 
+        the hand-curated reference abstracts for a particular set of terms you 
+        might be interested in; the search will find all of the papers with 
+        abstracts containing the terms. Try the sample search below to see the 
+        results one might get.
+      </p>
+      <br>
+      <form style="padding-top: 4px;" class="tiny" action="javascript:getSearchData('reference_abstract', 'abstract_results', document.getElementById('abterm'\).value\)" method="get">
+        <input type="text" name="term" id="abterm" class="quick_search" value="" size="30">
+        <input type="button"  name="button"  value="Submit" class="button" onClick="getSearchData('reference_abstract', 'abstract_results', document.getElementById('abterm'\).value\);" >
+        (see a <a href="#abstract" onClick="document.getElementById('abterm'\).value = 'cysteine proteinase inhibitor'">sample reference abstract search</a>\)
+      </form>
+      <br>
+      
+      <div id ="abstract_results" name="abstract_results"></div>   
+      <br>   
+    </div>
+    
+<!-- ADVANCED SEARCH -->
+    <div id="search_lite_green_background">
+      <p style="margin-bottom: 8px;">
+        <span style="font-family: Verdana, Arial, sans-serif; font-size: 110%; font-weight: bold; margin-bottom: 6px;">Reference Advanced Search</span>
+      </p>
+      <p>
+        Below, you can enter criteria for complex searches through the 
+        hand-curated references stored in MaizeGDB.
+      </p>
+      <br>
+      <table CELLPADDING=6 CELLSPACING=4 BORDER=0 WIDTH="100%" summary="A table within which you can review your search criteria.">
+        <tr> 
+          <td WIDTH="100%" VALIGN="TOP" CLASS="small">
+            <form method="GET" action="javascript:ref_adv_search('adv_results'\);" style="margin-bottom: 0px; margin-top: 0px; padding-bottom: 0px;">
+              <input type="hidden" name="query" value="true">
+              <input type="checkbox" id="box_author1" name="use1" value="true"> 
+              <label for="use1">Show only references</label> written by 
+              <b><label for="input1">this author:</label></b> 
+              <input type="text" class="small" length="20" maxlength="30" id="author1" onchange="document.getElementById('box_author1'\).checked = true;" name="author1box">
+              <br>
+              <input type="checkbox" id="box_author2" name="use2" value="true"> 
+              <label for="use2">AND show only references</label> written by
+              <b><label for="input2">this author:</label></b> 
+              <input type="text" class="small" length="20" maxlength="30" id="author2" onchange="document.getElementById('box_author2'\).checked = true;" name="author2box">
+              <br>
+              <input type="checkbox" id="box_journal" name="use3" value="true">
+              <label for="use3">Show only references</label> from
+              <b><label for="input3">this journal:</label></b>
+              (<u>Tip</u>: you can jump to the first letter by entering that in the box\)
+              <select style="width:98%;" onchange="document.getElementById('box_journal'\).checked = true;" name="journal" id="journal" class="small">
+                $(journal_options)
+              </select>
+              <br>
+              <input type="checkbox" id="box_pub_year" name="use4" value="true"> 
+              <label for="use4">Show only references</label> published in 
+              <b><label for="input4">this year:</label></b>
+              <input type="text" class="small" length="20" maxlength="30" id="pub_year" onchange="document.getElementById('box_pub_year'\).checked = true;" name="year">
+              <br>
+              <input type="checkbox" id="box_title" name="use5" value="true"> 
+              <label for="use5">Show only references</label> with 
+              <b><label for="input5">title containing:</label></b> 
+              <input type="text" class="small" length="20" maxlength="30" id="title" onchange="document.getElementById('box_title'\).checked = true;" name="title">
+              <br>
+              <input type="checkbox" id="box_ed_board" name="use7" value="true"> 
+              <label for="use7">Show only references</label> recommended by an Editorial Board member
+              <b><label for="input7">recommended by an Editorial Board member:</label></b> 
+              <br>
+              <input type="checkbox" id="box_pubtypes" name="use6" value="true">
+              <label for="use3">Show only references</label> from
+              <b><label for="input6">these publication types:</label></b>
+              <select onchange="document.getElementById('box_pubtypes'\).checked = true;" name="pubtypes" id="pubtypes" class="small">
+                $(pub_types)
+              </select> <br>
+              <input type="button" class="button" name="button" value="Submit" onclick="javascript:ref_adv_search('adv_results'\);">
+              &nbsp;
+              <input type="button" value="Clear" class="button" onClick="this.form.reset(\);">
+              @(adv_limits
+                *(adv_adjust_limits #load: templates/data_center/set_adv_search_limit.bau#)
+              )
+            </form>
+            <div id="adv_results"></div>
+          </td>
+        </tr>
+      </table>
+      <br>
+    </div>
+    
+    <p style="margin-bottom: 8px;">
+      <span style="font-family: Verdana, Arial, sans-serif; font-size: 110%; font-weight: bold; margin-bottom: 6px;">
+        Discussion of Reference Data for the General Public
+      </span>
+    </p>
+    <br>
+    <p>
+      Reference data provides the background for much of the information stored
+      in this site.  References provide hard documentation for the facts presented
+      here, and allow interested parties to dig deeper into a particular topic of
+      interest.  Most records on the site have linkages to reference data.
+    </p>
+    <br>
+  </div>
+  
+  @(start-search #display:off#
+    <script language="javascript">
+      getSearchData('reference', 'simple_results', '$(term)'\);
+    </script>
+  )
+)

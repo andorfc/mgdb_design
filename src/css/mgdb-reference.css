@@ -1,0 +1,547 @@
+/* ==========================================================================
+   Reference literature search (/data_center/reference)
+   --------------------------------------------------------------------------
+   Layout and interaction come from the reference search in the MaizeGDB
+   website repository. Restyled onto the shared tokens so the page matches the
+   rest of the redesign instead of carrying its own palette and type scale.
+   Scoped under .mgdb-reference-page.
+   ========================================================================== */
+
+/* Hero --------------------------------------------------------------------- */
+
+.mgdb-reference-page .reference-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+  gap: var(--mgdb-space-6);
+  align-items: center;
+  padding: var(--mgdb-space-6);
+  border-radius: var(--mgdb-radius-lg);
+  background: linear-gradient(135deg, #16351f, #24502c 58%, #2f6134);
+  color: #fff;
+  box-shadow: var(--mgdb-shadow-lg);
+}
+
+.mgdb-reference-page .reference-hero .mgdb-eyebrow { color: #ffe6a9; }
+
+.mgdb-reference-page .reference-hero h1 {
+  margin: var(--mgdb-space-2) 0 var(--mgdb-space-3);
+  color: #fff;
+  font-size: clamp(1.75rem, 1.1rem + 2vw, 2.375rem);
+}
+
+.mgdb-reference-page .reference-hero-copy p {
+  max-width: var(--mgdb-measure);
+  color: #eaf3e6;
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-reference-page .reference-hero .mgdb-button-primary { background: #fff; color: var(--mgdb-green-dark) !important; }
+.mgdb-reference-page .reference-hero .mgdb-button-primary:hover { background: #eaf3e6; }
+.mgdb-reference-page .reference-hero :focus-visible { outline-color: #fff; }
+
+/* Bare links in the hero inherit the page link colour (burgundy), which fails
+   contrast on the dark green. Force white. */
+.mgdb-reference-page .reference-hero a {
+  display: inline-block;
+  margin-top: var(--mgdb-space-4);
+  color: #fff;
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+}
+
+/* The submit and reset controls are bare <button> elements in the template;
+   give them the shared button treatment rather than the browser default. */
+.mgdb-reference-page .reference-search-submit,
+.mgdb-reference-page .reference-reset {
+  display: inline-flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  justify-content: center;
+  min-height: var(--mgdb-tap-target);
+  padding: var(--mgdb-space-2) var(--mgdb-space-5);
+  border: 1px solid transparent;
+  border-radius: var(--mgdb-radius-sm);
+  font-family: inherit;
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.mgdb-reference-page .reference-search-submit {
+  background: var(--mgdb-green-dark);
+  color: #fff;
+}
+
+.mgdb-reference-page .reference-search-submit:hover { background: #0f3325; }
+
+.mgdb-reference-page .reference-reset {
+  border-color: var(--mgdb-line);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+}
+
+.mgdb-reference-page .reference-reset:hover { background: var(--mgdb-surface-alt); }
+
+/* Corpus figures beside the hero. */
+.mgdb-reference-page .reference-hero-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--mgdb-space-3);
+  padding: var(--mgdb-space-4);
+  border: 1px solid rgba(255, 255, 255, .2);
+  border-radius: var(--mgdb-radius);
+  background: rgba(0, 0, 0, .18);
+}
+
+.mgdb-reference-page .reference-hero-metrics > article strong {
+  display: block;
+  color: #fff;
+  font-size: var(--mgdb-text-2xl);
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.mgdb-reference-page .reference-hero-metrics > article span {
+  display: block;
+  margin-top: var(--mgdb-space-2);
+  color: #cfe3c8;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+/* Search panel ------------------------------------------------------------- */
+
+.mgdb-reference-page > section { margin-top: var(--mgdb-space-7); }
+
+.mgdb-reference-page .reference-section-heading { margin-bottom: var(--mgdb-space-4); }
+.mgdb-reference-page .reference-section-heading h2 { color: var(--mgdb-green-dark); }
+.mgdb-reference-page .reference-section-heading p { max-width: var(--mgdb-measure); margin-top: var(--mgdb-space-2); color: var(--mgdb-muted); }
+
+.mgdb-reference-page .reference-search-panel {
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+}
+
+/* The form is the row: term field, scope select, and submit sit on one line and
+   wrap together. .reference-main-search and .reference-scope-search are each a
+   label plus its control, so they are the flex items rather than containers. */
+.mgdb-reference-page #reference-search-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: flex-end;
+}
+
+.mgdb-reference-page .reference-main-search { flex: 3 1 22rem; min-width: 0; }
+.mgdb-reference-page .reference-scope-search { flex: 1 1 14rem; min-width: 0; }
+.mgdb-reference-page .reference-search-submit { flex: 0 0 auto; }
+
+/* Example row and advanced filters take their own full-width lines. */
+.mgdb-reference-page .reference-example-row,
+.mgdb-reference-page .reference-advanced { flex: 1 0 100%; }
+
+/* The term field wraps a search glyph, the input, and a clear button. */
+.mgdb-reference-page .reference-query-control {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid #b9b2a5;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-reference-page .reference-query-control:focus-within { border-color: var(--mgdb-focus); }
+.mgdb-reference-page .reference-query-control > span:first-child { color: var(--mgdb-muted); }
+
+.mgdb-reference-page .reference-query-control input {
+  min-height: 40px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.mgdb-reference-page .reference-query-control input:focus { outline: none; }
+
+.mgdb-reference-page .reference-query-control button {
+  border: 0;
+  background: none;
+  color: var(--mgdb-burgundy);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-reference-page label,
+.mgdb-reference-page .reference-search-panel label {
+  display: block;
+  margin-bottom: var(--mgdb-space-1);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+}
+
+.mgdb-reference-page input[type="text"],
+.mgdb-reference-page input[type="search"],
+.mgdb-reference-page input[type="number"],
+.mgdb-reference-page select {
+  display: block;
+  width: 100%;
+  min-height: var(--mgdb-tap-target);
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  border: 1px solid #b9b2a5;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  /* 16px also stops iOS zooming the page when a field takes focus. */
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-reference-page input:focus,
+.mgdb-reference-page select:focus { border-color: var(--mgdb-focus); }
+
+.mgdb-reference-page .reference-search-submit { flex: 0 0 auto; }
+
+/* Worked examples under the field. */
+.mgdb-reference-page .reference-example-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-top: var(--mgdb-space-3);
+}
+
+.mgdb-reference-page .reference-example-row > span {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.mgdb-reference-page .reference-example-row button {
+  min-height: 34px;
+  padding: var(--mgdb-space-1) var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface);
+  color: var(--mgdb-burgundy);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-reference-page .reference-example-row button:hover { border-color: var(--mgdb-gold-dark); background: var(--mgdb-gold-soft); }
+
+/* Advanced filters live in a details element, so they collapse without script. */
+.mgdb-reference-page .reference-advanced {
+  margin-top: var(--mgdb-space-4);
+  border-top: 1px solid var(--mgdb-line);
+  padding-top: var(--mgdb-space-3);
+}
+
+.mgdb-reference-page .reference-advanced > summary {
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-reference-page .reference-advanced > summary:focus-visible { outline: 3px solid var(--mgdb-focus); outline-offset: 2px; }
+.mgdb-reference-page .reference-advanced > summary + * { margin-top: var(--mgdb-space-4); }
+
+.mgdb-reference-page .reference-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--mgdb-space-4);
+}
+
+/* Each filter is a label wrapping its own caption span and control. */
+.mgdb-reference-page .reference-filter-grid > label { margin: 0; }
+.mgdb-reference-page .reference-filter-grid > label > span {
+  display: block;
+  margin-bottom: var(--mgdb-space-1);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+}
+
+/* The advanced summary carries a heading and a hint on separate lines. */
+.mgdb-reference-page .reference-advanced > summary strong { display: block; }
+.mgdb-reference-page .reference-advanced > summary small {
+  display: block;
+  margin-top: 2px;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 400;
+}
+
+/* Checkbox rows: the control and its label sit on one line. */
+.mgdb-reference-page .reference-check {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin: 0;
+  font-weight: 600;
+}
+
+.mgdb-reference-page .reference-check input {
+  width: auto;
+  min-height: 0;
+  margin: 0;
+  accent-color: var(--mgdb-green-dark);
+}
+
+.mgdb-reference-page .reference-reset { margin-top: var(--mgdb-space-4); }
+
+/* Dashboard ---------------------------------------------------------------- */
+
+.mgdb-reference-page .reference-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-5);
+}
+
+.mgdb-reference-page .reference-summary-grid > div {
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-reference-page .reference-summary-grid strong {
+  display: block;
+  color: var(--mgdb-leaf);
+  font-size: var(--mgdb-text-xl);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.mgdb-reference-page .reference-summary-grid span { display: block; margin-top: var(--mgdb-space-2); color: var(--mgdb-muted); }
+
+.mgdb-reference-page .reference-entity-summary {
+  margin-bottom: var(--mgdb-space-4);
+  padding: var(--mgdb-space-4);
+  border-left: 4px solid var(--mgdb-gold);
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  background: var(--mgdb-gold-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-reference-page .reference-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-reference-page .reference-chart-card {
+  min-width: 0;
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-reference-page .reference-chart-card h3 { color: var(--mgdb-green-dark); font-size: var(--mgdb-text-lg); }
+.mgdb-reference-page .reference-chart-card p { margin-top: var(--mgdb-space-1); color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+.mgdb-reference-page .reference-chart { width: 100%; height: 280px; margin-top: var(--mgdb-space-3); }
+.mgdb-reference-page .reference-chart-wide { grid-column: 1 / -1; }
+.mgdb-reference-page .reference-chart-compact { height: 240px; }
+
+/* Results ------------------------------------------------------------------ */
+
+.mgdb-reference-page .reference-results-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3) var(--mgdb-space-5);
+  align-items: end;
+  justify-content: space-between;
+  padding-bottom: var(--mgdb-space-3);
+  border-bottom: 1px solid var(--mgdb-line);
+}
+
+.mgdb-reference-page #reference-results-status {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.mgdb-reference-page .reference-selection-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  margin-top: var(--mgdb-space-4);
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-green);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-green-soft);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.mgdb-reference-page .reference-export-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-reference-page .reference-select-page { display: flex; gap: var(--mgdb-space-2); align-items: center; margin: 0; font-size: var(--mgdb-text-sm); }
+.mgdb-reference-page .reference-select-page input { width: auto; min-height: 0; margin: 0; accent-color: var(--mgdb-green-dark); }
+
+.mgdb-reference-page #reference-results { margin-top: var(--mgdb-space-4); }
+
+/* One result. A hanging layout: checkbox, then the citation block. */
+.mgdb-reference-page .reference-result-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--mgdb-space-4);
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-reference-page .reference-result-card + .reference-result-card { margin-top: var(--mgdb-space-3); }
+.mgdb-reference-page .reference-result-card:hover { border-color: var(--mgdb-gold-dark); }
+
+/* Editorial picks carry a gold spine and a text badge, so the distinction is
+   never carried by colour alone. */
+.mgdb-reference-page .reference-result-card.is-editorial-pick {
+  border-left: 5px solid var(--mgdb-gold);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-reference-page .reference-result-select { margin: 0; }
+.mgdb-reference-page .reference-result-select input { width: 18px; min-height: 0; margin: 0; accent-color: var(--mgdb-green-dark); }
+
+.mgdb-reference-page .reference-result-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: center;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-reference-page .reference-result-card h3 {
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-reference-page .reference-result-card h3 a { color: inherit; }
+.mgdb-reference-page .reference-result-authors { margin-top: var(--mgdb-space-1); color: var(--mgdb-ink-soft); font-size: var(--mgdb-text-sm); }
+.mgdb-reference-page .reference-result-citation { margin-top: var(--mgdb-space-1); color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+
+.mgdb-reference-page .reference-result-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  align-items: center;
+  margin-top: var(--mgdb-space-3);
+}
+
+.mgdb-reference-page .reference-result-links a { color: var(--mgdb-burgundy); font-size: var(--mgdb-text-sm); font-weight: 700; }
+
+.mgdb-reference-page .reference-copy-id {
+  min-height: 32px;
+  padding: 2px var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink-soft);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-reference-page .reference-copy-id:hover { background: var(--mgdb-surface-alt); }
+
+.mgdb-reference-page mark { background: #fdf0c4; color: inherit; font-weight: 700; }
+
+/* Pagination --------------------------------------------------------------- */
+
+.mgdb-reference-page .reference-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-reference-page .reference-pagination button {
+  min-width: var(--mgdb-tap-target);
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-reference-page .reference-pagination button:hover:not(:disabled) { background: var(--mgdb-surface-alt); }
+.mgdb-reference-page .reference-pagination button[aria-current="page"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #fff;
+}
+.mgdb-reference-page .reference-pagination button:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Related resources -------------------------------------------------------- */
+
+.mgdb-reference-page .reference-resource-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-reference-page .reference-resource-grid > a {
+  display: block;
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink) !important;
+  text-decoration: none;
+}
+
+.mgdb-reference-page .reference-resource-grid > a:hover { border-color: var(--mgdb-gold-dark); background: var(--mgdb-surface-alt); }
+.mgdb-reference-page .reference-resource-grid strong { display: block; color: var(--mgdb-green-dark); text-decoration: underline; }
+.mgdb-reference-page .reference-resource-grid span { display: block; margin-top: var(--mgdb-space-1); color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+
+/* Responsive --------------------------------------------------------------- */
+
+@media (max-width: 1023px) {
+  .mgdb-reference-page .reference-hero { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 767px) {
+  .mgdb-reference-page .reference-hero { padding: var(--mgdb-space-5) var(--mgdb-space-4); }
+  .mgdb-reference-page .reference-hero-metrics { grid-template-columns: 1fr; }
+  .mgdb-reference-page .reference-chart-grid { grid-template-columns: 1fr; }
+  .mgdb-reference-page .reference-search-submit,
+  .mgdb-reference-page .reference-search-submit .mgdb-button { width: 100%; }
+  .mgdb-reference-page .reference-result-card { padding: var(--mgdb-space-4); }
+}

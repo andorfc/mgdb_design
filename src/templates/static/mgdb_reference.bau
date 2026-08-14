@@ -1,0 +1,135 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-reference
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https://maizegdb.org/data_center/reference">
+<meta property="og:title" content="MaizeGDB Literature Search">
+<meta property="og:description" content="Search curated maize papers, explore publication trends, and export citations, DOIs, PubMed IDs, or references associated with genes and loci.">
+
+<main class="mgdb-page mgdb-reference-page" id="reference-top">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">›</span><a href="/sitemap">Data centers</a><span aria-hidden="true">›</span><span>References</span>
+  </nav>
+
+  <header class="reference-hero">
+    <div class="reference-hero-copy">
+      <span class="mgdb-eyebrow">Curated maize literature</span>
+      <h1>Search papers and follow the research over time.</h1>
+      <p>Find references by topic, title, author, abstract, gene model, or locus. Explore publication patterns and export the identifiers or citations you need.</p>
+      <a href="#reference-search-panel">Search the literature <span aria-hidden="true">↓</span></a>
+    </div>
+    <div class="reference-hero-metrics" aria-label="Reference collection summary">
+      <article><strong>$(reference_count)</strong><span>curated references</span></article>
+      <article><strong>$(year_range)</strong><span>years represented</span></article>
+      <article><strong>$(pubmed_count)</strong><span>PubMed-linked records</span></article>
+      <article><strong>$(doi_count)</strong><span>records with DOI</span></article>
+    </div>
+  </header>
+
+  <section id="reference-search-panel" class="reference-search-panel" aria-labelledby="reference-search-title">
+    <div class="reference-section-heading">
+      <div><span class="mgdb-eyebrow">Literature search</span><h2 id="reference-search-title">What are you looking for?</h2></div>
+      <p>Use Related gene, gene model, or locus to retrieve papers curated against a biological record rather than papers that merely mention its name.</p>
+    </div>
+
+    <form id="reference-search-form" role="search">
+      <div class="reference-main-search">
+        <label for="reference-query">Search term</label>
+        <div class="reference-query-control"><span aria-hidden="true">⌕</span><input id="reference-query" name="q" type="search" placeholder="Try liguleless, Walbot, transposable elements, lg1, or a gene-model ID" autocomplete="off"><button id="reference-query-clear" type="button" hidden>Clear</button></div>
+      </div>
+      <div class="reference-scope-search">
+        <label for="reference-scope">Search within</label>
+        <select id="reference-scope" name="scope">
+          <option value="all">All searchable fields</option>
+          <option value="title">Title and citation</option>
+          <option value="author">Author</option>
+          <option value="abstract">Abstract</option>
+          <option value="entity">Related gene, gene model, or locus</option>
+        </select>
+      </div>
+      <button class="reference-search-submit" type="submit">Search papers</button>
+
+      <div class="reference-example-row" aria-label="Example searches">
+        <span>Examples</span>
+        <button type="button" data-reference-example="liguleless">liguleless</button>
+        <button type="button" data-reference-example="transposable elements">transposable elements</button>
+        <button type="button" data-reference-example="Walbot" data-reference-scope="author">Walbot</button>
+        <button type="button" data-reference-example="lg1" data-reference-scope="entity">papers related to lg1</button>
+      </div>
+
+      <details class="reference-advanced">
+        <summary><span><strong>Refine the search</strong><small>Year, source collections, publication type, identifiers, and editorial picks</small></span><span aria-hidden="true">⌄</span></summary>
+        <div class="reference-filter-grid">
+          <label><span>From year</span><input id="reference-year-from" name="year_from" type="number" min="1800" max="2100" placeholder="e.g. 2015"></label>
+          <label><span>Through year</span><input id="reference-year-to" name="year_to" type="number" min="1800" max="2100" placeholder="e.g. 2026"></label>
+          <label><span>Journal</span><select id="reference-journal" name="journal"><option value="">All journals</option>$(journal_options)</select></label>
+          <label><span>Publication type</span><select id="reference-pub-type" name="pub_type"><option value="">All publication types</option>$(pub_type_options)</select></label>
+          <label><span>External identifier</span><select id="reference-identifier" name="identifier"><option value="all">Any record</option><option value="any">Has DOI or PubMed ID</option><option value="doi">Has DOI</option><option value="pubmed">Has PubMed ID</option></select></label>
+          <label><span>Sort results</span><select id="reference-sort" name="sort"><option value="relevance">Best match</option><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="title">Title A–Z</option></select></label>
+          <label class="reference-check"><input id="reference-editorial" name="editorial" type="checkbox" value="1"><span><strong>Editorial Board picks only</strong><small>Limit results to papers selected for community interest.</small></span></label>
+          <label class="reference-check"><input id="reference-include-meeting" name="include_meeting" type="checkbox" value="1" checked><span><strong>Include Maize Meeting abstracts</strong><small>Uncheck to focus on journal articles and other publications.</small></span></label>
+          <label class="reference-check"><input id="reference-include-mnl" name="include_mnl" type="checkbox" value="1" checked><span><strong>Include Maize Newsletter articles</strong><small>Uncheck to omit informal MNL notes from the results.</small></span></label>
+          <button id="reference-reset-filters" class="reference-reset" type="button">Reset filters</button>
+        </div>
+      </details>
+    </form>
+  </section>
+
+  <section id="reference-dashboard" class="reference-dashboard" aria-labelledby="reference-dashboard-title" hidden>
+    <div class="reference-section-heading">
+      <div><span class="mgdb-eyebrow">Search overview</span><h2 id="reference-dashboard-title">Publication patterns</h2></div>
+      <p id="reference-dashboard-description">Figures summarize every matching record, not only the current page.</p>
+    </div>
+    <div class="reference-summary-grid">
+      <article><strong id="reference-total-count">0</strong><span>matching papers</span></article>
+      <article><strong id="reference-doi-count">0</strong><span>with DOI</span></article>
+      <article><strong id="reference-pubmed-count">0</strong><span>with PubMed ID</span></article>
+      <article><strong id="reference-year-span">—</strong><span>publication span</span></article>
+    </div>
+    <div id="reference-entity-summary" class="reference-entity-summary" hidden></div>
+    <div class="reference-chart-grid">
+      <article class="reference-chart-card reference-chart-wide"><div><span>Publication activity</span><h3>Papers by year</h3></div><div id="reference-year-chart" class="reference-chart" role="img" aria-label="Number of matching MaizeGDB references by publication year"></div></article>
+      <article class="reference-chart-card reference-chart-wide"><div><span>Peer-reviewed literature</span><h3>Top journals</h3></div><div id="reference-journal-chart" class="reference-chart reference-chart-compact" role="img" aria-label="Journals with the most matching MaizeGDB references, excluding Maize Meeting abstracts and Maize Newsletter articles"></div></article>
+      <article class="reference-chart-card"><div><span>Conference collection</span><h3>Maize Meeting abstracts by year</h3></div><div id="reference-meeting-chart" class="reference-chart reference-chart-compact" role="img" aria-label="Matching Maize Meeting abstracts by publication year"></div></article>
+      <article class="reference-chart-card"><div><span>Community archive</span><h3>Maize Newsletter articles by year</h3></div><div id="reference-mnl-chart" class="reference-chart reference-chart-compact" role="img" aria-label="Matching Maize Newsletter articles by publication year"></div></article>
+    </div>
+  </section>
+
+  <section class="reference-results-section" aria-labelledby="reference-results-title">
+    <div class="reference-results-heading">
+      <div><span class="mgdb-eyebrow">Search results</span><h2 id="reference-results-title">Curated references</h2><p id="reference-results-status" aria-live="polite">Loading the newest references…</p></div>
+      <div class="reference-sort-compact"><label for="reference-sort-compact">Sort</label><select id="reference-sort-compact"><option value="relevance">Best match</option><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="title">Title A–Z</option></select></div>
+    </div>
+
+    <div class="reference-export-bar">
+      <div><strong>Download all matches</strong><span>Exports include up to 20,000 matching references.</span></div>
+      <div>
+        <a href="#" data-reference-export="csv">CSV</a>
+        <a href="#" data-reference-export="doi">DOI list</a>
+        <a href="#" data-reference-export="pmid">PubMed IDs</a>
+        <a href="#" data-reference-export="ris">RIS</a>
+        <a href="#" data-reference-export="bibtex">BibTeX</a>
+      </div>
+    </div>
+
+    <div id="reference-selection-bar" class="reference-selection-bar" hidden><span><strong id="reference-selection-count">0</strong> selected on this page</span><button type="button" data-selected-export="csv">Download selected CSV</button><button type="button" data-selected-export="doi">Copy selected DOIs</button><button type="button" data-selected-export="pmid">Copy selected PubMed IDs</button><button id="reference-selection-clear" type="button">Clear selection</button></div>
+    <label class="reference-select-page"><input id="reference-select-page" type="checkbox"> Select every result on this page</label>
+
+    <div id="reference-loading" class="mgdb-loading" aria-hidden="true"><span></span><span>Searching curated literature…</span></div>
+    <div id="reference-results"></div>
+    <div id="reference-empty" class="mgdb-empty" hidden><strong>No matching references found.</strong><span>Try fewer words, a broader field, or clear one of the filters.</span></div>
+    <div id="reference-error" class="reference-empty reference-error" hidden><strong>The search could not be completed.</strong><span>Please retry. If the problem continues, send the query to the MaizeGDB team.</span><button id="reference-retry" type="button">Retry search</button></div>
+    <nav id="reference-pagination" class="reference-pagination" aria-label="Reference result pages"></nav>
+  </section>
+
+  <section class="reference-resources" aria-labelledby="reference-resources-title">
+    <div class="reference-section-heading"><div><span class="mgdb-eyebrow">Related resources</span><h2 id="reference-resources-title">Go beyond the curated collection</h2></div><p>MaizeGDB emphasizes curated links between publications and biological records. Use external indexes for comprehensive literature discovery.</p></div>
+    <div class="reference-resource-grid">
+      <a href="/hot_new_papers"><strong>Editorial Board picks</strong><span>Recent papers selected for the maize research community.</span><span aria-hidden="true">→</span></a>
+      <a href="https\://pubmed.ncbi.nlm.nih.gov/"><strong>PubMed</strong><span>Search the broader biomedical and life-sciences literature.</span><span aria-hidden="true">↗</span></a>
+      <a href="/mnl"><strong>Maize Newsletter archive</strong><span>Browse community reports and newsletters dating to 1929.</span><span aria-hidden="true">→</span></a>
+      <a href="/cite"><strong>Cite MaizeGDB</strong><span>Find the appropriate citation for the database, tools, and datasets.</span><span aria-hidden="true">→</span></a>
+    </div>
+  </section>
+</main>
+)

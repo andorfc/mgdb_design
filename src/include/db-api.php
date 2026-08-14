@@ -1,0 +1,316 @@
+<?PHP 
+/* file: db-api.php
+ *
+ * purpose: common functions for interacting with the database
+ *
+ * history:
+ *   05/08/12  eksc  modified for PostgreSQL
+ *   11/24/14  bbraun  modified for PDO
+ */
+
+  if (session_status() == PHP_SESSION_NONE) {
+      session_start();
+  }
+  
+  include_once($_SERVER['DOCUMENT_ROOT'] . "/include/gp_lib.php");
+  
+// MONGODB
+//  include_once($_SERVER['DOCUMENT_ROOT'] . "/lib/pdo-decorator/PDODecorator.php");
+//  include_once($_SERVER['DOCUMENT_ROOT'] . "/lib/pdo-mongo-cache/vendor/autoload.php");
+//  include_once($_SERVER['DOCUMENT_ROOT'] . "/lib/pdo-mongo-cache/MongoCacheDecorator.php");
+
+//  use PDO\Cache\MongoPDOCache as MongoCacheDecorator;
+
+  /**
+   * jp - Added $use_cache parameter to allow individual queries to turn off the cache.
+   */
+  function connect_to_database($use_cache=true) {
+    $db = getSystemInfo('db.conf');
+    $system = getSystemInfo('mgdb.conf');
+
+    $connect_str = 'host=' . $db['DB_HOST'];
+    $connect_str .= ' dbname=' . $db['DB_NAME'];
+    $connect_str .= ' user=' . $db['DB_USER'];
+    $connect_str .= ' password=' . $db['DB_PASS'];
+    
+    if (isset($db['DB_PORT'])) {
+        $connect_str .= ' port=' . $db['DB_PORT'];
+    }
+
+    $conn = null;
+    try {
+      $conn = new PDO("pgsql:$connect_str", $db['DB_USER'], $db['DB_PASS']);
+    }
+    catch (PDOException $e) {
+      reportError("UNABLE TO CONNECT TO DATABASE!\n", $e->getMessage());
+    }
+
+    $decoratedConn = $conn;
+// MONGODB
+//    if ($system['use_cache'] == "true" && $use_cache) {
+//      try { // decorate the PDO instance
+//        $decoratedConn = new MongoCacheDecorator($conn, array(
+//          'db_name'           => $system['mongo_cache_db'],
+//          'collection_name'   => $system['mongo_cache_collection'], // name of mongo collection
+//          'object_serializer' => 'php' // php, igBinary, json
+//        ));
+//      }
+//      catch (Exception $e) {
+//        reportError("UNABLE TO CREATE CACHED PDO INSTANCE\n", $e->getMessage());
+//      }
+//    }
+
+    return($decoratedConn);
+  }//connect_to_database
+  
+
+  // NOTE: $prefetch_count isn't used for PostgreSQL;
+  //       retained for backward compatibility
+  /*
+   * $params was added for the reference literature search, whose queries are
+   * parameterized. It is optional and defaults to an empty array.
+   *
+   * execute() is called with no argument when $params is empty rather than
+   * passing array(). PDO treats an empty array as "these are the values",
+   * which would discard any bindParam() bindings; calling execute() bare keeps
+   * behaviour byte-identical for the several hundred existing callers.
+   */
+  function make_query($DBConn, $query, $prefetch_count=1, $params=array()) {
+    if (!$DBConn) {
+      reportError("No connection provded for\n$query");
+    }
+    $result = false;
+    $time_start = microtime(true);
+    logMessage("Query = $query");
+    try {
+      $stmt = $DBConn->prepare($query);
+      if ($stmt !== false) {
+        // Try getting the results
+        $result = empty($params) ? $stmt->execute() : $stmt->execute($params);
+        if ($result === false) {
+          reportError(implode("\n", $stmt->errorInfo()) . "QUERY EXECUTION FAILED\n$query", true); // error executing
+        }
+      }
+      else {
+        // Unable to create statement
+        reportError(implode("\n", $DBConn->errorInfo()) . "FAILED TO CREATE STATEMENT\n$query", true);
+      }
+    }
+    catch (PDOException $e) {
+      logVarDump($e, "Exception thrown:\n");
+    }
+    
+    $time_end = microtime(true);
+    $time_diff = $time_end - $time_start;
+    if ($time_diff > 5) {
+      $msg = "OVER 5 seconds";
+    }
+    else if($time_diff > 1) {
+      $msg = "OVER 1 seconds";
+    }
+    else {
+      $msg = '';
+    }
+
+    // Log query and time to run; true=dump stack (2 levels only)
+    logMessage("Query execution time = $time_diff $msg", true);
+
+    return $stmt;
+  }//make_query
+
+
+  function retrieve_row($statement) {
+    if (!$statement) {
+      reportError("NULL statement handle");
+      return false;
+    }
+
+    $returned_array = $statement->fetch(PDO::FETCH_ASSOC);
+    if (!$returned_array) {
+       return false;
+    }
+/*
+    // HACK: include uppercase versions of all fields too, to avoid having to
+    //       change umpteen-gazillion lines of code.`
+    foreach (array_keys($returned_array) as $field) {
+       $returned_array[strtoupper($field)] = $returned_array[$field];
+    }
+*/
+    return $returned_array;
+  }//retrieve_row
+
+
+  function get_all_rows($statement) {
+    return $statement->fetchAll(PDO::FETCH_ASSOC);
+  }//get_all_rows
+
+
+  function commit($DBConn) {
+    // do nothing
+  }//commit
+
+
+  function disconnect_from_database($DBConn) {
+    $DBConn = null; // PDO's destructor will automatically close connection
+  }//disconnect_from_database
+
+
+  function get_num_rows($statement) {
+    return ($statement) ? $statement->rowCount() : 0;
+  }//num_rows
+
+
+  /**
+   * Checks the user's input for safety before sending it into an SQL query.
+   *
+   * MongoDB takes care of SQL injection prevention, but MongoDB is disabled
+   * in a few places, so it's still prudent to do some filtering here.
+   *
+   * @param $DBConn - the database connection resource
+   * @param $input - the input string to be validated
+   * @return the string of the input after it has been validated.
+   */
+  function validate_input($DBConn, $input) {
+    if (is_array($input)) {
+      $filtered_input = array();
+      foreach ($input as $in) {
+        $filtered_input[] = validate_string($in);
+      }
+      return $filtered_input;
+    }
+    
+    return validate_string($input);
+  }
+  
+  function validate_string($input) {
+    return $input;
+  }  
+
+  /**
+   *  enable the cache to store any arbritrary variable
+   */
+  function initialize_cache() {
+    $system = getSystemInfo('mgdb.conf'); // to get cache config
+// MONGODB
+//    if ($system['use_cache'] == "true") {
+//      $client = new \MongoClient;
+//      $options = array(
+//         // These options must remain as-is in order to use the same cache the database handle uses
+//        'db_name'           => $system['mongo_cache_db'],
+//        'collection_name'   => $system['mongo_cache_collection'],
+//        'object_serializer' => 'php'
+//      );
+//      $cache = new \Apix\Cache\Mongo($client, $options);
+//      return $cache;
+//    }
+//    else {
+      return false;
+//    }
+  }
+  
+  function storeCache($key, $data) {
+     $cache = initialize_cache();
+     if ($cache) {
+        $cache->save($data, $key);
+     }
+  }
+  
+  function loadCache($key) {
+     $cache = initialize_cache();
+     if ($cache) {
+        return $cache->load($key);
+     }
+  }
+  
+
+
+/* These old functions are used in so many scripts it would be a job-o-work to 
+   move them to data_center_functions.php. Maybe some day... -eksc */
+   
+  function get_user_info($DBConn, $username) {
+    $sql = "
+      SELECT first_name, last_name, email, id, curation_lvl
+      FROM annotation_author
+      WHERE username = '$username'";
+    $sql_ret = make_query($DBConn, $sql, 1);
+    $row = retrieve_row($sql_ret);
+    if ($row) {
+      return array(
+         'name'                 => $row['first_name'] . ' ' . $row['last_name'],
+         'email'                => $row['email'],
+         'annotation_author_id' => $row['id'],
+         'curation_lvl'         => $row['curation_lvl']
+      );
+    }
+    else {
+      return array(
+         'name'                 => '',
+         'email'                => '',
+         'annotation_author_id' => -1,
+         'curation_lvl'         => 99,
+      );
+    }
+  }//get_user_info
+
+
+  /**
+   * Search for any comment(s) for a specific ID and return them as a string
+   * (will replace display_comments)
+   */
+// Deprecated and replaced with readComments() in annotation_lib.php. 
+// Don't use in new or active data pages.
+  function read_comment($DBConn, $id) {
+    if (!$id) {
+      return false;
+    }
+    
+    $query_comments = "
+      SELECT DISTINCT(memo), type_term, m.order1, t.name AS type,
+             p.name AS person_authority, r.name AS reference_authority
+      FROM memo m
+        LEFT OUTER JOIN term t ON t.id=m.type_term
+        LEFT OUTER JOIN reference r ON r.id=m.source
+        lEFT OUTER JOIN person p ON p.id=m.source
+      WHERE m.id = $id ORDER BY m.order1";
+    $stmt_comments = make_query($DBConn, $query_comments);
+  
+    $comment_string = false;
+    while ($arrComments = retrieve_row($stmt_comments)) {
+      if ($arrComments['memo'] && $arrComments['memo'] != '') {
+        $comment_string .= "<br>&nbsp;&nbsp;&nbsp;";
+        if ($arrComments['type'] && $arrComments['type'] != '') {
+          $comment_string .= '<b>' . $arrComments['type'] . ':</b> ';
+        }
+        $comment_string .= $arrComments['memo'];
+        if ($arrComments['person_authority'] && $arrComments['person_authority'] != '') {
+          $comment_string .= ' (per ' . $arrComments['person_authority'] . ')';
+        }
+        else if ($arrComments['reference_authority'] && $arrComments['reference_authority'] != '') {
+          $comment_string .= ' (per ' . $arrComments['reference_authority'] . ')';
+        }
+        $comment_string .= '<br>';
+      }
+    }
+  
+    return $comment_string;
+  }//read_comment
+
+
+  /**
+   * Grabs the synonyms and returns them in a string (will replace display_synoynms)
+   */
+  function read_synonyms($DBConn, $id, $name='') {
+    $query_synonyms = "SELECT synonyms FROM synonyms WHERE id=$id ORDER BY synonyms";
+    $stmt_synonyms = make_query($DBConn, $query_synonyms);
+    
+    $synonyms = array();
+    while ($arrSyn = retrieve_row($stmt_synonyms)) {
+      if ($arrSyn['synonyms'] != $name) {
+        array_push($synonyms, $arrSyn['synonyms']);
+      }
+    }
+    return implode('<br>', $synonyms);
+  }//read_synonyms
+  
+
+?>
