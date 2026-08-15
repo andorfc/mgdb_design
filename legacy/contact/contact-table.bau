@@ -1,0 +1,188 @@
+*(contact-table
+<div id='leftcolumn-contact'>
+  <table width='670px' id='contact-tab' cellpadding="20" cellspacing='20' style="border-collapse: collapse;">
+    <tr style="font-weight: bold; text-align: left;">
+      <th colspan="5" style="font-size: 12px">USDA-ARS Members</th>
+    </tr>
+    <tr id='table-header'>
+      <th style='width: 91px; padding:3px' align='left'>Image</th>
+      <th style='width:119px;padding:3px;' align='left'>Name</th>
+      <th style='width:105px;padding:3px;' align='left'>Role</th>
+      <th style='width:281px;padding:3px;' align='left'>Expertise</th>
+      <th style='width:74px;padding:3px;' align='left'>Contact</th>
+    </tr>
+
+    @(inits #display: off#
+      $(index #default: 1#)
+    )
+
+    @(contact-table-row-usda
+    <tr
+      %(color-row-usda
+        $index = $this->reflect(\)->upstream('contact-table'\)->get('index'\);
+        $idval = $index->value(\);
+        $idstr = "";
+        if ($idval % 2 == 0\) {
+          $idstr = "id='contact-table-even'";
+        }
+        else {
+          $idstr = "id='contact-table-odd'";
+        }
+        $index->replace($idval + 1\);
+        return $idstr;
+      )
+    >
+    <td style='padding:0px;'><img src='$(Image)' height='58px'></img></td>
+    <td style='padding:3px;'>$(Name)</td>
+    <td style='padding:3px;'>$(Role)</td>
+    <td style='padding:3px;'>$(Expertise)</td>
+       <td style='padding:3px;'>
+        <center>
+          <a href="mailto:$(Email)$(Email-opts)"><img src='/icon/email_open_16.png'></a>
+          $(FindPerson)
+        </center>
+      </td>
+    </tr>
+    <tr style="height: 5px"><td> </td> <td> </td><td> </td><td> </td><td> </td></tr>
+    )
+  </table>
+  <br><br>
+  
+  <!-- Non-federal -->
+  <table width='670px' id='contact-tab' cellpadding=0 cellspacing='0px' style="border-collapse: collapse;">
+    <tr style="font-weight: bold; text-align: left;">
+      <th colspan="5" style="font-size: 12px">Non-federal Members</th>
+    </tr>
+    <tr id='table-header'>
+      <th style='width:91px;padding:3px' align='left'>Image</th>
+      <th style='width:119px;padding:3px;' align='left'>Name</th>
+      <th style='width:105px;padding:3px;' align='left'>Role</th>
+      <th style='width:281px;padding:3px;' align='left'>Expertise</th>
+      <th style='width:74px;padding:3px;' align='left'>Contact</th>
+    </tr>
+
+    @(contact-table-row-nonfed
+    <tr
+      %(color-row-nonfed
+        $index = $this->reflect(\)->upstream('contact-table'\)->get('index'\);
+        $idval = $index->value(\);
+        $idstr = "";
+        if ($idval % 2 == 0\) {
+          $idstr = "id='contact-table-even'";
+        }
+        else {
+          $idstr = "id='contact-table-odd'";
+        }
+        $index->replace($idval + 1\);
+        return $idstr;
+      )
+    >
+      <td style='padding:0px;'><img src='$(Image)' height='58px'></img></td>
+      <td style='padding:3px;'>$(Name)</td>
+      <td style='padding:3px;'>$(Role)</td>
+      <td style='padding:3px;'>$(Expertise)</td>
+      <td style='padding:3px;'>
+        <center>
+          <a href="mailto:$(Email)$(Email-opts)"><img src='/icon/email_open_16.png'></a>
+          $(FindPerson)
+        </center>
+      </td>
+    </tr>
+    <tr style="height: 5px"><td> </td> <td> </td><td> </td><td> </td><td> </td></tr>
+    )
+  </table>
+  <br><br>
+  
+  <!-- Students -->
+  <table width='670px' id='contact-tab' cellpadding=0 cellspacing='2px' style="border-collapse: collapse">
+    <tr style="font-weight: bold; text-align: left;">
+      <th colspan="5" style="font-size: 12px">Students</th>
+    </tr>
+    <tr id='table-header'>
+      <th style='width:91px;padding:3px' align='left'>Image</th>
+      <th style='width:119px;padding:3px;' align='left'>Name</th>
+      <th style='width:105px;padding:3px;' align='left'>Role</th>
+      <th style='width:281px;padding:3px;' align='left'>Expertise</th>
+      <th style='width:74px;padding:3px;' align='left'>Contact</th>
+    </tr>
+
+    @(contact-table-row-student
+    <tr
+      %(color-row-student
+        $index = $this->reflect(\)->upstream('contact-table'\)->get('index'\);
+        $idval = $index->value(\);
+        $idstr = "";
+        if ($idval % 2 == 0\) {
+          $idstr = "id='contact-table-even'";
+        }
+        else {
+          $idstr = "id='contact-table-odd'";
+        }
+        $index->replace($idval + 1\);
+        return $idstr;
+      )
+    >
+      <td style='padding:0px;'><img src='$(Image)' height='58px'></img></td>
+      <td style='padding:3px;'>$(Name)</td>
+      <td style='padding:3px;'>$(Role)</td>
+      <td style='padding:3px;'>$(Expertise)</td>
+      <td style='padding:3px;'>
+        <center>
+          <a href="mailto:$(Email)$(Email-opts)"><img src='/icon/email_open_16.png'></a>
+          $(FindPerson)
+        </center>
+      </td>
+    </tr>
+    <tr style="height: 5px"><td> </td> <td> </td><td> </td><td> </td><td> </td></tr>
+    )
+  </table>
+  <br><br>
+  
+  <!-- Alumni -->
+  <table width='670px' id='contact-tab' cellpadding=0 cellspacing='2px' style="border-collapse: collapse">
+    <tr style="font-weight: bold; text-align: left;">
+      <th colspan="5" style="font-size: 12px">Alumni</th>
+    </tr>
+    <tr id='table-header'>
+      <th style='width:91px;padding:3px' align='left'>Image</th>
+      <th style='width:119px;padding:3px;' align='left'>Name</th>
+      <th style='width:105px;padding:3px;' align='left'>Role</th>
+      <th style='width:281px;padding:3px;' align='left'>Expertise</th>
+      <th style='width:74px;padding:3px;' align='left'>Contact</th>
+    </tr>
+
+    @(contact-table-row-alumni
+    <tr
+      %(color-row-alumni
+        $index = $this->reflect(\)->upstream('contact-table'\)->get('index'\);
+        $idval = $index->value(\);
+        $idstr = "";
+        if ($idval % 2 == 0\) {
+          $idstr = "id='contact-table-even'";
+        }
+        else {
+          $idstr = "id='contact-table-odd'";
+        }
+        $index->replace($idval + 1\);
+        return $idstr;
+      )
+    >
+      <td style='padding:0px;'><img src='$(Image)' height='58px'></img></td>
+      <td style='padding:3px;'>$(Name)</td>
+      <td style='padding:3px;'>$(Role)</td>
+      <td style='padding:3px;'>$(Expertise)</td>
+      <td style='padding:3px;'>
+        <center>
+          <a href="mailto:$(Email)$(Email-opts)"><img src='/icon/email_open_16.png'></a>
+          $(FindPerson)
+        </center>
+      </td>
+    </tr>
+    <tr style="height: 5px"><td> </td> <td> </td><td> </td><td> </td><td> </td></tr>
+    )
+  </table>
+  <br>
+  *(contact-info #load: templates/about/contact-info.bau#)
+  <br>
+</div>
+)

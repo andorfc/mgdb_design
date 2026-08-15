@@ -1,0 +1,133 @@
+/* ==========================================================================
+   Contact (/contact)
+   --------------------------------------------------------------------------
+   Scoped under .mgdb-contact-page, built on the shared tokens.
+
+   Portraits are deliberately not rendered: the ones available are 58px and
+   look poor at any usable size. Each person card keeps its portrait path in
+   data-photo, so switching them back on is a markup and CSS change only, with
+   no data to re-enter. The rule for that is at the end of this file, commented
+   out and ready.
+   ========================================================================== */
+
+.mgdb-contact-page > section { margin-top: var(--mgdb-space-7); }
+
+/* Group photograph --------------------------------------------------------- */
+
+.mgdb-contact-page .contact-core figure {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow);
+}
+
+.mgdb-contact-page .contact-core img { display: block; width: 100%; height: auto; }
+
+.mgdb-contact-page .contact-core figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3) var(--mgdb-space-6);
+  align-items: end;
+  justify-content: space-between;
+  padding: var(--mgdb-space-5);
+  border-top: 1px solid var(--mgdb-line-soft);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-contact-page .contact-core h2 { color: var(--mgdb-green-dark); }
+.mgdb-contact-page .contact-core figcaption p { margin-top: var(--mgdb-space-2); color: var(--mgdb-muted); }
+
+.mgdb-contact-page .contact-core-tags {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+/* Directory ---------------------------------------------------------------- */
+
+.mgdb-contact-page .contact-group { margin-top: var(--mgdb-space-6); }
+
+.mgdb-contact-page .contact-group h3 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: baseline;
+  padding-bottom: var(--mgdb-space-2);
+  border-bottom: 2px solid var(--mgdb-line);
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-contact-page .contact-group-count {
+  padding: 1px 9px;
+  border-radius: 999px;
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.mgdb-contact-page .contact-person-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-contact-page .contact-person {
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-left: 4px solid var(--mgdb-green);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-contact-page .contact-person h4 { color: var(--mgdb-green-dark); font-size: var(--mgdb-text-lg); }
+.mgdb-contact-page .contact-person-role { margin-top: var(--mgdb-space-1); color: var(--mgdb-ink); font-weight: 600; }
+.mgdb-contact-page .contact-person-expertise { margin-top: var(--mgdb-space-2); color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); line-height: var(--mgdb-leading-snug); }
+
+.mgdb-contact-page .contact-person-links {
+  margin-top: var(--mgdb-space-3);
+  font-size: var(--mgdb-text-sm);
+  overflow-wrap: anywhere;
+}
+
+.mgdb-contact-page .contact-person-links a { color: var(--mgdb-burgundy); font-weight: 600; }
+
+/* Alumni are historical rather than current contacts. */
+.mgdb-contact-page .contact-person[data-group="alumni"] { border-left-color: var(--mgdb-line); }
+
+/* A group whose members are all filtered out disappears with them. */
+.mgdb-contact-page .contact-group[hidden] { display: none !important; }
+
+@media (max-width: 767px) {
+  .mgdb-contact-page .contact-core figcaption { display: block; }
+  .mgdb-contact-page .contact-core-tags { display: block; margin-top: var(--mgdb-space-3); }
+}
+
+/* --------------------------------------------------------------------------
+   Restoring portraits
+
+   Each .contact-person carries data-photo with its portrait path. To bring
+   headshots back, have the template emit an <img> from that attribute and
+   uncomment the rules below. Nothing else needs to change.
+
+.mgdb-contact-page .contact-person {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--mgdb-space-4);
+  align-items: start;
+}
+
+.mgdb-contact-page .contact-person img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--mgdb-surface-sunken);
+}
+   -------------------------------------------------------------------------- */

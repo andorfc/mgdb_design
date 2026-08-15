@@ -1,0 +1,26 @@
+*(contact-info
+
+<!--
+<div>
+  <a name="key_group"></a>
+	<h2>MaizeGDB Key Collaborators</h2><br>
+  @(key-list1	
+    <a href="$(KeyPerson)">$(KeyCollaborator)</a><br>
+  )
+  <br>
+</div>
+-->
+
+<div>
+  <a name="working_group"></a>
+	<h2>MaizeGDB Working Group</h2><br>
+  @(contact-info1	
+     <a href="$(WorkingPerson)"> $(WorkingGroupMembers)</a><br>
+  )
+  <br>
+  @(contact-info2
+    $(AdditionalInfo)<br>
+  )
+</div>
+
+)
