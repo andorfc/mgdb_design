@@ -1,0 +1,35 @@
+*(person_search #include-js: /js/person.js, include-css: /css/person.css#
+  <table width=100% cellpadding=0 cellspacing=0>
+    <tr>
+      <td>
+        <div id="centercolumn_record">
+          <div class='navarea'>
+            <font size="1">
+              <span class='underlinedlink' align='right'><a href='/index.php'>Home</a> >
+              <a href=''>Community</a> >
+              </span><span class='greylink' align='right'><a href='/person'>Find people</a></span>
+            </font>
+          </div>
+          <br>
+          <table width='100%'  cellpadding=0 cellspacing=0>
+            <tr valign='center' class='green_curve_background'>
+              <td align='left'>
+                <img src='/images/header_left.gif'></img>
+              </td>
+              <td width='97%' valign='center' class='green_curve_background'>
+                Find People		
+              </td>
+              <td align='right'>
+                <img src='/images/header_right.gif'></img>
+              </td>
+            </tr>
+          </table>	
+        </div>
+  
+        *(person-left #load: templates/community/person-left.bau#)
+        *(person-right #load: templates/community/person-right.bau#)
+          
+      </td>
+    </tr>
+  </table>
+)

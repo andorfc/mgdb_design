@@ -1,0 +1,340 @@
+/* ==========================================================================
+   Person and organization search (/person)
+   --------------------------------------------------------------------------
+   Layout ported from the MaizeGDB website repository, restyled onto the shared
+   tokens. Scoped under .mgdb-person-page.
+   ========================================================================== */
+
+.mgdb-person-page > section { margin-top: var(--mgdb-space-7); }
+
+/* Hero --------------------------------------------------------------------- */
+
+.mgdb-person-page .person-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr);
+  gap: var(--mgdb-space-6);
+  align-items: center;
+  padding: var(--mgdb-space-6);
+  border-radius: var(--mgdb-radius-lg);
+  background: linear-gradient(135deg, #16351f, #24502c 58%, #2f6134);
+  color: #fff;
+  box-shadow: var(--mgdb-shadow-lg);
+}
+
+.mgdb-person-page .person-hero .mgdb-eyebrow { color: #ffe6a9; }
+
+.mgdb-person-page .person-hero h1 {
+  margin: var(--mgdb-space-2) 0 var(--mgdb-space-3);
+  color: #fff;
+  font-size: clamp(1.75rem, 1.1rem + 2vw, 2.375rem);
+}
+
+.mgdb-person-page .person-hero-copy p { max-width: var(--mgdb-measure); color: #eaf3e6; }
+.mgdb-person-page .person-hero :focus-visible { outline-color: #fff; }
+
+/* What a person record connects to. Decorative support for the copy. */
+.mgdb-person-page .person-connection-map {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  justify-content: center;
+  padding: var(--mgdb-space-4);
+  border: 1px solid rgba(255, 255, 255, .2);
+  border-radius: var(--mgdb-radius);
+  background: rgba(0, 0, 0, .18);
+}
+
+.mgdb-person-page .person-connection-map span {
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .1);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.mgdb-person-page .person-connection-map i { color: #ffd99a; font-style: normal; font-weight: 800; }
+
+/* Search workspace --------------------------------------------------------- */
+
+.mgdb-person-page .person-search-workspace {
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-person-page .person-search-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3) var(--mgdb-space-5);
+  align-items: start;
+  justify-content: space-between;
+}
+
+.mgdb-person-page .person-section-label {
+  display: block;
+  color: var(--mgdb-red);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.mgdb-person-page .person-search-heading h2 { margin-top: var(--mgdb-space-1); color: var(--mgdb-green-dark); }
+.mgdb-person-page .person-search-heading p { max-width: var(--mgdb-measure); margin-top: var(--mgdb-space-2); color: var(--mgdb-muted); }
+
+/* Search tips collapse without script. */
+.mgdb-person-page .person-search-tips > summary {
+  display: inline-flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  min-height: 38px;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+
+.mgdb-person-page .person-search-tips > summary::-webkit-details-marker { display: none; }
+.mgdb-person-page .person-search-tips > summary::after { content: "+"; font-size: 1.1em; }
+.mgdb-person-page .person-search-tips[open] > summary::after { content: "\2212"; }
+.mgdb-person-page .person-search-tips > summary:focus-visible { outline: 3px solid var(--mgdb-focus); outline-offset: 2px; }
+.mgdb-person-page .person-search-tips ul { margin-top: var(--mgdb-space-3); padding-left: 1.3em; color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+.mgdb-person-page .person-search-tips li + li { margin-top: var(--mgdb-space-2); }
+
+/* Query field -------------------------------------------------------------- */
+
+.mgdb-person-page label {
+  display: block;
+  margin-bottom: var(--mgdb-space-1);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+}
+
+.mgdb-person-page .person-input-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: stretch;
+  margin-top: var(--mgdb-space-4);
+}
+
+/* .person-autocomplete is the field wrapper: it holds the icon, the input, and
+   the suggestion listbox. .person-input-icon is only the glyph. */
+.mgdb-person-page .person-autocomplete {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  flex: 1 1 22rem;
+  min-width: 0;
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid #b9b2a5;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-person-page .person-autocomplete:focus-within { border-color: var(--mgdb-focus); }
+.mgdb-person-page .person-input-icon { color: var(--mgdb-muted); }
+
+.mgdb-person-page .person-autocomplete input {
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  /* 16px also stops iOS zooming the page when the field takes focus. */
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-person-page .person-search-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-6);
+  border: 0;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-green-dark);
+  color: #fff;
+  font-family: inherit;
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-person-page .person-search-button:hover { background: #0f3325; }
+.mgdb-person-page .person-search-meta { margin-top: var(--mgdb-space-2); color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+
+/* Worked examples. */
+.mgdb-person-page .person-example-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-top: var(--mgdb-space-3);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-person-page .person-example-row button {
+  min-height: 34px;
+  padding: var(--mgdb-space-1) var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface);
+  color: var(--mgdb-burgundy);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-person-page .person-example-row button:hover { border-color: var(--mgdb-gold-dark); background: var(--mgdb-gold-soft); }
+
+/* Suggestions -------------------------------------------------------------- */
+
+.mgdb-person-page #person-suggestions {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 4px);
+  right: 0;
+  left: 0;
+  max-height: 22rem;
+  overflow-y: auto;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-lg);
+}
+
+.mgdb-person-page #person-suggestions[hidden] { display: none !important; }
+
+.mgdb-person-page #person-suggestions:empty { display: none; }
+.mgdb-person-page #person-suggestions [role="option"],
+.mgdb-person-page #person-suggestions button,
+.mgdb-person-page #person-suggestions a {
+  display: block;
+  width: 100%;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 0;
+  border-bottom: 1px solid var(--mgdb-line-soft);
+  background: none;
+  color: var(--mgdb-ink);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.mgdb-person-page #person-suggestions [aria-selected="true"],
+.mgdb-person-page #person-suggestions a:hover,
+.mgdb-person-page #person-suggestions button:hover { background: var(--mgdb-green-soft); }
+.mgdb-person-page #person-suggestions strong { color: var(--mgdb-green-dark); }
+.mgdb-person-page #person-suggestions small { display: block; margin-top: 2px; color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+.mgdb-person-page mark { background: #fdf0c4; color: inherit; font-weight: 700; }
+
+/* Results ------------------------------------------------------------------ */
+
+.mgdb-person-page #person-results-region { margin-top: var(--mgdb-space-5); }
+.mgdb-person-page #person-search-status { color: var(--mgdb-ink-soft); font-size: var(--mgdb-text-sm); font-weight: 700; }
+
+.mgdb-person-page #person-results-region table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-person-page #person-results-region th,
+.mgdb-person-page #person-results-region td {
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  border-bottom: 1px solid var(--mgdb-line-soft);
+  text-align: left;
+  vertical-align: top;
+}
+
+.mgdb-person-page #person-results-region th {
+  border-bottom: 2px solid var(--mgdb-line);
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-green-dark);
+  font-weight: 700;
+}
+
+.mgdb-person-page #person-results-region tr:hover td { background: var(--mgdb-surface-alt); }
+.mgdb-person-page #person-results-region a { color: var(--mgdb-burgundy); font-weight: 600; }
+
+/* Supporting cards --------------------------------------------------------- */
+
+.mgdb-person-page .person-support-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-person-page .person-support-grid article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--mgdb-space-4);
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-person-page .person-support-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-size: 1.1rem;
+}
+
+.mgdb-person-page .person-support-grid h2 { color: var(--mgdb-green-dark); font-size: var(--mgdb-text-lg); }
+.mgdb-person-page .person-support-grid p { margin-top: var(--mgdb-space-2); color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+
+@media (max-width: 1023px) {
+  .mgdb-person-page .person-hero { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 767px) {
+  .mgdb-person-page .person-hero { padding: var(--mgdb-space-5) var(--mgdb-space-4); }
+  .mgdb-person-page .person-search-button { width: 100%; }
+}
+
+/* Suggestion rows carry an avatar bearing the person's initial. Without a rule
+   it rendered as bare text against the name, reading as "WWalbot, V". */
+.mgdb-person-page .person-suggestion {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+}
+
+.mgdb-person-page .person-suggestion-avatar {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 800;
+}
+
+.mgdb-person-page .person-suggestion strong { display: block; color: var(--mgdb-green-dark); }
+.mgdb-person-page .person-suggestion em { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); font-style: normal; }

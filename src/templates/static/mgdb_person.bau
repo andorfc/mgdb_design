@@ -1,0 +1,87 @@
+*(mgdb-person
+  <main class="mgdb-page mgdb-person-page" id="mgdb-person-main">
+    <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Home</a><span aria-hidden="true">›</span>
+      <a href="/contact">Community</a><span aria-hidden="true">›</span>
+      <span aria-current="page">Find people</span>
+    </nav>
+
+    <section class="person-hero">
+      <div class="person-hero-copy">
+        <span class="mgdb-eyebrow">Maize research community</span>
+        <h1>Find a person or organization</h1>
+        <p>Search MaizeGDB community records by researcher name, organization, or a known name variant. Select a suggestion for the quickest route to a record.</p>
+      </div>
+      <div class="person-connection-map" aria-label="Person records connect research resources">
+        <span>People</span><i aria-hidden="true">→</i><span>Publications</span><i aria-hidden="true">→</i><span>Maize data</span>
+      </div>
+    </section>
+
+      <section class="person-search-workspace" aria-labelledby="person-search-heading">
+    <div class="person-search-heading">
+      <div>
+        <span class="person-section-label">Directory search</span>
+        <h2 id="person-search-heading">Search community records</h2>
+        <p>Enter at least three characters. Names, institutions, and known aliases are searched without regard to capitalization.</p>
+      </div>
+      <details class="person-search-tips">
+        <summary>Search tips</summary>
+        <ul>
+          <li>Try a last name, full name, or organization.</li>
+          <li>Use a partial name if spelling is uncertain.</li>
+          <li>Choose an autocomplete suggestion to open the record directly.</li>
+        </ul>
+      </details>
+    </div>
+
+    <form id="person-search-form" class="person-search-form" action="/person" method="get" role="search">
+      <label for="bacterm">Person or organization</label>
+      <div class="person-input-row">
+        <div class="person-autocomplete">
+          <span class="person-input-icon" aria-hidden="true">⌕</span>
+          <input autocomplete="off" type="search" name="term" id="bacterm"
+                 value="$(queryterm)" placeholder="Try a name such as Virginia Walbot"
+                 aria-describedby="person-search-help person-search-status"
+                 aria-autocomplete="list" aria-controls="person-suggestions"
+                 aria-expanded="false">
+          <div id="person-suggestions" class="person-suggestions" role="listbox" hidden></div>
+        </div>
+        <button type="submit" class="person-search-button">Search</button>
+      </div>
+      <div class="person-search-meta">
+        <span id="person-search-help">Three or more characters</span>
+        <span id="person-search-status" role="status" aria-live="polite"></span>
+      </div>
+      <div class="person-example-row" aria-label="Example searches">
+        <span>Try:</span>
+        <button type="button" data-person-example="Walbot">Walbot</button>
+        <button type="button" data-person-example="Buckler">Buckler</button>
+        <button type="button" data-person-example="Iowa State University">Iowa State University</button>
+      </div>
+    </form>
+  </section>
+
+  <section id="person-results-region" class="person-results-region" aria-label="Search results" aria-live="polite">
+    <div id="p1" hidden></div>
+    <div id="p4" hidden></div>
+    <div id="p3" hidden></div>
+  </section>
+
+  <script type="text/javascript">$(js_insert)</script>
+
+    <section class="person-support-grid" aria-label="More ways to connect">
+      <article>
+        <span class="person-support-icon" aria-hidden="true">◎</span>
+        <div><h2>Connected records</h2><p>Person records link researchers and organizations to publications and other curated MaizeGDB data.</p></div>
+      </article>
+      <article>
+        <span class="person-support-icon" aria-hidden="true">↻</span>
+        <div><h2>Keep information current</h2><p>Found an outdated affiliation or contact detail? Send the correction to the MaizeGDB team.</p><a href="/contact">Contact MaizeGDB →</a></div>
+      </article>
+      <article>
+        <span class="person-support-icon" aria-hidden="true">⌕</span>
+        <div><h2>Search the literature</h2><p>Looking for work by an author rather than a profile? Search references, abstracts, DOIs, and PubMed records.</p><a href="/data_center/reference">Find a paper →</a></div>
+      </article>
+    </section>
+  </main>
+)

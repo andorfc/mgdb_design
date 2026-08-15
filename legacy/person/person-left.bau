@@ -1,0 +1,57 @@
+*(person-left
+<div id='person_left_col'>
+
+  <p><b>Person/Organization Search</b><br>
+  
+  <div id='person_green_background'>
+    This search form allows you to quickly retrieve the person you are looking 
+    for.<b> For best results, put in Last name, First initial. Please enter at 
+    least three characters.</b>
+    For searches of less than 3 characters use spaces (e.g. "Li "\). Use % as a 
+    wild card.</p>
+    
+    <form name='n1' style="padding-top: 0px; padding-bottom: 0px;" class="tiny" 
+          action="/tools/ajax/person_search/persondisplayresults.php" 
+          method="get" onsubmit="return false">
+      <input autocomplete="off" type="text" onkeyup="doWork(\);doSugg(\);" 
+             name="term" id="bacterm" size="20" class="quick_search"
+             value="$(queryterm)">
+      (see a <a href="#" onClick="SamplePersonQuery(\);doWork(\);">sample person query</a>\)
+    </form>
+  
+    <div id='sp14' style='display:none'>
+      <table id='person_green_background' style='width:700px' 
+             summary="A table containing the main page content.">
+        <tr>
+          <td> 
+            Did you mean: 
+            <div id='sp4'> 
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <br>
+    
+  <div id='p1' style='display:none'>
+    <table id='person_green_background' style='width:723px' 
+           summary="A table containing the main page content.">
+      <tr>
+        <td>
+        </td>
+      </tr>
+    </table>
+  </div>
+    
+  <div id='p4' style='display:none;width:723px;'>
+  </div>
+  
+  <div id="p3" style="display:none"></div>
+</div>
+
+<script type='text/javascript'>
+ $(js_insert)
+ </script>
+ 
+)
