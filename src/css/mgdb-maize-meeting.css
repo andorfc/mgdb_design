@@ -1,0 +1,415 @@
+/* ==========================================================================
+   Maize Genetics Meeting (/maize_meeting/)
+   --------------------------------------------------------------------------
+   Layout ported from the MaizeGDB website repository, rewritten on the shared
+   tokens. Scoped under .mgdb-meeting-page.
+
+   The page header uses the shared two-tone .mgdb-hero, and the eyebrow, section
+   headings, buttons, empty state, and data note use their design system
+   equivalents, so none of those are restyled here.
+
+   The original ran 8-11px for body copy, labels, and card text. Everything here
+   uses the shared scale instead, whose floor is 16px for body copy and 14px for
+   secondary text.
+   ========================================================================== */
+
+.mgdb-meeting-page > section { margin-top: var(--mgdb-space-7); }
+
+/* Upcoming meetings -------------------------------------------------------- */
+/* Moved directly below the header: for most readers this is the thing they
+   came for, so it precedes the history and the archive. */
+
+.mgdb-meeting-page .meeting-upcoming-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-meeting-page .meeting-event-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-4);
+  align-items: center;
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink) !important;
+  text-decoration: none;
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-meeting-page .meeting-event-card:hover { border-color: var(--mgdb-gold-dark); background: var(--mgdb-surface-alt); }
+
+/* The next meeting gets a gold spine as well as the tint, so it is marked by
+   more than colour. */
+.mgdb-meeting-page .meeting-event-featured {
+  border-left: 5px solid var(--mgdb-gold);
+  background: linear-gradient(135deg, var(--mgdb-gold-soft), var(--mgdb-surface) 70%);
+}
+
+/* Venue photograph with the year over it. */
+.mgdb-meeting-page .meeting-event-visual {
+  position: relative;
+  display: grid;
+  width: 96px;
+  height: 96px;
+  flex: none;
+  place-items: center;
+  overflow: hidden;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-green-dark);
+}
+
+.mgdb-meeting-page .meeting-event-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mgdb-meeting-page .meeting-event-visual strong {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 3px 0;
+  background: rgba(16, 45, 26, .82);
+  color: #fff;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 800;
+  text-align: center;
+}
+
+.mgdb-meeting-page .meeting-event-card small {
+  color: var(--mgdb-red);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.mgdb-meeting-page .meeting-event-card h3 { margin-top: var(--mgdb-space-1); color: var(--mgdb-green-dark); font-size: var(--mgdb-text-lg); }
+.mgdb-meeting-page .meeting-event-card p { margin-top: var(--mgdb-space-1); color: var(--mgdb-muted); font-size: var(--mgdb-text-base); }
+.mgdb-meeting-page .meeting-event-card b { color: var(--mgdb-red); font-size: var(--mgdb-text-xl); }
+
+/* Overview metrics --------------------------------------------------------- */
+
+.mgdb-meeting-page .meeting-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-meeting-page .meeting-metric {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--mgdb-space-4);
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-top: 3px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-meeting-page .meeting-tone-red { border-top-color: var(--mgdb-red); }
+.mgdb-meeting-page .meeting-tone-amber { border-top-color: var(--mgdb-orange); }
+.mgdb-meeting-page .meeting-tone-brown { border-top-color: var(--mgdb-burgundy); }
+
+.mgdb-meeting-page .meeting-metric-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 900;
+}
+
+.mgdb-meeting-page .meeting-tone-red .meeting-metric-icon { background: var(--mgdb-red-soft); color: var(--mgdb-red); }
+.mgdb-meeting-page .meeting-tone-amber .meeting-metric-icon { background: #fff0e7; color: #a33d10; }
+.mgdb-meeting-page .meeting-tone-brown .meeting-metric-icon { background: var(--mgdb-burgundy-soft); color: var(--mgdb-burgundy); }
+
+.mgdb-meeting-page .meeting-metric strong {
+  display: block;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-2xl);
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.mgdb-meeting-page .meeting-metric h3 { margin-top: var(--mgdb-space-2); color: var(--mgdb-ink); font-size: var(--mgdb-text-base); }
+.mgdb-meeting-page .meeting-metric p { margin-top: var(--mgdb-space-1); color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); line-height: var(--mgdb-leading-snug); }
+
+/* Charts ------------------------------------------------------------------- */
+
+.mgdb-meeting-page .meeting-dashboard {
+  padding: var(--mgdb-space-6) var(--mgdb-space-5);
+  border-top: 1px solid var(--mgdb-line-soft);
+  border-bottom: 1px solid var(--mgdb-line-soft);
+  background: linear-gradient(180deg, var(--mgdb-surface-alt), var(--mgdb-surface));
+}
+
+.mgdb-meeting-page .meeting-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-meeting-page .meeting-chart-card {
+  min-width: 0;
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-meeting-page .meeting-chart-card > div > span {
+  display: block;
+  color: var(--mgdb-red);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.mgdb-meeting-page .meeting-chart-card h3 { margin-top: var(--mgdb-space-1); color: var(--mgdb-green-dark); font-size: var(--mgdb-text-lg); }
+.mgdb-meeting-page .meeting-chart-card p { margin-top: var(--mgdb-space-1); color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+.mgdb-meeting-page .meeting-chart { width: 100%; height: 320px; margin-top: var(--mgdb-space-3); }
+
+/* Milestones timeline ------------------------------------------------------ */
+
+.mgdb-meeting-page .meeting-timeline {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: var(--mgdb-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mgdb-meeting-page .meeting-timeline li {
+  position: relative;
+  min-width: 0;
+  padding: var(--mgdb-space-6) var(--mgdb-space-4) var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-meeting-page .meeting-timeline li::before {
+  position: absolute;
+  top: var(--mgdb-space-3);
+  left: var(--mgdb-space-4);
+  width: 12px;
+  height: 12px;
+  border: 3px solid var(--mgdb-surface);
+  border-radius: 50%;
+  background: var(--mgdb-gold);
+  box-shadow: 0 0 0 1px var(--mgdb-gold-dark);
+  content: "";
+}
+
+.mgdb-meeting-page .meeting-timeline span { color: var(--mgdb-red); font-size: var(--mgdb-text-sm); font-weight: 900; letter-spacing: .06em; }
+.mgdb-meeting-page .meeting-timeline strong { display: block; margin-top: var(--mgdb-space-2); color: var(--mgdb-green-dark); font-size: var(--mgdb-text-base); }
+.mgdb-meeting-page .meeting-timeline small { display: block; margin-top: var(--mgdb-space-2); color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); line-height: var(--mgdb-leading-snug); }
+
+/* Archive ------------------------------------------------------------------ */
+
+.mgdb-meeting-page .meeting-archive-tools {
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-meeting-page .meeting-archive-search {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  min-height: var(--mgdb-tap-target);
+  margin: 0;
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid #b9b2a5;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-meeting-page .meeting-archive-search:focus-within { border-color: var(--mgdb-focus); }
+.mgdb-meeting-page .meeting-archive-search > span:first-child { color: var(--mgdb-muted); font-size: 1.1rem; }
+
+.mgdb-meeting-page .meeting-archive-search input {
+  width: 100%;
+  min-height: 40px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-meeting-page .meeting-archive-search button {
+  border: 0;
+  background: none;
+  color: var(--mgdb-burgundy);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-meeting-page .meeting-archive-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-top: var(--mgdb-space-4);
+}
+
+/* Period chips match the shared filter chip, check included so the pressed
+   state is not colour-only. */
+.mgdb-meeting-page .meeting-archive-filters button {
+  min-height: 36px;
+  padding: var(--mgdb-space-1) var(--mgdb-space-4);
+  border: 1px solid #c7bda8;
+  border-radius: 999px;
+  background: var(--mgdb-surface);
+  color: var(--mgdb-burgundy);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-meeting-page .meeting-archive-filters button:hover { background: var(--mgdb-gold-soft); }
+
+.mgdb-meeting-page .meeting-archive-filters button[aria-pressed="true"] {
+  border-color: var(--mgdb-burgundy);
+  border-width: 2px;
+  background: var(--mgdb-burgundy);
+  color: #fff;
+}
+
+.mgdb-meeting-page .meeting-archive-filters button[aria-pressed="true"]::before { content: "\2713 "; }
+
+.mgdb-meeting-page #meeting-archive-count {
+  margin-left: auto;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.mgdb-meeting-page .meeting-archive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-meeting-page .meeting-archive-grid a {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink) !important;
+  text-decoration: none;
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-meeting-page .meeting-archive-grid a:hover { border-color: var(--mgdb-gold-dark); }
+
+/* A canceled meeting is marked by its placeholder text and reduced emphasis,
+   never by colour alone. */
+.mgdb-meeting-page .meeting-archive-grid a.is-canceled { opacity: .78; }
+
+.mgdb-meeting-page .meeting-archive-thumb {
+  display: grid;
+  height: 122px;
+  place-items: center;
+  overflow: hidden;
+  background: var(--mgdb-green-dark);
+}
+
+.mgdb-meeting-page .meeting-archive-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+.mgdb-meeting-page .meeting-archive-placeholder {
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.mgdb-meeting-page .meeting-archive-copy {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  padding: var(--mgdb-space-4);
+}
+
+.mgdb-meeting-page .meeting-archive-year { color: var(--mgdb-red); font-size: var(--mgdb-text-xl); font-weight: 900; }
+.mgdb-meeting-page .meeting-archive-copy strong { margin-top: var(--mgdb-space-1); color: var(--mgdb-green-dark); font-size: var(--mgdb-text-base); }
+.mgdb-meeting-page .meeting-archive-copy small { margin-top: var(--mgdb-space-1); color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+
+/* Closing resource panel --------------------------------------------------- */
+
+.mgdb-meeting-page .meeting-resources {
+  display: grid;
+  grid-template-columns: minmax(240px, .7fr) minmax(0, 1.3fr);
+  gap: var(--mgdb-space-6);
+  padding: var(--mgdb-space-6);
+  border-radius: var(--mgdb-radius-lg);
+  background: linear-gradient(125deg, #331315, #5b1a1c);
+  color: #fff;
+}
+
+.mgdb-meeting-page .meeting-resources .mgdb-eyebrow { color: #ffc65d; }
+.mgdb-meeting-page .meeting-resources h2 { color: #fff; }
+.mgdb-meeting-page .meeting-resources > div:first-child > p { margin-top: var(--mgdb-space-3); color: #f5dfe0; }
+.mgdb-meeting-page .meeting-resources :focus-visible { outline-color: #fff; }
+
+.mgdb-meeting-page .meeting-resources > div:last-child {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--mgdb-space-3);
+}
+
+.mgdb-meeting-page .meeting-resources a {
+  display: block;
+  padding: var(--mgdb-space-4);
+  border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: var(--mgdb-radius-sm);
+  background: rgba(255, 255, 255, .07);
+  color: #fff !important;
+  text-decoration: none;
+}
+
+.mgdb-meeting-page .meeting-resources a:hover { background: rgba(255, 255, 255, .14); }
+.mgdb-meeting-page .meeting-resources a strong { display: block; font-size: var(--mgdb-text-base); text-decoration: underline; }
+.mgdb-meeting-page .meeting-resources a span { display: block; margin-top: var(--mgdb-space-1); color: #eccfd1; font-size: var(--mgdb-text-sm); }
+
+/* Responsive --------------------------------------------------------------- */
+
+@media (max-width: 1023px) {
+  .mgdb-meeting-page .meeting-resources { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 767px) {
+  .mgdb-meeting-page .meeting-dashboard { padding-inline: var(--mgdb-space-4); }
+  .mgdb-meeting-page .meeting-chart-grid,
+  .mgdb-meeting-page .meeting-upcoming-grid { grid-template-columns: 1fr; }
+  .mgdb-meeting-page .meeting-event-card { grid-template-columns: auto minmax(0, 1fr); }
+  .mgdb-meeting-page .meeting-event-card b { display: none; }
+  .mgdb-meeting-page #meeting-archive-count { width: 100%; margin-left: 0; }
+}
