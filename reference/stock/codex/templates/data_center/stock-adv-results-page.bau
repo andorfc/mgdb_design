@@ -1,0 +1,37 @@
+$$SYNTAX-LEVEL 2
+*(stock-adv-results-page
+  <div class="stock-table-scroll" role="region" aria-label="Advanced stock search results page" tabindex="0"><table width="100%" cellpadding="0" cellspacing="0">
+  <caption class="stock-visually-hidden">Stocks on this advanced-search results page</caption>
+  <tr>
+   <th scope="col" align="left" width="20%">Name</th>
+   <th scope="col" align="left" width="20%">Descriptive Name</th>
+   <th scope="col" align="left" width="20%">Type</th>
+   <th scope="col" align="left" width="20%">Focus Linkage <br> Group</th>
+   <th scope="col" align="left" width="20%">Source</th>
+  </tr>
+  
+  @(stock-adv-row 
+   <tr style="background-color: $(bgcolor)">
+     <td>
+      <a href="/data_center/stock?id=$(id)">
+        $(name) 
+       </a>
+      </td>
+      <td> $(syn) </td>
+      <td> $(type) </td>
+      <td> <a href="/data_center/lg?id=$(lg_id)">$(lg_name)</a> </td>
+      <td> <a href="/person?id=$(avail_id)">$(avail)</a> $(status) </td>
+     </tr>
+  )
+  </table></div>
+  
+  @(load-next-page_adv {display: off}
+    <script language="javascript">
+      if($(cytogenetics)\)
+         getAdvSearch\("stock", 'stock_adv_results_list$(type123)_$(nextpage)', arrSearchOpt, $(nextpage)\);
+      else
+         stock_adv_search\('stock_adv_results_list$(type123)_$(nextpage)', $(nextpage)\);
+    </script>
+    
+  )
+)

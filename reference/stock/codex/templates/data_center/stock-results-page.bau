@@ -1,0 +1,80 @@
+$$SYNTAX-LEVEL 2
+*(stock-results-page
+  
+  <table width="100%" cellpadding="7" cellspacing="7">
+    @(exact-matches {display: off}
+      <table width="100%" cellpadding=0 cellspacing=0>
+        @(exact-row
+        <tr>
+          <td width="20px"></td>
+          <td>
+            <a href="/data_center/stock?id=$(id)"><b>$(name)</b></a> 
+            $(synonyms)
+            $(comments)
+            $(status)
+            <br><br>
+          </td>
+        </tr>
+        )
+      </table>
+    )
+    
+    @(starting-matches {display: off}
+      <table width="100%" cellpadding=0 cellspacing=0>
+        @(start-header {display: off}
+        <tr>
+          <td colspan=2></td>
+            <b>Starting Matches ($(startCount)\)</b>
+          </td>
+        </tr>
+        )
+               
+        @(start-row
+        <tr>
+          <td width="20px"></td>
+          <td>
+            <a href="/data_center/stock?id=$(id)"><b>$(name)</b></a>
+            $(synonyms)
+            $(comments)
+            $(status)
+            <br><br>
+          </td>
+        </tr>
+        )
+      </table>
+    )
+    
+    @(other-matches {display: off}
+      <table width="100%" cellpadding=0 cellspacing=0>   
+      @(other-header {display: off}
+        <tr>
+          <td colspan=2>
+            <b>Other Matches ($(otherCount)\)</b>
+          </td>
+        </tr>
+      )
+      
+      @(other-row
+      <tr>
+        <td width="20px"></td>
+        <td>
+          <a href="/data_center/stock?id=$(id)"><b>$(name)</b></a>
+          $(synonyms)
+          $(comments)
+          $(status)
+          <br><br>
+        </td>
+      </tr>
+      )
+    </table>
+    )
+  </table>
+
+  @(load-next-page {display: off}
+<!-- to prevent bauplan errors: $(term) $(url_term) -->
+    <script language="javascript">
+      getSearchData('stock', 'stock_results_list$(nextpage)', 
+                    $(raw_term_json), $(nextpage)\);
+    </script>
+  )
+)

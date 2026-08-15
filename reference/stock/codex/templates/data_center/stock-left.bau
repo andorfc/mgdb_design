@@ -1,0 +1,181 @@
+*(stock-left
+  <section class="stock-hero" aria-labelledby="stock-page-title">
+    <div class="stock-hero-mark" aria-hidden="true">
+      <svg viewBox="0 0 120 120" role="img">
+        <path d="M61 17c21 13 31 32 25 55-6 23-25 35-45 29-17-5-25-23-18-42 7-20 19-34 38-42Z" fill="currentColor" opacity=".18"/>
+        <path d="M63 21c12 20 13 50 1 77M42 32c13 14 18 39 13 66M80 38c-6 7-11 16-14 26M34 53c10 4 18 10 25 18M72 71c5 4 9 9 12 15" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+      </svg>
+      <span>Germplasm</span>
+    </div>
+    <div class="stock-hero-copy">
+      <span class="stock-kicker">MaizeGDB Data Center</span>
+      <h1 id="stock-page-title">Maize Stock Data</h1>
+      <p>Search curated maize genetic stocks, connect living germplasm with variation and phenotype records, and locate collections available from stock centers and research programs.</p>
+      <div class="stock-hero-actions">
+        <a class="stock-button stock-button-primary" href="#simple-search">Search stocks</a>
+        <a class="stock-button stock-button-secondary" href="/stock_catalog">Browse the Stock Center catalog</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="stock-summary" aria-labelledby="stock-summary-title">
+    <div class="stock-section-heading">
+      <span class="stock-eyebrow">Collection summary</span>
+      <h2 id="stock-summary-title">Stock records at a glance</h2>
+      <p>Live summary of curated MaizeGDB stock records. Historical and unavailable records remain discoverable through search when scientifically relevant.</p>
+    </div>
+    <div class="stock-metric-grid">
+      <article class="stock-metric"><strong>$(metric_active)</strong><span>active stock records</span></article>
+      <article class="stock-metric"><strong>$(metric_types)</strong><span>represented stock types</span></article>
+      <article class="stock-metric"><strong>$(metric_sources)</strong><span>recorded providers</span></article>
+      <article class="stock-metric"><strong>26</strong><span>NAM founder lines</span></article>
+    </div>
+    <div class="stock-chart-card">
+      <div>
+        <span class="stock-eyebrow">Composition</span>
+        <h3>Largest stock categories</h3>
+        <p>The chart summarizes active MaizeGDB stock records by curated stock type. The accompanying list provides the same values without relying on the graphic.</p>
+      </div>
+      <div id="stock-type-chart" class="stock-chart" data-stock-types='$(stock_type_chart)' role="img" aria-label="Bar chart of the largest active stock categories"></div>
+      <div class="stock-chart-fallback" id="stock-type-fallback">$(stock_type_list)</div>
+    </div>
+  </section>
+
+  <nav class="stock-section-nav" aria-label="Stock Data Center sections">
+    <a href="#simple-search">Quick search</a>
+    <a href="#advanced-search">Advanced search</a>
+    <a href="#stock-resources">Collections and resources</a>
+    <a href="#nam">NAM founders</a>
+  </nav>
+
+  @(stock-simple_search
+    <section id="simple-search" class="stock-section stock-search-section" aria-labelledby="stock-simple-title">
+      <div class="stock-section-heading">
+        <span class="stock-eyebrow">Find a record</span>
+        <h2 id="stock-simple-title">Quick stock search</h2>
+        <p>Search by stock identifier, synonym, external accession, or a variation written in parentheses.</p>
+      </div>
+      <form name="n1" id="stock-quick-form" method="get" action="/data_center/stock" class="stock-search-form" role="search">
+        <input type="hidden" name="stock_limit" id="stock-limit-state" value="">
+        <input type="hidden" name="stock_pagesize" id="stock-pagesize-state" value="">
+        <input type="hidden" name="stock_case" id="stock-case-state" value="">
+        <label for="stockterm">Stock identifier or keyword</label>
+        <div class="stock-search-row">
+          <input type="search" name="stock_term" id="stockterm" value="$(term)" class="quick_search" autocomplete="off" placeholder="For example: B97, CML, or bz1">
+          <button type="submit" class="stock-button stock-button-primary" id="stock-search-submit">Search</button>
+        </div>
+        <p class="stock-field-help">Use parentheses around a variation, such as <button type="button" class="stock-text-button" data-stock-example="(a1\)">(a1\)</button>, to find stocks associated with that variation.</p>
+        <details class="stock-search-options">
+          <summary>Search and display options</summary>
+          <div class="stock-options-grid">
+            <label class="stock-check"><input type="checkbox" name="case" id="case" value="1" $(case_checked)> Match capitalization exactly</label>
+            @(limits
+              *(adjust_limits #load: templates/data_center/set_search_limit.bau#)
+            )
+          </div>
+        </details>
+      </form>
+
+      <div id="stock-search-status" class="stock-sr-status" role="status" aria-live="polite"></div>
+      <div id="grin_results_msg" class="stock-results-switch" style="display:none;">
+        <input type="hidden" id="new_search" value="">
+        <p>There are also <button type="button" class="stock-text-button" data-stock-results-mode="grin"><span id="grin_count"></span> matching GRIN germplasm records</button>. For the complete collection, visit <a href="https://npgsweb.ars-grin.gov/gringlobal/search.aspx">GRIN-Global</a>.</p>
+      </div>
+      <div id="stock_results_msg" class="stock-results-switch" style="display:none;">
+        <p><button type="button" class="stock-text-button" data-stock-results-mode="stock">Return to <span id="stock_count"></span> matching MaizeGDB stock records</button>.</p>
+      </div>
+      <div id="stock_results" class="stock-results" aria-live="polite"></div>
+      <div id="grin_results" class="stock-results" aria-live="polite"></div>
+
+      @(start-search #display:off#
+        <script>getSearchData('stock', 'stock_results', $(term_json)\);</script>
+      )
+    </section>
+  )
+
+  @(stock-advanced_search
+    <section id="advanced-search" class="stock-section" aria-labelledby="stock-advanced-title">
+      <div class="stock-section-heading">
+        <span class="stock-eyebrow">Refine a collection</span>
+        <h2 id="stock-advanced-title">Advanced stock search</h2>
+        <p>Select only the criteria needed for the scientific question. Search results retain the established MaizeGDB stock routes and result format.</p>
+      </div>
+      <form method="get" action="/data_center/stock" id="stock-advanced-form" class="stock-advanced-form">
+        <input type="hidden" name="advanced" value="1">
+        <fieldset>
+          <legend>Availability and provenance</legend>
+          <label class="stock-check stock-check-wide"><input type="checkbox" id="box_mgsc" name="mgscbox" value="true"> Available from the Maize Genetics Cooperation Stock Center</label>
+          <div class="stock-filter-row">
+            <label class="stock-check" for="box_dev"><input type="checkbox" id="box_dev" name="developerbox" value="true"> Developed by</label>
+            <div class="stock-control-stack"><label for="dev">Developer</label><select id="dev" name="developer" data-check="box_dev"><option value="0">All developers</option>$(developer_options)</select></div>
+          </div>
+          <div class="stock-filter-row">
+            <label class="stock-check" for="box_avail"><input type="checkbox" id="box_avail" name="availbox" value="true"> Available from</label>
+            <div class="stock-control-stack"><label for="avail">Provider</label><select id="avail" name="avail_from" data-check="box_avail"><option value="0">All providers</option>$(group_options)</select></div>
+          </div>
+          <label class="stock-check stock-check-wide"><input type="checkbox" id="box_bank" name="box_bank" value="true"> Available from a germplasm bank</label>
+          <label class="stock-check stock-check-wide"><input type="checkbox" id="box_expvp" name="box_expvp" value="true"> Ex-PVP stock</label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Identity and classification</legend>
+          <div class="stock-filter-row">
+            <label class="stock-check" for="box_name"><input type="checkbox" id="box_name" name="namebox" value="true"> Identifier</label>
+            <div class="stock-control-stack"><label for="stock_name">Identifier contains</label><input type="text" maxlength="60" id="stock_name" name="name" data-check="box_name" placeholder="For example: B73"></div>
+          </div>
+          <div class="stock-filter-row">
+            <label class="stock-check" for="box_type"><input type="checkbox" id="box_type" name="typebox" value="true"> Stock type</label>
+            <div class="stock-control-stack"><label for="type">Stock type</label><select id="type" name="type" data-check="box_type"><option value="0">All types</option>$(type_options)</select></div>
+          </div>
+          <div class="stock-filter-row">
+            <label class="stock-check" for="box_lg"><input type="checkbox" id="box_lg" name="lgbox" value="true"> Focus linkage group</label>
+            <div class="stock-control-stack"><label for="lg">Focus linkage group</label><select id="lg" name="linkage_group" data-check="box_lg"><option value="0">All linkage groups</option>$(linkage_options)</select></div>
+          </div>
+          <div class="stock-filter-row">
+            <label class="stock-check" for="box_parent"><input type="checkbox" id="box_parent" name="parentbox" value="true"> Parent stock</label>
+            <div class="stock-control-stack"><label for="parent">Parent stock</label><select id="parent" name="parent" data-check="box_parent"><option value="0">All parents</option>$(parent_options)</select></div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Genotype, karyotype, and phenotype</legend>
+          <div class="stock-filter-row"><label class="stock-check" for="box_genvar1"><input type="checkbox" id="box_genvar1" name="gv1box" value="true"> Genotypic variation 1</label><div class="stock-control-stack"><label for="genvar1">First variation name</label><input type="text" maxlength="60" id="genvar1" name="genvar1" data-check="box_genvar1"></div></div>
+          <div class="stock-filter-row"><label class="stock-check" for="box_genvar2"><input type="checkbox" id="box_genvar2" name="gv2box" value="true"> Genotypic variation 2</label><div class="stock-control-stack"><label for="genvar2">Second variation name</label><input type="text" maxlength="60" id="genvar2" name="genvar2" data-check="box_genvar2"></div></div>
+          <div class="stock-filter-row"><label class="stock-check" for="box_genvar3"><input type="checkbox" id="box_genvar3" name="gv3box" value="true"> Genotypic variation 3</label><div class="stock-control-stack"><label for="genvar3">Third variation name</label><input type="text" maxlength="60" id="genvar3" name="genvar3" data-check="box_genvar3"></div></div>
+          <div class="stock-filter-row"><label class="stock-check" for="box_kv"><input type="checkbox" id="box_kv" name="kvbox" value="true"> Karyotypic variation</label><div class="stock-control-stack"><label for="kv">Karyotypic variation</label><select id="kv" name="karyovar" data-check="box_kv"><option value="0">All karyotypic variations</option>$(karyotype_options)</select></div></div>
+          <div class="stock-filter-row"><label class="stock-check" for="box_pheno"><input type="checkbox" id="box_pheno" name="phenobox" value="true"> Phenotype</label><div class="stock-control-stack"><label for="pheno">Phenotype</label><select id="pheno" name="phenotype" data-check="box_pheno"><option value="0">All phenotypes</option>$(phenotype_options)</select></div></div>
+          <div class="stock-filter-row stock-filter-row-indented"><span></span><div class="stock-control-stack"><label for="phenovar">Phenotype attributable to variation</label><input type="text" maxlength="60" id="phenovar" name="attribution" data-check="box_pheno"></div></div>
+        </fieldset>
+
+        <div class="stock-advanced-actions">
+          <button type="submit" class="stock-button stock-button-primary">Search selected criteria</button>
+          <button type="reset" class="stock-button stock-button-secondary">Reset</button>
+          @(adv_limits
+            *(adv_adjust_limits #load: templates/data_center/set_adv_search_limit.bau#)
+          )
+        </div>
+      </form>
+      <div id="stock-advanced-status" class="stock-sr-status" role="status" aria-live="polite"></div>
+      <div id="adv_results" class="stock-results" aria-live="polite"></div>
+    </section>
+  )
+
+  <section id="stock-resources" class="stock-section" aria-labelledby="stock-resources-title">
+    <div class="stock-section-heading"><span class="stock-eyebrow">Use and obtain germplasm</span><h2 id="stock-resources-title">Collections and resources</h2></div>
+    <div class="stock-resource-grid">
+      <article><h3>Stock Center catalog</h3><p>Browse the categorized catalog of stocks maintained by the Maize Genetics Cooperation Stock Center.</p><a href="/stock_catalog">Browse catalog</a></article>
+      <article><h3>Order and documentation</h3><p>Visit the Stock Center for availability and ordering information, or consult the guide to stock packet labels.</p><a href="https://maizecoopsc.org/">Visit the Stock Center</a><a href="/stock_decryption">Decrypt packet labels</a></article>
+      <article><h3>Phenotypes and images</h3><p>Connect stock collections with phenotype, variation, locus, and image records maintained by MaizeGDB.</p><a href="/data_center/phenotype">Search phenotypes</a><a href="/data_center/image_phenotype">Browse phenotype images</a></article>
+      <article><h3>Genotypes and traits</h3><p>Use related tools to examine genotype and trait data for diversity panels and mapping populations.</p><a href="https://wgs.maizegdb.org/">Open SNPversity</a><a href="/traits_ibm_nam">Search trait values</a></article>
+      <article><h3>Project collections</h3><p>Explore sequence-indexed insertion resources and project collections represented across MaizeGDB.</p><a href="/uniformmu">UniformMu</a><a href="/ems-phenotype">EMS Inflorescence Project mutants</a><a href="/gbrowse/maize_v3?enable=AcDs">Ac/Ds project track</a><a href="/gbrowse/maize_v4?enable=Mu_Illumina">Mu-Illumina project track</a></article>
+      <article><h3>Additional germplasm and downloads</h3><p>Access additional germplasm, diversity-panel selection tools, and supporting stock datasets.</p><a href="https://maizecoopsc.org/ncrpis/">North Central Regional Plant Introduction Station</a><a href="/TYPSimSelector">TYPSimSelector</a><a href="https://iastate.app.box.com/v/maizegdb-public/file/1876142430468">Download flow cytometry data</a></article>
+    </div>
+  </section>
+
+  <section id="nam" class="stock-section stock-nam" aria-labelledby="stock-nam-title">
+    <div class="stock-section-heading"><span class="stock-eyebrow">Reference population</span><h2 id="stock-nam-title">Maize NAM founders</h2><p>The maize Nested Association Mapping population contains 26 diverse founder lines. Stocks may be requested from the <a href="https://maizecoopsc.org/nam-rils">Maize Genetics Cooperation Stock Center</a>. See <a href="https://doi.org/10.1534/genetics.107.074245">Yu et al. 2008</a>.</p></div>
+    <div class="stock-nam-grid">
+      <a href="/data_center/stock/B97">B97</a><a href="/data_center/stock/CML103">CML103</a><a href="/data_center/stock/CML228">CML228</a><a href="/data_center/stock/CML247">CML247</a><a href="/data_center/stock/CML277">CML277</a><a href="/data_center/stock/CML322">CML322</a><a href="/data_center/stock/CML333">CML333</a><a href="/data_center/stock/CML052">CML52</a><a href="/data_center/stock/CML069">CML69</a><a href="/data_center/stock/Hp301">Hp301</a><a href="/data_center/stock/Il14H">Il14H</a><a href="/data_center/stock/Ki11">Ki11</a><a href="/data_center/stock/Ki3">Ki3</a><a href="/data_center/stock/Ky21">Ky21</a><a href="/data_center/stock/M162W">M162W</a><a href="/data_center/stock/M37W">M37W</a><a href="/data_center/stock/Mo17">Mo17</a><a href="/data_center/stock/Mo18W">Mo18W</a><a href="/data_center/stock/MS71">MS71</a><a href="/data_center/stock/NC350">NC350</a><a href="/data_center/stock/NC358">NC358</a><a href="/data_center/stock/Oh43">Oh43</a><a href="/data_center/stock/Oh7B">Oh7B</a><a href="/data_center/stock/P39">P39</a><a href="/data_center/stock/Tx303">Tx303</a><a href="/data_center/stock/Tzi8">Tzi8</a>
+    </div>
+  </section>
+)

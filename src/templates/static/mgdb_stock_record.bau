@@ -1,0 +1,104 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-stock-record
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:title" content="$(stock_name) &mdash; MaizeGDB stock record">
+<meta property="og:description" content="$(stock_summary)">
+
+<main class="mgdb-page mgdb-stock-record-page" id="stock-record-top" data-stock-id="$(stock_id)">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data centers</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/stock">Stock Center</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(stock_name)</span>
+  </nav>
+
+  <header class="mgdb-hero-record">
+    <div>
+      <span class="mgdb-eyebrow">Genetic stock &middot; $(stock_type)</span>
+      <h1>$(stock_name) $(status_badge)</h1>
+      <p class="stock-record-synonyms" id="stock-record-synonyms" hidden></p>
+      <dl class="mgdb-record-facts" id="stock-record-facts"></dl>
+    </div>
+    <div class="mgdb-hero-record-actions" id="stock-record-actions"></div>
+  </header>
+
+  <nav class="mgdb-section-tabs" id="stock-record-tabs" aria-label="Sections on this record" hidden></nav>
+
+  <div class="mgdb-loading" id="stock-record-loading"><span class="mgdb-spinner" aria-hidden="true"></span><span>Loading the full record&hellip;</span></div>
+
+  <div class="mgdb-message mgdb-message-error" id="stock-record-error" role="alert" hidden>
+    <div>
+      <strong>The rest of this record could not be loaded.</strong>
+      <span>The identity above is correct. Reload to try again, or report it if it keeps happening.</span>
+      <button class="mgdb-button mgdb-button-secondary" id="stock-record-retry" type="button">Retry</button>
+    </div>
+  </div>
+
+  <div class="mgdb-message mgdb-message-info" id="stock-record-notice" role="status" hidden></div>
+
+  <section id="stock-record-overview" aria-labelledby="stock-record-overview-title" hidden>
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Record</span><h2 id="stock-record-overview-title">Overview</h2></div>
+    </div>
+    <div id="stock-record-overview-body"></div>
+  </section>
+
+  <section id="stock-record-pedigree" aria-labelledby="stock-record-pedigree-title" hidden>
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Ancestry</span><h2 id="stock-record-pedigree-title">Pedigree</h2></div>
+      <p>Coefficient of parentage is shown where it has been calculated.</p>
+    </div>
+    <div id="stock-record-pedigree-body"></div>
+  </section>
+
+  <section id="stock-record-related" aria-labelledby="stock-record-related-title" hidden>
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Curated associations</span><h2 id="stock-record-related-title">Related records</h2></div>
+      <p>What this stock carries, what it shows, and the collections it belongs to.</p>
+    </div>
+    <div id="stock-record-related-body"></div>
+  </section>
+
+  <section id="stock-record-references" aria-labelledby="stock-record-references-title" hidden>
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Literature</span><h2 id="stock-record-references-title">References</h2></div>
+      <p>Papers curated against this record, newest first.</p>
+    </div>
+    <div id="stock-record-references-body"></div>
+  </section>
+
+  <section id="stock-record-offsite" aria-labelledby="stock-record-offsite-title" hidden>
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Elsewhere</span><h2 id="stock-record-offsite-title">Offsite resources</h2></div>
+      <p>This stock&rsquo;s accessions in other databases.</p>
+    </div>
+    <div id="stock-record-offsite-body"></div>
+  </section>
+
+  <section id="stock-record-grin" aria-labelledby="stock-record-grin-title" hidden>
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">USDA germplasm</span><h2 id="stock-record-grin-title">GRIN</h2></div>
+      <p>Read live from the USDA Germplasm Resources Information Network.</p>
+    </div>
+    <div id="stock-record-grin-body"></div>
+  </section>
+
+  <section class="mgdb-resource-panel" aria-labelledby="stock-record-next-title">
+    <div>
+      <span class="mgdb-eyebrow">Keep going</span>
+      <h2 id="stock-record-next-title">From this stock</h2>
+      <p>The searches and tools that take a single record further.</p>
+    </div>
+    <div class="mgdb-resource-list">
+      <a href="/data_center/stock"><strong>Search stocks</strong><span>Find related germplasm by type, provider, parentage, or variation.</span></a>
+      <a href="https\://maizecoopsc.org/"><strong>Stock Center</strong><span>Availability and ordering for the stocks it distributes.</span></a>
+      <a href="/data_center/phenotype"><strong>Phenotype records</strong><span>The traits curated against maize stocks.</span></a>
+      <a href="https\://wgs.maizegdb.org/"><strong>SNPversity 2.0</strong><span>Genotype data across the diversity panels.</span></a>
+    </div>
+  </section>
+
+  <p class="stock-record-provenance">
+    This page is assembled from one call to the MaizeGDB API.
+    <a id="stock-record-api-link" href="/api/v1/records/stock/$(stock_id)">View this record as JSON</a>
+    &middot; <a href="/api/v1/openapi">API documentation</a>
+  </p>
+</main>
+)

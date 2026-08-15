@@ -1,0 +1,183 @@
+$$SYNTAX-LEVEL 2
+*(stock-results
+  @(no-term {display: off}
+    <br><b>You did not provide any search criteria.</b><br>
+  )
+  @(no-results_adv {display: off}
+    <br>
+    <table cellpadding=8 cellspacing=3 width="100%" 
+           summary="A table containing the main page content.">
+      <tr>
+        <td width="100%">
+          <p><b>Stock Advanced Search Results - None</b></p>
+          <p>There are no records matching your search criteria.
+          Please check your search and try again. <br>
+          <span style="font-family: Verdana, Arial, sans-serif; font-size: 100%; font-weight: bold; margin-bottom: 6px;">
+              Search Criteria:
+          </span>
+          <br>
+          $(criteria)
+          </p>
+        </td>
+      </tr>
+    </table>
+  )
+  @(adv_results {display: off}
+    <table cellpadding=8 cellspacing=3 width="100%" summary="A table containing the main page content.">
+      <tr>
+        <td width="100%">
+          <p style="margin-bottom: 8px;">
+            <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+              Stock Advanced Search Results - Complete List
+            </span><br><br>
+            There are <b>$(count)</b> stocks matching your search criteria, which is summarized below.<br>
+          </p>
+          <span style="font-family: Verdana, Arial, sans-serif; font-size: 100%; font-weight: bold; margin-bottom: 6px;">
+              Search Criteria:
+          </span>
+          <br>
+          $(criteria)
+          <br>
+          <div class="stock-table-scroll" role="region" aria-label="Advanced stock search results" tabindex="0"><table width="100%" cellpadding=0 cellspacing=0>
+            <caption class="stock-visually-hidden">Stocks matching the selected advanced search criteria</caption>
+            <tr>
+              <th scope="col" align="left" width="20%">Name</th>
+              <th scope="col" align="left" width="20%">Descriptive Name</th>
+              <th scope="col" align="left" width="20%">Type</th>
+              <th scope="col" align="left" width="20%">Focus Linkage <br> Group</th>
+              <th scope="col" align="left" width="20%">Source</th>
+            </tr>
+            @(adv_stock-row
+            <tr style="background-color: $(bgcolor)">
+              <td>
+                <a href="/data_center/stock?id=$(id)">
+                 $(name) 
+                </a>
+              </td>
+              <td> $(syn) </td>
+              <td> $(type) </td>
+              <td> <a href="/data_center/lg?id=$(lg_id)">$(lg_name)</a> </td>
+              <td> <a href="/person?id=$(avail_id)">$(avail)</a> $(status) </td>
+            </tr>
+            )
+          </table></div>
+        </td>
+      <tr>
+    </table>
+  )
+  @(adv_results-paged {display: off}
+    <table cellpadding=8 cellspacing=3 width="100%" summary="A table containing the main page content.">
+      <tr>
+        <td width="100%">
+          
+          @(results
+            <p style="margin-bottom: 8px;">
+            <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+              Stock Advanced Search Results - Complete List
+            </span>
+          </p>
+            There are <b>$(count)</b> stocks matching your search criteria, which is summarized below.
+          )
+          @(results_limited {bind: results | display: off}
+           <p style="margin-bottom: 8px;">
+            <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+              Stock Advanced Search Results - Limited List
+            </span>
+          </p>
+           There were <b>$(countAll)</b> stocks matching your search criteria. The first
+           <b>$(limit)</b> are shown. Please refine your search to narrow down your results.
+            @(max_limit {display: off}
+             *(max_limit_exceeded {load: ../../templates/data_center/max_limit_exceeded.bau})
+            )           
+           )         
+           <br><br>
+          <span style="font-family: Verdana, Arial, sans-serif; font-size: 100%; font-weight: bold; margin-bottom: 6px;">
+              Search Criteria: 
+          </span>
+          <br>
+          $(criteria)
+          <input type="hidden" name="$(div)_rows_adv" id="$(div)_rows_adv" value="$(rows)">
+          <br>
+          @(pages
+            <div name="stock_adv_results_page$(type123)_$(pagenum)" id="stock_adv_results_page$(type123)_$(pagenum)" 
+                 style="display:$(displayval)">
+              <table width="100%" cellpadding="4" cellspacing="4">
+                <tr>
+                  <td>
+                   <b> Results $(startnum) - $(endnum)</b> out of <b>$(total)</b>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                     <table>
+                     <tr>
+                      <td style="vertical-align:bottom; width:32px; height: 36.4px;">
+                       $(prev-page) 
+                      </td>
+                      <td> $(page-list) </td>
+                      <td style="vertical-align:top;">
+                       $(next-page)
+                      </td> 
+                     </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div name="stock_adv_results_list$(type123)_$(pagenum)" 
+                         id="stock_adv_results_list$(type123)_$(pagenum)">
+                      <div class="stock-table-scroll" role="region" aria-label="Advanced stock search results page" tabindex="0"><table width="100%" cellpadding=0 cellspacing=0>
+                       <caption class="stock-visually-hidden">Stocks on this advanced-search results page</caption>
+                       <tr>
+                        <th scope="col" align="left" width="20%">Name</th>
+                        <th scope="col" align="left" width="20%">Descriptive Name</th>
+                        <th scope="col" align="left" width="20%">Type</th>
+                        <th scope="col" align="left" width="20%">Focus Linkage <br> Group</th>
+                        <th scope="col" align="left" width="20%">Source</th>
+                       </tr>
+                       @(adv_stock-page-row
+                       <tr style="background-color: $(bgcolor)">
+                        <td>
+                         <a href="/data_center/stock?id=$(id)">
+                          $(name) 
+                         </a>
+                        </td>
+                        <td> $(syn) </td>
+                        <td> $(type) </td>
+                        <td> <a href="/data_center/lg?id=$(lg_id)">$(lg_name)</a> </td>
+                        <td> <a href="/person?id=$(avail_id)">$(avail)</a> $(status) </td>
+                       </tr>
+                     )
+                    </table></div>
+                   </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                     <table>
+                     <tr>
+                      <td style="vertical-align:bottom; width:32px; height: 36.4px;">
+                       $(prev-page) 
+                      </td>
+                      <td> $(page-list) </td>
+                      <td style="vertical-align:top;">
+                       $(next-page)
+                      </td> 
+                     </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          )
+          <script language="javascript">
+            if ($(cytogenetics)\)
+              getAdvSearch("stock", 'stock_adv_results_list$(type123)_2', arrSearchOpt, 2\);
+            else
+              stock_adv_search('stock_adv_results_list$(type123)_2', 2\);
+          </script>
+        </td>
+      <tr>
+    </table>
+  )
+)

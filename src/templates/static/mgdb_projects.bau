@@ -1,0 +1,93 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-projects
+<a class="mgdb-skip-link" href="#mgdb-projects-main">Skip to main content</a>
+<main class="mgdb-page mgdb-projects-page" id="mgdb-projects-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Analysis projects</span>
+  </nav>
+
+  <section class="mgdb-hero-basic" aria-labelledby="projects-title">
+    <span class="mgdb-hero-basic-icon" aria-hidden="true">
+      <svg viewBox="0 0 84 84" role="presentation" focusable="false">
+        <rect x="12" y="44" width="12" height="26" rx="3" fill="currentColor" />
+        <rect x="30" y="26" width="12" height="44" rx="3" fill="currentColor" />
+        <rect x="48" y="36" width="12" height="34" rx="3" fill="currentColor" />
+        <rect x="66" y="16" width="6" height="54" rx="3" fill="currentColor" />
+        <rect x="8" y="72" width="66" height="5" rx="2.5" fill="#2f5e2a" />
+      </svg>
+    </span>
+    <div>
+      <span class="mgdb-eyebrow">MaizeGDB analyses</span>
+      <h1 id="projects-title">Analysis projects</h1>
+      <p>Small and medium analyses run at MaizeGDB, each published as one self-contained page: the figures, the tables, the methods that produced them, and the underlying data to download.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="projects-about-title">
+    <div class="mgdb-prose-layout">
+      <div class="mgdb-prose">
+        <h2 id="projects-about-title" class="mgdb-leaf-heading">What belongs here</h2>
+        <p>A project is a finished analysis rather than a search interface. It answers a specific question over a fixed set of inputs, and its results do not change until the analysis is re-run.</p>
+        <p>That makes it a different kind of page from the rest of the site. A <a href="/data_center/">data center</a> searches the production database and returns whatever is in it today. A <a href="/sitemap">tool</a> takes your input and computes an answer. A project is neither: it is a result, stated once, with everything needed to check it or reuse it.</p>
+        <p>Every project page carries the same four things &mdash; what was measured, what the numbers mean, how they were produced, and the files behind them &mdash; so a figure on one of these pages can always be traced back to a downloadable table.</p>
+      </div>
+      <aside class="mgdb-aside-card">
+        <h3>Proposing a project</h3>
+        <p>Analyses that would be useful to the maize community are welcome here. Get in touch through the <a href="/contact">contact page</a> with what you have and what it answers.</p>
+      </aside>
+    </div>
+  </section>
+
+  <section aria-labelledby="projects-browse-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Browse</span>
+        <h2 id="projects-browse-title">Published projects</h2>
+      </div>
+      <p>Search by title or topic. Filtering happens as you type and the filtered view can be shared from the address bar.</p>
+    </div>
+
+    <div class="mgdb-search">
+      <div class="mgdb-search-row">
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="projects-query">Search projects</label>
+          <p class="mgdb-hint" id="projects-query-hint">Enter a topic, a species, or a method. Example: <code>domain</code> or <code>immunity</code></p>
+          <input class="mgdb-input" id="projects-query" name="q" type="search" aria-describedby="projects-query-hint" autocomplete="off" placeholder="protein domain" />
+        </div>
+        <button class="mgdb-button mgdb-button-quiet" id="projects-reset" type="button" hidden>Reset</button>
+      </div>
+      <div class="mgdb-filters">
+        <span aria-hidden="true" class="mgdb-small mgdb-muted">Topic:</span>
+        $(topic-chips)
+        <span class="mgdb-result-count" id="projects-count" aria-live="polite"></span>
+      </div>
+    </div>
+
+    <div class="mgdb-card-grid projects-grid" id="projects-results">
+      $(project-cards)
+    </div>
+
+    <div class="mgdb-empty" id="projects-empty" hidden>
+      <h3>No projects match that search</h3>
+      <p>There are $(project-count) published projects. Clear the search and filters to see all of them.</p>
+      <button class="mgdb-button mgdb-button-secondary" id="projects-empty-reset" type="button">Clear search and filters</button>
+    </div>
+  </section>
+
+  <section class="mgdb-resource-panel" aria-labelledby="projects-resources-title">
+    <div>
+      <span class="mgdb-eyebrow">Related</span>
+      <h2 id="projects-resources-title">Where else to look</h2>
+      <p>Projects sit alongside the searchable data centers and the analysis tools rather than replacing either of them.</p>
+    </div>
+    <div class="mgdb-resource-list">
+      <a href="/data_center/"><strong>Data Centers</strong><span>Search the production database by record type</span></a>
+      <a href="/genome"><strong>Genome Center</strong><span>The assemblies these analyses are built on</span></a>
+      <a href="/ai"><strong>AI and machine learning</strong><span>Model-ready datasets and predictions</span></a>
+      <a href="/contact"><strong>Contact MaizeGDB</strong><span>Propose an analysis or ask about one</span></a>
+    </div>
+  </section>
+
+</main>
+)

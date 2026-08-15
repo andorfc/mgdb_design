@@ -1,0 +1,608 @@
+$$SYNTAX-LEVEL 2
+*(pan_gene_model-left 
+  <div id='centercolumn_record'>
+    &nbsp;&nbsp;<a href='#simple' id='link_blue'><img src='../../images/bulletpoint.png' border=0>
+      Simple pan-gene search
+    </a>    
+    &nbsp;&nbsp;<a href='#advanced' id='link_blue'><img src='../../images/bulletpoint.png' border=0>
+      Advanced pan-gene search
+    </a>
+    &nbsp;&nbsp;<a href='#gm_downloads' id='link_blue'><img src='../../images/bulletpoint.png' border=0>
+      Downloads
+    </a>
+    &nbsp;&nbsp;<a href='#phylotrees' id='link_blue'><img src='../../images/bulletpoint.png' border=0>
+      Phylogenetic tree
+    </a>
+    &nbsp;&nbsp;<a href='#explore' id='link_blue'><img src='../../images/bulletpoint.png' border=0>
+      Explore
+    </a>
+    &nbsp;&nbsp;<a href='#information' id='link_blue'><img src='../../images/bulletpoint.png' border=0>
+      Information
+    </a>
+    &nbsp;&nbsp;<a href='#definitions' id='link_blue'><img src='../../images/bulletpoint.png' border=0>
+      Definitions
+    </a>
+    <br>
+
+
+<!-- INTRO TO PAN-GENE -->
+    <div id="pan_gene_info_background" name="pan_gene_info">
+      <span class="section_title">Introduction</span><br> 
+      <p>
+        The pan-gene and gene family datasets presented in this data center were 
+        calculated by MaizeGDB staff. Details about the analyses are in the information 
+        section below and in each pan-gene record page.
+        <br><br>
+        Note that different pan-gene and gene family analyses will produce difference 
+        results, and that the accuracy of the results are impacted by assembly and
+        annotation quality.
+        <br><br>
+        <b>We welcome comments, error reports, and suggestions. Please use the 
+        <a class="feedback-form" href="#!">feedback form</a>.</b>
+        <br><br>
+      </p>
+    </div>
+    
+<!-- SIMPLE SEARCH -->
+    <a name='simple'></a>
+    <div id="pan_gene_light_green_background" name="simple_pan_gene_search">
+      <p>
+        <span class="section_title">Simple Search</span><br> 
+        This search form allows you to find pan-genes by locus symbol, gene model ID,
+        transcript ID, or protein ID.
+      </p>
+      <br>
+      <form name='n1' method="get" action="/pan_gene_center/pan_gene" class="tiny">
+        <input type="hidden" name="dataname" id="dataname" value="gene">
+        <input type="text" name="term" id="term" size="20" class="quick_search"
+               value=$(pan_gene_term)>
+        <span name="button" value="" class="button" 
+              onClick="getSearchData('pan_gene', 'simple_results', document.getElementById\('term'\).value\);">Submit</span>
+        (see example <a href="#" 
+           onClick="document.getElementById('term'\).value='Zm00001eb067740'">gene model query</a>
+        or <a href="#" 
+           onClick="document.getElementById('term'\).value='lg1'">locus query</a>\)
+<!-- something is requiring this ... what?
+        @(limits
+          <br>
+          *(adjust_limits {load: templates/data_center/set_search_limit.bau})
+        )
+-->
+      </form>
+      <br>
+      
+      <div id='simple_results'></div>
+      
+    </div>
+    <br>
+    
+<!-- ADVANCED SEARCH -->
+    <a name='advanced'></a>
+    <div id="pan_gene_gray_background" name="adv_pan_gene_search">
+      <form id="pan_gene-adv_search_form">
+        <table summary="A table within which you can set up your search criteria." 
+               border="0" cellpadding="6" cellspacing="4" width="100%">
+          <tr>
+            <td class="small" valign="TOP" width="100%" colspan=2>
+              <p style="margin-bottom: 8px;">
+                <span class="section_title">Advanced Search</span>
+                <br>
+                Check the boxes next to the fields you want to search; if you 
+                just want to find records that have <i>any</i> value for that 
+                attribute, check the box and leave the criteria alone.
+              </p>
+              <br>
+              Search for pan-genes:<br>
+            </td>
+          </tr>
+          <tr>
+            <td><input id="box_analysis" type="checkbox"></td>
+            <td>
+              in the pan-gene analysis 
+              <select id="analysis">
+                <option value="">Any</option>
+                $(analysis_ops)
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td><input id="box_gene_models" type="checkbox"></td> 
+            <td>
+              that contain the gene model(s\) 
+              <input id="gene_models" type="text" size=60 onchange="\$('#box_gene_models'\).prop('checked', true\)">
+            </td>
+          </tr>
+          <tr>
+            <td><input id="box_locus" type="checkbox"></td>
+            <td>that are associated with a gene locus</td>
+          </tr>
+          <tr>
+            <td><input id="box_protein" type="checkbox"></td>
+            <td>
+              that are associated with protein(s\)
+              <input id="proteins" type="text" size=60 onchange="\$('#box_protein'\).prop('checked', true\)">
+            </td>
+          </tr>
+          <tr>
+            <td><input id="box_trait" type="checkbox"></td>
+            <td>that are associated with a trait</td>
+          </tr>
+          <tr>
+            <td><input id="box_min" type="checkbox"></td> 
+            <td>
+              that have at least 
+              <input id="min" type="text" size=4 onchange="\$('#box_min'\).prop('checked', true\)"> 
+              members
+            </td>
+          </tr>
+          <tr>
+            <td><input id="box_max" type="checkbox"></td>
+            <td>
+              that have fewer than 
+              <input id="max" type="text" size=4 onchange="\$('#box_max'\).prop('checked', true\)"> 
+              members
+            </td>
+          </tr>
+          <tr>
+            <td><input id="box_min_annots" type="checkbox"></td>
+            <td>
+              that have members in at least 
+              <input id="min_annots" type="text" size=4 maxlength=3 
+                     onchange="\$('#box_min_annots'\).prop('checked', true\);verifyPercent(this\)"> 
+              % of annotations
+            </td>
+          </tr>
+          <tr>
+            <td><input id="box_max_annots" type="checkbox"></td>
+            <td>
+              that have members in no more than 
+              <input id="max_annots" type="text" size=4 maxlength=3
+                     onchange="\$('#box_max_annots'\).prop('checked', true\);verifyPercent(this\)""> 
+              % of annotations
+            </td>
+          </tr>
+<!-- no data to support these
+          <tr>
+            <td valign="top"><input id="box_classes" type="checkbox"></td>
+            <td>
+              <span style="vertical-align:top">that only appear in the class(s\)</span>
+              <select id="classes" multiple onchange="\$('#box_classes'\).prop('checked', true\)">
+                <option value="tropical">tropical</option>
+                <option value="temporate">temporate</option>
+                <option value="stiff-stock">stiff-stock</option>
+                <option value="non stiff-stock">non stiff-stock</option>
+                <option value="sweet corn">sweet corn</option>
+                <option value="popcorn">popcorn</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top"><input id="box_not_classes" type="checkbox"></td>
+            <td valign="top">
+              <span style="vertical-align:top">that do not appear in class(s\)</span>
+              <select id="not_classes" multiple onchange="\$('#box_not_classes'\).prop('checked', true\)">
+                <option value="tropical">tropical</option>
+                <option value="temporate">temporate</option>
+                <option value="stiff-stock">stiff-stock</option>
+                <option value="non stiff-stock">non stiff-stock</option>
+                <option value="sweet corn">sweet corn</option>
+                <option value="popcorn">popcorn</option>
+              </select>
+            </td>
+          </tr>
+-->
+          <tr>
+            <td valign="top"><input id="box_appear" type="checkbox"></td>
+            <td valign="top">
+              <span style="vertical-align:top">that contain members from annotations for ALL of these assemblies</span><br>
+              <select id="appear" multiple size=8 onchange="\$('#box_appear'\).prop('checked', true\)">
+                $(assembly_ops)
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top"><input id="box_not_appear" type="checkbox"></td>
+            <td valign="top">
+              <span style="vertical-align:top">that do not contain members from annotations for any of these assemblies</span><br>
+              <select id="not_appear" multiple size=8 onchange="\$('#box_not_appear'\).prop('checked', true\)">
+                $(assembly_ops)
+              </select>
+            </td>
+          </tr>
+          <tr><td style="margin-top:5x"></td></tr>
+          <tr>
+            <td colspan=2>
+              <span name="button" class="button" 
+                    onclick="panGeneAdvSearch('adv_results'\)">Submit</span>
+              <span name="button" class="button" 
+                    onclick="clearAdvSearchForm(\)">Clear</span>
+            </td>
+          </tr>
+        </table>
+        @(adv_limits
+          *(adv_adjust_limits {load: templates/data_center/set_adv_search_limit.bau})
+        )
+      </form>
+      <br>
+      
+      <div id="adv_results"></div>
+
+    </div> <!-- advanced search -->
+    <br>
+
+<!-- DOWNLOADS -->
+    <a name='gm_downloads'></a>
+    <div id="pan_gene_light_green_background" name="pan_gene_downloads">
+      <span class="section_title">Downloads</span>
+      <br>
+      <a href="https://download.maizegdb.org/Pan-genes/Pan-Zea/">All bulk pan-zea downloads</a><br>
+<!--     
+      <a href="">All pan-B73 downloads</a><br>
+      <a href="">All grass gene family downloads</a><br>
+      See the README in each directory for file descriptions
+-->
+      <br><br>
+      <b>Download pan-gene exemplar sequence</b> 
+      <form id="pan_gene-download_exemplar_sequence" method="POST" target="_blank"
+            action="/search/pan_gene/pan_gene_exemplar_seq.php">
+        <table>
+          <tr>
+            <td colspan=3>
+              Enter up to <b>$(pan_gene-download_exemplar_limit)</b>
+              gene models. Sequence for the exemplar gene models for
+              the pan-genes these belong to will be downloaded.
+              <br>
+              <a href="#!" onclick="setDownloadExample('pan_gene-download_list'\)">Example dataset</a>
+            </td>
+          </tr>
+          <tr>
+            <td width="120px">
+              <textarea id="pan_gene-download_list" name="pan_gene-download_list"
+                        cols=40 rows=6></textarea>
+              Sequence type: 
+              <input type="radio" id="exmplar_download_seq" name="exmplar_download_seq"
+                     value="CDS" checked=true> CDS
+              <input type="radio" id="exmplar_download_seq" name="exmplar_download_seq"
+                     value="protein"> protein
+            </td>
+            <td width=5px></td>
+            <td valign="center" width="100%">
+              in the pan-gene analysis 
+              <select id="exmplar_download_analysis" name="exmplar_download_analysis">
+                <option>Pan-Zea</option>
+<!--                <option>Pan-B73</option>
+                <option>Pan-Grass</option> -->
+              </select>
+            </td>
+          </tr>
+          <tr height="2px"></tr>
+          <tr>
+            <td>
+              Note that one gene model from each pan-gene is selected as the exemplar
+              for that pan-gene, rather than calculating a consensus gene model.
+            </td>
+            <td></td>
+            <td></td>
+          </tr>
+        </table>
+        <br>
+        <span name="button" class="button" 
+              onclick="document.getElementById('pan_gene-download_exemplar_sequence'\).submit(\)">Submit</span>
+        <br><br>
+      </form>
+<!-- -->
+    </div> <!-- downloads -->
+    <br>
+
+<!-- PHLYO TREES -->
+    <a name='phylotrees'></a>
+    <div id="pan_gene_light_blue_background">
+      <b>Zea phylogenetic tree</b><br>
+      Calculated with Orthofinder.
+      <img src="/images/Zea_phylo_tree.png" style="width:850">
+    </div>
+
+<!-- EXPLORE -->
+    <a name='explore'></a>
+    <div id="pan_gene_light_green_background">
+      <span class="section_title">Third party tools for further exploration</span>
+      <br><br>
+      <p>
+        Pair-wise comparison of two genomes:
+        <a href="https://www.ncbi.nlm.nih.gov/genome/cgv"
+           target="_blank">Comparative Genome Viewer 
+        (CGV\) at NCBI</a>
+        <br>
+        Explore structural variation among the NAM founders and the latest assembly
+        of B73. 
+      </p>
+      <br>
+      <p>
+        Explore NCBI B73 gene model annotation 
+        <a href="https://www.ncbi.nlm.nih.gov/genome/gdv/browser/genome/?id=GCF_902167145.1&chr=NC_050097.1&from=4493424&to=4497434"
+           target="_blank">Genome 
+        Data Viewer (GDV\) at NCBI</a>
+        Explore structural variation at the gene model level among the NAM founders
+        and the latest assembly of B73.
+      </p>
+    </div> <!-- explore -->
+    <br>    
+  
+<!-- INFORMATION -->
+    <a name='information'></a>
+    <div id="pan_gene_gray_background">
+      <span class="section_title">About pan-gene data at MaizeGDB</span>
+      <br>
+<!--
+      The results of two pan-gene analyses and two gene family analyses are presented 
+      at MaizeGDB: pan-Zea mays, pan-B73, Zea gene families, and grass gene families. 
+      All four were generated using the "pan" and "fam" pipelines from 
+-->
+      The Zea mays pan-gene analysis was generated by MaizeGDB staff, using the 
+      <a href="https://github.com/legumeinfo/pandagma">Pandagma</a> pipeline.
+       Details of each analysis are presented on separate tabs on the pan-gene record pages.
+      <br><br>
+<!--
+      Note that pan-gene and gene family analyses carried out by different software
+      are likely to produce different results.
+-->
+      Note that pan-gene analyses generated out by different software is
+      likely to produce different results.
+      <br><br>
+      
+      <script src="/js/lib/plotly/plotly-2.25.2.min.js" charset="utf-8"></script>
+      <div id="pan_zea_dist" class="wrap-collabsible">
+        <input id="pan-zea-distribution_checkbox" class="inner_toggle_checkbox" type="checkbox"
+               onclick="simpleToggle('pan-zea-distribution_div'\)">
+        <label for="pan-zea-distribution_checkbox" class="simple_inner_lbl-toggle">Pan-gene 
+        distribution for the Pan-Zea mays analysis</label>
+        
+        <div id="pan-zea-distribution_div" class="collapsible-content">
+          Number of annotations represented in analysis: $(annot-count).
+          Table is cut off at pan genes of size $(cutoff).
+          <br><br>
+          <div id="pan-gene_dist" style="width:900px;height:350px;"></div>
+          <script language="javascript">
+            let points = [
+              @(pan-zea-distribution-histo
+                [$(pan_gene_size),$(member_count)],
+              )
+            ];
+            data = [
+              {
+                x: points.map(x => x[0]\),
+                y: points.map(y => y[1]\),
+                type: 'bar'
+              }
+            ];
+            let layout = {
+              margin: {l:50, r:0, t:0, b:50},
+              showaxeslabels: true,
+              xaxis: {
+                title: {text: "Size"},
+                margin: {l:0, r:0, t:0, b:0},
+                dtick: 10,
+              }, 
+              yaxis: {
+                title: {text: "pan-gene count"}
+              },
+            };
+
+            let config = {
+              displayModeBar: false,
+              //frameMargins: 0,
+              //margin: {l:0, r:0, t:0, b:0},
+            }
+            Plotly.newPlot('pan-gene_dist', data, layout, config\);
+          </script>
+        </div>
+      </div> <!-- pan-zea mays-distribution -->
+      <br>
+      <div id="pan_zea_annotations" class="wrap-collabsible">
+        <input id="pan-zea-annotations_checkbox" class="inner_toggle_checkbox" type="checkbox"
+               onclick="simpleToggle('pan-zea-annotations_div'\)">
+        <label for="pan-zea-annotations_checkbox" class="simple_inner_lbl-toggle">Annotations
+        included in the Pan-Zea analysis</label>
+        
+        <div id="pan-zea-annotations_div" class="collapsible-content">
+          Number of annotations: $(annot-count)<br>
+          <table>
+            <tr>
+              <th align="left">Assembly</th>
+              <th align="left">Annotation</th>
+              <td></td>
+              <th align="left">Gene model count&nbsp;</th>
+              <td></td>
+              <th align="left">Min length&nbsp;</th>
+              <td></td>
+              <th align="left">Max length&nbsp;</th>
+              <td></td>
+              <th align="left">Ave length&nbsp;</th>
+              <td></td>
+              <th align="left">% placed in pan-genes</th>
+            </tr>
+            @(annotation-rows
+              <!-- $(analysis) -->
+              <tr class="$(color_class)">
+                <td align="left"><a href="/genome/assembly/$(assembly)">$(assembly)</a></td>
+                <td align="left">&nbsp;$(annotation)</td>
+                <td></td>
+                <td align="center">$(gene_model_count)</td>
+                <td></td>
+                <td align="center">$(min_gene_model_length)</td>
+                <td></td>
+                <td align="center">$(max_gene_model_length)</td>
+                <td></td>
+                <td align="center">$(ave_gene_model_length)</td>
+                <td></td>
+                <td align="center">$(perc_gene_models_placed)</td>
+              </tr>
+            )
+          </table>
+        </div>
+      </div><!-- analysis members -->
+
+      <br><br>
+      
+<!--      
+      <div id="pan_b73_dist" class="wrap-collabsible">
+        <input id="pan-b73-distribution_checkbox" class="inner_toggle_checkbox" type="checkbox"
+               onclick="simpleToggle('pan-b73-distribution_div'\)">
+        <label for="pan-b73-distribution_checkbox" class="simple_inner_lbl-toggle">Pan-gene 
+        distribution for the Pan-B73 analysis across versions v3, v4, and v5</label>
+        <div id="pan-b73-distribution_div" class="collapsible-content">
+          <table>
+            <tr>
+              <th>pan-gene size</th>
+              <td width="10px"></td>
+              <th>member count</th>
+            </tr>
+          @(b73-pan-grass-distribution
+            <tr><td>$(b73-pan_gene_size)</td>
+            <td></td>
+            <td>$(b73-member_count)</td></tr>
+          )
+          </table>
+        </div>
+      </div> <!-- pan-b73-distribution --
+      <br><br>
+
+      <div id="zea_fam_dist" class="wrap-collabsible">
+        <input id="zea_fam-distribution_checkbox" class="inner_toggle_checkbox" type="checkbox"
+               onclick="simpleToggle('zea_fam-distribution_div'\)">
+        <label for="zea_fam-distribution_checkbox" class="simple_inner_lbl-toggle">Pan-gene 
+        distribution for the Zea gene family analysis</label>
+        <div id="zea_fam-distribution_div" class="collapsible-content">
+          <table>
+            <tr>
+              <th>family size</th>
+              <td width="10px"></td>
+              <th>member count</th>
+            </tr>
+          @(zea_fam-distribution
+            <tr><td>$(zea_fam_size)</td>
+            <td></td>
+            <td>$(zea_fam-member_count)</td></tr>
+          )
+          </table>
+        </div>
+      </div> <!-- zea_fam-distribution --
+      <br><br>
+      
+      <div id="grass_fam_dist" class="wrap-collabsible">
+        <input id="grass_fam-distribution_checkbox" class="inner_toggle_checkbox" type="checkbox"
+               onclick="simpleToggle('grass_fam-distribution_div'\)">
+        <label for="grass_fam-distribution_checkbox" class="simple_inner_lbl-toggle">Gene
+        family distribution for the grass gene family analysis</label>
+        <div id="grass_fam-distribution_div" class="collapsible-content">
+          <table>
+            <tr>
+              <th>family size</th>
+              <td width="10px"></td>
+              <th>member count</th>
+            </tr>
+          @(grass_fam-distribution
+            <tr><td>$(grass_fam_size)</td>
+            <td></td>
+            <td>$(grass_fam-member_count)</td></tr>
+          )
+          </table>
+        </div>
+      </div> <!-- grass_fam-distribution --
+-->
+    </div> <!-- information -->
+    <br>    
+  
+<!-- TERMS -->
+    <a name='definitions'></a>
+    <div id="pan_gene_light_green_background" name="gene_terms">
+      <span class="section_title">Definitions</span>
+      <br>
+      <dl>
+        <dt class="pan_gene_definition">exemplar</dt>
+        <dd class="pan_gene_definition">
+          The gene model selected as being the standard for a pan-gene. This approach for
+          producing sequence representative of the pan-gene is often more accurate than 
+          creating a consensus sequence. As the methods for pan-gene analysis are 
+          undergoing rapid change, pan-genes are rarely stable across multiple analyses. 
+          Therefore, the exemplars are used to identify pan-genes rather than assigning 
+          pan-gene identifiers.
+        </dd>
+        <dt class="pan_gene_definition">gene family</dt>
+        <dd class="pan_gene_definition">
+          A gene family differs from a pan-gene in that a pan-gene analysis typically
+          operates within a species, or a clade with chromosome-to-chromosome 
+          correspondence, and makes use of synteny comparisons when assigning members
+          to a pan-gene. Gene families look farther back into evolution and rely more on
+          sequence similarity.
+        </dd>
+        <dt class="pan_gene_definition">gene locus</dt>
+        <dd class="pan_gene_definition">
+          It is difficult to precisely describe a "gene". Here, a gene locus is
+          interpreted to be a locus that has been associated with a phenotype or
+          function.
+        </dd>
+        <dt class="pan_gene_definition">pan-gene</dt>
+        <dd class="pan_gene_definition">
+          We define a pan-gene is the collection of all gene models that appear to be
+          the same thing, based on synteny and sequence similarity, along with any
+          gene loci that have been associated with one or more gene models in the pan-gene.
+        </dd>
+        <dt class="pan_gene_definition">pan-gene analysis</dt>
+        <dd class="pan_gene_definition">
+          A pan-gene analysis looks at genome and annotation sequence, gene model
+          coordinates, and synteny to calculate likely sets of gene models from multiple
+          genomes that appear to be serving the same role.
+        </dd>
+        <dt class="pan_gene_definition">pan-genome</dt>
+        <dd class="pan_gene_definition">
+          There are multiple definitions of a pan-genome. We define a pan-genome to be 
+          all of the unique sequence across a set of genomes MaizeGDB does not, at this 
+          time, archive or provide this data, only the sequence data for each genome.
+        </dd>
+        <dt class="pan_gene_definition">pan-genome analysis</dt>
+        <dd class="pan_gene_definition">
+          A pan-genome analysis is any analysis that includes assembly, and often 
+          annotation information from multiple genomes to make inferences about what is
+          the same, similar, and different across all genomes included. 
+        </dd>
+      </dl>
+    </div>  <!-- terms -->
+
+  </div>
+  
+  <script language="javascript">
+    // jQuery code to trap and properly handle CRs in search simple search box.
+    \$(document\).on('keydown', 'input', function(e, ui\) \{
+      if (e.keyCode === 13\) \{
+        if (this.id == 'term'\) \{
+          getSearchData('pan_gene', 'simple_results', \$('#term'\).val(\)\);
+          e.preventDefault(\);  // stop default behavior
+        \}  
+      \}
+    \}\);
+/*
+    window.ATL_JQ_PAGE_PROPS = {
+  	  '883299e6': {  // feedback
+  	    "triggerFunction": function(showCollectorDialog\) {
+          //Requires that jQuery is available! 
+          jQuery("#feedback-link"\).click(function(e\) {
+			      e.preventDefault(\);
+			      showCollectorDialog(\);
+		      }\);
+	      },
+	      fieldValues: {
+	        recordWebInfo: '1', // field Name
+          recordWebInfoConsent: ['1'] // field Id
+	      }
+	    }
+	  };
+*/
+  </script>
+  
+  @(start-search {display:off}
+    <script language="javascript">
+      getSearchData('pan_gene', 'simple_results', '$(pan_gene_term)'\);
+    </script>
+  )
+)

@@ -1,0 +1,321 @@
+/* ==========================================================================
+   Stock record page — page-specific styles
+   --------------------------------------------------------------------------
+   Scoped under .mgdb-stock-record-page and composed from the tokens in
+   mgdb-modern.css. The record header itself is the shared .mgdb-hero-record
+   component; everything here is the body of the record.
+   ========================================================================== */
+
+.mgdb-stock-record-page .mgdb-hero-record h1 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+}
+
+.mgdb-stock-record-page .stock-record-synonyms {
+  max-width: var(--mgdb-measure);
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-stock-record-page .stock-record-synonyms em { font-style: italic; }
+
+/* Section tabs. Sticky so a long record keeps its section list reachable. */
+.mgdb-stock-record-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  padding: var(--mgdb-space-2) 0;
+  background: var(--mgdb-surface);
+}
+
+.mgdb-stock-record-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.mgdb-stock-record-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
+
+.mgdb-stock-record-page .mgdb-section-tabs a.is-current {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #fff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+/* A tab's count, so the reader knows what is behind it before going there. */
+.mgdb-stock-record-page .mgdb-section-tabs .stock-record-tab-count {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.mgdb-stock-record-page .mgdb-section-tabs a.is-current .stock-record-tab-count {
+  background: rgba(255, 255, 255, .22);
+  color: #fff;
+}
+
+.mgdb-stock-record-page > section { scroll-margin-top: 4.5rem; }
+
+/* --------------------------------------------------------------------------
+   Facts
+   -------------------------------------------------------------------------- */
+
+/* The overview is a set of labelled facts. A definition list keeps the pairing
+   programmatic, and the grid keeps a long value from stretching the column. */
+.mgdb-stock-record-page .stock-record-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin: 0;
+}
+
+.mgdb-stock-record-page .stock-record-grid > div {
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line-soft);
+  border-left: 3px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-stock-record-page .stock-record-grid dt {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+}
+
+.mgdb-stock-record-page .stock-record-grid dd {
+  margin: var(--mgdb-space-1) 0 0;
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+}
+
+.mgdb-stock-record-page .stock-record-grid dd small {
+  display: block;
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 400;
+  line-height: var(--mgdb-leading-snug);
+}
+
+/* --------------------------------------------------------------------------
+   Sub-blocks within a section
+   -------------------------------------------------------------------------- */
+
+.mgdb-stock-record-page .stock-record-block { margin-top: var(--mgdb-space-5); }
+.mgdb-stock-record-page .stock-record-block:first-child { margin-top: 0; }
+
+.mgdb-stock-record-page .stock-record-block > h3 {
+  margin-bottom: var(--mgdb-space-1);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+}
+
+.mgdb-stock-record-page .stock-record-block > p {
+  max-width: var(--mgdb-measure);
+  margin-bottom: var(--mgdb-space-3);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* A list of links to other records. Dense, because there can be hundreds. */
+.mgdb-stock-record-page .stock-record-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.mgdb-stock-record-page .stock-record-chips a {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  padding: var(--mgdb-space-1) var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-burgundy) !important;
+  font-size: var(--mgdb-text-sm);
+  text-decoration: none;
+}
+
+.mgdb-stock-record-page .stock-record-chips a:hover {
+  border-color: var(--mgdb-gold-dark);
+  background: var(--mgdb-gold-soft);
+  text-decoration: underline;
+}
+
+.mgdb-stock-record-page .stock-record-chips .stock-record-qualifier {
+  margin-left: var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+}
+
+/* Very long chip lists collapse. The first rows are visible without asking;
+   the rest are one activation away and still in the DOM for find-in-page. */
+.mgdb-stock-record-page .stock-record-more { margin-top: var(--mgdb-space-3); }
+
+.mgdb-stock-record-page .stock-record-more > summary {
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-stock-record-page .stock-record-more > summary:focus-visible {
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: 2px;
+}
+
+.mgdb-stock-record-page .stock-record-more[open] > summary { margin-bottom: var(--mgdb-space-3); }
+
+/* Prose blocks: descriptions and curator memos. */
+.mgdb-stock-record-page .stock-record-notes {
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-stock-record-page .stock-record-notes dt {
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.mgdb-stock-record-page .stock-record-notes dd {
+  max-width: var(--mgdb-measure);
+  margin: var(--mgdb-space-1) 0 var(--mgdb-space-3);
+  color: var(--mgdb-ink-soft);
+}
+
+.mgdb-stock-record-page .stock-record-notes dd:last-child { margin-bottom: 0; }
+
+/* --------------------------------------------------------------------------
+   References
+   -------------------------------------------------------------------------- */
+
+.mgdb-stock-record-page .stock-record-references {
+  display: grid;
+  gap: var(--mgdb-space-3);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.mgdb-stock-record-page .stock-record-references > li {
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-stock-record-page .stock-record-references h3 {
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+}
+
+.mgdb-stock-record-page .stock-record-references p {
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* --------------------------------------------------------------------------
+   Images
+   -------------------------------------------------------------------------- */
+
+.mgdb-stock-record-page .stock-record-images {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--mgdb-space-4);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.mgdb-stock-record-page .stock-record-images figure {
+  height: 100%;
+  padding: var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-stock-record-page .stock-record-images img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-sunken);
+}
+
+.mgdb-stock-record-page .stock-record-images figcaption {
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-stock-record-page .stock-record-images figcaption strong { display: block; color: var(--mgdb-ink); }
+
+/* --------------------------------------------------------------------------
+   Provenance footer
+   -------------------------------------------------------------------------- */
+
+.mgdb-stock-record-page .stock-record-provenance {
+  margin-top: var(--mgdb-space-6);
+  padding-top: var(--mgdb-space-4);
+  border-top: 1px solid var(--mgdb-line-soft);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-stock-record-page .stock-record-empty {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* --------------------------------------------------------------------------
+   Responsive
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 767px) {
+  .mgdb-stock-record-page .mgdb-section-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-inline: calc(-1 * var(--mgdb-space-4));
+    padding-inline: var(--mgdb-space-4);
+  }
+
+  .mgdb-stock-record-page .mgdb-section-tabs a { white-space: nowrap; }
+  .mgdb-stock-record-page .stock-record-images { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+}
+
+/* The shared message component lays its icon out against a single child; the
+   label and the body inside that child still need separating. */
+.mgdb-stock-record-page .mgdb-message > div > strong { display: block; }
+.mgdb-stock-record-page .mgdb-message > div > span { display: block; margin-top: var(--mgdb-space-1); }
+.mgdb-stock-record-page .mgdb-message .mgdb-button { margin-top: var(--mgdb-space-3); }

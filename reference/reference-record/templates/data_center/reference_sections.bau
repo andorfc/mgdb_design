@@ -1,0 +1,418 @@
+$$SYNTAX-LEVEL 2
+*(reference-sections
+ <p>
+  </p>
+  @(top {display: off}
+    <script language="javascript">
+      recordAccess('reference', '$(escaped_title)'\);
+    </script>
+
+    <p class='data_center_title'>
+      <table>
+        <tr>
+          <td valign='middle'>
+            <span class='data_center_title'>$(title)</span>  
+          </td>
+        </tr>
+      </table>
+    </p>
+    <br>
+    <p>
+      See the <a href="/data_center/reference">reference data center</a> for more references.
+    </p>
+    <br>
+    @(user-annotation {display: off}
+      <p>
+        <b>
+          <a href="create_pheno_annotation.cgi?id=$(id)" target="new">Add your 
+            own annotation to this record!</a>
+        </b>
+      </p>
+    )
+  )
+  
+  @(overview {display: off}
+    <br>
+    <p>
+      <b>Reference Summary:</b> $(name)<br><br>
+      @(biblio {display: off}
+        <b>Bibliography:</b> $(reference_listing)<br><br>
+      )
+      @(ed_board_recommend {display: off}
+        Recommended by the $(ed_board_year) Editorial Board<br><br>
+      )
+      @(abstract {display:off} 
+        <b>Abstract:</b> $(abstract_str)<br>
+      ) 
+      <b>Author(s\):</b>
+      @(auth_sec
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="/person?id=$(auth_id)"> $(auth_name) </a>
+        $(author)
+      )
+      @(no_authors {bind: auth_sec | display: off}
+        There are no authors linked to this reference.
+      )
+      <br><br>
+
+      @(mnl {display:off} 
+        <b>Maize Newsletter (MNL\):</b>
+        <a href="https://mnl.maizegdb.org/$(mnl_issue)">MNL $(mnl_issue)</a>
+        <br><br>
+      )
+      @(pubmed {display:off} 
+        <b>PubMed:</b>
+        <a href="https://www.ncbi.nlm.nih.gov/pubmed/$(pubmed_id)">$(pubmed_id)</a>
+        <br><br>
+      )
+      @(doi {display:off} 
+        <b>DOI ID:</b> <a href="http://dx.doi.org/$(doi_id)">$(doi_id)</a><br><br>
+      )
+      @(comment_sec {display: off}
+        <b>Comments:</b> 
+        <div class="small_tab">$(comments)</div>
+        <br><br>
+      ) 
+    </p>
+  )
+  
+  @(annotations {display: off}
+    @(curation {display: off}
+      <table cellpadding=0 cellspacing=0 width="90%">
+        <tr>
+          <td><img src="/images/lite_green_lt.gif"></td>
+          <td class=lite_green_background width="100%"></td>
+          <td><img src="/images/lite_green_rt.gif"></td>
+        </tr>
+        <tr>
+          <td class=lite_green_background></td>
+          <td class=lite_green_background style="padding:2px">
+            <p>
+              <b>Annotate this record</b>
+              <form method="post" id="curationform" 
+                    action="javascript:popUpAnnotation\('curationform', '/curation/FreeText/edit'\);">
+                <input type="hidden" id="mgdb_id" name="mgdb_id" value="$(mgdb_id)">
+                <input type="hidden" id="table_name" name="table_name" value="reference">
+                <input type="hidden" id="rec_name" name="rec_name" value="$(rec_name)">
+                &nbsp;<a onclick="javascript:curationform.submit(\);"
+                   href="#" >Add free text annotation</a>
+              </form>
+            </p>
+          </td>
+          <td class=lite_green_background></td>
+        </tr>
+        <tr>
+          <td><img src="/images/lite_green_lb.gif"></td>
+          <td class=lite_green_background width="100%"></td>
+          <td><img src="/images/lite_green_rb.gif"></td>
+        </tr>
+      </table>
+      <br>
+    )
+    
+    @(annotation-no-user {display: off}
+      <p><b>No user annotations</b></p>
+      <br>
+    )
+    @(annotation-user {display: off}
+      <p><b>User Annotations:</b></p>
+      @(annotation-user-list
+        <form name="ft_edit_$(auto_num)" id="ft_edit_$(auto_num)" method="post" 
+              target="annotation">
+          <input type="hidden" name="auto_num" id="auto_num" value="$(auto_num)">
+          <input type="hidden" name="mgdb_id" id="mgdb_id" value="$(mgdb_id)">
+          <input type="hidden" name="table_name" id="table_name" value="reference">
+          From:
+          <b><a href="/person/$(person_id)">$(first_name) $(last_name)</a></b>
+          (<i>$(mod_date)</i>\)
+          <br>
+          <span style="margin-left: 10px;">$(memo)</span>
+        </form>
+      )
+      <br>
+    )
+    @(annotation-user-curator {display: off}
+      <p><b>User Annotations: (curator's view\)</b></p>
+      @(annotation-user-list-ex
+        <form name="ft_edit_$(auto_num)" id="ft_edit_$(auto_num)" method="post" 
+              target="annotation">
+          <input type="hidden" name="auto_num" id="auto_num" value="$(auto_num)">
+          <input type="hidden" name="mgdb_id" id="mgdb_id" value="$(mgdb_id)">
+          <input type="hidden" name="table_name" id="table_name" value="reference">
+          From:
+          <b><a href="/person/$(person_id)">$(first_name) $(last_name)</a></b>
+          (<i>$(mod_date)</i>\)
+          <br> 
+          <span style="margin-left: 10px;">$(memo)</span>
+          <br>
+          <i><a href="#" 
+                onclick="popUpAnnotation('ft_edit_$(auto_num)', '/curation/FreeText/edit'\);">Edit this annotation</a>
+          </i>
+        </form>
+      )
+      <br>
+    )
+  ) 
+  
+  @(offsite_res {display: off}
+    <br>
+    <p>
+    @(offsite_sec {display: on}
+      $(offsite)
+    )
+    @(no_offsite {display: off | bind: offsite_sec}
+      <b> No offsite data available for this record. </b>
+    )
+    </p>
+  )
+  
+  @(describes {display: off}
+  <br>
+    <p>
+      @(clones {display: off}
+        &nbsp;<u>Clone Libraries</u><br>
+        @(clones_links
+          &nbsp;<a href="clone?id=$(cl_id)">$(cl_name)</a><br>    
+        )    
+        <br>        
+      )
+      @(environment {display: off}
+        &nbsp;<u>Environments</u><br>
+        @(environment_links
+          &nbsp;<a href="environment?id=$(env_id)">$(env_name)</a><br>     
+        )
+        <br>        
+      )
+      @(ecr {display: off}
+        &nbsp;<u>Enzyme-catalyzed Reactions</u><br>
+        @(ecr_links
+          &nbsp;<a href="ecr?id=$(ecr_id)">$(ecr_name)</a><br>
+        )
+        <br>        
+      )
+      @(gel_patterns {display: off}
+        &nbsp;<u>Gel Patterns</u><br>
+        @(gel_patterns_links
+          &nbsp;<a href="gel?id=$(gel_id)">$(gel_name)</a><br>
+        )
+        <br>        
+      )
+      @(gene_products {display: off}
+        &nbsp;<u>Gene Products</u><br>
+        @(gene_products_links
+          &nbsp;<a href="gene_product?id=$(gp_id)">$(gp_name)</a><br>
+        )
+        <br>        
+      )
+      @(genome_assemblies {display: off}
+        &nbsp;<u>Genome Assemblies</u><br>
+        @(genome_assembly_links
+          &nbsp;<a href="/genome/assembly/$(assembly_name)">$(assembly_name)</a><br>
+        )
+        <br>        
+      )
+      @(images {display: off}
+        &nbsp;<u>Images</u><br>
+        <table>
+          @(image_list
+          <tr>
+            <td style="max-width:200px;width=100%" class="smalltext">
+              <a href='#!' onclick="open_sb('$(image_full_url)', '$(image_caption)'\);">
+                <img src="$(image_thumbnail)">
+              </a>
+              <br>
+              $(term_caption)
+            </td>
+          </tr>
+          )
+        </table>
+        <br>
+      )
+      @(journals {display: off}
+        &nbsp;<u>Journals</u><br>
+        @(journals_links
+          &nbsp;<a href="journal?id=$(jrnl_id)">$(jrnl_name)</a><br>
+        )
+        <br>        
+      )
+      @(linkage_group {display: off}
+        &nbsp;<u>Linkage Groups</u><br>
+        @(linkage_group_links
+          &nbsp;<a href="lg?id=$(lg_id)">$(lg_name)</a><br>
+        )
+        <br>        
+      )
+      @(locus {display: off}
+        &nbsp;<u>Loci (Locus\)</u><br>
+        @(locus_links
+          &nbsp;<a href="/data_center/locus?id=$(loci_id)">$(loci_name) <i>$(loci_full)</i></a>
+          $(synonym)<br>
+        )
+        <br>        
+      )
+      @(maps {display: off}
+        &nbsp;<u>Maps</u><br>
+        @(maps_links
+          &nbsp;<a href="/data_center/map?id=$(map_id)">$(map_name)</a><br>
+        )    
+        <br>        
+      )
+      @(meta_path {display: off}
+        &nbsp;<u>Metabolic Pathways</u><br>
+        @(meta_path_links
+          &nbsp;<a href="mp?id=$(meta_id)">$(meta_name)</a><br>
+        )
+        <br>        
+      )
+      @(panel_stocks {display: off}
+        &nbsp;<u>Panels of Stocks</u><br>
+        @(panel_stocks_links
+          &nbsp;<a href="pos?id=$(pos_id)">$(pos_name)</a><br>
+        )
+        <br>        
+      )
+      @(person {display: off}
+        &nbsp;<u>People</u><br>
+        @(person_links
+          &nbsp;<a href="/person?id=$(pers_id)">$(pers_name)</a><br>
+        )
+        <br>        
+      )
+      @(phenotypes {display: off}
+        &nbsp;<u>Phenotypes</u><br>
+        @(phenotypes_links
+          &nbsp;<a href="/data_center/phenotype?id=$(pheno_id)">$(pheno_name)</a><br>    
+        )
+        <br>        
+      )
+      @(bac {display: off}
+        &nbsp;<u>BACs</u><br>
+        @(bac_links
+          &nbsp;<a href="/data_center/bac?id=$(bac_id)">$(bac_name)</a><br>
+        )
+        <br>        
+      )
+      @(est {display: off}
+        &nbsp;<u>ESTs</u><br>
+        @(est_links
+          &nbsp;<a href="/data_center/est?id=$(est_id)">$(est_name)</a>
+          <br>
+        )
+        <br>        
+      )
+      @(overgo {display: off}
+        &nbsp;<u>Overgos</u><br>
+        @(overgo_links
+          &nbsp;<a href="/data_center/overgo?id=$(overgo_id)">$(overgo_name)</a><br>
+        )
+        <br>        
+      )
+      @(ssr {display: off}
+        &nbsp;<u>SSRs</u><br>
+        @(ssr_links
+          &nbsp;<a href="/data_center/ssr?id=$(ssr_id)">$(ssr_name)</a><br>
+        )
+        <br>        
+      )
+      @(probe {display: off}
+        &nbsp;<u>Probes</u><br>
+        @(probe_links
+          &nbsp;<a href="/data_center/marker?id=$(probe_id)">$(probe_name)</a><br>
+        )    
+        <br>        
+      )
+      @(qtl {display: off}
+        &nbsp;<u>QTL Experiments</u><br>
+        @(qtl_links
+          &nbsp;<a href="/data_center/qtl?id=$(qtl_id)">$(qtl_name)</a><br>    
+        )
+        <br>        
+      )
+      @(recombination {display: off}
+        &nbsp;<u>Recombination Data</u><br>
+        @(recombination_links
+          &nbsp;<a href="/data_center/recombination?id=$(recomb_id)">$(recomb_name)</a>
+          <br>    
+        )
+        <br>        
+      )
+      @(reference {display: off}
+        &nbsp;<u>References</u><br>
+        @(reference_links
+          &nbsp;<a href="/data_center/reference?id=$(ref_id)">$(ref_name)</a><br>
+        )
+        <br>        
+      )
+      @(stocks_big {display: off}
+        <table>
+         <tr>
+           <td width = "100%"><u>Stocks</u></td>
+         </tr>
+        </table>
+        <table>
+        @(stocks_big_sec
+          <tr>
+            <td> 
+              &nbsp;<a href="/data_center/stock?id=$(stock_id)">$(stock_name)</a>
+            </td>
+          </tr>
+        )
+        </table>
+        <br>
+      )
+      @(stocks_small {display: off}
+        &nbsp;<u>Stocks</u><br>
+        @(stocks_small_links
+          &nbsp;<a href="/data_center/stock?id=$(stock_id)">$(stock_name)</a><br>
+        )
+        <br>        
+      )
+      @(traits {display: off}
+        &nbsp;<u>Traits</u><br>
+        <table>
+        @(traits_links
+          <tr>
+            <td style="max-width:200px;width=100%" class="smalltext">
+              <a href='#!' onclick="open_sb('$(trait_full_url)', '$(trait_caption)'\);">$(trait_image)</a>
+              $(trait_caption)
+            </td>
+            <td valign="top">
+              <a href="/data_center/trait?id=$(trait_id)">$(trait_name)</a>
+            </td>
+          </tr>
+        )
+        </table>
+        <br>        
+      )
+      @(terms {display: off}
+        &nbsp;<u>Terminology</u><br>
+        <table>
+          @(terms_links
+          <tr>
+            <td style="max-width:200px;width=100%" class="smalltext">
+              <a href='#!' onclick="open_sb('$(term_full_url)', '$(term_caption)'\);">$(term_image)</a>
+              $(term_caption)
+            </td>
+            <td valign="top">
+              $(term_name)<i>$(contents)</i>
+              <a href="/data_center/term?id=$(term_id)">?</a>
+            </td>
+          </tr>
+          )
+        </table>
+        <br>        
+      )
+      @(variations {display: off}
+        &nbsp;<u>Variations</u><br>
+        @(variations_links
+          &nbsp;<a href="/data_center/variation?id=$(var_id)">$(var_name)</a><br>
+        )
+        <br>        
+      )
+      @(no_describes {display: off}
+        <b>This reference does not describe any other record type.</b>
+      )
+      <br>
+    </p>
+  )
+)

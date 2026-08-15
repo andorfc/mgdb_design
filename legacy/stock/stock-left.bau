@@ -1,0 +1,431 @@
+*(stock-left
+<div id="datacenter_left_col">
+  <p id='big'>
+    <a href='#simple_search' id='link_blue'><img src='../../images/bulletpoint.png' border=0> Simple Stock Search</a><br>
+    <a href='#advanced_search' id='link_blue'><img src='../../images/bulletpoint.png' border=0> Advanced Stock Search</a><br>
+<!--    <a href='#mutantsearch' id='link_blue'><img src='../../images/bulletpoint.png' border=0> Search for sequence-indexed mutants</a><br> -->
+    <a href='#stockdownloads' id='link_blue'><img src='../../images/bulletpoint.png' border=0> Stock downloads</a><br>
+    <a href='#stockresources' id='link_blue'><img src='../../images/bulletpoint.png' border=0> Stock resources</a><br>
+    <a href='#nam' id='link_blue'><img src='../../images/bulletpoint.png' border=0> The NAM founders</a><br><br>
+  </p>
+  <p>
+    Also see <b><a href="https://wgs.maizegdb.org/">SNPversity 2.0</a></b>: 
+    This tool allows you to query genotype data.
+  </p>
+  
+  @(stock-simple_search
+    <a name="simple_search"></a>
+    <div id="datacenter_gray_background">
+      <p>
+        <span style="font-weight:bold">Simple Stock Search</span>: 
+        This search form allows you to just enter basic name info to quickly
+        retrieve the desired stock. 
+        below.
+      </p>
+      <br>
+      <div name="button_container" class="button_container">   
+        <form name='n1' method="get" action="javascript:stock_simple_search(\);" class="tiny"> 
+          <input type="text" name="term" id="stockterm" size="20" value="$(term)" class="quick_search">
+          <input type="submit" class="button" value="Submit" id="minisub"> 
+          (see a <a href="#" onClick="document.getElementById('stockterm'\).value = 'bz1 a1 wx1';">sample stock query</a>\)
+          <br>
+          <input type="checkbox" name="case" id="case" value="1">&nbsp;
+          <label for="case">Make this search case-sensitive</label>
+          @(limits
+            *(adjust_limits #load: templates/data_center/set_search_limit.bau#)
+          )
+        </form>
+      </div>
+
+      <p>
+        <span style="font-weight:bold">Tip</span>:  
+          If you want to find stocks utilizing a specific variation, put the name
+          of the variation in parentheses before you search. For example, (a1\)
+          will find variations of a1. Be sure to check the case-sensitive box if
+          you want your search to be case sensitive.
+        </span>
+      </p>
+      <br>
+      
+      <div id="grin_results_msg" style="display: none;">
+        <input type="hidden" id="new_search" value=""\>
+        <p>
+          There are also 
+          <a href="javascript:toggle_grin(document.getElementById('stockterm'\).value, 'grin'\);">
+            <span id="grin_count" style="font-weight: bold;"></span> 
+            matching GRIN germplasm records
+          </a> in addition to these results. <br>
+          <i>For a complete set of matching GRIN records, visit 
+          <a href="https://npgsweb.ars-grin.gov/gringlobal/search.aspx?">GRIN-Global</a>.</i>
+          <br><br>
+      </div>
+      <div id="stock_results_msg" style="display: none;">
+        Return to the 
+        <a href="javascript:toggle_grin(document.getElementById('stockterm'\).value, 'stock'\);">
+          <span id="stock_count" style="font-weight: bold;"></span> 
+          matching Stock results.
+        </a> 
+        <br><br>
+      </div>
+      
+      <div id='stock_results'></div>
+      <div id='grin_results'></div>
+      
+      @(start-search #display:off#
+        <script language="javascript">
+          getSearchData('stock', 'stock_results', '$(term)'\);
+        </script>
+      )
+    </div>
+  )
+  
+  @(stock-advanced_search
+    <br><br>
+    <a name="advanced_search"></a>
+    <p style="margin-bottom: 8px;">
+      <span id="datacenter_title">Advanced Stock Query</span>
+    </p>
+    <div id="datacenter_lite_green_background">
+      <p>
+        You can use this form to create a more detailed stock query.  
+        Check the boxes for the filters you want to use, then click submit 
+        to see a table of the results.
+      </p>
+      <table CELLPADDING='6' CELLSPACING='4' BORDER='0' WIDTH="100%" 
+      summary="A table within which you can set up your search criteria.">
+        <tr>
+          <td WIDTH="100%" VALIGN="TOP" CLASS="small">
+          <div name="button_container" class="button_container">
+            <form method="get" action="javascript:stock_adv_search('adv_results'\);" 
+            style="margin-bottom: 0px; margin-top: 0px; padding-bottom: 0px;">
+               <input type="hidden" name="check" value="true">
+               <input type="checkbox" id="box_mgsc" name="mgscbox" value="true"> 
+               <label for="box_mgsc">Show only stocks</label> 
+               <span style="font-weight:bold">available from the Maize Genetics Stock Center</span>
+               <br>
+               <input type="checkbox" id="box_dev" name="developerbox" value="true"> 
+               <label for="box_dev">Show only stocks</label> 
+               <span style="font-weight:bold">developed by</span></label>:
+               <select class="small" id="dev" onchange="document.getElementById('box_dev'\).checked = true;" name="developer">
+                 <option value=0>All developers
+                 $(developer_options)
+               </select>
+               <br>
+               <input type="checkbox" id="box_name" name="namebox" value="true"> 
+               <label for="box_name">Show only stocks</label> with 
+               <label for="stock_name">this <span style="font-weight:bold">identifier</span></label>:
+               <input type="text" class="small" length="20" maxlength="30" id="stock_name" onchange="document.getElementById('box_name'\).checked = true;" name="name">
+               <br>
+               <input type="checkbox" id="box_type" name="typebox" value="true"> 
+               <label for="box_type">Show only stocks</label> with 
+               <label for="type">this <span style="font-weight:bold">type</span></label>: 
+               <select class="small" id="type" onchange="document.getElementById('box_type'\).checked = true;" name="type">
+                 <option value=0>All types
+                 $(type_options)
+               </select>
+              <br>
+             <input type="checkbox" id="box_lg" name="lgbox" value="true"> 
+             <label for="box_lg">Show only stocks</label> with 
+             <label for="lg">this 
+             <span style="font-weight:bold">focus 
+               <acronym title="A linkage group is a known related set of loci discovered by linkage experiments">linkage group</acronym>
+             </span>
+             </label>: 
+             <select class="small" id="lg" onchange="document.getElementById('box_lg'\).checked = true;" name="linkage_group">
+               <option value=0>All focus linkage groups
+                $(linkage_options)
+             </select>
+             <br>
+             <input type="checkbox" id="box_genvar1" name="gv1box" value="true"> 
+             <label for="box_genvar1">Show only stocks</label> with <label for="genvar1">this 
+             <span style="font-weight:bold">genotypic variation</span></label>:
+             <input type="text" class="small" length="20" maxlength="30" id="genvar1" 
+             onchange="document.getElementById('box_genvar1'\).checked = true;" name="genvar1"> 
+             <br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" id="box_genvar2" name="gv2box" value="true"> 
+             <label for="box_genvar2"> AND show only stocks</label> with <label for="genvar2">this 
+             <span style="font-weight:bold">genotypic variation</span></label>: 
+             <input type="text" class="small" length="20" maxlength="30" id="genvar2" 
+             onchange="document.getElementById('box_genvar2'\).checked = true;" name="genvar2">
+             <br>
+             &nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" id="box_genvar3" name="gv3box" value="true"> 
+             <label for="box_genvar3"> AND show only stocks</label> with <label for="genvar3">this 
+             <span style="font-weight:bold">genotypic variation</span></label>: 
+             <input type="text" class="small" length="20" maxlength="30" id="genvar3" 
+             onchange="document.getElementById('box_genvar3'\).checked = true;" name="genvar3">
+             <br>
+             <input type="checkbox" id="box_kv" name="kvbox" value="true"> 
+             <label for="box_kv"> Show only stocks</label> with <label for="kv">this 
+             <span style="font-weight:bold">karyotypic variation</span></label>: 
+             <select class="small" id="kv" 
+             onchange="document.getElementById('box_kv'\).checked = true;" name="karyovar">
+               <option value=0>All karyotypic variations
+               $(karyotype_options)
+             </select>
+             <br>
+             <input type="checkbox" id="box_pheno" name="phenobox" value="true"> 
+             <label for="box_pheno">Show only stocks</label> with 
+             <label for="pheno">this <span style="font-weight:bold">phenotype</span></label>: 
+             <select class="small" id="pheno" onchange="document.getElementById('box_pheno'\).checked = true;" name="phenotype">
+               <option value=0>All phenotypes
+               $(phenotype_options)
+            </select>
+            and/or <label for="pheno_var"><span style="font-weight:bold">attributable to</span>
+            this variation</label>: 
+            <input type="text" class="small" length="20" maxlength="30" id="phenovar" 
+            onchange="document.getElementById('box_pheno'\).checked = true;" name="attribution">
+            <br>
+            <input type="checkbox" id="box_avail" name="availbox" value="true"> 
+            <label for="box_avail">Show only stocks</label> available from 
+            <label for="avail">this <span style="font-weight:bold">group/individual</span></label>:
+            <select class="small" id="avail" onchange="document.getElementById('box_avail'\).checked = true;" name="avail_from">
+              <option value=0>All availabilities
+              $(group_options)
+            </select>
+            <br>
+            <input type="checkbox" id="box_parent" name="parentbox" value="true"> 
+            <label for="box_parent">Show only stocks</label> with 
+            <label for="parent">this <span style="font-weight:bold">parent</span></label>: 
+            <select class="small" id="parent" onchange="document.getElementById('box_parent'\).checked = true;" name="parent">
+              <option value=0>All parents
+              $(parent_options)
+            </select>
+            <br>
+            <input type="checkbox" id="box_expvp" name="box_expvp" value="true"> 
+               <label for="box_expvp">Show only <b>ex-PVP (Plant Variety Protection\)</b> stocks</label>. 
+            <br>
+            <input type="checkbox" id="box_bank" name="box_bank" value="true">
+            <label for="box_bank">Show only stocks <b>available from the germplasm banks</b></label>.
+            <br>
+            <br>
+             <input type="button" class="button" value="Submit" id="minisub" 
+              onClick="javascript:stock_adv_search('adv_results'\);">
+            &nbsp;
+             <input type="button" class="button" value="Clear" id="minisub" 
+              onClick="this.form.reset(\);">
+            @(adv_limits
+              *(adv_adjust_limits #load: templates/data_center/set_adv_search_limit.bau#)
+            )
+           </form>
+           </div>
+          </td>
+         </tr>
+        </table>
+        <div id="adv_results"></div>
+     </div>
+   )
+   
+   @(mutant-search #display: off#
+      <br><br>
+      <a name="mutantsearch"></a>
+      <p style="margin-bottom: 8px;">
+        <span id="datacenter_title">Search for sequence-indexed mutants</span>
+      </p>
+      <div id="datacenter_lite_blue_background">
+        <table width=700>
+          <tr>
+             <td>
+              <form action="/popcorn/search/sequence_search/dosearch.php" 
+                    method="POST" id="popcornform">
+                <table>
+                  <tr>
+                    <td width="100%" style="white-space:nowrap">
+                      Use this tool to do a sequence search for mutants.
+                      <br><br>
+                      Enter sequence, Genbank IDs or gene model names (GRMZMxxxxxx\):
+                      <a href="javascript:addExamplePOPcornSeq('sequence'\)">Example</a>
+                      <br>
+                      <input type="radio" name="seq_type" id="seq_type" class="seq_type" 
+                             value="nucleotide" checked> Nucleotide<br>
+                      <input type="radio" name="seq_type" id="seq_type" class="seq_type"
+                             value="aminoacid"> Amino acid
+                    </td>
+                    <td align="right">
+                      <img src="/images/PopcornIcon_48-trans.png">
+                    </td>
+                  </tr>
+                </table>
+                <textarea name="sequence" id="sequence" rows=8 cols=82></textarea>
+                <br>
+                <input type="hidden" name="max_evalue" id="max_evalue" value="1e-7">
+                <input type="hidden" name="max_hits" id="max_hits" value=5>
+                <input type="hidden" name="selected_search[]" id="selected_search[]" 
+                       value="SEQ2ACDS_SEEDSTOCK">
+                <input type="hidden" name="selected_search[]" id="selected_search[]" 
+                       value="SEQ2MUINSERTION">
+                <input type="hidden" name="selected_search[]" id="selected_search[]" 
+                       value="SEQ2SEEDSTOCK">
+                <input type="hidden" name="selected_search[]" id="selected_search[]" 
+                       value="SEQ2TILLING_SEEDSTOCK">
+                <input type="hidden" name="selected_search[]" id="selected_search[]" 
+                       value="SEQ2UNIFORMMU_SEEDSTOCK">
+                 <br>
+                <input type="button" class="button" id="startbtn" 
+                       value="start search" onclick="startPOPcornSearch(\)">
+                <span id="status" style="display:none;color:#213955;">Starting...</span>
+              </form>
+            </td>
+          </tr>
+        </table>
+      </div>
+   )
+   
+   @(stock-downloads
+     <script type="text/javascript">
+      document.n1.term.focus(\);
+     </script>
+     <br><br>
+     <a name="stockdownloads"></a>
+     <p style="margin-bottom: 8px;">
+       <span id="datacenter_title">Stock Downloads</span>
+     </p>
+     <p>
+       <a href="https://iastate.app.box.com/v/maizegdb-public/file/1876142430468">
+         Flow cytometry for selected lines</a>.
+     </p>
+   )
+   
+   @(stock-resources
+     <script type="text/javascript">
+      document.n1.term.focus(\);
+     </script>
+     <br><br>
+     <a name="stockresources"></a>
+     <p style="margin-bottom: 8px;">
+       <span id="datacenter_title">Maize Genetics Cooperation Stock Center Resources</span>
+     </p>
+     <p>
+       <a href="http://maizecoop.cropsci.uiuc.edu/">
+         <span style="font-weight:bold">The Maize Genetics Cooperation Stock Center</span>
+       </a> 
+       maintains an extensive collection of maize genetic stocks.  MaizeGDB supports 
+       the Stock Center by providing interlinked stock information throughout our 
+       database, as well as reports and catalogues of Stock Center stocks, and the 
+       ability to order stocks or request more information directly from the Stock
+       Center.
+     </p><br>
+     <p>
+      The primary portal to genetic stocks (germplasm\) is distributed by the Maize Genetics Cooperation Stock Center,
+      Urbana IL. Additional germplasm may also be accessed from this site, for example germplasm with molecular 
+      or phenotype data represented in MaizeGDB. Many of these non-mutant resources, may be requested from the 
+      <a href="https://maizecoopsc.org/ncrpis/"> North Central Regional Plant Introduction Station (NCRPRIS\)</a>.
+    </p><br>
+     <p>
+       <a href="/stock_catalog">
+         <span style="font-weight:bold">The Stock Center Catalog</span>
+       </a> 
+       is an extensive categorized listing of the stocks available from
+       the stock center.
+     </p><br>
+     <p>A key for how to 
+       <a href="/stock_decryption"><span style="font-weight:bold">Decrypt Stock Packet Labels</span></a> 
+       is often helpful for researchers unfamiliar with the Stock Center's labelling practices.
+    </p>
+    <br>
+    <p>
+      You may also sort lines from the Ames Diversity Panel
+      ((a USDA-maintained set of maize lines representing wide genetic variation in Ames, Iowa\) 
+      based on IBS (Identity by State\) score using the
+      <a href="/TYPSimSelector">TYPSimSelector</a>.
+    </p>
+    <br/>
+    <p>
+      Search for and download
+      <a href="/traits_ibm_nam">Trait Values</a>.
+    </p>
+    <br/>
+  )
+  
+  <br>
+  <p style="margin-bottom: 8px;">
+    <span id="datacenter_title">Search and Browse Phenotypes in Stock Collections</span>
+  </p>
+  <b>Stocks Distributed by the 
+  <a href="http://maizecoop.cropsci.uiuc.edu" target="_blank">Maize Genetics Cooperation 
+  Stock Center</a></b>
+  <p>
+    The Core COOP Collection
+    <div style="margin-left: 24px">
+        <a href="/stock_catalog">Browse catalog listing</a> <br>
+        Query data centers (<a href="/data_center/stock">Stock</a>,  <a href="/data_center/phenotype">Phenotype</a>,  <a href="/data_center/variation">Allele</a>,  <a href="/data_center/locus">Locus</a>.\) <br>
+        Quick search (top right box above the menu bar\)  <br>
+        <a href="/data_center/image_phenotype">Browse Images</a> <br>
+    </div>
+    EMS Inflorescence Project Mutants (S Hake\)
+    <div style="margin-left: 24px">
+        <a href="/ems-phenotype">Browse/query database screenings/images for seed, seedling and adult stages phenotypes</a><br>
+    </div>
+    Sequence-tagged insertion mutants
+    <div style="margin-left: 24px">
+        <a href="/uniformmu">UniformMu (D McCarty\)</a>. View UniformMu trakcs on the Genome Browser 
+        (<a href="/gbrowse/maize_v2?enable=UniformMU">B73_V2</a>, 
+        <a href="/gbrowse/maize_v3?enable=UniformMU">B73_V3</a>, 
+        <a href="/gbrowse/maize_v4?enable=UniformMu">B73_V4</a>, 
+        <a href="https://jbrowse.maizegdb.org/?data=v5&tracks=gene_models,uniformmu">B73_V5</a>
+        <a href="/gbrowse/maize_w22v2?enable=UniformMu">W22_V2</a>\). <br>
+<!-- no longer supported
+        RescueMU (Walbot\). <a href="/rescuemu-phenotype">Database with images from screenings for seed, seedling and adult stages</a> <br>
+-->
+        Ac/Ds/Ds-GFP (Dooner\). Track on Genome Browser (<a href="/gbrowse/maize_v2?enable=AcDs_Dooner">B73_V2</a>, <a href="/gbrowse/maize_v3?enable=AcDs_Dooner">B73_V3</a>\)
+    </div>
+  </p>
+  <br>
+  <p style="margin-bottom: 8px;">
+    <span id="datacenter_title">Stocks Distributed by Individual Projects</span>
+  </p>
+  Sequence-tagged insertions
+  Ac/Ds Brutnell & Vollbrecht. See track on Genome Browser (<a href="/gbrowse/maize_v2?enable=AcDs">B73_V2</a>, <a href="/gbrowse/maize_v3?enable=AcDs">B73_V3</a>\)<br>
+  <a href="http://teosinte.uoregon.edu/mu-illumina/">Mu (Barkan\)</a>. See track on Genome Browser (<a href="/gbrowse/maize_v3?enable=Mu_Illumina">B73_V3</a>, <a href="/gbrowse/maize_v4?enable=Mu_Illumina">B73_V4</a>\) <br>
+  <a href="http://maize.jcvi.org/cellgenomics/protocol.php">GFP-tagged proteins (JCVI\)</a> Track on Genome Browser (<a href="/gbrowse/maize_v2?enable=Flourescent_Tagged_Constructs_JCVI">B73_V2</a>, <a href="/gbrowse/maize_v3?enable=All_Primers_JCVI">B73_V3</a>\)<br> 
+
+  <br><br>
+  <a name="nam"></a>
+  <p style="margin-bottom: 8px;">
+   <span id="datacenter_title">The maize NAM founders</span>
+  </p>
+  <p>
+    The maize Nested Association Mapping (NAM\) population was developed by the "Molecular 
+    and Functional Diversity of the Maize Genome" project. The 26 diverse founder lines 
+    are listed below. <b>Reference:</b> 
+    <a href="https://dx.doi.org/10.1534%2Fgenetics.107.074245">Yu et al., 2008</a>.
+    <br><br>
+    Stocks may be ordered from the 
+    <a href="https://maizecoopsc.org/nam-rils">Maize Genetics Cooperation Stock Center</a>.
+  </p>
+  <br>
+  <table>
+    <tr>
+      <td width=20px></td>
+      <td>
+        <a href="/data_center/stock/B97">B97</a><br>
+        <a href="/data_center/stock/CML103">CML103</a><br> 
+        <a href="/data_center/stock/CML228">CML228</a><br>
+        <a href="/data_center/stock/CML247">CML247</a><br>
+        <a href="/data_center/stock/CML277">CML277</a><br>
+        <a href="/data_center/stock/CML322">CML322</a><br>
+        <a href="/data_center/stock/CML333">CML333</a><br>
+        <a href="/data_center/stock/CML052">CML52</a><br>
+        <a href="/data_center/stock/CML069">CML69</a><br>
+        <a href="/data_center/stock/Hp301">Hp301</a><br>
+        <a href="/data_center/stock/Il14H">Il14H</a><br>
+        <a href="/data_center/stock/Ki11">Ki11</a><br>
+        <a href="/data_center/stock/Ki3">Ki3</a><br>
+        <a href="/data_center/stock/Ky21">Ky21</a><br>
+        <a href="/data_center/stock/M162W">M162W</a><br>
+        <a href="/data_center/stock/M37W">M37W</a><br>
+        <a href="/data_center/stock/Mo17">Mo17 (IBM\)</a><br>
+        <a href="/data_center/stock/Mo18W">Mo18W</a><br>
+        <a href="/data_center/stock/MS71">MS71</a><br>
+        <a href="/data_center/stock/NC350">NC350 </a><br>
+        <a href="/data_center/stock/NC358">NC358</a><br>
+        <a href="/data_center/stock/Oh43">Oh43</a><br>
+        <a href="/data_center/stock/Oh7B">Oh7B</a><br>
+        <a href="/data_center/stock/P39">P39</a><br>
+        <a href="/data_center/stock/Tx303">Tx303</a><br>
+        <a href="/data_center/stock/Tzi8">Tzi8</a>
+      </td>
+    </tr>
+  </table>
+  
+</div>
+)

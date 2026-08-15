@@ -1,0 +1,370 @@
+{
+ "version": "maize_immunity_classes v1.0",
+ "counting_unit": "gene (longest protein per gene); architecture = set of Pfam/InterPro signatures on that protein",
+ "precedence": [
+  "NLR",
+  "NLR_partial",
+  "RLK",
+  "RLP",
+  "PR",
+  "IMMUNE_SIGNALING",
+  "IMMUNE_OTHER"
+ ],
+ "signatures": {
+  "NB_ARC": [
+   "PF00931",
+   "IPR002182"
+  ],
+  "TIR": [
+   "PF01582",
+   "IPR000157"
+  ],
+  "RPW8": [
+   "PF05659",
+   "IPR008808"
+  ],
+  "CC_RX": [
+   "PF18052",
+   "IPR041118"
+  ],
+  "LRR": [
+   "PF00560",
+   "PF07723",
+   "PF07725",
+   "PF12799",
+   "PF13855",
+   "PF13306",
+   "PF13516",
+   "PF08263",
+   "IPR001611",
+   "IPR003591",
+   "IPR013210",
+   "IPR032675"
+  ],
+  "PKINASE": [
+   "PF00069",
+   "PF07714",
+   "IPR000719",
+   "IPR001245",
+   "IPR011009"
+  ],
+  "LYSM": [
+   "PF01476",
+   "IPR018392"
+  ],
+  "WAK_GUB": [
+   "PF13947",
+   "IPR025287"
+  ],
+  "EGF": [
+   "PF00008",
+   "PF07645",
+   "PF12947",
+   "IPR000742",
+   "IPR001881"
+  ],
+  "MALECTIN": [
+   "PF12819",
+   "PF11721",
+   "IPR024788",
+   "IPR024801"
+  ],
+  "B_LECTIN": [
+   "PF01453",
+   "IPR001480"
+  ],
+  "S_LOCUS": [
+   "PF00954",
+   "IPR000858"
+  ],
+  "PAN_APPLE": [
+   "PF08276",
+   "PF00024",
+   "IPR003609"
+  ],
+  "LEG_LECTIN": [
+   "PF00139",
+   "IPR001220"
+  ],
+  "GNK2_DUF26": [
+   "PF01657",
+   "IPR002902"
+  ],
+  "THAUMATIN": [
+   "PF00314",
+   "IPR001938"
+  ],
+  "CAP_PR1": [
+   "PF00188",
+   "IPR014044"
+  ],
+  "CHITIN_BIND": [
+   "PF00187",
+   "IPR001002"
+  ],
+  "GH19_CHITINASE": [
+   "PF00182",
+   "IPR000726"
+  ],
+  "GH17_GLUCANASE": [
+   "PF00332",
+   "IPR000490"
+  ],
+  "BARWIN": [
+   "PF00967",
+   "IPR001153"
+  ],
+  "BET_V1": [
+   "PF00407",
+   "IPR000916"
+  ],
+  "DEFENSIN": [
+   "PF00706",
+   "PF01097",
+   "IPR008176"
+  ],
+  "LTP": [
+   "PF00234",
+   "IPR003612"
+  ],
+  "GERMIN": [
+   "PF01072",
+   "IPR001929"
+  ],
+  "PEROXIDASE": [
+   "PF00141",
+   "IPR002016"
+  ],
+  "WRKY": [
+   "PF03106",
+   "IPR003657"
+  ],
+  "NPR_BTB": [
+   "PF00651",
+   "IPR000210"
+  ],
+  "ANKYRIN": [
+   "PF00023",
+   "PF12796",
+   "IPR002110"
+  ],
+  "RBOH_FRD": [
+   "PF01794",
+   "PF08022",
+   "PF08030",
+   "IPR013112",
+   "IPR013121"
+  ],
+  "EF_HAND": [
+   "PF00036",
+   "PF13499",
+   "IPR002048"
+  ],
+  "MLO": [
+   "PF03094",
+   "IPR004326"
+  ],
+  "TM_SP": [
+   "SignalP",
+   "TMHMM",
+   "Phobius"
+  ]
+ },
+ "classes": [
+  {
+   "class": "NLR",
+   "subclass": "TNL",
+   "rule": "NB_ARC AND TIR",
+   "note": "TIR-NB-LRR; rare/absent in monocots - a nonzero monocot count is a flag to inspect"
+  },
+  {
+   "class": "NLR",
+   "subclass": "CNL",
+   "rule": "NB_ARC AND CC_RX",
+   "note": "Rx-type coiled-coil NLR; dominant monocot class"
+  },
+  {
+   "class": "NLR",
+   "subclass": "RNL",
+   "rule": "NB_ARC AND RPW8",
+   "note": "RPW8/ADR1-NRG1 helper NLRs"
+  },
+  {
+   "class": "NLR",
+   "subclass": "NL",
+   "rule": "NB_ARC AND LRR AND NOT (TIR OR CC_RX OR RPW8)",
+   "note": "NB-ARC + LRR, no assignable N-terminal domain"
+  },
+  {
+   "class": "NLR",
+   "subclass": "N_only",
+   "rule": "NB_ARC AND NOT LRR AND NOT (TIR OR CC_RX OR RPW8)",
+   "note": "NB-ARC alone; often truncated/pseudogenized or a helper"
+  },
+  {
+   "class": "NLR",
+   "subclass": "NLR_ID",
+   "rule": "NB_ARC AND any_integrated_domain",
+   "note": "integrated decoy domain NLR (e.g. NB-ARC + kinase/WRKY/zinc-finger/HMA); the Rp1/RGA-type architectures"
+  },
+  {
+   "class": "NLR_partial",
+   "subclass": "TIR_only",
+   "rule": "TIR AND NOT NB_ARC"
+  },
+  {
+   "class": "NLR_partial",
+   "subclass": "RPW8_only",
+   "rule": "RPW8 AND NOT NB_ARC"
+  },
+  {
+   "class": "RLK",
+   "subclass": "LRR-RLK",
+   "rule": "PKINASE AND LRR AND TM_or_default",
+   "note": "largest RLK subfamily; includes FLS2/BRI1/Xa21-type"
+  },
+  {
+   "class": "RLK",
+   "subclass": "LysM-RLK",
+   "rule": "PKINASE AND LYSM",
+   "note": "chitin/PAMP receptors, CERK1/LYK homologs"
+  },
+  {
+   "class": "RLK",
+   "subclass": "WAK",
+   "rule": "PKINASE AND WAK_GUB",
+   "note": "wall-associated kinases; Htn1/qHSR1 northern leaf blight resistance in maize"
+  },
+  {
+   "class": "RLK",
+   "subclass": "CrRLK1L",
+   "rule": "PKINASE AND MALECTIN",
+   "note": "Catharanthus RLK1-like / FERONIA family"
+  },
+  {
+   "class": "RLK",
+   "subclass": "L-lectin-RLK",
+   "rule": "PKINASE AND LEG_LECTIN"
+  },
+  {
+   "class": "RLK",
+   "subclass": "G-lectin-RLK",
+   "rule": "PKINASE AND (B_LECTIN OR S_LOCUS OR PAN_APPLE)"
+  },
+  {
+   "class": "RLK",
+   "subclass": "CRK-DUF26",
+   "rule": "PKINASE AND GNK2_DUF26",
+   "note": "cysteine-rich receptor kinases"
+  },
+  {
+   "class": "RLK",
+   "subclass": "EGF/WAK-like",
+   "rule": "PKINASE AND EGF AND NOT WAK_GUB"
+  },
+  {
+   "class": "RLK",
+   "subclass": "RLK_other",
+   "rule": "PKINASE AND none_of_above_ectodomains AND TM",
+   "note": "kinase with TM but unassigned ectodomain"
+  },
+  {
+   "class": "RLP",
+   "subclass": "LRR-RLP",
+   "rule": "LRR AND NOT PKINASE AND NOT NB_ARC AND TM",
+   "note": "receptor-like protein, no kinase domain"
+  },
+  {
+   "class": "RLP",
+   "subclass": "LysM-RLP",
+   "rule": "LYSM AND NOT PKINASE AND NOT NB_ARC"
+  },
+  {
+   "class": "PR",
+   "subclass": "PR-1",
+   "rule": "CAP_PR1"
+  },
+  {
+   "class": "PR",
+   "subclass": "PR-2_glucanase",
+   "rule": "GH17_GLUCANASE"
+  },
+  {
+   "class": "PR",
+   "subclass": "PR-3_4_chitinase",
+   "rule": "GH19_CHITINASE OR (CHITIN_BIND AND NOT PKINASE)"
+  },
+  {
+   "class": "PR",
+   "subclass": "PR-4_barwin",
+   "rule": "BARWIN"
+  },
+  {
+   "class": "PR",
+   "subclass": "PR-5_thaumatin",
+   "rule": "THAUMATIN"
+  },
+  {
+   "class": "PR",
+   "subclass": "PR-9_peroxidase",
+   "rule": "PEROXIDASE"
+  },
+  {
+   "class": "PR",
+   "subclass": "PR-10_BetV1",
+   "rule": "BET_V1"
+  },
+  {
+   "class": "PR",
+   "subclass": "PR-12_defensin",
+   "rule": "DEFENSIN"
+  },
+  {
+   "class": "PR",
+   "subclass": "PR-14_LTP",
+   "rule": "LTP"
+  },
+  {
+   "class": "PR",
+   "subclass": "PR-16_germin",
+   "rule": "GERMIN"
+  },
+  {
+   "class": "IMMUNE_SIGNALING",
+   "subclass": "WRKY_TF",
+   "rule": "WRKY"
+  },
+  {
+   "class": "IMMUNE_SIGNALING",
+   "subclass": "NPR-like",
+   "rule": "NPR_BTB AND ANKYRIN"
+  },
+  {
+   "class": "IMMUNE_SIGNALING",
+   "subclass": "RBOH",
+   "rule": "RBOH_FRD AND EF_HAND"
+  },
+  {
+   "class": "IMMUNE_OTHER",
+   "subclass": "MLO",
+   "rule": "MLO",
+   "note": "susceptibility factor; loss-of-function gives powdery mildew resistance"
+  }
+ ],
+ "integrated_domain_pool": [
+  "PF03106",
+  "PF00069",
+  "PF07714",
+  "PF01535",
+  "PF00403",
+  "PF13947",
+  "PF00097",
+  "PF00646",
+  "PF01582"
+ ],
+ "caveats": [
+  "Pfam-only input (MaizeGDB precomputed) lacks RPW8 (PF05659) and CC_RX (PF18052) coverage, so CNL/RNL subclassing is only reliable on the uniform re-scan; on Pfam-only data those genes fall to NL/N_only.",
+  "TM/signal-peptide evidence requires Phobius/SignalP/TMHMM in the InterProScan run; where absent, RLK_other and RLP calls are made on domain architecture alone and are flagged lower-confidence.",
+  "NLR counts from ab initio Helixer models can differ substantially from curated models: NLR clusters are repetitive and tandemly arrayed, a known hard case for gene callers. Report both arms, never one alone."
+ ]
+}

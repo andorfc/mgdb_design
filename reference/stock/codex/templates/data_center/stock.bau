@@ -1,0 +1,44 @@
+*(stock
+  <!-- create AJAX to populate sections-->
+  <script language="JavaScript">  
+    var data_center_type = "stock";
+    var data_center_id = "$(id)";
+  
+    getData(data_center_type, "top", data_center_id\);
+
+    @(nav_checkbox_javascript
+        set_checkBoxes("$(nav_name)", "$(nav_id0)", "$(is_checked)"\); 
+    )
+   
+    if (get_cookie(data_center_type\) != 'set'\)
+    {
+      document.cookie=data_center_type + "=set";
+    }
+  
+  
+    function set_checkBoxes(menu_item_name, menu_item, is_checked \) {
+      var Name1 = data_center_type + "_" + menu_item + "_checked";
+      var checkid = "checkbox" + menu_item;
+    
+      if (get_cookie(data_center_type\) != 'set'\)
+      {
+        var cookie_value = (is_checked == "checked"\);
+        document.cookie=data_center_type + "_" + menu_item + "_checked=" + cookie_value;
+      }
+    
+      if (get_cookie(Name1\) == 'true'\)
+      {
+        document.forms["nav_form"][checkid ].checked = true;
+      } else {
+        document.forms["nav_form"][checkid ].checked = false;
+      }
+  
+      if (document.forms["nav_form"][checkid].checked \)
+      {
+        getData(data_center_type, menu_item, data_center_id\);
+      } else {
+        getBlank(menu_item_name, menu_item, data_center_id\);
+      }
+    }
+  </script>
+)

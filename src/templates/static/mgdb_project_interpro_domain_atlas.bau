@@ -1,0 +1,485 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-project-interpro-domain-atlas
+<a class="mgdb-skip-link" href="#pd-main">Skip to main content</a>
+<main class="mgdb-page mgdb-project-page mgdb-pd-page" id="pd-main" data-payload="$(payload-url)">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/projects">Analysis projects</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Protein domain atlas</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="pd-title">
+    <div class="mgdb-hero-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="Stylized protein domain architecture">
+        <g fill="none" stroke="#7a4a10" stroke-width="5" stroke-linecap="round">
+          <path d="M12 48h72" />
+        </g>
+        <rect x="18" y="34" width="18" height="28" rx="5" fill="#d99a0b" />
+        <rect x="42" y="28" width="14" height="40" rx="5" fill="#8a5a0f" />
+        <rect x="62" y="38" width="20" height="20" rx="5" fill="#d99a0b" />
+      </svg>
+      <strong>Analysis<br />Project</strong>
+      <span>Published $(generated-long)</span>
+    </div>
+    <div class="mgdb-hero-body">
+      <span class="mgdb-eyebrow">Comparative genomics</span>
+      <h1 id="pd-title">The protein domain landscape across maize, its relatives, and outgroups</h1>
+      <p class="mgdb-hero-tagline">One uniform InterProScan re-scan of $(total-genomes) genomes, so that copy-number comparison across them is defensible.</p>
+      <p class="mgdb-hero-description">Every genome here was scanned identically: the same InterProScan build, the same member databases, the same counting unit. That is what makes the numbers comparable, and it is why the scan was re-run rather than pooling the per-genome domain files already published, which are Pfam-only and date from 2020.</p>
+      <div class="mgdb-hero-actions">
+        <a class="mgdb-button mgdb-button-primary" href="#pd-downloads">Download the data</a>
+        <a class="mgdb-button mgdb-button-secondary" href="#pd-methods">Methods and caveats</a>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="pd-summary-title">
+    <h2 class="mgdb-visually-hidden" id="pd-summary-title">Summary</h2>
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9678;</span>
+        <div>
+          <strong class="mgdb-metric-value">$(total-genomes)</strong>
+          <h3>Genomes scanned</h3>
+          <p>$(andropogoneae-count) Andropogoneae genomes and $(outgroup-count) outgroup species, every one scanned with the same build.</p>
+        </div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-green">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9707;</span>
+        <div>
+          <strong class="mgdb-metric-value">$(gene-total)</strong>
+          <h3>Genes annotated</h3>
+          <p>$(genes-curated) curated Andropogoneae genes, $(genes-outgroup) outgroup genes, and $(genes-helixer) Helixer-predicted genes.</p>
+        </div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-red">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9633;</span>
+        <div>
+          <strong class="mgdb-metric-value">$(class-count)</strong>
+          <h3>Functional classes</h3>
+          <p>Defined by $(ipr-count) curated InterPro accessions, out of $(ipr-detected) accessions detected in the curated arm.</p>
+        </div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-burgundy">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9998;</span>
+        <div>
+          <strong class="mgdb-metric-value mgdb-metric-value-compact">$(generated)</strong>
+          <h3>Data generated</h3>
+          <p>InterProScan $(ips-version) with $(ips-analyses) member analyses, across $(shard-count) compute shards.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="pd-measures-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Before you read a number</span>
+        <h2 id="pd-measures-title">Two measures, two annotation arms</h2>
+      </div>
+      <p>Three distinctions in this dataset produce plausible-looking wrong answers if they are collapsed. Every panel below states which side of each it is on.</p>
+    </div>
+
+    <div class="mgdb-card-grid pd-measures">
+      <article class="mgdb-card">
+        <span class="pd-measure-badge pd-measure-inclusive">Inclusive</span>
+        <h3>The $(class-count)-class functional ontology</h3>
+        <p>A gene is counted under <em>every</em> class whose domains it carries. A wall-associated receptor kinase carries both an LRR and a protein kinase domain, so it appears under receptor kinase <em>and</em> under LRR.</p>
+        <p class="mgdb-small mgdb-muted">Consequence: class counts overlap. Summing across classes is meaningless, and the class counts do not add up to the gene total.</p>
+      </article>
+      <article class="mgdb-card">
+        <span class="pd-measure-badge pd-measure-exclusive">Exclusive</span>
+        <h3>Architecture-precedence immunity calls</h3>
+        <p>Each gene is assigned to exactly one class by the precedence NLR &rsaquo; NLR partial &rsaquo; receptor kinase &rsaquo; receptor-like protein &rsaquo; PR &rsaquo; immune signaling &rsaquo; other immune.</p>
+        <p class="mgdb-small mgdb-muted">Consequence: these counts do sum, and they are strictly lower than the matching inclusive class.</p>
+      </article>
+      <article class="mgdb-card">
+        <span class="pd-measure-badge pd-measure-arms">Two arms</span>
+        <h3>Curated and Helixer gene models</h3>
+        <p>Every genome was annotated twice: once with the curated annotation shipped with the assembly, once <i>ab initio</i> with Helixer $(helixer-version). Helixer predicts roughly 15% more genes in maize, at 76% locus concordance with curated B73.</p>
+        <p class="mgdb-small mgdb-muted">Consequence: a difference between arms is a statement about annotation method, not about genome content. The two are never pooled or averaged.</p>
+      </article>
+    </div>
+
+    <p class="mgdb-note mgdb-spaced"><strong>The test that catches a collapse.</strong> For Zm-B73-REFERENCE-NAM-5.0, the inclusive class Immunity: NLR &#40;NBS-LRR&#41; holds <strong>$(b73-nlr-inclusive)</strong> genes and the exclusive class NLR holds <strong>$(b73-nlr-exclusive)</strong>. Both are correct for the same genome and the same biology. If an analysis returns the same number for both, the two measures have been merged.</p>
+  </section>
+
+  <nav class="pd-section-nav" aria-label="Sections of this analysis">
+    <a href="#pd-variance">Which classes vary</a>
+    <a href="#pd-matrix">Genome &times; class matrix</a>
+    <a href="#pd-immunity">Immunity detail</a>
+    <a href="#pd-species">Across species</a>
+    <a href="#pd-classes">Class definitions</a>
+    <a href="#pd-figures">Figures</a>
+    <a href="#pd-methods">Methods</a>
+    <a href="#pd-downloads">Downloads</a>
+  </nav>
+
+  <section id="pd-variance" aria-labelledby="pd-variance-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Panel 1 <span class="pd-measure-badge pd-measure-inclusive">Inclusive</span></span>
+        <h2 id="pd-variance-title">Which functional classes vary across genomes</h2>
+      </div>
+      <p>Ranking classes by abundance returns protein kinase, LRR and PPR every time &mdash; true, and uninformative. Ranking by coefficient of variation across the maize genomes is the view worth reading.</p>
+    </div>
+
+    <p class="mgdb-section-intro">Within maize, domain <em>presence</em> is nearly invariant: almost every domain that occurs at all occurs everywhere. What differs is copy number, and even that is modest. The most variable class here is <strong>$(most-variable-class)</strong> at a coefficient of variation of $(most-variable-cv); the least is <strong>$(least-variable-class)</strong> at $(least-variable-cv).</p>
+
+    <figure class="mgdb-figure">
+      <h3>Mean copy number against variability</h3>
+      <p>Each of the $(class-count) classes plotted by its mean gene count across maize genomes and its coefficient of variation. Marker shape and colour both encode the ontology group.</p>
+      <div class="mgdb-chart" id="pd-chart-variance" role="img" aria-label="Scatter plot of mean gene count against coefficient of variation for each functional class across maize genomes">
+        <span class="mgdb-chart-fallback">Loading chart&hellip;</span>
+      </div>
+      <figcaption>Four regimes separate out: stable and abundant in the lower right, stable and rare in the lower left, and the variable classes rising above them. The complete values are in the table below.</figcaption>
+    </figure>
+
+    <p class="mgdb-note mgdb-spaced"><strong>Read the top of this ranking carefully.</strong> Helicase leads it for a reason that is not biological. Three HiLo genomes &#40;PDJ, TAB, PT&#41; carry roughly twice the helicase-gene fraction of every other maize line, 4.0 to 4.7% against 2.0%, at normal total gene counts. That is annotation provenance, not copy-number biology.</p>
+
+    <div class="mgdb-search mgdb-spaced">
+      <div class="mgdb-search-row">
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="pd-variance-query">Search classes</label>
+          <p class="mgdb-hint" id="pd-variance-query-hint">Enter a class or an ontology group. Example: <code>immunity</code> or <code>TF</code></p>
+          <input class="mgdb-input" id="pd-variance-query" type="search" aria-describedby="pd-variance-query-hint" autocomplete="off" placeholder="immunity" />
+        </div>
+        <button class="mgdb-button mgdb-button-quiet" id="pd-variance-reset" type="button" hidden>Reset</button>
+      </div>
+      <div class="mgdb-filters">
+        <span aria-hidden="true" class="mgdb-small mgdb-muted">Group:</span>
+        <button class="mgdb-chip" type="button" data-filter="all" aria-pressed="true">All</button>
+        <button class="mgdb-chip" type="button" data-filter="Immunity" aria-pressed="false">Immunity</button>
+        <button class="mgdb-chip" type="button" data-filter="Transcription factor" aria-pressed="false">Transcription factor</button>
+        <button class="mgdb-chip" type="button" data-filter="Hormone signaling" aria-pressed="false">Hormone signaling</button>
+        <button class="mgdb-chip" type="button" data-filter="Metabolism" aria-pressed="false">Metabolism</button>
+        <button class="mgdb-chip" type="button" data-filter="Transport" aria-pressed="false">Transport</button>
+        <button class="mgdb-chip" type="button" data-filter="Protein fate" aria-pressed="false">Protein fate</button>
+        <button class="mgdb-chip" type="button" data-filter="DNA/chromosome" aria-pressed="false">DNA and chromosome</button>
+        <button class="mgdb-chip" type="button" data-filter="RNA" aria-pressed="false">RNA</button>
+        <span class="mgdb-result-count" id="pd-variance-count" aria-live="polite"></span>
+      </div>
+    </div>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table" id="pd-variance-table" data-sortable>
+        <caption>
+          Copy-number variation by functional class, curated annotation arm
+          <span class="mgdb-muted">Statistics are computed across the maize genomes only. Inclusive measure: a gene may appear in several classes.</span>
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col" data-sort="text"><button type="button">Class</button></th>
+            <th scope="col" data-sort="text"><button type="button">Group</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">CV</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Mean</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Min</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Max</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Max / min</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Mean, all genomes</button></th>
+          </tr>
+        </thead>
+        <tbody>$(variance-rows)</tbody>
+      </table>
+    </div>
+
+    <div class="mgdb-empty mgdb-spaced" id="pd-variance-empty" hidden>
+      <h3>No classes match that search</h3>
+      <p>Clear the search and filters to see all $(class-count) classes.</p>
+      <button class="mgdb-button mgdb-button-secondary" id="pd-variance-empty-reset" type="button">Clear search and filters</button>
+    </div>
+
+    <figure class="mgdb-figure mgdb-spaced">
+      <h3>The same classes, measured twice</h3>
+      <p>Mean gene count per class under the curated annotation against the mean under Helixer, for the genomes present in both arms.</p>
+      <div class="mgdb-chart" id="pd-chart-arms" role="img" aria-label="Scatter plot comparing mean gene count per class under curated annotation against Helixer annotation, with a line of equality">
+        <span class="mgdb-chart-fallback">Loading chart&hellip;</span>
+      </div>
+      <figcaption>Points above the line of equality are classes where the <i>ab initio</i> caller finds more genes than the curated annotation. The distance from that line is the size of the annotation-method effect, and it is why an arm is always stated with a count.</figcaption>
+    </figure>
+  </section>
+
+  <section id="pd-matrix" aria-labelledby="pd-matrix-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Panel 2 <span class="pd-measure-badge pd-measure-inclusive">Inclusive</span></span>
+        <h2 id="pd-matrix-title">Genome &times; class matrix</h2>
+      </div>
+      <p>Every genome as a row, every functional class as a column, cells carrying the gene count. This is the core object of the analysis; everything else on the page is a view of it.</p>
+    </div>
+
+    <p class="mgdb-section-intro">Rows are ordered by taxon rather than clustered. Clustering the maize genomes on their domain profile produces a dendrogram that looks meaningful and mostly is not &mdash; the first principal component of log-count space carries under 10% of the variance &mdash; so the ordering states only what the data supports. Cell shading is the count relative to the median for that class <em>within the same row group</em>, and is a reading aid: the count itself is in every cell.</p>
+
+    <div class="mgdb-search">
+      <div class="mgdb-search-row">
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="pd-matrix-query">Search genomes</label>
+          <p class="mgdb-hint" id="pd-matrix-query-hint">Enter an assembly name, a species, or a collection. Example: <code>B73</code>, <code>teosinte</code>, or <code>HiLo</code></p>
+          <input class="mgdb-input" id="pd-matrix-query" type="search" aria-describedby="pd-matrix-query-hint" autocomplete="off" placeholder="B73" />
+        </div>
+        <button class="mgdb-button mgdb-button-quiet" id="pd-matrix-reset" type="button" hidden>Reset</button>
+      </div>
+      <div class="mgdb-filters">
+        <span aria-hidden="true" class="mgdb-small mgdb-muted">Annotation:</span>
+        <button class="mgdb-chip" type="button" data-filter="all" aria-pressed="true">All rows</button>
+        <button class="mgdb-chip" type="button" data-filter="reference" aria-pressed="false">Curated &#40;$(matrix-reference-count)&#41;</button>
+        <button class="mgdb-chip" type="button" data-filter="helixer" aria-pressed="false">Helixer &#40;$(matrix-helixer-count)&#41;</button>
+        <button class="mgdb-chip" type="button" data-filter="outgroup" aria-pressed="false">Outgroups &#40;$(matrix-outgroup-count)&#41;</button>
+        <span class="mgdb-result-count" id="pd-matrix-count" aria-live="polite"></span>
+      </div>
+    </div>
+
+    <div class="pd-matrix-legend">
+      <span class="mgdb-small mgdb-muted">Relative to the class median in the same row group:</span>
+      <span aria-hidden="true"><span class="pd-swatch pd-heatm3"></span><span class="pd-swatch pd-heatm2"></span><span class="pd-swatch pd-heatm1"></span><span class="pd-swatch pd-heatp0"></span><span class="pd-swatch pd-heatp1"></span><span class="pd-swatch pd-heatp2"></span><span class="pd-swatch pd-heatp3"></span></span>
+      <span class="mgdb-small mgdb-muted">much lower to much higher</span>
+    </div>
+    <p class="mgdb-small mgdb-muted pd-matrix-clip">Each row group is scaled by its own spread, so that the most deviant tenth of its cells saturate: a fold change of $(matrix-clip). Within maize the ratios are tight; against the outgroups they are an order of magnitude wider, and one scale for both would leave one of them blank.</p>
+
+    <div class="mgdb-table-scroll pd-matrix-scroll">
+      <table class="mgdb-table pd-matrix" id="pd-matrix-table">
+        <caption>
+          Gene counts per functional class, all genomes and both annotation arms
+          <span class="mgdb-muted">Inclusive measure across $(matrix-column-count) classes. Curated and Helixer rows are separate measurements of the same genomes and must not be pooled.</span>
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col" class="pd-matrix-corner">Genome</th>
+            $(matrix-head)
+          </tr>
+        </thead>
+        $(matrix-body)
+      </table>
+    </div>
+
+    <div class="mgdb-empty mgdb-spaced" id="pd-matrix-empty" hidden>
+      <h3>No genomes match that search</h3>
+      <p>Check the spelling of the assembly name, or clear the filters.</p>
+      <button class="mgdb-button mgdb-button-secondary" id="pd-matrix-empty-reset" type="button">Clear search and filters</button>
+    </div>
+
+    <p class="mgdb-note mgdb-note-info mgdb-spaced"><strong>A stable cell is not an answer.</strong> Domain counts for the immunity classes are among the least variable in this matrix, even though individual NLR genes are famously presence/absence variable between maize lines. The turnover happens below the resolution of a count: the number of NB-ARC genes barely moves while <em>which</em> NLRs are present changes substantially. The gene-level lists in the downloads are where that variation is visible.</p>
+  </section>
+
+  <section id="pd-immunity" aria-labelledby="pd-immunity-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Panel 3 <span class="pd-measure-badge pd-measure-exclusive">Exclusive</span></span>
+        <h2 id="pd-immunity-title">Immunity classes in detail</h2>
+      </div>
+      <p>Every immunity gene assigned to exactly one class by its domain architecture, so these counts sum. They are strictly lower than the inclusive classes in the matrix above.</p>
+    </div>
+
+    <figure class="mgdb-figure">
+      <h3>Immunity gene counts by genome</h3>
+      <p>Exclusive class assignments across the curated annotation arm, ordered by taxon.</p>
+      <div class="mgdb-chart pd-chart-tall" id="pd-chart-immunity" role="img" aria-label="Stacked bar chart of exclusive immunity class gene counts for every genome in the curated annotation arm">
+        <span class="mgdb-chart-fallback">Loading chart&hellip;</span>
+      </div>
+      <figcaption>Receptor kinases and receptor-like proteins dominate the immunity repertoire in every genome; the NLR fraction is smaller and more even than its reputation suggests. The values are in the table below.</figcaption>
+    </figure>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table" data-sortable>
+        <caption>
+          Exclusive immunity class counts, curated annotation arm
+          <span class="mgdb-muted">One row per genome, one class per gene. These counts sum to the total column.</span>
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col" data-sort="text"><button type="button">Genome</button></th>
+            <th scope="col" data-sort="text"><button type="button">Taxon</button></th>
+            $(immunity-head)
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Total</button></th>
+          </tr>
+        </thead>
+        <tbody>$(immunity-rows)</tbody>
+      </table>
+    </div>
+
+    <p class="mgdb-note mgdb-spaced"><strong>Lower confidence on the receptor split.</strong> SignalP, TMHMM and Phobius are license-restricted and absent from this InterProScan build, so the receptor kinase against receptor-like protein call rests on domain architecture with no membrane-topology evidence behind it. The NLR and PR classes are unaffected.</p>
+
+    <figure class="mgdb-figure mgdb-spaced">
+      <h3>NLR architecture subclasses</h3>
+      <p>What an NB-ARC gene carries alongside its nucleotide-binding domain decides its subclass.</p>
+      <div class="mgdb-chart pd-chart-tall" id="pd-chart-nlr" role="img" aria-label="Stacked bar chart of NLR architecture subclass composition across genomes">
+        <span class="mgdb-chart-fallback">Loading chart&hellip;</span>
+      </div>
+      <figcaption>B73 resolves to $(b73-nlr-profile) &mdash; the coiled-coil-dominated, TIR-depleted profile expected of a grass. TIR-NLRs are essentially a dicot feature and are near absent here.</figcaption>
+    </figure>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table" data-sortable>
+        <caption>
+          NLR architecture subclasses, curated annotation arm
+          <span class="mgdb-muted">CNL adds a coiled-coil, TNL a TIR domain, RNL an RPW8 domain. NL carries an LRR with no recognized N-terminal domain; N only is NB-ARC alone.</span>
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col" data-sort="text"><button type="button">Genome</button></th>
+            <th scope="col" data-sort="text"><button type="button">Taxon</button></th>
+            $(nlr-head)
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Total</button></th>
+          </tr>
+        </thead>
+        <tbody>$(nlr-rows)</tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="pd-species" aria-labelledby="pd-species-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Panel 4 <span class="pd-measure-badge pd-measure-inclusive">Inclusive</span></span>
+        <h2 id="pd-species-title">Across species, with ploidy stated</h2>
+      </div>
+      <p>Presence and absence carry almost no signal within maize. Against the outgroups they finally do &mdash; provided the comparison handles ploidy honestly.</p>
+    </div>
+
+    <p class="mgdb-section-intro">Wheat is allohexaploid, so its raw counts are roughly three genomes' worth. Both its raw value and its per-monoploid value are shown, never one silently substituted for the other: a normalized number quoted alone cannot be checked by anyone who downloads the table underneath it. Soybean is <em>not</em> divided. Its two ancient whole-genome duplications left real present-day gene copies rather than an artifact of assembly ploidy, and dividing them would understate its gene content.</p>
+
+    <figure class="mgdb-figure">
+      <h3>Immunity classes across the comparison set</h3>
+      <p>Andropogoneae medians beside the six outgroup species, with wheat plotted raw and per monoploid genome.</p>
+      <div class="mgdb-chart pd-chart-tall" id="pd-chart-species" role="img" aria-label="Grouped bar chart of inclusive immunity class gene counts for Andropogoneae taxon medians and six outgroup species, with wheat shown both raw and per monoploid genome">
+        <span class="mgdb-chart-fallback">Loading chart&hellip;</span>
+      </div>
+      <figcaption>Divided by three, wheat falls in line with barley and the other cereals. Undivided, it is an outlier in every panel it appears in, which is a fact about its ploidy and not about its immune repertoire.</figcaption>
+    </figure>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table" data-sortable>
+        <caption>
+          Immunity class gene counts across the comparison set
+          <span class="mgdb-muted">Inclusive measure, curated annotation. Andropogoneae rows are medians within a taxon; outgroup rows are single species.</span>
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col" data-sort="text"><button type="button">Genome or taxon</button></th>
+            <th scope="col" data-sort="text"><button type="button">Set</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Monoploid divisor</button></th>
+            $(species-head)
+          </tr>
+        </thead>
+        <tbody>$(species-rows)</tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="pd-classes" aria-labelledby="pd-classes-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Panel 5</span>
+        <h2 id="pd-classes-title">What each class is made of</h2>
+      </div>
+      <p>A class is a curated set of InterPro accessions, not a keyword search. The full definition, including every include and exclude pattern, is in the ontology file in the downloads.</p>
+    </div>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table" data-sortable>
+        <caption>
+          The $(class-count) functional classes and their defining InterPro accessions
+          <span class="mgdb-muted">$(ipr-count) distinct accessions in total. Accession links open the InterPro entry at EBI.</span>
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col" data-sort="text"><button type="button">Class</button></th>
+            <th scope="col" data-sort="text"><button type="button">Group</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Accessions</button></th>
+            <th scope="col">InterPro accessions</th>
+          </tr>
+        </thead>
+        <tbody>$(definition-rows)</tbody>
+      </table>
+    </div>
+
+    <div class="mgdb-panel mgdb-spaced">
+      <h3>Curation notes</h3>
+      <p class="mgdb-small mgdb-muted">Decisions taken while building the ontology, kept with it as an audit trail.</p>
+      <ul class="pd-curation-notes">$(curation-notes)</ul>
+    </div>
+  </section>
+
+  <section id="pd-figures" aria-labelledby="pd-figures-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Figures</span>
+        <h2 id="pd-figures-title">Publication figures</h2>
+      </div>
+      <p>Static, 300 dpi versions of the three headline figures, generated by the pipeline rather than by this page.</p>
+    </div>
+    <div class="pd-figure-grid">$(figures)</div>
+  </section>
+
+  <section id="pd-methods" aria-labelledby="pd-methods-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Provenance</span>
+        <h2 id="pd-methods-title">Methods and caveats</h2>
+      </div>
+      <p>What was run, on what, and what the results do not support.</p>
+    </div>
+
+    <div class="mgdb-prose-layout">
+      <div class="mgdb-prose">
+        <h3 class="mgdb-leaf-heading">How the data was produced</h3>
+        <p>48 REFERENCE-grade assemblies were taken from three MaizeGDB collections &mdash; 27 NAM founders, 7 HiLo, 14 Pan-Andropogoneae &mdash; and checksum-verified against the published manifests. Two of the Pan-Andropogoneae entries are alternate haplotype assemblies of the same individuals as their counterparts rather than subgenomes; they were processed but held out of the primary matrix so alleles are not double-counted, leaving $(andropogoneae-count) distinct genomes. Six outgroup species came from Ensembl Plants release $(ensembl-release).</p>
+        <p>Curated proteomes were reduced to the longest protein per gene, collapsing an isoform ratio of 1.78 to one, with nothing dropped. The Helixer arm used Helixer $(helixer-version) with the land_plant_v0.3_a_0080 model on GPU, which emits one transcript per gene, so no isoform selection was needed. Both arms are carried through every step and never pooled.</p>
+        <p>Domain annotation was InterProScan $(ips-version) with $(ips-analyses) analyses &mdash; Pfam 38.2, PANTHER 19.0, CDD 3.21, Gene3D, SUPERFAMILY, SMART, ProSite, PRINTS, NCBIfam, PIRSF and PIRSR, Hamap, SFLD, AntiFam, Coils and MobiDBLite &mdash; run as three independent campaigns totalling $(shard-count) shards and roughly $(core-hours) core-hours, with no shard failures. Counts are gene counts throughout: a gene carrying three tandem LRR domains contributes one, not three.</p>
+
+        <h3 class="mgdb-leaf-heading">Why the scan was re-run</h3>
+        <p>MaizeGDB already publishes a per-genome domain file for many of these assemblies. Those files contain Pfam hits only, with signature dates from mid-2020. They are not comparable with these results and the two must not be pooled. The concordance table in the downloads records how the two relate.</p>
+
+        <h3 class="mgdb-leaf-heading">What these results do not support</h3>
+        <ul>
+          <li><strong>Membrane topology.</strong> SignalP, TMHMM and Phobius are license-restricted and absent from this build, so receptor kinase against receptor-like protein calls rest on domain architecture alone. Treat that split as lower confidence.</li>
+          <li><strong>Helicase as biology.</strong> Three HiLo genomes carry about twice the helicase-gene fraction of every other maize line at normal total gene counts. That is annotation provenance, and it is why Helicase tops the variance ranking.</li>
+          <li><strong>Cross-genome gene set operations.</strong> Gene identifiers are genome-specific and are not orthology-mapped, so intersecting gene lists between two genomes returns nothing. Comparison has to go through counts, or through an orthogroup table that this analysis does not include.</li>
+          <li><strong>Organellar and transposon-derived domains.</strong> They are excluded from the class definitions but retained in the per-domain status files with a technical flag, because they track plastid and mitochondrial insertion into nuclear assemblies and transposable-element annotation depth rather than gene copy-number variation.</li>
+        </ul>
+      </div>
+
+      <aside class="mgdb-aside-card">
+        <h3>At a glance</h3>
+        <dl class="pd-provenance">
+          <div><dt>Gene models, <i>ab initio</i></dt><dd>Helixer $(helixer-version), land_plant_v0.3_a_0080</dd></div>
+          <div><dt>Domain annotation</dt><dd>InterProScan $(ips-version), $(ips-analyses) analyses</dd></div>
+          <div><dt>Counting unit</dt><dd>Longest protein per gene, curated arm; one transcript per gene, Helixer arm</dd></div>
+          <div><dt>Outgroups</dt><dd>Ensembl Plants release $(ensembl-release)</dd></div>
+          <div><dt>Functional ontology</dt><dd>maize_functional_classes v1.1</dd></div>
+          <div><dt>Immunity rule set</dt><dd>maize_immunity_classes v1.0</dd></div>
+          <div><dt>Data generated</dt><dd>$(generated-long)</dd></div>
+        </dl>
+      </aside>
+    </div>
+  </section>
+
+  <section id="pd-downloads" aria-labelledby="pd-downloads-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Data</span>
+        <h2 id="pd-downloads-title">Downloads</h2>
+      </div>
+      <p>Every number on this page traces to one of these files. Compressed files are gzip; the count tables are plain text and open in a browser.</p>
+    </div>
+
+    <p class="mgdb-note"><strong>Before writing code against these files</strong>, read the data semantics note in the last group. Three distinctions &mdash; inclusive against exclusive, curated against Helixer, and the ploidy divisor &mdash; produce plausible-looking wrong numbers if they are collapsed. Each of them caused a real error during development.</p>
+
+    $(downloads)
+  </section>
+
+  <section class="mgdb-resource-panel" aria-labelledby="pd-resources-title">
+    <div>
+      <span class="mgdb-eyebrow">Related</span>
+      <h2 id="pd-resources-title">Where to go next</h2>
+      <p>This analysis sits on top of assemblies and annotations that MaizeGDB serves in their own right.</p>
+    </div>
+    <div class="mgdb-resource-list">
+      <a href="/projects"><strong>All analysis projects</strong><span>Other self-contained analyses</span></a>
+      <a href="/genome"><strong>Genome Center</strong><span>The assemblies scanned here</span></a>
+      <a href="/data_center/protein_structure"><strong>Protein structures</strong><span>Predicted structures for maize proteins</span></a>
+      <a href="https\://www.ebi.ac.uk/interpro/" target="_blank" rel="noopener"><strong>InterPro at EBI</strong><span>The source of every accession used<span class="mgdb-visually-hidden"> &#40;opens ebi.ac.uk&#41;</span></span></a>
+    </div>
+  </section>
+
+</main>
+)

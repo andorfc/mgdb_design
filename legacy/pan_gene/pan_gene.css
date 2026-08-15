@@ -1,0 +1,289 @@
+/* Generic tab and collapsible div styles */
+.section_tab {
+  font-size:               14pt;
+  font-weight:             bold;
+  cursor:                  pointer;
+  padding:                 3px;
+  margin-right:            1px;
+  border-top-left-radius:  10px 5px;
+  border-top-right-radius: 10px 5px;
+}
+.section_tab button {
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 2px 10px 6px;
+  padding-right: 10px;
+  margin-right: 1px;
+  transition: 0.3s;
+  font-size: 14pt;
+  white-space: nowrap;
+  border-top-left-radius: 10px 5px;
+  border-top-right-radius: 10px 5px;
+}
+.section_tab button:hover {
+  background-color: green;
+}
+.section_tab button.active {
+  background-color: #81AD34;
+}
+.section_tab button.inactive {
+  background-color: #BEDAA7;
+  opacity:          0.6;
+  filter:           alpha(opacity=60);
+}
+.section_tabcontent {
+  display: none;
+  margin: 0px;
+  padding: 5px;
+  padding-top: 15px;
+  border: none;
+  width: 99%;
+  height: 100%;
+}
+
+.collapsible-content {
+  display: none;
+  overflow: hidden;
+  transition: max-height .25s ease-in-out;
+  width: 98%;
+  background: #E1FCFD;
+  border-bottom-left-radius: 7px;
+  border-bottom-right-radius: 7px;
+  padding: .5rem;
+}
+
+
+/* Inner section collapsible bits */
+
+/* Use checkbox to track tab state, but hide it */
+.inner_toggle_checkbox {
+  display: none;
+}
+/* Square off bottom of bar */
+.inner_toggle_checkbox:checked + .inner_lbl-toggle {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+/* toggle label */
+.inner_lbl-toggle {
+  display: block;
+  font-weight: bold;
+  font-family: monospace;
+  font-size: 1rem;
+  text-transform: uppercase;
+  text-align: left;
+  padding: .5rem;
+  color: #E1FCFD;
+  background: #5E9799; 
+  width: 98%;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: all 0.25s ease-out;
+}
+.inner_lbl-toggle-alert {
+  display: block;
+  font-weight: bold;
+  font-family: monospace;
+  font-size: 1rem;
+  text-transform: uppercase;
+  text-align: left;
+  padding: .5rem;
+  color: #E1FCFD;
+  background: #D34141; 
+  width: 98%;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: all 0.25s ease-out;
+}
+.inner_lbl-toggle:hover {
+  background: #3D7173;
+}
+/* make close/open triangle */
+.inner_lbl-toggle::before, .inner_lbl-toggle-alert::before {
+  content: ' ';
+  display: inline-block;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 5px solid currentColor;
+  vertical-align: middle;
+  margin-right: .7rem;
+  transform: translateY(-2px);
+  transition: transform .2s ease-out;
+}
+/* Rotate triangle when checked */
+.inner_toggle_checkbox:checked + .inner_lbl-toggle::before {
+  transform: rotate(90deg) translateX(-3px);
+}
+.inner_toggle_checkbox:checked + .inner_lbl-toggle-alert::before {
+  transform: rotate(90deg) translateX(-3px);
+}
+
+.simple_inner_lbl-toggle {
+  display: block;
+  font-weight: bold;
+  font-family: monospace;
+  font-size: .8rem;
+  text-align: left;
+  padding: .4rem;
+  color: #234243;
+  background: #bcdbdc; 
+  width: 98%;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: all 0.25s ease-out;
+}
+.simple_inner_lbl-toggle:hover {
+  background: #8ac0c1;
+}
+/* make close/open triangle */
+.simple_inner_lbl-toggle::before {
+  content: ' ';
+  display: inline-block;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 5px solid currentColor;
+  vertical-align: middle;
+  margin-right: .7rem;
+  transform: translateY(-2px);
+  transition: transform .2s ease-out;
+}
+
+
+/* specialized for GCV */
+.gcv_iframe {
+  width:1060px;
+  height: 700px;
+}
+
+/* Some table improvements */
+.pan_gene-table th {
+  text-align: left;
+  font-weight: bold;
+}
+.pan_gene-table td {
+  text-align: left;
+  vertical-align: top;
+  padding-right: 20px;
+}
+
+
+/* Definition lists */
+dt.pan_gene_definition {
+  font-weight: bold;
+}
+dd.pan_gene_definition {
+  margin-left: 20px;
+}
+
+
+/* Modified from standard data center page sections */
+.section_title {
+  font-family: Verdana,Arial,sans-serif; 
+  font-size: 120%; 
+  font-weight: bold; 
+  margin-bottom: 6px;
+}
+
+#pan_gene_info_background {
+  background-color:#FEF9EB; /*#F5EBFE;*/
+  margin-left:10px;
+  margin-top:5px;
+  width:850px;
+  padding: 5px;
+  border-top: 5px solid #FEF9EB;
+  border-bottom: 5px solid #FEF9EB;
+  border-right: 5px solid #FEF9EB;
+  border-left: 5px solid #FEF9EB;
+  border-top-right-radius: 1em;
+  border-top-left-radius: 1em;
+  border-bottom-right-radius: 1em;
+  border-bottom-left-radius: 1em;
+  -moz-border-radius-topright:1em;
+  -moz-border-radius-topleft:1em;
+  -moz-border-radius-bottomright:1em;
+  -moz-border-radius-bottomleft:1em;
+  -webkit-border-top-right-radius:1em;
+  -webkit-border-top-left-radius:1em;
+  -webkit-border-bottom-right-radius:1em;
+  -webkit-border-bottom-left-radius:1em;
+}
+
+#pan_gene_light_green_background {
+  background-color:#E6EDDB;
+  margin-left:10px;
+  margin-top:5px;
+  width:850px;
+  padding: 5px;
+  border-top: 5px solid #E8E8E8;
+  border-bottom: 5px solid #E8E8E8;
+  border-right: 5px solid #E8E8E8;
+  border-left: 5px solid #E8E8E8;
+  border-top-right-radius: 1em;
+  border-top-left-radius: 1em;
+  border-bottom-right-radius: 1em;
+  border-bottom-left-radius: 1em;
+  -moz-border-radius-topright:1em;
+  -moz-border-radius-topleft:1em;
+  -moz-border-radius-bottomright:1em;
+  -moz-border-radius-bottomleft:1em;
+  -webkit-border-top-right-radius:1em;
+  -webkit-border-top-left-radius:1em;
+  -webkit-border-bottom-right-radius:1em;
+  -webkit-border-bottom-left-radius:1em;
+}
+#pan_gene_gray_background {
+  background-color:#E8E8E8;
+  margin-left:10px;
+  margin-top:5px;
+  width:850px;
+  padding: 5px;
+  border-top: 5px solid #E8E8E8;
+  border-bottom: 5px solid #E8E8E8;
+  border-right: 5px solid #E8E8E8;
+  border-left: 5px solid #E8E8E8;
+  border-top-right-radius: 1em;
+  border-top-left-radius: 1em;
+  border-bottom-right-radius: 1em;
+  border-bottom-left-radius: 1em;
+  -moz-border-radius-topright:1em;
+  -moz-border-radius-topleft:1em;
+  -moz-border-radius-bottomright:1em;
+  -moz-border-radius-bottomleft:1em;
+  -webkit-border-top-right-radius:1em;
+  -webkit-border-top-left-radius:1em;
+  -webkit-border-bottom-right-radius:1em;
+  -webkit-border-bottom-left-radius:1em;
+}
+#pan_gene_light_blue_background {
+  background-color:#d2e1f0;
+  padding: 3px;
+  margin-left:8px;
+  margin-right:5px;
+  width:850px;
+  border-top: 5px solid #d2e1f0;
+  border-bottom: 5px solid #d2e1f0;
+  border-right: 5px solid #d2e1f0;
+  border-left: 5px solid #d2e1f0;
+  border-top-right-radius: 1em;
+  border-top-left-radius: 1em;
+  border-bottom-right-radius: 1em;
+  border-bottom-left-radius: 1em;
+  -moz-border-radius-topright:1em;
+  -moz-border-radius-topleft:1em;
+  -moz-border-radius-bottomright:1em;
+  -moz-border-radius-bottomleft:1em;
+  -webkit-border-top-right-radius:1em;
+  -webkit-border-top-left-radius:1em;
+  -webkit-border-bottom-right-radius:1em;
+  -webkit-border-bottom-left-radius:1em;
+}
+
+/* For alternating table row colors */
+.pan_gene_pale_blue {
+  background-color: #d2e1f0;
+}
+.pan_gene_pale_gray {
+  background-color: #f4f4f4;
+}

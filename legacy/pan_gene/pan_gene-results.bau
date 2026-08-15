@@ -1,0 +1,232 @@
+$$SYNTAX-LEVEL 2
+*(pan_gene-results
+<!-- something wants this, but can't figure out who or where!
+$(div)
+-->
+
+  @(no-term {display: off}
+    <br><b>You did not provide a search term.</b><br><br>
+  )
+  
+  @(no-filters {display: off}
+    <br><b>You did not select any search filters.</b><br><br>
+  )
+  
+  @(no-results {display: off}
+    <br>
+    <table cellpadding=8 cellspacing=3 width="100%">
+      <tr>
+        <td width="100%">
+          <p><b>Pan-Gene Search Results - No records found</b></p>
+          <br>
+          <p>There are no pan-gene records matching the term <b>$(term)</b>. 
+          </p>
+        </td>
+      </tr>
+    </table>
+  )
+  @(no-results_adv {display: off}
+    <br>
+    <table cellpadding=8 cellspacing=3 width="100%">
+      <tr>
+        <td width="100%">
+          <p><b>Pan-Gene Search Results - No records found</b></p>
+          <br>
+        </td>
+      </tr>
+    </table>
+  )
+  
+  @(obsolete-annotation {display: off}
+    <br>
+    <table cellpadding=8 cellspacing=3 width="100%">
+      <tr>
+        <td width="100%">
+          <p>
+            This gene model is obsolete. Look in the 
+            <a href="https://download.maizegdb.org">download directory</a>
+            for your assembly of interest to see if there is a cross-reference
+            file linking preliminary and official gene model ids.
+          </p>
+        </td>
+      </tr>
+    </table>
+  )
+  
+  @(singleton {display: off}
+    <br>
+    <b>Not found.</b>
+    <br><br>
+    <b>$(term)</b> doesn't exist, or was not placed in a pan-gene. If you believe $(term)
+    is a valid gene model or gene locus, you may be able to find information in the
+    <a href="/gene_center/gene">Gene/Gene Model Center</a>.
+    <br><br>
+  )
+  
+  @(multi-results {display: off}
+    <table cellpadding=8 cellspacing=3 width="100%">
+      <tr>
+        <td width="100%">
+          <p style="margin-bottom: 8px;">
+            <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+              Pan-Gene Search Results
+            </span>
+          </p>
+
+          @(results {display: off}
+            There are <b>$(count)</b> pan-genes matching the term <b>$(raw_term)</b>.
+            <br>
+          )
+          @(adv_results {display: off}
+            There are <b>$(count)</b> pan-genes matching your search criteria:<br>
+            <div style="margin-left:20px">$(criteria)</div>
+          )
+          
+          @(pan_gene-simple_download {display: off}
+            <br>
+            <a href="javascript:doDownload('/search/pan_gene/pan_gene_results.php', 
+               '$(url_term)', 'pan_genes.txt'\)">Download the full list of search results</a>
+            <br>
+            <div name="download_status_div" id="download_status_div" style="margin-left:20px"></div>
+            <iframe name="download_iframe" id="download_iframe" width=0 height=0 style="border:none"></iframe>
+          )
+          @(pan_gene-adv_download {display: off}
+            <br>
+            <a href="#!" 
+               onclick="doAdvPanGeneDownload('/search/pan_gene/pan_gene_adv_results.php'\)">Download 
+            the full list of search results to a file</a>
+            <br>
+            <div name="download_status_div" id="download_status_div" style="margin-left:20px"></div>
+            <iframe name="download_iframe" id="download_iframe" width=0 height=0 style="border:none"></iframe>
+            <br>
+          )
+          
+          $(one-page)     
+             
+        </td>
+      <tr>
+    </table>
+  )
+  
+  @(multi-results-paged {display: off}
+    <table cellpadding=8 cellspacing=3 width="100%">
+      <tr>
+        <td width="100%">
+          <p style="margin-bottom: 8px;">
+            <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+              Pan-Gene Search Results
+            </span>
+          </p>
+          
+          @(multi_results {display: off}
+            There are <b>$(count)</b> pan-genes matching the term <b>$(raw_term)</b>.
+            <br>
+          )
+          @(multi_adv_results {display: off}
+            There are <b>$(count)</b> pan-genes matching your search criteria:<br>
+            <div style="margin-left:20px">$(criteria)</div>
+          )
+          
+          @(results_limited_simple {display: off}
+            There were a large number of pan-genes matching the term <b>$(raw_term)</b> so  
+            <span style="color:red;">only the first <b>$(limit)</b> are shown.</span>
+            <br>
+          )
+          @(results_limited_adv {display: off}
+            There were a large number of pan-genes matching your criteria so  
+            <span style="color:red;">only the first <b>$(limit)</b> are shown.</span>
+            <br>
+          )
+          
+          @(locus-note {display: off}
+            The same locus may be associated with multiple pan-genes, and a pan-gene
+            may be associated with multiple loci. This can be caused by multiple
+            factors, including incorrectly inferring an association based on similarity
+            to a gene model that has been shown to correspond to a locus via experiment,
+            gene arrays.
+          )
+          
+          @(pan_gene-simple_paged_download {display: off}
+            <br>
+            <a href="javascript:doDownload('/search/pan_gene/pan_gene_results.php', 
+               '$(url_term)', 'pan_genes.txt'\)">Download the full list of search results</a>
+            <br>
+            <div name="download_status_div" id="download_status_div"></div>
+            <iframe name="download_iframe" id="download_iframe" width=0 height=0 style="border:none"></iframe>
+          )
+          @(pan_gene-adv_paged_download {display: off}
+            <br>
+            <a href="#!" 
+               onclick="doAdvPanGeneDownload('/search/pan_gene/pan_gene_adv_results.php'\)">Download 
+            the full list of search results</a> (May take several minutes\)
+            <br>
+            <a href="javascript:downloadPanGeneExemplars('/search/pan_gene/pan_gene_adv_results.php'\)">Download 
+            exemplars only</a>
+            <br>
+            <div name="download_status_div" id="download_status_div"></div>
+            <iframe name="download_iframe" id="download_iframe" width=0 height=0 style="border:none"></iframe>
+            <br>
+          )
+          
+          <table cellspacing=5 cellpadding=5>
+            <tr>
+              <td style="vertical-align:bottom; width:32px; height: 36.4px;">
+                <a href="javascript:prevPage(\)" name="prevpage" id="prevpage">
+                  <img style='border:0px' src='/images/corn-icon-prev.png'>
+                </a>
+              </td>
+              <td>
+                <form action="javascript:goToPage(document.getElementById('pagenum'\).value, 'pan_gene_results_page', $(pagecount)\)" 
+                      name='pagenumform' id='pagenumform'>
+                  Page 
+                  <input type='text' size=2 maxlength=3 name='pagenum' 
+                         id='pagenum' value='1'>
+                  of $(pagecount)
+                </form>
+              </td>
+              <td style="vertical-align:top;">
+                <a href="javascript:nextPage($(pagecount)\)" name="nextpage" id="nextpage">
+                  <img style='border:0px' src='/images/corn-icon-next.png'>
+                </a>
+              </td> 
+            </tr>
+          </table>
+
+          @(pages
+            <!-- Need these for bauplan due to legacy paging, but don't display: 
+                 $(startnum)$(endnum)$(total)$(prev-page)$(next-page)$(page-list)-->
+            <div class="resultdiv" name="pan_gene_results_page$(pagenum)" 
+                 id="pan_gene_results_page$(pagenum)" style="display:$(displayval)">
+              <table width="100%" cellpadding="7" cellspacing="7">
+                <tr>
+                  <td>
+                    <div name="pan_gene_results_list$(pagenum)" 
+                         id="pan_gene_results_list$(pagenum)">
+                      $(multi-page)
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          )
+
+          <script language="javascript">
+            @(simple-search-get_next_page {display: off}
+              getSearchData('pan_gene', 'pan_gene_results_list2', '$(raw_term)', 2\);
+            )
+            @(advanced-search-get_next_page {display: off}
+              panGeneAdvSearch('pan_gene_results_list2', 2\);
+            )
+          </script>
+
+        </td>
+      <tr>
+    </table>
+  )
+  
+  @(open_shadowbox {display: off}
+      <script language="javascript">
+        open_shadowbox('pan_gene', '$(term)', 'html'\);
+      </script>
+  )
+)

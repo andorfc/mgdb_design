@@ -1,0 +1,357 @@
+/* ==========================================================================
+   Pan-Gene Center search — page-specific styles
+   --------------------------------------------------------------------------
+   Everything is scoped under .mgdb-pan-gene-page and composed from the tokens
+   in mgdb-modern.css. No new colours, type sizes, or spacing values are
+   introduced here.
+   ========================================================================== */
+
+/* Section tabs. Sticky so the section list stays reachable on a long page;
+   they are ordinary in-page links, so they work with script disabled. */
+.mgdb-pan-gene-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  padding: var(--mgdb-space-2) 0;
+  background: var(--mgdb-surface);
+}
+
+.mgdb-pan-gene-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.mgdb-pan-gene-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
+
+/* The current section is marked by weight and a gold bar as well as colour. */
+.mgdb-pan-gene-page .mgdb-section-tabs a.is-current {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #fff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+/* Scroll-margin so an anchored section is not hidden behind the sticky tabs. */
+.mgdb-pan-gene-page > section { scroll-margin-top: 4.5rem; }
+
+/* --------------------------------------------------------------------------
+   Search
+   -------------------------------------------------------------------------- */
+
+/* .mgdb-hint is a block element in the shared sheet; inside a wrapping <label>
+   a <span> carries it instead, so it needs the block treatment restated. */
+.mgdb-pan-gene-page span.mgdb-hint,
+.mgdb-pan-gene-page span.mgdb-label { display: block; }
+
+.mgdb-pan-gene-page .pan-gene-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-top: var(--mgdb-space-4);
+}
+
+/* Advanced search disclosure ---------------------------------------------- */
+
+.mgdb-pan-gene-page .pan-gene-advanced {
+  margin-top: var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-pan-gene-page .pan-gene-advanced > summary {
+  display: flex;
+  gap: var(--mgdb-space-4);
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--mgdb-tap-target);
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  color: var(--mgdb-green-dark);
+  cursor: pointer;
+}
+
+.mgdb-pan-gene-page .pan-gene-advanced > summary:focus-visible {
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: -3px;
+}
+
+.mgdb-pan-gene-page .pan-gene-advanced > summary strong {
+  display: block;
+  font-size: var(--mgdb-text-lg);
+}
+
+.mgdb-pan-gene-page .pan-gene-advanced > summary small {
+  display: block;
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 400;
+}
+
+.mgdb-pan-gene-page .pan-gene-advanced[open] > summary {
+  border-bottom: 1px solid var(--mgdb-line);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-pan-gene-page .pan-gene-advanced[open] > summary > span[aria-hidden] {
+  transform: rotate(180deg);
+}
+
+.mgdb-pan-gene-page .pan-gene-advanced > form { padding: var(--mgdb-space-5); }
+
+.mgdb-pan-gene-page .pan-gene-fieldset {
+  padding: var(--mgdb-space-4) var(--mgdb-space-5) var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius-sm);
+  margin: var(--mgdb-space-5) 0 0;
+}
+
+.mgdb-pan-gene-page .pan-gene-fieldset > legend {
+  padding: 0 var(--mgdb-space-2);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+}
+
+.mgdb-pan-gene-page .pan-gene-filter-grid,
+.mgdb-pan-gene-page .pan-gene-check-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--mgdb-space-4);
+}
+
+/* The grid already spaces the fields; the shared stacking margin would double it. */
+.mgdb-pan-gene-page .pan-gene-filter-grid > .mgdb-field + .mgdb-field { margin-top: 0; }
+
+.mgdb-pan-gene-page .pan-gene-check {
+  display: flex;
+  gap: var(--mgdb-space-3);
+  align-items: flex-start;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-alt);
+  cursor: pointer;
+}
+
+.mgdb-pan-gene-page .pan-gene-check:hover { border-color: var(--mgdb-green-dark); }
+.mgdb-pan-gene-page .pan-gene-check input { margin-top: 0.3em; flex: none; }
+.mgdb-pan-gene-page .pan-gene-check strong { display: block; font-size: var(--mgdb-text-base); }
+
+.mgdb-pan-gene-page .pan-gene-check small {
+  display: block;
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-pan-gene-page .pan-gene-fieldset .pan-gene-check + .pan-gene-check { margin-top: var(--mgdb-space-3); }
+
+/* A multi-select is the one control here that cannot be a fixed height. */
+.mgdb-pan-gene-page .pan-gene-multi { height: auto; padding: var(--mgdb-space-2); }
+.mgdb-pan-gene-page .pan-gene-multi option { padding: var(--mgdb-space-1) var(--mgdb-space-2); }
+
+/* --------------------------------------------------------------------------
+   Results
+   -------------------------------------------------------------------------- */
+
+.mgdb-pan-gene-page .pan-gene-sort {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  flex: none;
+}
+
+.mgdb-pan-gene-page .pan-gene-sort .mgdb-select { width: auto; min-width: 14rem; }
+
+.mgdb-pan-gene-page .pan-gene-criteria {
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-left: 4px solid var(--mgdb-green-dark);
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  margin-bottom: var(--mgdb-space-4);
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* Exactly one match. The legacy page navigated straight to the record; this
+   surfaces the same destination as the primary action instead, so the reader
+   sees why they landed there. */
+.mgdb-pan-gene-page .pan-gene-single {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-4) var(--mgdb-space-6);
+  align-items: center;
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-left: 6px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius);
+  margin-bottom: var(--mgdb-space-5);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-pan-gene-page .pan-gene-single h3 {
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xl);
+}
+
+.mgdb-pan-gene-page .pan-gene-single p { margin-top: var(--mgdb-space-2); color: var(--mgdb-ink-soft); }
+
+.mgdb-pan-gene-page .pan-gene-id {
+  font-family: var(--mgdb-font-mono);
+  font-variant-ligatures: none;
+}
+
+/* A member/annotation coverage figure reads better as a fraction than as two
+   numbers in separate columns. */
+.mgdb-pan-gene-page .pan-gene-coverage { display: block; }
+
+.mgdb-pan-gene-page .pan-gene-coverage-bar {
+  display: block;
+  width: 100%;
+  max-width: 6rem;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  margin-top: var(--mgdb-space-1);
+  margin-left: auto;
+  background: var(--mgdb-line-soft);
+}
+
+.mgdb-pan-gene-page .pan-gene-coverage-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--mgdb-green);
+}
+
+/* Long value lists — proteins, traits, loci — must not stretch a column. */
+.mgdb-pan-gene-page .pan-gene-values {
+  display: block;
+  max-width: 22rem;
+}
+
+.mgdb-pan-gene-page .pan-gene-values-more {
+  display: block;
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-pan-gene-page .pan-gene-matched {
+  display: inline-block;
+  margin: 0 var(--mgdb-space-1) var(--mgdb-space-1) 0;
+}
+
+.mgdb-pan-gene-page .pan-gene-none { color: var(--mgdb-muted); }
+
+/* Locus evidence: which gene model tied the locus in, and on whose authority. */
+.mgdb-pan-gene-page .pan-gene-evidence {
+  margin-top: var(--mgdb-space-2);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-pan-gene-page .pan-gene-evidence > summary {
+  color: var(--mgdb-green-dark);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-pan-gene-page .pan-gene-evidence ul {
+  padding-left: 1.1em;
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-muted);
+}
+
+/* --------------------------------------------------------------------------
+   Downloads and figures
+   -------------------------------------------------------------------------- */
+
+.mgdb-pan-gene-page .pan-gene-exemplar-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: var(--mgdb-space-5);
+  align-items: start;
+}
+
+.mgdb-pan-gene-page .pan-gene-example-button { margin-top: var(--mgdb-space-3); }
+
+.mgdb-pan-gene-page .pan-gene-exemplar-grid .pan-gene-fieldset { margin-top: 0; }
+.mgdb-pan-gene-page .pan-gene-exemplar-grid .mgdb-field { margin-top: var(--mgdb-space-4); }
+
+.mgdb-pan-gene-page .mgdb-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+}
+
+/* --------------------------------------------------------------------------
+   Definitions
+   -------------------------------------------------------------------------- */
+
+.mgdb-pan-gene-page .pan-gene-definitions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-pan-gene-page .pan-gene-definitions > div {
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line-soft);
+  border-top: 3px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-pan-gene-page .pan-gene-definitions dt {
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+  font-weight: 700;
+}
+
+.mgdb-pan-gene-page .pan-gene-definitions dd {
+  margin: var(--mgdb-space-2) 0 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-base);
+}
+
+/* --------------------------------------------------------------------------
+   Responsive
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 1023px) {
+  .mgdb-pan-gene-page .pan-gene-exemplar-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 767px) {
+  .mgdb-pan-gene-page .mgdb-section-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-inline: calc(-1 * var(--mgdb-space-4));
+    padding-inline: var(--mgdb-space-4);
+  }
+
+  .mgdb-pan-gene-page .mgdb-section-tabs a { white-space: nowrap; }
+  .mgdb-pan-gene-page .pan-gene-single { grid-template-columns: 1fr; }
+  .mgdb-pan-gene-page .pan-gene-sort { width: 100%; }
+  .mgdb-pan-gene-page .pan-gene-sort .mgdb-select { width: 100%; min-width: 0; }
+  .mgdb-pan-gene-page .pan-gene-values { max-width: none; }
+}

@@ -1,0 +1,105 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-reference-record
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:title" content="$(reference_title)">
+<meta property="og:description" content="$(reference_summary)">
+
+<main class="mgdb-page mgdb-reference-record-page" id="reference-record-top" data-reference-id="$(reference_id)">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data centers</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/reference">Literature</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Reference $(reference_id)</span>
+  </nav>
+
+  <header class="mgdb-hero-record reference-record-header">
+    <div>
+      <span class="mgdb-eyebrow">$(reference_kicker)</span>
+      <h1>$(reference_title)</h1>
+      <p class="reference-record-byline" id="reference-record-byline"></p>
+      <div class="reference-record-badges">$(editorial_badge)</div>
+      <dl class="mgdb-record-facts" id="reference-record-facts"></dl>
+    </div>
+    <div class="mgdb-hero-record-actions" id="reference-record-actions"></div>
+  </header>
+
+  <nav class="mgdb-section-tabs" id="reference-record-tabs" aria-label="Sections on this record" hidden></nav>
+
+  <div class="mgdb-loading" id="reference-record-loading"><span class="mgdb-spinner" aria-hidden="true"></span><span>Loading the full record&hellip;</span></div>
+
+  <div class="mgdb-message mgdb-message-error" id="reference-record-error" role="alert" hidden>
+    <div>
+      <strong>The rest of this record could not be loaded.</strong>
+      <span>The citation above is correct. Reload to try again, or report it if it keeps happening.</span>
+      <button class="mgdb-button mgdb-button-secondary" id="reference-record-retry" type="button">Retry</button>
+    </div>
+  </div>
+
+  <div class="mgdb-message mgdb-message-info" id="reference-record-notice" role="status" hidden></div>
+
+  <section id="reference-record-editorial" aria-labelledby="reference-record-editorial-title" hidden>
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Community signal</span><h2 id="reference-record-editorial-title">Editorial Board pick</h2></div>
+      <p>The MaizeGDB Editorial Board is a panel of working maize geneticists who each year nominate papers of particular interest to the community.</p>
+    </div>
+    <div id="reference-record-editorial-body"></div>
+  </section>
+
+  <section id="reference-record-abstract" aria-labelledby="reference-record-abstract-title" hidden>
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">The paper</span><h2 id="reference-record-abstract-title">Abstract</h2></div>
+    </div>
+    <div id="reference-record-abstract-body"></div>
+  </section>
+
+  <section id="reference-record-authors" aria-labelledby="reference-record-authors-title" hidden>
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Who wrote it</span><h2 id="reference-record-authors-title">Authors</h2></div>
+      <p>Paper counts are what MaizeGDB holds for that author, which is a floor rather than a complete bibliography.</p>
+    </div>
+    <div id="reference-record-authors-body"></div>
+  </section>
+
+  <section id="reference-record-describes" aria-labelledby="reference-record-describes-title" hidden>
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Curated links</span><h2 id="reference-record-describes-title">What this paper describes</h2></div>
+      <p>Records a MaizeGDB curator read this paper and connected it to. Loci carry their gene models, so you can go straight to the annotation you work in.</p>
+    </div>
+    <div id="reference-record-describes-body"></div>
+  </section>
+
+  <section id="reference-record-citation" aria-labelledby="reference-record-citation-title" hidden>
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Reuse</span><h2 id="reference-record-citation-title">Cite this paper</h2></div>
+      <p>Copy a formatted citation, or an entry for your reference manager.</p>
+    </div>
+    <div id="reference-record-citation-body"></div>
+  </section>
+
+  <section id="reference-record-links" aria-labelledby="reference-record-links-title" hidden>
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Elsewhere</span><h2 id="reference-record-links-title">Identifiers and full text</h2></div>
+      <p>Where each link goes, and what you will find when you get there.</p>
+    </div>
+    <div id="reference-record-links-body"></div>
+  </section>
+
+  <section class="mgdb-resource-panel" aria-labelledby="reference-record-next-title">
+    <div>
+      <span class="mgdb-eyebrow">Keep going</span>
+      <h2 id="reference-record-next-title">From this paper</h2>
+      <p>The searches that take a single reference further.</p>
+    </div>
+    <div class="mgdb-resource-list">
+      <a href="/data_center/reference"><strong>Search the literature</strong><span>More than 50,000 curated maize references by topic, author, or gene.</span></a>
+      <a href="/hot_new_papers"><strong>Editorial Board picks</strong><span>Papers the Board nominated as being of community interest.</span></a>
+      <a href="/gene_center/gene"><strong>Gene Center</strong><span>Loci and gene models, with the papers curated against them.</span></a>
+      <a href="/data_center/stock"><strong>Stock Center</strong><span>Germplasm, including stocks described in the literature.</span></a>
+    </div>
+  </section>
+
+  <p class="reference-record-provenance">
+    This page is assembled from one call to the MaizeGDB API.
+    <a id="reference-record-api-link" href="/api/v1/records/reference/$(reference_id)">View this record as JSON</a>
+    &middot; <a href="/api/v1/openapi">API documentation</a>
+  </p>
+</main>
+)

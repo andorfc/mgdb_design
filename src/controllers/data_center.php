@@ -46,6 +46,36 @@
     return;
   }
 
+  /* Reference record pages. The modern controller returns false without
+     publishing when the identifier does not resolve, so an unknown id falls
+     through to the original code and its 404 handling.
+     Rollback: delete this block. */
+  if (PAGE == 'reference' && getCGIParam('id', 'G', ID)) {
+    if (include('controllers/data_center/reference_record_modern.php')) {
+      return;
+    }
+  }
+
+  /* The same for the stock search page. Stock *record* pages (an id is
+     present) continue through the original code below, unchanged.
+     Rollback: delete this block.
+     Pre-redesign originals are archived in the redesign repo under
+     legacy/stock/. */
+  if (PAGE == 'stock' && !getCGIParam('id', 'G', ID)) {
+    include('controllers/data_center/stock_search_modern.php');
+    return;
+  }
+
+  /* Stock record pages. The modern controller returns false without publishing
+     when the identifier does not resolve, so an unknown id falls through to
+     the original code and its 404 handling rather than being answered twice.
+     Rollback: delete this block. */
+  if (PAGE == 'stock' && getCGIParam('id', 'G', ID)) {
+    if (include('controllers/data_center/stock_record_modern.php')) {
+      return;
+    }
+  }
+
   // NOTE: CONTROLLER and PAGE are set in controller.php
   logMessage("CONTROLLER: " . CONTROLLER . ", PAGE: " . PAGE . ", ID: " . ID);
  

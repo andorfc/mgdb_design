@@ -1,0 +1,312 @@
+$$SYNTAX-LEVEL 2
+*(stock-results
+  
+ <div id="stock_results2">
+ 
+  @(no-term {display: off}
+    <br><b>You did not provide a search term.</b><br>
+  )
+  
+  @(no-results {display: off}
+    <br>
+    <table cellpadding=8 cellspacing=3 width="100%" 
+           summary="A table containing the main page content.">
+      <tr>
+        <td width="100%">
+          <p><b>Stock Search Results - Complete List</b></p>
+          <p>There are no records matching your search criteria! You searched 
+            using the term <b>$(raw_term)</b>, for which we have no matches. Please 
+            try another search.
+          </p>
+        </td>
+      </tr>
+    </table>
+  )
+  
+  @(multi-results {display: off}
+    <table cellpadding=8 cellspacing=3 width="100%" summary="A table containing the main page content.">
+      <tr>
+        <td width="100%">
+          @(results_unpaged
+          <p style="margin-bottom: 8px;">
+            <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+              Stock Search Results - Complete List
+            </span>
+          </p>
+          Here are the <b>$(count)</b> result records matching the term <b>$(term)</b>.
+          )
+          
+          @(results_limited_unpaged {bind: results_unpaged | display: off}
+            <p style="margin-bottom: 8px;">
+              <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+                Stock Search Results - Limited List
+              </span>
+            </p>
+              There are <b>$(countAll)</b> stocks matching <b>$(term)</b>.
+              The first <b>$(limit)</b> results are shown.
+              @(datacenter-adjust {display: off}
+                Please refine your search to narrow down your results in the 
+                box above or use the advanced search form below, or adjust 
+                the search limit above.
+              )
+              @(alldata-adjust {display: off}
+                Please go to the <a href="/data_center/stock">stock data center</a>
+                to modify your search.
+              )
+            ) 
+            <br>
+
+            <button type="button" class="stock-text-button" onclick="doDownload('/search/stock/stock_results.php', '$(url_term)', 'Stocks.txt'\)">Download the full list of results</button>
+            <br>
+            <div name="download_status_div" id="download_status_div"></div>
+            <iframe name="download_iframe" id="download_iframe" width=0 height=0 style="border:none"></iframe>
+                      
+            @(exact-matches {display: off}
+            <table width="100%" cellpadding=0 cellspacing=0>
+              <tr>
+                <td colspan=2>
+                  <b>Exact Matches ($(exactCount)\)</b>
+                </td>
+              </tr>
+             @(exact-row
+              <tr>
+                <td width="20px"></td>
+                <td>
+                  <a href="/data_center/stock?id=$(id)"><b>$(name)</b></a> 
+                  $(synonyms)
+                  $(comments)
+                  $(status)
+                  <br><br>
+                </td>
+              </tr>
+              )
+            </table>
+            )
+            
+            @(starting-matches {display: off}
+            <table width="100%" cellpadding=0 cellspacing=0>
+              <tr>
+                <td colspan=2>
+                  <b>Starting Matches ($(startCount)\)</b>
+                </td>
+              </tr>
+              @(start-row
+              <tr>
+                <td width=20px></td>
+                <td>
+                  <a href="/data_center/stock?id=$(id)"><b>$(name)</b></a> 
+                  $(synonyms)
+                  $(comments)
+                  $(status)
+                 <br><br>
+                </td>
+              </tr>
+              )
+            </table>
+            )
+            
+            @(other-matches {display: off}
+            <table width="100%" cellpadding=0 cellspacing=0>   
+              <tr>
+                <td colspan=2>
+                  <b>Other Matches ($(otherCount)\)</b>
+                </td>
+              </tr>
+              @(other-row
+              <tr>
+                <td width="20px"></td>
+                <td>
+                  <a href="/data_center/stock?id=$(id)"><b>$(name)</b></a>
+                  $(synonyms)
+                  $(comments)
+                  $(status)
+                  <br><br>
+                </td>
+              </tr>
+              )
+              
+            </table>
+          )
+          
+        </td>
+      <tr>
+    </table>
+  )
+  
+  @(multi-results-paged {display: off}
+    <table cellpadding=8 cellspacing=3 width="100%" summary="A table containing the main page content.">
+      <tr>
+        <td width="100%">
+          
+          @(results
+            <p style="margin-bottom: 8px;">
+              <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+                Stock Search Results - Complete List
+              </span>
+            </p>
+            There are <b>$(count)</b> stocks matching your term <b>$(term)</b>, as summarized below.
+          )
+          
+          @(results_limited {bind: results | display: off}
+            <p style="margin-bottom: 8px;">
+              <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+                Stock Search Results - Limited List
+              </span>
+            </p>
+            There are <b>$(countAll)</b> stocks matching <b>$(term)</b>.
+            The first <b>$(limit)</b> results are shown.
+            @(datacenter-adjust-paged {display: off}
+              Please refine your search to narrow down your results in the 
+              box above or use the advanced search form below, or adjust 
+              the search limit above.
+            )
+            @(alldata-adjust-paged {display: off}
+              Please go to the <a href="/data_center/stock">stock data center</a>
+              to modify your search.
+            )
+          )
+          
+          <button type="button" class="stock-text-button" onclick="doDownload('/search/stock/stock_results.php', '$(url_term)', 'Stocks.txt'\)">Download the full list of results</button>.
+          (This may take several minutes.\)
+          <br>
+          <div name="download_status_div" id="download_status_div"></div>
+          <iframe name="download_iframe" id="download_iframe" width=0 height=0 style="border:none"></iframe>
+          
+          <input type="hidden" name="$(div)_rows" id="$(div)_rows" value="$(rows)">
+<!-- new style paging -->
+          <table cellspacing=5 cellpadding=5>
+            <tr>
+              <td style="vertical-align:bottom; width:32px; height: 36.4px;">
+                <a href="javascript:prevPage(\)" name="prevpage" id="prevpage">
+                  <img style='border:0px' src='/images/corn-icon-prev.png' alt='Previous results page'>
+                </a>
+              </td>
+              <td>
+                <form action="javascript:goToPage(document.getElementById('pagenum'\).value, 'stock_results_page', $(pagecount)\)" 
+                      name='pagenumform' id='pagenumform'>
+                  Page 
+                  <input type='text' size=2 maxlength=3 name='pagenum' 
+                         id='pagenum' value='1' aria-label='Results page number'>
+                  of $(pagecount)
+                </form>
+              </td>
+              <td style="vertical-align:top;">
+                <a href="javascript:nextPage($(pagecount)\)" name="nextpage" id="nextpage">
+                  <img style='border:0px' src='/images/corn-icon-next.png' alt='Next results page'>
+                </a>
+              </td> 
+            </tr>
+          </table>
+          <br>
+          @(pages
+            <div class="resultdiv" name="stock_results_page$(pagenum)" 
+                 id="stock_results_page$(pagenum)" style="display:$(displayval)">
+                 
+              <table width="100%" cellpadding="7" cellspacing="7">
+                <tr>
+                  <td>
+                    <b>Results $(startnum) - $(endnum)</b> out of <b>$(total)</b>
+                  </td>
+                </tr>
+                
+                <tr>
+                  <td>
+                    <div name="stock_results_list$(pagenum)" 
+                         id="stock_results_list$(pagenum)">    
+                      @(loading_page
+                       <center><img src='/images/cornloading_trans.gif' alt='Loading search results'></center>
+                      )
+                      
+                      <table width="100%" cellpadding=0 cellspacing=0>           
+                      @(exact-page-matches {display: off}
+                        <tr>
+                          <td colspan=2></td>
+                            <b>Exact Matches ($(exact-page-count)\)</b>
+                          </td>
+                        </tr>  
+                      )            
+                      @(exact-page-row {display: off}
+                        <tr>
+                          <td width="20px"></td>
+                          <td>
+                            <a href="/data_center/stock?id=$(id)"><b>$(name)</b></a>
+                            $(synonyms)
+                            $(comments)
+                            $(status)
+                            <br><br>
+                          </td>
+                        </tr>
+                      )
+                      @(starting-page-matches {display: off}
+                        <tr>
+                          <td colspan=2>
+                            <b>Starts with '$(sterm)' ($(start-page-count)\)</b>
+                          </td>
+                        </tr>  
+                      ) 
+                      @(start-page-row {display: off}
+                        <tr>
+                          <td width="20px"></td>
+                          <td>
+                            <a href="/data_center/stock?id=$(id)"><b>$(name)</b></a>
+                            $(synonyms)
+                            $(comments)
+                            $(status)
+                            <br><br>
+                          </td>
+                        </tr>
+                      )
+                      @(other-page-matches {display: off}
+                        <tr>
+                          <td colspan=2>
+                            <b>Other Matches ($(other-page-count)\)</b>
+                          </td>
+                        </tr>  
+                      ) 
+                      @(other-page-row {display: off}
+                        <tr>
+                          <td width="20px"></td>
+                          <td>
+                            <a href="/data_center/stock?id=$(id)"><b>$(name)</b></a>
+                            $(synonyms)
+                            $(comments)
+                            $(status)
+                            <br><br>
+                          </td>
+                        </tr>
+                      )
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          )
+       
+          <script language="javascript">
+            getSearchData('stock', 'stock_results_list2', $(term_json), 2\);
+          </script>
+        </td>
+      </tr>
+    </table>
+  )
+  
+  @(open_shadowbox {display: off}
+    <script language="javascript">
+      open_shadowbox('stock', $(term_json), 'html'\);
+    </script>
+  )
+  
+  @(grin_results {display: off}
+  <script language="javascript">
+    toggle_grin_message($(grin_count), 'grin', true\);
+    @(load_page2 {display: off}
+      // Need this here because the regex in search.js won't parse multiple <script> 
+      // elements (this page is a very special case\)
+      getSearchData('stock', 'stock_results_list2', $(term_json), 2\);
+    )
+  </script>
+  )
+  
+ </div>
+)

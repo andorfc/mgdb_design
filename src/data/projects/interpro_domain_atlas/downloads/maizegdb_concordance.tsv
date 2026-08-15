@@ -1,0 +1,6 @@
+comparison	level	tp	fp_mine_only	fn_mgdb_only	precision	recall	jaccard	note
+Pfam-restricted (HEADLINE)	protein x Pfam signature	539	68	35	0.888	0.939	0.8396	like-for-like; both sides Pfam only
+Pfam-restricted (HEADLINE)	protein x IPR accession	502	73	38	0.873	0.9296	0.8189	Pfam-derived integrated IPR entries only
+Pfam-restricted	distinct Pfam signature accessions	400	53	21	0.883	0.9501	0.8439	set overlap ignoring which protein
+Pfam-restricted	distinct IPR accessions	364	56	25	0.8667	0.9357	0.818	set overlap ignoring which protein
+All-analyses (CONFOUNDED)	protein x IPR accession	518	1058	22	0.3287	0.9593	0.3242	fp column is member-DB coverage, not disagreement

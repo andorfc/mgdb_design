@@ -92,6 +92,99 @@ src/tools/ajax/person_search/person_suggest_api.php      tools/ajax/person_searc
 src/controllers/community/person_search_modern.php       controllers/community/person_search_modern.php
 src/controllers/community.php                            controllers/community.php
 
+# Pan-Gene search — replaces the bare /pan_gene_center/pan_gene route
+src/search/pan_gene/pan_gene_search_lib.php      search/pan_gene/pan_gene_search_lib.php
+src/search/pan_gene/pan_gene_search_api.php      search/pan_gene/pan_gene_search_api.php
+src/templates/static/mgdb_pan_gene.bau           templates/static/mgdb_pan_gene.bau
+src/css/mgdb-pan-gene.css                        css/mgdb-pan-gene.css
+src/js/mgdb-pan-gene.js                          js/mgdb-pan-gene.js
+src/controllers/pan_gene_center/pan_gene_search_modern.php  controllers/pan_gene_center/pan_gene_search_modern.php
+src/controllers/pan_gene_center.php              controllers/pan_gene_center.php
+
+# Stock data center — replaces the bare /data_center/stock route
+src/search/stock/stock_search_lib.php            search/stock/stock_search_lib.php
+src/search/stock/stock_search_api.php            search/stock/stock_search_api.php
+src/templates/static/mgdb_stock.bau              templates/static/mgdb_stock.bau
+src/css/mgdb-stock.css                           css/mgdb-stock.css
+src/js/mgdb-stock.js                             js/mgdb-stock.js
+src/controllers/data_center/stock_search_modern.php  controllers/data_center/stock_search_modern.php
+
+# JSON API (v1). Additive: the /api route is new and shadows nothing.
+src/controllers/api.php                          controllers/api.php
+src/include/api/v1/lib/mgdb_api.php              include/api/v1/lib/mgdb_api.php
+src/include/api/v1/openapi.php                   include/api/v1/openapi.php
+src/include/api/v1/records/stock.php             include/api/v1/records/stock.php
+
+# Stock record page — replaces /data_center/stock/{id}
+src/include/stock_record_lib.php                 include/stock_record_lib.php
+src/templates/static/mgdb_stock_record.bau       templates/static/mgdb_stock_record.bau
+src/css/mgdb-stock-record.css                    css/mgdb-stock-record.css
+src/js/mgdb-stock-record.js                      js/mgdb-stock-record.js
+src/controllers/data_center/stock_record_modern.php  controllers/data_center/stock_record_modern.php
+
+# Reference record page — replaces /data_center/reference?id={id}
+src/include/api/v1/records/reference.php         include/api/v1/records/reference.php
+src/include/reference_record_lib.php             include/reference_record_lib.php
+src/templates/static/mgdb_reference_record.bau   templates/static/mgdb_reference_record.bau
+src/css/mgdb-reference-record.css                css/mgdb-reference-record.css
+src/js/mgdb-reference-record.js                  js/mgdb-reference-record.js
+src/controllers/data_center/reference_record_modern.php  controllers/data_center/reference_record_modern.php
+
+# Analysis projects — new /projects section. Additive: the route is new and
+# shadows nothing, and there is deliberately no projects/ directory in the web
+# root, which would stop .htaccess rewriting /projects/... to controller.php.
+src/include/projects_lib.php                     include/projects_lib.php
+src/controllers/projects.php                     controllers/projects.php
+src/css/mgdb-projects.css                        css/mgdb-projects.css
+src/js/mgdb-projects.js                          js/mgdb-projects.js
+src/templates/static/mgdb_projects.bau           templates/static/mgdb_projects.bau
+src/templates/static/mgdb_projects_notfound.bau  templates/static/mgdb_projects_notfound.bau
+
+# Project: protein domain atlas (/projects/interpro_domain_atlas)
+src/controllers/projects/interpro_domain_atlas.php               controllers/projects/interpro_domain_atlas.php
+src/templates/static/mgdb_project_interpro_domain_atlas.bau      templates/static/mgdb_project_interpro_domain_atlas.bau
+src/js/mgdb-project-interpro-domain-atlas.js                     js/mgdb-project-interpro-domain-atlas.js
+
+# Project data. Pipeline outputs, served straight off disk — the page reads the
+# payload server-side and the browser fetches the same file for its charts.
+src/data/projects/interpro_domain_atlas/domain_center_data.json                 data/projects/interpro_domain_atlas/domain_center_data.json
+src/data/projects/interpro_domain_atlas/downloads/DATA_SEMANTICS.md             data/projects/interpro_domain_atlas/downloads/DATA_SEMANTICS.md
+src/data/projects/interpro_domain_atlas/downloads/METHODS.md                    data/projects/interpro_domain_atlas/downloads/METHODS.md
+src/data/projects/interpro_domain_atlas/downloads/added_value_by_database.tsv   data/projects/interpro_domain_atlas/downloads/added_value_by_database.tsv
+src/data/projects/interpro_domain_atlas/downloads/class_gene_counts_helixer.tsv data/projects/interpro_domain_atlas/downloads/class_gene_counts_helixer.tsv
+src/data/projects/interpro_domain_atlas/downloads/class_gene_counts_outgroup.tsv data/projects/interpro_domain_atlas/downloads/class_gene_counts_outgroup.tsv
+src/data/projects/interpro_domain_atlas/downloads/class_gene_counts_reference.tsv data/projects/interpro_domain_atlas/downloads/class_gene_counts_reference.tsv
+src/data/projects/interpro_domain_atlas/downloads/class_gene_lists_helixer.tsv.gz data/projects/interpro_domain_atlas/downloads/class_gene_lists_helixer.tsv.gz
+src/data/projects/interpro_domain_atlas/downloads/class_gene_lists_outgroup.tsv.gz data/projects/interpro_domain_atlas/downloads/class_gene_lists_outgroup.tsv.gz
+src/data/projects/interpro_domain_atlas/downloads/class_gene_lists_reference.tsv.gz data/projects/interpro_domain_atlas/downloads/class_gene_lists_reference.tsv.gz
+src/data/projects/interpro_domain_atlas/downloads/domain_status_combined.tsv.gz data/projects/interpro_domain_atlas/downloads/domain_status_combined.tsv.gz
+src/data/projects/interpro_domain_atlas/downloads/domain_status_helixer.tsv.gz  data/projects/interpro_domain_atlas/downloads/domain_status_helixer.tsv.gz
+src/data/projects/interpro_domain_atlas/downloads/domain_status_reference.tsv.gz data/projects/interpro_domain_atlas/downloads/domain_status_reference.tsv.gz
+src/data/projects/interpro_domain_atlas/downloads/domain_technical_filter.json  data/projects/interpro_domain_atlas/downloads/domain_technical_filter.json
+src/data/projects/interpro_domain_atlas/downloads/genome_manifest.tsv           data/projects/interpro_domain_atlas/downloads/genome_manifest.tsv
+src/data/projects/interpro_domain_atlas/downloads/helixer_vs_curated_validation.tsv data/projects/interpro_domain_atlas/downloads/helixer_vs_curated_validation.tsv
+src/data/projects/interpro_domain_atlas/downloads/immunity_calls_helixer.tsv.gz data/projects/interpro_domain_atlas/downloads/immunity_calls_helixer.tsv.gz
+src/data/projects/interpro_domain_atlas/downloads/immunity_calls_outgroup.tsv.gz data/projects/interpro_domain_atlas/downloads/immunity_calls_outgroup.tsv.gz
+src/data/projects/interpro_domain_atlas/downloads/immunity_calls_reference.tsv.gz data/projects/interpro_domain_atlas/downloads/immunity_calls_reference.tsv.gz
+src/data/projects/interpro_domain_atlas/downloads/immunity_counts_helixer.tsv   data/projects/interpro_domain_atlas/downloads/immunity_counts_helixer.tsv
+src/data/projects/interpro_domain_atlas/downloads/immunity_counts_outgroup.tsv  data/projects/interpro_domain_atlas/downloads/immunity_counts_outgroup.tsv
+src/data/projects/interpro_domain_atlas/downloads/immunity_counts_reference.tsv data/projects/interpro_domain_atlas/downloads/immunity_counts_reference.tsv
+src/data/projects/interpro_domain_atlas/downloads/immunity_subclass_counts_helixer.tsv data/projects/interpro_domain_atlas/downloads/immunity_subclass_counts_helixer.tsv
+src/data/projects/interpro_domain_atlas/downloads/immunity_subclass_counts_outgroup.tsv data/projects/interpro_domain_atlas/downloads/immunity_subclass_counts_outgroup.tsv
+src/data/projects/interpro_domain_atlas/downloads/immunity_subclass_counts_reference.tsv data/projects/interpro_domain_atlas/downloads/immunity_subclass_counts_reference.tsv
+src/data/projects/interpro_domain_atlas/downloads/maize_functional_classes.json data/projects/interpro_domain_atlas/downloads/maize_functional_classes.json
+src/data/projects/interpro_domain_atlas/downloads/maize_immunity_classes.json   data/projects/interpro_domain_atlas/downloads/maize_immunity_classes.json
+src/data/projects/interpro_domain_atlas/downloads/maizegdb_concordance.tsv      data/projects/interpro_domain_atlas/downloads/maizegdb_concordance.tsv
+src/data/projects/interpro_domain_atlas/downloads/matrix_combined_ref_outgroup.csv.gz data/projects/interpro_domain_atlas/downloads/matrix_combined_ref_outgroup.csv.gz
+src/data/projects/interpro_domain_atlas/downloads/matrix_helixer.csv.gz         data/projects/interpro_domain_atlas/downloads/matrix_helixer.csv.gz
+src/data/projects/interpro_domain_atlas/downloads/matrix_outgroup.csv.gz        data/projects/interpro_domain_atlas/downloads/matrix_outgroup.csv.gz
+src/data/projects/interpro_domain_atlas/downloads/matrix_reference.csv.gz       data/projects/interpro_domain_atlas/downloads/matrix_reference.csv.gz
+src/data/projects/interpro_domain_atlas/downloads/outgroup_manifest.tsv         data/projects/interpro_domain_atlas/downloads/outgroup_manifest.tsv
+src/data/projects/interpro_domain_atlas/downloads/proteome_census.tsv           data/projects/interpro_domain_atlas/downloads/proteome_census.tsv
+src/data/projects/interpro_domain_atlas/figures/fig_class_variation.png         data/projects/interpro_domain_atlas/figures/fig_class_variation.png
+src/data/projects/interpro_domain_atlas/figures/fig_immunity_classes.png        data/projects/interpro_domain_atlas/figures/fig_immunity_classes.png
+src/data/projects/interpro_domain_atlas/figures/fig_nlr_subclass.png            data/projects/interpro_domain_atlas/figures/fig_nlr_subclass.png
+
 # Redesign status — /redesign_status. The JSON is written by
 # tools/redesign_status.py; rerun it before deploying this group.
 src/controllers/redesign_status.php                    controllers/redesign_status.php

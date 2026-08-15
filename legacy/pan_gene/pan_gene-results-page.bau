@@ -1,0 +1,16 @@
+$$SYNTAX-LEVEL 2
+*(pan_gene-results-page
+  
+  $(multi-page)
+
+  @(load-next-page {display: off}
+    <script language="javascript">
+      @(simple-search-get_next_page {display: off}
+        getSearchData('pan_gene', 'pan_gene_results_list$(nextpage)', '$(raw_term)', $(nextpage)\);
+      )
+      @(advanced-search-get_next_page {display: off}
+        panGeneAdvSearch('pan_gene_results_list$(nextpage)', $(nextpage)\);
+      )
+    </script>
+  )
+)
