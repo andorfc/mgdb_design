@@ -413,3 +413,43 @@
   .mgdb-meeting-page .meeting-event-card b { display: none; }
   .mgdb-meeting-page #meeting-archive-count { width: 100%; margin-left: 0; }
 }
+
+
+/* Photograph attribution ---------------------------------------------------
+   The venue photographs are CC BY / CC BY-SA, so each card names its
+   photographer and licence, and the section closes with a full credits list
+   linking back to each original. */
+
+.mgdb-meeting-page .meeting-archive-credit {
+  display: block;
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  line-height: 1.35;
+}
+
+.mgdb-meeting-page .meeting-photo-credits {
+  margin-top: var(--mgdb-space-5);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--mgdb-line);
+}
+
+.mgdb-meeting-page .meeting-photo-credits > summary {
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-meeting-page .meeting-photo-credits > summary:focus-visible { outline: 3px solid var(--mgdb-focus); outline-offset: 2px; }
+.mgdb-meeting-page .meeting-photo-credits > p { max-width: var(--mgdb-measure); margin-top: var(--mgdb-space-3); color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+
+.mgdb-meeting-page .meeting-photo-credits ul {
+  margin-top: var(--mgdb-space-3);
+  padding-left: 1.2em;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-meeting-page .meeting-photo-credits li + li { margin-top: var(--mgdb-space-2); }
+.mgdb-meeting-page .meeting-photo-credits strong { color: var(--mgdb-ink); }

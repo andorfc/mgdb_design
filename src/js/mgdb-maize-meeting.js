@@ -54,12 +54,53 @@
     {year:'1999', annual:41, location:'Lake Geneva, Wisconsin', url:'/maize_meeting/1999', image:'/images/maize_meeting/geneva.jpg'},
     {year:'1998', annual:40, location:'Lake Geneva, Wisconsin', url:'/maize_meeting/1998', image:'/images/maize_meeting/geneva.jpg'},
     {year:'1997', annual:39, location:'Clearwater Beach, Florida', url:'/maize_meeting/1997', image:'/images/maize_meeting/florida1.jpg'},
-    {year:'1959', annual:1, location:'Allerton Park, Illinois', url:'/maize_meeting/1959', note:'original-meeting mock-up', image:'/maize_meeting/1959/images/allerton.jpg'}
+    {year:'1959', annual:1, location:'Allerton Park, Illinois', url:'/maize_meeting/1959', note:'original-meeting mock-up', image:'/images/maize_meeting/allerton.jpg'}
   ];
+
+
+  /* Photograph attribution. Every venue image is CC BY or CC BY-SA, which
+     require credit, so each card carries the photographer's name and the licence
+     and the archive section renders a full credits list underneath. Keyed by
+     image path so a row without a photograph simply gets no credit. */
+  var photoCredits = {
+    '/images/maize_meeting/allerton.jpg': {creator:"James Postema", license:"CC BY 4.0", title:"Reflecting pond at Robert Allerton Park.jpg", source:"https://commons.wikimedia.org/wiki/File:Reflecting_pond_at_Robert_Allerton_Park.jpg"},
+    '/images/maize_meeting/asilomar.jpg': {creator:"UnifiedFunctionality", license:"CC BY-SA 4.0", title:"Asilomar State Beach at Sunset.jpg", source:"https://commons.wikimedia.org/wiki/File:Asilomar_State_Beach_at_Sunset.jpg"},
+    '/images/maize_meeting/beijing.jpg': {creator:"\u00b7\u02d9\u00b7ChinaUli2010\u00b7.\u00b7", license:"CC BY 3.0", title:"\u00b7\u02d9\u00b7ChinaUli2010\u00b7.\u00b7 Beijing - Temple of Heaven Park - panoramio (7).jpg", source:"https://commons.wikimedia.org/w/index.php?curid=53373371"},
+    '/images/maize_meeting/chicago.jpg': {creator:"Aneekr at English Wikipedia", license:"CC BY-SA 3.0", title:"St. Charles Municipal Building (St. Charles, IL) 09", source:"https://commons.wikimedia.org/w/index.php?curid=6636572"},
+    '/images/maize_meeting/dc.jpg': {creator:"Sergiy Galyonkin from Raleigh, USA", license:"CC BY-SA 2.0", title:"Washington DC - United States Capitol at blue hour (51282289914)", source:"https://commons.wikimedia.org/w/index.php?curid=120353198"},
+    '/images/maize_meeting/florida1.jpg': {creator:"TampaThings.com", license:"CC BY-SA 4.0", title:"Clearwater-beach-florida-pier-60", source:"https://commons.wikimedia.org/w/index.php?curid=107581285"},
+    '/images/maize_meeting/florida2.jpg': {creator:"Visitor7", license:"CC BY-SA 3.0", title:"Kissimmee Lakefront Park-1.jpg", source:"https://commons.wikimedia.org/w/index.php?curid=32084736"},
+    '/images/maize_meeting/geneva.jpg': {creator:"Michael Barera", license:"CC BY-SA 4.0", title:"Lake Geneva April 2025 12 (Geneva Lake).jpg", source:"https://commons.wikimedia.org/wiki/File:Lake_Geneva_April_2025_12_(Geneva_Lake).jpg"},
+    '/images/maize_meeting/idaho.jpg': {creator:"Ken Lund from Reno, Nevada, USA", license:"CC BY-SA 2.0", title:"Lake Coeur d'Alene, Coeur d'Alene, Idaho (50083363521).jpg", source:"https://commons.wikimedia.org/wiki/File:Lake_Coeur_d%27Alene,_Coeur_d%27Alene,_Idaho_(50083363521).jpg"},
+    '/images/maize_meeting/italy.jpg': {creator:"Stefano Travasci", license:"CC BY 4.0", title:"Vista da nord su Riva del Garda (1)", source:"https://commons.wikimedia.org/w/index.php?curid=175677158"},
+    '/images/maize_meeting/jacksonville.jpg': {creator:"Quintin Soloviev", license:"CC BY 4.0", title:"Jacksonville skyline", source:"https://commons.wikimedia.org/w/index.php?curid=182002489"},
+    '/images/maize_meeting/mexico.jpg': {creator:"Carolina L\u00f3pez", license:"CC BY 2.0", title:"Palacio de Bellas Artes.jpg", source:"https://commons.wikimedia.org/w/index.php?curid=4269986"},
+    '/images/maize_meeting/portland.jpg': {creator:"King of Hearts", license:"CC BY-SA 4.0", title:"Portland from Pittock Mansion October 2019 panorama 2", source:"https://commons.wikimedia.org/w/index.php?curid=89570832"},
+    '/images/maize_meeting/raleigh.png': {creator:"Daderot", license:"Public domain", title:"Raleigh Convention Center - Raleigh, NC - DSC06102.JPG", source:"https://commons.wikimedia.org/wiki/File:Raleigh_Convention_Center_-_Raleigh,_NC_-_DSC06102.JPG"},
+    '/images/maize_meeting/stlouis.png': {creator:"Jaredgd", license:"CC BY-SA 4.0", title:"Gateway Arch & St. Louis Skyline 1", source:"https://commons.wikimedia.org/w/index.php?curid=176434724"},
+    '/images/maize_meeting/stmalo.png': {creator:"Gzen92", license:"CC BY-SA 4.0", title:"Fort National - maison (Saint-Malo).jpg", source:"https://commons.wikimedia.org/wiki/File:Fort_National_-_maison_(Saint-Malo).jpg"}
+  };
+
+  function creditFor(image) { return image ? photoCredits[image] : null; }
+
+  /* Archive photographs are referenced from this script, not from a resource
+     tag, so Bauplan's automatic ?v= never reaches them and the CDN went on
+     serving the pre-replacement images. Bump this when a photograph changes. */
+  var PHOTO_VERSION = '2';
+
+  function photoUrl(path) {
+    return path ? path + (path.indexOf('?') === -1 ? '?v=' + PHOTO_VERSION : '') : path;
+  }
 
   var activePeriod = 'all';
 
   function byId(id) { return document.getElementById(id); }
+
+  function escapeHtml(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
   function normalize(value) { return String(value || '').toLowerCase().replace(/\s+/g, ' ').trim(); }
   function ordinal(number) {
     var mod100 = number % 100;
@@ -86,13 +127,42 @@
     grid.innerHTML = visible.map(function (row) {
       var note = row.note || ordinal(row.annual) + ' annual meeting';
       var media = row.image
-        ? '<span class="meeting-archive-thumb"><img src="' + row.image + '" alt="" loading="lazy" /></span>'
+        ? '<span class="meeting-archive-thumb"><img src="' + photoUrl(row.image) + '" alt="" loading="lazy" /></span>'
         : '<span class="meeting-archive-thumb meeting-archive-placeholder" aria-hidden="true">Canceled</span>';
-      return '<a href="' + row.url + '"' + (row.canceled ? ' class="is-canceled"' : '') + '>' + media + '<span class="meeting-archive-copy"><span class="meeting-archive-year">' + row.year + '</span><strong>' + row.location + '</strong><small>' + note + '</small></span></a>';
+      var credit = creditFor(row.image);
+      var creditHtml = credit
+        ? '<span class="meeting-archive-credit">Photo: ' + escapeHtml(credit.creator) + ' / ' + escapeHtml(credit.license) + '</span>'
+        : '';
+      return '<a href="' + row.url + '"' + (row.canceled ? ' class="is-canceled"' : '') + '>' + media
+        + '<span class="meeting-archive-copy"><span class="meeting-archive-year">' + row.year
+        + '</span><strong>' + row.location + '</strong><small>' + note + '</small>'
+        + creditHtml + '</span></a>';
     }).join('');
     byId('meeting-archive-count').textContent = visible.length + (visible.length === 1 ? ' site shown' : ' sites shown');
     byId('meeting-archive-clear').hidden = !query;
     byId('meeting-archive-empty').hidden = visible.length !== 0;
+    renderCredits();
+  }
+
+  /* The complete attribution list. Rendered once; CC BY and CC BY-SA are
+     satisfied by naming the photographer, the work, and the licence, and by
+     linking back to the source page. */
+  function renderCredits() {
+    var host = byId('meeting-photo-credits');
+    if (!host || host.getAttribute('data-rendered') === 'true') { return; }
+    var seen = {};
+    var items = [];
+    archives.forEach(function (row) {
+      var c = creditFor(row.image);
+      if (!c || seen[row.image]) { return; }
+      seen[row.image] = true;
+      items.push('<li><strong>' + escapeHtml(row.location) + '</strong> &mdash; '
+        + '<a href="' + escapeHtml(c.source) + '">' + escapeHtml(c.title || 'photograph') + '</a>'
+        + ' by ' + escapeHtml(c.creator) + ', ' + escapeHtml(c.license) + '</li>');
+    });
+    if (!items.length) { return; }
+    host.innerHTML = '<ul>' + items.join('') + '</ul>';
+    host.setAttribute('data-rendered', 'true');
   }
 
   function setPeriod(period) {
