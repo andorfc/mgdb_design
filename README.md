@@ -137,12 +137,32 @@ introducing new colors or spacing values.
 
 ## Status
 
-Complete and verified on the development instance:
+On the redesign and verified on the development instance:
 
-- Shared design system and pattern library
-- Opt-in modern document shell
-- Responsive global chrome, no horizontal scrolling from 320px upward
-- Keyboard-operable megamenu on modernized pages
+| Page | Route |
+| --- | --- |
+| How to cite MaizeGDB | `/cite` |
+| Genome Center | `/genome` |
+| AI and machine learning | `/ai` |
+| Reference literature search | `/data_center/reference` |
+| Maize Genetics Meeting | `/maize_meeting/` |
+| Contact | `/contact` |
+| Person and organization search | `/person` |
+| Design pattern library | `/pattern_library/` |
 
-Not yet started: the visual redesign of the global header, navigation, and
-footer, and the modernization of individual production pages.
+Foundations complete: the shared design system, the opt-in modern document
+shell, the responsive global chrome and mega menu, the blue page ground, and a
+single rail shared by the chrome and the page content.
+
+## Starting a new session
+
+Point at the pattern library first — <https://claude.maizegdb.org/pattern_library/>
+renders every component in the system. Compose from those rather than inventing
+new ones, and reuse the tokens rather than adding colors or spacing values.
+
+A useful opening prompt:
+
+> Read README.md in ~/Documents/ClaudeCode/maizegdb-redesign, then look at
+> https://claude.maizegdb.org/pattern_library/ so you are using the existing
+> design system. Then modernize <page>, replacing the real route and archiving
+> the originals per the policy in the README.
