@@ -21,6 +21,8 @@ src/lib/Bauplan.php            Modernized document shell (opt-in)
 src/templates/static/          Page body templates (.bau)
 src/pages/                     Page controllers (index.php)
 reference/                     Unmodified copies of the files being replaced
+tools/redesign_status.py       Measures how much of the site is modernized
+REDESIGN_STATUS.md             Its report. Generated; do not edit by hand
 docs/BASELINE_AUDIT.md         Architecture and findings from the initial audit
 ADMIN_DEPENDENCIES.md          Changes that need an administrator
 backups/<timestamp>/           Automatic pre-deploy snapshot of every server file
@@ -117,6 +119,50 @@ the pattern library. Every rule in `mgdb-modern.css` is scoped under
 (`.mgdb-page.mgdb-<page>-page`), and reuse the shared tokens rather than
 introducing new colors or spacing values.
 
+## Redesign status
+
+How much of the site is on the design system is measured rather than tracked by
+hand. `tools/redesign_status.py` copies itself to the development instance,
+walks the whole web root, and works out which URLs the site exposes the same way
+`controller.php` and `redirect.php` do — top-level controllers, controller
+directories, the single-segment fallback search, real directories in the web
+root, and the `if (PAGE == 'x') include('..._modern.php')` guards this redesign
+uses. It then fetches each URL over HTTP from the server and reads the response,
+so the verdict is what the page actually serves and not what its controller
+appears to say.
+
+```bash
+tools/redesign_status.py
+```
+
+One run writes both outputs:
+
+| Output | What it is |
+| --- | --- |
+| `REDESIGN_STATUS.md` | The report, committed to this repository |
+| `src/data/redesign_status.json` | The same data, rendered by `/redesign_status` |
+
+Deploy the JSON after a run, or the page keeps showing the previous measurement:
+
+```bash
+./deploy/deploy.sh src/data/redesign_status.json
+```
+
+Three parts of the report are worth reading before picking up the next page.
+**Work on these next** ranks the not-yet-modern pages by exposure: everything
+reachable from the mega menu first, then by how many places in the codebase link
+to it. **Built on the design system but not routed** lists controllers already
+written against the design system that no URL reaches — wiring one up is a guard
+in its parent controller rather than a rebuild. **Unreachable files** is the
+mirror image: files that can no longer be reached at the URL they were written
+for, which is what replacing a page in place looks like from the outside.
+
+The scan has to run on the server because the MaizeGDB codebase is not in this
+repository — only the files the redesign has replaced. The script is stdlib-only
+Python and runs under the server's 3.9. Pages that sign in or out, send mail,
+write to the database, or need a record identifier are never fetched; those rows
+are classified from the source and say so.
+
 ## Conventions this codebase relies on
 
 - `.bau` templates escape literal parentheses as `\(` and `\)`. An unescaped
@@ -149,6 +195,10 @@ On the redesign and verified on the development instance:
 | Contact | `/contact` |
 | Person and organization search | `/person` |
 | Design pattern library | `/pattern_library/` |
+| Redesign status | `/redesign_status` |
+
+`REDESIGN_STATUS.md` counts the rest. As of the last run, 19 of the 268 URLs the
+site exposes are on the design system.
 
 Foundations complete: the shared design system, the opt-in modern document
 shell, the responsive global chrome and mega menu, the blue page ground, and a

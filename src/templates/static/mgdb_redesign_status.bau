@@ -1,0 +1,269 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-redesign-status
+<a class="mgdb-skip-link" href="#redesign-status-main">Skip to main content</a>
+<main class="mgdb-page mgdb-redesign-status-page" id="redesign-status-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Redesign status</span>
+  </nav>
+
+  <section class="mgdb-hero-basic" aria-labelledby="redesign-status-title">
+    <span class="mgdb-hero-basic-icon" aria-hidden="true">
+      <svg viewBox="0 0 84 84" role="presentation" focusable="false">
+        <rect x="10" y="18" width="64" height="10" rx="5" fill="currentColor" />
+        <rect x="10" y="37" width="40" height="10" rx="5" fill="currentColor" />
+        <rect x="10" y="56" width="22" height="10" rx="5" fill="#2f5e2a" />
+      </svg>
+    </span>
+    <div>
+      <span class="mgdb-eyebrow">Page modernization standard</span>
+      <h1 id="redesign-status-title">Redesign status</h1>
+      <p>Every URL MaizeGDB exposes to the web, and whether it is on the modern interface or still on the old one. Measured from the codebase on this instance, not from a hand-kept list.</p>
+      <p class="mgdb-small mgdb-muted">Last measured $(generated). $(evidence-note)</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="redesign-status-summary-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Where it stands</span>
+        <h2 id="redesign-status-summary-title">The whole site</h2>
+      </div>
+      <p>A page counts as modern when it opts in to the modern document shell and loads the shared design system. Partial means it has one of the two and not the other.</p>
+    </div>
+
+    <div class="mgdb-metric-grid">
+      <div class="mgdb-metric">
+        <span class="mgdb-label">URLs found</span>
+        <span class="mgdb-metric-value">$(total-urls)</span>
+        <span class="mgdb-small mgdb-muted">Pages the site answers</span>
+      </div>
+      <div class="mgdb-metric">
+        <span class="mgdb-label">Modern</span>
+        <span class="mgdb-metric-value">$(modern-count)</span>
+        <span class="mgdb-small mgdb-muted">$(percent-modern)% of the site</span>
+      </div>
+      <div class="mgdb-metric mgdb-metric-quiet">
+        <span class="mgdb-label">Partial</span>
+        <span class="mgdb-metric-value">$(partial-count)</span>
+        <span class="mgdb-small mgdb-muted">Design system inside the old shell</span>
+      </div>
+      <div class="mgdb-metric mgdb-metric-quiet">
+        <span class="mgdb-label">Legacy</span>
+        <span class="mgdb-metric-value">$(legacy-count)</span>
+        <span class="mgdb-small mgdb-muted">Untouched</span>
+      </div>
+    </div>
+
+    <div class="status-overall">
+      $(overall-bar)
+      <p class="mgdb-small mgdb-muted">
+        <span class="status-key status-key-modern">Modern</span>
+        <span class="status-key status-key-partial">Partial</span>
+        <span class="status-key status-key-legacy">Legacy</span>
+      </p>
+    </div>
+  </section>
+
+  <section aria-labelledby="redesign-status-category-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">By area</span>
+        <h2 id="redesign-status-category-title">Progress by category</h2>
+      </div>
+      <p>The data centers are the largest single block of work and the most linked-to part of the site, so they move the total more than anything else on this list.</p>
+    </div>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table" data-sortable>
+        <caption>Every URL grouped by the part of the site it belongs to</caption>
+        <thead>
+          <tr>
+            <th scope="col" data-sort="text"><button type="button">Category</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Modern</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Partial</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Legacy</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Total</button></th>
+            <th scope="col" data-sort="number"><button type="button">Progress</button></th>
+          </tr>
+        </thead>
+        <tbody>
+          $(category-rows)
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="redesign-status-next-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Priority</span>
+        <h2 id="redesign-status-next-title">Work on these next</h2>
+      </div>
+      <p>Ranked by exposure: anything reachable from the mega menu first, then by how many places in the codebase link to it. Curation and internal pages are left out.</p>
+    </div>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table status-next-table" data-sortable>
+        <caption>The $(next-count) most exposed pages that are not yet on the design system</caption>
+        <thead>
+          <tr>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Rank</button></th>
+            <th scope="col" data-sort="text"><button type="button">URL</button></th>
+            <th scope="col" data-sort="text"><button type="button">Category</button></th>
+            <th scope="col" data-sort="text"><button type="button">Status</button></th>
+            <th scope="col" data-sort="text"><button type="button">In menu</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Links in</button></th>
+            <th scope="col" data-sort="text"><button type="button">Serving file</button></th>
+          </tr>
+        </thead>
+        <tbody>
+          $(next-rows)
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="redesign-status-orphans-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Nearly free</span>
+        <h2 id="redesign-status-orphans-title">Built on the design system but not routed</h2>
+      </div>
+      <p>$(orphan-count) controllers are already written against the design system and nothing reaches them. Wiring one up is a guard in its parent controller rather than a rebuild.</p>
+    </div>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table">
+        <caption>Modern controllers no URL currently resolves to</caption>
+        <thead>
+          <tr>
+            <th scope="col">File</th>
+            <th scope="col">Named by a controller</th>
+          </tr>
+        </thead>
+        <tbody>
+          $(orphan-rows)
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="redesign-status-inventory-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Everything</span>
+        <h2 id="redesign-status-inventory-title">Full inventory</h2>
+      </div>
+      <p>Search by URL, category, or the file that serves it. Filtering happens as you type and the filtered view can be shared from the address bar.</p>
+    </div>
+
+    <div class="mgdb-search">
+      <div class="mgdb-search-row">
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="status-query">Search URLs</label>
+          <p class="mgdb-hint" id="status-query-hint">A path, a category, or a file name. Example: <code>data_center</code> or <code>search_modern</code></p>
+          <input class="mgdb-input" id="status-query" name="q" type="search" aria-describedby="status-query-hint" autocomplete="off" placeholder="data_center" />
+        </div>
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="status-category">Category</label>
+          <p class="mgdb-hint" id="status-category-hint">Narrow to one part of the site</p>
+          <select class="mgdb-select" id="status-category" aria-describedby="status-category-hint">
+            $(category-options)
+          </select>
+        </div>
+        <button class="mgdb-button mgdb-button-quiet" id="status-reset" type="button" hidden>Reset</button>
+      </div>
+      <div class="mgdb-filters">
+        <span aria-hidden="true" class="mgdb-small mgdb-muted">Interface:</span>
+        $(status-chips)
+        <span class="mgdb-result-count" id="status-count" aria-live="polite"></span>
+      </div>
+    </div>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table status-inventory" id="status-inventory" data-sortable>
+        <caption>Every URL the site answers, with the file that answers it</caption>
+        <thead>
+          <tr>
+            <th scope="col" data-sort="text"><button type="button">URL</button></th>
+            <th scope="col" data-sort="text"><button type="button">Interface</button></th>
+            <th scope="col" data-sort="text"><button type="button">Category</button></th>
+            <th scope="col" data-sort="text"><button type="button">How classified</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Links in</button></th>
+            <th scope="col" data-sort="text"><button type="button">In menu</button></th>
+            <th scope="col" data-sort="text"><button type="button">Serving file</button></th>
+          </tr>
+        </thead>
+        <tbody id="status-inventory-body">
+          $(inventory-rows)
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mgdb-empty" id="status-empty" hidden>
+      <h3>No URLs match that search</h3>
+      <p>There are $(inventory-total) URLs in the inventory. Clear the search and filters to see all of them.</p>
+      <button class="mgdb-button mgdb-button-secondary" id="status-empty-reset" type="button">Clear search and filters</button>
+    </div>
+  </section>
+
+  <section aria-labelledby="redesign-status-hosts-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Outside this codebase</span>
+        <h2 id="redesign-status-hosts-title">MaizeGDB applications on their own subdomain</h2>
+      </div>
+      <p>$(host-count) MaizeGDB subdomains are linked from the codebase. A visitor reads them as MaizeGDB, but they are separate applications with their own interfaces, so they sit outside the counts above and each is its own piece of work.</p>
+    </div>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table" data-sortable>
+        <caption>The 25 most-linked MaizeGDB subdomains</caption>
+        <thead>
+          <tr>
+            <th scope="col" data-sort="text"><button type="button">Host</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Links from the codebase</button></th>
+            <th scope="col" data-sort="text"><button type="button">Example</button></th>
+          </tr>
+        </thead>
+        <tbody>
+          $(host-rows)
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="redesign-status-method-title">
+    <div class="mgdb-prose-layout">
+      <div class="mgdb-prose">
+        <h2 id="redesign-status-method-title" class="mgdb-leaf-heading">How this is measured</h2>
+        <p>The inventory is derived, not maintained. A script walks the web root on this instance and works out which URLs exist the same way the site does: a top-level controller answers its own name, a controller directory answers a second path segment, a single-segment URL with no controller falls through to the fallback search, and a real directory in the web root is served by Apache before any rewrite happens.</p>
+        <p>Guards of the form <code>if &#40;PAGE == 'x'&#41; include&#40;'..._modern.php'&#41;</code> are read out of each controller, so a page swapped in for one route without touching its siblings is credited to that route alone rather than to every page its controller serves.</p>
+        <p>Each URL is then fetched over HTTP from the server itself and the response is read. The live response is the verdict where there is one, which is why a route that redirects somewhere else is scored on the page a visitor actually lands on. Pages that sign in or out, send mail, write to the database, or need a record identifier are never fetched; those rows say <strong>Source</strong> in the <em>How classified</em> column and fall back to reading the controller.</p>
+        <p>A file reachable at more than one URL is one row carrying both, so the totals count pages rather than paths.</p>
+      </div>
+      <aside class="mgdb-aside-card">
+        <h3>Regenerating this page</h3>
+        <p>Run <code>tools/redesign_status.py</code> in the redesign repository. It rewrites <code>REDESIGN_STATUS.md</code> and the data behind this page in one pass.</p>
+        <p class="mgdb-small mgdb-muted">Generated by $(generator).</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="mgdb-resource-panel" aria-labelledby="redesign-status-related-title">
+    <div>
+      <span class="mgdb-eyebrow">Related</span>
+      <h2 id="redesign-status-related-title">Where to start</h2>
+      <p>Every modernized page is composed from the same components, so the pattern library is the first stop before rebuilding anything on this list.</p>
+    </div>
+    <div class="mgdb-resource-list">
+      <a href="/pattern_library/"><strong>Design pattern library</strong><span>Every component in the shared system</span></a>
+      <a href="/data_center/stock"><strong>Stock search</strong><span>A rebuilt data centre search page</span></a>
+      <a href="/data_center/stock/105132"><strong>Stock record</strong><span>A record page built on the JSON API</span></a>
+      <a href="/projects"><strong>Analysis projects</strong><span>The newest kind of page on the site</span></a>
+    </div>
+  </section>
+
+</main>
+)

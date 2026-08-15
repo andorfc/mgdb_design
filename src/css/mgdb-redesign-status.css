@@ -1,0 +1,124 @@
+/* ==========================================================================
+   Redesign status (/redesign_status)
+   --------------------------------------------------------------------------
+   Scoped under .mgdb-redesign-status-page so nothing here can reach another
+   page. Everything is composed from the tokens in /css/mgdb-modern.css; the
+   only thing the shared system has no equivalent for is the three-part
+   proportion bar, which is defined below.
+
+   The bar carries no information on its own: every segment it draws is also
+   printed as a number in the same row, so the page reads the same without
+   colour and without CSS.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Proportion bar
+   -------------------------------------------------------------------------- */
+
+.mgdb-redesign-status-page .status-bar {
+  display: flex;
+  overflow: hidden;
+  width: 100%;
+  min-width: 6rem;
+  height: 0.6rem;
+  border-radius: 999px;
+  background: var(--mgdb-line-soft);
+}
+
+.mgdb-redesign-status-page .status-bar-part { display: block; height: 100%; }
+.mgdb-redesign-status-page .status-bar-modern  { background: var(--mgdb-status-ok); }
+.mgdb-redesign-status-page .status-bar-partial { background: var(--mgdb-status-warn); }
+.mgdb-redesign-status-page .status-bar-legacy  { background: var(--mgdb-line); }
+
+.mgdb-redesign-status-page .status-overall {
+  margin-top: var(--mgdb-space-5);
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-redesign-status-page .status-overall .status-bar { height: 1rem; }
+.mgdb-redesign-status-page .status-overall p { margin: var(--mgdb-space-3) 0 0; }
+
+/* The key repeats the bar's colours as swatches beside their labels, so the
+   mapping is legible without hovering anything. */
+.mgdb-redesign-status-page .status-key {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  margin-right: var(--mgdb-space-4);
+}
+
+.mgdb-redesign-status-page .status-key::before {
+  content: "";
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 3px;
+}
+
+.mgdb-redesign-status-page .status-key-modern::before  { background: var(--mgdb-status-ok); }
+.mgdb-redesign-status-page .status-key-partial::before { background: var(--mgdb-status-warn); }
+.mgdb-redesign-status-page .status-key-legacy::before  { background: var(--mgdb-line); }
+
+/* --------------------------------------------------------------------------
+   Tables
+   -------------------------------------------------------------------------- */
+
+.mgdb-redesign-status-page .status-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-3);
+  min-width: 11rem;
+}
+
+.mgdb-redesign-status-page .status-progress-value {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Paths and file names are the point of most of these cells, so they get the
+   monospace face and are allowed to wrap at a separator rather than forcing
+   the table wider than the viewport. */
+.mgdb-redesign-status-page .status-file,
+.mgdb-redesign-status-page .status-url code {
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xs);
+  overflow-wrap: anywhere;
+}
+
+.mgdb-redesign-status-page .status-url { min-width: 14rem; }
+
+.mgdb-redesign-status-page .status-alias {
+  display: block;
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-redesign-status-page .status-alias code { font-size: inherit; }
+
+.mgdb-redesign-status-page .status-example {
+  max-width: 34rem;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  overflow-wrap: anywhere;
+}
+
+/* The inventory is long. Sticking the header row keeps the column meanings
+   visible while scrolling through it. */
+.mgdb-redesign-status-page .status-inventory thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.mgdb-redesign-status-page .status-inventory td { vertical-align: top; }
+
+.mgdb-redesign-status-page .mgdb-table-scroll { max-width: 100%; }
+
+@media (max-width: 48rem) {
+  .mgdb-redesign-status-page .status-progress { min-width: 8rem; }
+  .mgdb-redesign-status-page .status-example { display: none; }
+}

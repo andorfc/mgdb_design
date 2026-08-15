@@ -1,0 +1,27 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-redesign-status-missing
+<a class="mgdb-skip-link" href="#redesign-status-main">Skip to main content</a>
+<main class="mgdb-page mgdb-redesign-status-page" id="redesign-status-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Redesign status</span>
+  </nav>
+
+  <section class="mgdb-hero-basic" aria-labelledby="redesign-status-title">
+    <div>
+      <span class="mgdb-eyebrow">Page modernization standard</span>
+      <h1 id="redesign-status-title">Redesign status</h1>
+      <p>The scan behind this page has not been deployed to this instance.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="redesign-status-missing-title">
+    <div class="mgdb-message mgdb-message-error" role="status">
+      <h2 id="redesign-status-missing-title" class="mgdb-leaf-heading">No measurement to show</h2>
+      <p>This page renders <code>data/redesign_status.json</code>, which is written by <code>tools/redesign_status.py</code> in the redesign repository and deployed with everything else in the manifest.</p>
+      <p>An empty table here would read as "nothing left to do", so the page says this instead. Run the script and deploy, and the inventory returns.</p>
+    </div>
+  </section>
+
+</main>
+)
