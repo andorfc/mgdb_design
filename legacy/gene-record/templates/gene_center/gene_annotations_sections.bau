@@ -1,0 +1,294 @@
+$$SYNTAX-LEVEL 2
+*(gene-annotations-sections
+  @(annotations {display: off}
+
+    @(gene_model_analyses {display: off}
+      <p><b>Gene model analyses</b></p>
+      $(generic_analyses)
+      <br>
+    )
+    
+    @(no-ont-terms {display: off}
+      <p><b>No ontology terms are attached to this record</b></p>
+      <br>
+    )
+    @(onto-terms {display: off}
+      <br><b>Ontology terms</b>
+      $(ontology_terms)
+    )
+
+    @(no-scores {display: off}
+      <b>No scores are available for this gene model.</b>
+      <br><br>
+    )
+    
+    @(scores {display: off}
+      <br><b>Scores</b><br>
+      (Canoncial transcript is in bold font\)
+      </br><br>
+      
+      @(AED {display: off}
+        <b><span class="tooltip">AED scores<span class="tooltiptext tooltip-right">
+          An Annotation Edit Distance (AED\) score is a measure of confidence 
+          for a predicted gene model transcript. It indicates how well a gene  
+          model matches evidence sequences (e.g. ESTs, RNAseq\). Values are
+          less than 1, with lower values indicating more confidence.
+        </span></span></b>
+        <br>
+        @(aed_scores
+          $(transcript): $(aed_score)<br>
+        )
+      )
+      
+      @(reelGene {display: off}
+        <br>
+        <b><span class="tooltip">reelGene scores<span class="tooltiptext tooltip-right">
+          reelGene is a pipeline of Machine Learning models that looks at transcription 
+          boundaries, mRNA integrity, and protein structure.</span></span></b>
+        <a href="https://doi.org/10.1111/tpj.70483" target="_blank">(Schultz et al., 2025\)</a>
+        Download files from <a href="https://bitbucket.org/bucklerlab/reelgene_scores/src/master/">GitHub</a>.
+        <br>
+        <div style=" border: 1px solid black">
+          <table width="100%">
+            <tr>
+              <th align="left">transcript</th>
+              <th align="left">exon score</th>
+              <th align="left">protein score</th>
+              <th align="left">average</th>
+            </tr>
+            @(reelGene-scores
+            <tr>
+              <td>$(transcript)</td>
+              <td>$(ExonScore)</td>
+              <td>$(ProteinScore)</td>
+              <td>$(Average)</td>
+            </tr>
+            )
+          </table>
+        </div>
+      )
+      
+      @(pSAURON {display: off}
+        <br>
+        <b><span class="tooltip">pSAURON scores<span class="tooltiptext tooltip-right">
+          pSAURON is a Machine Learning model for assessing the quality of protein-coding
+          gene model prediction.</span></span></b>
+        <a href="https://doi.org/10.1093/nargab/lqae189" target="_blank">(Sommer et al., 2025\)</a>
+        <br>
+        <div style=" border: 1px solid black">
+          <table width="100%">
+            <tr>
+              <th align="left">transcript</th>
+              <th align="left">is-protein</th>
+              <th align="left">in_frame_score</th>
+            </tr>
+            @(pSAURON-scores
+            <tr>
+              <td>$(transcript)</td>
+              <td>$(is_protein)</td>
+              <td>$(in_frame_score)</td>
+            </tr>
+            )
+          </table>
+        </div>
+      )
+      
+      @(protein_structure {display: off}
+        <br>
+        <b>Protein structure scores</b>
+        <div style=" border: 1px solid black">
+          <table width="100%">
+            <tr>
+              <th align="left">transcript</th>
+              <th align="left">
+                <span class="tooltip">IUPred2A % >= 0.5<span class="tooltiptext tooltip-right">
+                  The percentage of residues predicted by IUPred2 to be disordered
+                </span></span>
+              </th>
+              <th align="left">
+                <span class="tooltip">Anchor2 % >= 0.5<span class="tooltiptext tooltip-right">
+                  The percentage of residues predicted by Anchor2 to be disordered binding regions
+                </span></span>
+              </th>
+              <th align="left">
+                <span class="tooltip">AlphaFold2 average pLDDT<span class="tooltiptext tooltip-right">
+                  The average pLDDT scores across the protein's AlphaFold2 predicted structure
+                </span></span>
+              </th>
+              <th align="left">
+                <span class="tooltip">ESMfold average pLDDT<span class="tooltiptext tooltip-right">
+                  The average pLDDT scores across the protein's ESMFold predicted structure
+                </span></span>
+              </th>
+              <th align="left">
+              </th>             
+            </tr>
+            @(protein_structure-scores
+            <tr>
+              <td>$(transcript)</td>
+              <td>$(IUPRED2_PERCENT_GREATER_EQUAL_TO_0.5)</td>
+              <td>$(ANCHOR2_PERCENT_GREATER_EQUAL_TO_0.5)</td>
+              <td>$(ALPHAFOLD2_AVERAGE_pLDDT)</td>
+              <td>$(ESMFOLD_AVERAGE_pLDDT)</td>
+            </tr>
+            )
+          </table>
+        </div>
+        <br>
+      )
+      <br><br>
+    )    
+    
+    @(no-user {display: off}
+      <p><b>No community annotations</b></p>
+      <br>
+    )
+    @(user {display: off}
+      <p><b>User Annotations:</b></p>
+      @(user-list
+        <form name="ft_edit_$(auto_num)" id="ft_edit_$(auto_num)" method="post"
+              target="annotation">
+          <input type="hidden" name="auto_num" id="auto_num" value="$(auto_num)">
+          <input type="hidden" name="gene_model_id" id="gene_model_id" value="$(gene_model_id)">
+          <input type="hidden" name="gene_model_version" id="gene_model_version" value="$(gene_model_version)">
+          From:
+          <b><a href="/person/$(person_id)">$(first_name) $(last_name)</a></b>
+          (<i>$(mod_date)</i>\)
+          <br>
+          RE: version $(gene_model_version_modified)
+          <br>
+          <span style="margin-left: 10px;">$(memo)</span>
+        </form>
+      )
+      <br><br>
+    )
+    @(user-curator {display: off}
+      <p><b>User Annotations: (curator's view\)</b></p>
+      @(user-list-ex
+        <form name="ft_edit_$(auto_num)" id="ft_edit_$(auto_num)" method="post"
+              target="annotation">
+          <input type="hidden" name="auto_num" id="auto_num" value="$(auto_num)">
+          <input type="hidden" name="gene_model_id" id="gene_model_id" value="$(gene_model_id)">
+          <input type="hidden" name="gene_model_version" id="gene_model_version" value="$(gene_model_version)">
+          From:
+          <b><a href="/data_center/annotator/$(ann_author_id)">$(first_name) $(last_name)</a></b>
+          (<i>$(mod_date)</i>\)
+          <br>
+          RE: version $(gene_model_version_modified)
+          <br>
+          <span style="margin-left: 10px;">$(memo)</span>
+          <br>
+          <i><a href="#"
+                onclick="popUpAnnotation('ft_edit_$(auto_num)', '/curation/FreeText/edit'\);">Edit this annotation</a>
+          </i>
+        </form>
+      )
+      <br><br>
+    )
+
+    @(gramene {display: off}
+      <b>Gramene Annotations</b>
+      from the latest release at
+      <a href='http://www.gramene.org/'>Gramene</a>:
+      @(ortholog_sec
+        <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Ortholog/Paralog information: </b>
+        <a href="http://www.gramene.org/Zea_mays/Gene/Compara_Tree?g=$(gene_model_id)">Gene Tree View</a>,
+        <a href="http://www.gramene.org/Zea_mays/Gene/Compara_Ortholog?db=core&g=$(gene_model_id)">Ortholog List</a>,
+        <a href="http://www.gramene.org/Zea_mays/Gene/Compara_Paralog?db=core&g=$(gene_model_id)">Paralog List</a>
+      )
+
+      @(var_sec
+        <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Variation Table:</b>
+
+        <a href='http://ensembl.gramene.org/Zea_mays/Transcript/Summary?db=core;t=$(canonical_transcript)'>$(canonical_transcript)</a>
+      )
+      @(misannotation_section {display: off}
+        <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:red"><b>Misannotation:</b></span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A putative gene misannotation 
+        (split gene\) has been identified for this gene model using Compara homology predictions.<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The following gene models may represent one gene:<br>
+        @(joined_genes
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/gene_center/gene/$(joined_gene)">$(joined_gene)</a>
+        )
+      )
+      <br><br>
+    )
+
+    @(no_gramene {display: off | bind: gramene}
+      <b>Gramene Annotations: </b> Gramene Annotations are not
+      available for this gene model.
+      <br><br>
+    )
+
+    @(annotation-sets {display: off}
+      <b>$(annotation_source) $(annotation_version) Annotations: $(annotation_program) $(annotation_program_version)</b> 
+      $(annotation_publication)
+      <br>
+      $(analysis_html)
+      $(transcript-annots)
+      <br><br>
+    )
+    
+    <!-- jp: RI-1061 this had been removed previously in the template, but not in the gene_data code. I've added this back for now
+            to fix the bauplan error that was occurring -->    
+    @(phytozome {display: off}
+      <b>Phytozome Annotations</b>
+     [<div id='id02' style='display: inline;'>
+       <a href="javascript:showDetail3(\)"><b>Reference</b></a>
+      </div>
+      <div id='id12' style='display: none;'>
+        <a href="http://www.ncbi.nlm.nih.gov/pubmed/19965430" alt='PubMed Abstract'>
+          <font size="1"> PubMed Abstract</font>
+        </a>
+        |
+        <a href=\"http://www.sciencemag.org/content/326/5956/1112.long\">
+          <font size="1"> HTML</font>
+        </a>
+      </div>]</b>
+      <br>
+      These annotations are from the 
+      <a href="http://phytozome.jgi.doe.gov/pz/portal.html#!info?alias=Org_Zmays">
+        $(phytozome_maize_version) <i>Zea mays</i> release</a> 
+      of <a href='http://www.phytozome.org'>Phytozome $(phytozome_version)</a> 
+      @(transcript_sec
+        <br>
+        <div style="margin-left: 15pt">
+          <b>Transcript: </b>
+          <a href="http://www.ncbi.nlm.nih.gov/protein/$(transcript_acc)">$(transcript_acc)</a>
+          (Gramene ID: $(transcript_id)\)
+          <div style="margin-left: 15pt">
+            $(pfam_id)
+            $(panther_id)
+            $(kog_id)
+            $(kegg_ec)
+            $(kegg_orth)
+            $(tair_hit)
+            $(rice_hit)
+          </div>
+        </div>
+      )
+    )
+    <br>
+  )
+  
+  @(no_phytozome {display: off} 
+    <b>Phytozome Annotations: </b> Phytozome Annotations are not
+     available for this gene model.<br>
+  )
+  
+  @(protein_accessions {display: off}
+    <br>
+    <b>Protein accessions:</b>
+    <div style="margin-left: 15pt">
+    @(protein_accession_list
+      $(gm_protein) <a href="$(protein_accession_url)">$(protein_accession)</a> 
+      $(protein_description)
+      ($(db-name)\) per $(source)<br>
+    )
+    </div>
+    <br>
+  )
+)

@@ -1,0 +1,224 @@
+$$SYNTAX-LEVEL 2
+*(gene-proteomics-sections
+
+  @(no-proteomics {display: off}
+    <br>
+    No proteomics data is associated with gene model $(gm_id).
+    <br>
+    Check the Pan-gene tab above to see if any related gene models have proteomic data.
+  )
+
+  @(pan-gene-proteomics {display: off}
+    <br>
+    Proteomic data is associated with one or more members of this pan-gene set:<br>
+    @(prot_gene_model_list
+      <a href="/gene_center/gene/$(prot_gene_model)">$(prot_gene_model)</a>
+      <br>
+    )
+    <br>
+  )
+
+
+  @(proteomics {display: off}
+    <br>
+    <i>Proteomics data associated with $(genbank_id)
+      (Gramene ID: $(gm_id)\):</i>
+      <br><br>
+    Tissue-specific expression of peptides has been determined by
+    <a href="http://science.sciencemag.org/content/353/6301/814.full" target="_blank">Walley JW et al. (2016\)</a>. The full set of proteomics data is available for download at <a href="http://science.sciencemag.org/content/353/6301/814.full" target="_blank">Science</a>.
+    <br><br>
+    Using mass spectrometry, an atlas of 17,862 non-modified proteins, and 6,227 phosphoproteins
+    harboring 31,595 phosphorylation sites were quantified across maize development.<br><br>
+    <!--Protein Sequence Coverage-->
+    <div id="datacenter_green_background" style="position: relative;"><!--$(abun_table_width)-->
+    <b>Protein Sequence Coverage</b><br>
+    Identified phosphorylated peptides are highlighted in yellow with the phosphorylation site(s\) highlighted in red.
+    Non-modified peptides are highlighted in gray.
+    <br>
+    @(protein_seq
+     <div id="$(protein)_seq" name="$(protein)_seq" class="protodiv_protSeq" style='display: $(display)'>
+      <table width="100%">
+        <tr height='10px'>
+          $(tabs)
+        </tr>
+      </table>
+      <div style='width: 100%; background-color: white;'>
+       <div style="position:relative; left:20px;top:5px;  width:100%; font-family: monospace;">
+         $(prot_sequence)
+         <br><br>
+       </div>
+       </div>
+      </div>
+    )
+    </div>
+    <br>
+
+
+    <!--Abundance Protein Coverage-->
+    <div id="datacenter_green_background" style="position: relative;"><!--$(abun_table_width)-->
+    <b>Normalized Non-Modified Protein Abundance</b><br><br>
+    @(abun_proteins_sec
+      @(abun_proteins
+       <div id="$(protein)" name="$(protein)" class="protodiv_abunProt" style='display: $(display)'>
+         <!--<b>Phosphorylated Proteins: </b> <br> $(abun_peptides) <br><br>-->
+        <table width="100%">
+          <tr height='10px'>
+            $(tabs)
+          </tr>
+        </table>
+        <div style='width: 100%; background-color: white;'>
+         <div style="position:relative; left:20px;top:5px;  width:100%;">
+           <a href="#!" onclick='javascript:open_sb("$(gbrowse_url)/etc/images/protoProteinAbundance/$(internal_id).png", "Abundance Protein: $(protein)"\);'>
+             <img src="$(gbrowse_url)/etc/images/protoProteinAbundance/$(internal_id).png" style="width: 95%"/>
+           </a>         <br>
+         </div>
+         </div>
+        </div>
+      )
+    )
+    @(no_abun_proteins {display: off}
+     <b>There is no non-modified protein data for $(gm_id)</b>
+    )
+    </div>
+    <br>
+
+    <!--Phosphorylated Protein Coverage-->
+    <div id="datacenter_green_background" style="position: relative;"><!--$(abun_table_width)-->
+    <b>Normalized Phosphoprotein Abundance</b><br><br>
+    @(phos_proteins_sec
+    @(phos_proteins
+     <div id="$(protein)" name="$(protein)" class="protodiv_phosProt" style='display: $(display)'>
+       <!--<b>Phosphorylated Proteins: </b> <br> $(abun_peptides) <br><br>-->
+      <table width="100%">
+        <tr height='10px'>
+          $(tabs)
+        </tr>
+      </table>
+      <div style='width: 100%; background-color: white;'>
+       <div style="position:relative; left:20px;top:5px;  width:100%;">
+         <a href="#!" onclick='javascript:open_sb("$(gbrowse_url)/etc/images/protoProteinPhosphorylated/$(internal_id).png", "Phosphorylated Protein: $(protein)"\);'>
+           <img src="$(gbrowse_url)/etc/images/protoProteinPhosphorylated/$(internal_id).png" style="width: 95%"/>
+         </a>         <br>
+         <!--<b>Score:</b> $(score)<br>-->
+         <b>Protein Coverage:</b> $(protein_coverage)<br>
+         <b>In Group Proteins:</b> $(in_group_proteins)<br>
+         <b>Group Leader:</b> $(group_leader)<br><br>
+       </div>
+       </div>
+      </div>
+    )
+    )
+    @(no_phos_proteins {display: off | bind: phos_proteins_sec}
+     <b>There is no phosphorylated protein data for $(gm_id)</b>
+    )
+    </div>
+    <br>
+
+    <!--Phosphorylated Peptides-->
+   <div id="datacenter_green_background">
+    <a href="#!" onclick="javascript:toggle_sec('phos_pep'\);">
+      <img id="phos_pep_icon" src="/images/expand.png"/>
+      <b>Phosphorylated Peptides</b>
+      </a>
+    <div id="phos_pep" style="position: relative; display: none;">
+    @(phosphorylated_sec
+      <br>
+    <span style="font-weight:bold;" title="Click to go to the genome browser">Peptide Sequence Coverage:</span><br>
+    (Click the image to go to the browser\)<br>
+    <a href="/gbrowse/maize_v3/?q=$(gm_id);enable=ProteomicsPhosphorylatedPeptides">
+      <img title="Click to go to the genome browser"
+           src="$(gbrowse_img_url_v3)/?q=$(gm_id);enable=ProteomicsPhosphorylatedPeptides;width=600"/>
+    </a>
+    <br><br>
+    @(phos_images
+     <div id="$(peptide)" name="$(peptide)" class="protodiv_phos" style='display: $(display)'>
+     Click a peptide to view its tissue quanitifcation data.
+     <br>$(phos_peptides) <br><br>
+     Each peptide contains one or more expression images based on its Phosphopeptide Sequence. The number in the sequence represents the confidence in
+     phosphosite assignment where a value >= 0.99 is considered localized and anything less is considered unlocalized.<br>
+      <table width="100%">
+        <tr height='10px'>
+          $(tabs)
+        </tr>
+      </table>
+      <div style='width: 100%; background-color: white;'>
+       <div style="position:relative; left:20px;top:5px;  width:100%;">
+        $(content)
+         <!--<a href="#$(sequence_vml)" onclick='javascript:open_sb("$(gbrowse_url)/etc/images/protoPeptidePhosphorylated/$(internal_id).png", "Sequence VML: $(sequence_vml)"\);'>
+           <img src="$(gbrowse_url)/etc/images/protoPeptidePhosphorylated/$(internal_id).png" style="width: 95%"/>
+         </a>         <br>
+         <b>Protein:</b> $(parent_proteins)<br>
+         <b>Peptide:</b> $(peptide)<br>
+         <b>Sequence VML:</b> $(sequence_vml)<br><br>-->
+       </div>
+       </div>
+      </div>
+    )
+    )
+    @(no_phos {display: off | bind: phosphorylated_sec}
+     <b>There is no phosphorylated peptide data for $(gm_id).</b>
+    )
+    </div>
+   </div>
+   <br>
+   <!--Abundance Peptides-->
+   <div id="datacenter_green_background">
+    <a href="#!" onclick="javascript:toggle_sec('abun_pep'\);">
+      <img id="abun_pep_icon" src="/images/expand.png"/>
+      <b>Non-modified Peptides</b>
+      </a>
+    <div id="abun_pep" style="position: relative; display: none;"><!--$(abun_table_width)-->
+    @(abundance_sec
+      <br><span style="font-weight:bold;" title="Click to go to the genome browser">Peptide Sequence Coverage:</span><br>
+      (Click the image to go to the browser\)<br>
+      <a href="/gbrowse/maize_v3/?q=$(gm_id);enable=ProteomicsAbundancePeptides">
+        <img title="Click to go to the genome browser"
+             src="$(gbrowse_img_url_v3)/?q=$(gm_id);enable=ProteomicsAbundancePeptides;width=600"/>
+      </a>
+      <br><br>
+      @(peptides
+       <div id="$(internal_id)" name="$(internal_id)" class="protodiv" style='display: $(display)'>
+         Click a peptide to view its tissue quantification data.
+         <br> $(abun_peptides) <br><br>
+        <table width="100%">
+          <tr height='10px'>
+            $(tabs)
+          </tr>
+        </table>
+        <div style='width: 100%; background-color: white;'>
+         <div style="position:relative; left:20px;top:5px;  width:100%;">
+           <a href="#$(peptide)" onclick='javascript:open_sb("$(gbrowse_url)/etc/images/protoPeptideAbundance/$(internal_id).png", "Abundance Peptide: $(peptide)"\);'>
+             <img src="$(gbrowse_url)/etc/images/protoPeptideAbundance/$(internal_id).png" style="width: 95%"/>
+           </a>         <br>
+           <b>Protein(s\):</b> $(parent_proteins)<br>
+           <b>Peptide:</b> $(peptide)<br><br>
+         </div>
+         </div>
+        </div>
+      )
+    )
+    @(no_abun_peptides {display: off}
+     <b>There is no non-modified peptide data for $(gm_id)</b>
+    )
+    </div>
+   </div>
+   <br><br>
+  )
+
+  <script src="https://unpkg.com/ngl@0.10.4/dist/ngl.js"></script>
+   @(alphafold {display: off}
+       @(alphafold_sec
+           $(alphafold_html)
+      )
+
+   )
+
+      @(esmfold {display: off}
+          @(esmfold_sec
+              $(esmfold_html)
+         )
+
+      )
+
+
+)

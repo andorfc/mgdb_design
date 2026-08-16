@@ -1,0 +1,18 @@
+$$SYNTAX-LEVEL 2
+*(genomebrowser_sections
+
+  @(genome-browsers {display: off}
+    <div id="genome-browsers-content" name="genome-browsers-content">
+      <div id="gb-div" name="gb-div" width="95%" class="genome_box toggle_div gb_div"
+           style="display:$(display)">
+        <div id="gb-content" name="gb-content"
+             style="position:relative; left:20px;top:5px; width:95%; height: auto">
+          $(genomebrowser-contents)
+        </div>
+        <br>
+      </div>
+      
+    </div>
+  ) 
+  
+)

@@ -1,0 +1,665 @@
+$$SYNTAX-LEVEL 2
+*(gene_model-eFP-browser-sections
+<br>
+
+  @(efp_headers_sec {display: off}
+     *(gene-expression-efp-information {load: ../templates/gene_center/gene_expression_efp_information.bau})
+        <br><br>
+        <label class="select_label">
+            <select class="select_header" onchange="toggle_tabs_efp(this.value, 'gbdiv'\)">
+                @(efp_menu_opts
+                  $(option)
+                )
+            </select>
+        </label>
+  )
+  @(efp_browser_sec {display: off}
+    <div id="efp" class="gbdiv" name="efp" style="display: inline">
+      
+      <!--<div class="sec_header_green">
+        eFP Atlas Browser
+      </div>-->
+      <!--<table width="100%">
+        <tr height='10px'>
+          <td width='24%' class='genomebrowser_tab_focus' align="center">
+            eFP Atlas Browser<sup>(<a style="cursor: pointer; color: blue;" onclick="javascript:toggleDesc('efp-desc'\)">?</a>\)</sup>
+            <br>
+          </td>
+          @(efp-stress_tab {display: off}
+          <td width='24%' class='genomebrowser_tab_unfocus' onclick="toggle_tab('efp-stress', 'gbdiv'\)" align="center">
+            eFP Stress Browser
+            <br>
+          </td>
+          )
+          @(efp-kernel_tab {display: off}
+          <td width='24%' class='genomebrowser_tab_unfocus' onclick="toggle_tab('efp-kernel', 'gbdiv'\)" align="center">
+            eFP Kernel Browser
+            <br>
+          </td>
+          )
+          @(efp-rna_tab
+          <td width='24%' align="center" 
+              class='genomebrowser_tab_unfocus' onclick="toggle_tab('rna', 'gbdiv'\)">
+            RNA-Seq Expression
+            <br>
+          </td>
+          )
+          <td width='4%' style='align: right; width: 20%;'>
+            &nbsp;&nbsp;&nbsp;
+          </td>
+        </tr>
+      </table>
+      -->
+      
+      <!-- jp 
+      <div width="95%" style='width: 95%; background-color: white;'>
+        <div style="position:relative; left:20px;top:5px;  width:95%;">-->
+      <div class="sec_green">
+
+          <div id="efp-desc" class="exp_desc" style="display:none;width:550px;font-size:11px;">
+            <div style="text-align:right;background-color: gray;">
+              <a onclick="javascript:toggleDesc('efp-desc'\)" 
+                style='text-decoration:none; cursor: pointer;'>
+                <span style='font-size:10;color:white;'>Close X</span>
+              </a>
+            </div>
+            <br>
+            *(gene-expression-efp-information2 {load: ../templates/gene_center/gene_expression_efp_information.bau})
+          </div>
+            
+          @(efp-error {display: off}
+            <i>
+              This gene model was not found in eFP browser. This is likely because
+              the gene model is not part of the original atlas data, but if you believe 
+              it is please contact MaizeGDB using the feedback button above. 
+            </i>
+            <br><br>
+          )
+          
+          @(efp-no-browser {display: off}
+            <i>No eFP view exists for $(gm_id)</i><br>
+            <br>
+          )
+            
+          @(efp-browser {display: off}
+            <a href="#efp" onclick="javascript:open_sb('$(efp-img_src)', '$(gm_name)'\);" rel="shadowbox">
+              <img src="$(efp-img_src)" width='100%'/>
+            </a>
+            <br><br>
+            <b>Expression: </b>
+            See the <a href="$(efp-link)" target="blank">eFP Browser</a>
+            (<a href='https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1934936/' 
+                target='_blank'>Winter et al. 2007</a>\)
+            for tissue-specific expression of <b>$(gm_name)</b> as determined by the
+            <a href="https://www.ncbi.nlm.nih.gov/pubmed/30537259" target="_blank">Hoopes et al. 2018</a> 
+            'Maize Organ-specific and Stress-induced Gene Expression Atlas' and 
+            <a href="https://www.ncbi.nlm.nih.gov/pubmed/27898762" target="_blank">Stelpflug et al. 2016</a> 
+            'Maize Gene Expression Atlas.' The original data set was done on the Zm-B73-REFERENCE-GRAMENE-4.0 annotation.
+            <br><br>
+          ) 
+          
+       <!-- jp </div>
+        <br>-->
+      </div> 
+    </div>
+  )
+  
+  @(efp_stress_browser_sec {display: off}
+    <div id="efp-stress" class="gbdiv" name="efp-stress" style="display: none">    
+      <!--<label class="select_label">
+        <select class="select_header" onchange="toggle_tab(this.value, 'gbdiv'\)">
+            <option value="efp-stress">eFP Stress Browser</option>
+            <option value="efp">eFP Atlas Browser</option>
+            <option value="efp-kernel">eFP Kernel Browser</option>
+            <option value="rna">RNA-Seq Expression</option>
+        </select>
+        </label>-->
+      <!--<table width="100%">
+        <tr height='10px'>
+           <td width='24%' class='genomebrowser_tab_unfocus' onclick="toggle_tab('efp', 'gbdiv'\)" align="center">
+            eFP Atlas Browser
+            <br>
+          </td>
+          <td width='24%' class='genomebrowser_tab_focus' align="center">
+            eFP Stress Browser(<a style="cursor: pointer; color: blue;" onclick="javascript:toggleDesc('efp_stress-desc'\)">?</a>\)
+            <br>
+          </td>
+          @(efp_stress-kernel_tab {display: off}
+          <td width='24%' class='genomebrowser_tab_unfocus' onclick="toggle_tab('efp-kernel', 'gbdiv'\)" align="center">
+            eFP Kernel Browser
+            <br>
+          </td>
+          )
+          @(efp_stress-rna_tab
+          <td width='24%' align="center" 
+              class='genomebrowser_tab_unfocus' onclick="toggle_tab('rna', 'gbdiv'\)">
+            RNA-Seq Expression
+            <br>
+          </td>
+          )
+          <td width='4%' style='align: right;'>
+            &nbsp;&nbsp;&nbsp;
+          </td>
+        </tr>
+      </table>-->
+      
+      <div class="sec_green">
+          <div id="efp_stress-desc" class="exp_desc" style="display: none;width: 550px; font-size:11px;">
+            <div style="text-align:right;background-color: gray;">
+              <a onclick="javascript:toggleDesc('efp_stress-desc'\)" 
+                style='text-decoration:none; cursor: pointer;'>
+                <span style='font-size:10;color:white;'>Close X</span>
+              </a>
+           </div>
+           <br>
+            *(gene-expression-efp-information-stress {load: ../templates/gene_center/gene_expression_efp_information.bau})
+          </div>
+          <br>
+          
+          @(efp_stress-error {display: off}
+            <i>
+              This gene model was not found in eFP stress browser. This is likely because
+              the gene model is not part of the original atlas data, but if you believe 
+              it is please contact MaizeGDB using the feedback button above. 
+            </i>
+            <br><br>
+          )
+          
+          @(efp_stress-no-browser {display: off}
+            <i>No eFP stress view exists for $(gm_id)</i><br>
+            <br>
+          )
+          
+          @(efp_stress-browser {display: off}
+            <a href="#efp-stress" onclick="javascript:open_sb('$(efp_stress-img_src)', '$(gm_name)'\);" rel="shadowbox">
+              <img src="" url="$(efp_stress-img_src)" width='100%'/>
+            </a>
+            <br><br>
+            <b>Expression: </b>
+            See the <a href="$(efp_stress-link)" target="_blank">eFP Browser</a> 
+            (<a href='https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1934936/' 
+                target='_blank'>Winter et al. 2007</a>\)
+            for tissue-specific expression of <b>$(gm_name)</b> as determined by the
+            <a href="https://www.ncbi.nlm.nih.gov/pubmed/30537259" target="_blank">Hoopes et al. 2018</a> 
+            'Maize Organ-specific and Stress-induced Gene Expression Atlas' and 
+            <a href="https://www.ncbi.nlm.nih.gov/pubmed/27898762" target="_blank">Stelpflug et al. 2016</a> 
+            'Maize Gene Expression Atlas',
+            and by <a href="https://www.ncbi.nlm.nih.gov/pubmed/25174417" target="_blank">Opitz et al. 2014</a>,
+            <a href="https://www.ncbi.nlm.nih.gov/pubmed/25569788" target="_blank">Makarevitch et al. 2015</a>, 
+            and <a href="https://www.ncbi.nlm.nih.gov/pubmed/28535078" target="_blank">Swart et al. 2017</a>.
+            The original data set was done on the Zm-B73-REFERENCE-GRAMENE-4.0 annotation.
+            <br>
+          )      
+        </div>
+        <br>
+    </div>
+  )
+  
+  @(efp_kernel_browser_sec {display: off}
+    <div id="efp-kernel" class="gbdiv" name="efp-kernel" style="display: none">    
+      <!--<label class="select_label">
+        <select class="select_header" onchange="toggle_tab(this.value, 'gbdiv'\)">
+            <option value="efp-kernel">eFP Kernel Browser</option>
+            <option value="efp">eFP Atlas Browser</option>
+            <option value="efp-stress">eFP Stress Browser</option>
+            <option value="rna">RNA-Seq Expression</option>
+        </select>
+      </label>-->
+      <!--<table width="100%">
+        <tr height='10px'>
+           <td width='24%' class='genomebrowser_tab_unfocus' onclick="toggle_tab('efp', 'gbdiv'\)" align="center">
+            eFP Atlas Browser
+            <br>
+          </td>
+          @(efp_kernel-stress_tab {display: off}
+          <td width='24%' class='genomebrowser_tab_unfocus' onclick="toggle_tab('efp-stress', 'gbdiv'\)" align="center">
+            eFP Stress Browser
+            <br>
+          </td>
+          )
+          <td width='24%' class='genomebrowser_tab_focus' align="center">
+            eFP Kernel Browser(<a style="cursor: pointer; color: blue;" onclick="javascript:toggleDesc('efp_kernel-desc'\)">?</a>\)
+            <br>
+          </td>
+          @(efp_kernel-rna_tab
+          <td width='24%' align="center" 
+              class='genomebrowser_tab_unfocus' onclick="toggle_tab('rna', 'gbdiv'\)">
+            RNA-Seq Expression
+            <br>
+          </td>
+          )
+          <td width='4%' style='align: right;'>
+            &nbsp;&nbsp;&nbsp;
+          </td>
+        </tr>
+      </table>-->
+      
+      <div class="sec_green">
+          <div id="efp_kernel-desc" class="exp_desc" style="display:none; width: 550px; font-size:11px;">
+            <div style="text-align:right;background-color: gray;">
+              <a onclick="javascript:toggleDesc('efp_kernel-desc'\)" 
+                style='text-decoration:none; cursor: pointer;'>
+                <span style='font-size:10;color:white;'>Close X</span>
+              </a>
+           </div>
+           <br>
+           *(gene-expression-efp-information-kernel {load: ../templates/gene_center/gene_expression_efp_information.bau})
+          </div>
+          <br>
+          
+          @(efp_kernel-error {display: off}
+            <i>
+              This gene model was not found in eFP kernel browser. This is likely because
+              the gene model is not part of the original atlas data, but if you believe 
+              it is please contact MaizeGDB using the feedback button above. 
+            </i>
+            <br><br>
+          )
+          
+          @(efp_kernel-no-browser {display: off}
+            <i>No eFP kernel view exists for $(gm_id)</i><br>
+            <br>
+          )
+          
+          @(efp_kernel-browser {display: off}
+            <a href="#efp-kernel" onclick="javascript:open_sb('$(efp_kernel-img_src)', '$(gm_name)'\);" rel="shadowbox">
+              <img src="" url="$(efp_kernel-img_src)" width='100%'/>
+            </a>
+            <br><br>
+            <b>Expression: </b>
+            <a href='$(efp_kernel-link)' target='_blank'>See the eFP Browser</a> 
+            (<a href='https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1934936/' 
+                target='_blank'>Winter et al. 2007</a>\)
+            for tissue-specific expression of <b>$(gm_name)</b> as determined by
+            <a href="https://doi.org/10.1105/tpc.19.00756" target="_blank">Doll et al. 2020</a>.
+            The original data set was done on the Zm-B73-REFERENCE-GRAMENE-4.0 annotation.
+            <br>
+          )      
+        </div>
+        <br>
+    </div>
+  )
+  
+   @(efp_seed_browser_sec {display: off}
+    <div id="efp-seed" class="gbdiv" name="efp-seed" style="display: none">    
+      <div class="sec_green">
+          <br>
+          @(efp_seed-error {display: off}
+            <i>
+              This gene model was not found in eFP seed browser. This is likely because
+              the gene model is not part of the original atlas data, but if you believe 
+              it is please contact MaizeGDB using the feedback button above. 
+            </i>
+            <br><br>
+          )
+          
+          @(efp_seed-no-browser {display: off}
+            <i>No eFP seed view exists for $(gm_id)</i><br>
+            <br>
+          )
+          
+          @(efp_seed-browser {display: off}
+            <a href="#efp-seed" onclick="javascript:open_sb('$(efp_seed-img_src)', '$(gm_name)'\);" rel="shadowbox">
+              <img src="" url="$(efp_seed-img_src)" width='100%'/>
+            </a>
+            <br><br>
+            <b>Expression: </b>
+            <a href='$(efp_seed-link)' target='_blank'>See the eFP Browser</a> 
+            (<a href='https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1934936/' 
+                target='_blank'>Winter et al. 2007</a>\)
+            for tissue-specific expression of <b>$(gm_name)</b> as determined by
+            <a href="https://doi.org/10.1105/tpc.18.00961" target="_blank">Yi et al. 2019</a>.
+            <br>
+          )      
+        </div>
+        <br>
+    </div>
+  )
+  
+  @(efp_downs-atlas_browser_sec {display: off}
+    <div id="efp-downs-atlas" class="gbdiv" name="efp-downs-atlas" style="display: none">    
+      <div class="sec_green">
+          <br>
+          @(efp_downs-atlas-error {display: off}
+            <i>
+              This gene model was not found in eFP Downs et al. atlas browser. This is likely because
+              the gene model is not part of the original atlas data, but if you believe 
+              it is please contact MaizeGDB using the feedback button above. 
+            </i>
+            <br><br>
+          )
+          
+          @(efp_downs-atlas-no-browser {display: off}
+            <i>No eFP downs-atlas view exists for $(gm_id)</i><br>
+            <br>
+          )
+          
+          @(efp_downs-atlas-browser {display: off}
+            <a href="#efp-downs-atlas" onclick="javascript:open_sb('$(efp_downs-atlas-img_src)', '$(gm_name)'\);" rel="shadowbox">
+              <img src="" url="$(efp_downs-atlas-img_src)" width='100%'/>
+            </a>
+            <br><br>
+            <b>Expression: </b>
+            <a href='$(efp_downs-atlas-link)' target='_blank'>See the eFP Browser</a> 
+            (<a href='https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1934936/' 
+                target='_blank'>Winter et al. 2007</a>\)
+            for tissue-specific expression of <b>$(gm_name)</b> as determined by
+            <a href="http://dx.doi.org/10.1104/pp.112.213231" target="_blank">Downs et al. 2013</a>. The original data set was done on the B73 RefGen_v3 annotation.
+            <br>
+          )      
+        </div>
+        <br>
+    </div>
+  )
+  
+  @(efp_embryonic_browser_sec {display: off}
+    <div id="efp-embryonic" class="gbdiv" name="efp-embryonic" style="display: none">    
+      <div class="sec_green">
+          <br>
+          @(efp_embryonic-error {display: off}
+            <i>
+              This gene model was not found in eFP embryonic leaf development browser. This is likely because
+              the gene model is not part of the original atlas data, but if you believe 
+              it is please contact MaizeGDB using the feedback button above. 
+            </i>
+            <br><br>
+          )
+          
+          @(efp_embryonic-no-browser {display: off}
+            <i>No eFP embryonic view exists for $(gm_id)</i><br>
+            <br>
+          )
+          
+          @(efp_embryonic-browser {display: off}
+            <a href="#efp-embryonic" onclick="javascript:open_sb('$(efp_embryonic-img_src)', '$(gm_name)'\);" rel="shadowbox">
+              <img src="" url="$(efp_embryonic-img_src)" width='100%'/>
+            </a>
+            <br><br>
+            <b>Expression: </b>
+            <a href='$(efp_embryonic-link)' target='_blank'>See the eFP Browser</a> 
+            (<a href='https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1934936/' 
+                target='_blank'>Winter et al. 2007</a>\)
+            for tissue-specific expression of <b>$(gm_name)</b> as determined by
+            <a href="https://doi.org/10.1073/pnas.2208795119" target="_blank">Liu et al. 2022</a>.
+            The original data set was done on the Zm-B73-REFERENCE-GRAMENE-4.0 annotation.
+            <br>
+          )      
+        </div>
+        <br>
+    </div>
+  )
+  
+  @(efp_root_browser_sec {display: off}
+    <div id="efp-root" class="gbdiv" name="efp-root" style="display: none">    
+      <div class="sec_green">
+          <br>
+          @(efp_root-error {display: off}
+            <i>
+              This gene model was not found in eFP root browser. This is likely because
+              the gene model is not part of the original atlas data, but if you believe 
+              it is please contact MaizeGDB using the feedback button above. 
+            </i>
+            <br><br>
+          )
+          
+          @(efp_root-no-browser {display: off}
+            <i>No eFP root view exists for $(gm_id)</i><br>
+            <br>
+          )
+          
+          @(efp_root-browser {display: off}
+            <a href="#efp-root" onclick="javascript:open_sb('$(efp_root-img_src)', '$(gm_name)'\);" rel="shadowbox">
+              <img src="" url="$(efp_root-img_src)" width='100%'/>
+            </a>
+            <br><br>
+            <b>Expression: </b>
+            <a href='$(efp_root-link)' target='_blank'>See the eFP Browser</a> 
+            (<a href='https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1934936/' 
+                target='_blank'>Winter et al. 2007</a>\)
+            for tissue-specific expression of <b>$(gm_name)</b> as determined by
+            <a href="https://doi.org/10.1093/jxb/erv453" target="_blank">Opitz et al. 2016</a>, <a href="https://doi.org/10.1093/jxb/erx104" target="_blank">Hey et al. 2017</a>, <a href="https://doi.org/10.1093/jxb/erw422" target="_blank">Tai et al. 2016</a>, and <a href="https://doi.org/10.1186/1471-2164-15-741" target="_blank">Opitz et al. 2014</a>. The original data set was done on the B73 RefGen_v3 annotation.
+            <br>
+          )      
+        </div>
+        <br>
+    </div>
+  )
+  
+  @(efp_sekhon-atlas_browser_sec {display: off}
+    <div id="efp-sekhon-atlas" class="gbdiv" name="efp-sekhon-atlas" style="display: none">    
+      <div class="sec_green">
+          <br>
+          @(efp_sekhon-atlas-error {display: off}
+            <i>
+              This gene model was not found in eFP Sekhon et al. atlas browser. This is likely because
+              the gene model is not part of the original atlas data, but if you believe 
+              it is please contact MaizeGDB using the feedback button above. 
+            </i>
+            <br><br>
+          )
+          
+          @(efp_sekhon-atlas-no-browser {display: off}
+            <i>No eFP Sekhon et al. atlas view exists for $(gm_id)</i><br>
+            <br>
+          )
+          
+          @(efp_sekhon-atlas-browser {display: off}
+            <a href="#efp-sekhon-atlas" onclick="javascript:open_sb('$(efp_sekhon-atlas-img_src)', '$(gm_name)'\);" rel="shadowbox">
+              <img src="" url="$(efp_sekhon-atlas-img_src)" width='100%'/>
+            </a>
+            <br><br>
+            <b>Expression: </b>
+            <a href='$(efp_sekhon-atlas-link)' target='_blank'>See the eFP Browser</a> 
+            (<a href='https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1934936/' 
+                target='_blank'>Winter et al. 2007</a>\)
+            for tissue-specific expression of <b>$(gm_name)</b> as determined by
+            <a href="https://doi.org/10.1111/j.1365-313x.2011.04527.x" target="_blank">Sekhon et al. 2011</a>. The original data set was done on the B73 RefGen_v3 annotation.
+            <br>
+          )      
+        </div>
+        <br>
+    </div>
+  )
+  
+  @(efp_tassel_browser_sec {display: off}
+    <div id="efp-tassel" class="gbdiv" name="efp-tassel" style="display: none">    
+      <div class="sec_green">
+          <br>
+          @(efp_tassel-error {display: off}
+            <i>
+              This gene model was not found in eFP tassel browser. This is likely because
+              the gene model is not part of the original atlas data, but if you believe 
+              it is please contact MaizeGDB using the feedback button above. 
+            </i>
+            <br><br>
+          )
+          
+          @(efp_tassel-no-browser {display: off}
+            <i>No eFP tassel view exists for $(gm_id)</i><br>
+            <br>
+          )
+          
+          @(efp_tassel-browser {display: off}
+            <a href="#efp-tassel" onclick="javascript:open_sb('$(efp_tassel-img_src)', '$(gm_name)'\);" rel="shadowbox">
+              <img src="" url="$(efp_tassel-img_src)" width='100%'/>
+            </a>
+            <br><br>
+            <b>Expression: </b>
+            <a href='$(efp_tassel-link)' target='_blank'>See the eFP Browser</a> 
+            (<a href='https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1934936/' 
+                target='_blank'>Winter et al. 2007</a>\)
+            for tissue-specific expression of <b>$(gm_name)</b> as determined by
+            <a href="https://doi.org/10.1101/gr.166397.113" target="_blank">Eveland et al. 2014</a>. The original data set was done on the B73 RefGen_v3 annotation.
+            <br>
+          )      
+        </div>
+        <br>
+    </div>
+  )
+  
+  @(efp_iplant_browser_sec {display: off}
+    <div id="efp-iplant" class="gbdiv" name="efp-iplant" style="display: none">    
+      <div class="sec_green">
+          <br>
+          @(efp_iplant-error {display: off}
+            <i>
+              This gene model was not found in eFP iplant browser. This is likely because
+              the gene model is not part of the original atlas data, but if you believe 
+              it is please contact MaizeGDB using the feedback button above. 
+            </i>
+            <br><br>
+          )
+          
+          @(efp_iplant-no-browser {display: off}
+            <br><br>
+            <i>No eFP iplant view exists for $(gm_id)</i><br>
+            <br>
+          )
+          
+          @(efp_iplant-browser {display: off}
+            <a href="#efp-iplant" onclick="javascript:open_sb('$(efp_iplant-img_src)', '$(gm_name)'\);" rel="shadowbox">
+              <img src="" url="$(efp_iplant-img_src)" width='100%'/>
+            </a>
+            <br><br>
+            <b>Expression: </b>
+            <a href='$(efp_iplant-link)' target='_blank'>See the eFP Browser</a> 
+            (<a href='https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1934936/' 
+                target='_blank'>Winter et al. 2007</a>\)
+            for tissue-specific expression of <b>$(gm_name)</b> as determined by
+            <a href="https://doi.org/10.1038/ng.703" target="_blank">Li et al. 2010</a>. The original data set was done on the B73 RefGen_v3 annotation.
+            <br>
+          )      
+        </div>
+        <br>
+    </div>
+  )
+  
+  @(efp_leaf_browser_sec {display: off}
+    <div id="efp-leaf" class="gbdiv" name="efp-leaf" style="display: none">    
+      <div class="sec_green">
+          <br>
+          @(efp_leaf-error {display: off}
+            <i>
+              This gene model was not found in eFP leaf browser. This is likely because
+              the gene model is not part of the original atlas data, but if you believe 
+              it is please contact MaizeGDB using the feedback button above. 
+            </i>
+            <br><br>
+          )
+          
+          @(efp_leaf-no-browser {display: off}
+            <i>No eFP leaf view exists for $(gm_id)</i><br>
+            <br>
+          )
+          
+          @(efp_leaf-browser {display: off}
+            <a href="#efp-leaf" onclick="javascript:open_sb('$(efp_leaf-img_src)', '$(gm_name)'\);" rel="shadowbox">
+              <img src="" url="$(efp_leaf-img_src)" width='100%'/>
+            </a>
+            <br><br>
+            <b>Expression: </b>
+            <a href='$(efp_leaf-link)' target='_blank'>See the eFP Browser</a> 
+            (<a href='https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1934936/' 
+                target='_blank'>Winter et al. 2007</a>\)
+            for tissue-specific expression of <b>$(gm_name)</b> as determined by
+            <a href="http://dx.doi.org/10.1038/nbt.3019" target="_blank">Wang et al. 2014</a>. The original data set was done on the B73 RefGen_v3 annotation.
+            <br>
+          )      
+        </div>
+        <br>
+    </div>
+  )
+  
+  @(rna_seq_sec {display: off}
+    <div id="rna" name="rna" class="gbdiv" style='display: $(rna_init_display)'>
+      <!--<label class="select_label">
+        <select class="select_header" onchange="toggle_tab(this.value, 'gbdiv'\)">
+            <option value="rna">RNA-Seq Expression</option>
+            <option value="efp">eFP Atlas Browser</option>
+            <option value="efp-stress">eFP Stress Browser</option>
+            <option value="efp-kernel">eFP Kernel Browser</option>
+        </select>
+      </label>-->
+      <!--<table width="100%">
+        <tr height='10px'>
+        @(rna_efp_tab
+          <td width='24%'  align="center" class='genomebrowser_tab_unfocus'
+              onclick="toggle_tab('efp', 'gbdiv'\)">
+            eFP Atlas Browser
+            <br>
+          </td>
+        )
+          @(rna_efp-stress_tab {display: off}
+          <td width='24%'  align="center" class='genomebrowser_tab_unfocus'
+              onclick="toggle_tab('efp-stress', 'gbdiv'\)">
+            eFP Stress Browser
+            <br>
+          </td>
+          )
+          @(rna_efp-kernel_tab {display: off}
+          <td width='24%'  align="center" class='genomebrowser_tab_unfocus'
+              onclick="toggle_tab('efp-kernel', 'gbdiv'\)">
+           eFP Kernel Browser
+            <br>
+          </td>
+          )
+          <td width='24%' align="center" 
+              class='genomebrowser_tab_focus'>
+            RNA-Seq Expression
+            <br>
+          </td>
+          <td width='4%' style='align: right; width: 20%;'>
+            &nbsp;&nbsp;&nbsp;
+          </td>
+        </tr>
+      </table>-->
+      
+      <div class="sec_green">
+          @(no-rnaseq-exp-histogram {display: off}
+            <br><br>
+            <i>No RNA-Seq based expression histogram exists for $(gm_id)</i><br>
+            <br>
+          )
+            
+          @(rnaseq-exp-histogram {display: off}
+            <a href="#rnaseq" onclick='javascript:open_sb("$(gbrowse_url)/etc/images/$(img_path)", "$(gm_id)"\);'>
+             <img src="" url="$(gbrowse_url)/etc/images/$(img_path)" width="95%">
+             </a>
+            <br>
+            <i>Showing the canonical transcript $(hist_id). See the 
+             genome browser for the complete list
+            </i>
+            <br><br>
+            @(v3-data_desc {display: off}
+              The RNA-seq gene atlas of maize inbred B73 includes 79 distinct replicated samples. 
+              This includes 50 samples from the original array-based gene atlas 
+              (Sekhon et al. 2011, Plant J 66:553-563\), a time-course of 12 stalk
+              and leaf samples post-flowering (Sekhon et al. 2012, Plant Phys. 159:1730-1744\),
+              and a novel set of 17 samples from the maize seedling and adult root system. 
+              The entire dataset contains 4.6 billion mapped reads, with an average of 20.5
+              million mapped reads per biological replicate, allowing for detection of genes
+              with lower transcript abundance. For more information see: 
+              <a href=\"/data_center/reference?id=9031218\" target=\"_blank\">
+                Stelpflug, S.C., R.S. Sekhon, B. Vaillancourt, C.N. Hirsch, C.R. Buell, N. de Leon,
+                and S.M. Kaeppler. 2015. An expanded maize gene expression atlas based on RNA-sequencing
+                and its use to explore root development. Plant Genome.
+              </a>
+            )
+            @(v4-data_desc {display: off}
+              This RNA-seq gene atlas of maize inbred B73 includes 68 distinct samples over 23 tissues with 3 
+              biological replicates per tissue (2 replicates in Vegetative Meristem\). The reads were mapped to 
+              B73 RefGen_v4 using STAR.  Transcripts were observed from 43,781 genes. The entire dataset contains 
+              1.35 billion uniquely mapped reads, with an average of 19.9 million uniquely mapped reads per biological 
+              replicate. For more information see: 
+              <a href='http://science.sciencemag.org/content/353/6301/814.full' target='_blank'>
+                 Walley JW, Sartor RC, Shen Z, Schmitz RJ, Wu KJ, Urich MA, et al. 
+                 2016. Integration of omic networks in a developmental atlas of maize. Science.
+              </a>
+            )
+            <br><br>    
+          )         
+        </div>
+        <br>
+    </div>
+  )   
+)

@@ -1,0 +1,535 @@
+$$SYNTAX-LEVEL 2
+*(overview-sections
+
+  @(overview {display: off}
+    <br>
+    <b>Gene Model Set:</b> $(gene_model_set), 
+    <b>Assembly version:</b> <a href="/genome/genome_assembly/$(assembly_version)">$(assembly_version)</a><br>
+    <b>Model Type:</b> $(model_type)<br>
+    <b>Alternative names:</b> $(alt_names)<br>
+    <b>NCBI Gene (Entrez Gene\): </b> $(entrez_gene) $(entrez_name)<br>
+    @(ec_number {display: off}
+      <span class=\"tooltip\"><b>EC:</b>
+        <span class=\"tooltiptext tooltip-right\">Enzyme Commission number</span>
+      </span>
+      $(ec)
+      <br>
+    )
+    
+    @(history {display: off}
+      <span class=\"tooltip\"><b>History:</b>
+        <span class=\"tooltiptext tooltip-right\">$(history_analysis)</span>
+      </span>
+      $(history_str)
+      <br>
+    )
+    
+    @(related_gene_models {display: off}
+    <!-- no longer used, replaced by pan-gene tab -->
+      <b>$(relationship_type)</b>
+      <br>
+      <table width="100%">
+        <tr align="left">
+          <th width="4em" valign="top"></th>
+          <th width="7em" valign="top">quality&nbsp;</th>
+          <th width="12em" valign="top">relationship&nbsp;</th>
+          <th width="14em" valign="top">gene model(s\)&nbsp;</th>
+          <th width="10em" valign="top">set&nbsp;</th>
+          <th width="24em" valign="top">assembly&nbsp;</th>
+          <th width="14em" valign="top">computed by</th>
+        </tr>
+        @(related_gene_model_list
+          <tr align="left">
+            <td></td>
+            <td width="7em" valign="top">$(quality)&nbsp;</td>
+            <td width="12em" valign="top">$(association_type)&nbsp;</td>
+            <td width="14em" valign="top">$(related_gms)&nbsp;</td>
+            <td width="10em" valign="top">$(related_gene_model_set)&nbsp;</td>
+            <td width="24em" valign="top"><a href="/genome/genome_assembly/$(related_assembly)">$(related_assembly)</a>&nbsp;</td>
+            <td width="14em" valign="top">$(association_attribution)&nbsp;</td>
+          </tr>
+        )
+      </table>
+    )
+    
+    @(related_gene_model {display: off}
+    <!-- no longer used, replaced by pan-gene tab -->
+      <b>$(relationship_type)</b>
+      <br>
+      $(association_type) $(related_gms) in gene model set $(related_gene_model_set)
+      for assembly <a href="/genome/genome_assembly/$(related_assembly)">$(related_assembly)</a>. 
+      Quality of association is $(quality).
+      Calculated by $(association_attribution).
+      <br>
+    )
+    
+    @(improved_gene_model {display: off}
+      <b>Previous Version:</b>
+      The gene model
+      <a href='/gene_center/gene/$(gene_model)'>$(gene_model)</a>
+      on $(assembly_version) is an improved version of gene model
+      <b>$(prev_gene_model)</b> on $(prev_assembly_version).
+      <br>
+    )
+
+    @(merged_gene_model {display: off}
+      <b>Merged gene models:</b>
+      $(quality)
+      merged gene models $(merged_models)
+      $(association_attribution)
+      <br>
+    )
+
+    @(overlapped_gene_models {display: off}
+      <br><span style="color:#ff1010;font-weight:bold">
+      This gene models overlaps </span>
+      @(overlapped_list
+        <a href="/gene_center/gene/$(overlapped_gene_model)">$(overlapped_gene_model)</a>
+      )
+      <br>
+    )
+    
+    @(tandem_gene_models {display: off}
+      <br>
+      This gene model is in a <b>tandem array</b> with the following gene models:<br>
+      @(tandem_gene_model_list
+        &nbsp;&nbsp;&nbsp;<a href="/gene_center/gene/$(tandem_gene)">$(tandem_gene)</a>
+        $(overlap)
+        <br>
+      )
+    )
+    
+    @(pan_gene_member {display: off}
+      <br>
+      This gene model is in a 
+      <a href="/pan_gene_center/pan_gene/$(gene_model_name)"><b>pan-gene</b></a>.
+      <br>
+    )
+
+    @(retained {display: off}
+      <b>Previous Version:</b>
+      The gene model <a href='/gene_center/gene/$(agid)'>$(agid)</a>
+      in $(prev_annotation_version) was maintained as gene model
+      <a href='/gene_center/gene/$(agid)'>$(agid)</a>
+      in $(annotation_version).
+      <br>
+    )
+
+    @(critical_comment_section {display: off}
+      <b>Critical comment:</b><br>
+      <div class="small_tab" style="color:crimson">$(critical_comment)</div>
+      <br>
+    )
+    
+    @(jira_issues_section {display: off}
+      @(open-issue {display: off} <img src="/icon/red_flag_16.png">)
+      @(resolved-issue {display: off} <img src="/icon/blue_flag_16.png">)
+      <b>Issues:</b>
+      <div style='margin-left: 40px;'>
+        <ul>
+          *(lambda {load: ../templates/partials/issues.bau})
+        </ul>
+      </div>
+    )
+
+    @(assembly_issues_section {display: off}
+      <b>Issues:</b>
+      <div style='margin-left: 40px;'>
+        <ul>
+        @(issue-list
+          <li>
+            <section>
+              $(flag)
+              <p>$(title)</p>
+              <div style='margin-left: 5px;'>
+                <dl>
+                  <dt>
+                    <b>Assembly:</b> $(assembly_name {default: not specified})
+                  </dt>
+                  <dt>
+                    <b>Annotation:</b> $(annotation_name {default: not specified})
+                  </dt>
+                  <dt>
+                    <b>Affected component(s\):</b> $(components)
+                  </dt>
+                  <dt>
+                    $(display_text)
+                  </dt>
+                  <dt>
+                    Created: $(created), last updated: $(updated)
+                  </dt>
+                </dl>
+                <br>
+              </div>
+            </section>
+          </li>
+        )
+        </ul>
+      </div>
+    )
+
+    @(hand-curated_section {display: off}
+      <img src="/icon/blue_flag_16.png">
+      <b>The structure of this gene module has been modified through hand curatation.</b>
+      <div style="margin-left:20px">
+        <a href="#" onclick="toggleItem('hand_curated'\)"><img id="hand_curated_img" src="/images/expand.png"> Show changes</a>
+        <div id="hand_curated" style="position:relative;display:none">
+          <div style="width: 100%; text-align: center"><img border="no" src="/images/ajax-loader-small.gif" id="browser_loader02"/></div>
+            <a href='$(gbrowseURL)?name=$(gm_chr):$(gm_min)..$(gm_max);h_feat=$(gm_id)'><br>
+            <img border='no' src="$(gbrowse_img_url)/?name=$(gm_chr):$(gm_min)..$(gm_max);h_feat=$(gm_id)@lightgreen;width=600;type=$(gbrowse_type)+Curated_Annotations" 
+                 onload="document.getElementById('browser_loader02'\).style.display='none'">
+            </a>
+          </div>
+          <br>
+          For more information, visit the 
+          <a href="http://www.gramene.org/curated_maize_v4_gene_models">Gramene gene model curation page</a>
+        </div>
+      </div>
+      <br>
+    )
+    
+    @(overview_browser {display: off}
+      <br>
+      <b>Genome Browser:</b> <a href="$(browser_link)">($(ngm_chr): $(ngm_start)..$(ngm_end)\)</a><br>
+      @(gbrowse-snapshot {display: off}
+        <div style="width: 100%; text-align: center"><img border="no" src="/images/ajax-loader-small.gif" id="browser_loader01"/></div>
+        <a href='$(gbrowseURL)?name=$(gm_chr):$(gm_min)..$(gm_max);h_feat=$(gm_id)'><br><img border='no'
+           src="$(gbrowse_img_url)/?name=$(gm_chr):$(gm_min)..$(gm_max);h_feat=$(gm_id)@lightgreen;width=600;type=$(gbrowse_type)$(other_tracks)" 
+           onload="document.getElementById('browser_loader01'\).style.display='none'">
+        </a>
+        <br><br>
+      )
+      @(jbrowse-snapshot {display: off}
+        <iframe style="width: 100%; height: 300px;" src="$(browser_link)&tracklist=0&nav=0&overview=0"></iframe>
+        <br><br>
+      )
+    )
+
+    @(no_loci {display: off}
+      <b>Gene name (Symbol\):</b>&nbsp;&nbsp;<i>There are no loci linked to this gene model.</i>
+      <br>
+    )
+
+    @(gene_model_transcript {display: off}
+      <b><span class="tooltip">Canonical<span class="tooltiptext tooltip-right">
+        Canonical is the representative transcript or protein for a gene model
+        which may have multiple isoforms.</span></span> 
+        Transcript:</b> $(transcript)<br>
+      <b>Canonical Length:</b> $(transcript_len)bp</b><br>
+      <b>Canonical Protein:</b>
+      $(can_protein)
+      @(genbank_accession {display: off}
+        (GenBank accession: 
+        <a href="http://www.ncbi.nlm.nih.gov/protein/$(transcript_acc)">$(transcript_acc)</a>\)
+      )
+      <br>
+    )
+    
+    @(variant-effect {display: off}
+      <p>
+        <b>Variant effects:</b>
+        <a href="/effect/maize_v2/?id=$(gene_model)">$(gene_model)</a>
+      </p>
+      <br>
+    )
+    @(has_gene_products {display: off}
+      <p>
+        <b>Gene Products:</b><br>
+        @(gene-products-list
+          <div class='small_tab'>
+            <a href="/data_center/gene_product?id=$(gp_id)">$(gp_name)</a>
+          </div>
+        )
+      </p>
+    )
+    
+    @(no_meta {display: off}
+      <b>Metabolic Pathway:</b><br>
+      There is currently no pathway information available for this gene model.
+      <br>
+    )
+
+    @(metapath {display: off}
+      <b><span class="tooltip">Metabolic Pathway:<span class="tooltiptext tooltip-right">
+        Note that different pathway analyses may put the same gene into 
+        different pathways.
+      </span></span></b>
+      
+      @(no_corncyc {display: off}
+        <div style="margin-left: 10px">
+          This gene model does not appear in 
+          <a href="$(corncyc_url)/CORN/search-query?type=GENE&gname=$(gene_id)" 
+             target="_new">CornCyc</a>.
+        </div>
+        <br>
+      )
+      @(corncyc_link {display: off}
+        This gene model is in 
+        <a href="$(corncyc_url)/CORN/search-query?type=GENE&gname=$(gene_id)" 
+           target="_new">CornCyc</a> but has not been assigned to a path.
+      )
+      @(corncyc {display: off}
+        <div style="margin-left: 10px">
+          <b>Pathway information in <a href="$(corncyc_url)/CORN/" target="_new">CornCyc</a></b>
+          <table cellspacing=2 cellpadding=2>
+            <tr>
+              <td><u>database</u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+              <td><u>protein</u>&nbsp;&nbsp;</td>
+              <td><u>gene/transcript</u></td>
+              <td><u>pathway</u></td>
+            </tr>
+          @(corncyc_pathways
+            <tr>
+              <td>$(corncyc_dbname)</td>
+              <td>$(corncyc_protein)&nbsp;&nbsp;</td>
+              <td>$(transcript)&nbsp;&nbsp;</td>
+              <td><a href='$(corncyc_url)$(corncyc_pathway_id)' target="_new">$(corncyc_pathway_name)</a></td>
+            </tr>
+          )
+          </table>
+        </div>
+        <br>
+      )
+      
+      @(other_pathways {display: off}
+        <div style="margin-left: 10px">
+          <b>Other pathways:</b><br>
+          @(pathways 
+            <a href="$(pathway_url)">$(pathway_db)</a>
+            <a href="$(pathway_urlprefix)$(pathway_name)">$(pathway_name)</a>
+            $(pathway_description)<br>
+          )
+        </div>
+        <br>
+      )
+    )
+
+    @(reactions {display: off}
+      <b>Reaction(s\):</b><br>
+      <div style="margin-left: 10px">
+        @(reaction_list 
+          <a href="$(reaction_url)">$(reaction_db)</a>
+          <a href="$(reaction_urlprefix)$(reaction_name)">$(reaction_name)</a>
+          $(reaction_description)<br>
+        )
+      </div>
+      <br>
+    )
+
+    @(phylogenic-tree {display: off}
+      <b><span class="tooltip">Phylogenic tree(s\)<span class="tooltiptext tooltip=right">
+        Note that different phylogentic tree analyses may group the same gene model
+        into a tree with a different structure, or with different members.
+      </span></span></b>:
+      <div style="margin-left: 10px">
+        @(phylotrees
+          <a href="$(phylogenelink)" target="_blank">$(phylogenename)</a> 
+          (<a href="$(phylolink)">$(phylosource)</a>\)<br>
+        )
+      </div>
+      <br>
+    )
+    
+    
+    @(PLAZA-3.0 {display: off}
+      <b>PLAZA</b>: 
+      $(PLAZA-3.0_ids)
+      <br>
+    )
+    
+    @(UniProt {display: off}
+      <b>UniProt accession(s\)</b>: <br>
+      $(UniProt_ids)
+      <br><br>
+    )
+    
+    @(protein-domains {display: off}
+      <b>Protein domains</b>:
+      <div style="margin-left:20">
+        <b>String representation in order along gene model</b> 
+        <br>
+        Numbers in brackets indicate repeat count and <b>bold font</b> indicates canonical transcript
+        <br><br>
+        $(protein-domain-string)
+        <br>
+        <table style="margin-top:5px">
+          <tr>
+            <th align="left">Domain Name</th>
+            <th width="5px"></th>
+            <th>Accession</th>
+            <th width="5px"></th>
+            <th align="left">Description</th>
+          </tr>
+          @(protein-domain-accessions
+          <tr>
+            <td align="left">$(domain_name)</td>
+            <td></td>
+            <td><a href="https://www.ebi.ac.uk/interpro/entry/pfam/$(domain_accession)">$(domain_accession)</a></td>
+            <td></td>
+            <td align="left">$(domain_description)</td>
+          </tr>
+          )
+        </table>
+      </div>
+      <br>
+    )
+    
+    @(no-orthologs {display: off}
+      <b>Syntenic orthologs:</b> <i>Syntenic orthologs are not available for this gene model.</i>
+      <br>
+    )
+
+    @(orthologs {display: off}
+      <b><span class="tooltip">Orthologs<span class="tooltiptext tolltip-right">
+        $(ortholog_attribution)
+      </span></span></b>
+      <div style="margin-left:40px">
+        <b>Sorghum bicolor (Sorghum\) ortholog</b>: $(sorghum)
+        <br>
+        <b>Setaria italica (Foxtail millet\) ortholog</b>: $(foxtail)
+        <br>
+        <b>Oryza sativa japonica (Rice\) ortholog</b>: $(rice)
+        <br>
+        <b>Brachypodium distachyon (Brachypodium\) ortholog</b>: $(brachy)
+        <br>
+        @(at_ortho {display: off} <b>Arabidopsis ortholog</b>: $(arabidopsis)<br>)
+        <br>
+        $(ortho_gevo)
+        $(ortho_qteller)
+      </div>
+    )
+    
+    @(phylostrata {display: off}
+       <br><b><span class="tooltip">Phylostrata<span class="tooltiptext tolltip-right">
+        Phylostratigraphy determines the level of evolutionary conservation of a given protein, shown here on a scale from 1 (cellular organisms, most conserved\) to 14 (Zea mays mays, least conserved\).
+      </span></span></b><br>
+       <div style="margin-left: 25px">
+          <a href="#!" onclick="javascript:open_sb('https://images.maizegdb.org/phylostrata/B73_phylostrata_images/output_images/$(gene_model).png', 'Phylostrata data for $(gene_model)'\);"> 
+          <img style='border:1px solid #000000' src='https://images.maizegdb.org/phylostrata/B73_phylostrata_images/output_images/downsized/$(gene_model).jpg'/>
+          </a><br>
+          <a href="https://phylostrata.maizegdb.org/gene_pages/index.html?page=$(gene_model)" target="_blank">Phylostrata details for $(gene_model)</a> | <a href="https://phylostrata.maizegdb.org/#about" target="_blank">About the Phylostrata tool</a>
+          <br>
+      </div>
+
+    )
+
+    @(phytozome {display: off}
+      <b>Phytozome Annotations</b>
+     [<div id='id02' style='display: inline;'>
+       <a href="javascript:showDetail3(\)"><b>Reference</b></a>
+      </div>
+      <div id='id12' style='display: none;'>
+        <a href="http://www.ncbi.nlm.nih.gov/pubmed/19965430" alt='PubMed Abstract'>
+          <font size="1"> PubMed Abstract</font>
+        </a>
+        |
+        <a href=\"http://www.sciencemag.org/content/326/5956/1112.long\">
+          <font size="1"> HTML</font>
+        </a>
+      </div>]</b>
+
+      These annotations are from the
+      <a href="http://phytozome.jgi.doe.gov/pz/portal.html#!info?alias=Org_Zmays">
+        $(phytozome_maize_version) <i>Zea mays</i> release</a>
+      of <a href='http://www.phytozome.org'>Phytozome $(phytozome_version)</a>
+      @(transcript_sec
+        <br>
+        <div style="margin-left: 15pt">
+          <b>Transcript: </b>
+          <a href="http://www.ncbi.nlm.nih.gov/protein/$(transcript_acc)">$(transcript_acc)</a>
+          (Gramene ID: $(transcript_id)\)
+          <div style="margin-left: 15pt">
+            $(pfam_id)
+            $(panther_id)
+            $(kog_id)
+            $(kegg_ec)
+            $(kegg_orth)
+            $(tair_hit)
+            $(rice_hit)
+          </div>
+        </div>
+        <br>
+      )
+    )
+    @(no_phytozome {display: off}
+      <b>Phytozome Annotations: </b> Phytozome Annotations are not
+      available for this gene model.<br>
+    )
+
+    @(POG {display: off}
+      <b>See
+      <a href="http://pogs.uoregon.edu">Putative Orthologous Group</a></b>:
+      <a href="http://pogs.uoregon.edu/#/search/genemodel/$(transcript)">$(protein)</a>
+      [ <a href="http://dx.doi.org/10.1371/journal.pone.0082569">Reference</a> ]
+      <br><br>
+    )
+
+    @(GEvo-comparison {display: off}
+      <br>
+      <b>GEvo GenBank Record/Gene Model Comparison</b>:
+      <a href='http://www.genomevolution.org/CoGe/GEvo.pl?;accn1=$(gene_model);dsid1=43385;gbaccn2=$(genbank_acc);prog=blastn;autogo=1;num_seqs=2'>$(gene_model)</a>
+      <br>
+    )
+
+    @(maizemine {display: off}
+      <br>
+      <p style="height:125%">
+        See this gene model in <a href="$(maizemine_link)">
+          <img src="/images/maize_mine_logo.png" style="border:1px solid gray;border-radius:5px;margin-bottom:-5px">
+        </a>
+      </p>
+    )
+    
+    @(SNPversity {display: off}
+      <br>
+      Explore genotype data for $(gene_id) using <a href="/snpversity">SNPversity</a>
+      <br>
+    )
+    
+    @(loci_sec {display: off}
+      <br>
+      <b>All Associated Loci:</b> (some may be synonyms\)<br>
+      <table>
+        <tr>
+          <th>Locus</th>
+          <th>Type</th>
+          <th>Authority</th>
+        </tr>
+      @(loci
+        <tr>
+          <td>
+            &nbsp;
+            <a href="/data_center/locus/$(locus_id)" target="_new">$(locus_name)</a>
+            &nbsp;
+          </td>
+          <td>&nbsp;$(type)&nbsp;</td>
+          <td>&nbsp;$(assoc_source)</td>
+        </tr>
+      )
+      </table>
+      <br>
+    )
+
+    @(no_loci_sec {display: off}
+      <b>This gene model is not associated with any loci</b><br>
+    )
+
+    @(new_gene_model {display: off}
+      The gene model
+      <a href='/gene_center/gene/$(gene_model)'>$(gene_id)</a>
+      is new in the gene model set "$(annotation_version)".
+      <br>
+    )
+    
+    @(gramene_link {display: off}
+      See this gene model at 
+      <a href="https://ensembl.gramene.org/Zea_mays/Gene/Summary?db=core;g=$(gene_id)"
+         target="_blank">Gramene.org</a>
+    )
+  )
+
+  ;; compat for showAnnotations
+  @(lambda {display: off}
+    $(no-user)
+  )
+)

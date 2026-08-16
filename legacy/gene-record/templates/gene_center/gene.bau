@@ -1,0 +1,94 @@
+*(gene #include-js: /js/locus_lookup.js#
+
+  <!-- create classical genes-->
+  <div id='classical_div'>
+  </div>
+
+  <!-- create gene reviews-->
+  <div id='genereview_div'>
+  </div>
+
+
+  <!-- create AJAX to populate sections-->
+  <script language="JavaScript">
+    var gm_id    = '$(gm_id)';
+    var locus_id = '$(locus_id)';
+    
+    var data_center_id;
+    if (gm_id != ''\) {
+      data_center_id = gm_id;
+      getData("gene", "top", gm_id\);
+    }
+    else if (locus_id != ''\) {
+      data_center_id = locus_id;
+      getData('gene_locus', "top", locus_id\);
+    }
+    else {
+      // oops! (should never get here!\)
+    }
+    
+    @(nav_checkbox_javascript_gm
+      set_checkBoxes("gene", gm_id, "nav_form", "$(nav_name)", "$(nav_id0)", "$(is_checked)"\); 
+      setRecordTab('$(id_type)'\);
+    )
+    if (get_cookie("gene"\) != 'set'\) {
+      document.cookie = "gene=set";
+    }
+   
+    @(nav_checkbox_javascript_sequence
+      set_checkBoxes("gene_sequence", gm_id, "nav_formSequence", "$(nav_name)", "$(nav_id0)", "$(is_checked)"\); 
+      setRecordTab('$(id_type)'\);
+    )
+    if (get_cookie("gene_sequence"\) != 'set'\) {
+      document.cookie = "gene_sequence=set";
+    }
+   
+    @(nav_checkbox_javascript_pangenome
+      document.cookie = gene_pangenome_overview_checked=true;
+      set_checkBoxes("gene_pangenome", gm_id, "nav_formPanGenome", "$(nav_name)", "$(nav_id0)", "$(is_checked)"\); 
+      setRecordTab('$(id_type)'\);
+    )
+    if (get_cookie("gene_pangenome"\) != 'set'\) {
+      document.cookie = "gene_pangenome=set";
+    }
+   
+    @(nav_checkbox_javascript_gene
+      set_checkBoxes("gene_locus", locus_id, "nav_formGene", "$(nav_name)", "$(nav_id0)", "$(is_checked)"\); 
+      setRecordTab('$(id_type)'\);
+    )    
+    if (get_cookie('gene_locus'\) != 'set'\) {
+      document.cookie="gene_locus=set";
+    }
+   
+  
+    function set_checkBoxes(data_center_type, data_center_id, nav_form, 
+                            menu_item_name, menu_item, is_checked \) {
+      var Name1 = data_center_type + "_" + menu_item + "_checked";
+      var checkid = "checkbox" + menu_item;
+      
+      if (typeof document.forms[nav_form][checkid] !== 'undefined'\) {
+var t3 = get_cookie(data_center_type\);
+        if (get_cookie(data_center_type\) != 'set'\) {
+          var cookie_value = (is_checked == "checked"\);
+          document.cookie=data_center_type + "_" + menu_item + "_checked=" + cookie_value;
+        }
+        
+var t4 = get_cookie(Name1\);
+        if (get_cookie(Name1\) == 'true'\) {
+          document.forms[nav_form][checkid].checked = true;
+        } 
+        else {
+          document.forms[nav_form][checkid].checked = false;
+        }
+        
+        if (document.forms[nav_form][checkid].checked \) {
+          getData(data_center_type, menu_item, data_center_id\);
+        } 
+        else {
+          getBlank(menu_item_name, menu_item, data_center_id\);
+        }
+      }
+    }
+  
+  </script>
+)

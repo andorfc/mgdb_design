@@ -1,0 +1,55 @@
+*(gene_model_search
+<!-- $(version) - to fix an annoyance -->
+  <table cellpadding=0 cellspacing=0>
+    <tr>
+      <td>
+        <div id="centercolumn_record">
+          <table cellspacing=0 cellpadding=0>
+            <tr>
+              <td align="left"> 
+                <div  class="nowrap">
+                  <div style="width: 100%; overflow: hidden;">
+                    <div style="margin-left: 10px;width:400px">
+                      <form action="javascript:popUpAnnotation('gene_issueform', '/curation/GeneModelIssue/edit'\);" 
+                             method="post" id="gene_issueform">
+                        <input type="hidden" id="gene_model_id" value="Zm00001d002005">
+                        <input type="hidden" id="gene_model_version" value="Zm00001d.2">
+                        <input type="hidden" id="auto_num" name="auto_num" value="">
+                        <a class="trigger_gene_model_issue_form" 
+                           style="color: crimson; text-decoration: underline; font-weight:bold;" href="#" >
+                           Report a gene model error</a>
+                      </form>
+                    </div>
+                  </div> 
+                </div>               
+              </td>
+              <td align="right" width = "100%"> 
+                <a href="/index.php"> Home</a> > 
+                <a href="/gene_center/">Gene Center</a> > 
+                <a href="/gene_center/gene">Gene</a> 
+              </td>
+            </tr>
+          </table>
+          <br>
+          <table width=100% cellpadding=0 cellspacing=0>
+            <tr valign='center' class='green_curve_background'>
+              <td align='left'>
+                <img src='/images/header_left.gif'>
+              </td>
+              <td width='97%' valign='center' class='green_curve_background'>
+                Gene Data In MaizeGDB			
+              </td>
+              <td align='right'>
+                <img src='/images/header_right.gif'>
+              </td>
+            </tr>
+          </table>	 
+        </div>
+  
+  *(datacenter-left #load: templates/gene_center/gene-left.bau#)
+  *(datacenter-right #load: templates/gene_center/gene-right.bau#)
+  
+      </td>
+    </tr>
+  </table>
+)

@@ -1,0 +1,203 @@
+$$SYNTAX-LEVEL 2
+*(gene-sequence-details
+  
+  @(no-sequence {display: off}
+    <br>
+    <div id="sequence-content" name="sequence-content">
+      <br>
+      <i>No sequence available</i>
+      <br><br><br><br>
+    </div>
+  )
+
+  @(sequence-many-transcripts {display: off}
+    <br>
+    $(gene_set_source)
+    <br><br>
+    Note that while transcript sequence is available for all gene models, 
+    genomic and protein sequences may not be available.
+    <br><br>
+    <center>Genomic DNA for Gene Model</center>
+    <hr>
+    All genomic sequence is generated in the forward direction.
+    <br>
+    <b>ID:</b> $(genbank_id) (Gramene ID: $(gene_id)\)
+    <br><br>
+    <u>Genomic DNA:</u><br>
+    <br>
+    <iframe style="color:green"  width="100%" height="200"
+            src="https://sequence2.maizegdb.org/get_sequence.php?gene-model-set=$(gene_model_set)&dbtype=nuc&id=$(gene_id)">
+    </iframe>
+    <a href="$(blast_url)&sequence=$(gene_id)&gene_model_set=$(gene_model_set)">
+    BLAST DNA sequence against MaizeGDB</a> | 
+    <a href="https://sequence2.maizegdb.org/get_sequence.php?gene-model-set=$(gene_model_set)&dbtype=nuc&id=$(gene_id)"
+       target="_blank">
+      Download DNA sequence
+    </a>
+    <br>
+    <br><br>
+    <center>Transcripts and Translations</center><hr>
+    <br>
+    This model has <b>$(count)</b> transcript(s\).
+    <br><br>
+    Canonical transcript: $(canonical_transcript)
+    <iframe style="color:green"  width="100%" height="200"
+            src="https://sequence2.maizegdb.org/get_sequence.php?gene-model-set=$(gene_model_set)&dbtype=cdna&id=$(transcript_id)">
+    </iframe>
+    <form method="POST">
+      <input type="hidden" id="gene-model-set" value="$(gene_model_set)">
+      <input type="hidden" id="id" value="$(trans_id_list)">
+      <a href="#!" onclick="downloadSequence(\$(this\), 'cdna'\)">
+        Download all transcript sequences (slow, if many transcripts\)
+      </a>
+    </form>
+    <br><br>
+    <b>Translation ID:</b> $(translation_id)<br>
+    GenBank accession: 
+    <a href="https://www.ncbi.nlm.nih.gov/protein/$(transcript_acc)">$(transcript_acc)</a>
+    <br><br>    
+    <u>Translation:</u><br>
+    <br>
+    <iframe style="color:green"  width='100%' height='200'  
+            src="https://sequence2.maizegdb.org/get_sequence.php?gene-model-set=$(gene_model_set)&dbtype=protein&id=$(translation_id)">
+    </iframe>
+    <form method="POST">
+      <input type="hidden" id="gene-model-set" value="$(gene_model_set)">
+      <input type="hidden" id="id" value="$(prot_id_list)">
+      <a href="#!" onclick="downloadSequence(\$(this\), 'protein'\)">
+        Download all protein sequences (slow, if many transcripts\)
+      </a>
+    </form>
+    <br>
+  )
+  
+  @(sequence-details {display: off}
+    <br>
+    $(gene_set_source)
+    <br><br>
+    Note that while transcript sequence is available for all gene models, 
+    genomic and protein sequence may not be available.
+    <br><br>
+    
+    @(no_region {display: off}
+      <br>This gene model is not associated with $(version)
+      <br><br>
+    ) 
+
+    @(region {display: on} 
+      <br><br>
+      <center>Genomic DNA for Gene Model</center><hr>
+      All genomic sequence is generated in the forward direction.
+      <br>
+      <b>ID:</b> $(genbank_id) (Gramene ID: $(gene_id)\)
+      <br><br>
+      <u>Genomic DNA</u><br>
+      <br>
+      <iframe style="color:green"  width="100%" height="200"
+              src="https://sequence2.maizegdb.org/get_sequence.php?gene-model-set=$(gene_model_set)&dbtype=nuc&id=$(gene_id)">
+      </iframe>
+      <a href="$(blast_url)&sequence=$(gene_id)&gene_model_set=$(gene_model_set)">
+      BLAST DNA sequence against MaizeGDB</a> | 
+      <a href="https://sequence2.maizegdb.org/get_sequence.php?gene-model-set=$(gene_model_set)&dbtype=nuc&id=$(gene_id)"
+         target="_blank">
+        Download DNA sequence
+      </a>
+      <br>
+      <br><br>
+      <center>Transcripts and Translations</center><hr>
+      <br>
+      $(gene_id) has <b>$(count)</b> transcript(s\).
+      @(non-coding {display: off}
+        <br>
+        <b>This is a non-coding gene model, so it may lack transcript and/or protein sequences.</b>
+      )
+      <br><br>
+  
+      @(transcript_tabs {display: off}
+        <table valign="top" cellspacing=5 cellpadding=3 width="100%">
+          <tr valign="top" id="seq-$(tab_set)">
+            @(seq-transcripts_tabs
+              <td id="seq-$(section_id)" name="seq-$(section_id)"
+                  class="trans_tab $(class)" 
+                  onclick="toggle_transcript('seq-$(tab_set)', 'div-$(tab_set)', 'seq-$(section_id)'\)">
+                $(section_name)
+              </td>
+            )
+          </tr>
+        </table>
+      )
+      
+      <div id="div-$(tab_set)">
+        @(transcripts
+          <div id="seq-$(section_id)_div" name="seq-$(section_id)_div" 
+               class="trans_div" style="display: $(display)">
+            <table valign="top" cellspacing=5 cellpadding=3 width="100%">    
+              <tr valign='top'>
+                <td>
+                  <b>Transcript ID:</b> 
+                    <a href="http://www.ncbi.nlm.nih.gov/protein/$(transcript_acc)">$(transcript_acc)</a>
+                    (Gramene ID: $(transcript_id)\)
+                  <br>
+                  <b>Canonical</b>: $(canonical)<br>
+                  <b>Transcript Class</b>: $(transcript_class)<br>
+                  <b>Evidence Type</b>: $(evidence_type)<br>
+                  <b>Model Type</b>: $(model_type)<br>
+                  <b>Probes</b>: $(probes)<br>
+                  <b>Position:</b> $(chr): $(transcript_start)..$(transcript_end)<br>
+                  <b>Length:</b> $(trans_seq_len)bp
+                  <br><br>    
+                </td>
+<!-- ...but left it to make bauplan happy...
+                  <td valign='top' align='right'>
+                    <a href='http://genomaize.org/cgi-bin/hgTracks?position=$(transcript_id)'>
+                      <img src='/images/genomaize_small.gif' style="border: 1px solid white"></a>
+                    <br>
+                    <a href='http://www.plantgdb.org/ZmGDB/cgi-bin/findRecord.pl?id=$(transcript_id)'>
+                      <img src='/images/plantgdb2.jpg' style="border: 1px solid white"></a>
+                    <br>
+                    <a href='http://www.plantgdb.org/yrGATE/ZmGDB/AnnotationTool.pl?start=$(transcript_start)&end=$(transcript_end)&dbid=1&blastDB=&altCONTEXT=chr&chr=$(chr_num)'>
+                      <img src='/images/annotate_plantgdb.jpg' style="border: 1px solid white"></a>
+                    <br>
+                    <a href='http://www.plexdb.org/modules/PD_browse/experiment_browser.php?section=Expression&probeset_view=expressiongraph&array=nimbMaize&probeset=$(transcript_id)'>
+                      <img src='/images/plexdb_button.jpg' style="border: 1px solid white"></a>
+                    <br>
+                  </td>
+-->
+              </tr>
+            </table>
+            
+            <div style="display:$(premrna_display)">
+              <u>Pre-mRNA:</u><br>
+              <br><br>
+              <iframe style="color:green"  width='100%' height='200'  
+                      src="https://sequence2.maizegdb.org/get_sequence.php?gene-model-set=$(gene_model_set)&dbtype=mrna&id=$(transcript_id)">
+              </iframe>
+              <br><br>
+            </div>
+            
+            <u>cDNA:</u>
+            <br><br>
+            <iframe style="color:green"  width='100%' height='200'  
+                    src="https://sequence2.maizegdb.org/get_sequence.php?gene-model-set=$(gene_model_set)&dbtype=cdna&id=$(transcript_id)">
+            </iframe>
+            <br><br>
+            
+            <b>Translation ID:</b> $(translation_id)<br>
+            GenBank accession: 
+            <a href="https://www.ncbi.nlm.nih.gov/protein/$(transcript_acc)">$(transcript_acc)</a>
+            <br>
+            <u>Translation:</u><br>
+            <br>
+            <iframe style="color:green"  width='100%' height='200'  
+                    src="https://sequence2.maizegdb.org/get_sequence.php?gene-model-set=$(gene_model_set)&dbtype=protein&id=$(translation_id)">
+            </iframe>
+            <br>
+            
+            <br><br>
+          </div>
+        )
+      </div>
+    )
+  )
+  
+)

@@ -1,0 +1,23 @@
+$$SYNTAX-LEVEL 2
+*(stocks-table ;; TODO include-js
+  <table>
+    <thead>
+      <tr>
+        <th>Stock name</th>
+        <th>Stock type</th>
+        <th>Stock developer</th>
+        <th>GRIN link</th>
+      </tr>
+    </thead>
+    <tbody>
+      @(stocks
+        <tr>
+          <td>$(name)</td>
+          <td>$(type)</td>
+          <td>$(developer)</td>
+          <td>$(link)</td>
+        </tr>
+      )
+    </tbody>
+  </table>
+)

@@ -1,0 +1,483 @@
+$$SYNTAX-LEVEL 2
+*(data-view-gene
+<!-- DATA VIEW -->
+<table cellpadding=0 cellspacing=0>
+  <tr>
+    <td>
+<!-- TOP HEADING -->
+      <div id="centercolumn_record">
+        <div align="right">
+          <a href="/">Home</a> >
+          <a href="/gene_center/gene">Gene Center</a>
+        </div>
+        <br>
+        <table width='100%'  cellpadding=0 cellspacing=0>
+          <tr valign='center' class='green_curve_background'>
+            <td align='left'>
+              <img src='/images/header_left.gif'>
+            </td>
+            <td width='97%' valign='center' class='green_curve_background'>
+              $(record_name) record
+            </td>
+            <td align='right'>
+              <img src='/images/header_right.gif'>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+<!-- LEFT COLUMNS -->
+      <div id="leftcolumn_record">
+        <div id="top"></div>
+
+  <!-- GENE MODEL TAB-->
+        <!-- jp: show_alphafold(\) is a javascript function that needs to execute when the proteomics section loads. 
+        It's defined in /record_data/gene_page/gene_data_proteomics.php -->
+        <div id='gm_tab' name='gm_tab' style='display: inline'>
+          <table width="95%">
+            <tr height='10px'>
+              <td class='gene_center_tab gene_center_tab_focus' align="center">
+                &nbsp;&nbsp;&nbsp;GENE MODEL &nbsp;&nbsp;&nbsp;
+              </td>
+              <td onclick="setRecordTab('sequence'\)"
+                  class='gene_center_tab gene_center_tab_unfocus' align="center">
+                &nbsp;&nbsp;&nbsp;SEQUENCE&nbsp;&nbsp;&nbsp;
+              </td>
+              <td onclick="setRecordTab('pangenome'\)"
+                  class='gene_center_tab gene_center_tab_unfocus' align="center">
+                &nbsp;&nbsp;&nbsp;PAN-GENE&nbsp;&nbsp;&nbsp;
+              </td>
+              <td onclick="setRecordTab('locus'\)"
+                  class='gene_center_tab gene_center_tab_unfocus' align="center">
+                &nbsp;&nbsp;&nbsp;GENETIC INFORMATION $(locus_name)&nbsp;&nbsp;&nbsp;
+              </td>
+            </tr>
+          </table>
+
+          @(main_section_gm
+            <div><a name="$(dom_id1)"> </a></div>
+            <br>
+            <table width='100%'  cellpadding=0 cellspacing=0>
+              <tr valign='center' class='$(color1)_background'>
+                <td align='left'>
+                  <img src='/images/$(color1)_lt.gif'>
+                </td>
+                <td width='97%' valign='center' class='$(color3)_background'>
+                </td>
+                <td valign='top' align="right">
+
+                </td>
+                <td align='right'>
+                  <img src='/images/$(color1)_rt.gif'>
+                </td>
+              </tr>
+              <tr valign='center' class='$(color1)_background'>
+                <td colspan=3 align='left'>
+                  <h2 class="subtitle">
+                    <span class="ec_icon">
+                      <a href="javascript:toggleItem\('$(dom_id1)'\)">
+                        <img id="$(dom_id1)_img" frameborder='no' border=0 src="/images/collapse.png">
+                      </a>
+                    </span>
+                    $(section_name)
+                  </h2>
+
+                  <div class="column_collapsible_section" id="$(dom_id1)" style="display:block;">
+                  </div>
+                </td>
+                <td valign='top' align="right">
+                  <div class="calendar_Section" id="$(dom_var)" style="display:block;">
+                    &nbsp;&nbsp;&nbsp;
+                  </div>
+                </td>
+              </tr>
+              <tr valign='center' class='$(color1)_background'>
+                <td align='left'>
+                  <img src='/images/$(color1)_lb.gif'>
+                </td>
+                <td width='97%' valign='center' class='$(color1)_background'>
+                </td>
+                <td valign='top' align="right">
+
+                </td>
+                <td align='right'>
+                  <img src='/images/$(color1)_rb.gif'>
+                </td>
+              </tr>
+            </table>
+          )
+        </div> <!-- gene model tab-->
+
+  <!-- SEQUENCE TAB-->
+        <div id='sequence_tab' name='sequence_tab' style='display: none'>
+          <table width="95%">
+            <tr height='10px'>
+              <td onclick="setRecordTab('gm'\); show_alphafold(\); show_esmfold(\);"
+                  class='gene_center_tab gene_center_tab_unfocus' align="center">
+                &nbsp;&nbsp;&nbsp;GENE MODEL &nbsp;&nbsp;&nbsp;
+              </td>
+              <td class='gene_center_tab gene_center_tab_focus' align="center">
+                &nbsp;&nbsp;&nbsp;SEQUENCE&nbsp;&nbsp;&nbsp;
+              </td>
+              <td onclick="setRecordTab('pangenome'\)"
+                  class='gene_center_tab gene_center_tab_unfocus' align="center">
+                &nbsp;&nbsp;&nbsp;PAN-GENE&nbsp;&nbsp;&nbsp;
+              </td>
+              <td onclick="setRecordTab('locus'\)"
+                  class='gene_center_tab gene_center_tab_unfocus' align="center">
+                &nbsp;&nbsp;&nbsp;GENETIC INFORMATION $(locus_name)&nbsp;&nbsp;&nbsp;
+              </td>
+            </tr>
+          </table>
+
+          @(main_section_sequence
+            <div><a name="$(dom_id1)"> </a></div>
+            <br>
+            <table width='100%'  cellpadding=0 cellspacing=0>
+              <tr valign='center' class='$(color1)_background'>
+                <td align='left'>
+                  <img src='/images/$(color1)_lt.gif'>
+                </td>
+                <td width='97%' valign='center' class='$(color3)_background'>
+                </td>
+                <td valign='top' align="right">
+
+                </td>
+                <td align='right'>
+                  <img src='/images/$(color1)_rt.gif'>
+                </td>
+              </tr>
+              <tr valign='center' class='$(color1)_background'>
+                <td colspan=3 align='left'>
+                  <h2 class="subtitle">
+                    <span class="ec_icon">
+                      <a href="javascript:toggleItem\('$(dom_id1)'\)">
+                        <img id="$(dom_id1)_img" frameborder='no' border=0 src="/images/collapse.png">
+                      </a>
+                    </span>
+                    $(section_name)
+                  </h2>
+
+                  <div class="column_collapsible_section" id="$(dom_id1)" style="display:block;">
+                  </div>
+                </td>
+                <td valign='top' align="right">
+                  <div class="calendar_Section" id="$(dom_var)" style="display:block;">
+                    &nbsp;&nbsp;&nbsp;
+                  </div>
+                </td>
+              </tr>
+              <tr valign='center' class='$(color1)_background'>
+                <td align='left'>
+                  <img src='/images/$(color1)_lb.gif'>
+                </td>
+                <td width='97%' valign='center' class='$(color1)_background'>
+                </td>
+                <td valign='top' align="right">
+
+                </td>
+                <td align='right'>
+                  <img src='/images/$(color1)_rb.gif'>
+                </td>
+              </tr>
+            </table>
+          )
+
+        </div> <!-- sequence tab-->
+
+  <!-- PAN-GENOME TAB -->
+        <div id='pangenome_tab' name='pangenome_tab' style='display: none'>
+          <table width="95%">
+            <tr height='10px'>
+              <td onclick="setRecordTab('gm'\); show_alphafold(\); show_esmfold(\);"
+                  class='gene_center_tab gene_center_tab_unfocus' align="center">
+                &nbsp;&nbsp;&nbsp;GENE MODEL &nbsp;&nbsp;&nbsp;
+              </td>
+              <td onclick="setRecordTab('sequence'\)"
+                  class='gene_center_tab gene_center_tab_unfocus' align="center">
+                &nbsp;&nbsp;&nbsp;SEQUENCE&nbsp;&nbsp;&nbsp;
+              </td>
+              <td class='gene_center_tab gene_center_tab_focus' align="center">
+                &nbsp;&nbsp;&nbsp;PAN-GENE&nbsp;&nbsp;&nbsp;
+              </td>
+              <td onclick="setRecordTab('locus'\)"
+                class='gene_center_tab gene_center_tab_unfocus' align="center">
+                &nbsp;&nbsp;&nbsp;GENETIC INFORMATION $(locus_name)&nbsp;&nbsp;&nbsp;
+              </td>
+            </tr>
+          </table>
+
+          @(main_section_pangenome
+            <div><a name="$(dom_id1)"> </a></div>
+            <br>
+            <table width='100%'  cellpadding=0 cellspacing=0>
+              <tr valign='center' class='$(color1)_background'>
+                <td align='left'>
+                  <img src='/images/$(color1)_lt.gif'>
+                </td>
+                <td width='97%' valign='center' class='$(color3)_background'>
+                </td>
+                <td valign='top' align="right">
+
+                </td>
+                <td align='right'>
+                  <img src='/images/$(color1)_rt.gif'>
+                </td>
+              </tr>
+              <tr valign='center' class='$(color1)_background'>
+                <td colspan=3 align='left'>
+                  <h2 class="subtitle">
+                    <span class="ec_icon">
+                      <a href="javascript:toggleItem\('$(dom_id1)'\)">
+                        <img id="$(dom_id1)_img" frameborder='no' border=0 src="/images/collapse.png">
+                      </a>
+                    </span>
+                    $(section_name)
+                  </h2>
+
+                  <div class="column_collapsible_section" id="$(dom_id1)" style="display:block;">
+                  </div>
+                </td>
+                <td valign='top' align="right">
+                  <div class="calendar_Section" id="$(dom_var)" style="display:block;">
+                    &nbsp;&nbsp;&nbsp;
+                  </div>
+                </td>
+              </tr>
+              <tr valign='center' class='$(color1)_background'>
+                <td align='left'>
+                  <img src='/images/$(color1)_lb.gif'>
+                </td>
+                <td width='97%' valign='center' class='$(color1)_background'>
+                </td>
+                <td valign='top' align="right">
+
+                </td>
+                <td align='right'>
+                  <img src='/images/$(color1)_rb.gif'>
+                </td>
+              </tr>
+            </table>
+          )
+        </div> <!-- pan-genome tab -->
+
+  <!-- LOCUS TAB -->
+        <div id='gene_tab' name='gene_tab' style='display: none'>
+          <table width="95%">
+            <tr height='10px'>
+              <td onclick="setRecordTab('gm'\); show_alphafold(\); show_esmfold(\);"
+                  class='gene_center_tab gene_center_tab_unfocus' align="center" >
+                &nbsp;&nbsp;&nbsp;GENE MODEL&nbsp;&nbsp;&nbsp;
+              </td>
+              <td onclick="setRecordTab('sequence'\)"
+                  class='gene_center_tab gene_center_tab_unfocus' align="center">
+                &nbsp;&nbsp;&nbsp;SEQUENCE&nbsp;&nbsp;&nbsp;
+              </td>
+              <td onclick="setRecordTab('pangenome'\)"
+                  class='gene_center_tab gene_center_tab_unfocus' align="center">
+                &nbsp;&nbsp;&nbsp;PAN-GENE&nbsp;&nbsp;&nbsp;
+              </td>
+              <td class='gene_center_tab gene_center_tab_focus' align="center">
+                &nbsp;&nbsp;&nbsp;GENETIC INFORMATION $(locus_name)&nbsp;&nbsp;&nbsp;
+              </td>
+            </tr>
+          </table>
+
+          <b>Note:</b> A gene is a specific type of locus;
+          <a href="/nomenclature#DEFINITIONS">the word "gene" should not be
+          considered to be synonymous with "locus"<a/>.
+          <br><br>
+
+          $(nogene_section)
+
+          @(main_section_gene
+            <div><a name="$(dom_id1)"> </a></div>
+            <br>
+            <table width='100%'  cellpadding=0 cellspacing=0>
+              <tr valign='center' class='$(color1)_background'>
+                <td align='left'>
+                  <img src='/images/$(color1)_lt.gif'>
+                </td>
+                <td width='97%' valign='center' class='$(color3)_background'>
+                </td>
+                <td valign='top' align="right">
+
+                </td>
+                <td align='right'>
+                  <img src='/images/$(color1)_rt.gif'>
+                </td>
+              </tr>
+              <tr valign='center' class='$(color1)_background'>
+                <td colspan=3 align='left'>
+                  <h2 class="subtitle">
+                    <span class="ec_icon">
+                      <a href="javascript:toggleItem\('$(dom_id1)'\)">
+                        <img id="$(dom_id1)_img" frameborder='no' border=0 src="/images/collapse.png">
+                      </a>
+                    </span>
+                    $(section_name)
+                  </h2>
+                  <div class="column_collapsible_section" id="$(dom_id1)" style="display:block;">
+                  </div>
+                </td>
+                <td valign='top' align="right">
+                  <div class="calendar_Section" id="$(dom_var)" style="display:block;">
+                    &nbsp;&nbsp;&nbsp;
+                  </div>
+                </td>
+              </tr>
+              <tr valign='center' class='$(color1)_background'>
+                <td align='left'>
+                  <img src='/images/$(color1)_lb.gif'>
+                </td>
+                <td width='97%' valign='center' class='$(color1)_background'>
+                </td>
+                <td valign='top' align="right">
+
+                </td>
+                <td align='right'>
+                  <img src='/images/$(color1)_rb.gif'>
+                </td>
+              </tr>
+            </table>
+          )
+        </div> <!-- gene (locus\) tab-->
+      </div> <!-- leftcolumn_record -->
+
+<!-- RIGHT COLUMN NAVIGATION -->
+      <div id="rightcolumn_record">
+        <!-- create navigation menu-->
+        <table width='100%'  cellpadding=0 cellspacing=0>
+          <tr valign='center' class='$(navmenu_color)_background'>
+            <td align='left'>
+              <img src='/images/$(navmenu_color)_lt.gif'>
+            </td>
+            <td width='97%' valign='center' class='$(navmenu_color)_background'>
+            </td>
+            <td align='right'>
+              <img src='/images/$(navmenu_color)_rt.gif'>
+            </td>
+          </tr>
+          <tr valign='center' class='$(navmenu_color)_background'>
+            <td colspan=3 align='left'>
+   <!-- GENE MODEL NAVIGATION -->
+              <div id="gm_menu_list">
+                <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+                Gene Model
+                </span><br>
+                <div class="record_navigation_gm">
+                  <form id='nav_form' name='nav_form'>
+                    @(nav_section_gm
+                      <input onchange="checkAction('$(nav_id0)', 'nav_form', 'gene', '$(nav_name)'\)"
+                             $(is_checked) type="checkbox" name="checkbox$(nav_id0)" value="$(nav_id0)">
+                      <a class='seg' href="#$(nav_id0)">$(nav_name)</a><br>
+                    )
+                  </form>
+                </div>
+              </div>
+
+  <!-- SEQUENCE NAVIGATION -->
+              <div id="sequence_menu_list" style="display: none;">
+                <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+                  Sequence
+                </span><br>
+                <div class="record_navigation_gene">
+                  <form id='nav_formSequence' name='nav_formSequence'>
+                    @(nav_section_sequence
+                      <input onchange="checkAction('$(nav_id0)', 'nav_formSequence', 'gene_sequence', '$(nav_name)'\)"
+                             $(is_checked) type="checkbox" name="checkbox$(nav_id0)" value="$(nav_id0)">
+                      <a class='seg' href="#$(nav_id0)">$(nav_name)</a><br>
+                    )
+                  </form>
+                </div>
+              </div>
+
+  <!-- PAN-GENOME NAVIGATION -->
+              <div id="pangenome_menu_list" style="display: none;">
+                <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+                  Pan-genome
+                </span><br>
+                <div class="record_navigation_pangenome">
+                  <form id='nav_formPanGenome' name='nav_formPanGenome'>
+                    @(nav_section_pangenome
+                      <input onchange="checkAction('$(nav_id0)', 'nav_formPanGenome', 'gene_pangenome', '$(nav_name)'\)"
+                             $(is_checked) type="checkbox" name="checkbox$(nav_id0)" value="$(nav_id0)">
+                      <a class='seg' href="#$(nav_id0)">$(nav_name)</a><br>
+                    )
+                  </form>
+                </div>
+              </div>
+
+  <!-- GENE LOCUS NAVIGATION -->
+              <div id="gene_menu_list" style="display: none;">
+                <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+                  Gene
+                </span><br>
+                <div class="record_navigation_gene">
+                  <form id='nav_formGene' name='nav_formGene'>
+                    @(nav_section_gene
+                      <input onchange="checkAction('$(nav_id0)', 'nav_formGene', 'gene_locus', '$(nav_name)'\)"
+                             $(is_checked) type="checkbox" name="checkbox$(nav_id0)" value="$(nav_id0)">
+                      <a class='seg' href="#$(nav_id0)">$(nav_name)</a><br>
+                    )
+                  </form>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr valign='center' class='$(navmenu_color)_background'>
+            <td align='left'>
+              <img src='/images/$(navmenu_color)_lb.gif'>
+            </td>
+            <td width='97%' valign='center' class='$(navmenu_color)_background'>
+            </td>
+            <td align='right'>
+              <img src='/images/$(navmenu_color)_rb.gif'>
+            </td>
+          </tr>
+
+          <tr><td height="15"><!-- section separator --></td></tr>
+
+          @(rcontent_section {display: off}
+            <tr valign='center' class='$(rcont_color)_background'>
+              <td align='left'>
+                <img src='/images/$(rcont_color)_lt.gif'>
+              </td>
+              <td width='97%' valign='center' class='$(rcont_color)_background'>
+              </td>
+              <td align='right'>
+                <img src='/images/$(rcont_color)_rt.gif'>
+              </td>
+            </tr>
+            <tr valign='center' class='$(rcont_color)_background'>
+              <td colspan=3 align='left'>
+                @(right_content
+                  &nbsp;&nbsp;<b>$(heading)</b><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;$(content)
+                )
+              </td>
+            </tr>
+            <tr valign='center' class='$(rcont_color)_background'>
+              <td align='left'>
+                <img src='/images/$(rcont_color)_lb.gif'>
+              </td>
+              <td width='97%' valign='center' class='$(rcont_color)_background'>
+              </td>
+              <td align='right'>
+                <img src='/images/$(rcont_color)_rb.gif'>
+              </td>
+            </tr>
+          )
+          </table>
+        <br>
+
+        *(data_view_optionals {load: templates/data_center/data_view_optionals.bau})
+
+      </div> <!-- rightcolumn_record -->
+    </td>
+  </tr>
+</table>
+
+<!-- SPECIFIC DATA VIEW -->
+*(specific-data-view)
+)

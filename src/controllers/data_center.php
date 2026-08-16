@@ -76,6 +76,43 @@
     }
   }
 
+  /* The remaining modernized search pages. Each follows the same shape as the
+     two above: the bare route gets the modern page, a record id falls through
+     to the original code untouched, and rollback is deleting the block.
+     Pre-redesign originals are archived in the redesign repo under
+     legacy/bac/, legacy/cytogenetic/, legacy/est/, legacy/overgo/ and
+     legacy/ssr/.
+
+     These five were wired up on the server rather than here, so every deploy
+     of this file put them back to the legacy page while their controllers sat
+     on disk unreachable. Keeping the guards in the repository is what stops
+     that: this file is deployed from the manifest, so anything not written
+     here does not survive the next deploy. */
+  if (PAGE == 'bac' && !getCGIParam('id', 'G', ID)) {
+    include('controllers/data_center/bac_search_modern.php');
+    return;
+  }
+
+  if (PAGE == 'cytogenetic' && !getCGIParam('id', 'G', ID)) {
+    include('controllers/data_center/cytogenetic_search_modern.php');
+    return;
+  }
+
+  if (PAGE == 'est' && !getCGIParam('id', 'G', ID)) {
+    include('controllers/data_center/est_search_modern.php');
+    return;
+  }
+
+  if (PAGE == 'overgo' && !getCGIParam('id', 'G', ID)) {
+    include('controllers/data_center/overgo_search_modern.php');
+    return;
+  }
+
+  if (PAGE == 'ssr' && !getCGIParam('id', 'G', ID)) {
+    include('controllers/data_center/ssr_search_modern.php');
+    return;
+  }
+
   // NOTE: CONTROLLER and PAGE are set in controller.php
   logMessage("CONTROLLER: " . CONTROLLER . ", PAGE: " . PAGE . ", ID: " . ID);
  

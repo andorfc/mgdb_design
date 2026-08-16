@@ -1,0 +1,23 @@
+*(top-20-genes
+    <a name="top-20"></a>
+    <span style="font-family: Verdana, Arial, sans-serif; font-size: 110%; font-weight: bold; margin-bottom: 6px;">
+      Top 20 genes
+    </span>
+    <p>
+      These are the most searched-for genes in $(top-20-year)
+    </p>
+    <table>
+    @(top-20-gene-list
+      <tr>
+        <td width="20px"></td>
+        <td align="left" width="20px">$(top-num)</td>
+        <td>
+          <a href="/gene_center/gene/$(top-locus)">$(top-locus)</a>
+        </td>
+      </tr>
+    )
+    </table>
+    * lg1 is the example gene name in the <a href="/gene_center/gene">gene search page</a>
+    <br><br>
+  )
+

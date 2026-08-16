@@ -1,0 +1,21 @@
+$$SYNTAX-LEVEL 2
+*(gene-locus-references-sections
+
+  @(references {display:off}
+    <br>
+    @(show_ref 
+      <b>Related Papers:</b><br>
+      @(fill_ref
+        <p style="margin-left: 20px">
+          (<i>$(cont_name)</i>\) 
+          <a href="/data_center/reference?id=$(ref_id)" title="$(ref_title)">$(ref_name)</a>
+        </p>
+      )
+    )
+    @(no_ref {bind: show_ref | display: off}
+      <b>There are no references for this record</b>
+      <br>
+    )
+  )
+ 
+)

@@ -1,0 +1,16 @@
+$$SYNTAX-LEVEL 2
+*(gene-locus-phenotypes-sections
+
+  @(phenotypes {display: off}
+    <br>
+    <p>
+      @(pheno_sec
+        <a href="/data_center/phenotype?id=$(pheno_id)">$(pheno_name)</a>
+        <br>
+      )
+      @(no_pheno {bind: pheno_sec | display: off}
+        <b>There are no Phenotypes for this Locus record.</b>
+      )
+  ) <!-- phenotypes -->
+
+)

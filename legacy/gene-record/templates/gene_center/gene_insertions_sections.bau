@@ -1,0 +1,57 @@
+$$SYNTAX-LEVEL 2
+*(insertions-section
+  <div style="margin-left: 20px">
+  @(uniformmu-link {display: off}
+      Learn more about UniformMu insertions <a href="/uniformmu">here</a>.<br>
+  )
+  @(acds_gfp-link {display: off}
+      Learn more about Ds-GFP insertions <a href="/dooner_du_acds_insertions">here</a>.<br>
+  )
+  </div>
+  
+  @(gene_model-insertions {display: off}
+    <table style="border-spacing:10px 5px">
+      <tr>
+        <th>Name</th>
+        <th>Position</th>
+        <th>Gene structure</th>
+        <th>Transcript/gene model</th>
+        <th>Stock</th>
+        <th>Source</th>
+      </tr>
+      @(gene_model-insertion-rows
+        <tr>
+          <td valign="top">
+            <a href="/data_center/variation/$(variation_id)">$(insertion_name)</a>
+            &nbsp;
+          </td>
+          <td valign="top">
+            <a href="$(gbrowse_url)/?ref=$(chromosome);start=$(start);end=$(end);l=$(track);h_feat=$(insertion_name)">$(insertion_position)</a>
+          </td>
+          <td valign="top">
+            <span class="tooltip">
+              $(insertion_structure)
+              <span class="tooltiptext">
+                $(structure_definition)
+              </span>
+          </td>
+          <td valign="top">
+            $(insertion_transcript)
+          </td>
+          <td valign="top">
+            $(stocks)
+          </td>
+          <td>
+            <a href="/person/$(source_id)">$(insertion_source)</a>
+          </td>
+        </tr>
+      )
+    </table>
+  )
+  
+  @(no-gene_model-insertions {display: off}
+    There are no known insertions for this gene model.
+    <br>
+    Check the Pan-gene tab above to see if any related gene models have insertions.
+  )
+)

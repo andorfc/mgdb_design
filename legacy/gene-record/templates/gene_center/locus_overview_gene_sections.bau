@@ -1,0 +1,349 @@
+$$SYNTAX-LEVEL 2
+*(gene-locus-overviewsections
+  @(overview_gene {display: off}
+    @(gene-locus {display: off}
+      <b>Gene symbol: </b>$(locus_name)<br>
+      <b>Gene name:</b> $(full_name)<br>
+      @(plant_wide {display:off} $(complete_name)<br>)
+    )
+    @(other-locus {display:off}
+      <b>Name: </b>$(locus_name)<br>
+      <b>Full name:</b> $(full_name)<br>
+    )
+    @(syn_sec
+      <b>Synonyms</b>:
+      <div class="small_tab">
+        @(syn_list
+          <b>$(synonym)</b> $(authority)<br>
+        )
+      </div>
+    )
+    <br>
+    <p>
+      <b>Gene Products:</b><br>
+      @(gene-products-list {display: off}
+        <div class='small_tab'>
+          <a href="/data_center/gene_product?id=$(gp_id)">$(gp_name)</a>
+        </div>
+      )
+      @(gene-products-none {display: off}
+        <div class='small_tab'>
+          <i>none</i><br>
+        </div>
+      )
+    </p>
+    
+    @(uniprot {display: off}
+      <br>
+      <p>
+        <b>UniProt accession(s\):</b> <br>
+        @(uniprot_accs
+          &nbsp;&nbsp;<a href="$(uniprot_url)">$(uniprot_acc)</a><br>
+        )
+      </p>
+    )
+    
+    <p>
+      <br><b>Description:</b>
+      @(description-list {display: off}
+        <div class="small_tab" alt="$(order1)">
+          <p>$(brief-description)</p>
+          <br>
+        </div>
+      )
+      @(description-none {display: off}
+        <i>none provided</i><br>
+      )
+      @(functional-statements {display: off}
+        <div class="small_tab" alt="$(order1)">
+          $(fs_memo) &mdash; <a href="/data_center/reference/$(ref_id)">$(ref_name)</a> ($(stmt_type)\)
+          <br><br>
+        </div>
+      )
+      @(critical-statements {display: off}
+        <b>Critical comments</b><br>
+        <div class="small_tab" style="color:red;text-weight:bold">
+          $(critical)
+          <br>
+        </div>
+      )
+      @(comments_gene {display: off}
+        <p>
+          <b>Comments:</b>
+          <div class="small_tab" style="margin-left:10px">
+            $(comment-list_gene)
+          </div>
+          <br>
+        </p>
+      )
+    </p>
+    
+    @(critical_comment_section {display: off}
+      <b>Critical comment:</b> $(critical_comment) [ <a href="$(issue_link)">Issue Tracker</a> ] <br>
+    )
+
+    @(jira_issues_section {display: off}
+      @(open-issue {display: off} <img src="/icon/red_flag_16.png">)
+      @(resolved-issue {display: off} <img src="/icon/blue_flag_16.png">)
+      <b>Issues:</b>
+      <div style='margin-left: 40px;'>
+        <ul>
+          *(lambda {load: ../templates/partials/issues.bau})
+        </ul>
+      </div>
+    )
+
+    @(assembly_issues_section {display: off}
+      <b>Issues:</b>
+      <div style='margin-left: 40px;'>
+        <ul>
+        @(issue-list
+          <li>
+            <section>
+              $(flag)
+              <p>$(title)</p>
+              <div style='margin-left: 5px;'>
+                <dl>
+                  <dt>
+                    <b>Assembly:</b> $(assembly_name {default: not specified})
+                  </dt>
+                  <dt>
+                    <b>Annotation:</b> $(annotation_name {default: not specified})
+                  </dt>
+                  <dt>
+                    <b>Affected component(s\):</b> $(components)
+                  </dt>
+                  <dt>
+                    $(display_text)
+                  </dt>
+                  <dt>
+                    Created: $(created), last updated: $(updated)
+                  </dt>
+                </dl>
+                <br>
+              </div>
+            </section>
+          </li>
+        )
+        </ul>
+      </div>
+    )
+    
+    @(entrez_genes_sec {display: off}
+      <b>NCBI Gene:</b> <br>
+      @(entrez_genes
+        <div class='small_tab'>
+        <a href="$(url_prefix)$(key)">$(key)  $(entrez_name)</a>
+        </div>
+      )
+      <br>
+    )
+    
+    @(locus-type {display:off}
+      <b>Type</b>:
+      <a href="/data_center/term?id=$(type)"><acronym title="$(term_comments)">$(term_name)</acronym></a><br>
+    )
+
+    @(species_sec {display: off}
+      <br>
+      <b>Species</b>: <a href="/data_center/species?id=$(species)">$(species_name)</a> <br>
+    )
+    
+    @(linkage-group {display: off}
+        <br><b>Linkage Group</b>:
+        <a href="/data_center/lg?id=$(linkage_group)">$(lg_name)</a><br>
+        @(bin_sec {display: off}
+         <b>Bin</b>:
+         <a href="/bin_viewer?fullbin=$(fullbin)">$(fullbin)</a><br>
+        )
+        $(arm)
+        $(lg_length)
+    )
+    
+    @(phenotypes {display: off}
+      <br><b>Phenotypes:</b><br>
+      @(phenotype_list
+        &nbsp;&nbsp;&nbsp;<a href="/data_center/phenotype?id=$(pheno_id)">$(pheno_name)</a><br>
+      )
+    )
+
+    $(flis)
+
+    <p>
+      <br>
+      <b>Properties</b>:
+      @(property-list {display: off}
+        <acronym title="$(property_comments)$(term_comments)">$(property_name)$(name)</acronym>$(delim)&nbsp;
+      )
+      @(properties-none {display: off}
+        <i>none</i>
+      )
+      <br>
+    </p>
+
+    @(expression_ind {display: off}
+      <br>
+      <b>Expression Induction:</b> Expression of this locus is induced by
+      $(expression_gene)
+      <br>
+    )
+    
+    <!-- jCarousel -->
+    @(img_carousel {display: off}
+     <br>
+     <b>Images of $(name) expression</b><br>
+     <div id="gen_images">
+       <iframe id="carousel" name="carousel" marginheight='0' marginwidth='0'
+               width='110%' height='115' frameborder='0' scrolling='no'
+               src="../../tools/car/examples/locus_carousel.php?id=$(locus_id)">
+       </iframe>
+      <a href="#!" onclick="javascript:toggle_sec('img_table'\);">
+      <img id="img_table_icon" src="/images/expand.png"/>
+      <b>Captions</b>
+      </a>
+      <div id="img_table" style="display: none;">
+       <table cellpadding='15' cellspacing='0' width='100%'>
+         <tr style='background-color: #D3DEBC;' valign='top'>
+           <td width='10%' valign='top'><b>Image</b></td>
+           <td width='10%' valign='top'><b>Variation</b></td>
+           <td valign='top' width='10%'><b>Type</b></td>
+           <td><b>Caption</b></td>
+         </tr>
+         @(locus_img_tbl
+           <tr style='background-color:$(bgcolor)' valign='top' width='100%'> 
+            <td valign='top' >
+              <a rel="shadowbox" class="shadow" href="# return false;" onclick="javascript:open_sb('$(img_url)/db_images/Variation/$(url)', 'image $(img_count)'\)">image $(img_count)</a>:
+            </td>
+            <td valign='top'><a href="/data_center/variation?id=$(id)">$(name)</a></td>
+            <td valign='top'>$(type)</td>
+            <td valign='top' width='60%'>$(caption)<br><br></td>
+           </tr>
+         )
+       </table>
+       </div>
+       <br>
+      </div>
+    )
+
+<!-- removed by popular demand
+    @(domain_experts {display: off}
+     <p><br>
+       <acronym title="Domain experts are those individuals who have the most noted papers dealing with this particular locus in the MaizeGDB database.">
+         <b>Domain experts</b>
+       </acronym>
+       for this locus include
+       @(domain_sec
+        $(sep)<a href="/person?id=$(dx_id)">$(dx_name)</a>
+       )
+       (<em>domain experts are those people with the most papers in MaizeGDB identified as being related to this
+         locus ... please let us know about your papers if you'd like to be included</em>\)
+     </p>
+    )
+-->
+
+    @(sequence_gene {display: off}
+     <br><b>Sequence:</b><br>
+     @(sequence_sec
+       &nbsp;&nbsp;&nbsp;<a href="/data_center/sequence?id=$(bid)">$(genbank_acc)</a><br>
+      )
+    )
+
+    <p>
+      <br>
+      <b>All Associated Gene Models:</b>
+      @(gene-models-list {display: off}
+        <div class='small_tab'>
+          <a href="/gene_center/gene/$(gene_model_key)">$(gene_model_key)</a>
+          [$(source)]
+          $(extra)
+          $(browser_link)
+        </div>
+      )
+      @(gene-models-none {display: off}
+        <i>none</i>
+      )
+    </p>
+
+    @(stocks {display: off}
+     <!--*(lambda {load: ../templates/gene_center/stocks-table.bau})-->
+     @(stock_list_small
+      <br><b>Stocks:</b><br>
+      &nbsp;&nbsp;&nbsp;<b>Bold font</b> indicates stocks available from <a href+"http://maizecoop.cropsci.uiuc.edu/">Maize Genetics COOP Stock Center<a>
+      <br>
+     )
+     @(stock_list_large {bind: stock_list_small | display: off}
+      <br><b>Stocks</b>
+      (<a  href="javascript:toggle_stocks(\);"><span id="stock_text">show</span> all <b>$(stock_count)</b> stocks</a>\)<b>:</b>
+      <br>
+      &nbsp;&nbsp;&nbsp;<b>Bold font</b> indicates stocks available from <a href+"http://maizecoop.cropsci.uiuc.edu/">Maize Genetics COOP Stock Center<a>
+      <br>
+     )
+      <div id="stock_list" style="display: $(display)">
+       @(stock_list
+         &nbsp;&nbsp;&nbsp;<a href="/data_center/stock?id=$(id)">$(name)</a><br>
+       )
+     </div>
+     <br>
+    )
+
+    <p>
+      <br>
+      <b>Related Loci:</b>
+      <div class='small_tab'>
+        @(related-loci-list {display: off}
+          $(relation)
+          <a href="/data_center/locus?id=$(locus_id)">$(locus_name) <i>$(locus_full_name)</i></a>
+          <br>
+        )
+        @(related-loci-none {display: off}
+          <i>none</i><br>
+        )
+      </div>
+    </p>
+
+    @(offsite_resources {display: off}
+     <br>
+     <b>Offsite Resources:</b>
+     @(offsite_sec
+       <br>&nbsp;&nbsp;<a href="/person?id=$(key_id)">$(key_name)</a> ->
+       $(key) $(seq_title)
+     )
+     <br>
+    )
+  
+    @(physical_positions {display: off}
+      <br>
+      <b>Physical postitions:</b> <br>
+      $(physical-position-list)
+      <br>
+    )
+    
+    <!-- Detectors -->
+    @(bacs {display: off}
+     <br>
+     <b>BACs:</b><br>
+     $(bac_list)
+    )
+    @(ests {display: off}
+     <br>
+     <b>ESTs:</b><br>
+     $(est_list)
+    )
+    @(probes_gene {display: off}
+     <br>
+     <b>Probes:</b><br>
+     $(probe_list)
+    )
+    @(overgos {display: off}
+     <br>
+     <b>Overgos:</b><br>
+     $(overgo_list)
+    )
+    @(ssrs {display: off}
+     <br>
+     <b>SSRs:</b><br>
+     $(ssr_list)
+    )
+    
+  )
+)

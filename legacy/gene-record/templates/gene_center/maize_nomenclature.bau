@@ -1,0 +1,29 @@
+$$SYNTAX-LEVEL 2
+*(maize-genomic-nomenclature
+  <b>Genome assembly names</b><br>
+  Genome assemblies have both names and identifiers. The names are intended to bee
+  human-readable, and look like:<br>
+  <span style="margin-left:20px">[species id] - [cultivar] - [project] - [assembly version]</span><br>
+  For example:
+  <span style="margin-left:20px">Zm-B73-REFERENCE-NAM-5.0</span>
+  <br><br>
+  <b>Genome assembly identifiers</b><br>
+  Assemblies are also assigned an identifier, which is used to identify which genome, 
+  and which assembly version a gene model belongs to. An assembly identifier looks like:<br>
+  <span style="margin-left:20px">[species id][5 digits][version]</span><br>
+  For example:
+  Zm00001e = the 5th version of the B73 reference genome, where 'e' represents the 5th
+  assembly version. This system will permit unique names for up to 99,999 genome 
+  assemblies. It is impossible to predict how many genome assemblies will be produced, 
+  so the naming scheme accomodates more than what seems a reasonable number.
+  <br><br>
+  <b>Gene model names</b><br>
+  The assembly identifier and annotation version are used as prefixes for gene models.
+  For example, the current set official B73 gene models belong to the second annotation 
+  of the version 5 assembly, so the gene model prefix is Zm00001eb, where b indicates 
+  the second annotation. Gene models in B73v5, second annotation look like:<br>
+  <span style="margin-left:20px">Zm00001eb001020</span><br>
+  This naming scheme ensures that each gene model has a unique identifier, and indicates
+  which genome, assembly, and annotation version it belongs to.
+  <br><br>
+) 

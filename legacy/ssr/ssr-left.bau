@@ -1,0 +1,153 @@
+*(ssr-left
+<!--
+      NO LONGER SUPPORTED
+-->
+
+<div id="datacenter_left_col">
+  <p id='datacenter_title'>SSR Research Tools</p>
+  <br>
+  <span class="notice">
+    <br>
+    Note that this data center is no longer updated.
+    <br><br><br>
+  </span>
+
+  *(ssr_simple_search
+  <div id='datacenter_gray_background'>
+    <p>
+      <span style="font-weight:bold">Simple SSR Search</span>:
+      This search form allows you to just enter a complete or partial name or 
+      repeat sequence to quickly retrieve the desired SSR.
+      <br>
+      
+      *(simple-search-instructions #load: templates/data_center/simple_search_instructions.bau#)
+      
+    </p>
+    <br>
+    <form method="get" action="javascript:getSearchData('ssr', 'simple_results', document.getElementById('ssrterm'\).value\);" class="tiny">
+     <input type="text" name="term" id="ssrterm" size="20" class="small" value="">
+     <input type="submit" class="button" value="Submit" id="minisub">
+     (see a 
+     <a href="#" onClick="document.getElementById('ssrterm'\).value = '(AAAT\)5';">sample SSR query</a>\)<br>
+     @(limits
+            *(adjust_limits #load: templates/data_center/set_search_limit.bau#)
+          )
+    </form>
+    <br>
+    
+    <div id="simple_results">
+    </div>
+
+    
+    <p>
+      <span style="font-weight:bold">Mapped SSRs:</span> 
+      This utility displays the map locations of the SSRs in MaizeGDB.  
+      You can obtain this information by chromosome (1-10, below\).
+      <br>
+      <a href="https://download.maizegdb.org/SNPs_and_Maps/SSRs/ssr_details_chr1.tsv"><span style="font-weight:bold">1</span></a> 
+      | <a href="https://download.maizegdb.org/SNPs_and_Maps/SSRs/ssr_details_chr2.tsv"><span style="font-weight:bold">2</span></a> 
+      | <a href="https://download.maizegdb.org/SNPs_and_Maps/SSRs/ssr_details_chr3.tsv"><span style="font-weight:bold">3</span></a> 
+      | <a href="https://download.maizegdb.org/SNPs_and_Maps/SSRs/ssr_details_chr4.tsv"><span style="font-weight:bold">4</span></a> 
+      | <a href="https://download.maizegdb.org/SNPs_and_Maps/SSRs/ssr_details_chr5.tsv"><span style="font-weight:bold">5</span></a> 
+      | <a href="https://download.maizegdb.org/SNPs_and_Maps/SSRs/ssr_details_chr6.tsv"><span style="font-weight:bold">6</span></a> 
+      | <a href="https://download.maizegdb.org/SNPs_and_Maps/SSRs/ssr_details_chr7.tsv"><span style="font-weight:bold">7</span></a> 
+      | <a href="https://download.maizegdb.org/SNPs_and_Maps/SSRs/ssr_details_chr8.tsv"><span style="font-weight:bold">8</span></a> 
+      | <a href="https://download.maizegdb.org/SNPs_and_Maps/SSRs/ssr_details_chr9.tsv"><span style="font-weight:bold">9</span></a> 
+      | <a href="https://download.maizegdb.org/SNPs_and_Maps/SSRs/ssr_details_chr10.tsv"><span style="font-weight:bold">10</span></a>
+    </p>
+    <br>
+    <p>
+      <span style="font-weight:bold">Mapped SSRs: (Detail\)</span> 
+      This utility displays the map locations of the SSRs in MaizeGDB.  This 
+      table is sorted by Map and Map Coordinate.  
+      Includes Amplicon Length and Sequence Preview columns.
+      You can obtain this information by chromosome (1-10, below\).
+      <br>
+      <a href="https://download.maizegdb.org/SNPs_and_Maps/SSRs/mappedSSRs_chr1.xls"><span style="font-weight:bold">1</span></a> 
+      | <a href="https://download.maizegdb.org/SNPs_and_Maps/SSRs/mappedSSRs_chr2.xls"><span style="font-weight:bold">2</span></a> 
+      | <a href="https://download.maizegdb.org/SNPs_and_Maps/SSRs/mappedSSRs_chr3.xls"><span style="font-weight:bold">3</span></a> 
+      | <a href="https://download.maizegdb.org/SNPs_and_Maps/SSRs/mappedSSRs_chr4.xls"><span style="font-weight:bold">4</span></a> 
+      | <a href="https://download.maizegdb.org/SNPs_and_Maps/SSRs/mappedSSRs_chr5.xls"><span style="font-weight:bold">5</span></a> 
+      | <a href="https://download.maizegdb.org/SNPs_and_Maps/SSRs/mappedSSRs_chr6.xls"><span style="font-weight:bold">6</span></a> 
+      | <a href="https://download.maizegdb.org/SNPs_and_Maps/SSRs/mappedSSRs_chr7.xls"><span style="font-weight:bold">7</span></a> 
+      | <a href="https://download.maizegdb.org/SNPs_and_Maps/SSRs/mappedSSRs_chr8.xls"><span style="font-weight:bold">8</span></a> 
+      | <a href="https://download.maizegdb.org/SNPs_and_Maps/SSRs/mappedSSRs_chr9.xls"><span style="font-weight:bold">9</span></a> 
+      | <a href="https://download.maizegdb.org/SNPs_and_Maps/SSRs/mappedSSRs_chr10.xls"><span style="font-weight:bold">10</span></a>
+    </p>
+<!--
+    <br>  
+    <p>
+      <span style="font-weight:bold">Mapped & Anchored SSRs:</span> 
+      This utility lists SSRs that are both genetically mapped (on IBM2\)
+      and also detect a BAC.  
+      Includes Amplicon Length and Sequence Preview columns.
+      You can obtain this information by chromosome (1-10, below\).
+      <b>Because the download process is too slow to run through a browser, the 
+      links below will return only 50 records per chromosome. If you would like 
+      a file containing the entire dataset, notify the MaizeGDB team using the 
+      feedback link in the menu bar.</b>
+      <br>
+      <a href="/mappedssrs?chr=1"><span style="font-weight:bold">1</span></a> | 
+      <a href="/mappedssrs?chr=2"><span style="font-weight:bold">2</span></a> | 
+      <a href="/mappedssrs?chr=3"><span style="font-weight:bold">3</span></a> | 
+      <a href="/mappedssrs?chr=4"><span style="font-weight:bold">4</span></a> | 
+      <a href="/mappedssrs?chr=5"><span style="font-weight:bold">5</span></a> | 
+      <a href="/mappedssrs?chr=6"><span style="font-weight:bold">6</span></a> | 
+      <a href="/mappedssrs?chr=7"><span style="font-weight:bold">7</span></a> | 
+      <a href="/mappedssrs?chr=8"><span style="font-weight:bold">8</span></a> | 
+      <a href="/mappedssrs?chr=9"><span style="font-weight:bold">9</span></a> | 
+      <a href="/mappedssrs?chr=10"><span style="font-weight:bold">10</span></a>
+    </p>
+    <br> 
+	  <p>
+      <span style="font-weight:bold">SSRs Details: </span> 
+      This utility displays the map locations of the SSRs in MaizeGDB.  This 
+      table is sorted by Bin number and Map coordinate.  
+      Includes Primers and Gel Pattern Images.
+      You can obtain this information by chromosome (1-10, below\).
+      <b>Because the download process is too slow to run through a browser, the 
+      links below will return only 50 records per chromosome. If you would like 
+      a file containing the entire dataset, notify the MaizeGDB team using the 
+      feedback link in the menu bar.</b>
+      <br>
+      <a href="/mappedssrs_detail?chrom=1"><span style="font-weight:bold">1</span></a> | 
+      <a href="/mappedssrs_detail?chrom=2"><span style="font-weight:bold">2</span></a> | 
+      <a href="/mappedssrs_detail?chrom=3"><span style="font-weight:bold">3</span></a> | 
+      <a href="/mappedssrs_detail?chrom=4"><span style="font-weight:bold">4</span></a> | 
+      <a href="/mappedssrs_detail?chrom=5"><span style="font-weight:bold">5</span></a> | 
+      <a href="/mappedssrs_detail?chrom=6"><span style="font-weight:bold">6</span></a> | 
+      <a href="/mappedssrs_detail?chrom=7"><span style="font-weight:bold">7</span></a> | 
+      <a href="/mappedssrs_detail?chrom=8"><span style="font-weight:bold">8</span></a> | 
+      <a href="/mappedssrs_detail?chrom=9"><span style="font-weight:bold">9</span></a> | 
+      <a href="/mappedssrs_detail?chrom=10"><span style="font-weight:bold">10</span></a>
+    </p>
+-->  		
+    <br>  
+    <p>
+      <a href="/ssrreports?id=1"><span style="font-weight:bold">Complete List of SSR Repeats</span></a>:
+      Provides a complete list of SSR repeats available in MaizeGDB, linked
+      to their respective full SSR records.
+      <br>
+      <a href="/ssrreports?id=2"><span style="font-weight:bold">SSRs Derived From Genes</span></a>: 
+      An up-to-date listing of SSRs and the genes from which they are derived,
+      formatted in an easily-downloadable table.
+    </p>
+    <br>
+
+    <p>
+      You might also be interested in 
+      <a href="/data_center/image_gel_pattern">visually browsing our gel patterns</a>.
+    </p>
+    <br>
+  </div>
+  )
+  <br>
+   *(ssr_sample_queries
+      <p>
+     You may also be interested in 
+     <a href="/ssr_protocols">SSR protocols</a> 
+     from the Maize Mapping Project.
+   </p>
+   )
+</div>
+)

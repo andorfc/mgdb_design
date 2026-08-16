@@ -1,0 +1,50 @@
+$$SYNTAX-LEVEL 2
+*(gene-locus-molecular-sections
+  @(molecular {display: off}
+    @(biochem_path  {display: off}
+      <p>
+        <b>Biochemical Pathways:</b><br>
+        <div class='small_tab'>Coming soon.</div>
+      </p>
+      <br>
+    )
+    
+    @(sequences {display: off}
+      <br>
+      <b>Sequences:</b> These sequences relate to $(rec_name) 
+      <a href="locusfasta.cgi?locus=$(rec_id)">
+        Download these genetic sequences in FASTA format.
+      </a><br>
+      <a title="Some notes on sequence matching, and why you should do your own investigation." 
+         onKeyPress="javascript:window.open('/buyer_beware.html','buyerbeware','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,width=400,height=520,left=50,top=50'\);" 
+         onClick="javascript:window.open('/buyer_beware.html','buyerbeware','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,width=400,height=520,left=50,top=50'\);" 
+         href="#">
+         <span style="font-color:red; font-weight: bold;">Important note</span>
+      </a> 
+      about sequence matches.
+      <table border=0 cellpadding=1 cellspacing=1>
+        <tr>
+          <td width=115><b><u>Type</u></b>&nbsp;&nbsp;&nbsp;</td>
+          <td width=115><b><u>Accession #</u></b>&nbsp;&nbsp;&nbsp;</td>
+          <td><u><b>Length</b></u>&nbsp;&nbsp;&nbsp;</td>
+          <td><u><b>Annotation Summary</b></u></td>
+        </tr>
+        @(seq_sec
+        <tr>
+          <td>$(seq_type)</td>
+          <td><b><a href="/data_center/sequence?id=$(seq_id)">$(genbank_acc)</a></b></td>
+          <td>$(seq_length)</td>
+          <td>$(seq_title)(see
+            <a href="http://www.plantgdb.org/search/display/data.php?Seq_ID=$(seq_id)">
+            this sequence at PlantGDB</a>\)
+          </td>
+        </tr>
+        )
+      </table>
+    )
+    @(no_molecular {display: off}
+      <b>There is no molecular information for this record.</b>
+    ) 
+  ) <!-- molecular -->
+ 
+)

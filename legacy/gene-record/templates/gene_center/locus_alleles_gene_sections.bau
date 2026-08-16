@@ -1,0 +1,15 @@
+$$SYNTAX-LEVEL 2
+*(gene-locus-alleles-sections
+
+  @(alleles {display: off}
+    @(show_alleles
+    <p>
+      $(allele-table)
+    </p>
+    )
+    @(no_alleles {bind: show_alleles | display: off}
+      <br><b>There are no alleles for this record.</b>
+    )
+  ) <!-- alleles -->
+ 
+)

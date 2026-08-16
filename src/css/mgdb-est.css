@@ -1,0 +1,323 @@
+/* EST collection page — shared MaizeGDB modern design system. */
+
+.mgdb-modern .mgdb-est-page {
+  padding-bottom: clamp(3rem, 6vw, 5.5rem);
+}
+
+.mgdb-modern .est-hero-mark {
+  display: block;
+  width: 7.2rem;
+  height: 6.3rem;
+  margin: 0 auto 0.7rem;
+}
+
+.mgdb-modern .est-search-panel {
+  overflow: hidden;
+  padding: clamp(1.25rem, 3vw, 2.2rem);
+  border: 1px solid var(--mgdb-line);
+  border-top: 0.3rem solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-modern .est-search-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.mgdb-modern .est-search-intro > div {
+  max-width: 48rem;
+}
+
+.mgdb-modern .est-search-intro h3 {
+  margin: 0.25rem 0 0.45rem;
+  color: var(--mgdb-green-dark);
+  font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+}
+
+.mgdb-modern .est-search-intro p {
+  margin: 0;
+  color: var(--mgdb-muted);
+}
+
+.mgdb-modern .est-search-number {
+  color: var(--mgdb-surface-sunken);
+  font-size: clamp(4.8rem, 9vw, 7.5rem);
+  font-weight: 800;
+  line-height: 0.8;
+  letter-spacing: -0.08em;
+  pointer-events: none;
+}
+
+.mgdb-modern .est-search-panel .mgdb-search {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.mgdb-modern .est-query-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 0.8rem;
+}
+
+.mgdb-modern .est-query-field {
+  min-width: 0;
+}
+
+.mgdb-modern .est-search-submit {
+  min-height: var(--mgdb-tap-target);
+  white-space: nowrap;
+}
+
+.mgdb-modern .est-search-options {
+  display: grid;
+  grid-template-columns: minmax(10rem, 14rem) minmax(0, 1fr);
+  gap: 0.9rem;
+  margin-top: 1.1rem;
+  padding: 1rem;
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-modern .est-search-options .mgdb-input {
+  width: 100%;
+}
+
+.mgdb-modern .est-search-guide {
+  display: grid;
+  align-content: center;
+  gap: 0.18rem;
+  padding-left: 1rem;
+  border-left: 1px solid var(--mgdb-line);
+}
+
+.mgdb-modern .est-search-guide strong {
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-modern .est-search-guide span {
+  color: var(--mgdb-muted);
+  font-size: 0.84rem;
+}
+
+.mgdb-modern .est-search-guide a {
+  color: var(--mgdb-burgundy);
+  font-size: 0.84rem;
+  font-weight: 750;
+}
+
+.mgdb-modern .est-examples {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 1rem;
+}
+
+.mgdb-modern .est-examples > span {
+  color: var(--mgdb-muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.mgdb-modern .est-results:not(:empty) {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--mgdb-line);
+}
+
+.mgdb-modern .est-results table {
+  width: 100% !important;
+  border-collapse: collapse;
+  color: var(--mgdb-ink);
+  font-size: 0.9rem;
+}
+
+.mgdb-modern .est-results td {
+  padding: 0.55rem 0.35rem;
+  border-bottom: 1px solid var(--mgdb-line-soft);
+  vertical-align: top;
+}
+
+.mgdb-modern .est-results a {
+  color: var(--mgdb-burgundy);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.15em;
+}
+
+.mgdb-modern .est-results [style*="font-family: Verdana"] {
+  color: var(--mgdb-green-dark);
+  font-family: inherit !important;
+  font-size: 1.15rem !important;
+}
+
+.mgdb-modern .est-results [style*="color:red"] {
+  color: var(--mgdb-red) !important;
+}
+
+.mgdb-modern .est-results input[type="text"] {
+  width: 3.5rem;
+  min-height: 2.25rem;
+  padding: 0.3rem 0.45rem;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  font: inherit;
+}
+
+.mgdb-modern .est-results img {
+  max-width: 2.5rem;
+  height: auto;
+}
+
+.mgdb-modern .est-chromosome-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.mgdb-modern .est-chromosome-grid > a {
+  position: relative;
+  display: grid;
+  min-height: 7.5rem;
+  align-content: center;
+  justify-items: center;
+  overflow: hidden;
+  padding: 1rem;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-sm);
+  color: var(--mgdb-ink);
+  text-decoration: none;
+}
+
+.mgdb-modern .est-chromosome-grid > a::after {
+  position: absolute;
+  right: -1rem;
+  bottom: -1rem;
+  width: 4rem;
+  height: 5.5rem;
+  opacity: 0.09;
+  background: repeating-linear-gradient(90deg, var(--mgdb-burgundy) 0 0.38rem, transparent 0.38rem 0.8rem);
+  content: '';
+  transform: rotate(12deg);
+}
+
+.mgdb-modern .est-chromosome-grid > a:hover,
+.mgdb-modern .est-chromosome-grid > a:focus-visible {
+  border-color: var(--mgdb-gold);
+  box-shadow: var(--mgdb-shadow-md);
+  transform: translateY(-0.12rem);
+}
+
+.mgdb-modern .est-chromosome-grid > a:focus-visible {
+  outline: 0.18rem solid var(--mgdb-gold);
+  outline-offset: 0.14rem;
+}
+
+.mgdb-modern .est-chromosome-grid span {
+  color: var(--mgdb-muted);
+  font-size: 0.7rem;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.mgdb-modern .est-chromosome-grid strong {
+  color: var(--mgdb-green-dark);
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.mgdb-modern .est-chromosome-grid small {
+  margin-top: 0.4rem;
+  color: var(--mgdb-burgundy);
+  font-size: 0.76rem;
+  font-weight: 750;
+}
+
+.mgdb-modern .est-all-export {
+  margin-top: 1rem;
+}
+
+.mgdb-modern .est-all-export a {
+  color: var(--mgdb-burgundy);
+  font-weight: 750;
+}
+
+.mgdb-modern .est-context-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(18rem, 0.75fr);
+  align-items: start;
+  gap: 1.4rem;
+  margin-top: clamp(2.5rem, 6vw, 5rem);
+}
+
+.mgdb-modern .est-context-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.1rem;
+}
+
+.mgdb-modern .est-clone-policy h3 {
+  margin: 0.55rem 0 0.65rem;
+  color: var(--mgdb-green-dark);
+  font-size: 1.3rem;
+  line-height: 1.25;
+}
+
+@media (max-width: 900px) {
+  .mgdb-modern .est-chromosome-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .mgdb-modern .est-context-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .mgdb-modern .est-query-row,
+  .mgdb-modern .est-search-options {
+    grid-template-columns: 1fr;
+  }
+
+  .mgdb-modern .est-search-guide {
+    padding: 0.9rem 0 0;
+    border-top: 1px solid var(--mgdb-line);
+    border-left: 0;
+  }
+
+  .mgdb-modern .est-search-submit {
+    width: 100%;
+  }
+
+  .mgdb-modern .est-chromosome-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  .mgdb-modern .est-search-panel {
+    padding: 1.05rem;
+  }
+
+  .mgdb-modern .est-search-number {
+    font-size: 4.5rem;
+  }
+
+  .mgdb-modern .est-hero-mark {
+    width: 5.8rem;
+    height: 5.1rem;
+  }
+}

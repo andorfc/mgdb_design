@@ -1,0 +1,87 @@
+*(overgo-left
+<div id="datacenter_left_col">
+  <span class="notice">
+    <br>
+    Note that this data center is no longer supported.
+    <br><br><br>
+  </span>
+  
+  <p>
+    <span id='datacenter_title'>Simple Overgo Search</span>
+  </p>
+  <div id='datacenter_gray_background'>
+    <p>
+      This search form allows you to just enter basic name info to quickly 
+      retrieve the desired overgo.
+      <br>
+      
+      *(simple-search-instructions #load: templates/data_center/simple_search_instructions.bau#)
+      
+    </p>
+    <div name="button_container" class="button_container">
+    <form name="n1" method="get" 
+          action="javascript:getSearchData('overgo', 'simple_results', document.getElementById('overgoterm'\).value\);" 
+          class="tiny">
+      <input type="text" name="term" id="overgoterm" size="20" value="" class="quick_search">
+      <input type="submit" class="button" value="Submit" id="minisub">
+      (see a <a href="#" onClick="document.getElementById('overgoterm'\).value = 'si486';">sample overgo search</a>\)
+      <br>
+      @(limits
+        *(adjust_limits #load: templates/data_center/set_search_limit.bau#)
+      )
+    </form>
+    </div>
+    <script type="text/javascript">
+        document.n1.term.focus(\);
+    </script>
+    <p>
+      The above search, given as an example, lets you find overgos developed 
+      from the 486 library of the Maize Gene Discovery Project.  Another 
+      interesting sample query would be <span style="font-weight:bold;">%486055D02</span> 
+      (which retrieves an overgo designed from a specific member of that 486
+      library\).
+    </p>
+    <br>
+    <p>
+      From the Maize Mapping Project, you can find overgos prepared by 
+      DuPont/Incyte using a search like <span style="font-weight:bold;">cl%</span> 
+      (combined public/private cluster\), <span style="font-weight:bold;">pc%</span> 
+      (public cluster\), or <span style="font-weight:bold;">si%</span>
+      (public singleton\), which retrieves overgos designed for the project.
+    </p>
+    <br>
+    <p>
+      This search can be executed on every page on the site by utilizing the
+      form in the upper right corner.  Choose "Overgo" from the drop-down menu, 
+      enter your search term in the field, and hit return to find the overgo you're
+      looking for.
+    </p>
+    <br>
+    <div id='simple_results'></div>
+   </div>
+   <br>
+   <p>
+    <span id='datacenter_title'>Overgo Sequence Search</span>
+   </p>
+   <div id='datacenter_gray_background'>
+     <p>
+       This search form allows you to enter snippets of nucleotide sequence 
+       (up to 25 bp\) and find all exact matches in the overgo sequences we have.
+     </p>
+     
+     <div name="button_container" class="button_container">
+     <form method="get" action="javascript:getSearchData('overgo_seq', 'sequence_results', document.getElementById('ovterm'\).value\);" class="tiny">
+      <input type="text" name="term" id="ovterm" size="25" class="quick_search">
+      <span class="button"  id="minisub" onClick="javascript:getSearchData('overgo_seq', 'sequence_results', document.getElementById('ovterm'\).value\);" >Submit</span>
+      (see a 
+      <a href="#" onClick="document.getElementById('ovterm'\).value = 'ACGTGC';">sample overgo sequence search</a>\)
+     </form>
+     <div id="sequence_results" name="sequence_results"></div>
+     </div>
+    </div>
+    <br>
+    <p>
+      <a href="https://download.maizegdb.org/Archive/Overgoes/overgoes.txt"><span style="font-weight:bold;">Download all overgo sequences</span></a>.
+    </p>
+ </div>
+)

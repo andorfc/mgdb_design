@@ -1,0 +1,189 @@
+$$SYNTAX-LEVEL 2
+*(gene-adv-results
+  @(no-term {display: off}
+    <br><b>You did not specify any search criteria.</b><br>
+  )
+   @(no-results_adv {display: off}
+    <br>
+    <table cellpadding=8 cellspacing=3 width="100%" 
+           summary="A table containing the main page content.">
+      <tr>
+        <td width="100%">
+          <p><b>Gene Model/Gene Advanced Search Results - None</b></p>
+          <p>There are either no records matching your search criteria or you did 
+            not select any search criteria. Please check your search and try again.
+          </p>
+        </td>
+      </tr>
+    </table>
+  )
+  
+  @(adv_results {display: off}
+    <table cellpadding=8 cellspacing=3 width="100%" summary="A table containing the main page content.">
+      <tr>
+        <td width="100%">
+          <p style="margin-bottom: 8px;">
+            <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+              Gene Model/Gene  Advanced Search Results - Complete List
+            </span>
+          </p>
+            There are <b>$(count)</b> gene models/genes which match your search criteria.
+           <br><br>
+          <span style="font-family: Verdana, Arial, sans-serif; font-size: 100%; font-weight: bold; margin-bottom: 6px;">
+              Search Criteria:
+          </span>
+          <br>
+          All genes $(criteria)
+          <br><br>
+          <table width="100%" cellpadding=0 cellspacing=0>
+            <tr>
+              <th style="text-align: left; width: 10%">Locus Name</th>
+              <th style="text-align: left; width: 35%">Full Name</th>
+              <th style="text-align: left; width: 20%">Gene Model</th>
+              <th style="text-align: left; width: 5%">Line</th>
+              <th style="text-align: left; width: 10%">Type</th>
+              <th style="text-align: left; width: 10%">Chr</th>
+              <th style="text-align: left; width: 10%">Version</th>
+            </tr>
+            @(adv_gene-row
+            <tr style="background-color: $(bgcolor); height:25px;">
+              <td style="text-align: left%">
+                <a href="$(path)/$(locus_id)">$(locus_name)</a>&nbsp;
+              </td>
+              <td style="text-align: left">$(locus_full_name)&nbsp;</td>
+              <td style="text-align: left">
+                <a href="$(path)/$(gene_name)">$(gene_name)</a>&nbsp;
+              </td>
+              <td style="text-align: left">$(line)&nbsp;</td>
+              <td style="text-align: left">$(model_type)&nbsp;</td>
+              <td style="text-align: left">$(chr)&nbsp;</td>
+              <td style="text-align: left">$(version)&nbsp;</td>
+            </tr>
+            )
+          </table>
+        </td>
+      <tr>
+    </table>
+  )
+  
+  @(adv_results-paged {display: off}
+    <table cellpadding=8 cellspacing=3 width="100%" summary="A table containing the main page content.">
+      <tr>
+        <td width="100%">
+          
+          @(results
+            <p style="margin-bottom: 8px;">
+            <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+              Gene Advanced Search Results - Complete List
+            </span>
+          </p>
+            There are <b>$(count)</b> gene models/genes matching your search criteria, which is summarized below.
+          )
+          @(results_limited {bind: results | display: off}
+           <p style="margin-bottom: 8px;">
+            <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+              Gene Advanced Search Results - Limited List
+            </span>
+          </p>
+           There were <b>$(unlimited_count)</b> genes matching your search criteria, and so <span style="color:red;"> only the first 
+           <b>$(limit)</b> are shown</span>. You may <a href="#!" onclick="downloadSearchList('$(div)_unlimited_rows_adv'\);">download all <b>$(unlimited_count)</b> genes to a file</a>, or you can refine your search to narrow down your results.
+           @(max_limit {display: off}
+             *(max_limit_exceeded {load: ../../templates/data_center/max_limit_exceeded.bau})
+            )           
+           )         
+           <br><br>
+          <span style="font-family: Verdana, Arial, sans-serif; font-size: 100%; font-weight: bold; margin-bottom: 6px;">
+              Search Criteria:
+          </span>
+          <br>
+          $(criteria)
+          <input type="hidden" name="$(div)_rows_adv" id="$(div)_rows_adv" value="$(rows)">
+          <input type="hidden" name="$(div)_unlimited_rows_adv" id="$(div)_unlimited_rows_adv" value="$(unlimited_rows)">
+          <!--<input type="hidden" name="unlimited_query" id="unlimited_query" value="$(unlimited_query)">-->
+          <br><br>
+          <input class="button" value="Download these $(unlimited_count) genes" type="button" onclick="downloadSearchList('$(div)_unlimited_rows_adv'\)">
+          <br>
+          @(pages
+            <div name="gene_adv_results_page$(pagenum)" id="gene_adv_results_page$(pagenum)" 
+                 style="display:$(displayval)">
+              <table width="100%" cellpadding="7" cellspacing="7">
+                <tr>
+                  <td>
+                   <b> Results $(startnum) - $(endnum)</b> out of <b>$(total)</b>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                     <table>
+                     <tr>
+                      <td style="vertical-align:bottom; width:32px; height: 36.4px;">
+                       $(prev-page) 
+                      </td>
+                      <td> $(page-list) </td>
+                      <td style="vertical-align:top;">
+                       $(next-page)
+                      </td> 
+                     </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div name="gene_adv_results_list$(pagenum)" 
+                         id="gene_adv_results_list$(pagenum)">
+                      <table width="100%" cellpadding=0 cellspacing=0>
+                        <tr>
+                          <th style="text-align: left; width: 10%">Locus Name</th>
+                          <th style="text-align: left; width: 30%">Full Name</th>
+                          <th style="text-align: left; width: 20%">Gene Model</th>
+                          <th style="text-align: left; width: 5%">Line</th>
+                          <th style="text-align: left; width: 10%">Type</th>
+                          <th style="text-align: left; width: 10%">Chr</th>
+                          <th style="text-align: left; width: 10%">Version</th>
+                        </tr>
+                        @(adv_gene-page-row
+                        <tr style="background-color: $(bgcolor); height:25px;">
+                          <td style="text-align: left">
+                            <a href="$(path)/$(locus_id)">$(locus_name)</a>&nbsp;
+                          </td>
+                          <td style="text-align: left">$(locus_full_name)&nbsp;</td>
+                          <td style="text-align: left">
+                            <a href="$(path)/$(gene_name)">$(gene_name)</a>&nbsp;
+                          </td>
+                          <td style="text-align: left">$(line)&nbsp;</td>
+                          <td style="text-align: left">$(model_type)&nbsp;</td>
+                          <td style="text-align: left">$(chr)&nbsp;</td>
+                          <td style="text-align: left">$(version)&nbsp;</td>
+                        </tr>
+                        )
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                     <table>
+                     <tr>
+                      <td style="vertical-align:bottom; width:32px; height: 36.4px;">
+                       $(prev-page) 
+                      </td>
+                      <td> $(page-list) </td>
+                      <td style="vertical-align:top;">
+                       $(next-page)
+                      </td> 
+                     </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          )
+          <script language="javascript">
+            geneAdvSearch('gene_adv_results_list2', 2\);
+            setWaitIcon('gene_adv_results_list', $(total)\);
+          </script>
+        </td>
+      <tr>
+    </table>
+  )
+)

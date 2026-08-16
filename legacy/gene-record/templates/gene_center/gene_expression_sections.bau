@@ -1,0 +1,38 @@
+$$SYNTAX-LEVEL 2
+*(gene-expression-sections
+  @(no-expression {display: off}
+    No expression data is associated with gene model $(gm_id).
+    <br>
+    Check the Pan-gene tab above to see if any related gene models have expression data.
+    <br>
+    See the <a href="/expression">Expression Data Center</a> for more information.
+  )
+  
+  @(expression {display: off}
+    <i>Expression data associated with $(gm_id):</i><br>
+    Also check the Pan-gene tab above to see if any related gene models have expression data.
+    <br>
+    See the <a href="/expression">Expression Data Center</a> for more information.
+    <br>
+    
+    @(qteller {display: off}
+      <br>
+      Explore gene expression for $(gm_id) in 
+      <a href="$(qteller_url)">qTeller</a>.
+      <br>
+    )
+    
+    <br>
+    
+    @(pan-gene-expression {display: off}
+      Expression data is associated with one or more members of this pan-gene set:<br>
+      @(exp_gene_model_list
+        <a href="/gene_center/gene/$(exp_gene_model)">$(exp_gene_model)</a>
+        <br>
+      )
+    )
+    
+    *(gene_model-eFP-browser-sections {load: ../templates/gene_center/gene_model_efp.bau})
+    
+  )
+)

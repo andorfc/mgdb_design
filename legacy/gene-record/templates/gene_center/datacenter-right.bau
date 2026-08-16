@@ -1,0 +1,43 @@
+*(datacenter-right
+
+<!-- documentation: http://www.mediawiki.org/wiki/API -->
+
+@(data-center-right-content
+<div id='datacenter_right_col'>
+  <br><h4>$(title)</h4><br>
+  <p>source: <a href="http://www.wikipedia.org/">wikipedia</a></p><br>
+  @(qtl-right-q
+    <!--<p>$(Question)</p><br>-->
+    <!--<div id='qtl_lite_green_background' style='margin-left:12px'>$(Answer)</div><br>-->
+    <!--document.getElementById('wiki_extract'\).innerHTML = data.toSource(\);}\);-->
+    <!--alert(Wiky.toHtml(document.getElementById('wiki_extract'\).value\)\);}\);-->
+    <!--<div id='qtl_lite_green_background'>$(Answer)</div><br>-->
+    <!--document.getElementById('wiki_extract'\).innerHTML = val2.replace(/<a href="\\/wiki/g,'<a href="\http://en.wikipedia.org/wiki'\);-->
+  )
+	
+  <div id='wiki_extract' style='height:$(column-height); overflow: auto;'></div>
+    
+	<script>
+		$.getJSON("http://en.wikipedia.org/w/api.php?action=parse&format=json&callback=?", 
+		          {page:"$(page)", prop:"text"}, 
+		          function(data\) {
+                var i=0;
+                $.each(data, function(key, val\) {
+                  $.each(val, function(key1, val1\) {
+         		        i++;
+         		        if (i==2\) {
+        				      $.each(val1, function(key2, val2\) {
+        				        val3 = val2.replace(/<a href="\\/wiki/g,
+        				                            '<a href="\http://en.wikipedia.org/wiki'\);
+						            document.getElementById('wiki_extract'\).innerHTML 
+						              = val3.replace(/<span class="editsection">.+?<\\/span>?/g, ""\);
+  				            }\);//each
+  				          }//if
+                  }\);//each
+  	            }\);//each
+              }\);//getJSON
+	</script>
+</div>
+)
+)
+

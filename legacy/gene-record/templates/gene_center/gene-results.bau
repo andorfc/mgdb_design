@@ -1,0 +1,212 @@
+$$SYNTAX-LEVEL 2
+*(gene-results
+
+  @(no-term {display: off}
+    <br><b>You did not provide a search term.</b><br>
+  )
+  
+  @(no-results {display: off}
+    <br>
+    <table cellpadding=8 cellspacing=3 width="100%" 
+           summary="A table containing the main page content.">
+      <tr>
+        <td width="100%">
+          <p><b>Gene Model Search Results - Complete List</b></p>
+          <p>There are no records matching your search criteria. You searched 
+            using the term <b>$(term)</b>, for which we have no gene model matches. 
+            <br><br>
+            If you are searching for a locus, try the 
+            <a href="/data_center/locus">locus search</a> instead.
+          </p>
+        </td>
+      </tr>
+    </table>
+  )
+  
+  @(withdrawn-gene-model {display: off}
+    <b>This gene model has been withdrawn.</b><br>
+    $(withdraw-comment)
+    @(replacement {display: off}
+      See the corresponding active gene model 
+      <a href="/gene_center/gene/$(replacement-gene-model)">$(replacement-gene-model)</a>.
+    )
+    @(no-replacement {display: off}
+      There is no replacement.
+    )
+    <br><br>
+    A full list of correspondences between the obsolete and current gene models is
+    <a href="https://download.maizegdb.org/$(assembly)/">here</a>. Look for a file
+    that ends in "_xref_gene_IDs.txt". Complete data for obsolete gene models can be
+    found in the "archive" subdirectory. If you need help with this obsolete gene
+    model, please <a href="/contact">contact us</a>.
+    <br><br>
+  )
+  
+  @(obsolete-annotation {display: off}
+    <br>
+    <table cellpadding=8 cellspacing=3 width="100%" 
+           summary="A table containing the main page content.">
+      <tr>
+        <td width="100%">
+          <p>
+            If you are searching for a gene model, it may be deprecated or withdrawn, 
+            or it may be only available on its assembly browser and in bulk downloads. 
+            Check the <a href="https://download.maizegdb.org">MaizeGDB data downloads</a> 
+            for the complete set of annotations and cross-reference files.
+          </p>
+        </td>
+      </tr>
+    </table>
+  )
+  
+  @(multi-results {display: off}
+    <table cellpadding=8 cellspacing=3 width="100%" summary="A table containing the main page content.">
+      <tr>
+        <td width="100%">
+          <p style="margin-bottom: 8px;">
+            <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+              Gene Search Results
+            </span>
+          </p>
+          
+          @(gene-model-download {display: off}
+            <a href="javascript:doDownload('/search/gene/gene_results.php', '$(url_term)', 'gene_models.txt'\)">Download the full list of gene model results</a>
+            <br>
+          )
+          <a href="javascript:doDownload('/search/gene/gene_results.php', '$(url_term)', 'genes.txt'\)">Download the full list of gene loci results</a>
+          <br>
+          <div name="download_status_div" id="download_status_div"></div>
+          <iframe name="download_iframe" id="download_iframe" width=0 height=0 style="border:none"></iframe>
+          
+          $(one-page)        
+        </td>
+      <tr>
+    </table>
+  )
+  
+  @(multi-results-paged {display: off}
+    <table cellpadding=8 cellspacing=3 width="100%">
+      <tr>
+        <td width="100%">
+          <p style="margin-bottom: 8px;">
+            <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+              Gene Search Results
+            </span>
+          </p>
+          
+          @(results
+            There are <b>$(count)</b> genes/gene models matching the term <b>$(term)</b>.
+            <br>
+            Results may include multiple versions and transcripts of the same gene model.
+            <br>
+            It may be necessary to use the pan-gene tab on the gene record page to find 
+            corresponding gene models in other assemblies.
+          )
+          
+          @(results_limited {bind: results | display: off}
+            There were a large number of genes/gene models matching the term <b>$(term)</b> so  
+            <span style="color:red;">only the first <b>$(limit)</b> are shown.</span>
+            @(datacenter-adjust-paged {display: off}
+              Please refine your search to narrow down your results in the 
+              box above or use the advanced search form below, or adjust 
+              the search limit above.
+            )
+            @(alldata-adjust-paged {display: off}
+              Please go to the <a href="/gene_center/gene">gene/gene model data center</a>
+              to modify your search.
+            )
+            <br>
+          )
+          @(gene-model-download-paged {display: off}
+            <a href="javascript:doDownload('/search/gene/gene_results.php', '$(url_term)', 'gene_models.txt'\)">Download the full list of gene model results</a>
+            <br>
+          )
+          <a href="javascript:doDownload('/search/gene/gene_results.php', '$(url_term)', 'genes.txt'\)">Download the full list of gene loci results</a>
+          <br>
+      
+          <div name="download_status_div" id="download_status_div"></div>
+          <iframe name="download_iframe" id="download_iframe" width=0 height=0 style="border:none"></iframe>
+          
+          <input type="hidden" name="$(div)_rows" id="$(div)_rows" value="$(rows)">
+
+<!-- new style paging -->
+          <table cellspacing=5 cellpadding=5>
+            <tr>
+              <td style="vertical-align:bottom; width:32px; height: 36.4px;">
+                <a href="javascript:prevPage(\)" name="prevpage" id="prevpage">
+                  <img style='border:0px' src='/images/corn-icon-prev.png'>
+                </a>
+              </td>
+              <td>
+                <form action="javascript:goToPage(document.getElementById('pagenum'\).value, 'gene_results_page', $(pagecount)\)" 
+                      name='pagenumform' id='pagenumform'>
+                  Page 
+                  <input type='text' size=2 maxlength=3 name='pagenum' 
+                         id='pagenum' value='1'>
+                  of $(pagecount)
+                </form>
+              </td>
+              <td style="vertical-align:top;">
+                <a href="javascript:nextPage($(pagecount)\)" name="nextpage" id="nextpage">
+                  <img style='border:0px' src='/images/corn-icon-next.png'>
+                </a>
+              </td> 
+            </tr>
+          </table>
+<!-- -->
+
+          @(pages
+            <div class="resultdiv" name="gene_results_page$(pagenum)" 
+                 id="gene_results_page$(pagenum)" style="display:$(displayval)">
+              <table width="100%" cellpadding="7" cellspacing="7">
+<!-- remove because results can't be easily counted, but leave commented out so bauplan doesn't cough
+                <tr>
+                  <td>
+                    <b>Results $(startnum) - $(endnum)</b> out of <b>$(total)</b>
+                  </td>
+                </tr>
+-->
+<!-- old style paging              
+                <tr>
+                  <td>
+                     <table>
+                     <tr>
+                      <td style="vertical-align:bottom; width:32px; height: 36.4px;">
+                       $(prev-page) 
+                      </td>
+                      <td> $(page-list) </td>
+                      <td style="vertical-align:top;">
+                       $(next-page)
+                      </td> 
+                     </tr>
+                    </table>
+                  </td>
+                </tr>
+-->
+                <tr>
+                  <td>
+                    <div name="gene_results_list$(pagenum)" 
+                         id="gene_results_list$(pagenum)">
+                      $(multi-page)
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          )
+
+          <script language="javascript">
+            getSearchData('gene', 'gene_results_list2', '$(raw_term)', 2\);
+          </script>
+
+        </td>
+      <tr>
+    </table>
+  )
+  
+  @(open_shadowbox {display: off}
+      <script language="javascript">
+        open_shadowbox('gene', '$(term)', 'html'\);
+      </script>
+  )
+)

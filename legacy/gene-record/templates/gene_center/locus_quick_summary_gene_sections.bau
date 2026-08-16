@@ -1,0 +1,56 @@
+$$SYNTAX-LEVEL 2
+*(gene-locus-quick-sections
+
+  @(quick-summary {display: off}
+    <div id="quick_summary_section">
+      <b>(Includes only curated data\)</b>
+      <table width=700 class="nowrap">
+        <tr width="100%">
+          <td width='19%'>BACs: $(bac_count)</td>
+          <td width='16%'>ESTs: $(est_count)</td>
+          <td width='16%'>Gels: $(gel_count)</td>
+          <td width='16%'>Gene Products: $(gp_count)</td>
+          <td width='16%'>Maps: $(map_count)</td>
+          <td width='17%'>Map Scores: $(mapscore_count)</td>
+        </tr>
+        <tr>
+          <td>Off-Site Resources: $(off_count)</td>
+          <td>Overgos: $(overgo_count)</td>
+          <td>Phenotypes: $(pheno_count)</td>
+          <td>Primers: $(primer_count)</td>
+          <td>Probes: $(probe_count)</td>
+          <td>Recombination: $(rec_count)</td>
+        </tr>
+        <tr>
+          <td>Related BACs: $(rbac_count)</td>
+          <td>Related loci: $(rloci_count)</td>
+          <td>SSRs: $(ssr_count)</td>
+          <td>Variations: $(var_count)</td>
+        </tr>
+        @(recent {display: off}
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>
+              <br>
+              <table align='right'>
+                <tr>
+                  <td>
+                    <img src="/images/updated_16.png"></img>
+                  </td>
+                  <td valign='center'>
+                    <i>recently updated</i>
+                  </td>
+                <tr>
+              </table>
+            </td>
+          </tr>
+         )
+      </table>
+    </div>
+  )<!-- quick-summary -->
+
+)

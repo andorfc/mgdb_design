@@ -1,0 +1,141 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-est
+<main class="mgdb-page mgdb-est-page" id="est-main">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/">Data centers</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Expressed sequence tags</span>
+  </nav>
+
+  <section class="mgdb-hero est-hero" aria-labelledby="est-title">
+    <div class="mgdb-hero-emblem">
+      <svg class="est-hero-mark" viewBox="0 0 132 116" role="img" aria-label="Stacked expressed sequence tag reads">
+        <g fill="none" stroke-linecap="round" stroke-width="9">
+          <path d="M18 24h62" stroke="#501719" /><path d="M42 24h55" stroke="#a96919" />
+          <path d="M11 49h47" stroke="#2f5e2a" /><path d="M72 49h47" stroke="#501719" />
+          <path d="M25 74h70" stroke="#a96919" /><path d="M52 74h67" stroke="#2f5e2a" />
+          <path d="M15 99h38" stroke="#501719" /><path d="M68 99h42" stroke="#2f5e2a" />
+        </g>
+        <g fill="#f4edd0"><circle cx="42" cy="24" r="4" /><circle cx="72" cy="49" r="4" /><circle cx="52" cy="74" r="4" /><circle cx="68" cy="99" r="4" /></g>
+      </svg>
+      <strong>EST<br />Collection</strong>
+      <span>Expressed sequences</span>
+    </div>
+    <div class="mgdb-hero-body">
+      <span class="mgdb-eyebrow">Historical MaizeGDB sequence collection</span>
+      <h1 id="est-title">Find an expressed sequence tag.</h1>
+      <p class="mgdb-hero-tagline">Search names, GenBank accessions, sequence identifiers, and legacy library patterns.</p>
+      <p class="mgdb-hero-description">ESTs captured expressed maize transcripts before complete reference genomes became available. MaizeGDB preserves these records, annotations, detected loci, and map relationships for reproducibility and historical research.</p>
+      <div class="mgdb-hero-actions">
+        <a class="mgdb-button mgdb-button-primary" href="#est-search">Search EST records</a>
+        <a class="mgdb-button mgdb-button-secondary" href="#mapped-ests">Browse mapped ESTs</a>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="est-summary-title">
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Collection at a glance</span><h2 id="est-summary-title">Legacy transcript evidence, still connected</h2></div>
+      <p>EST records remain linked to sequence data, annotations, loci, genetic maps, and related MaizeGDB records.</p>
+    </div>
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric"><span class="mgdb-metric-icon" aria-hidden="true">&#9776;</span><div><strong class="mgdb-metric-value mgdb-metric-value-compact">$(est_count)</strong><h3>EST records</h3><p>Visible expressed sequence tag records in the collection.</p></div></article>
+      <article class="mgdb-metric mgdb-tone-green"><span class="mgdb-metric-icon" aria-hidden="true">10</span><div><strong class="mgdb-metric-value">10</strong><h3>Chromosome exports</h3><p>Mapped EST views for chromosomes 1 through 10.</p></div></article>
+      <article class="mgdb-metric mgdb-tone-red"><span class="mgdb-metric-icon" aria-hidden="true">%</span><div><strong class="mgdb-metric-value">4</strong><h3>Pattern operators</h3><p>Partial, wildcard, start-anchored, and end-anchored searches.</p></div></article>
+      <article class="mgdb-metric mgdb-tone-burgundy"><span class="mgdb-metric-icon" aria-hidden="true">&#8594;</span><div><strong class="mgdb-metric-value mgdb-metric-value-compact">Linked</strong><h3>Scientific context</h3><p>Records connect sequences with loci, maps, and annotations.</p></div></article>
+    </div>
+  </section>
+
+  <section id="est-search" aria-labelledby="est-search-title">
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Search the collection</span><h2 id="est-search-title">Search EST names and identifiers</h2></div>
+      <p>Search an EST name, sequence identifier, GenBank accession, or library pattern. Use the locus search for gene symbols such as <em>bz1</em> or <em>wx</em>.</p>
+    </div>
+
+    <article class="est-search-panel">
+      <div class="est-search-intro">
+        <div><span class="mgdb-eyebrow">EST identity</span><h3>Which sequence tag are you looking for?</h3><p>Wildcards are useful for exploring library families; exact identifiers may open their record directly.</p></div>
+        <span class="est-search-number" aria-hidden="true">01</span>
+      </div>
+
+      <form id="est-search-form" class="mgdb-search" role="search">
+        <div class="est-query-row">
+          <div class="mgdb-field est-query-field">
+            <label class="mgdb-label" for="est_term">EST name, accession, sequence ID, or pattern</label>
+            <p class="mgdb-hint" id="est-query-hint">Use <code>%</code> or <code>*</code> for a wildcard, <code>^</code> to anchor the beginning, and <code>$</code> to anchor the end.</p>
+            <input class="mgdb-input" id="est_term" name="q" type="search" aria-describedby="est-query-hint" autocomplete="off" placeholder="p-std486%" required />
+          </div>
+          <button class="mgdb-button mgdb-button-primary est-search-submit" type="submit">Search ESTs</button>
+        </div>
+
+        <div class="est-search-options">
+          <div class="mgdb-field">
+            <label class="mgdb-label" for="limit_val">Maximum results</label>
+            <input id="limit" type="checkbox" checked hidden />
+            <input class="mgdb-input" id="limit_val" type="number" min="1" max="$(search_limit_max)" value="$(search_limit)" inputmode="numeric" />
+            <p class="mgdb-hint">Up to $(search_limit_max) records.</p>
+          </div>
+          <div class="est-search-guide">
+            <strong>Searching by gene name?</strong>
+            <span>Use the locus data center for gene symbols and locus aliases.</span>
+            <a href="/data_center/locus">Open locus search <span aria-hidden="true">&rarr;</span></a>
+          </div>
+        </div>
+
+        <div class="mgdb-form-actions">
+          <button class="mgdb-button mgdb-button-quiet" type="reset">Clear search</button>
+        </div>
+
+        <div class="est-examples" aria-label="Example EST searches">
+          <span>Try a collection</span>
+          <button class="mgdb-chip" type="button" data-est-example="p-std486%">486 library</button>
+          <button class="mgdb-chip" type="button" data-est-example="p-std606%">606 library</button>
+          <button class="mgdb-chip" type="button" data-est-example="%606001A02%">Specific 606 member</button>
+        </div>
+      </form>
+
+      <p id="est-search-status" class="mgdb-visually-hidden" aria-live="polite"></p>
+      <div id="est-search-results" class="est-results" aria-labelledby="est-search-status"></div>
+    </article>
+  </section>
+
+  <section id="mapped-ests" aria-labelledby="mapped-ests-title">
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Genetic map locations</span><h2 id="mapped-ests-title">Download mapped ESTs by chromosome</h2></div>
+      <p>Each export lists ESTs alongside detected loci, map names, bins, and coordinates. The all-chromosome export is substantially larger.</p>
+    </div>
+    <div class="est-chromosome-grid" aria-label="Mapped EST exports by chromosome">
+      <a href="/mapped_elements?type=e&chrom=1"><span>Chr</span><strong>1</strong><small>Mapped ESTs</small></a>
+      <a href="/mapped_elements?type=e&chrom=2"><span>Chr</span><strong>2</strong><small>Mapped ESTs</small></a>
+      <a href="/mapped_elements?type=e&chrom=3"><span>Chr</span><strong>3</strong><small>Mapped ESTs</small></a>
+      <a href="/mapped_elements?type=e&chrom=4"><span>Chr</span><strong>4</strong><small>Mapped ESTs</small></a>
+      <a href="/mapped_elements?type=e&chrom=5"><span>Chr</span><strong>5</strong><small>Mapped ESTs</small></a>
+      <a href="/mapped_elements?type=e&chrom=6"><span>Chr</span><strong>6</strong><small>Mapped ESTs</small></a>
+      <a href="/mapped_elements?type=e&chrom=7"><span>Chr</span><strong>7</strong><small>Mapped ESTs</small></a>
+      <a href="/mapped_elements?type=e&chrom=8"><span>Chr</span><strong>8</strong><small>Mapped ESTs</small></a>
+      <a href="/mapped_elements?type=e&chrom=9"><span>Chr</span><strong>9</strong><small>Mapped ESTs</small></a>
+      <a href="/mapped_elements?type=e&chrom=10"><span>Chr</span><strong>10</strong><small>Mapped ESTs</small></a>
+    </div>
+    <div class="mgdb-message mgdb-message-info est-all-export">
+      <div><strong>Need the complete mapped collection?</strong> The <a href="/mapped_elements?type=e">all-chromosome export</a> creates a very large table and may take longer to download or open.</div>
+    </div>
+  </section>
+
+  <section class="est-context-layout" aria-labelledby="est-context-title">
+    <div class="mgdb-prose">
+      <span class="mgdb-eyebrow">Understanding the collection</span>
+      <h2 id="est-context-title" class="mgdb-leaf-heading">What an EST record represents</h2>
+      <p>An expressed sequence tag is a short sequence read derived from a cDNA clone. EST collections provided early evidence for transcribed genes and supported gene discovery, annotation, marker development, and genetic mapping.</p>
+      <p>For current gene models and genome-scale expression datasets, begin with the modern gene and expression resources. Use this collection when a publication, clone, sequence accession, or historical map refers specifically to an EST.</p>
+      <div class="est-context-actions">
+        <a class="mgdb-button mgdb-button-secondary" href="/gene_center/gene">Search genes</a>
+        <a class="mgdb-button mgdb-button-quiet" href="/expression">Explore expression data</a>
+      </div>
+    </div>
+    <aside class="mgdb-aside-card est-clone-policy">
+      <span class="mgdb-eyebrow">Clone ordering policy</span>
+      <h3>MaizeGDB does not distribute maize clones.</h3>
+      <p>Clones submitted by Virginia Walbot may be requested from the Arizona Genomics Institute. Have the clone's GenBank record available when ordering; the request form asks for information from that record.</p>
+      <a class="mgdb-button mgdb-button-secondary" href="http\://www.genome.arizona.edu/orders/">Arizona clone orders <span aria-hidden="true">&nearr;</span></a>
+    </aside>
+  </section>
+</main>
+)

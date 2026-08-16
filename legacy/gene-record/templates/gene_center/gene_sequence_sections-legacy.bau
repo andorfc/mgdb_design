@@ -1,0 +1,90 @@
+$$SYNTAX-LEVEL 2
+*(gene-sequence-sections-legacy
+   
+  @(no-sequence {display: off}
+    <b>There is no sequence available for this gene model.</b>
+  )
+  
+  @(sequence {display: off}    
+    <div id="sequence-content" name="sequence-content">
+<!-- no longer providing v1 and v2 sequence, so no need for tabs
+      <br><br>
+      <table width="95%">
+        <tr height="10px">
+          <td width="30%" id="seq-tab_v3" name="seq-tab_v3"
+              class="toggle_tab seq_tab gene_center_tab genome_tab_focus" align="center"
+              onclick="toggle_genome_tabs('seq-tab_v3', 'seq-div_v3', 'seq'\)">
+            &nbsp;&nbsp;&nbsp;B73 RefGen_v3&nbsp;&nbsp;&nbsp;
+            <br>
+          </td>
+          <td width="30%" id="seq-tab_v2" name="seq-tab_v2"
+              class='toggle_tab seq_tab gene_center_tab genome_tab_unfocus' align="center"
+              onclick="toggle_genome_tabs('seq-tab_v2', 'seq-div_v2', 'seq'\)">
+            &nbsp;&nbsp;&nbsp;B73 RefGen_v2&nbsp;&nbsp;&nbsp;
+            <br>
+          </td>
+          <td width="30%" id="seq-tab_v1" name="seq-tab_v1"
+              class='toggle_tab seq_tab gene_center_tab genome_tab_unfocus' align="center"
+              onclick="toggle_genome_tabs('seq-tab_v1', 'seq-div_v1', 'seq'\)">
+            &nbsp;&nbsp;&nbsp;B73 RefGen_v1&nbsp;&nbsp;&nbsp;
+            <br>
+          </td>
+          <td style='align: right; width: 10%;'>
+            &nbsp;&nbsp;&nbsp;
+          </td>
+        </tr>
+      </table>
+      
+      @(v1-sequence {display: off}
+        <div id="seq-div_v1" name="seq-div_v1" width="95%" class="genome_box toggle_div seq_div"
+             style="display:$(display-v1)">
+          <div id="seq-content_v1" name="seq-content_v1"
+               style="position:relative; left:20px;top:5px; width:95%;">
+            $(contents-v1)
+          </div>
+        </div>
+      )
+      @(v1-none {display: off}
+        <div id="seq-div_v1" name="seq-div_v1" width="95%" class="genome_box toggle_div seq_div"
+             style="display:$(display-v1)">
+           <br><br><b>This gene model does not exist in B73 RefGen_v1</b>
+           <br><br>
+        </div>
+      )
+      @(v2-sequence {display: off}
+        <div id="seq-div_v2" name="seq-div_v2" width="95%" class="genome_box toggle_div seq_div"
+             style="display:$(display-v2)">
+          <div id="seq-content_v2" name="seq-content_v2"
+               style="position:relative; left:20px;top:5px; width:95%;">
+            $(contents-v2)
+          </div>
+        </div>
+      )
+      @(v2-none {display: off}
+        <div id="seq-div_v2" name="seq-div_v2" width="95%" class="genome_box toggle_div seq_div"
+             style="display:$(display-v2)">
+          <br><br><b>This gene model does not exist in B73 RefGen_v2</b><br><br>
+          <br><br>
+        <div>
+      )
+      
+-->
+      @(v3-sequence {display: on}
+        <div id="seq-div_v3" name="seq-div_v3" width="95%" class="genome_box toggle_div seq_div"
+             style="display:$(display-v3)">
+          <div id="seq-content_v3" name="seq-content_v3"
+               style="position:relative; left:20px;top:5px; width:95%;">
+            $(contents-v3)
+          </div>
+        </div>
+      )
+      @(v3-none {display: off}
+         <div id="seq-div_v3" name="seq-div_v3" width="95%" class="genome_box toggle_div seq_div"
+             style="display:$(display-v3)">
+           <br><br><b>This gene model does not exist in B73 RefGen_v3</b><br><br>
+          <br><br>
+         </div>
+      )
+    </div>
+  )
+)

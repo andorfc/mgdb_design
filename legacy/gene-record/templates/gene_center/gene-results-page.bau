@@ -1,0 +1,13 @@
+$$SYNTAX-LEVEL 2
+*(gene-results-page
+  
+  $(multi-page)
+
+<!-- to prevent bauplan errors: $(term) $(url_term) -->
+  @(load-next-page {display: off}
+    <script language="javascript">
+      getSearchData('gene', 'gene_results_list$(nextpage)', 
+                    '$(term)', $(nextpage)\);
+    </script>
+  )
+)

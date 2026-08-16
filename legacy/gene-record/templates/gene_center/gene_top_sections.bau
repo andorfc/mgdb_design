@@ -1,0 +1,87 @@
+$$SYNTAX-LEVEL 2
+*(top-sections
+
+  <script language="javascript">
+    var gene_id = '$(gene_id)';
+    var locus_name = '$(locus_name)';
+    if (gene_id != ''\) {
+      recordAccess('gene_model', gene_id\);
+    }
+    if (locus_name != ''\) {
+      recordAccess('gene', locus_name\);
+    }
+  </script>
+
+  @(top {display: off}
+    <p class='data_center_title'>
+      <div style="width: 100%; overflow: hidden;">
+        <div style="width: 180px; float: left;">
+          <form action="javascript:popUpAnnotation('genome_issueform', '/curation/GenomeIssue/edit'\);" 
+                method="post" id="genome_issueform">
+            <input type="hidden" id="gene_model_id" value="">
+            <input type="hidden" id="gene_model_version" value="">
+            <input type="hidden" id="auto_num" name="auto_num" value="">
+            <a onclick="genome_issueform.submit(\)" 
+               style="color: crimson; text-decoration: underline; font-weight:bold;" href="#" >
+               Report an assembly error</a>
+          </form>
+        </div>
+        <div style="margin-left: 180px;">
+          <form action="javascript:popUpAnnotation('gene_issueform', '/curation/GenomeIssue/edit'\);" 
+                 method="post" id="gene_issueform">
+            <input type="hidden" id="gene_model_id" value="$(gene_id)">
+            <input type="hidden" id="gene_model_version" value="$(gene_model_set)">
+            <input type="hidden" id="auto_num" name="auto_num" value="">
+            <a onclick="gene_issueform.submit(\)" 
+               style="color: crimson; text-decoration: underline; font-weight:bold;" href="#" >
+               Report a gene model error</a>
+          </form>
+        </div>
+      </div>
+      <br>              
+      <span class='data_center_title'>
+        ;; keep xref section for possible use when we have global, permanent identifiers
+        @(xref_section {display: off}
+          <span class='data_center_title'>$(gene_id)/$(gene_id_xref)</span>
+        )
+        @(gene_model_section {display: off}
+          <span class='data_center_title'>$(gene_id)</span>
+        )
+        @(matching_locus_section {display: off}
+          <span class='data_center_title'>($(locus_name)$(locus_fullname)\)</span>
+        )
+
+        @(loci_via_related_gene_model_section {display: off}
+          <br>
+          <span style="font-size: 8pt;">
+            No genes are linked to directly to this gene model.<br>
+            However, related gene model 
+            <a href="/gene_center/gene/$(related_gene_model)">$(related_gene_model)</a> 
+            is linked to
+            <a href="/gene_center/gene/$(locus_name)">$(locus_name) - $(locus_fullname)</a>$(locus_id)\
+          </span>
+          <br>
+        )
+
+        @(no_loci_section {display: off}
+          <br>
+          <br><span style="font-size: 8pt;">There are no genes linked to this gene model.</span>
+          <br>
+        )
+      </span>
+    </p>
+    <br>
+
+    @(other-loci {display: off}
+      (Also associated with $(loci-list)\)
+    )
+
+    @(user-annotation {display: off}
+      <p><b>
+        <a href="create_seq_annotation.cgi?id=$(seq_id)" target="new">Add your
+          own annotation to this record!</a>
+      </b></p>
+    )
+  )
+
+)

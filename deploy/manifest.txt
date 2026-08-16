@@ -114,6 +114,7 @@ src/controllers/api.php                          controllers/api.php
 src/include/api/v1/lib/mgdb_api.php              include/api/v1/lib/mgdb_api.php
 src/include/api/v1/openapi.php                   include/api/v1/openapi.php
 src/include/api/v1/records/stock.php             include/api/v1/records/stock.php
+src/include/api/v1/records/gene.php              include/api/v1/records/gene.php
 
 # Stock record page — replaces /data_center/stock/{id}
 src/include/stock_record_lib.php                 include/stock_record_lib.php
@@ -129,6 +130,14 @@ src/templates/static/mgdb_reference_record.bau   templates/static/mgdb_reference
 src/css/mgdb-reference-record.css                css/mgdb-reference-record.css
 src/js/mgdb-reference-record.js                  js/mgdb-reference-record.js
 src/controllers/data_center/reference_record_modern.php  controllers/data_center/reference_record_modern.php
+
+# Gene record page — replaces /gene_center/gene/{id}
+src/include/gene_record_lib.php                  include/gene_record_lib.php
+src/templates/static/mgdb_gene_record.bau        templates/static/mgdb_gene_record.bau
+src/css/mgdb-gene-record.css                     css/mgdb-gene-record.css
+src/js/mgdb-gene-record.js                       js/mgdb-gene-record.js
+src/controllers/gene_center/gene_record_modern.php  controllers/gene_center/gene_record_modern.php
+src/controllers/gene_center.php                  controllers/gene_center.php
 
 # Analysis projects — new /projects section. Additive: the route is new and
 # shadows nothing, and there is deliberately no projects/ directory in the web
@@ -193,3 +202,27 @@ src/templates/static/mgdb_redesign_status_missing.bau  templates/static/mgdb_red
 src/css/mgdb-redesign-status.css                       css/mgdb-redesign-status.css
 src/js/mgdb-redesign-status.js                         js/mgdb-redesign-status.js
 src/data/redesign_status.json                          data/redesign_status.json
+
+# BAC, cytogenetics, EST, overgo and SSR search pages. These were built on
+# the server and never added here, so every deploy of data_center.php put
+# them back to the legacy page. Guards live in src/controllers/data_center.php.
+src/controllers/data_center/bac_search_modern.php      controllers/data_center/bac_search_modern.php
+src/templates/static/mgdb_bac.bau                      templates/static/mgdb_bac.bau
+src/css/mgdb-bac.css                                   css/mgdb-bac.css
+src/js/mgdb-bac.js                                     js/mgdb-bac.js
+src/controllers/data_center/cytogenetic_search_modern.php controllers/data_center/cytogenetic_search_modern.php
+src/templates/static/mgdb_cytogenetic.bau              templates/static/mgdb_cytogenetic.bau
+src/css/mgdb-cytogenetic.css                           css/mgdb-cytogenetic.css
+src/js/mgdb-cytogenetic.js                             js/mgdb-cytogenetic.js
+src/controllers/data_center/est_search_modern.php      controllers/data_center/est_search_modern.php
+src/templates/static/mgdb_est.bau                      templates/static/mgdb_est.bau
+src/css/mgdb-est.css                                   css/mgdb-est.css
+src/js/mgdb-est.js                                     js/mgdb-est.js
+src/controllers/data_center/overgo_search_modern.php   controllers/data_center/overgo_search_modern.php
+src/templates/static/mgdb_overgo.bau                   templates/static/mgdb_overgo.bau
+src/css/mgdb-overgo.css                                css/mgdb-overgo.css
+src/js/mgdb-overgo.js                                  js/mgdb-overgo.js
+src/controllers/data_center/ssr_search_modern.php      controllers/data_center/ssr_search_modern.php
+src/templates/static/mgdb_ssr.bau                      templates/static/mgdb_ssr.bau
+src/css/mgdb-ssr.css                                   css/mgdb-ssr.css
+src/js/mgdb-ssr.js                                     js/mgdb-ssr.js

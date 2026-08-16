@@ -1,0 +1,59 @@
+$$SYNTAX-LEVEL 2
+*(gene-locus-external-sections
+  @(external_resources {display: off}
+    @(additional {display: off}
+      <br>
+      <b>Additional External Resources:</b><br>
+      @(res_sec
+        <b>$(key)</b> 
+        (at $(db_name) via 
+        <a href="$(pb_url)/$(pb_id)" target="_self">$(pb_name)</a>\)<br>
+      )
+      <br>
+    )
+    @(keys {display: off}
+      <br>
+      <b>Keys to Related Variations:</b><br>
+      <table width="100%" cellpadding=0 cellspacing=0>
+        <tr>
+          <td width="15%"><u>Variation</u></td>
+          <td width="35%"><u>Database</u></td>
+          <td width="20%"><u>Link To The Record</u></td>
+          <td width="30%"><u>Comment</u></td>
+        </tr>
+        @(keys_sec
+          <tr>
+            <td><a href="/data_center/variation?id=$(var_id)">$(var_name)</a></td>
+            <td><a href="/person?id=$(db_id)">$(db_name)</a></td>
+            <td><a href="$(url)">$(key)</a></td>
+            <td>$(comment)&nbsp;</td>
+          </tr>
+        )
+      </table>
+    )
+    @(gp_keys {display: off}
+      <br>
+      <b>Keys to Related Gene Products:</b><br>
+      <table width="100%" cellpadding=0 cellspacing=0>
+        <tr>
+          <td width="15%"><u>Gene Product</u></td>
+          <td width="35%"><u>Database</u></td>
+          <td width="20%">&nbsp;<u>Link To The Record</u>&nbsp;</td>
+          <td width="30%"><u>Comment</u></td>
+        </tr>
+        @(gp_sec
+          <tr>
+            <td valign="top"><a href="/data_center/gene_product?id=$(genep_id)">$(genep_name)</a></td>
+            <td valign="top"><a href="/person?id=$(db_id)">$(db_name)</a></td>
+            <td valign="top">&nbsp;$(link)&nbsp;</td>
+            <td valign="top">$(comment)&nbsp;</td>
+          </tr>
+        )
+      </table>
+    )
+    @(no_external {display: off}
+      <br>
+      <b>There are no external links for this record.</b>
+    )
+  ) <!-- external_resources -->
+)

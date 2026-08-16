@@ -1,0 +1,81 @@
+$$SYNTAX-LEVEL 2
+*(gene-genomebrowser_details
+
+  @(genome-browser-details {display: off}
+    <br>
+    $(gene_set_source)
+    <br> 
+    <div>
+      @(browser {display: off}
+        <br>
+        <p>(Click on image to go to the Genome Browser\)</p>
+        <a href='$(link)'> 
+          <div style="width: 100%; text-align: center"><img border="no" src="/images/ajax-loader-small.gif" id="browser_loader02"/></div>
+          <img border="no"
+               src="$(gbrowse_img_url)/?name=$(gm_chr):$(gm_min)..$(gm_max);h_feat=$(gm_id)@lightgreen;width=600;type=$(gbrowse_type)" onload="document.getElementById('browser_loader02'\).style.display='none'">
+        </a>
+        <br>
+      )
+      
+      @(browser-link-only {display: off}
+       <iframe style="width: 100%; height: 300px;" src="$(link)&tracklist=0&nav=0&overview=0&tracklabels=0"></iframe>
+        Canonical Transcript: 
+        $(genbank_id) $(gm_chr):$(ngm_start)..$(ngm_end)
+        ($(tr_id)\)<br>
+        <a href="$(link)">Go to browser</a>
+      )
+      
+      @(no-browser {display: off}
+        <span class="error">
+          There is no genome browser for gene models in the $(annotation) 
+          annotation for genome assembly $(assembly_version).
+          <br><br><br>
+        </span>
+      )
+      
+      @(not-on-browser {display: off}
+        <span class="error">
+          The gene model $(gm_id) is not on the $(assembly_name) genome browser.
+          <br><br><br>
+        </span>
+      )
+      
+      @(browser-error {display: off}
+        <span class="error">
+          The $(assembly_name) genome browser is unavailable. This is likely 
+          a temporary problem, but if it persists, please notify us using 
+          the feedback link in the menu bar.
+        </span>
+      )
+
+      @(other-browsers {display: off}
+        <br>
+        <div style="text-align:center">
+          @(maizemine-browser {display: off}
+            <a href='$(maizemine-browser-url)$(gm_id)'>
+              <img src='/images/maizemine_button.png' style="border: 1px solid white"></a>
+          )
+          @(genomaize-browser {display: off}
+            <a href='$(genomaize-browser-url)$(gm_id)'>
+              <img src='/images/genomaize_small.gif' style="border: 1px solid white"></a>
+          )
+          @(plantgdb-browser {display: off}
+            <a href='$(plantgdb-browser-url)$(gm_id)'>
+              <img src='/images/plantgdb2.jpg' style="border: 1px solid white"></a>
+          )
+          @(gramene-browser {display: off}
+            <a href='$(gramene-browser-url)$(gm_id)'>
+              <img src='/images/GrameneButton_lg.png'></a>
+          )
+          @(plexdb-browser {display: off}
+            <a href='$(plexdb-browser-url)$(gm_id)'>
+              <img src='/images/plexdb_button.jpg' style="border: 1px solid white"></a>
+          )
+        </div>
+        <br>
+      )
+    </div>
+  )
+)
+
+

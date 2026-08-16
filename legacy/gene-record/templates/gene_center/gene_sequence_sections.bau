@@ -1,0 +1,19 @@
+$$SYNTAX-LEVEL 2
+*(gene-sequence-sections
+  @(no-sequence {display: off}
+    <b>There is no sequence available for this gene model.</b>
+  )
+  
+  @(sequence {display: off}
+    <div id="sequence-content" name="sequence-content">
+      <div id="seq-div" name="seq-div" width="95%" class="genome_box toggle_div seq_div"
+           style="display:$(display-v3)">
+        <div id="seq-content" name="seq-content"
+             style="position:relative; left:20px;top:5px; width:95%;">
+          $(sequence-contents)
+        </div>
+      </div>
+    </div>
+  )
+
+)

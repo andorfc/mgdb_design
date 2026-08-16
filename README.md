@@ -78,6 +78,11 @@ immediately. Where a file was overwritten, restore it from
 | Stock search | `/data_center/stock` | `controllers/data_center/stock_search_modern.php` | `legacy/stock/` |
 | Stock record | `/data_center/stock/{id}` | `controllers/data_center/stock_record_modern.php` | `legacy/stock-record/` |
 | Reference record | `/data_center/reference?id={id}` | `controllers/data_center/reference_record_modern.php` | `legacy/reference-record/` |
+| BAC search | `/data_center/bac` | `controllers/data_center/bac_search_modern.php` | `legacy/bac/` |
+| Cytogenetics | `/data_center/cytogenetic` | `controllers/data_center/cytogenetic_search_modern.php` | `legacy/cytogenetic/` |
+| EST search | `/data_center/est` | `controllers/data_center/est_search_modern.php` | `legacy/est/` |
+| Overgo search | `/data_center/overgo` | `controllers/data_center/overgo_search_modern.php` | `legacy/overgo/` |
+| SSR search | `/data_center/ssr` | `controllers/data_center/ssr_search_modern.php` | `legacy/ssr/` |
 
 `/cite` had no top-level controller, so `controller.php` fell through to
 `redirect.php`, which found `controllers/about/cite.php`. Because
@@ -116,6 +121,36 @@ if (PAGE == 'stock' && getCGIParam('id', 'G', ID)) {
   }
 }
 ```
+
+`/data_center/bac`, `/data_center/cytogenetic`, `/data_center/est`,
+`/data_center/overgo` and `/data_center/ssr` add five more of the same shape.
+
+### The guard has to live here, not on the server
+
+Those five pages were built and wired up **on the development server**, and the
+guards kept disappearing. `deploy/manifest.txt` maps
+`src/controllers/data_center.php` onto `controllers/data_center.php`, so the
+repository owns that entire file: every deploy of it — a full manifest run or a
+single-file one — replaces the server copy wholesale. The guards went with it
+each time, while the modern controllers stayed on disk with nothing routing to
+them. The pages looked like they had been reverted; in fact they had never been
+reachable from anything this repository deploys.
+
+The deploy backups record it exactly. `backups/20260815-122402/` captured eight
+modern guards in `data_center.php`; the snapshot thirteen seconds later has
+four.
+
+So, for any file the manifest owns:
+
+- **Edit it here and deploy.** A change made only on the server survives until
+  the next deploy of that file and no longer.
+- **Put every file the page needs in the manifest** — controller, template,
+  stylesheet, script. A page whose assets live only on the server is not backed
+  up by anything; the five above were one `deploy.sh` away from being lost.
+- `tools/redesign_status.py` catches this. A modern controller that no URL
+  reaches shows up under *Built on the design system but not routed*, and a
+  server copy that has drifted from the repository shows up as a file whose
+  live response disagrees with its source.
 
 ## Modernizing a page
 
@@ -470,12 +505,17 @@ On the redesign and verified on the development instance:
 | Stock search | `/data_center/stock` |
 | Stock record | `/data_center/stock/{id}` |
 | Reference record | `/data_center/reference?id={id}` |
+| BAC search | `/data_center/bac` |
+| Cytogenetics | `/data_center/cytogenetic` |
+| EST search | `/data_center/est` |
+| Overgo search | `/data_center/overgo` |
+| SSR search | `/data_center/ssr` |
 | Analysis projects | `/projects` |
 | Protein domain atlas | `/projects/interpro_domain_atlas` |
 | Design pattern library | `/pattern_library/` |
 | Redesign status | `/redesign_status` |
 
-`REDESIGN_STATUS.md` counts the rest. As of the last run, 19 of the 268 URLs the
+`REDESIGN_STATUS.md` counts the rest. As of the last run, 25 of the 268 URLs the
 site exposes are on the design system.
 
 Foundations complete: the shared design system, the opt-in modern document

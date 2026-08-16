@@ -1,0 +1,61 @@
+$$SYNTAX-LEVEL 2
+*(gene-locus-annotation-sections
+
+   @(annotations_gene {display: off}
+    
+    @(onto-terms {display: off}
+      <br><b>Ontology terms</b>
+      $(ontology_terms)
+    )
+    
+    @(no-ont-terms {display: off}
+      <p><b>No ontology terms</b></p>
+      <br>
+    )
+    
+    @(no-user_gene {display: off}
+      <p><b>No user annotations</b></p>
+      <br>
+    )
+    
+    @(user_gene {display: off}
+      <p><b>User Annotations:</b></p>
+      @(user_gene-list
+        <form name="ft_edit_$(auto_num)" id="ft_edit_$(auto_num)" method="post" 
+              target="annotation">
+          <input type="hidden" name="auto_num" id="auto_num" value="$(auto_num)">
+          <input type="hidden" name="mgdb_id" id="mgdb_id" value="$(mgdb_id)">
+          <input type="hidden" name="table_name" id="table_name" value="locus">
+          From:
+          <b><a href="/data_center/annotator/$(ann_author_id)">$(first_name) $(last_name)</a></b>
+          (<i>$(mod_date)</i>\)
+          <br>
+          <span style="margin-left: 10px;">$(memo)</span>
+        </form>
+      )
+      <br>
+    )
+    
+    @(user_gene-curator {display: off}
+      <p><b>User Annotations: (curator's view\)</b></p>
+      @(user_gene-list-ex
+        <form name="ft_edit_$(auto_num)" id="ft_edit_$(auto_num)" method="post" 
+              target="annotation">
+          <input type="hidden" name="auto_num" id="auto_num" value="$(auto_num)">
+          <input type="hidden" name="mgdb_id" id="mgdb_id" value="$(mgdb_id)">
+          <input type="hidden" name="table_name" id="table_name" value="locus">
+          From:
+          <b><a href="/person/$(person_id)">$(first_name) $(last_name)</a></b>
+          (<i>$(mod_date)</i>\)
+          <br> 
+          <span style="margin-left: 10px;">$(memo)</span>
+          <br>
+          <i><a href="#" 
+                onclick="popUpAnnotation('ft_edit_$(auto_num)', '/curation/FreeText/edit'\);">Edit this annotation</a>
+          </i>
+        </form>
+      )
+      <br>
+    )
+  )
+)

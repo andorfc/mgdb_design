@@ -1,0 +1,87 @@
+$$SYNTAX-LEVEL 2
+*(gene-evidence-details
+
+  @(evidence-details {display: off}
+    <br>
+    $(gene_set_source)
+    <br><br>
+          
+    This table shows the EST alignments with the gene model transcipt(s\)
+    $(ev_est_transcripts)
+    <br><br>
+    <table width="100%" cellpadding='1' cellspacing='1'>
+      <tr>
+        <td width="15%">Transcript Accession</td>
+        <td width="10%">EST GI</td>
+        <td width="10%">Chromosome</td>
+        <td width="10%">Chromosome Start</td>
+        <td width="10%">Chromosome End</td>
+      </tr>
+    </table>
+    <div id='gb_v1_0' class="inner_table">
+      <table width="100%" cellpadding='1' cellspacing='1'>
+        @(est_table {display: off}
+          <tr>
+            <td width="15%">$(ev_transcript_id)</td>
+            <td width="10%"><a href='/data_center/sequence/$(ev_gi)'>$(ev_gi)</a></td>
+            <td width="10%">$(outchr)</td>
+            <td width="10%">$(l_pos)</td>
+            <td width="10%">$(r_pos)</td>
+          </tr>
+        )
+        
+        @(no-est {display: off}
+          <tr>
+            <td colspan='5' align="center">
+              There is no EST evidence for this gene model.
+            </td>
+          </tr>
+        )
+      </table> 
+    </div>
+    <br><br>
+          
+    @(ev_cdna 
+      This table shows the cDNA alignments with the gene model transcipt(s\)
+      $(ev_cdna_transcripts)
+      <br><br>
+      <table width="100%" cellpadding='1' cellspacing='1'>
+       <tr>
+         <td width="15%">Transcript Accession</td>
+         <td width="10%">cDNA GI</td>
+         <td width="10%">Chromosome</td>
+         <td width="10%">Chromosome Start</td>
+         <td width="10%">Chromosome End</td>
+         </tr>
+      </table>
+      <div id='gb_v1_0' class = "inner_table">
+        <table width="100%" cellpadding='1' cellspacing='1'>
+        
+          @(cdna_table {display: off}
+            <tr>
+              <td width="15%">$(ev_transcript_id)</td>
+              <td width="10%"><a href='/data_center/sequence/$(ev_gi)'>$(ev_gi)</a></td>
+              <td width="10%">$(outchr)</td>
+              <td width="10%">$(l_pos)</td>
+              <td width="10%">$(r_pos)</td>
+            </tr>
+          )
+          
+          @(no-cdna {display: off}
+             <tr>
+               <td colspan='5' align="center">
+                 There is no cDNA evidence for this gene model.
+               </td>
+             </tr>
+          )
+        </table>
+      </div>
+    )
+  )
+
+  @(no-evidence {display: off}
+    <br>
+    No EST or cDNA evidence is available for $(assembly)
+    <br><br>
+  )
+)

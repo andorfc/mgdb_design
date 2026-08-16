@@ -1,0 +1,143 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-overgo
+<main class="mgdb-page mgdb-overgo-page" id="overgo-main">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/">Data centers</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Overgo probes</span>
+  </nav>
+
+  <section class="mgdb-hero overgo-hero" aria-labelledby="overgo-title">
+    <div class="mgdb-hero-emblem">
+      <svg class="overgo-hero-mark" viewBox="0 0 120 120" role="img" aria-label="Paired Overgo oligonucleotides">
+        <path d="M22 82 L52 52 L86 86" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M34 94 L64 64 L98 98" fill="none" stroke="#a96919" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M22 38 L52 68" fill="none" stroke="#501719" stroke-width="8" stroke-linecap="round" />
+        <path d="M34 26 L64 56" fill="none" stroke="#2f5e2a" stroke-width="8" stroke-linecap="round" />
+      </svg>
+      <strong>Overgo<br />Probe Archive</strong>
+      <span>Legacy collection</span>
+    </div>
+    <div class="mgdb-hero-body">
+      <span class="mgdb-eyebrow">Archived MaizeGDB data center</span>
+      <h1 id="overgo-title">Find an Overgo probe.</h1>
+      <p class="mgdb-hero-tagline">Search the historical probe collection by name or exact nucleotide sequence.</p>
+      <p class="mgdb-hero-description">Overgo probes supported physical mapping projects including the Maize Gene Discovery Project and the Maize Mapping Project. The collection remains available for reproducibility and historical research.</p>
+      <div class="mgdb-hero-actions">
+        <a class="mgdb-button mgdb-button-primary" href="#overgo-search">Search the archive</a>
+        <a class="mgdb-button mgdb-button-secondary" href="https\://download.maizegdb.org/Archive/Overgoes/overgoes.txt">Download all sequences</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="mgdb-message mgdb-message-info overgo-archive-note" role="status">
+    <div><strong>Archive notice.</strong> This data center is no longer actively maintained. Records and sequence search are preserved as a legacy research resource.</div>
+  </div>
+
+  <section aria-labelledby="overgo-summary-title">
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Collection summary</span><h2 id="overgo-summary-title">What is available</h2></div>
+      <p>Counts are read from the current MaizeGDB archive. Search results link to the original record pages and their curated relationships.</p>
+    </div>
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9678;</span>
+        <div><strong class="mgdb-metric-value">$(overgo_count)</strong><h3>Overgo records</h3><p>Active archived probe records available by name.</p></div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-green">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#8644;</span>
+        <div><strong class="mgdb-metric-value">$(sequence_count)</strong><h3>Searchable sequences</h3><p>Records with an archived Overgo nucleotide sequence.</p></div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-red">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#8804;</span>
+        <div><strong class="mgdb-metric-value">25 <span class="mgdb-metric-unit">bp</span></strong><h3>Sequence query length</h3><p>Maximum exact-match nucleotide snippet accepted.</p></div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-burgundy">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9633;</span>
+        <div><strong class="mgdb-metric-value mgdb-metric-value-compact">Archived</strong><h3>Collection status</h3><p>Preserved for historical access; not actively updated.</p></div>
+      </article>
+    </div>
+  </section>
+
+  <section id="overgo-search" aria-labelledby="overgo-search-title">
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Search the collection</span><h2 id="overgo-search-title">Choose a search method</h2></div>
+      <p>Name search accepts the SQL-style wildcard <code>%</code>. Sequence search finds exact matches in either orientation, including reverse complements.</p>
+    </div>
+
+    <input id="limit" type="checkbox" checked hidden />
+    <input id="limit_val" type="hidden" value="$(search_limit)" />
+
+    <div class="overgo-search-grid">
+      <article class="overgo-search-panel">
+        <span class="overgo-search-number" aria-hidden="true">01</span>
+        <div class="overgo-search-heading">
+          <span class="mgdb-eyebrow">Probe identity</span>
+          <h3>Search by Overgo name</h3>
+          <p>Enter a full name, a partial name with <code>%</code>, or a library prefix.</p>
+        </div>
+        <form id="overgo-name-form" class="mgdb-search" data-overgo-source="overgo" data-overgo-results="overgo-name-results" role="search">
+          <div class="mgdb-field">
+            <label class="mgdb-label" for="overgo-name-query">Overgo name</label>
+            <p class="mgdb-hint" id="overgo-name-hint">Example: <code>si486</code> or <code>%486055D02</code></p>
+            <input class="mgdb-input" id="overgo-name-query" name="q" type="search" aria-describedby="overgo-name-hint" autocomplete="off" placeholder="si486" required />
+          </div>
+          <div class="mgdb-form-actions">
+            <button class="mgdb-button mgdb-button-primary" type="submit">Search names</button>
+            <button class="mgdb-button mgdb-button-quiet" type="reset">Clear</button>
+          </div>
+          <div class="overgo-examples" aria-label="Example name searches">
+            <span>Try</span>
+            <button class="mgdb-chip" type="button" data-overgo-example="si486">si486</button>
+            <button class="mgdb-chip" type="button" data-overgo-example="%486055D02">%486055D02</button>
+            <button class="mgdb-chip" type="button" data-overgo-example="cl%">cl%</button>
+          </div>
+        </form>
+        <p id="overgo-name-status" class="mgdb-visually-hidden" aria-live="polite"></p>
+        <div id="overgo-name-results" class="overgo-results" aria-labelledby="overgo-name-status"></div>
+      </article>
+
+      <article class="overgo-search-panel">
+        <span class="overgo-search-number" aria-hidden="true">02</span>
+        <div class="overgo-search-heading">
+          <span class="mgdb-eyebrow">Nucleotide match</span>
+          <h3>Search by sequence</h3>
+          <p>Enter an A, C, G, or T snippet up to 25 bases to find exact matches.</p>
+        </div>
+        <form id="overgo-sequence-form" class="mgdb-search" data-overgo-source="overgo_seq" data-overgo-results="overgo-sequence-results" role="search">
+          <div class="mgdb-field">
+            <label class="mgdb-label" for="ovterm">Nucleotide sequence</label>
+            <p class="mgdb-hint" id="overgo-sequence-hint">Spaces are removed before searching. Example: <code>ACGTGC</code></p>
+            <input class="mgdb-input overgo-sequence-input" id="ovterm" name="q" type="search" aria-describedby="overgo-sequence-hint overgo-sequence-error" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="25" placeholder="ACGTGC" required />
+            <p class="mgdb-field-error" id="overgo-sequence-error" hidden>Enter 1 to 25 nucleotide bases using A, C, G, or T.</p>
+          </div>
+          <div class="mgdb-form-actions">
+            <button class="mgdb-button mgdb-button-primary" type="submit">Search sequences</button>
+            <button class="mgdb-button mgdb-button-quiet" type="reset">Clear</button>
+          </div>
+          <div class="overgo-examples" aria-label="Example sequence searches">
+            <span>Try</span>
+            <button class="mgdb-chip" type="button" data-overgo-example="ACGTGC">ACGTGC</button>
+          </div>
+        </form>
+        <p id="overgo-sequence-status" class="mgdb-visually-hidden" aria-live="polite"></p>
+        <div id="overgo-sequence-results" class="overgo-results" aria-labelledby="overgo-sequence-status"></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="mgdb-prose-layout" aria-labelledby="overgo-about-title">
+    <div class="mgdb-prose">
+      <span class="mgdb-eyebrow">About the archive</span>
+      <h2 id="overgo-about-title" class="mgdb-leaf-heading">How Overgo probes were used</h2>
+      <p>Overgo probes are short, overlapping oligonucleotide pairs used to label a longer hybridization probe. They were widely used to connect sequence-tagged markers with BAC-based physical maps.</p>
+      <p>The name search includes probes developed from the 486 library of the Maize Gene Discovery Project and public or combined clusters from the Maize Mapping Project.</p>
+      <p><a href="https\://www.ncbi.nlm.nih.gov/projects/genome/probe/doc/TechOvergo.shtml">Read the archived NCBI technical explanation <span aria-hidden="true">&nearr;</span></a></p>
+    </div>
+    <aside class="mgdb-aside-card">
+      <h3>Working with archived data</h3>
+      <p>Record pages can include primer alignments, detected loci, map coordinates, related papers, and links to other databases.</p>
+      <p>For bulk or reproducible work, download the complete text file rather than collecting results one at a time.</p>
+      <a class="mgdb-button mgdb-button-secondary" href="https\://download.maizegdb.org/Archive/Overgoes/overgoes.txt">Download all sequences</a>
+    </aside>
+  </section>
+</main>
+)

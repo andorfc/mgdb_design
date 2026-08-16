@@ -1,0 +1,40 @@
+$$SYNTAX-LEVEL 2
+*(gene-locus-map-sections
+
+  @(map_coordinates_gene {display: off}
+    @(map_data  
+      (* indicates the locus is on the backbone\)
+      <br>
+      <table cellpadding='1' cellspacing='1'>
+        <tr>
+          <td width="150">
+            <u>Map</u>
+          </td>
+          <td align='right'>
+            <u><a href="/coordinateDef" target="new">Coordinate</a></u>
+          </td>
+          <td width="75" style="text-align: right;">
+            <u><a href="/bin_viewer" target="new">Bin</a></u>
+          </td>
+        </tr>
+        @(map_coord_sec
+         <tr>
+          <td>
+            <a href="/data_center/map?id=$(map_coord)&amp;reflocus=$(locus_id)#reflocus">$(fix_name)</a> $(backbone)
+          </td>
+          <td style="font-family: Courier New,Courier,serif; text-align: right;">
+           $(coord_value)
+          </td>
+          <td style="text-align: right;">
+           $(coord_bin)
+          </td>
+         </tr>
+        )
+      </table>
+    )
+    @(no_map_gene {display: off | bind: map_data}
+      <br><b>There is no map data for this locus record.</b>
+    )
+  ) <!-- map_coordinates_gene -->
+ 
+)

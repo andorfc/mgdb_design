@@ -1,0 +1,59 @@
+$$SYNTAX-LEVEL 2
+*(gene-genomebrowser_sections
+
+  @(genome-browsers {display: off}
+    <div id="genome-browsers-content" name="genome-browsers-content">
+      <i>Gene Models found on the Genome Browser</i>
+      <table width="95%">
+        <tr height='10px'>
+         <td width="30%" id="gb-tab_v3" name="gb-tab_v3"
+              class="toggle_tab gb_tab gene_center_tab genome_tab_focus" align="center"
+              onclick="toggle_genome_tabs('gb-tab_v3', 'gb-div_v3', 'gb'\)">
+            &nbsp;&nbsp;&nbsp;B73 RefGen_v3&nbsp;&nbsp;&nbsp;
+            <br>
+          </td>
+          <td width="30%" id="gb-tab_v2" name="gb-tab_v2"
+              class='toggle_tab gb_tab gene_center_tab genome_tab_unfocus' align="center"
+              onclick="toggle_genome_tabs('gb-tab_v2', 'gb-div_v2', 'gb'\)">
+            &nbsp;&nbsp;&nbsp;B73 RefGen_v2&nbsp;&nbsp;&nbsp;
+            <br>
+          </td>
+          <td width="30%" id="gb-tab_v1" name="gb-tab_v1"
+              class='toggle_tab gb_tab gene_center_tab genome_tab_unfocus' align="center"
+              onclick="toggle_genome_tabs('gb-tab_v1', 'gb-div_v1', 'gb'\)">
+            &nbsp;&nbsp;&nbsp;B73 RefGen_v1&nbsp;&nbsp;&nbsp;
+            <br>
+          </td>
+          <td style='align: right; width: 10%;'>
+            &nbsp;&nbsp;&nbsp;
+          </td>
+        </tr>
+      </table>
+    
+      <div id="gb-div_v3" name="gb-div_v3" width="95%" class="genome_box toggle_div gb_div"
+           style="display:$(display-v3)">
+        <div id="gb-content_v3" name="gb-content_v3"
+             style="position:relative; left:20px;top:5px; width:95%;">
+          $(contents-v3)
+        </div>
+      </div>
+      
+      <div id="gb-div_v2" name="gb-div_v2" width="95%" class="genome_box toggle_div gb_div"
+           style="display:$(display-v2)">
+        <div id="gb-content_v2" name="gb-content_v2"
+             style="position:relative; left:20px;top:5px; width:95%;">
+          $(contents-v2)
+        </div>
+      </div>
+      
+      <div id="gb-div_v1" name="gb-div_v1" width="95%" class="genome_box toggle_div gb_div"
+           style="display:$(display-v1)">
+        <div id="gb-content_v1" name="gb-content_v1"
+             style="position:relative; left:20px;top:5px; width:95%;">
+          $(contents-v1)
+        </div>
+      </div>
+    </div>
+  ) 
+  
+)

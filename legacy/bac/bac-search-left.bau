@@ -1,0 +1,88 @@
+*(bac-search-left
+  <div id='datacenter_left_col'>
+    <a name="ss"></a>
+    <h4><span id="datacenter_title">BAC Research Tools</span></h4>
+    <br>
+    <span class="notice">
+      <br>
+      Note that this data center is no longer supported.
+      <br><br><br>
+    </span>
+  
+    <p><b>Simple BAC Search:</b></p> 
+  
+    <div id="datacenter_gray_background">
+      <p>
+        This search form allows you to enter a name or partial name to quickly 
+        retrieve the desired BAC.
+      <\p>
+      
+      *(simple-search-instructions #load: templates/data_center/simple_search_instructions.bau#)
+      
+      <div name="button_container" class="button_container">
+      <form name="n1" 
+            style="padding-top: 0px; padding-bottom: 0px;" 
+            class="tiny" action="javascript:getSearchData\('bac','simple_results', document.getElementById\('bac_term'\).value\);" method="get"> 
+            <input type="text" name="term" id="bac_term" size=20 class="quick_search" value="$(bac_term)">
+         <input type="submit" name="button"  value="Submit" id="minisub" class="button">
+         (see a 
+         <a href="#" 
+           onClick="document.getElementById\('bac_term'\).value = 'c0085K';">sample 
+         BAC query</a>\) 
+         <br>
+         @(limits
+           *(adjust_limits #load: templates/data_center/set_search_limit.bau#)
+         )
+      </form>
+      </div>
+      
+      <script type="text/javascript">
+          document.n1.term.focus(\);
+      </script>
+  
+      <p>Here are some other sample queries for you to try out: <b>b0052P04</b>, 
+        <b>c0047J13</b>, <b>b000</b> (partial names also work\)
+      </p>
+      <br>
+      <p>These queries are examples of the type of search you can do; they return 
+        BACs from the Maize Mapping Project isolated from B73 inbred line, 
+        PI 550473 \(the "b" prefix applies to BACs isolated from a HindIII digest 
+        at Clemson and the "c" prefix applies to BACs isolated from an EcoRI 
+        digest, beginning with c0001 through c0288, or an MboI digest, c0289 
+        through c0576, at Children's Hospital Oakland Research Institute\).
+      </p>
+      <br>
+      
+      <div id='simple_results'></div>
+    </div>
+    <br>
+  
+    <a name="seq"></a>
+    <span id="datacenter_title">
+      What BACs were used for the physical map and for sequencing B73?
+    </span>
+    <br><br>
+    <p>
+    The BACs used in the B73 RefGen_v2 assembly had been reassembled 
+    independently of the sequence in GenBank. The BACs in GenBank were 
+    repaired with respect to the v2 assembly in September, 2013, and are
+    in agreement with RefGen_v3 as well. 
+    </p>
+    <br>
+    <p>BAC libraries used for the physical BAC map, and the B73 genome sequence 
+      may be ordered from AGI 
+      \(<a href="http://www.genome.arizona.edu">http://www.genome.arizona.edu</a>\). 
+      There are 2 library listings, ZMMBBb, for BAC names starting with a 'b', 
+      e.g., <a href="/data_center/bac/330471">b0052P04</a>; and 
+      ZMMBBc, for BAC clone names starting with a 'c', e.g., 
+      <a href="/data_center/bac/432170">c0047J13</a>.
+    </p>
+  </div>
+  
+  @(start-search #display:off#
+    <script language="javascript">
+      getSearchData('bac', 'simple_results', '$(bac_term)'\);
+    </script>
+  )
+
+)

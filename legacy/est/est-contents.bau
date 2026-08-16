@@ -1,0 +1,91 @@
+*(est-contents
+<div id='datacenter_left_col'>
+  <p>
+    <span id='datacenter_title'>Simple EST Search</span>
+  </p>
+  <div id='datacenter_gray_background'>
+    <p>
+      This search form allows you to just enter basic 
+      name info to quickly retrieve the desired EST.
+    </p>
+      
+      *(simple-search-instructions #load: templates/data_center/simple_search_instructions.bau#)
+      <br><br>
+      
+    <p>
+      If you want to <b>search by gene name, like <i>bz1</i> or <i>wx</i></b>, try the 
+	    <a href="/data_center/locus">locus search</a>.
+    </p>
+	  <div name="button_container" class="button_container">
+      <form name="n1" method="get" action="javascript:getSearchData('est', 'simple_results', document.getElementById('estterm'\).value\);" class="tiny">
+        <input type="text" name="term" id="estterm" size="20" class="quick_search">
+        <input type="submit" class="button" value="Submit" id="minisub">
+        (see a <a href="#" onClick="document.getElementById('estterm'\).value = 'p-std486%';">sample EST query</a>\)<br>
+        @(limits
+          *(adjust_limits #load: templates/data_center/set_search_limit.bau#)
+        )
+	    </form>
+    </div>
+	  <script type="text/javascript">
+		  document.n1.term.focus(\);
+	  </script>	
+    <p>
+	    The above search provides an example of the type of search you can do; 
+      it returns a listing of ESTs from the 486 library of the Maize Gene Discovery 
+      Project ("std" is short for Stanford, in this case\). Other interesting searches 
+      include <b>p-std606%</b> (the 606 library\) and <b>%606001A02%</b> (a specific member 
+      of the 606 library\).
+	  </p>
+	  <br>
+	
+	  <div id="simple_results">	</div>
+  </div>
+  <br><br>   
+  <p>
+  <div id='datacenter_gray_background'>
+    <b>Mapped ESTs:</b> This utility displays the map locations of the ESTs in the 
+    database.  You can obtain this information by chromosome (1-10, below\) or all 
+    together (All, creates a <i>very</i> large table which will take a while to 
+    download and may cause issues with some browsers\).
+	  <br>
+    <a href="/mapped_elements?type=e&chrom=1"><b>1</b></a> | 
+    <a href="/mapped_elements?type=e&chrom=2"><b>2</b></a> | 
+    <a href="/mapped_elements?type=e&chrom=3"><b>3</b></a> | 
+    <a href="/mapped_elements?type=e&chrom=4"><b>4</b></a> | 
+    <a href="/mapped_elements?type=e&chrom=5"><b>5</b></a> | 
+    <a href="/mapped_elements?type=e&chrom=6"><b>6</b></a> | 
+    <a href="/mapped_elements?type=e&chrom=7"><b>7</b></a> | 
+    <a href="/mapped_elements?type=e&chrom=8"><b>8</b></a> | 
+    <a href="/mapped_elements?type=e&chrom=9"><b>9</b></a> | 
+    <a href="/mapped_elements?type=e&chrom=10"><b>10</b></a> | 
+    <a href="/mapped_elements?type=e"><b>All</b></a>
+    </p>
+    <br>
+    <p>
+      <b>Our Policy on Ordering Clones</b>
+      <br><br>
+      MaizeGDB does <i>not</i> distribute maize clones. Read on for more  
+      information about clone ordering.
+    </p>
+    <br>
+    <p>
+      <i>If you are interested in clones that were submitted by Virginia Walbot</i>, 
+      these clones are available at 
+	    <a href="http://www.genome.arizona.edu/orders/">http://www.genome.arizona.edu/orders/</a>. 
+        Be sure to have the GenBank record for the clone ready when you order, as you'll be 
+        required to fill in information from the record.
+    </p>
+  </div>
+</div>
+
+
+<!--<div id='est_right_col'>
+<p><span id='est_title'><a name="dld"></a><h4>Discussion of EST Data for the General Public</h4></span></p>
+
+@(est-right-q
+<p>$(Question)</p><br>
+<div id='est_lite_green_background'>$(Answer)</div><br>
+)
+</div> -->
+
+)

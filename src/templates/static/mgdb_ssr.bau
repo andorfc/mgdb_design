@@ -1,0 +1,148 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-ssr
+<main class="mgdb-page mgdb-ssr-page" id="ssr-main">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/">Data centers</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">SSR markers</span>
+  </nav>
+
+  <section class="mgdb-hero ssr-hero" aria-labelledby="ssr-title">
+    <div class="mgdb-hero-emblem">
+      <svg class="ssr-hero-mark" viewBox="0 0 132 116" role="img" aria-label="Repeating DNA motif blocks">
+        <path d="M11 29h110M11 58h110M11 87h110" stroke="#d4b44f" stroke-width="3" stroke-linecap="round" opacity=".75" />
+        <g>
+          <rect x="13" y="18" width="22" height="22" rx="6" fill="#501719" /><rect x="40" y="18" width="22" height="22" rx="6" fill="#2f5e2a" /><rect x="67" y="18" width="22" height="22" rx="6" fill="#501719" /><rect x="94" y="18" width="22" height="22" rx="6" fill="#2f5e2a" />
+          <rect x="13" y="47" width="22" height="22" rx="11" fill="#a96919" /><rect x="40" y="47" width="22" height="22" rx="11" fill="#501719" /><rect x="67" y="47" width="22" height="22" rx="11" fill="#a96919" /><rect x="94" y="47" width="22" height="22" rx="11" fill="#501719" />
+          <rect x="13" y="76" width="22" height="22" rx="6" fill="#2f5e2a" /><rect x="40" y="76" width="22" height="22" rx="6" fill="#a96919" /><rect x="67" y="76" width="22" height="22" rx="6" fill="#2f5e2a" /><rect x="94" y="76" width="22" height="22" rx="6" fill="#a96919" />
+        </g>
+      </svg>
+      <strong>SSR Marker<br />Archive</strong>
+      <span>Microsatellite markers</span>
+    </div>
+    <div class="mgdb-hero-body">
+      <span class="mgdb-eyebrow">Archived MaizeGDB data center</span>
+      <h1 id="ssr-title">Find a simple sequence repeat.</h1>
+      <p class="mgdb-hero-tagline">Search marker names, synonyms, and tandem-repeat motifs from the historical maize SSR collection.</p>
+      <p class="mgdb-hero-description">SSR markers supported maize linkage mapping, diversity analysis, and gene discovery. MaizeGDB preserves these marker records, primers, gel patterns, loci, and map relationships for reproducibility and historical research.</p>
+      <div class="mgdb-hero-actions">
+        <a class="mgdb-button mgdb-button-primary" href="#ssr-search">Search SSR records</a>
+        <a class="mgdb-button mgdb-button-secondary" href="#mapped-ssrs">Download mapped SSRs</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="mgdb-message mgdb-message-info ssr-archive-note" role="status">
+    <div><strong>Archive notice.</strong> This data center is no longer updated. SSR records, repeat reports, protocols, gel patterns, and mapped-marker files remain available as a legacy research resource.</div>
+  </div>
+
+  <section aria-labelledby="ssr-summary-title">
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Collection at a glance</span><h2 id="ssr-summary-title">Microsatellite markers in context</h2></div>
+      <p>Search the record archive or move directly to chromosome-level marker files and supporting laboratory resources.</p>
+    </div>
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric"><span class="mgdb-metric-icon" aria-hidden="true">&#8942;</span><div><strong class="mgdb-metric-value mgdb-metric-value-compact">$(ssr_count)</strong><h3>SSR records</h3><p>Visible marker records in the MaizeGDB archive.</p></div></article>
+      <article class="mgdb-metric mgdb-tone-green"><span class="mgdb-metric-icon" aria-hidden="true">10</span><div><strong class="mgdb-metric-value">10</strong><h3>Chromosome sets</h3><p>Mapped SSR downloads for chromosomes 1 through 10.</p></div></article>
+      <article class="mgdb-metric mgdb-tone-red"><span class="mgdb-metric-icon" aria-hidden="true">&#8659;</span><div><strong class="mgdb-metric-value">2</strong><h3>Download formats</h3><p>TSV summaries and detailed XLS tables.</p></div></article>
+      <article class="mgdb-metric mgdb-tone-burgundy"><span class="mgdb-metric-icon" aria-hidden="true">&#9633;</span><div><strong class="mgdb-metric-value mgdb-metric-value-compact">Archived</strong><h3>Collection status</h3><p>Preserved for historical access; not actively updated.</p></div></article>
+    </div>
+  </section>
+
+  <section id="ssr-search" aria-labelledby="ssr-search-title">
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Search the archive</span><h2 id="ssr-search-title">Search SSR names and repeat motifs</h2></div>
+      <p>Search a complete or partial marker name, synonym, or repeat sequence. Exact matches may open their record directly.</p>
+    </div>
+
+    <article class="ssr-search-panel">
+      <div class="ssr-search-intro">
+        <div><span class="mgdb-eyebrow">Marker identity</span><h3>Which SSR are you looking for?</h3><p>Search by marker family, a known synonym, or a formatted motif such as <code>\(AAAT\)5</code>.</p></div>
+        <span class="ssr-search-number" aria-hidden="true">01</span>
+      </div>
+
+      <form id="ssr-search-form" class="mgdb-search" role="search">
+        <div class="ssr-query-row">
+          <div class="mgdb-field ssr-query-field">
+            <label class="mgdb-label" for="ssr_term">SSR name, synonym, or repeat motif</label>
+            <p class="mgdb-hint" id="ssr-query-hint">Use <code>%</code> or <code>*</code> for a wildcard, <code>^</code> to anchor the beginning, and <code>$</code> to anchor the end.</p>
+            <input class="mgdb-input" id="ssr_term" name="q" type="search" aria-describedby="ssr-query-hint" autocomplete="off" placeholder="\(AAAT\)5" required />
+          </div>
+          <button class="mgdb-button mgdb-button-primary ssr-search-submit" type="submit">Search SSRs</button>
+        </div>
+
+        <div class="ssr-search-options">
+          <div class="mgdb-field">
+            <label class="mgdb-label" for="limit_val">Maximum results</label>
+            <input id="limit" type="checkbox" checked hidden />
+            <input class="mgdb-input" id="limit_val" type="number" min="1" max="$(search_limit_max)" value="$(search_limit)" inputmode="numeric" />
+            <p class="mgdb-hint">Up to $(search_limit_max) records.</p>
+          </div>
+          <div class="ssr-search-guide">
+            <strong>What can a record include?</strong>
+            <span>Marker names and synonyms, repeat motifs, primers, gel patterns, detected loci, map coordinates, and related references.</span>
+          </div>
+        </div>
+
+        <div class="mgdb-form-actions"><button class="mgdb-button mgdb-button-quiet" type="reset">Clear search</button></div>
+
+        <div class="ssr-examples" aria-label="Example SSR searches">
+          <span>Try</span>
+          <button class="mgdb-chip" type="button" data-ssr-example="\(AAAT\)5">\(AAAT\)5</button>
+          <button class="mgdb-chip" type="button" data-ssr-example="bnlg%">bnlg family</button>
+          <button class="mgdb-chip" type="button" data-ssr-example="phi%">phi family</button>
+        </div>
+      </form>
+
+      <p id="ssr-search-status" class="mgdb-visually-hidden" aria-live="polite"></p>
+      <div id="ssr-search-results" class="ssr-results" aria-labelledby="ssr-search-status"></div>
+    </article>
+  </section>
+
+  <section id="mapped-ssrs" aria-labelledby="mapped-ssrs-title">
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Chromosomes 1–10</span><h2 id="mapped-ssrs-title">Mapped SSR downloads</h2></div>
+      <p>Choose a compact TSV summary or a detailed XLS table sorted by map and coordinate with amplicon length and sequence preview.</p>
+    </div>
+    <div class="ssr-chromosome-grid" aria-label="Mapped SSR downloads by chromosome">
+      <article><span>Chromosome</span><strong>1</strong><div><a href="https\://download.maizegdb.org/SNPs_and_Maps/SSRs/ssr_details_chr1.tsv">TSV summary</a><a href="https\://download.maizegdb.org/SNPs_and_Maps/SSRs/mappedSSRs_chr1.xls">XLS detail</a></div></article>
+      <article><span>Chromosome</span><strong>2</strong><div><a href="https\://download.maizegdb.org/SNPs_and_Maps/SSRs/ssr_details_chr2.tsv">TSV summary</a><a href="https\://download.maizegdb.org/SNPs_and_Maps/SSRs/mappedSSRs_chr2.xls">XLS detail</a></div></article>
+      <article><span>Chromosome</span><strong>3</strong><div><a href="https\://download.maizegdb.org/SNPs_and_Maps/SSRs/ssr_details_chr3.tsv">TSV summary</a><a href="https\://download.maizegdb.org/SNPs_and_Maps/SSRs/mappedSSRs_chr3.xls">XLS detail</a></div></article>
+      <article><span>Chromosome</span><strong>4</strong><div><a href="https\://download.maizegdb.org/SNPs_and_Maps/SSRs/ssr_details_chr4.tsv">TSV summary</a><a href="https\://download.maizegdb.org/SNPs_and_Maps/SSRs/mappedSSRs_chr4.xls">XLS detail</a></div></article>
+      <article><span>Chromosome</span><strong>5</strong><div><a href="https\://download.maizegdb.org/SNPs_and_Maps/SSRs/ssr_details_chr5.tsv">TSV summary</a><a href="https\://download.maizegdb.org/SNPs_and_Maps/SSRs/mappedSSRs_chr5.xls">XLS detail</a></div></article>
+      <article><span>Chromosome</span><strong>6</strong><div><a href="https\://download.maizegdb.org/SNPs_and_Maps/SSRs/ssr_details_chr6.tsv">TSV summary</a><a href="https\://download.maizegdb.org/SNPs_and_Maps/SSRs/mappedSSRs_chr6.xls">XLS detail</a></div></article>
+      <article><span>Chromosome</span><strong>7</strong><div><a href="https\://download.maizegdb.org/SNPs_and_Maps/SSRs/ssr_details_chr7.tsv">TSV summary</a><a href="https\://download.maizegdb.org/SNPs_and_Maps/SSRs/mappedSSRs_chr7.xls">XLS detail</a></div></article>
+      <article><span>Chromosome</span><strong>8</strong><div><a href="https\://download.maizegdb.org/SNPs_and_Maps/SSRs/ssr_details_chr8.tsv">TSV summary</a><a href="https\://download.maizegdb.org/SNPs_and_Maps/SSRs/mappedSSRs_chr8.xls">XLS detail</a></div></article>
+      <article><span>Chromosome</span><strong>9</strong><div><a href="https\://download.maizegdb.org/SNPs_and_Maps/SSRs/ssr_details_chr9.tsv">TSV summary</a><a href="https\://download.maizegdb.org/SNPs_and_Maps/SSRs/mappedSSRs_chr9.xls">XLS detail</a></div></article>
+      <article><span>Chromosome</span><strong>10</strong><div><a href="https\://download.maizegdb.org/SNPs_and_Maps/SSRs/ssr_details_chr10.tsv">TSV summary</a><a href="https\://download.maizegdb.org/SNPs_and_Maps/SSRs/mappedSSRs_chr10.xls">XLS detail</a></div></article>
+    </div>
+  </section>
+
+  <section id="ssr-resources" aria-labelledby="ssr-resources-title">
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Reports and laboratory resources</span><h2 id="ssr-resources-title">Explore the supporting collection</h2></div>
+      <p>Move from repeat definitions and gene relationships to experimental gel patterns and historical mapping protocols.</p>
+    </div>
+    <div class="mgdb-card-grid ssr-resource-grid">
+      <article class="mgdb-card"><span class="mgdb-pill mgdb-pill-info">Repeat index</span><h3>Complete list of SSR repeats</h3><p>Browse repeat motifs available in MaizeGDB, linked to their full SSR records.</p><a href="/ssrreports?id=1">Open the repeat report <span aria-hidden="true">&rarr;</span></a></article>
+      <article class="mgdb-card"><span class="mgdb-pill mgdb-pill-ok">Gene context</span><h3>SSRs derived from genes</h3><p>Download a table connecting SSR markers with the genes from which they were derived.</p><a href="/ssrreports?id=2">View gene-derived SSRs <span aria-hidden="true">&rarr;</span></a></article>
+      <article class="mgdb-card"><span class="mgdb-pill mgdb-pill-warn">Experimental evidence</span><h3>Gel pattern images</h3><p>Visually browse PCR gel patterns associated with marker records.</p><a href="/data_center/image_gel_pattern">Browse gel patterns <span aria-hidden="true">&rarr;</span></a></article>
+      <article class="mgdb-card"><span class="mgdb-pill">Protocol archive</span><h3>SSR protocols</h3><p>Read DNA preparation, PCR, screening, gel, and mapping protocols from the Maize Mapping Project.</p><a href="/ssr_protocols">Read SSR protocols <span aria-hidden="true">&rarr;</span></a></article>
+    </div>
+  </section>
+
+  <section class="mgdb-prose-layout ssr-about-layout" aria-labelledby="ssr-about-title">
+    <div class="mgdb-prose">
+      <span class="mgdb-eyebrow">About microsatellite markers</span>
+      <h2 id="ssr-about-title" class="mgdb-leaf-heading">Short repeats with useful variation</h2>
+      <p>An SSR, or simple sequence repeat, is also called a microsatellite. It is a DNA motif of roughly one to ten nucleotides repeated in tandem. Variation in repeat count can make SSRs informative genetic markers.</p>
+      <p>Use this archive when a publication, genetic map, primer pair, or historical experiment refers to a maize SSR. For current genome-position and sequence-variation work, begin with contemporary marker and genome resources.</p>
+      <div class="ssr-about-actions"><a class="mgdb-button mgdb-button-secondary" href="/data_center/marker">Search molecular markers</a><a class="mgdb-button mgdb-button-quiet" href="/genome">Explore maize genomes</a></div>
+    </div>
+    <aside class="mgdb-aside-card ssr-reference-card">
+      <span class="mgdb-eyebrow">Further reading</span>
+      <h3>How SSR markers are used</h3>
+      <p>For a review of microsatellite marker development and applications, see Vieira and colleagues' 2016 overview.</p>
+      <a class="mgdb-button mgdb-button-secondary" href="https\://doi.org/10.1590/1678-4685-GMB-2016-0027">Read the review <span aria-hidden="true">&nearr;</span></a>
+    </aside>
+  </section>
+</main>
+)

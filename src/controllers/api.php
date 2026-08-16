@@ -23,6 +23,7 @@
 
   include_once('./include/db-api.php');
   include_once('./include/stock_record_lib.php');
+  include_once('./include/gene_record_lib.php');
   define('MGDB_API', true);
   include_once('./include/api/v1/lib/mgdb_api.php');
 
@@ -159,6 +160,12 @@ function api_record_types() {
       'description' => 'Curated maize literature: papers, abstracts, chapters, and newsletter articles.',
       'href' => $base . '/api/v1/records/reference/{id}',
       'example' => $base . '/api/v1/records/reference/9043389'
+    ),
+    array(
+      'type' => 'gene',
+      'description' => 'Maize genes: the classical loci and the gene models that represent them across assemblies.',
+      'href' => $base . '/api/v1/records/gene/{id}',
+      'example' => $base . '/api/v1/records/gene/Zm00001eb067740'
     )
   );
 }//api_record_types
