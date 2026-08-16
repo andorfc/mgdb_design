@@ -410,8 +410,32 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
       }
     }
 
+    /* Protein length.
+
+       It is not in the database: chado.feature.seqlen is NULL for all 1,410,521
+       polypeptide features and residues is NULL for every feature of every type.
+       The legacy page filled the gap by printing transcript_end - transcript_start
+       and labelling it "Canonical Length", which is the genomic span -- 4,010 for
+       a gene whose protein is 399 residues.
+
+       So it is read from the sequence service, with a short timeout, exactly as
+       stock.php reads GRIN. Without it the domain positions cannot be placed
+       against the protein and the page falls back to a table.
+
+       The call costs about 470 ms -- it is the service's own latency, not the
+       network -- which is more than the whole rest of this record. So it is
+       opt-in with ?protein_length=1 rather than on by default, and the record
+       page fetches it in a second, parallel request: the page paints in around
+       130 ms and the domain track fills in when the length arrives. */
+    $protein = null;
+    if (MgdbApi::query('protein_length', '') !== ''
+        && $canonical_protein !== null && $annotation_version !== null) {
+      $protein = gene_api_protein_length($annotation_version, $canonical_protein);
+    }
+
     $sections['structure'] = array(
       'transcripts' => $transcripts,
+      'protein' => $protein,
       'protein_domains' => $domains,
       'scores' => $scores,
       /* Stated rather than left blank. There are no exon, CDS, or UTR features
@@ -560,57 +584,55 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   if (isset($want['variation'])) {
     $insertions = array();
     if ($gene_name !== null) {
-      // One query. The legacy code ran two, and its first joined
-      // stock_genotypic_var and stock while selecting nothing from them.
+      /* One row per insertion, not per alignment. An insertion is recorded once
+         per (transcript, gene structure) it touches, so a single event that
+         spans an exon and an intron produces several marker_gene_model rows --
+         mu1013469 has eight. Grouping on the insertion locus keeps the row count
+         equal to meta.counts.insertions and reads better besides: one line per
+         insertion, listing the structures it disrupts.
+
+         The variation and stock joins are LEFT: an insertion with no variation
+         row still has to appear, or it would vanish from a list whose count says
+         it is there.
+
+         One query. The legacy code ran two, and its first joined
+         stock_genotypic_var and stock while selecting nothing from them. */
       $sth = make_query($DBConn, "
-        SELECT l.name AS insertion, v.id AS variation_id, v.name AS variation,
-               gs.name AS gene_structure, gs.term_comments AS structure_definition,
-               p.id AS source_id, p.name AS source,
-               mgm.chromosome, mgm.start_coordinate, mgm.end_coordinate,
+        SELECT l.id AS insertion_id, l.name AS insertion,
+               p.name AS source,
+               min(mgm.chromosome) AS chromosome,
+               min(mgm.start_coordinate) AS start_coordinate,
+               max(mgm.end_coordinate) AS end_coordinate,
+               string_agg(DISTINCT gs.name, ', ' ORDER BY gs.name) AS gene_structures,
                string_agg(DISTINCT COALESCE(mgm.transcript, mgm.gene_model), ', ') AS transcripts,
+               jsonb_agg(DISTINCT jsonb_build_object('id', v.id, 'name', v.name))
+                 FILTER (WHERE v.id IS NOT NULL) AS variations,
                jsonb_agg(DISTINCT jsonb_build_object('id', s.id, 'name', s.name))
                  FILTER (WHERE s.id IS NOT NULL) AS stocks
         FROM perm_tables.marker_gene_model mgm
           JOIN mgdb.locus l ON l.id = mgm.id
           JOIN mgdb.person p ON p.id = mgm.source_id
-          JOIN mgdb.variation v ON v.variationof = l.id
+          LEFT JOIN mgdb.variation v ON v.variationof = l.id
           LEFT JOIN mgdb.term gs ON gs.id = mgm.gene_structure_id
           LEFT JOIN mgdb.stock_genotypic_var sgv ON sgv.variation = v.id
           LEFT JOIN mgdb.stock s ON s.id = sgv.id
         WHERE mgm.marker_type_id = 32173
               AND (mgm.gene_model = :gm OR mgm.transcript LIKE :gm_pat)
-        GROUP BY l.id, l.name, v.id, v.name, gs.name, gs.term_comments, p.id, p.name,
-                 mgm.chromosome, mgm.start_coordinate, mgm.end_coordinate
+        GROUP BY l.id, l.name, p.name
         ORDER BY l.name", 1,
         array('gm' => $gene_name, 'gm_pat' => $gene_name . '%'));
       MgdbApi::countQuery();
       while ($row = retrieve_row($sth)) {
-        $stocks = array();
-        if ($row['stocks'] !== null && $row['stocks'] !== '') {
-          $decoded = json_decode($row['stocks'], true);
-          if (is_array($decoded)) {
-            foreach ($decoded as $stock) {
-              if (!isset($stock['id'])) { continue; }
-              $stocks[] = array(
-                'type' => 'stock',
-                'id' => (int) $stock['id'],
-                'name' => MgdbApi::text(isset($stock['name']) ? $stock['name'] : null),
-                'html' => '/data_center/stock/' . (int) $stock['id']
-              );
-            }
-          }
-        }
         $insertions[] = array(
           'name' => MgdbApi::text($row['insertion']),
-          'variation' => MgdbApi::ref('variation', $row['variation_id'], $row['variation']),
-          'gene_structure' => MgdbApi::text($row['gene_structure']),
-          'structure_definition' => MgdbApi::text($row['structure_definition']),
+          'variations' => gene_api_json_refs($row['variations'], 'variation', null),
+          'gene_structures' => MgdbApi::text($row['gene_structures']),
           'source' => MgdbApi::text($row['source']),
           'chromosome' => MgdbApi::text($row['chromosome']),
           'start' => MgdbApi::int($row['start_coordinate']),
           'end' => MgdbApi::int($row['end_coordinate']),
           'transcripts' => MgdbApi::text($row['transcripts']),
-          'stocks' => $stocks
+          'stocks' => gene_api_json_refs($row['stocks'], 'stock', '/data_center/stock/')
         );
       }
     }
@@ -709,16 +731,26 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
 
          The COALESCE is mandatory, not defensive: members that have a MaizeGDB
          page carry ids with gene_model_name NULL, and members without a page
-         carry names with NULL ids. */
+         carry names with NULL ids.
+
+         The member's name comes from chado.feature, not from chado.gene_model.
+         The matview holds only rows whose analysis is current, so a member
+         pointing at a superseded annotation resolves to NULL there and vanishes
+         from the list while still being counted in pan_gene_count -- one member
+         of pan-gene pan10847 disappeared exactly that way. chado.feature has
+         one row per feature_id unconditionally, so it names every member and
+         cannot fan out. The matview is still joined, for the coordinates and to
+         decide whether the member has a record page. */
       $sth = make_query($DBConn, "
         SELECT pg.pan_gene_name, pg.pan_gene_count, pg.exemplar_gene_model,
                pg.chr AS pan_chr, pg.gene_set_id, pg.pan_gene_analysis,
-               COALESCE(gsm.gene_model_name, gm.gene_name) AS member,
+               COALESCE(gsm.gene_model_name, f.name) AS member,
                COALESCE(gsm.transcript_name, gm.canonical_transcript_name) AS member_transcript,
                gm.feature_id, gm.chr AS member_chr, gm.gm_start, gm.gm_end,
                asm.name AS assembly, ann.name AS annotation
         FROM chado.pan_gene pg
           JOIN chado.gene_set_member gsm ON gsm.gene_set_id = pg.gene_set_id
+          LEFT JOIN chado.feature f ON f.feature_id = gsm.gene_model_id
           LEFT JOIN chado.gene_model gm ON gm.feature_id = gsm.gene_model_id
                                        AND gm.analysis_is_current = 'yes'
           LEFT JOIN chado.analysis asm ON asm.analysis_id = gsm.assembly_id
@@ -909,12 +941,19 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
       );
     }
 
+    /* mgdb.locus_coordinates.map is numeric while mgdb.id_num.id and
+       mgdb.map.id are bigint. Joining them bare makes Postgres cast the
+       *indexed* side to numeric, which throws away both primary keys and turns
+       this into a parallel sequential scan of 4.1 M id_num rows: 382 ms and
+       66,207 buffers to return 13 rows. Casting the numeric column instead
+       keeps the keys usable -- 8 ms, same rows. The legacy query
+       (locus_data_lib.php:707) has the same shape and the same cost. */
     $map_positions = array();
     $sth = make_query($DBConn, "
       SELECT c.name AS map_name, a.map, a.value, a.bin, a.bin2, a.back_bone
       FROM mgdb.locus_coordinates a
-        JOIN mgdb.id_num b ON b.id = a.map AND b.curation_lvl = 0
-        JOIN mgdb.map c ON c.id = a.map
+        JOIN mgdb.id_num b ON b.id = a.map::bigint AND b.curation_lvl = 0
+        JOIN mgdb.map c ON c.id = a.map::bigint
       WHERE a.id = :lid
       ORDER BY lower(c.name)", 1, array('lid' => $locus_id));
     MgdbApi::countQuery();
@@ -1154,6 +1193,90 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
 /////
 // FUNCTIONS
 /////////////////////////////////////////////////////////////////////////////////////////
+
+/* The canonical protein's length in residues, read from the sequence service.
+
+   Returns null and records a warning on any failure. The record must render
+   without it -- the service is separate infrastructure and its availability is
+   not ours -- so the timeout is short and the failure is stated rather than
+   retried. The response is a FASTA record; only its length is kept, because the
+   sequence itself belongs in the browser's request, not in every record payload.
+
+   Confirmed against the live service: the gene-model-set parameter is
+   chado.gene_model.version, not assembly_version. */
+function gene_api_protein_length($annotation_version, $protein_name) {
+  $url = 'https://sequence2.maizegdb.org/get_sequence.php?gene-model-set='
+       . rawurlencode($annotation_version) . '&dbtype=protein&id=' . rawurlencode($protein_name);
+
+  $context = stream_context_create(array(
+    'http' => array(
+      'method' => 'GET',
+      'timeout' => 3,
+      'ignore_errors' => true,
+      'header' => "Accept: text/plain\r\nUser-Agent: MaizeGDB/1.0\r\n"
+    ),
+    'ssl' => array('verify_peer' => true, 'verify_peer_name' => true)
+  ));
+
+  $body = @file_get_contents($url, false, $context);
+  if ($body === false || trim($body) === '') {
+    MgdbApi::warn('protein_length_unavailable',
+      'The sequence service did not answer within 3 seconds, so protein length is not shown.');
+    return null;
+  }
+
+  // "Unable to find the assembly for X." and similar come back as prose, not FASTA.
+  if (strpos($body, '>') !== 0) {
+    MgdbApi::warn('protein_length_unavailable',
+      'The sequence service has no protein sequence for ' . $protein_name . '.');
+    return null;
+  }
+
+  $lines = preg_split('/\r\n|\r|\n/', $body);
+  array_shift($lines);   // the FASTA header
+  $residues = preg_replace('/[^A-Za-z*]/', '', implode('', $lines));
+  $length = strlen(rtrim($residues, '*'));   // the stop codon is not a residue
+
+  if ($length === 0) {
+    MgdbApi::warn('protein_length_unavailable',
+      'The sequence service returned an empty sequence for ' . $protein_name . '.');
+    return null;
+  }
+
+  return array(
+    'name' => $protein_name,
+    'length_aa' => $length,
+    'source' => 'sequence2.maizegdb.org'
+  );
+}//gene_api_protein_length
+
+
+/* jsonb_agg(jsonb_build_object(...)) arrives as a JSON string. Turned into the
+   {type, id, name, html} reference shape every other record type uses. */
+function gene_api_json_refs($raw, $type, $htmlPath) {
+  if ($raw === null || $raw === '') {
+    return array();
+  }
+  $decoded = json_decode($raw, true);
+  if (!is_array($decoded)) {
+    return array();
+  }
+  $out = array();
+  foreach ($decoded as $entry) {
+    if (!isset($entry['id'])) { continue; }
+    $ref = array(
+      'type' => $type,
+      'id' => (int) $entry['id'],
+      'name' => MgdbApi::text(isset($entry['name']) ? $entry['name'] : null)
+    );
+    if ($htmlPath !== null) {
+      $ref['html'] = $htmlPath . (int) $entry['id'];
+    }
+    $out[] = $ref;
+  }
+  return $out;
+}//gene_api_json_refs
+
 
 /* Postgres array literals arrive as a string: {a,b,"c d"}. */
 function gene_api_pg_array($raw) {

@@ -41,6 +41,23 @@
   // NOTE: CONTROLLER, PAGE and ID are set in controller.php
   logMessage("gene_center.php: CONTROLLER: " . CONTROLLER . ", PAGE: " . PAGE . ", ID: " . ID);
 
+  /* Gene record pages on the modern design system.
+   *
+   * The modern controller returns false without publishing when the identifier
+   * does not resolve, so an unknown id falls through to the original code below
+   * and its 404 handling rather than the route being answered twice. `include`
+   * evaluates to the included file's return value; a bare `return;` there would
+   * yield 1 and wrongly take the route.
+   *
+   * Rollback: delete this block. Pre-redesign originals are archived in the
+   * redesign repository under legacy/gene-record/.
+   */
+  if (PAGE == 'gene' && trim((string) getCGIParam('id', 'G', ID)) !== '') {
+    if (include('controllers/gene_center/gene_record_modern.php')) {
+      return;
+    }
+  }
+
   // Hack! Make "/gene_center/" a valid URL
   if (!PAGE || PAGE == '') {
     $gene_search_url = $system['root_url'] . '/gene_center/gene';

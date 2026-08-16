@@ -78,6 +78,7 @@ immediately. Where a file was overwritten, restore it from
 | Stock search | `/data_center/stock` | `controllers/data_center/stock_search_modern.php` | `legacy/stock/` |
 | Stock record | `/data_center/stock/{id}` | `controllers/data_center/stock_record_modern.php` | `legacy/stock-record/` |
 | Reference record | `/data_center/reference?id={id}` | `controllers/data_center/reference_record_modern.php` | `legacy/reference-record/` |
+| Gene record | `/gene_center/gene/{id}` | `controllers/gene_center/gene_record_modern.php` | `legacy/gene-record/` |
 | BAC search | `/data_center/bac` | `controllers/data_center/bac_search_modern.php` | `legacy/bac/` |
 | Cytogenetics | `/data_center/cytogenetic` | `controllers/data_center/cytogenetic_search_modern.php` | `legacy/cytogenetic/` |
 | EST search | `/data_center/est` | `controllers/data_center/est_search_modern.php` | `legacy/est/` |
@@ -170,9 +171,9 @@ See `legacy/nomenclature/README.md`.
 $bauplan = new Bauplan('Page Title | MaizeGDB');
 $bauplan->modern();   // DOCTYPE, viewport, <html lang>, body class
 
-$bauplan->includeCss('/css/mgdb-modern.css?v=' . filemtime($system['root_dir'] . '/css/mgdb-modern.css'));
-$bauplan->includeScript('/js/mgdb-modern.js?v=' . filemtime($system['root_dir'] . '/js/mgdb-modern.js'));
-$bauplan->includeScript('/js/mgdb-chrome.js?v=' . filemtime($system['root_dir'] . '/js/mgdb-chrome.js'));
+$bauplan->includeCss('/css/mgdb-modern.css');
+$bauplan->includeScript('/js/mgdb-modern.js');
+$bauplan->includeScript('/js/mgdb-chrome.js');
 ```
 
 `modern()` is opt-in by design. Legacy pages were authored against quirks-mode
@@ -180,8 +181,14 @@ box sizing and a fixed 1280px wrapper; switching them to standards mode or a
 device-width viewport would change their layout. Pages that do not call it
 render byte-identically to before.
 
-Add `$bauplan->bodyClass('mgdb-wide')` for data-dense pages that need the full
-1280px wrapper instead of the 1080px content column.
+Cache busting is automatic: `Bauplan::versionMarkup()` rewrites every emitted
+`href`/`src` through `assetVersion()`, which appends `?v=` + `filemtime()`. Pass
+bare paths. A hand-written `?v=` *disables* that logic, because `assetVersion()`
+skips any path already containing `?`.
+
+The modern shell already gives `#wrapper` the full 1280px `--mgdb-max-width`, so
+data-dense pages need nothing extra. (`.mgdb-wide` is passed by two controllers
+but has no rule in `mgdb-modern.css`; it does nothing.)
 
 **2. Wrap the page body in `.mgdb-page`** and compose from the components in
 the pattern library. Every rule in `mgdb-modern.css` is scoped under
@@ -226,6 +233,7 @@ See ADMIN_DEPENDENCIES.md AD-011.
 | --- | --- | --- |
 | `stock` | id, name, alternate description, external accession such as `PI 595550` | `overview` `pedigree` `related` `references` `offsite` `grin` |
 | `reference` | id, DOI, PubMed ID | `overview` `authors` `abstract` `citation` `describes` `links` `editorial` |
+| `gene` | gene model name, transcript, protein, GenBank name, gene symbol, full name, synonym, numeric locus id | `overview` `structure` `function` `expression` `variation` `pan_gene` `orthologs` `locus` `references` `xrefs` `sequences` |
 
 A DOI contains slashes, so it is given unencoded as the rest of the path:
 `/api/v1/records/reference/10.1016/j.molp.2020.03.003`. An encoded `%2F` is
@@ -372,6 +380,133 @@ database layer in this codebase returns an empty result rather than raising, so
 without that check a broken query is indistinguishable from a record with no
 data. It caught three during development.
 
+## The gene record page
+
+`/gene_center/gene/{id}` is the most visited page on the site and was the least
+modern: nothing was server-rendered, so it had no `<h1>` and could not be
+indexed; section visibility was stored in four namespaces of per-section
+cookies; and the body was assembled from **nineteen** Ajax requests sharded
+across `ajax0..6.maizegdb.org` to get around the browser's per-host connection
+limit.
+
+Those nineteen requests cost **over 1,700 database queries**. Measured for
+`Zm00001eb067740`: overview 28, annotations 21, the locus tab about 22, and the
+pan-genome tab **300 to 500** on its own — it called `queryPanGeneMembers()`
+from scratch four times, and inside it two queries per name-only member plus two
+per member for orthologs. `hasPanGenomeData()`, whose entire job was deciding
+whether to print a tab label, ran the full member expansion: 223 queries before
+a byte of content rendered.
+
+The replacement is one server-rendered identity block plus one call to
+`/api/v1/records/gene/{id}`, which answers in **23 queries**.
+
+### One page, not four tabs
+
+The legacy page had four tab groups — Gene Model, Sequence, Pan-gene, and Gene
+(locus) — and the last of these gave the classical gene its own parallel
+Overview, Annotations and External Links sections. `Zm00001eb067740` and `lg1`
+are the same gene, and nobody thinks of them as two tabs. They are now one
+record with a sticky section nav, and the locus sections simply do not exist for
+the ~49% of B73 v5 gene models that have no classical locus.
+
+### Identifier resolution
+
+`include/gene_record_lib.php` replaces `check_id()` in
+`controllers/gene_center/gene_functions.php`. The old function ran up to four
+sequential SQL branches, two of them full parallel sequential scans of a 646 MB
+materialized view:
+
+| Identifier | Legacy | Now |
+| --- | --- | --- |
+| gene model name | index scan, 0.6 ms | one query, all arms |
+| classical gene symbol | **seq scan, 270 ms, 91,162 buffers** | 0.23 ms, 13 buffers |
+| transcript name | seq scan, 270 ms — and it never ran | index scan |
+
+The symbol path is the one that mattered: every classical-gene URL paid 270 ms
+and two extra worker backends. `chado.gene_model.locus_name` has no index and
+carries trailing whitespace; going through `mgdb.locus`, which is indexed on
+`name` and `full_name`, and reaching the gene model by the indexed `locus_id`
+returns the same rows 1,170× faster. No new index is required.
+
+Four defects in `check_id()` are not carried over: the transcript branch and the
+`ext_db_key` branch both call `get_all_rows()` on a **stale statement handle**
+and never execute their own SQL; `$ret['EXTRA_LOCI']` is assigned while `$ret`
+is still `false`, which is fatal on PHP 8; and a `while` loop increments past
+the end of its array before the bound is tested. Every branch also interpolated
+the URL path straight into SQL — `validate_string()` in `include/db-api.php` is
+literally `return $input;`. Everything in the new resolver is bound.
+
+A withdrawn gene model now answers `410` with its replacement rather than `404`.
+
+### What the data cannot support, stated rather than hidden
+
+Three things are absent from the database and are said so on the page and in the
+API, rather than left blank or faked:
+
+- **Strand.** `chado.featureloc.strand` is NULL for all 4,701,925 rows and
+  `chado.transcript.strand` is empty for every B73 v5 transcript. The record
+  carries `overview.strand: null` beside a `strand_note`, and the page renders
+  "not recorded".
+- **Exon and UTR structure.** There are no `exon`, `CDS`, `five_prime_UTR` or
+  `three_prime_UTR` features anywhere in `chado.feature`, for any organism, so
+  no transcript diagram can be drawn from this database. The page says so and
+  links to the genome browser.
+- **Protein length.** `chado.feature.seqlen` is NULL for all 1,410,521
+  polypeptide features. The legacy page filled the gap with
+  `transcript_end - transcript_start` labelled "Canonical Length" — that is the
+  **genomic span**, and it showed 4,010 for a gene whose protein is 399
+  residues. The new page never publishes a "length" without saying which one:
+  the transcript column is `span_bp`, and the true protein length is read from
+  the sequence service.
+
+That last call costs about 470 ms — more than the rest of the record together —
+so it is opt-in with `?protein_length=1` and the page fetches it in a second,
+parallel request. The page is interactive in about 130 ms and the protein domain
+track fills in when the length arrives. Without it the domains are listed as a
+table: scaling the track to the last domain's end would imply the protein stops
+there, which for `lg1` would show a domain ending at residue 258 as if it were
+the C-terminus.
+
+### Things worth knowing about the data
+
+- **`perm_tables.id_ontology.id` has no index** (11.7 M rows). It is only usable
+  when paired with `table_name`; filtering on `id` alone is a 786 ms scan.
+- **`mgdb.locus_coordinates.map` is `numeric` while `mgdb.id_num.id` and
+  `mgdb.map.id` are `bigint`.** Joining them bare makes Postgres cast the
+  *indexed* side, which discards both primary keys: 382 ms and 66,207 buffers to
+  return 13 rows. Casting the numeric column instead gives 8 ms. The legacy
+  query has the same shape and the same cost.
+- **An insertion is recorded once per (transcript, gene structure) it touches**,
+  so one event spanning an exon and an intron yields several
+  `marker_gene_model` rows — `mu1013469` has eight. The API groups on the
+  insertion locus so the row count matches `meta.counts.insertions`.
+- `chado.gene_model.gene_name` is **not unique**: 1,878,909 rows for 1,623,561
+  distinct names, because the matview fans out on (version × locus).
+  `GRMZM2G078954` has 12 rows. Resolution dedupes and reports the rest in
+  `meta.other_matches`.
+
+### Bugs in the legacy page that were not ported
+
+`gene_model_snps_traits.php:113` computes the transcript column from `$rec`
+*before* the loop that defines `$rec`, so every transcript cell in the SNP table
+renders empty. All four B73-relative lists in `gene_pangenome_sections.bau`
+anchor their links at the current gene rather than the related one.
+`annotation_lib.php:328` is missing a comma between two `IN`-list literals,
+which silently drops **Plant Ontology (59 keys) and PATO (33 keys)**
+cross-references. `getOfficialGeneModelID()` branches on `strcmp(...) != 0`,
+which is true whenever the strings *differ*. `isRepresentativeGeneModel()` reads
+a misspelled key and is always false. `gmMerged()` ignores its argument and
+hard-codes a `LIKE` against one gene.
+
+### Verification
+
+Cloudflare's bot challenge sits in front of the development instance, so a
+browser cannot load the page for checking. The render path is exercised instead
+by running `js/mgdb-gene-record.js` against real API payloads under
+JavaScriptCore with a small DOM shim — all eleven sections, the empty-record and
+locus-less variants, the request-failure and abort paths, and the domain-track
+geometry.
+
 ## Analysis projects
 
 `/projects` is a third kind of page, alongside the data centres and the tools.
@@ -494,7 +629,7 @@ are classified from the source and say so.
   `templates/home/maizegdb_header.bau`.
 - Page bodies are fetched over HTTP by `loadRemote()`, so a template must be
   reachable under `/templates/static/` on the same host.
-- Cache busting uses `filemtime()` appended as `?v=`; keep that pattern.
+- Cache busting is applied by `Bauplan` itself; pass bare asset paths.
 - Never copy `conf/mgdb.conf` or `conf/db.conf` into this repository. They
   contain database credentials and are listed in `.gitignore`.
 
@@ -515,6 +650,7 @@ On the redesign and verified on the development instance:
 | Stock search | `/data_center/stock` |
 | Stock record | `/data_center/stock/{id}` |
 | Reference record | `/data_center/reference?id={id}` |
+| Gene record | `/gene_center/gene/{id}` |
 | BAC search | `/data_center/bac` |
 | Cytogenetics | `/data_center/cytogenetic` |
 | EST search | `/data_center/est` |

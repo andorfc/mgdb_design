@@ -163,3 +163,49 @@ Status values: `proposed` · `approved` · `implemented` · `rejected` · `defer
 - **Required administrator:** MaizeGDB application maintainer (web root `.htaccess`)
 - **Status:** proposed
 - **Validation:** `curl -o /dev/null -w '%{http_code}' https://<host>/data_center/stock/Ajs1` returns 200 from the front controller rather than 404 from Apache.
+
+---
+
+## AD-012 — Strand is never populated, so no maize gene page can state gene orientation
+
+- **Date:** 2026-08-15
+- **Affected component:** `chado.featureloc.strand`, `chado.transcript.strand` — the gene record page, the genome browser links, and anything deriving orientation
+- **Current limitation:** `chado.featureloc.strand` is NULL for **all 4,701,925 rows**; `SELECT strand, count(*) FROM chado.featureloc GROUP BY 1` returns exactly one row. The `chado.transcript` matview takes strand from a `featureprop` of cvterm `strand`, which exists for only 935,653 of 3,002,752 transcripts and for **zero** B73 v5 transcripts — `Zm00001eb.1` has 77,341 transcripts and none with strand, and the same holds for all 25 NAM founders. Only `Zm00001d.1`, `Zm00001d.2` and `5b+` are populated. Ensembl reports `lg1` on the minus strand; MaizeGDB cannot. The redesigned gene page therefore renders "not recorded" rather than guessing, but strand is fundamental and the page should be able to show it.
+- **Proposed change:** Populate strand during annotation load. `Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.gff3` is on the download server uncompressed and carries strand in column 7; the same pass could also load exon, CDS and UTR features, which do not exist in `chado.feature` for any organism (see AD-013).
+- **Expected benefit:** Gene pages, browser deep links and any downstream analysis can state orientation. Removes a visible "not recorded" from the most-visited page on the site.
+- **Risk and rollback:** Low for reads — the column is NULL today, so nothing can regress by filling it. The loader change wants review, and the matviews holding strand must be refreshed after.
+- **Required administrator:** MaizeGDB database administrator / annotation loader maintainer
+- **Status:** proposed
+- **Validation:** `SELECT strand, count(*) FROM chado.featureloc GROUP BY 1` returns more than one row; `/api/v1/records/gene/Zm00001eb067740` reports `overview.strand` as `-` rather than null.
+
+---
+
+## AD-013 — No exon, CDS or UTR features exist, so transcript structure cannot be drawn
+
+- **Date:** 2026-08-15
+- **Affected component:** `chado.feature` — the gene record page's structure section
+- **Current limitation:** The full type census of `chado.feature` is `mRNA 2,725,143 · gene 1,828,260 · polypeptide 1,410,521 · contig 147,731 · transcript 138,648 · region 4,413 · lincRNA_gene 2,532 · lincRNA 2,532 · tRNA_gene 2,290 · tRNA 2,238 · chromosome 2,226 · miRNA_gene 154 · miRNA 154`. There is no `exon`, `CDS`, `five_prime_UTR` or `three_prime_UTR` row for any organism. A gene-structure diagram — which every comparable resource shows — cannot be built from this database. `chado.feature.residues` is likewise NULL for every row of every type, and `seqlen` is NULL for all 1,410,521 polypeptides, so protein length is not available either and has to be read from `sequence2.maizegdb.org` at about 470 ms per call.
+- **Proposed change:** Load sub-features and polypeptide lengths from the annotation GFF3 in the same pass as AD-012.
+- **Expected benefit:** A transcript structure diagram (exon/intron, UTR versus CDS, isoforms stacked) and an in-database protein length, which removes a slow external call from the gene page and lets the protein domain track render without one.
+- **Risk and rollback:** Adding rows to `chado.feature` is additive but substantial in volume; sizing and index impact want measuring first. Nothing currently reads these types, so nothing can break by their absence being fixed.
+- **Required administrator:** MaizeGDB database administrator / annotation loader maintainer
+- **Status:** proposed
+- **Validation:** `SELECT count(*) FROM chado.feature f JOIN chado.cvterm c ON c.cvterm_id=f.type_id WHERE c.name='exon'` returns a non-zero count.
+
+---
+
+## AD-014 — Missing indexes behind gene identifier resolution and ontology lookup
+
+- **Date:** 2026-08-15
+- **Affected component:** `chado.gene_model`, `chado.transcript`, `perm_tables.id_ontology`, `chado.all_gene_model_data`
+- **Current limitation:** Four gaps, none of which block the redesigned gene page — it routes around all of them — but each of which still costs the legacy pages and would let the new code be simpler:
+  - `chado.gene_model` has no index on `locus_name` or `locus_full_name`. `check_id()` resolves every classical-gene URL that way: two parallel sequential scans of a 646 MB matview, **270 ms and 91,162 buffers**. The new resolver goes through `mgdb.locus` instead (0.23 ms, 13 buffers).
+  - `chado.transcript` has no index on `transcript_name` or `translation_name`, so any lookup there is a parallel scan of 3.0 M rows / 662 MB, again about 270 ms. The new resolver uses `chado.gene_model.canonical_transcript_name` and `chado.feature.name`.
+  - `perm_tables.id_ontology` (11.7 M rows) has no index on `id`. It is usable only when paired with `table_name`; filtering on `id` alone is a **786 ms** scan.
+  - `chado.all_gene_model_data` (1.87 M rows, 995 MB) and `all_gene_model_data_step1` have **no indexes at all**.
+- **Proposed change:** `CREATE INDEX CONCURRENTLY` on `chado.gene_model (locus_name)`, `chado.transcript (transcript_name)`, and `perm_tables.id_ontology (id, table_name)`. Decide separately whether `all_gene_model_data` is still read by anything.
+- **Expected benefit:** Removes three 270–790 ms sequential scans from the legacy pages that still run them.
+- **Risk and rollback:** Low; indexes can be built concurrently and dropped with no application change. Note that **no chado matview has a unique index**, so none can `REFRESH MATERIALIZED VIEW CONCURRENTLY` — every refresh of `chado.gene_model`, `chado.transcript` or the 4 GB `chado.pan_gene` takes an `AccessExclusiveLock` and blocks all gene page reads for its duration. That is worth fixing in the same pass; `chado.gene_model` would need `(feature_id, locus_id)` rather than `feature_id` alone, because the matview fans out on multi-locus genes.
+- **Required administrator:** MaizeGDB database administrator
+- **Status:** proposed
+- **Validation:** `EXPLAIN (ANALYZE, BUFFERS) SELECT * FROM chado.gene_model WHERE locus_name='lg1'` reports an index scan rather than a parallel sequential scan.

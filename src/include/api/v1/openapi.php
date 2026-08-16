@@ -179,6 +179,111 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
             '503' => array('description' => 'The record store could not be reached.')
           )
         )
+      ),
+      '/records/gene/{id}' => array(
+        'get' => array(
+          'tags' => array('records'),
+          'summary' => 'One gene record, fully assembled',
+          'description' =>
+            "A maize gene: the gene model as annotated in one assembly, and the "
+            . "classical locus it represents, in one record. Accepts a gene model "
+            . "name, a transcript or protein name, a GenBank or old GenBank name, "
+            . "a classical gene symbol or full name, a synonym, or a numeric locus "
+            . "id. Which arm matched is reported in `meta.id_type`, and any other "
+            . "candidate the identifier could have meant is in `meta.other_matches`.\n\n"
+            . "A withdrawn gene model answers `410` with its replacement rather "
+            . "than `404`: the identifier was valid in an earlier annotation.\n\n"
+            . "Two values are absent by fact rather than omission and say so: "
+            . "`overview.strand` is always null because strand is not populated in "
+            . "this database, and `structure.exon_structure` is always null because "
+            . "no exon, CDS or UTR features exist in it.",
+          'operationId' => 'getGene',
+          'parameters' => array(
+            array(
+              'name' => 'id', 'in' => 'path', 'required' => true,
+              'description' => 'Gene model name, transcript, protein, gene symbol, synonym, or locus id.',
+              'schema' => array('type' => 'string', 'maxLength' => 200),
+              'examples' => array(
+                'by gene model' => array('value' => 'Zm00001eb067740'),
+                'by gene symbol' => array('value' => 'lg1'),
+                'by full name' => array('value' => 'liguleless1'),
+                'by transcript' => array('value' => 'Zm00001eb067740_T001'),
+                'by synonym' => array('value' => 'ZmSBP15'),
+                'by locus id' => array('value' => '12386')
+              )
+            ),
+            array(
+              'name' => 'fields', 'in' => 'query', 'required' => false,
+              'description' =>
+                "Comma-separated sections to return. Omit for all of them. A full "
+                . "record costs 23 queries; `fields=overview` costs 5. The `locus`, "
+                . "`references` and `xrefs` sections are empty for a gene model "
+                . "with no classical locus, which is about half of B73 v5.",
+              'schema' => array(
+                'type' => 'string',
+                'examples' => array('overview,structure,function')
+              )
+            ),
+            array(
+              'name' => 'protein_length', 'in' => 'query', 'required' => false,
+              'description' =>
+                "Set to 1 to include `structure.protein.length_aa`. Off by default: "
+                . "protein length is not held in this database and has to be read "
+                . "from the sequence service, which costs about 470 ms — more than "
+                . "the rest of the record together. On failure the field is null and "
+                . "`meta.warnings` says why.",
+              'schema' => array('type' => 'string', 'enum' => array('1'))
+            ),
+            array(
+              'name' => 'max_items', 'in' => 'query', 'required' => false,
+              'description' =>
+                'Cap on any one embedded list, default 500, maximum 5000. Some gene '
+                . 'models carry over 2,000 insertions. `meta.counts` keeps the true '
+                . 'totals and `meta.truncated` names every list that was cut.',
+              'schema' => array('type' => 'integer', 'minimum' => 1, 'maximum' => 5000)
+            ),
+            array(
+              'name' => 'If-None-Match', 'in' => 'header', 'required' => false,
+              'description' => 'An ETag from a previous response. Returns 304 when the record is unchanged.',
+              'schema' => array('type' => 'string')
+            )
+          ),
+          'responses' => array(
+            '200' => array(
+              'description' =>
+                'The record. `sections.structure.scores` carries the gene model and '
+                . 'protein-structure scores with a plain-language reading of each; '
+                . '`sections.pan_gene` carries every assembly the gene was found in, '
+                . 'grouped by Zea species; `sections.locus` is present only when the '
+                . 'gene model is matched to a classical gene.',
+              'headers' => array(
+                'ETag' => array('description' => 'Strong validator for the record.',
+                                'schema' => array('type' => 'string')),
+                'Cache-Control' => array('schema' => array('type' => 'string')),
+                'X-Request-Id' => array('description' => 'Correlates this response with the server log.',
+                                        'schema' => array('type' => 'string'))
+              ),
+              'content' => array('application/json' => array(
+                'schema' => array('$ref' => '#/components/schemas/Envelope')
+              ))
+            ),
+            '304' => array('description' => 'Unchanged since the supplied ETag.'),
+            '400' => array('description' => 'Malformed identifier, or an unknown value in fields.',
+                           'content' => array('application/problem+json' => array(
+                             'schema' => array('$ref' => '#/components/schemas/Problem')))),
+            '404' => array('description' => 'No gene model or locus matches that identifier.',
+                           'content' => array('application/problem+json' => array(
+                             'schema' => array('$ref' => '#/components/schemas/Problem')))),
+            '410' => array('description' =>
+                             'The gene model was withdrawn from its annotation. The body '
+                             . 'carries `replacement` and `replacement_html` when one exists.',
+                           'content' => array('application/problem+json' => array(
+                             'schema' => array('$ref' => '#/components/schemas/Problem')))),
+            '405' => array('description' => 'The API is read-only.'),
+            '406' => array('description' => 'Only application/json can be produced.'),
+            '503' => array('description' => 'The record store could not be reached.')
+          )
+        )
       )
     ),
     'components' => array(
