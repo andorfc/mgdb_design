@@ -83,6 +83,7 @@ immediately. Where a file was overwritten, restore it from
 | EST search | `/data_center/est` | `controllers/data_center/est_search_modern.php` | `legacy/est/` |
 | Overgo search | `/data_center/overgo` | `controllers/data_center/overgo_search_modern.php` | `legacy/overgo/` |
 | SSR search | `/data_center/ssr` | `controllers/data_center/ssr_search_modern.php` | `legacy/ssr/` |
+| Maize genetics nomenclature | `/nomenclature` | `controllers/community/nomenclature.php` | `legacy/nomenclature/` — see the note there |
 
 `/cite` had no top-level controller, so `controller.php` fell through to
 `redirect.php`, which found `controllers/about/cite.php`. Because
@@ -151,6 +152,15 @@ So, for any file the manifest owns:
   reaches shows up under *Built on the design system but not routed*, and a
   server copy that has drifted from the repository shows up as a file whose
   live response disagrees with its source.
+
+`/nomenclature` is the same story with a worse ending. It was modernized by
+overwriting `controllers/community/nomenclature.php` in place rather than
+shadowing it, and since it had never been a manifest target there was no
+pre-deploy snapshot to archive: the pre-redesign controller is unrecoverable.
+The standard itself was never at risk — it lives in
+`templates/community/nomenclature.bau`, which the modern page nests unchanged,
+and which is deliberately **not** in the manifest because curators maintain it.
+See `legacy/nomenclature/README.md`.
 
 ## Modernizing a page
 
@@ -510,12 +520,13 @@ On the redesign and verified on the development instance:
 | EST search | `/data_center/est` |
 | Overgo search | `/data_center/overgo` |
 | SSR search | `/data_center/ssr` |
+| Maize genetics nomenclature | `/nomenclature` |
 | Analysis projects | `/projects` |
 | Protein domain atlas | `/projects/interpro_domain_atlas` |
 | Design pattern library | `/pattern_library/` |
 | Redesign status | `/redesign_status` |
 
-`REDESIGN_STATUS.md` counts the rest. As of the last run, 25 of the 268 URLs the
+`REDESIGN_STATUS.md` counts the rest. As of the last run, 26 of the 268 URLs the
 site exposes are on the design system.
 
 Foundations complete: the shared design system, the opt-in modern document

@@ -226,3 +226,12 @@ src/controllers/data_center/ssr_search_modern.php      controllers/data_center/s
 src/templates/static/mgdb_ssr.bau                      templates/static/mgdb_ssr.bau
 src/css/mgdb-ssr.css                                   css/mgdb-ssr.css
 src/js/mgdb-ssr.js                                     js/mgdb-ssr.js
+
+# Maize genetics nomenclature. Built on the server; pulled in here so it is
+# version-controlled and deployed like everything else.
+# templates/community/nomenclature.bau is deliberately NOT listed: it is the
+# curator-maintained standard itself, the modern page nests it unchanged, and
+# the repository must not own it.
+src/controllers/community/nomenclature.php             controllers/community/nomenclature.php
+src/templates/community/mgdb_nomenclature.bau          templates/community/mgdb_nomenclature.bau
+src/css/mgdb-nomenclature.css                          css/mgdb-nomenclature.css
