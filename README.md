@@ -85,6 +85,8 @@ immediately. Where a file was overwritten, restore it from
 | Overgo search | `/data_center/overgo` | `controllers/data_center/overgo_search_modern.php` | `legacy/overgo/` |
 | SSR search | `/data_center/ssr` | `controllers/data_center/ssr_search_modern.php` | `legacy/ssr/` |
 | Maize genetics nomenclature | `/nomenclature` | `controllers/community/nomenclature.php` | `legacy/nomenclature/` — see the note there |
+| UniformMu insertion resource | `/uniformmu` | `controllers/uniformmu.php` | `legacy/uniformmu/` |
+| TYPSimSelector | `/TYPSimSelector` | `controllers/TYPSimSelector.php` | `legacy/typsimselector/` |
 
 `/cite` had no top-level controller, so `controller.php` fell through to
 `redirect.php`, which found `controllers/about/cite.php`. Because
@@ -571,6 +573,494 @@ change next to the legend.
 
 `docs/DATA_SEMANTICS.md` and `docs/METHODS.md` ship with the downloads.
 
+## The UniformMu insertion resource
+
+`/uniformmu` replaces a 557-line static document written in 2012 and last
+revised for the March 2011 data release. It described a collection of 26,211
+insertions in 5,127 seed stocks. The collection now holds **77,990 insertion
+records and 10,525 seed stocks**, every one of which is a record page on this
+site, and the old page said none of that — its numbers were typed into the
+prose by hand and nothing updated them.
+
+```
+controllers/uniformmu.php                     the page. Runs zero SQL
+templates/static/mgdb_uniformmu.bau           its body
+css/mgdb-uniformmu.css  js/mgdb-uniformmu.js  its assets
+search/uniformmu/uniformmu_search_api.php     the live lookup
+search/uniformmu/uniformmu_search_lib.php     its four queries
+data/uniformmu/uniformmu_summary.json         the precomputed counts
+tools/uniformmu_summary.php                   what writes them
+```
+
+`controller.php` checks `controllers/<CONTROLLER>.php` before falling through
+to `redirect.php`, so `controllers/uniformmu.php` takes the route the same way
+`/cite` did, without touching `controllers/documentation/uniformmu.php`.
+Rollback is deleting the new controller. The originals are archived in
+`legacy/uniformmu/`, and the nine methods figures — which existed only on the
+server — are now in the repository and the manifest.
+
+**`/documentation/uniformmu` is a second route to the old page and still
+serves it**, the same way `/about/cite` still serves the pre-redesign cite
+page. It differs in one respect worth deciding about: the old page states
+26,211 insertions in 5,127 stocks, which is now wrong by a factor of three, so
+this duplicate is stale rather than merely redundant. Nothing on the site links
+to it — every internal link, in `templates/insertion/`, `data_center/`,
+`gene_center/` and `documentation/projects.bau`, points at `/uniformmu` — so it
+is reachable only from an old bookmark. Retiring it means replacing
+`controllers/documentation/uniformmu.php` with a redirect, which puts a file
+owned by another maintainer under this repository's manifest; that is a
+judgement call and has deliberately not been made here.
+
+### Measured numbers are precomputed; lookups are live
+
+The page separates two things that used to be one paragraph of prose.
+
+**The counts are precomputed.** Every collection-wide number comes from
+`data/uniformmu/uniformmu_summary.json`. `perm_tables.marker_gene_model` holds
+1,305,425 rows and is indexed on `gene_model`, `transcript` and `id` — nothing
+on `source_id`, `assembly_version` or position — so the per-assembly rollup is a
+sequential scan costing **1.6 s and 19,551 buffers**. Rendering the page
+therefore runs **no SQL at all**. Re-run the tool and redeploy the file to
+update the page:
+
+```bash
+scp tools/uniformmu_summary.php development-server:/tmp/
+ssh development-server 'cd <webroot> && php /tmp/uniformmu_summary.php' > src/data/uniformmu/uniformmu_summary.json
+./deploy/deploy.sh src/data/uniformmu/uniformmu_summary.json
+```
+
+The file's modification time is what the page reports as its data date, so the
+page cannot claim to be fresher than its data. The tool checks its own output
+and refuses to look healthy when a headline total comes back as zero.
+
+**The lookup is live**, and it is the thing the old page did not have. Four
+modes, all indexed, all bounded:
+
+| Mode | Accepts | Cost |
+| --- | --- | --- |
+| `gene` | any identifier a gene page accepts | 9–10 queries, ~40 ms |
+| `insertion` | `mu1013469`, or a bare locus id | 3 queries, ~20 ms |
+| `stock` | `UFMu-01828`, `ufmu1828`, or `1828` | 4 queries, ~30 ms |
+| `region` | assembly, chromosome, window ≤ 20 Mb | 3 queries, ~130 ms |
+
+Each resolves a subject, collects insertion ids, and then answers two questions
+about them in one query each — where each sits on every assembly, and what
+variation and seed stock it leads to. That is why an insertion found through a
+v3 gene name still shows its v5 coordinates.
+
+The gene mode does one thing worth knowing about: it asks the locus which gene
+model names it has answered to, and searches all of them. UniformMu alignments
+are recorded against four assemblies whose gene names are unrelated strings —
+`GRMZM2G036297`, `Zm00001d002005`, `Zm00001eb067740` are the same gene — so
+searching only the name that was typed finds only the insertions aligned to
+that one annotation.
+
+### Three ways to be wrong about this data, and what the page does about them
+
+- **The assembly rows are not additive.** They are one collection aligned four
+  times. 58,102 insertions on v5 and 63,008 on v3 are mostly the same
+  insertions.
+- **Structure counts are alignments, not insertions.** An insertion is recorded
+  once per (transcript, gene structure) it touches, so one event spanning an
+  exon and an intron of a two-transcript gene yields four rows.
+  `mu1013469` has fifteen across four assemblies and the page shows it as four.
+- **W22 has no genic calls.** Every W22 alignment is recorded as a flanking
+  region, so its "hit inside the transcript" column reads *none recorded*, not
+  zero. And the v3 coverage share is measured against the whole 110,467-model
+  working gene set rather than a filtered one, so it is not comparable with the
+  v4 and v5 shares beside it. The page states both.
+
+Two data problems found while building it are in `ADMIN_DEPENDENCIES.md`: nine
+*Ac* insertions filed under the UniformMu source (AD-016), which both the tool
+and the lookup work around by restricting to the `mu#####` naming convention,
+and the missing positional index (AD-015) that makes the region lookup a
+sequential scan and the summary a precomputed file rather than a query.
+
+### Verification
+
+Cloudflare's bot challenge means a browser cannot load the page for checking,
+so the render path is exercised the same way the gene record page's is — under
+JavaScriptCore against real captured payloads, with a small DOM shim:
+
+```bash
+tools/tests/run_uniformmu_render_test.sh
+```
+
+Forty-four checks: every link the result table emits, the assemblies it lists,
+the three states that are easy to render as nothing (an insertion with no
+coordinates, one with no seed, a stock with no mapped insertion), the two
+inputs refused client-side, the figure-zoom overlay, and the chart geometry —
+including that the chromosome axis stays in chromosome order rather than
+sorting itself by count.
+
+Two of those checks exist because of a bug this harness did not originally
+model. `Bauplan::includeScript()` emits into `<head>`, so page scripts run
+while the document is still parsing. The first version of
+`mgdb-uniformmu.js` read `document.querySelector('.mgdb-uniformmu-page')` at
+module scope, got `null`, and returned — **no charts and no lookup, with the
+page showing "Loading chart…" indefinitely**, which reads as still working
+rather than as given up. The shim now starts at `readyState: "loading"` with
+an empty document and fires `DOMContentLoaded` afterwards, so anything that
+touches the DOM too early fails the suite. Any new page script in this
+repository has the same exposure.
+
+## The protein structure data center
+
+`/data_center/protein_structure` replaces a page that was two things bolted
+together: a static header with three hand-typed counts, and a pair of NGL
+viewers that each reloaded an HTML fragment through a jQuery `.ajax()` call.
+Between them sat a complex search which was the only part with real data behind
+it, and the part with the least room on the page.
+
+This version inverts that. The structure workspace *is* the page: one search
+resolves an identifier to every assembly state predicted for it — monomer,
+homodimer, heterodimer — and the chosen model opens in a three-pane viewer with
+per-residue confidence along the bottom.
+
+    src/controllers/data_center/protein_structure_modern.php  guarded from data_center.php
+    src/templates/static/mgdb_protein_structure.bau
+    src/css/mgdb-protein-structure.css
+    src/js/mgdb-protein-structure.js
+    src/js/lib/3dmol/3Dmol-min.js                             vendored, see its LICENSE file
+    src/search/protein_structure/protein_structure_api.php    suggest · lookup · esmfold · manifest
+    src/search/protein_structure/protein_structure_lib.php
+    src/tools/protein_structure_index.php                     builds data/protein_structure/
+
+Pre-redesign originals are archived in `legacy/protein_structure/`, with a
+README recording what was wrong with them.
+
+### The viewer
+
+Ported from a standalone Boltz-2 complex viewer: the AlphaFold pLDDT palette and
+binning, the colour-function approach to 3Dmol styling, the per-residue
+confidence strip, surfaces, legend and colourbar. Dropped on the way in: the
+scripted camera tour, the movie recorder, presentation mode, the draggable pane
+splitters, and the ligand affinity scorecard, which has no counterpart in
+AlphaFold complex data.
+
+One substantive change. The original shipped a precomputed `res_plddt` array
+beside each structure. AlphaFold and ESMFold both write per-residue pLDDT into
+the **B-factor column**, so here the profile is derived from the parsed model —
+`residueProfile()`, one CA atom per residue. Nothing has to be precomputed, and
+the strip works for any model the viewer can open.
+
+**Two viewers coexist on this page** — the workspace one and the ESMFold one —
+so every control is addressed by a `data-ps-*` attribute and looked up inside
+its own `[data-ps-viewer]` root. Ids were tried first and were wrong: a shared
+`id="ps-viewport"` resolves to whichever viewer comes first in the document,
+with the effect that opening an ESMFold model rendered it into the workspace
+viewer and overwrote that viewer's confidence strip. Do not reintroduce ids
+here.
+
+3Dmol is vendored rather than loaded from unpkg, which is where the old page got
+NGL. When extracting it from a single-file viewer, **strip the trailing
+`</script>`** — leaving it in produces a file that downloads as valid
+`application/javascript`, throws `Unexpected token '<'`, and defines no global,
+which looks nothing like the cause.
+
+### Why the typeahead is an index and not a scan
+
+The old `suggest` action read `suggestions.json` — 73,408 entries, 13 MB — and
+`json_decode`d and walked all of it **on every keystroke**. Measured on codex:
+164 ms median, 527 ms worst case, per request, repeated for every user typing at
+once.
+
+The obvious fix does not work, and the reason is worth keeping. Every one of the
+73,042 gene models begins `Zm00001eb`, so the trigram `zm0` has 73,042 postings,
+as does every prefix of that stem up to nine characters; TrEMBL accessions do
+the same with `A0A` (65,707) and NCBI symbols with `LOC` (31,409). **An n-gram
+index over this corpus is one giant posting list plus noise.**
+
+What works is a prefix index that splits adaptively. Bucket at depth 3; any
+prefix still over `SHARD_CAP` is *hot* and gets rebuilt one character deeper,
+repeatedly. On the current export that settles at **3,847 shards, median 15
+postings, maximum 400**, leaving only **185 hot prefixes** — a routing table
+small enough to be a 2 KB file. A hot prefix is still a legitimate query, so each
+one also gets a precomputed, already-ranked answer: a typeahead shows ten rows,
+and there is no reason to rank 73,042 candidates at request time to fill them.
+
+Because the shared stem carries no information, each gene model is **also**
+indexed under its numeric tail — `168550` finds `Zm00001eb168550`. Without that,
+typing the part of the identifier that actually distinguishes one gene from
+another matches nothing.
+
+Answering a keystroke is now one routing read, one shard read, and a prefix
+filter over at most 400 short strings:
+
+| query | old | new | |
+| --- | ---: | ---: | ---: |
+| `adh` | 176.0 ms | 1.5 ms | 117× |
+| `sod` | 165.1 ms | 1.6 ms | 101× |
+| `a0a` | 458.9 ms | 1.6 ms | 292× |
+| `zm` | 527.1 ms | 1.8 ms | 298× |
+| **median** | **164.2 ms** | **1.6 ms** | **102×** |
+
+### Query cost
+
+Rendering the page runs **zero SQL** — every headline count comes from
+`data/protein_structure/manifest.json`, so the header cannot disagree with the
+data the search answers out of. That was the old page's other bug: `39,299`,
+`71,725` and `8 proteomes` were literals in the template, and the summary strip
+below them carried different numbers from a different date.
+
+`suggest` and `lookup` cost **no queries** on an index hit. The database is
+reached only when the index has already missed, so that the page can distinguish
+*this is not a gene* from *this is a gene with nothing predicted for it* — which
+are different answers with different next steps. `esmfold` always queries,
+because ESMFold models are named by protein isoform and only the database maps a
+gene to its canonical one; it is a separate action so that searching stays at
+zero queries and only a reader who opens that panel pays for it.
+
+Every response carries `summary.elapsed_ms` and `summary.queries`. The old
+endpoint's 164 ms was invisible until somebody measured it; leaving the
+measurement in the response makes the next regression visible from the network
+tab.
+
+### Two traps in the data
+
+**`wx1` is not in the collection.** No symbol in the export begins with `wx`.
+The old substring matcher answered the page's own `wx1` example button with
+`A0A804MWX1` — an unrelated magnesium transporter that merely contains those
+letters — and presented it as the match. Prefix matching returns nothing there;
+the lookup path resolves `wx1` through the gene database to `Zm00001eb378140`
+(WAXY, five monomer models), which is what was being asked for.
+
+**Rank dimers on ipSAE, not ipTM.** ipTM scores the whole complex and is
+dominated by how well each chain folds alone, so two confidently folded proteins
+parked next to each other without touching still score well. ipSAE is computed
+over the interface. Sorting these lists by ipTM puts big well-folded
+non-interactions at the top; `psSortModels()` uses ipSAE for dimers and pLDDT
+for monomers.
+
+### Rebuilding the payload
+
+`data/protein_structure/` is generated on the server and is deliberately **not**
+in `deploy/manifest.txt` — it is 110 MB across ~4,600 files. See AD-019 in
+ADMIN_DEPENDENCIES for the command and when to run it.
+
+## TYPSimSelector
+
+`/TYPSimSelector` ranks the USDA Ames maize inbred collection against one
+chosen accession by identity by state.
+
+```
+controllers/TYPSimSelector.php                          the page. Runs zero SQL
+templates/static/mgdb_typsimselector.bau                its body
+css/mgdb-typsimselector.css  js/mgdb-typsimselector.js  its assets
+search/typsimselector/typsimselector_search_api.php     the ranking and exports
+search/typsimselector/typsimselector_search_lib.php     its queries
+data/typsimselector/summary.json                        the collection counts
+data/typsimselector/lines_curation.json                 3,679 accessions
+data/typsimselector/lines_breeding.json                 2,831 lines
+tools/typsimselector_index.php                          what writes all three
+```
+
+`controller.php` checks `controllers/<CONTROLLER>.php` before falling through
+to `redirect.php`, so the top-level controller takes the route from
+`controllers/tools/TYPSimSelector.php` without touching it. Rollback is
+deleting the new controller. The originals are archived in
+`legacy/typsimselector/`, along with two defects in them worth not repeating.
+
+### Where the weight went
+
+The page it replaces was **705 KB**, with no `<h1>`, no viewport, and the title
+"Welcome to MaizeGDB". Almost all of that weight was four `<select>` elements —
+the curation list twice and the breeding list twice, about 13,000 `<option>`
+elements — built by four queries that ran on every page view whether or not
+anyone opened a dropdown. One of them, `DISTINCT iid1` over the 4,005,865-row
+`pidata.ames_merged`, is a 320 ms sequential scan.
+
+Those lists are constants: the IBS matrices were computed once, in 2012, from a
+fixed SNP export, and nothing writes to the tables. So they are built offline
+into `data/typsimselector/` and fetched as static files, once, only after a
+reader has chosen a dataset. The page is **53 KB** and renders with **zero
+SQL**; a ranking costs three or four indexed queries and answers in 10–25 ms.
+
+Rerun the index only if the `pidata` tables are ever reloaded:
+
+```bash
+ssh development-server 'cd <webroot> && php tools/typsimselector_index.php'
+scp 'development-server:<webroot>/data/typsimselector/*.json' src/data/typsimselector/
+./deploy/deploy.sh
+```
+
+### Three traps in pidata
+
+All three are why the queries are shaped the way they are, and the first two are
+bugs in the page being replaced.
+
+**Every row of `pidata.snp_entry` exists exactly twice.** 8,952 rows, 4,476
+ids, byte-identical pairs, no column distinguishing them. Any join to it
+doubles unless it is read through `DISTINCT`.
+
+**`pidata.custom_inventory` is keyed by `snp_entry_id`, not `inventory_id`.**
+4,327 rows, 4,327 distinct `snp_entry_id`, but only 2,817 distinct
+`inventory_id`. The legacy page joined on `inventory_id`, which is a
+many-to-one collapse that happens to be harmless today only because the
+duplicated inventory rows agree.
+
+**`pidata.ames_merged` is the strict upper triangle.** 4,005,865 rows is
+exactly `2831 * 2830 / 2`: no diagonal, and no pair stored in both orders. A
+line has to be looked for in `iid1` and `iid2` both — and the last line in sort
+order never appears in `iid1` at all, which is why the legacy dropdown, built
+from `DISTINCT iid1`, was one line short. Its `dst` column is also
+`character varying`, so it is cast before it is ordered.
+
+`pidata.snp_entry_map`, by contrast, is a complete 4,476 × 4,476 square with a
+diagonal of 1 and both directions in agreement, so one indexed scan of
+`germplasm2_id` is the whole result set.
+
+Neither `snp_entry` nor `custom_inventory` carries any index. Both are small
+enough to hash — the joins cost about 2 ms — so nothing here waits on an
+administrator, but an index on `snp_entry_id` in each would remove the hash.
+
+### What the page adds
+
+- **The replicate runs are reachable.** 347 curation accessions were genotyped
+  more than once, one of them 28 times. Each run has its own row in the matrix
+  and its own ranking. The old dropdown collapsed on the taxa string and kept
+  the first id it saw, so every replicate after the first was unreachable from
+  the interface while still appearing in results. The picker now offers the run.
+- **Absent accessions are said, not guessed.** 829 of the 3,679 curation
+  accessions carry the NCRPIS `TEMP` placeholder rather than a real accession
+  number, all pointing at one shared inventory row. The old page linked them to
+  GRIN anyway, every one to the same unrelated record — and, because the
+  accession variables were never reset between rows, a row with no inventory
+  match printed the previous row's accession.
+- **A distribution, not just a list.** One aggregate over the same index range
+  gives the five-number summary and a 50-bin histogram, so a reader can see
+  whether a near-duplicate is genuinely unusual or whether the whole panel sits
+  that close. The bins are fixed per dataset so two lines can be compared.
+- **TSV and CSV exports** of the full ranking, up to 25,000 rows.
+- Plotly is 3.6 MB and is fetched on first use rather than on page load,
+  because the figure does not exist until a comparison has been run.
+
+## The header search
+
+The search field in the global chrome is shared by every modern page. Three
+things about it are worth knowing before changing it.
+
+**The category list carries an icon per data type.** `templates/home/search-box-modern.bau`
+defines a single inline SVG sprite; the category listbox, the toggle, and the
+suggestion rows all reference it with `<use>`, and the toggle retargets its own
+`<use>` as the selection changes rather than keeping a second copy of the map in
+script. The chip palette lives in one block of `css/mgdb-modern.css` keyed on
+`[data-cat]`, whose values are the same category names the API returns. Adding a
+data type means adding a `<symbol>`, a palette line, and a `cat` on the API item —
+nothing else.
+
+Colour is decoration. Every row keeps its label, the glyph shapes differ from one
+another, and the selected category is marked with a check, so nothing is carried
+by hue alone.
+
+**A locus cannot be found by its own name through `all_text_search`.** That table
+stores wx1's three names concatenated into the single token `gss1wx1waxy1`, so
+neither `waxy` nor `waxy1` nor `Gss1` nor even `wx1` matches it there. The
+autocomplete works around it with `acLocusNameLookup()`, which reads
+`mgdb.locus.name`, `full_name`, and `plant_wide_gene_name` directly and unions in
+the curated `mgdb.synonyms` list. Case-insensitivity is faked by probing four
+spellings of the prefix, because the locus indexes are on the raw columns. See
+AD-020 for the functional indexes that would collapse that to one probe.
+
+**Gene models are not in `all_text_search` at all.** They live in
+`chado.gene_model`, and a query shaped like an identifier is answered from there
+directly.
+
+A locus with gene models is presented as a gene and links to `/gene_center/gene/<name>`;
+a locus without them stays a locus. The same rule is applied from both sides, so
+a record never appears in both groups.
+
+## The all-data search
+
+`/search_engine/searchall` is the page the header search submits to. It has two
+views over one dataset: an overview of the leading data types with the first few
+records of each, and one data type at a time, paginated.
+
+Files: `controllers/search_engine/searchall_modern.php` (shell),
+`search/searchall/searchall_api.php` (JSON), `search/searchall/searchall_lib.php`
+(queries and the type registry), `templates/static/mgdb_searchall.bau`,
+`css/mgdb-searchall.css`, `js/mgdb-searchall.js`.
+
+### What was wrong with the page it replaces
+
+It ran `all_text_search.text LIKE '%term%'` — a leading wildcard, which no index
+can serve — across 8,794,429 rows and 1.6 GB, then materialised every match into
+PHP and built an unbounded `IN (...)` list per data type. Searching `b73`
+returned **457,015 rows**, and the whole search ran again for every section the
+reader opened. The reader saw a loading GIF until it finished.
+
+The table already carried `idx_text_gin` on `to_tsvector('english', text)`. The
+page was not using it.
+
+### Three things make it fast
+
+1. **Match through the GIN index**, the same path the header autocomplete uses,
+   so the two agree on what matches.
+2. **Materialise the match once per request** into a temp table keyed by source
+   table. A request needs the same match set for the counts and again for every
+   section; re-running the scan for each was the largest single cost on a broad
+   term. `b73` went from 1,818 ms to 731 ms.
+3. **Page the identifiers before joining** the display tables. Abstracts,
+   journal names, and stock centers are then fetched for 25 rows instead of for
+   every match — `maize` References fell from 1,428 ms to 115 ms.
+
+| Search | Page it replaces | Shell | Results |
+| --- | ---: | ---: | ---: |
+| `waxy` | 666 ms / 327 rows | 53 ms | 69 ms |
+| `wx1` | 634 ms / 1,385 rows | 53 ms | 89 ms |
+| `dwarf` | 662 ms / 707 rows | 53 ms | 73 ms |
+| `b73` | 1,791 ms / 457,015 rows | 54 ms | 727 ms |
+| `maize` | 1,431 ms / 98,436 rows | 55 ms | 930 ms |
+
+The shell runs no query at all, so the first paint never waits on the database.
+
+### The type registry is the thing to edit
+
+`saTypeRegistry()` in `searchall_lib.php` declares, per data type, which
+`all_text_search.table_name` values can produce it, which record table to join,
+and which card layout to render. **A text source that is not in some type's
+`sources` is invisible to the search.** The map was derived by cross-tabulating
+`table_name` against `id_num.type_term` over the whole corpus and is recorded in
+AD-021 — `table_name` is the table the *text* came from, not the type of the
+record, and the two are not the same.
+
+### Volume is bounded everywhere
+
+Five rows per overview section, 25 per page, 200 pages maximum. And `memo`
+(1.76 M rows) and `map_scores` (312 K) are out of the default corpus: they are
+commentary, not identity, and with memos in scope `b73` reports 169,742 loci —
+one for every locus whose comment mentions the reference line. A checkbox turns
+them back on.
+
+### Each data type gets the layout its records need
+
+A reference is a publication card with authors, journal, year, and a three-line
+abstract preview from `mgdb.reference_abstract`, plus DOI and PubMed links. A
+gene lists the models annotated for it as links. A stock shows its pedigree and
+the stock center that distributes it. An allele links to its parent locus. The
+alternative — one generic table of name and identifier — makes the reader open
+records to tell them apart.
+
+Two fields look like labels and are not: `reference.name` is a whole citation
+string that repeats the title and authors (the journal is `reference.in1` into
+`mgdb.journal`), and `stock.available_from` and `locus.linkage_group` are
+identifiers, into `mgdb.person` and `mgdb.linkage_group` respectively.
+
+### One behaviour change
+
+`LIKE '%term%'` matched inside a word, so `waxy` hit `nonwaxy`. The indexed path
+matches on token prefix: `waxy` hits `waxy1` and `waxy endosperm` but not
+`nonwaxy`. Prefix matching is what makes the index usable and is what the header
+search already did.
+
+### Verification
+
+`ORDER BY` ends in the primary key for every type. Without a total order two
+records that tie on name and length swap places between queries, which lets a row
+appear on two pages or on none; 6 pages deep on the four largest result sets
+returns 150 distinct rows and no duplicates. The temp-table path and the inline
+fallback were checked to return identical results across 132 type queries.
+
 ## Redesign status
 
 How much of the site is on the design system is measured rather than tracked by
@@ -657,17 +1147,55 @@ On the redesign and verified on the development instance:
 | Overgo search | `/data_center/overgo` |
 | SSR search | `/data_center/ssr` |
 | Maize genetics nomenclature | `/nomenclature` |
+| UniformMu insertion resource | `/uniformmu` |
 | Analysis projects | `/projects` |
 | Protein domain atlas | `/projects/interpro_domain_atlas` |
 | Design pattern library | `/pattern_library/` |
 | Redesign status | `/redesign_status` |
+| Marker and probe search | `/data_center/marker` |
+| Phenotype search | `/data_center/phenotype` |
+| Image search | `/data_center/image` |
+| Protein structure data center | `/data_center/protein_structure` |
+| TYPSimSelector | `/TYPSimSelector` |
+| All-data search | `/search_engine/searchall` |
+| Sitemap | `/sitemap` |
+| Archive | `/archive` |
+| FAIR practices | `/FAIRpractices` |
+| Genomes | `/genomes_modern/` |
+| Coming soon | `/coming_soon` |
 
-`REDESIGN_STATUS.md` counts the rest. As of the last run, 26 of the 268 URLs the
-site exposes are on the design system.
+`REDESIGN_STATUS.md` counts the rest. As of the last run, 40 of the 268 URLs the
+site exposes are on the design system, and every one of them was re-checked over
+HTTP on the development instance on 2026-08-17.
 
 Foundations complete: the shared design system, the opt-in modern document
 shell, the responsive global chrome and mega menu, the blue page ground, and a
 single rail shared by the chrome and the page content.
+
+## Working alongside other agents
+
+Claude Code, Codex, and Gemini agents share this one working copy and one `main`
+branch. Their edits land in the same files, so a few things are worth holding to.
+
+**Pull before starting and commit when a page is finished.** Uncommitted work is
+invisible to the other agents and easy to overwrite. The tree has held eight
+finished pages at once; that is a lot of unpushed work to lose.
+
+**These files are shared. Edit them additively.**
+
+| File | Why |
+| --- | --- |
+| `deploy/manifest.txt` | Append-only. Concurrent appends are safe; a rewrite is not. |
+| `src/css/mgdb-modern.css` | The design system every page loads. |
+| `src/controllers/data_center.php` | Holds one `include(..._modern.php)` guard per data center. |
+| `README.md`, `ADMIN_DEPENDENCIES.md` | Append a section rather than restructuring. |
+
+**Do not sweep another agent's half-finished page into a commit** to get a clean
+tree. Leave it uncommitted and say so.
+
+**`tools/redesign_status.py` is the honest check.** It fetches every URL the site
+exposes and classifies from the response, so it reports what is actually live
+rather than what anyone believes they deployed. Run it before reporting status.
 
 ## Starting a new session
 
