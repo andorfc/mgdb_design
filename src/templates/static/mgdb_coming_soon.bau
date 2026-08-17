@@ -1,0 +1,143 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-coming-soon {include-css: /css/mgdb-coming-soon.css}
+<main class="mgdb-page mgdb-coming-soon-page" id="main-content">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Coming Soon</span>
+  </nav>
+
+  <section class="mgdb-hero-basic" aria-labelledby="cs-title">
+    <span class="mgdb-hero-basic-icon" aria-hidden="true">
+      <svg viewBox="0 0 84 84" role="presentation" focusable="false">
+        <path d="M42 10C42 10 60 22 60 48C60 56 56 62 56 62L42 54L28 62C28 62 24 56 24 48C24 22 42 10 42 10Z" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/>
+        <circle cx="42" cy="32" r="7" fill="none" stroke="currentColor" stroke-width="4"/>
+        <path d="M24 48L12 58V66L28 62" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M60 48L72 58V66L56 62" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M36 64C36 72 42 76 42 76C42 76 48 72 48 64" fill="#2f5e2a"/>
+      </svg>
+    </span>
+    <div>
+      <span class="mgdb-eyebrow">MaizeGDB Development Roadmap</span>
+      <h1 id="cs-title">Coming Soon to MaizeGDB</h1>
+      <p>Track upcoming tools, genomic data tracks, page modernizations, and analysis features. Updated regularly as new datasets and tools transition into production.</p>
+    </div>
+  </section>
+
+  <section id="cs-metrics-section" aria-labelledby="cs-metrics-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Summary dashboard</span>
+        <h2 id="cs-metrics-title">Roadmap Overview</h2>
+      </div>
+      <p>Current snapshot of roadmap items across tools, tracks, and page enhancements.</p>
+    </div>
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9678;</span>
+        <div>
+          <strong class="mgdb-metric-value">$(total-items)</strong>
+          <h3>Total items</h3>
+          <p>Features, tools & tracks tracked.</p>
+        </div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-green">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9707;</span>
+        <div>
+          <strong class="mgdb-metric-value">$(beta-count)</strong>
+          <h3>Beta releases</h3>
+          <p>Available for community testing.</p>
+        </div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-red">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9633;</span>
+        <div>
+          <strong class="mgdb-metric-value">$(in-progress-count)</strong>
+          <h3>In progress</h3>
+          <p>Active engineering developments.</p>
+        </div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-burgundy">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9998;</span>
+        <div>
+          <strong class="mgdb-metric-value">$(completed-count)</strong>
+          <h3>Completed</h3>
+          <p>Deploys in active production.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="cs-roadmap-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Features, Data & Tools</span>
+        <h2 id="cs-roadmap-title">Upcoming & Recent Releases</h2>
+      </div>
+      <p>Filter by status or category, or search for specific tools and datasets.</p>
+    </div>
+
+    <div class="mgdb-search">
+      <div class="mgdb-search-row">
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="cs-query">Search roadmap</label>
+          <p class="mgdb-hint" id="cs-query-hint">Name, description, or category. Example: <code>SNPTools</code> or <code>JBrowse</code></p>
+          <input class="mgdb-input" id="cs-query" name="q" type="search" aria-describedby="cs-query-hint" autocomplete="off" placeholder="SNPTools" />
+        </div>
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="cs-category">Category</label>
+          <p class="mgdb-hint" id="cs-category-hint">Narrow to tool, track, or feature</p>
+          <select class="mgdb-select" id="cs-category" aria-describedby="cs-category-hint">
+            $(category-options)
+          </select>
+        </div>
+        <button class="mgdb-button mgdb-button-quiet" id="cs-reset" type="button" hidden>Reset</button>
+      </div>
+      <div class="mgdb-filters">
+        <span aria-hidden="true" class="mgdb-small mgdb-muted">Status:</span>
+        $(status-chips)
+        <span class="mgdb-result-count" id="cs-count" aria-live="polite"></span>
+      </div>
+    </div>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table cs-inventory" id="cs-inventory" data-sortable>
+        <caption>Upcoming and completed features, datasets, and tools across MaizeGDB</caption>
+        <thead>
+          <tr>
+            <th scope="col" data-sort="text"><button type="button">Feature / Tool</button></th>
+            <th scope="col" data-sort="text"><button type="button">Category</button></th>
+            <th scope="col" data-sort="text"><button type="button">Description</button></th>
+            <th scope="col" data-sort="text"><button type="button">Status</button></th>
+            <th scope="col" data-sort="text"><button type="button">Target / Release</button></th>
+            <th scope="col" data-sort="text"><button type="button">Access / Link</button></th>
+          </tr>
+        </thead>
+        <tbody id="cs-inventory-body">
+          $(table-rows)
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mgdb-empty" id="cs-empty" hidden>
+      <h3>No features or tools match that search</h3>
+      <p>There are $(total-items) items in the roadmap inventory. Clear your query or filter to see all of them.</p>
+      <button class="mgdb-button mgdb-button-secondary" id="cs-empty-reset" type="button">Clear search and filters</button>
+    </div>
+  </section>
+
+  <section class="mgdb-resource-panel" aria-labelledby="cs-related-title">
+    <div>
+      <span class="mgdb-eyebrow">Related Resources</span>
+      <h2 id="cs-related-title">Explore Active Tools & Services</h2>
+      <p>Access production tools, genome browsers, and redesigned data center interfaces.</p>
+    </div>
+    <div class="mgdb-resource-list">
+      <a href="https://snptools.maizegdb.org/"><strong>SNPTools</strong><span>Integrated suite for exploring maize sequence variation</span></a>
+      <a href="/jbrowse/"><strong>JBrowse Genome Browsers</strong><span>Multi-assembly browser instances</span></a>
+      <a href="/pan_gene_center/pan_gene"><strong>Pan-gene Center</strong><span>Syntenic ortholog and pan-genome analysis</span></a>
+      <a href="/redesign_status"><strong>Redesign Status</strong><span>Site modernisation progress dashboard</span></a>
+    </div>
+  </section>
+
+</main>
+)
