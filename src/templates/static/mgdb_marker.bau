@@ -1,0 +1,243 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-marker
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https://maizegdb.org/data_center/marker">
+<meta property="og:title" content="MaizeGDB Molecular Marker & Probe Data Center">
+<meta property="og:description" content="Search over 769,000 curated maize molecular markers, probes, BAC clones, SSRs, RFLPs, and sequence features with chromosome bin coordinates and linked loci.">
+
+<main class="mgdb-page mgdb-marker-page" id="marker-top">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data centers</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Markers &amp; Probes</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="marker-title">
+    <div class="mgdb-hero-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="Molecular marker chromosome pin icon">
+        <rect x="22" y="8" width="52" height="80" rx="24" fill="none" stroke="#235c37" stroke-width="6" />
+        <line x1="22" y1="32" x2="74" y2="32" stroke="#235c37" stroke-width="5" stroke-linecap="round" />
+        <line x1="22" y1="48" x2="74" y2="48" stroke="#d99a0b" stroke-width="6" stroke-linecap="round" />
+        <line x1="22" y1="64" x2="74" y2="64" stroke="#235c37" stroke-width="5" stroke-linecap="round" />
+        <circle cx="74" cy="48" r="8" fill="#7a4a10" />
+      </svg>
+      <strong>Marker<br />Center</strong>
+      <span>MaizeGDB</span>
+    </div>
+    <div class="mgdb-hero-body">
+      <span class="mgdb-eyebrow">Molecular markers and probes</span>
+      <h1 id="marker-title">Find the markers behind genetic maps and experiments</h1>
+      <p class="mgdb-hero-tagline">Curated records for over $(total_markers) maize molecular markers, probes, BAC clones, SSRs, and sequence features &mdash; linked to chromosome bin coordinates, loci, and experimental evidence.</p>
+      <p class="mgdb-hero-description">Search by marker name, synonym, or partial identifier. Filter by marker type \(SSR, BAC, cDNA, SNP, Overgo, RAPD\) or search chromosome bin positions.</p>
+      <div class="mgdb-hero-actions">
+        <a class="mgdb-button mgdb-button-primary" href="#marker-search-panel">Search markers</a>
+        <a class="mgdb-button mgdb-button-secondary" href="#marker-collections">Explore collections</a>
+      </div>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#marker-overview">Overview</a>
+    <a href="#marker-search-panel">Search</a>
+    <a href="#marker-results-section">Results</a>
+    <a href="#marker-collections">Collections</a>
+    <a href="#marker-downloads">Downloads</a>
+  </nav>
+
+  <section id="marker-overview" aria-labelledby="marker-overview-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Collection summary</span>
+        <h2 id="marker-overview-title">Marker dataset at a glance</h2>
+      </div>
+      <p>Curated probe, marker, and clone resources maintained in the MaizeGDB database.</p>
+    </div>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric-quiet">
+        <strong class="mgdb-metric-value">$(total_markers)</strong>
+        <p>total markers &amp; probes</p>
+      </article>
+      <article class="mgdb-metric-quiet">
+        <strong class="mgdb-metric-value">$(mapped_count)</strong>
+        <p>mapped with bin coordinates</p>
+      </article>
+      <article class="mgdb-metric-quiet">
+        <strong class="mgdb-metric-value">$(type_count)</strong>
+        <p>distinct marker types</p>
+      </article>
+      <article class="mgdb-metric-quiet">
+        <strong class="mgdb-metric-value">$(ssr_count)</strong>
+        <p>SSR microsatellite markers</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="marker-search-panel" class="marker-search-panel" aria-labelledby="marker-search-title">
+    <div class="marker-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Interactive search</span>
+        <h2 id="marker-search-title">Search molecular markers &amp; probes</h2>
+      </div>
+      <p>Enter a marker name, symbol prefix, or partial keyword. Use wildcards \(e.g. <code>bnlg%</code> or <code>csh*</code>\) to find marker series.</p>
+    </div>
+
+    <form id="marker-search-form" role="search">
+      <div class="marker-main-search">
+        <label for="marker-query">Marker name or synonym</label>
+        <div class="marker-query-control">
+          <svg class="marker-search-icon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="7" r="5"/><line x1="11" y1="11" x2="15" y2="15"/></svg>
+          <input id="marker-query" name="q" type="search" placeholder="Try bnlg1079, csh, umc, phi, myb, or phi029" autocomplete="off" />
+          <button id="marker-query-clear" type="button" hidden>Clear</button>
+        </div>
+      </div>
+
+      <div class="marker-type-search">
+        <label for="marker-type">Marker type</label>
+        <select id="marker-type" name="type">
+          $(type_options)
+        </select>
+      </div>
+
+      <div class="marker-search-submit">
+        <button class="mgdb-button mgdb-button-primary" type="submit">Search markers</button>
+      </div>
+
+      <div class="marker-example-row" aria-label="Example marker searches">
+        <span>Examples</span>
+        <button type="button" data-marker-example="bnlg1079">bnlg1079</button>
+        <button type="button" data-marker-example="csh">csh series</button>
+        <button type="button" data-marker-example="umc%">umc family</button>
+        <button type="button" data-marker-example="phi029">phi029</button>
+        <button type="button" data-marker-example="myb">myb-related</button>
+      </div>
+    </form>
+  </section>
+
+  <section id="marker-results-section" class="marker-results-section" aria-labelledby="marker-results-title">
+    <div class="marker-results-heading">
+      <div>
+        <span class="mgdb-eyebrow">Search results</span>
+        <h2 id="marker-results-title">Matching markers</h2>
+        <p id="marker-results-status" aria-live="polite">Enter a search term above or select an example to view markers.</p>
+      </div>
+      <div class="marker-results-controls">
+        <div class="marker-view-toggle" role="group" aria-label="View style">
+          <button class="marker-view-btn" type="button" data-view="card" aria-pressed="true">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>Cards
+          </button>
+          <button class="marker-view-btn" type="button" data-view="table" aria-pressed="false">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="2" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="12" width="14" height="2" rx="1" fill="currentColor"/></svg>Table
+          </button>
+        </div>
+        <div class="marker-export-buttons">
+          <a class="mgdb-button mgdb-button-quiet" id="marker-export-tsv" href="#" download>Export TSV</a>
+          <a class="mgdb-button mgdb-button-quiet" id="marker-export-csv" href="#" download>Export CSV</a>
+        </div>
+      </div>
+    </div>
+
+    <div id="marker-results" class="marker-results-container marker-view-card"></div>
+
+    <div id="marker-empty" class="mgdb-empty" hidden>
+      <h3>No markers matched your query</h3>
+      <p>Try searching with a broader keyword, using wildcards \(e.g. <code>bnlg%</code>\), or selecting 'All marker types'.</p>
+      <button class="mgdb-button mgdb-button-secondary" id="marker-empty-reset" type="button">Reset search</button>
+    </div>
+
+    <nav id="marker-pagination" class="marker-pagination" aria-label="Search result pages"></nav>
+  </section>
+
+  <section id="marker-collections" aria-labelledby="marker-collections-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Specialized archives</span>
+        <h2 id="marker-collections-title">Explore marker collections &amp; tools</h2>
+      </div>
+      <p>MaizeGDB maintains dedicated data centers for high-volume marker types with custom tools, chromosome maps, and protocol documentation.</p>
+    </div>
+
+    <div class="mgdb-card-grid marker-collection-grid">
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-info">Microsatellites</span>
+        <h3>SSR Data Center</h3>
+        <p>Search simple sequence repeat markers, repeat motifs, primer sets, and chromosome download tables.</p>
+        <a href="/data_center/ssr">Open SSR Center <span aria-hidden="true">&rarr;</span></a>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-ok">Clones &amp; Assemblies</span>
+        <h3>BAC Data Center</h3>
+        <p>Explore over 430,000 bacterial artificial chromosome clones, library origins, and physical mappings.</p>
+        <a href="/data_center/bac">Open BAC Center <span aria-hidden="true">&rarr;</span></a>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-warn">Transcripts</span>
+        <h3>EST Data Center</h3>
+        <p>Browse expressed sequence tags, cDNA libraries, and sequencing project submissions.</p>
+        <a href="/data_center/est">Open EST Center <span aria-hidden="true">&rarr;</span></a>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill">Overgo Probes</span>
+        <h3>Overgo Data Center</h3>
+        <p>Search overlapping oligonucleotide pairs designed for physical map hybridization and contig anchoring.</p>
+        <a href="/data_center/overgo">Open Overgo Center <span aria-hidden="true">&rarr;</span></a>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-ok">Genomic Variation</span>
+        <h3>SNPTools &amp; SNPversity</h3>
+        <p>Integrated suites for exploring sequence variation and high-density SNPs across diverse maize lines.</p>
+        <a href="https://snptools.maizegdb.org/">Launch SNPTools <span aria-hidden="true">&nearr;</span></a>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill">Visual Evidence</span>
+        <h3>Gel Pattern Archive</h3>
+        <p>Visually inspect experimental agarose and polyacrylamide gel patterns linked to marker assays.</p>
+        <a href="/data_center/image_gel_pattern">Browse gel patterns <span aria-hidden="true">&rarr;</span></a>
+      </article>
+    </div>
+  </section>
+
+  <section id="marker-downloads" aria-labelledby="marker-downloads-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Bulk datasets</span>
+        <h2 id="marker-downloads-title">Marker downloads &amp; tables</h2>
+      </div>
+      <p>Download comprehensive datasets for genome-wide markers, insertion-deletions, and genotyping arrays.</p>
+    </div>
+
+    <div class="marker-download-grid" aria-label="Bulk marker downloads">
+      <article class="marker-download-card">
+        <div class="marker-download-header">
+          <span class="mgdb-pill mgdb-pill-ok">XLSX</span>
+          <h3>B73 INDELs</h3>
+        </div>
+        <p>Comprehensive dataset of mapped insertion-deletion markers in the B73 reference genome.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="https://download.maizegdb.org/SNPs_and_Maps/INDELs/B73-INDELs.xlsx">Download B73 INDELs <span aria-hidden="true">&darr;</span></a>
+      </article>
+
+      <article class="marker-download-card">
+        <div class="marker-download-header">
+          <span class="mgdb-pill mgdb-pill-info">Archive</span>
+          <h3>MaizeSNP50 Array</h3>
+        </div>
+        <p>Illumina MaizeSNP50 genotyping array markers, probe sequences, and genetic map coordinates.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="https://download.maizegdb.org/SNPs_and_Maps/SNPs/">Download MaizeSNP50 <span aria-hidden="true">&darr;</span></a>
+      </article>
+
+      <article class="marker-download-card">
+        <div class="marker-download-header">
+          <span class="mgdb-pill mgdb-pill-warn">TSV / XLS</span>
+          <h3>Mapped SSR Tables</h3>
+        </div>
+        <p>Chromosome-by-chromosome mapped SSR marker detail files with amplicon lengths and primer sequences.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="/data_center/ssr#mapped-ssrs">View Chromosome Tables <span aria-hidden="true">&rarr;</span></a>
+      </article>
+    </div>
+  </section>
+</main>
+)

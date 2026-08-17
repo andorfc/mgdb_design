@@ -1,0 +1,545 @@
+/* Molecular Marker & Probe Data Center Styles
+   Scoped under .mgdb-marker-page; relies on mgdb-modern.css tokens. */
+
+/* ── Hero Emblem ─────────────────────────────────────────────────────────── */
+
+.mgdb-marker-page .mgdb-hero-emblem {
+  background: var(--mgdb-green-soft);
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-marker-page .mgdb-hero-emblem svg {
+  width: 68px;
+  height: 68px;
+}
+
+/* ── Sticky Section Tabs ─────────────────────────────────────────────────── */
+
+.mgdb-marker-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-5);
+  padding: var(--mgdb-space-2) 0;
+  background: var(--mgdb-surface);
+  border-bottom: 1px solid var(--mgdb-line);
+}
+
+.mgdb-marker-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-decoration: none;
+  transition: background .12s, border-color .12s;
+}
+
+.mgdb-marker-page .mgdb-section-tabs a:hover {
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-marker-page .mgdb-section-tabs a.is-current {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #fff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+.mgdb-marker-page > section,
+.mgdb-marker-page section[id] {
+  scroll-margin-top: 4.5rem;
+}
+
+/* ── Search Panel ────────────────────────────────────────────────────────── */
+
+.mgdb-marker-page .marker-search-panel {
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-marker-page .marker-section-heading h2 {
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-marker-page .marker-section-heading p {
+  max-width: var(--mgdb-measure);
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+}
+
+.mgdb-marker-page #marker-search-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: flex-end;
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-marker-page .marker-main-search {
+  flex: 3 1 20rem;
+  min-width: 0;
+}
+
+.mgdb-marker-page .marker-type-search {
+  flex: 2 1 14rem;
+  min-width: 0;
+}
+
+.mgdb-marker-page .marker-search-submit {
+  flex: 0 0 auto;
+}
+
+.mgdb-marker-page .marker-main-search label,
+.mgdb-marker-page .marker-type-search label {
+  display: block;
+  margin-bottom: var(--mgdb-space-1);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.mgdb-marker-page .marker-query-control {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid #b9b2a5;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-marker-page .marker-query-control:focus-within {
+  border-color: var(--mgdb-focus);
+}
+
+.mgdb-marker-page .marker-query-control svg {
+  color: var(--mgdb-muted);
+}
+
+.mgdb-marker-page .marker-query-control input {
+  min-height: 40px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-marker-page .marker-query-control input:focus {
+  outline: none;
+}
+
+.mgdb-marker-page .marker-query-control button {
+  border: 0;
+  background: none;
+  color: var(--mgdb-burgundy);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-marker-page select.mgdb-select,
+.mgdb-marker-page .marker-type-search select {
+  display: block;
+  width: 100%;
+  min-height: var(--mgdb-tap-target);
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  border: 1px solid #b9b2a5;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-marker-page .marker-example-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  flex: 1 0 100%;
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-marker-page .marker-example-row button {
+  padding: 2px 10px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink-soft);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .12s, border-color .12s;
+}
+
+.mgdb-marker-page .marker-example-row button:hover {
+  background: var(--mgdb-green-soft);
+  border-color: var(--mgdb-green);
+  color: var(--mgdb-green-dark);
+}
+
+/* ── Results Section ─────────────────────────────────────────────────────── */
+
+.mgdb-marker-page .marker-results-section {
+  margin-top: var(--mgdb-space-6);
+}
+
+.mgdb-marker-page .marker-results-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3) var(--mgdb-space-5);
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: var(--mgdb-space-3);
+  border-bottom: 1px solid var(--mgdb-line);
+}
+
+.mgdb-marker-page #marker-results-status {
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+}
+
+.mgdb-marker-page .marker-results-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+}
+
+.mgdb-marker-page .marker-view-toggle {
+  display: inline-flex;
+  gap: 2px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  padding: 2px;
+}
+
+.mgdb-marker-page .marker-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  padding: 4px var(--mgdb-space-3);
+  border: none;
+  border-radius: var(--mgdb-radius-xs, 4px);
+  background: transparent;
+  color: var(--mgdb-ink-soft);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+
+.mgdb-marker-page .marker-view-btn:hover:not([aria-pressed="true"]) {
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-ink);
+}
+
+.mgdb-marker-page .marker-view-btn[aria-pressed="true"] {
+  background: var(--mgdb-green-dark);
+  color: #fff;
+}
+
+.mgdb-marker-page .marker-view-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+.mgdb-marker-page .marker-export-buttons {
+  display: flex;
+  gap: var(--mgdb-space-2);
+}
+
+/* ── Result Cards (Card View) ────────────────────────────────────────────── */
+
+.mgdb-marker-page .marker-results-container.marker-view-card {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-marker-page .marker-result-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.mgdb-marker-page .marker-result-card:hover {
+  border-color: var(--mgdb-gold-dark);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-marker-page .marker-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: center;
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-marker-page .marker-type-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.mgdb-marker-page .marker-bin-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.mgdb-marker-page .marker-result-card h3 {
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+  line-height: var(--mgdb-leading-snug);
+  margin: 0;
+}
+
+.mgdb-marker-page .marker-result-card h3 a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.mgdb-marker-page .marker-result-card h3 a:hover {
+  color: var(--mgdb-leaf);
+}
+
+.mgdb-marker-page .marker-card-details {
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-marker-page .marker-card-details p {
+  margin-top: var(--mgdb-space-1);
+}
+
+.mgdb-marker-page .marker-card-details strong {
+  color: var(--mgdb-ink);
+}
+
+.mgdb-marker-page .marker-card-comments {
+  margin-top: var(--mgdb-space-2);
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-marker-page .marker-card-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: center;
+  margin-top: var(--mgdb-space-3);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--mgdb-line);
+}
+
+.mgdb-marker-page .marker-card-links a {
+  color: var(--mgdb-burgundy);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.mgdb-marker-page .marker-card-links a:hover {
+  text-decoration: underline;
+}
+
+.mgdb-marker-page .marker-copy-btn {
+  min-height: 28px;
+  padding: 2px var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink-soft);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .12s, border-color .12s;
+}
+
+.mgdb-marker-page .marker-copy-btn:hover {
+  background: var(--mgdb-surface-alt);
+  border-color: var(--mgdb-muted);
+}
+
+/* ── Result Table (Table View) ───────────────────────────────────────────── */
+
+.mgdb-marker-page .marker-results-container.marker-view-table {
+  margin-top: var(--mgdb-space-4);
+  overflow-x: auto;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-marker-page .marker-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--mgdb-text-sm);
+  text-align: left;
+}
+
+.mgdb-marker-page .marker-table th {
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-bottom: 2px solid var(--mgdb-line);
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-green-dark);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.mgdb-marker-page .marker-table td {
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-bottom: 1px solid var(--mgdb-line);
+  color: var(--mgdb-ink);
+  vertical-align: top;
+}
+
+.mgdb-marker-page .marker-table tr:last-child td {
+  border-bottom: none;
+}
+
+.mgdb-marker-page .marker-table tr:hover td {
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-marker-page .marker-table a {
+  color: var(--mgdb-burgundy);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.mgdb-marker-page .marker-table a:hover {
+  text-decoration: underline;
+}
+
+/* ── Pagination ──────────────────────────────────────────────────────────── */
+
+.mgdb-marker-page .marker-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-marker-page .marker-pagination button {
+  min-width: var(--mgdb-tap-target);
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .12s, border-color .12s;
+}
+
+.mgdb-marker-page .marker-pagination button:hover:not(:disabled) {
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-marker-page .marker-pagination button[aria-current="page"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #fff;
+}
+
+.mgdb-marker-page .marker-pagination button:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+/* ── Downloads & Collection Grid ─────────────────────────────────────────── */
+
+.mgdb-marker-page .marker-download-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-marker-page .marker-download-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-marker-page .marker-download-header {
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-3);
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-marker-page .marker-download-header h3 {
+  margin: 0;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+}
+
+.mgdb-marker-page .marker-download-card p {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+  .mgdb-marker-page .marker-search-panel { padding: var(--mgdb-space-4); }
+  .mgdb-marker-page .marker-results-container.marker-view-card { grid-template-columns: 1fr; }
+  .mgdb-marker-page .marker-results-heading { flex-direction: column; align-items: flex-start; }
+}
