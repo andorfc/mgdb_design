@@ -1,0 +1,532 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-uniformmu
+<a class="mgdb-skip-link" href="#um-main">Skip to main content</a>
+<main class="mgdb-page mgdb-uniformmu-page" id="um-main" data-payload="$(payload-url)">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/insertion">Insertions</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">UniformMu</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="um-title">
+    <div class="mgdb-hero-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="A transposon inserted into a gene model">
+        <rect x="8" y="42" width="80" height="12" rx="4" fill="#e6dfd2" />
+        <rect x="14" y="42" width="18" height="12" fill="#174634" />
+        <rect x="40" y="42" width="12" height="12" fill="#174634" />
+        <rect x="66" y="42" width="16" height="12" fill="#174634" />
+        <path d="M58 20 L58 40" stroke="#b32b21" stroke-width="5" stroke-linecap="round" />
+        <path d="M50 26 L58 18 L66 26" fill="none" stroke="#b32b21" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="46" y="56" width="24" height="14" rx="3" fill="#f2a515" stroke="#8a5a0f" stroke-width="3" />
+      </svg>
+      <strong>Insertion<br />Resource</strong>
+      <span>Data measured $(data-date)</span>
+    </div>
+    <div class="mgdb-hero-body">
+      <span class="mgdb-eyebrow">Sequence-indexed transposon population</span>
+      <h1 id="um-title">UniformMu</h1>
+      <p class="mgdb-hero-tagline">A maize population in which almost the only genetic variation between plants is the <em>Mu</em> insertions themselves &mdash; so a phenotype has a short list of candidate causes, and the seed carrying each one is free.</p>
+      <p class="mgdb-hero-description">Active <em>Mu</em> transposons were introgressed into the genetically uniform W22 inbred background, then the insertion sites were sequenced and mapped rather than screened for one gene at a time. Every insertion, the allele it creates, and the seed stock that carries it is a record at MaizeGDB, and the seed is distributed by the Maize Genetics Cooperation Stock Center free of charge.</p>
+      <div class="mgdb-hero-actions">
+        <a class="mgdb-button mgdb-button-primary" href="#um-find">Find insertions</a>
+        <a class="mgdb-button mgdb-button-secondary" href="#um-order">Order seed</a>
+        <a class="mgdb-button mgdb-button-quiet" href="#um-downloads">Downloads</a>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="um-summary-title">
+    <h2 class="mgdb-visually-hidden" id="um-summary-title">The collection in numbers</h2>
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9678;</span>
+        <div>
+          <strong class="mgdb-metric-value">$(insertion-count)</strong>
+          <h3>Insertion records</h3>
+          <p>$(aligned-count) of them carry genome coordinates. The other $(unaligned-count) are recorded, and have seed, but were never aligned to an assembly on file here.</p>
+        </div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-green">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9707;</span>
+        <div>
+          <strong class="mgdb-metric-value">$(stock-count)</strong>
+          <h3>Seed stocks</h3>
+          <p>UFMu lines at the Stock Center, distributed free of charge. $(mapped-stock-count) of them have at least one sequence-indexed insertion linked to them; the median line carries $(stock-insertions-median) insertions.</p>
+        </div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-red">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9633;</span>
+        <div>
+          <strong class="mgdb-metric-value">$(reference-genes)</strong>
+          <h3>Genes hit on $(reference-label)</h3>
+          <p>$(reference-fraction) of the $(reference-universe) reference gene models. $(reference-genic) of those &#40;$(reference-genic-fraction)&#41; are hit inside the transcript rather than only in the flank.</p>
+        </div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-burgundy">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9998;</span>
+        <div>
+          <strong class="mgdb-metric-value">$(assembly-count)</strong>
+          <h3>Assemblies aligned</h3>
+          <p>$(alignment-count) alignments in total, so an insertion found on one assembly can be followed to its position on the others.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <nav class="um-section-nav" aria-label="Sections of this page">
+    <a href="#um-find">Find insertions</a>
+    <a href="#um-records">How it is recorded</a>
+    <a href="#um-coverage">Coverage</a>
+    <a href="#um-browsers">Genome browsers</a>
+    <a href="#um-order">Ordering seed</a>
+    <a href="#um-downloads">Downloads</a>
+    <a href="#um-methods">Methods</a>
+    <a href="#um-references">References</a>
+  </nav>
+
+  <!-- ==================================================================== -->
+
+  <section id="um-find" aria-labelledby="um-find-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Live lookup</span>
+        <h2 id="um-find-title">Find insertions</h2>
+      </div>
+      <p>Four ways in, all of them ending at the same place: the insertion record, the allele it creates, and the seed you can order.</p>
+    </div>
+
+    <div class="mgdb-search um-finder">
+      <div class="mgdb-filters um-modes" role="group" aria-label="What to search by">
+        <span aria-hidden="true" class="mgdb-small mgdb-muted">Search by:</span>
+        <button class="mgdb-chip" type="button" data-mode="gene" aria-pressed="true">Gene</button>
+        <button class="mgdb-chip" type="button" data-mode="insertion" aria-pressed="false">Insertion</button>
+        <button class="mgdb-chip" type="button" data-mode="stock" aria-pressed="false">Seed stock</button>
+        <button class="mgdb-chip" type="button" data-mode="region" aria-pressed="false">Genomic region</button>
+      </div>
+
+      <form class="um-mode-panel" id="um-panel-gene" novalidate>
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="um-gene">Gene model, transcript, or gene symbol</label>
+          <p class="mgdb-hint" id="um-gene-hint">Any identifier a MaizeGDB gene page accepts. Insertions aligned to an older annotation of the same gene are included. Try <button class="um-example" type="button" data-fill="um-gene" data-value="Zm00001eb067740">Zm00001eb067740</button>, <button class="um-example" type="button" data-fill="um-gene" data-value="lg1">lg1</button>, or <button class="um-example" type="button" data-fill="um-gene" data-value="GRMZM2G002492">GRMZM2G002492</button></p>
+          <input class="mgdb-input" id="um-gene" name="gene" type="search" autocomplete="off" aria-describedby="um-gene-hint" placeholder="Zm00001eb067740" />
+        </div>
+        <div class="mgdb-form-actions">
+          <button class="mgdb-button mgdb-button-primary" type="submit">Find insertions</button>
+        </div>
+      </form>
+
+      <form class="um-mode-panel" id="um-panel-insertion" hidden novalidate>
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="um-insertion">Insertion identifier</label>
+          <p class="mgdb-hint" id="um-insertion-hint">A UniformMu insertion locus, as printed in the browser track and in papers. Try <button class="um-example" type="button" data-fill="um-insertion" data-value="mu1013469">mu1013469</button> or <button class="um-example" type="button" data-fill="um-insertion" data-value="mu1038042">mu1038042</button></p>
+          <input class="mgdb-input" id="um-insertion" name="insertion" type="search" autocomplete="off" aria-describedby="um-insertion-hint" placeholder="mu1013469" />
+        </div>
+        <div class="mgdb-form-actions">
+          <button class="mgdb-button mgdb-button-primary" type="submit">Look up insertion</button>
+        </div>
+      </form>
+
+      <form class="um-mode-panel" id="um-panel-stock" hidden novalidate>
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="um-stock">Seed stock</label>
+          <p class="mgdb-hint" id="um-stock-hint">A UFMu line. The number on its own is enough. Try <button class="um-example" type="button" data-fill="um-stock" data-value="UFMu-01828">UFMu-01828</button> or <button class="um-example" type="button" data-fill="um-stock" data-value="UFMu-04038">UFMu-04038</button></p>
+          <input class="mgdb-input" id="um-stock" name="stock" type="search" autocomplete="off" aria-describedby="um-stock-hint" placeholder="UFMu-01828" />
+        </div>
+        <div class="mgdb-form-actions">
+          <button class="mgdb-button mgdb-button-primary" type="submit">List the insertions in this line</button>
+        </div>
+      </form>
+
+      <form class="um-mode-panel" id="um-panel-region" hidden novalidate>
+        <div class="um-region-row">
+          <div class="mgdb-field">
+            <label class="mgdb-label" for="um-assembly">Assembly</label>
+            <select class="mgdb-select" id="um-assembly" name="assembly">
+              <option value="Zm-B73-REFERENCE-NAM-5.0">B73 v5</option>
+              <option value="Zm-B73-REFERENCE-GRAMENE-4.0">B73 v4</option>
+              <option value="B73 RefGen_v3">B73 v3</option>
+              <option value="Zm-W22-REFERENCE-NRGENE-2.0">W22 v2</option>
+            </select>
+          </div>
+          <div class="mgdb-field">
+            <label class="mgdb-label" for="um-chr">Chromosome</label>
+            <input class="mgdb-input" id="um-chr" name="chr" type="text" autocomplete="off" value="chr1" />
+          </div>
+          <div class="mgdb-field">
+            <label class="mgdb-label" for="um-start">Start</label>
+            <input class="mgdb-input" id="um-start" name="start" type="text" inputmode="numeric" autocomplete="off" value="4897501" />
+          </div>
+          <div class="mgdb-field">
+            <label class="mgdb-label" for="um-end">End</label>
+            <input class="mgdb-input" id="um-end" name="end" type="text" inputmode="numeric" autocomplete="off" value="5413000" />
+          </div>
+        </div>
+        <p class="mgdb-hint" id="um-region-hint">Chromosome names follow the assembly: <code>chr1</code> on B73 v5 and W22, <code>Chr1</code> on v3 and v4. Windows are limited to 20 Mb, because this is the one lookup with no index behind it.</p>
+        <div class="mgdb-form-actions">
+          <button class="mgdb-button mgdb-button-primary" type="submit">Find insertions in this window</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Not aria-live: this region is replaced wholesale with a table, and a
+         polite live region containing one would be read out in full on every
+         search. The count is announced through the shared live region in
+         mgdb-modern.js instead, which is what the pattern library does. -->
+    <div class="um-results" id="um-results" aria-busy="false">
+      <div class="mgdb-empty" id="um-idle">
+        <h3>Nothing searched yet</h3>
+        <p>Pick a starting point above. Every result links straight through to the MaizeGDB record for the insertion, the variation and the seed stock.</p>
+      </div>
+    </div>
+
+    <noscript>
+      <div class="mgdb-message mgdb-message-info" role="status">
+        <div><strong>This lookup needs JavaScript.</strong> Without it, search for an insertion by name from the <a href="/data_center/locus">locus data center</a>, for a seed stock from the <a href="/data_center/stock">stock data center</a>, or open a gene page and read its Variation section.</div>
+      </div>
+    </noscript>
+  </section>
+
+  <!-- ==================================================================== -->
+
+  <section id="um-records" aria-labelledby="um-records-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Where the data lives</span>
+        <h2 id="um-records-title">How a UniformMu insertion is recorded</h2>
+      </div>
+      <p>Four record types, in a chain. Knowing the chain is what turns &ldquo;there is an insertion in my gene&rdquo; into an envelope of seed.</p>
+    </div>
+
+    <ol class="um-chain">
+      <li class="mgdb-card">
+        <span class="um-chain-step">1</span>
+        <h3>The insertion</h3>
+        <p>A single mapped <em>Mu</em> insertion site, named <code>mu1013469</code>. Its record carries the coordinates on every assembly it was aligned to.</p>
+        <p class="mgdb-small mgdb-muted">Locus record &middot; <code>/data_center/locus</code></p>
+      </li>
+      <li class="mgdb-card">
+        <span class="um-chain-step">2</span>
+        <h3>The variation</h3>
+        <p>The allele that insertion creates, named <code>mu1013469::Mu</code>. This is what a stock is genotyped for, and it is the link between a position in the genome and a plant. $(variation-count) of them are on file.</p>
+        <p class="mgdb-small mgdb-muted">Variation record &middot; <code>/data_center/variation</code></p>
+      </li>
+      <li class="mgdb-card">
+        <span class="um-chain-step">3</span>
+        <h3>The seed stock</h3>
+        <p>A UFMu line carrying that allele, named <code>UFMu-01346</code>. A line carries several insertions &mdash; a median of $(stock-insertions-median), a mean of $(stock-insertions-mean) &mdash; so the stock record lists them all.</p>
+        <p class="mgdb-small mgdb-muted">Stock record &middot; <code>/data_center/stock</code></p>
+      </li>
+      <li class="mgdb-card">
+        <span class="um-chain-step">4</span>
+        <h3>The order</h3>
+        <p>Requested from the Maize Genetics Cooperation Stock Center, free of charge. Roughly 15 seeds per request.</p>
+        <p class="mgdb-small mgdb-muted">Order form &middot; <code>/ordering/coop_order</code></p>
+      </li>
+    </ol>
+
+    <div class="mgdb-prose-layout mgdb-spaced">
+      <div class="mgdb-prose">
+        <h3 class="mgdb-leaf-heading">A worked example</h3>
+        <p><a href="/data_center/locus?id=1271727">mu1013469</a> is an insertion in the 5&prime; UTR of <a href="/gene_center/gene/Zm00001eb008090">Zm00001eb008090</a> on B73 v5, at chr1:24,092,427. The same event is on file at chr1:24,310,665 on v4 and chr1:23,936,299 on v3, where it sits in <a href="/gene_center/gene/GRMZM2G002492">GRMZM2G002492</a>. It creates the allele <a href="/data_center/variation?id=1275599">mu1013469::Mu</a>, which is carried by <a href="/data_center/stock/1279088">UFMu-01346</a>, and that seed can be <a href="/ordering/coop_order/UFMu-01346">ordered</a>.</p>
+        <p>The lookup above walks that chain for you from any point on it.</p>
+        <h3 class="mgdb-leaf-heading">On the gene pages</h3>
+        <p>Every MaizeGDB gene model page lists the UniformMu insertions in that gene in its Variation section, alongside insertions from the other collections &mdash; BonnMu, Ds-GFP, and the Ac/Ds genome-wide mutagenesis. That is the right place to compare what is available across resources for one gene; this page is the right place to work from the UniformMu side.</p>
+      </div>
+      <aside class="mgdb-aside-card">
+        <h3>What &ldquo;associated with a gene&rdquo; means</h3>
+        <p>An insertion counts as associated with a gene model if it falls within the model, in a UTR, exon or intron, or within 10 kb upstream or downstream of it.</p>
+        <p>All transcripts are considered, not only the canonical one. That is why an insertion can be listed as hitting both an exon and an intron of the same gene.</p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ==================================================================== -->
+
+  <section id="um-coverage" aria-labelledby="um-coverage-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Measured from the database</span>
+        <h2 id="um-coverage-title">What the collection covers</h2>
+      </div>
+      <p>Everything in this section was counted on $(data-date). Nothing here is typed in by hand.</p>
+    </div>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table" data-sortable>
+        <caption>
+          UniformMu insertions by assembly
+          <span class="mgdb-muted">The same insertions, aligned four times. Rows are not additive.</span>
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col" data-sort="text"><button type="button">Assembly</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Insertions placed</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Genes with an insertion</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Hit inside the transcript</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Share of gene models</button></th>
+            <th scope="col" data-sort="text"><button type="button">Note</button></th>
+          </tr>
+        </thead>
+        <tbody>$(assembly-rows)</tbody>
+      </table>
+    </div>
+
+    <p class="mgdb-note mgdb-spaced"><strong>Three things this table will mislead you about if read quickly.</strong> The rows describe one collection aligned four times, not four collections, so they must never be summed. The B73 v3 share is measured against the whole v3 working gene set of 110,467 models rather than a filtered set, so it is not comparable with the v4 and v5 shares beside it. And the W22 alignments are recorded only as flanking regions &mdash; no UTR, exon or intron call was made against that annotation &mdash; which is why its &ldquo;hit inside the transcript&rdquo; cell reads <em>none recorded</em> rather than zero.</p>
+
+    <figure class="mgdb-figure">
+      <h3>How many insertions a gene has</h3>
+      <p>Genes on $(reference-label) that carry at least one UniformMu insertion, grouped by how many they carry. $(genes-multi) of the $(genes-with-insertions) have more than one, which is what makes a co-segregation test possible without crossing in a second allele from elsewhere.</p>
+      <div class="mgdb-chart" id="um-chart-per-gene" role="img" aria-label="Bar chart of the number of genes carrying one, two, three, and up to ten or more UniformMu insertions">
+        <span class="mgdb-chart-fallback">Loading chart&hellip;</span>
+      </div>
+      <figcaption>Independent insertion alleles in the same gene are the cheapest available control for a phenotype: two alleles, one phenotype, no second cross.</figcaption>
+      <div class="mgdb-table-scroll">
+        <table class="mgdb-table">
+          <caption>Insertions per gene on $(reference-label)</caption>
+          <thead>
+            <tr>
+              <th scope="col" class="um-bucket-col">Insertions in the gene</th>
+              <th scope="col" class="mgdb-numeric">Gene models</th>
+              <th scope="col" class="mgdb-numeric">Share of them</th>
+            </tr>
+          </thead>
+          <tbody>$(bucket-rows)</tbody>
+        </table>
+      </div>
+    </figure>
+
+    <figure class="mgdb-figure">
+      <h3>Where in a gene the insertions land</h3>
+      <p><em>Mu</em> inserts with a strong 5&prime; bias, and the counts show it: on the current reference the UTR class is the largest by a wide margin. Counts here are alignments, not insertions &mdash; one insertion touching two transcripts that disagree about where the UTR ends is counted under both classes.</p>
+      <div class="mgdb-chart" id="um-chart-structure" role="img" aria-label="Grouped bar chart of the share of UniformMu alignments falling in UTRs, exons, introns and flanking regions, on each assembly">
+        <span class="mgdb-chart-fallback">Loading chart&hellip;</span>
+      </div>
+      <figcaption>The flanking class is everything within 10 kb of a gene but outside it. Its share differs between assemblies because their annotations differ, not because the insertions moved.</figcaption>
+      <div class="mgdb-table-scroll">
+        <table class="mgdb-table" data-sortable>
+          <caption>Gene structure hit, by assembly</caption>
+          <thead>
+            <tr>
+              <th scope="col" data-sort="text"><button type="button">Assembly</button></th>
+              <th scope="col" data-sort="text"><button type="button">Gene structure</button></th>
+              <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Insertions</button></th>
+              <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Alignments</button></th>
+              <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Share of assembly</button></th>
+            </tr>
+          </thead>
+          <tbody>$(structure-rows)</tbody>
+        </table>
+      </div>
+    </figure>
+
+    <figure class="mgdb-figure">
+      <h3>Distribution across the genome</h3>
+      <p>Insertions placed on each chromosome of $(reference-label). The gradient from chromosome 1 down to chromosome 10 tracks chromosome length and gene density; there is no chromosome the collection avoids.</p>
+      <div class="mgdb-chart" id="um-chart-chromosome" role="img" aria-label="Bar chart of the number of UniformMu insertions placed on each of the ten maize chromosomes">
+        <span class="mgdb-chart-fallback">Loading chart&hellip;</span>
+      </div>
+      <figcaption>Insertions on unplaced scaffolds are excluded from this chart; there are a few dozen of them and they would not be visible beside the chromosome bars.</figcaption>
+      <div class="mgdb-table-scroll">
+        <table class="mgdb-table" data-sortable>
+          <caption>Insertions per chromosome on $(reference-label)</caption>
+          <thead>
+            <tr>
+              <th scope="col" data-sort="text"><button type="button">Chromosome</button></th>
+              <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Insertions</button></th>
+              <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">First position</button></th>
+              <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Last position</button></th>
+            </tr>
+          </thead>
+          <tbody>$(chromosome-rows)</tbody>
+        </table>
+      </div>
+    </figure>
+  </section>
+
+  <!-- ==================================================================== -->
+
+  <section id="um-browsers" aria-labelledby="um-browsers-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Visual context</span>
+        <h2 id="um-browsers-title">In the genome browsers</h2>
+      </div>
+      <p>The UniformMu track sits under &ldquo;insertions&rdquo; in each browser. Use it to see what else is nearby &mdash; other insertion collections, and the gene model an insertion sits in.</p>
+    </div>
+    <div class="mgdb-card-grid um-browsers">$(browser-cards)</div>
+  </section>
+
+  <!-- ==================================================================== -->
+
+  <section id="um-order" aria-labelledby="um-order-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Getting the seed</span>
+        <h2 id="um-order-title">Ordering, and what to do with what arrives</h2>
+      </div>
+      <p>Seed is distributed by the Maize Genetics Cooperation Stock Center free of charge. The advice below is the authors&rsquo;, carried over from the UniformMu methods document.</p>
+    </div>
+
+    <div class="mgdb-prose-layout">
+      <div class="mgdb-prose">
+        <h3 class="mgdb-leaf-heading">Planting UFMu and W22 wild type seed</h3>
+        <p>At least 15 seeds are typically provided for each request. The seed supply is limited, so it is worth planning carefully before planting to recover seed carrying the insertion of interest from as many plants as possible.</p>
+        <p>The envelope contains pooled seed from sib-pollinated F<sub>3</sub> plants. F<sub>3</sub> lines are sibbed to minimise selection against insertions with deleterious phenotypes &mdash; lethals, male steriles and the like &mdash; so many interesting but deleterious mutations are preserved as heterozygotes. Roughly half the <em>Mu</em> insertions in a UFMu line are homozygous and present in every plant; even a deleterious insert should still be carried by some heterozygous F<sub>3</sub> seed in the sample.</p>
+        <p><strong>Plant at least eight seeds</strong> in the field or greenhouse, so that every plant can be sampled for DNA and pollinated.</p>
+        <p><strong>Plant W22 wild type alongside them</strong> &#40;Stock Center catalogue number X17EA&#41;, and consider additional W22 about ten days before and after the mutant seed to widen the window of silk availability. This matters for three reasons. UniformMu lines generally have good fertility, but some carry mutations that reduce vigour or fecundity, and wild type pollen and silks help ensure seed is recovered at all. Backcrosses to wild type are usually a necessary step towards a segregating family in which wild type and mutant siblings can be tested for co-segregation with the insert &mdash; especially where the insert is homozygous in the UFMu line. And a UFMu line typically carries five to ten novel insertions, sometimes more, so a backcross aids their separation and independent assortment in later generations. A phenotype in the first generation may or may not be due to the insert of interest.</p>
+
+        <h3 class="mgdb-leaf-heading">Confirming an insertion by PCR</h3>
+        <p>To confirm that an insertion is present in a gene of interest, extract genomic DNA from individual plants and analyse it by PCR with gene-specific primers.</p>
+        <ol>
+          <li>Design at least two gene-specific primers per insertion, one upstream and one downstream of the insert site, compatible with a <em>Mu</em> TIR-specific primer. TIR6 or TIR8 are recommended for routine confirmation and genotyping. TIR8 is a mixture of four primers nested with respect to TIR6, which allows two-stage use for extra specificity; TIR8 amplicons contain enough TIR sequence downstream of the primer to authenticate the insertion. For sequence validation, an initial reaction with TIR6, gel-purified and sequenced with the nested TIR8 primer or a gene-specific primer, is the usual route.</li>
+          <li>Primer3 and similar tools help. Pairs of 21&ndash;27 bp gene-specific primers annealing upstream and downstream of the predicted site work well; ordering three such pairs allows alternate combinations to be tested. Keep the upstream and downstream primers within 500 bp of each other in wild type sequence to maximise amplification efficiency, and BLASTN the maize genome to avoid primers present in multiple copies. Because W22 genome sequence is limited, primer design usually relies on the B73 reference &mdash; sequence polymorphisms in the target region affect both primer efficiency and predicted product sizes, so targeting exon sequence reduces the risk where that is possible.</li>
+          <li>Including 5% DMSO, or a commercial PCR adjuvant such as the Invitrogen PCRx Enhancer System, improves success with GC-rich maize sequence. Add DMSO fresh from aliquots stored at &minus;20&nbsp;&deg;C.</li>
+          <li>Test flanking gene-specific primers in pairs against wild type W22 DNA first, to confirm they amplify the expected wild type fragment. If the first pair fails, individual upstream primers can be combined with other downstream primers; W22&ndash;B73 sequence polymorphisms and multi-copy sequence are the common causes of failure, and they are more likely where a primer sits in the promoter or 5&prime; UTR. Placing primers there is often unavoidable given the strong 5&prime; bias of <em>Mu</em> insertion, but testing several usually produces a working pair.</li>
+          <li>Once the best pair is identified in W22 control DNA, test <u>both</u> forward and reverse primers in combination with TIR6 against DNA from individual UFMu plants. There are cases where only one of the two produces bands with TIR6 even though together they amplify the wild type allele. Confirm insertion positions by sequencing the products. Parallel reactions with the flanking pair test for the wild type allele and heterozygosity &mdash; but a wild-type-sized fragment can appear even where the insert is homozygous, if the gene is duplicated. If nothing amplifies from any plant with TIR6, try TIR8.</li>
+          <li>Where primers turn out not to be strictly gene-specific and have to be used anyway, they may amplify two or more genomic segments that a standard gel will not resolve. A homozygous plant can then be genotyped as heterozygous. Two independent approaches resolve this: sequence the PCR products directly with the gene-specific primers or internal sequencing primers, where polymorphisms between the loci should be detectable; or backcross the line to W22 to produce multiple F<sub>1</sub> ears, since a parent homozygous for the insertion gives F<sub>1</sub> plants that all carry it.</li>
+        </ol>
+        <figure class="um-figure-inline">
+          <a class="um-zoom" href="/images/uniformmu/table2.png"><img src="/images/uniformmu/table2.png" alt="Table 2: the standard two-step touchdown PCR protocol used for UniformMu insertion confirmation." width="290" height="194" loading="lazy" /></a>
+          <figcaption>Table 2. The standard two-step, touchdown PCR protocol.</figcaption>
+        </figure>
+        <figure class="um-figure-inline">
+          <a class="um-zoom" href="/images/uniformmu/table3.png"><img src="/images/uniformmu/table3.png" alt="Table 3: Mu terminal inverted repeat primer sequences, including TIR6 and the four nested TIR8 primers." width="557" height="157" loading="lazy" /></a>
+          <figcaption>Table 3. TIR primers &#40;Latshaw and McCarty, unpublished; and Settles <em>et al.</em>, 2004&#41;.</figcaption>
+        </figure>
+      </div>
+
+      <aside class="mgdb-aside-card um-order-card">
+        <h3>Order seed</h3>
+        <p>Find the stock through the lookup above, or search the stock data center directly, then use the order link on its record.</p>
+        <p><a class="mgdb-button mgdb-button-primary" href="/data_center/stock">Stock data center</a></p>
+        <p><a class="mgdb-button mgdb-button-secondary" href="/ordering/coop_order">Stock Center order form</a></p>
+        <h3>Questions about a line</h3>
+        <p>Contact the UniformMu group directly: <a href="mailto:DRM@UFL.edu">DRM@UFL.edu</a> or <a href="mailto:KEKoch@UFL.edu">KEKoch@UFL.edu</a>.</p>
+        <p class="mgdb-small mgdb-muted">Stock availability changes. A depleted line is marked as such on its record and its order link is withdrawn rather than left to fail at the form.</p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ==================================================================== -->
+
+  <section id="um-downloads" aria-labelledby="um-downloads-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Bulk data</span>
+        <h2 id="um-downloads-title">Downloads</h2>
+      </div>
+      <p>Coordinate files by release. Each says which assembly it is against, because that is the thing that most often goes wrong.</p>
+    </div>
+    $(downloads)
+  </section>
+
+  <!-- ==================================================================== -->
+
+  <section id="um-methods" aria-labelledby="um-methods-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">The resource in detail</span>
+        <h2 id="um-methods-title">Methods</h2>
+      </div>
+      <p>The genetics, the sequencing and the bioinformatics behind the collection, as described by the group that built it. This text dates from the 2011 methods document and describes how the resource was made; the counts elsewhere on this page are current.</p>
+    </div>
+
+    <div class="mgdb-prose">
+      <h3 class="mgdb-leaf-heading">Key features of the population</h3>
+      <p>UniformMu is a maize population developed specifically for genetics research. Its defining feature is that genetic variation between individual UniformMu plants is limited to mutations caused by Robertson&rsquo;s <em>Mutator</em> transposons &#40;McCarty <em>et al.</em>, 2005&#41;. That is achieved by introgressing active <em>Mu</em> transposons into the genetically uniform W22 inbred strain.</p>
+      <p>The consequence is two things at once. The uniformity of the plants and seeds gives an excellent basis for phenotype comparison &mdash; uniform wild type controls &mdash; and mutations of individual genes are caused by <em>Mu</em> insertions whose positions are known. Gene function can then be studied at the biochemical, metabolic and whole-plant levels as a consequence of a specific change in gene sequence.</p>
+      <div class="um-feature-grid">
+        <div class="mgdb-card">
+          <h4>Uniform background</h4>
+          <p>W22, with active <em>Mu</em> introgressed into it.</p>
+          <figure class="um-figure-inline">
+            <a class="um-zoom" href="/images/uniformmu/figure1.png"><img src="/images/uniformmu/figure1.png" alt="Figure 1: the crossing scheme introgressing active Mu transposons into the uniform W22 inbred background." width="445" height="187" loading="lazy" /></a>
+            <figcaption>Figure 1. The uniform W22 background.</figcaption>
+          </figure>
+        </div>
+        <div class="mgdb-card">
+          <h4>Genetic stability</h4>
+          <p><em>Mu</em> activity is monitored with the <em>bronze</em> colour marker, so lines that have gone inactive can be identified rather than assumed.</p>
+        </div>
+        <div class="mgdb-card">
+          <h4>Mapped, heritable insertions</h4>
+          <p>An average of about ten insertions per line where a visible phenotype is present, about five where it is not. Forty ancestral <em>Mu</em> elements in the W22 inbred genome are defined, so they can be excluded.</p>
+        </div>
+        <div class="mgdb-card">
+          <h4>A sustainable seed resource</h4>
+          <p>Stocks come from sib-pollinated F<sub>3</sub> plants. Sib-pollination preserves deleterious mutations as heterozygotes rather than losing them.</p>
+        </div>
+      </div>
+
+      <h3 class="mgdb-leaf-heading">Field genetics</h3>
+      <p>To isolate new mutations, plants heterozygous for a highly active <em>MuDR</em> &mdash; self-pollinated ears segregating 3:1 for densely spotted <em>bz1</em>-mum9 and stable bronze kernels &mdash; are backcrossed to the standard W22 ACR inbred strain &#40;McCarty <em>et al.</em>, 2005&#41;. The resulting F<sub>1</sub> plants are grown, self-pollinated and screened for stable <em>bz1</em> seed. Because the F<sub>1</sub> plants are heterozygous for <em>MuDR</em>, the self-pollinated ears segregate <em>Mu</em>-inactive seed with a stable bronze, non-spotted kernel phenotype. Those stable bronze F<sub>2</sub> seed are grown and self-pollinated to establish confirmed homozygous <em>MuDR</em>&#40;&minus;&#41;, <em>Mu</em>-inactive derivative lines.</p>
+      <p>Twenty spot-free F<sub>3</sub> kernels are selected from each line, grown, and the plants sib-pollinated. A balanced pool of 200&ndash;300 seed is prepared from two to five ears per family, and every stock is screened manually to eliminate residual <em>Mu</em> activity, cracking, mould and other defects that affect viability. Plants are grown and pollinated at the UF PSREU experimental farm at Citra, Florida, and at the Gray Research facility in Askum, Illinois &mdash; Florida allows two generations a year, while the milder central Illinois summer is better for producing high-quality seed.</p>
+      <figure class="um-figure-inline">
+        <a class="um-zoom" href="/images/uniformmu/figure4.png"><img src="/images/uniformmu/figure4.png" alt="Figure 4: the field genetics scheme producing Mu-inactive F3 seed stocks for sequence indexing and public distribution." width="356" height="286" loading="lazy" /></a>
+        <figcaption>Figure 4. Producing F<sub>3</sub> UniformMu seed stocks for sequence-indexing and public distribution.</figcaption>
+      </figure>
+
+      <h3 class="mgdb-leaf-heading">Sequence-indexing by Illumina sequencing</h3>
+      <p>Plants are grown in 24 &times; 24 grids &mdash; 576 lines per grid &mdash; creating a two-dimensional array of 48 pooled DNA samples, 24 for each axis. The 48 samples are sequenced in a single multiplexed library on one lane of a flow cell. Multiplexing uses a custom set of adaptor oligos, each carrying one of 64 four-base key codes at the 5&prime; end; the fourth base is a checksum that detects sequencing errors in the key. To eliminate chimeric PCR artefacts that cause key swapping between samples, every step of library construction is performed separately per sample, and sub-libraries are pooled only at the cluster generation stage.</p>
+      <p>Each DNA sample is randomly sheared, end-polished, and ligated to a universal adaptor. PCR I uses a <em>Mu</em> TIR-specific primer and the universal adaptor primer; a nested PCR II incorporates the flow-cell adaptor primers into <em>Mu</em>-specific amplicons. The 3&prime; half of the long A-sequencing adaptor is fused to a nested TIR-specific oligo anchored six bases from the 3&prime; end of the TIR, and those six bases of TIR in the genomic read are what confirm an authentic <em>Mu</em>-flanking product &mdash; fewer than 1% of reads are rejected for mispriming. PCR II products are size-selected by excision from agarose gels, each sample on its own gel to rule out cross-contamination, and a third reaction completes the 5&prime; portion of the sequencing adaptor. Every PCR step uses the minimum number of cycles to limit bias.</p>
+      <figure class="um-figure-inline um-figure-wide">
+        <a class="um-zoom" href="/images/uniformmu/figure5.png"><img src="/images/uniformmu/figure5.png" alt="Figure 5: the library construction scheme, showing the nested TIR primers, the universal adaptor, and the anchored genomic sequence retained in each read." width="678" height="311" loading="lazy" /></a>
+        <figcaption>Figure 5. Library construction and the anchored <em>Mu</em>-flanking read.</figcaption>
+      </figure>
+
+      <h3 class="mgdb-leaf-heading">Mapping the flanking sequences</h3>
+      <p>A 72-base run yields 25&ndash;32 million reads per lane, giving more than 500,000 quality-trimmed reads per multiplexed sample. After the key code is parsed and the TIR sequence trimmed, reads retain 38 bases of precisely anchored genomic sequence flanking the insertion. Trimmed reads are mapped with BLASTN run in parallel; the output is parsed into a database of insertion sites at an expectation cutoff of 10<sup>&minus;7</sup>, and flanking sequences mapping within 3 bp of each other are assigned to the same insertion locus.</p>
+      <p>For each locus, read counts in each grid axis locate the lines carrying that insertion. Loci that map to low-copy locations &mdash; a maximum of four unresolved copies, with over 95% single copy &mdash; and that have unambiguous, statistically robust axis assignments are given a unique identifier such as <code>mu103480</code> and submitted to MaizeGDB. In parallel, seed stocks of at least 200 high-quality seed per line are deposited at the Stock Center. Consensus flanking sequences are assembled from the reads and the paired flanking sequences deposited in GenBank as gapped 76 bp sequences.</p>
+      <figure class="um-figure-inline um-figure-wide">
+        <a class="um-zoom" href="/images/uniformmu/figure6.png"><img src="/images/uniformmu/figure6.png" alt="Figure 6: the grid design, showing how read counts on each axis of the 24 by 24 array identify which line carries an insertion." width="703" height="431" loading="lazy" /></a>
+        <figcaption>Figure 6. Locating a line in the grid from axis read counts.</figcaption>
+      </figure>
+
+      <h3 class="mgdb-leaf-heading">Historical figures</h3>
+      <p>These two figures are from the March 2011 data release, when the collection held 26,211 insertions in 5,127 stocks. They are kept because published work refers to them; the current numbers are in the coverage section above.</p>
+      <div class="um-figure-pair">
+        <figure class="um-figure-inline">
+          <a class="um-zoom" href="/images/uniformmu/table1.png"><img src="/images/uniformmu/table1.png" alt="Table 1: the March 2011 release summary, giving insertion, stock and gene counts." width="316" height="416" loading="lazy" /></a>
+          <figcaption>Table 1. The March 2011 release summary.</figcaption>
+        </figure>
+        <figure class="um-figure-inline">
+          <a class="um-zoom" href="/images/uniformmu/figure2.png"><img src="/images/uniformmu/figure2.png" alt="Figure 2: the distribution of UniformMu insertions across the maize genome as of the 2011 release." width="229" height="318" loading="lazy" /></a>
+          <figcaption>Figure 2. Insertion distribution, 2011 release.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================== -->
+
+  <section id="um-references" aria-labelledby="um-references-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Literature</span>
+        <h2 id="um-references-title">Papers and references</h2>
+      </div>
+      <p>Cite the resource papers if you use UniformMu seed or the mapped insertion data.</p>
+    </div>
+
+    <h3 class="mgdb-leaf-heading">The resource papers</h3>
+    <div class="um-reference-list">$(papers)</div>
+
+    <h3 class="mgdb-leaf-heading">References cited above</h3>
+    <div class="um-reference-list">$(references)</div>
+  </section>
+
+  <section class="mgdb-resource-panel" aria-labelledby="um-related-title">
+    <div>
+      <span class="mgdb-eyebrow">Related</span>
+      <h2 id="um-related-title">Other insertion resources</h2>
+      <p>UniformMu is one of several insertion collections at MaizeGDB. A gene page shows what every collection has for that gene, side by side.</p>
+    </div>
+    <div class="mgdb-resource-list">
+      <a href="/insertion"><strong>Insertion data at MaizeGDB</strong><span>Every insertion collection held here, and where each came from</span></a>
+      <a href="/data_center/stock"><strong>Stock data center</strong><span>Search seed stocks and place an order</span></a>
+      <a href="/data_center/locus"><strong>Locus data center</strong><span>Search insertion and marker records by name</span></a>
+      <a href="https://download.maizegdb.org/Insertions/UniformMu/"><strong>UniformMu downloads</strong><span>The full download directory<span class="mgdb-visually-hidden"> &#40;opens download.maizegdb.org&#41;</span></span></a>
+    </div>
+  </section>
+
+</main>
+)

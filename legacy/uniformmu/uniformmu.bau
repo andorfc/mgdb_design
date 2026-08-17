@@ -1,0 +1,557 @@
+$$SYNTAX-LEVEL 2
+*(uniformmu
+
+<table border="0" cellpadding="6" cellspacing="4">
+  <tr>
+    <td>
+      <p style="margin-bottom: 8px;">
+        <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+          UniformMu Transposon Resource
+        </span>
+        <br>
+        <a href="https://download.maizegdb.org/Insertions/UniformMu/UniformMu_Methods2011.pdf">Download</a> 
+        this document as PDF.
+        <br><br>
+        <b>Papers:</b> <br>
+        <a href="">The UniformMu National Public Resource: Transposon-Induced
+        Mutant Seeds for Functional Genomics Studies in Maize.</a> K Koch and D McCarty. (2025\)
+        <br>
+        <a href=" https://doi.org/10.1371/journal.pone.0077172">Mu-seq: Sequence-Based 
+        Mapping and Identification of Transposon Induced Mutations.</a> D McCarty, 
+        S Latshaw, S Wu, M Suzuki, C Hunter, W Avigne, K Koch. (2013\)
+        <br>
+      </p>
+      <p>
+        <b>Downloads:</b>
+        <div style="margin-left:20px">
+          W22 to B73 cross-reference:
+          <br>
+          <a href="https://download.maizegdb.org/Insertions/UniformMu/UniformMu_W22_V4_lookup.xlsx">Excel spreadsheet</a><br>
+          <br>
+          Genomic coordinates for Zm-B73-REFERENCE-GRAMENE-4.0 (aka B73 RefGen_v4\):
+          <br>
+          <a href="https://download.maizegdb.org/Insertions/UniformMu/UniformMu_Release-9_B73v4.xlsx"> Release 9 Excel spreadsheet</a>
+          <br>
+          <a href="https://download.maizegdb.org/Insertions/UniformMu/UniformMu_Release-9_B73v4_exons.xlsx"> Release 9 Excel spreadsheet with gene structure</a>
+          <br><br>
+          List of gene models from the B73 RefGen_v3 Filtered Gene Set that have UniformMu insertions: 
+          <br>
+          <a href="https://download.maizegdb.org/Insertions/UniformMu/UniformMu_Release-8_GeneModel_B73_RefGen_v3.xlsx"> Release 8 Excel spreadsheet</a>
+          <br><br>
+          List of gene models from the B73 RefGen_v2 Filtered Gene Set that have UniformMu insertions including 100 bp upstream or downstream: 
+          <br>
+          <a href="https://download.maizegdb.org/Insertions/UniformMu/UniformMu_Release-7_Insertions_in_RefGenv2_FGS.xlsx"> Release 7 Excel spreadsheet</a>
+          <br>
+          <a href="https://download.maizegdb.org/Insertions/UniformMu/UniformMu_Release-8_Insertions_in_RefGenv2_FGS.xlsx"> Release 8 Excel spreadsheet</a>
+          <br><br>
+          List of gene models from the B73 RefGen_v2 Filtered Gene Set that have UniformMu insertions in exons: 
+          <br>
+          <a href="https://download.maizegdb.org/Insertions/UniformMu/UniformMu_Release-7_Insertions_in_RefGenv2_FGS_exons.xlsx"> Release 7 Excel spreadsheet</a>
+          <br>
+          <a href="https://download.maizegdb.org/Insertions/UniformMu/UniformMu_Release-8_Insertions_in_RefGenv2_FGS_exons.xlsx"> Release 8 Excel spreadsheet</a>
+          <br><br>
+          <a href="https://download.maizegdb.org/Insertions/UniformMu/">All UniformMu downloads</a>, including flanking sequence for B73 and W22.
+        </div>
+      </p>
+      <br><br>
+      <p>
+        <b>Genome alignments</b><br>
+        Insertions have been aligned to all assembly versions of the representative maize 
+        genome B73, and to the W22 genome assembly v2 (Zm-W22-REFERENCE-NRGENE-2.0\).
+        <br><br>
+        An insertion is considered to be associated with a gene model if it aligns within
+        10kb upstream or downstream, or within a gene model UTR, exon, or intron. All 
+        transcripts are considered, not just the canonical transcript.
+      </p>
+      <br><br>
+      <p><strong>The UniformMu Resource in Detail</strong></p>
+      <p>
+        <ol type="I" class="uniformmu">
+          <li class="uniformmu">
+            <a href="#I"><strong>Key features and current status of the  UniformMu resource</strong></a>
+          </li>
+          <li class="uniformmu">
+            <a href="#II"><strong>Finding insertions at MaizeGDB.org</strong></a>
+          </li>
+          <li class="uniformmu">
+            <a href="#III"><strong>Recommended care and handling of  UniformMu lines</strong></a>
+          </li>
+          <li class="uniformmu">
+            <a href="#IV"><strong>UniformMu Methods:  Genetics, sequencing and bioinformatics</strong></a>
+          </li>
+          <li class="uniformmu">
+            <a href="#references"><strong>References</strong></a>
+          </li>
+        </ol>
+      </p>
+        
+      <a name="I"></a>
+      <div style="width:750px">
+        <br>
+        <p>
+          <strong>I. Key  features and current status of the UniformMu resource 
+          (March, 2011\)</strong><br>
+          Uniform Mu is a unique maize  population developed for genetics 
+          research. Its most notable features are the extent of its uniformity, 
+          and the  degree to which this is punctuated by naturally-induced 
+          mutations from the Mu  transposable elements within it. Uniform Mu 
+          maize is widely used for experimental analysis of gene function, since 
+          1\) the uniformity of the plants and seeds provides an excellent basis 
+          for comparison (controls\), and 2\) natural mutations of individual genes 
+          occur when the Mu transposable elements insert within them. Gene 
+          function can then be studied at the  biochemical, metabolic, and 
+          whole-plant levels as a consequence of the specific  changes in gene 
+          sequence. The altered genes are identified by a sequence-based approach 
+          (Uniform Mu database\) and  seeds are available to researchers (MaizeGDB 
+          and Stock Center\).
+        </p>
+        <p>
+          UniformMu is a special maize population developed specifically for 
+          genetics research. A key feature is that genetic variation between 
+          individual UniformMu plants is limited to mutations caused by 
+          Robertsons Mutator transposons (McCarty et al., 2005\). This is achieved 
+          by introgression of active  Mu transposons into agenetically uniform 
+          W22 inbred strain. UniformMu maize is widely used for experimental 
+          analysis of gene function because 1\) the uniformity of the plants and 
+          seeds provides an excellent basis for phenotype comparisons (uniform 
+          wild type controls\), and 2\) mutations of individual genes are caused 
+          by Mu transposable element  insertions. Gene function can then be 
+          studied at the biochemical, metabolic, and whole-plant levels as a 
+          consequence of the specific changes in gene sequence. Mutations in 
+          genes are identified by a sequence-based mapping of germinal Mu 
+          insertions in the maize genome and seeds are available to researchers 
+          (via MaizeGDB and Maize Coop Stock Center\).
+        </p>
+        <p>
+          <strong>Key features:</strong><br>
+          <ol class="uniformmu">
+            <li class="uniformmu">
+              <b>Uniform background: W22</b><br>
+              <img src="/images/uniformmu/figure1.png" width="445" height="187" alt="Figure 1." />
+            </li>
+            <li>
+              <b>Genetic stability: Mu-activity monitored with bronze color marker</b>
+            </li>
+            <li>
+              <b>Mapped, heritable insertion:<br>
+              <dl>
+                <dd class="uniformmu">
+                  average 10 insertions per line if a visible phenotype is present
+                </dd>
+                <dd class="uniformmu">
+                  average 5 insertions per line if visible phenotype not present
+                </dd>
+                <dd class="uniformmu">
+                  Ancestral insertions defined:  40 ancestral Mu elements in the 
+                  W22 inbred  genome identified
+                </dd>
+              </dl></b>
+            </li>
+            <li>
+              <b>Sustainable seed resource:
+              <dl>
+                <dt class="uniformmu">
+                  seed  stocks from sib-pollinated F3 plants
+                </dt>
+                <dt class="uniformmu">
+                  sib-pollination  preserves deleterious mutations as heterozygotes
+                </dt>
+              </tl></b>
+            </li>
+          </ol>
+        </p>
+        <br>
+        <p>
+          The latest UniformMu data release at MaizeGDB (March 2011\) includes 
+          26,211 germinal insertions mapped in 5,127 seed stocks, each available 
+          immediately and free of charge from the Maize Genetics Cooperation 
+          Stock Center. By July, 2011, we will have mapped up to 38,000 germinal, 
+          heritable insertions in 8,256 seed stocks. The collection currently 
+          contains insertions in an estimated 31% of maize genes based on mapped 
+          Mu sites in at least 12,127 high-confidence maize genes in the Filtered 
+          Gene Set (v 5b.60, MaizeSequence.org\). These genes also include 5,329 
+          that have multiple insertion alleles invaluable for confirming 
+          genotype-phenotype relationships (Table 1\).
+        </p>
+        <table width="680" height="185" border="0">
+          <tr>
+            <td width="433" align="right" valign="top">
+              <img src="/images/uniformmu/table1.png" width="316" height="416" alt="Table1.">
+            </td>
+            <td width="237" align="left" valign="top">
+              <img src="/images/uniformmu/figure2.png" alt="Figure 2." width="229" height="318">
+            </td>
+          </tr>
+        </table>
+      </div>
+      <br>
+      
+      <a name="II"></a>
+      <br>
+      <div style="width:750px">
+        <p>
+          <strong>II. Finding insertions at MaizeGDB.org</strong><br />
+          The UniformMu insertions are displayed as track in the  MaizeGDB genome 
+          browser (Fig 2\). To search for insertions in a gene of interest (e.g. 
+          using a GRMZM identifier\) paste the gene name in the MaizeGBD search 
+          window and select &quot;genome browser - B73 RefGen_v2&quot; from the 
+          drop down list. When the genome browser display for the gene appears 
+          scroll down and locate the UniformMu track. Any insertions located in 
+          the displayed region will be displayed. Each unique insertion locus in 
+          the maize genome is given a unique identifier (e.g. mu10128088\).
+          Clicking on the insertion will bring up a locus page containing 
+          additional information about the insertion. To locate the seed stock 
+          containing the insertion, scroll down to the section labeled 
+          &quot;Variations/Polymorphisms&quot; and click on the link. The 
+          variation page will include a list of available stocks for the 
+          insertion (e.g. UFMu-01828\). Clicking on the stock link will open a 
+          stock page. The stock page includes a list of all insertions that have '
+          been mapped in the selected stock (typically  5-10 insertions, 
+          sometimes more\). To request seed from the Stock Center, use the 
+          &quot;Order this stock&quot; link located in the right-hand side 
+          panel.
+        </p>
+        <br><br>
+        <blockquote>
+          <blockquote>
+            <blockquote>
+              <img src="/images/uniformmu/figure3.png" alt="Figure3." width="540" 
+                   height="486" align="absbottom" class="uniformmu_block">
+              <br>
+            </blockquote>
+          </blockquote>
+        </blockquote>
+        <br>
+        <b>MaizeGDB browsers with UniformMu tracks</b><br>
+        <a href="https://www.maizegdb.org/gbrowse/maize_v2/?start=34400;stop=530000;ref=Chr1;width=1000;version=100;flip=0;grid=1;id=f3e56d34082ca3b8c03410da1eec743a;l=UniformMU%1EGene_models">B73 RefGen_v2</a> (Release 8\)<br>
+        <a href="https://www.maizegdb.org/gbrowse/maize_v4/?start=34400;stop=530000;ref=Chr1;width=1000;version=100;flip=0;grid=1;id=f3e56d34082ca3b8c03410da1eec743a;l=UniformMu%1EGene_Models">Zm-B73-REFERENCE-GRAMENE-4.0</a> (Release 9\)<br>
+        <a href="https://www.maizegdb.org/gbrowse/maize_w22v2/?start=2373000;stop=2385999;ref=chr1;width=1000;version=100;flip=0;grid=1;id=f3e56d34082ca3b8c03410da1eec743a;l=Gene_Models%1EUniformMu">W22 Version 2.0</a> <br>
+        <a href="https://jbrowse.maizegdb.org/?loc=chr1%3A56590639..56904419&tracks=uniformmu%2Cgene_models_official">Zm-B73-REFERENCE-NAM-5.0</a> (Release 9\)<br>
+        </div>
+        
+        <a name="III"></a>
+        <br>
+        <div style="width:750px">
+        <p>
+          <strong>III. Recommended care and handling of UniformMu insertion lines </strong><br>
+          <strong>Planting UFMu and W22 wild type seed stocks.</strong><br />
+          At least 15  seeds will typically be provided for each request of UFMu 
+          seed from the Maize Genetics Cooperation Stock Center. Because the seed 
+          supply is limited, it is important to plan carefully before planting to 
+          ensure recovery of seed carrying the insertion of interest from as many 
+          plants as possible. If you  have any problems, please contact us 
+          (<a href="mailto:DRM@UFL.edu">DRM@UFL.edu</a> or 
+          <a href="mailto:KEKoch@UFL.edu">KEKoch@UFL.edu</a>\).
+        </p>
+        <p>
+          The envelope will contain pooled seed from sib-pollinated F3 plants 
+          (see UniformMu Methods\). The F3 lines are sibbed to  minimize selection 
+          against insertions that may have deleterious phenotypes (e.g. 
+          lethal&rsquo;s, male steriles, etc\). Many interesting, but deleterious 
+          mutations are thus preserved as heterozygous insertions; whereas, 
+          roughly half of the Mu insertions in UFMu lines are homozygous and will 
+          be present in all plants. Even if  the Mu-insert of interest is 
+          deleterious, it should still be carried by at least some heterozygous 
+          F3 seed in the sample provided.  
+        </p>
+        <p>
+          -- We recommend planting at least eight seeds in the field or 
+          greenhouse such that  all plants can be sampled for DNA and pollinated.
+        </p>
+        <p>
+          -- We also  recommend concurrently planting W22 wild type seeds 
+          (available from the Stock Center &151; catalog # X17EA\), so that these can 
+          be used as additional mothers for pollen from mutant plants (Additional 
+          W22 can also be planted about 10 days before and after the mutant seed 
+          to increase potential for silk availability at the time of mutant 
+          anthesis\). This is important for three reasons. First, although 
+          UniformMu lines generally have good fertility, some may carry mutations 
+          that reduce vigor and fecundity (e.g. male sterility\). Having wild type 
+          pollen and silks available helps ensure recovery of seed from the 
+          selected UFMu line. Second, backcrosses to wild type are often a
+          necessary step towards developing a family of segregating progeny, 
+          where wildtype and mutant siblings can be tested for co-segregation of 
+          any phenotypic features with presence of the Mu-insert of interest. 
+          This is especially important if the insert is homozygous in the UFMu 
+          line, in which case this generation will be needed to generate a 
+          suitable segregating family. Third, the UFMu lines typically carry 5 
+          to 10 novel insertions (sometimes more\), so a backcross will aid 
+          separation and independent assortment of these in subsequent 
+          generations (A given phenotype in the first generation may or may not 
+          be due to the Mu-insert of interest\). Recommended backcrosses can thus 
+          speed  analyses. <br>
+        </p>
+        <br>
+        <p>
+          <strong>PCR confirmation of Mu insertions.</strong>
+        </p>
+        <ol class="uniformmu">
+          <li>
+            To confirm presence of the Mu insertions in a  gene of interest, 
+            genomic DNA must be extracted from individual plants and analyzed by 
+            PCR using gene-specific primers.
+          </li>
+          <li>
+            At least two gene specific primers will need  to be designed for each 
+            insertion (one upstream and one downstream of the  insert site\), and 
+            these will need to be compatible with a Mu TIR specific  primer. 
+            See Table 1 for a list of TIR primers we use (Latshaw and McCarty, 
+            unpublished, and Settles et al., 2004\). We recommend TIR6 or TIR8 for 
+            routine  confirmation and genotyping. Note that  TIR8 is a mixture of 
+            four primers that are nested with respect to TIR6. This allows their 
+            use in two stages for enhanced specificity. TIR8 amplicons contain 
+            sufficient TIR sequence downstream of the primer to authenticate the 
+            Mu insertion. For sequence validation of insertion sites, we 
+            typically do an initial PCR reaction with TIR6.  Product is gel 
+            purified and sequenced using the nested TIR8 primer and/or 
+            gene-specific primer.
+          </li>
+          <li>
+            Online tools such as Primer3 may aid design gene-specific primers. 
+            We typically use pairs of 21-27bp gene specific primers, with 
+            primers that anneal upstream and downstream of the predicted insert 
+            site. Where possible, we order three such pairs, so that they can be 
+            tested in alternate combinations (see more below on this\). Ideally, 
+            the upstream and downstream gene specific primers should be separated 
+            by less than 500 bp in the wild type sequence to maximize 
+            amplification efficiency. BLASTN searches of the maize genome should 
+            be used to avoid primers that are present in multiple copies. Because
+            there is currently limited genome sequence available for the W22 
+            inbred background of UniformMu, we typically rely on the B73 
+            reference genome for primer design. Sequence polymorphisms in the 
+            target region can affect primer efficiency and predicted product 
+            sizes. Where possible, targeting exon sequences can reduce likelihood 
+            of sequence polymorphisms that will compromise optimal primer 
+            annealing. Table 2 contains our standard two-step, touchdown PCR 
+            protocol. We have found that including 5% DMSO in the reaction or 
+            addition of commercial PCR &ldquo;adjuvant&rdquo; cocktails (such as 
+            Invitrogen PCRx Enhancer System\) can be effective for improving PCR 
+            success with GC rich maize genome sequences. We add fresh DMSO from 
+            aliquots stored at -20&deg;C.
+          </li>
+          <li>
+            Gene-specific primers that flank the insertion site are first 
+            PCR-tested in pairs with wild type W22 DNA. This confirms capacity of 
+            the selected primers to amplify the expected wild type fragment.
+          </li>
+          <blockquote>
+            <blockquote>
+              <img src="/images/uniformmu/table2.png" width="290" height="194" alt="Table2." /><br clear="all" />
+            </blockquote>
+          </blockquote>
+        </ol>
+        <blockquote>
+          <p>
+            The advantage of designing and ordering three pairs of primers, is 
+            that individual upstream primers can be combined with other 
+            downstream primers if the first pairs tested fail to optimally 
+            amplify the wild type sequence. All possible forward-reverse 
+            combinations can be tested with W22 DNA. The W22-B73 sequence 
+            polymorphisms and multiple copy sequences are common causes of primer  
+            failure. The former are more likely to be encountered where one or 
+            both primers are located in the promoter or 5&rsquo;-UTR. While 
+            placing primers in those regions is often unavoidable due to a strong 
+            5&rsquo; bias for Mu insertions, testing multiple primers will usually 
+            produce a successful pair.<br>
+          </p>
+        </blockquote>
+        <ol class="uniformmu">
+          <blockquote>
+            <blockquote>
+              <img src="/images/uniformmu/table3.png" width="557" height="157" alt="Table3" />
+            </blockquote>
+          </blockquote>
+          <li>
+            Once the best primer pairs have been identified for the gene of 
+            interest in W22 control DNA, we test <u>BOTH</u> forward and reverse 
+            primers in combination with the TIR6 primer in the presence of DNA 
+            from individual UFMu plants. We have seen a limited number of cases 
+            where only one of the primers produced PCR  bands with TIR6 even 
+            though together they amplified wild type alleles. We subsequently 
+            confirm the location of Mu insertions by sequencing PCR products. 
+            Parallel PCR reactions performed with the pair of flanking gene 
+            specific primers can be used to test for presence of the wild type 
+            allele and heterozygosity. However, amplification of a wild-type-sized 
+            fragment can sometimes occur even in situations where an  nsert is 
+            homozygous, if the gene is duplicated in the maize genome. If no 
+            products can be obtained from any plants using TIR6, try repeating the 
+            PCR using TIR8. If that also fails, contact us and we may be able to 
+            assist (e-addresses above\).
+          </li>
+          <li>
+            The sequence analyses described in #3, may still result in primers 
+            that are not strictly gene specific. You may have to compromise and 
+            use them. If so, they may amplify two or more genomic segments that 
+            are not be resolved by standard gel electrophoresis. More 
+            specifically, this situation could arise where a homozygous Mu insert 
+            is present in a gene of interest that has paralogs or duplicated 
+            segments in maize genome. Such homozygous plants may be incorrectly  
+            genotyped as heterozygous because the wild type primer pairs are 
+            likely to generate PCR products visible as a single band in the 
+            agarose gel. There are two independent approaches to resolve and 
+            confirm such insertions. First, the PCR products can be 
+            <u>directly</u> sequenced with the gene specific primers that were 
+            used to amplify, or with additional internal sequencing primers. If 
+            primers amplify one or more additional loci, polymorphisms should be 
+            detectable with the PCR products. Second, a genetic test can be done 
+            by backcrossing the lines to the W22 inbred to produce multiple F1 
+            ears. If parental plants are homozygous for the Mu insertions, all 
+            the F1 plants will typically carry the insertion.<br>
+          </li>
+        </ol>
+      </div>
+      
+      <a name="IV"></a>
+      <br>
+      <div style="width:750px">
+        <p>
+          <strong>
+            IV. UniformMu Methods - genetics, sequencing and bioinformatics
+          </strong>
+          <br>
+        </p>
+        <p>
+          <strong>
+            Field genetics - Production of  F3, UniformMu seed stocks for 
+            sequence-indexing and public distribution.  
+          </strong>
+          To isolate new mutations, plants heterozygous for a highly active MuDR 
+          (i.e. self-pollinated ears that segregate 3:1 for densely spotted,
+          <em>bz1</em>-mum9 andstable bronze kernels\) are backcrossed to our 
+          standard W22 ACR inbred strain (McCarty et al., 2005\). The resulting F1  
+          plants are grown, self-pollinated and screened for stable <em>bz1</em>
+          seed (Fig 4; McCarty  et al., 2005\). Because the F1 plants are
+          heterozygous for MuDR, the self-pollinated ears segregate Mu-inactive 
+          seed that havea stable bronze (non-spotted\) kernel phenotype. The 
+          stable bronze F2 seed are grown and self-pollinated to establish 
+          confirmed homozygous MuDR(-\), Mu-inactive derivative lines. Twenty, 
+          spot-free F3 kernels are selected from each line, grown and the plants 
+          sib-pollinated. To create a seed stock suitable for sequence analysis 
+          and public distribution through the Stock Center, a balanced pool of
+          200-300 seed is prepared from 2-5 ears (depending on ear size, and 
+          quality\) from each family. To ensure highest possible seed quality all 
+          seed stocks are screened manually by experienced personnel (including 
+          students, mentors, and technical staff to eliminate residual 
+          Mu-activity, cracking, mold and other defects that may impact seed 
+          viability. Maize plants are grown and pollinated at the UF PSREU 
+          experimental farm at Citra, FL and at the Gray Research facility 
+          located in Askum, Ill. The Florida location allows two generations 
+          per year while the relatively mild central Illinois summer season is 
+          optimal for production of high quality seed stocks.
+        </p>
+        <br>
+        <blockquote>
+          <blockquote>
+            <img src="/images/uniformmu/figure4.png" alt="Figure4" width="356" height="286" hspace="1" vspace="1" />
+          </blockquote>
+        </blockquote>
+        <br>
+        <p>
+          <strong>Sequence-indexing of Mu insertions by Illumina sequencing.</strong>
+          We have developed a highly efficient protocol for sequencing Mu flanking 
+          sequences using the Illumina platform (Illumina.com\).  Plants are grown 
+          in 24 X 24 grids (576 lines per grid\) creating a 2D array of 48 pooled 
+          DNA samples (24 for each axis\). The 48 DNA samples are sequenced in a 
+          single multiplexed library using one lane of an Illumina flow cell.  
+          Multiplexing is implemented using a custom set of Illumina Flow Cell A 
+          sequencing adaptor oligos each incorporating one of 64 different 4-base 
+          key codes into the 5'-end of the sequence. The fourth base of the code 
+          is a check sum that allows detection of sequencing errors in the 
+          multiplex key. To eliminate chimera PCR artifacts that can result in 
+          &quot;key swapping&quot; among the multiplex samples, all steps of 
+          library construction are performed  eparately for each of the 48 DNA 
+          samples and sub-libraries are pooled prior to the cluster generation 
+          stage in the Illumina sequencing protocol.
+        </p>
+        <br>
+        <blockquote>
+          <blockquote>
+            <a href="/images/uniformmu/figure5.png" target="_new" 
+               class="Black_Border_Link"><img src="/images/uniformmu/figure5.png" 
+               alt="Figure5." width="678" height="311" border="1" align="absbottom"></a>
+          </blockquote>
+        </blockquote>
+        <br>
+        <p>
+          In brief, to obtain unbiased sampling of the genome, each DNA sample is 
+          randomly sheared using a BioRuptor sonication instrument, end-polished 
+          and ligated to a universal adaptor oligonucleotide (Fig 5\).  PCR I is 
+          performed using a Mu TIR specific primer and the universal adaptor 
+          primer. A nested PCR II reaction is then performed to incorporate the 
+          Illumina A and B flow-cell adaptor primers into Mu specific amplicons.  
+          The 3' half of the long Illumina A-sequencing adaptor is fused to a 
+          nested Mu TIR specific oligo that is anchored six bases from the 3'-end 
+          of the TIR (Fig 5a\), and the B-adaptor sequence is incorporated 
+          by fusion to the universal adaptor primer. The six bases of TIR in the 
+          genomic sequence downstream of the A-primer are used to confirm 
+          authentic Mu flanking PCR products. Less than 1% of reads  are rejected 
+          for mispriming. The PCR II products are size-selected by excision from 
+          agarose gels where each sample is run in a separate gel to eliminate the 
+          possibility of cross-contamination. Incorporation of the 5-prime 
+          portions of the A-sequencing adaptor is completed in a third PCR 
+          reaction. All PCR steps use a minimum number of cycles to mitigate PCR 
+          bias.
+        </p>
+        <p>
+          <strong>Bioinformatics analysis and mapping of Mu  flanking sequences.</strong>
+          In a typical 72 base run performed at NCGR (Santa Fe, NM\), our custom 
+          multiplex libraries yield  25-32 million reads per lane providing 
+          greater than 500,000 quality trimmed reads per multiplex DNA sample. 
+          With current Illumina technology, 72-base runs return high yields of 
+          reads conducive to statistically robust axis assignments while allowing 
+          relatively fast turn-around due to availability of 72-base lanes at 
+          sequencing centers (e.g.  NCGR\). Longer reads may be obtained from the 
+          same libraries without modification. After parsing of the key code, 
+          trimming of the Mu TIR sequence, reads retain 38 bases of precisely 
+          anchored genomic DNA sequence flanking the Mu insertion (Fig 5 b\). The 
+          trimmed reads are mapped to the B73 maize genome (AGP v2 
+          pseudomolecules\) using BLASTN run in parallel on the UF HPC computing 
+          cluster (www.hpc.ufl.edu\). Using 64 processors, mapping of 32 M reads is
+          completed in about 2 hours. The BLAST output is parsed into a database 
+          of mapped Mu insertion sites using a cutoff BLAST expectation score of 
+          10-7. Flanking sequences that map within 3 bp in the maize genome are 
+          assigned to the same insertion locus.<br>
+        </p>
+        <p> 
+          For each insertion locus, read counts in each grid axis are used to 
+          locate maize lines in grid that contain that insertion (Fig 6\). 
+          Insertion loci that map to low copy locations in the genome (maximum of 
+          4 unresolved copies; &gt;95% are single  copy\) and that have 
+          unambiguous, statistically robust assignments (axis counts with a C2 
+          score less than 10-5\) to individual lines in the grid are assigned a 
+          unique six digit identifier (e.g. mu103480\) and submitted to 
+          MaizeGDB.org. In parallel, seed stocks (minimum of 200 high-quality 
+          seed per line\) for each grid are deposited in the Stock Center. 
+          Consensus flanking sequences for each insertion are assembled from the 
+          Illumina reads using the AMOS simple consensus program (Meyers et al., 
+          2000\) and paired flanking sequences are deposited in Genbank as gapped 
+          76 bp sequences (or longer depending on Illumina read length\).
+        </p>
+        <br>
+        <blockquote>
+          <blockquote>
+            <a href="/images/uniformmu/figure6.png" target="_blank" 
+               class="Black_Border_Link"><img src="/images/uniformmu/figure6.png" 
+               alt="" width="703" height="431" border="1" /></a>
+          </blockquote>
+        </blockquote>
+      </div>
+      
+      <div style="width:750px">
+        <br>
+        <a name="references"></a>
+        <p><strong>References</strong></p>
+        <p>McCarty DR,  Meeley RB. (2009\) Transposon resources for forward and reverse genetics in  maize. In. Handbook of Maize: genetics and genomics. (Ed. JL Bennetzen, S.  Hake\). Springer Science Berlin. pp 561-584.</p>
+        <br>
+        <p>McCarty DR,  Settles AM, Suzuki M, Tan BC, Latshaw S, Porch T, Robin K, Baier J, Avigne W,  Lai J, Messing J, Koch KE, Hannah LC. (2005\) Steady-state transposon  mutagenesis in inbred maize. Plant J. 44:52-61.</p>
+        <br>
+        <p>Myers E,  Sutton G, et. al. (2000\) A Whole-Genome Assembly of <em>Drosophila</em><em>. <em>Science</em></em> 287:2196-204</p>
+        <br>
+        <p>Schnable PS  et al. (2009\) The B73 maize genome: complexity, diversity, and dynamics.  Science 326:1112-5</p>
+        <br>
+        <p>Settles AM,  Holding DR, Tan BC, Latshaw SP, Liu J, Suzuki M, Li L, O'Brien BA, Fajardo DS,  Wroclawska E, Tseung CW, Lai J, Hunter CT 3rd, Avigne WT, Baier J, Messing J,  Hannah LC, Koch KE, Becraft PW, Larkins BA, McCarty DR. (2007\) Sequence-indexed  mutations in maize using the UniformMu transposon-tagging population. BMC  Genomics. 8:116</p></td>
+      </div>
+    </tr>
+</table>
+  
+)

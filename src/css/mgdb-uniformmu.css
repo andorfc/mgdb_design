@@ -1,0 +1,558 @@
+/* ==========================================================================
+   /uniformmu — the UniformMu insertion resource
+   --------------------------------------------------------------------------
+   Page-specific rules only. Everything structural — the hero, metric cards,
+   tables, chips, figures, resource lists — comes from css/mgdb-modern.css and
+   is not restated here. Every value below is a shared token; this file adds no
+   colours and no spacing steps of its own.
+
+   Scoped under .mgdb-uniformmu-page so nothing can reach another page.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Section navigation
+
+   Sticks to the top of the viewport once it is scrolled past. This page is
+   long — eight sections, a methods document among them — and a nav that
+   scrolls away is a nav that only works before you need it.
+
+   The site header is position:relative, not sticky, so top:0 is the right
+   offset. The z-index has to clear .mgdb-table thead th, which is itself
+   sticky at top:0 with no z-index of its own; without this the header row of
+   a long table paints over the nav as it scrolls under.
+   -------------------------------------------------------------------------- */
+
+.mgdb-uniformmu-page .um-section-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-uniformmu-page .um-section-nav a {
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  border-radius: var(--mgdb-radius-sm);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.mgdb-uniformmu-page .um-section-nav a:hover {
+  background: var(--mgdb-gold-soft);
+  text-decoration: underline;
+}
+
+/* Marks the section currently in view. Set by nothing today — the highlight is
+   a scroll-spy that IntersectionObserver would provide and that the dev
+   instance cannot be checked in — so the rule sits here unused rather than
+   shipping behaviour that cannot be verified. */
+.mgdb-uniformmu-page .um-section-nav a[aria-current="true"] {
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+}
+
+/* A jump link must not land its target underneath the sticky nav. */
+.mgdb-uniformmu-page > section[id] { scroll-margin-top: 4.5rem; }
+
+/* Sticky positioning inside a scroll container behaves differently, and on a
+   short viewport the bar would eat the screen. Below that height it scrolls
+   with the page like any other element. */
+@media (max-height: 34rem) {
+  .mgdb-uniformmu-page .um-section-nav { position: static; box-shadow: none; }
+}
+
+/* --------------------------------------------------------------------------
+   The lookup
+
+   One panel is visible at a time. They are toggled with the hidden attribute
+   rather than display:none in a class, so a panel that is not shown is also
+   out of the accessibility tree and out of the tab order — a hidden form whose
+   fields are still focusable is a keyboard trap that sighted users never see.
+   -------------------------------------------------------------------------- */
+
+.mgdb-uniformmu-page .um-finder { display: grid; gap: var(--mgdb-space-4); }
+
+.mgdb-uniformmu-page .um-modes { margin: 0; }
+
+.mgdb-uniformmu-page .um-mode-panel {
+  display: grid;
+  gap: var(--mgdb-space-3);
+  margin: 0;
+}
+
+.mgdb-uniformmu-page .um-mode-panel[hidden] { display: none; }
+
+/* An example is a real control, not a decorated span: clicking it fills the
+   field, so it has to be a button and has to look like one to a screen reader.
+   It is styled down to inline text because a row of buttons in a hint line
+   reads as a toolbar, which it is not. */
+.mgdb-uniformmu-page .um-example {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mgdb-burgundy);
+  font: inherit;
+  font-family: var(--mgdb-font-mono);
+  font-size: 0.95em;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.mgdb-uniformmu-page .um-example:hover { background: var(--mgdb-gold-soft); }
+
+.mgdb-uniformmu-page .um-region-row {
+  display: grid;
+  gap: var(--mgdb-space-3);
+  grid-template-columns: minmax(12rem, 1.4fr) minmax(7rem, 0.7fr) repeat(2, minmax(9rem, 1fr));
+  align-items: end;
+}
+
+@media (max-width: 48rem) {
+  .mgdb-uniformmu-page .um-region-row { grid-template-columns: 1fr 1fr; }
+}
+
+/* --------------------------------------------------------------------------
+   Results
+   -------------------------------------------------------------------------- */
+
+.mgdb-uniformmu-page .um-results { margin-top: var(--mgdb-space-5); }
+
+.mgdb-uniformmu-page .um-subject {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-left: 4px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-uniformmu-page .um-subject h3 {
+  margin: 0 0 var(--mgdb-space-1);
+  font-size: var(--mgdb-text-xl);
+}
+
+.mgdb-uniformmu-page .um-subject p { margin: 0; }
+
+.mgdb-uniformmu-page .um-subject-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+/* The insertion name and every coordinate are identifiers: a reader compares
+   them character by character and copies them into a terminal. Proportional
+   digits make that harder than it needs to be. */
+.mgdb-uniformmu-page .um-id {
+  font-family: var(--mgdb-font-mono);
+  font-size: 0.95em;
+  white-space: nowrap;
+}
+
+.mgdb-uniformmu-page .um-place { display: block; }
+.mgdb-uniformmu-page .um-place + .um-place { margin-top: var(--mgdb-space-2); }
+
+.mgdb-uniformmu-page .um-place-assembly {
+  display: inline-block;
+  min-width: 4.5rem;
+  font-weight: 600;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-uniformmu-page .um-links a { display: inline-block; }
+.mgdb-uniformmu-page .um-links a + a { margin-left: var(--mgdb-space-2); }
+
+.mgdb-uniformmu-page .um-none { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+
+/* --------------------------------------------------------------------------
+   The record chain
+   -------------------------------------------------------------------------- */
+
+.mgdb-uniformmu-page .um-chain {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--mgdb-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+
+.mgdb-uniformmu-page .um-chain > li { position: relative; }
+
+.mgdb-uniformmu-page .um-chain h3 { margin-top: var(--mgdb-space-2); }
+
+.mgdb-uniformmu-page .um-chain-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+  background: var(--mgdb-green-dark);
+  color: #fff;
+  font-weight: 700;
+  font-size: var(--mgdb-text-sm);
+}
+
+/* --------------------------------------------------------------------------
+   Assemblies, browsers, downloads
+   -------------------------------------------------------------------------- */
+
+/* The full assembly string under its short label. It is what appears in a GFF
+   and in the download filenames, so it has to be on the page somewhere, but it
+   is nine times the length of "B73 v5" and cannot lead the row. */
+.mgdb-uniformmu-page .um-assembly-name {
+  display: block;
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 400;
+  color: var(--mgdb-muted);
+}
+
+.mgdb-uniformmu-page .um-browsers { margin-top: var(--mgdb-space-4); }
+
+.mgdb-uniformmu-page .um-browser-card { text-decoration: none; }
+.mgdb-uniformmu-page .um-browser-card:hover { border-color: var(--mgdb-gold); }
+.mgdb-uniformmu-page .um-browser-card h3 { margin-top: 0; }
+
+/* --------------------------------------------------------------------------
+   Downloads
+
+   A table, not a list of links. The question a reader actually has is "which
+   of these is against v4?", and that is answered by reading one column down
+   rather than by parsing five sentences. The previous version rendered these
+   as a light two-line resource list, which was too faint to scan and hid the
+   assembly inside the label.
+   -------------------------------------------------------------------------- */
+
+.mgdb-uniformmu-page .um-download-group { margin-top: var(--mgdb-space-6); }
+
+.mgdb-uniformmu-page .um-download-group h3 {
+  margin-bottom: var(--mgdb-space-1);
+  padding-bottom: var(--mgdb-space-2);
+  border-bottom: 2px solid var(--mgdb-line);
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-uniformmu-page .um-download-note {
+  max-width: var(--mgdb-measure);
+  margin: var(--mgdb-space-2) 0 var(--mgdb-space-4);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-base);
+}
+
+/* The file name is the thing being clicked, so it carries the weight the row
+   used to spread evenly across four columns of grey. */
+.mgdb-uniformmu-page .um-download-link {
+  color: var(--mgdb-burgundy);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+}
+
+.mgdb-uniformmu-page .um-download-detail {
+  display: block;
+  max-width: 46ch;
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 400;
+  line-height: var(--mgdb-leading-snug);
+}
+
+/* The assembly is the field that most often goes wrong, so it is set in the
+   monospace face and given its own chip: it is an identifier, not prose. */
+.mgdb-uniformmu-page .um-download-assembly {
+  display: inline-block;
+  padding: 1px var(--mgdb-space-2);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-ink);
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xs);
+  white-space: nowrap;
+}
+
+.mgdb-uniformmu-page .um-download-format {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+.mgdb-uniformmu-page .um-download-table th[scope="row"] { width: 46%; }
+.mgdb-uniformmu-page .um-download-table tbody tr:hover { background: var(--mgdb-surface-alt); }
+
+/* --------------------------------------------------------------------------
+   Methods figures
+
+   The figures are 2011 raster scans at fixed pixel dimensions. They are capped
+   at their natural width so they are never upscaled into blur, and allowed to
+   shrink so they never force a horizontal scroll on a phone.
+   -------------------------------------------------------------------------- */
+
+.mgdb-uniformmu-page .um-figure-inline {
+  margin: var(--mgdb-space-4) 0;
+}
+
+.mgdb-uniformmu-page .um-figure-inline img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+}
+
+/* Every figure is a link to its own image file, so it enlarges with or without
+   scripting; the script only keeps the reader on the page. The cursor and the
+   hover border are what say so — a picture that is clickable and does not look
+   it is a picture nobody clicks. */
+.mgdb-uniformmu-page .um-zoom {
+  display: inline-block;
+  max-width: 100%;
+  cursor: zoom-in;
+  line-height: 0;
+}
+
+.mgdb-uniformmu-page .um-zoom img { transition: border-color .15s, box-shadow .15s; }
+
+.mgdb-uniformmu-page .um-zoom:hover img,
+.mgdb-uniformmu-page .um-zoom:focus-visible img {
+  border-color: var(--mgdb-gold-dark);
+  box-shadow: var(--mgdb-shadow);
+}
+
+.mgdb-uniformmu-page .um-figure-inline figcaption {
+  margin-top: var(--mgdb-space-2);
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-muted);
+}
+
+/* Figures 5 and 6 are wider than the prose measure and are unreadable inside
+   it. They are allowed the full column instead. */
+.mgdb-uniformmu-page .um-figure-wide { max-width: none; }
+
+.mgdb-uniformmu-page .um-figure-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--mgdb-space-4);
+  align-items: start;
+}
+
+.mgdb-uniformmu-page .um-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--mgdb-space-4);
+  margin: var(--mgdb-space-5) 0;
+}
+
+.mgdb-uniformmu-page .um-feature-grid h4 {
+  margin: 0 0 var(--mgdb-space-2);
+  font-size: var(--mgdb-text-lg);
+  color: var(--mgdb-green-dark);
+}
+
+/* --------------------------------------------------------------------------
+   Ordering and references
+   -------------------------------------------------------------------------- */
+
+.mgdb-uniformmu-page .um-order-card .mgdb-button { width: 100%; }
+.mgdb-uniformmu-page .um-order-card h3 + p { margin-top: var(--mgdb-space-2); }
+
+/* Citations use the same card as the reference data center and the cite page,
+   so a reference looks the same wherever it appears on the site. The rules are
+   duplicated rather than shared because mgdb-reference.css scopes every one of
+   them under .mgdb-reference-page. */
+
+.mgdb-uniformmu-page .um-reference-list { margin-top: var(--mgdb-space-4); }
+
+.mgdb-uniformmu-page .reference-result-card {
+  display: block;
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.mgdb-uniformmu-page .reference-result-card + .reference-result-card {
+  margin-top: var(--mgdb-space-3);
+}
+
+.mgdb-uniformmu-page .reference-result-card:hover {
+  border-color: var(--mgdb-gold-dark);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+/* The paper to cite for the resource itself. A gold spine, and the card also
+   carries a sentence saying so, because a colour is not a label. */
+.mgdb-uniformmu-page .reference-result-card.is-lead {
+  border-left: 5px solid var(--mgdb-gold);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-uniformmu-page .reference-result-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: center;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-uniformmu-page .reference-result-card h3 {
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-uniformmu-page .reference-result-card h3 a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.mgdb-uniformmu-page .reference-result-card h3 a:hover { color: var(--mgdb-leaf); }
+
+.mgdb-uniformmu-page .reference-result-authors {
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-uniformmu-page .reference-result-citation {
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-uniformmu-page .reference-result-note {
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-uniformmu-page .reference-result-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  align-items: center;
+  margin-top: var(--mgdb-space-3);
+}
+
+.mgdb-uniformmu-page .reference-result-links a {
+  color: var(--mgdb-burgundy);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.mgdb-uniformmu-page .reference-result-links a:hover { text-decoration: underline; }
+
+/* --------------------------------------------------------------------------
+   The insertions-per-gene table
+
+   Its first column holds "1", "2", … under a header six times their width.
+   Right-aligned — which is what .mgdb-numeric does — the digits sit against
+   the second column and the row reads as though it has a deep indent. The
+   values are labels for a bucket, not quantities to be compared down the
+   column, so they are left-aligned and the column is held narrow.
+   -------------------------------------------------------------------------- */
+
+.mgdb-uniformmu-page .um-bucket-col {
+  width: 14rem;
+  text-align: left;
+}
+
+/* --------------------------------------------------------------------------
+   Figure zoom overlay
+
+   Built by mgdb-uniformmu.js on first use, appended to <body>, so it is
+   outside .mgdb-uniformmu-page and cannot be scoped under it.
+   -------------------------------------------------------------------------- */
+
+.um-zoom-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99500;   /* above .mgdb-site-header, which sits at 99000 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--mgdb-space-5);
+  background: rgba(23, 32, 27, .82);
+  overflow: auto;
+}
+
+.um-zoom-overlay[hidden] { display: none; }
+
+/* Locks the page behind the overlay so a scroll gesture moves the figure, not
+   the document underneath it. */
+body.um-zoom-open { overflow: hidden; }
+
+.um-zoom-frame {
+  position: relative;
+  max-width: min(96vw, 1400px);
+  padding: var(--mgdb-space-5);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-lg);
+}
+
+.um-zoom-image {
+  display: block;
+  /* Scaled up from a 2011 raster, so smoothing is turned off: these are line
+     drawings and gel photographs, and crisp pixels read better than a blur. */
+  width: auto;
+  max-width: 100%;
+  max-height: 78vh;
+  height: auto;
+  margin-inline: auto;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+.um-zoom-caption {
+  max-width: 70ch;
+  margin: var(--mgdb-space-4) auto 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+  text-align: center;
+}
+
+.um-zoom-close {
+  position: absolute;
+  top: var(--mgdb-space-3);
+  right: var(--mgdb-space-3);
+  min-height: 36px;
+  padding: var(--mgdb-space-1) var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.um-zoom-close:hover { background: var(--mgdb-gold-soft); border-color: var(--mgdb-gold-dark); }
+
+@media (max-width: 40rem) {
+  .um-zoom-frame { padding: var(--mgdb-space-4); }
+  .um-zoom-close { position: static; display: block; margin: 0 0 var(--mgdb-space-3) auto; }
+}
