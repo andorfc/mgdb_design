@@ -1,0 +1,158 @@
+$$SYNTAX-LEVEL 2
+*(protein_structure-content {include-js: /js/protein_structure.js?v=20260812e | include-js: https\://unpkg.com/ngl@0.10.4/dist/ngl.js}
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@MaizeGDB" />
+<meta property="og:url" content="https://www.maizegdb.org/data_center/protein_structure" />
+<meta property="og:title" content="MaizeGDB Protein Structure Resource" />
+<meta property="og:description" content="Search, compare, and interact with predicted maize protein structures." />
+<meta property="og:image" content="https://www.maizegdb.org/images/protein_structure.png" />
+
+<main class="protein-structure-page">
+  <nav class="ps-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a> &rsaquo; <a href="/data_center">Data centers</a> &rsaquo; Protein structure</nav>
+
+  <header class="ps-hero">
+    <div class="ps-hero-icon-panel">
+      <img src="/images/protein_structure/protein-structure-icon.png" alt="Predicted maize protein structure" />
+      <div class="ps-hero-icon-title">Protein Structure<br />Data Center</div>
+    </div>
+    <div class="ps-hero-content">
+      <div class="ps-eyebrow">Maize Genetics and Genomics Database</div>
+      <h1>Explore maize proteins in 3D</h1>
+      <p>Search predicted structures, inspect model confidence, and compare structural evidence across species from one research workspace.</p>
+      <div class="ps-hero-actions">
+        <a class="ps-button ps-button-primary" href="#structure-viewers">View predicted structures</a>
+        <a class="ps-button ps-button-secondary" href="https://doi.org/10.1093/genetics/iyad016" target="_blank" rel="noopener">Read the resource paper &nearr;</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="ps-stats" aria-label="Resource highlights">
+    <div class="ps-stat"><strong>39,299</strong><span>AlphaFold maize protein models</span></div>
+    <div class="ps-stat"><strong>71,725</strong><span>ESMFold RefGen_v5 isoform models</span></div>
+    <div class="ps-stat"><strong>8 proteomes</strong><span>available for rapid structure comparison</span></div>
+  </section>
+
+  <section class="ps-section ps-complex-section" id="protein-complexes" aria-labelledby="complex-title">
+    <div class="ps-section-heading">
+      <div><span class="ps-eyebrow" style="color:#176b55">AlphaFold structure explorer</span><h2 id="complex-title">Explore predicted maize structures</h2></div>
+      <p>Enter a B73 RefGen_v5 gene model, locus name, gene symbol, or UniProt accession to discover available monomer, homodimer, and heterodimer predictions.</p>
+    </div>
+    <div class="ps-complex-summary" aria-label="Protein complex index summary">
+      <div><strong>33,604</strong><span>AlphaFold monomers</span></div><div><strong>4,302</strong><span>homodimer models</span></div><div><strong>3,089</strong><span>heterodimer models</span></div><div><strong>26,059</strong><span>mapped B73v5 genes</span></div>
+    </div>
+    <div class="ps-card ps-complex-workspace">
+      <form class="ps-complex-search" id="ps-complex-search-form" autocomplete="off">
+        <label for="ps-complex-search"><b>Find predicted structures for a gene</b><span>Searches model identifiers, B73v5 genes, symbols, locus names, and UniProt accessions.</span></label>
+        <div class="ps-complex-search-row"><span aria-hidden="true">⌕</span><input id="ps-complex-search" type="search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ps-complex-suggestions" placeholder="Try Zm00001eb168550, ADH2, wx1, or P04707" /><button type="submit">Find structures</button></div>
+        <div id="ps-complex-suggestions" class="ps-complex-suggestions" role="listbox" hidden></div>
+        <div class="ps-examples">Examples: <button type="button" data-complex-example="Zm00001eb168550">ADH2</button> · <button type="button" data-complex-example="P04707">UniProt P04707</button> · <button type="button" data-complex-example="Zm00001eb348450">ACT1</button> · <button type="button" data-complex-example="Zm00001eb099910">many partners</button></div>
+      </form>
+      <div id="ps-complex-results" class="ps-complex-results" aria-live="polite">
+        <div class="ps-complex-welcome"><span aria-hidden="true">A·A₂</span><div><strong>One search, every available assembly state</strong><p>The workspace reports whether a monomer, homodimer, or heterodimer is available and opens the selected AlphaFold model beside its predicted aligned-error map.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ps-section" aria-labelledby="compare-title">
+    <div class="ps-section-heading">
+      <div><span class="ps-eyebrow" style="color:#176b55">Compare</span><h2 id="compare-title">Find structural relatives</h2></div>
+      <p>Move from a maize identifier to homologous structures or compare agreement among sequence- and structure-based methods.</p>
+    </div>
+    <div class="ps-tool-grid">
+      <article class="ps-card ps-tool-card">
+        <div class="ps-tool-icon">FS</div>
+        <h3>Foldseek search</h3>
+        <p>Rapidly align a maize protein structure against Arabidopsis, soybean, rice, maize, human, yeast, fission yeast, and sorghum proteomes.</p>
+        <form class="ps-search-form" action="/foldseek" method="get">
+          <label for="foldseek_search"><b>Gene or protein identifier</b></label>
+          <div class="ps-search-row"><input class="ps-search-input" name="uniprot" id="foldseek_search" type="search" placeholder="e.g. Zm00001eb374230" /><button class="ps-search-button" type="submit">Search</button></div>
+          <div class="ps-examples">Try: <button type="button" data-example-target="foldseek_search" data-example-value="wx1">wx1</button> · <button type="button" data-example-target="foldseek_search" data-example-value="P16165">P16165</button></div>
+        </form>
+      </article>
+
+      <article class="ps-card ps-tool-card">
+        <div class="ps-tool-icon">FC</div>
+        <h3>FATCAT comparison</h3>
+        <p>Compare top ortholog candidates from DIAMOND, Foldseek, and FATCAT across four plant proteomes to assess support for a relationship.</p>
+        <form class="ps-search-form" action="/fatcat" method="get">
+          <label for="fatcat_search"><b>Gene or protein identifier</b></label>
+          <div class="ps-search-row"><input class="ps-search-input" name="uniprot" id="fatcat_search" type="search" placeholder="e.g. Zm00001eb374230" /><button class="ps-search-button" type="submit">Compare</button></div>
+          <div class="ps-examples">Try: <button type="button" data-example-target="fatcat_search" data-example-value="wx1">wx1</button> · <button type="button" data-example-target="fatcat_search" data-example-value="Zm00001d045055">Zm00001d045055</button></div>
+        </form>
+      </article>
+    </div>
+  </section>
+
+  <section class="ps-section" id="structure-viewers" aria-labelledby="models-title">
+    <div class="ps-section-heading">
+      <div><span class="ps-eyebrow" style="color:#176b55">Visualize</span><h2 id="models-title">Predicted protein structures</h2></div>
+      <p>Change the molecular representation and coloring, rotate automatically, reset the camera, enter fullscreen, or export a publication-ready image.</p>
+    </div>
+
+    <div class="ps-model-grid">
+      <article class="ps-card ps-model-card">
+        <div class="ps-model-header">
+          <span class="ps-model-badge">B73 RefGen_v4</span>
+          <h3>AlphaFold</h3>
+          <p>Predictions from EMBL-EBI and DeepMind, colored by per-residue pLDDT confidence.</p>
+          <div class="ps-confidence" aria-label="pLDDT confidence legend">
+            <span class="ps-conf-very-low">Very low<br />&lt; 50</span><span class="ps-conf-low">Low<br />50–70</span><span class="ps-conf-high">Confident<br />70–90</span><span class="ps-conf-very-high">Very high<br />&gt; 90</span>
+          </div>
+          <form class="ps-search-form" data-structure-search="alphafold_results">
+            <label for="alphafold_search"><b>Load an AlphaFold model</b></label>
+            <div class="ps-search-row"><input class="ps-search-input" id="alphafold_search" type="search" placeholder="Gene or UniProt ID" /><button class="ps-search-button" type="submit">Load</button></div>
+            <div class="ps-examples">Examples: <button type="button" data-example-target="alphafold_search" data-example-value="wx1">wx1</button> · <button type="button" data-example-target="alphafold_search" data-example-value="A0A1D6L5F6">A0A1D6L5F6</button></div>
+          </form>
+        </div>
+        <div id="alphafold_results" class="ps-results">
+          <div class="ps-viewer-shell">
+            <div class="ps-viewer-toolbar" aria-label="AlphaFold viewer controls">
+              <select class="ps-viewer-select" data-viewer-style aria-label="Molecular style"><option value="cartoon">Cartoon</option><option value="surface">Surface</option><option value="ball+stick">Ball and stick</option><option value="backbone">Backbone</option></select>
+              <select class="ps-viewer-select" data-viewer-color aria-label="Color scheme"><option value="confidence">Color: confidence</option><option value="chainname">Color: chain</option><option value="element">Color: element</option></select>
+              <button class="ps-viewer-button" type="button" data-viewer-spin>Auto-rotate</button><button class="ps-viewer-button" type="button" data-viewer-reset>Reset view</button>
+              <span class="ps-viewer-spacer"></span><button class="ps-viewer-button" type="button" data-viewer-image>Save PNG</button><a class="ps-viewer-button" data-viewer-download href="https://alphafold.ebi.ac.uk/files/AF-A0A1D6L5F6-F1-model_v6.pdb" download>Download PDB</a><button class="ps-viewer-button" type="button" data-viewer-fullscreen>Fullscreen</button>
+            </div>
+            <div id="viewport_alphafold" class="protein-viewer" data-structure-url="https://alphafold.ebi.ac.uk/files/AF-A0A1D6L5F6-F1-model_v6.pdb" data-structure-name="AF-A0A1D6L5F6-F1-model_v6"></div>
+            <div class="ps-viewer-status" data-viewer-status>Loading structure…</div>
+          </div>
+          <div class="ps-overview"><div class="ps-overview-item"><b>UniProt ID</b><a href="https://www.uniprot.org/uniprotkb/A0A1D6L5F6" target="_blank" rel="noopener">A0A1D6L5F6</a></div><div class="ps-overview-item"><b>Description</b>Nucleotide binding protein</div><div class="ps-overview-item"><b>B73 version 5</b><a href="/gene_center/gene/Zm00001eb057920">Zm00001eb057920</a></div><div class="ps-overview-item"><b>B73 version 4</b><a href="/gene_center/gene/Zm00001d034081">Zm00001d034081</a></div></div>
+          <div class="ps-genome"><h4>Genome context</h4><iframe title="AlphaFold genome context" loading="lazy" src="https://jbrowse.maizegdb.org/?loc=Zm00001eb057920&amp;tracks=gene_models_official%2Calphafold&amp;tracklist=0&amp;nav=0&amp;overview=0"></iframe></div>
+        </div>
+      </article>
+
+      <article class="ps-card ps-model-card">
+        <div class="ps-model-header">
+          <span class="ps-model-badge">B73 RefGen_v5</span>
+          <h3>ESMFold</h3>
+          <p>Meta AI predictions for official RefGen_v5 protein isoforms, with confidence encoded in the model.</p>
+          <div class="ps-confidence" aria-label="pLDDT confidence legend">
+            <span class="ps-conf-very-low">Very low<br />&lt; 50</span><span class="ps-conf-low">Low<br />50–70</span><span class="ps-conf-high">Confident<br />70–90</span><span class="ps-conf-very-high">Very high<br />&gt; 90</span>
+          </div>
+          <form class="ps-search-form" data-structure-search="esmfold_results">
+            <label for="esmfold_search"><b>Load an ESMFold model</b></label>
+            <div class="ps-search-row"><input class="ps-search-input" id="esmfold_search" type="search" placeholder="Gene or protein ID" /><button class="ps-search-button" type="submit">Load</button></div>
+            <div class="ps-examples">Examples: <button type="button" data-example-target="esmfold_search" data-example-value="wx1">wx1</button> · <button type="button" data-example-target="esmfold_search" data-example-value="Zm00001eb057920">Zm00001eb057920</button></div>
+          </form>
+        </div>
+        <div id="esmfold_results" class="ps-results">
+          <div class="ps-viewer-shell">
+            <div class="ps-viewer-toolbar" aria-label="ESMFold viewer controls">
+              <select class="ps-viewer-select" data-viewer-style aria-label="Molecular style"><option value="cartoon">Cartoon</option><option value="surface">Surface</option><option value="ball+stick">Ball and stick</option><option value="backbone">Backbone</option></select>
+              <select class="ps-viewer-select" data-viewer-color aria-label="Color scheme"><option value="confidence">Color: confidence</option><option value="chainname">Color: chain</option><option value="element">Color: element</option></select>
+              <button class="ps-viewer-button" type="button" data-viewer-spin>Auto-rotate</button><button class="ps-viewer-button" type="button" data-viewer-reset>Reset view</button>
+              <span class="ps-viewer-spacer"></span><button class="ps-viewer-button" type="button" data-viewer-image>Save PNG</button><a class="ps-viewer-button" data-viewer-download href="https://images.maizegdb.org/esm/b73/Zm00001eb057920_P002.pdb" download>Download PDB</a><button class="ps-viewer-button" type="button" data-viewer-fullscreen>Fullscreen</button>
+            </div>
+            <div id="viewport_esmfold" class="protein-viewer" data-structure-url="https://images.maizegdb.org/esm/b73/Zm00001eb057920_P002.pdb" data-structure-name="Zm00001eb057920_P002"></div>
+            <div class="ps-viewer-status" data-viewer-status>Loading structure…</div>
+          </div>
+          <div class="ps-overview"><div class="ps-overview-item"><b>Protein</b><a href="/gene_center/gene/Zm00001eb057920_P002">Zm00001eb057920_P002</a></div><div class="ps-overview-item"><b>Description</b>Nucleotide binding protein</div><div class="ps-overview-item"><b>B73 version 5</b><a href="/gene_center/gene/Zm00001eb057920">Zm00001eb057920</a></div><div class="ps-overview-item"><b>B73 version 4</b><a href="/gene_center/gene/Zm00001d034081">Zm00001d034081</a></div></div>
+          <div class="ps-genome"><h4>Genome context</h4><iframe title="ESMFold genome context" loading="lazy" src="https://jbrowse.maizegdb.org/?loc=Zm00001eb057920&amp;tracks=gene_models_official%2Cesmfold&amp;tracklist=0&amp;nav=0&amp;overview=0"></iframe></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <aside class="ps-note"><b>Interpreting predictions:</b> Model confidence is not experimental validation. Use low-confidence regions carefully and combine structure evidence with sequence, expression, and genetic data.</aside>
+</main>
+)

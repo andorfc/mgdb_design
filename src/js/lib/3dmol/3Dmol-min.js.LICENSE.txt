@@ -1,0 +1,27 @@
+3Dmol.js
+https://3dmol.csb.pitt.edu/
+https://github.com/3dmol/3Dmol.js
+
+Licensed under the BSD 3-Clause License.
+
+Cite: Nicholas Rego and David Koes, "3Dmol.js: molecular visualization with
+WebGL", Bioinformatics (2015) 31 (8): 1322-1324,
+https://doi.org/10.1093/bioinformatics/btu829
+
+--------------------------------------------------------------------------
+Why this file is vendored rather than fetched from a CDN
+--------------------------------------------------------------------------
+The page this replaces loaded NGL from unpkg.com on every request. That put a
+third party in the critical path of a MaizeGDB page — the viewer is broken
+whenever they are — and disclosed a request from every MaizeGDB reader to a
+host with no relationship to this project.
+
+The bundle is served from MaizeGDB instead. Bauplan appends ?v=filemtime() to
+the emitted src, so replacing this file busts the cache on its own; no path or
+version number has to be edited anywhere else.
+
+To upgrade: replace this file with a current 3Dmol build, keep the name, and
+check the viewer against a monomer, a homodimer and a heterodimer. The API
+surface used by js/mgdb-protein-structure.js is small and stable —
+createViewer, addModel, setStyle/addStyle, addSurface, removeAllSurfaces,
+setViewStyle, selectedAtoms, zoomTo, spin, resize, render, pngURI.

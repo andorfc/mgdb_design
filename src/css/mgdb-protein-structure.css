@@ -1,0 +1,783 @@
+/* ==========================================================================
+   /data_center/protein_structure — predicted structures and complexes
+   --------------------------------------------------------------------------
+   Everything here is scoped under .mgdb-modern, like every other page
+   stylesheet, so no legacy page can be reached by these rules. Layout,
+   typography, colour and state components come from mgdb-modern.css; this file
+   adds only what the structure workspace needs and cannot get from there.
+
+   The one place this page departs from the design system is inside the 3D
+   viewer, and deliberately. A molecular viewer is read as a lit object against
+   a dark ground — that is the convention in every structure tool the audience
+   already uses, and pLDDT's own palette (blue high, orange low) was designed
+   against it. Rendering the viewport on the page's cream surface would make
+   confident regions vanish. So the viewport and its two control rails carry a
+   dark local palette, declared once in .ps-viewer and used only there. The rest
+   of the page stays on the site tokens.
+
+   Contents
+     1.  Search and suggestions
+     2.  Result summary and assembly-state tabs
+     3.  Candidate list
+     4.  The viewer shell (dark, three panes plus strip)
+     5.  Viewer controls
+     6.  Metrics, partners and legends
+     7.  Predicted aligned error
+     8.  Reading and tool cards
+     9.  Responsive behaviour
+     10. Motion, forced colours, print
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Search and suggestions
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .ps-workspace { scroll-margin-top: var(--mgdb-space-5); }
+
+.mgdb-modern .ps-search { margin: 0 0 var(--mgdb-space-4); }
+
+.mgdb-modern .ps-search-row {
+  display: flex;
+  gap: var(--mgdb-space-3);
+  align-items: flex-start;
+  margin: var(--mgdb-space-2) 0 0;
+}
+
+/* The field owns the suggestion panel's positioning context. Without this the
+   panel anchors to the row and drifts under the submit button. */
+.mgdb-modern .ps-search-field { position: relative; flex: 1 1 auto; min-width: 0; }
+
+.mgdb-modern .ps-search-input { width: 100%; }
+
+.mgdb-modern .ps-search-submit { flex: 0 0 auto; }
+
+.mgdb-modern .ps-suggestions { width: 100%; }
+
+/* The count column on a suggestion row: how many of each assembly state that
+   protein has. Tabular figures so the columns line up down the list. */
+.mgdb-modern .ps-suggestion-counts {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: baseline;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.mgdb-modern .ps-suggestion-counts b {
+  color: var(--mgdb-ink);
+  font-weight: 700;
+}
+
+.mgdb-modern .ps-suggestion-counts .ps-zero { color: #8b948d; font-weight: 400; }
+
+.mgdb-modern .ps-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin: var(--mgdb-space-3) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-modern .ps-examples .mgdb-chip {
+  border: 1px solid var(--mgdb-line);
+  background: var(--mgdb-surface);
+  cursor: pointer;
+  font: inherit;
+}
+
+.mgdb-modern .ps-examples .mgdb-chip:hover {
+  border-color: var(--mgdb-green);
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-modern .ps-search-compact .ps-search-row > .mgdb-input { flex: 1 1 auto; min-width: 0; }
+
+/* --------------------------------------------------------------------------
+   2. Result summary and assembly-state tabs
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .ps-identity {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-left: 4px solid var(--mgdb-green);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-modern .ps-identity h3 {
+  margin: 0;
+  font-size: var(--mgdb-text-xl);
+  line-height: var(--mgdb-leading-tight);
+}
+
+.mgdb-modern .ps-identity-aliases {
+  margin: var(--mgdb-space-1) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  word-break: break-word;
+}
+
+.mgdb-modern .ps-identity-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+/* Assembly-state tabs. Real buttons in a tablist, not links: switching state
+   changes what is below without navigating. */
+.mgdb-modern .ps-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin: var(--mgdb-space-5) 0 var(--mgdb-space-4);
+  border-bottom: 2px solid var(--mgdb-line);
+}
+
+.mgdb-modern .ps-tab {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  min-height: var(--mgdb-tap-target);
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 0;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  background: none;
+  color: var(--mgdb-muted);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-modern .ps-tab:hover:not([disabled]) { color: var(--mgdb-green-dark); background: var(--mgdb-green-soft); }
+.mgdb-modern .ps-tab:focus-visible { outline: 3px solid var(--mgdb-focus); outline-offset: -3px; }
+
+.mgdb-modern .ps-tab[aria-selected="true"] {
+  border-bottom-color: var(--mgdb-green);
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-modern .ps-tab[disabled] { opacity: .5; cursor: not-allowed; }
+
+.mgdb-modern .ps-tab-count {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.mgdb-modern .ps-tab[aria-selected="true"] .ps-tab-count {
+  background: var(--mgdb-green);
+  color: #fff;
+}
+
+/* --------------------------------------------------------------------------
+   3. Candidate list
+
+   The list and the viewer sit side by side; the list scrolls independently so
+   a protein with 100 predicted partners does not push the structure off the
+   screen.
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .ps-browser {
+  display: grid;
+  grid-template-columns: minmax(240px, 19rem) minmax(0, 1fr);
+  gap: var(--mgdb-space-4);
+  align-items: start;
+}
+
+.mgdb-modern .ps-candidates {
+  max-height: 44rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-modern .ps-candidate {
+  display: block;
+  width: 100%;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 0;
+  border-bottom: 1px solid var(--mgdb-line-soft);
+  background: none;
+  color: var(--mgdb-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mgdb-modern .ps-candidate:last-child { border-bottom: 0; }
+.mgdb-modern .ps-candidate:hover { background: var(--mgdb-green-soft); }
+.mgdb-modern .ps-candidate:focus-visible { outline: 3px solid var(--mgdb-focus); outline-offset: -3px; }
+
+.mgdb-modern .ps-candidate[aria-current="true"] {
+  background: var(--mgdb-green-soft);
+  box-shadow: inset 4px 0 0 var(--mgdb-green-dark);
+}
+
+.mgdb-modern .ps-candidate-name {
+  display: block;
+  font-weight: 700;
+  word-break: break-word;
+}
+
+.mgdb-modern .ps-candidate-id {
+  display: block;
+  margin-top: 2px;
+  color: var(--mgdb-muted);
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-modern .ps-candidate-scores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-2);
+  font-size: var(--mgdb-text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.mgdb-modern .ps-score-pill {
+  padding: 1px 7px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-ink-soft);
+}
+
+/* Confidence banding. Paired with the numeric value in the label, never colour
+   alone — see the pill text, which always carries the score. */
+.mgdb-modern .ps-score-high { border-color: #7fb89c; background: var(--mgdb-status-ok-soft); color: var(--mgdb-status-ok); }
+.mgdb-modern .ps-score-mid  { border-color: #dcc189; background: var(--mgdb-status-warn-soft); color: var(--mgdb-status-warn); }
+.mgdb-modern .ps-score-low  { border-color: #e0a9a3; background: var(--mgdb-status-error-soft); color: var(--mgdb-status-error); }
+
+/* A model the export marked as not worth showing. It is still listed — hiding
+   it would misrepresent what was predicted — but it says so. */
+.mgdb-modern .ps-candidate-flag {
+  display: inline-block;
+  margin-top: var(--mgdb-space-2);
+  padding: 1px 7px;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.mgdb-modern .ps-truncation-note {
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-top: 1px solid var(--mgdb-line);
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* --------------------------------------------------------------------------
+   4. The viewer shell
+
+   Dark palette, local to this component. Declared on .ps-viewer so it cannot
+   leak: nothing outside the viewer inherits these.
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .ps-viewer {
+  --ps-bg: #0d1117;
+  --ps-panel: #161b22;
+  --ps-panel-2: #1c2333;
+  --ps-line: #2d3748;
+  --ps-text: #e6edf3;
+  --ps-text-dim: #9aa7b8;
+  --ps-accent: #4dd0e1;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 15rem;
+  grid-template-rows: auto minmax(22rem, 1fr) auto;
+  overflow: hidden;
+  border: 1px solid var(--ps-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--ps-bg);
+  color: var(--ps-text);
+}
+
+.mgdb-modern .ps-viewer-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  justify-content: space-between;
+  grid-column: 1 / -1;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-bottom: 1px solid var(--ps-line);
+  background: var(--ps-panel);
+}
+
+.mgdb-modern .ps-viewer-title { min-width: 0; }
+
+.mgdb-modern .ps-viewer-title strong {
+  display: block;
+  font-size: var(--mgdb-text-lg);
+  word-break: break-word;
+}
+
+.mgdb-modern .ps-viewer-title span {
+  display: block;
+  color: var(--ps-text-dim);
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-modern .ps-viewport {
+  position: relative;
+  grid-column: 1;
+  grid-row: 2;
+  min-height: 22rem;
+  background: #000;
+}
+
+/* 3Dmol appends an absolutely positioned canvas; the container must establish
+   the containing block or the canvas escapes the grid cell. */
+.mgdb-modern .ps-viewport canvas { display: block; }
+
+.mgdb-modern .ps-viewer-rail {
+  grid-column: 2;
+  grid-row: 2;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--mgdb-space-3);
+  border-left: 1px solid var(--ps-line);
+  background: var(--ps-panel);
+}
+
+.mgdb-modern .ps-strip-wrap {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4) var(--mgdb-space-2);
+  border-top: 1px solid var(--ps-line);
+  background: var(--ps-panel);
+}
+
+.mgdb-modern .ps-strip-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  justify-content: space-between;
+  color: var(--ps-text-dim);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-modern .ps-strip-head b { color: var(--ps-text); font-variant-numeric: tabular-nums; }
+
+.mgdb-modern .ps-strip-shell { position: relative; }
+
+.mgdb-modern .ps-strip {
+  display: block;
+  width: 100%;
+  height: 96px;
+  cursor: crosshair;
+}
+
+.mgdb-modern .ps-strip-tip {
+  position: absolute;
+  z-index: 5;
+  top: 4px;
+  padding: 3px 7px;
+  border: 1px solid var(--ps-accent);
+  border-radius: var(--mgdb-radius-sm);
+  background: rgba(0, 0, 0, .88);
+  color: #fff;
+  font-size: var(--mgdb-text-xs);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.mgdb-modern .ps-strip-tip[hidden] { display: none; }
+
+/* Overlays inside the viewport */
+.mgdb-modern .ps-hud {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  max-width: 60%;
+  color: #fff;
+  text-shadow: 0 1px 4px #000;
+  pointer-events: none;
+}
+
+.mgdb-modern .ps-hud b { display: block; font-size: var(--mgdb-text-base); }
+.mgdb-modern .ps-hud span { display: block; color: #b9c6d6; font-size: var(--mgdb-text-xs); }
+
+.mgdb-modern .ps-colorbar {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  padding: 7px 9px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: var(--mgdb-radius-sm);
+  background: rgba(0, 0, 0, .68);
+  font-size: var(--mgdb-text-xs);
+  pointer-events: none;
+}
+
+.mgdb-modern .ps-colorbar[hidden] { display: none; }
+.mgdb-modern .ps-colorbar-grad { height: 9px; width: 150px; border-radius: 3px; margin: 4px 0; }
+.mgdb-modern .ps-colorbar-ends { display: flex; justify-content: space-between; color: #b9c6d6; }
+
+.mgdb-modern .ps-viewer-status {
+  position: absolute;
+  bottom: 10px;
+  left: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, .72);
+  color: #d7e2ee;
+  font-size: var(--mgdb-text-xs);
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   5. Viewer controls
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .ps-viewer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-modern .ps-viewer-button {
+  min-height: 34px;
+  padding: 5px 11px;
+  border: 1px solid var(--ps-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--ps-panel-2);
+  color: var(--ps-text);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.mgdb-modern .ps-viewer-button:hover { border-color: var(--ps-accent); color: var(--ps-accent); }
+.mgdb-modern .ps-viewer-button:focus-visible { outline: 3px solid #7cc4ff; outline-offset: 1px; }
+
+.mgdb-modern .ps-viewer-button[aria-pressed="true"] {
+  border-color: var(--ps-accent);
+  background: var(--ps-accent);
+  color: #06232a;
+  font-weight: 700;
+}
+
+.mgdb-modern .ps-rail-group { margin: 0 0 var(--mgdb-space-4); }
+
+.mgdb-modern .ps-rail-group h4 {
+  margin: 0 0 var(--mgdb-space-2);
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--ps-line);
+  color: var(--ps-text-dim);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.mgdb-modern .ps-rail-label {
+  display: block;
+  margin: 0 0 4px;
+  color: var(--ps-text-dim);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-modern .ps-rail-select {
+  width: 100%;
+  min-height: 34px;
+  padding: 5px 8px;
+  border: 1px solid var(--ps-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--ps-panel-2);
+  color: var(--ps-text);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-modern .ps-rail-select:focus-visible { outline: 3px solid #7cc4ff; outline-offset: 1px; }
+
+.mgdb-modern .ps-rail-check {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin: var(--mgdb-space-2) 0;
+  color: var(--ps-text);
+  font-size: var(--mgdb-text-sm);
+  cursor: pointer;
+}
+
+.mgdb-modern .ps-rail-check input { width: 15px; height: 15px; accent-color: var(--ps-accent); cursor: pointer; }
+
+.mgdb-modern .ps-rail-range { width: 100%; accent-color: var(--ps-accent); }
+
+.mgdb-modern .ps-rail-hint {
+  margin: var(--mgdb-space-2) 0 0;
+  color: var(--ps-text-dim);
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading-snug);
+}
+
+/* Legend inside the dark rail */
+.mgdb-modern .ps-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px var(--mgdb-space-3);
+  margin: var(--mgdb-space-2) 0 0;
+}
+
+.mgdb-modern .ps-legend div {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  color: var(--ps-text-dim);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-modern .ps-legend i {
+  width: 11px;
+  height: 11px;
+  flex: 0 0 auto;
+  border: 1px solid rgba(0, 0, 0, .4);
+  border-radius: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   6. Metrics and partners — on the page ground, below the dark viewer
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .ps-model-detail { min-width: 0; }
+
+.mgdb-modern .ps-metric-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+  gap: var(--mgdb-space-3);
+  margin: var(--mgdb-space-4) 0;
+}
+
+.mgdb-modern .ps-metric {
+  padding: var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-modern .ps-metric dt {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.mgdb-modern .ps-metric dd {
+  margin: 2px 0 0;
+  font-size: var(--mgdb-text-2xl);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: var(--mgdb-leading-tight);
+}
+
+.mgdb-modern .ps-metric p {
+  margin: var(--mgdb-space-1) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-modern .ps-partners {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--mgdb-space-3);
+  margin: var(--mgdb-space-4) 0;
+}
+
+.mgdb-modern .ps-partner {
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+
+/* Chain badges use the same two colours the viewer paints the chains, so the
+   card and the 3D object agree. */
+.mgdb-modern .ps-chain {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  color: #10202e;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 800;
+}
+
+.mgdb-modern .ps-chain-a { background: #8fa6c4; }
+.mgdb-modern .ps-chain-b { background: #ff9f40; }
+
+.mgdb-modern .ps-partner h4 {
+  margin: var(--mgdb-space-2) 0 var(--mgdb-space-1);
+  font-size: var(--mgdb-text-lg);
+  word-break: break-word;
+}
+
+.mgdb-modern .ps-partner p { margin: 0; color: var(--mgdb-ink-soft); font-size: var(--mgdb-text-sm); }
+
+.mgdb-modern .ps-partner-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-3);
+}
+
+.mgdb-modern .ps-partner-links a { font-size: var(--mgdb-text-sm); }
+
+/* --------------------------------------------------------------------------
+   7. Predicted aligned error
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .ps-pae {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-2);
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-modern .ps-pae canvas {
+  width: 100%;
+  max-width: 22rem;
+  height: auto;
+  align-self: center;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  /* The matrix is one pixel per residue pair; smoothing it invents structure
+     that the prediction does not contain. */
+  image-rendering: pixelated;
+}
+
+.mgdb-modern .ps-pae-scale {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-modern .ps-pae-scale i {
+  flex: 1 1 auto;
+  height: 9px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #10403a, #2f7d6a, #7fb8a4, #d8ebe3, #fbf9f2);
+}
+
+/* Partner cards beside the aligned-error map, below the full-width viewer. The
+   PAE panel is a fixed-size square and the partner grid reflows, so the fixed
+   thing gets the narrow column. */
+.mgdb-modern .ps-visual-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 24rem);
+  gap: var(--mgdb-space-4);
+  align-items: start;
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-modern .ps-visual-grid .ps-partners { margin-top: 0; }
+
+/* --------------------------------------------------------------------------
+   8. Reading and tool cards
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .ps-reading-grid .mgdb-card h3 { margin-top: 0; }
+
+.mgdb-modern .ps-card-flag {
+  border-left: 4px solid var(--mgdb-gold);
+  background: var(--mgdb-gold-soft);
+}
+
+.mgdb-modern .ps-tool-card .ps-search-row { margin-top: var(--mgdb-space-3); }
+
+.mgdb-modern .ps-provenance-note { margin-top: var(--mgdb-space-3); }
+
+/* --------------------------------------------------------------------------
+   9. Responsive behaviour
+
+   Two collapses, at different widths and for different reasons. The candidate
+   list stops being a side rail first, because a 19rem column and a viewport
+   cannot both be usable below about 60rem. The viewer's own control rail goes
+   last, because losing it costs the reader the colour scheme control.
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 64rem) {
+  .mgdb-modern .ps-browser { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-modern .ps-candidates { max-height: 22rem; }
+  .mgdb-modern .ps-visual-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 48rem) {
+  .mgdb-modern .ps-viewer {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(18rem, 1fr) auto auto;
+  }
+  .mgdb-modern .ps-viewport { grid-column: 1; grid-row: 2; }
+  .mgdb-modern .ps-viewer-rail {
+    grid-column: 1;
+    grid-row: 3;
+    max-height: 20rem;
+    border-top: 1px solid var(--ps-line);
+    border-left: 0;
+  }
+  .mgdb-modern .ps-strip-wrap { grid-row: 4; }
+  .mgdb-modern .ps-search-row { flex-direction: column; align-items: stretch; }
+  .mgdb-modern .ps-hud { max-width: 80%; }
+}
+
+/* --------------------------------------------------------------------------
+   10. Motion, forced colours, print
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Auto-rotation is motion the reader did not ask for. The control stays —
+     it is opt-in — but it never starts on its own, and the JS checks the same
+     query before animating a camera move. */
+  .mgdb-modern .ps-viewer * { transition: none !important; animation: none !important; }
+}
+
+@media (forced-colors: active) {
+  .mgdb-modern .ps-viewer,
+  .mgdb-modern .ps-viewer-rail,
+  .mgdb-modern .ps-viewer-head { border: 1px solid CanvasText; }
+  .mgdb-modern .ps-tab[aria-selected="true"] { border-bottom-color: Highlight; }
+  .mgdb-modern .ps-candidate[aria-current="true"] { outline: 2px solid Highlight; }
+  .mgdb-modern .ps-score-pill { border-color: CanvasText; }
+}
+
+@media print {
+  /* The viewer is a WebGL canvas and prints as a black rectangle. Drop it and
+     keep the metrics, partners and scores, which are the part of a result
+     worth carrying onto paper. */
+  .mgdb-modern .ps-viewer,
+  .mgdb-modern .ps-suggestions,
+  .mgdb-modern .ps-examples,
+  .mgdb-modern .ps-search-submit { display: none !important; }
+  .mgdb-modern .ps-browser,
+  .mgdb-modern .ps-visual-grid { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-modern .ps-candidates { max-height: none; overflow: visible; }
+}
