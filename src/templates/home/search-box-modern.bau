@@ -3,6 +3,102 @@ $$SYNTAX-LEVEL 2
 {
   include-js: /js/mgdb-search.js
 }
+<!-- Icon sprite for the search categories. Defined once, referenced by the
+     category listbox and by the toggle, which swaps its `use` target as the
+     selection changes. Each glyph is stroked in currentColor so the chip
+     palette in css/mgdb-modern.css is the single place the colours live. -->
+<svg class="mgdb-search-sprite" aria-hidden="true" focusable="false" width="0" height="0">
+  <defs>
+    <g id="mgdb-cat-all">
+      <rect x="3.6" y="3.6" width="7.2" height="7.2" rx="1.6"/>
+      <circle cx="17" cy="7.2" r="3.6"/>
+      <circle cx="7.2" cy="17" r="3.6"/>
+      <rect x="13.2" y="13.2" width="7.2" height="7.2" rx="1.6"/>
+    </g>
+    <g id="mgdb-cat-gene">
+      <path d="M7.5 3c0 4.2 9 5.4 9 9s-9 4.8-9 9"/>
+      <path d="M16.5 3c0 4.2-9 5.4-9 9s9 4.8 9 9"/>
+      <path d="M8.6 6.2h6.8M7.4 9.4h9.2M7.4 14.6h9.2M8.6 17.8h6.8"/>
+    </g>
+    <g id="mgdb-cat-gene-model">
+      <path d="M2 12h20"/>
+      <rect x="3" y="8.4" width="4.6" height="7.2" rx="1.2"/>
+      <rect x="10" y="8.4" width="4" height="7.2" rx="1.2"/>
+      <rect x="16.4" y="8.4" width="4.6" height="7.2" rx="1.2"/>
+    </g>
+    <g id="mgdb-cat-genome">
+      <rect x="2.6" y="4.4" width="18.8" height="4" rx="2"/>
+      <rect x="2.6" y="10" width="14.4" height="4" rx="2"/>
+      <rect x="2.6" y="15.6" width="18.8" height="4" rx="2"/>
+      <path d="M9.4 4.4v4M13.8 10v4M8 15.6v4"/>
+    </g>
+    <g id="mgdb-cat-locus">
+      <path d="M12 3v2.6"/>
+      <path d="M12 9.2l-2.9-3.4h5.8z" fill="currentColor"/>
+      <rect x="2.4" y="10.4" width="19.2" height="6.2" rx="3.1"/>
+      <rect x="10.7" y="10.4" width="2.6" height="6.2" fill="currentColor"/>
+    </g>
+    <g id="mgdb-cat-marker">
+      <path d="M12 21.4c0 0 6.4-6.9 6.4-11a6.4 6.4 0 1 0-12.8 0c0 4.1 6.4 11 6.4 11z"/>
+      <circle cx="12" cy="10.2" r="2.4" fill="currentColor"/>
+    </g>
+    <g id="mgdb-cat-qtl">
+      <path d="M3.4 3v17.6h17.2"/>
+      <path d="M5.6 18c2 0 2.4-2.2 3.8-2.2s1.8-9 3.8-9 2.2 8 3.6 8 1.4-3 2.8-3" stroke-linejoin="round"/>
+      <path d="M4.6 11.2h16.2" stroke-dasharray="2.4 2.6" opacity=".8"/>
+    </g>
+    <g id="mgdb-cat-stock">
+      <path d="M12 2.6c3.3 0 5.2 3.6 5.2 8.4s-1.9 10.4-5.2 10.4-5.2-5.6-5.2-10.4S8.7 2.6 12 2.6z"/>
+      <path d="M9 8.2h6M8.6 12h6.8M9 15.8h6"/>
+      <path d="M17.2 8.6c2.6-1 4.2-3 4.6-5.6-2.7.2-4.7 1.5-5.6 3.6"/>
+    </g>
+    <g id="mgdb-cat-reference">
+      <path d="M12 6.6s-2.4-2-8.4-2v13c6 0 8.4 2 8.4 2s2.4-2 8.4-2v-13c-6 0-8.4 2-8.4 2z" stroke-linejoin="round"/>
+      <path d="M12 6.6v13"/>
+    </g>
+    <g id="mgdb-cat-trait">
+      <path d="M3.6 10.8V4.6a1 1 0 0 1 1-1h6.2c.5 0 1 .2 1.4.6l8 8a2 2 0 0 1 0 2.8l-5.6 5.6a2 2 0 0 1-2.8 0l-8-8a2 2 0 0 1-.6-1.4z" stroke-linejoin="round"/>
+      <circle cx="7.6" cy="7.6" r="1.5" fill="currentColor"/>
+    </g>
+    <g id="mgdb-cat-phenotype">
+      <path d="M20.8 3.4C11.2 2.8 4 7.4 4 14.4c0 2.6 1 4.8 2.5 6.2C13.2 20 18.8 14.9 20.8 3.4z" stroke-linejoin="round"/>
+      <path d="M6.5 20.6C9.2 14 13.8 9.4 19.2 6.6"/>
+      <circle cx="13.4" cy="9.8" r="1.5" fill="currentColor"/>
+    </g>
+    <g id="mgdb-cat-variation">
+      <rect x="2.4" y="4.6" width="4.2" height="5.2" rx="1.2"/>
+      <rect x="7.3" y="4.6" width="4.2" height="5.2" rx="1.2"/>
+      <rect x="12.2" y="4.6" width="4.2" height="5.2" rx="1.2"/>
+      <rect x="17.1" y="4.6" width="4.2" height="5.2" rx="1.2"/>
+      <rect x="2.4" y="14.2" width="4.2" height="5.2" rx="1.2"/>
+      <rect x="7.3" y="14.2" width="4.2" height="5.2" rx="1.2"/>
+      <rect x="12.2" y="14.2" width="4.2" height="5.2" rx="1.2" fill="currentColor"/>
+      <rect x="17.1" y="14.2" width="4.2" height="5.2" rx="1.2"/>
+    </g>
+    <g id="mgdb-cat-map">
+      <path d="M2.6 6.4l6-2.6v13.8l-6 2.6z" stroke-linejoin="round"/>
+      <path d="M8.6 3.8l6.8 2.6v13.8L8.6 17.6z" stroke-linejoin="round"/>
+      <path d="M15.4 6.4l6-2.6v13.8l-6 2.6z" stroke-linejoin="round"/>
+    </g>
+    <g id="mgdb-cat-person">
+      <circle cx="9.4" cy="7.8" r="3.4"/>
+      <path d="M3 20.4c0-3.5 2.9-5.8 6.4-5.8s6.4 2.3 6.4 5.8"/>
+      <circle cx="17.6" cy="9.4" r="2.4"/>
+      <path d="M16.4 14.9c2.8-.5 5 1.6 5 5.5"/>
+    </g>
+    <g id="mgdb-cat-id">
+      <path d="M9.4 3.4L7.4 20.6M17 3.4l-2 17.2M3.6 9h16.6M2.8 15.2h16.6"/>
+    </g>
+    <g id="mgdb-cat-page">
+      <rect x="2.6" y="4" width="18.8" height="16" rx="2.6"/>
+      <path d="M2.6 9h18.8"/>
+      <circle cx="5.8" cy="6.5" r=".9" fill="currentColor"/>
+      <circle cx="8.6" cy="6.5" r=".9" fill="currentColor"/>
+      <path d="M6 12.8h9.4M6 16.4h6.2"/>
+    </g>
+  </defs>
+</svg>
+
 <form id="global_search_form" class="mgdb-search-form" method="POST" action="/search_engine/searchall" role="search">
   <input type="hidden" id="global_search_source" name="global_search_source" value="search_box">
 
@@ -29,6 +125,9 @@ $$SYNTAX-LEVEL 2
       </select>
 
       <button class="mgdb-search-category-button" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="mgdb-search-menu">
+        <span class="mgdb-search-icon" data-search-category-icon data-cat="anything" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false"><use href="#mgdb-cat-all"></use></svg>
+        </span>
         <span class="mgdb-search-category-label">
           <span class="mgdb-visually-hidden">Search category: </span><span data-search-category-label>All data</span>
         </span>
@@ -36,22 +135,22 @@ $$SYNTAX-LEVEL 2
       </button>
 
       <div id="mgdb-search-menu" class="mgdb-search-menu" role="listbox" aria-label="Search category" hidden>
-        <button type="button" role="option" aria-selected="true"  data-value="anything"><strong>All data</strong></button>
-        <button type="button" role="option" aria-selected="false" data-value="gene_product"><strong>Genes</strong></button>
-        <button type="button" role="option" aria-selected="false" data-value="gene_model"><strong>Gene models</strong></button>
-        <button type="button" role="option" aria-selected="false" data-value="genome"><strong>Genomes</strong></button>
-        <button type="button" role="option" aria-selected="false" data-value="locus"><strong>Loci</strong></button>
-        <button type="button" role="option" aria-selected="false" data-value="probe"><strong>Markers</strong></button>
-        <button type="button" role="option" aria-selected="false" data-value="qtl_exp"><strong>QTL experiments</strong></button>
-        <button type="button" role="option" aria-selected="false" data-value="stock"><strong>Stocks</strong></button>
-        <button type="button" role="option" aria-selected="false" data-value="reference"><strong>References</strong></button>
-        <button type="button" role="option" aria-selected="false" data-value="term"><strong>Traits</strong></button>
-        <button type="button" role="option" aria-selected="false" data-value="phenotype"><strong>Phenotypes / mutants</strong></button>
-        <button type="button" role="option" aria-selected="false" data-value="variation"><strong>Variations / alleles</strong></button>
-        <button type="button" role="option" aria-selected="false" data-value="map"><strong>Maps</strong></button>
-        <button type="button" role="option" aria-selected="false" data-value="person"><strong>People / organizations</strong></button>
-        <button type="button" role="option" aria-selected="false" data-value="id"><strong>MaizeGDB ID</strong></button>
-        <button type="button" role="option" aria-selected="false" data-value="goog"><strong>Static web pages</strong></button>
+        <button type="button" role="option" aria-selected="true"  data-value="anything" data-label="All data"><span class="mgdb-search-icon" data-cat="anything" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mgdb-cat-all"></use></svg></span><strong>All data</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
+        <button type="button" role="option" aria-selected="false" data-value="gene_product" data-label="Genes"><span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mgdb-cat-gene"></use></svg></span><strong>Genes</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
+        <button type="button" role="option" aria-selected="false" data-value="gene_model" data-label="Gene models"><span class="mgdb-search-icon" data-cat="gene_model" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mgdb-cat-gene-model"></use></svg></span><strong>Gene models</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
+        <button type="button" role="option" aria-selected="false" data-value="genome" data-label="Genomes"><span class="mgdb-search-icon" data-cat="genome" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mgdb-cat-genome"></use></svg></span><strong>Genomes</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
+        <button type="button" role="option" aria-selected="false" data-value="locus" data-label="Loci"><span class="mgdb-search-icon" data-cat="locus" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mgdb-cat-locus"></use></svg></span><strong>Loci</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
+        <button type="button" role="option" aria-selected="false" data-value="probe" data-label="Markers"><span class="mgdb-search-icon" data-cat="probe" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mgdb-cat-marker"></use></svg></span><strong>Markers</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
+        <button type="button" role="option" aria-selected="false" data-value="qtl_exp" data-label="QTL experiments"><span class="mgdb-search-icon" data-cat="qtl_exp" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mgdb-cat-qtl"></use></svg></span><strong>QTL experiments</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
+        <button type="button" role="option" aria-selected="false" data-value="stock" data-label="Stocks"><span class="mgdb-search-icon" data-cat="stock" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mgdb-cat-stock"></use></svg></span><strong>Stocks</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
+        <button type="button" role="option" aria-selected="false" data-value="reference" data-label="References"><span class="mgdb-search-icon" data-cat="reference" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mgdb-cat-reference"></use></svg></span><strong>References</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
+        <button type="button" role="option" aria-selected="false" data-value="term" data-label="Traits"><span class="mgdb-search-icon" data-cat="term" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mgdb-cat-trait"></use></svg></span><strong>Traits</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
+        <button type="button" role="option" aria-selected="false" data-value="phenotype" data-label="Phenotypes / mutants"><span class="mgdb-search-icon" data-cat="phenotype" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mgdb-cat-phenotype"></use></svg></span><strong>Phenotypes / mutants</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
+        <button type="button" role="option" aria-selected="false" data-value="variation" data-label="Variations / alleles"><span class="mgdb-search-icon" data-cat="variation" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mgdb-cat-variation"></use></svg></span><strong>Variations / alleles</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
+        <button type="button" role="option" aria-selected="false" data-value="map" data-label="Maps"><span class="mgdb-search-icon" data-cat="map" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mgdb-cat-map"></use></svg></span><strong>Maps</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
+        <button type="button" role="option" aria-selected="false" data-value="person" data-label="People / organizations"><span class="mgdb-search-icon" data-cat="person" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mgdb-cat-person"></use></svg></span><strong>People / organizations</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
+        <button type="button" role="option" aria-selected="false" data-value="id" data-label="MaizeGDB ID"><span class="mgdb-search-icon" data-cat="id" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mgdb-cat-id"></use></svg></span><strong>MaizeGDB ID</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
+        <button type="button" role="option" aria-selected="false" data-value="goog" data-label="Static web pages"><span class="mgdb-search-icon" data-cat="goog" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mgdb-cat-page"></use></svg></span><strong>Static web pages</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
       </div>
     </div>
 

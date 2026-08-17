@@ -113,6 +113,10 @@
   --mgdb-page-blue: #0641a5;   /* the original MaizeGDB page ground */
   --mgdb-gutter: var(--mgdb-space-5);
   --mgdb-tap-target: 44px;      /* WCAG 2.5.8 minimum */
+
+  /* Header search — one height drives the shell, the category control, the
+     field, and the submit button, so they cannot drift apart. */
+  --mgdb-search-height: 56px;
 }
 
 /* --------------------------------------------------------------------------
@@ -533,14 +537,20 @@ body.mgdb-modern {
 
 .mgdb-search-form { position: relative; margin: 0; }
 
+/* The sprite is only a definition store; it must not take up layout. */
+.mgdb-search-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+
 .mgdb-search-shell {
   display: grid;
-  grid-template-columns: minmax(9rem, 12rem) minmax(0, 1fr) 3.25rem;
+  grid-template-columns: minmax(11rem, 13.5rem) minmax(0, 1fr) var(--mgdb-search-height);
   align-items: stretch;
-  height: 48px;
-  border-radius: var(--mgdb-radius);
+  height: var(--mgdb-search-height);
+  border-radius: var(--mgdb-radius-lg);
   background: var(--mgdb-surface);
-  box-shadow: 0 6px 16px rgba(9, 30, 14, .28);
+  /* The hairline ring is drawn as a shadow rather than a border: the chrome
+     sits outside .mgdb-page, so it does not inherit border-box sizing and a
+     real border would push the shell past its column. */
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, .85), 0 8px 20px rgba(9, 30, 14, .3);
 }
 
 .mgdb-search-category { position: relative; min-width: 0; }
@@ -548,12 +558,13 @@ body.mgdb-modern {
 /* The native select stays in the DOM and is what submits; it is only hidden
    once the scripted listbox is ready, so the form still works without JS. */
 .mgdb-search-native {
+  box-sizing: border-box;
   width: 100%;
-  height: 48px;
+  height: var(--mgdb-search-height);
   padding: 0 var(--mgdb-space-3);
   border: 0;
   border-right: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius) 0 0 var(--mgdb-radius);
+  border-radius: var(--mgdb-radius-lg) 0 0 var(--mgdb-radius-lg);
   background: var(--mgdb-surface-alt);
   color: var(--mgdb-ink);
   font-family: inherit;
@@ -570,15 +581,16 @@ body.mgdb-modern {
 }
 
 .mgdb-search-category-button {
+  box-sizing: border-box;
   display: none;
   width: 100%;
-  height: 48px;
+  height: var(--mgdb-search-height);
   gap: var(--mgdb-space-2);
   align-items: center;
   padding: 0 var(--mgdb-space-3);
   border: 0;
   border-right: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius) 0 0 var(--mgdb-radius);
+  border-radius: var(--mgdb-radius-lg) 0 0 var(--mgdb-radius-lg);
   background: var(--mgdb-surface-alt);
   color: var(--mgdb-ink);
   font-family: inherit;
@@ -599,6 +611,57 @@ body.mgdb-modern {
   white-space: nowrap;
 }
 
+/* Category icons ---------------------------------------------------------
+
+   One chip style, tinted per data type. Colour is decoration only: every row
+   carries its label, and the glyph shapes differ from one another, so nothing
+   is conveyed by hue alone. Each ink is at least 4.5:1 on white and so clears
+   the 3:1 that WCAG 1.4.11 asks of a graphic against its chip.
+   ------------------------------------------------------------------------ */
+
+.mgdb-search-icon {
+  box-sizing: border-box;
+  display: grid;
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--mgdb-cat-soft, var(--mgdb-green-soft));
+  color: var(--mgdb-cat-ink, var(--mgdb-green));
+}
+
+.mgdb-search-icon svg {
+  display: block;
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+}
+
+.mgdb-search-icon[data-cat="anything"]     { --mgdb-cat-ink: #285d46; --mgdb-cat-soft: #d7ebe0; }
+.mgdb-search-icon[data-cat="gene_product"] { --mgdb-cat-ink: #0f6b7c; --mgdb-cat-soft: #cdecf2; }
+.mgdb-search-icon[data-cat="gene_model"]   { --mgdb-cat-ink: #2159a5; --mgdb-cat-soft: #d8e6fa; }
+.mgdb-search-icon[data-cat="genome"]       { --mgdb-cat-ink: #4a45ad; --mgdb-cat-soft: #dedcf8; }
+.mgdb-search-icon[data-cat="locus"]        { --mgdb-cat-ink: #6f3ba3; --mgdb-cat-soft: #e8dbf8; }
+.mgdb-search-icon[data-cat="probe"]        { --mgdb-cat-ink: #0e6a5e; --mgdb-cat-soft: #cdeae3; }
+.mgdb-search-icon[data-cat="qtl_exp"]      { --mgdb-cat-ink: #a52a63; --mgdb-cat-soft: #fad6e6; }
+.mgdb-search-icon[data-cat="stock"]        { --mgdb-cat-ink: #8a5a0f; --mgdb-cat-soft: #fbe6bd; }
+.mgdb-search-icon[data-cat="reference"]    { --mgdb-cat-ink: #7a2c43; --mgdb-cat-soft: #f6d8e0; }
+.mgdb-search-icon[data-cat="term"]         { --mgdb-cat-ink: #4c7038; --mgdb-cat-soft: #e1eed2; }
+.mgdb-search-icon[data-cat="phenotype"]    { --mgdb-cat-ink: #1c6b45; --mgdb-cat-soft: #d2ecdd; }
+.mgdb-search-icon[data-cat="variation"]    { --mgdb-cat-ink: #b32b21; --mgdb-cat-soft: #fad7d2; }
+.mgdb-search-icon[data-cat="map"]          { --mgdb-cat-ink: #9a4b12; --mgdb-cat-soft: #fbdec8; }
+.mgdb-search-icon[data-cat="person"]       { --mgdb-cat-ink: #7a5230; --mgdb-cat-soft: #efdfcb; }
+.mgdb-search-icon[data-cat="id"]           { --mgdb-cat-ink: #40596b; --mgdb-cat-soft: #dbe5ec; }
+.mgdb-search-icon[data-cat="goog"]         { --mgdb-cat-ink: #55605a; --mgdb-cat-soft: #dfe5e1; }
+
+/* On the toggle the chip sits on the panel fill, so it gets a white ground to
+   lift it away from that; in the menu the tint does the lifting. */
+.mgdb-search-category-button .mgdb-search-icon { box-shadow: inset 0 0 0 1px rgba(31, 39, 35, .07); }
+
 .mgdb-search-chevron {
   width: 8px;
   height: 8px;
@@ -611,11 +674,12 @@ body.mgdb-modern {
 .mgdb-search-category.is-open .mgdb-search-chevron { transform: translateY(2px) rotate(225deg); }
 
 .mgdb-search-menu {
+  box-sizing: border-box;
   position: absolute;
   z-index: 30;
   top: calc(100% + 6px);
   left: 0;
-  width: max(100%, 15rem);
+  width: max(100%, 17.5rem);
   max-height: 60vh;
   overflow-y: auto;
   padding: var(--mgdb-space-1);
@@ -628,11 +692,14 @@ body.mgdb-modern {
 .mgdb-search-menu[hidden] { display: none !important; }
 
 .mgdb-search-menu button {
-  display: flex;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) 18px;
+  gap: var(--mgdb-space-3);
   width: 100%;
-  min-height: 38px;
+  min-height: var(--mgdb-tap-target);
   align-items: center;
-  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  padding: var(--mgdb-space-1) var(--mgdb-space-2);
   border: 0;
   border-radius: var(--mgdb-radius-sm);
   background: none;
@@ -643,7 +710,14 @@ body.mgdb-modern {
   cursor: pointer;
 }
 
-.mgdb-search-menu button strong { font-weight: 600; }
+.mgdb-search-menu button strong {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .mgdb-search-menu button:hover,
 .mgdb-search-menu button:focus-visible { outline: none; background: var(--mgdb-green-soft); }
 
@@ -653,14 +727,27 @@ body.mgdb-modern {
 }
 
 .mgdb-search-menu button[aria-selected="true"] strong { font-weight: 800; }
-/* A check marks the current category, so selection is not colour-only. */
-.mgdb-search-menu button[aria-selected="true"]::after { margin-left: auto; content: "\2713"; font-weight: 900; }
+
+/* A check marks the current category, so selection is not colour-only. The
+   element is always in the row and only made visible when selected, so the
+   label column does not shift as the selection moves. */
+.mgdb-search-check {
+  visibility: hidden;
+  color: var(--mgdb-green-dark);
+  font-style: normal;
+  font-weight: 900;
+  text-align: center;
+}
+
+.mgdb-search-check::before { content: "\2713"; }
+.mgdb-search-menu button[aria-selected="true"] .mgdb-search-check { visibility: visible; }
 
 .mgdb-search-query { min-width: 0; }
 
 .mgdb-search-input {
+  box-sizing: border-box;
   width: 100%;
-  height: 48px;
+  height: var(--mgdb-search-height);
   padding: 0 var(--mgdb-space-4);
   border: 0;
   background: transparent;
@@ -675,12 +762,13 @@ body.mgdb-modern {
 .mgdb-search-input::-webkit-search-cancel-button { cursor: pointer; }
 
 .mgdb-search-submit {
+  box-sizing: border-box;
   display: grid;
-  width: 3.25rem;
-  height: 48px;
+  width: var(--mgdb-search-height);
+  height: var(--mgdb-search-height);
   place-items: center;
   border: 0;
-  border-radius: 0 var(--mgdb-radius) var(--mgdb-radius) 0;
+  border-radius: 0 var(--mgdb-radius-lg) var(--mgdb-radius-lg) 0;
   background: var(--mgdb-green-dark);
   cursor: pointer;
 }
@@ -752,9 +840,10 @@ body.mgdb-modern {
 
 .mgdb-suggestions-count { color: var(--mgdb-muted); font-weight: 600; }
 
+/* Flex rather than a fixed grid: a row carries a leading data-type icon when
+   the record has one and only two children when it does not. */
 .mgdb-suggestion {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: flex;
   gap: var(--mgdb-space-3);
   align-items: center;
   padding: var(--mgdb-space-3) var(--mgdb-space-4);
@@ -775,7 +864,7 @@ body.mgdb-modern {
 .mgdb-suggestion[aria-selected="true"] { background: var(--mgdb-green-soft); }
 .mgdb-suggestion[aria-selected="true"] { box-shadow: inset 3px 0 0 var(--mgdb-green-dark); }
 
-.mgdb-suggestion-copy { min-width: 0; }
+.mgdb-suggestion-copy { flex: 1 1 auto; min-width: 0; }
 .mgdb-suggestion-copy strong { display: block; font-size: var(--mgdb-text-base); font-weight: 700; }
 .mgdb-suggestion-copy small {
   display: block;
@@ -812,7 +901,13 @@ body.mgdb-modern {
 }
 
 .mgdb-suggestion-recent { width: 100%; border: 0; border-bottom: 1px solid var(--mgdb-line-soft); }
-.mgdb-suggestion-recent small { display: block; margin-top: 2px; color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+.mgdb-suggestion-recent strong { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mgdb-suggestion-recent small { flex: 0 0 auto; color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+
+/* The chip is a touch smaller in a result row than in the category control, so
+   the record label stays the loudest thing in the row. */
+.mgdb-suggestion .mgdb-search-icon { width: 28px; height: 28px; border-radius: 8px; }
+.mgdb-suggestion .mgdb-search-icon svg { width: 17px; height: 17px; }
 
 .mgdb-suggestions-message {
   display: flex;
@@ -920,7 +1015,7 @@ body.mgdb-modern {
   /* Stack the shell so the category control and the field each get full width
      rather than squeezing to unusable widths. */
   .mgdb-search-shell {
-    grid-template-columns: minmax(0, 1fr) 3.25rem;
+    grid-template-columns: minmax(0, 1fr) var(--mgdb-search-height);
     height: auto;
   }
   .mgdb-search-category { grid-column: 1 / -1; }
@@ -928,9 +1023,9 @@ body.mgdb-modern {
   .mgdb-search-category-button {
     border-right: 0;
     border-bottom: 1px solid var(--mgdb-line);
-    border-radius: var(--mgdb-radius) var(--mgdb-radius) 0 0;
+    border-radius: var(--mgdb-radius-lg) var(--mgdb-radius-lg) 0 0;
   }
-  .mgdb-search-submit { border-radius: 0 0 var(--mgdb-radius) 0; }
+  .mgdb-search-submit { border-radius: 0 0 var(--mgdb-radius-lg) 0; }
   .mgdb-site-footer-inner { justify-content: center; text-align: center; }
 }
 

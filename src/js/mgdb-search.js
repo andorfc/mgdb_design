@@ -4,8 +4,10 @@
    Two behaviours over the search form:
 
      1. Category listbox — replaces the native <select> with a styled listbox
-        that matches the search shell. The native select stays in the DOM and
-        remains the submitted value, so the form works with JavaScript off.
+        that matches the search shell. Each row carries the data type's icon,
+        and the toggle mirrors the icon of the chosen row. The native select
+        stays in the DOM and remains the submitted value, so the form works
+        with JavaScript off.
 
      2. Suggestions — debounced, cancellable autocomplete against
         /search_engine/autocomplete, following the ARIA combobox pattern.
@@ -33,8 +35,45 @@
   var RECENT_KEY = 'maizegdb_recent_searches_v1';
   var RECENT_MAX = 6;
 
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+
   function reducedMotion() {
     return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  /* ------------------------------------------------------------------------
+     Data-type icons
+
+     The category listbox already carries one chip per data type, so the sprite
+     targets are read back out of it rather than duplicated here. A record whose
+     type has no row in the listbox simply gets no icon.
+     ------------------------------------------------------------------------ */
+
+  function readIconIndex(form) {
+    var index = {};
+    var rows = form.querySelectorAll('#mgdb-search-menu [role="option"]');
+    Array.prototype.forEach.call(rows, function (row) {
+      var use = row.querySelector('use');
+      var value = row.getAttribute('data-value');
+      if (use && value) { index[value] = use.getAttribute('href'); }
+    });
+    return index;
+  }
+
+  function buildIcon(index, cat) {
+    if (!cat || !index[cat]) { return null; }
+    var chip = document.createElement('span');
+    chip.className = 'mgdb-search-icon';
+    chip.setAttribute('data-cat', cat);
+    chip.setAttribute('aria-hidden', 'true');
+    var svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('focusable', 'false');
+    var use = document.createElementNS(SVG_NS, 'use');
+    use.setAttribute('href', index[cat]);
+    svg.appendChild(use);
+    chip.appendChild(svg);
+    return chip;
   }
 
   /* ------------------------------------------------------------------------
@@ -49,6 +88,7 @@
     var toggle = root.querySelector('.mgdb-search-category-button');
     var menu = root.querySelector('.mgdb-search-menu');
     var label = root.querySelector('[data-search-category-label]');
+    var icon = root.querySelector('[data-search-category-icon]');
     var options = menu ? Array.prototype.slice.call(menu.querySelectorAll('[role="option"]')) : [];
     if (!select || !toggle || !menu || !label || !options.length) { return null; }
 
@@ -59,10 +99,24 @@
       return options[0];
     }
 
+    /* The toggle shows the chosen category's icon. Rather than keep a second
+       copy of the sprite map in script, it retargets its own <use> at whatever
+       the chosen row points to and copies the row's data-cat, which is what
+       the stylesheet keys the chip colours on. */
+    function syncIcon(chosen, value) {
+      if (!icon) { return; }
+      icon.setAttribute('data-cat', value);
+      var source = chosen.querySelector('use');
+      var slot = icon.querySelector('use');
+      if (source && slot) { slot.setAttribute('href', source.getAttribute('href')); }
+    }
+
     function sync(value) {
       var chosen = optionFor(value);
-      select.value = chosen.getAttribute('data-value');
-      label.textContent = chosen.textContent.trim();
+      var chosenValue = chosen.getAttribute('data-value');
+      select.value = chosenValue;
+      label.textContent = chosen.getAttribute('data-label') || chosen.textContent.trim();
+      syncIcon(chosen, chosenValue);
       options.forEach(function (option) {
         option.setAttribute('aria-selected', option === chosen ? 'true' : 'false');
       });
@@ -132,6 +186,8 @@
     var footer = panel && panel.querySelector('[data-suggestions-footer]');
     var status = form.querySelector('#mgdb-search-status');
     if (!input || !select || !panel || !content || !footer || !status || !window.fetch) { return; }
+
+    var icons = readIconIndex(form);
 
     var timer = null;
     var controller = null;
@@ -242,6 +298,9 @@
         button.setAttribute('aria-selected', 'false');
         button.id = 'mgdb-suggestion-' + index;
 
+        var icon = buildIcon(icons, item.type);
+        if (icon) { button.appendChild(icon); }
+
         var term = document.createElement('strong');
         term.textContent = item.term;
         var scope = document.createElement('small');
@@ -313,6 +372,11 @@
       link.id = 'mgdb-suggestion-' + index;
       link.setAttribute('role', 'option');
       link.setAttribute('aria-selected', 'false');
+
+      /* The type is on the item, not the group, because the promoted top hit
+         belongs to no group and a group can mix types. */
+      var icon = buildIcon(icons, item.cat || (group && group.cat));
+      if (icon) { link.appendChild(icon); }
 
       var copy = document.createElement('span');
       copy.className = 'mgdb-suggestion-copy';

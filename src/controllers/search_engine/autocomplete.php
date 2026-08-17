@@ -99,6 +99,95 @@ function acDetailRows($db, $group, $ids) {
   return array();
 }
 
+/*
+ * Case variants of a prefix. mgdb.locus is indexed on the raw columns, not on
+ * lower(), so a case-insensitive prefix search has to probe each spelling the
+ * data actually uses: wx1 is stored lowercase, B73 uppercase, Gss1 capitalised.
+ * Four ranges over a btree still beat one ILIKE sequential scan of 790k rows by
+ * two orders of magnitude. See ADMIN_DEPENDENCIES.md AD-020 for the functional
+ * indexes that would collapse this to a single probe.
+ */
+function acPrefixCases($prefix) {
+  return array_values(array_unique(array(
+    $prefix, strtolower($prefix), strtoupper($prefix), ucfirst(strtolower($prefix)),
+  )));
+}
+
+function acPrefixRanges($column, $prefix, &$params, $tag) {
+  $clauses = array();
+  foreach (acPrefixCases($prefix) as $index => $value) {
+    $from = ':' . $tag . $index . 'a';
+    $to   = ':' . $tag . $index . 'b';
+    $clauses[] = '(' . $column . ' >= ' . $from . ' AND ' . $column . ' < ' . $to . ')';
+    $params[$from] = $value;
+    $params[$to] = acPrefixEnd($value);
+  }
+  return implode(' OR ', $clauses);
+}
+
+/*
+ * Loci matched by any of the names they are known by.
+ *
+ * all_text_search cannot do this: it stores a locus's three names as one
+ * concatenated string — wx1 is indexed as the single lexeme "gss1wx1waxy1" —
+ * so neither "waxy" nor "waxy1" nor "Gss1" can ever match it there, and even
+ * "wx1" fails to return its own record. Read the three columns directly
+ * instead, plus the curated synonym list, all of which are indexed.
+ *
+ * Every branch is a bounded index range scan, so cost does not grow with the
+ * table: 4-8ms for the prefixes people actually type, 35-75ms for the two
+ * broadest two-letter ones ("zm", "Ac"), which already cost ~500ms elsewhere.
+ * The per-branch cap of 12 is what keeps that ceiling down — only 3 gene
+ * symbols and 4 loci are ever rendered, so a wider net buys nothing and a
+ * two-letter prefix like "Ac" costs twice as much to gather at 20. A btree
+ * returns a prefix range in sorted order, so the shortest, closest names are
+ * the ones the cap keeps.
+ */
+function acLocusNameLookup($db, $query, $limit=24) {
+  $lower = strtolower($query);
+  $params = array();
+  $sql = "
+    WITH hits AS (
+      (SELECT id FROM mgdb.locus WHERE " . acPrefixRanges('name', $query, $params, 'n') . " LIMIT 12)
+      UNION
+      (SELECT id FROM mgdb.locus WHERE " . acPrefixRanges('full_name', $query, $params, 'f') . " LIMIT 12)
+      UNION
+      (SELECT id FROM mgdb.locus WHERE " . acPrefixRanges('plant_wide_gene_name', $query, $params, 'p') . " LIMIT 12)
+      -- lower(synonyms) is indexed, so this one needs no case variants.
+      UNION
+      (SELECT s.id FROM mgdb.synonyms s
+        WHERE lower(s.synonyms) >= :syn_start AND lower(s.synonyms) < :syn_end LIMIT 12)
+    )
+    SELECT l.id, l.name, l.full_name, l.plant_wide_gene_name,
+      CASE WHEN lower(l.name)=:exact OR lower(l.full_name)=:exact
+                OR lower(l.plant_wide_gene_name)=:exact THEN 0
+           WHEN lower(l.name) LIKE :prefix THEN 1
+           WHEN lower(l.full_name) LIKE :prefix
+                OR lower(l.plant_wide_gene_name) LIKE :prefix THEN 2
+           ELSE 3 END AS match_rank
+    FROM hits h
+    INNER JOIN mgdb.locus l ON l.id=h.id
+    WHERE NOT EXISTS (SELECT 1 FROM mgdb.id_num idn WHERE idn.id=l.id AND idn.curation_lvl<>0)
+      AND EXISTS     (SELECT 1 FROM mgdb.id_num idn WHERE idn.id=l.id)
+    -- Within a tier the shortest name that actually matched wins, so \"waxy\"
+    -- ranks wx1 (waxy1) above wx (waxy endosperm).
+    ORDER BY match_rank,
+      LEAST(
+        CASE WHEN lower(l.name) LIKE :prefix THEN length(l.name) ELSE 9999 END,
+        CASE WHEN lower(l.full_name) LIKE :prefix THEN length(l.full_name) ELSE 9999 END,
+        CASE WHEN lower(l.plant_wide_gene_name) LIKE :prefix THEN length(l.plant_wide_gene_name) ELSE 9999 END
+      ),
+      length(l.name), l.id
+    LIMIT " . (int)$limit;
+  $params[':syn_start'] = $lower;
+  $params[':syn_end'] = acPrefixEnd($lower);
+  $params[':exact'] = $lower;
+  $params[':prefix'] = $lower . '%';
+  $sth = $db->prepare($sql);
+  $sth->execute($params);
+  return $sth->fetchAll(PDO::FETCH_ASSOC);
+}
+
 function acRecordItem($group, $candidate, $row, $meta) {
   $id = (string)$candidate['id'];
   $label = '';
@@ -169,6 +258,9 @@ function acRecordItem($group, $candidate, $row, $meta) {
     'label' => $label,
     'secondary' => acCleanText($secondary, 180),
     'url' => $url,
+    /* The data type, named exactly as the header search categories are, so the
+       client can look the record's icon up in the sprite it already carries. */
+    'cat' => $group,
     'badge' => $meta['badge'],
     'exact' => ((int)$candidate['match_rank'] === 0),
   );
@@ -186,21 +278,23 @@ if ($query === '' || (($type !== 'id') && strlen($query) < 2) || $type === 'goog
   acJson(array('query' => $query, 'type' => $type, 'groups' => array(), 'minimum' => 2));
 }
 
+/* Keys match the header search category values, which is what the client keys
+   its icon sprite on — see templates/home/search-box-modern.bau. */
 $groupMeta = array(
-  'gene_model' => array('label' => 'Genes', 'icon' => '⌘', 'badge' => 'GENE'),
-  'genome' => array('label' => 'Genomes', 'icon' => '◎', 'badge' => 'GENOME'),
-  'locus' => array('label' => 'Loci', 'icon' => '●', 'badge' => 'LOCUS'),
-  'probe' => array('label' => 'Markers', 'icon' => '⚑', 'badge' => 'MARKER'),
-  'stock' => array('label' => 'Stocks / germplasm', 'icon' => '🌽', 'badge' => 'STOCK'),
-  'reference' => array('label' => 'References', 'icon' => '▤', 'badge' => 'REF'),
-  'qtl_exp' => array('label' => 'QTL experiments', 'icon' => '▥', 'badge' => 'QTL'),
-  'term' => array('label' => 'Traits and terms', 'icon' => '◇', 'badge' => 'TRAIT'),
-  'phenotype' => array('label' => 'Phenotypes', 'icon' => '◐', 'badge' => 'PHENO'),
-  'variation' => array('label' => 'Variations / alleles', 'icon' => '△', 'badge' => 'ALLELE'),
-  'gene_product' => array('label' => 'Gene products', 'icon' => 'G', 'badge' => 'PRODUCT'),
-  'map' => array('label' => 'Maps', 'icon' => '⌖', 'badge' => 'MAP'),
-  'person' => array('label' => 'People / organizations', 'icon' => '○', 'badge' => 'PERSON'),
-  'id' => array('label' => 'MaizeGDB ID', 'icon' => '#', 'badge' => 'ID'),
+  'gene_model' => array('label' => 'Genes', 'badge' => 'GENE'),
+  'genome' => array('label' => 'Genomes', 'badge' => 'GENOME'),
+  'locus' => array('label' => 'Loci', 'badge' => 'LOCUS'),
+  'probe' => array('label' => 'Markers', 'badge' => 'MARKER'),
+  'stock' => array('label' => 'Stocks / germplasm', 'badge' => 'STOCK'),
+  'reference' => array('label' => 'References', 'badge' => 'REF'),
+  'qtl_exp' => array('label' => 'QTL experiments', 'badge' => 'QTL'),
+  'term' => array('label' => 'Traits and terms', 'badge' => 'TRAIT'),
+  'phenotype' => array('label' => 'Phenotypes', 'badge' => 'PHENO'),
+  'variation' => array('label' => 'Variations / alleles', 'badge' => 'ALLELE'),
+  'gene_product' => array('label' => 'Gene products', 'badge' => 'PRODUCT'),
+  'map' => array('label' => 'Maps', 'badge' => 'MAP'),
+  'person' => array('label' => 'People / organizations', 'badge' => 'PERSON'),
+  'id' => array('label' => 'MaizeGDB ID', 'badge' => 'ID'),
 );
 
 $typeTables = array(
@@ -249,7 +343,7 @@ try {
         'label' => acCleanText($stock['name'], 150),
         'secondary' => acJoinText(array($typeName, $stock['pedigree'], $stock['country'])),
         'url' => '/data_center/stock/' . rawurlencode($stock['id']),
-        'icon' => $groupMeta['stock']['icon'],
+        'cat' => 'stock',
         'badge' => $groupMeta['stock']['badge'],
         'action' => 'Go to germplasm record',
       );
@@ -317,7 +411,7 @@ try {
           $groupsByKey[$group] = array(
             'key' => $group,
             'label' => $groupMeta[$group]['label'],
-            'icon' => $groupMeta[$group]['icon'],
+            'cat' => $group,
             'total' => (int)$groupCandidates[0]['group_count'],
             'items' => $items,
           );
@@ -326,8 +420,19 @@ try {
     }
   }
 
+  /*
+   * Loci matched by name, full name, plant-wide name, or synonym. Shared by
+   * the Genes group (a named locus is what a reader means by "the gene") and
+   * the Loci group (for loci that have no gene model to sit under).
+   */
+  $locusMatches = array();
+  $symbolLocusIds = array();
+  $searchesLoci = in_array($type, array('anything', 'gene_product', 'gene_model', 'locus'));
+  if ($searchesLoci) $locusMatches = acLocusNameLookup($DBConn, $query);
+
   if ($type === 'anything' || $type === 'gene_product' || $type === 'gene_model') {
     $lower = strtolower($query);
+    $locusIds = array();
     $geneIdentifierQuery = preg_match('/^(zm|grm|ac|zeammb73)/i', $query);
     if ($geneIdentifierQuery) {
       // Use the indexed lower(gene_name) range directly. Avoiding DISTINCT here
@@ -344,15 +449,23 @@ try {
         ORDER BY lower(gene_name), assembly_rank, version DESC LIMIT 24";
     }
     else {
+      /* The locus ids are already known, so the gene models under them are a
+         plain indexed lookup rather than a nested search. intval makes the
+         inlined list safe; it cannot be a bound parameter and stay one query. */
+      $locusIds = array_map('intval', array_column($locusMatches, 'id'));
+      $locusBranch = '';
+      if ($locusIds) {
+        $locusBranch = "
+          UNION ALL
+          SELECT gm.gene_name, gm.locus_name, gm.locus_id, gm.version, gm.assembly_version,
+            CASE WHEN lower(gm.gene_name)=:exact_locus OR lower(gm.locus_name)=:exact_locus THEN 0 ELSE 2 END,
+            CASE WHEN gm.assembly_version ILIKE '%NAM-5.0%' THEN 0
+                 WHEN gm.assembly_version ILIKE '%RefGen_v4%' THEN 1 ELSE 2 END
+          FROM chado.gene_model gm
+          WHERE gm.is_obsolete IS NOT TRUE AND gm.locus_id IN (" . implode(',', $locusIds) . ")";
+      }
       $geneSql = "
-        WITH matching_loci AS (
-          SELECT id
-          FROM mgdb.locus
-          WHERE (name >= :locus_raw AND name < :locus_raw_end)
-             OR (name >= :locus_upper AND name < :locus_upper_end)
-             OR (name >= :locus_lower AND name < :locus_lower_end)
-          ORDER BY CASE WHEN lower(name)=:locus_order_exact THEN 0 ELSE 1 END, id LIMIT 40
-        ), candidates AS (
+        WITH candidates AS (
           SELECT gene_name, locus_name, locus_id, version, assembly_version,
             CASE WHEN lower(gene_name)=:exact OR lower(locus_name)=:exact THEN 0
                  WHEN lower(gene_name) LIKE :prefix THEN 1 ELSE 2 END AS match_rank,
@@ -361,19 +474,12 @@ try {
           FROM chado.gene_model
           WHERE is_obsolete IS NOT TRUE
             AND lower(gene_name) >= :range_start AND lower(gene_name) < :range_end
-          UNION ALL
-          SELECT gm.gene_name, gm.locus_name, gm.locus_id, gm.version, gm.assembly_version,
-            CASE WHEN lower(gm.gene_name)=:exact_locus OR lower(gm.locus_name)=:exact_locus THEN 0 ELSE 2 END,
-            CASE WHEN gm.assembly_version ILIKE '%NAM-5.0%' THEN 0
-                 WHEN gm.assembly_version ILIKE '%RefGen_v4%' THEN 1 ELSE 2 END
-          FROM matching_loci ml
-          INNER JOIN chado.gene_model gm ON gm.locus_id=ml.id
-          WHERE gm.is_obsolete IS NOT TRUE
+          " . $locusBranch . "
         ), dedup AS (
         SELECT DISTINCT ON (gene_name) gene_name, locus_name, locus_id, version, assembly_version, match_rank, assembly_rank
         FROM candidates ORDER BY gene_name, match_rank, assembly_rank, version DESC
         )
-        SELECT * FROM dedup ORDER BY match_rank, assembly_rank, gene_name LIMIT 5";
+        SELECT * FROM dedup ORDER BY match_rank, assembly_rank, gene_name LIMIT 12";
     }
     $geneParams = array(
       ':exact' => $lower,
@@ -381,58 +487,133 @@ try {
       ':range_start' => $lower,
       ':range_end' => acPrefixEnd($lower),
     );
-    if (!$geneIdentifierQuery) {
-      $geneParams += array(
-        ':locus_raw' => $query,
-        ':locus_raw_end' => acPrefixEnd($query),
-        ':locus_upper' => strtoupper($query),
-        ':locus_upper_end' => acPrefixEnd(strtoupper($query)),
-        ':locus_lower' => strtolower($query),
-        ':locus_lower_end' => acPrefixEnd(strtolower($query)),
-        ':locus_order_exact' => $lower,
-        ':exact_locus' => $lower,
-      );
+    if (!$geneIdentifierQuery && $locusIds) {
+      $geneParams += array(':exact_locus' => $lower);
     }
     $sth = $DBConn->prepare($geneSql);
     $sth->execute($geneParams);
     $rows = $sth->fetchAll(PDO::FETCH_ASSOC);
     $uniqueGeneRows = array();
     $seenGenes = array();
+    $locusHasModels = array();
     foreach ($rows as $row) {
+      if ($row['locus_id']) $locusHasModels[(string)$row['locus_id']] = true;
       $geneKey = strtolower($row['gene_name']);
       if (isset($seenGenes[$geneKey])) continue;
       $seenGenes[$geneKey] = true;
       $uniqueGeneRows[] = $row;
-      if (count($uniqueGeneRows) >= 5) break;
     }
-    $hasMoreGenes = count($uniqueGeneRows) > 4;
-    $items = array();
-    foreach (array_slice($uniqueGeneRows, 0, 4) as $row) {
+
+    /*
+     * Gene symbols first. Someone typing "waxy" or "waxy1" wants wx1, not the
+     * model identifiers filed under it, so each matched locus that actually has
+     * gene models leads the group with its symbol and links to the gene record.
+     * Loci with no models are left for the Loci group below.
+     */
+    $symbolItems = array();
+    $seenSymbols = array();
+    foreach ($locusMatches as $locus) {
+      if (!isset($locusHasModels[(string)$locus['id']])) continue;
+      $symbol = trim((string)$locus['name']);
+      if ($symbol === '' || isset($seenSymbols[strtolower($symbol)])) continue;
+      $seenSymbols[strtolower($symbol)] = true;
+      $symbolLocusIds[(string)$locus['id']] = true;
+      $names = acJoinText(array($locus['full_name'], $locus['plant_wide_gene_name']));
+      $symbolItems[] = array(
+        'label' => acCleanText($symbol, 150),
+        'secondary' => $names !== '' ? $names : 'Maize gene',
+        'url' => '/gene_center/gene/' . rawurlencode($symbol),
+        'cat' => 'gene_model',
+        'badge' => $groupMeta['gene_model']['badge'],
+        'exact' => ((int)$locus['match_rank'] === 0),
+      );
+      if (count($symbolItems) >= 3) break;
+    }
+
+    $modelItems = array();
+    foreach ($uniqueGeneRows as $row) {
+      /* A model whose locus already leads the group as a symbol adds nothing
+         when the query was a name rather than an identifier. */
+      if (!$geneIdentifierQuery && isset($locusHasModels[(string)$row['locus_id']])
+          && isset($seenSymbols[strtolower((string)$row['locus_name'])])
+          && strpos($lower, strtolower((string)$row['gene_name'])) !== 0) {
+        continue;
+      }
       $locusLabel = $row['locus_name'] ? 'Locus ' . $row['locus_name'] : 'Associated locus';
       $locusIdLabel = $row['locus_id'] ? 'Locus ID ' . $row['locus_id'] : '';
       $secondary = acJoinText(array($locusLabel, $locusIdLabel, $row['assembly_version'], $row['version']));
-      $item = array(
+      $modelItems[] = array(
         'label' => acCleanText($row['gene_name'], 150),
         'secondary' => $secondary,
         'url' => '/gene_center/gene/' . rawurlencode($row['gene_name']),
+        'cat' => 'gene_model',
         'badge' => $groupMeta['gene_model']['badge'],
         'exact' => ((int)$row['match_rank'] === 0),
       );
-      $items[] = $item;
-      if ($topHit === null && strtolower($row['gene_name']) === $lower) {
-        $topHit = $item + array(
-          'icon' => $groupMeta['gene_model']['icon'],
-          'action' => 'Go to gene model',
-        );
-      }
+      if (count($symbolItems) + count($modelItems) >= 5) break;
     }
+
+    $items = array_merge($symbolItems, $modelItems);
+    $hasMoreGenes = count($items) > 4;
+    $items = array_slice($items, 0, 4);
+
+    foreach ($items as $item) {
+      if ($topHit !== null) break;
+      if (!$item['exact']) continue;
+      $topHit = $item + array('action' => 'Go to gene record');
+    }
+
     if ($items) {
       $groupsByKey['gene_model'] = array(
         'key' => 'gene_model', 'label' => $groupMeta['gene_model']['label'],
-        'icon' => $groupMeta['gene_model']['icon'], 'total' => count($items),
+        'cat' => 'gene_model', 'total' => count($items),
         'has_more' => $hasMoreGenes, 'items' => $items,
       );
     }
+  }
+
+  /*
+   * Named loci with no gene model behind them — "wx" (waxy endosperm) is one.
+   * Merged ahead of the all_text_search hits, which cannot find a locus by any
+   * of its own names.
+   */
+  if ($searchesLoci && $type !== 'gene_model') {
+    $existing = isset($groupsByKey['locus']) ? $groupsByKey['locus'] : null;
+
+    /* A locus already leading the Genes group is the same record reached by a
+       different route — /data_center/locus/<id> redirects to the gene page —
+       so it is dropped here rather than listed twice under two labels. */
+    $shown = array();
+    foreach ($symbolLocusIds as $id => $unused) $shown['/data_center/locus/' . rawurlencode($id)] = true;
+
+    $named = array();
+    $seenUrls = $shown;
+    foreach ($locusMatches as $locus) {
+      $item = acRecordItem('locus', $locus, $locus, $groupMeta['locus']);
+      if (!$item || isset($seenUrls[$item['url']])) continue;
+      $seenUrls[$item['url']] = true;
+      $named[] = $item;
+      if (count($named) >= 4) break;
+    }
+
+    $carried = array();
+    if ($existing) {
+      foreach ($existing['items'] as $item) {
+        if (isset($seenUrls[$item['url']])) continue;
+        $seenUrls[$item['url']] = true;
+        $carried[] = $item;
+      }
+    }
+
+    $merged = array_slice(array_merge($named, $carried), 0, 4);
+    if ($merged) {
+      $groupsByKey['locus'] = array(
+        'key' => 'locus', 'label' => $groupMeta['locus']['label'], 'cat' => 'locus',
+        'total' => max($existing ? (int)$existing['total'] : 0, count($merged)),
+        'items' => $merged,
+      );
+    }
+    else unset($groupsByKey['locus']);
   }
 
   if ($type === 'anything' || $type === 'genome') {
@@ -452,13 +633,14 @@ try {
         'label' => acCleanText($row['assembly_name'], 150),
         'secondary' => acJoinText(array($row['project'], $row['annotation'])),
         'url' => '/genome/assembly/' . rawurlencode($row['assembly_name']),
+        'cat' => 'genome',
         'badge' => $groupMeta['genome']['badge'],
         'exact' => (strtolower($row['assembly_name']) === $lower),
       );
     }
     if ($items) {
       $groupsByKey['genome'] = array(
-        'key' => 'genome', 'label' => $groupMeta['genome']['label'], 'icon' => $groupMeta['genome']['icon'],
+        'key' => 'genome', 'label' => $groupMeta['genome']['label'], 'cat' => 'genome',
         'total' => count($items), 'items' => $items,
       );
     }
@@ -474,9 +656,10 @@ try {
         'Person'=>'/person/', 'Gene Product'=>'/data_center/gene_product/');
       if (isset($recordTypeToUrl[$row['record_type']])) {
         $groupsByKey['id'] = array(
-          'key'=>'id', 'label'=>$groupMeta['id']['label'], 'icon'=>$groupMeta['id']['icon'], 'total'=>1,
+          'key'=>'id', 'label'=>$groupMeta['id']['label'], 'cat'=>'id', 'total'=>1,
           'items'=>array(array('label'=>'MaizeGDB ID ' . $row['id'], 'secondary'=>$row['record_type'],
-            'url'=>$recordTypeToUrl[$row['record_type']] . rawurlencode($row['id']), 'badge'=>'ID', 'exact'=>true)),
+            'url'=>$recordTypeToUrl[$row['record_type']] . rawurlencode($row['id']),
+            'cat'=>'id', 'badge'=>'ID', 'exact'=>true)),
         );
       }
     }
