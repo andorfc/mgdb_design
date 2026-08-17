@@ -1,0 +1,239 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-typsimselector
+<a class="mgdb-skip-link" href="#typ-main">Skip to main content</a>
+
+<main class="mgdb-page mgdb-typsimselector-page" id="typ-main"
+      data-lines-curation="$(lines-curation-url)"
+      data-lines-breeding="$(lines-breeding-url)"
+      data-api="$(api-url)">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Tools</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">TYPSimSelector</span>
+  </nav>
+
+  <section class="mgdb-hero typ-hero" aria-labelledby="typ-title">
+    <div class="mgdb-hero-emblem">
+      <svg class="typ-hero-mark" viewBox="0 0 132 116" role="img" aria-label="A reference accession linked to nearer and more distant relatives">
+        <g stroke="#d4b44f" stroke-width="2.5" stroke-linecap="round" opacity=".8">
+          <path d="M66 58 L30 26" /><path d="M66 58 L104 30" /><path d="M66 58 L26 74" /><path d="M66 58 L100 84" /><path d="M66 58 L58 100" />
+        </g>
+        <circle cx="66" cy="58" r="15" fill="#501719" />
+        <circle cx="30" cy="26" r="9" fill="#2f5e2a" />
+        <circle cx="104" cy="30" r="7" fill="#a96919" />
+        <circle cx="26" cy="74" r="6" fill="#a96919" />
+        <circle cx="100" cy="84" r="8" fill="#2f5e2a" />
+        <circle cx="58" cy="100" r="5" fill="#a96919" />
+      </svg>
+      <strong>TYPSim<br />Selector</strong>
+      <span>Identity by state</span>
+    </div>
+    <div class="mgdb-hero-body">
+      <span class="mgdb-eyebrow">Germplasm similarity tool</span>
+      <h1 id="typ-title">Rank the maize collection against one accession.</h1>
+      <p class="mgdb-hero-tagline">Pick an inbred line held at the North Central Regional Plant Introduction Station and see every other accession sorted by how much of its genome it shares.</p>
+      <p class="mgdb-hero-description">Similarity here is identity by state, computed with PLINK from the genotyping-by-sequencing SNP data behind the Ames Diversity Panel. A score of 1 means two samples matched at every scored marker; the rest of the panel spreads out below that. Use it to find near-duplicates in a seed request, to pick contrasting parents, or to sanity-check what an accession actually is.</p>
+      <div class="mgdb-hero-actions">
+        <a class="mgdb-button mgdb-button-primary" href="#typ-compare">Start a comparison</a>
+        <a class="mgdb-button mgdb-button-secondary" href="#typ-method">How the scores were calculated</a>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="typ-scale-title">
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">What is behind the tool</span><h2 id="typ-scale-title">Two matrices, both computed once</h2></div>
+      <p>Every pair in each dataset was scored ahead of time, so a comparison is a lookup rather than a calculation.</p>
+    </div>
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9678;</span>
+        <div><strong class="mgdb-metric-value mgdb-metric-value-compact">$(curation-accessions)</strong><h3>Curated accessions</h3><p>NCRPIS accessions in the curation dataset, across $(curation-entries) genotyping runs.</p></div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-green">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9670;</span>
+        <div><strong class="mgdb-metric-value mgdb-metric-value-compact">$(breeding-lines)</strong><h3>Breeding lines</h3><p>Named inbred lines in the merged Ames breeding dataset.</p></div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-burgundy">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#8646;</span>
+        <div><strong class="mgdb-metric-value mgdb-metric-value-compact">$(total-pairs)</strong><h3>Pairwise scores</h3><p>$(curation-pairs) curation comparisons and $(breeding-pairs) breeding comparisons on file.</p></div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-red">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#8942;</span>
+        <div><strong class="mgdb-metric-value mgdb-metric-value-compact">680,000+</strong><h3>SNP markers</h3><p>Genotyping-by-sequencing markers used to establish the relationships.</p></div>
+      </article>
+    </div>
+  </section>
+
+  <section id="typ-compare" aria-labelledby="typ-compare-title">
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Run a comparison</span><h2 id="typ-compare-title">Choose a dataset and a reference line</h2></div>
+      <p>Results appear below, ranked and downloadable. Nothing is submitted anywhere and no account is needed.</p>
+    </div>
+
+    <form id="typ-form" class="typ-console" novalidate>
+      <fieldset class="typ-step" id="typ-step-dataset">
+        <legend><span class="typ-step-number" aria-hidden="true">1</span> Dataset</legend>
+        <p class="mgdb-hint" id="typ-dataset-hint">The two datasets were genotyped and scored separately. Scores from one are not comparable with scores from the other.</p>
+        <div class="typ-dataset-choices" role="radiogroup" aria-describedby="typ-dataset-hint" aria-labelledby="typ-dataset-label">
+          <span class="mgdb-visually-hidden" id="typ-dataset-label">Dataset</span>
+          <label class="typ-dataset-card">
+            <input type="radio" name="dataset" value="curation" />
+            <span class="typ-dataset-body">
+              <strong>Curation dataset</strong>
+              <span class="typ-dataset-count">$(curation-accessions) accessions</span>
+              <span class="typ-dataset-note">Keyed to NCRPIS inventory, so every row carries its accession number and links out to GRIN. Includes replicate genotyping runs of the same accession.</span>
+            </span>
+          </label>
+          <label class="typ-dataset-card">
+            <input type="radio" name="dataset" value="breeding" />
+            <span class="typ-dataset-body">
+              <strong>Breeding dataset</strong>
+              <span class="typ-dataset-count">$(breeding-lines) lines</span>
+              <span class="typ-dataset-note">The merged Ames genotype set, keyed by line name. One score per pair of lines, with no accession numbers attached.</span>
+            </span>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="typ-step" id="typ-step-line" disabled>
+        <legend><span class="typ-step-number" aria-hidden="true">2</span> Reference line</legend>
+        <p class="mgdb-hint" id="typ-line-hint">Start typing a line name or an accession number. Everything else will be ranked against whatever you pick here.</p>
+
+        <div class="mgdb-field typ-combobox" data-combobox="line">
+          <label class="mgdb-label" for="typ-line-input">Line or accession</label>
+          <input class="mgdb-input typ-combobox-input" id="typ-line-input" type="text"
+                 role="combobox" aria-expanded="false" aria-autocomplete="list"
+                 aria-controls="typ-line-listbox" aria-describedby="typ-line-hint"
+                 autocomplete="off" spellcheck="false" placeholder="Choose a dataset first" disabled />
+          <ul class="typ-combobox-list" id="typ-line-listbox" role="listbox" aria-label="Matching lines" hidden></ul>
+          <p class="typ-combobox-status mgdb-small mgdb-muted" id="typ-line-status" aria-live="polite"></p>
+        </div>
+
+        <div class="mgdb-field typ-run-field" id="typ-run-field" hidden>
+          <label class="mgdb-label" for="typ-run">Genotyping run</label>
+          <select class="mgdb-select" id="typ-run"></select>
+          <p class="mgdb-hint">This accession was genotyped more than once. Each run was scored against the panel separately and is ranked on its own.</p>
+        </div>
+      </fieldset>
+
+      <fieldset class="typ-step" id="typ-step-scope" disabled>
+        <legend><span class="typ-step-number" aria-hidden="true">3</span> Comparison and order</legend>
+
+        <div class="typ-scope-grid">
+          <div class="mgdb-field">
+            <label class="mgdb-label" for="typ-scope">Compare against</label>
+            <select class="mgdb-select" id="typ-scope">
+              <option value="all" selected>The whole dataset</option>
+              <option value="one">One other line</option>
+            </select>
+          </div>
+
+          <div class="mgdb-field">
+            <label class="mgdb-label" for="typ-sort">Order</label>
+            <select class="mgdb-select" id="typ-sort">
+              <option value="desc" selected>Most similar first</option>
+              <option value="asc">Least similar first</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mgdb-field typ-combobox" data-combobox="compare" id="typ-compare-field" hidden>
+          <label class="mgdb-label" for="typ-compare-input">Second line</label>
+          <input class="mgdb-input typ-combobox-input" id="typ-compare-input" type="text"
+                 role="combobox" aria-expanded="false" aria-autocomplete="list"
+                 aria-controls="typ-compare-listbox" autocomplete="off" spellcheck="false" />
+          <ul class="typ-combobox-list" id="typ-compare-listbox" role="listbox" aria-label="Matching lines" hidden></ul>
+          <p class="typ-combobox-status mgdb-small mgdb-muted" id="typ-compare-status" aria-live="polite"></p>
+        </div>
+
+        <div class="mgdb-form-actions typ-actions">
+          <button class="mgdb-button mgdb-button-primary" id="typ-submit" type="submit">Rank the dataset</button>
+          <button class="mgdb-button mgdb-button-quiet" id="typ-reset" type="reset">Start over</button>
+        </div>
+      </fieldset>
+    </form>
+
+    <p id="typ-status" class="mgdb-visually-hidden" aria-live="polite"></p>
+    <div id="typ-results" class="typ-results"></div>
+  </section>
+
+  <section class="mgdb-prose-layout typ-about-layout" id="typ-about" aria-labelledby="typ-about-title">
+    <div class="mgdb-prose">
+      <span class="mgdb-eyebrow">About the tool</span>
+      <h2 id="typ-about-title" class="mgdb-leaf-heading">What TYPSimSelector is</h2>
+      <p>TYPSimSelector sorts identity by state values derived from SNP datasets for accessions in the Ames Diversity Panel &mdash; a USDA-maintained set of maize lines held in Ames, Iowa that represents a wide span of the species' genetic variation, described by <a href="/data_center/reference?id=9023933">Romay et al., 2013</a>.</p>
+      <p>The tool was conceived and first implemented by Mark Millard at the North Central Regional Plant Introduction Station, to make genomic similarity usable in day-to-day germplasm management. Recognising that the same analysis would be useful to others, a collaboration to deploy it through MaizeGDB began in 2013. It was developed by Emily Mauch with guidance from Carson Andorf, Mark Millard, Cinta Romay, Ed Buckler, Candy Gardner, and Carolyn Lawrence.</p>
+      <p>As Romay and colleagues describe it, the panel is roughly 2,500 maize accessions distributed mainly through the station in Ames. It was interrogated with more than 680,000 SNP markers to establish identity by state relationships between them. Those relationships have proven useful for examining how lines relate to one another: identical samples score 1, and divergence is read as 1 minus the similarity.</p>
+      <div class="typ-about-actions">
+        <a class="mgdb-button mgdb-button-secondary" href="/data_center/stock">Search MaizeGDB stocks</a>
+        <a class="mgdb-button mgdb-button-quiet" href="https\://npgsweb.ars-grin.gov/gringlobal/search.aspx">Search GRIN-Global</a>
+      </div>
+    </div>
+
+    <aside class="mgdb-aside-card typ-download-card">
+      <span class="mgdb-eyebrow">Underlying data</span>
+      <h3>The genotypes themselves</h3>
+      <p>The raw HapMap file and its key are archived and can be downloaded in full. The unzipped genotype file is about 6 GB.</p>
+      <ul class="mgdb-resource-list">
+        <li><a href="https\://download.maizegdb.org/Archive/TYPSimSelector/All_Ames_all_20120110.hmp.zip">Ames genotypes, HapMap<span class="mgdb-small mgdb-muted"> &mdash; ZIP, expands to about 6 GB</span></a></li>
+        <li><a href="https\://download.maizegdb.org/Archive/TYPSimSelector/Ames_key_120110.xlsx">Sample key<span class="mgdb-small mgdb-muted"> &mdash; XLSX</span></a></li>
+      </ul>
+    </aside>
+  </section>
+
+  <section id="typ-method" aria-labelledby="typ-method-title">
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Method and caveats</span><h2 id="typ-method-title">How the scores were calculated, and how far to trust them</h2></div>
+      <p>Read this before quoting a number from the table.</p>
+    </div>
+
+    <div class="mgdb-card-grid typ-method-grid">
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-info">Calculation</span>
+        <h3>Identity by state, from PLINK</h3>
+        <p>Scores were calculated as described by <a href="/data_center/reference?id=9023933">Romay et al., 2013</a>. Identity by state was computed for all possible pairwise comparisons with PLINK v1.07, <a href="https\://www.ncbi.nlm.nih.gov/pmc/articles/PMC1950838/">Purcell et al., 2007</a>.</p>
+      </article>
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-warn">Caveat</span>
+        <h3>The bottom of the ranking is not a result</h3>
+        <p>Very low similarity scores are distorted by ascertainment bias in the marker set. The lines reported as most dissimilar should not be treated as an authoritative answer to which lines are furthest apart.</p>
+      </article>
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-ok">Reading a score</span>
+        <h3>1 is identical, and near-1 is common</h3>
+        <p>Two samples of the same accession usually land above 0.98. The bulk of any panel-wide ranking sits between 0.83 and 0.87, so the interesting part of the distribution is the tail, not the middle.</p>
+      </article>
+      <article class="mgdb-card">
+        <span class="mgdb-pill">Replicates</span>
+        <h3>The same accession, genotyped twice</h3>
+        <p>347 accessions in the curation dataset were genotyped more than once, one of them 28 times. Each run is scored separately, so the same accession can occupy several nearby rows, and the spread between its own runs is a useful floor on the noise.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="typ-cite" aria-labelledby="typ-cite-title">
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Attribution</span><h2 id="typ-cite-title">Citing this tool</h2></div>
+      <p>If TYPSimSelector contributed to your research, cite both MaizeGDB and the source of the scores.</p>
+    </div>
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table typ-cite-table">
+        <caption>Works to cite when using TYPSimSelector</caption>
+        <thead>
+          <tr><th scope="col">Cite</th><th scope="col">Reference</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">MaizeGDB</th>
+            <td>Andorf CM, Cannon EK, Portwood JL, Gardiner JM, Harper LC, Schaeffer ML, Braun BL, Campbell DA, Vinnakota AG, Sribalusu VV, Huerta M, Cho KT, Wimalanathan K, Richter JD, Mauch ED, Rao BS, Birkett SM, Sen TZ, Lawrence-Dill CJ. MaizeGDB update: new tools, data and interface for the maize model organism database. <em>Nucleic Acids Research</em> 2016 Jan 4;44:D1195&ndash;201. <a href="https\://doi.org/10.1093/nar/gkv1007">doi:10.1093/nar/gkv1007</a></td>
+          </tr>
+          <tr>
+            <th scope="row">Romay et al.</th>
+            <td>Romay MC, Millard MJ, Glaubitz JC, Peiffer JA, Swarts KL, Casstevens TM, Elshire RJ, Acharya CB, Mitchell SE, Flint-Garcia SA, McMullen MD, Holland JB, Buckler ES, Gardner CA. Comprehensive genotyping of the USA national maize inbred seed bank. <em>Genome Biology</em> 2013;14:R55. <a href="https\://doi.org/10.1186/gb-2013-14-6-r55">doi:10.1186/gb-2013-14-6-r55</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+)

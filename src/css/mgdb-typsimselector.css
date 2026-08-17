@@ -1,0 +1,449 @@
+/* ==========================================================================
+   TYPSimSelector — /TYPSimSelector
+
+   Page-specific rules only. Everything structural comes from mgdb-modern.css;
+   nothing here introduces a colour, a radius, or a spacing value that is not
+   already a token. Every rule is scoped under .mgdb-typsimselector-page.
+   ========================================================================== */
+
+.mgdb-typsimselector-page .typ-hero-mark {
+  width: 84px;
+  height: 74px;
+}
+
+/* --------------------------------------------------------------------------
+   The console
+
+   Three fieldsets, disabled until the step before them has an answer. Disabled
+   is used rather than hidden so the shape of the task is visible from the
+   start: a reader can see there are three decisions before making the first.
+   -------------------------------------------------------------------------- */
+
+.mgdb-typsimselector-page .typ-console {
+  display: grid;
+  gap: var(--mgdb-space-5);
+  padding: var(--mgdb-space-6);
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-lg);
+  box-shadow: var(--mgdb-shadow);
+}
+
+.mgdb-typsimselector-page .typ-step {
+  margin: 0;
+  /* A fieldset's default min-width is min-content, which stops its grid
+     children from ever shrinking and overflows the page on a narrow screen.
+     This is the fix; it is not optional. */
+  min-width: 0;
+  padding: 0 0 var(--mgdb-space-5);
+  border: 0;
+  border-bottom: 1px solid var(--mgdb-line-soft);
+}
+
+.mgdb-typsimselector-page .typ-step:last-of-type {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.mgdb-typsimselector-page .typ-step[disabled] {
+  opacity: .5;
+}
+
+.mgdb-typsimselector-page .typ-step legend {
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-3);
+  padding: 0;
+  margin-bottom: var(--mgdb-space-2);
+  font-size: var(--mgdb-text-xl);
+  font-weight: 700;
+  line-height: var(--mgdb-leading-tight);
+  color: var(--mgdb-burgundy);
+}
+
+.mgdb-typsimselector-page .typ-step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  font-size: var(--mgdb-text-base);
+  color: var(--mgdb-surface);
+  background: var(--mgdb-burgundy);
+  border-radius: 50%;
+}
+
+.mgdb-typsimselector-page .typ-step[disabled] .typ-step-number {
+  background: var(--mgdb-muted);
+}
+
+/* --------------------------------------------------------------------------
+   Dataset choice
+   -------------------------------------------------------------------------- */
+
+.mgdb-typsimselector-page .typ-dataset-choices {
+  display: grid;
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
+}
+
+.mgdb-typsimselector-page .typ-dataset-card {
+  display: flex;
+  gap: var(--mgdb-space-3);
+  align-items: flex-start;
+  padding: var(--mgdb-space-4);
+  cursor: pointer;
+  background: var(--mgdb-surface-alt);
+  border: 2px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+}
+
+.mgdb-typsimselector-page .typ-dataset-card:hover {
+  border-color: var(--mgdb-green);
+}
+
+.mgdb-typsimselector-page .typ-dataset-card input {
+  flex: none;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin-top: .2rem;
+  accent-color: var(--mgdb-green);
+}
+
+.mgdb-typsimselector-page .typ-dataset-card:has(input:checked) {
+  background: var(--mgdb-green-soft);
+  border-color: var(--mgdb-green);
+}
+
+/* :has is recent enough that the state has to survive without it. The script
+   also sets this class, so the selected card is unambiguous everywhere. */
+.mgdb-typsimselector-page .typ-dataset-card.is-selected {
+  background: var(--mgdb-green-soft);
+  border-color: var(--mgdb-green);
+}
+
+.mgdb-typsimselector-page .typ-dataset-card:focus-within {
+  box-shadow: var(--mgdb-focus-ring);
+}
+
+.mgdb-typsimselector-page .typ-dataset-body {
+  display: grid;
+  min-width: 0;
+  gap: var(--mgdb-space-1);
+}
+
+.mgdb-typsimselector-page .typ-dataset-body strong {
+  font-size: var(--mgdb-text-lg);
+  color: var(--mgdb-ink);
+}
+
+.mgdb-typsimselector-page .typ-dataset-count {
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-typsimselector-page .typ-dataset-note {
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+  color: var(--mgdb-muted);
+}
+
+/* --------------------------------------------------------------------------
+   Combobox
+
+   A text input over a filtered list. The list is 3,679 entries at most and is
+   already in memory, so filtering is local and there is no request per
+   keystroke.
+   -------------------------------------------------------------------------- */
+
+.mgdb-typsimselector-page .typ-combobox {
+  position: relative;
+  max-width: 40rem;
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-typsimselector-page .typ-combobox-list {
+  position: absolute;
+  z-index: 20;
+  width: 100%;
+  max-height: 20rem;
+  padding: var(--mgdb-space-1);
+  margin: var(--mgdb-space-1) 0 0;
+  overflow-y: auto;
+  list-style: none;
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  box-shadow: var(--mgdb-shadow-lg);
+}
+
+.mgdb-typsimselector-page .typ-combobox-option {
+  display: grid;
+  gap: 2px;
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  cursor: pointer;
+  border-radius: var(--mgdb-radius-sm);
+}
+
+.mgdb-typsimselector-page .typ-combobox-option[aria-selected="true"],
+.mgdb-typsimselector-page .typ-combobox-option:hover {
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-typsimselector-page .typ-combobox-option strong {
+  font-size: var(--mgdb-text-base);
+  font-weight: 600;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-typsimselector-page .typ-combobox-option span {
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+}
+
+.mgdb-typsimselector-page .typ-combobox-option mark {
+  padding: 0 1px;
+  color: inherit;
+  background: var(--mgdb-gold-soft);
+  border-radius: 2px;
+}
+
+.mgdb-typsimselector-page .typ-combobox-status {
+  margin: var(--mgdb-space-2) 0 0;
+}
+
+.mgdb-typsimselector-page .typ-combobox.is-chosen .typ-combobox-input {
+  border-color: var(--mgdb-green);
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-typsimselector-page .typ-run-field,
+.mgdb-typsimselector-page .typ-scope-grid {
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-typsimselector-page .typ-scope-grid {
+  display: grid;
+  gap: var(--mgdb-space-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
+  max-width: 40rem;
+}
+
+.mgdb-typsimselector-page .typ-run-field {
+  max-width: 40rem;
+}
+
+.mgdb-typsimselector-page .typ-actions {
+  margin-top: var(--mgdb-space-5);
+}
+
+/* --------------------------------------------------------------------------
+   Results
+   -------------------------------------------------------------------------- */
+
+.mgdb-typsimselector-page .typ-results:empty {
+  display: none;
+}
+
+.mgdb-typsimselector-page .typ-results {
+  display: grid;
+  gap: var(--mgdb-space-5);
+  margin-top: var(--mgdb-space-6);
+}
+
+.mgdb-typsimselector-page .typ-result-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: var(--mgdb-space-4);
+  border-bottom: 2px solid var(--mgdb-gold);
+}
+
+.mgdb-typsimselector-page .typ-result-title {
+  margin: 0;
+  font-size: var(--mgdb-text-2xl);
+  line-height: var(--mgdb-leading-tight);
+  color: var(--mgdb-burgundy);
+}
+
+.mgdb-typsimselector-page .typ-result-subtitle {
+  margin: var(--mgdb-space-2) 0 0;
+  color: var(--mgdb-muted);
+}
+
+.mgdb-typsimselector-page .typ-result-subtitle code {
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-typsimselector-page .typ-downloads {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+}
+
+/* mgdb-modern.css ships error, ok and info message variants but no caution
+   one, and the ascertainment-bias note is a caution rather than either. Built
+   from the existing status tokens and scoped to this page rather than added to
+   the shared file, which would mean a pattern-library entry to go with it. */
+.mgdb-typsimselector-page .typ-message-warn {
+  color: #6b450b;
+  background: var(--mgdb-status-warn-soft);
+  border-color: var(--mgdb-status-warn);
+}
+
+.mgdb-typsimselector-page .typ-message-warn::before {
+  content: "\26A0";
+}
+
+/* The five-number summary of the reference line against the whole panel. */
+.mgdb-typsimselector-page .typ-stat-row {
+  display: grid;
+  gap: var(--mgdb-space-3);
+  grid-template-columns: repeat(auto-fit, minmax(min(8.5rem, 100%), 1fr));
+}
+
+.mgdb-typsimselector-page .typ-stat {
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  background: var(--mgdb-surface-sunken);
+  border-radius: var(--mgdb-radius);
+}
+
+.mgdb-typsimselector-page .typ-stat dt {
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-muted);
+}
+
+.mgdb-typsimselector-page .typ-stat dd {
+  margin: var(--mgdb-space-1) 0 0;
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xl);
+  font-weight: 700;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-typsimselector-page .typ-chart {
+  height: 260px;
+}
+
+/* --------------------------------------------------------------------------
+   Ranking table
+
+   The similarity bar is a background gradient on the cell rather than an extra
+   element, so the number stays selectable and the row stays one grid cell tall.
+   The bar is scaled across the panel's own range, not 0 to 1: every score in
+   this data is above 0.75, and a bar drawn from zero would be 90% full for
+   every row and would say nothing.
+   -------------------------------------------------------------------------- */
+
+.mgdb-typsimselector-page .typ-table-wrap {
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+}
+
+.mgdb-typsimselector-page .typ-rank-col {
+  width: 4.5rem;
+  font-family: var(--mgdb-font-mono);
+  color: var(--mgdb-muted);
+}
+
+.mgdb-typsimselector-page .typ-name-col strong {
+  display: block;
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-typsimselector-page .typ-full-name {
+  display: block;
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  overflow-wrap: anywhere;
+}
+
+.mgdb-typsimselector-page .typ-score-col {
+  min-width: 11rem;
+}
+
+.mgdb-typsimselector-page .typ-score {
+  display: block;
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+}
+
+.mgdb-typsimselector-page .typ-score-bar {
+  display: block;
+  height: 6px;
+  margin-top: var(--mgdb-space-1);
+  overflow: hidden;
+  background: var(--mgdb-line-soft);
+  border-radius: 3px;
+}
+
+.mgdb-typsimselector-page .typ-score-bar i {
+  display: block;
+  height: 100%;
+  background: var(--mgdb-green);
+}
+
+.mgdb-typsimselector-page tr.is-self {
+  background: var(--mgdb-gold-soft);
+}
+
+.mgdb-typsimselector-page tr.is-self .typ-score-bar i {
+  background: var(--mgdb-gold-dark);
+}
+
+.mgdb-typsimselector-page .typ-self-pill {
+  margin-left: var(--mgdb-space-2);
+}
+
+.mgdb-typsimselector-page .typ-no-accession {
+  color: var(--mgdb-muted);
+}
+
+.mgdb-typsimselector-page .typ-pager {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mgdb-typsimselector-page .typ-pager-buttons {
+  display: flex;
+  gap: var(--mgdb-space-2);
+}
+
+/* --------------------------------------------------------------------------
+   Supporting sections
+   -------------------------------------------------------------------------- */
+
+.mgdb-typsimselector-page .typ-about-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-typsimselector-page .typ-cite-table th[scope="row"] {
+  width: 9rem;
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+@media (max-width: 40rem) {
+  .mgdb-typsimselector-page .typ-console {
+    padding: var(--mgdb-space-4);
+  }
+
+  .mgdb-typsimselector-page .typ-result-header {
+    align-items: flex-start;
+  }
+}

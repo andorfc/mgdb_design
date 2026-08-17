@@ -1,0 +1,124 @@
+*(TYPSimSelector-content #include-js: /js/bin_viewer.js, include-css: /css/TYPSimSelector.css#
+<span id="typ_left">
+  <table width="100%" cellpadding=5 cellspacing=5>
+  <tr>
+    <td valign=top>
+    <p>
+     <b>Directions for TYPSimSelector: </b><br>
+    Select a dataset, a line of interest from those provided, and a sorting order. 
+    <br><br>
+   <a href="https://download.maizegdb.org/Archive/TYPSimSelector/All_Ames_all_20120110.hmp.zip" target="_blank">Download raw data here.</a> 
+   (Unzipped file is ~6 GB\)
+   <br>
+   <a href="https://download.maizegdb.org/Archive/TYPSimSelector/Ames_key_120110.xlsx" target="_blank">Download raw data key here.</a>
+    </p>
+    <br>
+  
+  <div id="datacenter_gray_background">
+    
+    <!-- Data Sets form -->
+    <form name="dataset_form" method="get">
+      Please choose a data set to query:<br>
+      
+      <select id="dataset" name="dataset" onChange="datasetForms(\);"><br>
+        <option value="none">(Select a dataset\)</option>
+        <option value="curation">Curation Data Set</option>
+        <option value="breeding">Breeding Data Set</option>
+      </select>
+      
+      <span style="cursor:help" title="Difference between Curator's and Breeder's datasets"><img src="/images/question.png" height="15" width="15"></span>
+      <br>
+    </form>
+    
+    <!-- Curator's form -->
+    <form name="taxa_form_curators" id="taxa_form_curators" action="/tools/ajax/typsimselector/TYPSimSelector_action.php" method="get" style="display:none">
+      <br>Please select your maize line/accession of interest:<br>
+      <select id="curator_taxa" name="curator_taxa"><br>
+        $(options_insert)
+      </select>
+      <br>
+      <br>
+      
+      <input type="checkbox" id="taxa2_check2" onClick="showhide(document.getElementById('dataset'\).value\)"\><label for="taxa2_check2">&nbsp(Optional\) Check here to compare to a second line</label>
+      
+      <div id="curator_taxa2_div" style="display:none">
+        <br>Select a second line/accession to compare:<br>
+        <select id="curator_taxa2" name="curator_taxa2"><br>
+          $(options_insert2)
+        </select>
+      </div>
+      
+      <br>
+      <br>
+      
+      Sort order:<br>
+      <select id="curator_sort_order" name="sort_order_2"><br>
+        <option value="DESC">Most similar on top</option>
+        <option value="ASC">Least similar on top</option>
+      </select>
+      <span style="cursor:help" title="Very low similarity scores are impacted by ascertainment bias.  Scores reported among most dissimilar lines are suspect and should not be considered an authoritative analysis to determine which lines are most dissimilar."><img src="/images/question.png" height="15" width="15"></span>
+      <br>
+      <br>
+      
+      <span style="cursor:default" name="button2" value="" class="button" onClick="runTYP_results(document.getElementById('curator_sort_order'\).value,document.getElementById('curator_taxa'\).value,document.getElementById('curator_taxa2'\).value,document.getElementById('dataset'\).value\)">Submit</span>
+      <span style="cursor:default" name="reset2" value="" class="button" onClick="reset_page(\);"\)>Reset</span>
+      
+    </form>    
+    
+    <!-- Breeder's form -->
+    <form name="taxa_form_breeders" id="taxa_form_breeders" action="/tools/ajax/typsimselector/TYPSimSelector_action.php" method="get" style="display:none">
+
+      <br>Please select your maize line/accession of interest:<br>
+      <select id="taxa" name="taxa"><br>
+        $(options_insert3)
+      </select>
+      <br>
+      <br>
+      
+      <input type="checkbox" id="taxa2_check" onClick="showhide(document.getElementById('dataset'\).value\)"\><label for="taxa2_check">&nbsp(Optional\) Check here to compare to a second line</label>
+      
+      <div id="taxa2_div" style="display:none">
+        <br>Select a second line/accession to compare:<br>
+        <select id="taxa2" name="taxa2"><br>
+          $(options_insert4)
+        </select>
+      </div>
+      
+      <br>
+      <br>
+      
+      Sort order:<br>
+      <select id="sort_order" name="sort_order"><br>
+        <option value="DESC">Most similar on top</option>
+        <option value="ASC">Least similar on top</option>
+      </select>
+      <span style="cursor:help" title="Very low similarity scores are impacted by ascertainment bias.  Scores reported among most dissimilar lines are suspect and should not be considered an authoritative analysis to determine which lines are most dissimilar."><img src="/images/question.png" height="15" width="15"></span>
+      <br>
+      <br>
+      
+      <span style="cursor:default" name="button" value="" class="button" onClick="runTYP_results(document.getElementById('sort_order'\).value,document.getElementById('taxa'\).value,document.getElementById('taxa2'\).value,document.getElementById('dataset'\).value\)">Submit</span>
+      <span style="cursor:default" name="reset" value="" class="button" onClick="reset_page(\);"\)>Reset</span>
+
+    </form>
+
+    
+    <br><br>
+    <div id='TYP_results'>
+        Results will appear here:<br><br>
+    </div>
+      
+    
+    <!-- Resets the checkbox and index of taxa2 : TYPSimSelector.js-->
+    <script type="text/javascript">
+      reset_page(\);
+    </script>
+    
+    <br>
+  
+  </div>
+  <br>  
+   </td>
+  </tr>
+ </table>
+</span>
+)
