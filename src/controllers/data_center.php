@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /* file: data_center.php
  *
  * purpose: main controller for all data center pages
@@ -103,13 +103,42 @@
     return;
   }
 
+  if (in_array(PAGE, array('image', 'image_phenotype', 'image_trait', 'image_species', 'image_gel_pattern', 'image_mutant'), true) && !getCGIParam('id', 'G', ID)) {
+    include('controllers/data_center/image_search_modern.php');
+    return;
+  }
+
+  if (PAGE == 'marker' && !getCGIParam('id', 'G', ID)) {
+    include('controllers/data_center/marker_search_modern.php');
+    return;
+  }
+
   if (PAGE == 'overgo' && !getCGIParam('id', 'G', ID)) {
     include('controllers/data_center/overgo_search_modern.php');
     return;
   }
 
+  if (PAGE == 'phenotype' && !getCGIParam('id', 'G', ID)) {
+    include('controllers/data_center/phenotype_search_modern.php');
+    return;
+  }
+
   if (PAGE == 'ssr' && !getCGIParam('id', 'G', ID)) {
     include('controllers/data_center/ssr_search_modern.php');
+    return;
+  }
+
+  /* The protein structure data centre. Unlike the pages above there is no
+     record-id form of this route to fall through to: the old page had no
+     record view, and an identifier is carried as ?term= and answered by the
+     page's own search rather than by a separate controller. So this guard is
+     unconditional.
+     Rollback: delete this block. controllers/data_center/protein_structure_search.php
+     is still on disk and is found again immediately; it and its template,
+     stylesheet and script are archived in the redesign repo under
+     legacy/protein_structure/. */
+  if (PAGE == 'protein_structure') {
+    include('controllers/data_center/protein_structure_modern.php');
     return;
   }
 

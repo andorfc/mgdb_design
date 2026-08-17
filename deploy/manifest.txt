@@ -235,3 +235,119 @@ src/js/mgdb-ssr.js                                     js/mgdb-ssr.js
 src/controllers/community/nomenclature.php             controllers/community/nomenclature.php
 src/templates/community/mgdb_nomenclature.bau          templates/community/mgdb_nomenclature.bau
 src/css/mgdb-nomenclature.css                          css/mgdb-nomenclature.css
+
+# Coming soon & development roadmap — replaces /coming_soon in place
+src/controllers/coming_soon.php                        controllers/coming_soon.php
+src/templates/static/mgdb_coming_soon.bau             templates/static/mgdb_coming_soon.bau
+src/css/mgdb-coming-soon.css                           css/mgdb-coming-soon.css
+src/js/mgdb-coming-soon.js                             js/mgdb-coming-soon.js
+src/data/coming_soon.json                              data/coming_soon.json
+
+
+# UniformMu insertion resource — replaces /uniformmu in place.
+# controller.php checks controllers/uniformmu.php before falling through to
+# redirect.php, so this takes the route without touching
+# controllers/documentation/uniformmu.php, which is archived in
+# legacy/uniformmu/ and now unreachable.
+src/controllers/uniformmu.php                          controllers/uniformmu.php
+src/templates/static/mgdb_uniformmu.bau                templates/static/mgdb_uniformmu.bau
+src/css/mgdb-uniformmu.css                             css/mgdb-uniformmu.css
+src/js/mgdb-uniformmu.js                               js/mgdb-uniformmu.js
+src/search/uniformmu/uniformmu_search_api.php          search/uniformmu/uniformmu_search_api.php
+src/search/uniformmu/uniformmu_search_lib.php          search/uniformmu/uniformmu_search_lib.php
+
+# Written by tools/uniformmu_summary.php on the server; rerun it before
+# deploying this file, or the page keeps reporting the previous measurement.
+src/data/uniformmu/uniformmu_summary.json              data/uniformmu/uniformmu_summary.json
+
+# Figures from the UniformMu methods document. They were only ever on the
+# server; pulled into the repository so the page's assets are backed up and
+# deployed like everything else. figure3.png is the exception: it is a
+# screenshot of the retired GBrowse interface and the modern page does not show
+# it, but the archived original in legacy/uniformmu/ still references it, and a
+# file that lives only on the server is backed up by nothing.
+src/images/uniformmu/figure1.png                       images/uniformmu/figure1.png
+src/images/uniformmu/figure2.png                       images/uniformmu/figure2.png
+src/images/uniformmu/figure3.png                       images/uniformmu/figure3.png
+src/images/uniformmu/figure4.png                       images/uniformmu/figure4.png
+src/images/uniformmu/figure5.png                       images/uniformmu/figure5.png
+src/images/uniformmu/figure6.png                       images/uniformmu/figure6.png
+src/images/uniformmu/table1.png                        images/uniformmu/table1.png
+src/images/uniformmu/table2.png                        images/uniformmu/table2.png
+src/images/uniformmu/table3.png                        images/uniformmu/table3.png
+
+# Molecular Marker & Probe Data Center — replaces the bare /data_center/marker route
+src/search/marker/marker_search_lib.php                  search/marker/marker_search_lib.php
+src/search/marker/marker_search_api.php                  search/marker/marker_search_api.php
+src/controllers/data_center/marker_search_modern.php    controllers/data_center/marker_search_modern.php
+src/templates/static/mgdb_marker.bau                    templates/static/mgdb_marker.bau
+src/css/mgdb-marker.css                                 css/mgdb-marker.css
+src/js/mgdb-marker.js                                   js/mgdb-marker.js
+
+# Phenotype Data Center — replaces the bare /data_center/phenotype route
+src/search/phenotype/phenotype_search_lib.php            search/phenotype/phenotype_search_lib.php
+src/search/phenotype/phenotype_search_api.php            search/phenotype/phenotype_search_api.php
+src/controllers/data_center/phenotype_search_modern.php  controllers/data_center/phenotype_search_modern.php
+src/templates/static/mgdb_phenotype.bau                  templates/static/mgdb_phenotype.bau
+src/css/mgdb-phenotype.css                               css/mgdb-phenotype.css
+src/js/mgdb-phenotype.js                                 js/mgdb-phenotype.js
+
+# Unified Image Data Center — unifies image, image_phenotype, image_trait, image_species, image_gel_pattern, image_mutant
+src/search/image/image_search_lib.php                    search/image/image_search_lib.php
+src/search/image/image_search_api.php                    search/image/image_search_api.php
+src/controllers/data_center/image_search_modern.php      controllers/data_center/image_search_modern.php
+src/templates/static/mgdb_image.bau                      templates/static/mgdb_image.bau
+src/css/mgdb-image.css                                   css/mgdb-image.css
+src/js/mgdb-image.js                                     js/mgdb-image.js
+
+
+
+# Protein structure data center — replaces /data_center/protein_structure.
+# The guard lives in src/controllers/data_center.php; the pre-redesign
+# originals are archived in legacy/protein_structure/ and stay on disk.
+#
+# The payload under data/protein_structure/ is NOT deployed from here. It is
+# 110 MB across 4,600 files and is built on the server by
+# tools/protein_structure_index.php, the same arrangement uniformmu uses for
+# its summary. Rerun that tool after a structure export refresh; see
+# ADMIN_DEPENDENCIES.
+src/controllers/data_center/protein_structure_modern.php  controllers/data_center/protein_structure_modern.php
+src/templates/static/mgdb_protein_structure.bau           templates/static/mgdb_protein_structure.bau
+src/css/mgdb-protein-structure.css                        css/mgdb-protein-structure.css
+src/js/mgdb-protein-structure.js                          js/mgdb-protein-structure.js
+src/search/protein_structure/protein_structure_api.php    search/protein_structure/protein_structure_api.php
+src/search/protein_structure/protein_structure_lib.php    search/protein_structure/protein_structure_lib.php
+src/tools/protein_structure_index.php                     tools/protein_structure_index.php
+# 3Dmol, vendored so the viewer does not depend on unpkg. See the LICENSE file
+# beside it for the upgrade procedure.
+src/js/lib/3dmol/3Dmol-min.js                             js/lib/3dmol/3Dmol-min.js
+src/js/lib/3dmol/3Dmol-min.js.LICENSE.txt                 js/lib/3dmol/3Dmol-min.js.LICENSE.txt
+
+
+# TYPSimSelector — replaces /TYPSimSelector.
+#
+# Shadowed, not overwritten: controller.php checks controllers/<CONTROLLER>.php
+# before redirect.php, which is what used to find controllers/tools/. The
+# originals stay on disk and are archived in legacy/typsimselector/.
+#
+# data/typsimselector/ IS deployed from here. Unlike uniformmu and protein
+# structure, the payload is 390 KB of frozen 2012 constants, small enough to
+# version and large enough that rebuilding it on the server by hand would be a
+# way to lose it. Rebuild with tools/typsimselector_index.php only if the
+# pidata tables are ever reloaded, then copy the JSON back into src/data/.
+src/controllers/TYPSimSelector.php                        controllers/TYPSimSelector.php
+src/templates/static/mgdb_typsimselector.bau              templates/static/mgdb_typsimselector.bau
+src/css/mgdb-typsimselector.css                           css/mgdb-typsimselector.css
+src/js/mgdb-typsimselector.js                             js/mgdb-typsimselector.js
+src/search/typsimselector/typsimselector_search_lib.php   search/typsimselector/typsimselector_search_lib.php
+src/search/typsimselector/typsimselector_search_api.php   search/typsimselector/typsimselector_search_api.php
+src/tools/typsimselector_index.php                        tools/typsimselector_index.php
+src/data/typsimselector/summary.json                      data/typsimselector/summary.json
+src/data/typsimselector/lines_curation.json               data/typsimselector/lines_curation.json
+src/data/typsimselector/lines_breeding.json               data/typsimselector/lines_breeding.json
+src/search/searchall/searchall_lib.php          search/searchall/searchall_lib.php
+src/search/searchall/searchall_api.php          search/searchall/searchall_api.php
+src/controllers/search_engine/searchall_modern.php  controllers/search_engine/searchall_modern.php
+src/templates/static/mgdb_searchall.bau          templates/static/mgdb_searchall.bau
+src/css/mgdb-searchall.css                       css/mgdb-searchall.css
+src/js/mgdb-searchall.js                         js/mgdb-searchall.js
