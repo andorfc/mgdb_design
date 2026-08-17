@@ -76,7 +76,20 @@ logVarDump($_POST, "\nPOST parameters in search_engine.php\n");
     include_once('controllers/search_engine/searchall_id.php');
     exit;
   }
-  
+
+  // All-data and per-type results on the modern design system. Renders a shell
+  // and lets search/searchall/searchall_api.php return the records, rather than
+  // running the whole search server-side behind a loading GIF. 'goog' still
+  // goes to the site-wide Google search below, and 'id' was handled above.
+  //
+  // Reached both by POST from the header search and by GET, so a result page
+  // can be linked to. The legacy path is archived at legacy/searchall/.
+  if (PAGE == 'searchall' && $type != 'goog') {
+    include('controllers/search_engine/searchall_modern.php');
+    exit;
+  }
+
+
   // If we get here, we will need to fire up bauplan to build page content.
   //   This page shows the busy icon and contains javascript to build the results.
   if ($source == 'search_box') {

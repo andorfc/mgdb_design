@@ -1,0 +1,342 @@
+/* ==========================================================================
+   MaizeGDB Modern — all-data search results (/search_engine/searchall)
+   --------------------------------------------------------------------------
+   Loaded alongside mgdb-modern.css. Every value here comes from that file's
+   tokens; this sheet only lays out the two views the page has — an overview of
+   the leading data types, and one data type at a time — and the row shapes
+   each type needs.
+
+   The data-type chips reuse .mgdb-search-icon from the design system, so a
+   reference row on this page carries exactly the icon the header search shows
+   for References.
+   ========================================================================== */
+
+.sa-page { padding-bottom: var(--mgdb-space-8); }
+
+/* Page head --------------------------------------------------------------- */
+
+.sa-head {
+  padding: var(--mgdb-space-5) var(--mgdb-space-6);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-surface-alt);
+}
+
+.sa-head h1 {
+  margin-top: var(--mgdb-space-1);
+  overflow-wrap: anywhere;
+}
+
+.sa-summary {
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-base);
+}
+
+.sa-refine {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  margin-top: var(--mgdb-space-4);
+}
+
+.sa-refine-input { flex: 1 1 22rem; min-width: 0; }
+
+.sa-toggle {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  cursor: pointer;
+}
+
+.sa-toggle input { width: 18px; height: 18px; accent-color: var(--mgdb-green); }
+
+/* Layout ------------------------------------------------------------------ */
+
+.sa-layout {
+  display: grid;
+  grid-template-columns: 15rem minmax(0, 1fr);
+  gap: var(--mgdb-space-6);
+  margin-top: var(--mgdb-space-6);
+  align-items: start;
+}
+
+.sa-rail { position: sticky; top: var(--mgdb-space-4); }
+
+.sa-rail-heading {
+  margin-bottom: var(--mgdb-space-3);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.sa-rail-items { list-style: none; padding: 0; }
+
+.sa-rail-link {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  min-height: var(--mgdb-tap-target);
+  padding: var(--mgdb-space-2);
+  border-radius: var(--mgdb-radius-sm);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  text-decoration: none;
+}
+
+.sa-rail-link:hover { background: var(--mgdb-green-soft); }
+
+/* The current type is marked by weight and a rule as well as by fill, so it
+   does not rely on colour alone. */
+.sa-rail-link.is-active {
+  background: var(--mgdb-green-soft);
+  box-shadow: inset 3px 0 0 var(--mgdb-green-dark);
+  font-weight: 800;
+}
+
+.sa-rail-label { flex: 1 1 auto; min-width: 0; }
+
+.sa-rail-count {
+  flex: 0 0 auto;
+  color: var(--mgdb-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.sa-rail-link.is-active .sa-rail-count { color: var(--mgdb-green-dark); }
+
+/* Sections ---------------------------------------------------------------- */
+
+.sa-section {
+  padding: var(--mgdb-space-4) var(--mgdb-space-5) var(--mgdb-space-2);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.sa-section + .sa-section,
+.sa-section + .sa-more { margin-top: var(--mgdb-space-5); }
+
+.sa-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: var(--mgdb-space-3);
+  border-bottom: 2px solid var(--mgdb-line-soft);
+}
+
+.sa-section-title {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  font-size: var(--mgdb-text-xl);
+}
+
+.sa-section-count {
+  padding: 1px 9px;
+  border-radius: 999px;
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.sa-see-all { font-size: var(--mgdb-text-sm); font-weight: 700; white-space: nowrap; }
+
+.sa-section-blurb {
+  margin-top: var(--mgdb-space-3);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.sa-showing {
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Rows -------------------------------------------------------------------- */
+
+.sa-list { list-style: none; padding: 0; }
+
+.sa-row {
+  display: flex;
+  gap: var(--mgdb-space-3);
+  align-items: flex-start;
+  padding: var(--mgdb-space-3) 0;
+  border-bottom: 1px solid var(--mgdb-line-soft);
+}
+
+.sa-row:last-child { border-bottom: 0; }
+
+.sa-icon { margin-top: 2px; }
+.sa-row-body { min-width: 0; flex: 1 1 auto; }
+
+.sa-row-title {
+  display: inline-block;
+  font-size: var(--mgdb-text-lg);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.sa-row-sub {
+  margin-top: 2px;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-base);
+  overflow-wrap: anywhere;
+}
+
+.sa-meta {
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.sa-sep { margin: 0 .45em; }
+.sa-inline-link { font-weight: 700; }
+
+/* Genes ------------------------------------------------------------------- */
+
+.sa-models {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: baseline;
+  margin-top: var(--mgdb-space-2);
+  font-size: var(--mgdb-text-sm);
+}
+
+.sa-models-label { color: var(--mgdb-muted); }
+
+.sa-model-link {
+  padding: 2px 8px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface-alt);
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xs);
+  text-decoration: none;
+}
+
+.sa-model-link:hover { background: var(--mgdb-green-soft); }
+.sa-models-more { color: var(--mgdb-muted); font-size: var(--mgdb-text-xs); }
+
+/* Publication cards ------------------------------------------------------- */
+
+.sa-pub-title { font-size: var(--mgdb-text-lg); line-height: var(--mgdb-leading-snug); }
+
+.sa-pub-authors {
+  margin-top: 2px;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* Three lines of abstract is enough to judge relevance without the card
+   growing tall enough to push the next result off the screen. */
+.sa-pub-abstract {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  margin-top: var(--mgdb-space-2);
+  padding-left: var(--mgdb-space-3);
+  border-left: 3px solid var(--mgdb-line);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.sa-links { display: flex; gap: var(--mgdb-space-3); margin-top: var(--mgdb-space-2); }
+
+.sa-link {
+  font-size: var(--mgdb-text-xs);
+  font-weight: 800;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+
+/* Also-found chips -------------------------------------------------------- */
+
+.sa-more {
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 1px dashed var(--mgdb-line);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-surface-alt);
+}
+
+.sa-more-title {
+  margin-bottom: var(--mgdb-space-3);
+  font-size: var(--mgdb-text-base);
+  color: var(--mgdb-green-dark);
+}
+
+.sa-more-list { display: flex; flex-wrap: wrap; gap: var(--mgdb-space-2); }
+.sa-more-chip { text-decoration: none; }
+.sa-more-count { margin-left: .4em; color: var(--mgdb-muted); font-variant-numeric: tabular-nums; }
+
+/* Pager ------------------------------------------------------------------- */
+
+.sa-pager {
+  display: flex;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  justify-content: center;
+  margin: var(--mgdb-space-4) 0 var(--mgdb-space-3);
+}
+
+.sa-pager-status { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); font-variant-numeric: tabular-nums; }
+
+/* Loading ----------------------------------------------------------------- */
+
+.sa-skeleton { display: grid; gap: var(--mgdb-space-3); }
+
+.sa-skeleton span {
+  height: 76px;
+  border-radius: var(--mgdb-radius);
+  background: linear-gradient(90deg, var(--mgdb-surface-sunken) 25%, var(--mgdb-surface-alt) 50%, var(--mgdb-surface-sunken) 75%);
+  background-size: 400% 100%;
+  animation: sa-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes sa-shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sa-skeleton span { animation: none; }
+}
+
+/* Responsive -------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .sa-layout { grid-template-columns: minmax(0, 1fr); }
+  .sa-rail { position: static; }
+  .sa-rail-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--mgdb-space-2);
+  }
+  .sa-rail-items li { flex: 0 1 auto; }
+  .sa-rail-link {
+    border: 1px solid var(--mgdb-line);
+    border-radius: 999px;
+    padding: var(--mgdb-space-1) var(--mgdb-space-3);
+  }
+  .sa-rail-link.is-active { box-shadow: none; border-color: var(--mgdb-green-dark); }
+}
+
+@media (max-width: 620px) {
+  .sa-head { padding: var(--mgdb-space-4); }
+  .sa-section { padding-inline: var(--mgdb-space-4); }
+  .sa-section-head { flex-direction: column; align-items: flex-start; gap: var(--mgdb-space-2); }
+}

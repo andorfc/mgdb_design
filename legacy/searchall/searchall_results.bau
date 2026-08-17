@@ -1,0 +1,48 @@
+$$SYNTAX-LEVEL 2
+*(searchall_results
+<div id="centercolumn_record">
+   
+  @(no-search-term {display: off}
+    <br><br>
+    <span style="color:red"><b>No search term was given</b></span>
+  )
+   
+  @(no-results {display: off}
+    <br><br>
+    <h3>No records were found that match '$(term)'.</h3>
+  )
+  
+  @(results {display: off}
+    <h3>Found $(res_count) records that match '$(term)'.</h3>
+    <br><br>
+    
+    @(results_by_table
+      <div id="searchall$(type)" class="wrap-collabsible">
+        <input id="searchall_checkbox$(type)" class="inner_toggle_checkbox" type="checkbox"
+               onclick="toggleTableResults('$(term)', 'searchall_div$(type)', '$(type)'\)">
+        <label for="searchall_checkbox$(type)" class="inner_lbl-toggle">$(type) ($(type_count)\)</label>
+        <input type="hidden" id="ids$(type)" value="$(all_ids)">
+        <div id="searchall_div$(type)" class="collapsible-content"></div>
+      </div>
+      <br style="height:25px">
+    )
+  )
+  
+  @(id-results {display: off}
+    <br><br>
+    The id $(id) represents a $(table) record.
+  )
+  
+  @(table-results {display: off}
+    <h3>Search $(global_search_type) records for '$(global_search_term)'.</h3>
+    <br><br>
+    <div id="searchall_div$(table)">
+      <br><img src="/images/cornloading_60.gif">
+    </div>
+    <script language="javascript">
+      populateTableResults('$(global_search_term)', 'searchall_div$(table)', '$(table)'\);
+    </script>
+  )
+</div>
+
+)

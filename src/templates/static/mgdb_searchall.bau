@@ -1,0 +1,56 @@
+$$SYNTAX-LEVEL 2
+*(mgdb_searchall
+
+<main class="mgdb-page sa-page" id="sa-top"
+      data-search-term="$(search_term)"
+      data-initial-type="$(initial_type)"
+      data-initial-comments="$(initial_comments)">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Search results</span>
+  </nav>
+
+  <section class="sa-head" aria-labelledby="sa-heading">
+    <span class="mgdb-eyebrow">MaizeGDB search</span>
+    <h1 id="sa-heading">Results for &ldquo;<span data-sa-term>$(search_term)</span>&rdquo;</h1>
+    <p class="sa-summary" data-sa-summary>Searching&hellip;</p>
+
+    <form class="sa-refine" id="sa-refine" role="search">
+      <label class="mgdb-visually-hidden" for="sa-query">Refine this search</label>
+      <input class="mgdb-input sa-refine-input" id="sa-query" type="search" name="q"
+             value="$(search_term)" placeholder="Refine, or search for something else"
+             autocomplete="off" spellcheck="false">
+      <button class="mgdb-button mgdb-button-primary" type="submit">Search</button>
+      <label class="sa-toggle" for="sa-comments">
+        <input type="checkbox" id="sa-comments">
+        <span>Also search comments and notes</span>
+      </label>
+    </form>
+  </section>
+
+  <div class="sa-layout">
+    <nav class="sa-rail" id="sa-rail" aria-labelledby="sa-rail-heading">
+      <h2 class="sa-rail-heading" id="sa-rail-heading">Data types</h2>
+      <div class="sa-rail-list" data-sa-types>
+        <p class="mgdb-muted mgdb-small">Counting&hellip;</p>
+      </div>
+    </nav>
+
+    <div class="sa-main" data-sa-results aria-busy="true">
+      <div class="sa-skeleton" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+
+  <p class="mgdb-visually-hidden" role="status" aria-live="polite" data-sa-status></p>
+
+  <noscript>
+    <div class="mgdb-note">
+      <strong>This search needs JavaScript.</strong>
+      The <a href="/data_center">data centers</a> reach the same records through
+      forms that work without it.
+    </div>
+  </noscript>
+</main>
+)
