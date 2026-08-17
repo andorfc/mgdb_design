@@ -16,20 +16,31 @@
  * legacy/cite/. Rollback: delete this file and /cite returns to the old page.
  */
 
+  // Explicit headers to bypass Cloudflare / browser edge cache for this page
+  header("Cache-Control: no-cache, no-store, must-revalidate, max-age=0");
+  header("Pragma: no-cache");
+  header("Expires: 0");
+
   $system = getSystemInfo('mgdb.conf');
   logMessage('Starting controllers/cite.php');
 
   $bauplan = new Bauplan('How to Cite MaizeGDB | MaizeGDB');
   $bauplan->modern();
 
+  $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';
+  $css_file = $doc_root . '/css/mgdb-cite.css';
+  $js_file = $doc_root . '/js/mgdb-cite.js';
+  $v_css = file_exists($css_file) ? filemtime($css_file) : time();
+  $v_js = file_exists($js_file) ? filemtime($js_file) : time();
+
   $bauplan->preHTML('<meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
   $bauplan->includeCss('/css/static.css');
   $bauplan->includeCss('/css/mgdb-modern.css');
   $bauplan->includeCss('/css/mgdb-megamenu.css');
-  $bauplan->includeCss('/css/mgdb-cite.css');
+  $bauplan->includeCss('/css/mgdb-cite.css?v=' . $v_css);
   $bauplan->includeScript('/js/mgdb-modern.js');
   $bauplan->includeScript('/js/mgdb-chrome.js');
-  $bauplan->includeScript('/js/mgdb-cite.js');
+  $bauplan->includeScript('/js/mgdb-cite.js?v=' . $v_js);
   $bauplan->head('<meta name="description" content="How to cite MaizeGDB, including the current reference for the resource and the full list of MaizeGDB publications.">');
 
   $mgdb = $bauplan->template()->load('templates/maizegdb-main-modern.bau');

@@ -1,17 +1,23 @@
 /* How to cite MaizeGDB.
 
-   Every citation is rendered server-side, so the full list is present and
-   indexable before this runs. Filtering only hides and shows what is already
-   there, and copying the primary citation is a convenience on top of text the
-   reader could always select by hand. */
+   Citations are rendered server-side in full semantic card markup matching
+   the Reference Data Center.
+   This script handles:
+     1. Primary citation clipboard copy
+     2. Copy DOI / Copy PMID inline button actions
+     3. List / Card view toggle with localStorage persistence
+     4. Real-time client-side search and year/category filtering
+*/
 
 (function () {
   'use strict';
 
+  var STORAGE_KEY = 'mgdb-cite-journal-view';
+
   function byId(id) { return document.getElementById(id); }
 
-  /* Copy the primary citation, falling back to selecting it when the clipboard
-     API is unavailable or refused (it needs a secure context and permission). */
+  /* ── Copy the primary citation ──────────────────────────────────────────── */
+
   function initCopy() {
     var button = byId('cite-copy');
     var status = byId('cite-copy-status');
@@ -53,6 +59,59 @@
     });
   }
 
+  /* ── Copy DOI / PMID button helper ──────────────────────────────────────── */
+
+  function initCopyButtons() {
+    Array.prototype.forEach.call(document.querySelectorAll('.reference-copy-id'), function (btn) {
+      btn.addEventListener('click', function () {
+        var val = btn.getAttribute('data-copy-value');
+        if (!val) { return; }
+        var original = btn.textContent;
+        function finish(ok) {
+          btn.textContent = ok ? 'Copied!' : 'Press Cmd+C';
+          window.setTimeout(function () { btn.textContent = original; }, 1800);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(val).then(function () { finish(true); }).catch(function () { finish(false); });
+        } else {
+          finish(false);
+        }
+      });
+    });
+  }
+
+  /* ── List / Cards View Toggle ───────────────────────────────────────────── */
+
+  function initViewToggle() {
+    var group = document.querySelector('.mgdb-cite-group[data-group="journal"]');
+    if (!group) { return; }
+
+    var buttons = group.querySelectorAll('.cite-view-btn[data-view]');
+    if (!buttons.length) { return; }
+
+    var savedView = 'list';
+    try { savedView = localStorage.getItem(STORAGE_KEY) || 'list'; } catch (e) {}
+
+    function applyView(view) {
+      group.classList.remove('cite-view-list', 'cite-view-card');
+      group.classList.add('cite-view-' + view);
+      Array.prototype.forEach.call(buttons, function (btn) {
+        btn.setAttribute('aria-pressed', btn.getAttribute('data-view') === view ? 'true' : 'false');
+      });
+      try { localStorage.setItem(STORAGE_KEY, view); } catch (e) {}
+    }
+
+    Array.prototype.forEach.call(buttons, function (btn) {
+      btn.addEventListener('click', function () {
+        applyView(btn.getAttribute('data-view'));
+      });
+    });
+
+    applyView(savedView);
+  }
+
+  /* ── Filtering and search ────────────────────────────────────────────────── */
+
   function initFilters() {
     if (!window.MGDB) { return; }
 
@@ -78,23 +137,15 @@
         return true;
       },
       onChange: function () {
-        // Hide a year heading with nothing left under it, and a whole category
-        // group when every entry in it is filtered out, so the page does not
-        // leave empty headings behind.
         Array.prototype.forEach.call(groups, function (group) {
           var visibleInGroup = 0;
 
-          Array.prototype.forEach.call(group.children, function (node) {
-            if (!node.classList.contains('mgdb-cite-year')) { return; }
-            var visibleUnderHeading = 0;
-            var sibling = node.nextElementSibling;
-            while (sibling && !sibling.classList.contains('mgdb-cite-year')) {
-              if (sibling.classList.contains('mgdb-cite-entry') && !sibling.hidden) {
-                visibleUnderHeading += 1;
-              }
-              sibling = sibling.nextElementSibling;
-            }
-            node.hidden = visibleUnderHeading === 0;
+          // Year headings visibility
+          var yearHeadings = group.querySelectorAll('.mgdb-cite-year[data-year-heading]');
+          Array.prototype.forEach.call(yearHeadings, function (heading) {
+            var headingYear = heading.getAttribute('data-year-heading');
+            var visibleForYear = group.querySelectorAll('.mgdb-cite-entry[data-year="' + headingYear + '"]:not([hidden])').length;
+            heading.hidden = visibleForYear === 0;
           });
 
           Array.prototype.forEach.call(group.querySelectorAll('.mgdb-cite-entry'), function (entry) {
@@ -121,8 +172,6 @@
     var emptyReset = byId('cite-empty-reset');
     if (emptyReset) {
       emptyReset.addEventListener('click', function () {
-        // Delegate to the main reset so filterList's own state (query, active
-        // chip, URL) is cleared rather than only the visible attributes.
         if (yearSelect) { yearSelect.value = ''; }
         if (reset) { reset.click(); }
         else { list.refresh(); }
@@ -130,8 +179,12 @@
     }
   }
 
+  /* ── Bootstrap ──────────────────────────────────────────────────────────── */
+
   function init() {
     initCopy();
+    initCopyButtons();
+    initViewToggle();
     initFilters();
   }
 

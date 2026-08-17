@@ -55,9 +55,8 @@
   letter-spacing: .04em;
 }
 
-/* Citations are dense reference text. A hanging indent makes each entry's
-   first line stand out so the list can be scanned by author. */
-.mgdb-cite-page .mgdb-cite-entry {
+/* Non-journal cite entries fallback to hanging indent */
+.mgdb-cite-page p.mgdb-cite-entry {
   max-width: 88ch;
   padding-left: 1.5em;
   margin-top: var(--mgdb-space-3);
@@ -67,12 +66,12 @@
   text-indent: -1.5em;
 }
 
-.mgdb-cite-page .mgdb-cite-entry a {
+.mgdb-cite-page p.mgdb-cite-entry a {
   color: var(--mgdb-burgundy);
   overflow-wrap: anywhere;
 }
 
-/* Search highlight, matching the header suggestions. */
+/* Search highlight */
 .mgdb-cite-page mark { background: #fdf0c4; color: inherit; font-weight: 700; }
 
 /* A group whose entries are all filtered out should disappear with them. */
@@ -82,6 +81,205 @@
 .mgdb-cite-page .mgdb-search-row .mgdb-field:first-child { flex: 3 1 22rem; }
 .mgdb-cite-page .mgdb-search-row .mgdb-field { flex: 1 1 10rem; }
 
+/* ── View toggle toolbar ─────────────────────────────────────────────────── */
+
+.mgdb-cite-page .cite-view-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-4);
+  padding: var(--mgdb-space-2) 0;
+}
+
+.mgdb-cite-page .cite-view-label {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+}
+
+.mgdb-cite-page .cite-view-buttons {
+  display: inline-flex;
+  gap: 2px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  padding: 2px;
+}
+
+.mgdb-cite-page .cite-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  padding: 4px var(--mgdb-space-3);
+  border: none;
+  border-radius: var(--mgdb-radius-xs, 4px);
+  background: transparent;
+  color: var(--mgdb-ink-soft);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+
+.mgdb-cite-page .cite-view-btn:hover:not([aria-pressed="true"]) {
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-ink);
+}
+
+.mgdb-cite-page .cite-view-btn[aria-pressed="true"] {
+  background: var(--mgdb-green-dark);
+  color: #fff;
+}
+
+.mgdb-cite-page .cite-view-btn svg {
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+}
+
+/* ── Reference result card (matching Reference Data Center) ─────────────── */
+
+.mgdb-cite-page .reference-result-card {
+  display: block;
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.mgdb-cite-page .reference-result-card + .reference-result-card {
+  margin-top: var(--mgdb-space-3);
+}
+
+.mgdb-cite-page .reference-result-card:hover {
+  border-color: var(--mgdb-gold-dark);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-cite-page .reference-result-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: center;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-cite-page .reference-result-card h3 {
+  margin-top: var(--mgdb-space-1);
+  padding-bottom: 0;
+  border-bottom: none;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-cite-page .reference-result-card h3 a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.mgdb-cite-page .reference-result-card h3 a:hover {
+  color: var(--mgdb-leaf);
+}
+
+.mgdb-cite-page .reference-result-authors {
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-cite-page .reference-result-citation {
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-cite-page .reference-result-abstract {
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-cite-page .reference-result-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  align-items: center;
+  margin-top: var(--mgdb-space-3);
+}
+
+.mgdb-cite-page .reference-result-links a {
+  color: var(--mgdb-burgundy);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.mgdb-cite-page .reference-result-links a:hover {
+  text-decoration: underline;
+}
+
+.mgdb-cite-page .reference-copy-id {
+  min-height: 30px;
+  padding: 2px var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink-soft);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+
+.mgdb-cite-page .reference-copy-id:hover {
+  background: var(--mgdb-surface-alt);
+  border-color: var(--mgdb-muted);
+}
+
+/* ── Card grid view modifier ─────────────────────────────────────────────── */
+
+.mgdb-cite-page .mgdb-cite-group[data-group="journal"].cite-view-card .cite-journal-cards-wrapper {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-cite-page .mgdb-cite-group[data-group="journal"].cite-view-card .cite-journal-cards-wrapper .mgdb-cite-year {
+  grid-column: 1 / -1;
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-cite-page .mgdb-cite-group[data-group="journal"].cite-view-card .reference-result-card + .reference-result-card {
+  margin-top: 0;
+}
+
+.mgdb-cite-page .mgdb-cite-group[data-group="journal"].cite-view-card .reference-result-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.mgdb-cite-page .mgdb-cite-group[data-group="journal"].cite-view-card .reference-result-abstract {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Responsive */
 @media (max-width: 767px) {
-  .mgdb-cite-page .mgdb-cite-entry { padding-left: 1.1em; text-indent: -1.1em; }
+  .mgdb-cite-page p.mgdb-cite-entry { padding-left: 1.1em; text-indent: -1.1em; }
+  .mgdb-cite-page .reference-result-card { padding: var(--mgdb-space-4); }
+  .mgdb-cite-page .mgdb-cite-group[data-group="journal"].cite-view-card .cite-journal-cards-wrapper {
+    grid-template-columns: 1fr;
+  }
 }
