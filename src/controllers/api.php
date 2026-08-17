@@ -94,6 +94,20 @@
   }
 
   /////
+  // GET /api/v1/coming_soon — MaizeGDB upcoming features roadmap
+  /////
+
+  if ($api_resource === 'coming_soon' || $api_resource === 'roadmap') {
+    $cs_file = $system['root_dir'] . '/data/coming_soon.json';
+    if (!is_file($cs_file)) {
+      $cs_file = $_SERVER['DOCUMENT_ROOT'] . '/data/coming_soon.json';
+    }
+    $cs_data = is_file($cs_file) ? json_decode(file_get_contents($cs_file), true) : array('items' => array());
+    MgdbApi::sendDocument($cs_data, 3600);
+    return;
+  }
+
+  /////
   // GET /api/v1/records/{type}/{id}
   /////
 
