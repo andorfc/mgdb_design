@@ -20,6 +20,7 @@ src/js/mgdb-chrome.js          Header and megamenu enhancement
 src/lib/Bauplan.php            Modernized document shell (opt-in)
 src/templates/static/          Page body templates (.bau)
 src/pages/                     Page controllers (index.php)
+icons/                         The MaizeGDB icon set — source of truth
 reference/                     Unmodified copies of the files being replaced
 tools/redesign_status.py       Measures how much of the site is modernized
 REDESIGN_STATUS.md             Its report. Generated; do not edit by hand
@@ -28,6 +29,66 @@ ADMIN_DEPENDENCIES.md          Changes that need an administrator
 backups/<timestamp>/           Automatic pre-deploy snapshot of every server file
 deploy/manifest.txt            local path -> webroot destination mapping
 ```
+
+## Icons
+
+`icons/` is the source of truth for the MaizeGDB icon set: 39 line icons drawn
+on one 24×24 grid at `stroke-width: 1.75`.
+
+```
+icons/maizegdb-icons-sprite.svg  All 39 as <symbol id="mzg-SLUG">
+icons/index.tsv                  slug, human label, brand colour
+icons/mono/  icons/color/        Standalone SVG, currentColor and brand-coloured
+icons/png/16 /24 /48             Raster fallbacks
+```
+
+**How pages consume them.** The sprite is inlined once by
+`templates/home/search-box-modern.bau`, which the modern shell puts in the
+header of every modern page. A page therefore only writes the reference:
+
+```html
+<span class="mgdb-search-icon" data-cat="stock" aria-hidden="true">
+  <svg focusable="false"><use href="#mzg-stocks-and-germplasm"></use></svg>
+</span>
+```
+
+Each symbol carries its own `viewBox` and `stroke="currentColor"`, so colour
+comes from the surrounding element — in practice from the
+`.mgdb-search-icon[data-cat]` tint pairs in `mgdb-modern.css`. That is why the
+homepage index can group-tint its rows (Tools teal, Data indigo, Resources
+gold, Community wine) while still using per-resource artwork. `index.tsv` also
+records a per-icon brand colour, which nothing currently uses.
+
+**Adding or changing an icon:** edit `icons/`, then re-inline the sprite into
+`search-box-modern.bau`. Keep the `mzg-` prefix; it is what separates this set
+from the four surviving `mgdb-cat-*` shapes.
+
+**The four `mgdb-cat-*` shapes** kept beside it — `all`, `id`, `page` and
+`gene-model` — have no equivalent in the new set. The first three are search
+*scopes* rather than data types; the fourth is the exon-box diagram the header's
+"Gene models" option needs.
+
+**Two vocabularies meet here, so match the icon to the visible label, not to
+the key.** They collide on exactly two spellings:
+
+| Key | In the header listbox | In the search/suggestion API |
+| --- | --- | --- |
+| `gene_model` | the option *Gene models* | a gene record — group *Genes* |
+| `gene_product` | the option *Genes* | a protein or RNA — group *Gene products* |
+
+The other twelve keys agree. `searchall_modern.php` reconciles the two by
+mapping both header gene categories onto the single `gene` type, so nothing is
+functionally wrong — but anything picking an icon *by key* will draw the wrong
+one. Three places resolve it, and they must stay in step:
+
+- `templates/home/search-box-modern.bau` — listbox vocabulary. *Genes* →
+  `#mzg-genes`, *Gene models* → `#mgdb-cat-gene-model`.
+- `js/mgdb-searchall.js` — API vocabulary, in its `ICONS` map.
+- `js/mgdb-search.js` — **both**. Recent searches store `select.value`
+  (listbox) and read the index directly; suggestions carry the API value and go
+  through `apiIconHref()` first.
+
+All three end up pointing *Genes* at `#mzg-genes`.
 
 ## Deploying
 
@@ -87,6 +148,8 @@ immediately. Where a file was overwritten, restore it from
 | Maize genetics nomenclature | `/nomenclature` | `controllers/community/nomenclature.php` | `legacy/nomenclature/` — see the note there |
 | UniformMu insertion resource | `/uniformmu` | `controllers/uniformmu.php` | `legacy/uniformmu/` |
 | TYPSimSelector | `/TYPSimSelector` | `controllers/TYPSimSelector.php` | `legacy/typsimselector/` |
+| Insertion Data Center | `/insertion` | `controllers/insertion/insertion_search_modern.php` | `legacy/insertion/` |
+| Homepage | `/` | `index.php` | `legacy/home/` |
 
 `/cite` had no top-level controller, so `controller.php` fell through to
 `redirect.php`, which found `controllers/about/cite.php`. Because
@@ -704,6 +767,110 @@ an empty document and fires `DOMContentLoaded` afterwards, so anything that
 touches the DOM too early fails the suite. Any new page script in this
 repository has the same exposure.
 
+## The insertion data center
+
+`/insertion` is its own top-level controller, not a `/data_center/<page>` route,
+so the guard lives at the top of `src/controllers/insertion.php` rather than in
+`data_center.php`. Everything below that guard is the unmodified legacy code —
+`/insertion/mu1000002` and every other record page still goes through it.
+
+**One table, four collections.** `perm_tables.marker_gene_model` holds 1,305,425
+rows, of which 1,269,215 are insertion alignments split across four
+`mgdb.person` ids:
+
+| Collection | `source_id` | Alignments | Insertions |
+| --- | --- | --- | --- |
+| UniformMu | 1226435 | 597,426 | 68,843 |
+| BonnMu | 9045136 | 647,938 | 463,968 |
+| Ds-GFP (Dooner-Du Ac/Ds) | 3229932 | 18,428 | 7,510 |
+| Ac/Ds genome-wide (Volbrecht) | 9023179 | 5,423 | 1,638 |
+
+Restricting to those four ids is what makes "all datasets" mean something
+narrower than every row in the table.
+
+**Three search modes, and what each costs.** Each resolves a bounded set of
+insertion locus ids first, then asks two indexed questions about that set —
+where each insertion sits, and what variation and stock it leads to. That keeps
+every query's row count close to what the page renders, instead of joining
+stocks onto alignments and de-duplicating the product.
+
+| Mode | Cost | Why |
+| --- | --- | --- |
+| by gene model | ~30 ms | one index probe per gene, against `marker_gene_model_idx1`/`idx3` |
+| by insertion name | ~20 ms | one `IN` against `idx_locus_name` |
+| by genome window | ~150 ms | **no positional index** — a parallel sequential scan of 1.3 M rows. AD-015. |
+
+The region window is capped at 20 Mb for that reason: the scan costs the same
+whatever the width, so the cap bounds the pathological request rather than the
+normal one.
+
+`gene_model` is empty on every W22 alignment and the transcript carries the gene
+name instead, so both are tested and the transcript's `_T###` suffix is stripped
+before grouping. Counting distinct `gene_model` on W22 returns 10, which is not
+a fact about the genome.
+
+**The legacy endpoint is still live and still injectable.** The forms this page
+replaces posted to `search/insertion/insertion_results.php`, which interpolates
+the chromosome, coordinates, dataset, background, and the whole identifier list
+straight into SQL. Recorded as AD-022. The modern library binds every value as a
+named parameter, including expanding id lists to individually-bound
+placeholders.
+
+## The homepage
+
+Built from the `design_handoff_maizegdb_homepage` bundle, direction 1c. The
+handoff's mapping table was accurate: every component it named already existed,
+and the page adds only three new rule groups in `src/css/mgdb-home.css` — the
+two-column body, the banded index, and the right-rail lists.
+
+**Where each number comes from, and why they are not all live.** The four metric
+counts are full scans; measured together they cost **878 ms**, which the site's
+most requested page should not pay to show figures that change once per release.
+`tools/home_summary.php` measures them offline into
+`src/data/home/home_summary.json` and the page reads that — the same arrangement
+`/uniformmu` and `/insertion` use for their collection-wide totals.
+
+| Value | Source | Cost |
+| --- | --- | --- |
+| Release / next update | `ctl`, live | 1.6 ms |
+| Genome assemblies | precomputed | 8.6 ms |
+| B73 gene models | precomputed | 348.6 ms |
+| Seed stocks | precomputed | 220.4 ms |
+| References | precomputed | 299.1 ms |
+
+The dates stay live deliberately: a stale release date is a claim about the
+data, and it is one indexed row.
+
+Assemblies count *Zea mays* only — 129 of the 161 completed assemblies. The
+other 32 are Andropogoneae from the PanAnd project, real data but not what
+"genome assemblies" means to a reader on the maize homepage. Note `/genomes`
+separately hard-codes 158 and so disagrees; that page has not been reconciled.
+
+**News is derived, not authored.** `data/news.xml` has no title field — each
+entry is a paragraph of curator prose with trusted HTML in it. The rail needs a
+headline, so one is made: entities decoded, tags stripped, first sentence taken,
+trimmed on a word boundary. It is a lossy summary of curator copy, which is why
+the full entry stays one click away under the list. A `<title>` element in
+`news.xml` would remove the guesswork.
+
+**`index.php` is now owned by this repository.** It was `john:mgdbadmin` and
+outside the manifest. Listing it means every deploy overwrites the server copy,
+which is the fix for the drift documented against the data centers — and also
+means a change made directly on the server will be silently erased.
+`index_legacy.php` sits beside it: the verbatim pre-redesign controller, which
+the new one includes for any `?page=` other than `home`, and which is the
+rollback.
+
+`?page=<anything>` returns a Bauplan error about a missing `blast_url`. That is
+pre-existing — the codex instance's untouched copy returns the same bytes —
+because the original only ever loaded the megamenu in its `home` branch. The
+fallback reproduces it rather than quietly fixing it.
+
+**Four resources were dropped from the index** by explicit decision:
+Nomenclature, Mutants & Phenotypes, SNPs & Traits, and Metabolic Pathways. All
+four are still in the Data Centers mega menu. `legacy/home/README.md` records
+where to put them back.
+
 ## The protein structure data center
 
 `/data_center/protein_structure` replaces a page that was two things bolted
@@ -1137,6 +1304,8 @@ On the redesign and verified on the development instance:
 | Contact | `/contact` |
 | Person and organization search | `/person` |
 | Pan-gene search | `/pan_gene_center/pan_gene` |
+| Insertion Data Center | `/insertion` |
+| Homepage | `/` |
 | Stock search | `/data_center/stock` |
 | Stock record | `/data_center/stock/{id}` |
 | Reference record | `/data_center/reference?id={id}` |

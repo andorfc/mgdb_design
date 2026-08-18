@@ -26,21 +26,31 @@
 
   /* Sprite ids for the data-type chips. The header search carries the sprite
      itself; this map only names the targets. Keys match the `cat` the API
-     returns, which is the same vocabulary the header categories use. */
+     returns.
+
+     Careful: `cat` here and the header's data-cat are NOT the same vocabulary,
+     despite sharing two spellings. In this file the API's own registry applies,
+     where cat 'gene_model' is the section labelled *Genes* and 'gene_product'
+     is *Gene products*. In the header, data-cat 'gene_product' is the option
+     labelled *Genes* and 'gene_model' is *Gene models*; searchall_modern.php
+     reconciles them by mapping both header gene categories onto the one `gene`
+     type. So match the icon to the visible label, not to the key — that is why
+     'gene_model' takes the genes icon here while the header's 'gene_model'
+     takes the gene-model shape. */
   var ICONS = {
-    gene_model: '#mgdb-cat-gene',
-    locus: '#mgdb-cat-locus',
-    reference: '#mgdb-cat-reference',
-    stock: '#mgdb-cat-stock',
-    probe: '#mgdb-cat-marker',
-    variation: '#mgdb-cat-variation',
-    phenotype: '#mgdb-cat-phenotype',
-    term: '#mgdb-cat-trait',
-    qtl_exp: '#mgdb-cat-qtl',
-    gene_product: '#mgdb-cat-gene-model',
-    map: '#mgdb-cat-map',
-    person: '#mgdb-cat-person',
-    genome: '#mgdb-cat-genome',
+    gene_model: '#mzg-genes',
+    locus: '#mzg-loci',
+    reference: '#mzg-references',
+    stock: '#mzg-stocks-and-germplasm',
+    probe: '#mzg-markers-and-probes',
+    variation: '#mzg-variations-and-alleles',
+    phenotype: '#mzg-phenotypes',
+    term: '#mzg-traits-and-terms',
+    qtl_exp: '#mzg-qtl-experiments',
+    gene_product: '#mzg-gene-products',
+    map: '#mzg-maps',
+    person: '#mzg-people-and-organizations',
+    genome: '#mzg-genomes',
     id: '#mgdb-cat-id'
   };
 

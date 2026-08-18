@@ -60,8 +60,34 @@
     return index;
   }
 
-  function buildIcon(index, cat) {
-    if (!cat || !index[cat]) { return null; }
+  /* Two vocabularies reach the icon builder, and they disagree on exactly
+     two keys.
+
+       listbox   gene_product = the option labelled "Genes"
+                 gene_model   = the option labelled "Gene models"
+       API       gene_model   = a gene record  — group labelled "Genes"
+                 gene_product = a protein/RNA  — group labelled "Gene products"
+
+     Recent searches store the listbox value (select.value), so they look up
+     the index directly. Suggestions carry the API's value and come through
+     here first. Without it a gene suggestion draws with the gene-model shape
+     and a gene product with the genes icon — exactly swapped.
+
+     The other twelve keys are identical in both, which is why the index is
+     still read off the listbox: a new category keeps working with no change
+     here. Same reconciliation mgdb-searchall.js makes; keep the two in step. */
+  function apiIconHref(index, cat) {
+    // Both mean "Genes"; prefer the listbox's own target so a swap there follows.
+    if (cat === 'gene_model') { return index.gene_product || '#mzg-genes'; }
+    // "Gene products" is a result type only — the listbox has no row to read.
+    if (cat === 'gene_product') { return '#mzg-gene-products'; }
+    return index[cat];
+  }
+
+  /* href is resolved by the caller: from the index directly for a listbox
+     value, or through apiIconHref() for a value that came from the API. */
+  function buildIconFrom(href, cat) {
+    if (!cat || !href) { return null; }
     var chip = document.createElement('span');
     chip.className = 'mgdb-search-icon';
     chip.setAttribute('data-cat', cat);
@@ -70,10 +96,20 @@
     svg.setAttribute('viewBox', '0 0 24 24');
     svg.setAttribute('focusable', 'false');
     var use = document.createElementNS(SVG_NS, 'use');
-    use.setAttribute('href', index[cat]);
+    use.setAttribute('href', href);
     svg.appendChild(use);
     chip.appendChild(svg);
     return chip;
+  }
+
+  // A listbox value: recent searches, which store select.value verbatim.
+  function buildIcon(index, cat) {
+    return buildIconFrom(cat ? index[cat] : null, cat);
+  }
+
+  // An API value: suggestion rows and their groups.
+  function buildApiIcon(index, cat) {
+    return buildIconFrom(apiIconHref(index, cat), cat);
   }
 
   /* ------------------------------------------------------------------------
@@ -375,7 +411,7 @@
 
       /* The type is on the item, not the group, because the promoted top hit
          belongs to no group and a group can mix types. */
-      var icon = buildIcon(icons, item.cat || (group && group.cat));
+      var icon = buildApiIcon(icons, item.cat || (group && group.cat));
       if (icon) { link.appendChild(icon); }
 
       var copy = document.createElement('span');
