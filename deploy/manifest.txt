@@ -373,3 +373,18 @@ src/templates/static/mgdb_searchall.bau          templates/static/mgdb_searchall
 src/css/mgdb-searchall.css                       css/mgdb-searchall.css
 src/js/mgdb-searchall.js                         js/mgdb-searchall.js
 
+# Homepage — replaces / in place, from design handoff direction 1c.
+# index.php was previously owned by john:mgdbadmin and outside the manifest;
+# listing it here means this repository owns it and every deploy overwrites the
+# server copy. index_legacy.php is the verbatim pre-redesign controller: the
+# new controller includes it for any ?page= other than 'home', and it is the
+# rollback. Pre-redesign original also archived in legacy/home/.
+src/index.php                                            index.php
+src/index_legacy.php                                     index_legacy.php
+src/templates/static/mgdb_home.bau                       templates/static/mgdb_home.bau
+src/css/mgdb-home.css                                    css/mgdb-home.css
+
+# Written by tools/home_summary.php on the server; rerun it each release or the
+# four metric counts keep reporting the previous measurement. Precomputed
+# because querying them live costs 878 ms on the site's busiest page.
+src/data/home/home_summary.json                          data/home/home_summary.json

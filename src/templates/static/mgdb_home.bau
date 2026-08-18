@@ -1,0 +1,235 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-home
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https://maizegdb.org/">
+<meta property="og:title" content="MaizeGDB — Maize Genetics and Genomics Database">
+<meta property="og:description" content="The community database for maize genetics and genomics: genome assemblies, gene models, seed stocks, and curated literature, with the tools to search them.">
+
+<main class="mgdb-page mgdb-home-page">
+
+  <div class="mgdb-hero-record">
+    <div>
+      <span class="mgdb-eyebrow">Maize genetics and genomics database</span>
+      <h1>Welcome to MaizeGDB</h1>
+      <dl class="mgdb-record-facts">
+        <div><dt>Release</dt><dd class="mgdb-record-id">$(release_date)</dd></div>
+        <div><dt>Next update</dt><dd class="mgdb-record-id">$(next_update)</dd></div>
+        <div><dt>Reference</dt><dd class="mgdb-record-id">B73 RefGen_v5</dd></div>
+      </dl>
+    </div>
+    <div class="mgdb-hero-record-actions">
+      <a class="mgdb-button mgdb-button-primary" href="$(server-url)/contribute_data">Contribute your data</a>
+      <a class="mgdb-button mgdb-button-secondary" href="$(server-url)/cite">Cite MaizeGDB</a>
+    </div>
+  </div>
+
+  <!-- The metric cards carry h3 headings, from the shared .mgdb-metric
+       component. Elsewhere they sit under a section h2; the design gives this
+       strip no visible heading, so one is supplied for the outline only —
+       without it the document skips from h1 straight to h3. -->
+  <h2 class="mgdb-visually-hidden">MaizeGDB at a glance</h2>
+  <div class="mgdb-metric-grid mgdb-home-metrics">
+    <article class="mgdb-metric mgdb-tone-green">
+      <span class="mgdb-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="21" height="21" focusable="false"><use href="#mzg-genomes"></use></svg></span>
+      <div>
+        <strong class="mgdb-metric-value">$(metric_assemblies)</strong>
+        <h3>Genome assemblies</h3>
+        <p>Completed <i>Zea mays</i> assemblies hosted here</p>
+      </div>
+    </article>
+    <article class="mgdb-metric mgdb-tone-amber">
+      <span class="mgdb-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="21" height="21" focusable="false"><use href="#mzg-genes"></use></svg></span>
+      <div>
+        <strong class="mgdb-metric-value">$(metric_genes)</strong>
+        <h3>B73 gene models</h3>
+        <p>Zm00001eb annotation set</p>
+      </div>
+    </article>
+    <article class="mgdb-metric">
+      <span class="mgdb-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="21" height="21" focusable="false"><use href="#mzg-stocks-and-germplasm"></use></svg></span>
+      <div>
+        <strong class="mgdb-metric-value">$(metric_stocks)</strong>
+        <h3>Seed stocks</h3>
+        <p>Orderable from the COOP</p>
+      </div>
+    </article>
+    <article class="mgdb-metric mgdb-tone-burgundy">
+      <span class="mgdb-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="21" height="21" focusable="false"><use href="#mzg-references"></use></svg></span>
+      <div>
+        <strong class="mgdb-metric-value">$(metric_references)</strong>
+        <h3>References</h3>
+        <p>Curated maize literature</p>
+      </div>
+    </article>
+  </div>
+
+  <div class="mgdb-home-layout">
+
+    <section aria-labelledby="home-index-title">
+      <div class="mgdb-home-index-heading">
+        <div>
+          <span class="mgdb-eyebrow">Index</span>
+          <h2 id="home-index-title">All resources</h2>
+        </div>
+        <a href="$(server-url)/data_center/">Data centers</a>
+      </div>
+      <p class="mgdb-home-index-intro">Every tool and data center, grouped by kind. One row per resource &mdash; no icon hunting.</p>
+
+      <div class="mgdb-index">
+
+        <h3 class="mgdb-index-band" id="home-band-tools">Tools</h3>
+        <div role="list" aria-labelledby="home-band-tools">
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/genomebrowser">
+            <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-genome-browsers"></use></svg></span>
+            <strong>Genome Browsers</strong>
+            <span class="mgdb-index-desc">JBrowse tracks for every assembly</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="$(blast_url)">
+            <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-sequences"></use></svg></span>
+            <strong>BLAST</strong>
+            <span class="mgdb-index-desc">Align a sequence to maize databases</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="https://snptools.maizegdb.org" target="_blank" rel="noopener">
+            <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-variations-and-alleles"></use></svg></span>
+            <strong>SNPTools</strong>
+            <span class="mgdb-index-desc">Variant browsing and AI score tracks</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="https://pangenome-viewer.maizegdb.org" target="_blank" rel="noopener">
+            <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-pan-genome-graphs"></use></svg></span>
+            <strong>Pan-genome viewer</strong>
+            <span class="mgdb-index-desc">Compare structure across genomes</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="https://qteller.maizegdb.org" target="_blank" rel="noopener">
+            <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-gene-expression-profile"></use></svg></span>
+            <strong>qTeller</strong>
+            <span class="mgdb-index-desc">Compare expression across experiments</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="https://maizemine.rnet.missouri.edu/maizemine/" target="_blank" rel="noopener">
+            <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-maizemine"></use></svg></span>
+            <strong>MaizeMine</strong>
+            <span class="mgdb-index-desc">Build and export custom queries</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="https://feta.maizegdb.org" target="_blank" rel="noopener">
+            <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-gene-enrichment-feta"></use></svg></span>
+            <strong>Gene Enrichment</strong>
+            <span class="mgdb-index-desc">GO and pathway enrichment testing</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="https://phylostrata.maizegdb.org" target="_blank" rel="noopener">
+            <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-gene-evolution"></use></svg></span>
+            <strong>Phylostrata</strong>
+            <span class="mgdb-index-desc">Evolutionary age of gene families</span>
+          </a>
+        </div>
+
+        <h3 class="mgdb-index-band" id="home-band-data">Data</h3>
+        <div role="list" aria-labelledby="home-band-data">
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/NAM_project">
+            <span class="mgdb-search-icon" data-cat="genome" aria-hidden="true"><svg focusable="false"><use href="#mzg-nam-genomes"></use></svg></span>
+            <strong>NAM Genomes</strong>
+            <span class="mgdb-index-desc">The 26 founder-line assemblies</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/PanAnd_project">
+            <span class="mgdb-search-icon" data-cat="genome" aria-hidden="true"><svg focusable="false"><use href="#mzg-panand-genomes"></use></svg></span>
+            <strong>PanAnd Genomes</strong>
+            <span class="mgdb-index-desc">Andropogoneae comparative set</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/pan_gene_center/pan_gene">
+            <span class="mgdb-search-icon" data-cat="genome" aria-hidden="true"><svg focusable="false"><use href="#mzg-pan-genes"></use></svg></span>
+            <strong>Pan-genes</strong>
+            <span class="mgdb-index-desc">Orthology across the pan-genome</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/gene_center/gene">
+            <span class="mgdb-search-icon" data-cat="genome" aria-hidden="true"><svg focusable="false"><use href="#mzg-genes"></use></svg></span>
+            <strong>Gene Center</strong>
+            <span class="mgdb-index-desc">One report page per gene model</span>
+          </a>
+        </div>
+
+        <h3 class="mgdb-index-band" id="home-band-resources">Resources</h3>
+        <div role="list" aria-labelledby="home-band-resources">
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/ai">
+            <span class="mgdb-search-icon" data-cat="stock" aria-hidden="true"><svg focusable="false"><use href="#mzg-artificial-intelligence"></use></svg></span>
+            <strong>Artificial Intelligence</strong>
+            <span class="mgdb-index-desc">Model-derived predictions and scores</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/download">
+            <span class="mgdb-search-icon" data-cat="stock" aria-hidden="true"><svg focusable="false"><use href="#mzg-datasets-and-downloads"></use></svg></span>
+            <strong>Downloads</strong>
+            <span class="mgdb-index-desc">Bulk sequence and annotation files</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/data_center/protein_structure">
+            <span class="mgdb-search-icon" data-cat="stock" aria-hidden="true"><svg focusable="false"><use href="#mzg-protein-structures"></use></svg></span>
+            <strong>Protein Structures</strong>
+            <span class="mgdb-index-desc">Predicted folds and domain annotation</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/new_genes">
+            <span class="mgdb-search-icon" data-cat="stock" aria-hidden="true"><svg focusable="false"><use href="#mzg-new-genes"></use></svg></span>
+            <strong>Newly Characterized Genes</strong>
+            <span class="mgdb-index-desc">Recently described maize genes</span>
+          </a>
+        </div>
+
+        <h3 class="mgdb-index-band" id="home-band-community">Community</h3>
+        <div role="list" aria-labelledby="home-band-community">
+          <a class="mgdb-index-row" role="listitem" href="https://www.mgcmeeting.com" target="_blank" rel="noopener">
+            <span class="mgdb-search-icon" data-cat="reference" aria-hidden="true"><svg focusable="false"><use href="#mzg-maize-genetics-meeting"></use></svg></span>
+            <strong>Maize Meeting</strong>
+            <span class="mgdb-index-desc">Annual conference and archive</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="https://www.maizegenetics.org" target="_blank" rel="noopener">
+            <span class="mgdb-search-icon" data-cat="reference" aria-hidden="true"><svg focusable="false"><use href="#mzg-maize-genetics-cooperation"></use></svg></span>
+            <strong>Maize Genetics Cooperation</strong>
+            <span class="mgdb-index-desc">Stock center and newsletter</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/hot_new_papers">
+            <span class="mgdb-search-icon" data-cat="reference" aria-hidden="true"><svg focusable="false"><use href="#mzg-editorial-board-papers"></use></svg></span>
+            <strong>Editorial Board papers</strong>
+            <span class="mgdb-index-desc">Curated picks from the literature</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="https://www.agbiodata.org" target="_blank" rel="noopener">
+            <span class="mgdb-search-icon" data-cat="reference" aria-hidden="true"><svg focusable="false"><use href="#mzg-agbiodata"></use></svg></span>
+            <strong>AgBioData</strong>
+            <span class="mgdb-index-desc">Cross-database FAIR data consortium</span>
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <aside class="mgdb-home-rail" aria-label="News and shortcuts">
+
+      <div class="mgdb-aside-card">
+        <h2>MaizeGDB news</h2>
+        <ul class="mgdb-home-news">
+          $(news_items)
+        </ul>
+        <p class="mgdb-home-news-more"><a href="$(server-url)/whatsnew">More news &middot; Archive</a></p>
+      </div>
+
+      <div class="mgdb-panel">
+        <h2 class="mgdb-home-rail-title">Common tasks</h2>
+        <ul class="mgdb-home-tasks">
+          <li><a href="$(server-url)/gene_center/gene">Find a gene by symbol</a></li>
+          <li><a href="$(server-url)/gene_center/gene#translate">Convert coordinates between assemblies</a></li>
+          <li><a href="$(server-url)/data_center/stock">Order seed from the COOP</a></li>
+          <li><a href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0">Download the B73 annotation</a></li>
+        </ul>
+      </div>
+
+      <div class="mgdb-panel">
+        <h2 class="mgdb-home-rail-title">Other USDA crop databases</h2>
+        <ul class="mgdb-home-tasks">
+          <li><a href="https://wheat.pw.usda.gov/GG3/" target="_blank" rel="noopener">GrainGenes</a></li>
+          <li><a href="https://sorghumbase.org/" target="_blank" rel="noopener">SorghumBase</a></li>
+          <li><a href="https://soybase.org/" target="_blank" rel="noopener">SoyBase</a></li>
+        </ul>
+        <a class="mgdb-home-usda" href="https://www.usda.gov/" target="_blank" rel="noopener">
+          <img src="/images/USDA.png" alt="United States Department of Agriculture" height="40" />
+        </a>
+      </div>
+
+    </aside>
+  </div>
+</main>
+)
