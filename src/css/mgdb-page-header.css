@@ -1,0 +1,261 @@
+/* ==========================================================================
+   Page header ("header bubble")
+   --------------------------------------------------------------------------
+   A rounded card whose left portion is a solid wheat field carrying the page
+   title, blending on the right into a photograph. The core idea is that the
+   tint is *solid* under the text and fades out over the photo — not a
+   translucent scrim over the whole image — so the text sits on flat colour at
+   full contrast and the photo is untouched where it shows.
+
+   Built from the design handoff. Every value a page might want to change is a
+   custom property, so a page overrides tokens rather than writing CSS:
+
+     --mgdb-header-photo         the image, as a url() — set on the element
+     --mgdb-header-fade-start    tint stays fully solid up to here
+     --mgdb-header-fade-end      photo is fully clear past here
+     --mgdb-header-text-width    the text column
+     --mgdb-header-min-height    card height
+     --mgdb-header-title-size    title size, and --mgdb-header-title-wrap
+
+   Two deviations from the handoff, both deliberate:
+
+   1. The handoff derives the fade stops with color-mix(). This uses an rgb
+      triplet token instead, so the stops are literal rgba() and the file works
+      in browsers without color-mix support. The tint is still defined once.
+   2. The handoff specifies Source Sans 3 from Google Fonts. This inherits the
+      site's own stack via --mgdb-font and leaves --mgdb-header-font as the
+      override, so the header adds no external request. Source Sans 3 is a
+      one-line change here if it is ever self-hosted.
+
+   ACCESSIBILITY. Contrast is only guaranteed where the tint is solid. No line
+   of text may extend past --mgdb-header-fade-start: an earlier iteration put
+   body text on lit foliage at about 1.5:1. Keep --mgdb-header-text-width less
+   than or equal to --mgdb-header-fade-start; the header workbench at
+   /pattern_library/header/ checks this live.
+   ========================================================================== */
+
+.mgdb-page-header {
+  /* -- colour ------------------------------------------------------------ */
+  --mgdb-header-tint-rgb: 246, 232, 203;              /* #F6E8CB */
+  --mgdb-header-tint: rgb(var(--mgdb-header-tint-rgb));
+  --mgdb-header-title-color: #4A1710;                 /* 12.4:1 on the tint */
+  --mgdb-header-lede-color: #5C2418;                  /* 9.8:1 */
+  --mgdb-header-text-color: #58483C;                  /* 7.3:1 */
+
+  /* -- geometry ---------------------------------------------------------- */
+  --mgdb-header-radius: 22px;
+  --mgdb-header-min-height: 210px;
+  --mgdb-header-text-width: 60%;
+  --mgdb-header-fade-start: 60%;
+  --mgdb-header-fade-end: 86%;
+  --mgdb-header-pad-y: 26px;
+  --mgdb-header-pad-x: 40px;
+  --mgdb-header-gap: 10px;
+
+  /* -- type -------------------------------------------------------------- */
+  --mgdb-header-font: var(--mgdb-font, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif);
+  --mgdb-header-title-size: 38px;
+  --mgdb-header-title-wrap: nowrap;
+  --mgdb-header-lede-size: 20px;
+  --mgdb-header-text-size: 17px;
+
+  /* -- photo ------------------------------------------------------------- */
+  --mgdb-header-photo: none;
+  --mgdb-header-photo-filter: saturate(1.12) contrast(1.08);
+  --mgdb-header-photo-position: center;
+  /* Height of the photo band below 760px. Defaults to the handoff's 45%, but
+     of the card's minimum height rather than its rendered height, so a long
+     body paragraph cannot push the band down over the text. */
+  --mgdb-header-photo-band: calc(var(--mgdb-header-min-height) * .45);
+
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--mgdb-header-radius);
+  background: var(--mgdb-header-tint);
+  box-shadow: 0 1px 2px rgba(60, 40, 20, .08), 0 12px 32px rgba(60, 40, 20, .10);
+  font-family: var(--mgdb-header-font);
+  min-height: var(--mgdb-header-min-height);
+  isolation: isolate;
+
+  /* So the title can be sized against the card rather than the viewport. The
+     card is rarely the full width of the window: it sits inside the page rail,
+     and in the logo variant it loses another 200px. */
+  container-type: inline-size;
+}
+
+/* The photo is a background rather than an <img> so the whole component is one
+   element plus two children, and a page that sets no photo gets a plain tinted
+   card with no broken image and no extra request. */
+.mgdb-page-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--mgdb-header-photo);
+  background-size: cover;
+  background-position: var(--mgdb-header-photo-position);
+  filter: var(--mgdb-header-photo-filter);
+}
+
+/* The solid-to-transparent tint. The two middle stops sit at 40% and 77% of
+   the distance between fade-start and fade-end, which reproduces the handoff's
+   canonical 60 / 70 / 80 / 86 gradient and keeps that shape when either end is
+   moved. */
+.mgdb-page-header::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg,
+    rgb(var(--mgdb-header-tint-rgb)) 0%,
+    rgb(var(--mgdb-header-tint-rgb)) var(--mgdb-header-fade-start),
+    rgba(var(--mgdb-header-tint-rgb), .90)
+      calc(var(--mgdb-header-fade-start) + (var(--mgdb-header-fade-end) - var(--mgdb-header-fade-start)) * .4),
+    rgba(var(--mgdb-header-tint-rgb), .25)
+      calc(var(--mgdb-header-fade-start) + (var(--mgdb-header-fade-end) - var(--mgdb-header-fade-start)) * .77),
+    rgba(var(--mgdb-header-tint-rgb), 0) var(--mgdb-header-fade-end));
+}
+
+.mgdb-page-header__body {
+  position: relative;
+  z-index: 1;
+  padding: var(--mgdb-header-pad-y) var(--mgdb-header-pad-x);
+  max-width: var(--mgdb-header-text-width);
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-header-gap);
+}
+
+.mgdb-page-header__title {
+  margin: 0;
+  font-size: var(--mgdb-header-title-size);
+  /* The handoff sets 38px and no wrapping, which keeps the card one line tall
+     and is right at the width it was designed against. Narrower than that, a
+     title set not to wrap does not push the card wider or get clipped — it
+     runs straight out over the photograph, which is the contrast failure the
+     handoff warns about, arriving by a different route.
+
+     So: 38px wherever 38px fits, and proportional to the card below that. The
+     second declaration is ignored by browsers without container query units,
+     which keeps the first as the fallback. A title long enough to overflow
+     even at full width is a content problem, not a layout one; the workbench
+     measures it and says so.
+
+     3.5cqw is where the handoff's own 27-character title stops fitting: the
+     column is 60% of the card less 80px of padding, so the size that fits
+     falls off faster than the card width does. At the width this was drawn
+     against the ceiling is above 38px and never binds; it starts biting below
+     about 1090px, which is where the title would otherwise cross the fade. */
+  font-size: min(var(--mgdb-header-title-size), 3.5cqw);
+  line-height: 1.05;
+  font-weight: 900;
+  letter-spacing: -.02em;
+  color: var(--mgdb-header-title-color);
+  white-space: var(--mgdb-header-title-wrap);
+}
+
+.mgdb-page-header__lede {
+  margin: 0;
+  font-size: var(--mgdb-header-lede-size);
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--mgdb-header-lede-color);
+}
+
+.mgdb-page-header__text {
+  margin: 0;
+  font-size: var(--mgdb-header-text-size);
+  line-height: 1.5;
+  color: var(--mgdb-header-text-color);
+  text-wrap: pretty;
+}
+
+/* Optional logo column. The cream continues from the panel into the tint, so
+   there is no divider; the logo is multiplied and masked to a soft circle so
+   it melts into the field instead of sitting in a hard square. */
+.mgdb-page-header--logo {
+  display: grid;
+  grid-template-columns: var(--mgdb-header-logo-width, 200px) 1fr;
+  --mgdb-header-pad-x: 16px;
+  --mgdb-header-text-width: 66%;
+}
+.mgdb-page-header--logo .mgdb-page-header__logo {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  background: linear-gradient(90deg, #FCF7EA 0%, #F8EFD9 70%, var(--mgdb-header-tint) 100%);
+}
+.mgdb-page-header--logo .mgdb-page-header__logo img {
+  width: 104px;
+  height: 104px;
+  border-radius: 6px;
+  mix-blend-mode: multiply;
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 52%, transparent 78%);
+  mask-image: radial-gradient(circle at 50% 50%, #000 52%, transparent 78%);
+}
+/* The photo and the tint must start after the logo column rather than under
+   it, or the gradient's 0% lands off the left edge of the field. */
+.mgdb-page-header--logo::before,
+.mgdb-page-header--logo::after {
+  left: var(--mgdb-header-logo-width, 200px);
+}
+
+/* --------------------------------------------------------------------------
+   Narrow screens
+
+   A left-to-right blend has nowhere to go under about 760px, so the layout
+   turns: the photo becomes a band across the top and the tint becomes a
+   vertical gradient beneath it, with the text on solid colour at full width.
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 760px) {
+  /* Two things this rule set must not do, both learned the hard way.
+
+     It must not restate the tokens on .mgdb-page-header. A page sets those
+     inline — that is the whole interface — and an inline custom property beats
+     any stylesheet rule, media query or not. Overriding tokens here looks like
+     it works until the first page passes title_size, and then the narrow
+     layout silently keeps the desktop value. So the narrow behaviour is
+     expressed on the child elements instead, where a real property on a real
+     selector wins.
+
+     And the photo band must not be a percentage. The card's height here is
+     driven by the text, so 45% of it is 95px on a short header and 700px on a
+     long one, which puts the text back on the photograph exactly when there is
+     the most text to read. It is a fixed band, and the text clears it. */
+
+  .mgdb-page-header { --mgdb-header-pad-y: 20px; --mgdb-header-pad-x: 22px; }
+
+  .mgdb-page-header::before {
+    height: var(--mgdb-header-photo-band, calc(var(--mgdb-header-min-height) * .45));
+    bottom: auto;
+  }
+  .mgdb-page-header::after {
+    background: linear-gradient(180deg,
+      rgba(var(--mgdb-header-tint-rgb), 0) 0,
+      rgba(var(--mgdb-header-tint-rgb), .85)
+        calc(var(--mgdb-header-photo-band, calc(var(--mgdb-header-min-height) * .45)) - 26px),
+      rgb(var(--mgdb-header-tint-rgb))
+        var(--mgdb-header-photo-band, calc(var(--mgdb-header-min-height) * .45)));
+  }
+
+  .mgdb-page-header__body {
+    max-width: 100%;
+    padding-top: calc(var(--mgdb-header-photo-band, calc(var(--mgdb-header-min-height) * .45)) + 8px);
+  }
+  .mgdb-page-header__title {
+    font-size: min(var(--mgdb-header-title-size), 28px);
+    white-space: normal;
+  }
+  .mgdb-page-header__lede { font-size: min(var(--mgdb-header-lede-size), 18px); }
+
+  .mgdb-page-header--logo { grid-template-columns: 1fr; }
+  .mgdb-page-header--logo::before,
+  .mgdb-page-header--logo::after { left: 0; }
+  .mgdb-page-header--logo .mgdb-page-header__logo { display: none; }
+}
+
+@media (prefers-contrast: more) {
+  .mgdb-page-header { --mgdb-header-photo-filter: saturate(1) contrast(1) brightness(.92); }
+}

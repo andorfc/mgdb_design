@@ -1,0 +1,99 @@
+<!-- MaizeGDB page header — paste-ready, themeable.
+     Copy the <style> block into your shared stylesheet once, then the <header>
+     markup onto each page. Override any --mgdb-header-* value per page or from
+     your token layer (e.g. on :root or an inline style on the <header>). -->
+<style>
+.mgdb-header {
+  /* themeable tokens */
+  --mgdb-header-tint: #F6E8CB;          /* solid color behind the text */
+  --mgdb-header-radius: 22px;
+  --mgdb-header-min-height: 210px;
+  --mgdb-header-text-width: 60%;        /* text column; also where the tint stays solid */
+  --mgdb-header-fade-start: 60%;        /* tint fully solid up to here */
+  --mgdb-header-fade-end: 86%;          /* photo fully clear past here */
+  --mgdb-header-pad-y: 26px;
+  --mgdb-header-pad-x: 40px;
+  --mgdb-header-title-size: 38px;
+  --mgdb-header-title-color: #4A1710;
+  --mgdb-header-lede-color: #5C2418;
+  --mgdb-header-text-color: #58483C;
+  --mgdb-header-photo-filter: saturate(1.12) contrast(1.08);
+  --mgdb-header-font: "Source Sans 3", Helvetica, Arial, sans-serif;
+
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--mgdb-header-radius);
+  background: var(--mgdb-header-tint);
+  box-shadow: 0 1px 2px rgba(60,40,20,.08), 0 12px 32px rgba(60,40,20,.10);
+  font-family: var(--mgdb-header-font);
+  min-height: var(--mgdb-header-min-height);
+}
+.mgdb-header__photo {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: var(--mgdb-header-photo-filter);
+}
+/* solid tint under the text, blending into the photo */
+.mgdb-header__tint {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg,
+    var(--mgdb-header-tint) 0%,
+    var(--mgdb-header-tint) var(--mgdb-header-fade-start),
+    color-mix(in srgb, var(--mgdb-header-tint) 90%, transparent)
+      calc(var(--mgdb-header-fade-start) + (var(--mgdb-header-fade-end) - var(--mgdb-header-fade-start)) * .4),
+    color-mix(in srgb, var(--mgdb-header-tint) 25%, transparent)
+      calc(var(--mgdb-header-fade-start) + (var(--mgdb-header-fade-end) - var(--mgdb-header-fade-start)) * .77),
+    transparent var(--mgdb-header-fade-end));
+}
+.mgdb-header__body {
+  position: relative;
+  padding: var(--mgdb-header-pad-y) var(--mgdb-header-pad-x);
+  max-width: var(--mgdb-header-text-width);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.mgdb-header__title {
+  margin: 0;
+  font-size: var(--mgdb-header-title-size);
+  line-height: 1.05; font-weight: 900;
+  letter-spacing: -.02em;
+  color: var(--mgdb-header-title-color);
+  white-space: nowrap;
+}
+.mgdb-header__lede {
+  margin: 0; font-size: 20px; font-weight: 700; line-height: 1.35;
+  color: var(--mgdb-header-lede-color);
+}
+.mgdb-header__text {
+  margin: 0; font-size: 17px; line-height: 1.5;
+  color: var(--mgdb-header-text-color); text-wrap: pretty;
+}
+/* narrow screens: photo becomes a top band, text gets full width */
+@media (max-width: 760px) {
+  .mgdb-header {
+    --mgdb-header-text-width: 100%;
+    --mgdb-header-pad-y: 20px;
+    --mgdb-header-pad-x: 22px;
+    --mgdb-header-title-size: 28px;
+  }
+  .mgdb-header__title { white-space: normal; }
+  .mgdb-header__lede { font-size: 18px; }
+  .mgdb-header__photo { height: 45%; }
+  .mgdb-header__tint {
+    background: linear-gradient(180deg,
+      transparent 0%,
+      color-mix(in srgb, var(--mgdb-header-tint) 85%, transparent) 30%,
+      var(--mgdb-header-tint) 55%);
+  }
+}
+</style>
+
+<header class="mgdb-header">
+  <img class="mgdb-header__photo" src="/images/cornfield.jpg" alt="">
+  <div class="mgdb-header__tint"></div>
+  <div class="mgdb-header__body">
+    <h1 class="mgdb-header__title">Shared interface components</h1>
+    <p class="mgdb-header__lede">The reusable building blocks for modernized MaizeGDB pages.</p>
+    <p class="mgdb-header__text">This reference renders every component defined in the shared stylesheet so that spacing, contrast, keyboard behavior, and responsive breakpoints can be verified in one place before a pattern is applied to a production page.</p>
+  </div>
+</header>

@@ -1,0 +1,162 @@
+/* ==========================================================================
+   Page header workbench chrome (/pattern_library/header/)
+   --------------------------------------------------------------------------
+   Deliberately plain. The component being reviewed is the only thing on this
+   page allowed to have a design; everything around it is scaffolding and is
+   kept quiet so it cannot influence the judgement.
+
+   The guide overlay lives here rather than in mgdb-page-header.css: it is a
+   measuring aid for this page, not part of the component.
+   ========================================================================== */
+
+:root {
+  --wb-ink: #1b1f1d;
+  --wb-muted: #5b655e;
+  --wb-line: #dcd8cf;
+  --wb-accent: #285d46;
+  --wb-surface: #fbf9f5;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #fff;
+  color: var(--wb-ink);
+  font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.wb-sr {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.wb-bar {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: .35rem 1rem;
+  padding: .7rem 1.5rem;
+  background: #14171a; color: #e8eae9;
+  font-size: 13px;
+}
+.wb-bar strong { font-size: 14px; }
+.wb-bar span { color: #a8b0ab; }
+.wb-bar a { margin-left: auto; color: #f2a515; }
+
+.wb-shell {
+  max-width: 1380px; margin: 0 auto; padding: 1.75rem 1.5rem 5rem;
+  display: grid; gap: 2rem;
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 68rem) {
+  .wb-shell { grid-template-columns: minmax(0, 1fr) 22rem; align-items: start; }
+  .wb-controls { position: sticky; top: 4rem; }
+  .wb-docs { grid-column: 1 / -1; }
+}
+
+/* -- stage ----------------------------------------------------------------- */
+
+.wb-stage-head { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-bottom: .8rem; }
+.wb-stage-head h2 { margin: 0; font-size: 1.05rem; }
+.wb-widths { margin-left: auto; display: flex; gap: .25rem; }
+.wb-widths button {
+  padding: .3rem .7rem; border: 1px solid var(--wb-line); border-radius: 6px;
+  background: #fff; font: inherit; font-size: 13px; cursor: pointer;
+}
+.wb-widths button.is-on { background: var(--wb-accent); border-color: var(--wb-accent); color: #fff; }
+
+/* A checkerboard behind the card, so where the tint goes transparent is
+   visible even with no photo loaded. */
+.wb-stage {
+  width: 100%;
+  padding: 1.5rem;
+  border: 1px solid var(--wb-line); border-radius: 12px;
+  background-color: #f4f2ee;
+  background-image:
+    linear-gradient(45deg, #e9e6e0 25%, transparent 25%, transparent 75%, #e9e6e0 75%),
+    linear-gradient(45deg, #e9e6e0 25%, transparent 25%, transparent 75%, #e9e6e0 75%);
+  background-size: 22px 22px;
+  background-position: 0 0, 11px 11px;
+  transition: width .18s ease;
+}
+
+.wb-flag {
+  margin: .9rem 0 0; padding: .7rem .9rem;
+  border-left: 4px solid #8a5a0f; background: #fff6df;
+  font-size: 14px; color: #5a3c0a;
+}
+.wb-note { margin: 1rem 0 0; max-width: 70ch; font-size: 13.5px; color: var(--wb-muted); }
+
+/* The guides mark the two lines that matter: where the tint stops being solid,
+   and where the text column ends. They are drawn on top of everything. */
+.mgdb-page-header.wb-guides-on .mgdb-page-header__body::before,
+.mgdb-page-header.wb-guides-on .mgdb-page-header__body::after {
+  content: ""; position: absolute; top: 0; bottom: 0; width: 0; z-index: 3; pointer-events: none;
+}
+.mgdb-page-header.wb-guides-on { position: relative; }
+.mgdb-page-header.wb-guides-on::before { z-index: 0; }
+.mgdb-page-header.wb-guides-on .mgdb-page-header__body {
+  position: relative;
+  outline: 1px dashed rgba(122, 46, 27, .55);
+  outline-offset: -1px;
+}
+/* Fade-start line, drawn against the card rather than the text column. */
+.wb-stage .mgdb-page-header.wb-guides-on {
+  background-image: linear-gradient(90deg, transparent calc(var(--wb-guide-fade) - 1px),
+                                            rgba(122, 46, 27, .75) var(--wb-guide-fade),
+                                            transparent calc(var(--wb-guide-fade) + 1px));
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+/* -- controls -------------------------------------------------------------- */
+
+.wb-controls { display: grid; gap: 1.1rem; }
+.wb-group { padding: 1rem 1.1rem; border: 1px solid var(--wb-line); border-radius: 10px; background: var(--wb-surface); }
+.wb-group h3 { margin: 0 0 .7rem; font-size: .78rem; letter-spacing: .09em; text-transform: uppercase; color: var(--wb-muted); }
+
+.wb-field { display: block; margin-bottom: .9rem; }
+.wb-field > span { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: .25rem; }
+.wb-field > span b { float: right; font-weight: 600; color: var(--wb-accent); font-variant-numeric: tabular-nums; }
+.wb-field em { display: block; margin-top: .3rem; font-style: normal; font-size: 12.5px; color: var(--wb-muted); }
+.wb-field input[type="text"], .wb-field textarea, .wb-field select {
+  width: 100%; padding: .45rem .6rem; border: 1px solid var(--wb-line); border-radius: 6px;
+  font: inherit; font-size: 13.5px; background: #fff;
+}
+.wb-field textarea { resize: vertical; }
+.wb-field input[type="range"] { width: 100%; accent-color: var(--wb-accent); }
+.wb-inline select { width: auto; }
+
+.wb-check { display: flex; align-items: center; gap: .45rem; font-size: 13.5px; margin-top: .3rem; }
+.wb-check input { accent-color: var(--wb-accent); }
+
+.wb-picks { display: grid; gap: .35rem; margin-bottom: .9rem; }
+.wb-pick {
+  text-align: left; padding: .45rem .6rem; border: 1px solid var(--wb-line); border-radius: 6px;
+  background: #fff; font: inherit; cursor: pointer;
+}
+.wb-pick span { display: block; font-size: 13.5px; font-weight: 600; }
+.wb-pick em { display: block; font-style: normal; font-size: 12px; color: var(--wb-muted); }
+.wb-pick.is-on { border-color: var(--wb-accent); box-shadow: inset 0 0 0 1px var(--wb-accent); }
+
+.wb-reset { margin: .6rem 0 0; }
+.wb-reset button, .wb-copy {
+  padding: .4rem .8rem; border: 1px solid var(--wb-line); border-radius: 6px;
+  background: #fff; font: inherit; font-size: 13px; cursor: pointer;
+}
+.wb-copy { border-color: var(--wb-accent); color: var(--wb-accent); font-weight: 600; }
+
+.wb-code {
+  margin: .5rem 0; padding: .7rem .8rem; overflow-x: auto;
+  border: 1px solid var(--wb-line); border-radius: 8px; background: #14171a; color: #e8eae9;
+  font: 12.5px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.wb-code code { white-space: pre; }
+
+.wb-small { font-size: 13px; color: var(--wb-muted); max-width: 72ch; }
+.wb-small code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; background: #f0ede7; padding: .1em .3em; border-radius: 4px; }
+
+.wb-docs h2 { font-size: 1.05rem; margin: 0 0 .6rem; }
+
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible {
+  outline: 3px solid var(--wb-accent); outline-offset: 2px;
+}

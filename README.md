@@ -1310,6 +1310,72 @@ file, so switching stylesheet switches the whole language.
 These pages carry no JavaScript and no chart library; the bar chart is drawn in
 CSS so each style can restyle it.
 
+## The page header
+
+A rounded card whose left portion is a solid wheat field carrying the page
+title, blending on the right into a photograph. Built from the design handoff
+in `docs/`. The idea it turns on is that the tint is **solid** under the text
+and fades out over the photo — not a translucent scrim over the whole image —
+so the text sits on flat colour at full contrast and the photograph is
+untouched where it shows.
+
+```
+src/css/mgdb-page-header.css       the component
+src/include/page_header_lib.php    mgdb_page_header(), which builds the markup
+src/images/headers/                the photographs
+```
+
+A page includes the library and the stylesheet and hands the result to its
+template:
+
+```php
+include_once('./include/page_header_lib.php');
+$bauplan->includeCss('/css/mgdb-page-header.css');
+
+$body->get('page-header')->replace(mgdb_page_header(array(
+  'title' => 'Stock search',
+  'lede'  => 'Find maize genetic stocks by name, accession, or pedigree.',
+  'photo' => '/images/headers/cornfield-sample.jpg',
+)));
+```
+
+Everything else — `fade_start`, `fade_end`, `text_width`, `min_height`,
+`title_size`, `title_wrap`, `photo_position`, `tint_rgb`, `logo` — has a
+default and is only written to the element when it differs, so the stylesheet
+stays the source of truth. The function returns markup rather than printing it,
+which is also why it exists: this markup in a `.bau` file would need every
+literal parenthesis in the `url()` and the gradient escaped.
+
+**<https://claude.maizegdb.org/pattern_library/header/>** is a workbench for
+it. Edit the title, lede, and body; drag the fade start; swap the photograph;
+and it prints the exact `mgdb_page_header()` call that produces what is on
+screen. The preview is the component itself rendered by the function, not a
+mock.
+
+### Three things this component defends against
+
+- **Text on the photograph.** Contrast is only guaranteed where the tint is
+  solid. A `text_width` past `fade_start` is clamped back to it, in the PHP and
+  in the workbench, and the caller is told. An earlier iteration of the design
+  put body text on lit foliage at about 1.5:1.
+- **A title that does not fit.** The handoff sets 38px and no wrapping, which is
+  right at the width it was drawn against. Narrower than that, a title set not
+  to wrap does not get clipped — it runs out over the photograph. The title is
+  therefore capped at `3.5cqw`, so it holds 38px on a full-width card and
+  scales below. A title long enough to overflow even then is a content problem;
+  the workbench measures it and says so.
+- **The narrow layout being overridden.** Below 760px the photo becomes a band
+  across the top. That behaviour is written on the child elements, never by
+  restating tokens on `.mgdb-page-header` — a page sets those inline, and an
+  inline custom property beats any stylesheet rule, media query or not. The
+  band is a fixed height for the same class of reason: as a percentage of a
+  card whose height is driven by its text, it lands back on top of the text
+  exactly when there is the most of it.
+
+The cornfield photograph is a **placeholder**: it came from the design session
+with its provenance unconfirmed. Replace it with a MaizeGDB or USDA owned
+image, or a public-domain one, before this appears on a public page.
+
 ## Conventions this codebase relies on
 
 - `.bau` templates escape literal parentheses as `\(` and `\)`. An unescaped
