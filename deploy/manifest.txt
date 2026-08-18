@@ -300,6 +300,27 @@ src/templates/static/mgdb_image.bau                      templates/static/mgdb_i
 src/css/mgdb-image.css                                   css/mgdb-image.css
 src/js/mgdb-image.js                                     js/mgdb-image.js
 
+# Insertion Data Center — replaces /insertion in place. Unlike the
+# /data_center/<page> routes, /insertion is its own top-level controller
+# (CONTROLLER == 'insertion'), so the guard lives inside
+# src/controllers/insertion.php itself rather than in data_center.php. The
+# record-page branch of that file (an insertion identifier resolves) is the
+# unmodified legacy code, kept so individual insertion pages keep working;
+# the pre-redesign whole-file original is archived in legacy/insertion/.
+src/controllers/insertion.php                            controllers/insertion.php
+src/controllers/insertion/insertion_search_modern.php    controllers/insertion/insertion_search_modern.php
+src/search/insertion/insertion_search_lib.php             search/insertion/insertion_search_lib.php
+src/search/insertion/insertion_search_api.php             search/insertion/insertion_search_api.php
+src/templates/static/mgdb_insertion.bau                   templates/static/mgdb_insertion.bau
+src/css/mgdb-insertion.css                                css/mgdb-insertion.css
+src/js/mgdb-insertion.js                                  js/mgdb-insertion.js
+
+# Written by tools/insertion_summary.php on the server; rerun it before
+# deploying this file, or the overview numbers keep reporting the previous
+# measurement. See ADMIN_DEPENDENCIES AD-015 for why this is precomputed
+# instead of queried live.
+src/data/insertion/insertion_summary.json                 data/insertion/insertion_summary.json
+
 
 
 # Protein structure data center — replaces /data_center/protein_structure.
@@ -351,3 +372,4 @@ src/controllers/search_engine/searchall_modern.php  controllers/search_engine/se
 src/templates/static/mgdb_searchall.bau          templates/static/mgdb_searchall.bau
 src/css/mgdb-searchall.css                       css/mgdb-searchall.css
 src/js/mgdb-searchall.js                         js/mgdb-searchall.js
+

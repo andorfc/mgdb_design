@@ -440,3 +440,55 @@ Status values: `proposed` · `approved` · `implemented` · `rejected` · `defer
   locus's three names concatenated into one string, so a locus cannot be found
   by its own name through this table at all. That is AD-020, and it is why the
   Genes section is served by its own query rather than from this index.
+
+---
+
+## AD-022 — The legacy insertion search endpoint interpolates request parameters straight into SQL
+
+- **Date:** 2026-08-17
+- **Affected component:** `search/insertion/insertion_results_lib.php` — the
+  results endpoint behind the pre-redesign `/insertion` search forms
+  (`by_gene_model`, `by_position`, `by_insertion`)
+- **What it is:** every filter value reaches all three queries as literal
+  text, none of it cast, quoted, or parameterised:
+
+      $sql .= "\n          AND p.name='$dataset'";
+      ...
+      WHERE chromosome='$chromosome' AND start_coordinate>=$start AND end_coordinate<=$end
+
+  `$dataset`, `$background`, `$assembly`, `$chromosome`, `$start`, and `$end`
+  are all handled this way in `doByPositionSearch()` and `doByGeneModelSearch()`.
+  `doByInsertionSearch()` and `doByGeneModelSearch()` also splice a
+  comma-joined identifier list straight into an `IN (...)` clause with no
+  escaping. Only the `structure` value is escaped, and the comment above it
+  notes why — the developer had already noticed the string could contain a
+  quote. The connection is a PDO handle and `make_query()` has taken a
+  `$params` array since the reference literature search (see AD-021 above,
+  the equivalent finding for TYPSimSelector); the mechanism to fix this is
+  already in the codebase and simply is not used here.
+
+  The endpoint is reachable directly by URL (`search/insertion/insertion_results.php`)
+  and does not check a referer or a token.
+- **What the application does now:** `src/controllers/insertion.php` routes the
+  bare `/insertion` route to a modern search page whose backing library,
+  `search/insertion/insertion_search_lib.php`, binds every value as a named
+  `:parameter` — including the gene-model, insertion-name, and structure lists,
+  which are expanded to individually-bound placeholders rather than joined
+  into a string. The old endpoint is still on disk and still answers; nothing
+  currently visible on the modernized page calls it, but the legacy
+  `js/insertion.js` (kept live for record pages, see `legacy/insertion/README.md`)
+  still points at it by URL.
+- **Proposed change:** delete `search/insertion/insertion_results.php` and
+  `search/insertion/insertion_results_lib.php` once nothing else depends on
+  them, or parameterise them in place if they must stay.
+- **Expected benefit:** removes an unauthenticated injection point into
+  `perm_tables.marker_gene_model`, `mgdb.locus`, `mgdb.stock`, and related
+  tables from the public web root.
+- **Risk and rollback:** the file is not a `deploy/manifest.txt` target, so
+  this repository will neither delete nor restore it.
+- **Required administrator:** whoever owns `search/insertion/` on the
+  production web root
+- **Status:** proposed
+- **Validation:** `search/insertion/insertion_results.php` returns 404 or an
+  equivalent inert response, and `/insertion` search still functions through
+  the modern endpoint.
