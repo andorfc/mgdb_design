@@ -1272,6 +1272,44 @@ Python and runs under the server's 3.9. Pages that sign in or out, send mail,
 write to the database, or need a record identifier are never fetched; those rows
 are classified from the source and say so.
 
+## Alternative design languages
+
+Five complete alternatives to the current design system live at
+<https://claude.maizegdb.org/pattern_library/styles/>, as full pattern
+libraries rather than mood boards. They are a comparison exercise: **nothing in
+them is applied to any page on the site**, and the current library at
+`/pattern_library/` is untouched.
+
+| | Style | What it is | Best at | Costs |
+| --- | --- | --- | --- | --- |
+| 1 | Journal | Serif, hairline rules, one accent | Long-form: nomenclature, methods, help | Density |
+| 2 | Console | Monospace, 13px, borders not shadows | Tables, identifiers, coordinates | Reading prose |
+| 3 | Grid | Swiss grid, heavy rules, huge type contrast | Staying neutral for a decade; printing | Warmth, scannability |
+| 4 | Prairie | Rounded, soft shadows, generous space | First visits, projectors | Rows per screen |
+| 5 | Instrument | Dark ground, luminous accents, mono numerals | Charts, browsers, long sessions | Prose, print, familiarity |
+
+All five render **byte-identical markup** from
+`src/pages/pattern_library/styles/_shell.php`. Of the 440 lines each page
+emits, 28 differ, and every one of those is the style's own name, its number,
+which stylesheet it links, or which switcher link is current. That constraint
+is the point: a comparison is only worth something if the content is held
+constant, and a style that needs different structure has to earn it through CSS
+the same way it would on a real page.
+
+```
+src/css/pattern-style-base.css     Reset, page skeleton, comparison bar. No colour, type, or radius.
+src/css/pattern-style-<n>.css      One design language, entire.
+src/pages/pattern_library/styles/  The shell, the five thin entry points, and the chooser.
+```
+
+The base sheet holds nothing a reader would call style. Everything else — the
+type stack and scale, the palette, density, radii, whether a component is
+bounded by a border or a shadow, how a table is ruled — is in the numbered
+file, so switching stylesheet switches the whole language.
+
+These pages carry no JavaScript and no chart library; the bar chart is drawn in
+CSS so each style can restyle it.
+
 ## Conventions this codebase relies on
 
 - `.bau` templates escape literal parentheses as `\(` and `\)`. An unescaped
