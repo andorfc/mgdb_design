@@ -135,10 +135,68 @@
   margin-bottom: var(--mgdb-space-4);
 }
 
+.mgdb-insertion-page .ins-results-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mgdb-space-3);
+}
+
+.mgdb-insertion-page .ins-view-toggle {
+  display: inline-flex;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  overflow: hidden;
+}
+
+.mgdb-insertion-page .ins-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mgdb-space-1);
+  min-height: 36px;
+  padding: 0 var(--mgdb-space-3);
+  border: none;
+  background: transparent;
+  color: var(--mgdb-ink-soft);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.mgdb-insertion-page .ins-view-btn svg {
+  flex-shrink: 0;
+}
+
+.mgdb-insertion-page .ins-view-btn:hover {
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-ink);
+}
+
+.mgdb-insertion-page .ins-view-btn.is-active,
+.mgdb-insertion-page .ins-view-btn[aria-pressed="true"] {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+}
+
 .mgdb-insertion-page #insertion-notes .mgdb-message { margin-bottom: var(--mgdb-space-4); }
 
 .mgdb-insertion-page .ins-table td,
 .mgdb-insertion-page .ins-table th { vertical-align: top; }
+
+.mgdb-insertion-page .ins-gene-cell strong {
+  display: block;
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-insertion-page .ins-gene-cell span {
+  display: block;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  margin-top: 2px;
+}
 
 .mgdb-insertion-page .ins-alignment-list {
   margin: 0;

@@ -153,7 +153,19 @@ $$SYNTAX-LEVEL 2
         <h2 id="insertion-results-title">Matching insertions</h2>
         <p id="insertion-results-status" aria-live="polite">Choose a search mode above and enter a query to view insertions.</p>
       </div>
-      <a class="mgdb-button mgdb-button-quiet" id="insertion-export-tsv" href="#" download hidden>Export TSV</a>
+      <div class="ins-results-controls">
+        <div class="ins-view-toggle" role="group" aria-label="Table grouping">
+          <button type="button" class="ins-view-btn is-active" data-group="insertion" aria-pressed="true">
+            <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><rect x="2" y="2" width="12" height="12" rx="1.5"/><line x1="6" y1="2" x2="6" y2="14"/></svg>
+            By Insertion
+          </button>
+          <button type="button" class="ins-view-btn" data-group="gene" aria-pressed="false">
+            <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><rect x="2" y="2" width="12" height="12" rx="1.5"/><line x1="2" y1="6" x2="14" y2="6"/><line x1="2" y1="10" x2="14" y2="10"/></svg>
+            By Gene Model
+          </button>
+        </div>
+        <a class="mgdb-button mgdb-button-quiet" id="insertion-export-tsv" href="#" download hidden>Export TSV</a>
+      </div>
     </div>
 
     <div id="insertion-notes"></div>

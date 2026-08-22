@@ -53,8 +53,33 @@ function insSend($payload) {
 /* TSV export shares the exact same id resolution and result shaping as the
    JSON path -- same caps, same parameterized queries -- so a downloaded file
    can never disagree with what the page just showed. */
-function insExportTsv($results) {
+function insExportTsv($results, $groupBy = 'insertion') {
     header('Content-Type: text/tab-separated-values; charset=utf-8');
+    if ($groupBy === 'gene') {
+        header('Content-Disposition: attachment; filename="maizegdb_insertions_by_gene_' . date('Ymd_His') . '.tsv"');
+        $out = fopen('php://output', 'w');
+        fputcsv($out, array('Gene', 'Insertion', 'Status', 'Dataset', 'Assembly', 'Chromosome',
+            'Start', 'End', 'Structure', 'Stocks'), "\t");
+        foreach ($results as $result) {
+            $stockNames = array();
+            foreach ($result['stocks'] as $stock) { $stockNames[] = $stock['name']; }
+
+            if ($result['alignments']) {
+                foreach ($result['alignments'] as $place) {
+                    fputcsv($out, array($place['gene'] ? $place['gene'] : '(Intergenic)',
+                        $result['name'], $result['status'], $place['dataset'],
+                        $place['assembly_label'], $place['chromosome'], $place['start'], $place['end'],
+                        $place['structures'], implode(', ', $stockNames)), "\t");
+                }
+            } else {
+                fputcsv($out, array('(No alignment)', $result['name'], $result['status'], '',
+                    '', '', '', '', '', implode(', ', $stockNames)), "\t");
+            }
+        }
+        fclose($out);
+        exit;
+    }
+
     header('Content-Disposition: attachment; filename="maizegdb_insertions_' . date('Ymd_His') . '.tsv"');
     $out = fopen('php://output', 'w');
     fputcsv($out, array('Insertion', 'Status', 'Dataset(s)', 'Assembly', 'Chromosome',
@@ -104,7 +129,8 @@ function insAnswer($DBConn, $ids, $mode, $query, $notes, $background = '') {
     $results = insBuildResults($ids, $alignments, $records, $background);
 
     if ($format === 'tsv') {
-        insExportTsv($results);
+        $groupBy = insValue('group_by', 'insertion');
+        insExportTsv($results, $groupBy);
     }
 
     $with_stock = 0;
