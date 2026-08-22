@@ -114,10 +114,8 @@
      Row renderers, one per view
      --------------------------------------------------------------------- */
 
-  function rowShell(row, cat) {
+  function rowShell(row) {
     var item = el('li', 'sa-row');
-    var chip = icon(cat);
-    if (chip) { item.appendChild(chip); }
     var body = el('div', 'sa-row-body');
     item.appendChild(body);
     return { item: item, body: body };
@@ -273,10 +271,10 @@
     }
   };
 
-  function renderRows(list, rows, view, cat) {
+  function renderRows(list, rows, view) {
     var render = VIEWS[view] || VIEWS.simple;
     rows.forEach(function (row) {
-      var shell = rowShell(row, cat);
+      var shell = rowShell(row);
       render(row, shell.body);
       list.appendChild(shell.item);
     });
@@ -360,7 +358,7 @@
       var wrap = el('section', 'sa-section');
       wrap.appendChild(sectionHeader(section, true));
       var list = el('ul', 'sa-list');
-      renderRows(list, section.rows, section.view, section.cat);
+      renderRows(list, section.rows, section.view);
       wrap.appendChild(list);
       resultsEl.appendChild(wrap);
     });
@@ -428,7 +426,7 @@
       'Showing ' + count(first) + '–' + count(last) + ' of ' + count(data.total)));
 
     var list = el('ul', 'sa-list');
-    renderRows(list, data.rows, data.type.view, data.type.cat);
+    renderRows(list, data.rows, data.type.view);
     wrap.appendChild(list);
 
     var pager = renderPager(data);

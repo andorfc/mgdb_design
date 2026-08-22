@@ -6,9 +6,8 @@
    the leading data types, and one data type at a time — and the row shapes
    each type needs.
 
-   The data-type chips reuse .mgdb-search-icon from the design system, so a
-   reference row on this page carries exactly the icon the header search shows
-   for References.
+   The data-type chips reuse .mgdb-search-icon from the design system for
+   section headers and the type rail.
    ========================================================================== */
 
 .sa-page { padding-bottom: var(--mgdb-space-8); }
@@ -169,9 +168,7 @@
 .sa-list { list-style: none; padding: 0; }
 
 .sa-row {
-  display: flex;
-  gap: var(--mgdb-space-3);
-  align-items: flex-start;
+  display: block;
   padding: var(--mgdb-space-3) 0;
   border-bottom: 1px solid var(--mgdb-line-soft);
 }
@@ -179,7 +176,7 @@
 .sa-row:last-child { border-bottom: 0; }
 
 .sa-icon { margin-top: 2px; }
-.sa-row-body { min-width: 0; flex: 1 1 auto; }
+.sa-row-body { min-width: 0; }
 
 .sa-row-title {
   display: inline-block;
