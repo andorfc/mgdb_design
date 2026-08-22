@@ -110,6 +110,11 @@
     return;
   }
 
+  if (PAGE == 'expression') {
+    include('controllers/expression/expression_modern.php');
+    return;
+  }
+
   if (PAGE == 'gene_product' && !getCGIParam('id', 'G', ID)) {
     include('controllers/data_center/gene_product_search_modern.php');
     return;
