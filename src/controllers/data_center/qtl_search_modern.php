@@ -59,7 +59,6 @@ $page_data = dashboardCache($system, 'qtl/page', function () use ($DBConn) {
         'mapping_parents'   => $stats['mapping_parents'],
         'trait_options'     => qtlTraitOptions($DBConn),
         'parent_options'    => qtlParentOptions($DBConn),
-        'chr_options'       => qtlChrOptions($DBConn),
         'data_date'         => date('F j, Y')
     );
 });
@@ -72,7 +71,6 @@ $content->get('mapping_parents')->replace(number_format($page_data['mapping_pare
 
 $content->get('trait_options')->replace($page_data['trait_options']);
 $content->get('parent_options')->replace($page_data['parent_options']);
-$content->get('chr_options')->replace($page_data['chr_options']);
 $content->get('data_date')->replace($page_data['data_date']);
 
 include_once('translation.php');

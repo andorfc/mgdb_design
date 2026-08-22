@@ -14,8 +14,8 @@ function locusSummaryStats($DBConn) {
         SELECT 
             COUNT(DISTINCT l.id) AS total_loci,
             COUNT(DISTINCT l.id) FILTER (WHERE l.type = 101) AS gene_loci,
-            (SELECT COUNT(DISTINCT a.id) FROM mgdb.allele a JOIN mgdb.id_num i ON i.id=a.id WHERE i.curation_lvl=0) AS total_alleles,
-            (SELECT COUNT(DISTINCT lp.pheno_id) FROM mgdb.locus_phenotypes lp) AS distinct_phenotypes
+            (SELECT COUNT(DISTINCT v.id) FROM mgdb.variation v JOIN mgdb.id_num i ON i.id=v.id WHERE i.curation_lvl=0) AS total_alleles,
+            (SELECT COUNT(DISTINCT p.id) FROM mgdb.phenotype p JOIN mgdb.id_num i ON i.id=p.id WHERE i.curation_lvl=0) AS distinct_phenotypes
         FROM mgdb.locus l
         JOIN mgdb.id_num i ON i.id = l.id
         WHERE i.curation_lvl = 0";
@@ -59,14 +59,18 @@ function locusChrOptions($DBConn) {
 function locusPhenotypeOptions($DBConn) {
     $options = '<option value="">All curated phenotypes</option>' . "\n";
     $sql = "
-        SELECT pheno_id, pheno_name, COUNT(DISTINCT id) AS locus_count
-        FROM mgdb.locus_phenotypes
-        GROUP BY pheno_id, pheno_name
-        ORDER BY pheno_name ASC";
+        SELECT p.id, p.name, COUNT(DISTINCT v.variationof) AS locus_count
+        FROM mgdb.phenotype p
+        JOIN mgdb.id_num i ON i.id = p.id
+        JOIN mgdb.var_pheno_effects vpe ON vpe.pheno_effect = p.id
+        JOIN mgdb.variation v ON v.id = vpe.id
+        WHERE i.curation_lvl = 0 AND v.variationof IS NOT NULL
+        GROUP BY p.id, p.name
+        ORDER BY p.name ASC";
     $stmt = make_query($DBConn, $sql);
     while ($row = retrieve_row($stmt)) {
-        $options .= '<option value="' . (int) $row['pheno_id'] . '">'
-                 . htmlspecialchars($row['pheno_name'], ENT_QUOTES, 'UTF-8')
+        $options .= '<option value="' . (int) $row['id'] . '">'
+                 . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8')
                  . ' (' . number_format((int) $row['locus_count']) . ')'
                  . "</option>\n";
     }
@@ -115,7 +119,7 @@ function locusSearch($DBConn, $filters = array(), $limit = 50, $offset = 0) {
     $phenoId = isset($filters['phenotype']) && $filters['phenotype'] !== '' ? (int) $filters['phenotype'] : null;
     if ($phenoId !== null && $phenoId > 0) {
         $params[] = $phenoId;
-        $where[] = "EXISTS (SELECT 1 FROM mgdb.locus_phenotypes lp WHERE lp.id = l.id AND lp.pheno_id = ?)";
+        $where[] = "EXISTS (SELECT 1 FROM mgdb.variation v JOIN mgdb.var_pheno_effects vpe ON vpe.id = v.id WHERE v.variationof = l.id AND vpe.pheno_effect = ?)";
     }
 
     $whereSql = implode(' AND ', $where);
