@@ -1,0 +1,259 @@
+/* file: mgdb-gene-product.css
+ *
+ * Page-specific styles for the Gene Product Data Center (/data_center/gene_product).
+ * Scoped under .mgdb-gene-product-page.
+ */
+
+/* --------------------------------------------------------------------------
+   Hero Emblem
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-product-page .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-gene-product-page .mgdb-hero-emblem svg {
+  width: min(100%, 64px);
+  height: auto;
+  mix-blend-mode: normal;
+}
+
+/* --------------------------------------------------------------------------
+   Sticky Section Tabs
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-product-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-5);
+  padding: var(--mgdb-space-2) 0;
+  background: var(--mgdb-surface);
+  border-bottom: 1px solid var(--mgdb-line);
+}
+
+.mgdb-gene-product-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-decoration: none;
+  transition: background .12s, border-color .12s;
+}
+
+.mgdb-gene-product-page .mgdb-section-tabs a:hover {
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-gene-product-page .mgdb-section-tabs a.is-current,
+.mgdb-gene-product-page .mgdb-section-tabs a[aria-current="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+.mgdb-gene-product-page > section,
+.mgdb-gene-product-page section[id] {
+  scroll-margin-top: 4.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   Search Form
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-product-page .gp-search-form {
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-gene-product-page .gp-example-btn {
+  display: inline-block;
+  margin: 0 var(--mgdb-space-1);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mgdb-green-dark);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.mgdb-gene-product-page .gp-example-btn:hover {
+  color: var(--mgdb-green);
+}
+
+/* --------------------------------------------------------------------------
+   Results Section & Table
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-product-page .gene-product-results-section {
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-gene-product-page .gp-results-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-gene-product-page #gp-notes .mgdb-message {
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-gene-product-page .gp-table td,
+.mgdb-gene-product-page .gp-table th {
+  vertical-align: top;
+}
+
+.mgdb-gene-product-page .gp-name-cell strong {
+  display: block;
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-gene-product-page .gp-syn-list {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  margin-top: 2px;
+}
+
+.mgdb-gene-product-page .gp-ec-badge {
+  display: inline-block;
+  margin: 1px 4px 1px 0;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #fdf3d8;
+  color: #7a4a10;
+  font-family: var(--mgdb-font-mono, monospace);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.mgdb-gene-product-page .gp-attr-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mgdb-gene-product-page .gp-attr-list li {
+  margin-bottom: var(--mgdb-space-1);
+}
+
+.mgdb-gene-product-page .gp-attr-list li:last-child {
+  margin-bottom: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Functional Class Grid & Shortcut Buttons
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-product-page .gp-class-grid {
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-gene-product-page .gp-filter-shortcut {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mgdb-space-1);
+  margin-top: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mgdb-green-dark);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.mgdb-gene-product-page .gp-filter-shortcut:hover {
+  text-decoration: underline;
+  color: var(--mgdb-green);
+}
+
+/* --------------------------------------------------------------------------
+   Downloads & Pathways Grid
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-product-page .gp-download-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-gene-product-page .gp-download-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-2);
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-gene-product-page .gp-download-header {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+}
+
+.mgdb-gene-product-page .gp-download-header h3 {
+  margin: 0;
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-gene-product-page .gp-download-card p {
+  margin: 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-gene-product-page .gp-download-card .mgdb-button {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+/* --------------------------------------------------------------------------
+   Connected Resources (Bottom Section — Soft Green)
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-product-page .gp-bottom-section {
+  padding: var(--mgdb-space-6);
+  border: 1px solid #cfe3d6;
+  border-radius: var(--mgdb-radius-lg);
+  background: linear-gradient(135deg, #f2f8f4 0%, var(--mgdb-green-soft) 100%);
+}
+
+.mgdb-gene-product-page .gp-bottom-section .mgdb-resource-panel {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: #cfe3d6;
+}
+
+@media (max-width: 640px) {
+  .mgdb-gene-product-page .mgdb-section-tabs {
+    position: static;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  .mgdb-gene-product-page .mgdb-section-tabs a {
+    white-space: nowrap;
+  }
+}

@@ -36,6 +36,13 @@
   $password = getCookie('password', false);
   $userid =   getCookie('userid', false);
 
+  /* The Data Center Main Hub (/data_center/). The controller root is an
+     interactive discovery hub and metrics dashboard across all active data centers. */
+  if (!defined('PAGE') || !PAGE || PAGE == 'data_center' || PAGE == 'index') {
+    include('controllers/data_center/data_center_hub_modern.php');
+    return;
+  }
+
   /* The reference search page is modernized. Reference *record* pages (an id is
      present) and every other data centre continue through the original code
      below, unchanged. Rollback: delete this block.
@@ -103,9 +110,25 @@
     return;
   }
 
+  if (PAGE == 'gene_product' && !getCGIParam('id', 'G', ID)) {
+    include('controllers/data_center/gene_product_search_modern.php');
+    return;
+  }
+
   if (in_array(PAGE, array('image', 'image_phenotype', 'image_trait', 'image_species', 'image_gel_pattern', 'image_mutant'), true) && !getCGIParam('id', 'G', ID)) {
     include('controllers/data_center/image_search_modern.php');
     return;
+  }
+
+  if (PAGE == 'map' && !getCGIParam('id', 'G', ID)) {
+    include('controllers/data_center/map_search_modern.php');
+    return;
+  }
+
+  if (PAGE == 'map' && getCGIParam('id', 'G', ID)) {
+    if (include('controllers/data_center/map_record_modern.php')) {
+      return;
+    }
   }
 
   if (PAGE == 'marker' && !getCGIParam('id', 'G', ID)) {
@@ -125,6 +148,11 @@
 
   if (PAGE == 'ssr' && !getCGIParam('id', 'G', ID)) {
     include('controllers/data_center/ssr_search_modern.php');
+    return;
+  }
+
+  if (PAGE == 'variation' && !getCGIParam('id', 'G', ID)) {
+    include('controllers/data_center/variation_search_modern.php');
     return;
   }
 
