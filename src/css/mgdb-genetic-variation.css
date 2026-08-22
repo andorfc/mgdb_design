@@ -56,15 +56,15 @@
 }
 
 .mgdb-genetic-variation-page .mgdb-section-tabs a:hover {
-  background: var(--mgdb-surface-hover);
-  border-color: var(--mgdb-line-strong);
-  text-decoration: none;
+  background: var(--mgdb-green-soft);
 }
 
-.mgdb-genetic-variation-page .mgdb-section-tabs a.is-current {
-  background: var(--mgdb-green-soft);
-  border-color: var(--mgdb-leaf);
-  color: var(--mgdb-green-dark) !important;
+.mgdb-genetic-variation-page .mgdb-section-tabs a.is-current,
+.mgdb-genetic-variation-page .mgdb-section-tabs a[aria-current="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
 /* Scroll-margin so an anchored section is not hidden behind the sticky nav. */
