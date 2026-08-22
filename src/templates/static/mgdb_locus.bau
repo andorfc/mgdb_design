@@ -1,0 +1,346 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-locus
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https://maizegdb.org/data_center/locus">
+<meta property="og:title" content="MaizeGDB Locus Data Center | Classic Genetic Loci, Mutants &amp; Characterized Genes">
+<meta property="og:description" content="Explore classic maize genetic loci, characterized genes, mutant alleles, and cytological bin coordinates mapped to reference gene models.">
+
+<main class="mgdb-page mgdb-locus-page" id="locus-top">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center">Data centers</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Loci</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="locus-title">
+    <div class="mgdb-hero-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="Locus and chromosome map position icon">
+        <rect x="28" y="16" width="40" height="64" rx="20" fill="#e8f4ec" stroke="#235c37" stroke-width="4" />
+        <line x1="28" y1="36" x2="68" y2="36" stroke="#235c37" stroke-width="3" stroke-dasharray="2 3" />
+        <line x1="28" y1="56" x2="68" y2="56" stroke="#235c37" stroke-width="3" stroke-dasharray="2 3" />
+        <rect x="24" y="42" width="48" height="12" rx="4" fill="#d99a0b" stroke="#7a4a10" stroke-width="2" />
+        <circle cx="48" cy="48" r="3" fill="#ffffff" />
+        <path d="M12 48 L22 48 M74 48 L84 48" stroke="#d99a0b" stroke-width="3" stroke-linecap="round" />
+      </svg>
+      <strong>Locus<br />Center</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data_date)</p>
+      <h1 id="locus-title">Explore classic maize genetic loci &amp; mutant genes</h1>
+      <p class="mgdb-hero-description">Discover $(total_loci) curated genetic loci &mdash; including $(gene_loci) characterized genes, $(total_alleles) mutant alleles, and $(distinct_phenotypes) phenotypic classes &mdash; mapped across chromosomes and linked to reference gene models.</p>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#locus-search-panel" class="is-current">Search Loci</a>
+    <a href="#locus-top-genes">Classic Genes &amp; Mutants</a>
+    <a href="#locus-downloads">Downloads &amp; Gene Center</a>
+    <a href="#locus-overview">Statistics</a>
+    <a href="#locus-related">Related Resources</a>
+  </nav>
+
+  <!-- Notice: Gene Models vs Classic Loci -->
+  <div class="locus-notice-banner" role="note">
+    <div class="locus-notice-icon" aria-hidden="true">&#9432;</div>
+    <div class="locus-notice-body">
+      <strong>Looking for annotated gene models or transcript IDs?</strong>
+      <span>B73 reference gene models \(e.g., <code>Zm00001eb026700</code>, <code>GRMZM2G098346</code>\) are indexed in the <a href="/gene_center/gene">Gene Center &rarr;</a>. Classic genetic loci, characterized mutant symbols, and mapped marker loci are searched below.</span>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       1. Search Panel & Results
+       ==================================================================== -->
+  <section id="locus-search-panel" class="locus-search-panel" aria-labelledby="locus-search-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Interactive search</span>
+        <h2 id="locus-search-title">Search genetic loci &amp; genes</h2>
+      </div>
+      <p>Search by locus symbol, full gene name, synonym, or filter by locus type, chromosome, and phenotype.</p>
+    </div>
+
+    <form id="locus-search-form" class="locus-search-form" role="search">
+      <div class="mgdb-field">
+        <label class="mgdb-label" for="locus-search-term">Search locus symbol, gene name, or synonym</label>
+        <div class="locus-search-input-wrap">
+          <input class="mgdb-input" id="locus-search-term" name="term" type="search" placeholder="e.g., adh1, tb1, kn1, bronze, glossy, opaque, bz1, Zm00001eb054440" autocomplete="off" />
+        </div>
+        <p class="mgdb-hint">
+          <span>Try an example&#58;</span>
+          <button type="button" class="locus-example-btn" data-term="adh1">adh1</button>
+          <button type="button" class="locus-example-btn" data-term="tb1">tb1</button>
+          <button type="button" class="locus-example-btn" data-term="kn1">kn1</button>
+          <button type="button" class="locus-example-btn" data-term="opaque">opaque</button>
+          <button type="button" class="locus-example-btn" data-term="glossy">glossy</button>
+          <button type="button" class="locus-example-btn" data-term="sh2">sh2</button>
+        </p>
+      </div>
+
+      <div class="mgdb-search-row">
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="locus-filter-type">Locus type</label>
+          <select class="mgdb-select" id="locus-filter-type" name="type">
+            $(type_options)
+          </select>
+        </div>
+
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="locus-filter-chr">Chromosome</label>
+          <select class="mgdb-select" id="locus-filter-chr" name="chromosome">
+            $(chr_options)
+          </select>
+        </div>
+
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="locus-filter-pheno">Curated phenotype</label>
+          <select class="mgdb-select" id="locus-filter-pheno" name="phenotype">
+            $(pheno_options)
+          </select>
+        </div>
+      </div>
+
+      <div class="mgdb-form-actions">
+        <button class="mgdb-button mgdb-button-primary" type="submit">Search loci</button>
+        <button class="mgdb-button mgdb-button-quiet" type="reset" id="locus-reset-btn">Reset filters</button>
+      </div>
+    </form>
+  </section>
+
+  <section id="locus-results-section" class="locus-results-section" aria-labelledby="locus-results-title">
+    <div class="locus-results-heading">
+      <div>
+        <span class="mgdb-eyebrow">Search results</span>
+        <h2 id="locus-results-title">Matching genetic loci</h2>
+        <p id="locus-results-status" aria-live="polite">Enter a locus symbol or choose a filter above to view matching records.</p>
+      </div>
+      <a class="mgdb-button mgdb-button-quiet" id="locus-export-tsv" href="#" download hidden>Export TSV</a>
+    </div>
+
+    <div id="locus-notes"></div>
+    <div id="locus-results"></div>
+
+    <div id="locus-empty" class="mgdb-empty" hidden>
+      <h3>No genetic loci matched</h3>
+      <p>Try checking the locus symbol spelling, searching for a synonym, or visiting the <a href="/gene_center/gene">Gene Center</a> for gene model accessions.</p>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       2. Classic Genes & Mutants
+       ==================================================================== -->
+  <section id="locus-top-genes" aria-labelledby="locus-top-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Characterized genes</span>
+        <h2 id="locus-top-title">Classic maize genetic loci &amp; mutants</h2>
+      </div>
+      <p>Widely studied reference loci in maize developmental genetics, biochemical pathways, and agronomic domestication.</p>
+    </div>
+
+    <div class="mgdb-card-grid locus-top-grid">
+      <article class="mgdb-card">
+        <div class="locus-card-top">
+          <span class="mgdb-pill mgdb-pill-ok">Chr 1 &middot; Bin 1.09</span>
+        </div>
+        <h3><a href="/data_center/locus?id=12671"><em>tb1</em> &mdash; teosinte branched1</a></h3>
+        <p>TCP family transcription factor regulating apical dominance and plant architecture during maize domestication.</p>
+        <span class="mgdb-muted locus-card-footer">Model&#58; Zm00001eb054440 &middot; 45 alleles</span>
+      </article>
+
+      <article class="mgdb-card">
+        <div class="locus-card-top">
+          <span class="mgdb-pill mgdb-pill-ok">Chr 1 &middot; Bin 1.08</span>
+        </div>
+        <h3><a href="/data_center/locus?id=12352"><em>kn1</em> &mdash; knotted1</a></h3>
+        <p>Homeobox transcription factor required for shoot apical meristem maintenance and leaf development.</p>
+        <span class="mgdb-muted locus-card-footer">Model&#58; Zm00001eb058310 &middot; 38 alleles</span>
+      </article>
+
+      <article class="mgdb-card">
+        <div class="locus-card-top">
+          <span class="mgdb-pill mgdb-pill-ok">Chr 1 &middot; Bin 1.03</span>
+        </div>
+        <h3><a href="/data_center/locus?id=12021"><em>adh1</em> &mdash; alcohol dehydrogenase1</a></h3>
+        <p>Classic anaerobic response enzyme catalyzing reduction of acetaldehyde to ethanol under flooding stress.</p>
+        <span class="mgdb-muted locus-card-footer">Model&#58; Zm00001eb026700 &middot; 84 alleles</span>
+      </article>
+
+      <article class="mgdb-card">
+        <div class="locus-card-top">
+          <span class="mgdb-pill mgdb-pill-ok">Chr 9 &middot; Bin 9.02</span>
+        </div>
+        <h3><a href="/data_center/locus?id=12086"><em>bz1</em> &mdash; bronze1</a></h3>
+        <p>UDP-glucose flavonol glucosyltransferase involved in anthocyanin biosynthesis; historic transposon tagging locus.</p>
+        <span class="mgdb-muted locus-card-footer">Model&#58; Zm00001eb375080 &middot; 62 alleles</span>
+      </article>
+
+      <article class="mgdb-card">
+        <div class="locus-card-top">
+          <span class="mgdb-pill mgdb-pill-ok">Chr 7 &middot; Bin 7.01</span>
+        </div>
+        <h3><a href="/data_center/locus?id=12461"><em>o2</em> &mdash; opaque2</a></h3>
+        <p>bZIP transcription factor regulating 22-kDa alpha-zein storage protein synthesis and kernel nutritional quality.</p>
+        <span class="mgdb-muted locus-card-footer">Model&#58; Zm00001eb304040 &middot; 71 alleles</span>
+      </article>
+
+      <article class="mgdb-card">
+        <div class="locus-card-top">
+          <span class="mgdb-pill mgdb-pill-ok">Chr 9 &middot; Bin 9.03</span>
+        </div>
+        <h3><a href="/data_center/locus?id=12763"><em>wx1</em> &mdash; waxy1</a></h3>
+        <p>Granule-bound starch synthase responsible for amylose synthesis in the endosperm and pollen grains.</p>
+        <span class="mgdb-muted locus-card-footer">Model&#58; Zm00001eb378290 &middot; 95 alleles</span>
+      </article>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       3. Bulk Downloads & Gene Center
+       ==================================================================== -->
+  <section id="locus-downloads" aria-labelledby="locus-downloads-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Genomic resources</span>
+        <h2 id="locus-downloads-title">Locus annotations, mappings &amp; downloads</h2>
+      </div>
+      <p>Access genome-wide locus coordinates, gene model mapping tables, and bulk download files.</p>
+    </div>
+
+    <div class="locus-download-grid" aria-label="Locus downloads">
+      <article class="locus-download-card">
+        <div class="locus-download-header">
+          <span class="mgdb-pill mgdb-pill-ok">Gene Center</span>
+          <h3>Reference Gene Models</h3>
+        </div>
+        <p>Explore B73 RefGen_v5, v4, and NAM pan-genome gene models with transcript isoforms, functional GO terms, and expression atlases.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="/gene_center/gene">Visit Gene Center <span aria-hidden="true">&rarr;</span></a>
+      </article>
+
+      <article class="locus-download-card">
+        <div class="locus-download-header">
+          <span class="mgdb-pill mgdb-pill-info">Bulk Data</span>
+          <h3>Locus to Gene Model Mapping</h3>
+        </div>
+        <p>Download comprehensive tab-delimited mapping tables correlating classic locus symbols to B73/W22 gene model identifiers.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="https://download.maizegdb.org/Gene_Models/">Browse Download Files <span aria-hidden="true">&nearr;</span></a>
+      </article>
+
+      <article class="locus-download-card">
+        <div class="locus-download-header">
+          <span class="mgdb-pill mgdb-pill-warn">Phenotypes</span>
+          <h3>Mutant Stock Catalog</h3>
+        </div>
+        <p>Browse seed stocks carrying characterized mutant alleles from the Maize Genetics Cooperation Stock Center \(MGCSC\).</p>
+        <a class="mgdb-button mgdb-button-secondary" href="/data_center/stock">Explore Seed Stocks <span aria-hidden="true">&rarr;</span></a>
+      </article>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       4. Corpus Statistics \(Second to Last Item\)
+       ==================================================================== -->
+  <section id="locus-overview" aria-labelledby="locus-overview-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Corpus summary</span>
+        <h2 id="locus-overview-title">Locus dataset at a glance</h2>
+      </div>
+      <p>Key metrics across curated maize genetic loci, characterized genes, alleles, and phenotypes.</p>
+    </div>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Curated Loci</h3>
+          <span class="mgdb-metric-badge">All Types</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(total_loci)</strong>
+        </div>
+        <p class="mgdb-metric-description">Total genetic loci, mapped probed sites, points, and genes cataloged in MaizeGDB.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Characterized Genes</h3>
+          <span class="mgdb-metric-badge">Gene Loci</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(gene_loci)</strong>
+        </div>
+        <p class="mgdb-metric-description">Curated classic genes with named gene symbols and experimental characterization.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Curated Alleles</h3>
+          <span class="mgdb-metric-badge">Alleles</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(total_alleles)</strong>
+        </div>
+        <p class="mgdb-metric-description">Named mutant alleles, sequence variations, and transposon insertion events.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Phenotype Classes</h3>
+          <span class="mgdb-metric-badge">Phenotypes</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(distinct_phenotypes)</strong>
+        </div>
+        <p class="mgdb-metric-description">Distinct curated phenotypic trait classes associated with maize mutant loci.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       5. Connected Resources \(Final Item — Soft Green Surface\)
+       ==================================================================== -->
+  <section id="locus-related" class="locus-bottom-section" aria-labelledby="locus-related-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Connected resources</span>
+        <h2 id="locus-related-title">Related data centers &amp; tools</h2>
+      </div>
+      <p>Explore related genomic data centers, mutant phenotypes, germplasm stocks, and genome browsers.</p>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/gene_center/gene">
+          <strong>Gene Center</strong>
+          <span>Search B73/NAM reference gene models, functional descriptions, GO annotations, and expression data</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/phenotype">
+          <strong>Phenotype Data Center</strong>
+          <span>Curated mutant phenotypes, morphological descriptions, and phenotypic images</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/variation">
+          <strong>Genetic Variation Data Center</strong>
+          <span>Sequence variants, SNP alleles, and mutant insertion alleles in maize loci</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/stock">
+          <strong>Stock Data Center</strong>
+          <span>Order seeds and explore stocks from the Maize Genetics Cooperation Stock Center</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/map">
+          <strong>Map Data Center</strong>
+          <span>Genetic linkage maps, physical maps, and cytological bin assignments</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/qtl">
+          <strong>QTL Data Center</strong>
+          <span>Quantitative trait locus mapping experiments and agronomic trait loci</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

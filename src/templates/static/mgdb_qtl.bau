@@ -1,0 +1,301 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-qtl
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https://maizegdb.org/data_center/qtl">
+<meta property="og:title" content="MaizeGDB QTL Data Center | Quantitative Trait Loci &amp; Mapping Experiments">
+<meta property="og:description" content="Explore maize quantitative trait loci \(QTLs\), mapping populations, agronomic trait evaluations, and LOD score analyses.">
+
+<main class="mgdb-page mgdb-qtl-page" id="qtl-top">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center">Data centers</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">QTLs</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="qtl-title">
+    <div class="mgdb-hero-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="Quantitative Trait Loci LOD peak icon">
+        <line x1="16" y1="76" x2="80" y2="76" stroke="#235c37" stroke-width="4" stroke-linecap="round" />
+        <line x1="16" y1="76" x2="16" y2="16" stroke="#235c37" stroke-width="4" stroke-linecap="round" />
+        <line x1="16" y1="44" x2="80" y2="44" stroke="#d99a0b" stroke-width="2" stroke-dasharray="4 3" />
+        <path d="M18 74 C26 74, 32 72, 38 52 C44 32, 48 24, 52 24 C56 24, 60 38, 66 60 C72 74, 76 74, 80 74" fill="none" stroke="#235c37" stroke-width="4" stroke-linecap="round" />
+        <circle cx="52" cy="24" r="5" fill="#d99a0b" stroke="#7a4a10" stroke-width="2" />
+      </svg>
+      <strong>QTL<br />Center</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data_date)</p>
+      <h1 id="qtl-title">Explore maize quantitative trait loci &amp; mapping studies</h1>
+      <p class="mgdb-hero-description">Discover $(total_analyses) curated QTL trait analyses across $(distinct_traits) agronomic traits and $(total_experiments) mapping experiments evaluated in $(mapping_parents) parental inbred lines.</p>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#qtl-search-panel" class="is-current">Search QTLs</a>
+    <a href="#qtl-traits">Major Agronomic Traits</a>
+    <a href="#qtl-experiments">Mapping Populations</a>
+    <a href="#qtl-overview">Statistics</a>
+    <a href="#qtl-related">Related Resources</a>
+  </nav>
+
+  <!-- ====================================================================
+       1. Search Panel & Results
+       ==================================================================== -->
+  <section id="qtl-search-panel" class="qtl-search-panel" aria-labelledby="qtl-search-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Interactive search</span>
+        <h2 id="qtl-search-title">Search QTL trait analyses</h2>
+      </div>
+      <p>Search by trait keyword, experiment name, analysis symbol, or filter by specific agronomic trait and parent stock.</p>
+    </div>
+
+    <form id="qtl-search-form" class="qtl-search-form" role="search">
+      <div class="mgdb-field">
+        <label class="mgdb-label" for="qtl-search-term">Search trait name, experiment, or analysis code</label>
+        <div class="qtl-search-input-wrap">
+          <input class="mgdb-input" id="qtl-search-term" name="term" type="search" placeholder="e.g., kernel weight, plant height, anthesis, yield, B73 x Mo17, Schon" autocomplete="off" />
+        </div>
+        <p class="mgdb-hint">
+          <span>Try an example&#58;</span>
+          <button type="button" class="qtl-example-btn" data-term="kernel weight">kernel weight</button>
+          <button type="button" class="qtl-example-btn" data-term="anthesis">anthesis</button>
+          <button type="button" class="qtl-example-btn" data-term="plant height">plant height</button>
+          <button type="button" class="qtl-example-btn" data-term="borer">corn borer</button>
+        </p>
+      </div>
+
+      <div class="mgdb-search-row">
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="qtl-filter-trait">Agronomic trait</label>
+          <select class="mgdb-select" id="qtl-filter-trait" name="trait">
+            $(trait_options)
+          </select>
+        </div>
+
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="qtl-filter-parent">Mapping parent line</label>
+          <select class="mgdb-select" id="qtl-filter-parent" name="parent">
+            $(parent_options)
+          </select>
+        </div>
+      </div>
+
+      <div class="mgdb-form-actions">
+        <button class="mgdb-button mgdb-button-primary" type="submit">Search QTLs</button>
+        <button class="mgdb-button mgdb-button-quiet" type="reset" id="qtl-reset-btn">Reset filters</button>
+      </div>
+    </form>
+  </section>
+
+  <section id="qtl-results-section" class="qtl-results-section" aria-labelledby="qtl-results-title">
+    <div class="qtl-results-heading">
+      <div>
+        <span class="mgdb-eyebrow">Search results</span>
+        <h2 id="qtl-results-title">Matching QTL analyses</h2>
+        <p id="qtl-results-status" aria-live="polite">Enter a search keyword or choose a filter above to view matching QTL records.</p>
+      </div>
+      <a class="mgdb-button mgdb-button-quiet" id="qtl-export-tsv" href="#" download hidden>Export TSV</a>
+    </div>
+
+    <div id="qtl-notes"></div>
+    <div id="qtl-results"></div>
+
+    <div id="qtl-empty" class="mgdb-empty" hidden>
+      <h3>No QTL analyses matched</h3>
+      <p>Try widening your search terms, selecting a broader trait from the dropdown, or resetting the mapping parent filter.</p>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       2. Major Agronomic Traits
+       ==================================================================== -->
+  <section id="qtl-traits" aria-labelledby="qtl-traits-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Agronomic traits</span>
+        <h2 id="qtl-traits-title">Explore major trait categories</h2>
+      </div>
+      <p>Key agronomic and physiological trait classifications mapped in maize QTL mapping studies.</p>
+    </div>
+
+    <div class="mgdb-card-grid qtl-traits-grid">
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-ok">Grain Yield</span>
+        <h3>Kernel &amp; Ear Traits</h3>
+        <p>QTLs for 100-kernel weight, 1000-kernel weight, ear length, row number, kernel depth, and total grain yield.</p>
+        <button type="button" class="qtl-trait-shortcut" data-term="kernel">Filter kernel traits <span aria-hidden="true">&rarr;</span></button>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-info">Architecture</span>
+        <h3>Plant Height &amp; Lodging</h3>
+        <p>QTLs governing plant height, ear height, stalk diameter, rind penetrometer resistance, and root lodging resistance.</p>
+        <button type="button" class="qtl-trait-shortcut" data-term="height">Filter height traits <span aria-hidden="true">&rarr;</span></button>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-warn">Phenology</span>
+        <h3>Flowering &amp; Maturity</h3>
+        <p>QTLs controlling days to anthesis \(DTA\), days to silking \(DTS\), anthesis-silking interval \(ASI\), and photoperiod response.</p>
+        <button type="button" class="qtl-trait-shortcut" data-term="anthesis">Filter flowering traits <span aria-hidden="true">&rarr;</span></button>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-warn">Biotic Stress</span>
+        <h3>Disease &amp; Pest Resistance</h3>
+        <p>Quantitative resistance loci against European corn borer, northern corn leaf blight, gray leaf spot, and ear rots.</p>
+        <button type="button" class="qtl-trait-shortcut" data-term="borer">Filter resistance traits <span aria-hidden="true">&rarr;</span></button>
+      </article>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       3. Mapping Populations & Experiments
+       ==================================================================== -->
+  <section id="qtl-experiments" aria-labelledby="qtl-exp-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Mapping populations</span>
+        <h2 id="qtl-exp-title">Classical mapping crosses &amp; study designs</h2>
+      </div>
+      <p>Well-characterized recombinant inbred line \(RIL\), F2, and backcross populations utilized in maize QTL mapping.</p>
+    </div>
+
+    <div class="qtl-exp-grid" aria-label="Mapping populations">
+      <article class="qtl-exp-card">
+        <div class="qtl-exp-header">
+          <span class="mgdb-pill mgdb-pill-ok">Reference Cross</span>
+          <h3>B73 &times; Mo17 \(IBM / F2\)</h3>
+        </div>
+        <p>Historic reference intermated recombinant inbred line population providing high-resolution genetic and QTL mapping across all 10 chromosomes.</p>
+        <button type="button" class="mgdb-button mgdb-button-secondary qtl-parent-shortcut" data-term="Mo17">Explore B73 &times; Mo17 QTLs <span aria-hidden="true">&rarr;</span></button>
+      </article>
+
+      <article class="qtl-exp-card">
+        <div class="qtl-exp-header">
+          <span class="mgdb-pill mgdb-pill-info">European Inbreds</span>
+          <h3>D146 &times; KW1265</h3>
+        </div>
+        <p>Multi-environment European flint-dent experimental populations evaluated for cold tolerance, early vigor, and kernel composition.</p>
+        <button type="button" class="mgdb-button mgdb-button-secondary qtl-parent-shortcut" data-term="KW1265">Explore Flint-Dent QTLs <span aria-hidden="true">&rarr;</span></button>
+      </article>
+
+      <article class="qtl-exp-card">
+        <div class="qtl-exp-header">
+          <span class="mgdb-pill mgdb-pill-warn">Pest Resistance</span>
+          <h3>B52 &times; B73</h3>
+        </div>
+        <p>Mapping populations specifically bred for analyzing genetic architecture of 1st and 2nd brood European corn borer resistance.</p>
+        <button type="button" class="mgdb-button mgdb-button-secondary qtl-parent-shortcut" data-term="B52">Explore Pest QTLs <span aria-hidden="true">&rarr;</span></button>
+      </article>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       4. Corpus Statistics \(Second to Last Item\)
+       ==================================================================== -->
+  <section id="qtl-overview" aria-labelledby="qtl-overview-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Corpus summary</span>
+        <h2 id="qtl-overview-title">QTL dataset at a glance</h2>
+      </div>
+      <p>Key metrics across curated quantitative trait analyses, traits, mapping populations, and inbred parents.</p>
+    </div>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Trait Analyses</h3>
+          <span class="mgdb-metric-badge">Curated</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(total_analyses)</strong>
+        </div>
+        <p class="mgdb-metric-description">Curated quantitative trait analyses with statistical models and QTL detections.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Mapped QTL Loci</h3>
+          <span class="mgdb-metric-badge">Genomic</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(total_qtl_loci)</strong>
+        </div>
+        <p class="mgdb-metric-description">Individual QTL peak loci placed onto maize genetic and cytological bin maps.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Distinct Traits</h3>
+          <span class="mgdb-metric-badge">Phenotypes</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(distinct_traits)</strong>
+        </div>
+        <p class="mgdb-metric-description">Agronomic, morphological, biochemical, and physiological traits evaluated.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Parental Inbreds</h3>
+          <span class="mgdb-metric-badge">Germplasm</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(mapping_parents)</strong>
+        </div>
+        <p class="mgdb-metric-description">Distinct inbred parent stocks utilized across mapping cross designs.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       5. Connected Resources \(Final Item — Soft Green Surface\)
+       ==================================================================== -->
+  <section id="qtl-related" class="qtl-bottom-section" aria-labelledby="qtl-related-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Connected resources</span>
+        <h2 id="qtl-related-title">Related data centers &amp; tools</h2>
+      </div>
+      <p>Explore qualitative mutant phenotypes, genetic variation alleles, chromosome maps, and germplasm stocks.</p>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/phenotype">
+          <strong>Phenotype Data Center</strong>
+          <span>Curated qualitative mutant phenotypes, developmental traits, and morphological variations</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/variation">
+          <strong>Genetic Variation Data Center</strong>
+          <span>Sequence variants, SNP alleles, and insertion disruptions in quantitative trait candidate genes</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Locus Data Center</strong>
+          <span>Classic genetic loci, cloned genes, and mutant alleles mapped to chromosomal bins</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/map">
+          <strong>Map Data Center</strong>
+          <span>Genetic linkage maps, physical maps, and cytological bin coordinates</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/stock">
+          <strong>Stock Data Center</strong>
+          <span>Inbred parent lines and mapping population seed stocks from the MGCSC</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/gene_center/gene">
+          <strong>Gene Center</strong>
+          <span>B73/NAM reference gene models, functional GO terms, and expression data</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

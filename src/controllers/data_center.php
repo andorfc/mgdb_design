@@ -115,8 +115,13 @@
     return;
   }
 
-  if (in_array(PAGE, array('image', 'image_phenotype', 'image_trait', 'image_species', 'image_gel_pattern', 'image_mutant'), true) && !getCGIParam('id', 'G', ID)) {
+  if (PAGE == 'image' && !getCGIParam('id', 'G', ID) || in_array(PAGE, array('image_phenotype', 'image_trait', 'image_species', 'image_gel_pattern', 'image_mutant'), true) && !getCGIParam('id', 'G', ID)) {
     include('controllers/data_center/image_search_modern.php');
+    return;
+  }
+
+  if (PAGE == 'locus' && !getCGIParam('id', 'G', ID)) {
+    include('controllers/data_center/locus_search_modern.php');
     return;
   }
 
@@ -143,6 +148,11 @@
 
   if (PAGE == 'phenotype' && !getCGIParam('id', 'G', ID)) {
     include('controllers/data_center/phenotype_search_modern.php');
+    return;
+  }
+
+  if (PAGE == 'qtl' && !getCGIParam('id', 'G', ID)) {
+    include('controllers/data_center/qtl_search_modern.php');
     return;
   }
 

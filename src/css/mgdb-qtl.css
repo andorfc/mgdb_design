@@ -1,0 +1,257 @@
+/* file: mgdb-qtl.css
+ *
+ * Page-specific styles for the QTL Data Center (/data_center/qtl).
+ * Scoped under .mgdb-qtl-page.
+ */
+
+/* --------------------------------------------------------------------------
+   Hero Emblem
+   -------------------------------------------------------------------------- */
+
+.mgdb-qtl-page .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-qtl-page .mgdb-hero-emblem svg {
+  width: min(100%, 64px);
+  height: auto;
+  mix-blend-mode: normal;
+}
+
+/* --------------------------------------------------------------------------
+   Sticky Section Tabs
+   -------------------------------------------------------------------------- */
+
+.mgdb-qtl-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-5);
+  padding: var(--mgdb-space-2) 0;
+  background: var(--mgdb-surface);
+  border-bottom: 1px solid var(--mgdb-line);
+}
+
+.mgdb-qtl-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-decoration: none;
+  transition: background .12s, border-color .12s;
+}
+
+.mgdb-qtl-page .mgdb-section-tabs a:hover {
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-qtl-page .mgdb-section-tabs a.is-current,
+.mgdb-qtl-page .mgdb-section-tabs a[aria-current="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+.mgdb-qtl-page > section,
+.mgdb-qtl-page section[id] {
+  scroll-margin-top: 4.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   Search Form
+   -------------------------------------------------------------------------- */
+
+.mgdb-qtl-page .qtl-search-form {
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-qtl-page .qtl-example-btn {
+  display: inline-block;
+  margin: 0 var(--mgdb-space-1);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mgdb-green-dark);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.mgdb-qtl-page .qtl-example-btn:hover {
+  color: var(--mgdb-green);
+}
+
+/* --------------------------------------------------------------------------
+   Results Section & Table
+   -------------------------------------------------------------------------- */
+
+.mgdb-qtl-page .qtl-results-section {
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-qtl-page .qtl-results-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-qtl-page #qtl-notes .mgdb-message {
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-qtl-page .qtl-table td,
+.mgdb-qtl-page .qtl-table th {
+  vertical-align: top;
+}
+
+.mgdb-qtl-page .qtl-name-cell strong {
+  display: block;
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-qtl-page .qtl-desc {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  margin-top: 4px;
+}
+
+.mgdb-qtl-page .qtl-parents-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+}
+
+.mgdb-qtl-page .qtl-attr-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mgdb-qtl-page .qtl-attr-list li {
+  margin-bottom: var(--mgdb-space-1);
+}
+
+.mgdb-qtl-page .qtl-attr-list li:last-child {
+  margin-bottom: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Trait Categories Grid & Shortcut Buttons
+   -------------------------------------------------------------------------- */
+
+.mgdb-qtl-page .qtl-traits-grid {
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-qtl-page .qtl-trait-shortcut {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mgdb-space-1);
+  margin-top: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mgdb-green-dark);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.mgdb-qtl-page .qtl-trait-shortcut:hover {
+  text-decoration: underline;
+  color: var(--mgdb-green);
+}
+
+/* --------------------------------------------------------------------------
+   Mapping Populations Grid
+   -------------------------------------------------------------------------- */
+
+.mgdb-qtl-page .qtl-exp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-qtl-page .qtl-exp-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-2);
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-qtl-page .qtl-exp-header {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+}
+
+.mgdb-qtl-page .qtl-exp-header h3 {
+  margin: 0;
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-qtl-page .qtl-exp-card p {
+  margin: 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-qtl-page .qtl-exp-card .mgdb-button {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+/* --------------------------------------------------------------------------
+   Connected Resources (Bottom Section — Soft Green)
+   -------------------------------------------------------------------------- */
+
+.mgdb-qtl-page .qtl-bottom-section {
+  padding: var(--mgdb-space-6);
+  border: 1px solid #cfe3d6;
+  border-radius: var(--mgdb-radius-lg);
+  background: linear-gradient(135deg, #f2f8f4 0%, var(--mgdb-green-soft) 100%);
+}
+
+.mgdb-qtl-page .qtl-bottom-section .mgdb-resource-panel {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: #cfe3d6;
+}
+
+@media (max-width: 640px) {
+  .mgdb-qtl-page .mgdb-section-tabs {
+    position: static;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  .mgdb-qtl-page .mgdb-section-tabs a {
+    white-space: nowrap;
+  }
+}

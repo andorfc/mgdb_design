@@ -1,0 +1,291 @@
+/* file: mgdb-locus.css
+ *
+ * Page-specific styles for the Locus Data Center (/data_center/locus).
+ * Scoped under .mgdb-locus-page.
+ */
+
+/* --------------------------------------------------------------------------
+   Hero Emblem
+   -------------------------------------------------------------------------- */
+
+.mgdb-locus-page .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-locus-page .mgdb-hero-emblem svg {
+  width: min(100%, 64px);
+  height: auto;
+  mix-blend-mode: normal;
+}
+
+/* --------------------------------------------------------------------------
+   Notice Banner (Gene Center vs Locus Data Center)
+   -------------------------------------------------------------------------- */
+
+.mgdb-locus-page .locus-notice-banner {
+  display: flex;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  margin-top: var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-4);
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 1px solid #b8dbca;
+  border-radius: var(--mgdb-radius);
+  background: #edf7f1;
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-locus-page .locus-notice-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--mgdb-green);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.mgdb-locus-page .locus-notice-body strong {
+  display: block;
+  color: var(--mgdb-green-dark);
+  margin-bottom: 2px;
+}
+
+.mgdb-locus-page .locus-notice-body code {
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: #e1efe7;
+  color: var(--mgdb-green-dark);
+  font-size: 0.9em;
+}
+
+/* --------------------------------------------------------------------------
+   Sticky Section Tabs
+   -------------------------------------------------------------------------- */
+
+.mgdb-locus-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-5);
+  padding: var(--mgdb-space-2) 0;
+  background: var(--mgdb-surface);
+  border-bottom: 1px solid var(--mgdb-line);
+}
+
+.mgdb-locus-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-decoration: none;
+  transition: background .12s, border-color .12s;
+}
+
+.mgdb-locus-page .mgdb-section-tabs a:hover {
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-locus-page .mgdb-section-tabs a.is-current,
+.mgdb-locus-page .mgdb-section-tabs a[aria-current="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+.mgdb-locus-page > section,
+.mgdb-locus-page section[id] {
+  scroll-margin-top: 4.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   Search Form
+   -------------------------------------------------------------------------- */
+
+.mgdb-locus-page .locus-search-form {
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-locus-page .locus-example-btn {
+  display: inline-block;
+  margin: 0 var(--mgdb-space-1);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mgdb-green-dark);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.mgdb-locus-page .locus-example-btn:hover {
+  color: var(--mgdb-green);
+}
+
+/* --------------------------------------------------------------------------
+   Results Section & Table
+   -------------------------------------------------------------------------- */
+
+.mgdb-locus-page .locus-results-section {
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-locus-page .locus-results-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-locus-page #locus-notes .mgdb-message {
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-locus-page .locus-table td,
+.mgdb-locus-page .locus-table th {
+  vertical-align: top;
+}
+
+.mgdb-locus-page .locus-name-cell strong {
+  display: block;
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-locus-page .locus-fullname {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-locus-page .locus-syn-list {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  margin-top: 2px;
+}
+
+.mgdb-locus-page .locus-attr-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mgdb-locus-page .locus-attr-list li {
+  margin-bottom: var(--mgdb-space-1);
+}
+
+.mgdb-locus-page .locus-attr-list li:last-child {
+  margin-bottom: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Classic Genes Grid Cards
+   -------------------------------------------------------------------------- */
+
+.mgdb-locus-page .locus-top-grid {
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-locus-page .locus-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-locus-page .locus-card-footer {
+  display: block;
+  margin-top: auto;
+  font-size: var(--mgdb-text-xs);
+}
+
+/* --------------------------------------------------------------------------
+   Downloads & Resources Grid
+   -------------------------------------------------------------------------- */
+
+.mgdb-locus-page .locus-download-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-locus-page .locus-download-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-2);
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-locus-page .locus-download-header {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+}
+
+.mgdb-locus-page .locus-download-header h3 {
+  margin: 0;
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-locus-page .locus-download-card p {
+  margin: 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-locus-page .locus-download-card .mgdb-button {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+/* --------------------------------------------------------------------------
+   Connected Resources (Bottom Section — Soft Green)
+   -------------------------------------------------------------------------- */
+
+.mgdb-locus-page .locus-bottom-section {
+  padding: var(--mgdb-space-6);
+  border: 1px solid #cfe3d6;
+  border-radius: var(--mgdb-radius-lg);
+  background: linear-gradient(135deg, #f2f8f4 0%, var(--mgdb-green-soft) 100%);
+}
+
+.mgdb-locus-page .locus-bottom-section .mgdb-resource-panel {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: #cfe3d6;
+}
+
+@media (max-width: 640px) {
+  .mgdb-locus-page .mgdb-section-tabs {
+    position: static;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  .mgdb-locus-page .mgdb-section-tabs a {
+    white-space: nowrap;
+  }
+}
