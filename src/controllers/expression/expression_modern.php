@@ -4,25 +4,35 @@
  * purpose: modernized controller for MaizeGDB Expression Data Center
  */
 
-include_once('./lib/Bauplan.php');
 include_once('./include/db-api.php');
-include_once('./include/gp_lib.php');
 include_once('./include/dashboard_cache.php');
 include_once('./search/expression/expression_search_lib.php');
 
 $system = getSystemInfo('mgdb.conf');
-$DBConn = connect_to_database();
+logMessage('Starting expression_modern.php');
 
-$bauplan = new Bauplan();
-$bauplan->title('Maize Expression Data Center');
+$DBConn = connect_to_database(false);
 
-$v_css = file_exists('css/mgdb-expression.css') ? filemtime('css/mgdb-expression.css') : time();
-$v_js  = file_exists('js/mgdb-expression.js')   ? filemtime('js/mgdb-expression.js')   : time();
+// Bypass Cloudflare and browser edge cache
+header("Cache-Control: no-cache, no-store, must-revalidate, max-age=0");
+header("Pragma: no-cache");
+header("Expires: 0");
 
+$bauplan = new Bauplan('MaizeGDB Expression Data Center | RNA-seq Atlases, qTeller & Transcriptomics');
+$bauplan->modern();
+
+$doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';
+$css_file = $doc_root . '/css/mgdb-expression.css';
+$js_file = $doc_root . '/js/mgdb-expression.js';
+$v_css = file_exists($css_file) ? filemtime($css_file) : time();
+$v_js = file_exists($js_file) ? filemtime($js_file) : time();
+
+$bauplan->preHTML('<meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
+$bauplan->includeCss('/css/static.css');
 $bauplan->includeCss('/css/mgdb-modern.css');
 $bauplan->includeCss('/css/mgdb-megamenu.css');
 $bauplan->includeCss('/css/mgdb-expression.css?v=' . $v_css);
-
+$bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
 $bauplan->includeScript('/js/mgdb-expression.js?v=' . $v_js);
 $bauplan->head('<meta name="description" content="Explore maize quantitative transcriptomics, RNA-seq expression atlases, qTeller, eFP browser, pan-genome NAM founder lines, and bulk downloads.">');
