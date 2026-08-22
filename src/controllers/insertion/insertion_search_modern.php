@@ -17,6 +17,7 @@
  */
 
 include_once('./include/db-api.php');
+include_once('./include/dashboard_cache.php');
 include_once('./include/gp_lib.php');
 include_once('./search/insertion/insertion_search_lib.php');
 
@@ -54,28 +55,41 @@ $mgdb->get('server-url')->replace($system['root_url']);
 
 $content = $mgdb->get('body')->load('templates/static/mgdb_insertion.bau');
 
-// Precomputed overview numbers -- zero SQL on this page load.
-$summary_file = $doc_root . '/data/insertion/insertion_summary.json';
-$summary = array(
-    'total_alignments' => 1269215, 'total_insertions' => 541950, 'total_genes' => 99775,
-    'total_stocks' => 26150, 'generated_at' => null
-);
-if (file_exists($summary_file)) {
-    $decoded = json_decode(file_get_contents($summary_file), true);
-    if (is_array($decoded)) { $summary = array_merge($summary, $decoded); }
-}
+// Precomputed overview numbers wrapped in dashboardCache
+$payload = dashboardCache($system, 'insertion/page', function () use ($doc_root) {
+    $summary_file = $doc_root . '/data/insertion/insertion_summary.json';
+    $summary = array(
+        'total_alignments' => 1269215, 'total_insertions' => 541950, 'total_genes' => 99775,
+        'total_stocks' => 26150, 'generated_at' => null
+    );
+    if (file_exists($summary_file)) {
+        $decoded = json_decode(file_get_contents($summary_file), true);
+        if (is_array($decoded)) { $summary = array_merge($summary, $decoded); }
+    }
 
-$content->get('total_alignments')->replace(number_format((int) $summary['total_alignments']));
-$content->get('total_insertions')->replace(number_format((int) $summary['total_insertions']));
-$content->get('total_genes')->replace(number_format((int) $summary['total_genes']));
-$content->get('total_stocks')->replace(number_format((int) $summary['total_stocks']));
-$content->get('dataset_count')->replace((int) (isset($summary['dataset_count']) ? $summary['dataset_count'] : 4));
-$content->get('data_date')->replace($summary['generated_at']
-    ? gmdate('F j, Y', strtotime($summary['generated_at'])) : 'unknown');
+    return array(
+        'total_alignments'  => number_format((int) $summary['total_alignments']),
+        'total_insertions'  => number_format((int) $summary['total_insertions']),
+        'total_genes'       => number_format((int) $summary['total_genes']),
+        'total_stocks'      => number_format((int) $summary['total_stocks']),
+        'dataset_count'     => (int) (isset($summary['dataset_count']) ? $summary['dataset_count'] : 4),
+        'data_date'         => $summary['generated_at'] ? gmdate('F j, Y', strtotime($summary['generated_at'])) : 'August 2026',
+        'dataset_options'   => insDatasetOptionsHTML(),
+        'structure_options' => insStructureOptionsHTML(),
+        'assembly_options'  => insAssemblyOptionsHTML(),
+    );
+});
 
-$content->get('dataset_options')->replace(insDatasetOptionsHTML());
-$content->get('structure_options')->replace(insStructureOptionsHTML());
-$content->get('assembly_options')->replace(insAssemblyOptionsHTML());
+$content->get('total_alignments')->replace($payload['total_alignments']);
+$content->get('total_insertions')->replace($payload['total_insertions']);
+$content->get('total_genes')->replace($payload['total_genes']);
+$content->get('total_stocks')->replace($payload['total_stocks']);
+$content->get('dataset_count')->replace($payload['dataset_count']);
+$content->get('data_date')->replace($payload['data_date']);
+
+$content->get('dataset_options')->replace($payload['dataset_options']);
+$content->get('structure_options')->replace($payload['structure_options']);
+$content->get('assembly_options')->replace($payload['assembly_options']);
 
 include_once('translation.php');
 $mgdb->get('blast_url')->replace($system['BLAST_URL']);

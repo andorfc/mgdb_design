@@ -3,7 +3,7 @@ $$SYNTAX-LEVEL 2
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@MaizeGDB">
 <meta property="og:url" content="https://maizegdb.org/insertion">
-<meta property="og:title" content="MaizeGDB Insertion Data Center">
+<meta property="og:title" content="MaizeGDB Insertion Data Center | Mu, Ac/Ds &amp; Ds-GFP Insertions">
 <meta property="og:description" content="Search over 1.2 million maize transposon insertion alignments from UniformMu, BonnMu, and Ac/Ds collections by gene model, genome position, or insertion identifier.">
 
 <main class="mgdb-page mgdb-insertion-page" id="insertion-top">
@@ -20,64 +20,32 @@ $$SYNTAX-LEVEL 2
         <line x1="38" y1="52" x2="52" y2="52" stroke="#d99a0b" stroke-width="4" stroke-linecap="round" />
       </svg>
       <strong>Insertion<br />Center</strong>
-      <span>MaizeGDB</span>
     </div>
     <div class="mgdb-hero-body">
-      <span class="mgdb-eyebrow">Transposon insertion collections</span>
-      <h1 id="insertion-title">Find insertions and the stocks that carry them</h1>
-      <p class="mgdb-hero-tagline">$(total_alignments) insertion alignments across $(dataset_count) collections &mdash; UniformMu, BonnMu, and two Ac/Ds populations &mdash; covering $(total_genes) genes and linked to $(total_stocks) seed stocks.</p>
-      <p class="mgdb-hero-description">Search by B73 gene model, genome position, or insertion identifier. Every result links to its genome coordinates, its variation record, and the seed stock available for order.</p>
-      <div class="mgdb-hero-actions">
-        <a class="mgdb-button mgdb-button-primary" href="#insertion-search-panel">Search insertions</a>
-        <a class="mgdb-button mgdb-button-secondary" href="#insertion-collections">Browse collections</a>
-      </div>
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data_date)</p>
+      <h1 id="insertion-title">Explore maize transposon insertion collections</h1>
+      <p class="mgdb-hero-description">Discover $(total_alignments) sequence-indexed insertion alignments across $(dataset_count) collections &mdash; UniformMu, BonnMu, and two Ac/Ds populations &mdash; spanning $(total_genes) genes and linked to $(total_stocks) accessible seed stocks.</p>
     </div>
   </section>
 
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#insertion-overview">Overview</a>
-    <a href="#insertion-search-panel">Search</a>
-    <a href="#insertion-results-section">Results</a>
+    <a href="#insertion-search-panel" class="is-current">Search Insertions</a>
     <a href="#insertion-collections">Collections</a>
     <a href="#insertion-downloads">Downloads</a>
+    <a href="#insertion-overview">Statistics</a>
+    <a href="#insertion-related">Related Resources</a>
   </nav>
 
-  <section id="insertion-overview" aria-labelledby="insertion-overview-title">
-    <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Collection summary</span>
-        <h2 id="insertion-overview-title">Insertion dataset at a glance</h2>
-      </div>
-      <p>Overview figures measured offline on $(data_date) and refreshed on a curation cycle, not on every page load.</p>
-    </div>
-
-    <div class="mgdb-metric-grid">
-      <article class="mgdb-metric-quiet">
-        <strong class="mgdb-metric-value">$(total_alignments)</strong>
-        <p>insertion alignments</p>
-      </article>
-      <article class="mgdb-metric-quiet">
-        <strong class="mgdb-metric-value">$(total_insertions)</strong>
-        <p>distinct insertion loci</p>
-      </article>
-      <article class="mgdb-metric-quiet">
-        <strong class="mgdb-metric-value">$(total_genes)</strong>
-        <p>genes with an insertion</p>
-      </article>
-      <article class="mgdb-metric-quiet">
-        <strong class="mgdb-metric-value">$(total_stocks)</strong>
-        <p>seed stocks reachable</p>
-      </article>
-    </div>
-  </section>
-
+  <!-- ====================================================================
+       1. Search Panel & Results
+       ==================================================================== -->
   <section id="insertion-search-panel" class="insertion-search-panel" aria-labelledby="insertion-search-title">
     <div class="mgdb-section-heading">
       <div>
         <span class="mgdb-eyebrow">Interactive search</span>
         <h2 id="insertion-search-title">Search insertions</h2>
       </div>
-      <p>Choose a search mode below. Every search is bounded and runs against indexed or capped queries, so results return in well under a second.</p>
+      <p>Choose a search mode below. Search by gene model, chromosomal region, or insertion name to locate target stocks.</p>
     </div>
 
     <div class="ins-tabs" role="tablist" aria-label="Insertion search modes">
@@ -90,7 +58,7 @@ $$SYNTAX-LEVEL 2
       <div class="mgdb-field">
         <label class="mgdb-label" for="ins-gene-list">B73 gene models or transcripts</label>
         <p class="mgdb-hint">Up to 50, one per line or comma-separated.</p>
-        <textarea class="mgdb-textarea" id="ins-gene-list" name="genes" rows="6" placeholder="Zm00001eb228780&#10;Zm00001eb064660&#10;Zm00001eb000240"></textarea>
+        <textarea class="mgdb-textarea" id="ins-gene-list" name="genes" rows="5" placeholder="Zm00001eb228780&#10;Zm00001eb064660&#10;Zm00001eb000240"></textarea>
         <p class="mgdb-hint"><button type="button" class="ins-example" data-example="genes">Try an example</button></p>
       </div>
       <div class="mgdb-search-row">
@@ -168,7 +136,7 @@ $$SYNTAX-LEVEL 2
       <div class="mgdb-field">
         <label class="mgdb-label" for="ins-stock-list">Insertion identifiers</label>
         <p class="mgdb-hint">Up to 100, one per line or comma-separated.</p>
-        <textarea class="mgdb-textarea" id="ins-stock-list" name="names" rows="6" placeholder="mu1000002&#10;mu1001742&#10;BonnMu0266339"></textarea>
+        <textarea class="mgdb-textarea" id="ins-stock-list" name="names" rows="5" placeholder="mu1000002&#10;mu1001742&#10;BonnMu0266339"></textarea>
         <p class="mgdb-hint"><button type="button" class="ins-example" data-example="names">Try an example</button></p>
       </div>
       <div class="mgdb-form-actions">
@@ -197,13 +165,16 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
+  <!-- ====================================================================
+       2. Insertion Collections
+       ==================================================================== -->
   <section id="insertion-collections" aria-labelledby="insertion-collections-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Four collections</span>
+        <span class="mgdb-eyebrow">Curated collections</span>
         <h2 id="insertion-collections-title">Explore insertion collections</h2>
       </div>
-      <p>Each collection was generated by a different lab and aligned to different B73 or W22 assemblies.</p>
+      <p>Four primary sequence-indexed transposon collections aligned to reference B73 and W22 genome assemblies.</p>
     </div>
 
     <div class="mgdb-card-grid insertion-collection-grid">
@@ -231,7 +202,7 @@ $$SYNTAX-LEVEL 2
       <article class="mgdb-card">
         <span class="mgdb-pill mgdb-pill-warn">Ac/Ds transposon</span>
         <h3>Volbrecht Ac/Ds</h3>
-        <p>Genome-wide Ac/Ds mutagenesis in W22, published in <a href="https://doi.org/10.1105/tpc.109.073452">Vollbrecht et al. 2010</a>.</p>
+        <p>Genome-wide Ac/Ds mutagenesis in W22, published in Vollbrecht et al. 2010.</p>
         <a href="https://jbrowse.maizegdb.org/?loc=chr1%3A1..10310000&amp;tracks=gene_models_official%2Cacds">View in JBrowse <span aria-hidden="true">&nearr;</span></a>
       </article>
     </div>
@@ -241,13 +212,16 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
+  <!-- ====================================================================
+       3. Bulk Downloads
+       ==================================================================== -->
   <section id="insertion-downloads" aria-labelledby="insertion-downloads-title">
     <div class="mgdb-section-heading">
       <div>
         <span class="mgdb-eyebrow">Bulk datasets</span>
         <h2 id="insertion-downloads-title">Insertion downloads</h2>
       </div>
-      <p>Full per-collection alignment files, for analyses broader than what an interactive search should return.</p>
+      <p>Full per-collection alignment files for genome-wide and offline computational analyses.</p>
     </div>
 
     <div class="ins-download-grid" aria-label="Bulk insertion downloads">
@@ -256,7 +230,7 @@ $$SYNTAX-LEVEL 2
           <span class="mgdb-pill mgdb-pill-ok">GFF / TSV</span>
           <h3>UniformMu</h3>
         </div>
-        <p>Full UniformMu insertion-to-gene-model alignment set, all assemblies.</p>
+        <p>Full UniformMu insertion-to-gene-model alignment set across all supported genome assemblies.</p>
         <a class="mgdb-button mgdb-button-secondary" href="https://download.maizegdb.org/Insertions/UniformMu/">Download UniformMu <span aria-hidden="true">&darr;</span></a>
       </article>
 
@@ -265,7 +239,7 @@ $$SYNTAX-LEVEL 2
           <span class="mgdb-pill mgdb-pill-warn">GFF / TSV</span>
           <h3>Dooner-Du Ac/Ds</h3>
         </div>
-        <p>GFP-Ds insertion collection alignment files.</p>
+        <p>GFP-Ds insertion collection alignment files with flanking sequence markers.</p>
         <a class="mgdb-button mgdb-button-secondary" href="https://download.maizegdb.org/Insertions/AcDs_Dooner/">Download Ac/Ds \(Dooner-Du\) <span aria-hidden="true">&darr;</span></a>
       </article>
 
@@ -274,9 +248,116 @@ $$SYNTAX-LEVEL 2
           <span class="mgdb-pill mgdb-pill-warn">GFF / TSV</span>
           <h3>Volbrecht Ac/Ds</h3>
         </div>
-        <p>Genome-wide Ac/Ds mutagenesis alignment files.</p>
+        <p>Genome-wide Ac/Ds mutagenesis alignment files and mapped insertion coordinates.</p>
         <a class="mgdb-button mgdb-button-secondary" href="https://download.maizegdb.org/Insertions/AcDs_Vollbrecht/">Download Ac/Ds \(Volbrecht\) <span aria-hidden="true">&darr;</span></a>
       </article>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       4. Corpus Statistics \(Second to Last Item\)
+       ==================================================================== -->
+  <section id="insertion-overview" aria-labelledby="insertion-overview-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Corpus summary</span>
+        <h2 id="insertion-overview-title">Insertion dataset at a glance</h2>
+      </div>
+      <p>Key metrics across curated transposon insertion collections and stock linkages.</p>
+    </div>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Alignments</h3>
+          <span class="mgdb-metric-badge">Sequenced</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(total_alignments)</strong>
+        </div>
+        <p class="mgdb-metric-description">Insertion alignments mapped across reference genome assemblies.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Insertion Loci</h3>
+          <span class="mgdb-metric-badge">Distinct</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(total_insertions)</strong>
+        </div>
+        <p class="mgdb-metric-description">Unique sequence-indexed insertion locations in the maize genome.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Disrupted Genes</h3>
+          <span class="mgdb-metric-badge">Coverage</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(total_genes)</strong>
+        </div>
+        <p class="mgdb-metric-description">Distinct maize gene models carrying one or more mapped insertions.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Seed Stocks</h3>
+          <span class="mgdb-metric-badge">Available</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(total_stocks)</strong>
+        </div>
+        <p class="mgdb-metric-description">Curated seed stocks cataloged and orderable for experimental validation.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       5. Connected Resources \(Final Item — Soft Green Surface\)
+       ==================================================================== -->
+  <section id="insertion-related" class="ins-bottom-section" aria-labelledby="insertion-related-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Connected resources</span>
+        <h2 id="insertion-related-title">Related data centers &amp; tools</h2>
+      </div>
+      <p>Connect insertional mutants to physical seed stocks, gene models, curated variations, and genome browsers.</p>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/stock">
+          <strong>Stock Center &amp; Germplasm</strong>
+          <span>Curated genetic stocks, mutant alleles, and UniformMu UFMu seed stocks</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/variation">
+          <strong>Variations &amp; Alleles Data Center</strong>
+          <span>Over 1.7 million sequence variations, allele descriptors, and locus records</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/gene_center">
+          <strong>Gene Center</strong>
+          <span>Search B73 gene models, functional annotations, GO terms, and expression data</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/genome">
+          <strong>Genome Data Center</strong>
+          <span>Reference assemblies for B73, W22, NAM founder lines, and wild relatives</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="https://jbrowse.maizegdb.org">
+          <strong>JBrowse Genome Browser</strong>
+          <span>Interactive genome browser tracks for transposon insertions and gene models</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/cite">
+          <strong>How to Cite MaizeGDB</strong>
+          <span>Guidelines and citation formats for database records, tools, and datasets</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+      </div>
     </div>
   </section>
 </main>

@@ -275,9 +275,46 @@
     return '<td><ul class="ins-stock-list">' + items + '</ul></td>';
   }
 
+  /* ── Section Navigation Tabs & Scrollspy ────────────────────────────────── */
+
+  function initSectionTabs() {
+    var nav = document.querySelector('.mgdb-section-tabs');
+    if (!nav) return;
+    var links = nav.querySelectorAll('a[href^="#"]');
+    if (!links.length) return;
+
+    var sections = [];
+    Array.prototype.forEach.call(links, function (link) {
+      var id = link.getAttribute('href').slice(1);
+      var el = document.getElementById(id);
+      if (el) sections.push({ id: id, link: link, el: el });
+    });
+
+    if (!('IntersectionObserver' in window)) return;
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          sections.forEach(function (s) {
+            var current = s.el === entry.target;
+            s.link.classList.toggle('is-current', current);
+            if (current) {
+              s.link.setAttribute('aria-current', 'true');
+            } else {
+              s.link.removeAttribute('aria-current');
+            }
+          });
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+
+    sections.forEach(function (s) { observer.observe(s.el); });
+  }
+
   /* ── Init ────────────────────────────────────────────────────────────── */
 
   function init() {
+    initSectionTabs();
     initTabs();
     initBackgroundSync('ins-gene-dataset', 'ins-gene-background');
     initBackgroundSync('ins-region-dataset', 'ins-region-background');

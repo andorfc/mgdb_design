@@ -1,11 +1,71 @@
-/* file: mgdb-insertion.css
- *
- * Page-specific styles for the Insertion Data Center (/insertion).
- * Scoped under .mgdb-insertion-page; relies on mgdb-modern.css tokens and
- * shared components (.mgdb-hero, .mgdb-metric-grid, .mgdb-field, .mgdb-table,
- * .mgdb-card, .mgdb-empty, .mgdb-message, .mgdb-pill). Only what those do not
- * already cover is defined here.
- */
+/* --------------------------------------------------------------------------
+   Hero Emblem
+   -------------------------------------------------------------------------- */
+
+.mgdb-insertion-page .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-insertion-page .mgdb-hero-emblem svg {
+  width: min(100%, 64px);
+  height: auto;
+  mix-blend-mode: normal;
+}
+
+/* --------------------------------------------------------------------------
+   Sticky Section Tabs
+   -------------------------------------------------------------------------- */
+
+.mgdb-insertion-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-5);
+  padding: var(--mgdb-space-2) 0;
+  background: var(--mgdb-surface);
+  border-bottom: 1px solid var(--mgdb-line);
+}
+
+.mgdb-insertion-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-decoration: none;
+  transition: background .12s, border-color .12s;
+}
+
+.mgdb-insertion-page .mgdb-section-tabs a:hover {
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-insertion-page .mgdb-section-tabs a.is-current,
+.mgdb-insertion-page .mgdb-section-tabs a[aria-current="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #fff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+.mgdb-insertion-page > section,
+.mgdb-insertion-page section[id] {
+  scroll-margin-top: 4.5rem;
+}
+
+.mgdb-insertion-page .insertion-search-panel + .insertion-results-section {
+  margin-top: var(--mgdb-space-5);
+}
 
 /* --------------------------------------------------------------------------
    Search mode tabs -- same shape as the protein-structure page's .ps-tabs,
@@ -149,7 +209,29 @@
 .mgdb-insertion-page .ins-download-card p { margin: 0; color: var(--mgdb-ink-soft); font-size: var(--mgdb-text-sm); }
 .mgdb-insertion-page .ins-download-card .mgdb-button { align-self: flex-start; margin-top: auto; }
 
+/* --------------------------------------------------------------------------
+   Connected Resources (Bottom Section — Soft Green)
+   -------------------------------------------------------------------------- */
+
+.mgdb-insertion-page .ins-bottom-section {
+  padding: var(--mgdb-space-6);
+  border: 1px solid #cfe3d6;
+  border-radius: var(--mgdb-radius-lg);
+  background: linear-gradient(135deg, #f2f8f4 0%, var(--mgdb-green-soft) 100%);
+}
+
+.mgdb-insertion-page .ins-bottom-section .mgdb-resource-panel {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: #cfe3d6;
+}
+
 @media (max-width: 640px) {
+  .mgdb-insertion-page .mgdb-section-tabs {
+    position: static;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  .mgdb-insertion-page .mgdb-section-tabs a { white-space: nowrap; }
   .mgdb-insertion-page .ins-tabs { border-bottom: 0; }
   .mgdb-insertion-page .ins-tab { border: 1px solid var(--mgdb-line); border-radius: var(--mgdb-radius-sm); margin-bottom: 0; }
   .mgdb-insertion-page .ins-tab[aria-selected="true"] { background: var(--mgdb-green-soft); }

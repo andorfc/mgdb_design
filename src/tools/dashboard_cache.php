@@ -62,6 +62,7 @@ $WARM_URLS = array(
     '/data_center/protein_structure',
     '/data_center/phenotype',
     '/genetic_variation',
+    '/insertion',
     '/search/reference/reference_search_api.php?facets_only=1'
 );
 
