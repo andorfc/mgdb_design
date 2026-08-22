@@ -2,10 +2,11 @@ $$SYNTAX-LEVEL 2
 *(mgdb-phenotype
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@MaizeGDB">
-<meta property="og:url" content="https://maizegdb.org/data_center/phenotype">
+<meta property="og:url" content="https\://maizegdb.org/data_center/phenotype">
 <meta property="og:title" content="MaizeGDB Phenotype Data Center">
 <meta property="og:description" content="Explore curated maize mutant phenotypes, anatomical body parts, trait classifications, and mutant stock associations.">
 
+<a class="mgdb-skip-link" href="#pheno-top">Skip to main content</a>
 <main class="mgdb-page mgdb-phenotype-page" id="pheno-top">
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
     <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data centers</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Phenotypes</span>
@@ -13,64 +14,27 @@ $$SYNTAX-LEVEL 2
 
   <section class="mgdb-hero" aria-labelledby="pheno-title">
     <div class="mgdb-hero-emblem">
-      <svg viewBox="0 0 96 96" role="img" aria-label="Maize mutant phenotype leaf emblem">
-        <path d="M48 84 C48 84, 48 54, 48 38" fill="none" stroke="#235c37" stroke-width="5" stroke-linecap="round" />
-        <path d="M48 48 C32 42, 18 28, 22 14 C36 12, 46 26, 48 48 Z" fill="#d99a0b" stroke="#7a4a10" stroke-width="3" />
-        <path d="M48 38 C64 32, 78 18, 74 6 C60 6, 50 18, 48 38 Z" fill="#437d57" stroke="#235c37" stroke-width="3" />
-        <circle cx="48" cy="84" r="5" fill="#235c37" />
-      </svg>
-      <strong>Phenotype<br />Center</strong>
-      <span>MaizeGDB</span>
+      <img src="/images/data_center/phenotype.png?v=20260822" alt="Maize phenotype kernel mutant comparison icon" class="pheno-hero-icon" width="80" height="80" />
+      <strong>Phenotype<br />Data Center</strong>
     </div>
     <div class="mgdb-hero-body">
-      <span class="mgdb-eyebrow">Maize mutant phenotypes &amp; traits</span>
-      <h1 id="pheno-title">Explore observable traits, mutant phenotypes, and plant anatomy</h1>
-      <p class="mgdb-hero-tagline">Curated records for $(total_phenotypes) maize phenotypes across $(trait_count) trait categories &mdash; linked to anatomical body parts, alleles, and $(stock_count) mutant stocks.</p>
-      <p class="mgdb-hero-description">Search by phenotype name, synonym, or keyword. Filter by trait category \(pigmentation, kernel type, plant height\) or affected plant body parts \(leaf, kernel, ear, tassel, cob\).</p>
-      <div class="mgdb-hero-actions">
-        <a class="mgdb-button mgdb-button-primary" href="#pheno-search-panel">Search phenotypes</a>
-        <a class="mgdb-button mgdb-button-secondary" href="#pheno-collections">Mutant archives</a>
-      </div>
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; August 2026</p>
+      <h1 id="pheno-title">Explore observable traits, mutant phenotypes &amp; plant anatomy</h1>
+      <p class="mgdb-hero-description">Search curated maize mutant phenotypes, trait classifications, and anatomical structures across B73 and classical genetic stocks.</p>
     </div>
   </section>
 
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#pheno-overview">Overview</a>
-    <a href="#pheno-search-panel">Search</a>
-    <a href="#pheno-results-section">Results</a>
-    <a href="#pheno-collections">Collections</a>
+    <a href="#pheno-search-panel" class="is-current">Search &amp; Results</a>
+    <a href="#pheno-collections">Mutant Archives</a>
     <a href="#pheno-downloads">Downloads</a>
+    <a href="#pheno-overview">Statistics</a>
+    <a href="#pheno-resources">Related Resources</a>
   </nav>
 
-  <section id="pheno-overview" aria-labelledby="pheno-overview-title">
-    <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Corpus summary</span>
-        <h2 id="pheno-overview-title">Phenotype collection at a glance</h2>
-      </div>
-      <p>Curated mutant characteristics, trait ontologies, and anatomical associations in the MaizeGDB database.</p>
-    </div>
-
-    <div class="mgdb-metric-grid">
-      <article class="mgdb-metric-quiet">
-        <strong class="mgdb-metric-value">$(total_phenotypes)</strong>
-        <p>curated phenotypes</p>
-      </article>
-      <article class="mgdb-metric-quiet">
-        <strong class="mgdb-metric-value">$(trait_count)</strong>
-        <p>classified by trait category</p>
-      </article>
-      <article class="mgdb-metric-quiet">
-        <strong class="mgdb-metric-value">$(body_part_count)</strong>
-        <p>annotated to body parts</p>
-      </article>
-      <article class="mgdb-metric-quiet">
-        <strong class="mgdb-metric-value">$(stock_count)</strong>
-        <p>linked mutant stocks</p>
-      </article>
-    </div>
-  </section>
-
+  <!-- ====================================================================
+       1. Interactive Search Panel \(Moved to top\)
+       ==================================================================== -->
   <section id="pheno-search-panel" class="pheno-search-panel" aria-labelledby="pheno-search-title">
     <div class="pheno-section-heading">
       <div>
@@ -120,19 +84,22 @@ $$SYNTAX-LEVEL 2
     </form>
   </section>
 
+  <!-- ====================================================================
+       2. Search Results \(Table as default\)
+       ==================================================================== -->
   <section id="pheno-results-section" class="pheno-results-section" aria-labelledby="pheno-results-title">
     <div class="pheno-results-heading">
       <div>
         <span class="mgdb-eyebrow">Search results</span>
         <h2 id="pheno-results-title">Matching phenotypes</h2>
-        <p id="pheno-results-status" aria-live="polite">Enter a search term above or select an example to view phenotypes.</p>
+        <p id="pheno-results-status" aria-live="polite">Enter a search term above, select a trait category or anatomical body part, or click an example to explore phenotypes.</p>
       </div>
       <div class="pheno-results-controls">
         <div class="pheno-view-toggle" role="group" aria-label="View style">
-          <button class="pheno-view-btn" type="button" data-view="card" aria-pressed="true">
+          <button class="pheno-view-btn" type="button" data-view="card" aria-pressed="false">
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>Cards
           </button>
-          <button class="pheno-view-btn" type="button" data-view="table" aria-pressed="false">
+          <button class="pheno-view-btn" type="button" data-view="table" aria-pressed="true">
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="2" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="12" width="14" height="2" rx="1" fill="currentColor"/></svg>Table
           </button>
         </div>
@@ -143,7 +110,12 @@ $$SYNTAX-LEVEL 2
       </div>
     </div>
 
-    <div id="pheno-results" class="pheno-results-container pheno-view-card"></div>
+    <div id="pheno-results" class="pheno-results-container pheno-view-table">
+      <div class="mgdb-empty pheno-welcome">
+        <p><strong>Ready to search phenotypes.</strong></p>
+        <p>Type a keyword like <code>shrunken</code>, <code>dwarf</code>, or <code>pigment</code>, or choose a trait category from the dropdown above.</p>
+      </div>
+    </div>
 
     <div id="pheno-empty" class="mgdb-empty" hidden>
       <h3>No phenotypes matched your query</h3>
@@ -154,6 +126,9 @@ $$SYNTAX-LEVEL 2
     <nav id="pheno-pagination" class="pheno-pagination" aria-label="Search result pages"></nav>
   </section>
 
+  <!-- ====================================================================
+       3. Mutant archives & resources
+       ==================================================================== -->
   <section id="pheno-collections" aria-labelledby="pheno-collections-title">
     <div class="mgdb-section-heading">
       <div>
@@ -168,7 +143,7 @@ $$SYNTAX-LEVEL 2
         <span class="mgdb-pill mgdb-pill-ok">Neuffer Collection</span>
         <h3>Guide to Maize Mutant Phenotypes</h3>
         <p>Classic illustrated mutant guide by M. Gerald Neuffer with pollen mutagenesis history, high-resolution photographs, and phenotypic descriptions.</p>
-        <a href="https://mutants.maizegdb.org/doku.php">Open Neuffer Guide <span aria-hidden="true">&nearr;</span></a>
+        <a href="https\://mutants.maizegdb.org/doku.php">Open Neuffer Guide <span aria-hidden="true">&nearr;</span></a>
       </article>
 
       <article class="mgdb-card">
@@ -188,7 +163,7 @@ $$SYNTAX-LEVEL 2
       <article class="mgdb-card">
         <span class="mgdb-pill">Stock Repository</span>
         <h3>Maize Genetics COOP Stocks</h3>
-        <p>Order curated seed stocks, mutant lines, and chromosome chromosome translocations from the COOP stock center.</p>
+        <p>Order curated seed stocks, mutant lines, and chromosome translocations from the COOP stock center.</p>
         <a href="/data_center/stock">Explore Stocks <span aria-hidden="true">&rarr;</span></a>
       </article>
 
@@ -208,6 +183,9 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
+  <!-- ====================================================================
+       4. Bulk data & downloads
+       ==================================================================== -->
   <section id="pheno-downloads" aria-labelledby="pheno-downloads-title">
     <div class="mgdb-section-heading">
       <div>
@@ -224,7 +202,7 @@ $$SYNTAX-LEVEL 2
           <h3>Neuffer High-Resolution Images</h3>
         </div>
         <p>Complete archive of Dr. M. Gerald Neuffer's classic high-resolution maize mutant photographs and specimen figures.</p>
-        <a class="mgdb-button mgdb-button-secondary" href="https://download.maizegdb.org/Neuffer_Mutant_Images/Neuffer_Mutant_Images.zip">Download Image Archive <span aria-hidden="true">&darr;</span></a>
+        <a class="mgdb-button mgdb-button-secondary" href="https\://download.maizegdb.org/Neuffer_Mutant_Images/Neuffer_Mutant_Images.zip">Download Image Archive <span aria-hidden="true">&darr;</span></a>
       </article>
 
       <article class="pheno-download-card">
@@ -233,7 +211,7 @@ $$SYNTAX-LEVEL 2
           <h3>Maize Mutagenesis History</h3>
         </div>
         <p>Historical overview of maize mutagenesis, cooperative stock development, and classical allele nomenclature.</p>
-        <a class="mgdb-button mgdb-button-secondary" href="https://mutants.maizegdb.org/doku.php?id=info:history_and_perspective">Read History <span aria-hidden="true">&nearr;</span></a>
+        <a class="mgdb-button mgdb-button-secondary" href="https\://mutants.maizegdb.org/doku.php?id=info:history_and_perspective">Read History <span aria-hidden="true">&nearr;</span></a>
       </article>
 
       <article class="pheno-download-card">
@@ -246,5 +224,108 @@ $$SYNTAX-LEVEL 2
       </article>
     </div>
   </section>
+
+  <!-- ====================================================================
+       5. Corpus summary / Dashboard statistics \(second to last item\)
+       ==================================================================== -->
+  <section id="pheno-overview" aria-labelledby="pheno-overview-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Corpus summary</span>
+        <h2 id="pheno-overview-title">Phenotype collection at a glance</h2>
+      </div>
+      <p>Curated mutant characteristics, trait ontologies, and anatomical associations in the MaizeGDB database.</p>
+    </div>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Curated Phenotypes</h3>
+          <span class="mgdb-metric-badge">Cataloged</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(total_phenotypes)</strong>
+        </div>
+        <p class="mgdb-metric-description">Observable mutant and physiological traits documented across maize literature.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Trait Categories</h3>
+          <span class="mgdb-metric-badge">Ontology</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(trait_count)</strong>
+        </div>
+        <p class="mgdb-metric-description">Phenotypes classified under structured Trait Ontology \(TO\) categories.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Anatomical Structures</h3>
+          <span class="mgdb-metric-badge">Plant Anatomy</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(body_part_count)</strong>
+        </div>
+        <p class="mgdb-metric-description">Tissues and plant body parts mapped to Plant Ontology \(PO\) terms.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Linked Stocks</h3>
+          <span class="mgdb-metric-badge">COOP Repository</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(stock_count)</strong>
+        </div>
+        <p class="mgdb-metric-description">Live seed stocks and mutant alleles available for order from the stock center.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       6. Connected & Related Resources \(final item\)
+       ==================================================================== -->
+  <section id="pheno-resources" aria-labelledby="pheno-resources-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Connected tools</span>
+        <h2 id="pheno-resources-title">Related resources</h2>
+      </div>
+      <p>Explore connected MaizeGDB data centers, visual mutant image galleries, and germplasm repositories.</p>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/stock">
+          <strong>Stock Data Center</strong>
+          <span>Order seed stocks, mutant lines, and cytogenetic stocks</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/image_phenotype">
+          <strong>Image Data Center</strong>
+          <span>High-definition specimen photos of mutant ears, leaves, and seedlings</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/uniformmu">
+          <strong>UniformMu Resource</strong>
+          <span>Transposon-indexed mutant collection with seedling phenotype screens</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/pan_gene_center/pan_gene">
+          <strong>Pan-Gene Data Center</strong>
+          <span>Syntenic pan-genome models across 66 maize assemblies</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/genome">
+          <strong>Genome Data Center</strong>
+          <span>Chromosome assemblies, annotations, and pseudomolecules</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
 </main>
 )

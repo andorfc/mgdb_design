@@ -60,6 +60,7 @@ $WARM_URLS = array(
     '/data_center/overgo',
     '/data_center/ssr',
     '/data_center/protein_structure',
+    '/data_center/phenotype',
     '/search/reference/reference_search_api.php?facets_only=1'
 );
 

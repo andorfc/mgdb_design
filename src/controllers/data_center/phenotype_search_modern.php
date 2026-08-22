@@ -7,6 +7,7 @@
  */
 
 include_once('./include/db-api.php');
+include_once('./include/dashboard_cache.php');
 
 $system = getSystemInfo('mgdb.conf');
 logMessage('Starting phenotype_search_modern.php');
@@ -44,16 +45,25 @@ $mgdb->get('server-url')->replace($system['root_url']);
 
 $content = $mgdb->get('body')->load('templates/static/mgdb_phenotype.bau');
 
-// Live corpus statistics
-$stats = getPhenotypeCorpusStats($DBConn);
-$content->get('total_phenotypes')->replace(number_format($stats['total']));
-$content->get('trait_count')->replace(number_format($stats['with_trait']));
-$content->get('body_part_count')->replace(number_format($stats['with_parts']));
-$content->get('stock_count')->replace(number_format($stats['stocks']));
+// Cached corpus statistics & filter options (see include/dashboard_cache.php)
+$page_data = dashboardCache($system, 'phenotype/page', function () use ($DBConn) {
+    $stats = getPhenotypeCorpusStats($DBConn);
+    return array(
+        'total'             => (int) $stats['total'],
+        'with_trait'        => (int) $stats['with_trait'],
+        'with_parts'        => (int) $stats['with_parts'],
+        'stocks'            => (int) $stats['stocks'],
+        'trait_options'     => getPhenotypeTraitOptions($DBConn),
+        'body_part_options' => getPhenotypeBodyPartOptions($DBConn)
+    );
+});
 
-// Populate Trait and Body Part filter dropdowns
-$content->get('trait_options')->replace(getPhenotypeTraitOptions($DBConn));
-$content->get('body_part_options')->replace(getPhenotypeBodyPartOptions($DBConn));
+$content->get('total_phenotypes')->replace(number_format($page_data['total']));
+$content->get('trait_count')->replace(number_format($page_data['with_trait']));
+$content->get('body_part_count')->replace(number_format($page_data['with_parts']));
+$content->get('stock_count')->replace(number_format($page_data['stocks']));
+$content->get('trait_options')->replace($page_data['trait_options']);
+$content->get('body_part_options')->replace($page_data['body_part_options']);
 
 include_once('translation.php');
 

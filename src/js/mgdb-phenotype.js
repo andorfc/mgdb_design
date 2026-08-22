@@ -15,7 +15,7 @@
     page: 1,
     pageSize: 24,
     sort: 'relevance',
-    view: 'card',
+    view: 'table',
     currentData: null,
     loading: false
   };
@@ -125,7 +125,7 @@
     if (state.trait) params.set('trait', state.trait);
     if (state.part) params.set('part', state.part);
     if (state.page > 1) params.set('page', state.page);
-    if (state.view && state.view !== 'card') params.set('view', state.view);
+    if (state.view && state.view !== 'table') params.set('view', state.view);
 
     var queryString = params.toString();
     var newUrl = window.location.pathname + (queryString ? '?' + queryString : '');
@@ -477,8 +477,8 @@
     var buttons = document.querySelectorAll('.pheno-view-btn[data-view]');
     if (!buttons.length) return;
 
-    var savedView = 'card';
-    try { savedView = localStorage.getItem(STORAGE_VIEW_KEY) || 'card'; } catch (e) {}
+    var savedView = 'table';
+    try { savedView = localStorage.getItem(STORAGE_VIEW_KEY) || 'table'; } catch (e) {}
     if (state.view) savedView = state.view;
 
     function applyView(view) {
@@ -513,16 +513,6 @@
 
     // If query term, trait, or body part in URL, search immediately
     if (state.term || state.trait || state.part) {
-      executeSearch(false);
-    } else {
-      // Default initial query with popular mutant trait e.g. purple
-      state.term = 'purple';
-      var input = byId('pheno-query');
-      if (input) {
-        input.value = state.term;
-        var clearBtn = byId('pheno-query-clear');
-        if (clearBtn) clearBtn.hidden = false;
-      }
       executeSearch(false);
     }
   }
