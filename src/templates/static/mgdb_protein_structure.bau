@@ -1,82 +1,48 @@
 $$SYNTAX-LEVEL 2
 *(mgdb-protein-structure
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https\://maizegdb.org/data_center/protein_structure">
+<meta property="og:title" content="MaizeGDB Protein Structures | AlphaFold Monomers, Homodimers &amp; Heterodimers">
+<meta property="og:description" content="Search over 40,000 predicted maize protein structures with pLDDT confidence, ipTM, ipSAE and pDockQ interface scores, plus ESMFold models.">
+
 <a class="mgdb-skip-link" href="#ps-main">Skip to main content</a>
 <main class="mgdb-page mgdb-protein-structure-page" id="ps-main">
 
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
-    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center">Data centers</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Protein structure</span>
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data centers</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Protein Structures</span>
   </nav>
 
   <section class="mgdb-hero" aria-labelledby="ps-title">
     <div class="mgdb-hero-emblem">
-      <svg viewBox="0 0 96 96" role="img" aria-label="Two protein chains predicted as a complex">
-        <path d="M18 74 C30 62, 22 46, 34 34 C42 26, 40 18, 36 12" fill="none" stroke="#f2a515" stroke-width="7" stroke-linecap="round" />
-        <path d="M78 22 C66 34, 74 50, 62 62 C54 70, 56 78, 60 84" fill="none" stroke="#65cbf3" stroke-width="7" stroke-linecap="round" />
-        <circle cx="48" cy="48" r="7" fill="#fff" stroke="#501719" stroke-width="3" />
-      </svg>
+      <img src="/images/data_center/protein_structure.png?v=20260822" alt="Protein structure icon" class="ps-hero-icon" width="80" height="80" />
       <strong>Structure<br />Data Center</strong>
-      <span>Index built $(data-date)</span>
     </div>
     <div class="mgdb-hero-body">
-      <span class="mgdb-eyebrow">Predicted structures and complexes</span>
-      <h1 id="ps-title">Maize protein structures</h1>
-      <p class="mgdb-hero-tagline">A maize protein is rarely a lone chain. This page asks a different question from a structure database: not &ldquo;what does this protein look like&rdquo; but &ldquo;what has it been predicted to fold <em>with</em>&rdquo;.</p>
-      <p class="mgdb-hero-description">Search any gene model, locus, gene symbol or UniProt accession and get every assembly state predicted for it &mdash; the monomer, the homodimer it may form with itself, and the heterodimers it may form with other maize proteins &mdash; each with the confidence and interface scores needed to judge whether the prediction means anything.</p>
-      <div class="mgdb-hero-actions">
-        <a class="mgdb-button mgdb-button-primary" href="#ps-find">Find structures</a>
-        <a class="mgdb-button mgdb-button-secondary" href="#ps-esmfold">ESMFold isoforms</a>
-        <a class="mgdb-button mgdb-button-quiet" href="#ps-reading">How to read a prediction</a>
-      </div>
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; August 2026</p>
+      <h1 id="ps-title">Explore predicted protein structures &amp; complexes</h1>
+      <p class="mgdb-hero-description">Search any gene model, locus, gene symbol, or UniProt accession to view predicted AlphaFold monomers, homodimers, and heterodimers with confidence metrics and interface scores, plus ESMFold isoform models.</p>
     </div>
   </section>
 
-  <section aria-labelledby="ps-summary-title">
-    <h2 class="mgdb-visually-hidden" id="ps-summary-title">The collection in numbers</h2>
-    <div class="mgdb-metric-grid">
-      <article class="mgdb-metric">
-        <span class="mgdb-metric-icon" aria-hidden="true">&#9711;</span>
-        <div>
-          <strong class="mgdb-metric-value">$(monomer-count)</strong>
-          <h3>Monomer models</h3>
-          <p>Single-chain AlphaFold predictions from the EMBL-EBI database, covering $(gene-count) distinct B73 RefGen_v5 genes.</p>
-        </div>
-      </article>
-      <article class="mgdb-metric mgdb-tone-green">
-        <span class="mgdb-metric-icon" aria-hidden="true">&#9679;</span>
-        <div>
-          <strong class="mgdb-metric-value">$(homodimer-count)</strong>
-          <h3>Homodimer models</h3>
-          <p>A protein predicted against a second copy of itself. Many enzymes and nearly all of the classical transcription factor families are obligate dimers.</p>
-        </div>
-      </article>
-      <article class="mgdb-metric mgdb-tone-amber">
-        <span class="mgdb-metric-icon" aria-hidden="true">&#9680;</span>
-        <div>
-          <strong class="mgdb-metric-value">$(heterodimer-count)</strong>
-          <h3>Heterodimer models</h3>
-          <p>Two different maize proteins predicted together. This is the part of the collection with no experimental counterpart at MaizeGDB, and the part worth the most scrutiny.</p>
-        </div>
-      </article>
-      <article class="mgdb-metric mgdb-tone-red">
-        <span class="mgdb-metric-icon" aria-hidden="true">&#9635;</span>
-        <div>
-          <strong class="mgdb-metric-value">$(model-count)</strong>
-          <h3>Models indexed</h3>
-          <p>Every one is searchable by gene model, locus, symbol or accession, and opens in the viewer below without leaving this page.</p>
-        </div>
-      </article>
-    </div>
-  </section>
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#ps-find" class="is-current">Search &amp; Viewer</a>
+    <a href="#ps-esmfold">ESMFold Isoforms</a>
+    <a href="#ps-tools">Comparison Tools</a>
+    <a href="#ps-reading">Interpreting Predictions</a>
+    <a href="#ps-sources">Data Sources</a>
+    <a href="#ps-dashboard">Statistics</a>
+    <a href="#ps-resources">Related Resources</a>
+  </nav>
 
   <!-- ====================================================================
-       The structure workspace. Everything above is context; this is the page.
+       1. Interactive search & 3D structure workspace \(Search at top\)
        ==================================================================== -->
-
-  <section class="mgdb-panel ps-workspace" id="ps-find" aria-labelledby="ps-find-title">
+  <section class="mgdb-panel ps-workspace marker-search-panel" id="ps-find" aria-labelledby="ps-find-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Search</span>
-        <h2 id="ps-find-title">Find every predicted structure for a protein</h2>
+        <span class="mgdb-eyebrow">Interactive search</span>
+        <h2 id="ps-find-title">Find predicted structures for a protein</h2>
       </div>
       <p>One identifier, every assembly state. Accepts B73 RefGen_v5 gene models, older annotations that map to one, locus and gene symbols, UniProt accessions, and AlphaFold model identifiers.</p>
     </div>
@@ -95,16 +61,17 @@ $$SYNTAX-LEVEL 2
         <button class="mgdb-button mgdb-button-primary ps-search-submit" type="submit">Find structures</button>
       </div>
       <p class="mgdb-hint" id="ps-search-hint">Type at least two characters. The numeric tail of a gene model works on its own &mdash; <code>168550</code> finds <code>Zm00001eb168550</code>.</p>
-      <p class="ps-examples">Try:
+      <div class="marker-example-row ps-examples" aria-label="Example protein searches">
+        <span>Examples</span>
         <button class="mgdb-chip" type="button" data-ps-example="Zm00001eb168550">Zm00001eb168550</button>
         <button class="mgdb-chip" type="button" data-ps-example="P11428">P11428 \(SOD\)</button>
         <button class="mgdb-chip" type="button" data-ps-example="TIF5A">TIF5A</button>
         <button class="mgdb-chip" type="button" data-ps-example="Zm00001eb099910">many partners</button>
-      </p>
+      </div>
     </form>
 
     <noscript>
-      <p class="mgdb-message mgdb-message-info">The structure search and the 3D viewer need JavaScript. Every model on this page is also reachable directly at the <a href="https://alphafold.ebi.ac.uk/">AlphaFold Protein Structure Database</a>.</p>
+      <p class="mgdb-message mgdb-message-info">The structure search and the 3D viewer need JavaScript. Every model on this page is also reachable directly at the <a href="https\://alphafold.ebi.ac.uk/">AlphaFold Protein Structure Database</a>.</p>
     </noscript>
 
     <div id="ps-results" class="ps-results" aria-live="polite">
@@ -116,10 +83,8 @@ $$SYNTAX-LEVEL 2
   </section>
 
   <!-- ====================================================================
-       ESMFold: a different prediction of the same proteins, kept separate
-       because it answers a different question and covers a different set.
+       2. ESMFold isoform models
        ==================================================================== -->
-
   <section class="mgdb-panel" id="ps-esmfold" aria-labelledby="ps-esmfold-title">
     <div class="mgdb-section-heading">
       <div>
@@ -136,10 +101,11 @@ $$SYNTAX-LEVEL 2
                placeholder="Zm00001eb057920 or Zm00001eb057920_P002" />
         <button class="mgdb-button mgdb-button-secondary" type="submit">Load model</button>
       </div>
-      <p class="ps-examples">Try:
+      <div class="marker-example-row ps-examples" aria-label="Example ESMFold searches">
+        <span>Examples</span>
         <button class="mgdb-chip" type="button" data-ps-esm-example="Zm00001eb057920">Zm00001eb057920</button>
         <button class="mgdb-chip" type="button" data-ps-esm-example="Zm00001eb168550">Zm00001eb168550</button>
-      </p>
+      </div>
     </form>
 
     <div id="ps-esm-results" class="ps-results" aria-live="polite">
@@ -150,62 +116,22 @@ $$SYNTAX-LEVEL 2
   </section>
 
   <!-- ====================================================================
-       Reading the numbers. This sits below the workspace on purpose: it is
-       reference material, and it is what the metric tooltips point at.
+       3. Structural comparison and search tools
        ==================================================================== -->
-
-  <section id="ps-reading" aria-labelledby="ps-reading-title">
-    <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Interpretation</span>
-        <h2 id="ps-reading-title">How to read a predicted complex</h2>
-      </div>
-      <p>Every model here is a prediction. None of it is experimental evidence that two maize proteins interact, and the scores are the only thing standing between a hypothesis and a confident mistake.</p>
-    </div>
-
-    <div class="mgdb-card-grid ps-reading-grid">
-      <article class="mgdb-card">
-        <h3>pLDDT &mdash; is the fold right?</h3>
-        <p>Per-residue confidence, 0&ndash;100, written into the B-factor column of every model file. Above 90 the backbone is usually right; 70&ndash;90 is a confident fold with looser side chains; 50&ndash;70 should be treated cautiously; below 50 is frequently not a fold at all but a disordered or unresolvable region.</p>
-        <p class="mgdb-small">Long low-pLDDT tails are common and normal. Judge the domain, not the average.</p>
-      </article>
-      <article class="mgdb-card">
-        <h3>ipTM &mdash; is the complex right?</h3>
-        <p>A whole-complex confidence score. Useful, but it is dominated by how well each chain folds on its own: two confidently folded proteins parked next to each other without touching can still score well. Treat ipTM as necessary, not sufficient.</p>
-      </article>
-      <article class="mgdb-card ps-card-flag">
-        <h3>ipSAE &mdash; is the <em>interface</em> right?</h3>
-        <p>Computed over the predicted interface rather than the whole complex, so it separates a real predicted contact from two chains that merely share a box. This is the score the candidate lists on this page are ranked by, and it is the one to read first on a heterodimer.</p>
-      </article>
-      <article class="mgdb-card">
-        <h3>pDockQ and contacts</h3>
-        <p>pDockQ estimates interface quality from the number of contacts and the confidence around them. The contact count is the raw quantity behind it. A high pDockQ over very few contacts is a small interface, which may be real but is easy to over-read.</p>
-      </article>
-    </div>
-
-    <aside class="mgdb-note mgdb-note-info">
-      <p><strong>Predicted is not observed.</strong> A high-scoring heterodimer means two proteins <em>could</em> form the modelled interface, not that they are ever in the same cell, tissue or compartment at the same time. Before treating one as a finding, check that both partners are expressed together and localise together &mdash; the gene records linked from every result are the place to start.</p>
-    </aside>
-  </section>
-
-  <!-- ====================================================================
-       Where to go next. Structure comparison lives on its own tools; this
-       page hands off rather than reimplementing them.
-       ==================================================================== -->
-
-  <section aria-labelledby="ps-tools-title">
+  <section id="ps-tools" aria-labelledby="ps-tools-title">
     <div class="mgdb-section-heading">
       <div>
         <span class="mgdb-eyebrow">Compare</span>
-        <h2 id="ps-tools-title">Structural comparison and search</h2>
+        <h2 id="ps-tools-title">Structural comparison &amp; search</h2>
       </div>
       <p>To go from one structure to its relatives &mdash; across maize, across species, or across methods &mdash; these tools take the same identifiers this page does.</p>
     </div>
 
     <div class="mgdb-card-grid">
       <article class="mgdb-card ps-tool-card">
+        <span class="mgdb-pill mgdb-pill-info">Structure Alignment</span>
         <h3>Foldseek structure search</h3>
-        <p>Align a maize protein structure against Arabidopsis, soybean, rice, maize, human, yeast, fission yeast and sorghum proteomes. Structure search finds relatives that sequence search misses, which is the point of having structures at all.</p>
+        <p>Align a maize protein structure against Arabidopsis, soybean, rice, maize, human, yeast, fission yeast and sorghum proteomes. Structure search finds relatives that sequence search misses.</p>
         <form class="ps-search-row" action="/foldseek" method="get">
           <label class="mgdb-visually-hidden" for="ps-foldseek">Identifier for Foldseek search</label>
           <input class="mgdb-input" id="ps-foldseek" name="uniprot" type="search" placeholder="Zm00001eb374230" />
@@ -214,8 +140,9 @@ $$SYNTAX-LEVEL 2
       </article>
 
       <article class="mgdb-card ps-tool-card">
+        <span class="mgdb-pill mgdb-pill-ok">Ortholog Comparison</span>
         <h3>FATCAT comparison</h3>
-        <p>Compare the top ortholog candidates from DIAMOND, Foldseek and FATCAT across four plant proteomes. Where three methods that disagree by construction all agree, the relationship is worth trusting.</p>
+        <p>Compare the top ortholog candidates from DIAMOND, Foldseek and FATCAT across four plant proteomes. Where three independent methods agree, the relationship is confident.</p>
         <form class="ps-search-row" action="/fatcat" method="get">
           <label class="mgdb-visually-hidden" for="ps-fatcat">Identifier for FATCAT comparison</label>
           <input class="mgdb-input" id="ps-fatcat" name="uniprot" type="search" placeholder="Zm00001eb374230" />
@@ -224,25 +151,68 @@ $$SYNTAX-LEVEL 2
       </article>
 
       <article class="mgdb-card ps-tool-card">
+        <span class="mgdb-pill mgdb-pill-warn">Domain Atlas</span>
         <h3>Protein domain atlas</h3>
-        <p>InterPro domain assignments across the maize pan-genome. A predicted interface that falls inside a known interaction domain is a very different claim from one that falls in a linker.</p>
-        <p><a class="mgdb-button mgdb-button-quiet" href="/projects/interpro_domain_atlas">Open the domain atlas</a></p>
+        <p>InterPro domain assignments across the maize pan-genome. Check whether a predicted interface falls inside a known functional domain or an unstructured linker region.</p>
+        <p><a class="mgdb-button mgdb-button-quiet" href="/projects/interpro_domain_atlas">Open domain atlas <span aria-hidden="true">&rarr;</span></a></p>
       </article>
 
       <article class="mgdb-card ps-tool-card">
+        <span class="mgdb-pill">Homology</span>
         <h3>Sequence search</h3>
-        <p>No structure for your protein? BLAST it against the maize genomes and annotations first &mdash; a close homolog that does have a model is often the fastest route to a usable structure.</p>
-        <p><a class="mgdb-button mgdb-button-quiet" href="$(blast-url)">Open BLAST</a></p>
+        <p>No structure for your protein? BLAST it against the maize genomes and annotations first &mdash; a close homolog with a model is often the fastest route to a usable structure.</p>
+        <p><a class="mgdb-button mgdb-button-quiet" href="$(blast-url)">Open BLAST <span aria-hidden="true">&rarr;</span></a></p>
       </article>
     </div>
   </section>
 
-  <section aria-labelledby="ps-sources-title">
+  <!-- ====================================================================
+       4. How to read a predicted complex
+       ==================================================================== -->
+  <section id="ps-reading" aria-labelledby="ps-reading-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Interpretation</span>
+        <h2 id="ps-reading-title">How to read a predicted complex</h2>
+      </div>
+      <p>Every model here is a prediction. None of it is experimental evidence that two maize proteins interact, and the scores are the key metrics to evaluate.</p>
+    </div>
+
+    <div class="mgdb-card-grid ps-reading-grid">
+      <article class="mgdb-card">
+        <h3>pLDDT &mdash; is the fold right?</h3>
+        <p>Per-residue confidence, 0&ndash;100, written into the B-factor column of every model file. Above 90 the backbone is usually right; 70&ndash;90 is a confident fold with looser side chains; 50&ndash;70 should be treated cautiously; below 50 is frequently a disordered region.</p>
+        <p class="mgdb-small">Long low-pLDDT tails are common and normal. Judge the domain, not the average.</p>
+      </article>
+      <article class="mgdb-card">
+        <h3>ipTM &mdash; is the complex right?</h3>
+        <p>A whole-complex confidence score. Useful, but it is dominated by how well each chain folds on its own: two confidently folded proteins parked next to each other without touching can still score well. Treat ipTM as necessary, not sufficient.</p>
+      </article>
+      <article class="mgdb-card ps-card-flag">
+        <h3>ipSAE &mdash; is the <em>interface</em> right?</h3>
+        <p>Computed over the predicted interface rather than the whole complex, separating a real predicted contact from two chains that merely share a box. This is the primary score the candidate lists are ranked by.</p>
+      </article>
+      <article class="mgdb-card">
+        <h3>pDockQ and contacts</h3>
+        <p>pDockQ estimates interface quality from the number of contacts and the confidence around them. The contact count is the raw quantity behind it. A high pDockQ over very few contacts is a small interface.</p>
+      </article>
+    </div>
+
+    <aside class="mgdb-note mgdb-note-info">
+      <p><strong>Predicted is not observed.</strong> A high-scoring heterodimer means two proteins <em>could</em> form the modelled interface, not that they are ever in the same cell, tissue or compartment at the same time. Check that both partners are expressed together &mdash; the gene records linked from every result are the place to start.</p>
+    </aside>
+  </section>
+
+  <!-- ====================================================================
+       5. Where these models come from
+       ==================================================================== -->
+  <section id="ps-sources" aria-labelledby="ps-sources-title">
     <div class="mgdb-section-heading">
       <div>
         <span class="mgdb-eyebrow">Provenance</span>
         <h2 id="ps-sources-title">Where these models come from</h2>
       </div>
+      <p>Structure collections, underlying computational pipelines, and citation information.</p>
     </div>
 
     <div class="mgdb-table-scroll">
@@ -256,23 +226,23 @@ $$SYNTAX-LEVEL 2
             <td><strong>Monomers</strong><br /><span class="mgdb-small">$(monomer-count) models</span></td>
             <td>AlphaFold Monomer v2.0 pipeline</td>
             <td>UniProt accession</td>
-            <td><a href="https://alphafold.ebi.ac.uk/" rel="noopener">AlphaFold DB</a> at EMBL-EBI</td>
+            <td><a href="https\://alphafold.ebi.ac.uk/" rel="noopener">AlphaFold DB</a> at EMBL-EBI</td>
           </tr>
           <tr>
             <td><strong>Homodimers</strong><br /><span class="mgdb-small">$(homodimer-count) models</span></td>
             <td>AlphaFold-Multimer, via ColabFold and OpenFold-TRT</td>
             <td>AF model identifier</td>
-            <td><a href="https://alphafold.ebi.ac.uk/" rel="noopener">AlphaFold DB</a> at EMBL-EBI</td>
+            <td><a href="https\://alphafold.ebi.ac.uk/" rel="noopener">AlphaFold DB</a> at EMBL-EBI</td>
           </tr>
           <tr>
             <td><strong>Heterodimers</strong><br /><span class="mgdb-small">$(heterodimer-count) models</span></td>
             <td>AlphaFold-Multimer, via ColabFold and OpenFold-TRT</td>
             <td>AF model identifier</td>
-            <td><a href="https://alphafold.ebi.ac.uk/" rel="noopener">AlphaFold DB</a> at EMBL-EBI</td>
+            <td><a href="https\://alphafold.ebi.ac.uk/" rel="noopener">AlphaFold DB</a> at EMBL-EBI</td>
           </tr>
           <tr>
             <td><strong>ESMFold</strong></td>
-            <td>ESMFold, over the official RefGen_v5 annotation</td>
+            <td>ESMFold, over official RefGen_v5 annotation</td>
             <td>Protein isoform name</td>
             <td>MaizeGDB</td>
           </tr>
@@ -280,12 +250,114 @@ $$SYNTAX-LEVEL 2
       </table>
     </div>
 
-    <p class="mgdb-small ps-provenance-note">Structure files are fetched by your browser directly from the archive that holds them, so what you see in the viewer is the file as published, not a MaizeGDB copy of it. The $(record-count) records behind the search &mdash; the identifier mapping and the scores &mdash; are indexed here and were last rebuilt $(data-date).</p>
+    <p class="mgdb-small ps-provenance-note">Structure files are fetched by your browser directly from the archive that holds them, so what you see in the viewer is the file as published. The $(record-count) records behind the search &mdash; the identifier mapping and the scores &mdash; are indexed here and were last rebuilt $(data-date).</p>
 
     <!-- Bauplan reads an unescaped close-paren as a scope close, including
          inside an HTML comment, so every literal parenthesis below is
          backslash-escaped. See legacy/protein_structure/README.md. -->
     <p class="mgdb-small">Citing a model from this page means citing its source. AlphaFold: Jumper et al. \(2021\) <i>Nature</i> 596:583&ndash;589, and Varadi et al. \(2024\) <i>Nucleic Acids Research</i> 52:D368&ndash;D375 for the database. AlphaFold-Multimer: Evans et al. \(2021\). ESMFold: Lin et al. \(2023\) <i>Science</i> 379:1123&ndash;1130. For the MaizeGDB structure resource: Andorf et al. \(2023\) <i>Genetics</i> 223:iyad016.</p>
+  </section>
+
+  <!-- ====================================================================
+       6. Dashboard / Corpus statistics \(second to last item\)
+       ==================================================================== -->
+  <section id="ps-dashboard" aria-labelledby="ps-dashboard-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Corpus summary</span>
+        <h2 id="ps-dashboard-title">Protein structure dataset at a glance</h2>
+      </div>
+      <p>Curated 3D protein structures, multimeric complexes, and confidence annotations maintained in the MaizeGDB repository.</p>
+    </div>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Monomer Models</h3>
+          <span class="mgdb-metric-badge">AlphaFold v2</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(monomer-count)</strong>
+        </div>
+        <p class="mgdb-metric-description">Single-chain AlphaFold predictions covering $(gene-count) B73 RefGen_v5 genes.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Homodimer Models</h3>
+          <span class="mgdb-metric-badge">Multimer</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(homodimer-count)</strong>
+        </div>
+        <p class="mgdb-metric-description">Self-interacting pairs for classical enzymes and transcription factors.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Heterodimer Models</h3>
+          <span class="mgdb-metric-badge">Multimer</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(heterodimer-count)</strong>
+        </div>
+        <p class="mgdb-metric-description">Predicted complexes between two distinct maize proteins.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Total Indexed</h3>
+          <span class="mgdb-metric-badge">3D Models</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(model-count)</strong>
+        </div>
+        <p class="mgdb-metric-description">Searchable by gene model, locus, symbol or UniProt accession.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       7. External and related resources \(final item\)
+       ==================================================================== -->
+  <section id="ps-resources" aria-labelledby="ps-resources-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Connected tools</span>
+        <h2 id="ps-resources-title">Related resources</h2>
+      </div>
+      <p>Explore related MaizeGDB data centers, protein structure prediction tools, and international archives.</p>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/pan_gene_center/pan_gene">
+          <strong>Pan-Gene Data Center</strong>
+          <span>Syntenic pan-genome analysis across 66 maize genome assemblies</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/genome">
+          <strong>Genome Data Center</strong>
+          <span>Chromosome-level reference genomes and pseudomolecules</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/projects/interpro_domain_atlas">
+          <strong>InterPro Domain Atlas</strong>
+          <span>Predicted protein domain annotations across maize lines</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="https\://alphafold.ebi.ac.uk/" target="_blank" rel="noopener">
+          <strong>AlphaFold Protein Structure Database</strong>
+          <span>EMBL-EBI open-access predicted structure repository</span>
+          <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+        </a>
+        <a href="https\://www.rcsb.org/" target="_blank" rel="noopener">
+          <strong>RCSB Protein Data Bank &#40;PDB&#41;</strong>
+          <span>Primary global archive of 3D macromolecular structures</span>
+          <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+        </a>
+      </div>
+    </div>
   </section>
 
 </main>

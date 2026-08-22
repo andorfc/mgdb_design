@@ -1114,11 +1114,75 @@
       });
   }
 
+  /* ── Section Tabs & Scrollspy ───────────────────────────────────────────── */
+
+  function buildTabs() {
+    var tabs = document.querySelectorAll('.mgdb-section-tabs a');
+    if (!tabs.length) { return; }
+
+    var pairs = [];
+    Array.prototype.forEach.call(tabs, function (tab) {
+      var href = tab.getAttribute('href');
+      if (href && href.indexOf('#') === 0) {
+        var section = document.querySelector(href);
+        if (section) {
+          pairs.push({ tab: tab, section: section });
+        }
+      }
+    });
+
+    function markCurrent(target) {
+      pairs.forEach(function (pair) {
+        var current = pair.section === target;
+        pair.tab.classList.toggle('is-current', current);
+        if (current) {
+          pair.tab.setAttribute('aria-current', 'true');
+        } else {
+          pair.tab.removeAttribute('aria-current');
+        }
+      });
+    }
+
+    var initial = pairs[0];
+    if (window.location.hash) {
+      pairs.forEach(function (pair) {
+        if ('#' + pair.section.id === window.location.hash) {
+          initial = pair;
+        }
+      });
+    }
+    if (initial) {
+      markCurrent(initial.section);
+    }
+
+    pairs.forEach(function (pair) {
+      pair.tab.addEventListener('click', function () {
+        markCurrent(pair.section);
+      });
+    });
+
+    if (!window.IntersectionObserver) { return; }
+
+    var observer = new window.IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          markCurrent(entry.target);
+        }
+      });
+    }, { rootMargin: '-20% 0px -60% 0px' });
+
+    pairs.forEach(function (pair) {
+      observer.observe(pair.section);
+    });
+  }
+
   /* ------------------------------------------------------------------------
      Init
      ------------------------------------------------------------------------ */
 
   function init() {
+    buildTabs();
+
     form = byId('ps-search-form');
     input = byId('ps-search-input');
     panel = byId('ps-suggestions');

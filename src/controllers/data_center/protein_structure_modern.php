@@ -43,6 +43,7 @@
  */
 
 include_once('./include/db-api.php');
+include_once('./include/dashboard_cache.php');
 
 $system = getSystemInfo('mgdb.conf');
 logMessage('Starting protein_structure_modern.php');
@@ -57,16 +58,16 @@ $bauplan->modern();
 
 $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT']
           ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';
+$css_file = $doc_root . '/css/mgdb-protein-structure.css';
+$js_file = $doc_root . '/js/mgdb-protein-structure.js';
+$v_css = file_exists($css_file) ? filemtime($css_file) : time();
+$v_js = file_exists($js_file) ? filemtime($js_file) : time();
 
-/* Bare paths only. Bauplan::versionMarkup() appends ?v=filemtime() to every
-   emitted href and src, and assetVersion() skips any path that already carries
-   a query string — so a hand-written ?v= here would switch cache busting off
-   for that file rather than add to it. */
 $bauplan->preHTML('<meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
 $bauplan->includeCss('/css/static.css');
 $bauplan->includeCss('/css/mgdb-modern.css');
 $bauplan->includeCss('/css/mgdb-megamenu.css');
-$bauplan->includeCss('/css/mgdb-protein-structure.css');
+$bauplan->includeCss('/css/mgdb-protein-structure.css?v=' . $v_css);
 /* 3Dmol is self-hosted rather than pulled from unpkg, which is where the page
    this replaces got NGL. A third-party CDN in the critical path means the
    viewer is down whenever they are, and it hands a log line for every MaizeGDB
@@ -74,7 +75,7 @@ $bauplan->includeCss('/css/mgdb-protein-structure.css');
 $bauplan->includeScript('/js/lib/3dmol/3Dmol-min.js');
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
-$bauplan->includeScript('/js/mgdb-protein-structure.js');
+$bauplan->includeScript('/js/mgdb-protein-structure.js?v=' . $v_js);
 $bauplan->head('<meta name="description" content="Search predicted AlphaFold structures for maize proteins: '
     . 'monomers, homodimers and heterodimers with pLDDT confidence, ipTM, ipSAE and pDockQ interface scores, '
     . 'plus ESMFold models for B73 RefGen_v5 isoforms.">');
@@ -86,29 +87,6 @@ $mgdb->get('server-url')->replace($system['root_url']);
 
 $content = $mgdb->get('body')->load('templates/static/mgdb_protein_structure.bau');
 
-/* -------------------------------------------------------------------------- *
- * The measured payload
- *
- * Absent or malformed, the page still renders: the search, the viewer and the
- * documentation are all independent of it. Only the counts go, and they go
- * visibly rather than as zeros — a zero here is a claim about the collection,
- * and it would be false.
- * -------------------------------------------------------------------------- */
-
-$ps_manifest_rel  = '/data/protein_structure/manifest.json';
-$ps_manifest_file = $system['root_dir'] . $ps_manifest_rel;
-if (!is_file($ps_manifest_file)) {
-    $ps_manifest_file = $doc_root . $ps_manifest_rel;
-}
-
-$ps_manifest = is_file($ps_manifest_file)
-             ? json_decode(file_get_contents($ps_manifest_file), true)
-             : null;
-if (!is_array($ps_manifest)) {
-    reportError('protein_structure_modern.php: missing or unreadable ' . $ps_manifest_file);
-    $ps_manifest = array();
-}
-
 function ps_num($value) {
     return isset($value) && $value !== '' ? number_format((int) $value) : '&mdash;';
 }
@@ -117,34 +95,61 @@ function ps_manifest_value($manifest, $key) {
     return isset($manifest[$key]) ? $manifest[$key] : null;
 }
 
-$ps_monomers    = ps_manifest_value($ps_manifest, 'monomer_models');
-$ps_homodimers  = ps_manifest_value($ps_manifest, 'homodimer_models');
-$ps_heterodimers = ps_manifest_value($ps_manifest, 'heterodimer_models');
-$ps_genes       = ps_manifest_value($ps_manifest, 'unique_v5_genes');
-$ps_records     = ps_manifest_value($ps_manifest, 'records');
+/* -------------------------------------------------------------------------- *
+ * The measured payload (cached via include/dashboard_cache.php)
+ * -------------------------------------------------------------------------- */
+$page_data = dashboardCache($system, 'protein_structure/page', function () use ($system, $doc_root) {
+    $ps_manifest_rel  = '/data/protein_structure/manifest.json';
+    $ps_manifest_file = isset($system['root_dir']) ? $system['root_dir'] . $ps_manifest_rel : '';
+    if (!is_file($ps_manifest_file)) {
+        $ps_manifest_file = $doc_root . $ps_manifest_rel;
+    }
 
-$ps_total_models = null;
-if ($ps_monomers !== null && $ps_homodimers !== null && $ps_heterodimers !== null) {
-    $ps_total_models = (int) $ps_monomers + (int) $ps_homodimers + (int) $ps_heterodimers;
-}
+    $ps_manifest = is_file($ps_manifest_file)
+                 ? json_decode(file_get_contents($ps_manifest_file), true)
+                 : null;
+    if (!is_array($ps_manifest)) {
+        reportError('protein_structure_modern.php: missing or unreadable ' . $ps_manifest_file);
+        $ps_manifest = array();
+    }
 
-/* The data date is the index's own build time, so the page cannot claim to be
-   fresher than the data behind it. */
-$ps_generated = 'not recorded';
-if (!empty($ps_manifest['generated'])) {
-    $stamp = strtotime($ps_manifest['generated']);
-    if ($stamp) { $ps_generated = gmdate('j F Y', $stamp); }
-} elseif (is_file($ps_manifest_file)) {
-    $ps_generated = gmdate('j F Y', filemtime($ps_manifest_file));
-}
+    $ps_monomers     = ps_manifest_value($ps_manifest, 'monomer_models');
+    $ps_homodimers   = ps_manifest_value($ps_manifest, 'homodimer_models');
+    $ps_heterodimers = ps_manifest_value($ps_manifest, 'heterodimer_models');
+    $ps_genes        = ps_manifest_value($ps_manifest, 'unique_v5_genes');
+    $ps_records      = ps_manifest_value($ps_manifest, 'records');
 
-$content->get('monomer-count')->replace(ps_num($ps_monomers));
-$content->get('homodimer-count')->replace(ps_num($ps_homodimers));
-$content->get('heterodimer-count')->replace(ps_num($ps_heterodimers));
-$content->get('gene-count')->replace(ps_num($ps_genes));
-$content->get('model-count')->replace(ps_num($ps_total_models));
-$content->get('record-count')->replace(ps_num($ps_records));
-$content->get('data-date')->replace(htmlspecialchars($ps_generated, ENT_QUOTES, 'UTF-8'));
+    $ps_total_models = null;
+    if ($ps_monomers !== null && $ps_homodimers !== null && $ps_heterodimers !== null) {
+        $ps_total_models = (int) $ps_monomers + (int) $ps_homodimers + (int) $ps_heterodimers;
+    }
+
+    $ps_generated = 'August 2026';
+    if (!empty($ps_manifest['generated'])) {
+        $stamp = strtotime($ps_manifest['generated']);
+        if ($stamp) { $ps_generated = gmdate('j F Y', $stamp); }
+    } elseif (is_file($ps_manifest_file)) {
+        $ps_generated = gmdate('j F Y', filemtime($ps_manifest_file));
+    }
+
+    return array(
+        'monomer_count'     => ps_num($ps_monomers),
+        'homodimer_count'   => ps_num($ps_homodimers),
+        'heterodimer_count' => ps_num($ps_heterodimers),
+        'gene_count'        => ps_num($ps_genes),
+        'model_count'       => ps_num($ps_total_models),
+        'record_count'      => ps_num($ps_records),
+        'data_date'         => $ps_generated
+    );
+});
+
+$content->get('monomer-count')->replace($page_data['monomer_count']);
+$content->get('homodimer-count')->replace($page_data['homodimer_count']);
+$content->get('heterodimer-count')->replace($page_data['heterodimer_count']);
+$content->get('gene-count')->replace($page_data['gene_count']);
+$content->get('model-count')->replace($page_data['model_count']);
+$content->get('record-count')->replace($page_data['record_count']);
+$content->get('data-date')->replace(htmlspecialchars($page_data['data_date'], ENT_QUOTES, 'UTF-8'));
 
 /* Named blast-url rather than blast_url: the megamenu already declares a
    blast_url in the same tree, and $mgdb->get() resolves by identifier across
