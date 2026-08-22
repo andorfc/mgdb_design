@@ -1,0 +1,712 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-map
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https://maizegdb.org/data_center/map">
+<meta property="og:title" content="MaizeGDB Map Center | Genetic, Cytogenetic &amp; Physical Maps">
+<meta property="og:description" content="Explore and search over 2,100 curated maize genetic, cytogenetic, physical, and bin maps across chromosomes 1–10.">
+
+<main class="mgdb-page mgdb-map-page" id="map-main">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data centers</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Map Center</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="map-title">
+    <div class="mgdb-hero-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="Chromosome map icon">
+        <rect x="28" y="16" width="16" height="64" rx="8" fill="none" stroke="#235c37" stroke-width="4"/>
+        <line x1="28" y1="32" x2="44" y2="32" stroke="#d99a0b" stroke-width="3"/>
+        <line x1="28" y1="44" x2="44" y2="44" stroke="#235c37" stroke-width="3"/>
+        <line x1="28" y1="52" x2="44" y2="52" stroke="#d99a0b" stroke-width="3"/>
+        <line x1="28" y1="68" x2="44" y2="68" stroke="#235c37" stroke-width="3"/>
+        <rect x="52" y="24" width="16" height="56" rx="8" fill="none" stroke="#235c37" stroke-width="4"/>
+        <line x1="52" y1="40" x2="68" y2="40" stroke="#d99a0b" stroke-width="3"/>
+        <line x1="52" y1="56" x2="68" y2="56" stroke="#235c37" stroke-width="3"/>
+        <line x1="52" y1="64" x2="68" y2="64" stroke="#d99a0b" stroke-width="3"/>
+      </svg>
+      <strong>Map<br />Center</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; August 2026</p>
+      <h1 id="map-title">Explore maize chromosome &amp; linkage maps</h1>
+      <p class="mgdb-hero-description">Discover over 2,100 curated genetic, cytogenetic, recombinant inbred, physical, and bin maps comprising more than 738,000 locus coordinates across the 10 maize chromosomes.</p>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Map resource sections">
+    <a href="#map-search-section" class="is-current" aria-current="true">Search maps</a>
+    <a href="#map-key-maps">Key genetic maps</a>
+    <a href="#map-chromosomes">Chromosome matrix</a>
+    <a href="#map-collections">Map tools &amp; collections</a>
+    <a href="#map-downloads">Bulk downloads</a>
+    <a href="#map-statistics">Corpus statistics</a>
+    <a href="#map-related">Related resources</a>
+  </nav>
+
+  <!-- Search & Advanced Filters Panel -->
+  <section id="map-search-section" class="map-search-panel" aria-labelledby="map-search-title">
+    <div class="map-search-header">
+      <div>
+        <span class="mgdb-eyebrow">Interactive finder</span>
+        <h2 id="map-search-title">Search &amp; filter maize maps</h2>
+      </div>
+      <p>Search by map name, mapping population, author, or filter by chromosome and specific mapped loci.</p>
+    </div>
+
+    <form id="map-search-form" class="map-search-form" role="search">
+      <div class="map-field-query">
+        <label for="map-query">Search term</label>
+        <div class="map-query-control">
+          <svg class="map-search-icon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="7" r="5"/><line x1="11" y1="11" x2="15" y2="15"/></svg>
+          <input id="map-query" name="term" type="search" placeholder="Try IBM2, ISU, Bins, Cornfed, FSU, UMC 98, or B73…" autocomplete="off" />
+          <button id="map-query-clear" type="button" hidden>Clear</button>
+        </div>
+      </div>
+
+      <div class="map-field">
+        <label for="map-linkage">Chromosome / Linkage group</label>
+        <select id="map-linkage" name="linkage">
+          <option value="0">All chromosomes &amp; linkage groups</option>
+          $(linkage_options)
+        </select>
+      </div>
+
+      <div class="map-field map-field-checkbox">
+        <label for="map-has-loci">Locus filter</label>
+        <label class="map-checkbox-label">
+          <input type="checkbox" id="map-has-loci" name="has_loci" value="1" />
+          <span>With mapped locus coordinates</span>
+        </label>
+      </div>
+
+      <div class="map-search-submit">
+        <button class="mgdb-button mgdb-button-primary" type="submit">Search maps</button>
+      </div>
+
+      <div class="map-example-row" aria-label="Example map searches">
+        <span>Examples&#58;</span>
+        <button type="button" data-map-example="IBM2">IBM2 Neighbors</button>
+        <button type="button" data-map-example="Bins">Bin maps</button>
+        <button type="button" data-map-example="ISU">ISU integrated</button>
+        <button type="button" data-map-example="UMC 98">UMC 98</button>
+        <button type="button" data-map-example="Cornfed">Cornfed composite</button>
+        <button type="button" data-map-example="FSU">FSU cytogenetic</button>
+        <button type="button" data-map-example="Chromosome 1">Chromosome 1</button>
+      </div>
+
+      <!-- Advanced Search Criteria Accordion -->
+      <details class="map-adv-accordion" id="map-adv-accordion">
+        <summary>
+          <strong>Advanced search criteria</strong>
+          <span>Filter by specific mapped locus, source contributor, or mapping panel</span>
+        </summary>
+        <div class="map-adv-body">
+          <div class="map-field">
+            <label for="map-locus-filter">Contains specific locus / marker name &#40;e.g. kn1, tub1, bz1&#41;</label>
+            <input type="text" id="map-locus-filter" name="locus" placeholder="Enter locus symbol or comma-separated list…" />
+          </div>
+
+          <div class="map-field">
+            <label for="map-source-filter">Mapping source / Contributor</label>
+            <select id="map-source-filter" name="source">
+              <option value="0">All mapping sources &amp; authors</option>
+              $(source_options)
+            </select>
+          </div>
+
+          <div class="map-field">
+            <label for="map-panel-filter">Mapping panel of stocks</label>
+            <select id="map-panel-filter" name="panel">
+              <option value="0">All mapping panels &#40;IBM-94, IBM-302, NAM, etc.&#41;</option>
+              $(panel_options)
+            </select>
+          </div>
+
+          <div class="map-adv-actions">
+            <button class="mgdb-button mgdb-button-primary" type="submit">Apply advanced filters</button>
+            <button class="mgdb-button mgdb-button-quiet" id="map-adv-reset-btn" type="button">Reset advanced filters</button>
+          </div>
+        </div>
+      </details>
+    </form>
+  </section>
+
+  <!-- Results Section -->
+  <section id="map-results-section" class="map-results-section" aria-labelledby="map-results-title">
+    <div class="map-results-heading">
+      <div>
+        <span class="mgdb-eyebrow">Search results</span>
+        <h2 id="map-results-title">Matching chromosome maps</h2>
+        <p id="map-results-status" aria-live="polite">Enter a search term above or choose a chromosome filter to inspect maps.</p>
+      </div>
+      <div class="map-results-controls">
+        <div class="map-view-toggle" role="group" aria-label="View style">
+          <button class="map-view-btn" type="button" data-view="card" aria-pressed="false">
+            <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>Cards
+          </button>
+          <button class="map-view-btn is-active" type="button" data-view="table" aria-pressed="true">
+            <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><rect x="1" y="2" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="12" width="14" height="2" rx="1" fill="currentColor"/></svg>Table
+          </button>
+        </div>
+        <div class="map-sort-control">
+          <label for="map-sort" class="mgdb-visually-hidden">Sort results</label>
+          <select id="map-sort">
+            <option value="relevance">Sort&#58; Best match</option>
+            <option value="loci-desc">Sort&#58; Most mapped loci</option>
+            <option value="linkage">Sort&#58; Chromosome &#40;1&ndash;10&#41;</option>
+            <option value="name">Sort&#58; Name A&ndash;Z</option>
+            <option value="name-desc">Sort&#58; Name Z&ndash;A</option>
+          </select>
+        </div>
+        <div class="map-export-buttons">
+          <a class="mgdb-button mgdb-button-quiet" id="map-export-tsv" href="#" download>Export TSV</a>
+          <a class="mgdb-button mgdb-button-quiet" id="map-export-csv" href="#" download>Export CSV</a>
+        </div>
+      </div>
+    </div>
+
+    <div id="map-results" class="map-results-container map-view-table"></div>
+
+    <div id="map-empty" class="mgdb-empty" hidden>
+      <h3>No maps matched your query</h3>
+      <p>Try searching with a broader keyword &#40;e.g. <code>IBM</code>, <code>Bins</code>, <code>1</code>&#41; or resetting chromosome and locus filters.</p>
+      <button class="mgdb-button mgdb-button-secondary" id="map-empty-reset" type="button">Reset search</button>
+    </div>
+
+    <nav id="map-pagination" class="map-pagination" aria-label="Search result pages"></nav>
+  </section>
+
+  <!-- Key Genetic Maps Quick Navigation Section -->
+  <section id="map-key-maps" aria-labelledby="map-key-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Direct navigation</span>
+        <h2 id="map-key-title">Key genetics &amp; physical maps catalog</h2>
+      </div>
+      <p>Quick access to all 10 chromosomes across primary community reference frameworks, high-resolution recombinant inbred maps, and SNP array panels.</p>
+    </div>
+
+    <div class="map-key-matrix">
+      <!-- Category 1: Framework & Consensus -->
+      <article class="map-key-card">
+        <div class="map-key-header">
+          <span class="mgdb-pill mgdb-pill-ok">Consensus &amp; Frameworks</span>
+          <h3>Framework &amp; Consensus Maps</h3>
+        </div>
+        <ul class="map-key-list">
+          <li>
+            <strong>Bins &#40;Reference Bins&#41;</strong>
+            <span>Standard cytological bin coordinates</span>
+            <div class="map-chr-pills">
+              <a href="/data_center/map/64489">1</a><a href="/data_center/map/64501">2</a><a href="/data_center/map/64505">3</a><a href="/data_center/map/64506">4</a><a href="/data_center/map/64507">5</a><a href="/data_center/map/64508">6</a><a href="/data_center/map/64509">7</a><a href="/data_center/map/64510">8</a><a href="/data_center/map/64511">9</a><a href="/data_center/map/64512">10</a>
+            </div>
+          </li>
+          <li>
+            <strong>Genetic 2008</strong>
+            <span>Consensus genetic map</span>
+            <div class="map-chr-pills">
+              <a href="/data_center/map/1140081">1</a><a href="/data_center/map/1140082">2</a><a href="/data_center/map/1140083">3</a><a href="/data_center/map/1140084">4</a><a href="/data_center/map/1140085">5</a><a href="/data_center/map/1140086">6</a><a href="/data_center/map/1140087">7</a><a href="/data_center/map/1140088">8</a><a href="/data_center/map/1140089">9</a><a href="/data_center/map/1140090">10</a>
+            </div>
+          </li>
+          <li>
+            <strong>Genetic 2005</strong>
+            <span>Classical framework</span>
+            <div class="map-chr-pills">
+              <a href="/data_center/map/970757">1</a><a href="/data_center/map/970758">2</a><a href="/data_center/map/970759">3</a><a href="/data_center/map/970760">4</a><a href="/data_center/map/970761">5</a><a href="/data_center/map/970762">6</a><a href="/data_center/map/970763">7</a><a href="/data_center/map/970764">8</a><a href="/data_center/map/970765">9</a><a href="/data_center/map/970766">10</a>
+            </div>
+          </li>
+          <li>
+            <strong>UMC 98</strong>
+            <span>Classic RFLP framework</span>
+            <div class="map-chr-pills">
+              <a href="/data_center/map/40028">1</a><a href="/data_center/map/40030">2</a><a href="/data_center/map/40031">3</a><a href="/data_center/map/40032">4</a><a href="/data_center/map/40033">5</a><a href="/data_center/map/40034">6</a><a href="/data_center/map/40035">7</a><a href="/data_center/map/40036">8</a><a href="/data_center/map/40037">9</a><a href="/data_center/map/40029">10</a>
+            </div>
+          </li>
+          <li>
+            <strong>IBM 2008 Neighbors</strong>
+            <span>Includes ISU Map7, NAM, and Genetic 2008</span>
+            <div class="map-chr-pills">
+              <a href="/data_center/map/1140201">1</a><a href="/data_center/map/1140202">2</a><a href="/data_center/map/1140203">3</a><a href="/data_center/map/1140204">4</a><a href="/data_center/map/1140205">5</a><a href="/data_center/map/1140206">6</a><a href="/data_center/map/1140207">7</a><a href="/data_center/map/1140208">8</a><a href="/data_center/map/1140209">9</a><a href="/data_center/map/1140210">10</a>
+            </div>
+          </li>
+          <li>
+            <strong>IBM 2005 Neighbors</strong>
+            <span>Multi-population consensus</span>
+            <div class="map-chr-pills">
+              <a href="/data_center/map/978377">1</a><a href="/data_center/map/978378">2</a><a href="/data_center/map/978379">3</a><a href="/data_center/map/978380">4</a><a href="/data_center/map/978381">5</a><a href="/data_center/map/978382">6</a><a href="/data_center/map/978383">7</a><a href="/data_center/map/978384">8</a><a href="/data_center/map/978385">9</a><a href="/data_center/map/978386">10</a>
+            </div>
+          </li>
+          <li>
+            <strong>IBM Neighbors</strong>
+            <span>Pioneer &amp; community high-density placement</span>
+            <div class="map-chr-pills">
+              <a href="/data_center/map/754720">1</a><a href="/data_center/map/754721">2</a><a href="/data_center/map/754722">3</a><a href="/data_center/map/754723">4</a><a href="/data_center/map/754724">5</a><a href="/data_center/map/754725">6</a><a href="/data_center/map/754726">7</a><a href="/data_center/map/754727">8</a><a href="/data_center/map/754728">9</a><a href="/data_center/map/754729">10</a>
+            </div>
+          </li>
+        </ul>
+      </article>
+
+      <!-- Category 2: High Resolution Mixed Marker -->
+      <article class="map-key-card">
+        <div class="map-key-header">
+          <span class="mgdb-pill mgdb-pill-info">High Resolution</span>
+          <h3>Mixed Marker Maps &#40;RFLP, SSR, SNP, INDEL&#41;</h3>
+        </div>
+        <ul class="map-key-list">
+          <li>
+            <strong>IBM2 &#40;Intermated B73/Mo17&#41;</strong>
+            <span>High-resolution genetic map</span>
+            <div class="map-chr-pills">
+              <a href="/data_center/map/870745">1</a><a href="/data_center/map/870746">2</a><a href="/data_center/map/870747">3</a><a href="/data_center/map/870748">4</a><a href="/data_center/map/870749">5</a><a href="/data_center/map/870750">6</a><a href="/data_center/map/870751">7</a><a href="/data_center/map/870752">8</a><a href="/data_center/map/870753">9</a><a href="/data_center/map/870754">10</a>
+            </div>
+          </li>
+          <li>
+            <strong>IBM GNP 2004</strong>
+            <span>Genoplante genetic map</span>
+            <div class="map-chr-pills">
+              <a href="/data_center/map/954207">1</a><a href="/data_center/map/954208">2</a><a href="/data_center/map/954209">3</a><a href="/data_center/map/954210">4</a><a href="/data_center/map/954211">5</a><a href="/data_center/map/954212">6</a><a href="/data_center/map/954213">7</a><a href="/data_center/map/954214">8</a><a href="/data_center/map/954215">9</a><a href="/data_center/map/954216">10</a>
+            </div>
+          </li>
+          <li>
+            <strong>ISU Integrated IBM 2009</strong>
+            <span>ISU integrated high-density framework</span>
+            <div class="map-chr-pills">
+              <a href="/data_center/map/1233730">1</a><a href="/data_center/map/1233731">2</a><a href="/data_center/map/1233732">3</a><a href="/data_center/map/1233733">4</a><a href="/data_center/map/1233734">5</a><a href="/data_center/map/1233735">6</a><a href="/data_center/map/1233736">7</a><a href="/data_center/map/1233737">8</a><a href="/data_center/map/1233738">9</a><a href="/data_center/map/1233739">10</a>
+            </div>
+          </li>
+          <li>
+            <strong>LHRF Gnp 2004</strong>
+            <span>High-resolution map from Genoplante</span>
+            <div class="map-chr-pills">
+              <a href="/data_center/map/954374">1</a><a href="/data_center/map/954375">2</a><a href="/data_center/map/954376">3</a><a href="/data_center/map/954377">4</a><a href="/data_center/map/954378">5</a><a href="/data_center/map/954379">6</a><a href="/data_center/map/954380">7</a><a href="/data_center/map/954381">8</a><a href="/data_center/map/954382">9</a><a href="/data_center/map/954383">10</a>
+            </div>
+          </li>
+          <li>
+            <strong>NAM &#40;Nested Association Mapping&#41;</strong>
+            <span>25 diverse founder crosses</span>
+            <div class="map-chr-pills">
+              <a href="/data_center/map/1160762">1</a><a href="/data_center/map/1160763">2</a><a href="/data_center/map/1160764">3</a><a href="/data_center/map/1160765">4</a><a href="/data_center/map/1160766">5</a><a href="/data_center/map/1160767">6</a><a href="/data_center/map/1160768">7</a><a href="/data_center/map/1160769">8</a><a href="/data_center/map/1160770">9</a><a href="/data_center/map/1160771">10</a>
+            </div>
+          </li>
+        </ul>
+      </article>
+
+      <!-- Category 3: MaizeSNP50 Array -->
+      <article class="map-key-card">
+        <div class="map-key-header">
+          <span class="mgdb-pill mgdb-pill-warn">MaizeSNP50 Array</span>
+          <h3>SNP - MaizeSNP50 Array Based Maps</h3>
+        </div>
+        <ul class="map-key-list">
+          <li>
+            <strong>IBM MaizeSNP50</strong>
+            <span>High-density 50k Illumina SNP array</span>
+            <div class="map-chr-pills">
+              <a href="/data_center/map/2776662">1</a><a href="/data_center/map/2776663">2</a><a href="/data_center/map/2776664">3</a><a href="/data_center/map/2776665">4</a><a href="/data_center/map/2776666">5</a><a href="/data_center/map/2776667">6</a><a href="/data_center/map/2776668">7</a><a href="/data_center/map/2776669">8</a><a href="/data_center/map/2776670">9</a><a href="/data_center/map/2776671">10</a>
+            </div>
+          </li>
+          <li>
+            <strong>LHRF MaizeSNP50</strong>
+            <span>High-density SNP map</span>
+            <div class="map-chr-pills">
+              <a href="/data_center/map/2776672">1</a><a href="/data_center/map/2776673">2</a><a href="/data_center/map/2776674">3</a><a href="/data_center/map/2776675">4</a><a href="/data_center/map/2776676">5</a><a href="/data_center/map/2776677">6</a><a href="/data_center/map/2776678">7</a><a href="/data_center/map/2776679">8</a><a href="/data_center/map/2776680">9</a><a href="/data_center/map/2776681">10</a>
+            </div>
+          </li>
+          <li>
+            <strong>Cornfed Dent Composite</strong>
+            <span>European Dent diversity panel composite</span>
+            <div class="map-chr-pills">
+              <a href="/data_center/map/3133142">1</a><a href="/data_center/map/3133143">2</a><a href="/data_center/map/3133144">3</a><a href="/data_center/map/3133145">4</a><a href="/data_center/map/3133146">5</a><a href="/data_center/map/3133147">6</a><a href="/data_center/map/3133148">7</a><a href="/data_center/map/3133149">8</a><a href="/data_center/map/3133150">9</a><a href="/data_center/map/3133151">10</a>
+            </div>
+          </li>
+          <li>
+            <strong>Cornfed Flint Composite</strong>
+            <span>European Flint diversity panel composite</span>
+            <div class="map-chr-pills">
+              <a href="/data_center/map/3094852">1</a><a href="/data_center/map/3133133">2</a><a href="/data_center/map/3133134">3</a><a href="/data_center/map/3133135">4</a><a href="/data_center/map/3133136">5</a><a href="/data_center/map/3133141">6</a><a href="/data_center/map/3133137">7</a><a href="/data_center/map/3133138">8</a><a href="/data_center/map/3133139">9</a><a href="/data_center/map/3133140">10</a>
+            </div>
+          </li>
+        </ul>
+      </article>
+
+      <!-- Category 4: Physical, Cytogenetics & Scores -->
+      <article class="map-key-card">
+        <div class="map-key-header">
+          <span class="mgdb-pill">Specialized &amp; Scores</span>
+          <h3>Physical, Cytogenetic &amp; Map Scores</h3>
+        </div>
+        <ul class="map-key-list">
+          <li>
+            <strong>Physical Maps &#40;MMP&#41;</strong>
+            <span>BAC contigs &amp; FPC builds from the Maize Mapping Project</span>
+            <div class="map-chr-pills">
+              <a href="https://archive.maizegdb.org/documentation/maizemap/index.php" target="_blank" rel="noopener">MMP Documentation &nearr;</a>
+            </div>
+          </li>
+          <li>
+            <strong>Recombination Nodule &#40;RN&#41; Maps</strong>
+            <span>Pachytene synaptonemal complex frequency maps</span>
+            <div class="map-chr-pills">
+              <a href="/docs/RNmaps">RN Maps</a>
+              <a href="https://dill-picl.org/projects/morgan-2/" target="_blank" rel="noopener">Morgan2McClintock &nearr;</a>
+            </div>
+          </li>
+          <li>
+            <strong>IBM 94 Population Map Scores</strong>
+            <span>Lines, cIBM on-frame scores, IBM GNP 2004 scores &amp; MapMaker infiles</span>
+            <div class="map-chr-pills">
+              <a href="/mapscore_ibmlist">Lines</a>
+              <a href="/mapscore_ibmscore">cIBM Scores</a>
+              <a href="/mapscore_ibm94genoscore">GNP 2004</a>
+              <a href="/docs/ibm94mm.txt" download>MapMaker Infile &darr;</a>
+            </div>
+          </li>
+          <li>
+            <strong>IBM 302 Population Map Scores</strong>
+            <span>Lines, map scores, and QTL Cartographer files</span>
+            <div class="map-chr-pills">
+              <a href="/mapscore_ibm302list">Lines</a>
+              <a href="/mapscore_ibm302score">Scores</a>
+              <a href="/data_center/qtl-data">QTL Cartographer</a>
+            </div>
+          </li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <!-- Chromosome Matrix 1-10 Section -->
+  <section id="map-chromosomes" aria-labelledby="map-chromosomes-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Genome architecture</span>
+        <h2 id="map-chromosomes-title">Maize chromosome maps matrix &#40;1&ndash;10&#41;</h2>
+      </div>
+      <p>Quick access to the standard reference bin and genetic maps for each of the 10 maize chromosomes.</p>
+    </div>
+
+    <div class="map-chr-grid" aria-label="Maize chromosomes 1 through 10">
+      <article class="map-chr-card">
+        <span class="map-chr-badge">Chr 1</span>
+        <h3>Chromosome 1</h3>
+        <p>Largest maize chromosome; over 12,000 bin-mapped loci.</p>
+        <div class="map-chr-actions">
+          <a href="/data_center/map/64489">Bins 1 &rarr;</a>
+          <a href="/data_center/map/40028">UMC 98 1 &rarr;</a>
+          <a href="/compare_maps?map1=40028&amp;map2=940880">Compare &nearr;</a>
+        </div>
+      </article>
+
+      <article class="map-chr-card">
+        <span class="map-chr-badge">Chr 2</span>
+        <h3>Chromosome 2</h3>
+        <p>Over 9,600 loci mapped across genetic and physical frameworks.</p>
+        <div class="map-chr-actions">
+          <a href="/data_center/map/64501">Bins 2 &rarr;</a>
+          <a href="/data_center/map/40030">UMC 98 2 &rarr;</a>
+          <a href="/compare_maps?map1=40030&amp;map2=940881">Compare &nearr;</a>
+        </div>
+      </article>
+
+      <article class="map-chr-card">
+        <span class="map-chr-badge">Chr 3</span>
+        <h3>Chromosome 3</h3>
+        <p>Nearly 9,000 loci; comprehensive recombinant inbred mapping.</p>
+        <div class="map-chr-actions">
+          <a href="/data_center/map/64505">Bins 3 &rarr;</a>
+          <a href="/data_center/map/40031">UMC 98 3 &rarr;</a>
+          <a href="/compare_maps?map1=40031&amp;map2=940882">Compare &nearr;</a>
+        </div>
+      </article>
+
+      <article class="map-chr-card">
+        <span class="map-chr-badge">Chr 4</span>
+        <h3>Chromosome 4</h3>
+        <p>Over 9,000 loci; classical phenotypic markers and SSR maps.</p>
+        <div class="map-chr-actions">
+          <a href="/data_center/map/64506">Bins 4 &rarr;</a>
+          <a href="/data_center/map/40032">UMC 98 4 &rarr;</a>
+          <a href="/compare_maps?map1=40032&amp;map2=940883">Compare &nearr;</a>
+        </div>
+      </article>
+
+      <article class="map-chr-card">
+        <span class="map-chr-badge">Chr 5</span>
+        <h3>Chromosome 5</h3>
+        <p>Over 9,300 loci mapped with high-density SNP panels.</p>
+        <div class="map-chr-actions">
+          <a href="/data_center/map/64507">Bins 5 &rarr;</a>
+          <a href="/data_center/map/40033">UMC 98 5 &rarr;</a>
+          <a href="/compare_maps?map1=40033&amp;map2=940884">Compare &nearr;</a>
+        </div>
+      </article>
+
+      <article class="map-chr-card">
+        <span class="map-chr-badge">Chr 6</span>
+        <h3>Chromosome 6</h3>
+        <p>Nucleolar organizer region &#40;NOR&#41; and satellite chromosome.</p>
+        <div class="map-chr-actions">
+          <a href="/data_center/map/64508">Bins 6 &rarr;</a>
+          <a href="/data_center/map/40034">UMC 98 6 &rarr;</a>
+          <a href="/compare_maps?map1=40034&amp;map2=940885">Compare &nearr;</a>
+        </div>
+      </article>
+
+      <article class="map-chr-card">
+        <span class="map-chr-badge">Chr 7</span>
+        <h3>Chromosome 7</h3>
+        <p>Over 6,300 mapped loci; extensive QTL mapping records.</p>
+        <div class="map-chr-actions">
+          <a href="/data_center/map/64509">Bins 7 &rarr;</a>
+          <a href="/data_center/map/40035">UMC 98 7 &rarr;</a>
+          <a href="/compare_maps?map1=40035&amp;map2=940886">Compare &nearr;</a>
+        </div>
+      </article>
+
+      <article class="map-chr-card">
+        <span class="map-chr-badge">Chr 8</span>
+        <h3>Chromosome 8</h3>
+        <p>Over 7,100 loci mapped across diverse mapping populations.</p>
+        <div class="map-chr-actions">
+          <a href="/data_center/map/64510">Bins 8 &rarr;</a>
+          <a href="/data_center/map/40036">UMC 98 8 &rarr;</a>
+          <a href="/compare_maps?map1=40036&amp;map2=940887">Compare &nearr;</a>
+        </div>
+      </article>
+
+      <article class="map-chr-card">
+        <span class="map-chr-badge">Chr 9</span>
+        <h3>Chromosome 9</h3>
+        <p>Classic genetics model; FSU cytogenetic FISH integration.</p>
+        <div class="map-chr-actions">
+          <a href="/data_center/map/64511">Bins 9 &rarr;</a>
+          <a href="/data_center/map/40037">UMC 98 9 &rarr;</a>
+          <a href="/compare_maps?map1=40037&amp;map2=940888">Compare &nearr;</a>
+        </div>
+      </article>
+
+      <article class="map-chr-card">
+        <span class="map-chr-badge">Chr 10</span>
+        <h3>Chromosome 10</h3>
+        <p>Includes abnormal chromosome 10 &#40;Ab10&#41; meiotic drive locus.</p>
+        <div class="map-chr-actions">
+          <a href="/data_center/map/64512">Bins 10 &rarr;</a>
+          <a href="/data_center/map/40029">UMC 98 10 &rarr;</a>
+          <a href="/compare_maps?map1=40029&amp;map2=940889">Compare &nearr;</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Map Collections & Tools Section -->
+  <section id="map-collections" aria-labelledby="map-collections-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Mapping utilities</span>
+        <h2 id="map-collections-title">Map comparison tools &amp; collections</h2>
+      </div>
+      <p>Explore tools for comparing marker orders, viewing bin assignments, and analyzing syntenic maps.</p>
+    </div>
+
+    <div class="mgdb-card-grid map-collection-grid">
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-ok">Interactive Tool</span>
+        <h3>Compare Two Maps</h3>
+        <p>Side-by-side interactive comparison of locus orders, recombination distances, and syntenic inversions.</p>
+        <a href="/compare_maps">Launch Map Comparator <span aria-hidden="true">&rarr;</span></a>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-info">Whole-Genome</span>
+        <h3>Complete Map Across All Chromosomes</h3>
+        <p>View all 10 chromosome sets together for composite maps such as IBM2 Neighbors and UMC 98.</p>
+        <a href="/displaycompletemaprecord.cgi?id=64489">View Complete Map <span aria-hidden="true">&rarr;</span></a>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-warn">Bin Coordinates</span>
+        <h3>Bin Viewer Tool</h3>
+        <p>Search and browse core bin markers &#40;CBMs&#41; and bin boundaries across the maize genome.</p>
+        <a href="/bin_viewer">Open Bin Viewer <span aria-hidden="true">&rarr;</span></a>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill">Cytogenetics</span>
+        <h3>Cytogenetic &amp; FISH Maps</h3>
+        <p>Fluorescence in situ hybridization &#40;FISH&#41; chromosome physical maps and B chromosome breakpoints.</p>
+        <a href="/data_center/cytogenetic">Explore Cytogenetic Maps <span aria-hidden="true">&rarr;</span></a>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-ok">SNP Comparison</span>
+        <h3>SNPversity Tool</h3>
+        <p>Search for SNPs and compare diversity patterns across thousands of inbred lines.</p>
+        <a href="/snpversity">Launch SNPversity <span aria-hidden="true">&rarr;</span></a>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill">Incongruency Analysis</span>
+        <h3>Map vs Genome Incongruencies</h3>
+        <p>Inspect incongruencies between B73 RefGen assembly coordinates and ISU Integrated IBM 2009 genetic coordinates.</p>
+        <a href="/incongruency">View Incongruency Analysis <span aria-hidden="true">&rarr;</span></a>
+      </article>
+    </div>
+  </section>
+
+  <!-- Bulk Downloads Section -->
+  <section id="map-downloads" aria-labelledby="map-downloads-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Bulk data</span>
+        <h2 id="map-downloads-title">Map catalogs &amp; locus coordinates downloads</h2>
+      </div>
+      <p>Download complete tabulated map listings and locus coordinates for computational and offline analyses.</p>
+    </div>
+
+    <div class="map-download-grid" aria-label="Map downloads">
+      <article class="map-download-card">
+        <div class="map-download-header">
+          <span class="mgdb-pill mgdb-pill-ok">Full TSV</span>
+          <h3>Tabulated Map Catalog</h3>
+        </div>
+        <p>Complete curated catalog of all 2,100+ maps with identifiers, chromosomes, coordinate units, authors, and locus counts.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="/search/map/map_search_api.php?format=tsv">Download Maps TSV <span aria-hidden="true">&darr;</span></a>
+      </article>
+
+      <article class="map-download-card">
+        <div class="map-download-header">
+          <span class="mgdb-pill mgdb-pill-info">CSV Export</span>
+          <h3>Tabulated Map CSV</h3>
+        </div>
+        <p>Comma-separated export of map records suitable for Excel, Python Pandas, and R bioinformatics pipelines.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="/search/map/map_search_api.php?format=csv">Download Maps CSV <span aria-hidden="true">&darr;</span></a>
+      </article>
+
+      <article class="map-download-card">
+        <div class="map-download-header">
+          <span class="mgdb-pill mgdb-pill-warn">Bin Coordinates</span>
+          <h3>Bin Coordinates Archive</h3>
+        </div>
+        <p>Standardized maize core bin coordinates and boundary locus markers across all 10 chromosomes.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="/data_center/map/64489">View Reference Bins <span aria-hidden="true">&rarr;</span></a>
+      </article>
+    </div>
+  </section>
+
+  <!-- Corpus Statistics & Top 10 Map Series Chart Section -->
+  <section id="map-statistics" aria-labelledby="map-statistics-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Corpus summary</span>
+        <h2 id="map-statistics-title">Map collection at a glance</h2>
+      </div>
+      <p>Curated genetic, cytogenetic, and physical maps maintained by MaizeGDB.</p>
+    </div>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Curated Maps</h3>
+          <span class="mgdb-metric-badge">Frameworks</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(metric_maps)</strong>
+        </div>
+        <p class="mgdb-metric-description">Active curated genetic, bin, and physical maps.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Mapped Loci</h3>
+          <span class="mgdb-metric-badge">Coordinates</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(metric_loci)</strong>
+        </div>
+        <p class="mgdb-metric-description">Positioned genetic loci, markers, and QTLs.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Chromosomes &amp; LGs</h3>
+          <span class="mgdb-metric-badge">Linkage</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(metric_chrs)</strong>
+        </div>
+        <p class="mgdb-metric-description">Chromosomes 1–10, B chromosome, and organellar genomes.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Mapping Publications</h3>
+          <span class="mgdb-metric-badge">Literature</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(metric_pubs)</strong>
+        </div>
+        <p class="mgdb-metric-description">Peer-reviewed publications linked to mapping studies.</p>
+      </article>
+    </div>
+
+    <div class="map-chart-panel">
+      <figure class="mgdb-figure mgdb-map-figure-wide">
+        <h3>Top 10 maize maps by total mapped markers</h3>
+        <p>Total unique markers and genetic loci positioned across chromosomes 1&ndash;10 for each map series.</p>
+        <div class="mgdb-chart" id="map-chr-chart" role="img"
+             aria-label="Horizontal bar chart of total markers across chromosomes 1 through 10 for the top 10 maize map series"
+             data-labels="$(chart_labels)" data-values="$(chart_values)">
+          <div class="mgdb-chart-fallback">Loading top map marker breakdown&hellip;</div>
+        </div>
+        <figcaption>$(chart_caption)</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- Related Resources Section -->
+  <section id="map-related" aria-labelledby="map-related-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Connected tools</span>
+        <h2 id="map-related-title">Related resources</h2>
+      </div>
+      <p>Explore related genomic hubs, probe databases, and sequence browsers at MaizeGDB.</p>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/marker">
+          <strong>Molecular Marker &amp; Probe Center</strong>
+          <span>Over 771,000 marker records with mapped chromosome bin positions and gel assays</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/genome">
+          <strong>Genome Data Center</strong>
+          <span>160 hosted genome assemblies across 31 maize and wild relative species</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/variation">
+          <strong>Variations &amp; Alleles Data Center</strong>
+          <span>Over 1.7 million curated variations, gene mutations, and allele descriptors</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/stock">
+          <strong>Stock Center &amp; Germplasm</strong>
+          <span>Curated genetic stocks, mutant alleles, and NAM founder inbred lines</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/cytogenetic">
+          <strong>Cytogenetic Data Center</strong>
+          <span>Chromosome FISH coordinates, translocation breakpoints, and karyotypes</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/cite">
+          <strong>How to Cite MaizeGDB</strong>
+          <span>Guidelines and citation formats for database records, tools, and datasets</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)
