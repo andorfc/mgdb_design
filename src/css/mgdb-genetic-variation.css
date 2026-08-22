@@ -1,0 +1,606 @@
+/* ==========================================================================
+   /genetic_variation — the Genetic Variation data center
+   --------------------------------------------------------------------------
+   Page-specific rules only. Structural rules come from mgdb-modern.css.
+   Scoped under .mgdb-genetic-variation-page.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Hero Emblem
+   -------------------------------------------------------------------------- */
+
+.mgdb-genetic-variation-page .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-genetic-variation-page .mgdb-hero-emblem img.gv-hero-icon {
+  width: min(100%, 76px);
+  max-height: 80px;
+  height: auto;
+  object-fit: contain;
+  mix-blend-mode: normal;
+}
+
+/* --------------------------------------------------------------------------
+   Sticky Section Tabs
+   -------------------------------------------------------------------------- */
+
+.mgdb-genetic-variation-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-5);
+  padding: var(--mgdb-space-2) 0;
+  background: var(--mgdb-surface);
+  border-bottom: 1px solid var(--mgdb-line);
+}
+
+.mgdb-genetic-variation-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background var(--mgdb-dur-fast), border-color var(--mgdb-dur-fast), color var(--mgdb-dur-fast);
+}
+
+.mgdb-genetic-variation-page .mgdb-section-tabs a:hover {
+  background: var(--mgdb-surface-hover);
+  border-color: var(--mgdb-line-strong);
+  text-decoration: none;
+}
+
+.mgdb-genetic-variation-page .mgdb-section-tabs a.is-current {
+  background: var(--mgdb-green-soft);
+  border-color: var(--mgdb-leaf);
+  color: var(--mgdb-green-dark) !important;
+}
+
+/* Scroll-margin so an anchored section is not hidden behind the sticky nav. */
+.mgdb-genetic-variation-page > section[id] { scroll-margin-top: 4.5rem; }
+
+/* --------------------------------------------------------------------------
+   Featured workspace — SNPTools
+   -------------------------------------------------------------------------- */
+
+.mgdb-genetic-variation-page .gv-featured {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+  gap: var(--mgdb-space-6);
+  padding: var(--mgdb-space-6);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-surface);
+  box-shadow: 0 1px 3px rgba(23, 70, 52, .04);
+}
+
+.mgdb-genetic-variation-page .gv-featured-copy > * + * { margin-top: var(--mgdb-space-3); }
+
+.mgdb-genetic-variation-page .gv-featured h3 {
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-2xl);
+}
+
+.mgdb-genetic-variation-page .gv-featured-lead {
+  max-width: 56ch;
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-lg);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-genetic-variation-page .gv-feature-list {
+  display: grid;
+  gap: var(--mgdb-space-3);
+  padding: 0;
+  list-style: none;
+}
+
+.mgdb-genetic-variation-page .gv-feature-list li {
+  padding-left: var(--mgdb-space-4);
+  border-left: 3px solid var(--mgdb-gold);
+}
+
+.mgdb-genetic-variation-page .gv-feature-list strong {
+  display: block;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-genetic-variation-page .gv-feature-list span {
+  display: block;
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-genetic-variation-page .gv-featured-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-genetic-variation-page .gv-featured .mgdb-button-primary {
+  background: var(--mgdb-green-dark);
+  color: #fff !important;
+}
+
+.mgdb-genetic-variation-page .gv-featured .mgdb-button-primary:hover { background: #0f3325; }
+
+.mgdb-genetic-variation-page .gv-featured .mgdb-button-secondary {
+  border-color: var(--mgdb-line-strong);
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-green-dark) !important;
+}
+
+.mgdb-genetic-variation-page .gv-featured .mgdb-button-secondary:hover { background: #fff; }
+
+/* The session diagram --------------------------------------------------- */
+
+.mgdb-genetic-variation-page .gv-workflow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-4);
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-genetic-variation-page .gv-workflow-heading span {
+  display: block;
+  color: var(--mgdb-leaf);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.mgdb-genetic-variation-page .gv-workflow-heading strong {
+  display: block;
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-base);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-genetic-variation-page .gv-workflow ol {
+  display: grid;
+  gap: var(--mgdb-space-3);
+  padding: 0;
+  list-style: none;
+}
+
+.mgdb-genetic-variation-page .gv-workflow li {
+  display: flex;
+  gap: var(--mgdb-space-3);
+  align-items: flex-start;
+}
+
+.mgdb-genetic-variation-page .gv-workflow li > span {
+  flex: 0 0 auto;
+  min-width: 2rem;
+  padding: 2px 0;
+  color: var(--mgdb-gold-dark);
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.mgdb-genetic-variation-page .gv-workflow li strong {
+  display: block;
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-genetic-variation-page .gv-workflow li small {
+  display: block;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-genetic-variation-page .gv-suite-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  padding-top: var(--mgdb-space-4);
+  border-top: 1px solid var(--mgdb-line-soft);
+}
+
+.mgdb-genetic-variation-page .gv-suite-list span {
+  padding: var(--mgdb-space-1) var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface);
+  color: var(--mgdb-green);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   Tool cards
+   -------------------------------------------------------------------------- */
+
+.mgdb-genetic-variation-page .gv-tool-grid { margin-top: var(--mgdb-space-5); }
+
+.mgdb-genetic-variation-page .gv-tool-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.mgdb-genetic-variation-page .gv-tool-card .mgdb-pill { align-self: flex-start; }
+
+.mgdb-genetic-variation-page .gv-tool-card h3 {
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xl);
+}
+
+.mgdb-genetic-variation-page .gv-tool-facts {
+  display: grid;
+  gap: var(--mgdb-space-2);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--mgdb-line-soft);
+}
+
+.mgdb-genetic-variation-page .gv-tool-facts > div {
+  display: flex;
+  gap: var(--mgdb-space-3);
+  justify-content: space-between;
+}
+
+.mgdb-genetic-variation-page .gv-tool-facts dt {
+  flex: 0 0 auto;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.mgdb-genetic-variation-page .gv-tool-facts dd {
+  margin: 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  text-align: right;
+}
+
+.mgdb-genetic-variation-page .gv-card-cta {
+  margin-top: auto;
+  padding-top: var(--mgdb-space-4);
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   Table controls
+
+   Search box, filter chips and a live count, above each of the two tables.
+   Both tables are rendered server-side and complete; these only hide rows.
+   -------------------------------------------------------------------------- */
+
+.mgdb-genetic-variation-page .gv-table-controls {
+  display: grid;
+  grid-template-columns: minmax(220px, 20rem) minmax(0, 1fr);
+  gap: var(--mgdb-space-3) var(--mgdb-space-5);
+  align-items: end;
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-genetic-variation-page .gv-filter-field { margin: 0; }
+
+.mgdb-genetic-variation-page .gv-table-controls .mgdb-filters { margin: 0; }
+
+.mgdb-genetic-variation-page .gv-table-controls .mgdb-result-count {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.mgdb-genetic-variation-page .gv-reset { padding-block: var(--mgdb-space-1); }
+
+/* --------------------------------------------------------------------------
+   Dataset table
+
+   Ten columns is a lot, and three of them are one-glyph flags. Give the prose
+   columns a ceiling so the flags do not get squeezed to nothing, and let the
+   whole thing scroll horizontally inside .mgdb-table-scroll rather than
+   wrapping every cell to two words.
+   -------------------------------------------------------------------------- */
+
+.mgdb-genetic-variation-page .gv-dataset-table { min-width: 68rem; }
+
+/* The build name is the row's identity, so it gets enough width to stay on one
+   or two lines rather than breaking after every word. */
+.mgdb-genetic-variation-page .gv-dataset-table tbody th[scope="row"] { min-width: 10rem; }
+
+.mgdb-genetic-variation-page .gv-dataset-name {
+  display: block;
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-genetic-variation-page .gv-dataset-build {
+  display: block;
+  margin-top: 2px;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mgdb-genetic-variation-page .gv-filter-list {
+  min-width: 14rem;
+  margin: 0;
+  padding-left: 1.1em;
+  color: var(--mgdb-ink-soft);
+}
+
+.mgdb-genetic-variation-page .gv-filter-list li + li { margin-top: 2px; }
+
+.mgdb-genetic-variation-page .gv-paper-col { min-width: 9rem; }
+.mgdb-genetic-variation-page .gv-note-col {
+  min-width: 16rem;
+  max-width: 24rem;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading-snug);
+}
+
+/* Flags ------------------------------------------------------------------ */
+
+.mgdb-genetic-variation-page .gv-flag-col { text-align: center; }
+
+/* position:relative matters. .mgdb-visually-hidden is position:absolute, and an
+   absolutely positioned element is not clipped by an ancestor's overflow unless
+   that ancestor is in its containing-block chain. Without a positioned parent
+   these labels resolve against the initial containing block, escape
+   .mgdb-table-scroll, and stretch the whole document to the width of the widest
+   one — 706px of horizontal page scroll on a phone, from text nobody can see. */
+.mgdb-genetic-variation-page .gv-flag {
+  position: relative;
+  display: inline-flex;
+  width: 1.6rem;
+  height: 1.6rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.mgdb-genetic-variation-page .gv-flag-yes {
+  background: var(--mgdb-status-ok-soft);
+  color: var(--mgdb-status-ok);
+}
+
+.mgdb-genetic-variation-page .gv-flag-no {
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-muted);
+}
+
+/* --------------------------------------------------------------------------
+   Project table
+   -------------------------------------------------------------------------- */
+
+.mgdb-genetic-variation-page .gv-project-table { min-width: 48rem; }
+
+.mgdb-genetic-variation-page .gv-accession-col { min-width: 13rem; }
+
+.mgdb-genetic-variation-page .gv-accession {
+  display: inline-block;
+  margin: 0 var(--mgdb-space-1) var(--mgdb-space-1) 0;
+  padding: 1px var(--mgdb-space-2);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-alt);
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xs);
+  white-space: nowrap;
+}
+
+.mgdb-genetic-variation-page a.gv-accession:hover {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-genetic-variation-page .gv-doi {
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xs);
+  word-break: break-word;
+}
+
+.mgdb-genetic-variation-page .gv-archive-key { margin-top: var(--mgdb-space-3); }
+
+/* --------------------------------------------------------------------------
+   Downloads & Public Globus
+   -------------------------------------------------------------------------- */
+
+.mgdb-genetic-variation-page .gv-downloads-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+  gap: var(--mgdb-space-5);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-genetic-variation-page .gv-globus-card {
+  display: flex;
+  flex-direction: column;
+  padding: var(--mgdb-space-6);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-surface);
+  box-shadow: 0 1px 3px rgba(23, 70, 52, .04);
+}
+
+.mgdb-genetic-variation-page .gv-globus-card .mgdb-pill {
+  align-self: flex-start;
+  margin-bottom: var(--mgdb-space-3);
+}
+
+.mgdb-genetic-variation-page .gv-globus-card h3 {
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-2xl);
+}
+
+.mgdb-genetic-variation-page .gv-globus-card p {
+  color: var(--mgdb-ink-soft);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-genetic-variation-page .gv-globus-features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--mgdb-space-3);
+  margin-top: auto;
+  padding-top: var(--mgdb-space-5);
+  border-top: 1px solid var(--mgdb-line-soft);
+}
+
+.mgdb-genetic-variation-page .gv-globus-features div strong {
+  display: block;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-genetic-variation-page .gv-globus-features div span {
+  display: block;
+  margin-top: 2px;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-genetic-variation-page .gv-direct-downloads {
+  margin-top: 0;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-genetic-variation-page .gv-note { margin-top: var(--mgdb-space-4); }
+
+/* --------------------------------------------------------------------------
+   Types of variation
+   -------------------------------------------------------------------------- */
+
+.mgdb-genetic-variation-page .gv-types-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-genetic-variation-page .gv-type-card {
+  display: flex;
+  flex-direction: column;
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-surface);
+  box-shadow: 0 1px 3px rgba(23, 70, 52, .04);
+}
+
+.mgdb-genetic-variation-page .gv-type-card h3 {
+  margin-bottom: var(--mgdb-space-3);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xl);
+}
+
+.mgdb-genetic-variation-page .gv-type-card .mgdb-list {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-genetic-variation-page .gv-type-where {
+  margin-top: auto;
+  padding-top: var(--mgdb-space-4);
+  border-top: 1px solid var(--mgdb-line-soft);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+/* --------------------------------------------------------------------------
+   Connected Resources & Contributor Banner (Bottom Section — Light Green)
+   -------------------------------------------------------------------------- */
+
+.mgdb-genetic-variation-page .gv-bottom-section {
+  padding: var(--mgdb-space-6);
+  border: 1px solid #cfe3d6;
+  border-radius: var(--mgdb-radius-lg);
+  background: linear-gradient(135deg, #f2f8f4 0%, var(--mgdb-green-soft) 100%);
+}
+
+.mgdb-genetic-variation-page .gv-bottom-section .mgdb-resource-panel {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: #cfe3d6;
+}
+
+.mgdb-genetic-variation-page .gv-contribute-banner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-5);
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--mgdb-space-6);
+  padding: var(--mgdb-space-5);
+  border: 1px solid #cfe3d6;
+  border-left: 4px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.mgdb-genetic-variation-page .gv-contribute-banner h3 {
+  margin: var(--mgdb-space-1) 0 var(--mgdb-space-2);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xl);
+}
+
+.mgdb-genetic-variation-page .gv-contribute-banner p {
+  max-width: 60ch;
+  margin: 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-genetic-variation-page .gv-contribute-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+}
+
+/* --------------------------------------------------------------------------
+   Narrow viewports
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .mgdb-genetic-variation-page .gv-featured { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-genetic-variation-page .gv-downloads-layout { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-genetic-variation-page .gv-table-controls { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-genetic-variation-page .mgdb-resource-split { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .mgdb-genetic-variation-page .mgdb-section-tabs {
+    position: static;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  .mgdb-genetic-variation-page .mgdb-section-tabs a { white-space: nowrap; }
+  .mgdb-genetic-variation-page .gv-globus-features { grid-template-columns: 1fr; }
+  .mgdb-genetic-variation-page .gv-tool-facts > div { flex-direction: column; gap: 0; }
+  .mgdb-genetic-variation-page .gv-tool-facts dd { text-align: left; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mgdb-genetic-variation-page * { transition: none !important; }
+}

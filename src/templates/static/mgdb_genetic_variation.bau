@@ -1,0 +1,465 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-genetic-variation
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https\://maizegdb.org/genetic_variation">
+<meta property="og:title" content="MaizeGDB Genetic Variation Data Center">
+<meta property="og:description" content="Maize SNP and indel resources at MaizeGDB: the SNPTools workspace, SNPVersity 2, TYPSimSelector, eleven variant builds on B73 v5, and public resequencing projects.">
+
+<a class="mgdb-skip-link" href="#gv-main">Skip to main content</a>
+
+<main class="mgdb-page mgdb-genetic-variation-page" id="gv-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center">Data centers</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Genetic variation</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="gv-title">
+    <div class="mgdb-hero-emblem">
+      <img class="gv-hero-icon" src="/images/data_center/genetic_variation_transparent.png?v=20260822" width="76" height="76" alt="Maize genetic variation four-kernel emblem" />
+      <strong>Genetic<br />Variation</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data-date)</p>
+      <h1 id="gv-title">Explore maize SNPs, indels &amp; genetic diversity</h1>
+      <p class="mgdb-hero-description">Discover maize sequence variants, navigate $(dataset-count) curated builds on B73 RefGen_v5, explore public resequencing projects, and launch specialized analysis tools.</p>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#gv-tools" class="is-current">Tools</a>
+    <a href="#gv-datasets">Datasets</a>
+    <a href="#gv-projects">Projects</a>
+    <a href="#gv-downloads">Downloads</a>
+    <a href="#gv-types">Variation Types</a>
+    <a href="#gv-overview">Statistics</a>
+    <a href="#gv-related">Related Resources</a>
+  </nav>
+
+  <!-- ====================================================================
+       1. Tools & Workspaces
+       ==================================================================== -->
+  <section id="gv-tools" aria-labelledby="gv-tools-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Workspaces &amp; tools</span>
+        <h2 id="gv-tools-title">Interactive variation tools</h2>
+      </div>
+      <p>Analyze maize variants across shared builds, build targeted VCFs, and explore functional consequences.</p>
+    </div>
+
+    <article class="gv-featured" aria-labelledby="gv-snptools-title">
+      <div class="gv-featured-copy">
+        <span class="mgdb-pill mgdb-pill-ok">Featured workspace</span>
+        <h3 id="gv-snptools-title">SNPTools</h3>
+        <p class="gv-featured-lead">One unified workspace for maize SNP discovery, allele exploration, and functional interpretation. Search variants, inspect evidence, compare accessions, and pass selections directly between downstream tools.</p>
+        <ul class="gv-feature-list">
+          <li><strong>Build a targeted view</strong><span>Select a B73 v5 genomic interval or gene model, then choose accessions from any supported dataset.</span></li>
+          <li><strong>Inspect the evidence</strong><span>Explore alleles, predicted variant effects, and DNA/protein language-model scores in one interactive interface.</span></li>
+          <li><strong>Connected analysis</strong><span>Download a focused VCF or transfer selections directly to impact, function, structure, and phylogenetic workflows.</span></li>
+        </ul>
+        <div class="gv-featured-actions">
+          <a class="mgdb-button mgdb-button-primary" href="https\://snptools.maizegdb.org/" target="_blank" rel="noopener">Open SNPTools <span aria-hidden="true">&nearr;</span></a>
+          <a class="mgdb-button mgdb-button-secondary" href="https\://snptools.maizegdb.org/#help" target="_blank" rel="noopener">Help &amp; FAQ <span aria-hidden="true">&nearr;</span></a>
+          <a class="mgdb-button mgdb-button-quiet" href="/ai">AI Resources</a>
+        </div>
+      </div>
+      <div class="gv-workflow" aria-label="SNPTools session workflow">
+        <div class="gv-workflow-heading"><span>Connected workflow</span><strong>Start with a region. Continue with evidence.</strong></div>
+        <ol>
+          <li><span aria-hidden="true">01</span><div><strong>Choose</strong><small>Dataset, interval, gene, and accessions</small></div></li>
+          <li><span aria-hidden="true">02</span><div><strong>Explore</strong><small>Variants, alleles, effects, and model scores</small></div></li>
+          <li><span aria-hidden="true">03</span><div><strong>Compare</strong><small>Accessions, functional evidence, and relationships</small></div></li>
+          <li><span aria-hidden="true">04</span><div><strong>Export</strong><small>Download a focused VCF or continue in another tool</small></div></li>
+        </ol>
+        <div class="gv-suite-list" aria-label="Applications in the SNPTools suite">
+          <span>SNPVersity</span><span>SNPImpact</span><span>SNPFunction</span><span>SNPFold</span><span>SNPCompare</span><span>SNPTrait</span><span>SNPTree</span><span>PanEffect</span>
+        </div>
+      </div>
+    </article>
+
+    <div class="mgdb-card-grid gv-tool-grid">
+      <article class="mgdb-card gv-tool-card">
+        <span class="mgdb-pill mgdb-pill-info">VCF builder</span>
+        <h3>SNPVersity 2</h3>
+        <p>Create a custom VCF for any region of B73 v5 across thousands of diverse maize accessions, then view the result as a genotype table, a phylogenetic tree, or an identity-by-state matrix.</p>
+        <dl class="gv-tool-facts">
+          <div><dt>Release</dt><dd>$(snpv-release), $(snpv-release-date)</dd></div>
+          <div><dt>Datasets</dt><dd>$(b73-dataset-count) builds on B73 v5</dd></div>
+        </dl>
+        <a class="gv-card-cta" href="https\://wgs.maizegdb.org/" target="_blank" rel="noopener">Open SNPVersity 2 <span aria-hidden="true">&nearr;</span></a>
+      </article>
+
+      <article class="mgdb-card gv-tool-card">
+        <span class="mgdb-pill mgdb-pill-warn">Germplasm similarity</span>
+        <h3>TYPSimSelector</h3>
+        <p>Sort lines from the Ames Diversity Panel &mdash; representing wide genetic diversity in maize &mdash; by identity-by-state similarity against any chosen reference accession.</p>
+        <dl class="gv-tool-facts">
+          <div><dt>Scores</dt><dd>Identity by state \(PLINK\)</dd></div>
+          <div><dt>Data</dt><dd>Genotyping-by-sequencing SNPs</dd></div>
+        </dl>
+        <a class="gv-card-cta" href="/TYPSimSelector">Open TYPSimSelector <span aria-hidden="true">&rarr;</span></a>
+      </article>
+
+      <article class="mgdb-card gv-tool-card">
+        <span class="mgdb-pill mgdb-pill-info">Variant effects</span>
+        <h3>PanEffect</h3>
+        <p>Visualize predicted effects for every possible missense substitution across B73 proteins, and examine natural variation across the maize pan-genome against that landscape.</p>
+        <dl class="gv-tool-facts">
+          <div><dt>Scope</dt><dd>B73 v5 proteome</dd></div>
+          <div><dt>Integrated</dt><dd>Available inside SNPTools</dd></div>
+        </dl>
+        <a class="gv-card-cta" href="/effect/maize_v2/">Open PanEffect <span aria-hidden="true">&rarr;</span></a>
+      </article>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       2. Variant Datasets
+       ==================================================================== -->
+  <section id="gv-datasets" aria-labelledby="gv-datasets-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Curated builds</span>
+        <h2 id="gv-datasets-title">Variant datasets</h2>
+      </div>
+      <p>Every build below is selectable in SNPVersity 2 and SNPTools. <strong>High Quality</strong> builds apply linkage-disequilibrium \(LD\) filtering on top of <strong>High Coverage</strong> datasets for reduced redundancy.</p>
+    </div>
+
+    <div class="gv-table-controls">
+      <div class="mgdb-field gv-filter-field">
+        <label class="mgdb-label" for="gv-dataset-query">Filter datasets</label>
+        <input class="mgdb-input" id="gv-dataset-query" type="search" autocomplete="off" placeholder="B73 v5, imputation, NAM, Panzea..." />
+      </div>
+      <div class="mgdb-filters" role="group" aria-label="Filter datasets by property">
+        <button class="mgdb-chip" type="button" data-filter="all" aria-pressed="true">All</button>
+        <button class="mgdb-chip" type="button" data-filter="maizegdb" aria-pressed="false">MaizeGDB builds</button>
+        <button class="mgdb-chip" type="button" data-filter="indels" aria-pressed="false">With indels</button>
+        <button class="mgdb-chip" type="button" data-filter="imputed" aria-pressed="false">Imputed</button>
+        <button class="mgdb-button mgdb-button-quiet gv-reset" type="button" id="gv-dataset-reset" hidden>Reset</button>
+      </div>
+      <p class="mgdb-result-count" id="gv-dataset-count" aria-live="polite"></p>
+    </div>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table gv-dataset-table" data-sortable>
+        <caption>
+          Variant builds available through SNPVersity 2 and SNPTools
+          <span class="mgdb-muted">Accession counts and variant-site counts are published values. Sort columns with header buttons.</span>
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col" data-sort="text"><button type="button">Dataset</button></th>
+            <th scope="col" data-sort="text"><button type="button">Reference</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Accessions</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Variant sites</button></th>
+            <th scope="col">Key filters</th>
+            <th scope="col" class="gv-flag-col">Het. sites</th>
+            <th scope="col" class="gv-flag-col">Indels</th>
+            <th scope="col" class="gv-flag-col">Imputation</th>
+            <th scope="col">Paper</th>
+            <th scope="col">Notes</th>
+          </tr>
+        </thead>
+        <tbody id="gv-dataset-rows">
+          $(dataset-rows)
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mgdb-empty" id="gv-dataset-empty" hidden>
+      <h3>No datasets match that filter</h3>
+      <p>Clear the search box or choose <strong>All</strong> to see every build again.</p>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       3. Public Resequencing Projects
+       ==================================================================== -->
+  <section id="gv-projects" aria-labelledby="gv-projects-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Sequencing source data</span>
+        <h2 id="gv-projects-title">Public resequencing projects</h2>
+      </div>
+      <p>Whole-genome resequencing projects for maize and wild relatives. Accessions link to archive records at NCBI, ENA, NGDC, or CNGB.</p>
+    </div>
+
+    <div class="gv-table-controls">
+      <div class="mgdb-field gv-filter-field">
+        <label class="mgdb-label" for="gv-project-query">Filter projects</label>
+        <input class="mgdb-input" id="gv-project-query" type="search" autocomplete="off" placeholder="PRJNA641489, NAM, landrace, European..." />
+      </div>
+      <div class="mgdb-filters" role="group" aria-label="Filter projects by archive">
+        <button class="mgdb-chip" type="button" data-filter="all" aria-pressed="true">All</button>
+        <button class="mgdb-chip" type="button" data-filter="ncbi" aria-pressed="false">NCBI / ENA</button>
+        <button class="mgdb-chip" type="button" data-filter="other" aria-pressed="false">NGDC / CNGB</button>
+        <button class="mgdb-button mgdb-button-quiet gv-reset" type="button" id="gv-project-reset" hidden>Reset</button>
+      </div>
+      <p class="mgdb-result-count" id="gv-project-count" aria-live="polite"></p>
+    </div>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table gv-project-table" data-sortable>
+        <caption>
+          Public projects behind the maize variant collections
+          <span class="mgdb-muted">Year is the year MaizeGDB records for the project.</span>
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Project accession</th>
+            <th scope="col" data-sort="text"><button type="button">Project name</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Year</button></th>
+            <th scope="col">PubMed</th>
+            <th scope="col">DOI</th>
+          </tr>
+        </thead>
+        <tbody id="gv-project-rows">
+          $(project-rows)
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mgdb-empty" id="gv-project-empty" hidden>
+      <h3>No projects match that filter</h3>
+      <p>Clear the search box or choose <strong>All</strong> to see every project again.</p>
+    </div>
+
+    <p class="mgdb-small mgdb-muted gv-archive-key">Accession prefixes&#58; <code>PRJNA</code> and <code>PRJEB</code> resolve at NCBI BioProject / ENA&#59; <code>PRJCA</code> at the National Genomics Data Center&#59; <code>CNP</code> at the China National GeneBank.</p>
+  </section>
+
+  <!-- ====================================================================
+       4. Downloads & Public Globus Endpoint
+       ==================================================================== -->
+  <section id="gv-downloads" aria-labelledby="gv-downloads-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Bulk data transfer</span>
+        <h2 id="gv-downloads-title">Downloads &amp; Public Globus Endpoint</h2>
+      </div>
+      <p>Filtered variant builds download directly. Large whole-genome datasets are available via Box and the upcoming Public Globus collection.</p>
+    </div>
+
+    <div class="gv-downloads-layout">
+      <div class="gv-globus-card">
+        <span class="mgdb-pill mgdb-pill-ok">High-Speed Transfer</span>
+        <h3>Public Globus Endpoint</h3>
+        <p>Maize variant builds are transitioning to a public Globus collection. Open to anyone with a free Globus account &mdash; no MaizeGDB login required, no individual access forms, and automatic resumed transfers for multi-hundred-gigabyte VCFs.</p>
+        <div class="gv-globus-features">
+          <div><strong>Fast</strong><span>High-throughput grid transfers</span></div>
+          <div><strong>Reliable</strong><span>Resumable interrupted downloads</span></div>
+          <div><strong>Direct</strong><span>Full VCF and score matrices</span></div>
+        </div>
+      </div>
+
+      <div class="mgdb-resource-panel gv-direct-downloads">
+        <div class="mgdb-resource-list">
+          <a href="https\://wgs.maizegdb.org/#download" target="_blank" rel="noopener">
+            <strong>SNPVersity 2 Downloads</strong>
+            <span>Filtered builds on Box with MD5 checksums.</span>
+            <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+          </a>
+          <a href="https\://iastate.app.box.com/v/maizegdb-public/folder/323422312050" target="_blank" rel="noopener">
+            <strong>Schnable 2023 Imputation</strong>
+            <span>46M high-quality SNPs across 1,515 accessions.</span>
+            <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+          </a>
+          <a href="https\://iastate.box.com/s/hle6ukv1i1ybu4dqjcqhdzxusvj7bj1a" target="_blank" rel="noopener">
+            <strong>PlantCaduceus DNA Scores</strong>
+            <span>Genomic sequence language-model fitness scores.</span>
+            <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+          </a>
+          <a href="https\://iastate.box.com/s/qyrg2q005xaoek4yz3wxot6dtusye10b" target="_blank" rel="noopener">
+            <strong>ESM Protein Scores</strong>
+            <span>Alternate amino acid log-likelihood ratios \(ESM family\).</span>
+            <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+          </a>
+          <a href="https\://www.panzea.org/genotypes" target="_blank" rel="noopener">
+            <strong>Panzea Genotypes &amp; GBS</strong>
+            <span>HapMap1-3 and GBS v2.7 in AGPv2-v4 coordinates.</span>
+            <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+          </a>
+          <a href="https\://download.maizegdb.org/SNPs_and_Maps/Traits" target="_blank" rel="noopener">
+            <strong>IBM &amp; NAM Trait Values</strong>
+            <span>Raw text trait measurements for mapping populations.</span>
+            <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mgdb-note mgdb-note-info gv-note">
+      <p><strong>Transfer advisory&#58;</strong> Verify local disk storage before downloading large multi-gigabyte VCFs, use a wired connection with download managers that support resume, and always verify published checksums upon completion.</p>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       5. Types of Variation Data
+       ==================================================================== -->
+  <section id="gv-types" aria-labelledby="gv-types-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Data scope</span>
+        <h2 id="gv-types-title">Types of variation data at MaizeGDB</h2>
+      </div>
+      <p>Overview of the diversity of sequence, phenotypic, and structural variation cataloged across MaizeGDB.</p>
+    </div>
+
+    <div class="gv-types-grid">
+      <article class="gv-type-card">
+        <h3>Sequence variation</h3>
+        <ul class="mgdb-list">
+          <li>Single nucleotide polymorphisms \(SNPs\) &amp; indels</li>
+          <li>Copy number variations \(CNVs\)</li>
+          <li>Presence/absence variations \(PAVs\)</li>
+          <li>Complex alleles &amp; alternative loci</li>
+          <li>Unmapped sequence contigs</li>
+          <li>Inversion breakpoints</li>
+        </ul>
+        <p class="gv-type-where">In <a href="https\://snptools.maizegdb.org/" target="_blank" rel="noopener">SNPTools</a>, <a href="https\://wgs.maizegdb.org/" target="_blank" rel="noopener">SNPVersity 2</a>, and <a href="/data_center/variation">Alleles &amp; Polymorphisms</a>.</p>
+      </article>
+
+      <article class="gv-type-card">
+        <h3>Phenotype and germplasm</h3>
+        <ul class="mgdb-list">
+          <li>Curated mutant phenotypes &amp; descriptions</li>
+          <li>Germplasm accessions with GRIN passport data</li>
+          <li>IBM &amp; NAM population trait measurements</li>
+          <li>Genetic linkage maps &amp; marker positions</li>
+        </ul>
+        <p class="gv-type-where">In the <a href="/data_center/phenotype">Phenotype</a>, <a href="/data_center/stock">Stock</a>, and <a href="/data_center/map">Map</a> data centers.</p>
+      </article>
+
+      <article class="gv-type-card">
+        <h3>Sequence and expression</h3>
+        <ul class="mgdb-list">
+          <li>Transcript assembly &amp; exome alignments</li>
+          <li>GenBank exome and full-length cDNA sequences</li>
+          <li>Tissue expression across developmental stages</li>
+        </ul>
+        <p class="gv-type-where">Through <a href="/gene_center/gene">Gene</a> records and the <a href="/expression">Expression Atlas</a>.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       6. Corpus Summary / Statistics \(second to last item\)
+       ==================================================================== -->
+  <section id="gv-overview" aria-labelledby="gv-overview-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Corpus summary</span>
+        <h2 id="gv-overview-title">Genetic variation in numbers</h2>
+      </div>
+      <p>Key metrics across curated whole-genome sequencing builds and resequencing collections.</p>
+    </div>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Variant sites</h3>
+          <span class="mgdb-metric-badge">Largest build</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value mgdb-metric-value-compact">$(max-variants)</strong>
+        </div>
+        <p class="mgdb-metric-description">In MaizeGDB 2026 \(High Coverage\). High-quality LD-filtered build retains $(hq-variants) sites.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Accessions genotyped</h3>
+          <span class="mgdb-metric-badge">2026 Collection</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value mgdb-metric-value-compact">$(max-accessions)</strong>
+        </div>
+        <p class="mgdb-metric-description">Diverse maize lines genotyped, up from $(prev-accessions) in 2024. Selectable individually in VCF builders.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Variant builds</h3>
+          <span class="mgdb-metric-badge">Selectable</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value mgdb-metric-value-compact">$(dataset-count)</strong>
+        </div>
+        <p class="mgdb-metric-description">$(b73-dataset-count) called against B73 v5, plus historical GBS v2.7 in AGPv2-v4 coordinates.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Public projects</h3>
+          <span class="mgdb-metric-badge">Resequencing</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value mgdb-metric-value-compact">$(project-count)</strong>
+        </div>
+        <p class="mgdb-metric-description">Resequencing projects at NCBI, ENA, NGDC, and CNGB whose reads underpin these calls.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       7. Connected Resources & Contributor Submission \(final item, light green\)
+       ==================================================================== -->
+  <section id="gv-related" class="gv-bottom-section" aria-labelledby="gv-related-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Connected resources</span>
+        <h2 id="gv-related-title">Related data centers &amp; submissions</h2>
+      </div>
+      <p>Connect variants to biological functions, alleles, gene models, 3D structures, and submit new community datasets.</p>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/variation">
+          <strong>Alleles &amp; Polymorphisms</strong>
+          <span>Curated variation records, alleles, and linked genetic loci</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/gene_center/gene">
+          <strong>Genes &amp; Gene Models</strong>
+          <span>Gene annotations, functional descriptions, and expression</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/uniformmu">
+          <strong>UniformMu &amp; Insertions</strong>
+          <span>Sequence-indexed transposon insertions and mutant stocks</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/protein_structure">
+          <strong>Protein Structures</strong>
+          <span>Predicted 3D structures to assess missense variant impacts</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/genome">
+          <strong>Genomes Data Center</strong>
+          <span>B73 v5, NAM founder lines, and pan-genome assemblies</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/stock">
+          <strong>Stocks Data Center</strong>
+          <span>Order seeds for diverse genotyped accessions via Stock Center and GRIN</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="gv-contribute-banner">
+      <div>
+        <span class="mgdb-eyebrow">Community Data</span>
+        <h3>Submitting variation datasets</h3>
+        <p>MaizeGDB welcomes SNP, indel, and trait datasets from the maize community. If you have new resequencing data to deposit or a published project to index, reach out to our curation team.</p>
+      </div>
+      <div class="gv-contribute-actions">
+        <a class="mgdb-button mgdb-button-primary" href="/contact">Contact Curation Team</a>
+        <a class="mgdb-button mgdb-button-secondary" href="/nomenclature">Naming Conventions</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+)
