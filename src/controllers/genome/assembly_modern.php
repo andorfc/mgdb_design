@@ -17,7 +17,7 @@ header("Cache-Control: no-cache, no-store, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-$bauplan = new Bauplan('MaizeGDB Reference Assembly Information | B73 Reference Genomes, Versions & Annotations');
+$bauplan = new Bauplan('B73 Maize Genome Assembly | Versions, Annotations & Downloads');
 $bauplan->modern();
 
 $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';
