@@ -31,7 +31,7 @@ function expressionSummaryStats($DBConn) {
         'total_assemblies'     => 29, // 26 NAM founder lines + B73v5 + B73v4 + B73v3
         'nam_lines'            => 26, // 26 NAM pan-genome founder inbreds
         'distinct_tissues'     => 60, // 60 developmental tissues in Sekhon et al. & qTeller atlases
-        'interactive_tools'    => 5   // qTeller, eFP Browser, JBrowse RNA-seq, MaizeMine, NCBI GEO/SRA
+        'interactive_tools'    => 6   // FETA, qTeller, eFP Browser, JBrowse RNA-seq, MaizeMine, NCBI GEO/SRA
     );
 }
 

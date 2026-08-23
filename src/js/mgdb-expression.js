@@ -221,6 +221,7 @@
       if (r.efp_url && r.gene_name.indexOf('GRMZM') !== -1) {
         html += '<a class="expression-tool-btn" style="background:#fce7f3; color:#9d174d; border-color:#fbcfe8;" href="' + escapeHtml(r.efp_url) + '" target="_blank" rel="noopener">eFP Browser</a>';
       }
+      html += '<a class="expression-tool-btn expression-tool-btn-feta" href="https://feta.maizegdb.org/" target="_blank" rel="noopener">FETA</a>';
       html += '</div></td>';
 
       html += '</tr>';
