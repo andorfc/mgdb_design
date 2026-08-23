@@ -48,9 +48,11 @@ $page_data = dashboardCache($system, 'genomebrowser/page', function () use ($DBC
     $assembly_options = '';
     $instance_rows = '';
     $total_browsers = 0;
+    $jbrowse2_count = 0;
+    $jbrowse1_count = 0;
+    $gbrowse_count = 0;
     $nam_count = 0;
     $panand_count = 0;
-    $gbrowse_count = 0;
 
     if ($DBConn) {
         // Assembly select options
@@ -88,15 +90,22 @@ $page_data = dashboardCache($system, 'genomebrowser/page', function () use ($DBC
                 $proj = htmlspecialchars(isset($b['project']) && $b['project'] ? $b['project'] : '—');
                 $url = htmlspecialchars($b['browser']);
 
-                $type_badge = 'JBrowse 1';
-                $badge_class = 'badge-jbrowse';
-                if (strpos($url, 'jbrowse2') !== false) {
-                    $type_badge = 'JBrowse 2';
-                    $badge_class = 'badge-jbrowse2';
-                } elseif (strpos($url, 'gbrowse') !== false) {
-                    $type_badge = 'GBrowse';
-                    $badge_class = 'badge-gbrowse';
+                $is_gbrowse = (strpos($url, 'gbrowse') !== false);
+
+                if ($is_gbrowse) {
                     $gbrowse_count++;
+                    $platform_html = '<span class="browser-pill badge-gbrowse">GBrowse</span>';
+                    $data_types = 'gbrowse';
+                    $launch_html = '<a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="' . $url . '" target="_blank" rel="noopener">GBrowse &#8599;</a>';
+                } else {
+                    $jbrowse2_count++;
+                    $jbrowse1_count++;
+                    $platform_html = '<span class="browser-pill badge-jbrowse2">JBrowse 2</span> <span class="browser-pill badge-jbrowse">JBrowse 1</span>';
+                    $data_types = 'jbrowse 2 jbrowse 1 jbrowse';
+                    $launch_html = '<div class="instance-launch-btns">'
+                                 . '<a class="mgdb-button mgdb-button-sm mgdb-button-primary" href="https://jbrowse2.maizegdb.org" target="_blank" rel="noopener">JBrowse 2 &#8599;</a>'
+                                 . '<a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="' . $url . '" target="_blank" rel="noopener">JBrowse 1 &#8599;</a>'
+                                 . '</div>';
                 }
 
                 if (strpos($asm, 'NAM') !== false) {
@@ -106,12 +115,12 @@ $page_data = dashboardCache($system, 'genomebrowser/page', function () use ($DBC
                     $panand_count++;
                 }
 
-                $instance_rows .= '<tr data-type="' . strtolower($type_badge) . '">';
+                $instance_rows .= '<tr data-type="' . $data_types . '">';
                 $instance_rows .= '  <td><strong>' . $asm . '</strong></td>';
                 $instance_rows .= '  <td>' . $stock . '</td>';
-                $instance_rows .= '  <td><span class="browser-pill ' . $badge_class . '">' . $type_badge . '</span></td>';
+                $instance_rows .= '  <td><div class="platform-pills-wrap">' . $platform_html . '</div></td>';
                 $instance_rows .= '  <td><small class="instance-proj-text">' . $proj . '</small></td>';
-                $instance_rows .= '  <td><a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="' . $url . '" target="_blank" rel="noopener">Open Browser &#8599;</a></td>';
+                $instance_rows .= '  <td>' . $launch_html . '</td>';
                 $instance_rows .= '</tr>';
             }
         }
@@ -120,7 +129,10 @@ $page_data = dashboardCache($system, 'genomebrowser/page', function () use ($DBC
     return array(
         'assembly_options' => $assembly_options,
         'instance_rows'    => $instance_rows,
-        'total_browsers'   => $total_browsers > 0 ? $total_browsers : 66,
+        'total_browsers'   => $total_browsers > 0 ? $total_browsers : 59,
+        'jbrowse2_count'   => $jbrowse2_count > 0 ? $jbrowse2_count : 48,
+        'jbrowse1_count'   => $jbrowse1_count > 0 ? $jbrowse1_count : 48,
+        'gbrowse_count'    => $gbrowse_count > 0 ? $gbrowse_count : 11,
         'nam_count'        => $nam_count > 0 ? $nam_count : 26,
         'panand_count'     => $panand_count > 0 ? $panand_count : 15,
         'data_date'        => date('F j, Y')
@@ -134,6 +146,9 @@ $content->get('assembly_options4')->replace($page_data['assembly_options']);
 $content->get('instance_rows')->replace($page_data['instance_rows']);
 
 $content->get('total_browsers')->replace(number_format($page_data['total_browsers']));
+$content->get('jbrowse2_count')->replace(number_format($page_data['jbrowse2_count']));
+$content->get('jbrowse1_count')->replace(number_format($page_data['jbrowse1_count']));
+$content->get('gbrowse_count')->replace(number_format($page_data['gbrowse_count']));
 $content->get('nam_count')->replace(number_format($page_data['nam_count']));
 $content->get('panand_count')->replace(number_format($page_data['panand_count']));
 $content->get('data_date')->replace($page_data['data_date']);

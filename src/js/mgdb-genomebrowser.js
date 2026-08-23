@@ -69,7 +69,7 @@
       var q = searchQuery.toLowerCase().trim();
 
       rows.forEach(function (row) {
-        var rowType = row.getAttribute('data-type') || '';
+        var rowType = (row.getAttribute('data-type') || '').toLowerCase();
         var text = row.textContent.toLowerCase();
 
         var matchesPlatform = (activePlatform === 'all' || rowType.indexOf(activePlatform) !== -1);

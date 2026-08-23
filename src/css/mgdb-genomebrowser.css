@@ -210,23 +210,36 @@
   flex: 1;
 }
 
-/* Case Studies */
+/* --------------------------------------------------------------------------
+   Case Studies
+   -------------------------------------------------------------------------- */
+
 .mgdb-genomebrowser-page .jbrowse2-case-studies {
   margin-top: var(--mgdb-space-5);
   padding-top: var(--mgdb-space-4);
   border-top: 1px solid var(--mgdb-line);
 }
 
-.mgdb-genomebrowser-page .jbrowse2-case-studies h3 {
+.mgdb-genomebrowser-page .case-studies-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mgdb-space-3);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-genomebrowser-page .case-studies-header h3 {
   font-size: 1.15rem;
   font-weight: 700;
-  margin: 0 0 var(--mgdb-space-1) 0;
+  margin: 0 0 2px 0;
+  color: var(--mgdb-ink);
 }
 
 .mgdb-genomebrowser-page .case-studies-lead {
   font-size: var(--mgdb-text-sm);
   color: var(--mgdb-muted);
-  margin-bottom: var(--mgdb-space-4);
+  margin: 0;
 }
 
 .mgdb-genomebrowser-page .case-studies-grid {
@@ -236,16 +249,13 @@
 }
 
 .mgdb-genomebrowser-page .case-study-card {
-  position: relative;
   background: var(--mgdb-surface);
   border: 1px solid var(--mgdb-line);
   border-radius: var(--mgdb-radius);
   overflow: hidden;
-  text-decoration: none;
-  color: inherit;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   transition: transform .12s, box-shadow .12s, border-color .12s;
 }
 
@@ -255,40 +265,71 @@
 }
 
 .mgdb-genomebrowser-page .case-study-badge {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  background: rgba(15, 23, 42, 0.85);
-  color: #ffffff;
-  font-size: 10px;
+  display: inline-block;
+  padding: 3px 10px;
+  background: #dbeafe;
+  color: #1e40af;
+  border-bottom: 1px solid #bfdbfe;
+  font-size: 11px;
   font-weight: 800;
-  padding: 2px 8px;
-  border-radius: 9999px;
-  z-index: 2;
 }
 
-.mgdb-genomebrowser-page .case-study-card img {
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
+.mgdb-genomebrowser-page .case-badge-amber {
+  background: #fef3c7;
+  color: #92400e;
+  border-bottom-color: #fde68a;
+}
+
+.mgdb-genomebrowser-page .case-badge-purple {
+  background: #f3e8ff;
+  color: #6b21a8;
+  border-bottom-color: #e9d5ff;
+}
+
+.mgdb-genomebrowser-page .case-badge-blue {
+  background: #e0f2fe;
+  color: #0369a1;
+  border-bottom-color: #bae6fd;
+}
+
+.mgdb-genomebrowser-page .case-study-img-wrap {
+  height: 150px;
+  background: #f8fafc;
   border-bottom: 1px solid var(--mgdb-line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 6px;
 }
 
-.mgdb-genomebrowser-page .case-study-label {
-  padding: var(--mgdb-space-3);
+.mgdb-genomebrowser-page .case-study-img-wrap img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.mgdb-genomebrowser-page .case-study-content {
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  flex: 1;
 }
 
-.mgdb-genomebrowser-page .case-study-label strong {
+.mgdb-genomebrowser-page .case-study-title {
   font-size: var(--mgdb-text-sm);
+  font-weight: 700;
   color: var(--mgdb-ink);
+  margin: 0 0 var(--mgdb-space-1) 0;
+  line-height: 1.3;
 }
 
-.mgdb-genomebrowser-page .case-study-label span {
+.mgdb-genomebrowser-page .case-study-desc {
   font-size: var(--mgdb-text-xs);
-  color: var(--mgdb-muted);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.4;
+  margin-bottom: var(--mgdb-space-3);
+  flex: 1;
 }
 
 /* --------------------------------------------------------------------------
@@ -590,6 +631,12 @@
   font-size: 10px;
 }
 
+.mgdb-genomebrowser-page .platform-pills-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
 .mgdb-genomebrowser-page .browser-pill {
   display: inline-block;
   padding: 2px 8px;
@@ -602,6 +649,12 @@
 .mgdb-genomebrowser-page .badge-jbrowse2 { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
 .mgdb-genomebrowser-page .badge-jbrowse { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
 .mgdb-genomebrowser-page .badge-gbrowse { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+
+.mgdb-genomebrowser-page .instance-launch-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
 
 .mgdb-genomebrowser-page .instance-proj-text {
   color: var(--mgdb-muted);

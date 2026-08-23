@@ -94,35 +94,68 @@ $$SYNTAX-LEVEL 2
       </article>
     </div>
 
-    <!-- FEATURED STRUCTURAL VARIATION SESSIONS -->
+    <!-- FEATURED STRUCTURAL VARIATION CASE STUDIES -->
     <div class="jbrowse2-case-studies">
-      <h3>Featured Structural Variation Case Studies</h3>
-      <p class="case-studies-lead">Click any card to open a pre-configured JBrowse 2 interactive session highlighting structural chromosome changes&#58;</p>
+      <div class="case-studies-header">
+        <div>
+          <h3>Featured Structural Variation &amp; Synteny Case Studies</h3>
+          <p class="case-studies-lead">Explore pre-configured interactive sessions and comparative workflows in JBrowse 2&#58;</p>
+        </div>
+        <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="/genome/jbrowse2_tutorial">View Full JBrowse 2 Tutorial &#8594;</a>
+      </div>
 
       <div class="case-studies-grid">
-        <a class="case-study-card" href="https://jbrowse2.maizegdb.org/?session=share-1Y3gVw9V1s&amp;password=Vf9y1" target="_blank" rel="noopener">
-          <div class="case-study-badge">Inversion</div>
-          <img src="/images/jbrowse2_tutorial/inversion.png" alt="Inversion detection session" loading="lazy" />
-          <div class="case-study-label"><strong>Pericentric Inversion Detection</strong><span>Click to explore syntenic inversion breakpoints</span></div>
-        </a>
+        <!-- 1: Linear Synteny -->
+        <article class="case-study-card">
+          <div class="case-study-badge">Synteny Ribbons</div>
+          <div class="case-study-img-wrap">
+            <img src="/images/jbrowse2_tutorial/synteny.png" alt="Linear Synteny View between assemblies" loading="lazy" />
+          </div>
+          <div class="case-study-content">
+            <h4 class="case-study-title">Linear Synteny &amp; Gene Collinearity</h4>
+            <p class="case-study-desc">Multi-assembly comparative view displaying connecting syntenic ribbons and collinear gene arrangements.</p>
+            <a class="mgdb-button mgdb-button-sm mgdb-button-primary" href="https://jbrowse2.maizegdb.org" target="_blank" rel="noopener">Open JBrowse 2 Synteny &#8599;</a>
+          </div>
+        </article>
 
-        <a class="case-study-card" href="https://jbrowse2.maizegdb.org/?session=share-SDwKQqw7gW&amp;password=y3owa" target="_blank" rel="noopener">
-          <div class="case-study-badge">Translocation</div>
-          <img src="/images/jbrowse2_tutorial/translocation.png" alt="Translocation session" loading="lazy" />
-          <div class="case-study-label"><strong>Inter-chromosomal Translocation</strong><span>Click to explore reciprocal translocation ribbons</span></div>
-        </a>
+        <!-- 2: Stop Loss -->
+        <article class="case-study-card">
+          <div class="case-study-badge case-badge-amber">Stop-Loss Codon</div>
+          <div class="case-study-img-wrap">
+            <img src="/images/jbrowse2_tutorial/stop_loss.png" alt="Stop loss codon in CML277, CML333, and Tzi8" loading="lazy" />
+          </div>
+          <div class="case-study-content">
+            <h4 class="case-study-title">Stop-Loss Codon in CML277 &amp; Tzi8</h4>
+            <p class="case-study-desc">Interactive session highlighting a stop-loss codon mutation missing in CML277, CML333, and Tzi8.</p>
+            <a class="mgdb-button mgdb-button-sm mgdb-button-primary" href="https://jbrowse2.maizegdb.org/?session=share-SDwKQqw7gW&amp;password=y3owa" target="_blank" rel="noopener">Launch Shared Session &#8599;</a>
+          </div>
+        </article>
 
-        <a class="case-study-card" href="https://jbrowse2.maizegdb.org/?session=share-SDwKQqw7gW&amp;password=y3owa" target="_blank" rel="noopener">
-          <div class="case-study-badge">Stop Loss</div>
-          <img src="/images/jbrowse2_tutorial/stop_loss.png" alt="Stop loss mutation session" loading="lazy" />
-          <div class="case-study-label"><strong>Stop-Loss Variant Analysis</strong><span>Examine coding sequence elongation across inbreds</span></div>
-        </a>
+        <!-- 3: Truncated Gene Model -->
+        <article class="case-study-card">
+          <div class="case-study-badge case-badge-purple">Truncated Model</div>
+          <div class="case-study-img-wrap">
+            <img src="/images/jbrowse2_tutorial/truncated.png" alt="Truncated gene model session" loading="lazy" />
+          </div>
+          <div class="case-study-content">
+            <h4 class="case-study-title">Truncated Gene Model Structure</h4>
+            <p class="case-study-desc">Interactive session analyzing premature stop codon formation and structural transcript truncation.</p>
+            <a class="mgdb-button mgdb-button-sm mgdb-button-primary" href="https://jbrowse2.maizegdb.org/?session=share-H-Nj0TUsQw&amp;password=G6T7q" target="_blank" rel="noopener">Launch Shared Session &#8599;</a>
+          </div>
+        </article>
 
-        <a class="case-study-card" href="https://jbrowse2.maizegdb.org/?session=share-H-Nj0TUsQw&amp;password=G6T7q" target="_blank" rel="noopener">
-          <div class="case-study-badge">Truncation</div>
-          <img src="/images/jbrowse2_tutorial/truncated.png" alt="Truncated gene model session" loading="lazy" />
-          <div class="case-study-label"><strong>Truncated Gene Model</strong><span>Analyze premature stop codon and transcript shifts</span></div>
-        </a>
+        <!-- 4: Dotplot -->
+        <article class="case-study-card">
+          <div class="case-study-badge case-badge-blue">Dotplot Matrix</div>
+          <div class="case-study-img-wrap">
+            <img src="/images/jbrowse2_tutorial/dotplot.png" alt="Whole-genome comparative dotplot" loading="lazy" />
+          </div>
+          <div class="case-study-content">
+            <h4 class="case-study-title">Whole-Genome Synteny Dotplot</h4>
+            <p class="case-study-desc">2D matrix visualization revealing whole-chromosome inversions, translocations, and segmental duplications.</p>
+            <a class="mgdb-button mgdb-button-sm mgdb-button-primary" href="/genome/jbrowse2_tutorial#dotplot">Explore Dotplot Guide &#8594;</a>
+          </div>
+        </article>
       </div>
     </div>
   </section>
@@ -394,9 +427,9 @@ $$SYNTAX-LEVEL 2
 
     <div class="directory-filter-chips" role="tablist" aria-label="Filter by browser platform">
       <button type="button" class="dir-filter-chip is-active" data-filter="all">All Platforms <span class="chip-count">$(total_browsers)</span></button>
-      <button type="button" class="dir-filter-chip" data-filter="jbrowse 2">JBrowse 2</button>
-      <button type="button" class="dir-filter-chip" data-filter="jbrowse 1">JBrowse 1</button>
-      <button type="button" class="dir-filter-chip" data-filter="gbrowse">GBrowse</button>
+      <button type="button" class="dir-filter-chip" data-filter="jbrowse 2">JBrowse 2 <span class="chip-count">$(jbrowse2_count)</span></button>
+      <button type="button" class="dir-filter-chip" data-filter="jbrowse 1">JBrowse 1 <span class="chip-count">$(jbrowse1_count)</span></button>
+      <button type="button" class="dir-filter-chip" data-filter="gbrowse">GBrowse <span class="chip-count">$(gbrowse_count)</span></button>
     </div>
 
     <div class="mgdb-table-wrapper">
