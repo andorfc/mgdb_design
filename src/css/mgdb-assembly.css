@@ -1,0 +1,518 @@
+/* file: mgdb-assembly.css
+ *
+ * Page-specific styles for the Reference Assembly Data Center (/assembly & /data_center/assembly).
+ * Scoped under .mgdb-assembly-page.
+ */
+
+/* --------------------------------------------------------------------------
+   Hero Emblem
+   -------------------------------------------------------------------------- */
+
+.mgdb-assembly-page .mgdb-hero-emblem {
+  background: #ffffff !important;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-assembly-page .mgdb-hero-emblem svg {
+  width: min(100%, 64px);
+  height: auto;
+  mix-blend-mode: normal;
+}
+
+/* --------------------------------------------------------------------------
+   Sticky Section Tabs
+   -------------------------------------------------------------------------- */
+
+.mgdb-assembly-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-5);
+  padding: var(--mgdb-space-2) 0;
+  background: var(--mgdb-surface);
+  border-bottom: 1px solid var(--mgdb-line);
+}
+
+.mgdb-assembly-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-decoration: none;
+  transition: background .12s, border-color .12s;
+}
+
+.mgdb-assembly-page .mgdb-section-tabs a:hover {
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-assembly-page .mgdb-section-tabs a.is-current,
+.mgdb-assembly-page .mgdb-section-tabs a[aria-current="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+.mgdb-assembly-page > section,
+.mgdb-assembly-page section[id] {
+  scroll-margin-top: 4.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   Quick Downloads Banner
+   -------------------------------------------------------------------------- */
+
+.mgdb-assembly-page .assembly-quick-downloads {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mgdb-space-3);
+  padding: var(--mgdb-space-4);
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--mgdb-radius);
+  margin-bottom: var(--mgdb-space-5);
+}
+
+.mgdb-assembly-page .assembly-quick-title {
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  color: #166534;
+}
+
+.mgdb-assembly-page .assembly-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+/* --------------------------------------------------------------------------
+   Tables
+   -------------------------------------------------------------------------- */
+
+.mgdb-assembly-page .assembly-row-current {
+  background: #f0fdf4 !important;
+}
+
+.mgdb-assembly-page .assembly-row-current td {
+  border-bottom-color: #bbf7d0;
+}
+
+.mgdb-assembly-page .assembly-name-link {
+  color: var(--mgdb-green-dark);
+  text-decoration: none;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-assembly-page .assembly-name-link:hover {
+  text-decoration: underline;
+}
+
+.mgdb-assembly-page .assembly-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1);
+}
+
+/* --------------------------------------------------------------------------
+   Assembly Details Cards Grid
+   -------------------------------------------------------------------------- */
+
+.mgdb-assembly-page .assembly-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-assembly-page .assembly-detail-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-4);
+  display: flex;
+  flex-direction: column;
+}
+
+.mgdb-assembly-page .assembly-detail-card.is-current-card {
+  border-color: #86efac;
+  box-shadow: 0 4px 12px rgba(22, 101, 52, 0.08);
+}
+
+.mgdb-assembly-page .assembly-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--mgdb-space-2);
+  margin-bottom: var(--mgdb-space-3);
+}
+
+.mgdb-assembly-page .assembly-detail-title {
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  margin: 0;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-assembly-page .assembly-detail-sub {
+  display: block;
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  margin-top: 2px;
+}
+
+.mgdb-assembly-page .assembly-detail-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--mgdb-space-2);
+  background: var(--mgdb-surface-alt);
+  padding: var(--mgdb-space-3);
+  border-radius: var(--mgdb-radius-sm);
+  margin-bottom: var(--mgdb-space-3);
+}
+
+.mgdb-assembly-page .assembly-metric-item strong {
+  display: block;
+  font-size: var(--mgdb-text-base);
+  color: var(--mgdb-ink);
+}
+
+.mgdb-assembly-page .assembly-metric-item span {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+}
+
+.mgdb-assembly-page .assembly-detail-desc {
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.5;
+  margin: 0 0 var(--mgdb-space-4) 0;
+  flex: 1;
+}
+
+.mgdb-assembly-page .assembly-detail-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+/* --------------------------------------------------------------------------
+   Notice Box
+   -------------------------------------------------------------------------- */
+
+.mgdb-assembly-page .assembly-notice-box {
+  padding: var(--mgdb-space-4);
+  background: #fefce8;
+  border: 1px solid #fef08a;
+  border-radius: var(--mgdb-radius);
+  margin-bottom: var(--mgdb-space-4);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-assembly-page .assembly-notice-box strong {
+  color: #854d0e;
+  display: block;
+  margin-bottom: var(--mgdb-space-1);
+}
+
+.mgdb-assembly-page .assembly-notice-box p {
+  margin: 0;
+  color: var(--mgdb-ink);
+  line-height: 1.5;
+}
+
+/* --------------------------------------------------------------------------
+   Timeline
+   -------------------------------------------------------------------------- */
+
+.mgdb-assembly-page .assembly-history-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-4);
+  position: relative;
+  padding-left: var(--mgdb-space-8);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-assembly-page .assembly-history-timeline::before {
+  content: '';
+  position: absolute;
+  left: 17px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: var(--mgdb-line);
+}
+
+.mgdb-assembly-page .timeline-item {
+  position: relative;
+}
+
+.mgdb-assembly-page .timeline-badge {
+  position: absolute;
+  left: calc(-1 * var(--mgdb-space-8));
+  top: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 4px var(--mgdb-surface);
+}
+
+.mgdb-assembly-page .timeline-content {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-4);
+}
+
+.mgdb-assembly-page .timeline-content h3 {
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  margin: 0 0 var(--mgdb-space-1) 0;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-assembly-page .timeline-content p {
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-ink-soft);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* --------------------------------------------------------------------------
+   Publications List & Cards
+   -------------------------------------------------------------------------- */
+
+.mgdb-assembly-page .assembly-pubs-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+/* Reference card styles matching mgdb-cite / mgdb-reference */
+.mgdb-assembly-page .reference-result-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-4);
+  transition: border-color .12s ease;
+}
+
+.mgdb-assembly-page .reference-result-card:hover {
+  border-color: var(--mgdb-green);
+}
+
+.mgdb-assembly-page .reference-result-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-assembly-page .reference-result-meta span {
+  background: var(--mgdb-surface-alt);
+  padding: 2px 6px;
+  border-radius: var(--mgdb-radius-sm);
+}
+
+.mgdb-assembly-page .reference-result-card h3 {
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  margin: 0 0 var(--mgdb-space-1) 0;
+}
+
+.mgdb-assembly-page .reference-result-card h3 a {
+  color: var(--mgdb-green-dark);
+  text-decoration: none;
+}
+
+.mgdb-assembly-page .reference-result-card h3 a:hover {
+  text-decoration: underline;
+}
+
+.mgdb-assembly-page .reference-result-authors {
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  color: var(--mgdb-ink);
+  margin: 0 0 var(--mgdb-space-1) 0;
+}
+
+.mgdb-assembly-page .reference-result-citation {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  margin: 0 0 var(--mgdb-space-2) 0;
+}
+
+.mgdb-assembly-page .reference-result-abstract {
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.5;
+  margin: 0 0 var(--mgdb-space-3) 0;
+}
+
+.mgdb-assembly-page .reference-result-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-assembly-page .reference-result-links a,
+.mgdb-assembly-page .reference-copy-id {
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--mgdb-radius-sm);
+  border: 1px solid var(--mgdb-line);
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-green-dark);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all .12s ease;
+}
+
+.mgdb-assembly-page .reference-result-links a:hover,
+.mgdb-assembly-page .reference-copy-id:hover {
+  background: var(--mgdb-green-soft);
+  border-color: var(--mgdb-green);
+}
+
+/* --------------------------------------------------------------------------
+   FAQs Accordion
+   -------------------------------------------------------------------------- */
+
+.mgdb-assembly-page .assembly-faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-assembly-page .assembly-faq-item {
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  overflow: hidden;
+}
+
+.mgdb-assembly-page .assembly-faq-question {
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  font-weight: 700;
+  font-size: var(--mgdb-text-base);
+  color: var(--mgdb-ink);
+  cursor: pointer;
+  background: var(--mgdb-surface-alt);
+  list-style: none;
+}
+
+.mgdb-assembly-page .assembly-faq-question::-webkit-details-marker {
+  display: none;
+}
+
+.mgdb-assembly-page .assembly-faq-question::after {
+  content: '▾';
+  float: right;
+  font-size: 1.1em;
+  color: var(--mgdb-muted);
+}
+
+.mgdb-assembly-page .assembly-faq-item[open] .assembly-faq-question::after {
+  content: '▴';
+}
+
+.mgdb-assembly-page .assembly-faq-answer {
+  padding: var(--mgdb-space-4);
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.6;
+}
+
+.mgdb-assembly-page .assembly-faq-answer p {
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Stock Content
+   -------------------------------------------------------------------------- */
+
+.mgdb-assembly-page .assembly-stock-content {
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.6;
+}
+
+.mgdb-assembly-page .assembly-stock-content p {
+  margin-bottom: var(--mgdb-space-3);
+}
+
+/* --------------------------------------------------------------------------
+   Connected Resources Bottom Section
+   -------------------------------------------------------------------------- */
+
+.mgdb-assembly-page .assembly-bottom-section {
+  background: linear-gradient(180deg, var(--mgdb-surface) 0%, var(--mgdb-green-soft) 100%) !important;
+  border-color: #b8dbca !important;
+}
+
+.mgdb-assembly-page .assembly-related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-assembly-page .assembly-related-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  padding: var(--mgdb-space-3);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color .12s, box-shadow .12s;
+}
+
+.mgdb-assembly-page .assembly-related-card:hover {
+  border-color: var(--mgdb-green);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.mgdb-assembly-page .assembly-related-title {
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+  margin-bottom: 2px;
+}
+
+.mgdb-assembly-page .assembly-related-desc {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .mgdb-assembly-page .mgdb-section-tabs {
+    position: static;
+  }
+}

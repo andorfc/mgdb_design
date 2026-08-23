@@ -1,0 +1,795 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-assembly
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https://maizegdb.org/assembly">
+<meta property="og:title" content="MaizeGDB Reference Assembly Information | B73 Reference Genomes, Versions &amp; Annotations">
+<meta property="og:description" content="Explore maize B73 representative reference genome assemblies \(v1 to v5\), structural gene model annotations, change histories, GenBank chromosome accessions, and bulk downloads.">
+
+<main class="mgdb-page mgdb-assembly-page" id="assembly-top">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center">Data centers</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Assemblies</span>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="mgdb-hero" aria-labelledby="assembly-title">
+    <div class="mgdb-hero-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="Genome assembly chromosome icon">
+        <!-- Chromosome scaffold / contig puzzle motif -->
+        <rect x="18" y="16" width="26" height="28" rx="6" fill="#e8f4ec" stroke="#235c37" stroke-width="3" />
+        <rect x="52" y="16" width="26" height="28" rx="6" fill="#235c37" />
+        <rect x="18" y="52" width="26" height="28" rx="6" fill="#d99a0b" stroke="#7a4a10" stroke-width="2" />
+        <rect x="52" y="52" width="26" height="28" rx="6" fill="#e8f4ec" stroke="#235c37" stroke-width="3" />
+        <!-- Connection links -->
+        <path d="M44 30 L52 30 M31 44 L31 52 M65 44 L65 52 M44 66 L52 66" stroke="#235c37" stroke-width="3" stroke-linecap="round" />
+        <circle cx="48" cy="48" r="5" fill="#d99a0b" stroke="#ffffff" stroke-width="2" />
+      </svg>
+      <strong>Assembly<br />Center</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data_date)</p>
+      <h1 id="assembly-title">Maize Reference Genome Assemblies &amp; Annotations</h1>
+      <p class="mgdb-hero-description">Explore the maize B73 representative reference genome assemblies \(v1 through v5\), structural gene model annotations, change histories, chromosome accessions, and bulk downloads.</p>
+    </div>
+  </section>
+
+  <!-- STICKY SECTION TABS -->
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#assembly-versions" class="is-current">Assemblies &amp; Versions</a>
+    <a href="#assembly-details">Assembly Details &amp; Status</a>
+    <a href="#assembly-nomenclature">Gene Models &amp; Nomenclature</a>
+    <a href="#assembly-history">Change History</a>
+    <a href="#assembly-accessions">Chromosome Accessions</a>
+    <a href="#assembly-stocks">Stock &amp; Origin</a>
+    <a href="#assembly-downloads">Downloads</a>
+    <a href="#assembly-publications">Key Publications</a>
+    <a href="#assembly-faqs">FAQs</a>
+    <a href="#assembly-overview">Statistics</a>
+    <a href="#assembly-related">Related Resources</a>
+  </nav>
+
+  <!-- SECTION 1: ASSEMBLIES & VERSIONS -->
+  <section id="assembly-versions" class="mgdb-panel" aria-labelledby="assembly-versions-heading">
+    <div class="assembly-quick-downloads">
+      <div class="assembly-quick-title">Quick Downloads &bull; Current Representative Reference \(v5\)</div>
+      <div class="assembly-quick-actions">
+        <a class="mgdb-button mgdb-button-primary mgdb-button-sm" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0.fa.gz" target="_blank" rel="noopener">Assembly FASTA \(v5\)</a>
+        <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/" target="_blank" rel="noopener">Gene Model FASTA \(Zm00001eb.1\)</a>
+        <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.gff3.gz" target="_blank" rel="noopener">Gene Model GFF3</a>
+        <a class="mgdb-button mgdb-button-quiet mgdb-button-sm" href="https://www.ncbi.nlm.nih.gov/bioproject/PRJEB32225" target="_blank" rel="noopener">GenBank PRJEB32225 &#8599;</a>
+      </div>
+    </div>
+
+    <h2 id="assembly-versions-heading" class="mgdb-panel-title">The Maize B73 Representative Reference Genome</h2>
+    <p class="mgdb-panel-lead">The maize B73 reference genome has been revised across five generations since its initial BAC-by-BAC release in 2009. The maize nomenclature committee standards accommodate multiple <i>Zea</i> species, accessions, and versions \([<a href="https://documents.maizegdb.org/nomenclature/maize_assembly_nomenclature_2021.pdf" target="_blank" rel="noopener">Nomenclature Standards PDF</a>]\).</p>
+
+    <div class="mgdb-table-wrap">
+      <table class="mgdb-table assembly-compare-table">
+        <thead>
+          <tr>
+            <th>Assembly Name</th>
+            <th>Common Names / AKA</th>
+            <th>Sequencing Technology</th>
+            <th>Release Year</th>
+            <th>Official Annotation</th>
+            <th>Gramene / Ensembl</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="assembly-row-current">
+            <td>
+              <a class="assembly-name-link" href="/genome/assembly/Zm-B73-REFERENCE-NAM-5.0"><strong>Zm-B73-REFERENCE-NAM-5.0</strong></a>
+              <span class="mgdb-badge" style="background:#dcfce7; color:#166534; margin-left:4px;">Current Gold Standard</span>
+            </td>
+            <td>B73 RefGen_v5</td>
+            <td>PacBio Sequel + BioNano Optical</td>
+            <td>2020</td>
+            <td><code>Zm00001eb.1</code></td>
+            <td>Release 64+</td>
+            <td>
+              <div class="assembly-row-actions">
+                <a class="mgdb-button mgdb-button-sm mgdb-button-primary" href="/genome/assembly/Zm-B73-REFERENCE-NAM-5.0">View Assembly</a>
+                <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="https://jbrowse.maizegdb.org/?data=data%2FZm-B73-REFERENCE-NAM-5.0" target="_blank" rel="noopener">JBrowse</a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a class="assembly-name-link" href="/genome/assembly/Zm-B73-REFERENCE-GRAMENE-4.0"><strong>Zm-B73-REFERENCE-GRAMENE-4.0</strong></a>
+            </td>
+            <td>B73 RefGen_v4, AGPv4</td>
+            <td>PacBio RS II Long Reads</td>
+            <td>2017</td>
+            <td><code>Zm00001d.2</code></td>
+            <td>Release 32&ndash;40</td>
+            <td>
+              <div class="assembly-row-actions">
+                <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="/genome/assembly/Zm-B73-REFERENCE-GRAMENE-4.0">View Assembly</a>
+                <a class="mgdb-button mgdb-button-sm mgdb-button-quiet" href="https://www.maizegdb.org/gbrowse/maize_v4" target="_blank" rel="noopener">GBrowse v4</a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a class="assembly-name-link" href="/genome/assembly/B73%20RefGen_v3"><strong>B73 RefGen_v3</strong></a>
+            </td>
+            <td>RefGen_v3, AGPv3</td>
+            <td>BAC Sanger + WGS Gap Closure</td>
+            <td>2013</td>
+            <td><code>5b+</code> / MAKER-P</td>
+            <td>Release 18&ndash;31</td>
+            <td>
+              <div class="assembly-row-actions">
+                <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="/genome/assembly/B73%20RefGen_v3">View Assembly</a>
+                <a class="mgdb-button mgdb-button-sm mgdb-button-quiet" href="https://www.maizegdb.org/gbrowse/maize_v3" target="_blank" rel="noopener">GBrowse v3</a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a class="assembly-name-link" href="/genome/assembly/B73%20RefGen_v2"><strong>B73 RefGen_v2</strong></a>
+            </td>
+            <td>RefGen_v2, AGPv2</td>
+            <td>BAC Sanger Minimal Tiling Path</td>
+            <td>2010</td>
+            <td><code>5b</code> \(5b.60\)</td>
+            <td>Release 7&ndash;17</td>
+            <td>
+              <div class="assembly-row-actions">
+                <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="/genome/assembly/B73%20RefGen_v2">View Assembly</a>
+                <a class="mgdb-button mgdb-button-sm mgdb-button-quiet" href="https://www.maizegdb.org/gbrowse/maize_v2" target="_blank" rel="noopener">GBrowse v2</a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a class="assembly-name-link" href="/genome/assembly/B73%20RefGen_v1"><strong>B73 RefGen_v1</strong></a>
+            </td>
+            <td>RefGen_v1, AGPv1</td>
+            <td>Initial BAC-by-BAC Sanger</td>
+            <td>2009</td>
+            <td><code>4a</code> \(4a.53\)</td>
+            <td>Release 1&ndash;6</td>
+            <td>
+              <div class="assembly-row-actions">
+                <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="/genome/assembly/B73%20RefGen_v1">View Assembly</a>
+                <a class="mgdb-button mgdb-button-sm mgdb-button-quiet" href="https://www.maizegdb.org/gbrowse/maize_v1" target="_blank" rel="noopener">GBrowse v1</a>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 2: ASSEMBLY DETAILS & STATUS -->
+  <section id="assembly-details" class="mgdb-panel" aria-labelledby="assembly-details-heading">
+    <h2 id="assembly-details-heading" class="mgdb-panel-title">Assembly Details &amp; Status</h2>
+    <p class="mgdb-panel-lead">Detailed structural composition, contig statistics, and sequencing methodology across each reference assembly release.</p>
+
+    <div class="assembly-cards-grid">
+      <!-- V5 Card -->
+      <article class="assembly-detail-card is-current-card">
+        <div class="assembly-detail-header">
+          <div>
+            <h3 class="assembly-detail-title">Zm-B73-REFERENCE-NAM-5.0 \(v5\)</h3>
+            <span class="assembly-detail-sub">Current Gold-Standard Representative Reference</span>
+          </div>
+          <span class="mgdb-badge" style="background:#15803d; color:#ffffff;">Active Standard</span>
+        </div>
+        <div class="assembly-detail-metrics">
+          <div class="assembly-metric-item"><strong>2,133 Mb</strong><span>Total Assembled</span></div>
+          <div class="assembly-metric-item"><strong>25.6 Mb</strong><span>Contig N50</span></div>
+          <div class="assembly-metric-item"><strong>10</strong><span>Pseudomolecules</span></div>
+          <div class="assembly-metric-item"><strong>40</strong><span>Unplaced Contigs</span></div>
+        </div>
+        <p class="assembly-detail-desc">De novo assembly constructed from PacBio Sequel long-read sequencing technology. Scaffolds validated and anchored by BioNano optical mapping and genetic linkage maps. Annotated with <code>Zm00001eb.1</code> containing sequentially numbered gene models.</p>
+        <div class="assembly-detail-links">
+          <a class="mgdb-button mgdb-button-primary mgdb-button-sm" href="/genome/assembly/Zm-B73-REFERENCE-NAM-5.0">Assembly Profile</a>
+          <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/" target="_blank" rel="noopener">Download Directory</a>
+          <a class="mgdb-button mgdb-button-quiet mgdb-button-sm" href="https://www.ncbi.nlm.nih.gov/bioproject/PRJEB32225" target="_blank" rel="noopener">NCBI BioProject</a>
+        </div>
+      </article>
+
+      <!-- V4 Card -->
+      <article class="assembly-detail-card">
+        <div class="assembly-detail-header">
+          <div>
+            <h3 class="assembly-detail-title">Zm-B73-REFERENCE-GRAMENE-4.0 \(v4\)</h3>
+            <span class="assembly-detail-sub">PacBio Single-Molecule Real-Time Assembly</span>
+          </div>
+          <span class="mgdb-badge">v4 Reference</span>
+        </div>
+        <div class="assembly-detail-metrics">
+          <div class="assembly-metric-item"><strong>2,134 Mb</strong><span>Total Assembled</span></div>
+          <div class="assembly-metric-item"><strong>1.18 Mb</strong><span>Contig N50</span></div>
+          <div class="assembly-metric-item"><strong>10</strong><span>Pseudomolecules</span></div>
+          <div class="assembly-metric-item"><strong>625</strong><span>Unplaced Scaffolds</span></div>
+        </div>
+        <p class="assembly-detail-desc">Complete de novo assembly generated using PacBio single-molecule technology on high-molecular-weight DNA extracted from a descendant of the accession used for v1&ndash;v3 assemblies \(PI 677128\). Annotated with Filtered Gene Set <code>Zm00001d.2</code>.</p>
+        <div class="assembly-detail-links">
+          <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="/genome/assembly/Zm-B73-REFERENCE-GRAMENE-4.0">Assembly Profile</a>
+          <a class="mgdb-button mgdb-button-quiet mgdb-button-sm" href="https://download.maizegdb.org/Zm-B73-REFERENCE-GRAMENE-4.0/" target="_blank" rel="noopener">Download Directory</a>
+        </div>
+      </article>
+
+      <!-- V3 Card -->
+      <article class="assembly-detail-card">
+        <div class="assembly-detail-header">
+          <div>
+            <h3 class="assembly-detail-title">B73 RefGen_v3 \(v3\)</h3>
+            <span class="assembly-detail-sub">BAC Framework with WGS Gap Closure</span>
+          </div>
+          <span class="mgdb-badge">v3 Legacy</span>
+        </div>
+        <div class="assembly-detail-metrics">
+          <div class="assembly-metric-item"><strong>2,066 Mb</strong><span>Total Assembled</span></div>
+          <div class="assembly-metric-item"><strong>10</strong><span>Pseudomolecules</span></div>
+          <div class="assembly-metric-item"><strong>213</strong><span>New Gene Models</span></div>
+          <div class="assembly-metric-item"><strong>251</strong><span>Improved Models</span></div>
+        </div>
+        <p class="assembly-detail-desc">Captured missing gene space in v2 using whole-genome shotgun \(WGS\) sequence reads. Introduced 213 new gene models, improved 251 gene models, and merged 10 models. Annotated with <code>5b+</code> and MAKER-P gene sets.</p>
+        <div class="assembly-detail-links">
+          <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="/genome/assembly/B73%20RefGen_v3">Assembly Profile</a>
+          <a class="mgdb-button mgdb-button-quiet mgdb-button-sm" href="https://download.maizegdb.org/B73_RefGen_v3/" target="_blank" rel="noopener">Download Directory</a>
+        </div>
+      </article>
+
+      <!-- V2 & V1 Card -->
+      <article class="assembly-detail-card">
+        <div class="assembly-detail-header">
+          <div>
+            <h3 class="assembly-detail-title">B73 RefGen_v2 &amp; RefGen_v1</h3>
+            <span class="assembly-detail-sub">Foundational BAC Physical Map Assemblies</span>
+          </div>
+          <span class="mgdb-badge">Historic BAC</span>
+        </div>
+        <div class="assembly-detail-metrics">
+          <div class="assembly-metric-item"><strong>2,048 Mb</strong><span>v1 Assembly</span></div>
+          <div class="assembly-metric-item"><strong>2,066 Mb</strong><span>v2 Assembly</span></div>
+          <div class="assembly-metric-item"><strong>10</strong><span>Chromosomes</span></div>
+          <div class="assembly-metric-item"><strong>2009</strong><span>v1 Initial Release</span></div>
+        </div>
+        <p class="assembly-detail-desc">RefGen_v1 was the first complete sequencing of the maize B73 genome using BAC-by-BAC Sanger sequencing \(Schnable et al. 2009\). RefGen_v2 improved the ordering and orientation of intra-BAC contigs using the minimum tiling path \(MTP\).</p>
+        <div class="assembly-detail-links">
+          <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="/genome/assembly/B73%20RefGen_v2">RefGen_v2 Profile</a>
+          <a class="mgdb-button mgdb-button-quiet mgdb-button-sm" href="/genome/assembly/B73%20RefGen_v1">RefGen_v1 Profile</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 3: GENE MODELS & NOMENCLATURE -->
+  <section id="assembly-nomenclature" class="mgdb-panel" aria-labelledby="assembly-nomenclature-heading">
+    <h2 id="assembly-nomenclature-heading" class="mgdb-panel-title">B73 Reference Gene Models &amp; Nomenclature Standards</h2>
+    <p class="mgdb-panel-lead">Structural annotation sets, identifier numbering schemes, and cross-reference mapping tables across reference releases.</p>
+
+    <div class="assembly-notice-box">
+      <strong>Important Annotation Notice&#58;</strong>
+      <p>The B73 v5 and NAM founders genome assemblies were initially released with a preliminary annotation \(<code>Zm00001e.1</code>\). The official annotation \(<code>Zm00001eb.1</code>\) features refined gene models and sequentially numbered identifiers across chromosomes. Use the official <code>Zm00001eb.1</code> gene models for current analyses. Cross-references between preliminary, v4, and v3 models are available below.</p>
+    </div>
+
+    <div class="mgdb-table-wrap">
+      <table class="mgdb-table">
+        <thead>
+          <tr>
+            <th>Gene Model Set</th>
+            <th>Description</th>
+            <th>Assembly Version</th>
+            <th>Gramene / Ensembl Release</th>
+            <th>Cross-Reference Files</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="assembly-row-current">
+            <td><a href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/" target="_blank" rel="noopener"><strong>Zm00001eb.1</strong></a></td>
+            <td>Official v5 annotation &mdash; Sequentially numbered models</td>
+            <td>Zm-B73-REFERENCE-NAM-5.0</td>
+            <td>Release 64+</td>
+            <td><a class="mgdb-link" href="https://download.maizegdb.org/Pan-genes/B73_gene_xref/" target="_blank" rel="noopener">B73 Gene Xref Directory &#8599;</a></td>
+          </tr>
+          <tr>
+            <td><code>Zm00001e.1</code></td>
+            <td><span class="mgdb-badge" style="background:#fee2e2; color:#991b1b;">Preliminary &bull; Replaced by Zm00001eb.1</span></td>
+            <td>Zm-B73-REFERENCE-NAM-5.0</td>
+            <td><i>N/A</i></td>
+            <td><a class="mgdb-link" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0_Zm00001e.1_ab.1_xref_gene_IDs.txt.gz" target="_blank" rel="noopener">e.1 to eb.1 Xref Table &#8599;</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://download.maizegdb.org/Zm-B73-REFERENCE-GRAMENE-4.0/" target="_blank" rel="noopener"><strong>Zm00001d.2</strong></a></td>
+            <td>Official v4 Filtered Gene Set \(FGS\)</td>
+            <td>Zm-B73-REFERENCE-GRAMENE-4.0</td>
+            <td>Release 36&ndash;40</td>
+            <td><a class="mgdb-link" href="https://download.maizegdb.org/Pan-genes/B73_gene_xref/" target="_blank" rel="noopener">v4 to v3/v5 Xref &#8599;</a></td>
+          </tr>
+          <tr>
+            <td><code>Zm00001d.1</code></td>
+            <td>Early v4 gene build</td>
+            <td>Zm-B73-REFERENCE-GRAMENE-4.0</td>
+            <td>Release 32&ndash;33</td>
+            <td><a class="mgdb-link" href="https://download.maizegdb.org/Pan-genes/B73_gene_xref/" target="_blank" rel="noopener">v4 Xref &#8599;</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://download.maizegdb.org/B73_RefGen_v3/" target="_blank" rel="noopener"><strong>5b+</strong></a></td>
+            <td>Filtered Gene Set &bull; MAKER-P annotations</td>
+            <td>B73 RefGen_v3</td>
+            <td>Release 18&ndash;31</td>
+            <td><a class="mgdb-link" href="https://download.maizegdb.org/Pan-genes/B73_gene_xref/" target="_blank" rel="noopener">5b+ Xref &#8599;</a></td>
+          </tr>
+          <tr>
+            <td><code>5b</code></td>
+            <td>Filtered Gene Set \(5b.60\)</td>
+            <td>B73 RefGen_v2</td>
+            <td>Release 7&ndash;17</td>
+            <td><a class="mgdb-link" href="https://download.maizegdb.org/B73_RefGen_v2/" target="_blank" rel="noopener">v2 Downloads &#8599;</a></td>
+          </tr>
+          <tr>
+            <td><code>4a</code></td>
+            <td>Initial Gene Set \(4a.53\)</td>
+            <td>B73 RefGen_v1</td>
+            <td>Release 1&ndash;6</td>
+            <td><a class="mgdb-link" href="https://download.maizegdb.org/B73_RefGen_v1/" target="_blank" rel="noopener">v1 Downloads &#8599;</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 4: CHANGE HISTORY -->
+  <section id="assembly-history" class="mgdb-panel" aria-labelledby="assembly-history-heading">
+    <h2 id="assembly-history-heading" class="mgdb-panel-title">Assembly Change History</h2>
+    <p class="mgdb-panel-lead">Chronological development and key improvements across maize reference genome releases.</p>
+
+    <div class="assembly-history-timeline">
+      <div class="timeline-item">
+        <div class="timeline-badge">v5</div>
+        <div class="timeline-content">
+          <h3>Zm-B73-REFERENCE-NAM-5.0 \(2020\)</h3>
+          <p>De novo long-read assembly using PacBio Sequel technology coupled with high-coverage BioNano optical genome maps. Captures complex repetitive regions, centromeric arrays, and structural variants with contig N50 increased to 25.6 Mb. Accompanied by pan-genome assemblies for 26 NAM founder lines.</p>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-badge">v4</div>
+        <div class="timeline-content">
+          <h3>Zm-B73-REFERENCE-GRAMENE-4.0 \(2017\)</h3>
+          <p>Complete de novo assembly using PacBio RS II single-molecule sequencing on tissue derived from PI 677128. Resolved thousands of misassemblies, orientation errors, and gap regions from Sanger BAC physical maps, boosting contig N50 from 40 kb to 1.18 Mb \(Jiao et al. 2017\).</p>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-badge">v3</div>
+        <div class="timeline-content">
+          <h3>B73 RefGen_v3 \(2013\)</h3>
+          <p>Captured missing gene space in v2 using whole-genome shotgun \(WGS\) sequence reads. Integrated 213 new gene models, refined 251 models, and resolved contig order/orientation across chromosomes.</p>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-badge">v2</div>
+        <div class="timeline-content">
+          <h3>B73 RefGen_v2 \(2010\)</h3>
+          <p>Iterative improvement on the initial BAC physical map by correcting contig order and orientation within BACs using the minimum tiling path \(MTP\). Upgraded gene model set from 4a to 5b.</p>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-badge">v1</div>
+        <div class="timeline-content">
+          <h3>B73 RefGen_v1 \(2009\)</h3>
+          <p>Initial publication of the complete maize B73 reference genome using BAC-by-BAC Sanger sequencing anchored by fingerprint contig \(FPC\) physical and genetic maps \(Schnable et al. 2009, Wei et al. 2009\).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: CHROMOSOME ACCESSIONS -->
+  <section id="assembly-accessions" class="mgdb-panel" aria-labelledby="assembly-accessions-heading">
+    <h2 id="assembly-accessions-heading" class="mgdb-panel-title">Chromosome Names &amp; GenBank Accessions</h2>
+    <p class="mgdb-panel-lead">Primary NCBI GenBank nucleotide accession numbers for Zm-B73-REFERENCE-NAM-5.0 \(PRJEB32225\) and Zm-B73-REFERENCE-GRAMENE-4.0 \(PRJNA10719\).</p>
+
+    <div class="mgdb-table-wrap">
+      <table class="mgdb-table">
+        <thead>
+          <tr>
+            <th>Chromosome / Molecule</th>
+            <th>RefGen_v5 Accession \(NAM-5.0\)</th>
+            <th>RefGen_v4 Accession \(GRAMENE-4.0\)</th>
+            <th>NCBI Direct Link</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Chromosome 1</strong></td><td><code>NC_050096.1</code> / <code>CABHLF010000001.1</code></td><td><code>CM007647.1</code></td><td><a class="mgdb-link" href="https://www.ncbi.nlm.nih.gov/nuccore/NC_050096.1" target="_blank" rel="noopener">NC_050096.1 &#8599;</a></td></tr>
+          <tr><td><strong>Chromosome 2</strong></td><td><code>NC_050097.1</code> / <code>CABHLF010000002.1</code></td><td><code>CM007648.1</code></td><td><a class="mgdb-link" href="https://www.ncbi.nlm.nih.gov/nuccore/NC_050097.1" target="_blank" rel="noopener">NC_050097.1 &#8599;</a></td></tr>
+          <tr><td><strong>Chromosome 3</strong></td><td><code>NC_050098.1</code> / <code>CABHLF010000003.1</code></td><td><code>CM007649.1</code></td><td><a class="mgdb-link" href="https://www.ncbi.nlm.nih.gov/nuccore/NC_050098.1" target="_blank" rel="noopener">NC_050098.1 &#8599;</a></td></tr>
+          <tr><td><strong>Chromosome 4</strong></td><td><code>NC_050099.1</code> / <code>CABHLF010000004.1</code></td><td><code>CM007650.1</code></td><td><a class="mgdb-link" href="https://www.ncbi.nlm.nih.gov/nuccore/NC_050099.1" target="_blank" rel="noopener">NC_050099.1 &#8599;</a></td></tr>
+          <tr><td><strong>Chromosome 5</strong></td><td><code>NC_050100.1</code> / <code>CABHLF010000005.1</code></td><td><code>CM007651.1</code></td><td><a class="mgdb-link" href="https://www.ncbi.nlm.nih.gov/nuccore/NC_050100.1" target="_blank" rel="noopener">NC_050100.1 &#8599;</a></td></tr>
+          <tr><td><strong>Chromosome 6</strong></td><td><code>NC_050101.1</code> / <code>CABHLF010000006.1</code></td><td><code>CM007652.1</code></td><td><a class="mgdb-link" href="https://www.ncbi.nlm.nih.gov/nuccore/NC_050101.1" target="_blank" rel="noopener">NC_050101.1 &#8599;</a></td></tr>
+          <tr><td><strong>Chromosome 7</strong></td><td><code>NC_050102.1</code> / <code>CABHLF010000007.1</code></td><td><code>CM007653.1</code></td><td><a class="mgdb-link" href="https://www.ncbi.nlm.nih.gov/nuccore/NC_050102.1" target="_blank" rel="noopener">NC_050102.1 &#8599;</a></td></tr>
+          <tr><td><strong>Chromosome 8</strong></td><td><code>NC_050103.1</code> / <code>CABHLF010000008.1</code></td><td><code>CM007654.1</code></td><td><a class="mgdb-link" href="https://www.ncbi.nlm.nih.gov/nuccore/NC_050103.1" target="_blank" rel="noopener">NC_050103.1 &#8599;</a></td></tr>
+          <tr><td><strong>Chromosome 9</strong></td><td><code>NC_050104.1</code> / <code>CABHLF010000009.1</code></td><td><code>CM007655.1</code></td><td><a class="mgdb-link" href="https://www.ncbi.nlm.nih.gov/nuccore/NC_050104.1" target="_blank" rel="noopener">NC_050104.1 &#8599;</a></td></tr>
+          <tr><td><strong>Chromosome 10</strong></td><td><code>NC_050105.1</code> / <code>CABHLF010000010.1</code></td><td><code>CM007656.1</code></td><td><a class="mgdb-link" href="https://www.ncbi.nlm.nih.gov/nuccore/NC_050105.1" target="_blank" rel="noopener">NC_050105.1 &#8599;</a></td></tr>
+          <tr><td><strong>Mitochondria</strong></td><td><code>NC_007982.1</code></td><td><code>NC_007982.1</code></td><td><a class="mgdb-link" href="https://www.ncbi.nlm.nih.gov/nuccore/NC_007982.1" target="_blank" rel="noopener">NC_007982.1 &#8599;</a></td></tr>
+          <tr><td><strong>Chloroplast</strong></td><td><code>NC_001666.2</code></td><td><code>NC_001666.2</code></td><td><a class="mgdb-link" href="https://www.ncbi.nlm.nih.gov/nuccore/NC_001666.2" target="_blank" rel="noopener">NC_001666.2 &#8599;</a></td></tr>
+          <tr><td><strong>Whole Genome Shotgun \(WGS\)</strong></td><td><a class="mgdb-link" href="https://www.ncbi.nlm.nih.gov/Traces/wgs/CABHLF0100?display=contigs" target="_blank" rel="noopener">CABHLF0100 Contigs &#8599;</a></td><td><a class="mgdb-link" href="https://www.ncbi.nlm.nih.gov/Traces/wgs/LPUQ01?display=contigs" target="_blank" rel="noopener">LPUQ01 Contigs &#8599;</a></td><td>GenBank WGS Traces</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 6: STOCK & ORIGIN -->
+  <section id="assembly-stocks" class="mgdb-panel" aria-labelledby="assembly-stocks-heading">
+    <h2 id="assembly-stocks-heading" class="mgdb-panel-title">B73 Stock Information &amp; Pedigree Origin</h2>
+    <p class="mgdb-panel-lead">Seed germplasm sources, plant introduction accessions, and BAC library construction lineage.</p>
+
+    <div class="assembly-stock-content">
+      <p>The seed source for both <strong>Zm-B73-REFERENCE-NAM-5.0</strong> and <strong>Zm-B73-REFERENCE-GRAMENE-4.0</strong> descended from <a class="mgdb-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail.aspx?accid=PI+550473" target="_blank" rel="noopener">PI 550473</a>, maintained at the North Central Regional Plant Introduction Station \(NCRPIS\). The accession closest to the seed lot used for sequencing was deposited as <a class="mgdb-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail.aspx?accid=PI+677128" target="_blank" rel="noopener">PI 677128</a>.</p>
+      
+      <p>The B73 source for the original BAC libraries \(BACs with prefix <code>b</code> constructed in Rod Wing's lab; BACs with prefix <code>c</code> constructed in Peter deJong's lab\) was derived from the Coe PI 550473 line. High-Molecular-Weight DNA was prepared by Jack Gardiner at the University of Missouri.</p>
+      
+      <p>Specific details regarding pedigree validation, contig frameworks, and physical maps are described in <a class="mgdb-link" href="/reference/9017907">Coe &amp; Schaeffer \(2005\) <i>Maydica</i> 50&#58;285-303</a> [<a class="mgdb-link" href="/docs/B73materials.pdf" target="_blank" rel="noopener">PDF</a>].</p>
+    </div>
+  </section>
+
+  <!-- SECTION 7: DOWNLOADS -->
+  <section id="assembly-downloads" class="mgdb-panel" aria-labelledby="assembly-downloads-heading">
+    <h2 id="assembly-downloads-heading" class="mgdb-panel-title">B73 Assembly &amp; Gene Model Downloads</h2>
+    <p class="mgdb-panel-lead">Direct download links for reference genome sequences, cDNA, CDS, PEP, ncRNA, and GFF3 structural annotations.</p>
+
+    <div class="mgdb-table-wrap">
+      <table class="mgdb-table">
+        <thead>
+          <tr>
+            <th>Assembly Version</th>
+            <th>Dataset Type</th>
+            <th>Ensembl / Gramene Version</th>
+            <th>Download Link</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="assembly-row-current">
+            <td><strong>Zm-B73-REFERENCE-NAM-5.0</strong></td>
+            <td>Complete Assembly FASTA, GFF3, cDNA, CDS, PEP</td>
+            <td>Release 64+</td>
+            <td><a class="mgdb-button mgdb-button-sm mgdb-button-primary" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/" target="_blank" rel="noopener">Download v5 Files</a></td>
+          </tr>
+          <tr>
+            <td><strong>Zm-B73-REFERENCE-GRAMENE-4.0</strong></td>
+            <td>Genome Sequence FASTA \(DNA\)</td>
+            <td>Release 32&ndash;40</td>
+            <td><a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="https://download.maizegdb.org/Zm-B73-REFERENCE-GRAMENE-4.0/" target="_blank" rel="noopener">Download v4 DNA</a></td>
+          </tr>
+          <tr>
+            <td><strong>Zm-B73-REFERENCE-GRAMENE-4.0</strong></td>
+            <td>Gene Model cDNA, CDS, PEP, ncRNA FASTA &amp; GFF3</td>
+            <td>Release 36</td>
+            <td><a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="https://download.maizegdb.org/Zm-B73-REFERENCE-GRAMENE-4.0/" target="_blank" rel="noopener">Download v4 Annotations</a></td>
+          </tr>
+          <tr>
+            <td><strong>B73 RefGen_v3</strong></td>
+            <td>Assembly FASTA, cDNA, CDS, PEP, GFF3</td>
+            <td>Release 18&ndash;31</td>
+            <td><a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="https://download.maizegdb.org/B73_RefGen_v3/" target="_blank" rel="noopener">Download v3 Files</a></td>
+          </tr>
+          <tr>
+            <td><strong>B73 RefGen_v3</strong></td>
+            <td>MAKER-P Gene Model Predictions</td>
+            <td><i>N/A</i></td>
+            <td><a class="mgdb-button mgdb-button-sm mgdb-button-quiet" href="https://download.maizegdb.org/B73_RefGen_v3/MAKERP/" target="_blank" rel="noopener">Download MAKER-P</a></td>
+          </tr>
+          <tr>
+            <td><strong>B73 RefGen_v2</strong></td>
+            <td>Assembly FASTA &amp; Filtered Gene Set \(5b\)</td>
+            <td>Release 7&ndash;17</td>
+            <td><a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="https://download.maizegdb.org/B73_RefGen_v2/" target="_blank" rel="noopener">Download v2 Files</a></td>
+          </tr>
+          <tr>
+            <td><strong>B73 RefGen_v1</strong></td>
+            <td>Initial Assembly FASTA &amp; Working Gene Set \(4a\)</td>
+            <td>Release 1&ndash;6</td>
+            <td><a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="https://download.maizegdb.org/B73_RefGen_v1/" target="_blank" rel="noopener">Download v1 Files</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 8: KEY PUBLICATIONS -->
+  <section id="assembly-publications" class="mgdb-panel" aria-labelledby="assembly-pubs-heading">
+    <h2 id="assembly-pubs-heading" class="mgdb-panel-title">Key Reference Genome Publications</h2>
+    <p class="mgdb-panel-lead">Primary landmark peer-reviewed research papers establishing the maize reference genome assemblies, annotations, and pan-genome foundations.</p>
+
+    <div class="assembly-pubs-list">
+      <!-- 1: Hufford et al. 2021 -->
+      <article class="reference-result-card">
+        <div class="reference-result-meta">
+          <span>2021</span><span>Research Article</span><span>Science</span><span>DOI</span><span>PubMed</span>
+        </div>
+        <h3><a href="https://doi.org/10.1126/science.abg5289" target="_blank" rel="noopener">De novo assembly, annotation, and comparative analysis of 26 diverse maize genomes</a></h3>
+        <p class="reference-result-authors">Hufford MB, Seetharam AS, Woodhouse MR, Chougule KM, Ou S, Liu J, Ricci WA, Guo T, Olson A, Qing Y, et al.</p>
+        <p class="reference-result-citation">Science &bull; 373\(6555\) &bull; 655-662 &bull; doi:10.1126/science.abg5289</p>
+        <p class="reference-result-abstract">Maize is a cornerstone crop with exceptional genetic diversity. Here we report high-quality de novo chromosome-level genome assemblies and comprehensive annotations for 26 inbred lines representing the Nested Association Mapping \(NAM\) founder population, alongside an improved B73 reference genome \(NAM-5.0\). Comparative pan-genomic analyses reveal vast structural variation, transposable element dynamics, and variable gene content across modern temperate, tropical, and sweet corn lineages.</p>
+        <div class="reference-result-links">
+          <a href="https://doi.org/10.1126/science.abg5289" target="_blank" rel="noopener">DOI &#8599;</a>
+          <button class="reference-copy-id" type="button" data-copy-value="10.1126/science.abg5289">Copy DOI</button>
+          <a href="https://pubmed.ncbi.nlm.nih.gov/34353948/" target="_blank" rel="noopener">PubMed &#8599;</a>
+          <button class="reference-copy-id" type="button" data-copy-value="34353948">Copy PMID</button>
+        </div>
+      </article>
+
+      <!-- 2: Jiao et al. 2017 -->
+      <article class="reference-result-card">
+        <div class="reference-result-meta">
+          <span>2017</span><span>Research Article</span><span>Nature</span><span>DOI</span><span>PubMed</span>
+        </div>
+        <h3><a href="https://doi.org/10.1038/nature22971" target="_blank" rel="noopener">Improved maize reference genome with single-molecule technologies</a></h3>
+        <p class="reference-result-authors">Jiao Y, Peluso P, Shi J, Liang T, Stitzer MC, Wang B, Campbell MS, Stein JC, Wei X, Chin CS, et al.</p>
+        <p class="reference-result-citation">Nature &bull; 546\(7659\) &bull; 524-527 &bull; doi:10.1038/nature22971</p>
+        <p class="reference-result-abstract">Maize is an important genetic model and major crop. However, its complex genome with over 85% repetitive transposable elements challenged short-read assembly. Here we present a reference assembly of B73 \(RefGen_v4\) using single-molecule real-time sequencing and optical mapping. This assembly increases contiguity by 52-fold, closes over 100,000 gaps, corrects structural misassemblies, and refines the Filtered Gene Set.</p>
+        <div class="reference-result-links">
+          <a href="https://doi.org/10.1038/nature22971" target="_blank" rel="noopener">DOI &#8599;</a>
+          <button class="reference-copy-id" type="button" data-copy-value="10.1038/nature22971">Copy DOI</button>
+          <a href="https://pubmed.ncbi.nlm.nih.gov/28605751/" target="_blank" rel="noopener">PubMed &#8599;</a>
+          <button class="reference-copy-id" type="button" data-copy-value="28605751">Copy PMID</button>
+        </div>
+      </article>
+
+      <!-- 3: Law et al. 2015 -->
+      <article class="reference-result-card">
+        <div class="reference-result-meta">
+          <span>2015</span><span>Research Article</span><span>Plant Physiology</span><span>DOI</span><span>PubMed</span>
+        </div>
+        <h3><a href="https://doi.org/10.1104/pp.114.245027" target="_blank" rel="noopener">Automated update, revision, and quality control of the maize genome annotations using MAKER-P improves the B73 RefGen_v3 gene models and identifies new genes</a></h3>
+        <p class="reference-result-authors">Law M, Childs KL, Campbell MS, Stein JC, Soto-Del Valle XM, Wei S, Liang C, Lu Z, Andorf CM, Ware D, Yandell M.</p>
+        <p class="reference-result-citation">Plant Physiol. &bull; 167\(1\) &bull; 25-39 &bull; doi:10.1104/pp.114.245027</p>
+        <p class="reference-result-abstract">Accurate structural annotation of plant genomes is vital for functional characterization. Using the MAKER-P pipeline, we updated the B73 RefGen_v3 genome annotation, improving existing gene models, identifying missing loci, and providing comprehensive quality-control metrics across protein-coding transcripts.</p>
+        <div class="reference-result-links">
+          <a href="https://doi.org/10.1104/pp.114.245027" target="_blank" rel="noopener">DOI &#8599;</a>
+          <button class="reference-copy-id" type="button" data-copy-value="10.1104/pp.114.245027">Copy DOI</button>
+          <a href="https://pubmed.ncbi.nlm.nih.gov/25398939/" target="_blank" rel="noopener">PubMed &#8599;</a>
+          <button class="reference-copy-id" type="button" data-copy-value="25398939">Copy PMID</button>
+        </div>
+      </article>
+
+      <!-- 4: Schnable et al. 2009 -->
+      <article class="reference-result-card">
+        <div class="reference-result-meta">
+          <span>2009</span><span>Landmark Paper</span><span>Science</span><span>DOI</span><span>PubMed</span>
+        </div>
+        <h3><a href="https://doi.org/10.1126/science.1178534" target="_blank" rel="noopener">The B73 maize genome: complexity, diversity, and dynamics</a></h3>
+        <p class="reference-result-authors">Schnable PS, Ware D, Fulton RS, Stein JC, Wei F, Pasternak S, Liang C, Zhang J, Fulton L, Graves TA, et al.</p>
+        <p class="reference-result-citation">Science &bull; 326\(5956\) &bull; 1112-1115 &bull; doi:10.1126/science.1178534</p>
+        <p class="reference-result-abstract">We report a 2.3-gigabase reference sequence of the maize inbred line B73. The genome exhibits paleopolyploid ancestry, extensive retrotransposon expansions comprising ~85% of nuclear DNA, and substantial structural divergence that fuels hybrid vigor and phenotypic variation.</p>
+        <div class="reference-result-links">
+          <a href="https://doi.org/10.1126/science.1178534" target="_blank" rel="noopener">DOI &#8599;</a>
+          <button class="reference-copy-id" type="button" data-copy-value="10.1126/science.1178534">Copy DOI</button>
+          <a href="https://pubmed.ncbi.nlm.nih.gov/19965430/" target="_blank" rel="noopener">PubMed &#8599;</a>
+          <button class="reference-copy-id" type="button" data-copy-value="19965430">Copy PMID</button>
+        </div>
+      </article>
+
+      <!-- 5: Wei et al. 2009 -->
+      <article class="reference-result-card">
+        <div class="reference-result-meta">
+          <span>2009</span><span>Research Article</span><span>PLoS Genetics</span><span>DOI</span><span>PubMed</span>
+        </div>
+        <h3><a href="https://doi.org/10.1371/journal.pgen.1000715" target="_blank" rel="noopener">The physical and genetic framework of the maize B73 genome</a></h3>
+        <p class="reference-result-authors">Wei F, Zhang J, Zhou S, He R, Schaeffer M, Kollner TG, Tao Q, Dong J, Gardiner J, Coe E, et al.</p>
+        <p class="reference-result-citation">PLoS Genet. &bull; 5\(11\) &bull; e1000715 &bull; doi:10.1371/journal.pgen.1000715</p>
+        <p class="reference-result-abstract">High-resolution physical maps integrated with genetic markers are foundational for assembling large repeat-rich eukaryotic genomes. Here we describe the construction of the agarose and polyacrylamide fingerprint contig physical map of B73 anchored by over 10,000 markers.</p>
+        <div class="reference-result-links">
+          <a href="https://doi.org/10.1371/journal.pgen.1000715" target="_blank" rel="noopener">DOI &#8599;</a>
+          <button class="reference-copy-id" type="button" data-copy-value="10.1371/journal.pgen.1000715">Copy DOI</button>
+          <a href="https://pubmed.ncbi.nlm.nih.gov/19936064/" target="_blank" rel="noopener">PubMed &#8599;</a>
+          <button class="reference-copy-id" type="button" data-copy-value="19936064">Copy PMID</button>
+        </div>
+      </article>
+
+      <!-- 6: Wei et al. 2007 -->
+      <article class="reference-result-card">
+        <div class="reference-result-meta">
+          <span>2007</span><span>Research Article</span><span>PLoS Genetics</span><span>DOI</span><span>PubMed</span>
+        </div>
+        <h3><a href="https://doi.org/10.1371/journal.pgen.0030123" target="_blank" rel="noopener">Physical and genetic structure of the maize genome reflects its complex evolutionary history</a></h3>
+        <p class="reference-result-authors">Wei F, Coe E, Nelson W, Bharti AK, Engler F, Butler E, Kim H, Goicoechea JL, Chen M, Lee S, et al.</p>
+        <p class="reference-result-citation">PLoS Genet. &bull; 3\(7\) &bull; e123 &bull; doi:10.1371/journal.pgen.0030123</p>
+        <p class="reference-result-abstract">Characterization of the maize genome architecture provides fundamental insights into genome evolution following allotetraploidization, including extensive gene fractionation and structural rearrangements across homeologous chromosomes.</p>
+        <div class="reference-result-links">
+          <a href="https://doi.org/10.1371/journal.pgen.0030123" target="_blank" rel="noopener">DOI &#8599;</a>
+          <button class="reference-copy-id" type="button" data-copy-value="10.1371/journal.pgen.0030123">Copy DOI</button>
+          <a href="https://pubmed.ncbi.nlm.nih.gov/17658955/" target="_blank" rel="noopener">PubMed &#8599;</a>
+          <button class="reference-copy-id" type="button" data-copy-value="17658955">Copy PMID</button>
+        </div>
+      </article>
+
+      <!-- 7: Bi et al. 2006 -->
+      <article class="reference-result-card">
+        <div class="reference-result-meta">
+          <span>2006</span><span>Research Article</span><span>Crop Science</span><span>DOI</span>
+        </div>
+        <h3><a href="https://doi.org/10.2135/cropsci2004.0706" target="_blank" rel="noopener">Single nucleotide polymorphisms and insertion&ndash;deletions for genetic markers and anchoring the maize fingerprint contig physical map</a></h3>
+        <p class="reference-result-authors">Bi I, McMullen MD, Sanchez-Villeda H, Schroeder SG, Fang Z, McMullen M, Polacco M, McMullen M, Coe E.</p>
+        <p class="reference-result-citation">Crop Sci. &bull; 46\(1\) &bull; 12-21 &bull; doi:10.2135/cropsci2004.0706</p>
+        <p class="reference-result-abstract">Development of high-throughput SNP and indel markers anchored to the B73 fingerprint contig map to connect genetic linkage maps with physical clones across the ten maize chromosomes.</p>
+        <div class="reference-result-links">
+          <a href="https://doi.org/10.2135/cropsci2004.0706" target="_blank" rel="noopener">DOI &#8599;</a>
+          <button class="reference-copy-id" type="button" data-copy-value="10.2135/cropsci2004.0706">Copy DOI</button>
+        </div>
+      </article>
+
+      <!-- 8: Coe & Schaeffer 2005 -->
+      <article class="reference-result-card">
+        <div class="reference-result-meta">
+          <span>2005</span><span>Review</span><span>Maydica</span><span>MaizeGDB Reference</span>
+        </div>
+        <h3><a href="/reference/9017907">Genetic, physical maps, and database resources for maize</a></h3>
+        <p class="reference-result-authors">Coe E, Schaeffer ML.</p>
+        <p class="reference-result-citation">Maydica &bull; 50 &bull; 285-303</p>
+        <p class="reference-result-abstract">Comprehensive documentation of the materials, BAC clone resources, high-molecular-weight DNA preparations, IBM mapping population ancestry, and contig frameworks that underpinned the maize genome sequencing initiative.</p>
+        <div class="reference-result-links">
+          <a href="/reference/9017907">MaizeGDB Record &#8599;</a>
+          <a href="/docs/B73materials.pdf" target="_blank" rel="noopener">PDF Paper &#8599;</a>
+        </div>
+      </article>
+
+      <!-- 9: Gardiner et al. 2004 -->
+      <article class="reference-result-card">
+        <div class="reference-result-meta">
+          <span>2004</span><span>Research Article</span><span>Plant Physiology</span><span>DOI</span><span>PubMed</span>
+        </div>
+        <h3><a href="https://doi.org/10.1104/pp.103.034538" target="_blank" rel="noopener">Anchoring 9,371 maize expressed sequence tagged unigenes to the bacterial artificial chromosome contig map by two-dimensional overgo hybridization</a></h3>
+        <p class="reference-result-authors">Gardiner J, Schroeder S, Polacco ML, Sanchez-Villeda H, Fang Z, Morgante M, Landewe T, Browne K, Davis G, Coe EH, et al.</p>
+        <p class="reference-result-citation">Plant Physiol. &bull; 134\(4\) &bull; 1317-1326 &bull; doi:10.1104/pp.103.034538</p>
+        <p class="reference-result-abstract">Two-dimensional overgo hybridization strategy used to anchor 9,371 EST unigenes directly to BAC physical contigs, linking transcribed gene space to chromosome locations prior to whole-genome sequencing.</p>
+        <div class="reference-result-links">
+          <a href="https://doi.org/10.1104/pp.103.034538" target="_blank" rel="noopener">DOI &#8599;</a>
+          <button class="reference-copy-id" type="button" data-copy-value="10.1104/pp.103.034538">Copy DOI</button>
+          <a href="https://pubmed.ncbi.nlm.nih.gov/15064373/" target="_blank" rel="noopener">PubMed &#8599;</a>
+          <button class="reference-copy-id" type="button" data-copy-value="15064373">Copy PMID</button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 9: FAQS -->
+  <section id="assembly-faqs" class="mgdb-panel" aria-labelledby="assembly-faqs-heading">
+    <h2 id="assembly-faqs-heading" class="mgdb-panel-title">Frequently Asked Questions \(FAQs\)</h2>
+    <p class="mgdb-panel-lead">Common questions regarding maize reference genome definitions, assembly coordinate mapping, and annotations.</p>
+
+    <div class="assembly-faq-list">
+      <details class="assembly-faq-item" open>
+        <summary class="assembly-faq-question">What is a Representative Reference Genome?</summary>
+        <div class="assembly-faq-answer">
+          <p>A reference genome is a haploid representation of a species' DNA sequence with a defined coordinate system, version identifier, and structural annotations. B73 is the internationally recognized representative reference genome for <i>Zea mays</i>, serving as the common coordinate system for genetic maps, variant catalogs, and pan-genomic comparisons.</p>
+        </div>
+      </details>
+
+      <details class="assembly-faq-item">
+        <summary class="assembly-faq-question">What are the main changes between RefGen_v4 and Zm-B73-REFERENCE-NAM-5.0?</summary>
+        <div class="assembly-faq-answer">
+          <p>Zm-B73-REFERENCE-NAM-5.0 is an advanced de novo assembly generated using PacBio Sequel long-read technology validated by high-resolution BioNano optical maps. Contig N50 jumped from 1.18 Mb in v4 to 25.6 Mb in v5, resolving previously unplaced scaffolds, complex repetitive element arrays, and centromeric regions.</p>
+        </div>
+      </details>
+
+      <details class="assembly-faq-item">
+        <summary class="assembly-faq-question">Why was a preliminary v5 annotation released, and which set should I use?</summary>
+        <div class="assembly-faq-answer">
+          <p>A preliminary annotation \(<code>Zm00001e.1</code>\) was released alongside the initial v5 assembly to provide early data access. It was subsequently superseded by the official annotation, <code>Zm00001eb.1</code>, which features refined gene boundaries and sequentially numbered gene models across chromosomes. <strong>Always use <code>Zm00001eb.1</code> for current research and publications.</strong></p>
+        </div>
+      </details>
+
+      <details class="assembly-faq-item">
+        <summary class="assembly-faq-question">How can I translate coordinates between assembly versions?</summary>
+        <div class="assembly-faq-answer">
+          <p>Chain files between v4 and v5 are available in the <a class="mgdb-link" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/chain_files/" target="_blank" rel="noopener">MaizeGDB v5 Chain Files Directory</a> and can be used with standard tools like <strong>LiftOver</strong> or <strong>CrossMap</strong>. For v2 to v3 translation, use the <a class="mgdb-link" href="http://ensembl.gramene.org/tools.html" target="_blank" rel="noopener">Ensembl Assembly Converter</a>.</p>
+        </div>
+      </details>
+
+      <details class="assembly-faq-item">
+        <summary class="assembly-faq-question">How do I identify the Filtered Gene Set \(FGS\) in RefGen_v3?</summary>
+        <div class="assembly-faq-answer">
+          <p>In the <code>5b+</code> gene build, former Filtered Gene Set models are explicitly classified as protein-coding models in the GFF3 and FASTA files.</p>
+        </div>
+      </details>
+
+      <details class="assembly-faq-item">
+        <summary class="assembly-faq-question">Where can I find legacy resources from MaizeSequence.org?</summary>
+        <div class="assembly-faq-answer">
+          <p>Historical files, gene builds, and FTP dumps from MaizeSequence.org are permanently preserved in the <a class="mgdb-link" href="ftp://ftp.gramene.org/pub/gramene/maizesequence.org/" target="_blank" rel="noopener">Gramene MaizeSequence FTP Archive &#8599;</a>.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- SECTION 10: CORPUS STATISTICS \(SECOND TO LAST ITEM\) -->
+  <section id="assembly-overview" class="mgdb-panel" aria-labelledby="assembly-overview-heading">
+    <h2 id="assembly-overview-heading" class="mgdb-panel-title">Corpus Statistics</h2>
+    <p class="mgdb-panel-lead">Summary of reference genome versions, pan-genome lineages, and structural annotation sets curated at MaizeGDB.</p>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Reference Releases</h3>
+          <span class="mgdb-metric-badge">B73 Reference</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(total_assemblies)</strong>
+        </div>
+        <p class="mgdb-metric-description">Generations of B73 reference sequence assemblies from v1 \(2009\) to v5 \(2020\).</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>NAM Founders</h3>
+          <span class="mgdb-metric-badge">Pan-Genome</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(nam_genomes)</strong>
+        </div>
+        <p class="mgdb-metric-description">Chromosome-level de novo founder inbred genomes sequenced alongside B73 RefGen_v5.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Nuclear Chromosomes</h3>
+          <span class="mgdb-metric-badge">Pseudomolecules</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(chromosomes)</strong>
+        </div>
+        <p class="mgdb-metric-description">Pseudomolecules anchored to genetic linkage maps plus organellar genomes.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Gene Model Sets</h3>
+          <span class="mgdb-metric-badge">Annotations</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(gene_model_sets)</strong>
+        </div>
+        <p class="mgdb-metric-description">Structural annotation releases indexed with cross-reference translation tables.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 11: CONNECTED RESOURCES \(FINAL ITEM\) -->
+  <section id="assembly-related" class="mgdb-panel assembly-bottom-section" aria-labelledby="assembly-related-heading">
+    <h2 id="assembly-related-heading" class="mgdb-panel-title">Connected Resources</h2>
+    <p class="mgdb-panel-lead">Explore related MaizeGDB centers for genomes, gene models, expression data, and genetic variation.</p>
+
+    <div class="assembly-related-grid">
+      <a class="assembly-related-card" href="/genome">
+        <div class="assembly-related-title">Genome Data Center</div>
+        <p class="assembly-related-desc">Browse 49 assembled maize genomes, cytological maps, genome browsers, and GFF downloads.</p>
+      </a>
+
+      <a class="assembly-related-card" href="/gene_center/gene">
+        <div class="assembly-related-title">Gene Center</div>
+        <p class="assembly-related-desc">Search annotated reference gene models, pan-gene sets, functional descriptions, and expression tabs.</p>
+      </a>
+
+      <a class="assembly-related-card" href="/pan_gene">
+        <div class="assembly-related-title">Pan-Gene Center</div>
+        <p class="assembly-related-desc">Explore syntenic pan-gene matrix clusters across 26 NAM founder lines and reference genomes.</p>
+      </a>
+
+      <a class="assembly-related-card" href="/data_center/locus">
+        <div class="assembly-related-title">Locus Data Center</div>
+        <p class="assembly-related-desc">Explore characterized classic maize genetic loci, mutant phenotypes, and allele collections.</p>
+      </a>
+
+      <a class="assembly-related-card" href="/expression">
+        <div class="assembly-related-title">Expression Data Center</div>
+        <p class="assembly-related-desc">RNA-seq transcriptomics atlases, developmental series, qTeller, and FETA functional enrichments.</p>
+      </a>
+
+      <a class="assembly-related-card" href="/genetic_variation">
+        <div class="assembly-related-title">Variation Data Center</div>
+        <p class="assembly-related-desc">SNPs, indels, structural variants, HapMaps, and diversity matrices across maize accessions.</p>
+      </a>
+    </div>
+  </section>
+</main>
+)

@@ -64,6 +64,8 @@ $WARM_URLS = array(
     '/data_center/gene_product',
     '/data_center/locus',
     '/data_center/qtl',
+    '/data_center/assembly',
+    '/assembly',
     '/expression',
     '/genetic_variation',
     '/insertion',

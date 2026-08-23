@@ -34,6 +34,12 @@
     return;
   }
 
+  /* When /genome/assembly is requested without an ID, render the modernized Assembly Data Center */
+  if (PAGE == 'assembly' && (!defined('ID') || !ID || ID == '')) {
+    include('controllers/genome/assembly_modern.php');
+    return;
+  }
+
   // Set title
   if (PAGE == 'genome_assembly') {
     $title = ID . ' metadata';
