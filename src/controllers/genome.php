@@ -40,6 +40,12 @@
     return;
   }
 
+  /* When /genome/genomebrowser is requested without an ID, render the modernized Genome Browser Data Center */
+  if (PAGE == 'genomebrowser' && (!defined('ID') || !ID || ID == '')) {
+    include('controllers/genome/genomebrowser_modern.php');
+    return;
+  }
+
   // Set title
   if (PAGE == 'genome_assembly') {
     $title = ID . ' metadata';

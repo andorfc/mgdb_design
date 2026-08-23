@@ -125,6 +125,11 @@
     return;
   }
 
+  if (PAGE == 'genomebrowser' && !getCGIParam('id', 'G', ID)) {
+    include('controllers/genome/genomebrowser_modern.php');
+    return;
+  }
+
   if (PAGE == 'image' && !getCGIParam('id', 'G', ID) || in_array(PAGE, array('image_phenotype', 'image_trait', 'image_species', 'image_gel_pattern', 'image_mutant'), true) && !getCGIParam('id', 'G', ID)) {
     include('controllers/data_center/image_search_modern.php');
     return;
