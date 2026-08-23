@@ -66,6 +66,8 @@ $WARM_URLS = array(
     '/data_center/qtl',
     '/data_center/assembly',
     '/assembly',
+    '/maize_history',
+    '/timelines',
     '/expression',
     '/genetic_variation',
     '/insertion',

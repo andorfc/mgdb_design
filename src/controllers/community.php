@@ -64,6 +64,11 @@
     return;
   }
 
+  if (PAGE == 'maize_history' || PAGE == 'timelines' || CONTROLLER == 'maize_history' || CONTROLLER == 'timelines') {
+    include('controllers/community/maize_history_modern.php');
+    return;
+  }
+
   if (CONTROLLER == "person") {
     // fields shifted because 'community' is implicit for 'person' controller
     $id = PAGE;

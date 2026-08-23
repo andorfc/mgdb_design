@@ -40,6 +40,16 @@ src/templates/home/megamenu_modern/gb.bau              templates/home/megamenu_m
 src/templates/home/megamenu_modern/genomes.bau         templates/home/megamenu_modern/genomes.bau
 src/templates/home/megamenu_modern/search.bau          templates/home/megamenu_modern/search.bau
 src/templates/home/megamenu_modern/sitemap.bau         templates/home/megamenu_modern/sitemap.bau
+
+# The /sitemap page. These five files existed only on the server until
+# 2026-08-23 -- not in this repository and not in this manifest, so nothing
+# backed them up. sitemap-content.bau is generated from a content model; see
+# README.md, "The site map".
+src/controllers/about/sitemap.php                controllers/about/sitemap.php
+src/templates/about/sitemap.bau                  templates/about/sitemap.bau
+src/templates/about/sitemap-content.bau          templates/about/sitemap-content.bau
+src/css/sitemap.css                              css/sitemap.css
+src/js/sitemap.js                                js/sitemap.js
 src/templates/home/megamenu_modern/tools.bau           templates/home/megamenu_modern/tools.bau
 
 # How to cite MaizeGDB — replaces /cite in place
@@ -535,4 +545,13 @@ src/controllers/genome/assembly_modern.php           controllers/genome/assembly
 src/templates/static/mgdb_assembly.bau               templates/static/mgdb_assembly.bau
 src/css/mgdb-assembly.css                            css/mgdb-assembly.css
 src/js/mgdb-assembly.js                              js/mgdb-assembly.js
+
+# Maize History & Timelines — replaces /maize_history and /timelines in place
+src/controllers/maize_history.php                    controllers/maize_history.php
+src/controllers/timelines.php                        controllers/timelines.php
+src/controllers/community/maize_history_modern.php  controllers/community/maize_history_modern.php
+src/templates/static/mgdb_history.bau                templates/static/mgdb_history.bau
+src/css/mgdb-history.css                             css/mgdb-history.css
+src/js/mgdb-history.js                               js/mgdb-history.js
+
 

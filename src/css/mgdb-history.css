@@ -1,0 +1,690 @@
+/* file: mgdb-history.css
+ *
+ * Scoped styling for Maize History & Timelines (/maize_history & /timelines).
+ * Scoped under .mgdb-history-page.
+ */
+
+/* --------------------------------------------------------------------------
+   Hero Emblem
+   -------------------------------------------------------------------------- */
+
+.mgdb-history-page .mgdb-hero-emblem {
+  background: #ffffff !important;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-history-page .mgdb-hero-emblem svg {
+  width: min(100%, 64px);
+  height: auto;
+  mix-blend-mode: normal;
+}
+
+/* --------------------------------------------------------------------------
+   Sticky Section Tabs
+   -------------------------------------------------------------------------- */
+
+.mgdb-history-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-5);
+  padding: var(--mgdb-space-2) 0;
+  background: var(--mgdb-surface);
+  border-bottom: 1px solid var(--mgdb-line);
+}
+
+.mgdb-history-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-decoration: none;
+  transition: background .12s, border-color .12s;
+}
+
+.mgdb-history-page .mgdb-section-tabs a:hover {
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-history-page .mgdb-section-tabs a.is-current,
+.mgdb-history-page .mgdb-section-tabs a[aria-current="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+.mgdb-history-page > section,
+.mgdb-history-page section[id] {
+  scroll-margin-top: 4.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   Filter Bar
+   -------------------------------------------------------------------------- */
+
+.mgdb-history-page .history-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mgdb-space-3);
+  margin-bottom: var(--mgdb-space-6);
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  background: var(--mgdb-surface-alt);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+}
+
+.mgdb-history-page .history-filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-history-page .history-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  border: 1px solid var(--mgdb-line);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .12s ease;
+}
+
+.mgdb-history-page .history-filter-btn:hover {
+  background: var(--mgdb-green-soft);
+  border-color: var(--mgdb-green);
+}
+
+.mgdb-history-page .history-filter-btn.is-active {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border-color: var(--mgdb-green-dark);
+}
+
+.mgdb-history-page .history-filter-btn.is-active .history-filter-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+.mgdb-history-page .history-filter-count {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-muted);
+  font-size: 10px;
+}
+
+.mgdb-history-page .filter-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.mgdb-history-page .filter-dot-breakthrough { background: #2563eb; }
+.mgdb-history-page .filter-dot-meeting { background: #d97706; }
+.mgdb-history-page .filter-dot-cooperative { background: #16a34a; }
+
+.mgdb-history-page .history-search-input {
+  min-width: 260px;
+  font-size: var(--mgdb-text-sm);
+  padding: 6px 12px;
+}
+
+/* --------------------------------------------------------------------------
+   Timeline Container & Cards
+   -------------------------------------------------------------------------- */
+
+.mgdb-history-page .timeline-container {
+  position: relative;
+  padding: var(--mgdb-space-4) 0;
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-history-page .timeline-track-line {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #cbd5e1;
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+.mgdb-history-page .timeline-item {
+  position: relative;
+  width: 50%;
+  margin-bottom: var(--mgdb-space-6);
+  z-index: 2;
+}
+
+.mgdb-history-page .timeline-item.is-hidden {
+  display: none !important;
+}
+
+.mgdb-history-page .timeline-item-left {
+  left: 0;
+  padding-right: var(--mgdb-space-6);
+}
+
+.mgdb-history-page .timeline-item-right {
+  left: 50%;
+  padding-left: var(--mgdb-space-6);
+}
+
+/* Center circle marker on track line */
+.mgdb-history-page .timeline-marker {
+  position: absolute;
+  top: 14px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border: 4px solid var(--mgdb-surface);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+.mgdb-history-page .timeline-item-left .timeline-marker {
+  right: -22px;
+}
+
+.mgdb-history-page .timeline-item-right .timeline-marker {
+  left: -22px;
+}
+
+/* Timeline Card */
+.mgdb-history-page .timeline-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-4);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+}
+
+.mgdb-history-page .timeline-card:hover {
+  border-color: var(--mgdb-green);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.mgdb-history-page .timeline-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mgdb-space-2);
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-history-page .timeline-year-chip {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-history-page .timeline-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.mgdb-history-page .timeline-badge-breakthrough {
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+
+.mgdb-history-page .timeline-badge-meeting {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.mgdb-history-page .timeline-badge-cooperative {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.mgdb-history-page .timeline-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 var(--mgdb-space-2) 0;
+  color: var(--mgdb-ink);
+  line-height: 1.3;
+}
+
+.mgdb-history-page .timeline-card-desc {
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.5;
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-history-page .timeline-event-pub {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  background: var(--mgdb-surface-alt);
+  padding: 6px 10px;
+  border-radius: var(--mgdb-radius-sm);
+  margin-top: var(--mgdb-space-2);
+}
+
+.mgdb-history-page .timeline-event-pub a {
+  color: var(--mgdb-green-dark);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.mgdb-history-page .timeline-event-pub a:hover {
+  text-decoration: underline;
+}
+
+.mgdb-history-page .timeline-event-media {
+  margin-top: var(--mgdb-space-3);
+  text-align: center;
+}
+
+.mgdb-history-page .timeline-event-media img {
+  max-width: 100%;
+  max-height: 220px;
+  border-radius: var(--mgdb-radius-sm);
+  border: 1px solid var(--mgdb-line);
+  object-fit: contain;
+  background: #ffffff;
+}
+
+.mgdb-history-page .timeline-media-caption {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  margin-top: 4px;
+}
+
+.mgdb-history-page .timeline-media-credit {
+  display: block;
+  color: var(--mgdb-muted);
+  font-style: italic;
+}
+
+/* --------------------------------------------------------------------------
+   MaizeGDB Evolution Section
+   -------------------------------------------------------------------------- */
+
+.mgdb-history-page .history-maizegdb-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: var(--mgdb-space-6);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-history-page .history-maizegdb-narrative h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 var(--mgdb-space-3) 0;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-history-page .history-maizegdb-narrative p {
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.6;
+  margin-bottom: var(--mgdb-space-3);
+}
+
+.mgdb-history-page .history-pillars {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--mgdb-space-3);
+  margin: var(--mgdb-space-4) 0;
+}
+
+.mgdb-history-page .pillar-card {
+  background: var(--mgdb-surface-alt);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+}
+
+.mgdb-history-page .pillar-card h4 {
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+  margin: 0 0 var(--mgdb-space-2) 0;
+}
+
+.mgdb-history-page .pillar-card ul {
+  margin: 0;
+  padding-left: var(--mgdb-space-4);
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.5;
+}
+
+.mgdb-history-page .history-conference-links {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  font-size: var(--mgdb-text-sm);
+  color: #166534;
+}
+
+.mgdb-history-page .history-links-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-2);
+}
+
+.mgdb-history-page .history-diagrams-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-history-page .history-diagram-card {
+  margin: 0;
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.mgdb-history-page .history-diagram-card img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--mgdb-radius-sm);
+  border: 1px solid #e2e8f0;
+}
+
+.mgdb-history-page .history-diagram-card figcaption {
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  color: var(--mgdb-muted);
+  text-align: center;
+  margin-top: var(--mgdb-space-2);
+}
+
+/* --------------------------------------------------------------------------
+   Classic Reads Grid
+   -------------------------------------------------------------------------- */
+
+.mgdb-history-page .classic-reads-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-history-page .classic-read-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-4);
+  display: flex;
+  flex-direction: column;
+  transition: border-color .12s, box-shadow .12s;
+}
+
+.mgdb-history-page .classic-read-card:hover {
+  border-color: var(--mgdb-green);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.mgdb-history-page .classic-read-year {
+  display: inline-block;
+  align-self: flex-start;
+  background: var(--mgdb-surface-alt);
+  border: 1px solid var(--mgdb-line);
+  padding: 2px 8px;
+  border-radius: var(--mgdb-radius-sm);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-history-page .classic-read-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.mgdb-history-page .classic-read-title {
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  margin: 0 0 var(--mgdb-space-1) 0;
+  line-height: 1.3;
+}
+
+.mgdb-history-page .classic-read-title a {
+  color: var(--mgdb-green-dark);
+  text-decoration: none;
+}
+
+.mgdb-history-page .classic-read-title a:hover {
+  text-decoration: underline;
+}
+
+.mgdb-history-page .classic-read-authors {
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  color: var(--mgdb-ink);
+  margin: 0 0 var(--mgdb-space-2) 0;
+}
+
+.mgdb-history-page .classic-read-desc {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.5;
+  margin-bottom: var(--mgdb-space-3);
+  flex: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Historic Image Galleries
+   -------------------------------------------------------------------------- */
+
+.mgdb-history-page .history-galleries-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-history-page .history-gallery-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-5);
+  display: flex;
+  flex-direction: column;
+  transition: border-color .12s, box-shadow .12s;
+}
+
+.mgdb-history-page .history-gallery-card:hover {
+  border-color: var(--mgdb-green);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.mgdb-history-page .history-gallery-badge {
+  display: inline-block;
+  align-self: flex-start;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: var(--mgdb-space-3);
+}
+
+.mgdb-history-page .history-gallery-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 var(--mgdb-space-1) 0;
+}
+
+.mgdb-history-page .history-gallery-title a {
+  color: var(--mgdb-ink);
+  text-decoration: none;
+}
+
+.mgdb-history-page .history-gallery-title a:hover {
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-history-page .history-gallery-location {
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  color: var(--mgdb-muted);
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-history-page .history-gallery-desc {
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.5;
+  margin-bottom: var(--mgdb-space-4);
+  flex: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Domestication Card
+   -------------------------------------------------------------------------- */
+
+.mgdb-history-page .history-domestication-content {
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-history-page .domestication-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-5);
+}
+
+.mgdb-history-page .domestication-card h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 var(--mgdb-space-3) 0;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-history-page .domestication-card p {
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.6;
+  margin-bottom: var(--mgdb-space-3);
+}
+
+.mgdb-history-page .domestication-links {
+  margin-top: var(--mgdb-space-4);
+}
+
+/* --------------------------------------------------------------------------
+   Connected Resources Bottom Section
+   -------------------------------------------------------------------------- */
+
+.mgdb-history-page .history-bottom-section {
+  background: linear-gradient(180deg, var(--mgdb-surface) 0%, var(--mgdb-green-soft) 100%) !important;
+  border-color: #b8dbca !important;
+}
+
+.mgdb-history-page .history-related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-history-page .history-related-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  padding: var(--mgdb-space-3);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color .12s, box-shadow .12s;
+}
+
+.mgdb-history-page .history-related-card:hover {
+  border-color: var(--mgdb-green);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.mgdb-history-page .history-related-title {
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+  margin-bottom: 2px;
+}
+
+.mgdb-history-page .history-related-desc {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive Mobile Layout
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .mgdb-history-page .history-maizegdb-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .mgdb-history-page .mgdb-section-tabs {
+    position: static;
+  }
+
+  .mgdb-history-page .timeline-track-line {
+    left: 20px;
+  }
+
+  .mgdb-history-page .timeline-item {
+    width: 100%;
+    left: 0 !important;
+    padding-left: 54px !important;
+    padding-right: 0 !important;
+  }
+
+  .mgdb-history-page .timeline-marker {
+    left: 0 !important;
+    right: auto !important;
+  }
+}
