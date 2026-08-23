@@ -68,6 +68,8 @@ $WARM_URLS = array(
     '/assembly',
     '/data_center/genomebrowser',
     '/genomebrowser',
+    '/download',
+    '/downloads',
     '/maize_history',
     '/timelines',
     '/expression',

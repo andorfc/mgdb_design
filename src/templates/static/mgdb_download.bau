@@ -1,0 +1,733 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-download
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https://maizegdb.org/download">
+<meta property="og:title" content="Bulk Downloads &amp; Globus Data Portal | MaizeGDB">
+<meta property="og:description" content="Download maize reference genomes, NAM founders, Pan-Andropogoneae wild relatives, AI/ML models, variant matrices, and functional data tracks via Globus high-speed endpoints and HTTP bulk servers.">
+
+<main class="mgdb-page mgdb-download-page" id="download-top">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center">Data centers</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Bulk Downloads &amp; Globus</span>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="mgdb-hero" aria-labelledby="download-title">
+    <div class="mgdb-hero-emblem">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Cloud outline & base server layers -->
+        <path d="M48 38C52.4183 38 56 34.4183 56 30C56 25.8254 52.8021 22.3978 48.7188 22.0368C47.8016 15.1741 41.9366 10 34.8 10C28.6186 10 23.3601 13.9161 21.464 19.467C20.3541 19.1607 19.1934 19 18 19C12.4772 19 8 23.4772 8 29C8 34.2045 11.9796 38.4807 17.0652 38.9507" stroke="#1b5e20" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Download Arrow -->
+        <path d="M32 24V46M32 46L23 37M32 46L41 37" stroke="#2e7d32" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Storage Base Trays -->
+        <path d="M12 50H52M16 56H48" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <strong>Bulk<br />Downloads</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data_date)</p>
+      <h1 id="download-title">MaizeGDB Bulk Downloads &amp; Globus Data Portal</h1>
+      <p class="mgdb-hero-description">High-performance data distribution environments for maize reference assemblies, pan-genomes, functional track packages, large variant matrices, AI models, and curated community dataset archives.</p>
+    </div>
+  </section>
+
+  <!-- STICKY SECTION TABS -->
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#downloads-globus" class="is-current">Globus High-Speed Endpoint</a>
+    <a href="#downloads-server">HTTP Bulk Server</a>
+    <a href="#downloads-b73">B73 Reference Genomes</a>
+    <a href="#downloads-nam">NAM Founder Genomes</a>
+    <a href="#downloads-panand">Pan-Andropogoneae &amp; Relatives</a>
+    <a href="#downloads-inbreds">Diverse Inbreds</a>
+    <a href="#downloads-thematic">Functional &amp; AI Datasets</a>
+    <a href="#downloads-overview">Statistics</a>
+    <a href="#downloads-related">Connected Resources</a>
+  </nav>
+
+  <!-- SECTION 1: GLOBUS PUBLIC COLLECTION \(SCINet - JUNO\) -->
+  <section id="downloads-globus" class="mgdb-panel globus-hero-panel" aria-labelledby="globus-panel-heading">
+    <div class="globus-badge-row">
+      <span class="globus-tag-badge">High-Throughput Data Transfer</span>
+      <span class="globus-subtag-badge">USDA SCINet HPC Infrastructure</span>
+    </div>
+    <h2 id="globus-panel-heading" class="mgdb-panel-title">MaizeGDB Public Collection \(SCINet - JUNO\)</h2>
+    <p class="mgdb-panel-lead">High-speed, multi-gigabit automated data transfer powered by Globus. Ideal for multi-gigabyte to multi-terabyte datasets including complete genome assemblies, pre-indexed browser tracks, intermediate pipeline outputs, massive variant matrices, and AI/ML models.</p>
+
+    <!-- GLOBUS COLLECTION IDENTITY CARD -->
+    <div class="globus-id-card">
+      <div class="globus-id-icon-wrap">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <!-- Globus multi-node network graphic -->
+          <polygon points="24,6 40,15 40,33 24,42 8,33 8,15" stroke="#16a34a" stroke-width="2.5" fill="#f0fdf4" />
+          <circle cx="24" cy="6" r="3.5" fill="#15803d" />
+          <circle cx="40" cy="15" r="3.5" fill="#15803d" />
+          <circle cx="40" cy="33" r="3.5" fill="#15803d" />
+          <circle cx="24" cy="42" r="3.5" fill="#15803d" />
+          <circle cx="8" cy="33" r="3.5" fill="#15803d" />
+          <circle cx="8" cy="15" r="3.5" fill="#15803d" />
+          <circle cx="24" cy="24" r="5" fill="#ca8a04" />
+          <line x1="24" y1="24" x2="24" y2="6" stroke="#16a34a" stroke-width="2" />
+          <line x1="24" y1="24" x2="40" y2="15" stroke="#16a34a" stroke-width="2" />
+          <line x1="24" y1="24" x2="40" y2="33" stroke="#16a34a" stroke-width="2" />
+          <line x1="24" y1="24" x2="24" y2="42" stroke="#16a34a" stroke-width="2" />
+          <line x1="24" y1="24" x2="8" y2="33" stroke="#16a34a" stroke-width="2" />
+          <line x1="24" y1="24" x2="8" y2="15" stroke="#16a34a" stroke-width="2" />
+        </svg>
+      </div>
+      <div class="globus-id-body">
+        <div class="globus-header-flex">
+          <h3 class="globus-collection-name">MaizeGDB Public Collection \(SCINet - JUNO\)</h3>
+          <span class="globus-guest-chip">Guest Collection \(GCS\) on <strong>SCINet-Juno</strong></span>
+        </div>
+
+        <div class="globus-meta-grid">
+          <div class="globus-meta-item">
+            <span class="meta-label">Collection Owner&#58;</span>
+            <span class="meta-value"><code>carson.andorf@scinet.usda.gov</code></span>
+          </div>
+          <div class="globus-meta-item">
+            <span class="meta-label">Globus Domain Endpoint&#58;</span>
+            <span class="meta-value">
+              <code id="globus-domain-str">g-3126c1.67741c.a567.data.globus.org</code>
+              <button type="button" class="copy-btn-inline" onclick="copyText\('globus-domain-str', this\)" title="Copy Domain">Copy</button>
+            </span>
+          </div>
+        </div>
+
+        <p class="globus-collection-desc">
+          <strong>Dataset Scope&#58;</strong> This public collection provides unrestricted, read-only access to curated datasets from MaizeGDB. It hosts a comprehensive suite of genetics, genomics, and breeding data including whole-genome FASTA/GFF files, pre-formatted JBrowse tracks \(BigWig, BAM, CRAM, VCF\), intermediate pipeline analyses, high-density SNP matrices, and AI machine learning weights and inference outputs.
+        </p>
+
+        <div class="globus-actions-row">
+          <a class="mgdb-button mgdb-button-primary" href="https://app.globus.org/file-manager?origin_id=g-3126c1.67741c.a567.data.globus.org" target="_blank" rel="noopener">Open in Globus Web App &#8599;</a>
+          <a class="mgdb-button mgdb-button-secondary" href="https://g-3126c1.67741c.a567.data.globus.org/" target="_blank" rel="noopener">Direct HTTPS Browse &#8599;</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- GLOBUS HOW-TO CONNECTION GUIDE -->
+    <div class="globus-guide-container">
+      <h3 class="guide-heading">How to Connect &amp; Transfer Data via Globus</h3>
+
+      <!-- Step Cards Grid -->
+      <div class="globus-methods-grid">
+        <!-- METHOD 1: WEB APP -->
+        <article class="method-card">
+          <div class="method-badge">Method 1 &bull; Web Interface</div>
+          <h4>Globus Web App \(Interactive GUI\)</h4>
+          <p>Ideal for point-and-click transfers between MaizeGDB and your personal workstation, university cluster, or cloud storage \(AWS S3, Google Drive, Box\).</p>
+          <ol class="method-steps-list">
+            <li>Navigate to <a href="https://app.globus.org" target="_blank" rel="noopener">app.globus.org &#8599;</a> and log in with your institutional credentials or Globus ID.</li>
+            <li>In the <strong>File Manager</strong> search bar, enter <code>MaizeGDB Public Collection \(SCINet - JUNO\)</code> or domain <code>g-3126c1.67741c.a567.data.globus.org</code>.</li>
+            <li>Select the files or directories you wish to retrieve on the left pane.</li>
+            <li>Select your target destination endpoint on the right pane and click <strong>Start Transfer</strong>. Globus manages checksum verification, fire-and-forget background transfer, and email notification upon completion.</li>
+          </ol>
+        </article>
+
+        <!-- METHOD 2: CLI -->
+        <article class="method-card">
+          <div class="method-badge method-badge-blue">Method 2 &bull; Command Line</div>
+          <h4>Globus CLI \(Automated Pipelines\)</h4>
+          <p>Ideal for batch compute jobs, bioinformatic workflows, and scheduled cron synchronization scripts on high-performance computing clusters.</p>
+          
+          <div class="code-block-wrap">
+            <div class="code-block-header">
+              <span>Terminal Command Snippets</span>
+              <button type="button" class="copy-btn-inline" onclick="copySnippet\('cli-snippet-1', this\)">Copy Code</button>
+            </div>
+            <pre><code id="cli-snippet-1"># 1. Install Globus CLI via pip or conda
+pip install globus-cli
+
+# 2. Authenticate session
+globus login
+
+# 3. List top-level directories in the MaizeGDB collection
+globus ls g-3126c1.67741c.a567.data.globus.org:/
+
+# 4. Initiate recursive background transfer to your local HPC endpoint
+globus transfer g-3126c1.67741c.a567.data.globus.org:/genomes/ &lt;YOUR_ENDPOINT_ID&gt;:/scratch/maize/ --recursive --label "MaizeGDB Genome Sync"</code></pre>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: DIRECT HTTP BULK DOWNLOAD SERVER -->
+  <section id="downloads-server" class="mgdb-panel" aria-labelledby="downloads-server-heading">
+    <h2 id="downloads-server-heading" class="mgdb-panel-title">Direct HTTP Download Server &amp; Box Repository</h2>
+    <p class="mgdb-panel-lead">Standard web-based FTP-style directories and institutional data stores for direct file downloads and automated scripting via curl or wget.</p>
+
+    <div class="servers-grid">
+      <!-- Card 1: HTTP Download Server -->
+      <article class="server-card">
+        <div class="server-card-top">
+          <div class="server-icon-wrap">
+            <img src="/images/maize_download.png" alt="MaizeGDB Download Server" />
+          </div>
+          <div>
+            <h3>MaizeGDB HTTP Download Server</h3>
+            <span class="server-url-badge">https&#58;//download.maizegdb.org/</span>
+          </div>
+        </div>
+        <p class="server-card-desc">Comprehensive open-access file tree holding all released B73 assemblies \(v1&ndash;v5\), 26 NAM founder inbreds, wild relatives, genetic maps, transcriptomics matrices, and supplementary publication files.</p>
+        <div class="server-card-actions">
+          <a class="mgdb-button mgdb-button-primary" href="https://download.maizegdb.org/" target="_blank" rel="noopener">Browse Download Server &#8599;</a>
+        </div>
+      </article>
+
+      <!-- Card 2: Box Data Store -->
+      <article class="server-card">
+        <div class="server-card-top">
+          <div class="server-icon-wrap">
+            <img src="/images/box_download.png" alt="MaizeGDB Box Data Store" />
+          </div>
+          <div>
+            <h3>Institutional Box Data Store</h3>
+            <span class="server-url-badge">iastate.app.box.com/v/maizegdb-public</span>
+          </div>
+        </div>
+        <p class="server-card-desc">Public cloud storage repository dedicated to large machine learning models, neural network weights, deep learning datasets, and bundled NAM project JBrowse track archives.</p>
+        <div class="server-card-actions">
+          <a class="mgdb-button mgdb-button-secondary" href="https://iastate.app.box.com/v/maizegdb-public" target="_blank" rel="noopener">Browse Box Repository &#8599;</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 3: B73 REFERENCE GENOMES -->
+  <section id="downloads-b73" class="mgdb-panel" aria-labelledby="downloads-b73-heading">
+    <h2 id="downloads-b73-heading" class="mgdb-panel-title">B73 Representative Reference Genome Releases</h2>
+    <p class="mgdb-panel-lead">Complete sequence assemblies, GFF3 gene model annotations, canonical CDS/PEP FASTA, and MAKER-P support packages for all 5 B73 reference versions.</p>
+
+    <div class="mgdb-table-wrapper">
+      <table class="mgdb-table">
+        <thead>
+          <tr>
+            <th scope="col">Version / Name</th>
+            <th scope="col">Release Year</th>
+            <th scope="col">Annotation Format</th>
+            <th scope="col">Key Features</th>
+            <th scope="col">Direct Download Links</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>B73 RefGen_v5</strong><br><small>Zm-B73-REFERENCE-NAM-5.0</small></td>
+            <td>2020</td>
+            <td>Zm00001eb</td>
+            <td>PacBio Sequel II HiFi / BioNano de novo assembly; current reference standard</td>
+            <td>
+              <div class="download-link-group">
+                <a class="table-dl-btn" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/" target="_blank" rel="noopener">Browse v5 Files &#8599;</a>
+                <a class="table-dl-btn table-dl-secondary" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0.fa.gz">Assembly FASTA</a>
+                <a class="table-dl-btn table-dl-secondary" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.gff3.gz">GFF3 Annotation</a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>B73 RefGen_v4</strong><br><small>Zm-B73-REFERENCE-GRAMENE-4.0</small></td>
+            <td>2016</td>
+            <td>Zm00001d</td>
+            <td>PacBio single-molecule real-time sequencing assembly; Gramene annotation</td>
+            <td>
+              <div class="download-link-group">
+                <a class="table-dl-btn" href="https://download.maizegdb.org/Zm-B73-REFERENCE-GRAMENE-4.0/" target="_blank" rel="noopener">Browse v4 Files &#8599;</a>
+                <a class="table-dl-btn table-dl-secondary" href="https://download.maizegdb.org/Zm-B73-REFERENCE-GRAMENE-4.0/Zm-B73-REFERENCE-GRAMENE-4.0.fa.gz">Assembly FASTA</a>
+                <a class="table-dl-btn table-dl-secondary" href="https://download.maizegdb.org/Zm-B73-REFERENCE-GRAMENE-4.0/Zm-B73-REFERENCE-GRAMENE-4.0_Zm00001d.2.gff3.gz">GFF3 Annotation</a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>B73 RefGen_v3</strong><br><small>RefGen_v3</small></td>
+            <td>2013</td>
+            <td>GRMZM \(5b/6a\)</td>
+            <td>Upgraded BAC tiling path with improved pseudomolecule scaffolding</td>
+            <td>
+              <div class="download-link-group">
+                <a class="table-dl-btn" href="https://download.maizegdb.org/B73_RefGen_v3/" target="_blank" rel="noopener">Browse v3 Files &#8599;</a>
+                <a class="table-dl-btn table-dl-secondary" href="https://download.maizegdb.org/B73_RefGen_v3/Zea_mays.AGPv3.22.dna.toplevel.fa.gz">Assembly FASTA</a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>B73 RefGen_v2</strong><br><small>RefGen_v2</small></td>
+            <td>2010</td>
+            <td>GRMZM \(5a\)</td>
+            <td>Intermediate BAC-based chromosome builds</td>
+            <td>
+              <div class="download-link-group">
+                <a class="table-dl-btn" href="https://download.maizegdb.org/B73_RefGen_v2/" target="_blank" rel="noopener">Browse v2 Files &#8599;</a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>B73 RefGen_v1</strong><br><small>RefGen_v1 \(Schnable et al., 2009\)</small></td>
+            <td>2009</td>
+            <td>GRMZM \(4a\)</td>
+            <td>First BAC-by-BAC Sanger sequence release for Zea mays</td>
+            <td>
+              <div class="download-link-group">
+                <a class="table-dl-btn" href="https://download.maizegdb.org/B73_RefGen_v1/" target="_blank" rel="noopener">Browse v1 Files &#8599;</a>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 4: NAM FOUNDER INBRED GENOMES -->
+  <section id="downloads-nam" class="mgdb-panel" aria-labelledby="downloads-nam-heading">
+    <div class="section-badge-row">
+      <span class="nam-count-badge">26 Chromosome-Scale Assemblies</span>
+      <span class="nam-citation-badge">Hufford et al., 2021 <em>Science</em></span>
+    </div>
+    <h2 id="downloads-nam-heading" class="mgdb-panel-title">NAM Founder Inbred Line Genomes</h2>
+    <p class="mgdb-panel-lead">High-quality de novo assemblies and comprehensive annotations for all 26 diverse founder inbreds of the Nested Association Mapping \(NAM\) population.</p>
+
+    <div class="nam-downloads-grid">
+      <!-- 26 NAM FOUNDERS -->
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-B97-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">B97</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-CML52-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">CML52</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-CML69-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">CML69</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-CML103-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">CML103</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-CML228-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">CML228</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-CML247-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">CML247</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-CML277-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">CML277</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-CML322-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">CML322</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-CML333-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">CML333</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-HP301-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">HP301</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-Il14H-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">Il14H</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-Ki3-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">Ki3</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-Ki11-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">Ki11</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-Ky21-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">Ky21</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-M37W-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">M37W</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-M162W-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">M162W</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-Mo18W-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">Mo18W</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-Ms71-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">Ms71</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-NC350-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">NC350</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-NC358-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">NC358</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-Oh43-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">Oh43</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-Oh7B-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">Oh7B</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-P39-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">P39</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-Tx303-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">Tx303</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card" href="https://download.maizegdb.org/Zm-Tzi8-REFERENCE-NAM-1.0/" target="_blank" rel="noopener">
+        <span class="nam-item-name">Tzi8</span>
+        <span class="nam-item-dl">Download Files &#8599;</span>
+      </a>
+      <a class="nam-item-card nam-card-jbrowse" href="https://iastate.app.box.com/v/maizegdb-public/folder/323421472117" target="_blank" rel="noopener">
+        <span class="nam-item-name">NAM JBrowse Tracks</span>
+        <span class="nam-item-dl">Browse Box Bundle &#8599;</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- SECTION 5: PAN-ANDROPOGONEAE & WILD RELATIVES -->
+  <section id="downloads-panand" class="mgdb-panel" aria-labelledby="downloads-panand-heading">
+    <div class="toronto-notice-box">
+      <strong>Data Access Notice&#58;</strong> Pan-Andropogoneae wild relative genome assemblies are provided in accordance with the <a href="https://www.nature.com/articles/461168a" target="_blank" rel="noopener">Toronto Agreement</a> for pre-publication data sharing. Please cite MaizeGDB and the respective sequencing consortia when using these resources in research.
+    </div>
+    <h2 id="downloads-panand-heading" class="mgdb-panel-title">Pan-Andropogoneae Genomes &amp; Wild Relatives</h2>
+    <p class="mgdb-panel-lead">Assemblies and gene model annotations across wild teosintes, Tripsacum, and outgroup Andropogoneae grasses.</p>
+
+    <div class="wild-species-grid">
+      <!-- Zea diploperennis Gigi -->
+      <article class="species-dl-card">
+        <div class="species-dl-badge">Teosinte</div>
+        <h4><em>Zea diploperennis</em> \(Gigi\)</h4>
+        <p class="species-desc">Perennial teosinte reference assembly.</p>
+        <a class="species-btn" href="https://download.maizegdb.org/Zd-Gigi-REFERENCE-PanAnd-1.0/" target="_blank" rel="noopener">Download Zd-Gigi &#8599;</a>
+      </article>
+
+      <!-- Zea diploperennis Momo -->
+      <article class="species-dl-card">
+        <div class="species-dl-badge">Teosinte</div>
+        <h4><em>Zea diploperennis</em> \(Momo\)</h4>
+        <p class="species-desc">Perennial teosinte reference assembly.</p>
+        <a class="species-btn" href="https://download.maizegdb.org/Zd-Momo-REFERENCE-PanAnd-1.0/" target="_blank" rel="noopener">Download Zd-Momo &#8599;</a>
+      </article>
+
+      <!-- Zea luxurians -->
+      <article class="species-dl-card">
+        <div class="species-dl-badge">Teosinte</div>
+        <h4><em>Zea luxurians</em> \(RIL003\)</h4>
+        <p class="species-desc">Guatemalan teosinte reference genome.</p>
+        <a class="species-btn" href="https://download.maizegdb.org/Zl-RIL003-REFERENCE-PanAnd-1.0/" target="_blank" rel="noopener">Download Zl-RIL003 &#8599;</a>
+      </article>
+
+      <!-- Zea mays huehuetenangensis -->
+      <article class="species-dl-card">
+        <div class="species-dl-badge">Teosinte</div>
+        <h4><em>Zea mays ssp. huehuetenangensis</em></h4>
+        <p class="species-desc">Highland wild teosinte accession RIMHU001.</p>
+        <a class="species-btn" href="https://download.maizegdb.org/Zh-RIMHU001-REFERENCE-PanAnd-1.0/" target="_blank" rel="noopener">Download Zh-RIMHU001 &#8599;</a>
+      </article>
+
+      <!-- Zea nicaraguensis -->
+      <article class="species-dl-card">
+        <div class="species-dl-badge">Teosinte</div>
+        <h4><em>Zea nicaraguensis</em> \(PI615697\)</h4>
+        <p class="species-desc">Flood-tolerant wild teosinte reference.</p>
+        <a class="species-btn" href="https://download.maizegdb.org/Zn-PI615697-REFERENCE-PanAnd-1.0/" target="_blank" rel="noopener">Download Zn-PI615697 &#8599;</a>
+      </article>
+
+      <!-- Zea mays parviglumis -->
+      <article class="species-dl-card">
+        <div class="species-dl-badge species-badge-gold">Direct Ancestor</div>
+        <h4><em>Zea mays ssp. parviglumis</em></h4>
+        <p class="species-desc">Primary wild progenitor of domesticated maize \(TIL01 &amp; TIL11\).</p>
+        <div class="species-btn-row">
+          <a class="species-btn" href="https://download.maizegdb.org/Zv-TIL01-REFERENCE-PanAnd-1.0/" target="_blank" rel="noopener">TIL01 &#8599;</a>
+          <a class="species-btn" href="https://download.maizegdb.org/Zv-TIL11-REFERENCE-PanAnd-1.0/" target="_blank" rel="noopener">TIL11 &#8599;</a>
+        </div>
+      </article>
+
+      <!-- Zea mays mexicana -->
+      <article class="species-dl-card">
+        <div class="species-dl-badge species-badge-gold">Highland Introgression</div>
+        <h4><em>Zea mays ssp. mexicana</em></h4>
+        <p class="species-desc">Highland teosinte involved in adaptive introgression \(TIL18 &amp; TIL25\).</p>
+        <div class="species-btn-row">
+          <a class="species-btn" href="https://download.maizegdb.org/Zx-TIL18-REFERENCE-PanAnd-1.0/" target="_blank" rel="noopener">TIL18 &#8599;</a>
+          <a class="species-btn" href="https://download.maizegdb.org/Zx-TIL25-REFERENCE-PanAnd-1.0/" target="_blank" rel="noopener">TIL25 &#8599;</a>
+        </div>
+      </article>
+
+      <!-- Tripsacum dactyloides -->
+      <article class="species-dl-card">
+        <div class="species-dl-badge species-badge-blue">Outgroup</div>
+        <h4><em>Tripsacum dactyloides</em> \(Gamagrass\)</h4>
+        <p class="species-desc">Eastern gamagrass reference assemblies \(FL, KS, McKain334\).</p>
+        <div class="species-btn-row">
+          <a class="species-btn" href="https://download.maizegdb.org/Td-FL_9056069_6-DRAFT-PanAnd-1.0/" target="_blank" rel="noopener">FL &#8599;</a>
+          <a class="species-btn" href="https://download.maizegdb.org/Td-KS_B6-1-DRAFT-PanAnd-1.0/" target="_blank" rel="noopener">KS &#8599;</a>
+          <a class="species-btn" href="https://download.maizegdb.org/Td-McKain334-DRAFT-PanAnd-1.0/" target="_blank" rel="noopener">McKain &#8599;</a>
+        </div>
+      </article>
+
+      <!-- Anatherum virginicum -->
+      <article class="species-dl-card">
+        <div class="species-dl-badge species-badge-blue">Outgroup</div>
+        <h4><em>Anatherum virginicum</em></h4>
+        <p class="species-desc">Broomsedge grass reference assembly.</p>
+        <a class="species-btn" href="https://download.maizegdb.org/Av-Kellogg1287_8-REFERENCE-PanAnd-1.0/" target="_blank" rel="noopener">Download Av-Kellogg &#8599;</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 6: DIVERSE INBREDS & HISTORIC LINES -->
+  <section id="downloads-inbreds" class="mgdb-panel" aria-labelledby="downloads-inbreds-heading">
+    <h2 id="downloads-inbreds-heading" class="mgdb-panel-title">Diverse Inbred Lines &amp; Specialized Assemblies</h2>
+    <p class="mgdb-panel-lead">Assemblies for widely utilized reference lines, transformation standards, European flints, and sweet corn inbreds.</p>
+
+    <div class="inbreds-grid">
+      <div class="inbred-card">
+        <h4>A188 Reference</h4>
+        <p>Tissue culture and embryogenic transformation model.</p>
+        <a class="table-dl-btn" href="https://download.maizegdb.org/A188/" target="_blank" rel="noopener">Download A188 &#8599;</a>
+      </div>
+
+      <div class="inbred-card">
+        <h4>B104 Reference</h4>
+        <p>High-efficiency transformation standard inbred.</p>
+        <a class="table-dl-btn" href="https://download.maizegdb.org/B104/" target="_blank" rel="noopener">Download B104 &#8599;</a>
+      </div>
+
+      <div class="inbred-card">
+        <h4>Mo17 CAU &amp; Yan</h4>
+        <p>Stiff stalk counter-heterotic tester inbred line.</p>
+        <a class="table-dl-btn" href="https://download.maizegdb.org/Mo17/" target="_blank" rel="noopener">Download Mo17 &#8599;</a>
+      </div>
+
+      <div class="inbred-card">
+        <h4>PH207 Reference</h4>
+        <p>Ex-PVP commercial elite dent inbred genome.</p>
+        <a class="table-dl-btn" href="https://download.maizegdb.org/PH207/" target="_blank" rel="noopener">Download PH207 &#8599;</a>
+      </div>
+
+      <div class="inbred-card">
+        <h4>W22 Reference</h4>
+        <p>Genetic model for <em>UniformMu</em> mutagenesis &amp; seed color.</p>
+        <a class="table-dl-btn" href="https://download.maizegdb.org/W22/" target="_blank" rel="noopener">Download W22 &#8599;</a>
+      </div>
+
+      <div class="inbred-card">
+        <h4>EP1 &amp; F7 Flint Lines</h4>
+        <p>European flint cold-tolerant germplasm references.</p>
+        <a class="table-dl-btn" href="https://download.maizegdb.org/EP1_and_F7/" target="_blank" rel="noopener">Download Flints &#8599;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 7: THEMATIC FUNCTIONAL DATASETS & AI MODELS -->
+  <section id="downloads-thematic" class="mgdb-panel" aria-labelledby="downloads-thematic-heading">
+    <h2 id="downloads-thematic-heading" class="mgdb-panel-title">Thematic Functional Datasets, AI Models &amp; Archives</h2>
+    <p class="mgdb-panel-lead">Curated collections spanning machine learning weights, variant catalogs, transcriptomics matrices, mutagenesis libraries, and phenotypic images.</p>
+
+    <div class="thematic-grid">
+      <!-- 1: AI / Machine Learning -->
+      <article class="thematic-card">
+        <div class="thematic-badge thematic-badge-green">AI &amp; Models</div>
+        <h3 class="thematic-title">Artificial Intelligence &amp; ML Models</h3>
+        <p class="thematic-desc">Trained deep learning model weights, embeddings, benchmark training/validation splits, and pipeline inference outputs.</p>
+        <div class="thematic-links">
+          <a class="thematic-link" href="https://iastate.app.box.com/v/maizegdb-public/folder/323424248589" target="_blank" rel="noopener">Box Repository &#8599;</a>
+          <a class="thematic-link" href="#downloads-globus">Globus Endpoint &uarr;</a>
+        </div>
+      </article>
+
+      <!-- 2: SNPs & Maps -->
+      <article class="thematic-card">
+        <div class="thematic-badge thematic-badge-gold">Genotyping</div>
+        <h3 class="thematic-title">SNPs, Genetic Maps &amp; Genotypes</h3>
+        <p class="thematic-desc">HapMap VCFs, high-density SNP genotyping arrays, recombination genetic maps, and marker coordinate mapping files.</p>
+        <div class="thematic-links">
+          <a class="thematic-link" href="https://download.maizegdb.org/SNPs_and_Maps/" target="_blank" rel="noopener">Browse SNP Downloads &#8599;</a>
+        </div>
+      </article>
+
+      <!-- 3: Expression -->
+      <article class="thematic-card">
+        <div class="thematic-badge thematic-badge-blue">Transcriptomics</div>
+        <h3 class="thematic-title">Gene Function &amp; Expression</h3>
+        <p class="thematic-desc">Multi-tissue developmental RNA-seq expression TPM matrices, qTeller raw counts, and functional GO/pathway annotations.</p>
+        <div class="thematic-links">
+          <a class="thematic-link" href="https://download.maizegdb.org/GeneFunction_and_Expression/" target="_blank" rel="noopener">Browse Expression Files &#8599;</a>
+        </div>
+      </article>
+
+      <!-- 4: Insertions -->
+      <article class="thematic-card">
+        <div class="thematic-badge thematic-badge-purple">Mutagenesis</div>
+        <h3 class="thematic-title">Transposon Insertions &amp; Mutants</h3>
+        <p class="thematic-desc">Sequence-indexed <em>UniformMu</em> flanking sequence tags, Ac/Ds insertion coordinates, and rescue clone data.</p>
+        <div class="thematic-links">
+          <a class="thematic-link" href="https://download.maizegdb.org/Insertions/" target="_blank" rel="noopener">Browse Insertion Data &#8599;</a>
+        </div>
+      </article>
+
+      <!-- 5: Domestication -->
+      <article class="thematic-card">
+        <div class="thematic-badge">Evolution</div>
+        <h3 class="thematic-title">Maize Domestication Traits</h3>
+        <p class="thematic-desc">Morphological trait measurements, archaeological cob metrics, and selection sweep datasets comparing maize and teosinte.</p>
+        <div class="thematic-links">
+          <a class="thematic-link" href="https://download.maizegdb.org/Maize_Domestication_Traits/" target="_blank" rel="noopener">Browse Domestication Data &#8599;</a>
+        </div>
+      </article>
+
+      <!-- 6: Metabolic -->
+      <article class="thematic-card">
+        <div class="thematic-badge">Biochemistry</div>
+        <h3 class="thematic-title">Metabolic Pathways \(CornCyc\)</h3>
+        <p class="thematic-desc">Pathway/Genome Databases \(PGDBs\), enzymatic reactions, metabolite cross-references, and BioCyc flat files.</p>
+        <div class="thematic-links">
+          <a class="thematic-link" href="https://download.maizegdb.org/MetabolicResources/" target="_blank" rel="noopener">Browse CornCyc Resources &#8599;</a>
+        </div>
+      </article>
+
+      <!-- 7: Neuffer Images -->
+      <article class="thematic-card">
+        <div class="thematic-badge">Phenomics</div>
+        <h3 class="thematic-title">Neuffer Mutant Image Collection</h3>
+        <p class="thematic-desc">High-resolution photographic slide collection documenting classic morphological maize mutants across ear, tassel, and leaf phenotypes.</p>
+        <div class="thematic-links">
+          <a class="thematic-link" href="https://download.maizegdb.org/Neuffer_Mutant_Images/" target="_blank" rel="noopener">Browse Image Archives &#8599;</a>
+        </div>
+      </article>
+
+      <!-- 8: Templates -->
+      <article class="thematic-card">
+        <div class="thematic-badge">Curation</div>
+        <h3 class="thematic-title">Community Data Submission Templates</h3>
+        <p class="thematic-desc">Standardized Excel and TSV templates for submitting QTL, loci, stocks, phenotypic measurements, and mapping data to MaizeGDB.</p>
+        <div class="thematic-links">
+          <a class="thematic-link" href="https://download.maizegdb.org/data_templates/" target="_blank" rel="noopener">Browse Submission Templates &#8599;</a>
+        </div>
+      </article>
+
+      <!-- 9: Archives -->
+      <article class="thematic-card">
+        <div class="thematic-badge">Historical</div>
+        <h3 class="thematic-title">Historical Database Archives</h3>
+        <p class="thematic-desc">Past releases of MaizeDB, BAC clone fingerprinting tables, SSR marker maps, and legacy curation snapshots.</p>
+        <div class="thematic-links">
+          <a class="thematic-link" href="https://download.maizegdb.org/Archive/" target="_blank" rel="noopener">Browse Historical Archives &#8599;</a>
+        </div>
+      </article>
+
+      <!-- 10: Supplementary -->
+      <article class="thematic-card">
+        <div class="thematic-badge">Publications</div>
+        <h3 class="thematic-title">Supplementary Publication Files</h3>
+        <p class="thematic-desc">Author-contributed data tables, supplementary protocols, scripts, and figure datasets linked from community literature.</p>
+        <div class="thematic-links">
+          <a class="thematic-link" href="https://download.maizegdb.org/supplementary_files/" target="_blank" rel="noopener">Browse Supplementary Files &#8599;</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 8: STATISTICS & OVERVIEW -->
+  <section id="downloads-overview" class="mgdb-panel" aria-labelledby="downloads-overview-heading">
+    <h2 id="downloads-overview-heading" class="mgdb-panel-title">Bulk Downloads &amp; Infrastructure Statistics</h2>
+    <p class="mgdb-panel-lead">Summary of datasets, transfer speed capacities, and pan-genomic resources hosted across MaizeGDB repositories.</p>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Total Assemblies</h3>
+          <span class="mgdb-metric-badge">Genomes</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(total_assemblies)</strong>
+        </div>
+        <p class="mgdb-metric-description">Curated genome assemblies across reference, founder, and wild relative taxa.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Globus Bandwidth</h3>
+          <span class="mgdb-metric-badge">High-Speed</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">100G</strong>
+        </div>
+        <p class="mgdb-metric-description">USDA SCINet high-performance network connectivity with auto-resume transfer.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>NAM Founders</h3>
+          <span class="mgdb-metric-badge">Diversity</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">26</strong>
+        </div>
+        <p class="mgdb-metric-description">Chromosome-scale de novo founder assemblies and comprehensive annotations.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Dataset Categories</h3>
+          <span class="mgdb-metric-badge">Thematic</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">10+</strong>
+        </div>
+        <p class="mgdb-metric-description">AI models, SNPs, expression, metabolic pathways, transposons, and image sets.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 9: CONNECTED RESOURCES -->
+  <section id="downloads-related" class="mgdb-panel download-bottom-section" aria-labelledby="downloads-related-heading">
+    <h2 id="downloads-related-heading" class="mgdb-panel-title">Connected Genomics &amp; Analysis Platforms</h2>
+    <p class="mgdb-panel-lead">Explore interactive browsers, analytical tools, and guidelines for citing data downloaded from MaizeGDB.</p>
+
+    <div class="download-related-grid">
+      <a class="download-related-card" href="/assembly">
+        <div class="download-related-title">B73 Reference Assembly Center</div>
+        <p class="download-related-desc">Explore version histories \(v1&ndash;v5\), GenBank chromosome accessions, and FASTA/GFF metrics.</p>
+      </a>
+
+      <a class="download-related-card" href="/genomebrowser">
+        <div class="download-related-title">Genome Browser Data Center</div>
+        <p class="download-related-desc">Visualize assemblies and tracks in next-gen JBrowse 2, linear synteny viewers, and classic JBrowse 1.</p>
+      </a>
+
+      <a class="download-related-card" href="/genetic_variation">
+        <div class="download-related-title">Genetic Variation Center</div>
+        <p class="download-related-desc">Query SNPs, structural variations, and resequencing catalogs across diverse lines.</p>
+      </a>
+
+      <a class="download-related-card" href="/expression">
+        <div class="download-related-title">Expression Data Center</div>
+        <p class="download-related-desc">Explore qTeller RNA-seq expression profiles and multi-tissue transcriptomics matrices.</p>
+      </a>
+
+      <a class="download-related-card" href="https://feta.maizegdb.org" target="_blank" rel="noopener">
+        <div class="download-related-title">FETA Functional Enrichment &#8599;</div>
+        <p class="download-related-desc">Perform multi-ontology functional enrichment analysis across B73 and NAM proteomes.</p>
+      </a>
+
+      <a class="download-related-card" href="/cite">
+        <div class="download-related-title">Citing MaizeGDB &amp; Data Sources</div>
+        <p class="download-related-desc">Guidelines and citations for acknowledging MaizeGDB datasets and sequencing consortia in publications.</p>
+      </a>
+    </div>
+  </section>
+</main>
+)
