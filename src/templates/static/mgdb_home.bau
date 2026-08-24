@@ -24,59 +24,250 @@ $$SYNTAX-LEVEL 2
     </div>
   </div>
 
-  <!-- The metric cards carry h3 headings, from the shared .mgdb-metric
-       component. Elsewhere they sit under a section h2; the design gives this
-       strip no visible heading, so one is supplied for the outline only —
-       without it the document skips from h1 straight to h3. -->
-  <h2 class="mgdb-visually-hidden">MaizeGDB at a glance</h2>
-  <div class="mgdb-metric-grid mgdb-home-metrics">
-    <article class="mgdb-metric mgdb-tone-green">
-      <span class="mgdb-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="21" height="21" focusable="false"><use href="#mzg-genomes"></use></svg></span>
-      <div>
-        <strong class="mgdb-metric-value">$(metric_assemblies)</strong>
-        <h3>Genome assemblies</h3>
-        <p>Completed <i>Zea mays</i> assemblies hosted here</p>
-      </div>
-    </article>
-    <article class="mgdb-metric mgdb-tone-amber">
-      <span class="mgdb-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="21" height="21" focusable="false"><use href="#mzg-genes"></use></svg></span>
-      <div>
-        <strong class="mgdb-metric-value">$(metric_genes)</strong>
-        <h3>B73 gene models</h3>
-        <p>Zm00001eb annotation set</p>
-      </div>
-    </article>
-    <article class="mgdb-metric">
-      <span class="mgdb-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="21" height="21" focusable="false"><use href="#mzg-stocks-and-germplasm"></use></svg></span>
-      <div>
-        <strong class="mgdb-metric-value">$(metric_stocks)</strong>
-        <h3>Seed stocks</h3>
-        <p>Orderable from the COOP</p>
-      </div>
-    </article>
-    <article class="mgdb-metric mgdb-tone-burgundy">
-      <span class="mgdb-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="21" height="21" focusable="false"><use href="#mzg-references"></use></svg></span>
-      <div>
-        <strong class="mgdb-metric-value">$(metric_references)</strong>
-        <h3>References</h3>
-        <p>Curated maize literature</p>
-      </div>
-    </article>
-  </div>
-
   <div class="mgdb-home-layout">
 
     <section aria-labelledby="home-index-title">
       <div class="mgdb-home-index-heading">
         <div>
-          <span class="mgdb-eyebrow">Index</span>
-          <h2 id="home-index-title">All resources</h2>
+          <h2 id="home-index-title">Quick links</h2>
         </div>
-        <a href="$(server-url)/data_center/">Data centers</a>
+        <div class="mgdb-home-index-controls">
+          <div class="mgdb-view-toggle" role="group" aria-label="Choose how resources are shown">
+            <button type="button" class="mgdb-view-button is-active" data-home-view="grid" aria-pressed="true">
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+              Quick links
+            </button>
+            <button type="button" class="mgdb-view-button" data-home-view="list" aria-pressed="false">
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><rect x="1" y="2" width="3" height="3" rx="0.5"/><rect x="6" y="2.75" width="9" height="1.5" rx="0.75"/><rect x="1" y="7" width="3" height="3" rx="0.5"/><rect x="6" y="7.75" width="9" height="1.5" rx="0.75"/><rect x="1" y="12" width="3" height="3" rx="0.5"/><rect x="6" y="12.75" width="9" height="1.5" rx="0.75"/></svg>
+              List
+            </button>
+          </div>
+        </div>
       </div>
-      <p class="mgdb-home-index-intro">Every tool and data center, grouped by kind. One row per resource &mdash; no icon hunting.</p>
+      <ul class="mgdb-quicklinks" data-home-panel="grid">
+        <li>
+          <a class="mgdb-quicklink" href="$(server-url)/genomebrowser">
+            <span class="mgdb-quicklink-art">
+              <img src="/images/quicklinks/genomebrowser.png" alt="" width="128" height="128" loading="eager" fetchpriority="high" decoding="async" />
+            </span>
+            <span class="mgdb-quicklink-text">
+              <strong class="mgdb-quicklink-label">Genome Browsers</strong>
+              <span class="mgdb-quicklink-desc">JBrowse tracks for every assembly</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a class="mgdb-quicklink" href="$(blast_url)">
+            <span class="mgdb-quicklink-art">
+              <img src="/images/quicklinks/blast.png" alt="" width="128" height="128" loading="eager" fetchpriority="high" decoding="async" />
+            </span>
+            <span class="mgdb-quicklink-text">
+              <strong class="mgdb-quicklink-label">BLAST</strong>
+              <span class="mgdb-quicklink-desc">Align a sequence to maize databases</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a class="mgdb-quicklink" href="$(server-url)/gene_center">
+            <span class="mgdb-quicklink-art">
+              <img src="/images/quicklinks/gene_center.png" alt="" width="128" height="128" loading="eager" fetchpriority="high" decoding="async" />
+            </span>
+            <span class="mgdb-quicklink-text">
+              <strong class="mgdb-quicklink-label">Gene Center</strong>
+              <span class="mgdb-quicklink-desc">Look up a gene model or symbol</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a class="mgdb-quicklink" href="$(server-url)/pan_gene_center">
+            <span class="mgdb-quicklink-art">
+              <img src="/images/quicklinks/pan_genes.png" alt="" width="128" height="128" loading="eager" fetchpriority="high" decoding="async" />
+            </span>
+            <span class="mgdb-quicklink-text">
+              <strong class="mgdb-quicklink-label">Pan-genes</strong>
+              <span class="mgdb-quicklink-desc">Pan-gene assignments across assemblies</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a class="mgdb-quicklink" href="$(server-url)/genome">
+            <span class="mgdb-quicklink-art">
+              <img src="/images/quicklinks/genome.png" alt="" width="128" height="128" loading="eager" fetchpriority="high" decoding="async" />
+            </span>
+            <span class="mgdb-quicklink-text">
+              <strong class="mgdb-quicklink-label">Genomes</strong>
+              <span class="mgdb-quicklink-desc">Every assembly hosted at MaizeGDB</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a class="mgdb-quicklink" href="$(server-url)/NAM_project">
+            <span class="mgdb-quicklink-art">
+              <img src="/images/quicklinks/NAM.png" alt="" width="128" height="128" loading="eager" fetchpriority="high" decoding="async" />
+            </span>
+            <span class="mgdb-quicklink-text">
+              <strong class="mgdb-quicklink-label">NAM Genomes</strong>
+              <span class="mgdb-quicklink-desc">NAM parent assembly project</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a class="mgdb-quicklink" href="$(server-url)/PanAnd_project">
+            <span class="mgdb-quicklink-art">
+              <img src="/images/quicklinks/pannad.png" alt="" width="128" height="128" loading="eager" fetchpriority="high" decoding="async" />
+            </span>
+            <span class="mgdb-quicklink-text">
+              <strong class="mgdb-quicklink-label">PanAnd Genomes</strong>
+              <span class="mgdb-quicklink-desc">Pan-Andropogoneae assemblies</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a class="mgdb-quicklink" href="$(server-url)/genetic_variation">
+            <span class="mgdb-quicklink-art">
+              <img src="/images/quicklinks/variation.png" alt="" width="128" height="128" loading="eager" fetchpriority="high" decoding="async" />
+            </span>
+            <span class="mgdb-quicklink-text">
+              <strong class="mgdb-quicklink-label">Genetic Variation</strong>
+              <span class="mgdb-quicklink-desc">SNP datasets and associated traits</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a class="mgdb-quicklink" href="$(server-url)/data_center/protein_structure">
+            <span class="mgdb-quicklink-art">
+              <img src="/images/quicklinks/protein.png" alt="" width="128" height="128" loading="lazy" decoding="async" />
+            </span>
+            <span class="mgdb-quicklink-text">
+              <strong class="mgdb-quicklink-label">Protein Structures</strong>
+              <span class="mgdb-quicklink-desc">Predicted structures per gene model</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a class="mgdb-quicklink" href="$(server-url)/data_center/phenotype">
+            <span class="mgdb-quicklink-art">
+              <img src="/images/quicklinks/phenotype.png" alt="" width="128" height="128" loading="lazy" decoding="async" />
+            </span>
+            <span class="mgdb-quicklink-text">
+              <strong class="mgdb-quicklink-label">Mutants & Phenotypes</strong>
+              <span class="mgdb-quicklink-desc">Phenotype records and mutant archives</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a class="mgdb-quicklink" href="$(server-url)/new_genes">
+            <span class="mgdb-quicklink-art">
+              <img src="/images/quicklinks/new_genes.png" alt="" width="128" height="128" loading="lazy" decoding="async" />
+            </span>
+            <span class="mgdb-quicklink-text">
+              <strong class="mgdb-quicklink-label">New Genes</strong>
+              <span class="mgdb-quicklink-desc">Recently characterized genes</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a class="mgdb-quicklink" href="$(server-url)/ai">
+            <span class="mgdb-quicklink-art">
+              <img src="/images/quicklinks/AI.png" alt="" width="128" height="128" loading="lazy" decoding="async" />
+            </span>
+            <span class="mgdb-quicklink-text">
+              <strong class="mgdb-quicklink-label">AI & Machine Learning</strong>
+              <span class="mgdb-quicklink-desc">Model-derived datasets and tools</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a class="mgdb-quicklink" href="$(server-url)/metabolic_pathways">
+            <span class="mgdb-quicklink-art">
+              <img src="/images/quicklinks/pathway.png" alt="" width="128" height="128" loading="lazy" decoding="async" />
+            </span>
+            <span class="mgdb-quicklink-text">
+              <strong class="mgdb-quicklink-label">Metabolic Pathways</strong>
+              <span class="mgdb-quicklink-desc">Pathways and their gene assignments</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a class="mgdb-quicklink" href="https://qteller.maizegdb.org" target="_blank" rel="noopener">
+            <span class="mgdb-quicklink-art">
+              <img src="/images/quicklinks/qteller.png" alt="" width="128" height="128" loading="lazy" decoding="async" />
+            </span>
+            <span class="mgdb-quicklink-text">
+              <strong class="mgdb-quicklink-label">qTeller <span class="mgdb-quicklink-ext" aria-hidden="true">&nearr;</span></strong>
+              <span class="mgdb-quicklink-desc">Compare expression across experiments</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a class="mgdb-quicklink" href="https://maizemine.rnet.missouri.edu/maizemine/" target="_blank" rel="noopener">
+            <span class="mgdb-quicklink-art">
+              <img src="/images/quicklinks/maize_mine.png" alt="" width="128" height="128" loading="lazy" decoding="async" />
+            </span>
+            <span class="mgdb-quicklink-text">
+              <strong class="mgdb-quicklink-label">MaizeMine <span class="mgdb-quicklink-ext" aria-hidden="true">&nearr;</span></strong>
+              <span class="mgdb-quicklink-desc">Build and export custom queries</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a class="mgdb-quicklink" href="$(server-url)/nomenclature">
+            <span class="mgdb-quicklink-art">
+              <img src="/images/quicklinks/nomenclature.png" alt="" width="128" height="128" loading="lazy" decoding="async" />
+            </span>
+            <span class="mgdb-quicklink-text">
+              <strong class="mgdb-quicklink-label">Nomenclature</strong>
+              <span class="mgdb-quicklink-desc">How to name genes, alleles, and stocks</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a class="mgdb-quicklink" href="$(server-url)/download">
+            <span class="mgdb-quicklink-art">
+              <img src="/images/quicklinks/download.png" alt="" width="128" height="128" loading="lazy" decoding="async" />
+            </span>
+            <span class="mgdb-quicklink-text">
+              <strong class="mgdb-quicklink-label">Downloads</strong>
+              <span class="mgdb-quicklink-desc">Bulk assemblies, annotations, and data</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a class="mgdb-quicklink" href="$(server-url)/hot_new_papers">
+            <span class="mgdb-quicklink-art">
+              <img src="/images/quicklinks/editorial_board.png" alt="" width="128" height="128" loading="lazy" decoding="async" />
+            </span>
+            <span class="mgdb-quicklink-text">
+              <strong class="mgdb-quicklink-label">Editorial Board</strong>
+              <span class="mgdb-quicklink-desc">Curated picks from the literature</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a class="mgdb-quicklink" href="$(server-url)/mgec">
+            <span class="mgdb-quicklink-art">
+              <img src="/images/quicklinks/mgec.png" alt="" width="128" height="128" loading="lazy" decoding="async" />
+            </span>
+            <span class="mgdb-quicklink-text">
+              <strong class="mgdb-quicklink-label">MGEC</strong>
+              <span class="mgdb-quicklink-desc">Maize Genetics Executive Committee</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a class="mgdb-quicklink" href="https://www.agbiodata.org" target="_blank" rel="noopener">
+            <span class="mgdb-quicklink-art">
+              <img src="/images/quicklinks/agbiodata.png" alt="" width="128" height="128" loading="lazy" decoding="async" />
+            </span>
+            <span class="mgdb-quicklink-text">
+              <strong class="mgdb-quicklink-label">AgBioData <span class="mgdb-quicklink-ext" aria-hidden="true">&nearr;</span></strong>
+              <span class="mgdb-quicklink-desc">Cross-database FAIR data consortium</span>
+            </span>
+          </a>
+        </li>
+      </ul>
 
-      <div class="mgdb-index">
+      <div class="mgdb-index" data-home-panel="list" hidden>
 
         <h3 class="mgdb-index-band" id="home-band-tools">Tools</h3>
         <div role="list" aria-labelledby="home-band-tools">
@@ -195,6 +386,10 @@ $$SYNTAX-LEVEL 2
         </div>
 
       </div>
+
+      <p class="mgdb-home-index-more">
+        <a class="mgdb-home-index-all" href="$(server-url)/sitemap">All resources &rsaquo;</a>
+      </p>
     </section>
 
     <aside class="mgdb-home-rail" aria-label="News and shortcuts">
@@ -207,29 +402,71 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-home-news-more"><a href="$(server-url)/whatsnew">More news &middot; Archive</a></p>
       </div>
 
-      <div class="mgdb-panel">
+      <div class="mgdb-panel mgdb-home-tasks-panel">
         <h2 class="mgdb-home-rail-title">Common tasks</h2>
         <ul class="mgdb-home-tasks">
           <li><a href="$(server-url)/gene_center/gene">Find a gene by symbol</a></li>
           <li><a href="$(server-url)/gene_center/gene#translate">Convert coordinates between assemblies</a></li>
           <li><a href="$(server-url)/data_center/stock">Order seed from the COOP</a></li>
-          <li><a href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0">Download the B73 annotation</a></li>
+          <li><a href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0">Download B73 annotations</a></li>
         </ul>
       </div>
 
-      <div class="mgdb-panel">
-        <h2 class="mgdb-home-rail-title">Other USDA crop databases</h2>
-        <ul class="mgdb-home-tasks">
-          <li><a href="https://wheat.pw.usda.gov/GG3/" target="_blank" rel="noopener">GrainGenes</a></li>
-          <li><a href="https://sorghumbase.org/" target="_blank" rel="noopener">SorghumBase</a></li>
-          <li><a href="https://soybase.org/" target="_blank" rel="noopener">SoyBase</a></li>
-        </ul>
-        <a class="mgdb-home-usda" href="https://www.usda.gov/" target="_blank" rel="noopener">
-          <img src="/images/USDA.png" alt="United States Department of Agriculture" height="40" />
-        </a>
+      <div class="mgdb-panel mgdb-home-crops-panel">
+        <div class="mgdb-home-crops-header">
+          <h2 class="mgdb-home-rail-title">Other USDA crop databases</h2>
+          <a class="mgdb-home-usda-link" href="https://www.usda.gov/" target="_blank" rel="noopener" title="United States Department of Agriculture">
+            <img src="/images/USDA.png" alt="United States Department of Agriculture" height="24" />
+          </a>
+        </div>
+        <div class="mgdb-home-crops-links">
+          <a class="mgdb-crop-chip" href="https://wheat.pw.usda.gov/GG3/" target="_blank" rel="noopener">GrainGenes <span aria-hidden="true">&#8599;</span></a>
+          <a class="mgdb-crop-chip" href="https://sorghumbase.org/" target="_blank" rel="noopener">SorghumBase <span aria-hidden="true">&#8599;</span></a>
+          <a class="mgdb-crop-chip" href="https://soybase.org/" target="_blank" rel="noopener">SoyBase <span aria-hidden="true">&#8599;</span></a>
+        </div>
       </div>
 
     </aside>
+  </div>
+
+  <!-- The metric cards carry h3 headings, from the shared .mgdb-metric
+       component. Elsewhere they sit under a section h2; the design gives this
+       strip no visible heading, so one is supplied for the outline only —
+       without it the document skips from h1 straight to h3. -->
+  <h2 class="mgdb-visually-hidden">MaizeGDB at a glance</h2>
+  <div class="mgdb-metric-grid mgdb-home-metrics">
+    <article class="mgdb-metric mgdb-tone-green">
+      <span class="mgdb-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="21" height="21" focusable="false"><use href="#mzg-genomes"></use></svg></span>
+      <div>
+        <strong class="mgdb-metric-value">$(metric_assemblies)</strong>
+        <h3>Genome assemblies</h3>
+        <p>Completed <i>Zea mays</i> assemblies hosted here</p>
+      </div>
+    </article>
+    <article class="mgdb-metric mgdb-tone-amber">
+      <span class="mgdb-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="21" height="21" focusable="false"><use href="#mzg-genes"></use></svg></span>
+      <div>
+        <strong class="mgdb-metric-value">$(metric_genes)</strong>
+        <h3>B73 gene models</h3>
+        <p>Zm00001eb annotation set</p>
+      </div>
+    </article>
+    <article class="mgdb-metric">
+      <span class="mgdb-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="21" height="21" focusable="false"><use href="#mzg-stocks-and-germplasm"></use></svg></span>
+      <div>
+        <strong class="mgdb-metric-value">$(metric_stocks)</strong>
+        <h3>Seed stocks</h3>
+        <p>Orderable from the COOP</p>
+      </div>
+    </article>
+    <article class="mgdb-metric mgdb-tone-burgundy">
+      <span class="mgdb-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="21" height="21" focusable="false"><use href="#mzg-references"></use></svg></span>
+      <div>
+        <strong class="mgdb-metric-value">$(metric_references)</strong>
+        <h3>References</h3>
+        <p>Curated maize literature</p>
+      </div>
+    </article>
   </div>
 </main>
 )

@@ -23,9 +23,9 @@
 .mgdb-home-page .mgdb-home-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 340px;
-  gap: var(--mgdb-space-6);
+  gap: var(--mgdb-space-5);
   align-items: start;
-  margin-top: var(--mgdb-space-7);
+  margin-top: var(--mgdb-space-5);
 }
 
 @media (max-width: 900px) {
@@ -34,7 +34,7 @@
 
 .mgdb-home-page .mgdb-home-rail {
   display: grid;
-  gap: var(--mgdb-space-5);
+  gap: var(--mgdb-space-4);
 }
 
 /* --------------------------------------------------------------------------
@@ -143,7 +143,7 @@
 }
 
 .mgdb-home-page .mgdb-home-news li {
-  padding: var(--mgdb-space-3) 0;
+  padding: var(--mgdb-space-2) 0;
   border-top: 1px solid var(--mgdb-line);
 }
 
@@ -151,26 +151,29 @@
 
 .mgdb-home-page .mgdb-home-news time {
   display: block;
-  margin-bottom: var(--mgdb-space-1);
+  margin-bottom: 2px;
   color: var(--mgdb-muted);
   font-family: var(--mgdb-font-mono);
   font-size: var(--mgdb-text-xs);
 }
 
-/* The design specifies 15px here; the scale has no 15px step and the audit
-   sets a 16px body floor, so this is text-base. */
 .mgdb-home-page .mgdb-home-news a {
   color: var(--mgdb-burgundy);
-  font-size: var(--mgdb-text-base);
+  font-size: var(--mgdb-text-sm);
   font-weight: 600;
   line-height: var(--mgdb-leading-snug);
+  text-decoration: none;
+}
+
+.mgdb-home-page .mgdb-home-news a:hover {
+  text-decoration: underline;
 }
 
 .mgdb-home-page .mgdb-home-news-more {
-  margin: var(--mgdb-space-4) 0 0;
-  padding-top: var(--mgdb-space-3);
+  margin: var(--mgdb-space-3) 0 0;
+  padding-top: var(--mgdb-space-2);
   border-top: 1px solid var(--mgdb-line);
-  font-size: var(--mgdb-text-sm);
+  font-size: var(--mgdb-text-xs);
 }
 
 .mgdb-home-page .mgdb-home-tasks {
@@ -179,20 +182,345 @@
   list-style: none;
 }
 
-.mgdb-home-page .mgdb-home-tasks a {
-  display: flex;
-  min-height: var(--mgdb-tap-target);
-  align-items: center;
-  color: var(--mgdb-burgundy);
-  font-weight: 600;
-  line-height: var(--mgdb-leading-snug);
+.mgdb-home-page .mgdb-home-tasks li {
+  padding: 4px 0;
+  border-top: 1px solid var(--mgdb-line-soft);
 }
 
-.mgdb-home-page .mgdb-home-usda {
+.mgdb-home-page .mgdb-home-tasks li:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.mgdb-home-page .mgdb-home-tasks a {
+  display: flex;
+  align-items: center;
+  color: var(--mgdb-burgundy);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.mgdb-home-page .mgdb-home-tasks a:hover {
+  color: var(--mgdb-green-dark);
+  text-decoration: underline;
+}
+
+/* Horizontal Other USDA Crop Databases */
+.mgdb-home-page .mgdb-home-crops-panel {
+  padding: var(--mgdb-space-4);
+}
+
+.mgdb-home-page .mgdb-home-crops-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mgdb-space-2);
+  margin-bottom: var(--mgdb-space-3);
+}
+
+.mgdb-home-page .mgdb-home-crops-header .mgdb-home-rail-title {
+  margin-bottom: 0;
+}
+
+.mgdb-home-page .mgdb-home-usda-link {
+  display: inline-flex;
+  align-items: center;
+}
+
+.mgdb-home-page .mgdb-home-usda-link img {
+  height: 24px;
+  width: auto;
   display: block;
-  margin-top: var(--mgdb-space-4);
-  padding-top: var(--mgdb-space-4);
+}
+
+.mgdb-home-page .mgdb-home-crops-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mgdb-home-page .mgdb-crop-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 10px;
+  background: var(--mgdb-surface-alt);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  color: var(--mgdb-burgundy) !important;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-decoration: none;
+  transition: all .12s ease;
+}
+
+.mgdb-home-page .mgdb-crop-chip:hover {
+  background: var(--mgdb-green-soft);
+  border-color: var(--mgdb-green);
+  color: var(--mgdb-green-dark) !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Quick links, and the toggle between them and the list.
+
+   The group asked to keep the icon buttons from the production homepage so the
+   transition feels familiar, with the modernized list available as the other
+   view. Quick links are the default: that is what returning users expect to
+   see, and the choice is remembered per browser afterwards.
+   --------------------------------------------------------------------------- */
+
+.mgdb-home-page .mgdb-home-index-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mgdb-space-3);
+}
+
+.mgdb-home-page .mgdb-home-index-all {
+  font-size: var(--mgdb-text-sm);
+  white-space: nowrap;
+}
+
+.mgdb-home-page .mgdb-view-toggle {
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-home-page .mgdb-view-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+  /* 8px/14px lands the control at 38px; the 44px tap target is met by the
+     toggle's own padding plus the heading row's gap on touch widths below. */
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  color: var(--mgdb-ink-soft);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.mgdb-home-page .mgdb-view-button svg { fill: currentColor; }
+
+.mgdb-home-page .mgdb-view-button:hover { color: var(--mgdb-ink); }
+
+.mgdb-home-page .mgdb-view-button.is-active {
+  background: var(--mgdb-surface);
+  color: var(--mgdb-green-dark);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-home-page .mgdb-view-button:focus-visible {
+  outline: var(--mgdb-focus-ring);
+  outline-offset: 2px;
+}
+
+/* --- the grid ------------------------------------------------------------- */
+
+.mgdb-home-page .mgdb-quicklinks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: var(--mgdb-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mgdb-home-page .mgdb-quicklink {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  height: 100%;
+  padding: var(--mgdb-space-3) var(--mgdb-space-2);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  text-align: center;
+  text-decoration: none;
+  transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+}
+
+.mgdb-home-page .mgdb-quicklink:hover,
+.mgdb-home-page .mgdb-quicklink:focus-visible {
+  border-color: var(--mgdb-green);
+  box-shadow: var(--mgdb-shadow);
+  transform: translateY(-2px);
+}
+
+.mgdb-home-page .mgdb-quicklink:focus-visible {
+  outline: var(--mgdb-focus-ring);
+  outline-offset: 2px;
+}
+
+/* The art is flat vector on white; a tinted disc keeps the tiles reading as one
+   family even though the marks differ in weight and colour. */
+.mgdb-home-page .mgdb-quicklink-art {
+  display: grid;
+  place-items: center;
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  background: var(--mgdb-green-soft);
+  transition: background 120ms ease;
+}
+
+.mgdb-home-page .mgdb-quicklink:hover .mgdb-quicklink-art,
+.mgdb-home-page .mgdb-quicklink:focus-visible .mgdb-quicklink-art {
+  background: var(--mgdb-gold-soft);
+}
+
+.mgdb-home-page .mgdb-quicklink-art img {
+  width: 56px;
+  height: 56px;
+  /* The source art is on white; blending it into the disc avoids a white
+     square sitting inside a coloured circle. */
+  mix-blend-mode: multiply;
+}
+
+.mgdb-home-page .mgdb-quicklink-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.mgdb-home-page .mgdb-quicklink-label {
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  line-height: var(--mgdb-leading-snug);
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-home-page .mgdb-quicklink-ext {
+  font-size: 0.85em;
+  color: var(--mgdb-muted);
+}
+
+.mgdb-home-page .mgdb-quicklink-desc {
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading-snug);
+  color: var(--mgdb-muted);
+}
+
+/* --- narrow screens ------------------------------------------------------- */
+
+@media (max-width: 640px) {
+  /* Title first, then the toggle on its own line. Sharing a row with the
+     eyebrow forced "Quick links" to wrap inside its pill and left the h2
+     breaking around the trailing link. */
+  .mgdb-home-page .mgdb-home-index-heading {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--mgdb-space-3);
+  }
+
+  .mgdb-home-page .mgdb-home-index-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .mgdb-home-page .mgdb-view-toggle { flex: 1 1 auto; }
+  .mgdb-home-page .mgdb-view-button { flex: 1 1 0; justify-content: center; }
+
+  /* Two columns rather than one: nineteen full-width rows would bury the rest
+     of the page, and the tiles stay well above the 44px tap target. */
+  .mgdb-home-page .mgdb-quicklinks {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--mgdb-space-2);
+  }
+
+  .mgdb-home-page .mgdb-quicklink {
+    /* Icon beside the label reads better than stacked at this width and keeps
+       each tile short enough that several are visible at once. */
+    flex-direction: row;
+    align-items: center;
+    gap: var(--mgdb-space-2);
+    padding: var(--mgdb-space-2);
+    text-align: left;
+  }
+
+  .mgdb-home-page .mgdb-quicklink-art {
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+  }
+
+  .mgdb-home-page .mgdb-quicklink-art img { width: 34px; height: 34px; }
+
+  /* The one-liners are the first thing to go when space is tight; the label
+     and the icon still say what the tile is. */
+  .mgdb-home-page .mgdb-quicklink-desc { display: none; }
+}
+
+/* 340px, not 380px: 360 and 375 are the two most common phone widths and both
+   hold two columns comfortably. Only the genuinely tiny viewports drop to one. */
+@media (max-width: 340px) {
+  .mgdb-home-page .mgdb-quicklinks { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mgdb-home-page .mgdb-quicklink,
+  .mgdb-home-page .mgdb-quicklink-art,
+  .mgdb-home-page .mgdb-view-button { transition: none; }
+  .mgdb-home-page .mgdb-quicklink:hover { transform: none; }
+}
+
+/* The shared rule drops every metric grid to one column on narrow screens,
+   which is right where the cards carry a paragraph. The four homepage metrics
+   are a number and a short line, so stacking them cost 564px of scrolling and
+   pushed the quick links 1,466px down the page -- most of a phone screen spent
+   before reaching the first thing anyone came to click. Two up, with the value
+   a size down so the numbers still fit. */
+@media (max-width: 640px) {
+  .mgdb-home-page .mgdb-home-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--mgdb-space-2);
+  }
+
+  .mgdb-home-page .mgdb-home-metrics .mgdb-metric { padding: var(--mgdb-space-3); }
+  .mgdb-home-page .mgdb-home-metrics .mgdb-metric-value { font-size: var(--mgdb-text-xl); }
+  .mgdb-home-page .mgdb-home-metrics .mgdb-metric p { font-size: var(--mgdb-text-xs); }
+}
+
+/* The sitemap link moved out of the heading to sit under whichever panel is
+   showing, where it reads as "and here is everything else" rather than
+   competing with the view toggle for the top-right corner. */
+.mgdb-home-page .mgdb-home-index-more {
+  margin: var(--mgdb-space-4) 0 0;
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--mgdb-line-soft);
+  text-align: right;
+}
+
+.mgdb-home-page .mgdb-home-index-more .mgdb-home-index-all {
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  color: var(--mgdb-green-dark);
+}
+
+/* With the eyebrow and the intro gone the heading row is just a title and the
+   toggle, so it can sit tighter to the grid below it. */
+.mgdb-home-page .mgdb-home-index-heading { margin-bottom: var(--mgdb-space-3); }
+
+/* The metric strip is the last thing on the page now rather than the second,
+   so it needs separating from the content above instead of the hero. */
+.mgdb-home-page .mgdb-home-metrics {
+  margin-top: var(--mgdb-space-5);
+  padding-top: var(--mgdb-space-5);
   border-top: 1px solid var(--mgdb-line);
 }
 
-.mgdb-home-page .mgdb-home-usda img { height: 40px; width: auto; }
+@media (max-width: 640px) {
+  .mgdb-home-page .mgdb-home-index-more { text-align: left; }
+}
