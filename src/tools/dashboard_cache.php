@@ -70,6 +70,7 @@ $WARM_URLS = array(
     '/genomebrowser',
     '/download',
     '/downloads',
+    '/TYPSimSelector',
     '/maize_history',
     '/timelines',
     '/expression',

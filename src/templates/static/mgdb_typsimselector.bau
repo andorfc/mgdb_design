@@ -11,64 +11,62 @@ $$SYNTAX-LEVEL 2
     <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Tools</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">TYPSimSelector</span>
   </nav>
 
-  <section class="mgdb-hero typ-hero" aria-labelledby="typ-title">
+  <!-- HERO SECTION -->
+  <section class="mgdb-hero" aria-labelledby="typ-title">
     <div class="mgdb-hero-emblem">
-      <svg class="typ-hero-mark" viewBox="0 0 132 116" role="img" aria-label="A reference accession linked to nearer and more distant relatives">
-        <g stroke="#d4b44f" stroke-width="2.5" stroke-linecap="round" opacity=".8">
-          <path d="M66 58 L30 26" /><path d="M66 58 L104 30" /><path d="M66 58 L26 74" /><path d="M66 58 L100 84" /><path d="M66 58 L58 100" />
-        </g>
-        <circle cx="66" cy="58" r="15" fill="#501719" />
-        <circle cx="30" cy="26" r="9" fill="#2f5e2a" />
-        <circle cx="104" cy="30" r="7" fill="#a96919" />
-        <circle cx="26" cy="74" r="6" fill="#a96919" />
-        <circle cx="100" cy="84" r="8" fill="#2f5e2a" />
-        <circle cx="58" cy="100" r="5" fill="#a96919" />
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Connecting network lines -->
+        <line x1="32" y1="32" x2="16" y2="16" stroke="#ca8a04" stroke-width="2" stroke-dasharray="3 2" />
+        <line x1="32" y1="32" x2="48" y2="16" stroke="#ca8a04" stroke-width="2" stroke-dasharray="3 2" />
+        <line x1="32" y1="32" x2="14" y2="44" stroke="#ca8a04" stroke-width="2" stroke-dasharray="3 2" />
+        <line x1="32" y1="32" x2="50" y2="44" stroke="#ca8a04" stroke-width="2" stroke-dasharray="3 2" />
+        <line x1="32" y1="32" x2="32" y2="54" stroke="#ca8a04" stroke-width="2" stroke-dasharray="3 2" />
+        <!-- Surrounding accession nodes -->
+        <circle cx="16" cy="16" r="6" fill="#15803d" />
+        <circle cx="48" cy="16" r="5" fill="#166534" />
+        <circle cx="14" cy="44" r="5" fill="#854d0e" />
+        <circle cx="50" cy="44" r="6" fill="#15803d" />
+        <circle cx="32" cy="54" r="4.5" fill="#854d0e" />
+        <!-- Central Reference Node -->
+        <circle cx="32" cy="32" r="10" fill="#501719" stroke="#ffffff" stroke-width="2" />
+        <circle cx="32" cy="32" r="4" fill="#facc15" />
       </svg>
       <strong>TYPSim<br />Selector</strong>
-      <span>Identity by state</span>
     </div>
     <div class="mgdb-hero-body">
-      <span class="mgdb-eyebrow">Germplasm similarity tool</span>
-      <h1 id="typ-title">Rank the maize collection against one accession.</h1>
-      <p class="mgdb-hero-tagline">Pick an inbred line held at the North Central Regional Plant Introduction Station and see every other accession sorted by how much of its genome it shares.</p>
-      <p class="mgdb-hero-description">Similarity here is identity by state, computed with PLINK from the genotyping-by-sequencing SNP data behind the Ames Diversity Panel. A score of 1 means two samples matched at every scored marker; the rest of the panel spreads out below that. Use it to find near-duplicates in a seed request, to pick contrasting parents, or to sanity-check what an accession actually is.</p>
-      <div class="mgdb-hero-actions">
-        <a class="mgdb-button mgdb-button-primary" href="#typ-compare">Start a comparison</a>
-        <a class="mgdb-button mgdb-button-secondary" href="#typ-method">How the scores were calculated</a>
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data_date)</p>
+      <h1 id="typ-title">TYPSimSelector</h1>
+      <p class="mgdb-hero-description">Rank and compare USDA Ames maize inbred lines against any reference accession using genome-wide identity-by-state \(IBS\) genetic similarity scores computed from the Ames Diversity Panel.</p>
+
+      <div class="typ-hero-actions-row">
+        <a class="typ-hero-link" href="/data_center/stock">
+          <span class="typ-link-dot" aria-hidden="true"></span> Search MaizeGDB Stocks &#8599;
+        </a>
+        <a class="typ-hero-link" href="https://npgsweb.ars-grin.gov/gringlobal/search.aspx" target="_blank" rel="noopener">
+          <span class="typ-link-dot" aria-hidden="true"></span> Search GRIN-Global &#8599;
+        </a>
+        <a class="typ-hero-link" href="#typ-data">
+          <span class="typ-link-dot typ-dot-gold" aria-hidden="true"></span> Ames HapMap Genotypes &#8595;
+        </a>
       </div>
     </div>
   </section>
 
-  <section aria-labelledby="typ-scale-title">
-    <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">What is behind the tool</span><h2 id="typ-scale-title">Two matrices, both computed once</h2></div>
-      <p>Every pair in each dataset was scored ahead of time, so a comparison is a lookup rather than a calculation.</p>
-    </div>
-    <div class="mgdb-metric-grid">
-      <article class="mgdb-metric">
-        <span class="mgdb-metric-icon" aria-hidden="true">&#9678;</span>
-        <div><strong class="mgdb-metric-value mgdb-metric-value-compact">$(curation-accessions)</strong><h3>Curated accessions</h3><p>NCRPIS accessions in the curation dataset, across $(curation-entries) genotyping runs.</p></div>
-      </article>
-      <article class="mgdb-metric mgdb-tone-green">
-        <span class="mgdb-metric-icon" aria-hidden="true">&#9670;</span>
-        <div><strong class="mgdb-metric-value mgdb-metric-value-compact">$(breeding-lines)</strong><h3>Breeding lines</h3><p>Named inbred lines in the merged Ames breeding dataset.</p></div>
-      </article>
-      <article class="mgdb-metric mgdb-tone-burgundy">
-        <span class="mgdb-metric-icon" aria-hidden="true">&#8646;</span>
-        <div><strong class="mgdb-metric-value mgdb-metric-value-compact">$(total-pairs)</strong><h3>Pairwise scores</h3><p>$(curation-pairs) curation comparisons and $(breeding-pairs) breeding comparisons on file.</p></div>
-      </article>
-      <article class="mgdb-metric mgdb-tone-red">
-        <span class="mgdb-metric-icon" aria-hidden="true">&#8942;</span>
-        <div><strong class="mgdb-metric-value mgdb-metric-value-compact">680,000+</strong><h3>SNP markers</h3><p>Genotyping-by-sequencing markers used to establish the relationships.</p></div>
-      </article>
-    </div>
-  </section>
+  <!-- STICKY SECTION TABS -->
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#typ-compare" class="is-current">Comparison Console</a>
+    <a href="#typ-about">About the Tool</a>
+    <a href="#typ-method">Methodology &amp; Guidelines</a>
+    <a href="#typ-data">Underlying Data</a>
+    <a href="#typ-overview">Statistics</a>
+    <a href="#typ-cite">Attribution &amp; Citation</a>
+    <a href="#typ-related">Connected Resources</a>
+  </nav>
 
-  <section id="typ-compare" aria-labelledby="typ-compare-title">
-    <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Run a comparison</span><h2 id="typ-compare-title">Choose a dataset and a reference line</h2></div>
-      <p>Results appear below, ranked and downloadable. Nothing is submitted anywhere and no account is needed.</p>
-    </div>
+  <!-- SECTION 1: INTERACTIVE COMPARISON CONSOLE & RESULTS -->
+  <section id="typ-compare" class="mgdb-panel" aria-labelledby="typ-compare-title">
+    <h2 id="typ-compare-title" class="mgdb-panel-title">Interactive Comparison Console</h2>
+    <p class="mgdb-panel-lead">Select a dataset and reference line to rank the collection by genetic similarity. Results, interactive distribution charts, and exports appear below.</p>
 
     <form id="typ-form" class="typ-console" novalidate>
       <fieldset class="typ-step" id="typ-step-dataset">
@@ -157,65 +155,131 @@ $$SYNTAX-LEVEL 2
     <div id="typ-results" class="typ-results"></div>
   </section>
 
-  <section class="mgdb-prose-layout typ-about-layout" id="typ-about" aria-labelledby="typ-about-title">
-    <div class="mgdb-prose">
-      <span class="mgdb-eyebrow">About the tool</span>
-      <h2 id="typ-about-title" class="mgdb-leaf-heading">What TYPSimSelector is</h2>
-      <p>TYPSimSelector sorts identity by state values derived from SNP datasets for accessions in the Ames Diversity Panel &mdash; a USDA-maintained set of maize lines held in Ames, Iowa that represents a wide span of the species' genetic variation, described by <a href="/data_center/reference?id=9023933">Romay et al., 2013</a>.</p>
-      <p>The tool was conceived and first implemented by Mark Millard at the North Central Regional Plant Introduction Station, to make genomic similarity usable in day-to-day germplasm management. Recognising that the same analysis would be useful to others, a collaboration to deploy it through MaizeGDB began in 2013. It was developed by Emily Mauch with guidance from Carson Andorf, Mark Millard, Cinta Romay, Ed Buckler, Candy Gardner, and Carolyn Lawrence.</p>
-      <p>As Romay and colleagues describe it, the panel is roughly 2,500 maize accessions distributed mainly through the station in Ames. It was interrogated with more than 680,000 SNP markers to establish identity by state relationships between them. Those relationships have proven useful for examining how lines relate to one another: identical samples score 1, and divergence is read as 1 minus the similarity.</p>
-      <div class="typ-about-actions">
-        <a class="mgdb-button mgdb-button-secondary" href="/data_center/stock">Search MaizeGDB stocks</a>
-        <a class="mgdb-button mgdb-button-quiet" href="https\://npgsweb.ars-grin.gov/gringlobal/search.aspx">Search GRIN-Global</a>
-      </div>
-    </div>
+  <!-- SECTION 2: ABOUT TYPSIMSELECTOR -->
+  <section id="typ-about" class="mgdb-panel" aria-labelledby="typ-about-title">
+    <h2 id="typ-about-title" class="mgdb-panel-title">About TYPSimSelector</h2>
+    <p class="mgdb-panel-lead">Origins, background, and practical applications of genomic identity-by-state similarity in maize germplasm management.</p>
 
-    <aside class="mgdb-aside-card typ-download-card">
-      <span class="mgdb-eyebrow">Underlying data</span>
-      <h3>The genotypes themselves</h3>
-      <p>The raw HapMap file and its key are archived and can be downloaded in full. The unzipped genotype file is about 6 GB.</p>
-      <ul class="mgdb-resource-list">
-        <li><a href="https\://download.maizegdb.org/Archive/TYPSimSelector/All_Ames_all_20120110.hmp.zip">Ames genotypes, HapMap<span class="mgdb-small mgdb-muted"> &mdash; ZIP, expands to about 6 GB</span></a></li>
-        <li><a href="https\://download.maizegdb.org/Archive/TYPSimSelector/Ames_key_120110.xlsx">Sample key<span class="mgdb-small mgdb-muted"> &mdash; XLSX</span></a></li>
-      </ul>
-    </aside>
+    <div class="typ-about-content">
+      <p>TYPSimSelector sorts identity-by-state \(IBS\) values derived from genotyping-by-sequencing \(GBS\) SNP datasets for accessions in the <strong>Ames Diversity Panel</strong> &mdash; a USDA-maintained collection of maize inbred lines held at the North Central Regional Plant Introduction Station \(NCRPIS\) in Ames, Iowa, representing a broad spectrum of the species' genetic variation \(<a href="/data_center/reference?id=9023933">Romay et al., 2013</a>\).</p>
+      
+      <p>The tool was conceived and first implemented by <strong>Mark Millard</strong> at NCRPIS to make genomic similarity directly actionable for germplasm curators. Recognising its utility for the wider maize genetics community, a collaboration to deploy it through MaizeGDB was established in 2013. The tool was developed by <strong>Emily Mauch</strong> with guidance from <strong>Carson Andorf</strong>, <strong>Mark Millard</strong>, <strong>Cinta Romay</strong>, <strong>Ed Buckler</strong>, <strong>Candy Gardner</strong>, and <strong>Carolyn Lawrence</strong>.</p>
+      
+      <p>The Ames Diversity Panel comprises approximately 2,800 maize accessions genotyped across more than <strong>680,000 SNP markers</strong>. Pairwise similarity metrics are essential for detecting near-duplicates, confirming seed purity, identifying contrasting parents for cross-breeding, and verifying sample identity prior to experimental trials.</p>
+    </div>
   </section>
 
-  <section id="typ-method" aria-labelledby="typ-method-title">
-    <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Method and caveats</span><h2 id="typ-method-title">How the scores were calculated, and how far to trust them</h2></div>
-      <p>Read this before quoting a number from the table.</p>
-    </div>
+  <!-- SECTION 3: METHODOLOGY & INTERPRETATION GUIDELINES -->
+  <section id="typ-method" class="mgdb-panel" aria-labelledby="typ-method-title">
+    <h2 id="typ-method-title" class="mgdb-panel-title">Methodology &amp; Interpretation Guidelines</h2>
+    <p class="mgdb-panel-lead">Guidelines for interpreting identity-by-state scores, understanding replicate spread, and avoiding ascertainment bias pitfalls.</p>
 
     <div class="mgdb-card-grid typ-method-grid">
       <article class="mgdb-card">
         <span class="mgdb-pill mgdb-pill-info">Calculation</span>
-        <h3>Identity by state, from PLINK</h3>
-        <p>Scores were calculated as described by <a href="/data_center/reference?id=9023933">Romay et al., 2013</a>. Identity by state was computed for all possible pairwise comparisons with PLINK v1.07, <a href="https\://www.ncbi.nlm.nih.gov/pmc/articles/PMC1950838/">Purcell et al., 2007</a>.</p>
+        <h3>Identity by State via PLINK</h3>
+        <p>Scores were calculated as described by <a href="/data_center/reference?id=9023933">Romay et al., 2013</a>. Pairwise IBS metrics across all accessions were computed using PLINK v1.07 \(<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1950838/" target="_blank" rel="noopener">Purcell et al., 2007</a>\).</p>
       </article>
+
       <article class="mgdb-card">
         <span class="mgdb-pill mgdb-pill-warn">Caveat</span>
-        <h3>The bottom of the ranking is not a result</h3>
-        <p>Very low similarity scores are distorted by ascertainment bias in the marker set. The lines reported as most dissimilar should not be treated as an authoritative answer to which lines are furthest apart.</p>
+        <h3>Ascertainment Bias in Low Scores</h3>
+        <p>Very low similarity scores are subject to ascertainment bias in the GBS marker set. The lines ranked at the extreme bottom should not be interpreted as an authoritative phylogenetically distant outlier.</p>
       </article>
+
       <article class="mgdb-card">
-        <span class="mgdb-pill mgdb-pill-ok">Reading a score</span>
-        <h3>1 is identical, and near-1 is common</h3>
-        <p>Two samples of the same accession usually land above 0.98. The bulk of any panel-wide ranking sits between 0.83 and 0.87, so the interesting part of the distribution is the tail, not the middle.</p>
+        <span class="mgdb-pill mgdb-pill-ok">Score Interpretation</span>
+        <h3>1.0 is Identical, 0.85 is Baseline</h3>
+        <p>Replicate samples of the same accession typically score above 0.98. The baseline background similarity across the entire panel centers between 0.83 and 0.87; the informative signal lies in the upper tail.</p>
       </article>
+
       <article class="mgdb-card">
-        <span class="mgdb-pill">Replicates</span>
-        <h3>The same accession, genotyped twice</h3>
-        <p>347 accessions in the curation dataset were genotyped more than once, one of them 28 times. Each run is scored separately, so the same accession can occupy several nearby rows, and the spread between its own runs is a useful floor on the noise.</p>
+        <span class="mgdb-pill">Replicate Runs</span>
+        <h3>Independent Genotyping Replicates</h3>
+        <p>347 accessions in the curation dataset were genotyped multiple times \(one accession up to 28 times\). Each run was scored independently against the entire panel to capture experimental variance.</p>
       </article>
     </div>
   </section>
 
-  <section id="typ-cite" aria-labelledby="typ-cite-title">
-    <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Attribution</span><h2 id="typ-cite-title">Citing this tool</h2></div>
-      <p>If TYPSimSelector contributed to your research, cite both MaizeGDB and the source of the scores.</p>
+  <!-- SECTION 4: UNDERLYING GENOTYPIC DATA & DOWNLOADS -->
+  <section id="typ-data" class="mgdb-panel" aria-labelledby="typ-data-title">
+    <h2 id="typ-data-title" class="mgdb-panel-title">Underlying Genotypic Data &amp; HapMap Downloads</h2>
+    <p class="mgdb-panel-lead">Complete open-access downloads for the raw Ames Diversity Panel HapMap genotyping matrices and sample identification keys.</p>
+
+    <div class="typ-downloads-grid">
+      <article class="typ-dl-card">
+        <div class="typ-dl-badge">Genotypes Matrix</div>
+        <h3>Ames Diversity Panel HapMap Genotypes</h3>
+        <p>Raw GBS SNP genotype matrix for all Ames accessions in standard HapMap format. Compressed ZIP archive \(expands to approximately 6 GB\).</p>
+        <a class="mgdb-button mgdb-button-primary" href="https://download.maizegdb.org/Archive/TYPSimSelector/All_Ames_all_20120110.hmp.zip" target="_blank" rel="noopener">Download HapMap ZIP \(6 GB\) &#8599;</a>
+      </article>
+
+      <article class="typ-dl-card">
+        <div class="typ-dl-badge typ-dl-badge-blue">Sample Metadata</div>
+        <h3>Ames Diversity Panel Sample Key</h3>
+        <p>Comprehensive sample mapping spreadsheet matching taxa identifiers, NCRPIS accession numbers, seed lot codes, and GRIN identifiers.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="https://download.maizegdb.org/Archive/TYPSimSelector/Ames_key_120110.xlsx" target="_blank" rel="noopener">Download Sample Key \(XLSX\) &#8599;</a>
+      </article>
     </div>
+  </section>
+
+  <!-- SECTION 5: DATASET STATISTICS & MATRIX SCALE \(DASHBOARD MOVED TO BOTTOM\) -->
+  <section id="typ-overview" class="mgdb-panel" aria-labelledby="typ-scale-title">
+    <h2 id="typ-scale-title" class="mgdb-panel-title">Dataset Statistics &amp; Matrix Scale</h2>
+    <p class="mgdb-panel-lead">Pre-computed pairwise similarity matrix scale across the Ames Diversity Panel.</p>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Curated Accessions</h3>
+          <span class="mgdb-metric-badge">Curation</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(curation-accessions)</strong>
+        </div>
+        <p class="mgdb-metric-description">NCRPIS accessions in the curation dataset across $(curation-entries) genotyping runs.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Breeding Lines</h3>
+          <span class="mgdb-metric-badge">Breeding</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(breeding-lines)</strong>
+        </div>
+        <p class="mgdb-metric-description">Named inbred lines in the merged Ames diversity breeding dataset.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Pairwise Scores</h3>
+          <span class="mgdb-metric-badge">Matrix</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(total-pairs)</strong>
+        </div>
+        <p class="mgdb-metric-description">$(curation-pairs) curation pairs and $(breeding-pairs) breeding comparisons on file.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>SNP Markers</h3>
+          <span class="mgdb-metric-badge">GBS</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">680,000+</strong>
+        </div>
+        <p class="mgdb-metric-description">Genotyping-by-sequencing markers used to compute pairwise identity by state.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 6: ATTRIBUTION & CITATIONS -->
+  <section id="typ-cite" class="mgdb-panel" aria-labelledby="typ-cite-title">
+    <h2 id="typ-cite-title" class="mgdb-panel-title">Attribution &amp; Citing TYPSimSelector</h2>
+    <p class="mgdb-panel-lead">If TYPSimSelector contributed to your research or breeding selections, please cite both MaizeGDB and the Ames panel publication&#58;</p>
+
     <div class="mgdb-table-scroll">
       <table class="mgdb-table typ-cite-table">
         <caption>Works to cite when using TYPSimSelector</caption>
@@ -225,14 +289,52 @@ $$SYNTAX-LEVEL 2
         <tbody>
           <tr>
             <th scope="row">MaizeGDB</th>
-            <td>Andorf CM, Cannon EK, Portwood JL, Gardiner JM, Harper LC, Schaeffer ML, Braun BL, Campbell DA, Vinnakota AG, Sribalusu VV, Huerta M, Cho KT, Wimalanathan K, Richter JD, Mauch ED, Rao BS, Birkett SM, Sen TZ, Lawrence-Dill CJ. MaizeGDB update: new tools, data and interface for the maize model organism database. <em>Nucleic Acids Research</em> 2016 Jan 4;44:D1195&ndash;201. <a href="https\://doi.org/10.1093/nar/gkv1007">doi:10.1093/nar/gkv1007</a></td>
+            <td>Andorf CM, Cannon EK, Portwood JL, Gardiner JM, Harper LC, Schaeffer ML, Braun BL, Campbell DA, Vinnakota AG, Sribalusu VV, Huerta M, Cho KT, Wimalanathan K, Richter JD, Mauch ED, Rao BS, Birkett SM, Sen TZ, Lawrence-Dill CJ. MaizeGDB update&#58; new tools, data and interface for the maize model organism database. <em>Nucleic Acids Research</em> 2016 Jan 4;44\(D1\)&#58;D1195&ndash;D1201. <a href="https://doi.org/10.1093/nar/gkv1007" target="_blank" rel="noopener">doi&#58;10.1093/nar/gkv1007</a></td>
           </tr>
           <tr>
-            <th scope="row">Romay et al.</th>
-            <td>Romay MC, Millard MJ, Glaubitz JC, Peiffer JA, Swarts KL, Casstevens TM, Elshire RJ, Acharya CB, Mitchell SE, Flint-Garcia SA, McMullen MD, Holland JB, Buckler ES, Gardner CA. Comprehensive genotyping of the USA national maize inbred seed bank. <em>Genome Biology</em> 2013;14:R55. <a href="https\://doi.org/10.1186/gb-2013-14-6-r55">doi:10.1186/gb-2013-14-6-r55</a></td>
+            <th scope="row">Romay et al., 2013</th>
+            <td>Romay MC, Millard MJ, Glaubitz JC, Peiffer JA, Swarts KL, Casstevens TM, Elshire RJ, Acharya CB, Mitchell SE, Flint-Garcia SA, McMullen MD, Holland JB, Buckler ES, Gardner CA. Comprehensive genotyping of the USA national maize inbred seed bank. <em>Genome Biology</em> 2013;14&#58;R55. <a href="https://doi.org/10.1186/gb-2013-14-6-r55" target="_blank" rel="noopener">doi&#58;10.1186/gb-2013-14-6-r55</a></td>
           </tr>
         </tbody>
       </table>
+    </div>
+  </section>
+
+  <!-- SECTION 7: CONNECTED GENOMICS RESOURCES -->
+  <section id="typ-related" class="mgdb-panel typ-bottom-section" aria-labelledby="typ-related-title">
+    <h2 id="typ-related-title" class="mgdb-panel-title">Connected Genomics Resources</h2>
+    <p class="mgdb-panel-lead">Explore related stock repositories, genetic variation tools, and reference genome resources.</p>
+
+    <div class="typ-related-grid">
+      <a class="typ-related-card" href="/data_center/stock">
+        <div class="typ-related-title">Stocks Data Center</div>
+        <p class="typ-related-desc">Search and request maize germplasm stocks, mutant alleles, and NCRPIS seed accessions.</p>
+      </a>
+
+      <a class="typ-related-card" href="/genetic_variation">
+        <div class="typ-related-title">Genetic Variation Center</div>
+        <p class="typ-related-desc">Query SNPs, structural variations, and resequencing catalogs across diverse inbred lines.</p>
+      </a>
+
+      <a class="typ-related-card" href="/assembly">
+        <div class="typ-related-title">B73 Reference Assemblies</div>
+        <p class="typ-related-desc">Explore version histories \(v1&ndash;v5\), chromosome accessions, and FASTA/GFF bulk downloads.</p>
+      </a>
+
+      <a class="typ-related-card" href="/download">
+        <div class="typ-related-title">Bulk Downloads &amp; Globus</div>
+        <p class="typ-related-desc">Access high-speed Globus endpoints and bulk HTTP download directories.</p>
+      </a>
+
+      <a class="typ-related-card" href="https://npgsweb.ars-grin.gov/gringlobal/search.aspx" target="_blank" rel="noopener">
+        <div class="typ-related-title">GRIN-Global Germplasm &#8599;</div>
+        <p class="typ-related-desc">National Plant Germplasm System repository holding NCRPIS Ames maize collections.</p>
+      </a>
+
+      <a class="typ-related-card" href="/data_center">
+        <div class="typ-related-title">All Data Centers Hub</div>
+        <p class="typ-related-desc">Discover the full catalog of MaizeGDB data centers, tools, and interactive catalogs.</p>
+      </a>
     </div>
   </section>
 </main>
