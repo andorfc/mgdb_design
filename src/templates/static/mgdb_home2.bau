@@ -6,32 +6,23 @@ $$SYNTAX-LEVEL 2
 <meta property="og:title" content="MaizeGDB — Maize Genetics and Genomics Database">
 <meta property="og:description" content="The community database for maize genetics and genomics: genome assemblies, gene models, seed stocks, and curated literature, with the tools to search them.">
 
-<main class="mgdb-page mgdb-home-page mgdb-home-v3">
+<main class="mgdb-page mgdb-home-page mgdb-home-v2">
 
-  <!-- A warm welcome header with release details and key actions. -->
-  <header class="mgdb-home3-hero">
-    <div class="mgdb-home3-hero-inner">
-      <p class="mgdb-home3-kicker">Maize genetics and genomics database</p>
+  <div class="mgdb-hero-record">
+    <div>
+      <span class="mgdb-eyebrow">Maize genetics and genomics database</span>
       <h1>Welcome to MaizeGDB</h1>
-      <p class="mgdb-home3-lede">MaizeGDB is a community-oriented, long-term, federally funded
-        informatics service to researchers focused on the crop plant and model organism
-        <i>Zea mays</i>.</p>
-      <p class="mgdb-home3-links">
-        <a href="$(server-url)/contribute_data">Contribute your data</a>
-        <a href="$(server-url)/cite">Cite MaizeGDB</a>
-        <a href="$(server-url)/contact">Contact us</a>
-      </p>
-      <p class="mgdb-home3-stamp">
-        <span>Release <strong>$(release_date)</strong></span>
-        <span>Next update <strong>$(next_update)</strong></span>
-        <span>Reference <strong>B73 RefGen_v5</strong></span>
-      </p>
+      <dl class="mgdb-record-facts">
+        <div><dt>Release</dt><dd class="mgdb-record-id">$(release_date)</dd></div>
+        <div><dt>Next update</dt><dd class="mgdb-record-id">$(next_update)</dd></div>
+        <div><dt>Reference</dt><dd class="mgdb-record-id">B73 RefGen_v5</dd></div>
+      </dl>
     </div>
-    <!-- The kernels from the MaizeGDB mark. Decorative, so it carries an empty
-         alt and aria-hidden -- the wordmark in the chrome already names the site. -->
-    <img class="mgdb-home3-hero-art" src="/images/kernels.png" alt="" aria-hidden="true"
-         width="368" height="213" decoding="async" />
-  </header>
+    <div class="mgdb-hero-record-actions">
+      <a class="mgdb-button mgdb-button-primary" href="$(server-url)/contribute_data">Contribute your data</a>
+      <a class="mgdb-button mgdb-button-secondary" href="$(server-url)/cite">Cite MaizeGDB</a>
+    </div>
+  </div>
 
   <div class="mgdb-home-layout">
 
@@ -379,35 +370,22 @@ $$SYNTAX-LEVEL 2
 
     <aside class="mgdb-home-rail" aria-label="News and shortcuts">
 
-      <!-- The Reference Assembly block from the production homepage, rebuilt.
-           There it was three images with their captions baked in -- 75px PNGs
-           reading "B73 ASSEMBLY", "B73 ANNOTATION", "ALL GENOMES" -- which is
-           illegible on a phone and invisible to a screen reader. The puzzle art
-           is the recognizable part, so it leads as the section emblem and the
-           three destinations become real text. Same three links as production. -->
-      <div class="mgdb-aside-card mgdb-refassembly">
-        <h2>Reference assembly</h2>
-        <div class="mgdb-refassembly-head">
-          <img src="/images/home/assembly_puzzle.png" alt="" aria-hidden="true"
-               width="160" height="160" loading="lazy" decoding="async" />
-          <div>
-            <strong>B73 RefGen_v5</strong>
-            <span>The current MaizeGDB reference</span>
-          </div>
-        </div>
-        <ul class="mgdb-refassembly-links">
-          <li><a href="$(server-url)/assembly">B73 assembly<span>How the reference was chosen</span></a></li>
-          <li><a href="$(server-url)/gene_center/gene">B73 annotation<span>Gene models on the reference</span></a></li>
-          <li><a href="$(server-url)/genome">All genomes<span>Every assembly hosted here</span></a></li>
-        </ul>
-      </div>
-
       <div class="mgdb-aside-card">
         <h2>MaizeGDB news</h2>
         <ul class="mgdb-home-news">
           $(news_items)
         </ul>
         <p class="mgdb-home-news-more"><a href="$(server-url)/whatsnew">More news &middot; Archive</a></p>
+      </div>
+
+      <div class="mgdb-panel mgdb-home-tasks-panel">
+        <h2 class="mgdb-home-rail-title">Common tasks</h2>
+        <ul class="mgdb-home-tasks">
+          <li><a href="$(server-url)/gene_center/gene">Find a gene by symbol</a></li>
+          <li><a href="$(server-url)/gene_center/gene#translate">Convert coordinates between assemblies</a></li>
+          <li><a href="$(server-url)/data_center/stock">Order seed from the COOP</a></li>
+          <li><a href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0">Download B73 annotations</a></li>
+        </ul>
       </div>
 
       <div class="mgdb-panel mgdb-home-crops-panel">
