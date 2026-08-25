@@ -21,12 +21,13 @@
 	align-items:center;
 	box-sizing:border-box;
 	width:1080px;
-	height:42px;
+	min-height:46px;
 	padding:0 10px;
 	border:1px solid rgba(255,255,255,.25);
 	border-radius:11px;
 	background:linear-gradient(to bottom, #658c26 0%, #354914 100%);
 	box-shadow:0 5px 16px rgba(22,52,9,.18), inset 0 1px 0 rgba(255,255,255,.18);
+	font-family: var(--mgdb-font, system-ui, -apple-system, sans-serif);
 }
 
 .mgdb-modern #menu_bar > li,
@@ -69,21 +70,22 @@
 
 .mgdb-modern #menu_bar > li > a {
 	box-sizing:border-box;
-	min-height:34px;
-	padding:7px 10px;
+	min-height:36px;
+	padding:7px 12px;
 	border:1px solid transparent;
 	border-radius:7px;
 	color:#fff;
-	font-size:13px;
+	font-family:inherit;
+	font-size:18px;
 	font-weight:600;
-	line-height:18px;
+	line-height:22px;
 	letter-spacing:.01em;
 	text-shadow:none;
 	white-space:nowrap;
 }
 
 .mgdb-modern #menu_bar > li > a.drop {
-	padding-right:25px;
+	padding-right:26px;
 	background:none;
 }
 
@@ -111,7 +113,7 @@
 
 .mgdb-modern #menu_bar > li:hover > a,
 .mgdb-modern #menu_bar > li:focus-within > a {
-	padding:7px 10px;
+	padding:7px 12px;
 	border:1px solid rgba(255,255,255,.18);
 	border-radius:7px;
 	color:#fff;
@@ -120,7 +122,7 @@
 
 .mgdb-modern #menu_bar > li:hover > a.drop,
 .mgdb-modern #menu_bar > li:focus-within > a.drop {
-	padding-right:25px;
+	padding-right:26px;
 	background:none;
 }
 
@@ -134,16 +136,27 @@
 	color:#fff4bd;
 }
 
+.mgdb-modern #menu_bar > li.right:hover,
+.mgdb-modern #menu_bar > li.right:focus-within {
+	background:none;
+}
+
 .mgdb-modern #menu_bar .mega-feedback-link {
 	margin-left:4px;
-	border-color:rgba(168,207,255,.62);
-	background:#185fa6;
+	border:1px solid rgba(255, 255, 255, .32);
+	border-radius:7px;
+	background:rgba(255, 255, 255, .12);
+	color:#fff;
+	transition:background-color .15s ease, border-color .15s ease, color .15s ease;
 }
 
 .mgdb-modern #menu_bar > li:hover .mega-feedback-link,
-.mgdb-modern #menu_bar > li:focus-within .mega-feedback-link {
-	border-color:#d9eaff;
-	background:#0d4e8d;
+.mgdb-modern #menu_bar > li:focus-within .mega-feedback-link,
+.mgdb-modern #menu_bar .mega-feedback-link:hover,
+.mgdb-modern #menu_bar .mega-feedback-link:focus {
+	border-color:rgba(255, 255, 255, .55);
+	background:rgba(255, 255, 255, .22);
+	color:#fff;
 }
 
 .mgdb-modern #menu_bar .mega-dropdown {
@@ -156,7 +169,7 @@
 	background:#fff;
 	box-shadow:0 20px 46px rgba(20,43,13,.22), 0 4px 12px rgba(20,43,13,.12);
 	color:#263522;
-	font-family:Arial, Helvetica, sans-serif;
+	font-family: var(--mgdb-font, system-ui, -apple-system, sans-serif);
 }
 
 .mgdb-modern #menu_bar .mega-dropdown-about,
@@ -166,7 +179,7 @@
 
 .mgdb-modern #menu_bar > li:hover .mega-dropdown,
 .mgdb-modern #menu_bar > li:focus-within .mega-dropdown {
-	top:37px;
+	top:41px;
 }
 
 .mgdb-modern #menu_bar > li:hover .mega-dropdown-about,
@@ -178,7 +191,7 @@
 
 .mgdb-modern #menu_bar > li:hover .dropdown_fullwidth,
 .mgdb-modern #menu_bar > li:focus-within .dropdown_fullwidth {
-	top:37px;
+	top:41px;
 }
 
 .mgdb-modern #menu_bar > li.mega-community-item:hover .dropdown_fullwidth,
@@ -198,7 +211,7 @@
 
 .mgdb-modern #menu_bar .mega-panel-heading {
 	box-sizing:border-box;
-	padding:20px 22px 16px;
+	padding:13px 20px 11px;
 	border-bottom:1px solid #e4eae0;
 	background:linear-gradient(135deg, #f8fbf5 0%, #eef5e9 100%);
 }
@@ -212,11 +225,11 @@
 
 .mgdb-modern #menu_bar .mega-eyebrow {
 	display:block;
-	margin-bottom:4px;
+	margin-bottom:3px;
 	color:#557b2b;
 	font-size:10px;
 	font-weight:800;
-	line-height:14px;
+	line-height:13px;
 	letter-spacing:.13em;
 	text-transform:uppercase;
 }
@@ -229,22 +242,22 @@
 	padding:0;
 	border:0;
 	color:#203d17;
-	font-family:Arial, Helvetica, sans-serif;
+	font-family: var(--mgdb-font, system-ui, -apple-system, sans-serif);
 	font-weight:700;
 	text-shadow:none;
 }
 
 .mgdb-modern #menu_bar .mega-panel-heading h2 {
-	font-size:20px;
-	line-height:25px;
+	font-size:17px;
+	line-height:22px;
 }
 
 .mgdb-modern #menu_bar .mega-panel-heading p {
 	max-width:600px;
-	margin:5px 0 0;
+	margin:4px 0 0;
 	color:#576453;
-	font-size:12px;
-	line-height:18px;
+	font-size:11px;
+	line-height:16px;
 }
 
 .mgdb-modern #menu_bar .mega-heading-action,
@@ -253,7 +266,7 @@
 	align-items:center;
 	flex:0 0 auto;
 	gap:6px;
-	padding:8px 12px;
+	padding:6px 11px;
 	border:1px solid #b8cbaa;
 	border-radius:7px;
 	color:#315f19;
@@ -273,8 +286,8 @@
 .mgdb-modern #menu_bar .mega-grid {
 	display:grid;
 	box-sizing:border-box;
-	gap:16px;
-	padding:18px 20px 20px;
+	gap:14px;
+	padding:12px 18px 14px;
 }
 
 .mgdb-modern #menu_bar .mega-grid-3 {
@@ -294,12 +307,12 @@
 }
 
 .mgdb-modern #menu_bar .mega-group h3 {
-	margin:0 0 8px;
-	padding:0 4px 8px;
+	margin:0 0 6px;
+	padding:0 4px 6px;
 	border-bottom:2px solid #d9e6d1;
 	color:#355c20;
 	font-size:12px;
-	line-height:17px;
+	line-height:16px;
 	letter-spacing:.02em;
 }
 
@@ -309,9 +322,9 @@
 	flex-direction:column;
 	box-sizing:border-box;
 	margin:1px 0;
-	padding:7px 8px;
+	padding:4px 8px;
 	border:0;
-	border-radius:7px;
+	border-radius:6px;
 	color:#263522;
 	line-height:16px;
 	text-decoration:none;
@@ -339,14 +352,14 @@
 
 .mgdb-modern #menu_bar .mega-compact-groups .mega-group > a,
 .mgdb-modern #menu_bar li:hover div .mega-compact-groups .mega-group > a {
-	padding-top:5px;
-	padding-bottom:5px;
+	padding-top:4px;
+	padding-bottom:4px;
 }
 
 .mgdb-modern #menu_bar .mega-feature {
 	box-sizing:border-box;
 	min-width:0;
-	padding:16px;
+	padding:12px 14px;
 	border:1px solid #cbdcc0;
 	border-radius:10px;
 	background:#f3f8ef;
@@ -443,7 +456,7 @@
 .mgdb-modern #menu_bar .mega-panel-footer {
 	display:flex;
 	align-items:center;
-	padding:11px 22px;
+	padding:8px 18px;
 	border-top:1px solid #e1e8dd;
 	background:#f8faf7;
 }
