@@ -28,6 +28,13 @@ src/css/mgdb-genomes.css                        css/mgdb-genomes.css
 src/js/mgdb-genomes.js                          js/mgdb-genomes.js
 src/pages/genomes_modern/index.php              genomes_modern/index.php
 
+# NAM Parent Genome Assembly Project (/NAM_project)
+src/controllers/NAM_project.php                 controllers/NAM_project.php
+src/controllers/genome/NAM_project.php          controllers/genome/NAM_project.php
+src/templates/static/mgdb_nam_project.bau       templates/static/mgdb_nam_project.bau
+src/css/mgdb-nam-project.css                    css/mgdb-nam-project.css
+src/js/mgdb-nam-project.js                      js/mgdb-nam-project.js
+
 # Modern mega menu
 src/css/mgdb-megamenu.css                              css/mgdb-megamenu.css
 src/templates/home/maizegdb_header_modern.bau          templates/home/maizegdb_header_modern.bau
@@ -80,6 +87,7 @@ src/include/db-api.php                           include/db-api.php
 # Settings live in conf/mgdb.conf (dashboard_cache*), which is not in this
 # repository; README.md documents the keys. Run the tool after each reload:
 #   cd <webroot> && php tools/dashboard_cache.php --purge --warm
+src/include/home_lib.php                         include/home_lib.php
 src/include/dashboard_cache.php                  include/dashboard_cache.php
 src/tools/dashboard_cache.php                    tools/dashboard_cache.php
 src/templates/static/mgdb_reference.bau           templates/static/mgdb_reference.bau
@@ -580,6 +588,7 @@ src/images/quicklinks/gene_center.png          images/quicklinks/gene_center.png
 src/images/quicklinks/genome.png               images/quicklinks/genome.png
 src/images/quicklinks/genomebrowser.png        images/quicklinks/genomebrowser.png
 src/images/quicklinks/maize_mine.png           images/quicklinks/maize_mine.png
+src/images/quicklinks/mgec.png                images/quicklinks/mgec.png
 src/images/quicklinks/new_genes.png            images/quicklinks/new_genes.png
 src/images/quicklinks/nomenclature.png         images/quicklinks/nomenclature.png
 src/images/quicklinks/pan_genes.png            images/quicklinks/pan_genes.png
@@ -596,3 +605,13 @@ src/controllers/tools/download_modern.php      controllers/tools/download_modern
 src/templates/static/mgdb_download.bau         templates/static/mgdb_download.bau
 src/css/mgdb-download.css                      css/mgdb-download.css
 src/js/mgdb-download.js                        js/mgdb-download.js
+
+# Homepage design alternatives for group review, at /index2/ and /index3/.
+# Both share include/home_lib.php with the real homepage, so all three show the
+# same data. Delete these five entries and both page directories once a design
+# is chosen. See README.md, "Homepage alternatives".
+src/css/mgdb-home-alt.css                        css/mgdb-home-alt.css
+src/templates/static/mgdb_home2.bau              templates/static/mgdb_home2.bau
+src/templates/static/mgdb_home3.bau              templates/static/mgdb_home3.bau
+src/pages/index2/index.php                       index2/index.php
+src/pages/index3/index.php                       index3/index.php

@@ -1,0 +1,1064 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-nam-project
+<a class="mgdb-skip-link" href="#nam-main">Skip to main content</a>
+
+<main class="mgdb-page mgdb-nam-project-page" id="nam-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/genome">Genomes</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">NAM Parent Assemblies</span>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="mgdb-hero" aria-labelledby="nam-title">
+    <div class="mgdb-hero-emblem">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Chromosome / DNA backbone nodes -->
+        <rect x="8" y="14" width="48" height="36" rx="6" fill="#f0fdf4" stroke="#1b5e20" stroke-width="2.5" />
+        <!-- Multi-line genome tracks -->
+        <line x1="14" y1="23" x2="50" y2="23" stroke="#2e7d32" stroke-width="3" stroke-linecap="round" />
+        <line x1="14" y1="32" x2="50" y2="32" stroke="#d97706" stroke-width="3" stroke-linecap="round" />
+        <line x1="14" y1="41" x2="50" y2="41" stroke="#2563eb" stroke-width="3" stroke-linecap="round" />
+        <!-- Marker dots -->
+        <circle cx="22" cy="23" r="2.5" fill="#facc15" />
+        <circle cx="38" cy="23" r="2.5" fill="#ffffff" />
+        <circle cx="30" cy="32" r="2.5" fill="#ffffff" />
+        <circle cx="44" cy="32" r="2.5" fill="#facc15" />
+        <circle cx="26" cy="41" r="2.5" fill="#facc15" />
+      </svg>
+      <strong>NAM<br />Project</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data_date)</p>
+      <h1 id="nam-title">Nested Association Mapping \(NAM\) Parent Genomes</h1>
+      <p class="mgdb-hero-description">High-quality de novo PacBio reference genome assemblies, structural variation catalogs, annotations, genetic maps, and stock lines for 26 diverse founder inbreds representing the spectrum of modern maize genetic diversity.</p>
+
+      <div class="nam-hero-actions-row">
+        <a class="nam-hero-link" href="/genomebrowser">
+          <span class="nam-link-dot nam-dot-green" aria-hidden="true"></span> Explore in JBrowse 2 &#8599;
+        </a>
+        <a class="nam-hero-link" href="https://nam-genomes.github.io/" target="_blank" rel="noopener">
+          <span class="nam-link-dot nam-dot-gold" aria-hidden="true"></span> NAM Consortium Website &#8599;
+        </a>
+        <a class="nam-hero-link" href="/download#downloads-nam">
+          <span class="nam-link-dot nam-dot-blue" aria-hidden="true"></span> Bulk Downloads &#8595;
+        </a>
+        <a class="nam-hero-link" href="https://maizecoopsc.org/nam-rils.php" target="_blank" rel="noopener">
+          <span class="nam-link-dot nam-dot-purple" aria-hidden="true"></span> Order NAM RILs &#8599;
+        </a>
+        <a class="nam-hero-link" href="/curation/GenomeIssue/edit">
+          <span class="nam-link-dot nam-dot-rose" aria-hidden="true"></span> Report Curation Issue &#8599;
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STICKY SECTION TABS -->
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#nam-assemblies" class="is-current">Assemblies &amp; Stocks Table</a>
+    <a href="#nam-subpopulations">Subpopulation Structure</a>
+    <a href="#nam-publications">Key Publications &amp; Abstracts</a>
+    <a href="#nam-data-hosted">Data Hosted at MaizeGDB</a>
+    <a href="#nam-overview">Scale &amp; Metrics</a>
+    <a href="#nam-faqs">FAQs &amp; Guidelines</a>
+    <a href="#nam-related">Connected Resources</a>
+  </nav>
+
+  <!-- SECTION 1: INTERACTIVE ASSEMBLIES & STOCKS TABLE -->
+  <section id="nam-assemblies" class="mgdb-panel" aria-labelledby="nam-assemblies-title">
+    <div class="nam-panel-header-wrap">
+      <div>
+        <h2 id="nam-assemblies-title" class="mgdb-panel-title">NAM Founder Genome Assemblies &amp; Stock Directory</h2>
+        <p class="mgdb-panel-lead">Search, sort, and filter the 26 reference genome assemblies, official gene annotations, USDA GRIN accessions, and MaizeGDB stock records.</p>
+      </div>
+    </div>
+
+    <!-- FILTER & SEARCH TOOLBAR -->
+    <div class="nam-table-toolbar">
+      <div class="nam-filter-chips-wrap" role="group" aria-label="Filter by subpopulation">
+        <span class="nam-toolbar-label">Subpopulation&#58;</span>
+        <button type="button" class="nam-chip is-active" data-subpop-filter="all">All \(26\)</button>
+        <button type="button" class="nam-chip nam-chip-stiff" data-subpop-filter="stiff-stalk">Stiff Stalk \(2\)</button>
+        <button type="button" class="nam-chip nam-chip-nonstiff" data-subpop-filter="non-stiff-stalk">Non-Stiff Stalk \(5\)</button>
+        <button type="button" class="nam-chip nam-chip-tropical" data-subpop-filter="tropical">Tropical / Subtropical \(13\)</button>
+        <button type="button" class="nam-chip nam-chip-mixed" data-subpop-filter="mixed">Mixed \(3\)</button>
+        <button type="button" class="nam-chip nam-chip-popcorn" data-subpop-filter="popcorn">Popcorn \(1\)</button>
+        <button type="button" class="nam-chip nam-chip-sweet" data-subpop-filter="sweet-corn">Sweet Corn \(2\)</button>
+      </div>
+
+      <div class="nam-search-wrap">
+        <label for="nam-search-input" class="mgdb-visually-hidden">Search NAM assemblies</label>
+        <input type="text" id="nam-search-input" class="mgdb-input nam-search-input" placeholder="Search line, subpopulation, PI, stock, or accession..." autocomplete="off" spellcheck="false" />
+      </div>
+    </div>
+
+    <div class="nam-table-status-bar">
+      <span id="nam-row-count">Showing 26 of 26 assemblies</span>
+      <span class="nam-table-hint">Click column headers to sort &bull; Use buttons to launch JBrowse 2 or download files</span>
+    </div>
+
+    <!-- MAIN INTERACTIVE TABLE -->
+    <div class="mgdb-table-scroll nam-table-scroll">
+      <table class="mgdb-table nam-table" id="nam-data-table">
+        <thead>
+          <tr>
+            <th scope="col" class="is-sortable" data-sort="line" aria-sort="ascending">
+              <button type="button">Line Name <span class="sort-icon" aria-hidden="true">&uarr;</span></button>
+            </th>
+            <th scope="col" class="is-sortable" data-sort="subpop">
+              <button type="button">Subpopulation <span class="sort-icon" aria-hidden="true">&updownarrow;</span></button>
+            </th>
+            <th scope="col">Genome Assembly &amp; JBrowse</th>
+            <th scope="col">Official Annotation &amp; Xref</th>
+            <th scope="col" class="is-sortable" data-sort="grin">
+              <button type="button">USDA GRIN PI <span class="sort-icon" aria-hidden="true">&updownarrow;</span></button>
+            </th>
+            <th scope="col" class="is-sortable" data-sort="stock">
+              <button type="button">MaizeGDB Stock <span class="sort-icon" aria-hidden="true">&updownarrow;</span></button>
+            </th>
+            <th scope="col" class="is-sortable" data-sort="ncbi">
+              <button type="button">NCBI Accession <span class="sort-icon" aria-hidden="true">&updownarrow;</span></button>
+            </th>
+            <th scope="col" class="text-right">Bulk Download</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- 1: B73 \(Common Reference Parent\) -->
+          <tr data-line="B73" data-subpop="stiff-stalk" data-grin="677128" data-stock="47743" data-ncbi="GCA_000005005" class="is-reference-row">
+            <td class="nam-line-cell">
+              <strong>B73</strong>
+              <span class="nam-ref-badge">Common Parent</span>
+            </td>
+            <td>
+              <span class="nam-badge nam-badge-stiff">Stiff stalk</span>
+            </td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-B73-REFERENCE-NAM-5.0">Zm-B73-REFERENCE-NAM-5.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-B73-REFERENCE-NAM-5.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-B73-REFERENCE-NAM-5.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00001eb.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0_Zm00001e.1_ab.1_xref_gene_IDs.txt.gz" title="Cross-reference translation mapping">e.1 &rarr; eb.1 xref &#8599;</a>
+            </td>
+            <td>
+              <a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=1936636" target="_blank" rel="noopener">PI 677128 &#8599;</a>
+            </td>
+            <td>
+              <a class="nam-stock-link" href="/data_center/stock/47743">Stock #47743</a>
+            </td>
+            <td>
+              <a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_000005005" target="_blank" rel="noopener">GCA_000005005 &#8599;</a>
+            </td>
+            <td class="text-right">
+              <a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0" target="_blank" rel="noopener">Download &#8599;</a>
+            </td>
+          </tr>
+
+          <!-- 2: B97 -->
+          <tr data-line="B97" data-subpop="stiff-stalk" data-grin="692138" data-stock="47748" data-ncbi="GCA_902167145">
+            <td class="nam-line-cell"><strong>B97</strong></td>
+            <td><span class="nam-badge nam-badge-stiff">Stiff stalk</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-B97-REFERENCE-NAM-1.0">Zm-B97-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-B97-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-B97-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00018ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-B97-REFERENCE-NAM-1.0/Zm-B97-REFERENCE-NAM-1.0_Zm00018a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098531" target="_blank" rel="noopener">PI 692138 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/47748">Stock #47748</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902167145" target="_blank" rel="noopener">GCA_902167145 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-B97-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+
+          <!-- 3: CML52 -->
+          <tr data-line="CML52" data-subpop="tropical" data-grin="692139" data-stock="17163" data-ncbi="GCA_902167155">
+            <td class="nam-line-cell"><strong>CML52</strong></td>
+            <td><span class="nam-badge nam-badge-tropical">Tropical</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-CML52-REFERENCE-NAM-1.0">Zm-CML52-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-CML52-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-CML52-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00019ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-CML52-REFERENCE-NAM-1.0/Zm-CML52-REFERENCE-NAM-1.0_Zm00019a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098532" target="_blank" rel="noopener">PI 692139 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/17163">Stock #17163</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902167155" target="_blank" rel="noopener">GCA_902167155 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-CML52-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+
+          <!-- 4: CML69 -->
+          <tr data-line="CML69" data-subpop="tropical" data-grin="692140" data-stock="68310" data-ncbi="GCA_902167135">
+            <td class="nam-line-cell"><strong>CML69</strong></td>
+            <td><span class="nam-badge nam-badge-tropical">Tropical</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-CML69-REFERENCE-NAM-1.0">Zm-CML69-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-CML69-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-CML69-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00020ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-CML69-REFERENCE-NAM-1.0/Zm-CML69-REFERENCE-NAM-1.0_Zm00020a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098533" target="_blank" rel="noopener">PI 692140 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/68310">Stock #68310</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902167135" target="_blank" rel="noopener">GCA_902167135 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-CML69-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+
+          <!-- 5: CML103 -->
+          <tr data-line="CML103" data-subpop="tropical" data-grin="692141" data-stock="68311" data-ncbi="GCA_902167125">
+            <td class="nam-line-cell"><strong>CML103</strong></td>
+            <td><span class="nam-badge nam-badge-tropical">Tropical</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-CML103-REFERENCE-NAM-1.0">Zm-CML103-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-CML103-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-CML103-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00021ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-CML103-REFERENCE-NAM-1.0/Zm-CML103-REFERENCE-NAM-1.0_Zm00021a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098534" target="_blank" rel="noopener">PI 692141 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/68311">Stock #68311</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902167125" target="_blank" rel="noopener">GCA_902167125 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-CML103-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+
+          <!-- 6: CML228 -->
+          <tr data-line="CML228" data-subpop="tropical" data-grin="692142" data-stock="68312" data-ncbi="GCA_902167115">
+            <td class="nam-line-cell"><strong>CML228</strong></td>
+            <td><span class="nam-badge nam-badge-tropical">Tropical</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-CML228-REFERENCE-NAM-1.0">Zm-CML228-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-CML228-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-CML228-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00022ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-CML228-REFERENCE-NAM-1.0/Zm-CML228-REFERENCE-NAM-1.0_Zm00022a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098535" target="_blank" rel="noopener">PI 692142 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/68312">Stock #68312</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902167115" target="_blank" rel="noopener">GCA_902167115 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-CML228-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+
+          <!-- 7: CML247 -->
+          <tr data-line="CML247" data-subpop="tropical" data-grin="692143" data-stock="68313" data-ncbi="GCA_902167105">
+            <td class="nam-line-cell"><strong>CML247</strong></td>
+            <td><span class="nam-badge nam-badge-tropical">Tropical</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-CML247-REFERENCE-NAM-1.0">Zm-CML247-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-CML247-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-CML247-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00023ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-CML247-REFERENCE-NAM-1.0/Zm-CML247-REFERENCE-NAM-1.0_Zm00023a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098536" target="_blank" rel="noopener">PI 692143 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/68313">Stock #68313</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902167105" target="_blank" rel="noopener">GCA_902167105 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-CML247-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+
+          <!-- 8: CML277 -->
+          <tr data-line="CML277" data-subpop="tropical" data-grin="692144" data-stock="68314" data-ncbi="GCA_902167095">
+            <td class="nam-line-cell"><strong>CML277</strong></td>
+            <td><span class="nam-badge nam-badge-tropical">Tropical</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-CML277-REFERENCE-NAM-1.0">Zm-CML277-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-CML277-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-CML277-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00024ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-CML277-REFERENCE-NAM-1.0/Zm-CML277-REFERENCE-NAM-1.0_Zm00024a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098537" target="_blank" rel="noopener">PI 692144 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/68314">Stock #68314</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902167095" target="_blank" rel="noopener">GCA_902167095 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-CML277-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+
+          <!-- 9: CML322 -->
+          <tr data-line="CML322" data-subpop="tropical" data-grin="692145" data-stock="68315" data-ncbi="GCA_902167085">
+            <td class="nam-line-cell"><strong>CML322</strong></td>
+            <td><span class="nam-badge nam-badge-tropical">Tropical</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-CML322-REFERENCE-NAM-1.0">Zm-CML322-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-CML322-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-CML322-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00025ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-CML322-REFERENCE-NAM-1.0/Zm-CML322-REFERENCE-NAM-1.0_Zm00025a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098538" target="_blank" rel="noopener">PI 692145 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/68315">Stock #68315</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902167085" target="_blank" rel="noopener">GCA_902167085 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-CML322-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+
+          <!-- 10: CML333 -->
+          <tr data-line="CML333" data-subpop="tropical" data-grin="692146" data-stock="17164" data-ncbi="GCA_902167075">
+            <td class="nam-line-cell"><strong>CML333</strong></td>
+            <td><span class="nam-badge nam-badge-tropical">Tropical</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-CML333-REFERENCE-NAM-1.0">Zm-CML333-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-CML333-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-CML333-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00026ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-CML333-REFERENCE-NAM-1.0/Zm-CML333-REFERENCE-NAM-1.0_Zm00026a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098539" target="_blank" rel="noopener">PI 692146 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/17164">Stock #17164</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902167075" target="_blank" rel="noopener">GCA_902167075 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-CML333-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+
+          <!-- 11: HP301 -->
+          <tr data-line="HP301" data-subpop="popcorn" data-grin="692147" data-stock="47796" data-ncbi="GCA_902167065">
+            <td class="nam-line-cell"><strong>HP301</strong></td>
+            <td><span class="nam-badge nam-badge-popcorn">Popcorn</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-HP301-REFERENCE-NAM-1.0">Zm-HP301-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-HP301-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-HP301-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00027ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-HP301-REFERENCE-NAM-1.0/Zm-HP301-REFERENCE-NAM-1.0_Zm00027a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098540" target="_blank" rel="noopener">PI 692147 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/47796">Stock #47796</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902167065" target="_blank" rel="noopener">GCA_902167065 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-HP301-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+
+          <!-- 12: Il14H -->
+          <tr data-line="Il14H" data-subpop="sweet-corn" data-grin="692148" data-stock="17165" data-ncbi="GCA_902167055">
+            <td class="nam-line-cell"><strong>Il14H</strong></td>
+            <td><span class="nam-badge nam-badge-sweet">Sweet corn</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-Il14H-REFERENCE-NAM-1.0">Zm-Il14H-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-Il14H-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Il14H-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00028ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-Il14H-REFERENCE-NAM-1.0/Zm-Il14H-REFERENCE-NAM-1.0_Zm00028a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098541" target="_blank" rel="noopener">PI 692148 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/17165">Stock #17165</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902167055" target="_blank" rel="noopener">GCA_902167055 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-Il14H-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+
+          <!-- 13: Ki3 -->
+          <tr data-line="Ki3" data-subpop="tropical" data-grin="692136" data-stock="47805" data-ncbi="GCA_902167385">
+            <td class="nam-line-cell"><strong>Ki3</strong></td>
+            <td><span class="nam-badge nam-badge-tropical">Tropical</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-Ki3-REFERENCE-NAM-1.0">Zm-Ki3-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-Ki3-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Ki3-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00029ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-Ki3-REFERENCE-NAM-1.0/Zm-Ki3-REFERENCE-NAM-1.0_Zm00029a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098529" target="_blank" rel="noopener">PI 692136 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/47805">Stock #47805</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902167385" target="_blank" rel="noopener">GCA_902167385 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-Ki3-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+
+          <!-- 14: Ki11 -->
+          <tr data-line="Ki11" data-subpop="tropical" data-grin="692137" data-stock="47806" data-ncbi="GCA_902167395">
+            <td class="nam-line-cell"><strong>Ki11</strong></td>
+            <td><span class="nam-badge nam-badge-tropical">Tropical</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-Ki11-REFERENCE-NAM-1.0">Zm-Ki11-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-Ki11-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Ki11-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00030ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-Ki11-REFERENCE-NAM-1.0/Zm-Ki11-REFERENCE-NAM-1.0_Zm00030a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098530" target="_blank" rel="noopener">PI 692137 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/47806">Stock #47806</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902167395" target="_blank" rel="noopener">GCA_902167395 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-Ki11-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+
+          <!-- 15: Ky21 -->
+          <tr data-line="Ky21" data-subpop="non-stiff-stalk" data-grin="692149" data-stock="47814" data-ncbi="GCA_902167045">
+            <td class="nam-line-cell"><strong>Ky21</strong></td>
+            <td><span class="nam-badge nam-badge-nonstiff">Non-stiff-stalk</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-Ky21-REFERENCE-NAM-1.0">Zm-Ky21-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-Ky21-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Ky21-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00031ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-Ky21-REFERENCE-NAM-1.0/Zm-Ky21-REFERENCE-NAM-1.0_Zm00031a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098542" target="_blank" rel="noopener">PI 692149 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/47814">Stock #47814</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902167045" target="_blank" rel="noopener">GCA_902167045 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-Ky21-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+
+          <!-- 16: M37W -->
+          <tr data-line="M37W" data-subpop="mixed" data-grin="692150" data-stock="68317" data-ncbi="GCA_902167175">
+            <td class="nam-line-cell"><strong>M37W</strong></td>
+            <td><span class="nam-badge nam-badge-mixed">Mixed</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-M37W-REFERENCE-NAM-1.0">Zm-M37W-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-M37W-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-M37W-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00032ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-M37W-REFERENCE-NAM-1.0/Zm-M37W-REFERENCE-NAM-1.0_Zm00032a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098543" target="_blank" rel="noopener">PI 692150 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/68317">Stock #68317</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902167175" target="_blank" rel="noopener">GCA_902167175 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-M37W-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+
+          <!-- 17: M162W -->
+          <tr data-line="M162W" data-subpop="non-stiff-stalk" data-grin="692151" data-stock="68316" data-ncbi="GCA_902166995">
+            <td class="nam-line-cell"><strong>M162W</strong></td>
+            <td><span class="nam-badge nam-badge-nonstiff">Non-stiff-stalk</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-M162W-REFERENCE-NAM-1.0">Zm-M162W-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-M162W-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-M162W-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00033ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-M162W-REFERENCE-NAM-1.0/Zm-M162W-REFERENCE-NAM-1.0_Zm00033a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098544" target="_blank" rel="noopener">PI 692151 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/68316">Stock #68316</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902166995" target="_blank" rel="noopener">GCA_902166995 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-M162W-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+
+          <!-- 18: Mo18W -->
+          <tr data-line="Mo18W" data-subpop="mixed" data-grin="692152" data-stock="47847" data-ncbi="GCA_902167165">
+            <td class="nam-line-cell"><strong>Mo18W</strong></td>
+            <td><span class="nam-badge nam-badge-mixed">Mixed</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-Mo18W-REFERENCE-NAM-1.0">Zm-Mo18W-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-Mo18W-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Mo18W-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00034ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-Mo18W-REFERENCE-NAM-1.0/Zm-Mo18W-REFERENCE-NAM-1.0_Zm00034a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098545" target="_blank" rel="noopener">PI 692152 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/47847">Stock #47847</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902167165" target="_blank" rel="noopener">GCA_902167165 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-Mo18W-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+
+          <!-- 19: Ms71 -->
+          <tr data-line="Ms71" data-subpop="non-stiff-stalk" data-grin="692153" data-stock="51056" data-ncbi="GCA_902167375">
+            <td class="nam-line-cell"><strong>Ms71</strong></td>
+            <td><span class="nam-badge nam-badge-nonstiff">Non-stiff-stalk</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-Ms71-REFERENCE-NAM-1.0">Zm-Ms71-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-Ms71-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Ms71-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00035ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-Ms71-REFERENCE-NAM-1.0/Zm-Ms71-REFERENCE-NAM-1.0_Zm00035a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098546" target="_blank" rel="noopener">PI 692153 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/51056">Stock #51056</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902167375" target="_blank" rel="noopener">GCA_902167375 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-Ms71-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+
+          <!-- 20: NC350 -->
+          <tr data-line="NC350" data-subpop="tropical" data-grin="692154" data-stock="248182" data-ncbi="GCA_902167005">
+            <td class="nam-line-cell"><strong>NC350</strong></td>
+            <td><span class="nam-badge nam-badge-tropical">Tropical</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-NC350-REFERENCE-NAM-1.0">Zm-NC350-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-NC350-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-NC350-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00036ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-NC350-REFERENCE-NAM-1.0/Zm-NC350-REFERENCE-NAM-1.0_Zm00036a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098547" target="_blank" rel="noopener">PI 692154 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/248182">Stock #248182</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902167005" target="_blank" rel="noopener">GCA_902167005 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-NC350-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+
+          <!-- 21: NC358 -->
+          <tr data-line="NC358" data-subpop="tropical" data-grin="692155" data-stock="248063" data-ncbi="GCA_902167035">
+            <td class="nam-line-cell"><strong>NC358</strong></td>
+            <td><span class="nam-badge nam-badge-tropical">Tropical</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-NC358-REFERENCE-NAM-1.0">Zm-NC358-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-NC358-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-NC358-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00037ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-NC358-REFERENCE-NAM-1.0/Zm-NC358-REFERENCE-NAM-1.0_Zm00037a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098548" target="_blank" rel="noopener">PI 692155 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/248063">Stock #248063</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902167035" target="_blank" rel="noopener">GCA_902167035 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-NC358-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+
+          <!-- 22: Oh7B -->
+          <tr data-line="Oh7B" data-subpop="non-stiff-stalk" data-grin="692156" data-stock="1083619" data-ncbi="GCA_902166955">
+            <td class="nam-line-cell"><strong>Oh7B</strong></td>
+            <td><span class="nam-badge nam-badge-nonstiff">Non-stiff-stalk</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-Oh7B-REFERENCE-NAM-1.0">Zm-Oh7B-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-Oh7B-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Oh7B-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00038ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-Oh7B-REFERENCE-NAM-1.0/Zm-Oh7B-REFERENCE-NAM-1.0_Zm00038a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098549" target="_blank" rel="noopener">PI 692156 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/1083619">Stock #1083619</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902166955" target="_blank" rel="noopener">GCA_902166955 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-Oh7B-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+
+          <!-- 23: Oh43 -->
+          <tr data-line="Oh43" data-subpop="non-stiff-stalk" data-grin="692157" data-stock="47888" data-ncbi="GCA_902167015">
+            <td class="nam-line-cell"><strong>Oh43</strong></td>
+            <td><span class="nam-badge nam-badge-nonstiff">Non-stiff-stalk</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-Oh43-REFERENCE-NAM-1.0">Zm-Oh43-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-Oh43-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Oh43-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00039ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-Oh43-REFERENCE-NAM-1.0/Zm-Oh43-REFERENCE-NAM-1.0_Zm00039a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098550" target="_blank" rel="noopener">PI 692157 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/47888">Stock #47888</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902167015" target="_blank" rel="noopener">GCA_902167015 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-Oh43-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+
+          <!-- 24: P39 -->
+          <tr data-line="P39" data-subpop="sweet-corn" data-grin="692158" data-stock="78845" data-ncbi="GCA_902166965">
+            <td class="nam-line-cell"><strong>P39</strong></td>
+            <td><span class="nam-badge nam-badge-sweet">Sweet corn</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-P39-REFERENCE-NAM-1.0">Zm-P39-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-P39-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-P39-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00040ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-P39-REFERENCE-NAM-1.0/Zm-P39-REFERENCE-NAM-1.0_Zm00040a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098551" target="_blank" rel="noopener">PI 692158 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/78845">Stock #78845</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902166965" target="_blank" rel="noopener">GCA_902166965 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-P39-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+
+          <!-- 25: Tx303 -->
+          <tr data-line="Tx303" data-subpop="mixed" data-grin="692159" data-stock="17166" data-ncbi="GCA_902167205">
+            <td class="nam-line-cell"><strong>Tx303</strong></td>
+            <td><span class="nam-badge nam-badge-mixed">Mixed</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-Tx303-REFERENCE-NAM-1.0">Zm-Tx303-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-Tx303-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Tx303-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00041ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-Tx303-REFERENCE-NAM-1.0/Zm-Tx303-REFERENCE-NAM-1.0_Zm00041a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098552" target="_blank" rel="noopener">PI 692159 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/17166">Stock #17166</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902167205" target="_blank" rel="noopener">GCA_902167205 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-Tx303-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+
+          <!-- 26: Tzi8 -->
+          <tr data-line="Tzi8" data-subpop="tropical" data-grin="692160" data-stock="78865" data-ncbi="GCA_902167185">
+            <td class="nam-line-cell"><strong>Tzi8</strong></td>
+            <td><span class="nam-badge nam-badge-tropical">Tropical</span></td>
+            <td>
+              <a class="nam-assembly-link" href="/genome/assembly/Zm-Tzi8-REFERENCE-NAM-1.0">Zm-Tzi8-REFERENCE-NAM-1.0</a>
+              <div class="nam-jb-btns">
+                <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-Tzi8-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Tzi8-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+              </div>
+            </td>
+            <td>
+              <span class="nam-annot-tag">Zm00042ab.1</span>
+              <a class="nam-xref-link" href="https://download.maizegdb.org/Zm-Tzi8-REFERENCE-NAM-1.0/Zm-Tzi8-REFERENCE-NAM-1.0_Zm00042a.1_ab.1_xref_gene_IDs.txt.gz">a.1 &rarr; ab.1 xref &#8599;</a>
+            </td>
+            <td><a class="nam-grin-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=2098553" target="_blank" rel="noopener">PI 692160 &#8599;</a></td>
+            <td><a class="nam-stock-link" href="/data_center/stock/78865">Stock #78865</a></td>
+            <td><a class="nam-ncbi-link" href="https://www.ncbi.nlm.nih.gov/assembly/GCA_902167185" target="_blank" rel="noopener">GCA_902167185 &#8599;</a></td>
+            <td class="text-right"><a class="nam-dl-btn" href="https://download.maizegdb.org/Zm-Tzi8-REFERENCE-NAM-1.0" target="_blank" rel="noopener">Download &#8599;</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 2: SUBPOPULATION STRUCTURE & GENOMIC DIVERSITY -->
+  <section id="nam-subpopulations" class="mgdb-panel" aria-labelledby="nam-subpop-title">
+    <h2 id="nam-subpop-title" class="mgdb-panel-title">Subpopulation Structure &amp; Germplasm Pools</h2>
+    <p class="mgdb-panel-lead">The 26 NAM founder inbreds sample the genetic breadth of modern maize breeding, structured across 6 major germplasm pools.</p>
+
+    <div class="nam-subpop-grid">
+      <!-- Stiff Stalk -->
+      <article class="nam-subpop-card">
+        <div class="nam-subpop-head">
+          <span class="nam-badge nam-badge-stiff">Stiff Stalk</span>
+          <span class="nam-subpop-count">2 inbreds</span>
+        </div>
+        <h3 class="nam-subpop-name">Stiff Stalk Synthetic \(SS\)</h3>
+        <p class="nam-subpop-desc">Iowa Stiff Stalk Synthetic derivatives characterized by stalk strength and lodging resistance, forming one of the primary heterotic groups in North American hybrid breeding.</p>
+        <div class="nam-subpop-lines">
+          <strong>Members&#58;</strong> <span>B73 \(Common Reference\), B97</span>
+        </div>
+      </article>
+
+      <!-- Non-Stiff Stalk -->
+      <article class="nam-subpop-card">
+        <div class="nam-subpop-head">
+          <span class="nam-badge nam-badge-nonstiff">Non-Stiff Stalk</span>
+          <span class="nam-subpop-count">5 inbreds</span>
+        </div>
+        <h3 class="nam-subpop-name">Non-Stiff Stalk \(NSS\)</h3>
+        <p class="nam-subpop-desc">Diverse temperate inbreds originating from Lancaster Sure Crop, Reid Yellow Dent, and Leaming pools, providing maximal heterosis when crossed to Stiff Stalk parents.</p>
+        <div class="nam-subpop-lines">
+          <strong>Members&#58;</strong> <span>Ky21, M162W, Ms71, Oh43, Oh7B</span>
+        </div>
+      </article>
+
+      <!-- Tropical / Subtropical -->
+      <article class="nam-subpop-card">
+        <div class="nam-subpop-head">
+          <span class="nam-badge nam-badge-tropical">Tropical / Subtropical</span>
+          <span class="nam-subpop-count">13 inbreds</span>
+        </div>
+        <h3 class="nam-subpop-name">Tropical &amp; Subtropical Inbreds</h3>
+        <p class="nam-subpop-desc">Bred at CIMMYT, IITA, and Suwan lines in Thailand, harboring vast allelic diversity, photoperiod sensitivity, disease resistance alleles, and distinct genomic architecture.</p>
+        <div class="nam-subpop-lines">
+          <strong>Members&#58;</strong> <span>CML52, CML69, CML103, CML228, CML247, CML277, CML322, CML333, Ki3, Ki11, NC350, NC358, Tzi8</span>
+        </div>
+      </article>
+
+      <!-- Mixed -->
+      <article class="nam-subpop-card">
+        <div class="nam-subpop-head">
+          <span class="nam-badge nam-badge-mixed">Mixed</span>
+          <span class="nam-subpop-count">3 inbreds</span>
+        </div>
+        <h3 class="nam-subpop-name">Temperate / Tropical Mixed</h3>
+        <p class="nam-subpop-desc">Lines adapted through hybrid crosses between temperate dent lines and tropical germplasm, bridging distinct climatic adaptations and maturity zones.</p>
+        <div class="nam-subpop-lines">
+          <strong>Members&#58;</strong> <span>M37W, Mo18W, Tx303</span>
+        </div>
+      </article>
+
+      <!-- Popcorn -->
+      <article class="nam-subpop-card">
+        <div class="nam-subpop-head">
+          <span class="nam-badge nam-badge-popcorn">Popcorn</span>
+          <span class="nam-subpop-count">1 inbred</span>
+        </div>
+        <h3 class="nam-subpop-name">Popcorn Line</h3>
+        <p class="nam-subpop-desc">Specialty endosperm architecture characterized by a hard, dense pericarp and high expansion volume upon heating.</p>
+        <div class="nam-subpop-lines">
+          <strong>Members&#58;</strong> <span>HP301</span>
+        </div>
+      </article>
+
+      <!-- Sweet Corn -->
+      <article class="nam-subpop-card">
+        <div class="nam-subpop-head">
+          <span class="nam-badge nam-badge-sweet">Sweet Corn</span>
+          <span class="nam-subpop-count">2 inbreds</span>
+        </div>
+        <h3 class="nam-subpop-name">Sweet Corn Inbreds</h3>
+        <p class="nam-subpop-desc">Specialty table corn lines carrying endosperm mutations that retard starch conversion, increasing sugar accumulation in kernels.</p>
+        <div class="nam-subpop-lines">
+          <strong>Members&#58;</strong> <span>Il14H, P39</span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 3: KEY PUBLICATIONS & ABSTRACT PREVIEWS -->
+  <section id="nam-publications" class="mgdb-panel" aria-labelledby="nam-pub-title">
+    <h2 id="nam-pub-title" class="mgdb-panel-title">Key Publications &amp; Abstract Previews</h2>
+    <p class="mgdb-panel-lead">Foundational scientific literature detailing the NAM genome assemblies, genetic architecture, and population design.</p>
+
+    <div class="nam-publications-grid">
+      <!-- Publication 1: Hufford et al. 2021 -->
+      <article class="nam-pub-card">
+        <div class="nam-pub-meta-top">
+          <span class="nam-pub-journal-badge">Science &bull; 2021</span>
+          <span class="nam-pub-doi">DOI&#58; 10.1126/science.abg5289</span>
+        </div>
+        <h3 class="nam-pub-title">De novo assembly, annotation, and comparative analysis of 26 diverse maize genomes</h3>
+        <p class="nam-pub-authors">Matthew B. Hufford, Arun S. Seetharam, Margaret R. Woodhouse, Kapeel Chougule, Fang Ou, Jianing Liu, Scott T. Higgins, John L. Portwood II, Carson M. Andorf, et al. \(NAM Consortium\)</p>
+        <p class="nam-pub-citation"><em>Science</em> 2021 Aug 6; 373\(6555\)&#58;655&ndash;662.</p>
+        
+        <div class="nam-pub-abstract-wrap">
+          <h4 class="nam-pub-abstract-heading">Abstract</h4>
+          <p class="nam-pub-abstract-text">Maize is an important crop with extraordinary levels of genetic and phenotypic diversity. To understand this diversity, we produced de novo chromosome-scale genome assemblies for 26 inbred lines representing the founders of the nested association mapping population. Comparative analyses revealed that although the genome architecture is broadly conserved, the maize pan-genome contains substantial structural variation, with thousands of genes exhibiting presence-absence variation or copy number variation across lines. We identified widespread structural diversity in intergenic regulatory regions, demonstrating how transposable element proliferation and local sequence divergence shape the transcriptional landscape and phenotypic diversity of modern maize.</p>
+        </div>
+
+        <div class="nam-pub-actions">
+          <a class="mgdb-button mgdb-button-primary" href="https://www.science.org/doi/10.1126/science.abg5289" target="_blank" rel="noopener">Full Text on Science &#8599;</a>
+          <a class="mgdb-button mgdb-button-secondary" href="https://pubmed.ncbi.nlm.nih.gov/34353948/" target="_blank" rel="noopener">PubMed 34353948 &#8599;</a>
+          <a class="mgdb-button mgdb-button-quiet" href="/data_center/reference?id=9023933">MaizeGDB Record</a>
+        </div>
+      </article>
+
+      <!-- Publication 2: McMullen et al. 2009 -->
+      <article class="nam-pub-card">
+        <div class="nam-pub-meta-top">
+          <span class="nam-pub-journal-badge">Science &bull; 2009</span>
+          <span class="nam-pub-doi">DOI&#58; 10.1126/science.1174320</span>
+        </div>
+        <h3 class="nam-pub-title">Genetic Properties of the Maize Nested Association Mapping Population</h3>
+        <p class="nam-pub-authors">Michael D. McMullen, Stephen Kresovich, Hector Sanchez Villeda, Peter Bradbury, Huihui Li, Qi Sun, Sherry Flint-Garcia, Jeffrey Thornsberry, Charlotte Acharya, Christopher Bottoms, et al.</p>
+        <p class="nam-pub-citation"><em>Science</em> 2009 Aug 7; 325\(5941\)&#58;737&ndash;740.</p>
+        
+        <div class="nam-pub-abstract-wrap">
+          <h4 class="nam-pub-abstract-heading">Abstract</h4>
+          <p class="nam-pub-abstract-text">Nested association mapping \(NAM\) takes advantage of both historical recombination events and structured biparental crosses to provide high statistical power and high resolution for dissecting complex quantitative traits. The maize NAM population consists of 25 recombinant inbred line \(RIL\) families with 200 lines each \(5,000 RILs total\) crossed to the common parent B73. We characterized recombination landscapes and genetic architecture across the population, demonstrating the utility of NAM for high-resolution QTL mapping in crops.</p>
+        </div>
+
+        <div class="nam-pub-actions">
+          <a class="mgdb-button mgdb-button-primary" href="https://www.science.org/doi/10.1126/science.1174320" target="_blank" rel="noopener">Full Text on Science &#8599;</a>
+          <a class="mgdb-button mgdb-button-secondary" href="https://pubmed.ncbi.nlm.nih.gov/19661427/" target="_blank" rel="noopener">PubMed 19661427 &#8599;</a>
+        </div>
+      </article>
+
+      <!-- Publication 3: Yu et al. 2008 -->
+      <article class="nam-pub-card">
+        <div class="nam-pub-meta-top">
+          <span class="nam-pub-journal-badge">Genetics &bull; 2008</span>
+          <span class="nam-pub-doi">DOI&#58; 10.1534/genetics.107.074245</span>
+        </div>
+        <h3 class="nam-pub-title">Genetic Design and Statistical Power of a Nested Association Mapping Population in Maize</h3>
+        <p class="nam-pub-authors">Jianming Yu, James B. Holland, Michael D. McMullen, Edward S. Buckler</p>
+        <p class="nam-pub-citation"><em>Genetics</em> 2008 Jan; 178\(1\)&#58;539&ndash;551.</p>
+        
+        <div class="nam-pub-abstract-wrap">
+          <h4 class="nam-pub-abstract-heading">Abstract</h4>
+          <p class="nam-pub-abstract-text">We evaluate the genetic properties and statistical power of the Nested Association Mapping \(NAM\) strategy. By nesting diverse parental lines into a reference design, NAM integrates the benefits of linkage analysis with association mapping, circumventing allele frequency limitations and population structure confounding.</p>
+        </div>
+
+        <div class="nam-pub-actions">
+          <a class="mgdb-button mgdb-button-primary" href="https://doi.org/10.1534/genetics.107.074245" target="_blank" rel="noopener">Full Text on Genetics &#8599;</a>
+          <a class="mgdb-button mgdb-button-secondary" href="https://pubmed.ncbi.nlm.nih.gov/18202393/" target="_blank" rel="noopener">PubMed 18202393 &#8599;</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 4: DATA HOSTED AT MAIZEGDB -->
+  <section id="nam-data-hosted" class="mgdb-panel" aria-labelledby="nam-hosted-title">
+    <h2 id="nam-hosted-title" class="mgdb-panel-title">NAM Datasets Hosted at MaizeGDB</h2>
+    <p class="mgdb-panel-lead">Explore integrated genome browser tracks, sequence BLAST targets, linkage maps, and bulk download archives.</p>
+
+    <div class="nam-hosted-grid">
+      <!-- 1: JBrowse 2 -->
+      <article class="nam-hosted-card">
+        <div class="nam-hosted-icon-wrap" aria-hidden="true">&#128065;</div>
+        <h3>Genome Browsers \(JBrowse 2\)</h3>
+        <p>Interactive chromosome-scale browsers for all 26 assemblies with multi-tissue RNA-seq, gene models, repeat elements, and synteny tracks.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="/genomebrowser">Open Genome Browsers &#8599;</a>
+      </article>
+
+      <!-- 2: BLAST -->
+      <article class="nam-hosted-card">
+        <div class="nam-hosted-icon-wrap" aria-hidden="true">&#9889;</div>
+        <h3>Sequence BLAST Tool</h3>
+        <p>Align nucleotide or peptide queries directly against full NAM founder assemblies, predicted CDS, and annotated gene model targets.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="$(blast_url)">Run BLAST Search &#8599;</a>
+      </article>
+
+      <!-- 3: Bulk Downloads -->
+      <article class="nam-hosted-card">
+        <div class="nam-hosted-icon-wrap" aria-hidden="true">&#128229;</div>
+        <h3>Bulk Downloads &amp; Globus</h3>
+        <p>Retrieve whole-genome FASTA, GFF3 annotations, canonical CDS/PEP sequences, and pre-indexed BigWig tracks via HTTP or Globus.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="/download#downloads-nam">Browse NAM Downloads &#8599;</a>
+      </article>
+
+      <!-- 4: Gene & Pan-Gene Center -->
+      <article class="nam-hosted-card">
+        <div class="nam-hosted-icon-wrap" aria-hidden="true">&#127793;</div>
+        <h3>Gene &amp; Pan-Gene Centers</h3>
+        <p>Query pan-gene matrix assignments, homolog cluster groupings, and functional GO/InterPro domain annotations across all 26 lines.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="/pan_gene_center">Explore Pan-Genes &#8599;</a>
+      </article>
+    </div>
+
+    <!-- NAM GENETIC MAPS 1-10 -->
+    <div class="nam-maps-panel">
+      <div class="nam-maps-header">
+        <span class="nam-maps-badge">Linkage Maps</span>
+        <h3>NAM Genetic Linkage Maps \(Chromosomes 1&ndash;10\)</h3>
+        <p>Explore high-density recombinant inbred line linkage maps across all 10 maize chromosomes in the MaizeGDB Map Viewer&#58;</p>
+      </div>
+
+      <div class="nam-maps-grid">
+        <a class="nam-map-btn" href="/data_center/map/1160762">
+          <strong>Chr 1</strong>
+          <span>Map #1160762</span>
+        </a>
+        <a class="nam-map-btn" href="/data_center/map/1160763">
+          <strong>Chr 2</strong>
+          <span>Map #1160763</span>
+        </a>
+        <a class="nam-map-btn" href="/data_center/map/1160764">
+          <strong>Chr 3</strong>
+          <span>Map #1160764</span>
+        </a>
+        <a class="nam-map-btn" href="/data_center/map/1160765">
+          <strong>Chr 4</strong>
+          <span>Map #1160765</span>
+        </a>
+        <a class="nam-map-btn" href="/data_center/map/1160766">
+          <strong>Chr 5</strong>
+          <span>Map #1160766</span>
+        </a>
+        <a class="nam-map-btn" href="/data_center/map/1160767">
+          <strong>Chr 6</strong>
+          <span>Map #1160767</span>
+        </a>
+        <a class="nam-map-btn" href="/data_center/map/1160768">
+          <strong>Chr 7</strong>
+          <span>Map #1160768</span>
+        </a>
+        <a class="nam-map-btn" href="/data_center/map/1160769">
+          <strong>Chr 8</strong>
+          <span>Map #1160769</span>
+        </a>
+        <a class="nam-map-btn" href="/data_center/map/1160770">
+          <strong>Chr 9</strong>
+          <span>Map #1160770</span>
+        </a>
+        <a class="nam-map-btn" href="/data_center/map/1160771">
+          <strong>Chr 10</strong>
+          <span>Map #1160771</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: DATASET SCALE & METRICS -->
+  <section id="nam-overview" class="mgdb-panel" aria-labelledby="nam-metrics-title">
+    <h2 id="nam-metrics-title" class="mgdb-panel-title">NAM Dataset Scale &amp; Metrics</h2>
+    <p class="mgdb-panel-lead">Overview of sequencing depth, genome assembly completeness, and recombinant line resources.</p>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Founder Genomes</h3>
+          <span class="mgdb-metric-badge">PacBio</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">26</strong>
+        </div>
+        <p class="mgdb-metric-description">Chromosome-scale de novo assemblies including B73 and 25 diverse founder lines.</p>
+      </article>
+
+      <article class="mgdb-metric mgdb-tone-green">
+        <div class="mgdb-metric-top">
+          <h3>Mapping Lines</h3>
+          <span class="mgdb-metric-badge">COOP RILs</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">~5,000</strong>
+        </div>
+        <p class="mgdb-metric-description">Recombinant Inbred Lines across 25 biparental cross families orderable from the COOP.</p>
+      </article>
+
+      <article class="mgdb-metric mgdb-tone-amber">
+        <div class="mgdb-metric-top">
+          <h3>SNP Markers</h3>
+          <span class="mgdb-metric-badge">GBS / HapMap</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">680,000+</strong>
+        </div>
+        <p class="mgdb-metric-description">High-density genotyping-by-sequencing markers mapped across the pan-genome.</p>
+      </article>
+
+      <article class="mgdb-metric mgdb-tone-burgundy">
+        <div class="mgdb-metric-top">
+          <h3>Genetic Maps</h3>
+          <span class="mgdb-metric-badge">Chromosomes</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">10</strong>
+        </div>
+        <p class="mgdb-metric-description">Curated linkage maps indexed in the MaizeGDB Map Viewer for all 10 chromosomes.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 6: FAQS & COMMUNITY RESOURCES -->
+  <section id="nam-faqs" class="mgdb-panel" aria-labelledby="nam-faqs-title">
+    <h2 id="nam-faqs-title" class="mgdb-panel-title">Frequently Asked Questions &amp; Guidelines</h2>
+    <p class="mgdb-panel-lead">Helpful guidance on understanding NAM design, annotation identifier changes, and stock seed orders.</p>
+
+    <div class="mgdb-card-grid nam-faqs-grid">
+      <!-- FAQ 1: What is NAM -->
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-info">Concept</span>
+        <h3>What is Nested Association Mapping?</h3>
+        <p>Nested Association Mapping \(NAM\) combines the advantages of linkage analysis \(high statistical power\) with genome-wide association studies \(high genetic resolution\). A common reference parent \(B73\) was crossed to 25 diverse founder lines, and 200 recombinant inbred lines \(RILs\) were generated per family to create ~5,000 lines with high historical and recent recombination density.</p>
+      </article>
+
+      <!-- FAQ 2: Annotation IDs -->
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-warn">Annotation Note</span>
+        <h3>Preliminary vs Official Gene Identifiers</h3>
+        <p>The NAM founder assemblies were initially released with preliminary gene annotations \(e.g., <code>Zm00018a.1</code> for B97\). The official annotations \(e.g., <code>Zm00018ab.1</code>\) replaced the preliminary models with improved evidence-based structures and sequential numbering. Use the cross-reference translation files linked in the table above to map between versions.</p>
+      </article>
+
+      <!-- FAQ 3: Ordering Seed -->
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-ok">Seed Ordering</span>
+        <h3>How to Order NAM RIL Seed Lines</h3>
+        <p>Seed packets for the NAM founder lines and the ~5,000 recombinant inbred lines are maintained and distributed by the <strong>Maize Genetics Cooperation Stock Center</strong>. You can place seed requests directly through the <a href="https://maizecoopsc.org/nam-rils.php" target="_blank" rel="noopener">Maize COOP Stock Center NAM Portal &#8599;</a> or browse individual stock records linked above.</p>
+      </article>
+
+      <!-- FAQ 4: Reporting Issues -->
+      <article class="mgdb-card">
+        <span class="mgdb-pill">Curation</span>
+        <h3>Report Assembly or Gene Model Issues</h3>
+        <p>If you encounter sequence anomalies, scaffold misorientations, or questionable gene annotations in any NAM assembly, you can submit an issue report directly to MaizeGDB curators via the <a href="/curation/GenomeIssue/edit">Genome Issue Curation Form &#8599;</a> to assist ongoing community curation.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 7: CONNECTED GENOMICS RESOURCES -->
+  <section id="nam-related" class="mgdb-panel nam-bottom-section" aria-labelledby="nam-related-title">
+    <h2 id="nam-related-title" class="mgdb-panel-title">Connected Genomics Resources</h2>
+    <p class="mgdb-panel-lead">Explore complementary genome assemblies, pangenome graphs, and variation datasets across MaizeGDB.</p>
+
+    <div class="nam-related-grid">
+      <a class="nam-related-card" href="/assembly">
+        <div class="nam-related-title">B73 Reference Assembly</div>
+        <p class="nam-related-desc">Explore release histories \(v1&ndash;v5\), chromosome accessions, and assembly statistics.</p>
+      </a>
+
+      <a class="nam-related-card" href="/PanAnd_project">
+        <div class="nam-related-title">Pan-Andropogoneae Genomes</div>
+        <p class="nam-related-desc">Assemblies for wild relatives and outgroup panicoid grasses across the Andropogoneae tribe.</p>
+      </a>
+
+      <a class="nam-related-card" href="/genomebrowser">
+        <div class="nam-related-title">Genome Browser Hub</div>
+        <p class="nam-related-desc">Launch JBrowse 2 linear and synteny comparison views across maize assemblies.</p>
+      </a>
+
+      <a class="nam-related-card" href="/genetic_variation">
+        <div class="nam-related-title">Genetic Variation Center</div>
+        <p class="nam-related-desc">Explore SNP matrices, HapMap datasets, and structural variant tracks.</p>
+      </a>
+
+      <a class="nam-related-card" href="/download#downloads-nam">
+        <div class="nam-related-title">Bulk Downloads Directory</div>
+        <p class="nam-related-desc">High-speed HTTP and Globus public endpoints for all 26 NAM genome packages.</p>
+      </a>
+
+      <a class="nam-related-card" href="/data_center">
+        <div class="nam-related-title">All Data Centers Hub</div>
+        <p class="nam-related-desc">Discover the complete catalog of MaizeGDB data centers, tools, and databases.</p>
+      </a>
+    </div>
+  </section>
+</main>
+)

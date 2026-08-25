@@ -71,6 +71,7 @@ $WARM_URLS = array(
     '/download',
     '/downloads',
     '/TYPSimSelector',
+    '/NAM_project',
     '/maize_history',
     '/timelines',
     '/expression',
