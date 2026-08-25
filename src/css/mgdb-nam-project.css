@@ -4,7 +4,7 @@
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   Hero Emblem & Action Links
+   Hero Emblem, Freshness Stamp & Action Links
    -------------------------------------------------------------------------- */
 
 .mgdb-nam-project-page .mgdb-hero-emblem {
@@ -15,6 +15,17 @@
 .mgdb-nam-project-page .mgdb-hero-emblem svg {
   width: min(100%, 64px);
   height: auto;
+}
+
+.mgdb-nam-project-page .mgdb-hero-stamp {
+  position: static !important;
+  align-self: flex-start !important;
+  margin-bottom: var(--mgdb-space-2) !important;
+  display: inline-flex !important;
+}
+
+.mgdb-nam-project-page .mgdb-hero h1 {
+  padding-right: 0 !important;
 }
 
 .mgdb-nam-project-page .nam-hero-actions-row {
@@ -246,14 +257,15 @@
 }
 
 /* --------------------------------------------------------------------------
-   Table Styling & Sorting
+   Table Styling & Sorting (Non-scrollable, natural full height)
    -------------------------------------------------------------------------- */
 
 .mgdb-nam-project-page .nam-table-scroll {
   border: 1px solid var(--mgdb-line);
   border-radius: var(--mgdb-radius);
-  max-height: 720px;
-  overflow-y: auto;
+  overflow-x: auto;
+  overflow-y: visible;
+  max-height: none;
 }
 
 .mgdb-nam-project-page .nam-table {
@@ -621,11 +633,6 @@
   flex-direction: column;
 }
 
-.mgdb-nam-project-page .nam-hosted-icon-wrap {
-  font-size: 24px;
-  margin-bottom: var(--mgdb-space-2);
-}
-
 .mgdb-nam-project-page .nam-hosted-card h3 {
   font-size: 1.05rem;
   font-weight: 700;
@@ -716,7 +723,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   Section 6: FAQs Grid
+   Section 5: FAQs Grid
    -------------------------------------------------------------------------- */
 
 .mgdb-nam-project-page .nam-faqs-grid {

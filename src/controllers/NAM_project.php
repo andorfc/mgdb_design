@@ -46,7 +46,8 @@
   $body->get('data_date')->replace(date('F j, Y'));
 
   include_once('translation.php');
-  $mgdb->get('blast_url')->replace($system['BLAST_URL']);
+  $blast_url = isset($system['BLAST_URL']) && !empty($system['BLAST_URL']) ? $system['BLAST_URL'] : '/blast';
+  $body->get('blast_url')->replace($blast_url);
 
   $bauplan->publish();
   return;
