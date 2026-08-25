@@ -1,0 +1,770 @@
+/* ==========================================================================
+   Pan-Andropogoneae Genomes Project — /PanAnd_project
+   Scoped styles under .mgdb-panand-project-page
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Hero Emblem, Freshness Stamp & Action Links
+   -------------------------------------------------------------------------- */
+
+.mgdb-panand-project-page .mgdb-hero-emblem {
+  background: #ffffff !important;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-panand-project-page .mgdb-hero-emblem svg {
+  width: min(100%, 64px);
+  height: auto;
+}
+
+.mgdb-panand-project-page .mgdb-hero-stamp {
+  position: static !important;
+  align-self: flex-start !important;
+  margin-bottom: var(--mgdb-space-2) !important;
+  display: inline-flex !important;
+}
+
+.mgdb-panand-project-page .mgdb-hero h1 {
+  padding-right: 0 !important;
+}
+
+.mgdb-panand-project-page .panand-hero-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-3);
+}
+
+.mgdb-panand-project-page .panand-hero-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: 9999px;
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-decoration: none;
+  transition: all .12s ease;
+}
+
+.mgdb-panand-project-page .panand-hero-link:hover {
+  background: var(--mgdb-green-soft);
+  border-color: var(--mgdb-green);
+  color: var(--mgdb-green-dark) !important;
+}
+
+.mgdb-panand-project-page .panand-link-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.mgdb-panand-project-page .panand-dot-green { background: #16a34a; }
+.mgdb-panand-project-page .panand-dot-gold { background: #ca8a04; }
+.mgdb-panand-project-page .panand-dot-purple { background: #9333ea; }
+.mgdb-panand-project-page .panand-dot-blue { background: #2563eb; }
+.mgdb-panand-project-page .panand-dot-rose { background: #e11d48; }
+.mgdb-panand-project-page .panand-dot-dark { background: #475569; }
+
+/* --------------------------------------------------------------------------
+   Sticky Section Tabs
+   -------------------------------------------------------------------------- */
+
+.mgdb-panand-project-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-5);
+  padding: var(--mgdb-space-2) 0;
+  background: var(--mgdb-surface);
+  border-bottom: 1px solid var(--mgdb-line);
+}
+
+.mgdb-panand-project-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-decoration: none;
+  transition: background .12s, border-color .12s;
+}
+
+.mgdb-panand-project-page .mgdb-section-tabs a:hover {
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-panand-project-page .mgdb-section-tabs a.is-current,
+.mgdb-panand-project-page .mgdb-section-tabs a[aria-current="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+.mgdb-panand-project-page > section,
+.mgdb-panand-project-page section[id] {
+  scroll-margin-top: 4.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   Section 1: Assemblies Table Toolbar & Filtering
+   -------------------------------------------------------------------------- */
+
+.mgdb-panand-project-page .panand-table-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-3);
+}
+
+.mgdb-panand-project-page .panand-filter-chips-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.mgdb-panand-project-page .panand-toolbar-label {
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  color: var(--mgdb-muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-right: 2px;
+}
+
+.mgdb-panand-project-page .panand-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: var(--mgdb-surface-alt);
+  border: 1px solid var(--mgdb-line);
+  border-radius: 9999px;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  color: var(--mgdb-ink);
+  cursor: pointer;
+  transition: all .12s ease;
+}
+
+.mgdb-panand-project-page .panand-chip:hover {
+  background: var(--mgdb-green-soft);
+  border-color: var(--mgdb-green);
+}
+
+.mgdb-panand-project-page .panand-chip.is-active {
+  background: var(--mgdb-green-dark);
+  border-color: var(--mgdb-green-dark);
+  color: #ffffff;
+}
+
+.mgdb-panand-project-page .panand-chip-teosinte.is-active { background: #166534; border-color: #166534; }
+.mgdb-panand-project-page .panand-chip-tripsacum.is-active { background: #1e40af; border-color: #1e40af; }
+.mgdb-panand-project-page .panand-chip-grass.is-active { background: #92400e; border-color: #92400e; }
+.mgdb-panand-project-page .panand-chip-round1.is-active { background: #334155; border-color: #334155; }
+.mgdb-panand-project-page .panand-chip-round2.is-active { background: #0f766e; border-color: #0f766e; }
+
+.mgdb-panand-project-page .panand-search-wrap {
+  flex: 1 1 240px;
+  max-width: 380px;
+}
+
+.mgdb-panand-project-page .panand-search-input {
+  width: 100%;
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-panand-project-page .panand-table-status-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  margin-bottom: var(--mgdb-space-2);
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+}
+
+.mgdb-panand-project-page .panand-table-hint {
+  font-style: italic;
+}
+
+/* --------------------------------------------------------------------------
+   Clade Badges & Round Tags
+   -------------------------------------------------------------------------- */
+
+.mgdb-panand-project-page .panand-badge {
+  display: inline-block;
+  white-space: nowrap;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.mgdb-panand-project-page .panand-badge-teosinte {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.mgdb-panand-project-page .panand-badge-tripsacum {
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+
+.mgdb-panand-project-page .panand-badge-grass {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.mgdb-panand-project-page .panand-badge-outgroup {
+  background: #f3e8ff;
+  color: #6b21a8;
+  border: 1px solid #e9d5ff;
+}
+
+.mgdb-panand-project-page .panand-round-tag {
+  display: inline-block;
+  padding: 2px 6px;
+  background: #f1f5f9;
+  color: #475569;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  border: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.mgdb-panand-project-page .panand-round-tag2 {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #a7f3d0;
+}
+
+/* --------------------------------------------------------------------------
+   Table Styling & Sorting (Non-scrollable, natural full height)
+   -------------------------------------------------------------------------- */
+
+.mgdb-panand-project-page .panand-table-scroll {
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  overflow-x: auto;
+  overflow-y: visible;
+  max-height: none;
+}
+
+.mgdb-panand-project-page .panand-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-panand-project-page .panand-table th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #f8fafc;
+  border-bottom: 2px solid var(--mgdb-line);
+  padding: 10px 12px;
+  font-weight: 700;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.mgdb-panand-project-page .panand-table th.is-sortable button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  color: var(--mgdb-ink);
+  cursor: pointer;
+}
+
+.mgdb-panand-project-page .panand-table th.is-sortable button:hover {
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-panand-project-page .sort-icon {
+  color: var(--mgdb-muted);
+  font-size: 11px;
+}
+
+.mgdb-panand-project-page .panand-table th[aria-sort="ascending"] .sort-icon,
+.mgdb-panand-project-page .panand-table th[aria-sort="descending"] .sort-icon {
+  color: var(--mgdb-green-dark);
+  font-weight: 900;
+}
+
+.mgdb-panand-project-page .panand-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--mgdb-line-soft);
+  vertical-align: middle;
+}
+
+.mgdb-panand-project-page .panand-table tr:hover {
+  background: #f8fafc;
+}
+
+.mgdb-panand-project-page .panand-assembly-link {
+  font-weight: 700;
+  color: var(--mgdb-burgundy);
+  text-decoration: none;
+  display: block;
+}
+
+.mgdb-panand-project-page .panand-assembly-link:hover {
+  text-decoration: underline;
+}
+
+.mgdb-panand-project-page .panand-species-note {
+  display: block;
+  font-size: 11px;
+  color: var(--mgdb-muted);
+  margin-top: 1px;
+}
+
+.mgdb-panand-project-page .panand-jb-btns {
+  display: flex;
+  gap: 4px;
+  margin-top: 3px;
+}
+
+.mgdb-panand-project-page .panand-btn-jb2,
+.mgdb-panand-project-page .panand-btn-jb1 {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background .12s;
+}
+
+.mgdb-panand-project-page .panand-btn-jb2 {
+  background: #dbeafe;
+  color: #1e40af !important;
+  border: 1px solid #bfdbfe;
+}
+
+.mgdb-panand-project-page .panand-btn-jb2:hover {
+  background: #bfdbfe;
+}
+
+.mgdb-panand-project-page .panand-btn-jb1 {
+  background: #f1f5f9;
+  color: #475569 !important;
+  border: 1px solid #cbd5e1;
+}
+
+.mgdb-panand-project-page .panand-btn-jb1:hover {
+  background: #e2e8f0;
+}
+
+.mgdb-panand-project-page .panand-annot-tag {
+  display: block;
+  font-family: var(--mgdb-font-mono);
+  font-weight: 600;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-panand-project-page .panand-annot-na {
+  color: var(--mgdb-muted);
+  font-style: italic;
+}
+
+.mgdb-panand-project-page .panand-xref-link {
+  display: block;
+  font-size: 10px;
+  color: var(--mgdb-muted);
+  text-decoration: none;
+  margin-top: 2px;
+}
+
+.mgdb-panand-project-page .panand-xref-link:hover {
+  color: var(--mgdb-green-dark);
+  text-decoration: underline;
+}
+
+.mgdb-panand-project-page .panand-dl-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  background: var(--mgdb-green-soft);
+  border: 1px solid #bbf7d0;
+  border-radius: var(--mgdb-radius-sm);
+  color: var(--mgdb-green-dark) !important;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all .12s ease;
+}
+
+.mgdb-panand-project-page .panand-dl-btn:hover {
+  background: var(--mgdb-green);
+  border-color: var(--mgdb-green);
+  color: #ffffff !important;
+}
+
+/* --------------------------------------------------------------------------
+   Section 2: Taxonomic & Clade Diversity Grid
+   -------------------------------------------------------------------------- */
+
+.mgdb-panand-project-page .panand-clades-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-panand-project-page .panand-clade-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-4);
+  display: flex;
+  flex-direction: column;
+}
+
+.mgdb-panand-project-page .panand-clade-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-panand-project-page .panand-clade-count {
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  color: var(--mgdb-muted);
+}
+
+.mgdb-panand-project-page .panand-clade-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--mgdb-ink);
+  margin: 0 0 var(--mgdb-space-2) 0;
+}
+
+.mgdb-panand-project-page .panand-clade-desc {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.5;
+  margin-bottom: var(--mgdb-space-3);
+  flex: 1;
+}
+
+.mgdb-panand-project-page .panand-clade-members {
+  font-size: var(--mgdb-text-xs);
+  padding-top: var(--mgdb-space-2);
+  border-top: 1px solid var(--mgdb-line-soft);
+  color: var(--mgdb-muted);
+  line-height: 1.4;
+}
+
+.mgdb-panand-project-page .panand-clade-members strong {
+  color: var(--mgdb-ink);
+}
+
+/* --------------------------------------------------------------------------
+   Section 3: Key Publications & Abstract Previews
+   -------------------------------------------------------------------------- */
+
+.mgdb-panand-project-page .panand-publications-grid {
+  display: grid;
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-panand-project-page .panand-pub-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-5);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-panand-project-page .panand-pub-meta-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-panand-project-page .panand-pub-journal-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #ffe4e6;
+  color: #9f1239;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.mgdb-panand-project-page .panand-pub-doi {
+  font-family: var(--mgdb-font-mono);
+  font-size: 11px;
+  color: var(--mgdb-muted);
+}
+
+.mgdb-panand-project-page .panand-pub-award {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.mgdb-panand-project-page .panand-pub-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--mgdb-burgundy);
+  margin: 0 0 var(--mgdb-space-2) 0;
+}
+
+.mgdb-panand-project-page .panand-pub-authors {
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-ink);
+  margin: 0 0 var(--mgdb-space-1) 0;
+  line-height: 1.4;
+}
+
+.mgdb-panand-project-page .panand-pub-citation {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  margin: 0 0 var(--mgdb-space-3) 0;
+}
+
+.mgdb-panand-project-page .panand-pub-abstract-wrap {
+  background: var(--mgdb-surface-alt);
+  border-left: 3px solid var(--mgdb-green);
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-panand-project-page .panand-pub-abstract-heading {
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--mgdb-green-dark);
+  margin: 0 0 4px 0;
+}
+
+.mgdb-panand-project-page .panand-pub-abstract-text {
+  font-size: var(--mgdb-text-xs);
+  line-height: 1.6;
+  color: var(--mgdb-ink-soft);
+  margin: 0;
+}
+
+.mgdb-panand-project-page .panand-pub-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+/* --------------------------------------------------------------------------
+   Section 4: Data Hosted at MaizeGDB
+   -------------------------------------------------------------------------- */
+
+.mgdb-panand-project-page .panand-hosted-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-panand-project-page .panand-hosted-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-4);
+  display: flex;
+  flex-direction: column;
+}
+
+.mgdb-panand-project-page .panand-hosted-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 var(--mgdb-space-2) 0;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-panand-project-page .panand-hosted-card p {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.5;
+  margin-bottom: var(--mgdb-space-4);
+  flex: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Section 5: Phylogenetic Framework & Tree Image
+   -------------------------------------------------------------------------- */
+
+.mgdb-panand-project-page .panand-phylo-content-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: var(--mgdb-space-5);
+  margin-top: var(--mgdb-space-4);
+  align-items: start;
+}
+
+.mgdb-panand-project-page .panand-tree-img-box {
+  background: #ffffff;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-3);
+}
+
+.mgdb-panand-project-page .panand-tree-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--mgdb-radius-sm);
+}
+
+.mgdb-panand-project-page .panand-tree-caption {
+  font-size: 11px;
+  color: var(--mgdb-muted);
+  margin-top: var(--mgdb-space-2);
+  margin-bottom: 0;
+  line-height: 1.4;
+}
+
+.mgdb-panand-project-page .panand-phylo-text-box h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+  margin: 0 0 var(--mgdb-space-2) 0;
+}
+
+.mgdb-panand-project-page .panand-phylo-text-box p {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.6;
+  margin-bottom: var(--mgdb-space-3);
+}
+
+.mgdb-panand-project-page .panand-toronto-box {
+  background: var(--mgdb-surface-alt);
+  border-left: 3px solid #ca8a04;
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  padding: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-panand-project-page .panand-toronto-box strong {
+  display: block;
+  font-size: var(--mgdb-text-xs);
+  color: #854d0e;
+  margin-bottom: 2px;
+}
+
+.mgdb-panand-project-page .panand-toronto-box p {
+  font-size: 11px;
+  color: var(--mgdb-ink-soft);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* --------------------------------------------------------------------------
+   Section 6: FAQs Grid
+   -------------------------------------------------------------------------- */
+
+.mgdb-panand-project-page .panand-faqs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+/* --------------------------------------------------------------------------
+   Section 8: Connected Genomics Resources
+   -------------------------------------------------------------------------- */
+
+.mgdb-panand-project-page .panand-bottom-section {
+  background: linear-gradient(180deg, var(--mgdb-surface) 0%, var(--mgdb-green-soft) 100%) !important;
+  border-color: #b8dbca !important;
+}
+
+.mgdb-panand-project-page .panand-related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-panand-project-page .panand-related-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  padding: var(--mgdb-space-3);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color .12s, box-shadow .12s;
+}
+
+.mgdb-panand-project-page .panand-related-card:hover {
+  border-color: var(--mgdb-green);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.mgdb-panand-project-page .panand-related-title {
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+  margin-bottom: 2px;
+}
+
+.mgdb-panand-project-page .panand-related-desc {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+@media (max-width: 54rem) {
+  .mgdb-panand-project-page .panand-phylo-content-wrap {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 48rem) {
+  .mgdb-panand-project-page .mgdb-section-tabs {
+    position: static;
+  }
+}
