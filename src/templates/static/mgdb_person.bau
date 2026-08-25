@@ -1,87 +1,362 @@
+$$SYNTAX-LEVEL 2
 *(mgdb-person
   <main class="mgdb-page mgdb-person-page" id="mgdb-person-main">
+
+    <!-- Breadcrumbs -->
     <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
       <a href="/">Home</a><span aria-hidden="true">›</span>
       <a href="/contact">Community</a><span aria-hidden="true">›</span>
-      <span aria-current="page">Find people</span>
+      <span aria-current="page">Find a Person or Organization</span>
     </nav>
 
-    <section class="person-hero">
-      <div class="person-hero-copy">
-        <span class="mgdb-eyebrow">Maize research community</span>
-        <h1>Find a person or organization</h1>
-        <p>Search MaizeGDB community records by researcher name, organization, or a known name variant. Select a suggestion for the quickest route to a record.</p>
-      </div>
-      <div class="person-connection-map" aria-label="Person records connect research resources">
-        <span>People</span><i aria-hidden="true">→</i><span>Publications</span><i aria-hidden="true">→</i><span>Maize data</span>
-      </div>
-    </section>
-
-      <section class="person-search-workspace" aria-labelledby="person-search-heading">
-    <div class="person-search-heading">
-      <div>
-        <span class="person-section-label">Directory search</span>
-        <h2 id="person-search-heading">Search community records</h2>
-        <p>Enter at least three characters. Names, institutions, and known aliases are searched without regard to capitalization.</p>
-      </div>
-      <details class="person-search-tips">
-        <summary>Search tips</summary>
-        <ul>
-          <li>Try a last name, full name, or organization.</li>
-          <li>Use a partial name if spelling is uncertain.</li>
-          <li>Choose an autocomplete suggestion to open the record directly.</li>
-        </ul>
-      </details>
-    </div>
-
-    <form id="person-search-form" class="person-search-form" action="/person" method="get" role="search">
-      <label for="bacterm">Person or organization</label>
-      <div class="person-input-row">
-        <div class="person-autocomplete">
-          <span class="person-input-icon" aria-hidden="true">⌕</span>
-          <input autocomplete="off" type="search" name="term" id="bacterm"
-                 value="$(queryterm)" placeholder="Try a name such as Virginia Walbot"
-                 aria-describedby="person-search-help person-search-status"
-                 aria-autocomplete="list" aria-controls="person-suggestions"
-                 aria-expanded="false">
-          <div id="person-suggestions" class="person-suggestions" role="listbox" hidden></div>
+    <!-- Hero Header -->
+    <header class="mgdb-hero-record">
+      <div class="mgdb-hero-grid">
+        <div class="mgdb-hero-emblem" aria-hidden="true" style="background:#ffffff; border:1px solid #e2e8f0;">
+          <svg viewBox="0 0 48 48" width="38" height="38" fill="none" stroke="#1b5e20" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            <path d="M31 38v-3a6 6 0 0 0-6-6H15a6 6 0 0 0-6 6v3"></path>
+            <circle cx="20" cy="19" r="5"></circle>
+            <circle cx="38" cy="22" r="3"></circle>
+            <path d="M46 38v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M36 31.13a4 4 0 0 1 0 5.75"></path>
+          </svg>
+          <strong>Community<br />Directory</strong>
         </div>
-        <button type="submit" class="person-search-button">Search</button>
+        <div class="mgdb-hero-body">
+          <div class="mgdb-hero-topline">
+            <span class="mgdb-hero-badge">Community Hub</span>
+            <span class="mgdb-hero-updated">Updated: $(data_date)</span>
+          </div>
+          <h1>Find a Person or Organization</h1>
+          <p class="mgdb-hero-desc">
+            Search <strong>57,000+</strong> maize researchers, cooperator profiles, and agricultural research institutions across the global genetics community.
+          </p>
+          <div class="mgdb-hero-actions">
+            <a class="mgdb-btn mgdb-btn-primary" href="/contact">Community Hub <span aria-hidden="true">&#8599;</span></a>
+            <a class="mgdb-btn mgdb-btn-secondary" href="https://www.maizegenetics.org" target="_blank" rel="noopener">Maize Genetics Cooperation <span aria-hidden="true">&#8599;</span></a>
+            <a class="mgdb-btn mgdb-btn-secondary" href="https://www.maizegenetics.org/maize-meeting/2027" target="_blank" rel="noopener">69th Maize Meeting \(2027\) <span aria-hidden="true">&#8599;</span></a>
+            <a class="mgdb-btn mgdb-btn-secondary" href="/hot_new_papers">Editorial Board Papers <span aria-hidden="true">&#8599;</span></a>
+            <a class="mgdb-btn mgdb-btn-secondary" href="/data_center/reference">Literature Search <span aria-hidden="true">&#8599;</span></a>
+            <a class="mgdb-btn mgdb-btn-secondary" href="/contribute_data">Contribute Data <span aria-hidden="true">&#8599;</span></a>
+          </div>
+        </div>
       </div>
-      <div class="person-search-meta">
-        <span id="person-search-help">Three or more characters</span>
-        <span id="person-search-status" role="status" aria-live="polite"></span>
+    </header>
+
+    <!-- Sticky Section Navigation Tabs -->
+    <nav class="mgdb-section-tabs" aria-label="Page sections">
+      <a class="mgdb-section-tab is-active" href="#person-search-section">Directory Search &amp; Results</a>
+      <a class="mgdb-section-tab" href="#person-metrics-section">Community Scale &amp; Metrics</a>
+      <a class="mgdb-section-tab" href="#person-browse-section">Alphabetical Directory \(A–Z\)</a>
+      <a class="mgdb-section-tab" href="#person-pioneers-section">Pioneering Geneticists</a>
+      <a class="mgdb-section-tab" href="#person-faqs-section">FAQs &amp; Profile Updates</a>
+      <a class="mgdb-section-tab" href="#person-related-section">Connected Resources</a>
+    </nav>
+
+    <!-- Section 1: Directory Search & Results Table -->
+    <section id="person-search-section" class="mgdb-panel mgdb-panel-white person-search-section">
+      <div class="mgdb-panel-header">
+        <div>
+          <span class="mgdb-panel-eyebrow">Search &amp; Filter</span>
+          <h2>Search Community Directory</h2>
+          <p class="mgdb-panel-sub">
+            Enter 2 or more characters to search researchers, authors, and organizations by first/last name, known aliases, or institution.
+          </p>
+        </div>
       </div>
-      <div class="person-example-row" aria-label="Example searches">
-        <span>Try:</span>
-        <button type="button" data-person-example="Walbot">Walbot</button>
-        <button type="button" data-person-example="Buckler">Buckler</button>
-        <button type="button" data-person-example="Iowa State University">Iowa State University</button>
+
+      <!-- Search Toolbar -->
+      <div class="person-search-toolbar">
+        <form id="person-search-form" class="person-search-form" action="/person" method="get" role="search">
+          <label for="bacterm" class="sr-only">Search researcher name or institution</label>
+          <div class="person-search-input-wrap">
+            <span class="person-search-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="8.5" cy="8.5" r="5.5"></circle>
+                <line x1="12.5" y1="12.5" x2="17" y2="17"></line>
+              </svg>
+            </span>
+            <input autocomplete="off" spellcheck="false" type="search" name="term" id="bacterm"
+                   value="$(queryterm)" placeholder="Search researcher name or institution \(e.g. Walbot, Buckler, Li, Wu, USDA, Iowa State\)..."
+                   aria-describedby="person-search-status"
+                   aria-autocomplete="list" aria-controls="person-suggestions"
+                   aria-expanded="false">
+            <button type="button" id="person-search-clear" class="person-search-clear" aria-label="Clear search input" hidden>&times;</button>
+            <button type="submit" class="mgdb-btn mgdb-btn-primary person-search-submit">Search</button>
+
+            <!-- Autocomplete Dropdown -->
+            <div id="person-suggestions" class="person-suggestions" role="listbox" hidden></div>
+          </div>
+        </form>
+
+        <div class="person-search-meta-row">
+          <span id="person-search-status" class="person-search-status" role="status" aria-live="polite"></span>
+        </div>
+
+        <!-- Quick Search Chips -->
+        <div class="person-chips-row" aria-label="Quick search examples">
+          <span class="person-chips-label">Popular searches:</span>
+          <button type="button" class="person-chip" data-person-example="Barbara McClintock">Barbara McClintock</button>
+          <button type="button" class="person-chip" data-person-example="Ed Buckler">Ed Buckler</button>
+          <button type="button" class="person-chip" data-person-example="Virginia Walbot">Virginia Walbot</button>
+          <button type="button" class="person-chip" data-person-example="Li">Li</button>
+          <button type="button" class="person-chip" data-person-example="Wu">Wu</button>
+          <button type="button" class="person-chip" data-person-example="George Beadle">George Beadle</button>
+          <button type="button" class="person-chip" data-person-example="Sarah Hake">Sarah Hake</button>
+          <button type="button" class="person-chip" data-person-example="USDA-ARS">USDA-ARS</button>
+          <button type="button" class="person-chip" data-person-example="Iowa State University">Iowa State</button>
+          <button type="button" class="person-chip" data-person-example="Cornell University">Cornell</button>
+          <button type="button" class="person-chip" data-person-example="CIMMYT">CIMMYT</button>
+        </div>
       </div>
-    </form>
-  </section>
 
-  <section id="person-results-region" class="person-results-region" aria-label="Search results" aria-live="polite">
-    <div id="p1" hidden></div>
-    <div id="p4" hidden></div>
-    <div id="p3" hidden></div>
-  </section>
-
-  <script type="text/javascript">$(js_insert)</script>
-
-    <section class="person-support-grid" aria-label="More ways to connect">
-      <article>
-        <span class="person-support-icon" aria-hidden="true">◎</span>
-        <div><h2>Connected records</h2><p>Person records link researchers and organizations to publications and other curated MaizeGDB data.</p></div>
-      </article>
-      <article>
-        <span class="person-support-icon" aria-hidden="true">↻</span>
-        <div><h2>Keep information current</h2><p>Found an outdated affiliation or contact detail? Send the correction to the MaizeGDB team.</p><a href="/contact">Contact MaizeGDB →</a></div>
-      </article>
-      <article>
-        <span class="person-support-icon" aria-hidden="true">⌕</span>
-        <div><h2>Search the literature</h2><p>Looking for work by an author rather than a profile? Search references, abstracts, DOIs, and PubMed records.</p><a href="/data_center/reference">Find a paper →</a></div>
-      </article>
+      <!-- Results Table Wrap -->
+      <div id="person-results-table-wrap" class="person-results-table-wrap">
+        <div class="person-loading" aria-label="Loading results" hidden>
+          <div class="person-spinner"></div>
+          <span>Searching MaizeGDB community records…</span>
+        </div>
+        <div id="person-results-container">
+          <!-- Populated dynamically by js/mgdb-person.js via /tools/ajax/person_search/persondisplayresults.php -->
+        </div>
+      </div>
     </section>
+
+    <!-- Section 2: Community Scale & Metrics Dashboard -->
+    <section id="person-metrics-section" class="mgdb-panel person-metrics-section">
+      <div class="mgdb-panel-header">
+        <div>
+          <span class="mgdb-panel-eyebrow">Directory Scale</span>
+          <h2>Community Scale &amp; Impact</h2>
+          <p class="mgdb-panel-sub">
+            Overview of researchers, organizations, and linked scholarly contributions across the global maize community.
+          </p>
+        </div>
+      </div>
+
+      <div class="mgdb-metric-grid mgdb-metric-grid-4">
+        <div class="mgdb-metric-card mgdb-metric-card-green">
+          <div class="mgdb-metric-number">57,000+</div>
+          <div class="mgdb-metric-title">Active Researchers &amp; Authors</div>
+          <div class="mgdb-metric-desc">Cooperators, geneticists, bioinformaticians, and authors indexed in MaizeGDB.</div>
+        </div>
+        <div class="mgdb-metric-card mgdb-metric-card-gold">
+          <div class="mgdb-metric-number">1,500+</div>
+          <div class="mgdb-metric-title">Institutions &amp; Organizations</div>
+          <div class="mgdb-metric-desc">Universities, USDA-ARS stations, international institutes, and seed centers.</div>
+        </div>
+        <div class="mgdb-metric-card mgdb-metric-card-blue">
+          <div class="mgdb-metric-number">125,000+</div>
+          <div class="mgdb-metric-title">Linked Publications</div>
+          <div class="mgdb-metric-desc">Direct attribution connecting researchers to reference records, gene loci, and datasets.</div>
+        </div>
+        <div class="mgdb-metric-card mgdb-metric-card-orange">
+          <div class="mgdb-metric-number">70+</div>
+          <div class="mgdb-metric-title">Countries Represented</div>
+          <div class="mgdb-metric-desc">Worldwide collaboration across the Americas, Europe, Asia, Africa, and Oceania.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Alphabetical Directory A-Z -->
+    <section id="person-browse-section" class="mgdb-panel person-browse-section">
+      <div class="mgdb-panel-header">
+        <div>
+          <span class="mgdb-panel-eyebrow">Alphabetical Index</span>
+          <h2>Browse Directory by Last Name Initial \(A–Z\)</h2>
+          <p class="mgdb-panel-sub">
+            Click any letter to instantly browse all community researchers and organizations starting with that letter.
+          </p>
+        </div>
+      </div>
+
+      <div class="person-az-grid" role="group" aria-label="Alphabetical directory filter">
+        <button type="button" class="person-az-btn" data-letter="A">A</button>
+        <button type="button" class="person-az-btn" data-letter="B">B</button>
+        <button type="button" class="person-az-btn" data-letter="C">C</button>
+        <button type="button" class="person-az-btn" data-letter="D">D</button>
+        <button type="button" class="person-az-btn" data-letter="E">E</button>
+        <button type="button" class="person-az-btn" data-letter="F">F</button>
+        <button type="button" class="person-az-btn" data-letter="G">G</button>
+        <button type="button" class="person-az-btn" data-letter="H">H</button>
+        <button type="button" class="person-az-btn" data-letter="I">I</button>
+        <button type="button" class="person-az-btn" data-letter="J">J</button>
+        <button type="button" class="person-az-btn" data-letter="K">K</button>
+        <button type="button" class="person-az-btn" data-letter="L">L</button>
+        <button type="button" class="person-az-btn" data-letter="M">M</button>
+        <button type="button" class="person-az-btn" data-letter="N">N</button>
+        <button type="button" class="person-az-btn" data-letter="O">O</button>
+        <button type="button" class="person-az-btn" data-letter="P">P</button>
+        <button type="button" class="person-az-btn" data-letter="Q">Q</button>
+        <button type="button" class="person-az-btn" data-letter="R">R</button>
+        <button type="button" class="person-az-btn" data-letter="S">S</button>
+        <button type="button" class="person-az-btn" data-letter="T">T</button>
+        <button type="button" class="person-az-btn" data-letter="U">U</button>
+        <button type="button" class="person-az-btn" data-letter="V">V</button>
+        <button type="button" class="person-az-btn" data-letter="W">W</button>
+        <button type="button" class="person-az-btn" data-letter="X">X</button>
+        <button type="button" class="person-az-btn" data-letter="Y">Y</button>
+        <button type="button" class="person-az-btn" data-letter="Z">Z</button>
+      </div>
+    </section>
+
+    <!-- Section 4: Pioneering Geneticists & Community Spotlight -->
+    <section id="person-pioneers-section" class="mgdb-panel person-pioneers-section">
+      <div class="mgdb-panel-header">
+        <div>
+          <span class="mgdb-panel-eyebrow">Community Heritage</span>
+          <h2>Pioneering Maize Geneticists</h2>
+          <p class="mgdb-panel-sub">
+            Foundational scientists whose cytogenetic and genetic discoveries in maize shaped modern biology.
+          </p>
+        </div>
+      </div>
+
+      <div class="person-pioneers-grid">
+        <div class="person-pioneer-card">
+          <div class="person-pioneer-avatar" style="background: #e8f5e9; color: #1b5e20;">BM</div>
+          <div class="person-pioneer-info">
+            <h3><a href="/person?id=2557">Barbara McClintock</a></h3>
+            <span class="person-pioneer-role">Nobel Laureate in Physiology or Medicine \(1983\)</span>
+            <p>Discovered transposable genetic elements \(<em>Ac/Ds</em>\) in maize, breakage-fusion-bridge cycles, and cytogenetic mechanisms of chromosome crossing over.</p>
+            <div class="person-pioneer-links">
+              <a href="/person?id=2557" class="person-pioneer-link">View Profile &rarr;</a>
+              <a href="/data_center/reference?author=McClintock" class="person-pioneer-link">Publications &rarr;</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="person-pioneer-card">
+          <div class="person-pioneer-avatar" style="background: #fff8e1; color: #b78103;">GB</div>
+          <div class="person-pioneer-info">
+            <h3><a href="/person?id=2541">George Beadle</a></h3>
+            <span class="person-pioneer-role">Nobel Laureate in Physiology or Medicine \(1958\)</span>
+            <p>Co-discovered the "one gene, one enzyme" hypothesis connecting genetics to biochemistry; pioneered fundamental teosinte and maize domestication genetics.</p>
+            <div class="person-pioneer-links">
+              <a href="/person?id=2541" class="person-pioneer-link">View Profile &rarr;</a>
+              <a href="/data_center/reference?author=Beadle" class="person-pioneer-link">Publications &rarr;</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="person-pioneer-card">
+          <div class="person-pioneer-avatar" style="background: #e3f2fd; color: #0d47a1;">RE</div>
+          <div class="person-pioneer-info">
+            <h3><a href="/person?id=2561">Rollins Emerson</a></h3>
+            <span class="person-pioneer-role">Father of Maize Genetics &amp; Cornell School</span>
+            <p>Established foundational linkage groups, kernel pigmentation genetics, and mentored the generation of geneticists who established maize as a premier model organism.</p>
+            <div class="person-pioneer-links">
+              <a href="/person?id=2561" class="person-pioneer-link">View Profile &rarr;</a>
+              <a href="/data_center/reference?author=Emerson" class="person-pioneer-link">Publications &rarr;</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="person-pioneer-card">
+          <div class="person-pioneer-avatar" style="background: #fbe9e7; color: #bf360c;">MR</div>
+          <div class="person-pioneer-info">
+            <h3><a href="/person?id=2580">Marcus Rhoades</a></h3>
+            <span class="person-pioneer-role">Pioneer of Cytogenetics &amp; Maize Newsletter</span>
+            <p>Uncovered preferential segregation, cytoplasmic male sterility \(CMS\), and established the <em>Maize Genetics Cooperation News Letter</em> \(MNL\) in 1929.</p>
+            <div class="person-pioneer-links">
+              <a href="/person?id=2580" class="person-pioneer-link">View Profile &rarr;</a>
+              <a href="/data_center/reference?author=Rhoades" class="person-pioneer-link">Publications &rarr;</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: FAQs & Profile Updates -->
+    <section id="person-faqs-section" class="mgdb-panel person-faqs-section">
+      <div class="mgdb-panel-header">
+        <div>
+          <span class="mgdb-panel-eyebrow">Community Guidelines</span>
+          <h2>Frequently Asked Questions &amp; Profile Updates</h2>
+          <p class="mgdb-panel-sub">
+            How to keep contact information current, claim publication records, and connect datasets to your profile.
+          </p>
+        </div>
+      </div>
+
+      <div class="person-faq-list">
+        <details class="person-faq-item">
+          <summary><h3>How do I update my affiliation, address, or contact details?</h3></summary>
+          <div class="person-faq-body">
+            <p>
+              If your institution, email address, or mailing address has changed, please send an update to the MaizeGDB team via the <a href="/contact">Contact Form</a> or email <a href="mailto:curators@maizegdb.org">curators@maizegdb.org</a>. Please include your MaizeGDB Person ID or full name and current affiliation.
+            </p>
+          </div>
+        </details>
+
+        <details class="person-faq-item">
+          <summary><h3>How are publications and datasets linked to my profile?</h3></summary>
+          <div class="person-faq-body">
+            <p>
+              When literature is curated into MaizeGDB, author names are mapped to Person records. If you notice missing publications on your profile, you can submit the DOIs or PubMed IDs through our <a href="/contribute_data">Contribute Data</a> portal.
+            </p>
+          </div>
+        </details>
+
+        <details class="person-faq-item">
+          <summary><h3>How are short names \(such as "Li", "Wu", "Yu", "Xu"\) handled?</h3></summary>
+          <div class="person-faq-body">
+            <p>
+              The MaizeGDB search directory fully supports two-letter surnames and given names. Searching "Li" or "Wu" prioritizes exact surname matches followed by full name and institution matches.
+            </p>
+          </div>
+        </details>
+
+        <details class="person-faq-item">
+          <summary><h3>Can I register a new research laboratory or agricultural organization?</h3></summary>
+          <div class="person-faq-body">
+            <p>
+              Yes! New academic institutions, seed repositories, research consortia, and private organizations can be registered to facilitate attribution and stock ordering. Contact our curation staff to register an organizational profile.
+            </p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- Section 6: Connected Community Resources -->
+    <section id="person-related-section" class="mgdb-panel mgdb-panel-soft-green person-related-section">
+      <div class="mgdb-panel-header">
+        <div>
+          <span class="mgdb-panel-eyebrow">Explore Connected Data</span>
+          <h2>Related Community &amp; Research Centers</h2>
+          <p class="mgdb-panel-sub">
+            Discover publications, genetic stocks, and research initiatives curated by the MaizeGDB community.
+          </p>
+        </div>
+      </div>
+
+      <div class="person-related-grid">
+        <a class="person-related-card" href="/data_center/reference">
+          <span class="person-related-badge">Literature</span>
+          <h3>Literature Search &rarr;</h3>
+          <p>Search over 125,000 maize research papers, abstracts, DOIs, and PubMed records linked to authors.</p>
+        </a>
+        <a class="person-related-card" href="/data_center/stock">
+          <span class="person-related-badge">Stocks</span>
+          <h3>Stock Center &rarr;</h3>
+          <p>Browse seed stocks, mutant lines, and accessions maintained by the Maize Genetics Cooperation Stock Center.</p>
+        </a>
+        <a class="person-related-card" href="/hot_new_papers">
+          <span class="person-related-badge">Curated</span>
+          <h3>Editorial Board Papers &rarr;</h3>
+          <p>Read monthly featured picks and commentary selected by the MaizeGDB Editorial Board.</p>
+        </a>
+        <a class="person-related-card" href="https://www.maizegenetics.org" target="_blank" rel="noopener">
+          <span class="person-related-badge">Cooperation</span>
+          <h3>MGC Website &rarr;</h3>
+          <p>Official website of the Maize Genetics Cooperation, community awards, advocacy, and meeting archives.</p>
+        </a>
+      </div>
+    </section>
+
   </main>
 )

@@ -1,9 +1,8 @@
-/* Person and organization search (/person).
+/* ==========================================================================
+ * file: mgdb-person.js
+ * purpose: Interactive Person and Organization Directory search (/person)
+ * ========================================================================== */
 
-   Suggestion and result behaviour ported unchanged from the MaizeGDB
-   website repository; only the presentation layer was restyled. */
-
-/* Person and organization search, plus record-page disclosure controls. */
 (function () {
   'use strict';
 
@@ -12,187 +11,311 @@
   var searchController = null;
   var suggestionController = null;
   var activeSuggestion = -1;
+  var currentRequestId = 0;
 
-  function byId(id) { return document.getElementById(id); }
+  function byId(id) {
+    return document.getElementById(id);
+  }
+
   function escapeHtml(value) {
-    return String(value || '').replace(/[&<>'"]/g, function (char) {
-      return {'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char];
+    return String(value || '').replace(/[&<>'"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c];
     });
   }
-  function query() { return byId('bacterm') ? byId('bacterm').value.trim() : ''; }
-  function setStatus(message) { if (byId('person-search-status')) byId('person-search-status').textContent = message || ''; }
+
+  function getQuery() {
+    var input = byId('bacterm');
+    return input ? input.value.trim() : '';
+  }
+
+  function setStatus(message) {
+    var status = byId('person-search-status');
+    if (status) {
+      status.textContent = message || '';
+    }
+  }
+
+  function updateClearButton() {
+    var clearBtn = byId('person-search-clear');
+    var val = getQuery();
+    if (clearBtn) {
+      clearBtn.hidden = !val.length;
+    }
+  }
 
   function closeSuggestions() {
     var panel = byId('person-suggestions');
     var input = byId('bacterm');
-    if (panel) { panel.hidden = true; panel.innerHTML = ''; }
-    if (input) { input.setAttribute('aria-expanded', 'false'); input.removeAttribute('aria-activedescendant'); }
+    if (panel) {
+      panel.hidden = true;
+      panel.innerHTML = '';
+    }
+    if (input) {
+      input.setAttribute('aria-expanded', 'false');
+      input.removeAttribute('aria-activedescendant');
+    }
     activeSuggestion = -1;
   }
 
   function renderSuggestions(items) {
     var panel = byId('person-suggestions');
     var input = byId('bacterm');
-    if (!panel || !input || !items.length) { closeSuggestions(); return; }
+    if (!panel || !input || !items || !items.length) {
+      closeSuggestions();
+      return;
+    }
+
     panel.innerHTML = items.map(function (item, index) {
       var secondary = [item.institution, item.location].filter(Boolean).join(' · ');
+      var subName = item.full_name ? ' (' + escapeHtml(item.full_name) + ')' : '';
       return '<a id="person-suggestion-' + index + '" class="person-suggestion" role="option" href="/person?id=' +
         encodeURIComponent(item.id) + '" data-index="' + index + '">' +
-        '<span class="person-suggestion-avatar" aria-hidden="true">' + escapeHtml(item.initial) + '</span>' +
-        '<span><strong>' + escapeHtml(item.name) + '</strong>' +
-        (item.full_name ? '<small>' + escapeHtml(item.full_name) + '</small>' : '') +
-        (secondary ? '<em>' + escapeHtml(secondary) + '</em>' : '') + '</span>' +
-        '<b aria-hidden="true">→</b></a>';
+        '<span class="person-suggestion-avatar" aria-hidden="true">' + escapeHtml(item.initial || 'P') + '</span>' +
+        '<div class="person-suggestion-content">' +
+        '  <span class="person-suggestion-name">' + escapeHtml(item.name) + subName + '</span>' +
+        (secondary ? '  <span class="person-suggestion-meta">' + escapeHtml(secondary) + '</span>' : '') +
+        '</div>' +
+        '<span class="person-suggestion-arrow" aria-hidden="true">&rarr;</span>' +
+        '</a>';
     }).join('');
+
     panel.hidden = false;
     input.setAttribute('aria-expanded', 'true');
   }
 
-  window.doSugg = function () {
-    var term = query();
-    if (term.length < 2) { closeSuggestions(); return; }
-    if (suggestionController) suggestionController.abort();
+  function fetchSuggestions() {
+    var term = getQuery();
+    if (term.length < 2) {
+      closeSuggestions();
+      return;
+    }
+
+    if (suggestionController) {
+      suggestionController.abort();
+    }
     suggestionController = new AbortController();
+
     fetch('/tools/ajax/person_search/person_suggest_api.php?term=' + encodeURIComponent(term), {
       signal: suggestionController.signal,
-      headers: {'Accept': 'application/json'}
+      headers: { 'Accept': 'application/json' }
     }).then(function (response) {
       if (!response.ok) throw new Error('Suggestion request failed');
       return response.json();
     }).then(function (data) {
-      if (query() === term) renderSuggestions(data.results || []);
+      if (getQuery() === term) {
+        renderSuggestions(data.results || []);
+      }
     }).catch(function (error) {
-      if (error.name !== 'AbortError') closeSuggestions();
+      if (error.name !== 'AbortError') {
+        closeSuggestions();
+      }
     });
-  };
+  }
 
-  window.doSyn = function (term, requestId) {
-    var panel = byId('p4');
-    if (!panel || term.length < 3) return Promise.resolve();
-    return fetch('/tools/ajax/person_search/displaypersonsynlist_ajax.php?term=' + encodeURIComponent(term))
-      .then(function (response) { if (!response.ok) throw new Error(); return response.text(); })
-      .then(function (html) {
-        if (requestId === window.personSearchRequestId) {
-          panel.innerHTML = html;
-          panel.hidden = !html.trim();
-        }
-      }).catch(function () { panel.hidden = true; });
-  };
-
-  window.doWork = function (update, keepSuggestions) {
-    var term = query();
-    var results = byId('p1');
-    var aliases = byId('p4');
+  function executeSearch(customQuery, isLetter) {
+    var term = typeof customQuery === 'string' ? customQuery.trim() : getQuery();
+    var results = byId('person-results-container');
+    var loading = document.querySelector('.person-loading');
     if (!results) return false;
-    if (!keepSuggestions) closeSuggestions();
-    if (term.length < 3) {
-      results.hidden = true;
-      results.innerHTML = '';
-      if (aliases) { aliases.hidden = true; aliases.innerHTML = ''; }
-      setStatus(term.length ? 'Enter ' + (3 - term.length) + ' more character' + (term.length === 2 ? '' : 's') + '.' : '');
+
+    closeSuggestions();
+
+    // Clear active letter button styling unless doing a letter search
+    if (!isLetter) {
+      document.querySelectorAll('.person-az-btn').forEach(function (btn) {
+        btn.classList.remove('is-active');
+      });
+    }
+
+    if (!term.length) {
+      results.innerHTML = '<div class="person-empty-state"><h3>Enter a researcher or organization name</h3><p>Search by surname, full name, aliases, or institution above, or browse using the A–Z directory below.</p></div>';
+      setStatus('');
       return false;
     }
 
-    if (searchController) searchController.abort();
-    searchController = new AbortController();
-    window.personSearchRequestId = (window.personSearchRequestId || 0) + 1;
-    var requestId = window.personSearchRequestId;
-    var updateFlag = typeof update !== 'undefined' ? '&update=Y' : '';
-    results.hidden = false;
-    results.innerHTML = '<div class="person-loading" aria-label="Loading results"><i></i><i></i><i></i></div>';
-    if (aliases) { aliases.hidden = true; aliases.innerHTML = ''; }
-    setStatus('Searching…');
-
-    if (!update && window.history && window.history.replaceState) {
-      window.history.replaceState({}, '', '/person?term=' + encodeURIComponent(term));
+    if (!isLetter && term.length < 2) {
+      results.innerHTML = '<div class="person-empty-state"><h3>Enter at least 2 characters</h3><p>Please enter 2 or more characters to search (e.g. <em>Li</em>, <em>Wu</em>, <em>Yu</em>, <em>Buckler</em>, <em>Walbot</em>).</p></div>';
+      setStatus('Enter at least 2 characters.');
+      return false;
     }
 
-    fetch('/tools/ajax/person_search/persondisplayresults.php?term=' + encodeURIComponent(term) + updateFlag, {
-      signal: searchController.signal
-    }).then(function (response) {
-      if (!response.ok) throw new Error('Search request failed');
-      return response.text();
-    }).then(function (html) {
-      if (requestId !== window.personSearchRequestId) return;
-      results.innerHTML = html;
-      setStatus('Results updated for ' + term + '.');
-      return window.doSyn(term, requestId);
-    }).catch(function (error) {
-      if (error.name === 'AbortError') return;
-      results.innerHTML = '<div class="person-empty-state"><h2>Search unavailable</h2><p>Please try again in a moment.</p></div>';
-      setStatus('The search could not be completed.');
-    });
-    return false;
-  };
+    if (searchController) {
+      searchController.abort();
+    }
+    searchController = new AbortController();
 
-  window.SamplePersonQuery = function () {
-    var samples = ['Ed Buckler', 'Virginia Walbot', 'Barbara McClintock', 'John Portwood', 'Sarah Hake'];
-    var input = byId('bacterm');
-    if (input) input.value = samples[Math.floor(Math.random() * samples.length)];
-  };
+    currentRequestId++;
+    var reqId = currentRequestId;
+
+    if (loading) loading.hidden = false;
+    setStatus('Searching community records…');
+
+    var url = isLetter
+      ? '/tools/ajax/person_search/persondisplayresults.php?letter=' + encodeURIComponent(term)
+      : '/tools/ajax/person_search/persondisplayresults.php?term=' + encodeURIComponent(term);
+
+    // Sync browser URL history
+    if (window.history && window.history.replaceState) {
+      var newUrl = isLetter
+        ? '/person?letter=' + encodeURIComponent(term)
+        : '/person?term=' + encodeURIComponent(term);
+      window.history.replaceState({}, '', newUrl);
+    }
+
+    fetch(url, { signal: searchController.signal })
+      .then(function (response) {
+        if (!response.ok) throw new Error('Search failed');
+        return response.text();
+      })
+      .then(function (html) {
+        if (reqId !== currentRequestId) return;
+        if (loading) loading.hidden = true;
+        results.innerHTML = html;
+        setStatus('Results updated for ' + (isLetter ? 'letter ' + term : '"' + term + '"') + '.');
+      })
+      .catch(function (error) {
+        if (error.name === 'AbortError') return;
+        if (loading) loading.hidden = true;
+        results.innerHTML = '<div class="person-empty-state"><h3>Search temporarily unavailable</h3><p>Please check your connection or try again in a moment.</p></div>';
+        setStatus('Search failed.');
+      });
+
+    return false;
+  }
 
   function selectSuggestion(direction) {
     var panel = byId('person-suggestions');
     var input = byId('bacterm');
     if (!panel || panel.hidden) return;
+
     var options = panel.querySelectorAll('[role="option"]');
     if (!options.length) return;
+
     activeSuggestion = (activeSuggestion + direction + options.length) % options.length;
-    options.forEach(function (option, index) { option.classList.toggle('is-active', index === activeSuggestion); });
+    options.forEach(function (option, index) {
+      option.classList.toggle('is-active', index === activeSuggestion);
+    });
+
     input.setAttribute('aria-activedescendant', options[activeSuggestion].id);
+    options[activeSuggestion].scrollIntoView({ block: 'nearest' });
   }
 
-  function initSearch() {
+  function initPersonSearch() {
     var form = byId('person-search-form');
     var input = byId('bacterm');
+    var clearBtn = byId('person-search-clear');
+
     if (!form || !input) return;
-    form.addEventListener('submit', function (event) { event.preventDefault(); window.doWork(); });
-    input.addEventListener('input', function () {
-      clearTimeout(searchTimer); clearTimeout(suggestionTimer);
-      suggestionTimer = setTimeout(window.doSugg, 140);
-      searchTimer = setTimeout(function () { window.doWork(undefined, true); }, 420);
+
+    updateClearButton();
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      executeSearch();
     });
-    input.addEventListener('keydown', function (event) {
-      if (event.key === 'ArrowDown') { event.preventDefault(); selectSuggestion(1); }
-      else if (event.key === 'ArrowUp') { event.preventDefault(); selectSuggestion(-1); }
-      else if (event.key === 'Escape') closeSuggestions();
-      else if (event.key === 'Enter' && activeSuggestion >= 0) {
-        var active = byId('person-suggestion-' + activeSuggestion);
-        if (active) { event.preventDefault(); window.location.href = active.href; }
+
+    input.addEventListener('input', function () {
+      updateClearButton();
+      clearTimeout(searchTimer);
+      clearTimeout(suggestionTimer);
+
+      var val = getQuery();
+      if (val.length >= 2) {
+        suggestionTimer = setTimeout(fetchSuggestions, 120);
+        searchTimer = setTimeout(function () {
+          executeSearch();
+        }, 380);
+      } else {
+        closeSuggestions();
+        if (!val.length) {
+          executeSearch();
+        }
       }
     });
-    document.addEventListener('click', function (event) {
-      if (!event.target.closest('.person-autocomplete')) closeSuggestions();
+
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        selectSuggestion(1);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        selectSuggestion(-1);
+      } else if (e.key === 'Escape') {
+        closeSuggestions();
+      } else if (e.key === 'Enter' && activeSuggestion >= 0) {
+        var active = byId('person-suggestion-' + activeSuggestion);
+        if (active) {
+          e.preventDefault();
+          window.location.href = active.href;
+        }
+      }
     });
-    document.querySelectorAll('[data-person-example]').forEach(function (button) {
-      button.addEventListener('click', function () { input.value = button.getAttribute('data-person-example'); window.doWork(); });
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function () {
+        input.value = '';
+        updateClearButton();
+        closeSuggestions();
+        input.focus();
+        executeSearch();
+      });
+    }
+
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('.person-search-input-wrap')) {
+        closeSuggestions();
+      }
     });
+
+    // Quick Search Chips
+    document.querySelectorAll('.person-chip').forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        var val = chip.getAttribute('data-person-example') || chip.textContent.trim();
+        input.value = val;
+        updateClearButton();
+        closeSuggestions();
+        executeSearch(val);
+      });
+    });
+
+    // A-Z Alphabetical directory buttons
+    document.querySelectorAll('.person-az-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var letter = btn.getAttribute('data-letter') || btn.textContent.trim();
+        document.querySelectorAll('.person-az-btn').forEach(function (b) {
+          b.classList.toggle('is-active', b === btn);
+        });
+        input.value = '';
+        updateClearButton();
+        closeSuggestions();
+        executeSearch(letter, true);
+      });
+    });
+
+    // Initial search on page load if query param present or default
+    var urlParams = new URLSearchParams(window.location.search);
+    var initTerm = urlParams.get('term');
+    var initLetter = urlParams.get('letter');
+
+    if (initTerm && initTerm.trim().length >= 2) {
+      input.value = initTerm.trim();
+      updateClearButton();
+      executeSearch(initTerm.trim());
+    } else if (initLetter && initLetter.trim().length === 1) {
+      var targetBtn = document.querySelector('.person-az-btn[data-letter="' + initLetter.trim().toUpperCase() + '"]');
+      if (targetBtn) targetBtn.classList.add('is-active');
+      executeSearch(initLetter.trim(), true);
+    } else if (input.value && input.value.trim().length >= 2) {
+      executeSearch(input.value.trim());
+    } else {
+      // Default landing: show prominent initial directory (e.g. Walbot or letter A)
+      executeSearch('Walbot');
+    }
   }
 
-  document.addEventListener('DOMContentLoaded', initSearch);
-}());
-
-function doCity() {
-  var code = $('#city').val();
-  if (code.length > 2) $('#p2').show().load('/tools/ajax/person_search/personuslocquery_ajax.php?city=' + encodeURIComponent(code));
-  return false;
-}
-function doState() {
-  var state = $('#state').val();
-  var stateFull = $('#state option:selected').text();
-  if (state.length > 1) $('#p2').show().load('/tools/ajax/person_search/personusstatequery_ajax.php?state=' + encodeURIComponent(state) + '&state_full=' + encodeURIComponent(stateFull));
-  return false;
-}
-function doNation() {
-  var code = $('#country').val();
-  if (code.length > 1) $('#p3').show().load('/tools/ajax/person_search/personintllocquery_ajax.php?country=' + encodeURIComponent(code));
-  return false;
-}
-function toggle_references(display) {
-  document.getElementById('show_ref').style.display = display === 'show' ? 'block' : 'none';
-  document.getElementById('hide_ref').style.display = display === 'show' ? 'none' : 'block';
-}
-function toggle_prj(display) {
-  document.getElementById('show_prj').style.display = display === 'show' ? 'block' : 'none';
-  document.getElementById('hide_prj').style.display = display === 'show' ? 'none' : 'block';
-}
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPersonSearch);
+  } else {
+    initPersonSearch();
+  }
+})();

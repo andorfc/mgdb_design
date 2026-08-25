@@ -1,340 +1,698 @@
 /* ==========================================================================
-   Person and organization search (/person)
-   --------------------------------------------------------------------------
-   Layout ported from the MaizeGDB website repository, restyled onto the shared
-   tokens. Scoped under .mgdb-person-page.
-   ========================================================================== */
+ * file: mgdb-person.css
+ * purpose: Person and Organization directory search (/person) on MaizeGDB
+ * ========================================================================== */
 
-.mgdb-person-page > section { margin-top: var(--mgdb-space-7); }
+.mgdb-person-page {
+  padding-bottom: var(--mgdb-space-8);
+}
 
-/* Hero --------------------------------------------------------------------- */
-
-.mgdb-person-page .person-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr);
-  gap: var(--mgdb-space-6);
-  align-items: center;
+.mgdb-person-page .mgdb-panel {
+  margin-top: var(--mgdb-space-6);
   padding: var(--mgdb-space-6);
+  border: 1px solid var(--mgdb-line);
   border-radius: var(--mgdb-radius-lg);
-  background: linear-gradient(135deg, #16351f, #24502c 58%, #2f6134);
-  color: #fff;
-  box-shadow: var(--mgdb-shadow-lg);
+  background: var(--mgdb-surface);
 }
 
-.mgdb-person-page .person-hero .mgdb-eyebrow { color: #ffe6a9; }
-
-.mgdb-person-page .person-hero h1 {
-  margin: var(--mgdb-space-2) 0 var(--mgdb-space-3);
-  color: #fff;
-  font-size: clamp(1.75rem, 1.1rem + 2vw, 2.375rem);
+.mgdb-person-page .mgdb-panel-white {
+  background: #ffffff;
 }
 
-.mgdb-person-page .person-hero-copy p { max-width: var(--mgdb-measure); color: #eaf3e6; }
-.mgdb-person-page .person-hero :focus-visible { outline-color: #fff; }
+.mgdb-person-page .mgdb-panel-soft-green {
+  background: linear-gradient(180deg, #f2f8f3 0%, #ffffff 100%);
+  border-color: #d1e7dd;
+}
 
-/* What a person record connects to. Decorative support for the copy. */
-.mgdb-person-page .person-connection-map {
+.mgdb-person-page .mgdb-panel-header {
   display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-5);
+}
+
+.mgdb-person-page .mgdb-panel-eyebrow {
+  display: inline-block;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--mgdb-green-dark);
+  margin-bottom: var(--mgdb-space-1);
+}
+
+.mgdb-person-page .mgdb-panel-header h2 {
+  margin: 0 0 var(--mgdb-space-1);
+  font-size: var(--mgdb-text-2xl);
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-person-page .mgdb-panel-sub {
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  max-width: 75ch;
+}
+
+/* --------------------------------------------------------------------------
+ * Search Toolbar & Input
+ * -------------------------------------------------------------------------- */
+
+.mgdb-person-page .person-search-toolbar {
+  margin-bottom: var(--mgdb-space-5);
+}
+
+.mgdb-person-page .person-search-form {
+  position: relative;
+  width: 100%;
+}
+
+.mgdb-person-page .person-search-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
   gap: var(--mgdb-space-2);
+}
+
+.mgdb-person-page .person-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--mgdb-muted);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+.mgdb-person-page #bacterm {
+  flex: 1;
+  min-height: 48px;
+  padding: 10px 42px 10px 42px;
+  font-size: var(--mgdb-text-base);
+  border: 2px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: #ffffff;
+  color: var(--mgdb-ink);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.mgdb-person-page #bacterm:focus {
+  outline: none;
+  border-color: var(--mgdb-green-dark);
+  box-shadow: 0 0 0 3px rgba(27, 94, 32, 0.15);
+}
+
+.mgdb-person-page .person-search-clear {
+  position: absolute;
+  right: 120px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--mgdb-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 50%;
+}
+
+.mgdb-person-page .person-search-clear:hover {
+  color: var(--mgdb-ink);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.mgdb-person-page .person-search-submit {
+  min-height: 48px;
+  padding: 0 var(--mgdb-space-5);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.mgdb-person-page .person-search-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--mgdb-space-2);
+  min-height: 20px;
+}
+
+.mgdb-person-page .person-search-status {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+}
+
+/* Autocomplete suggestions dropdown */
+.mgdb-person-page .person-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 110px;
+  margin-top: 6px;
+  max-height: 380px;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+}
+
+.mgdb-person-page .person-suggestion {
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-3);
+  padding: 10px var(--mgdb-space-4);
+  color: var(--mgdb-ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--mgdb-line-soft);
+  transition: background 0.12s ease;
+}
+
+.mgdb-person-page .person-suggestion:last-child {
+  border-bottom: none;
+}
+
+.mgdb-person-page .person-suggestion:hover,
+.mgdb-person-page .person-suggestion.is-active {
+  background: #f0f7f1;
+}
+
+.mgdb-person-page .person-suggestion-avatar {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #e8f5e9;
+  color: #1b5e20;
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--mgdb-space-4);
-  border: 1px solid rgba(255, 255, 255, .2);
-  border-radius: var(--mgdb-radius);
-  background: rgba(0, 0, 0, .18);
-}
-
-.mgdb-person-page .person-connection-map span {
-  padding: var(--mgdb-space-2) var(--mgdb-space-3);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, .1);
-  font-size: var(--mgdb-text-sm);
   font-weight: 700;
+  font-size: var(--mgdb-text-sm);
 }
 
-.mgdb-person-page .person-connection-map i { color: #ffd99a; font-style: normal; font-weight: 800; }
-
-/* Search workspace --------------------------------------------------------- */
-
-.mgdb-person-page .person-search-workspace {
-  padding: var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface-alt);
+.mgdb-person-page .person-suggestion-content {
+  flex: 1;
+  min-width: 0;
 }
 
-.mgdb-person-page .person-search-heading {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-3) var(--mgdb-space-5);
-  align-items: start;
-  justify-content: space-between;
-}
-
-.mgdb-person-page .person-section-label {
+.mgdb-person-page .person-suggestion-name {
   display: block;
-  color: var(--mgdb-red);
-  font-size: var(--mgdb-text-sm);
   font-weight: 700;
-  letter-spacing: .07em;
-  text-transform: uppercase;
-}
-
-.mgdb-person-page .person-search-heading h2 { margin-top: var(--mgdb-space-1); color: var(--mgdb-green-dark); }
-.mgdb-person-page .person-search-heading p { max-width: var(--mgdb-measure); margin-top: var(--mgdb-space-2); color: var(--mgdb-muted); }
-
-/* Search tips collapse without script. */
-.mgdb-person-page .person-search-tips > summary {
-  display: inline-flex;
-  gap: var(--mgdb-space-2);
-  align-items: center;
-  min-height: 38px;
-  padding: 0 var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
   color: var(--mgdb-green-dark);
   font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-  cursor: pointer;
-  list-style: none;
 }
 
-.mgdb-person-page .person-search-tips > summary::-webkit-details-marker { display: none; }
-.mgdb-person-page .person-search-tips > summary::after { content: "+"; font-size: 1.1em; }
-.mgdb-person-page .person-search-tips[open] > summary::after { content: "\2212"; }
-.mgdb-person-page .person-search-tips > summary:focus-visible { outline: 3px solid var(--mgdb-focus); outline-offset: 2px; }
-.mgdb-person-page .person-search-tips ul { margin-top: var(--mgdb-space-3); padding-left: 1.3em; color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
-.mgdb-person-page .person-search-tips li + li { margin-top: var(--mgdb-space-2); }
-
-/* Query field -------------------------------------------------------------- */
-
-.mgdb-person-page label {
+.mgdb-person-page .person-suggestion-meta {
   display: block;
-  margin-bottom: var(--mgdb-space-1);
-  color: var(--mgdb-ink);
-  font-size: var(--mgdb-text-base);
-  font-weight: 700;
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.mgdb-person-page .person-input-row {
+.mgdb-person-page .person-suggestion-arrow {
+  flex-shrink: 0;
+  color: var(--mgdb-green-dark);
+  font-weight: bold;
+}
+
+/* Quick search chips */
+.mgdb-person-page .person-chips-row {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--mgdb-space-3);
-  align-items: stretch;
-  margin-top: var(--mgdb-space-4);
-}
-
-/* .person-autocomplete is the field wrapper: it holds the icon, the input, and
-   the suggestion listbox. .person-input-icon is only the glyph. */
-.mgdb-person-page .person-autocomplete {
-  position: relative;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: var(--mgdb-space-2);
   align-items: center;
-  flex: 1 1 22rem;
-  min-width: 0;
-  padding: 0 var(--mgdb-space-3);
-  border: 1px solid #b9b2a5;
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-3);
 }
 
-.mgdb-person-page .person-autocomplete:focus-within { border-color: var(--mgdb-focus); }
-.mgdb-person-page .person-input-icon { color: var(--mgdb-muted); }
-
-.mgdb-person-page .person-autocomplete input {
-  width: 100%;
-  min-height: 44px;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: var(--mgdb-ink);
-  font-family: inherit;
-  /* 16px also stops iOS zooming the page when the field takes focus. */
-  font-size: var(--mgdb-text-base);
+.mgdb-person-page .person-chips-label {
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  color: var(--mgdb-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-right: var(--mgdb-space-1);
 }
 
-.mgdb-person-page .person-search-button {
+.mgdb-person-page .person-chip {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  min-height: var(--mgdb-tap-target);
-  padding: 0 var(--mgdb-space-6);
-  border: 0;
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-green-dark);
-  color: #fff;
-  font-family: inherit;
-  font-size: var(--mgdb-text-base);
-  font-weight: 700;
+  padding: 5px 12px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.15s ease;
 }
 
-.mgdb-person-page .person-search-button:hover { background: #0f3325; }
-.mgdb-person-page .person-search-meta { margin-top: var(--mgdb-space-2); color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+.mgdb-person-page .person-chip:hover {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border-color: var(--mgdb-green-dark);
+}
 
-/* Worked examples. */
-.mgdb-person-page .person-example-row {
+/* --------------------------------------------------------------------------
+ * Results Table & Status Bar
+ * -------------------------------------------------------------------------- */
+
+.mgdb-person-page .person-results-table-wrap {
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-person-page .person-results-status-bar {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
   flex-wrap: wrap;
   gap: var(--mgdb-space-2);
+  padding: 10px var(--mgdb-space-4);
+  background: var(--mgdb-surface-alt);
+  border: 1px solid var(--mgdb-line);
+  border-bottom: none;
+  border-radius: var(--mgdb-radius) var(--mgdb-radius) 0 0;
+}
+
+.mgdb-person-page .person-results-badge {
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-ink);
+}
+
+.mgdb-person-page .person-results-hint {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+}
+
+.mgdb-person-page .person-table-scroll {
+  border: 1px solid var(--mgdb-line);
+  border-radius: 0 0 var(--mgdb-radius) var(--mgdb-radius);
+  overflow-x: auto;
+  background: #ffffff;
+}
+
+.mgdb-person-page .person-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-person-page .person-table th {
+  background: #f8faf9;
+  color: var(--mgdb-green-dark);
+  font-weight: 700;
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--mgdb-line);
+  white-space: nowrap;
+}
+
+.mgdb-person-page .person-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--mgdb-line-soft);
+  vertical-align: middle;
+}
+
+.mgdb-person-page .person-table tbody tr:hover {
+  background: #f8faf8;
+}
+
+.mgdb-person-page .person-name-link {
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+  text-decoration: none;
+  display: block;
+}
+
+.mgdb-person-page .person-name-link:hover {
+  text-decoration: underline;
+}
+
+.mgdb-person-page .person-subname {
+  display: block;
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  margin-top: 2px;
+}
+
+.mgdb-person-page .person-alias-note {
+  display: block;
+  font-size: var(--mgdb-text-xs);
+  color: #c25e00;
+  margin-top: 3px;
+}
+
+/* Badges */
+.mgdb-person-page .person-type-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.mgdb-person-page .person-badge-researcher {
+  background: #e8f5e9;
+  color: #1b5e20;
+  border: 1px solid #c8e6c9;
+}
+
+.mgdb-person-page .person-badge-org {
+  background: #e3f2fd;
+  color: #0d47a1;
+  border: 1px solid #bbdefb;
+}
+
+.mgdb-person-page .person-org-link {
+  color: var(--mgdb-ink);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.mgdb-person-page .person-org-link:hover {
+  color: var(--mgdb-green-dark);
+  text-decoration: underline;
+}
+
+.mgdb-person-page .person-na-text {
+  color: #a0aec0;
+}
+
+.mgdb-person-page .person-view-btn {
+  display: inline-block;
+  padding: 6px 12px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: #ffffff;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.mgdb-person-page .person-view-btn:hover {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border-color: var(--mgdb-green-dark);
+}
+
+.mgdb-person-page .text-right {
+  text-align: right;
+}
+
+/* Loading & Empty States */
+.mgdb-person-page .person-loading {
+  display: flex;
   align-items: center;
-  margin-top: var(--mgdb-space-3);
+  justify-content: center;
+  gap: var(--mgdb-space-3);
+  padding: var(--mgdb-space-8);
   color: var(--mgdb-muted);
   font-size: var(--mgdb-text-sm);
 }
 
-.mgdb-person-page .person-example-row button {
-  min-height: 34px;
-  padding: var(--mgdb-space-1) var(--mgdb-space-3);
-  border: 1px solid var(--mgdb-line);
-  border-radius: 999px;
-  background: var(--mgdb-surface);
-  color: var(--mgdb-burgundy);
-  font-family: inherit;
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-  cursor: pointer;
+.mgdb-person-page .person-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #e2e8f0;
+  border-top-color: var(--mgdb-green-dark);
+  border-radius: 50%;
+  animation: person-spin 0.8s linear infinite;
 }
 
-.mgdb-person-page .person-example-row button:hover { border-color: var(--mgdb-gold-dark); background: var(--mgdb-gold-soft); }
+@keyframes person-spin {
+  to { transform: rotate(360deg); }
+}
 
-/* Suggestions -------------------------------------------------------------- */
+.mgdb-person-page .person-empty-state {
+  padding: var(--mgdb-space-8) var(--mgdb-space-6);
+  text-align: center;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: #ffffff;
+}
 
-.mgdb-person-page #person-suggestions {
-  position: absolute;
-  z-index: 30;
-  top: calc(100% + 4px);
-  right: 0;
-  left: 0;
-  max-height: 22rem;
-  overflow-y: auto;
+.mgdb-person-page .person-empty-state h3 {
+  margin: 0 0 var(--mgdb-space-2);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+}
+
+.mgdb-person-page .person-empty-state p {
+  margin: 0 auto var(--mgdb-space-4);
+  color: var(--mgdb-muted);
+  max-width: 60ch;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-person-page .person-tips-list {
+  display: inline-block;
+  text-align: left;
+  margin: 0 auto;
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  padding-left: var(--mgdb-space-4);
+}
+
+.mgdb-person-page .person-tips-list li {
+  margin-bottom: var(--mgdb-space-1);
+}
+
+/* --------------------------------------------------------------------------
+ * Alphabetical A-Z Browse Grid
+ * -------------------------------------------------------------------------- */
+
+.mgdb-person-page .person-az-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-3);
+}
+
+.mgdb-person-page .person-az-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
   border: 1px solid var(--mgdb-line);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
-  box-shadow: var(--mgdb-shadow-lg);
-}
-
-.mgdb-person-page #person-suggestions[hidden] { display: none !important; }
-
-.mgdb-person-page #person-suggestions:empty { display: none; }
-.mgdb-person-page #person-suggestions [role="option"],
-.mgdb-person-page #person-suggestions button,
-.mgdb-person-page #person-suggestions a {
-  display: block;
-  width: 100%;
-  padding: var(--mgdb-space-3) var(--mgdb-space-4);
-  border: 0;
-  border-bottom: 1px solid var(--mgdb-line-soft);
-  background: none;
-  color: var(--mgdb-ink);
-  font: inherit;
-  text-align: left;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.mgdb-person-page #person-suggestions [aria-selected="true"],
-.mgdb-person-page #person-suggestions a:hover,
-.mgdb-person-page #person-suggestions button:hover { background: var(--mgdb-green-soft); }
-.mgdb-person-page #person-suggestions strong { color: var(--mgdb-green-dark); }
-.mgdb-person-page #person-suggestions small { display: block; margin-top: 2px; color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
-.mgdb-person-page mark { background: #fdf0c4; color: inherit; font-weight: 700; }
-
-/* Results ------------------------------------------------------------------ */
-
-.mgdb-person-page #person-results-region { margin-top: var(--mgdb-space-5); }
-.mgdb-person-page #person-search-status { color: var(--mgdb-ink-soft); font-size: var(--mgdb-text-sm); font-weight: 700; }
-
-.mgdb-person-page #person-results-region table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--mgdb-text-sm);
-}
-
-.mgdb-person-page #person-results-region th,
-.mgdb-person-page #person-results-region td {
-  padding: var(--mgdb-space-2) var(--mgdb-space-3);
-  border-bottom: 1px solid var(--mgdb-line-soft);
-  text-align: left;
-  vertical-align: top;
-}
-
-.mgdb-person-page #person-results-region th {
-  border-bottom: 2px solid var(--mgdb-line);
-  background: var(--mgdb-surface-sunken);
+  background: #ffffff;
   color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-base);
   font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
-.mgdb-person-page #person-results-region tr:hover td { background: var(--mgdb-surface-alt); }
-.mgdb-person-page #person-results-region a { color: var(--mgdb-burgundy); font-weight: 600; }
-
-/* Supporting cards --------------------------------------------------------- */
-
-.mgdb-person-page .person-support-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--mgdb-space-4);
+.mgdb-person-page .person-az-btn:hover,
+.mgdb-person-page .person-az-btn.is-active {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border-color: var(--mgdb-green-dark);
 }
 
-.mgdb-person-page .person-support-grid article {
+/* --------------------------------------------------------------------------
+ * Pioneering Geneticists Spotlight
+ * -------------------------------------------------------------------------- */
+
+.mgdb-person-page .person-pioneers-grid {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--mgdb-space-5);
+}
+
+@media (max-width: 800px) {
+  .mgdb-person-page .person-pioneers-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mgdb-person-page .person-pioneer-card {
+  display: flex;
   gap: var(--mgdb-space-4);
   padding: var(--mgdb-space-5);
   border: 1px solid var(--mgdb-line);
   border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
+  background: #ffffff;
   box-shadow: var(--mgdb-shadow-sm);
 }
 
-.mgdb-person-page .person-support-icon {
-  display: grid;
-  width: 40px;
-  height: 40px;
-  place-items: center;
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-green-soft);
-  color: var(--mgdb-green-dark);
-  font-size: 1.1rem;
-}
-
-.mgdb-person-page .person-support-grid h2 { color: var(--mgdb-green-dark); font-size: var(--mgdb-text-lg); }
-.mgdb-person-page .person-support-grid p { margin-top: var(--mgdb-space-2); color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
-
-@media (max-width: 1023px) {
-  .mgdb-person-page .person-hero { grid-template-columns: 1fr; }
-}
-
-@media (max-width: 767px) {
-  .mgdb-person-page .person-hero { padding: var(--mgdb-space-5) var(--mgdb-space-4); }
-  .mgdb-person-page .person-search-button { width: 100%; }
-}
-
-/* Suggestion rows carry an avatar bearing the person's initial. Without a rule
-   it rendered as bare text against the name, reading as "WWalbot, V". */
-.mgdb-person-page .person-suggestion {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: var(--mgdb-space-3);
-  align-items: center;
-}
-
-.mgdb-person-page .person-suggestion-avatar {
-  display: grid;
-  width: 34px;
-  height: 34px;
-  place-items: center;
+.mgdb-person-page .person-pioneer-avatar {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
-  background: var(--mgdb-green-soft);
-  color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-weight: 800;
+  font-size: var(--mgdb-text-lg);
 }
 
-.mgdb-person-page .person-suggestion strong { display: block; color: var(--mgdb-green-dark); }
-.mgdb-person-page .person-suggestion em { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); font-style: normal; }
+.mgdb-person-page .person-pioneer-info h3 {
+  margin: 0 0 2px;
+  font-size: var(--mgdb-text-lg);
+}
+
+.mgdb-person-page .person-pioneer-info h3 a {
+  color: var(--mgdb-green-dark);
+  text-decoration: none;
+}
+
+.mgdb-person-page .person-pioneer-info h3 a:hover {
+  text-decoration: underline;
+}
+
+.mgdb-person-page .person-pioneer-role {
+  display: block;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  color: var(--mgdb-gold-dark);
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-person-page .person-pioneer-info p {
+  margin: 0 0 var(--mgdb-space-3);
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-ink);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-person-page .person-pioneer-links {
+  display: flex;
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-person-page .person-pioneer-link {
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+  text-decoration: none;
+}
+
+.mgdb-person-page .person-pioneer-link:hover {
+  text-decoration: underline;
+}
+
+/* --------------------------------------------------------------------------
+ * FAQ Accordions
+ * -------------------------------------------------------------------------- */
+
+.mgdb-person-page .person-faq-list {
+  display: grid;
+  gap: var(--mgdb-space-3);
+}
+
+.mgdb-person-page .person-faq-item {
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.mgdb-person-page .person-faq-item summary {
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  background: #ffffff;
+  transition: background 0.12s ease;
+}
+
+.mgdb-person-page .person-faq-item summary:hover {
+  background: #f8faf8;
+}
+
+.mgdb-person-page .person-faq-item summary h3 {
+  display: inline;
+  font-size: var(--mgdb-text-base);
+  color: var(--mgdb-green-dark);
+  margin: 0;
+}
+
+.mgdb-person-page .person-faq-body {
+  padding: 0 var(--mgdb-space-5) var(--mgdb-space-4);
+  border-top: 1px solid var(--mgdb-line-soft);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-person-page .person-faq-body a {
+  color: var(--mgdb-green-dark);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+ * Connected Resources Grid
+ * -------------------------------------------------------------------------- */
+
+.mgdb-person-page .person-related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-person-page .person-related-card {
+  display: block;
+  padding: var(--mgdb-space-4);
+  border: 1px solid #d1e7dd;
+  border-radius: var(--mgdb-radius);
+  background: #ffffff;
+  text-decoration: none;
+  color: var(--mgdb-ink);
+  transition: all 0.15s ease;
+}
+
+.mgdb-person-page .person-related-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--mgdb-shadow-md);
+  border-color: var(--mgdb-green-dark);
+}
+
+.mgdb-person-page .person-related-badge {
+  display: inline-block;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--mgdb-green-dark);
+  margin-bottom: var(--mgdb-space-1);
+}
+
+.mgdb-person-page .person-related-card h3 {
+  margin: 0 0 var(--mgdb-space-2);
+  font-size: var(--mgdb-text-base);
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-person-page .person-related-card p {
+  margin: 0;
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  line-height: var(--mgdb-leading-snug);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .mgdb-person-page .person-search-input-wrap {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .mgdb-person-page .person-search-submit {
+    width: 100%;
+  }
+  .mgdb-person-page .person-suggestions {
+    right: 0;
+  }
+}
