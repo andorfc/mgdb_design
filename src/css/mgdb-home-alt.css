@@ -1,109 +1,110 @@
-/* Homepage design styles for MaizeGDB Home (v3).
+/* Homepage design alternatives, for /index2 and /index3.
  *
- * Efficient spacing, zero wasted white space, compact quick links grid,
- * slim welcome banner, redesigned common tasks card, and 4-column full-width metrics strip.
+ * Loaded only by those two pages, after mgdb-home.css, so everything here is an
+ * override of the default homepage rather than a fork of it. The default at /
+ * is untouched by this file.
+ *
+ * Both drop the one-line description under each tile and enlarge the art.
+ * Version 3 goes further: larger again, no card border until you touch it, and
+ * a warmer header in place of the record-page hero.
  */
 
 /* ===========================================================================
-   Shared Typography & Quicklink Labels
+   Shared by both alternatives
    =========================================================================== */
 
+/* With no description the label is the whole caption, so it can carry a little
+   more weight and sit closer to the art. */
+.mgdb-modern .mgdb-home-v2 .mgdb-quicklink-label,
 .mgdb-modern .mgdb-home-v3 .mgdb-quicklink-label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  line-height: 1.2;
+  font-size: var(--mgdb-text-base);
 }
 
+.mgdb-modern .mgdb-home-v2 .mgdb-quicklink-text,
 .mgdb-modern .mgdb-home-v3 .mgdb-quicklink-text {
   gap: 0;
 }
 
 /* ===========================================================================
-   Version 3 — Compact 5-Column Quick Links Grid (No Wasted Space)
+   Version 2 — bigger art, labels only, card kept
    =========================================================================== */
 
-.mgdb-modern .mgdb-home-v3 .mgdb-home-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: var(--mgdb-space-4);
-  align-items: start;
-  margin-top: var(--mgdb-space-3);
+.mgdb-modern .mgdb-home-v2 .mgdb-quicklinks {
+  grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
 }
 
-@media (max-width: 960px) {
-  .mgdb-modern .mgdb-home-v3 .mgdb-home-layout {
-    grid-template-columns: minmax(0, 1fr);
+.mgdb-modern .mgdb-home-v2 .mgdb-quicklink {
+  gap: var(--mgdb-space-3);
+  padding: var(--mgdb-space-4) var(--mgdb-space-3);
+}
+
+.mgdb-modern .mgdb-home-v2 .mgdb-quicklink-art {
+  width: 104px;
+  height: 104px;
+}
+
+.mgdb-modern .mgdb-home-v2 .mgdb-quicklink-art img {
+  width: 84px;
+  height: 84px;
+}
+
+@media (max-width: 640px) {
+  /* Restated because the desktop override above is more specific than the base
+     two-column mobile rule in mgdb-home.css and would otherwise win here,
+     leaving one very wide column. */
+  .mgdb-modern .mgdb-home-v2 .mgdb-quicklinks {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .mgdb-modern .mgdb-home-v2 .mgdb-quicklink {
+    gap: var(--mgdb-space-2);
+    padding: var(--mgdb-space-2);
+  }
+  .mgdb-modern .mgdb-home-v2 .mgdb-quicklink-art { width: 52px; height: 52px; }
+  .mgdb-modern .mgdb-home-v2 .mgdb-quicklink-art img { width: 40px; height: 40px; }
+  .mgdb-modern .mgdb-home-v2 .mgdb-quicklink-label { font-size: var(--mgdb-text-sm); }
 }
 
-.mgdb-modern .mgdb-home-v3 .mgdb-home-rail {
-  display: grid;
+/* ===========================================================================
+   Version 3 — larger again, borderless until interacted with
+   =========================================================================== */
+
+/* 10rem, not 11: at the content width this page has, 11rem still resolved to
+   four columns and the tiles stretched to 208px. 10rem fits five, which is the
+   size reduction that was actually asked for, and twenty tiles land as four
+   even rows. */
+/* Four across, so twenty tiles land as four even rows. Fixed rather than
+   auto-fill: auto-fill picks the column count from the available width, which
+   is what produced five columns here, and the ask is specifically four. The
+   tiles grow to fill the track. */
+.mgdb-modern .mgdb-home-v3 .mgdb-quicklinks {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--mgdb-space-3);
 }
 
-.mgdb-modern .mgdb-home-v3 .mgdb-quicklinks {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: var(--mgdb-space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
+/* Outlined and weighted. The borderless version read as a set of loose images
+   and, in review, as though the tiles might float away -- so the border is back
+   and each tile casts a small shadow down and to the right. */
 .mgdb-modern .mgdb-home-v3 .mgdb-quicklink {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: 4px;
-  padding: 8px 4px;
+  gap: var(--mgdb-space-2);
+  padding: var(--mgdb-space-3) var(--mgdb-space-2);
   border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
   background: var(--mgdb-surface);
-  box-shadow: 1px 2px 0 rgba(23, 70, 52, 0.04), 2px 3px 6px rgba(23, 70, 52, 0.05);
-  text-decoration: none;
-  transition: all 0.12s ease;
-  min-height: 84px;
+  box-shadow: 2px 3px 0 rgba(23, 70, 52, 0.06), 3px 4px 10px rgba(23, 70, 52, 0.07);
 }
 
 .mgdb-modern .mgdb-home-v3 .mgdb-quicklink:hover,
 .mgdb-modern .mgdb-home-v3 .mgdb-quicklink:focus-visible {
   border-color: var(--mgdb-gold);
   background: var(--mgdb-gold-soft);
-  box-shadow: 2px 3px 0 rgba(138, 90, 15, 0.08), 3px 4px 10px rgba(138, 90, 15, 0.12);
-  transform: translateY(-1px);
-}
-
-.mgdb-modern .mgdb-home-v3 .mgdb-quicklink:active {
-  background: #fdeec4;
-  box-shadow: 1px 1px 0 rgba(138, 90, 15, 0.10);
+  box-shadow: 3px 4px 0 rgba(138, 90, 15, 0.10), 4px 6px 14px rgba(138, 90, 15, 0.14);
   transform: none;
 }
 
-.mgdb-modern .mgdb-home-v3 .mgdb-quicklink-art {
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  flex-shrink: 0;
-}
-
-.mgdb-modern .mgdb-home-v3 .mgdb-quicklink-art img {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
-}
-
-.mgdb-modern .mgdb-home-v3 .mgdb-quicklink-label {
-  font-size: 0.78rem;
-  font-weight: 600;
-  line-height: 1.2;
-  color: var(--mgdb-ink);
-  text-align: center;
-  overflow-wrap: break-word;
+/* Pressed: the shadow collapses and the tile settles onto the page. */
+.mgdb-modern .mgdb-home-v3 .mgdb-quicklink:active {
+  background: #fdeec4;
+  box-shadow: 1px 1px 0 rgba(138, 90, 15, 0.10);
 }
 
 .mgdb-modern .mgdb-home-v3 .mgdb-quicklink:hover .mgdb-quicklink-label,
@@ -111,51 +112,77 @@
   color: var(--mgdb-gold-dark);
 }
 
-@media (max-width: 1100px) {
-  .mgdb-modern .mgdb-home-v3 .mgdb-quicklinks {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
+.mgdb-modern .mgdb-home-v3 .mgdb-quicklink-art {
+  width: 116px;
+  height: 116px;
+  background: transparent;
+}
+
+/* The disc is gone, so hover tints the art's own ground instead. */
+.mgdb-modern .mgdb-home-v3 .mgdb-quicklink:hover .mgdb-quicklink-art,
+.mgdb-modern .mgdb-home-v3 .mgdb-quicklink:focus-visible .mgdb-quicklink-art {
+  background: transparent;
+}
+
+.mgdb-modern .mgdb-home-v3 .mgdb-quicklink-art img {
+  width: 104px;
+  height: 104px;
 }
 
 @media (max-width: 640px) {
   .mgdb-modern .mgdb-home-v3 .mgdb-quicklinks {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--mgdb-space-1);
+    gap: 0;
   }
   .mgdb-modern .mgdb-home-v3 .mgdb-quicklink {
-    padding: 6px 4px;
-    min-height: 72px;
+    gap: var(--mgdb-space-2);
+    padding: var(--mgdb-space-2);
   }
-  .mgdb-modern .mgdb-home-v3 .mgdb-quicklink-art { width: 40px; height: 40px; }
-  .mgdb-modern .mgdb-home-v3 .mgdb-quicklink-art img { width: 32px; height: 32px; }
-  .mgdb-modern .mgdb-home-v3 .mgdb-quicklink-label { font-size: 0.75rem; }
+  /* 54px, not 66: at a 172px tile the longer single-word labels had nowhere to
+     go -- "Nomenclature" ran 9px past its own border, since it cannot wrap.
+     Trimming the art gives the text the room, and break-word is the guard for
+     whatever long label gets added next. */
+  .mgdb-modern .mgdb-home-v3 .mgdb-quicklink-art { width: 54px; height: 54px; }
+  .mgdb-modern .mgdb-home-v3 .mgdb-quicklink-art img { width: 48px; height: 48px; }
+  .mgdb-modern .mgdb-home-v3 .mgdb-quicklink-label {
+    font-size: var(--mgdb-text-sm);
+    overflow-wrap: break-word;
+  }
 }
 
 /* ===========================================================================
-   Version 3 — Tightened Welcome Hero Banner
+   Version 3 — the warm header
    =========================================================================== */
 
 .mgdb-modern .mgdb-home3-hero {
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--mgdb-space-3);
+  gap: var(--mgdb-space-5);
   overflow: hidden;
-  margin-bottom: var(--mgdb-space-3);
-  padding: 10px 18px;
+  /* Compact on purpose. Measured at 1280px: the first draft of this header was
+     366px tall and pushed the quick links to 712px down the page. Halving the
+     vertical padding, dropping a size off the title and the lede, and turning
+     the two buttons into a row of links brings it to 258px and the grid to
+     597px -- 30% off the header for the same content. */
+  margin-bottom: var(--mgdb-space-5);
+  padding: var(--mgdb-space-5) var(--mgdb-space-6);
   border: 1px solid #f0e2c2;
-  border-radius: var(--mgdb-radius);
+  border-radius: var(--mgdb-radius-lg);
+  /* Cream into a warmer gold, so the page opens on the colour of the crop
+     rather than on the grey of a record header. */
   background:
     radial-gradient(120% 150% at 92% 10%, #ffe9b0 0%, rgba(255, 233, 176, 0) 62%),
     linear-gradient(160deg, var(--mgdb-gold-soft) 0%, var(--mgdb-surface-alt) 76%);
 }
 
+/* A single gold rule along the top, the one piece of the record hero worth
+   keeping -- it says "this is MaizeGDB" without the metadata frame. */
 .mgdb-modern .mgdb-home3-hero::before {
   content: "";
   position: absolute;
   inset: 0 0 auto 0;
-  height: 3px;
+  height: 4px;
   background: linear-gradient(90deg, var(--mgdb-gold) 0%, var(--mgdb-orange) 55%, var(--mgdb-wine) 100%);
 }
 
@@ -164,36 +191,43 @@
   min-width: 0;
 }
 
+/* The one headline on the site that is not the standard green. #9c1c1f is the
+   deep rust already inside the MaizeGDB kernels mark -- sampled from the art
+   rather than invented, so it belongs to the brand. 6.6:1 on the cream ground,
+   comfortably past AA. Sized to sit just under the logo wordmark above it. */
 .mgdb-modern .mgdb-home3-hero h1 {
-  margin: 0 0 2px;
-  font-size: 1.45rem;
-  line-height: 1.2;
+  margin: 0 0 var(--mgdb-space-2);
+  font-size: clamp(2rem, 1.5rem + 2.1vw, 2.9rem);
+  line-height: var(--mgdb-leading-tight);
   color: #9c1c1f;
-  font-weight: 800;
 }
 
+/* Wide measure on purpose: the sentence is meant to run long rather than stack
+   into a narrow column beside the kernels. */
 .mgdb-modern .mgdb-home3-lede {
-  max-width: 90ch;
-  margin: 0 0 6px;
-  font-size: 0.88rem;
-  line-height: 1.4;
+  max-width: 82ch;
+  margin: 0 0 var(--mgdb-space-3);
+  font-size: var(--mgdb-text-base);
+  line-height: var(--mgdb-leading);
   color: var(--mgdb-ink);
 }
 
+/* Underlined links rather than buttons. On a welcome these are an offer, not a
+   call to action, and two filled buttons were carrying more weight than the
+   sentence above them. */
 .mgdb-modern .mgdb-home3-links {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-  margin: 0;
-  font-size: 0.8rem;
+  gap: var(--mgdb-space-1) var(--mgdb-space-4);
+  margin: 0 0 var(--mgdb-space-3);
+  font-size: var(--mgdb-text-sm);
 }
 
 .mgdb-modern .mgdb-home3-links a {
   font-weight: 600;
   color: var(--mgdb-green-dark);
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-underline-offset: 3px;
   text-decoration-thickness: 1px;
 }
 
@@ -203,12 +237,31 @@
   text-decoration-thickness: 2px;
 }
 
+/* The release facts the record hero showed as a definition list. Same three
+   numbers, one quiet line, out of the way of the welcome. */
+.mgdb-modern .mgdb-home3-stamp {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px var(--mgdb-space-4);
+  margin: 0;
+  padding-top: var(--mgdb-space-2);
+  border-top: 1px solid #ecdcb8;
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-ink-soft);
+}
+
+.mgdb-modern .mgdb-home3-stamp strong {
+  font-family: var(--mgdb-font-mono);
+  font-weight: 600;
+  color: var(--mgdb-green-dark);
+}
+
+/* The kernels from the MaizeGDB mark. The source PNG already carries alpha, so
+   it sits on the gradient without a plate behind it. */
 .mgdb-modern .mgdb-home3-hero-art {
   flex: 0 0 auto;
-  width: 72px;
+  width: clamp(120px, 14vw, 190px);
   height: auto;
-  max-height: 56px;
-  object-fit: contain;
   align-self: center;
 }
 
@@ -218,23 +271,23 @@
 
 @media (max-width: 640px) {
   .mgdb-modern .mgdb-home3-hero {
-    padding: 10px 14px;
+    padding: var(--mgdb-space-4);
   }
-  .mgdb-modern .mgdb-home3-hero h1 { font-size: 1.25rem; }
-  .mgdb-modern .mgdb-home3-lede { font-size: 0.82rem; }
+  .mgdb-modern .mgdb-home3-lede { font-size: var(--mgdb-text-sm); }
 }
 
 /* ===========================================================================
-   Version 3 — Reference Assembly Card (Compact)
+   Version 3 — the Reference assembly card
    =========================================================================== */
 
 .mgdb-modern .mgdb-refassembly {
+  /* A white ground, not the header's cream: the puzzle art is amber, and on
+     cream it washed out to almost nothing. The warmth comes from the accent
+     bar instead, which also marks this as the featured card in the rail. */
   position: relative;
   overflow: hidden;
   border-color: #f0e2c2;
   background: var(--mgdb-surface);
-  padding: 10px 14px;
-  border-radius: var(--mgdb-radius);
 }
 
 .mgdb-modern .mgdb-refassembly::before {
@@ -245,47 +298,34 @@
   background: linear-gradient(90deg, var(--mgdb-gold) 0%, var(--mgdb-orange) 60%, var(--mgdb-wine) 100%);
 }
 
-.mgdb-modern .mgdb-refassembly h2 {
-  font-size: var(--mgdb-text-xs);
-  font-weight: 800;
-  color: var(--mgdb-green-dark);
-  text-transform: uppercase;
-  letter-spacing: .04em;
-  margin: 0 0 6px;
-}
-
 .mgdb-modern .mgdb-refassembly-head {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-  padding-bottom: 6px;
+  gap: var(--mgdb-space-2);
+  margin-bottom: var(--mgdb-space-3);
+  padding-bottom: var(--mgdb-space-3);
   border-bottom: 1px solid #ecdcb8;
 }
 
+/* The puzzle is the recognizable part of the production block, so give it room
+   to be recognized. */
 .mgdb-modern .mgdb-refassembly-head img {
   flex: 0 0 auto;
-  width: 44px;
-  height: 44px;
+  width: 84px;
+  height: 84px;
   object-fit: contain;
 }
 
-.mgdb-modern .mgdb-refassembly-current {
+.mgdb-modern .mgdb-refassembly-head strong {
   display: block;
   font-family: var(--mgdb-font-mono);
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-size: var(--mgdb-text-base);
   color: var(--mgdb-green-dark);
-  text-decoration: underline;
-  text-underline-offset: 2px;
 }
-
-.mgdb-modern .mgdb-refassembly-current:hover,
-.mgdb-modern .mgdb-refassembly-current:focus-visible { color: var(--mgdb-gold-dark); }
 
 .mgdb-modern .mgdb-refassembly-head span {
   display: block;
-  font-size: 11px;
+  font-size: var(--mgdb-text-xs);
   line-height: var(--mgdb-leading-snug);
   color: var(--mgdb-ink-soft);
 }
@@ -301,9 +341,11 @@
 }
 
 .mgdb-modern .mgdb-refassembly-links a {
+  /* 10px vertical keeps the row at 44px with the two lines of text, which is
+     the tap-target floor. */
   display: block;
-  padding: 4px 0;
-  font-size: var(--mgdb-text-xs);
+  padding: 10px 0;
+  font-size: var(--mgdb-text-sm);
   font-weight: 600;
   color: var(--mgdb-green-dark);
   text-decoration: none;
@@ -311,9 +353,9 @@
 
 .mgdb-modern .mgdb-refassembly-links a span {
   display: block;
-  font-size: 11px;
+  font-size: var(--mgdb-text-xs);
   font-weight: 400;
-  line-height: 1.2;
+  line-height: var(--mgdb-leading-snug);
   color: var(--mgdb-muted);
 }
 
@@ -321,134 +363,112 @@
 .mgdb-modern .mgdb-refassembly-links a:focus-visible {
   color: var(--mgdb-gold-dark);
   text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
-/* ===========================================================================
-   Version 3 — Redesigned Common Tasks Card
-   =========================================================================== */
-
-.mgdb-modern .mgdb-home-tasks-card {
-  padding: 10px 14px;
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
-  box-shadow: var(--mgdb-shadow-sm);
-}
-
-.mgdb-modern .mgdb-tasks-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-  padding-bottom: 4px;
-  border-bottom: 1px solid var(--mgdb-line-soft);
-}
-
-.mgdb-modern .mgdb-tasks-heading h2 {
-  margin: 0;
-  font-size: var(--mgdb-text-xs);
-  font-weight: 800;
-  color: var(--mgdb-green-dark);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.mgdb-modern .mgdb-tasks-list {
-  display: grid;
-  gap: 3px;
-}
-
-.mgdb-modern .mgdb-task-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 5px 8px;
-  background: var(--mgdb-surface-alt);
-  border: 1px solid transparent;
-  border-radius: var(--mgdb-radius-sm);
-  color: var(--mgdb-ink);
-  font-size: var(--mgdb-text-xs);
-  font-weight: 600;
+/* --- summary facts, now links ---------------------------------------------
+   The cards route to the resource each number describes, so they need the
+   affordances of a link without the underline of one. */
+.mgdb-modern .mgdb-home-page .mgdb-metric-link {
   text-decoration: none;
-  transition: all 0.12s ease;
+  color: inherit;
+  transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
 }
 
-.mgdb-modern .mgdb-task-item:hover,
-.mgdb-modern .mgdb-task-item:focus-visible {
-  background: var(--mgdb-green-soft);
-  border-color: #bbf7d0;
-  color: var(--mgdb-green-dark);
-  transform: translateX(2px);
+.mgdb-modern .mgdb-home-page .mgdb-metric-link:hover,
+.mgdb-modern .mgdb-home-page .mgdb-metric-link:focus-visible {
+  border-color: var(--mgdb-green);
+  box-shadow: 2px 3px 0 rgba(23, 70, 52, 0.06), 3px 4px 10px rgba(23, 70, 52, 0.07);
+  transform: translateY(-1px);
 }
 
-.mgdb-modern .mgdb-task-label {
-  flex: 1;
+.mgdb-modern .mgdb-home-page .mgdb-metric-link:focus-visible {
+  outline: var(--mgdb-focus-ring);
+  outline-offset: 2px;
 }
 
-.mgdb-modern .mgdb-task-arrow {
+/* Release dates, now at the foot of the page rather than in the header. */
+.mgdb-modern .mgdb-home-page .mgdb-home-stamp-foot {
+  justify-content: center;
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-3);
+  border-top: 0;
   color: var(--mgdb-muted);
-  font-size: 11px;
-  margin-left: 6px;
 }
 
-.mgdb-modern .mgdb-task-item:hover .mgdb-task-arrow {
+/* The reference assembly name is a link to its genome page. */
+.mgdb-modern .mgdb-refassembly-current {
+  display: block;
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-base);
+  font-weight: 600;
   color: var(--mgdb-green-dark);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
-/* ===========================================================================
-   Version 3 — Sidebar News & Crops Panels (Compact)
-   =========================================================================== */
+.mgdb-modern .mgdb-refassembly-current:hover,
+.mgdb-modern .mgdb-refassembly-current:focus-visible { color: var(--mgdb-gold-dark); }
 
-.mgdb-modern .mgdb-aside-card {
-  padding: 10px 14px;
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
-}
+/* --- Common tasks -----------------------------------------------------------
+   A <details> rather than a scripted dropdown: it opens and closes, takes
+   keyboard focus, and announces its state to a screen reader without any JS,
+   and it degrades to a plain open list if scripting is off. */
+.mgdb-modern .mgdb-home-tasks-card { padding-bottom: var(--mgdb-space-3); }
 
-.mgdb-modern .mgdb-aside-card h2 {
-  margin: 0 0 6px 0;
-  color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-xs);
-  font-weight: 800;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-}
-
-.mgdb-modern .mgdb-home-news {
-  margin: 0;
-  padding: 0;
+.mgdb-modern .mgdb-home-tasks-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  min-height: var(--mgdb-tap-target);
+  cursor: pointer;
   list-style: none;
 }
 
-.mgdb-modern .mgdb-home-news li {
-  padding: 4px 0;
-  border-top: 1px solid var(--mgdb-line-soft);
-  font-size: var(--mgdb-text-xs);
-  line-height: 1.35;
+.mgdb-modern .mgdb-home-tasks-summary::-webkit-details-marker { display: none; }
+
+.mgdb-modern .mgdb-home-tasks-summary h2 { margin: 0; }
+
+.mgdb-modern .mgdb-home-tasks-summary::after {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-left: auto;
+  border-right: 2px solid var(--mgdb-muted);
+  border-bottom: 2px solid var(--mgdb-muted);
+  transform: rotate(45deg) translate(-0.1rem, -0.1rem);
+  transition: transform 140ms ease;
 }
 
-.mgdb-modern .mgdb-home-news li:first-child { border-top: 0; padding-top: 0; }
-
-.mgdb-modern .mgdb-home-news-more {
-  margin: 4px 0 0;
-  font-size: 11px;
+.mgdb-modern .mgdb-home-tasks-card[open] .mgdb-home-tasks-summary::after {
+  transform: rotate(-135deg) translate(-0.1rem, -0.1rem);
 }
 
-.mgdb-modern .mgdb-home-crops-panel {
-  padding: 10px 14px;
+.mgdb-modern .mgdb-home-tasks-summary:focus-visible {
+  outline: var(--mgdb-focus-ring);
+  outline-offset: 2px;
 }
 
+.mgdb-modern .mgdb-home-tasks-card .mgdb-home-tasks a {
+  display: block;
+  min-height: var(--mgdb-tap-target);
+  padding: var(--mgdb-space-2) 0;
+}
+
+/* --- sister USDA-ARS databases ---------------------------------------------
+   The three logos are JPEGs with their own backgrounds -- one is dark, two are
+   light -- so each sits in its own bordered tile. That reads as deliberate
+   rather than as three mismatched images on one ground. */
 .mgdb-modern .mgdb-home-crops-intro {
-  margin: 0 0 6px;
-  font-size: 11px;
-  line-height: 1.3;
+  margin: 0 0 var(--mgdb-space-3);
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading-snug);
   color: var(--mgdb-ink-soft);
 }
 
 .mgdb-modern .mgdb-home-crops-logos {
   display: grid;
-  gap: 4px;
+  gap: var(--mgdb-space-2);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -457,126 +477,53 @@
 .mgdb-modern .mgdb-home-crops-logos a {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 4px 6px;
+  gap: var(--mgdb-space-3);
+  min-height: var(--mgdb-tap-target);
+  padding: var(--mgdb-space-2);
   border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-sm);
+  border-radius: var(--mgdb-radius);
   background: var(--mgdb-surface);
   color: var(--mgdb-ink);
   text-decoration: none;
-  transition: all 0.12s ease;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
 }
 
 .mgdb-modern .mgdb-home-crops-logos a:hover,
 .mgdb-modern .mgdb-home-crops-logos a:focus-visible {
   border-color: var(--mgdb-green);
-  box-shadow: 1px 2px 0 rgba(23, 70, 52, 0.06);
+  box-shadow: 2px 3px 0 rgba(23, 70, 52, 0.06);
 }
 
 .mgdb-modern .mgdb-home-crops-logos img {
   flex: 0 0 auto;
-  width: 28px;
-  height: 28px;
-  border-radius: 4px;
+  width: 42px;
+  height: 42px;
+  border-radius: 6px;
   object-fit: cover;
 }
 
 .mgdb-modern .mgdb-home-crops-logos strong {
   display: block;
-  font-size: var(--mgdb-text-xs);
+  font-size: var(--mgdb-text-sm);
   color: var(--mgdb-green-dark);
 }
 
 .mgdb-modern .mgdb-home-crops-logos small {
   display: block;
-  font-size: 10px;
-  line-height: 1.2;
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading-snug);
   color: var(--mgdb-muted);
 }
 
+/* The USDA lockup is a wide SVG: at height="30" it lays out 346px wide, which
+   is more than the 340px rail and pushed the whole document into horizontal
+   scroll. Constrain it to its container and let the height follow. */
 .mgdb-modern .mgdb-home-usda-link img {
   max-width: 100%;
-  height: 22px;
+  height: auto;
 }
 
 .mgdb-modern .mgdb-home-crops-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-}
-
-/* ===========================================================================
-   Version 3 — 4-Column Full-Width Metrics Dashboard Strip
-   =========================================================================== */
-
-.mgdb-modern .mgdb-home-page .mgdb-home-metrics {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-  gap: var(--mgdb-space-3);
-  margin-top: var(--mgdb-space-3);
-  width: 100%;
-}
-
-.mgdb-modern .mgdb-home-page .mgdb-metric-link {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 8px 12px;
-  text-decoration: none;
-  color: inherit;
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
-  transition: all 0.12s ease;
-}
-
-.mgdb-modern .mgdb-home-page .mgdb-metric-link:hover,
-.mgdb-modern .mgdb-home-page .mgdb-metric-link:focus-visible {
-  border-color: var(--mgdb-green);
-  box-shadow: 2px 3px 0 rgba(23, 70, 52, 0.06), 3px 4px 8px rgba(23, 70, 52, 0.06);
-  transform: translateY(-1px);
-}
-
-.mgdb-modern .mgdb-home-page .mgdb-metric-value {
-  display: block;
-  font-size: 1.25rem;
-  font-weight: 800;
-  line-height: 1.1;
-  color: var(--mgdb-ink);
-}
-
-.mgdb-modern .mgdb-home-page .mgdb-metric-link h3 {
-  font-size: var(--mgdb-text-xs);
-  font-weight: 700;
-  margin: 1px 0 1px;
-  color: var(--mgdb-green-dark);
-}
-
-.mgdb-modern .mgdb-home-page .mgdb-metric-link p {
-  font-size: 11px;
-  color: var(--mgdb-muted);
-  margin: 0;
-  line-height: 1.25;
-}
-
-@media (max-width: 900px) {
-  .mgdb-modern .mgdb-home-page .mgdb-home-metrics {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
-}
-
-@media (max-width: 500px) {
-  .mgdb-modern .mgdb-home-page .mgdb-home-metrics {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
-}
-
-.mgdb-modern .mgdb-home-page .mgdb-home-stamp-foot {
-  justify-content: center;
-  margin-top: var(--mgdb-space-2);
-  padding-top: var(--mgdb-space-2);
-  border-top: 0;
-  color: var(--mgdb-muted);
-  font-size: 11px;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
 }

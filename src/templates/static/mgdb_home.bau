@@ -11,18 +11,26 @@ $$SYNTAX-LEVEL 2
   <!-- A warm welcome header with release details and key actions. -->
   <header class="mgdb-home3-hero">
     <div class="mgdb-home3-hero-inner">
-      <h1>Welcome to MaizeGDB!</h1>
-      <p class="mgdb-home3-lede">MaizeGDB is a community-oriented, long-term, federally funded informatics service to researchers focused on the crop plant and model organism <i>Zea mays</i>.</p>
+      <p class="mgdb-home3-kicker">Maize genetics and genomics database</p>
+      <h1>Welcome to MaizeGDB</h1>
+      <p class="mgdb-home3-lede">MaizeGDB is a community-oriented, long-term, federally funded
+        informatics service to researchers focused on the crop plant and model organism
+        <i>Zea mays</i>.</p>
       <p class="mgdb-home3-links">
-        <a href="$(server-url)/contribute_data">Contribute data</a>
+        <a href="$(server-url)/contribute_data">Contribute your data</a>
         <a href="$(server-url)/cite">Cite MaizeGDB</a>
         <a href="$(server-url)/contact">Contact us</a>
+      </p>
+      <p class="mgdb-home3-stamp">
+        <span>Release <strong>$(release_date)</strong></span>
+        <span>Next update <strong>$(next_update)</strong></span>
+        <span>Reference <strong>B73 RefGen_v5</strong></span>
       </p>
     </div>
     <!-- The kernels from the MaizeGDB mark. Decorative, so it carries an empty
          alt and aria-hidden -- the wordmark in the chrome already names the site. -->
     <img class="mgdb-home3-hero-art" src="/images/kernels.png" alt="" aria-hidden="true"
-         width="120" height="70" decoding="async" />
+         width="368" height="213" decoding="async" />
   </header>
 
   <div class="mgdb-home-layout">
@@ -30,17 +38,21 @@ $$SYNTAX-LEVEL 2
     <section aria-labelledby="home-index-title">
       <div class="mgdb-home-index-heading">
         <div>
-          <h2 id="home-index-title">Quick Links</h2>
+          <h2 id="home-index-title">Quick links</h2>
         </div>
         <div class="mgdb-home-index-controls">
           <div class="mgdb-view-toggle" role="group" aria-label="Choose how resources are shown">
             <button type="button" class="mgdb-view-button is-active" data-home-view="grid" aria-pressed="true">
               <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
-              Quick Links
+              Quick links
             </button>
             <button type="button" class="mgdb-view-button" data-home-view="list" aria-pressed="false">
               <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><rect x="1" y="2" width="3" height="3" rx="0.5"/><rect x="6" y="2.75" width="9" height="1.5" rx="0.75"/><rect x="1" y="7" width="3" height="3" rx="0.5"/><rect x="6" y="7.75" width="9" height="1.5" rx="0.75"/><rect x="1" y="12" width="3" height="3" rx="0.5"/><rect x="6" y="12.75" width="9" height="1.5" rx="0.75"/></svg>
-              Key Resources
+              Key resources
+            </button>
+            <button type="button" class="mgdb-view-button" data-home-view="tasks" aria-pressed="false">
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path d="M2.5 1A1.5 1.5 0 0 0 1 2.5v11A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-11A1.5 1.5 0 0 0 13.5 1h-11zm1 2h9a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm0 4h9a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm0 4h5a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5z"/></svg>
+              Common tasks
             </button>
           </div>
         </div>
@@ -57,7 +69,7 @@ $$SYNTAX-LEVEL 2
           </a>
         </li>
         <li>
-          <a class="mgdb-quicklink" href="$(server-url)/BLAST">
+          <a class="mgdb-quicklink" href="$(blast_url)">
             <span class="mgdb-quicklink-art">
               <img src="/images/quicklinks/blast.png$(ql_version)" alt="" width="128" height="128" loading="eager" fetchpriority="high" decoding="async" />
             </span>
@@ -137,12 +149,22 @@ $$SYNTAX-LEVEL 2
           </a>
         </li>
         <li>
+          <a class="mgdb-quicklink" href="$(server-url)/data_center/phenotype">
+            <span class="mgdb-quicklink-art">
+              <img src="/images/quicklinks/phenotype.png$(ql_version)" alt="" width="128" height="128" loading="lazy" decoding="async" />
+            </span>
+            <span class="mgdb-quicklink-text">
+              <strong class="mgdb-quicklink-label">Mutants & Phenotypes</strong>
+            </span>
+          </a>
+        </li>
+        <li>
           <a class="mgdb-quicklink" href="$(server-url)/new_genes">
             <span class="mgdb-quicklink-art">
               <img src="/images/quicklinks/new_genes.png$(ql_version)" alt="" width="128" height="128" loading="lazy" decoding="async" />
             </span>
             <span class="mgdb-quicklink-text">
-              <strong class="mgdb-quicklink-label">Update genes</strong>
+              <strong class="mgdb-quicklink-label">New Genes</strong>
             </span>
           </a>
         </li>
@@ -217,22 +239,12 @@ $$SYNTAX-LEVEL 2
           </a>
         </li>
         <li>
-          <a class="mgdb-quicklink" href="https://www.maizegenetics.org/" target="_blank" rel="noopener">
+          <a class="mgdb-quicklink" href="$(server-url)/mgec">
             <span class="mgdb-quicklink-art">
               <img src="/images/quicklinks/mgec.png$(ql_version)" alt="" width="128" height="128" loading="lazy" decoding="async" />
             </span>
             <span class="mgdb-quicklink-text">
-              <strong class="mgdb-quicklink-label">MGC <span class="mgdb-quicklink-ext" aria-hidden="true">&nearr;</span></strong>
-            </span>
-          </a>
-        </li>
-        <li>
-          <a class="mgdb-quicklink" href="$(server-url)/maize_meeting/">
-            <span class="mgdb-quicklink-art">
-              <img src="/images/quicklinks/maize_meeting.png$(ql_version)" alt="" width="128" height="128" loading="lazy" decoding="async" />
-            </span>
-            <span class="mgdb-quicklink-text">
-              <strong class="mgdb-quicklink-label">Maize Meeting</strong>
+              <strong class="mgdb-quicklink-label">MGEC</strong>
             </span>
           </a>
         </li>
@@ -367,6 +379,58 @@ $$SYNTAX-LEVEL 2
         </div>
 
       </div>
+
+      <div class="mgdb-index" data-home-panel="tasks" hidden>
+
+        <h3 class="mgdb-index-band" id="home-band-tasks-genes">Genes &amp; Genomes</h3>
+        <div role="list" aria-labelledby="home-band-tasks-genes">
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/gene_center/gene">
+            <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-genes"></use></svg></span>
+            <strong>Find a gene by symbol</strong>
+            <span class="mgdb-index-desc">Search loci, gene models, and functional annotations</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/gene_center/gene#translate">
+            <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-sequences"></use></svg></span>
+            <strong>Translate gene models between assemblies</strong>
+            <span class="mgdb-index-desc">Cross-reference gene IDs between B73 v3, v4, v5, and NAM assemblies</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0" target="_blank" rel="noopener">
+            <span class="mgdb-search-icon" data-cat="genome" aria-hidden="true"><svg focusable="false"><use href="#mzg-datasets-and-downloads"></use></svg></span>
+            <strong>Reference genome downloads</strong>
+            <span class="mgdb-index-desc">B73 RefGen_v5 FASTA, GFF3, and annotation files</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="$(blast_url)">
+            <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-sequences"></use></svg></span>
+            <strong>BLAST sequence search</strong>
+            <span class="mgdb-index-desc">Align DNA or protein sequences to maize databases</span>
+          </a>
+        </div>
+
+        <h3 class="mgdb-index-band" id="home-band-tasks-stocks">Stocks, Nomenclature &amp; Curation</h3>
+        <div role="list" aria-labelledby="home-band-tasks-stocks">
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/data_center/stock">
+            <span class="mgdb-search-icon" data-cat="stock" aria-hidden="true"><svg focusable="false"><use href="#mzg-stocks-and-germplasm"></use></svg></span>
+            <strong>Order seed from the COOP</strong>
+            <span class="mgdb-index-desc">Request seed stocks from the Maize Genetics Cooperation Stock Center</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/nomenclature_summary">
+            <span class="mgdb-search-icon" data-cat="reference" aria-hidden="true"><svg focusable="false"><use href="#mzg-nomenclature"></use></svg></span>
+            <strong>Nomenclature summary</strong>
+            <span class="mgdb-index-desc">Standard rules for maize genes, alleles, and QTL naming</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/curation/GenomeIssue">
+            <span class="mgdb-search-icon" data-cat="reference" aria-hidden="true"><svg focusable="false"><use href="#mzg-curation"></use></svg></span>
+            <strong>Report a genome issue</strong>
+            <span class="mgdb-index-desc">Submit feedback or corrections on assembly scaffolds</span>
+          </a>
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/curation/geneModelIssues">
+            <span class="mgdb-search-icon" data-cat="reference" aria-hidden="true"><svg focusable="false"><use href="#mzg-curation"></use></svg></span>
+            <strong>Report a gene model issue</strong>
+            <span class="mgdb-index-desc">Submit corrections for structural or functional gene annotations</span>
+          </a>
+        </div>
+
+      </div>
     </section>
 
     <aside class="mgdb-home-rail" aria-label="News and shortcuts">
@@ -383,7 +447,7 @@ $$SYNTAX-LEVEL 2
           <img src="/images/home/assembly_puzzle.png" alt="" aria-hidden="true"
                width="160" height="160" loading="lazy" decoding="async" />
           <div>
-            <a class="mgdb-refassembly-current" href="$(server-url)/genome/assembly/Zm-B73-REFERENCE-NAM-5.0">B73 RefGen_v5</a>
+            <strong>B73 RefGen_v5</strong>
             <span>The current MaizeGDB reference</span>
           </div>
         </div>
@@ -394,38 +458,6 @@ $$SYNTAX-LEVEL 2
         </ul>
       </div>
 
-      <div class="mgdb-aside-card mgdb-home-tasks-card">
-        <div class="mgdb-tasks-heading">
-          <h2>Common Tasks</h2>
-        </div>
-        <div class="mgdb-tasks-list">
-          <a class="mgdb-task-item" href="$(server-url)/gene_center/gene">
-            <span class="mgdb-task-label">Find gene by symbol</span>
-            <span class="mgdb-task-arrow" aria-hidden="true">&rarr;</span>
-          </a>
-          <a class="mgdb-task-item" href="$(server-url)/gene_center/gene#translate">
-            <span class="mgdb-task-label">Translate gene models</span>
-            <span class="mgdb-task-arrow" aria-hidden="true">&rarr;</span>
-          </a>
-          <a class="mgdb-task-item" href="$(server-url)/data_center/stock">
-            <span class="mgdb-task-label">Order seed from COOP</span>
-            <span class="mgdb-task-arrow" aria-hidden="true">&rarr;</span>
-          </a>
-          <a class="mgdb-task-item" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0" target="_blank" rel="noopener">
-            <span class="mgdb-task-label">Reference downloads</span>
-            <span class="mgdb-task-arrow" aria-hidden="true">&nearr;</span>
-          </a>
-          <a class="mgdb-task-item" href="$(server-url)/nomenclature_summary">
-            <span class="mgdb-task-label">Nomenclature summary</span>
-            <span class="mgdb-task-arrow" aria-hidden="true">&rarr;</span>
-          </a>
-          <a class="mgdb-task-item" href="$(server-url)/curation/GenomeIssue">
-            <span class="mgdb-task-label">Report a genome issue</span>
-            <span class="mgdb-task-arrow" aria-hidden="true">&rarr;</span>
-          </a>
-        </div>
-      </div>
-
       <div class="mgdb-aside-card">
         <h2>MaizeGDB news</h2>
         <ul class="mgdb-home-news">
@@ -434,36 +466,18 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-home-news-more"><a href="$(server-url)/whatsnew">More news &middot; Archive</a></p>
       </div>
 
-      <!-- Sister USDA-ARS genome databases. Logos supplied by the group and
-           already present in the web root; each tile links to its database. -->
       <div class="mgdb-panel mgdb-home-crops-panel">
         <div class="mgdb-home-crops-header">
-          <h2 class="mgdb-home-rail-title">USDA-ARS databases</h2>
+          <h2 class="mgdb-home-rail-title">USDA crop databases</h2>
           <a class="mgdb-home-usda-link" href="https://www.usda.gov/" target="_blank" rel="noopener" title="United States Department of Agriculture">
-            <img src="/images/usda-v2-color-lockup.svg" alt="United States Department of Agriculture" height="30" />
+            <img src="/images/USDA.png" alt="United States Department of Agriculture" height="38" />
           </a>
         </div>
-        <p class="mgdb-home-crops-intro">MaizeGDB is one of several crop genome databases supported by the USDA Agricultural Research Service.</p>
-        <ul class="mgdb-home-crops-logos">
-          <li>
-            <a href="https://graingenes.org/" target="_blank" rel="noopener">
-              <img src="/images/graingenes.jpg" alt="" width="132" height="135" loading="lazy" decoding="async" />
-              <span><strong>GrainGenes <span class="mgdb-quicklink-ext" aria-hidden="true">&nearr;</span></strong><small>Wheat, barley, oat, rye</small></span>
-            </a>
-          </li>
-          <li>
-            <a href="https://sorghumbase.org/" target="_blank" rel="noopener">
-              <img src="/images/sorghumbase.jpg" alt="" width="132" height="135" loading="lazy" decoding="async" />
-              <span><strong>SorghumBase <span class="mgdb-quicklink-ext" aria-hidden="true">&nearr;</span></strong><small>Sorghum genomics</small></span>
-            </a>
-          </li>
-          <li>
-            <a href="https://soybase.org/" target="_blank" rel="noopener">
-              <img src="/images/soybase.jpg" alt="" width="132" height="135" loading="lazy" decoding="async" />
-              <span><strong>SoyBase <span class="mgdb-quicklink-ext" aria-hidden="true">&nearr;</span></strong><small>Soybean genetics</small></span>
-            </a>
-          </li>
-        </ul>
+        <div class="mgdb-home-crops-links">
+          <a class="mgdb-crop-chip" href="https://wheat.pw.usda.gov/GG3/" target="_blank" rel="noopener">GrainGenes <span aria-hidden="true">&#8599;</span></a>
+          <a class="mgdb-crop-chip" href="https://sorghumbase.org/" target="_blank" rel="noopener">SorghumBase <span aria-hidden="true">&#8599;</span></a>
+          <a class="mgdb-crop-chip" href="https://soybase.org/" target="_blank" rel="noopener">SoyBase <span aria-hidden="true">&#8599;</span></a>
+        </div>
       </div>
 
     </aside>
@@ -475,43 +489,38 @@ $$SYNTAX-LEVEL 2
        without it the document skips from h1 straight to h3. -->
   <h2 class="mgdb-visually-hidden">MaizeGDB at a glance</h2>
   <div class="mgdb-metric-grid mgdb-home-metrics">
-    <a class="mgdb-metric mgdb-metric-link mgdb-tone-green" href="$(server-url)/genome">
+    <article class="mgdb-metric mgdb-tone-green">
       <span class="mgdb-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="21" height="21" focusable="false"><use href="#mzg-genomes"></use></svg></span>
       <div>
         <strong class="mgdb-metric-value">$(metric_assemblies)</strong>
         <h3>Genome assemblies</h3>
-        <p>Hosted assemblies of <i>Zea mays</i> and relatives</p>
+        <p>Completed <i>Zea mays</i> assemblies hosted here</p>
       </div>
-    </a>
-    <a class="mgdb-metric mgdb-metric-link mgdb-tone-amber" href="$(server-url)/genome/assembly/Zm-B73-REFERENCE-NAM-5.0">
+    </article>
+    <article class="mgdb-metric mgdb-tone-amber">
       <span class="mgdb-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="21" height="21" focusable="false"><use href="#mzg-genes"></use></svg></span>
       <div>
         <strong class="mgdb-metric-value">$(metric_genes)</strong>
-        <h3>B73 v5 gene models</h3>
-        <p>The current reference annotation</p>
+        <h3>B73 gene models</h3>
+        <p>Zm00001eb annotation set</p>
       </div>
-    </a>
-    <a class="mgdb-metric mgdb-metric-link" href="$(server-url)/data_center/stock">
+    </article>
+    <article class="mgdb-metric">
       <span class="mgdb-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="21" height="21" focusable="false"><use href="#mzg-stocks-and-germplasm"></use></svg></span>
       <div>
         <strong class="mgdb-metric-value">$(metric_stocks)</strong>
         <h3>Seed stocks</h3>
-        <p>Available from the Maize Genetics Cooperation Stock Center</p>
+        <p>Orderable from the COOP</p>
       </div>
-    </a>
-    <a class="mgdb-metric mgdb-metric-link mgdb-tone-blue" href="$(server-url)/data_center/stock">
-      <span class="mgdb-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="21" height="21" focusable="false"><use href="#mzg-stocks-and-germplasm"></use></svg></span>
+    </article>
+    <article class="mgdb-metric mgdb-tone-burgundy">
+      <span class="mgdb-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="21" height="21" focusable="false"><use href="#mzg-references"></use></svg></span>
       <div>
-        <strong class="mgdb-metric-value">$(metric_grin)</strong>
-        <h3>NPGS accessions</h3>
-        <p>Maize accessions linked to the USDA National Plant Germplasm System</p>
+        <strong class="mgdb-metric-value">$(metric_references)</strong>
+        <h3>References</h3>
+        <p>Curated maize literature</p>
       </div>
-    </a>
+    </article>
   </div>
-
-  <p class="mgdb-home3-stamp mgdb-home-stamp-foot">
-    <span>Release <strong>$(release_date)</strong></span>
-    <span>Next update <strong>$(next_update)</strong></span>
-  </p>
 </main>
 )
