@@ -1,0 +1,650 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-european-flints
+<a class="mgdb-skip-link" href="#flints-main">Skip to main content</a>
+
+<main class="mgdb-page mgdb-european-flints-page" id="flints-main">
+
+  <!-- Breadcrumb Navigation -->
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span>
+    <a href="/genome">Genomes</a><span aria-hidden="true">&rsaquo;</span>
+    <span aria-current="page">European Flints Project</span>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="mgdb-hero" aria-labelledby="flints-title">
+    <div class="mgdb-hero-emblem" aria-hidden="true" style="background:#ffffff; border:1px solid #e2e8f0;">
+      <svg width="56" height="56" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Maize flint cob outline -->
+        <path d="M32 6C23 6 18 18 18 36C18 50 24 58 32 58C40 58 46 50 46 36C46 18 41 6 32 6Z" fill="#fef9c3" stroke="#854d0e" stroke-width="2.5"/>
+        <!-- Kernels grid flint colored -->
+        <circle cx="26" cy="20" r="3.2" fill="#ca8a04"/>
+        <circle cx="38" cy="20" r="3.2" fill="#eab308"/>
+        <circle cx="32" cy="27" r="3.2" fill="#b45309"/>
+        <circle cx="24" cy="34" r="3.2" fill="#d97706"/>
+        <circle cx="40" cy="34" r="3.2" fill="#ca8a04"/>
+        <circle cx="32" cy="41" r="3.2" fill="#eab308"/>
+        <circle cx="26" cy="48" r="3.2" fill="#b45309"/>
+        <circle cx="38" cy="48" r="3.2" fill="#d97706"/>
+        <!-- Husk leaves -->
+        <path d="M18 48C14 54 8 58 4 60C12 58 18 52 20 46" stroke="#15803d" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M46 48C50 54 56 58 60 60C52 58 46 52 44 46" stroke="#15803d" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <strong>European<br />Flints</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data_date)</p>
+      <h1 id="flints-title">European Flint Reference Genomes &amp; Heterosis Framework</h1>
+      <p class="mgdb-hero-description">
+        De novo chromosome-scale genome assemblies, annotations, and structural variation maps for four cornerstone European flint inbred lines \(DK105, EP1, F7, PE0075\) to uncover cold-tolerance adaptations and dent &times; flint heterosis.
+      </p>
+
+      <div class="flints-hero-actions-row">
+        <a class="flints-hero-link" href="/genomebrowser">
+          <span class="flints-link-dot flints-dot-green" aria-hidden="true"></span> Explore in JBrowse 2 &#8599;
+        </a>
+        <a class="flints-hero-link" href="http://www.europeanmaize.net/" target="_blank" rel="noopener">
+          <span class="flints-link-dot flints-dot-gold" aria-hidden="true"></span> European Maize Portal &#8599;
+        </a>
+        <a class="flints-hero-link" href="/download#downloads-flints">
+          <span class="flints-link-dot flints-dot-blue" aria-hidden="true"></span> Bulk Downloads &#8595;
+        </a>
+        <a class="flints-hero-link" href="https://doi.org/10.1038/s41588-020-0671-9" target="_blank" rel="noopener">
+          <span class="flints-link-dot flints-dot-rose" aria-hidden="true"></span> Nature Genetics Paper &#8599;
+        </a>
+        <a class="flints-hero-link" href="/gene_center/gene">
+          <span class="flints-link-dot flints-dot-purple" aria-hidden="true"></span> Gene Center &#8599;
+        </a>
+        <a class="flints-hero-link" href="$(blast_url)">
+          <span class="flints-link-dot flints-dot-dark" aria-hidden="true"></span> BLAST Search &#8599;
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STICKY SECTION NAVIGATION TABS -->
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#flints-assemblies" class="is-current">Assemblies &amp; Line Directory</a>
+    <a href="#flints-heterosis">Flint vs. Dent Heterosis &amp; Diversity</a>
+    <a href="#flints-publications">Key Publications &amp; Preprints</a>
+    <a href="#flints-data-hosted">Data Hosted at MaizeGDB</a>
+    <a href="#flints-metrics">Scale &amp; Genomic Metrics</a>
+    <a href="#flints-faqs">FAQs &amp; Guidelines</a>
+    <a href="#flints-related">Connected Resources</a>
+  </nav>
+
+  <!-- SECTION 1: INTERACTIVE ASSEMBLIES DIRECTORY TABLE -->
+  <section id="flints-assemblies" class="mgdb-panel" aria-labelledby="flints-assemblies-title">
+    <div class="flints-panel-header-wrap">
+      <div>
+        <h2 id="flints-assemblies-title" class="mgdb-panel-title">European Flint Assemblies &amp; Line Directory</h2>
+        <p class="mgdb-panel-lead">Explore, filter, and download chromosome-scale reference assemblies for the four foundational European flint lines.</p>
+      </div>
+    </div>
+
+    <!-- FILTER & SEARCH TOOLBAR -->
+    <div class="flints-table-toolbar">
+      <div class="flints-filter-chips-wrap" role="group" aria-label="Filter by geographic origin">
+        <span class="flints-toolbar-label">Origin&#58;</span>
+        <button type="button" class="flints-chip is-active" data-filter="all">All \(4\)</button>
+        <button type="button" class="flints-chip flints-chip-germany" data-filter="germany">Germany \(2\)</button>
+        <button type="button" class="flints-chip flints-chip-spain" data-filter="spain">Spain \(1\)</button>
+        <button type="button" class="flints-chip flints-chip-france" data-filter="france">France \(1\)</button>
+      </div>
+
+      <div class="flints-search-wrap">
+        <label for="flints-search-input" class="mgdb-visually-hidden">Search European Flint assemblies</label>
+        <input type="text" id="flints-search-input" class="mgdb-input flints-search-input" placeholder="Search assembly ID, inbred line, landrace origin, or GenBank accession..." autocomplete="off" spellcheck="false" />
+      </div>
+    </div>
+
+    <div class="flints-table-status-bar">
+      <span id="flints-row-count">Showing 4 of 4 assemblies</span>
+      <span class="flints-table-hint">Click column headers to sort &bull; Launch JBrowse 2 or download files directly</span>
+    </div>
+
+    <!-- MAIN INTERACTIVE TABLE -->
+    <div class="mgdb-table-scroll flints-table-scroll">
+      <table class="mgdb-table flints-table" id="flints-data-table">
+        <thead>
+          <tr>
+            <th scope="col" class="is-sortable" data-sort="assembly" aria-sort="ascending">
+              <button type="button">Assembly ID &amp; JBrowse <span class="sort-icon" aria-hidden="true">&uarr;</span></button>
+            </th>
+            <th scope="col" class="is-sortable" data-sort="line">
+              <button type="button">Inbred Line &amp; Ancestral Landrace <span class="sort-icon" aria-hidden="true">&updownarrow;</span></button>
+            </th>
+            <th scope="col" class="is-sortable" data-sort="origin">
+              <button type="button">Geographic Origin <span class="sort-icon" aria-hidden="true">&updownarrow;</span></button>
+            </th>
+            <th scope="col" class="is-sortable" data-sort="genbank">
+              <button type="button">GenBank Accession <span class="sort-icon" aria-hidden="true">&updownarrow;</span></button>
+            </th>
+            <th scope="col" class="is-sortable" data-sort="annotation">
+              <button type="button">Gene Models &amp; Annotation <span class="sort-icon" aria-hidden="true">&updownarrow;</span></button>
+            </th>
+            <th scope="col" class="text-right">Bulk Download</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- DK105 -->
+          <tr data-clade="germany" data-search="dk105 gelber badischer landmais germany central europe gca_003709335.1 tum-1.0">
+            <td>
+              <div class="flints-primary-cell">
+                <a href="/genome/assembly/Zm-DK105-REFERENCE-TUM-1.0" class="flints-assembly-link">
+                  <strong>Zm-DK105-REFERENCE-TUM-1.0</strong>
+                </a>
+                <div class="flints-sub-actions">
+                  <a href="/genomebrowser?assembly=Zm-DK105-REFERENCE-TUM-1.0" class="flints-jb2-btn" title="View DK105 in JBrowse 2">
+                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
+                  </a>
+                  <a href="/genome/assembly/Zm-DK105-REFERENCE-TUM-1.0" class="flints-rec-btn">Assembly Page &rarr;</a>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="flints-taxon-cell">
+                <strong class="flints-line-name">DK105</strong>
+                <span class="flints-landrace-name">Gelber Badischer Landmais</span>
+                <span class="flints-detail-note">Northern/Central European open-pollinated flint landrace</span>
+              </div>
+            </td>
+            <td>
+              <div class="flints-origin-cell">
+                <span class="flints-badge flints-badge-germany">Germany</span>
+                <span class="flints-region-text">Baden-Württemberg, Southern Germany</span>
+              </div>
+            </td>
+            <td>
+              <a href="https://www.ncbi.nlm.nih.gov/assembly/GCA_003709335.1" class="flints-xref-link" target="_blank" rel="noopener">
+                <code>GCA_003709335.1</code> &#8599;
+              </a>
+            </td>
+            <td>
+              <div class="flints-anno-cell">
+                <span class="flints-anno-tag">TUM-1.0 High-Confidence</span>
+                <a href="/gene_center/gene" class="flints-gene-link">Explore Gene Models &rarr;</a>
+              </div>
+            </td>
+            <td class="text-right">
+              <div class="flints-download-btns">
+                <a href="https://download.maizegdb.org/Zm-DK105-REFERENCE-TUM-1.0/" class="flints-dl-btn flints-dl-mgdb" title="Download from MaizeGDB">
+                  MaizeGDB &#8595;
+                </a>
+                <a href="https://ftp.ncbi.nlm.nih.gov/genomes/genbank/plant/Zea_mays/all_assembly_versions/GCA_003709335.1_Zm-DK105-REFERENCE-TUM-1.0" class="flints-dl-btn flints-dl-ncbi" target="_blank" rel="noopener" title="Download from NCBI GenBank">
+                  GenBank &#8599;
+                </a>
+              </div>
+            </td>
+          </tr>
+
+          <!-- EP1 -->
+          <tr data-clade="spain" data-search="ep1 lizargarate spain southern europe pyrenees gca_001984235.2 tum-1.0">
+            <td>
+              <div class="flints-primary-cell">
+                <a href="/genome/assembly/Zm-EP1-REFERENCE-TUM-1.0" class="flints-assembly-link">
+                  <strong>Zm-EP1-REFERENCE-TUM-1.0</strong>
+                </a>
+                <div class="flints-sub-actions">
+                  <a href="/genomebrowser?assembly=Zm-EP1-REFERENCE-TUM-1.0" class="flints-jb2-btn" title="View EP1 in JBrowse 2">
+                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
+                  </a>
+                  <a href="/genome/assembly/Zm-EP1-REFERENCE-TUM-1.0" class="flints-rec-btn">Assembly Page &rarr;</a>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="flints-taxon-cell">
+                <strong class="flints-line-name">EP1</strong>
+                <span class="flints-landrace-name">Lizargarate</span>
+                <span class="flints-detail-note">Spanish Pyrenean flint landrace selection</span>
+              </div>
+            </td>
+            <td>
+              <div class="flints-origin-cell">
+                <span class="flints-badge flints-badge-spain">Spain</span>
+                <span class="flints-region-text">Northern Spain \(Pyrenees\)</span>
+              </div>
+            </td>
+            <td>
+              <a href="https://www.ncbi.nlm.nih.gov/assembly/GCA_001984235.2" class="flints-xref-link" target="_blank" rel="noopener">
+                <code>GCA_001984235.2</code> &#8599;
+              </a>
+            </td>
+            <td>
+              <div class="flints-anno-cell">
+                <span class="flints-anno-tag">TUM-1.0 High-Confidence</span>
+                <a href="/gene_center/gene" class="flints-gene-link">Explore Gene Models &rarr;</a>
+              </div>
+            </td>
+            <td class="text-right">
+              <div class="flints-download-btns">
+                <a href="https://download.maizegdb.org/Zm-EP1-REFERENCE-TUM-1.0/" class="flints-dl-btn flints-dl-mgdb" title="Download from MaizeGDB">
+                  MaizeGDB &#8595;
+                </a>
+                <a href="https://ftp.ncbi.nlm.nih.gov/genomes/genbank/plant/Zea_mays/all_assembly_versions/GCA_001984235.2_Zm-EP1-REFERENCE-TUM-1.0" class="flints-dl-btn flints-dl-ncbi" target="_blank" rel="noopener" title="Download from NCBI GenBank">
+                  GenBank &#8599;
+                </a>
+              </div>
+            </td>
+          </tr>
+
+          <!-- F7 -->
+          <tr data-clade="france" data-search="f7 lacaune france western europe massif central gca_001990705.1 tum-1.0 inra">
+            <td>
+              <div class="flints-primary-cell">
+                <a href="/genome/assembly/Zm-F7-REFERENCE-TUM-1.0" class="flints-assembly-link">
+                  <strong>Zm-F7-REFERENCE-TUM-1.0</strong>
+                </a>
+                <div class="flints-sub-actions">
+                  <a href="/genomebrowser?assembly=Zm-F7-REFERENCE-TUM-1.0" class="flints-jb2-btn" title="View F7 in JBrowse 2">
+                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
+                  </a>
+                  <a href="/genome/assembly/Zm-F7-REFERENCE-TUM-1.0" class="flints-rec-btn">Assembly Page &rarr;</a>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="flints-taxon-cell">
+                <strong class="flints-line-name">F7</strong>
+                <span class="flints-landrace-name">Lacaune</span>
+                <span class="flints-detail-note">French Massif Central inbred line \(INRA\)</span>
+              </div>
+            </td>
+            <td>
+              <div class="flints-origin-cell">
+                <span class="flints-badge flints-badge-france">France</span>
+                <span class="flints-region-text">Southern France \(Massif Central\)</span>
+              </div>
+            </td>
+            <td>
+              <a href="https://www.ncbi.nlm.nih.gov/assembly/GCA_001990705.1" class="flints-xref-link" target="_blank" rel="noopener">
+                <code>GCA_001990705.1</code> &#8599;
+              </a>
+            </td>
+            <td>
+              <div class="flints-anno-cell">
+                <span class="flints-anno-tag">TUM-1.0 High-Confidence</span>
+                <a href="/gene_center/gene" class="flints-gene-link">Explore Gene Models &rarr;</a>
+              </div>
+            </td>
+            <td class="text-right">
+              <div class="flints-download-btns">
+                <a href="https://download.maizegdb.org/Zm-F7-REFERENCE-TUM-1.0/" class="flints-dl-btn flints-dl-mgdb" title="Download from MaizeGDB">
+                  MaizeGDB &#8595;
+                </a>
+                <a href="https://ftp.ncbi.nlm.nih.gov/genomes/genbank/plant/Zea_mays/all_assembly_versions/GCA_001990705.1_Zm-F7-REFERENCE-TUM-1.0" class="flints-dl-btn flints-dl-ncbi" target="_blank" rel="noopener" title="Download from NCBI GenBank">
+                  GenBank &#8599;
+                </a>
+              </div>
+            </td>
+          </tr>
+
+          <!-- PE0075 -->
+          <tr data-clade="germany" data-search="pe0075 petkuser ferdinand rot germany northern europe doubled haploid gca_003704525.1 tum-1.0">
+            <td>
+              <div class="flints-primary-cell">
+                <a href="/genome/assembly/Zm-PE0075-REFERENCE-TUM-1.0" class="flints-assembly-link">
+                  <strong>Zm-PE0075-REFERENCE-TUM-1.0</strong>
+                </a>
+                <div class="flints-sub-actions">
+                  <a href="/genomebrowser?assembly=Zm-PE0075-REFERENCE-TUM-1.0" class="flints-jb2-btn" title="View PE0075 in JBrowse 2">
+                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
+                  </a>
+                  <a href="/genome/assembly/Zm-PE0075-REFERENCE-TUM-1.0" class="flints-rec-btn">Assembly Page &rarr;</a>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="flints-taxon-cell">
+                <strong class="flints-line-name">PE0075</strong>
+                <span class="flints-landrace-name">Petkuser Ferdinand Rot</span>
+                <span class="flints-detail-note">Doubled-haploid line from Northern German landrace</span>
+              </div>
+            </td>
+            <td>
+              <div class="flints-origin-cell">
+                <span class="flints-badge flints-badge-germany">Germany</span>
+                <span class="flints-region-text">Northern Germany</span>
+              </div>
+            </td>
+            <td>
+              <a href="https://www.ncbi.nlm.nih.gov/assembly/GCA_003704525.1" class="flints-xref-link" target="_blank" rel="noopener">
+                <code>GCA_003704525.1</code> &#8599;
+              </a>
+            </td>
+            <td>
+              <div class="flints-anno-cell">
+                <span class="flints-anno-tag">TUM-1.0 High-Confidence</span>
+                <a href="/gene_center/gene" class="flints-gene-link">Explore Gene Models &rarr;</a>
+              </div>
+            </td>
+            <td class="text-right">
+              <div class="flints-download-btns">
+                <a href="https://download.maizegdb.org/Zm-PE0075-REFERENCE-TUM-1.0/" class="flints-dl-btn flints-dl-mgdb" title="Download from MaizeGDB">
+                  MaizeGDB &#8595;
+                </a>
+                <a href="https://ftp.ncbi.nlm.nih.gov/genomes/genbank/plant/Zea_mays/all_assembly_versions/GCA_003704525.1_Zm-PE0075-REFERENCE-TUM-1.0" class="flints-dl-btn flints-dl-ncbi" target="_blank" rel="noopener" title="Download from NCBI GenBank">
+                  GenBank &#8599;
+                </a>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 2: FLINT VS DENT HETEROSIS & DIVERSITY -->
+  <section id="flints-heterosis" class="mgdb-panel" aria-labelledby="flints-heterosis-title">
+    <div class="flints-panel-header-wrap">
+      <div>
+        <h2 id="flints-heterosis-title" class="mgdb-panel-title">Flint vs. Dent Heterosis &amp; Cold Climate Adaptation</h2>
+        <p class="mgdb-panel-lead">How European flint genomes diverged from American Dent lines to provide cold tolerance and complementary hybrid vigor.</p>
+      </div>
+    </div>
+
+    <div class="flints-heterosis-grid">
+      <div class="flints-heterosis-card">
+        <div class="flints-heterosis-icon" style="background:#e0f2fe; color:#0369a1;">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+            <path d="M2 12h20"></path>
+          </svg>
+        </div>
+        <h3>Post-Columbian Introduction &amp; Lineage Divergence</h3>
+        <p>
+          Following multiple introduction waves from the Caribbean and North America in the 16th century, European maize established a distinct flint germplasm pool. Through centuries of regional selection in Central and Northern Europe, flint landraces adapted to shorter growing seasons and cooler climates, accumulating extensive chromosomal and retrotransposon differences from American Dent germplasm.
+        </p>
+      </div>
+
+      <div class="flints-heterosis-card">
+        <div class="flints-heterosis-icon" style="background:#fef3c7; color:#b45309;">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v20"></path>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+        </div>
+        <h3>Genomic Basis of Dent &times; Flint Heterosis</h3>
+        <p>
+          Hybrid maize breeding in Europe fundamentally exploits the strong heterotic pool complementation between European Flint and US Dent \(such as B73 and Mo17\). Comparative genomics reveals that gene copy number variations, presence/absence variations \(PAVs\), and non-overlapping retrotransposon insertions between flint and dent genomes drive hybrid vigor in F1 progeny.
+        </p>
+      </div>
+
+      <div class="flints-heterosis-card">
+        <div class="flints-heterosis-icon" style="background:#dcfce7; color:#15803d;">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+          </svg>
+        </div>
+        <h3>Cold Tolerance &amp; Early Growth Vigor</h3>
+        <p>
+          Flint inbreds exhibit superior germination, seedling emergence, and photosynthetic capacity under low spring temperatures \(10–14&deg;C\). Assemblies of DK105, EP1, F7, and PE0075 uncover duplications in gene networks governing cold-stress signaling, chloroplast stability, anthocyanin biosynthesis, and rapid cell division during juvenile growth.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: KEY PUBLICATIONS & PREPRINTS -->
+  <section id="flints-publications" class="mgdb-panel" aria-labelledby="flints-pubs-title">
+    <div class="flints-panel-header-wrap">
+      <div>
+        <h2 id="flints-pubs-title" class="mgdb-panel-title">Key Publications &amp; Project Literature</h2>
+        <p class="mgdb-panel-lead">Foundational peer-reviewed studies and preprints detailing the sequencing, annotation, and structural variations of European flint lines.</p>
+      </div>
+    </div>
+
+    <div class="flints-pubs-grid">
+      <!-- Haberer et al. 2020 -->
+      <article class="flints-pub-card">
+        <div class="flints-pub-badge-row">
+          <span class="flints-pub-badge flints-badge-peer">Peer-Reviewed Article</span>
+          <span class="flints-pub-journal">Nature Genetics &bull; September 2020</span>
+        </div>
+        <h3 class="flints-pub-title">
+          <a href="https://doi.org/10.1038/s41588-020-0671-9" target="_blank" rel="noopener">
+            European maize genomes highlight intraspecies variation in repeat and gene content
+          </a>
+        </h3>
+        <p class="flints-pub-authors">
+          Haberer, G., Kamal, N., Bauer, E., Gundlach, H., Fischer, I., Seidel, M. A., Spannagl, M., Marcon, C., Ruban, A., Urbany, C., Nemri, A., Hochmuth, A., Schoof, H., Mayer, K. F. X., &amp; Sch&ouml;n, C.-C.
+        </p>
+        <div class="flints-pub-meta-row">
+          <span><strong>Citation&#58;</strong> <em>Nature Genetics</em> 52, 950–957 \(2020\)</span>
+          <span><strong>DOI&#58;</strong> <a href="https://doi.org/10.1038/s41588-020-0671-9" target="_blank" rel="noopener">10.1038/s41588-020-0671-9</a></span>
+        </div>
+
+        <details class="flints-abstract-drawer">
+          <summary class="flints-abstract-toggle">
+            <span class="flints-toggle-text">Show Abstract</span>
+            <span class="flints-toggle-icon" aria-hidden="true">&darr;</span>
+          </summary>
+          <div class="flints-abstract-content">
+            <p>
+              Maize \(<em>Zea mays</em> L.\) is a model plant for genetic studies and a major crop worldwide. Modern hybrid breeding exploits the complementarity between distinct germplasm pools, such as European flint and American dent. Here we report high-quality de novo sequence assemblies of four Central European flint inbred lines \(DK105, EP1, F7, and PE0075\) that capture founders of European hybrid maize. Comparative analyses with US dent reference genomes reveal high intraspecific diversity, with striking variation in transposable element dynamics, a 1.6-fold difference in long terminal repeat retrotransposon turnover rates, and pervasive copy number variation in defense, cold tolerance, and developmental gene families. These assemblies complement the maize pan-genome and provide a mechanistic framework for understanding dent &times; flint heterosis in temperate agriculture.
+            </p>
+          </div>
+        </details>
+
+        <div class="flints-pub-actions">
+          <a href="https://doi.org/10.1038/s41588-020-0671-9" class="mgdb-btn mgdb-btn-primary flints-btn-sm" target="_blank" rel="noopener">Read Paper at Nature Genetics &#8599;</a>
+          <a href="/data_center/reference?author=Haberer" class="mgdb-btn mgdb-btn-secondary flints-btn-sm">MaizeGDB Reference Record &rarr;</a>
+        </div>
+      </article>
+
+      <!-- Unterseer et al. 2017 -->
+      <article class="flints-pub-card">
+        <div class="flints-pub-badge-row">
+          <span class="flints-pub-badge flints-badge-preprint">Preprint</span>
+          <span class="flints-pub-journal">bioRxiv &bull; January 2017</span>
+        </div>
+        <h3 class="flints-pub-title">
+          <a href="https://doi.org/10.1101/103747" target="_blank" rel="noopener">
+            European Flint reference sequences complement the maize pan-genome
+          </a>
+        </h3>
+        <p class="flints-pub-authors">
+          Unterseer, S., Pophaly, S. D., Peis, R., Frascaroli, E., Schippery, W., Mayer, K. F. X., Bauer, E., &amp; Sch&ouml;n, C.-C.
+        </p>
+        <div class="flints-pub-meta-row">
+          <span><strong>Repository&#58;</strong> <em>bioRxiv</em> 103747 \(2017\)</span>
+          <span><strong>DOI&#58;</strong> <a href="https://doi.org/10.1101/103747" target="_blank" rel="noopener">10.1101/103747</a></span>
+        </div>
+
+        <details class="flints-abstract-drawer">
+          <summary class="flints-abstract-toggle">
+            <span class="flints-toggle-text">Show Abstract</span>
+            <span class="flints-toggle-icon" aria-hidden="true">&darr;</span>
+          </summary>
+          <div class="flints-abstract-content">
+            <p>
+              Maize was introduced to Europe in the sixteenth century and adapted to climatic conditions distinct from its Central American origin. To expand the genomic resources of the maize pan-genome beyond American dent lines, we assembled BAC-based and whole-genome shotgun sequences of European flint inbreds. These data demonstrate that flint reference genomes uncover novel genes and non-shared structural variants absent in B73, facilitating high-resolution QTL mapping and genomic prediction in European hybrid breeding pipelines.
+            </p>
+          </div>
+        </details>
+
+        <div class="flints-pub-actions">
+          <a href="https://doi.org/10.1101/103747" class="mgdb-btn mgdb-btn-primary flints-btn-sm" target="_blank" rel="noopener">Read bioRxiv Preprint &#8599;</a>
+          <a href="/data_center/reference?author=Unterseer" class="mgdb-btn mgdb-btn-secondary flints-btn-sm">MaizeGDB Reference Record &rarr;</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 4: DATA HOSTED AT MAIZEGDB -->
+  <section id="flints-data-hosted" class="mgdb-panel" aria-labelledby="flints-hosted-title">
+    <div class="flints-panel-header-wrap">
+      <div>
+        <h2 id="flints-hosted-title" class="mgdb-panel-title">European Flint Data Hosted at MaizeGDB</h2>
+        <p class="mgdb-panel-lead">Integrated tools, browsers, BLAST databases, and sequence downloads available across the MaizeGDB ecosystem.</p>
+      </div>
+    </div>
+
+    <div class="flints-hosted-grid">
+      <div class="flints-hosted-card">
+        <div class="flints-hosted-icon" style="background:#e8f5e9; color:#1b5e20;">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+        </div>
+        <h3>Genome Browsers \(JBrowse 2\)</h3>
+        <p>Interactive JBrowse 2 tracks for DK105, EP1, F7, and PE0075 featuring gene models, RepeatMasker TE tracks, RNA-seq alignments, and synteny views.</p>
+        <a href="/genomebrowser" class="flints-card-link">Launch Genome Browser &rarr;</a>
+      </div>
+
+      <div class="flints-hosted-card">
+        <div class="flints-hosted-icon" style="background:#fef3c7; color:#b45309;">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+        </div>
+        <h3>Gene Center &amp; Models</h3>
+        <p>Over 40,000 high-confidence gene models per assembly indexed in the Gene Center with functional annotations, GO terms, and cross-references.</p>
+        <a href="/gene_center/gene" class="flints-card-link">Explore Gene Center &rarr;</a>
+      </div>
+
+      <div class="flints-hosted-card">
+        <div class="flints-hosted-icon" style="background:#e0f2fe; color:#0369a1;">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </div>
+        <h3>BLAST Sequence Search</h3>
+        <p>Run nucleotide, CDS, transcript, and translated protein BLAST searches against European flint genome assemblies and gene models.</p>
+        <a href="$(blast_url)" class="flints-card-link">Open BLAST Tool &rarr;</a>
+      </div>
+
+      <div class="flints-hosted-card">
+        <div class="flints-hosted-icon" style="background:#fce7f3; color:#be185d;">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+        </div>
+        <h3>Bulk &amp; Globus Downloads</h3>
+        <p>Download complete assembly FASTA files, GFF3 gene annotations, peptide sequences, and RepeatMasker tracks via HTTP or Globus endpoint.</p>
+        <a href="/download#downloads-flints" class="flints-card-link">View Download Files &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: SCALE & GENOMIC METRICS DASHBOARD -->
+  <section id="flints-metrics" class="mgdb-panel" aria-labelledby="flints-metrics-title">
+    <div class="flints-panel-header-wrap">
+      <div>
+        <h2 id="flints-metrics-title" class="mgdb-panel-title">European Flint Dataset Scale &amp; Metrics</h2>
+        <p class="mgdb-panel-lead">Summary metrics across the European flint de novo assemblies, genome coverage, and annotations.</p>
+      </div>
+    </div>
+
+    <div class="mgdb-metric-grid mgdb-metric-grid-4">
+      <div class="mgdb-metric-card mgdb-metric-card-green">
+        <div class="mgdb-metric-number">4</div>
+        <div class="mgdb-metric-title">De Novo Reference Assemblies</div>
+        <div class="mgdb-metric-desc">DK105, EP1, F7, and PE0075 representing major Central European flint founder lineages.</div>
+      </div>
+      <div class="mgdb-metric-card mgdb-metric-card-gold">
+        <div class="mgdb-metric-number">~2.3 Gb</div>
+        <div class="mgdb-metric-title">Genome Assembly Size</div>
+        <div class="mgdb-metric-desc">High-continuity chromosome-scale scaffolds capturing ~95% of estimated flint genome content.</div>
+      </div>
+      <div class="mgdb-metric-card mgdb-metric-card-blue">
+        <div class="mgdb-metric-number">1.6&times;</div>
+        <div class="mgdb-metric-title">Retrotransposon Dynamics</div>
+        <div class="mgdb-metric-desc">1.6-fold faster LTR retrotransposon turnover rate compared to US dent lines \(B73\).</div>
+      </div>
+      <div class="mgdb-metric-card mgdb-metric-card-orange">
+        <div class="mgdb-metric-number">40,000+</div>
+        <div class="mgdb-metric-title">Gene Models per Assembly</div>
+        <div class="mgdb-metric-desc">High-confidence TUM-1.0 structural and functional gene annotations per inbred line.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6: FAQS & GUIDELINES -->
+  <section id="flints-faqs" class="mgdb-panel" aria-labelledby="flints-faqs-title">
+    <div class="flints-panel-header-wrap">
+      <div>
+        <h2 id="flints-faqs-title" class="mgdb-panel-title">Frequently Asked Questions &amp; Guidelines</h2>
+        <p class="mgdb-panel-lead">Information regarding gene nomenclature, coordinate liftovers, and data access.</p>
+      </div>
+    </div>
+
+    <div class="flints-faq-list">
+      <details class="flints-faq-item">
+        <summary><h3>How do European flint gene models compare to the B73 RefGen_v5 reference?</h3></summary>
+        <div class="flints-faq-body">
+          <p>
+            The European flint assemblies were annotated with the TUM-1.0 pipeline using comprehensive RNA-seq evidence and cross-species homology. While the core gene set shares ~85% 1:1 syntenic orthology with B73 RefGen_v5, each flint line carries 2,000–3,500 non-syntenic or duplicated genes, particularly enriched in abiotic stress response and cell wall biosynthesis pathways.
+          </p>
+        </div>
+      </details>
+
+      <details class="flints-faq-item">
+        <summary><h3>Where can I download the complete FASTA and GFF3 annotation files?</h3></summary>
+        <div class="flints-faq-body">
+          <p>
+            Complete genome sequences, soft-masked FASTA files, GFF3 gene annotations, CDS sequences, and protein translations are available on the <a href="/download#downloads-flints">MaizeGDB Downloads Page</a>, via direct HTTPS links in the table above, or through the NCBI GenBank repository.
+          </p>
+        </div>
+      </details>
+
+      <details class="flints-faq-item">
+        <summary><h3>How should I cite the European flint genome assemblies in publications?</h3></summary>
+        <div class="flints-faq-body">
+          <p>
+            Please cite the landmark paper&#58; <strong>Haberer et al. \(2020\)</strong>, <em>European maize genomes highlight intraspecies variation in repeat and gene content</em>, Nature Genetics 52, 950–957 \(<a href="https://doi.org/10.1038/s41588-020-0671-9" target="_blank" rel="noopener">doi&#58;10.1038/s41588-020-0671-9</a>\), along with the specific assembly accession numbers and MaizeGDB database citation.
+          </p>
+        </div>
+      </details>
+
+      <details class="flints-faq-item">
+        <summary><h3>Can I run BLAST against individual European flint assemblies?</h3></summary>
+        <div class="flints-faq-body">
+          <p>
+            Yes! MaizeGDB hosts dedicated BLAST databases for all four flint lines. Navigate to the <a href="$(blast_url)">BLAST Tool</a> and select the desired European flint assembly or predicted peptide database from the target sequence dropdown menu.
+          </p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- SECTION 7: CONNECTED RESOURCES -->
+  <section id="flints-related" class="mgdb-panel mgdb-panel-soft-green" aria-labelledby="flints-related-title">
+    <div class="flints-panel-header-wrap">
+      <div>
+        <h2 id="flints-related-title" class="mgdb-panel-title">Connected MaizeGDB Genomics Projects</h2>
+        <p class="mgdb-panel-lead">Explore related pangenomic, germplasm diversity, and association mapping resources.</p>
+      </div>
+    </div>
+
+    <div class="flints-related-grid">
+      <a class="flints-related-card" href="/NAM_project">
+        <span class="flints-related-badge">Pangenome</span>
+        <h3>NAM Parent Genomes &rarr;</h3>
+        <p>26 de novo chromosome-scale assemblies of the US Nested Association Mapping founder lines.</p>
+      </a>
+      <a class="flints-related-card" href="/PanAnd_project">
+        <span class="flints-related-badge">Comparative</span>
+        <h3>Pan-Andropogoneae Genomes &rarr;</h3>
+        <p>36+ reference assemblies across wild panicoid grasses, teosintes, and sorghum outgroups.</p>
+      </a>
+      <a class="flints-related-card" href="/genome">
+        <span class="flints-related-badge">All Genomes</span>
+        <h3>Genome Assembly Center &rarr;</h3>
+        <p>Browse all reference, founder, diversity, and pan-genomic maize assemblies hosted at MaizeGDB.</p>
+      </a>
+      <a class="flints-related-card" href="/gene_center/gene">
+        <span class="flints-related-badge">Annotation</span>
+        <h3>Gene Center &rarr;</h3>
+        <p>Explore gene models, functional descriptions, GO annotations, and protein structures.</p>
+      </a>
+    </div>
+  </section>
+
+</main>
+)

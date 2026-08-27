@@ -42,6 +42,13 @@ src/templates/static/mgdb_panand_project.bau    templates/static/mgdb_panand_pro
 src/css/mgdb-panand-project.css                 css/mgdb-panand-project.css
 src/js/mgdb-panand-project.js                   js/mgdb-panand-project.js
 
+# European Flint Reference Genomes Project (/european_flints)
+src/controllers/european_flints.php             controllers/european_flints.php
+src/controllers/genome/european_flints.php      controllers/genome/european_flints.php
+src/templates/static/mgdb_european_flints.bau   templates/static/mgdb_european_flints.bau
+src/css/mgdb-european-flints.css                css/mgdb-european-flints.css
+src/js/mgdb-european-flints.js                  js/mgdb-european-flints.js
+
 # Modern mega menu
 src/css/mgdb-megamenu.css                              css/mgdb-megamenu.css
 src/templates/home/maizegdb_header_modern.bau          templates/home/maizegdb_header_modern.bau
@@ -49,6 +56,11 @@ src/templates/home/megamenu_modern/about.bau           templates/home/megamenu_m
 src/templates/home/megamenu_modern/blast.bau           templates/home/megamenu_modern/blast.bau
 src/templates/home/megamenu_modern/community.bau       templates/home/megamenu_modern/community.bau
 src/templates/home/megamenu_modern/data-centers.bau    templates/home/megamenu_modern/data-centers.bau
+
+# The pre-redesign megamenu, still served on every page that has not been
+# modernized. Pulled into the repo on 2026-08-25 for the Data Hub rename;
+# it was server-only and nothing was backing it up.
+src/templates/home/megamenu/data-centers.bau     templates/home/megamenu/data-centers.bau
 src/templates/home/megamenu_modern/feedback.bau        templates/home/megamenu_modern/feedback.bau
 src/templates/home/megamenu_modern/gb.bau              templates/home/megamenu_modern/gb.bau
 src/templates/home/megamenu_modern/genomes.bau         templates/home/megamenu_modern/genomes.bau
@@ -102,6 +114,8 @@ src/css/mgdb-reference.css                        css/mgdb-reference.css
 src/js/mgdb-reference.js                          js/mgdb-reference.js
 src/controllers/data_center/reference_search_modern.php  controllers/data_center/reference_search_modern.php
 src/controllers/data_center.php                   controllers/data_center.php
+src/controllers/static/archive.php               controllers/static/archive.php
+src/templates/static/mgdb_archive.bau            templates/static/mgdb_archive.bau
 
 # Maize Genetics Meeting — replaces /maize_meeting/ in place
 src/templates/static/mgdb_maize_meeting.bau      templates/static/mgdb_maize_meeting.bau
@@ -455,6 +469,10 @@ src/js/mgdb-searchall.js                         js/mgdb-searchall.js
 # new controller includes it for any ?page= other than 'home', and it is the
 # rollback. Pre-redesign original also archived in legacy/home/.
 src/index.php                                            index.php
+
+# Fills the shell's language slots, including dc_name -- the top-level menu
+# label. Server-only until 2026-08-25; nothing was backing it up.
+src/translation.php                              translation.php
 src/index_legacy.php                                     index_legacy.php
 src/templates/static/mgdb_home.bau                       templates/static/mgdb_home.bau
 src/css/mgdb-home.css                                    css/mgdb-home.css
