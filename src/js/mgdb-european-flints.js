@@ -127,25 +127,6 @@
       });
     });
 
-    // Abstract toggle text
-    document.querySelectorAll('.flints-abstract-drawer').forEach(function (drawer) {
-      var summary = drawer.querySelector('summary');
-      var toggleText = drawer.querySelector('.flints-toggle-text');
-      var toggleIcon = drawer.querySelector('.flints-toggle-icon');
-
-      if (summary && toggleText && toggleIcon) {
-        drawer.addEventListener('toggle', function () {
-          if (drawer.open) {
-            toggleText.textContent = 'Hide Abstract';
-            toggleIcon.innerHTML = '&uarr;';
-          } else {
-            toggleText.textContent = 'Show Abstract';
-            toggleIcon.innerHTML = '&darr;';
-          }
-        });
-      }
-    });
-
     updateTable();
   }
 
