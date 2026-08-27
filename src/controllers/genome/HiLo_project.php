@@ -5,3 +5,4 @@
  */
 
 include_once(__DIR__ . '/../HiLo_project.php');
+exit;

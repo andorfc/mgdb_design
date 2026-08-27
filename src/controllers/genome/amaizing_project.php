@@ -5,3 +5,4 @@
  */
 
 include_once(__DIR__ . '/../amaizing_project.php');
+exit;

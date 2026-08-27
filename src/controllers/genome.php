@@ -6,7 +6,7 @@
  *
  * history:
  *  02/10/16  eksc  created from about.php
- *  11/27/18  eksc  expanded to include a genome data center
+ *  11/27/18  eksc  expanded to include a genome data hub
  *  07/25/19  eksc  modified to accommodate a tabbed genome information page
  */
 
@@ -34,15 +34,29 @@
     return;
   }
 
-  /* When /genome/assembly is requested without an ID, render the modernized Assembly Data Center */
+  /* When /genome/assembly is requested without an ID, render the modernized Assembly Data Hub */
   if (PAGE == 'assembly' && (!defined('ID') || !ID || ID == '')) {
     include('controllers/genome/assembly_modern.php');
     return;
   }
 
-  /* When /genome/genomebrowser is requested without an ID, render the modernized Genome Browser Data Center */
+  /* When /genome/genomebrowser is requested without an ID, render the modernized Genome Browser Data Hub */
   if (PAGE == 'genomebrowser' && (!defined('ID') || !ID || ID == '')) {
     include('controllers/genome/genomebrowser_modern.php');
+    return;
+  }
+
+  /* Modernized Genome Project Pages: delegate directly to their standalone modern controllers */
+  $modern_project_controllers = [
+    'NAM_project'      => 'controllers/NAM_project.php',
+    'PanAnd_project'   => 'controllers/PanAnd_project.php',
+    'european_flints'  => 'controllers/european_flints.php',
+    'HiLo_project'     => 'controllers/HiLo_project.php',
+    'amaizing_project' => 'controllers/amaizing_project.php',
+    'CAAS_FIL_project' => 'controllers/CAAS_FIL_project.php',
+  ];
+  if (defined('PAGE') && PAGE && isset($modern_project_controllers[PAGE])) {
+    include($modern_project_controllers[PAGE]);
     return;
   }
 
@@ -113,7 +127,7 @@
   }
   
   else  {
-    // NOTE: genome data center is more hard-coded than other data centers.
+    // NOTE: genome data hub is more hard-coded than other data hubs.
     
     if (!ID || ID == '') {
       // execute this requested page directly as a script.

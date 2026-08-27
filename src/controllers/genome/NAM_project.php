@@ -5,3 +5,4 @@
  */
 
 include_once(__DIR__ . '/../NAM_project.php');
+exit;

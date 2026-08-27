@@ -5,3 +5,4 @@
  */
 
 include_once(__DIR__ . '/../PanAnd_project.php');
+exit;

@@ -5,3 +5,4 @@
  */
 
 include_once(__DIR__ . '/../european_flints.php');
+exit;
