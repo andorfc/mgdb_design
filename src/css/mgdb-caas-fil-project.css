@@ -1,0 +1,740 @@
+/* ==========================================================================
+ * file: mgdb-caas-fil-project.css
+ * purpose: Stylesheet for CAAS 12 Founder Inbred Lines Genomes Project (/CAAS_FIL_project)
+ *          Formatted to match NAM, European Flints, and HiLo project standards
+ * ========================================================================== */
+
+.mgdb-caas-fil-project-page {
+  padding-bottom: var(--mgdb-space-8);
+}
+
+.mgdb-caas-fil-project-page .mgdb-panel {
+  margin-top: var(--mgdb-space-6);
+  padding: var(--mgdb-space-6);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-caas-fil-project-page .caas-panel-header-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-caas-fil-project-page .mgdb-panel-title {
+  margin: 0 0 var(--mgdb-space-1);
+  font-size: var(--mgdb-text-2xl);
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-caas-fil-project-page .mgdb-panel-lead {
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  max-width: 75ch;
+}
+
+/* --------------------------------------------------------------------------
+ * Hero Action Links
+ * -------------------------------------------------------------------------- */
+
+.mgdb-caas-fil-project-page .caas-hero-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-caas-fil-project-page .caas-hero-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.mgdb-caas-fil-project-page .caas-hero-link:hover {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border-color: var(--mgdb-green-dark);
+}
+
+.mgdb-caas-fil-project-page .caas-link-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.mgdb-caas-fil-project-page .caas-dot-green { background: #16a34a; }
+.mgdb-caas-fil-project-page .caas-dot-gold { background: #d97706; }
+.mgdb-caas-fil-project-page .caas-dot-blue { background: #2563eb; }
+.mgdb-caas-fil-project-page .caas-dot-rose { background: #e11d48; }
+.mgdb-caas-fil-project-page .caas-dot-purple { background: #9333ea; }
+.mgdb-caas-fil-project-page .caas-dot-dark { background: #475569; }
+
+/* --------------------------------------------------------------------------
+ * Filter & Search Toolbar
+ * -------------------------------------------------------------------------- */
+
+.mgdb-caas-fil-project-page .caas-table-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  margin-bottom: var(--mgdb-space-3);
+}
+
+.mgdb-caas-fil-project-page .caas-filter-chips-wrap {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-caas-fil-project-page .caas-toolbar-label {
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  color: var(--mgdb-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-right: 2px;
+}
+
+.mgdb-caas-fil-project-page .caas-chip {
+  padding: 5px 12px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mgdb-caas-fil-project-page .caas-chip:hover {
+  background: var(--mgdb-line);
+}
+
+.mgdb-caas-fil-project-page .caas-chip.is-active {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border-color: var(--mgdb-green-dark);
+}
+
+.mgdb-caas-fil-project-page .caas-search-wrap {
+  flex: 1 1 280px;
+  max-width: 380px;
+}
+
+.mgdb-caas-fil-project-page .caas-search-input {
+  width: 100%;
+  height: 38px;
+  padding: 6px 12px;
+  font-size: var(--mgdb-text-sm);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: #ffffff;
+}
+
+.mgdb-caas-fil-project-page .caas-search-input:focus {
+  outline: none;
+  border-color: var(--mgdb-green-dark);
+  box-shadow: 0 0 0 3px rgba(27, 94, 32, 0.15);
+}
+
+.mgdb-caas-fil-project-page .caas-table-status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  padding: 8px 14px;
+  background: var(--mgdb-surface-alt);
+  border: 1px solid var(--mgdb-line);
+  border-bottom: none;
+  border-radius: var(--mgdb-radius) var(--mgdb-radius) 0 0;
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-caas-fil-project-page #caas-row-count {
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-caas-fil-project-page .caas-table-hint {
+  color: var(--mgdb-muted);
+}
+
+/* --------------------------------------------------------------------------
+ * Main Interactive Table
+ * -------------------------------------------------------------------------- */
+
+.mgdb-caas-fil-project-page .caas-table-scroll {
+  border: 1px solid var(--mgdb-line);
+  border-radius: 0 0 var(--mgdb-radius) var(--mgdb-radius);
+  overflow-x: auto;
+  background: #ffffff;
+}
+
+.mgdb-caas-fil-project-page .caas-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-caas-fil-project-page .caas-table th {
+  background: #f8fafc;
+  color: var(--mgdb-ink);
+  font-weight: 700;
+  padding: 10px 14px;
+  border-bottom: 2px solid var(--mgdb-line);
+  white-space: nowrap;
+}
+
+.mgdb-caas-fil-project-page .caas-table th.is-sortable button {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 700;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mgdb-caas-fil-project-page .caas-table th.is-sortable button:hover {
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-caas-fil-project-page .caas-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--mgdb-line-soft);
+  vertical-align: middle;
+}
+
+.mgdb-caas-fil-project-page .caas-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.mgdb-caas-fil-project-page .caas-line-cell {
+  white-space: nowrap;
+}
+
+.mgdb-caas-fil-project-page .caas-line-cell strong {
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-ink);
+  display: block;
+}
+
+.mgdb-caas-fil-project-page .caas-detail-note {
+  font-size: 11px;
+  color: var(--mgdb-muted);
+}
+
+.mgdb-caas-fil-project-page .caas-primary-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mgdb-caas-fil-project-page .caas-assembly-link {
+  font-weight: 700;
+  color: var(--mgdb-burgundy);
+  text-decoration: none;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-caas-fil-project-page .caas-assembly-link:hover {
+  text-decoration: underline;
+}
+
+.mgdb-caas-fil-project-page .caas-sub-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mgdb-caas-fil-project-page .caas-jb2-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 6px;
+  border: 1px solid #c8e6c9;
+  border-radius: var(--mgdb-radius-sm);
+  background: #e8f5e9;
+  color: #1b5e20;
+  font-size: 10px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.12s ease;
+}
+
+.mgdb-caas-fil-project-page .caas-jb2-btn:hover {
+  background: #1b5e20;
+  color: #ffffff;
+  border-color: #1b5e20;
+}
+
+.mgdb-caas-fil-project-page .jb2-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #2e7d32;
+}
+
+.mgdb-caas-fil-project-page .caas-jb2-btn:hover .jb2-dot {
+  background: #ffffff;
+}
+
+.mgdb-caas-fil-project-page .caas-rec-btn {
+  font-size: 11px;
+  color: var(--mgdb-muted);
+  text-decoration: none;
+}
+
+.mgdb-caas-fil-project-page .caas-rec-btn:hover {
+  color: var(--mgdb-green-dark);
+  text-decoration: underline;
+}
+
+/* Badges */
+.mgdb-caas-fil-project-page .caas-badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.mgdb-caas-fil-project-page .caas-badge-tspt {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.mgdb-caas-fil-project-page .caas-badge-pgroup {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.mgdb-caas-fil-project-page .caas-badge-lancaster {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.mgdb-caas-fil-project-page .caas-badge-ss {
+  background: #ede9fe;
+  color: #5b21b6;
+  border: 1px solid #ddd6fe;
+}
+
+.mgdb-caas-fil-project-page .caas-badge-other {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+}
+
+.mgdb-caas-fil-project-page .caas-anno-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mgdb-caas-fil-project-page .caas-anno-tag {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--mgdb-font-mono, monospace);
+}
+
+.mgdb-caas-fil-project-page .caas-gene-count {
+  font-size: 11px;
+  color: var(--mgdb-muted);
+}
+
+.mgdb-caas-fil-project-page .caas-xref-link {
+  color: var(--mgdb-burgundy);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-caas-fil-project-page .caas-xref-link:hover {
+  text-decoration: underline;
+}
+
+.mgdb-caas-fil-project-page .caas-xref-link code {
+  font-family: var(--mgdb-font-mono, monospace);
+  font-size: var(--mgdb-text-xs);
+  background: #f1f5f9;
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+.mgdb-caas-fil-project-page .caas-dl-btn {
+  display: inline-block;
+  padding: 4px 8px;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--mgdb-radius-sm);
+  background: #f0fdf4;
+  color: var(--mgdb-green-dark);
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.12s ease;
+}
+
+.mgdb-caas-fil-project-page .caas-dl-btn:hover {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border-color: var(--mgdb-green-dark);
+}
+
+.mgdb-caas-fil-project-page .text-right {
+  text-align: right;
+}
+
+/* --------------------------------------------------------------------------
+ * Section 2: Heterotic Groups & Architecture (NO ICONS, LIKE NAM)
+ * -------------------------------------------------------------------------- */
+
+.mgdb-caas-fil-project-page .caas-groups-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-caas-fil-project-page .caas-group-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-4);
+  display: flex;
+  flex-direction: column;
+}
+
+.mgdb-caas-fil-project-page .caas-group-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 var(--mgdb-space-2) 0;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-caas-fil-project-page .caas-group-card p {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.5;
+  margin: 0;
+  flex: 1;
+}
+
+/* --------------------------------------------------------------------------
+ * Section 3: Publications (FORMATTED EXACTLY LIKE NAM)
+ * -------------------------------------------------------------------------- */
+
+.mgdb-caas-fil-project-page .caas-publications-grid {
+  display: grid;
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-caas-fil-project-page .caas-pub-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-5);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-caas-fil-project-page .caas-pub-meta-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-caas-fil-project-page .caas-pub-journal-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #fef3c7;
+  color: #92400e;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.mgdb-caas-fil-project-page .caas-pub-doi {
+  font-family: var(--mgdb-font-mono, monospace);
+  font-size: 11px;
+  color: var(--mgdb-muted);
+}
+
+.mgdb-caas-fil-project-page .caas-pub-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--mgdb-burgundy);
+  margin: 0 0 var(--mgdb-space-2) 0;
+}
+
+.mgdb-caas-fil-project-page .caas-pub-authors {
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-ink);
+  margin: 0 0 var(--mgdb-space-1) 0;
+  line-height: 1.4;
+}
+
+.mgdb-caas-fil-project-page .caas-pub-citation {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  margin: 0 0 var(--mgdb-space-3) 0;
+}
+
+.mgdb-caas-fil-project-page .caas-pub-abstract-wrap {
+  background: var(--mgdb-surface-alt);
+  border-left: 3px solid var(--mgdb-green);
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-caas-fil-project-page .caas-pub-abstract-heading {
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--mgdb-green-dark);
+  margin: 0 0 4px 0;
+}
+
+.mgdb-caas-fil-project-page .caas-pub-abstract-text {
+  font-size: var(--mgdb-text-xs);
+  line-height: 1.6;
+  color: var(--mgdb-ink-soft);
+  margin: 0;
+}
+
+.mgdb-caas-fil-project-page .caas-pub-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+/* --------------------------------------------------------------------------
+ * Section 4: Data Hosted at MaizeGDB Cards (NO ICONS, LIKE NAM)
+ * -------------------------------------------------------------------------- */
+
+.mgdb-caas-fil-project-page .caas-hosted-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-caas-fil-project-page .caas-hosted-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-4);
+  display: flex;
+  flex-direction: column;
+}
+
+.mgdb-caas-fil-project-page .caas-hosted-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 var(--mgdb-space-2) 0;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-caas-fil-project-page .caas-hosted-card p {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.5;
+  margin-bottom: var(--mgdb-space-4);
+  flex: 1;
+}
+
+/* --------------------------------------------------------------------------
+ * Button Styles Matching NAM Project
+ * -------------------------------------------------------------------------- */
+
+.mgdb-caas-fil-project-page .mgdb-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--mgdb-radius-sm);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.mgdb-caas-fil-project-page .mgdb-button-primary {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border: 1px solid var(--mgdb-green-dark);
+}
+
+.mgdb-caas-fil-project-page .mgdb-button-primary:hover {
+  background: #14532d;
+  border-color: #14532d;
+}
+
+.mgdb-caas-fil-project-page .mgdb-button-secondary {
+  background: #ffffff;
+  color: var(--mgdb-green-dark);
+  border: 1px solid var(--mgdb-line);
+}
+
+.mgdb-caas-fil-project-page .mgdb-button-secondary:hover {
+  background: var(--mgdb-surface-alt);
+  border-color: var(--mgdb-green-dark);
+}
+
+.mgdb-caas-fil-project-page .mgdb-button-quiet {
+  background: transparent;
+  color: var(--mgdb-muted);
+  border: 1px solid transparent;
+}
+
+.mgdb-caas-fil-project-page .mgdb-button-quiet:hover {
+  color: var(--mgdb-ink);
+  background: var(--mgdb-surface-alt);
+}
+
+/* --------------------------------------------------------------------------
+ * Section 6: FAQ Accordions
+ * -------------------------------------------------------------------------- */
+
+.mgdb-caas-fil-project-page .caas-faq-list {
+  display: grid;
+  gap: var(--mgdb-space-3);
+}
+
+.mgdb-caas-fil-project-page .caas-faq-item {
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.mgdb-caas-fil-project-page .caas-faq-item summary {
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  background: #ffffff;
+  transition: background 0.12s ease;
+}
+
+.mgdb-caas-fil-project-page .caas-faq-item summary:hover {
+  background: #f8faf8;
+}
+
+.mgdb-caas-fil-project-page .caas-faq-item summary h3 {
+  display: inline;
+  font-size: var(--mgdb-text-base);
+  color: var(--mgdb-green-dark);
+  margin: 0;
+}
+
+.mgdb-caas-fil-project-page .caas-faq-body {
+  padding: 0 var(--mgdb-space-5) var(--mgdb-space-4);
+  border-top: 1px solid var(--mgdb-line-soft);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-caas-fil-project-page .caas-faq-body a {
+  color: var(--mgdb-green-dark);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+ * Section 7: Connected Resources (Matching NAM bottom section)
+ * -------------------------------------------------------------------------- */
+
+.mgdb-caas-fil-project-page .caas-bottom-section {
+  background: linear-gradient(180deg, var(--mgdb-surface) 0%, var(--mgdb-green-soft) 100%) !important;
+  border-color: #b8dbca !important;
+}
+
+.mgdb-caas-fil-project-page .caas-related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-caas-fil-project-page .caas-related-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  padding: var(--mgdb-space-3);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color .12s, box-shadow .12s;
+}
+
+.mgdb-caas-fil-project-page .caas-related-card:hover {
+  border-color: var(--mgdb-green);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.mgdb-caas-fil-project-page .caas-related-title {
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+  margin-bottom: 2px;
+}
+
+.mgdb-caas-fil-project-page .caas-related-desc {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mgdb-caas-fil-project-page .caas-table-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .mgdb-caas-fil-project-page .caas-search-wrap {
+    max-width: 100%;
+  }
+}
