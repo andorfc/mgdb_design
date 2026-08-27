@@ -231,7 +231,7 @@ $mgdb->get('megamenu')->load('templates/home/maizegdb_header_modern.bau');
 $mgdb->get('image-dir')->replace($system['image_url']);
 $mgdb->get('server-url')->replace($system['root_url']);
 
-$body = $mgdb->get('body')->loadRemote($system['root_url_private'] . '/templates/static/mgdb_genome_center.bau');
+$body = $mgdb->get('body')->load('templates/static/mgdb_genome_center.bau');
 
 $body->get('total-assemblies')->replace(number_format($total_assemblies));
 $body->get('total-species')->replace(number_format($total_species));
@@ -246,5 +246,5 @@ $body->get('group-data')->replace(json_encode($group_json));
 include_once('translation.php');
 $mgdb->get('blast_url')->replace($system['BLAST_URL']);
 
-$bauplan->publish();
+$bauplan->publish(); exit;
 ?>

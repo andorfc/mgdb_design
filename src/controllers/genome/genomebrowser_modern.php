@@ -1,7 +1,7 @@
 <?php
 /* file: controllers/genome/genomebrowser_modern.php
  *
- * purpose: Modernized controller for the Genome Browser Data Center (/genomebrowser)
+ * purpose: Modernized controller for the Genome Browser Data Hub (/genomebrowser)
  */
 
 include_once('./include/db-api.php');
@@ -17,7 +17,7 @@ header("Cache-Control: no-cache, no-store, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-$bauplan = new Bauplan('Genome Browser Data Center | JBrowse 2, JBrowse & Synteny');
+$bauplan = new Bauplan('Genome Browser Data Hub | JBrowse 2, JBrowse & Synteny');
 $bauplan->modern();
 
 $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';
@@ -154,4 +154,4 @@ $content->get('panand_count')->replace(number_format($page_data['panand_count'])
 $content->get('data_date')->replace($page_data['data_date']);
 
 include_once('translation.php');
-echo $bauplan->publish();
+echo $bauplan->publish(); exit;

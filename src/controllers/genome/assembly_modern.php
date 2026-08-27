@@ -1,7 +1,7 @@
 <?php
 /* file: controllers/genome/assembly_modern.php
  *
- * purpose: modernized controller for MaizeGDB Reference Assembly Data Center (/assembly)
+ * purpose: modernized controller for MaizeGDB Reference Assembly Data Hub (/assembly)
  */
 
 include_once('./include/db-api.php');
@@ -62,4 +62,4 @@ $content->get('gene_model_sets')->replace(number_format($page_data['gene_model_s
 $content->get('data_date')->replace($page_data['data_date']);
 
 include_once('translation.php');
-echo $bauplan->publish();
+echo $bauplan->publish(); exit;
