@@ -75,6 +75,7 @@ $WARM_URLS = array(
     '/PanAnd_project',
     '/european_flints',
     '/HiLo_project',
+    '/amaizing_project',
     '/maize_history',
     '/timelines',
     '/expression',

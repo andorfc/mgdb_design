@@ -1,0 +1,738 @@
+/* ==========================================================================
+ * file: mgdb-amaizing-project.css
+ * purpose: Stylesheet for AMAIZING European Maize Genomes Project (/amaizing_project)
+ *          Formatted to match NAM and European Flints project standards
+ * ========================================================================== */
+
+.mgdb-amaizing-project-page {
+  padding-bottom: var(--mgdb-space-8);
+}
+
+.mgdb-amaizing-project-page .mgdb-panel {
+  margin-top: var(--mgdb-space-6);
+  padding: var(--mgdb-space-6);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-amaizing-project-page .amaizing-panel-header-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-amaizing-project-page .mgdb-panel-title {
+  margin: 0 0 var(--mgdb-space-1);
+  font-size: var(--mgdb-text-2xl);
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-amaizing-project-page .mgdb-panel-lead {
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  max-width: 75ch;
+}
+
+/* --------------------------------------------------------------------------
+ * Hero Action Links
+ * -------------------------------------------------------------------------- */
+
+.mgdb-amaizing-project-page .amaizing-hero-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-amaizing-project-page .amaizing-hero-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.mgdb-amaizing-project-page .amaizing-hero-link:hover {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border-color: var(--mgdb-green-dark);
+}
+
+.mgdb-amaizing-project-page .amaizing-link-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.mgdb-amaizing-project-page .amaizing-dot-green { background: #16a34a; }
+.mgdb-amaizing-project-page .amaizing-dot-gold { background: #d97706; }
+.mgdb-amaizing-project-page .amaizing-dot-blue { background: #2563eb; }
+.mgdb-amaizing-project-page .amaizing-dot-purple { background: #9333ea; }
+.mgdb-amaizing-project-page .amaizing-dot-dark { background: #475569; }
+
+/* --------------------------------------------------------------------------
+ * Filter & Search Toolbar
+ * -------------------------------------------------------------------------- */
+
+.mgdb-amaizing-project-page .amaizing-table-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  margin-bottom: var(--mgdb-space-3);
+}
+
+.mgdb-amaizing-project-page .amaizing-filter-chips-wrap {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-amaizing-project-page .amaizing-toolbar-label {
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  color: var(--mgdb-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-right: 2px;
+}
+
+.mgdb-amaizing-project-page .amaizing-chip {
+  padding: 5px 12px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mgdb-amaizing-project-page .amaizing-chip:hover {
+  background: var(--mgdb-line);
+}
+
+.mgdb-amaizing-project-page .amaizing-chip.is-active {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border-color: var(--mgdb-green-dark);
+}
+
+.mgdb-amaizing-project-page .amaizing-search-wrap {
+  flex: 1 1 280px;
+  max-width: 380px;
+}
+
+.mgdb-amaizing-project-page .amaizing-search-input {
+  width: 100%;
+  height: 38px;
+  padding: 6px 12px;
+  font-size: var(--mgdb-text-sm);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: #ffffff;
+}
+
+.mgdb-amaizing-project-page .amaizing-search-input:focus {
+  outline: none;
+  border-color: var(--mgdb-green-dark);
+  box-shadow: 0 0 0 3px rgba(27, 94, 32, 0.15);
+}
+
+.mgdb-amaizing-project-page .amaizing-table-status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  padding: 8px 14px;
+  background: var(--mgdb-surface-alt);
+  border: 1px solid var(--mgdb-line);
+  border-bottom: none;
+  border-radius: var(--mgdb-radius) var(--mgdb-radius) 0 0;
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-amaizing-project-page #amaizing-row-count {
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-amaizing-project-page .amaizing-table-hint {
+  color: var(--mgdb-muted);
+}
+
+/* --------------------------------------------------------------------------
+ * Main Interactive Table
+ * -------------------------------------------------------------------------- */
+
+.mgdb-amaizing-project-page .amaizing-table-scroll {
+  border: 1px solid var(--mgdb-line);
+  border-radius: 0 0 var(--mgdb-radius) var(--mgdb-radius);
+  overflow-x: auto;
+  background: #ffffff;
+}
+
+.mgdb-amaizing-project-page .amaizing-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-amaizing-project-page .amaizing-table th {
+  background: #f8fafc;
+  color: var(--mgdb-ink);
+  font-weight: 700;
+  padding: 10px 14px;
+  border-bottom: 2px solid var(--mgdb-line);
+  white-space: nowrap;
+}
+
+.mgdb-amaizing-project-page .amaizing-table th.is-sortable button {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 700;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mgdb-amaizing-project-page .amaizing-table th.is-sortable button:hover {
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-amaizing-project-page .amaizing-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--mgdb-line-soft);
+  vertical-align: middle;
+}
+
+.mgdb-amaizing-project-page .amaizing-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.mgdb-amaizing-project-page .amaizing-primary-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mgdb-amaizing-project-page .amaizing-assembly-link {
+  font-weight: 700;
+  color: var(--mgdb-burgundy);
+  text-decoration: none;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-amaizing-project-page .amaizing-assembly-link:hover {
+  text-decoration: underline;
+}
+
+.mgdb-amaizing-project-page .amaizing-sub-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mgdb-amaizing-project-page .amaizing-jb2-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 6px;
+  border: 1px solid #c8e6c9;
+  border-radius: var(--mgdb-radius-sm);
+  background: #e8f5e9;
+  color: #1b5e20;
+  font-size: 10px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.12s ease;
+}
+
+.mgdb-amaizing-project-page .amaizing-jb2-btn:hover {
+  background: #1b5e20;
+  color: #ffffff;
+  border-color: #1b5e20;
+}
+
+.mgdb-amaizing-project-page .jb2-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #2e7d32;
+}
+
+.mgdb-amaizing-project-page .amaizing-jb2-btn:hover .jb2-dot {
+  background: #ffffff;
+}
+
+.mgdb-amaizing-project-page .amaizing-rec-btn {
+  font-size: 11px;
+  color: var(--mgdb-muted);
+  text-decoration: none;
+}
+
+.mgdb-amaizing-project-page .amaizing-rec-btn:hover {
+  color: var(--mgdb-green-dark);
+  text-decoration: underline;
+}
+
+.mgdb-amaizing-project-page .amaizing-taxon-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mgdb-amaizing-project-page .amaizing-line-name {
+  font-weight: 700;
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-amaizing-project-page .amaizing-landrace-name {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-green-dark);
+  font-weight: 600;
+}
+
+.mgdb-amaizing-project-page .amaizing-detail-note {
+  font-size: 11px;
+  color: var(--mgdb-muted);
+}
+
+/* Badges */
+.mgdb-amaizing-project-page .amaizing-origin-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mgdb-amaizing-project-page .amaizing-badge {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.mgdb-amaizing-project-page .amaizing-badge-flint {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.mgdb-amaizing-project-page .amaizing-badge-dent {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.mgdb-amaizing-project-page .amaizing-badge-north {
+  background: #ede9fe;
+  color: #5b21b6;
+  border: 1px solid #ddd6fe;
+}
+
+.mgdb-amaizing-project-page .amaizing-badge-tropical {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.mgdb-amaizing-project-page .amaizing-region-text {
+  font-size: 11px;
+  color: var(--mgdb-muted);
+}
+
+.mgdb-amaizing-project-page .amaizing-anno-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mgdb-amaizing-project-page .amaizing-anno-tag {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.mgdb-amaizing-project-page .amaizing-gene-link {
+  font-size: 11px;
+  color: var(--mgdb-green-dark);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.mgdb-amaizing-project-page .amaizing-gene-link:hover {
+  text-decoration: underline;
+}
+
+.mgdb-amaizing-project-page .amaizing-dl-btn {
+  display: inline-block;
+  padding: 4px 8px;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--mgdb-radius-sm);
+  background: #f0fdf4;
+  color: var(--mgdb-green-dark);
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.12s ease;
+}
+
+.mgdb-amaizing-project-page .amaizing-dl-btn:hover {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border-color: var(--mgdb-green-dark);
+}
+
+.mgdb-amaizing-project-page .text-right {
+  text-align: right;
+}
+
+/* --------------------------------------------------------------------------
+ * Section 2: Diversity & Heterotic Groups (NO ICONS, LIKE NAM)
+ * -------------------------------------------------------------------------- */
+
+.mgdb-amaizing-project-page .amaizing-diversity-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-amaizing-project-page .amaizing-diversity-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-4);
+  display: flex;
+  flex-direction: column;
+}
+
+.mgdb-amaizing-project-page .amaizing-diversity-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 var(--mgdb-space-2) 0;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-amaizing-project-page .amaizing-diversity-card p {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.5;
+  margin: 0;
+  flex: 1;
+}
+
+/* --------------------------------------------------------------------------
+ * Section 3: Publications (FORMATTED EXACTLY LIKE NAM)
+ * -------------------------------------------------------------------------- */
+
+.mgdb-amaizing-project-page .amaizing-publications-grid {
+  display: grid;
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-amaizing-project-page .amaizing-pub-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-5);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-amaizing-project-page .amaizing-pub-meta-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-amaizing-project-page .amaizing-pub-journal-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #fef3c7;
+  color: #92400e;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.mgdb-amaizing-project-page .amaizing-pub-doi {
+  font-family: var(--mgdb-font-mono, monospace);
+  font-size: 11px;
+  color: var(--mgdb-muted);
+}
+
+.mgdb-amaizing-project-page .amaizing-pub-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--mgdb-burgundy);
+  margin: 0 0 var(--mgdb-space-2) 0;
+}
+
+.mgdb-amaizing-project-page .amaizing-pub-authors {
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-ink);
+  margin: 0 0 var(--mgdb-space-1) 0;
+  line-height: 1.4;
+}
+
+.mgdb-amaizing-project-page .amaizing-pub-citation {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  margin: 0 0 var(--mgdb-space-3) 0;
+}
+
+.mgdb-amaizing-project-page .amaizing-pub-abstract-wrap {
+  background: var(--mgdb-surface-alt);
+  border-left: 3px solid var(--mgdb-green);
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-amaizing-project-page .amaizing-pub-abstract-heading {
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--mgdb-green-dark);
+  margin: 0 0 4px 0;
+}
+
+.mgdb-amaizing-project-page .amaizing-pub-abstract-text {
+  font-size: var(--mgdb-text-xs);
+  line-height: 1.6;
+  color: var(--mgdb-ink-soft);
+  margin: 0;
+}
+
+.mgdb-amaizing-project-page .amaizing-pub-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+/* --------------------------------------------------------------------------
+ * Section 4: Data Hosted at MaizeGDB Cards (NO ICONS, LIKE NAM)
+ * -------------------------------------------------------------------------- */
+
+.mgdb-amaizing-project-page .amaizing-hosted-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-amaizing-project-page .amaizing-hosted-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-4);
+  display: flex;
+  flex-direction: column;
+}
+
+.mgdb-amaizing-project-page .amaizing-hosted-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 var(--mgdb-space-2) 0;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-amaizing-project-page .amaizing-hosted-card p {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.5;
+  margin-bottom: var(--mgdb-space-4);
+  flex: 1;
+}
+
+/* --------------------------------------------------------------------------
+ * Button Styles Matching NAM Project
+ * -------------------------------------------------------------------------- */
+
+.mgdb-amaizing-project-page .mgdb-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--mgdb-radius-sm);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.mgdb-amaizing-project-page .mgdb-button-primary {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border: 1px solid var(--mgdb-green-dark);
+}
+
+.mgdb-amaizing-project-page .mgdb-button-primary:hover {
+  background: #14532d;
+  border-color: #14532d;
+}
+
+.mgdb-amaizing-project-page .mgdb-button-secondary {
+  background: #ffffff;
+  color: var(--mgdb-green-dark);
+  border: 1px solid var(--mgdb-line);
+}
+
+.mgdb-amaizing-project-page .mgdb-button-secondary:hover {
+  background: var(--mgdb-surface-alt);
+  border-color: var(--mgdb-green-dark);
+}
+
+.mgdb-amaizing-project-page .mgdb-button-quiet {
+  background: transparent;
+  color: var(--mgdb-muted);
+  border: 1px solid transparent;
+}
+
+.mgdb-amaizing-project-page .mgdb-button-quiet:hover {
+  color: var(--mgdb-ink);
+  background: var(--mgdb-surface-alt);
+}
+
+/* --------------------------------------------------------------------------
+ * Section 6: FAQ Accordions
+ * -------------------------------------------------------------------------- */
+
+.mgdb-amaizing-project-page .amaizing-faq-list {
+  display: grid;
+  gap: var(--mgdb-space-3);
+}
+
+.mgdb-amaizing-project-page .amaizing-faq-item {
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.mgdb-amaizing-project-page .amaizing-faq-item summary {
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  background: #ffffff;
+  transition: background 0.12s ease;
+}
+
+.mgdb-amaizing-project-page .amaizing-faq-item summary:hover {
+  background: #f8faf8;
+}
+
+.mgdb-amaizing-project-page .amaizing-faq-item summary h3 {
+  display: inline;
+  font-size: var(--mgdb-text-base);
+  color: var(--mgdb-green-dark);
+  margin: 0;
+}
+
+.mgdb-amaizing-project-page .amaizing-faq-body {
+  padding: 0 var(--mgdb-space-5) var(--mgdb-space-4);
+  border-top: 1px solid var(--mgdb-line-soft);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-amaizing-project-page .amaizing-faq-body a {
+  color: var(--mgdb-green-dark);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+ * Section 7: Connected Resources (Matching NAM bottom section)
+ * -------------------------------------------------------------------------- */
+
+.mgdb-amaizing-project-page .amaizing-bottom-section {
+  background: linear-gradient(180deg, var(--mgdb-surface) 0%, var(--mgdb-green-soft) 100%) !important;
+  border-color: #b8dbca !important;
+}
+
+.mgdb-amaizing-project-page .amaizing-related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-amaizing-project-page .amaizing-related-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  padding: var(--mgdb-space-3);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color .12s, box-shadow .12s;
+}
+
+.mgdb-amaizing-project-page .amaizing-related-card:hover {
+  border-color: var(--mgdb-green);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.mgdb-amaizing-project-page .amaizing-related-title {
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+  margin-bottom: 2px;
+}
+
+.mgdb-amaizing-project-page .amaizing-related-desc {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mgdb-amaizing-project-page .amaizing-table-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .mgdb-amaizing-project-page .amaizing-search-wrap {
+    max-width: 100%;
+  }
+}

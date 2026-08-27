@@ -1,0 +1,628 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-amaizing-project
+<a class="mgdb-skip-link" href="#amaizing-main">Skip to main content</a>
+
+<main class="mgdb-page mgdb-amaizing-project-page" id="amaizing-main">
+
+  <!-- Breadcrumb Navigation -->
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span>
+    <a href="/genome">Genomes</a><span aria-hidden="true">&rsaquo;</span>
+    <span aria-current="page">AMAIZING Project</span>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="mgdb-hero" aria-labelledby="amaizing-title">
+    <div class="mgdb-hero-emblem" aria-hidden="true" style="background:#ffffff; border:1px solid #e2e8f0;">
+      <svg width="56" height="56" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- European hex/star pattern with maize ear -->
+        <polygon points="32,8 54,20 54,44 32,56 10,44 10,20" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2.5"/>
+        <path d="M32 16C26 16 22 26 22 36C22 46 27 50 32 50C37 50 42 46 42 36C42 26 38 16 32 16Z" fill="#fef08a" stroke="#ca8a04" stroke-width="2"/>
+        <circle cx="28" cy="28" r="2" fill="#d97706"/>
+        <circle cx="36" cy="28" r="2" fill="#d97706"/>
+        <circle cx="32" cy="36" r="2" fill="#d97706"/>
+        <circle cx="28" cy="44" r="2" fill="#d97706"/>
+        <circle cx="36" cy="44" r="2" fill="#d97706"/>
+      </svg>
+      <strong>AMAIZING<br />Genomes</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data_date)</p>
+      <h1 id="amaizing-title">The AMAIZING European Maize Sequencing Project</h1>
+      <p class="mgdb-hero-description">
+        De novo chromosome-scale genome assemblies, multi-tissue transcriptomics under watered and drought regimes, and panEDTA transposable element annotations for seven foundational inbred lines in European breeding.
+      </p>
+
+      <div class="amaizing-hero-actions-row">
+        <a class="amaizing-hero-link" href="/genomebrowser">
+          <span class="amaizing-link-dot amaizing-dot-green" aria-hidden="true"></span> Explore in JBrowse 2 &#8599;
+        </a>
+        <a class="amaizing-hero-link" href="https://amaizing.fr/" target="_blank" rel="noopener">
+          <span class="amaizing-link-dot amaizing-dot-gold" aria-hidden="true"></span> AMAIZING Project Portal &#8599;
+        </a>
+        <a class="amaizing-hero-link" href="/download#downloads-amaizing">
+          <span class="amaizing-link-dot amaizing-dot-blue" aria-hidden="true"></span> Bulk Downloads &#8595;
+        </a>
+        <a class="amaizing-hero-link" href="/gene_center/gene">
+          <span class="amaizing-link-dot amaizing-dot-purple" aria-hidden="true"></span> Gene Center &#8599;
+        </a>
+        <a class="amaizing-hero-link" href="$(blast_url)">
+          <span class="amaizing-link-dot amaizing-dot-dark" aria-hidden="true"></span> BLAST Search &#8599;
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STICKY SECTION NAVIGATION TABS -->
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#amaizing-assemblies" class="is-current">Assemblies &amp; Line Directory</a>
+    <a href="#amaizing-diversity">Heterotic Groups &amp; Diversity</a>
+    <a href="#amaizing-publications">Key Publications &amp; Abstracts</a>
+    <a href="#amaizing-data-hosted">Data Hosted at MaizeGDB</a>
+    <a href="#amaizing-metrics">Scale &amp; Genomic Metrics</a>
+    <a href="#amaizing-faqs">FAQs &amp; Guidelines</a>
+    <a href="#amaizing-related">Connected Resources</a>
+  </nav>
+
+  <!-- SECTION 1: INTERACTIVE ASSEMBLIES DIRECTORY TABLE -->
+  <section id="amaizing-assemblies" class="mgdb-panel" aria-labelledby="amaizing-assemblies-title">
+    <div class="amaizing-panel-header-wrap">
+      <div>
+        <h2 id="amaizing-assemblies-title" class="mgdb-panel-title">AMAIZING Assemblies &amp; Line Directory</h2>
+        <p class="mgdb-panel-lead">Search, sort, and download chromosome-scale reference assemblies for the seven key European flint, dent, and diversity founder lines.</p>
+      </div>
+    </div>
+
+    <!-- FILTER & SEARCH TOOLBAR -->
+    <div class="amaizing-table-toolbar">
+      <div class="amaizing-filter-chips-wrap" role="group" aria-label="Filter by germplasm pool">
+        <span class="amaizing-toolbar-label">Group&#58;</span>
+        <button type="button" class="amaizing-chip is-active" data-filter="all">All \(7\)</button>
+        <button type="button" class="amaizing-chip amaizing-chip-flint" data-filter="flint">European Flint \(2\)</button>
+        <button type="button" class="amaizing-chip amaizing-chip-dent" data-filter="dent">Dent / Iodent \(2\)</button>
+        <button type="button" class="amaizing-chip amaizing-chip-north" data-filter="north">Northern Flint \(1\)</button>
+        <button type="button" class="amaizing-chip amaizing-chip-tropical" data-filter="tropical">Tropical / Spanish \(2\)</button>
+      </div>
+
+      <div class="amaizing-search-wrap">
+        <label for="amaizing-search-input" class="mgdb-visually-hidden">Search AMAIZING assemblies</label>
+        <input type="text" id="amaizing-search-input" class="mgdb-input amaizing-search-input" placeholder="Search assembly ID, inbred line, heterotic family, or origin..." autocomplete="off" spellcheck="false" />
+      </div>
+    </div>
+
+    <div class="amaizing-table-status-bar">
+      <span id="amaizing-row-count">Showing 7 of 7 assemblies</span>
+      <span class="amaizing-table-hint">Click column headers to sort &bull; Launch JBrowse 2 or download files directly</span>
+    </div>
+
+    <!-- MAIN INTERACTIVE TABLE -->
+    <div class="mgdb-table-scroll amaizing-table-scroll">
+      <table class="mgdb-table amaizing-table" id="amaizing-data-table">
+        <thead>
+          <tr>
+            <th scope="col" class="is-sortable" data-sort="assembly" aria-sort="ascending">
+              <button type="button">Assembly ID &amp; JBrowse <span class="sort-icon" aria-hidden="true">&uarr;</span></button>
+            </th>
+            <th scope="col" class="is-sortable" data-sort="line">
+              <button type="button">Inbred Line &amp; Origin <span class="sort-icon" aria-hidden="true">&updownarrow;</span></button>
+            </th>
+            <th scope="col" class="is-sortable" data-sort="group">
+              <button type="button">Germplasm / Heterotic Pool <span class="sort-icon" aria-hidden="true">&updownarrow;</span></button>
+            </th>
+            <th scope="col" class="is-sortable" data-sort="annotation">
+              <button type="button">RNA-seq &amp; TE Annotation <span class="sort-icon" aria-hidden="true">&updownarrow;</span></button>
+            </th>
+            <th scope="col" class="text-right">Bulk Download</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- 1: F2 -->
+          <tr data-clade="flint" data-search="f2 lacaune european flint southern france zm-f2-reference-amz-1.0 inra">
+            <td>
+              <div class="amaizing-primary-cell">
+                <a href="/genome/assembly/Zm-F2-REFERENCE-AMZ-1.0" class="amaizing-assembly-link">
+                  <strong>Zm-F2-REFERENCE-AMZ-1.0</strong>
+                </a>
+                <div class="amaizing-sub-actions">
+                  <a href="/genomebrowser?assembly=Zm-F2-REFERENCE-AMZ-1.0" class="amaizing-jb2-btn" title="View F2 in JBrowse 2">
+                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
+                  </a>
+                  <a href="/genome/assembly/Zm-F2-REFERENCE-AMZ-1.0" class="amaizing-rec-btn">Assembly Page &rarr;</a>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="amaizing-taxon-cell">
+                <strong class="amaizing-line-name">F2</strong>
+                <span class="amaizing-landrace-name">Lacaune Population Derivative</span>
+                <span class="amaizing-detail-note">Primary founder of the European Flint heterotic group \(INRA\)</span>
+              </div>
+            </td>
+            <td>
+              <div class="amaizing-origin-cell">
+                <span class="amaizing-badge amaizing-badge-flint">European Flint</span>
+                <span class="amaizing-region-text">Southern France</span>
+              </div>
+            </td>
+            <td>
+              <div class="amaizing-anno-cell">
+                <span class="amaizing-anno-tag">15 Tissues &bull; panEDTA TEs</span>
+                <a href="/gene_center/gene" class="amaizing-gene-link">Explore Gene Models &rarr;</a>
+              </div>
+            </td>
+            <td class="text-right">
+              <a href="https://download.maizegdb.org/Zm-F2-REFERENCE-AMZ-1.0/" class="amaizing-dl-btn" target="_blank" rel="noopener">
+                Download &#8599;
+              </a>
+            </td>
+          </tr>
+
+          <!-- 2: F4 -->
+          <tr data-clade="flint" data-search="f4 etoile de normandie european flint northern france early flowering zm-f4-reference-amz-1.0 inra">
+            <td>
+              <div class="amaizing-primary-cell">
+                <a href="/genome/assembly/Zm-F4-REFERENCE-AMZ-1.0" class="amaizing-assembly-link">
+                  <strong>Zm-F4-REFERENCE-AMZ-1.0</strong>
+                </a>
+                <div class="amaizing-sub-actions">
+                  <a href="/genomebrowser?assembly=Zm-F4-REFERENCE-AMZ-1.0" class="amaizing-jb2-btn" title="View F4 in JBrowse 2">
+                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
+                  </a>
+                  <a href="/genome/assembly/Zm-F4-REFERENCE-AMZ-1.0" class="amaizing-rec-btn">Assembly Page &rarr;</a>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="amaizing-taxon-cell">
+                <strong class="amaizing-line-name">F4</strong>
+                <span class="amaizing-landrace-name">&Eacute;toile de Normandie Derivative</span>
+                <span class="amaizing-detail-note">Early flowering Northern European flint founder</span>
+              </div>
+            </td>
+            <td>
+              <div class="amaizing-origin-cell">
+                <span class="amaizing-badge amaizing-badge-flint">European Flint</span>
+                <span class="amaizing-region-text">Northern France</span>
+              </div>
+            </td>
+            <td>
+              <div class="amaizing-anno-cell">
+                <span class="amaizing-anno-tag">15 Tissues &bull; panEDTA TEs</span>
+                <a href="/gene_center/gene" class="amaizing-gene-link">Explore Gene Models &rarr;</a>
+              </div>
+            </td>
+            <td class="text-right">
+              <a href="https://download.maizegdb.org/Zm-F4-REFERENCE-AMZ-1.0/" class="amaizing-dl-btn" target="_blank" rel="noopener">
+                Download &#8599;
+              </a>
+            </td>
+          </tr>
+
+          <!-- 3: Gaspe1_1_1 GF111 -->
+          <tr data-clade="north" data-search="gaspe1_1_1 gf111 gaspe flint northern flint canada italy very early flowering zm-gaspe1_1_1-reference-amz-1.0">
+            <td>
+              <div class="amaizing-primary-cell">
+                <a href="/genome/assembly/Zm-Gaspe1_1_1-REFERENCE-AMZ-1.0" class="amaizing-assembly-link">
+                  <strong>Zm-Gaspe1_1_1-REFERENCE-AMZ-1.0</strong>
+                </a>
+                <div class="amaizing-sub-actions">
+                  <a href="/genomebrowser?assembly=Zm-Gaspe1_1_1-REFERENCE-AMZ-1.0" class="amaizing-jb2-btn" title="View Gaspe1_1_1 in JBrowse 2">
+                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
+                  </a>
+                  <a href="/genome/assembly/Zm-Gaspe1_1_1-REFERENCE-AMZ-1.0" class="amaizing-rec-btn">Assembly Page &rarr;</a>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="amaizing-taxon-cell">
+                <strong class="amaizing-line-name">Gaspe1_1_1 \(GF111\)</strong>
+                <span class="amaizing-landrace-name">Gasp&eacute; Flint Selection</span>
+                <span class="amaizing-detail-note">Extremely early flowering Canadian landrace derivative \(Italy\)</span>
+              </div>
+            </td>
+            <td>
+              <div class="amaizing-origin-cell">
+                <span class="amaizing-badge amaizing-badge-north">Northern Flint</span>
+                <span class="amaizing-region-text">North America &bull; Italy</span>
+              </div>
+            </td>
+            <td>
+              <div class="amaizing-anno-cell">
+                <span class="amaizing-anno-tag">15 Tissues &bull; panEDTA TEs</span>
+                <a href="/gene_center/gene" class="amaizing-gene-link">Explore Gene Models &rarr;</a>
+              </div>
+            </td>
+            <td class="text-right">
+              <a href="https://download.maizegdb.org/Zm-Gaspe1_1_1-REFERENCE-AMZ-1.0/" class="amaizing-dl-btn" target="_blank" rel="noopener">
+                Download &#8599;
+              </a>
+            </td>
+          </tr>
+
+          <!-- 4: MBS847 -->
+          <tr data-clade="dent" data-search="mbs847 iodent pioneer 3901 modern dent zm-mbs847-reference-amz-1.0">
+            <td>
+              <div class="amaizing-primary-cell">
+                <a href="/genome/assembly/Zm-MBS847-REFERENCE-AMZ-1.0" class="amaizing-assembly-link">
+                  <strong>Zm-MBS847-REFERENCE-AMZ-1.0</strong>
+                </a>
+                <div class="amaizing-sub-actions">
+                  <a href="/genomebrowser?assembly=Zm-MBS847-REFERENCE-AMZ-1.0" class="amaizing-jb2-btn" title="View MBS847 in JBrowse 2">
+                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
+                  </a>
+                  <a href="/genome/assembly/Zm-MBS847-REFERENCE-AMZ-1.0" class="amaizing-rec-btn">Assembly Page &rarr;</a>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="amaizing-taxon-cell">
+                <strong class="amaizing-line-name">MBS847</strong>
+                <span class="amaizing-landrace-name">Pioneer 3901 Family</span>
+                <span class="amaizing-detail-note">Modern cornerstone inbred of the Iodent heterotic subgroup</span>
+              </div>
+            </td>
+            <td>
+              <div class="amaizing-origin-cell">
+                <span class="amaizing-badge amaizing-badge-dent">Iodent Heterotic Group</span>
+                <span class="amaizing-region-text">North American / European Commercial</span>
+              </div>
+            </td>
+            <td>
+              <div class="amaizing-anno-cell">
+                <span class="amaizing-anno-tag">15 Tissues &bull; panEDTA TEs</span>
+                <a href="/gene_center/gene" class="amaizing-gene-link">Explore Gene Models &rarr;</a>
+              </div>
+            </td>
+            <td class="text-right">
+              <a href="https://download.maizegdb.org/Zm-MBS847-REFERENCE-AMZ-1.0/" class="amaizing-dl-btn" target="_blank" rel="noopener">
+                Download &#8599;
+              </a>
+            </td>
+          </tr>
+
+          <!-- 5: F252 -->
+          <tr data-clade="dent" data-search="f252 co125 early dent early flowering zm-f252-reference-amz-1.0 inra">
+            <td>
+              <div class="amaizing-primary-cell">
+                <a href="/genome/assembly/Zm-F252-REFERENCE-AMZ-1.0" class="amaizing-assembly-link">
+                  <strong>Zm-F252-REFERENCE-AMZ-1.0</strong>
+                </a>
+                <div class="amaizing-sub-actions">
+                  <a href="/genomebrowser?assembly=Zm-F252-REFERENCE-AMZ-1.0" class="amaizing-jb2-btn" title="View F252 in JBrowse 2">
+                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
+                  </a>
+                  <a href="/genome/assembly/Zm-F252-REFERENCE-AMZ-1.0" class="amaizing-rec-btn">Assembly Page &rarr;</a>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="amaizing-taxon-cell">
+                <strong class="amaizing-line-name">F252</strong>
+                <span class="amaizing-landrace-name">CO125 Line Derivative</span>
+                <span class="amaizing-detail-note">Early flowering dent inbred line adapted to European conditions</span>
+              </div>
+            </td>
+            <td>
+              <div class="amaizing-origin-cell">
+                <span class="amaizing-badge amaizing-badge-dent">Early Dent</span>
+                <span class="amaizing-region-text">France / North American Heritage</span>
+              </div>
+            </td>
+            <td>
+              <div class="amaizing-anno-cell">
+                <span class="amaizing-anno-tag">15 Tissues &bull; panEDTA TEs</span>
+                <a href="/gene_center/gene" class="amaizing-gene-link">Explore Gene Models &rarr;</a>
+              </div>
+            </td>
+            <td class="text-right">
+              <a href="https://download.maizegdb.org/Zm-F252-REFERENCE-AMZ-1.0/" class="amaizing-dl-btn" target="_blank" rel="noopener">
+                Download &#8599;
+              </a>
+            </td>
+          </tr>
+
+          <!-- 6: EA1197 -->
+          <tr data-clade="tropical" data-search="ea1197 mollar almeria south spanish tropical spain early introduction zm-ea1197-reference-amz-1.0">
+            <td>
+              <div class="amaizing-primary-cell">
+                <a href="/genome/assembly/Zm-EA1197-REFERENCE-AMZ-1.0" class="amaizing-assembly-link">
+                  <strong>Zm-EA1197-REFERENCE-AMZ-1.0</strong>
+                </a>
+                <div class="amaizing-sub-actions">
+                  <a href="/genomebrowser?assembly=Zm-EA1197-REFERENCE-AMZ-1.0" class="amaizing-jb2-btn" title="View EA1197 in JBrowse 2">
+                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
+                  </a>
+                  <a href="/genome/assembly/Zm-EA1197-REFERENCE-AMZ-1.0" class="amaizing-rec-btn">Assembly Page &rarr;</a>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="amaizing-taxon-cell">
+                <strong class="amaizing-line-name">EA1197</strong>
+                <span class="amaizing-landrace-name">Mollar de Almer&iacute;a Population</span>
+                <span class="amaizing-detail-note">South Spanish landrace tracing the earliest European maize introductions</span>
+              </div>
+            </td>
+            <td>
+              <div class="amaizing-origin-cell">
+                <span class="amaizing-badge amaizing-badge-tropical">Spanish / Tropical</span>
+                <span class="amaizing-region-text">Southern Spain</span>
+              </div>
+            </td>
+            <td>
+              <div class="amaizing-anno-cell">
+                <span class="amaizing-anno-tag">15 Tissues &bull; panEDTA TEs</span>
+                <a href="/gene_center/gene" class="amaizing-gene-link">Explore Gene Models &rarr;</a>
+              </div>
+            </td>
+            <td class="text-right">
+              <a href="https://download.maizegdb.org/Zm-EA1197-REFERENCE-AMZ-1.0/" class="amaizing-dl-btn" target="_blank" rel="noopener">
+                Download &#8599;
+              </a>
+            </td>
+          </tr>
+
+          <!-- 7: F331 -->
+          <tr data-clade="tropical" data-search="f331 cimmyt population 86 c2 highland tropical france zm-f331-reference-amz-1.0 inra">
+            <td>
+              <div class="amaizing-primary-cell">
+                <a href="/genome/assembly/Zm-F331-REFERENCE-AMZ-1.0" class="amaizing-assembly-link">
+                  <strong>Zm-F331-REFERENCE-AMZ-1.0</strong>
+                </a>
+                <div class="amaizing-sub-actions">
+                  <a href="/genomebrowser?assembly=Zm-F331-REFERENCE-AMZ-1.0" class="amaizing-jb2-btn" title="View F331 in JBrowse 2">
+                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
+                  </a>
+                  <a href="/genome/assembly/Zm-F331-REFERENCE-AMZ-1.0" class="amaizing-rec-btn">Assembly Page &rarr;</a>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="amaizing-taxon-cell">
+                <strong class="amaizing-line-name">F331</strong>
+                <span class="amaizing-landrace-name">CIMMYT Population 86 C2</span>
+                <span class="amaizing-detail-note">Highland tropical inbred line developed in France from CIMMYT germplasm</span>
+              </div>
+            </td>
+            <td>
+              <div class="amaizing-origin-cell">
+                <span class="amaizing-badge amaizing-badge-tropical">Highland Tropical</span>
+                <span class="amaizing-region-text">CIMMYT &bull; France</span>
+              </div>
+            </td>
+            <td>
+              <div class="amaizing-anno-cell">
+                <span class="amaizing-anno-tag">15 Tissues &bull; panEDTA TEs</span>
+                <a href="/gene_center/gene" class="amaizing-gene-link">Explore Gene Models &rarr;</a>
+              </div>
+            </td>
+            <td class="text-right">
+              <a href="https://download.maizegdb.org/Zm-F331-REFERENCE-AMZ-1.0/" class="amaizing-dl-btn" target="_blank" rel="noopener">
+                Download &#8599;
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 2: HETEROTIC GROUPS & DIVERSITY -->
+  <section id="amaizing-diversity" class="mgdb-panel" aria-labelledby="amaizing-diversity-title">
+    <div class="amaizing-panel-header-wrap">
+      <div>
+        <h2 id="amaizing-diversity-title" class="mgdb-panel-title">Heterotic Groups &amp; Environmental Response</h2>
+        <p class="mgdb-panel-lead">How the AMAIZING assemblies capture the full breadth of European breeding history, heterotic pooling, and water-deficit responsiveness.</p>
+      </div>
+    </div>
+
+    <div class="amaizing-diversity-grid">
+      <article class="amaizing-diversity-card">
+        <h3>European Flint &amp; Dent Heterotic Complementarity</h3>
+        <p>
+          European hybrid maize production relies on the complementary heterotic grouping between European Flint \(represented by F2 and F4\) and Dent/Iodent lines \(MBS847, F252\). The AMAIZING reference genomes provide the first comprehensive, chromosome-scale pan-genomic atlas dissecting structural variants and non-shared gene content between these pools.
+        </p>
+      </article>
+
+      <article class="amaizing-diversity-card">
+        <h3>Early Flowering &amp; North American Introgression</h3>
+        <p>
+          Lines such as Gaspe1_1_1 \(GF111\) and F252 incorporate extremely early flowering alleles that enabled maize cultivation to expand northward into temperate Europe and Canada. High-continuity sequence assemblies resolve complex promoter rearrangements and copy number variants at major flowering time loci.
+        </p>
+      </article>
+
+      <article class="amaizing-diversity-card">
+        <h3>Multi-Tissue Transcriptomics &amp; Water-Deficit Response</h3>
+        <p>
+          Each genome assembly is accompanied by triplicate RNA-seq profiling across 15 distinct developmental tissues, including comparative physiological assays under well-watered and controlled water-deficit regimes, mapping gene regulatory networks governing drought resilience.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 3: KEY PUBLICATIONS & ABSTRACT PREVIEWS -->
+  <section id="amaizing-publications" class="mgdb-panel" aria-labelledby="amaizing-pub-title">
+    <div class="amaizing-panel-header-wrap">
+      <div>
+        <h2 id="amaizing-pub-title" class="mgdb-panel-title">Key Publications &amp; Abstract Previews</h2>
+        <p class="mgdb-panel-lead">Scientific literature and project reports detailing the AMAIZING genome assemblies, transposable element dynamics, and expression atlases.</p>
+      </div>
+    </div>
+
+    <div class="amaizing-publications-grid">
+      <!-- Publication 1: AMAIZING Consortium Overview -->
+      <article class="amaizing-pub-card">
+        <div class="amaizing-pub-meta-top">
+          <span class="amaizing-pub-journal-badge">AMAIZING Consortium &bull; 2024</span>
+          <span class="amaizing-pub-doi">Project Portal&#58; amaizing.fr</span>
+        </div>
+        <h3 class="amaizing-pub-title">De novo chromosome-scale assemblies of seven founder inbred lines representing European maize diversity</h3>
+        <p class="amaizing-pub-authors">Alain Charcosset, St&eacute;phane Nicolas, Johann Joets, Karine Alaux, Christine Bauland, Carine Palaffre, Jean-Philippe Pichon, Val&eacute;rie Combes, et al. \(AMAIZING Consortium\)</p>
+        <p class="amaizing-pub-citation"><em>AMAIZING Program Synthesis &amp; Genome Releases</em> 2024; INRAE / CEA-Genoscope / MaizeGDB.</p>
+        
+        <div class="amaizing-pub-abstract-wrap">
+          <h4 class="amaizing-pub-abstract-heading">Abstract</h4>
+          <p class="amaizing-pub-abstract-text">While whole-genome sequence assemblies have been generated for key American dent lines, understanding European maize diversity requires reference assemblies for cornerstone founder lines used in temperate hybrid breeding. Within the French Investments for the Future AMAIZING project, we produced high-quality de novo sequence assemblies for seven diverse inbred lines \(F2, F4, Gaspe1_1_1, MBS847, F252, EA1197, F331\) capturing European Flint, Northern Flint, Early Dent, Iodent, South Spanish, and Highland Tropical germplasm pools. Multi-tissue RNA-seq and panEDTA transposable element annotation reveal rich structural divergence, informing genomic selection and hybrid prediction in European agro-ecosystems.</p>
+        </div>
+
+        <div class="amaizing-pub-actions">
+          <a class="mgdb-button mgdb-button-primary" href="https://amaizing.fr/" target="_blank" rel="noopener">AMAIZING Project Portal &#8599;</a>
+          <a class="mgdb-button mgdb-button-secondary" href="/download#downloads-amaizing">Browse AMAIZING Downloads &#8599;</a>
+          <a class="mgdb-button mgdb-button-quiet" href="/data_center/reference?author=Charcosset">MaizeGDB Record</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 4: DATA HOSTED AT MAIZEGDB -->
+  <section id="amaizing-data-hosted" class="mgdb-panel" aria-labelledby="amaizing-hosted-title">
+    <div class="amaizing-panel-header-wrap">
+      <div>
+        <h2 id="amaizing-hosted-title" class="mgdb-panel-title">AMAIZING Datasets Hosted at MaizeGDB</h2>
+        <p class="mgdb-panel-lead">Integrated genome browser tracks, sequence BLAST targets, gene models, and bulk download archives.</p>
+      </div>
+    </div>
+
+    <div class="amaizing-hosted-grid">
+      <!-- 1: JBrowse 2 -->
+      <article class="amaizing-hosted-card">
+        <h3>Genome Browsers \(JBrowse 2\)</h3>
+        <p>Interactive chromosome-scale browsers for all 7 AMAIZING assemblies featuring gene models, panEDTA repeat tracks, and synteny views.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="/genomebrowser">Open Genome Browsers &#8599;</a>
+      </article>
+
+      <!-- 2: Gene Center -->
+      <article class="amaizing-hosted-card">
+        <h3>Gene Center &amp; Models</h3>
+        <p>High-confidence structural and functional gene annotations across all 7 lines indexed in the Gene Center with GO terms.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="/gene_center/gene">Explore Gene Center &#8599;</a>
+      </article>
+
+      <!-- 3: BLAST -->
+      <article class="amaizing-hosted-card">
+        <h3>Sequence BLAST Tool</h3>
+        <p>Align nucleotide, CDS, transcript, and translated protein queries directly against AMAIZING assemblies and gene models.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="$(blast_url)">Run BLAST Search &#8599;</a>
+      </article>
+
+      <!-- 4: Bulk Downloads -->
+      <article class="amaizing-hosted-card">
+        <h3>Bulk Downloads &amp; Globus</h3>
+        <p>Download complete assembly FASTA files, GFF3 annotations, canonical CDS/PEP sequences, and panEDTA TE tracks.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="/download#downloads-amaizing">Browse Downloads &#8599;</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 5: SCALE & GENOMIC METRICS DASHBOARD -->
+  <section id="amaizing-metrics" class="mgdb-panel" aria-labelledby="amaizing-metrics-title">
+    <div class="amaizing-panel-header-wrap">
+      <div>
+        <h2 id="amaizing-metrics-title" class="mgdb-panel-title">AMAIZING Dataset Scale &amp; Metrics</h2>
+        <p class="mgdb-panel-lead">Summary statistics across the AMAIZING assemblies, multi-tissue transcriptomics, and diversity pools.</p>
+      </div>
+    </div>
+
+    <div class="mgdb-metric-grid mgdb-metric-grid-4">
+      <div class="mgdb-metric-card mgdb-metric-card-green">
+        <div class="mgdb-metric-number">7</div>
+        <div class="mgdb-metric-title">De Novo Reference Assemblies</div>
+        <div class="mgdb-metric-desc">F2, F4, Gaspe1_1_1, MBS847, F252, EA1197, and F331 covering key European pools.</div>
+      </div>
+      <div class="mgdb-metric-card mgdb-metric-card-gold">
+        <div class="mgdb-metric-number">15 Tissues</div>
+        <div class="mgdb-metric-title">Multi-Tissue RNA-seq</div>
+        <div class="mgdb-metric-desc">Triplicate mRNA-seq expression profiles under well-watered and water-deficit conditions.</div>
+      </div>
+      <div class="mgdb-metric-card mgdb-metric-card-blue">
+        <div class="mgdb-metric-number">panEDTA</div>
+        <div class="mgdb-metric-title">Transposable Element Curation</div>
+        <div class="mgdb-metric-desc">High-precision comprehensive repeat annotation across all seven chromosome-scale assemblies.</div>
+      </div>
+      <div class="mgdb-metric-card mgdb-metric-card-orange">
+        <div class="mgdb-metric-number">40,000+</div>
+        <div class="mgdb-metric-title">Gene Models per Line</div>
+        <div class="mgdb-metric-desc">High-confidence structural and functional annotations indexed across MaizeGDB.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6: FAQS & GUIDELINES -->
+  <section id="amaizing-faqs" class="mgdb-panel" aria-labelledby="amaizing-faqs-title">
+    <div class="amaizing-panel-header-wrap">
+      <div>
+        <h2 id="amaizing-faqs-title" class="mgdb-panel-title">Frequently Asked Questions &amp; Guidelines</h2>
+        <p class="mgdb-panel-lead">Information regarding gene model access, project background, and download endpoints.</p>
+      </div>
+    </div>
+
+    <div class="amaizing-faq-list">
+      <details class="amaizing-faq-item">
+        <summary><h3>What is the AMAIZING project and which institutions contributed?</h3></summary>
+        <div class="amaizing-faq-body">
+          <p>
+            The AMAIZING project is a major French national public-private collaborative program supported by the French National Research Agency \(ANR\), led by INRAE in partnership with CEA-Genoscope, Arvalis Institut du V&eacute;g&eacute;tal, CIRAD, CNRS, private plant breeding companies, and international databases including MaizeGDB. Learn more at <a href="https://amaizing.fr/" target="_blank" rel="noopener">amaizing.fr</a>.
+          </p>
+        </div>
+      </details>
+
+      <details class="amaizing-faq-item">
+        <summary><h3>Where can I download the complete FASTA and GFF3 files for AMAIZING lines?</h3></summary>
+        <div class="amaizing-faq-body">
+          <p>
+            Full-genome FASTA sequences, GFF3 gene annotations, CDS/PEP files, and panEDTA transposable element tracks can be downloaded directly from the <a href="/download#downloads-amaizing">MaizeGDB Downloads Portal</a> or via individual assembly download links in the table above.
+          </p>
+        </div>
+      </details>
+
+      <details class="amaizing-faq-item">
+        <summary><h3>How do AMAIZING gene models compare with B73 RefGen_v5?</h3></summary>
+        <div class="amaizing-faq-body">
+          <p>
+            The AMAIZING genomes capture significant pan-genomic structural variation, including thousands of non-syntenic genes, presence-absence variants, and TE insertions that are absent from B73. Comparative tracks and synteny views are viewable directly in <a href="/genomebrowser">JBrowse 2</a>.
+          </p>
+        </div>
+      </details>
+
+      <details class="amaizing-faq-item">
+        <summary><h3>Can I search these genomes using BLAST at MaizeGDB?</h3></summary>
+        <div class="amaizing-faq-body">
+          <p>
+            Yes! MaizeGDB maintains dedicated BLAST databases for all seven AMAIZING lines. Go to the <a href="$(blast_url)">BLAST Tool</a> and choose the desired AMAIZING assembly or predicted peptide database.
+          </p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- SECTION 7: CONNECTED RESOURCES -->
+  <section id="amaizing-related" class="mgdb-panel amaizing-bottom-section" aria-labelledby="amaizing-related-title">
+    <div class="amaizing-panel-header-wrap">
+      <div>
+        <h2 id="amaizing-related-title" class="mgdb-panel-title">Connected MaizeGDB Genomics Projects</h2>
+        <p class="mgdb-panel-lead">Explore related pangenomic, diversity, and association mapping resources.</p>
+      </div>
+    </div>
+
+    <div class="amaizing-related-grid">
+      <a class="amaizing-related-card" href="/NAM_project">
+        <div class="amaizing-related-title">NAM Parent Genomes &rarr;</div>
+        <p class="amaizing-related-desc">26 de novo chromosome-scale assemblies of the US Nested Association Mapping founder lines.</p>
+      </a>
+      <a class="amaizing-related-card" href="/european_flints">
+        <div class="amaizing-related-title">European Flints Project &rarr;</div>
+        <p class="amaizing-related-desc">4 reference assemblies exploring European flint diversity, heterosis, and cold adaptation.</p>
+      </a>
+      <a class="amaizing-related-card" href="/HiLo_project">
+        <div class="amaizing-related-title">HiLo Adaptation Genomes &rarr;</div>
+        <p class="amaizing-related-desc">7 reference assemblies spanning high and low elevation Mexican landraces and CIMMYT inbreds.</p>
+      </a>
+      <a class="amaizing-related-card" href="/genome">
+        <div class="amaizing-related-title">Genome Assembly Center &rarr;</div>
+        <p class="amaizing-related-desc">Browse all reference, founder, diversity, and pan-genomic maize assemblies hosted at MaizeGDB.</p>
+      </a>
+    </div>
+  </section>
+
+</main>
+)
