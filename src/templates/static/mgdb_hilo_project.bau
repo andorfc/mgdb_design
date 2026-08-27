@@ -1,0 +1,677 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-hilo-project
+<a class="mgdb-skip-link" href="#hilo-main">Skip to main content</a>
+
+<main class="mgdb-page mgdb-hilo-project-page" id="hilo-main">
+
+  <!-- Breadcrumb Navigation -->
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span>
+    <a href="/genome">Genomes</a><span aria-hidden="true">&rsaquo;</span>
+    <span aria-current="page">HiLo Project</span>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="mgdb-hero" aria-labelledby="hilo-title">
+    <div class="mgdb-hero-emblem" aria-hidden="true" style="background:#ffffff; border:1px solid #e2e8f0;">
+      <svg width="56" height="56" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Mountain peaks representing altitudinal elevation gradient -->
+        <path d="M8 52L24 22L36 38L46 16L58 52H8Z" fill="#ecfdf5" stroke="#047857" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M24 22L31 34L26 36L24 22Z" fill="#a7f3d0"/>
+        <path d="M46 16L51 29L47 31L46 16Z" fill="#a7f3d0"/>
+        <!-- Maize ear accent on side -->
+        <path d="M34 52V42C34 38 38 36 38 36C38 36 42 38 42 42V52H34Z" fill="#fef08a" stroke="#ca8a04" stroke-width="2"/>
+        <circle cx="38" cy="42" r="1.5" fill="#a16207"/>
+        <circle cx="38" cy="47" r="1.5" fill="#a16207"/>
+      </svg>
+      <strong>HiLo<br />Genomes</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data_date)</p>
+      <h1 id="hilo-title">High &amp; Low Elevation Maize Adaptation Genomes \(HiLo\)</h1>
+      <p class="mgdb-hero-description">
+        De novo chromosome-scale reference genome assemblies, gene models, and altitudinal adaptation genomics for traditional Mexican landraces and CIMMYT inbred lines across 50 to 2,520 meters above sea level.
+      </p>
+
+      <div class="hilo-hero-actions-row">
+        <a class="hilo-hero-link" href="/genomebrowser">
+          <span class="hilo-link-dot hilo-dot-green" aria-hidden="true"></span> Explore in JBrowse 2 &#8599;
+        </a>
+        <a class="hilo-hero-link" href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1546719" target="_blank" rel="noopener">
+          <span class="hilo-link-dot hilo-dot-gold" aria-hidden="true"></span> NSF Award #1546719 &#8599;
+        </a>
+        <a class="hilo-hero-link" href="/download#downloads-hilo">
+          <span class="hilo-link-dot hilo-dot-blue" aria-hidden="true"></span> Bulk Downloads &#8595;
+        </a>
+        <a class="hilo-hero-link" href="https://doi.org/10.1093/g3journal/jkab447" target="_blank" rel="noopener">
+          <span class="hilo-link-dot hilo-dot-rose" aria-hidden="true"></span> G3 Research Paper &#8599;
+        </a>
+        <a class="hilo-hero-link" href="/gene_center/gene">
+          <span class="hilo-link-dot hilo-dot-purple" aria-hidden="true"></span> Gene Center &#8599;
+        </a>
+        <a class="hilo-hero-link" href="$(blast_url)">
+          <span class="hilo-link-dot hilo-dot-dark" aria-hidden="true"></span> BLAST Search &#8599;
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STICKY SECTION NAVIGATION TABS -->
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#hilo-assemblies" class="is-current">Assemblies &amp; Line Directory</a>
+    <a href="#hilo-adaptation">Altitudinal Adaptation &amp; Traits</a>
+    <a href="#hilo-publications">Key Publications &amp; Abstracts</a>
+    <a href="#hilo-data-hosted">Data Hosted at MaizeGDB</a>
+    <a href="#hilo-metrics">Scale &amp; Genomic Metrics</a>
+    <a href="#hilo-collab">Partners &amp; Acknowledgments</a>
+    <a href="#hilo-faqs">FAQs &amp; Guidelines</a>
+    <a href="#hilo-related">Connected Resources</a>
+  </nav>
+
+  <!-- SECTION 1: INTERACTIVE ASSEMBLIES DIRECTORY TABLE -->
+  <section id="hilo-assemblies" class="mgdb-panel" aria-labelledby="hilo-assemblies-title">
+    <div class="hilo-panel-header-wrap">
+      <div>
+        <h2 id="hilo-assemblies-title" class="mgdb-panel-title">HiLo Assemblies &amp; Accessions Directory</h2>
+        <p class="mgdb-panel-lead">Search, sort, and download chromosome-scale reference assemblies for the 7 high- and low-elevation traditional landraces and breeding lines.</p>
+      </div>
+    </div>
+
+    <!-- FILTER & SEARCH TOOLBAR -->
+    <div class="hilo-table-toolbar">
+      <div class="hilo-filter-chips-wrap" role="group" aria-label="Filter by elevation zone">
+        <span class="hilo-toolbar-label">Elevation&#58;</span>
+        <button type="button" class="hilo-chip is-active" data-filter="all">All \(7\)</button>
+        <button type="button" class="hilo-chip hilo-chip-highland" data-filter="highland">Highland &gt;2000m \(4\)</button>
+        <button type="button" class="hilo-chip hilo-chip-mid" data-filter="mid">Mid-Elevation \(1\)</button>
+        <button type="button" class="hilo-chip hilo-chip-lowland" data-filter="lowland">Lowland \(2\)</button>
+      </div>
+
+      <div class="hilo-search-wrap">
+        <label for="hilo-search-input" class="mgdb-visually-hidden">Search HiLo assemblies</label>
+        <input type="text" id="hilo-search-input" class="mgdb-input hilo-search-input" placeholder="Search assembly ID, cultivar name, accession, or elevation..." autocomplete="off" spellcheck="false" />
+      </div>
+    </div>
+
+    <div class="hilo-table-status-bar">
+      <span id="hilo-row-count">Showing 7 of 7 assemblies</span>
+      <span class="hilo-table-hint">Click column headers to sort &bull; Launch JBrowse 2 or download files directly</span>
+    </div>
+
+    <!-- MAIN INTERACTIVE TABLE -->
+    <div class="mgdb-table-scroll hilo-table-scroll">
+      <table class="mgdb-table hilo-table" id="hilo-data-table">
+        <thead>
+          <tr>
+            <th scope="col" class="is-sortable" data-sort="assembly" aria-sort="ascending">
+              <button type="button">Assembly ID &amp; JBrowse <span class="sort-icon" aria-hidden="true">&uarr;</span></button>
+            </th>
+            <th scope="col" class="is-sortable" data-sort="cultivar">
+              <button type="button">Cultivar / Landrace &amp; Accession <span class="sort-icon" aria-hidden="true">&updownarrow;</span></button>
+            </th>
+            <th scope="col" class="is-sortable" data-sort="elevation">
+              <button type="button">Elevation &amp; Ecology <span class="sort-icon" aria-hidden="true">&updownarrow;</span></button>
+            </th>
+            <th scope="col" class="is-sortable" data-sort="annotation">
+              <button type="button">Gene Annotation <span class="sort-icon" aria-hidden="true">&updownarrow;</span></button>
+            </th>
+            <th scope="col" class="text-right">Bulk Download</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- 1: Palomero Toluqueño PT -->
+          <tr data-clade="highland" data-search="palomero toluqueno pt highland 2507 masl cimmytma 2233 zm-pt-reference-hilo-1.0 zm00109aa.1 mexico">
+            <td>
+              <div class="hilo-primary-cell">
+                <a href="/genome/assembly/Zm-PT-REFERENCE-HiLo-1.0" class="hilo-assembly-link">
+                  <strong>Zm-PT-REFERENCE-HiLo-1.0</strong>
+                </a>
+                <div class="hilo-sub-actions">
+                  <a href="/genomebrowser?assembly=Zm-PT-REFERENCE-HiLo-1.0" class="hilo-jb2-btn" title="View PT in JBrowse 2">
+                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
+                  </a>
+                  <a href="/genome/assembly/Zm-PT-REFERENCE-HiLo-1.0" class="hilo-rec-btn">Assembly Page &rarr;</a>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="hilo-taxon-cell">
+                <strong class="hilo-line-name">Palomero Toluque&ntilde;o \(PT\)</strong>
+                <span class="hilo-landrace-name">Traditional Popcorn Landrace</span>
+                <span class="hilo-detail-note">Accession&#58; <a href="https://doi.org/10.18730/GAKPV" target="_blank" rel="noopener">CIMMYTMA 2233 &#8599;</a></span>
+              </div>
+            </td>
+            <td>
+              <div class="hilo-origin-cell">
+                <span class="hilo-badge hilo-badge-highland">Highland &bull; 2,507 masl</span>
+                <span class="hilo-region-text">Toluca Valley, Central Mexico</span>
+              </div>
+            </td>
+            <td>
+              <div class="hilo-anno-cell">
+                <span class="hilo-anno-tag">Zm00109aa.1</span>
+                <a href="/gene_center/gene" class="hilo-gene-link">Explore Gene Models &rarr;</a>
+              </div>
+            </td>
+            <td class="text-right">
+              <a href="https://download.maizegdb.org/Zm-PT-REFERENCE-HiLo-1.0/" class="hilo-dl-btn" target="_blank" rel="noopener">
+                Download &#8599;
+              </a>
+            </td>
+          </tr>
+
+          <!-- 2: Palomero de Jalisco PDJ -->
+          <tr data-clade="highland" data-search="palomero de jalisco pdj highland 2520 masl pi 693885 zm-pdj-reference-hilo-1.0 zm00112aa.1 mexico">
+            <td>
+              <div class="hilo-primary-cell">
+                <a href="/genome/assembly/Zm-PDJ-REFERENCE-HiLo-1.0" class="hilo-assembly-link">
+                  <strong>Zm-PDJ-REFERENCE-HiLo-1.0</strong>
+                </a>
+                <div class="hilo-sub-actions">
+                  <a href="/genomebrowser?assembly=Zm-PDJ-REFERENCE-HiLo-1.0" class="hilo-jb2-btn" title="View PDJ in JBrowse 2">
+                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
+                  </a>
+                  <a href="/genome/assembly/Zm-PDJ-REFERENCE-HiLo-1.0" class="hilo-rec-btn">Assembly Page &rarr;</a>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="hilo-taxon-cell">
+                <strong class="hilo-line-name">Palomero de Jalisco \(PDJ\)</strong>
+                <span class="hilo-landrace-name">Highland Popcorn Landrace</span>
+                <span class="hilo-detail-note">Accession&#58; <a href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=1925923" target="_blank" rel="noopener">PI 693885 &#8599;</a></span>
+              </div>
+            </td>
+            <td>
+              <div class="hilo-origin-cell">
+                <span class="hilo-badge hilo-badge-highland">Highland &bull; 2,520 masl</span>
+                <span class="hilo-region-text">Jalisco Highlands, Western Mexico</span>
+              </div>
+            </td>
+            <td>
+              <div class="hilo-anno-cell">
+                <span class="hilo-anno-tag">Zm00112aa.1</span>
+                <a href="/gene_center/gene" class="hilo-gene-link">Explore Gene Models &rarr;</a>
+              </div>
+            </td>
+            <td class="text-right">
+              <a href="https://download.maizegdb.org/Zm-PDJ-REFERENCE-HiLo-1.0/" class="hilo-dl-btn" target="_blank" rel="noopener">
+                Download &#8599;
+              </a>
+            </td>
+          </tr>
+
+          <!-- 3: CML457 -->
+          <tr data-clade="highland" data-search="cml457 highland cimmytma 28056 inbred zm-cml457-reference-hilo-1.0 zm00106aa.1">
+            <td>
+              <div class="hilo-primary-cell">
+                <a href="/genome/assembly/Zm-CML457-REFERENCE-HiLo-1.0" class="hilo-assembly-link">
+                  <strong>Zm-CML457-REFERENCE-HiLo-1.0</strong>
+                </a>
+                <div class="hilo-sub-actions">
+                  <a href="/genomebrowser?assembly=Zm-CML457-REFERENCE-HiLo-1.0" class="hilo-jb2-btn" title="View CML457 in JBrowse 2">
+                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
+                  </a>
+                  <a href="/genome/assembly/Zm-CML457-REFERENCE-HiLo-1.0" class="hilo-rec-btn">Assembly Page &rarr;</a>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="hilo-taxon-cell">
+                <strong class="hilo-line-name">CML457</strong>
+                <span class="hilo-landrace-name">CIMMYT Highland Inbred Line</span>
+                <span class="hilo-detail-note">Accession&#58; <a href="https://glis.fao.org/glis/entity/view?eid=560903" target="_blank" rel="noopener">CIMMYTMA 28056 &#8599;</a></span>
+              </div>
+            </td>
+            <td>
+              <div class="hilo-origin-cell">
+                <span class="hilo-badge hilo-badge-highland">Highland Adapted</span>
+                <span class="hilo-region-text">CIMMYT Tropical/Subtropical Highland Program</span>
+              </div>
+            </td>
+            <td>
+              <div class="hilo-anno-cell">
+                <span class="hilo-anno-tag">Zm00106aa.1</span>
+                <a href="/gene_center/gene" class="hilo-gene-link">Explore Gene Models &rarr;</a>
+              </div>
+            </td>
+            <td class="text-right">
+              <a href="https://download.maizegdb.org/Zm-CML457-REFERENCE-HiLo-1.0/" class="hilo-dl-btn" target="_blank" rel="noopener">
+                Download &#8599;
+              </a>
+            </td>
+          </tr>
+
+          <!-- 4: CML459 -->
+          <tr data-clade="highland" data-search="cml459 highland cimmytma 28058 inbred zm-cml459-reference-hilo-1.0 zm00107aa.1">
+            <td>
+              <div class="hilo-primary-cell">
+                <a href="/genome/assembly/Zm-CML459-REFERENCE-HiLo-1.0" class="hilo-assembly-link">
+                  <strong>Zm-CML459-REFERENCE-HiLo-1.0</strong>
+                </a>
+                <div class="hilo-sub-actions">
+                  <a href="/genomebrowser?assembly=Zm-CML459-REFERENCE-HiLo-1.0" class="hilo-jb2-btn" title="View CML459 in JBrowse 2">
+                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
+                  </a>
+                  <a href="/genome/assembly/Zm-CML459-REFERENCE-HiLo-1.0" class="hilo-rec-btn">Assembly Page &rarr;</a>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="hilo-taxon-cell">
+                <strong class="hilo-line-name">CML459</strong>
+                <span class="hilo-landrace-name">CIMMYT Highland Inbred Line</span>
+                <span class="hilo-detail-note">Accession&#58; <a href="https://glis.fao.org/glis/entity/view?eid=560905" target="_blank" rel="noopener">CIMMYTMA 28058 &#8599;</a></span>
+              </div>
+            </td>
+            <td>
+              <div class="hilo-origin-cell">
+                <span class="hilo-badge hilo-badge-highland">Highland Adapted</span>
+                <span class="hilo-region-text">CIMMYT Tropical/Subtropical Highland Program</span>
+              </div>
+            </td>
+            <td>
+              <div class="hilo-anno-cell">
+                <span class="hilo-anno-tag">Zm00107aa.1</span>
+                <a href="/gene_center/gene" class="hilo-gene-link">Explore Gene Models &rarr;</a>
+              </div>
+            </td>
+            <td class="text-right">
+              <a href="https://download.maizegdb.org/Zm-CML459-REFERENCE-HiLo-1.0/" class="hilo-dl-btn" target="_blank" rel="noopener">
+                Download &#8599;
+              </a>
+            </td>
+          </tr>
+
+          <!-- 5: Tabloncillo TAB -->
+          <tr data-clade="mid" data-search="tabloncillo tab mid-elevation 1355 masl ames 32914 zm-tab-reference-hilo-1.0 zm00111aa.1 western mexico">
+            <td>
+              <div class="hilo-primary-cell">
+                <a href="/genome/assembly/Zm-TAB-REFERENCE-HiLo-1.0" class="hilo-assembly-link">
+                  <strong>Zm-TAB-REFERENCE-HiLo-1.0</strong>
+                </a>
+                <div class="hilo-sub-actions">
+                  <a href="/genomebrowser?assembly=Zm-TAB-REFERENCE-HiLo-1.0" class="hilo-jb2-btn" title="View TAB in JBrowse 2">
+                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
+                  </a>
+                  <a href="/genome/assembly/Zm-TAB-REFERENCE-HiLo-1.0" class="hilo-rec-btn">Assembly Page &rarr;</a>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="hilo-taxon-cell">
+                <strong class="hilo-line-name">Tabloncillo \(TAB\)</strong>
+                <span class="hilo-landrace-name">Traditional Mid-Elevation Landrace</span>
+                <span class="hilo-detail-note">Accession&#58; <a href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=1925925" target="_blank" rel="noopener">Ames 32914 &#8599;</a></span>
+              </div>
+            </td>
+            <td>
+              <div class="hilo-origin-cell">
+                <span class="hilo-badge hilo-badge-mid">Mid-Elevation &bull; 1,355 masl</span>
+                <span class="hilo-region-text">Western Mexico Subtropical Transitional Zone</span>
+              </div>
+            </td>
+            <td>
+              <div class="hilo-anno-cell">
+                <span class="hilo-anno-tag">Zm00111aa.1</span>
+                <a href="/gene_center/gene" class="hilo-gene-link">Explore Gene Models &rarr;</a>
+              </div>
+            </td>
+            <td class="text-right">
+              <a href="https://download.maizegdb.org/Zm-TAB-REFERENCE-HiLo-1.0/" class="hilo-dl-btn" target="_blank" rel="noopener">
+                Download &#8599;
+              </a>
+            </td>
+          </tr>
+
+          <!-- 6: Zapalote Chico ZAP -->
+          <tr data-clade="lowland" data-search="zapalote chico zap lowland 50 masl ames 30536 zm-zap-reference-hilo-1.0 zm00110aa.1 oaxaca mexico">
+            <td>
+              <div class="hilo-primary-cell">
+                <a href="/genome/assembly/Zm-ZAP-REFERENCE-HiLo-1.0" class="hilo-assembly-link">
+                  <strong>Zm-ZAP-REFERENCE-HiLo-1.0</strong>
+                </a>
+                <div class="hilo-sub-actions">
+                  <a href="/genomebrowser?assembly=Zm-ZAP-REFERENCE-HiLo-1.0" class="hilo-jb2-btn" title="View ZAP in JBrowse 2">
+                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
+                  </a>
+                  <a href="/genome/assembly/Zm-ZAP-REFERENCE-HiLo-1.0" class="hilo-rec-btn">Assembly Page &rarr;</a>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="hilo-taxon-cell">
+                <strong class="hilo-line-name">Zapalote Chico \(ZAP\)</strong>
+                <span class="hilo-landrace-name">Traditional Coastal Lowland Landrace</span>
+                <span class="hilo-detail-note">Accession&#58; <a href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=1842814" target="_blank" rel="noopener">Ames 30536 &#8599;</a></span>
+              </div>
+            </td>
+            <td>
+              <div class="hilo-origin-cell">
+                <span class="hilo-badge hilo-badge-lowland">Lowland &bull; 50 masl</span>
+                <span class="hilo-region-text">Isthmus of Tehuantepec, Oaxaca, Mexico</span>
+              </div>
+            </td>
+            <td>
+              <div class="hilo-anno-cell">
+                <span class="hilo-anno-tag">Zm00110aa.1</span>
+                <a href="/gene_center/gene" class="hilo-gene-link">Explore Gene Models &rarr;</a>
+              </div>
+            </td>
+            <td class="text-right">
+              <a href="https://download.maizegdb.org/Zm-ZAP-REFERENCE-HiLo-1.0/" class="hilo-dl-btn" target="_blank" rel="noopener">
+                Download &#8599;
+              </a>
+            </td>
+          </tr>
+
+          <!-- 7: CML530 -->
+          <tr data-clade="lowland" data-search="cml530 lowland acid soil cimmytma 29750 inbred zm-cml530-reference-hilo-1.0 zm00108aa.1">
+            <td>
+              <div class="hilo-primary-cell">
+                <a href="/genome/assembly/Zm-CML530-REFERENCE-HiLo-1.0" class="hilo-assembly-link">
+                  <strong>Zm-CML530-REFERENCE-HiLo-1.0</strong>
+                </a>
+                <div class="hilo-sub-actions">
+                  <a href="/genomebrowser?assembly=Zm-CML530-REFERENCE-HiLo-1.0" class="hilo-jb2-btn" title="View CML530 in JBrowse 2">
+                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
+                  </a>
+                  <a href="/genome/assembly/Zm-CML530-REFERENCE-HiLo-1.0" class="hilo-rec-btn">Assembly Page &rarr;</a>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="hilo-taxon-cell">
+                <strong class="hilo-line-name">CML530</strong>
+                <span class="hilo-landrace-name">CIMMYT Acid-Soil Adapted Inbred</span>
+                <span class="hilo-detail-note">Accession&#58; <a href="https://glis.fao.org/glis/entity/view?eid=562449" target="_blank" rel="noopener">CIMMYTMA 29750 &#8599;</a></span>
+              </div>
+            </td>
+            <td>
+              <div class="hilo-origin-cell">
+                <span class="hilo-badge hilo-badge-lowland">Lowland Acid Soil</span>
+                <span class="hilo-region-text">CIMMYT Tropical Lowland Acid-Soil Program</span>
+              </div>
+            </td>
+            <td>
+              <div class="hilo-anno-cell">
+                <span class="hilo-anno-tag">Zm00108aa.1</span>
+                <a href="/gene_center/gene" class="hilo-gene-link">Explore Gene Models &rarr;</a>
+              </div>
+            </td>
+            <td class="text-right">
+              <a href="https://download.maizegdb.org/Zm-CML530-REFERENCE-HiLo-1.0/" class="hilo-dl-btn" target="_blank" rel="noopener">
+                Download &#8599;
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 2: ALTITUDINAL ADAPTATION & TRAITS -->
+  <section id="hilo-adaptation" class="mgdb-panel" aria-labelledby="hilo-adaptation-title">
+    <div class="hilo-panel-header-wrap">
+      <div>
+        <h2 id="hilo-adaptation-title" class="mgdb-panel-title">Altitudinal Adaptation &amp; Environmental Traits</h2>
+        <p class="mgdb-panel-lead">How traditional Mexican highland and lowland maize varieties evolved specialized morphological and physiological adaptations along elevational gradients.</p>
+      </div>
+    </div>
+
+    <div class="hilo-adaptation-grid">
+      <article class="hilo-adaptation-card">
+        <h3>Phosphorus Efficiency &amp; Low-Temperature Growth</h3>
+        <p>
+          Mexican highland varieties \(such as Palomero Toluque&ntilde;o\) are cultivated at extreme altitudes where volcanic soils severely limit phosphorus availability. These varieties exhibit specialized mycorrhizal associations, increased purple anthocyanin pigmentation protecting photosynthetic machinery against intense ultraviolet radiation, and superior metabolic performance under low temperatures.
+        </p>
+      </article>
+
+      <article class="hilo-adaptation-card">
+        <h3>Macro-Hair Density &amp; Root Architecture</h3>
+        <p>
+          Highland maize produces dense macro-hairs \(trichomes\) covering leaf sheaths and stems, creating a micro-boundary layer that buffers against mountain frost and insect herbivory. Highland plants feature specialized root system development, and farmers historically practice hilling \(piling soil around the stalk base\) during vegetative growth to support anchorage and prevent lodging.
+        </p>
+      </article>
+
+      <article class="hilo-adaptation-card">
+        <h3>Elevational Genomic Divergence &amp; Flowering Time</h3>
+        <p>
+          Comparative mapping across the elevational gradient from 50 meters \(Zapalote Chico\) to over 2,500 meters \(Palomero Toluque&ntilde;o\) uncovers large chromosomal inversions and regulatory polymorphisms in photoperiod and flowering pathways \(e.g., <em>ZCN8</em>, <em>Vgt1</em>\), driving local adaptation to highland and lowland environments.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 3: KEY PUBLICATIONS & ABSTRACT PREVIEWS -->
+  <section id="hilo-publications" class="mgdb-panel" aria-labelledby="hilo-pub-title">
+    <div class="hilo-panel-header-wrap">
+      <div>
+        <h2 id="hilo-pub-title" class="mgdb-panel-title">Key Publications &amp; Abstract Previews</h2>
+        <p class="mgdb-panel-lead">Scientific literature detailing the HiLo genome assemblies, genetic mapping populations, and highland adaptation loci.</p>
+      </div>
+    </div>
+
+    <div class="hilo-publications-grid">
+      <!-- Publication 1: Perez-Limón et al. 2022 -->
+      <article class="hilo-pub-card">
+        <div class="hilo-pub-meta-top">
+          <span class="hilo-pub-journal-badge">G3 \(Bethesda\) &bull; 2022</span>
+          <span class="hilo-pub-doi">DOI&#58; 10.1093/g3journal/jkab447</span>
+        </div>
+        <h3 class="hilo-pub-title">A B73 &times; Palomero Toluque&ntilde;o mapping population reveals local adaptation in Mexican highland maize</h3>
+        <p class="hilo-pub-authors">Sergio Perez-Lim&oacute;n, Meng Li, Gina C. Cintora-Martinez, M. Rosario Aguilar-Rangel, M. Nicole Salazar-Vidal, Enrique Gonz&aacute;lez-Segovia, Kevin Bl&ouml;cher-Ju&aacute;rez, Alejandra Guerrero-Zavala, Bernardo Barrales-Gamez, Jonathan Carca&ntilde;o-Macias, et al.</p>
+        <p class="hilo-pub-citation"><em>G3&#58; Genes, Genomes, Genetics</em> 2022 Feb; 12\(2\)&#58;jkab447.</p>
+        
+        <div class="hilo-pub-abstract-wrap">
+          <h4 class="hilo-pub-abstract-heading">Abstract</h4>
+          <p class="hilo-pub-abstract-text">Maize was domesticated in the warm lowlands of southwestern Mexico and subsequently adapted to the cold volcanic highlands of central Mexico and the Andes. Highland landraces display distinctive phenotypes including stem pigmentation, macro-hair development, modified root architecture, and cold tolerance. To characterize the genetic architecture of highland adaptation, we generated a recombinant inbred line population between B73 and the Mexican highland landrace Palomero Toluque&ntilde;o. Quantitative trait locus \(QTL\) mapping across multi-environment highland and lowland field trials identified key genomic regions governing anthocyanin pigmentation, flowering time, plant height, and tillering, providing insight into the genetic basis of altitudinal adaptation in traditional landraces.</p>
+        </div>
+
+        <div class="hilo-pub-actions">
+          <a class="mgdb-button mgdb-button-primary" href="https://doi.org/10.1093/g3journal/jkab447" target="_blank" rel="noopener">Full Text on G3 &#8599;</a>
+          <a class="mgdb-button mgdb-button-secondary" href="https://pubmed.ncbi.nlm.nih.gov/34994770/" target="_blank" rel="noopener">PubMed 34994770 &#8599;</a>
+          <a class="mgdb-button mgdb-button-quiet" href="/data_center/reference?author=Perez-Limon">MaizeGDB Record</a>
+        </div>
+      </article>
+
+      <!-- Publication 2: Eagles & Lothrop 1994 -->
+      <article class="hilo-pub-card">
+        <div class="hilo-pub-meta-top">
+          <span class="hilo-pub-journal-badge">Crop Science &bull; 1994</span>
+          <span class="hilo-pub-doi">DOI&#58; 10.2135/cropsci1994.0011183X003400010002x</span>
+        </div>
+        <h3 class="hilo-pub-title">Highland Maize from Central Mexico - Its Origin, Characteristics, and Use in Breeding Programs</h3>
+        <p class="hilo-pub-authors">Howard A. Eagles, J. E. Lothrop</p>
+        <p class="hilo-pub-citation"><em>Crop Science</em> 1994 Jan; 34\(1\)&#58;11&ndash;19.</p>
+        
+        <div class="hilo-pub-abstract-wrap">
+          <h4 class="hilo-pub-abstract-heading">Abstract</h4>
+          <p class="hilo-pub-abstract-text">Highland maize from the Central Mexican plateau \(elevations &gt;2000 m\) represents a unique germplasm pool characterized by rapid early growth under low temperatures, high tolerance to night frosts, and distinctive grain quality. This foundational review outlines the geographical distribution, evolutionary origins, morphological attributes, and potential of Central Mexican highland landraces for introducing cold tolerance and phosphorus efficiency into temperate hybrid breeding programs worldwide.</p>
+        </div>
+
+        <div class="hilo-pub-actions">
+          <a class="mgdb-button mgdb-button-primary" href="https://doi.org/10.2135/cropsci1994.0011183X003400010002x" target="_blank" rel="noopener">Full Text on Crop Science &#8599;</a>
+          <a class="mgdb-button mgdb-button-quiet" href="/data_center/reference?author=Eagles">MaizeGDB Record</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 4: DATA HOSTED AT MAIZEGDB -->
+  <section id="hilo-data-hosted" class="mgdb-panel" aria-labelledby="hilo-hosted-title">
+    <div class="hilo-panel-header-wrap">
+      <div>
+        <h2 id="hilo-hosted-title" class="mgdb-panel-title">HiLo Datasets Hosted at MaizeGDB</h2>
+        <p class="mgdb-panel-lead">Integrated genome browser tracks, sequence BLAST targets, gene models, and bulk download archives.</p>
+      </div>
+    </div>
+
+    <div class="hilo-hosted-grid">
+      <!-- 1: JBrowse 2 -->
+      <article class="hilo-hosted-card">
+        <h3>Genome Browsers \(JBrowse 2\)</h3>
+        <p>Interactive chromosome-scale browsers for all 7 HiLo assemblies with gene models, repeat elements, and comparative tracks.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="/genomebrowser">Open Genome Browsers &#8599;</a>
+      </article>
+
+      <!-- 2: Gene Center -->
+      <article class="hilo-hosted-card">
+        <h3>Gene Center &amp; Models</h3>
+        <p>High-confidence structural and functional gene annotations across all 7 lines indexed in the Gene Center with GO terms.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="/gene_center/gene">Explore Gene Center &#8599;</a>
+      </article>
+
+      <!-- 3: BLAST -->
+      <article class="hilo-hosted-card">
+        <h3>Sequence BLAST Tool</h3>
+        <p>Align nucleotide, CDS, transcript, and translated protein queries directly against HiLo assemblies and gene models.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="$(blast_url)">Run BLAST Search &#8599;</a>
+      </article>
+
+      <!-- 4: Bulk Downloads -->
+      <article class="hilo-hosted-card">
+        <h3>Bulk Downloads &amp; Globus</h3>
+        <p>Download complete assembly FASTA files, GFF3 annotations, canonical CDS/PEP sequences, and pre-indexed tracks.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="/download#downloads-hilo">Browse Downloads &#8599;</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 5: SCALE & GENOMIC METRICS DASHBOARD -->
+  <section id="hilo-metrics" class="mgdb-panel" aria-labelledby="hilo-metrics-title">
+    <div class="hilo-panel-header-wrap">
+      <div>
+        <h2 id="hilo-metrics-title" class="mgdb-panel-title">HiLo Dataset Scale &amp; Metrics</h2>
+        <p class="mgdb-panel-lead">Summary statistics across the high and low elevation maize genome assemblies and ecological gradient.</p>
+      </div>
+    </div>
+
+    <div class="mgdb-metric-grid mgdb-metric-grid-4">
+      <div class="mgdb-metric-card mgdb-metric-card-green">
+        <div class="mgdb-metric-number">7</div>
+        <div class="mgdb-metric-title">De Novo Reference Assemblies</div>
+        <div class="mgdb-metric-desc">Traditional landraces \(PT, PDJ, TAB, ZAP\) and CIMMYT inbreds \(CML457, CML459, CML530\).</div>
+      </div>
+      <div class="mgdb-metric-card mgdb-metric-card-gold">
+        <div class="mgdb-metric-number">50–2520m</div>
+        <div class="mgdb-metric-title">Elevation Range</div>
+        <div class="mgdb-metric-desc">Spanning lowland coastal tropics \(50 masl\) to high-altitude volcanic plateaus \(2,520 masl\).</div>
+      </div>
+      <div class="mgdb-metric-card mgdb-metric-card-blue">
+        <div class="mgdb-metric-number">40,000+</div>
+        <div class="mgdb-metric-title">Gene Models per Line</div>
+        <div class="mgdb-metric-desc">High-confidence structural and functional gene annotations across all 7 assembled lines.</div>
+      </div>
+      <div class="mgdb-metric-card mgdb-metric-card-orange">
+        <div class="mgdb-metric-number">NSF #1546719</div>
+        <div class="mgdb-metric-title">Supported Collaboration</div>
+        <div class="mgdb-metric-desc">Multi-institutional effort across CINVESTAV/LANGEBIO, UNAM, NC State, UC Davis, ISU, and USDA.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6: COLLABORATING INSTITUTIONS & ACKNOWLEDGMENTS -->
+  <section id="hilo-collab" class="mgdb-panel" aria-labelledby="hilo-collab-title">
+    <div class="hilo-panel-header-wrap">
+      <div>
+        <h2 id="hilo-collab-title" class="mgdb-panel-title">Partners &amp; Acknowledgments</h2>
+        <p class="mgdb-panel-lead">Collaborating research institutions and acknowledgment of indigenous agricultural heritage.</p>
+      </div>
+    </div>
+
+    <div class="hilo-collab-wrap">
+      <p>
+        The HiLo project was supported by National Science Foundation Award <a href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1546719" target="_blank" rel="noopener">#1546719</a> and developed in close collaboration with <strong>CINVESTAV Unidad de Gen&oacute;mica Avanzada \(LANGEBIO\)</strong>, <strong>Universidad Nacional Aut&oacute;noma de M&eacute;xico \(UNAM\)</strong>, <strong>North Carolina State University</strong>, <strong>Iowa State University</strong>, <strong>University of California Davis</strong>, <strong>Penn State University</strong>, <strong>USDA-ARS</strong>, and <strong>Corteva Agriscience</strong>.
+      </p>
+      <div class="hilo-acknowledgment-box">
+        <p>
+          <strong>Acknowledgment of Indigenous Heritage&#58;</strong> We acknowledge the smallholder farmers and indigenous peoples of Mexico and the Americas whose centuries of dedicated stewardship, cultural traditions, and identity continue to preserve maize genetic diversity for global agriculture.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 7: FAQS & GUIDELINES -->
+  <section id="hilo-faqs" class="mgdb-panel" aria-labelledby="hilo-faqs-title">
+    <div class="hilo-panel-header-wrap">
+      <div>
+        <h2 id="hilo-faqs-title" class="mgdb-panel-title">Frequently Asked Questions &amp; Guidelines</h2>
+        <p class="mgdb-panel-lead">Information regarding gene model access, germplasm stock ordering, and citation standards.</p>
+      </div>
+    </div>
+
+    <div class="hilo-faq-list">
+      <details class="hilo-faq-item">
+        <summary><h3>How do I obtain physical seed stocks for the HiLo landraces and inbreds?</h3></summary>
+        <div class="hilo-faq-body">
+          <p>
+            Seed stocks for the traditional landraces are preserved in national and international germplasm repositories:
+            Palomero de Jalisco \(<a href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=1925923" target="_blank" rel="noopener">PI 693885</a>\),
+            Tabloncillo \(<a href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=1925925" target="_blank" rel="noopener">Ames 32914</a>\),
+            Zapalote Chico \(<a href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail?id=1842814" target="_blank" rel="noopener">Ames 30536</a>\),
+            and CIMMYT inbreds through the <a href="https://www.cimmyt.org/resources/seed-request/" target="_blank" rel="noopener">CIMMYT Germplasm Bank</a>.
+          </p>
+        </div>
+      </details>
+
+      <details class="hilo-faq-item">
+        <summary><h3>Where can I download the complete FASTA sequences and GFF3 gene annotations?</h3></summary>
+        <div class="hilo-faq-body">
+          <p>
+            All assemblies, GFF3 annotation files, and predicted CDS/peptide FASTA sequences can be downloaded directly from the <a href="/download#downloads-hilo">MaizeGDB Downloads Portal</a> or via individual assembly links in the table above.
+          </p>
+        </div>
+      </details>
+
+      <details class="hilo-faq-item">
+        <summary><h3>How should I cite the HiLo project in research publications?</h3></summary>
+        <div class="hilo-faq-body">
+          <p>
+            Please cite <strong>Perez-Lim&oacute;n et al. \(2022\)</strong>, <em>A B73 &times; Palomero Toluque&ntilde;o mapping population reveals local adaptation in Mexican highland maize</em>, G3&#58; Genes, Genomes, Genetics 12\(2\)&#58;jkab447 \(<a href="https://doi.org/10.1093/g3journal/jkab447" target="_blank" rel="noopener">doi&#58;10.1093/g3journal/jkab447</a>\), along with NSF Award #1546719 and the MaizeGDB database citation.
+          </p>
+        </div>
+      </details>
+
+      <details class="hilo-faq-item">
+        <summary><h3>Can I compare HiLo genomes with B73 in JBrowse 2?</h3></summary>
+        <div class="hilo-faq-body">
+          <p>
+            Yes! Launch <a href="/genomebrowser">JBrowse 2</a>, select any HiLo assembly, and use the Track Selector to add synteny, gene models, and comparative alignments against B73 RefGen_v5.
+          </p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- SECTION 8: CONNECTED RESOURCES -->
+  <section id="hilo-related" class="mgdb-panel hilo-bottom-section" aria-labelledby="hilo-related-title">
+    <div class="hilo-panel-header-wrap">
+      <div>
+        <h2 id="hilo-related-title" class="mgdb-panel-title">Connected MaizeGDB Genomics Projects</h2>
+        <p class="mgdb-panel-lead">Explore related pangenomic, diversity, and association mapping resources.</p>
+      </div>
+    </div>
+
+    <div class="hilo-related-grid">
+      <a class="hilo-related-card" href="/NAM_project">
+        <div class="hilo-related-title">NAM Parent Genomes &rarr;</div>
+        <p class="hilo-related-desc">26 de novo chromosome-scale assemblies of the US Nested Association Mapping founder lines.</p>
+      </a>
+      <a class="hilo-related-card" href="/PanAnd_project">
+        <div class="hilo-related-title">Pan-Andropogoneae Genomes &rarr;</div>
+        <p class="hilo-related-desc">36+ reference assemblies across wild panicoid grasses, teosintes, and sorghum outgroups.</p>
+      </a>
+      <a class="hilo-related-card" href="/european_flints">
+        <div class="hilo-related-title">European Flints Project &rarr;</div>
+        <p class="hilo-related-desc">4 reference assemblies exploring European flint diversity, heterosis, and cold adaptation.</p>
+      </a>
+      <a class="hilo-related-card" href="/genome">
+        <div class="hilo-related-title">Genome Assembly Center &rarr;</div>
+        <p class="hilo-related-desc">Browse all reference, founder, diversity, and pan-genomic maize assemblies hosted at MaizeGDB.</p>
+      </a>
+    </div>
+  </section>
+
+</main>
+)

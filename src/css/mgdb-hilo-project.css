@@ -1,0 +1,773 @@
+/* ==========================================================================
+ * file: mgdb-hilo-project.css
+ * purpose: Stylesheet for High & Low Elevation Maize Genomes Project (/HiLo_project)
+ *          Formatted to match NAM and European Flints project standards
+ * ========================================================================== */
+
+.mgdb-hilo-project-page {
+  padding-bottom: var(--mgdb-space-8);
+}
+
+.mgdb-hilo-project-page .mgdb-panel {
+  margin-top: var(--mgdb-space-6);
+  padding: var(--mgdb-space-6);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-hilo-project-page .hilo-panel-header-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-hilo-project-page .mgdb-panel-title {
+  margin: 0 0 var(--mgdb-space-1);
+  font-size: var(--mgdb-text-2xl);
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-hilo-project-page .mgdb-panel-lead {
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  max-width: 75ch;
+}
+
+/* --------------------------------------------------------------------------
+ * Hero Action Links
+ * -------------------------------------------------------------------------- */
+
+.mgdb-hilo-project-page .hilo-hero-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-hilo-project-page .hilo-hero-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.mgdb-hilo-project-page .hilo-hero-link:hover {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border-color: var(--mgdb-green-dark);
+}
+
+.mgdb-hilo-project-page .hilo-link-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.mgdb-hilo-project-page .hilo-dot-green { background: #16a34a; }
+.mgdb-hilo-project-page .hilo-dot-gold { background: #d97706; }
+.mgdb-hilo-project-page .hilo-dot-blue { background: #2563eb; }
+.mgdb-hilo-project-page .hilo-dot-rose { background: #e11d48; }
+.mgdb-hilo-project-page .hilo-dot-purple { background: #9333ea; }
+.mgdb-hilo-project-page .hilo-dot-dark { background: #475569; }
+
+/* --------------------------------------------------------------------------
+ * Filter & Search Toolbar
+ * -------------------------------------------------------------------------- */
+
+.mgdb-hilo-project-page .hilo-table-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  margin-bottom: var(--mgdb-space-3);
+}
+
+.mgdb-hilo-project-page .hilo-filter-chips-wrap {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-hilo-project-page .hilo-toolbar-label {
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  color: var(--mgdb-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-right: 2px;
+}
+
+.mgdb-hilo-project-page .hilo-chip {
+  padding: 5px 12px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mgdb-hilo-project-page .hilo-chip:hover {
+  background: var(--mgdb-line);
+}
+
+.mgdb-hilo-project-page .hilo-chip.is-active {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border-color: var(--mgdb-green-dark);
+}
+
+.mgdb-hilo-project-page .hilo-search-wrap {
+  flex: 1 1 280px;
+  max-width: 380px;
+}
+
+.mgdb-hilo-project-page .hilo-search-input {
+  width: 100%;
+  height: 38px;
+  padding: 6px 12px;
+  font-size: var(--mgdb-text-sm);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: #ffffff;
+}
+
+.mgdb-hilo-project-page .hilo-search-input:focus {
+  outline: none;
+  border-color: var(--mgdb-green-dark);
+  box-shadow: 0 0 0 3px rgba(27, 94, 32, 0.15);
+}
+
+.mgdb-hilo-project-page .hilo-table-status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  padding: 8px 14px;
+  background: var(--mgdb-surface-alt);
+  border: 1px solid var(--mgdb-line);
+  border-bottom: none;
+  border-radius: var(--mgdb-radius) var(--mgdb-radius) 0 0;
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-hilo-project-page #hilo-row-count {
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-hilo-project-page .hilo-table-hint {
+  color: var(--mgdb-muted);
+}
+
+/* --------------------------------------------------------------------------
+ * Main Interactive Table
+ * -------------------------------------------------------------------------- */
+
+.mgdb-hilo-project-page .hilo-table-scroll {
+  border: 1px solid var(--mgdb-line);
+  border-radius: 0 0 var(--mgdb-radius) var(--mgdb-radius);
+  overflow-x: auto;
+  background: #ffffff;
+}
+
+.mgdb-hilo-project-page .hilo-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-hilo-project-page .hilo-table th {
+  background: #f8fafc;
+  color: var(--mgdb-ink);
+  font-weight: 700;
+  padding: 10px 14px;
+  border-bottom: 2px solid var(--mgdb-line);
+  white-space: nowrap;
+}
+
+.mgdb-hilo-project-page .hilo-table th.is-sortable button {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 700;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mgdb-hilo-project-page .hilo-table th.is-sortable button:hover {
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-hilo-project-page .hilo-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--mgdb-line-soft);
+  vertical-align: middle;
+}
+
+.mgdb-hilo-project-page .hilo-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.mgdb-hilo-project-page .hilo-primary-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mgdb-hilo-project-page .hilo-assembly-link {
+  font-weight: 700;
+  color: var(--mgdb-burgundy);
+  text-decoration: none;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-hilo-project-page .hilo-assembly-link:hover {
+  text-decoration: underline;
+}
+
+.mgdb-hilo-project-page .hilo-sub-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mgdb-hilo-project-page .hilo-jb2-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 6px;
+  border: 1px solid #c8e6c9;
+  border-radius: var(--mgdb-radius-sm);
+  background: #e8f5e9;
+  color: #1b5e20;
+  font-size: 10px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.12s ease;
+}
+
+.mgdb-hilo-project-page .hilo-jb2-btn:hover {
+  background: #1b5e20;
+  color: #ffffff;
+  border-color: #1b5e20;
+}
+
+.mgdb-hilo-project-page .jb2-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #2e7d32;
+}
+
+.mgdb-hilo-project-page .hilo-jb2-btn:hover .jb2-dot {
+  background: #ffffff;
+}
+
+.mgdb-hilo-project-page .hilo-rec-btn {
+  font-size: 11px;
+  color: var(--mgdb-muted);
+  text-decoration: none;
+}
+
+.mgdb-hilo-project-page .hilo-rec-btn:hover {
+  color: var(--mgdb-green-dark);
+  text-decoration: underline;
+}
+
+.mgdb-hilo-project-page .hilo-taxon-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mgdb-hilo-project-page .hilo-line-name {
+  font-weight: 700;
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-hilo-project-page .hilo-landrace-name {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-green-dark);
+  font-weight: 600;
+}
+
+.mgdb-hilo-project-page .hilo-detail-note {
+  font-size: 11px;
+  color: var(--mgdb-muted);
+}
+
+.mgdb-hilo-project-page .hilo-detail-note a {
+  color: var(--mgdb-green-dark);
+  text-decoration: none;
+}
+
+.mgdb-hilo-project-page .hilo-detail-note a:hover {
+  text-decoration: underline;
+}
+
+/* Badges */
+.mgdb-hilo-project-page .hilo-origin-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mgdb-hilo-project-page .hilo-badge {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.mgdb-hilo-project-page .hilo-badge-highland {
+  background: #ede9fe;
+  color: #5b21b6;
+  border: 1px solid #ddd6fe;
+}
+
+.mgdb-hilo-project-page .hilo-badge-mid {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.mgdb-hilo-project-page .hilo-badge-lowland {
+  background: #ccfbf1;
+  color: #115e59;
+  border: 1px solid #99f6e4;
+}
+
+.mgdb-hilo-project-page .hilo-region-text {
+  font-size: 11px;
+  color: var(--mgdb-muted);
+}
+
+.mgdb-hilo-project-page .hilo-anno-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mgdb-hilo-project-page .hilo-anno-tag {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--mgdb-font-mono, monospace);
+}
+
+.mgdb-hilo-project-page .hilo-gene-link {
+  font-size: 11px;
+  color: var(--mgdb-green-dark);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.mgdb-hilo-project-page .hilo-gene-link:hover {
+  text-decoration: underline;
+}
+
+.mgdb-hilo-project-page .hilo-dl-btn {
+  display: inline-block;
+  padding: 4px 8px;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--mgdb-radius-sm);
+  background: #f0fdf4;
+  color: var(--mgdb-green-dark);
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.12s ease;
+}
+
+.mgdb-hilo-project-page .hilo-dl-btn:hover {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border-color: var(--mgdb-green-dark);
+}
+
+.mgdb-hilo-project-page .text-right {
+  text-align: right;
+}
+
+/* --------------------------------------------------------------------------
+ * Section 2: Adaptation & Traits Cards (NO ICONS, LIKE NAM)
+ * -------------------------------------------------------------------------- */
+
+.mgdb-hilo-project-page .hilo-adaptation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-hilo-project-page .hilo-adaptation-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-4);
+  display: flex;
+  flex-direction: column;
+}
+
+.mgdb-hilo-project-page .hilo-adaptation-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 var(--mgdb-space-2) 0;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-hilo-project-page .hilo-adaptation-card p {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.5;
+  margin: 0;
+  flex: 1;
+}
+
+/* --------------------------------------------------------------------------
+ * Section 3: Publications (FORMATTED EXACTLY LIKE NAM)
+ * -------------------------------------------------------------------------- */
+
+.mgdb-hilo-project-page .hilo-publications-grid {
+  display: grid;
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-hilo-project-page .hilo-pub-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-5);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-hilo-project-page .hilo-pub-meta-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-hilo-project-page .hilo-pub-journal-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #fef3c7;
+  color: #92400e;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.mgdb-hilo-project-page .hilo-pub-doi {
+  font-family: var(--mgdb-font-mono, monospace);
+  font-size: 11px;
+  color: var(--mgdb-muted);
+}
+
+.mgdb-hilo-project-page .hilo-pub-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--mgdb-burgundy);
+  margin: 0 0 var(--mgdb-space-2) 0;
+}
+
+.mgdb-hilo-project-page .hilo-pub-authors {
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-ink);
+  margin: 0 0 var(--mgdb-space-1) 0;
+  line-height: 1.4;
+}
+
+.mgdb-hilo-project-page .hilo-pub-citation {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  margin: 0 0 var(--mgdb-space-3) 0;
+}
+
+.mgdb-hilo-project-page .hilo-pub-abstract-wrap {
+  background: var(--mgdb-surface-alt);
+  border-left: 3px solid var(--mgdb-green);
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-hilo-project-page .hilo-pub-abstract-heading {
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--mgdb-green-dark);
+  margin: 0 0 4px 0;
+}
+
+.mgdb-hilo-project-page .hilo-pub-abstract-text {
+  font-size: var(--mgdb-text-xs);
+  line-height: 1.6;
+  color: var(--mgdb-ink-soft);
+  margin: 0;
+}
+
+.mgdb-hilo-project-page .hilo-pub-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+/* --------------------------------------------------------------------------
+ * Section 4: Data Hosted at MaizeGDB Cards (NO ICONS, LIKE NAM)
+ * -------------------------------------------------------------------------- */
+
+.mgdb-hilo-project-page .hilo-hosted-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-hilo-project-page .hilo-hosted-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-4);
+  display: flex;
+  flex-direction: column;
+}
+
+.mgdb-hilo-project-page .hilo-hosted-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 var(--mgdb-space-2) 0;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-hilo-project-page .hilo-hosted-card p {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.5;
+  margin-bottom: var(--mgdb-space-4);
+  flex: 1;
+}
+
+/* --------------------------------------------------------------------------
+ * Section 6: Collaboration & Acknowledgment
+ * -------------------------------------------------------------------------- */
+
+.mgdb-hilo-project-page .hilo-collab-wrap {
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+  color: var(--mgdb-ink);
+}
+
+.mgdb-hilo-project-page .hilo-collab-wrap a {
+  color: var(--mgdb-green-dark);
+  font-weight: 600;
+}
+
+.mgdb-hilo-project-page .hilo-acknowledgment-box {
+  margin-top: var(--mgdb-space-4);
+  padding: var(--mgdb-space-4);
+  background: #f0fdf4;
+  border-left: 4px solid var(--mgdb-green);
+  border-radius: 0 var(--mgdb-radius) var(--mgdb-radius) 0;
+  font-size: var(--mgdb-text-xs);
+  line-height: 1.6;
+  color: #166534;
+}
+
+.mgdb-hilo-project-page .hilo-acknowledgment-box p {
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+ * Button Styles Matching NAM Project
+ * -------------------------------------------------------------------------- */
+
+.mgdb-hilo-project-page .mgdb-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--mgdb-radius-sm);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.mgdb-hilo-project-page .mgdb-button-primary {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border: 1px solid var(--mgdb-green-dark);
+}
+
+.mgdb-hilo-project-page .mgdb-button-primary:hover {
+  background: #14532d;
+  border-color: #14532d;
+}
+
+.mgdb-hilo-project-page .mgdb-button-secondary {
+  background: #ffffff;
+  color: var(--mgdb-green-dark);
+  border: 1px solid var(--mgdb-line);
+}
+
+.mgdb-hilo-project-page .mgdb-button-secondary:hover {
+  background: var(--mgdb-surface-alt);
+  border-color: var(--mgdb-green-dark);
+}
+
+.mgdb-hilo-project-page .mgdb-button-quiet {
+  background: transparent;
+  color: var(--mgdb-muted);
+  border: 1px solid transparent;
+}
+
+.mgdb-hilo-project-page .mgdb-button-quiet:hover {
+  color: var(--mgdb-ink);
+  background: var(--mgdb-surface-alt);
+}
+
+/* --------------------------------------------------------------------------
+ * Section 7: FAQ Accordions
+ * -------------------------------------------------------------------------- */
+
+.mgdb-hilo-project-page .hilo-faq-list {
+  display: grid;
+  gap: var(--mgdb-space-3);
+}
+
+.mgdb-hilo-project-page .hilo-faq-item {
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.mgdb-hilo-project-page .hilo-faq-item summary {
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  background: #ffffff;
+  transition: background 0.12s ease;
+}
+
+.mgdb-hilo-project-page .hilo-faq-item summary:hover {
+  background: #f8faf8;
+}
+
+.mgdb-hilo-project-page .hilo-faq-item summary h3 {
+  display: inline;
+  font-size: var(--mgdb-text-base);
+  color: var(--mgdb-green-dark);
+  margin: 0;
+}
+
+.mgdb-hilo-project-page .hilo-faq-body {
+  padding: 0 var(--mgdb-space-5) var(--mgdb-space-4);
+  border-top: 1px solid var(--mgdb-line-soft);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-hilo-project-page .hilo-faq-body a {
+  color: var(--mgdb-green-dark);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+ * Section 8: Connected Resources (Matching NAM bottom section)
+ * -------------------------------------------------------------------------- */
+
+.mgdb-hilo-project-page .hilo-bottom-section {
+  background: linear-gradient(180deg, var(--mgdb-surface) 0%, var(--mgdb-green-soft) 100%) !important;
+  border-color: #b8dbca !important;
+}
+
+.mgdb-hilo-project-page .hilo-related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-hilo-project-page .hilo-related-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  padding: var(--mgdb-space-3);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color .12s, box-shadow .12s;
+}
+
+.mgdb-hilo-project-page .hilo-related-card:hover {
+  border-color: var(--mgdb-green);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.mgdb-hilo-project-page .hilo-related-title {
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+  margin-bottom: 2px;
+}
+
+.mgdb-hilo-project-page .hilo-related-desc {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mgdb-hilo-project-page .hilo-table-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .mgdb-hilo-project-page .hilo-search-wrap {
+    max-width: 100%;
+  }
+}
