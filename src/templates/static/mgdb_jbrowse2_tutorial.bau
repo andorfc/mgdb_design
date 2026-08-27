@@ -1,0 +1,345 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-jbrowse2-tutorial
+<a class="mgdb-skip-link" href="#jb2-main">Skip to main content</a>
+
+<main class="mgdb-page mgdb-jbrowse2-tutorial-page" id="jb2-main">
+
+  <!-- Breadcrumb Navigation -->
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span>
+    <a href="/genome">Genomes</a><span aria-hidden="true">&rsaquo;</span>
+    <span aria-current="page">JBrowse 2 Tutorial</span>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="mgdb-hero" aria-labelledby="jb2-title">
+    <div class="mgdb-hero-emblem" aria-hidden="true" style="background:#ffffff; border:1px solid #e2e8f0;">
+      <svg width="56" height="56" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Browser window with multiple genome tracks and synteny ribbons -->
+        <rect x="8" y="10" width="48" height="44" rx="4" fill="#f8fafc" stroke="#1b5e20" stroke-width="2"/>
+        <path d="M8 20H56" stroke="#1b5e20" stroke-width="1.5"/>
+        <circle cx="14" cy="15" r="2" fill="#ef4444"/>
+        <circle cx="20" cy="15" r="2" fill="#eab308"/>
+        <circle cx="26" cy="15" r="2" fill="#22c55e"/>
+        <!-- Tracks inside browser -->
+        <rect x="14" y="26" width="36" height="4" rx="2" fill="#3b82f6"/>
+        <rect x="14" y="34" width="24" height="4" rx="2" fill="#10b981"/>
+        <rect x="22" y="42" width="28" height="4" rx="2" fill="#8b5cf6"/>
+      </svg>
+      <strong>JBrowse 2<br />Tutorial</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data_date)</p>
+      <h1 id="jb2-title">How to Use MaizeGDB's JBrowse 2</h1>
+      <p class="mgdb-hero-description">
+        Comprehensive guide to navigating next-generation multi-genome views, linear synteny alignments, whole-genome dotplots, structural variant tracks, and session sharing on JBrowse 2.
+      </p>
+
+      <div class="jb2-hero-actions-row">
+        <a class="jb2-hero-link" href="https://jbrowse2.maizegdb.org" target="_blank" rel="noopener">
+          <span class="jb2-link-dot jb2-dot-green" aria-hidden="true"></span> Launch JBrowse 2 &#8599;
+        </a>
+        <a class="jb2-hero-link" href="#jb2-linear">
+          <span class="jb2-link-dot jb2-dot-blue" aria-hidden="true"></span> Linear Assembly View &#8595;
+        </a>
+        <a class="jb2-hero-link" href="#jb2-synteny">
+          <span class="jb2-link-dot jb2-dot-gold" aria-hidden="true"></span> Synteny Alignments &#8595;
+        </a>
+        <a class="jb2-hero-link" href="#jb2-dotplot">
+          <span class="jb2-link-dot jb2-dot-purple" aria-hidden="true"></span> Dotplot Visualizer &#8595;
+        </a>
+        <a class="jb2-hero-link" href="/genomebrowser">
+          <span class="jb2-link-dot jb2-dot-dark" aria-hidden="true"></span> Genome Browsers Hub &#8599;
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STICKY SECTION NAVIGATION TABS -->
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#jb2-overview" class="is-current">Overview &amp; Menus</a>
+    <a href="#jb2-linear">Linear Assembly View</a>
+    <a href="#jb2-synteny">Linear Synteny &amp; Stacking</a>
+    <a href="#jb2-dotplot">Dotplot Alignments</a>
+    <a href="#jb2-variation">Pan-Genome &amp; Variants</a>
+    <a href="#jb2-metrics">Platform Metrics</a>
+    <a href="#jb2-faqs">FAQs &amp; Shortcuts</a>
+    <a href="#jb2-related">Connected Resources</a>
+  </nav>
+
+  <!-- SECTION 1: OVERVIEW & MENUS -->
+  <section id="jb2-overview" class="mgdb-panel" aria-labelledby="jb2-overview-title">
+    <div class="jb2-panel-header-wrap">
+      <div>
+        <h2 id="jb2-overview-title" class="mgdb-panel-title">Interface Architecture &amp; Top Menus</h2>
+        <p class="mgdb-panel-lead">JBrowse 2 provides a responsive modular canvas capable of displaying multiple synchronized view types in one workspace.</p>
+      </div>
+    </div>
+
+    <div class="jb2-step-card">
+      <div class="jb2-step-header">
+        <span class="jb2-step-num">Step 1</span>
+        <h3>Main Navigation Bar &amp; Workspace Controls</h3>
+      </div>
+      <p>
+        The top navigation bar contains session management, track selectors, and the <strong>View</strong> menu used to launch new linear, synteny, dotplot, or tabular panels.
+      </p>
+      <div class="jb2-img-wrap">
+        <img src="/images/jbrowse2_tutorial/menus.png" alt="JBrowse 2 menus and controls interface overview" class="jb2-guide-img" loading="lazy" />
+      </div>
+      <div class="jb2-key-points">
+        <strong>Key Controls&#58;</strong>
+        <ul>
+          <li><strong>File &amp; Session&#58;</strong> Save bookmarks, export SVG snapshots, or generate permanent shareable session URLs.</li>
+          <li><strong>Tracks Selector&#58;</strong> Open the hierarchical track drawer to activate gene models, RNA-seq alignments, epigenetic marks, and repeat features.</li>
+          <li><strong>Add View&#58;</strong> Spawn multiple simultaneous viewports side-by-side or stacked vertically.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: LINEAR ASSEMBLY VIEW -->
+  <section id="jb2-linear" class="mgdb-panel" aria-labelledby="jb2-linear-title">
+    <div class="jb2-panel-header-wrap">
+      <div>
+        <h2 id="jb2-linear-title" class="mgdb-panel-title">Linear Assembly View &amp; Track Navigation</h2>
+        <p class="mgdb-panel-lead">Explore high-resolution gene models, exon-intron structures, transcript isoforms, and bigWig signal tracks.</p>
+      </div>
+    </div>
+
+    <div class="jb2-step-card">
+      <div class="jb2-step-header">
+        <span class="jb2-step-num">Step 2</span>
+        <h3>Navigating Genes &amp; Quantitative Data Tracks</h3>
+      </div>
+      <p>
+        Search by locus symbol \(e.g., <code>bx1</code>, <code>y1</code>, <code>tb1</code>\), gene model accession \(e.g., <code>Zm00001eb000010</code>\), or genomic coordinates \(e.g., <code>chr1&#58;100000..150000</code>\).
+      </p>
+      <div class="jb2-img-wrap">
+        <img src="/images/jbrowse2_tutorial/linear_genome.png" alt="JBrowse 2 linear genome assembly view showing gene tracks" class="jb2-guide-img" loading="lazy" />
+      </div>
+      <div class="jb2-key-points">
+        <strong>Useful Features in Linear View&#58;</strong>
+        <ul>
+          <li><strong>Feature Tooltips &amp; Details&#58;</strong> Click on any gene, transcript, or variant to inspect functional annotations, Pfam domains, and GO terms.</li>
+          <li><strong>Smooth Zoom &amp; Pan&#58;</strong> Use mouse drag, scroll wheel, or <code>Shift + Mouse Wheel</code> to pan rapidly along chromosomes.</li>
+          <li><strong>Color by Strand &amp; Quality&#58;</strong> Custom renderers color-code forward/reverse strands and highlight non-synonymous codon changes.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: LINEAR SYNTENY & STACKING -->
+  <section id="jb2-synteny" class="mgdb-panel" aria-labelledby="jb2-synteny-title">
+    <div class="jb2-panel-header-wrap">
+      <div>
+        <h2 id="jb2-synteny-title" class="mgdb-panel-title">Linear Synteny &amp; Multi-Genome Stacking</h2>
+        <p class="mgdb-panel-lead">Compare homologous loci, lifted-over genes, and structural variations directly between assemblies.</p>
+      </div>
+    </div>
+
+    <div class="jb2-step-card">
+      <div class="jb2-step-header">
+        <span class="jb2-step-num">Step 3</span>
+        <h3>Dual-Assembly Synteny Ribbons</h3>
+      </div>
+      <p>
+        Linear synteny views display two distinct genome assemblies \(e.g., B73 v5 vs. Mo17 or W22\) connected by translucent synteny ribbons representing whole-genome alignments.
+      </p>
+      <div class="jb2-img-wrap">
+        <img src="/images/jbrowse2_tutorial/synteny.png" alt="JBrowse 2 linear synteny view comparing two assemblies" class="jb2-guide-img" loading="lazy" />
+      </div>
+    </div>
+
+    <div class="jb2-step-card">
+      <div class="jb2-step-header">
+        <span class="jb2-step-num">Step 4</span>
+        <h3>Liftovers &amp; Stacked Multi-Genome Comparisons</h3>
+      </div>
+      <p>
+        You can use lifted-over gene models from one assembly to center an adjacent assembly pane, stacking 3 or more genomes simultaneously to dissect pan-genome structural dynamics.
+      </p>
+      <div class="jb2-img-wrap">
+        <img src="/images/jbrowse2_tutorial/synteny2.png" alt="JBrowse 2 lifted over synteny track" class="jb2-guide-img" loading="lazy" />
+      </div>
+      <div class="jb2-img-wrap">
+        <img src="/images/jbrowse2_tutorial/synteny3.png" alt="JBrowse 2 multi-genome stacked synteny panels" class="jb2-guide-img" loading="lazy" />
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: DOTPLOT ALIGNMENTS -->
+  <section id="jb2-dotplot" class="mgdb-panel" aria-labelledby="jb2-dotplot-title">
+    <div class="jb2-panel-header-wrap">
+      <div>
+        <h2 id="jb2-dotplot-title" class="mgdb-panel-title">Whole-Genome Dotplot Alignments</h2>
+        <p class="mgdb-panel-lead">Visualize large-scale chromosomal inversions, translocations, and segmental duplications on an interactive 2D matrix.</p>
+      </div>
+    </div>
+
+    <div class="jb2-step-card">
+      <div class="jb2-step-header">
+        <span class="jb2-step-num">Step 5</span>
+        <h3>Interactive 2D Dotplot Explorer</h3>
+      </div>
+      <p>
+        The dotplot view plots assembly sequence coordinates against one another. Collinear regions form diagonal lines, while off-diagonal diagonals and perpendicular segments highlight duplications and chromosomal inversions.
+      </p>
+      <div class="jb2-img-wrap">
+        <img src="/images/jbrowse2_tutorial/dotplot.png" alt="JBrowse 2 interactive whole-genome dotplot matrix" class="jb2-guide-img" loading="lazy" />
+      </div>
+      <div class="jb2-key-points">
+        <strong>Dotplot Features&#58;</strong>
+        <ul>
+          <li><strong>Box Zooming&#58;</strong> Click and drag a bounding box on the dotplot to immediately zoom into the corresponding chromosomal region.</li>
+          <li><strong>Direct Link to Synteny&#58;</strong> Right-click any aligned block to spawn a synchronized linear synteny track at that exact locus.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: PAN-GENOME & VARIATION -->
+  <section id="jb2-variation" class="mgdb-panel" aria-labelledby="jb2-var-title">
+    <div class="jb2-panel-header-wrap">
+      <div>
+        <h2 id="jb2-var-title" class="mgdb-panel-title">Pan-Genome &amp; Structural Variation Tracks</h2>
+        <p class="mgdb-panel-lead">Dissecting gene presence/absence variation, premature stop codons, and frame shifts across diversity lines.</p>
+      </div>
+    </div>
+
+    <div class="jb2-cards-grid">
+      <article class="jb2-card">
+        <h3>Stop Gain &amp; Loss Variations</h3>
+        <p>Inspect predicted functional impacts of point mutations and indels causing truncated or lengthened open reading frames across founder lines.</p>
+        <div class="jb2-img-wrap">
+          <img src="/images/jbrowse2_tutorial/stop_loss.png" alt="Stop loss variant display in JBrowse 2" class="jb2-thumb-img" loading="lazy" />
+        </div>
+      </article>
+
+      <article class="jb2-card">
+        <h3>Truncated Gene Models</h3>
+        <p>Examine pseudogenized and truncated gene models relative to intact canonical B73 reference transcripts.</p>
+        <div class="jb2-img-wrap">
+          <img src="/images/jbrowse2_tutorial/truncated.png" alt="Truncated gene model visualization in JBrowse 2" class="jb2-thumb-img" loading="lazy" />
+        </div>
+      </article>
+
+      <article class="jb2-card">
+        <h3>Pan-Genome Graph Coordinates</h3>
+        <p>Cross-reference linear track coordinates with variation graphs and structural variant calls in the NAM pan-genome.</p>
+        <div class="jb2-img-wrap">
+          <img src="/images/jbrowse2_tutorial/pan_genome.png" alt="Pan-genome structural variation tracks in JBrowse 2" class="jb2-thumb-img" loading="lazy" />
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 6: SCALE & PLATFORM METRICS DASHBOARD -->
+  <section id="jb2-metrics" class="mgdb-panel" aria-labelledby="jb2-metrics-title">
+    <div class="jb2-panel-header-wrap">
+      <div>
+        <h2 id="jb2-metrics-title" class="mgdb-panel-title">JBrowse 2 Platform Metrics</h2>
+        <p class="mgdb-panel-lead">Scope of assemblies, views, and data tracks available on the MaizeGDB JBrowse 2 instance.</p>
+      </div>
+    </div>
+
+    <div class="mgdb-metric-grid mgdb-metric-grid-4">
+      <div class="mgdb-metric-card mgdb-metric-card-green">
+        <div class="mgdb-metric-number">40+</div>
+        <div class="mgdb-metric-title">Genomic Assemblies</div>
+        <div class="mgdb-metric-desc">B73 v1–v5, 25 NAM founders, Pan-Andropogoneae, and European lines.</div>
+      </div>
+      <div class="mgdb-metric-card mgdb-metric-card-gold">
+        <div class="mgdb-metric-number">5 Views</div>
+        <div class="mgdb-metric-title">Supported Viewports</div>
+        <div class="mgdb-metric-desc">Linear genome, synteny ribbons, dotplot matrices, circular, and tables.</div>
+      </div>
+      <div class="mgdb-metric-card mgdb-metric-card-blue">
+        <div class="mgdb-metric-number">200+</div>
+        <div class="mgdb-metric-title">Curated Data Tracks</div>
+        <div class="mgdb-metric-desc">Gene models, RNA-seq, ChIP-seq, chromatin accessibility, and variants.</div>
+      </div>
+      <div class="mgdb-metric-card mgdb-metric-card-orange">
+        <div class="mgdb-metric-number">1-Click</div>
+        <div class="mgdb-metric-title">Session Sharing</div>
+        <div class="mgdb-metric-desc">Instantly share exact multi-panel views and active tracks via URL.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 7: FAQS & SHORTCUTS -->
+  <section id="jb2-faqs" class="mgdb-panel" aria-labelledby="jb2-faqs-title">
+    <div class="jb2-panel-header-wrap">
+      <div>
+        <h2 id="jb2-faqs-title" class="mgdb-panel-title">Frequently Asked Questions &amp; Keyboard Shortcuts</h2>
+        <p class="mgdb-panel-lead">Tips for maximizing performance and keyboard navigation in JBrowse 2.</p>
+      </div>
+    </div>
+
+    <div class="jb2-faq-list">
+      <details class="jb2-faq-item">
+        <summary><h3>What are the primary keyboard shortcuts for JBrowse 2?</h3></summary>
+        <div class="jb2-faq-body">
+          <p>
+            <strong>Navigation Shortcuts&#58;</strong>
+            <ul>
+              <li><code>Left / Right Arrow</code>&#58; Pan along chromosome.</li>
+              <li><code>Up / Down Arrow</code>&#58; Zoom in and out.</li>
+              <li><code>Shift + Drag</code>&#58; Select exact region to zoom in.</li>
+              <li><code>Esc</code>&#58; Close open dialogs and drawers.</li>
+            </ul>
+          </p>
+        </div>
+      </details>
+
+      <details class="jb2-faq-item">
+        <summary><h3>Can I load my own custom BAM, VCF, or BigWig files?</h3></summary>
+        <div class="jb2-faq-body">
+          <p>
+            Yes! In the top menu, go to <strong>File &rarr; Open track...</strong> to upload local files or specify public HTTP/HTTPS URLs. The data remains entirely local in your browser and is not uploaded to MaizeGDB servers.
+          </p>
+        </div>
+      </details>
+
+      <details class="jb2-faq-item">
+        <summary><h3>How do I export publication-quality vector figures from JBrowse 2?</h3></summary>
+        <div class="jb2-faq-body">
+          <p>
+            Click the menu icon on any individual view panel \(the three horizontal dots in the panel corner\) and select <strong>Export SVG</strong> to save a vector graphic of the current visible region and tracks.
+          </p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- SECTION 8: CONNECTED RESOURCES -->
+  <section id="jb2-related" class="mgdb-panel jb2-bottom-section" aria-labelledby="jb2-related-title">
+    <div class="jb2-panel-header-wrap">
+      <div>
+        <h2 id="jb2-related-title" class="mgdb-panel-title">Connected Browser &amp; Genome Tools</h2>
+        <p class="mgdb-panel-lead">Access interactive browser instances and comparative visualization tools.</p>
+      </div>
+    </div>
+
+    <div class="jb2-related-grid">
+      <a class="jb2-related-card" href="https://jbrowse2.maizegdb.org" target="_blank" rel="noopener">
+        <div class="jb2-related-title">Launch JBrowse 2 &rarr;</div>
+        <p class="jb2-related-desc">Open the live MaizeGDB JBrowse 2 multi-genome browser instance.</p>
+      </a>
+      <a class="jb2-related-card" href="/genomebrowser">
+        <div class="jb2-related-title">Genome Browsers Hub &rarr;</div>
+        <p class="jb2-related-desc">Overview of all genome browsers hosted at MaizeGDB \(JBrowse 2, JBrowse 1\).</p>
+      </a>
+      <a class="jb2-related-card" href="/whole_genome">
+        <div class="jb2-related-title">Whole Genome Views &rarr;</div>
+        <p class="jb2-related-desc">Interactive chromosome ideograms and repeat density maps across founder lines.</p>
+      </a>
+      <a class="jb2-related-card" href="/NAM_project">
+        <div class="jb2-related-title">NAM Pan-Genome &rarr;</div>
+        <p class="jb2-related-desc">26 de novo chromosome-scale assemblies of the US NAM founder inbred lines.</p>
+      </a>
+    </div>
+  </section>
+
+</main>
+)

@@ -1,0 +1,423 @@
+/* ==========================================================================
+ * file: mgdb-whole-genome.css
+ * purpose: Stylesheet for Whole Genome Views & Chromosome Visualizer (/whole_genome)
+ * ========================================================================== */
+
+.mgdb-whole-genome-page {
+  padding-bottom: var(--mgdb-space-8);
+}
+
+.mgdb-whole-genome-page .mgdb-panel {
+  margin-top: var(--mgdb-space-6);
+  padding: var(--mgdb-space-6);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-whole-genome-page .whole-genome-panel-header-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-whole-genome-page .mgdb-panel-title {
+  margin: 0 0 var(--mgdb-space-1);
+  font-size: var(--mgdb-text-2xl);
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-whole-genome-page .mgdb-panel-lead {
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  max-width: 75ch;
+}
+
+/* --------------------------------------------------------------------------
+ * Hero Action Links
+ * -------------------------------------------------------------------------- */
+
+.mgdb-whole-genome-page .whole-genome-hero-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-whole-genome-page .whole-genome-hero-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.mgdb-whole-genome-page .whole-genome-hero-link:hover {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border-color: var(--mgdb-green-dark);
+}
+
+.mgdb-whole-genome-page .whole-genome-link-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.mgdb-whole-genome-page .whole-genome-dot-green { background: #16a34a; }
+.mgdb-whole-genome-page .whole-genome-dot-blue { background: #2563eb; }
+.mgdb-whole-genome-page .whole-genome-dot-gold { background: #d97706; }
+.mgdb-whole-genome-page .whole-genome-dot-purple { background: #9333ea; }
+.mgdb-whole-genome-page .whole-genome-dot-dark { background: #475569; }
+
+/* --------------------------------------------------------------------------
+ * Controls & Selectors
+ * -------------------------------------------------------------------------- */
+
+.mgdb-whole-genome-page .wg-control-bar {
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-whole-genome-page .wg-select-wrap {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+}
+
+.mgdb-whole-genome-page .wg-select-label {
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-whole-genome-page .wg-select {
+  min-width: 320px;
+  height: 40px;
+  padding: 6px 12px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  font-size: var(--mgdb-text-sm);
+  background: #ffffff;
+}
+
+/* Chromosome Chips */
+.mgdb-whole-genome-page .wg-chr-chips-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-whole-genome-page .wg-chr-chip {
+  padding: 6px 14px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mgdb-whole-genome-page .wg-chr-chip:hover {
+  background: var(--mgdb-line);
+}
+
+.mgdb-whole-genome-page .wg-chr-chip.is-active {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border-color: var(--mgdb-green-dark);
+}
+
+/* --------------------------------------------------------------------------
+ * Display Card & Image Frame
+ * -------------------------------------------------------------------------- */
+
+.mgdb-whole-genome-page .wg-display-card {
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: #ffffff;
+  padding: var(--mgdb-space-4);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-whole-genome-page .wg-display-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  padding-bottom: var(--mgdb-space-3);
+  margin-bottom: var(--mgdb-space-3);
+  border-bottom: 1px solid var(--mgdb-line-soft);
+}
+
+.mgdb-whole-genome-page .wg-display-meta strong {
+  display: block;
+  font-size: var(--mgdb-text-base);
+  color: var(--mgdb-ink);
+}
+
+.mgdb-whole-genome-page .wg-display-sub {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+}
+
+.mgdb-whole-genome-page .wg-display-sub code {
+  font-family: var(--mgdb-font-mono, monospace);
+  background: #f1f5f9;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.mgdb-whole-genome-page .wg-display-actions {
+  display: flex;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-whole-genome-page .wg-image-frame {
+  text-align: center;
+  background: #ffffff;
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius-sm);
+  padding: var(--mgdb-space-4);
+  overflow-x: auto;
+}
+
+.mgdb-whole-genome-page .wg-main-img {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+}
+
+/* --------------------------------------------------------------------------
+ * Section 3: Feature & Repeat Legend
+ * -------------------------------------------------------------------------- */
+
+.mgdb-whole-genome-page .wg-legend-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-whole-genome-page .wg-legend-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: var(--mgdb-space-3);
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+}
+
+.mgdb-whole-genome-page .wg-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.mgdb-whole-genome-page .swatch-blue { background: #0000ff; }
+.mgdb-whole-genome-page .swatch-red { background: #ff0000; }
+.mgdb-whole-genome-page .swatch-black { background: #000000; }
+.mgdb-whole-genome-page .swatch-amber { background: #eeaf11; }
+.mgdb-whole-genome-page .swatch-orange { background: #e1341e; }
+.mgdb-whole-genome-page .swatch-cyan { background: #1ecbe1; }
+.mgdb-whole-genome-page .swatch-magenta { background: #d22dcd; }
+
+.mgdb-whole-genome-page .wg-legend-info strong {
+  display: block;
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-ink);
+  margin-bottom: 2px;
+}
+
+.mgdb-whole-genome-page .wg-legend-info span {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  line-height: 1.4;
+  display: block;
+}
+
+/* --------------------------------------------------------------------------
+ * Section 4: Connected Tools Cards (NO ICONS)
+ * -------------------------------------------------------------------------- */
+
+.mgdb-whole-genome-page .wg-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-whole-genome-page .wg-tool-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-4);
+  display: flex;
+  flex-direction: column;
+}
+
+.mgdb-whole-genome-page .wg-tool-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 var(--mgdb-space-2) 0;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-whole-genome-page .wg-tool-card p {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.5;
+  margin-bottom: var(--mgdb-space-4);
+  flex: 1;
+}
+
+/* --------------------------------------------------------------------------
+ * Button Styles Matching NAM Project
+ * -------------------------------------------------------------------------- */
+
+.mgdb-whole-genome-page .mgdb-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--mgdb-radius-sm);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.mgdb-whole-genome-page .mgdb-button-primary {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border: 1px solid var(--mgdb-green-dark);
+}
+
+.mgdb-whole-genome-page .mgdb-button-primary:hover {
+  background: #14532d;
+  border-color: #14532d;
+}
+
+.mgdb-whole-genome-page .mgdb-button-secondary {
+  background: #ffffff;
+  color: var(--mgdb-green-dark);
+  border: 1px solid var(--mgdb-line);
+}
+
+.mgdb-whole-genome-page .mgdb-button-secondary:hover {
+  background: var(--mgdb-surface-alt);
+  border-color: var(--mgdb-green-dark);
+}
+
+/* --------------------------------------------------------------------------
+ * Section 6: FAQ Accordions
+ * -------------------------------------------------------------------------- */
+
+.mgdb-whole-genome-page .whole-genome-faq-list {
+  display: grid;
+  gap: var(--mgdb-space-3);
+}
+
+.mgdb-whole-genome-page .whole-genome-faq-item {
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.mgdb-whole-genome-page .whole-genome-faq-item summary {
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  background: #ffffff;
+  transition: background 0.12s ease;
+}
+
+.mgdb-whole-genome-page .whole-genome-faq-item summary:hover {
+  background: #f8faf8;
+}
+
+.mgdb-whole-genome-page .whole-genome-faq-item summary h3 {
+  display: inline;
+  font-size: var(--mgdb-text-base);
+  color: var(--mgdb-green-dark);
+  margin: 0;
+}
+
+.mgdb-whole-genome-page .whole-genome-faq-body {
+  padding: 0 var(--mgdb-space-5) var(--mgdb-space-4);
+  border-top: 1px solid var(--mgdb-line-soft);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-whole-genome-page .whole-genome-faq-body a {
+  color: var(--mgdb-green-dark);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+ * Section 7: Connected Resources
+ * -------------------------------------------------------------------------- */
+
+.mgdb-whole-genome-page .wg-bottom-section {
+  background: linear-gradient(180deg, var(--mgdb-surface) 0%, var(--mgdb-green-soft) 100%) !important;
+  border-color: #b8dbca !important;
+}
+
+.mgdb-whole-genome-page .whole-genome-related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-whole-genome-page .whole-genome-related-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  padding: var(--mgdb-space-3);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color .12s, box-shadow .12s;
+}
+
+.mgdb-whole-genome-page .whole-genome-related-card:hover {
+  border-color: var(--mgdb-green);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.mgdb-whole-genome-page .whole-genome-related-title {
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+  margin-bottom: 2px;
+}
+
+.mgdb-whole-genome-page .whole-genome-related-desc {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  margin: 0;
+  line-height: 1.4;
+}

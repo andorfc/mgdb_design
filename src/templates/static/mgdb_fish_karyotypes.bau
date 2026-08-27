@@ -1,0 +1,413 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-fish-karyotypes
+<a class="mgdb-skip-link" href="#fish-main">Skip to main content</a>
+
+<main class="mgdb-page mgdb-fish-karyotypes-page" id="fish-main">
+
+  <!-- Breadcrumb Navigation -->
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span>
+    <a href="/genome">Genomes</a><span aria-hidden="true">&rsaquo;</span>
+    <span aria-current="page">Multicolor FISH Karyotypes</span>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="mgdb-hero" aria-labelledby="fish-title">
+    <div class="mgdb-hero-emblem" aria-hidden="true" style="background:#ffffff; border:1px solid #e2e8f0;">
+      <svg width="56" height="56" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Paired mitotic chromosome karyotypes with multicolor FISH probe bands -->
+        <rect x="18" y="10" width="10" height="44" rx="5" fill="#3b82f6" opacity="0.3"/>
+        <rect x="36" y="10" width="10" height="44" rx="5" fill="#3b82f6" opacity="0.3"/>
+        <!-- Centromere constrictions -->
+        <ellipse cx="23" cy="28" rx="6" ry="3" fill="#1e293b"/>
+        <ellipse cx="41" cy="28" rx="6" ry="3" fill="#1e293b"/>
+        <!-- Probe bands  -->
+        <rect x="18" y="18" width="10" height="4" fill="#eab308"/>
+        <rect x="36" y="18" width="10" height="4" fill="#eab308"/>
+        <rect x="18" y="34" width="10" height="4" fill="#22c55e"/>
+        <rect x="36" y="34" width="10" height="4" fill="#22c55e"/>
+        <rect x="18" y="44" width="10" height="4" fill="#ef4444"/>
+        <rect x="36" y="44" width="10" height="4" fill="#ef4444"/>
+      </svg>
+      <strong>FISH<br />Karyotypes</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data_date)</p>
+      <h1 id="fish-title">Maize Somatic Chromosome Painting &amp; FISH Karyotypes</h1>
+      <p class="mgdb-hero-description">
+        Multicolor fluorescence in situ hybridization \(FISH\) chromosome painting maps across 14 diverse maize inbred lines and high-resolution B73 vs. Mo17 somatic karyotyping using repetitive DNA probe mixtures.
+      </p>
+
+      <div class="fish-hero-actions-row">
+        <a class="fish-hero-link" href="#fish-gallery">
+          <span class="fish-link-dot fish-dot-green" aria-hidden="true"></span> View Karyotype Gallery &#8595;
+        </a>
+        <a class="fish-hero-link" href="#fish-probe-key">
+          <span class="fish-link-dot fish-dot-gold" aria-hidden="true"></span> Probe Signal Key &#8595;
+        </a>
+        <a class="fish-hero-link" href="https://doi.org/10.1073/pnas.0403659101" target="_blank" rel="noopener">
+          <span class="fish-link-dot fish-dot-rose" aria-hidden="true"></span> PNAS 2004 Paper &#8599;
+        </a>
+        <a class="fish-hero-link" href="/person?id=17766">
+          <span class="fish-link-dot fish-dot-purple" aria-hidden="true"></span> Dr. Akio Kato Profile &#8599;
+        </a>
+        <a class="fish-hero-link" href="/data_center/cytogenetic">
+          <span class="fish-link-dot fish-dot-dark" aria-hidden="true"></span> Cytogenetic Data Hub &#8599;
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STICKY SECTION NAVIGATION TABS -->
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#fish-gallery" class="is-current">Karyotype Gallery</a>
+    <a href="#fish-probe-key">Probe Signals &amp; Cytogenetic Key</a>
+    <a href="#fish-methodology">Methodology &amp; Technology</a>
+    <a href="#fish-publications">Key Publications &amp; Abstracts</a>
+    <a href="#fish-metrics">Scale &amp; Cytogenetic Metrics</a>
+    <a href="#fish-faqs">FAQs &amp; Guidelines</a>
+    <a href="#fish-related">Connected Resources</a>
+  </nav>
+
+  <!-- SECTION 1: INTERACTIVE KARYOTYPE GALLERY -->
+  <section id="fish-gallery" class="mgdb-panel" aria-labelledby="fish-gallery-title">
+    <div class="fish-panel-header-wrap">
+      <div>
+        <h2 id="fish-gallery-title" class="mgdb-panel-title">Multicolor FISH Karyotype Atlas</h2>
+        <p class="mgdb-panel-lead">Switch between the 14 inbred lines comparative karyotype map and the high-resolution B73 vs. Mo17 somatic painting.</p>
+      </div>
+    </div>
+
+    <!-- GALLERY VIEW TABS -->
+    <div class="fish-view-tabs" role="tablist" aria-label="Karyotype image views">
+      <button type="button" class="fish-tab-btn is-active" id="tab-14inbreds" role="tab" aria-selected="true" aria-controls="view-14inbreds" data-view="14inbreds">
+        14 Inbred Lines Atlas
+      </button>
+      <button type="button" class="fish-tab-btn" id="tab-b73mo17" role="tab" aria-selected="false" aria-controls="view-b73mo17" data-view="b73mo17">
+        B73 &amp; Mo17 Comparative Painting
+      </button>
+    </div>
+
+    <!-- VIEW 1: 14 INBRED LINES -->
+    <div class="fish-image-card" id="view-14inbreds" role="tabpanel" aria-labelledby="tab-14inbreds">
+      <div class="fish-image-toolbar">
+        <div class="fish-image-meta">
+          <strong>14 Inbred Lines Somatic Chromosome Painting</strong>
+          <span class="fish-meta-sub">Visualized by Akio Kato, J.C. Lamb &amp; J.A. Birchler &bull; Scale bar = 10 &mu;m</span>
+        </div>
+        <div class="fish-image-actions">
+          <a href="/images/genome/karyotype.jpg" class="mgdb-button mgdb-button-primary" target="_blank" rel="noopener" download="maize_14_inbreds_karyotypes_fish.jpg">
+            Download High-Res JPG &#8595;
+          </a>
+        </div>
+      </div>
+
+      <div class="fish-image-wrap">
+        <img src="/images/genome/karyotype.jpg" alt="Karyotypes of 14 maize inbred lines visualized by multicolor fluorescence in situ hybridization FISH" class="fish-display-img" loading="lazy" />
+      </div>
+
+      <div class="fish-image-caption">
+        <p>
+          <strong>Figure Overview&#58;</strong> Multicolor somatic chromosome painting across 14 foundational inbred lines \(including B73, Mo17, CML247, and diverse lines\). Each chromosome \(1–10\) is unambiguously identified by its unique pattern of tandem repeats, centromeric arrays, and subtelomeric signals.
+        </p>
+      </div>
+    </div>
+
+    <!-- VIEW 2: B73 AND MO17 -->
+    <div class="fish-image-card" id="view-b73mo17" role="tabpanel" aria-labelledby="tab-b73mo17" style="display:none;">
+      <div class="fish-image-toolbar">
+        <div class="fish-image-meta">
+          <strong>B73 and Mo17 Somatic Chromosomes</strong>
+          <span class="fish-meta-sub">High-resolution comparison of classical heterotic parent lines &bull; Scale bar = 10 &mu;m</span>
+        </div>
+        <div class="fish-image-actions">
+          <a href="/images/genome/b73mo17.jpg" class="mgdb-button mgdb-button-primary" target="_blank" rel="noopener" download="maize_b73_mo17_fish_karyotype.jpg">
+            Download High-Res JPG &#8595;
+          </a>
+        </div>
+      </div>
+
+      <div class="fish-image-wrap">
+        <img src="/images/genome/b73mo17.jpg" alt="B73 and Mo17 somatic chromosomes visualized by multicolor fluorescence in situ hybridization FISH" class="fish-display-img" loading="lazy" />
+      </div>
+
+      <div class="fish-image-caption">
+        <p>
+          <strong>Figure Overview&#58;</strong> Somatic chromosome karyotyping of B73 and Mo17 probed simultaneously with the multi-probe cocktail. Notice significant polymorphisms in knob repeat distribution, NOR size, and centromeric signals between the two heterotic parents.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: PROBE SIGNALS & CYTOGENETIC KEY -->
+  <section id="fish-probe-key" class="mgdb-panel" aria-labelledby="fish-key-title">
+    <div class="fish-panel-header-wrap">
+      <div>
+        <h2 id="fish-key-title" class="mgdb-panel-title">Probe Signals &amp; Cytogenetic Key</h2>
+        <p class="mgdb-panel-lead">The 9 distinct tandem repeat and chromosome-specific probes utilized in the Kato et al. multicolor FISH cocktail.</p>
+      </div>
+    </div>
+
+    <div class="fish-probe-grid">
+      <!-- 1: Knob 180-bp -->
+      <article class="fish-probe-card">
+        <div class="fish-probe-badge-row">
+          <span class="fish-color-swatch swatch-blue" aria-hidden="true"></span>
+          <span class="fish-probe-tag">Knob 180-bp Repeat</span>
+        </div>
+        <h3>Knob 180-bp \(Blue\)</h3>
+        <p>Major tandem repeat element marking knob positions across chromosome arms; exhibits extensive presence/absence polymorphism among lines.</p>
+      </article>
+
+      <!-- 2: 5S rDNA -->
+      <article class="fish-probe-card">
+        <div class="fish-probe-badge-row">
+          <span class="fish-color-swatch swatch-yellow" aria-hidden="true"></span>
+          <span class="fish-probe-tag">5S 2-3-3 Clone</span>
+        </div>
+        <h3>5S rDNA \(Yellow &bull; 2L\)</h3>
+        <p>Specific marker hybridizing to the 5S ribosomal RNA gene cluster located on the long arm of Chromosome 2 \(2L\).</p>
+      </article>
+
+      <!-- 3: NOR-173 -->
+      <article class="fish-probe-card">
+        <div class="fish-probe-badge-row">
+          <span class="fish-color-swatch swatch-green" aria-hidden="true"></span>
+          <span class="fish-probe-tag">NOR-173 Clone</span>
+        </div>
+        <h3>NOR-173 \(Green &bull; 6S\)</h3>
+        <p>Nucleolus organizer region \(45S rDNA\) probe marking the secondary constriction on the short arm of Chromosome 6 \(6S\).</p>
+      </article>
+
+      <!-- 4: CentC -->
+      <article class="fish-probe-card">
+        <div class="fish-probe-badge-row">
+          <span class="fish-color-swatch swatch-green" aria-hidden="true"></span>
+          <span class="fish-probe-tag">CentC Satellite</span>
+        </div>
+        <h3>CentC \(Green\)</h3>
+        <p>Conserved centromeric satellite repeat hybridizing to functional centromeres across all maize chromosomes.</p>
+      </article>
+
+      <!-- 5: Subtelomeric 4-12-1 -->
+      <article class="fish-probe-card">
+        <div class="fish-probe-badge-row">
+          <span class="fish-color-swatch swatch-green" aria-hidden="true"></span>
+          <span class="fish-probe-tag">Subtelomere 4-12-1</span>
+        </div>
+        <h3>Subtelomeric 4-12-1 \(Green\)</h3>
+        <p>Repetitive clone marking specific chromosome ends and subtelomeric domains across the maize complement.</p>
+      </article>
+
+      <!-- 6: Cent4 -->
+      <article class="fish-probe-card">
+        <div class="fish-probe-badge-row">
+          <span class="fish-color-swatch swatch-red" aria-hidden="true"></span>
+          <span class="fish-probe-tag">Cent4 Satellite</span>
+        </div>
+        <h3>Cent4 \(Red &bull; 4C\)</h3>
+        <p>Chromosome 4-specific centromeric satellite repeat that uniquely and unambiguously identifies Chromosome 4.</p>
+      </article>
+
+      <!-- 7: Microsatellite 1-26-2 -->
+      <article class="fish-probe-card">
+        <div class="fish-probe-badge-row">
+          <span class="fish-color-swatch swatch-red" aria-hidden="true"></span>
+          <span class="fish-probe-tag">Microsatellite 1-26-2</span>
+        </div>
+        <h3>Microsatellite 1-26-2 \(Red\)</h3>
+        <p>Tandem microsatellite repeat clone providing diagnostic chromosomal position signals on somatic spreads.</p>
+      </article>
+
+      <!-- 8: pMTY9ER Telomere -->
+      <article class="fish-probe-card">
+        <div class="fish-probe-badge-row">
+          <span class="fish-color-swatch swatch-red" aria-hidden="true"></span>
+          <span class="fish-probe-tag">pMTY9ER Telomere</span>
+        </div>
+        <h3>pMTY9ER Telomeric \(Red\)</h3>
+        <p>Telomere-associated sequence identifying chromosome termini across somatic metaphase spreads.</p>
+      </article>
+
+      <!-- 9: TR-1 Repeat -->
+      <article class="fish-probe-card">
+        <div class="fish-probe-badge-row">
+          <span class="fish-color-swatch swatch-white" aria-hidden="true"></span>
+          <span class="fish-probe-tag">TR-1 Repeat</span>
+        </div>
+        <h3>TR-1 Repeat \(White / Silver\)</h3>
+        <p>350-bp tandem repeat element found in a subset of maize knobs, frequently co-occurring with or distinct from Knob 180-bp repeats.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 3: METHODOLOGY & TECHNOLOGY -->
+  <section id="fish-methodology" class="mgdb-panel" aria-labelledby="fish-methodology-title">
+    <div class="fish-panel-header-wrap">
+      <div>
+        <h2 id="fish-methodology-title" class="mgdb-panel-title">Cytogenetic Methodology &amp; Chromosome Identification</h2>
+        <p class="mgdb-panel-lead">How multi-target FISH revolutionized maize chromosome karyotyping in somatic root-tip metaphases.</p>
+      </div>
+    </div>
+
+    <div class="fish-method-grid">
+      <article class="fish-method-card">
+        <h3>One-Step Somatic Chromosome Identification</h3>
+        <p>
+          Classical maize cytogenetics relied heavily on pachytene spreads in meiotic microsporocytes. The Kato et al. FISH cocktail allowed for the first time rapid, simultaneous identification of all 10 somatic mitotic chromosome pairs in standard root-tip squashes, enabling high-throughput screening of genetic stocks, translocations, and aneuploids.
+        </p>
+      </article>
+
+      <article class="fish-method-card">
+        <h3>Structural Variation &amp; Heterochromatic Knob Polymorphism</h3>
+        <p>
+          The comparative atlas across 14 inbred lines reveals extensive natural variation in knob size, repeat composition \(Knob180 vs TR-1\), and chromosomal locations, providing physical cytogenetic validation for sequence-based pan-genome assemblies and structural variation studies.
+        </p>
+      </article>
+
+      <article class="fish-method-card">
+        <h3>Biological Stocks &amp; Historical Provenance</h3>
+        <p>
+          The B73 and Mo17 stocks utilized in these landmark cytogenetic experiments were obtained by Dr. James Birchler directly from Dr. Edward Coe, ensuring direct genetic continuity with foundational MaizeGDB genetic stocks.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 4: KEY PUBLICATIONS & ABSTRACT PREVIEWS -->
+  <section id="fish-publications" class="mgdb-panel" aria-labelledby="fish-pub-title">
+    <div class="fish-panel-header-wrap">
+      <div>
+        <h2 id="fish-pub-title" class="mgdb-panel-title">Key Publications &amp; Abstract Previews</h2>
+        <p class="mgdb-panel-lead">Primary literature establishing somatic chromosome painting and FISH karyotyping in maize.</p>
+      </div>
+    </div>
+
+    <div class="fish-publications-grid">
+      <!-- Publication 1: Kato et al. 2004 PNAS -->
+      <article class="fish-pub-card">
+        <div class="fish-pub-meta-top">
+          <span class="fish-pub-journal-badge">Proc Natl Acad Sci USA &bull; 2004</span>
+          <span class="fish-pub-doi">DOI&#58; 10.1073/pnas.0403659101</span>
+        </div>
+        <h3 class="fish-pub-title">Chromosome painting using repetitive DNA sequences as probes for somatic chromosome identification in maize</h3>
+        <p class="fish-pub-authors">Akio Kato, Jonathan C. Lamb, James A. Birchler</p>
+        <p class="fish-pub-citation"><em>Proc. Natl. Acad. Sci. U.S.A.</em> 2004 Sep 14; 101\(37\)&#58;13554&ndash;13559.</p>
+        
+        <div class="fish-pub-abstract-wrap">
+          <h4 class="fish-pub-abstract-heading">Abstract</h4>
+          <p class="fish-pub-abstract-text">A chromosome identification system using fluorescence in situ hybridization \(FISH\) with repetitive DNA sequences as probes was developed for somatic chromosomes of maize. Probes for the 180-bp knob repeat, TR-1 knob repeat, CentC \(centromere satellite\), Cent4 \(Chromosome 4 centromere\), NOR \(nucleolus organizer region\), 5S ribosomal DNA, subtelomeric 4-12-1 clone, microsatellite 1-26-2, and telomere repeat were labeled with different fluorochromes. By using a single hybridization with a mixture of these probes, every somatic chromosome of maize can be identified simultaneously in metaphase spreads. The karyotypes of 14 inbred lines were analyzed, demonstrating that each line possesses a distinctive FISH karyotype that reflects its specific repetitive sequence composition.</p>
+        </div>
+
+        <div class="fish-pub-actions">
+          <a class="mgdb-button mgdb-button-primary" href="https://doi.org/10.1073/pnas.0403659101" target="_blank" rel="noopener">Full Text on PNAS &#8599;</a>
+          <a class="mgdb-button mgdb-button-secondary" href="/data_center/reference?id=974526">MaizeGDB Reference Record &#8599;</a>
+          <a class="mgdb-button mgdb-button-quiet" href="/person?id=17766">Dr. Akio Kato Profile</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 5: SCALE & CYTOGENETIC METRICS DASHBOARD -->
+  <section id="fish-metrics" class="mgdb-panel" aria-labelledby="fish-metrics-title">
+    <div class="fish-panel-header-wrap">
+      <div>
+        <h2 id="fish-metrics-title" class="mgdb-panel-title">Scale &amp; Cytogenetic Metrics</h2>
+        <p class="mgdb-panel-lead">Summary statistics for the maize cytogenetic karyotyping atlas.</p>
+      </div>
+    </div>
+
+    <div class="mgdb-metric-grid mgdb-metric-grid-4">
+      <div class="mgdb-metric-card mgdb-metric-card-green">
+        <div class="mgdb-metric-number">10</div>
+        <div class="mgdb-metric-title">Chromosome Pairs Identified</div>
+        <div class="mgdb-metric-desc">Unambiguous single-step identification of all 10 somatic metaphase chromosomes.</div>
+      </div>
+      <div class="mgdb-metric-card mgdb-metric-card-gold">
+        <div class="mgdb-metric-number">14</div>
+        <div class="mgdb-metric-title">Inbred Lines Profiled</div>
+        <div class="mgdb-metric-desc">High-resolution karyotyping across foundational North American and tropical inbreds.</div>
+      </div>
+      <div class="mgdb-metric-card mgdb-metric-card-blue">
+        <div class="mgdb-metric-number">9 Probes</div>
+        <div class="mgdb-metric-title">Multi-Fluor Cocktail</div>
+        <div class="mgdb-metric-desc">Combinatorial fluorochrome labeling of centromeric, knob, telomeric, and rDNA arrays.</div>
+      </div>
+      <div class="mgdb-metric-card mgdb-metric-card-orange">
+        <div class="mgdb-metric-number">10 &mu;m</div>
+        <div class="mgdb-metric-title">Microscopic Scale</div>
+        <div class="mgdb-metric-desc">Direct physical mapping of repetitive sequence architecture on root-tip spreads.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6: FAQS & GUIDELINES -->
+  <section id="fish-faqs" class="mgdb-panel" aria-labelledby="fish-faqs-title">
+    <div class="fish-panel-header-wrap">
+      <div>
+        <h2 id="fish-faqs-title" class="mgdb-panel-title">Frequently Asked Questions &amp; Guidelines</h2>
+        <p class="mgdb-panel-lead">Common questions regarding probe availability, cytogenetic maps, and stock provenance.</p>
+      </div>
+    </div>
+
+    <div class="fish-faq-list">
+      <details class="fish-faq-item">
+        <summary><h3>How do somatic FISH karyotypes relate to physical genome assemblies?</h3></summary>
+        <div class="fish-faq-body">
+          <p>
+            Somatic FISH karyotypes provide independent physical verification of chromosome structure, centromere positions, and large heterochromatic knob domains. They serve as physical ground truth when scaffolding sequence assemblies and characterizing structural chromosomal rearrangements.
+          </p>
+        </div>
+      </details>
+
+      <details class="fish-faq-item">
+        <summary><h3>Can these FISH probes be used to identify chromosomes in other grass species?</h3></summary>
+        <div class="fish-faq-body">
+          <p>
+            Several probes in this cocktail \(such as 5S rDNA, NOR, and telomeric sequences\) are conserved across grasses. Centromeric and knob probes \(CentC, Knob180, TR-1\) are specific to *Zea* and closely related *Tripsacum* species.
+          </p>
+        </div>
+      </details>
+
+      <details class="fish-faq-item">
+        <summary><h3>Where can I find additional cytogenetic chromosome maps at MaizeGDB?</h3></summary>
+        <div class="fish-faq-body">
+          <p>
+            Visit the <a href="/data_center/cytogenetic">Cytogenetic Data Center</a> to search cytogenetic translocation stocks, deficiency mapping data, inversion breakpoints, and classical chromosome maps.
+          </p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- SECTION 7: CONNECTED RESOURCES -->
+  <section id="fish-related" class="mgdb-panel fish-bottom-section" aria-labelledby="fish-related-title">
+    <div class="fish-panel-header-wrap">
+      <div>
+        <h2 id="fish-related-title" class="mgdb-panel-title">Connected Cytogenetic &amp; Genome Resources</h2>
+        <p class="mgdb-panel-lead">Explore related chromosome mapping, stock collections, and sequence browsers.</p>
+      </div>
+    </div>
+
+    <div class="fish-related-grid">
+      <a class="fish-related-card" href="/data_center/cytogenetic">
+        <div class="fish-related-title">Cytogenetic Data Center &rarr;</div>
+        <p class="fish-related-desc">Search translocations, inversions, monosomics, and cytogenetic stocks.</p>
+      </a>
+      <a class="fish-related-card" href="/genome">
+        <div class="fish-related-title">Genome Center &rarr;</div>
+        <p class="fish-related-desc">Explore chromosome-scale reference and diversity genome assemblies.</p>
+      </a>
+      <a class="fish-related-card" href="/genomebrowser">
+        <div class="fish-related-title">Genome Browsers \(JBrowse 2\) &rarr;</div>
+        <p class="fish-related-desc">Interactive sequence browsers with repeat annotations and synteny tracks.</p>
+      </a>
+      <a class="fish-related-card" href="/data_center/stock">
+        <div class="fish-related-title">Stock Center &rarr;</div>
+        <p class="fish-related-desc">Browse genetic and cytogenetic seed stocks maintained by the Maize Coop.</p>
+      </a>
+    </div>
+  </section>
+
+</main>
+)

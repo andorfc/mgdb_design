@@ -1,0 +1,317 @@
+/* ==========================================================================
+ * file: mgdb-jbrowse2-tutorial.css
+ * purpose: Stylesheet for JBrowse 2 Interactive User Guide & Tutorial
+ * ========================================================================== */
+
+.mgdb-jbrowse2-tutorial-page {
+  padding-bottom: var(--mgdb-space-8);
+}
+
+.mgdb-jbrowse2-tutorial-page .mgdb-panel {
+  margin-top: var(--mgdb-space-6);
+  padding: var(--mgdb-space-6);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-panel-header-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-jbrowse2-tutorial-page .mgdb-panel-title {
+  margin: 0 0 var(--mgdb-space-1);
+  font-size: var(--mgdb-text-2xl);
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-jbrowse2-tutorial-page .mgdb-panel-lead {
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  max-width: 75ch;
+}
+
+/* --------------------------------------------------------------------------
+ * Hero Action Links
+ * -------------------------------------------------------------------------- */
+
+.mgdb-jbrowse2-tutorial-page .jb2-hero-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-hero-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-hero-link:hover {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border-color: var(--mgdb-green-dark);
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-link-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-dot-green { background: #16a34a; }
+.mgdb-jbrowse2-tutorial-page .jb2-dot-blue { background: #2563eb; }
+.mgdb-jbrowse2-tutorial-page .jb2-dot-gold { background: #d97706; }
+.mgdb-jbrowse2-tutorial-page .jb2-dot-purple { background: #9333ea; }
+.mgdb-jbrowse2-tutorial-page .jb2-dot-dark { background: #475569; }
+
+/* --------------------------------------------------------------------------
+ * Step Cards & Visual Guides
+ * -------------------------------------------------------------------------- */
+
+.mgdb-jbrowse2-tutorial-page .jb2-step-card {
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: #ffffff;
+  padding: var(--mgdb-space-5);
+  box-shadow: var(--mgdb-shadow-sm);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-step-header {
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-3);
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-step-num {
+  display: inline-block;
+  padding: 2px 8px;
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  border: 1px solid #bbf7d0;
+  border-radius: 4px;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-step-header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-step-card p {
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.5;
+  margin: 0 0 var(--mgdb-space-4) 0;
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-img-wrap {
+  text-align: center;
+  background: #f8fafc;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  padding: var(--mgdb-space-2);
+  margin-bottom: var(--mgdb-space-3);
+  overflow-x: auto;
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-guide-img {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-key-points {
+  background: var(--mgdb-surface-alt);
+  border-left: 3px solid var(--mgdb-green);
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-ink);
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-key-points strong {
+  display: block;
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-green-dark);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-bottom: 4px;
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-key-points ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-key-points li {
+  margin-bottom: 4px;
+  line-height: 1.45;
+}
+
+/* --------------------------------------------------------------------------
+ * Section 5: Pan-Genome & Variation Cards
+ * -------------------------------------------------------------------------- */
+
+.mgdb-jbrowse2-tutorial-page .jb2-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-4);
+  display: flex;
+  flex-direction: column;
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 var(--mgdb-space-2) 0;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-card p {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.5;
+  margin: 0 0 var(--mgdb-space-3) 0;
+  flex: 1;
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-thumb-img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 4px;
+  border: 1px solid var(--mgdb-line-soft);
+}
+
+/* --------------------------------------------------------------------------
+ * Section 7: FAQ Accordions
+ * -------------------------------------------------------------------------- */
+
+.mgdb-jbrowse2-tutorial-page .jb2-faq-list {
+  display: grid;
+  gap: var(--mgdb-space-3);
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-faq-item {
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-faq-item summary {
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  background: #ffffff;
+  transition: background 0.12s ease;
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-faq-item summary:hover {
+  background: #f8faf8;
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-faq-item summary h3 {
+  display: inline;
+  font-size: var(--mgdb-text-base);
+  color: var(--mgdb-green-dark);
+  margin: 0;
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-faq-body {
+  padding: 0 var(--mgdb-space-5) var(--mgdb-space-4);
+  border-top: 1px solid var(--mgdb-line-soft);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-faq-body ul {
+  margin: 6px 0 0;
+  padding-left: 20px;
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-faq-body code {
+  font-family: var(--mgdb-font-mono, monospace);
+  background: #f1f5f9;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: var(--mgdb-text-xs);
+}
+
+/* --------------------------------------------------------------------------
+ * Section 8: Connected Resources
+ * -------------------------------------------------------------------------- */
+
+.mgdb-jbrowse2-tutorial-page .jb2-bottom-section {
+  background: linear-gradient(180deg, var(--mgdb-surface) 0%, var(--mgdb-green-soft) 100%) !important;
+  border-color: #b8dbca !important;
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-related-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  padding: var(--mgdb-space-3);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color .12s, box-shadow .12s;
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-related-card:hover {
+  border-color: var(--mgdb-green);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-related-title {
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+  margin-bottom: 2px;
+}
+
+.mgdb-jbrowse2-tutorial-page .jb2-related-desc {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  margin: 0;
+  line-height: 1.4;
+}

@@ -1,0 +1,483 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-historic-assemblies
+<a class="mgdb-skip-link" href="#historic-main">Skip to main content</a>
+
+<main class="mgdb-page mgdb-historic-assemblies-page" id="historic-main">
+
+  <!-- Breadcrumb Navigation -->
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span>
+    <a href="/genome">Genomes</a><span aria-hidden="true">&rsaquo;</span>
+    <span aria-current="page">Historic B73 Assemblies</span>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="mgdb-hero" aria-labelledby="historic-title">
+    <div class="mgdb-hero-emblem" aria-hidden="true" style="background:#ffffff; border:1px solid #e2e8f0;">
+      <svg width="56" height="56" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Clock / Timeline icon representing historical assembly progression -->
+        <circle cx="32" cy="32" r="22" stroke="#0284c7" stroke-width="2.5" fill="#f0f9ff"/>
+        <path d="M32 18V32L41 38" stroke="#0369a1" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="32" cy="32" r="3" fill="#0284c7"/>
+        <path d="M14 32H10" stroke="#0284c7" stroke-width="2" stroke-linecap="round"/>
+        <path d="M54 32H50" stroke="#0284c7" stroke-width="2" stroke-linecap="round"/>
+        <path d="M32 14V10" stroke="#0284c7" stroke-width="2" stroke-linecap="round"/>
+        <path d="M32 54V50" stroke="#0284c7" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <strong>B73 History<br />&amp; Versions</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data_date)</p>
+      <h1 id="historic-title">Historic B73 Assembly &amp; Annotation Information</h1>
+      <p class="mgdb-hero-description">
+        Comprehensive version history, structural change logs, gene model migrations, and coordinate transitions across B73 reference releases from RefGen_v1 through NAM-5.0.
+      </p>
+
+      <div class="historic-hero-actions-row">
+        <a class="historic-hero-link" href="/assembly">
+          <span class="historic-link-dot historic-dot-green" aria-hidden="true"></span> Current Assembly Hub &#8599;
+        </a>
+        <a class="historic-hero-link" href="#historic-matrix">
+          <span class="historic-link-dot historic-dot-blue" aria-hidden="true"></span> Version Matrix &#8595;
+        </a>
+        <a class="historic-hero-link" href="#historic-v2v3">
+          <span class="historic-link-dot historic-dot-gold" aria-hidden="true"></span> v2 &rarr; v3 Changelog &#8595;
+        </a>
+        <a class="historic-hero-link" href="#historic-migrations">
+          <span class="historic-link-dot historic-dot-purple" aria-hidden="true"></span> Gene Model Migrations &#8595;
+        </a>
+        <a class="historic-hero-link" href="/download">
+          <span class="historic-link-dot historic-dot-dark" aria-hidden="true"></span> Download Archives &#8599;
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STICKY SECTION NAVIGATION TABS -->
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#historic-matrix" class="is-current">Version Matrix</a>
+    <a href="#historic-v2v3">v2 to v3 Transitions</a>
+    <a href="#historic-migrations">Gene Model Migrations</a>
+    <a href="#historic-v4v5">v4 &amp; v5 Modern Era</a>
+    <a href="#historic-metrics">Version Scale &amp; Metrics</a>
+    <a href="#historic-faqs">FAQs &amp; Guidelines</a>
+    <a href="#historic-related">Connected Resources</a>
+  </nav>
+
+  <!-- SECTION 1: VERSION COMPARISON MATRIX -->
+  <section id="historic-matrix" class="mgdb-panel" aria-labelledby="historic-matrix-title">
+    <div class="historic-panel-header-wrap">
+      <div>
+        <h2 id="historic-matrix-title" class="mgdb-panel-title">B73 Reference Assembly Version Matrix</h2>
+        <p class="mgdb-panel-lead">Chronological evolution of the maize B73 reference genome from physical clone maps to high-continuity long reads.</p>
+      </div>
+    </div>
+
+    <div class="mgdb-table-scroll historic-table-scroll">
+      <table class="mgdb-table historic-table">
+        <thead>
+          <tr>
+            <th scope="col">Assembly Release</th>
+            <th scope="col">Year</th>
+            <th scope="col">Sequencing Technology</th>
+            <th scope="col">Total Size</th>
+            <th scope="col">Gene Model Set</th>
+            <th scope="col">Primary Landmark Citation</th>
+            <th scope="col" class="text-right">Download Archive</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <strong>Zm-B73-REFERENCE-NAM-5.0</strong>
+              <span class="historic-tag-current">Current Reference</span>
+            </td>
+            <td>2020</td>
+            <td>PacBio Sequel II &bull; Optical Mapping &bull; Bionano</td>
+            <td>2.18 Gb</td>
+            <td><code>Zm00001eb.1</code> \(39,756 genes\)</td>
+            <td>Hufford et al. 2021 <em>Science</em></td>
+            <td class="text-right">
+              <a href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/" class="historic-dl-btn" target="_blank" rel="noopener">Download &#8599;</a>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>B73 RefGen_v4</strong></td>
+            <td>2017</td>
+            <td>PacBio RS II &bull; Single-Molecule Real-Time \(SMRT\)</td>
+            <td>2.13 Gb</td>
+            <td><code>Zm00001d.2</code> \(39,498 genes\)</td>
+            <td>Jiao et al. 2017 <em>Nature</em></td>
+            <td class="text-right">
+              <a href="https://download.maizegdb.org/B73_RefGen_v4/" class="historic-dl-btn" target="_blank" rel="noopener">Download &#8599;</a>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>B73 RefGen_v3</strong></td>
+            <td>2014</td>
+            <td>BAC Minimum Tiling Path + Illumina WGS gap closure</td>
+            <td>2.06 Gb</td>
+            <td><code>5b+ / 6a</code> \(39,475 genes\)</td>
+            <td>Law et al. 2014 &bull; MaizeGDB release</td>
+            <td class="text-right">
+              <a href="https://download.maizegdb.org/B73_RefGen_v3/" class="historic-dl-btn" target="_blank" rel="noopener">Download &#8599;</a>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>B73 RefGen_v2</strong></td>
+            <td>2011</td>
+            <td>BAC Minimum Tiling Path \(MTP\) scaffold refinement</td>
+            <td>2.04 Gb</td>
+            <td><code>5a / 5b</code> \(39,656 FGS genes\)</td>
+            <td>Schnable et al. 2011 release</td>
+            <td class="text-right">
+              <a href="https://download.maizegdb.org/B73_RefGen_v2/" class="historic-dl-btn" target="_blank" rel="noopener">Download &#8599;</a>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>B73 RefGen_v1</strong></td>
+            <td>2009</td>
+            <td>Sanger dideoxy sequencing of ~16,800 BAC clones</td>
+            <td>2.01 Gb</td>
+            <td><code>Filtered Gene Set 4a</code></td>
+            <td>Schnable et al. 2009 <em>Science</em></td>
+            <td class="text-right">
+              <a href="https://download.maizegdb.org/B73_RefGen_v1/" class="historic-dl-btn" target="_blank" rel="noopener">Download &#8599;</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 2: V2 TO V3 TRANSITIONS -->
+  <section id="historic-v2v3" class="mgdb-panel" aria-labelledby="historic-v2v3-title">
+    <div class="historic-panel-header-wrap">
+      <div>
+        <h2 id="historic-v2v3-title" class="mgdb-panel-title">What Changed Between RefGen_v2 and RefGen_v3?</h2>
+        <p class="mgdb-panel-lead">Key structural refinements, contig realignments, and gene model upgrades introduced in the v3 release.</p>
+      </div>
+    </div>
+
+    <div class="historic-cards-grid">
+      <article class="historic-card">
+        <h3>Assembly Gap Filling &amp; Sequence Continuity</h3>
+        <p>
+          RefGen_v3 utilized whole-genome shotgun \(WGS\) sequence reads to capture gene space that was missing in RefGen_v2 due to BAC clone gaps in the original minimum tiling path \(MTP\). Multiple previously misoriented or inverted contigs were flipped and placed into validated chromosomal order.
+        </p>
+      </article>
+
+      <article class="historic-card">
+        <h3>Gene Model Improvements &amp; Novel Loci</h3>
+        <p>
+          The v3 annotation overhaul updated <strong>251 improved gene models</strong> and introduced <strong>213 novel gene models</strong>. The legacy FGS gene model set of 39,656 models in 5b was refined into 39,475 high-confidence protein-coding models in release 5b+ after removing low-confidence transposable element fragments.
+        </p>
+      </article>
+
+      <article class="historic-card">
+        <h3>Gene Merges &amp; Structural Consolidation</h3>
+        <p>
+          10 pairs of fragmented gene models previously split across contig boundaries were consolidated and merged into single high-continuity gene models with unified GRMZM accessions.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 3: GENE MODEL MIGRATIONS -->
+  <section id="historic-migrations" class="mgdb-panel" aria-labelledby="historic-mig-title">
+    <div class="historic-panel-header-wrap">
+      <div>
+        <h2 id="historic-mig-title" class="mgdb-panel-title">Historic Gene Model Migration Tables</h2>
+        <p class="mgdb-panel-lead">Lookup tables for Fgenesh models transitioned to GRMZM identifiers and merged gene model pairs.</p>
+      </div>
+    </div>
+
+    <!-- FILTER TOOLBAR -->
+    <div class="historic-table-toolbar">
+      <div class="historic-filter-chips-wrap">
+        <span class="historic-toolbar-label">Category&#58;</span>
+        <button type="button" class="historic-chip is-active" data-filter="all">All Models</button>
+        <button type="button" class="historic-chip" data-filter="fgenesh">Fgenesh to GRMZM</button>
+        <button type="button" class="historic-chip" data-filter="merged">Merged Gene Pairs</button>
+      </div>
+
+      <div class="historic-search-wrap">
+        <label for="historic-search-input" class="mgdb-visually-hidden">Search historic gene models</label>
+        <input type="text" id="historic-search-input" class="mgdb-input historic-search-input" placeholder="Search gene ID, GRMZM identifier, or Fgenesh model..." autocomplete="off" spellcheck="false" />
+      </div>
+    </div>
+
+    <div class="historic-table-status-bar">
+      <span id="historic-row-count">Showing 19 historical gene models</span>
+      <span class="historic-table-hint">Use search to filter legacy gene IDs</span>
+    </div>
+
+    <div class="mgdb-table-scroll historic-table-scroll">
+      <table class="mgdb-table historic-table" id="historic-gene-table">
+        <thead>
+          <tr>
+            <th scope="col">Legacy / Previous Model ID</th>
+            <th scope="col">Transition Type</th>
+            <th scope="col">Consolidated GRMZM ID</th>
+            <th scope="col">Gene Center Lookup</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Fgenesh to GRMZM -->
+          <tr data-type="fgenesh" data-search="ac147602.5_fg004 grmzm6g741210">
+            <td><code>AC147602.5_FG004</code></td>
+            <td><span class="historic-pill historic-pill-blue">Fgenesh &rarr; GRMZM</span></td>
+            <td><strong><code>GRMZM6G741210</code></strong></td>
+            <td><a href="/gene_center/gene?id=GRMZM6G741210" class="historic-lookup-link">View in Gene Center &rarr;</a></td>
+          </tr>
+          <tr data-type="fgenesh" data-search="ac190882.3_fg003 grmzm6g961377">
+            <td><code>AC190882.3_FG003</code></td>
+            <td><span class="historic-pill historic-pill-blue">Fgenesh &rarr; GRMZM</span></td>
+            <td><strong><code>GRMZM6G961377</code></strong></td>
+            <td><a href="/gene_center/gene?id=GRMZM6G961377" class="historic-lookup-link">View in Gene Center &rarr;</a></td>
+          </tr>
+          <tr data-type="fgenesh" data-search="ac192244.3_fg001 grmzm6g869379">
+            <td><code>AC192244.3_FG001</code></td>
+            <td><span class="historic-pill historic-pill-blue">Fgenesh &rarr; GRMZM</span></td>
+            <td><strong><code>GRMZM6G869379</code></strong></td>
+            <td><a href="/gene_center/gene?id=GRMZM6G869379" class="historic-lookup-link">View in Gene Center &rarr;</a></td>
+          </tr>
+          <tr data-type="fgenesh" data-search="ac194389.3_fg001 grmzm6g399977">
+            <td><code>AC194389.3_FG001</code></td>
+            <td><span class="historic-pill historic-pill-blue">Fgenesh &rarr; GRMZM</span></td>
+            <td><strong><code>GRMZM6G399977</code></strong></td>
+            <td><a href="/gene_center/gene?id=GRMZM6G399977" class="historic-lookup-link">View in Gene Center &rarr;</a></td>
+          </tr>
+          <tr data-type="fgenesh" data-search="ac204604.3_fg008 grmzm6g220418">
+            <td><code>AC204604.3_FG008</code></td>
+            <td><span class="historic-pill historic-pill-blue">Fgenesh &rarr; GRMZM</span></td>
+            <td><strong><code>GRMZM6G220418</code></strong></td>
+            <td><a href="/gene_center/gene?id=GRMZM6G220418" class="historic-lookup-link">View in Gene Center &rarr;</a></td>
+          </tr>
+          <tr data-type="fgenesh" data-search="ac210529.3_fg004 grmzm6g945840">
+            <td><code>AC210529.3_FG004</code></td>
+            <td><span class="historic-pill historic-pill-blue">Fgenesh &rarr; GRMZM</span></td>
+            <td><strong><code>GRMZM6G945840</code></strong></td>
+            <td><a href="/gene_center/gene?id=GRMZM6G945840" class="historic-lookup-link">View in Gene Center &rarr;</a></td>
+          </tr>
+          <tr data-type="fgenesh" data-search="ac232289.2_fg005 grmzm6g404540">
+            <td><code>AC232289.2_FG005</code></td>
+            <td><span class="historic-pill historic-pill-blue">Fgenesh &rarr; GRMZM</span></td>
+            <td><strong><code>GRMZM6G404540</code></strong></td>
+            <td><a href="/gene_center/gene?id=GRMZM6G404540" class="historic-lookup-link">View in Gene Center &rarr;</a></td>
+          </tr>
+          <tr data-type="fgenesh" data-search="ac233893.1_fg001 grmzm6g310687">
+            <td><code>AC233893.1_FG001</code></td>
+            <td><span class="historic-pill historic-pill-blue">Fgenesh &rarr; GRMZM</span></td>
+            <td><strong><code>GRMZM6G310687</code></strong></td>
+            <td><a href="/gene_center/gene?id=GRMZM6G310687" class="historic-lookup-link">View in Gene Center &rarr;</a></td>
+          </tr>
+          <tr data-type="fgenesh" data-search="ac233910.1_fg005 grmzm6g729818">
+            <td><code>AC233910.1_FG005</code></td>
+            <td><span class="historic-pill historic-pill-blue">Fgenesh &rarr; GRMZM</span></td>
+            <td><strong><code>GRMZM6G729818</code></strong></td>
+            <td><a href="/gene_center/gene?id=GRMZM6G729818" class="historic-lookup-link">View in Gene Center &rarr;</a></td>
+          </tr>
+          <tr data-type="fgenesh" data-search="ac235534.1_fg001 grmzm6g798998">
+            <td><code>AC235534.1_FG001</code></td>
+            <td><span class="historic-pill historic-pill-blue">Fgenesh &rarr; GRMZM</span></td>
+            <td><strong><code>GRMZM6G798998</code></strong></td>
+            <td><a href="/gene_center/gene?id=GRMZM6G798998" class="historic-lookup-link">View in Gene Center &rarr;</a></td>
+          </tr>
+
+          <!-- Merged Models -->
+          <tr data-type="merged" data-search="grmzm2g000964 grmzm2g103315">
+            <td><code>GRMZM2G000964</code> + <code>GRMZM2G103315</code></td>
+            <td><span class="historic-pill historic-pill-gold">Merged Model</span></td>
+            <td><strong><code>GRMZM2G000964</code></strong></td>
+            <td><a href="/gene_center/gene?id=GRMZM2G000964" class="historic-lookup-link">View in Gene Center &rarr;</a></td>
+          </tr>
+          <tr data-type="merged" data-search="grmzm2g045892 grmzm2g452386">
+            <td><code>GRMZM2G045892</code> + <code>GRMZM2G452386</code></td>
+            <td><span class="historic-pill historic-pill-gold">Merged Model</span></td>
+            <td><strong><code>GRMZM2G045892</code></strong></td>
+            <td><a href="/gene_center/gene?id=GRMZM2G045892" class="historic-lookup-link">View in Gene Center &rarr;</a></td>
+          </tr>
+          <tr data-type="merged" data-search="grmzm2g119720 grmzm2g518717">
+            <td><code>GRMZM2G119720</code> + <code>GRMZM2G518717</code></td>
+            <td><span class="historic-pill historic-pill-gold">Merged Model</span></td>
+            <td><strong><code>GRMZM2G119720</code></strong></td>
+            <td><a href="/gene_center/gene?id=GRMZM2G119720" class="historic-lookup-link">View in Gene Center &rarr;</a></td>
+          </tr>
+          <tr data-type="merged" data-search="grmzm2g142383 grmzm2g020429">
+            <td><code>GRMZM2G142383</code> + <code>GRMZM2G020429</code></td>
+            <td><span class="historic-pill historic-pill-gold">Merged Model</span></td>
+            <td><strong><code>GRMZM2G142383</code></strong></td>
+            <td><a href="/gene_center/gene?id=GRMZM2G142383" class="historic-lookup-link">View in Gene Center &rarr;</a></td>
+          </tr>
+          <tr data-type="merged" data-search="grmzm2g319465 grmzm2g439578">
+            <td><code>GRMZM2G319465</code> + <code>GRMZM2G439578</code></td>
+            <td><span class="historic-pill historic-pill-gold">Merged Model</span></td>
+            <td><strong><code>GRMZM2G319465</code></strong></td>
+            <td><a href="/gene_center/gene?id=GRMZM2G319465" class="historic-lookup-link">View in Gene Center &rarr;</a></td>
+          </tr>
+          <tr data-type="merged" data-search="grmzm2g338693 grmzm2g117517">
+            <td><code>GRMZM2G338693</code> + <code>GRMZM2G117517</code></td>
+            <td><span class="historic-pill historic-pill-gold">Merged Model</span></td>
+            <td><strong><code>GRMZM2G338693</code></strong></td>
+            <td><a href="/gene_center/gene?id=GRMZM2G338693" class="historic-lookup-link">View in Gene Center &rarr;</a></td>
+          </tr>
+          <tr data-type="merged" data-search="grmzm5g861997 grmzm5g864178">
+            <td><code>GRMZM5G861997</code> + <code>GRMZM5G864178</code></td>
+            <td><span class="historic-pill historic-pill-gold">Merged Model</span></td>
+            <td><strong><code>GRMZM5G861997</code></strong></td>
+            <td><a href="/gene_center/gene?id=GRMZM5G861997" class="historic-lookup-link">View in Gene Center &rarr;</a></td>
+          </tr>
+          <tr data-type="merged" data-search="grmzm5g872800 grmzm2g143862">
+            <td><code>GRMZM5G872800</code> + <code>GRMZM2G143862</code></td>
+            <td><span class="historic-pill historic-pill-gold">Merged Model</span></td>
+            <td><strong><code>GRMZM5G872800</code></strong></td>
+            <td><a href="/gene_center/gene?id=GRMZM5G872800" class="historic-lookup-link">View in Gene Center &rarr;</a></td>
+          </tr>
+          <tr data-type="merged" data-search="grmzm5g891969 grmzm5g823855">
+            <td><code>GRMZM5G891969</code> + <code>GRMZM5G823855</code></td>
+            <td><span class="historic-pill historic-pill-gold">Merged Model</span></td>
+            <td><strong><code>GRMZM5G891969</code></strong></td>
+            <td><a href="/gene_center/gene?id=GRMZM5G891969" class="historic-lookup-link">View in Gene Center &rarr;</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 4: V4 & V5 MODERN ERA -->
+  <section id="historic-v4v5" class="mgdb-panel" aria-labelledby="historic-v4v5-title">
+    <div class="historic-panel-header-wrap">
+      <div>
+        <h2 id="historic-v4v5-title" class="mgdb-panel-title">The Long-Read Era&#58; RefGen_v4 &amp; NAM-5.0</h2>
+        <p class="mgdb-panel-lead">How single-molecule sequencing resolved centromeres, transposable element nests, and structural pangenomics.</p>
+      </div>
+    </div>
+
+    <div class="historic-cards-grid">
+      <article class="historic-card">
+        <h3>B73 RefGen_v4 \(Jiao et al. 2017\)</h3>
+        <p>
+          Produced using PacBio single-molecule real-time \(SMRT\) long reads, RefGen_v4 closed over 2,500 sequencing gaps present in v3, increased contig N50 by 52-fold, and resolved complex tandem repeats, knob clusters, and centromeric satellite arrays with unheralded precision.
+        </p>
+      </article>
+
+      <article class="historic-card">
+        <h3>Zm-B73-REFERENCE-NAM-5.0 \(Hufford et al. 2021\)</h3>
+        <p>
+          Generated using PacBio Sequel II HiFi reads and Bionano optical scaffolding as the central reference anchor for the 26 US Nested Association Mapping \(NAM\) founder pan-genome. It provides chromosome-scale continuity and serves as the baseline coordinate system for modern maize genetics.
+        </p>
+      </article>
+
+      <article class="historic-card">
+        <h3>Coordinate Remapping &amp; LiftOver</h3>
+        <p>
+          MaizeGDB provides cross-assembly sequence alignments and coordinate conversion tools to translate gene annotations and variant positions across all five reference releases seamlessly.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 5: SCALE & METRICS DASHBOARD -->
+  <section id="historic-metrics" class="mgdb-panel" aria-labelledby="historic-metrics-title">
+    <div class="historic-panel-header-wrap">
+      <div>
+        <h2 id="historic-metrics-title" class="mgdb-panel-title">B73 Assembly Evolution Metrics</h2>
+        <p class="mgdb-panel-lead">Benchmark statistics across the 15-year progression of B73 reference genome releases.</p>
+      </div>
+    </div>
+
+    <div class="mgdb-metric-grid mgdb-metric-grid-4">
+      <div class="mgdb-metric-card mgdb-metric-card-green">
+        <div class="mgdb-metric-number">5 Major</div>
+        <div class="mgdb-metric-title">Reference Versions</div>
+        <div class="mgdb-metric-desc">RefGen_v1, RefGen_v2, RefGen_v3, RefGen_v4, and Zm-B73-REFERENCE-NAM-5.0.</div>
+      </div>
+      <div class="mgdb-metric-card mgdb-metric-card-gold">
+        <div class="mgdb-metric-number">2.18 Gb</div>
+        <div class="mgdb-metric-title">Current Assembly Size</div>
+        <div class="mgdb-metric-desc">Comprehensive chromosome-scale coverage across all 10 maize pseudomolecules.</div>
+      </div>
+      <div class="mgdb-metric-card mgdb-metric-card-blue">
+        <div class="mgdb-metric-number">39,756</div>
+        <div class="mgdb-metric-title">Canonical Gene Models</div>
+        <div class="mgdb-metric-desc">High-confidence structural gene annotations in canonical v5 release \(Zm00001eb.1\).</div>
+      </div>
+      <div class="mgdb-metric-card mgdb-metric-card-orange">
+        <div class="mgdb-metric-number">100%</div>
+        <div class="mgdb-metric-title">Archival Availability</div>
+        <div class="mgdb-metric-desc">Full FASTA sequences, GFF3 files, and gene catalogs preserved for every release.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6: FAQS & GUIDELINES -->
+  <section id="historic-faqs" class="mgdb-panel" aria-labelledby="historic-faqs-title">
+    <div class="historic-panel-header-wrap">
+      <div>
+        <h2 id="historic-faqs-title" class="mgdb-panel-title">Frequently Asked Questions &amp; Guidelines</h2>
+        <p class="mgdb-panel-lead">Guidance on selecting the appropriate reference assembly for your analysis.</p>
+      </div>
+    </div>
+
+    <div class="historic-faq-list">
+      <details class="historic-faq-item">
+        <summary><h3>Which B73 reference version should I use for new research?</h3></summary>
+        <div class="historic-faq-body">
+          <p>
+            For all new genomic, transcriptomic, and variant discovery studies, we strongly recommend using <strong>Zm-B73-REFERENCE-NAM-5.0</strong>. It represents the highest-continuity reference assembly and directly aligns with the 26 NAM founder pan-genome lines.
+          </p>
+        </div>
+      </details>
+
+      <details class="historic-faq-item">
+        <summary><h3>Where can I download complete FASTA and GFF3 files for older versions?</h3></summary>
+        <div class="historic-faq-body">
+          <p>
+            All historic assembly sequences, gene models, and structural annotations are permanently archived on the <a href="/download">MaizeGDB Downloads Portal</a> under their respective version directories \(e.g., <code>/B73_RefGen_v1/</code>, <code>/B73_RefGen_v2/</code>, <code>/B73_RefGen_v3/</code>, <code>/B73_RefGen_v4/</code>\).
+          </p>
+        </div>
+      </details>
+
+      <details class="historic-faq-item">
+        <summary><h3>How do I convert gene coordinates between RefGen_v3, v4, and v5?</h3></summary>
+        <div class="historic-faq-body">
+          <p>
+            You can search any gene identifier in the <a href="/gene_center/gene">Gene Center</a> to view cross-reference mappings across versions, or use NCBI and Ensembl Plants coordinate liftover chains.
+          </p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- SECTION 7: CONNECTED RESOURCES -->
+  <section id="historic-related" class="mgdb-panel historic-bottom-section" aria-labelledby="historic-related-title">
+    <div class="historic-panel-header-wrap">
+      <div>
+        <h2 id="historic-related-title" class="mgdb-panel-title">Connected Genome Resources</h2>
+        <p class="mgdb-panel-lead">Explore current assembly catalogs, pan-genomes, and sequence tools.</p>
+      </div>
+    </div>
+
+    <div class="historic-related-grid">
+      <a class="historic-related-card" href="/assembly">
+        <div class="historic-related-title">B73 Assembly Hub &rarr;</div>
+        <p class="historic-related-desc">Current B73 v5 reference assembly profiles, gene models, and chromosomes.</p>
+      </a>
+      <a class="historic-related-card" href="/genome">
+        <div class="historic-related-title">Genome Center &rarr;</div>
+        <p class="historic-related-desc">Explore all reference, founder, diversity, and pan-genomic assemblies.</p>
+      </a>
+      <a class="historic-related-card" href="/NAM_project">
+        <div class="historic-related-title">NAM Pan-Genome &rarr;</div>
+        <p class="historic-related-desc">26 de novo chromosome-scale assemblies of the NAM founder inbred lines.</p>
+      </a>
+      <a class="historic-related-card" href="/download">
+        <div class="historic-related-title">Bulk Downloads &rarr;</div>
+        <p class="historic-related-desc">Permanent repository archives for all current and historic maize datasets.</p>
+      </a>
+    </div>
+  </section>
+
+</main>
+)

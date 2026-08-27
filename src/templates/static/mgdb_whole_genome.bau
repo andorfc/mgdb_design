@@ -1,0 +1,374 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-whole-genome
+<a class="mgdb-skip-link" href="#whole-genome-main">Skip to main content</a>
+
+<main class="mgdb-page mgdb-whole-genome-page" id="whole-genome-main">
+
+  <!-- Breadcrumb Navigation -->
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span>
+    <a href="/genome">Genomes</a><span aria-hidden="true">&rsaquo;</span>
+    <span aria-current="page">Whole Genome Views</span>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="mgdb-hero" aria-labelledby="whole-genome-title">
+    <div class="mgdb-hero-emblem" aria-hidden="true" style="background:#ffffff; border:1px solid #e2e8f0;">
+      <svg width="56" height="56" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- 10 vertical chromosome ideograms -->
+        <rect x="8" y="12" width="3" height="40" rx="1.5" fill="#2563eb"/>
+        <rect x="13" y="14" width="3" height="38" rx="1.5" fill="#2563eb"/>
+        <rect x="18" y="16" width="3" height="36" rx="1.5" fill="#2563eb"/>
+        <rect x="23" y="18" width="3" height="34" rx="1.5" fill="#2563eb"/>
+        <rect x="28" y="20" width="3" height="32" rx="1.5" fill="#2563eb"/>
+        <rect x="33" y="22" width="3" height="30" rx="1.5" fill="#2563eb"/>
+        <rect x="38" y="24" width="3" height="28" rx="1.5" fill="#2563eb"/>
+        <rect x="43" y="26" width="3" height="26" rx="1.5" fill="#2563eb"/>
+        <rect x="48" y="28" width="3" height="24" rx="1.5" fill="#2563eb"/>
+        <rect x="53" y="30" width="3" height="22" rx="1.5" fill="#2563eb"/>
+        <!-- Cross-linking synteny ribbon -->
+        <path d="M8 32 C 20 40, 35 20, 53 38" stroke="#e11d48" stroke-width="2" fill="none"/>
+      </svg>
+      <strong>Whole<br />Genomes</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data_date)</p>
+      <h1 id="whole-genome-title">Whole Genome Views &amp; Chromosome Maps</h1>
+      <p class="mgdb-hero-description">
+        Interactive chromosome ideograms, gene density landscapes, centromeric repeats, and tandem array distributions across B73 v5 and the 25 NAM founder pan-genomes rendered via CViTjs.
+      </p>
+
+      <div class="whole-genome-hero-actions-row">
+        <a class="whole-genome-hero-link" href="#whole-genome-assemblies">
+          <span class="whole-genome-link-dot whole-genome-dot-green" aria-hidden="true"></span> Assembly Ideograms &#8595;
+        </a>
+        <a class="whole-genome-hero-link" href="#whole-genome-chromosomes">
+          <span class="whole-genome-link-dot whole-genome-dot-blue" aria-hidden="true"></span> Chromosome Visualizer &#8595;
+        </a>
+        <a class="whole-genome-hero-link" href="/genomebrowser">
+          <span class="whole-genome-link-dot whole-genome-dot-gold" aria-hidden="true"></span> JBrowse 2 Multi-Genome &#8599;
+        </a>
+        <a class="whole-genome-hero-link" href="https://pangenome-viewer.maizegdb.org" target="_blank" rel="noopener">
+          <span class="whole-genome-link-dot whole-genome-dot-purple" aria-hidden="true"></span> Pangenome Graph &#8599;
+        </a>
+        <a class="whole-genome-hero-link" href="/NAM_project">
+          <span class="whole-genome-link-dot whole-genome-dot-dark" aria-hidden="true"></span> NAM Pan-Genome Hub &#8599;
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STICKY SECTION NAVIGATION TABS -->
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#whole-genome-assemblies" class="is-current">Whole Genome Assemblies</a>
+    <a href="#whole-genome-chromosomes">Chromosome Visualizer</a>
+    <a href="#whole-genome-legend">Feature &amp; Repeat Legend</a>
+    <a href="#whole-genome-tools">Connected Comparative Tools</a>
+    <a href="#whole-genome-metrics">Scale &amp; Metrics</a>
+    <a href="#whole-genome-faqs">FAQs &amp; Guidelines</a>
+    <a href="#whole-genome-related">Connected Resources</a>
+  </nav>
+
+  <!-- SECTION 1: WHOLE GENOME ASSEMBLY EXPLORER -->
+  <section id="whole-genome-assemblies" class="mgdb-panel" aria-labelledby="wg-assemblies-title">
+    <div class="whole-genome-panel-header-wrap">
+      <div>
+        <h2 id="wg-assemblies-title" class="mgdb-panel-title">Explore Whole Genome Assembly Ideograms</h2>
+        <p class="mgdb-panel-lead">Select an assembly from B73 v5 or the 25 NAM founder lines to view its complete 10-chromosome karyotype layout.</p>
+      </div>
+    </div>
+
+    <!-- SELECTOR FORM -->
+    <div class="wg-control-bar">
+      <div class="wg-select-wrap">
+        <label for="select-assembly-input" class="wg-select-label">Select Genome Assembly&#58;</label>
+        <select id="select-assembly-input" class="mgdb-select wg-select">
+          <option value="B73v5" selected>Zm-B73-REFERENCE-NAM-5.0 \(B73 Reference\)</option>
+          <option value="B97">Zm-B97-REFERENCE-NAM-1.0 \(B97 &bull; Northern Flint/Dent\)</option>
+          <option value="CML52">Zm-CML52-REFERENCE-NAM-1.0 \(CML52 &bull; Tropical Lowland\)</option>
+          <option value="CML69">Zm-CML69-REFERENCE-NAM-1.0 \(CML69 &bull; Tropical\)</option>
+          <option value="CML103">Zm-CML103-REFERENCE-NAM-1.0 \(CML103 &bull; Tropical\)</option>
+          <option value="CML228">Zm-CML228-REFERENCE-NAM-1.0 \(CML228 &bull; Tropical Late\)</option>
+          <option value="CML247">Zm-CML247-REFERENCE-NAM-1.0 \(CML247 &bull; Tropical Highland\)</option>
+          <option value="CML277">Zm-CML277-REFERENCE-NAM-1.0 \(CML277 &bull; Tropical\)</option>
+          <option value="CML322">Zm-CML322-REFERENCE-NAM-1.0 \(CML322 &bull; Tropical\)</option>
+          <option value="CML333">Zm-CML333-REFERENCE-NAM-1.0 \(CML333 &bull; Tropical\)</option>
+          <option value="HP301">Zm-HP301-REFERENCE-NAM-1.0 \(HP301 &bull; Popcorn\)</option>
+          <option value="Il14H">Zm-Il14H-REFERENCE-NAM-1.0 \(Il14H &bull; Sweet Corn\)</option>
+          <option value="Ki3">Zm-Ki3-REFERENCE-NAM-1.0 \(Ki3 &bull; Tropical Suwan\)</option>
+          <option value="Ki11">Zm-Ki11-REFERENCE-NAM-1.0 \(Ki11 &bull; Tropical Suwan\)</option>
+          <option value="Ky21">Zm-Ky21-REFERENCE-NAM-1.0 \(Ky21 &bull; Non-Stiff Stalk\)</option>
+          <option value="M37W">Zm-M37W-REFERENCE-NAM-1.0 \(M37W &bull; Non-Stiff Stalk\)</option>
+          <option value="M162W">Zm-M162W-REFERENCE-NAM-1.0 \(M162W &bull; Non-Stiff Stalk\)</option>
+          <option value="Mo18W">Zm-Mo18W-REFERENCE-NAM-1.0 \(Mo18W &bull; Non-Stiff Stalk\)</option>
+          <option value="Ms71">Zm-Ms71-REFERENCE-NAM-1.0 \(Ms71 &bull; Non-Stiff Stalk\)</option>
+          <option value="NC350">Zm-NC350-REFERENCE-NAM-1.0 \(NC350 &bull; Tropical\)</option>
+          <option value="NC358">Zm-NC358-REFERENCE-NAM-1.0 \(NC358 &bull; Tropical\)</option>
+          <option value="Oh7B">Zm-Oh7B-REFERENCE-NAM-1.0 \(Oh7B &bull; Non-Stiff Stalk\)</option>
+          <option value="Oh43">Zm-Oh43-REFERENCE-NAM-1.0 \(Oh43 &bull; Lancaster\)</option>
+          <option value="P39">Zm-P39-REFERENCE-NAM-1.0 \(P39 &bull; Sweet Corn\)</option>
+          <option value="Tx303">Zm-Tx303-REFERENCE-NAM-1.0 \(Tx303 &bull; Non-Stiff Stalk\)</option>
+          <option value="Tzi8">Zm-Tzi8-REFERENCE-NAM-1.0 \(Tzi8 &bull; Tropical Africa\)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- VIEWER CARD -->
+    <div class="wg-display-card">
+      <div class="wg-display-toolbar">
+        <div class="wg-display-meta">
+          <strong id="wg-display-title">Zm-B73-REFERENCE-NAM-5.0</strong>
+          <span class="wg-display-sub">Annotation Set&#58; <code id="wg-display-annot">Zm00001eb.1</code> &bull; 10 Chromosomes</span>
+        </div>
+        <div class="wg-display-actions" id="wg-display-downloads">
+          <a id="btn-dl-png" href="/images/NAM/B73v5.png" class="mgdb-button mgdb-button-secondary" target="_blank" rel="noopener" download>Download PNG &#8595;</a>
+          <a id="btn-dl-svg" href="/images/NAM/B73v5.svg" class="mgdb-button mgdb-button-primary" target="_blank" rel="noopener" download>Download Vector SVG &#8595;</a>
+        </div>
+      </div>
+
+      <div class="wg-image-frame">
+        <img id="wg-main-image" src="/images/NAM/B73v5.png" alt="Whole genome chromosomal map of maize assembly" class="wg-main-img" />
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: MULTI-ASSEMBLY CHROMOSOME VISUALIZER -->
+  <section id="whole-genome-chromosomes" class="mgdb-panel" aria-labelledby="wg-chr-title">
+    <div class="whole-genome-panel-header-wrap">
+      <div>
+        <h2 id="wg-chr-title" class="mgdb-panel-title">Multi-Assembly Chromosome Visualizer</h2>
+        <p class="mgdb-panel-lead">Select an individual chromosome \(1 to 10\) to compare its physical structure and repeat distribution across all 26 NAM founder genomes.</p>
+      </div>
+    </div>
+
+    <!-- CHROMOSOME CHIPS -->
+    <div class="wg-chr-chips-wrap" role="group" aria-label="Select chromosome">
+      <button type="button" class="wg-chr-chip is-active" data-chr="chr1">Chromosome 1</button>
+      <button type="button" class="wg-chr-chip" data-chr="chr2">Chromosome 2</button>
+      <button type="button" class="wg-chr-chip" data-chr="chr3">Chromosome 3</button>
+      <button type="button" class="wg-chr-chip" data-chr="chr4">Chromosome 4</button>
+      <button type="button" class="wg-chr-chip" data-chr="chr5">Chromosome 5</button>
+      <button type="button" class="wg-chr-chip" data-chr="chr6">Chromosome 6</button>
+      <button type="button" class="wg-chr-chip" data-chr="chr7">Chromosome 7</button>
+      <button type="button" class="wg-chr-chip" data-chr="chr8">Chromosome 8</button>
+      <button type="button" class="wg-chr-chip" data-chr="chr9">Chromosome 9</button>
+      <button type="button" class="wg-chr-chip" data-chr="chr10">Chromosome 10</button>
+    </div>
+
+    <!-- CHROMOSOME DISPLAY CARD -->
+    <div class="wg-display-card">
+      <div class="wg-display-toolbar">
+        <div class="wg-display-meta">
+          <strong id="wg-chr-display-title">Chromosome 1 Across 26 NAM Founder Assemblies</strong>
+          <span class="wg-display-sub">Comparative structural view &bull; 26 reference genomes</span>
+        </div>
+        <div class="wg-display-actions" id="wg-chr-downloads">
+          <a id="btn-dl-chr-png" href="/images/NAM/chr1.png" class="mgdb-button mgdb-button-secondary" target="_blank" rel="noopener" download>Download PNG &#8595;</a>
+          <a id="btn-dl-chr-svg" href="/images/NAM/chr1.svg" class="mgdb-button mgdb-button-primary" target="_blank" rel="noopener" download>Download Vector SVG &#8595;</a>
+        </div>
+      </div>
+
+      <div class="wg-image-frame">
+        <img id="wg-chr-image" src="/images/NAM/chr1.png" alt="Comparative chromosome map across all NAM founder assemblies" class="wg-main-img" />
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: FEATURE & REPEAT LEGEND -->
+  <section id="whole-genome-legend" class="mgdb-panel" aria-labelledby="wg-legend-title">
+    <div class="whole-genome-panel-header-wrap">
+      <div>
+        <h2 id="wg-legend-title" class="mgdb-panel-title">Feature &amp; Repeat Density Color Legend</h2>
+        <p class="mgdb-panel-lead">Color specifications representing genomic annotations and repetitive satellite arrays in CViTjs ideograms.</p>
+      </div>
+    </div>
+
+    <div class="wg-legend-grid">
+      <div class="wg-legend-card">
+        <span class="wg-swatch swatch-blue" aria-hidden="true"></span>
+        <div class="wg-legend-info">
+          <strong>Gene Density</strong>
+          <span>High-confidence protein-coding gene model density along chromosome arms.</span>
+        </div>
+      </div>
+
+      <div class="wg-legend-card">
+        <span class="wg-swatch swatch-red" aria-hidden="true"></span>
+        <div class="wg-legend-info">
+          <strong>Tandem Arrays</strong>
+          <span>Tandemly duplicated gene clusters and repetitive array regions.</span>
+        </div>
+      </div>
+
+      <div class="wg-legend-card">
+        <span class="wg-swatch swatch-black" aria-hidden="true"></span>
+        <div class="wg-legend-info">
+          <strong>Centromeres</strong>
+          <span>CentC satellite repeat core boundaries and functional kinetochore domains.</span>
+        </div>
+      </div>
+
+      <div class="wg-legend-card">
+        <span class="wg-swatch swatch-amber" aria-hidden="true"></span>
+        <div class="wg-legend-info">
+          <strong>Knob 180-bp Repeats</strong>
+          <span>Major 180-bp knob satellite repeat clusters marking heterochromatic knobs.</span>
+        </div>
+      </div>
+
+      <div class="wg-legend-card">
+        <span class="wg-swatch swatch-orange" aria-hidden="true"></span>
+        <div class="wg-legend-info">
+          <strong>TR-1 Repeats</strong>
+          <span>350-bp TR-1 knob repeat elements polymorphic across lines.</span>
+        </div>
+      </div>
+
+      <div class="wg-legend-card">
+        <span class="wg-swatch swatch-cyan" aria-hidden="true"></span>
+        <div class="wg-legend-info">
+          <strong>AF013103.1 Satellite</strong>
+          <span>Subtelomeric and chromosomal marker satellite repeat arrays.</span>
+        </div>
+      </div>
+
+      <div class="wg-legend-card">
+        <span class="wg-swatch swatch-magenta" aria-hidden="true"></span>
+        <div class="wg-legend-info">
+          <strong>CL569186.1 Repeat</strong>
+          <span>Characteristic maize repeat sequence family mapped across founder lines.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: CONNECTED COMPARATIVE TOOLS -->
+  <section id="whole-genome-tools" class="mgdb-panel" aria-labelledby="wg-tools-title">
+    <div class="whole-genome-panel-header-wrap">
+      <div>
+        <h2 id="wg-tools-title" class="mgdb-panel-title">Connected Comparative Whole-Genome Tools</h2>
+        <p class="mgdb-panel-lead">Advanced interactive browsers and synteny applications integrated with MaizeGDB.</p>
+      </div>
+    </div>
+
+    <div class="wg-tools-grid">
+      <article class="wg-tool-card">
+        <h3>JBrowse 2 Linear &amp; Synteny Browser</h3>
+        <p>Interactive multi-genome browser supporting simultaneous linear chromosome views, synteny curves between founder lines, and dotplot alignments.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="/genomebrowser">Open JBrowse 2 &#8599;</a>
+      </article>
+
+      <article class="wg-tool-card">
+        <h3>MaizeGDB Pangenome Graph Viewer</h3>
+        <p>Explore variation graphs representing structural presence/absence variations, inversions, and translocations across the NAM founder pan-genome.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="https://pangenome-viewer.maizegdb.org" target="_blank" rel="noopener">Open Pangenome Graph &#8599;</a>
+      </article>
+
+      <article class="wg-tool-card">
+        <h3>Genome Context Viewer \(GCV\)</h3>
+        <p>Compare local gene order, synteny conservation, and micro-collinearity across multiple grass genomes and maize diversity lines.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="https://gcv.maizegdb.org" target="_blank" rel="noopener">Launch GCV Tool &#8599;</a>
+      </article>
+
+      <article class="wg-tool-card">
+        <h3>NAM Pan-Gene Viewer</h3>
+        <p>Query pan-gene copy number variation, core vs. dispensable gene classifications, and structural variants across all 26 NAM assemblies.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="https://pangenome-viewer.maizegdb.org/?set=NAM&amp;geneID=Zm00001eb406090" target="_blank" rel="noopener">Explore Pan-Gene Sets &#8599;</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 5: SCALE & METRICS DASHBOARD -->
+  <section id="whole-genome-metrics" class="mgdb-panel" aria-labelledby="wg-metrics-title">
+    <div class="whole-genome-panel-header-wrap">
+      <div>
+        <h2 id="wg-metrics-title" class="mgdb-panel-title">Scale &amp; Genomic Metrics</h2>
+        <p class="mgdb-panel-lead">Overview of comparative whole-genome maps across MaizeGDB founder lines.</p>
+      </div>
+    </div>
+
+    <div class="mgdb-metric-grid mgdb-metric-grid-4">
+      <div class="mgdb-metric-card mgdb-metric-card-green">
+        <div class="mgdb-metric-number">26</div>
+        <div class="mgdb-metric-title">Founder Reference Genomes</div>
+        <div class="mgdb-metric-desc">B73 v5 reference plus all 25 diverse US NAM founder inbred lines.</div>
+      </div>
+      <div class="mgdb-metric-card mgdb-metric-card-gold">
+        <div class="mgdb-metric-number">10</div>
+        <div class="mgdb-metric-title">Chromosomes Mapped</div>
+        <div class="mgdb-metric-desc">High-continuity chromosome-scale pseudomolecules for every assembly.</div>
+      </div>
+      <div class="mgdb-metric-card mgdb-metric-card-blue">
+        <div class="mgdb-metric-number">7 Features</div>
+        <div class="mgdb-metric-title">Density Tracks Tracked</div>
+        <div class="mgdb-metric-desc">Genes, centromeres, tandem arrays, Knob180, TR-1, and satellite repeats.</div>
+      </div>
+      <div class="mgdb-metric-card mgdb-metric-card-orange">
+        <div class="mgdb-metric-number">SVG &amp; PNG</div>
+        <div class="mgdb-metric-title">Publication Downloads</div>
+        <div class="mgdb-metric-desc">High-resolution raster and scalable vector graphics available for every view.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6: FAQS & GUIDELINES -->
+  <section id="whole-genome-faqs" class="mgdb-panel" aria-labelledby="wg-faqs-title">
+    <div class="whole-genome-panel-header-wrap">
+      <div>
+        <h2 id="wg-faqs-title" class="mgdb-panel-title">Frequently Asked Questions &amp; Guidelines</h2>
+        <p class="mgdb-panel-lead">Information regarding CViTjs rendering, vector image downloads, and data provenance.</p>
+      </div>
+    </div>
+
+    <div class="whole-genome-faq-list">
+      <details class="whole-genome-faq-item">
+        <summary><h3>How were these whole-genome chromosome maps generated?</h3></summary>
+        <div class="whole-genome-faq-body">
+          <p>
+            These whole-genome images were produced using <a href="https://github.com/LegumeFederation/cvitjs" target="_blank" rel="noopener">CViTjs</a>, an open-source JavaScript chromosome visualization tool. Features and repeat tracks were computed directly from canonical assembly FASTA and GFF3 annotation releases.
+          </p>
+        </div>
+      </details>
+
+      <details class="whole-genome-faq-item">
+        <summary><h3>Can I download vector SVG files for publication figures?</h3></summary>
+        <div class="whole-genome-faq-body">
+          <p>
+            Yes! Click the <strong>Download Vector SVG</strong> button on any assembly or chromosome view to obtain publication-ready scalable vector graphics.
+          </p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- SECTION 7: CONNECTED RESOURCES -->
+  <section id="whole-genome-related" class="mgdb-panel wg-bottom-section" aria-labelledby="wg-related-title">
+    <div class="whole-genome-panel-header-wrap">
+      <div>
+        <h2 id="wg-related-title" class="mgdb-panel-title">Connected Genome Resources</h2>
+        <p class="mgdb-panel-lead">Explore related pangenomic, diversity, and association mapping resources.</p>
+      </div>
+    </div>
+
+    <div class="whole-genome-related-grid">
+      <a class="whole-genome-related-card" href="/NAM_project">
+        <div class="whole-genome-related-title">NAM Parent Genomes &rarr;</div>
+        <p class="whole-genome-related-desc">26 de novo chromosome-scale assemblies of the US NAM founder lines.</p>
+      </a>
+      <a class="whole-genome-related-card" href="/genome">
+        <div class="whole-genome-related-title">Genome Assembly Center &rarr;</div>
+        <p class="whole-genome-related-desc">Browse all reference, founder, diversity, and pan-genomic maize assemblies.</p>
+      </a>
+      <a class="whole-genome-related-card" href="/14InbredsFISH">
+        <div class="whole-genome-related-title">FISH Karyotype Gallery &rarr;</div>
+        <p class="whole-genome-related-desc">Somatic chromosome painting and multicolor FISH maps across 14 inbred lines.</p>
+      </a>
+      <a class="whole-genome-related-card" href="/genomebrowser">
+        <div class="whole-genome-related-title">Genome Browsers &rarr;</div>
+        <p class="whole-genome-related-desc">Interactive sequence browsers with repeat annotations and synteny tracks.</p>
+      </a>
+    </div>
+  </section>
+
+</main>
+)

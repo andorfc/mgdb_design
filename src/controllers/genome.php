@@ -48,12 +48,18 @@
 
   /* Modernized Genome Project Pages: delegate directly to their standalone modern controllers */
   $modern_project_controllers = [
-    'NAM_project'      => 'controllers/NAM_project.php',
-    'PanAnd_project'   => 'controllers/PanAnd_project.php',
-    'european_flints'  => 'controllers/european_flints.php',
-    'HiLo_project'     => 'controllers/HiLo_project.php',
-    'amaizing_project' => 'controllers/amaizing_project.php',
-    'CAAS_FIL_project' => 'controllers/CAAS_FIL_project.php',
+    'NAM_project'        => 'controllers/NAM_project.php',
+    'PanAnd_project'     => 'controllers/PanAnd_project.php',
+    'european_flints'    => 'controllers/european_flints.php',
+    'HiLo_project'       => 'controllers/HiLo_project.php',
+    'amaizing_project'   => 'controllers/amaizing_project.php',
+    'CAAS_FIL_project'   => 'controllers/CAAS_FIL_project.php',
+    '14InbredsFISH'      => 'controllers/14InbredsFISH.php',
+    '14InbredFISH'       => 'controllers/14InbredsFISH.php',
+    'B73Mo17FISH'        => 'controllers/14InbredsFISH.php',
+    'historic'           => 'controllers/historic.php',
+    'whole_genome'       => 'controllers/whole_genome.php',
+    'jbrowse2_tutorial'  => 'controllers/jbrowse2_tutorial.php',
   ];
   if (defined('PAGE') && PAGE && isset($modern_project_controllers[PAGE])) {
     include($modern_project_controllers[PAGE]);

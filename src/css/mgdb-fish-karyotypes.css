@@ -1,0 +1,505 @@
+/* ==========================================================================
+ * file: mgdb-fish-karyotypes.css
+ * purpose: Stylesheet for Maize Somatic Chromosome Painting & FISH Karyotypes
+ * ========================================================================== */
+
+.mgdb-fish-karyotypes-page {
+  padding-bottom: var(--mgdb-space-8);
+}
+
+.mgdb-fish-karyotypes-page .mgdb-panel {
+  margin-top: var(--mgdb-space-6);
+  padding: var(--mgdb-space-6);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-fish-karyotypes-page .fish-panel-header-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-fish-karyotypes-page .mgdb-panel-title {
+  margin: 0 0 var(--mgdb-space-1);
+  font-size: var(--mgdb-text-2xl);
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-fish-karyotypes-page .mgdb-panel-lead {
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  max-width: 75ch;
+}
+
+/* --------------------------------------------------------------------------
+ * Hero Action Links
+ * -------------------------------------------------------------------------- */
+
+.mgdb-fish-karyotypes-page .fish-hero-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-fish-karyotypes-page .fish-hero-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.mgdb-fish-karyotypes-page .fish-hero-link:hover {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border-color: var(--mgdb-green-dark);
+}
+
+.mgdb-fish-karyotypes-page .fish-link-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.mgdb-fish-karyotypes-page .fish-dot-green { background: #16a34a; }
+.mgdb-fish-karyotypes-page .fish-dot-gold { background: #d97706; }
+.mgdb-fish-karyotypes-page .fish-dot-rose { background: #e11d48; }
+.mgdb-fish-karyotypes-page .fish-dot-purple { background: #9333ea; }
+.mgdb-fish-karyotypes-page .fish-dot-dark { background: #475569; }
+
+/* --------------------------------------------------------------------------
+ * Gallery Tabs & Image Container
+ * -------------------------------------------------------------------------- */
+
+.mgdb-fish-karyotypes-page .fish-view-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-bottom: var(--mgdb-space-4);
+  border-bottom: 2px solid var(--mgdb-line);
+  padding-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-fish-karyotypes-page .fish-tab-btn {
+  padding: 8px 16px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mgdb-fish-karyotypes-page .fish-tab-btn:hover {
+  background: var(--mgdb-line);
+}
+
+.mgdb-fish-karyotypes-page .fish-tab-btn.is-active {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border-color: var(--mgdb-green-dark);
+}
+
+.mgdb-fish-karyotypes-page .fish-image-card {
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: #ffffff;
+  padding: var(--mgdb-space-4);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-fish-karyotypes-page .fish-image-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  padding-bottom: var(--mgdb-space-3);
+  margin-bottom: var(--mgdb-space-3);
+  border-bottom: 1px solid var(--mgdb-line-soft);
+}
+
+.mgdb-fish-karyotypes-page .fish-image-meta strong {
+  display: block;
+  font-size: var(--mgdb-text-base);
+  color: var(--mgdb-ink);
+}
+
+.mgdb-fish-karyotypes-page .fish-meta-sub {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+}
+
+.mgdb-fish-karyotypes-page .fish-image-wrap {
+  text-align: center;
+  background: #000000;
+  border-radius: var(--mgdb-radius-sm);
+  padding: var(--mgdb-space-2);
+  overflow-x: auto;
+}
+
+.mgdb-fish-karyotypes-page .fish-display-img {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+  border-radius: var(--mgdb-radius-sm);
+}
+
+.mgdb-fish-karyotypes-page .fish-image-caption {
+  margin-top: var(--mgdb-space-3);
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.5;
+}
+
+/* --------------------------------------------------------------------------
+ * Section 2: Probe Signal Grid
+ * -------------------------------------------------------------------------- */
+
+.mgdb-fish-karyotypes-page .fish-probe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-fish-karyotypes-page .fish-probe-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-4);
+  display: flex;
+  flex-direction: column;
+}
+
+.mgdb-fish-karyotypes-page .fish-probe-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-fish-karyotypes-page .fish-color-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  display: inline-block;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.mgdb-fish-karyotypes-page .swatch-blue { background: #2563eb; }
+.mgdb-fish-karyotypes-page .swatch-yellow { background: #eab308; }
+.mgdb-fish-karyotypes-page .swatch-green { background: #22c55e; }
+.mgdb-fish-karyotypes-page .swatch-red { background: #ef4444; }
+.mgdb-fish-karyotypes-page .swatch-white { background: #f8fafc; border-color: #cbd5e1; }
+
+.mgdb-fish-karyotypes-page .fish-probe-tag {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--mgdb-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.mgdb-fish-karyotypes-page .fish-probe-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 var(--mgdb-space-1) 0;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-fish-karyotypes-page .fish-probe-card p {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.5;
+  margin: 0;
+  flex: 1;
+}
+
+/* --------------------------------------------------------------------------
+ * Section 3: Methodology Cards (NO ICONS)
+ * -------------------------------------------------------------------------- */
+
+.mgdb-fish-karyotypes-page .fish-method-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-fish-karyotypes-page .fish-method-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-4);
+  display: flex;
+  flex-direction: column;
+}
+
+.mgdb-fish-karyotypes-page .fish-method-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 var(--mgdb-space-2) 0;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-fish-karyotypes-page .fish-method-card p {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.5;
+  margin: 0;
+  flex: 1;
+}
+
+/* --------------------------------------------------------------------------
+ * Section 4: Publications (NAM FORMATTING)
+ * -------------------------------------------------------------------------- */
+
+.mgdb-fish-karyotypes-page .fish-publications-grid {
+  display: grid;
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-fish-karyotypes-page .fish-pub-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: var(--mgdb-space-5);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-fish-karyotypes-page .fish-pub-meta-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-fish-karyotypes-page .fish-pub-journal-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #fef3c7;
+  color: #92400e;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.mgdb-fish-karyotypes-page .fish-pub-doi {
+  font-family: var(--mgdb-font-mono, monospace);
+  font-size: 11px;
+  color: var(--mgdb-muted);
+}
+
+.mgdb-fish-karyotypes-page .fish-pub-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--mgdb-burgundy);
+  margin: 0 0 var(--mgdb-space-2) 0;
+}
+
+.mgdb-fish-karyotypes-page .fish-pub-authors {
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-ink);
+  margin: 0 0 var(--mgdb-space-1) 0;
+  line-height: 1.4;
+}
+
+.mgdb-fish-karyotypes-page .fish-pub-citation {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  margin: 0 0 var(--mgdb-space-3) 0;
+}
+
+.mgdb-fish-karyotypes-page .fish-pub-abstract-wrap {
+  background: var(--mgdb-surface-alt);
+  border-left: 3px solid var(--mgdb-green);
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-fish-karyotypes-page .fish-pub-abstract-heading {
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--mgdb-green-dark);
+  margin: 0 0 4px 0;
+}
+
+.mgdb-fish-karyotypes-page .fish-pub-abstract-text {
+  font-size: var(--mgdb-text-xs);
+  line-height: 1.6;
+  color: var(--mgdb-ink-soft);
+  margin: 0;
+}
+
+.mgdb-fish-karyotypes-page .fish-pub-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+/* --------------------------------------------------------------------------
+ * Button Styles Matching NAM Project
+ * -------------------------------------------------------------------------- */
+
+.mgdb-fish-karyotypes-page .mgdb-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--mgdb-radius-sm);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.mgdb-fish-karyotypes-page .mgdb-button-primary {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border: 1px solid var(--mgdb-green-dark);
+}
+
+.mgdb-fish-karyotypes-page .mgdb-button-primary:hover {
+  background: #14532d;
+  border-color: #14532d;
+}
+
+.mgdb-fish-karyotypes-page .mgdb-button-secondary {
+  background: #ffffff;
+  color: var(--mgdb-green-dark);
+  border: 1px solid var(--mgdb-line);
+}
+
+.mgdb-fish-karyotypes-page .mgdb-button-secondary:hover {
+  background: var(--mgdb-surface-alt);
+  border-color: var(--mgdb-green-dark);
+}
+
+.mgdb-fish-karyotypes-page .mgdb-button-quiet {
+  background: transparent;
+  color: var(--mgdb-muted);
+  border: 1px solid transparent;
+}
+
+.mgdb-fish-karyotypes-page .mgdb-button-quiet:hover {
+  color: var(--mgdb-ink);
+  background: var(--mgdb-surface-alt);
+}
+
+/* --------------------------------------------------------------------------
+ * Section 6: FAQ Accordions
+ * -------------------------------------------------------------------------- */
+
+.mgdb-fish-karyotypes-page .fish-faq-list {
+  display: grid;
+  gap: var(--mgdb-space-3);
+}
+
+.mgdb-fish-karyotypes-page .fish-faq-item {
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.mgdb-fish-karyotypes-page .fish-faq-item summary {
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  background: #ffffff;
+  transition: background 0.12s ease;
+}
+
+.mgdb-fish-karyotypes-page .fish-faq-item summary:hover {
+  background: #f8faf8;
+}
+
+.mgdb-fish-karyotypes-page .fish-faq-item summary h3 {
+  display: inline;
+  font-size: var(--mgdb-text-base);
+  color: var(--mgdb-green-dark);
+  margin: 0;
+}
+
+.mgdb-fish-karyotypes-page .fish-faq-body {
+  padding: 0 var(--mgdb-space-5) var(--mgdb-space-4);
+  border-top: 1px solid var(--mgdb-line-soft);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-fish-karyotypes-page .fish-faq-body a {
+  color: var(--mgdb-green-dark);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+ * Section 7: Connected Resources (Matching NAM bottom section)
+ * -------------------------------------------------------------------------- */
+
+.mgdb-fish-karyotypes-page .fish-bottom-section {
+  background: linear-gradient(180deg, var(--mgdb-surface) 0%, var(--mgdb-green-soft) 100%) !important;
+  border-color: #b8dbca !important;
+}
+
+.mgdb-fish-karyotypes-page .fish-related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-fish-karyotypes-page .fish-related-card {
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  padding: var(--mgdb-space-3);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color .12s, box-shadow .12s;
+}
+
+.mgdb-fish-karyotypes-page .fish-related-card:hover {
+  border-color: var(--mgdb-green);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.mgdb-fish-karyotypes-page .fish-related-title {
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+  margin-bottom: 2px;
+}
+
+.mgdb-fish-karyotypes-page .fish-related-desc {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  margin: 0;
+  line-height: 1.4;
+}
