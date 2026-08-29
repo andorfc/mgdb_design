@@ -1,65 +1,55 @@
 /* ==========================================================================
-   Stock record page — page-specific styles
+   Stock record page — /data_center/stock/{id}
    --------------------------------------------------------------------------
-   Scoped under .mgdb-stock-record-page and composed from the tokens in
-   mgdb-modern.css. The record header itself is the shared .mgdb-hero-record
-   component; everything here is the body of the record.
+   Built on the MaizeGDB design system: css/mgdb-modern.css provides the
+   tokens and the shell, this file lays out the stock-specific sections.
    ========================================================================== */
 
-.mgdb-stock-record-page .mgdb-hero-record h1 {
+.mgdb-stock-record-page {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-3);
-  align-items: center;
+  flex-direction: column;
+  gap: var(--mgdb-space-6);
 }
 
-.mgdb-stock-record-page .stock-record-synonyms {
-  max-width: var(--mgdb-measure);
-  margin-top: var(--mgdb-space-2);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-}
+/* --------------------------------------------------------------------------
+   Tabs
+   -------------------------------------------------------------------------- */
 
-.mgdb-stock-record-page .stock-record-synonyms em { font-style: italic; }
-
-/* Section tabs. Sticky so a long record keeps its section list reachable. */
 .mgdb-stock-record-page .mgdb-section-tabs {
   position: sticky;
-  z-index: 20;
   top: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  margin-top: var(--mgdb-space-5);
-  padding: var(--mgdb-space-2) 0;
+  z-index: 10;
   background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  padding: 4px;
+  box-shadow: var(--mgdb-shadow-sm);
 }
 
 .mgdb-stock-record-page .mgdb-section-tabs a {
   display: inline-flex;
-  min-height: 40px;
-  gap: var(--mgdb-space-2);
   align-items: center;
-  padding: 0 var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
+  gap: var(--mgdb-space-2);
+  padding: 6px var(--mgdb-space-3);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink) !important;
+  color: var(--mgdb-ink-soft);
   font-size: var(--mgdb-text-sm);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
+  transition: background .15s, color .15s;
 }
 
-.mgdb-stock-record-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
+.mgdb-stock-record-page .mgdb-section-tabs a:hover:not(.is-current) {
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-ink);
+}
 
 .mgdb-stock-record-page .mgdb-section-tabs a.is-current {
-  border-color: var(--mgdb-green-dark);
   background: var(--mgdb-green-dark);
-  color: #fff !important;
+  color: #fff;
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
-/* A tab's count, so the reader knows what is behind it before going there. */
 .mgdb-stock-record-page .mgdb-section-tabs .stock-record-tab-count {
   padding: 1px 7px;
   border-radius: 999px;
@@ -80,8 +70,6 @@
    Facts
    -------------------------------------------------------------------------- */
 
-/* The overview is a set of labelled facts. A definition list keeps the pairing
-   programmatic, and the grid keeps a long value from stretching the column. */
 .mgdb-stock-record-page .stock-record-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -139,7 +127,307 @@
   font-size: var(--mgdb-text-sm);
 }
 
-/* A list of links to other records. Dense, because there can be hundreds. */
+/* --------------------------------------------------------------------------
+   Pedigree & relationships
+   -------------------------------------------------------------------------- */
+
+.mgdb-stock-record-page .stock-pedigree-summary {
+  display: grid;
+  gap: var(--mgdb-space-5);
+}
+
+.mgdb-stock-record-page .stock-pedigree-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--mgdb-space-4);
+  margin: 0;
+}
+
+.mgdb-stock-record-page .stock-pedigree-metrics > div {
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-top: 4px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-stock-record-page .stock-pedigree-metrics dt {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.mgdb-stock-record-page .stock-pedigree-metrics dd {
+  margin: var(--mgdb-space-1) 0;
+  color: var(--mgdb-green-dark);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.mgdb-stock-record-page .stock-pedigree-metrics span {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-stock-record-page .stock-pedigree-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mgdb-space-3);
+}
+
+.mgdb-stock-record-page .stock-pedigree-view-toggle {
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-stock-record-page .stock-pedigree-view-toggle button {
+  min-height: 38px;
+  padding: 0 var(--mgdb-space-4);
+  border: 0;
+  border-radius: calc(var(--mgdb-radius-sm) - 2px);
+  background: transparent;
+  color: var(--mgdb-ink-soft);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-stock-record-page .stock-pedigree-view-toggle button:hover:not(.is-active) {
+  color: var(--mgdb-ink);
+}
+
+.mgdb-stock-record-page .stock-pedigree-view-toggle button.is-active {
+  background: var(--mgdb-green-dark);
+  color: #fff;
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-stock-record-page .stock-pedigree-view-toggle button:focus-visible,
+.mgdb-stock-record-page .stock-pedigree-node:focus-visible {
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: 2px;
+}
+
+.mgdb-stock-record-page .stock-pedigree-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-stock-record-page .stock-pedigree-map {
+  padding: clamp(var(--mgdb-space-4), 4vw, var(--mgdb-space-6));
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background:
+    linear-gradient(180deg, rgba(242, 165, 21, .08), transparent 30%),
+    var(--mgdb-surface-alt);
+}
+
+.mgdb-stock-record-page .stock-pedigree-generation h3 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mgdb-space-2);
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-base);
+  text-align: center;
+}
+
+.mgdb-stock-record-page .stock-pedigree-generation h3 span {
+  display: inline-flex;
+  min-width: 24px;
+  min-height: 24px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.mgdb-stock-record-page .stock-pedigree-node-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: var(--mgdb-space-2);
+  width: 100%;
+}
+
+.mgdb-stock-record-page .stock-pedigree-node {
+  display: flex;
+  min-width: 0;
+  min-height: 58px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-burgundy) !important;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: var(--mgdb-shadow-sm);
+  transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+.mgdb-stock-record-page .stock-pedigree-node:hover {
+  border-color: var(--mgdb-gold-dark);
+  box-shadow: var(--mgdb-shadow);
+  transform: translateY(-2px);
+}
+
+.mgdb-stock-record-page .stock-pedigree-node strong {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-stock-record-page .stock-pedigree-node span {
+  margin-top: 2px;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-stock-record-page .stock-pedigree-node-parent {
+  border-bottom: 3px solid var(--mgdb-gold);
+}
+
+.mgdb-stock-record-page .stock-pedigree-node-progeny {
+  border-top: 3px solid var(--mgdb-green-dark);
+}
+
+.mgdb-stock-record-page .stock-pedigree-flow {
+  display: flex;
+  min-height: 72px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+
+.mgdb-stock-record-page .stock-pedigree-flow b {
+  color: var(--mgdb-gold-dark);
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.mgdb-stock-record-page .stock-pedigree-selected {
+  display: flex;
+  width: min(100%, 360px);
+  min-height: 92px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 3px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-green-dark);
+  color: #fff;
+  text-align: center;
+  box-shadow: var(--mgdb-shadow);
+}
+
+.mgdb-stock-record-page .stock-pedigree-selected span {
+  color: rgba(255, 255, 255, .8);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.mgdb-stock-record-page .stock-pedigree-selected a {
+  margin-top: var(--mgdb-space-1);
+  color: #fff !important;
+  font-size: var(--mgdb-text-xl);
+  font-weight: 800;
+  line-height: var(--mgdb-leading-snug);
+  overflow-wrap: anywhere;
+}
+
+.mgdb-stock-record-page .stock-pedigree-empty,
+.mgdb-stock-record-page .stock-pedigree-map-note,
+.mgdb-stock-record-page .stock-pedigree-table-note {
+  margin: var(--mgdb-space-3) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  text-align: center;
+}
+
+.mgdb-stock-record-page .stock-pedigree-table-tools {
+  display: grid;
+  grid-template-columns: minmax(180px, 420px) auto;
+  align-items: end;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-3);
+}
+
+.mgdb-stock-record-page .stock-pedigree-table-tools label {
+  grid-column: 1;
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.mgdb-stock-record-page .stock-pedigree-table-tools input {
+  grid-column: 1;
+  min-height: 42px;
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  font: inherit;
+}
+
+.mgdb-stock-record-page .stock-pedigree-table-tools input:focus {
+  border-color: var(--mgdb-green-dark);
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: 1px;
+}
+
+.mgdb-stock-record-page #stock-pedigree-result-count {
+  grid-column: 2;
+  grid-row: 2;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.mgdb-stock-record-page .stock-pedigree-table th,
+.mgdb-stock-record-page .stock-pedigree-table td {
+  vertical-align: middle;
+}
+
+.mgdb-stock-record-page .stock-pedigree-table tbody th {
+  color: var(--mgdb-burgundy);
+  font-weight: 700;
+}
+
+.mgdb-stock-record-page .stock-pedigree-table-note {
+  text-align: left;
+}
+
+/* Chips */
 .mgdb-stock-record-page .stock-record-chips {
   display: flex;
   flex-wrap: wrap;
@@ -173,8 +461,6 @@
   color: var(--mgdb-muted);
 }
 
-/* Very long chip lists collapse. The first rows are visible without asking;
-   the rest are one activation away and still in the DOM for find-in-page. */
 .mgdb-stock-record-page .stock-record-more { margin-top: var(--mgdb-space-3); }
 
 .mgdb-stock-record-page .stock-record-more > summary {
@@ -191,7 +477,7 @@
 
 .mgdb-stock-record-page .stock-record-more[open] > summary { margin-bottom: var(--mgdb-space-3); }
 
-/* Prose blocks: descriptions and curator memos. */
+/* Curator notes */
 .mgdb-stock-record-page .stock-record-notes {
   padding: var(--mgdb-space-4) var(--mgdb-space-5);
   border: 1px solid var(--mgdb-line-soft);
@@ -214,74 +500,6 @@
 .mgdb-stock-record-page .stock-record-notes dd:last-child { margin-bottom: 0; }
 
 /* --------------------------------------------------------------------------
-   References
-   -------------------------------------------------------------------------- */
-
-.mgdb-stock-record-page .stock-record-references {
-  display: grid;
-  gap: var(--mgdb-space-3);
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-
-.mgdb-stock-record-page .stock-record-references > li {
-  padding: var(--mgdb-space-4) var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
-}
-
-.mgdb-stock-record-page .stock-record-references h3 {
-  font-size: var(--mgdb-text-base);
-  font-weight: 700;
-}
-
-.mgdb-stock-record-page .stock-record-references p {
-  margin-top: var(--mgdb-space-1);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-}
-
-/* --------------------------------------------------------------------------
-   Images
-   -------------------------------------------------------------------------- */
-
-.mgdb-stock-record-page .stock-record-images {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: var(--mgdb-space-4);
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-
-.mgdb-stock-record-page .stock-record-images figure {
-  height: 100%;
-  padding: var(--mgdb-space-3);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
-}
-
-.mgdb-stock-record-page .stock-record-images img {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface-sunken);
-}
-
-.mgdb-stock-record-page .stock-record-images figcaption {
-  margin-top: var(--mgdb-space-2);
-  color: var(--mgdb-ink-soft);
-  font-size: var(--mgdb-text-sm);
-  line-height: var(--mgdb-leading-snug);
-}
-
-.mgdb-stock-record-page .stock-record-images figcaption strong { display: block; color: var(--mgdb-ink); }
-
-/* --------------------------------------------------------------------------
    Provenance footer
    -------------------------------------------------------------------------- */
 
@@ -299,6 +517,499 @@
 }
 
 /* --------------------------------------------------------------------------
+   Modern Reference Cards (matching /data_center/reference and /ai)
+   -------------------------------------------------------------------------- */
+
+.mgdb-stock-record-page .reference-result-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+.mgdb-stock-record-page .reference-result-card:hover {
+  border-color: var(--mgdb-gold-dark);
+  box-shadow: var(--mgdb-shadow-sm);
+  transform: translateY(-2px);
+}
+
+.mgdb-stock-record-page .reference-result-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  margin-bottom: var(--mgdb-space-2);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-stock-record-page .reference-year {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-ink);
+  font-weight: 700;
+}
+
+.mgdb-stock-record-page .reference-copy-id {
+  color: var(--mgdb-muted);
+  font-family: var(--mgdb-font-mono, monospace);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-stock-record-page .reference-card-title {
+  margin: 0 0 var(--mgdb-space-2);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-stock-record-page .reference-card-title a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.mgdb-stock-record-page .reference-card-title a:hover {
+  color: var(--mgdb-leaf);
+}
+
+.mgdb-stock-record-page .reference-card-authors {
+  margin: 0 0 var(--mgdb-space-1);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 500;
+}
+
+.mgdb-stock-record-page .reference-card-journal {
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-stock-record-page .reference-card-journal em {
+  color: var(--mgdb-ink-soft);
+  font-style: italic;
+  font-weight: 600;
+}
+
+.mgdb-stock-record-page .reference-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-3);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--mgdb-line-soft);
+}
+
+/* --------------------------------------------------------------------------
+   TYPSimSelector Genetic Similarity Section
+   -------------------------------------------------------------------------- */
+
+.mgdb-stock-record-page .stock-typsim-card {
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-stock-record-page .stock-typsim-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-4);
+  padding-bottom: var(--mgdb-space-4);
+  border-bottom: 1px solid var(--mgdb-line);
+}
+
+.mgdb-stock-record-page .stock-typsim-header h3 {
+  margin: 0 0 var(--mgdb-space-1);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+}
+
+.mgdb-stock-record-page .stock-typsim-header p {
+  max-width: var(--mgdb-measure);
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-stock-record-page .stock-typsim-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-stock-record-page .stock-typsim-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--mgdb-text-sm);
+  text-align: left;
+}
+
+.mgdb-stock-record-page .stock-typsim-table th {
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  background: var(--mgdb-surface-alt);
+  border-bottom: 1px solid var(--mgdb-line);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+
+.mgdb-stock-record-page .stock-typsim-table td {
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-bottom: 1px solid var(--mgdb-line-soft);
+  color: var(--mgdb-ink);
+  vertical-align: middle;
+}
+
+.mgdb-stock-record-page .stock-typsim-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.mgdb-stock-record-page .stock-typsim-table tr.is-self {
+  background: rgba(35, 92, 55, .05);
+}
+
+.mgdb-stock-record-page .stock-typsim-bar-cell {
+  min-width: 160px;
+}
+
+.mgdb-stock-record-page .stock-typsim-bar {
+  position: relative;
+  width: 100%;
+  height: 10px;
+  background: var(--mgdb-surface-sunken);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.mgdb-stock-record-page .stock-typsim-bar i {
+  display: block;
+  height: 100%;
+  background: var(--mgdb-green-dark);
+  border-radius: 999px;
+}
+
+.mgdb-stock-record-page .stock-typsim-table tr.is-self .stock-typsim-bar i {
+  background: var(--mgdb-gold);
+}
+
+/* --------------------------------------------------------------------------
+   Image Cards (matching /data_center/image)
+   -------------------------------------------------------------------------- */
+
+.mgdb-stock-record-page .stock-record-images {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--mgdb-space-4);
+  padding: 0;
+  margin: var(--mgdb-space-3) 0 0;
+  list-style: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.mgdb-stock-record-page .mgdb-image-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  overflow: hidden;
+  transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+.mgdb-stock-record-page .mgdb-image-card:hover {
+  border-color: var(--mgdb-gold-dark);
+  box-shadow: var(--mgdb-shadow-sm);
+  transform: translateY(-2px);
+}
+
+.mgdb-stock-record-page .image-card-figure {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-sunken);
+  cursor: pointer;
+  margin: 0 0 var(--mgdb-space-3) 0;
+  padding: 0;
+  border: none;
+}
+
+.mgdb-stock-record-page .image-card-figure img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--mgdb-radius-sm);
+  transition: transform .25s ease;
+}
+
+.mgdb-stock-record-page .image-card-figure:hover img {
+  transform: scale(1.05);
+}
+
+.mgdb-stock-record-page .image-card-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mgdb-stock-record-page .image-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-bottom: var(--mgdb-space-1);
+}
+
+.mgdb-stock-record-page .image-card-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #e6f0fa;
+  color: #1a568c;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.mgdb-stock-record-page .image-card-badge[data-cat="Variation / Mutant"],
+.mgdb-stock-record-page .image-card-badge[data-cat="Mutant / Allele"] {
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+}
+
+.mgdb-stock-record-page .mgdb-image-card h3 {
+  margin: 0 0 var(--mgdb-space-1);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  line-height: var(--mgdb-leading-snug);
+  word-break: break-word;
+}
+
+.mgdb-stock-record-page .mgdb-image-card h3 a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.mgdb-stock-record-page .mgdb-image-card h3 a:hover {
+  color: var(--mgdb-leaf);
+}
+
+.mgdb-stock-record-page .image-card-caption {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: var(--mgdb-space-1) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading-snug);
+  word-break: break-word;
+}
+
+.mgdb-stock-record-page .image-card-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-top: var(--mgdb-space-3);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--mgdb-line);
+}
+
+.mgdb-stock-record-page .image-card-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 2px var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink-soft);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .12s, border-color .12s;
+}
+
+.mgdb-stock-record-page .image-card-btn:hover {
+  background: var(--mgdb-surface-alt);
+  border-color: var(--mgdb-muted);
+  color: var(--mgdb-ink);
+}
+
+/* Lightbox Modal */
+.image-lightbox-modal {
+  padding: 0;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  max-width: 900px;
+  width: 90vw;
+}
+
+.image-lightbox-modal::backdrop {
+  background: rgba(15, 25, 20, 0.75);
+  backdrop-filter: blur(4px);
+}
+
+.image-lightbox-modal .lightbox-dialog-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.image-lightbox-modal .lightbox-close-btn {
+  position: absolute;
+  top: var(--mgdb-space-3);
+  right: var(--mgdb-space-3);
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-lightbox-modal .lightbox-close-btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.image-lightbox-modal .lightbox-image-wrap {
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 280px;
+  max-height: 60vh;
+  overflow: hidden;
+}
+
+.image-lightbox-modal .lightbox-image-wrap img {
+  max-width: 100%;
+  max-height: 60vh;
+  object-fit: contain;
+}
+
+.image-lightbox-modal .lightbox-details {
+  padding: var(--mgdb-space-5);
+  background: var(--mgdb-surface);
+}
+
+.image-lightbox-modal .lightbox-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.image-lightbox-modal .lightbox-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-4);
+  border-top: 1px solid var(--mgdb-line);
+}
+
+/* --------------------------------------------------------------------------
+   Pagination (Reference pagination matching standard data hubs)
+   -------------------------------------------------------------------------- */
+
+.mgdb-stock-record-page .stock-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mgdb-space-1);
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-4);
+  border-top: 1px solid var(--mgdb-line-soft);
+}
+
+.mgdb-stock-record-page .stock-page-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .12s, border-color .12s;
+}
+
+.mgdb-stock-record-page .stock-page-btn:hover:not(:disabled):not(.is-active) {
+  background: var(--mgdb-surface-alt);
+  border-color: var(--mgdb-muted);
+}
+
+.mgdb-stock-record-page .stock-page-btn.is-active {
+  background: var(--mgdb-green-dark);
+  border-color: var(--mgdb-green-dark);
+  color: #fff;
+}
+
+.mgdb-stock-record-page .stock-page-btn:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+.mgdb-stock-record-page .stock-page-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  color: var(--mgdb-muted);
+}
+
+/* --------------------------------------------------------------------------
    Responsive
    -------------------------------------------------------------------------- */
 
@@ -311,11 +1022,22 @@
   }
 
   .mgdb-stock-record-page .mgdb-section-tabs a { white-space: nowrap; }
-  .mgdb-stock-record-page .stock-record-images { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .mgdb-stock-record-page .stock-pedigree-metrics { grid-template-columns: 1fr; }
+  .mgdb-stock-record-page .stock-pedigree-toolbar { align-items: stretch; }
+  .mgdb-stock-record-page .stock-pedigree-view-toggle,
+  .mgdb-stock-record-page .stock-pedigree-actions { width: 100%; }
+  .mgdb-stock-record-page .stock-pedigree-view-toggle button,
+  .mgdb-stock-record-page .stock-pedigree-actions .mgdb-button { flex: 1 1 auto; }
+  .mgdb-stock-record-page .stock-pedigree-node-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mgdb-stock-record-page .stock-pedigree-table-tools { grid-template-columns: 1fr; }
+  .mgdb-stock-record-page #stock-pedigree-result-count { grid-column: 1; grid-row: auto; }
+  .mgdb-stock-record-page .stock-record-images { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
 }
 
-/* The shared message component lays its icon out against a single child; the
-   label and the body inside that child still need separating. */
+@media (max-width: 479px) {
+  .mgdb-stock-record-page .stock-pedigree-node-grid { grid-template-columns: 1fr; }
+}
+
 .mgdb-stock-record-page .mgdb-message > div > strong { display: block; }
 .mgdb-stock-record-page .mgdb-message > div > span { display: block; margin-top: var(--mgdb-space-1); }
 .mgdb-stock-record-page .mgdb-message .mgdb-button { margin-top: var(--mgdb-space-3); }

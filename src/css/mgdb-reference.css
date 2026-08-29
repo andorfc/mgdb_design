@@ -9,44 +9,63 @@
 
 /* Hero --------------------------------------------------------------------- */
 
-.mgdb-reference-page .reference-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
-  gap: var(--mgdb-space-6);
+/* Hero Emblem & Section Tabs ----------------------------------------------- */
+
+.mgdb-reference-page .mgdb-hero-emblem {
+  gap: var(--mgdb-space-2);
+  padding: var(--mgdb-space-4) var(--mgdb-space-3);
+  border-right: 1px solid #cfe3d6;
+  background: linear-gradient(160deg, rgba(255, 255, 255, .92), rgba(255, 255, 255, .55));
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-reference-page .mgdb-hero-emblem svg {
+  width: min(100%, 62px);
+  height: auto;
+  mix-blend-mode: normal;
+}
+
+.mgdb-reference-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-6);
+  padding: var(--mgdb-space-2) 0;
+  background: var(--mgdb-surface);
+  border-bottom: 1px solid var(--mgdb-line);
+}
+
+.mgdb-reference-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
   align-items: center;
-  padding: var(--mgdb-space-6);
-  border-radius: var(--mgdb-radius-lg);
-  background: linear-gradient(135deg, #16351f, #24502c 58%, #2f6134);
-  color: #fff;
-  box-shadow: var(--mgdb-shadow-lg);
-}
-
-.mgdb-reference-page .reference-hero .mgdb-eyebrow { color: #ffe6a9; }
-
-.mgdb-reference-page .reference-hero h1 {
-  margin: var(--mgdb-space-2) 0 var(--mgdb-space-3);
-  color: #fff;
-  font-size: clamp(1.75rem, 1.1rem + 2vw, 2.375rem);
-}
-
-.mgdb-reference-page .reference-hero-copy p {
-  max-width: var(--mgdb-measure);
-  color: #eaf3e6;
-  font-size: var(--mgdb-text-base);
-}
-
-.mgdb-reference-page .reference-hero .mgdb-button-primary { background: #fff; color: var(--mgdb-green-dark) !important; }
-.mgdb-reference-page .reference-hero .mgdb-button-primary:hover { background: #eaf3e6; }
-.mgdb-reference-page .reference-hero :focus-visible { outline-color: #fff; }
-
-/* Bare links in the hero inherit the page link colour (burgundy), which fails
-   contrast on the dark green. Force white. */
-.mgdb-reference-page .reference-hero a {
-  display: inline-block;
-  margin-top: var(--mgdb-space-4);
-  color: #fff;
-  font-size: var(--mgdb-text-base);
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
   font-weight: 700;
+  text-decoration: none;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.mgdb-reference-page .mgdb-section-tabs a:hover {
+  background: var(--mgdb-green-soft);
+  border-color: #bcd9c6;
+  color: var(--mgdb-green-dark) !important;
+}
+
+.mgdb-reference-page .mgdb-section-tabs a.is-current,
+.mgdb-reference-page .mgdb-section-tabs a[aria-current="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
 /* The submit and reset controls are bare <button> elements in the template;
@@ -82,36 +101,6 @@
 }
 
 .mgdb-reference-page .reference-reset:hover { background: var(--mgdb-surface-alt); }
-
-/* Corpus figures beside the hero. */
-.mgdb-reference-page .reference-hero-metrics {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--mgdb-space-3);
-  padding: var(--mgdb-space-4);
-  border: 1px solid rgba(255, 255, 255, .2);
-  border-radius: var(--mgdb-radius);
-  background: rgba(0, 0, 0, .18);
-}
-
-.mgdb-reference-page .reference-hero-metrics > article strong {
-  display: block;
-  color: #fff;
-  font-size: var(--mgdb-text-2xl);
-  font-weight: 800;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-
-.mgdb-reference-page .reference-hero-metrics > article span {
-  display: block;
-  margin-top: var(--mgdb-space-2);
-  color: #cfe3c8;
-  font-size: var(--mgdb-text-sm);
-  font-weight: 600;
-  letter-spacing: .05em;
-  text-transform: uppercase;
-}
 
 /* Search panel ------------------------------------------------------------- */
 
@@ -162,11 +151,17 @@
 .mgdb-reference-page .reference-query-control:focus-within { border-color: var(--mgdb-focus); }
 .mgdb-reference-page .reference-query-control > span:first-child { color: var(--mgdb-muted); }
 
-.mgdb-reference-page .reference-query-control input {
+.mgdb-reference-page .reference-query-control input,
+.mgdb-reference-page .reference-query-control input[type="search"],
+.mgdb-reference-page .reference-query-control input[type="text"] {
+  width: 100%;
   min-height: 40px;
-  padding: 0;
-  border: 0;
-  background: transparent;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--mgdb-ink);
 }
 
 .mgdb-reference-page .reference-query-control input:focus { outline: none; }
@@ -252,10 +247,24 @@
 }
 
 .mgdb-reference-page .reference-advanced > summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--mgdb-space-2);
   color: var(--mgdb-green-dark);
   font-size: var(--mgdb-text-base);
   font-weight: 700;
   cursor: pointer;
+}
+
+.mgdb-reference-page .reference-advanced > summary strong {
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-reference-page .reference-advanced > summary small {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 400;
 }
 
 .mgdb-reference-page .reference-advanced > summary:focus-visible { outline: 3px solid var(--mgdb-focus); outline-offset: 2px; }
@@ -509,37 +518,9 @@
 }
 .mgdb-reference-page .reference-pagination button:disabled { opacity: .5; cursor: not-allowed; }
 
-/* Related resources -------------------------------------------------------- */
-
-.mgdb-reference-page .reference-resource-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: var(--mgdb-space-4);
-}
-
-.mgdb-reference-page .reference-resource-grid > a {
-  display: block;
-  padding: var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink) !important;
-  text-decoration: none;
-}
-
-.mgdb-reference-page .reference-resource-grid > a:hover { border-color: var(--mgdb-gold-dark); background: var(--mgdb-surface-alt); }
-.mgdb-reference-page .reference-resource-grid strong { display: block; color: var(--mgdb-green-dark); text-decoration: underline; }
-.mgdb-reference-page .reference-resource-grid span { display: block; margin-top: var(--mgdb-space-1); color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
-
 /* Responsive --------------------------------------------------------------- */
 
-@media (max-width: 1023px) {
-  .mgdb-reference-page .reference-hero { grid-template-columns: 1fr; }
-}
-
 @media (max-width: 767px) {
-  .mgdb-reference-page .reference-hero { padding: var(--mgdb-space-5) var(--mgdb-space-4); }
-  .mgdb-reference-page .reference-hero-metrics { grid-template-columns: 1fr; }
   .mgdb-reference-page .reference-chart-grid { grid-template-columns: 1fr; }
   .mgdb-reference-page .reference-search-submit,
   .mgdb-reference-page .reference-search-submit .mgdb-button { width: 100%; }

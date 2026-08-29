@@ -1,7 +1,7 @@
 <?php
 /* file: data_center.php
  *
- * purpose: main controller for all data center pages
+ * purpose: main controller for all data hub pages
  *
  *          this script is loaded by controller.php
  *
@@ -36,8 +36,8 @@
   $password = getCookie('password', false);
   $userid =   getCookie('userid', false);
 
-  /* The Data Center Main Hub (/data_center/). The controller root is an
-     interactive discovery hub and metrics dashboard across all active data centers. */
+  /* The Data Hub directory (/data_center/). The controller root is an
+     interactive discovery hub and metrics dashboard across all active data hubs. */
   if (!defined('PAGE') || !PAGE || PAGE == 'data_center' || PAGE == 'index') {
     include('controllers/data_center/data_center_hub_modern.php');
     return;
@@ -195,6 +195,17 @@
     return;
   }
 
+  /* AlphaFill ligand transplants. A new route rather than a replacement: there
+     has never been an /data_center/alphafill page, so nothing falls through
+     behind this guard and deleting it 404s the route, which is the correct
+     rollback for a page with no predecessor. The gene or ligand of interest is
+     carried as ?gene= or ?ligand= and answered by the page's own search, so
+     there is no record-id form to fall through to either. */
+  if (PAGE == 'alphafill') {
+    include('controllers/data_center/alphafill_modern.php');
+    return;
+  }
+
   // NOTE: CONTROLLER and PAGE are set in controller.php
   logMessage("CONTROLLER: " . CONTROLLER . ", PAGE: " . PAGE . ", ID: " . ID);
  
@@ -348,7 +359,7 @@ logVarDump($ids, "IDs for $id:\n");
       require($page_filename);
 logMessage("load page: $page_filename");
 
-      // specific actions related to DATA CENTER
+      // specific actions related to DATA HUB
       populate_sections($mgdb->get('body')->get('main_section'),
                         get_section_array());
       populate_nav_menu($mgdb->get('body')->get('nav_section'),
@@ -412,7 +423,7 @@ logMessage("load page: $page_filename");
 
 
 
-  // Specific functions related to DATA CENTER
+  // Specific functions related to DATA HUB
 
   function populate_sections($main_section, $section_array) {
     $main_section->loop($section_array);
@@ -433,7 +444,7 @@ logMessage("load page: $page_filename");
   
   /**
    * Controls content beneath navigation menu on right side of rec pages.
-   * Add additional data centers as necessary.
+   * Add additional data hubs as necessary.
    */
   function populate_optional_content($page, $tmpl, $DBConn, $ids) {
     $id = $ids['ID'];

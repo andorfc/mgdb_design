@@ -1,12 +1,26 @@
 /* ==========================================================================
-   Stock data center — page-specific styles
-   --------------------------------------------------------------------------
-   Scoped under .mgdb-stock-page and composed from the tokens in
-   mgdb-modern.css. No new colours, type sizes, or spacing values.
+   Stock Data Hub (/data_center/stock)
+   Scoped under .mgdb-stock-page; relies on mgdb-modern.css tokens.
    ========================================================================== */
 
-/* Section tabs. Sticky so the section list stays reachable on a long page;
-   ordinary in-page links, so they work with script disabled. */
+/* ── Hero Emblem ─────────────────────────────────────────────────────────── */
+
+.mgdb-stock-page .mgdb-hero-emblem {
+  gap: var(--mgdb-space-2);
+  padding: var(--mgdb-space-4) var(--mgdb-space-3);
+  border-right: 1px solid #cfe3d6;
+  background: linear-gradient(160deg, rgba(255, 255, 255, .92), rgba(255, 255, 255, .55));
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-stock-page .mgdb-hero-emblem svg {
+  width: min(100%, 64px);
+  height: auto;
+  mix-blend-mode: normal;
+}
+
+/* ── Sticky Section Navigation Tabs ──────────────────────────────────────── */
+
 .mgdb-stock-page .mgdb-section-tabs {
   position: sticky;
   z-index: 20;
@@ -15,8 +29,10 @@
   flex-wrap: wrap;
   gap: var(--mgdb-space-2);
   margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-6);
   padding: var(--mgdb-space-2) 0;
   background: var(--mgdb-surface);
+  border-bottom: 1px solid var(--mgdb-line);
 }
 
 .mgdb-stock-page .mgdb-section-tabs a {
@@ -31,347 +47,598 @@
   font-size: var(--mgdb-text-sm);
   font-weight: 700;
   text-decoration: none;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
 }
 
-.mgdb-stock-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
+.mgdb-stock-page .mgdb-section-tabs a:hover {
+  background: var(--mgdb-green-soft);
+  border-color: #bcd9c6;
+  color: var(--mgdb-green-dark) !important;
+}
 
-.mgdb-stock-page .mgdb-section-tabs a.is-current {
+.mgdb-stock-page .mgdb-section-tabs a.is-current,
+.mgdb-stock-page .mgdb-section-tabs a[aria-current="true"] {
   border-color: var(--mgdb-green-dark);
   background: var(--mgdb-green-dark);
-  color: #fff !important;
+  color: #ffffff !important;
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
-.mgdb-stock-page > section { scroll-margin-top: 4.5rem; }
-
-/* The category chart is the only figure in its grid, so it takes the width. */
-.mgdb-stock-page .mgdb-stock-figure-wide { grid-column: 1 / -1; }
-.mgdb-stock-page .mgdb-stock-figure-wide .mgdb-chart { height: 380px; }
-
-/* --------------------------------------------------------------------------
-   Search
-   -------------------------------------------------------------------------- */
-
-.mgdb-stock-page .stock-examples {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2) var(--mgdb-space-3);
-  align-items: center;
-  margin-top: var(--mgdb-space-4);
+.mgdb-stock-page > section,
+.mgdb-stock-page section[id] {
+  scroll-margin-top: 4.5rem;
 }
 
-.mgdb-stock-page .stock-case {
-  display: inline-flex;
-  gap: var(--mgdb-space-2);
-  align-items: center;
-  min-height: 36px;
-  margin-left: auto;
-  color: var(--mgdb-ink);
-  font-size: var(--mgdb-text-sm);
-  cursor: pointer;
-}
+/* ── Search & Filter Panel ───────────────────────────────────────────────── */
 
-/* Advanced search disclosure ---------------------------------------------- */
-
-.mgdb-stock-page .stock-advanced {
-  margin-top: var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
-}
-
-.mgdb-stock-page .stock-advanced > summary {
-  display: flex;
-  gap: var(--mgdb-space-4);
-  align-items: center;
-  justify-content: space-between;
-  min-height: var(--mgdb-tap-target);
-  padding: var(--mgdb-space-4) var(--mgdb-space-5);
-  color: var(--mgdb-green-dark);
-  cursor: pointer;
-}
-
-.mgdb-stock-page .stock-advanced > summary:focus-visible {
-  outline: 3px solid var(--mgdb-focus);
-  outline-offset: -3px;
-}
-
-.mgdb-stock-page .stock-advanced > summary strong { display: block; font-size: var(--mgdb-text-lg); }
-
-.mgdb-stock-page .stock-advanced > summary small {
-  display: block;
-  margin-top: var(--mgdb-space-1);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-  font-weight: 400;
-}
-
-.mgdb-stock-page .stock-advanced[open] > summary {
-  border-bottom: 1px solid var(--mgdb-line);
-  background: var(--mgdb-surface-alt);
-}
-
-.mgdb-stock-page .stock-advanced[open] > summary > span[aria-hidden] { transform: rotate(180deg); }
-.mgdb-stock-page .stock-advanced > form { padding: var(--mgdb-space-5); }
-
-.mgdb-stock-page .stock-fieldset {
-  padding: var(--mgdb-space-4) var(--mgdb-space-5) var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line-soft);
-  border-radius: var(--mgdb-radius-sm);
-  margin: var(--mgdb-space-5) 0 0;
-}
-
-.mgdb-stock-page .stock-fieldset > legend {
-  padding: 0 var(--mgdb-space-2);
-  color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-base);
-  font-weight: 700;
-}
-
-.mgdb-stock-page .stock-check-grid,
-.mgdb-stock-page .stock-filter-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--mgdb-space-4);
-}
-
-.mgdb-stock-page .stock-check-grid + .stock-filter-grid { margin-top: var(--mgdb-space-4); }
-
-.mgdb-stock-page .stock-check {
-  display: flex;
-  gap: var(--mgdb-space-3);
-  align-items: flex-start;
-  padding: var(--mgdb-space-3) var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line-soft);
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface-alt);
-  cursor: pointer;
-}
-
-.mgdb-stock-page .stock-check:hover { border-color: var(--mgdb-green-dark); }
-.mgdb-stock-page .stock-check input { margin-top: 0.3em; flex: none; }
-.mgdb-stock-page .stock-check strong { display: block; font-size: var(--mgdb-text-base); }
-
-.mgdb-stock-page .stock-check small {
-  display: block;
-  margin-top: var(--mgdb-space-1);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-  line-height: var(--mgdb-leading-snug);
-}
-
-/* The label form of a filter: a checkbox that turns the filter on, sitting
-   above the control that narrows it. */
-.mgdb-stock-page .stock-check-inline {
-  padding: 0;
-  border: 0;
-  margin-bottom: var(--mgdb-space-2);
-  background: none;
-  align-items: center;
-  font-weight: 700;
-}
-
-.mgdb-stock-page .stock-check-inline:hover { border-color: transparent; }
-.mgdb-stock-page .stock-check-inline input { margin-top: 0; }
-
-.mgdb-stock-page .stock-filter-continuation {
-  display: block;
-  min-height: 24px;
-  margin-bottom: var(--mgdb-space-2);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-base);
-}
-
-/* --------------------------------------------------------------------------
-   Results
-   -------------------------------------------------------------------------- */
-
-.mgdb-stock-page .stock-sort {
-  display: flex;
-  gap: var(--mgdb-space-2);
-  align-items: center;
-  flex: none;
-}
-
-.mgdb-stock-page .stock-sort .mgdb-select { width: auto; min-width: 12rem; }
-
-.mgdb-stock-page .stock-criteria {
-  padding: var(--mgdb-space-3) var(--mgdb-space-4);
-  border-left: 4px solid var(--mgdb-green-dark);
-  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
-  margin-bottom: var(--mgdb-space-4);
-  background: var(--mgdb-green-soft);
-  color: var(--mgdb-ink);
-  font-size: var(--mgdb-text-sm);
-}
-
-/* Source switch between MaizeGDB stocks and the mirrored GRIN accessions. */
-.mgdb-stock-page .stock-sources {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2) var(--mgdb-space-3);
-  align-items: center;
-  margin-bottom: var(--mgdb-space-4);
-}
-
-.mgdb-stock-page .stock-sources .mgdb-small { flex: 1 1 18rem; }
-
-/* Exactly one match. The legacy page navigated straight to the record; this
-   surfaces the same destination as the primary action instead. */
-.mgdb-stock-page .stock-single {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--mgdb-space-4) var(--mgdb-space-6);
-  align-items: center;
+.mgdb-stock-page .stock-search-panel {
   padding: var(--mgdb-space-5);
   border: 1px solid var(--mgdb-line);
-  border-left: 6px solid var(--mgdb-gold);
   border-radius: var(--mgdb-radius);
-  margin-bottom: var(--mgdb-space-5);
   background: var(--mgdb-surface-alt);
 }
 
-.mgdb-stock-page .stock-single h3 { font-size: var(--mgdb-text-xl); }
-.mgdb-stock-page .stock-single p { margin-top: var(--mgdb-space-2); color: var(--mgdb-ink-soft); }
-
-/* A stock is a paragraph of facts, not a row of short cells: the genotype
-   strings and curator memos are long, so the results are a list of cards. */
-.mgdb-stock-page .stock-list {
-  display: grid;
-  gap: var(--mgdb-space-3);
-  padding: 0;
-  margin: 0;
-  list-style: none;
+.mgdb-stock-page .stock-search-header h2 {
+  color: var(--mgdb-green-dark);
 }
 
-.mgdb-stock-page .stock-item {
-  padding: var(--mgdb-space-4) var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
-  box-shadow: var(--mgdb-shadow-sm);
-}
-
-.mgdb-stock-page .stock-item-head {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2) var(--mgdb-space-3);
-  align-items: baseline;
-}
-
-.mgdb-stock-page .stock-item-head h3 {
-  font-size: var(--mgdb-text-lg);
-  font-variant-ligatures: none;
-}
-
-.mgdb-stock-page .stock-item-head h3 a { color: var(--mgdb-burgundy); }
-
-.mgdb-stock-page .stock-synonyms {
-  margin-top: var(--mgdb-space-2);
-  color: var(--mgdb-ink-soft);
-  font-size: var(--mgdb-text-sm);
-}
-
-.mgdb-stock-page .stock-synonyms em { font-style: italic; }
-
-/* Facts that are short and always present read better inline than stacked. */
-.mgdb-stock-page .stock-facts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-1) var(--mgdb-space-5);
-  margin-top: var(--mgdb-space-3);
-}
-
-.mgdb-stock-page .stock-facts > div {
-  display: flex;
-  gap: var(--mgdb-space-2);
-  align-items: baseline;
-}
-
-.mgdb-stock-page .stock-facts dt {
+.mgdb-stock-page .stock-search-header p {
+  margin-top: var(--mgdb-space-1);
   color: var(--mgdb-muted);
   font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-stock-page .stock-search-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-stock-page .stock-field-query {
+  grid-column: 1 / -1;
+}
+
+.mgdb-stock-page .stock-field,
+.mgdb-stock-page .stock-field-query {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-1);
+}
+
+.mgdb-stock-page .stock-field label,
+.mgdb-stock-page .stock-field-query label {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.mgdb-stock-page .stock-query-control {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid #b9b2a5;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-stock-page .stock-query-control:focus-within {
+  border-color: var(--mgdb-focus);
+}
+
+.mgdb-stock-page .stock-search-icon {
+  color: var(--mgdb-muted);
+}
+
+.mgdb-stock-page .stock-query-control input {
+  min-height: 40px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-stock-page .stock-query-control input:focus {
+  outline: none;
+}
+
+.mgdb-stock-page .stock-query-control button {
+  border: 0;
+  background: none;
+  color: var(--mgdb-burgundy);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-stock-page .stock-field select {
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid #b9b2a5;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-stock-page .stock-field select:focus {
+  border-color: var(--mgdb-focus);
+  outline: none;
+}
+
+.mgdb-stock-page .stock-field-options {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3) var(--mgdb-space-5);
+  margin-top: var(--mgdb-space-1);
+}
+
+.mgdb-stock-page .stock-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mgdb-stock-page .stock-checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--mgdb-green-dark);
+}
+
+.mgdb-stock-page .stock-search-submit {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-start;
+  margin-top: var(--mgdb-space-2);
+}
+
+.mgdb-stock-page .stock-example-row {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-top: var(--mgdb-space-3);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--mgdb-line);
+}
+
+.mgdb-stock-page .stock-example-row span {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.mgdb-stock-page .stock-example-row button {
+  padding: 3px 10px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface);
+  color: var(--mgdb-burgundy);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .12s, border-color .12s;
+}
+
+.mgdb-stock-page .stock-example-row button:hover {
+  background: var(--mgdb-green-soft);
+  border-color: #bcd9c6;
+  color: var(--mgdb-green-dark);
+}
+
+/* ── Results Section ─────────────────────────────────────────────────────── */
+
+.mgdb-stock-page .stock-results-section {
+  margin-top: var(--mgdb-space-6);
+}
+
+.mgdb-stock-page .stock-results-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-stock-page .stock-results-heading h2 {
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-stock-page #stock-results-status {
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-stock-page .stock-results-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+}
+
+.mgdb-stock-page .stock-view-toggle {
+  display: inline-flex;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  overflow: hidden;
+}
+
+.mgdb-stock-page .stock-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mgdb-space-1);
+  min-height: 34px;
+  padding: 0 var(--mgdb-space-3);
+  border: 0;
+  background: transparent;
+  color: var(--mgdb-ink-soft);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+}
+
+.mgdb-stock-page .stock-view-btn.is-active,
+.mgdb-stock-page .stock-view-btn[aria-pressed="true"] {
+  background: var(--mgdb-green-dark);
+  color: #fff;
+}
+
+.mgdb-stock-page .stock-sort-control select {
+  min-height: 34px;
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
   font-weight: 600;
 }
 
-.mgdb-stock-page .stock-facts dd {
-  margin: 0;
+.mgdb-stock-page .stock-export-buttons {
+  display: flex;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-stock-page .stock-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-bottom: var(--mgdb-space-4);
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  background: var(--mgdb-surface-alt);
+  border-radius: var(--mgdb-radius-sm);
+}
+
+.mgdb-stock-page .stock-sources .mgdb-chip {
+  padding: 4px 12px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface);
   color: var(--mgdb-ink);
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-}
-
-.mgdb-stock-page .stock-comments {
-  margin-top: var(--mgdb-space-3);
-  font-size: var(--mgdb-text-sm);
-}
-
-.mgdb-stock-page .stock-comments > summary {
-  color: var(--mgdb-green-dark);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
   font-weight: 700;
   cursor: pointer;
 }
 
-.mgdb-stock-page .stock-comments dl { margin-top: var(--mgdb-space-2); }
-.mgdb-stock-page .stock-comments dt { color: var(--mgdb-muted); font-weight: 700; }
-
-.mgdb-stock-page .stock-comments dd {
-  margin: 0 0 var(--mgdb-space-2);
-  color: var(--mgdb-ink-soft);
+.mgdb-stock-page .stock-sources .mgdb-chip.is-active,
+.mgdb-stock-page .stock-sources .mgdb-chip[aria-pressed="true"] {
+  background: var(--mgdb-green-dark);
+  border-color: var(--mgdb-green-dark);
+  color: #fff;
 }
 
-.mgdb-stock-page .stock-none { color: var(--mgdb-muted); font-weight: 400; }
+/* ── Card View ───────────────────────────────────────────────────────────── */
 
-/* GRIN accessions are a different kind of record and are marked as such. */
-.mgdb-stock-page .stock-item-grin { border-left: 4px solid var(--mgdb-status-info); }
+.mgdb-stock-page .stock-results-container.stock-view-card {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--mgdb-space-4);
+}
 
-/* --------------------------------------------------------------------------
-   NAM founders
-   -------------------------------------------------------------------------- */
+.mgdb-stock-page .stock-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+.mgdb-stock-page .stock-card:hover {
+  border-color: var(--mgdb-gold-dark);
+  box-shadow: var(--mgdb-shadow-sm);
+  transform: translateY(-2px);
+}
+
+.mgdb-stock-page .stock-card-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-stock-page .stock-card h3 {
+  margin: 0;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-stock-page .stock-card h3 a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.mgdb-stock-page .stock-card h3 a:hover {
+  color: var(--mgdb-leaf);
+}
+
+.mgdb-stock-page .stock-card-meta {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-3);
+  padding: var(--mgdb-space-3) 0;
+  border-top: 1px solid var(--mgdb-line);
+  border-bottom: 1px solid var(--mgdb-line);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-stock-page .stock-card-meta dt {
+  color: var(--mgdb-muted);
+  font-weight: 700;
+}
+
+.mgdb-stock-page .stock-card-meta dd {
+  margin: 0;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-stock-page .stock-card-desc {
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-stock-page .stock-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-2);
+}
+
+.mgdb-stock-page .stock-card-actions a {
+  color: var(--mgdb-burgundy);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.mgdb-stock-page .stock-card-actions a:hover {
+  color: var(--mgdb-leaf);
+}
+
+/* ── Table View ──────────────────────────────────────────────────────────── */
+
+.mgdb-stock-page .stock-results-container.stock-view-table {
+  display: block;
+  overflow-x: auto;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-stock-page .stock-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--mgdb-text-sm);
+  text-align: left;
+}
+
+.mgdb-stock-page .stock-table th {
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  background: var(--mgdb-surface-alt);
+  border-bottom: 1px solid var(--mgdb-line);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+
+.mgdb-stock-page .stock-table td {
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-bottom: 1px solid var(--mgdb-line);
+  color: var(--mgdb-ink);
+  vertical-align: top;
+}
+
+.mgdb-stock-page .stock-table tr:hover td {
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-stock-page .stock-table a {
+  color: var(--mgdb-burgundy);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.mgdb-stock-page .stock-table a:hover {
+  color: var(--mgdb-leaf);
+}
+
+/* ── Pagination ──────────────────────────────────────────────────────────── */
+
+.mgdb-stock-page .stock-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--mgdb-space-6);
+}
+
+.mgdb-stock-page .stock-pagination button {
+  min-width: var(--mgdb-tap-target);
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .12s, border-color .12s;
+}
+
+.mgdb-stock-page .stock-pagination button:hover:not(:disabled) {
+  background: var(--mgdb-surface-alt);
+  border-color: var(--mgdb-muted);
+}
+
+.mgdb-stock-page .stock-pagination button[aria-current="page"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #fff;
+}
+
+.mgdb-stock-page .stock-pagination button:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+/* ── Collections, Downloads & NAM Founders ───────────────────────────────── */
+
+.mgdb-stock-page .stock-collection-grid,
+.mgdb-stock-page .stock-download-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-stock-page .stock-download-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-stock-page .stock-download-header h3 {
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+}
+
+.mgdb-stock-page .stock-download-card p {
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-stock-page .stock-download-card .mgdb-button {
+  margin-top: var(--mgdb-space-4);
+  align-self: flex-start;
+}
+
+.mgdb-stock-page .stock-section-intro {
+  margin-top: var(--mgdb-space-2);
+  margin-bottom: var(--mgdb-space-4);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
 
 .mgdb-stock-page .stock-nam-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: var(--mgdb-space-2);
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-4);
 }
 
 .mgdb-stock-page .stock-nam-grid a {
   display: flex;
-  min-height: var(--mgdb-tap-target);
-  align-items: center;
-  justify-content: center;
-  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  flex-direction: column;
+  padding: var(--mgdb-space-3);
   border: 1px solid var(--mgdb-line);
   border-radius: var(--mgdb-radius-sm);
   background: var(--mgdb-surface);
-  color: var(--mgdb-burgundy) !important;
-  font-weight: 700;
-  text-align: center;
   text-decoration: none;
+  transition: border-color .15s, box-shadow .15s, transform .15s;
 }
 
 .mgdb-stock-page .stock-nam-grid a:hover {
   border-color: var(--mgdb-gold-dark);
-  background: var(--mgdb-gold-soft);
-  text-decoration: underline;
+  box-shadow: var(--mgdb-shadow-sm);
+  transform: translateY(-2px);
 }
 
-/* --------------------------------------------------------------------------
-   Responsive
-   -------------------------------------------------------------------------- */
+.mgdb-stock-page .stock-nam-grid a strong {
+  color: var(--mgdb-burgundy);
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-stock-page .stock-nam-grid a span {
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-stock-page .stock-chart-panel {
+  margin-top: var(--mgdb-space-5);
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
 
 @media (max-width: 767px) {
-  .mgdb-stock-page .mgdb-section-tabs {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    margin-inline: calc(-1 * var(--mgdb-space-4));
-    padding-inline: var(--mgdb-space-4);
+  .mgdb-stock-page .stock-search-form {
+    grid-template-columns: 1fr;
   }
-
-  .mgdb-stock-page .mgdb-section-tabs a { white-space: nowrap; }
-  .mgdb-stock-page .stock-single { grid-template-columns: 1fr; }
-  .mgdb-stock-page .stock-sort { width: 100%; }
-  .mgdb-stock-page .stock-sort .mgdb-select { width: 100%; min-width: 0; }
-  .mgdb-stock-page .stock-case { margin-left: 0; }
-  .mgdb-stock-page .mgdb-stock-figure-wide .mgdb-chart { height: 300px; }
+  .mgdb-stock-page .stock-results-heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .mgdb-stock-page .stock-results-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
 }

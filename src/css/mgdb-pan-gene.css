@@ -355,3 +355,161 @@
   .mgdb-pan-gene-page .pan-gene-sort .mgdb-select { width: 100%; min-width: 0; }
   .mgdb-pan-gene-page .pan-gene-values { max-width: none; }
 }
+
+/* --------------------------------------------------------------------------
+   Page header
+
+   The shared .mgdb-hero is a deep burgundy-to-orange gradient built for a
+   data centre that wants to announce itself. This page sits above a long,
+   quiet working surface — a search form and a table — so the header is
+   re-tuned rather than reused as-is: a light green wash that belongs to the
+   same family as the section headings below it, and about a third less
+   height. Only the pan-gene page is affected; every other hero is untouched.
+   -------------------------------------------------------------------------- */
+
+.mgdb-pan-gene-page .pan-gene-hero {
+  align-items: stretch;
+  grid-template-columns: minmax(150px, 17%) minmax(0, 1fr);
+  border: 1px solid #cfe3d6;
+  background: linear-gradient(115deg, #f4faf6 0%, var(--mgdb-green-soft) 46%, #e4f0e6 100%);
+  color: var(--mgdb-ink);
+  /* The shared hero carries a heavy drop shadow to lift it off the page. A
+     hairline and a whisper of shadow are enough for a panel this light. */
+  box-shadow: 0 1px 2px rgba(23, 70, 52, .05);
+}
+
+/* The decorative ring is kept — it is what stops the panel reading as a plain
+   box — but taken down to a tint that only registers at the edge of vision. */
+.mgdb-pan-gene-page .pan-gene-hero::after {
+  top: -210px;
+  right: -130px;
+  width: 380px;
+  height: 380px;
+  border-width: 40px;
+  border-color: rgba(40, 93, 70, .06);
+}
+
+.mgdb-pan-gene-page .pan-gene-hero .mgdb-hero-emblem {
+  gap: var(--mgdb-space-2);
+  padding: var(--mgdb-space-4) var(--mgdb-space-3);
+  border-right: 1px solid #cfe3d6;
+  background: linear-gradient(160deg, rgba(255, 255, 255, .92), rgba(255, 255, 255, .55));
+  /* The mark inherits this, so the icon and the wordmark are one colour. */
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-pan-gene-page .pan-gene-hero .mgdb-hero-emblem svg {
+  width: min(100%, 62px);
+  mix-blend-mode: normal;
+}
+
+.mgdb-pan-gene-page .pan-gene-hero .mgdb-hero-emblem strong {
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-base);
+  letter-spacing: .01em;
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-pan-gene-page .pan-gene-hero .mgdb-hero-body {
+  position: relative;
+  padding: var(--mgdb-space-5) var(--mgdb-space-6);
+}
+
+.mgdb-pan-gene-page .pan-gene-hero h1 {
+  margin: 0 0 var(--mgdb-space-2);
+  /* Sized to sit under the section headings further down rather than shout
+     over them; the page's own name is carried by the emblem beside it. */
+  color: var(--mgdb-green-dark);
+  font-size: clamp(1.5rem, 1.1rem + 1.3vw, 1.875rem);
+  /* Room for the stamp, which floats at the top right on a wide screen. */
+  padding-right: 11rem;
+}
+
+.mgdb-pan-gene-page .pan-gene-hero .mgdb-hero-description {
+  max-width: 62ch;
+  margin-top: 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-base);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-pan-gene-page .pan-gene-hero .mgdb-hero-actions { margin-top: var(--mgdb-space-4); }
+
+/* Buttons: the shared hero inverts them for a dark ground. On this light one
+   they go back to the page's ordinary treatment. */
+.mgdb-pan-gene-page .pan-gene-hero .mgdb-button-primary {
+  background: var(--mgdb-green-dark);
+  color: #fff !important;
+}
+
+.mgdb-pan-gene-page .pan-gene-hero .mgdb-button-primary:hover { background: #0f3325; }
+
+.mgdb-pan-gene-page .pan-gene-hero .mgdb-button-secondary {
+  border-color: var(--mgdb-green-dark);
+  background: rgba(255, 255, 255, .7);
+  color: var(--mgdb-green-dark) !important;
+}
+
+.mgdb-pan-gene-page .pan-gene-hero .mgdb-button-secondary:hover { background: #fff; }
+
+.mgdb-pan-gene-page .pan-gene-hero :focus-visible { outline-color: var(--mgdb-focus); }
+
+/* The freshness stamp. A dataset that is rebuilt on a cycle should say when it
+   was last rebuilt, and a reader should not have to hunt for it. */
+.mgdb-pan-gene-page .pan-gene-hero-stamp {
+  position: absolute;
+  z-index: 1;
+  top: var(--mgdb-space-5);
+  right: var(--mgdb-space-6);
+  display: inline-flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  padding: var(--mgdb-space-1) var(--mgdb-space-3);
+  border: 1px solid #bcd9c6;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .9);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* The dot is a freshness cue, not decoration for its own sake — gold picks up
+   the brand accent that the rest of this header deliberately leaves out. */
+.mgdb-pan-gene-page .pan-gene-hero-stamp span {
+  color: var(--mgdb-gold);
+  font-size: .7em;
+  line-height: 1;
+}
+
+@media (max-width: 1023px) {
+  .mgdb-pan-gene-page .pan-gene-hero { grid-template-columns: minmax(130px, 22%) minmax(0, 1fr); }
+  .mgdb-pan-gene-page .pan-gene-hero .mgdb-hero-body { padding: var(--mgdb-space-4) var(--mgdb-space-5); }
+  .mgdb-pan-gene-page .pan-gene-hero-stamp { top: var(--mgdb-space-4); right: var(--mgdb-space-5); }
+}
+
+@media (max-width: 767px) {
+  /* Stacked, the stamp has nowhere to float to; it leads the block instead. */
+  .mgdb-pan-gene-page .pan-gene-hero { grid-template-columns: 1fr; }
+
+  .mgdb-pan-gene-page .pan-gene-hero .mgdb-hero-emblem {
+    flex-flow: row wrap;
+    gap: var(--mgdb-space-3);
+    align-items: center;
+    justify-content: flex-start;
+    padding: var(--mgdb-space-3) var(--mgdb-space-4);
+    border-right: 0;
+    border-bottom: 1px solid #cfe3d6;
+    text-align: left;
+  }
+
+  .mgdb-pan-gene-page .pan-gene-hero .mgdb-hero-emblem svg { width: 38px; }
+  .mgdb-pan-gene-page .pan-gene-hero .mgdb-hero-emblem strong { flex: 1 1 auto; }
+
+  .mgdb-pan-gene-page .pan-gene-hero h1 { padding-right: 0; }
+
+  .mgdb-pan-gene-page .pan-gene-hero-stamp {
+    position: static;
+    margin-bottom: var(--mgdb-space-3);
+  }
+}

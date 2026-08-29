@@ -33,7 +33,7 @@
   $mgdb->get('image-dir')->replace($system['image_url']);
   $mgdb->get('server-url')->replace($system['root_url']);
 
-  $mgdb->get('body')->loadRemote($system['root_url_private'] . '/templates/static/mgdb_contact.bau');
+  $mgdb->get('body')->load('templates/static/mgdb_contact.bau');
 
   include_once('translation.php');
   $mgdb->get('blast_url')->replace($system['BLAST_URL']);

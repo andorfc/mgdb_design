@@ -12,6 +12,17 @@ header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: public, max-age=60, stale-while-revalidate=300');
 header('X-Content-Type-Options: nosniff');
 
+/* The current representative assembly. Ranked above everything else for any
+   query it matches, because a search for "B73" wants this before it wants the
+   2009 assembly of the same name.
+
+   Pinned as a literal, which is how the rest of the codebase does it --
+   controllers/genome/genome_center_modern.php \(GC_REPRESENTATIVE_ASSEMBLY\),
+   include/gene_record_lib.php, search/expression/expression_search_lib.php,
+   search/uniformmu/uniformmu_search_lib.php and others all carry the same
+   string. It has to change in all of them together at the next release. */
+define('AC_REPRESENTATIVE_ASSEMBLY', 'Zm-B73-REFERENCE-NAM-5.0');
+
 function acJson($payload, $status=200) {
   http_response_code($status);
   $json = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
@@ -617,15 +628,33 @@ try {
   }
 
   if ($type === 'anything' || $type === 'genome') {
-    $genomeSql = "SELECT project, assembly_name, annotation
+    /* Ranked, not alphabetical. The previous order was: exact name, then names
+       starting with the query, then everything else by name -- and with
+       LIMIT 4 that silently dropped the assembly people are usually looking
+       for. "B73" matches nine rows; the current reference sorts last on both
+       counts, because it is named Zm-B73-REFERENCE-NAM-5.0 and "Z" is last in
+       the alphabet. The four that came back were v1, v2, v3 and the 2008
+       BAC-based assembly.
+
+       chado.genome_metadata is one row per assembly *per annotation set*, not
+       per assembly: Zm-B73-REFERENCE-GRAMENE-4.0 appears twice because it has
+       both NCBI 101 and Zm00001d.2 annotations. Both are real records, so they
+       are left alone here -- but a query matching such an assembly spends two
+       of these four slots on it. Worth collapsing to one row per assembly if
+       that becomes a nuisance. */
+    $genomeSql = "SELECT project, assembly_name, annotation,
+                         CASE WHEN assembly_name = :representative THEN 0
+                              WHEN lower(assembly_name) = :exact THEN 1
+                              WHEN lower(assembly_name) LIKE :prefix THEN 2
+                              WHEN assembly_name ILIKE '%REFERENCE%' THEN 3
+                              ELSE 4 END AS assembly_rank
                   FROM chado.genome_metadata
                   WHERE assembly_name ILIKE :contains OR project ILIKE :contains OR annotation ILIKE :contains
-                  ORDER BY CASE WHEN lower(assembly_name)=:exact THEN 0
-                                WHEN lower(assembly_name) LIKE :prefix THEN 1 ELSE 2 END,
-                           assembly_name LIMIT 4";
+                  ORDER BY assembly_rank, assembly_name LIMIT 4";
     $sth = $DBConn->prepare($genomeSql);
     $lower = strtolower($query);
-    $sth->execute(array(':contains' => '%' . $query . '%', ':exact' => $lower, ':prefix' => $lower . '%'));
+    $sth->execute(array(':contains' => '%' . $query . '%', ':exact' => $lower, ':prefix' => $lower . '%',
+                        ':representative' => AC_REPRESENTATIVE_ASSEMBLY));
     $rows = $sth->fetchAll(PDO::FETCH_ASSOC);
     $items = array();
     foreach ($rows as $row) {
@@ -665,7 +694,12 @@ try {
     }
   }
 
-  $priority = array('id', 'gene_model', 'locus', 'stock', 'probe', 'reference', 'genome', 'qtl_exp',
+  /* Genomes sit above Loci and Stocks: a query naming an inbred is usually
+     after its assembly, and the group was previously seventh, below three
+     groups that can each run to thousands of rows. Only the group order moves
+     -- an exact stock name is still promoted as the top hit above all of
+     them, which is what "B73" the germplasm record is. */
+  $priority = array('id', 'gene_model', 'genome', 'locus', 'stock', 'probe', 'reference', 'qtl_exp',
                     'term', 'phenotype', 'variation', 'gene_product', 'map', 'person');
   foreach ($priority as $key) if (isset($groupsByKey[$key])) $groups[] = $groupsByKey[$key];
 

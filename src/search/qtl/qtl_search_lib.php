@@ -2,7 +2,7 @@
 /* file: qtl_search_lib.php
  *
  * purpose: Query builder, lookup helpers, and result shaping for the modernized
- *          QTL Data Center (/data_center/qtl).
+ *          QTL Data Hub (/data_center/qtl).
  */
 
 if (!defined('QTL_MAX_RESULTS')) {

@@ -6,19 +6,60 @@
 
   function byId(id) { return document.getElementById(id); }
 
+  function initViewToggle() {
+    var buttons = document.querySelectorAll('.mgdb-view-btn[data-view]');
+    var tableView = byId('pattern-table-view');
+    var cardsView = byId('pattern-cards-view');
+
+    if (!buttons.length || !tableView || !cardsView) return;
+
+    function setView(view) {
+      Array.prototype.forEach.call(buttons, function (btn) {
+        btn.setAttribute('aria-pressed', btn.getAttribute('data-view') === view ? 'true' : 'false');
+      });
+      if (view === 'table') {
+        tableView.hidden = false;
+        cardsView.hidden = true;
+      } else {
+        tableView.hidden = true;
+        cardsView.hidden = false;
+      }
+    }
+
+    Array.prototype.forEach.call(buttons, function (btn) {
+      btn.addEventListener('click', function () {
+        setView(btn.getAttribute('data-view'));
+      });
+    });
+
+    setView('table');
+  }
+
   function init() {
     if (!window.MGDB) { return; }
 
+    initViewToggle();
+
     /* Search + filter + live count, with state mirrored into the URL. */
+    var rows = document.querySelectorAll('#pattern-table-tbody > tr');
+    var cards = document.querySelectorAll('#pattern-cards-view > .mgdb-card');
+
     var list = window.MGDB.filterList({
-      items: document.querySelectorAll('#pattern-results > .mgdb-card'),
+      items: rows,
       input: byId('pattern-query'),
       chips: document.querySelectorAll('.mgdb-chip[data-filter]'),
       count: byId('pattern-count'),
       empty: byId('pattern-empty'),
       reset: byId('pattern-reset'),
       noun: 'assemblies',
-      urlKeys: { query: 'q', filter: 'type' }
+      urlKeys: { query: 'q', filter: 'type' },
+      onChange: function (visibleCount) {
+        Array.prototype.forEach.call(rows, function (row, i) {
+          if (cards[i]) {
+            cards[i].hidden = row.hidden;
+          }
+        });
+      }
     });
 
     var emptyReset = byId('pattern-empty-reset');

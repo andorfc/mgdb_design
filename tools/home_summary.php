@@ -59,6 +59,14 @@
  *                Current stock records, which is what the COOP can ship.
  *   references   mgdb.reference joined to id_num, curation_lvl 0. Curated
  *                literature; 55,089 rows total, 54,818 current.
+ *   grin_accessions
+ *                distinct plant_id in mgdb.stock_grin -- maize accessions in
+ *                the USDA National Plant Germplasm System that MaizeGDB links
+ *                to. DISTINCT because the table holds one row per accession per
+ *                holding site: 62,459 rows collapse to 59,219 accessions. Every
+ *                row is genus Zea, so no species filter is needed. Note that
+ *                stock_grin.stock_id is empty throughout, so the accessions
+ *                cannot be counted through a join to mgdb.stock.
  */
 
 if (PHP_SAPI !== 'cli') {
@@ -112,12 +120,18 @@ $references = homeCount("
       JOIN mgdb.id_num i ON i.id = r.id
     WHERE i.curation_lvl = 0");
 
+$grin_accessions = homeCount("
+    SELECT COUNT(DISTINCT plant_id) AS n
+    FROM mgdb.stock_grin
+    WHERE plant_id IS NOT NULL AND btrim(plant_id) <> ''");
+
 $summary = array(
     'generated_at' => gmdate('c'),
     'assemblies' => $assemblies,
     'assemblies_all_species' => $assemblies_all,
     'b73_genes' => $b73_genes,
     'stocks' => $stocks,
+    'grin_accessions' => $grin_accessions,
     'references' => $references,
     'measured_seconds' => round(microtime(true) - $started, 2)
 );

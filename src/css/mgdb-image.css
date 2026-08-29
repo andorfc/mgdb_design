@@ -1,16 +1,17 @@
-/* Image Data Center Styles
-   Scoped under .mgdb-image-page; relies on mgdb-modern.css tokens. */
-
 /* ── Hero Emblem ─────────────────────────────────────────────────────────── */
 
 .mgdb-image-page .mgdb-hero-emblem {
-  background: var(--mgdb-green-soft);
-  border-color: var(--mgdb-line);
+  gap: var(--mgdb-space-2);
+  padding: var(--mgdb-space-4) var(--mgdb-space-3);
+  border-right: 1px solid #cfe3d6;
+  background: linear-gradient(160deg, rgba(255, 255, 255, .92), rgba(255, 255, 255, .55));
+  color: var(--mgdb-green-dark);
 }
 
 .mgdb-image-page .mgdb-hero-emblem svg {
-  width: 68px;
-  height: 68px;
+  width: min(100%, 62px);
+  height: auto;
+  mix-blend-mode: normal;
 }
 
 /* ── Sticky Section Tabs ─────────────────────────────────────────────────── */
@@ -23,7 +24,7 @@
   flex-wrap: wrap;
   gap: var(--mgdb-space-2);
   margin-top: var(--mgdb-space-5);
-  margin-bottom: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-6);
   padding: var(--mgdb-space-2) 0;
   background: var(--mgdb-surface);
   border-bottom: 1px solid var(--mgdb-line);
@@ -41,17 +42,20 @@
   font-size: var(--mgdb-text-sm);
   font-weight: 700;
   text-decoration: none;
-  transition: background .12s, border-color .12s;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
 }
 
 .mgdb-image-page .mgdb-section-tabs a:hover {
   background: var(--mgdb-green-soft);
+  border-color: #bcd9c6;
+  color: var(--mgdb-green-dark) !important;
 }
 
-.mgdb-image-page .mgdb-section-tabs a.is-current {
+.mgdb-image-page .mgdb-section-tabs a.is-current,
+.mgdb-image-page .mgdb-section-tabs a[aria-current="true"] {
   border-color: var(--mgdb-green-dark);
   background: var(--mgdb-green-dark);
-  color: #fff !important;
+  color: #ffffff !important;
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
@@ -62,7 +66,8 @@
 
 /* ── Category Pill Bar ───────────────────────────────────────────────────── */
 
-.mgdb-image-page .image-category-pill-bar {
+.mgdb-image-page .image-category-pill-bar,
+.mgdb-image-page .image-category-pills {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-2);
@@ -256,11 +261,155 @@
   font-weight: 600;
 }
 
+.mgdb-image-page .image-results-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+}
+
+.mgdb-image-page .image-view-toggle {
+  display: inline-flex;
+  gap: 2px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  padding: 2px;
+}
+
+.mgdb-image-page .image-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  padding: 4px var(--mgdb-space-3);
+  border: none;
+  border-radius: var(--mgdb-radius-xs, 4px);
+  background: transparent;
+  color: var(--mgdb-ink-soft);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+
+.mgdb-image-page .image-view-btn:hover:not([aria-pressed="true"]) {
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-ink);
+}
+
+.mgdb-image-page .image-view-btn[aria-pressed="true"] {
+  background: var(--mgdb-green-dark);
+  color: #fff;
+}
+
+.mgdb-image-page .image-view-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+.mgdb-image-page .image-export-buttons {
+  display: flex;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-image-page .image-results-container {
+  margin-top: var(--mgdb-space-4);
+}
+
 .mgdb-image-page .image-results-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: var(--mgdb-space-4);
-  margin-top: var(--mgdb-space-4);
+}
+
+/* ── Result Table (Table View) ───────────────────────────────────────────── */
+
+.mgdb-image-page .image-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.mgdb-image-page .image-table th,
+.mgdb-image-page .image-table td {
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  vertical-align: middle;
+}
+
+.mgdb-image-page .image-table-thumb {
+  display: block;
+  width: 64px;
+  height: 52px;
+  padding: 0;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  overflow: hidden;
+  background: var(--mgdb-surface-sunken);
+  cursor: pointer;
+  transition: transform .15s, border-color .15s;
+}
+
+.mgdb-image-page .image-table-thumb:hover {
+  transform: scale(1.08);
+  border-color: var(--mgdb-gold-dark);
+}
+
+.mgdb-image-page .image-table-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mgdb-image-page .image-table-title {
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.mgdb-image-page .image-table-title:hover {
+  color: var(--mgdb-leaf);
+}
+
+.mgdb-image-page .image-table-caption {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading-snug);
+  max-width: 480px;
+}
+
+.mgdb-image-page .image-table-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--mgdb-space-1);
+}
+
+.mgdb-image-page .image-table-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 2px var(--mgdb-space-2);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink-soft);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .12s, border-color .12s;
+}
+
+.mgdb-image-page .image-table-btn:hover {
+  background: var(--mgdb-surface-alt);
+  border-color: var(--mgdb-muted);
+  color: var(--mgdb-ink);
 }
 
 /* ── Image Card ──────────────────────────────────────────────────────────── */

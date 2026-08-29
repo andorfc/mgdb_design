@@ -2,7 +2,9 @@
 include_once('../../include/db-api.php');
 include_once('../../include/gp_lib.php');
 include_once('reference_search_lib.php');
+include_once('../../include/dashboard_cache.php');
 
+$system = getSystemInfo('mgdb.conf');
 $DBConn = connect_to_database(false);
 $filter = referenceBuildFilters($DBConn);
 $format = referenceSearchValue('format');
@@ -23,9 +25,29 @@ try {
         $sort = 'relevance';
     }
 
+    // facets_only=1 asks for the corpus dashboard without result rows. The page
+    // uses it on a bare load, where there is no query to show results for.
+    $facetsOnly = referenceSearchValue('facets_only') === '1';
+
     $started = microtime(true);
-    $combined = referenceCombinedQuery($filter, $page, $pageSize, $sort);
-    $payload = retrieve_row(make_query($DBConn, $combined['sql'], 1, $combined['params']));
+
+    /* An unfiltered facets_only request describes the whole collection, so it is
+       identical for every visitor and worth caching. A request carrying a query
+       or a filter is specific to that user and always runs live. */
+    $cacheable = $facetsOnly && $filter['term'] === '' && count($filter['params']) === 0;
+
+    if ($cacheable) {
+        $payload = dashboardCache($system, 'reference/facets', function () use ($DBConn, $filter) {
+            $built = referenceFacetsOnlyQuery($filter);
+            return retrieve_row(make_query($DBConn, $built['sql'], 1, $built['params']));
+        }, $cacheMeta);
+    } else {
+        $combined = $facetsOnly
+            ? referenceFacetsOnlyQuery($filter)
+            : referenceCombinedQuery($filter, $page, $pageSize, $sort);
+        $payload = retrieve_row(make_query($DBConn, $combined['sql'], 1, $combined['params']));
+        $cacheMeta = array('status' => 'live', 'built' => null);
+    }
     $results = json_decode($payload['results'], true) ?: array();
     $facets = array(
         'year' => json_decode($payload['year_facets'], true) ?: array(),
@@ -56,8 +78,11 @@ try {
             'with_pubmed' => $pubmedCount,
             'page' => $page,
             'page_size' => $pageSize,
-            'page_count' => $total ? (int) ceil($total / $pageSize) : 0,
-            'elapsed_ms' => (int) round((microtime(true) - $started) * 1000)
+            'page_count' => ($facetsOnly || !$total) ? 0 : (int) ceil($total / $pageSize),
+            'elapsed_ms' => (int) round((microtime(true) - $started) * 1000),
+            'facets_only' => $facetsOnly,
+            'cache' => $cacheMeta['status'],
+            'data_built' => $cacheMeta['built'] ? date('c', $cacheMeta['built']) : null
         ),
         'entities' => $filter['entities'],
         'facets' => $facets,

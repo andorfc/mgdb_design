@@ -1,7 +1,7 @@
 <?php
 /* file: map_search_modern.php
  *
- * purpose: Map Data Center main page (/data_center/map) on the modern design system.
+ * purpose: Map Data Hub main page (/data_center/map) on the modern design system.
  */
 
 include_once('./include/db-api.php');

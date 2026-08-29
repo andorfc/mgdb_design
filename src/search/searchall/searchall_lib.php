@@ -267,8 +267,8 @@ function saTypeRegistry() {
 /* The order sections appear in when their counts tie or when no term ranking
    applies. Broadly: what a reader is most often looking for, first. */
 function saTypeOrder() {
-    return array('gene', 'locus', 'reference', 'stock', 'probe', 'variation', 'phenotype',
-                 'term', 'qtl_exp', 'gene_product', 'map', 'genome', 'person', 'recomb',
+    return array('gene', 'genome', 'locus', 'reference', 'stock', 'probe', 'variation', 'phenotype',
+                 'term', 'qtl_exp', 'gene_product', 'map', 'person', 'recomb',
                  'primer', 'journal', 'species');
 }
 
@@ -906,16 +906,35 @@ function saParsePgArray($value) {
     }));
 }
 
+/* The current representative assembly, ranked first for any query it matches.
+   Same literal as AC_REPRESENTATIVE_ASSEMBLY in
+   controllers/search_engine/autocomplete.php and GC_REPRESENTATIVE_ASSEMBLY in
+   controllers/genome/genome_center_modern.php; all three move together. */
+define('SA_REPRESENTATIVE_ASSEMBLY', 'Zm-B73-REFERENCE-NAM-5.0');
+
 function saGenomeRows($DBConn, $term, $page, $pageSize) {
     $lower = strtolower($term);
+    /* Ranked, not alphabetical -- see the note on the matching query in
+       controllers/search_engine/autocomplete.php. On this page nothing was
+       dropped, since it paginates rather than capping at four, but
+       Zm-B73-REFERENCE-NAM-5.0 came back ninth of nine for "B73": last in its
+       tier because "Z" is last in the alphabet.
+
+       Nine rows for eight assemblies: this table is one row per assembly per
+       annotation set, and Zm-B73-REFERENCE-GRAMENE-4.0 carries two \(NCBI 101
+       and Zm00001d.2\). Both are real records and both are listed. */
     $sth = $DBConn->prepare("
-        SELECT assembly_name, project, annotation
+        SELECT assembly_name, project, annotation,
+               CASE WHEN assembly_name = :representative THEN 0
+                    WHEN lower(assembly_name) = :exact THEN 1
+                    WHEN lower(assembly_name) LIKE :prefix THEN 2
+                    WHEN assembly_name ILIKE '%REFERENCE%' THEN 3
+                    ELSE 4 END AS assembly_rank
         FROM chado.genome_metadata
         WHERE assembly_name ILIKE :contains OR project ILIKE :contains OR annotation ILIKE :contains
-        ORDER BY CASE WHEN lower(assembly_name)=:exact THEN 0
-                      WHEN lower(assembly_name) LIKE :prefix THEN 1 ELSE 2 END,
-                 assembly_name");
-    $sth->execute(array(':contains' => '%' . $term . '%', ':exact' => $lower, ':prefix' => $lower . '%'));
+        ORDER BY assembly_rank, assembly_name");
+    $sth->execute(array(':contains' => '%' . $term . '%', ':exact' => $lower, ':prefix' => $lower . '%',
+                        ':representative' => SA_REPRESENTATIVE_ASSEMBLY));
     $all = $sth->fetchAll(PDO::FETCH_ASSOC);
 
     $rows = array();

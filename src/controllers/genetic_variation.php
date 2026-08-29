@@ -1,7 +1,7 @@
 <?php
 /* file: genetic_variation.php
  *
- * purpose: /genetic_variation — the Genetic Variation data center.
+ * purpose: /genetic_variation — the Genetic Variation data hub.
  *
  *          Loaded by controller.php, which checks controllers/<CONTROLLER>.php
  *          before falling through to redirect.php. That is what takes this
@@ -190,7 +190,7 @@ function gv_project_rows($projects) {
     return $out;
 }
 
-$bauplan = new Bauplan('MaizeGDB Genetic Variation | SNPs, Indels & Diversity Data Center');
+$bauplan = new Bauplan('MaizeGDB Genetic Variation | SNPs, Indels & Diversity Data Hub');
 $bauplan->modern();
 
 $bauplan->preHTML('<meta http-equiv="Content-Type" content="text/html; charset=utf-8">');

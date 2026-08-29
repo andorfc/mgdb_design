@@ -7,8 +7,8 @@
    "total": 2
   },
   "Community": {
-   "legacy": 31,
-   "modern": 3,
+   "legacy": 29,
+   "modern": 5,
    "partial": 0,
    "total": 34
   },
@@ -18,9 +18,9 @@
    "partial": 0,
    "total": 13
   },
-  "Data centers": {
-   "legacy": 57,
-   "modern": 20,
+  "Data hubs": {
+   "legacy": 51,
+   "modern": 26,
    "partial": 0,
    "total": 77
   },
@@ -37,16 +37,16 @@
    "total": 7
   },
   "Genome": {
-   "legacy": 16,
-   "modern": 1,
+   "legacy": 3,
+   "modern": 15,
    "partial": 0,
-   "total": 17
+   "total": 18
   },
   "Information pages": {
-   "legacy": 47,
-   "modern": 10,
+   "legacy": 45,
+   "modern": 28,
    "partial": 0,
-   "total": 57
+   "total": 73
   },
   "Search and API": {
    "legacy": 7,
@@ -56,19 +56,19 @@
   },
   "Standalone apps in the web root": {
    "legacy": 4,
-   "modern": 3,
+   "modern": 5,
    "partial": 0,
-   "total": 7
+   "total": 9
   },
   "Tools": {
-   "legacy": 40,
+   "legacy": 39,
    "modern": 0,
    "partial": 0,
-   "total": 40
+   "total": 39
   }
  },
  "category_order": [
-  "Data centers",
+  "Data hubs",
   "Gene and pan-gene centers",
   "Genome",
   "Tools",
@@ -81,19 +81,19 @@
   "Curation and internal"
  ],
  "counts": {
-  "legacy": 225,
-  "modern": 43,
+  "legacy": 201,
+  "modern": 85,
   "partial": 0
  },
- "generated": "2026-08-18T02:18:05Z",
+ "generated": "2026-08-29T03:50:29Z",
  "generator": "tools/redesign_status.py 1.0",
  "mgdb_hosts": [
   {
-   "count": 370,
+   "count": 577,
    "examples": [
-    "https://download.maizegdb.org/Insertions/UniformMu/UniformMu_Release-8_Insertions_in_RefGenv2_FGS.xlsx",
-    "https://download.maizegdb.org/Insertions/UniformMu/UniformMu_Release-7_Insertions_in_RefGenv2_FGS.xlsx",
-    "https://download.maizegdb.org/Insertions/UniformMu/UniformMu_W22_V4_lookup.xlsx"
+    "https://download.maizegdb.org/Insertions/UniformMu/",
+    "https://download.maizegdb.org/Insertions/UniformMu/UniformMu_Release-9_B73v4.xlsx",
+    "https://download.maizegdb.org/Insertions/UniformMu/UniformMu_Release-8_GeneModel_B73_RefGen_v3.xlsx"
    ],
    "host": "download.maizegdb.org",
    "linked_from": [
@@ -107,9 +107,9 @@
   {
    "count": 102,
    "examples": [
-    "https://mnl.maizegdb.org/mnl/08/",
-    "https://mnl.maizegdb.org/mnl/46/",
-    "https://mnl.maizegdb.org/mnl/40/"
+    "https://mnl.maizegdb.org/mnl/44/",
+    "https://mnl.maizegdb.org/28",
+    "https://mnl.maizegdb.org/mnl/81/"
    ],
    "host": "mnl.maizegdb.org",
    "linked_from": [
@@ -121,7 +121,7 @@
    ]
   },
   {
-   "count": 84,
+   "count": 102,
    "examples": [
     "https://jbrowse.maizegdb.org/",
     "https://jbrowse.maizegdb.org",
@@ -137,11 +137,11 @@
    ]
   },
   {
-   "count": 65,
+   "count": 66,
    "examples": [
     "http://documents.maizegdb.org/",
-    "https://documents.maizegdb.org/working_group/WorkingGroup08.pdf",
-    "https://documents.maizegdb.org/working_group/WGreportFinal2010December.pdf"
+    "https://documents.maizegdb.org/working_group/MaizeGDB_WG_report_March2012_final.doc",
+    "https://documents.maizegdb.org/working_group/2008WGreport.pdf"
    ],
    "host": "documents.maizegdb.org",
    "linked_from": [
@@ -153,11 +153,11 @@
    ]
   },
   {
-   "count": 32,
+   "count": 34,
    "examples": [
-    "http://ftp.maizegdb.org/static_media/NCGA_Podcast_Proteomics.mp3",
-    "http://ftp.maizegdb.org/static_media/NCGA_Podcast_GBrowse2.mp3",
-    "http://ftp.maizegdb.org/static_media/NCGA_Podcast_Alternative_Genome_Assemblies.mp3"
+    "http://ftp.maizegdb.org/static_media/NCGA_Podcast_eFPbrowser.mp3",
+    "http://ftp.maizegdb.org/static_media/NCGA_Podcast_Alternative_Genome_Assemblies.mp3",
+    "http://ftp.maizegdb.org/static_media/NCGA_Podcast_phenotypes.mp3"
    ],
    "host": "ftp.maizegdb.org",
    "linked_from": [
@@ -169,10 +169,26 @@
    ]
   },
   {
+   "count": 21,
+   "examples": [
+    "https://qteller.maizegdb.org",
+    "https://qteller.maizegdb.org/index_B73v5.php",
+    "https://qteller.maizegdb.org/index_NAM.php"
+   ],
+   "host": "qteller.maizegdb.org",
+   "linked_from": [
+    "templates/about/sitemap-content.bau",
+    "templates/home/quick-links-filled.bau",
+    "templates/home/megamenu/tools.bau",
+    "templates/home/megamenu_modern/tools.bau",
+    "templates/pan_gene_center/pan_gene_record-expression.bau"
+   ]
+  },
+  {
    "count": 19,
    "examples": [
-    "https://sequence.maizegdb.org/get_sequence.php",
     "https://sequence.maizegdb.org/getFASTA.php",
+    "https://sequence.maizegdb.org/get_sequence.php",
     "http://sequence.maizegdb.org/getFASTA.php"
    ],
    "host": "sequence.maizegdb.org",
@@ -188,8 +204,8 @@
    "count": 15,
    "examples": [
     "https://images.maizegdb.org/db_images/Term/",
-    "https://images.maizegdb.org/db_images/Variation/$",
-    "https://images.maizegdb.org/db_images/Variation/$(url)"
+    "https://images.maizegdb.org/db_images/Variation/$(url)",
+    "https://images.maizegdb.org/db_images/Variation/$"
    ],
    "host": "images.maizegdb.org",
    "linked_from": [
@@ -201,34 +217,49 @@
    ]
   },
   {
-   "count": 13,
-   "examples": [
-    "https://gbrowse.maizegdb.org/gb2/gbrowse/maize_v4",
-    "https://gbrowse.maizegdb.org/gb2/gbrowse/maize_w22v2",
-    "https://gbrowse.maizegdb.org/gb2/gbrowse/maize_v3"
-   ],
-   "host": "gbrowse.maizegdb.org",
-   "linked_from": [
-    "templates/about/sitemap-content.bau",
-    "templates/genome/european_flints.bau",
-    "templates/tools/gbrowse-content.bau",
-    "include/gene_center_lib.php",
-    "test3.html"
-   ]
-  },
-  {
-   "count": 12,
+   "count": 14,
    "examples": [
     "https://wgs.maizegdb.org/",
     "https://wgs.maizegdb.org"
    ],
    "host": "wgs.maizegdb.org",
    "linked_from": [
+    "controllers/genetic_variation.php",
     "templates/about/sitemap-content.bau",
+    "templates/about/sitemap-featured.bau",
     "templates/data_center/marker-left.bau",
-    "templates/data_center/stock-left.bau",
+    "templates/data_center/stock-left.bau"
+   ]
+  },
+  {
+   "count": 13,
+   "examples": [
+    "https://pangenome-viewer.maizegdb.org/",
+    "https://pangenome-viewer.maizegdb.org/images/odgi_logo.png",
+    "https://pangenome-viewer.maizegdb.org"
+   ],
+   "host": "pangenome-viewer.maizegdb.org",
+   "linked_from": [
+    "templates/about/sitemap-content.bau",
+    "templates/about/sitemap-featured.bau",
     "templates/home/megamenu/tools.bau",
+    "templates/home/megamenu_modern/genomes.bau",
     "templates/home/megamenu_modern/tools.bau"
+   ]
+  },
+  {
+   "count": 12,
+   "examples": [
+    "https://feta.maizegdb.org",
+    "https://feta.maizegdb.org/"
+   ],
+   "host": "feta.maizegdb.org",
+   "linked_from": [
+    "templates/about/sitemap-content.bau",
+    "templates/about/sitemap-featured.bau",
+    "templates/home/megamenu/tools.bau",
+    "templates/home/megamenu_modern/tools.bau",
+    "templates/static/ai.bau"
    ]
   },
   {
@@ -250,6 +281,21 @@
   {
    "count": 11,
    "examples": [
+    "https://jbrowse2.maizegdb.org",
+    "https://jbrowse2.maizegdb.org/"
+   ],
+   "host": "jbrowse2.maizegdb.org",
+   "linked_from": [
+    "controllers/genome/genomebrowser_modern.php",
+    "templates/genome/genomebrowser-content.bau",
+    "templates/home/megamenu_modern/genomes.bau",
+    "templates/static/mgdb_genomebrowser.bau",
+    "templates/static/mgdb_jbrowse2_tutorial.bau"
+   ]
+  },
+  {
+   "count": 11,
+   "examples": [
     "https://sequence2.maizegdb.org/get_sequence.php"
    ],
    "host": "sequence2.maizegdb.org",
@@ -262,35 +308,35 @@
    ]
   },
   {
-   "count": 11,
+   "count": 10,
    "examples": [
-    "https://qteller.maizegdb.org",
-    "https://qteller.maizegdb.org/index_B73v4.php",
-    "http://qteller.maizegdb.org/"
+    "https://phylostrata.maizegdb.org",
+    "https://phylostrata.maizegdb.org/gene_pages/index.html",
+    "https://phylostrata.maizegdb.org/"
    ],
-   "host": "qteller.maizegdb.org",
+   "host": "phylostrata.maizegdb.org",
    "linked_from": [
-    "templates/home/quick-links-filled.bau",
+    "templates/about/sitemap-content.bau",
+    "templates/about/sitemap-featured.bau",
+    "templates/gene_center/gene_overview_sections.bau",
     "templates/home/megamenu/tools.bau",
-    "templates/home/megamenu_modern/tools.bau",
-    "templates/pan_gene_center/pan_gene_record-expression.bau",
-    "templates/static/expression.bau"
+    "templates/home/megamenu_modern/tools.bau"
    ]
   },
   {
    "count": 10,
    "examples": [
-    "https://pangenome-viewer.maizegdb.org/",
-    "https://pangenome-viewer.maizegdb.org/images/odgi_logo.png",
-    "https://pangenome-viewer.maizegdb.org"
+    "https://archive.maizegdb.org/documentation/maizemap/index.php",
+    "http://archive.maizegdb.org/cgi-bin/mapmarkers.cgi",
+    "http://archive.maizegdb.org/markerlocations_refgenv1.php"
    ],
-   "host": "pangenome-viewer.maizegdb.org",
+   "host": "archive.maizegdb.org",
    "linked_from": [
-    "templates/about/sitemap-content.bau",
-    "templates/home/megamenu/tools.bau",
-    "templates/home/megamenu_modern/genomes.bau",
-    "templates/home/megamenu_modern/tools.bau",
-    "templates/static/mgdb_home.bau"
+    "templates/data_center/map-left.bau",
+    "templates/community/reports-content.bau",
+    "templates/documentation/projects.bau",
+    "templates/static/ssr_protocols-content.bau",
+    "templates/static/mgdb_map.bau"
    ]
   },
   {
@@ -312,38 +358,9 @@
   {
    "count": 9,
    "examples": [
-    "https://mutants.maizegdb.org/doku.php"
-   ],
-   "host": "mutants.maizegdb.org",
-   "linked_from": [
-    "controllers/data_center/image_search.php",
-    "templates/about/sitemap-content.bau",
-    "templates/data_center/phenotype-left.bau",
-    "templates/data_center/phenotype-right.bau",
-    "templates/static/mgdb_phenotype.bau"
-   ]
-  },
-  {
-   "count": 9,
-   "examples": [
-    "https://archive.maizegdb.org/documentation/maizemap/index.php",
-    "http://archive.maizegdb.org/cgi-bin/personreports.cgi",
-    "http://archive.maizegdb.org/UniformMu_insertions_release_2.txt"
-   ],
-   "host": "archive.maizegdb.org",
-   "linked_from": [
-    "templates/data_center/map-left.bau",
-    "templates/community/reports-content.bau",
-    "templates/documentation/projects.bau",
-    "templates/static/ssr_protocols-content.bau"
-   ]
-  },
-  {
-   "count": 8,
-   "examples": [
-    "https://gcv.maizegdb.org/instructions",
+    "https://gcv.maizegdb.org",
     "https://gcv.maizegdb.org/",
-    "https://gcv.maizegdb.org"
+    "https://gcv.maizegdb.org/gene;maize=$(grass-pan_gene-exemplar)"
    ],
    "host": "gcv.maizegdb.org",
    "linked_from": [
@@ -352,6 +369,36 @@
     "templates/home/megamenu_modern/genomes.bau",
     "templates/home/megamenu_modern/tools.bau",
     "templates/pan_gene_center/pan_gene_record-gcv.bau"
+   ]
+  },
+  {
+   "count": 8,
+   "examples": [
+    "https://snptools.maizegdb.org",
+    "https://snptools.maizegdb.org/"
+   ],
+   "host": "snptools.maizegdb.org",
+   "linked_from": [
+    "templates/about/sitemap-content.bau",
+    "templates/about/sitemap-featured.bau",
+    "templates/home/megamenu_modern/tools.bau",
+    "templates/static/mgdb_coming_soon.bau",
+    "templates/static/mgdb_marker.bau"
+   ]
+  },
+  {
+   "count": 8,
+   "examples": [
+    "https://gbrowse.maizegdb.org/gb2/gbrowse/maize_ep1",
+    "https://gbrowse.maizegdb.org/gb2/gbrowse/maize_f7",
+    "https://gbrowse.maizegdb.org/gb2/gbrowse/$"
+   ],
+   "host": "gbrowse.maizegdb.org",
+   "linked_from": [
+    "templates/genome/european_flints.bau",
+    "templates/tools/gbrowse-content.bau",
+    "include/gene_center_lib.php",
+    "test3.html"
    ]
   },
   {
@@ -388,24 +435,9 @@
   {
    "count": 6,
    "examples": [
-    "https://phylostrata.maizegdb.org",
-    "https://phylostrata.maizegdb.org/gene_pages/index.html",
-    "https://phylostrata.maizegdb.org/"
-   ],
-   "host": "phylostrata.maizegdb.org",
-   "linked_from": [
-    "templates/about/sitemap-content.bau",
-    "templates/gene_center/gene_overview_sections.bau",
-    "templates/home/megamenu/tools.bau",
-    "templates/static/mgdb_home.bau"
-   ]
-  },
-  {
-   "count": 6,
-   "examples": [
-    "http://community.maizegdb.org/mgec-survey12/report2012.php",
-    "http://community.maizegdb.org/mgec-survey14/report2014.php",
-    "http://community.maizegdb.org/mgec-survey19/report2019.php"
+    "http://community.maizegdb.org/mgec-survey19/report2019.php",
+    "http://community.maizegdb.org/mgec-survey17/report2017.php",
+    "http://community.maizegdb.org/mgec-survey16/report2016.php"
    ],
    "host": "community.maizegdb.org",
    "linked_from": [
@@ -415,28 +447,13 @@
   {
    "count": 5,
    "examples": [
-    "https://feta.maizegdb.org"
+    "https://mutants.maizegdb.org/doku.php"
    ],
-   "host": "feta.maizegdb.org",
+   "host": "mutants.maizegdb.org",
    "linked_from": [
-    "templates/about/sitemap-content.bau",
-    "templates/home/megamenu/tools.bau",
-    "templates/home/megamenu_modern/tools.bau",
-    "templates/static/ai.bau",
-    "templates/static/mgdb_home.bau"
-   ]
-  },
-  {
-   "count": 5,
-   "examples": [
-    "https://jbrowse2.maizegdb.org/",
-    "https://jbrowse2.maizegdb.org"
-   ],
-   "host": "jbrowse2.maizegdb.org",
-   "linked_from": [
-    "templates/genome/genomebrowser-content.bau",
-    "templates/home/megamenu_modern/genomes.bau",
-    "js/genomebrowser.js"
+    "controllers/data_center/image_search.php",
+    "templates/data_center/phenotype-left.bau",
+    "templates/data_center/phenotype-right.bau"
    ]
   },
   {
@@ -444,7 +461,7 @@
    "examples": [
     "http://ateb.maizegdb.org/data_center/ssr",
     "http://ateb.maizegdb.org/mapped_elements_sort",
-    "http://ateb.maizegdb.org/mapped_elements"
+    "http://ateb.maizegdb.org/data_center/est"
    ],
    "host": "ateb.maizegdb.org",
    "linked_from": [
@@ -455,14 +472,28 @@
   {
    "count": 4,
    "examples": [
-    "https://mfs.maizegdb.org/",
-    "https://mfs.maizegdb.org/data_sources"
+    "https://mfs.maizegdb.org/"
    ],
    "host": "mfs.maizegdb.org",
    "linked_from": [
     "templates/about/sitemap-content.bau",
     "templates/home/megamenu/tools.bau",
+    "templates/home/megamenu_modern/tools.bau",
     "templates/static/ai.bau"
+   ]
+  },
+  {
+   "count": 4,
+   "examples": [
+    "https://fusarium.maizegdb.org",
+    "https://fusarium.maizegdb.org/"
+   ],
+   "host": "fusarium.maizegdb.org",
+   "linked_from": [
+    "templates/about/sitemap-content.bau",
+    "templates/about/sitemap-featured.bau",
+    "templates/home/megamenu/tools.bau",
+    "templates/static/mgdb_cite.bau"
    ]
   },
   {
@@ -481,23 +512,9 @@
   {
    "count": 4,
    "examples": [
-    "https://snptools.maizegdb.org",
-    "https://snptools.maizegdb.org/"
-   ],
-   "host": "snptools.maizegdb.org",
-   "linked_from": [
-    "templates/home/megamenu_modern/tools.bau",
-    "templates/static/mgdb_coming_soon.bau",
-    "templates/static/mgdb_marker.bau",
-    "templates/static/mgdb_home.bau"
-   ]
-  },
-  {
-   "count": 4,
-   "examples": [
-    "http://popcorn.maizegdb.org/",
-    "http://popcorn.maizegdb.org/main/index.php",
-    "http://popcorn.maizegdb.org"
+    "http://popcorn.maizegdb.org",
+    "http://popcorn.maizegdb.org/search/sequence_search/home.php",
+    "http://popcorn.maizegdb.org/main/index.php"
    ],
    "host": "popcorn.maizegdb.org",
    "linked_from": [
@@ -513,19 +530,6 @@
    "host": "curation-tools-dev.maizegdb.org",
    "linked_from": [
     "templates/insertion/insertion_search.bau"
-   ]
-  },
-  {
-   "count": 3,
-   "examples": [
-    "https://fusarium.maizegdb.org",
-    "https://fusarium.maizegdb.org/"
-   ],
-   "host": "fusarium.maizegdb.org",
-   "linked_from": [
-    "templates/about/sitemap-content.bau",
-    "templates/home/megamenu/tools.bau",
-    "templates/static/mgdb_cite.bau"
    ]
   },
   {
@@ -613,17 +617,6 @@
   {
    "count": 2,
    "examples": [
-    "https://past3.maizegdb.org"
-   ],
-   "host": "past3.maizegdb.org",
-   "linked_from": [
-    "templates/tools/past-content.bau",
-    "templates/tools/proteins-content.bau"
-   ]
-  },
-  {
-   "count": 2,
-   "examples": [
     "https://past2.maizegdb.org"
    ],
    "host": "past2.maizegdb.org",
@@ -635,8 +628,19 @@
   {
    "count": 2,
    "examples": [
-    "https://snpversity.maizegdb.org/Diversity/$",
-    "https://snpversity.maizegdb.org/Diversity/$(source).php"
+    "https://past3.maizegdb.org"
+   ],
+   "host": "past3.maizegdb.org",
+   "linked_from": [
+    "templates/tools/past-content.bau",
+    "templates/tools/proteins-content.bau"
+   ]
+  },
+  {
+   "count": 2,
+   "examples": [
+    "https://snpversity.maizegdb.org/Diversity/$(source).php",
+    "https://snpversity.maizegdb.org/Diversity/$"
    ],
    "host": "snpversity.maizegdb.org",
    "linked_from": [
@@ -658,10 +662,10 @@
   {
    "count": 2,
    "examples": [
-    "http://outreach.maizegdb.org/",
-    "http://outreach.maizegdb.org"
+    "http://faq.maizegdb.org/",
+    "http://faq.maizegdb.org"
    ],
-   "host": "outreach.maizegdb.org",
+   "host": "faq.maizegdb.org",
    "linked_from": [
     "test3.html"
    ]
@@ -669,10 +673,10 @@
   {
    "count": 2,
    "examples": [
-    "http://faq.maizegdb.org/",
-    "http://faq.maizegdb.org"
+    "http://outreach.maizegdb.org/",
+    "http://outreach.maizegdb.org"
    ],
-   "host": "faq.maizegdb.org",
+   "host": "outreach.maizegdb.org",
    "linked_from": [
     "test3.html"
    ]
@@ -693,16 +697,6 @@
     "https://reelgene.maizegdb.org/"
    ],
    "host": "reelgene.maizegdb.org",
-   "linked_from": [
-    "templates/about/sitemap-content.bau"
-   ]
-  },
-  {
-   "count": 1,
-   "examples": [
-    "https://chi.maizegdb.org/mgc/"
-   ],
-   "host": "chi.maizegdb.org",
    "linked_from": [
     "templates/about/sitemap-content.bau"
    ]
@@ -780,9 +774,9 @@
   {
    "count": 1,
    "examples": [
-    "http://interface.maizegdb.org/maizegdb_news_feed.php"
+    "http://zealign.maizegdb.org/"
    ],
-   "host": "interface.maizegdb.org",
+   "host": "zealign.maizegdb.org",
    "linked_from": [
     "test3.html"
    ]
@@ -800,9 +794,9 @@
   {
    "count": 1,
    "examples": [
-    "http://zealign.maizegdb.org/"
+    "http://interface.maizegdb.org/maizegdb_news_feed.php"
    ],
-   "host": "zealign.maizegdb.org",
+   "host": "interface.maizegdb.org",
    "linked_from": [
     "test3.html"
    ]
@@ -819,38 +813,47 @@
   }
  ],
  "next_up": [
-  "/data_center/locus",
-  "/data_center/map",
   "/bin_viewer",
-  "/data_center/variation",
   "/gene_center/gene",
   "/cooperators",
   "/mgec",
-  "/data_center/gene_product",
   "/hot_new_papers",
   "/incongruency",
-  "/assembly",
-  "/breeders_toolbox",
-  "/mnl",
-  "/expression",
-  "/foldseek",
-  "/genome/whole_genome",
-  "/login",
-  "/maize_history",
-  "/metabolic_pathways",
+  "/locus_summary_table",
   "/whatsnew",
-  "/NAM_project",
+  "/breeders_toolbox",
+  "/community/awards",
+  "/metabolic_pathways",
+  "/mnl",
+  "/stock_catalog",
+  "/foldseek",
+  "/login",
+  "/ssrreports",
   "/community/videos",
+  "/coordinateDef",
   "/doc",
-  "/faq",
-  "/genetic_variation",
-  "/about/working_group",
+  "/ordering/coop_order",
   "/data_center/RNmaps",
+  "/faq",
+  "/fatcat",
   "/jobs",
-  "/14InbredsFISH",
-  "/HiLo_project"
+  "/nomenclature_summary",
+  "/traits_ibm_nam",
+  "/about/working_group",
+  "/locus_lookup",
+  "/ssr_protocols",
+  "/assembly_manifesto"
  ],
  "orphan_modern": [
+  {
+   "file": "controllers/data_center/alphafill_modern.php",
+   "markers": [
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
+   ],
+   "referenced_anywhere": true
+  },
   {
    "file": "controllers/data_center/data_center_hub_modern.php",
    "markers": [
@@ -861,7 +864,7 @@
    "referenced_anywhere": true
   },
   {
-   "file": "controllers/data_center/image_search_modern.php",
+   "file": "controllers/expression/expression_modern.php",
    "markers": [
     "modern_shell",
     "design_system",
@@ -877,40 +880,53 @@
     "modern_chrome"
    ],
    "referenced_anywhere": true
+  },
+  {
+   "file": "controllers/tools/download_modern.php",
+   "markers": [
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
+   ],
+   "referenced_anywhere": true
   }
  ],
- "percent_modern": 16.0,
+ "percent_modern": 29.7,
  "probed": true,
  "rows": [
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": true,
    "kind": "search",
-   "links_in": 5474,
-   "notes": [],
+   "links_in": 5485,
+   "notes": [
+    "modern page swapped in by a guard"
+   ],
    "probe_error": null,
    "probed": true,
-   "serves": "controllers/data_center/locus_search.php",
-   "shell_owner": "controllers/data_center.php",
+   "serves": "controllers/data_center/locus_search_modern.php",
+   "shell_owner": "controllers/data_center/locus_search_modern.php",
    "static_markers": [
-    "legacy_shell"
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
    ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "MaizeGDB locus Search Page",
+   "static_status": "modern",
+   "status": "modern",
+   "title": "MaizeGDB Locus Data Hub | Classic Genetic Loci, Mutants & Characterized Genes",
    "url": "/data_center/locus"
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "source",
    "http": null,
    "in_menu": false,
    "kind": "record",
-   "links_in": 1368,
+   "links_in": 1371,
    "notes": [],
    "probe_error": null,
    "probed": false,
@@ -926,28 +942,32 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": true,
    "kind": "search",
-   "links_in": 210,
-   "notes": [],
+   "links_in": 214,
+   "notes": [
+    "modern page swapped in by a guard"
+   ],
    "probe_error": null,
    "probed": true,
-   "serves": "controllers/data_center/map_search.php",
-   "shell_owner": "controllers/data_center.php",
+   "serves": "controllers/data_center/map_search_modern.php",
+   "shell_owner": "controllers/data_center/map_search_modern.php",
    "static_markers": [
-    "legacy_shell"
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
    ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "MaizeGDB map Search Page",
+   "static_status": "modern",
+   "status": "modern",
+   "title": "MaizeGDB Map Center | Genetic, Cytogenetic & Physical Maps",
    "url": "/data_center/map"
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -968,12 +988,12 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": true,
    "kind": "search",
-   "links_in": 76,
+   "links_in": 85,
    "notes": [
     "modern page swapped in by a guard"
    ],
@@ -993,28 +1013,57 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "search",
+   "links_in": 62,
+   "notes": [
+    "modern page swapped in by a guard"
+   ],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/data_center/stock_search_modern.php",
+   "shell_owner": "controllers/data_center/stock_search_modern.php",
+   "static_markers": [
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
+   ],
+   "static_status": "modern",
+   "status": "modern",
+   "title": "MaizeGDB Stock Center | Maize Genetic Stocks and Germplasm",
+   "url": "/data_center/stock"
+  },
+  {
+   "also": [],
+   "category": "Data hubs",
    "evidence": "source",
    "http": null,
    "in_menu": false,
    "kind": "record",
-   "links_in": 52,
-   "notes": [],
+   "links_in": 53,
+   "notes": [
+    "modern page swapped in by a guard"
+   ],
    "probe_error": null,
    "probed": false,
-   "serves": "controllers/data_center/map.php",
-   "shell_owner": "controllers/data_center.php",
+   "serves": "controllers/data_center/map_record_modern.php",
+   "shell_owner": "controllers/data_center/map_record_modern.php",
    "static_markers": [
-    "legacy_shell"
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
    ],
-   "static_status": "legacy",
-   "status": "legacy",
+   "static_status": "modern",
+   "status": "modern",
    "title": null,
    "url": "/data_center/map/{id}"
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "source",
    "http": null,
    "in_menu": false,
@@ -1035,19 +1084,19 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": true,
    "kind": "search",
-   "links_in": 51,
+   "links_in": 45,
    "notes": [
     "modern page swapped in by a guard"
    ],
    "probe_error": null,
    "probed": true,
-   "serves": "controllers/data_center/stock_search_modern.php",
-   "shell_owner": "controllers/data_center/stock_search_modern.php",
+   "serves": "controllers/data_center/variation_search_modern.php",
+   "shell_owner": "controllers/data_center/variation_search_modern.php",
    "static_markers": [
     "modern_shell",
     "design_system",
@@ -1055,33 +1104,37 @@
    ],
    "static_status": "modern",
    "status": "modern",
-   "title": "MaizeGDB Stock Search | Maize Genetic Stocks and Germplasm",
-   "url": "/data_center/stock"
-  },
-  {
-   "also": [],
-   "category": "Data centers",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": true,
-   "kind": "search",
-   "links_in": 35,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/data_center/variation_search.php",
-   "shell_owner": "controllers/data_center.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "MaizeGDB variation Search Page",
+   "title": "MaizeGDB Variations & Alleles | Genetic Variants Data Hub",
    "url": "/data_center/variation"
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "search",
+   "links_in": 38,
+   "notes": [
+    "modern page swapped in by a guard"
+   ],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/data_center/phenotype_search_modern.php",
+   "shell_owner": "controllers/data_center/phenotype_search_modern.php",
+   "static_markers": [
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
+   ],
+   "static_status": "modern",
+   "status": "modern",
+   "title": "MaizeGDB Phenotypes | Observable Traits & Mutant Data Hub",
+   "url": "/data_center/phenotype"
+  },
+  {
+   "also": [],
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -1102,37 +1155,12 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": true,
    "kind": "search",
-   "links_in": 30,
-   "notes": [
-    "modern page swapped in by a guard"
-   ],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/data_center/phenotype_search_modern.php",
-   "shell_owner": "controllers/data_center/phenotype_search_modern.php",
-   "static_markers": [
-    "modern_shell",
-    "design_system",
-    "modern_chrome"
-   ],
-   "static_status": "modern",
-   "status": "modern",
-   "title": "MaizeGDB Phenotypes | Observable Traits & Mutant Data Center",
-   "url": "/data_center/phenotype"
-  },
-  {
-   "also": [],
-   "category": "Data centers",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": true,
-   "kind": "search",
-   "links_in": 24,
+   "links_in": 26,
    "notes": [
     "modern page swapped in by a guard"
    ],
@@ -1147,12 +1175,58 @@
    ],
    "static_status": "modern",
    "status": "modern",
-   "title": "MaizeGDB Markers & Probes | Molecular Marker Data Center",
+   "title": "MaizeGDB Markers & Probes | Molecular Marker Data Hub",
    "url": "/data_center/marker"
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "controller",
+   "links_in": 21,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/data_center.php",
+   "shell_owner": "controllers/data_center.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "modern",
+   "title": "MaizeGDB Data Hubs | Unified Directory & Big Dashboard",
+   "url": "/data_center"
+  },
+  {
+   "also": [],
+   "category": "Data hubs",
+   "evidence": "source",
+   "http": null,
+   "in_menu": false,
+   "kind": "record",
+   "links_in": 21,
+   "notes": [
+    "modern page swapped in by a guard"
+   ],
+   "probe_error": null,
+   "probed": false,
+   "serves": "controllers/data_center/reference_record_modern.php",
+   "shell_owner": "controllers/data_center/reference_record_modern.php",
+   "static_markers": [
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
+   ],
+   "static_status": "modern",
+   "status": "modern",
+   "title": null,
+   "url": "/data_center/reference/{id}"
+  },
+  {
+   "also": [],
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": true,
@@ -1177,12 +1251,12 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
    "kind": "page",
-   "links_in": 20,
+   "links_in": 19,
    "notes": [],
    "probe_error": null,
    "probed": true,
@@ -1198,37 +1272,12 @@
   },
   {
    "also": [],
-   "category": "Data centers",
-   "evidence": "source",
-   "http": null,
-   "in_menu": false,
-   "kind": "record",
-   "links_in": 19,
-   "notes": [
-    "modern page swapped in by a guard"
-   ],
-   "probe_error": null,
-   "probed": false,
-   "serves": "controllers/data_center/reference_record_modern.php",
-   "shell_owner": "controllers/data_center/reference_record_modern.php",
-   "static_markers": [
-    "modern_shell",
-    "design_system",
-    "modern_chrome"
-   ],
-   "static_status": "modern",
-   "status": "modern",
-   "title": null,
-   "url": "/data_center/reference/{id}"
-  },
-  {
-   "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
-   "in_menu": false,
+   "in_menu": true,
    "kind": "search",
-   "links_in": 18,
+   "links_in": 19,
    "notes": [
     "modern page swapped in by a guard"
    ],
@@ -1248,28 +1297,82 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": true,
    "kind": "search",
    "links_in": 17,
-   "notes": [],
+   "notes": [
+    "modern page swapped in by a guard"
+   ],
    "probe_error": null,
    "probed": true,
-   "serves": "controllers/data_center/gene_product_search.php",
-   "shell_owner": "controllers/data_center.php",
+   "serves": "controllers/data_center/gene_product_search_modern.php",
+   "shell_owner": "controllers/data_center/gene_product_search_modern.php",
    "static_markers": [
-    "legacy_shell"
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
    ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "MaizeGDB gene_product Search Page",
+   "static_status": "modern",
+   "status": "modern",
+   "title": "MaizeGDB Gene Product Data Hub | Enzymes, Transporters & Functional Proteins",
    "url": "/data_center/gene_product"
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "search",
+   "links_in": 15,
+   "notes": [
+    "modern page swapped in by a guard"
+   ],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/data_center/protein_structure_modern.php",
+   "shell_owner": "controllers/data_center/protein_structure_modern.php",
+   "static_markers": [
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
+   ],
+   "static_status": "modern",
+   "status": "modern",
+   "title": "MaizeGDB Protein Structures | AlphaFold Monomers, Homodimers & Heterodimers",
+   "url": "/data_center/protein_structure"
+  },
+  {
+   "also": [],
+   "category": "Data hubs",
+   "evidence": "source",
+   "http": null,
+   "in_menu": false,
+   "kind": "record",
+   "links_in": 15,
+   "notes": [
+    "modern page swapped in by a guard"
+   ],
+   "probe_error": null,
+   "probed": false,
+   "serves": "controllers/data_center/stock_record_modern.php",
+   "shell_owner": "controllers/data_center/stock_record_modern.php",
+   "static_markers": [
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
+   ],
+   "static_status": "modern",
+   "status": "modern",
+   "title": null,
+   "url": "/data_center/stock/{id}"
+  },
+  {
+   "also": [],
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -1290,7 +1393,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": true,
@@ -1315,7 +1418,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": true,
@@ -1340,7 +1443,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -1361,53 +1464,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
-   "evidence": "source",
-   "http": null,
-   "in_menu": false,
-   "kind": "record",
-   "links_in": 12,
-   "notes": [
-    "modern page swapped in by a guard"
-   ],
-   "probe_error": null,
-   "probed": false,
-   "serves": "controllers/data_center/stock_record_modern.php",
-   "shell_owner": "controllers/data_center/stock_record_modern.php",
-   "static_markers": [
-    "modern_shell",
-    "design_system",
-    "modern_chrome"
-   ],
-   "static_status": "modern",
-   "status": "modern",
-   "title": null,
-   "url": "/data_center/stock/{id}"
-  },
-  {
-   "also": [],
-   "category": "Data centers",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": true,
-   "kind": "controller",
-   "links_in": 11,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/data_center.php",
-   "shell_owner": "controllers/data_center.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "modern",
-   "title": "MaizeGDB Data Centers | Unified Directory & Big Dashboard",
-   "url": "/data_center"
-  },
-  {
-   "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -1428,28 +1485,78 @@
   },
   {
    "also": [],
-   "category": "Data centers",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": true,
-   "kind": "search",
-   "links_in": 10,
+   "category": "Data hubs",
+   "evidence": "source",
+   "http": null,
+   "in_menu": false,
+   "kind": "record",
+   "links_in": 11,
    "notes": [],
    "probe_error": null,
-   "probed": true,
-   "serves": "controllers/data_center/image_search.php",
+   "probed": false,
+   "serves": "controllers/data_center/variation.php",
    "shell_owner": "controllers/data_center.php",
    "static_markers": [
     "legacy_shell"
    ],
    "static_status": "legacy",
+   "status": "legacy",
+   "title": null,
+   "url": "/data_center/variation/{id}"
+  },
+  {
+   "also": [],
+   "category": "Data hubs",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "search",
+   "links_in": 10,
+   "notes": [
+    "modern page swapped in by a guard"
+   ],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/data_center/image_search_modern.php",
+   "shell_owner": "controllers/data_center/image_search_modern.php",
+   "static_markers": [
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
+   ],
+   "static_status": "modern",
    "status": "modern",
-   "title": "MaizeGDB Image Data Center | Visual Genetics & Genomics Archive",
+   "title": "MaizeGDB Image Data Hub | Visual Genetics & Genomics Archive",
    "url": "/data_center/image"
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "search",
+   "links_in": 10,
+   "notes": [
+    "modern page swapped in by a guard"
+   ],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/data_center/qtl_search_modern.php",
+   "shell_owner": "controllers/data_center/qtl_search_modern.php",
+   "static_markers": [
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
+   ],
+   "static_status": "modern",
+   "status": "modern",
+   "title": "MaizeGDB QTL Data Hub | Quantitative Trait Loci & Mapping Experiments",
+   "url": "/data_center/qtl"
+  },
+  {
+   "also": [],
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -1470,7 +1577,28 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
+   "evidence": "source",
+   "http": null,
+   "in_menu": false,
+   "kind": "record",
+   "links_in": 9,
+   "notes": [],
+   "probe_error": null,
+   "probed": false,
+   "serves": "controllers/data_center/phenotype.php",
+   "shell_owner": "controllers/data_center.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": null,
+   "url": "/data_center/phenotype/{id}"
+  },
+  {
+   "also": [],
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -1491,19 +1619,19 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": true,
    "kind": "search",
-   "links_in": 8,
+   "links_in": 6,
    "notes": [
     "modern page swapped in by a guard"
    ],
    "probe_error": null,
    "probed": true,
-   "serves": "controllers/data_center/protein_structure_modern.php",
-   "shell_owner": "controllers/data_center/protein_structure_modern.php",
+   "serves": "controllers/data_center/cytogenetic_search_modern.php",
+   "shell_owner": "controllers/data_center/cytogenetic_search_modern.php",
    "static_markers": [
     "modern_shell",
     "design_system",
@@ -1511,75 +1639,12 @@
    ],
    "static_status": "modern",
    "status": "modern",
-   "title": "MaizeGDB Protein Structures | AlphaFold Monomers, Homodimers & Heterodimers",
-   "url": "/data_center/protein_structure"
+   "title": "Cytogenetics Resources | MaizeGDB",
+   "url": "/data_center/cytogenetic"
   },
   {
    "also": [],
-   "category": "Data centers",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": false,
-   "kind": "search",
-   "links_in": 8,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/data_center/qtl_search.php",
-   "shell_owner": "controllers/data_center.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": null,
-   "url": "/data_center/qtl"
-  },
-  {
-   "also": [],
-   "category": "Data centers",
-   "evidence": "source",
-   "http": null,
-   "in_menu": false,
-   "kind": "record",
-   "links_in": 8,
-   "notes": [],
-   "probe_error": null,
-   "probed": false,
-   "serves": "controllers/data_center/variation.php",
-   "shell_owner": "controllers/data_center.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": null,
-   "url": "/data_center/variation/{id}"
-  },
-  {
-   "also": [],
-   "category": "Data centers",
-   "evidence": "source",
-   "http": null,
-   "in_menu": false,
-   "kind": "record",
-   "links_in": 7,
-   "notes": [],
-   "probe_error": null,
-   "probed": false,
-   "serves": "controllers/data_center/phenotype.php",
-   "shell_owner": "controllers/data_center.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": null,
-   "url": "/data_center/phenotype/{id}"
-  },
-  {
-   "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "source",
    "http": null,
    "in_menu": false,
@@ -1600,7 +1665,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -1621,7 +1686,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -1642,7 +1707,28 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "page",
+   "links_in": 6,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/ordering/coop_order.php",
+   "shell_owner": "controllers/ordering.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": "Stock request",
+   "url": "/ordering/coop_order"
+  },
+  {
+   "also": [],
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": true,
@@ -1663,7 +1749,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "source",
    "http": null,
    "in_menu": false,
@@ -1684,7 +1770,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -1700,58 +1786,33 @@
    ],
    "static_status": "legacy",
    "status": "modern",
-   "title": "MaizeGDB Image Data Center | Visual Genetics & Genomics Archive",
+   "title": "MaizeGDB Image Data Hub | Visual Genetics & Genomics Archive",
    "url": "/data_center/image_gel_pattern"
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
-   "in_menu": false,
-   "kind": "page",
+   "in_menu": true,
+   "kind": "controller",
    "links_in": 5,
    "notes": [],
    "probe_error": null,
    "probed": true,
-   "serves": "controllers/ordering/coop_order.php",
-   "shell_owner": "controllers/ordering.php",
+   "serves": "controllers/insertion.php",
+   "shell_owner": "controllers/insertion.php",
    "static_markers": [
     "legacy_shell"
    ],
    "static_status": "legacy",
-   "status": "legacy",
-   "title": "Stock request",
-   "url": "/ordering/coop_order"
-  },
-  {
-   "also": [],
-   "category": "Data centers",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": true,
-   "kind": "search",
-   "links_in": 4,
-   "notes": [
-    "modern page swapped in by a guard"
-   ],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/data_center/cytogenetic_search_modern.php",
-   "shell_owner": "controllers/data_center/cytogenetic_search_modern.php",
-   "static_markers": [
-    "modern_shell",
-    "design_system",
-    "modern_chrome"
-   ],
-   "static_status": "modern",
    "status": "modern",
-   "title": "Cytogenetics Resources | MaizeGDB",
-   "url": "/data_center/cytogenetic"
+   "title": "MaizeGDB Insertion Data Hub | Mu, Ac/Ds & Ds-GFP Insertions",
+   "url": "/insertion"
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -1772,7 +1833,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "source",
    "http": null,
    "in_menu": false,
@@ -1793,7 +1854,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -1809,12 +1870,12 @@
    ],
    "static_status": "legacy",
    "status": "modern",
-   "title": "MaizeGDB Image Data Center | Visual Genetics & Genomics Archive",
+   "title": "MaizeGDB Image Data Hub | Visual Genetics & Genomics Archive",
    "url": "/data_center/image_phenotype"
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -1835,7 +1896,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -1856,7 +1917,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "source",
    "http": null,
    "in_menu": false,
@@ -1877,28 +1938,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": true,
-   "kind": "controller",
-   "links_in": 4,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/insertion.php",
-   "shell_owner": "controllers/insertion.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "modern",
-   "title": "MaizeGDB Insertion Data Center | Mu, Ac/Ds & Ds-GFP Insertions",
-   "url": "/insertion"
-  },
-  {
-   "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "source",
    "http": null,
    "in_menu": false,
@@ -1919,7 +1959,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -1940,7 +1980,28 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "search",
+   "links_in": 3,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/data_center/metabolic_pathway_search.php",
+   "shell_owner": "controllers/data_center.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": "MaizeGDB metabolic_pathway Search Page",
+   "url": "/data_center/metabolic_pathway"
+  },
+  {
+   "also": [],
+   "category": "Data hubs",
    "evidence": "source",
    "http": null,
    "in_menu": false,
@@ -1961,7 +2022,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -1982,7 +2043,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -2003,7 +2064,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -2024,7 +2085,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -2033,19 +2094,19 @@
    "notes": [],
    "probe_error": null,
    "probed": true,
-   "serves": "controllers/data_center/metabolic_pathway_search.php",
+   "serves": "controllers/data_center/qtl-data_search.php",
    "shell_owner": "controllers/data_center.php",
    "static_markers": [
     "legacy_shell"
    ],
    "static_status": "legacy",
    "status": "legacy",
-   "title": "MaizeGDB metabolic_pathway Search Page",
-   "url": "/data_center/metabolic_pathway"
+   "title": "MaizeGDB qtl-data Search Page",
+   "url": "/data_center/qtl-data"
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "source",
    "http": null,
    "in_menu": false,
@@ -2066,7 +2127,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -2087,7 +2148,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -2108,7 +2169,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -2124,12 +2185,12 @@
    ],
    "static_status": "legacy",
    "status": "modern",
-   "title": "MaizeGDB Image Data Center | Visual Genetics & Genomics Archive",
+   "title": "MaizeGDB Image Data Hub | Visual Genetics & Genomics Archive",
    "url": "/data_center/image_mutant"
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -2145,12 +2206,12 @@
    ],
    "static_status": "legacy",
    "status": "modern",
-   "title": "MaizeGDB Image Data Center | Visual Genetics & Genomics Archive",
+   "title": "MaizeGDB Image Data Hub | Visual Genetics & Genomics Archive",
    "url": "/data_center/image_species"
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -2166,12 +2227,12 @@
    ],
    "static_status": "legacy",
    "status": "modern",
-   "title": "MaizeGDB Image Data Center | Visual Genetics & Genomics Archive",
+   "title": "MaizeGDB Image Data Hub | Visual Genetics & Genomics Archive",
    "url": "/data_center/image_trait"
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -2192,7 +2253,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -2213,7 +2274,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -2234,7 +2295,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -2255,28 +2316,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": false,
-   "kind": "search",
-   "links_in": 1,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/data_center/qtl-data_search.php",
-   "shell_owner": "controllers/data_center.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "MaizeGDB qtl-data Search Page",
-   "url": "/data_center/qtl-data"
-  },
-  {
-   "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -2297,7 +2337,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -2318,7 +2358,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "source",
    "http": null,
    "in_menu": false,
@@ -2339,7 +2379,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "source",
    "http": null,
    "in_menu": false,
@@ -2360,7 +2400,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -2381,7 +2421,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -2402,7 +2442,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -2423,7 +2463,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -2439,12 +2479,12 @@
    ],
    "static_status": "legacy",
    "status": "legacy",
-   "title": "MaizeGDB Insertion Data Center",
+   "title": "MaizeGDB Insertion Data Hub",
    "url": "/insertion/insertion"
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "source",
    "http": null,
    "in_menu": false,
@@ -2465,7 +2505,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -2486,7 +2526,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -2507,7 +2547,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -2528,7 +2568,7 @@
   },
   {
    "also": [],
-   "category": "Data centers",
+   "category": "Data hubs",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
@@ -2554,7 +2594,7 @@
    "http": 200,
    "in_menu": true,
    "kind": "search",
-   "links_in": 35,
+   "links_in": 70,
    "notes": [],
    "probe_error": null,
    "probed": true,
@@ -2575,7 +2615,7 @@
    "http": 200,
    "in_menu": true,
    "kind": "search",
-   "links_in": 10,
+   "links_in": 18,
    "notes": [
     "modern page swapped in by a guard"
    ],
@@ -2600,7 +2640,7 @@
    "http": null,
    "in_menu": false,
    "kind": "record",
-   "links_in": 8,
+   "links_in": 17,
    "notes": [
     "modern page swapped in by a guard"
    ],
@@ -2625,7 +2665,7 @@
    "http": 200,
    "in_menu": false,
    "kind": "controller",
-   "links_in": 4,
+   "links_in": 10,
    "notes": [],
    "probe_error": null,
    "probed": true,
@@ -2646,7 +2686,7 @@
    "http": 200,
    "in_menu": false,
    "kind": "controller",
-   "links_in": 4,
+   "links_in": 7,
    "notes": [],
    "probe_error": null,
    "probed": true,
@@ -2667,7 +2707,7 @@
    "http": null,
    "in_menu": false,
    "kind": "record",
-   "links_in": 2,
+   "links_in": 4,
    "notes": [],
    "probe_error": null,
    "probed": false,
@@ -2709,7 +2749,26 @@
    "http": 200,
    "in_menu": true,
    "kind": "controller",
-   "links_in": 19,
+   "links_in": 170,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/genomebrowser.php",
+   "shell_owner": "controllers/genomebrowser.php",
+   "static_markers": [],
+   "static_status": "legacy",
+   "status": "modern",
+   "title": "Genome Browser Data Hub | JBrowse 2, JBrowse & Synteny",
+   "url": "/genomebrowser"
+  },
+  {
+   "also": [],
+   "category": "Genome",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "controller",
+   "links_in": 34,
    "notes": [
     "routed by a guard in controllers/genome.php"
    ],
@@ -2728,38 +2787,13 @@
    "url": "/genome"
   },
   {
-   "also": [
-    "/genome/assembly"
-   ],
+   "also": [],
    "category": "Genome",
    "evidence": "probe",
    "http": 200,
    "in_menu": true,
    "kind": "page",
-   "links_in": 9,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/genome/assembly.php",
-   "shell_owner": "controllers/genome.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "MaizeGDB Reference Assembly Information",
-   "url": "/assembly"
-  },
-  {
-   "also": [
-    "/whole_genome"
-   ],
-   "category": "Genome",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": true,
-   "kind": "page",
-   "links_in": 7,
+   "links_in": 5,
    "notes": [],
    "probe_error": null,
    "probed": true,
@@ -2769,37 +2803,12 @@
     "legacy_shell"
    ],
    "static_status": "legacy",
-   "status": "legacy",
-   "title": "Whole Genome Views",
+   "status": "modern",
+   "title": "Whole Genome Views & Chromosome Visualizer | MaizeGDB",
    "url": "/genome/whole_genome"
   },
   {
-   "also": [
-    "/genome/NAM_project"
-   ],
-   "category": "Genome",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": true,
-   "kind": "page",
-   "links_in": 6,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/genome/NAM_project.php",
-   "shell_owner": "controllers/genome.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "NAM Parent Genome Assembly Project",
-   "url": "/NAM_project"
-  },
-  {
-   "also": [
-    "/genome/14InbredsFISH"
-   ],
+   "also": [],
    "category": "Genome",
    "evidence": "probe",
    "http": 200,
@@ -2809,153 +2818,40 @@
    "notes": [],
    "probe_error": null,
    "probed": true,
-   "serves": "controllers/genome/14InbredsFISH.php",
+   "serves": "controllers/genome/jbrowse2_tutorial.php",
    "shell_owner": "controllers/genome.php",
    "static_markers": [
     "legacy_shell"
    ],
    "static_status": "legacy",
-   "status": "legacy",
-   "title": "Welcome to MaizeGDB",
-   "url": "/14InbredsFISH"
+   "status": "modern",
+   "title": "JBrowse 2 Interactive Tutorial & User Guide | MaizeGDB",
+   "url": "/genome/jbrowse2_tutorial"
   },
   {
-   "also": [
-    "/genome/HiLo_project"
-   ],
-   "category": "Genome",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": true,
-   "kind": "page",
-   "links_in": 4,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/genome/HiLo_project.php",
-   "shell_owner": "controllers/genome.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "Highland/lowland Project",
-   "url": "/HiLo_project"
-  },
-  {
-   "also": [
-    "/genome/PanAnd_project"
-   ],
-   "category": "Genome",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": true,
-   "kind": "page",
-   "links_in": 4,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/genome/PanAnd_project.php",
-   "shell_owner": "controllers/genome.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "Pan-Andropogoneae Project",
-   "url": "/PanAnd_project"
-  },
-  {
-   "also": [
-    "/genome/genomebrowser"
-   ],
+   "also": [],
    "category": "Genome",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
    "kind": "page",
-   "links_in": 4,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/genome/genomebrowser.php",
-   "shell_owner": "controllers/genome.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "MaizeGDB Genome Browsers",
-   "url": "/genomebrowser"
-  },
-  {
-   "also": [
-    "/genome/B73Mo17FISH"
-   ],
-   "category": "Genome",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": true,
-   "kind": "page",
-   "links_in": 3,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/genome/B73Mo17FISH.php",
-   "shell_owner": "controllers/genome.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "Welcome to MaizeGDB",
-   "url": "/B73Mo17FISH"
-  },
-  {
-   "also": [
-    "/genome/european_flints"
-   ],
-   "category": "Genome",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": true,
-   "kind": "page",
-   "links_in": 3,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/genome/european_flints.php",
-   "shell_owner": "controllers/genome.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "European Flint Project",
-   "url": "/european_flints"
-  },
-  {
-   "also": [
-    "/genome/amaizing_project"
-   ],
-   "category": "Genome",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": true,
-   "kind": "page",
    "links_in": 2,
-   "notes": [],
+   "notes": [
+    "modern page swapped in by a guard"
+   ],
    "probe_error": null,
    "probed": true,
-   "serves": "controllers/genome/amaizing_project.php",
-   "shell_owner": "controllers/genome.php",
+   "serves": "controllers/genome/assembly_modern.php",
+   "shell_owner": "controllers/genome/assembly_modern.php",
    "static_markers": [
-    "legacy_shell"
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
    ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "AMAIZING Project",
-   "url": "/amaizing_project"
+   "static_status": "modern",
+   "status": "modern",
+   "title": "B73 Maize Genome Assembly | Versions, Annotations & Downloads",
+   "url": "/genome/assembly"
   },
   {
    "also": [
@@ -2981,73 +2877,29 @@
    "url": "/genome/genome"
   },
   {
-   "also": [
-    "/jbrowse2_tutorial"
-   ],
+   "also": [],
    "category": "Genome",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
    "kind": "page",
    "links_in": 1,
-   "notes": [],
+   "notes": [
+    "modern page swapped in by a guard"
+   ],
    "probe_error": null,
    "probed": true,
-   "serves": "controllers/genome/jbrowse2_tutorial.php",
-   "shell_owner": "controllers/genome.php",
+   "serves": "controllers/genome/genomebrowser_modern.php",
+   "shell_owner": "controllers/genome/genomebrowser_modern.php",
    "static_markers": [
-    "legacy_shell"
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
    ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "MaizeGDB JBrowse2 tutorial",
-   "url": "/genome/jbrowse2_tutorial"
-  },
-  {
-   "also": [
-    "/genome/historic"
-   ],
-   "category": "Genome",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": false,
-   "kind": "page",
-   "links_in": 1,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/genome/historic.php",
-   "shell_owner": "controllers/genome.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "MaizeGDB Historic Assembly Information",
-   "url": "/historic"
-  },
-  {
-   "also": [
-    "/genome/CAAS_FIL_project"
-   ],
-   "category": "Genome",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": false,
-   "kind": "page",
-   "links_in": 0,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/genome/CAAS_FIL_project.php",
-   "shell_owner": "controllers/genome.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "CAAS 12 Founder Inbred Lines Project",
-   "url": "/CAAS_FIL_project"
+   "static_status": "modern",
+   "status": "modern",
+   "title": "Genome Browser Data Hub | JBrowse 2, JBrowse & Synteny",
+   "url": "/genome/genomebrowser"
   },
   {
    "also": [
@@ -3078,6 +2930,195 @@
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
+   "kind": "page",
+   "links_in": 0,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/genome/14InbredsFISH.php",
+   "shell_owner": "controllers/genome.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "modern",
+   "title": "Maize FISH Chromosome Karyotype Gallery | MaizeGDB",
+   "url": "/genome/14InbredsFISH"
+  },
+  {
+   "also": [],
+   "category": "Genome",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": false,
+   "kind": "page",
+   "links_in": 0,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/genome/B73Mo17FISH.php",
+   "shell_owner": "controllers/genome.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "modern",
+   "title": "Maize FISH Chromosome Karyotype Gallery | MaizeGDB",
+   "url": "/genome/B73Mo17FISH"
+  },
+  {
+   "also": [],
+   "category": "Genome",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": false,
+   "kind": "page",
+   "links_in": 0,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/genome/CAAS_FIL_project.php",
+   "shell_owner": "controllers/genome.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "modern",
+   "title": "CAAS 12 Founder Inbred Lines Project | MaizeGDB",
+   "url": "/genome/CAAS_FIL_project"
+  },
+  {
+   "also": [],
+   "category": "Genome",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": false,
+   "kind": "page",
+   "links_in": 0,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/genome/HiLo_project.php",
+   "shell_owner": "controllers/genome.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "modern",
+   "title": "High & Low Elevation Maize Genomes (HiLo) | MaizeGDB",
+   "url": "/genome/HiLo_project"
+  },
+  {
+   "also": [],
+   "category": "Genome",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": false,
+   "kind": "page",
+   "links_in": 0,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/genome/NAM_project.php",
+   "shell_owner": "controllers/genome.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "modern",
+   "title": "NAM Parent Genome Assembly Project | MaizeGDB",
+   "url": "/genome/NAM_project"
+  },
+  {
+   "also": [],
+   "category": "Genome",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": false,
+   "kind": "page",
+   "links_in": 0,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/genome/PanAnd_project.php",
+   "shell_owner": "controllers/genome.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "modern",
+   "title": "Pan-Andropogoneae Genomes Project | MaizeGDB",
+   "url": "/genome/PanAnd_project"
+  },
+  {
+   "also": [],
+   "category": "Genome",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": false,
+   "kind": "page",
+   "links_in": 0,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/genome/amaizing_project.php",
+   "shell_owner": "controllers/genome.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "modern",
+   "title": "AMAIZING European Maize Genomes Project | MaizeGDB",
+   "url": "/genome/amaizing_project"
+  },
+  {
+   "also": [],
+   "category": "Genome",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": false,
+   "kind": "page",
+   "links_in": 0,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/genome/european_flints.php",
+   "shell_owner": "controllers/genome.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "modern",
+   "title": "European Flint Reference Genomes Project | MaizeGDB",
+   "url": "/genome/european_flints"
+  },
+  {
+   "also": [],
+   "category": "Genome",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": false,
+   "kind": "page",
+   "links_in": 0,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/genome/historic.php",
+   "shell_owner": "controllers/genome.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "modern",
+   "title": "Historic B73 Genome Assembly Information | MaizeGDB",
+   "url": "/genome/historic"
+  },
+  {
+   "also": [],
+   "category": "Genome",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": false,
    "kind": "fallback",
    "links_in": 0,
    "notes": [],
@@ -3100,7 +3141,7 @@
    "http": 200,
    "in_menu": true,
    "kind": "fallback",
-   "links_in": 149,
+   "links_in": 150,
    "notes": [],
    "probe_error": null,
    "probed": true,
@@ -3113,6 +3154,27 @@
    "status": "legacy",
    "title": "MaizeGDB BinViewer",
    "url": "/bin_viewer"
+  },
+  {
+   "also": [],
+   "category": "Tools",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": false,
+   "kind": "fallback",
+   "links_in": 34,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/tools/compare_maps.php",
+   "shell_owner": "redirect.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": "Welcome to MaizeGDB",
+   "url": "/compare_maps"
   },
   {
    "also": [],
@@ -3161,30 +3223,9 @@
    "category": "Tools",
    "evidence": "probe",
    "http": 200,
-   "in_menu": false,
-   "kind": "fallback",
-   "links_in": 20,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/tools/compare_maps.php",
-   "shell_owner": "redirect.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "Welcome to MaizeGDB",
-   "url": "/compare_maps"
-  },
-  {
-   "also": [],
-   "category": "Tools",
-   "evidence": "probe",
-   "http": 200,
    "in_menu": true,
    "kind": "fallback",
-   "links_in": 12,
+   "links_in": 13,
    "notes": [],
    "probe_error": null,
    "probed": true,
@@ -3203,9 +3244,9 @@
    "category": "Tools",
    "evidence": "probe",
    "http": 200,
-   "in_menu": false,
+   "in_menu": true,
    "kind": "fallback",
-   "links_in": 10,
+   "links_in": 11,
    "notes": [],
    "probe_error": null,
    "probed": true,
@@ -3289,6 +3330,27 @@
    "http": 200,
    "in_menu": true,
    "kind": "fallback",
+   "links_in": 8,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/tools/stock_catalog.php",
+   "shell_owner": "redirect.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": "Maize Genetics Cooperation Stock Center Catalog of Stocks - New Additions",
+   "url": "/stock_catalog"
+  },
+  {
+   "also": [],
+   "category": "Tools",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "fallback",
    "links_in": 7,
    "notes": [],
    "probe_error": null,
@@ -3308,21 +3370,21 @@
    "category": "Tools",
    "evidence": "probe",
    "http": 200,
-   "in_menu": false,
+   "in_menu": true,
    "kind": "fallback",
    "links_in": 7,
    "notes": [],
    "probe_error": null,
    "probed": true,
-   "serves": "controllers/tools/stock_catalog.php",
+   "serves": "controllers/tools/ssrreports.php",
    "shell_owner": "redirect.php",
    "static_markers": [
     "legacy_shell"
    ],
    "static_status": "legacy",
    "status": "legacy",
-   "title": "Maize Genetics Cooperation Stock Center Catalog of Stocks - New Additions",
-   "url": "/stock_catalog"
+   "title": "Welcome to MaizeGDB",
+   "url": "/ssrreports"
   },
   {
    "also": [],
@@ -3350,13 +3412,13 @@
    "category": "Tools",
    "evidence": "probe",
    "http": 200,
-   "in_menu": false,
+   "in_menu": true,
    "kind": "fallback",
-   "links_in": 6,
+   "links_in": 5,
    "notes": [],
    "probe_error": null,
    "probed": true,
-   "serves": "controllers/tools/ssrreports.php",
+   "serves": "controllers/tools/fatcat.php",
    "shell_owner": "redirect.php",
    "static_markers": [
     "legacy_shell"
@@ -3364,7 +3426,28 @@
    "static_status": "legacy",
    "status": "legacy",
    "title": "Welcome to MaizeGDB",
-   "url": "/ssrreports"
+   "url": "/fatcat"
+  },
+  {
+   "also": [],
+   "category": "Tools",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": false,
+   "kind": "fallback",
+   "links_in": 5,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/tools/new_genes.php",
+   "shell_owner": "redirect.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": null,
+   "url": "/new_genes"
   },
   {
    "also": [],
@@ -3392,7 +3475,7 @@
    "category": "Tools",
    "evidence": "probe",
    "http": 200,
-   "in_menu": false,
+   "in_menu": true,
    "kind": "fallback",
    "links_in": 5,
    "notes": [],
@@ -3440,48 +3523,6 @@
    "notes": [],
    "probe_error": null,
    "probed": true,
-   "serves": "controllers/tools/fatcat.php",
-   "shell_owner": "redirect.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "Welcome to MaizeGDB",
-   "url": "/fatcat"
-  },
-  {
-   "also": [],
-   "category": "Tools",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": true,
-   "kind": "fallback",
-   "links_in": 4,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/tools/new_genes.php",
-   "shell_owner": "redirect.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": null,
-   "url": "/new_genes"
-  },
-  {
-   "also": [],
-   "category": "Tools",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": false,
-   "kind": "fallback",
-   "links_in": 3,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
    "serves": "controllers/tools/locus_lookup.php",
    "shell_owner": "redirect.php",
    "static_markers": [
@@ -3499,7 +3540,7 @@
    "http": 200,
    "in_menu": false,
    "kind": "fallback",
-   "links_in": 3,
+   "links_in": 4,
    "notes": [],
    "probe_error": null,
    "probed": true,
@@ -3518,30 +3559,9 @@
    "category": "Tools",
    "evidence": "probe",
    "http": 200,
-   "in_menu": false,
+   "in_menu": true,
    "kind": "fallback",
-   "links_in": 2,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/tools/download.php",
-   "shell_owner": "redirect.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "MaizeGDB Downloads",
-   "url": "/download"
-  },
-  {
-   "also": [],
-   "category": "Tools",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": false,
-   "kind": "fallback",
-   "links_in": 2,
+   "links_in": 3,
    "notes": [],
    "probe_error": null,
    "probed": true,
@@ -3560,9 +3580,9 @@
    "category": "Tools",
    "evidence": "probe",
    "http": 200,
-   "in_menu": false,
+   "in_menu": true,
    "kind": "fallback",
-   "links_in": 2,
+   "links_in": 3,
    "notes": [],
    "probe_error": null,
    "probed": true,
@@ -3581,9 +3601,9 @@
    "category": "Tools",
    "evidence": "probe",
    "http": 200,
-   "in_menu": false,
+   "in_menu": true,
    "kind": "fallback",
-   "links_in": 2,
+   "links_in": 3,
    "notes": [],
    "probe_error": null,
    "probed": true,
@@ -3665,6 +3685,27 @@
    "category": "Tools",
    "evidence": "probe",
    "http": 200,
+   "in_menu": true,
+   "kind": "fallback",
+   "links_in": 1,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/tools/gbrowse.php",
+   "shell_owner": "redirect.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": "Welcome to MaizeGDB",
+   "url": "/gbrowse"
+  },
+  {
+   "also": [],
+   "category": "Tools",
+   "evidence": "probe",
+   "http": 200,
    "in_menu": false,
    "kind": "fallback",
    "links_in": 1,
@@ -3728,6 +3769,48 @@
    "category": "Tools",
    "evidence": "probe",
    "http": 200,
+   "in_menu": true,
+   "kind": "fallback",
+   "links_in": 1,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/tools/mapman.php",
+   "shell_owner": "redirect.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": "MaizeGDB Addons for MapMan",
+   "url": "/mapman"
+  },
+  {
+   "also": [],
+   "category": "Tools",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "fallback",
+   "links_in": 1,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/tools/mapman_two_tissue_comp.php",
+   "shell_owner": "redirect.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": "Welcome to MaizeGDB",
+   "url": "/mapman_two_tissue_comp"
+  },
+  {
+   "also": [],
+   "category": "Tools",
+   "evidence": "probe",
+   "http": 200,
    "in_menu": false,
    "kind": "fallback",
    "links_in": 0,
@@ -3785,69 +3868,6 @@
    "status": "legacy",
    "title": "Welcome to MaizeGDB",
    "url": "/fcfair"
-  },
-  {
-   "also": [],
-   "category": "Tools",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": false,
-   "kind": "fallback",
-   "links_in": 0,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/tools/gbrowse.php",
-   "shell_owner": "redirect.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "Welcome to MaizeGDB",
-   "url": "/gbrowse"
-  },
-  {
-   "also": [],
-   "category": "Tools",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": false,
-   "kind": "fallback",
-   "links_in": 0,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/tools/mapman.php",
-   "shell_owner": "redirect.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "MaizeGDB Addons for MapMan",
-   "url": "/mapman"
-  },
-  {
-   "also": [],
-   "category": "Tools",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": false,
-   "kind": "fallback",
-   "links_in": 0,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/tools/mapman_two_tissue_comp.php",
-   "shell_owner": "redirect.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "Welcome to MaizeGDB",
-   "url": "/mapman_two_tissue_comp"
   },
   {
    "also": [],
@@ -3940,7 +3960,7 @@
    "http": 200,
    "in_menu": true,
    "kind": "home",
-   "links_in": 113,
+   "links_in": 136,
    "notes": [],
    "probe_error": null,
    "probed": true,
@@ -3963,7 +3983,7 @@
    "http": 200,
    "in_menu": true,
    "kind": "controller",
-   "links_in": 27,
+   "links_in": 29,
    "notes": [],
    "probe_error": null,
    "probed": true,
@@ -3988,7 +4008,7 @@
    "http": 200,
    "in_menu": true,
    "kind": "page",
-   "links_in": 18,
+   "links_in": 25,
    "notes": [
     "modern page swapped in by a guard"
    ],
@@ -4013,7 +4033,7 @@
    "http": 200,
    "in_menu": true,
    "kind": "controller",
-   "links_in": 14,
+   "links_in": 24,
    "notes": [],
    "probe_error": null,
    "probed": true,
@@ -4034,9 +4054,74 @@
    "category": "Information pages",
    "evidence": "probe",
    "http": 200,
+   "in_menu": true,
+   "kind": "controller",
+   "links_in": 17,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/NAM_project.php",
+   "shell_owner": "controllers/NAM_project.php",
+   "static_markers": [
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
+   ],
+   "static_status": "modern",
+   "status": "modern",
+   "title": "NAM Parent Genome Assembly Project | MaizeGDB",
+   "url": "/NAM_project"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "controller",
+   "links_in": 16,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/assembly.php",
+   "shell_owner": "controllers/assembly.php",
+   "static_markers": [],
+   "static_status": "legacy",
+   "status": "modern",
+   "title": "B73 Maize Genome Assembly | Versions, Annotations & Downloads",
+   "url": "/assembly"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "controller",
+   "links_in": 14,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/genetic_variation.php",
+   "shell_owner": "controllers/genetic_variation.php",
+   "static_markers": [
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
+   ],
+   "static_status": "modern",
+   "status": "modern",
+   "title": "MaizeGDB Genetic Variation | SNPs, Indels & Diversity Data Hub",
+   "url": "/genetic_variation"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
    "in_menu": false,
    "kind": "controller",
-   "links_in": 12,
+   "links_in": 14,
    "notes": [],
    "probe_error": null,
    "probed": true,
@@ -4058,20 +4143,173 @@
    "evidence": "probe",
    "http": 200,
    "in_menu": true,
-   "kind": "fallback",
-   "links_in": 8,
+   "kind": "controller",
+   "links_in": 13,
    "notes": [],
    "probe_error": null,
    "probed": true,
-   "serves": "controllers/static/expression.php",
+   "serves": "controllers/download.php",
+   "shell_owner": "controllers/download.php",
+   "static_markers": [],
+   "static_status": "legacy",
+   "status": "modern",
+   "title": "Bulk Downloads & Globus Data Portal | MaizeGDB",
+   "url": "/download"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "controller",
+   "links_in": 11,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/PanAnd_project.php",
+   "shell_owner": "controllers/PanAnd_project.php",
+   "static_markers": [
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
+   ],
+   "static_status": "modern",
+   "status": "modern",
+   "title": "Pan-Andropogoneae Genomes Project | MaizeGDB",
+   "url": "/PanAnd_project"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "controller",
+   "links_in": 11,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/ai.php",
+   "shell_owner": "controllers/ai.php",
+   "static_markers": [
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
+   ],
+   "static_status": "modern",
+   "status": "modern",
+   "title": "AI and Machine Learning Resources | MaizeGDB",
+   "url": "/ai"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "controller",
+   "links_in": 11,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/expression.php",
+   "shell_owner": "controllers/expression.php",
+   "static_markers": [],
+   "static_status": "legacy",
+   "status": "modern",
+   "title": "MaizeGDB Expression Data Hub | RNA-seq Atlases, qTeller & Transcriptomics",
+   "url": "/expression"
+  },
+  {
+   "also": [
+    "/about/whatsnew"
+   ],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "page",
+   "links_in": 10,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/about/whatsnew.php",
+   "shell_owner": "controllers/about.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": "Welcome to MaizeGDB",
+   "url": "/whatsnew"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "fallback",
+   "links_in": 9,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/static/metabolic_pathways.php",
    "shell_owner": "redirect.php",
    "static_markers": [
     "legacy_shell"
    ],
    "static_status": "legacy",
    "status": "legacy",
-   "title": "Expression Data at MaizeGDB",
-   "url": "/expression"
+   "title": "MaizeGDB Metabolic Pathways",
+   "url": "/metabolic_pathways"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "controller",
+   "links_in": 7,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/TYPSimSelector.php",
+   "shell_owner": "controllers/TYPSimSelector.php",
+   "static_markers": [
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
+   ],
+   "static_status": "modern",
+   "status": "modern",
+   "title": "TYPSimSelector: rank maize accessions by genetic similarity | MaizeGDB",
+   "url": "/TYPSimSelector"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "controller",
+   "links_in": 7,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/european_flints.php",
+   "shell_owner": "controllers/european_flints.php",
+   "static_markers": [
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
+   ],
+   "static_status": "modern",
+   "status": "modern",
+   "title": "European Flint Reference Genomes Project | MaizeGDB",
+   "url": "/european_flints"
   },
   {
    "also": [],
@@ -4100,89 +4338,43 @@
    "evidence": "probe",
    "http": 200,
    "in_menu": true,
-   "kind": "fallback",
-   "links_in": 7,
+   "kind": "controller",
+   "links_in": 6,
    "notes": [],
    "probe_error": null,
    "probed": true,
-   "serves": "controllers/static/metabolic_pathways.php",
+   "serves": "controllers/14InbredsFISH.php",
+   "shell_owner": "controllers/14InbredsFISH.php",
+   "static_markers": [
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
+   ],
+   "static_status": "modern",
+   "status": "modern",
+   "title": "Maize FISH Chromosome Karyotype Gallery | MaizeGDB",
+   "url": "/14InbredsFISH"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "fallback",
+   "links_in": 6,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/static/coordinateDef.php",
    "shell_owner": "redirect.php",
    "static_markers": [
     "legacy_shell"
    ],
    "static_status": "legacy",
    "status": "legacy",
-   "title": "MaizeGDB Metabolic Pathways",
-   "url": "/metabolic_pathways"
-  },
-  {
-   "also": [
-    "/about/whatsnew"
-   ],
-   "category": "Information pages",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": true,
-   "kind": "page",
-   "links_in": 7,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/about/whatsnew.php",
-   "shell_owner": "controllers/about.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
    "title": "Welcome to MaizeGDB",
-   "url": "/whatsnew"
-  },
-  {
-   "also": [],
-   "category": "Information pages",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": true,
-   "kind": "controller",
-   "links_in": 6,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/TYPSimSelector.php",
-   "shell_owner": "controllers/TYPSimSelector.php",
-   "static_markers": [
-    "modern_shell",
-    "design_system",
-    "modern_chrome"
-   ],
-   "static_status": "modern",
-   "status": "modern",
-   "title": "TYPSimSelector: rank maize accessions by genetic similarity | MaizeGDB",
-   "url": "/TYPSimSelector"
-  },
-  {
-   "also": [],
-   "category": "Information pages",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": true,
-   "kind": "controller",
-   "links_in": 6,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/ai.php",
-   "shell_owner": "controllers/ai.php",
-   "static_markers": [
-    "modern_shell",
-    "design_system",
-    "modern_chrome"
-   ],
-   "static_status": "modern",
-   "status": "modern",
-   "title": "AI and Machine Learning Resources | MaizeGDB",
-   "url": "/ai"
+   "url": "/coordinateDef"
   },
   {
    "also": [
@@ -4209,6 +4401,31 @@
   },
   {
    "also": [
+    "/annotator"
+   ],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": false,
+   "kind": "controller",
+   "links_in": 5,
+   "notes": [
+    "aliased in controller.php to controllers/community.php"
+   ],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/community.php",
+   "shell_owner": "controllers/community.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": "Welcome to MaizeGDB",
+   "url": "/community"
+  },
+  {
+   "also": [
     "/about/faq"
    ],
    "category": "Information pages",
@@ -4216,7 +4433,7 @@
    "http": 200,
    "in_menu": true,
    "kind": "page",
-   "links_in": 6,
+   "links_in": 5,
    "notes": [],
    "probe_error": null,
    "probed": true,
@@ -4236,64 +4453,22 @@
    "evidence": "probe",
    "http": 200,
    "in_menu": true,
-   "kind": "fallback",
-   "links_in": 6,
+   "kind": "controller",
+   "links_in": 4,
    "notes": [],
    "probe_error": null,
    "probed": true,
-   "serves": "controllers/static/genetic_variation.php",
-   "shell_owner": "redirect.php",
+   "serves": "controllers/HiLo_project.php",
+   "shell_owner": "controllers/HiLo_project.php",
    "static_markers": [
-    "legacy_shell"
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
    ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "MaizeGDB SNPs and Traits",
-   "url": "/genetic_variation"
-  },
-  {
-   "also": [
-    "/working_group"
-   ],
-   "category": "Information pages",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": true,
-   "kind": "page",
-   "links_in": 5,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/about/working_group.php",
-   "shell_owner": "controllers/about.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "About MaizeGDB",
-   "url": "/about/working_group"
-  },
-  {
-   "also": [],
-   "category": "Information pages",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": false,
-   "kind": "fallback",
-   "links_in": 5,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/static/coordinateDef.php",
-   "shell_owner": "redirect.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "Welcome to MaizeGDB",
-   "url": "/coordinateDef"
+   "static_status": "modern",
+   "status": "modern",
+   "title": "High & Low Elevation Maize Genomes (HiLo) | MaizeGDB",
+   "url": "/HiLo_project"
   },
   {
    "also": [],
@@ -4318,28 +4493,66 @@
   },
   {
    "also": [
-    "/annotator"
+    "/working_group"
    ],
    "category": "Information pages",
    "evidence": "probe",
    "http": 200,
-   "in_menu": false,
-   "kind": "controller",
+   "in_menu": true,
+   "kind": "page",
    "links_in": 4,
-   "notes": [
-    "aliased in controller.php to controllers/community.php"
-   ],
+   "notes": [],
    "probe_error": null,
    "probed": true,
-   "serves": "controllers/community.php",
-   "shell_owner": "controllers/community.php",
+   "serves": "controllers/about/working_group.php",
+   "shell_owner": "controllers/about.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": "About MaizeGDB",
+   "url": "/about/working_group"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "fallback",
+   "links_in": 4,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/static/ssr_protocols.php",
+   "shell_owner": "redirect.php",
    "static_markers": [
     "legacy_shell"
    ],
    "static_status": "legacy",
    "status": "legacy",
    "title": "Welcome to MaizeGDB",
-   "url": "/community"
+   "url": "/ssr_protocols"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "controller",
+   "links_in": 3,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/B73Mo17FISH.php",
+   "shell_owner": "controllers/B73Mo17FISH.php",
+   "static_markers": [],
+   "static_status": "legacy",
+   "status": "modern",
+   "title": "Maize FISH Chromosome Karyotype Gallery | MaizeGDB",
+   "url": "/B73Mo17FISH"
   },
   {
    "also": [],
@@ -4361,8 +4574,52 @@
    ],
    "static_status": "modern",
    "status": "modern",
-   "title": "Archived Data Centers | MaizeGDB",
+   "title": "Archived Data Hubs | MaizeGDB",
    "url": "/archive"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "fallback",
+   "links_in": 3,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/static/assembly_manifesto.php",
+   "shell_owner": "redirect.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": "MaizeGDB Reference Assembly Information",
+   "url": "/assembly_manifesto"
+  },
+  {
+   "also": [
+    "/about/credit"
+   ],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "page",
+   "links_in": 3,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/about/credit.php",
+   "shell_owner": "controllers/about.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": "Welcome to MaizeGDB",
+   "url": "/credit"
   },
   {
    "also": [],
@@ -4384,6 +4641,90 @@
    "status": "legacy",
    "title": null,
    "url": "/forgot_password"
+  },
+  {
+   "also": [
+    "/about/handyref"
+   ],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "page",
+   "links_in": 3,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/about/handyref.php",
+   "shell_owner": "controllers/about.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": "Welcome to MaizeGDB",
+   "url": "/handyref"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "controller",
+   "links_in": 3,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/maize_history.php",
+   "shell_owner": "controllers/maize_history.php",
+   "static_markers": [],
+   "static_status": "legacy",
+   "status": "modern",
+   "title": "History of Maize Genetics & MaizeGDB Timelines | Community Milestones",
+   "url": "/maize_history"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "fallback",
+   "links_in": 3,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/static/mapscore_ibm302list.php",
+   "shell_owner": "redirect.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": "Welcome to MaizeGDB",
+   "url": "/mapscore_ibm302list"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "fallback",
+   "links_in": 3,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/static/mapscore_ibmlist.php",
+   "shell_owner": "redirect.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": "Welcome to MaizeGDB",
+   "url": "/mapscore_ibmlist"
   },
   {
    "also": [
@@ -4411,27 +4752,6 @@
   {
    "also": [],
    "category": "Information pages",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": false,
-   "kind": "fallback",
-   "links_in": 3,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/static/ssr_protocols.php",
-   "shell_owner": "redirect.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "Welcome to MaizeGDB",
-   "url": "/ssr_protocols"
-  },
-  {
-   "also": [],
-   "category": "Information pages",
    "evidence": "source",
    "http": null,
    "in_menu": false,
@@ -4455,67 +4775,199 @@
    "category": "Information pages",
    "evidence": "probe",
    "http": 200,
-   "in_menu": false,
+   "in_menu": true,
+   "kind": "controller",
+   "links_in": 3,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/whole_genome.php",
+   "shell_owner": "controllers/whole_genome.php",
+   "static_markers": [
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
+   ],
+   "static_status": "modern",
+   "status": "modern",
+   "title": "Whole Genome Views & Chromosome Visualizer | MaizeGDB",
+   "url": "/whole_genome"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "controller",
+   "links_in": 2,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/CAAS_FIL_project.php",
+   "shell_owner": "controllers/CAAS_FIL_project.php",
+   "static_markers": [
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
+   ],
+   "static_status": "modern",
+   "status": "modern",
+   "title": "CAAS 12 Founder Inbred Lines Project | MaizeGDB",
+   "url": "/CAAS_FIL_project"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "controller",
+   "links_in": 2,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/amaizing_project.php",
+   "shell_owner": "controllers/amaizing_project.php",
+   "static_markers": [
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
+   ],
+   "static_status": "modern",
+   "status": "modern",
+   "title": "AMAIZING European Maize Genomes Project | MaizeGDB",
+   "url": "/amaizing_project"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
    "kind": "fallback",
    "links_in": 2,
    "notes": [],
    "probe_error": null,
    "probed": true,
-   "serves": "controllers/static/assembly_manifesto.php",
+   "serves": "controllers/static/controlled_pollination.php",
    "shell_owner": "redirect.php",
    "static_markers": [
     "legacy_shell"
    ],
    "static_status": "legacy",
    "status": "legacy",
-   "title": "MaizeGDB Reference Assembly Information",
-   "url": "/assembly_manifesto"
+   "title": "Controlled Pollination of Maize",
+   "url": "/controlled_pollination"
   },
   {
-   "also": [
-    "/about/credit"
-   ],
+   "also": [],
    "category": "Information pages",
    "evidence": "probe",
    "http": 200,
-   "in_menu": false,
-   "kind": "page",
+   "in_menu": true,
+   "kind": "controller",
    "links_in": 2,
    "notes": [],
    "probe_error": null,
    "probed": true,
-   "serves": "controllers/about/credit.php",
-   "shell_owner": "controllers/about.php",
+   "serves": "controllers/historic.php",
+   "shell_owner": "controllers/historic.php",
+   "static_markers": [
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
+   ],
+   "static_status": "modern",
+   "status": "modern",
+   "title": "Historic B73 Genome Assembly Information | MaizeGDB",
+   "url": "/historic"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": false,
+   "kind": "fallback",
+   "links_in": 2,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/static/mapscore_ibm302score.php",
+   "shell_owner": "redirect.php",
    "static_markers": [
     "legacy_shell"
    ],
    "static_status": "legacy",
    "status": "legacy",
    "title": "Welcome to MaizeGDB",
-   "url": "/credit"
+   "url": "/mapscore_ibm302score"
   },
   {
-   "also": [
-    "/about/handyref"
-   ],
+   "also": [],
    "category": "Information pages",
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
-   "kind": "page",
+   "kind": "fallback",
    "links_in": 2,
    "notes": [],
    "probe_error": null,
    "probed": true,
-   "serves": "controllers/about/handyref.php",
-   "shell_owner": "controllers/about.php",
+   "serves": "controllers/static/mapscore_ibm94genoscore.php",
+   "shell_owner": "redirect.php",
    "static_markers": [
     "legacy_shell"
    ],
    "static_status": "legacy",
    "status": "legacy",
    "title": "Welcome to MaizeGDB",
-   "url": "/handyref"
+   "url": "/mapscore_ibm94genoscore"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": false,
+   "kind": "fallback",
+   "links_in": 2,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/static/mapscore_ibmscore.php",
+   "shell_owner": "redirect.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": "Welcome to MaizeGDB",
+   "url": "/mapscore_ibmscore"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "controller",
+   "links_in": 2,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/redesign_status.php",
+   "shell_owner": "controllers/redesign_status.php",
+   "static_markers": [
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
+   ],
+   "static_status": "modern",
+   "status": "modern",
+   "title": "Redesign status | MaizeGDB",
+   "url": "/redesign_status"
   },
   {
    "also": [
@@ -4539,27 +4991,6 @@
    "status": "legacy",
    "title": "Welcome to MaizeGDB",
    "url": "/steering"
-  },
-  {
-   "also": [],
-   "category": "Information pages",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": false,
-   "kind": "fallback",
-   "links_in": 1,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/static/controlled_pollination.php",
-   "shell_owner": "redirect.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "Controlled Pollination of Maize",
-   "url": "/controlled_pollination"
   },
   {
    "also": [],
@@ -4606,105 +5037,21 @@
    "category": "Information pages",
    "evidence": "probe",
    "http": 200,
-   "in_menu": false,
+   "in_menu": true,
    "kind": "fallback",
    "links_in": 1,
    "notes": [],
    "probe_error": null,
    "probed": true,
-   "serves": "controllers/static/mapscore_ibm302list.php",
+   "serves": "controllers/static/maize_meeting_coverart.php",
    "shell_owner": "redirect.php",
    "static_markers": [
     "legacy_shell"
    ],
    "static_status": "legacy",
    "status": "legacy",
-   "title": "Welcome to MaizeGDB",
-   "url": "/mapscore_ibm302list"
-  },
-  {
-   "also": [],
-   "category": "Information pages",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": false,
-   "kind": "fallback",
-   "links_in": 1,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/static/mapscore_ibm302score.php",
-   "shell_owner": "redirect.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "Welcome to MaizeGDB",
-   "url": "/mapscore_ibm302score"
-  },
-  {
-   "also": [],
-   "category": "Information pages",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": false,
-   "kind": "fallback",
-   "links_in": 1,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/static/mapscore_ibm94genoscore.php",
-   "shell_owner": "redirect.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "Welcome to MaizeGDB",
-   "url": "/mapscore_ibm94genoscore"
-  },
-  {
-   "also": [],
-   "category": "Information pages",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": false,
-   "kind": "fallback",
-   "links_in": 1,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/static/mapscore_ibmlist.php",
-   "shell_owner": "redirect.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "Welcome to MaizeGDB",
-   "url": "/mapscore_ibmlist"
-  },
-  {
-   "also": [],
-   "category": "Information pages",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": false,
-   "kind": "fallback",
-   "links_in": 1,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/static/mapscore_ibmscore.php",
-   "shell_owner": "redirect.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "Welcome to MaizeGDB",
-   "url": "/mapscore_ibmscore"
+   "title": "Maize Meeting Cover Art",
+   "url": "/maize_meeting_coverart"
   },
   {
    "also": [],
@@ -4728,29 +5075,6 @@
    "url": "/preferences"
   },
   {
-   "also": [],
-   "category": "Information pages",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": false,
-   "kind": "controller",
-   "links_in": 1,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/redesign_status.php",
-   "shell_owner": "controllers/redesign_status.php",
-   "static_markers": [
-    "modern_shell",
-    "design_system",
-    "modern_chrome"
-   ],
-   "static_status": "modern",
-   "status": "modern",
-   "title": "Redesign status | MaizeGDB",
-   "url": "/redesign_status"
-  },
-  {
    "also": [
     "/about/site_tour"
    ],
@@ -4772,6 +5096,25 @@
    "status": "legacy",
    "title": "Welcome to MaizeGDB",
    "url": "/site_tour"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": false,
+   "kind": "controller",
+   "links_in": 1,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/timelines.php",
+   "shell_owner": "controllers/timelines.php",
+   "static_markers": [],
+   "static_status": "legacy",
+   "status": "modern",
+   "title": "History of Maize Genetics & MaizeGDB Timelines | Community Milestones",
+   "url": "/timelines"
   },
   {
    "also": [],
@@ -4928,6 +5271,25 @@
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
+   "kind": "controller",
+   "links_in": 0,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/downloads.php",
+   "shell_owner": "controllers/downloads.php",
+   "static_markers": [],
+   "static_status": "legacy",
+   "status": "modern",
+   "title": "Bulk Downloads & Globus Data Portal | MaizeGDB",
+   "url": "/downloads"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": false,
    "kind": "fallback",
    "links_in": 0,
    "notes": [],
@@ -4989,20 +5351,22 @@
    "evidence": "probe",
    "http": 200,
    "in_menu": false,
-   "kind": "fallback",
+   "kind": "controller",
    "links_in": 0,
    "notes": [],
    "probe_error": null,
    "probed": true,
-   "serves": "controllers/static/maize_meeting_coverart.php",
-   "shell_owner": "redirect.php",
+   "serves": "controllers/jbrowse2_tutorial.php",
+   "shell_owner": "controllers/jbrowse2_tutorial.php",
    "static_markers": [
-    "legacy_shell"
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
    ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "Maize Meeting Cover Art",
-   "url": "/maize_meeting_coverart"
+   "static_status": "modern",
+   "status": "modern",
+   "title": "JBrowse 2 Interactive Tutorial & User Guide | MaizeGDB",
+   "url": "/jbrowse2_tutorial"
   },
   {
    "also": [
@@ -5183,7 +5547,7 @@
    "http": 200,
    "in_menu": true,
    "kind": "search",
-   "links_in": 259,
+   "links_in": 264,
    "notes": [
     "aliased in controller.php to controllers/community.php"
    ],
@@ -5210,7 +5574,7 @@
    "http": null,
    "in_menu": false,
    "kind": "page",
-   "links_in": 64,
+   "links_in": 66,
    "notes": [],
    "probe_error": null,
    "probed": false,
@@ -5233,7 +5597,7 @@
    "http": 200,
    "in_menu": true,
    "kind": "page",
-   "links_in": 27,
+   "links_in": 28,
    "notes": [],
    "probe_error": null,
    "probed": true,
@@ -5256,7 +5620,7 @@
    "http": 200,
    "in_menu": true,
    "kind": "page",
-   "links_in": 23,
+   "links_in": 26,
    "notes": [],
    "probe_error": null,
    "probed": true,
@@ -5279,7 +5643,7 @@
    "http": 200,
    "in_menu": true,
    "kind": "page",
-   "links_in": 16,
+   "links_in": 19,
    "notes": [],
    "probe_error": null,
    "probed": true,
@@ -5302,7 +5666,7 @@
    "http": 200,
    "in_menu": true,
    "kind": "page",
-   "links_in": 14,
+   "links_in": 19,
    "notes": [],
    "probe_error": null,
    "probed": true,
@@ -5317,6 +5681,29 @@
    "status": "modern",
    "title": "Maize Genetics Nomenclature | MaizeGDB",
    "url": "/nomenclature"
+  },
+  {
+   "also": [
+    "/awards"
+   ],
+   "category": "Community",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "page",
+   "links_in": 9,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/community/awards.php",
+   "shell_owner": "controllers/community.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": "Maize Genetics Cooperation - Awards",
+   "url": "/community/awards"
   },
   {
    "also": [
@@ -5340,50 +5727,6 @@
    "status": "legacy",
    "title": "Welcome to MaizeGDB",
    "url": "/mnl"
-  },
-  {
-   "also": [
-    "/awards"
-   ],
-   "category": "Community",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": false,
-   "kind": "page",
-   "links_in": 8,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/community/awards.php",
-   "shell_owner": "controllers/community.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "Maize Genetics Cooperation - Awards",
-   "url": "/community/awards"
-  },
-  {
-   "also": [
-    "/community/maize_history"
-   ],
-   "category": "Community",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": true,
-   "kind": "page",
-   "links_in": 7,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/community/maize_history.php",
-   "shell_owner": "controllers/community/maize_history.php",
-   "static_markers": [],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "Maize History",
-   "url": "/maize_history"
   },
   {
    "also": [
@@ -5433,6 +5776,29 @@
   },
   {
    "also": [
+    "/community/nomenclature_summary"
+   ],
+   "category": "Community",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "page",
+   "links_in": 5,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/community/nomenclature_summary.php",
+   "shell_owner": "controllers/community.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": "Maize Assembly and Annotation Nomenclature",
+   "url": "/nomenclature_summary"
+  },
+  {
+   "also": [
     "/community/FAIRpractices"
    ],
    "category": "Community",
@@ -5440,7 +5806,7 @@
    "http": 200,
    "in_menu": true,
    "kind": "page",
-   "links_in": 3,
+   "links_in": 4,
    "notes": [],
    "probe_error": null,
    "probed": true,
@@ -5457,27 +5823,29 @@
    "url": "/FAIRpractices"
   },
   {
-   "also": [
-    "/community/nomenclature_summary"
-   ],
+   "also": [],
    "category": "Community",
    "evidence": "probe",
    "http": 200,
-   "in_menu": true,
+   "in_menu": false,
    "kind": "page",
-   "links_in": 3,
-   "notes": [],
+   "links_in": 4,
+   "notes": [
+    "modern page swapped in by a guard"
+   ],
    "probe_error": null,
    "probed": true,
-   "serves": "controllers/community/nomenclature_summary.php",
-   "shell_owner": "controllers/community.php",
+   "serves": "controllers/community/maize_history_modern.php",
+   "shell_owner": "controllers/community/maize_history_modern.php",
    "static_markers": [
-    "legacy_shell"
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
    ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "Maize Assembly and Annotation Nomenclature",
-   "url": "/nomenclature_summary"
+   "static_status": "modern",
+   "status": "modern",
+   "title": "History of Maize Genetics & MaizeGDB Timelines | Community Milestones",
+   "url": "/community/maize_history"
   },
   {
    "also": [
@@ -5504,6 +5872,98 @@
   },
   {
    "also": [
+    "/community/classic_reads"
+   ],
+   "category": "Community",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "page",
+   "links_in": 2,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/community/classic_reads.php",
+   "shell_owner": "controllers/community.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": "Classic Reads",
+   "url": "/classic_reads"
+  },
+  {
+   "also": [
+    "/community/education"
+   ],
+   "category": "Community",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "page",
+   "links_in": 2,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/community/education.php",
+   "shell_owner": "controllers/community.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": "Welcome to MaizeGDB",
+   "url": "/education"
+  },
+  {
+   "also": [
+    "/community/sequencing_project"
+   ],
+   "category": "Community",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "page",
+   "links_in": 2,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/community/sequencing_project.php",
+   "shell_owner": "controllers/community.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": "Welcome to MaizeGDB",
+   "url": "/sequencing_project"
+  },
+  {
+   "also": [
+    "/community/steering_committee"
+   ],
+   "category": "Community",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "page",
+   "links_in": 2,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/community/steering_committee.php",
+   "shell_owner": "controllers/community.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": "Welcome to MaizeGDB",
+   "url": "/steering_committee"
+  },
+  {
+   "also": [
     "/community/annotation"
    ],
    "category": "Community",
@@ -5524,29 +5984,6 @@
    "status": "legacy",
    "title": "Welcome to MaizeGDB",
    "url": "/annotation"
-  },
-  {
-   "also": [
-    "/community/classic_reads"
-   ],
-   "category": "Community",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": true,
-   "kind": "page",
-   "links_in": 1,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/community/classic_reads.php",
-   "shell_owner": "controllers/community.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "Classic Reads",
-   "url": "/classic_reads"
   },
   {
    "also": [
@@ -5571,29 +6008,6 @@
   },
   {
    "also": [
-    "/community/education"
-   ],
-   "category": "Community",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": false,
-   "kind": "page",
-   "links_in": 1,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/community/education.php",
-   "shell_owner": "controllers/community.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "Welcome to MaizeGDB",
-   "url": "/education"
-  },
-  {
-   "also": [
     "/community/maize_bionet"
    ],
    "category": "Community",
@@ -5614,6 +6028,29 @@
    "status": "legacy",
    "title": "Welcome to MaizeGDB",
    "url": "/maize_bionet"
+  },
+  {
+   "also": [
+    "/community/mcclintockprize"
+   ],
+   "category": "Community",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": true,
+   "kind": "page",
+   "links_in": 1,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/community/mcclintockprize.php",
+   "shell_owner": "controllers/community.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": "The McClintock Prize for Plant Genetics and Genome Studies",
+   "url": "/mcclintockprize"
   },
   {
    "also": [
@@ -5686,75 +6123,6 @@
   },
   {
    "also": [
-    "/community/sequencing_project"
-   ],
-   "category": "Community",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": false,
-   "kind": "page",
-   "links_in": 1,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/community/sequencing_project.php",
-   "shell_owner": "controllers/community.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "Welcome to MaizeGDB",
-   "url": "/sequencing_project"
-  },
-  {
-   "also": [
-    "/community/steering_committee"
-   ],
-   "category": "Community",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": false,
-   "kind": "page",
-   "links_in": 1,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/community/steering_committee.php",
-   "shell_owner": "controllers/community.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "Welcome to MaizeGDB",
-   "url": "/steering_committee"
-  },
-  {
-   "also": [
-    "/community/timelines"
-   ],
-   "category": "Community",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": false,
-   "kind": "page",
-   "links_in": 1,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/community/timelines.php",
-   "shell_owner": "controllers/community.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "Welcome to MaizeGDB",
-   "url": "/timelines"
-  },
-  {
-   "also": [
     "/community/annotator"
    ],
    "category": "Community",
@@ -5796,6 +6164,27 @@
    "status": "legacy",
    "title": null,
    "url": "/community/site_tour"
+  },
+  {
+   "also": [],
+   "category": "Community",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": false,
+   "kind": "page",
+   "links_in": 0,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "controllers/community/timelines.php",
+   "shell_owner": "controllers/community.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "modern",
+   "title": "History of Maize Genetics & MaizeGDB Timelines | Community Milestones",
+   "url": "/community/timelines"
   },
   {
    "also": [
@@ -5911,29 +6300,6 @@
    "status": "legacy",
    "title": "Welcome to MaizeGDB",
    "url": "/maizeprojects"
-  },
-  {
-   "also": [
-    "/community/mcclintockprize"
-   ],
-   "category": "Community",
-   "evidence": "probe",
-   "http": 200,
-   "in_menu": false,
-   "kind": "page",
-   "links_in": 0,
-   "notes": [],
-   "probe_error": null,
-   "probed": true,
-   "serves": "controllers/community/mcclintockprize.php",
-   "shell_owner": "controllers/community.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": "The McClintock Prize for Plant Genetics and Genome Studies",
-   "url": "/mcclintockprize"
   },
   {
    "also": [
@@ -6112,9 +6478,9 @@
    "category": "Analysis projects",
    "evidence": "probe",
    "http": 200,
-   "in_menu": false,
+   "in_menu": true,
    "kind": "page",
-   "links_in": 1,
+   "links_in": 3,
    "notes": [],
    "probe_error": null,
    "probed": true,
@@ -6137,7 +6503,7 @@
    "http": 200,
    "in_menu": true,
    "kind": "directory",
-   "links_in": 8,
+   "links_in": 11,
    "notes": [],
    "probe_error": null,
    "probed": true,
@@ -6248,6 +6614,52 @@
    "notes": [],
    "probe_error": null,
    "probed": true,
+   "serves": "index2/index.php",
+   "shell_owner": "index2/index.php",
+   "static_markers": [
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
+   ],
+   "static_status": "modern",
+   "status": "modern",
+   "title": "MaizeGDB \u2014 Maize Genetics and Genomics Database (design 2)",
+   "url": "/index2/"
+  },
+  {
+   "also": [],
+   "category": "Standalone apps in the web root",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": false,
+   "kind": "directory",
+   "links_in": 0,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "serves": "index3/index.php",
+   "shell_owner": "index3/index.php",
+   "static_markers": [
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
+   ],
+   "static_status": "modern",
+   "status": "modern",
+   "title": "MaizeGDB \u2014 Maize Genetics and Genomics Database (design 3)",
+   "url": "/index3/"
+  },
+  {
+   "also": [],
+   "category": "Standalone apps in the web root",
+   "evidence": "probe",
+   "http": 200,
+   "in_menu": false,
+   "kind": "directory",
+   "links_in": 0,
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
    "serves": "legacy_curation/index.php",
    "shell_owner": "legacy_curation/index.php",
    "static_markers": [],
@@ -6299,9 +6711,9 @@
    "category": "Search and API",
    "evidence": "probe",
    "http": 200,
-   "in_menu": false,
+   "in_menu": true,
    "kind": "page",
-   "links_in": 2,
+   "links_in": 3,
    "notes": [
     "modern page swapped in by a guard"
    ],
@@ -6454,6 +6866,27 @@
    "http": null,
    "in_menu": false,
    "kind": "page",
+   "links_in": 5,
+   "notes": [],
+   "probe_error": null,
+   "probed": false,
+   "serves": "controllers/curation/geneModelIssues.php",
+   "shell_owner": "controllers/curation.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": null,
+   "url": "/curation/geneModelIssues"
+  },
+  {
+   "also": [],
+   "category": "Curation and internal",
+   "evidence": "source",
+   "http": null,
+   "in_menu": false,
+   "kind": "page",
    "links_in": 4,
    "notes": [],
    "probe_error": null,
@@ -6473,30 +6906,9 @@
    "category": "Curation and internal",
    "evidence": "source",
    "http": null,
-   "in_menu": false,
-   "kind": "page",
-   "links_in": 4,
-   "notes": [],
-   "probe_error": null,
-   "probed": false,
-   "serves": "controllers/curation/geneModelIssues.php",
-   "shell_owner": "controllers/curation.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": null,
-   "url": "/curation/geneModelIssues"
-  },
-  {
-   "also": [],
-   "category": "Curation and internal",
-   "evidence": "source",
-   "http": null,
    "in_menu": true,
    "kind": "controller",
-   "links_in": 2,
+   "links_in": 3,
    "notes": [],
    "probe_error": null,
    "probed": false,
@@ -6530,6 +6942,27 @@
    "status": "legacy",
    "title": null,
    "url": "/curation/downloadGeneModelIssues"
+  },
+  {
+   "also": [],
+   "category": "Curation and internal",
+   "evidence": "source",
+   "http": null,
+   "in_menu": false,
+   "kind": "page",
+   "links_in": 1,
+   "notes": [],
+   "probe_error": null,
+   "probed": false,
+   "serves": "controllers/curation/GenomeIssue.php",
+   "shell_owner": "controllers/curation.php",
+   "static_markers": [
+    "legacy_shell"
+   ],
+   "static_status": "legacy",
+   "status": "legacy",
+   "title": null,
+   "url": "/curation/GenomeIssue"
   },
   {
    "also": [],
@@ -6626,27 +7059,6 @@
    "notes": [],
    "probe_error": null,
    "probed": false,
-   "serves": "controllers/curation/GenomeIssue.php",
-   "shell_owner": "controllers/curation.php",
-   "static_markers": [
-    "legacy_shell"
-   ],
-   "static_status": "legacy",
-   "status": "legacy",
-   "title": null,
-   "url": "/curation/GenomeIssue"
-  },
-  {
-   "also": [],
-   "category": "Curation and internal",
-   "evidence": "source",
-   "http": null,
-   "in_menu": false,
-   "kind": "page",
-   "links_in": 0,
-   "notes": [],
-   "probe_error": null,
-   "probed": false,
    "serves": "controllers/curation/OBO.php",
    "shell_owner": "controllers/curation.php",
    "static_markers": [
@@ -6723,23 +7135,7 @@
  ],
  "self_hosts": [
   {
-   "count": 50,
-   "examples": [
-    "https://www.maizegdb.org/images/hotpapers.jpg",
-    "http://www.maizegdb.org/cgi-bin/anythingsearch.cgi",
-    "http://www.maizegdb.org/cgi-bin/locus_pair_lookup.cgi"
-   ],
-   "host": "www.maizegdb.org",
-   "linked_from": [
-    "controllers/community.php",
-    "controllers/search_engine/search_orig.php",
-    "templates/about/cite-text.bau",
-    "templates/data_center/gene_product-left.bau",
-    "templates/data_center/phenotype-left.bau"
-   ]
-  },
-  {
-   "count": 44,
+   "count": 66,
    "examples": [
     "https://maizegdb.org/maizeprojects.php",
     "http://maizegdb.org/maize_bionet.php",
@@ -6753,6 +7149,22 @@
     "templates/insertion/insertion_search.bau",
     "templates/curation/obo_form.bau"
    ]
+  },
+  {
+   "count": 62,
+   "examples": [
+    "https://www.maizegdb.org/images/hotpapers.jpg",
+    "http://www.maizegdb.org/cgi-bin/locus_pair_lookup.cgi",
+    "http://www.maizegdb.org/cgi-bin/anythingsearch.cgi"
+   ],
+   "host": "www.maizegdb.org",
+   "linked_from": [
+    "controllers/community.php",
+    "controllers/search_engine/search_orig.php",
+    "templates/about/cite-text.bau",
+    "templates/data_center/gene_product-left.bau",
+    "templates/data_center/phenotype-left.bau"
+   ]
   }
  ],
  "shadowed": [
@@ -6765,6 +7177,16 @@
    "answered_by": "controllers/coming_soon.php",
    "unreachable": "controllers/static/coming_soon.php",
    "url": "/coming_soon"
+  },
+  {
+   "answered_by": "controllers/expression.php",
+   "unreachable": "controllers/static/expression.php",
+   "url": "/expression"
+  },
+  {
+   "answered_by": "controllers/genetic_variation.php",
+   "unreachable": "controllers/static/genetic_variation.php",
+   "url": "/genetic_variation"
   },
   {
    "answered_by": "maize_meeting/ in the web root",
@@ -6792,6 +7214,11 @@
    "url": "/annotator"
   },
   {
+   "answered_by": "controllers/maize_history.php",
+   "unreachable": "controllers/community/maize_history.php",
+   "url": "/maize_history"
+  },
+  {
    "answered_by": "controllers/community.php",
    "unreachable": "controllers/community/person.php",
    "url": "/person"
@@ -6802,9 +7229,84 @@
    "url": "/site_tour"
   },
   {
+   "answered_by": "controllers/timelines.php",
+   "unreachable": "controllers/community/timelines.php",
+   "url": "/timelines"
+  },
+  {
    "answered_by": "controllers/TYPSimSelector.php",
    "unreachable": "controllers/tools/TYPSimSelector.php",
    "url": "/TYPSimSelector"
+  },
+  {
+   "answered_by": "controllers/download.php",
+   "unreachable": "controllers/tools/download.php",
+   "url": "/download"
+  },
+  {
+   "answered_by": "controllers/14InbredsFISH.php",
+   "unreachable": "controllers/genome/14InbredsFISH.php",
+   "url": "/14InbredsFISH"
+  },
+  {
+   "answered_by": "controllers/B73Mo17FISH.php",
+   "unreachable": "controllers/genome/B73Mo17FISH.php",
+   "url": "/B73Mo17FISH"
+  },
+  {
+   "answered_by": "controllers/CAAS_FIL_project.php",
+   "unreachable": "controllers/genome/CAAS_FIL_project.php",
+   "url": "/CAAS_FIL_project"
+  },
+  {
+   "answered_by": "controllers/HiLo_project.php",
+   "unreachable": "controllers/genome/HiLo_project.php",
+   "url": "/HiLo_project"
+  },
+  {
+   "answered_by": "controllers/NAM_project.php",
+   "unreachable": "controllers/genome/NAM_project.php",
+   "url": "/NAM_project"
+  },
+  {
+   "answered_by": "controllers/PanAnd_project.php",
+   "unreachable": "controllers/genome/PanAnd_project.php",
+   "url": "/PanAnd_project"
+  },
+  {
+   "answered_by": "controllers/amaizing_project.php",
+   "unreachable": "controllers/genome/amaizing_project.php",
+   "url": "/amaizing_project"
+  },
+  {
+   "answered_by": "controllers/assembly.php",
+   "unreachable": "controllers/genome/assembly.php",
+   "url": "/assembly"
+  },
+  {
+   "answered_by": "controllers/european_flints.php",
+   "unreachable": "controllers/genome/european_flints.php",
+   "url": "/european_flints"
+  },
+  {
+   "answered_by": "controllers/genomebrowser.php",
+   "unreachable": "controllers/genome/genomebrowser.php",
+   "url": "/genomebrowser"
+  },
+  {
+   "answered_by": "controllers/historic.php",
+   "unreachable": "controllers/genome/historic.php",
+   "url": "/historic"
+  },
+  {
+   "answered_by": "controllers/jbrowse2_tutorial.php",
+   "unreachable": "controllers/genome/jbrowse2_tutorial.php",
+   "url": "/jbrowse2_tutorial"
+  },
+  {
+   "answered_by": "controllers/whole_genome.php",
+   "unreachable": "controllers/genome/whole_genome.php",
+   "url": "/whole_genome"
   },
   {
    "answered_by": "controllers/projects.php",
@@ -6820,7 +7322,7 @@
  "site": "https://claude.maizegdb.org",
  "third_party_hosts": [
   {
-   "count": 253,
+   "count": 314,
    "examples": [
     "https://www.ncbi.nlm.nih.gov/bioproject/",
     "https://www.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi",
@@ -6828,47 +7330,31 @@
    ],
    "host": "www.ncbi.nlm.nih.gov",
    "linked_from": [
+    "controllers/genetic_variation.php",
     "controllers/genome/genome_center_modern.php",
     "controllers/BLAST/BLAST.js",
     "controllers/data_center/overgo_search.php",
-    "templates/curation/obo_form.bau",
-    "templates/data_center/bac_rec-sequence_details.bau"
+    "templates/curation/obo_form.bau"
    ]
   },
   {
-   "count": 200,
+   "count": 220,
    "examples": [
     "https://doi.org/",
     "https://doi.org/10.1105/tpc.109.073452",
-    "https://doi.org/10.1016/j.cpb.2017.11.001"
+    "https://doi.org/10.1186/s13007-015-0053-y"
    ],
    "host": "doi.org",
    "linked_from": [
     "controllers/uniformmu.php",
+    "controllers/genetic_variation.php",
     "templates/insertion/insertion_search.bau",
     "templates/about/cite-text.bau",
-    "templates/gene_center/kcs_family.bau",
-    "templates/gene_center/gene_annotations_sections.bau"
+    "templates/gene_center/kcs_family.bau"
    ]
   },
   {
-   "count": 59,
-   "examples": [
-    "https://pubmed.ncbi.nlm.nih.gov/34416864/",
-    "https://pubmed.ncbi.nlm.nih.gov/20124413/",
-    "https://pubmed.ncbi.nlm.nih.gov/38337024/"
-   ],
-   "host": "pubmed.ncbi.nlm.nih.gov",
-   "linked_from": [
-    "templates/static/mgdb_cite.bau",
-    "templates/static/mgdb_pattern_library.bau",
-    "js/mgdb-reference.js",
-    "js/mgdb-searchall.js",
-    "include/api/v1/records/reference.php"
-   ]
-  },
-  {
-   "count": 43,
+   "count": 75,
    "examples": [
     "https://npgsweb.ars-grin.gov/gringlobal/accessiondetail.aspx",
     "https://npgsweb.ars-grin.gov/gringlobal/search.aspx",
@@ -6881,6 +7367,38 @@
     "templates/data_center/stock-left.bau",
     "templates/genome/HiLo_project.bau",
     "templates/genome/assembly.bau"
+   ]
+  },
+  {
+   "count": 70,
+   "examples": [
+    "https://pubmed.ncbi.nlm.nih.gov/",
+    "https://pubmed.ncbi.nlm.nih.gov/30061736/",
+    "https://pubmed.ncbi.nlm.nih.gov/33228531/"
+   ],
+   "host": "pubmed.ncbi.nlm.nih.gov",
+   "linked_from": [
+    "controllers/genetic_variation.php",
+    "templates/static/mgdb_cite.bau",
+    "templates/static/mgdb_assembly.bau",
+    "templates/static/mgdb_nam_project.bau",
+    "templates/static/mgdb_european_flints.bau"
+   ]
+  },
+  {
+   "count": 32,
+   "examples": [
+    "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd",
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd",
+    "http://www.w3.org"
+   ],
+   "host": "www.w3.org",
+   "linked_from": [
+    "controllers/BLAST.php",
+    "controllers/insertion.php",
+    "controllers/community.php",
+    "controllers/curation.php",
+    "controllers/gene_center.php"
    ]
   },
   {
@@ -6902,6 +7420,22 @@
   {
    "count": 26,
    "examples": [
+    "https://iastate.app.box.com/v/maizegdb-public/file/1876142430468",
+    "https://iastate.app.box.com/v/maizegdb-public/folder/323421472117",
+    "https://iastate.app.box.com/v/maizegdb-public"
+   ],
+   "host": "iastate.app.box.com",
+   "linked_from": [
+    "templates/data_center/stock-left.bau",
+    "templates/genome/genome-left.bau",
+    "templates/genome/NAM_project.bau",
+    "templates/tools/download-content.bau",
+    "templates/static/genetic_variation.bau"
+   ]
+  },
+  {
+   "count": 26,
+   "examples": [
     "https://arabidopsis.org/servlets/Search"
    ],
    "host": "arabidopsis.org",
@@ -6910,7 +7444,7 @@
    ]
   },
   {
-   "count": 21,
+   "count": 22,
    "examples": [
     "https://github.com/steineggerlab/foldseek",
     "https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md",
@@ -6923,38 +7457,6 @@
     "templates/genome/whole_genome.bau",
     "templates/tools/past-content.bau",
     "templates/tools/proteins-content.bau"
-   ]
-  },
-  {
-   "count": 20,
-   "examples": [
-    "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd",
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd",
-    "http://www.w3.org"
-   ],
-   "host": "www.w3.org",
-   "linked_from": [
-    "controllers/BLAST.php",
-    "controllers/insertion.php",
-    "controllers/community.php",
-    "controllers/curation.php",
-    "controllers/gene_center.php"
-   ]
-  },
-  {
-   "count": 20,
-   "examples": [
-    "https://iastate.app.box.com/v/maizegdb-public/folder/362582785407",
-    "https://iastate.app.box.com/v/maizegdb-public/file/1876142430468",
-    "https://iastate.app.box.com/v/maizegdb-public/folder/323421472117"
-   ],
-   "host": "iastate.app.box.com",
-   "linked_from": [
-    "templates/about/sitemap-content.bau",
-    "templates/data_center/stock-left.bau",
-    "templates/genome/genome-left.bau",
-    "templates/genome/NAM_project.bau",
-    "templates/tools/download-content.bau"
    ]
   },
   {
@@ -6974,10 +7476,42 @@
    ]
   },
   {
+   "count": 18,
+   "examples": [
+    "https://maizecoopsc.org/staff-2",
+    "https://maizecoopsc.org/about",
+    "https://maizecoopsc.org/ncrpis/"
+   ],
+   "host": "maizecoopsc.org",
+   "linked_from": [
+    "templates/about/faq-text.bau",
+    "templates/data_center/phenotype-left.bau",
+    "templates/data_center/stock-left.bau",
+    "templates/genome/NAM_project.bau",
+    "templates/ordering/coop_order.bau"
+   ]
+  },
+  {
+   "count": 18,
+   "examples": [
+    "http://bar.utoronto.ca/efp_maize/cgi-bin/efpWeb.cgi",
+    "https://bar.utoronto.ca/api/efp_image/efp_maize/Embryonic_Leaf_Development/Absolute/$id",
+    "https://bar.utoronto.ca/api/efp_image/efp_maize/Downs_et_al_Atlas/Absolute/$id"
+   ],
+   "host": "bar.utoronto.ca",
+   "linked_from": [
+    "templates/static/expression.bau",
+    "templates/static/mgdb_expression.bau",
+    "include/gene_center_lib.php",
+    "include/api/v1/records/gene.php",
+    "search/expression/expression_search_lib.php"
+   ]
+  },
+  {
    "count": 17,
    "examples": [
-    "http://player.vimeo.com/video/",
     "http://player.vimeo.com/video/71891927",
+    "http://player.vimeo.com/video/",
     "https://player.vimeo.com/video/212310824"
    ],
    "host": "player.vimeo.com",
@@ -7007,38 +7541,24 @@
   {
    "count": 16,
    "examples": [
-    "https://maizecoopsc.org/staff-2",
-    "https://maizecoopsc.org/about",
-    "https://maizecoopsc.org/ncrpis/"
+    "https://www.maizegenetics.org/awards/community-awards",
+    "https://www.maizegenetics.org/",
+    "https://www.maizegenetics.org/thekernel"
    ],
-   "host": "maizecoopsc.org",
+   "host": "www.maizegenetics.org",
    "linked_from": [
-    "templates/about/faq-text.bau",
-    "templates/data_center/phenotype-left.bau",
-    "templates/data_center/stock-left.bau",
-    "templates/genome/NAM_project.bau",
-    "templates/ordering/coop_order.bau"
+    "templates/home/megamenu/community.bau",
+    "templates/home/megamenu_modern/community.bau",
+    "templates/static/maize_meeting_modern.bau",
+    "templates/static/mgdb_person.bau",
+    "templates/static/mgdb_home.bau"
    ]
   },
   {
    "count": 16,
    "examples": [
-    "http://bar.utoronto.ca/efp_maize/cgi-bin/efpWeb.cgi",
-    "https://bar.utoronto.ca/api/efp_image/efp_maize/Hoopes_et_al_Atlas/Absolute/$id",
-    "https://bar.utoronto.ca/api/efp_image/efp_maize/Early_Seed/Absolute/$id"
-   ],
-   "host": "bar.utoronto.ca",
-   "linked_from": [
-    "templates/static/expression.bau",
-    "include/gene_center_lib.php",
-    "include/api/v1/records/gene.php"
-   ]
-  },
-  {
-   "count": 16,
-   "examples": [
-    "https://commons.wikimedia.org/wiki/File:Lake_Geneva_April_2025_12_",
     "https://commons.wikimedia.org/w/index.php",
+    "https://commons.wikimedia.org/wiki/File:Raleigh_Convention_Center_-_Raleigh,_NC_-_DSC06102.JPG",
     "https://commons.wikimedia.org/wiki/File:Fort_National_-_maison_"
    ],
    "host": "commons.wikimedia.org",
@@ -7047,7 +7567,7 @@
    ]
   },
   {
-   "count": 14,
+   "count": 15,
    "examples": [
     "http://ensembl.gramene.org/biomart/martview/ad0a9ec80279cc0c809831f66fcf6fc",
     "http://ensembl.gramene.org/Zea_mays/Transcript/Summary",
@@ -7081,9 +7601,9 @@
   {
    "count": 13,
    "examples": [
-    "http://www.gramene.org/",
+    "http://www.gramene.org/Zea_mays/Gene/Compara_Tree",
     "http://www.gramene.org/Zea_mays/Gene/Compara_Ortholog",
-    "http://www.gramene.org/Zea_mays/Gene/Compara_Tree"
+    "http://www.gramene.org/Zea_mays/Gene/Compara_Paralog"
    ],
    "host": "www.gramene.org",
    "linked_from": [
@@ -7097,8 +7617,8 @@
   {
    "count": 12,
    "examples": [
-    "http://ftp.maizesequence.org/release-3b.50/",
     "http://ftp.maizesequence.org/current/assembly//",
+    "http://ftp.maizesequence.org/release-3b.50/",
     "http://ftp.maizesequence.org/release-5b"
    ],
    "host": "ftp.maizesequence.org",
@@ -7109,23 +7629,8 @@
     "templates/genome/assembly-details-v2.bau",
     "templates/genome/assembly-details-v3.bau"
    ]
-  },
-  {
-   "count": 11,
-   "examples": [
-    "https://cbsusrv04.tc.cornell.edu/users/panzea/filegateway.aspx",
-    "http://cbsusrv04.tc.cornell.edu/users/panzea/download.aspx"
-   ],
-   "host": "cbsusrv04.tc.cornell.edu",
-   "linked_from": [
-    "templates/tools/gbs.bau",
-    "templates/tools/genotype-content.php",
-    "templates/tools/genotype.bau",
-    "templates/static/genetic_variation.bau",
-    "templates/static/diversity.bau"
-   ]
   }
  ],
- "third_party_total": 261,
- "total": 268
+ "third_party_total": 270,
+ "total": 286
 }

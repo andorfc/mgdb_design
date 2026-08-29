@@ -1,7 +1,7 @@
 <?php
 /* file: insertion_search_modern.php
  *
- * purpose: Insertion Data Center search landing page (/insertion) on the
+ * purpose: Insertion Data Hub search landing page (/insertion) on the
  *          modern design system.
  *
  *          Included by controllers/insertion.php when no insertion identifier
@@ -29,7 +29,7 @@ header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
 header('Pragma: no-cache');
 header('Expires: 0');
 
-$bauplan = new Bauplan('MaizeGDB Insertion Data Center | Mu, Ac/Ds & Ds-GFP Insertions');
+$bauplan = new Bauplan('MaizeGDB Insertion Data Hub | Mu, Ac/Ds & Ds-GFP Insertions');
 $bauplan->modern();
 
 $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';

@@ -8,31 +8,32 @@ $$SYNTAX-LEVEL 2
 
 <main class="mgdb-page mgdb-pan-gene-page" id="pan-gene-top">
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
-    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data centers</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Pan-Gene Center</span>
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Pan-Gene Center</span>
   </nav>
 
-  <section class="mgdb-hero" aria-labelledby="pan-gene-title">
+  <section class="mgdb-hero pan-gene-hero" aria-labelledby="pan-gene-title">
     <div class="mgdb-hero-emblem">
       <svg viewBox="0 0 96 96" role="img" aria-label="Stylized cluster of aligned gene models">
-        <g fill="none" stroke="#7a4a10" stroke-width="5" stroke-linecap="round">
+        <g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" opacity=".85">
           <path d="M48 12v72" />
         </g>
-        <g stroke="#d99a0b" stroke-width="6" stroke-linecap="round">
+        <g stroke="currentColor" stroke-width="6" stroke-linecap="round">
           <path d="M22 26h52" /><path d="M30 42h36" /><path d="M26 58h44" /><path d="M34 74h28" />
         </g>
       </svg>
-      <strong>Pan-Gene<br />Center</strong>
-      <span>MaizeGDB</span>
+      <strong>Pan-Gene Data Hub</strong>
     </div>
     <div class="mgdb-hero-body">
-      <span class="mgdb-eyebrow">Pan-genome analysis</span>
-      <h1 id="pan-gene-title">One gene, across every maize genome</h1>
-      <p class="mgdb-hero-tagline">A pan-gene collects the gene models from many assemblies that appear to be the same gene, together with the loci curated against them.</p>
-      <p class="mgdb-hero-description">Search by locus symbol, gene model, transcript, or protein to find the pan-gene a sequence belongs to. Or build a query over pan-gene size, assembly coverage, and curated trait and protein associations.</p>
+      <p class="pan-gene-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; January 2026</p>
+      <h1 id="pan-gene-title">Pan-genome analysis</h1>
+      <p class="mgdb-hero-description">A MaizeGDB pan-gene connects gene models from 66 high-quality maize genome assemblies that are inferred to represent the same gene based on sequence similarity and synteny.</p>
+<!-- Hero actions parked while the shorter header is evaluated. The section
+           tabs immediately below already reach Search and Downloads.
       <div class="mgdb-hero-actions">
         <a class="mgdb-button mgdb-button-primary" href="#pan-gene-search">Search pan-genes</a>
         <a class="mgdb-button mgdb-button-secondary" href="#pan-gene-downloads">Downloads</a>
       </div>
+      -->
     </div>
   </section>
 
@@ -49,7 +50,7 @@ $$SYNTAX-LEVEL 2
     <div class="mgdb-section-heading">
       <div>
         <span class="mgdb-eyebrow">$(analysis_name)</span>
-        <h2 id="pan-gene-overview-title">What is in this data center</h2>
+        <h2 id="pan-gene-overview-title">What is in this data hub</h2>
       </div>
       <p>Calculated by MaizeGDB staff with the Pandagma pipeline. Analyses run with different software, or over different assemblies, will not agree exactly.</p>
     </div>

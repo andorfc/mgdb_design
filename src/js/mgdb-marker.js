@@ -1,4 +1,4 @@
-/* Molecular Marker & Probe Data Center JavaScript
+/* Molecular Marker & Probe Data Hub JavaScript
    Handles search input, debounced live queries, card/table view switching,
    sticky section tabs with scrollspy, pagination, clipboard actions, and export URL synchronization. */
 
@@ -15,7 +15,7 @@
     page: 1,
     pageSize: 24,
     sort: 'relevance',
-    view: 'card',
+    view: 'table',
     currentData: null,
     loading: false
   };
@@ -462,8 +462,8 @@
     var buttons = document.querySelectorAll('.marker-view-btn[data-view]');
     if (!buttons.length) return;
 
-    var savedView = 'card';
-    try { savedView = localStorage.getItem(STORAGE_VIEW_KEY) || 'card'; } catch (e) {}
+    var savedView = 'table';
+    try { savedView = localStorage.getItem(STORAGE_VIEW_KEY) || 'table'; } catch (e) {}
     if (state.view) savedView = state.view;
 
     function applyView(view) {
@@ -498,16 +498,6 @@
 
     // If query term or type was in URL on load, execute search immediately
     if (state.term || state.type || state.bin) {
-      executeSearch(false);
-    } else {
-      // Default initial query with featured popular markers (e.g. bnlg)
-      state.term = 'bnlg%';
-      var input = byId('marker-query');
-      if (input) {
-        input.value = state.term;
-        var clearBtn = byId('marker-query-clear');
-        if (clearBtn) clearBtn.hidden = false;
-      }
       executeSearch(false);
     }
   }

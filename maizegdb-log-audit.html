@@ -1,0 +1,695 @@
+<title>MaizeGDB Log Audit</title>
+
+<style>
+  :root{
+    --ground:#FAFBFC;
+    --surface:#FFFFFF;
+    --surface-2:#F1F4F6;
+    --ink:#171A1F;
+    --ink-2:#3A424D;
+    --muted:#5A6472;
+    --line:#DCE2E8;
+    --line-2:#C6D0D9;
+    --accent:#15646F;
+    --accent-soft:#E2F0F2;
+    --crit:#A9302A;
+    --crit-soft:#FAE9E7;
+    --warn:#8A6008;
+    --warn-soft:#FBF0DA;
+    --ok:#256B48;
+    --ok-soft:#E3F1E9;
+    --info:#3F4E63;
+    --info-soft:#EAEEF4;
+    --shadow:0 1px 2px rgba(20,30,45,.05), 0 6px 18px -10px rgba(20,30,45,.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0E1116;
+      --surface:#171B21;
+      --surface-2:#1F252D;
+      --ink:#E7EAEE;
+      --ink-2:#C2C9D2;
+      --muted:#929CAA;
+      --line:#2A323C;
+      --line-2:#3A444F;
+      --accent:#54B4C1;
+      --accent-soft:#13323A;
+      --crit:#F0837A;
+      --crit-soft:#3A1E1D;
+      --warn:#E0AC42;
+      --warn-soft:#352A15;
+      --ok:#63C193;
+      --ok-soft:#16301F;
+      --info:#A8B6CC;
+      --info-soft:#1D242F;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0E1116;
+    --surface:#171B21;
+    --surface-2:#1F252D;
+    --ink:#E7EAEE;
+    --ink-2:#C2C9D2;
+    --muted:#929CAA;
+    --line:#2A323C;
+    --line-2:#3A444F;
+    --accent:#54B4C1;
+    --accent-soft:#13323A;
+    --crit:#F0837A;
+    --crit-soft:#3A1E1D;
+    --warn:#E0AC42;
+    --warn-soft:#352A15;
+    --ok:#63C193;
+    --ok-soft:#16301F;
+    --info:#A8B6CC;
+    --info-soft:#1D242F;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+
+  *{box-sizing:border-box}
+
+  body{
+    background:var(--ground);
+    color:var(--ink);
+    font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    margin:0;
+    padding:0 24px 96px;
+  }
+
+  .wrap{max-width:900px;margin:0 auto}
+
+  code,.mono{
+    font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+    font-size:.88em;
+    font-variant-ligatures:none;
+  }
+  code{
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:.08em .34em;
+    word-break:break-word;
+  }
+
+  h1,h2,h3{
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,ui-serif,serif;
+    text-wrap:balance;
+    font-weight:600;
+    letter-spacing:-.005em;
+    margin:0;
+  }
+
+  /* ---------- masthead ---------- */
+  header.mast{
+    padding:64px 0 34px;
+    border-bottom:2px solid var(--ink);
+    margin-bottom:40px;
+  }
+  .eyebrow{
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:11.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 18px;
+    display:flex;
+    gap:10px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+  .eyebrow::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--line-2);
+    min-width:24px;
+  }
+  h1{font-size:clamp(34px,5.4vw,52px);line-height:1.08}
+  .standfirst{
+    color:var(--muted);
+    font-size:17px;
+    max-width:66ch;
+    margin:18px 0 0;
+  }
+  .meta-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 26px;
+    margin-top:26px;
+    font-size:12.5px;
+    color:var(--muted);
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  .meta-row b{color:var(--ink-2);font-weight:600}
+
+  /* ---------- scorecard ---------- */
+  .scorecard{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(158px,1fr));
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    border-radius:8px;
+    overflow:hidden;
+    margin:0 0 20px;
+  }
+  .stat{background:var(--surface);padding:18px 18px 16px;display:flex;flex-direction:column;gap:5px}
+  .stat .k{
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  }
+  .stat .v{
+    font-size:26px;font-weight:650;line-height:1.1;
+    font-variant-numeric:tabular-nums;letter-spacing:-.02em;
+  }
+  .stat .n{font-size:12px;color:var(--muted);line-height:1.35}
+  .stat.is-crit .v{color:var(--crit)}
+  .stat.is-warn .v{color:var(--warn)}
+  .stat.is-ok .v{color:var(--ok)}
+
+  /* ---------- sections ---------- */
+  section{margin:56px 0 0;scroll-margin-top:20px}
+  .sec-head{
+    display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+    padding-bottom:12px;border-bottom:1px solid var(--line-2);margin-bottom:8px;
+  }
+  .sec-head h2{font-size:26px}
+  .sec-tag{
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);margin-left:auto;white-space:nowrap;
+  }
+  .sec-intro{color:var(--muted);max-width:70ch;margin:14px 0 4px}
+
+  p{max-width:72ch}
+
+  /* ---------- findings ---------- */
+  .finding{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-left:4px solid var(--line-2);
+    border-radius:7px;
+    padding:20px 22px;
+    margin:16px 0;
+    box-shadow:var(--shadow);
+  }
+  .finding.crit{border-left-color:var(--crit)}
+  .finding.high{border-left-color:var(--warn)}
+  .finding.med{border-left-color:var(--info)}
+  .finding.good{border-left-color:var(--ok)}
+
+  .f-top{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;margin-bottom:9px}
+  .f-id{
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.04em;
+  }
+  .finding h3{font-size:18.5px;line-height:1.3;flex:1;min-width:220px}
+  .pill{
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:10px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;
+    padding:3px 9px;border-radius:100px;white-space:nowrap;
+  }
+  .pill.crit{background:var(--crit-soft);color:var(--crit)}
+  .pill.high{background:var(--warn-soft);color:var(--warn)}
+  .pill.med{background:var(--info-soft);color:var(--info)}
+  .pill.good{background:var(--ok-soft);color:var(--ok)}
+  .finding p{margin:9px 0;color:var(--ink-2)}
+  .finding p:last-child{margin-bottom:0}
+
+  .evidence{
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:12px 14px;
+    margin:13px 0;
+    overflow-x:auto;
+  }
+  .evidence pre{
+    margin:0;
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:12.5px;line-height:1.65;color:var(--ink-2);
+    font-variant-numeric:tabular-nums;white-space:pre;
+  }
+  .fix{
+    border-top:1px dashed var(--line-2);
+    margin-top:14px;padding-top:12px;
+    display:flex;gap:10px;align-items:flex-start;
+  }
+  .fix .lab{
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--accent);white-space:nowrap;padding-top:3px;font-weight:600;
+  }
+  .fix p{margin:0}
+
+  /* ---------- tables ---------- */
+  .tbl-wrap{overflow-x:auto;margin:20px 0;border:1px solid var(--line);border-radius:7px;background:var(--surface)}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:520px}
+  th,td{padding:9px 14px;text-align:left;border-bottom:1px solid var(--line)}
+  thead th{
+    background:var(--surface-2);
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+    font-weight:600;white-space:nowrap;
+  }
+  tbody tr:last-child td{border-bottom:none}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+  td.path{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:12.5px;word-break:break-all}
+  .bad{color:var(--crit);font-weight:600}
+  .good-t{color:var(--ok);font-weight:600}
+
+  ul,ol{max-width:72ch;padding-left:22px;color:var(--ink-2)}
+  li{margin:7px 0}
+  li::marker{color:var(--accent)}
+
+  .callout{
+    background:var(--accent-soft);
+    border:1px solid var(--line);
+    border-left:4px solid var(--accent);
+    border-radius:7px;padding:18px 22px;margin:22px 0;
+  }
+  .callout h3{font-size:17px;margin-bottom:7px}
+  .callout p{margin:7px 0 0;color:var(--ink-2)}
+  .callout p:first-of-type{margin-top:0}
+
+  footer{
+    margin-top:64px;padding-top:22px;border-top:1px solid var(--line-2);
+    color:var(--muted);font-size:13px;
+  }
+  footer p{max-width:74ch}
+  a{color:var(--accent)}
+  a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
+
+  @media (max-width:620px){
+    body{padding:0 16px 64px}
+    header.mast{padding-top:40px}
+    .stat .v{font-size:22px}
+  }
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <p class="eyebrow">Access &amp; error log review</p>
+  <h1>MaizeGDB Log Audit</h1>
+  <p class="standfirst">Six days of production Apache logs, read end to end for broken pages, security exposure, and wasted work — with the findings mapped onto decisions the redesign has to make anyway.</p>
+  <div class="meta-row">
+    <span><b>Window</b> 23–28 Aug 2026</span>
+    <span><b>Requests</b> 5,655,317</span>
+    <span><b>Served</b> 859.9 GB</span>
+    <span><b>Sources</b> access_log 1.77 GB · error_log 85 MB</span>
+  </div>
+</header>
+
+<div class="scorecard">
+  <div class="stat is-crit">
+    <span class="k">5xx rate</span>
+    <span class="v">4.18%</span>
+    <span class="n">236,392 server errors</span>
+  </div>
+  <div class="stat is-crit">
+    <span class="k">Wasted bytes</span>
+    <span class="v">48.6%</span>
+    <span class="n">418 GB of redundant index re-downloads</span>
+  </div>
+  <div class="stat is-crit">
+    <span class="k">mRNA sequence</span>
+    <span class="v">0%</span>
+    <span class="n">success rate — entirely broken</span>
+  </div>
+  <div class="stat is-warn">
+    <span class="k">Gene page</span>
+    <span class="v">14.9&times;</span>
+    <span class="n">AJAX calls per page view</span>
+  </div>
+  <div class="stat is-warn">
+    <span class="k">Scraper share</span>
+    <span class="v">30.8%</span>
+    <span class="n">of main-site traffic, 3 sources</span>
+  </div>
+  <div class="stat is-ok">
+    <span class="k">Compromise</span>
+    <span class="v">None</span>
+    <span class="n">no probe reached a live handler</span>
+  </div>
+</div>
+
+<p class="sec-intro">Two problems dominate everything else, and they are unrelated to each other. The sequence-retrieval stack is both <em>broken</em> (mRNA and non-coding sequence fetches never succeed) and <em>enormously wasteful</em> (half of all bytes MaizeGDB ships are the same index files, re-downloaded). Separately, the gene record page fans out into fifteen-plus server round-trips per view, which is the single most consequential thing the redesign can fix.</p>
+
+<!-- ============ SECURITY ============ -->
+<section id="security">
+  <div class="sec-head">
+    <h2>Security</h2>
+    <span class="sec-tag">6 findings</span>
+  </div>
+  <p class="sec-intro">The headline is good: nothing in six days of logs shows a successful intrusion. The real security defects are configuration-level — the site tells attackers "yes, that exists" for every path they guess, and a legacy CMS host is drawing targeted exploit traffic.</p>
+
+  <div class="finding good">
+    <div class="f-top">
+      <span class="f-id">SEC‑1</span>
+      <h3>No successful exploitation found</h3>
+      <span class="pill good">Verified</span>
+    </div>
+    <p>Every injection, traversal, and webshell probe in the window was checked against its response. All of them landed on a soft-404, a real 404, a 400, or a 503 — none reached a live handler.</p>
+    <p>The clearest proof is the AcyMailing SQL injection aimed at <code>past3</code>: the "successful" 200 responses are <strong>4,476 bytes</strong>, byte-identical to that host's ordinary home page. The query never executed; the attacker got the front page.</p>
+    <div class="evidence"><pre>past3.maizegdb.org  200  4476 bytes   ?columns=id+FROM+%23__acym_user+AS+user+UNION+SELECT+VERSION()%23
+past3.maizegdb.org  200  4476 bytes   GET /              &lt;- same size, ordinary homepage</pre></div>
+    <p>Similarly, the SSRF probes at <code>169.254.169.254</code> (cloud metadata) returned 400/503 from <code>archive</code>, and the 63 "successful" traversal hits for <code>/etc/passwd</code> and <code>/.aws/credentials</code> were all the 39 KB catch-all page described next.</p>
+  </div>
+
+  <div class="finding high">
+    <div class="f-top">
+      <span class="f-id">SEC‑2</span>
+      <h3>The main site answers 200 for pages that do not exist</h3>
+      <span class="pill high">High</span>
+    </div>
+    <p><code>maizegdb.org</code> returns <strong>HTTP 200 with a ~39 KB page</strong> for essentially any nonexistent path. Of ~1,870 requests to obviously bogus paths, <strong>1,741 (93%) got a 200</strong>; only 107 returned a real 404.</p>
+    <div class="evidence"><pre>GET /etc/passwd                                200   39,290 bytes
+GET /.env                                      200   39,266 bytes
+GET /wp-content/plugins/hellopress/…php        200   39,346 bytes
+GET /static../.aws/credentials                 200   39,294 bytes</pre></div>
+    <p>Three consequences, in order of how much they cost you. Scanners read 200 as "endpoint exists", so MaizeGDB looks like it has thousands of live attack surfaces and keeps getting re-probed. Search engines will index junk URLs. And no uptime check or link crawler can tell a working page from a dead one, which is why broken links elsewhere in this report went unnoticed.</p>
+    <div class="fix"><span class="lab">Fix</span><p>Return a genuine <code>404</code> status (a friendly HTML body is fine — the <em>status line</em> is what matters), and <code>410</code> for paths deliberately retired. Carry this into the redesign as a hard rule: status codes are part of the API contract, not decoration.</p></div>
+  </div>
+
+  <div class="finding high">
+    <div class="f-top">
+      <span class="f-id">SEC‑3</span>
+      <h3>Legacy CMS hosts are drawing targeted exploit traffic</h3>
+      <span class="pill high">High</span>
+    </div>
+    <p><code>past1</code>, <code>past2</code>, <code>past3</code> and <code>archive</code> run WordPress/Joomla stacks. <code>past3</code> is being hit with the AcyMailing component SQL-injection CVE across three different route forms — this is targeted at a known vulnerable extension, not generic noise. <code>archive.maizegdb.org</code> meanwhile returned <strong>4,861 × 503</strong>, so it is largely down anyway.</p>
+    <p>These attempts fail today. They keep working only as long as the CMS never drifts out of date — which is a weaker guarantee than it sounds for hosts nobody is actively maintaining.</p>
+    <div class="fix"><span class="lab">Fix</span><p>Snapshot these to static HTML and retire the CMS, or put them behind auth. Static archives cannot be SQL-injected.</p></div>
+  </div>
+
+  <div class="finding med">
+    <div class="f-top">
+      <span class="f-id">SEC‑4</span>
+      <h3>Development and staging hosts are internet-reachable</h3>
+      <span class="pill med">Medium</span>
+    </div>
+    <p><code>staging</code>, <code>sandbox</code>, <code>appsdev</code>, <code>maizedigtest</code>, <code>genomeqcdev</code>, <code>codex</code> and <code>claude</code> all appear in the public access log. Separately, 1,735 requests were denied while trying to reach <code>dev8.usda.iastate.edu</code> through the proxy — the deny rule works, but the route is discoverable, and the block is what is holding.</p>
+    <div class="fix"><span class="lab">Fix</span><p>IP-restrict or password-protect non-production vhosts. Given the redesign will run on <code>claude</code>/<code>codex</code> for months, worth doing before those hosts carry anything sensitive.</p></div>
+  </div>
+
+  <div class="finding med">
+    <div class="f-top">
+      <span class="f-id">SEC‑5</span>
+      <h3>Sustained automated scanning</h3>
+      <span class="pill med">Informational</span>
+    </div>
+    <p>Continuous background probing across the estate: ~14,600 WordPress path probes, ~13,000 <code>.env</code> / credential-file requests, ~2,600 webshell filename guesses (<code>alfa.php</code>, <code>wso.php</code>, <code>xmrlpc.php</code>), 22 Apache path-traversal RCE attempts (<code>/cgi-bin/.%2e/…/bin/sh</code>, the CVE-2021-41773 pattern), and one Mozi IoT-botnet dropper embedded in a request line. All rejected.</p>
+    <p>Worth stating plainly: this is normal internet background radiation for a public site, not a sign of being singled out. Fixing SEC‑2 will reduce it, because the scanners are currently being told they found something.</p>
+  </div>
+
+  <div class="finding med">
+    <div class="f-top">
+      <span class="f-id">SEC‑6</span>
+      <h3>Blind spot: 205,548 POST bodies are not logged</h3>
+      <span class="pill med">Limitation</span>
+    </div>
+    <p>An access log records the request line only. Roughly <strong>205,000 POST requests</strong> — including <code>BLAST_tasks.php</code>, <code>searchall</code>, <code>populate_table</code>, and the <code>search/gene/*</code> handlers — carry parameters this audit cannot see. <em>No POST-based injection can be confirmed or ruled out from these logs.</em></p>
+    <p>Those form handlers are the most likely place for query-parameter interpolation to survive, and they are precisely the endpoints the redesign is replacing.</p>
+    <div class="fix"><span class="lab">Fix</span><p>Audit POST handlers by reading the source rather than the logs. In the new API, use parameterized queries everywhere and treat that as non-negotiable.</p></div>
+  </div>
+</section>
+
+<!-- ============ BROKEN ============ -->
+<section id="broken">
+  <div class="sec-head">
+    <h2>Broken on the live site</h2>
+    <span class="sec-tag">Fix now — independent of redesign</span>
+  </div>
+  <p class="sec-intro">These are real user-facing failures happening today. None of them need to wait for the new site.</p>
+
+  <div class="finding crit">
+    <div class="f-top">
+      <span class="f-id">BRK‑1</span>
+      <h3>mRNA and non-coding sequence retrieval fails 100% of the time</h3>
+      <span class="pill crit">Critical</span>
+    </div>
+    <p>The FASTA service uses htslib to random-access bgzipped FASTA files over HTTP, which requires a <code>.fai</code> index alongside each <code>.fa.gz</code>. For the mRNA and non-coding files, <strong>that index was never generated</strong> — so every request fails. The correlation is absolute:</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Sequence type</th><th class="num">200 OK</th><th class="num">400</th><th class="num">502</th><th>Verdict</th></tr></thead>
+        <tbody>
+          <tr><td class="path">mrna</td><td class="num bad">0</td><td class="num">57,936</td><td class="num">1,427</td><td class="bad">Always fails</td></tr>
+          <tr><td class="path">nc.mrna</td><td class="num bad">0</td><td class="num">38,695</td><td class="num">2,026</td><td class="bad">Always fails</td></tr>
+          <tr><td class="path">nc.cdna</td><td class="num bad">0</td><td class="num">475</td><td class="num">2,325</td><td class="bad">Always fails</td></tr>
+          <tr><td class="path">nc.cds</td><td class="num">1</td><td class="num">9</td><td class="num">5</td><td class="bad">Always fails</td></tr>
+          <tr><td class="path">protein</td><td class="num good-t">52,509</td><td class="num">575</td><td class="num">4,575</td><td>Works</td></tr>
+          <tr><td class="path">cdna</td><td class="num good-t">43,997</td><td class="num">540</td><td class="num">3,600</td><td>Works</td></tr>
+          <tr><td class="path">gene</td><td class="num good-t">23,115</td><td class="num">400</td><td class="num">2,099</td><td>Works</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Confirming it from the other side: <code>download.maizegdb.org</code> served <strong>99,974 × 404</strong> for <code>.fai</code> requests, and the top four missing files are exactly the mRNA indexes.</p>
+    <div class="evidence"><pre>34,503  404  /Zm-B73-REFERENCE-NAM-5.0/…_Zm00001eb.1.mrna.fa.gz.fai
+33,529  404  /Zm-B73-REFERENCE-NAM-5.0/…_Zm00001eb.1.nc.mrna.fa.gz.fai
+ 9,214  404  /Zm-B73-REFERENCE-GRAMENE-4.0/…_Zm00001d.2.mrna.fa.gz.fai
+ 8,971  404  /Zm-B73-REFERENCE-GRAMENE-4.0/…_Zm00001d.provisional.mrna.fa.gz.fai</pre></div>
+    <p>That is roughly <strong>97,000 failed sequence retrievals in six days</strong> — every one a researcher who asked for an mRNA sequence and got nothing.</p>
+    <div class="fix"><span class="lab">Fix</span><p>Run <code>samtools faidx</code> (and <code>bgzip -r</code> for the <code>.gzi</code>) over every <code>.mrna</code> and <code>.nc.*</code> file on <code>download.maizegdb.org</code>. Then add a release check that refuses to publish a <code>.fa.gz</code> without its index.</p></div>
+  </div>
+
+  <div class="finding crit">
+    <div class="f-top">
+      <span class="f-id">BRK‑2</span>
+      <h3><code>get_sequence.php</code> fails on nearly a third of requests</h3>
+      <span class="pill crit">Critical</span>
+    </div>
+    <p>The sequence endpoint on <code>sequence2.maizegdb.org</code>:</p>
+    <div class="evidence"><pre>200  181,657   68.2%
+502   63,344   23.8%   backend died
+504   21,386    8.0%   backend timed out
+                ─────
+     84,730 failures = 31.8%</pre></div>
+    <p>The error log ties this to one backend: <code>c2s2.usda.iastate.edu:29977</code> accounts for 115,722 proxy failures, split between connection resets (109,748 estate-wide) and hard timeouts (79,170). The pattern — resets under sustained load rather than refused connections — points at worker exhaustion or per-request memory, not a host that is down.</p>
+    <div class="fix"><span class="lab">Fix</span><p>Instrument <code>c2s2</code> for worker count, request duration, and memory before tuning. Raise <code>ProxyTimeout</code> only after the underlying slowness is understood — a longer timeout converts 502s into slow 200s and hides the problem.</p></div>
+  </div>
+
+  <div class="finding crit">
+    <div class="f-top">
+      <span class="f-id">BRK‑3</span>
+      <h3>An internal client sends 208,272 requests with an empty gene ID</h3>
+      <span class="pill crit">Critical</span>
+    </div>
+    <p>A single internal host — <code>2610:130:104:200:ca1f:66ff:fe5e:ee50</code> — makes <strong>every one</strong> of these requests, at roughly one every 2.5 seconds, around the clock. The transcript ID slot in the URL is empty, so all 203,386 answered requests return 403.</p>
+    <div class="evidence"><pre>GET /fasta/fetch//https://download.maizegdb.org/…_Zm00029ab.1.cdna.fa.gz  403
+                 ↑↑
+          empty ID — should be /fasta/fetch/&lt;transcript_id&gt;/…</pre></div>
+    <p>That same host generates <strong>921,415 requests total — 16% of all traffic to MaizeGDB</strong>, including 116,966 hits on the fasta service root. Whatever this process is, it is stuck in a loop with an unset variable and has been for the whole window.</p>
+    <div class="fix"><span class="lab">Fix</span><p>Identify the process on that host and fix the empty-ID case. This is the single cheapest large win in the report — it removes ~16% of total request volume for what is likely a one-line change.</p></div>
+  </div>
+
+  <div class="finding high">
+    <div class="f-top">
+      <span class="f-id">BRK‑4</span>
+      <h3>Two record pages reference JavaScript files that do not exist</h3>
+      <span class="pill high">High</span>
+    </div>
+    <p>Real 404s, requested from real record pages, meaning these pages ship with broken behaviour:</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Missing file</th><th class="num">404s</th><th>Referred from</th></tr></thead>
+        <tbody>
+          <tr><td class="path">/data_center/js/gene_product.js</td><td class="num">547</td><td class="path">/data_center/gene_product/*</td></tr>
+          <tr><td class="path">/data_center/js/map.js</td><td class="num">51</td><td class="path">/data_center/map/*</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Every gene-product record page and every map record page requests a script that returns 404. This went unnoticed precisely because of SEC‑2 — with soft-404s masking most missing-resource errors, nobody had a signal.</p>
+    <div class="fix"><span class="lab">Fix</span><p>Restore or remove the references. Then check the built pages against the JS they load — these two were found by log inspection, not by anything monitoring.</p></div>
+  </div>
+
+  <div class="finding med">
+    <div class="f-top">
+      <span class="f-id">BRK‑5</span>
+      <h3>CornCyc cellular-overview page has server-side includes disabled</h3>
+      <span class="pill med">Medium</span>
+    </div>
+    <p>433 warnings, almost all for one page:</p>
+    <div class="evidence"><pre>[include:warn] mod_include: Options +Includes (or IncludesNoExec) wasn't set,
+               INCLUDES filter removed: /overviewsWeb/celOv.shtml</pre></div>
+    <p>Apache strips the SSI directives instead of executing them, so <code>celOv.shtml</code> renders with its included content missing. <code>/msa.shtml</code> and <code>/web-services.shtml</code> are affected too.</p>
+    <div class="fix"><span class="lab">Fix</span><p>Set <code>Options +IncludesNoExec</code> for that directory in the CornCyc vhost.</p></div>
+  </div>
+
+  <div class="finding med">
+    <div class="f-top">
+      <span class="f-id">BRK‑6</span>
+      <h3>Smaller defects worth a sweep</h3>
+      <span class="pill med">Medium</span>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Symptom</th><th class="num">Count</th><th>Reading</th></tr></thead>
+        <tbody>
+          <tr><td class="path">/B73_RefGen_v3/.fai</td><td class="num">4,692</td><td>Filename never interpolated — v3 genome path built from an empty variable</td></tr>
+          <tr><td class="path">recordAccess.php → 400</td><td class="num">1,595</td><td>Malformed analytics beacon; a further 1,027 return 502</td></tr>
+          <tr><td class="path">archive.* → 503</td><td class="num">4,861</td><td>Host effectively down for the whole window</td></tr>
+          <tr><td class="path">maizedig.* → 502</td><td class="num">4,961</td><td>Backend unreliable</td></tr>
+          <tr><td class="path">curation2.* → 502</td><td class="num">10,417</td><td><code>mgdb-curation-tools2</code> failing under load</td></tr>
+          <tr><td class="path">SNI without Host header</td><td class="num">30</td><td><code>mgdb-proxy9</code> reached directly, bypassing the vhost name</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EFFICIENCY ============ -->
+<section id="efficiency">
+  <div class="sec-head">
+    <h2>Efficiency</h2>
+    <span class="sec-tag">Where the work goes</span>
+  </div>
+
+  <div class="finding crit">
+    <div class="f-top">
+      <span class="f-id">EFF‑1</span>
+      <h3>Half of everything MaizeGDB serves is the same index files, re-downloaded</h3>
+      <span class="pill crit">Critical</span>
+    </div>
+    <p>The FASTA service does not cache the <code>.fai</code> index. Every sequence lookup makes htslib pull the entire multi-megabyte index across the network again.</p>
+    <div class="evidence"><pre>.fai requests            244,584
+.fai bytes transferred   418.08 GB      average 1.8 MB per request
+                                        peak file: 2.7 MB, fetched 32,554 times
+
+download.maizegdb.org    770.2 GB total  → 54.3% is .fai
+ALL of MaizeGDB          859.9 GB total  → 48.6% is .fai</pre></div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Index file</th><th class="num">Fetches</th><th class="num">Transferred</th></tr></thead>
+        <tbody>
+          <tr><td class="path">…NAM-5.0_Zm00001eb.1.protein.fa.gz.fai</td><td class="num">32,554</td><td class="num">87.2 GB</td></tr>
+          <tr><td class="path">…NAM-5.0_Zm00001eb.1.cdna.fa.gz.fai</td><td class="num">31,799</td><td class="num">88.0 GB</td></tr>
+          <tr><td class="path">…NAM-5.0_Zm00001eb.1.gene.fa.gz.fai</td><td class="num">16,895</td><td class="num">27.8 GB</td></tr>
+          <tr><td class="path">…GRAMENE-4.0_Zm00001d.2.protein.fa.gz.fai</td><td class="num">8,459</td><td class="num">44.0 GB</td></tr>
+          <tr><td class="path">…GRAMENE-4.0_Zm00001d.2.cdna.fa.gz.fai</td><td class="num">8,532</td><td class="num">42.3 GB</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The whole working set is roughly a dozen files. Held on local disk they would total well under a gigabyte, and they change only when a genome release changes.</p>
+    <div class="fix"><span class="lab">Fix</span><p>Mount or rsync the <code>.fai</code>/<code>.gzi</code> indexes onto the FASTA host and point htslib at local paths. This removes ~70 GB/day of transfer and takes a network round-trip out of every sequence lookup — it should be the largest single latency improvement available.</p></div>
+  </div>
+
+  <div class="finding crit">
+    <div class="f-top">
+      <span class="f-id">EFF‑2</span>
+      <h3>Each gene page view costs 14.9 server round-trips</h3>
+      <span class="pill crit">Critical · redesign</span>
+    </div>
+    <p>The gene record page loads its HTML shell, then fires a burst of independent PHP requests — one per tab — each with its own bootstrap and database connection.</p>
+    <div class="evidence"><pre>gene_center HTML page loads      96,957
+record_data AJAX calls        1,442,536      = 14.9 per page
+
+One page load, one client, same second:
+  00:04:49  gene_data.php?id=Zm00001eb286810&amp;type=top
+  00:04:49  gene_data.php?…&amp;type=overview
+  00:04:49  gene_data.php?…&amp;type=annotations
+  00:04:49  gene_data.php?…&amp;type=expression
+  00:04:49  gene_data.php?…&amp;type=insertions
+  00:04:49  gene_data.php?…&amp;type=proteomics
+  00:04:49  gene_data.php?…&amp;type=snps
+  00:04:49  gene_sequence_data.php?…&amp;type=sequence</pre></div>
+    <p>Across the four record scripts there are about twenty distinct <code>type</code> values. This fan-out is <strong>69.4% of all main-site traffic</strong> (1,442,536 of 2,077,454 requests) — the gene page is not one page, it is twenty small ones in a trench coat.</p>
+    <p>It also explains BRK‑2's failure pattern. Twenty parallel requests per view, multiplied by the scrapers in EFF‑3, is what saturates the backends.</p>
+    <div class="fix"><span class="lab">Fix</span><p>In the redesign, collapse this into <strong>one JSON call for above-the-fold content</strong> plus at most one lazy call for heavy tabs, sharing a single DB connection and letting the query planner see the whole record at once. Even a straight consolidation with no query tuning removes ~1.3M requests per six days.</p></div>
+  </div>
+
+  <div class="finding high">
+    <div class="f-top">
+      <span class="f-id">EFF‑3</span>
+      <h3>Three scrapers account for 30.8% of main-site traffic</h3>
+      <span class="pill high">High</span>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Source</th><th class="num">Requests</th><th>Behaviour</th></tr></thead>
+        <tbody>
+          <tr><td class="path">2604:2d80:5c04:9800::/64</td><td class="num">1,059,956</td><td>Declares Chrome/149 on Linux; fetches only record_data, get_sequence and jbrowse config — never CSS, JS or images</td></tr>
+          <tr><td class="path">202.112.160.19</td><td class="num">234,751</td><td>Exclusively <code>gene_locus_data.php</code> + <code>gene_data.php</code></td></tr>
+          <tr><td class="path">114.251.216.98</td><td class="num">151,520</td><td>Same pattern</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>A separate R client (<code>r-curl/httr</code>, 266,984 requests) hits the same two endpoints. That one is a researcher using MaizeGDB as an API because no documented API exists — a product signal rather than abuse.</p>
+    <p>The traffic profile corroborates this: load peaks 20:00–04:00 US Central and troughs during North American working hours. The busiest hours are automated, not human.</p>
+    <div class="fix"><span class="lab">Fix</span><p>Two moves that reinforce each other — publish a real bulk/API endpoint so programmatic users stop scraping page internals, then rate-limit per-IP on the record endpoints. Ship the API first, or you will simply break the researchers.</p></div>
+  </div>
+
+  <div class="finding med">
+    <div class="f-top">
+      <span class="f-id">EFF‑4</span>
+      <h3>Transport and caching leave easy wins</h3>
+      <span class="pill med">Medium</span>
+    </div>
+    <ul>
+      <li><strong>No HTTP/2 to origin.</strong> 5,653,899 requests are HTTP/1.1; ten are HTTP/2. With EFF‑2's twenty-request burst, head-of-line blocking on a handful of connections is doing real damage.</li>
+      <li><strong>119,439 revalidations for CSS/JS</strong> that returned 304, against 37,373 full 200s. The caching works, but each 304 is still a round-trip. Content-hashed filenames plus <code>Cache-Control: immutable</code> would eliminate them.</li>
+      <li><strong>No response times are recorded.</strong> The <code>LogFormat</code> has no <code>%D</code>, so slow-but-successful requests are invisible — this audit can identify what failed but not what was merely slow. Adding <code>%D</code> costs nothing and would let you measure the redesign against the current site.</li>
+      <li><strong><code>gcv</code> re-fetches <code>/config/config.json</code> on every page view</strong> (3,999 times, 6.6 KB each). Harmless, but trivially cacheable. <em>Note: this file is legitimate — it matched a credential-file heuristic during scanning and was cleared.</em></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ REDESIGN ============ -->
+<section id="redesign">
+  <div class="sec-head">
+    <h2>What this means for the redesign</h2>
+    <span class="sec-tag">Design constraints from evidence</span>
+  </div>
+
+  <div class="callout">
+    <h3>The gene record page is the product</h3>
+    <p>Nearly 70% of main-site traffic is one page type's data layer. Whatever the new gene record page does for latency and request count will dominate every other performance decision — and conversely, no amount of work elsewhere will compensate if it ships with the same fan-out.</p>
+  </div>
+
+  <ol>
+    <li><strong>One record, one response.</strong> Replace the <code>?type=</code> fan-out with a single JSON document per record, with heavy sections (pangenome, proteomics, expression) behind one lazy call. The existing <code>type</code> values map cleanly onto keys in that document, so this is a re-shaping job, not a re-modelling one.</li>
+    <li><strong>Publish the API you already have.</strong> Roughly half a million requests in this window are programmatic clients pulling <code>record_data</code> endpoints directly. A documented, versioned, rate-limited API converts scraping load into supported usage — and gives you somewhere to point the R and Python users.</li>
+    <li><strong>Status codes are part of the contract.</strong> Real 404s, 410 for retired records, 503 with <code>Retry-After</code> for backend trouble. This is the fix for SEC‑2 and the prerequisite for any monitoring that works.</li>
+    <li><strong>Sequence retrieval needs an owner.</strong> Between BRK‑1, BRK‑2, BRK‑3 and EFF‑1, the sequence stack is the least healthy part of the estate: a third of requests fail, one sequence type never works, and it generates half the site's bandwidth. Local indexes and a caching layer in front of <code>get_sequence.php</code> would address most of it.</li>
+    <li><strong>Instrument before you migrate.</strong> Add <code>%D</code> to the log format now, so there is a baseline to compare the new pages against. Right now there is no way to say whether the redesign made anything faster.</li>
+    <li><strong>Retire rather than port.</strong> The <code>past*</code> and <code>archive</code> hosts, the CornCyc SSI pages and the <code>cgi-bin</code> scripts each carry ongoing failures. The redesign is the natural moment to snapshot them to static HTML.</li>
+  </ol>
+</section>
+
+<!-- ============ PRIORITY ============ -->
+<section id="priority">
+  <div class="sec-head">
+    <h2>Suggested order</h2>
+    <span class="sec-tag">Effort vs. impact</span>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Action</th><th>Ref</th><th>Effort</th><th>Impact</th></tr></thead>
+      <tbody>
+        <tr><td class="num">1</td><td>Generate missing <code>.fai</code> indexes for mRNA / non-coding FASTA</td><td class="path">BRK‑1</td><td>Hours</td><td class="bad">Restores a broken feature</td></tr>
+        <tr><td class="num">2</td><td>Fix the empty-ID loop on the internal host</td><td class="path">BRK‑3</td><td>Hours</td><td class="bad">−16% total traffic</td></tr>
+        <tr><td class="num">3</td><td>Cache <code>.fai</code> indexes locally on the FASTA host</td><td class="path">EFF‑1</td><td>Days</td><td class="bad">−70 GB/day; large latency win</td></tr>
+        <tr><td class="num">4</td><td>Return real 404s instead of the 200 catch-all</td><td class="path">SEC‑2</td><td>Hours</td><td>Security, SEO, monitoring</td></tr>
+        <tr><td class="num">5</td><td>Restore <code>gene_product.js</code> and <code>map.js</code></td><td class="path">BRK‑4</td><td>Hours</td><td>Fixes two record page types</td></tr>
+        <tr><td class="num">6</td><td>Add <code>%D</code> to <code>LogFormat</code></td><td class="path">EFF‑4</td><td>Minutes</td><td>Baseline for the redesign</td></tr>
+        <tr><td class="num">7</td><td>Diagnose <code>c2s2</code> backend saturation</td><td class="path">BRK‑2</td><td>Days</td><td>−31.8% failure rate on sequences</td></tr>
+        <tr><td class="num">8</td><td>Set <code>Options +IncludesNoExec</code> for CornCyc</td><td class="path">BRK‑5</td><td>Minutes</td><td>Fixes overview pages</td></tr>
+        <tr><td class="num">9</td><td>Retire or freeze <code>past*</code> / <code>archive</code> CMS hosts</td><td class="path">SEC‑3</td><td>Days</td><td>Removes exploit surface</td></tr>
+        <tr><td class="num">10</td><td>Consolidate record_data fan-out into one JSON call</td><td class="path">EFF‑2</td><td>Redesign</td><td class="bad">−69% of main-site requests</td></tr>
+        <tr><td class="num">11</td><td>Publish a documented API, then rate-limit</td><td class="path">EFF‑3</td><td>Redesign</td><td>Converts scraping to supported use</td></tr>
+        <tr><td class="num">12</td><td>Restrict dev/staging vhosts</td><td class="path">SEC‑4</td><td>Hours</td><td>Reduces exposure</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  <p><strong>Method.</strong> Full-pass parse of all 5,655,317 access log lines (zero unparsed) and all 370,203 error log lines, aggregating status, vhost, path, byte, user-agent, referer and client-IP dimensions, plus a nineteen-pattern security scan. Every suspicious request returning 2xx was individually re-checked against response size to separate genuine exposure from the soft-404 page; heuristic matches on <code>cm=10</code> (read as a command parameter) and <code>gcv</code>'s <code>config.json</code> were confirmed false positives and excluded.</p>
+  <p><strong>Limits.</strong> POST bodies are not logged, so ~205,000 form submissions could not be inspected. The log format records no response time, so slow-but-successful requests are invisible. Client IPs arrive via Cloudflare's forwarded-for chain and are not independently verified. The window is six days (23–28 Aug 2026), with 28 Aug partial — ending 13:26.</p>
+</footer>
+
+</div>

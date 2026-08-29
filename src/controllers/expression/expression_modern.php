@@ -1,7 +1,7 @@
 <?php
 /* file: controllers/expression/expression_modern.php
  *
- * purpose: modernized controller for MaizeGDB Expression Data Center
+ * purpose: modernized controller for MaizeGDB Expression Data Hub
  */
 
 include_once('./include/db-api.php');
@@ -18,7 +18,7 @@ header("Cache-Control: no-cache, no-store, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-$bauplan = new Bauplan('MaizeGDB Expression Data Center | RNA-seq Atlases, qTeller & Transcriptomics');
+$bauplan = new Bauplan('MaizeGDB Expression Data Hub | RNA-seq Atlases, qTeller & Transcriptomics');
 $bauplan->modern();
 
 $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';

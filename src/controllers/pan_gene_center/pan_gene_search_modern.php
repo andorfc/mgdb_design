@@ -43,7 +43,7 @@
   $mgdb->get('image-dir')->replace($system['image_url']);
   $mgdb->get('server-url')->replace($system['root_url']);
 
-  $content = $mgdb->get('body')->loadRemote($system['root_url_private'] . '/templates/static/mgdb_pan_gene.bau');
+  $content = $mgdb->get('body')->load('templates/static/mgdb_pan_gene.bau');
 
   /////
   // The analysis this page describes

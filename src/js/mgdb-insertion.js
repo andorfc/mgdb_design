@@ -1,4 +1,4 @@
-/* Insertion Data Center JavaScript (/insertion)
+/* Insertion Data Hub JavaScript (/insertion)
    Handles the three search-mode tabs, dataset-dependent background options,
    example fill-ins, the live search request, results rendering, and the TSV
    export link. */

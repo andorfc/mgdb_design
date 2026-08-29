@@ -1,7 +1,7 @@
 <?php
 /* file: image_search_modern.php
  *
- * purpose: Modernized controller for the unified Image Data Center (/data_center/image).
+ * purpose: Modernized controller for the unified Image Data Hub (/data_center/image).
  *          Unifies image_phenotype, image_trait, image_species, image_gel_pattern,
  *          and image_mutant into a single interactive visual archive.
  */
@@ -18,7 +18,7 @@ header("Cache-Control: no-cache, no-store, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-$bauplan = new Bauplan('MaizeGDB Image Data Center | Visual Genetics & Genomics Archive');
+$bauplan = new Bauplan('MaizeGDB Image Data Hub | Visual Genetics & Genomics Archive');
 $bauplan->modern();
 
 $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';

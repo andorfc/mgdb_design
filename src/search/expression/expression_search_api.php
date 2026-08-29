@@ -1,7 +1,7 @@
 <?php
 /* file: search/expression/expression_search_api.php
  *
- * purpose: AJAX JSON endpoint and TSV export for Expression Data Center lookup
+ * purpose: AJAX JSON endpoint and TSV export for Expression Data Hub lookup
  */
 
 $start_time = microtime(true);

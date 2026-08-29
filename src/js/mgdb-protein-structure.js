@@ -254,6 +254,15 @@
       links.push('<a class="mgdb-button mgdb-button-quiet" href="/foldseek?uniprot='
         + encodeURIComponent(identity.gene_ids[0]) + '">Foldseek</a>');
     }
+    /* AlphaFill answers the question this page cannot: not what shape the
+       protein is, but what it probably binds. The link is unconditional
+       because /data_center/alphafill distinguishes "no transplant" from "no
+       model" from "not a gene", and each of those is worth landing on --
+       gating the link here would collapse them back into silence. */
+    if ((identity.gene_ids || []).length) {
+      links.push('<a class="mgdb-button mgdb-button-quiet" href="/data_center/alphafill?gene='
+        + encodeURIComponent(identity.gene_ids[0]) + '">Predicted ligands</a>');
+    }
 
     /* Saying which route answered is not trivia: "structure index" means the
        identifier was matched exactly, "MaizeGDB gene database" means it was

@@ -91,7 +91,7 @@ PROBE_SKIP = re.compile(
 
 # Categories, in the order they appear in the report.
 CATEGORY_ORDER = [
-    "Data centers",
+    "Data hubs",
     "Gene and pan-gene centers",
     "Genome",
     "Tools",
@@ -309,7 +309,7 @@ class Scanner(object):
     def category_for(self, url, chain):
         leaf = chain[-1]
         if url.startswith("/data_center"):
-            return "Data centers"
+            return "Data hubs"
         if url.startswith("/gene_center") or url.startswith("/pan_gene_center"):
             return "Gene and pan-gene centers"
         if url.startswith("/genome") or leaf.startswith("controllers/genome/"):
@@ -329,7 +329,7 @@ class Scanner(object):
         if leaf.startswith("controllers/about/") or leaf.startswith("controllers/static/"):
             return "Information pages"
         if url.startswith("/insertion") or url.startswith("/ordering"):
-            return "Data centers"
+            return "Data hubs"
         return "Information pages"
 
     def discover(self):

@@ -2,7 +2,7 @@
 /* file: image_search_lib.php
  *
  * purpose: Query builder, image URL resolver, and export functions for the
- *          unified Image Data Center (/data_center/image).
+ *          unified Image Data Hub (/data_center/image).
  */
 
 function imgSearchValue($key, $default = '') {

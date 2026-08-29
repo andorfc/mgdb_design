@@ -118,12 +118,14 @@ src/templates/home/megamenu_modern/genomes.bau         templates/home/megamenu_m
 src/templates/home/megamenu_modern/search.bau          templates/home/megamenu_modern/search.bau
 src/templates/home/megamenu_modern/sitemap.bau         templates/home/megamenu_modern/sitemap.bau
 
-# The /sitemap page. These five files existed only on the server until
-# 2026-08-23 -- not in this repository and not in this manifest, so nothing
-# backed them up. sitemap-content.bau is generated from a content model; see
-# README.md, "The site map".
+# The /sitemap page. These files existed only on the server until 2026-08-23
+# -- not in this repository and not in this manifest, so nothing backed them
+# up. sitemap-featured.bau and sitemap-content.bau are both generated from a
+# content model; see README.md, "The site map".
 src/controllers/about/sitemap.php                controllers/about/sitemap.php
 src/templates/about/sitemap.bau                  templates/about/sitemap.bau
+src/templates/about/sitemap-featured.bau         templates/about/sitemap-featured.bau
+src/templates/about/sitemap-tabs.bau             templates/about/sitemap-tabs.bau
 src/templates/about/sitemap-content.bau          templates/about/sitemap-content.bau
 src/css/sitemap.css                              css/sitemap.css
 src/js/sitemap.js                                js/sitemap.js
@@ -483,6 +485,31 @@ src/images/data_center/protein_structure.png           images/data_center/protei
 # 3Dmol, vendored so the viewer does not depend on unpkg. See the LICENSE file
 src/js/lib/3dmol/3Dmol-min.js                             js/lib/3dmol/3Dmol-min.js
 src/js/lib/3dmol/3Dmol-min.js.LICENSE.txt                 js/lib/3dmol/3Dmol-min.js.LICENSE.txt
+
+
+# AlphaFill ligand transplants — /data_center/alphafill. A new route, not a
+# replacement: nothing falls through behind the guard in
+# src/controllers/data_center.php, so deleting that guard 404s the page, which
+# is the correct rollback for a page with no predecessor.
+#
+# The payload under data/alphafill/ is NOT deployed from here and is not built
+# on the server either, which is the one place this differs from every other
+# resource page. Its source is a one-off research output — six CSVs, the
+# AlphaFill run's filled mmCIFs, and the AlphaFold model archive — that has
+# never lived on the web host. See README, "Rebuilding the AlphaFill payload",
+# and ADMIN_DEPENDENCIES AD-028 for where the source should end up.
+#
+# Reuses js/lib/3dmol/ from the protein structure block above.
+src/controllers/data_center/alphafill_modern.php          controllers/data_center/alphafill_modern.php
+src/templates/static/mgdb_alphafill.bau                   templates/static/mgdb_alphafill.bau
+src/css/mgdb-alphafill.css                                css/mgdb-alphafill.css
+src/js/mgdb-alphafill.js                                  js/mgdb-alphafill.js
+src/search/alphafill/alphafill_api.php                    search/alphafill/alphafill_api.php
+src/search/alphafill/alphafill_lib.php                    search/alphafill/alphafill_lib.php
+src/search/alphafill/alphafill_download.php               search/alphafill/alphafill_download.php
+src/tools/alphafill_index.py                              tools/alphafill_index.py
+src/tools/alphafill_models.py                             tools/alphafill_models.py
+src/tools/alphafill_ligand_extract.py                     tools/alphafill_ligand_extract.py
 
 
 # TYPSimSelector — replaces /TYPSimSelector.

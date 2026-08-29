@@ -24,7 +24,7 @@
 // Reachable only through controllers/api.php.
 if (!defined('MGDB_API')) { http_response_code(404); exit; }
 
-  $SECTIONS = array('overview', 'pedigree', 'related', 'references', 'offsite', 'grin');
+  $SECTIONS = array('overview', 'pedigree', 'related', 'typsim', 'references', 'offsite', 'grin');
   $wanted = MgdbApi::sections($SECTIONS);
   $want = array_flip($wanted);
   $max_items = MgdbApi::maxItems();
@@ -478,27 +478,105 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   }
 
   /////
+  // TYPSimSelector (Identity-By-State Similarity)
+  /////
+
+  if (isset($want['typsim'])) {
+    $typsim = null;
+    $stock_name_clean = trim((string) $record['name']);
+
+    // Check if this stock or accession is present in pidata.snp_entry
+    $snp_row = retrieve_row(make_query($DBConn, "
+      SELECT e.snp_entry_id, e.taxa,
+             ci.inventory_number_part1 AS part1,
+             ci.inventory_number_part2 AS part2,
+             ci.accession_id
+      FROM pidata.snp_entry e
+      LEFT JOIN pidata.custom_inventory ci ON ci.snp_entry_id = e.snp_entry_id
+      WHERE e.taxa ILIKE :name1 OR e.taxa ILIKE :name2
+      ORDER BY e.snp_entry_id ASC
+      LIMIT 1", 1, array('name1' => $stock_name_clean, 'name2' => $stock_name_clean . '_%')));
+    MgdbApi::countQuery();
+
+    if ($snp_row && isset($snp_row['snp_entry_id'])) {
+      if (file_exists(__DIR__ . '/../../../../search/typsimselector/typsimselector_search_lib.php')) {
+        include_once(__DIR__ . '/../../../../search/typsimselector/typsimselector_search_lib.php');
+      } else {
+        include_once('./search/typsimselector/typsimselector_search_lib.php');
+      }
+      $line = typsimResolveLine($DBConn, 'curation', (int) $snp_row['snp_entry_id']);
+      if ($line) {
+        $line_id_int = isset($line['id']) ? (int) $line['id'] : (int) $snp_row['snp_entry_id'];
+        $result = typsimResultPage($DBConn, 'curation', $line_id_int, '', 'desc', 1, 6);
+        $top_rows = array();
+        if (isset($result['rows']) && is_array($result['rows'])) {
+          foreach ($result['rows'] as $r) {
+            $top_rows[] = array(
+              'rank' => (int) $r['rank'],
+              'id' => $r['id'],
+              'name' => $r['name'],
+              'line' => $r['line'],
+              'accession' => $r['accession'],
+              'similarity' => (float) $r['similarity'],
+              'similarity_percent' => round(((float) $r['similarity']) * 100, 2),
+              'divergence' => (float) $r['divergence'],
+              'is_self' => (bool) $r['is_self'],
+              'html' => '/data_center/stock/' . rawurlencode($r['line'])
+            );
+          }
+        }
+
+        $typsim = array(
+          'available' => true,
+          'line_id' => (string) $snp_row['snp_entry_id'],
+          'taxa' => $snp_row['taxa'],
+          'line_name' => $line['line'],
+          'accession' => $line['accession'],
+          'total_compared' => isset($result['total']) ? (int) $result['total'] : 4476,
+          'tool_url' => '/TYPSimSelector?line=' . rawurlencode((string) $snp_row['snp_entry_id']),
+          'top_matches' => $top_rows
+        );
+      }
+    }
+
+    $sections['typsim'] = $typsim;
+  }
+
+  /////
   // References
   /////
 
   if (isset($want['references'])) {
     $references = array();
     $sth = make_query($DBConn, "
-      SELECT r.id, r.name, r.title, r.year, t.name AS contents
+      SELECT r.id, r.name, r.title, r.year, r.doi, r.author_desc, t.name AS contents,
+             t_type.name AS pub_type
       FROM mgdb.id_reference ir
         INNER JOIN mgdb.reference r ON r.id = ir.reference
         INNER JOIN mgdb.id_num i ON i.id = ir.reference AND i.curation_lvl = 0
         LEFT JOIN mgdb.term t ON t.id = ir.contents
+        LEFT JOIN mgdb.term t_type ON t_type.id = r.type
       WHERE ir.id = :id
       ORDER BY r.year DESC NULLS LAST, LOWER(r.name)", 1, array('id' => $id));
     MgdbApi::countQuery();
     while ($row = retrieve_row($sth)) {
+      $doi = MgdbApi::text($row['doi']);
+      if ($doi && preg_match('/(?:doi:\s*|https?:\/\/doi\.org\/)?(10\.\d{4,9}\/[-._;()\/:A-Z0-9]+)/i', $doi, $m)) {
+        $doi = $m[1];
+      } elseif (preg_match('/(?:doi:\s*|https?:\/\/doi\.org\/)?(10\.\d{4,9}\/[-._;()\/:A-Z0-9]+)/i', (string) $row['name'], $m)) {
+        $doi = $m[1];
+      } else {
+        $doi = null;
+      }
       $references[] = array(
         'type' => 'reference',
         'id' => MgdbApi::int($row['id']),
         'citation' => MgdbApi::text($row['name']),
         'title' => MgdbApi::text($row['title']),
+        'authors' => MgdbApi::text($row['author_desc']),
         'year' => MgdbApi::int($row['year']),
+        'doi' => $doi,
+        'pub_type' => MgdbApi::text($row['pub_type']) ?: 'Journal article',
         'relevance' => MgdbApi::text($row['contents']),
         'html' => '/data_center/reference?id=' . (int) $row['id']
       );
@@ -614,12 +692,13 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   // Cap the embedded lists
   //
   // After the consistency check, so truncation cannot be mistaken for a failed
-  // query. meta.counts still carries the true totals.
+  // query. meta.counts still carries the true totals. Pedigree is deliberately
+  // not capped: the stock record's relationship table is the complete direct
+  // parent/progeny record, while its graph applies its own visual limit.
   /////
 
   $truncated = array();
-  foreach (array('pedigree' => array('parents', 'progeny'),
-                 'related' => array('genotypic_variations', 'karyotypic_variations',
+  foreach (array('related' => array('genotypic_variations', 'karyotypic_variations',
                                     'phenotypes', 'relations', 'images', 'variation_images'),
                  'references' => null) as $section => $keys) {
     if (!isset($sections[$section])) {

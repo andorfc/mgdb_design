@@ -87,6 +87,12 @@ $$SYNTAX-LEVEL 2
       )
     </li>
     
+      <!-- Downloads is a destination, not a panel, so it carries no dropdown and
+           needs none of the image-dir plumbing the panels use. Points at the
+           existing download host rather than a new page. -->
+      <li>
+        <a class="mega-plain-link" href="https://download.maizegdb.org" target="_blank" rel="noopener">Downloads</a>
+      </li>
    <li>
     *(sitemap-item {load: templates/home/megamenu_modern/sitemap.bau}
       &(lambda
@@ -101,6 +107,7 @@ $$SYNTAX-LEVEL 2
       )
     )
     </li>
+
      
     <li class="right">
       *(feedback-item {load: templates/home/megamenu_modern/feedback.bau}

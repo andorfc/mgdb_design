@@ -6,6 +6,8 @@
  * id is supplied. Individual SSR records continue through the legacy viewer.
  */
 
+include_once('./include/dashboard_cache.php');
+
 $system = getSystemInfo('mgdb.conf');
 logMessage('Starting ssr_search_modern.php');
 
@@ -36,7 +38,11 @@ $ssr_count_sql = "
   FROM probe p
   JOIN id_num i ON i.id=p.id
   WHERE p.type=104436 AND i.curation_lvl=0";
-$ssr_stats = retrieve_row(make_query($DBConn, $ssr_count_sql));
+/* One collection-wide count, static between reloads. See include/dashboard_cache.php. */
+$ssr_stats = dashboardCache($system, 'ssr/stats', function () use ($DBConn, $ssr_count_sql) {
+    $row = retrieve_row(make_query($DBConn, $ssr_count_sql));
+    return array('total' => (int) $row['total']);
+});
 
 $search_limit = getCGIParam('ssr_limit', 'S', $system['search_limit']);
 $search_limit = max(1, min((int) $search_limit, (int) $system['search_limit_max']));

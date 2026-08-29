@@ -17,3 +17,12 @@ deploy/config.local.sh
 # Python bytecode from tools/
 __pycache__/
 *.pyc
+
+# AlphaFill research outputs. This is a staging folder for the proteome run's
+# own artifacts, not source: a 54 MB single-file demo viewer with 179 structures
+# inlined, and the 16 MB gene x ligand table. Both are inputs to
+# tools/alphafill_index.py, which is versioned; the products are deployed as
+# tarballs and never committed. See README, "AlphaFill ligand transplants",
+# and ADMIN_DEPENDENCIES AD-028 for where the authoritative copies live.
+# The design spec that came with them is kept at docs/alphafill/.
+protein_data/

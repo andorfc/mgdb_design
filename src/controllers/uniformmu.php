@@ -413,7 +413,7 @@
           . '</section>';
   }
 
-  /* Papers and references, in the same card the reference data center and the
+  /* Papers and references, in the same card the reference data hub and the
      cite page use, so a citation looks the same everywhere on the site.
 
      Every entry that MaizeGDB holds a record for links to it. A DOI is printed
@@ -515,7 +515,7 @@
   $mgdb->get('image-dir')->replace($system['image_url']);
   $mgdb->get('server-url')->replace($system['root_url']);
 
-  $body = $mgdb->get('body')->loadRemote($system['root_url_private'] . '/templates/static/mgdb_uniformmu.bau');
+  $body = $mgdb->get('body')->load('templates/static/mgdb_uniformmu.bau');
 
   $body->get('payload-url')->replace(um_esc($um_payload_rel));
   $body->get('data-date')->replace(um_esc($um_generated_long));

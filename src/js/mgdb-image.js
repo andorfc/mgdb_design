@@ -1,4 +1,4 @@
-/* Image Data Center JavaScript
+/* Image Data Hub JavaScript
    Handles search input, category filtering, responsive gallery rendering,
    lightbox modal preview, sticky scrollspy tabs, pagination, and export URL synchronization. */
 
@@ -11,6 +11,7 @@
     term: '',
     category: 'all',
     sort: 'latest',
+    view: 'card',
     page: 1,
     pageSize: 24,
     currentData: null,
@@ -112,6 +113,9 @@
     if (params.has('sort')) {
       state.sort = params.get('sort') || 'latest';
     }
+    if (params.has('view')) {
+      state.view = params.get('view') === 'table' ? 'table' : 'card';
+    }
     if (params.has('page')) {
       state.page = parseInt(params.get('page'), 10) || 1;
     }
@@ -122,6 +126,7 @@
     if (state.term) params.set('q', state.term);
     if (state.category && state.category !== 'all') params.set('category', state.category);
     if (state.sort && state.sort !== 'latest') params.set('sort', state.sort);
+    if (state.view && state.view !== 'card') params.set('view', state.view);
     if (state.page > 1) params.set('page', state.page);
 
     var queryString = params.toString();
@@ -159,7 +164,7 @@
     state.loading = true;
 
     var status = byId('image-results-status');
-    var grid = byId('image-results-grid');
+    var container = byId('image-results') || byId('image-results-grid');
     var empty = byId('image-empty');
 
     if (status) {
@@ -190,7 +195,7 @@
         renderResults(data);
         renderPagination(data.summary.page, data.summary.page_count);
 
-        if (scrollToResults && grid) {
+        if (scrollToResults && container) {
           var target = byId('image-gallery-section');
           if (target && typeof target.scrollIntoView === 'function') {
             target.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -203,16 +208,16 @@
       });
   }
 
-  /* ── Render Gallery Cards ───────────────────────────────────────────────── */
+  /* ── Render Gallery Cards & Table ────────────────────────────────────────── */
 
   function renderResults(data) {
-    var grid = byId('image-results-grid');
+    var container = byId('image-results') || byId('image-results-grid');
     var empty = byId('image-empty');
     var status = byId('image-results-status');
     var summary = data.summary;
 
     if (!summary.total || summary.total === 0) {
-      if (grid) grid.innerHTML = '';
+      if (container) container.innerHTML = '';
       if (empty) empty.hidden = false;
       if (status) {
         var qText = data.query.term ? ' for “' + esc(data.query.term) + '”' : '';
@@ -232,35 +237,85 @@
         + ' images' + queryText + ' · ' + number(summary.elapsed_ms) + ' ms';
     }
 
-    if (!grid) return;
+    if (!container) return;
+    container.className = 'image-results-container image-view-' + state.view;
 
-    grid.innerHTML = data.results.map(function (row, idx) {
-      var name = row.entity_name || ('Image #' + row.auto_num);
-      var recordUrl = row.record_url || ('/data_center/variation?id=' + encodeURIComponent(row.id));
-      var imgUrl = row.image_url;
-      var caption = row.caption || '';
-      var catName = row.category_name || row.type_name || 'Media';
+    if (state.view === 'card') {
+      container.innerHTML = '<div class="image-results-grid">' + data.results.map(function (row, idx) {
+        var name = row.entity_name || ('Image #' + row.auto_num);
+        var recordUrl = row.record_url || ('/data_center/variation?id=' + encodeURIComponent(row.id));
+        var imgUrl = row.image_url;
+        var caption = row.caption || '';
+        var catName = row.category_name || row.type_name || 'Media';
 
-      return '<article class="mgdb-image-card" data-index="' + idx + '">'
-        + '  <div>'
-        + '    <figure class="image-card-figure" data-img-src="' + esc(imgUrl) + '" data-img-title="' + esc(name) + '" data-img-cat="' + esc(catName) + '" data-img-caption="' + esc(caption) + '" data-img-record="' + esc(recordUrl) + '">'
-        + '      <img src="' + esc(imgUrl) + '" alt="' + esc(caption || name) + '" loading="lazy" onerror="this.onerror=null;this.src=\'/images/logo.png\';this.style.objectFit=\'contain\';this.style.padding=\'16px\';" />'
-        + '    </figure>'
-        + '    <div class="image-card-body">'
-        + '      <div class="image-card-meta">'
-        + '        <span class="image-card-badge" data-cat="' + esc(row.type_name || catName) + '">' + esc(catName) + '</span>'
-        + '      </div>'
-        + '      <h3><a href="' + recordUrl + '">' + esc(name) + '</a></h3>'
-        + (caption ? '<p class="image-card-caption">' + esc(caption) + '</p>' : '')
-        + '    </div>'
-        + '  </div>'
-        + '  <div class="image-card-links">'
-        + '    <button class="image-card-btn image-preview-btn" type="button" data-img-src="' + esc(imgUrl) + '" data-img-title="' + esc(name) + '" data-img-cat="' + esc(catName) + '" data-img-caption="' + esc(caption) + '" data-img-record="' + esc(recordUrl) + '">Zoom</button>'
-        + '    <a class="image-card-btn" href="' + recordUrl + '">Record &rarr;</a>'
-        + '    <button class="image-card-btn image-copy-btn" type="button" data-copy-value="' + esc(imgUrl) + '">Copy URL</button>'
-        + '  </div>'
-        + '</article>';
-    }).join('');
+        return '<article class="mgdb-image-card" data-index="' + idx + '">'
+          + '  <div>'
+          + '    <figure class="image-card-figure" data-img-src="' + esc(imgUrl) + '" data-img-title="' + esc(name) + '" data-img-cat="' + esc(catName) + '" data-img-caption="' + esc(caption) + '" data-img-record="' + esc(recordUrl) + '">'
+          + '      <img src="' + esc(imgUrl) + '" alt="' + esc(caption || name) + '" loading="lazy" onerror="this.onerror=null;this.src=\'/images/logo.png\';this.style.objectFit=\'contain\';this.style.padding=\'16px\';" />'
+          + '    </figure>'
+          + '    <div class="image-card-body">'
+          + '      <div class="image-card-meta">'
+          + '        <span class="image-card-badge" data-cat="' + esc(row.type_name || catName) + '">' + esc(catName) + '</span>'
+          + '      </div>'
+          + '      <h3><a href="' + recordUrl + '">' + esc(name) + '</a></h3>'
+          + (caption ? '<p class="image-card-caption">' + esc(caption) + '</p>' : '')
+          + '    </div>'
+          + '  </div>'
+          + '  <div class="image-card-links">'
+          + '    <button class="image-card-btn image-preview-btn" type="button" data-img-src="' + esc(imgUrl) + '" data-img-title="' + esc(name) + '" data-img-cat="' + esc(catName) + '" data-img-caption="' + esc(caption) + '" data-img-record="' + esc(recordUrl) + '">Zoom</button>'
+          + '    <a class="image-card-btn" href="' + recordUrl + '">Record &rarr;</a>'
+          + '    <button class="image-card-btn image-copy-btn" type="button" data-copy-value="' + esc(imgUrl) + '">Copy URL</button>'
+          + '  </div>'
+          + '</article>';
+      }).join('') + '</div>';
+    } else {
+      var rows = data.results.map(function (row, idx) {
+        var name = row.entity_name || ('Image #' + row.auto_num);
+        var recordUrl = row.record_url || ('/data_center/variation?id=' + encodeURIComponent(row.id));
+        var imgUrl = row.image_url;
+        var caption = row.caption || '';
+        var catName = row.category_name || row.type_name || 'Media';
+
+        return '<tr>'
+          + '  <td>'
+          + '    <button class="image-table-thumb image-preview-btn" type="button" data-img-src="' + esc(imgUrl) + '" data-img-title="' + esc(name) + '" data-img-cat="' + esc(catName) + '" data-img-caption="' + esc(caption) + '" data-img-record="' + esc(recordUrl) + '" title="Click to zoom">'
+          + '      <img src="' + esc(imgUrl) + '" alt="' + esc(caption || name) + '" loading="lazy" onerror="this.onerror=null;this.src=\'/images/logo.png\';" />'
+          + '    </button>'
+          + '  </td>'
+          + '  <td>'
+          + '    <a class="image-table-title" href="' + recordUrl + '">' + esc(name) + '</a>'
+          + '  </td>'
+          + '  <td>'
+          + '    <span class="image-card-badge" data-cat="' + esc(row.type_name || catName) + '">' + esc(catName) + '</span>'
+          + '  </td>'
+          + '  <td>'
+          + '    <div class="image-table-caption">' + esc(caption || '—') + '</div>'
+          + '  </td>'
+          + '  <td>'
+          + '    <div class="image-table-actions">'
+          + '      <button class="image-table-btn image-preview-btn" type="button" data-img-src="' + esc(imgUrl) + '" data-img-title="' + esc(name) + '" data-img-cat="' + esc(catName) + '" data-img-caption="' + esc(caption) + '" data-img-record="' + esc(recordUrl) + '">Zoom</button>'
+          + '      <a class="image-table-btn" href="' + recordUrl + '">Record</a>'
+          + '      <button class="image-table-btn image-copy-btn" type="button" data-copy-value="' + esc(imgUrl) + '">Copy</button>'
+          + '    </div>'
+          + '  </td>'
+          + '</tr>';
+      }).join('');
+
+      container.innerHTML = '<div class="mgdb-table-scroll">'
+        + '<table class="mgdb-table image-table">'
+        + '  <thead>'
+        + '    <tr>'
+        + '      <th scope="col" style="width: 72px;">Preview</th>'
+        + '      <th scope="col">Entity / Title</th>'
+        + '      <th scope="col">Category</th>'
+        + '      <th scope="col">Caption</th>'
+        + '      <th scope="col" style="text-align: right; width: 140px;">Actions</th>'
+        + '    </tr>'
+        + '  </thead>'
+        + '  <tbody>' + rows + '</tbody>'
+        + '</table>'
+        + '</div>';
+    }
 
     initGalleryCardEvents();
   }
@@ -406,6 +461,31 @@
     });
   }
 
+  /* ── View Switcher (Cards vs Table) ─────────────────────────────────────── */
+
+  function setView(view) {
+    state.view = view || 'card';
+    Array.prototype.forEach.call(document.querySelectorAll('.image-view-btn'), function (btn) {
+      var active = btn.getAttribute('data-view') === state.view;
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+    updateUrlParams();
+    if (state.currentData) {
+      renderResults(state.currentData);
+    }
+  }
+
+  function initViewToggle() {
+    Array.prototype.forEach.call(document.querySelectorAll('.image-view-btn'), function (btn) {
+      btn.addEventListener('click', function () {
+        var targetView = btn.getAttribute('data-view');
+        if (targetView && targetView !== state.view) {
+          setView(targetView);
+        }
+      });
+    });
+  }
+
   /* ── Category Pill Bar & Form Controls ──────────────────────────────────── */
 
   function setCategory(cat, executeNow) {
@@ -516,8 +596,10 @@
     readUrlParams();
     buildTabs();
     initLightboxModal();
+    initViewToggle();
     initForm();
     setCategory(state.category, false);
+    setView(state.view);
     updateExportLinks();
 
     // Execute initial search

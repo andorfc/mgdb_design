@@ -80,7 +80,7 @@
     $mgdb->get('image-dir')->replace($system['image_url']);
     $mgdb->get('server-url')->replace($system['root_url']);
 
-    $body = $mgdb->get('body')->loadRemote($system['root_url_private'] . '/templates/static/mgdb_redesign_status_missing.bau');
+    $body = $mgdb->get('body')->load('templates/static/mgdb_redesign_status_missing.bau');
 
     include_once('translation.php');
     $mgdb->get('blast_url')->replace($system['BLAST_URL']);
@@ -245,7 +245,7 @@
   $mgdb->get('image-dir')->replace($system['image_url']);
   $mgdb->get('server-url')->replace($system['root_url']);
 
-  $body = $mgdb->get('body')->loadRemote($system['root_url_private'] . '/templates/static/mgdb_redesign_status.bau');
+  $body = $mgdb->get('body')->load('templates/static/mgdb_redesign_status.bau');
 
   $body->get('generated')->replace($generated_html);
   $body->get('total-urls')->replace(number_format($total));

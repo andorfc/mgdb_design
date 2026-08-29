@@ -1,7 +1,7 @@
 <?php
 /* file: search/expression/expression_search_lib.php
  *
- * purpose: database queries and search utilities for MaizeGDB Expression Data Center
+ * purpose: database queries and search utilities for MaizeGDB Expression Data Hub
  */
 
 include_once(__DIR__ . '/../../include/db-api.php');

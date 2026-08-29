@@ -1,7 +1,7 @@
 /**
  * file: js/mgdb-expression.js
  *
- * purpose: AJAX search, example launchers, and scrollspy for Expression Data Center
+ * purpose: AJAX search, example launchers, and scrollspy for Expression Data Hub
  */
 
 (function () {

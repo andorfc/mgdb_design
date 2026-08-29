@@ -124,8 +124,7 @@
   $mgdb->get('image-dir')->replace($system['image_url']);
   $mgdb->get('server-url')->replace($system['root_url']);
 
-  $content = $mgdb->get('body')->loadRemote(
-    $system['root_url_private'] . '/templates/static/mgdb_gene_record.bau');
+  $content = $mgdb->get('body')->load('templates/static/mgdb_gene_record.bau');
 
   // The identifier the client asks the API for. The canonical gene model name
   // when there is one, so a symbol URL and an accession URL share a cache entry.

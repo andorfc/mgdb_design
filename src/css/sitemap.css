@@ -1,0 +1,313 @@
+/* Site map — page-specific composition on the shared MaizeGDB modern system. */
+
+.mgdb-modern .mgdb-sitemap-page {
+  padding-bottom: clamp(3rem, 6vw, 5.5rem);
+}
+
+.mgdb-modern .sitemap-hero-mark {
+  display: block;
+  width: 6.5rem;
+  height: 6.5rem;
+  margin: 0 auto 0.7rem;
+}
+
+.mgdb-modern .sitemap-finder-panel {
+  padding: clamp(1.1rem, 2.6vw, 1.75rem);
+  border: 1px solid var(--mgdb-line);
+  border-top: 0.3rem solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-modern .sitemap-finder-panel .mgdb-search {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.mgdb-modern .sitemap-search-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.65rem;
+}
+
+.mgdb-modern .sitemap-search-row .mgdb-input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.mgdb-modern .sitemap-filter-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  margin-top: 1.15rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--mgdb-line);
+}
+
+.mgdb-modern .sitemap-filter-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.mgdb-modern .sitemap-filter-list .is-active {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: var(--mgdb-surface);
+}
+
+.mgdb-modern .sitemap-results-status {
+  min-height: 1.4em;
+  margin: 0.85rem 0 0;
+  color: var(--mgdb-muted);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.mgdb-modern .sitemap-directory {
+  margin-top: clamp(2rem, 5vw, 3.5rem);
+}
+
+/* Search panel and the list it filters are one unit, so the gap between them
+   is smaller than the gap between page sections. */
+.mgdb-modern .sitemap-directory #sitemap_content {
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-modern .sitemap-metrics {
+  margin-top: clamp(2.5rem, 6vw, 4.5rem);
+}
+
+/* The hero carries a heading and one line of description and nothing else, so
+   it needs a floor to keep from collapsing shorter than the emblem beside it. */
+.mgdb-modern .sitemap-hero .mgdb-hero-body {
+  min-height: 8.5rem;
+  gap: var(--mgdb-space-2);
+}
+
+/* --- sticky section tabs -------------------------------------------------- */
+
+/* The shared component sets its own top and bottom margins; the directory
+   below it would otherwise add a second gap. */
+.mgdb-modern .sitemap-tabs + .sitemap-directory {
+  margin-top: 0;
+}
+
+/* mgdb-modern.css scroll-margins `.mgdb-page > section[id]`. Three of these
+   tab targets are nested deeper than that, so without this they land under
+   the sticky bar. */
+.mgdb-modern #sitemap-featured,
+.mgdb-modern #sitemap-search-panel,
+.mgdb-modern .sitemap-section {
+  scroll-margin-top: 7.5rem;
+}
+
+/* A group filter can hide the section a tab points at. Rather than leave a
+   link that scrolls nowhere, the tab dims and js/sitemap.js swallows the
+   click. */
+.mgdb-modern .sitemap-tabs a.is-muted {
+  border-style: dashed;
+  opacity: .45;
+  cursor: default;
+}
+
+.mgdb-modern .sitemap-tabs a.is-muted:hover {
+  border-color: var(--mgdb-line);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-modern #sitemap_content {
+  float: none;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  color: var(--mgdb-ink);
+  background: transparent;
+}
+
+
+/* ---------------------------------------------------------------------------
+   Directory content.
+
+   The markup used to be a nested <table> of promoted tools plus <dl>/<dt>/<dd>
+   runs, and roughly a hundred lines here went on re-flowing tables into grids
+   and stripping tooltip spans. templates/about/sitemap-content.bau now emits
+   plain lists, so this styles the lists directly.
+   --------------------------------------------------------------------------- */
+
+.mgdb-modern #sitemap_content {
+  margin: 0;
+  padding: 0;
+  font-size: 1rem;
+  line-height: var(--mgdb-leading);
+  color: var(--mgdb-ink);
+}
+
+.mgdb-modern .sitemap-hidden {
+  display: none !important;
+}
+
+/* --- shared card ---------------------------------------------------------- */
+
+.mgdb-modern .sitemap-grid,
+.mgdb-modern .sitemap-featured-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--mgdb-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mgdb-modern .sitemap-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-1);
+  margin: 0;
+  padding: var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-left: 3px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+}
+
+.mgdb-modern .sitemap-item:hover,
+.mgdb-modern .sitemap-item:focus-within {
+  border-color: var(--mgdb-line-soft);
+  border-left-color: var(--mgdb-green);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-modern .sitemap-item-link {
+  font-weight: 600;
+  line-height: var(--mgdb-leading-snug);
+  color: var(--mgdb-green-dark);
+  text-decoration: none;
+}
+
+.mgdb-modern .sitemap-item-link:hover,
+.mgdb-modern .sitemap-item-link:focus-visible {
+  text-decoration: underline;
+}
+
+.mgdb-modern .sitemap-item-ext {
+  font-size: 0.85em;
+  color: var(--mgdb-muted);
+}
+
+.mgdb-modern .sitemap-item-desc {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: var(--mgdb-leading-snug);
+  color: var(--mgdb-ink-soft);
+}
+
+/* --- featured strip ------------------------------------------------------- */
+
+.mgdb-modern .sitemap-featured {
+  margin: clamp(2rem, 5vw, 3.5rem) 0 0;
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-gold-soft);
+}
+
+.mgdb-modern .sitemap-featured-title {
+  margin: 0 0 var(--mgdb-space-3);
+  font-size: 1.25rem;
+}
+
+.mgdb-modern .sitemap-featured-item {
+  border-left-color: var(--mgdb-gold-dark);
+  background: #fff;
+}
+
+.mgdb-modern .sitemap-featured-item:hover,
+.mgdb-modern .sitemap-featured-item:focus-within {
+  border-left-color: var(--mgdb-gold-dark);
+}
+
+/* --- collapsible sections ------------------------------------------------- */
+
+.mgdb-modern .sitemap-section {
+  margin: 0 0 var(--mgdb-space-5);
+  padding: 0 0 var(--mgdb-space-5);
+  border-bottom: 1px solid var(--mgdb-line);
+}
+
+.mgdb-modern .sitemap-section:last-of-type {
+  border-bottom: 0;
+}
+
+.mgdb-modern .sitemap-section-heading {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.mgdb-modern .sitemap-section-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  width: 100%;
+  padding: var(--mgdb-space-2) 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  color: var(--mgdb-ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.mgdb-modern .sitemap-section-toggle::after {
+  content: "";
+  width: 0.55rem;
+  height: 0.55rem;
+  margin-left: auto;
+  border-right: 2px solid var(--mgdb-muted);
+  border-bottom: 2px solid var(--mgdb-muted);
+  transform: rotate(45deg) translate(-0.1rem, -0.1rem);
+  transition: transform 140ms ease;
+}
+
+.mgdb-modern .sitemap-section-toggle[aria-expanded="true"]::after {
+  transform: rotate(-135deg) translate(-0.1rem, -0.1rem);
+}
+
+.mgdb-modern .sitemap-section-toggle:hover .sitemap-section-name {
+  text-decoration: underline;
+}
+
+.mgdb-modern .sitemap-section-count {
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: var(--mgdb-cat-soft);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--mgdb-cat-ink);
+  white-space: nowrap;
+}
+
+.mgdb-modern .sitemap-section-blurb {
+  max-width: var(--mgdb-measure);
+  margin: 0 0 var(--mgdb-space-3);
+  font-size: 0.9375rem;
+  color: var(--mgdb-ink-soft);
+}
+
+.mgdb-modern .sitemap-panel.closed {
+  display: none;
+}
+
+@media (max-width: 40rem) {
+  .mgdb-modern .sitemap-grid,
+  .mgdb-modern .sitemap-featured-grid {
+    grid-template-columns: 1fr;
+  }
+}

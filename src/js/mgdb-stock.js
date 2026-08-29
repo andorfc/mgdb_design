@@ -1,690 +1,742 @@
 /* ==========================================================================
-   Stock data center — page behavior
-   --------------------------------------------------------------------------
-   Companion to /css/mgdb-stock.css and templates/static/mgdb_stock.bau.
-   Depends only on MGDB (js/mgdb-modern.js).
-
-   Progressive enhancement: without this file the page still renders its
-   server-side content — the summary figures, the category table, the
-   collections, and the NAM founder list. Only the search results, which were
-   always fetched over the network, are lost.
+   Stock Data Hub (/data_center/stock)
+   Client-side search, faceted filtering, Plotly chart, pagination, and view switching.
    ========================================================================== */
 
-(function (window, document) {
+(function () {
   'use strict';
 
-  var MGDB = window.MGDB;
-  if (!MGDB) { return; }
-
-  var API = '/search/stock/stock_search_api.php';
-  var PAGE_SIZE = 25;
-
-  function byId(id) { return document.getElementById(id); }
-
-  var els = {};
+  var API_URL = '/search/stock/stock_search_api.php';
 
   var state = {
-    mode: 'simple',      // simple | advanced
-    source: 'mgdb',      // mgdb | grin — which set of results is on screen
     term: '',
-    caseSensitive: false,
+    type: 0,
+    available: 0,
+    linkage: 0,
+    phenotype: 0,
+    karyotype: 0,
+    f_mgsc: '',
+    f_bank: '',
+    f_expvp: '',
+    source: 'mgdb',
+    view: 'table',
     sort: 'relevance',
     page: 1,
-    filters: {},
-    grinTotal: 0
+    pageSize: 24,
+    totalPages: 1,
+    totalRecords: 0,
+    grinTotal: 0,
+    loading: false
   };
 
-  /* Each advanced filter is a checkbox that switches it on, optionally paired
-     with a control that narrows it. */
-  var FILTER_IDS = [
-    'f_mgsc', 'f_bank', 'f_expvp', 'f_available', 'f_developer', 'f_name',
-    'f_type', 'f_linkage', 'f_parent', 'f_genvar1', 'f_genvar2', 'f_genvar3',
-    'f_karyotype', 'f_phenotype'
-  ];
-  var VALUE_KEYS = [
-    'available', 'developer', 'name', 'type', 'linkage', 'parent',
-    'genvar1', 'genvar2', 'genvar3', 'karyotype', 'phenotype', 'attribution'
-  ];
+  var debounceTimer = null;
 
-  function filterInput(key) { return document.querySelector('[data-stock-filter="' + key + '"]'); }
-  function valueInput(key) { return document.querySelector('[data-stock-value="' + key + '"]'); }
+  function byId(id) {
+    return document.getElementById(id);
+  }
 
-  /* ------------------------------------------------------------------------
-     Section tabs
-     ------------------------------------------------------------------------ */
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  /* ── Sticky Section Tabs & Scrollspy ────────────────────────────────────── */
 
   function buildTabs() {
     var tabs = document.querySelectorAll('.mgdb-section-tabs a');
-    if (!tabs.length) { return; }
+    if (!tabs.length) return;
 
     var pairs = [];
     Array.prototype.forEach.call(tabs, function (tab) {
-      var section = document.querySelector(tab.getAttribute('href'));
-      if (section) { pairs.push({ tab: tab, section: section }); }
+      var href = tab.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        var section = document.querySelector(href);
+        if (section) {
+          pairs.push({ tab: tab, section: section });
+        }
+      }
     });
 
     function markCurrent(target) {
       pairs.forEach(function (pair) {
         var current = pair.section === target;
         pair.tab.classList.toggle('is-current', current);
-        if (current) { pair.tab.setAttribute('aria-current', 'true'); }
-        else { pair.tab.removeAttribute('aria-current'); }
+        if (current) {
+          pair.tab.setAttribute('aria-current', 'true');
+        } else {
+          pair.tab.removeAttribute('aria-current');
+        }
       });
     }
 
     var initial = pairs[0];
     if (window.location.hash) {
       pairs.forEach(function (pair) {
-        if ('#' + pair.section.id === window.location.hash) { initial = pair; }
+        if ('#' + pair.section.id === window.location.hash) {
+          initial = pair;
+        }
       });
     }
-    if (initial) { markCurrent(initial.section); }
+    if (initial) {
+      markCurrent(initial.section);
+    }
 
     pairs.forEach(function (pair) {
-      pair.tab.addEventListener('click', function () { markCurrent(pair.section); });
+      pair.tab.addEventListener('click', function () {
+        markCurrent(pair.section);
+      });
     });
 
-    if (!window.IntersectionObserver) { return; }
+    if (!window.IntersectionObserver) return;
 
     var observer = new window.IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
-        if (entry.isIntersecting) { markCurrent(entry.target); }
+        if (entry.isIntersecting) {
+          markCurrent(entry.target);
+        }
       });
-    }, { rootMargin: '-25% 0px -65% 0px' });
+    }, { rootMargin: '-20% 0px -60% 0px' });
 
-    pairs.forEach(function (pair) { observer.observe(pair.section); });
-  }
-
-  /* ------------------------------------------------------------------------
-     Stock category figure
-     ------------------------------------------------------------------------ */
-
-  function buildCategoryChart() {
-    var target = byId('stock-type-chart');
-    if (!target) { return; }
-
-    var labels = (target.getAttribute('data-labels') || '').split('|')
-      .filter(function (label) { return label !== ''; });
-    var values = (target.getAttribute('data-values') || '').split(',')
-      .map(function (value) { return parseInt(value, 10); })
-      .filter(function (value) { return !isNaN(value); });
-
-    if (!labels.length || labels.length !== values.length) { return; }
-
-    var rows = byId('stock-type-rows');
-    if (rows) {
-      var html = '';
-      for (var i = 0; i < labels.length; i++) {
-        html += '<tr><td>' + MGDB.escapeHtml(labels[i]) + '</td>' +
-                '<td class="mgdb-numeric">' + values[i].toLocaleString() + '</td></tr>';
-      }
-      rows.innerHTML = html;
-    }
-
-    // Horizontal bars: stock type names are long enough that vertical bars
-    // would force the labels to rotate.
-    MGDB.chart({
-      target: target,
-      traces: [{
-        type: 'bar',
-        orientation: 'h',
-        x: values.slice().reverse(),
-        y: labels.slice().reverse(),
-        marker: { color: MGDB.CHART_COLORS[3] },
-        hovertemplate: '%{y}<br>%{x:,} stocks<extra></extra>'
-      }],
-      layout: {
-        margin: { l: 200, r: 20, t: 12, b: 48 },
-        xaxis: { title: { text: 'Current stock records' } },
-        yaxis: { automargin: true }
-      }
+    pairs.forEach(function (pair) {
+      observer.observe(pair.section);
     });
   }
 
-  /* ------------------------------------------------------------------------
-     Query state
-     ------------------------------------------------------------------------ */
+  /* ── Query Execution ────────────────────────────────────────────────────── */
 
-  function readAdvancedForm() {
-    var filters = {};
-    FILTER_IDS.forEach(function (key) {
-      var el = filterInput(key);
-      if (el && el.checked) { filters[key] = '1'; }
+  function fetchResults(scrollToResults) {
+    if (state.loading) return;
+    state.loading = true;
+
+    var statusEl = byId('stock-results-status');
+    if (statusEl) {
+      statusEl.textContent = 'Searching stock records…';
+    }
+
+    var params = new URLSearchParams({
+      term: state.term,
+      type: state.type,
+      available: state.available,
+      linkage: state.linkage,
+      phenotype: state.phenotype,
+      karyotype: state.karyotype,
+      f_mgsc: state.f_mgsc,
+      f_bank: state.f_bank,
+      f_expvp: state.f_expvp,
+      source: state.source,
+      sort: state.sort,
+      page: state.page,
+      page_size: state.pageSize
     });
-    VALUE_KEYS.forEach(function (key) {
-      var el = valueInput(key);
-      if (!el) { return; }
-      var value = el.value.trim();
-      if (value !== '' && value !== '0') { filters[key] = value; }
-    });
-    return filters;
-  }
 
-  function writeAdvancedForm(filters) {
-    FILTER_IDS.forEach(function (key) {
-      var el = filterInput(key);
-      if (el) { el.checked = (filters[key] === '1'); }
-    });
-    VALUE_KEYS.forEach(function (key) {
-      var el = valueInput(key);
-      if (el) { el.value = filters[key] || (el.tagName === 'SELECT' ? '0' : ''); }
-    });
-  }
+    fetch(API_URL + '?' + params.toString())
+      .then(function (response) {
+        if (!response.ok) throw new Error('Network error');
+        return response.json();
+      })
+      .then(function (data) {
+        state.loading = false;
+        if (!data) {
+          renderError();
+          return;
+        }
 
-  function clearAdvancedForm() {
-    writeAdvancedForm({});
-    state.filters = {};
-  }
+        state.totalRecords = data.total || 0;
+        state.grinTotal = data.grin_total || 0;
+        state.totalPages = Math.ceil(state.totalRecords / state.pageSize) || 1;
 
-  function buildQuery(mode) {
-    var params = new window.URLSearchParams();
-    params.set('mode', mode);
-    params.set('page', String(state.page));
-    params.set('page_size', String(PAGE_SIZE));
+        updateSourceBadges();
+        renderResults(data);
+        renderPagination();
+        updateExportLinks();
+        syncUrlParams();
 
-    if (mode === 'advanced') {
-      params.set('sort', state.sort === 'relevance' ? 'name' : state.sort);
-      Object.keys(state.filters).forEach(function (key) {
-        params.set(key, state.filters[key]);
-      });
-    } else {
-      params.set('sort', state.sort);
-      params.set('term', state.term);
-      if (state.caseSensitive) { params.set('case', '1'); }
-    }
-    return params;
-  }
-
-  function syncUrl() {
-    if (!window.history || !window.history.replaceState) { return; }
-    var params = new window.URLSearchParams();
-
-    if (state.mode === 'advanced') {
-      params.set('mode', 'advanced');
-      Object.keys(state.filters).forEach(function (key) {
-        params.set(key, state.filters[key]);
-      });
-    } else if (state.term) {
-      params.set('term', state.term);
-      if (state.caseSensitive) { params.set('case', '1'); }
-      if (state.source === 'grin') { params.set('source', 'grin'); }
-    }
-    if (state.sort !== 'relevance') { params.set('sort', state.sort); }
-    if (state.page > 1) { params.set('page', String(state.page)); }
-
-    var query = params.toString();
-    window.history.replaceState(null, '',
-      window.location.pathname + (query ? '?' + query : '') + window.location.hash);
-  }
-
-  function readUrl() {
-    if (!window.URLSearchParams) { return false; }
-    var params = new window.URLSearchParams(window.location.search);
-
-    var sort = params.get('sort');
-    if (sort) {
-      state.sort = sort;
-      if (els.sort) { els.sort.value = sort; }
-    }
-    var page = parseInt(params.get('page'), 10);
-    if (!isNaN(page) && page > 0) { state.page = page; }
-
-    if (params.get('mode') === 'advanced') {
-      state.mode = 'advanced';
-      var filters = {};
-      FILTER_IDS.concat(VALUE_KEYS).forEach(function (key) {
-        var value = params.get(key);
-        if (value !== null && value !== '') { filters[key] = value; }
-      });
-      state.filters = filters;
-      writeAdvancedForm(filters);
-      if (els.advanced && Object.keys(filters).length) { els.advanced.open = true; }
-      return Object.keys(filters).length > 0;
-    }
-
-    // stock_term is the parameter the legacy form used; honour it so existing
-    // links keep working.
-    var term = params.get('term') || params.get('stock_term') || '';
-    if (term) {
-      state.mode = 'simple';
-      state.term = term;
-      state.caseSensitive = (params.get('case') === '1');
-      state.source = params.get('source') === 'grin' ? 'grin' : 'mgdb';
-      if (els.term) { els.term.value = term; }
-      if (els.caseBox) { els.caseBox.checked = state.caseSensitive; }
-      return true;
-    }
-    return false;
-  }
-
-  /* ------------------------------------------------------------------------
-     Rendering
-     ------------------------------------------------------------------------ */
-
-  function escape(value) { return MGDB.escapeHtml(value); }
-  function show(el, visible) { if (el) { el.hidden = !visible; } }
-
-  var STATUS_LABEL = {
-    unavailable: ['mgdb-pill-warn', 'Unavailable'],
-    discontinued: ['mgdb-pill-error', 'Discontinued']
-  };
-
-  function statusPill(status) {
-    var pill = STATUS_LABEL[status];
-    if (!pill) { return ''; }
-    return '<span class="mgdb-pill ' + pill[0] + '">' + pill[1] + '</span>';
-  }
-
-  function fact(label, value) {
-    if (!value) { return ''; }
-    return '<div><dt>' + label + '</dt><dd>' + value + '</dd></div>';
-  }
-
-  function stockItem(row) {
-    var url = '/data_center/stock?id=' + encodeURIComponent(row.id);
-
-    var html = '<li class="stock-item">' +
-      '<div class="stock-item-head">' +
-        '<h3><a href="' + url + '">' + escape(row.name) + '</a></h3>' +
-        statusPill(row.status) +
-      '</div>';
-
-    if (row.synonyms && row.synonyms.length) {
-      html += '<p class="stock-synonyms">Also known as <em>' +
-              row.synonyms.map(escape).join('</em>, <em>') + '</em></p>';
-    }
-
-    var facts = fact('Type', escape(row.type));
-    if (row.linkage_group) {
-      facts += fact('Focus linkage group',
-        '<a href="/data_center/lg?id=' + encodeURIComponent(row.linkage_group_id) + '">' +
-        escape(row.linkage_group) + '</a>');
-    }
-    if (row.provider) {
-      facts += fact('Available from',
-        '<a href="/person?id=' + encodeURIComponent(row.provider_id) + '">' +
-        escape(row.provider) + '</a>');
-    }
-    if (facts) {
-      html += '<dl class="stock-facts">' + facts + '</dl>';
-    }
-
-    if (row.comments && row.comments.length) {
-      html += '<details class="stock-comments"><summary>Curator notes (' +
-              row.comments.length + ')</summary><dl>';
-      row.comments.forEach(function (comment) {
-        html += '<dt>' + escape(comment.label) + '</dt><dd>' + escape(comment.text) + '</dd>';
-      });
-      html += '</dl></details>';
-    }
-
-    return html + '</li>';
-  }
-
-  function grinItem(row) {
-    var html = '<li class="stock-item stock-item-grin">' +
-      '<div class="stock-item-head"><h3>' + escape(row.name) + '</h3>' +
-      '<span class="mgdb-pill mgdb-pill-info">GRIN</span></div>';
-
-    var facts = fact('Accession', escape(row.accession)) +
-                fact('Improvement status', escape(row.improvement)) +
-                fact('Genus', escape(row.genus)) +
-                fact('Origin', escape(row.origin));
-    if (facts) { html += '<dl class="stock-facts">' + facts + '</dl>'; }
-
-    if (row.grin_id) {
-      html += '<p class="stock-synonyms"><a href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail.aspx?id=' +
-              encodeURIComponent(row.grin_id) + '">See this accession at GRIN-Global</a></p>';
-    }
-
-    return html + '</li>';
-  }
-
-  function renderPagination(summary) {
-    if (!els.pagination) { return; }
-    if (summary.page_count <= 1) {
-      els.pagination.innerHTML = '';
-      show(els.pagination, false);
-      return;
-    }
-
-    var current = summary.page;
-    var last = summary.page_count;
-    var wanted = [1, last, current, current - 1, current + 1, current - 2, current + 2];
-    var pages = wanted.filter(function (page, index, all) {
-      return page >= 1 && page <= last && all.indexOf(page) === index;
-    }).sort(function (a, b) { return a - b; });
-
-    var html = '';
-    if (current > 1) {
-      html += '<a href="#stock-results" data-stock-page="' + (current - 1) + '" rel="prev">Previous</a>';
-    }
-    var previous = 0;
-    pages.forEach(function (page) {
-      if (previous && page - previous > 1) { html += '<span aria-hidden="true">&hellip;</span>'; }
-      if (page === current) { html += '<span aria-current="page">' + page + '</span>'; }
-      else { html += '<a href="#stock-results" data-stock-page="' + page + '">' + page + '</a>'; }
-      previous = page;
-    });
-    if (current < last) {
-      html += '<a href="#stock-results" data-stock-page="' + (current + 1) + '" rel="next">Next</a>';
-    }
-    html += '<span class="mgdb-pagination-status">Page ' + current + ' of ' + last + '</span>';
-
-    els.pagination.innerHTML = html;
-    show(els.pagination, true);
-  }
-
-  function renderSources() {
-    // The GRIN switch only makes sense for a term search, and only when there
-    // is something on the other side of it.
-    var relevant = (state.mode === 'simple' && state.term !== '' && state.grinTotal > 0);
-    show(els.sources, relevant);
-    if (!relevant) { return; }
-
-    els.sourceMgdb.setAttribute('aria-pressed', state.source === 'mgdb' ? 'true' : 'false');
-    els.sourceGrin.setAttribute('aria-pressed', state.source === 'grin' ? 'true' : 'false');
-    els.sourceGrin.textContent = state.grinTotal.toLocaleString() + ' GRIN accession' +
-      (state.grinTotal === 1 ? '' : 's');
-  }
-
-  function renderEmpty(payload) {
-    var title = 'No stocks found';
-    var body = 'Check the spelling, or try a shorter term.';
-    var actionLabel = '';
-    var action = null;
-
-    if (payload.reason === 'no-term') {
-      title = 'Enter a search term';
-      body = 'Type a stock identifier, synonym, or external accession above.';
-    } else if (payload.reason === 'no-filters') {
-      title = 'No filters were set';
-      body = 'Tick at least one box in the advanced search before running it.';
-    } else if (payload.mode === 'grin') {
-      title = 'No GRIN accessions found';
-      body = 'Nothing in the mirrored USDA collection matched that term.';
-    } else if (payload.mode === 'advanced') {
-      body = 'No stock matched every one of those criteria. Try removing the narrowest one.';
-    } else if (state.grinTotal > 0) {
-      body = 'No MaizeGDB stock matched that term, but the mirrored USDA GRIN collection has ' +
-             state.grinTotal.toLocaleString() + '.';
-      actionLabel = 'Show the GRIN accessions';
-      action = function () { switchSource('grin'); };
-    }
-
-    els.emptyTitle.textContent = title;
-    els.emptyBody.textContent = body;
-
-    els.emptyAction.onclick = action;
-    if (actionLabel) {
-      els.emptyAction.textContent = actionLabel;
-      show(els.emptyAction, true);
-    } else {
-      show(els.emptyAction, false);
-    }
-    show(els.empty, true);
-  }
-
-  function renderCriteria(payload) {
-    if (!els.criteria) { return; }
-    if (payload.mode !== 'advanced' || !payload.criteria || !payload.criteria.length) {
-      show(els.criteria, false);
-      return;
-    }
-    els.criteria.innerHTML = '<strong>Searching for stocks</strong> ' +
-      escape(payload.criteria.join(', and ')) + '.';
-    show(els.criteria, true);
-  }
-
-  function render(payload) {
-    var summary = payload.summary || {};
-    var total = summary.total || 0;
-    var isGrin = (payload.mode === 'grin');
-
-    if (payload.mode === 'simple' && typeof payload.grin_total === 'number') {
-      state.grinTotal = payload.grin_total;
-    }
-
-    show(els.loading, false);
-    show(els.error, false);
-    show(els.single, false);
-    renderCriteria(payload);
-    renderSources();
-
-    if (total === 0) {
-      els.list.innerHTML = '';
-      show(els.list, false);
-      show(els.pagination, false);
-      show(els.sortWrap, false);
-      renderEmpty(payload);
-      els.status.textContent = (payload.reason === 'no-term' || payload.reason === 'no-filters')
-        ? '' : 'No matching records.';
-      MGDB.announce('No matching records.');
-      return;
-    }
-
-    show(els.empty, false);
-    els.list.innerHTML = payload.results.map(isGrin ? grinItem : stockItem).join('');
-    show(els.list, true);
-    show(els.sortWrap, !isGrin);
-    renderPagination(summary);
-
-    // Exactly one match: the legacy page navigated straight to the record.
-    // This offers the same destination without moving the reader off the
-    // search they just ran.
-    if (total === 1 && !isGrin && payload.mode === 'simple') {
-      var row = payload.results[0];
-      els.single.innerHTML =
-        '<div><span class="mgdb-eyebrow">Exactly one stock matched</span>' +
-        '<h3>' + escape(row.name) + '</h3>' +
-        '<p>' + (row.type ? escape(row.type) : 'Stock record') +
-        (row.provider ? ', available from ' + escape(row.provider) : '') + '.</p></div>' +
-        '<a class="mgdb-button mgdb-button-primary" href="/data_center/stock?id=' +
-        encodeURIComponent(row.id) + '">Open the stock record</a>';
-      show(els.single, true);
-    }
-
-    var noun = isGrin ? 'GRIN accession' : 'stock record';
-    var first = (summary.page - 1) * summary.page_size + 1;
-    var last = first + payload.results.length - 1;
-    var message = total.toLocaleString() + ' matching ' + noun + (total === 1 ? '' : 's');
-    if (summary.page_count > 1) {
-      message += ' &mdash; showing ' + first.toLocaleString() + ' to ' + last.toLocaleString();
-    }
-    els.status.innerHTML = message;
-    MGDB.announce(total.toLocaleString() + ' matching ' + noun + (total === 1 ? '' : 's'));
-  }
-
-  /* ------------------------------------------------------------------------
-     Running a search
-     ------------------------------------------------------------------------ */
-
-  function runSearch() {
-    var mode = (state.mode === 'simple' && state.source === 'grin') ? 'grin' : state.mode;
-
-    show(els.empty, false);
-    show(els.error, false);
-    show(els.single, false);
-    show(els.loading, true);
-    els.status.textContent = 'Searching…';
-
-    MGDB.request(API + '?' + buildQuery(mode).toString(), { key: 'stock-search' })
-      .then(function (payload) {
-        if (!payload || !payload.ok) { throw new Error('search failed'); }
-        render(payload);
-        syncUrl();
+        if (scrollToResults) {
+          var resultsSec = byId('stock-results-section');
+          if (resultsSec) {
+            resultsSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
       })
       .catch(function (error) {
-        // An aborted request is a newer search superseding this one.
-        if (error && error.name === 'AbortError') { return; }
-        show(els.loading, false);
-        show(els.list, false);
-        show(els.empty, false);
-        show(els.error, true);
-        els.status.textContent = 'The search could not be completed.';
+        state.loading = false;
+        renderError();
       });
   }
 
-  function searchSimple(term) {
-    state.mode = 'simple';
-    state.source = 'mgdb';
-    state.term = term;
-    state.caseSensitive = els.caseBox ? els.caseBox.checked : false;
-    state.grinTotal = 0;
-    state.page = 1;
-    runSearch();
+  function updateSourceBadges() {
+    var sourceBox = byId('stock-sources');
+    var mgdbBtn = byId('stock-source-mgdb');
+    var grinBtn = byId('stock-source-grin');
+
+    if (sourceBox) {
+      sourceBox.hidden = !(state.totalRecords > 0 || state.grinTotal > 0 || state.term !== '');
+    }
+
+    if (mgdbBtn) {
+      var mgdbCount = state.source === 'mgdb' ? state.totalRecords : '';
+      mgdbBtn.textContent = 'MaizeGDB stocks' + (mgdbCount !== '' ? ' (' + Number(mgdbCount).toLocaleString() + ')' : '');
+      var isMgdb = state.source === 'mgdb';
+      mgdbBtn.classList.toggle('is-active', isMgdb);
+      mgdbBtn.setAttribute('aria-pressed', isMgdb ? 'true' : 'false');
+    }
+
+    if (grinBtn) {
+      var grinCount = state.source === 'grin' ? state.totalRecords : state.grinTotal;
+      grinBtn.textContent = 'GRIN accessions' + (grinCount > 0 ? ' (' + Number(grinCount).toLocaleString() + ')' : '');
+      var isGrin = state.source === 'grin';
+      grinBtn.classList.toggle('is-active', isGrin);
+      grinBtn.setAttribute('aria-pressed', isGrin ? 'true' : 'false');
+    }
   }
 
-  function searchAdvanced() {
-    state.mode = 'advanced';
-    state.source = 'mgdb';
-    state.filters = readAdvancedForm();
-    state.page = 1;
-    runSearch();
+  /* ── Rendering ──────────────────────────────────────────────────────────── */
+
+  function renderResults(data) {
+    var container = byId('stock-results');
+    var emptyEl = byId('stock-empty');
+    var statusEl = byId('stock-results-status');
+    var rows = data.results || [];
+
+    if (!rows.length) {
+      if (container) container.innerHTML = '';
+      if (emptyEl) emptyEl.hidden = false;
+      if (statusEl) {
+        statusEl.textContent = 'No stocks matched your query.';
+      }
+      return;
+    }
+
+    if (emptyEl) emptyEl.hidden = true;
+
+    var start = (state.page - 1) * state.pageSize + 1;
+    var end = Math.min(start + rows.length - 1, state.totalRecords);
+    if (statusEl) {
+      statusEl.textContent = 'Showing ' + start.toLocaleString() + '–' + end.toLocaleString() + ' of ' + state.totalRecords.toLocaleString() + ' ' + (state.source === 'grin' ? 'GRIN accessions' : 'stocks');
+    }
+
+    if (state.view === 'card') {
+      container.className = 'stock-results-container stock-view-card';
+      container.innerHTML = rows.map(renderCard).join('');
+    } else {
+      container.className = 'stock-results-container stock-view-table';
+      container.innerHTML = renderTable(rows);
+    }
   }
 
-  function switchSource(source) {
-    state.source = source;
-    state.page = 1;
-    runSearch();
+  function renderCard(row) {
+    var typeBadge = row.type ? '<span class="mgdb-pill mgdb-pill-ok">' + escapeHtml(row.type) + '</span>' : '';
+    var providerBadge = row.provider ? '<span class="mgdb-pill mgdb-pill-info">' + escapeHtml(row.provider) + '</span>' : '';
+    var statusBadge = row.status && row.status !== 'available'
+      ? '<span class="mgdb-pill mgdb-pill-warn">' + escapeHtml(row.status) + '</span>'
+      : '';
+
+    var linkUrl = state.source === 'grin'
+      ? 'https://npgsweb.ars-grin.gov/gringlobal/accessiondetail.aspx?id=' + encodeURIComponent(row.id)
+      : '/data_center/stock?id=' + encodeURIComponent(row.id || row.name);
+
+    var metaItems = [];
+    if (row.type) metaItems.push('<dt>Type</dt><dd>' + escapeHtml(row.type) + '</dd>');
+    if (row.provider) metaItems.push('<dt>Provider</dt><dd>' + escapeHtml(row.provider) + '</dd>');
+    if (row.linkage_group) metaItems.push('<dt>Focus Linkage</dt><dd>' + escapeHtml(row.linkage_group) + '</dd>');
+    if (row.synonyms && row.synonyms.length) metaItems.push('<dt>Synonyms</dt><dd>' + escapeHtml(row.synonyms.join(', ')) + '</dd>');
+
+    var metaHtml = metaItems.length ? '<dl class="stock-card-meta">' + metaItems.join('') + '</dl>' : '';
+
+    var descHtml = '';
+    if (row.comments && row.comments.length) {
+      var firstComment = row.comments[0];
+      descHtml = '<p class="stock-card-desc"><strong>' + escapeHtml(firstComment.label || 'Description') + ':</strong> ' + firstComment.text + '</p>';
+    }
+
+    var orderLink = '';
+    if (row.provider && row.provider.indexOf('Stock Center') !== -1) {
+      orderLink = '<a href="https://maizecoopsc.org/" target="_blank" rel="noopener">Order seed &nearr;</a>';
+    }
+
+    return '<article class="stock-card" data-stock-id="' + row.id + '">' +
+      '<div>' +
+        '<div class="stock-card-header">' +
+          '<h3><a href="' + linkUrl + '">' + escapeHtml(row.name) + '</a></h3>' +
+          '<div style="display:flex;gap:4px;flex-wrap:wrap;">' + typeBadge + providerBadge + statusBadge + '</div>' +
+        '</div>' +
+        metaHtml +
+        descHtml +
+      '</div>' +
+      '<div class="stock-card-actions">' +
+        '<a href="' + linkUrl + '">Stock record &rarr;</a>' +
+        orderLink +
+      '</div>' +
+    '</article>';
   }
 
-  /* ------------------------------------------------------------------------
-     Wiring
-     ------------------------------------------------------------------------ */
+  function renderTable(rows) {
+    var thead = '<thead><tr>' +
+      '<th>Stock Identifier</th>' +
+      '<th>Type</th>' +
+      '<th>Available From</th>' +
+      '<th>Focus Linkage</th>' +
+      '<th>Synonyms &amp; Description</th>' +
+      '<th>Actions</th>' +
+    '</tr></thead>';
 
-  function init() {
-    els = {
-      form: byId('stock-form'),
-      term: byId('stock-term'),
-      caseBox: byId('stock-case'),
-      clear: byId('stock-clear'),
-      advanced: byId('stock-advanced'),
-      advancedForm: byId('stock-advanced-form'),
-      advancedClear: byId('stock-advanced-clear'),
-      sort: byId('stock-sort'),
-      sortWrap: byId('stock-sort-wrap'),
-      status: byId('stock-status'),
-      criteria: byId('stock-criteria'),
-      sources: byId('stock-sources'),
-      sourceMgdb: byId('stock-source-mgdb'),
-      sourceGrin: byId('stock-source-grin'),
-      loading: byId('stock-loading'),
-      single: byId('stock-single'),
-      list: byId('stock-list'),
-      empty: byId('stock-empty'),
-      emptyTitle: byId('stock-empty-title'),
-      emptyBody: byId('stock-empty-body'),
-      emptyAction: byId('stock-empty-action'),
-      error: byId('stock-error'),
-      pagination: byId('stock-pagination')
-    };
+    var tbody = rows.map(function (row) {
+      var linkUrl = state.source === 'grin'
+        ? 'https://npgsweb.ars-grin.gov/gringlobal/accessiondetail.aspx?id=' + encodeURIComponent(row.id)
+        : '/data_center/stock?id=' + encodeURIComponent(row.id || row.name);
 
-    buildTabs();
-    buildCategoryChart();
+      var nameCell = '<strong><a href="' + linkUrl + '">' + escapeHtml(row.name) + '</a></strong>';
+      var typeCell = row.type ? '<span class="mgdb-pill mgdb-pill-ok">' + escapeHtml(row.type) + '</span>' : '<span class="mgdb-muted">—</span>';
+      var provCell = row.provider ? escapeHtml(row.provider) : '<span class="mgdb-muted">—</span>';
+      var linkCell = row.linkage_group ? escapeHtml(row.linkage_group) : '<span class="mgdb-muted">—</span>';
 
-    if (!els.form || !els.list) { return; }
+      var descText = '';
+      if (row.synonyms && row.synonyms.length) {
+        descText += '<em>Synonyms: ' + escapeHtml(row.synonyms.join(', ')) + '</em>. ';
+      }
+      if (row.comments && row.comments.length) {
+        descText += row.comments[0].text;
+      }
+      var descCell = descText ? '<small>' + descText + '</small>' : '<span class="mgdb-muted">—</span>';
 
-    els.form.addEventListener('submit', function (event) {
-      event.preventDefault();
-      searchSimple(els.term.value.trim());
+      var actionCell = '<a href="' + linkUrl + '">Record &rarr;</a>';
+      if (row.provider && row.provider.indexOf('Stock Center') !== -1) {
+        actionCell += ' · <a href="https://maizecoopsc.org/" target="_blank" rel="noopener">Order &nearr;</a>';
+      }
+
+      return '<tr>' +
+        '<td>' + nameCell + '</td>' +
+        '<td>' + typeCell + '</td>' +
+        '<td>' + provCell + '</td>' +
+        '<td>' + linkCell + '</td>' +
+        '<td>' + descCell + '</td>' +
+        '<td>' + actionCell + '</td>' +
+      '</tr>';
+    }).join('');
+
+    return '<table class="stock-table">' + thead + '<tbody>' + tbody + '</tbody></table>';
+  }
+
+  function renderPagination() {
+    var nav = byId('stock-pagination');
+    if (!nav) return;
+
+    if (state.totalPages <= 1) {
+      nav.innerHTML = '';
+      nav.hidden = true;
+      return;
+    }
+
+    nav.hidden = false;
+    var html = '';
+    html += '<button type="button" data-page="' + (state.page - 1) + '" ' + (state.page <= 1 ? 'disabled' : '') + '>&lsaquo; Prev</button>';
+
+    var maxPagesToShow = 7;
+    var startPage = Math.max(1, state.page - 3);
+    var endPage = Math.min(state.totalPages, startPage + maxPagesToShow - 1);
+    if (endPage - startPage < maxPagesToShow - 1) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+
+    if (startPage > 1) {
+      html += '<button type="button" data-page="1">1</button>';
+      if (startPage > 2) html += '<span class="mgdb-muted" style="padding:0 4px">…</span>';
+    }
+
+    for (var p = startPage; p <= endPage; p++) {
+      var isCurrent = p === state.page;
+      html += '<button type="button" data-page="' + p + '" ' + (isCurrent ? 'aria-current="page"' : '') + '>' + p + '</button>';
+    }
+
+    if (endPage < state.totalPages) {
+      if (endPage < state.totalPages - 1) html += '<span class="mgdb-muted" style="padding:0 4px">…</span>';
+      html += '<button type="button" data-page="' + state.totalPages + '">' + state.totalPages + '</button>';
+    }
+
+    html += '<button type="button" data-page="' + (state.page + 1) + '" ' + (state.page >= state.totalPages ? 'disabled' : '') + '>Next &rsaquo;</button>';
+    nav.innerHTML = html;
+
+    Array.prototype.forEach.call(nav.querySelectorAll('button[data-page]'), function (btn) {
+      btn.addEventListener('click', function () {
+        var targetPage = parseInt(btn.getAttribute('data-page'), 10);
+        if (targetPage && targetPage >= 1 && targetPage <= state.totalPages && targetPage !== state.page) {
+          state.page = targetPage;
+          fetchResults(true);
+        }
+      });
+    });
+  }
+
+  function renderError() {
+    var container = byId('stock-results');
+    var statusEl = byId('stock-results-status');
+    if (container) container.innerHTML = '';
+    if (statusEl) {
+      statusEl.textContent = 'An error occurred while fetching stock records. Please try again.';
+    }
+  }
+
+  function updateExportLinks() {
+    var tsvBtn = byId('stock-export-tsv');
+    var csvBtn = byId('stock-export-csv');
+
+    var params = new URLSearchParams({
+      term: state.term,
+      type: state.type,
+      available: state.available,
+      linkage: state.linkage,
+      phenotype: state.phenotype,
+      karyotype: state.karyotype,
+      f_mgsc: state.f_mgsc,
+      f_bank: state.f_bank,
+      f_expvp: state.f_expvp,
+      source: state.source
     });
 
-    if (els.clear) {
-      els.clear.addEventListener('click', function () {
-        els.term.value = '';
-        els.term.focus();
+    if (tsvBtn) {
+      params.set('format', 'tsv');
+      tsvBtn.href = API_URL + '?' + params.toString();
+    }
+    if (csvBtn) {
+      params.set('format', 'csv');
+      csvBtn.href = API_URL + '?' + params.toString();
+    }
+  }
+
+  function syncUrlParams() {
+    if (!window.history || !window.history.replaceState) return;
+    var params = new URLSearchParams();
+    if (state.term) params.set('q', state.term);
+    if (state.type) params.set('type', state.type);
+    if (state.available) params.set('available', state.available);
+    if (state.linkage) params.set('linkage', state.linkage);
+    if (state.phenotype) params.set('phenotype', state.phenotype);
+    if (state.karyotype) params.set('karyotype', state.karyotype);
+    if (state.f_mgsc) params.set('f_mgsc', state.f_mgsc);
+    if (state.f_bank) params.set('f_bank', state.f_bank);
+    if (state.f_expvp) params.set('f_expvp', state.f_expvp);
+    if (state.source !== 'mgdb') params.set('source', state.source);
+    if (state.sort !== 'relevance') params.set('sort', state.sort);
+    if (state.view !== 'table') params.set('view', state.view);
+    if (state.page > 1) params.set('page', state.page);
+
+    var queryString = params.toString();
+    var newUrl = window.location.pathname + (queryString ? '?' + queryString : '');
+    window.history.replaceState({}, '', newUrl);
+  }
+
+  function readUrlParams() {
+    var params = new URLSearchParams(window.location.search);
+    if (params.has('q')) state.term = params.get('q');
+    else if (params.has('term')) state.term = params.get('term');
+    if (params.has('type')) state.type = parseInt(params.get('type'), 10) || 0;
+    if (params.has('available')) state.available = parseInt(params.get('available'), 10) || 0;
+    if (params.has('linkage')) state.linkage = parseInt(params.get('linkage'), 10) || 0;
+    if (params.has('phenotype')) state.phenotype = parseInt(params.get('phenotype'), 10) || 0;
+    if (params.has('karyotype')) state.karyotype = parseInt(params.get('karyotype'), 10) || 0;
+    if (params.has('f_mgsc')) state.f_mgsc = params.get('f_mgsc');
+    if (params.has('f_bank')) state.f_bank = params.get('f_bank');
+    if (params.has('f_expvp')) state.f_expvp = params.get('f_expvp');
+    if (params.has('source')) state.source = params.get('source');
+    if (params.has('sort')) state.sort = params.get('sort');
+    if (params.has('view')) state.view = params.get('view') === 'card' ? 'card' : 'table';
+    if (params.has('page')) state.page = parseInt(params.get('page'), 10) || 1;
+
+    var queryInput = byId('stock-query');
+    if (queryInput && state.term) queryInput.value = state.term;
+
+    var typeSelect = byId('stock-type');
+    if (typeSelect && state.type) typeSelect.value = state.type;
+
+    var availSelect = byId('stock-available');
+    if (availSelect && state.available) availSelect.value = state.available;
+
+    var linkSelect = byId('stock-linkage');
+    if (linkSelect && state.linkage) linkSelect.value = state.linkage;
+
+    var phenoSelect = byId('stock-phenotype');
+    if (phenoSelect && state.phenotype) phenoSelect.value = state.phenotype;
+
+    var karyoSelect = byId('stock-karyotype');
+    if (karyoSelect && state.karyotype) karyoSelect.value = state.karyotype;
+
+    var mgscCheck = byId('stock-f-mgsc');
+    if (mgscCheck) mgscCheck.checked = state.f_mgsc === '1' || state.f_mgsc === 'true';
+
+    var bankCheck = byId('stock-f-bank');
+    if (bankCheck) bankCheck.checked = state.f_bank === '1' || state.f_bank === 'true';
+
+    var expvpCheck = byId('stock-f-expvp');
+    if (expvpCheck) expvpCheck.checked = state.f_expvp === '1' || state.f_expvp === 'true';
+
+    var sortSelect = byId('stock-sort');
+    if (sortSelect && state.sort) sortSelect.value = state.sort;
+
+    updateViewButtons();
+  }
+
+  function updateViewButtons() {
+    var buttons = document.querySelectorAll('.stock-view-btn');
+    Array.prototype.forEach.call(buttons, function (btn) {
+      var isCurrent = btn.getAttribute('data-view') === state.view;
+      btn.classList.toggle('is-active', isCurrent);
+      btn.setAttribute('aria-pressed', isCurrent ? 'true' : 'false');
+    });
+  }
+
+  /* ── Plotly Category Breakdown Chart ────────────────────────────────────── */
+
+  function renderChart() {
+    var el = byId('stock-type-chart');
+    if (!el) return;
+
+    var rawLabels = el.getAttribute('data-labels') || '';
+    var rawValues = el.getAttribute('data-values') || '';
+    if (!rawLabels || !rawValues) return;
+
+    var labels = rawLabels.split('|');
+    var values = rawValues.split(',').map(function (v) { return parseInt(v, 10) || 0; });
+
+    // Populate fallback rows
+    var tbody = byId('stock-type-rows');
+    if (tbody) {
+      tbody.innerHTML = labels.map(function (l, idx) {
+        return '<tr><td>' + escapeHtml(l) + '</td><td class="mgdb-numeric">' + Number(values[idx]).toLocaleString() + '</td></tr>';
+      }).join('');
+    }
+
+    if (typeof Plotly === 'undefined') return;
+
+    var data = [{
+      type: 'bar',
+      x: values.slice().reverse(),
+      y: labels.slice().reverse(),
+      orientation: 'h',
+      marker: { color: '#235c37' }
+    }];
+
+    var layout = {
+      margin: { l: 200, r: 24, t: 24, b: 40 },
+      xaxis: { title: 'Current Stock Records', tickformat: ',d' },
+      yaxis: { automargin: true },
+      font: { family: 'inherit', size: 12 }
+    };
+
+    Plotly.newPlot(el, data, layout, { responsive: true, displayModeBar: false });
+  }
+
+  /* ── Initialization ────────────────────────────────────────────────────── */
+
+  function initialize() {
+    buildTabs();
+    readUrlParams();
+    renderChart();
+
+    var form = byId('stock-search-form');
+    var queryInput = byId('stock-query');
+    var clearBtn = byId('stock-query-clear');
+    var resetBtn = byId('stock-empty-reset');
+    var typeSelect = byId('stock-type');
+    var availSelect = byId('stock-available');
+    var linkSelect = byId('stock-linkage');
+    var phenoSelect = byId('stock-phenotype');
+    var karyoSelect = byId('stock-karyotype');
+    var mgscCheck = byId('stock-f-mgsc');
+    var bankCheck = byId('stock-f-bank');
+    var expvpCheck = byId('stock-f-expvp');
+    var sortSelect = byId('stock-sort');
+
+    var mgdbSourceBtn = byId('stock-source-mgdb');
+    var grinSourceBtn = byId('stock-source-grin');
+
+    if (queryInput) {
+      queryInput.addEventListener('input', function () {
+        state.term = queryInput.value.trim();
+        if (clearBtn) clearBtn.hidden = !state.term;
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(function () {
+          state.page = 1;
+          fetchResults(false);
+        }, 300);
+      });
+      if (clearBtn) clearBtn.hidden = !queryInput.value;
+    }
+
+    if (clearBtn && queryInput) {
+      clearBtn.addEventListener('click', function () {
+        queryInput.value = '';
         state.term = '';
-        state.mode = 'simple';
-        state.source = 'mgdb';
-        state.grinTotal = 0;
-        els.list.innerHTML = '';
-        show(els.list, false);
-        show(els.pagination, false);
-        show(els.single, false);
-        show(els.empty, false);
-        show(els.sortWrap, false);
-        show(els.criteria, false);
-        show(els.sources, false);
-        els.status.textContent = 'Enter an identifier above, or open the advanced search, to begin.';
-        syncUrl();
-      });
-    }
-
-    Array.prototype.forEach.call(
-      document.querySelectorAll('[data-stock-example]'), function (button) {
-        button.addEventListener('click', function () {
-          var term = button.getAttribute('data-stock-example');
-          els.term.value = term;
-          searchSimple(term);
-        });
-      });
-
-    if (els.advancedForm) {
-      els.advancedForm.addEventListener('submit', function (event) {
-        event.preventDefault();
-        searchAdvanced();
-      });
-
-      // Entering a value is a clear enough signal that the filter is wanted;
-      // ticking the box by hand as well would only be a way to get it wrong.
-      VALUE_KEYS.forEach(function (key) {
-        var value = valueInput(key);
-        var box = filterInput('f_' + key);
-        if (!value || !box) { return; }
-        value.addEventListener('change', function () {
-          if (value.value.trim() !== '' && value.value.trim() !== '0') { box.checked = true; }
-        });
-      });
-
-      // The phenotype attribution field belongs to the phenotype filter.
-      var attribution = valueInput('attribution');
-      var phenotypeBox = filterInput('f_phenotype');
-      if (attribution && phenotypeBox) {
-        attribution.addEventListener('change', function () {
-          if (attribution.value.trim() !== '') { phenotypeBox.checked = true; }
-        });
-      }
-    }
-
-    if (els.advancedClear) {
-      els.advancedClear.addEventListener('click', clearAdvancedForm);
-    }
-
-    if (els.sort) {
-      els.sort.addEventListener('change', function () {
-        state.sort = els.sort.value;
+        clearBtn.hidden = true;
         state.page = 1;
-        runSearch();
+        fetchResults(false);
+        queryInput.focus();
       });
     }
 
-    if (els.sourceMgdb) {
-      els.sourceMgdb.addEventListener('click', function () { switchSource('mgdb'); });
-    }
-    if (els.sourceGrin) {
-      els.sourceGrin.addEventListener('click', function () { switchSource('grin'); });
-    }
-
-    if (els.pagination) {
-      els.pagination.addEventListener('click', function (event) {
-        var link = event.target.closest ? event.target.closest('[data-stock-page]') : null;
-        if (!link) { return; }
-        var page = parseInt(link.getAttribute('data-stock-page'), 10);
-        if (isNaN(page)) { return; }
-        state.page = page;
-        runSearch();
+    if (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        state.page = 1;
+        fetchResults(true);
       });
     }
 
-    if (readUrl()) {
-      runSearch();
+    if (typeSelect) {
+      typeSelect.addEventListener('change', function () {
+        state.type = parseInt(typeSelect.value, 10) || 0;
+        state.page = 1;
+        fetchResults(false);
+      });
     }
+
+    if (availSelect) {
+      availSelect.addEventListener('change', function () {
+        state.available = parseInt(availSelect.value, 10) || 0;
+        state.page = 1;
+        fetchResults(false);
+      });
+    }
+
+    if (linkSelect) {
+      linkSelect.addEventListener('change', function () {
+        state.linkage = parseInt(linkSelect.value, 10) || 0;
+        state.page = 1;
+        fetchResults(false);
+      });
+    }
+
+    if (phenoSelect) {
+      phenoSelect.addEventListener('change', function () {
+        state.phenotype = parseInt(phenoSelect.value, 10) || 0;
+        state.page = 1;
+        fetchResults(false);
+      });
+    }
+
+    if (karyoSelect) {
+      karyoSelect.addEventListener('change', function () {
+        state.karyotype = parseInt(karyoSelect.value, 10) || 0;
+        state.page = 1;
+        fetchResults(false);
+      });
+    }
+
+    if (mgscCheck) {
+      mgscCheck.addEventListener('change', function () {
+        state.f_mgsc = mgscCheck.checked ? '1' : '';
+        state.page = 1;
+        fetchResults(false);
+      });
+    }
+
+    if (bankCheck) {
+      bankCheck.addEventListener('change', function () {
+        state.f_bank = bankCheck.checked ? '1' : '';
+        state.page = 1;
+        fetchResults(false);
+      });
+    }
+
+    if (expvpCheck) {
+      expvpCheck.addEventListener('change', function () {
+        state.f_expvp = expvpCheck.checked ? '1' : '';
+        state.page = 1;
+        fetchResults(false);
+      });
+    }
+
+    if (sortSelect) {
+      sortSelect.addEventListener('change', function () {
+        state.sort = sortSelect.value;
+        state.page = 1;
+        fetchResults(false);
+      });
+    }
+
+    if (mgdbSourceBtn) {
+      mgdbSourceBtn.addEventListener('click', function () {
+        if (state.source !== 'mgdb') {
+          state.source = 'mgdb';
+          state.page = 1;
+          fetchResults(false);
+        }
+      });
+    }
+
+    if (grinSourceBtn) {
+      grinSourceBtn.addEventListener('click', function () {
+        if (state.source !== 'grin') {
+          state.source = 'grin';
+          state.page = 1;
+          fetchResults(false);
+        }
+      });
+    }
+
+    Array.prototype.forEach.call(document.querySelectorAll('.stock-view-btn'), function (btn) {
+      btn.addEventListener('click', function () {
+        var view = btn.getAttribute('data-view');
+        if (view && (view === 'card' || view === 'table')) {
+          state.view = view;
+          updateViewButtons();
+          fetchResults(false);
+        }
+      });
+    });
+
+    Array.prototype.forEach.call(document.querySelectorAll('[data-stock-example]'), function (btn) {
+      btn.addEventListener('click', function () {
+        var ex = btn.getAttribute('data-stock-example');
+        if (ex && queryInput) {
+          queryInput.value = ex;
+          state.term = ex;
+          if (clearBtn) clearBtn.hidden = false;
+          state.page = 1;
+          fetchResults(true);
+        }
+      });
+    });
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function () {
+        if (queryInput) queryInput.value = '';
+        if (typeSelect) typeSelect.value = '0';
+        if (availSelect) availSelect.value = '0';
+        if (linkSelect) linkSelect.value = '0';
+        if (phenoSelect) phenoSelect.value = '0';
+        if (karyoSelect) karyoSelect.value = '0';
+        if (mgscCheck) mgscCheck.checked = false;
+        if (bankCheck) bankCheck.checked = false;
+        if (expvpCheck) expvpCheck.checked = false;
+        if (clearBtn) clearBtn.hidden = true;
+
+        state.term = '';
+        state.type = 0;
+        state.available = 0;
+        state.linkage = 0;
+        state.phenotype = 0;
+        state.karyotype = 0;
+        state.f_mgsc = '';
+        state.f_bank = '';
+        state.f_expvp = '';
+        state.source = 'mgdb';
+        state.page = 1;
+        fetchResults(false);
+      });
+    }
+
+    // Initial search on load
+    fetchResults(false);
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', initialize);
   } else {
-    init();
+    initialize();
   }
-})(window, document);
+}());

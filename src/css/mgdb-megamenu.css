@@ -76,7 +76,7 @@
 	border-radius:7px;
 	color:#fff;
 	font-family:inherit;
-	font-size:18px;
+	font-size:19px;   /* stepped down by the media queries further below */
 	font-weight:600;
 	line-height:22px;
 	letter-spacing:.01em;
@@ -172,9 +172,37 @@
 	font-family: var(--mgdb-font, system-ui, -apple-system, sans-serif);
 }
 
-.mgdb-modern #menu_bar .mega-dropdown-about,
+/* Four links in two columns; 765px left the panel mostly empty. 584px rather
+   than a round 560 because the h2 is the full database name: it measures 361px
+   at 19px/700, and 560px left only 357px beside the heading action -- four
+   pixels short, so it wrapped to two lines. This leaves ~20px of slack. Shrink
+   the panel or lengthen the action's label and it wraps again. */
+.mgdb-modern #menu_bar .mega-dropdown-about {
+	width:584px;
+}
+
+/* The Genomes panel is anchored at its trigger's left edge \(left:-1px\), not
+   pulled back to the rail by a negative offset the way the three 920px
+   fullwidth panels are. So its width has to clear the distance from that
+   trigger to the right edge of the bar, and that distance shrinks twice over:
+   once as the viewport narrows, and again as the label steps up a size and
+   pushes the trigger further right.
+
+   Measured trigger offset inside the bar: 17px labels -> 323, 18px -> 334,
+   19px -> 346. Each step below leaves at least 20px between the panel's right
+   edge and the bar's. Widening any of these without re-measuring puts the
+   right-hand column off-screen -- an 880px panel ran 76px past a 1151px
+   viewport. */
 .mgdb-modern #menu_bar .mega-dropdown-genomes {
-	width:765px;
+	width:840px;
+}
+
+@media (max-width: 1254px) {
+	.mgdb-modern #menu_bar .mega-dropdown-genomes { width:790px; }
+}
+
+@media (max-width: 1204px) {
+	.mgdb-modern #menu_bar .mega-dropdown-genomes { width:765px; }
 }
 
 .mgdb-modern #menu_bar > li:hover .mega-dropdown,
@@ -227,9 +255,9 @@
 	display:block;
 	margin-bottom:3px;
 	color:#557b2b;
-	font-size:10px;
+	font-size:11px;
 	font-weight:800;
-	line-height:13px;
+	line-height:14px;
 	letter-spacing:.13em;
 	text-transform:uppercase;
 }
@@ -248,22 +276,37 @@
 }
 
 .mgdb-modern #menu_bar .mega-panel-heading h2 {
-	font-size:17px;
-	line-height:22px;
+	font-size:19px;
+	line-height:24px;
 }
 
 .mgdb-modern #menu_bar .mega-panel-heading p {
 	max-width:600px;
 	margin:4px 0 0;
 	color:#576453;
-	font-size:11px;
-	line-height:16px;
+	font-size:12px;
+	line-height:17px;
+}
+
+/* Holds the section-level destinations that sit beside the heading in panels
+   carrying no footer. Wraps rather than squeezing the h2 when the panel steps
+   down a width band, so it still holds a second link if one is added. */
+.mgdb-modern #menu_bar .mega-heading-actions {
+	display:flex;
+	flex-wrap:wrap;
+	align-items:center;
+	justify-content:flex-end;
+	flex:0 0 auto;
+	gap:8px;
 }
 
 .mgdb-modern #menu_bar .mega-heading-action,
 .mgdb-modern #menu_bar li:hover div .mega-heading-action {
 	display:inline-flex;
 	align-items:center;
+	/* The drawer gives these width:100%; without this the padding and border are
+	   added on top of it and the button overhangs its own container. */
+	box-sizing:border-box;
 	flex:0 0 auto;
 	gap:6px;
 	padding:6px 11px;
@@ -271,9 +314,9 @@
 	border-radius:7px;
 	color:#315f19;
 	background:#fff;
-	font-size:11px;
+	font-size:12px;
 	font-weight:700;
-	line-height:15px;
+	line-height:16px;
 }
 
 .mgdb-modern #menu_bar li:hover div .mega-heading-action:hover,
@@ -290,6 +333,10 @@
 	padding:12px 18px 14px;
 }
 
+.mgdb-modern #menu_bar .mega-grid-2 {
+	grid-template-columns:repeat(2, minmax(0, 1fr));
+}
+
 .mgdb-modern #menu_bar .mega-grid-3 {
 	grid-template-columns:repeat(3, minmax(0, 1fr));
 }
@@ -298,8 +345,94 @@
 	grid-template-columns:repeat(4, minmax(0, 1fr));
 }
 
+/* Community's four tracks hold very different amounts of text, so four equal
+   columns starve the first and waste the middle two. Measured label widths at
+   14px/700, plus the 16px the link padding takes:
+
+     Community            210px needed   "Maize Genetics Cooperation"
+     Literature & media   143px
+     Share data           125px
+     meeting banner       259px          MGC2027_img.png is 231px wide
+
+   repeat\(4, 1fr\) gives every track 210px out of the 842px a 920px panel has.
+   That is exactly what the first column needs and no more -- it would sit on
+   the wrap threshold, and the feature would squeeze the banner below its
+   intrinsic width. The weights below resolve to 241 / 178 / 164 / 259, so the
+   longest label keeps ~30px of slack and the banner draws at full size.
+
+   Scoped to Community rather than folded into .mega-grid-4, which Data Hubs
+   also uses -- that panel has four evenly matched groups and no feature. */
+/* The B73 card carries a badge, a title, one link and five version chips —
+   about 120px of content. As an equal third of the panel it was 258px wide and
+   stretched to 227px tall to match the lists beside it, leaving 125px of empty
+   card. A fixed narrow track sizes it to its content and hands the ~56px back
+   to the two lists, which is where the long labels are \(the longest is
+   "NAM pangenome gene viewer" at 205px\).
+
+   202px is set by the one line that cannot wrap gracefully: "Open B73 genome
+   page" measures 154px, plus its arrow and the card's 28px of padding. */
+.mgdb-modern #menu_bar .mega-grid-genomes {
+	grid-template-columns:202px minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.mgdb-modern #menu_bar .mega-grid-community {
+	grid-template-columns:minmax(0, 1.35fr) minmax(0, 1fr) minmax(0, 0.92fr) 259px;
+}
+
+/* The meeting banner that replaced the "Meeting information" button. Scales to
+   the panel rather than holding its 231px intrinsic width, so it survives the
+   one-column mobile layout without overflowing. */
+/* The shipped megamenu.css pads every <a> inside a dropdown, and this one never
+   overrode it: the 9px inset shrank the banner's box, and width:100% then
+   downscaled a 231px image to 211px. The hover variant is listed because that
+   is the selector the legacy padding arrives through. */
+.mgdb-modern #menu_bar .mega-feature-art,
+.mgdb-modern #menu_bar li:hover div .mega-feature-art {
+	display:block;
+	margin:10px 0;
+	padding:0;
+	border:0;
+	border-radius:8px;
+	overflow:hidden;
+	line-height:0;
+}
+
+.mgdb-modern #menu_bar .mega-feature-art img {
+	width:100%;
+	max-width:231px;
+	height:auto;
+}
+
+.mgdb-modern #menu_bar .mega-feature-art:hover img,
+.mgdb-modern #menu_bar .mega-feature-art:focus-visible img {
+	opacity:.88;
+}
+
+/* Tools is wider than the other two fullwidth panels. Its four lists need
+   921px of track between them — measured widest label per column, plus the
+   16px the link padding takes:
+
+     Search & compare       203px   "Genome Context Viewer"
+     Genes & function       228px   "Protein structures" + Updated tag
+     Genomes & variation    285px   "NAM pangenome gene viewer" + New tag
+     AI & machine learning  205px   "MaizeGDB Feature Store"
+
+   At the shared 920px that leaves 842px of track — 79px short however the
+   tracks are divided, which is why the pangenome label wrapped. 1010px with
+   tighter gutters gives 952px, and the weights below resolve to
+   210 / 236 / 295 / 212, clearing each column by 7-10px.
+
+   The ceiling is 1037px, set by the narrowest desktop band: at a 1165px
+   viewport this panel starts at x=104 and the bar ends at 1141. Do not widen
+   past that, and re-measure if a label or tag changes. */
+.mgdb-modern #menu_bar > li.mega-tools-item .mega-dropdown-wide {
+	width:1010px;
+}
+
 .mgdb-modern #menu_bar .mega-grid-tools {
-	grid-template-columns:1.08fr repeat(3, 1fr);
+	grid-template-columns:minmax(0, 1fr) minmax(0, 1.124fr) minmax(0, 1.405fr) minmax(0, 1.01fr);
+	gap:10px;
+	padding:12px 14px 14px;
 }
 
 .mgdb-modern #menu_bar .mega-group {
@@ -311,8 +444,8 @@
 	padding:0 4px 6px;
 	border-bottom:2px solid #d9e6d1;
 	color:#355c20;
-	font-size:12px;
-	line-height:16px;
+	font-size:13px;
+	line-height:17px;
 	letter-spacing:.02em;
 }
 
@@ -332,16 +465,16 @@
 
 .mgdb-modern #menu_bar .mega-group > a strong {
 	color:#244c18;
-	font-size:12px;
+	font-size:14px;
 	font-weight:700;
-	line-height:16px;
+	line-height:19px;
 }
 
 .mgdb-modern #menu_bar .mega-group > a span {
 	margin-top:1px;
 	color:#687365;
-	font-size:10px;
-	line-height:14px;
+	font-size:12px;
+	line-height:16px;
 }
 
 .mgdb-modern #menu_bar li:hover div .mega-group > a:hover,
@@ -377,9 +510,9 @@
 	border-radius:999px;
 	color:#315f19;
 	background:#dcebcf;
-	font-size:9px;
+	font-size:10px;
 	font-weight:800;
-	line-height:13px;
+	line-height:14px;
 	letter-spacing:.08em;
 	text-transform:uppercase;
 }
@@ -391,15 +524,15 @@
 
 .mgdb-modern #menu_bar .mega-feature h3 {
 	margin-bottom:5px;
-	font-size:16px;
-	line-height:21px;
+	font-size:18px;
+	line-height:23px;
 }
 
 .mgdb-modern #menu_bar .mega-feature p {
 	margin:0 0 12px;
 	color:#556351;
-	font-size:11px;
-	line-height:17px;
+	font-size:13px;
+	line-height:19px;
 }
 
 .mgdb-modern #menu_bar .mega-feature-link,
@@ -414,9 +547,9 @@
 	border-radius:7px;
 	color:#fff;
 	background:#3f7424;
-	font-size:11px;
+	font-size:13px;
 	font-weight:700;
-	line-height:15px;
+	line-height:17px;
 }
 
 .mgdb-modern #menu_bar .mega-feature-blue .mega-feature-link,
@@ -442,15 +575,295 @@
 	padding:0;
 	border:0;
 	color:#496941;
-	font-size:10px;
+	font-size:12px;
 	font-weight:600;
-	line-height:14px;
+	line-height:16px;
 }
 
 .mgdb-modern #menu_bar li:hover div .mega-secondary-link:hover,
 .mgdb-modern #menu_bar .mega-secondary-link:focus {
 	color:#245116;
 	text-decoration:underline;
+}
+
+/* Alphabetical hub list
+   --------------------------------------------------------------------------
+   One list, flowed into columns by the browser rather than split into groups
+   by hand, so the A-Z stays correct if an entry is added or removed. CSS
+   columns fill down-then-across, which is the order a reader scans an
+   alphabetical list in. */
+/* Tighter on top than the other panels: the hint already sits directly above
+   this grid and the heading's own bottom padding separates them. */
+.mgdb-modern #menu_bar .mega-grid-hubs {
+	display:block;
+	padding:4px 18px 14px;
+}
+
+.mgdb-modern #menu_bar .mega-hub-list {
+	column-count:4;
+	column-gap:18px;
+}
+
+.mgdb-modern #menu_bar .mega-hub-list > a {
+	break-inside:avoid;
+}
+
+/* Hover hint
+   --------------------------------------------------------------------------
+   A single line under the heading that shows the pointed-at hub's description,
+   instead of a tooltip on each of the twenty links. One region cannot overflow
+   the panel, needs no per-item vertical space, appears instantly rather than
+   after the browser's ~1s title delay, and updates on keyboard focus as well as
+   hover. min-height reserves two lines so the panel does not jog as the text
+   changes length. Hidden in the drawer, where there is no pointer -- the
+   heading action is the route to the descriptions there. */
+/* The heading text and the action share a flex row. Left at its default
+   `flex: 0 1 auto` this block shrank to the h2's own width -- 389px -- and the
+   descriptions wrapped inside it, which is what forced the two-line reserve
+   below and left an empty line under every short one. Taking the row's spare
+   width lets every description sit on one line, so the reserve is one line. */
+.mgdb-modern #menu_bar .mega-heading-text {
+	flex:1 1 auto;
+	min-width:0;
+}
+
+/* Written as `p.mega-hint` so it beats `.mega-panel-heading p` \(1 id, 2
+   classes, 1 element\), which otherwise holds this at the 12px it sets for
+   heading body copy. */
+.mgdb-modern #menu_bar .mega-panel-heading p.mega-hint {
+	box-sizing:border-box;
+	max-width:none;
+	min-height:20px;
+	margin:5px 0 0;
+	color:#5b6a57;
+	font-size:14px;
+	font-style:italic;
+	line-height:20px;
+}
+
+.mgdb-modern #menu_bar .mega-panel-heading p.mega-hint[data-mgdb-hint-active] {
+	color:#33601b;
+	font-style:normal;
+}
+
+/* Status tags
+   --------------------------------------------------------------------------
+   Marked up inside the label's <strong> so they sit on the same line: the
+   anchor is a column flex container, and a sibling span would drop to its own
+   row. Specificity has to beat `.mega-group > a span` \(the description rule,
+   1 id / 2 classes / 2 elements\), hence the .mega-group in the selector. */
+.mgdb-modern #menu_bar .mega-group > a .mega-tag {
+	display:inline-block;
+	margin:0 0 0 5px;
+	padding:1px 5px;
+	border-radius:4px;
+	vertical-align:1px;
+	font-size:9px;
+	font-weight:800;
+	line-height:14px;
+	letter-spacing:.06em;
+	text-transform:uppercase;
+	white-space:nowrap;
+}
+
+.mgdb-modern #menu_bar .mega-group > a .mega-tag-new {
+	color:#2c5c14;
+	background:#d8ebc9;
+}
+
+.mgdb-modern #menu_bar .mega-group > a .mega-tag-updated {
+	color:#14548a;
+	background:#cfe4f5;
+}
+
+/* Compact feature card
+   --------------------------------------------------------------------------
+   Distributes its blocks down the full height of the row instead of stacking
+   them at the top: justify-content:space-between spreads the free space the
+   taller list columns create, and `gap` is the floor when there is none to
+   spread \(which is the case in the drawer, where the card is content-height\).
+   This is what turns 125px of dead card into breathing room. */
+.mgdb-modern #menu_bar .mega-feature-compact {
+	display:flex;
+	flex-direction:column;
+	justify-content:space-between;
+	gap:14px;
+	padding:16px 14px;
+}
+
+/* The card exists to say which assembly is current, so the version is the
+   largest thing on it rather than a line under a badge. */
+.mgdb-modern #menu_bar .mega-feature-compact h3 {
+	margin:0;
+	font-size:22px;
+	line-height:26px;
+}
+
+.mgdb-modern #menu_bar .mega-feature-compact .mega-badge {
+	align-self:flex-start;
+	margin:0;
+}
+
+/* A plain link, not a filled button: at 202px the button's padding pushed the
+   label onto a second line, and the card does not need two competing
+   emphases when the title above it is already the focal point. */
+.mgdb-modern #menu_bar .mega-feature-open,
+.mgdb-modern #menu_bar li:hover div .mega-feature-open {
+	display:inline-flex;
+	align-items:center;
+	gap:6px;
+	padding:0;
+	border:0;
+	background:none;
+	color:#2f6b16;
+	font-size:13px;
+	font-weight:700;
+	line-height:18px;
+	text-decoration:none;
+}
+
+.mgdb-modern #menu_bar li:hover div .mega-feature-open:hover,
+.mgdb-modern #menu_bar .mega-feature-open:focus {
+	color:#1d4a0c;
+	text-decoration:underline;
+}
+
+/* Five chips will not sit on one line in a 202px card, and 4+1 reads as an
+   accident. A three-column grid makes the 3+2 wrap look deliberate and keeps
+   the chips aligned to each other. The rule above the grid replaces the
+   "Earlier B73 assemblies" caption that used to introduce it. */
+.mgdb-modern #menu_bar .mega-feature-compact .mega-version-rail {
+	display:grid;
+	grid-template-columns:repeat(3, minmax(0, 1fr));
+	gap:6px;
+	margin:0;
+	padding-top:13px;
+	border-top:1px solid #cfe0c3;
+}
+
+.mgdb-modern #menu_bar .mega-feature-compact .mega-version-rail > a,
+.mgdb-modern #menu_bar li:hover div .mega-feature-compact .mega-version-rail > a {
+	justify-content:center;
+	padding-left:0;
+	padding-right:0;
+}
+
+/* Version rail
+   --------------------------------------------------------------------------
+   Five earlier B73 assemblies beside the representative one. Stacking them as
+   .mega-secondary-link rows would have made the feature box the tallest thing
+   in the panel and buried v5 under its own history, so they are chips on one
+   wrapping line instead: the version number is the whole label, and the rail's
+   accessible name supplies the rest. */
+.mgdb-modern #menu_bar .mega-rail-label {
+	display:block;
+	margin-top:11px;
+	color:#5b6c56;
+	font-size:11px;
+	font-weight:700;
+	line-height:15px;
+	letter-spacing:.04em;
+	text-transform:uppercase;
+}
+
+.mgdb-modern #menu_bar .mega-version-rail {
+	display:flex;
+	flex-wrap:wrap;
+	gap:5px;
+	margin-top:6px;
+}
+
+.mgdb-modern #menu_bar .mega-version-rail > a,
+.mgdb-modern #menu_bar li:hover div .mega-version-rail > a {
+	display:inline-flex;
+	align-items:center;
+	/* Without this the drawer's min-height:44px lands on the content box and the
+	   chips render 62px tall -- taller than every row around them. */
+	box-sizing:border-box;
+	padding:4px 9px;
+	border:1px solid #bcd2ac;
+	border-radius:999px;
+	color:#33601b;
+	background:#fff;
+	font-size:12px;
+	font-weight:700;
+	line-height:16px;
+	text-decoration:none;
+	white-space:nowrap;
+}
+
+.mgdb-modern #menu_bar li:hover div .mega-version-rail > a:hover,
+.mgdb-modern #menu_bar .mega-version-rail > a:focus {
+	border-color:#6d963d;
+	color:#1d4a0c;
+	background:#eef6e9;
+}
+
+/* Affiliation row
+   --------------------------------------------------------------------------
+   A partner organization stated as an affiliation rather than as a feature
+   column: the feature treatment gave AgBioData a badge, a heading and a filled
+   button, which read as one of MaizeGDB's own sections. One row across the foot
+   of the grid says the same thing without competing with them.
+
+   grid-column: 1 / -1 spans whatever track count the panel is using, so this
+   does not have to be respecified if the grid changes. */
+.mgdb-modern #menu_bar .mega-affiliation,
+.mgdb-modern #menu_bar li:hover div .mega-affiliation {
+	display:flex;
+	align-items:center;
+	box-sizing:border-box;
+	grid-column:1 / -1;
+	gap:12px;
+	margin-top:2px;
+	padding:10px 12px;
+	border:1px solid #d7e4cd;
+	border-radius:10px;
+	background:linear-gradient(135deg, #f8fbf5 0%, #eef5e9 100%);
+	color:#263522;
+	text-decoration:none;
+}
+
+.mgdb-modern #menu_bar li:hover div .mega-affiliation:hover,
+.mgdb-modern #menu_bar .mega-affiliation:focus {
+	border-color:#8fb46a;
+	background:#eef6e9;
+}
+
+.mgdb-modern #menu_bar .mega-affiliation-mark {
+	flex:0 0 auto;
+	width:38px;
+	height:38px;
+	border-radius:8px;
+	background:#fff;
+}
+
+.mgdb-modern #menu_bar .mega-affiliation-text {
+	display:flex;
+	flex-direction:column;
+	min-width:0;
+	gap:2px;
+}
+
+.mgdb-modern #menu_bar .mega-affiliation-text strong {
+	color:#244c18;
+	font-size:13px;
+	font-weight:700;
+	line-height:17px;
+}
+
+.mgdb-modern #menu_bar .mega-affiliation-text > span {
+	color:#5b6a57;
+	font-size:11px;
+	line-height:15px;
+}
+
+.mgdb-modern #menu_bar .mega-affiliation-cue {
+	flex:0 0 auto;
+	margin-left:auto;
+	color:#4c7a2e;
+	font-size:14px;
+	line-height:1;
 }
 
 .mgdb-modern #menu_bar .mega-panel-footer {
@@ -472,9 +885,9 @@
 	padding:0;
 	border:0;
 	color:#32611b;
-	font-size:10px;
+	font-size:12px;
 	font-weight:700;
-	line-height:14px;
+	line-height:16px;
 }
 
 .mgdb-modern #menu_bar li:hover div .mega-panel-footer a:hover,
@@ -513,7 +926,45 @@
   overflow-y: auto;
 }
 
-@media (max-width: 900px) {
+/* Label size against available rail
+   --------------------------------------------------------------------------
+   The nine bar items are one nowrap row, so their combined width sets a hard
+   floor on the viewport. Two things bound how large the labels can go:
+
+   1. .mgdb-site-nav caps the rail, so the bar stops widening at 1232px however
+      wide the viewport gets. A 1232px bar leaves 52px of slack at 19px labels
+      and only 10px at 20px -- so 19px is the ceiling, and no min-width query
+      above it would ever have room to be worth writing.
+   2. Below that cap the bar is viewport-48px, and each size needs its own
+      minimum. Measured on the live bar:
+
+        17px labels -> 1142px viewport
+        18px        -> 1185px
+        19px        -> 1228px
+
+   Each band starts about 20px above its own floor rather than exactly on it,
+   so a one-word label change does not immediately push the row into a wrap.
+
+   The bar was previously 18px at every width down to a 900px drawer
+   breakpoint, so between 900px and 1185px the items overran the bar and took
+   the whole document with them -- at a 1000px viewport the row ended at
+   x=1150 and document.scrollWidth was 1150, i.e. the page scrolled sideways.
+   The drawer breakpoint below is raised to 1164px so no viewport is left
+   without a size that fits.
+
+   Adding or renaming a top-level item invalidates every number above;
+   re-measure rather than assuming the next size down still clears. */
+.mgdb-modern #menu_bar > li > a { font-size: 19px; }
+
+@media (max-width: 1254px) {
+  .mgdb-modern #menu_bar > li > a { font-size: 18px; }
+}
+
+@media (max-width: 1204px) {
+  .mgdb-modern #menu_bar > li > a { font-size: 17px; }
+}
+
+@media (max-width: 1164px) {
   /* Below the drawer breakpoint the bar becomes a stacked list, so the flex
      row, fixed height, pill radius, and shadow all come off. */
   .mgdb-modern #menu_bar {
@@ -528,12 +979,29 @@
 
   .mgdb-modern #menu_bar[data-mgdb-nav="collapsed"] { display: none; }
 
+  /* The :hover and :focus-within variants are matched here too and outrank the
+     bare selector, so the open row was the one row inset by 2px with rounded
+     corners and its own lighter ground -- it read as a chip that had come
+     loose from the stack. Every state keeps the row flush; .mgdb-nav-open
+     below supplies the open row's ground instead. */
   .mgdb-modern #menu_bar > li,
-  .mgdb-modern #menu_bar > li.right {
+  .mgdb-modern #menu_bar > li.right,
+  .mgdb-modern #menu_bar > li:hover,
+  .mgdb-modern #menu_bar > li:focus-within {
     width: 100%;
     margin: 0;
     border-radius: 0;
     border-bottom: 1px solid rgba(255, 255, 255, .18);
+    background: none;
+  }
+
+  .mgdb-modern #menu_bar > li:hover > a,
+  .mgdb-modern #menu_bar > li:focus-within > a,
+  .mgdb-modern #menu_bar > li:hover > a.drop,
+  .mgdb-modern #menu_bar > li:focus-within > a.drop {
+    border: 1px solid transparent;
+    border-radius: 0;
+    background: none;
   }
 
   /* margin-left:auto pushes Feedback and Search right on desktop; in a stacked
@@ -542,18 +1010,71 @@
   .mgdb-modern #menu_bar > li.right:hover,
   .mgdb-modern #menu_bar > li.right:focus-within { margin-left: 0; }
 
+  /* The desktop step-down queries above also match inside the drawer; this
+     rule follows them in source order and wins, so the drawer keeps one size
+     regardless of how narrow the viewport gets. */
+  /* margin-left:4px separates Feedback from the bar's right edge on desktop; in
+     a stacked list it just indents that one row 4px past the other eight. */
+  .mgdb-modern #menu_bar .mega-feedback-link { margin-left: 0; }
+
   .mgdb-modern #menu_bar > li > a,
-  .mgdb-modern #menu_bar .mega-feedback-link {
-    display: block;
+  .mgdb-modern #menu_bar .mega-feedback-link,
+  /* Written as `> li > a.mega-plain-link` \(1 id, 2 classes, 2 elements\) rather
+     than `.mega-plain-link` \(1 id, 2 classes\): the base rule for this class
+     lives near the end of the file, after this media query, so at equal
+     specificity source order handed it the win and the Downloads row kept its
+     desktop 36px metrics -- 41px against the other eight rows at 51px, under
+     the tap-target floor. */
+  .mgdb-modern #menu_bar > li > a.mega-plain-link {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
     width: 100%;
     min-height: var(--mgdb-tap-target);
     padding: var(--mgdb-space-3) var(--mgdb-space-4);
     border-radius: 0;
-    font-size: var(--mgdb-text-base);
+    font-size: var(--mgdb-text-lg);
+    line-height: var(--mgdb-leading-snug);
     text-align: left;
   }
 
-  /* Panels stack inline beneath their trigger rather than floating over it. */
+  /* The caret is absolutely positioned against the <li>, which is now a
+     full-width row, so right:9px puts it at the screen edge rather than beside
+     its label. Parking it in the row's right gutter makes it read as this
+     row's disclosure control. */
+  .mgdb-modern #menu_bar > li > a.drop { padding-right: var(--mgdb-space-6); }
+
+  .mgdb-modern #menu_bar > li > a.drop:after,
+  .mgdb-modern #menu_bar > li:hover > a.drop:after,
+  .mgdb-modern #menu_bar > li:focus-within > a.drop:after {
+    right: var(--mgdb-space-4);
+    width: 8px;
+    height: 8px;
+    margin-top: -6px;
+  }
+
+  .mgdb-modern #menu_bar > li:hover > a.drop:after,
+  .mgdb-modern #menu_bar > li:focus-within > a.drop:after { margin-top: -2px; }
+
+  /* A trigger that is showing its panel needs to look distinct from the eight
+     closed rows above and below it, or the open panel reads as page content
+     that arrived from nowhere. */
+  .mgdb-modern #menu_bar > li.mgdb-nav-open > a,
+  .mgdb-modern #menu_bar > li.mgdb-nav-open > a.drop,
+  .mgdb-modern #menu_bar > li.mgdb-nav-open:hover > a,
+  .mgdb-modern #menu_bar > li.mgdb-nav-open:focus-within > a,
+  .mgdb-modern #menu_bar > li.mgdb-nav-open:hover > a.drop,
+  .mgdb-modern #menu_bar > li.mgdb-nav-open:focus-within > a.drop {
+    background: rgba(255, 255, 255, .16);
+  }
+
+
+  /* Panels stack inline beneath their trigger rather than floating over it.
+     .mgdb-nav-open is set by mgdb-chrome.js on tap: a touch device never
+     produces :hover, and neither Genomes nor Data Hubs could be opened at all
+     before, because both triggers carry a real href and the tap just followed
+     it. See setupNavToggle in js/mgdb-chrome.js. */
+  .mgdb-modern #menu_bar > li.mgdb-nav-open [class*="dropdown_"],
   .mgdb-modern #menu_bar > li:hover [class*="dropdown_"],
   .mgdb-modern #menu_bar > li:focus-within [class*="dropdown_"] {
     position: static;
@@ -582,4 +1103,254 @@
     float: none;
     margin: 0 0 var(--mgdb-space-3);
   }
+
+  /* The panels are CSS grids, and the width:100% above does nothing to a grid
+     item -- the track sizes it, not the item. Without this the Community panel
+     rendered as four 66px columns on a 375px screen, with the meeting feature
+     box 66px wide and its heading broken across five lines. Every grid variant
+     collapses to one column here. */
+  .mgdb-modern #menu_bar .mega-hub-list { column-count: 1; }
+
+  .mgdb-modern #menu_bar .mega-hint { display: none; }
+
+  .mgdb-modern #menu_bar .mega-grid-hubs {
+    padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  }
+
+  .mgdb-modern #menu_bar .mega-grid,
+  .mgdb-modern #menu_bar .mega-grid-2,
+  .mgdb-modern #menu_bar .mega-grid-3,
+  .mgdb-modern #menu_bar .mega-grid-4,
+  .mgdb-modern #menu_bar .mega-grid-community,
+  .mgdb-modern #menu_bar .mega-grid-genomes,
+  .mgdb-modern #menu_bar .mega-grid-tools {
+    grid-template-columns: minmax(0, 1fr);
+    /* Side by side these are columns and the gap only has to separate them
+       horizontally; stacked they are consecutive sections of one long list, and
+       at space-2 there were 21px between the end of one section and the next
+       heading against 1px between rows inside it -- too close to read as a
+       break. Tools stacks four of them, which is where it showed. */
+    gap: var(--mgdb-space-4);
+    padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  }
+
+  /* Stacked, the feature box is no longer a column beside the lists -- it is a
+     card between them, so it needs its own edges rather than borrowing the
+     column's. */
+  .mgdb-modern #menu_bar .mega-feature {
+    padding: var(--mgdb-space-3);
+    border-radius: 10px;
+  }
+
+  .mgdb-modern #menu_bar .mega-feature h3 {
+    font-size: var(--mgdb-text-lg);
+    line-height: var(--mgdb-leading-snug);
+  }
+
+  /* Panel body copy at the 16px floor. In a column these sat at 12-14px; a
+     full-width stacked row has the room and the standard asks for it. */
+  .mgdb-modern #menu_bar .mega-group > a strong,
+  .mgdb-modern #menu_bar .mega-feature-link,
+  .mgdb-modern #menu_bar li:hover div .mega-feature-link,
+  .mgdb-modern #menu_bar .mega-secondary-link,
+  .mgdb-modern #menu_bar li:hover div .mega-secondary-link,
+  .mgdb-modern #menu_bar .mega-panel-footer a,
+  .mgdb-modern #menu_bar li:hover div .mega-panel-footer a,
+  .mgdb-modern #menu_bar .mega-heading-action,
+  .mgdb-modern #menu_bar li:hover div .mega-heading-action {
+    font-size: var(--mgdb-text-base);
+    line-height: var(--mgdb-leading-snug);
+  }
+
+  .mgdb-modern #menu_bar .mega-group > a span,
+  .mgdb-modern #menu_bar .mega-feature p,
+  .mgdb-modern #menu_bar .mega-panel-heading p {
+    font-size: var(--mgdb-text-sm);
+    line-height: var(--mgdb-leading);
+  }
+
+  .mgdb-modern #menu_bar .mega-panel-heading h2 {
+    font-size: var(--mgdb-text-xl);
+    line-height: var(--mgdb-leading-snug);
+  }
+
+  /* The heading action is a flex child of a row that is display:block here, so
+     it keeps its inline-flex shrink-to-fit width and lands mid-panel. Give it
+     the full width and the tap-target height the rows below it have. */
+  .mgdb-modern #menu_bar .mega-heading-actions {
+    display: block;
+    margin-top: var(--mgdb-space-2);
+  }
+
+  .mgdb-modern #menu_bar .mega-heading-action,
+  .mgdb-modern #menu_bar li:hover div .mega-heading-action {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    min-height: var(--mgdb-tap-target);
+    margin-top: var(--mgdb-space-2);
+  }
+
+  /* The version chips stay a wrapping row -- stacked they would be five
+     near-empty full-width rows -- but each chip has to clear the tap target
+     on its own. */
+  .mgdb-modern #menu_bar .mega-version-rail { gap: var(--mgdb-space-2); }
+
+  .mgdb-modern #menu_bar .mega-version-rail > a,
+  .mgdb-modern #menu_bar li:hover div .mega-version-rail > a {
+    min-height: var(--mgdb-tap-target);
+    padding: var(--mgdb-space-2) var(--mgdb-space-4);
+    font-size: var(--mgdb-text-base);
+  }
+
+  .mgdb-modern #menu_bar .mega-rail-label {
+    font-size: var(--mgdb-text-sm);
+    margin-top: var(--mgdb-space-4);
+  }
+
+  /* Full-width row at the drawer's type floor, with the tap target the other
+     destinations get. */
+  .mgdb-modern #menu_bar .mega-feature-open,
+  .mgdb-modern #menu_bar li:hover div .mega-feature-open {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    min-height: var(--mgdb-tap-target);
+    font-size: var(--mgdb-text-base);
+  }
+
+  /* Wider here than the 202px desktop card, so the chips get their own row
+     each rather than a cramped three-up grid. */
+  .mgdb-modern #menu_bar .mega-feature-compact .mega-version-rail {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--mgdb-space-2);
+    padding-top: var(--mgdb-space-3);
+  }
+
+  /* One row, one tap target -- it stays a row rather than stacking, and the
+     type comes up to the drawer's floor like every other destination.
+     The description runs to four lines at this width, so centring left the
+     mark hovering beside the middle of the paragraph instead of its title. */
+  .mgdb-modern #menu_bar .mega-affiliation,
+  .mgdb-modern #menu_bar li:hover div .mega-affiliation {
+    align-items: flex-start;
+    min-height: var(--mgdb-tap-target);
+    margin-top: var(--mgdb-space-2);
+    padding: var(--mgdb-space-3);
+  }
+
+  .mgdb-modern #menu_bar .mega-affiliation-cue { margin-top: 2px; }
+
+  .mgdb-modern #menu_bar .mega-affiliation-text strong {
+    font-size: var(--mgdb-text-base);
+    line-height: var(--mgdb-leading-snug);
+  }
+
+  .mgdb-modern #menu_bar .mega-affiliation-text > span {
+    font-size: var(--mgdb-text-sm);
+    line-height: var(--mgdb-leading-snug);
+  }
+
+  /* Group headings are section labels in a stack, not column captions. The rule
+     divides them; it has to be a dark hairline, since the panel is white here
+     even though the bar around it is dark green. */
+  .mgdb-modern #menu_bar .mega-group h3 {
+    margin: 0 0 var(--mgdb-space-1);
+    padding: 0 0 var(--mgdb-space-1);
+    border-bottom: 1px solid var(--mgdb-line);
+  }
+
+  /* Headings and their links share a left edge; the heading carried a 4px
+     indent from the desktop layout that left the two misaligned. */
+  .mgdb-modern #menu_bar .mega-group h3,
+  .mgdb-modern #menu_bar .mega-group > a { padding-left: 0; }
+
+  /* Each destination has to clear the tap-target floor once it is a full-width
+     row rather than a line in a narrow column. */
+  /* These links stay flex-direction:column from the desktop rule so a label and
+     its description can stack. In a column the axes swap: centring has to come
+     from justify-content, and align-items:center would centre the text
+     horizontally -- which it did, leaving every destination centred under a
+     left-aligned heading. */
+  .mgdb-modern #menu_bar .mega-group > a,
+  .mgdb-modern #menu_bar .mega-secondary-link,
+  .mgdb-modern #menu_bar li:hover div .mega-secondary-link {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    min-height: var(--mgdb-tap-target);
+    padding: var(--mgdb-space-2) 0;
+  }
+
+  /* The feature link is a filled button, not a text row: it was in the rule
+     above, which zeroed its horizontal padding and left the label touching the
+     green edge. It keeps its own padding and its arrow stays right-aligned. */
+  .mgdb-modern #menu_bar .mega-feature-link,
+  .mgdb-modern #menu_bar li:hover div .mega-feature-link {
+    min-height: var(--mgdb-tap-target);
+    padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  }
+
+  /* The heading keeps its desktop 20px inset while the grid below it uses 16px,
+     so the h2 and the section headings under it sat on two different left
+     edges. In one stacked column that reads as a mistake. */
+  .mgdb-modern #menu_bar .mega-panel-heading {
+    padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  }
+
+  /* Two footer links side by side leave each about 150px on a phone. */
+  .mgdb-modern #menu_bar .mega-panel-footer,
+  .mgdb-modern #menu_bar .mega-panel-footer-split {
+    display: block;
+    padding: var(--mgdb-space-2) var(--mgdb-space-4) var(--mgdb-space-3);
+  }
+
+  .mgdb-modern #menu_bar .mega-panel-footer a,
+  .mgdb-modern #menu_bar li:hover div .mega-panel-footer a {
+    display: flex;
+    align-items: center;
+    min-height: var(--mgdb-tap-target);
+  }
+}
+
+/* Closing a panel
+   --------------------------------------------------------------------------
+   mgdb-chrome.js marks a panel closed by Escape, or by a second tap in the
+   drawer, with .mgdb-menu-closed. mgdb-modern.css backs that with
+   `left: -999em`, but that selector carries no id and loses to the
+   `#menu_bar > li:focus-within .mega-dropdown-*` rules above -- so Escape
+   flipped aria-expanded to false while the panel stayed on screen, and in the
+   drawer the focus left on the tapped trigger held it open through
+   :focus-within. Hiding it outright settles both: the open rules never set
+   display, so nothing there can win this back.
+
+   Only the script applies the class, so a page without it hides nothing. */
+.mgdb-modern #menu_bar > li.mgdb-menu-closed:not(.mgdb-nav-open) [class*="dropdown_"] {
+	display:none;
+}
+
+/* A top-level nav item that is a plain destination rather than a panel
+   trigger. Matches the triggers' metrics so the bar stays even. */
+/* Metrics copied from the panel triggers rather than approximated: height:100%
+   with no border left this one 36px tall against their 38px, so Downloads sat
+   a pixel high in an otherwise even row. */
+.mgdb-modern #menu_bar .mega-plain-link {
+	display:flex;
+	align-items:center;
+	box-sizing:border-box;
+	min-height:36px;
+	padding:7px 12px;
+	border:1px solid transparent;
+	border-radius:7px;
+	color:#fff;
+	font-weight:600;
+	letter-spacing:.01em;
+	text-decoration:none;
+	white-space:nowrap;
+}
+
+.mgdb-modern #menu_bar .mega-plain-link:hover,
+.mgdb-modern #menu_bar .mega-plain-link:focus-visible {
+	background:rgba(255,255,255,.12);
 }

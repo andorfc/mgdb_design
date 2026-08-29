@@ -492,3 +492,360 @@ Status values: `proposed` · `approved` · `implemented` · `rejected` · `defer
 - **Validation:** `search/insertion/insertion_results.php` returns 404 or an
   equivalent inert response, and `/insertion` search still functions through
   the modern endpoint.
+
+---
+
+## AD-023 — The dashboard cache directory needs a persistent SELinux file context
+
+- **Date:** 2026-08-21
+- **Affected component:** `/home/cache/dashboard` on the development instance; `include/dashboard_cache.php`
+- **Current limitation:** The data-centre dashboard cache writes JSON to `/home/cache/dashboard`. SELinux is `Enforcing`, and `/home/cache` carries `user_home_dir_t`, which `httpd` cannot write. A newly created subdirectory inherits `user_home_t` and Apache silently cannot build a single entry — the library reports `unwritable` and every page falls back to live SQL, which is correct but gives up the entire speedup.
+
+  The directory has been created and relabelled by hand:
+
+  ```
+  mkdir -p /home/cache/dashboard
+  chmod 777 /home/cache/dashboard
+  chcon -t httpd_sys_rw_content_t /home/cache/dashboard
+  ```
+
+  This works today, but `chcon` only changes the label on disk. A filesystem relabel or any `restorecon` over `/home` reverts it to `user_home_t` and the cache silently stops writing again. The same relabelling will also be needed from scratch on the production and curation hosts. Note the existing `/home/cache/search` directory is already `apache`-owned with `httpd_sys_rw_content_t`, so this pattern has precedent here.
+
+- **Proposed change:** Record the context in policy rather than on the inode, and give the directory to Apache:
+
+  ```
+  semanage fcontext -a -t httpd_sys_rw_content_t '/home/cache/dashboard(/.*)?'
+  restorecon -Rv /home/cache/dashboard
+  chown apache:apache /home/cache/dashboard
+  chmod 775 /home/cache/dashboard
+  ```
+
+  On production, do this before setting `dashboard_cache=true`. On the curation instance the setting stays `false`, so no directory is needed there at all.
+
+- **Expected benefit:** The cache survives a relabel. Measured effect while it is working: nine data-centre pages drop from 18,165 ms of database work to 730 ms, with byte-identical output. Without the context, every page silently reverts to the slow path.
+- **Risk and rollback:** Low. The paths are specific to this directory and grant Apache write access to nothing else. Rollback is `semanage fcontext -d '/home/cache/dashboard(/.*)?'` followed by `restorecon`. Setting `dashboard_cache=false` disables the feature entirely without touching the filesystem.
+- **Required administrator:** System administrator with root on the web hosts
+- **Status:** proposed
+- **Validation:** `ls -ldZ /home/cache/dashboard` shows `httpd_sys_rw_content_t`; then `cd <webroot> && php tools/dashboard_cache.php --purge --warm` reports every page `ok` and `--status` lists twelve entries. A page request should report `summary.cache` as `hit`, not `unwritable`.
+
+---
+
+## AD-024 — Cloudflare is in front of every MaizeGDB host and is caching none of the API responses
+
+- **Date:** 2026-08-22
+- **Affected component:** Cloudflare zone `maizegdb.org` (Cache Rules); `search/*/*_api.php` response headers
+- **Current limitation:** The whole site sits behind Cloudflare — `www.maizegdb.org` and `maizegdb.org` both resolve into Cloudflare address space — but every JSON endpoint is served from origin on every request. Two independent causes, and **both** have to be fixed or nothing changes:
+
+  1. **The responses forbid shared caching.** Eleven of the thirteen search endpoints send `Cache-Control: private, max-age=60`. The `private` directive specifically instructs shared caches, Cloudflare included, not to store the response. `search/map/map_search_api.php` goes further with `no-cache, no-store, must-revalidate`. This is for a database that is reloaded once a month and whose search responses are anonymous and identical for every visitor.
+
+     | Endpoint | Current `Cache-Control` |
+     |---|---|
+     | `image`, `insertion`, `marker`, `pan_gene`, `phenotype`, `reference`, `stock`, `variation` | `private, max-age=60` |
+     | `uniformmu` | `private, max-age=300` |
+     | `map` | `no-cache, no-store, must-revalidate` |
+     | `searchall` | `public, max-age=60, stale-while-revalidate=300` |
+     | `protein_structure` | `public, max-age=300, stale-while-revalidate=1800` |
+     | `typsimselector` | `public, max-age=600` |
+
+  2. **Cloudflare does not cache `.php` responses by default,** regardless of headers. Verified: the three endpoints that already send `public` still return `cf-cache-status: DYNAMIC`. Cloudflare's default cache behaviour keys off a static file-extension list, so a Cache Rule is required to make these paths eligible at all. Fixing the headers alone will accomplish nothing.
+
+  For contrast, the CDN is working correctly for static assets — `/css/mgdb-modern.css` returns `cf-cache-status: HIT` with `age: 341` — so the zone itself is healthy and the plan supports caching. Only the API paths are excluded.
+
+  These endpoints are safe to cache in a shared cache: they read no cookie and no session, and are deterministic functions of the query string. (`$_POST` appears only inside a helper that accepts a parameter by either method; Cloudflare does not cache POST.)
+
+- **Proposed change:** Two pieces, one on each side.
+
+  **a. Zone configuration — requires the network administrator.** Add a Cache Rule scoped to the production hostnames only, so the development instances are unaffected:
+
+  ```
+  (http.host in {"www.maizegdb.org" "maizegdb.org"}
+   and starts_with(http.request.uri.path, "/search/")
+   and http.request.method eq "GET")
+  ```
+
+  with the action *Eligible for cache*, *Respect origin TTL*, and the query string included in the cache key (the default — different searches must remain different objects).
+
+  Hostname scoping is deliberate and load-bearing. Seven hosts share this zone — `php8`, `claude`, `codex`, `redesign`, `john`, `chi`, `gamma` — and all of them are development instances where edge caching would serve stale responses during active work while providing no benefit. See the development note below.
+
+  **b. Response headers — application side, no administrator needed.** Change `private` to `public` on the collection-wide endpoints and raise `max-age` to match the monthly reload cycle, with `stale-while-revalidate` so an expiring object never makes a visitor wait for a rebuild. This work is ready to do once the rule exists; doing it first would have no effect.
+
+  **A purge is required after each monthly database reload,** by the same logic as the dashboard cache in AD-023. Either the administrator provides a scoped API token so `deploy/deploy.sh` can issue a purge-by-prefix for production deploys and the reload script can purge `/search/*`, or the administrator purges the zone manually as part of the reload. A token limited to *Cache Purge* on this single zone is the lower-friction option and grants nothing else.
+
+- **Expected benefit:** Every search response currently costs a round trip to Ames. Cached at the edge, it is served from a point of presence near the user. For a database with an international user base this is a far larger real-world improvement than anything achievable at the origin — origin-side work can only reduce the server's share of the time, not the distance.
+
+  Origin cost per request today, after the dashboard cache landed (median, measured on the development instance):
+
+  | Request | origin cost | payload |
+  |---|---|---|
+  | `reference_search_api.php?facets_only=1` | 13 ms | 9.1 KB |
+  | `variation_search_api.php` | 46 ms | 8.6 KB |
+  | `marker_search_api.php` | 609 ms | 3.5 KB |
+
+  Every one of those becomes zero origin work on a hit, which also removes the PHP-FPM worker and the database connection each request occupies. The benefit is therefore latency *and* headroom: the origin stops doing repeat work and is free for the requests that genuinely need it.
+
+- **Risk and rollback:** Low, and reversible in seconds — disabling the Cache Rule returns every response to origin immediately.
+
+  Two things to get right, both addressed by the proposal above:
+
+  - **Staleness after a reload.** With no purge, visitors see the previous month's figures until the TTL expires. This is why the purge step is part of the request rather than an afterthought.
+  - **HTML pages are deliberately excluded.** The page shell renders login affordances through `translation.php` (`topright_login` / `topright_logout`). Caching logged-in HTML in a shared cache is how one user is served another user's page. The rule above is confined to `/search/` for that reason. Extending it to page routes would require verifying with a real authenticated session that the markup does not vary, plus a cookie-based bypass, and is explicitly **not** part of this request.
+
+- **Required administrator:** Network administrator with access to the Cloudflare zone `maizegdb.org`
+- **Status:** proposed
+- **Validation:** Against a production URL, `cf-cache-status` should read `MISS` on the first request and `HIT` on the second, with `age` climbing:
+
+  ```
+  curl -sI 'https://www.maizegdb.org/search/reference/reference_search_api.php?facets_only=1' \
+    | grep -iE 'cf-cache-status|age|cache-control'
+  ```
+
+  Then confirm the development instances were **not** affected — this must still report `DYNAMIC`:
+
+  ```
+  curl -sI 'https://claude.maizegdb.org/search/reference/reference_search_api.php?facets_only=1' \
+    | grep -i cf-cache-status
+  ```
+
+  Finally, confirm a purge takes effect: purge the zone, then re-request and expect `MISS` again.
+
+- **Development note — worth passing on with the request:** a browser hard reload does **not** bypass the Cloudflare cache. Measured on the current asset cache, a request carrying `Cache-Control: no-cache` returned the identical cached object, same `age: 363`, as a normal request. Ctrl+Shift+R clears the *browser* cache and then receives the same stale copy from the edge, which reads exactly like a deploy that did not take. Working alternatives, in order of usefulness: request the origin directly with `curl --resolve <host>:80:<origin-ip>`, append a unique query parameter, or switch on Cloudflare's Development Mode (a zone-wide three-hour bypass that expires by itself). Hostname-scoping the rule as proposed keeps this off the development instances entirely, so it should only ever matter when deliberately testing production caching.
+
+---
+
+## AD-025 — Marker search scans 3.6 million rows on every query for want of two trigram indexes
+
+- **Date:** 2026-08-22
+- **Affected component:** `mgdb.probe`, `mgdb.synonyms` — the search behind `/data_center/marker` and `search/marker/marker_search_api.php`
+- **Current limitation:** Every marker search reads the whole probe table and the whole synonyms table, whatever is typed. Measured through the live API before any change, on PostgreSQL 15.13:
+
+  | Query | Time | Hits |
+  |---|---|---|
+  | `q=bnlg` | 7511 ms | 424 |
+  | `q=umc` | 7444 ms | 1972 |
+  | `q=phi` | 7445 ms | 162 |
+  | `q=csh` | 7431 ms | 5357 |
+  | `q=bnlg1079` | 6150 ms | 1 |
+
+  The time is flat regardless of how many rows come back — the signature of a full scan rather than a lookup. `EXPLAIN (ANALYZE, BUFFERS)` on the count for `q=bnlg` attributes it to three things:
+
+  - **Seq Scan on `probe`**, 780,086 rows, 1.8 s. The predicate is `name ILIKE '%bnlg%'`. The leading wildcard makes the existing btree `idx_probe_name` unusable, so every row is read and 779,662 are discarded.
+  - **Parallel Seq Scan on `synonyms`**, 2,807,952 rows, 1.08 s, for the same reason against `idx_synonyms_synonyms`.
+  - **Hash of the whole `id_num` table**, 4,138,469 rows built into 194 MB of memory, 1.48 s, only to apply `curation_lvl = 0`.
+
+  This is the same class of problem as AD-020 on `mgdb.locus`: the indexes that exist cannot serve the case-insensitive substring searches the interface actually issues. It may be worth taking the two items to the same person.
+
+  **Half of this has already been fixed in application code and needs nothing from an administrator.** The filter was rewritten from an `OR` with a correlated `EXISTS` into a union of two independent scans, which stopped the planner probing synonyms once per probe row. Marker search went from 7511 ms to 2742 ms for `q=bnlg`, a 63% reduction, verified to return the identical id list in the identical order across fourteen cases — plain terms, a prefix form, mixed case, an embedded wildcard, an apostrophe, a no-hit term, and combinations with the type and bin filters. That change is deployed.
+
+  What remains is the ~2.9 s of sequential scanning, which cannot be fixed in SQL. It needs indexes.
+
+- **Proposed change:** Create GIN trigram indexes on the two searched columns. **`pg_trgm` is already installed on this database** — verified against `pg_extension` — so no extension work is required:
+
+  ```sql
+  CREATE INDEX CONCURRENTLY idx_probe_name_trgm
+    ON mgdb.probe USING gin (name gin_trgm_ops);
+
+  CREATE INDEX CONCURRENTLY idx_synonyms_synonyms_trgm
+    ON mgdb.synonyms USING gin (synonyms gin_trgm_ops);
+
+  ANALYZE mgdb.probe;
+  ANALYZE mgdb.synonyms;
+  ```
+
+  `CONCURRENTLY` lets the build proceed without taking a write lock, so it can be run against a live instance. It is slower than a plain build and cannot run inside a transaction.
+
+  The application-side rewrite already deployed is what makes these indexes usable: a correlated `EXISTS` could not have used them, whereas each branch of the union is a plain `ILIKE` against one column and is exactly the shape `gin_trgm_ops` accelerates. The two changes are complementary, and the indexes are the larger remaining half.
+
+- **Expected benefit:** Both sequential scans become index scans, removing roughly 2.9 s of the remaining 2.7 s per query (the two overlap; the practical expectation is marker search dropping from seconds to well under half a second). This is the primary function of the marker data centre, so it is felt by every user who types anything into it.
+
+  It also lifts a load the database currently carries on every keystroke-driven search: the page issues a search 500 ms after typing stops, so each search currently reads 3.6 million rows.
+
+- **Risk and rollback:** Low, and fully reversible with `DROP INDEX CONCURRENTLY`.
+
+  Sizing, for planning:
+
+  | Table | Rows | Heap | Existing indexes | Indexed text |
+  |---|---|---|---|---|
+  | `mgdb.synonyms` | 2,818,048 | 538 MB | 1193 MB | 47 MB in `synonyms` |
+  | `mgdb.probe` | 780,086 | 76 MB | 57 MB | 8 MB in `name` |
+
+  GIN trigram indexes are typically a modest multiple of the indexed text rather than of the table, so the expected additions are small against the 1193 MB of indexes `synonyms` already carries. The `synonyms` build is the longer of the two and should be scheduled with that in mind.
+
+  Write overhead is the usual objection to GIN and does not apply here: production is bulk-loaded once a month and takes no writes in between. If the monthly load drops and recreates these tables, the index creation needs adding to that script — worth confirming with whoever owns it. On the curation instance, which does take writes, the trade is still likely favourable but should be reviewed separately.
+
+- **Required administrator:** Database administrator with DDL rights on the `mgdb` schema
+- **Status:** proposed
+- **Validation:** Before and after, the same query should change plan and time:
+
+  ```sql
+  EXPLAIN (ANALYZE, BUFFERS)
+  SELECT count(*) FROM mgdb.probe p
+  WHERE p.name ILIKE '%bnlg%';
+  ```
+
+  Expect `Seq Scan on probe` with ~780,000 rows scanned beforehand, and a `Bitmap Index Scan on idx_probe_name_trgm` afterwards. End to end, `/search/marker/marker_search_api.php?q=bnlg` should fall from ~2700 ms to well under 500 ms while still reporting `424` hits — the hit count is the correctness check and must not move.
+
+---
+
+## AD-026 — 289 tables lost their SELECT grant to the application role, and `chado.genome_information` no longer exists
+
+- **Date:** 2026-08-28
+- **Affected component:** Database `planter` on the development instance — schemas `mgdb` (221 tables), `chado` (63), `perm_tables` (5). Every page and endpoint that reads them.
+- **Current limitation:** The application connects as the non-superuser role `mgdb`. **289 of the 410 tables now deny it `SELECT`.** The count of tables with a NULL `relacl` — that is, default owner-only privileges — is also exactly 289, so the two sets coincide: these tables were created or replaced by `postgres` and the follow-up `GRANT SELECT … TO mgdb` was never run. Working tables carry an explicit `mgdb=r/postgres` ACL; broken ones carry no ACL at all.
+
+  Separately, **`chado.genome_information` does not exist anywhere in the database.** It is not renamed or moved — a catalog-wide search on the name returns nothing. `controllers/genome/genome_center_modern.php` selects from it.
+
+  This is recent. On 2026-08-27 a direct query against `chado.genome_information` returned the expected B73 rows and `/genome` reported 160 assemblies; on 2026-08-28 the table is absent and `/genome` renders "No assemblies". The postmaster has been up since 2026-05-04, so the tables were replaced in place on a running server.
+
+  **Most of the damage is silent.** Only the header autocomplete surfaces an error \(HTTP 503, "Suggestions are temporarily unavailable"\); it is the one endpoint that catches `Throwable` and sets a status. Others swallow the failure and return success with nothing in it — `gene_product_search_api.php` answers `{"ok":true,"total":0}`, `person_suggest_api.php` answers `{"results":[]}`, and `/genome` shows an empty-state message. Pages look like they have no data rather than like they are broken. The Genome Center's metric tiles still read "73 assemblies" beside a table with none, because the tiles come from the offline dashboard cache written while the database was healthy.
+
+- **Proposed change:** Re-run the post-load grants as a superuser, then restore the missing table:
+
+  ```sql
+  GRANT USAGE ON SCHEMA mgdb, chado, perm_tables TO mgdb;
+  GRANT SELECT ON ALL TABLES IN SCHEMA mgdb, chado, perm_tables TO mgdb;
+  -- so the next reload does not reintroduce this
+  ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA mgdb, chado, perm_tables
+    GRANT SELECT ON TABLES TO mgdb;
+  ```
+
+  `chado.genome_information` has to be reloaded from whatever produced it; no grant recovers a table that is not there.
+
+- **Expected benefit:** Restores the site's data. This is not a redesign issue — it blocks verification of every page that reads the database.
+- **Risk and rollback:** Low. The grants are additive and read-only, and `REVOKE` reverses them. Confirm first that read-only is the intended posture for `mgdb`; if it also writes, the working tables' current ACL \(`r` only\) suggests the write grants are missing too and the audit should be widened to INSERT/UPDATE/DELETE.
+- **Required administrator:** PostgreSQL superuser on the development instance \(role `postgres`\). The application role cannot grant on tables it does not own, and `mgdb` owns none of them.
+- **Status:** implemented (2026-08-28), with one table outstanding
+- **Validation:** `SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE c.relkind IN ('r','v','m','p') AND n.nspname NOT IN ('pg_catalog','information_schema') AND NOT has_table_privilege('mgdb', c.oid, 'SELECT');` should return 0. Then `/search_engine/autocomplete?global_search_term=b73&global_search_type=anything` should return 200 with populated groups, and `/genome` should list its assemblies again.
+
+### Resolved 2026-08-28, except for one table
+
+The database was restored and re-granted the same day. The counts moved from
+289 tables unreadable to **1**, `chado.genome_information` is back, the database
+grew 35 GB → 45 GB, and the postmaster start time changed — so this was a
+reload, not a grant-only repair. `/genome` lists its 161 assembly rows again and
+the header autocomplete returns populated results \(`b73` promotes the B73
+germplasm record; `anthocyanin` returns the `a1` gene\).
+
+**Still outstanding: `mgdb.full_reference` has no SELECT grant.** Nothing reads
+it today — every occurrence in the codebase is the *string* `'full_reference'`
+used as an `all_text_search.table_name` filter, and a search for real SQL
+against the table finds none, so the reference autocomplete works by reading
+`all_text_search` and then `mgdb.reference`. It is a gap in the grant sweep
+rather than a live fault, but it should be closed so the validation query above
+returns 0:
+
+```sql
+GRANT SELECT ON mgdb.full_reference TO mgdb;
+```
+
+### Two things worth fixing regardless
+
+1. **The site log has been full since 2026-08-04 and is discarding every message.** `logs/mgdb.log` is 753,386 bytes against the `max_logsize` of 750,000 in `conf/mgdb.conf`, and `_writeToLog()` in `include/gp_lib.php` returns early once the file is over that cap — the comment there says "just stop and hope the cronjob rolls the log soon". The rotation cronjob is evidently not running. The autocomplete controller does call `logMessage()` with the real PDO message before returning its 503, so this failure *was* being reported; the report went nowhere. Diagnosing it required running the controller under an instrumented copy.
+2. **A caught `Throwable` should not be reduced to a generic string with no way to recover it.** Whatever the log policy, the endpoint should keep the SQLSTATE somewhere an operator can reach.
+
+---
+
+## AD-027 — Apache cannot write the site log: SELinux labels `logs/` read-only, and the file is owned by root
+
+- **Date:** 2026-08-28
+- **Affected component:** `/var/www/claude/logs/` and `include/gp_lib.php` `_writeToLog\(\)`. The same shape applies to the other five per-instance log directories.
+- **Current limitation:** Two barriers, either of which alone blocks the write:
+
+  1. **SELinux.** The host is `Enforcing`, and both the directory and the file are labelled `httpd_sys_content_t` — readable by `httpd_t`, not writable. `httpd_unified` and `httpd_anon_write` are both `off`. Confirmed by moving the file aside: apache owns the directory `\(drwxrwxr-x apache:mgdbadmin\)` and still could not create a replacement, failing with `Permission denied`.
+  2. **Unix ownership.** `mgdb.log` is `root:mgdbadmin` mode `rw-rw-r--`, and apache belongs only to group `apache`, so it falls through to the `r--` other bits.
+
+  The consequence is that this instance has **never** written a log line. The 750,000-byte `max_logsize` cap was masking it: `_writeToLog\(\)` returns at gp_lib.php:272 before reaching `fopen\(\)`, so the failure was silent.
+
+  **Removing the mask turns the silence into a site-wide outage.** On 2026-08-28 `max_logsize` was raised to 750000000, which let execution past the size check to `fopen\(…, 'a+'\)` at line 274. That returns `false`; the guard on line 276 does not catch it, because `false != 0` is itself false in PHP; and line 299's `fwrite\($fh, …\)` sits *outside* that guard. On PHP 8.2 that is `TypeError: fwrite\(\): Argument #1 \($stream\) must be of type resource, bool given` — a fatal on every request, because `index.php:56` calls `logMessage\(\)`. Every page served a 622-byte error instead. Restored by reverting the cap to 750000 so the early return applies again.
+
+- **Proposed change:** Give apache a writable, correctly labelled log directory, then rotate:
+
+  ```bash
+  # 1. Unix ownership, all instances
+  chown apache:mgdbadmin /var/www/*/logs/*.log
+  chmod 664 /var/www/*/logs/*.log
+
+  # 2. SELinux: label the log directories read-write for httpd, persistently
+  semanage fcontext -a -t httpd_sys_rw_content_t '/var/www/[^/]+/logs\(/.*\)?'
+  restorecon -Rv /var/www/*/logs
+
+  # 3. Rotate what is already at the cap
+  #    \(mgdb.log, redirect.log and both .bk copies are all ~750 KB\)
+  ```
+
+  The `semanage fcontext` step is what makes it survive a relabel; `chcon` alone is undone by the next `restorecon`. Same lesson as AD-023.
+
+- **Expected benefit:** Errors get recorded. This is not cosmetic: AD-026 took an instrumented copy of the controller to diagnose, because the endpoint *did* log the real SQLSTATE and the message went nowhere.
+- **Risk and rollback:** Low, and reversible with `semanage fcontext -d` plus `restorecon`. **Order matters** — do not raise `max_logsize` or empty the log until apache can actually write, or the site fatals as above.
+- **Required administrator:** root on the development instance \(for `chown`, `semanage`, `restorecon`\).
+- **Status:** proposed
+- **Validation:** As apache, `test -w /var/www/claude/logs/mgdb.log`. Then request any page and confirm a new timestamped line appears. Only then raise the cap or rotate.
+
+### Also needed: rotation that covers the per-instance directories
+
+`/home/cronjobs/maizegdb_log_backup.sh` \(cron: `15 */2 * * *`\) still rotates the pre-multi-instance layout:
+
+```bash
+rollLog "/var/www/logs" "mgdb.log"
+```
+
+`/var/www/logs` exists, but it is not this instance's. Six per-instance directories exist — `chi`, `claude`, `codex`, `gamma`, `john`, `redesign` — and **none is in the script**, so none is ever rolled. Replace it with logrotate, which handles all of them and recreates the file with the right owner:
+
+```
+/var/www/*/logs/*.log {
+    size 500k
+    rotate 5
+    missingok
+    notifempty
+    copytruncate
+    create 664 apache mgdbadmin
+}
+```
+
+Then drop the `/var/www/logs` line from the script, or retire the cron job, so the two do not fight.
+
+### Two code fixes in `_writeToLog\(\)`, worth making whatever the sysadmin does
+
+1. **Line 299–300 belong inside the `if \($fh\)` guard.** As written, an unwritable log is a fatal rather than a degraded no-op. That single line is what turned a permissions problem into an outage.
+2. **Line 272 returns without the `ob_end_clean\(\)` from line 268,** leaking an output buffer on every suppressed call. Harmless today — the buffers are empty and flush at shutdown — but it is a leak, and it is on the hot path.
+
+---
+
+## AD-028 — The AlphaFill payload is built off-host, and its source is not on any MaizeGDB server
+
+- **Date:** 2026-08-29
+- **Affected component:** `/data_center/alphafill` — the whole page
+- **Status:** **an administrator request,** for the storage decision in the last section. Everything above it is recorded so the next rebuild is reproducible.
+- **What it is:** 1.4 GB in `data/alphafill/` on the claude instance:
+
+  | | size | files |
+  |---|---:|---:|
+  | `models/` AlphaFold models, gzipped | 1.1 GB | 18,887 |
+  | `lig/` transplanted ligand coordinates, gzipped | 256 MB | 33,002 |
+  | `detail/` `pockets/` `genes/` and the rest of the index | 325 MB | ~14,000 |
+
+- **Why it is not built on the server, unlike AD-019.** Its inputs are a one-off research output that has never lived on a web host: six CSVs totalling 200 MB, the run's 39 GB of filled mmCIFs on SCINet Atlas, and a 6.7 GB archive of the AlphaFold models the run was performed on. The build therefore runs on the workstation and ships as three tarballs. Reproducing it needs all three sources, so **the sources are the thing to preserve, not the payload.**
+
+- **The Atlas copy is on 90-day scratch.** The filled mmCIFs are at `/90daydata/maizegdb/carson/alphafill/prod/out` — 38,360 directories, 39 GB — and `/90daydata` expires. Everything MaizeGDB serves has already been extracted from it, so the site does not depend on it surviving; but a rebuild with different parameters would, and once it expires that is no longer possible without rerunning AlphaFill.
+
+- **How to rebuild,** in order:
+
+      # 1. on Atlas — split filled mmCIFs into ligands + slim metadata (~4 min on 8 cores)
+      python3 alphafill_ligand_extract.py --out prod/out --dest stage --shard I --of 8
+
+      # 2. on the workstation — extract the models the page serves (~25 min, one pass)
+      python3 tools/alphafill_models.py --archive B73.tar.gz \
+              --need needed_proteins.txt --dest <staging>
+
+      # 3. on the workstation — build the index (~100 s)
+      python3 tools/alphafill_index.py --source <proteome outputs> \
+              --models <staging>/model_index.json --plddt <staging>/model_plddt.json \
+              --gff Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.gff3.gz \
+              --ccd ccd.json --meta <staging>/meta --dest <staging>/alphafill
+
+- **Two things that will bite whoever does this next.**
+  1. **Files unpacked from the Atlas tarball carry mode 640 and directories 750,** so Apache answers `403 Server unable to read htaccess file` for every ligand. `find lig -type d -exec chmod 755 {} +` and `-type f -exec chmod 644 {} +` after unpacking.
+  2. **Structure URLs carry a `?v=<release>` stamp** because they are served `immutable, max-age=2592000`. Without it Cloudflare serves a month-old copy of any file a release corrects — which it did, during this build, and the origin and the CDN disagreed for long enough to be confusing.
+
+- **What the administrator is being asked to decide.** These 1.4 GB are on a development instance today. The natural home for the two structure directories is `images.maizegdb.org`, beside `esm/b73/` which already serves ESMFold models the same way — and the AlphaFold B73 v5 model set has value well beyond this page, since **it is currently published nowhere.** `download.maizegdb.org` has no structure section at all, and `images.maizegdb.org` has only the ESMFold set. Publishing all 68,262 models rather than the 18,887 this page needs would cost roughly 3.9 GB gzipped.
+
+- **A correctness note that motivates the above.** The ESMFold models MaizeGDB already serves cannot substitute for these. For `Zm00001eb000660_P001` the two agree on sequence and disagree by **1.53 Å CA RMSD** after optimal superposition, and the transplanted ligand coordinates are in the AlphaFold model's frame. 1.53 Å is the same magnitude as AlphaFill's entire benchmarked accuracy (median 1.59 Å pocket RMSD), so overlaying the ligands on the ESMFold model would introduce error as large as the signal — silently, and it would look plausible.

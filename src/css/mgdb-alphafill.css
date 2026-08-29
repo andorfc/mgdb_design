@@ -1,0 +1,681 @@
+/* ==========================================================================
+   /data_center/alphafill — AlphaFill ligand transplants
+   --------------------------------------------------------------------------
+   Scoped under .mgdb-modern like every other page stylesheet, so no legacy
+   page can be reached by these rules. Layout, typography, colour and state
+   components come from mgdb-modern.css; this file adds only what the ligand
+   browser needs and cannot get from there.
+
+   Two deliberate departures from the design system, both for the same reason
+   the protein structure page makes them:
+
+   1. The 3D viewport carries a dark local palette. A molecular viewer is read
+      as a lit object against a dark ground — the convention in every structure
+      tool this audience already uses — and pLDDT's own palette was designed
+      against it. Rendering the viewport on the page's cream surface would make
+      confident regions vanish.
+
+   2. The evidence badges use five fixed hues rather than the status tokens.
+      Evidence class is not a status: "ion" is neither worse nor better than
+      "weak", it is a different kind of thing, and mapping five categories onto
+      three status colours would imply an ordering that is not there. The hues
+      are drawn from the site palette and all five clear 4.5:1 on their own
+      backgrounds.
+
+   Contents
+     1.  Hero and the caveat rail
+     2.  Search, suggestions and results
+     3.  Evidence badges
+     4.  Gene result: identity, ligand cards
+     5.  The viewer (dark, with its control rail)
+     6.  Ligand view and browse tables
+     7.  Target list
+     8.  Interpretation, methods, downloads
+     9.  Responsive behaviour
+     10. Motion, forced colours, print
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Hero and the caveat rail
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .mgdb-alphafill-page .mgdb-hero-emblem,
+.mgdb-alphafill-page .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-modern .af-hero-icon {
+  width: min(100%, 76px);
+  height: auto;
+  object-fit: contain;
+}
+
+/* The caveats are not a dismissible banner and not a footnote. Ions are 43.8%
+   of the corpus; a reader who sorts by count without knowing that reaches a
+   wrong conclusion, so this sits above the first control. */
+.mgdb-modern .af-caveats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--mgdb-space-3);
+  margin: var(--mgdb-space-5) 0;
+  padding: var(--mgdb-space-4);
+  background: var(--mgdb-gold-soft);
+  border: 1px solid #e7d4a8;
+  border-left: 4px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius);
+}
+
+.mgdb-modern .af-caveat {
+  display: flex;
+  gap: var(--mgdb-space-3);
+  align-items: flex-start;
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+  color: var(--mgdb-ink-soft);
+}
+
+.mgdb-modern .af-caveat b { color: var(--mgdb-gold-dark); }
+
+.mgdb-modern .af-caveat-mark {
+  flex: 0 0 auto;
+  font-size: 1.1rem;
+  line-height: 1.2;
+  color: var(--mgdb-gold-dark);
+}
+
+/* --------------------------------------------------------------------------
+   2. Search, suggestions and results
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .af-workspace { scroll-margin-top: var(--mgdb-space-5); }
+.mgdb-modern .af-search { margin: 0 0 var(--mgdb-space-4); }
+
+.mgdb-modern .af-search-row {
+  display: flex;
+  gap: var(--mgdb-space-3);
+  align-items: flex-start;
+  margin: var(--mgdb-space-2) 0 0;
+}
+
+/* The field owns the suggestion panel's positioning context. Without this the
+   panel anchors to the row and drifts under the submit button. */
+.mgdb-modern .af-search-field { position: relative; flex: 1 1 auto; min-width: 0; }
+.mgdb-modern .af-search-input { width: 100%; }
+.mgdb-modern .af-search-submit { flex: 0 0 auto; }
+.mgdb-modern .af-suggestions { width: 100%; }
+
+.mgdb-modern .af-suggestion-group {
+  padding: var(--mgdb-space-2) var(--mgdb-space-3) var(--mgdb-space-1);
+  font-size: var(--mgdb-text-xs);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--mgdb-muted);
+  background: var(--mgdb-surface-alt);
+  border-top: 1px solid var(--mgdb-line-soft);
+}
+.mgdb-modern .af-suggestion-group:first-child { border-top: 0; }
+
+.mgdb-modern .af-suggestion-meta {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: baseline;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.mgdb-modern .af-suggestion-meta b { color: var(--mgdb-ink-soft); font-weight: 600; }
+
+.mgdb-modern .af-results { margin-top: var(--mgdb-space-4); }
+
+/* --------------------------------------------------------------------------
+   3. Evidence badges
+
+   Five categories, five hues, no implied ordering between ion and weak. Each
+   pairing was checked at 4.5:1 or better against its own background.
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .af-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+
+.mgdb-modern .af-badge-strong   { background: var(--mgdb-green-soft);  color: var(--mgdb-green-dark); border-color: #b6d8c6; }
+.mgdb-modern .af-badge-moderate { background: var(--mgdb-status-info-soft); color: var(--mgdb-status-info); border-color: #b9d6e5; }
+.mgdb-modern .af-badge-ion      { background: #efeaf6; color: #57377f; border-color: #d3c4e6; }
+.mgdb-modern .af-badge-weak     { background: var(--mgdb-surface-sunken); color: var(--mgdb-muted); border-color: var(--mgdb-line); }
+.mgdb-modern .af-badge-additive { background: var(--mgdb-gold-soft); color: var(--mgdb-gold-dark); border-color: #e7d4a8; }
+.mgdb-modern .af-badge-none     { background: var(--mgdb-burgundy-soft); color: var(--mgdb-burgundy); border-color: #e2c9cc; }
+
+.mgdb-modern .af-badge-pocket {
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  border-color: #b6d8c6;
+}
+
+.mgdb-modern .af-evidence-key { margin-top: var(--mgdb-space-6); }
+.mgdb-modern .af-evidence-table td:first-child { white-space: nowrap; }
+.mgdb-modern .af-num { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+
+/* --------------------------------------------------------------------------
+   4. Gene result
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .af-identity {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+  align-items: baseline;
+  padding: var(--mgdb-space-4);
+  background: var(--mgdb-surface-alt);
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-modern .af-identity h3 {
+  margin: 0;
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xl);
+}
+
+.mgdb-modern .af-identity-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+.mgdb-modern .af-identity-facts b {
+  color: var(--mgdb-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* A gene whose transplants sit on a non-canonical isoform. 3,216 genes are in
+   this state and the distinction is load-bearing: the model, the residue
+   numbering and the ligand coordinates all belong to that isoform. */
+.mgdb-modern .af-isoform-note {
+  width: 100%;
+  margin: 0;
+  padding-top: var(--mgdb-space-2);
+  border-top: 1px dashed var(--mgdb-line);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-modern .af-ligand-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--mgdb-space-3);
+}
+
+.mgdb-modern .af-ligand-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-2);
+  padding: var(--mgdb-space-3);
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-left: 4px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  font: inherit;
+  color: inherit;
+}
+.mgdb-modern .af-ligand-card:hover { border-color: var(--mgdb-green); box-shadow: var(--mgdb-shadow-sm); }
+.mgdb-modern .af-ligand-card:focus-visible { outline: none; box-shadow: var(--mgdb-focus-ring); }
+.mgdb-modern .af-ligand-card.is-active {
+  border-color: var(--mgdb-green);
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-modern .af-ligand-card[data-af-evidence="strong"]   { border-left-color: var(--mgdb-green); }
+.mgdb-modern .af-ligand-card[data-af-evidence="moderate"] { border-left-color: var(--mgdb-status-info); }
+.mgdb-modern .af-ligand-card[data-af-evidence="ion"]      { border-left-color: #7a5aa8; }
+.mgdb-modern .af-ligand-card[data-af-evidence="weak"]     { border-left-color: var(--mgdb-line); }
+.mgdb-modern .af-ligand-card[data-af-evidence="additive"] { border-left-color: var(--mgdb-gold); }
+
+.mgdb-modern .af-ligand-head {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  flex-wrap: wrap;
+}
+.mgdb-modern .af-ligand-ccd {
+  font-family: var(--mgdb-font-mono);
+  font-weight: 700;
+  font-size: var(--mgdb-text-lg);
+}
+.mgdb-modern .af-ligand-swatch {
+  width: 12px; height: 12px;
+  border-radius: 3px;
+  flex: 0 0 auto;
+  border: 1px solid rgba(31, 39, 35, .25);
+}
+.mgdb-modern .af-ligand-name {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-modern .af-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--mgdb-space-2);
+  margin-top: auto;
+}
+.mgdb-modern .af-metric {
+  text-align: center;
+  padding: var(--mgdb-space-2) var(--mgdb-space-1);
+  background: var(--mgdb-surface-sunken);
+  border-radius: var(--mgdb-radius-sm);
+}
+.mgdb-modern .af-metric strong {
+  display: block;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--mgdb-text-sm);
+}
+.mgdb-modern .af-metric span {
+  display: block;
+  font-size: 11px;
+  color: var(--mgdb-muted);
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+.mgdb-modern .af-metric.is-high strong { color: var(--mgdb-green-dark); }
+.mgdb-modern .af-metric.is-mid strong  { color: var(--mgdb-gold-dark); }
+.mgdb-modern .af-metric.is-low strong  { color: var(--mgdb-red); }
+
+.mgdb-modern .af-flag {
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  border-radius: var(--mgdb-radius-sm);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+.mgdb-modern .af-flag-additive { background: var(--mgdb-gold-soft); color: var(--mgdb-ink-soft); }
+.mgdb-modern .af-flag-ion      { background: #efeaf6; color: #452c66; }
+.mgdb-modern .af-flag-remote   { background: var(--mgdb-surface-sunken); color: var(--mgdb-ink-soft); }
+
+/* The three empty states. Each gets its own colour so the difference between
+   them is visible before the sentence is read. */
+.mgdb-modern .af-state {
+  padding: var(--mgdb-space-5);
+  border-radius: var(--mgdb-radius);
+  border: 1px solid var(--mgdb-line);
+}
+.mgdb-modern .af-state h3 { margin-top: 0; }
+.mgdb-modern .af-state-no-donor {
+  background: #f3eff9;
+  border-color: #d3c4e6;
+}
+.mgdb-modern .af-state-no-donor h3 { color: #4a2d70; }
+.mgdb-modern .af-state-no-model {
+  background: var(--mgdb-surface-sunken);
+  border-color: var(--mgdb-line);
+}
+.mgdb-modern .af-state-unknown {
+  background: var(--mgdb-red-soft);
+  border-color: #e2c9cc;
+}
+.mgdb-modern .af-state-unknown h3 { color: var(--mgdb-red); }
+
+/* --------------------------------------------------------------------------
+   5. The viewer
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .af-viewer {
+  --af-dark: #0d141b;
+  --af-panel: #161d26;
+  --af-line: #2b3644;
+  --af-text: #e6edf3;
+  --af-text-dim: #9aa7b8;
+  --af-accent: #4dd0e1;
+
+  margin: var(--mgdb-space-4) 0;
+  border: 1px solid var(--af-line);
+  border-radius: var(--mgdb-radius);
+  overflow: hidden;
+  background: var(--af-dark);
+  color: var(--af-text);
+}
+
+.mgdb-modern .af-viewer-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  background: var(--af-panel);
+  border-bottom: 1px solid var(--af-line);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-modern .af-viewer-bar label {
+  display: inline-flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  color: var(--af-text-dim);
+}
+
+.mgdb-modern .af-viewer-bar select,
+.mgdb-modern .af-viewer-bar button {
+  background: #1d2733;
+  color: var(--af-text);
+  border: 1px solid var(--af-line);
+  border-radius: var(--mgdb-radius-sm);
+  padding: 6px 10px;
+  font: inherit;
+  min-height: 34px;
+  cursor: pointer;
+}
+.mgdb-modern .af-viewer-bar button:hover,
+.mgdb-modern .af-viewer-bar select:hover { border-color: var(--af-accent); }
+.mgdb-modern .af-viewer-bar button:focus-visible,
+.mgdb-modern .af-viewer-bar select:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--af-dark), 0 0 0 4px var(--af-accent);
+}
+.mgdb-modern .af-viewer-bar button.is-on {
+  background: #123c47;
+  border-color: var(--af-accent);
+  color: var(--af-accent);
+}
+
+.mgdb-modern .af-viewport {
+  position: relative;
+  width: 100%;
+  height: clamp(360px, 52vh, 620px);
+  background: #05080b;
+}
+/* 3Dmol positions its canvas absolutely inside this element. */
+.mgdb-modern .af-viewport canvas { display: block; }
+
+.mgdb-modern .af-viewer-status,
+.mgdb-modern .af-viewer-legend {
+  position: absolute;
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  background: rgba(13, 20, 27, .86);
+  border: 1px solid var(--af-line);
+  border-radius: var(--mgdb-radius-sm);
+  font-size: var(--mgdb-text-xs);
+  line-height: 1.5;
+  color: var(--af-text-dim);
+  max-width: min(46ch, 60%);
+  pointer-events: none;
+}
+.mgdb-modern .af-viewer-status { left: 10px; bottom: 10px; }
+.mgdb-modern .af-viewer-legend { right: 10px; top: 10px; }
+.mgdb-modern .af-viewer-legend b { color: var(--af-text); display: block; margin-bottom: 4px; }
+
+.mgdb-modern .af-legend-row {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+}
+.mgdb-modern .af-legend-swatch {
+  width: 22px; height: 9px;
+  border-radius: 2px;
+  flex: 0 0 auto;
+}
+
+/* Per-residue pLDDT along the bottom, derived from the model's B-factor column
+   rather than shipped alongside it. */
+.mgdb-modern .af-strip {
+  display: block;
+  width: 100%;
+  height: 42px;
+  background: var(--af-panel);
+  border-top: 1px solid var(--af-line);
+}
+.mgdb-modern .af-strip-meta {
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  background: var(--af-panel);
+  border-top: 1px solid var(--af-line);
+  color: var(--af-text-dim);
+  font-size: var(--mgdb-text-xs);
+}
+.mgdb-modern .af-strip-meta b { color: var(--af-text); }
+
+/* --------------------------------------------------------------------------
+   6. Ligand view and browse tables
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .af-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  padding: var(--mgdb-space-3);
+  background: var(--mgdb-surface-alt);
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius);
+  margin-bottom: var(--mgdb-space-3);
+}
+
+.mgdb-modern .af-filter-label {
+  font-size: var(--mgdb-text-xs);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--mgdb-muted);
+  margin-left: var(--mgdb-space-2);
+}
+.mgdb-modern .af-filter-label:first-child { margin-left: 0; }
+
+.mgdb-modern .af-filter-inline {
+  display: inline-flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-muted);
+}
+.mgdb-modern .af-filter-inline select { min-width: 12ch; }
+
+.mgdb-modern .mgdb-chip.is-on {
+  background: var(--mgdb-green);
+  border-color: var(--mgdb-green);
+  color: #ffffff;
+}
+
+.mgdb-modern .af-table-wrap {
+  max-height: 640px;
+  overflow: auto;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+}
+.mgdb-modern .af-table-wrap .mgdb-table { margin: 0; }
+.mgdb-modern .af-table-wrap thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--mgdb-surface-sunken);
+}
+
+.mgdb-modern .af-table-gene {
+  font-family: var(--mgdb-font-mono);
+  white-space: nowrap;
+}
+
+.mgdb-modern .af-result-count {
+  margin: 0 0 var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.mgdb-modern .af-ligand-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+  align-items: baseline;
+  padding: var(--mgdb-space-4);
+  background: var(--mgdb-surface-alt);
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius);
+  margin-bottom: var(--mgdb-space-3);
+}
+.mgdb-modern .af-ligand-summary h3 {
+  margin: 0;
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xl);
+}
+.mgdb-modern .af-ligand-formula {
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-muted);
+}
+
+/* --------------------------------------------------------------------------
+   7. Target list
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .af-targets-panel { border-left: 4px solid #7a5aa8; }
+
+/* --------------------------------------------------------------------------
+   8. Interpretation, methods, downloads
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .af-card-flag {
+  border-left: 4px solid var(--mgdb-gold);
+  background: var(--mgdb-gold-soft);
+}
+
+.mgdb-modern .af-reading-grid .mgdb-card h3,
+.mgdb-modern .af-limits-grid .mgdb-card h3 { margin-top: 0; }
+
+.mgdb-modern .af-provenance-note { margin-top: var(--mgdb-space-4); }
+
+.mgdb-modern .af-charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-modern .af-chart {
+  padding: var(--mgdb-space-4);
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+}
+.mgdb-modern .af-chart h3 {
+  margin: 0 0 var(--mgdb-space-3);
+  font-size: var(--mgdb-text-base);
+}
+.mgdb-modern .af-bar-row {
+  display: grid;
+  grid-template-columns: 9ch 1fr 8ch;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-bottom: var(--mgdb-space-2);
+  font-size: var(--mgdb-text-sm);
+}
+.mgdb-modern .af-bar-track {
+  height: 12px;
+  background: var(--mgdb-surface-sunken);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.mgdb-modern .af-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--mgdb-green);
+}
+.mgdb-modern .af-bar-value {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--mgdb-muted);
+}
+
+/* --------------------------------------------------------------------------
+   9. Responsive behaviour
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 820px) {
+  .mgdb-modern .af-search-row { flex-direction: column; align-items: stretch; }
+  .mgdb-modern .af-search-submit { width: 100%; }
+  .mgdb-modern .af-viewport { height: clamp(300px, 46vh, 420px); }
+  .mgdb-modern .af-viewer-legend { position: static; max-width: none; margin: var(--mgdb-space-2); }
+  .mgdb-modern .af-metrics { grid-template-columns: repeat(2, 1fr); }
+  .mgdb-modern .af-bar-row { grid-template-columns: 7ch 1fr 7ch; }
+}
+
+/* --------------------------------------------------------------------------
+   10. Motion, forced colours, print
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .mgdb-modern .af-ligand-card,
+  .mgdb-modern .af-bar-fill { transition: none; }
+}
+
+@media (forced-colors: active) {
+  .mgdb-modern .af-badge,
+  .mgdb-modern .af-ligand-card,
+  .mgdb-modern .af-state { border: 1px solid CanvasText; }
+  .mgdb-modern .af-ligand-swatch,
+  .mgdb-modern .af-legend-swatch { forced-color-adjust: none; }
+}
+
+@media print {
+  /* The viewport is a WebGL canvas and prints as a black rectangle; the cards
+     beside it carry every number it is showing, so drop it. */
+  .mgdb-modern .af-viewer,
+  .mgdb-modern .af-filters,
+  .mgdb-modern .mgdb-section-tabs { display: none; }
+  .mgdb-modern .af-table-wrap { max-height: none; overflow: visible; }
+  .mgdb-modern .af-caveats { border: 1px solid #000; background: none; }
+}
+
+/* --------------------------------------------------------------------------
+   11. Pocket track
+
+   Pocket residues projected to genomic coordinates. Blocks are drawn in
+   percentage units so the track rescales with its container without needing a
+   resize handler or a measured viewBox.
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .af-track {
+  margin-top: var(--mgdb-space-5);
+  padding: var(--mgdb-space-4);
+  background: var(--mgdb-surface-alt);
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius);
+}
+.mgdb-modern .af-track h3 { margin: 0 0 var(--mgdb-space-2); font-size: var(--mgdb-text-lg); }
+.mgdb-modern .af-track-svg {
+  display: block;
+  margin: var(--mgdb-space-3) 0;
+  overflow: visible;
+}
+.mgdb-modern .af-track-legend {
+  margin: 0 0 var(--mgdb-space-2);
+  padding: 0;
+  list-style: none;
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-ink-soft);
+}
+.mgdb-modern .af-track-legend li {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: baseline;
+  margin-bottom: 2px;
+}
+.mgdb-modern .af-track-key {
+  width: 11px; height: 11px;
+  border-radius: 2px;
+  flex: 0 0 auto;
+  transform: translateY(1px);
+}
+
+@media (forced-colors: active) {
+  .mgdb-modern .af-track-svg rect { forced-color-adjust: none; }
+}

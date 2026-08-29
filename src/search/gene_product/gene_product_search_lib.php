@@ -2,7 +2,7 @@
 /* file: gene_product_search_lib.php
  *
  * purpose: Query builder, lookup helpers, and result shaping for the modernized
- *          Gene Product Data Center (/data_center/gene_product).
+ *          Gene Product Data Hub (/data_center/gene_product).
  */
 
 if (!defined('GP_MAX_RESULTS')) {

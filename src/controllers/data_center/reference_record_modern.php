@@ -72,7 +72,7 @@
   $mgdb->get('image-dir')->replace($system['image_url']);
   $mgdb->get('server-url')->replace($system['root_url']);
 
-  $content = $mgdb->get('body')->loadRemote($system['root_url_private'] . '/templates/static/mgdb_reference_record.bau');
+  $content = $mgdb->get('body')->load('templates/static/mgdb_reference_record.bau');
 
   $content->get('reference_id')->replace((int) $reference_id);
   $content->get('reference_title')->replace(htmlspecialchars($title, ENT_QUOTES, 'UTF-8'));

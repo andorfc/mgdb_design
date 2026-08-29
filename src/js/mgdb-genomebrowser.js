@@ -1,7 +1,7 @@
 /**
  * file: js/mgdb-genomebrowser.js
  *
- * purpose: Scrollspy, launcher submit handlers, and live search for Genome Browser Data Center
+ * purpose: Scrollspy, launcher submit handlers, and live search for Genome Browser Data Hub
  */
 
 (function () {

@@ -1,4 +1,4 @@
-/* Gene Product Data Center JavaScript (/data_center/gene_product)
+/* Gene Product Data Hub JavaScript (/data_center/gene_product)
  * Handles search submissions, dropdown filters, live results rendering,
  * example buttons, functional class shortcuts, and scrollspy navigation tabs.
  */

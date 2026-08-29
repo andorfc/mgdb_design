@@ -1,0 +1,158 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-map-record
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:title" content="$(map_name) &mdash; MaizeGDB map record">
+<meta property="og:description" content="Curated maize chromosome $(map_linkage) map record comprising $(map_loci_count) mapped loci.">
+
+<main class="mgdb-page mgdb-map-record-page" id="map-record-top" data-map-id="$(map_id)">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/map">Map Center</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(map_name)</span>
+  </nav>
+
+  <header class="mgdb-hero-record">
+    <div>
+      <span class="mgdb-eyebrow">Maize map &middot; Chromosome $(map_linkage)</span>
+      <h2><span class="mgdb-record-id">$(map_name)</span> <span class="mgdb-pill mgdb-pill-ok">Curated</span></h2>
+      <dl class="mgdb-record-facts" id="map-record-facts"></dl>
+    </div>
+    <div class="mgdb-hero-record-actions" id="map-record-actions"></div>
+  </header>
+
+  <nav class="mgdb-section-tabs" id="map-record-tabs" aria-label="Sections on this record" hidden></nav>
+
+  <div class="mgdb-loading" id="map-record-loading"><span class="mgdb-spinner" aria-hidden="true"></span><span>Loading the full map record&hellip;</span></div>
+
+  <div class="mgdb-message mgdb-message-error" id="map-record-error" role="alert" hidden>
+    <div>
+      <strong>The rest of this map record could not be loaded.</strong>
+      <span>The identity above is correct. Reload to try again, or report it if it keeps happening.</span>
+      <button class="mgdb-button mgdb-button-secondary" id="map-record-retry" type="button">Retry</button>
+    </div>
+  </div>
+
+  <div class="mgdb-message mgdb-message-info" id="map-record-notice" role="status" hidden></div>
+
+  <!-- Overview Section -->
+  <section id="map-record-overview" aria-labelledby="map-record-overview-title" hidden>
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Record</span><h2 id="map-record-overview-title">Overview</h2></div>
+      <p>Chromosome assignment, coordinate units, span, and contributor attribution.</p>
+    </div>
+    <div id="map-record-overview-body"></div>
+  </section>
+
+  <!-- Mapped Loci & Coordinates Section -->
+  <section id="map-record-loci" aria-labelledby="map-record-loci-title" hidden>
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Coordinates</span><h2 id="map-record-loci-title">Mapped loci &amp; coordinates</h2></div>
+      <p>Ordered genetic markers, genes, and cloned probe sites along chromosome $(map_linkage).</p>
+    </div>
+    <div id="map-record-loci-body"></div>
+  </section>
+
+  <!-- Sister Chromosome Maps in Series Section -->
+  <section id="map-record-series" aria-labelledby="map-record-series-title" hidden>
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Genome series</span><h2 id="map-record-series-title">Sister chromosome maps in this series</h2></div>
+      <p>Other chromosomes mapped using the same methodology, population, or panel.</p>
+    </div>
+    <div id="map-record-series-body"></div>
+  </section>
+
+  <!-- Alternative Maps on Same Chromosome Section -->
+  <section id="map-record-alt" aria-labelledby="map-record-alt-title" hidden>
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Synteny &amp; comparison</span><h2 id="map-record-alt-title">Other maps on chromosome $(map_linkage)</h2></div>
+      <p>Alternative genetic and physical maps on chromosome $(map_linkage) available for comparative alignment.</p>
+    </div>
+    <div id="map-record-alt-body"></div>
+  </section>
+
+  <!-- QTL Experiments Section -->
+  <section id="map-record-qtls" aria-labelledby="map-record-qtls-title" hidden>
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Quantitative traits</span><h2 id="map-record-qtls-title">Associated QTL experiments</h2></div>
+      <p>Quantitative trait loci mapped onto this chromosome framework.</p>
+    </div>
+    <div id="map-record-qtls-body"></div>
+  </section>
+
+  <!-- Curated Literature References Section -->
+  <section id="map-record-references" aria-labelledby="map-record-references-title" hidden>
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Literature</span><h2 id="map-record-references-title">Curated references</h2></div>
+      <p id="map-record-ref-status">Publications linked to this chromosome map and its marker framework.</p>
+    </div>
+    <div id="map-record-references-body"></div>
+    <nav id="map-record-ref-pagination" class="map-pagination" aria-label="Reference pages" hidden></nav>
+  </section>
+
+  <!-- Related Resources Section -->
+  <section id="map-record-related" aria-labelledby="map-record-related-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Connected tools</span>
+        <h2 id="map-record-related-title">Related resources</h2>
+      </div>
+      <p>Explore related genomic hubs, marker databases, and sequence browsers.</p>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/marker">
+          <strong>Molecular Marker Center</strong>
+          <span>Search over 771,000 markers with primer sequences and gel assays</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/compare_maps?map1=$(map_id)">
+          <strong>Map Comparator Tool</strong>
+          <span>Interactive comparative alignment of marker orders across two maps</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/genome">
+          <strong>Genome Data Hub</strong>
+          <span>160 hosted genome assemblies across 31 maize and wild relative species</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/variation">
+          <strong>Variations Data Hub</strong>
+          <span>Over 1.7 million curated variations and gene alleles</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/stock">
+          <strong>Stock Center &amp; Germplasm</strong>
+          <span>Curated genetic stocks, mutant alleles, and inbred lines</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/cite">
+          <strong>How to Cite MaizeGDB</strong>
+          <span>Citing map records, datasets, and bioinformatics tools</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- API Provenance Section -->
+  <section class="mgdb-card map-record-provenance" id="map-record-provenance" aria-labelledby="map-provenance-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Transparency</span>
+        <h2 id="map-provenance-title">API provenance &amp; data access</h2>
+      </div>
+      <p>This page is assembled from one call to the MaizeGDB API.</p>
+    </div>
+    <div class="map-provenance-body">
+      <div class="map-provenance-endpoint">
+        <code>GET /api/v1/records/map/$(map_id)</code>
+        <div class="map-provenance-actions">
+          <a class="mgdb-button mgdb-button-quiet" id="map-raw-json-link" href="/api/v1/records/map/$(map_id)" target="_blank" rel="noopener">Raw JSON &nearr;</a>
+          <button class="mgdb-button mgdb-button-quiet" id="map-copy-json-btn" type="button">Copy JSON</button>
+        </div>
+      </div>
+      <p class="map-provenance-note">Every fact, mapped locus coordinate, sister series link, and literature reference on this page is retrieved in a single structured JSON response.</p>
+    </div>
+  </section>
+</main>
+)

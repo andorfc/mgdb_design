@@ -1,12 +1,5 @@
 /* AI and machine learning resources (/ai).
-
-   Resource finder and citation copying, ported from the AI page in the MaizeGDB
-   website repository. The cards are rendered server-side, so filtering only
-   hides and shows what is already present.
-
-   Adapted for the redesign: the section-hiding selector follows the class the
-   template now uses, and copying falls back to selecting the citation when the
-   clipboard API is unavailable or refused. */
+   Resource finder, citation & DOI copying, and sticky tab scrollspy. */
 
 (function () {
   'use strict';
@@ -20,6 +13,70 @@
   function normalize(value) {
     return String(value || '').toLowerCase().replace(/\s+/g, ' ').trim();
   }
+
+  /* ── Section Tabs & Scrollspy ───────────────────────────────────────────── */
+
+  function buildTabs() {
+    var tabs = document.querySelectorAll('.mgdb-section-tabs a');
+    if (!tabs.length) return;
+
+    var pairs = [];
+    Array.prototype.forEach.call(tabs, function (tab) {
+      var href = tab.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        var section = document.querySelector(href);
+        if (section) {
+          pairs.push({ tab: tab, section: section });
+        }
+      }
+    });
+
+    function markCurrent(target) {
+      pairs.forEach(function (pair) {
+        var current = pair.section === target;
+        pair.tab.classList.toggle('is-current', current);
+        if (current) {
+          pair.tab.setAttribute('aria-current', 'true');
+        } else {
+          pair.tab.removeAttribute('aria-current');
+        }
+      });
+    }
+
+    var initial = pairs[0];
+    if (window.location.hash) {
+      pairs.forEach(function (pair) {
+        if ('#' + pair.section.id === window.location.hash) {
+          initial = pair;
+        }
+      });
+    }
+    if (initial) {
+      markCurrent(initial.section);
+    }
+
+    pairs.forEach(function (pair) {
+      pair.tab.addEventListener('click', function () {
+        markCurrent(pair.section);
+      });
+    });
+
+    if (!window.IntersectionObserver) return;
+
+    var observer = new window.IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          markCurrent(entry.target);
+        }
+      });
+    }, { rootMargin: '-20% 0px -60% 0px' });
+
+    pairs.forEach(function (pair) {
+      observer.observe(pair.section);
+    });
+  }
+
+  /* ── Resource Finder & Search ───────────────────────────────────────────── */
 
   function updateResources() {
     var input = byId('ai-resource-query');
@@ -36,16 +93,27 @@
     });
 
     document.querySelectorAll('.ai-section').forEach(function (section) {
-      if (section.id === 'ai-publications') return;
+      if (section.id === 'ai-publications' || section.id === 'ai-related') return;
       var resourceCards = section.querySelectorAll('[data-ai-resource]');
       if (!resourceCards.length) return;
       var sectionVisible = Array.prototype.some.call(resourceCards, function (card) { return !card.hidden; });
       section.hidden = !sectionVisible;
     });
 
-    byId('ai-resource-count').textContent = visible + (visible === 1 ? ' resource shown' : ' resources shown');
-    byId('ai-no-results').hidden = visible !== 0;
-    byId('ai-resource-clear').hidden = !query;
+    var countEl = byId('ai-resource-count');
+    if (countEl) {
+      countEl.textContent = visible + (visible === 1 ? ' resource shown' : ' resources shown');
+    }
+
+    var noResults = byId('ai-no-results');
+    if (noResults) {
+      noResults.hidden = visible !== 0;
+    }
+
+    var clearBtn = byId('ai-resource-clear');
+    if (clearBtn) {
+      clearBtn.hidden = !query;
+    }
   }
 
   function setCategory(category) {
@@ -59,58 +127,90 @@
   }
 
   function resetFinder() {
-    byId('ai-resource-query').value = '';
+    var input = byId('ai-resource-query');
+    if (input) input.value = '';
     setCategory('all');
-    byId('ai-resource-query').focus();
+    if (input) input.focus();
+  }
+
+  /* ── Copy Helpers (Citation & DOI) ───────────────────────────────────────── */
+
+  function copyText(text, button) {
+    if (!text) return;
+    var original = button.textContent;
+    function done(ok) {
+      button.textContent = ok ? 'Copied!' : 'Press Ctrl+C';
+      window.setTimeout(function () { button.textContent = original; }, 1400);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { done(true); }).catch(function () {
+        selectAndCopy(text, button, done);
+      });
+    } else {
+      selectAndCopy(text, button, done);
+    }
+  }
+
+  function selectAndCopy(text, button, callback) {
+    var area = document.createElement('textarea');
+    area.value = text;
+    area.style.position = 'fixed';
+    area.style.opacity = '0';
+    document.body.appendChild(area);
+    area.select();
+    try {
+      var success = document.execCommand('copy');
+      document.body.removeChild(area);
+      callback(success);
+    } catch (e) {
+      document.body.removeChild(area);
+      callback(false);
+    }
   }
 
   function copyCitation(button) {
     var target = byId(button.getAttribute('data-copy-target'));
     if (!target) return;
     var citation = target.textContent.replace(/\s+/g, ' ').trim();
-    var original = button.textContent;
-    function done() {
-      button.textContent = 'Copied';
-      window.setTimeout(function () { button.textContent = original; }, 1200);
-    }
-    function selectTarget() {
-      var range = document.createRange();
-      range.selectNodeContents(target);
-      var selection = window.getSelection();
-      selection.removeAllRanges();
-      selection.addRange(range);
-      button.textContent = 'Press Ctrl or Cmd + C';
-      window.setTimeout(function () { button.textContent = original; }, 2000);
-    }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(citation).then(done).catch(selectTarget);
-    } else {
-      var area = document.createElement('textarea');
-      area.value = citation;
-      document.body.appendChild(area);
-      area.select();
-      document.execCommand('copy');
-      document.body.removeChild(area);
-      done();
-    }
+    copyText(citation, button);
   }
 
   function initialize() {
-    if (!byId('ai-resource-query')) return;
+    buildTabs();
 
-    byId('ai-resource-query').addEventListener('input', updateResources);
-    byId('ai-resource-clear').addEventListener('click', function () {
-      byId('ai-resource-query').value = '';
-      updateResources();
-      byId('ai-resource-query').focus();
-    });
-    byId('ai-no-results-reset').addEventListener('click', resetFinder);
+    var queryInput = byId('ai-resource-query');
+    var clearBtn = byId('ai-resource-clear');
+    var resetBtn = byId('ai-no-results-reset');
+
+    if (queryInput) {
+      queryInput.addEventListener('input', updateResources);
+    }
+
+    if (clearBtn && queryInput) {
+      clearBtn.addEventListener('click', function () {
+        queryInput.value = '';
+        updateResources();
+        queryInput.focus();
+      });
+    }
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', resetFinder);
+    }
 
     document.querySelectorAll('[data-ai-filter]').forEach(function (button) {
       button.addEventListener('click', function () { setCategory(button.getAttribute('data-ai-filter')); });
     });
+
     document.querySelectorAll('.ai-copy-citation').forEach(function (button) {
       button.addEventListener('click', function () { copyCitation(button); });
+    });
+
+    document.querySelectorAll('.ai-copy-doi, [data-copy-value]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        var val = button.getAttribute('data-copy-value');
+        if (val) copyText(val, button);
+      });
     });
 
     setCategory('all');

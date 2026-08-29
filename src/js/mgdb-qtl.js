@@ -1,4 +1,4 @@
-/* QTL Data Center JavaScript (/data_center/qtl)
+/* QTL Data Hub JavaScript (/data_center/qtl)
  * Handles search submissions, dropdown filters, live results rendering,
  * example chips, trait shortcuts, and scrollspy navigation tabs.
  */

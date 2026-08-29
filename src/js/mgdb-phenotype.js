@@ -1,4 +1,4 @@
-/* Phenotype Data Center JavaScript
+/* Phenotype Data Hub JavaScript
    Handles search input, trait & body part filtering, card/table view switching,
    sticky section tabs with scrollspy, pagination, clipboard actions, and export URL synchronization. */
 

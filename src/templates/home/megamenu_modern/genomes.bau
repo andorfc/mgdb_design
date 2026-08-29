@@ -4,37 +4,65 @@ $$SYNTAX-LEVEL 2
   <span id="genomes_menu">
     <div class="dropdown_5columns mega-dropdown mega-dropdown-genomes">
       <div class="mega-panel-heading mega-panel-heading-row">
-        <div>
-          <span class="mega-eyebrow">Genome resources</span>
-          <h2>Browse, compare, and visualize maize genomes</h2>
+        <h2>Maize Genomics Data and Tools</h2>
+        <!-- The panel carries no footer, so the section destination sits here
+             beside the heading. /genome is the modernized Genome Center, which
+             is the hub itself -- not /data_center/genome, the legacy
+             search-by-category page the rest of the site still links as the
+             Genome Data Hub. -->
+        <div class="mega-heading-actions">
+          <a class="mega-heading-action" href="$(server-url)/genome">Genome Data Hub <span aria-hidden="true">&#8594;</span></a>
         </div>
-        <a class="mega-heading-action" href="$(server-url)/genome">All assemblies <span aria-hidden="true">&#8594;</span></a>
       </div>
-      <div class="mega-grid mega-grid-3 mega-compact-groups">
-        <aside class="mega-feature mega-feature-green">
-          <span class="mega-badge">Reference genome</span>
-          <h3>B73 NAM 5.0</h3>
-          <p>The current B73 reference assembly and annotation.</p>
-          <a class="mega-feature-link" href="$(server-url)/genome/assembly/Zm-B73-REFERENCE-NAM-5.0">Open B73 v5 <span aria-hidden="true">&#8594;</span></a>
-          <a class="mega-secondary-link" href="$(server-url)/genome/assembly/Zm-B73-REFERENCE-GRAMENE-4.0">B73 v4</a>
-          <a class="mega-secondary-link" href="$(server-url)/genome/assembly/B73 RefGen_v3">B73 v3</a>
+      <div class="mega-grid mega-grid-3 mega-grid-genomes mega-compact-groups">
+        <!-- B73 leads the panel. "Representative" rather than "Reference"
+             follows GenBank's usage: the collection now holds many
+             reference-quality assemblies, so only one can be representative.
+             The same word is derived in controllers/genome/genome_center_modern.php
+             for the assembly table, and the two must not disagree. -->
+        <!-- A narrow vertical card rather than a third full column. The badge
+             reads "Representative" alone: "Representative genome" measured
+             172px, wider than the card now is, and the word "genome" is
+             carried by the panel it sits in.
+             .mega-feature-open replaces .mega-feature-link so this one card can
+             be a plain link without restyling the filled buttons that the
+             Tools and Community panels rely on. -->
+        <aside class="mega-feature mega-feature-green mega-feature-compact">
+          <span class="mega-badge">Representative</span>
+          <h3>B73 v5</h3>
+          <a class="mega-feature-open" href="$(server-url)/genome/genome_assembly/Zm-B73-REFERENCE-NAM-5.0">Open B73 genome page <span aria-hidden="true">&#8594;</span></a>
+          <!-- The visible "Earlier B73 assemblies" caption is gone, so the rail
+               carries that text as its accessible name instead: on their own,
+               "v4" and "BAC" say nothing about what they are versions of.
+               Assembly names carry spaces and must arrive percent-encoded. -->
+          <div class="mega-version-rail" role="group" aria-label="Earlier B73 assemblies">
+            <a href="$(server-url)/genome/genome_assembly/Zm-B73-REFERENCE-GRAMENE-4.0">v4</a>
+            <a href="$(server-url)/genome/genome_assembly/B73%20RefGen_v3">v3</a>
+            <a href="$(server-url)/genome/genome_assembly/B73%20RefGen_v2">v2</a>
+            <a href="$(server-url)/genome/genome_assembly/B73%20RefGen_v1">v1</a>
+            <a href="$(server-url)/genome/genome_assembly/BAC-based%20maize%20B73">BAC</a>
+          </div>
         </aside>
         <section class="mega-group">
-          <h3>Genome collections</h3>
+          <h3>Collections</h3>
           <a href="$(server-url)/NAM_project"><strong>NAM founders</strong></a>
           <a href="$(server-url)/PanAnd_project"><strong>Pan-Andropogoneae</strong></a>
           <a href="$(server-url)/european_flints"><strong>European flints</strong></a>
-          <a href="$(server-url)/HiLo_project"><strong>Highland–lowland</strong></a>
+          <a href="$(server-url)/HiLo_project"><strong>Highland&#8211;lowland</strong></a>
+          <a href="$(server-url)/amaizing_project"><strong>AMAIZING European maize</strong></a>
+          <a href="$(server-url)/CAAS_FIL_project"><strong>CAAS 12 founder inbreds</strong></a>
         </section>
         <section class="mega-group">
-          <h3>View &amp; compare</h3>
+          <h3>Explore and browse</h3>
           <a href="https://pangenome-viewer.maizegdb.org/?set=NAM&amp;geneID=Zm00001eb406090" target="_blank" rel="noopener"><strong>NAM pangenome gene viewer</strong></a>
           <a href="https://jbrowse2.maizegdb.org" target="_blank" rel="noopener"><strong>JBrowse 2</strong></a>
           <a href="https://jbrowse.maizegdb.org/?data=v5" target="_blank" rel="noopener"><strong>JBrowse</strong></a>
-          <a href="$(server-url)/whole_genome"><strong>Whole-genome views</strong></a>
           <a href="https://pangenome-viewer.maizegdb.org" target="_blank" rel="noopener"><strong>Pangenome graph</strong></a>
           <a href="https://gcv.maizegdb.org" target="_blank" rel="noopener"><strong>Genome Context Viewer</strong></a>
           <a href="$(server-url)/14InbredsFISH"><strong>Karyotype views</strong></a>
+          <!-- Last in the column on purpose: the oldest viewer here, though it
+               still carries the current B73 and NAM chromosome paintings. -->
+          <a href="$(server-url)/whole_genome"><strong>Whole-genome views</strong></a>
         </section>
       </div>
     </div>

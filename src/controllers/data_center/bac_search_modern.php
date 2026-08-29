@@ -7,6 +7,7 @@
  */
 
 include_once('./include/db-api.php');
+include_once('./include/dashboard_cache.php');
 
 $system = getSystemInfo('mgdb.conf');
 logMessage('Starting bac_search_modern.php');
@@ -57,11 +58,20 @@ $bac_stats_sql = "
          COUNT(*) FILTER (WHERE lower(name) LIKE 'b%') AS b_prefix,
          COUNT(*) FILTER (WHERE lower(name) LIKE 'c%') AS c_prefix
   FROM bac_records";
-$bac_stats = retrieve_row(make_query($DBConn, $bac_stats_sql));
+/* The BAC rollup unions two scans of locus and re-counts by name prefix; it is
+   collection-wide and static between reloads. See include/dashboard_cache.php. */
+$bac_stats = dashboardCache($system, 'bac/stats', function () use ($DBConn, $bac_stats_sql) {
+    $row = retrieve_row(make_query($DBConn, $bac_stats_sql));
+    return array(
+        'total'    => (int) $row['total'],
+        'b_prefix' => (int) $row['b_prefix'],
+        'c_prefix' => (int) $row['c_prefix']
+    );
+});
 
-$content->get('bac_count')->replace(number_format((int) $bac_stats['total']));
-$content->get('b_prefix_count')->replace(number_format((int) $bac_stats['b_prefix']));
-$content->get('c_prefix_count')->replace(number_format((int) $bac_stats['c_prefix']));
+$content->get('bac_count')->replace(number_format($bac_stats['total']));
+$content->get('b_prefix_count')->replace(number_format($bac_stats['b_prefix']));
+$content->get('c_prefix_count')->replace(number_format($bac_stats['c_prefix']));
 $content->get('search_limit')->replace((int) $system['search_limit']);
 $content->get('search_limit_max')->replace((int) $system['search_limit_max']);
 

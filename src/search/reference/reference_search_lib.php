@@ -429,6 +429,76 @@ function referenceCombinedQuery($filter, $page, $pageSize, $sort) {
     return array('sql' => $sql, 'params' => $params);
 }
 
+//
+// Dashboard-only variant of referenceCombinedQuery(): the corpus figures and the
+// five chart facets, with no result rows.
+//
+// The page fires this on a bare /data_center/reference load, where there is no
+// query to show results for. Dropping the paged CTE also lets two per-row
+// columns go: the LATERAL PubMed lookup becomes an EXISTS (which short-circuits
+// instead of sorting every match), and the editorial-pick flag is display-only
+// so it is not selected at all. Both were being computed for all ~55,000
+// references to render twenty.
+//
+function referenceFacetsOnlyQuery($filter) {
+    $params = $filter['params'];
+
+    $sql = "
+      WITH matched AS MATERIALIZED (
+        SELECT r.id, r.year, r.doi,
+               j.name AS journal, pt.name AS publication_type,
+               EXISTS (
+                 SELECT 1 FROM mgdb.ext_db_key x
+                 WHERE x.id=r.id AND x.db_person=134209
+               ) AS has_pubmed
+        FROM mgdb.reference r
+          JOIN mgdb.id_num i ON i.id=r.id
+          LEFT JOIN mgdb.journal j ON j.id=r.in1
+          LEFT JOIN mgdb.term pt ON pt.id=r.type
+        WHERE {$filter['where']}
+      ),
+      year_counts AS (
+        SELECT year::integer AS value, COUNT(*)::integer AS count
+        FROM matched WHERE year BETWEEN 1800 AND 2100 GROUP BY year
+      ),
+      type_counts AS (
+        SELECT COALESCE(publication_type, 'Unspecified') AS value, COUNT(*)::integer AS count
+        FROM matched GROUP BY COALESCE(publication_type, 'Unspecified')
+      ),
+      journal_counts AS (
+        SELECT COALESCE(journal, 'Unspecified') AS value, COUNT(*)::integer AS count
+        FROM matched
+        WHERE journal IS NOT NULL AND btrim(journal) <> ''
+          AND journal NOT IN ('MNL', 'Maize Genetics Conference Abstracts')
+        GROUP BY journal
+        ORDER BY count DESC, value LIMIT 10
+      ),
+      meeting_year_counts AS (
+        SELECT year::integer AS value, COUNT(*)::integer AS count
+        FROM matched
+        WHERE journal='Maize Genetics Conference Abstracts' AND year BETWEEN 1800 AND 2100
+        GROUP BY year
+      ),
+      mnl_year_counts AS (
+        SELECT year::integer AS value, COUNT(*)::integer AS count
+        FROM matched
+        WHERE journal='MNL' AND year BETWEEN 1800 AND 2100
+        GROUP BY year
+      )
+      SELECT
+        (SELECT COUNT(*)::integer FROM matched) AS total_count,
+        (SELECT COUNT(*)::integer FROM matched WHERE doi IS NOT NULL AND btrim(doi) <> '') AS doi_count,
+        (SELECT COUNT(*)::integer FROM matched WHERE has_pubmed) AS pubmed_count,
+        '[]'::json AS results,
+        COALESCE((SELECT json_agg(json_build_object('value', value::text, 'count', count) ORDER BY value) FROM year_counts), '[]'::json) AS year_facets,
+        COALESCE((SELECT json_agg(json_build_object('value', value, 'count', count) ORDER BY count DESC, value) FROM type_counts), '[]'::json) AS type_facets,
+        COALESCE((SELECT json_agg(json_build_object('value', value, 'count', count) ORDER BY count DESC, value) FROM journal_counts), '[]'::json) AS journal_facets,
+        COALESCE((SELECT json_agg(json_build_object('value', value::text, 'count', count) ORDER BY value) FROM meeting_year_counts), '[]'::json) AS meeting_year_facets,
+        COALESCE((SELECT json_agg(json_build_object('value', value::text, 'count', count) ORDER BY value) FROM mnl_year_counts), '[]'::json) AS mnl_year_facets";
+
+    return array('sql' => $sql, 'params' => $params);
+}
+
 function referenceExportQuery($filter, $identifierFormat = '') {
     $identifierOnly = $identifierFormat === 'doi' || $identifierFormat === 'pmid';
     $select = $identifierOnly

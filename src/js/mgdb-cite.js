@@ -1,7 +1,7 @@
 /* How to cite MaizeGDB.
 
    Citations are rendered server-side in full semantic card markup matching
-   the Reference Data Center.
+   the Reference Data Hub.
    This script handles:
      1. Primary citation clipboard copy
      2. Copy DOI / Copy PMID inline button actions

@@ -142,7 +142,7 @@
   $mgdb->get('image-dir')->replace($system['image_url']);
   $mgdb->get('server-url')->replace($system['root_url']);
 
-  $body = $mgdb->get('body')->loadRemote($system['root_url_private'] . '/templates/static/mgdb_coming_soon.bau');
+  $body = $mgdb->get('body')->load('templates/static/mgdb_coming_soon.bau');
 
   $body->get('total-items')->replace(number_format($total));
   $body->get('beta-count')->replace(number_format($counts['beta']));

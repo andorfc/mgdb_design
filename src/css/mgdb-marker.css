@@ -1,16 +1,20 @@
-/* Molecular Marker & Probe Data Center Styles
+/* Molecular Marker & Probe Data Hub Styles
    Scoped under .mgdb-marker-page; relies on mgdb-modern.css tokens. */
 
 /* ── Hero Emblem ─────────────────────────────────────────────────────────── */
 
 .mgdb-marker-page .mgdb-hero-emblem {
-  background: var(--mgdb-green-soft);
-  border-color: var(--mgdb-line);
+  gap: var(--mgdb-space-2);
+  padding: var(--mgdb-space-4) var(--mgdb-space-3);
+  border-right: 1px solid #cfe3d6;
+  background: linear-gradient(160deg, rgba(255, 255, 255, .92), rgba(255, 255, 255, .55));
+  color: var(--mgdb-green-dark);
 }
 
 .mgdb-marker-page .mgdb-hero-emblem svg {
-  width: 68px;
-  height: 68px;
+  width: min(100%, 62px);
+  height: auto;
+  mix-blend-mode: normal;
 }
 
 /* ── Sticky Section Tabs ─────────────────────────────────────────────────── */

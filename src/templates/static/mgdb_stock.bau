@@ -1,98 +1,378 @@
 $$SYNTAX-LEVEL 2
 *(mgdb-stock
-<meta name="twitter:card" content="summary">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@MaizeGDB">
 <meta property="og:url" content="https://maizegdb.org/data_center/stock">
-<meta property="og:title" content="MaizeGDB Stock Search">
-<meta property="og:description" content="Search curated maize genetic stocks and germplasm by identifier, variation, phenotype, provider, and parentage, and find where to order them.">
+<meta property="og:title" content="MaizeGDB Stock Center | Genetic Stocks & Germplasm">
+<meta property="og:description" content="Search curated maize genetic stocks, inbred lines, mutant alleles, phenotypes, and germplasm providers, and find where to order them.">
 
-<main class="mgdb-page mgdb-stock-page" id="stock-top">
+<main class="mgdb-page mgdb-stock-page" id="stock-main">
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
-    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data centers</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Stock Center</span>
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Stock Center</span>
   </nav>
 
   <section class="mgdb-hero" aria-labelledby="stock-title">
     <div class="mgdb-hero-emblem">
-      <svg viewBox="0 0 96 96" role="img" aria-label="Stylized maize seedling">
-        <g fill="none" stroke="#7a4a10" stroke-width="5" stroke-linecap="round">
+      <svg viewBox="0 0 96 96" role="img" aria-label="Maize seedling and germplasm icon">
+        <g fill="none" stroke="#235c37" stroke-width="5" stroke-linecap="round">
           <path d="M48 86V34" />
         </g>
         <g fill="#d99a0b">
           <path d="M48 44c-3-14-14-22-26-23 1 13 11 24 26 23Z" />
           <path d="M48 58c3-16 14-25 26-26-1 15-11 27-26 26Z" />
         </g>
-        <g fill="none" stroke="#7a4a10" stroke-width="4" stroke-linecap="round">
+        <g fill="none" stroke="#235c37" stroke-width="4" stroke-linecap="round">
           <path d="M32 86h32" />
         </g>
       </svg>
       <strong>Stock<br />Center</strong>
-      <span>MaizeGDB</span>
     </div>
     <div class="mgdb-hero-body">
-      <span class="mgdb-eyebrow">Germplasm and genetic stocks</span>
-      <h1 id="stock-title">Find the seed behind the result</h1>
-      <p class="mgdb-hero-tagline">Curated records for maize genetic stocks, linked to the variations, phenotypes, and loci they carry &mdash; and to the collections that distribute them.</p>
-      <p class="mgdb-hero-description">Search by stock identifier, synonym, or external accession. Put a variation in parentheses to find the stocks that carry it, or build a query over type, provider, parentage, karyotype, and phenotype.</p>
-      <div class="mgdb-hero-actions">
-        <a class="mgdb-button mgdb-button-primary" href="#stock-search">Search stocks</a>
-        <a class="mgdb-button mgdb-button-secondary" href="/stock_catalog">Browse the catalog</a>
-      </div>
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; August 2026</p>
+      <h1 id="stock-title">Explore maize genetic stocks &amp; germplasm</h1>
+      <p class="mgdb-hero-description">Discover curated maize genetic stocks, inbred lines, diversity panels, mutant alleles, and chromosomal translocations, linked directly to distribution collections and ordering portals.</p>
     </div>
   </section>
 
-  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#stock-overview">Overview</a>
-    <a href="#stock-search">Search</a>
-    <a href="#stock-results">Results</a>
-    <a href="#stock-resources">Collections</a>
+  <nav class="mgdb-section-tabs" aria-label="Stock resource sections">
+    <a href="#stock-search-section">Search stocks</a>
+    <a href="#stock-collections">Stock collections</a>
     <a href="#stock-nam">NAM founders</a>
+    <a href="#stock-downloads">Bulk downloads</a>
+    <a href="#stock-statistics">Corpus statistics</a>
+    <a href="#stock-related">Related resources</a>
   </nav>
 
-  <section id="stock-overview" aria-labelledby="stock-overview-title">
+  <section id="stock-search-section" class="stock-search-panel" aria-labelledby="stock-search-title">
+    <div class="stock-search-header">
+      <div>
+        <span class="mgdb-eyebrow">Interactive finder</span>
+        <h2 id="stock-search-title">Search &amp; filter maize genetic stocks</h2>
+      </div>
+      <p>Search by stock name, accession, gene or variation in parentheses &#40;e.g. <code>&#40;wx1&#41;</code>&#41;, or filter by stock type and provider.</p>
+    </div>
+
+    <form id="stock-search-form" class="stock-search-form" role="search">
+      <div class="stock-field-query">
+        <label for="stock-query">Search term</label>
+        <div class="stock-query-control">
+          <svg class="stock-search-icon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="7" r="5"/><line x1="11" y1="11" x2="15" y2="15"/></svg>
+          <input id="stock-query" name="term" type="search" placeholder="Try B73, Mo17, W22, &#40;wx1-m1&#41;, Ky21, Ames, or NAM…" autocomplete="off" />
+          <button id="stock-query-clear" type="button" hidden>Clear</button>
+        </div>
+      </div>
+
+      <div class="stock-field">
+        <label for="stock-type">Stock type</label>
+        <select id="stock-type" name="type">
+          <option value="0">All stock types</option>
+          $(type_options)
+        </select>
+      </div>
+
+      <div class="stock-field">
+        <label for="stock-available">Available from</label>
+        <select id="stock-available" name="available">
+          <option value="0">All providers &amp; centers</option>
+          $(provider_options)
+        </select>
+      </div>
+
+      <div class="stock-field">
+        <label for="stock-linkage">Focus linkage group</label>
+        <select id="stock-linkage" name="linkage">
+          <option value="0">All linkage groups</option>
+          $(linkage_options)
+        </select>
+      </div>
+
+      <div class="stock-field">
+        <label for="stock-phenotype">Phenotypic effect</label>
+        <select id="stock-phenotype" name="phenotype">
+          <option value="0">All phenotypic traits</option>
+          $(phenotype_options)
+        </select>
+      </div>
+
+      <div class="stock-field">
+        <label for="stock-karyotype">Karyotypic variation</label>
+        <select id="stock-karyotype" name="karyotype">
+          <option value="0">All karyotypes</option>
+          $(karyotype_options)
+        </select>
+      </div>
+
+      <div class="stock-field-options">
+        <label class="stock-checkbox-label">
+          <input type="checkbox" id="stock-f-mgsc" name="f_mgsc" value="1" />
+          <span>Available from Maize Genetics COOP Stock Center</span>
+        </label>
+        <label class="stock-checkbox-label">
+          <input type="checkbox" id="stock-f-bank" name="f_bank" value="1" />
+          <span>From germplasm bank &#40;CIMMYT/NCRPIS&#41;</span>
+        </label>
+        <label class="stock-checkbox-label">
+          <input type="checkbox" id="stock-f-expvp" name="f_expvp" value="1" />
+          <span>Ex-PVP line</span>
+        </label>
+      </div>
+
+      <div class="stock-search-submit">
+        <button class="mgdb-button mgdb-button-primary" type="submit">Search stocks</button>
+      </div>
+
+      <div class="stock-example-row" aria-label="Example stock searches">
+        <span>Examples</span>
+        <button type="button" data-stock-example="B73">B73 inbred</button>
+        <button type="button" data-stock-example="Mo17">Mo17 inbred</button>
+        <button type="button" data-stock-example="W22">W22 line</button>
+        <button type="button" data-stock-example="&#40;wx1-m1&#41;">&#40;wx1-m1&#41; alleles</button>
+        <button type="button" data-stock-example="&#40;tb1-ref&#41;">&#40;tb1-ref&#41;</button>
+        <button type="button" data-stock-example="Ky21">Ky21 NAM founder</button>
+        <button type="button" data-stock-example="Ames">Ames panel</button>
+        <button type="button" data-stock-example="TILLING">TILLING project</button>
+      </div>
+    </form>
+  </section>
+
+  <section id="stock-results-section" class="stock-results-section" aria-labelledby="stock-results-title">
+    <div class="stock-results-heading">
+      <div>
+        <span class="mgdb-eyebrow">Search results</span>
+        <h2 id="stock-results-title">Matching genetic stocks</h2>
+        <p id="stock-results-status" aria-live="polite">Enter a search term above or choose a filter to inspect stocks.</p>
+      </div>
+      <div class="stock-results-controls">
+        <div class="stock-view-toggle" role="group" aria-label="View style">
+          <button class="stock-view-btn" type="button" data-view="card" aria-pressed="false">
+            <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>Cards
+          </button>
+          <button class="stock-view-btn is-active" type="button" data-view="table" aria-pressed="true">
+            <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><rect x="1" y="2" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="12" width="14" height="2" rx="1" fill="currentColor"/></svg>Table
+          </button>
+        </div>
+        <div class="stock-sort-control">
+          <label for="stock-sort" class="mgdb-visually-hidden">Sort results</label>
+          <select id="stock-sort">
+            <option value="relevance">Sort&#58; Best match</option>
+            <option value="name">Sort&#58; Identifier A&ndash;Z</option>
+            <option value="name-desc">Sort&#58; Identifier Z&ndash;A</option>
+          </select>
+        </div>
+        <div class="stock-export-buttons">
+          <a class="mgdb-button mgdb-button-quiet" id="stock-export-tsv" href="#" download>Export TSV</a>
+          <a class="mgdb-button mgdb-button-quiet" id="stock-export-csv" href="#" download>Export CSV</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="stock-sources" id="stock-sources" hidden>
+      <button class="mgdb-chip is-active" id="stock-source-mgdb" type="button" aria-pressed="true">MaizeGDB stocks</button>
+      <button class="mgdb-chip" id="stock-source-grin" type="button" aria-pressed="false">GRIN accessions</button>
+      <span class="mgdb-small mgdb-muted" id="stock-source-note">GRIN is a mirror of the USDA collection. The full collection is at <a href="https\://npgsweb.ars-grin.gov/gringlobal/search.aspx" target="_blank" rel="noopener">GRIN-Global <span aria-hidden="true">&nearr;</span></a>.</span>
+    </div>
+
+    <div id="stock-results" class="stock-results-container stock-view-table"></div>
+
+    <div id="stock-empty" class="mgdb-empty" hidden>
+      <h3>No stocks matched your query</h3>
+      <p>Try searching with a broader keyword &#40;e.g. <code>B73</code>, <code>Mo17</code>, <code>inbred</code>&#41; or resetting provider and type filters.</p>
+      <button class="mgdb-button mgdb-button-secondary" id="stock-empty-reset" type="button">Reset search</button>
+    </div>
+
+    <nav id="stock-pagination" class="stock-pagination" aria-label="Search result pages"></nav>
+  </section>
+
+  <section id="stock-collections" aria-labelledby="stock-collections-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Collection summary</span>
-        <h2 id="stock-overview-title">What is in this data center</h2>
+        <span class="mgdb-eyebrow">Stock distribution &amp; repositories</span>
+        <h2 id="stock-collections-title">Explore stock collections &amp; ordering guides</h2>
       </div>
-      <p>Curated stock records maintained by MaizeGDB. Withdrawn and discontinued stocks stay searchable, because published work still refers to them.</p>
+      <p>MaizeGDB curates the genetic records; stock centers distribute the seed. These are the primary repositories and tools for obtaining germplasm.</p>
+    </div>
+
+    <div class="mgdb-card-grid stock-collection-grid">
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-ok">Primary Repository</span>
+        <h3>Maize Genetics COOP Stock Center</h3>
+        <p>The primary source of maize genetic stocks, mutant alleles, and translocation lines. Seed ordering and accession listings.</p>
+        <a href="https\://maizecoopsc.org/" target="_blank" rel="noopener">Open Stock Center <span aria-hidden="true">&nearr;</span></a>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-info">Stock Catalog</span>
+        <h3>COOP Stock Center Catalog</h3>
+        <p>Categorized directory of stocks distributed by the Maize Genetics Cooperation Stock Center.</p>
+        <a href="/stock_catalog">Browse Catalog <span aria-hidden="true">&rarr;</span></a>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-warn">Nomenclature Guide</span>
+        <h3>Decrypt Seed Packet Labels</h3>
+        <p>Comprehensive guide to the Stock Center&rsquo;s pedigree and accession labelling conventions for deciphering seed packets.</p>
+        <a href="/stock_decryption">Decrypt Packet <span aria-hidden="true">&rarr;</span></a>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill">USDA Repository</span>
+        <h3>North Central Regional PI Station</h3>
+        <p>NCRPIS non-mutant germplasm, open-pollinated landraces, and lines with molecular or phenotype data held at Ames, Iowa.</p>
+        <a href="https\://maizecoopsc.org/ncrpis/" target="_blank" rel="noopener">Explore NCRPIS <span aria-hidden="true">&nearr;</span></a>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-ok">Transposon Mutants</span>
+        <h3>UniformMu Insertion Lines</h3>
+        <p>Over 31,000 sequence-indexed Robertson&rsquo;s Mutator insertion alleles with cosegregating seedling and ear traits in uniform W22 background.</p>
+        <a href="/uniformmu">Explore UniformMu <span aria-hidden="true">&rarr;</span></a>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill">Chemical Mutagenesis</span>
+        <h3>EMS Inflorescence Mutants</h3>
+        <p>Screenings and photographs for seed, seedling, and adult phenotypes from the Hake lab EMS mutagenesis collection.</p>
+        <a href="/ems-phenotype">View EMS Stocks <span aria-hidden="true">&rarr;</span></a>
+      </article>
+    </div>
+  </section>
+
+  <section id="stock-nam" aria-labelledby="stock-nam-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Reference population</span>
+        <h2 id="stock-nam-title">The 26 maize NAM founder lines</h2>
+      </div>
+      <p>The 26 diverse founder inbreds of the Nested Association Mapping &#40;NAM&#41; population, representing global maize diversity.</p>
+    </div>
+
+    <p class="stock-section-intro">Stocks may be ordered from the <a href="https\://maizecoopsc.org/nam-rils" target="_blank" rel="noopener">Maize Genetics Cooperation Stock Center <span aria-hidden="true">&nearr;</span></a>. Key reference&#58; <a href="https\://doi.org/10.1534/genetics.107.074245" target="_blank" rel="noopener">Yu et al., 2008 <span aria-hidden="true">&nearr;</span></a>.</p>
+
+    <div class="stock-nam-grid" aria-label="NAM founder lines">
+      <a href="/data_center/stock/B97"><strong>B97</strong><span>Northern Flint</span></a>
+      <a href="/data_center/stock/CML103"><strong>CML103</strong><span>Tropical Lowland</span></a>
+      <a href="/data_center/stock/CML228"><strong>CML228</strong><span>Tropical Lowland</span></a>
+      <a href="/data_center/stock/CML247"><strong>CML247</strong><span>Tropical Lowland</span></a>
+      <a href="/data_center/stock/CML277"><strong>CML277</strong><span>Tropical Lowland</span></a>
+      <a href="/data_center/stock/CML322"><strong>CML322</strong><span>Tropical Lowland</span></a>
+      <a href="/data_center/stock/CML333"><strong>CML333</strong><span>Tropical Lowland</span></a>
+      <a href="/data_center/stock/CML052"><strong>CML52</strong><span>Tropical Lowland</span></a>
+      <a href="/data_center/stock/CML069"><strong>CML69</strong><span>Tropical Lowland</span></a>
+      <a href="/data_center/stock/Hp301"><strong>Hp301</strong><span>Popcorn</span></a>
+      <a href="/data_center/stock/Il14H"><strong>Il14H</strong><span>Sweet Corn</span></a>
+      <a href="/data_center/stock/Ki11"><strong>Ki11</strong><span>Tropical Lowland</span></a>
+      <a href="/data_center/stock/Ki3"><strong>Ki3</strong><span>Tropical Lowland</span></a>
+      <a href="/data_center/stock/Ky21"><strong>Ky21</strong><span>Non-Stiff Stalk</span></a>
+      <a href="/data_center/stock/M162W"><strong>M162W</strong><span>White Corn</span></a>
+      <a href="/data_center/stock/M37W"><strong>M37W</strong><span>White Corn</span></a>
+      <a href="/data_center/stock/Mo17"><strong>Mo17</strong><span>Non-Stiff Stalk</span></a>
+      <a href="/data_center/stock/Mo18W"><strong>Mo18W</strong><span>White Corn</span></a>
+      <a href="/data_center/stock/MS71"><strong>MS71</strong><span>Non-Stiff Stalk</span></a>
+      <a href="/data_center/stock/NC350"><strong>NC350</strong><span>Tropical Highland</span></a>
+      <a href="/data_center/stock/NC358"><strong>NC358</strong><span>Tropical Highland</span></a>
+      <a href="/data_center/stock/Oh43"><strong>Oh43</strong><span>Non-Stiff Stalk</span></a>
+      <a href="/data_center/stock/Oh7B"><strong>Oh7B</strong><span>Non-Stiff Stalk</span></a>
+      <a href="/data_center/stock/P39"><strong>P39</strong><span>Sweet Corn</span></a>
+      <a href="/data_center/stock/Tx303"><strong>Tx303</strong><span>Tropical Lowland</span></a>
+      <a href="/data_center/stock/Tzi8"><strong>Tzi8</strong><span>Tropical Lowland</span></a>
+    </div>
+  </section>
+
+  <section id="stock-downloads" aria-labelledby="stock-downloads-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Bulk data</span>
+        <h2 id="stock-downloads-title">Stock downloads &amp; germplasm datasets</h2>
+      </div>
+      <p>Download comprehensive stock catalogs, diversity population trait values, and measurement files for offline research.</p>
+    </div>
+
+    <div class="stock-download-grid" aria-label="Stock downloads">
+      <article class="stock-download-card">
+        <div class="stock-download-header">
+          <span class="mgdb-pill mgdb-pill-ok">Full TSV</span>
+          <h3>Tabulated Stock Catalog</h3>
+        </div>
+        <p>Complete curated stock catalog with stock identifiers, types, providers, variations, phenotypes, and pedigree links in TSV format.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="/search/stock/stock_search_api.php?format=tsv">Download Full TSV <span aria-hidden="true">&darr;</span></a>
+      </article>
+
+      <article class="stock-download-card">
+        <div class="stock-download-header">
+          <span class="mgdb-pill mgdb-pill-info">CSV Export</span>
+          <h3>Tabulated Stock CSV</h3>
+        </div>
+        <p>Comma-separated export of curated stock records, providers, and annotations suitable for Excel, Python, and R workflows.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="/search/stock/stock_search_api.php?format=csv">Download Full CSV <span aria-hidden="true">&darr;</span></a>
+      </article>
+
+      <article class="stock-download-card">
+        <div class="stock-download-header">
+          <span class="mgdb-pill mgdb-pill-warn">Flow Cytometry</span>
+          <h3>Genome Size Measurements</h3>
+        </div>
+        <p>Flow cytometry nuclear 2C DNA content and genome size measurements for selected maize inbred lines and landraces.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="https\://iastate.app.box.com/v/maizegdb-public/file/1876142430468" target="_blank" rel="noopener">Download Flow Cytometry <span aria-hidden="true">&nearr;</span></a>
+      </article>
+    </div>
+  </section>
+
+  <section id="stock-statistics" aria-labelledby="stock-statistics-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Corpus summary</span>
+        <h2 id="stock-statistics-title">Stock collection at a glance</h2>
+      </div>
+      <p>Curated stock records maintained by MaizeGDB. Withdrawn and discontinued stocks remain searchable because published research cites them.</p>
     </div>
 
     <div class="mgdb-metric-grid">
       <article class="mgdb-metric">
-        <span class="mgdb-metric-icon" aria-hidden="true">&#9678;</span>
-        <div>
+        <div class="mgdb-metric-top">
+          <h3>Curated Stocks</h3>
+          <span class="mgdb-metric-badge">Germplasm</span>
+        </div>
+        <div class="mgdb-metric-stat">
           <strong class="mgdb-metric-value">$(metric_active)</strong>
-          <h3>Current stock records</h3>
-          <p>Curated records that have not been withdrawn or discontinued. $(metric_with_provider) name a provider.</p>
         </div>
+        <p class="mgdb-metric-description">Active curated records; $(metric_with_provider) have an assigned provider.</p>
       </article>
-      <article class="mgdb-metric mgdb-tone-green">
-        <span class="mgdb-metric-icon" aria-hidden="true">&#9635;</span>
-        <div>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Stock Types</h3>
+          <span class="mgdb-metric-badge">Types</span>
+        </div>
+        <div class="mgdb-metric-stat">
           <strong class="mgdb-metric-value">$(metric_types)</strong>
-          <h3>Stock types</h3>
-          <p>From chromosome markers and inbred lines to TILLING and transposon collections.</p>
         </div>
+        <p class="mgdb-metric-description">From inbred lines to TILLING and chromosome marker stocks.</p>
       </article>
-      <article class="mgdb-metric mgdb-tone-burgundy">
-        <span class="mgdb-metric-icon" aria-hidden="true">&#9737;</span>
-        <div>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Providers &amp; Centers</h3>
+          <span class="mgdb-metric-badge">Centers</span>
+        </div>
+        <div class="mgdb-metric-stat">
           <strong class="mgdb-metric-value">$(metric_providers)</strong>
-          <h3>Providers</h3>
-          <p>Stock centers, germplasm banks, and individual research programs.</p>
         </div>
+        <p class="mgdb-metric-description">Stock centers, germplasm banks, and research programs.</p>
       </article>
-      <article class="mgdb-metric mgdb-tone-red">
-        <span class="mgdb-metric-icon" aria-hidden="true">&#9873;</span>
-        <div>
-          <strong class="mgdb-metric-value">$(metric_grin)</strong>
-          <h3>GRIN accessions</h3>
-          <p>USDA germplasm records mirrored here and searched alongside MaizeGDB stocks.</p>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>GRIN Accessions</h3>
+          <span class="mgdb-metric-badge">USDA GRIN</span>
         </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(metric_grin)</strong>
+        </div>
+        <p class="mgdb-metric-description">USDA germplasm records mirrored and searched at MaizeGDB.</p>
       </article>
     </div>
 
-    <div class="mgdb-chart-grid mgdb-spaced">
+    <div class="stock-chart-panel">
       <figure class="mgdb-figure mgdb-stock-figure-wide">
         <h3>Largest stock categories</h3>
         <p>Current stock records by curated stock type.</p>
@@ -115,338 +395,48 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
-  <section id="stock-search" aria-labelledby="stock-search-title">
+  <section id="stock-related" aria-labelledby="stock-related-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Find a stock</span>
-        <h2 id="stock-search-title">Search</h2>
+        <span class="mgdb-eyebrow">Connected tools</span>
+        <h2 id="stock-related-title">Related resources</h2>
       </div>
-      <p>Every word you enter must match. Stock names list their parts in an unpredictable order, so word order does not matter here.</p>
+      <p>Explore related genomic hubs, phenotype catalogs, and molecular archives at MaizeGDB.</p>
     </div>
 
-    <form class="mgdb-search" id="stock-form" role="search">
-      <div class="mgdb-search-row">
-        <div class="mgdb-field">
-          <label class="mgdb-label" for="stock-term">Stock identifier, synonym, or accession</label>
-          <p class="mgdb-hint" id="stock-term-hint">Wrap a variation in parentheses to find the stocks carrying it. Examples: <code>B73</code>, <code>bz1 a1 wx1</code>, <code>&#40;a1&#41;</code></p>
-          <input class="mgdb-input" id="stock-term" name="term" type="search" autocomplete="off" placeholder="B73" aria-describedby="stock-term-hint">
-        </div>
-        <button class="mgdb-button mgdb-button-primary" type="submit">Search</button>
-        <button class="mgdb-button mgdb-button-quiet" id="stock-clear" type="button">Clear</button>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="https\://maizecoopsc.org/" target="_blank" rel="noopener">
+          <strong>Maize Genetics COOP Stock Center</strong>
+          <span>Order seed stocks, mutant alleles, and chromosome translocation lines</span>
+          <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+        </a>
+        <a href="/data_center/variation">
+          <strong>Variations &amp; Alleles Data Hub</strong>
+          <span>Over 1.7 million curated variations, gene mutations, and allele descriptors</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/phenotype">
+          <strong>Phenotype Data Hub</strong>
+          <span>Curated observable traits, anatomical mutant profiles, and Plant Ontology terms</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/genome">
+          <strong>Genome Data Hub</strong>
+          <span>160 hosted genome assemblies across 31 maize and wild relative species</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/ai">
+          <strong>AI &amp; Machine Learning Data Hub</strong>
+          <span>Machine-learning feature stores, ESM protein scores, and predicted structures</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/cite">
+          <strong>How to Cite MaizeGDB</strong>
+          <span>Guidelines and citation formats for database records, tools, and datasets</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
       </div>
-
-      <div class="stock-examples">
-        <span class="mgdb-small mgdb-muted">Try:</span>
-        <button class="mgdb-chip" type="button" data-stock-example="B73">B73</button>
-        <button class="mgdb-chip" type="button" data-stock-example="bz1 a1 wx1">bz1 a1 wx1</button>
-        <button class="mgdb-chip" type="button" data-stock-example="&#40;a1&#41;">&#40;a1&#41; &mdash; carries this variation</button>
-        <label class="stock-case">
-          <input id="stock-case" type="checkbox" value="1">
-          <span>Match capitalization exactly</span>
-        </label>
-      </div>
-    </form>
-
-    <details class="stock-advanced" id="stock-advanced">
-      <summary>
-        <span>
-          <strong>Advanced search</strong>
-          <small>Build a query over availability, type, parentage, karyotype, and phenotype</small>
-        </span>
-        <span aria-hidden="true">&#8964;</span>
-      </summary>
-
-      <form id="stock-advanced-form">
-        <p class="mgdb-section-intro">Tick a box to require that a stock has any value recorded for it. Fill in the field beside it to narrow further. Criteria are combined with <em>and</em>.</p>
-
-        <fieldset class="stock-fieldset">
-          <legend>Availability and provenance</legend>
-          <div class="stock-check-grid">
-            <label class="stock-check">
-              <input id="stock-f-mgsc" data-stock-filter="f_mgsc" type="checkbox" value="1">
-              <span><strong>From the Stock Center</strong><small>Available from the Maize Genetics Cooperation Stock Center.</small></span>
-            </label>
-            <label class="stock-check">
-              <input id="stock-f-bank" data-stock-filter="f_bank" type="checkbox" value="1">
-              <span><strong>From a germplasm bank</strong><small>CIMMYT or the North Central Regional Plant Introduction Station.</small></span>
-            </label>
-            <label class="stock-check">
-              <input id="stock-f-expvp" data-stock-filter="f_expvp" type="checkbox" value="1">
-              <span><strong>Ex-PVP stock</strong><small>Once covered by a Plant Variety Protection certificate.</small></span>
-            </label>
-          </div>
-
-          <div class="stock-filter-grid">
-            <div class="stock-filter">
-              <label class="stock-check stock-check-inline">
-                <input id="stock-f-available" data-stock-filter="f_available" type="checkbox" value="1">
-                <span>Available from</span>
-              </label>
-              <select class="mgdb-select" id="stock-available" data-stock-value="available" aria-label="Provider">
-                <option value="0">Any recorded provider</option>
-                $(provider_options)
-              </select>
-            </div>
-            <div class="stock-filter">
-              <label class="stock-check stock-check-inline">
-                <input id="stock-f-developer" data-stock-filter="f_developer" type="checkbox" value="1">
-                <span>Developed by</span>
-              </label>
-              <select class="mgdb-select" id="stock-developer" data-stock-value="developer" aria-label="Developer">
-                <option value="0">Any recorded developer</option>
-                $(developer_options)
-              </select>
-            </div>
-          </div>
-        </fieldset>
-
-        <fieldset class="stock-fieldset">
-          <legend>Identity and classification</legend>
-          <div class="stock-filter-grid">
-            <div class="stock-filter">
-              <label class="stock-check stock-check-inline">
-                <input id="stock-f-name" data-stock-filter="f_name" type="checkbox" value="1">
-                <span>Identifier contains</span>
-              </label>
-              <input class="mgdb-input" id="stock-name" data-stock-value="name" type="text" maxlength="120" placeholder="B73" aria-label="Identifier contains">
-            </div>
-            <div class="stock-filter">
-              <label class="stock-check stock-check-inline">
-                <input id="stock-f-type" data-stock-filter="f_type" type="checkbox" value="1">
-                <span>Stock type</span>
-              </label>
-              <select class="mgdb-select" id="stock-type" data-stock-value="type" aria-label="Stock type">
-                <option value="0">Any recorded type</option>
-                $(type_options)
-              </select>
-            </div>
-            <div class="stock-filter">
-              <label class="stock-check stock-check-inline">
-                <input id="stock-f-linkage" data-stock-filter="f_linkage" type="checkbox" value="1">
-                <span>Focus linkage group</span>
-              </label>
-              <select class="mgdb-select" id="stock-linkage" data-stock-value="linkage" aria-label="Focus linkage group">
-                <option value="0">Any recorded linkage group</option>
-                $(linkage_options)
-              </select>
-            </div>
-            <div class="stock-filter">
-              <label class="stock-check stock-check-inline">
-                <input id="stock-f-parent" data-stock-filter="f_parent" type="checkbox" value="1">
-                <span>Parent stock</span>
-              </label>
-              <select class="mgdb-select" id="stock-parent" data-stock-value="parent" aria-label="Parent stock">
-                <option value="0">Any recorded parent</option>
-                $(parent_options)
-              </select>
-            </div>
-          </div>
-        </fieldset>
-
-        <fieldset class="stock-fieldset">
-          <legend>Genotype, karyotype, and phenotype</legend>
-          <div class="stock-filter-grid">
-            <div class="stock-filter">
-              <label class="stock-check stock-check-inline">
-                <input id="stock-f-genvar1" data-stock-filter="f_genvar1" type="checkbox" value="1">
-                <span>Genotypic variation</span>
-              </label>
-              <input class="mgdb-input" id="stock-genvar1" data-stock-value="genvar1" type="text" maxlength="120" placeholder="a1" aria-label="First genotypic variation">
-            </div>
-            <div class="stock-filter">
-              <label class="stock-check stock-check-inline">
-                <input id="stock-f-genvar2" data-stock-filter="f_genvar2" type="checkbox" value="1">
-                <span>and variation</span>
-              </label>
-              <input class="mgdb-input" id="stock-genvar2" data-stock-value="genvar2" type="text" maxlength="120" aria-label="Second genotypic variation">
-            </div>
-            <div class="stock-filter">
-              <label class="stock-check stock-check-inline">
-                <input id="stock-f-genvar3" data-stock-filter="f_genvar3" type="checkbox" value="1">
-                <span>and variation</span>
-              </label>
-              <input class="mgdb-input" id="stock-genvar3" data-stock-value="genvar3" type="text" maxlength="120" aria-label="Third genotypic variation">
-            </div>
-            <div class="stock-filter">
-              <label class="stock-check stock-check-inline">
-                <input id="stock-f-karyotype" data-stock-filter="f_karyotype" type="checkbox" value="1">
-                <span>Karyotypic variation</span>
-              </label>
-              <select class="mgdb-select" id="stock-karyotype" data-stock-value="karyotype" aria-label="Karyotypic variation">
-                <option value="0">Any recorded karyotypic variation</option>
-                $(karyotype_options)
-              </select>
-            </div>
-            <div class="stock-filter">
-              <label class="stock-check stock-check-inline">
-                <input id="stock-f-phenotype" data-stock-filter="f_phenotype" type="checkbox" value="1">
-                <span>Phenotype</span>
-              </label>
-              <select class="mgdb-select" id="stock-phenotype" data-stock-value="phenotype" aria-label="Phenotype">
-                <option value="0">Any recorded phenotype</option>
-                $(phenotype_options)
-              </select>
-            </div>
-            <div class="stock-filter">
-              <span class="stock-filter-continuation">attributable to variation</span>
-              <input class="mgdb-input" id="stock-attribution" data-stock-value="attribution" type="text" maxlength="120" aria-label="Phenotype attributable to this variation">
-            </div>
-          </div>
-        </fieldset>
-
-        <div class="mgdb-form-actions">
-          <button class="mgdb-button mgdb-button-primary" type="submit">Run advanced search</button>
-          <button class="mgdb-button mgdb-button-quiet" id="stock-advanced-clear" type="button">Clear all filters</button>
-        </div>
-      </form>
-    </details>
-  </section>
-
-  <section id="stock-results" aria-labelledby="stock-results-title">
-    <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Search results</span>
-        <h2 id="stock-results-title">Matching stocks</h2>
-        <p id="stock-status" aria-live="polite">Enter an identifier above, or open the advanced search, to begin.</p>
-      </div>
-      <div class="stock-sort" id="stock-sort-wrap" hidden>
-        <label class="mgdb-small" for="stock-sort">Sort</label>
-        <select class="mgdb-select" id="stock-sort">
-          <option value="relevance">Best match</option>
-          <option value="name">Identifier A&ndash;Z</option>
-          <option value="name-desc">Identifier Z&ndash;A</option>
-        </select>
-      </div>
-    </div>
-
-    <p class="stock-criteria" id="stock-criteria" hidden></p>
-
-    <div class="stock-sources" id="stock-sources" hidden>
-      <button class="mgdb-chip" id="stock-source-mgdb" type="button" aria-pressed="true">MaizeGDB stocks</button>
-      <button class="mgdb-chip" id="stock-source-grin" type="button" aria-pressed="false">GRIN accessions</button>
-      <span class="mgdb-small mgdb-muted" id="stock-source-note">GRIN is a mirror of the USDA collection. The full collection is at <a href="https\://npgsweb.ars-grin.gov/gringlobal/search.aspx">GRIN-Global</a>.</span>
-    </div>
-
-    <div class="mgdb-loading" id="stock-loading" hidden><span class="mgdb-spinner" aria-hidden="true"></span><span>Searching stock records&hellip;</span></div>
-
-    <div id="stock-single" class="stock-single" hidden></div>
-
-    <ul class="stock-list" id="stock-list" hidden></ul>
-
-    <div class="mgdb-empty" id="stock-empty" hidden>
-      <h3 id="stock-empty-title">No stocks found</h3>
-      <p id="stock-empty-body">Check the spelling, or try a shorter term.</p>
-      <button class="mgdb-button mgdb-button-secondary" id="stock-empty-action" type="button" hidden></button>
-    </div>
-
-    <div class="mgdb-message mgdb-message-error" id="stock-error" role="alert" hidden>
-      <div>
-        <strong>The search could not be completed.</strong>
-        <span>Please try again. If the problem continues, send the query to the MaizeGDB team.</span>
-      </div>
-    </div>
-
-    <nav class="mgdb-pagination" id="stock-pagination" aria-label="Result pages" hidden></nav>
-  </section>
-
-  <section id="stock-resources" aria-labelledby="stock-resources-title">
-    <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Obtain and interpret germplasm</span>
-        <h2 id="stock-resources-title">Collections and resources</h2>
-      </div>
-      <p>MaizeGDB describes the stocks; the stock centers distribute them. These are the routes from a record to seed in hand.</p>
-    </div>
-
-    <div class="mgdb-card-grid">
-      <a class="mgdb-card" href="https\://maizecoopsc.org/">
-        <h3>Maize Genetics Cooperation Stock Center <span class="mgdb-external" aria-hidden="true"></span><span class="mgdb-visually-hidden">External site</span></h3>
-        <p class="mgdb-muted">The primary source of maize genetic stocks. Availability, ordering, and requests for more information.</p>
-      </a>
-      <a class="mgdb-card" href="/stock_catalog">
-        <h3>Stock Center catalog</h3>
-        <p class="mgdb-muted">A categorized listing of the stocks the Stock Center distributes.</p>
-      </a>
-      <a class="mgdb-card" href="/stock_decryption">
-        <h3>Decrypt a packet label</h3>
-        <p class="mgdb-muted">A key to the Stock Center&rsquo;s labelling conventions, for anyone reading a seed packet for the first time.</p>
-      </a>
-      <a class="mgdb-card" href="https\://maizecoopsc.org/ncrpis/">
-        <h3>North Central Regional PI Station <span class="mgdb-external" aria-hidden="true"></span><span class="mgdb-visually-hidden">External site</span></h3>
-        <p class="mgdb-muted">Non-mutant germplasm, including lines with molecular or phenotype data held here.</p>
-      </a>
-      <a class="mgdb-card" href="/data_center/phenotype">
-        <h3>Phenotypes and images</h3>
-        <p class="mgdb-muted">Search phenotype records, or browse the phenotype image collections tied to these stocks.</p>
-      </a>
-      <a class="mgdb-card" href="/TYPSimSelector">
-        <h3>TYPSimSelector</h3>
-        <p class="mgdb-muted">Sort Ames Diversity Panel lines by identity-by-state score.</p>
-      </a>
-    </div>
-
-    <h3 class="mgdb-spaced">Project collections</h3>
-    <p class="mgdb-section-intro">Sequence-indexed insertion resources and project-distributed stocks, with the genome browser tracks that show where the insertions landed.</p>
-    <div class="mgdb-card-grid">
-      <a class="mgdb-card" href="/uniformmu">
-        <h3>UniformMu</h3>
-        <p class="mgdb-muted">Sequence-indexed <em>Mutator</em> insertions from the McCarty lab. Tracks are available on the genome browser for B73 v2 through v5 and W22.</p>
-      </a>
-      <a class="mgdb-card" href="/ems-phenotype">
-        <h3>EMS Inflorescence Project</h3>
-        <p class="mgdb-muted">Screenings and images for seed, seedling, and adult phenotypes from the Hake lab collection.</p>
-      </a>
-      <a class="mgdb-card" href="/gbrowse/maize_v3?enable=AcDs">
-        <h3>Ac/Ds insertions</h3>
-        <p class="mgdb-muted">Transposon insertion collections from the Brutnell, Vollbrecht, and Dooner programs, as a browser track.</p>
-      </a>
-      <a class="mgdb-card" href="https\://wgs.maizegdb.org/">
-        <h3>SNPversity 2.0 <span class="mgdb-external" aria-hidden="true"></span><span class="mgdb-visually-hidden">External site</span></h3>
-        <p class="mgdb-muted">Query genotype data across the diversity panels these stocks belong to.</p>
-      </a>
-    </div>
-
-    <p class="mgdb-note mgdb-spaced"><strong>Downloads.</strong> <a href="https\://iastate.app.box.com/v/maizegdb-public/file/1876142430468">Flow cytometry measurements for selected lines</a>, and <a href="/traits_ibm_nam">trait values for the IBM and NAM populations</a>.</p>
-  </section>
-
-  <section id="stock-nam" aria-labelledby="stock-nam-title">
-    <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Reference population</span>
-        <h2 id="stock-nam-title">The maize NAM founders</h2>
-      </div>
-      <p>The 26 diverse founder lines of the Nested Association Mapping population, developed by the Molecular and Functional Diversity of the Maize Genome project.</p>
-    </div>
-
-    <p class="mgdb-section-intro">Stocks may be ordered from the <a href="https\://maizecoopsc.org/nam-rils">Maize Genetics Cooperation Stock Center</a>. Reference: <a href="https\://doi.org/10.1534/genetics.107.074245">Yu et al., 2008</a>.</p>
-
-    <div class="stock-nam-grid">
-      <a href="/data_center/stock/B97">B97</a>
-      <a href="/data_center/stock/CML103">CML103</a>
-      <a href="/data_center/stock/CML228">CML228</a>
-      <a href="/data_center/stock/CML247">CML247</a>
-      <a href="/data_center/stock/CML277">CML277</a>
-      <a href="/data_center/stock/CML322">CML322</a>
-      <a href="/data_center/stock/CML333">CML333</a>
-      <a href="/data_center/stock/CML052">CML52</a>
-      <a href="/data_center/stock/CML069">CML69</a>
-      <a href="/data_center/stock/Hp301">Hp301</a>
-      <a href="/data_center/stock/Il14H">Il14H</a>
-      <a href="/data_center/stock/Ki11">Ki11</a>
-      <a href="/data_center/stock/Ki3">Ki3</a>
-      <a href="/data_center/stock/Ky21">Ky21</a>
-      <a href="/data_center/stock/M162W">M162W</a>
-      <a href="/data_center/stock/M37W">M37W</a>
-      <a href="/data_center/stock/Mo17">Mo17</a>
-      <a href="/data_center/stock/Mo18W">Mo18W</a>
-      <a href="/data_center/stock/MS71">MS71</a>
-      <a href="/data_center/stock/NC350">NC350</a>
-      <a href="/data_center/stock/NC358">NC358</a>
-      <a href="/data_center/stock/Oh43">Oh43</a>
-      <a href="/data_center/stock/Oh7B">Oh7B</a>
-      <a href="/data_center/stock/P39">P39</a>
-      <a href="/data_center/stock/Tx303">Tx303</a>
-      <a href="/data_center/stock/Tzi8">Tzi8</a>
     </div>
   </section>
 </main>

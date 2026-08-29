@@ -68,7 +68,7 @@ function e($v) { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8'); }
     </a>
     <nav class="pl-nav" aria-label="Main">
       <a href="#pl-headers">Genomes</a>
-      <a href="#pl-metrics">Data centers</a>
+      <a href="#pl-metrics">Data hubs</a>
       <a href="#pl-table">Tools</a>
       <a href="#pl-forms">Community</a>
       <a href="#pl-tokens">About</a>

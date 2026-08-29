@@ -3,12 +3,12 @@ $$SYNTAX-LEVEL 2
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@MaizeGDB">
 <meta property="og:url" content="https://maizegdb.org/data_center/image">
-<meta property="og:title" content="MaizeGDB Image Data Center">
+<meta property="og:title" content="MaizeGDB Image Data Hub">
 <meta property="og:description" content="Explore over 113,000 maize mutant ear photographs, agarose gel patterns, stock germplasm, teosinte species, and anatomical traits.">
 
 <main class="mgdb-page mgdb-image-page" id="image-top" data-initial-category="$(initial_category)">
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
-    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data centers</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Images</span>
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Images</span>
   </nav>
 
   <section class="mgdb-hero" aria-labelledby="image-title">
@@ -20,65 +20,22 @@ $$SYNTAX-LEVEL 2
         <circle cx="68" cy="36" r="4" fill="#7a4a10" />
         <path d="M34 24 L40 14 L56 14 L62 24 Z" fill="#235c37" />
       </svg>
-      <strong>Image<br />Center</strong>
-      <span>MaizeGDB</span>
+      <strong>Image<br />Data Hub</strong>
     </div>
     <div class="mgdb-hero-body">
-      <span class="mgdb-eyebrow">Visual genetics &amp; genomics archive</span>
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; August 2026</p>
       <h1 id="image-title">Explore photographs, mutant specimens, and molecular assays</h1>
-      <p class="mgdb-hero-tagline">Visual records for $(total_images) images across $(mutant_count) mutant variations, $(gel_count) gel patterns, $(stock_count) germplasm stocks, and wild teosinte species.</p>
-      <p class="mgdb-hero-description">Unifying mutant ear photographs from the classic Neuffer collection, agarose gel hybridization patterns, seedling phenotypes, Plant Ontology anatomy, and wild maize relatives.</p>
-      <div class="mgdb-hero-actions">
-        <a class="mgdb-button mgdb-button-primary" href="#image-search-panel">Search gallery</a>
-        <a class="mgdb-button mgdb-button-secondary" href="#image-categories">Browse categories</a>
-      </div>
+      <p class="mgdb-hero-description">Search over $(total_images) photographs across $(mutant_count) mutant variations, $(gel_count) gel patterns, $(stock_count) germplasm stocks, and wild teosinte species.</p>
     </div>
   </section>
 
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#image-overview">Overview</a>
     <a href="#image-search-panel">Search &amp; Gallery</a>
     <a href="#image-categories">Categories</a>
-    <a href="#image-collections">Collections</a>
     <a href="#image-downloads">Downloads</a>
+    <a href="#image-overview">Statistics</a>
+    <a href="#image-collections">Related resources</a>
   </nav>
-
-  <section id="image-overview" aria-labelledby="image-overview-title">
-    <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Visual archive summary</span>
-        <h2 id="image-overview-title">Image collection at a glance</h2>
-      </div>
-      <p>Curated photographs, microscopic images, gel patterns, and anatomical diagrams maintained at MaizeGDB.</p>
-    </div>
-
-    <div class="mgdb-metric-grid">
-      <article class="mgdb-metric-quiet">
-        <strong class="mgdb-metric-value">$(total_images)</strong>
-        <p>total curated images</p>
-      </article>
-      <article class="mgdb-metric-quiet">
-        <strong class="mgdb-metric-value">$(mutant_count)</strong>
-        <p>mutants &amp; variations</p>
-      </article>
-      <article class="mgdb-metric-quiet">
-        <strong class="mgdb-metric-value">$(gel_count)</strong>
-        <p>gel pattern assays</p>
-      </article>
-      <article class="mgdb-metric-quiet">
-        <strong class="mgdb-metric-value">$(stock_count)</strong>
-        <p>germplasm stock photos</p>
-      </article>
-      <article class="mgdb-metric-quiet">
-        <strong class="mgdb-metric-value">$(species_count)</strong>
-        <p>species &amp; teosinte photos</p>
-      </article>
-      <article class="mgdb-metric-quiet">
-        <strong class="mgdb-metric-value">$(probe_count)</strong>
-        <p>probe hybridization images</p>
-      </article>
-    </div>
-  </section>
 
   <section id="image-search-panel" class="image-search-panel" aria-labelledby="image-search-title">
     <div class="image-section-heading">
@@ -144,6 +101,14 @@ $$SYNTAX-LEVEL 2
         <p id="image-results-status" aria-live="polite">Loading images&hellip;</p>
       </div>
       <div class="image-results-controls">
+        <div class="image-view-toggle" role="group" aria-label="View style">
+          <button class="image-view-btn" type="button" data-view="card" aria-pressed="true">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>Cards
+          </button>
+          <button class="image-view-btn" type="button" data-view="table" aria-pressed="false">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="2" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="12" width="14" height="2" rx="1" fill="currentColor"/></svg>Table
+          </button>
+        </div>
         <div class="image-export-buttons">
           <a class="mgdb-button mgdb-button-quiet" id="image-export-tsv" href="#" download>Export TSV</a>
           <a class="mgdb-button mgdb-button-quiet" id="image-export-csv" href="#" download>Export CSV</a>
@@ -151,7 +116,7 @@ $$SYNTAX-LEVEL 2
       </div>
     </div>
 
-    <div id="image-results-grid" class="image-results-grid"></div>
+    <div id="image-results" class="image-results-container image-view-card"></div>
 
     <div id="image-empty" class="mgdb-empty" hidden>
       <h3>No images matched your query</h3>
@@ -216,39 +181,6 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
-  <section id="image-collections" aria-labelledby="image-collections-title">
-    <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Curated collections</span>
-        <h2 id="image-collections-title">Specialized mutant guides &amp; tools</h2>
-      </div>
-      <p>Deep-dive archives and sister data centers featuring specialized image sets.</p>
-    </div>
-
-    <div class="mgdb-card-grid image-special-grid">
-      <article class="mgdb-card">
-        <span class="mgdb-pill mgdb-pill-ok">External Guide</span>
-        <h3>Guide to Maize Mutant Phenotypes</h3>
-        <p>Classic online monograph by M. Gerald Neuffer with pollen EMS mutagenesis history, detailed phenotypic descriptions, and high-res plates.</p>
-        <a href="https://mutants.maizegdb.org/doku.php">Launch Guide <span aria-hidden="true">&nearr;</span></a>
-      </article>
-
-      <article class="mgdb-card">
-        <span class="mgdb-pill mgdb-pill-info">Data Center</span>
-        <h3>Phenotype Data Center</h3>
-        <p>Search over 1,190 mutant phenotypes classified by plant body part and trait ontologies.</p>
-        <a href="/data_center/phenotype">Open Phenotype Center <span aria-hidden="true">&rarr;</span></a>
-      </article>
-
-      <article class="mgdb-card">
-        <span class="mgdb-pill mgdb-pill-warn">Data Center</span>
-        <h3>Molecular Marker &amp; Probe Center</h3>
-        <p>Over 771,000 marker records with mapped chromosome bin positions, primer sets, and gel assay evidence.</p>
-        <a href="/data_center/marker">Open Marker Center <span aria-hidden="true">&rarr;</span></a>
-      </article>
-    </div>
-  </section>
-
   <section id="image-downloads" aria-labelledby="image-downloads-title">
     <div class="mgdb-section-heading">
       <div>
@@ -265,7 +197,7 @@ $$SYNTAX-LEVEL 2
           <h3>Neuffer High-Res Mutant Images</h3>
         </div>
         <p>Download the complete collection of Dr. M. Gerald Neuffer's original high-resolution maize mutant photographs.</p>
-        <a class="mgdb-button mgdb-button-secondary" href="https://download.maizegdb.org/Neuffer_Mutant_Images/Neuffer_Mutant_Images.zip">Download ZIP Archive <span aria-hidden="true">&darr;</span></a>
+        <a class="mgdb-button mgdb-button-secondary" href="https\://download.maizegdb.org/Neuffer_Mutant_Images/Neuffer_Mutant_Images.zip">Download ZIP Archive <span aria-hidden="true">&darr;</span></a>
       </article>
 
       <article class="image-download-card">
@@ -276,6 +208,97 @@ $$SYNTAX-LEVEL 2
         <p>Export full metadata for all 113,000+ images with record IDs, direct image URLs, and captions.</p>
         <a class="mgdb-button mgdb-button-secondary" href="/search/image/image_search_api.php?category=all&amp;format=tsv">Download Metadata TSV <span aria-hidden="true">&darr;</span></a>
       </article>
+    </div>
+  </section>
+
+  <section id="image-overview" aria-labelledby="image-overview-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Corpus summary</span>
+        <h2 id="image-overview-title">Image dataset at a glance</h2>
+      </div>
+      <p>Curated photographs, microscopic images, gel patterns, and anatomical diagrams maintained at MaizeGDB.</p>
+    </div>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Curated Images</h3>
+          <span class="mgdb-metric-badge">Gallery</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(total_images)</strong>
+        </div>
+        <p class="mgdb-metric-description">Total photographs, gel patterns, and anatomical plates.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Mutant Specimens</h3>
+          <span class="mgdb-metric-badge">Phenotypes</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(mutant_count)</strong>
+        </div>
+        <p class="mgdb-metric-description">Ears, seedlings, and kernel mosaicism across mutant lines.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Gel Patterns</h3>
+          <span class="mgdb-metric-badge">Assays</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(gel_count)</strong>
+        </div>
+        <p class="mgdb-metric-description">RFLP and SSR marker hybridization assay images.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Germplasm Stocks</h3>
+          <span class="mgdb-metric-badge">Stocks</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(stock_count)</strong>
+        </div>
+        <p class="mgdb-metric-description">Specimen photos of inbred lines, landraces, and seeds.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="image-collections" aria-labelledby="image-collections-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Connected tools</span>
+        <h2 id="image-collections-title">Related resources</h2>
+      </div>
+      <p>Explore related MaizeGDB mutant phenotypic guides, marker data hubs, and external resources.</p>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="https\://mutants.maizegdb.org/doku.php" target="_blank" rel="noopener">
+          <strong>Guide to Maize Mutant Phenotypes</strong>
+          <span>Classic online monograph by M. Gerald Neuffer with pollen EMS mutagenesis history and high-res plates</span>
+          <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+        </a>
+        <a href="/data_center/phenotype">
+          <strong>Phenotype Data Hub</strong>
+          <span>Search over 1,190 mutant phenotypes classified by plant body part and trait ontologies</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/marker">
+          <strong>Molecular Marker &amp; Probe Center</strong>
+          <span>Over 771,000 marker records with mapped chromosome bin positions and gel assay evidence</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/gene_center">
+          <strong>Gene Model Center</strong>
+          <span>Annotations, cross-references, and functional data by assembly</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+      </div>
     </div>
   </section>
 

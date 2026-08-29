@@ -7,6 +7,7 @@
  */
 
 include_once('./include/db-api.php');
+include_once('./include/dashboard_cache.php');
 
 $system = getSystemInfo('mgdb.conf');
 logMessage('Starting overgo_search_modern.php');
@@ -38,7 +39,12 @@ $record_sql = "
   FROM probe p
   JOIN id_num i ON i.id=p.id
   WHERE p.type IN (393660, 747274) AND i.curation_lvl=0";
-$record_stats = retrieve_row(make_query($DBConn, $record_sql));
+/* Both overgo counts scan the probe collection and are static between reloads.
+   See include/dashboard_cache.php. */
+$record_stats = dashboardCache($system, 'overgo/records', function () use ($DBConn, $record_sql) {
+    $row = retrieve_row(make_query($DBConn, $record_sql));
+    return array('total' => (int) $row['total']);
+});
 
 $sequence_sql = "
   SELECT COUNT(DISTINCT p.id) AS total
@@ -47,7 +53,10 @@ $sequence_sql = "
   JOIN memo m ON m.id=p.id AND m.type_term=487260
   WHERE p.type=393660 AND i.curation_lvl=0
     AND m.memo IS NOT NULL AND btrim(m.memo) <> ''";
-$sequence_stats = retrieve_row(make_query($DBConn, $sequence_sql));
+$sequence_stats = dashboardCache($system, 'overgo/sequences', function () use ($DBConn, $sequence_sql) {
+    $row = retrieve_row(make_query($DBConn, $sequence_sql));
+    return array('total' => (int) $row['total']);
+});
 
 $content->get('overgo_count')->replace(number_format((int) $record_stats['total']));
 $content->get('sequence_count')->replace(number_format((int) $sequence_stats['total']));

@@ -1,7 +1,7 @@
 /**
  * file: js/mgdb-assembly.js
  *
- * purpose: Scrollspy, copy-to-clipboard, and accordion interactivity for Reference Assembly Data Center
+ * purpose: Scrollspy, copy-to-clipboard, and accordion interactivity for Reference Assembly Data Hub
  */
 
 (function () {

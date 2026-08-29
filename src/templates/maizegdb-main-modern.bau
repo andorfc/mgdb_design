@@ -51,16 +51,29 @@ $$SYNTAX-LEVEL 2
       </div>
     </div>
 
-    <footer class="mgdb-site-footer">
+    <!-- One block, not two. This was a brand-and-columns section plus a
+         separate bottom bar, which read as two stacked footers with a band of
+         empty space between them. Everything that earned its place is now on
+         three lines: the mark, the statement, and one row of links.
+         The white lockup, not the colour one -- the footer ground is dark
+         green and the colour lockup sets its wordmark in near-black. -->
+    <footer class="mgdb-site-footer" role="contentinfo">
       <div class="mgdb-site-footer-inner">
-        <ul class="mgdb-footer-links">
-          <li><a href="$(server-url)/contact">$(footer_contact)</a></li>
-          <li><a href="$(server-url)/cite">$(footer_cite)</a></li>
-          <li><a href="https\://download.maizegdb.org">Download</a></li>
-        </ul>
-        <a class="mgdb-footer-usda" href="https\://www.usda.gov/">
-          <img src="/images/USDA.png" alt="United States Department of Agriculture" height="34" />
-        </a>
+        <p class="mgdb-footer-tagline">MaizeGDB is the community database for maize genetics and genomics, curated and supported by the USDA-ARS</p>
+
+        <div class="mgdb-footer-row">
+          <a class="mgdb-footer-usda" href="https\://www.usda.gov/" target="_blank" rel="noopener">
+            <img src="/images/usda-v2-white-lockup.svg" alt="United States Department of Agriculture" width="200" height="46" />
+          </a>
+
+          <ul class="mgdb-footer-links">
+            <li><a href="/contact">$(footer_contact)</a></li>
+            <li><a href="/cite">$(footer_cite)</a></li>
+            <li><a href="https\://www.usda.gov/accessibility-statement" target="_blank" rel="noopener">Accessibility</a></li>
+            <li><a href="https\://www.usda.gov/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a></li>
+            <li><a href="https\://www.usda.gov/non-discrimination-statement" target="_blank" rel="noopener">Non-Discrimination</a></li>
+          </ul>
+        </div>
       </div>
     </footer>
   </div>

@@ -10,13 +10,13 @@ $$SYNTAX-LEVEL 2
 <main class="mgdb-page mgdb-protein-structure-page" id="ps-main">
 
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
-    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data centers</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Protein Structures</span>
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Protein Structures</span>
   </nav>
 
   <section class="mgdb-hero" aria-labelledby="ps-title">
     <div class="mgdb-hero-emblem">
       <img src="/images/data_center/protein_structure.png?v=20260822" alt="Protein structure icon" class="ps-hero-icon" width="80" height="80" />
-      <strong>Structure<br />Data Center</strong>
+      <strong>Structure<br />Data Hub</strong>
     </div>
     <div class="mgdb-hero-body">
       <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; August 2026</p>
@@ -147,6 +147,17 @@ $$SYNTAX-LEVEL 2
           <label class="mgdb-visually-hidden" for="ps-fatcat">Identifier for FATCAT comparison</label>
           <input class="mgdb-input" id="ps-fatcat" name="uniprot" type="search" placeholder="Zm00001eb374230" />
           <button class="mgdb-button mgdb-button-secondary" type="submit">Compare</button>
+        </form>
+      </article>
+
+      <article class="mgdb-card ps-tool-card">
+        <span class="mgdb-pill mgdb-pill-ok">Ligands &amp; Cofactors</span>
+        <h3>AlphaFill transplants</h3>
+        <p>A structure without a ligand is only half the picture. AlphaFill copies cofactors, substrates and metal ions from homologous PDB entries onto these models &mdash; 624,456 transplants across 16,933 maize genes, each with its donor and confidence.</p>
+        <form class="ps-search-row" action="/data_center/alphafill" method="get">
+          <label class="mgdb-visually-hidden" for="ps-alphafill">Gene model for predicted ligands</label>
+          <input class="mgdb-input" id="ps-alphafill" name="gene" type="search" placeholder="Zm00001eb086870" />
+          <button class="mgdb-button mgdb-button-secondary" type="submit">Ligands</button>
         </form>
       </article>
 
@@ -326,18 +337,18 @@ $$SYNTAX-LEVEL 2
         <span class="mgdb-eyebrow">Connected tools</span>
         <h2 id="ps-resources-title">Related resources</h2>
       </div>
-      <p>Explore related MaizeGDB data centers, protein structure prediction tools, and international archives.</p>
+      <p>Explore related MaizeGDB data hubs, protein structure prediction tools, and international archives.</p>
     </div>
 
     <div class="mgdb-resource-panel">
       <div class="mgdb-resource-list">
         <a href="/pan_gene_center/pan_gene">
-          <strong>Pan-Gene Data Center</strong>
+          <strong>Pan-Gene Data Hub</strong>
           <span>Syntenic pan-genome analysis across 66 maize genome assemblies</span>
           <span class="mgdb-resource-badge">Internal</span>
         </a>
         <a href="/data_center/genome">
-          <strong>Genome Data Center</strong>
+          <strong>Genome Data Hub</strong>
           <span>Chromosome-level reference genomes and pseudomolecules</span>
           <span class="mgdb-resource-badge">Internal</span>
         </a>

@@ -6,6 +6,8 @@
  * id is supplied. Individual EST records continue through the legacy viewer.
  */
 
+include_once('./include/dashboard_cache.php');
+
 $system = getSystemInfo('mgdb.conf');
 logMessage('Starting est_search_modern.php');
 
@@ -36,7 +38,11 @@ $est_count_sql = "
   FROM probe p
   JOIN id_num i ON i.id=p.id
   WHERE p.type=34 AND i.curation_lvl=0";
-$est_stats = retrieve_row(make_query($DBConn, $est_count_sql));
+/* One collection-wide count, static between reloads. See include/dashboard_cache.php. */
+$est_stats = dashboardCache($system, 'est/stats', function () use ($DBConn, $est_count_sql) {
+    $row = retrieve_row(make_query($DBConn, $est_count_sql));
+    return array('total' => (int) $row['total']);
+});
 
 $search_limit = getCGIParam('est_limit', 'S', $system['search_limit']);
 $search_limit = max(1, min((int) $search_limit, (int) $system['search_limit_max']));

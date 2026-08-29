@@ -54,7 +54,7 @@
       $mgdb->get('image-dir')->replace($system['image_url']);
       $mgdb->get('server-url')->replace($system['root_url']);
 
-      $body = $mgdb->get('body')->loadRemote($system['root_url_private'] . '/templates/static/mgdb_projects_notfound.bau');
+      $body = $mgdb->get('body')->load('templates/static/mgdb_projects_notfound.bau');
       $body->get('requested-slug')->replace(mgdb_project_esc($slug));
 
       include_once('translation.php');
@@ -152,7 +152,7 @@
   $mgdb->get('image-dir')->replace($system['image_url']);
   $mgdb->get('server-url')->replace($system['root_url']);
 
-  $body = $mgdb->get('body')->loadRemote($system['root_url_private'] . '/templates/static/mgdb_projects.bau');
+  $body = $mgdb->get('body')->load('templates/static/mgdb_projects.bau');
 
   $body->get('project-count')->replace(number_format(count($projects)));
   $body->get('topic-chips')->replace($chips);

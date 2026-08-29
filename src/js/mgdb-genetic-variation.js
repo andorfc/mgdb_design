@@ -1,5 +1,5 @@
 /* ==========================================================================
-   /genetic_variation — the Genetic Variation data center
+   /genetic_variation — the Genetic Variation data hub
    --------------------------------------------------------------------------
    Progressive enhancement over a page that is already complete. Both tables
    are rendered server-side, so with this file missing the page still shows

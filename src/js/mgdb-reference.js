@@ -93,6 +93,13 @@
     var clean = new URLSearchParams(params.toString());
     if (clean.get('page') === '1') clean.delete('page');
     clean.delete('page_size');
+    /* With nothing narrowed, 'scope' and 'sort' describe a search that is not
+       being shown. Strip them so a resting URL stays clean enough to share. */
+    var narrowed = NARROWING.some(function (key) { return clean.has(key); });
+    if (!narrowed) {
+      clean.delete('scope');
+      clean.delete('sort');
+    }
     var next = window.location.pathname + (clean.toString() ? '?' + clean.toString() : '');
     window.history.replaceState({}, '', next);
   }
@@ -103,9 +110,87 @@
     if (loading) {
       byId('reference-empty').hidden = true;
       byId('reference-error').hidden = true;
+      byId('reference-resting').hidden = true;
       byId('reference-pagination').innerHTML = '';
       byId('reference-results-status').textContent = 'Searching curated literature…';
     }
+  }
+
+  /* Params that actually narrow the corpus. 'scope' is always present because it
+     defaults to 'all', and 'sort'/'page' do not narrow anything, so none of the
+     three counts as the user having asked for something. */
+  var NARROWING = ['q', 'year_from', 'year_to', 'journal', 'pub_type',
+                   'identifier', 'editorial', 'include_meeting', 'include_mnl'];
+
+  function hasSearchState() {
+    var params = formParams(1);
+    return NARROWING.some(function (key) { return params.has(key); }) || currentPage > 1;
+  }
+
+  /* Resting state: no query has been entered, so there are no results to show.
+     The dashboard below still describes the whole collection. */
+  function showResting() {
+    var results = byId('reference-results');
+    results.innerHTML = '';
+    results.hidden = true;
+    byId('reference-empty').hidden = true;
+    byId('reference-error').hidden = true;
+    byId('reference-resting').hidden = false;
+    byId('reference-pagination').innerHTML = '';
+    byId('reference-select-page').parentElement.hidden = true;
+    selectedIds = {};
+    updateSelection();
+  }
+
+  /* Corpus figures and charts without the result rows. Used on a bare page load
+     and whenever the user clears their way back to no query. */
+  function loadDashboard() {
+    var params = formParams(1);
+    params.delete('page');
+    params.delete('page_size');
+    params.set('facets_only', '1');
+    updateUrl(formParams(1));
+    setLoading(true);
+    byId('reference-results-status').textContent = 'Loading collection summary\u2026';
+
+    if (currentRequest && currentRequest.abort) currentRequest.abort();
+    currentRequest = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var options = currentRequest ? {signal: currentRequest.signal} : {};
+
+    fetch(apiUrl + '?' + params.toString(), options)
+      .then(function (response) {
+        if (!response.ok) throw new Error('Summary failed');
+        return response.json();
+      })
+      .then(function (data) {
+        if (!data.ok) throw new Error(data.message || 'Summary failed');
+        currentData = data;
+        renderSummary(data);
+        renderCharts(data.facets);
+        setLoading(false);
+        showResting();
+        byId('reference-results-status').textContent =
+          number(data.summary.total) + ' curated references. Search above to see matches.';
+        updateExports();
+      })
+      .catch(function (error) {
+        if (error.name === 'AbortError') return;
+        setLoading(false);
+        byId('reference-results').hidden = true;
+        byId('reference-resting').hidden = true;
+        byId('reference-error').hidden = false;
+        byId('reference-results-status').textContent = 'Collection summary unavailable.';
+      });
+  }
+
+  /* Route a change in the form: a real search when the user has narrowed
+     something, the resting dashboard when they have not. */
+  function refresh(page, scrollToResults) {
+    /* Set currentPage first: hasSearchState() reads it, and clearing a query
+       while on page 3 of a previous search must still land on the dashboard. */
+    currentPage = page || 1;
+    if (hasSearchState()) loadSearch(currentPage, scrollToResults);
+    else loadDashboard();
   }
 
   function loadSearch(page, scrollToResults) {
@@ -157,7 +242,6 @@
     var summary = data.summary;
     var years = data.facets.year.map(function (row) { return parseInt(row.value, 10); })
       .filter(function (year) { return !isNaN(year); });
-    byId('reference-dashboard').hidden = summary.total === 0;
     byId('reference-total-count').textContent = number(summary.total);
     byId('reference-doi-count').textContent = number(summary.with_doi);
     byId('reference-pubmed-count').textContent = number(summary.with_pubmed);
@@ -249,6 +333,7 @@
       ? 'Showing ' + number(start) + '–' + number(end) + ' of ' + number(summary.total)
         + ' matches' + queryText + ' · ' + number(summary.elapsed_ms) + ' ms'
       : 'No curated references matched' + queryText + '.';
+    byId('reference-resting').hidden = true;
     byId('reference-empty').hidden = summary.total !== 0;
     results.hidden = summary.total === 0;
     byId('reference-select-page').parentElement.hidden = summary.total === 0;
@@ -400,51 +485,114 @@
     byId('reference-editorial').checked = false;
     byId('reference-include-meeting').checked = true;
     byId('reference-include-mnl').checked = true;
-    loadSearch(1, false);
+    refresh(1, false);
+  }
+
+  /* ── Section Tabs & Scrollspy ───────────────────────────────────────────── */
+
+  function buildTabs() {
+    var tabs = document.querySelectorAll('.mgdb-section-tabs a');
+    if (!tabs.length) return;
+
+    var pairs = [];
+    Array.prototype.forEach.call(tabs, function (tab) {
+      var href = tab.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        var section = document.querySelector(href);
+        if (section) {
+          pairs.push({ tab: tab, section: section });
+        }
+      }
+    });
+
+    function markCurrent(target) {
+      pairs.forEach(function (pair) {
+        var current = pair.section === target;
+        pair.tab.classList.toggle('is-current', current);
+        if (current) {
+          pair.tab.setAttribute('aria-current', 'true');
+        } else {
+          pair.tab.removeAttribute('aria-current');
+        }
+      });
+    }
+
+    var initial = pairs[0];
+    if (window.location.hash) {
+      pairs.forEach(function (pair) {
+        if ('#' + pair.section.id === window.location.hash) {
+          initial = pair;
+        }
+      });
+    }
+    if (initial) {
+      markCurrent(initial.section);
+    }
+
+    pairs.forEach(function (pair) {
+      pair.tab.addEventListener('click', function () {
+        markCurrent(pair.section);
+      });
+    });
+
+    if (!window.IntersectionObserver) return;
+
+    var observer = new window.IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          markCurrent(entry.target);
+        }
+      });
+    }, { rootMargin: '-20% 0px -60% 0px' });
+
+    pairs.forEach(function (pair) {
+      observer.observe(pair.section);
+    });
   }
 
   function initialize() {
     if (!byId('reference-search-form')) return;
+    buildTabs();
     applyUrlState();
 
     byId('reference-search-form').addEventListener('submit', function (event) {
       event.preventDefault();
-      loadSearch(1, true);
+      refresh(1, true);
     });
     byId('reference-query').addEventListener('input', function () {
       byId('reference-query-clear').hidden = !byId('reference-query').value;
       window.clearTimeout(searchTimer);
       if (byId('reference-query').value.length === 0 || byId('reference-query').value.length >= 3) {
-        searchTimer = window.setTimeout(function () { loadSearch(1, false); }, 500);
+        searchTimer = window.setTimeout(function () { refresh(1, false); }, 500);
       }
     });
     byId('reference-query-clear').addEventListener('click', function () {
       byId('reference-query').value = '';
       byId('reference-query-clear').hidden = true;
-      loadSearch(1, false);
+      refresh(1, false);
       byId('reference-query').focus();
     });
-    byId('reference-scope').addEventListener('change', function () { loadSearch(1, false); });
+    byId('reference-scope').addEventListener('change', function () { refresh(1, false); });
     ['reference-year-from', 'reference-year-to', 'reference-journal', 'reference-pub-type', 'reference-identifier',
       'reference-editorial', 'reference-include-meeting', 'reference-include-mnl']
-      .forEach(function (id) { byId(id).addEventListener('change', function () { loadSearch(1, false); }); });
+      .forEach(function (id) { byId(id).addEventListener('change', function () { refresh(1, false); }); });
     byId('reference-sort').addEventListener('change', function () {
       byId('reference-sort-compact').value = byId('reference-sort').value;
-      loadSearch(1, false);
+      refresh(1, false);
     });
     byId('reference-sort-compact').addEventListener('change', function () {
       byId('reference-sort').value = byId('reference-sort-compact').value;
-      loadSearch(1, false);
+      refresh(1, false);
     });
     byId('reference-reset-filters').addEventListener('click', resetFilters);
-    byId('reference-retry').addEventListener('click', function () { loadSearch(currentPage, false); });
+    byId('reference-retry').addEventListener('click', function () { refresh(currentPage, false); });
 
     Array.prototype.forEach.call(document.querySelectorAll('[data-reference-example]'), function (button) {
       button.addEventListener('click', function () {
         byId('reference-query').value = button.getAttribute('data-reference-example');
         byId('reference-scope').value = button.getAttribute('data-reference-scope') || 'all';
         byId('reference-query-clear').hidden = false;
-        loadSearch(1, true);
+        refresh(1, true);
       });
     });
 
@@ -465,7 +613,9 @@
       button.addEventListener('click', function () { selectedExport(button.getAttribute('data-selected-export'), button); });
     });
 
-    loadSearch(currentPage, false);
+    /* Only run a search when the URL actually asks for one. A bare
+       /data_center/reference now loads the dashboard and waits. */
+    refresh(currentPage, false);
   }
 
   if (document.readyState === 'loading') {

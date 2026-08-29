@@ -3,33 +3,45 @@ $$SYNTAX-LEVEL 2
   <a href="#" class="drop">$(about_name)</a>
   <span id="about_menu">
     <div class="dropdown_5columns mega-dropdown mega-dropdown-about">
-      <div class="mega-panel-heading">
-        <span class="mega-eyebrow">About MaizeGDB</span>
-        <h2>Maize data, connected for discovery</h2>
-        <p>A long-term USDA informatics resource serving the maize genetics and genomics community.</p>
+      <div class="mega-panel-heading mega-panel-heading-row">
+        <!-- Fits on one line at the panel's 560px: the string measures 361px
+             at the h2's 19px/700, against 396px left beside the action. Both
+             numbers move if the panel narrows or the action's label grows. -->
+        <h2>Maize Genetics and Genomics Database</h2>
+        <!-- Same shape as the Genomes panel: no eyebrow, no footer, and the
+             section destination sits here beside the heading. The site map is
+             that destination rather than /about, which is a page about the
+             project rather than a way into the rest of the site. -->
+        <div class="mega-heading-actions">
+          <a class="mega-heading-action" href="$(server-url)/sitemap">Explore site map <span aria-hidden="true">&#8594;</span></a>
+        </div>
       </div>
-      <div class="mega-grid mega-grid-3 mega-compact-groups">
+      <div class="mega-grid mega-grid-2 mega-compact-groups">
         <section class="mega-group">
           <h3>Project</h3>
           <a href="$(server-url)/contact"><strong>People &amp; contact</strong></a>
           <a href="$(server-url)/cite"><strong>Cite MaizeGDB</strong></a>
-          <a href="$(server-url)/about/working_group"><strong>Working Group</strong></a>
         </section>
         <section class="mega-group">
           <h3>Learn</h3>
-          <a href="$(server-url)/faq"><strong>Frequently asked questions</strong></a>
           <a href="$(server-url)/doc"><strong>Documentation</strong></a>
           <a href="$(server-url)/whatsnew"><strong>News &amp; updates</strong></a>
         </section>
-        <aside class="mega-feature mega-feature-green">
-          <span class="mega-badge">FAIR data</span>
-          <h3>Part of AgBioData</h3>
-          <p>MaizeGDB works with agricultural databases to make research data findable, accessible, interoperable, and reusable.</p>
-          <a class="mega-feature-link" href="https://www.agbiodata.org" target="_blank" rel="noopener">Visit AgBioData <span aria-hidden="true">&#8599;</span></a>
-        </aside>
-      </div>
-      <div class="mega-panel-footer">
-        <a href="$(server-url)/sitemap">Explore the complete site map <span aria-hidden="true">&#8594;</span></a>
+        <!-- The membership was a full feature column, which gave a partner
+             organization the same weight as MaizeGDB's own sections. It is an
+             affiliation, so it reads as one: a single row across the foot of
+             the grid, carrying AgBioData's own agriculture mark. "Founding
+             member" is the site's existing wording, used verbatim in the
+             footer of every unmodernized page.
+             The whole row is one link, so it is one tap target in the drawer. -->
+        <a class="mega-affiliation" href="https://www.agbiodata.org" target="_blank" rel="noopener">
+          <img class="mega-affiliation-mark" src="$(image-dir)/quicklinks/agbiodata.png" alt="" width="128" height="128" loading="lazy" decoding="async" />
+          <span class="mega-affiliation-text">
+            <strong>Founding member of AgBioData</strong>
+            <span>The consortium making agricultural research data findable, accessible, interoperable, and reusable.</span>
+          </span>
+          <span class="mega-affiliation-cue" aria-hidden="true">&#8599;</span>
+        </a>
       </div>
     </div>
   </span>

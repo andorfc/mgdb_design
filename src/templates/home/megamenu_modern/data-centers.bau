@@ -4,49 +4,46 @@ $$SYNTAX-LEVEL 2
   <span id="data_center_menu">
     <div class="dropdown_fullwidth mega-dropdown mega-dropdown-wide">
       <div class="mega-panel-heading mega-panel-heading-row">
-        <div>
-          <span class="mega-eyebrow">Data Centers</span>
-          <h2>Explore maize data by research question</h2>
+        <div class="mega-heading-text">
+          <h2>Data hubs: explore maize data by data type</h2>
+          <!-- Filled in by mgdb-chrome.js from the pointed-at hub's data-desc.
+               aria-hidden because it is a pointer affordance duplicating the
+               link the user is already on; screen readers get the label, and
+               the heading action leads to the full descriptions. -->
+          <p class="mega-hint" data-mgdb-hint data-mgdb-hint-default="Point at a hub to see what it holds." aria-hidden="true">Point at a hub to see what it holds.</p>
         </div>
-        <a class="mega-heading-action" href="$(server-url)/data_center/">Open Data Center hub <span aria-hidden="true">&#8594;</span></a>
+        <div class="mega-heading-actions">
+          <a class="mega-heading-action" href="$(server-url)/data_center/">Data hub descriptions <span aria-hidden="true">&#8594;</span></a>
+        </div>
       </div>
-      <div class="mega-grid mega-grid-4 mega-compact-groups">
-        <section class="mega-group">
-          <h3>Genomes &amp; variation</h3>
-          <a href="$(server-url)/genome"><strong>Genomes</strong></a>
-          <a href="$(server-url)/data_center/variation"><strong>Alleles &amp; polymorphisms</strong></a>
-          <a href="$(server-url)/genetic_variation"><strong>SNPs &amp; traits</strong></a>
-          <a href="$(server-url)/insertion"><strong>Insertions</strong></a>
-          <a href="$(server-url)/data_center/map"><strong>Maps</strong></a>
+      <!-- One alphabetical list flowing down each column in turn, rather than
+           four themed groups. Several hubs sat awkwardly under any heading we
+           tried -- Analysis projects and Data summaries are not a data type at
+           all -- and with twenty entries an A-Z is faster to scan than a
+           taxonomy the reader has to learn first. -->
+      <div class="mega-grid mega-grid-hubs">
+        <section class="mega-group mega-hub-list">
+          <a href="$(server-url)/data_center/variation" data-desc="Alleles, polymorphisms, and the mutant collections behind them."><strong>Alleles &amp; polymorphisms</strong></a>
+          <a href="$(server-url)/projects" data-desc="Curated analysis projects and the datasets they produced."><strong>Analysis projects</strong></a>
+          <a href="$(server-url)/ai" data-desc="AI-derived datasets and tools hosted at MaizeGDB."><strong>Artificial intelligence</strong></a>
+          <a href="$(server-url)/data_center/" data-desc="Record counts and release summaries across every data type."><strong>Data summaries</strong></a>
+          <a href="$(server-url)/expression" data-desc="Expression atlases and per-tissue abundance for gene models."><strong>Expression</strong></a>
+          <a href="$(server-url)/data_center/gene_product" data-desc="Products assigned to gene models."><strong>Gene products</strong></a>
+          <a href="$(server-url)/gene_center/gene" data-desc="Look up a gene model, symbol, or locus."><strong>Genes &amp; gene models</strong></a>
+          <a href="$(server-url)/genome" data-desc="Assemblies hosted at MaizeGDB, with browsers and downloads."><strong>Genomes</strong></a>
+          <a href="$(server-url)/data_center/image" data-desc="Curated photographs of phenotypes, materials, and gel patterns."><strong>Images</strong></a>
+          <a href="$(server-url)/insertion" data-desc="Mu, Ac/Ds, and other transposon insertion collections."><strong>Insertions</strong></a>
+          <a href="$(server-url)/data_center/locus" data-desc="Locus records, including QTL."><strong>Loci &amp; QTL</strong></a>
+          <a href="$(server-url)/data_center/map" data-desc="Genetic, cytogenetic, physical, and bin maps across chromosomes 1-10."><strong>Maps</strong></a>
+          <a href="$(server-url)/metabolic_pathways/" data-desc="Maize metabolic pathways and the enzymes that act in them."><strong>Metabolic pathways</strong></a>
+          <a href="$(server-url)/data_center/marker" data-desc="Molecular markers, probes, SSRs, RFLPs, and sequence features."><strong>Molecular markers</strong></a>
+          <a href="$(server-url)/data_center/phenotype" data-desc="Phenotype records and the mutant archives they come from."><strong>Mutants &amp; phenotypes</strong></a>
+          <a href="$(server-url)/pan_gene_center/pan_gene" data-desc="Pan-gene assignments across the NAM assemblies."><strong>Pan-genes</strong></a>
+          <a href="$(server-url)/data_center/protein_structure" data-desc="Predicted structures for gene model proteins, with Foldseek and FATCAT."><strong>Protein structures</strong></a>
+          <a href="$(server-url)/data_center/reference" data-desc="The curated maize literature, searchable by topic, author, gene, or locus."><strong>References</strong></a>
+          <a href="$(server-url)/genetic_variation" data-desc="SNP datasets and the traits associated with them."><strong>SNPs &amp; traits</strong></a>
+          <a href="$(server-url)/data_center/stock" data-desc="Genetic stocks held by the Maize Genetics Cooperation Stock Center."><strong>Stocks &amp; germplasm</strong></a>
         </section>
-        <section class="mega-group">
-          <h3>Genes &amp; function</h3>
-          <a href="$(server-url)/gene_center/gene"><strong>Genes &amp; gene models</strong></a>
-          <a href="$(server-url)/pan_gene_center/pan_gene"><strong>Pan-genes</strong></a>
-          <a href="$(server-url)/data_center/gene_product"><strong>Gene products</strong></a>
-          <a href="$(server-url)/expression"><strong>Expression</strong></a>
-          <a href="$(server-url)/metabolic_pathways/"><strong>Metabolic pathways</strong></a>
-          <a href="$(server-url)/data_center/protein_structure"><strong>Protein structures</strong></a>
-        </section>
-        <section class="mega-group">
-          <h3>Traits &amp; germplasm</h3>
-          <a href="$(server-url)/data_center/locus"><strong>Loci &amp; QTL</strong></a>
-          <a href="$(server-url)/data_center/phenotype"><strong>Mutants &amp; phenotypes</strong></a>
-          <a href="$(server-url)/data_center/stock"><strong>Stocks &amp; germplasm</strong></a>
-          <a href="$(server-url)/data_center/marker"><strong>Molecular markers</strong></a>
-        </section>
-        <section class="mega-group">
-          <h3>Knowledge &amp; media</h3>
-          <a href="$(server-url)/data_center/reference"><strong>References</strong></a>
-          <a href="$(server-url)/data_center/image"><strong>Images</strong></a>
-          <a href="$(server-url)/ai"><strong>Artificial intelligence</strong></a>
-          <a href="$(server-url)/projects"><strong>Analysis projects</strong></a>
-          <a href="$(server-url)/data_center/"><strong>Data summaries</strong></a>
-        </section>
-      </div>
-      <div class="mega-panel-footer mega-panel-footer-split">
-        <a href="$(server-url)/data_center/">Browse all Data Centers <span aria-hidden="true">&#8594;</span></a>
-        <a href="$(server-url)/archive">Archived Data Centers</a>
       </div>
     </div>
   </span>

@@ -2,7 +2,7 @@
 /* file: phenotype_search_lib.php
  *
  * purpose: Query builder, data formatting, and export functions for the
- *          modernized Phenotype Data Center (/data_center/phenotype).
+ *          modernized Phenotype Data Hub (/data_center/phenotype).
  */
 
 function phenoSearchValue($key, $default = '') {

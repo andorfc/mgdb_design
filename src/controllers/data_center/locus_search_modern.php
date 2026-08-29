@@ -1,7 +1,7 @@
 <?php
 /* file: locus_search_modern.php
  *
- * purpose: Locus Data Center search landing page (/data_center/locus)
+ * purpose: Locus Data Hub search landing page (/data_center/locus)
  *          on the modern design system.
  *
  *          Included by controllers/data_center.php when PAGE is 'locus' and
@@ -22,7 +22,7 @@ header("Cache-Control: no-cache, no-store, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-$bauplan = new Bauplan('MaizeGDB Locus Data Center | Classic Genetic Loci, Mutants & Characterized Genes');
+$bauplan = new Bauplan('MaizeGDB Locus Data Hub | Classic Genetic Loci, Mutants & Characterized Genes');
 $bauplan->modern();
 
 $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';

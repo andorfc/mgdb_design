@@ -1,5 +1,20 @@
-/* Genomes page. Scoped under .mgdb-genomes-page so nothing here can reach
-   another page. Uses the shared tokens from mgdb-modern.css throughout. */
+/* Emblem styling in Hero Header */
+.mgdb-genomes-page .mgdb-hero-emblem {
+  gap: var(--mgdb-space-2);
+  padding: var(--mgdb-space-4) var(--mgdb-space-3);
+  border-right: 1px solid #cfe3d6;
+  background: linear-gradient(160deg, rgba(255, 255, 255, .92), rgba(255, 255, 255, .55));
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-genomes-page .mgdb-hero-emblem img {
+  width: min(100%, 72px);
+  height: auto;
+  max-height: 72px;
+  object-fit: contain;
+  mix-blend-mode: normal;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, .10));
+}
 
 /* Section tabs. Sticky so the section list stays reachable while scrolling a
    long page; they are ordinary in-page links, so they work without script. */
@@ -11,8 +26,10 @@
   flex-wrap: wrap;
   gap: var(--mgdb-space-2);
   margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-6);
   padding: var(--mgdb-space-2) 0;
   background: var(--mgdb-surface);
+  border-bottom: 1px solid var(--mgdb-line);
 }
 
 .mgdb-genomes-page .mgdb-section-tabs a {
@@ -27,12 +44,18 @@
   font-size: var(--mgdb-text-sm);
   font-weight: 700;
   text-decoration: none;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
 }
 
-.mgdb-genomes-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
+.mgdb-genomes-page .mgdb-section-tabs a:hover {
+  background: var(--mgdb-green-soft);
+  border-color: #bcd9c6;
+  color: var(--mgdb-green-dark) !important;
+}
 
 /* The current section is marked by weight and a left bar as well as colour. */
-.mgdb-genomes-page .mgdb-section-tabs a.is-current {
+.mgdb-genomes-page .mgdb-section-tabs a.is-current,
+.mgdb-genomes-page .mgdb-section-tabs a[aria-current="true"] {
   border-color: var(--mgdb-green-dark);
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
   background: var(--mgdb-green-dark);
@@ -52,35 +75,10 @@
   font-weight: 800;
 }
 
-.mgdb-genomes-page .mgdb-tool-card {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: var(--mgdb-space-4);
-  align-items: center;
-}
-
-.mgdb-genomes-page .mgdb-tool-card > * + * { margin-top: 0; }
-
-.mgdb-genomes-page .mgdb-tool-icon {
-  display: grid;
-  width: 44px;
-  height: 44px;
-  place-items: center;
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-green-soft);
-  color: var(--mgdb-green-dark);
-  font-size: 1.25rem;
-}
-
-.mgdb-genomes-page .mgdb-tool-card h3 { font-size: var(--mgdb-text-lg); }
-.mgdb-genomes-page .mgdb-tool-card p { margin-top: var(--mgdb-space-1); color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
-
 /* The explorer has three controls; give the selects a sensible basis so they
    sit on one row on desktop and stack cleanly on a phone. */
 .mgdb-genomes-page .mgdb-search-row .mgdb-field:first-child { flex: 2 1 20rem; }
 .mgdb-genomes-page .mgdb-search-row .mgdb-field { flex: 1 1 12rem; }
-
-.mgdb-genomes-page .mgdb-hero-emblem svg { width: min(100%, 96px); height: auto; }
 
 @media (max-width: 767px) {
   .mgdb-genomes-page .mgdb-section-tabs {

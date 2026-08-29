@@ -4,13 +4,7 @@
    Companion to /css/mgdb-stock-record.css and
    templates/static/mgdb_stock_record.bau.
 
-   One request to /api/v1/records/stock/{id} builds the whole page. The record
-   page this replaces made six, sharded across ajax1..N.maizegdb.org
-   subdomains to get around the browser's per-host connection limit — a
-   workaround that one request makes unnecessary.
-
-   The identity is already on the page, server-rendered, so a failure here
-   degrades to a record that still says what it is and links to its data.
+   One request to /api/v1/records/stock/{id} builds the whole page.
    ========================================================================== */
 
 (function (window, document) {
@@ -19,7 +13,9 @@
   var MGDB = window.MGDB;
   if (!MGDB) { return; }
 
-  var CHIP_LIMIT = 40;   // chips shown before the rest collapse behind a toggle
+  var CHIP_LIMIT = 40;     // chips shown before the rest collapse behind a toggle
+  var PEDIGREE_PROGENY_LIMIT = 12;
+  var REF_PAGE_SIZE = 5;    // references per page
 
   function byId(id) { return document.getElementById(id); }
   function escape(value) { return MGDB.escapeHtml(value); }
@@ -27,13 +23,13 @@
 
   var els = {};
   var payload = null;
+  var allReferences = [];
+  var refCurrentPage = 1;
 
   /* ------------------------------------------------------------------------
      Small builders
      ------------------------------------------------------------------------ */
 
-  /* A reference from the API is {type, id, name, html}. Anything without a
-     page is still named, just not linked. */
   function refLink(ref, extraClass) {
     if (!ref || !ref.name) { return ''; }
     var cls = extraClass ? ' class="' + extraClass + '"' : '';
@@ -53,10 +49,6 @@
            (description ? '<p>' + escape(description) + '</p>' : '') + body + '</div>';
   }
 
-  /* A list of record links. Past CHIP_LIMIT the remainder collapses: B73
-     carries over 1300 genotypic variations, and a wall of them buries
-     everything below it. The hidden ones stay in the DOM so find-in-page and
-     assistive technology can still reach them. */
   function chipList(items, qualifierKey) {
     if (!items || !items.length) { return ''; }
 
@@ -107,8 +99,6 @@
     facts += '<div><dt>MaizeGDB ID</dt><dd class="mgdb-record-id">' + escape(data.id) + '</dd></div>';
     els.facts.innerHTML = facts;
 
-    // Actions are the things a reader came to do: get the seed, see the
-    // pedigree, follow the accession outward.
     var actions = [];
     var grin = sections.grin;
 
@@ -116,18 +106,22 @@
       actions.push('<a class="mgdb-button mgdb-button-primary" href="' +
         escape(grin.details.order_url) + '">Request from the PI Station</a>');
     } else if (overview.provider && overview.provider.is_stock_center) {
-      actions.push('<a class="mgdb-button mgdb-button-primary" href="https://maizecoopsc.org/">' +
-        'Order from the Stock Center</a>');
+      actions.push('<a class="mgdb-button mgdb-button-primary" href="https://maizecoopsc.org/" target="_blank" rel="noopener">' +
+        'Order from the Stock Center &nearr;</a>');
     }
 
     var pedigree = sections.pedigree;
     if (pedigree && pedigree.network && pedigree.network.available && pedigree.network.interactive) {
       actions.push('<a class="mgdb-button mgdb-button-secondary" href="' +
-        escape(pedigree.network.interactive) + '">Pedigree viewer</a>');
+        escape(pedigree.network.interactive) + '">Explore pedigree</a>');
+    }
+    if (sections.typsim && sections.typsim.available) {
+      actions.push('<a class="mgdb-button mgdb-button-secondary" href="' +
+        escape(sections.typsim.tool_url) + '" target="_blank" rel="noopener">TYPSimSelector &nearr;</a>');
     }
     if (grin && grin.details && grin.details.grin_url) {
       actions.push('<a class="mgdb-button mgdb-button-quiet" href="' +
-        escape(grin.details.grin_url) + '">View at GRIN</a>');
+        escape(grin.details.grin_url) + '" target="_blank" rel="noopener">View at GRIN &nearr;</a>');
     }
 
     els.actions.innerHTML = actions.join('');
@@ -176,45 +170,200 @@
     return true;
   }
 
-  function renderPedigree(pedigree) {
+  function renderPedigree(pedigree, stockData, counts) {
     if (!pedigree) { return false; }
-
-    function withContribution(items) {
-      return items.map(function (item) {
-        var copy = { name: item.name, html: item.html };
-        if (item.contribution_percent !== null && item.contribution_percent !== undefined) {
-          copy.note = item.contribution_percent + '%';
-        }
-        return copy;
-      });
-    }
-
-    var html = '';
-    if (pedigree.parents && pedigree.parents.length) {
-      html += block('Parents', '', chipList(withContribution(pedigree.parents), 'note'));
-    }
-    if (pedigree.progeny && pedigree.progeny.length) {
-      html += block('Progeny', 'Stocks recorded as having this one as a parent.',
-        chipList(withContribution(pedigree.progeny), 'note'));
-    }
-
+    var parents = pedigree.parents || [];
+    var progeny = pedigree.progeny || [];
     var network = pedigree.network || {};
-    if (network.available && network.interactive) {
-      var figure = network.thumbnail
-        ? '<a href="' + escape(network.interactive) + '"><img src="' + escape(network.thumbnail) +
-          '" alt="Pedigree network for this stock" loading="lazy"></a>'
-        : '<a class="mgdb-button mgdb-button-secondary" href="' + escape(network.interactive) +
-          '">Open the pedigree viewer</a>';
-      html += block('Pedigree network',
-        'Ancestors and descendants as a navigable graph.', figure);
+    if (!parents.length && !progeny.length && !network.available) { return false; }
+
+    var attributes = stockData && stockData.attributes ? stockData.attributes : {};
+    var selectedName = attributes.name || ('Stock ' + (stockData ? stockData.id : ''));
+    var selectedHref = '/data_center/stock?id=' + encodeURIComponent(stockData ? stockData.id : '');
+    var parentCount = (counts && counts.parents !== null && counts.parents !== undefined)
+      ? counts.parents : parents.length;
+    var progenyCount = (counts && counts.progeny !== null && counts.progeny !== undefined)
+      ? counts.progeny : progeny.length;
+    var relationshipCount = parentCount + progenyCount;
+    var visibleProgeny = progeny.slice(0, PEDIGREE_PROGENY_LIMIT);
+
+    function contribution(item, missingLabel) {
+      if (item.contribution_percent === null || item.contribution_percent === undefined) {
+        return missingLabel || '';
+      }
+      return item.contribution_percent + '%';
     }
 
-    if (!html) { return false; }
+    function mapNode(item, direction) {
+      var note = contribution(item, 'Contribution not reported');
+      return '<a class="stock-pedigree-node stock-pedigree-node-' + direction + '" href="' +
+        escape(item.html || '#') + '"><strong>' + escape(item.name) + '</strong>' +
+        '<span>' + escape(note) + '</span></a>';
+    }
+
+    function emptyGroup(message) {
+      return '<p class="stock-pedigree-empty">' + escape(message) + '</p>';
+    }
+
+    function relationshipRow(item, direction) {
+      var label = direction === 'parent' ? 'Parent' : 'Progeny';
+      var percent = contribution(item, 'Not reported');
+      var search = (label + ' ' + item.name + ' ' + percent).toLowerCase();
+      return '<tr data-pedigree-row data-search="' + escape(search) + '">' +
+        '<td><span class="mgdb-pill ' + (direction === 'parent' ? 'mgdb-pill-info' : 'mgdb-pill-ok') +
+        '">' + label + '</span></td>' +
+        '<th scope="row"><a href="' + escape(item.html || '#') + '">' + escape(item.name) + '</a></th>' +
+        '<td class="mgdb-numeric" data-value="' +
+        (item.contribution_percent === null || item.contribution_percent === undefined
+          ? '' : escape(item.contribution_percent)) + '">' + escape(percent) + '</td>' +
+        '</tr>';
+    }
+
+    var parentNodes = parents.length
+      ? parents.map(function (item) { return mapNode(item, 'parent'); }).join('')
+      : emptyGroup('No parents are recorded for this stock.');
+    var progenyNodes = visibleProgeny.length
+      ? visibleProgeny.map(function (item) { return mapNode(item, 'progeny'); }).join('')
+      : emptyGroup('No direct progeny are recorded for this stock.');
+    var graphNote = progenyCount > PEDIGREE_PROGENY_LIMIT
+      ? '<p class="stock-pedigree-map-note">Showing the first ' + PEDIGREE_PROGENY_LIMIT + ' of ' +
+        progenyCount.toLocaleString() + ' direct progeny. The table includes every recorded relationship.</p>'
+      : '';
+    var rows = parents.map(function (item) { return relationshipRow(item, 'parent'); })
+      .concat(progeny.map(function (item) { return relationshipRow(item, 'progeny'); })).join('');
+
+    var html = '<div class="stock-pedigree-summary">' +
+      '<dl class="stock-pedigree-metrics">' +
+        '<div><dt>Parents</dt><dd>' + parentCount.toLocaleString() + '</dd><span>All shown in the map</span></div>' +
+        '<div><dt>Direct progeny</dt><dd>' + progenyCount.toLocaleString() + '</dd><span>First ' +
+          Math.min(progenyCount, PEDIGREE_PROGENY_LIMIT).toLocaleString() + ' shown in the map</span></div>' +
+        '<div><dt>Known relationships</dt><dd>' + relationshipCount.toLocaleString() +
+          '</dd><span>Complete table available</span></div>' +
+      '</dl>' +
+      '<div class="stock-pedigree-toolbar">' +
+        '<div class="stock-pedigree-view-toggle" role="group" aria-label="Pedigree presentation">' +
+          '<button type="button" class="is-active" data-pedigree-view="map" aria-pressed="true" ' +
+            'aria-controls="stock-pedigree-map-panel">Graph</button>' +
+          '<button type="button" data-pedigree-view="table" aria-pressed="false" ' +
+            'aria-controls="stock-pedigree-table-panel">Table</button>' +
+        '</div>' +
+        '<div class="stock-pedigree-actions">' +
+          (network.interactive ? '<a class="mgdb-button mgdb-button-primary" href="' +
+            escape(network.interactive) + '">Explore full pedigree</a>' : '') +
+          '<button class="mgdb-button mgdb-button-secondary" type="button" data-pedigree-download>' +
+            'Download relationships</button>' +
+        '</div>' +
+      '</div>' +
+      '<div id="stock-pedigree-map-panel" data-pedigree-panel="map">' +
+        '<div class="stock-pedigree-map" aria-label="Direct parents and progeny of ' + escape(selectedName) + '">' +
+          '<section class="stock-pedigree-generation stock-pedigree-parents" aria-labelledby="stock-pedigree-parents-title">' +
+            '<h3 id="stock-pedigree-parents-title">Parents <span>' + parentCount.toLocaleString() + '</span></h3>' +
+            '<div class="stock-pedigree-node-grid">' + parentNodes + '</div>' +
+          '</section>' +
+          '<div class="stock-pedigree-flow" aria-hidden="true"><span>contributes to</span><b>&darr;</b></div>' +
+          '<div class="stock-pedigree-selected">' +
+            '<span>Selected stock</span><a href="' + escape(selectedHref) + '">' + escape(selectedName) + '</a>' +
+          '</div>' +
+          '<div class="stock-pedigree-flow" aria-hidden="true"><span>recorded parent of</span><b>&darr;</b></div>' +
+          '<section class="stock-pedigree-generation stock-pedigree-progeny" aria-labelledby="stock-pedigree-progeny-title">' +
+            '<h3 id="stock-pedigree-progeny-title">Direct progeny <span>' + progenyCount.toLocaleString() + '</span></h3>' +
+            '<div class="stock-pedigree-node-grid">' + progenyNodes + '</div>' + graphNote +
+          '</section>' +
+        '</div>' +
+      '</div>' +
+      '<div id="stock-pedigree-table-panel" data-pedigree-panel="table" hidden>' +
+        '<div class="stock-pedigree-table-tools">' +
+          '<label for="stock-pedigree-search">Search relationships</label>' +
+          '<input id="stock-pedigree-search" type="search" placeholder="Filter by stock name or relationship" ' +
+            'autocomplete="off">' +
+          '<span id="stock-pedigree-result-count" role="status">' + relationshipCount.toLocaleString() +
+            (relationshipCount === 1 ? ' relationship' : ' relationships') + '</span>' +
+        '</div>' +
+        '<div class="mgdb-table-scroll" tabindex="0" role="region" aria-label="Pedigree relationships table">' +
+          '<table class="mgdb-table stock-pedigree-table" id="stock-pedigree-table">' +
+            '<caption class="mgdb-visually-hidden">All recorded parent and progeny relationships for ' +
+              escape(selectedName) + '</caption>' +
+            '<thead><tr>' +
+              '<th scope="col" data-sort="text"><button type="button">Relationship</button></th>' +
+              '<th scope="col" data-sort="text"><button type="button">Stock</button></th>' +
+              '<th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Contribution</button></th>' +
+            '</tr></thead><tbody>' + rows + '</tbody>' +
+          '</table>' +
+        '</div>' +
+        '<p class="stock-pedigree-table-note">Contribution is shown only where it is currently recorded in MaizeGDB.</p>' +
+      '</div>' +
+    '</div>';
+
     els.pedigreeBody.innerHTML = html;
+    initPedigreeEvents(parents, progeny, selectedName);
     return true;
   }
 
-  function renderRelated(related, counts) {
+  function initPedigreeEvents(parents, progeny, selectedName) {
+    var buttons = els.pedigreeBody.querySelectorAll('[data-pedigree-view]');
+    var panels = els.pedigreeBody.querySelectorAll('[data-pedigree-panel]');
+    Array.prototype.forEach.call(buttons, function (button) {
+      button.addEventListener('click', function () {
+        var view = button.getAttribute('data-pedigree-view');
+        Array.prototype.forEach.call(buttons, function (candidate) {
+          var active = candidate === button;
+          candidate.classList.toggle('is-active', active);
+          candidate.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+        Array.prototype.forEach.call(panels, function (panel) {
+          panel.hidden = panel.getAttribute('data-pedigree-panel') !== view;
+        });
+        MGDB.announce('Showing pedigree as ' + view + '.');
+      });
+    });
+
+    var table = byId('stock-pedigree-table');
+    if (table) { MGDB.sortTable(table); }
+
+    var search = byId('stock-pedigree-search');
+    var resultCount = byId('stock-pedigree-result-count');
+    if (search && table && table.tBodies.length) {
+      search.addEventListener('input', MGDB.debounce(function () {
+        var query = search.value.toLowerCase().replace(/\s+/g, ' ').trim();
+        var shown = 0;
+        Array.prototype.forEach.call(table.tBodies[0].rows, function (row) {
+          var match = !query || (row.getAttribute('data-search') || '').indexOf(query) !== -1;
+          row.hidden = !match;
+          if (match) { shown += 1; }
+        });
+        if (resultCount) {
+          resultCount.textContent = shown.toLocaleString() + (shown === 1 ? ' relationship' : ' relationships');
+        }
+      }, 120));
+    }
+
+    var download = els.pedigreeBody.querySelector('[data-pedigree-download]');
+    if (download) {
+      download.addEventListener('click', function () {
+        function cell(value) { return '"' + String(value == null ? '' : value).replace(/"/g, '""') + '"'; }
+        var csvRows = [['Relationship', 'Stock', 'Contribution percent', 'Stock URL']];
+        parents.forEach(function (item) {
+          csvRows.push(['Parent', item.name, item.contribution_percent, item.html || '']);
+        });
+        progeny.forEach(function (item) {
+          csvRows.push(['Progeny', item.name, item.contribution_percent, item.html || '']);
+        });
+        var csv = csvRows.map(function (row) { return row.map(cell).join(','); }).join('\r\n') + '\r\n';
+        var blob = new window.Blob([csv], { type: 'text/csv;charset=utf-8' });
+        var url = window.URL.createObjectURL(blob);
+        var link = document.createElement('a');
+        link.href = url;
+        link.download = selectedName.replace(/[^A-Za-z0-9._-]+/g, '-') + '-pedigree.csv';
+        link.hidden = true;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.setTimeout(function () { window.URL.revokeObjectURL(url); }, 0);
+      });
+    }
+  }
+
+  function renderRelated(related, counts, stockData) {
     if (!related) { return false; }
     var html = '';
 
@@ -237,18 +386,40 @@
 
     var images = (related.images || []).concat(related.variation_images || []);
     if (images.length) {
+      var stockName = (stockData && stockData.attributes && stockData.attributes.name) ? stockData.attributes.name : (stockData ? stockData.id : 'Stock');
+      var imageCardsHtml = images.map(function (image, idx) {
+        var isVar = (image.subject === 'variation' && image.variation && image.variation.name);
+        var title = isVar ? image.variation.name : stockName;
+        var recordUrl = isVar ? (image.variation.html || ('/data_center/variation?id=' + encodeURIComponent(image.variation.id))) : ('/data_center/stock/' + encodeURIComponent(stockName));
+        var catName = isVar ? 'Variation / Mutant' : 'Stock & Germplasm';
+        var caption = image.caption || '';
+        var imgUrl = image.url;
+
+        return '<article class="mgdb-image-card" data-index="' + idx + '">' +
+          '  <div>' +
+          '    <figure class="image-card-figure" data-img-src="' + escape(imgUrl) + '" data-img-title="' + escape(title) + '" data-img-cat="' + escape(catName) + '" data-img-caption="' + escape(caption) + '" data-img-record="' + escape(recordUrl) + '">' +
+          '      <img src="' + escape(imgUrl) + '" alt="' + escape(caption || title) + '" loading="lazy" onerror="this.onerror=null;this.src=\'/images/logo.png\';this.style.objectFit=\'contain\';this.style.padding=\'16px\';" />' +
+          '    </figure>' +
+          '    <div class="image-card-body">' +
+          '      <div class="image-card-meta">' +
+          '        <span class="image-card-badge" data-cat="' + escape(catName) + '">' + escape(catName) + '</span>' +
+          '      </div>' +
+          '      <h3><a href="' + escape(recordUrl) + '">' + escape(title) + '</a></h3>' +
+          (caption ? '      <p class="image-card-caption">' + escape(caption) + '</p>' : '') +
+          '    </div>' +
+          '  </div>' +
+          '  <div class="image-card-links">' +
+          '    <button class="image-card-btn image-preview-btn" type="button" data-img-src="' + escape(imgUrl) + '" data-img-title="' + escape(title) + '" data-img-cat="' + escape(catName) + '" data-img-caption="' + escape(caption) + '" data-img-record="' + escape(recordUrl) + '">Zoom</button>' +
+          '    <a class="image-card-btn" href="' + escape(recordUrl) + '">Record &rarr;</a>' +
+          '    <button class="image-card-btn image-copy-btn" type="button" data-copy-value="' + escape(imgUrl) + '">Copy URL</button>' +
+          '  </div>' +
+          '</article>';
+      }).join('');
+
       html += block('Images',
         images.length + (images.length === 1 ? ' image' : ' images') +
         ' of this stock and of the variations it carries.',
-        '<ul class="stock-record-images">' + images.map(function (image) {
-          var caption = '';
-          if (image.variation) { caption += '<strong>' + escape(image.variation.name) + '</strong>'; }
-          if (image.caption) { caption += escape(image.caption); }
-          return '<li><figure><img src="' + escape(image.url) + '" alt="' +
-                 escape(image.caption || 'Stock image') + '" loading="lazy">' +
-                 (caption ? '<figcaption>' + caption + '</figcaption>' : '') +
-                 '</figure></li>';
-        }).join('') + '</ul>');
+        '<div class="stock-record-images">' + imageCardsHtml + '</div>');
     }
 
     var traits = related.trait_values || {};
@@ -261,21 +432,334 @@
 
     if (!html) { return false; }
     els.relatedBody.innerHTML = html;
+    initImageCardEvents();
     void counts;
     return true;
   }
 
+  /* ------------------------------------------------------------------------
+     Lightbox Events
+     ------------------------------------------------------------------------ */
+
+  function openLightbox(src, title, cat, caption, recordUrl) {
+    var modal = byId('image-lightbox-modal');
+    var img = byId('lightbox-img');
+    var badge = byId('lightbox-badge');
+    var titleEl = byId('lightbox-title');
+    var captionEl = byId('lightbox-caption');
+    var recordLink = byId('lightbox-record-link');
+    var downloadLink = byId('lightbox-download-link');
+    var copyBtn = byId('lightbox-copy-url-btn');
+
+    if (!modal || !img) return;
+
+    img.src = src;
+    img.alt = caption || title || 'Image preview';
+    if (badge) {
+      badge.textContent = cat || 'Media';
+      badge.setAttribute('data-cat', cat || 'Media');
+    }
+    if (titleEl) titleEl.textContent = title || 'Image Preview';
+    if (captionEl) captionEl.textContent = caption || 'No caption available.';
+    if (recordLink) {
+      recordLink.href = recordUrl || '#';
+      recordLink.hidden = !recordUrl;
+    }
+    if (downloadLink) downloadLink.href = src;
+    if (copyBtn) {
+      copyBtn.setAttribute('data-copy-value', src);
+      copyBtn.textContent = 'Copy URL';
+      copyBtn.classList.remove('mgdb-button-ok');
+    }
+
+    if (typeof modal.showModal === 'function') {
+      modal.showModal();
+    } else {
+      modal.setAttribute('open', '');
+    }
+  }
+
+  function closeLightbox() {
+    var modal = byId('image-lightbox-modal');
+    if (!modal) return;
+    if (typeof modal.close === 'function') {
+      modal.close();
+    } else {
+      modal.removeAttribute('open');
+    }
+  }
+
+  function initImageCardEvents() {
+    Array.prototype.forEach.call(document.querySelectorAll('.image-card-figure, .image-preview-btn'), function (el) {
+      el.addEventListener('click', function () {
+        var src = el.getAttribute('data-img-src');
+        var title = el.getAttribute('data-img-title');
+        var cat = el.getAttribute('data-img-cat');
+        var caption = el.getAttribute('data-img-caption');
+        var recordUrl = el.getAttribute('data-img-record');
+        openLightbox(src, title, cat, caption, recordUrl);
+      });
+    });
+
+    Array.prototype.forEach.call(document.querySelectorAll('.image-copy-btn'), function (btn) {
+      btn.addEventListener('click', function () {
+        var val = btn.getAttribute('data-copy-value');
+        if (!val) return;
+        copyToClipboard(val, btn, 'URL copied!');
+      });
+    });
+
+    var closeBtn = byId('lightbox-close-btn');
+    if (closeBtn) {
+      closeBtn.onclick = closeLightbox;
+    }
+
+    var modal = byId('image-lightbox-modal');
+    if (modal) {
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) {
+          closeLightbox();
+        }
+      });
+    }
+
+    var lbCopyBtn = byId('lightbox-copy-url-btn');
+    if (lbCopyBtn) {
+      lbCopyBtn.addEventListener('click', function () {
+        var val = lbCopyBtn.getAttribute('data-copy-value');
+        if (!val) return;
+        copyToClipboard(val, lbCopyBtn, 'URL copied!');
+      });
+    }
+  }
+
+  function renderTypsim(typsim) {
+    if (!typsim || !typsim.available) { return false; }
+
+    var matches = typsim.top_matches || [];
+    var tableRows = matches.map(function (m) {
+      var percent = m.similarity_percent.toFixed(2);
+      var selfClass = m.is_self ? ' class="is-self"' : '';
+      var selfBadge = m.is_self ? ' <span class="mgdb-pill mgdb-pill-ok">Self</span>' : '';
+      var lineLink = '<a href="' + escape(m.html) + '"><strong>' + escape(m.line) + '</strong></a>' +
+                     (m.accession ? ' <small class="mgdb-muted">(' + escape(m.accession) + ')</small>' : '') +
+                     selfBadge;
+
+      return '<tr' + selfClass + '>' +
+        '<td>#' + m.rank + '</td>' +
+        '<td>' + lineLink + '</td>' +
+        '<td class="stock-typsim-bar-cell">' +
+          '<div class="stock-typsim-bar"><i style="width:' + percent + '%"></i></div>' +
+        '</td>' +
+        '<td><strong>' + percent + '%</strong></td>' +
+        '<td><small class="mgdb-muted">' + (m.divergence * 100).toFixed(2) + '%</small></td>' +
+        '<td><a href="' + escape(m.html) + '">Stock record &rarr;</a></td>' +
+      '</tr>';
+    }).join('');
+
+    var tableHtml = '<div class="stock-typsim-table-wrap">' +
+      '<table class="stock-typsim-table">' +
+        '<thead><tr>' +
+          '<th>Rank</th>' +
+          '<th>Accession / Line</th>' +
+          '<th>IBS Similarity</th>' +
+          '<th>Score</th>' +
+          '<th>Divergence</th>' +
+          '<th>Action</th>' +
+        '</tr></thead>' +
+        '<tbody>' + tableRows + '</tbody>' +
+      '</table>' +
+    '</div>';
+
+    var html = '<div class="stock-typsim-card">' +
+      '<div class="stock-typsim-header">' +
+        '<div>' +
+          '<h3>Ames Diversity Panel Genetic Similarity</h3>' +
+          '<p>Identity-by-state &#40;IBS&#41; genetic relationships scored across ' +
+          typsim.total_compared.toLocaleString() + ' panel accessions. Showing top closest relatives.</p>' +
+        '</div>' +
+        '<a class="mgdb-button mgdb-button-primary" href="' + escape(typsim.tool_url) + '" target="_blank" rel="noopener">' +
+          'Open in TYPSimSelector &nearr;' +
+        '</a>' +
+      '</div>' +
+      tableHtml +
+    '</div>';
+
+    els.typsimBody.innerHTML = html;
+    return true;
+  }
+
+  /* ------------------------------------------------------------------------
+     References with Pagination
+     ------------------------------------------------------------------------ */
+
   function renderReferences(references) {
     if (!references || !references.length) { return false; }
-    els.referencesBody.innerHTML = '<ul class="stock-record-references">' +
-      references.map(function (reference) {
-        var title = reference.title || reference.citation || 'Untitled reference';
-        return '<li><h3><a href="' + escape(reference.html) + '">' + escape(title) + '</a></h3>' +
-          (reference.citation ? '<p>' + escape(reference.citation) +
-            (reference.relevance ? ' &middot; ' + escape(reference.relevance) : '') + '</p>' : '') +
-          '</li>';
-      }).join('') + '</ul>';
+    allReferences = references;
+    refCurrentPage = 1;
+    renderReferencePage();
     return true;
+  }
+
+  function renderReferencePage() {
+    var total = allReferences.length;
+    var totalPages = Math.ceil(total / REF_PAGE_SIZE);
+    if (refCurrentPage > totalPages) refCurrentPage = totalPages;
+    if (refCurrentPage < 1) refCurrentPage = 1;
+
+    var start = (refCurrentPage - 1) * REF_PAGE_SIZE;
+    var end = Math.min(start + REF_PAGE_SIZE, total);
+    var pageSlice = allReferences.slice(start, end);
+
+    var html = pageSlice.map(function (ref) {
+      var yearBadge = ref.year ? '<span class="reference-year">' + ref.year + '</span>' : '';
+      var topicBadge = ref.relevance ? '<span class="mgdb-pill mgdb-pill-ok">' + escape(ref.relevance) + '</span>' : '';
+      var typeBadge = ref.pub_type ? '<span class="mgdb-pill mgdb-pill-info">' + escape(ref.pub_type) + '</span>' : '<span class="mgdb-pill mgdb-pill-info">Journal article</span>';
+      var idBadge = ref.id ? '<span class="reference-copy-id">ID: ' + ref.id + '</span>' : '';
+
+      var title = ref.title || ref.citation || 'Untitled reference';
+      var authors = ref.authors ? '<p class="reference-card-authors">' + escape(ref.authors) + '</p>' : '';
+      var citation = ref.citation ? '<p class="reference-card-journal">' + escape(ref.citation) + '</p>' : '';
+
+      var readBtn = ref.doi
+        ? '<a class="mgdb-button mgdb-button-quiet" href="https://doi.org/' + encodeURIComponent(ref.doi) + '" target="_blank" rel="noopener">Read paper &nearr;</a>'
+        : '';
+
+      var fullCitation = (ref.authors ? ref.authors + '. ' : '') +
+                         (ref.year ? '(' + ref.year + '). ' : '') +
+                         title + '. ' +
+                         (ref.citation ? ref.citation + '. ' : '') +
+                         (ref.doi ? 'doi:' + ref.doi : '');
+
+      return '<article class="reference-result-card">' +
+        '<div>' +
+          '<div class="reference-result-meta">' +
+            yearBadge + topicBadge + typeBadge + idBadge +
+          '</div>' +
+          '<h3 class="reference-card-title"><a href="' + escape(ref.html) + '">' + escape(title) + '</a></h3>' +
+          authors +
+          citation +
+        '</div>' +
+        '<div class="reference-card-actions">' +
+          '<a class="mgdb-button mgdb-button-secondary" href="' + escape(ref.html) + '">Reference record &rarr;</a>' +
+          readBtn +
+          '<button class="mgdb-button mgdb-button-quiet" type="button" data-copy-citation="' + escape(fullCitation) + '">Copy citation</button>' +
+          (ref.doi ? '<button class="mgdb-button mgdb-button-quiet" type="button" data-copy-doi="' + escape(ref.doi) + '">Copy DOI</button>' : '') +
+        '</div>' +
+      '</article>';
+    }).join('');
+
+    els.referencesBody.innerHTML = html;
+    bindReferenceCopyHandlers();
+
+    if (els.referencesStatus) {
+      els.referencesStatus.textContent = 'Showing ' + (start + 1) + '–' + end + ' of ' + total.toLocaleString() + ' curated publications, newest first.';
+    }
+
+    renderReferencePagination(totalPages);
+  }
+
+  function renderReferencePagination(totalPages) {
+    if (!els.referencesPagination) return;
+    if (totalPages <= 1) {
+      show(els.referencesPagination, false);
+      return;
+    }
+
+    var html = '';
+    html += '<button class="stock-page-btn" type="button" data-ref-page="' + (refCurrentPage - 1) + '" ' +
+            (refCurrentPage === 1 ? 'disabled' : '') + ' aria-label="Previous page">&larr; Prev</button>';
+
+    var pages = [];
+    for (var p = 1; p <= totalPages; p++) {
+      if (p === 1 || p === totalPages || (p >= refCurrentPage - 1 && p <= refCurrentPage + 1)) {
+        pages.push(p);
+      } else if (pages[pages.length - 1] !== '...') {
+        pages.push('...');
+      }
+    }
+
+    pages.forEach(function (page) {
+      if (page === '...') {
+        html += '<span class="stock-page-ellipsis" aria-hidden="true">&hellip;</span>';
+      } else {
+        var active = (page === refCurrentPage);
+        html += '<button class="stock-page-btn' + (active ? ' is-active' : '') + '" type="button" data-ref-page="' + page + '"' +
+                (active ? ' aria-current="page"' : '') + '>' + page + '</button>';
+      }
+    });
+
+    html += '<button class="stock-page-btn" type="button" data-ref-page="' + (refCurrentPage + 1) + '" ' +
+            (refCurrentPage === totalPages ? 'disabled' : '') + ' aria-label="Next page">Next &rarr;</button>';
+
+    els.referencesPagination.innerHTML = html;
+    show(els.referencesPagination, true);
+
+    Array.prototype.forEach.call(els.referencesPagination.querySelectorAll('[data-ref-page]'), function (btn) {
+      btn.addEventListener('click', function () {
+        var targetPage = parseInt(btn.getAttribute('data-ref-page'), 10);
+        if (!isNaN(targetPage) && targetPage >= 1 && targetPage <= totalPages && targetPage !== refCurrentPage) {
+          refCurrentPage = targetPage;
+          renderReferencePage();
+          var refSection = byId('stock-record-references');
+          if (refSection) {
+            refSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+      });
+    });
+  }
+
+  function bindReferenceCopyHandlers() {
+    Array.prototype.forEach.call(els.referencesBody.querySelectorAll('[data-copy-citation]'), function (btn) {
+      btn.addEventListener('click', function () {
+        var text = btn.getAttribute('data-copy-citation');
+        copyToClipboard(text, btn, 'Citation copied!');
+      });
+    });
+
+    Array.prototype.forEach.call(els.referencesBody.querySelectorAll('[data-copy-doi]'), function (btn) {
+      btn.addEventListener('click', function () {
+        var doi = btn.getAttribute('data-copy-doi');
+        copyToClipboard('https://doi.org/' + doi, btn, 'DOI copied!');
+      });
+    });
+  }
+
+  function copyToClipboard(text, btn, feedback) {
+    if (!navigator.clipboard) {
+      fallbackCopy(text, btn, feedback);
+      return;
+    }
+    navigator.clipboard.writeText(text).then(function () {
+      showCopyFeedback(btn, feedback);
+    }).catch(function () {
+      fallbackCopy(text, btn, feedback);
+    });
+  }
+
+  function fallbackCopy(text, btn, feedback) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand('copy');
+      showCopyFeedback(btn, feedback);
+    } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
+  function showCopyFeedback(btn, feedback) {
+    var original = btn.textContent;
+    btn.textContent = feedback;
+    btn.classList.add('mgdb-button-ok');
+    setTimeout(function () {
+      btn.textContent = original;
+      btn.classList.remove('mgdb-button-ok');
+    }, 2000);
   }
 
   function renderOffsite(offsite) {
@@ -283,7 +767,7 @@
     els.offsiteBody.innerHTML = '<dl class="stock-record-grid">' +
       offsite.map(function (entry) {
         return '<div><dt>' + escape(entry.database) + '</dt><dd><a href="' +
-               escape(entry.url) + '">' + escape(entry.accession) + '</a></dd></div>';
+               escape(entry.url) + '" target="_blank" rel="noopener">' + escape(entry.accession) + ' &nearr;</a></dd></div>';
       }).join('') + '</dl>';
     return true;
   }
@@ -293,8 +777,6 @@
 
     var details = grin.details;
     if (!details) {
-      // The accession is ours and is always known; the detail behind it is
-      // not. Say which is which rather than showing an empty section.
       els.grinBody.innerHTML = '<dl class="stock-record-grid">' +
         '<div><dt>Accession</dt><dd>' + escape(grin.accession) + '</dd></div></dl>' +
         '<p class="stock-record-empty">The GRIN service did not return details for this ' +
@@ -343,8 +825,9 @@
   function buildTabs(rendered, counts) {
     var labels = {
       'stock-record-overview': 'Overview',
-      'stock-record-pedigree': 'Pedigree',
+      'stock-record-pedigree': 'Pedigree & relationships',
       'stock-record-related': 'Related records',
+      'stock-record-typsim': 'Genetic similarity',
       'stock-record-references': 'References',
       'stock-record-offsite': 'Offsite',
       'stock-record-grin': 'GRIN'
@@ -409,8 +892,9 @@
 
     var rendered = [];
     if (renderOverview(sections.overview)) { rendered.push('stock-record-overview'); }
-    if (renderPedigree(sections.pedigree)) { rendered.push('stock-record-pedigree'); }
-    if (renderRelated(sections.related, counts)) { rendered.push('stock-record-related'); }
+    if (renderPedigree(sections.pedigree, data, counts)) { rendered.push('stock-record-pedigree'); }
+    if (renderRelated(sections.related, counts, data)) { rendered.push('stock-record-related'); }
+    if (renderTypsim(sections.typsim)) { rendered.push('stock-record-typsim'); }
     if (renderReferences(sections.references)) { rendered.push('stock-record-references'); }
     if (renderOffsite(sections.offsite)) { rendered.push('stock-record-offsite'); }
     if (renderGrin(sections.grin)) { rendered.push('stock-record-grin'); }
@@ -418,8 +902,6 @@
     rendered.forEach(function (id) { show(byId(id), true); });
     buildTabs(rendered, counts);
 
-    // Anything the API had to hold back is said out loud rather than left to
-    // look like the record simply has less in it than it does.
     var notices = [];
     (meta.truncated || []).forEach(function (list) {
       var key = list.split('.').pop();
@@ -473,7 +955,10 @@
       overviewBody: byId('stock-record-overview-body'),
       pedigreeBody: byId('stock-record-pedigree-body'),
       relatedBody: byId('stock-record-related-body'),
+      typsimBody: byId('stock-record-typsim-body'),
       referencesBody: byId('stock-record-references-body'),
+      referencesStatus: byId('stock-record-references-status'),
+      referencesPagination: byId('stock-record-references-pagination'),
       offsiteBody: byId('stock-record-offsite-body'),
       grinBody: byId('stock-record-grin-body'),
       apiLink: byId('stock-record-api-link')

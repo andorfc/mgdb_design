@@ -189,7 +189,7 @@ function wb_e($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
     <pre class="wb-code"><code>include_once('./include/page_header_lib.php');
 $bauplan-&gt;includeCss('/css/mgdb-page-header.css');
 
-$body = $mgdb-&gt;get('body')-&gt;loadRemote(...);
+$body = $mgdb-&gt;get('body')-&gt;load('templates/static/mgdb_stock.bau');
 $body-&gt;get('page-header')-&gt;replace(mgdb_page_header(array\(
   'title' =&gt; 'Stock search',
   'lede'  =&gt; 'Find maize genetic stocks.',

@@ -7,7 +7,7 @@ $$SYNTAX-LEVEL 2
 
 <main class="mgdb-page mgdb-stock-record-page" id="stock-record-top" data-stock-id="$(stock_id)">
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
-    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data centers</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/stock">Stock Center</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(stock_name)</span>
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/stock">Stock Center</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(stock_name)</span>
   </nav>
 
   <header class="mgdb-hero-record">
@@ -43,8 +43,8 @@ $$SYNTAX-LEVEL 2
 
   <section id="stock-record-pedigree" aria-labelledby="stock-record-pedigree-title" hidden>
     <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Ancestry</span><h2 id="stock-record-pedigree-title">Pedigree</h2></div>
-      <p>Coefficient of parentage is shown where it has been calculated.</p>
+      <div><span class="mgdb-eyebrow">Ancestry &amp; descendants</span><h2 id="stock-record-pedigree-title">Pedigree &amp; relationships</h2></div>
+      <p>Explore every recorded parent and direct progeny. Contribution is shown where it has been calculated.</p>
     </div>
     <div id="stock-record-pedigree-body"></div>
   </section>
@@ -57,41 +57,78 @@ $$SYNTAX-LEVEL 2
     <div id="stock-record-related-body"></div>
   </section>
 
+  <section id="stock-record-typsim" aria-labelledby="stock-record-typsim-title" hidden>
+    <div class="mgdb-section-heading">
+      <div><span class="mgdb-eyebrow">Genetic similarity &middot; Ames Diversity Panel</span><h2 id="stock-record-typsim-title">TYPSimSelector similarity</h2></div>
+      <p>Identity-by-state &#40;IBS&#41; genetic similarity scores computed across 4,400+ diverse maize accessions in the USDA Ames Diversity Panel.</p>
+    </div>
+    <div id="stock-record-typsim-body"></div>
+  </section>
+
   <section id="stock-record-references" aria-labelledby="stock-record-references-title" hidden>
     <div class="mgdb-section-heading">
       <div><span class="mgdb-eyebrow">Literature</span><h2 id="stock-record-references-title">References</h2></div>
-      <p>Papers curated against this record, newest first.</p>
+      <p id="stock-record-references-status">Curated publications associated with this genetic stock, newest first.</p>
     </div>
     <div id="stock-record-references-body"></div>
+    <nav id="stock-record-references-pagination" class="stock-pagination" aria-label="Reference result pages" hidden></nav>
   </section>
 
   <section id="stock-record-offsite" aria-labelledby="stock-record-offsite-title" hidden>
     <div class="mgdb-section-heading">
       <div><span class="mgdb-eyebrow">Elsewhere</span><h2 id="stock-record-offsite-title">Offsite resources</h2></div>
-      <p>This stock&rsquo;s accessions in other databases.</p>
+      <p>This stock&rsquo;s accessions in external public databases.</p>
     </div>
     <div id="stock-record-offsite-body"></div>
   </section>
 
   <section id="stock-record-grin" aria-labelledby="stock-record-grin-title" hidden>
     <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">USDA germplasm</span><h2 id="stock-record-grin-title">GRIN</h2></div>
-      <p>Read live from the USDA Germplasm Resources Information Network.</p>
+      <div><span class="mgdb-eyebrow">USDA germplasm</span><h2 id="stock-record-grin-title">GRIN accession details</h2></div>
+      <p>Retrieved live from the USDA Germplasm Resources Information Network.</p>
     </div>
     <div id="stock-record-grin-body"></div>
   </section>
 
-  <section class="mgdb-resource-panel" aria-labelledby="stock-record-next-title">
-    <div>
-      <span class="mgdb-eyebrow">Keep going</span>
-      <h2 id="stock-record-next-title">From this stock</h2>
-      <p>The searches and tools that take a single record further.</p>
+  <section id="stock-record-next" class="mgdb-resource-panel" aria-labelledby="stock-record-next-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Connected tools</span>
+        <h2 id="stock-record-next-title">Related resources</h2>
+      </div>
+      <p>Explore related genomic hubs, phenotype catalogs, and germplasm tools at MaizeGDB.</p>
     </div>
     <div class="mgdb-resource-list">
-      <a href="/data_center/stock"><strong>Search stocks</strong><span>Find related germplasm by type, provider, parentage, or variation.</span></a>
-      <a href="https\://maizecoopsc.org/"><strong>Stock Center</strong><span>Availability and ordering for the stocks it distributes.</span></a>
-      <a href="/data_center/phenotype"><strong>Phenotype records</strong><span>The traits curated against maize stocks.</span></a>
-      <a href="https\://wgs.maizegdb.org/"><strong>SNPversity 2.0</strong><span>Genotype data across the diversity panels.</span></a>
+      <a href="/data_center/stock">
+        <strong>Search Genetic Stocks</strong>
+        <span>Find related germplasm by stock type, provider, parentage, or variation</span>
+        <span class="mgdb-resource-badge">Internal</span>
+      </a>
+      <a href="https\://maizecoopsc.org/" target="_blank" rel="noopener">
+        <strong>Maize Genetics COOP Stock Center</strong>
+        <span>Availability and seed ordering for distributed mutant and inbred stocks</span>
+        <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+      </a>
+      <a href="/data_center/phenotype">
+        <strong>Phenotype Data Hub</strong>
+        <span>Observable traits, mutant descriptions, and Plant Ontology terms</span>
+        <span class="mgdb-resource-badge">Internal</span>
+      </a>
+      <a href="/TYPSimSelector">
+        <strong>TYPSimSelector Workspace</strong>
+        <span>Rank Ames Diversity Panel lines by identity-by-state genetic similarity</span>
+        <span class="mgdb-resource-badge">Internal</span>
+      </a>
+      <a href="/data_center/variation">
+        <strong>Variations &amp; Alleles Data Hub</strong>
+        <span>Over 1.7 million curated variations, gene mutations, and allele descriptors</span>
+        <span class="mgdb-resource-badge">Internal</span>
+      </a>
+      <a href="/cite">
+        <strong>How to Cite MaizeGDB</strong>
+        <span>Guidelines and citation formats for database records, tools, and datasets</span>
+        <span class="mgdb-resource-badge">Internal</span>
+      </a>
     </div>
   </section>
 
@@ -100,5 +137,27 @@ $$SYNTAX-LEVEL 2
     <a id="stock-record-api-link" href="/api/v1/records/stock/$(stock_id)">View this record as JSON</a>
     &middot; <a href="/api/v1/openapi">API documentation</a>
   </p>
+
+  <!-- Lightbox Modal -->
+  <dialog id="image-lightbox-modal" class="image-lightbox-modal" aria-labelledby="lightbox-title">
+    <div class="lightbox-dialog-content">
+      <button id="lightbox-close-btn" class="lightbox-close-btn" type="button" aria-label="Close preview">&times;</button>
+      <div class="lightbox-image-wrap">
+        <img id="lightbox-img" src="" alt="Full size image preview" />
+      </div>
+      <div class="lightbox-details">
+        <div class="lightbox-meta">
+          <span id="lightbox-badge" class="image-card-badge"></span>
+          <h3 id="lightbox-title"></h3>
+        </div>
+        <p id="lightbox-caption"></p>
+        <div class="lightbox-actions">
+          <a id="lightbox-record-link" class="mgdb-button mgdb-button-primary" href="#">View Database Record &rarr;</a>
+          <a id="lightbox-download-link" class="mgdb-button mgdb-button-secondary" href="#" target="_blank" rel="noopener noreferrer">Open Original File &nearr;</a>
+          <button id="lightbox-copy-url-btn" class="mgdb-button mgdb-button-quiet" type="button">Copy URL</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
 </main>
 )

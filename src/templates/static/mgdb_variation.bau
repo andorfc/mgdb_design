@@ -1,0 +1,358 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-variation
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https://maizegdb.org/data_center/variation">
+<meta property="og:title" content="MaizeGDB Variations & Alleles | Genetic Variants Data Hub">
+<meta property="og:description" content="Search over 1.7 million curated maize variations, alleles, gene mutations, phenotypic effects, and available genetic stocks.">
+
+<main class="mgdb-page mgdb-variation-page" id="mgdb-variation-main">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Variations &amp; Alleles</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="variation-title">
+    <div class="mgdb-hero-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="DNA double helix and variation mutation icon">
+        <path d="M28 20 C40 32, 56 32, 68 20 M28 76 C40 64, 56 64, 68 76 M28 48 C40 36, 56 60, 68 48 M28 34 C48 34, 48 62, 68 62 M28 62 C48 62, 48 34, 68 34" fill="none" stroke="#235c37" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="48" cy="48" r="6" fill="#d99a0b"/>
+        <circle cx="28" cy="20" r="4.5" fill="#235c37"/>
+        <circle cx="68" cy="20" r="4.5" fill="#235c37"/>
+        <circle cx="28" cy="76" r="4.5" fill="#235c37"/>
+        <circle cx="68" cy="76" r="4.5" fill="#235c37"/>
+      </svg>
+      <strong>Variations &amp;<br />Alleles</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; August 2026</p>
+      <h1 id="variation-title">Explore maize variations, alleles, and mutant stocks</h1>
+      <p class="mgdb-hero-description">Discover over 1.7 million curated maize variations, mutant alleles, transposon insertions, chemically induced mutations, phenotypic consequences, and associated germplasm stocks.</p>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Variation resource sections">
+    <a href="#variation-search-section">Search variations</a>
+    <a href="#variation-collections">Mutant collections</a>
+    <a href="#variation-downloads">Bulk downloads</a>
+    <a href="#variation-statistics">Corpus statistics</a>
+    <a href="#variation-related">Related resources</a>
+  </nav>
+
+  <section id="variation-search-section" class="variation-search-panel" aria-labelledby="variation-search-title">
+    <div class="variation-search-header">
+      <div>
+        <span class="mgdb-eyebrow">Interactive finder</span>
+        <h2 id="variation-search-title">Search &amp; filter maize variations</h2>
+      </div>
+      <p>Search by variation name, gene symbol, allele descriptor, phenotype, or mutagen.</p>
+    </div>
+
+    <form id="variation-search-form" class="variation-search-form" role="search">
+      <div class="variation-field-query">
+        <label for="variation-query">Search term</label>
+        <div class="variation-query-control">
+          <svg class="variation-search-icon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="7" r="5"/><line x1="11" y1="11" x2="15" y2="15"/></svg>
+          <input id="variation-query" name="term" type="search" placeholder="Try wx1-m1, bz1-mum9, tb1-ref, cl1-4, dek1-1, kn1-1, Ac/Ds, or EMS…" autocomplete="off" />
+          <button id="variation-query-clear" type="button" hidden>Clear</button>
+        </div>
+      </div>
+
+      <div class="variation-field">
+        <label for="variation-type">Variation type</label>
+        <select id="variation-type" name="type">
+          $(type_options)
+        </select>
+      </div>
+
+      <div class="variation-field">
+        <label for="variation-dominance">Dominance</label>
+        <select id="variation-dominance" name="dominance">
+          $(dominance_options)
+        </select>
+      </div>
+
+      <div class="variation-field">
+        <label for="variation-viability">Viability</label>
+        <select id="variation-viability" name="viability">
+          $(viability_options)
+        </select>
+      </div>
+
+      <div class="variation-field">
+        <label for="variation-mutagen">Mutagen &amp; origin</label>
+        <select id="variation-mutagen" name="mutagen">
+          $(mutagen_options)
+        </select>
+      </div>
+
+      <div class="variation-field">
+        <label for="variation-phenotype">Phenotypic effect</label>
+        <select id="variation-phenotype" name="phenotype">
+          $(phenotype_options)
+        </select>
+      </div>
+
+      <div class="variation-field-options">
+        <label class="variation-checkbox-label">
+          <input type="checkbox" id="variation-has-stock" name="has_stock" value="1" />
+          <span>Only variations with available stocks</span>
+        </label>
+      </div>
+
+      <div class="variation-search-submit">
+        <button class="mgdb-button mgdb-button-primary" type="submit">Search variations</button>
+      </div>
+
+      <div class="variation-example-row" aria-label="Example variation searches">
+        <span>Examples</span>
+        <button type="button" data-var-example="wx1-m1">wx1-m1</button>
+        <button type="button" data-var-example="bz1-mum9">bz1-mum9</button>
+        <button type="button" data-var-example="tb1-ref">tb1-ref</button>
+        <button type="button" data-var-example="cl1-4">cl1-4</button>
+        <button type="button" data-var-example="dek1-1">dek1-1</button>
+        <button type="button" data-var-example="kn1-1">kn1-1</button>
+        <button type="button" data-var-example="Ac/Ds">Ac/Ds insertions</button>
+        <button type="button" data-var-example="EMS">EMS alleles</button>
+      </div>
+    </form>
+  </section>
+
+  <section id="variation-results-section" class="variation-results-section" aria-labelledby="variation-results-title">
+    <div class="variation-results-heading">
+      <div>
+        <span class="mgdb-eyebrow">Search results</span>
+        <h2 id="variation-results-title">Matching variations &amp; alleles</h2>
+        <p id="variation-results-status" aria-live="polite">Enter a search term above or choose a filter to inspect variations.</p>
+      </div>
+      <div class="variation-results-controls">
+        <div class="variation-view-toggle" role="group" aria-label="View style">
+          <button class="variation-view-btn" type="button" data-view="card" aria-pressed="false">
+            <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>Cards
+          </button>
+          <button class="variation-view-btn is-active" type="button" data-view="table" aria-pressed="true">
+            <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><rect x="1" y="2" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="12" width="14" height="2" rx="1" fill="currentColor"/></svg>Table
+          </button>
+        </div>
+        <div class="variation-sort-control">
+          <label for="variation-sort" class="mgdb-visually-hidden">Sort results</label>
+          <select id="variation-sort">
+            <option value="relevance">Sort&#58; Relevance</option>
+            <option value="name-asc">Sort&#58; Name A&ndash;Z</option>
+            <option value="name-desc">Sort&#58; Name Z&ndash;A</option>
+            <option value="locus-asc">Sort&#58; Locus A&ndash;Z</option>
+            <option value="type-asc">Sort&#58; Variation Type</option>
+          </select>
+        </div>
+        <div class="variation-export-buttons">
+          <a class="mgdb-button mgdb-button-quiet" id="variation-export-tsv" href="#" download>Export TSV</a>
+          <a class="mgdb-button mgdb-button-quiet" id="variation-export-csv" href="#" download>Export CSV</a>
+        </div>
+      </div>
+    </div>
+
+    <div id="variation-results" class="variation-results-container variation-view-table"></div>
+
+    <div id="variation-empty" class="mgdb-empty" hidden>
+      <h3>No variations matched your query</h3>
+      <p>Try searching with a broader keyword \(e.g. <code>wx1</code>, <code>sh2</code>, <code>insertion</code>\) or resetting type and mutagen filters.</p>
+      <button class="mgdb-button mgdb-button-secondary" id="variation-empty-reset" type="button">Reset search</button>
+    </div>
+
+    <nav id="variation-pagination" class="variation-pagination" aria-label="Search result pages"></nav>
+  </section>
+
+  <section id="variation-collections" aria-labelledby="variation-collections-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Mutant resources &amp; pipelines</span>
+        <h2 id="variation-collections-title">Explore mutant archives &amp; variant tools</h2>
+      </div>
+      <p>Dedicated tools and historical mutant collections supporting maize functional genomics and allele discovery.</p>
+    </div>
+
+    <div class="mgdb-card-grid variation-collection-grid">
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-ok">Modern Workspace</span>
+        <h3>SNPTools &amp; SNPVersity</h3>
+        <p>Interactive discovery workspace for exploring maize single nucleotide polymorphisms, pan-genome diversity, and predicted variant consequences.</p>
+        <a href="https\://snptools.maizegdb.org/" target="_blank" rel="noopener">Open SNPTools <span aria-hidden="true">&nearr;</span></a>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-info">Pan-Genome Effects</span>
+        <h3>PanEffect Browser</h3>
+        <p>Explore predicted missense variant effects across the NAM founder lines and maize pan-genome accessions.</p>
+        <a href="/effect/maize_v2/">Open PanEffect <span aria-hidden="true">&rarr;</span></a>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-warn">Transposon Mutants</span>
+        <h3>UniformMu Resource</h3>
+        <p>Over 31,000 sequence-indexed Robertson&rsquo;s Mutator insertion alleles with cosegregating seedling and ear traits in uniform W22 background.</p>
+        <a href="/uniformmu">Explore UniformMu <span aria-hidden="true">&rarr;</span></a>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill">Stock Repository</span>
+        <h3>Maize Genetics COOP Stocks</h3>
+        <p>Order curated seed stocks, mutant lines, and chromosome chromosome translocations directly from the COOP stock center.</p>
+        <a href="/data_center/stock">Order Stocks <span aria-hidden="true">&rarr;</span></a>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-ok">Observable Traits</span>
+        <h3>Phenotype Data Hub</h3>
+        <p>Curated mutant phenotypes, anatomical body parts, and Plant Ontology trait associations linked to maize variations.</p>
+        <a href="/data_center/phenotype">Explore Phenotypes <span aria-hidden="true">&rarr;</span></a>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill">Chemical Mutagenesis</span>
+        <h3>EMS Mutagenesis Portal</h3>
+        <p>Ethyl methanesulfonate induced mutant allele listings, forward genetic screens, and phenotypic characterizations.</p>
+        <a href="/tools/ems-phenotype">View EMS Mutants <span aria-hidden="true">&rarr;</span></a>
+      </article>
+    </div>
+  </section>
+
+  <section id="variation-downloads" aria-labelledby="variation-downloads-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Bulk data</span>
+        <h2 id="variation-downloads-title">Variation downloads &amp; datasets</h2>
+      </div>
+      <p>Download comprehensive variation catalogs, allele descriptors, and mutant annotations for offline computational research.</p>
+    </div>
+
+    <div class="variation-download-grid" aria-label="Variation downloads">
+      <article class="variation-download-card">
+        <div class="variation-download-header">
+          <span class="mgdb-pill mgdb-pill-ok">Full TSV</span>
+          <h3>Tabulated Variation Catalog</h3>
+        </div>
+        <p>Complete curated variation catalog with gene symbols, allele descriptors, dominance, viability, mutagens, and stock links in TSV format.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="/search/variation/variation_search_api.php?format=tsv">Download Full TSV <span aria-hidden="true">&darr;</span></a>
+      </article>
+
+      <article class="variation-download-card">
+        <div class="variation-download-header">
+          <span class="mgdb-pill mgdb-pill-info">CSV Export</span>
+          <h3>Tabulated Variation CSV</h3>
+        </div>
+        <p>Comma-separated export of curated variations, phenotypes, and mutagens suitable for spreadsheet applications and Python/R analysis.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="/search/variation/variation_search_api.php?format=csv">Download Full CSV <span aria-hidden="true">&darr;</span></a>
+      </article>
+
+      <article class="variation-download-card">
+        <div class="variation-download-header">
+          <span class="mgdb-pill mgdb-pill-warn">AI Ready</span>
+          <h3>Variant Effect Scores</h3>
+        </div>
+        <p>Protein language model ESM variant effect scores computed across B73, W22, and NAM founder genomes.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="https\://iastate.app.box.com/v/maizegdb-public/folder/362583128761" target="_blank" rel="noopener">Download ESM Scores <span aria-hidden="true">&nearr;</span></a>
+      </article>
+    </div>
+  </section>
+
+  <section id="variation-statistics" aria-labelledby="variation-statistics-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Corpus summary</span>
+        <h2 id="variation-statistics-title">Variation collection at a glance</h2>
+      </div>
+      <p>Comprehensive overview of curated natural and induced genetic variants in the MaizeGDB repository.</p>
+    </div>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Curated Variations</h3>
+          <span class="mgdb-metric-badge">Alleles</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(total_variations)</strong>
+        </div>
+        <p class="mgdb-metric-description">Total alleles, DNA polymorphisms, and transposon insertions.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Gene Associations</h3>
+          <span class="mgdb-metric-badge">Loci</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(locus_count)</strong>
+        </div>
+        <p class="mgdb-metric-description">Variations mapped to characterized genes and genomic loci.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Phenotype Effects</h3>
+          <span class="mgdb-metric-badge">Phenotypes</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(phenotype_count)</strong>
+        </div>
+        <p class="mgdb-metric-description">Mutant alleles with documented phenotypic consequences.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Germplasm Stocks</h3>
+          <span class="mgdb-metric-badge">Stocks</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(stock_count)</strong>
+        </div>
+        <p class="mgdb-metric-description">Variations available in curated COOP seed stocks.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="variation-related" aria-labelledby="variation-related-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Connected tools</span>
+        <h2 id="variation-related-title">Related resources</h2>
+      </div>
+      <p>Explore related genomic hubs, phenotype catalogs, and molecular archives at MaizeGDB.</p>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="https\://snptools.maizegdb.org/" target="_blank" rel="noopener">
+          <strong>SNPTools Workspace</strong>
+          <span>Interactive SNP discovery, variant effects, and multi-accession comparison</span>
+          <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+        </a>
+        <a href="/data_center/phenotype">
+          <strong>Phenotype Data Hub</strong>
+          <span>Curated observable traits, anatomical mutant profiles, and Plant Ontology terms</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/stock">
+          <strong>Genetic Stock Center</strong>
+          <span>Search and order seed stocks, inbred lines, and chromosome variations</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/genome">
+          <strong>Genome Data Hub</strong>
+          <span>160 hosted genome assemblies across 31 maize and wild relative species</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/ai">
+          <strong>AI &amp; Machine Learning Data Hub</strong>
+          <span>Machine-learning feature stores, ESM protein scores, and predicted structures</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/cite">
+          <strong>How to Cite MaizeGDB</strong>
+          <span>Guidelines and citation formats for database records, tools, and datasets</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

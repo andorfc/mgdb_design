@@ -22,7 +22,7 @@
   include_once('./include/gp_lib.php');
   include_once('./include/insertion_lib.php');
 
-  // NOTE: PAGE in this data center is actually the insertion identifier.
+  // NOTE: PAGE in this data hub is actually the insertion identifier.
   // getInsertionName() is a pure string transform (prefix normalization),
   // so this can run before the system config / DB connection below.
   if (getInsertionName(PAGE) == '') {
@@ -37,7 +37,7 @@
 logMessage("CONTROLLER: " . CONTROLLER . ", PAGE: " . PAGE . ", ID: " . ID);
 
   // Set title
-  $title = 'MaizeGDB Insertion Data Center';
+  $title = 'MaizeGDB Insertion Data Hub';
 
   // Create templating object
   $bauplan = new Bauplan($title);
@@ -82,7 +82,7 @@ logMessage("CONTROLLER: " . CONTROLLER . ", PAGE: " . PAGE . ", ID: " . ID);
     $mgdb->get('username')->replace($username);
   }
 
-  // NOTE: PAGE in this data center is actually the insertion identifier
+  // NOTE: PAGE in this data hub is actually the insertion identifier
   $insertion_identifier = getInsertionName(PAGE);
 
   // Load requested page
@@ -107,7 +107,7 @@ logMessage("CONTROLLER: " . CONTROLLER . ", PAGE: " . PAGE . ", ID: " . ID);
   }
 
   else  {
-    // NOTE: insertion data center is more hard-coded than other data centers.
+    // NOTE: insertion data hub is more hard-coded than other data hubs.
 
     $page_filename = "record_data/insertion_data.php";
     if (!file_exists($page_filename)) {

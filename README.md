@@ -149,6 +149,7 @@ immediately. Where a file was overwritten, restore it from
 | UniformMu insertion resource | `/uniformmu` | `controllers/uniformmu.php` | `legacy/uniformmu/` |
 | TYPSimSelector | `/TYPSimSelector` | `controllers/TYPSimSelector.php` | `legacy/typsimselector/` |
 | Insertion Data Center | `/insertion` | `controllers/insertion/insertion_search_modern.php` | `legacy/insertion/` |
+| Genetic Variation | `/genetic_variation` | `controllers/genetic_variation.php` | `legacy/genetic_variation/` |
 | Homepage | `/` | `index.php` | `legacy/home/` |
 
 `/cite` had no top-level controller, so `controller.php` fell through to
@@ -218,6 +219,20 @@ So, for any file the manifest owns:
   reaches shows up under *Built on the design system but not routed*, and a
   server copy that has drifted from the repository shows up as a file whose
   live response disagrees with its source.
+
+`/genetic_variation` shadows `controllers/static/genetic_variation.php` the
+same way `/uniformmu` shadows its documentation controller: `controller.php`
+checks `controllers/<CONTROLLER>.php` before falling through to `redirect.php`,
+so adding `controllers/genetic_variation.php` takes the route and deleting it
+gives the route straight back. Nothing under `controllers/static/` or
+`templates/static/genetic_variation.bau` was touched, and both are archived in
+`legacy/genetic_variation/` as well.
+
+Its dataset table mirrors the one SNPVersity 2 serves at
+<https://wgs.maizegdb.org/>. The two are not linked by anything, so a new build
+there has to be added to `src/data/genetic_variation/genetic_variation.json`
+here — the JSON carries a note saying so, and the page prints the file's
+modification time as its data date so it cannot claim to be fresher than it is.
 
 `/nomenclature` is the same story with a worse ending. It was modernized by
 overwriting `controllers/community/nomenclature.php` in place rather than
@@ -1005,6 +1020,166 @@ for monomers.
 in `deploy/manifest.txt` — it is 110 MB across ~4,600 files. See AD-019 in
 ADMIN_DEPENDENCIES for the command and when to run it.
 
+## AlphaFill ligand transplants
+
+`/data_center/alphafill` publishes a proteome-wide AlphaFill 2.3.0 run over all
+68,262 B73 RefGen_v5 AlphaFold models: **624,456 transplants**, collapsing 4.7x
+to **133,489 gene x ligand pairs** across **16,933 genes**. It supplements the
+protein structure hub rather than replacing anything -- that page answers what
+shape a protein is, this one answers what it probably binds -- and the two
+cross-link both ways.
+
+```
+controllers/data_center/alphafill_modern.php   the page. Runs zero SQL
+templates/static/mgdb_alphafill.bau            its body
+css/mgdb-alphafill.css  js/mgdb-alphafill.js   its assets
+search/alphafill/alphafill_api.php             manifest·stats·suggest·gene·detail·ligand·targets
+search/alphafill/alphafill_lib.php             the reads
+search/alphafill/alphafill_download.php        four bulk files
+tools/alphafill_index.py                       builds data/alphafill/
+tools/alphafill_models.py                      extracts the AlphaFold models it serves
+tools/alphafill_ligand_extract.py              runs on the cluster; splits filled mmCIFs
+```
+
+Reuses `js/lib/3dmol/` from the protein structure page.
+
+### The three empty states
+
+This is the thing the page exists to get right. A gene with no transplant is in
+one of three situations and they are not the same fact:
+
+| state | genes | what the page says |
+| --- | ---: | --- |
+| `transplant` | 16,933 | show it |
+| `no_donor` | 21,427 | "no PDB homolog cleared the 25% identity floor -- **this is not evidence the protein binds nothing**" |
+| `no_model` | 1,396 | "no AlphaFold model exists, so AlphaFill never saw it" |
+
+The API returns the state and the page renders a different panel for each,
+with its own colour. Collapsing them into "no results" is how an annotation
+resource teaches people something false, and the middle one -- the large one --
+is a statement about PDB coverage of maize protein families, not about maize.
+
+### Three bugs in the source data, found by serving it
+
+**1. `alphafill.by_gene.json` is not valid JSON.** It carries a bare `NaN` for
+1,259 genes. Python's `json.loads` accepts that back, so it round-trips inside
+the pipeline that wrote it and looks fine; PHP's `json_decode` and the browser's
+`JSON.parse` both reject the whole file. It silently broke **1,076 of 4,096**
+gene shards, 1,005 ligand files and `index.json` before it was caught. The
+builder now scrubs non-finite floats and passes `allow_nan=False`, so a
+recurrence is a build failure rather than a quarter of the site.
+
+**2. The published pLDDT is the wrong isoform's.** 3,216 genes carry their
+transplants on a non-canonical isoform, and the upstream table looked pLDDT up
+under the *canonical* protein. Measured against the models themselves: for all
+13,717 canonical genes the published value agrees exactly, and for the
+non-canonical ones **85.5% disagree, by up to 46.3 pLDDT points**. Since pLDDT
+>= 70 is part of the definition of the `strong` evidence class, that is not
+cosmetic. `tools/alphafill_models.py` measures the real value from the
+B-factor column of the model actually served, and the builder reports how many
+it repaired (1,259 from NaN) and corrected (1,673 from the wrong isoform). The
+evidence *classes* are deliberately left as published, so the site agrees with
+the report the numbers appeared in.
+
+**3. AlphaFill writes unquoted primes into mmCIF atom names.** `N1'`, `C4'`,
+`C1'` -- and in CIF an unquoted apostrophe opens a string that never closes, so
+a parser swallows the rest of the line. 3Dmol dies on it with a bare
+`Cannot read properties of undefined (reading 'toUpperCase')` and renders
+nothing. Primes are the atom-naming convention for sugars and nucleotides, so
+the casualties are precisely the interesting compounds: over a 700-protein
+sample it removed **13.1% of all ligand copies** and touched **half of all
+proteins**, worst-hit ADP, ATP, AMP, GDP, GTP, FAD, UDP, SAH, FMN, SAM. The
+extractor now quotes any value containing a quote character.
+
+A fourth, already documented upstream, is real and was handled: AlphaFill writes
+multi-character chain labels into `_atom_site.label_alt_id` once a protein
+exceeds ~25 transplants, which strict parsers reject outright. The extractor
+writes `.` into that column for *every* row, not only the long ones -- a
+single-character value parses and then reads as an alternate conformation, which
+a viewer may legitimately draw only one of. That failure mode is worse because
+nothing errors; ligands simply do not appear.
+
+### Why the viewer loads two files
+
+Ligands are 4.6% of the atoms in a filled AlphaFill mmCIF, and the protein half
+of every one is byte-identical to the AlphaFold model fed in. So the viewer
+loads the model from `data/alphafill/models/` and the transplants from
+`data/alphafill/lig/` as a coordinates-only mmCIF, split into one 3Dmol model
+per `label_asym_id`. That is 4.9 GB down to 1.35 GB, and it is what lets pLDDT
+colouring apply to the protein while each transplant keeps its own colour and
+can be focused without re-fetching anything.
+
+**The ESMFold models MaizeGDB already serves cannot substitute for the
+AlphaFold ones.** For `Zm00001eb000660_P001` the two agree on sequence and
+disagree by **1.53 A CA RMSD** after optimal superposition, and their B-factor
+columns follow different conventions (AlphaFold per-residue constant, ESMFold
+per-atom). The ligand coordinates are in the AlphaFold model's frame, and
+1.53 A is the same magnitude as AlphaFill's entire benchmarked accuracy
+(median 1.59 A pocket RMSD) -- so overlaying them on the ESMFold model would add
+error as large as the signal, silently, and it would look plausible.
+
+Models are stored heavy-atom only. They are Amber-relaxed, so 51% of their atoms
+are hydrogens that no representation draws; dropping them halved the payload and
+matched what the transplants were computed against.
+
+### Query cost
+
+Rendering the page runs **zero SQL**. Every headline number comes from
+`data/alphafill/manifest.json`, and the cache key carries that file's mtime, so
+rebuilding the payload invalidates the page's counts automatically -- the header
+cannot disagree with the data its own search answers out of.
+
+`suggest`, `gene`, `detail`, `ligand` and `targets` cost **no queries** on an
+index hit. The database is reached only when the index has already missed, so
+that `wx1` still resolves -- through the gene database to `Zm00001eb378140` --
+and so that "not a maize gene" stays distinguishable from the three states
+above. Measured on the development instance:
+
+| action | elapsed | queries |
+| --- | ---: | ---: |
+| `suggest` (`zm0`, `flavin`, `nadp`) | 0-1 ms | 0 |
+| `gene` (index hit) | 1 ms | 0 |
+| `detail` (69 transplants) | 2 ms | 0 |
+| `ligand` (NAD, 872 genes) | 2 ms | 0 |
+| `targets` (1,954 genes) | 3 ms | 0 |
+
+The typeahead reuses the adaptively split prefix index from
+`tools/protein_structure_index.php` -- see that file for why an n-gram index
+cannot work on a corpus where every identifier begins with the same nine
+characters. Here it settles at 2,915 shards and 16 hot prefixes over 43,512
+postings, and it indexes chemical *names* as well as codes, so "flavin" finds
+FAD and "nadp" finds NAP and NDP.
+
+### Two denominators, and saying which
+
+Ions are **43.8% of the 624,456 transplants** but **29.7% of the 133,489 pairs**,
+because one gene x ligand pair absorbs however many redundant placements came
+from homologous donors. 43.8% is the number in the published report. The caveat
+rail quotes the transplant basis and gives the pair basis in parentheses;
+printing only the latter under the same sentence would look like the report was
+wrong. The same applies to additives: 9.9% of transplants, 11.6% of pairs.
+
+`p2rank_pockets.csv` has the same trap. Its `nearest_transplant_comp` is the
+nearest transplant *at any distance* -- median 12.4 A -- so joining on it
+without a cutoff labels thousands of pockets with a compound 30 A away. The
+builder applies a 5 A cutoff, which leaves 5,152 of 132,378 pockets
+ligand-supported, and puts that count in the manifest so the claim stays
+auditable.
+
+### Rebuilding the payload
+
+`data/alphafill/` is **1.6 GB** and is neither in `deploy/manifest.txt` nor
+built on the server -- the one place this differs from every other resource
+page. Its source is a one-off research output that has never lived on a web
+host. See **AD-028** for the full procedure, the Atlas paths, the file-mode trap
+after unpacking, and the storage decision that needs an administrator.
+
+One detail worth repeating here: structure files are served
+`immutable, max-age=2592000`, so their URLs carry a `?v=<release>` stamp. Without
+it Cloudflare serves a month-old copy of any file a rebuild corrects -- which it
+did, during this build, and origin and CDN disagreed for long enough to be
+confusing. `--release` overrides the stamp for a same-day rebuild.
+
 ## TYPSimSelector
 
 `/TYPSimSelector` ranks the USDA Ames maize inbred collection against one
@@ -1376,6 +1551,944 @@ The cornfield photograph is a **placeholder**: it came from the design session
 with its provenance unconfirmed. Replace it with a MaizeGDB or USDA owned
 image, or a public-domain one, before this appears on a public page.
 
+## The dashboard cache
+
+Every data-centre landing page opens by counting its whole collection so it can
+show headline figures and draw its charts. Those aggregates are the same for
+every visitor and change only when the database is reloaded, which on production
+happens once a month. Measured on the development instance before the cache
+existed, that was about eighteen seconds of identical work repeated on every
+page view for a month:
+
+| Page | live SQL | cached | |
+|---|---|---|---|
+| `/data_center/variation` | 10057 ms | 76 ms | −99% |
+| `/data_center/map` | 2127 ms | 169 ms | −92% |
+| `/data_center/marker` | 2072 ms | 62 ms | −97% |
+| `/data_center/stock` | 1211 ms | 74 ms | −94% |
+| `/data_center/bac` | 1147 ms | 67 ms | −94% |
+| `/data_center/reference` | 804 ms | 62 ms | −92% |
+| `/data_center/est` | 446 ms | 67 ms | −85% |
+| `/data_center/overgo` | 243 ms | 65 ms | −73% |
+| `/data_center/ssr` | 148 ms | 68 ms | −54% |
+| reference facets API | 427 ms | 12 ms | −97% |
+| **nine pages together** | **18165 ms** | **730 ms** | **−96%** |
+
+Every cached page was verified byte-identical to the same page rendered with the
+cache switched off.
+
+`include/dashboard_cache.php` holds the whole mechanism. Wrap the corpus work in
+a builder and give it a key:
+
+```php
+include_once('./include/dashboard_cache.php');
+
+$page_data = dashboardCache($system, 'marker/page', function () use ($DBConn, $stats_sql) {
+    $stats = retrieve_row(make_query($DBConn, $stats_sql));
+    return array(
+        'total_markers' => (int) $stats['total_markers'],
+        'type_options'  => getMarkerTypeOptions($DBConn)
+    );
+});
+```
+
+The builder runs on a miss, and the result is written atomically as JSON. On a
+hit it never runs. When the cache is off the builder runs every time and nothing
+touches the filesystem, so behaviour is exactly what it was before.
+
+**Only cache collection-wide data.** Anything scoped to a user's query stays
+live. `search/marker/marker_search_api.php` shows the shape: with no term, type,
+or bin the row count is a property of the whole collection and is cached as
+`marker/total`; any narrowed request counts live. Profiling first is worth the
+minute it takes -- on that endpoint the count was 534 ms and the twenty-four rows
+it returns were 27 ms, so caching the obvious thing would have won nothing. The reference API draws the line explicitly: an unfiltered `facets_only`
+request describes the whole collection and is cached, while a request carrying a
+query or a filter always runs. Its JSON reports which happened in
+`summary.cache` — `hit`, `miss`, `live`, `disabled`, `concurrent`, or
+`unwritable` — with `summary.data_built` giving the build time of a hit.
+
+A cache must never be able to break a page, so every failure path — unwritable
+directory, corrupt JSON, a lost race, a builder returning nothing — falls back
+to serving the builder's result live.
+
+### Settings
+
+These live in `conf/mgdb.conf`, which is not in this repository:
+
+```
+dashboard_cache=true
+dashboard_cache_path=/home/cache/dashboard
+dashboard_cache_ttl=0
+dashboard_cache_stamp=
+```
+
+- `dashboard_cache` — master switch, following the `use_cache=true` string
+  convention already in that file. Anything other than `true` is off, and a
+  missing key is off, so an instance that has never heard of this setting keeps
+  its present behaviour. **Set it to `false` on the curation instance**, whose
+  database takes writes all day and whose figures have to be live.
+- `dashboard_cache_path` — defaults to `<search_cache_path>/dashboard`. Must sit
+  outside the web root.
+- `dashboard_cache_ttl` — seconds before an entry is rebuilt. `0` means never
+  expire, which is right for a database reloaded on a known schedule.
+- `dashboard_cache_stamp` — free text mixed into every filename. Changing it
+  retires the whole cache at once without needing filesystem access, which is
+  the simplest thing for a monthly load script to bump.
+
+### After a monthly reload
+
+The cached figures are correct until the database is reloaded and wrong
+immediately after. Finish the reload with either a stamp bump or:
+
+```
+cd <webroot> && php tools/dashboard_cache.php --purge --warm
+```
+
+`--purge` empties the cache; `--warm` then requests each cached page once so the
+first real visitor gets a hit rather than paying the rebuild. Warming is
+optional — without it the cache fills itself and exactly one visitor per page
+pays for it. `--status` lists what is cached and how old it is.
+
+Warming goes to the local Apache with an overridden `Host` header rather than
+through `root_url_private`. The site sits behind Cloudflare, which answers a
+server-side fetch of an HTML page with a bot challenge, so warming through the
+public hostname reports every page as failed while the cache stays empty.
+
+## The homepage
+
+**Design 3 was chosen and is live at `/` as of 2026-08-25.** It won over the
+default and `/index2/`, so the homepage now carries the warm header, the larger
+borderless quick links, and the Reference assembly card described below. The
+version it replaced — the "data dashboard" direction, record-page hero and all —
+is archived in `legacy/home-dashboard/` with rollback steps.
+
+The `.mgdb-home-v3` body class and `css/mgdb-home-alt.css` came across as they
+were rather than being renamed, so `/` is byte-for-byte what the group approved
+at `/index3/`. Folding those rules into `mgdb-home.css` and dropping the class
+is tidying, not a fix, and is best done when nobody is mid-review.
+
+The homepage opens on **quick links** — the icon buttons from the production
+site — with the modernized list a click away. Keeping the familiar grid was a
+deliberate call by the group: it is the first thing anyone sees after the
+transition, and it should look like the site they know.
+
+Order on the page, after the group's review on 2026-08-24: hero, quick links,
+the news and shortcuts rail, then the metric strip last. The metrics led the
+page originally and were moved to the end so the grid is the first thing under
+the hero. The heading carries no eyebrow and no introductory paragraph — it is
+just the view name and the toggle, with an "All resources ›" link to `/sitemap`
+underneath whichever panel is showing.
+
+```
+[ Quick links | List ]      <- the toggle, remembered per browser
+```
+
+Both panels ship in the HTML, so with JavaScript off the page still shows the
+quick links. `js/mgdb-home.js` swaps `hidden` between the two `[data-home-panel]`
+blocks and stores the choice under `mgdb-home-view` in `localStorage`; blocked
+storage is caught and ignored, since the default view is still correct.
+
+The `<h2>` names the view rather than the section — "Quick links" over the grid,
+"All resources" over the list — so the JS rewrites it alongside the panels. A
+fixed heading would be wrong in one of the two states.
+
+### Design alternatives for review
+
+Two variants sit alongside the default for the group to compare. Both are
+`noindex` and neither is linked from anywhere:
+
+| | Art (desktop) | Caption | Card | Header |
+|---|---|---|---|---|
+| `/` and `/index3/` | 132px, no disc, 116px art | label only | none until hover | warm header |
+| `/index2/` | 104px disc, 84px art | label only | bordered | record hero |
+| *`legacy/home-dashboard/`* | 74px disc, 56px art | label + description | bordered | record hero |
+
+`/index3/` still serves the same page as `/` — it is left in place so the group
+can keep using the review URL. Delete it, `pages/index2`, and their manifest
+entries once nobody needs the comparison.
+
+Everything behind the three pages is shared. `include/home_lib.php` holds the
+release-date query, the precomputed metric counts, and the news rendering, so
+all three show identical data and only the presentation differs. That library
+was extracted from `index.php` on 2026-08-25 for exactly this reason — the
+alternative was three copies that would drift.
+
+`css/mgdb-home-alt.css` loads only on the two variants, after `mgdb-home.css`,
+and contains nothing but overrides scoped to `.mgdb-home-v2` / `.mgdb-home-v3`.
+The default homepage cannot be affected by it.
+
+**Version 3's header** is the substantive difference. The default homepage wears
+`.mgdb-hero-record` — the same component the gene, stock, map, and reference
+record pages use, an eyebrow over a title over a `<dl>` of facts. That reads as
+database metadata, which is right on a record and cold on a front door. Version 3
+replaces it with a warm cream-to-gold ground, a sentence saying what the site
+is, the three release facts demoted to one quiet line, and the kernels from the
+MaizeGDB mark \(`/images/kernels.png`, which already carries alpha\) sitting on
+the gradient.
+
+Its actions are underlined links rather than filled buttons: on a welcome they
+are an offer, not a call to action, and two buttons were outweighing the
+sentence above them.
+
+**The headline** is the one place on the site that is not the standard green.
+`#9c1c1f` is the deep rust already inside the MaizeGDB kernels mark — sampled
+from the art rather than invented, so it belongs to the brand — at 6.6:1 on the
+cream ground, comfortably past AA. It is sized just under the logo wordmark
+above it, and the "Maize genetics and genomics database" kicker was dropped: the
+logo already says that, one line higher.
+
+**The tiles are outlined and weighted.** The borderless treatment read, in
+review, as though the tiles might float away, so each carries a 1px border and a
+small shadow offset down and to the right; pressing one collapses the shadow so
+it settles onto the page. They are also smaller than the first pass — the grid
+minimum is 10rem, not 11, because 11 still resolved to four columns at this
+content width and the tiles stretched to 208px. Ten fits five columns at 164px,
+and twenty tiles land as four even rows.
+
+**The Reference assembly card** at the top of version 3's rail is the production
+homepage's block rebuilt. There it is three 75px PNGs with their captions baked
+into the art — `assembly_home_med.png`, `annotation_home_med.png`,
+`assembly_other.png`, reading "B73 ASSEMBLY", "B73 ANNOTATION", "ALL GENOMES" —
+which is illegible on a phone and invisible to a screen reader. The puzzle is the
+recognizable part, so it leads as the section emblem at 84px and the three
+destinations become real text with a line of context each. Same three links as
+production: `/assembly`, `/gene_center/gene`, `/genome`.
+
+`assembly_other.png` was the only one of the three worth keeping — 693×720 with
+alpha already. `src/images/home/assembly_puzzle.png` is that file trimmed and
+squared to 160px. The other two were 75px with baked captions and nothing
+salvageable at the size the card needs.
+
+The card sits on white rather than the header's cream: the puzzle art is amber
+and washed out against a warm ground. The warmth comes from a gold accent bar
+instead, which also marks it as the featured card in the rail. Measured at 1280px, the header is **258px** against 366px
+for the first draft — same content, 30% less height, with the quick links
+starting at 597px instead of 712px.
+
+**A specificity trap worth knowing** if you edit these: the variant column rules
+(`.mgdb-modern .mgdb-home-v3 .mgdb-quicklinks`, three classes) outrank the base
+responsive rules in `mgdb-home.css` (`.mgdb-home-page .mgdb-quicklinks`, two
+classes) *even inside a narrower media query*. Both breakpoints therefore have
+to be restated in the variant sheet; without that, version 3 fell to a single
+very wide column at 375px.
+
+When a design is chosen, fold its template and rules back into `index.php` and
+`mgdb_home.bau`, then delete `pages/index2`, `pages/index3`,
+`mgdb-home-alt.css`, the two variant templates, and their five manifest entries.
+
+### The icons
+
+Source art lives outside the repo in `~/Documents/ClaudeCode/icons-selected` as
+2048px squares — 22 MB for the set of twenty, with inconsistent white margins, so at a
+fixed tile size some marks would have looked large and others small.
+`tools/prep_icons.py` trims each one to its ink, re-squares it with a consistent
+margin, and writes 128px PNGs into `src/images/quicklinks/`:
+
+```
+python3 tools/prep_icons.py     # needs Pillow
+```
+
+**22 MB becomes 286 KB.** 128px is deliberate: the tile shows the art at 56px
+on desktop and 34px on mobile, so it covers a 2x display with room to spare. An
+earlier 256px pass cost 393 KB of eagerly-loaded icons for no visible gain.
+
+The first eight tiles are `loading="eager" fetchpriority="high"` because quick
+links are the default view and sit above the fold; the remaining twelve are
+lazy. Icons are `mix-blend-mode: multiply` inside a tinted disc, which drops the
+white background the source art carries without needing transparency.
+
+**Per-icon tuning.** Trimming to the bounding box makes every icon the same
+*bounding* size, which is not the same as making them look the same size: art
+built from thin strokes with white between them reads much smaller than solid
+art at identical dimensions. The `TUNE` table at the top of `prep_icons.py`
+corrects this per icon:
+
+- `crop` cuts part of the source before trimming. `pan_genes` carries a
+  "Pan-genes" caption beneath its diagram that is an illegible smudge at 60px
+  and steals a quarter of the height from the part that matters; the bottom 28%
+  is cut away.
+- `zoom` lets sparse art run closer to the tile edge. `pannad` \(three thin
+  plants with wide gaps\) is at 1.28, `qteller` at 1.45.
+
+`qteller` remains the weakest of the set — it is a hairline V whose strokes fall
+near a pixel at tile size. The zoom stops it reading as an empty tile, but the
+source really needs a heavier stroke.
+
+**Icon URLs are versioned.** `homeIconVersion()` in `include/home_lib.php`
+appends `?v=<newest mtime in the directory>` to every quick-link `src` through a
+single `$(ql_version)` slot. Without it a retuned icon keeps its URL and both
+the browser and Cloudflare go on serving the old one — observed on 2026-08-25,
+when the CDN held a superseded icon for 47 minutes after deploy while the origin
+had the new one.
+
+### Responsive behaviour
+
+| Width | Quick links | Metrics |
+|---|---|---|
+| desktop | 5 columns, icon above label, descriptions shown | 4 across |
+| ≤ 640px | 2 columns, icon beside label, descriptions hidden | 2 across |
+| ≤ 340px | 1 column | 2 across |
+
+Two mobile numbers worth keeping in mind, both found by measuring rather than
+by eye:
+
+- The breakpoint for one column is **340px, not 380px**. 360 and 375 are the two
+  most common phone widths and both hold two columns comfortably; a 380px
+  threshold dropped the most common phone to a single column.
+- The shared `.mgdb-metric-grid` rule stacks metrics one per row under 640px,
+  which is right where a card carries a paragraph. The four homepage metrics are
+  a number and a short line, and stacking them ran to **564px**. Two up halves
+  that to 283px. This mattered more when the strip led the page — it pushed the
+  quick links 1,466px down — and still keeps the foot of the page compact now
+  that it sits last.
+
+## The site map
+
+`/sitemap` is the complete directory: every page, tool, data hub, and resource
+at MaizeGDB, for someone who cannot find what they need any other way. 130
+entries across 11 groups, with search, group filters, per-section collapse, and
+a sticky tab bar.
+
+**These files lived only on the server until 2026-08-23** — absent from this
+repository and from the manifest, so nothing backed them up and any deploy
+touching their directories could have lost them. They are now tracked:
+
+| File | Role |
+|---|---|
+| `controllers/about/sitemap.php` | Route; supplies the live genome count |
+| `templates/about/sitemap.bau` | Hero, search and filter controls, metrics |
+| `templates/about/sitemap-featured.bau` | The "New tools" band, generated |
+| `templates/about/sitemap-tabs.bau` | The sticky section tab bar, generated |
+| `templates/about/sitemap-content.bau` | The directory itself, generated |
+| `css/sitemap.css` | Page composition on the shared tokens |
+| `js/sitemap.js` | Search, group filter, expand/collapse |
+
+Page order is hero → new tools → tab bar → search panel with the directory
+directly under it → metrics. Three generated partials rather than one because
+they land in three different places and Bauplan cannot split a single loaded
+partial across several.
+
+The hero carries a heading and a one-line description and no buttons, matching
+`/data_center/reference`. The tab bar is the shared `.mgdb-section-tabs`
+component from that page: thirteen jump links — New tools, Search, then one per
+directory group. Labels come from `TAB_LABELS` in the content model and are
+shorter than the section headings on purpose, since the bar is sticky and
+thirteen full headings would wrap to three rows. The generator fails loudly if
+a section has no label, so the bar cannot drift out of sync.
+
+### Editing the directory
+
+Both partials are generated from one content model:
+
+```
+# edit tools/sitemap_data.py, then
+python3 tools/gen_sitemap.py
+deploy/deploy.sh src/templates/about/sitemap-featured.bau
+deploy/deploy.sh src/templates/about/sitemap-tabs.bau
+deploy/deploy.sh src/templates/about/sitemap-content.bau
+```
+
+The generator warns when two entries in the same section point at the same URL.
+Across sections is fine — BLAST is both a starting point and a research tool.
+
+No section carries a blurb as of 2026-08-28; the Data hubs one was the last to
+go. The field, the generator branch and `.sitemap-section-blurb` in the CSS all
+still work, so putting a sentence back is a one-string edit in the content
+model.
+
+The generator exists because Bauplan requires every literal `(` and `)` to be
+written `\(` and `\)`, and a stray one reports the *last* `)` in the file as
+the error — useless on a 1,200-line template. `tools/gen_sitemap.py` escapes
+mechanically and checks that opens and closes balance before writing.
+
+The emitted `.bau` is plain, readable HTML, so editing it directly is fine for a
+one-line fix. Anything larger is easier in `tools/sitemap_data.py`, and
+regenerating overwrites hand edits — make the change in both, or in the data
+model only.
+
+### What the markup has to provide
+
+`js/sitemap.js` keys entirely off classes:
+
+```html
+<section class="sitemap-section" data-section-kind="tools">
+  <h2 class="sitemap-section-heading">
+    <button class="sitemap-section-toggle" aria-controls="sm-x-panel" aria-expanded="true">
+      <span class="sitemap-section-name">…</span>
+      <span class="sitemap-section-count" data-total="44">44</span>
+    </button>
+  </h2>
+  <div id="sm-x-panel" class="sitemap-panel open">
+    <ul class="sitemap-grid">
+      <li class="sitemap-item">
+        <a class="sitemap-item-link" href="…">…</a>
+        <p class="sitemap-item-desc">…</p>
+      </li>
+    </ul>
+  </div>
+</section>
+```
+
+`data-section-kind` is one of `tools`, `curated`, `community`, `archive` and
+drives the filter chips. A chip click filters the list immediately; the panel
+and the list it filters are one section so the effect is visible without
+scrolling.
+
+The new-tools band repeats tools that also appear in the directory below. It is
+filtered along with everything else but deliberately left out of every count —
+totals come from unique hrefs inside `#sitemap_content`.
+
+Two things about the tab bar are specific to this page. A group filter can hide
+the section a tab points at, so those tabs go dashed and inert rather than
+scrolling nowhere. And clicking a tab opens its section first, so a reader who
+collapsed everything does not land on a bare heading.
+
+**The scrollspy is a throttled scroll listener, not an `IntersectionObserver`,**
+unlike `/data_center/reference`. Some embedded and backgrounded browsers never
+deliver observer entries — the same failure `js/mgdb-modern.js` already carries
+a scroll fallback for — and the automated browser used to verify this page is
+one of them: it delivers no `IntersectionObserver` entries, no `scroll` events
+and no `requestAnimationFrame` callbacks at all. The throttle is `setTimeout`
+rather than `requestAnimationFrame` for the same reason. The trailing sections
+sit too close to the foot of the document to ever scroll under the sticky bar,
+so `spy()` special-cases the bottom of the page; without it the last tab can
+never light up.
+
+The previous version had no such contract: the JS scraped `<dt>` elements and
+walked `#sitemap_content > table > tbody > tr` to find promoted tools, and the
+"NEW TOOLS" strip was a nested `<table>` of `<td class="newtools">` cells with
+tooltip spans, which is what made that section look unformatted. About a hundred
+lines of `css/sitemap.css` existed only to re-flow those tables into grids;
+all of it is gone.
+
+### Keeping it complete
+
+`src/data/redesign_status.json` is the authoritative list of live URLs — 268 of
+them, written by `tools/redesign_status.py`. To find what the directory is
+missing, diff its `rows` against the hrefs in `sitemap-content.bau`. That check
+is what grew this page from 48 linked URLs to 227 entries.
+
+The 2026-08-28 group review cut it back to 130. Completeness is not the only
+goal: an entry earns its place only if the page it points at works without
+parameters and is still maintained. Everything dropped in that pass was checked
+against the live server first — see "Site map review" below.
+
+Deliberately excluded: record pages needing an id, JSON API endpoints, and the
+curator tools under `/curation/` — those are login-gated and return nothing
+useful to a signed-out visitor.
+
+Every link was verified to return 200/301/302 before shipping. One link found
+during that pass is genuinely dead — `archive.maizegdb.org` resolves through
+Cloudflare but its origin does not answer, which also breaks the "MMP
+Documentation" link on `/data_center/map`.
+
+The "Your account" section was removed on 2026-08-28. `/login`,
+`/create_account`, `/forgot_password`, `/preferences` and `/update_person` are
+no longer listed anywhere on this page — the header account controls are the
+route in. `/create_account` serves an empty body on dev and on www regardless.
+
+### Site map review, 2026-08-28
+
+Group review cut 227 entries to 135. Every removal was checked against the live
+server first — several of the group's calls were right for reasons stronger than
+the ones given, and two entries turned out to be duplicates nobody had spotted.
+
+Verified dead — 200 OK with an empty or parameter-stub body:
+
+| URL | What it serves |
+|---|---|
+| `/about` | "Oops, Sorry! The page you're looking for cannot be found." |
+| `/new_genes` | empty body |
+| `/curation/geneModelIssues` | empty body |
+| `/create_account` | empty body, on dev **and** on www — still linked, flagged |
+| `/help`, `/lab-pictures` | empty body |
+| `/ems-phenotype`, `/rescuemu-phenotype` | shell only, no content |
+| `/mapped_elements`, `/bin_viewer_locus_sequence`, `/single_tissue_comp` | empty body |
+| `/compare_maps` | "You must provide two map ids" |
+| `/compare_three_maps`, `/complete_map` | "Record Not Found!" |
+| `/mappedssrs` | "You did not specify a chromosome." |
+| `/bin_viewer_locus_accession` | renders bin 0.00, needs an accession |
+| `/community/image_gallery` | "No gallery name provided" |
+| `/conferences`, `/maizeprojects`, `/links` | "Click here to go to the old page." |
+| `/project_homepages`, `/mnl_submit` | stub, never converted |
+
+Same page under two URLs, merged to one entry:
+
+- `/14InbredsFISH` and `/B73Mo17FISH` → one "FISH karyotypes" entry. Both now
+  serve the same modernized page with the two karyotypes as tabs.
+- `/maize_history` and `/timelines` → one "Maize history and timelines" entry.
+  Byte-identical responses.
+
+Name corrections found while rewriting the genomic-data descriptions:
+
+- `/assembly_manifesto` is titled "MaizeGDB Reference Assembly Information" and
+  is about how the representative assembly is chosen. It now carries that name;
+  `/assembly` — actually the B73 v1–v5 assembly center — no longer does.
+- `/sequencing_project` is the historic BAC-by-BAC project record, which is why
+  the review asked to fold it into `/historic` as `/b73_history`. Until that
+  merge happens both are listed, named so the overlap is obvious.
+
+Still live, kept, contrary to first impressions: `/gbrowse`, `/foldseek` and
+`/fatcat` return almost no HTML because they are `<iframe>` wrappers. The
+`/data_center/*` hubs return 403 or "Just a moment…" to `curl` because of the
+Cloudflare bot check, not because they are broken.
+
+## "Data Hub", not "Data Center"
+
+Renamed site-wide on 2026-08-25: "data center" now reads as a building full of
+servers, so the user-facing term is **Data Hub** / **Data Hubs**. 306 occurrences
+across 117 files.
+
+**Only the spaced spelling was touched.** `data_center`, `data-center`,
+`dataCenter` are routes, file names, PHP identifiers and CSS class names, and the
+rename rules require a literal space so they cannot match. The apply script also
+asserted per file that the count of each of those tokens was identical before and
+after. `/data_center/…` URLs are unchanged, so no link, bookmark, or external
+reference breaks.
+
+Three things needed judgement rather than a substitution:
+
+- **`src/data/cite_journal_articles.json` was left alone.** Its one occurrence is
+  inside an `abstract` field — text quoted from a published paper. Rewriting a
+  citation to match our house style would be falsifying it.
+- **`src/data/redesign_status.json` was not hand-edited.** It is written by
+  `tools/redesign_status.py` from live page titles; editing it would have made it
+  disagree with the site. The generator's own category label changed instead and
+  the file was regenerated.
+- **"Data Center hub" would have become "Data Hub hub".** `/data_center/` is the
+  page that lists them, so that phrase — and "Data Center Hub", "All Data Centers
+  Hub" — map to **"Data Hubs"** instead. Those rules run before the general ones.
+
+Four files had to be pulled into the repository to be changed at all, because
+they were server-only and nothing was backing them up: `translation.php` (which
+holds `dc_name`, the top-level menu label), the pre-redesign
+`templates/home/megamenu/data-centers.bau` still served on every unmodernized
+page, `controllers/static/archive.php`, and `templates/static/mgdb_archive.bau`.
+
+Verified across 32 pages: none still shows the old term in visible text or in a
+`<title>`, and no route broke.
+
+## The megamenu on narrow screens
+
+Below 900px the bar becomes a stacked drawer and each panel renders inline under
+its trigger. That block in `css/mgdb-megamenu.css` sets `.mega-group` and
+`.mega-feature` to `width: 100%` — which does nothing, because they are **grid
+items** and the track sizes them, not the item.
+
+The result, measured on a 375px screen before this was fixed: the Community
+panel rendered as **four 66px columns**, the meeting feature box was 66px wide,
+and its heading broke across five lines. Every tab was affected — `mega-grid-3`,
+`mega-grid-4`, and `mega-grid-tools` all survived intact into the drawer.
+
+The fix collapses every grid variant to one column inside the media query. If a
+new panel layout is added, its grid class has to be added there too, or it will
+reproduce the same failure.
+
+Three things follow from stacking that the desktop layout did not need:
+
+- The feature box stops being a column beside the lists and becomes a card
+  between them, so it gets its own padding and radius.
+- Group headings get a hairline rule to separate the sections. It has to be a
+  **dark** hairline: the bar is dark green but the panel behind it is white, and
+  the first attempt used a white border that was invisible.
+- Every destination becomes a full-width row, so each is padded to the 44px tap
+  target rather than sitting at its desktop line height.
+
+The Community panel's meeting banner \(`/images/MGC2027_img.png`, 231×84\) is
+capped at its own intrinsic width. An early mobile override set
+`max-width: 100%`, which upscaled it to 265px on a 375px screen and softened it.
+
+## The menu bar's label size, and where the drawer starts
+
+2026-08-27. The bar's nine top-level items are a single `white-space: nowrap`
+row, so their combined width is a hard floor on the viewport. Two ceilings meet
+in the middle:
+
+- `.mgdb-site-nav` caps the rail, so **the bar stops widening at 1232px** no
+  matter how wide the viewport gets. A 1232px bar leaves 52px of slack at 19px
+  labels and 10px at 20px. **19px is the ceiling**, and a `min-width` query
+  above it would never have room to matter.
+- Below that cap the bar is viewport minus 48px, and each size needs its own
+  minimum viewport. Measured on the live bar: **17px → 1142, 18px → 1185,
+  19px → 1228.**
+
+The bar had been a flat 18px at every width down to a 900px drawer breakpoint —
+so **from 901px to 1185px the items overran the bar and took the document with
+them.** At a 1000px viewport the row ended at x=1150 with
+`document.scrollWidth` at 1150: the whole page scrolled sideways, on every
+modern page. Three stepped bands replace the flat size, and the drawer
+breakpoint moves to **1164px** so no viewport is left without a size that fits.
+
+**The breakpoint lives in three files and they must not drift:**
+
+| File | What it keys |
+| --- | --- |
+| `css/mgdb-megamenu.css` | the stacked drawer layout |
+| `css/mgdb-modern.css` | the injected Menu button and the collapse |
+| `js/mgdb-chrome.js` | `MOBILE_QUERY`, which drives the toggle and tap-to-open |
+
+`mgdb-modern.css` was the trap: its toggle rule shared a `900px` block with the
+masthead rules for the logo and search field. Raising the bar's breakpoint alone
+left a 901–1164px band that rendered the stacked drawer **with no button to open
+it**. The block is now split — the logo keeps 900px, the nav drawer takes 1164px.
+
+Adding or renaming a top-level item invalidates every number above. Re-measure;
+do not assume the next size down still clears.
+
+## Tapping a megamenu trigger that is also a link
+
+Panels open on `:hover` and `:focus-within`. A touch device produces neither
+before the tap resolves, and four of the six triggers are `href="#"`, so
+`mgdb-chrome.js` intercepted their click and opened the panel instead.
+
+**Genomes and Data Hubs carry real hrefs**, so they fell through that check:
+tapping either one simply navigated to `/genome` or `/data_center/`, and
+**their panels could not be opened on a phone at all.** Inside the drawer both
+labels are now the panel's disclosure control; the landing page stays one tap
+away in the panel's own heading action.
+
+Two details make the toggle survive a second tap:
+
+- The tap leaves focus on the trigger, so `:focus-within` would hold the panel
+  open forever. `li.mgdb-menu-closed:not(.mgdb-nav-open)` sets `display: none`,
+  which wins because the open rules never set `display`. Only the script applies
+  that class, so nothing is hidden when the script does not run.
+- `open()` deliberately does **not** latch `.mgdb-nav-open` while in the drawer.
+  A tap fires `focusin` before `click`; latching there would let the click
+  handler read its own open state and close what the tap just opened.
+
+That `display: none` rule sits at file scope in `css/mgdb-megamenu.css` rather
+than inside the drawer query, because **Escape was equally broken on the
+desktop.** `mgdb-chrome.js` had always set `.mgdb-menu-closed` on Escape, and
+`mgdb-modern.css` backs that with `left: -999em` — but that selector carries no
+id and loses to `#menu_bar > li:focus-within .mega-dropdown-*`. So Escape
+flipped `aria-expanded` to `false` while the panel stayed on screen: a screen
+reader was told the menu had closed and it had not. Confirmed fixed at 1440px —
+the panel's computed `display` is `none` after the keypress.
+
+## The Genomes panel
+
+2026-08-27, rebuilt from the six changes Carson asked for. Worth knowing:
+
+- **"Representative", not "Reference".** GenBank's usage, and the collection
+  holds many reference-quality assemblies. `gcQualityLabel()` in
+  `controllers/genome/genome_center_modern.php` already derived the same word
+  for the assembly table; the menu now agrees with it.
+- **B73 v4 down to BAC-based are chips, not rows.** Five stacked
+  `.mega-secondary-link`s would have made the feature box the tallest thing in
+  the panel and buried v5 under its own history. `.mega-version-rail` wraps them
+  onto one line, with the rail's accessible name carrying the context the
+  one-word labels drop.
+- **Assembly links use `/genome/genome_assembly/<name>`,** which is what the
+  Genome Center's own table links to. The old menu used `/genome/assembly/`,
+  which reaches the same record but falls past the title branch in
+  `controllers/genome.php`, so every B73 assembly opened with the browser tab
+  reading "MaizeGDB Genome Center". Names with spaces are percent-encoded in the
+  markup rather than left for the browser to fix.
+- **No eyebrow and no footer.** One section destination sits in
+  `.mega-heading-actions` beside the h2: **"Genome Data Hub", pointing at
+  `/genome`.** That is the modernized Genome Center — *not*
+  `/data_center/genome`, which the rest of the modern site labels "Genome Data
+  Hub" but which is still the legacy search-by-category page. The menu is the
+  first place to use the name for the page that has actually become the hub;
+  the older links are a separate cleanup. Whole-genome views is the last row of
+  Explore and browse: it still carries the current B73 and NAM paintings, but it
+  is the oldest viewer in the list.
+
+### The B73 card: a narrow column, not a third of the panel
+
+2026-08-28. As an equal third of `mega-grid-3` the card was **258 x 227px**
+holding about **102px of content** — a badge, a title, one link and five chips.
+It stretched to match the lists beside it, so 125px of it was empty.
+
+`.mega-grid-genomes` gives it a fixed **202px** track and hands the ~56px back to
+the two lists, which is where the long labels are \("NAM pangenome gene viewer",
+205px\). The lists went 258 → 286px at the widest band.
+
+202px is set by the one line that cannot wrap gracefully: "Open B73 genome page"
+measures 154px, plus its arrow and the card's 28px of padding.
+
+`.mega-feature-compact` then distributes the content down the full height with
+`justify-content: space-between`, so the free space the taller lists create
+becomes even **19px gaps** between all four blocks instead of 125px of dead card
+at the bottom. `gap` is the floor for when there is no free space to spread —
+which is the case in the drawer, where the card is content-height.
+
+Three things follow from the narrower column:
+
+- **The badge reads "Representative", not "Representative genome".** The longer
+  string measured 172px — wider than the card now is. The word "genome" is
+  carried by the panel it sits in.
+- **The link is `.mega-feature-open`, a plain link rather than the filled
+  `.mega-feature-link` button.** At 202px the button's padding pushed the label
+  onto a second line. A separate class rather than a restyle, so the filled
+  buttons in the Tools and Community panels are untouched.
+- **The version chips are a three-column grid.** Five will not sit on one line
+  in a 202px card, and a 4+1 wrap reads as an accident; a grid makes the 3+2
+  deliberate and keeps the chips aligned. The rule above it replaces the
+  "Earlier B73 assemblies" caption that used to introduce them — the rail keeps
+  that text as its `aria-label`, since "v4" and "BAC" say nothing on their own.
+  In the drawer the grid goes to five columns, where the width allows one row.
+
+## The About panel
+
+2026-08-28, rebuilt to the Genomes panel's shape: no eyebrow, no footer, no
+description paragraph, and one heading action. That action is **"Explore site
+map"** rather than a link to `/about` — `/about` is a page *about the project*,
+not a way into the rest of the site, so it makes a poor section destination.
+
+Four links remain after dropping FAQs and the Working Group, so the panel is
+**584px** rather than 765px on a two-column `mega-grid-2`. Left at 765px it was
+mostly empty space.
+
+584 is not a round number on purpose. The h2 is the full database name, "Maize
+Genetics and Genomics Database", which measures **361px** at the h2's 19px/700.
+A 560px panel leaves only 357px beside the heading action — four pixels short,
+so it wrapped to two lines. 584px leaves ~40px of slack. Narrowing the panel, or
+giving the action a longer label than "Explore site map", wraps it again.
+
+### AgBioData as an affiliation, not a feature
+
+The membership had a full `.mega-feature` column: a badge, a heading, body copy
+and a filled button — the same treatment B73 gets in the Genomes panel. That
+gave a partner organization equal weight with MaizeGDB's own sections.
+
+It is now `.mega-affiliation`: one row across the foot of the grid, carrying
+AgBioData's own agriculture mark from `/images/quicklinks/agbiodata.png` \(128px
+square, already on the server\). The whole row is a single `<a>`, so it is one
+tap target in the drawer rather than a card with a button inside it, and the
+mark's `alt` is empty because the adjacent text names it.
+
+`grid-column: 1 / -1` spans whatever track count the panel uses, so the row does
+not need respecifying if the grid changes. In the drawer it keeps
+`align-items: flex-start`: the description runs to four lines at 375px, and
+centring left the mark beside the middle of the paragraph rather than its title.
+
+**"Founding member"** is the site's own wording, used verbatim in the footer of
+every unmodernized page — not a claim invented here.
+
+## The Community panel
+
+2026-08-28. Eyebrow removed, and the h2 is now the plain name of the thing —
+**"Maize Genetics Community"** — rather than the verb phrase it carried. The
+heading action is wrapped in `.mega-heading-actions` so all three reworked
+panels stack identically in the drawer.
+
+### Weighted grid tracks
+
+"MGC website" became **"Maize Genetics Cooperation"**, and the measured need
+per track is nothing like even:
+
+| Track | Needs | Longest item |
+| --- | --- | --- |
+| Community | 210px | "Maize Genetics Cooperation" |
+| Literature & media | 143px | "Maize News Letter" |
+| Share data | 125px | "Contribute data" |
+| Meeting feature | 259px | MGC2027_img.png, 231px wide |
+
+`repeat\(4, 1fr\)` gives every track 210px out of the 842px of track space a
+920px panel has — exactly what the first column needs and not a pixel more, so
+it would sit on the wrap threshold, and the feature would squeeze the banner
+below its intrinsic width. `.mega-grid-community` weights them
+`1.35fr 1fr 0.92fr 259px`, resolving to **240 / 178 / 163 / 259**: ~30px of
+slack on the longest label, and the banner at full size.
+
+\(The label first read "Maize Genetics Cooperation \\(MGC\\)", which needed 258px
+and pushed the first track to 288px. Dropping the abbreviation brought the
+column back down.\)
+
+It is scoped to Community rather than folded into `.mega-grid-4`, which Data
+Hubs also uses: that panel has four evenly matched groups and no feature column,
+and even tracks are right for it.
+
+### The banner was being downscaled
+
+`.mega-feature-art` never overrode the shipped `megamenu.css` rule that pads
+every `<a>` inside a dropdown. That 9px inset shrank the link's box, and
+`width: 100%` then rendered the 231px image at 211px. Zeroed, so it draws at
+its intrinsic size.
+
+Note when screenshotting this panel: the banner is `loading="lazy"` inside a
+panel parked at `left: -999em`, so it does not fetch until the panel first
+opens. A screenshot taken immediately on hover catches an empty box — that is
+the lazy load, not a layout bug.
+
+**Literal parentheses in a label need escaping.** "Maize Genetics Cooperation
+\(MGC\)" is written `\\(MGC\\)` in the template; an unescaped `\)` ends the
+Bauplan block and the error it reports points at the end of the file.
+
+## The Tools panel
+
+2026-08-28. Eyebrow, footer and the featured-tool card all removed, so the panel
+is four lists rather than a card plus three. The AI tools that were only
+reachable through the old footer link \(`/ai`\) now have a column of their own,
+alongside FETA, PanEffect and the MaizeGDB Feature Store. Phylostrata was added
+at `https://phylostrata.maizegdb.org`, the URL the sitemap and homepage already
+use.
+
+### Status tags
+
+`.mega-tag` marks a tool New or Updated. It is written **inside the label's
+`<strong>`**, not as a sibling: `.mega-group > a` is a column flex container, so
+a sibling span drops to its own row. Specificity has to beat the description
+rule `.mega-group > a span` \(1 id, 2 classes, 2 elements\), which is why the
+selector carries `.mega-group` rather than being a bare `.mega-tag`.
+
+### The panel is wider than the other two fullwidth panels
+
+Its four lists need **921px** of track between them — measured widest label per
+column, plus the 16px the link padding takes:
+
+| Column | Needs | Longest item |
+| --- | --- | --- |
+| Search & compare | 203px | "Genome Context Viewer" |
+| Genes & function | 228px | "Protein structures" + Updated |
+| Genomes & variation | 285px | "NAM pangenome gene viewer" + New |
+| AI & machine learning | 205px | "MaizeGDB Feature Store" |
+
+The shared 920px `.mega-dropdown-wide` leaves 842px of track — **79px short
+however the tracks are divided**, which is why the pangenome label wrapped \(it
+wrapped before this rework too\). Tools alone goes to **1010px** with tighter
+gutters, giving 952px, and weights resolving to 210 / 236 / 295 / 212.
+
+**The ceiling is 1037px**, set by the narrowest desktop band: at a 1165px
+viewport this panel starts at x=104 and the bar ends at 1141. Do not widen past
+that, and re-measure if a label or tag changes.
+
+### Section spacing in the drawer
+
+Stacked, the columns become consecutive sections of one long list. At the
+drawer's old `gap: var\(--mgdb-space-2\)` there were **21px** between the end of
+one section and the next heading against **1px** between rows inside it — too
+close to read as a break. Tools stacks four sections, which is where it showed.
+The gap is now `--mgdb-space-4`, giving 29px, and it applies to every panel.
+
+## The Data Hubs panel
+
+2026-08-28. Eyebrow, footer and the four category headings all removed. The
+twenty hubs are now **one alphabetical list** in a single container, flowed into
+four columns by `column-count` rather than split into groups by hand — so the
+A-Z stays correct when an entry is added or removed, and CSS fills down-then-
+across, which is the order a reader scans an alphabetical list in.
+
+The headings went because several entries sat awkwardly under any of them:
+*Analysis projects* and *Data summaries* are not data types at all. With twenty
+entries an A-Z is faster to scan than a taxonomy the reader has to learn first.
+
+### Hover descriptions: one region, not twenty tooltips
+
+Each link carries `data-desc`; the panel carries **one** `[data-mgdb-hint]`
+region under the heading that shows the description of whatever the pointer or
+keyboard is on. `setupHints()` in `js/mgdb-chrome.js` wires them up.
+
+Per-item `title` tooltips were the obvious alternative and are worse in four
+ways: they never appear on touch, they wait about a second, they cannot be
+styled, and screen readers treat them inconsistently. A single region also
+cannot overflow the panel and costs no per-item vertical space — which matters,
+because a visible description line under each of twenty entries would roughly
+double the panel's height.
+
+Three details:
+
+- **The heading text block needs `flex: 1 1 auto`.** At the default
+  `flex: 0 1 auto` it shrank to the h2's own width — 389px — so descriptions
+  wrapped inside it and a two-line reserve was needed, which left an empty line
+  under every short one. Taking the row's spare width gives the hint 684px, and
+  all twenty descriptions then sit on one line, so the reserve is one line.
+- **`min-height` matches the line height**, so the panel does not jog as the
+  text changes. Verified by hovering all twenty: the panel stays 234px.
+- **Reset happens on the panel's `mouseleave`, not each link's.** Per-link reset
+  flickers while the pointer crosses the gap between two rows.
+
+The rule is written `p.mega-hint`, not `.mega-hint`: `.mega-panel-heading p`
+\(1 id, 2 classes, 1 element\) otherwise pins it to the 12px that rule sets for
+heading body copy. That silently swallowed a font-size change once.
+
+The region is `aria-hidden` — it duplicates the link the user is already on, and
+announcing it on every hover would be noise. Screen reader and touch users get
+the labels plus the **"Data hub descriptions"** heading action, which is the
+accessible route to the same information and the reason the hover version is an
+enhancement rather than the only way in.
+
+### One link lost
+
+The removed footer held **Archived Data Hubs** \(`/archive`\), which now has no
+link anywhere in the menu. It is still reachable from the site map.
+
+## Why "B73" did not return the B73 v5 genome
+
+2026-08-28. Both the header autocomplete and the full results ranked assemblies
+by *name*, not importance:
+
+```sql
+ORDER BY CASE WHEN lower(assembly_name)=:exact  THEN 0
+              WHEN lower(assembly_name) LIKE :prefix THEN 1 ELSE 2 END,
+         assembly_name
+```
+
+"B73" matches nine rows. The current reference is named
+**Zm-B73-REFERENCE-NAM-5.0**, so it is not an exact match, does not start with
+"B73", and sorts last alphabetically in the remaining tier — **ninth of nine**.
+The autocomplete's `LIMIT 4` then returned v1, v2, v3 and the 2008 BAC-based
+assembly, and the current reference never appeared at all. The full results page
+listed it, but bottom of the list.
+
+The fix ranks the representative assembly first, then exact, then name-prefix,
+then anything else carrying REFERENCE in its name:
+
+| Rank | Matches |
+| --- | --- |
+| 0 | `Zm-B73-REFERENCE-NAM-5.0` |
+| 1 | exact name match on the query |
+| 2 | name starts with the query |
+| 3 | name contains REFERENCE |
+| 4 | everything else |
+
+### The data cannot drive this
+
+Worth knowing before anyone tries to replace the pinned name with a column:
+
+- **`replaced_by` is empty for all nine**, including v1, v2 and v3, which are
+  definitively superseded.
+- **`release_date` is free text** — "2009", "9/16/2016" — and is **missing for
+  v5**, the one row that matters most.
+- **`quality` says "Representative" for v1, v2, v3 and v4, and is blank for
+  v5.** `genome_center_modern.php` already works around exactly this by
+  deriving the label from the assembly name instead.
+
+So the name is pinned as a literal, which is what the rest of the codebase
+already does — `GC_REPRESENTATIVE_ASSEMBLY`, `gene_record_lib.php`,
+`expression_search_lib.php`, `uniformmu_search_lib.php` and others all carry the
+same string. **It now appears in about ten files and they all have to change
+together at the next release.** Folding them into one shared constant is a
+worthwhile cleanup.
+
+### Group order: Genomes above Loci and Stocks
+
+Ranking within the group was only half of it — the group itself sat seventh in
+the autocomplete's `$priority`, below Loci and Stocks, each of which can run to
+thousands of rows \("B73" matches 335 loci and 1,324 stocks\). Genomes now comes
+straight after gene models in both the autocomplete and the results page
+\(`saTypeOrder\(\)`\), which are kept in step.
+
+**The promoted top hit is deliberately unchanged.** An exact stock name is still
+promoted above every group, so "B73" still leads with the B73 germplasm record —
+that is the only record actually named "B73". The genome ranking fix and the
+group reorder put the v5 assembly immediately below it rather than overriding
+exact-match promotion for every query on the site.
+
+The reorder only shows when a query matches an assembly: "anthocyanin" and
+"kinase" produce no Genomes group at all and are unaffected, while "Mo17"
+now leads with its assemblies the same way "B73" does.
+
+### genome_metadata is one row per annotation, not per assembly
+
+"B73" returns nine rows for eight assemblies: Zm-B73-REFERENCE-GRAMENE-4.0
+carries both an NCBI 101 and a Zm00001d.2 annotation, same `analysis_id`,
+different `annotation_id`. Both are real records, so both are listed. It is not
+a duplicate — but a query matching such an assembly does spend two of the
+autocomplete's four slots on it.
+
 ## Conventions this codebase relies on
 
 - `.bau` templates escape literal parentheses as `\(` and `\)`. An unescaped
@@ -1388,8 +2501,18 @@ image, or a public-domain one, before this appears on a public page.
   shell must declare every one of them, even the ones it does not render.
   Declaring them inside an HTML comment is the idiom already used by
   `templates/home/maizegdb_header.bau`.
-- Page bodies are fetched over HTTP by `loadRemote()`, so a template must be
-  reachable under `/templates/static/` on the same host.
+- Page bodies load from local disk with `load('templates/static/<name>.bau')`,
+  resolved against the web root. **Do not use `loadRemote()`.** It fetched the
+  template over HTTPS from `root_url_private` — the *public* hostname — so every
+  request made a full round trip out through Cloudflare and back for a file
+  already on disk: 220 ms per call, measured, against 0.065 ms for the local
+  read. All 19 call sites were converted on 2026-08-21; page render times fell
+  by 20–80%. `loadRemote()` also rewrites assets declared by a template's own
+  `{include-css:}` directive into absolute `http://` URLs, which is a
+  mixed-content risk on an HTTPS page.
+- Entry points under `pages/<name>/index.php` run with the working directory set
+  to their own folder, so they wrap template loads in `chdir('../')` … 
+  `chdir($cwd)`. The body load must sit inside that block.
 - Cache busting is applied by `Bauplan` itself; pass bare asset paths.
 - Never copy `conf/mgdb.conf` or `conf/db.conf` into this repository. They
   contain database credentials and are listed in `.gitignore`.

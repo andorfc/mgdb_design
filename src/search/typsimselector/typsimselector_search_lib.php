@@ -113,7 +113,17 @@ function typsimResolveLine($DBConn, $dataset, $identifier) {
     }
 
     if (!ctype_digit((string) $identifier)) {
-        return null;
+        $findRow = retrieve_row(make_query($DBConn, "
+            SELECT snp_entry_id
+            FROM pidata.snp_entry
+            WHERE taxa ILIKE ? OR taxa ILIKE ?
+            ORDER BY snp_entry_id ASC
+            LIMIT 1", 1, array($identifier, $identifier . '_%')));
+        if ($findRow && isset($findRow['snp_entry_id'])) {
+            $identifier = (string) $findRow['snp_entry_id'];
+        } else {
+            return null;
+        }
     }
 
     $sql = "

@@ -8,7 +8,9 @@
 include_once('../../include/db-api.php');
 include_once('../../include/gp_lib.php');
 include_once('marker_search_lib.php');
+include_once('../../include/dashboard_cache.php');
 
+$system = getSystemInfo('mgdb.conf');
 $DBConn = connect_to_database(false);
 $filter = markerBuildFilters($DBConn);
 $format = markerSearchValue('format');
@@ -32,9 +34,23 @@ try {
     $started = microtime(true);
     $combined = markerCombinedQuery($filter, $page, $pageSize, $sort);
 
-    // Count query
-    $countRow = retrieve_row(make_query($DBConn, $combined['countSql'], 1, $combined['countParams']));
-    $total = $countRow ? (int) $countRow['total'] : 0;
+    /* The count, not the page, is what this endpoint costs. Measured unfiltered:
+       534 ms to count 769,000 probes, against 27 ms to fetch the 24 rows shown.
+       With no term, type, or bin the count is a property of the whole collection,
+       so it is cached; any narrowed request counts live, and a selective filter
+       makes the count cheap anyway. See include/dashboard_cache.php. */
+    $cacheable = count($filter['whereParams']) === 0;
+
+    if ($cacheable) {
+        $total = (int) dashboardCache($system, 'marker/total', function () use ($DBConn, $combined) {
+            $row = retrieve_row(make_query($DBConn, $combined['countSql'], 1, $combined['countParams']));
+            return $row ? (int) $row['total'] : 0;
+        }, $cacheMeta);
+    } else {
+        $countRow = retrieve_row(make_query($DBConn, $combined['countSql'], 1, $combined['countParams']));
+        $total = $countRow ? (int) $countRow['total'] : 0;
+        $cacheMeta = array('status' => 'live', 'built' => null);
+    }
 
     $results = array();
     if ($total > 0) {
@@ -61,7 +77,9 @@ try {
             'page' => $page,
             'page_size' => $pageSize,
             'page_count' => $total ? (int) ceil($total / $pageSize) : 0,
-            'elapsed_ms' => (int) round((microtime(true) - $started) * 1000)
+            'elapsed_ms' => (int) round((microtime(true) - $started) * 1000),
+            'cache' => $cacheMeta['status'],
+            'data_built' => $cacheMeta['built'] ? date('c', $cacheMeta['built']) : null
         ),
         'results' => $results
     ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

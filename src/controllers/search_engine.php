@@ -29,7 +29,7 @@
  *                                            ACTUAL SEARCH URLS ARE HERE
  *
  *    search/alldata/*.php                  - search scripts for data types
- *                                            that lack a data center or that
+ *                                            that lack a data hub or that
  *                                            require a specialized search    
  *
  *  Flow of control from search box:

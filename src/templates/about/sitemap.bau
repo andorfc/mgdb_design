@@ -1,0 +1,74 @@
+$$SYNTAX-LEVEL 2
+*(sitemap
+<main class="mgdb-page mgdb-sitemap-page" id="sitemap-main">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Site map</span>
+  </nav>
+
+  <section class="mgdb-hero sitemap-hero" aria-labelledby="sitemap-title">
+    <div class="mgdb-hero-emblem">
+      <svg class="sitemap-hero-mark" viewBox="0 0 120 120" role="img" aria-label="Connected MaizeGDB resources">
+        <circle cx="60" cy="60" r="16" fill="#f2a515" />
+        <circle cx="24" cy="30" r="11" fill="#501719" />
+        <circle cx="96" cy="30" r="11" fill="#2f5e2a" />
+        <circle cx="24" cy="92" r="11" fill="#a96919" />
+        <circle cx="96" cy="92" r="11" fill="#501719" />
+        <path d="M34 36 L48 50 M86 36 L72 50 M34 86 L48 70 M86 86 L72 70" fill="none" stroke="#174634" stroke-width="6" stroke-linecap="round" />
+      </svg>
+      <strong>MaizeGDB<br />Site Map</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="sitemap-title">Explore MaizeGDB</h1>
+      <p class="mgdb-hero-description">Every tool, data hub, and resource at MaizeGDB in one directory. Search it, filter it by group, or jump straight to a section.</p>
+    </div>
+  </section>
+
+  *(sitemap-featured {load: templates/about/sitemap-featured.bau})
+
+  *(sitemap-tabs {load: templates/about/sitemap-tabs.bau})
+
+  <section id="sitemap-finder" class="sitemap-directory" aria-labelledby="sitemap-finder-heading">
+    <div class="mgdb-section-heading">
+      <div><h2 id="sitemap-finder-heading">Find a resource</h2></div>
+    </div>
+
+    <div id="sitemap-search-panel" class="sitemap-finder-panel">
+      <form id="sitemap-search-form" class="mgdb-search" role="search">
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="sitemap-search">Search the site map</label>
+          <p class="mgdb-hint" id="sitemap-search-hint">Try <code>BLAST</code>, <code>expression</code>, <code>newsletter</code>, or <code>stocks</code>.</p>
+          <div class="sitemap-search-row">
+            <input class="mgdb-input" id="sitemap-search" name="sitemap_q" type="search" aria-describedby="sitemap-search-hint" autocomplete="off" placeholder="Search resources and descriptions" />
+            <button id="sitemap-search-clear" class="mgdb-button mgdb-button-quiet" type="button" hidden>Clear</button>
+          </div>
+        </div>
+      </form>
+      <div class="sitemap-filter-heading">
+        <div id="sitemap-section-filters" class="sitemap-filter-list" aria-label="Filter by resource group">
+          <button type="button" class="mgdb-chip is-active" data-section-filter="all" aria-pressed="true">All</button>
+          <button type="button" class="mgdb-chip" data-section-filter="tools" aria-pressed="false">Tools</button>
+          <button type="button" class="mgdb-chip" data-section-filter="curated" aria-pressed="false">Data</button>
+          <button type="button" class="mgdb-chip" data-section-filter="community" aria-pressed="false">Community</button>
+          <button type="button" class="mgdb-chip" data-section-filter="archive" aria-pressed="false">Archives</button>
+        </div>
+        <button id="sitemap-expand-all" class="mgdb-button mgdb-button-quiet" type="button">Collapse all sections</button>
+      </div>
+      <p id="sitemap-results-status" class="sitemap-results-status" role="status" aria-live="polite"></p>
+    </div>
+
+    *(sitemap-content {load: templates/about/sitemap-content.bau})
+  </section>
+
+  <section class="sitemap-metrics" aria-labelledby="sitemap-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="sitemap-metrics-title">Metrics</h2></div>
+    </div>
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric"><span class="mgdb-metric-icon" aria-hidden="true">&#9783;</span><div><strong id="sitemap-hub-count" class="mgdb-metric-value">&mdash;</strong><h3>Data hubs</h3></div></article>
+      <article class="mgdb-metric mgdb-tone-green"><span class="mgdb-metric-icon" aria-hidden="true">&#8981;</span><div><strong id="sitemap-tool-count" class="mgdb-metric-value">&mdash;</strong><h3>Research tools</h3></div></article>
+      <article class="mgdb-metric mgdb-tone-red"><span class="mgdb-metric-icon" aria-hidden="true">&#9678;</span><div><strong class="mgdb-metric-value">$(genome_count)</strong><h3>Genome assemblies</h3></div></article>
+      <article class="mgdb-metric mgdb-tone-burgundy"><span class="mgdb-metric-icon" aria-hidden="true">&#8594;</span><div><strong id="sitemap-resource-count" class="mgdb-metric-value">&mdash;</strong><h3>Listed resources</h3></div></article>
+    </div>
+  </section>
+</main>
+)

@@ -1,4 +1,4 @@
-/* Locus Data Center JavaScript (/data_center/locus)
+/* Locus Data Hub JavaScript (/data_center/locus)
  * Handles search submissions, dropdown filters, live results rendering,
  * example chips, and scrollspy navigation tabs.
  */

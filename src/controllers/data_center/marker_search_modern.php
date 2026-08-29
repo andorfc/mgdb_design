@@ -10,6 +10,7 @@
  */
 
 include_once('./include/db-api.php');
+include_once('./include/dashboard_cache.php');
 
 $system = getSystemInfo('mgdb.conf');
 logMessage('Starting marker_search_modern.php');
@@ -21,7 +22,7 @@ header("Cache-Control: no-cache, no-store, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-$bauplan = new Bauplan('MaizeGDB Markers & Probes | Molecular Marker Data Center');
+$bauplan = new Bauplan('MaizeGDB Markers & Probes | Molecular Marker Data Hub');
 $bauplan->modern();
 
 $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';
@@ -58,13 +59,24 @@ $stats_sql = "
   FROM probe p
   JOIN id_num i ON i.id=p.id
   WHERE i.curation_lvl=0";
-$stats = retrieve_row(make_query($DBConn, $stats_sql));
+/* Corpus counts over 769,000 probes plus the marker-type list: identical for
+   every visitor, static between monthly reloads. See include/dashboard_cache.php. */
+$page_data = dashboardCache($system, 'marker/page', function () use ($DBConn, $stats_sql) {
+    $stats = retrieve_row(make_query($DBConn, $stats_sql));
+    return array(
+        'total_markers' => (int) $stats['total_markers'],
+        'mapped_count'  => (int) $stats['mapped_count'],
+        'type_count'    => (int) $stats['type_count'],
+        'ssr_count'     => (int) $stats['ssr_count'],
+        'type_options'  => getMarkerTypeOptions($DBConn)
+    );
+});
 
-$content->get('total_markers')->replace(number_format((int) $stats['total_markers']));
-$content->get('mapped_count')->replace(number_format((int) $stats['mapped_count']));
-$content->get('type_count')->replace(number_format((int) $stats['type_count']));
-$content->get('ssr_count')->replace(number_format((int) $stats['ssr_count']));
-$content->get('type_options')->replace(getMarkerTypeOptions($DBConn));
+$content->get('total_markers')->replace(number_format($page_data['total_markers']));
+$content->get('mapped_count')->replace(number_format($page_data['mapped_count']));
+$content->get('type_count')->replace(number_format($page_data['type_count']));
+$content->get('ssr_count')->replace(number_format($page_data['ssr_count']));
+$content->get('type_options')->replace($page_data['type_options']);
 
 include_once('translation.php');
 $mgdb->get('blast_url')->replace($system['BLAST_URL']);

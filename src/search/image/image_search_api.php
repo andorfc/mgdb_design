@@ -1,7 +1,7 @@
 <?php
 /* file: image_search_api.php
  *
- * purpose: REST API endpoint for the unified Image Data Center (/data_center/image).
+ * purpose: REST API endpoint for the unified Image Data Hub (/data_center/image).
  *          Returns JSON search results with pagination and supports TSV/CSV exports.
  */
 

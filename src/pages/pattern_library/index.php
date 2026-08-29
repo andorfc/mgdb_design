@@ -26,6 +26,7 @@ $bauplan->preHTML('<meta http-equiv="Content-Type" content="text/html; charset=u
 $bauplan->includeCss('/css/static.css');
 $bauplan->includeCss('/css/mgdb-modern.css');
 $bauplan->includeCss('/css/mgdb-megamenu.css');
+$bauplan->includeCss('/css/mgdb-pattern-library.css');
 $bauplan->includeScript('/js/lib/plotly/plotly-2.25.2.min.js');
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
@@ -37,12 +38,12 @@ $cwd = getcwd();
 chdir('../');
 $mgdb = $bauplan->template()->load('templates/maizegdb-main-modern.bau');
 $mgdb->get('megamenu')->load('templates/home/maizegdb_header_modern.bau');
-chdir($cwd);
 
 $mgdb->get('image-dir')->replace($system['image_url']);
 $mgdb->get('server-url')->replace($system['root_url']);
 
-$mgdb->get('body')->loadRemote($system['root_url_private'] . '/templates/static/mgdb_pattern_library.bau');
+$mgdb->get('body')->load('templates/static/mgdb_pattern_library.bau');
+chdir($cwd);
 
 include('../translation.php');
 $mgdb->get('blast_url')->replace($system['BLAST_URL']);

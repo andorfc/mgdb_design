@@ -2,7 +2,7 @@
 /* file: locus_search_lib.php
  *
  * purpose: Query builder, lookup helpers, and result shaping for the modernized
- *          Locus Data Center (/data_center/locus).
+ *          Locus Data Hub (/data_center/locus).
  */
 
 if (!defined('LOCUS_MAX_RESULTS')) {

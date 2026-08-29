@@ -1,7 +1,7 @@
 <?php
 /* file: qtl_search_modern.php
  *
- * purpose: QTL Data Center search landing page (/data_center/qtl)
+ * purpose: QTL Data Hub search landing page (/data_center/qtl)
  *          on the modern design system.
  *
  *          Included by controllers/data_center.php when PAGE is 'qtl' and
@@ -22,7 +22,7 @@ header("Cache-Control: no-cache, no-store, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-$bauplan = new Bauplan('MaizeGDB QTL Data Center | Quantitative Trait Loci & Mapping Experiments');
+$bauplan = new Bauplan('MaizeGDB QTL Data Hub | Quantitative Trait Loci & Mapping Experiments');
 $bauplan->modern();
 
 $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';

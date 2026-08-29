@@ -1,7 +1,7 @@
 <?php
 /* file: controllers/expression.php
  *
- * purpose: top-level controller for MaizeGDB Expression Data Center (/expression)
+ * purpose: top-level controller for MaizeGDB Expression Data Hub (/expression)
  *          Shadows legacy controllers/static/expression.php.
  */
 

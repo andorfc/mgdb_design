@@ -1,7 +1,7 @@
 <?php
 /* file: stock_search_api.php
  *
- * purpose: JSON search endpoint for the modernized stock data center
+ * purpose: JSON search endpoint for the modernized stock data hub
  *          (/data_center/stock). Read by js/mgdb-stock.js.
  *
  *          Three modes:

@@ -11,19 +11,27 @@ $$SYNTAX-LEVEL 2
     <div class="mgdb-hero-emblem">
       <img src="/images/maize_meeting/mgc-mark.png?v=1" alt="" />
       <strong>MaizeGDB<br />Design System</strong>
-      <span>Internal reference</span>
+      <span>Pattern library</span>
     </div>
     <div class="mgdb-hero-body">
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; August 2026</p>
       <span class="mgdb-eyebrow">Page modernization standard</span>
       <h1 id="pattern-title">Shared interface components</h1>
-      <p class="mgdb-hero-tagline">The reusable building blocks for modernized MaizeGDB pages.</p>
       <p class="mgdb-hero-description">This reference renders every component defined in the shared stylesheet so that spacing, contrast, keyboard behavior, and responsive breakpoints can be verified in one place before a pattern is applied to a production page.</p>
-      <div class="mgdb-hero-actions">
-        <a class="mgdb-button mgdb-button-primary" href="#pattern-headers">View components</a>
-        <a class="mgdb-button mgdb-button-secondary" href="#pattern-tokens">Design tokens</a>
-      </div>
     </div>
   </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#pattern-headers" class="is-current">Header variants</a>
+    <a href="#pattern-search">Search &amp; filters</a>
+    <a href="#pattern-table">Data table</a>
+    <a href="#pattern-charts">Figures &amp; charts</a>
+    <a href="#pattern-states">Messages &amp; states</a>
+    <a href="#pattern-forms">Form controls</a>
+    <a href="#pattern-tokens">Design tokens</a>
+    <a href="#pattern-dashboard">Metric cards</a>
+    <a href="#pattern-resources">Related resources</a>
+  </nav>
 
   <section id="pattern-headers" aria-labelledby="pattern-headers-title">
     <div class="mgdb-section-heading">
@@ -35,7 +43,7 @@ $$SYNTAX-LEVEL 2
     </div>
 
     <h3>Data centre &mdash; two-tone</h3>
-    <p class="mgdb-section-intro">Used above. The emblem panel and gradient body give data centres a distinct identity. Kept shallow so the summary dashboard stays visible without scrolling.</p>
+    <p class="mgdb-section-intro">Used above. The emblem panel and light green gradient body give data centres a distinct identity. Kept shallow so the summary dashboard stays visible without scrolling.</p>
 
     <h3 class="mgdb-spaced">Basic information page</h3>
     <p class="mgdb-section-intro">For prose-led pages such as archives, about pages, and documentation. A light panel with a gold spine and a subject icon.</p>
@@ -97,59 +105,15 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
-  <section id="pattern-dashboard" aria-labelledby="pattern-dashboard-title">
-    <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Summary dashboard</span>
-        <h2 id="pattern-dashboard-title">Metric cards</h2>
-      </div>
-      <p>Each card states a value, a unit, a descriptive label, and a short explanation. Tone colors are decorative; the label always carries the meaning.</p>
-    </div>
-    <div class="mgdb-metric-grid">
-      <article class="mgdb-metric">
-        <span class="mgdb-metric-icon" aria-hidden="true">&#9678;</span>
-        <div>
-          <strong class="mgdb-metric-value">39,756</strong>
-          <h3>Gene models</h3>
-          <p>B73 reference assembly, annotation release 5.0.</p>
-        </div>
-      </article>
-      <article class="mgdb-metric mgdb-tone-green">
-        <span class="mgdb-metric-icon" aria-hidden="true">&#9707;</span>
-        <div>
-          <strong class="mgdb-metric-value">54</strong>
-          <h3>Genome assemblies</h3>
-          <p>Nucleotide assemblies available for sequence search.</p>
-        </div>
-      </article>
-      <article class="mgdb-metric mgdb-tone-red">
-        <span class="mgdb-metric-icon" aria-hidden="true">&#9633;</span>
-        <div>
-          <strong class="mgdb-metric-value">1,204 <span class="mgdb-metric-unit">Mb</span></strong>
-          <h3>Reference genome size</h3>
-          <p>Total assembled length of the B73 reference.</p>
-        </div>
-      </article>
-      <article class="mgdb-metric mgdb-tone-burgundy">
-        <span class="mgdb-metric-icon" aria-hidden="true">&#9998;</span>
-        <div>
-          <strong class="mgdb-metric-value mgdb-metric-value-compact">2026-08-01</strong>
-          <h3>Last updated</h3>
-          <p>Date the underlying dataset was last refreshed.</p>
-        </div>
-      </article>
-    </div>
-  </section>
-
-  <section aria-labelledby="pattern-search-title">
+  <section id="pattern-search" aria-labelledby="pattern-search-title">
     <div class="mgdb-section-heading">
       <div>
         <span class="mgdb-eyebrow">Search and filters</span>
-        <h2 id="pattern-search-title">Search interface</h2>
+        <h2 id="pattern-search-title">Search interface &amp; dual views</h2>
       </div>
-      <p>Visible labels, a format hint, keyboard submission, live result counts announced to assistive technology, and filter state mirrored into the URL.</p>
+      <p>Search returns two synchronized presentations &mdash; Table and Grid &mdash; with Table configured as the default view.</p>
     </div>
-    <p class="mgdb-section-intro">Type to filter the list below. The result count updates as you type and is announced politely, and the search term is preserved in the address bar so a filtered view can be shared.</p>
+    <p class="mgdb-section-intro">Type to filter assemblies or click a category chip. Use the view toggle to switch between tabular and card-based presentations with live result counts, URL persistence, and export options.</p>
 
     <div class="mgdb-search">
       <div class="mgdb-search-row">
@@ -167,30 +131,119 @@ $$SYNTAX-LEVEL 2
         <button class="mgdb-chip" type="button" data-filter="nam" aria-pressed="false">NAM founders</button>
         <button class="mgdb-chip" type="button" data-filter="reference" aria-pressed="false">Reference</button>
         <button class="mgdb-chip" type="button" data-filter="teosinte" aria-pressed="false">Teosinte</button>
-        <span class="mgdb-result-count" id="pattern-count" aria-live="polite"></span>
       </div>
     </div>
 
-    <div class="mgdb-card-grid" id="pattern-results" style="margin-top: 1rem;">
-      <article class="mgdb-card" data-filter="reference" data-search="B73 reference Zea mays">
+    <div class="mgdb-results-header">
+      <p class="mgdb-results-status" id="pattern-count" aria-live="polite">Showing 4 assemblies</p>
+      <div class="mgdb-results-controls">
+        <div class="mgdb-view-toggle" role="group" aria-label="Result view">
+          <button class="mgdb-view-btn" id="pattern-view-cards" type="button" data-view="cards" aria-pressed="false">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>Cards
+          </button>
+          <button class="mgdb-view-btn" id="pattern-view-table" type="button" data-view="table" aria-pressed="true">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="2" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="12" width="14" height="2" rx="1" fill="currentColor"/></svg>Table
+          </button>
+        </div>
+        <div class="mgdb-export-buttons">
+          <button class="mgdb-button mgdb-button-quiet" type="button">Export TSV</button>
+          <button class="mgdb-button mgdb-button-quiet" type="button">Export CSV</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table View [Default] -->
+    <div class="mgdb-table-scroll" id="pattern-table-view" tabindex="0" role="region" aria-label="Assembly search results table">
+      <table class="mgdb-table" data-interactive-table="search-assemblies">
+        <caption class="mgdb-visually-hidden">Comparative assembly statistics for representative maize genomes</caption>
+        <thead>
+          <tr>
+            <th scope="col" data-sort="text"><button type="button">Genotype</button></th>
+            <th scope="col" data-sort="text"><button type="button">Assembly</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Length &#40;Mb&#41;</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Contig N50 &#40;Mb&#41;</button></th>
+            <th scope="col" data-sort="text"><button type="button">Category</button></th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody id="pattern-table-tbody">
+          <tr data-filter="reference" data-search="B73 reference NAM 5.0 Zea mays">
+            <th scope="row"><strong>B73</strong></th>
+            <td><code>Zm-B73-REFERENCE-NAM-5.0</code></td>
+            <td class="mgdb-numeric" data-value="2178.3">2,178.3</td>
+            <td class="mgdb-numeric" data-value="47.9">47.9</td>
+            <td><span class="mgdb-pill mgdb-pill-ok">Reference</span></td>
+            <td><a class="mgdb-button mgdb-button-quiet" href="#pattern-search">View</a></td>
+          </tr>
+          <tr data-filter="nam" data-search="Mo17 NAM founder CAU Zea mays">
+            <th scope="row"><strong>Mo17</strong></th>
+            <td><code>Zm-Mo17-REFERENCE-CAU-2.0</code></td>
+            <td class="mgdb-numeric" data-value="2183.0">2,183.0</td>
+            <td class="mgdb-numeric" data-value="19.6">19.6</td>
+            <td><span class="mgdb-pill mgdb-pill-info">NAM founder</span></td>
+            <td><a class="mgdb-button mgdb-button-quiet" href="#pattern-search">View</a></td>
+          </tr>
+          <tr data-filter="nam" data-search="CML247 NAM founder tropical Zea mays">
+            <th scope="row"><strong>CML247</strong></th>
+            <td><code>Zm-CML247-REFERENCE-NAM-1.0</code></td>
+            <td class="mgdb-numeric" data-value="2143.1">2,143.1</td>
+            <td class="mgdb-numeric" data-value="14.2">14.2</td>
+            <td><span class="mgdb-pill mgdb-pill-info">NAM founder</span></td>
+            <td><a class="mgdb-button mgdb-button-quiet" href="#pattern-search">View</a></td>
+          </tr>
+          <tr data-filter="teosinte" data-search="TIL11 teosinte Zea mays parviglumis">
+            <th scope="row"><strong>TIL11</strong></th>
+            <td><code>Zm-TIL11-REFERENCE-PANAND-1.0</code></td>
+            <td class="mgdb-numeric" data-value="1683.9">1,683.9</td>
+            <td class="mgdb-numeric" data-value="9.8">9.8</td>
+            <td><span class="mgdb-pill mgdb-pill-warn">Teosinte</span></td>
+            <td><a class="mgdb-button mgdb-button-quiet" href="#pattern-search">View</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Cards / Grid View -->
+    <div class="mgdb-card-grid" id="pattern-cards-view" hidden>
+      <article class="mgdb-card" data-filter="reference" data-search="B73 reference assembly Zea mays NAM 5.0">
+        <div class="mgdb-card-top" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span class="mgdb-pill mgdb-pill-ok">Reference</span>
+          <span class="mgdb-muted mgdb-small">2,178.3 Mb</span>
+        </div>
         <h3>B73</h3>
-        <p class="mgdb-muted mgdb-small">Reference assembly &middot; <span class="mgdb-pill mgdb-pill-ok">Current</span></p>
+        <p class="mgdb-muted mgdb-small"><code>Zm-B73-REFERENCE-NAM-5.0</code></p>
         <p>The maize reference genotype and the basis for annotation release 5.0.</p>
+        <div style="margin-top:12px;"><a class="mgdb-button mgdb-button-quiet" href="#pattern-search">View record &rarr;</a></div>
       </article>
-      <article class="mgdb-card" data-filter="nam" data-search="Mo17 NAM founder Zea mays">
+      <article class="mgdb-card" data-filter="nam" data-search="Mo17 NAM founder Zea mays CAU">
+        <div class="mgdb-card-top" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span class="mgdb-pill mgdb-pill-info">NAM founder</span>
+          <span class="mgdb-muted mgdb-small">2,183.0 Mb</span>
+        </div>
         <h3>Mo17</h3>
-        <p class="mgdb-muted mgdb-small">NAM founder &middot; <span class="mgdb-pill mgdb-pill-ok">Current</span></p>
+        <p class="mgdb-muted mgdb-small"><code>Zm-Mo17-REFERENCE-CAU-2.0</code></p>
         <p>A widely used inbred line and one of the NAM founder genotypes.</p>
+        <div style="margin-top:12px;"><a class="mgdb-button mgdb-button-quiet" href="#pattern-search">View record &rarr;</a></div>
       </article>
       <article class="mgdb-card" data-filter="nam" data-search="CML247 NAM founder tropical Zea mays">
+        <div class="mgdb-card-top" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span class="mgdb-pill mgdb-pill-info">NAM founder</span>
+          <span class="mgdb-muted mgdb-small">2,143.1 Mb</span>
+        </div>
         <h3>CML247</h3>
-        <p class="mgdb-muted mgdb-small">NAM founder &middot; <span class="mgdb-pill mgdb-pill-info">Tropical</span></p>
+        <p class="mgdb-muted mgdb-small"><code>Zm-CML247-REFERENCE-NAM-1.0</code></p>
         <p>A tropical inbred line from the NAM founder panel.</p>
+        <div style="margin-top:12px;"><a class="mgdb-button mgdb-button-quiet" href="#pattern-search">View record &rarr;</a></div>
       </article>
       <article class="mgdb-card" data-filter="teosinte" data-search="TIL11 teosinte Zea mays parviglumis">
+        <div class="mgdb-card-top" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span class="mgdb-pill mgdb-pill-warn">Teosinte</span>
+          <span class="mgdb-muted mgdb-small">1,683.9 Mb</span>
+        </div>
         <h3>TIL11</h3>
-        <p class="mgdb-muted mgdb-small">Teosinte &middot; <span class="mgdb-pill mgdb-pill-warn">Draft</span></p>
+        <p class="mgdb-muted mgdb-small"><code>Zm-TIL11-REFERENCE-PANAND-1.0</code></p>
         <p>A <i>Zea mays</i> subsp. <i>parviglumis</i> accession.</p>
+        <div style="margin-top:12px;"><a class="mgdb-button mgdb-button-quiet" href="#pattern-search">View record &rarr;</a></div>
       </article>
     </div>
 
@@ -201,19 +254,18 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
-  <section aria-labelledby="pattern-table-title">
+  <section id="pattern-table" aria-labelledby="pattern-table-title">
     <div class="mgdb-section-heading">
       <div>
         <span class="mgdb-eyebrow">Data presentation</span>
         <h2 id="pattern-table-title">Scientific data table</h2>
       </div>
-      <p>A caption, header cells with scope, sortable columns exposing aria-sort, and a scroll container that is focusable when it overflows.</p>
+      <p>Monospace tabular figures for alignable numbers, sticky headers on vertical scroll, sort buttons on interactive columns, and explicit <code>caption</code> for assistive tech.</p>
     </div>
-    <div class="mgdb-table-scroll">
-      <table class="mgdb-table" data-sortable>
-        <caption>
-          Selected maize genome assemblies
-          <span class="mgdb-muted">Values shown are illustrative and are not drawn from the production database.</span>
+    <div class="mgdb-table-scroll" tabindex="0" role="region" aria-label="Assembly summary table with horizontal scrolling">
+      <table class="mgdb-table" data-interactive-table="assemblies">
+        <caption class="mgdb-visually-hidden">
+          Comparative assembly statistics for representative maize genomes, sorted by genotype
         </caption>
         <thead>
           <tr>
@@ -259,7 +311,7 @@ $$SYNTAX-LEVEL 2
     <p class="mgdb-note" style="margin-top: 1rem;"><strong>Data note:</strong> blank or unreported values are shown as &ldquo;Not reported&rdquo; and always sort last, so a missing measurement is never presented as a zero.</p>
   </section>
 
-  <section aria-labelledby="pattern-chart-title">
+  <section id="pattern-charts" aria-labelledby="pattern-chart-title">
     <div class="mgdb-section-heading">
       <div>
         <span class="mgdb-eyebrow">Figures</span>
@@ -318,7 +370,7 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
-  <section aria-labelledby="pattern-states-title">
+  <section id="pattern-states" aria-labelledby="pattern-states-title">
     <div class="mgdb-section-heading">
       <div>
         <span class="mgdb-eyebrow">Feedback</span>
@@ -334,7 +386,7 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
-  <section aria-labelledby="pattern-form-title">
+  <section id="pattern-forms" aria-labelledby="pattern-form-title">
     <div class="mgdb-section-heading">
       <div>
         <span class="mgdb-eyebrow">Input</span>
@@ -402,15 +454,105 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
-  <section class="mgdb-resource-panel" aria-labelledby="pattern-resources-title">
-    <div>
-      <span class="mgdb-eyebrow">Reference</span>
-      <h2 id="pattern-resources-title">Applying these patterns</h2>
-      <p>Call <code>$bauplan-&gt;modern&#40;&#41;</code> in the page controller, include the shared stylesheet and script, then compose the page from the components above.</p>
+  <section id="pattern-dashboard" aria-labelledby="pattern-dashboard-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Dashboard</span>
+        <h2 id="pattern-dashboard-title">Metric cards</h2>
+      </div>
+      <p>Summary cards present high-level statistics with an eyebrow header, prominent value, descriptive context, and top-right metadata bubble.</p>
     </div>
-    <div class="mgdb-resource-list">
-      <a href="/maize_meeting/"><strong>Maize Genetics Meeting</strong><span>The first modernized page in this family</span></a>
-      <a href="/"><strong>MaizeGDB home</strong><span>Return to the main site</span></a>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Gene Models</h3>
+          <span class="mgdb-metric-badge">Release 5.0</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">39,756</strong>
+        </div>
+        <p class="mgdb-metric-description">B73 reference assembly, canonical high-confidence models.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Genome Assemblies</h3>
+          <span class="mgdb-metric-badge">Pan-Maize</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">26</strong>
+          <span class="mgdb-metric-unit">cultivars</span>
+        </div>
+        <p class="mgdb-metric-description">Nucleotide assemblies available for sequence &amp; synteny search.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Reference Genome Size</h3>
+          <span class="mgdb-metric-badge">B73 v5</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">2,178</strong>
+          <span class="mgdb-metric-unit">Mb</span>
+        </div>
+        <p class="mgdb-metric-description">Total assembled pseudomolecule length for the B73 reference.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Dataset Status</h3>
+          <span class="mgdb-metric-badge">Aug 2026</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value mgdb-metric-value-compact">Current</strong>
+        </div>
+        <p class="mgdb-metric-description">Underlying data models and gene annotations refreshed quarterly.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="pattern-resources" aria-labelledby="pattern-resources-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Connected tools</span>
+        <h2 id="pattern-resources-title">Related resources</h2>
+      </div>
+      <p>Explore modernized MaizeGDB data hubs, design system implementation guides, community projects, and connected external repositories.</p>
+    </div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/pan_gene_center/pan_gene">
+          <strong>Pan-Gene Data Hub</strong>
+          <span>Syntenic pan-genome analysis across 66 maize genome assemblies</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/maize_meeting/">
+          <strong>Maize Genetics Meeting</strong>
+          <span>Annual community meeting archive, attendance metrics, and schedules</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/">
+          <strong>MaizeGDB Home</strong>
+          <span>Modernized homepage, global multi-category search, and quick links</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="https\://github.com/MaizeGDB" target="_blank" rel="noopener noreferrer" class="mgdb-external">
+          <strong>MaizeGDB GitHub</strong>
+          <span>Open-source pipelines, data models, scripts, and documentation</span>
+          <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+        </a>
+        <a href="https\://www.ars.usda.gov" target="_blank" rel="noopener noreferrer" class="mgdb-external">
+          <strong>USDA-ARS Research</strong>
+          <span>Agricultural Research Service crop genetics and bioinformatics resources</span>
+          <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+        </a>
+        <a href="https\://www.ncbi.nlm.nih.gov" target="_blank" rel="noopener noreferrer" class="mgdb-external">
+          <strong>NCBI Databases</strong>
+          <span>National Center for Biotechnology Information genomic resources</span>
+          <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+        </a>
+      </div>
     </div>
   </section>
 

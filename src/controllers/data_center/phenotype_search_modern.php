@@ -1,7 +1,7 @@
 <?php
 /* file: phenotype_search_modern.php
  *
- * purpose: Modernized controller for the Phenotype Data Center (/data_center/phenotype).
+ * purpose: Modernized controller for the Phenotype Data Hub (/data_center/phenotype).
  *          Computes real-time corpus statistics, populates filter dropdowns,
  *          and renders the modern responsive page shell.
  */
@@ -19,7 +19,7 @@ header("Cache-Control: no-cache, no-store, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-$bauplan = new Bauplan('MaizeGDB Phenotypes | Observable Traits & Mutant Data Center');
+$bauplan = new Bauplan('MaizeGDB Phenotypes | Observable Traits & Mutant Data Hub');
 $bauplan->modern();
 
 $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';

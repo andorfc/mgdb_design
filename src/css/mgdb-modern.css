@@ -207,6 +207,10 @@
 body.mgdb-modern {
   margin: 0;
   background: var(--mgdb-page-blue);
+  color: var(--mgdb-ink);
+  font-family: var(--mgdb-font);
+  font-size: var(--mgdb-text-base);
+  line-height: var(--mgdb-leading);
 }
 
 /* The white page card. A flex column with min-height 100vh so a short page
@@ -221,6 +225,21 @@ body.mgdb-modern {
   margin-inline: auto;
   background: var(--mgdb-surface);
   box-shadow: 0 0 34px rgba(4, 26, 66, .34);
+  font-family: var(--mgdb-font);
+}
+
+.mgdb-modern button,
+.mgdb-modern input,
+.mgdb-modern select,
+.mgdb-modern textarea {
+  font-family: var(--mgdb-font);
+}
+
+.mgdb-modern [style*="font-family: Verdana"],
+.mgdb-modern [style*="font-family:Verdana"],
+.mgdb-modern [style*="font-family: Arial"],
+.mgdb-modern [style*="font-family:Arial"] {
+  font-family: inherit !important;
 }
 
 /* Takes the slack so the footer stays at the bottom on short pages. */
@@ -422,6 +441,15 @@ body.mgdb-modern {
   .mgdb-modern #logo > table > tbody > tr,
   .mgdb-modern #logo > table > tbody > tr > td { display: block; width: 100%; }
 
+}
+
+/* The nav drawer breaks at a different width from the masthead above it. The
+   bar is nine nowrap items and runs out of rail at 1164px; the logo and search
+   field do not, and keep their 900px breakpoint in the block above. These two
+   were one block at 900px, so between 901px and 1164px the bar overflowed its
+   rail with no Menu button to collapse it. Must stay in step with the drawer
+   breakpoint in css/mgdb-megamenu.css and MOBILE_QUERY in js/mgdb-chrome.js. */
+@media (max-width: 1164px) {
   .mgdb-modern .mgdb-nav-toggle { display: inline-flex; }
 
   .mgdb-modern #menu_bar,
@@ -515,6 +543,7 @@ body.mgdb-modern {
   z-index: 99000;
   padding: var(--mgdb-space-4) var(--mgdb-gutter);
   background: linear-gradient(135deg, #16351f, #24502c 60%, #2f6134);
+  font-family: var(--mgdb-font);
 }
 
 .mgdb-site-header-inner {
@@ -528,14 +557,14 @@ body.mgdb-modern {
 }
 
 .mgdb-site-brand { flex: 0 0 auto; line-height: 0; }
-.mgdb-site-brand img { width: 232px; max-width: 100%; height: auto; }
+.mgdb-site-brand img { width: 275px; max-width: 100%; height: auto; }
 .mgdb-site-brand:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
 
 .mgdb-site-search { position: relative; flex: 1 1 30rem; min-width: 0; max-width: 40rem; }
 
 /* Search shell ------------------------------------------------------------ */
 
-.mgdb-search-form { position: relative; margin: 0; }
+.mgdb-search-form { position: relative; margin: 0; font-family: var(--mgdb-font); }
 
 /* The sprite is only a definition store; it must not take up layout. */
 .mgdb-search-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
@@ -567,7 +596,7 @@ body.mgdb-modern {
   border-radius: var(--mgdb-radius-lg) 0 0 var(--mgdb-radius-lg);
   background: var(--mgdb-surface-alt);
   color: var(--mgdb-ink);
-  font-family: inherit;
+  font-family: var(--mgdb-font);
   font-size: var(--mgdb-text-base);
 }
 
@@ -593,7 +622,7 @@ body.mgdb-modern {
   border-radius: var(--mgdb-radius-lg) 0 0 var(--mgdb-radius-lg);
   background: var(--mgdb-surface-alt);
   color: var(--mgdb-ink);
-  font-family: inherit;
+  font-family: var(--mgdb-font);
   font-size: var(--mgdb-text-sm);
   font-weight: 700;
   text-align: left;
@@ -704,7 +733,7 @@ body.mgdb-modern {
   border-radius: var(--mgdb-radius-sm);
   background: none;
   color: var(--mgdb-ink);
-  font: inherit;
+  font-family: var(--mgdb-font);
   font-size: var(--mgdb-text-sm);
   text-align: left;
   cursor: pointer;
@@ -752,7 +781,7 @@ body.mgdb-modern {
   border: 0;
   background: transparent;
   color: var(--mgdb-ink);
-  font-family: inherit;
+  font-family: var(--mgdb-font);
   /* 16px keeps iOS from zooming the page when the field takes focus. */
   font-size: var(--mgdb-text-base);
 }
@@ -814,6 +843,7 @@ body.mgdb-modern {
   background: var(--mgdb-surface);
   box-shadow: var(--mgdb-shadow-lg);
   color: var(--mgdb-ink);
+  font-family: var(--mgdb-font);
   text-align: left;
 }
 
@@ -834,6 +864,7 @@ body.mgdb-modern {
   border-bottom: 1px solid var(--mgdb-line-soft);
   background: var(--mgdb-surface-alt);
   color: var(--mgdb-green-dark);
+  font-family: var(--mgdb-font);
   font-size: var(--mgdb-text-sm);
   font-weight: 800;
 }
@@ -850,7 +881,7 @@ body.mgdb-modern {
   border-bottom: 1px solid var(--mgdb-line-soft);
   background: none;
   color: var(--mgdb-ink) !important;
-  font: inherit;
+  font-family: var(--mgdb-font);
   text-align: left;
   text-decoration: none;
   cursor: pointer;
@@ -915,6 +946,7 @@ body.mgdb-modern {
   align-items: center;
   padding: var(--mgdb-space-5) var(--mgdb-space-4);
   color: var(--mgdb-muted);
+  font-family: var(--mgdb-font);
   font-size: var(--mgdb-text-sm);
 }
 
@@ -926,7 +958,7 @@ body.mgdb-modern {
   border-top: 1px solid var(--mgdb-line);
   background: var(--mgdb-surface-alt);
   color: var(--mgdb-green-dark);
-  font: inherit;
+  font-family: var(--mgdb-font);
   font-size: var(--mgdb-text-sm);
   font-weight: 700;
   text-align: left;
@@ -964,42 +996,214 @@ body.mgdb-modern {
 /* Modern footer ----------------------------------------------------------- */
 
 .mgdb-site-footer {
-  margin-top: var(--mgdb-space-8);
-  padding: var(--mgdb-space-5) var(--mgdb-gutter);
+  margin-top: var(--mgdb-space-9);
+  padding-top: var(--mgdb-space-7);
   border-top: 4px solid var(--mgdb-gold);
-  background: #16351f;
-  color: #fff;
+  background: #133221;
+  color: #e5ede7;
+  font-family: var(--mgdb-font);
 }
 
 .mgdb-site-footer-inner {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-4) var(--mgdb-space-6);
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(260px, 1.2fr) minmax(0, 2.8fr);
+  gap: var(--mgdb-space-6) var(--mgdb-space-8);
   max-width: var(--mgdb-max-width);
   margin-inline: auto;
+  padding-inline: var(--mgdb-gutter);
+  padding-bottom: var(--mgdb-space-7);
 }
 
-.mgdb-footer-links {
+.mgdb-footer-brand {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2) var(--mgdb-space-5);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--mgdb-space-3);
+}
+
+.mgdb-footer-usda {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.mgdb-footer-usda-card {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mgdb-space-3);
+  padding: 6px 12px;
+  background: #ffffff;
+  border-radius: var(--mgdb-radius-md);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.mgdb-footer-usda:hover .mgdb-footer-usda-card {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .35);
+}
+
+.mgdb-footer-usda-card img {
+  height: 38px;
+  width: auto;
+  display: block;
+}
+
+.mgdb-footer-usda-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  text-align: left;
+}
+
+.mgdb-footer-usda-text strong {
+  font-family: var(--mgdb-font);
+  font-size: var(--mgdb-text-base);
+  font-weight: 800;
+  color: #004785;
+  letter-spacing: .02em;
+}
+
+.mgdb-footer-usda-text span {
+  font-family: var(--mgdb-font);
+  font-size: 11px;
+  font-weight: 600;
+  color: #231f20;
+  max-width: 22ch;
+}
+
+.mgdb-footer-tagline {
+  margin: 0;
+  color: #b5cbbb;
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+  max-width: 38ch;
+}
+
+.mgdb-footer-tagline strong {
+  color: #ffffff;
+}
+
+.mgdb-footer-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--mgdb-space-4) var(--mgdb-space-5);
+}
+
+.mgdb-footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-footer-heading {
+  margin: 0 0 var(--mgdb-space-1);
+  color: #ffffff;
+  font-family: var(--mgdb-font);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.mgdb-footer-nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-2);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.mgdb-footer-links a {
-  display: inline-flex;
-  min-height: var(--mgdb-tap-target);
-  align-items: center;
-  color: #fff !important;
-  font-size: var(--mgdb-text-base);
-  font-weight: 600;
+.mgdb-footer-nav a {
+  color: #b5cbbb !important;
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+  text-decoration: none;
+  transition: color .15s ease;
 }
 
-.mgdb-site-footer :focus-visible { outline: 3px solid var(--mgdb-gold); outline-offset: 2px; }
+.mgdb-footer-nav a:hover {
+  color: #ffffff !important;
+  text-decoration: underline;
+}
+
+.mgdb-footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, .12);
+  background: #0d2518;
+  padding: var(--mgdb-space-4) var(--mgdb-gutter);
+}
+
+.mgdb-footer-bottom-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mgdb-space-3);
+  max-width: var(--mgdb-max-width);
+  margin-inline: auto;
+  color: #8fa996;
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-footer-copy {
+  margin: 0;
+  color: #8fa996;
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-footer-copy a,
+.mgdb-footer-cite-link {
+  color: #b5cbbb !important;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color .15s ease;
+}
+
+.mgdb-footer-copy a:hover,
+.mgdb-footer-cite-link:hover {
+  color: #ffffff !important;
+  text-decoration: underline;
+}
+
+.mgdb-footer-bottom-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+  color: #8fa996;
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-footer-bottom-links a {
+  color: #b5cbbb !important;
+  font-size: var(--mgdb-text-xs);
+  text-decoration: none;
+  transition: color .15s ease;
+}
+
+.mgdb-footer-bottom-links a:hover {
+  color: #ffffff !important;
+  text-decoration: underline;
+}
+
+.mgdb-site-footer :focus-visible {
+  outline: 3px solid var(--mgdb-gold);
+  outline-offset: 2px;
+}
+
+@media (max-width: 1023px) {
+  .mgdb-site-footer-inner {
+    grid-template-columns: 1fr;
+    gap: var(--mgdb-space-6);
+  }
+  .mgdb-footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 
 @media (max-width: 767px) {
   /* .mgdb-page tightens its padding at this breakpoint to win back width on a
@@ -1026,7 +1230,18 @@ body.mgdb-modern {
     border-radius: var(--mgdb-radius-lg) var(--mgdb-radius-lg) 0 0;
   }
   .mgdb-search-submit { border-radius: 0 0 var(--mgdb-radius-lg) 0; }
-  .mgdb-site-footer-inner { justify-content: center; text-align: center; }
+}
+
+@media (max-width: 639px) {
+  .mgdb-footer-grid {
+    grid-template-columns: 1fr;
+    gap: var(--mgdb-space-4);
+  }
+  .mgdb-footer-bottom-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mgdb-space-2);
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -1183,28 +1398,31 @@ body.mgdb-modern {
    7. Page identity header
 
    Split layout: emblem or illustration on the left, title and description on
-   the right. Deliberately shallow — the summary dashboard should be reachable
-   without scrolling on a laptop.
+   the right. A light green wash that belongs to the same family as the section
+   headings below it. Deliberately shallow — the summary dashboard should be
+   reachable without scrolling on a laptop.
    -------------------------------------------------------------------------- */
 
 .mgdb-hero {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(180px, 22%) minmax(0, 1fr);
+  grid-template-columns: minmax(150px, 17%) minmax(0, 1fr);
+  align-items: stretch;
   overflow: hidden;
+  border: 1px solid #cfe3d6;
   border-radius: var(--mgdb-radius-lg);
-  background: linear-gradient(118deg, #4d1518, #8d2a20 52%, #c9541f 100%);
-  color: #fff;
-  box-shadow: var(--mgdb-shadow-lg);
+  background: linear-gradient(115deg, #f4faf6 0%, var(--mgdb-green-soft) 46%, #e4f0e6 100%);
+  color: var(--mgdb-ink);
+  box-shadow: 0 1px 2px rgba(23, 70, 52, .05);
 }
 
 .mgdb-hero::after {
   position: absolute;
-  top: -185px;
-  right: -110px;
-  width: 420px;
-  height: 420px;
-  border: 48px solid rgba(255, 196, 76, .13);
+  top: -210px;
+  right: -130px;
+  width: 380px;
+  height: 380px;
+  border: 40px solid rgba(40, 93, 70, .06);
   border-radius: 50%;
   content: "";
   pointer-events: none;
@@ -1218,28 +1436,36 @@ body.mgdb-modern {
   gap: var(--mgdb-space-2);
   align-items: center;
   justify-content: center;
-  padding: var(--mgdb-space-4) var(--mgdb-space-4);
-  border-right: 1px solid rgba(255, 255, 255, .45);
-  background: linear-gradient(145deg, rgba(255, 252, 244, .98), rgba(249, 231, 188, .96));
+  padding: var(--mgdb-space-4) var(--mgdb-space-3);
+  border-right: 1px solid #cfe3d6;
+  background: linear-gradient(160deg, rgba(255, 255, 255, .92), rgba(255, 255, 255, .55));
+  color: var(--mgdb-green-dark);
   text-align: center;
 }
 
 /* multiply drops the white matte that ships with most MaizeGDB emblem PNGs so
    they sit on the cream panel without a visible box. */
 .mgdb-hero-emblem img {
-  width: min(100%, 104px);
+  width: min(100%, 64px);
   mix-blend-mode: multiply;
 }
 
+.mgdb-hero-emblem svg {
+  width: min(100%, 62px);
+  mix-blend-mode: normal;
+}
+
 .mgdb-hero-emblem strong {
-  color: var(--mgdb-burgundy);
-  font-size: var(--mgdb-text-lg);
-  line-height: var(--mgdb-leading-tight);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-base);
+  font-weight: 800;
+  letter-spacing: .01em;
+  line-height: var(--mgdb-leading-snug);
 }
 
 .mgdb-hero-emblem span {
-  color: var(--mgdb-gold-dark);
-  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-leaf);
+  font-size: var(--mgdb-text-xs);
   font-weight: 700;
   letter-spacing: .08em;
   text-transform: uppercase;
@@ -1255,26 +1481,28 @@ body.mgdb-modern {
   padding: var(--mgdb-space-5) var(--mgdb-space-6);
 }
 
-.mgdb-hero .mgdb-eyebrow { color: #ffe6a9; }
+.mgdb-hero .mgdb-eyebrow { color: var(--mgdb-leaf); }
 
 .mgdb-hero h1 {
-  margin: var(--mgdb-space-1) 0 var(--mgdb-space-2);
-  color: #fff;
-  font-size: clamp(1.625rem, 1.1rem + 1.8vw, 2rem);
+  margin: 0 0 var(--mgdb-space-2);
+  color: var(--mgdb-green-dark);
+  font-size: clamp(1.5rem, 1.1rem + 1.3vw, 1.875rem);
+  padding-right: 11rem;
 }
 
 .mgdb-hero-tagline {
   max-width: 60ch;
-  color: #fff;
+  color: var(--mgdb-ink);
   font-size: var(--mgdb-text-lg);
   font-weight: 600;
 }
 
 .mgdb-hero-description {
-  max-width: var(--mgdb-measure);
-  margin-top: var(--mgdb-space-2);
-  color: #fdf1e2;      /* 9.6:1 on the darkest gradient stop */
+  max-width: 62ch;
+  margin-top: 0;
+  color: var(--mgdb-ink-soft);
   font-size: var(--mgdb-text-base);
+  line-height: var(--mgdb-leading);
 }
 
 .mgdb-hero-actions {
@@ -1284,16 +1512,48 @@ body.mgdb-modern {
   margin-top: var(--mgdb-space-4);
 }
 
-.mgdb-hero .mgdb-button-primary { background: #fff; color: var(--mgdb-burgundy) !important; }
-.mgdb-hero .mgdb-button-primary:hover { background: #fff3dc; }
-.mgdb-hero .mgdb-button-secondary {
-  border-color: rgba(255, 255, 255, .7);
-  background: rgba(255, 255, 255, .1);
+.mgdb-hero .mgdb-button-primary {
+  background: var(--mgdb-green-dark);
   color: #fff !important;
 }
-.mgdb-hero .mgdb-button-secondary:hover { background: rgba(255, 255, 255, .2); }
+.mgdb-hero .mgdb-button-primary:hover { background: #0f3325; }
 
-.mgdb-hero :focus-visible { outline-color: #fff; }
+.mgdb-hero .mgdb-button-secondary {
+  border-color: var(--mgdb-green-dark);
+  background: rgba(255, 255, 255, .7);
+  color: var(--mgdb-green-dark) !important;
+}
+.mgdb-hero .mgdb-button-secondary:hover { background: #fff; }
+
+.mgdb-hero :focus-visible { outline-color: var(--mgdb-focus); }
+
+/* Freshness stamp --------------------------------------------------------- */
+
+.mgdb-hero-stamp,
+.pan-gene-hero-stamp {
+  position: absolute;
+  z-index: 1;
+  top: var(--mgdb-space-5);
+  right: var(--mgdb-space-6);
+  display: inline-flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  padding: var(--mgdb-space-1) var(--mgdb-space-3);
+  border: 1px solid #bcd9c6;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .9);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.mgdb-hero-stamp span,
+.pan-gene-hero-stamp span {
+  color: var(--mgdb-gold);
+  font-size: .7em;
+  line-height: 1;
+}
 
 /* --------------------------------------------------------------------------
    7b. Basic information page header
@@ -1345,6 +1605,74 @@ body.mgdb-modern {
   color: var(--mgdb-ink);
   font-size: var(--mgdb-text-base);
 }
+
+/* --------------------------------------------------------------------------
+   7c. In-page section navigation tabs
+   -------------------------------------------------------------------------- */
+
+.mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-6);
+  padding: var(--mgdb-space-2) 0;
+  background: var(--mgdb-surface);
+}
+
+.mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.mgdb-section-tabs a:hover {
+  background: var(--mgdb-green-soft);
+  border-color: #bcd9c6;
+}
+
+/* The current section is marked by weight, dark green fill, and a gold bar. */
+.mgdb-section-tabs a.is-current {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #fff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+.mgdb-section-tabs .mgdb-tab-count,
+.mgdb-section-tabs [class*="-tab-count"] {
+  display: inline-flex;
+  min-width: 1.4rem;
+  padding: 1px 6px;
+  margin-left: var(--mgdb-space-2);
+  border-radius: 999px;
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  justify-content: center;
+}
+
+.mgdb-section-tabs a.is-current .mgdb-tab-count,
+.mgdb-section-tabs a.is-current [class*="-tab-count"] {
+  background: rgba(255, 255, 255, .2);
+  color: #fff;
+}
+
+/* Scroll-margin so an anchored section is not hidden behind the sticky tabs. */
+.mgdb-page > section[id] { scroll-margin-top: 4.5rem; }
 
 /* --------------------------------------------------------------------------
    7c. Record page header
@@ -1423,92 +1751,126 @@ body.mgdb-modern {
 }
 
 /* --------------------------------------------------------------------------
-   8. Summary dashboard — metric cards
+   8. Metric cards
    -------------------------------------------------------------------------- */
 
 .mgdb-metric-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: var(--mgdb-space-4);
+  align-items: stretch;
 }
 
 .mgdb-metric {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: var(--mgdb-space-4);
+  grid-template-rows: auto auto 1fr;
+  align-content: start;
   padding: var(--mgdb-space-5);
   border: 1px solid var(--mgdb-line);
-  border-top: 3px solid var(--mgdb-gold);
-  border-radius: var(--mgdb-radius);
+  border-radius: var(--mgdb-radius-lg);
   background: var(--mgdb-surface);
-  box-shadow: var(--mgdb-shadow-sm);
+  box-shadow: 0 1px 3px rgba(23, 70, 52, .04);
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
 }
 
-/* Tone variants change the top border and icon chip. They are decorative:
-   the label always carries the meaning, never the colour. */
-.mgdb-tone-red { border-top-color: var(--mgdb-red); }
-.mgdb-tone-amber { border-top-color: var(--mgdb-orange); }
-.mgdb-tone-green { border-top-color: var(--mgdb-green); }
-.mgdb-tone-burgundy { border-top-color: var(--mgdb-burgundy); }
+.mgdb-metric:hover {
+  border-color: #bcd9c6;
+  box-shadow: 0 4px 14px rgba(23, 70, 52, .08);
+  transform: translateY(-1px);
+}
 
+/* Hide legacy icon chip when modern card layout is active */
 .mgdb-metric-icon {
+  display: none !important;
+}
+
+/* Row 1: Header + Info bubble with consistent height so 1-line and 2-line
+   headers reserve identical vertical space. */
+.mgdb-metric-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--mgdb-space-2);
+  min-height: 2.75rem;
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-metric h3,
+.mgdb-metric-title {
+  margin: 0;
+  color: var(--mgdb-ink-soft);
+  font-family: var(--mgdb-font);
+  font-size: var(--mgdb-text-base);
+  font-weight: 600;
+  line-height: var(--mgdb-leading-snug);
+  flex: 1 1 auto;
+}
+
+.mgdb-metric-badge {
   display: inline-flex;
-  width: 40px;
-  height: 40px;
   align-items: center;
-  justify-content: center;
-  border-radius: var(--mgdb-radius-sm);
+  flex: 0 0 auto;
+  margin-top: 1px;
+  padding: 3px 10px;
+  border-radius: 999px;
   background: var(--mgdb-gold-soft);
   color: var(--mgdb-gold-dark);
-  font-size: var(--mgdb-text-base);
-  font-weight: 800;
-}
-
-.mgdb-tone-red .mgdb-metric-icon { background: var(--mgdb-red-soft); color: var(--mgdb-red); }
-.mgdb-tone-amber .mgdb-metric-icon { background: #fff0e7; color: #a33d10; }
-.mgdb-tone-green .mgdb-metric-icon { background: var(--mgdb-green-soft); color: var(--mgdb-green); }
-.mgdb-tone-burgundy .mgdb-metric-icon { background: var(--mgdb-burgundy-soft); color: var(--mgdb-burgundy); }
-
-.mgdb-metric-value {
-  display: block;
-  color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-2xl);
-  font-weight: 800;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-
-/* Long values such as an ISO date wrap awkwardly at the display size. */
-.mgdb-metric-value-compact {
-  font-size: var(--mgdb-text-xl);
+  font-family: var(--mgdb-font);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .01em;
   white-space: nowrap;
 }
 
-/* Units belong beside the value, not only in a tooltip. */
+/* Row 2: Statistic value on consistent baseline height. */
+.mgdb-metric-stat {
+  display: flex;
+  align-items: baseline;
+  gap: var(--mgdb-space-1);
+  min-height: 2.5rem;
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-metric-value {
+  display: inline-block;
+  color: var(--mgdb-green-dark);
+  font-family: "Iowan Old Style", "Apple Garamond", "Baskerville", "Times New Roman", Georgia, serif, var(--mgdb-font);
+  font-size: clamp(2rem, 1.7rem + 1vw, 2.375rem);
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.mgdb-metric-value-compact {
+  font-size: clamp(1.5rem, 1.3rem + .8vw, 1.875rem);
+  white-space: nowrap;
+}
+
 .mgdb-metric-unit {
-  color: var(--mgdb-muted);
+  color: var(--mgdb-ink-soft);
+  font-family: var(--mgdb-font);
   font-size: var(--mgdb-text-base);
-  font-weight: 600;
+  font-weight: 500;
+  letter-spacing: normal;
+  margin-left: 2px;
 }
 
-.mgdb-metric h3 {
-  margin-top: var(--mgdb-space-2);
-  color: var(--mgdb-ink);
-  font-size: var(--mgdb-text-base);
-}
-
-.mgdb-metric p {
-  margin-top: var(--mgdb-space-1);
-  color: var(--mgdb-muted);
+/* Row 3: Description starting at the exact same horizontal position. */
+.mgdb-metric p,
+.mgdb-metric-description {
+  margin: 0;
+  color: var(--mgdb-ink-soft);
+  font-family: var(--mgdb-font);
   font-size: var(--mgdb-text-sm);
-  line-height: var(--mgdb-leading-snug);
+  line-height: var(--mgdb-leading);
 }
 
 .mgdb-metric a { color: var(--mgdb-green-dark); font-weight: 600; }
 
 /* Whole-card link variant. */
 a.mgdb-metric { color: var(--mgdb-ink) !important; text-decoration: none; }
-a.mgdb-metric:hover { border-color: var(--mgdb-gold-dark); background: var(--mgdb-surface-alt); }
+a.mgdb-metric:hover { border-color: var(--mgdb-green-dark); background: var(--mgdb-surface-alt); }
 
 /* Quiet metric — value over label, no icon or tone border. Pairs with the
    basic-page header on prose-led pages where the figures are supporting
@@ -1557,6 +1919,87 @@ a.mgdb-metric:hover { border-color: var(--mgdb-gold-dark); background: var(--mgd
   grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
   gap: var(--mgdb-space-6);
   align-items: start;
+}
+
+/* --------------------------------------------------------------------------
+   8b. Search result view switcher (Table vs. Cards/Grid)
+   -------------------------------------------------------------------------- */
+
+.mgdb-results-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-results-status {
+  color: var(--mgdb-ink-soft);
+  font-family: var(--mgdb-font);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 500;
+  margin: 0;
+}
+
+.mgdb-results-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+}
+
+.mgdb-view-toggle {
+  display: inline-flex;
+  gap: 2px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  padding: 2px;
+}
+
+.mgdb-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  padding: 5px var(--mgdb-space-3);
+  border: none;
+  border-radius: var(--mgdb-radius-xs, 4px);
+  background: transparent;
+  color: var(--mgdb-ink-soft);
+  font-family: var(--mgdb-font);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.mgdb-view-btn:hover:not([aria-pressed="true"]) {
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-ink);
+}
+
+.mgdb-view-btn[aria-pressed="true"] {
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+}
+
+.mgdb-view-btn svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+.mgdb-export-buttons {
+  display: flex;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-export-buttons .mgdb-button {
+  min-height: 32px;
+  padding: 4px var(--mgdb-space-3);
+  font-size: var(--mgdb-text-xs);
 }
 
 /* --------------------------------------------------------------------------
@@ -1622,43 +2065,134 @@ a.mgdb-card h3 { text-decoration: underline; }
   background: var(--mgdb-surface-alt);
 }
 
-.mgdb-panel-sunken { background: var(--mgdb-surface-sunken); }
+/* --------------------------------------------------------------------------
+   14. Related resources panel
 
-/* A dark closing panel for related links and documentation. */
+   A light closing panel for related links, documentation, and connected tools.
+   Matches the header's light green wash and structural clarity.
+   -------------------------------------------------------------------------- */
+
 .mgdb-resource-panel {
+  padding: var(--mgdb-space-5);
+  border: 1px solid #cfe3d6;
+  border-radius: var(--mgdb-radius-lg);
+  background: linear-gradient(115deg, #f4faf6 0%, var(--mgdb-green-soft) 46%, #e4f0e6 100%);
+  color: var(--mgdb-ink);
+  box-shadow: 0 1px 2px rgba(23, 70, 52, .05);
+}
+
+.mgdb-resource-panel.mgdb-resource-split {
   display: grid;
   grid-template-columns: minmax(240px, .7fr) minmax(0, 1.3fr);
   gap: var(--mgdb-space-6);
   padding: var(--mgdb-space-6);
-  border-radius: var(--mgdb-radius-lg);
-  background: linear-gradient(125deg, #331315, #5b1a1c);
-  color: #fff;
 }
 
-.mgdb-resource-panel h2 { color: #fff; }
-.mgdb-resource-panel .mgdb-eyebrow { color: #ffc65d; }
-.mgdb-resource-panel > div:first-child p { margin-top: var(--mgdb-space-3); color: #f5dfe0; }
-.mgdb-resource-panel :focus-visible { outline-color: #fff; }
+.mgdb-resource-panel h2 {
+  margin: var(--mgdb-space-1) 0 var(--mgdb-space-2);
+  color: var(--mgdb-green-dark);
+  font-size: clamp(1.375rem, 1.1rem + 1vw, 1.625rem);
+}
+
+.mgdb-resource-panel .mgdb-eyebrow {
+  color: var(--mgdb-leaf);
+}
+
+.mgdb-resource-panel > div:first-child p {
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-base);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-resource-panel > div:first-child code {
+  padding: 2px 6px;
+  border: 1px solid #cfe3d6;
+  border-radius: var(--mgdb-radius-sm);
+  background: rgba(255, 255, 255, .85);
+  color: var(--mgdb-green-dark);
+  font-size: .9em;
+}
+
+.mgdb-resource-panel :focus-visible { outline-color: var(--mgdb-focus); }
 
 .mgdb-resource-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: var(--mgdb-space-3);
+  align-content: start;
 }
 
 .mgdb-resource-list a {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
   padding: var(--mgdb-space-4);
-  border: 1px solid rgba(255, 255, 255, .18);
+  border: 1px solid #cfe3d6;
   border-radius: var(--mgdb-radius-sm);
-  background: rgba(255, 255, 255, .07);
-  color: #fff !important;
+  background: rgba(255, 255, 255, .85);
+  color: var(--mgdb-ink) !important;
   text-decoration: none;
+  transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease, transform .15s ease;
 }
 
-.mgdb-resource-list a:hover { background: rgba(255, 255, 255, .14); }
-.mgdb-resource-list strong { display: block; font-size: var(--mgdb-text-base); text-decoration: underline; }
-.mgdb-resource-list span { display: block; margin-top: var(--mgdb-space-1); color: #eccfd1; font-size: var(--mgdb-text-sm); }
+.mgdb-resource-list a:hover {
+  border-color: var(--mgdb-green-dark);
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(23, 70, 52, .08);
+  transform: translateY(-1px);
+}
+
+.mgdb-resource-list strong {
+  display: block;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-resource-list a:hover strong {
+  color: var(--mgdb-leaf);
+  text-decoration: underline;
+}
+
+.mgdb-resource-list span {
+  display: block;
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-resource-list .mgdb-resource-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+  margin-top: var(--mgdb-space-3);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-resource-list .mgdb-resource-badge-external {
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+}
+
+.mgdb-resource-list .mgdb-resource-badge-external::after {
+  content: "\2197";
+  font-size: 1.1em;
+  line-height: 1;
+  margin-left: 2px;
+}
+
+.mgdb-resource-list a.mgdb-external::after {
+  display: none;
+}
 
 /* Data provenance / citation note. Pairs an icon-free label with the text so
    it reads correctly in a screen reader. */
@@ -2098,12 +2632,29 @@ a.mgdb-card h3 { text-decoration: underline; }
     justify-content: flex-start;
     padding: var(--mgdb-space-4);
     border-right: 0;
-    border-bottom: 1px solid rgba(255, 255, 255, .45);
+    border-bottom: 1px solid #cfe3d6;
     text-align: left;
   }
-  .mgdb-hero-emblem img { width: 52px; }
+  .mgdb-hero-emblem img,
+  .mgdb-hero-emblem svg { width: 44px; }
   .mgdb-hero-emblem strong { min-width: 0; flex: 1 1 auto; }
   .mgdb-hero-emblem > span { flex: 1 0 100%; }
+  .mgdb-hero h1 { padding-right: 0; }
+  .mgdb-hero-stamp {
+    position: static;
+    margin-bottom: var(--mgdb-space-3);
+  }
+
+  .mgdb-section-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: var(--mgdb-space-2);
+  }
+  .mgdb-section-tabs a {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
 
   /* The basic-page icon is decorative context; the heading matters more at
      phone width, so stack rather than shrink the text column. */
@@ -2180,4 +2731,95 @@ a.mgdb-card h3 { text-decoration: underline; }
   .mgdb-table-scroll { overflow: visible; }
   .mgdb-chart-data[open],
   .mgdb-chart-data { display: block; }
+}
+
+/* The USDA lockup is a wide SVG. Given only a height it lays out ~346px across,
+   which overflows a 375px phone and puts every page into horizontal scroll.
+   The footer is on every page, so the constraint belongs here rather than in a
+   page stylesheet. */
+.mgdb-modern .mgdb-footer-usda img,
+.mgdb-modern .mgdb-footer-usda-card img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* --- footer, single block ---------------------------------------------------
+   Two rows: the statement centred across the full width, then the links on the
+   left and the USDA mark on the right.
+
+   The height was 220px for three short rows -- the <footer> carried 40px of its
+   own top padding on top of the inner block's 24px, and the lockup is only
+   ~30px tall because the artwork is 300x33. */
+.mgdb-modern .mgdb-site-footer { padding: 0; }
+
+.mgdb-modern .mgdb-site-footer .mgdb-site-footer-inner {
+  /* display:block explicitly. The earlier .mgdb-site-footer-inner rule from the
+     two-part footer sets display:grid with two columns, and it survived here --
+     the statement was being laid out in a 355px column and wrapping to three
+     lines instead of spanning the width. Third leftover from that footer to
+     leak through; the old block is worth deleting outright. */
+  display: block;
+  max-width: var(--mgdb-max-width);
+  margin: 0 auto;
+  padding: var(--mgdb-space-4) var(--mgdb-gutter);
+}
+
+.mgdb-modern .mgdb-site-footer .mgdb-footer-tagline {
+  /* Explicitly none: the earlier .mgdb-footer-tagline rule from the two-part
+     footer sets max-width:38ch, which survived here and broke the sentence over
+     three lines inside a full-width row. */
+  max-width: none;
+  margin: 0 0 var(--mgdb-space-3);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+  color: rgba(255, 255, 255, .88);
+  text-align: center;
+}
+
+.mgdb-modern .mgdb-site-footer .mgdb-footer-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mgdb-space-2) var(--mgdb-space-5);
+  padding-top: var(--mgdb-space-2);
+  border-top: 1px solid rgba(255, 255, 255, .14);
+}
+
+.mgdb-modern .mgdb-site-footer .mgdb-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--mgdb-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-modern .mgdb-site-footer .mgdb-footer-links a {
+  display: inline-flex;
+  align-items: center;
+  /* 38px, not the 44px tap floor: these sit in a row with generous horizontal
+     spacing, and 44 each added height for no gain in hit area. */
+  min-height: 38px;
+  color: rgba(255, 255, 255, .92);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.mgdb-modern .mgdb-site-footer .mgdb-footer-links a:hover,
+.mgdb-modern .mgdb-site-footer .mgdb-footer-links a:focus-visible { color: #fff; }
+
+.mgdb-modern .mgdb-site-footer .mgdb-footer-usda { flex: 0 0 auto; display: block; line-height: 0; }
+
+.mgdb-modern .mgdb-site-footer .mgdb-footer-usda img {
+  width: 280px;
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 640px) {
+  .mgdb-modern .mgdb-site-footer .mgdb-footer-row { justify-content: center; }
+  .mgdb-modern .mgdb-site-footer .mgdb-footer-links { justify-content: center; }
+  .mgdb-modern .mgdb-site-footer .mgdb-footer-usda img { width: 220px; }
 }

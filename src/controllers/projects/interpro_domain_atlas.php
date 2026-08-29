@@ -716,7 +716,9 @@ $mgdb->get('megamenu')->load('templates/home/maizegdb_header_modern.bau');
 $mgdb->get('image-dir')->replace($system['image_url']);
 $mgdb->get('server-url')->replace($system['root_url']);
 
-$body = $mgdb->get('body')->loadRemote($system['root_url_private'] . $project['template']);
+// projects_lib.php returns 'template' as a root-relative URL path; local loads
+// resolve against the web root, so the leading slash comes off.
+$body = $mgdb->get('body')->load(ltrim($project['template'], '/'));
 
 /* Identity and headline numbers */
 $body->get('payload-url')->replace(pdEsc($payload_url));

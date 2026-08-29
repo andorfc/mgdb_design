@@ -8,23 +8,34 @@ $$SYNTAX-LEVEL 2
 
 <main class="mgdb-page mgdb-reference-page" id="reference-top">
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
-    <a href="/">Home</a><span aria-hidden="true">›</span><a href="/sitemap">Data centers</a><span aria-hidden="true">›</span><span>References</span>
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Literature Search</span>
   </nav>
 
-  <header class="reference-hero">
-    <div class="reference-hero-copy">
-      <span class="mgdb-eyebrow">Curated maize literature</span>
-      <h1>Search papers and follow the research over time.</h1>
-      <p>Find references by topic, title, author, abstract, gene model, or locus. Explore publication patterns and export the identifiers or citations you need.</p>
-      <a href="#reference-search-panel">Search the literature <span aria-hidden="true">↓</span></a>
+  <section class="mgdb-hero" aria-labelledby="reference-title">
+    <div class="mgdb-hero-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="Open literature book icon">
+        <path d="M48 24c-8-6-18-8-28-8v52c10 0 20 2 28 8 8-6 18-8 28-8V16c-10 0-20 2-28 8z" fill="none" stroke="#235c37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+        <line x1="48" y1="24" x2="48" y2="76" stroke="#235c37" stroke-width="5" stroke-linecap="round" />
+        <line x1="26" y1="34" x2="40" y2="34" stroke="#d99a0b" stroke-width="4" stroke-linecap="round" />
+        <line x1="26" y1="46" x2="40" y2="46" stroke="#235c37" stroke-width="4" stroke-linecap="round" />
+        <line x1="56" y1="34" x2="70" y2="34" stroke="#235c37" stroke-width="4" stroke-linecap="round" />
+        <line x1="56" y1="46" x2="70" y2="46" stroke="#235c37" stroke-width="4" stroke-linecap="round" />
+      </svg>
+      <strong>Reference<br />Data Hub</strong>
     </div>
-    <div class="reference-hero-metrics" aria-label="Reference collection summary">
-      <article><strong>$(reference_count)</strong><span>curated references</span></article>
-      <article><strong>$(year_range)</strong><span>years represented</span></article>
-      <article><strong>$(pubmed_count)</strong><span>PubMed-linked records</span></article>
-      <article><strong>$(doi_count)</strong><span>records with DOI</span></article>
+    <div class="mgdb-hero-body">
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; August 2026</p>
+      <h1 id="reference-title">Explore curated literature and publication trends</h1>
+      <p class="mgdb-hero-description">Search over $(reference_count) curated maize references by topic, title, author, abstract, gene model, or locus, and explore publication patterns over time.</p>
     </div>
-  </header>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#reference-search-panel">Search</a>
+    <a href="#reference-results-section">Results</a>
+    <a href="#reference-dashboard">Result visuals</a>
+    <a href="#reference-resources">Related resources</a>
+  </nav>
 
   <section id="reference-search-panel" class="reference-search-panel" aria-labelledby="reference-search-title">
     <div class="reference-section-heading">
@@ -58,7 +69,7 @@ $$SYNTAX-LEVEL 2
       </div>
 
       <details class="reference-advanced">
-        <summary><span><strong>Refine the search</strong><small>Year, source collections, publication type, identifiers, and editorial picks</small></span><span aria-hidden="true">⌄</span></summary>
+        <summary><strong>Refine the search</strong><small>Year, source collections, publication type, identifiers, and editorial picks</small></summary>
         <div class="reference-filter-grid">
           <label><span>From year</span><input id="reference-year-from" name="year_from" type="number" min="1800" max="2100" placeholder="e.g. 2015"></label>
           <label><span>Through year</span><input id="reference-year-to" name="year_to" type="number" min="1800" max="2100" placeholder="e.g. 2026"></label>
@@ -75,34 +86,26 @@ $$SYNTAX-LEVEL 2
     </form>
   </section>
 
-  <section id="reference-dashboard" class="reference-dashboard" aria-labelledby="reference-dashboard-title" hidden>
-    <div class="reference-section-heading">
-      <div><span class="mgdb-eyebrow">Search overview</span><h2 id="reference-dashboard-title">Publication patterns</h2></div>
-      <p id="reference-dashboard-description">Figures summarize every matching record, not only the current page.</p>
-    </div>
-    <div class="reference-summary-grid">
-      <article><strong id="reference-total-count">0</strong><span>matching papers</span></article>
-      <article><strong id="reference-doi-count">0</strong><span>with DOI</span></article>
-      <article><strong id="reference-pubmed-count">0</strong><span>with PubMed ID</span></article>
-      <article><strong id="reference-year-span">—</strong><span>publication span</span></article>
-    </div>
-    <div id="reference-entity-summary" class="reference-entity-summary" hidden></div>
-    <div class="reference-chart-grid">
-      <article class="reference-chart-card reference-chart-wide"><div><span>Publication activity</span><h3>Papers by year</h3></div><div id="reference-year-chart" class="reference-chart" role="img" aria-label="Number of matching MaizeGDB references by publication year"></div></article>
-      <article class="reference-chart-card reference-chart-wide"><div><span>Peer-reviewed literature</span><h3>Top journals</h3></div><div id="reference-journal-chart" class="reference-chart reference-chart-compact" role="img" aria-label="Journals with the most matching MaizeGDB references, excluding Maize Meeting abstracts and Maize Newsletter articles"></div></article>
-      <article class="reference-chart-card"><div><span>Conference collection</span><h3>Maize Meeting abstracts by year</h3></div><div id="reference-meeting-chart" class="reference-chart reference-chart-compact" role="img" aria-label="Matching Maize Meeting abstracts by publication year"></div></article>
-      <article class="reference-chart-card"><div><span>Community archive</span><h3>Maize Newsletter articles by year</h3></div><div id="reference-mnl-chart" class="reference-chart reference-chart-compact" role="img" aria-label="Matching Maize Newsletter articles by publication year"></div></article>
-    </div>
-  </section>
-
-  <section class="reference-results-section" aria-labelledby="reference-results-title">
+  <section id="reference-results-section" class="reference-results-section" aria-labelledby="reference-results-title">
     <div class="reference-results-heading">
-      <div><span class="mgdb-eyebrow">Search results</span><h2 id="reference-results-title">Curated references</h2><p id="reference-results-status" aria-live="polite">Loading the newest references…</p></div>
-      <div class="reference-sort-compact"><label for="reference-sort-compact">Sort</label><select id="reference-sort-compact"><option value="relevance">Best match</option><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="title">Title A–Z</option></select></div>
+      <div>
+        <span class="mgdb-eyebrow">Search results</span>
+        <h2 id="reference-results-title">Curated references</h2>
+        <p id="reference-results-status" aria-live="polite">Loading references…</p>
+      </div>
+      <div class="reference-sort-compact">
+        <label for="reference-sort-compact">Sort</label>
+        <select id="reference-sort-compact">
+          <option value="relevance">Best match</option>
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+          <option value="title">Title A–Z</option>
+        </select>
+      </div>
     </div>
 
     <div class="reference-export-bar">
-      <div><strong>Download all matches</strong><span>Exports include up to 20,000 matching references.</span></div>
+      <div><strong>Download matches</strong><span>Export up to 20,000 matching citations&#58;</span></div>
       <div>
         <a href="#" data-reference-export="csv">CSV</a>
         <a href="#" data-reference-export="doi">DOI list</a>
@@ -112,23 +115,137 @@ $$SYNTAX-LEVEL 2
       </div>
     </div>
 
-    <div id="reference-selection-bar" class="reference-selection-bar" hidden><span><strong id="reference-selection-count">0</strong> selected on this page</span><button type="button" data-selected-export="csv">Download selected CSV</button><button type="button" data-selected-export="doi">Copy selected DOIs</button><button type="button" data-selected-export="pmid">Copy selected PubMed IDs</button><button id="reference-selection-clear" type="button">Clear selection</button></div>
+    <div id="reference-selection-bar" class="reference-selection-bar" hidden>
+      <span><strong id="reference-selection-count">0</strong> selected on this page</span>
+      <button type="button" data-selected-export="csv">Download selected CSV</button>
+      <button type="button" data-selected-export="doi">Copy selected DOIs</button>
+      <button type="button" data-selected-export="pmid">Copy selected PubMed IDs</button>
+      <button id="reference-selection-clear" type="button">Clear selection</button>
+    </div>
     <label class="reference-select-page"><input id="reference-select-page" type="checkbox"> Select every result on this page</label>
 
     <div id="reference-loading" class="mgdb-loading" aria-hidden="true"><span></span><span>Searching curated literature…</span></div>
     <div id="reference-results"></div>
+    <div id="reference-resting" class="mgdb-empty reference-resting" hidden><strong>Search the curated maize literature.</strong><span>Enter a topic, title, author, gene model, or locus above &mdash; or use one of the examples. Collection-wide figures for all references are shown below.</span></div>
     <div id="reference-empty" class="mgdb-empty" hidden><strong>No matching references found.</strong><span>Try fewer words, a broader field, or clear one of the filters.</span></div>
     <div id="reference-error" class="reference-empty reference-error" hidden><strong>The search could not be completed.</strong><span>Please retry. If the problem continues, send the query to the MaizeGDB team.</span><button id="reference-retry" type="button">Retry search</button></div>
     <nav id="reference-pagination" class="reference-pagination" aria-label="Reference result pages"></nav>
   </section>
 
-  <section class="reference-resources" aria-labelledby="reference-resources-title">
-    <div class="reference-section-heading"><div><span class="mgdb-eyebrow">Related resources</span><h2 id="reference-resources-title">Go beyond the curated collection</h2></div><p>MaizeGDB emphasizes curated links between publications and biological records. Use external indexes for comprehensive literature discovery.</p></div>
-    <div class="reference-resource-grid">
-      <a href="/hot_new_papers"><strong>Editorial Board picks</strong><span>Recent papers selected for the maize research community.</span><span aria-hidden="true">→</span></a>
-      <a href="https\://pubmed.ncbi.nlm.nih.gov/"><strong>PubMed</strong><span>Search the broader biomedical and life-sciences literature.</span><span aria-hidden="true">↗</span></a>
-      <a href="/mnl"><strong>Maize Newsletter archive</strong><span>Browse community reports and newsletters dating to 1929.</span><span aria-hidden="true">→</span></a>
-      <a href="/cite"><strong>Cite MaizeGDB</strong><span>Find the appropriate citation for the database, tools, and datasets.</span><span aria-hidden="true">→</span></a>
+  <section id="reference-dashboard" class="reference-dashboard" aria-labelledby="reference-dashboard-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Publication patterns</span>
+        <h2 id="reference-dashboard-title">Result visuals</h2>
+      </div>
+      <p id="reference-dashboard-description">Visual breakdown, publication trends, and top journals matching your search.</p>
+    </div>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Curated Papers</h3>
+          <span class="mgdb-metric-badge">Literature</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong id="reference-total-count" class="mgdb-metric-value">$(reference_count)</strong>
+        </div>
+        <p class="mgdb-metric-description">Peer-reviewed papers, conference abstracts, and community reports.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>PubMed Linked</h3>
+          <span class="mgdb-metric-badge">PMID</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong id="reference-pubmed-count" class="mgdb-metric-value">$(pubmed_count)</strong>
+        </div>
+        <p class="mgdb-metric-description">Records indexed with direct NCBI PubMed links and abstracts.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Digital Object IDs</h3>
+          <span class="mgdb-metric-badge">DOIs</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong id="reference-doi-count" class="mgdb-metric-value">$(doi_count)</strong>
+        </div>
+        <p class="mgdb-metric-description">Permanent digital object identifiers for journal full text.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Historical Span</h3>
+          <span class="mgdb-metric-badge">Archive</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong id="reference-year-span" class="mgdb-metric-value mgdb-metric-value-compact">$(year_range)</strong>
+        </div>
+        <p class="mgdb-metric-description">Decades of documented maize genetics and breeding history.</p>
+      </article>
+    </div>
+
+    <div id="reference-entity-summary" class="reference-entity-summary" hidden></div>
+
+    <div class="reference-chart-grid">
+      <article class="reference-chart-card reference-chart-wide">
+        <div><span>Publication activity</span><h3>Papers by year</h3></div>
+        <div id="reference-year-chart" class="reference-chart" role="img" aria-label="Number of matching MaizeGDB references by publication year"></div>
+      </article>
+      <article class="reference-chart-card reference-chart-wide">
+        <div><span>Peer-reviewed literature</span><h3>Top journals</h3></div>
+        <div id="reference-journal-chart" class="reference-chart reference-chart-compact" role="img" aria-label="Journals with the most matching MaizeGDB references, excluding Maize Meeting abstracts and Maize Newsletter articles"></div>
+      </article>
+      <article class="reference-chart-card">
+        <div><span>Conference collection</span><h3>Maize Meeting abstracts by year</h3></div>
+        <div id="reference-meeting-chart" class="reference-chart reference-chart-compact" role="img" aria-label="Matching Maize Meeting abstracts by publication year"></div>
+      </article>
+      <article class="reference-chart-card">
+        <div><span>Community archive</span><h3>Maize Newsletter articles by year</h3></div>
+        <div id="reference-mnl-chart" class="reference-chart reference-chart-compact" role="img" aria-label="Matching Maize Newsletter articles by publication year"></div>
+      </article>
+    </div>
+  </section>
+
+  <section id="reference-resources" aria-labelledby="reference-resources-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Connected tools</span>
+        <h2 id="reference-resources-title">Related resources</h2>
+      </div>
+      <p>Explore related MaizeGDB literature archives, data hubs, and external biomedical indexes.</p>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/hot_new_papers">
+          <strong>Editorial Board Picks</strong>
+          <span>Recent highlighted papers selected for the maize research community</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/newsletter">
+          <strong>Maize Newsletter Archive</strong>
+          <span>Browse historic community notes and newsletters dating back to 1929</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/maize_meeting/">
+          <strong>Maize Genetics Meeting</strong>
+          <span>Annual community meeting archive, attendance metrics, and abstracts</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/cite">
+          <strong>Cite MaizeGDB</strong>
+          <span>Guidelines and citation formats for database records, tools, and datasets</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="https\://pubmed.ncbi.nlm.nih.gov/" target="_blank" rel="noopener">
+          <strong>NCBI PubMed Database</strong>
+          <span>National Center for Biotechnology Information biomedical literature index</span>
+          <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+        </a>
+      </div>
     </div>
   </section>
 </main>

@@ -1,0 +1,305 @@
+{
+  "schema": 1,
+  "updated": "2026-08-21",
+  "snpversity": {
+    "release": "2.1.1",
+    "release_date": "04 February 2026",
+    "url": "https://wgs.maizegdb.org/",
+    "downloads_url": "https://wgs.maizegdb.org/#download",
+    "help_url": "https://wgs.maizegdb.org/#help"
+  },
+
+  "_datasets_note": "The variant builds served by SNPVersity 2 and the SNPTools workspace, and the collection that the public Globus endpoint will host. Mirrors the dataset table at https://wgs.maizegdb.org/ — keep the two in step. variant_sites_sort is the numeric form of variant_sites, used only for column sorting.",
+
+  "datasets": [
+    {
+      "id": "mgdb2026_hq",
+      "name": "MaizeGDB 2026",
+      "build": "High Quality",
+      "reference": "B73 v5",
+      "accessions": 2710,
+      "variant_sites": "98 million",
+      "variant_sites_sort": 98000000,
+      "filters": ["Mapping quality (≥ 30)", "Genotypic coverage (≥ 50%)", "LD (max R² > 0.5)"],
+      "heterozygous": true,
+      "indels": true,
+      "imputed": false,
+      "papers": [{ "label": "Manuscript in preparation", "url": null }],
+      "notes": "See the Help and Download tabs in SNPVersity 2 for more information about the dataset."
+    },
+    {
+      "id": "mgdb2026_hc",
+      "name": "MaizeGDB 2026",
+      "build": "High Coverage",
+      "reference": "B73 v5",
+      "accessions": 2710,
+      "variant_sites": "290 million",
+      "variant_sites_sort": 290000000,
+      "filters": ["Mapping quality (≥ 30)", "Genotypic coverage (≥ 50%)"],
+      "heterozygous": true,
+      "indels": true,
+      "imputed": false,
+      "papers": [{ "label": "Manuscript in preparation", "url": null }],
+      "notes": "See the Help and Download tabs in SNPVersity 2 for more information about the dataset."
+    },
+    {
+      "id": "mgdb2024_hq",
+      "name": "MaizeGDB 2024",
+      "build": "High Quality",
+      "reference": "B73 v5",
+      "accessions": 1498,
+      "variant_sites": "75 million",
+      "variant_sites_sort": 75000000,
+      "filters": ["Mapping quality (≥ 30)", "Genotypic coverage (≥ 50%)", "LD (max R² > 0.5)"],
+      "heterozygous": true,
+      "indels": true,
+      "imputed": false,
+      "papers": [{ "label": "Andorf et al. 2024", "url": "https://doi.org/10.1101/2024.04.30.591904" }],
+      "notes": "See the Help and Download tabs in SNPVersity 2 for more information about the dataset."
+    },
+    {
+      "id": "mgdb2024_hc",
+      "name": "MaizeGDB 2024",
+      "build": "High Coverage",
+      "reference": "B73 v5",
+      "accessions": 1498,
+      "variant_sites": "228 million",
+      "variant_sites_sort": 228000000,
+      "filters": ["Mapping quality (≥ 30)", "Genotypic coverage (≥ 50%)"],
+      "heterozygous": true,
+      "indels": true,
+      "imputed": false,
+      "papers": [{ "label": "Andorf et al. 2024", "url": "https://doi.org/10.1101/2024.04.30.591904" }],
+      "notes": "See the Help and Download tabs in SNPVersity 2 for more information about the dataset."
+    },
+    {
+      "id": "nam2021_hq",
+      "name": "MaizeGDB 2024 + NAM",
+      "build": "High Quality",
+      "reference": "B73 v5",
+      "accessions": 1525,
+      "variant_sites": "23 million",
+      "variant_sites_sort": 23000000,
+      "filters": ["Mapping quality (≥ 30)", "Genotypic coverage (≥ 50%)", "LD (max R² > 0.5)"],
+      "heterozygous": true,
+      "indels": false,
+      "imputed": false,
+      "papers": [
+        { "label": "Andorf et al. 2024", "url": "https://doi.org/10.1101/2024.04.30.591904" },
+        { "label": "Hufford et al. 2021", "url": "https://doi.org/10.1126/science.abg5289" }
+      ],
+      "notes": "The intersection of the MaizeGDB 2024 dataset and the variant sites identified in the NAM 2021 project. Note: the two datasets were generated using different variant calling methods."
+    },
+    {
+      "id": "nam2021_hc",
+      "name": "MaizeGDB 2024 + NAM",
+      "build": "High Coverage",
+      "reference": "B73 v5",
+      "accessions": 1525,
+      "variant_sites": "36 million",
+      "variant_sites_sort": 36000000,
+      "filters": ["Mapping quality (≥ 30)", "Genotypic coverage (≥ 50%)"],
+      "heterozygous": true,
+      "indels": false,
+      "imputed": false,
+      "papers": [
+        { "label": "Andorf et al. 2024", "url": "https://doi.org/10.1101/2024.04.30.591904" },
+        { "label": "Hufford et al. 2021", "url": "https://doi.org/10.1126/science.abg5289" }
+      ],
+      "notes": "The intersection of the MaizeGDB 2024 dataset and the variant sites identified in the NAM 2021 project. Note: the two datasets were generated using different variant calling methods."
+    },
+    {
+      "id": "schnable2023",
+      "name": "Schnable 2023",
+      "build": "Imputation",
+      "reference": "B73 v5",
+      "accessions": 1515,
+      "variant_sites": "46 million",
+      "variant_sites_sort": 46000000,
+      "filters": ["QualByDepth (≥ 2.0)", "FisherStrand (≤ 60.0)", "RMSMappingQuality (≥ 40.0)"],
+      "heterozygous": true,
+      "indels": true,
+      "imputed": true,
+      "papers": [{ "label": "Grzybowski et al. 2023", "url": "https://doi.org/10.1111/tpj.16123" }],
+      "notes": "See the paper for the full description of the methods used to generate the data."
+    },
+    {
+      "id": "panzeaRaw",
+      "name": "Panzea 2017 HapMap v3.2.1",
+      "build": null,
+      "reference": "B73 v5",
+      "accessions": 1174,
+      "variant_sites": "71 million",
+      "variant_sites_sort": 71000000,
+      "filters": ["Mapping quality (≥ 30)", "Base quality (≥ 10)", "Number of taxa (≥ 10)", "Segregation test (< 0.01)"],
+      "heterozygous": true,
+      "indels": false,
+      "imputed": false,
+      "papers": [{ "label": "Bukowski et al. 2018", "url": "https://doi.org/10.1093/gigascience/gix134" }],
+      "notes": "Mapped from B73 v4 to B73 v5 using Picard. See the paper for the full description of the methods used to generate the data."
+    },
+    {
+      "id": "panzeaImpute",
+      "name": "Panzea 2017 HapMap v3.2.1",
+      "build": "Imputation",
+      "reference": "B73 v5",
+      "accessions": 1174,
+      "variant_sites": "71 million",
+      "variant_sites_sort": 71000000,
+      "filters": ["Mapping quality (≥ 30)", "Base quality (≥ 10)", "Number of taxa (≥ 10)", "Segregation test (< 0.01)"],
+      "heterozygous": true,
+      "indels": false,
+      "imputed": true,
+      "papers": [{ "label": "Bukowski et al. 2018", "url": "https://doi.org/10.1093/gigascience/gix134" }],
+      "notes": "Mapped from B73 v4 to B73 v5 using Picard. See the paper for the full description of the methods used to generate the data."
+    },
+    {
+      "id": "panzea282",
+      "name": "Panzea 2017 282 association panel",
+      "build": null,
+      "reference": "B73 v5",
+      "accessions": 271,
+      "variant_sites": "71 million",
+      "variant_sites_sort": 71000000,
+      "filters": ["Mapping quality (≥ 30)", "Base quality (≥ 10)", "Number of taxa (≥ 10)", "Segregation test (< 0.01)"],
+      "heterozygous": true,
+      "indels": false,
+      "imputed": false,
+      "papers": [{ "label": "Bukowski et al. 2018", "url": "https://doi.org/10.1093/gigascience/gix134" }],
+      "notes": "Mapped from B73 v4 to B73 v5 using Picard. See the paper for the full description of the methods used to generate the data."
+    },
+    {
+      "id": "gbs27",
+      "name": "GBS v2.7",
+      "build": "Genotyping by sequencing",
+      "reference": "B73 v2, v3, v4",
+      "accessions": 17280,
+      "variant_sites": "955,690",
+      "variant_sites_sort": 955690,
+      "filters": ["ZeaGBS production pipeline"],
+      "heterozygous": true,
+      "indels": false,
+      "imputed": true,
+      "papers": [{ "label": "Panzea genotypes", "url": "https://www.panzea.org/genotypes" }],
+      "notes": "The current ZeaGBS build: 955,690 SNPs across more than 60,000 taxa, 17,280 of which are public. Raw and partially imputed genotypes are available as HDF5 in AGPv2 coordinates, readable in TASSEL 5; the variants were also uplifted to AGPv3 and AGPv4 in HapMap and TASSEL HDF5 formats.",
+      "external": true
+    }
+  ],
+
+  "_projects_note": "Selected public whole-genome resequencing projects for maize and its relatives. `year` is the year MaizeGDB records for the project itself, which is not always the year the linked paper appeared — PRJNA260788 is registered in 2014 and published in 2020, for instance. Accession prefixes decide where each identifier links: PRJNA/PRJEB/PRJDB to NCBI BioProject, PRJCA to the NGDC, CNP to CNGB.",
+
+  "projects": [
+    {
+      "accessions": ["PRJEB56265"],
+      "name": "Resequencing of three Polish maize inbred lines",
+      "year": 2023,
+      "pmid": "36705476",
+      "doi": "10.1111/tpj.16123"
+    },
+    {
+      "accessions": ["PRJEB56320", "PRJNA661271"],
+      "name": "Maize Wisconsin Diversity Panel resequencing",
+      "year": 2023,
+      "pmid": "36705476",
+      "doi": "10.1111/tpj.16123"
+    },
+    {
+      "accessions": ["PRJNA641489", "PRJNA816255", "PRJNA816273", "PRJNA645739"],
+      "name": "Genome sequencing reveals evidence of adaptive variation in the genus Zea",
+      "year": 2022,
+      "pmid": "36266506",
+      "doi": "10.1038/s41588-022-01184-y"
+    },
+    {
+      "accessions": ["PRJCA009749"],
+      "name": "WGS resequencing of 1,604 maize inbred lines",
+      "year": 2022,
+      "pmid": "35851624",
+      "doi": "10.1038/s41477-022-01190-2"
+    },
+    {
+      "accessions": ["PRJNA783885"],
+      "name": "Maize landrace whole genome resequencing",
+      "year": 2022,
+      "pmid": "35922428",
+      "doi": "10.1038/s41467-022-32180-9"
+    },
+    {
+      "accessions": ["CNP0003213"],
+      "name": "Genomic resequencing data of sweet corn population",
+      "year": 2022,
+      "pmid": null,
+      "doi": "10.2139/ssrn.4244249"
+    },
+    {
+      "accessions": ["PRJNA816255", "PRJNA816273", "PRJNA641489", "PRJNA645739"],
+      "name": "Genetic diversity of Zea",
+      "year": 2022,
+      "pmid": "22660545",
+      "doi": "10.1038/ng.2313"
+    },
+    {
+      "accessions": ["PRJEB31061"],
+      "name": "Genome sequence and assembly of the 25 founder lines of the NAM population",
+      "year": 2021,
+      "pmid": "34353948",
+      "doi": "10.1126/science.abg5289"
+    },
+    {
+      "accessions": ["PRJNA609577"],
+      "name": "Zea mays genome sequencing",
+      "year": 2020,
+      "pmid": "32341525",
+      "doi": "10.1038/s41588-020-0616-3"
+    },
+    {
+      "accessions": ["PRJNA389800"],
+      "name": "Whole genome sequencing of maize 282 panel",
+      "year": 2019,
+      "pmid": "29300887",
+      "doi": "10.1093/gigascience/gix134"
+    },
+    {
+      "accessions": ["PRJNA531553"],
+      "name": "Deep DNA resequencing of the association mapping panel",
+      "year": 2019,
+      "pmid": "31152161",
+      "doi": "10.1038/s41588-019-0427-6"
+    },
+    {
+      "accessions": ["PRJNA479960"],
+      "name": "South American maize genome sequencing",
+      "year": 2018,
+      "pmid": "30545889",
+      "doi": "10.1126/science.aav0207"
+    },
+    {
+      "accessions": ["PRJEB14212"],
+      "name": "European maize diversity",
+      "year": 2017,
+      "pmid": "28301472",
+      "doi": "10.1371/journal.pgen.1006666"
+    },
+    {
+      "accessions": ["PRJNA300309"],
+      "name": "Zea mays subsp. mays (maize) with Z. parviglumis",
+      "year": 2017,
+      "pmid": "29132403",
+      "doi": "10.1186/s13059-017-1346-4"
+    },
+    {
+      "accessions": ["PRJNA399729"],
+      "name": "Maize Haplotype Map version 3",
+      "year": 2017,
+      "pmid": "29300887",
+      "doi": "10.1093/gigascience/gix134"
+    },
+    {
+      "accessions": ["PRJNA260788"],
+      "name": "Zea mays genome sequencing (European maize genomes)",
+      "year": 2014,
+      "pmid": "32719517",
+      "doi": "10.1038/s41588-020-0671-9"
+    }
+  ]
+}
