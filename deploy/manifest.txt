@@ -512,6 +512,30 @@ src/tools/alphafill_models.py                             tools/alphafill_models
 src/tools/alphafill_ligand_extract.py                     tools/alphafill_ligand_extract.py
 
 
+# FATCAT structural ortholog comparison — replaces /fatcat.
+#
+# controller.php checks controllers/<CONTROLLER>.php before falling through to
+# redirect.php, so src/controllers/fatcat.php takes the route from
+# controllers/tools/fatcat.php without touching it. Rollback is deleting the
+# new controller; the original is found again immediately and is archived in
+# legacy/fatcat/ with what was wrong with it.
+#
+# There is no data payload. The ortholog table lives inside the application at
+# fatcat.maizegdb.org and exists nowhere else — not in the MaizeGDB database and
+# not in any export — so this page adapts that service rather than indexing it.
+# Responses are cached under <search_cache_path>/fatcat; see AD-029, including
+# the SELinux label that directory needs.
+#
+# Reuses js/lib/3dmol/ and data/protein_structure/ (for the typeahead) from the
+# protein structure block above.
+src/controllers/fatcat.php                                controllers/fatcat.php
+src/templates/static/mgdb_fatcat.bau                      templates/static/mgdb_fatcat.bau
+src/css/mgdb-fatcat.css                                   css/mgdb-fatcat.css
+src/js/mgdb-fatcat.js                                     js/mgdb-fatcat.js
+src/search/fatcat/fatcat_api.php                          search/fatcat/fatcat_api.php
+src/search/fatcat/fatcat_lib.php                          search/fatcat/fatcat_lib.php
+
+
 # TYPSimSelector — replaces /TYPSimSelector.
 #
 # Shadowed, not overwritten: controller.php checks controllers/<CONTROLLER>.php

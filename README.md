@@ -1180,6 +1180,106 @@ it Cloudflare serves a month-old copy of any file a rebuild corrects -- which it
 did, during this build, and origin and CDN disagreed for long enough to be
 confusing. `--release` overrides the stamp for a same-day rebuild.
 
+## FATCAT structural ortholog comparison
+
+`/fatcat` compares a maize protein with its closest matches in sorghum, rice,
+soybean and Arabidopsis. Three methods each pick a top hit — DIAMOND by
+sequence, Foldseek and FATCAT by structure — and **where they agree the ortholog
+assignment is corroborated by two different kinds of evidence.**
+
+```
+controllers/fatcat.php                    the page. Runs zero SQL
+templates/static/mgdb_fatcat.bau          its body
+css/mgdb-fatcat.css  js/mgdb-fatcat.js    its assets
+search/fatcat/fatcat_api.php              suggest · compare · alignment
+search/fatcat/fatcat_lib.php              the upstream adapter and its cache
+```
+
+Reuses `js/lib/3dmol/` and, for the typeahead, `data/protein_structure/`.
+Pre-redesign originals are archived in `legacy/fatcat/`.
+
+### It is an adapter, not an index
+
+The ortholog table lives inside the application at `fatcat.maizegdb.org` and
+exists nowhere else — not in the database, not on codex, not in any export. So
+this page fetches that page once per protein, parses it into JSON, and caches
+it. That dependency is not new: the page this replaces was a 1,050px `<iframe>`
+of the same service. What changes is the failure mode. An iframe that cannot
+load leaves a blank rectangle in a page with no `<h1>` and the title "Welcome to
+MaizeGDB"; a cached payload leaves a page that still has its documentation, its
+search, its links and its last good answer.
+
+**The load-bearing parse is the `loadFile` path in each viewer block**, not the
+`var str = '<acc>'` beside it. The accession looks like the obvious anchor and
+is not usable: some blocks put it before their `NGL.Stage` call and some after,
+so pairing by proximity silently shifts every hit by one from the third viewer
+onward. It produced a page where sorghum's Foldseek hit was a rice accession and
+it looked entirely plausible. The `loadFile` path is definitionally correct — it
+is the file the viewer actually loads — and it names the species directory, the
+query, the target and the model version at once. Scores and annotations are
+scraped more softly, so a failure there costs a blank metric rather than an
+answer.
+
+### Three things upstream that are broken, and are repaired here
+
+**Every AlphaFold link on the live page is dead.** They point at `model_v3`;
+EMBL-EBI is on **v6** and v1–v5 all 404, so the upstream viewer loads a 404 and
+every download link goes nowhere. Rewritten to v6, with the version as a single
+constant. Some accessions from the 2022 run have since been withdrawn from
+UniProt and have no model at any version; confidence colouring is disabled for
+those rather than silently doing nothing.
+
+**The alignment files send no CORS header** and are typed
+`application/vnd.palm`, so a browser on maizegdb.org cannot fetch them. They are
+proxied — which is also where the RMSD is read out of the file's own REMARK
+header, a number upstream computes, ships and never displays.
+
+**The comparison the tool exists for was left to the reader.** Twelve accession
+codes in twelve panels, and noticing that three methods agreed meant diffing
+strings by eye. It is now a four-by-three matrix with the agreement computed:
+cells matching the majority are filled, a dissenter is outlined, and each row
+carries a verdict — `confirmed` (3/3), `supported` (2/3), `conflicting`
+(three methods, three answers).
+
+### The viewer, and the caveat it exists to enforce
+
+The superposition is FATCAT's own twist output: chain A the ortholog, chain B
+the maize protein rotated onto it. Three colourings:
+
+| | shows | source |
+| --- | --- | --- |
+| chain | which backbone is which | the twist file |
+| confidence | per-residue pLDDT | fetched from the two source models and mapped back by residue number — **the twist file has no B-factor column at all** |
+| deviation | distance from each maize residue to the nearest ortholog backbone | computed in the browser |
+
+Deviation is labelled as a nearest-CA distance rather than as the alignment's
+own correspondence, because FATCAT's block correspondence is not in the file it
+ships and implying otherwise would claim more than the data supports.
+
+The reason confidence colouring is worth the two extra fetches is the caveat it
+enforces: **two predicted structures diverging in a region that is low-pLDDT in
+either of them says nothing about the proteins.** So the metrics panel reports
+the mean pLDDT across the residues that diverge past 5 Å. On `bz1` against its
+sorghum ortholog that is 41.9 — "low confidence, treat the divergence as
+uncertain". Against the rice protein that FATCAT alone picked it is 91.2 —
+"confidently modelled, the difference looks real". Same page, same reader, two
+opposite conclusions that the old tool gave no way to reach.
+
+### Query cost
+
+Rendering runs **zero SQL** and makes no upstream request. `suggest` reads the
+protein structure index — the identifiers are the same ones, so building a
+second index would be duplicated bytes and a second thing to rebuild. `compare`
+costs one upstream fetch on a miss and **1 ms** on a hit; `alignment` proxies
+one file and caches it permanently, since a superposition never changes.
+
+The cache lives at `<search_cache_path>/fatcat` and needs an SELinux label — a
+directory created outside httpd's context is `user_home_t` and every write is
+denied **silently**, so the page keeps working and simply never caches. The API
+now reports `summary.cache_error` so the next occurrence is visible from the
+network tab. See AD-029, which also records the three species that have
+superpositions but no hit table, and what would remove the upstream dependency.
+
 ## TYPSimSelector
 
 `/TYPSimSelector` ranks the USDA Ames maize inbred collection against one

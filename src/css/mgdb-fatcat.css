@@ -1,0 +1,468 @@
+/* ==========================================================================
+   /fatcat — structural ortholog comparison
+   --------------------------------------------------------------------------
+   Scoped under .mgdb-modern like every other page stylesheet. Layout,
+   typography, colour and state come from mgdb-modern.css; this file adds the
+   consensus matrix, the superposition viewer and the per-species cards.
+
+   Two deliberate departures from the design system:
+
+   1. The 3D viewport carries a dark local palette, for the reason the protein
+      structure and AlphaFill pages do: a molecular viewer is read as a lit
+      object against a dark ground, and both palettes used here — AlphaFold's
+      pLDDT scale and the deviation ramp — were designed against one.
+
+   2. Query and ortholog are blue and amber rather than any status colour.
+      They are two things being compared, not a good one and a bad one, and the
+      pair has to stay distinguishable for the common forms of colour blindness
+      — which rules out the red/green a "match/mismatch" reading would suggest.
+
+   Contents
+     1.  Search
+     2.  Identity header
+     3.  The consensus matrix
+     4.  The viewer
+     5.  Metrics
+     6.  Per-species cards
+     7.  Verdict badges
+     8.  Responsive behaviour
+     9.  Motion, forced colours, print
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Search
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .mgdb-fatcat-page .mgdb-hero-emblem,
+.mgdb-fatcat-page .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-modern .fc-hero-icon { width: min(100%, 76px); height: auto; object-fit: contain; }
+.mgdb-modern .fc-workspace { scroll-margin-top: var(--mgdb-space-5); }
+.mgdb-modern .fc-search { margin: 0 0 var(--mgdb-space-4); }
+
+.mgdb-modern .fc-search-row {
+  display: flex;
+  gap: var(--mgdb-space-3);
+  align-items: flex-start;
+  margin: var(--mgdb-space-2) 0 0;
+}
+/* The field owns the suggestion panel's positioning context; without it the
+   panel anchors to the row and drifts under the submit button. */
+.mgdb-modern .fc-search-field { position: relative; flex: 1 1 auto; min-width: 0; }
+.mgdb-modern .fc-search-input { width: 100%; }
+.mgdb-modern .fc-search-submit { flex: 0 0 auto; }
+.mgdb-modern .fc-suggestions { width: 100%; }
+.mgdb-modern .fc-results { margin-top: var(--mgdb-space-4); }
+
+/* --------------------------------------------------------------------------
+   2. Identity header
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .fc-identity {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: var(--mgdb-space-4);
+  background: var(--mgdb-surface-alt);
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius);
+  margin-bottom: var(--mgdb-space-4);
+}
+.mgdb-modern .fc-identity h3 { margin: 0 0 var(--mgdb-space-1); }
+.mgdb-modern .fc-identity-ids {
+  margin: 0 0 var(--mgdb-space-2);
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-sm);
+}
+.mgdb-modern .fc-id-old { color: var(--mgdb-muted); }
+.mgdb-modern .fc-identity-note {
+  margin: 0 0 var(--mgdb-space-2);
+  max-width: 62ch;
+  color: var(--mgdb-ink-soft);
+}
+.mgdb-modern .fc-headline {
+  margin: 0;
+  font-size: var(--mgdb-text-lg);
+  color: var(--mgdb-green-dark);
+}
+.mgdb-modern .fc-identity-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+/* --------------------------------------------------------------------------
+   3. The consensus matrix
+
+   The centrepiece. A cell that agrees with the majority is filled; a
+   dissenting one is outlined, so agreement reads as a solid band across the
+   row before any accession is read.
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .fc-matrix-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+}
+.mgdb-modern .fc-matrix { margin: 0; min-width: 640px; }
+.mgdb-modern .fc-matrix th[scope="col"] {
+  background: var(--mgdb-surface-sunken);
+  white-space: nowrap;
+}
+.mgdb-modern .fc-method-kind {
+  display: block;
+  font-weight: 400;
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  text-transform: lowercase;
+  letter-spacing: .02em;
+}
+.mgdb-modern .fc-species { text-align: left; white-space: nowrap; }
+.mgdb-modern .fc-species span {
+  display: block;
+  font-style: italic;
+  font-weight: 400;
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+}
+.mgdb-modern .fc-cell { text-align: center; }
+.mgdb-modern .fc-cell-empty { color: var(--mgdb-muted); }
+
+.mgdb-modern .fc-cell-button {
+  font: 600 var(--mgdb-text-sm)/1.2 var(--mgdb-font-mono);
+  padding: 6px 10px;
+  min-height: var(--mgdb-tap-target);
+  border-radius: var(--mgdb-radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  width: 100%;
+  background: none;
+  color: inherit;
+}
+.mgdb-modern .fc-cell.is-consensus .fc-cell-button {
+  background: var(--mgdb-green-soft);
+  border-color: #b6d8c6;
+  color: var(--mgdb-green-dark);
+}
+.mgdb-modern .fc-cell.is-dissenting .fc-cell-button {
+  background: transparent;
+  border-style: dashed;
+  border-color: var(--mgdb-gold);
+  color: var(--mgdb-gold-dark);
+}
+.mgdb-modern .fc-cell-button:hover { box-shadow: var(--mgdb-shadow-sm); }
+.mgdb-modern .fc-cell-button:focus-visible { outline: none; box-shadow: var(--mgdb-focus-ring); }
+.mgdb-modern .fc-cell-button.is-active {
+  outline: 2px solid var(--mgdb-focus);
+  outline-offset: 1px;
+}
+
+.mgdb-modern .fc-verdict-cell { white-space: nowrap; }
+.mgdb-modern .fc-verdict-note {
+  display: block;
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  margin-top: 2px;
+}
+.mgdb-modern .fc-matrix-note { margin-top: var(--mgdb-space-2); }
+
+/* --------------------------------------------------------------------------
+   4. The viewer
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .fc-viewer {
+  --fc-dark: #0d141b;
+  --fc-panel: #161d26;
+  --fc-line: #2b3644;
+  --fc-text: #e6edf3;
+  --fc-text-dim: #9aa7b8;
+  --fc-accent: #4dd0e1;
+
+  margin: var(--mgdb-space-4) 0;
+  border: 1px solid var(--fc-line);
+  border-radius: var(--mgdb-radius);
+  overflow: hidden;
+  background: var(--fc-dark);
+  color: var(--fc-text);
+}
+
+.mgdb-modern .fc-viewer-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  padding: var(--mgdb-space-3);
+  background: var(--fc-panel);
+  border-bottom: 1px solid var(--fc-line);
+  font-size: var(--mgdb-text-sm);
+}
+.mgdb-modern .fc-viewer-bar h3 {
+  margin: 0;
+  margin-right: auto;
+  font-size: var(--mgdb-text-base);
+  color: var(--fc-text);
+}
+.mgdb-modern .fc-viewer-bar label {
+  display: inline-flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  color: var(--fc-text-dim);
+}
+.mgdb-modern .fc-toggle { cursor: pointer; }
+.mgdb-modern .fc-viewer-bar select,
+.mgdb-modern .fc-viewer-bar button {
+  background: #1d2733;
+  color: var(--fc-text);
+  border: 1px solid var(--fc-line);
+  border-radius: var(--mgdb-radius-sm);
+  padding: 6px 10px;
+  font: inherit;
+  min-height: 34px;
+  cursor: pointer;
+}
+.mgdb-modern .fc-viewer-bar select:hover,
+.mgdb-modern .fc-viewer-bar button:hover { border-color: var(--fc-accent); }
+.mgdb-modern .fc-viewer-bar select:focus-visible,
+.mgdb-modern .fc-viewer-bar button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--fc-dark), 0 0 0 4px var(--fc-accent);
+}
+.mgdb-modern .fc-viewer-bar button.is-on {
+  background: #123c47;
+  border-color: var(--fc-accent);
+  color: var(--fc-accent);
+}
+
+.mgdb-modern .fc-viewport {
+  position: relative;
+  width: 100%;
+  height: clamp(380px, 55vh, 660px);
+  background: #05080b;
+}
+.mgdb-modern .fc-viewport canvas { display: block; }
+
+.mgdb-modern .fc-viewer-status,
+.mgdb-modern .fc-viewer-legend {
+  position: absolute;
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  background: rgba(13, 20, 27, .86);
+  border: 1px solid var(--fc-line);
+  border-radius: var(--mgdb-radius-sm);
+  font-size: var(--mgdb-text-xs);
+  line-height: 1.5;
+  color: var(--fc-text-dim);
+  max-width: min(48ch, 62%);
+  pointer-events: none;
+}
+.mgdb-modern .fc-viewer-status { left: 10px; bottom: 10px; }
+.mgdb-modern .fc-viewer-status b { color: var(--fc-text); }
+.mgdb-modern .fc-viewer-legend { right: 10px; top: 10px; }
+.mgdb-modern .fc-viewer-legend b { color: var(--fc-text); display: block; margin-bottom: 4px; }
+.mgdb-modern .fc-legend-row { display: flex; gap: var(--mgdb-space-2); align-items: center; }
+.mgdb-modern .fc-legend-swatch { width: 22px; height: 9px; border-radius: 2px; flex: 0 0 auto; }
+
+/* --------------------------------------------------------------------------
+   5. Metrics
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .fc-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 1px;
+  background: var(--fc-line);
+  border-top: 1px solid var(--fc-line);
+}
+.mgdb-modern .fc-metric {
+  padding: var(--mgdb-space-3);
+  background: var(--fc-panel);
+}
+.mgdb-modern .fc-metric dt {
+  font-size: var(--mgdb-text-xs);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--fc-text-dim);
+}
+.mgdb-modern .fc-metric dd {
+  margin: 2px 0 0;
+  font-size: var(--mgdb-text-xl);
+  font-variant-numeric: tabular-nums;
+  color: var(--fc-text);
+}
+.mgdb-modern .fc-metric p {
+  margin: 2px 0 0;
+  font-size: var(--mgdb-text-xs);
+  color: var(--fc-text-dim);
+  line-height: var(--mgdb-leading-snug);
+}
+
+/* --------------------------------------------------------------------------
+   6. Per-species cards
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .fc-species-grid { margin-top: var(--mgdb-space-5); }
+.mgdb-modern .fc-species-card h3 { margin-top: 0; }
+.mgdb-modern .fc-species-latin {
+  font-style: italic;
+  font-weight: 400;
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-muted);
+}
+
+.mgdb-modern .fc-target {
+  padding-top: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--mgdb-line-soft);
+}
+.mgdb-modern .fc-species-card .fc-target:first-of-type { border-top: 0; margin-top: 0; }
+
+.mgdb-modern .fc-target-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  font-family: var(--mgdb-font-mono);
+  font-weight: 600;
+}
+.mgdb-modern .fc-method-tag {
+  font-family: var(--mgdb-font);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--mgdb-line);
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-ink-soft);
+}
+/* Sequence and structure evidence are tinted differently, because "two
+   structure methods agreed" and "a sequence and a structure method agreed"
+   are not the same statement. */
+.mgdb-modern .fc-method-diamond {
+  background: var(--mgdb-status-info-soft);
+  border-color: #b9d6e5;
+  color: var(--mgdb-status-info);
+}
+.mgdb-modern .fc-method-foldseek,
+.mgdb-modern .fc-method-fatcat {
+  background: var(--mgdb-green-soft);
+  border-color: #b6d8c6;
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-modern .fc-target-note {
+  margin: var(--mgdb-space-2) 0;
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-ink-soft);
+}
+.mgdb-modern .fc-target-note-empty { color: var(--mgdb-muted); font-style: italic; }
+.mgdb-modern .fc-note-kind {
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--mgdb-muted);
+  margin-right: var(--mgdb-space-1);
+}
+
+.mgdb-modern .fc-target-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+  margin: 0 0 var(--mgdb-space-2);
+}
+.mgdb-modern .fc-target-metrics dt {
+  font-size: var(--mgdb-text-xs);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--mgdb-muted);
+}
+.mgdb-modern .fc-target-metrics dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.mgdb-modern .fc-target-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   7. Verdict badges
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .fc-verdict {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .03em;
+  white-space: nowrap;
+}
+.mgdb-modern .fc-verdict-confirmed {
+  background: var(--mgdb-green-soft); color: var(--mgdb-green-dark); border-color: #b6d8c6;
+}
+.mgdb-modern .fc-verdict-supported {
+  background: var(--mgdb-status-info-soft); color: var(--mgdb-status-info); border-color: #b9d6e5;
+}
+.mgdb-modern .fc-verdict-conflicting {
+  background: var(--mgdb-gold-soft); color: var(--mgdb-gold-dark); border-color: #e7d4a8;
+}
+.mgdb-modern .fc-verdict-single,
+.mgdb-modern .fc-verdict-none {
+  background: var(--mgdb-surface-sunken); color: var(--mgdb-muted); border-color: var(--mgdb-line);
+}
+
+.mgdb-modern .fc-card-confirmed  { border-left: 4px solid var(--mgdb-green); }
+.mgdb-modern .fc-card-supported  { border-left: 4px solid var(--mgdb-status-info); }
+.mgdb-modern .fc-card-conflicting{ border-left: 4px solid var(--mgdb-gold); }
+.mgdb-modern .fc-card-note       { border-left: 4px solid var(--mgdb-line); }
+.mgdb-modern .fc-reading-grid .mgdb-card h3 { margin-top: var(--mgdb-space-2); }
+
+.mgdb-modern .fc-state {
+  padding: var(--mgdb-space-5);
+  border-radius: var(--mgdb-radius);
+  border: 1px solid #e2c9cc;
+  background: var(--mgdb-red-soft);
+}
+.mgdb-modern .fc-state h3 { margin-top: 0; color: var(--mgdb-red); }
+
+/* --------------------------------------------------------------------------
+   8. Responsive behaviour
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 820px) {
+  .mgdb-modern .fc-search-row { flex-direction: column; align-items: stretch; }
+  .mgdb-modern .fc-search-submit { width: 100%; }
+  .mgdb-modern .fc-viewport { height: clamp(300px, 46vh, 420px); }
+  .mgdb-modern .fc-viewer-legend { position: static; max-width: none; margin: var(--mgdb-space-2); }
+  .mgdb-modern .fc-viewer-bar h3 { margin-right: 0; width: 100%; }
+  .mgdb-modern .fc-identity { flex-direction: column; }
+}
+
+/* --------------------------------------------------------------------------
+   9. Motion, forced colours, print
+   -------------------------------------------------------------------------- */
+
+@media (forced-colors: active) {
+  .mgdb-modern .fc-cell-button,
+  .mgdb-modern .fc-verdict,
+  .mgdb-modern .fc-method-tag { border: 1px solid CanvasText; }
+  .mgdb-modern .fc-legend-swatch { forced-color-adjust: none; }
+}
+
+@media print {
+  /* The viewport is a WebGL canvas and prints as a black rectangle; the matrix
+     and the cards carry every number it is showing. */
+  .mgdb-modern .fc-viewer,
+  .mgdb-modern .mgdb-section-tabs { display: none; }
+  .mgdb-modern .fc-matrix-wrap { overflow: visible; }
+  .mgdb-modern .fc-matrix { min-width: 0; }
+}

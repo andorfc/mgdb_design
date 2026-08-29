@@ -849,3 +849,27 @@ Then drop the `/var/www/logs` line from the script, or retire the cron job, so t
 - **What the administrator is being asked to decide.** These 1.4 GB are on a development instance today. The natural home for the two structure directories is `images.maizegdb.org`, beside `esm/b73/` which already serves ESMFold models the same way — and the AlphaFold B73 v5 model set has value well beyond this page, since **it is currently published nowhere.** `download.maizegdb.org` has no structure section at all, and `images.maizegdb.org` has only the ESMFold set. Publishing all 68,262 models rather than the 18,887 this page needs would cost roughly 3.9 GB gzipped.
 
 - **A correctness note that motivates the above.** The ESMFold models MaizeGDB already serves cannot substitute for these. For `Zm00001eb000660_P001` the two agree on sequence and disagree by **1.53 Å CA RMSD** after optimal superposition, and the transplanted ligand coordinates are in the AlphaFold model's frame. 1.53 Å is the same magnitude as AlphaFill's entire benchmarked accuracy (median 1.59 Å pocket RMSD), so overlaying the ligands on the ESMFold model would introduce error as large as the signal — silently, and it would look plausible.
+
+---
+
+## AD-029 — The FATCAT ortholog table exists only inside `fatcat.maizegdb.org`, and its AlphaFold links are dead
+
+- **Date:** 2026-08-29
+- **Affected component:** `/fatcat` — the structural ortholog comparison
+- **Status:** **an administrator request** for the first item; the rest is recorded so the dependency is understood.
+
+- **What it is:** `/fatcat` renders a comparison of a maize protein against its closest matches in four plant proteomes, by three methods. That hit table — which protein each method picked, its scores and its annotations — is not in the MaizeGDB database, not on the codex instance, and not in any export that was findable. It exists only as rendered HTML from the application at `fatcat.maizegdb.org`, which is on a different host behind Cloudflare. The redesigned page therefore fetches that page once per protein, parses it, and caches the result. `src/search/fatcat/fatcat_lib.php` documents exactly what is parsed and how brittle each part is.
+
+- **What the administrator is being asked for:** the source data behind that application — the per-protein hit table with DIAMOND, Foldseek and FATCAT scores. With it, `/fatcat` could be indexed the way `/data_center/protein_structure` and `/data_center/alphafill` are, and would stop depending on another service being up and on its markup not changing. The alignment files themselves (297,843 superpositions across seven species, 36 GB as `alignments_total.tar.gz`) are already served fine and would not need to move.
+
+- **Every AlphaFold link on the current page is dead.** The upstream app links `AF-<acc>-F1-model_v3.pdb`; EMBL-EBI is on **v6** and v1 through v5 all return 404. Its own structure viewer therefore loads a 404, and every download link goes nowhere. The redesigned page rewrites these to v6. **This will happen again** when v6 is retired — the version is a single constant, `FC_AF_VERSION` in `fatcat_lib.php`. Note also that some accessions in the 2022 analysis have since been withdrawn from UniProt (for example `Q6ZF65`) and have no model at any version; the page disables confidence colouring for those rather than showing an empty overlay.
+
+- **The alignment files send no CORS header,** and are served as `application/vnd.palm`. A browser on maizegdb.org cannot fetch them at all, so they are proxied through `fatcat_api.php`. If they ever gain `Access-Control-Allow-Origin`, the proxy could be dropped — but it is also where the RMSD is read out of the file's REMARK header, which upstream computes and never displays, so it earns its place either way.
+
+- **Three species are computed but not shown.** `fatcat.maizegdb.org/alignments/` holds superpositions for **human, cerevisiae and pombe** as well as the four plant proteomes — 34,158, 16,368 and 29,172 files respectively. The application computes no hit table for them, so this page cannot show them. If the source data above turns up and includes them, three more species come free.
+
+- **The response cache needs an SELinux label.** Entries go to `<search_cache_path>/fatcat`. A directory created outside httpd's context is labelled `user_home_t` and SELinux denies every write **silently** — the page keeps working and simply never caches, so every request goes upstream forever. This cost real time to find during the build. The fix, matching the sibling `dashboard` and `search` caches:
+
+      chcon -t httpd_sys_rw_content_t /home/cache/fatcat
+
+  The API now reports `summary.cache_error` when a write fails, so the next occurrence is visible from the browser's network tab rather than being invisible.

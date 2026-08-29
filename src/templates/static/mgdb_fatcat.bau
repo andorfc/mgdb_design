@@ -1,0 +1,252 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-fatcat
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https\://maizegdb.org/fatcat">
+<meta property="og:title" content="MaizeGDB FATCAT | Compare Maize Protein Structures With Their Orthologs">
+<meta property="og:description" content="Three independent methods pick an ortholog for a maize protein in sorghum, rice, soybean and Arabidopsis. Where they agree, the assignment is corroborated. Superpositions viewable in 3D.">
+
+<a class="mgdb-skip-link" href="#fc-main">Skip to main content</a>
+<main class="mgdb-page mgdb-fatcat-page" id="fc-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Tools</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/protein_structure">Protein Structures</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">FATCAT</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="fc-title">
+    <div class="mgdb-hero-emblem">
+      <img src="/images/data_center/protein_structure.png?v=20260822" alt="Protein structure icon" class="fc-hero-icon" width="80" height="80" />
+      <strong>Structural<br />Orthologs</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> DIAMOND &middot; Foldseek &middot; FATCAT &middot; AlphaFold DB</p>
+      <h1 id="fc-title">Does this maize protein have the same fold as its ortholog?</h1>
+      <p class="mgdb-hero-description">Three independent methods each pick the closest match to a maize protein in sorghum, rice, soybean and Arabidopsis &mdash; one by sequence, two by structure. Where all three land on the same protein, the ortholog assignment is corroborated rather than merely asserted. Where they disagree, that is worth knowing too.</p>
+      <p class="mgdb-hero-actions">
+        <a class="mgdb-button mgdb-button-quiet" href="/data_center/protein_structure">Protein structure hub <span aria-hidden="true">&rarr;</span></a>
+        <a class="mgdb-button mgdb-button-quiet" href="/data_center/alphafill">Predicted ligands <span aria-hidden="true">&rarr;</span></a>
+      </p>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#fc-find" class="is-current">Compare</a>
+    <a href="#fc-reading">Interpreting</a>
+    <a href="#fc-methods">The three methods</a>
+    <a href="#fc-sources">Data sources</a>
+    <a href="#fc-resources">Related resources</a>
+  </nav>
+
+  <!-- ====================================================================
+       1. Search and the comparison workspace
+       ==================================================================== -->
+  <section class="mgdb-panel fc-workspace marker-search-panel" id="fc-find" aria-labelledby="fc-find-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Interactive comparison</span>
+        <h2 id="fc-find-title">Find a protein and its structural orthologs</h2>
+      </div>
+      <p>Accepts B73 RefGen_v5 and RefGen_v4 gene models, gene symbols, and UniProt accessions. The analysis covers the maize proteins that had an AlphaFold model when it was run.</p>
+    </div>
+
+    <form class="fc-search" id="fc-search-form" autocomplete="off" role="search">
+      <label class="mgdb-label" for="fc-search-input">Gene model, gene symbol or UniProt accession</label>
+      <div class="fc-search-row">
+        <div class="fc-search-field">
+          <input class="mgdb-input fc-search-input" id="fc-search-input" type="search" name="term"
+                 role="combobox" aria-autocomplete="list" aria-expanded="false"
+                 aria-controls="fc-suggestions" aria-describedby="fc-search-hint"
+                 value="$(initial-term)"
+                 placeholder="Zm00001eb374230, bz1, P16165, 374230&hellip;" />
+          <div class="mgdb-suggestions fc-suggestions" id="fc-suggestions" role="listbox"
+               aria-label="Matching proteins" hidden></div>
+        </div>
+        <button class="mgdb-button mgdb-button-primary fc-search-submit" type="submit">Compare orthologs</button>
+      </div>
+      <p class="mgdb-hint" id="fc-search-hint">Type at least two characters. The numeric tail of a gene model works on its own &mdash; <code>374230</code> finds <code>Zm00001eb374230</code>.</p>
+      <div class="marker-example-row fc-examples" aria-label="Example comparisons">
+        <span>Examples</span>
+        <button class="mgdb-chip" type="button" data-fc-example="bz1">bz1 &#40;bronze1&#41;</button>
+        <button class="mgdb-chip" type="button" data-fc-example="wx1">wx1 &#40;waxy1&#41;</button>
+        <button class="mgdb-chip" type="button" data-fc-example="Zm00001eb086870">all four agree</button>
+        <button class="mgdb-chip" type="button" data-fc-example="Zm00001eb168550">Zm00001eb168550</button>
+      </div>
+    </form>
+
+    <noscript>
+      <p class="mgdb-message mgdb-message-info">The comparison and the 3D viewer need JavaScript. Every structure referenced here is also available from the <a href="https\://alphafold.ebi.ac.uk/">AlphaFold Protein Structure Database</a>.</p>
+    </noscript>
+
+    <div id="fc-results" class="fc-results" aria-live="polite">
+      <div class="mgdb-empty fc-welcome">
+        <p><strong>Search a protein to compare it with its orthologs.</strong></p>
+        <p>You will get one row per species showing what each of the three methods picked, whether they agree, and a 3D superposition of the maize protein onto the match &mdash; coloured by chain, by model confidence, or by how far apart the two backbones actually sit.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       2. How to read the comparison
+       ==================================================================== -->
+  <section id="fc-reading" aria-labelledby="fc-reading-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Interpretation</span>
+        <h2 id="fc-reading-title">How to read the comparison</h2>
+      </div>
+      <p>Agreement between methods is the signal. The scores tell you how good any single match is; the agreement tells you how much to trust the assignment.</p>
+    </div>
+
+    <div class="mgdb-card-grid fc-reading-grid">
+      <article class="mgdb-card fc-card-confirmed">
+        <span class="fc-verdict fc-verdict-confirmed">confirmed</span>
+        <h3>All three methods agree</h3>
+        <p>A sequence method and two independent structural methods picked the same protein. Sequence and structure are different kinds of evidence, so this is genuine corroboration rather than the same measurement made three times.</p>
+      </article>
+      <article class="mgdb-card fc-card-supported">
+        <span class="fc-verdict fc-verdict-supported">supported</span>
+        <h3>Two of three agree</h3>
+        <p>Common, and usually fine. Worth checking which method dissented: a structure method disagreeing with two sequence-led calls often means a shared fold with diverged sequence, which is the interesting case.</p>
+      </article>
+      <article class="mgdb-card fc-card-conflicting">
+        <span class="fc-verdict fc-verdict-conflicting">conflicting</span>
+        <h3>All three disagree</h3>
+        <p>Three methods, three different proteins. Usually a large family where several members are about equally close &mdash; so the honest answer is that the ortholog is ambiguous, not that the first-listed one is right.</p>
+      </article>
+      <article class="mgdb-card">
+        <h3>FATCAT score and p-value</h3>
+        <p>FATCAT allows the backbone to twist at a small number of hinges, so it aligns domains that rigid methods miss. The score rises with alignment length and quality; the p-value is the chance of scoring that well between unrelated folds. Below 0.05 is conventionally significant, and most pairs here are far below it.</p>
+      </article>
+    </div>
+
+    <aside class="mgdb-note mgdb-note-info">
+      <p><strong>Low confidence is not structural difference.</strong> Both structures here are predictions. Where two models diverge in a region that is low-pLDDT in either of them, the divergence is a statement about the predictions and not about the proteins. Colour the superposition by confidence before concluding anything from a region that does not superpose.</p>
+    </aside>
+  </section>
+
+  <!-- ====================================================================
+       3. The three methods
+       ==================================================================== -->
+  <section id="fc-methods" aria-labelledby="fc-methods-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Method</span>
+        <h2 id="fc-methods-title">What each method actually measures</h2>
+      </div>
+      <p>All three answer "which protein in this proteome is most like my query", and they disagree because they mean different things by "like".</p>
+    </div>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table">
+        <caption class="mgdb-visually-hidden">The three ortholog-finding methods compared</caption>
+        <thead>
+          <tr><th scope="col">Method</th><th scope="col">Compares</th><th scope="col">Good at</th><th scope="col">Blind to</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>DIAMOND</strong><br /><span class="mgdb-small">sequence</span></td>
+            <td>Amino acid sequence, accelerated BLASTP</td>
+            <td>Close relatives, and it is the only one of the three that sees sequence at all</td>
+            <td>Remote homologs whose sequence has diverged past recognition while the fold has not</td>
+          </tr>
+          <tr>
+            <td><strong>Foldseek</strong><br /><span class="mgdb-small">structure</span></td>
+            <td>Backbone geometry, encoded as a structural alphabet so it can be searched like sequence</td>
+            <td>Speed at proteome scale, and finding shared folds with no sequence signal</td>
+            <td>Fine detail &mdash; the alphabet is a lossy encoding, so it ranks approximately</td>
+          </tr>
+          <tr>
+            <td><strong>FATCAT</strong><br /><span class="mgdb-small">structure</span></td>
+            <td>Backbone geometry directly, allowing a few hinge twists</td>
+            <td>Multi-domain proteins whose domains have moved relative to each other</td>
+            <td>Nothing much, but it is far slower &mdash; which is why the other two are used to shortlist</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="mgdb-small">Every pair listed on this page, whichever method proposed it, is re-scored with FATCAT. So the FATCAT score and p-value on a DIAMOND hit are directly comparable to those on a Foldseek hit &mdash; the methods differ in what they <em>propose</em>, not in how the proposal is then measured.</p>
+  </section>
+
+  <!-- ====================================================================
+       4. Data sources
+       ==================================================================== -->
+  <section id="fc-sources" aria-labelledby="fc-sources-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Provenance</span>
+        <h2 id="fc-sources-title">Where this comes from</h2>
+      </div>
+      <p>A fixed analysis, not a live search. Knowing when it ran is part of reading it.</p>
+    </div>
+
+    <div class="mgdb-card-grid fc-source-grid">
+      <article class="mgdb-card">
+        <h3>The comparison set</h3>
+        <p>Each maize AlphaFold protein structure was aligned against four plant proteomes: <i>Sorghum bicolor</i>, <i>Oryza sativa</i>, <i>Glycine max</i> and <i>Arabidopsis thaliana</i>. The maize models were AlphaFold DB version 3, released July 2022.</p>
+      </article>
+      <article class="mgdb-card">
+        <h3>Structures are fetched live</h3>
+        <p>The models themselves come from the AlphaFold Protein Structure Database at EMBL-EBI as your browser draws them, so what you see is the file as published today. Superpositions are the FATCAT output, served through MaizeGDB.</p>
+      </article>
+      <article class="mgdb-card fc-card-note">
+        <h3>Annotations are two kinds</h3>
+        <p>UniProt annotations are curated or reviewed. <a href="http\://ekhidna2.biocenter.helsinki.fi/sanspanz/" rel="noopener">Pannzer</a> annotations are automated predictions, offered where UniProt has nothing to say. They are labelled separately because they are not equivalent evidence.</p>
+      </article>
+      <article class="mgdb-card">
+        <h3>Citing this</h3>
+        <p>FATCAT: Ye and Godzik \(2003\) <i>Bioinformatics</i> 19:ii246&ndash;255. Foldseek: van Kempen et al. \(2024\) <i>Nature Biotechnology</i> 42:243&ndash;246. DIAMOND: Buchfink et al. \(2021\) <i>Nature Methods</i> 18:366&ndash;368. AlphaFold: Jumper et al. \(2021\) <i>Nature</i> 596:583&ndash;589. MaizeGDB structures: Andorf et al. \(2023\) <i>Genetics</i> 223:iyad016.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       5. Related resources
+       ==================================================================== -->
+  <section id="fc-resources" aria-labelledby="fc-resources-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <span class="mgdb-eyebrow">Connected tools</span>
+        <h2 id="fc-resources-title">Related resources</h2>
+      </div>
+      <p>Where to go next with a protein, a fold or an ortholog.</p>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/protein_structure">
+          <strong>Protein Structure Data Hub</strong>
+          <span>AlphaFold monomers, homodimers and heterodimers with confidence and interface scores</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/alphafill">
+          <strong>AlphaFill ligand transplants</strong>
+          <span>What this protein is predicted to bind &mdash; cofactors, substrates and metal sites</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/foldseek">
+          <strong>Foldseek structure search</strong>
+          <span>Search a maize structure against eight proteomes, including human and yeast</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/pan_gene_center/pan_gene">
+          <strong>Pan-Gene Data Hub</strong>
+          <span>Syntenic relationships across maize assemblies &mdash; a different kind of ortholog evidence</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="$(blast-url)">
+          <strong>Sequence search</strong>
+          <span>BLAST a sequence against the maize genomes and annotations</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="https\://alphafold.ebi.ac.uk/" target="_blank" rel="noopener">
+          <strong>AlphaFold Protein Structure Database</strong>
+          <span>EMBL-EBI open-access predicted structure repository</span>
+          <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+)

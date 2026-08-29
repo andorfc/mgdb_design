@@ -1,0 +1,54 @@
+$$SYNTAX-LEVEL 2
+*(fatcat-content
+
+          <div style="vertical-align:middle;display:inline-block;border:solid 1px #AAAAAA;border-radius:15px;
+                           padding:2px 10px 5px 10px;height:16px;text-align: center; margin: 1px 5px 5px 5px;background-color: #07528A;color: white; 
+                           font-size: 14px;">
+            <a href="https://fatcat.maizegdb.org?uniprot=$(uniprot_id)" target="_blank" style="color: white">View this page in full screen</a>
+          </div>
+  <!-- Important: The code on gblade uses the window name when generating a bookmark url. Changing the name here will break it" -->
+  <iframe sandbox="allow-forms allow-downloads allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation allow-top-navigation-by-user-activation" id="gframe" name="gframe" src="https://fatcat.maizegdb.org?uniprot=$(uniprot_id)" height="1050px" width="100%" frameborder="0" style="z-index: 999; display: block;">
+  
+  </iframe>
+
+ 
+ <script language="javascript">
+ 
+  \$("#menu_bar", document\).removeClass("menu"\);
+  \$("#menu_bar", document\).removeClass("menu_green"\);
+  \$("#menu_bar", document\).addClass("menu_gbrowse"\);
+  \$("#menu_bar", document\).addClass("menu_green_gbrowse"\);
+  document.getElementById("wrapper"\).setAttribute("style", "width:1700px"\); //1600    
+  document.getElementById("logo"\).setAttribute("style", "width:1424px"\); //1324
+  document.getElementById("centercolumn_record"\).setAttribute("style", "width:1400px"\);
+  document.getElementById("whitecurve"\).setAttribute("style", "width:1420px"\);
+  document.getElementById("content"\).setAttribute("style", "width:1400px"\);
+  document.getElementById("content_top"\).src = "/images/content_top_gbrowse.png";
+  document.getElementById("content_top"\).setAttribute("style", "width:1420px"\);
+  document.getElementById("menu_bar"\).setAttribute("style", "width:87.5%"\);
+  window.onload=function(\) {
+    console.log('window on load'\);
+   //need to wait for these sections to load before changing them
+   \$("#footer_menu", document\).removeClass("menu"\);
+   \$("#footer_menu", document\).removeClass("menu_green"\);
+   \$("#footer_menu", document\).addClass("menu_gbrowse"\);
+   \$("#footer_menu", document\).addClass("menu_green_gbrowse"\);
+   document.getElementById("content_bottom"\).setAttribute("style", "width:1420px"\);
+   document.getElementById("footer"\).setAttribute("style", "width:1420px"\);
+   document.getElementById("content_bottom"\).src = "/images/content_bottom_gbrowse.png";
+   document.getElementById('gframe'\).style.webkitTransform = 'scale(1\)';
+
+   //document.getElementById('gframe'\).contentDocument.body.style.fontSize='80%';
+   document.addEventListener("load", function(event\) {
+   
+    console.log("load event listener"\);
+    var style = document.getElementById("gframe"\).style;
+    style.webkitTransform = style.webkitTransform ? "" : "scale(1\)";
+   var gframe = document.getElementById('gframe'\);
+   var content = (gframe.contentDocument || gframe.contentWindow\);
+   content.body.style.fontSize = "6px";
+}\);
+ }
+  
+ </script>
+)
