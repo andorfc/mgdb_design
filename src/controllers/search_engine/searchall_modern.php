@@ -48,6 +48,37 @@ if ($explicit_type !== '') {
 }
 $initial_comments = getCGIParam('comments', 'GP', '') === '1' ? '1' : '0';
 
+/* The MaizeGDB ID category resolves one identifier to one record page, so it
+   is the single case where this controller reads the database — one primary
+   key lookup, about 3 ms. Everything else still renders without a query.
+
+   The page this replaces interpolated the term into `WHERE idn.id=$term`, so
+   "GWAS" typed while the category was still on MaizeGDB ID made Postgres
+   error on an unknown column and the request finished with a 200 and an empty
+   body. Anything that is not a live id now falls through to the search, which
+   is where the reader was trying to get, with a line saying why. */
+$id_notice = '';
+if ($search_type === 'id' && $search_term !== '') {
+    include_once('search/searchall/searchall_lib.php');
+    if (!isset($DBConn) || !$DBConn) { $DBConn = connect_to_database(); }
+    $resolved = saResolveId($DBConn, $search_term);
+    if ($resolved && $resolved['url']) {
+        header('Location: ' . $resolved['url'], true, 302);
+        exit;
+    }
+    if ($resolved) {
+        $id_notice = 'MaizeGDB ID ' . $search_term . ' is a '
+            . strtolower($resolved['type_name']) . ' record, which has no page of its own. '
+            . 'Showing everything that matches instead.';
+    } elseif (preg_match('/^[0-9]+$/', $search_term)) {
+        $id_notice = 'No record carries MaizeGDB ID ' . $search_term . '. Searching all data instead.';
+    } else {
+        $id_notice = 'A MaizeGDB ID is a number, so “' . $search_term
+            . '” could not be looked up as one. Searching all data instead.';
+    }
+    $initial_type = '';
+}
+
 header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
 header('Pragma: no-cache');
 header('Expires: 0');
@@ -90,6 +121,7 @@ $content = $mgdb->get('body')->load('templates/static/mgdb_searchall.bau');
 $content->get('search_term')->replace(htmlspecialchars($search_term, ENT_QUOTES, 'UTF-8'));
 $content->get('initial_type')->replace(htmlspecialchars($initial_type, ENT_QUOTES, 'UTF-8'));
 $content->get('initial_comments')->replace($initial_comments);
+$content->get('id_notice')->replace(htmlspecialchars($id_notice, ENT_QUOTES, 'UTF-8'));
 
 include_once('translation.php');
 $mgdb->get('blast_url')->replace($system['BLAST_URL']);

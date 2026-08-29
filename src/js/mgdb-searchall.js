@@ -51,6 +51,10 @@
     map: '#mzg-maps',
     person: '#mzg-people-and-organizations',
     genome: '#mzg-genomes',
+    recomb: '#mzg-recombination-data',
+    primer: '#mzg-restriction-enzymes-and-primers',
+    species: '#mzg-species',
+    journal: '#mzg-journals',
     id: '#mgdb-cat-id'
   };
 
@@ -584,6 +588,17 @@
     var params = new window.URLSearchParams(window.location.search);
     var page = parseInt(params.get('page'), 10);
     state.page = page > 0 ? page : 1;
+
+    /* Set only when the MaizeGDB ID category was asked for a term that is not
+       a live id. The controller resolves a real id to its record page and
+       never gets here; this says why the reader is looking at a search
+       instead. Server-escaped, and read back as text. */
+    var idNotice = root.getAttribute('data-id-notice') || '';
+    if (idNotice) {
+      var note = el('div', 'mgdb-note sa-notice');
+      note.appendChild(el('p', null, idNotice));
+      root.insertBefore(note, root.querySelector('.sa-layout'));
+    }
 
     if (commentsInput) {
       commentsInput.checked = state.comments;

@@ -154,7 +154,7 @@ function saTypeRegistry() {
             'blurb' => 'Alleles and sequence variants and the loci they belong to.',
         ),
         'phenotype' => array(
-            'label' => 'Phenotypes',
+            'label' => 'Phenotypes and mutants',
             'cat' => 'phenotype',
             'view' => 'phenotype',
             'sources' => array('phenotype', 'synonyms'),
@@ -215,7 +215,7 @@ function saTypeRegistry() {
         ),
         'recomb' => array(
             'label' => 'Recombination data',
-            'cat' => 'map',
+            'cat' => 'recomb',
             'view' => 'simple',
             'sources' => array('recomb', 'recomb_class_freq'),
             'type_name' => 'Recombination Data',
@@ -225,7 +225,7 @@ function saTypeRegistry() {
         ),
         'primer' => array(
             'label' => 'Restriction enzyme primers',
-            'cat' => 'probe',
+            'cat' => 'primer',
             'view' => 'simple',
             'sources' => array('primer', 'synonyms'),
             'type_name' => 'Restriction Enzyme Primer',
@@ -235,7 +235,7 @@ function saTypeRegistry() {
         ),
         'species' => array(
             'label' => 'Species',
-            'cat' => 'genome',
+            'cat' => 'species',
             'view' => 'simple',
             'sources' => array('species', 'synonyms', 'species_nuclear'),
             'type_name' => 'Species',
@@ -245,7 +245,7 @@ function saTypeRegistry() {
         ),
         'journal' => array(
             'label' => 'Journals',
-            'cat' => 'reference',
+            'cat' => 'journal',
             'view' => 'simple',
             'sources' => array('journal', 'synonyms'),
             'type_name' => 'Journal',
@@ -270,6 +270,72 @@ function saTypeOrder() {
     return array('gene', 'genome', 'locus', 'reference', 'stock', 'probe', 'variation', 'phenotype',
                  'term', 'qtl_exp', 'gene_product', 'map', 'person', 'recomb',
                  'primer', 'journal', 'species');
+}
+
+/* --------------------------------------------------------------------------
+   MaizeGDB ID lookup
+
+   The "MaizeGDB ID" category is not a search: it resolves one identifier to
+   one record page. The registry already declares the current route for every
+   type the search returns — /data_center/marker/ for a probe, /person/ for a
+   person — so those are read from it rather than kept a second time. The types
+   listed here have record pages but no section in the search, so nothing else
+   in this file names them.
+   -------------------------------------------------------------------------- */
+
+function saIdUrlMap() {
+    $map = array();
+    foreach (saTypeRegistry() as $type) {
+        if (!empty($type['type_name']) && !empty($type['url'])) {
+            $map[$type['type_name']] = $type['url'];
+        }
+    }
+    $extra = array(
+        'Clone Library'                   => '/data_center/clone/',
+        'Environment'                     => '/data_center/environment/',
+        'Environment Type'                => '/data_center/environment/',
+        'Enz_Cat_Reaction'                => '/data_center/ecr/',
+        'Gel Pattern'                     => '/data_center/gel/',
+        'Karyotypic Variation Type'       => '/data_center/kv/',
+        'Linkage Group'                   => '/data_center/lg/',
+        'Map Scores'                      => '/data_center/map_scores/',
+        'Metabolic Pathway'               => '/data_center/mp/',
+        'Panel of Stock'                  => '/data_center/pos/',
+        'QTL Experiment Linkage Analysis' => '/data_center/qtl_analysis/',
+        'Trait Analysis'                  => '/data_center/trait_analysis/',
+    );
+    foreach ($extra as $name => $url) {
+        if (!isset($map[$name])) { $map[$name] = $url; }
+    }
+    return $map;
+}
+
+/* One primary-key read on mgdb.id_num — 3 ms — and no read at all unless the
+   term is digits. Returns:
+     array('type_name' => ..., 'url' => ...)   the record page
+     array('type_name' => ..., 'url' => null)  a real id whose type has no page
+     null                                      not an id, or no such id
+   The page this replaces interpolated the term straight into
+   `WHERE idn.id=$term`, so a non-numeric term raised an undefined-column error
+   and the request finished with an empty body. */
+function saResolveId($db, $term) {
+    $term = trim((string)$term);
+    if ($term === '' || !preg_match('/^[0-9]{1,18}$/', $term)) { return null; }
+
+    $sql = 'SELECT t.name AS type_name
+              FROM mgdb.id_num idn
+              JOIN mgdb.term t ON t.id = idn.type_term
+             WHERE idn.id = ' . (int)$term;
+    $sth = make_query($db, $sql);
+    $row = $sth ? retrieve_row($sth) : null;
+    if (!$row || empty($row['type_name'])) { return null; }
+
+    $map = saIdUrlMap();
+    $name = $row['type_name'];
+    return array(
+        'type_name' => $name,
+        'url' => isset($map[$name]) ? $map[$name] . (int)$term : null,
+    );
 }
 
 /* term.name -> registry key, for reading the grouped counts back. */

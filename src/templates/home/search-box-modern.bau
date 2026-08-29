@@ -9,7 +9,7 @@ $$SYNTAX-LEVEL 2
      palette in css/mgdb-modern.css is the single place the colours live. -->
 <svg class="mgdb-search-sprite" aria-hidden="true" focusable="false" width="0" height="0">
   <!-- MaizeGDB icon set. Source of truth is icons/ in this repository:
-       icons/maizegdb-icons-sprite.svg holds the 39 mzg-* symbols verbatim,
+       icons/maizegdb-icons-sprite.svg holds the 40 mzg-* symbols verbatim,
        icons/index.tsv names each slug and its brand colour, and icons/mono,
        icons/color and icons/png carry standalone copies.
 
@@ -61,7 +61,7 @@ $$SYNTAX-LEVEL 2
   </symbol>
   <symbol id="mzg-stocks-and-germplasm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
     <title>Stocks and germplasm</title>
-    <path d="M12 21c-3.2 0-5.7-2.4-5.7-5.6C6.3 10.7 9 6.3 12 3.2c3 3.1 5.7 7.5 5.7 12.2 0 3.2-2.5 5.6-5.7 5.6z"></path><path d="M12 20.6V9.5"></path><path d="M12 13.2c1.5-.6 2.4-1.7 2.8-3.2M12 16c-1.5-.6-2.4-1.7-2.8-3.2"></path>
+    <path d="M12 2.8c3.5 3.5 5.3 7.4 5.3 11.5 0 3.9-2.4 6.5-5.3 6.5s-5.3-2.6-5.3-6.5c0-4.1 1.8-8 5.3-11.5z"></path><path d="M8.4 10h7.2M6.9 14.4h10.2M8.6 18h6.8"></path><path d="M9.6 6.6v13.4M14.4 6.6v13.4"></path>
   </symbol>
   <symbol id="mzg-markers-and-probes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
     <title>Markers and probes</title>
@@ -73,7 +73,7 @@ $$SYNTAX-LEVEL 2
   </symbol>
   <symbol id="mzg-phenotypes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
     <title>Phenotypes</title>
-    <path d="M4.5 19.5C3.6 12 8.4 5.4 19.5 4.5c.9 7.5-3.9 14.1-15 15z"></path><path d="M6.6 17.4C9 13 12 10.5 16 9"></path>
+    <path d="M12 21.2V5.4"></path><path d="M12 5.4V2.4M12 4.2l2.8-1.6M12 4.2L9.2 2.6"></path><path d="M12 11c1.2-3.4 3.9-5.2 7.8-5.4-.9 3.6-3.5 5.4-7.8 5.4z"></path><path d="M12 16c-1.2-3.4-3.9-5.2-7.8-5.4.9 3.6 3.5 5.4 7.8 5.4z"></path>
   </symbol>
   <symbol id="mzg-traits-and-terms" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
     <title>Traits and terms</title>
@@ -90,6 +90,10 @@ $$SYNTAX-LEVEL 2
   <symbol id="mzg-maps" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
     <title>Maps</title>
     <path d="M9 4.5L3.5 6.6v12.9L9 17.4l6 2.1 5.5-2.1V4.5L15 6.6z"></path><path d="M9 4.5v12.9M15 6.6v12.9"></path>
+  </symbol>
+  <symbol id="mzg-recombination-data" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+    <title>Recombination data</title>
+    <path d="M6.4 3.4v3.4c0 3 11.2 4.4 11.2 7.4v6.4"></path><path d="M17.6 3.4v3.4c0 3-11.2 4.4-11.2 7.4v6.4"></path><path d="M9.6 9.2l4.8 3.4M14.4 9.2l-4.8 3.4"></path>
   </symbol>
   <symbol id="mzg-genomes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
     <title>Genomes</title>
@@ -217,15 +221,15 @@ $$SYNTAX-LEVEL 2
         <option value="gene_model">Gene models</option>
         <option value="genome">Genomes</option>
         <option value="locus">Loci</option>
-        <option value="probe">Markers</option>
+        <option value="probe">Markers and probes</option>
         <option value="qtl_exp">QTL experiments</option>
-        <option value="stock">Stocks</option>
+        <option value="stock">Stocks and germplasm</option>
         <option value="reference">References</option>
-        <option value="term">Traits</option>
-        <option value="phenotype">Phenotypes / mutants</option>
-        <option value="variation">Variations / alleles</option>
+        <option value="term">Traits and terms</option>
+        <option value="phenotype">Phenotypes and mutants</option>
+        <option value="variation">Variations and alleles</option>
         <option value="map">Maps</option>
-        <option value="person">People / organizations</option>
+        <option value="person">People and organizations</option>
         <option value="id">MaizeGDB ID</option>
         <option value="goog">Static web pages</option>
       </select>
@@ -246,15 +250,15 @@ $$SYNTAX-LEVEL 2
         <button type="button" role="option" aria-selected="false" data-value="gene_model" data-label="Gene models"><span class="mgdb-search-icon" data-cat="gene_model" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mgdb-cat-gene-model"></use></svg></span><strong>Gene models</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
         <button type="button" role="option" aria-selected="false" data-value="genome" data-label="Genomes"><span class="mgdb-search-icon" data-cat="genome" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mzg-genomes"></use></svg></span><strong>Genomes</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
         <button type="button" role="option" aria-selected="false" data-value="locus" data-label="Loci"><span class="mgdb-search-icon" data-cat="locus" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mzg-loci"></use></svg></span><strong>Loci</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
-        <button type="button" role="option" aria-selected="false" data-value="probe" data-label="Markers"><span class="mgdb-search-icon" data-cat="probe" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mzg-markers-and-probes"></use></svg></span><strong>Markers</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
+        <button type="button" role="option" aria-selected="false" data-value="probe" data-label="Markers and probes"><span class="mgdb-search-icon" data-cat="probe" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mzg-markers-and-probes"></use></svg></span><strong>Markers and probes</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
         <button type="button" role="option" aria-selected="false" data-value="qtl_exp" data-label="QTL experiments"><span class="mgdb-search-icon" data-cat="qtl_exp" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mzg-qtl-experiments"></use></svg></span><strong>QTL experiments</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
-        <button type="button" role="option" aria-selected="false" data-value="stock" data-label="Stocks"><span class="mgdb-search-icon" data-cat="stock" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mzg-stocks-and-germplasm"></use></svg></span><strong>Stocks</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
+        <button type="button" role="option" aria-selected="false" data-value="stock" data-label="Stocks and germplasm"><span class="mgdb-search-icon" data-cat="stock" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mzg-stocks-and-germplasm"></use></svg></span><strong>Stocks and germplasm</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
         <button type="button" role="option" aria-selected="false" data-value="reference" data-label="References"><span class="mgdb-search-icon" data-cat="reference" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mzg-references"></use></svg></span><strong>References</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
-        <button type="button" role="option" aria-selected="false" data-value="term" data-label="Traits"><span class="mgdb-search-icon" data-cat="term" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mzg-traits-and-terms"></use></svg></span><strong>Traits</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
-        <button type="button" role="option" aria-selected="false" data-value="phenotype" data-label="Phenotypes / mutants"><span class="mgdb-search-icon" data-cat="phenotype" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mzg-phenotypes"></use></svg></span><strong>Phenotypes / mutants</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
-        <button type="button" role="option" aria-selected="false" data-value="variation" data-label="Variations / alleles"><span class="mgdb-search-icon" data-cat="variation" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mzg-variations-and-alleles"></use></svg></span><strong>Variations / alleles</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
+        <button type="button" role="option" aria-selected="false" data-value="term" data-label="Traits and terms"><span class="mgdb-search-icon" data-cat="term" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mzg-traits-and-terms"></use></svg></span><strong>Traits and terms</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
+        <button type="button" role="option" aria-selected="false" data-value="phenotype" data-label="Phenotypes and mutants"><span class="mgdb-search-icon" data-cat="phenotype" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mzg-phenotypes"></use></svg></span><strong>Phenotypes and mutants</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
+        <button type="button" role="option" aria-selected="false" data-value="variation" data-label="Variations and alleles"><span class="mgdb-search-icon" data-cat="variation" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mzg-variations-and-alleles"></use></svg></span><strong>Variations and alleles</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
         <button type="button" role="option" aria-selected="false" data-value="map" data-label="Maps"><span class="mgdb-search-icon" data-cat="map" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mzg-maps"></use></svg></span><strong>Maps</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
-        <button type="button" role="option" aria-selected="false" data-value="person" data-label="People / organizations"><span class="mgdb-search-icon" data-cat="person" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mzg-people-and-organizations"></use></svg></span><strong>People / organizations</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
+        <button type="button" role="option" aria-selected="false" data-value="person" data-label="People and organizations"><span class="mgdb-search-icon" data-cat="person" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mzg-people-and-organizations"></use></svg></span><strong>People and organizations</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
         <button type="button" role="option" aria-selected="false" data-value="id" data-label="MaizeGDB ID"><span class="mgdb-search-icon" data-cat="id" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mgdb-cat-id"></use></svg></span><strong>MaizeGDB ID</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
         <button type="button" role="option" aria-selected="false" data-value="goog" data-label="Static web pages"><span class="mgdb-search-icon" data-cat="goog" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#mgdb-cat-page"></use></svg></span><strong>Static web pages</strong><i class="mgdb-search-check" aria-hidden="true"></i></button>
       </div>
@@ -263,7 +267,7 @@ $$SYNTAX-LEVEL 2
     <div class="mgdb-search-query">
       <label class="mgdb-visually-hidden" for="global_search_term">Search MaizeGDB</label>
       <input id="global_search_term" class="mgdb-search-input" type="search" name="global_search_term"
-             placeholder="Search genes, loci, markers, stocks, QTL&hellip;"
+             placeholder="Search genes, loci, markers, stocks, &hellip;"
              autocomplete="off" autocapitalize="off" spellcheck="false"
              role="combobox" aria-autocomplete="list" aria-controls="mgdb-search-suggestions" aria-expanded="false" required>
     </div>

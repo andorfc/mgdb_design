@@ -90,6 +90,44 @@ one. Three places resolve it, and they must stay in step:
 
 All three end up pointing *Genes* at `#mzg-genes`.
 
+**One name per data type.** The header listbox, the suggestion groups and the
+results rail each used to write their own label for the same set of records —
+*Stocks*, *Stocks / germplasm* and *Stocks and germplasm* were one category
+seen from three places. They now share one spelling, and adding a category
+means writing it in all three:
+
+| Key | Name |
+| --- | --- |
+| `probe` | Markers and probes |
+| `stock` | Stocks and germplasm |
+| `term` | Traits and terms |
+| `phenotype` | Phenotypes and mutants |
+| `variation` | Variations and alleles |
+| `person` | People and organizations |
+
+The three places are `templates/home/search-box-modern.bau` (the `<option>`
+text, `data-label` and the row's `<strong>`), the `$groupMeta` map in
+`controllers/search_engine/autocomplete.php`, and `label` in `saTypeRegistry()`
+in `search/searchall/searchall_lib.php`. The longest of these outrun the
+category column, so the toggle ellipsises them and carries the full name in a
+`title`; the menu row and the accessible name are never truncated.
+
+**A `cat` is a glyph, not a grouping.** Four registry types were declaring
+another type's `cat` — `recomb` took `map`, `primer` took `probe`, `species`
+took `genome`, `journal` took `reference` — so the rail listed *Maps* and
+*Recombination data* under the same icon in the same colour and they read as
+one category named twice. Each now has its own `cat`, its own palette line in
+`mgdb-modern.css` and its own entry in the `ICONS` map in `mgdb-searchall.js`.
+`recomb` needed artwork, so `#mzg-recombination-data` was drawn for it.
+
+**Two of the glyphs were not maize.** *Stocks and germplasm* was a seed with a
+midrib and *Phenotypes* was a dicot leaf with pinnate venation — neither shape
+occurs on a maize plant. They are now an ear with kernel rows and a tasselled
+plant with strap leaves. Source art is `icons/mono`, `icons/color` and
+`icons/png`; the sprite is `icons/maizegdb-icons-sprite.svg`, and the copy the
+site actually serves is inlined in `search-box-modern.bau`, so a change has to
+be written to both.
+
 ## Deploying
 
 ```bash
@@ -1395,6 +1433,16 @@ Colour is decoration. Every row keeps its label, the glyph shapes differ from on
 another, and the selected category is marked with a check, so nothing is carried
 by hue alone.
 
+**The visible category and the submitted one can drift apart, and did.** The
+native `<select>` is what submits; the styled toggle only mirrors it. Back-
+forward navigation restores form controls *after* this script has run — the
+document is reparsed and refilled once loading finishes, or it returns whole
+from the back-forward cache — so the select came back holding the category that
+was submitted while the toggle still showed the label it was built with. The
+reader saw *All data*, typed a term, and was sent to a MaizeGDB ID lookup or
+straight out to Google. `initCategory()` re-reads the select on `pageshow`,
+which fires after restoration either way.
+
 **A locus cannot be found by its own name through `all_text_search`.** That table
 stores wx1's three names concatenated into the single token `gss1wx1waxy1`, so
 neither `waxy` nor `waxy1` nor `Gss1` nor even `wx1` matches it there. The
@@ -1494,6 +1542,30 @@ identifiers, into `mgdb.person` and `mgdb.linkage_group` respectively.
 matches on token prefix: `waxy` hits `waxy1` and `waxy endosperm` but not
 `nonwaxy`. Prefix matching is what makes the index usable and is what the header
 search already did.
+
+### The two categories that are not searches
+
+*MaizeGDB ID* resolves one identifier to one record page, and *Static web
+pages* hands the term to Google. Both used to leave the modern route to do it.
+
+The id lookup ran `WHERE idn.id=$term` with the term interpolated, so a term
+that was not a number — "GWAS" left in the box while the category was still on
+MaizeGDB ID — made Postgres error on an unknown column, and the request
+finished with a 200 and **an empty body**. `saResolveId()` in
+`searchall_lib.php` now does it: one primary-key read, 3 ms, and no read at all
+unless the term is digits. A live id redirects to its record; anything else
+falls through to the all-data search with a line saying why, because that is
+where the reader was trying to get. The record URLs come from the registry's
+own `url` fields, so the id lookup cannot drift from the search — the list it
+replaced still pointed at `/data_center/probe` and `/data_center/person`.
+
+The Google option rendered the whole legacy in-progress page and let
+`js/search_engine.js` set `document.location` after it loaded: 39 KB and a
+flash of pre-redesign chrome on the way off the site. `search_engine.php` sends
+the 302 itself.
+
+This makes the id category the one case where the shell touches the database.
+Every other category still renders without a query.
 
 ### Verification
 

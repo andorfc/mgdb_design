@@ -150,8 +150,15 @@
     function sync(value) {
       var chosen = optionFor(value);
       var chosenValue = chosen.getAttribute('data-value');
+      var chosenLabel = chosen.getAttribute('data-label') || chosen.textContent.trim();
       select.value = chosenValue;
-      label.textContent = chosen.getAttribute('data-label') || chosen.textContent.trim();
+      label.textContent = chosenLabel;
+      /* The category column is narrower than the longest names now that the
+         listbox, the suggestion groups and the results rail all say the same
+         thing, so the toggle ellipsises "People and organizations". The menu
+         row and the accessible name carry it in full; this is for a sighted
+         reader hovering the truncated chip. */
+      toggle.setAttribute('title', chosenLabel);
       syncIcon(chosen, chosenValue);
       options.forEach(function (option) {
         option.setAttribute('aria-selected', option === chosen ? 'true' : 'false');
@@ -205,6 +212,18 @@
     });
 
     sync(select.value);
+
+    /* Back-forward navigation restores form controls, and it does so after
+       this script has run: with the page reparsed the browser refills the
+       native select once loading finishes, and out of the back-forward cache
+       the whole document returns with the value it was submitted with. Either
+       way the select — the control that actually submits — held the previous
+       category while the toggle still showed the label it was built with, so
+       the reader saw "All data" and got a MaizeGDB ID lookup or a Google
+       search. pageshow fires after restoration in both cases, so re-read the
+       select there and let the visible state follow it. */
+    window.addEventListener('pageshow', function () { sync(select.value); });
+
     root.classList.add('is-ready');
 
     return { close: function () { setOpen(false, false); } };

@@ -70,22 +70,38 @@ logVarDump($_POST, "\nPOST parameters in search_engine.php\n");
     exit;
   }
 
-  if ($type == 'id') {
-    // Pass control to searchall_id.php
-    include_once('controllers/search_engine/searchall_lib.php');
-    include_once('controllers/search_engine/searchall_id.php');
+  // "Static web pages" is a site: query against Google, and always was. It used
+  // to get there by rendering the whole legacy in-progress page and letting
+  // js/search_engine.js set document.location once that page had loaded — a
+  // 39 KB round trip and a flash of pre-redesign chrome on the way out of the
+  // site. The redirect is the whole behaviour, so send it directly.
+  if (PAGE == 'searchall' && $type == 'goog' && $term !== '') {
+    header('Location: https://www.google.com/search?q=site%3A*.maizegdb.org+' . rawurlencode($term), true, 302);
     exit;
   }
 
-  // All-data and per-type results on the modern design system. Renders a shell
-  // and lets search/searchall/searchall_api.php return the records, rather than
-  // running the whole search server-side behind a loading GIF. 'goog' still
-  // goes to the site-wide Google search below, and 'id' was handled above.
+  // All-data, per-type and MaizeGDB ID results on the modern design system.
+  // Renders a shell and lets search/searchall/searchall_api.php return the
+  // records, rather than running the whole search server-side behind a loading
+  // GIF. 'goog' still goes to the site-wide Google search below.
+  //
+  // The 'id' category used to be answered before this by searchall_id.php,
+  // which interpolated the term into `WHERE idn.id=$term` and rendered nothing
+  // at all when the lookup failed — a non-numeric term returned a 200 with an
+  // empty body. searchall_modern.php does the lookup itself and falls through
+  // to the search when the term is not a live id.
   //
   // Reached both by POST from the header search and by GET, so a result page
   // can be linked to. The legacy path is archived at legacy/searchall/.
   if (PAGE == 'searchall' && $type != 'goog') {
     include('controllers/search_engine/searchall_modern.php');
+    exit;
+  }
+
+  if ($type == 'id') {
+    // Any other page still reaching the id search keeps the old path.
+    include_once('controllers/search_engine/searchall_lib.php');
+    include_once('controllers/search_engine/searchall_id.php');
     exit;
   }
 
