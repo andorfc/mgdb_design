@@ -736,3 +736,24 @@
     max-width: 100%;
   }
 }
+
+/* --------------------------------------------------------------------------
+ * Hero, after the project-page pass
+ *
+ * No "Updated" stamp: it printed the day the page was served, so it always
+ * claimed the data had just changed. With it gone the title has the whole
+ * width, and the description is no longer clamped to the shared 62ch measure,
+ * which was wrapping one sentence into three short lines with the right half
+ * of the panel empty.
+ * -------------------------------------------------------------------------- */
+
+.mgdb-amaizing-project-page .mgdb-hero h1 { padding-right: 0; }
+.mgdb-amaizing-project-page .mgdb-hero-description { max-width: none; }
+
+/* The table was wider than its container, so it scrolled sideways and the last
+   column sat off the edge. Every header was nowrap, which is what reserved the
+   width; letting them wrap lets each column shrink to its content, and there is
+   then room to keep the assembly identifiers on one line. */
+.mgdb-amaizing-project-page .amaizing-table thead th,
+.mgdb-amaizing-project-page .amaizing-table thead th button { white-space: normal; text-align: left; }
+.mgdb-amaizing-project-page .amaizing-assembly-link { white-space: nowrap; }

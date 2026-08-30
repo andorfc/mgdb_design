@@ -43,8 +43,6 @@
 
   $body = $mgdb->get('body')->load('templates/static/mgdb_panand_project.bau');
 
-  $body->get('data_date')->replace(date('F j, Y'));
-
   include_once('translation.php');
   $blast_url = isset($system['BLAST_URL']) && !empty($system['BLAST_URL']) ? $system['BLAST_URL'] : '/blast';
   $body->get('blast_url')->replace($blast_url);

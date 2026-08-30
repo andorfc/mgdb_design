@@ -8,77 +8,61 @@ $$SYNTAX-LEVEL 2
     <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/genome">Genomes</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">NAM Parent Assemblies</span>
   </nav>
 
-  <!-- HERO SECTION -->
+  <!-- HERO
+
+       Same treatment as /PanAnd_project: the description uses the width it is
+       given rather than the shared 62ch measure, each action link is named
+       rather than described so all five sit on one row, and the emblem is the
+       artwork the homepage NAM quick link uses.
+
+       No "Updated" stamp. It printed date\('F j, Y'\) -- the day the page was
+       served -- so it always claimed the assemblies had been updated today.
+       Put it back when there is a real release date to print. -->
   <section class="mgdb-hero" aria-labelledby="nam-title">
     <div class="mgdb-hero-emblem">
-      <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <!-- Chromosome / DNA backbone nodes -->
-        <rect x="8" y="14" width="48" height="36" rx="6" fill="#f0fdf4" stroke="#1b5e20" stroke-width="2.5" />
-        <!-- Multi-line genome tracks -->
-        <line x1="14" y1="23" x2="50" y2="23" stroke="#2e7d32" stroke-width="3" stroke-linecap="round" />
-        <line x1="14" y1="32" x2="50" y2="32" stroke="#d97706" stroke-width="3" stroke-linecap="round" />
-        <line x1="14" y1="41" x2="50" y2="41" stroke="#2563eb" stroke-width="3" stroke-linecap="round" />
-        <!-- Marker dots -->
-        <circle cx="22" cy="23" r="2.5" fill="#facc15" />
-        <circle cx="38" cy="23" r="2.5" fill="#ffffff" />
-        <circle cx="30" cy="32" r="2.5" fill="#ffffff" />
-        <circle cx="44" cy="32" r="2.5" fill="#facc15" />
-        <circle cx="26" cy="41" r="2.5" fill="#facc15" />
-      </svg>
+      <img src="/images/quicklinks/NAM.png" alt="" width="128" height="128" decoding="async" />
       <strong>NAM<br />Project</strong>
     </div>
     <div class="mgdb-hero-body">
-      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data_date)</p>
       <h1 id="nam-title">Nested Association Mapping \(NAM\) Parent Genomes</h1>
-      <p class="mgdb-hero-description">High-quality de novo PacBio reference genome assemblies, structural variation catalogs, annotations, genetic maps, and stock lines for 26 diverse founder inbreds representing the spectrum of modern maize genetic diversity.</p>
+      <p class="mgdb-hero-description">High-quality de novo PacBio reference genome assemblies and gene model annotations for 26 diverse founder inbreds representing a broad cross-section of modern maize genetic variation.</p>
 
       <div class="nam-hero-actions-row">
-        <a class="nam-hero-link" href="/genomebrowser">
-          <span class="nam-link-dot nam-dot-green" aria-hidden="true"></span> Explore in JBrowse 2 &#8599;
-        </a>
-        <a class="nam-hero-link" href="https://nam-genomes.github.io/" target="_blank" rel="noopener">
-          <span class="nam-link-dot nam-dot-gold" aria-hidden="true"></span> NAM Consortium Website &#8599;
-        </a>
-        <a class="nam-hero-link" href="/download#downloads-nam">
-          <span class="nam-link-dot nam-dot-blue" aria-hidden="true"></span> Bulk Downloads &#8595;
-        </a>
-        <a class="nam-hero-link" href="https://maizecoopsc.org/nam-rils.php" target="_blank" rel="noopener">
-          <span class="nam-link-dot nam-dot-purple" aria-hidden="true"></span> Order NAM RILs &#8599;
-        </a>
-        <a class="nam-hero-link" href="/curation/GenomeIssue/edit">
-          <span class="nam-link-dot nam-dot-rose" aria-hidden="true"></span> Report Curation Issue &#8599;
-        </a>
+        <a class="nam-hero-link" href="/genomebrowser"><span class="nam-link-dot nam-dot-green" aria-hidden="true"></span> JBrowse 2</a>
+        <a class="nam-hero-link" href="https://nam-genomes.github.io/" target="_blank" rel="noopener"><span class="nam-link-dot nam-dot-gold" aria-hidden="true"></span> Project website &#8599;</a>
+        <a class="nam-hero-link" href="/download#downloads-nam"><span class="nam-link-dot nam-dot-blue" aria-hidden="true"></span> Downloads</a>
+        <a class="nam-hero-link" href="https://maizecoopsc.org/nam-rils.php" target="_blank" rel="noopener"><span class="nam-link-dot nam-dot-purple" aria-hidden="true"></span> Order RILs &#8599;</a>
+        <a class="nam-hero-link" href="/curation/GenomeIssue/edit"><span class="nam-link-dot nam-dot-rose" aria-hidden="true"></span> Report issue</a>
       </div>
     </div>
   </section>
 
   <!-- STICKY SECTION TABS -->
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#nam-assemblies" class="is-current">Assemblies &amp; Stocks Table</a>
-    <a href="#nam-subpopulations">Subpopulation Structure</a>
-    <a href="#nam-publications">Key Publications &amp; Abstracts</a>
-    <a href="#nam-data-hosted">Data Hosted at MaizeGDB</a>
-    <a href="#nam-faqs">FAQs &amp; Guidelines</a>
-    <a href="#nam-overview">Scale &amp; Metrics</a>
-    <a href="#nam-related">Connected Resources</a>
+    <a href="#nam-assemblies" class="is-current">Assemblies</a>
+    <a href="#nam-subpopulations">Subpopulations</a>
+    <a href="#nam-publications">Publications</a>
+    <a href="#nam-data-hosted">Hosted data</a>
+    <a href="#nam-faqs">FAQs</a>
+    <a href="#nam-overview">Metrics</a>
+    <a href="#nam-related">Related resources</a>
   </nav>
 
   <!-- SECTION 1: INTERACTIVE ASSEMBLIES & STOCKS TABLE -->
-  <section id="nam-assemblies" class="mgdb-panel" aria-labelledby="nam-assemblies-title">
-    <div class="nam-panel-header-wrap">
-      <div>
-        <h2 id="nam-assemblies-title" class="mgdb-panel-title">NAM Founder Genome Assemblies &amp; Stock Directory</h2>
-        <p class="mgdb-panel-lead">Search, sort, and filter the 26 reference genome assemblies, official gene annotations, USDA GRIN accessions, and MaizeGDB stock records.</p>
-      </div>
+  <section id="nam-assemblies" aria-labelledby="nam-assemblies-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="nam-assemblies-title">NAM Founder Genome Assemblies &amp; Stock Directory</h2></div>
+      <p>Search, sort, and filter the 26 reference genome assemblies, official gene annotations, USDA GRIN accessions, and MaizeGDB stock records.</p>
     </div>
 
-    <!-- FILTER & SEARCH TOOLBAR -->
+    <div class="mgdb-panel">
+<!-- FILTER & SEARCH TOOLBAR -->
     <div class="nam-table-toolbar">
       <div class="nam-filter-chips-wrap" role="group" aria-label="Filter by subpopulation">
         <span class="nam-toolbar-label">Subpopulation&#58;</span>
         <button type="button" class="nam-chip is-active" data-subpop-filter="all">All \(26\)</button>
-        <button type="button" class="nam-chip nam-chip-stiff" data-subpop-filter="stiff-stalk">Stiff Stalk \(2\)</button>
-        <button type="button" class="nam-chip nam-chip-nonstiff" data-subpop-filter="non-stiff-stalk">Non-Stiff Stalk \(5\)</button>
+        <button type="button" class="nam-chip nam-chip-stiff" data-subpop-filter="stiff-stalk">Stiff Stalk \(1\)</button>
+        <button type="button" class="nam-chip nam-chip-nonstiff" data-subpop-filter="non-stiff-stalk">Non-Stiff Stalk \(6\)</button>
         <button type="button" class="nam-chip nam-chip-tropical" data-subpop-filter="tropical">Tropical / Subtropical \(13\)</button>
         <button type="button" class="nam-chip nam-chip-mixed" data-subpop-filter="mixed">Mixed \(3\)</button>
         <button type="button" class="nam-chip nam-chip-popcorn" data-subpop-filter="popcorn">Popcorn \(1\)</button>
@@ -126,7 +110,6 @@ $$SYNTAX-LEVEL 2
           <tr data-line="B73" data-subpop="stiff-stalk" data-grin="677128" data-stock="47743" data-ncbi="GCA_000005005" class="is-reference-row">
             <td class="nam-line-cell">
               <strong>B73</strong>
-              <span class="nam-ref-badge">Common Parent</span>
             </td>
             <td>
               <span class="nam-badge nam-badge-stiff">Stiff stalk</span>
@@ -135,7 +118,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-B73-REFERENCE-NAM-5.0">Zm-B73-REFERENCE-NAM-5.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-B73-REFERENCE-NAM-5.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-B73-REFERENCE-NAM-5.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-B73-REFERENCE-NAM-5.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -157,14 +140,14 @@ $$SYNTAX-LEVEL 2
           </tr>
 
           <!-- 2: B97 -->
-          <tr data-line="B97" data-subpop="stiff-stalk" data-grin="692138" data-stock="47748" data-ncbi="GCA_902167145">
+          <tr data-line="B97" data-subpop="non-stiff-stalk" data-grin="692138" data-stock="47748" data-ncbi="GCA_902167145">
             <td class="nam-line-cell"><strong>B97</strong></td>
-            <td><span class="nam-badge nam-badge-stiff">Stiff stalk</span></td>
+            <td><span class="nam-badge nam-badge-nonstiff">Non-stiff stalk</span></td>
             <td>
               <a class="nam-assembly-link" href="/genome/assembly/Zm-B97-REFERENCE-NAM-1.0">Zm-B97-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-B97-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-B97-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-B97-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -185,7 +168,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-CML52-REFERENCE-NAM-1.0">Zm-CML52-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-CML52-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-CML52-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-CML52-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -206,7 +189,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-CML69-REFERENCE-NAM-1.0">Zm-CML69-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-CML69-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-CML69-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-CML69-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -227,7 +210,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-CML103-REFERENCE-NAM-1.0">Zm-CML103-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-CML103-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-CML103-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-CML103-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -248,7 +231,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-CML228-REFERENCE-NAM-1.0">Zm-CML228-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-CML228-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-CML228-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-CML228-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -269,7 +252,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-CML247-REFERENCE-NAM-1.0">Zm-CML247-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-CML247-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-CML247-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-CML247-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -290,7 +273,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-CML277-REFERENCE-NAM-1.0">Zm-CML277-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-CML277-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-CML277-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-CML277-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -311,7 +294,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-CML322-REFERENCE-NAM-1.0">Zm-CML322-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-CML322-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-CML322-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-CML322-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -332,7 +315,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-CML333-REFERENCE-NAM-1.0">Zm-CML333-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-CML333-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-CML333-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-CML333-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -353,7 +336,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-HP301-REFERENCE-NAM-1.0">Zm-HP301-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-HP301-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-HP301-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-HP301-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -374,7 +357,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-Il14H-REFERENCE-NAM-1.0">Zm-Il14H-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-Il14H-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Il14H-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Il14H-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -395,7 +378,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-Ki3-REFERENCE-NAM-1.0">Zm-Ki3-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-Ki3-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Ki3-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Ki3-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -416,7 +399,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-Ki11-REFERENCE-NAM-1.0">Zm-Ki11-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-Ki11-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Ki11-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Ki11-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -437,7 +420,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-Ky21-REFERENCE-NAM-1.0">Zm-Ky21-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-Ky21-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Ky21-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Ky21-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -458,7 +441,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-M37W-REFERENCE-NAM-1.0">Zm-M37W-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-M37W-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-M37W-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-M37W-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -479,7 +462,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-M162W-REFERENCE-NAM-1.0">Zm-M162W-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-M162W-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-M162W-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-M162W-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -500,7 +483,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-Mo18W-REFERENCE-NAM-1.0">Zm-Mo18W-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-Mo18W-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Mo18W-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Mo18W-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -521,7 +504,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-Ms71-REFERENCE-NAM-1.0">Zm-Ms71-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-Ms71-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Ms71-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Ms71-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -542,7 +525,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-NC350-REFERENCE-NAM-1.0">Zm-NC350-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-NC350-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-NC350-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-NC350-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -563,7 +546,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-NC358-REFERENCE-NAM-1.0">Zm-NC358-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-NC358-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-NC358-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-NC358-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -584,7 +567,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-Oh7B-REFERENCE-NAM-1.0">Zm-Oh7B-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-Oh7B-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Oh7B-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Oh7B-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -605,7 +588,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-Oh43-REFERENCE-NAM-1.0">Zm-Oh43-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-Oh43-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Oh43-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Oh43-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -626,7 +609,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-P39-REFERENCE-NAM-1.0">Zm-P39-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-P39-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-P39-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-P39-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -647,7 +630,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-Tx303-REFERENCE-NAM-1.0">Zm-Tx303-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-Tx303-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Tx303-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Tx303-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -668,7 +651,7 @@ $$SYNTAX-LEVEL 2
               <a class="nam-assembly-link" href="/genome/assembly/Zm-Tzi8-REFERENCE-NAM-1.0">Zm-Tzi8-REFERENCE-NAM-1.0</a>
               <div class="nam-jb-btns">
                 <a class="nam-btn-jb2" href="/genomebrowser?assembly=Zm-Tzi8-REFERENCE-NAM-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Tzi8-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="nam-btn-jb1" href="/genomebrowser?assembly=Zm-Tzi8-REFERENCE-NAM-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -683,24 +666,29 @@ $$SYNTAX-LEVEL 2
         </tbody>
       </table>
     </div>
+  </div>
+
   </section>
 
   <!-- SECTION 2: SUBPOPULATION STRUCTURE & GENOMIC DIVERSITY -->
-  <section id="nam-subpopulations" class="mgdb-panel" aria-labelledby="nam-subpop-title">
-    <h2 id="nam-subpop-title" class="mgdb-panel-title">Subpopulation Structure &amp; Germplasm Pools</h2>
-    <p class="mgdb-panel-lead">The 26 NAM founder inbreds sample the genetic breadth of modern maize breeding, structured across 6 major germplasm pools.</p>
+  <section id="nam-subpopulations" aria-labelledby="nam-subpop-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="nam-subpop-title">Subpopulation Structure &amp; Germplasm Pools</h2></div>
+      <p>The 26 NAM founder inbreds sample the genetic breadth of modern maize breeding, structured across 6 major germplasm pools.</p>
+    </div>
 
-    <div class="nam-subpop-grid">
+    <div class="mgdb-panel">
+<div class="nam-subpop-grid">
       <!-- Stiff Stalk -->
       <article class="nam-subpop-card">
         <div class="nam-subpop-head">
           <span class="nam-badge nam-badge-stiff">Stiff Stalk</span>
-          <span class="nam-subpop-count">2 inbreds</span>
+          <span class="nam-subpop-count">1 inbred</span>
         </div>
         <h3 class="nam-subpop-name">Stiff Stalk Synthetic \(SS\)</h3>
         <p class="nam-subpop-desc">Iowa Stiff Stalk Synthetic derivatives characterized by stalk strength and lodging resistance, forming one of the primary heterotic groups in North American hybrid breeding.</p>
         <div class="nam-subpop-lines">
-          <strong>Members&#58;</strong> <span>B73 \(Common Reference\), B97</span>
+          <strong>Members&#58;</strong> <span>B73 \(Common Reference\)</span>
         </div>
       </article>
 
@@ -708,12 +696,12 @@ $$SYNTAX-LEVEL 2
       <article class="nam-subpop-card">
         <div class="nam-subpop-head">
           <span class="nam-badge nam-badge-nonstiff">Non-Stiff Stalk</span>
-          <span class="nam-subpop-count">5 inbreds</span>
+          <span class="nam-subpop-count">6 inbreds</span>
         </div>
         <h3 class="nam-subpop-name">Non-Stiff Stalk \(NSS\)</h3>
         <p class="nam-subpop-desc">Diverse temperate inbreds originating from Lancaster Sure Crop, Reid Yellow Dent, and Leaming pools, providing maximal heterosis when crossed to Stiff Stalk parents.</p>
         <div class="nam-subpop-lines">
-          <strong>Members&#58;</strong> <span>Ky21, M162W, Ms71, Oh43, Oh7B</span>
+          <strong>Members&#58;</strong> <span>B97, Ky21, M162W, Ms71, Oh43, Oh7B</span>
         </div>
       </article>
 
@@ -769,15 +757,21 @@ $$SYNTAX-LEVEL 2
         </div>
       </article>
     </div>
+  </div>
+
   </section>
 
   <!-- SECTION 3: KEY PUBLICATIONS & ABSTRACT PREVIEWS -->
-  <section id="nam-publications" class="mgdb-panel" aria-labelledby="nam-pub-title">
-    <h2 id="nam-pub-title" class="mgdb-panel-title">Key Publications &amp; Abstract Previews</h2>
-    <p class="mgdb-panel-lead">Foundational scientific literature detailing the NAM genome assemblies, genetic architecture, and population design.</p>
+  <section id="nam-publications" aria-labelledby="nam-pub-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="nam-pub-title">Key Publications &amp; Abstract Previews</h2></div>
+      <p>Foundational scientific literature detailing the NAM genome assemblies, genetic architecture, and population design.</p>
+    </div>
 
-    <div class="nam-publications-grid">
-      <!-- Publication 1: Hufford et al. 2021 -->
+    <div class="mgdb-panel">
+      <div class="nam-publications-grid">
+      <!-- Publication 1: Hufford et al. 2021 -- the paper describing these
+           assemblies and their annotations, so the one to cite for the data -->
       <article class="nam-pub-card">
         <div class="nam-pub-meta-top">
           <span class="nam-pub-journal-badge">Science &bull; 2021</span>
@@ -841,14 +835,19 @@ $$SYNTAX-LEVEL 2
         </div>
       </article>
     </div>
+  </div>
+
   </section>
 
   <!-- SECTION 4: DATA HOSTED AT MAIZEGDB -->
-  <section id="nam-data-hosted" class="mgdb-panel" aria-labelledby="nam-hosted-title">
-    <h2 id="nam-hosted-title" class="mgdb-panel-title">NAM Datasets Hosted at MaizeGDB</h2>
-    <p class="mgdb-panel-lead">Explore integrated genome browser tracks, sequence BLAST targets, linkage maps, and bulk download archives.</p>
+  <section id="nam-data-hosted" aria-labelledby="nam-hosted-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="nam-hosted-title">NAM Datasets Hosted at MaizeGDB</h2></div>
+      <p>Explore integrated genome browser tracks, sequence BLAST targets, linkage maps, and bulk download archives.</p>
+    </div>
 
-    <div class="nam-hosted-grid">
+    <div class="mgdb-panel">
+<div class="nam-hosted-grid">
       <!-- 1: JBrowse 2 -->
       <article class="nam-hosted-card">
         <h3>Genome Browsers \(JBrowse 2\)</h3>
@@ -867,7 +866,7 @@ $$SYNTAX-LEVEL 2
       <article class="nam-hosted-card">
         <h3>Bulk Downloads &amp; Globus</h3>
         <p>Retrieve whole-genome FASTA, GFF3 annotations, canonical CDS/PEP sequences, and pre-indexed BigWig tracks via HTTP or Globus.</p>
-        <a class="mgdb-button mgdb-button-secondary" href="/download#downloads-nam">Browse NAM Downloads &#8599;</a>
+        <a class="mgdb-button mgdb-button-secondary" href="/download#downloads-nam">NAM Downloads &#8599;</a>
       </article>
 
       <!-- 4: Gene & Pan-Gene Center -->
@@ -929,14 +928,19 @@ $$SYNTAX-LEVEL 2
         </a>
       </div>
     </div>
+  </div>
+
   </section>
 
   <!-- SECTION 5: FAQS & COMMUNITY RESOURCES \(SWAPPED TO BE BEFORE SCALE & METRICS\) -->
-  <section id="nam-faqs" class="mgdb-panel" aria-labelledby="nam-faqs-title">
-    <h2 id="nam-faqs-title" class="mgdb-panel-title">Frequently Asked Questions &amp; Guidelines</h2>
-    <p class="mgdb-panel-lead">Helpful guidance on understanding NAM design, annotation identifier changes, and stock seed orders.</p>
+  <section id="nam-faqs" aria-labelledby="nam-faqs-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="nam-faqs-title">Frequently Asked Questions &amp; Guidelines</h2></div>
+      <p>Helpful guidance on understanding NAM design, annotation identifier changes, and stock seed orders.</p>
+    </div>
 
-    <div class="mgdb-card-grid nam-faqs-grid">
+    <div class="mgdb-panel">
+<div class="mgdb-card-grid nam-faqs-grid">
       <!-- FAQ 1: What is NAM -->
       <article class="mgdb-card">
         <span class="mgdb-pill mgdb-pill-info">Concept</span>
@@ -965,14 +969,19 @@ $$SYNTAX-LEVEL 2
         <p>If you encounter sequence anomalies, scaffold misorientations, or questionable gene annotations in any NAM assembly, you can submit an issue report directly to MaizeGDB curators via the <a href="/curation/GenomeIssue/edit">Genome Issue Curation Form &#8599;</a> to assist ongoing community curation.</p>
       </article>
     </div>
+  </div>
+
   </section>
 
   <!-- SECTION 6: DATASET SCALE & METRICS \(SWAPPED TO BE AFTER FAQS\) -->
-  <section id="nam-overview" class="mgdb-panel" aria-labelledby="nam-metrics-title">
-    <h2 id="nam-metrics-title" class="mgdb-panel-title">NAM Dataset Scale &amp; Metrics</h2>
-    <p class="mgdb-panel-lead">Overview of sequencing depth, genome assembly completeness, and recombinant line resources.</p>
+  <section id="nam-overview" aria-labelledby="nam-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="nam-metrics-title">NAM Dataset Scale &amp; Metrics</h2></div>
+      <p>Overview of sequencing depth, genome assembly completeness, and recombinant line resources.</p>
+    </div>
 
-    <div class="mgdb-metric-grid">
+    <div class="mgdb-panel">
+<div class="mgdb-metric-grid">
       <article class="mgdb-metric">
         <div class="mgdb-metric-top">
           <h3>Founder Genomes</h3>
@@ -984,7 +993,7 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Chromosome-scale de novo assemblies including B73 and 25 diverse founder lines.</p>
       </article>
 
-      <article class="mgdb-metric mgdb-tone-green">
+      <article class="mgdb-metric">
         <div class="mgdb-metric-top">
           <h3>Mapping Lines</h3>
           <span class="mgdb-metric-badge">COOP RILs</span>
@@ -995,7 +1004,7 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Recombinant Inbred Lines across 25 biparental cross families orderable from the COOP.</p>
       </article>
 
-      <article class="mgdb-metric mgdb-tone-amber">
+      <article class="mgdb-metric">
         <div class="mgdb-metric-top">
           <h3>SNP Markers</h3>
           <span class="mgdb-metric-badge">GBS / HapMap</span>
@@ -1006,7 +1015,7 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">High-density genotyping-by-sequencing markers mapped across the pan-genome.</p>
       </article>
 
-      <article class="mgdb-metric mgdb-tone-burgundy">
+      <article class="mgdb-metric">
         <div class="mgdb-metric-top">
           <h3>Genetic Maps</h3>
           <span class="mgdb-metric-badge">Chromosomes</span>
@@ -1017,14 +1026,19 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Curated linkage maps indexed in the MaizeGDB Map Viewer for all 10 chromosomes.</p>
       </article>
     </div>
+  </div>
+
   </section>
 
   <!-- SECTION 7: CONNECTED GENOMICS RESOURCES -->
-  <section id="nam-related" class="mgdb-panel nam-bottom-section" aria-labelledby="nam-related-title">
-    <h2 id="nam-related-title" class="mgdb-panel-title">Connected Genomics Resources</h2>
-    <p class="mgdb-panel-lead">Explore complementary genome assemblies, pangenome graphs, and variation datasets across MaizeGDB.</p>
+  <section id="nam-related" aria-labelledby="nam-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="nam-related-title">Connected Genomics Resources</h2></div>
+      <p>Explore complementary genome assemblies, pangenome graphs, and variation datasets across MaizeGDB.</p>
+    </div>
 
-    <div class="nam-related-grid">
+    <div class="mgdb-panel nam-bottom-section">
+<div class="nam-related-grid">
       <a class="nam-related-card" href="/assembly">
         <div class="nam-related-title">B73 Reference Assembly</div>
         <p class="nam-related-desc">Explore release histories \(v1&ndash;v5\), chromosome accessions, and assembly statistics.</p>
@@ -1045,16 +1059,14 @@ $$SYNTAX-LEVEL 2
         <p class="nam-related-desc">Explore SNP matrices, HapMap datasets, and structural variant tracks.</p>
       </a>
 
-      <a class="nam-related-card" href="/download#downloads-nam">
-        <div class="nam-related-title">Bulk Downloads Directory</div>
-        <p class="nam-related-desc">High-speed HTTP and Globus public endpoints for all 26 NAM genome packages.</p>
-      </a>
 
       <a class="nam-related-card" href="/data_center">
         <div class="nam-related-title">All Data Hubs</div>
         <p class="nam-related-desc">Discover the complete catalog of MaizeGDB data hubs, tools, and databases.</p>
       </a>
     </div>
+  </div>
+
   </section>
 </main>
 )

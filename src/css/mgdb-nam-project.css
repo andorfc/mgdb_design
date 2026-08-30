@@ -17,15 +17,16 @@
   height: auto;
 }
 
-.mgdb-nam-project-page .mgdb-hero-stamp {
-  position: static !important;
-  align-self: flex-start !important;
-  margin-bottom: var(--mgdb-space-2) !important;
-  display: inline-flex !important;
+/* No stamp in the corner, so the title gets the whole width. The shared rule
+   reserves 11rem for one that is not there. */
+.mgdb-nam-project-page .mgdb-hero h1 {
+  padding-right: 0;
 }
 
-.mgdb-nam-project-page .mgdb-hero h1 {
-  padding-right: 0 !important;
+/* The description uses the width it is given; the shared 62ch measure wrapped
+   one sentence into three short lines with the right half of the panel empty. */
+.mgdb-nam-project-page .mgdb-hero-description {
+  max-width: none;
 }
 
 .mgdb-nam-project-page .nam-hero-actions-row {
@@ -174,12 +175,14 @@
   color: #ffffff;
 }
 
-.mgdb-nam-project-page .nam-chip-stiff.is-active { background: #1e40af; border-color: #1e40af; }
-.mgdb-nam-project-page .nam-chip-nonstiff.is-active { background: #166534; border-color: #166534; }
-.mgdb-nam-project-page .nam-chip-tropical.is-active { background: #92400e; border-color: #92400e; }
-.mgdb-nam-project-page .nam-chip-mixed.is-active { background: #6b21a8; border-color: #6b21a8; }
-.mgdb-nam-project-page .nam-chip-popcorn.is-active { background: #9f1239; border-color: #9f1239; }
-.mgdb-nam-project-page .nam-chip-sweet.is-active { background: #854d0e; border-color: #854d0e; }
+/* The selected chip takes its subpopulation's ink, so the filter and the badges
+   it filters to agree. */
+.mgdb-nam-project-page .nam-chip-stiff.is-active { background: #854d0e; border-color: #854d0e; }
+.mgdb-nam-project-page .nam-chip-nonstiff.is-active { background: #1e40af; border-color: #1e40af; }
+.mgdb-nam-project-page .nam-chip-tropical.is-active { background: #166534; border-color: #166534; }
+.mgdb-nam-project-page .nam-chip-mixed.is-active { background: #334155; border-color: #334155; }
+.mgdb-nam-project-page .nam-chip-popcorn.is-active { background: #9d174d; border-color: #9d174d; }
+.mgdb-nam-project-page .nam-chip-sweet.is-active { background: #9a3412; border-color: #9a3412; }
 
 .mgdb-nam-project-page .nam-search-wrap {
   flex: 1 1 240px;
@@ -220,40 +223,53 @@
   line-height: 1.4;
 }
 
+/* Subpopulation colors follow the convention the NAM papers and the rest of
+   MaizeGDB use, which is not what these were: stiff stalk had blue \(the
+   non-stiff-stalk color\), non-stiff stalk had green \(tropical\), tropical had
+   amber, and mixed had purple. Every ink below clears 4.5:1 on its own fill,
+   and the badge always carries its name in words, so the hue is never the only
+   thing distinguishing two rows. Keep the filter chips in step. */
+
+/* stiff stalk - yellow */
 .mgdb-nam-project-page .nam-badge-stiff {
+  background: #fef3c7;
+  color: #854d0e;
+  border: 1px solid #fde68a;
+}
+
+/* non-stiff stalk - blue */
+.mgdb-nam-project-page .nam-badge-nonstiff {
   background: #dbeafe;
   color: #1e40af;
   border: 1px solid #bfdbfe;
 }
 
-.mgdb-nam-project-page .nam-badge-nonstiff {
+/* tropical - green */
+.mgdb-nam-project-page .nam-badge-tropical {
   background: #dcfce7;
   color: #166534;
   border: 1px solid #bbf7d0;
 }
 
-.mgdb-nam-project-page .nam-badge-tropical {
-  background: #fef3c7;
-  color: #92400e;
-  border: 1px solid #fde68a;
-}
-
+/* mixed - gray */
 .mgdb-nam-project-page .nam-badge-mixed {
-  background: #f3e8ff;
-  color: #6b21a8;
-  border: 1px solid #e9d5ff;
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
 }
 
+/* popcorn - pink */
 .mgdb-nam-project-page .nam-badge-popcorn {
-  background: #ffe4e6;
-  color: #9f1239;
-  border: 1px solid #fecdd3;
+  background: #fce7f3;
+  color: #9d174d;
+  border: 1px solid #fbcfe8;
 }
 
+/* sweet corn - orange */
 .mgdb-nam-project-page .nam-badge-sweet {
-  background: #fef9c3;
-  color: #854d0e;
-  border: 1px solid #fef08a;
+  background: #ffedd5;
+  color: #9a3412;
+  border: 1px solid #fed7aa;
 }
 
 /* --------------------------------------------------------------------------
@@ -340,18 +356,6 @@
 .mgdb-nam-project-page .nam-line-cell strong {
   font-size: var(--mgdb-text-sm);
   color: var(--mgdb-ink);
-}
-
-.mgdb-nam-project-page .nam-ref-badge {
-  display: inline-block;
-  margin-left: 4px;
-  padding: 1px 6px;
-  background: #ca8a04;
-  color: #ffffff;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
 }
 
 .mgdb-nam-project-page .nam-assembly-link {
@@ -783,3 +787,21 @@
     position: static;
   }
 }
+
+/* The founder table was 93px wider than its container at 1280px, so it scrolled
+   sideways and the Bulk Download column sat off the edge. Two things drove
+   that: "B73" carried a Common Parent badge that set the Line Name column's
+   width for all 26 rows, and every header is nowrap, so "Official Annotation &
+   Xref" reserved its full single-line width. The badge is gone; these headers
+   may now wrap onto a second line, which is what lets the columns shrink to
+   their content. The reference row keeps its highlight, so B73 is still
+   marked. */
+.mgdb-nam-project-page .nam-table thead th { white-space: normal; }
+.mgdb-nam-project-page .nam-table thead th button { white-space: normal; text-align: left; }
+
+/* With the headers free to wrap there is room for the assembly identifiers to
+   stay on one line, which was the point of reclaiming the Common Parent
+   badge's width: 19 of the 26 names were breaking across two lines. The table
+   still measures exactly its container at 1280px; below that .mgdb-table-scroll
+   takes over. */
+.mgdb-nam-project-page .nam-assembly-link { white-space: nowrap; }

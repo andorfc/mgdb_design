@@ -1723,6 +1723,107 @@ The cornfield photograph is a **placeholder**: it came from the design session
 with its provenance unconfirmed. Replace it with a MaizeGDB or USDA owned
 image, or a public-domain one, before this appears on a public page.
 
+## The Collections project pages
+
+Six pages under *Genomes → Collections*: `/NAM_project`, `/PanAnd_project`,
+`/european_flints`, `/HiLo_project`, `/amaizing_project`, `/CAAS_FIL_project`.
+They were built from one template and had drifted from the data hubs, so they
+were brought back onto the hub pattern together.
+
+**The header.** Each hero carried an "Updated" stamp rendering
+`date('F j, Y')` — the day the page was served. It always claimed the data had
+changed today, on pages whose assemblies were published in 2021–2023. Removed
+from all six; put one back only when there is a real release date to print. Its
+absence also frees the 11rem the shared `.mgdb-hero h1` reserves for it, which
+is what let these longer titles come back onto one line. Two overrides per page
+carry the rest:
+
+```css
+.<page> .mgdb-hero h1 { padding-right: 0; }
+.<page> .mgdb-hero-description { max-width: none; }
+```
+
+The 62ch measure on `.mgdb-hero-description` is right for a hero whose text sits
+beside something else. Here it wrapped one sentence into three short lines with
+the right half of the panel empty.
+
+Hero links are **named, not described** — *JBrowse 2*, not *Explore in
+JBrowse 2*; *Project website*, not *PanAnd Website* — which is what gets five
+or six of them onto one row. Section tabs follow the Genome hub's register:
+*Assemblies*, *Publications*, *Hosted data*, *Metrics*, one word where one word
+will do, and they then fit on one line.
+
+**The sections.** Each held its own `h2.mgdb-panel-title` *inside* the panel.
+They now use the hub shape — `.mgdb-section-heading` with the name and a
+one-line description over a rule, then the content in a `.mgdb-panel`:
+
+```html
+<section id="..." aria-labelledby="...-title">
+  <div class="mgdb-section-heading">
+    <div><h2 id="...-title">Name</h2></div>
+    <p>One line on what is in it.</p>
+  </div>
+  <div class="mgdb-panel"> ... </div>
+</section>
+```
+
+**The tables.** Every `th` was `white-space: nowrap`, so each column reserved
+its full single-line width and the table ran past its container — 93px on NAM,
+82px on European flints, with the last column off the edge. Letting the headers
+wrap lets each column shrink to its content, and there is then room to hold the
+assembly identifiers on one line, which 19 of NAM's 26 were not:
+
+```css
+.<page> .<table> thead th,
+.<page> .<table> thead th button { white-space: normal; text-align: left; }
+.<page> .<assembly-link> { white-space: nowrap; }
+```
+
+**NAM's subpopulations were wrong.** B97 was badged *Stiff stalk* in the founder
+table, in the filter chip counts, and again in the Subpopulation Structure
+cards. B73 is the only stiff-stalk founder among the 26; B97 is non-stiff stalk.
+All three places now agree — Stiff Stalk (1), Non-Stiff Stalk (6). The badge
+colors were close to scrambled against the convention the NAM papers use: stiff
+stalk had blue, which is the non-stiff-stalk color, and non-stiff stalk had
+green, which is tropical's. They are now stiff stalk yellow, non-stiff stalk
+blue, tropical green, sweet corn orange, popcorn pink, mixed gray, with the
+selected filter chip taking its subpopulation's ink.
+
+## The metric card, and its tones
+
+`.mgdb-metric` in `mgdb-modern.css` is the only metric card. Four of the
+Collections pages had been built on `.mgdb-metric-card` / `.mgdb-metric-number`
+/ `.mgdb-metric-grid-4` instead — **none of which is defined anywhere**. Those
+sections had always rendered as unstyled `div`s: no border, no ground, no
+padding, and the headline figure at 16px body text rather than the 38px serif
+numeral. Converted; the shape is
+
+```html
+<article class="mgdb-metric">
+  <div class="mgdb-metric-top"><h3>Label</h3><span class="mgdb-metric-badge">Qualifier</span></div>
+  <div class="mgdb-metric-stat"><strong class="mgdb-metric-value">42</strong></div>
+  <p class="mgdb-metric-description">One line.</p>
+</article>
+```
+
+The badge is optional. A value longer than about six characters takes
+`.mgdb-metric-value-compact` beside `.mgdb-metric-value`, which drops it from
+38px to 30px — `~2.26 Gb`, `530,000+`, `NSF #1546719` all need it.
+
+**`mgdb-tone-*` was dead too.** It was on 46 cards across ten templates and
+defined nowhere, so no card had ever been tinted. The rules now exist, and the
+tone colors **the left spine only**. That restraint is deliberate: the tones are
+a decorative rotation so a row of three or four cards does not read as one
+block, and `red` is the third step in that rotation rather than a warning.
+Recoloring the figure would make *Genome assemblies* and *Stock collections*
+look like a problem. It matches the gold spine
+`.reference-result-card.is-editorial-pick` already uses, and every card keeps
+its heading and description, so nothing rests on hue.
+
+Five tones exist because five are used: `green`, `amber`, `red`, `burgundy`,
+`blue`. The Genome hub's own metric row is untoned, and the project pages follow
+it.
+
 ## The dashboard cache
 
 Every data-centre landing page opens by counting its whole collection so it can

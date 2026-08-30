@@ -27,7 +27,6 @@ $$SYNTAX-LEVEL 2
       <strong>AMAIZING<br />Genomes</strong>
     </div>
     <div class="mgdb-hero-body">
-      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data_date)</p>
       <h1 id="amaizing-title">The AMAIZING European Maize Sequencing Project</h1>
       <p class="mgdb-hero-description">
         De novo chromosome-scale genome assemblies, multi-tissue transcriptomics under watered and drought regimes, and panEDTA transposable element annotations for seven foundational inbred lines in European breeding.
@@ -35,19 +34,19 @@ $$SYNTAX-LEVEL 2
 
       <div class="amaizing-hero-actions-row">
         <a class="amaizing-hero-link" href="/genomebrowser">
-          <span class="amaizing-link-dot amaizing-dot-green" aria-hidden="true"></span> Explore in JBrowse 2 &#8599;
+          <span class="amaizing-link-dot amaizing-dot-green" aria-hidden="true"></span> JBrowse 2
         </a>
         <a class="amaizing-hero-link" href="https://amaizing.fr/" target="_blank" rel="noopener">
-          <span class="amaizing-link-dot amaizing-dot-gold" aria-hidden="true"></span> AMAIZING Project Portal &#8599;
+          <span class="amaizing-link-dot amaizing-dot-gold" aria-hidden="true"></span> Project website &#8599;
         </a>
         <a class="amaizing-hero-link" href="/download#downloads-amaizing">
-          <span class="amaizing-link-dot amaizing-dot-blue" aria-hidden="true"></span> Bulk Downloads &#8595;
+          <span class="amaizing-link-dot amaizing-dot-blue" aria-hidden="true"></span> Downloads
         </a>
         <a class="amaizing-hero-link" href="/gene_center/gene">
-          <span class="amaizing-link-dot amaizing-dot-purple" aria-hidden="true"></span> Gene Center &#8599;
+          <span class="amaizing-link-dot amaizing-dot-purple" aria-hidden="true"></span> Gene Center
         </a>
         <a class="amaizing-hero-link" href="$(blast_url)">
-          <span class="amaizing-link-dot amaizing-dot-dark" aria-hidden="true"></span> BLAST Search &#8599;
+          <span class="amaizing-link-dot amaizing-dot-dark" aria-hidden="true"></span> BLAST
         </a>
       </div>
     </div>
@@ -55,25 +54,24 @@ $$SYNTAX-LEVEL 2
 
   <!-- STICKY SECTION NAVIGATION TABS -->
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#amaizing-assemblies" class="is-current">Assemblies &amp; Line Directory</a>
-    <a href="#amaizing-diversity">Heterotic Groups &amp; Diversity</a>
-    <a href="#amaizing-publications">Key Publications &amp; Abstracts</a>
-    <a href="#amaizing-data-hosted">Data Hosted at MaizeGDB</a>
-    <a href="#amaizing-metrics">Scale &amp; Genomic Metrics</a>
-    <a href="#amaizing-faqs">FAQs &amp; Guidelines</a>
-    <a href="#amaizing-related">Connected Resources</a>
+    <a href="#amaizing-assemblies" class="is-current">Assemblies</a>
+    <a href="#amaizing-diversity">Diversity</a>
+    <a href="#amaizing-publications">Publications</a>
+    <a href="#amaizing-data-hosted">Hosted data</a>
+    <a href="#amaizing-metrics">Metrics</a>
+    <a href="#amaizing-faqs">FAQs</a>
+    <a href="#amaizing-related">Related resources</a>
   </nav>
 
   <!-- SECTION 1: INTERACTIVE ASSEMBLIES DIRECTORY TABLE -->
-  <section id="amaizing-assemblies" class="mgdb-panel" aria-labelledby="amaizing-assemblies-title">
-    <div class="amaizing-panel-header-wrap">
-      <div>
-        <h2 id="amaizing-assemblies-title" class="mgdb-panel-title">AMAIZING Assemblies &amp; Line Directory</h2>
-        <p class="mgdb-panel-lead">Search, sort, and download chromosome-scale reference assemblies for the seven key European flint, dent, and diversity founder lines.</p>
-      </div>
+  <section id="amaizing-assemblies" aria-labelledby="amaizing-assemblies-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="amaizing-assemblies-title">AMAIZING Assemblies &amp; Line Directory</h2></div>
+      <p>Search, sort, and download chromosome-scale reference assemblies for the seven key European flint, dent, and diversity founder lines.</p>
     </div>
 
-    <!-- FILTER & SEARCH TOOLBAR -->
+    <div class="mgdb-panel">
+<!-- FILTER & SEARCH TOOLBAR -->
     <div class="amaizing-table-toolbar">
       <div class="amaizing-filter-chips-wrap" role="group" aria-label="Filter by germplasm pool">
         <span class="amaizing-toolbar-label">Group&#58;</span>
@@ -405,18 +403,19 @@ $$SYNTAX-LEVEL 2
         </tbody>
       </table>
     </div>
+  </div>
+
   </section>
 
   <!-- SECTION 2: HETEROTIC GROUPS & DIVERSITY -->
-  <section id="amaizing-diversity" class="mgdb-panel" aria-labelledby="amaizing-diversity-title">
-    <div class="amaizing-panel-header-wrap">
-      <div>
-        <h2 id="amaizing-diversity-title" class="mgdb-panel-title">Heterotic Groups &amp; Environmental Response</h2>
-        <p class="mgdb-panel-lead">How the AMAIZING assemblies capture the full breadth of European breeding history, heterotic pooling, and water-deficit responsiveness.</p>
-      </div>
+  <section id="amaizing-diversity" aria-labelledby="amaizing-diversity-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="amaizing-diversity-title">Heterotic Groups &amp; Environmental Response</h2></div>
+      <p>How the AMAIZING assemblies capture the full breadth of European breeding history, heterotic pooling, and water-deficit responsiveness.</p>
     </div>
 
-    <div class="amaizing-diversity-grid">
+    <div class="mgdb-panel">
+<div class="amaizing-diversity-grid">
       <article class="amaizing-diversity-card">
         <h3>European Flint &amp; Dent Heterotic Complementarity</h3>
         <p>
@@ -438,18 +437,19 @@ $$SYNTAX-LEVEL 2
         </p>
       </article>
     </div>
+  </div>
+
   </section>
 
   <!-- SECTION 3: KEY PUBLICATIONS & ABSTRACT PREVIEWS -->
-  <section id="amaizing-publications" class="mgdb-panel" aria-labelledby="amaizing-pub-title">
-    <div class="amaizing-panel-header-wrap">
-      <div>
-        <h2 id="amaizing-pub-title" class="mgdb-panel-title">Key Publications &amp; Abstract Previews</h2>
-        <p class="mgdb-panel-lead">Scientific literature and project reports detailing the AMAIZING genome assemblies, transposable element dynamics, and expression atlases.</p>
-      </div>
+  <section id="amaizing-publications" aria-labelledby="amaizing-pub-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="amaizing-pub-title">Key Publications &amp; Abstract Previews</h2></div>
+      <p>Scientific literature and project reports detailing the AMAIZING genome assemblies, transposable element dynamics, and expression atlases.</p>
     </div>
 
-    <div class="amaizing-publications-grid">
+    <div class="mgdb-panel">
+<div class="amaizing-publications-grid">
       <!-- Publication 1: AMAIZING Consortium Overview -->
       <article class="amaizing-pub-card">
         <div class="amaizing-pub-meta-top">
@@ -472,18 +472,19 @@ $$SYNTAX-LEVEL 2
         </div>
       </article>
     </div>
+  </div>
+
   </section>
 
   <!-- SECTION 4: DATA HOSTED AT MAIZEGDB -->
-  <section id="amaizing-data-hosted" class="mgdb-panel" aria-labelledby="amaizing-hosted-title">
-    <div class="amaizing-panel-header-wrap">
-      <div>
-        <h2 id="amaizing-hosted-title" class="mgdb-panel-title">AMAIZING Datasets Hosted at MaizeGDB</h2>
-        <p class="mgdb-panel-lead">Integrated genome browser tracks, sequence BLAST targets, gene models, and bulk download archives.</p>
-      </div>
+  <section id="amaizing-data-hosted" aria-labelledby="amaizing-hosted-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="amaizing-hosted-title">AMAIZING Datasets Hosted at MaizeGDB</h2></div>
+      <p>Integrated genome browser tracks, sequence BLAST targets, gene models, and bulk download archives.</p>
     </div>
 
-    <div class="amaizing-hosted-grid">
+    <div class="mgdb-panel">
+<div class="amaizing-hosted-grid">
       <!-- 1: JBrowse 2 -->
       <article class="amaizing-hosted-card">
         <h3>Genome Browsers \(JBrowse 2\)</h3>
@@ -512,51 +513,69 @@ $$SYNTAX-LEVEL 2
         <a class="mgdb-button mgdb-button-secondary" href="/download#downloads-amaizing">Browse Downloads &#8599;</a>
       </article>
     </div>
+  </div>
+
   </section>
 
   <!-- SECTION 5: SCALE & GENOMIC METRICS DASHBOARD -->
-  <section id="amaizing-metrics" class="mgdb-panel" aria-labelledby="amaizing-metrics-title">
-    <div class="amaizing-panel-header-wrap">
-      <div>
-        <h2 id="amaizing-metrics-title" class="mgdb-panel-title">AMAIZING Dataset Scale &amp; Metrics</h2>
-        <p class="mgdb-panel-lead">Summary statistics across the AMAIZING assemblies, multi-tissue transcriptomics, and diversity pools.</p>
-      </div>
+  <section id="amaizing-metrics" aria-labelledby="amaizing-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="amaizing-metrics-title">AMAIZING Dataset Scale &amp; Metrics</h2></div>
+      <p>Summary statistics across the AMAIZING assemblies, multi-tissue transcriptomics, and diversity pools.</p>
     </div>
 
-    <div class="mgdb-metric-grid mgdb-metric-grid-4">
-      <div class="mgdb-metric-card mgdb-metric-card-green">
-        <div class="mgdb-metric-number">7</div>
-        <div class="mgdb-metric-title">De Novo Reference Assemblies</div>
-        <div class="mgdb-metric-desc">F2, F4, Gaspe1_1_1, MBS847, F252, EA1197, and F331 covering key European pools.</div>
-      </div>
-      <div class="mgdb-metric-card mgdb-metric-card-gold">
-        <div class="mgdb-metric-number">15 Tissues</div>
-        <div class="mgdb-metric-title">Multi-Tissue RNA-seq</div>
-        <div class="mgdb-metric-desc">Triplicate mRNA-seq expression profiles under well-watered and water-deficit conditions.</div>
-      </div>
-      <div class="mgdb-metric-card mgdb-metric-card-blue">
-        <div class="mgdb-metric-number">panEDTA</div>
-        <div class="mgdb-metric-title">Transposable Element Curation</div>
-        <div class="mgdb-metric-desc">High-precision comprehensive repeat annotation across all seven chromosome-scale assemblies.</div>
-      </div>
-      <div class="mgdb-metric-card mgdb-metric-card-orange">
-        <div class="mgdb-metric-number">40,000+</div>
-        <div class="mgdb-metric-title">Gene Models per Line</div>
-        <div class="mgdb-metric-desc">High-confidence structural and functional annotations indexed across MaizeGDB.</div>
-      </div>
+    <div class="mgdb-panel">
+<div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>De Novo Reference Assemblies</h3>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">7</strong>
+        </div>
+        <p class="mgdb-metric-description">F2, F4, Gaspe1_1_1, MBS847, F252, EA1197, and F331 covering key European pools.</p>
+      </article>
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Multi-Tissue RNA-seq</h3>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value mgdb-metric-value-compact">15 Tissues</strong>
+        </div>
+        <p class="mgdb-metric-description">Triplicate mRNA-seq expression profiles under well-watered and water-deficit conditions.</p>
+      </article>
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Transposable Element Curation</h3>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value mgdb-metric-value-compact">panEDTA</strong>
+        </div>
+        <p class="mgdb-metric-description">High-precision comprehensive repeat annotation across all seven chromosome-scale assemblies.</p>
+      </article>
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Gene Models per Line</h3>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value mgdb-metric-value-compact">40,000+</strong>
+        </div>
+        <p class="mgdb-metric-description">High-confidence structural and functional annotations indexed across MaizeGDB.</p>
+      </article>
     </div>
+  </div>
+
   </section>
 
   <!-- SECTION 6: FAQS & GUIDELINES -->
-  <section id="amaizing-faqs" class="mgdb-panel" aria-labelledby="amaizing-faqs-title">
-    <div class="amaizing-panel-header-wrap">
-      <div>
-        <h2 id="amaizing-faqs-title" class="mgdb-panel-title">Frequently Asked Questions &amp; Guidelines</h2>
-        <p class="mgdb-panel-lead">Information regarding gene model access, project background, and download endpoints.</p>
-      </div>
+  <section id="amaizing-faqs" aria-labelledby="amaizing-faqs-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="amaizing-faqs-title">Frequently Asked Questions &amp; Guidelines</h2></div>
+      <p>Information regarding gene model access, project background, and download endpoints.</p>
     </div>
 
-    <div class="amaizing-faq-list">
+    <div class="mgdb-panel">
+<div class="amaizing-faq-list">
       <details class="amaizing-faq-item">
         <summary><h3>What is the AMAIZING project and which institutions contributed?</h3></summary>
         <div class="amaizing-faq-body">
@@ -593,18 +612,19 @@ $$SYNTAX-LEVEL 2
         </div>
       </details>
     </div>
+  </div>
+
   </section>
 
   <!-- SECTION 7: CONNECTED RESOURCES -->
-  <section id="amaizing-related" class="mgdb-panel amaizing-bottom-section" aria-labelledby="amaizing-related-title">
-    <div class="amaizing-panel-header-wrap">
-      <div>
-        <h2 id="amaizing-related-title" class="mgdb-panel-title">Connected MaizeGDB Genomics Projects</h2>
-        <p class="mgdb-panel-lead">Explore related pangenomic, diversity, and association mapping resources.</p>
-      </div>
+  <section id="amaizing-related" aria-labelledby="amaizing-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="amaizing-related-title">Connected MaizeGDB Genomics Projects</h2></div>
+      <p>Explore related pangenomic, diversity, and association mapping resources.</p>
     </div>
 
-    <div class="amaizing-related-grid">
+    <div class="mgdb-panel amaizing-bottom-section">
+<div class="amaizing-related-grid">
       <a class="amaizing-related-card" href="/NAM_project">
         <div class="amaizing-related-title">NAM Parent Genomes &rarr;</div>
         <p class="amaizing-related-desc">26 de novo chromosome-scale assemblies of the US Nested Association Mapping founder lines.</p>
@@ -622,6 +642,8 @@ $$SYNTAX-LEVEL 2
         <p class="amaizing-related-desc">Browse all reference, founder, diversity, and pan-genomic maize assemblies hosted at MaizeGDB.</p>
       </a>
     </div>
+  </div>
+
   </section>
 
 </main>

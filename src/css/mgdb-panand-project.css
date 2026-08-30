@@ -12,26 +12,30 @@
   border-color: var(--mgdb-line);
 }
 
-.mgdb-panand-project-page .mgdb-hero-emblem svg {
-  width: min(100%, 64px);
-  height: auto;
-}
+/* The stamp was pulled out of the corner and stacked above the title, which
+   cost the hero a whole line. It goes back where every other hub puts it; the
+   base rule's padding-right on the h1 is what keeps the title clear of it. */
 
-.mgdb-panand-project-page .mgdb-hero-stamp {
-  position: static !important;
-  align-self: flex-start !important;
-  margin-bottom: var(--mgdb-space-2) !important;
-  display: inline-flex !important;
-}
-
+/* No stamp in the corner on this page, so the title gets the whole width and
+   stays on one line. The shared rule reserves 11rem for a stamp that is not
+   there. */
 .mgdb-panand-project-page .mgdb-hero h1 {
-  padding-right: 0 !important;
+  padding-right: 0;
 }
 
+/* The description is the one line that should use the width it is given. The
+   shared 62ch measure is right for a hero whose text sits beside something
+   else, but here it wrapped a single sentence into three short lines with the
+   right half of the panel empty. */
+.mgdb-panand-project-page .mgdb-hero-description {
+  max-width: none;
+}
+
+/* Six links, one row. They are named rather than described, so they fit. */
 .mgdb-panand-project-page .panand-hero-actions-row {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--mgdb-space-3);
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
   margin-top: var(--mgdb-space-3);
 }
 

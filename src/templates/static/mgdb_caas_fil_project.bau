@@ -36,7 +36,6 @@ $$SYNTAX-LEVEL 2
       <strong>CAAS-FIL<br />Genomes</strong>
     </div>
     <div class="mgdb-hero-body">
-      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data_date)</p>
       <h1 id="caas-title">CAAS 12 Founder Inbred Lines Genomes Project \(FIL\)</h1>
       <p class="mgdb-hero-description">
         De novo chromosome-scale genome assemblies, annotations, and heterotic group architecture across 12 foundational Chinese and international maize founder lines shaping modern hybrid breeding.
@@ -44,19 +43,19 @@ $$SYNTAX-LEVEL 2
 
       <div class="caas-hero-actions-row">
         <a class="caas-hero-link" href="/genomebrowser">
-          <span class="caas-link-dot caas-dot-green" aria-hidden="true"></span> Explore in JBrowse 2 &#8599;
+          <span class="caas-link-dot caas-dot-green" aria-hidden="true"></span> JBrowse 2
         </a>
         <a class="caas-hero-link" href="/download#downloads-caas-fil">
-          <span class="caas-link-dot caas-dot-blue" aria-hidden="true"></span> Bulk Downloads &#8595;
+          <span class="caas-link-dot caas-dot-blue" aria-hidden="true"></span> Downloads
         </a>
         <a class="caas-hero-link" href="https://doi.org/10.1038/s41588-023-01449-w" target="_blank" rel="noopener">
-          <span class="caas-link-dot caas-dot-rose" aria-hidden="true"></span> Nature Genetics Paper &#8599;
+          <span class="caas-link-dot caas-dot-rose" aria-hidden="true"></span> Paper &#8599;
         </a>
         <a class="caas-hero-link" href="/gene_center/gene">
-          <span class="caas-link-dot caas-dot-purple" aria-hidden="true"></span> Gene Center &#8599;
+          <span class="caas-link-dot caas-dot-purple" aria-hidden="true"></span> Gene Center
         </a>
         <a class="caas-hero-link" href="$(blast_url)">
-          <span class="caas-link-dot caas-dot-dark" aria-hidden="true"></span> BLAST Search &#8599;
+          <span class="caas-link-dot caas-dot-dark" aria-hidden="true"></span> BLAST
         </a>
       </div>
     </div>
@@ -64,25 +63,24 @@ $$SYNTAX-LEVEL 2
 
   <!-- STICKY SECTION NAVIGATION TABS -->
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#caas-assemblies" class="is-current">Assemblies &amp; Line Directory</a>
-    <a href="#caas-groups">Heterotic Groups &amp; Architecture</a>
-    <a href="#caas-publications">Key Publications &amp; Abstracts</a>
-    <a href="#caas-data-hosted">Data Hosted at MaizeGDB</a>
-    <a href="#caas-metrics">Scale &amp; Genomic Metrics</a>
-    <a href="#caas-faqs">FAQs &amp; Guidelines</a>
-    <a href="#caas-related">Connected Resources</a>
+    <a href="#caas-assemblies" class="is-current">Assemblies</a>
+    <a href="#caas-groups">Heterotic groups</a>
+    <a href="#caas-publications">Publications</a>
+    <a href="#caas-data-hosted">Hosted data</a>
+    <a href="#caas-metrics">Metrics</a>
+    <a href="#caas-faqs">FAQs</a>
+    <a href="#caas-related">Related resources</a>
   </nav>
 
   <!-- SECTION 1: INTERACTIVE ASSEMBLIES DIRECTORY TABLE -->
-  <section id="caas-assemblies" class="mgdb-panel" aria-labelledby="caas-assemblies-title">
-    <div class="caas-panel-header-wrap">
-      <div>
-        <h2 id="caas-assemblies-title" class="mgdb-panel-title">CAAS 12 Founder Inbred Lines Directory</h2>
-        <p class="mgdb-panel-lead">Explore, sort, and download chromosome-scale reference assemblies for the 12 foundational founder lines.</p>
-      </div>
+  <section id="caas-assemblies" aria-labelledby="caas-assemblies-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="caas-assemblies-title">CAAS 12 Founder Inbred Lines Directory</h2></div>
+      <p>Explore, sort, and download chromosome-scale reference assemblies for the 12 foundational founder lines.</p>
     </div>
 
-    <!-- FILTER & SEARCH TOOLBAR -->
+    <div class="mgdb-panel">
+<!-- FILTER & SEARCH TOOLBAR -->
     <div class="caas-table-toolbar">
       <div class="caas-filter-chips-wrap" role="group" aria-label="Filter by heterotic group">
         <span class="caas-toolbar-label">Group&#58;</span>
@@ -611,18 +609,19 @@ $$SYNTAX-LEVEL 2
         </tbody>
       </table>
     </div>
+  </div>
+
   </section>
 
   <!-- SECTION 2: HETEROTIC GROUPS & ARCHITECTURE -->
-  <section id="caas-groups" class="mgdb-panel" aria-labelledby="caas-groups-title">
-    <div class="caas-panel-header-wrap">
-      <div>
-        <h2 id="caas-groups-title" class="mgdb-panel-title">Heterotic Groups &amp; Genomic Architecture</h2>
-        <p class="mgdb-panel-lead">The genomic foundations underlying major Chinese hybrid combinations and breeding group classifications.</p>
-      </div>
+  <section id="caas-groups" aria-labelledby="caas-groups-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="caas-groups-title">Heterotic Groups &amp; Genomic Architecture</h2></div>
+      <p>The genomic foundations underlying major Chinese hybrid combinations and breeding group classifications.</p>
     </div>
 
-    <div class="caas-groups-grid">
+    <div class="mgdb-panel">
+<div class="caas-groups-grid">
       <article class="caas-group-card">
         <h3>Tang Sipingtou \(TSPT\) &amp; Landrace Heritage</h3>
         <p>
@@ -644,18 +643,19 @@ $$SYNTAX-LEVEL 2
         </p>
       </article>
     </div>
+  </div>
+
   </section>
 
   <!-- SECTION 3: KEY PUBLICATIONS & ABSTRACT PREVIEWS -->
-  <section id="caas-publications" class="mgdb-panel" aria-labelledby="caas-pub-title">
-    <div class="caas-panel-header-wrap">
-      <div>
-        <h2 id="caas-pub-title" class="mgdb-panel-title">Key Publications &amp; Abstract Previews</h2>
-        <p class="mgdb-panel-lead">Scientific literature detailing the CAAS founder line assemblies, pan-genomic structural variation, and heterotic patterns.</p>
-      </div>
+  <section id="caas-publications" aria-labelledby="caas-pub-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="caas-pub-title">Key Publications &amp; Abstract Previews</h2></div>
+      <p>Scientific literature detailing the CAAS founder line assemblies, pan-genomic structural variation, and heterotic patterns.</p>
     </div>
 
-    <div class="caas-publications-grid">
+    <div class="mgdb-panel">
+<div class="caas-publications-grid">
       <!-- Publication 1: CAAS-FIL Landmark Paper -->
       <article class="caas-pub-card">
         <div class="caas-pub-meta-top">
@@ -678,18 +678,19 @@ $$SYNTAX-LEVEL 2
         </div>
       </article>
     </div>
+  </div>
+
   </section>
 
   <!-- SECTION 4: DATA HOSTED AT MAIZEGDB -->
-  <section id="caas-data-hosted" class="mgdb-panel" aria-labelledby="caas-hosted-title">
-    <div class="caas-panel-header-wrap">
-      <div>
-        <h2 id="caas-hosted-title" class="mgdb-panel-title">CAAS-FIL Datasets Hosted at MaizeGDB</h2>
-        <p class="mgdb-panel-lead">Integrated genome browser tracks, sequence BLAST targets, gene models, and bulk download archives.</p>
-      </div>
+  <section id="caas-data-hosted" aria-labelledby="caas-hosted-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="caas-hosted-title">CAAS-FIL Datasets Hosted at MaizeGDB</h2></div>
+      <p>Integrated genome browser tracks, sequence BLAST targets, gene models, and bulk download archives.</p>
     </div>
 
-    <div class="caas-hosted-grid">
+    <div class="mgdb-panel">
+<div class="caas-hosted-grid">
       <!-- 1: JBrowse 2 -->
       <article class="caas-hosted-card">
         <h3>Genome Browsers \(JBrowse 2\)</h3>
@@ -718,51 +719,69 @@ $$SYNTAX-LEVEL 2
         <a class="mgdb-button mgdb-button-secondary" href="/download#downloads-caas-fil">Browse Downloads &#8599;</a>
       </article>
     </div>
+  </div>
+
   </section>
 
   <!-- SECTION 5: SCALE & GENOMIC METRICS DASHBOARD -->
-  <section id="caas-metrics" class="mgdb-panel" aria-labelledby="caas-metrics-title">
-    <div class="caas-panel-header-wrap">
-      <div>
-        <h2 id="caas-metrics-title" class="mgdb-panel-title">CAAS-FIL Dataset Scale &amp; Metrics</h2>
-        <p class="mgdb-panel-lead">Summary statistics across the 12 founder inbred line assemblies, genome sizes, and annotations.</p>
-      </div>
+  <section id="caas-metrics" aria-labelledby="caas-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="caas-metrics-title">CAAS-FIL Dataset Scale &amp; Metrics</h2></div>
+      <p>Summary statistics across the 12 founder inbred line assemblies, genome sizes, and annotations.</p>
     </div>
 
-    <div class="mgdb-metric-grid mgdb-metric-grid-4">
-      <div class="mgdb-metric-card mgdb-metric-card-green">
-        <div class="mgdb-metric-number">12</div>
-        <div class="mgdb-metric-title">De Novo Reference Assemblies</div>
-        <div class="mgdb-metric-desc">Cornerstone founder lines representing all major Chinese and international heterotic groups.</div>
-      </div>
-      <div class="mgdb-metric-card mgdb-metric-card-gold">
-        <div class="mgdb-metric-number">~2.26 Gb</div>
-        <div class="mgdb-metric-title">Average Assembly Size</div>
-        <div class="mgdb-metric-desc">High-continuity chromosome-scale scaffold coverage ranging from 2.18 Gb to 2.31 Gb.</div>
-      </div>
-      <div class="mgdb-metric-card mgdb-metric-card-blue">
-        <div class="mgdb-metric-number">530,000+</div>
-        <div class="mgdb-metric-title">Total Gene Annotations</div>
-        <div class="mgdb-metric-desc">42,000–46,000 high-confidence gene models annotated per founder inbred line.</div>
-      </div>
-      <div class="mgdb-metric-card mgdb-metric-card-orange">
-        <div class="mgdb-metric-number">6 Groups</div>
-        <div class="mgdb-metric-title">Heterotic Classifications</div>
-        <div class="mgdb-metric-desc">Tang Sipingtou \(TSPT\), P-Group \(PA/PB\), Lancaster, Stiff Stalk, Iodent, and X-Group.</div>
-      </div>
+    <div class="mgdb-panel">
+<div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>De Novo Reference Assemblies</h3>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">12</strong>
+        </div>
+        <p class="mgdb-metric-description">Cornerstone founder lines representing all major Chinese and international heterotic groups.</p>
+      </article>
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Average Assembly Size</h3>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value mgdb-metric-value-compact">~2.26 Gb</strong>
+        </div>
+        <p class="mgdb-metric-description">High-continuity chromosome-scale scaffold coverage ranging from 2.18 Gb to 2.31 Gb.</p>
+      </article>
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Total Gene Annotations</h3>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value mgdb-metric-value-compact">530,000+</strong>
+        </div>
+        <p class="mgdb-metric-description">42,000–46,000 high-confidence gene models annotated per founder inbred line.</p>
+      </article>
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Heterotic Classifications</h3>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value mgdb-metric-value-compact">6 Groups</strong>
+        </div>
+        <p class="mgdb-metric-description">Tang Sipingtou \(TSPT\), P-Group \(PA/PB\), Lancaster, Stiff Stalk, Iodent, and X-Group.</p>
+      </article>
     </div>
+  </div>
+
   </section>
 
   <!-- SECTION 6: FAQS & GUIDELINES -->
-  <section id="caas-faqs" class="mgdb-panel" aria-labelledby="caas-faqs-title">
-    <div class="caas-panel-header-wrap">
-      <div>
-        <h2 id="caas-faqs-title" class="mgdb-panel-title">Frequently Asked Questions &amp; Guidelines</h2>
-        <p class="mgdb-panel-lead">Information regarding gene model access, heterotic grouping, and download endpoints.</p>
-      </div>
+  <section id="caas-faqs" aria-labelledby="caas-faqs-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="caas-faqs-title">Frequently Asked Questions &amp; Guidelines</h2></div>
+      <p>Information regarding gene model access, heterotic grouping, and download endpoints.</p>
     </div>
 
-    <div class="caas-faq-list">
+    <div class="mgdb-panel">
+<div class="caas-faq-list">
       <details class="caas-faq-item">
         <summary><h3>Why are founder inbred lines \(FILs\) critical for maize genetics?</h3></summary>
         <div class="caas-faq-body">
@@ -799,18 +818,19 @@ $$SYNTAX-LEVEL 2
         </div>
       </details>
     </div>
+  </div>
+
   </section>
 
   <!-- SECTION 7: CONNECTED RESOURCES -->
-  <section id="caas-related" class="mgdb-panel caas-bottom-section" aria-labelledby="caas-related-title">
-    <div class="caas-panel-header-wrap">
-      <div>
-        <h2 id="caas-related-title" class="mgdb-panel-title">Connected MaizeGDB Genomics Projects</h2>
-        <p class="mgdb-panel-lead">Explore related pangenomic, diversity, and association mapping resources.</p>
-      </div>
+  <section id="caas-related" aria-labelledby="caas-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="caas-related-title">Connected MaizeGDB Genomics Projects</h2></div>
+      <p>Explore related pangenomic, diversity, and association mapping resources.</p>
     </div>
 
-    <div class="caas-related-grid">
+    <div class="mgdb-panel caas-bottom-section">
+<div class="caas-related-grid">
       <a class="caas-related-card" href="/NAM_project">
         <div class="caas-related-title">NAM Parent Genomes &rarr;</div>
         <p class="caas-related-desc">26 de novo chromosome-scale assemblies of the US Nested Association Mapping founder lines.</p>
@@ -828,6 +848,8 @@ $$SYNTAX-LEVEL 2
         <p class="caas-related-desc">Browse all reference, founder, diversity, and pan-genomic maize assemblies hosted at MaizeGDB.</p>
       </a>
     </div>
+  </div>
+
   </section>
 
 </main>

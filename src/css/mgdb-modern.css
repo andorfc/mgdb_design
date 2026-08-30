@@ -1876,6 +1876,41 @@ body.mgdb-modern {
 a.mgdb-metric { color: var(--mgdb-ink) !important; text-decoration: none; }
 a.mgdb-metric:hover { border-color: var(--mgdb-green-dark); background: var(--mgdb-surface-alt); }
 
+/* Tone variants.
+
+   These classes were on 46 metric cards across ten templates and were defined
+   nowhere, so every one of them had always been a no-op. They are decorative:
+   a row of three or four cards rotates through the tones so the row does not
+   read as one undifferentiated block. Nothing is keyed to them -- `red` is the
+   third step in that rotation, not a warning, which is why the tone colors the
+   spine and nothing else. Recoloring the figure would make "Genome assemblies"
+   or "Stock collections" look like a problem.
+
+   Matches the gold spine .reference-result-card.is-editorial-pick already uses,
+   and every card keeps its heading and description, so a reader who cannot
+   separate the hues loses nothing.
+
+   The Genome hub's own metric row is untoned; project pages follow it. */
+
+.mgdb-metric.mgdb-tone-green,
+.mgdb-metric.mgdb-tone-amber,
+.mgdb-metric.mgdb-tone-red,
+.mgdb-metric.mgdb-tone-burgundy,
+.mgdb-metric.mgdb-tone-blue { border-left-width: 5px; }
+
+.mgdb-metric.mgdb-tone-green    { border-left-color: var(--mgdb-green); }
+.mgdb-metric.mgdb-tone-amber    { border-left-color: var(--mgdb-gold); }
+.mgdb-metric.mgdb-tone-red      { border-left-color: var(--mgdb-red); }
+.mgdb-metric.mgdb-tone-burgundy { border-left-color: var(--mgdb-burgundy); }
+.mgdb-metric.mgdb-tone-blue     { border-left-color: var(--mgdb-status-info); }
+
+/* The hover on a linked card recolors the whole border; keep the spine. */
+a.mgdb-metric.mgdb-tone-green:hover    { border-left-color: var(--mgdb-green); }
+a.mgdb-metric.mgdb-tone-amber:hover    { border-left-color: var(--mgdb-gold); }
+a.mgdb-metric.mgdb-tone-red:hover      { border-left-color: var(--mgdb-red); }
+a.mgdb-metric.mgdb-tone-burgundy:hover { border-left-color: var(--mgdb-burgundy); }
+a.mgdb-metric.mgdb-tone-blue:hover     { border-left-color: var(--mgdb-status-info); }
+
 /* Quiet metric — value over label, no icon or tone border. Pairs with the
    basic-page header on prose-led pages where the figures are supporting
    context rather than the point of the page. */

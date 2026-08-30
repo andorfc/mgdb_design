@@ -8,73 +8,127 @@ $$SYNTAX-LEVEL 2
     <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/genome">Genomes</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Pan-Andropogoneae Project</span>
   </nav>
 
-  <!-- HERO SECTION -->
+  <!-- HERO
+
+       Shorter than it was. The stamp is back in the corner rather than stacked
+       above the title, the description is no longer clamped to 62ch so it uses
+       the width it is given, and each action link is named rather than
+       described \("JBrowse 2", not "Explore in JBrowse 2"\) so all six sit on
+       one row. The emblem is the same artwork as the PanAnd quick link on the
+       homepage, so the two read as the same thing.
+
+       No "Updated" stamp. It rendered date\('F j, Y'\) -- the day the page was
+       served -- so it always claimed the data had been updated today, which is
+       not true of a page whose assemblies were released in 2022 and 2023. It
+       also reserved 224px beside the title, which is what pushed this title
+       onto a second line. Put it back when there is a real release date to
+       print. -->
   <section class="mgdb-hero" aria-labelledby="panand-title">
     <div class="mgdb-hero-emblem">
-      <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <!-- Grass branch / phylogenetic nodes -->
-        <rect x="8" y="14" width="48" height="36" rx="6" fill="#f0fdf4" stroke="#1b5e20" stroke-width="2.5" />
-        <!-- Phylogenetic branching tracks -->
-        <path d="M16 41C24 41 26 32 34 32C42 32 44 23 50 23" stroke="#2e7d32" stroke-width="3" stroke-linecap="round" fill="none" />
-        <path d="M34 32C42 32 44 41 50 41" stroke="#d97706" stroke-width="3" stroke-linecap="round" fill="none" />
-        <!-- Node dots -->
-        <circle cx="16" cy="41" r="3" fill="#2e7d32" />
-        <circle cx="34" cy="32" r="3" fill="#ca8a04" />
-        <circle cx="50" cy="23" r="3" fill="#2563eb" />
-        <circle cx="50" cy="41" r="3" fill="#16a34a" />
-      </svg>
+      <img src="/images/quicklinks/pannad.png" alt="" width="128" height="128" decoding="async" />
       <strong>PanAnd<br />Genomes</strong>
     </div>
     <div class="mgdb-hero-body">
-      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data_date)</p>
-      <h1 id="panand-title">Pan-Andropogoneae Reference Genomes &amp; Evolutionary Models</h1>
-      <p class="mgdb-hero-description">De novo chromosome-scale genome assemblies, annotations, and evolutionary constraint models across 36+ wild panicoid grasses, teosintes, and outgroups to predict adaptations to abiotic stress in maize and sorghum.</p>
+      <h1 id="panand-title">Pan-Andropogoneae Sequencing and Assembly Project</h1>
+      <p class="mgdb-hero-description">De novo genome assemblies and annotations across 36+ wild grasses, teosintes, and outgroups to facilitate study of the genetic variation and evolution across the Andropogoneae driving adaptive convergence and constraint in plant genomes.</p>
 
       <div class="panand-hero-actions-row">
-        <a class="panand-hero-link" href="/genomebrowser">
-          <span class="panand-link-dot panand-dot-green" aria-hidden="true"></span> Explore in JBrowse 2 &#8599;
-        </a>
-        <a class="panand-hero-link" href="https://panandropogoneae.com/" target="_blank" rel="noopener">
-          <span class="panand-link-dot panand-dot-gold" aria-hidden="true"></span> PanAnd Website &#8599;
-        </a>
-        <a class="panand-hero-link" href="https://mcstitzer.github.io/panand_assemblies" target="_blank" rel="noopener">
-          <span class="panand-link-dot panand-dot-purple" aria-hidden="true"></span> PanAnd GitHub Portal &#8599;
-        </a>
-        <a class="panand-hero-link" href="/download#downloads-panand">
-          <span class="panand-link-dot panand-dot-blue" aria-hidden="true"></span> Bulk Downloads &#8595;
-        </a>
-        <a class="panand-hero-link" href="https://www.biorxiv.org/content/10.1101/2025.01.22.633974v1" target="_blank" rel="noopener">
-          <span class="panand-link-dot panand-dot-rose" aria-hidden="true"></span> bioRxiv Preprint &#8599;
-        </a>
-        <a class="panand-hero-link" href="/curation/GenomeIssue/edit">
-          <span class="panand-link-dot panand-dot-dark" aria-hidden="true"></span> Report Issue &#8599;
-        </a>
+        <a class="panand-hero-link" href="/genomebrowser"><span class="panand-link-dot panand-dot-green" aria-hidden="true"></span> JBrowse 2</a>
+        <a class="panand-hero-link" href="https://panandropogoneae.com/" target="_blank" rel="noopener"><span class="panand-link-dot panand-dot-gold" aria-hidden="true"></span> Project website &#8599;</a>
+        <a class="panand-hero-link" href="https://mcstitzer.github.io/panand_assemblies" target="_blank" rel="noopener"><span class="panand-link-dot panand-dot-purple" aria-hidden="true"></span> GitHub &#8599;</a>
+        <a class="panand-hero-link" href="/download#downloads-panand"><span class="panand-link-dot panand-dot-blue" aria-hidden="true"></span> Downloads</a>
+        <a class="panand-hero-link" href="https://www.biorxiv.org/content/10.1101/2025.01.22.633974v1" target="_blank" rel="noopener"><span class="panand-link-dot panand-dot-rose" aria-hidden="true"></span> Preprint &#8599;</a>
+        <a class="panand-hero-link" href="/curation/GenomeIssue/edit"><span class="panand-link-dot panand-dot-dark" aria-hidden="true"></span> Report issue</a>
       </div>
     </div>
   </section>
 
   <!-- STICKY SECTION TABS -->
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#panand-assemblies" class="is-current">Genomes &amp; Assemblies Directory</a>
-    <a href="#panand-clades">Taxonomic &amp; Clade Diversity</a>
-    <a href="#panand-publications">Key Publications &amp; Preprints</a>
-    <a href="#panand-data-hosted">Data Hosted at MaizeGDB</a>
-    <a href="#panand-phylogeny">Phylogenetic Framework &amp; Tree</a>
-    <a href="#panand-faqs">FAQs &amp; Guidelines</a>
-    <a href="#panand-overview">Scale &amp; Metrics</a>
-    <a href="#panand-related">Connected Resources</a>
+    <a href="#panand-phylogeny" class="is-current">Phylogeny</a>
+    <a href="#panand-publications">Publications</a>
+    <a href="#panand-assemblies">Assemblies</a>
+    <a href="#panand-clades">Clades</a>
+    <a href="#panand-data-hosted">Hosted data</a>
+    <a href="#panand-faqs">FAQs</a>
+    <a href="#panand-overview">Metrics</a>
+    <a href="#panand-related">Related resources</a>
   </nav>
 
-  <!-- SECTION 1: INTERACTIVE ASSEMBLIES DIRECTORY TABLE -->
-  <section id="panand-assemblies" class="mgdb-panel" aria-labelledby="panand-assemblies-title">
-    <div class="panand-panel-header-wrap">
-      <div>
-        <h2 id="panand-assemblies-title" class="mgdb-panel-title">Pan-Andropogoneae Assemblies &amp; Taxa Directory</h2>
-        <p class="mgdb-panel-lead">Search, sort, and filter the 36 reference and draft assemblies across wild <em>Zea</em>, <em>Tripsacum</em>, and Andropogoneae outgroups.</p>
-      </div>
+  <!-- SECTION 5: PHYLOGENETIC FRAMEWORK & TREE -->
+  <section id="panand-phylogeny" aria-labelledby="panand-phylo-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="panand-phylo-title">Phylogenetic Framework &amp; Evolutionary History</h2></div>
+      <p>The Andropogoneae tribe of grasses contains a thousand species that collectively represent over a billion years of evolutionary history.</p>
     </div>
 
-    <!-- FILTER & SEARCH TOOLBAR -->
+    <div class="mgdb-panel">
+<div class="panand-phylo-content-wrap">
+      <div class="panand-tree-img-box">
+        <img src="/images/andropogoneae_tree.jpg" alt="Phylogenetic tree of the Andropogoneae grass tribe showing evolutionary divergence and sampled species" class="panand-tree-img" />
+        <p class="panand-tree-caption">Figure&#58; Phylogenetic tree of the Andropogoneae tribe illustrating divergence times, photosynthetic adaptations \(NADP-C4\), and genome sampling across panicoid lineages.</p>
+      </div>
+
+      <div class="panand-phylo-text-box">
+        <h3>Harnessing Convergence &amp; Constraint</h3>
+        <p>Maize, sorghum, sugarcane, and <em>Miscanthus</em> are among the most productive and water-efficient crops and biofuels in the world, owing to a shared physiology and genetic ancestry spanning the last 15 million years. Beyond these major crops, the Andropogoneae tribe encompasses 800+ wild species dominating global grasslands that are adapted to environmental extremes including flooding, drought, heat, and frost.</p>
+        <p>This project uses modern genomics and machine learning to survey and analyze these wild relatives, quantifying the disruptive impact of mutations in ancestral genomic elements and determining whether adaptive solutions to environmental stresses are convergently shared across species.</p>
+
+        <div class="panand-toronto-box">
+          <strong>Toronto Agreement Notice&#58;</strong>
+          <p>Early-release genome assemblies and annotations are provided to the scientific community in accordance with the Toronto Agreement guidelines. Users are requested to respect publication rights prior to primary publication by the project consortium.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </section>
+
+  <!-- SECTION 3: KEY PUBLICATIONS & PREPRINTS -->
+  <section id="panand-publications" aria-labelledby="panand-pub-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="panand-pub-title">Key Publications &amp; Preprints</h2></div>
+      <p>Scientific literature detailing the Pan-Andropogoneae assemblies, polyploidy dynamics, and evolutionary constraint analyses.</p>
+    </div>
+
+    <div class="mgdb-panel">
+<div class="panand-publications-grid">
+      <!-- Publication 1: Stitzer et al. 2025 \(bioRxiv\) -->
+      <article class="panand-pub-card">
+        <div class="panand-pub-meta-top">
+          <span class="panand-pub-journal-badge">bioRxiv &bull; 2025</span>
+          <span class="panand-pub-doi">DOI&#58; 10.1101/2025.01.22.633974</span>
+          <span class="panand-pub-award">NSF Award #1822330</span>
+        </div>
+        <h3 class="panand-pub-title">Extensive genome evolution distinguishes maize within a stable tribe of grasses</h3>
+        <p class="panand-pub-authors">Michelle C. Stitzer, Arun S. Seetharam, Armin Scheben, San-Kuo Hsu, Andrew J. Schulz, Tiffany AuBuchon-Elder, Matthew El-Walid, Tyler H. Ferebee, Christian O. Hale, Thien La, Zhi-Ying Liu, Samuel J. McMorrow, Philip Minx, Austin Phillips, Miranda Syring, Travis Wrightsman, Jiarui Zhai, Remy Pasquet, Colin McAllister, Simon Malcomber, Paweena Traiperm, Delanie Layton, Jane Zhong, Denise E. Costich, R. Kelly Dawe, Kevin Fengler, Carly Harris, Zachary Irelan, Victor Llaca, Preethi Parakkal, Gina Zastrow-Hayes, Margaret R. Woodhouse, Ethalinda K. Cannon, John L. Portwood II, Carson M. Andorf, Paul S. Albert, James A. Birchler, Adam Siepel, Jeffrey Ross-Ibarra, M. Cinta Romay, Elizabeth Kellogg, Edward S. Buckler, Matthew B. Hufford</p>
+        <p class="panand-pub-citation"><em>bioRxiv</em> 2025.01.22.633974; doi&#58; https&#58;//doi.org/10.1101/2025.01.22.633974</p>
+        
+        <div class="panand-pub-abstract-wrap">
+          <h4 class="panand-pub-abstract-heading">Abstract</h4>
+          <p class="panand-pub-abstract-text">Over the last 20 million years, the Andropogoneae tribe of grasses has evolved to dominate 17% of global land area. Domestication of these grasses in the last 10,000 years has yielded our most productive crops, including maize, sugarcane, and sorghum. The majority of Andropogoneae species, including maize, show a history of polyploidy &mdash; a condition that, while offering the evolutionary advantage of multiple gene copies, poses challenges to basic cellular processes, gene expression, and epigenetic regulation. Genomic studies of polyploidy have been limited by sparse sampling of taxa in groups with multiple polyploidy events. Here, we present 33 genome assemblies from 27 species, including chromosome-scale assemblies of maize relatives <em>Zea</em> and <em>Tripsacum</em>. In maize, the after-effects of polyploidy have been widely studied, showing reduced chromosome number, biased fractionation of duplicate genes, and transposable element \(TE\) expansions. While we observe these patterns within the genus <em>Zea</em>, 12 other polyploidy events deviate significantly. Those tetraploids and hexaploids retain elevated chromosome number, maintain nearly complete complements of duplicate genes, and have only stochastic TE amplifications. These genomes reveal variable outcomes of polyploidy, challenging simple predictions and providing a foundation for understanding its evolutionary implications in an ecologically and economically important clade.</p>
+        </div>
+
+        <div class="panand-pub-actions">
+          <a class="mgdb-button mgdb-button-primary" href="https://www.biorxiv.org/content/10.1101/2025.01.22.633974v1" target="_blank" rel="noopener">Read on bioRxiv &#8599;</a>
+          <a class="mgdb-button mgdb-button-secondary" href="https://nsf.gov/awardsearch/showAward?AWD_ID=1822330&HistoricalAwards" target="_blank" rel="noopener">NSF Award 1822330 &#8599;</a>
+          <a class="mgdb-button mgdb-button-quiet" href="https://panandropogoneae.com/" target="_blank" rel="noopener">PanAnd Consortium &#8599;</a>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  </section>
+
+  <!-- SECTION 1: INTERACTIVE ASSEMBLIES DIRECTORY TABLE -->
+  <section id="panand-assemblies" aria-labelledby="panand-assemblies-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="panand-assemblies-title">Pan-Andropogoneae Assemblies &amp; Taxa Directory</h2></div>
+      <p>Search, sort, and filter the 36 reference and draft assemblies across wild <em>Zea</em>, <em>Tripsacum</em>, and Andropogoneae outgroups.</p>
+    </div>
+
+    <div class="mgdb-panel">
+<!-- FILTER & SEARCH TOOLBAR -->
     <div class="panand-table-toolbar">
       <div class="panand-filter-chips-wrap" role="group" aria-label="Filter by clade or release round">
         <span class="panand-toolbar-label">Filter&#58;</span>
@@ -129,7 +183,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Av-Kellogg1287_8-REFERENCE-PanAnd-1.0">Av-Kellogg1287_8-REFERENCE-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Av-Kellogg1287_8-REFERENCE-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Av-Kellogg1287_8-REFERENCE-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Av-Kellogg1287_8-REFERENCE-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -150,7 +204,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Td-FL_9056069_6-DRAFT-PanAnd-1.0">Td-FL_9056069_6-DRAFT-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Td-FL_9056069_6-DRAFT-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Td-FL_9056069_6-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Td-FL_9056069_6-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -168,7 +222,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Td-KS_B6_1-DRAFT-PanAnd-1.0">Td-KS_B6_1-DRAFT-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Td-KS_B6_1-DRAFT-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Td-KS_B6_1-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Td-KS_B6_1-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -186,7 +240,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Td-McKain334_5-DRAFT-PanAnd-1.0">Td-McKain334_5-DRAFT-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Td-McKain334_5-DRAFT-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Td-McKain334_5-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Td-McKain334_5-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Tripsacum dactyloides</em> <span class="panand-species-note">\(McKain 334_5\)</span></td>
@@ -202,7 +256,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Zd-Gigi-REFERENCE-PanAnd-1.0">Zd-Gigi-REFERENCE-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Zd-Gigi-REFERENCE-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Zd-Gigi-REFERENCE-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Zd-Gigi-REFERENCE-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Zea diploperennis</em> <span class="panand-species-note">\(Gigi &bull; Perennial teosinte\)</span></td>
@@ -221,7 +275,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Zd-Momo-REFERENCE-PanAnd-1.0">Zd-Momo-REFERENCE-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Zd-Momo-REFERENCE-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Zd-Momo-REFERENCE-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Zd-Momo-REFERENCE-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Zea diploperennis</em> <span class="panand-species-note">\(Momo &bull; Perennial teosinte\)</span></td>
@@ -240,7 +294,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Zl-RIL003-REFERENCE-PanAnd-1.0">Zl-RIL003-REFERENCE-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Zl-RIL003-REFERENCE-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Zl-RIL003-REFERENCE-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Zl-RIL003-REFERENCE-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Zea luxurians</em> <span class="panand-species-note">\(Guatemalan teosinte &bull; Genomic sequence only\)</span></td>
@@ -256,7 +310,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Zh-RIMHU001-REFERENCE-PanAnd-1.0">Zh-RIMHU001-REFERENCE-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Zh-RIMHU001-REFERENCE-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Zh-RIMHU001-REFERENCE-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Zh-RIMHU001-REFERENCE-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Zea mays</em> ssp. <em>huehuetenangensis</em> <span class="panand-species-note">\(Huehuetenango teosinte\)</span></td>
@@ -275,7 +329,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Zn-PI615697-REFERENCE-PanAnd-1.0">Zn-PI615697-REFERENCE-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Zn-PI615697-REFERENCE-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Zn-PI615697-REFERENCE-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Zn-PI615697-REFERENCE-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Zea nicaraguensis</em> <span class="panand-species-note">\(Flood-tolerant Nicaraguan teosinte\)</span></td>
@@ -294,7 +348,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Zx-TIL18-REFERENCE-PanAnd-1.0">Zx-TIL18-REFERENCE-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Zx-TIL18-REFERENCE-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Zx-TIL18-REFERENCE-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Zx-TIL18-REFERENCE-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Zea mays</em> ssp. <em>mexicana</em> <span class="panand-species-note">\(TIL18 &bull; Mexican highland teosinte\)</span></td>
@@ -313,7 +367,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Zx-TIL25-REFERENCE-PanAnd-1.0">Zx-TIL25-REFERENCE-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Zx-TIL25-REFERENCE-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Zx-TIL25-REFERENCE-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Zx-TIL25-REFERENCE-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Zea mays</em> ssp. <em>mexicana</em> <span class="panand-species-note">\(TIL25 &bull; Mexican highland teosinte\)</span></td>
@@ -332,7 +386,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Zv-TIL01-REFERENCE-PanAnd-1.0">Zv-TIL01-REFERENCE-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Zv-TIL01-REFERENCE-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Zv-TIL01-REFERENCE-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Zv-TIL01-REFERENCE-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Zea mays</em> ssp. <em>parviglumis</em> <span class="panand-species-note">\(TIL01 &bull; Direct maize progenitor\)</span></td>
@@ -351,7 +405,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Zv-TIL11-REFERENCE-PanAnd-1.0">Zv-TIL11-REFERENCE-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Zv-TIL11-REFERENCE-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Zv-TIL11-REFERENCE-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Zv-TIL11-REFERENCE-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Zea mays</em> ssp. <em>parviglumis</em> <span class="panand-species-note">\(TIL11 &bull; Direct maize progenitor\)</span></td>
@@ -372,7 +426,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Ab-Traiperm_572-DRAFT-PanAnd-1.0">Ab-Traiperm_572-DRAFT-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Ab-Traiperm_572-DRAFT-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Ab-Traiperm_572-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Ab-Traiperm_572-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Andropogon burmanicus</em></td>
@@ -388,7 +442,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Ac-Pasquet1232-DRAFT-PanAnd-1.0">Ac-Pasquet1232-DRAFT-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Ac-Pasquet1232-DRAFT-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Ac-Pasquet1232-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Ac-Pasquet1232-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Andropogon chinensis</em></td>
@@ -404,7 +458,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Ag-CAM1351-DRAFT-PanAnd-1.0">Ag-CAM1351-DRAFT-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Ag-CAM1351-DRAFT-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Ag-CAM1351-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Ag-CAM1351-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Andropogon gerardii</em> <span class="panand-species-note">\(Big bluestem\)</span></td>
@@ -420,7 +474,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Bl-K1279B-DRAFT-PanAnd-1.0">Bl-K1279B-DRAFT-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Bl-K1279B-DRAFT-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Bl-K1279B-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Bl-K1279B-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Bothriochloa laguroides</em> <span class="panand-species-note">\(Silver bluestem / Silver beard grass\)</span></td>
@@ -436,7 +490,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Cc-PI314907-DRAFT-PanAnd-1.0">Cc-PI314907-DRAFT-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Cc-PI314907-DRAFT-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Cc-PI314907-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Cc-PI314907-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Cymbopogon citratus</em> <span class="panand-species-note">\(Lemon grass\)</span></td>
@@ -452,7 +506,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Cr-AUB069-DRAFT-PanAnd-1.0">Cr-AUB069-DRAFT-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Cr-AUB069-DRAFT-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Cr-AUB069-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Cr-AUB069-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Cymbopogon refractus</em> <span class="panand-species-note">\(Barbed wire grass\)</span></td>
@@ -468,7 +522,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Cs-KelloggPI219580-DRAFT-PanAnd-1.0">Cs-KelloggPI219580-DRAFT-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Cs-KelloggPI219580-DRAFT-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Cs-KelloggPI219580-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Cs-KelloggPI219580-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Chrysopogon serrulatus</em></td>
@@ -484,7 +538,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Et-Layton_Zhong168-DRAFT-PanAnd-1.0">Et-Layton_Zhong168-DRAFT-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Et-Layton_Zhong168-DRAFT-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Et-Layton_Zhong168-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Et-Layton_Zhong168-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Elionorus tripsacoides</em> <span class="panand-species-note">\(Pan-American balsamscale\)</span></td>
@@ -500,7 +554,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Hc-AUB53_1-DRAFT-PanAnd-1.0">Hc-AUB53_1-DRAFT-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Hc-AUB53_1-DRAFT-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Hc-AUB53_1-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Hc-AUB53_1-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Heteropogon contortus</em> <span class="panand-species-note">\(Black speargrass\)</span></td>
@@ -516,7 +570,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Hp-KelloggPI404118-DRAFT-PanAnd-1.0">Hp-KelloggPI404118-DRAFT-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Hp-KelloggPI404118-DRAFT-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Hp-KelloggPI404118-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Hp-KelloggPI404118-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Hemarthria compressa</em> <span class="panand-species-note">\(Whip grass\)</span></td>
@@ -532,7 +586,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Ir-Pasquet1136-DRAFT-PanAnd-1.0">Ir-Pasquet1136-DRAFT-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Ir-Pasquet1136-DRAFT-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Ir-Pasquet1136-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Ir-Pasquet1136-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Ischaemum rugosum</em> <span class="panand-species-note">\(Saramollagrass / Murainagrass\)</span></td>
@@ -548,7 +602,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Pi-Clark-DRAFT-PanAnd-1.0">Pi-Clark-DRAFT-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Pi-Clark-DRAFT-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Pi-Clark-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Pi-Clark-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Pogonatherum paniceum</em> <span class="panand-species-note">\(Baby bamboo\)</span></td>
@@ -564,7 +618,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Rr-Malcomber3106-DRAFT-PanAnd-1.0">Rr-Malcomber3106-DRAFT-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Rr-Malcomber3106-DRAFT-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Rr-Malcomber3106-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Rr-Malcomber3106-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Rhytachne rottboelloides</em></td>
@@ -580,7 +634,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Rt-Layton_Zhong169-DRAFT-PanAnd-1.0">Rt-Layton_Zhong169-DRAFT-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Rt-Layton_Zhong169-DRAFT-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Rt-Layton_Zhong169-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Rt-Layton_Zhong169-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td>
@@ -598,7 +652,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Sm-PI203595-DRAFT-PanAnd-1.0">Sm-PI203595-DRAFT-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Sm-PI203595-DRAFT-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Sm-PI203595-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Sm-PI203595-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Schizachyrium microstachyum</em></td>
@@ -614,7 +668,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Sn-CAM1369-DRAFT-PanAnd-1.0">Sn-CAM1369-DRAFT-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Sn-CAM1369-DRAFT-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Sn-CAM1369-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Sn-CAM1369-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Sorghastrum nutans</em> <span class="panand-species-note">\(Yellow Indiangrass / Golden feather grass\)</span></td>
@@ -630,7 +684,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Ss-CAM1384-DRAFT-PanAnd-1.0">Ss-CAM1384-DRAFT-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Ss-CAM1384-DRAFT-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Ss-CAM1384-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Ss-CAM1384-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Schizachyrium scoparium</em> <span class="panand-species-note">\(Little bluestem\)</span></td>
@@ -646,7 +700,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Td-FL_9056069_6-REFERENCE-PanAnd-2.0">Td-FL_9056069_6-REFERENCE-PanAnd-2.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Td-FL_9056069_6-REFERENCE-PanAnd-2.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Td-FL_9056069_6-REFERENCE-PanAnd-2.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Td-FL_9056069_6-REFERENCE-PanAnd-2.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Tripsacum dactyloides</em> <span class="panand-species-note">\(FL, south &bull; Eastern gamagrass &bull; Ref v2.0\)</span></td>
@@ -662,7 +716,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Td-KS_B6_1-REFERENCE-PanAnd-2.0">Td-KS_B6_1-REFERENCE-PanAnd-2.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Td-KS_B6_1-REFERENCE-PanAnd-2.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Td-KS_B6_1-REFERENCE-PanAnd-2.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Td-KS_B6_1-REFERENCE-PanAnd-2.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Tripsacum dactyloides</em> <span class="panand-species-note">\(KS, north &bull; Ref v2.0\)</span></td>
@@ -678,7 +732,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Te-Pasquet1246-DRAFT-PanAnd-1.0">Te-Pasquet1246-DRAFT-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Te-Pasquet1246-DRAFT-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Te-Pasquet1246-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Te-Pasquet1246-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Thelepogon elegans</em></td>
@@ -694,7 +748,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Tz-DC_05_58_3A-DRAFT-PanAnd-1.0">Tz-DC_05_58_3A-DRAFT-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Tz-DC_05_58_3A-DRAFT-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Tz-DC_05_58_3A-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Tz-DC_05_58_3A-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Tripsacum zopilotense</em></td>
@@ -710,7 +764,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Ud-Pasquet1171-DRAFT-PanAnd-1.0">Ud-Pasquet1171-DRAFT-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Ud-Pasquet1171-DRAFT-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Ud-Pasquet1171-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Ud-Pasquet1171-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Urelytrum digitatum</em></td>
@@ -726,7 +780,7 @@ $$SYNTAX-LEVEL 2
               <a class="panand-assembly-link" href="/genome/assembly/Vc-Pasquet1098-DRAFT-PanAnd-1.0">Vc-Pasquet1098-DRAFT-PanAnd-1.0</a>
               <div class="panand-jb-btns">
                 <a class="panand-btn-jb2" href="/genomebrowser?assembly=Vc-Pasquet1098-DRAFT-PanAnd-1.0&view=jbrowse2" target="_blank" rel="noopener">JBrowse 2</a>
-                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Vc-Pasquet1098-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JB1</a>
+                <a class="panand-btn-jb1" href="/genomebrowser?assembly=Vc-Pasquet1098-DRAFT-PanAnd-1.0&view=jbrowse1" target="_blank" rel="noopener">JBrowse1</a>
               </div>
             </td>
             <td><em>Vossia cuspidata</em> <span class="panand-species-note">\(Hippo grass\)</span></td>
@@ -738,14 +792,19 @@ $$SYNTAX-LEVEL 2
         </tbody>
       </table>
     </div>
+  </div>
+
   </section>
 
   <!-- SECTION 2: TAXONOMIC & CLADE DIVERSITY -->
-  <section id="panand-clades" class="mgdb-panel" aria-labelledby="panand-clades-title">
-    <h2 id="panand-clades-title" class="mgdb-panel-title">Taxonomic &amp; Clade Diversity</h2>
-    <p class="mgdb-panel-lead">The Pan-Andropogoneae dataset spans 15+ million years of panicoid grass evolution, structured across key taxonomic clades.</p>
+  <section id="panand-clades" aria-labelledby="panand-clades-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="panand-clades-title">Taxonomic &amp; Clade Diversity</h2></div>
+      <p>The Pan-Andropogoneae dataset spans 15+ million years of panicoid grass evolution, structured across key taxonomic clades.</p>
+    </div>
 
-    <div class="panand-clades-grid">
+    <div class="mgdb-panel">
+<div class="panand-clades-grid">
       <!-- Clade 1: Wild Zea / Teosintes -->
       <article class="panand-clade-card">
         <div class="panand-clade-head">
@@ -798,45 +857,19 @@ $$SYNTAX-LEVEL 2
         </div>
       </article>
     </div>
-  </section>
+  </div>
 
-  <!-- SECTION 3: KEY PUBLICATIONS & PREPRINTS -->
-  <section id="panand-publications" class="mgdb-panel" aria-labelledby="panand-pub-title">
-    <h2 id="panand-pub-title" class="mgdb-panel-title">Key Publications &amp; Preprints</h2>
-    <p class="mgdb-panel-lead">Scientific literature detailing the Pan-Andropogoneae assemblies, polyploidy dynamics, and evolutionary constraint analyses.</p>
-
-    <div class="panand-publications-grid">
-      <!-- Publication 1: Stitzer et al. 2025 \(bioRxiv\) -->
-      <article class="panand-pub-card">
-        <div class="panand-pub-meta-top">
-          <span class="panand-pub-journal-badge">bioRxiv &bull; 2025</span>
-          <span class="panand-pub-doi">DOI&#58; 10.1101/2025.01.22.633974</span>
-          <span class="panand-pub-award">NSF Award #1822330</span>
-        </div>
-        <h3 class="panand-pub-title">Extensive genome evolution distinguishes maize within a stable tribe of grasses</h3>
-        <p class="panand-pub-authors">Michelle C. Stitzer, Arun S. Seetharam, Armin Scheben, San-Kuo Hsu, Andrew J. Schulz, Tiffany AuBuchon-Elder, Matthew El-Walid, Tyler H. Ferebee, Christian O. Hale, Thien La, Zhi-Ying Liu, Samuel J. McMorrow, Philip Minx, Austin Phillips, Miranda Syring, Travis Wrightsman, Jiarui Zhai, Remy Pasquet, Colin McAllister, Simon Malcomber, Paweena Traiperm, Delanie Layton, Jane Zhong, Denise E. Costich, R. Kelly Dawe, Kevin Fengler, Carly Harris, Zachary Irelan, Victor Llaca, Preethi Parakkal, Gina Zastrow-Hayes, Margaret R. Woodhouse, Ethalinda K. Cannon, John L. Portwood II, Carson M. Andorf, Paul S. Albert, James A. Birchler, Adam Siepel, Jeffrey Ross-Ibarra, M. Cinta Romay, Elizabeth Kellogg, Edward S. Buckler, Matthew B. Hufford</p>
-        <p class="panand-pub-citation"><em>bioRxiv</em> 2025.01.22.633974; doi&#58; https&#58;//doi.org/10.1101/2025.01.22.633974</p>
-        
-        <div class="panand-pub-abstract-wrap">
-          <h4 class="panand-pub-abstract-heading">Abstract</h4>
-          <p class="panand-pub-abstract-text">Over the last 20 million years, the Andropogoneae tribe of grasses has evolved to dominate 17% of global land area. Domestication of these grasses in the last 10,000 years has yielded our most productive crops, including maize, sugarcane, and sorghum. The majority of Andropogoneae species, including maize, show a history of polyploidy &mdash; a condition that, while offering the evolutionary advantage of multiple gene copies, poses challenges to basic cellular processes, gene expression, and epigenetic regulation. Genomic studies of polyploidy have been limited by sparse sampling of taxa in groups with multiple polyploidy events. Here, we present 33 genome assemblies from 27 species, including chromosome-scale assemblies of maize relatives <em>Zea</em> and <em>Tripsacum</em>. In maize, the after-effects of polyploidy have been widely studied, showing reduced chromosome number, biased fractionation of duplicate genes, and transposable element \(TE\) expansions. While we observe these patterns within the genus <em>Zea</em>, 12 other polyploidy events deviate significantly. Those tetraploids and hexaploids retain elevated chromosome number, maintain nearly complete complements of duplicate genes, and have only stochastic TE amplifications. These genomes reveal variable outcomes of polyploidy, challenging simple predictions and providing a foundation for understanding its evolutionary implications in an ecologically and economically important clade.</p>
-        </div>
-
-        <div class="panand-pub-actions">
-          <a class="mgdb-button mgdb-button-primary" href="https://www.biorxiv.org/content/10.1101/2025.01.22.633974v1" target="_blank" rel="noopener">Read on bioRxiv &#8599;</a>
-          <a class="mgdb-button mgdb-button-secondary" href="https://nsf.gov/awardsearch/showAward?AWD_ID=1822330&HistoricalAwards" target="_blank" rel="noopener">NSF Award 1822330 &#8599;</a>
-          <a class="mgdb-button mgdb-button-quiet" href="https://panandropogoneae.com/" target="_blank" rel="noopener">PanAnd Consortium &#8599;</a>
-        </div>
-      </article>
-    </div>
   </section>
 
   <!-- SECTION 4: DATA HOSTED AT MAIZEGDB -->
-  <section id="panand-data-hosted" class="mgdb-panel" aria-labelledby="panand-hosted-title">
-    <h2 id="panand-hosted-title" class="mgdb-panel-title">PanAnd Datasets Hosted at MaizeGDB</h2>
-    <p class="mgdb-panel-lead">Explore integrated genome browser tracks, sequence BLAST targets, comparative synteny visualizers, and bulk download archives.</p>
+  <section id="panand-data-hosted" aria-labelledby="panand-hosted-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="panand-hosted-title">PanAnd Datasets Hosted at MaizeGDB</h2></div>
+      <p>Explore integrated genome browser tracks, sequence BLAST targets, comparative synteny visualizers, and bulk download archives.</p>
+    </div>
 
-    <div class="panand-hosted-grid">
+    <div class="mgdb-panel">
+<div class="panand-hosted-grid">
       <!-- 1: JBrowse 2 -->
       <article class="panand-hosted-card">
         <h3>Genome Browsers \(JBrowse 2\)</h3>
@@ -865,38 +898,19 @@ $$SYNTAX-LEVEL 2
         <a class="mgdb-button mgdb-button-secondary" href="/popcorn/search/sequence_search/home.php?a=BLAST_UI">Launch Comparative Tools &#8599;</a>
       </article>
     </div>
-  </section>
+  </div>
 
-  <!-- SECTION 5: PHYLOGENETIC FRAMEWORK & TREE -->
-  <section id="panand-phylogeny" class="mgdb-panel" aria-labelledby="panand-phylo-title">
-    <h2 id="panand-phylo-title" class="mgdb-panel-title">Phylogenetic Framework &amp; Evolutionary History</h2>
-    <p class="mgdb-panel-lead">The Andropogoneae tribe of grasses contains a thousand species that collectively represent over a billion years of evolutionary history.</p>
-
-    <div class="panand-phylo-content-wrap">
-      <div class="panand-tree-img-box">
-        <img src="/images/andropogoneae_tree.jpg" alt="Phylogenetic tree of the Andropogoneae grass tribe showing evolutionary divergence and sampled species" class="panand-tree-img" />
-        <p class="panand-tree-caption">Figure&#58; Phylogenetic tree of the Andropogoneae tribe illustrating divergence times, photosynthetic adaptations \(NADP-C4\), and genome sampling across panicoid lineages.</p>
-      </div>
-
-      <div class="panand-phylo-text-box">
-        <h3>Harnessing Convergence &amp; Constraint</h3>
-        <p>Maize, sorghum, sugarcane, and <em>Miscanthus</em> are among the most productive and water-efficient crops and biofuels in the world, owing to a shared physiology and genetic ancestry spanning the last 15 million years. Beyond these major crops, the Andropogoneae tribe encompasses 800+ wild species dominating global grasslands that are adapted to environmental extremes including flooding, drought, heat, and frost.</p>
-        <p>This project uses modern genomics and machine learning to survey and analyze these wild relatives, quantifying the disruptive impact of mutations in ancestral genomic elements and determining whether adaptive solutions to environmental stresses are convergently shared across species.</p>
-
-        <div class="panand-toronto-box">
-          <strong>Toronto Agreement Notice&#58;</strong>
-          <p>Early-release genome assemblies and annotations are provided to the scientific community in accordance with the Toronto Agreement guidelines. Users are requested to respect publication rights prior to primary publication by the project consortium.</p>
-        </div>
-      </div>
-    </div>
   </section>
 
   <!-- SECTION 6: FAQS & GUIDELINES -->
-  <section id="panand-faqs" class="mgdb-panel" aria-labelledby="panand-faqs-title">
-    <h2 id="panand-faqs-title" class="mgdb-panel-title">Frequently Asked Questions &amp; Guidelines</h2>
-    <p class="mgdb-panel-lead">Guidance on data access, annotation versions, project funding, and community contributions.</p>
+  <section id="panand-faqs" aria-labelledby="panand-faqs-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="panand-faqs-title">Frequently Asked Questions &amp; Guidelines</h2></div>
+      <p>Guidance on data access, annotation versions, project funding, and community contributions.</p>
+    </div>
 
-    <div class="mgdb-card-grid panand-faqs-grid">
+    <div class="mgdb-panel">
+<div class="mgdb-card-grid panand-faqs-grid">
       <!-- FAQ 1: Project Scope -->
       <article class="mgdb-card">
         <span class="mgdb-pill mgdb-pill-info">Overview</span>
@@ -925,14 +939,19 @@ $$SYNTAX-LEVEL 2
         <p>If you identify sequence anomalies, assembly gaps, or problematic gene annotations in any PanAnd genome, please submit a report to MaizeGDB curators via the <a href="/curation/GenomeIssue/edit">Genome Issue Curation Form &#8599;</a> to assist ongoing community curation.</p>
       </article>
     </div>
+  </div>
+
   </section>
 
   <!-- SECTION 7: SCALE & METRICS -->
-  <section id="panand-overview" class="mgdb-panel" aria-labelledby="panand-metrics-title">
-    <h2 id="panand-metrics-title" class="mgdb-panel-title">PanAnd Dataset Scale &amp; Metrics</h2>
-    <p class="mgdb-panel-lead">Overview of genome assembly depth, taxonomic breadth, and evolutionary sampling.</p>
+  <section id="panand-overview" aria-labelledby="panand-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="panand-metrics-title">PanAnd Dataset Scale &amp; Metrics</h2></div>
+      <p>Overview of genome assembly depth, taxonomic breadth, and evolutionary sampling.</p>
+    </div>
 
-    <div class="mgdb-metric-grid">
+    <div class="mgdb-panel">
+<div class="mgdb-metric-grid">
       <article class="mgdb-metric">
         <div class="mgdb-metric-top">
           <h3>Assembled Genomes</h3>
@@ -944,7 +963,7 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Chromosome-scale and high-continuity draft assemblies across wild grasses and teosintes.</p>
       </article>
 
-      <article class="mgdb-metric mgdb-tone-green">
+      <article class="mgdb-metric">
         <div class="mgdb-metric-top">
           <h3>Species Content</h3>
           <span class="mgdb-metric-badge">Gene / Regulatory</span>
@@ -955,7 +974,7 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Target species surveyed for gene model structures and conserved non-coding regulatory elements.</p>
       </article>
 
-      <article class="mgdb-metric mgdb-tone-amber">
+      <article class="mgdb-metric">
         <div class="mgdb-metric-top">
           <h3>WGS Surveys</h3>
           <span class="mgdb-metric-badge">Pan-Tribe</span>
@@ -966,7 +985,7 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Whole-genome sequencing surveys sampling genetic variation across global Andropogoneae species.</p>
       </article>
 
-      <article class="mgdb-metric mgdb-tone-burgundy">
+      <article class="mgdb-metric">
         <div class="mgdb-metric-top">
           <h3>Evolutionary Depth</h3>
           <span class="mgdb-metric-badge">Adaptation</span>
@@ -977,14 +996,19 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Years of shared evolutionary history and environmental adaptation captured in the dataset.</p>
       </article>
     </div>
+  </div>
+
   </section>
 
   <!-- SECTION 8: CONNECTED GENOMICS RESOURCES -->
-  <section id="panand-related" class="mgdb-panel panand-bottom-section" aria-labelledby="panand-related-title">
-    <h2 id="panand-related-title" class="mgdb-panel-title">Connected Genomics Resources</h2>
-    <p class="mgdb-panel-lead">Explore complementary genome assemblies, pangenome graphs, and variation datasets across MaizeGDB.</p>
+  <section id="panand-related" aria-labelledby="panand-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="panand-related-title">Connected Genomics Resources</h2></div>
+      <p>Explore complementary genome assemblies, pangenome graphs, and variation datasets across MaizeGDB.</p>
+    </div>
 
-    <div class="panand-related-grid">
+    <div class="mgdb-panel panand-bottom-section">
+<div class="panand-related-grid">
       <a class="panand-related-card" href="/NAM_project">
         <div class="panand-related-title">NAM Parent Genomes</div>
         <p class="panand-related-desc">Chromosome-scale assemblies for 26 diverse founder inbred lines representing modern maize diversity.</p>
@@ -1005,16 +1029,14 @@ $$SYNTAX-LEVEL 2
         <p class="panand-related-desc">Explore SNP matrices, HapMap datasets, and structural variant tracks.</p>
       </a>
 
-      <a class="panand-related-card" href="/download#downloads-panand">
-        <div class="panand-related-title">Bulk Downloads Directory</div>
-        <p class="panand-related-desc">High-speed HTTP and Globus public endpoints for all 36 PanAnd genome packages.</p>
-      </a>
 
       <a class="panand-related-card" href="/data_center">
         <div class="panand-related-title">All Data Hubs</div>
         <p class="panand-related-desc">Discover the complete catalog of MaizeGDB data hubs, tools, and databases.</p>
       </a>
     </div>
+  </div>
+
   </section>
 </main>
 )
