@@ -3,422 +3,336 @@ $$SYNTAX-LEVEL 2
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@MaizeGDB">
 <meta property="og:url" content="https://maizegdb.org/ai">
-<meta property="og:title" content="AI & Machine Learning Resources | MaizeGDB">
-<meta property="og:description" content="Maize genetic variants, protein language models, predicted structures, functional annotations, and machine-learning-ready datasets and tools at MaizeGDB.">
+<meta property="og:title" content="MaizeGDB AI &amp; Machine Learning Data Hub">
+<meta property="og:description" content="Search maize AI and machine learning resources at MaizeGDB: analysis tools, AI-ready datasets, open-source code, and the publications behind them.">
 
-<main class="mgdb-page mgdb-ai-page" id="mgdb-ai-main">
+<main class="mgdb-page mgdb-ai-page" id="ai-main">
+
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
-    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">AI &amp; Machine Learning</span>
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">AI &amp; Machine Learning Data Hub</span>
   </nav>
 
-  <section class="mgdb-hero" aria-labelledby="ai-page-title">
+  <section class="mgdb-hero" aria-labelledby="ai-title">
     <div class="mgdb-hero-emblem">
-      <img src="/images/data_center/ai_network_v2_transparent.png?v=202608212117" alt="Artificial Intelligence icon" class="ai-hero-icon" width="76" height="76" />
-      <strong>AI &amp; Machine<br />Learning</strong>
+      <img src="/images/quicklinks/AI.png" alt="" width="128" height="128" decoding="async" />
+      <strong>AI &amp; Machine Learning<br />Data Hub</strong>
     </div>
     <div class="mgdb-hero-body">
       <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; August 2026</p>
-      <h1 id="ai-page-title">Explore artificial intelligence and machine learning resources</h1>
-      <p class="mgdb-hero-description">Discover maize genetic variants, protein language models, predicted 3D structures, functional annotations, and machine-learning-ready multi-omics datasets.</p>
+      <h1 id="ai-title">Maize artificial intelligence and machine learning resources</h1>
+      <p class="mgdb-hero-description">$(metric_total) resources for machine learning on maize&#58; $(metric_tools) analysis tools, $(metric_data) AI-ready datasets, $(metric_code) code repositories, and $(metric_pubs) publications.</p>
     </div>
   </section>
 
-  <nav class="mgdb-section-tabs" aria-label="AI resource sections">
-    <a href="#ai-featured">Featured workspace</a>
-    <a href="#ai-tools">Analysis tools</a>
-    <a href="#ai-data">AI-ready data</a>
-    <a href="#ai-code">Open-source code</a>
-    <a href="#ai-publications">Key publications</a>
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#ai-search" class="is-current" aria-current="true">Search</a>
+    <a href="#ai-tools">Tools</a>
+    <a href="#ai-data">Data</a>
+    <a href="#ai-code">Code</a>
+    <a href="#ai-publications">Publications</a>
+    <a href="#ai-metrics">Metrics</a>
     <a href="#ai-related">Related resources</a>
   </nav>
 
-  <section id="ai-featured" class="ai-featured" aria-labelledby="ai-featured-title">
-    <div class="ai-featured-copy">
-      <span class="mgdb-pill mgdb-pill-ok">New Featured Workspace</span>
-      <h2 id="ai-featured-title">SNPTools&#58; One workspace for maize SNP discovery and interpretation</h2>
-      <p>SNPTools brings variant search, visualization, comparison, functional interpretation, and downstream analysis into a connected MaizeGDB toolkit.</p>
-      <ul class="ai-feature-list">
-        <li><strong>Build targeted variant views</strong><span>Select a B73 v5 interval or gene model and choose accessions from diverse maize datasets.</span></li>
-        <li><strong>Inspect richer evidence</strong><span>Review alleles, predicted effects, and DNA or protein language-model scores in an interactive table.</span></li>
-        <li><strong>Keep analysis moving</strong><span>Download VCF output or send a selection to comparison, impact, function, structure, tree, and PanEffect workflows.</span></li>
-      </ul>
-      <div class="ai-feature-actions">
-        <a class="mgdb-button mgdb-button-primary" href="https\://snptools.maizegdb.org/" target="_blank" rel="noopener">Open SNPTools <span aria-hidden="true">&nearr;</span></a>
-        <a class="mgdb-button mgdb-button-secondary" href="https\://snptools.maizegdb.org/#help" target="_blank" rel="noopener">Help &amp; FAQ <span aria-hidden="true">&nearr;</span></a>
-      </div>
+  <!-- ── Search ───────────────────────────────────────────────────────────── -->
+  <section id="ai-search" aria-labelledby="ai-search-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ai-search-title">Search</h2></div>
     </div>
-    <div class="ai-workflow" aria-label="SNPTools workflow">
-      <div class="ai-workflow-heading"><span>Connected workflow</span><strong>Start with a region. Continue with evidence.</strong></div>
-      <ol>
-        <li><span>01</span><div><strong>Choose</strong><small>Dataset, interval, gene, and accessions</small></div></li>
-        <li><span>02</span><div><strong>Explore</strong><small>Variants, alleles, effects, and model scores</small></div></li>
-        <li><span>03</span><div><strong>Compare</strong><small>Accessions, functional evidence, and relationships</small></div></li>
-        <li><span>04</span><div><strong>Export</strong><small>Download a focused VCF or continue in another tool</small></div></li>
-      </ol>
-      <div class="ai-suite-list" aria-label="SNPTools applications">
-        <span>SNPVersity</span><span>SNPImpact</span><span>SNPFunction</span><span>SNPFold</span><span>SNPCompare</span><span>SNPTree</span><span>PanEffect</span>
-      </div>
+
+    <div class="ai-search-panel">
+      <form id="ai-search-form" class="ai-search-form" role="search">
+        <div class="ai-field ai-field-query">
+          <label class="ai-label" for="ai-query">Search term</label>
+          <div class="ai-query-control">
+            <svg class="ai-search-icon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="7" r="5"/><line x1="11" y1="11" x2="15" y2="15"/></svg>
+            <input id="ai-query" name="q" type="search" placeholder="Tool, dataset, repository, method, or author" autocomplete="off" />
+            <button id="ai-query-clear" type="button" hidden>Clear</button>
+          </div>
+        </div>
+
+        <div class="ai-field ai-field-submit">
+          <button class="mgdb-button mgdb-button-primary" type="submit">Search resources</button>
+        </div>
+
+        <div class="ai-example-row" aria-label="Example searches">
+          <span>Examples&#58;</span>
+          <button type="button" data-ai-example="protein structure">protein structure</button>
+          <button type="button" data-ai-example="variant effect">variant effect</button>
+          <button type="button" data-ai-example="embeddings">embeddings</button>
+          <button type="button" data-ai-example="gene ontology">gene ontology</button>
+          <button type="button" data-ai-example="feature vectors">feature vectors</button>
+          <button type="button" data-ai-example="AlphaFold">AlphaFold</button>
+          <button type="button" data-ai-example="PanEffect">PanEffect</button>
+        </div>
+
+        <details class="ai-adv" id="ai-adv">
+          <summary>
+            <strong>Advanced search criteria</strong>
+            <span>Filter by resource type, data type, genome coverage, or internal and external access</span>
+          </summary>
+          <div class="ai-adv-body">
+            <div class="ai-field">
+              <label class="ai-label" for="ai-filter-category">Resource type</label>
+              <select id="ai-filter-category" name="category">
+                <option value="">All resource types</option>
+                <option value="tool">Analysis tools</option>
+                <option value="data">AI-ready data</option>
+                <option value="code">Open-source code</option>
+                <option value="publication">Publications</option>
+              </select>
+            </div>
+
+            <div class="ai-field">
+              <label class="ai-label" for="ai-filter-topic">Data type</label>
+              <select id="ai-filter-topic" name="topic">
+                <option value="">All data types</option>
+                $(topic_options)
+              </select>
+            </div>
+
+            <div class="ai-field">
+              <label class="ai-label" for="ai-filter-genome">Genome coverage</label>
+              <select id="ai-filter-genome" name="genome">
+                <option value="">All genomes and assemblies</option>
+                $(genome_options)
+              </select>
+            </div>
+
+            <div class="ai-field">
+              <label class="ai-label" for="ai-filter-access">Access</label>
+              <select id="ai-filter-access" name="access">
+                <option value="">Internal and external</option>
+                <option value="internal">Internal only</option>
+                <option value="external">External only</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="ai-adv-actions">
+            <button class="mgdb-button mgdb-button-primary" type="submit">Apply advanced filters</button>
+            <button class="mgdb-button mgdb-button-quiet" id="ai-adv-reset" type="button">Reset advanced filters</button>
+          </div>
+        </details>
+      </form>
     </div>
   </section>
 
-  <section class="ai-resource-finder" aria-labelledby="ai-resource-finder-title">
-    <div>
-      <span class="mgdb-eyebrow">Resource finder</span>
-      <h2 id="ai-resource-finder-title">Find computational tools &amp; datasets</h2>
-      <p>Search across interactive web tools, multi-omics datasets, and open-source workflows on this page.</p>
-    </div>
-    <div class="ai-resource-search">
-      <div class="ai-query-control">
-        <svg class="ai-search-icon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="7" r="5"/><line x1="11" y1="11" x2="15" y2="15"/></svg>
-        <label class="mgdb-visually-hidden" for="ai-resource-query">Search resources</label>
-        <input id="ai-resource-query" type="search" placeholder="Try variants, protein structure, GO terms, embeddings…" autocomplete="off" />
-        <button id="ai-resource-clear" type="button" hidden>Clear</button>
-      </div>
-    </div>
-    <div class="ai-resource-filters" aria-label="Filter resource cards">
-      <button type="button" class="is-active" data-ai-filter="all">All</button>
-      <button type="button" data-ai-filter="tool">Tools</button>
-      <button type="button" data-ai-filter="data">Data</button>
-      <button type="button" data-ai-filter="code">Code</button>
-      <span id="ai-resource-count" aria-live="polite"></span>
-    </div>
-  </section>
-
-  <section id="ai-tools" class="ai-section" aria-labelledby="ai-tools-title">
-    <div class="ai-section-heading">
+  <!-- ── Search results: hidden until a search runs ───────────────────────── -->
+  <section id="ai-results-section" class="ai-results-section" aria-labelledby="ai-results-title" hidden>
+    <div class="ai-results-heading">
       <div>
-        <span class="mgdb-eyebrow">Analyze &amp; interpret</span>
-        <h2 id="ai-tools-title">MaizeGDB analysis tools</h2>
+        <h2 id="ai-results-title">Search results</h2>
+        <p id="ai-results-status" role="status" aria-live="polite"></p>
       </div>
-      <p>Purpose-built web applications for functional enrichment, variant effects, protein structures, and multi-omics feature analysis.</p>
-    </div>
-    <div class="ai-card-grid ai-card-grid-tools">
-      <article class="ai-resource-card ai-tool-card" data-ai-resource data-ai-category="tool" data-ai-search="FETA functional enrichment genes gene ontology zea mays">
-        <span class="mgdb-pill mgdb-pill-ok">Functional enrichment</span>
-        <h3>FETA</h3>
-        <p>Explore gene functional enrichment in <i>Zea mays</i> and related species.</p>
-        <a class="ai-card-cta" href="https\://feta.maizegdb.org" target="_blank" rel="noopener">Open FETA <span aria-hidden="true">&nearr;</span></a>
-      </article>
-
-      <article class="ai-resource-card ai-tool-card" data-ai-resource data-ai-category="tool" data-ai-search="PanEffect missense amino acid substitution variant effects pangenome B73">
-        <span class="mgdb-pill mgdb-pill-info">Variant effects</span>
-        <h3>PanEffect</h3>
-        <p>Visualize predicted missense effects for B73 substitutions and natural variation across the maize pan-genome.</p>
-        <a class="ai-card-cta" href="/effect/maize_v2/">Open PanEffect <span aria-hidden="true">&rarr;</span></a>
-      </article>
-
-      <article class="ai-resource-card ai-tool-card" data-ai-resource data-ai-category="tool" data-ai-search="protein structure Foldseek FATCAT Diamond comparison predicted proteins">
-        <span class="mgdb-pill mgdb-pill-warn">Protein structure</span>
-        <h3>Structure resources</h3>
-        <p>View predicted maize structures, search proteomes with Foldseek, and compare ortholog predictions with FATCAT.</p>
-        <div class="ai-card-links">
-          <a href="/data_center/protein_structure">Browse structures &rarr;</a>
-          <a href="/foldseek">Foldseek &rarr;</a>
-          <a href="/fatcat">FATCAT &rarr;</a>
+      <div class="ai-results-controls">
+        <div class="ai-field">
+          <label class="ai-label" for="ai-results-filter">Filter results</label>
+          <input id="ai-results-filter" type="search" placeholder="Narrow this table" autocomplete="off" />
         </div>
-      </article>
+        <div class="ai-field">
+          <label class="ai-label" for="ai-page-size">Results per page</label>
+          <select id="ai-page-size">
+            <option value="10">Top 10</option>
+            <option value="25" selected>Top 25</option>
+            <option value="50">Top 50</option>
+            <option value="all">All results</option>
+          </select>
+        </div>
+      </div>
+    </div>
 
-      <article class="ai-resource-card ai-tool-card" data-ai-resource data-ai-category="tool" data-ai-search="Maize Feature Store machine learning gene features multiomics data exploration MFS">
-        <span class="mgdb-pill mgdb-pill-ok">Machine-learning features</span>
-        <h3>Maize Feature Store</h3>
-        <p>Explore centralized, gene-based maize features prepared for machine-learning applications.</p>
-        <a class="ai-card-cta" href="https\://mfs.maizegdb.org/" target="_blank" rel="noopener">Open Feature Store <span aria-hidden="true">&nearr;</span></a>
-      </article>
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table ai-results-table" id="ai-results-table">
+        <caption>
+          Matching AI and machine learning resources
+          <span class="mgdb-muted">Sort any column by activating its header. Access says whether the resource opens on this site or on another one.</span>
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col" data-ai-sort="name" aria-sort="none"><button type="button">Resource</button></th>
+            <th scope="col" data-ai-sort="category" aria-sort="none"><button type="button">Type</button></th>
+            <th scope="col" data-ai-sort="topics" aria-sort="none"><button type="button">Data type</button></th>
+            <th scope="col" data-ai-sort="access" aria-sort="none"><button type="button">Access</button></th>
+            <th scope="col" class="ai-col-open">Open</th>
+          </tr>
+        </thead>
+        <tbody id="ai-results-body"></tbody>
+      </table>
+    </div>
+
+    <div class="mgdb-empty" id="ai-results-empty" hidden>
+      <h3>No resources matched that search</h3>
+      <p>Try a broader term such as <code>structure</code>, <code>variant</code>, or <code>function</code>, or reset the advanced filters.</p>
+      <button class="mgdb-button mgdb-button-secondary" id="ai-empty-reset" type="button">Reset search</button>
+    </div>
+
+    <nav class="ai-pagination" id="ai-pagination" aria-label="Search result pages"></nav>
+  </section>
+
+  <!-- ── Analysis tools ───────────────────────────────────────────────────── -->
+  <section id="ai-tools" aria-labelledby="ai-tools-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ai-tools-title">Analysis tools</h2></div>
+    </div>
+    <div class="ai-card-grid">
+      $(featured_tool)
+      $(tool_cards)
     </div>
   </section>
 
-  <section id="ai-data" class="ai-section ai-section-tinted" aria-labelledby="ai-data-title">
-    <div class="ai-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Download &amp; reuse</span>
-        <h2 id="ai-data-title">AI-ready datasets</h2>
-      </div>
-      <div>
-        <p>Curated and computed resources for modeling, annotation, and reproducible analysis.</p>
-        <a class="ai-section-cta" href="https\://iastate.app.box.com/v/maizegdb-public/folder/362582785407" target="_blank" rel="noopener">Browse all downloads &nearr;</a>
-      </div>
+  <!-- ── AI-ready data ────────────────────────────────────────────────────── -->
+  <section id="ai-data" aria-labelledby="ai-data-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ai-data-title">AI-ready data</h2></div>
+      <a class="ai-section-link" href="https://iastate.app.box.com/v/maizegdb-public/folder/362582785407" target="_blank" rel="noopener">Browse all downloads <span aria-hidden="true">&nearr;</span></a>
     </div>
-    <div class="ai-card-grid ai-card-grid-data">
-      <article class="ai-resource-card ai-data-card" data-ai-resource data-ai-category="data" data-ai-search="Core-60 feature vector B73 NAM essential metadata 60 features Haley">
-        <span class="ai-data-label">Feature vectors</span>
-        <h3>Core-60</h3>
-        <p>A compact set of approximately 60 genetic and genomic attributes for B73 and NAM gene annotations.</p>
-        <div class="ai-tags"><span>B73 v5</span><span>NAM genes</span></div>
-        <a href="https\://iastate.app.box.com/v/maizegdb-public/folder/362581854753" target="_blank" rel="noopener">Download dataset &nearr;</a>
-      </article>
-
-      <article class="ai-resource-card ai-data-card" data-ai-resource data-ai-category="data" data-ai-search="Extended-17k feature vector B73 gene attributes machine learning 17000">
-        <span class="ai-data-label">Feature vectors</span>
-        <h3>Extended-17k</h3>
-        <p>An expansive collection of approximately 17,000 genetic and genomic attributes for each B73 gene annotation.</p>
-        <div class="ai-tags"><span>B73 v5</span><span>High dimensional</span></div>
-        <a href="https\://iastate.app.box.com/v/maizegdb-public/folder/362581772989" target="_blank" rel="noopener">Download dataset &nearr;</a>
-      </article>
-
-      <article class="ai-resource-card ai-data-card" data-ai-resource data-ai-category="data" data-ai-search="GO gene ontology Pannzer UniProt functional annotations FASSO ortholog Diamond Foldseek FATCAT">
-        <span class="ai-data-label">Functional annotation</span>
-        <h3>Gene function predictions</h3>
-        <p>Machine-learning GO predictions plus sequence- and structure-informed UniProt annotations.</p>
-        <div class="ai-card-links">
-          <a href="https\://download.maizegdb.org/GeneFunction_and_Expression/Pannzer_GO_Terms/" target="_blank" rel="noopener">GO terms &nearr;</a>
-          <a href="https\://download.maizegdb.org/GeneFunction_and_Expression/FASSO_AlphaFold_Orthologs/" target="_blank" rel="noopener">FASSO annotations &nearr;</a>
-        </div>
-      </article>
-
-      <article class="ai-resource-card ai-data-card" data-ai-resource data-ai-category="data" data-ai-search="curated literature manuscripts manual annotation gene publication B73">
-        <span class="ai-data-label">Training and evaluation</span>
-        <h3>Curated literature</h3>
-        <p>More than two decades of curator- and community-supplied manuscript annotations linked to maize records.</p>
-        <div class="ai-tags"><span>B73 v5</span><span>B73 v4</span></div>
-        <a href="https\://iastate.app.box.com/v/maizegdb-public/folder/362581211707" target="_blank" rel="noopener">Download dataset &nearr;</a>
-      </article>
-
-      <article class="ai-resource-card ai-data-card" data-ai-resource data-ai-category="data" data-ai-search="AlphaFold2 ESMFold protein structures embeddings ESM ProtBERT T5 language model NAM W22">
-        <span class="ai-data-label">Protein representations</span>
-        <h3>Structures &amp; embeddings</h3>
-        <p>AlphaFold2 and ESMFold structures plus ESM, ProtBERT, and T5 protein-language-model embeddings.</p>
-        <div class="ai-card-links">
-          <a href="https\://iastate.app.box.com/v/maizegdb-public/folder/362582492660" target="_blank" rel="noopener">AlphaFold2 &nearr;</a>
-          <a href="https\://iastate.app.box.com/v/maizegdb-public/folder/362581729713" target="_blank" rel="noopener">ESMFold &nearr;</a>
-          <a href="https\://iastate.app.box.com/v/maizegdb-public/folder/362582591980" target="_blank" rel="noopener">Embeddings &nearr;</a>
-        </div>
-      </article>
-
-      <article class="ai-resource-card ai-data-card" data-ai-resource data-ai-category="data" data-ai-search="variant effect scores esm variants protein language model PlantCAD B73 W22 NAM genomes">
-        <span class="ai-data-label">Variant prioritization</span>
-        <h3>Variant effect scores</h3>
-        <p>ESM protein-language-model scores for substitutions across B73, W22, NAM founders, and additional maize genomes.</p>
-        <div class="ai-tags"><span>Pan-genome</span><span>ESM variants</span></div>
-        <a href="https\://iastate.app.box.com/v/maizegdb-public/folder/362583128761" target="_blank" rel="noopener">Download scores &nearr;</a>
-      </article>
-
-      <article class="ai-resource-card ai-data-card" data-ai-resource data-ai-category="data" data-ai-search="metabolic pathways E2P2 CornCyc AraCyc OryzaCyc SAVI B73 NAM">
-        <span class="ai-data-label">Pathway annotation</span>
-        <h3>Metabolic pathways</h3>
-        <p>E2P2 enzyme predictions and validated pathway assignments using CornCyc, AraCyc, OryzaCyc, and SAVI evidence.</p>
-        <div class="ai-tags"><span>B73 v5</span><span>NAM founders</span></div>
-        <a href="https\://download.maizegdb.org/GeneFunction_and_Expression/E2P2_pathways/" target="_blank" rel="noopener">Download pathways &nearr;</a>
-      </article>
+    <div class="ai-card-grid">
+      $(data_cards)
     </div>
   </section>
 
-  <section id="ai-code" class="ai-section" aria-labelledby="ai-code-title">
-    <div class="ai-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Inspect &amp; extend</span>
-        <h2 id="ai-code-title">Open-source workflows</h2>
-      </div>
-      <p>Code used to process variants, generate embeddings, score sequences, and assign function.</p>
+  <!-- ── Open-source code ─────────────────────────────────────────────────── -->
+  <section id="ai-code" aria-labelledby="ai-code-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ai-code-title">Open-source code</h2></div>
+      <a class="ai-section-link" href="https://github.com/Maize-Genetics-and-Genomics-Database" target="_blank" rel="noopener">All MaizeGDB repositories <span aria-hidden="true">&nearr;</span></a>
     </div>
-    <div class="ai-card-grid ai-card-grid-code">
-      <article class="ai-resource-card ai-code-card" data-ai-resource data-ai-category="code" data-ai-search="SNPversity source VCF variant effect scores PlantCAD ESM variants">
-        <h3>SNPversity 2.0</h3>
-        <p>VCF processing and integration of variant-effect scores.</p>
-        <a href="https\://github.com/Maize-Genetics-and-Genomics-Database/SNPversity2.0" target="_blank" rel="noopener">View on GitHub &nearr;</a>
-      </article>
-
-      <article class="ai-resource-card ai-code-card" data-ai-resource data-ai-category="code" data-ai-search="Plant Embedding Generator protein language model homology search">
-        <h3>Plant Embedding Generator</h3>
-        <p>Protein-language-model embeddings and homology-search workflows.</p>
-        <a href="https\://github.com/Maize-Genetics-and-Genomics-Database/Plant-Embedding-Generator" target="_blank" rel="noopener">View on GitHub &nearr;</a>
-      </article>
-
-      <article class="ai-resource-card ai-code-card" data-ai-resource data-ai-category="code" data-ai-search="PlantCAD SeqTracks DNA embeddings DNABERT variant scoring visualization">
-        <h3>PlantCAD SeqTracks</h3>
-        <p>DNA embeddings, variant scoring, and model-output visualization notebooks.</p>
-        <a href="https\://github.com/Maize-Genetics-and-Genomics-Database/PlantCAD-SeqTracks" target="_blank" rel="noopener">View on GitHub &nearr;</a>
-      </article>
-
-      <article class="ai-resource-card ai-code-card" data-ai-resource data-ai-category="code" data-ai-search="FASSO functional annotation Diamond Foldseek FATCAT UniProt ortholog">
-        <h3>FASSO</h3>
-        <p>Functional annotation from combined sequence and structure orthology.</p>
-        <a href="https\://github.com/Maize-Genetics-and-Genomics-Database/FASSO" target="_blank" rel="noopener">View on GitHub &nearr;</a>
-      </article>
-
-      <article class="ai-resource-card ai-code-card" data-ai-resource data-ai-category="code" data-ai-search="PanEffect source variant effects pangenome amino acid substitutions">
-        <h3>PanEffect</h3>
-        <p>A JavaScript framework for exploring predicted effects across a pan-genome.</p>
-        <a href="https\://github.com/Maize-Genetics-and-Genomics-Database/PanEffect" target="_blank" rel="noopener">View on GitHub &nearr;</a>
-      </article>
+    <div class="ai-card-grid">
+      $(code_cards)
     </div>
   </section>
 
-  <div id="ai-no-results" class="mgdb-empty" hidden>
-    <h3>No resources matched that search</h3>
-    <p>Try searching with a broader keyword or switching to 'All'.</p>
-    <button class="mgdb-button mgdb-button-secondary" id="ai-no-results-reset" type="button">Reset resource finder</button>
-  </div>
-
-  <section id="ai-publications" class="ai-section ai-publications" aria-labelledby="ai-publications-title">
-    <div class="ai-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Methods &amp; context</span>
-        <h2 id="ai-publications-title">Key publications</h2>
-      </div>
-      <p>Curated scientific publications detailing the AI models, validation frameworks, and datasets behind MaizeGDB resources.</p>
+  <!-- ── Publications ─────────────────────────────────────────────────────── -->
+  <section id="ai-publications" aria-labelledby="ai-publications-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ai-publications-title">Publications</h2></div>
     </div>
-
-    <div class="ai-publications-list">
-      <article class="reference-result-card is-editorial-pick">
-        <div class="reference-result-body">
-          <div class="reference-result-meta">
-            <span>2026</span>
-            <span>Journal article</span>
-            <span class="mgdb-pill mgdb-pill-ok">&starf; Featured publication</span>
-            <span>DOI</span>
-          </div>
-          <h3><a href="https\://doi.org/10.1093/genetics/iyag005" target="_blank" rel="noopener">Delivering artificial intelligence&ndash;ready genomics with the Maize Genetics and Genomics Database</a></h3>
-          <p class="reference-result-authors">Haley OC, Tibbs-Cortes LE, Harding SF, Poretsky E, Cannon EK, Portwood JL, Gardiner JM, Sen TZ, Kim H, Woodhouse MR, Andorf CM.</p>
-          <p class="reference-result-citation"><i>Genetics</i>, iyag005 &middot; doi&#58;10.1093/genetics/iyag005</p>
-          <div class="reference-result-links">
-            <a href="https\://doi.org/10.1093/genetics/iyag005" target="_blank" rel="noopener">Read paper &nearr;</a>
-            <button class="reference-copy-id ai-copy-citation" type="button" data-copy-target="ai-citation-haley">Copy citation</button>
-            <button class="reference-copy-id ai-copy-doi" type="button" data-copy-value="10.1093/genetics/iyag005">Copy DOI</button>
-          </div>
-        </div>
-        <div id="ai-citation-haley" class="mgdb-visually-hidden">Haley OC, Tibbs-Cortes LE, Harding SF, Poretsky E, Cannon EK, Portwood JL, Gardiner JM, Sen TZ, Kim H, Woodhouse MR, Andorf CM. &#40;2026&#41; Delivering artificial intelligence–ready genomics with the Maize Genetics and Genomics Database. Genetics, iyag005. doi:10.1093/genetics/iyag005</div>
-      </article>
-
-      <article class="reference-result-card">
-        <div class="reference-result-body">
-          <div class="reference-result-meta">
-            <span>2023</span>
-            <span>Feature store</span>
-            <span>Journal article</span>
-            <span>DOI</span>
-          </div>
-          <h3><a href="https\://doi.org/10.1093/database/baad078" target="_blank" rel="noopener">Maize Feature Store&#58; A centralized resource to manage and analyze curated maize multi-omics features</a></h3>
-          <p class="reference-result-authors">Sen S, Woodhouse MR, Portwood JL, Andorf CM.</p>
-          <p class="reference-result-citation"><i>Database</i>, 2023&#58;baad078 &middot; doi&#58;10.1093/database/baad078</p>
-          <div class="reference-result-links">
-            <a href="https\://doi.org/10.1093/database/baad078" target="_blank" rel="noopener">Read paper &nearr;</a>
-            <button class="reference-copy-id ai-copy-citation" type="button" data-copy-target="ai-citation-mfs">Copy citation</button>
-            <button class="reference-copy-id ai-copy-doi" type="button" data-copy-value="10.1093/database/baad078">Copy DOI</button>
-          </div>
-        </div>
-        <div id="ai-citation-mfs" class="mgdb-visually-hidden">Sen S, Woodhouse MR, Portwood JL, Andorf CM. &#40;2023&#41; Maize Feature Store: A centralized resource to manage and analyze curated maize multi-omics features. Database, 2023:baad078. doi:10.1093/database/baad078</div>
-      </article>
-
-      <article class="reference-result-card">
-        <div class="reference-result-body">
-          <div class="reference-result-meta">
-            <span>2023</span>
-            <span>Variant effects</span>
-            <span>Preprint</span>
-            <span>DOI</span>
-          </div>
-          <h3><a href="https\://doi.org/10.1101/2023.09.25.559155" target="_blank" rel="noopener">PanEffect&#58; A pan-genome visualization tool for variant effects in maize</a></h3>
-          <p class="reference-result-authors">Andorf CM, Haley OC, Hayford RK, Portwood JL, Sen S, Cannon EK, Gardiner JM, Woodhouse MR.</p>
-          <p class="reference-result-citation"><i>bioRxiv</i> &middot; 2023.09.25.559155 &middot; doi&#58;10.1101/2023.09.25.559155</p>
-          <div class="reference-result-links">
-            <a href="https\://doi.org/10.1101/2023.09.25.559155" target="_blank" rel="noopener">Read paper &nearr;</a>
-            <button class="reference-copy-id ai-copy-citation" type="button" data-copy-target="ai-citation-paneffect">Copy citation</button>
-            <button class="reference-copy-id ai-copy-doi" type="button" data-copy-value="10.1101/2023.09.25.559155">Copy DOI</button>
-          </div>
-        </div>
-        <div id="ai-citation-paneffect" class="mgdb-visually-hidden">Andorf CM, Haley OC, Hayford RK, Portwood JL, Sen S, Cannon EK, Gardiner JM, Woodhouse MR. &#40;2023&#41; PanEffect: A pan-genome visualization tool for variant effects in maize. bioRxiv. doi:10.1101/2023.09.25.559155</div>
-      </article>
-
-      <article class="reference-result-card">
-        <div class="reference-result-body">
-          <div class="reference-result-meta">
-            <span>2023</span>
-            <span>Protein structure</span>
-            <span>Journal article</span>
-            <span>DOI</span>
-          </div>
-          <h3><a href="https\://doi.org/10.1093/genetics/iyad016" target="_blank" rel="noopener">Maize Protein Structure Resources at the Maize Genetics and Genomics Database</a></h3>
-          <p class="reference-result-authors">Woodhouse MR, Portwood JL, Sen S, Hayford RK, Gardiner JM, Cannon EK, Harper LC, Andorf CM.</p>
-          <p class="reference-result-citation"><i>Genetics</i>, 224&#40;3&#41;&#58;iyad016 &middot; doi&#58;10.1093/genetics/iyad016</p>
-          <div class="reference-result-links">
-            <a href="https\://doi.org/10.1093/genetics/iyad016" target="_blank" rel="noopener">Read paper &nearr;</a>
-            <button class="reference-copy-id ai-copy-citation" type="button" data-copy-target="ai-citation-structure">Copy citation</button>
-            <button class="reference-copy-id ai-copy-doi" type="button" data-copy-value="10.1093/genetics/iyad016">Copy DOI</button>
-          </div>
-        </div>
-        <div id="ai-citation-structure" class="mgdb-visually-hidden">Woodhouse MR, Portwood JL, Sen S, Hayford RK, Gardiner JM, Cannon EK, Harper LC, Andorf CM. &#40;2023&#41; Maize Protein Structure Resources at the Maize Genetics and Genomics Database. Genetics, 224&#40;3&#41;:iyad016. doi:10.1093/genetics/iyad016</div>
-      </article>
-
-      <article class="reference-result-card">
-        <div class="reference-result-body">
-          <div class="reference-result-meta">
-            <span>2022</span>
-            <span>Functional annotation</span>
-            <span>Preprint</span>
-            <span>DOI</span>
-          </div>
-          <h3><a href="https\://doi.org/10.1101/2022.11.10.516002" target="_blank" rel="noopener">FASSO&#58; An AlphaFold based method to assign functional annotations</a></h3>
-          <p class="reference-result-authors">Andorf CM, Sen S, Hayford RK, Portwood JL, Cannon EK, Harper LC, Gardiner JM, Sen TZ, Woodhouse MR.</p>
-          <p class="reference-result-citation"><i>bioRxiv</i> &middot; 2022.11.10.516002 &middot; doi&#58;10.1101/2022.11.10.516002</p>
-          <div class="reference-result-links">
-            <a href="https\://doi.org/10.1101/2022.11.10.516002" target="_blank" rel="noopener">Read paper &nearr;</a>
-            <button class="reference-copy-id ai-copy-citation" type="button" data-copy-target="ai-citation-fasso">Copy citation</button>
-            <button class="reference-copy-id ai-copy-doi" type="button" data-copy-value="10.1101/2022.11.10.516002">Copy DOI</button>
-          </div>
-        </div>
-        <div id="ai-citation-fasso" class="mgdb-visually-hidden">Andorf CM, Sen S, Hayford RK, Portwood JL, Cannon EK, Harper LC, Gardiner JM, Sen TZ, Woodhouse MR. &#40;2022&#41; FASSO: An AlphaFold based method to assign functional annotations. bioRxiv. doi:10.1101/2022.11.10.516002</div>
-      </article>
-
-      <article class="reference-result-card">
-        <div class="reference-result-body">
-          <div class="reference-result-meta">
-            <span>2022</span>
-            <span>Machine learning</span>
-            <span>Journal article</span>
-            <span>DOI</span>
-          </div>
-          <h3><a href="https\://doi.org/10.3389/frai.2022.830170" target="_blank" rel="noopener">Predicting Tissue-Specific mRNA and Protein Abundance in Maize</a></h3>
-          <p class="reference-result-authors">Cho KT, Sen TZ, Andorf CM.</p>
-          <p class="reference-result-citation"><i>Frontiers in Artificial Intelligence</i>, 5&#58;830170 &middot; doi&#58;10.3389/frai.2022.830170</p>
-          <div class="reference-result-links">
-            <a href="https\://doi.org/10.3389/frai.2022.830170" target="_blank" rel="noopener">Read paper &nearr;</a>
-            <button class="reference-copy-id ai-copy-citation" type="button" data-copy-target="ai-citation-expression">Copy citation</button>
-            <button class="reference-copy-id ai-copy-doi" type="button" data-copy-value="10.3389/frai.2022.830170">Copy DOI</button>
-          </div>
-        </div>
-        <div id="ai-citation-expression" class="mgdb-visually-hidden">Cho KT, Sen TZ, Andorf CM. &#40;2022&#41; Predicting Tissue-Specific mRNA and Protein Abundance in Maize. Frontiers in Artificial Intelligence, 5:830170. doi:10.3389/frai.2022.830170</div>
-      </article>
+    <div class="ai-pub-list">
+      $(publication_cards)
     </div>
   </section>
 
+  <!-- ── Metrics ──────────────────────────────────────────────────────────── -->
+  <section id="ai-metrics" aria-labelledby="ai-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ai-metrics-title">Metrics</h2></div>
+    </div>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Analysis tools</h3>
+          <span class="mgdb-metric-badge">Applications</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(metric_tools)</strong>
+        </div>
+        <p class="mgdb-metric-description">Interactive tools for variants, structures, function, and gene features.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>AI-ready datasets</h3>
+          <span class="mgdb-metric-badge">Downloads</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(metric_data)</strong>
+        </div>
+        <p class="mgdb-metric-description">Feature vectors, structures, embeddings, scores, and annotations.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Code repositories</h3>
+          <span class="mgdb-metric-badge">Open source</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(metric_code)</strong>
+        </div>
+        <p class="mgdb-metric-description">Public workflows that produced the datasets listed above.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Publications</h3>
+          <span class="mgdb-metric-badge">Methods</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(metric_pubs)</strong>
+        </div>
+        <p class="mgdb-metric-description">Peer-reviewed papers and preprints describing these methods.</p>
+      </article>
+    </div>
+
+    <figure class="mgdb-figure ai-figure">
+      <h3>Resources by data type</h3>
+      <div class="mgdb-chart" id="ai-topic-chart" role="img"
+           aria-label="Stacked horizontal bar chart counting the analysis tools, datasets, code repositories, and publications that cover each data type">
+        <div class="mgdb-chart-fallback">Loading the data type breakdown&hellip;</div>
+      </div>
+      <figcaption>Each resource is counted once per data type it covers, so the bars total more than the $(metric_total) resources in the catalog. Select a bar to search that data type.</figcaption>
+    </figure>
+
+    <div class="mgdb-table-scroll ai-figure-table">
+      <table class="mgdb-table" id="ai-topic-table">
+        <caption>
+          Resources by data type
+          <span class="mgdb-muted">The values behind the chart above.</span>
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Data type</th>
+            <th scope="col" class="mgdb-numeric">Tools</th>
+            <th scope="col" class="mgdb-numeric">Data</th>
+            <th scope="col" class="mgdb-numeric">Code</th>
+            <th scope="col" class="mgdb-numeric">Publications</th>
+            <th scope="col" class="mgdb-numeric">Total</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── Related resources ────────────────────────────────────────────────── -->
   <section id="ai-related" aria-labelledby="ai-related-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Connected tools</span>
-        <h2 id="ai-related-title">Related resources</h2>
-      </div>
-      <p>Explore related computational tools, variant platforms, and molecular structure archives at MaizeGDB.</p>
+      <div><h2 id="ai-related-title">Related resources</h2></div>
     </div>
 
     <div class="mgdb-resource-panel">
       <div class="mgdb-resource-list">
-        <a href="https\://snptools.maizegdb.org/" target="_blank" rel="noopener">
-          <strong>SNPTools Workspace</strong>
-          <span>Interactive SNP discovery, variant effects, and multi-accession comparison</span>
-          <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+        <a href="/data_center/genome">
+          <strong>Genome Data Hub</strong>
+          <span>Hosted genome assemblies across maize and its wild relatives, with assembly statistics</span>
+          <span class="mgdb-resource-badge">Internal</span>
         </a>
         <a href="/pan_gene_center/pan_gene">
           <strong>Pan-Gene Data Hub</strong>
-          <span>Explore syntenic pan-genes, core/dispensable loci, and structural variations</span>
+          <span>Syntenic pan-genes, core and dispensable loci, and structural variation across the pan-genome</span>
           <span class="mgdb-resource-badge">Internal</span>
         </a>
-        <a href="/data_center/protein_structure">
-          <strong>Protein Structure Center</strong>
-          <span>AlphaFold2 and ESMFold 3D protein structures with Foldseek structural search</span>
+        <a href="/data_center/variation">
+          <strong>Variations &amp; Alleles Data Hub</strong>
+          <span>Curated variations, gene mutations, and allele descriptors underlying the variant effect scores</span>
           <span class="mgdb-resource-badge">Internal</span>
         </a>
-        <a href="/data_center/genome">
-          <strong>Genome Data Hub</strong>
-          <span>160 hosted genome assemblies across 31 maize and wild relative species</span>
-          <span class="mgdb-resource-badge">Internal</span>
+        <a href="https://download.maizegdb.org/" target="_blank" rel="noopener">
+          <strong>MaizeGDB downloads</strong>
+          <span>Bulk sequence, annotation, expression, and function files, including the sets listed on this page</span>
+          <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
         </a>
         <a href="/cite">
-          <strong>How to Cite MaizeGDB</strong>
-          <span>Citation formats, primary database manuscripts, and publication bibliography</span>
+          <strong>How to cite MaizeGDB</strong>
+          <span>Citation formats, primary database manuscripts, and the publication bibliography</span>
           <span class="mgdb-resource-badge">Internal</span>
         </a>
       </div>
     </div>
   </section>
+
+  <script type="application/json" id="ai-search-index">$(search_index)</script>
+  <script type="application/json" id="ai-chart-data">$(chart_data)</script>
 </main>
 )

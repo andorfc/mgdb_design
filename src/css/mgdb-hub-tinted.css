@@ -1,0 +1,340 @@
+/* ==========================================================================
+   Data hub, tinted ground — comparison variant
+
+   Loaded by /data_center/map2, /data_center/stock2 and /genome2 -- the tinted
+   halves of the comparison pairs -- and by /ai, which is built on this ground
+   outright rather than as a variant of an untinted page.
+
+   The idea is SNPTools': the page sits on a pale blue ground and every element
+   on it is white, so each panel reads as a card lifted off the page rather than
+   as a section of one continuous sheet. The three values below are sampled from
+   snptools.maizegdb.org rather than guessed:
+
+     ground   #f4f7fc   its body background
+     surface  #ffffff   its cards
+     line     #e3e9f2   its card borders
+
+   The shell chrome, the hero, the buttons and every ink are left alone. This
+   changes what the page sits on and what its boxes are made of, nothing else.
+   ========================================================================== */
+
+:root {
+  --hub-ground: #f4f7fc;
+  --hub-surface: #ffffff;
+  --hub-line: #e3e9f2;
+  --hub-line-soft: #eef2f8;
+  /* Blue-grey rather than the warm shadow the default ground uses, so the lift
+     reads against the tint instead of muddying it. */
+  --hub-shadow: 0 1px 2px rgba(16, 30, 54, .06), 0 1px 3px rgba(16, 30, 54, .08);
+  --hub-shadow-lift: 0 2px 4px rgba(16, 30, 54, .07), 0 4px 12px rgba(16, 30, 54, .08);
+}
+
+/* The modern shell paints #content white; that is the sheet the tint replaces. */
+#content { background: var(--hub-ground); }
+
+/* --------------------------------------------------------------------------
+   Every box on the page becomes a white card on the tint
+   -------------------------------------------------------------------------- */
+
+.mgdb-genomes-page .genome-stats-app,
+.mgdb-genomes-page .genome-stats-table-wrap,
+.mgdb-genomes-page .genome-stats-controls,
+.mgdb-genomes-page .genome-stats-load-status,
+.mgdb-genomes-page .mgdb-search,
+.mgdb-stock-page .stock-search-panel,
+.mgdb-stock-page .stock-download-card,
+.mgdb-stock-page .stock-chart-panel,
+.mgdb-stock-page .stock-query-control,
+.mgdb-map-page .map-search-panel,
+.mgdb-map-page .map-key-card,
+.mgdb-map-page .map-download-card,
+.mgdb-map-page .map-table-wrap,
+.mgdb-map-page .map-adv-accordion,
+.mgdb-ai-page .ai-search-panel,
+.mgdb-ai-page .ai-card,
+.mgdb-ai-page .ai-pub,
+.mgdb-card,
+.mgdb-metric,
+.mgdb-panel,
+.mgdb-figure,
+.mgdb-map-page .mgdb-map-figure-wide,
+.mgdb-table-wrap,
+.mgdb-table-scroll {
+  border-color: var(--hub-line);
+  background: var(--hub-surface);
+  box-shadow: var(--hub-shadow);
+}
+
+/* The search panel is the one element that was already tinted (cream). It is
+   the busiest box on the page, so it keeps a slightly stronger lift. */
+.mgdb-map-page .map-search-panel,
+.mgdb-stock-page .stock-search-panel,
+.mgdb-ai-page .ai-search-panel,
+.mgdb-genomes-page .mgdb-search {
+  border-radius: 14px;
+  box-shadow: var(--hub-shadow-lift);
+}
+
+/* Cards that sit inside another card get the line but not a second shadow,
+   or the stack reads as embossed. */
+.mgdb-map-page .map-search-panel .map-adv-accordion,
+.mgdb-map-page .map-search-panel .map-query-control,
+.mgdb-ai-page .ai-search-panel .ai-adv,
+.mgdb-ai-page .ai-search-panel .ai-query-control,
+.mgdb-resource-panel .mgdb-resource-list > a {
+  border-color: var(--hub-line);
+  background: var(--hub-surface);
+  box-shadow: none;
+}
+
+/* The ten chromosome cards carry a deep green edge of their own. That is the
+   page's accent, not a default line, so it stays -- the card still lifts, it
+   just lifts in green rather than blue-grey. */
+.mgdb-map-page .map-chr-card {
+  background: var(--hub-surface);
+  box-shadow: var(--hub-shadow);
+}
+
+/* Radii: SNPTools runs 12–14px, which is what makes its cards read as cards.
+   The default set here is 10px on most boxes. */
+.mgdb-map-page .map-key-card,
+.mgdb-map-page .map-chr-card,
+.mgdb-map-page .map-download-card,
+.mgdb-map-page .map-table-wrap,
+.mgdb-card,
+.mgdb-figure,
+.mgdb-map-page .mgdb-map-figure-wide { border-radius: 12px; }
+
+/* Hairlines inside a card follow the same blue-grey, or the warm default line
+   shows against the cool surfaces. */
+.mgdb-genomes-page .genome-stats-controls,
+.mgdb-genomes-page .genome-stats-toggle-row,
+.mgdb-stock-page .stock-example-row,
+.mgdb-stock-page .stock-results-controls,
+.mgdb-stock-page .stock-pagination,
+.mgdb-map-page .map-chr-actions,
+.mgdb-map-page .map-example-row,
+.mgdb-map-page .map-adv-body,
+.mgdb-map-page .map-adv-actions,
+.mgdb-map-page .map-pagination,
+.mgdb-ai-page .ai-example-row,
+.mgdb-ai-page .ai-adv-body,
+.mgdb-ai-page .ai-card-links,
+.mgdb-ai-page .ai-pub-links,
+.mgdb-ai-page .ai-results-heading,
+.mgdb-ai-page .ai-pagination,
+.mgdb-section-heading,
+.mgdb-table th,
+.mgdb-table td { border-color: var(--hub-line-soft); }
+
+/* The hero is the page's one filled panel and would fight a white ground, so
+   it keeps its wash and takes the cool line and the lift instead. */
+.mgdb-page .mgdb-hero {
+  border-color: var(--hub-line);
+  box-shadow: var(--hub-shadow-lift);
+}
+
+/* Zebra striping was set against the warm ground. */
+.mgdb-table tbody tr:nth-child(even) { background: #fafbfe; }
+
+/* The shared hover is `.mgdb-table tbody tr:hover`, the same specificity as the
+   zebra rule above and earlier in the cascade -- so without this every even row
+   silently lost its hover state the moment this sheet was loaded. Restated here
+   rather than in mgdb-modern.css, because the colour has to answer the tint. */
+.mgdb-table tbody tr:hover,
+.mgdb-table tbody tr:nth-child(even):hover { background: var(--mgdb-green-soft); }
+
+/* The sticky tab bar is navigation, not a record, so it should not read as
+   another card. White on the tint with a radius and a shadow gave it an outline
+   it had not asked for. It takes the ground instead and marks its own edge with
+   a rule -- still opaque, because it is sticky and content scrolls under it. */
+.mgdb-page .mgdb-section-tabs {
+  border-bottom: 1px solid var(--hub-line);
+  background: var(--hub-ground);
+  box-shadow: none;
+}
+
+/* --------------------------------------------------------------------------
+   Form rows: one baseline for the labels, one height for the controls
+
+   Both search rows were ragged, and for the same two reasons.
+
+   The labels wrap to one line or two depending on their text -- "Locus filter"
+   against "Chromosome / linkage group" -- so each field's control started
+   wherever its own label happened to end. In the advanced row that put the
+   three controls on three different lines \(1052, 1031, 1031\). Reserving a
+   fixed two-line band and bottom-aligning the label inside it gives every
+   control the same starting line.
+
+   And the controls were not the same height: `.map-field select` is 44px, the
+   tap target, while `.map-field input[type="text"]` was 40px. Everything in
+   these rows is now 44px, which also brings the text inputs up to the tap
+   target rather than 4px under it.
+
+   The grids were `auto-fit`, which made five tracks for three fields in the
+   main row and four for three in the advanced one, leaving dead columns on the
+   right. Both are now declared to the number of fields they hold.
+   -------------------------------------------------------------------------- */
+
+.mgdb-map-page .map-search-form {
+  grid-template-columns: minmax(220px, 1fr) minmax(260px, 1fr) minmax(190px, auto);
+  align-items: start;
+}
+
+.mgdb-map-page .map-adv-body {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+}
+
+/* 3.5em is two lines of the label's own 12px type. A one-line label sits on
+   the same baseline as a two-line one instead of floating up. */
+.mgdb-map-page .map-search-form > .map-field > label:first-child,
+.mgdb-map-page .map-search-form > .map-field-checkbox > label:first-child,
+.mgdb-map-page .map-adv-body > .map-field > label:first-child {
+  display: flex;
+  min-height: 3.5em;
+  align-items: flex-end;
+  margin: 0;
+}
+
+.mgdb-map-page .map-field > select,
+.mgdb-map-page .map-field > input,
+.mgdb-map-page .map-field > .map-checkbox-label {
+  box-sizing: border-box;
+  min-height: var(--mgdb-tap-target);
+  height: var(--mgdb-tap-target);
+}
+
+/* The button has no label above it, so it bottom-aligns with the fields rather
+   than reserving a band of its own -- a fixed top padding would be in the
+   button's font size, not the label's, and land 10px low. */
+.mgdb-map-page .map-search-submit { align-self: end; }
+
+.mgdb-map-page .map-search-submit .mgdb-button {
+  min-height: var(--mgdb-tap-target);
+  height: var(--mgdb-tap-target);
+}
+
+/* With its own column the checkbox no longer has to wrap to two lines inside a
+   44px box. */
+.mgdb-map-page .map-field-checkbox > .map-checkbox-label { white-space: nowrap; }
+
+/* --------------------------------------------------------------------------
+   Related resources keeps its green wash
+
+   It was caught by the white-surface sweep above. It is the page's closing
+   panel and the one place the green belongs, so it goes back to the gradient
+   the design system gives it -- the links inside stay white, which is what
+   makes them read as cards on it.
+   -------------------------------------------------------------------------- */
+
+.mgdb-resource-panel {
+  border-color: #cfe3d6;
+  background: linear-gradient(115deg, #f4faf6 0%, var(--mgdb-green-soft) 46%, #e4f0e6 100%);
+  box-shadow: 0 1px 2px rgba(23, 70, 52, .05);
+}
+
+/* --------------------------------------------------------------------------
+   Metric cards take a colored top edge
+
+   The homepage marks its metrics with a colored spine on the left. Same idea
+   here, moved to the top edge. The markup carries no tone classes, so the
+   rotation is positional; it is decoration either way, and each card still
+   carries its own heading and figure.
+   -------------------------------------------------------------------------- */
+
+.mgdb-metric { border-top-width: 4px; }
+.mgdb-metric:nth-child(4n+1) { border-top-color: var(--mgdb-green); }
+.mgdb-metric:nth-child(4n+2) { border-top-color: var(--mgdb-gold); }
+.mgdb-metric:nth-child(4n+3) { border-top-color: var(--mgdb-status-info); }
+.mgdb-metric:nth-child(4n+4) { border-top-color: var(--mgdb-burgundy); }
+
+/* --------------------------------------------------------------------------
+   No section descriptions
+
+   The line that sat opposite each section heading. Six of them, all in the
+   right half. The search panel's sub-line sits under its own heading rather
+   than opposite it, and the results count is a live region, so neither is
+   caught by this.
+   -------------------------------------------------------------------------- */
+
+.mgdb-section-heading > p { display: none; }
+
+/* --------------------------------------------------------------------------
+   Where a tab jump lands
+
+   Clicking a section tab left a band of empty ground above the heading -- most
+   visible on "Key genetics & physical maps catalog", the second tab.
+
+   The shared rule is `.mgdb-page > section[id] { scroll-margin-top: 4.5rem }`,
+   a flat 80px. The sticky bar this is meant to clear is not 80px: it is 57px
+   with the tabs on one row and 105px when they wrap to two, which happens at
+   1170px and below. So the single value is wrong in both directions -- 23px of
+   dead space on a wide screen, and on a narrow one the heading lands 25px
+   *under* the bar it was supposed to clear.
+
+   Matched to the bar, plus 8px so the heading is not flush against it.
+   -------------------------------------------------------------------------- */
+
+.mgdb-page > section[id] { scroll-margin-top: 65px; }
+
+@media (max-width: 1170px) {
+  .mgdb-page > section[id] { scroll-margin-top: 113px; }
+}
+
+/* --------------------------------------------------------------------------
+   Related resources: the Internal / External chip sits on the floor
+
+   The chip follows the description in the card's flex column, so it landed
+   wherever that description happened to end -- 17px from the bottom on three
+   cards, 39px on the two with shorter text.
+
+   The slack goes to the description rather than to the chip's own margin. With
+   `margin-top: auto` on the chip the gap above it collapsed to 0 on any card
+   whose description ran the full three lines, which is most of them -- the
+   chip ended up touching the text. Letting the description grow instead means
+   the chip keeps a real margin on every card and still lands on the floor,
+   since the cards in a row are all the same height. Putting the space on the
+   card's `gap` would have worked too, but it also pushes the title and
+   description apart, from 8px to 20px.
+   -------------------------------------------------------------------------- */
+
+.mgdb-resource-list > a > span:not(.mgdb-resource-badge) {
+  flex: 1 1 auto;
+}
+
+.mgdb-resource-list > a > .mgdb-resource-badge {
+  margin-top: var(--mgdb-space-3);
+  align-self: flex-start;
+}
+
+/* --------------------------------------------------------------------------
+   The source-note strip loses its fill
+
+   `.stock-sources` -- the row holding the MaizeGDB / GRIN chips and the line
+   about GRIN mirroring the USDA collection -- sat on the warm cream surface,
+   which was the one panel still reading as a filled block on the tint. The
+   chips inside it carry their own borders, so the row reads fine without it.
+   -------------------------------------------------------------------------- */
+
+.mgdb-stock-page .stock-sources {
+  background: transparent;
+  padding-inline: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Assembly statistics is a section, not a card
+
+   `.genome-stats-section` is the <section> element itself. It was in the
+   white-surface list above, so the whole block became one white slab with a
+   shadow around it and the ground never showed between its parts -- every
+   other section on the page is transparent. It goes back to transparent, and
+   the boxes inside it \(the controls panel, the load status, the table\) take
+   the white treatment instead, which is where it belonged.
+   -------------------------------------------------------------------------- */
+
+.mgdb-genomes-page .genome-stats-section {
+  background: transparent;
+  box-shadow: none;
+}
+

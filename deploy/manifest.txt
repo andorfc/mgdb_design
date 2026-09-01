@@ -4,6 +4,10 @@
 src/css/mgdb-modern.css                       css/mgdb-modern.css
 src/js/mgdb-modern.js                         js/mgdb-modern.js
 
+# Data Hub shell: the pale blue ground, white section cards, coloured metric
+# edges and aligned form rows shared by every hub landing page.
+src/css/mgdb-hub.css                          css/mgdb-hub.css
+
 # Modernized document shell (adds opt-in modern(): DOCTYPE, viewport, body class)
 src/lib/Bauplan.php                           lib/Bauplan.php
 
@@ -140,6 +144,8 @@ src/controllers/cite.php                         controllers/cite.php
 # Genome Center — replaces the bare /genome route in place
 src/templates/static/mgdb_genome_center.bau      templates/static/mgdb_genome_center.bau
 src/js/mgdb-genome-center.js                     js/mgdb-genome-center.js
+src/data/genome/genome_assembly_stats_demo.json  data/genome/genome_assembly_stats_demo.json
+src/data/genome/genome_assembly_stats_demo.js    data/genome/genome_assembly_stats_demo.js
 src/controllers/genome/genome_center_modern.php  controllers/genome/genome_center_modern.php
 src/controllers/genome.php                       controllers/genome.php
 
@@ -148,6 +154,7 @@ src/templates/static/mgdb_ai.bau                 templates/static/mgdb_ai.bau
 src/css/mgdb-ai.css                              css/mgdb-ai.css
 src/js/mgdb-ai.js                                js/mgdb-ai.js
 src/controllers/ai.php                           controllers/ai.php
+src/data/ai/ai_resources.json                    data/ai/ai_resources.json
 
 # Reference literature search — backend
 src/search/reference/reference_search_api.php    search/reference/reference_search_api.php
@@ -176,6 +183,24 @@ src/css/mgdb-maize-meeting.css                   css/mgdb-maize-meeting.css
 src/js/mgdb-maize-meeting.js                     js/mgdb-maize-meeting.js
 src/pages/maize_meeting/index.php                maize_meeting/index.php
 src/images/maize_meeting/CREDITS.json            images/maize_meeting/CREDITS.json
+
+# Maize Newsletter archive — replaces /mnl in place. The legacy controller and
+# its community/ templates are untouched and archived in legacy/mnl/; rollback
+# is deleting controllers/mnl.php. The volume list is final and lives in the
+# controller: the newsletter stopped publishing after volume 94 in 2020.
+src/controllers/mnl.php                           controllers/mnl.php
+src/templates/static/mgdb_mnl.bau                 templates/static/mgdb_mnl.bau
+src/css/mgdb-mnl.css                              css/mgdb-mnl.css
+src/js/mgdb-mnl.js                                js/mgdb-mnl.js
+
+# News archive — replaces /whatsnew in place. The legacy controller and its
+# about/ templates are untouched and archived in legacy/whatsnew/; rollback is
+# deleting controllers/whatsnew.php. data/news.xml is curator-maintained on the
+# server and is NOT deployed from here.
+src/controllers/whatsnew.php                      controllers/whatsnew.php
+src/templates/static/mgdb_whatsnew.bau            templates/static/mgdb_whatsnew.bau
+src/css/mgdb-whatsnew.css                         css/mgdb-whatsnew.css
+src/js/mgdb-whatsnew.js                           js/mgdb-whatsnew.js
 
 # Contact — replaces /contact in place
 src/templates/static/mgdb_contact.bau             templates/static/mgdb_contact.bau
@@ -221,6 +246,8 @@ src/include/api/v1/records/gene.php              include/api/v1/records/gene.php
 src/include/stock_record_lib.php                 include/stock_record_lib.php
 src/templates/static/mgdb_stock_record.bau       templates/static/mgdb_stock_record.bau
 src/css/mgdb-stock-record.css                    css/mgdb-stock-record.css
+src/images/grin/GGlogo-color-sm.gif              images/grin/GGlogo-color-sm.gif
+src/images/stock/mgcsc-ear.png                   images/stock/mgcsc-ear.png
 src/js/mgdb-stock-record.js                      js/mgdb-stock-record.js
 src/controllers/data_center/stock_record_modern.php  controllers/data_center/stock_record_modern.php
 
@@ -239,6 +266,45 @@ src/css/mgdb-gene-record.css                     css/mgdb-gene-record.css
 src/js/mgdb-gene-record.js                       js/mgdb-gene-record.js
 src/controllers/gene_center/gene_record_modern.php  controllers/gene_center/gene_record_modern.php
 src/controllers/gene_center.php                  controllers/gene_center.php
+
+# Gene Data Hub landing page — replaces /gene_center/gene
+src/search/gene/gene_search_lib.php              search/gene/gene_search_lib.php
+src/search/gene/gene_search_api.php              search/gene/gene_search_api.php
+src/include/gene_hub_lib.php                     include/gene_hub_lib.php
+src/templates/static/mgdb_gene.bau               templates/static/mgdb_gene.bau
+src/css/mgdb-gene.css                            css/mgdb-gene.css
+src/js/mgdb-gene.js                              js/mgdb-gene.js
+src/controllers/gene_center/gene_search_modern.php  controllers/gene_center/gene_search_modern.php
+
+# Bin Viewer — replaces /bin_viewer in all three modes
+# bin_geometry.json and core_bin_markers.json are generated once by
+# tools/gen_bin_data.py from the legacy templates; regenerate only if those
+# change. The -nomaps section templates are copies of the legacy ones with the
+# image-map partial removed, selected by nomaps=1.
+src/data/bin_viewer/bin_geometry.json            data/bin_viewer/bin_geometry.json
+src/data/bin_viewer/core_bin_markers.json        data/bin_viewer/core_bin_markers.json
+src/include/bin_viewer_lib.php                   include/bin_viewer_lib.php
+src/templates/static/mgdb_bin_viewer.bau         templates/static/mgdb_bin_viewer.bau
+src/templates/static/mgdb_bin_record.bau         templates/static/mgdb_bin_record.bau
+src/templates/tools/bin_viewer-sections-nomaps.bau  templates/tools/bin_viewer-sections-nomaps.bau
+src/templates/tools/chromosome-sections-nomaps.bau  templates/tools/chromosome-sections-nomaps.bau
+src/css/mgdb-bin-viewer.css                      css/mgdb-bin-viewer.css
+src/js/mgdb-bin-viewer.js                        js/mgdb-bin-viewer.js
+src/controllers/tools/bin_viewer_modern.php      controllers/tools/bin_viewer_modern.php
+src/controllers/bin_viewer.php                   controllers/bin_viewer.php
+
+# Hot New Papers — the Editorial Board reading list, replaces /hot_new_papers
+# and /community/hot_new_papers
+src/search/hot_new_papers/hot_new_papers_lib.php  search/hot_new_papers/hot_new_papers_lib.php
+src/search/hot_new_papers/hot_new_papers_api.php  search/hot_new_papers/hot_new_papers_api.php
+src/templates/static/mgdb_hot_new_papers.bau      templates/static/mgdb_hot_new_papers.bau
+src/css/mgdb-hot-new-papers.css                   css/mgdb-hot-new-papers.css
+src/js/mgdb-hot-new-papers.js                     js/mgdb-hot-new-papers.js
+src/controllers/community/hot_new_papers_modern.php  controllers/community/hot_new_papers_modern.php
+src/controllers/hot_new_papers.php                controllers/hot_new_papers.php
+src/controllers/community.php                     controllers/community.php
+src/record_data/bin_viewer_data.php              record_data/bin_viewer_data.php
+src/record_data/chromosome_data.php              record_data/chromosome_data.php
 
 # Analysis projects — new /projects section. Additive: the route is new and
 # shadows nothing, and there is deliberately no projects/ directory in the web
@@ -401,6 +467,12 @@ src/controllers/data_center/variation_search_modern.php  controllers/data_center
 src/templates/static/mgdb_variation.bau                  templates/static/mgdb_variation.bau
 src/css/mgdb-variation.css                               css/mgdb-variation.css
 src/js/mgdb-variation.js                                 js/mgdb-variation.js
+src/controllers/data_center/variation_record_modern.php  controllers/data_center/variation_record_modern.php
+src/include/variation_record_lib.php                     include/variation_record_lib.php
+src/include/api/v1/records/variation.php                 include/api/v1/records/variation.php
+src/templates/static/mgdb_variation_record.bau           templates/static/mgdb_variation_record.bau
+src/css/mgdb-variation-record.css                        css/mgdb-variation-record.css
+src/js/mgdb-variation-record.js                          js/mgdb-variation-record.js
 
 # Unified Image Data Center — unifies image, image_phenotype, image_trait, image_species, image_gel_pattern, image_mutant
 src/search/image/image_search_lib.php                    search/image/image_search_lib.php
@@ -502,6 +574,7 @@ src/js/lib/3dmol/3Dmol-min.js.LICENSE.txt                 js/lib/3dmol/3Dmol-min
 # Reuses js/lib/3dmol/ from the protein structure block above.
 src/controllers/data_center/alphafill_modern.php          controllers/data_center/alphafill_modern.php
 src/templates/static/mgdb_alphafill.bau                   templates/static/mgdb_alphafill.bau
+src/templates/static/mgdb_alphafill_faq.bau               templates/static/mgdb_alphafill_faq.bau
 src/css/mgdb-alphafill.css                                css/mgdb-alphafill.css
 src/js/mgdb-alphafill.js                                  js/mgdb-alphafill.js
 src/search/alphafill/alphafill_api.php                    search/alphafill/alphafill_api.php
@@ -633,6 +706,13 @@ src/controllers/data_center/map_record_modern.php      controllers/data_center/m
 src/templates/static/mgdb_map.bau                      templates/static/mgdb_map.bau
 src/templates/static/mgdb_map_record.bau               templates/static/mgdb_map_record.bau
 src/css/mgdb-map.css                                   css/mgdb-map.css
+# Tinted-ground comparison variant of the Map hub, served at
+# /data_center/map2. Loaded by that route only; delete with the map2 guard
+# in src/controllers/data_center.php.
+src/css/mgdb-hub-tinted.css                            css/mgdb-hub-tinted.css
+# /genome2, the tinted Genome hub. A top-level route, so it needs its own
+# controller rather than a PAGE guard the way map2 and stock2 do.
+src/controllers/genome2.php                            controllers/genome2.php
 src/css/mgdb-map-record.css                            css/mgdb-map-record.css
 src/js/mgdb-map.js                                     js/mgdb-map.js
 src/js/mgdb-map-record.js                              js/mgdb-map-record.js
@@ -734,13 +814,17 @@ src/templates/static/mgdb_download.bau         templates/static/mgdb_download.ba
 src/css/mgdb-download.css                      css/mgdb-download.css
 src/js/mgdb-download.js                        js/mgdb-download.js
 
-# Homepage design alternatives for group review, at /index2/ and /index3/.
-# Both share include/home_lib.php with the real homepage, so all three show the
-# same data. Delete these five entries and both page directories once a design
+# Homepage design alternatives for group review, at /index2/, /index3/ and
+# /index4/. Version 4 is version 3 with smaller quick-link tiles and a wider
+# rail, so it shares mgdb-home-alt.css and adds only its own template.
+# All share include/home_lib.php with the real homepage, so every version shows
+# the same data. Delete these entries and the page directories once a design
 # is chosen. See README.md, "Homepage alternatives".
 src/css/mgdb-home-alt.css                        css/mgdb-home-alt.css
 src/templates/static/mgdb_home2.bau              templates/static/mgdb_home2.bau
 src/templates/static/mgdb_home3.bau              templates/static/mgdb_home3.bau
+src/templates/static/mgdb_home4.bau              templates/static/mgdb_home4.bau
 src/images/home/assembly_puzzle.png              images/home/assembly_puzzle.png
 src/pages/index2/index.php                       index2/index.php
 src/pages/index3/index.php                       index3/index.php
+src/pages/index4/index.php                       index4/index.php

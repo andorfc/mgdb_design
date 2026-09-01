@@ -1058,6 +1058,82 @@ for monomers.
 in `deploy/manifest.txt` — it is 110 MB across ~4,600 files. See AD-019 in
 ADMIN_DEPENDENCIES for the command and when to run it.
 
+## The AI & Machine Learning Data Hub
+
+`/ai` is the first page built on the **tinted data hub pattern** outright,
+rather than as the "2" half of a comparison pair. It takes its ground, its
+white cards, its metric top edges and its green Related resources panel from
+`css/mgdb-hub-tinted.css`, the same sheet `/genome2` and `/data_center/map2`
+load; the page's own sheet only describes its furniture.
+
+**Its collection is a catalog, not a table, so the page runs no SQL at all.**
+`data/ai/ai_resources.json` is the single source of truth for 27 resources —
+8 analysis tools, 8 AI-ready datasets, 5 code repositories, 6 publications —
+and `controllers/ai.php` derives four things from that one file:
+
+```
+the cards in the four sections     rendered server side, so the page reads with scripting off
+the four metric values             counts of the catalog's own categories
+the "resources by data type" series  each resource counted once per data type it covers
+the client search index            name, summary, topics, genomes, link hosts, lowercased once
+```
+
+Adding a resource to the JSON therefore adds it to the section, the count, the
+chart and the search together; there is no second list to keep in step. The
+whole derivation is wrapped in `dashboardCache()`, so a warm page is one read
+of a 39 KB cache entry — **about 60 ms**.
+
+### The cache key carries both mtimes
+
+`ai/page_<catalog mtime>_<controller mtime>`. Keying on the catalog alone was
+tried first and is wrong: the *renderers* live in the controller, so editing a
+card's markup left the page serving the old HTML with no sign anything had
+happened. It cost a confusing ten minutes the first time. The cost of the two-
+part key is that each edit orphans its predecessor, which
+`tools/dashboard_cache.php --purge` already clears.
+
+### Search
+
+Twenty-seven rows is too few to be worth an HTTP round trip, so the index is
+inlined as a JSON `<script>` block and the search runs in the client. All query
+terms must match; where each one lands sets the rank — name, then summary, then
+the keyword blob — and ties break by category, because someone searching
+"structure" most likely wants a tool they can open before the paper about it.
+
+The **link hosts** are folded into the haystack but not the paths: "github"
+should find the five repositories, while the Box folder ids would only add
+noise. The results table is hidden until a search runs, sorts on any column,
+filters within itself, and pages at 10 / 25 / 50 / all.
+
+A search is linkable: `/ai?q=embeddings`, or `/ai?topic=structure`, which is
+also what selecting a bar in the figure does.
+
+### External means "carries its own host"
+
+One predicate — `ai_is_external()` — decides the arrow, the `target`, the `rel`
+and the Internal/External chip, so a link cannot be labelled one way and behave
+the other. It tests for a scheme and host, deliberately **not** for the
+maizegdb.org domain: `snptools.maizegdb.org`, `feta.maizegdb.org` and
+`mfs.maizegdb.org` are separate applications a reader leaves the site to reach,
+and a first attempt that excluded the domain marked all three "Internal".
+
+### Two shared-CSS traps this page hit
+
+- **`mgdb-hub-tinted.css` sets a flat `border-color` on every white card.**
+  It is a shorthand, so it takes the top edge with it — and it loads *after* the
+  page sheet, so at equal specificity the three category colours on
+  `.ai-card-tool` / `-data` / `-code` all came out the tint's blue-grey. The
+  fix is one extra class: `.mgdb-modern .mgdb-ai-page .ai-card-tool`.
+- **`--mgdb-dur-fast` is defined nowhere.** Three page sheets use it in
+  `transition`, which makes the whole declaration invalid — those transitions
+  have never run. Written out here rather than propagated.
+
+While in that sheet, the zebra rule was found to be cancelling the table hover
+on every hub that loads it: `.mgdb-table tbody tr:nth-child(even)` and
+`.mgdb-table tbody tr:hover` are the same specificity and the zebra comes
+later, so even rows had no hover state. Fixed in the shared sheet, so
+`/genome2` and `/data_center/map2` get it too.
+
 ## AlphaFill ligand transplants
 
 `/data_center/alphafill` publishes a proteome-wide AlphaFill 2.3.0 run over all
@@ -2305,6 +2381,119 @@ Still live, kept, contrary to first impressions: `/gbrowse`, `/foldseek` and
 `/fatcat` return almost no HTML because they are `<iframe>` wrappers. The
 `/data_center/*` hubs return 403 or "Just a moment…" to `curl` because of the
 Cloudflare bot check, not because they are broken.
+
+## The Maize Newsletter archive
+
+`/mnl` is 94 volumes, 1929 to 2020. The newsletter stopped publishing after
+volume 94, so the list is final and lives in `controllers/mnl.php` rather than
+a data file. That controller takes the route ahead of
+`controllers/community/mnl.php`, which is untouched and archived in
+`legacy/mnl/`; rollback is deleting the new controller.
+
+Two views over one list — a grid of volume chips and the shared table — both
+rendered server-side and filtered together off identical `data-` attributes, so
+they cannot disagree about what matched. Note the count callback halves the
+visible total: every volume exists twice in the DOM, once per view.
+
+**The design mockup's format badges are not shipped.** It carried
+Born-digital / Complete PDF / Scanned facets and said in its own footer that
+they were illustrative. All 94 volume URLs return an HTML index page, so there
+is no per-volume format distinction observable from here, and inventing one on
+an archive page would misdescribe the holdings. The one era split the page can
+state is the one the newsletter documents about itself: fully electronic from
+volume 89 in 2015. That is the only badge shown.
+
+**The mockup's timeline view is not built either**, at the reviewer's request
+and for a reason worth recording: the newsletter ran one volume a year for
+ninety years, so a timeline drew a straight line and said nothing the year
+label beside each volume did not already say.
+
+Both `mnl.maizegdb.org/94` and the older `mnl.maizegdb.org/mnl/60/` URL shapes
+are in use and both are live. They are carried over exactly as published rather
+than normalized, because the older form is what external citations point at.
+All 94 were verified to return 200 before shipping.
+
+## The news archive
+
+`/whatsnew` is 262 announcements spanning 2002 to 2026, read from
+`data/news.xml` on the server. That file is curator-maintained and is **not**
+deployed from this repository. `controllers/whatsnew.php` takes the route ahead
+of `controllers/about/whatsnew.php`, which is untouched and archived in
+`legacy/whatsnew/`; rollback is deleting the new controller.
+
+The whole archive renders server-side and filters in the browser. At this size
+that costs ~270 KB and buys three things: the browser's own find-in-page works
+across every item, a `#news-250` permalink resolves without a round trip, and
+there is no pagination state to get wrong. Reverse chronological, grouped by
+year, with a sticky year heading.
+
+**The images were never lost — they were being parsed and thrown away.** The
+legacy `news_helper.php` reads an `<imgg>` element into every News object, but
+`build_loop_array()` in the old controller passed only `date` and `news` to the
+template, so 24 photographs and release graphics sat unused in the data for
+years. They are back, at their intrinsic dimensions.
+
+Three things worth knowing about that data:
+
+- **Four of the fifteen image paths have no leading slash.** They resolve today
+  only because the page sits at the web root; a route with a path segment would
+  break them. `wnImagePath()` normalizes.
+- **Lazy images need explicit width/height.** Most of the 260-odd items are far
+  below the fold, so the images are lazy — and a lazy image with no dimensions
+  reserves no space, reflowing the page under the reader as each one arrives.
+  `wnImageSize()` stats each of the fifteen distinct files once per request and
+  emits the real numbers.
+- **The `<news>` bodies contain curator-authored markup** — links, `<br>`,
+  emphasis — and it is emitted as-is, which is what the previous page did. Only
+  the file's own editors can change it. Everything *around* the body is escaped.
+
+The RSS subscribe link is gone from the page. The feed generator it pointed at,
+`tools/maizegdb_news_feed.php`, is still live at its own URL and was left
+alone — removing a published feed endpoint is a separate decision from removing
+a link to it.
+
+## The citation card
+
+One published reference, rendered the same way everywhere: the literature
+search results, the cite page, and any future page that lists papers. Styles
+live in `css/mgdb-modern.css` section 10b, keyed on `.reference-result-card`.
+**No page-level copy is needed** — that was the bug this replaced.
+
+```html
+<article class="reference-result-card">          <!-- + is-editorial-pick -->
+  <div class="reference-result-meta">…</div>     <!-- + is-selectable      -->
+  <h3><a href="…">Title</a></h3>
+  <p class="reference-result-authors">…</p>
+  <p class="reference-result-citation">Journal · volume · pages</p>
+  <p class="reference-result-abstract">…</p>
+  <div class="reference-result-links">…</div>
+</article>
+```
+
+Everything but the title is optional; omit an element rather than emitting it
+empty. Two variants: `is-editorial-pick` adds a gold spine and a badge that
+says so in words, `is-selectable` adds a checkbox gutter for bulk export.
+
+Consolidated on 2026-08-29. Both pages had their own copy of these rules under
+`.mgdb-cite-page` and `.mgdb-reference-page`, and the two had drifted: the
+search results left the abstract at body size, so a column of results read as
+paragraphs rather than as a list. The shared component takes the cite page's
+values, which also fixed the search page. 168 lines of duplicated CSS removed.
+
+Two traps found while consolidating, both worth knowing generally:
+
+- `.mgdb-cite-page .mgdb-cite-group h3` was a descendant selector meant for the
+  group heading. Once the page-scoped card reset was gone it also matched every
+  card title nested under the group, giving them the group heading's underline.
+  It is now `> h3`. **A bare-element descendant selector inside a page scope
+  will eventually catch a component nested under it.**
+- Page stylesheets load after `mgdb-modern.css`, so at equal specificity the
+  page wins. That is what lets a page override a shared component — and what
+  makes a too-broad page rule silently break one.
+
+Published strings are quoted material: titles, author lists, and journal names
+print as the publisher set them. Do not sentence-case a title, expand an author
+initial, or Americanize a journal name.
 
 ## "Data Hub", not "Data Center"
 
