@@ -1058,6 +1058,100 @@ for monomers.
 in `deploy/manifest.txt` — it is 110 MB across ~4,600 files. See AD-019 in
 ADMIN_DEPENDENCIES for the command and when to run it.
 
+## The Data Hub shell
+
+`css/mgdb-hub.css` is the shared shell. A page opts in with `mgdb-hub-page` on
+its `<main>` and gets the pale blue ground, the white section cards, the metric
+top edges, the grid-tile hover, the zebra striping, the green Related resources
+panel, the `.mgdb-hub-field` form row, and the scroll offset under the sticky
+tab bar. `/ai` and `/data_center/variation` are on it.
+
+### Section titles carry no rule; sections carry a colour
+
+Two changes made together on 2026-09-01, because they answer the same thing.
+`.mgdb-section-heading` in `mgdb-modern.css` closes with a `border-bottom`,
+which was right when a section was a transparent band on one continuous sheet.
+Once the section became a bordered white card that rule read as a **second
+border a few pixels inside the first** — a box around the title. It is now
+zeroed for hub pages, and the colour that used to distinguish one section from
+the next moved to the card's own top edge.
+
+The rotation is positional and **starts at `nth-of-type(2)`**, because the hero
+is the first `<section>` on every hub and is excluded. Eight colours — green,
+gold, blue, burgundy, leaf, orange, wine, dark gold — which is exactly the
+number of content sections both hubs carry, so nothing repeats. A page that
+wants to pin a section to a particular colour says so with `.mgdb-hub-tone-*`.
+
+The rotation rules sit **after** the Related resources block on purpose: that
+block sets a `border-color` shorthand for its green wash, which would otherwise
+take the top edge with it.
+
+### References
+
+One shape for a cited paper, wherever it appears: `.mgdb-ref*` in
+`css/mgdb-hub.css` and `include/references_lib.php` for the matching markup, so
+a page cannot get one without the other. Taken from `/NAM_project`, which is
+where the group settled it — journal and year as a pill, the DOI in mono, the
+title in burgundy, then authors, citation, the abstract in a green-edged well,
+and the links as buttons.
+
+The content comes from `data/cite_journal_articles.json`, the same curated
+bibliography `/cite` reads: verified titles, authors, volumes, DOIs, PubMed IDs
+and abstracts. **A page names DOIs, not citations**, so there is no second copy
+to drift. Anything outside that file — a preprint, say — supplies a `fallback`
+and renders without an abstract rather than with an empty well. One record
+stores a database URL where its abstract should be, 49 characters long, so the
+well only opens for text past 120.
+
+`.mgdb-ref` is the one block in `mgdb-hub.css` that does not require
+`mgdb-hub-page`, so a page outside the hub set can load the sheet and get the
+same references. Copy citation / Copy DOI is bound by `mgdb-modern.js` for every
+`.mgdb-ref-copy` on the page — no page script asks for it.
+
+### Legend placement, and why a page may not set it
+
+`MGDB.chart()` now **normalises the legend** to sit above the plot, anchored to
+the plot's top edge, and reserves a band for it. A page's own `legend.y` is
+overridden unless it passes `legendManual: true`.
+
+That is not tidiness. `legend.y` is in paper coordinates — a fraction of the
+*plot* height — so any fixed value drifts as a figure gets taller. The old
+`BASE_LAYOUT` value of `-0.22` sat on the tick labels of a 320px figure and was
+drawn about 140px below a 700px one, outside the paper, bleeding over the
+figcaption. Anchored above the plot there is no axis furniture to collide with,
+and the offset cannot drift because the anchor moves with the plot.
+
+`fitLegend()` then checks the drawn figure: a horizontal legend wraps when its
+entries do not fit one row, and the reserved band was sized for one. It measures
+**only whether the legend is clipped at the top of the figure** — with the
+legend anchored to the plot it cannot overlap the plot by construction. Two
+false starts are worth recording, both mine:
+
+- Growing the top margin against a legend placed *below* the plot is unstable —
+  shrinking the plot moves the legend further down. It reached `margin.t: 1809`
+  on a 472px figure before the cap caught it. Normalising the position is what
+  makes the correction safe.
+- `.cartesianlayer` is **not** the plot rectangle. It is a `<g>` whose bounding
+  box spans the whole SVG, so comparing the legend against it reported a 30px
+  overlap on a figure that had none, and the margin grew every pass. If a plot
+  rectangle is ever genuinely needed, `rect.nsewdrag` is the one.
+
+### The gap between a tick label and the plot
+
+`automargin` keeps a tick label from being cut off, but it makes the margin
+*exactly* as wide as the text — so on a horizontal bar chart the longest
+category name ends one pixel from the first bar and reads as running into it.
+Measured at 1px on all three `/data_center/variation` figures.
+
+`BASE_LAYOUT` now sets `ticks: 'outside'` with `tickcolor: 'rgba(0,0,0,0)'` and
+a `ticklen` on both axes: that reserves the gap without drawing a mark. 10px on
+the y axis, which carries the category names, 6px on the x. Measured at 14px
+after. The two-space `ticksuffix` that stood in for it on the variation hub is
+gone; it also leaked into the hover text.
+
+Related: outside bar labels need `\u00A0`, not a space — SVG collapses leading
+whitespace, so a plain space measures as no padding at all.
+
 ## The AI & Machine Learning Data Hub
 
 `/ai` is built on `css/mgdb-hub.css`, the generalised Data Hub shell: it puts
@@ -1125,6 +1219,10 @@ the other. It tests for a scheme and host, deliberately **not** for the
 maizegdb.org domain: `snptools.maizegdb.org`, `feta.maizegdb.org` and
 `mfs.maizegdb.org` are separate applications a reader leaves the site to reach,
 and a first attempt that excluded the domain marked all three "Internal".
+
+It renders its References through `include/references_lib.php` like every other
+hub; see **The Data Hub shell** above for that component and for the section
+top-edge colours.
 
 ### Two shared-CSS notes
 

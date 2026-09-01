@@ -263,6 +263,9 @@
 
 .mgdb-ai-page .ai-results-section[hidden] { display: none; }
 
+/* No rule under this one either: it is the results section's title row, and
+   the section card's own edge already closes it. See the note on
+   .mgdb-section-heading in css/mgdb-hub.css. */
 .mgdb-ai-page .ai-results-heading {
   display: flex;
   flex-wrap: wrap;
@@ -270,8 +273,6 @@
   align-items: end;
   justify-content: space-between;
   margin-bottom: var(--mgdb-space-4);
-  padding-bottom: var(--mgdb-space-3);
-  border-bottom: 1px solid var(--hub-line);
 }
 
 .mgdb-ai-page .ai-results-heading h2 { margin: 0; }
@@ -387,8 +388,7 @@
 
 /* The shared card puts a uniform margin between every pair of children; the
    flex `gap` above does that job here, and the two together doubled it. */
-.mgdb-ai-page .ai-card > * + *,
-.mgdb-ai-page .ai-pub > * + * { margin-top: 0; }
+.mgdb-ai-page .ai-card > * + * { margin-top: 0; }
 
 /* The featured tool spans its grid rather than sitting as one tile among the
    rest. */
@@ -451,8 +451,7 @@
   white-space: nowrap;
 }
 
-.mgdb-ai-page .ai-card-links,
-.mgdb-ai-page .ai-pub-links {
+.mgdb-ai-page .ai-card-links {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-2) var(--mgdb-space-4);
@@ -461,79 +460,14 @@
   border-top: 1px solid var(--hub-line-soft);
 }
 
-.mgdb-ai-page .ai-card-links a,
-.mgdb-ai-page .ai-pub-links a {
+.mgdb-ai-page .ai-card-links a {
   color: var(--mgdb-green-dark);
   font-size: var(--mgdb-text-sm);
   font-weight: 600;
   white-space: nowrap;
 }
 
-.mgdb-ai-page .ai-card-links .ai-card-cta,
-.mgdb-ai-page .ai-pub-links a { font-weight: 700; }
-
-/* --------------------------------------------------------------------------
-   Publications
-
-   One column: a citation is a line of prose, not a tile, and three of these
-   titles run past 80 characters.
-   -------------------------------------------------------------------------- */
-
-.mgdb-ai-page .ai-pub-list { grid-template-columns: minmax(0, 1fr); }
-
-.mgdb-ai-page .ai-pub {
-  display: flex;
-  flex-direction: column;
-  gap: var(--mgdb-space-2);
-}
-
-.mgdb-ai-page .ai-pub-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  align-items: center;
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-xs);
-  font-weight: 600;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-}
-
-.mgdb-ai-page .ai-pub h3 {
-  margin: 0;
-  font-size: var(--mgdb-text-lg);
-  line-height: var(--mgdb-leading-snug);
-}
-
-.mgdb-ai-page .ai-pub h3 a { color: var(--mgdb-green-dark); }
-
-.mgdb-ai-page .ai-pub-authors,
-.mgdb-ai-page .ai-pub-citation {
-  margin: 0;
-  color: var(--mgdb-ink-soft);
-  font-size: var(--mgdb-text-sm);
-  line-height: var(--mgdb-leading-snug);
-}
-
-.mgdb-ai-page .ai-pub-citation { color: var(--mgdb-muted); }
-
-.mgdb-ai-page .ai-copy {
-  padding: var(--mgdb-space-1) var(--mgdb-space-3);
-  border: 1px solid var(--hub-line);
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--hub-surface);
-  color: var(--mgdb-ink-soft);
-  font-family: inherit;
-  font-size: var(--mgdb-text-sm);
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.mgdb-ai-page .ai-copy:hover {
-  border-color: var(--mgdb-green-dark);
-  background: var(--mgdb-green-soft);
-  color: var(--mgdb-green-dark);
-}
+.mgdb-ai-page .ai-card-links .ai-card-cta { font-weight: 700; }
 
 /* --------------------------------------------------------------------------
    The figure

@@ -369,9 +369,29 @@
     margin: { l: 60, r: 20, t: 12, b: 56 },
     hovermode: 'closest',
     colorway: CHART_COLORS,
-    legend: { orientation: 'h', y: -0.22, x: 0, font: { size: 13 } },
-    xaxis: { gridcolor: '#ece7dd', zerolinecolor: '#dcd8cf', automargin: true },
-    yaxis: { gridcolor: '#ece7dd', zerolinecolor: '#dcd8cf', automargin: true }
+    /* Above the plot, anchored to its top edge, rather than below it.
+
+       `y` is in paper coordinates -- a fraction of the *plot* height -- so the
+       old `y: -0.22` moved further from the axis the taller the chart got: on a
+       320px figure it landed inside the 56px bottom margin and sat on the tick
+       labels, and on a 700px one it was drawn ~140px below a 44px margin,
+       outside the paper, bleeding over the figcaption. Above the plot there is
+       no axis furniture to collide with, and placeLegend() below keeps a
+       band open for it. */
+    legend: { orientation: 'h', x: 0, xanchor: 'left', y: 1, yanchor: 'bottom', font: { size: 13 } },
+    /* `ticks: 'outside'` with a transparent tick colour is the standoff: it
+       reserves ticklen pixels between a tick label and the plot without drawing
+       a mark. automargin keeps a label from being cut off, but it makes the
+       margin exactly as wide as the text, so the longest category name ends up
+       one pixel from the first bar and reads as running into it. Measured at
+       1px on all three /data_center/variation figures before this.
+
+       The y axis gets the larger gap because it carries the category names on a
+       horizontal bar chart, which is where the two collide. */
+    xaxis: { gridcolor: '#ece7dd', zerolinecolor: '#dcd8cf', automargin: true,
+             ticks: 'outside', ticklen: 6, tickcolor: 'rgba(0,0,0,0)' },
+    yaxis: { gridcolor: '#ece7dd', zerolinecolor: '#dcd8cf', automargin: true,
+             ticks: 'outside', ticklen: 10, tickcolor: 'rgba(0,0,0,0)' }
   };
 
   var BASE_CONFIG = {
@@ -380,6 +400,99 @@
     // Locks the chart to the page's own scroll behavior rather than zooming.
     scrollZoom: false
   };
+
+  /* One row of 13px legend text plus breathing room. A legend that wraps to two
+     rows is measured for after the draw rather than guessed at here. */
+  var LEGEND_BAND = 34;
+
+  /* Will Plotly actually draw a legend? It shows one by default only when there
+     is more than one trace, so a single-series chart must not have a band
+     reserved for a legend that never appears. */
+  function willShowLegend(layout, traces) {
+    if (layout.showlegend === false) { return false; }
+    if (layout.showlegend === true) { return true; }
+    return traces.length > 1;
+  }
+
+  /* Put the legend above the plot and keep a band open for it.
+
+     The placement is normalised rather than merged, so a page cannot move the
+     legend into the plot by passing its own `y`. That is not tidiness: `y` is
+     in paper coordinates -- a fraction of the *plot* height -- so any fixed
+     value drifts as a chart gets taller. A `y: -0.22` legend sat on the tick
+     labels of a 320px figure and was drawn a hundred and forty pixels below a
+     700px one, outside the paper entirely, bleeding over the figcaption.
+     Anchored to the top of the plot there is no axis furniture to collide with
+     and the offset cannot drift, because the anchor moves with the plot.
+
+     A figure that genuinely needs the legend somewhere else passes
+     `legendManual: true` and takes responsibility for it. */
+  function placeLegend(layout, traces, manual) {
+    if (!willShowLegend(layout, traces)) {
+      // Say so explicitly, so a one-trace chart cannot acquire a legend later
+      // from a trace that happens to set showlegend on itself.
+      layout.showlegend = false;
+      return layout;
+    }
+    if (manual) { return layout; }
+
+    layout.legend = Object.assign({}, layout.legend, {
+      orientation: 'h',
+      x: 0,
+      xanchor: 'left',
+      y: 1,
+      yanchor: 'bottom'
+    });
+    layout.margin = layout.margin || {};
+    layout.margin.t = Math.max(layout.margin.t || 0, LEGEND_BAND);
+
+    return layout;
+  }
+
+  /* Check the drawn figure rather than trusting the reservation.
+
+     With the legend anchored to the top of the plot it cannot overlap the plot
+     by construction, so there is exactly one way this goes wrong: the legend
+     wraps to more rows than the reserved band is tall and is clipped at the top
+     of the figure. That is measurable from the legend and the figure alone --
+     no plot rectangle needed, which matters because the obvious DOM handle for
+     one is wrong. `.cartesianlayer` is a <g> whose bounding box spans the whole
+     SVG, not the plotting area, so an earlier version of this check read a 30px
+     overlap on a figure that had none and grew the top margin every pass.
+
+     Growing the top margin is safe because the legend is anchored to the plot:
+     the plot moves down and the legend moves with it, so one correction
+     settles. Bounded anyway -- at most two passes, and never more than a third
+     of the figure.
+     -------------------------------------------------------------------- */
+  function fitLegend(target, layout, attempt) {
+    if (!window.Plotly || !window.Plotly.relayout) { return; }
+    if ((attempt || 0) >= 2) { return; }
+    if (layout.showlegend === false || layout.legendManual) { return; }
+
+    var legend = target.querySelector('g.legend');
+    if (!legend) { return; }
+
+    var legendBox, figureBox;
+    try {
+      legendBox = legend.getBoundingClientRect();
+      figureBox = target.getBoundingClientRect();
+    } catch (error) { return; }
+    if (!legendBox.height || !figureBox.height) { return; }
+
+    var shortfall = Math.ceil(figureBox.top - legendBox.top);
+    if (shortfall < 2) { return; }
+
+    var margin = layout.margin || {};
+    var wanted = Math.min((margin.t || 0) + shortfall + 6, Math.floor(figureBox.height / 3));
+    if (wanted <= (margin.t || 0)) { return; }
+
+    margin.t = wanted;
+    layout.margin = margin;
+    window.Plotly.relayout(target, { 'margin.t': wanted }).then(function () {
+      fitLegend(target, layout, (attempt || 0) + 1);
+    }).catch(function () { /* the figure is drawn either way */ });
+  }
 
   function mergeLayout(custom) {
     var layout = JSON.parse(JSON.stringify(BASE_LAYOUT));
@@ -401,6 +514,9 @@
        layout      Plotly layout overrides, merged over BASE_LAYOUT
        config      Plotly config overrides
        fallback    message shown if Plotly is unavailable
+       legendManual  keep the layout's own legend position instead of the
+                     shared one above the plot; the figure then owns the
+                     margins too
 
      The element is expected to already contain a .mgdb-chart-fallback child and
      to carry role="img" plus an aria-label describing the chart. The visible
@@ -436,7 +552,7 @@
         return;
       }
 
-      var layout = mergeLayout(config.layout);
+      var layout = placeLegend(mergeLayout(config.layout), traces, config.legendManual);
       var plotConfig = Object.assign({}, BASE_CONFIG, config.config || {});
       if (prefersReducedMotion()) { layout.transition = { duration: 0 }; }
 
@@ -447,9 +563,12 @@
         // aria-label on the container is what assistive technology reads.
         var svg = target.querySelector('.main-svg');
         if (svg) { svg.setAttribute('aria-hidden', 'true'); }
+        fitLegend(target, layout, 0);
         if (window.Plotly.Plots && window.Plotly.Plots.resize) {
           window.addEventListener('resize', debounce(function () {
             window.Plotly.Plots.resize(target);
+            // A narrower figure wraps the legend onto more rows.
+            fitLegend(target, layout, 0);
           }, 150));
         }
       }).catch(function () {
@@ -532,6 +651,56 @@
     });
 
     Array.prototype.forEach.call(document.querySelectorAll('table[data-sortable]'), sortTable);
+
+    initCopyButtons();
+  }
+
+  /* Copy citation / Copy DOI on a reference card. Bound here rather than in each
+     page script, so every page that renders include/references_lib.php markup
+     gets the behaviour without asking for it. */
+  function initCopyButtons() {
+    Array.prototype.forEach.call(document.querySelectorAll('.mgdb-ref-copy'), function (button) {
+      if (button.hasAttribute('data-copy-bound')) { return; }
+      button.setAttribute('data-copy-bound', '');
+      button.addEventListener('click', function () {
+        var value = button.getAttribute('data-copy-value');
+        if (!value) {
+          var source = document.getElementById(button.getAttribute('data-copy-target') || '');
+          value = source ? source.textContent.trim() : '';
+        }
+        if (value) { copyToClipboard(value, button); }
+      });
+    });
+  }
+
+  function copyToClipboard(text, button) {
+    var original = button.textContent;
+    function done() {
+      button.textContent = 'Copied';
+      window.setTimeout(function () { button.textContent = original; }, 1600);
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      // A rejection here is not rare -- an insecure context, a denied
+      // permission, or a document that does not have focus all reject -- so it
+      // falls through to the older path rather than leaving the button dead.
+      navigator.clipboard.writeText(text).then(done).catch(function () { legacyCopy(text, done); });
+      return;
+    }
+
+    legacyCopy(text, done);
+  }
+
+  function legacyCopy(text, done) {
+    var area = document.createElement('textarea');
+    area.value = text;
+    area.setAttribute('readonly', '');
+    area.style.position = 'absolute';
+    area.style.left = '-9999px';
+    document.body.appendChild(area);
+    area.select();
+    try { document.execCommand('copy'); done(); } catch (error) { /* nothing to do */ }
+    document.body.removeChild(area);
   }
 
   if (document.readyState === 'loading') {
@@ -553,6 +722,7 @@
   MGDB.CHART_SYMBOLS = CHART_SYMBOLS;
   MGDB.CHART_DASHES = CHART_DASHES;
   MGDB.prefersReducedMotion = prefersReducedMotion;
+  MGDB.initCopyButtons = initCopyButtons;
 
   window.MGDB = MGDB;
 })(window, document);

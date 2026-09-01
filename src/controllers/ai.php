@@ -22,6 +22,7 @@
  */
 
 include_once('./include/dashboard_cache.php');
+include_once('./include/references_lib.php');
 
 $system = getSystemInfo('mgdb.conf');
 logMessage('Starting controllers/ai.php');
@@ -133,37 +134,6 @@ function ai_render_card($r) {
     return $html;
 }
 
-/* Publications carry authors, a citation and a DOI, so they get their own
-   shape. The citation string is the one field allowed through as markup -- it
-   holds the <i> around the journal name and is hand-written in the catalog. */
-function ai_render_publication($r) {
-    $cite_id = 'ai-citation-' . ai_esc($r['id']);
-    $plain   = trim($r['authors'] . ' (' . $r['year'] . ') ' . $r['name'] . '. '
-             . $r['journal'] . '. doi:' . $r['doi']);
-
-    $html  = '<article class="mgdb-card ai-pub' . (!empty($r['featured']) ? ' is-featured' : '') . '">';
-    $html .= '<div class="ai-pub-meta">';
-    $html .= '<span>' . ai_esc($r['year']) . '</span>';
-    $html .= '<span>' . ai_esc($r['kind']) . '</span>';
-    if (!empty($r['featured'])) {
-        $html .= '<span class="mgdb-pill mgdb-pill-ok">Featured publication</span>';
-    }
-    $html .= '</div>';
-    $html .= '<h3>' . ai_link($r['name'], $r['primary']['url']) . '</h3>';
-    $html .= '<p class="ai-pub-authors">' . ai_esc($r['authors']) . '</p>';
-    $html .= '<p class="ai-pub-citation">' . $r['citation']
-           . ' &middot; doi&#58;' . ai_esc($r['doi']) . '</p>';
-    $html .= '<div class="ai-pub-links">';
-    $html .= ai_link('Read paper', $r['primary']['url']);
-    $html .= '<button class="ai-copy" type="button" data-copy-target="' . $cite_id . '">Copy citation</button>';
-    $html .= '<button class="ai-copy" type="button" data-copy-value="' . ai_esc($r['doi']) . '">Copy DOI</button>';
-    $html .= '</div>';
-    $html .= '<div id="' . $cite_id . '" class="mgdb-visually-hidden">' . ai_esc($plain) . '</div>';
-    $html .= '</article>';
-
-    return $html;
-}
-
 /* -------------------------------------------------------------------------- *
  * The catalog, and everything derived from it (cached)
  * -------------------------------------------------------------------------- */
@@ -185,12 +155,14 @@ if (!is_file($catalog_file)) {
    of about 40 KB. That is what `php tools/dashboard_cache.php --purge --warm`
    already clears on the monthly reload; the alternative -- a fixed key -- trades
    a handful of small files for a page that silently serves stale markup, which
-   is the worse failure. */
+   is the worse failure. The bibliography behind the reference cards is a third
+   input, so its mtime joins the key. */
 $catalog_stamp = is_file($catalog_file) ? (int) filemtime($catalog_file) : 0;
 $render_stamp  = (int) @filemtime(__FILE__);
-$cache_key     = 'ai/page_' . $catalog_stamp . '_' . $render_stamp;
+$cite_stamp    = (int) @filemtime($doc_root . '/data/cite_journal_articles.json');
+$cache_key     = 'ai/page_' . $catalog_stamp . '_' . $render_stamp . '_' . $cite_stamp;
 
-$page = dashboardCache($system, $cache_key, function () use ($catalog_file) {
+$page = dashboardCache($system, $cache_key, function () use ($catalog_file, $doc_root) {
     $raw     = is_file($catalog_file) ? file_get_contents($catalog_file) : '';
     $catalog = $raw !== '' ? json_decode($raw, true) : null;
 
@@ -204,6 +176,7 @@ $page = dashboardCache($system, $cache_key, function () use ($catalog_file) {
     $genomes   = isset($catalog['genomes']) ? $catalog['genomes'] : array();
 
     $cards = array('tool' => '', 'data' => '', 'code' => '', 'publication' => '');
+    $publications = array();
     $count = array('tool' => 0,  'data' => 0,  'code' => 0,  'publication' => 0);
     $featured_tool = null;
 
@@ -228,7 +201,21 @@ $page = dashboardCache($system, $cache_key, function () use ($catalog_file) {
         }
 
         if ($cat === 'publication') {
-            $cards['publication'] .= ai_render_publication($r);
+            /* Collected rather than rendered here: the shared reference
+               renderer takes the whole list at once so its cards are numbered
+               in one sequence. */
+            /* No 'kind' badge: the journal name already carries it -- a
+               bioRxiv card is a preprint -- and passing it would give /ai two
+               pills where /data_center/variation has one. */
+            $publications[] = array(
+                'doi'      => $r['doi'],
+                'fallback' => array(
+                    'title'   => $r['name'],
+                    'authors' => $r['authors'],
+                    'journal' => $r['journal'],
+                    'year'    => $r['year']
+                )
+            );
         } elseif (!empty($r['featured'])) {
             /* The featured tool is rendered separately, at the head of its
                grid, so it can span the full width. */
@@ -299,6 +286,12 @@ $page = dashboardCache($system, $cache_key, function () use ($catalog_file) {
     usort($chart, function ($a, $b) {
         return $a['total'] === $b['total'] ? strcmp($a['label'], $b['label']) : $a['total'] - $b['total'];
     });
+
+    /* The reference cards come from data/cite_journal_articles.json -- the same
+       curated bibliography /cite reads -- so a paper's authors, volume,
+       abstract and PubMed ID have one home. The catalog supplies only the DOI
+       and a fallback for anything not in that file. */
+    $cards['publication'] = mgdb_render_references($doc_root, $publications);
 
     return array(
         'cards'          => $cards,

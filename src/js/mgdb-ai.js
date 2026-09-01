@@ -24,14 +24,14 @@
     tool: 'Tool',
     data: 'Data',
     code: 'Code',
-    publication: 'Publication'
+    publication: 'Reference'
   };
 
   var CATEGORY_PLURAL = {
     tool: 'Tools',
     data: 'Datasets',
     code: 'Repositories',
-    publication: 'Publications'
+    publication: 'References'
   };
 
   var CATEGORY_RANK = { tool: 0, data: 1, code: 2, publication: 3 };
@@ -595,47 +595,6 @@
   }
 
   /* ======================================================================
-     Copy citation / DOI
-     ====================================================================== */
-
-  function copyText(text, button) {
-    var done = function () {
-      var original = button.textContent;
-      button.textContent = 'Copied';
-      window.setTimeout(function () { button.textContent = original; }, 1600);
-    };
-
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(done).catch(function () {});
-      return;
-    }
-
-    // Fallback for browsers without the async clipboard API.
-    var area = document.createElement('textarea');
-    area.value = text;
-    area.setAttribute('readonly', '');
-    area.style.position = 'absolute';
-    area.style.left = '-9999px';
-    document.body.appendChild(area);
-    area.select();
-    try { document.execCommand('copy'); done(); } catch (error) { /* nothing to do */ }
-    document.body.removeChild(area);
-  }
-
-  function initCopy() {
-    Array.prototype.forEach.call(document.querySelectorAll('.ai-copy'), function (btn) {
-      btn.addEventListener('click', function () {
-        var value = btn.getAttribute('data-copy-value');
-        if (!value) {
-          var target = document.getElementById(btn.getAttribute('data-copy-target') || '');
-          value = target ? target.textContent.trim() : '';
-        }
-        if (value) { copyText(value, btn); }
-      });
-    });
-  }
-
-  /* ======================================================================
      Resources by data type
 
      .mgdb-chart is a fixed 320px in the shared sheet, so the height has to be
@@ -699,9 +658,11 @@
         margin: { l: 200, r: 24, t: 8, b: 44 },
         xaxis: { title: 'Resources', dtick: 2, zeroline: false },
         yaxis: { automargin: true },
-        /* Plotly reverses the legend of a stacked bar by default, so it read
-           right to left against the bars it labels. */
-        legend: { orientation: 'h', y: -0.18, traceorder: 'normal' }
+        /* Position is the shared one -- above the plot, set by MGDB.chart --
+           so only the order is this figure's business: Plotly reverses the
+           legend of a stacked bar by default, which read right to left against
+           the bars it labels. */
+        legend: { traceorder: 'normal' }
       }
     });
 
@@ -741,7 +702,8 @@
 
     initTabs();
     initSearch();
-    initCopy();
+    /* Copy citation / Copy DOI is bound by mgdb-modern.js for every
+       .mgdb-ref-copy on the page, so there is nothing to do here. */
     initFigure();
   }
 

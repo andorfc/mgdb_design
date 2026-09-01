@@ -1,0 +1,560 @@
+/* ==========================================================================
+   Data Hub shell — the shared ground, surfaces and furniture
+
+   Every Data Hub landing page loads this after css/mgdb-modern.css and before
+   its own stylesheet, and puts `mgdb-hub-page` on its <main>. It is the
+   generalisation of css/mgdb-hub-tinted.css, which did the same job for the
+   /data_center/map2, /data_center/stock2 and /genome2 comparison variants but
+   named every page it touched. Nothing here names a page, so a new hub opts in
+   by loading the file and gets the whole treatment.
+
+   What it settles, so a page stylesheet does not have to:
+
+     - the pale blue page ground, with every section a white card on it
+     - one drop shadow, and one lift on hover
+     - the four coloured top edges on the metric row
+     - the coloured top edge that grid tiles take on hover
+     - the green wash kept on the closing Related resources panel
+     - a form row whose labels share a baseline and whose controls share a
+       height, so nothing wraps or steps
+     - a scroll offset that matches the sticky tab bar at both its heights
+
+   The three ground values are sampled from snptools.maizegdb.org rather than
+   guessed:
+
+     ground   #f4f7fc   its body background
+     surface  #ffffff   its cards
+     line     #e3e9f2   its card borders
+   ========================================================================== */
+
+:root {
+  --hub-ground: #f4f7fc;
+  --hub-surface: #ffffff;
+  --hub-line: #e3e9f2;
+  --hub-line-soft: #eef2f8;
+  /* Blue-grey rather than the warm shadow the default ground uses, so the lift
+     reads against the tint instead of muddying it. */
+  --hub-shadow: 0 1px 2px rgba(16, 30, 54, .06), 0 1px 3px rgba(16, 30, 54, .08);
+  --hub-shadow-lift: 0 2px 4px rgba(16, 30, 54, .07), 0 4px 12px rgba(16, 30, 54, .08);
+  --hub-shadow-hover: 0 4px 10px rgba(16, 30, 54, .09), 0 10px 24px rgba(16, 30, 54, .10);
+}
+
+/* The modern shell paints #content white; that is the sheet the tint replaces. */
+#content { background: var(--hub-ground); }
+
+/* --------------------------------------------------------------------------
+   Sections are white cards on the tint
+
+   The comparison variants left the <section> transparent and lifted only the
+   boxes inside it. Here the section itself is the card, which is what makes a
+   hub read as a stack of panels rather than one continuous sheet.
+
+   Two are excluded. The tab bar is navigation, not a record, and it is sticky,
+   so it takes the ground and marks its edge with a rule instead. The hero is a
+   <section> too, and has to be named in the :not() rather than just restyled
+   afterwards: this selector is more specific than .mgdb-hero, so it was
+   painting the wash white and adding 24px of padding inside a panel whose
+   emblem column is meant to run to its own edge.
+   -------------------------------------------------------------------------- */
+
+.mgdb-hub-page > section:not(.mgdb-hero) {
+  padding: var(--mgdb-space-5) var(--mgdb-space-5) var(--mgdb-space-6);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--hub-surface);
+  box-shadow: var(--hub-shadow-lift);
+}
+
+/* Boxes that sit inside a section keep the cool line and a shallower lift, or
+   the stack reads as embossed. */
+.mgdb-hub-page .mgdb-card,
+.mgdb-hub-page .mgdb-metric,
+.mgdb-hub-page .mgdb-panel,
+.mgdb-hub-page .mgdb-figure,
+.mgdb-hub-page .mgdb-table-scroll,
+.mgdb-hub-page .mgdb-hub-surface {
+  border-color: var(--hub-line);
+  background: var(--hub-surface);
+  box-shadow: var(--hub-shadow);
+}
+
+.mgdb-hub-page .mgdb-card,
+.mgdb-hub-page .mgdb-figure,
+.mgdb-hub-page .mgdb-hub-surface { border-radius: 12px; }
+
+/* Hairlines inside a card follow the same blue-grey, or the warm default line
+   shows against the cool surfaces. */
+.mgdb-hub-page .mgdb-table th,
+.mgdb-hub-page .mgdb-table td { border-color: var(--hub-line-soft); }
+
+/* --------------------------------------------------------------------------
+   Section titles carry no rule of their own
+
+   `.mgdb-section-heading` in mgdb-modern.css closes with a border-bottom. That
+   was right when a section was a transparent band on one continuous sheet and
+   the rule was the only thing separating it from the next. Now the section is
+   a bordered white card, so the rule read as a second border a few pixels
+   inside the first -- a box around the title. The card's own edge does that
+   job; the heading just needs air under it.
+   -------------------------------------------------------------------------- */
+
+.mgdb-hub-page .mgdb-section-heading {
+  margin-bottom: var(--mgdb-space-4);
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Every section carries its own top edge colour
+
+   The metric row marks its four cards with four colours; a hub's sections get
+   the same treatment, so the stack reads as distinct panels rather than one
+   repeated card, and a reader scrolling back can find a section by its edge.
+
+   The rotation is positional and starts at 2, because the hero is the first
+   <section> on every hub and is excluded from the treatment. Eight colours
+   covers the longest hub built so far without repeating. A page that wants to
+   pin a particular section to a particular colour can say so with one of the
+   .mgdb-hub-tone-* classes below, which are declared after the rotation and
+   therefore win.
+
+   These rules sit after the Related resources block on purpose: that block
+   sets a `border-color` shorthand for its green wash, which would otherwise
+   take the top edge with it.
+   -------------------------------------------------------------------------- */
+
+.mgdb-hub-page > section:not(.mgdb-hero) { border-top-width: 4px; }
+
+/* Zebra striping was set against the warm ground, and at #fafbfe it was not
+   readable as striping at all on a white card. The band is the page ground
+   itself, which reads as a band without becoming a second colour. */
+.mgdb-hub-page .mgdb-table tbody tr:nth-child(even) { background: var(--hub-ground); }
+.mgdb-hub-page .mgdb-table tbody tr:hover { background: #e6eefb; }
+
+/* The hero is the page's one filled panel and would fight a white ground, so
+   it keeps its wash and takes the cool line and the lift instead. */
+.mgdb-hub-page .mgdb-hero {
+  border-color: var(--hub-line);
+  box-shadow: var(--hub-shadow-lift);
+}
+
+/* The sticky tab bar is navigation, not a record. White on the tint with a
+   radius and a shadow gave it an outline it had not asked for. It takes the
+   ground instead and marks its own edge with a rule -- still opaque, because
+   it is sticky and content scrolls under it. */
+.mgdb-hub-page .mgdb-section-tabs {
+  padding: var(--mgdb-space-2) 0;
+  border-bottom: 1px solid var(--hub-line);
+  background: var(--hub-ground);
+  box-shadow: none;
+}
+
+/* --------------------------------------------------------------------------
+   No section descriptions
+
+   The line that sits opposite each section heading keeps coming back as a
+   review comment. Hub pages should not write one; this catches any that are
+   carried over when a page is copied from an older hub.
+   -------------------------------------------------------------------------- */
+
+.mgdb-hub-page .mgdb-section-heading > p { display: none; }
+
+/* --------------------------------------------------------------------------
+   Metric cards take a coloured top edge
+
+   The homepage marks its metrics with a coloured spine on the left. Same idea
+   here, moved to the top edge, so a row of four reads as four. The tone class
+   is what picks the colour; the nth-child rotation below is the fallback for
+   markup that carries no tone, and both land on the same four colours in the
+   same order.
+   -------------------------------------------------------------------------- */
+
+.mgdb-hub-page .mgdb-metric {
+  border-top-width: 4px;
+  border-left-width: 1px;
+}
+
+.mgdb-hub-page .mgdb-metric-grid > .mgdb-metric:nth-child(4n+1) { border-top-color: var(--mgdb-green); }
+.mgdb-hub-page .mgdb-metric-grid > .mgdb-metric:nth-child(4n+2) { border-top-color: var(--mgdb-gold); }
+.mgdb-hub-page .mgdb-metric-grid > .mgdb-metric:nth-child(4n+3) { border-top-color: var(--mgdb-status-info); }
+.mgdb-hub-page .mgdb-metric-grid > .mgdb-metric:nth-child(4n+4) { border-top-color: var(--mgdb-burgundy); }
+
+.mgdb-hub-page .mgdb-metric.mgdb-tone-green    { border-top-color: var(--mgdb-green); }
+.mgdb-hub-page .mgdb-metric.mgdb-tone-amber    { border-top-color: var(--mgdb-gold); }
+.mgdb-hub-page .mgdb-metric.mgdb-tone-blue     { border-top-color: var(--mgdb-status-info); }
+.mgdb-hub-page .mgdb-metric.mgdb-tone-burgundy { border-top-color: var(--mgdb-burgundy); }
+.mgdb-hub-page .mgdb-metric.mgdb-tone-red      { border-top-color: var(--mgdb-red); }
+
+.mgdb-hub-page .mgdb-metric:hover {
+  border-color: var(--hub-line);
+  box-shadow: var(--hub-shadow-hover);
+  transform: translateY(-2px);
+}
+
+/* The tone has to survive the hover, which resets border-color wholesale. */
+.mgdb-hub-page .mgdb-metric-grid > .mgdb-metric:nth-child(4n+1):hover { border-top-color: var(--mgdb-green); }
+.mgdb-hub-page .mgdb-metric-grid > .mgdb-metric:nth-child(4n+2):hover { border-top-color: var(--mgdb-gold); }
+.mgdb-hub-page .mgdb-metric-grid > .mgdb-metric:nth-child(4n+3):hover { border-top-color: var(--mgdb-status-info); }
+.mgdb-hub-page .mgdb-metric-grid > .mgdb-metric:nth-child(4n+4):hover { border-top-color: var(--mgdb-burgundy); }
+
+.mgdb-hub-page .mgdb-metric.mgdb-tone-green:hover    { border-top-color: var(--mgdb-green); }
+.mgdb-hub-page .mgdb-metric.mgdb-tone-amber:hover    { border-top-color: var(--mgdb-gold); }
+.mgdb-hub-page .mgdb-metric.mgdb-tone-blue:hover     { border-top-color: var(--mgdb-status-info); }
+.mgdb-hub-page .mgdb-metric.mgdb-tone-burgundy:hover { border-top-color: var(--mgdb-burgundy); }
+.mgdb-hub-page .mgdb-metric.mgdb-tone-red:hover      { border-top-color: var(--mgdb-red); }
+
+/* --------------------------------------------------------------------------
+   Grid tiles take a coloured top edge on hover
+
+   Cards in a grid carry a neutral 3px top edge at rest and colour it when the
+   pointer or the keyboard reaches them, so the grid has a highlight that does
+   not move anything around it.
+   -------------------------------------------------------------------------- */
+
+.mgdb-hub-page .mgdb-card-grid > .mgdb-card,
+.mgdb-hub-page .mgdb-hub-tile {
+  border-top: 3px solid var(--hub-line);
+  transition: border-top-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+.mgdb-hub-page .mgdb-card-grid > .mgdb-card:hover,
+.mgdb-hub-page .mgdb-card-grid > .mgdb-card:focus-within,
+.mgdb-hub-page .mgdb-hub-tile:hover,
+.mgdb-hub-page .mgdb-hub-tile:focus-within {
+  border-top-color: var(--mgdb-gold);
+  box-shadow: var(--hub-shadow-hover);
+  transform: translateY(-2px);
+}
+
+/* Cards in a row are the same height, so their closing links should sit on the
+   same line. The slack goes to the description rather than to the link's own
+   margin: `margin-top: auto` collapses the gap to nothing on any card whose
+   text already fills the height, which is most of them. Making the card a flex
+   column blockifies the pill, hence align-self. */
+.mgdb-hub-page .mgdb-card-grid > .mgdb-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.mgdb-hub-page .mgdb-card-grid > .mgdb-card > .mgdb-pill { align-self: flex-start; }
+.mgdb-hub-page .mgdb-card-grid > .mgdb-card > p { flex: 1 1 auto; }
+
+/* --------------------------------------------------------------------------
+   Related resources keeps its green wash
+
+   It is the page's closing panel and the one place the green belongs, so it
+   overrides the white section above -- the links inside stay white, which is
+   what makes them read as cards on it.
+   -------------------------------------------------------------------------- */
+
+.mgdb-hub-page > section.mgdb-hub-related,
+.mgdb-hub-page .mgdb-resource-panel {
+  border-color: #cfe3d6;
+  background: linear-gradient(115deg, #f4faf6 0%, var(--mgdb-green-soft) 46%, #e4f0e6 100%);
+}
+
+/* Inside the green section the panel is the section, so it drops its own box. */
+.mgdb-hub-page > section.mgdb-hub-related .mgdb-resource-panel {
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.mgdb-hub-page .mgdb-resource-list > a {
+  border-color: #cfe3d6;
+  background: rgba(255, 255, 255, .9);
+  box-shadow: none;
+}
+
+/* The Internal / External chip follows the description in the card's flex
+   column, so it lands wherever that description happens to end. Letting the
+   description take the slack puts every chip on the floor of its card and
+   still leaves it a real margin, which `margin-top: auto` does not on a card
+   whose description runs the full three lines. */
+.mgdb-hub-page .mgdb-resource-list > a > span:not(.mgdb-resource-badge) { flex: 1 1 auto; }
+
+.mgdb-hub-page .mgdb-resource-list > a > .mgdb-resource-badge {
+  margin-top: var(--mgdb-space-3);
+  align-self: flex-start;
+}
+
+/* The rotation itself, and the override classes. See the note above the
+   `border-top-width` rule for why they live here rather than beside it. */
+
+.mgdb-hub-page > section:nth-of-type(2) { border-top-color: var(--mgdb-green); }
+.mgdb-hub-page > section:nth-of-type(3) { border-top-color: var(--mgdb-gold); }
+.mgdb-hub-page > section:nth-of-type(4) { border-top-color: var(--mgdb-status-info); }
+.mgdb-hub-page > section:nth-of-type(5) { border-top-color: var(--mgdb-burgundy); }
+.mgdb-hub-page > section:nth-of-type(6) { border-top-color: var(--mgdb-leaf); }
+.mgdb-hub-page > section:nth-of-type(7) { border-top-color: var(--mgdb-orange); }
+.mgdb-hub-page > section:nth-of-type(8) { border-top-color: var(--mgdb-wine); }
+.mgdb-hub-page > section:nth-of-type(9) { border-top-color: var(--mgdb-gold-dark); }
+
+.mgdb-hub-page > section.mgdb-hub-tone-green    { border-top-color: var(--mgdb-green); }
+.mgdb-hub-page > section.mgdb-hub-tone-amber    { border-top-color: var(--mgdb-gold); }
+.mgdb-hub-page > section.mgdb-hub-tone-blue     { border-top-color: var(--mgdb-status-info); }
+.mgdb-hub-page > section.mgdb-hub-tone-burgundy { border-top-color: var(--mgdb-burgundy); }
+.mgdb-hub-page > section.mgdb-hub-tone-leaf     { border-top-color: var(--mgdb-leaf); }
+.mgdb-hub-page > section.mgdb-hub-tone-orange   { border-top-color: var(--mgdb-orange); }
+.mgdb-hub-page > section.mgdb-hub-tone-wine     { border-top-color: var(--mgdb-wine); }
+.mgdb-hub-page > section.mgdb-hub-tone-gold     { border-top-color: var(--mgdb-gold-dark); }
+
+/* --------------------------------------------------------------------------
+   References
+
+   One shape for a cited paper, wherever it appears. Taken from /NAM_project,
+   which is where the group settled it: journal and year as a pill, the DOI in
+   mono beside it, the title in burgundy, then authors, citation, the abstract
+   in a green-edged well, and the links as buttons.
+
+   This is the one block in this file that does not require `mgdb-hub-page`, so
+   a page outside the hub set can load the sheet and get the same references.
+   -------------------------------------------------------------------------- */
+
+.mgdb-ref-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-ref {
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--hub-line, var(--mgdb-line));
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-ref-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-ref-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.mgdb-ref-doi {
+  color: var(--mgdb-muted);
+  font-family: var(--mgdb-font-mono);
+  font-size: 11px;
+  /* A DOI is one unbroken token and will push a narrow card wide. */
+  overflow-wrap: anywhere;
+}
+
+.mgdb-ref-title {
+  margin: 0 0 var(--mgdb-space-2);
+  color: var(--mgdb-burgundy);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.mgdb-ref-title a { color: inherit; }
+
+.mgdb-ref-authors {
+  margin: 0 0 var(--mgdb-space-1);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.4;
+}
+
+.mgdb-ref-citation {
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-ref-abstract {
+  margin-bottom: var(--mgdb-space-4);
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-left: 3px solid var(--mgdb-green);
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-ref-abstract h4 {
+  margin: 0 0 4px;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.mgdb-ref-abstract p {
+  margin: 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  line-height: 1.6;
+}
+
+.mgdb-ref-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+}
+
+/* The copy buttons sit beside the link buttons and must match their height, or
+   the row steps. */
+.mgdb-ref-actions .mgdb-ref-copy {
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--hub-line, var(--mgdb-line));
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink-soft);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mgdb-ref-actions .mgdb-ref-copy:hover {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+}
+
+@media (max-width: 640px) {
+  .mgdb-ref { padding: var(--mgdb-space-4); }
+  .mgdb-ref-title { font-size: 1.1rem; }
+}
+
+/* --------------------------------------------------------------------------
+   Form rows: one baseline for the labels, one height for the controls
+
+   Labels wrap to one line or two depending on their text, so each field's
+   control used to start wherever its own label happened to end -- three
+   controls on three different lines in one row. Reserving a fixed two-line
+   band and bottom-aligning the label inside it gives every control the same
+   starting line. 2.8em is exactly two lines of the label's own 13px type at
+   the snug line height, so a one-line label reserves the second line without
+   adding air beyond it.
+
+   The controls were also not the same height: a select was the 44px tap
+   target while a text input was 40px. Everything in these rows is now 44px.
+   -------------------------------------------------------------------------- */
+
+.mgdb-hub-page .mgdb-hub-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--mgdb-space-1);
+}
+
+.mgdb-hub-page .mgdb-hub-field > label:first-child {
+  display: flex;
+  min-height: 2.8em;
+  align-items: flex-end;
+  margin: 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  line-height: var(--mgdb-leading-snug);
+  text-transform: uppercase;
+}
+
+.mgdb-hub-page .mgdb-hub-field > select,
+.mgdb-hub-page .mgdb-hub-field > input,
+.mgdb-hub-page .mgdb-hub-field > .mgdb-hub-check {
+  box-sizing: border-box;
+  min-height: var(--mgdb-tap-target);
+  height: var(--mgdb-tap-target);
+  max-width: 100%;
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid #b9b2a5;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-hub-page .mgdb-hub-field > select:focus,
+.mgdb-hub-page .mgdb-hub-field > input:focus {
+  border-color: var(--mgdb-focus);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(11, 87, 164, .18);
+}
+
+/* A button with no label above it bottom-aligns with the fields rather than
+   reserving a band of its own -- a fixed top padding would be in the button's
+   font size, not the label's, and land 10px low. */
+.mgdb-hub-page .mgdb-hub-field-action { align-self: end; }
+
+.mgdb-hub-page .mgdb-hub-field-action .mgdb-button {
+  min-height: var(--mgdb-tap-target);
+  height: var(--mgdb-tap-target);
+  white-space: nowrap;
+}
+
+.mgdb-hub-page .mgdb-hub-check {
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.mgdb-hub-page .mgdb-hub-check input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  accent-color: var(--mgdb-green-dark);
+  cursor: pointer;
+}
+
+/* --------------------------------------------------------------------------
+   Where a tab jump lands
+
+   The shared rule is a flat 4.5rem. The sticky bar it is meant to clear is not
+   80px: it is about 57px with the tabs on one row and about 105px when they
+   wrap to two. So the single value is wrong in both directions -- dead space
+   on a wide screen, and on a narrow one the heading lands under the bar it was
+   supposed to clear. Matched to the bar, plus 8px so the heading is not flush
+   against it. The page script reads this value back, so the two agree by
+   construction.
+   -------------------------------------------------------------------------- */
+
+.mgdb-hub-page > section[id] { scroll-margin-top: 65px; }
+
+@media (max-width: 1170px) {
+  .mgdb-hub-page > section[id] { scroll-margin-top: 113px; }
+}
+
+@media (max-width: 720px) {
+  .mgdb-hub-page > section:not(.mgdb-hero) {
+    padding: var(--mgdb-space-4) var(--mgdb-space-4) var(--mgdb-space-5);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mgdb-hub-page .mgdb-metric,
+  .mgdb-hub-page .mgdb-card-grid > .mgdb-card,
+  .mgdb-hub-page .mgdb-hub-tile { transition: none; }
+
+  .mgdb-hub-page .mgdb-metric:hover,
+  .mgdb-hub-page .mgdb-card-grid > .mgdb-card:hover,
+  .mgdb-hub-page .mgdb-hub-tile:hover { transform: none; }
+}
+
+@media print {
+  #content { background: #fff; }
+  .mgdb-hub-page > section { border: 0; box-shadow: none; }
+}
