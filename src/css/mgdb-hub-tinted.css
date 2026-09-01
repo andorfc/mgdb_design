@@ -1,9 +1,10 @@
 /* ==========================================================================
    Data hub, tinted ground — comparison variant
 
-   Loaded by /data_center/map2, /data_center/stock2 and /genome2 -- the tinted
-   halves of the comparison pairs -- and by /ai, which is built on this ground
-   outright rather than as a variant of an untinted page.
+   Loaded by /data_center/map2, /data_center/stock2 and /genome2, the tinted
+   halves of the comparison pairs, so the pages they copy are untouched and
+   each pair can be held side by side. New hubs take css/mgdb-hub.css instead:
+   it does the same job without naming a single page.
 
    The idea is SNPTools': the page sits on a pale blue ground and every element
    on it is white, so each panel reads as a card lifted off the page rather than
@@ -50,9 +51,6 @@
 .mgdb-map-page .map-download-card,
 .mgdb-map-page .map-table-wrap,
 .mgdb-map-page .map-adv-accordion,
-.mgdb-ai-page .ai-search-panel,
-.mgdb-ai-page .ai-card,
-.mgdb-ai-page .ai-pub,
 .mgdb-card,
 .mgdb-metric,
 .mgdb-panel,
@@ -69,7 +67,6 @@
    the busiest box on the page, so it keeps a slightly stronger lift. */
 .mgdb-map-page .map-search-panel,
 .mgdb-stock-page .stock-search-panel,
-.mgdb-ai-page .ai-search-panel,
 .mgdb-genomes-page .mgdb-search {
   border-radius: 14px;
   box-shadow: var(--hub-shadow-lift);
@@ -79,8 +76,6 @@
    or the stack reads as embossed. */
 .mgdb-map-page .map-search-panel .map-adv-accordion,
 .mgdb-map-page .map-search-panel .map-query-control,
-.mgdb-ai-page .ai-search-panel .ai-adv,
-.mgdb-ai-page .ai-search-panel .ai-query-control,
 .mgdb-resource-panel .mgdb-resource-list > a {
   border-color: var(--hub-line);
   background: var(--hub-surface);
@@ -117,12 +112,6 @@
 .mgdb-map-page .map-adv-body,
 .mgdb-map-page .map-adv-actions,
 .mgdb-map-page .map-pagination,
-.mgdb-ai-page .ai-example-row,
-.mgdb-ai-page .ai-adv-body,
-.mgdb-ai-page .ai-card-links,
-.mgdb-ai-page .ai-pub-links,
-.mgdb-ai-page .ai-results-heading,
-.mgdb-ai-page .ai-pagination,
 .mgdb-section-heading,
 .mgdb-table th,
 .mgdb-table td { border-color: var(--hub-line-soft); }

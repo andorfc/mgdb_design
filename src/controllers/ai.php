@@ -37,19 +37,20 @@ $bauplan->modern();
 $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';
 $css_file  = $doc_root . '/css/mgdb-ai.css';
 $js_file   = $doc_root . '/js/mgdb-ai.js';
-$tint_file = $doc_root . '/css/mgdb-hub-tinted.css';
+$hub_file  = $doc_root . '/css/mgdb-hub.css';
 $v_css  = file_exists($css_file)  ? filemtime($css_file)  : time();
 $v_js   = file_exists($js_file)   ? filemtime($js_file)   : time();
-$v_tint = file_exists($tint_file) ? filemtime($tint_file) : time();
+$v_hub  = file_exists($hub_file)  ? filemtime($hub_file)  : time();
 
 $bauplan->preHTML('<meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
 $bauplan->includeCss('/css/static.css');
 $bauplan->includeCss('/css/mgdb-modern.css');
 $bauplan->includeCss('/css/mgdb-megamenu.css');
+/* The shared Data Hub shell -- pale blue ground, white section cards, coloured
+   metric edges, aligned form rows -- loaded before the page's own sheet, which
+   is the order css/mgdb-hub.css documents. `mgdb-hub-page` on <main> opts in. */
+$bauplan->includeCss('/css/mgdb-hub.css?v=' . $v_hub);
 $bauplan->includeCss('/css/mgdb-ai.css?v=' . $v_css);
-/* The shared data hub ground: pale blue page, white cards. Loaded last so it
-   wins at equal specificity, the same way /genome2 and /data_center/map2 do. */
-$bauplan->includeCss('/css/mgdb-hub-tinted.css?v=' . $v_tint);
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
 $bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
@@ -98,7 +99,7 @@ function ai_link($label, $url, $class = '') {
    colour through a class, so the three grids read as three groups without any
    per-card styling in the catalog. */
 function ai_render_card($r) {
-    $html  = '<article class="ai-card ai-card-' . ai_esc($r['category']) . '"'
+    $html  = '<article class="mgdb-card ai-card ai-card-' . ai_esc($r['category']) . '"'
            . ' id="ai-card-' . ai_esc($r['id']) . '">';
     $html .= '<div class="ai-card-top">';
     if (!empty($r['badge'])) {
@@ -140,7 +141,7 @@ function ai_render_publication($r) {
     $plain   = trim($r['authors'] . ' (' . $r['year'] . ') ' . $r['name'] . '. '
              . $r['journal'] . '. doi:' . $r['doi']);
 
-    $html  = '<article class="ai-pub' . (!empty($r['featured']) ? ' is-featured' : '') . '">';
+    $html  = '<article class="mgdb-card ai-pub' . (!empty($r['featured']) ? ' is-featured' : '') . '">';
     $html .= '<div class="ai-pub-meta">';
     $html .= '<span>' . ai_esc($r['year']) . '</span>';
     $html .= '<span>' . ai_esc($r['kind']) . '</span>';
@@ -320,7 +321,7 @@ $page = dashboardCache($system, $cache_key, function () use ($catalog_file) {
 $featured_html = '';
 if (!empty($page['featured_tool'])) {
     $f = $page['featured_tool'];
-    $featured_html  = '<article class="ai-card ai-card-tool ai-card-featured" id="ai-card-' . ai_esc($f['id']) . '">';
+    $featured_html  = '<article class="mgdb-card ai-card ai-card-tool ai-card-featured" id="ai-card-' . ai_esc($f['id']) . '">';
     $featured_html .= '<div class="ai-card-top">';
     $featured_html .= '<span class="ai-card-badge">' . ai_esc($f['badge']) . '</span>';
     $featured_html .= '<span class="ai-card-access ai-card-access-external">External</span>';

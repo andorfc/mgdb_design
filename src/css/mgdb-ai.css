@@ -1,21 +1,22 @@
 /* ==========================================================================
    AI & Machine Learning Data Hub — /ai
    --------------------------------------------------------------------------
-   Built on mgdb-modern.css, and on the shared data hub ground in
-   mgdb-hub-tinted.css, which loads *after* this file: the pale blue page and
-   the white cards, the coloured top edge on the metric cards, the green
-   Related resources panel and the table zebra all come from there, so nothing
-   below repeats them.
+   Loaded after css/mgdb-modern.css and css/mgdb-hub.css. The hub shell already
+   settles the pale blue ground, the white section cards and their shadow, the
+   coloured top edges on the metric row, the gold top edge a grid tile takes on
+   hover, the zebra striping, the green Related resources panel, the shared
+   form field, and the scroll offset under the sticky tab bar.
 
-   What is here is the page's own furniture: the search panel, the three
-   resource grids, the results table, and the publication list.
+   Nothing above is repeated here. What is here is the page's own furniture:
+   the query control, the examples, the advanced accordion, the results table
+   and its pagination, the card interior, the publication list, and the figure.
    ========================================================================== */
 
 /* ── Hero emblem ─────────────────────────────────────────────────────────── */
 
 /* The homepage quick link's own artwork, so the hub and the tile a reader
-   arrives from carry the same mark. It is a full-bleed PNG with a white
-   matte, which is what the shared multiply blend is for. */
+   arrives from carry the same mark. It is a PNG with a white matte, which is
+   what the shared multiply blend is for. */
 .mgdb-ai-page .mgdb-hero-emblem {
   background: #ffffff;
   border-color: var(--mgdb-line);
@@ -28,9 +29,8 @@
 }
 
 /* The hub name runs to three words, so it needs a wider emblem column than the
-   one-word hubs to avoid breaking mid-word. */
+   one-word hubs or it breaks mid-word. */
 .mgdb-ai-page .mgdb-hero { grid-template-columns: minmax(170px, 20%) minmax(0, 1fr); }
-
 .mgdb-ai-page .mgdb-hero-emblem strong { line-height: var(--mgdb-leading-snug); }
 
 /* ── Sticky section tabs ─────────────────────────────────────────────────── */
@@ -44,9 +44,6 @@
   gap: var(--mgdb-space-2);
   margin-top: var(--mgdb-space-5);
   margin-bottom: var(--mgdb-space-5);
-  padding: var(--mgdb-space-2) 0;
-  background: var(--mgdb-surface);
-  border-bottom: 1px solid var(--mgdb-line);
 }
 
 .mgdb-ai-page .mgdb-section-tabs a {
@@ -54,9 +51,9 @@
   min-height: 40px;
   align-items: center;
   padding: 0 var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
   color: var(--mgdb-ink) !important;
   font-size: var(--mgdb-text-sm);
   font-weight: 600;
@@ -74,21 +71,22 @@
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
-/* Where a tab jump lands. The two values are the measured height of the bar
-   with the tabs on one row and on two, plus 8px so the heading is not flush
-   against it -- the same construction the other hubs use. Seven tabs wrap at
-   about 900px here. mgdb-ai.js reads the value back rather than repeating it,
-   so the scrollspy and the anchor offset cannot disagree. */
-.mgdb-ai-page > section[id] { scroll-margin-top: 65px; }
-
-@media (max-width: 900px) {
-  .mgdb-ai-page > section[id] { scroll-margin-top: 113px; }
+/* The tab bar wraps to two rows at 900px here rather than the shell's 1170px,
+   because this page carries seven tabs and one of them is two words. Restated
+   so the anchor offset matches the bar at the width it actually wraps; the
+   page script reads the value back, so the scrollspy follows. */
+@media (max-width: 1170px) and (min-width: 901px) {
+  .mgdb-hub-page.mgdb-ai-page > section[id] { scroll-margin-top: 65px; }
 }
 
-.mgdb-ai-page > section[id] { margin-bottom: var(--mgdb-space-7); }
+@media (max-width: 900px) {
+  .mgdb-hub-page.mgdb-ai-page > section[id] { scroll-margin-top: 113px; }
+}
+
+.mgdb-ai-page > section[id] { margin-bottom: var(--mgdb-space-5); }
 
 /* A section heading may carry one link opposite the title -- "Browse all
-   downloads". The shared rule hides a <p> there; this is not one. */
+   downloads". The shell hides a <p> there; this is not one. */
 .mgdb-ai-page .ai-section-link {
   color: var(--mgdb-green-dark);
   font-size: var(--mgdb-text-sm);
@@ -97,81 +95,50 @@
 }
 
 /* --------------------------------------------------------------------------
-   Search panel
+   Search
+
+   The section is the white card, so the form sits directly on it: one row of
+   two declared tracks -- the query takes the slack, the button takes what it
+   needs -- with the examples and the accordion spanning underneath.
    -------------------------------------------------------------------------- */
 
-.mgdb-ai-page .ai-search-panel {
-  padding: var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-lg);
-  background: var(--mgdb-surface-alt);
-}
-
-/* One row: the query takes the slack, the button takes what it needs. Declared
-   to the two fields it holds rather than auto-fit, so there is never a dead
-   track on the right. */
 .mgdb-ai-page .ai-search-form {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  gap: var(--mgdb-space-4);
   align-items: end;
 }
 
-.mgdb-ai-page .ai-field {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  gap: var(--mgdb-space-1);
-}
-
 .mgdb-ai-page .ai-field-query { grid-column: 1; }
-.mgdb-ai-page .ai-field-submit { grid-column: 2; }
+.mgdb-ai-page .mgdb-hub-field-action { grid-column: 2; }
 .mgdb-ai-page .ai-example-row,
 .mgdb-ai-page .ai-adv { grid-column: 1 / -1; }
 
-/* Every label reserves one line of its own 13px type, so a control never
-   starts at a different height from the one beside it. */
-.mgdb-ai-page .ai-label {
-  display: flex;
-  min-height: 1.6em;
-  align-items: flex-end;
-  margin: 0;
-  color: var(--mgdb-ink-soft);
-  font-size: var(--mgdb-text-xs);
-  font-weight: 700;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-}
-
-/* One height for every control in this page's forms: the WCAG tap target. */
-.mgdb-ai-page .ai-query-control,
-.mgdb-ai-page .ai-field select,
-.mgdb-ai-page .ai-field > input[type="search"],
-.mgdb-ai-page .ai-field > input[type="text"],
-.mgdb-ai-page .ai-field-submit .mgdb-button {
-  box-sizing: border-box;
-  min-height: var(--mgdb-tap-target);
-  height: var(--mgdb-tap-target);
-}
-
+/* The query control is a wrapper, not an <input>, so the shell's field rule
+   does not reach it. It takes the same 44px and the same border. */
 .mgdb-ai-page .ai-query-control {
   display: grid;
+  box-sizing: border-box;
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: var(--mgdb-space-2);
   align-items: center;
+  min-height: var(--mgdb-tap-target);
+  height: var(--mgdb-tap-target);
   padding: 0 var(--mgdb-space-3);
   border: 1px solid #b9b2a5;
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
 }
 
 .mgdb-ai-page .ai-query-control:focus-within {
   border-color: var(--mgdb-focus);
-  box-shadow: 0 0 0 3px rgba(11, 87, 164, .18);
+  box-shadow: 0 0 0 2px rgba(11, 87, 164, .18);
 }
 
 .mgdb-ai-page .ai-search-icon { color: var(--mgdb-muted); }
 
+/* The one control on the page a reader types a sentence into, so it keeps the
+   16px body floor rather than the 14px the filter selects use. */
 .mgdb-ai-page .ai-query-control input[type="search"] {
   width: 100%;
   min-width: 0;
@@ -190,34 +157,13 @@
   border: 0;
   background: transparent;
   color: var(--mgdb-muted);
+  font-family: inherit;
   font-size: var(--mgdb-text-sm);
   font-weight: 600;
   cursor: pointer;
 }
 
 .mgdb-ai-page #ai-query-clear:hover { color: var(--mgdb-green-dark); text-decoration: underline; }
-
-.mgdb-ai-page .ai-field select,
-.mgdb-ai-page .ai-field > input[type="search"] {
-  width: 100%;
-  min-width: 0;
-  padding: 0 var(--mgdb-space-3);
-  border: 1px solid #b9b2a5;
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink);
-  font-family: inherit;
-  font-size: var(--mgdb-text-base);
-}
-
-.mgdb-ai-page .ai-field select:focus,
-.mgdb-ai-page .ai-field > input[type="search"]:focus {
-  border-color: var(--mgdb-focus);
-  outline: 2px solid transparent;
-  box-shadow: 0 0 0 3px rgba(11, 87, 164, .18);
-}
-
-.mgdb-ai-page .ai-field-submit .mgdb-button { white-space: nowrap; }
 
 /* ── Examples ────────────────────────────────────────────────────────────── */
 
@@ -227,7 +173,7 @@
   gap: var(--mgdb-space-2);
   align-items: center;
   padding-top: var(--mgdb-space-3);
-  border-top: 1px solid var(--mgdb-line-soft);
+  border-top: 1px solid var(--hub-line-soft);
 }
 
 .mgdb-ai-page .ai-example-row > span {
@@ -240,15 +186,15 @@
 
 .mgdb-ai-page .ai-example-row button {
   padding: var(--mgdb-space-1) var(--mgdb-space-3);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: 999px;
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
   color: var(--mgdb-green-dark);
   font-family: inherit;
   font-size: var(--mgdb-text-sm);
   font-weight: 600;
-  cursor: pointer;
   white-space: nowrap;
+  cursor: pointer;
 }
 
 .mgdb-ai-page .ai-example-row button:hover {
@@ -258,10 +204,12 @@
 
 /* ── Advanced search ─────────────────────────────────────────────────────── */
 
+/* A box inside the section card: it takes the line but no shadow, or the two
+   read as embossed. */
 .mgdb-ai-page .ai-adv {
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
 }
 
 .mgdb-ai-page .ai-adv summary {
@@ -276,13 +224,8 @@
 }
 
 .mgdb-ai-page .ai-adv summary strong { font-size: var(--mgdb-text-base); }
-
-.mgdb-ai-page .ai-adv summary span {
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-}
-
-.mgdb-ai-page .ai-adv[open] summary { border-bottom: 1px solid var(--mgdb-line-soft); }
+.mgdb-ai-page .ai-adv summary span { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+.mgdb-ai-page .ai-adv[open] summary { border-bottom: 1px solid var(--hub-line-soft); }
 
 /* Four fields, four tracks. Halved at tablet width and stacked on a phone, so
    a select never has to shrink below a readable width. */
@@ -307,7 +250,7 @@
 
 @media (max-width: 640px) {
   .mgdb-ai-page .ai-search-form { grid-template-columns: minmax(0, 1fr); }
-  .mgdb-ai-page .ai-field-submit { grid-column: 1; }
+  .mgdb-ai-page .mgdb-hub-field-action { grid-column: 1; }
   .mgdb-ai-page .ai-adv-body { grid-template-columns: minmax(0, 1fr); }
 }
 
@@ -328,7 +271,7 @@
   justify-content: space-between;
   margin-bottom: var(--mgdb-space-4);
   padding-bottom: var(--mgdb-space-3);
-  border-bottom: 1px solid var(--mgdb-line);
+  border-bottom: 1px solid var(--hub-line);
 }
 
 .mgdb-ai-page .ai-results-heading h2 { margin: 0; }
@@ -356,15 +299,12 @@
 .mgdb-ai-page .ai-results-table th button { white-space: nowrap; }
 .mgdb-ai-page .ai-results-table td { vertical-align: top; }
 
-.mgdb-ai-page .ai-results-table .ai-result-name {
-  display: block;
-  font-weight: 700;
-}
+.mgdb-ai-page .ai-results-table .ai-result-name { display: block; font-weight: 700; }
 
 .mgdb-ai-page .ai-results-table .ai-result-summary {
   display: block;
-  margin-top: 2px;
   max-width: 52ch;
+  margin-top: 2px;
   color: var(--mgdb-muted);
   font-size: var(--mgdb-text-xs);
   font-weight: 400;
@@ -373,18 +313,12 @@
 
 .mgdb-ai-page .ai-results-table .ai-col-open { white-space: nowrap; }
 
-/* Zebra striping. Restated at this specificity so the stripe survives if the
-   shared tinted sheet is ever dropped from this page; the hover state is
-   restated with it, or the even rows would keep the stripe under the cursor. */
-.mgdb-ai-page .ai-results-table tbody tr:nth-child(even) { background: #fafbfe; }
-.mgdb-ai-page .ai-results-table tbody tr:hover { background: var(--mgdb-green-soft); }
-
 .mgdb-ai-page .ai-chip {
   display: inline-block;
   padding: 2px var(--mgdb-space-2);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: 999px;
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
   font-size: var(--mgdb-text-xs);
   white-space: nowrap;
 }
@@ -394,11 +328,7 @@
 .mgdb-ai-page .ai-chip-code        { border-color: #e0c6c8; background: var(--mgdb-burgundy-soft); color: var(--mgdb-burgundy); }
 .mgdb-ai-page .ai-chip-publication { border-color: #e8d4a8; background: var(--mgdb-gold-soft); color: var(--mgdb-gold-dark); }
 
-.mgdb-ai-page .ai-topic-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-1);
-}
+.mgdb-ai-page .ai-topic-chips { display: flex; flex-wrap: wrap; gap: var(--mgdb-space-1); }
 
 /* ── Pagination ──────────────────────────────────────────────────────────── */
 
@@ -410,7 +340,7 @@
   justify-content: center;
   margin-top: var(--mgdb-space-4);
   padding-top: var(--mgdb-space-4);
-  border-top: 1px solid var(--mgdb-line-soft);
+  border-top: 1px solid var(--hub-line-soft);
 }
 
 .mgdb-ai-page .ai-pagination:empty { display: none; }
@@ -419,9 +349,9 @@
   min-width: var(--mgdb-tap-target);
   min-height: var(--mgdb-tap-target);
   padding: 0 var(--mgdb-space-3);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
   color: var(--mgdb-ink);
   font-family: inherit;
   font-size: var(--mgdb-text-sm);
@@ -441,53 +371,27 @@
 }
 
 .mgdb-ai-page .ai-page-btn[disabled] { opacity: .45; cursor: not-allowed; }
-
-.mgdb-ai-page .ai-page-ellipsis { color: var(--mgdb-muted); padding: 0 var(--mgdb-space-1); }
+.mgdb-ai-page .ai-page-ellipsis { padding: 0 var(--mgdb-space-1); color: var(--mgdb-muted); }
 
 /* --------------------------------------------------------------------------
-   Resource grids
+   Card interiors
 
-   One card shape for tools, data, and code. The top edge carries the category
-   colour and turns gold on hover or keyboard focus, which is the highlight
-   that tells a reader which card their pointer is on.
+   The tile itself -- the flex column, the neutral top edge, the gold on hover,
+   the description taking the slack so the closing links land on one line -- is
+   the shell's. Only what is inside the card is described here.
    -------------------------------------------------------------------------- */
 
-.mgdb-ai-page .ai-card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-  gap: var(--mgdb-space-4);
-  align-items: stretch;
-}
+.mgdb-ai-page .ai-card-grid { grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); }
 
-.mgdb-ai-page .ai-card {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  gap: var(--mgdb-space-3);
-  padding: var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-top: 4px solid var(--mgdb-green);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
-  transition: border-top-color .15s ease, box-shadow .15s ease, transform .15s ease;
-}
+.mgdb-ai-page .ai-card { gap: var(--mgdb-space-3); }
 
-/* `.mgdb-modern` is on <body> and is carried here only to outrank
-   mgdb-hub-tinted.css, which loads after this file and sets a flat
-   `border-color` on every white card -- a shorthand, so it takes the top edge
-   with it. At equal specificity the later sheet wins and all three categories
-   came out the same blue-grey. One extra class settles it. */
-.mgdb-modern .mgdb-ai-page .ai-card-tool { border-top-color: var(--mgdb-green); }
-.mgdb-modern .mgdb-ai-page .ai-card-data { border-top-color: var(--mgdb-status-info); }
-.mgdb-modern .mgdb-ai-page .ai-card-code { border-top-color: var(--mgdb-burgundy); }
+/* The shared card puts a uniform margin between every pair of children; the
+   flex `gap` above does that job here, and the two together doubled it. */
+.mgdb-ai-page .ai-card > * + *,
+.mgdb-ai-page .ai-pub > * + * { margin-top: 0; }
 
-.mgdb-modern .mgdb-ai-page .ai-card:hover,
-.mgdb-modern .mgdb-ai-page .ai-card:focus-within {
-  border-top-color: var(--mgdb-gold);
-  box-shadow: var(--mgdb-shadow);
-  transform: translateY(-1px);
-}
-
+/* The featured tool spans its grid rather than sitting as one tile among the
+   rest. */
 .mgdb-ai-page .ai-card-featured { grid-column: 1 / -1; }
 
 .mgdb-ai-page .ai-card-top {
@@ -508,7 +412,7 @@
 
 .mgdb-ai-page .ai-card-access {
   padding: 2px var(--mgdb-space-2);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: 999px;
   color: var(--mgdb-muted);
   font-size: var(--mgdb-text-xs);
@@ -529,21 +433,14 @@
   line-height: var(--mgdb-leading-snug);
 }
 
-/* The description absorbs the slack in a row of unequal cards, so the tags and
-   the links below it land on the same line on every card. */
 .mgdb-ai-page .ai-card > p {
   margin: 0;
-  flex: 1 1 auto;
   color: var(--mgdb-ink-soft);
   font-size: var(--mgdb-text-sm);
   line-height: var(--mgdb-leading);
 }
 
-.mgdb-ai-page .ai-card-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-1);
-}
+.mgdb-ai-page .ai-card-tags { display: flex; flex-wrap: wrap; gap: var(--mgdb-space-1); }
 
 .mgdb-ai-page .ai-card-tags span {
   padding: 2px var(--mgdb-space-2);
@@ -554,47 +451,40 @@
   white-space: nowrap;
 }
 
-.mgdb-ai-page .ai-card-links {
+.mgdb-ai-page .ai-card-links,
+.mgdb-ai-page .ai-pub-links {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-2) var(--mgdb-space-4);
   align-items: center;
   padding-top: var(--mgdb-space-3);
-  border-top: 1px solid var(--mgdb-line-soft);
+  border-top: 1px solid var(--hub-line-soft);
 }
 
-.mgdb-ai-page .ai-card-links a {
+.mgdb-ai-page .ai-card-links a,
+.mgdb-ai-page .ai-pub-links a {
   color: var(--mgdb-green-dark);
   font-size: var(--mgdb-text-sm);
   font-weight: 600;
   white-space: nowrap;
 }
 
-.mgdb-ai-page .ai-card-links .ai-card-cta { font-weight: 700; }
+.mgdb-ai-page .ai-card-links .ai-card-cta,
+.mgdb-ai-page .ai-pub-links a { font-weight: 700; }
 
 /* --------------------------------------------------------------------------
    Publications
+
+   One column: a citation is a line of prose, not a tile, and three of these
+   titles run past 80 characters.
    -------------------------------------------------------------------------- */
 
-.mgdb-ai-page .ai-pub-list {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--mgdb-space-4);
-}
+.mgdb-ai-page .ai-pub-list { grid-template-columns: minmax(0, 1fr); }
 
-.mgdb-modern .mgdb-ai-page .ai-pub {
-  padding: var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-top: 4px solid var(--mgdb-gold-dark);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
-  transition: border-top-color .15s ease, box-shadow .15s ease;
-}
-
-.mgdb-modern .mgdb-ai-page .ai-pub:hover,
-.mgdb-modern .mgdb-ai-page .ai-pub:focus-within {
-  border-top-color: var(--mgdb-gold);
-  box-shadow: var(--mgdb-shadow);
+.mgdb-ai-page .ai-pub {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-2);
 }
 
 .mgdb-ai-page .ai-pub-meta {
@@ -610,7 +500,7 @@
 }
 
 .mgdb-ai-page .ai-pub h3 {
-  margin: var(--mgdb-space-2) 0 var(--mgdb-space-2);
+  margin: 0;
   font-size: var(--mgdb-text-lg);
   line-height: var(--mgdb-leading-snug);
 }
@@ -619,7 +509,7 @@
 
 .mgdb-ai-page .ai-pub-authors,
 .mgdb-ai-page .ai-pub-citation {
-  margin: 0 0 var(--mgdb-space-1);
+  margin: 0;
   color: var(--mgdb-ink-soft);
   font-size: var(--mgdb-text-sm);
   line-height: var(--mgdb-leading-snug);
@@ -627,27 +517,11 @@
 
 .mgdb-ai-page .ai-pub-citation { color: var(--mgdb-muted); }
 
-.mgdb-ai-page .ai-pub-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2) var(--mgdb-space-4);
-  align-items: center;
-  margin-top: var(--mgdb-space-3);
-  padding-top: var(--mgdb-space-3);
-  border-top: 1px solid var(--mgdb-line-soft);
-}
-
-.mgdb-ai-page .ai-pub-links a {
-  color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-}
-
 .mgdb-ai-page .ai-copy {
   padding: var(--mgdb-space-1) var(--mgdb-space-3);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
   color: var(--mgdb-ink-soft);
   font-family: inherit;
   font-size: var(--mgdb-text-sm);
@@ -662,7 +536,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   Metrics figure
+   The figure
 
    The shared .mgdb-chart is a fixed 320px, which squashes a bar chart that
    needs a row per data type. mgdb-ai.js sets an explicit pixel height from the
@@ -679,8 +553,6 @@
 }
 
 .mgdb-ai-page .ai-figure-table { margin-top: var(--mgdb-space-4); }
-.mgdb-ai-page .ai-figure-table tbody tr:nth-child(even) { background: #fafbfe; }
-.mgdb-ai-page .ai-figure-table tbody tr:hover { background: var(--mgdb-green-soft); }
 
 /* --------------------------------------------------------------------------
    Narrow screens
@@ -692,14 +564,11 @@
 
 @media (max-width: 640px) {
   .mgdb-ai-page .mgdb-hero { grid-template-columns: minmax(0, 1fr); }
-  .mgdb-ai-page .ai-search-panel { padding: var(--mgdb-space-4); }
-  .mgdb-ai-page .ai-card { padding: var(--mgdb-space-4); }
   .mgdb-ai-page .ai-results-controls { width: 100%; }
 }
 
-/* Printing drops the sticky bar and the interactive controls. */
 @media print {
   .mgdb-ai-page .mgdb-section-tabs,
-  .mgdb-ai-page .ai-search-panel,
+  .mgdb-ai-page .ai-search-form,
   .mgdb-ai-page .ai-pagination { display: none; }
 }

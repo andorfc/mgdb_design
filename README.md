@@ -1060,11 +1060,20 @@ ADMIN_DEPENDENCIES for the command and when to run it.
 
 ## The AI & Machine Learning Data Hub
 
-`/ai` is the first page built on the **tinted data hub pattern** outright,
-rather than as the "2" half of a comparison pair. It takes its ground, its
-white cards, its metric top edges and its green Related resources panel from
-`css/mgdb-hub-tinted.css`, the same sheet `/genome2` and `/data_center/map2`
-load; the page's own sheet only describes its furniture.
+`/ai` is built on `css/mgdb-hub.css`, the generalised Data Hub shell: it puts
+`mgdb-hub-page` on `<main>` and takes the pale blue ground, the white section
+cards, the coloured metric top edges, the gold edge a grid tile lifts on hover,
+the zebra striping, the green Related resources panel, the shared form field and
+the scroll offset from there. `css/mgdb-ai.css` describes only the page's own
+furniture and repeats none of it.
+
+It was first built against `css/mgdb-hub-tinted.css`, the sheet `/genome2` and
+`/data_center/map2` load, and moved once the generalised shell turned up. The
+two differ in one visible way: the tinted sheet leaves each `<section>`
+transparent and lifts only the boxes inside it, while the shell makes the
+section itself the white card. The second is what "make the individual sections
+have white backgrounds" asks for, and it is the one a new hub should use — the
+tinted sheet names every page it touches and stays with the comparison pairs.
 
 **Its collection is a catalog, not a table, so the page runs no SQL at all.**
 `data/ai/ai_resources.json` is the single source of truth for 27 resources —
@@ -1117,22 +1126,26 @@ maizegdb.org domain: `snptools.maizegdb.org`, `feta.maizegdb.org` and
 `mfs.maizegdb.org` are separate applications a reader leaves the site to reach,
 and a first attempt that excluded the domain marked all three "Internal".
 
-### Two shared-CSS traps this page hit
+### Two shared-CSS notes
 
-- **`mgdb-hub-tinted.css` sets a flat `border-color` on every white card.**
-  It is a shorthand, so it takes the top edge with it — and it loads *after* the
-  page sheet, so at equal specificity the three category colours on
-  `.ai-card-tool` / `-data` / `-code` all came out the tint's blue-grey. The
-  fix is one extra class: `.mgdb-modern .mgdb-ai-page .ai-card-tool`.
-- **`--mgdb-dur-fast` is defined nowhere.** Three page sheets use it in
+- **`--mgdb-dur-fast` is defined nowhere.** Three page sheets use it inside a
   `transition`, which makes the whole declaration invalid — those transitions
   have never run. Written out here rather than propagated.
+- **A hub sheet's flat `border-color` takes the top edge with it.** It is a
+  shorthand, and both hub sheets set one on every white card. While `/ai` was
+  still on `mgdb-hub-tinted.css` that silently flattened the three category
+  colours on `.ai-card-tool` / `-data` / `-code` to the tint's blue-grey,
+  because the shared sheet loads after the page sheet and the two selectors
+  were the same specificity. On `mgdb-hub.css` the question does not arise: the
+  shell owns the tile edge, neutral at rest and gold on hover, and the category
+  is carried by the section the card is in.
 
-While in that sheet, the zebra rule was found to be cancelling the table hover
-on every hub that loads it: `.mgdb-table tbody tr:nth-child(even)` and
-`.mgdb-table tbody tr:hover` are the same specificity and the zebra comes
-later, so even rows had no hover state. Fixed in the shared sheet, so
-`/genome2` and `/data_center/map2` get it too.
+While in `mgdb-hub-tinted.css`, its zebra rule was found to be cancelling the
+table hover on every hub that loads it: `.mgdb-table tbody tr:nth-child(even)`
+and `.mgdb-table tbody tr:hover` are the same specificity and the zebra comes
+later, so even rows had no hover state. Fixed there, so `/genome2`,
+`/data_center/map2` and `/data_center/stock2` get it too. `mgdb-hub.css`
+already had the pair the right way round.
 
 ## AlphaFill ligand transplants
 
