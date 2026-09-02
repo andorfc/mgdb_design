@@ -1,123 +1,32 @@
-/* MaizeGDB Data Hubs Stylesheet
-   Scoped under .mgdb-data-center-hub; utilizes mgdb-modern.css tokens. */
+/* ==========================================================================
+   Data Hub directory — /data_center/
+   --------------------------------------------------------------------------
+   Loaded after css/mgdb-modern.css and css/mgdb-hub.css. The hub shell settles
+   the pale blue ground, the white section cards and their coloured top edges,
+   the absence of a rule under a section title, the metric colours, the gold
+   edge a grid tile takes on hover, the green Related resources panel, and the
+   scroll offset.
 
-/* ── Hero Section ─────────────────────────────────────────────────────────── */
+   This page is a directory rather than a record search, so its "results" are
+   the hub cards and they are visible from the start. What is here is the
+   finder, the hub cards, the guided-path tiles, and the two figures.
+   ========================================================================== */
 
-.mgdb-data-center-hub .data-hub-hero {
-  display: grid;
-  grid-template-columns: 240px minmax(0, 1fr);
-  gap: var(--mgdb-space-6);
-  padding: var(--mgdb-space-6);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: linear-gradient(135deg, var(--mgdb-green-soft) 0%, var(--mgdb-surface) 65%, #f4f8f3 100%);
-  margin-bottom: var(--mgdb-space-6);
-}
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
 
-.mgdb-data-center-hub .data-hub-logo-panel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: var(--mgdb-space-4);
-  border-right: 1px solid var(--mgdb-line);
+.mgdb-data-center-hub .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
 }
 
 .mgdb-data-center-hub .data-hub-hero-svg {
-  width: 84px;
-  height: 84px;
-  margin-bottom: var(--mgdb-space-2);
-}
-
-.mgdb-data-center-hub .data-hub-logo-panel strong {
-  color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-lg);
-  line-height: var(--mgdb-leading-tight);
-}
-
-.mgdb-data-center-hub .data-hub-logo-panel span {
-  margin-top: var(--mgdb-space-1);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-}
-
-.mgdb-data-center-hub .data-hub-hero-main {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: var(--mgdb-space-5);
-}
-
-.mgdb-data-center-hub .data-hub-hero-copy h1 {
-  margin: var(--mgdb-space-2) 0 var(--mgdb-space-2);
-  color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-3xl);
-  line-height: var(--mgdb-leading-tight);
-}
-
-.mgdb-data-center-hub .data-hub-hero-tagline {
-  max-width: var(--mgdb-measure);
-  color: var(--mgdb-ink);
-  font-size: var(--mgdb-text-base);
-  line-height: var(--mgdb-leading);
-}
-
-.mgdb-data-center-hub .data-hub-hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-3);
-  margin-top: var(--mgdb-space-4);
-}
-
-.mgdb-data-center-hub .data-hub-hero-route {
-  padding-top: var(--mgdb-space-4);
-  border-top: 1px solid var(--mgdb-line);
-}
-
-.mgdb-data-center-hub .data-hub-hero-route > span {
   display: block;
-  margin-bottom: var(--mgdb-space-2);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-}
-
-.mgdb-data-center-hub .data-hub-hero-route ol {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--mgdb-space-3);
-  padding: 0;
+  width: min(100%, 76px);
+  height: auto;
   margin: 0;
-  list-style: none;
 }
 
-.mgdb-data-center-hub .data-hub-hero-route li {
-  padding: var(--mgdb-space-2) var(--mgdb-space-3);
-  border-left: 3px solid var(--mgdb-green);
-  background: rgba(255, 255, 255, 0.7);
-  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
-}
-
-.mgdb-data-center-hub .data-hub-hero-route li strong {
-  display: block;
-  color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-sm);
-}
-
-.mgdb-data-center-hub .data-hub-hero-route li small {
-  display: block;
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-xs);
-  line-height: var(--mgdb-leading-snug);
-}
-
-/* ── Sticky Section Tabs ─────────────────────────────────────────────────── */
+/* ── Sticky section tabs ─────────────────────────────────────────────────── */
 
 .mgdb-data-center-hub .mgdb-section-tabs {
   position: sticky;
@@ -127,10 +36,7 @@
   flex-wrap: wrap;
   gap: var(--mgdb-space-2);
   margin-top: var(--mgdb-space-5);
-  margin-bottom: var(--mgdb-space-6);
-  padding: var(--mgdb-space-2) 0;
-  background: var(--mgdb-surface);
-  border-bottom: 1px solid var(--mgdb-line);
+  margin-bottom: var(--mgdb-space-5);
 }
 
 .mgdb-data-center-hub .mgdb-section-tabs a {
@@ -138,148 +44,156 @@
   min-height: 40px;
   align-items: center;
   padding: 0 var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
   color: var(--mgdb-ink) !important;
   font-size: var(--mgdb-text-sm);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
-  transition: background .12s, border-color .12s;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
 }
 
-.mgdb-data-center-hub .mgdb-section-tabs a:hover {
-  background: var(--mgdb-green-soft);
-}
+.mgdb-data-center-hub .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
 
-.mgdb-data-center-hub .mgdb-section-tabs a.is-current {
+.mgdb-data-center-hub .mgdb-section-tabs a.is-current,
+.mgdb-data-center-hub .mgdb-section-tabs a[aria-current="true"] {
   border-color: var(--mgdb-green-dark);
   background: var(--mgdb-green-dark);
-  color: #fff !important;
+  color: #ffffff !important;
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
-.mgdb-data-center-hub > section,
-.mgdb-data-center-hub section[id] {
-  scroll-margin-top: 4.5rem;
-  margin-bottom: var(--mgdb-space-8);
+/* The offset ladder is set from the measured bar height, not from the tab
+   count, and not from the shell's default -- which steps to 113px at 1170px
+   while this bar may still be one row. Measured by resizing the real page:
+   one row (57px) down to somewhere in 701-740, two rows (105px) down to
+   somewhere in 396-415, and three (153px) below that. Each band takes the
+   larger of the two heights it could straddle, so a boundary errs towards dead
+   space and never towards a heading hidden behind the bar. */
+@media (max-width: 1170px) and (min-width: 741px) {
+  .mgdb-hub-page.mgdb-data-center-hub > section[id] { scroll-margin-top: 65px; }
 }
 
-/* ── Live Metrics Dashboard ──────────────────────────────────────────────── */
-
-.mgdb-data-center-hub .data-hub-metric-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--mgdb-space-3);
-  margin-top: var(--mgdb-space-4);
+@media (max-width: 740px) and (min-width: 416px) {
+  .mgdb-hub-page.mgdb-data-center-hub > section[id] { scroll-margin-top: 113px; }
 }
 
-.mgdb-data-center-hub .data-hub-metric {
-  display: flex;
-  gap: var(--mgdb-space-3);
-  align-items: flex-start;
-  padding: var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
-  transition: transform .15s ease, box-shadow .15s ease;
+@media (max-width: 415px) {
+  .mgdb-hub-page.mgdb-data-center-hub > section[id] { scroll-margin-top: 161px; }
 }
 
-.mgdb-data-center-hub .data-hub-metric:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--mgdb-shadow-sm);
-}
+.mgdb-data-center-hub > section[id] { margin-bottom: var(--mgdb-space-5); }
 
-.mgdb-data-center-hub .data-hub-metric-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: var(--mgdb-radius-sm);
-  font-size: var(--mgdb-text-xs);
-  font-weight: 900;
-  letter-spacing: .02em;
-  flex-shrink: 0;
-}
-
-.mgdb-data-center-hub .data-hub-tone-green .data-hub-metric-icon { background: var(--mgdb-green-soft); color: var(--mgdb-green-dark); }
-.mgdb-data-center-hub .data-hub-tone-blue .data-hub-metric-icon { background: #e8f1f8; color: #1b4d75; }
-.mgdb-data-center-hub .data-hub-tone-teal .data-hub-metric-icon { background: #e6f6f4; color: #156d64; }
-.mgdb-data-center-hub .data-hub-tone-gold .data-hub-metric-icon { background: var(--mgdb-gold-soft); color: var(--mgdb-gold-dark); }
-
-.mgdb-data-center-hub .data-hub-metric strong {
-  display: block;
-  color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-2xl);
-  line-height: var(--mgdb-leading-none);
-}
-
-.mgdb-data-center-hub .data-hub-metric h3 {
-  margin: var(--mgdb-space-1) 0 2px;
-  color: var(--mgdb-ink);
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-}
-
-.mgdb-data-center-hub .data-hub-metric p {
+.mgdb-data-center-hub .data-hub-section-lead {
+  max-width: 60rem;
+  margin: 0 0 1.1rem;
   color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-xs);
-  line-height: var(--mgdb-leading-snug);
 }
 
-/* ── Interactive Visual Charts ───────────────────────────────────────────── */
+/* ── The finder ──────────────────────────────────────────────────────────── */
 
-.mgdb-data-center-hub .data-hub-dashboard {
-  padding: var(--mgdb-space-6);
+.mgdb-data-center-hub .data-hub-search-panel {
+  overflow: hidden;
+  padding: clamp(1.25rem, 3vw, 2.2rem);
   border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface-alt);
-}
-
-.mgdb-data-center-hub .data-hub-chart-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.9fr);
-  gap: var(--mgdb-space-5);
-  margin-top: var(--mgdb-space-4);
-}
-
-.mgdb-data-center-hub .data-hub-chart-card {
-  padding: var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
+  border-top: 0.3rem solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius-lg);
   background: var(--mgdb-surface);
   box-shadow: var(--mgdb-shadow-sm);
+  margin-bottom: var(--mgdb-space-5);
 }
 
-.mgdb-data-center-hub .data-hub-chart-card h3 {
-  margin: var(--mgdb-space-1) 0 var(--mgdb-space-1);
+.mgdb-data-center-hub .data-hub-search-intro > div { max-width: 48rem; }
+
+.mgdb-data-center-hub .data-hub-search-intro h3 {
+  margin: 0.25rem 0 0.45rem;
   color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-lg);
+  font-size: clamp(1.35rem, 2.5vw, 1.8rem);
 }
 
-.mgdb-data-center-hub .data-hub-chart-card p {
+.mgdb-data-center-hub .data-hub-search-intro p {
+  margin: 0 0 1.2rem;
   color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-xs);
-  line-height: var(--mgdb-leading-snug);
 }
 
-.mgdb-data-center-hub .data-hub-chart {
-  width: 100%;
-  height: 290px;
-  margin-top: var(--mgdb-space-3);
-}
-
-.mgdb-data-center-hub .data-hub-chart-fallback {
+/* The control line. The clear button sits in the same flex row as the input
+   rather than in a neighbouring grid column offset by a hand-measured margin,
+   so they share the input's baseline by construction. */
+.mgdb-data-center-hub .data-hub-query-line {
   display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
 }
 
-/* ── Guided Tasks Grid ───────────────────────────────────────────────────── */
+.mgdb-data-center-hub .data-hub-query-line .mgdb-input {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.mgdb-data-center-hub .data-hub-query-field { min-width: 0; }
+
+.mgdb-data-center-hub .data-hub-query-clear {
+  min-height: var(--mgdb-tap-target);
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+.mgdb-data-center-hub .data-hub-result-line {
+  margin: 0.9rem 0 0;
+  color: var(--mgdb-muted);
+  font-size: 0.84rem;
+  font-weight: 750;
+}
+
+/* ── How the collections connect ─────────────────────────────────────────── */
+
+.mgdb-data-center-hub .data-hub-route {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0 0 1.1rem;
+  padding: 0;
+  list-style: none;
+  counter-reset: route;
+}
+
+.mgdb-data-center-hub .data-hub-route li {
+  display: grid;
+  grid-template-columns: 1.6rem minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0 0.55rem;
+  counter-increment: route;
+}
+
+.mgdb-data-center-hub .data-hub-route li::before {
+  content: counter(route);
+  color: var(--mgdb-gold-dark);
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.mgdb-data-center-hub .data-hub-route strong { color: var(--mgdb-green-dark); }
+
+.mgdb-data-center-hub .data-hub-route span {
+  grid-column: 2;
+  color: var(--mgdb-muted);
+  font-size: 0.84rem;
+}
+
+/* ── Figures ─────────────────────────────────────────────────────────────── */
+
+.mgdb-data-center-hub .data-hub-figure { margin-top: var(--mgdb-space-5); }
+
+.mgdb-data-center-hub .data-hub-figure .mgdb-chart {
+  height: auto;
+  min-height: 280px;
+  /* The value labels sit outside their bars (cliponaxis:false), so the box
+     must not clip them. */
+  overflow: visible;
+}
+
+.mgdb-data-center-hub .data-hub-figure-table { margin-top: var(--mgdb-space-4); }
 
 .mgdb-data-center-hub .data-hub-task-grid {
   display: grid;
@@ -309,12 +223,6 @@
   box-shadow: var(--mgdb-shadow-sm);
 }
 
-.mgdb-data-center-hub .task-num {
-  color: var(--mgdb-leaf);
-  font-size: var(--mgdb-text-xs);
-  font-weight: 800;
-}
-
 .mgdb-data-center-hub .data-hub-task-grid strong {
   display: block;
   color: var(--mgdb-green-dark);
@@ -333,60 +241,6 @@
 .mgdb-data-center-hub .data-hub-task-grid b {
   color: var(--mgdb-green);
   font-size: var(--mgdb-text-base);
-}
-
-/* ── Searchable Data Hub Directory ────────────────────────────────────── */
-
-.mgdb-data-center-hub .data-hub-finder {
-  padding: var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface-alt);
-  margin-top: var(--mgdb-space-4);
-}
-
-.mgdb-data-center-hub .data-hub-search {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: var(--mgdb-space-3);
-  align-items: center;
-  min-height: var(--mgdb-tap-target);
-  padding: 0 var(--mgdb-space-3);
-  border: 1px solid #b9b2a5;
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
-}
-
-.mgdb-data-center-hub .data-hub-search:focus-within {
-  border-color: var(--mgdb-focus);
-}
-
-.mgdb-data-center-hub .data-hub-search svg {
-  color: var(--mgdb-muted);
-}
-
-.mgdb-data-center-hub .data-hub-search input {
-  min-height: 40px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--mgdb-ink);
-  font-family: inherit;
-  font-size: var(--mgdb-text-base);
-}
-
-.mgdb-data-center-hub .data-hub-search input:focus {
-  outline: none;
-}
-
-.mgdb-data-center-hub .data-hub-search button {
-  border: 0;
-  background: none;
-  color: var(--mgdb-burgundy);
-  font-family: inherit;
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-  cursor: pointer;
 }
 
 .mgdb-data-center-hub .data-hub-filters {
@@ -414,20 +268,6 @@
 .mgdb-data-center-hub .data-hub-filter-btn:hover {
   background: var(--mgdb-surface-alt);
   color: var(--mgdb-ink);
-}
-
-.mgdb-data-center-hub .data-hub-filter-btn.is-active,
-.mgdb-data-center-hub .data-hub-filter-btn[aria-selected="true"] {
-  border-color: var(--mgdb-green-dark);
-  background: var(--mgdb-green-dark);
-  color: #fff;
-}
-
-.mgdb-data-center-hub #data-hub-result-count {
-  margin-left: auto;
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-xs);
-  font-weight: 700;
 }
 
 .mgdb-data-center-hub .data-hub-center-grid {
@@ -554,97 +394,26 @@
   font-size: var(--mgdb-text-xs);
 }
 
-.mgdb-data-center-hub .data-hub-empty button {
-  margin-top: var(--mgdb-space-3);
-  padding: var(--mgdb-space-2) var(--mgdb-space-4);
-  border: 0;
-  border-radius: var(--mgdb-radius-sm);
+.mgdb-data-center-hub .data-hub-filter-btn.is-active,
+.mgdb-data-center-hub .data-hub-filter-btn[aria-selected="true"] {
+  border-color: var(--mgdb-green-dark);
   background: var(--mgdb-green-dark);
   color: #fff;
-  cursor: pointer;
-  font-size: var(--mgdb-text-xs);
-  font-weight: 800;
 }
 
-/* ── Support & Bulk Services ─────────────────────────────────────────────── */
-
-.mgdb-data-center-hub .data-hub-support {
-  display: grid;
-  grid-template-columns: minmax(260px, 0.75fr) minmax(0, 1.25fr);
-  gap: var(--mgdb-space-6);
-  padding: var(--mgdb-space-6);
-  border-radius: var(--mgdb-radius);
-  background: #173824;
-  color: #fff;
-}
-
-.mgdb-data-center-hub .data-hub-support h2 {
-  margin-top: var(--mgdb-space-1);
-  color: #fff;
-  font-size: var(--mgdb-text-2xl);
-}
-
-.mgdb-data-center-hub .data-hub-support p {
-  margin-top: var(--mgdb-space-2);
-  color: #c9ded0;
-  font-size: var(--mgdb-text-sm);
-  line-height: var(--mgdb-leading);
-}
-
-.mgdb-data-center-hub .data-hub-support-links {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--mgdb-space-3);
-}
-
-.mgdb-data-center-hub .data-hub-support-links a {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 4px var(--mgdb-space-2);
-  padding: var(--mgdb-space-3) var(--mgdb-space-4);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--mgdb-radius-sm);
-  background: rgba(255, 255, 255, 0.06);
-  color: #fff !important;
-  text-decoration: none;
-  transition: background .12s, border-color .12s;
-}
-
-.mgdb-data-center-hub .data-hub-support-links a:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.3);
-}
-
-.mgdb-data-center-hub .data-hub-support-links strong {
-  font-size: var(--mgdb-text-sm);
-}
-
-.mgdb-data-center-hub .data-hub-support-links span {
-  grid-column: 1;
-  color: #b7d6be;
-  font-size: var(--mgdb-text-xs);
-}
-
-.mgdb-data-center-hub .data-hub-visually-hidden {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  overflow: hidden !important;
-  clip: rect(1px, 1px, 1px, 1px) !important;
-  white-space: nowrap !important;
-}
-
-/* ── Responsive Breakpoints ──────────────────────────────────────────────── */
+/* ── Narrow screens ──────────────────────────────────────────────────────── */
 
 @media (max-width: 900px) {
-  .mgdb-data-center-hub .data-hub-hero { grid-template-columns: 1fr; }
-  .mgdb-data-center-hub .data-hub-logo-panel { border-right: 0; border-bottom: 1px solid var(--mgdb-line); padding-bottom: var(--mgdb-space-4); }
-  .mgdb-data-center-hub .data-hub-chart-grid { grid-template-columns: 1fr; }
-  .mgdb-data-center-hub .data-hub-support { grid-template-columns: 1fr; }
+  .mgdb-data-center-hub .data-hub-center-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mgdb-data-center-hub .data-hub-task-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 680px) {
-  .mgdb-data-center-hub .data-hub-hero-route ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .mgdb-data-center-hub .data-hub-support-links { grid-template-columns: 1fr; }
-  .mgdb-data-center-hub #data-hub-result-count { width: 100%; margin-top: var(--mgdb-space-1); }
+  .mgdb-data-center-hub .data-hub-center-grid { grid-template-columns: 1fr; }
+
+  /* Stacked, the clear button takes the full width: left at its intrinsic
+     size it reads as a stub under a full-width input. */
+  .mgdb-data-center-hub .data-hub-query-clear { width: 100%; }
+
+  .mgdb-data-center-hub .data-hub-search-panel { padding: 1.1rem; }
 }

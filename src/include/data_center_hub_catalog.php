@@ -6,142 +6,195 @@
  *          resolves live statistics from the PostgreSQL database.
  */
 
-function getDataCenterHubMetrics($DBConn) {
-    // Defaults based on latest curation
-    $stats = array(
-        'genomes' => 162,
-        'gene_models' => 1878909,
-        'pan_genes' => 97184,
-        'stocks' => 87397,
-        'variations' => 1710428,
-        'loci' => 790110,
-        'markers' => 780086,
-        'images' => 113904,
-        'references' => 55089,
-        'structures' => 1000000,
-        'phenotypes' => 1208,
-        'pathways' => 650
+/* The four metric cards, and the rows behind the two figures.
+ *
+ * What was here before returned ten cards, and six of those numbers had no
+ * query behind them at all: 162 genome assemblies, 1.88M gene models, 97K
+ * pan-genes and "1M+" predicted structures were literals, and a try/catch
+ * answered a failed query with a hard-coded default. Every one of them had
+ * already drifted -- there are 160 assemblies, 1,878,920 gene models, and
+ * 40,995 structure models rather than a million.
+ *
+ * The four that did run counted whole tables. Every hub on this site counts
+ * `JOIN id_num i ON i.id = x.id WHERE i.curation_lvl = 0`, so the directory
+ * advertised 790,208 loci at a hub that says 781,395, and 87,397 stocks at a
+ * hub that says 80,063. A directory that disagrees with what it links to is
+ * worse than one that says less.
+ *
+ * Everything below is counted the way the hub it points at counts it, and
+ * there is no fallback: a collection whose count fails is dropped rather than
+ * drawn at a number nobody measured.
+ */
+function dataCenterHubCounts($DBConn) {
+    if (!$DBConn) {
+        return array();
+    }
+
+    $counts = array();
+
+    /* One statement per collection rather than one with several counts in it.
+       They are over different tables, and even over one table a
+       COUNT(*) FILTER (WHERE EXISTS ...) is a correlated subquery per row --
+       the EST hub's metric build took 50 seconds written that way. */
+    $curated = array(
+        'variations' => 'variation',
+        'loci'       => 'locus',
+        'stocks'     => 'stock',
+        'markers'    => 'probe',
+        'references' => 'reference',
+        'phenotypes' => 'phenotype'
     );
-
-    if ($DBConn) {
-        try {
-            $q = retrieve_row(make_query($DBConn, "SELECT COUNT(*) FROM variation"));
-            if ($q && isset($q['count'])) $stats['variations'] = (int) $q['count'];
-
-            $q = retrieve_row(make_query($DBConn, "SELECT COUNT(*) FROM locus"));
-            if ($q && isset($q['count'])) $stats['loci'] = (int) $q['count'];
-
-            $q = retrieve_row(make_query($DBConn, "SELECT COUNT(*) FROM stock"));
-            if ($q && isset($q['count'])) $stats['stocks'] = (int) $q['count'];
-
-            $q = retrieve_row(make_query($DBConn, "SELECT COUNT(*) FROM probe"));
-            if ($q && isset($q['count'])) $stats['markers'] = (int) $q['count'];
-
-            $q = retrieve_row(make_query($DBConn, "SELECT COUNT(*) FROM reference"));
-            if ($q && isset($q['count'])) $stats['references'] = (int) $q['count'];
-
-            $q = retrieve_row(make_query($DBConn, "SELECT COUNT(*) FROM web_image WHERE (curation_lvl = 0 OR curation_lvl IS NULL) AND url IS NOT NULL AND url != ''"));
-            if ($q && isset($q['count'])) $stats['images'] = (int) $q['count'];
-
-            $q = retrieve_row(make_query($DBConn, "SELECT COUNT(*) FROM phenotype"));
-            if ($q && isset($q['count'])) $stats['phenotypes'] = (int) $q['count'];
-        } catch (Exception $e) {
-            // Keep default values on error
+    foreach ($curated as $key => $table) {
+        $row = @retrieve_row(make_query($DBConn, "
+            SELECT COUNT(*) AS c
+            FROM mgdb.$table x
+              JOIN mgdb.id_num i ON i.id = x.id
+            WHERE i.curation_lvl = 0"));
+        if ($row && isset($row['c'])) {
+            $counts[$key] = (int) $row['c'];
         }
     }
 
-    return array(
-        array(
-            'value' => '162',
-            'label' => 'Genome assemblies',
-            'detail' => 'reference, diversity, and project assemblies',
-            'icon' => 'Chr',
-            'tone' => 'green',
-            'chart_value' => '162',
-            'chart_label' => 'Genome assemblies'
-        ),
-        array(
-            'value' => '1.88M',
-            'label' => 'Gene-model annotations',
-            'detail' => 'searchable across maize assemblies',
-            'icon' => 'GM',
-            'tone' => 'blue',
-            'chart_value' => '1878909',
-            'chart_label' => 'Gene models'
-        ),
-        array(
-            'value' => '97K',
-            'label' => 'Pan-gene groups',
-            'detail' => 'connecting annotations across genomes',
-            'icon' => 'Pan',
-            'tone' => 'teal',
-            'chart_value' => '97184',
-            'chart_label' => 'Pan-gene groups'
-        ),
-        array(
-            'value' => number_format(round($stats['stocks'] / 1000)) . 'K',
-            'label' => 'Stock records',
-            'detail' => 'germplasm, mutants, and genetic stocks',
-            'icon' => 'Stk',
-            'tone' => 'gold',
-            'chart_value' => (string) $stats['stocks'],
-            'chart_label' => 'Stock records'
-        ),
-        array(
-            'value' => number_format($stats['variations'] / 1000000, 2) . 'M',
-            'label' => 'Variation records',
-            'detail' => 'curated alleles and polymorphisms',
-            'icon' => 'Var',
-            'tone' => 'blue',
-            'chart_value' => (string) $stats['variations'],
-            'chart_label' => 'Variation records'
-        ),
-        array(
-            'value' => number_format(round($stats['loci'] / 1000)) . 'K',
-            'label' => 'Locus records',
-            'detail' => 'genes, loci, QTL, and linked evidence',
-            'icon' => 'Loc',
-            'tone' => 'green',
-            'chart_value' => (string) $stats['loci'],
-            'chart_label' => 'Locus records'
-        ),
-        array(
-            'value' => number_format(round($stats['markers'] / 1000)) . 'K',
-            'label' => 'Molecular markers & probes',
-            'detail' => 'SSRs, RFLPs, BACs, and primers',
-            'icon' => 'Mrk',
-            'tone' => 'teal',
-            'chart_value' => (string) $stats['markers'],
-            'chart_label' => 'Molecular markers'
-        ),
-        array(
-            'value' => number_format(round($stats['images'] / 1000)) . 'K',
-            'label' => 'Curated images',
-            'detail' => 'mutant ears, gel assays, and specimens',
-            'icon' => 'Img',
-            'tone' => 'gold',
-            'chart_value' => (string) $stats['images'],
-            'chart_label' => 'Curated images'
-        ),
-        array(
-            'value' => number_format($stats['references'] / 1000, 1) . 'K',
-            'label' => 'Curated references',
-            'detail' => 'literature linked to biological records',
-            'icon' => 'Ref',
-            'tone' => 'green',
-            'chart_value' => (string) $stats['references'],
-            'chart_label' => 'References'
-        ),
-        array(
-            'value' => '1M+',
-            'label' => 'Predicted structures',
-            'detail' => 'maize proteins across multiple genomes',
-            'icon' => '3D',
-            'tone' => 'blue',
-            'chart_value' => '1000000',
-            'chart_label' => 'Protein structures'
-        )
+    /* Images carry their curation level on the row rather than through id_num. */
+    $row = @retrieve_row(make_query($DBConn, "
+        SELECT COUNT(*) AS c FROM mgdb.web_image
+        WHERE (curation_lvl = 0 OR curation_lvl IS NULL)
+          AND url IS NOT NULL AND url <> ''"));
+    if ($row && isset($row['c'])) {
+        $counts['images'] = (int) $row['c'];
+    }
+
+    /* The same query the Genome hub's assembly table is built from, so the two
+       pages cannot report different numbers of assemblies. */
+    $row = @retrieve_row(make_query($DBConn, "
+        SELECT COUNT(*) AS c FROM (
+          SELECT DISTINCT gi.assembly
+          FROM chado.genome_information gi
+            INNER JOIN chado.analysis a ON a.name = gi.assembly
+            LEFT JOIN chado.analysisprop ap ON ap.analysis_id = a.analysis_id
+               AND ap.type_id = (SELECT cvterm_id FROM chado.cvterm
+                                 WHERE name = 'analysis_visibility'
+                                   AND cv_id = (SELECT cv_id FROM chado.cv
+                                                WHERE name = 'maizegdb'))
+          WHERE gi.status = 'Completed'
+            AND (ap.value IS NULL OR ap.value <> 'none')) x"));
+    if ($row && isset($row['c'])) {
+        $counts['genomes'] = (int) $row['c'];
+    }
+
+    $row = @retrieve_row(make_query($DBConn, "SELECT COUNT(*) AS c FROM chado.gene_model"));
+    if ($row && isset($row['c'])) {
+        $counts['gene_models'] = (int) $row['c'];
+    }
+
+    $row = @retrieve_row(make_query($DBConn, "
+        SELECT COUNT(DISTINCT pan_gene_name) AS c FROM chado.pan_gene_search"));
+    if ($row && isset($row['c'])) {
+        $counts['pan_genes'] = (int) $row['c'];
+    }
+
+    /* Protein structures come from the manifest the structure hub reads, which
+       is where that hub's own header numbers come from. */
+    $manifest_file = (isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT']
+        ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html')
+        . '/data/protein_structure/manifest.json';
+    if (is_readable($manifest_file)) {
+        $manifest = json_decode((string) file_get_contents($manifest_file), true);
+        if (is_array($manifest)) {
+            $models = 0;
+            foreach (array('monomer_models', 'homodimer_models', 'heterodimer_models') as $key) {
+                if (isset($manifest[$key])) { $models += (int) $manifest[$key]; }
+            }
+            if ($models > 0) { $counts['structures'] = $models; }
+        }
+    }
+
+    return $counts;
+}
+
+/* A compact form for a card: 1,709,866 reads as 1.71M, 781,395 as 781K. */
+function dataCenterHubShort($n) {
+    if ($n >= 1000000) { return number_format($n / 1000000, 2) . 'M'; }
+    if ($n >= 10000)   { return number_format(round($n / 1000)) . 'K'; }
+    return number_format($n);
+}
+
+/* Four cards. The first is the directory's own scale -- it is what this page
+   is -- and the other three are the largest collections it points at. Every
+   other number this page knows is in the figure below the cards, which is
+   where a list of ten belongs. */
+function getDataCenterHubMetrics($DBConn, $counts = null, $hub_count = 0) {
+    if ($counts === null) { $counts = dataCenterHubCounts($DBConn); }
+    $cards = array();
+
+    if ($hub_count > 0) {
+        $cards[] = array(
+            'value' => number_format($hub_count), 'label' => 'Data hubs',
+            'detail' => 'active entry points listed in the directory above',
+            'icon' => 'Hub', 'tone' => 'green');
+    }
+    $wanted = array(
+        array('variations', 'Variation records', 'curated alleles and polymorphisms', 'Var', 'amber'),
+        array('loci',       'Locus records',     'genes, loci, and their linked evidence', 'Loc', 'blue'),
+        array('markers',    'Markers and probes', 'SSRs, RFLPs, BACs, ESTs, and primers', 'Mrk', 'burgundy')
     );
+    foreach ($wanted as $w) {
+        if (!isset($counts[$w[0]])) { continue; }
+        $cards[] = array(
+            'value' => dataCenterHubShort($counts[$w[0]]), 'label' => $w[1],
+            'detail' => $w[2], 'icon' => $w[3], 'tone' => $w[4]);
+    }
+    return $cards;
+}
+
+/* The scale figure's rows: every collection this page can count, sorted so the
+   horizontal bars read top-down from largest. A collection missing from
+   $counts is simply absent -- there is no placeholder bar. */
+function getDataCenterHubScale($counts) {
+    $names = array(
+        'gene_models' => 'Gene models',
+        'variations'  => 'Variation records',
+        'loci'        => 'Locus records',
+        'markers'     => 'Markers and probes',
+        'images'      => 'Curated images',
+        'pan_genes'   => 'Pan-gene groups',
+        'stocks'      => 'Stock records',
+        'references'  => 'Curated references',
+        'structures'  => 'Protein structure models',
+        'phenotypes'  => 'Phenotype records',
+        'genomes'     => 'Genome assemblies'
+    );
+    $rows = array();
+    foreach ($names as $key => $label) {
+        if (isset($counts[$key]) && $counts[$key] > 0) {
+            $rows[] = array('label' => $label, 'count' => (int) $counts[$key]);
+        }
+    }
+    usort($rows, function ($a, $b) { return $b['count'] - $a['count']; });
+    return $rows;
+}
+
+/* The donut's rows, counted from the catalog rather than from the rendered
+   cards, so the figure is right before any script runs. */
+function getDataCenterHubDomains() {
+    $labels = array(
+        'genomes-variation'    => 'Genomes & variation',
+        'genes-function'       => 'Genes & function',
+        'phenotype-germplasm'  => 'Phenotype & germplasm',
+        'literature-media'     => 'Literature & media'
+    );
+    $tally = array();
+    foreach (getDataCenterHubCenters() as $center) {
+        $key = $center['category'];
+        $tally[$key] = isset($tally[$key]) ? $tally[$key] + 1 : 1;
+    }
+    $rows = array();
+    foreach ($labels as $key => $label) {
+        if (!empty($tally[$key])) {
+            $rows[] = array('label' => $label, 'count' => $tally[$key]);
+        }
+    }
+    return $rows;
 }
 
 function getDataCenterHubCenters() {
@@ -269,12 +322,22 @@ function getDataCenterHubCenters() {
         array(
             'category' => 'phenotype-germplasm',
             'category_label' => 'Phenotype & germplasm',
-            'icon' => 'QTL',
-            'name' => 'Loci and QTL',
-            'description' => 'Search classical loci and quantitative trait loci, connecting names and synonyms to maps, traits, phenotypes, stocks, and references.',
-            'best_for' => 'Biological loci and trait regions',
+            'icon' => 'LOC',
+            'name' => 'Loci',
+            'description' => 'Search classical loci, connecting names and synonyms to maps, traits, phenotypes, stocks, and references.',
+            'best_for' => 'Named biological loci',
             'url' => '/data_center/locus',
-            'search' => 'loci QTL quantitative trait loci genes coordinates maps'
+            'search' => 'loci locus genes coordinates maps synonyms classical'
+        ),
+        array(
+            'category' => 'phenotype-germplasm',
+            'category_label' => 'Phenotype & germplasm',
+            'icon' => 'QTL',
+            'name' => 'QTL',
+            'description' => 'Search quantitative trait loci by trait, experiment, map, and population, with the linkage evidence and publications behind each.',
+            'best_for' => 'Trait mapping experiments and QTL intervals',
+            'url' => '/data_center/qtl',
+            'search' => 'qtl quantitative trait loci mapping experiments linkage populations lod'
         ),
         array(
             'category' => 'phenotype-germplasm',

@@ -252,7 +252,12 @@
       traces: [{
         type: 'bar',
         orientation: 'h',
-        y: m.labels,
+        /* Keyed on the full labels always. Plotly pins a category axis's
+           values on first draw, so restyling `y` with a shortened set adds
+           new categories rather than renaming the existing ones, and the
+           figure keeps whichever labels it was born with when the window
+           crosses the breakpoint. The axis's ticktext is swapped instead. */
+        y: fullLabels,
         x: ordered.map(function (b) { return b.count; }),
         customdata: fullLabels,
         /* The rolled-up tail is not a trait you can search, so it is drawn in a
@@ -270,7 +275,7 @@
         showlegend: false,
         margin: m.margin,
         xaxis: { title: 'Mapped ESTs', zeroline: false, tickformat: ',d', nticks: m.nticks },
-        yaxis: { automargin: true }
+        yaxis: { automargin: true, tickmode: 'array', tickvals: fullLabels, ticktext: m.labels }
       }
     });
 
@@ -286,11 +291,12 @@
           var next = metrics();
           if (next.narrow === lastNarrow) { return; }
           lastNarrow = next.narrow;
-          window.Plotly.relayout(el, { margin: next.margin, 'xaxis.nticks': next.nticks });
-          window.Plotly.restyle(el, {
-            textposition: next.narrow ? 'none' : 'outside',
-            y: [next.labels]
+          window.Plotly.relayout(el, {
+            margin: next.margin,
+            'xaxis.nticks': next.nticks,
+            'yaxis.ticktext': next.labels
           });
+          window.Plotly.restyle(el, { textposition: next.narrow ? 'none' : 'outside' });
         }, 180);
       });
     }

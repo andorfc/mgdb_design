@@ -1,6 +1,6 @@
-/* MaizeGDB Data Hubs JavaScript
-   Handles interactive directory search & filtering, Plotly charts rendering,
-   and sticky section tabs with scrollspy navigation. */
+/* Data Hub directory — /data_center/
+   The directory's search and category filter, the two figures, and the sticky
+   section tabs. */
 
 (function () {
   'use strict';
@@ -10,70 +10,97 @@
   function byId(id) { return document.getElementById(id); }
   function normalize(value) { return String(value || '').toLowerCase().replace(/\s+/g, ' ').trim(); }
 
-  /* ── Section Tabs & Scrollspy ───────────────────────────────────────────── */
+  function esc(str) {
+    if (!str && str !== 0) { return ''; }
+    return String(str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function number(n) { return Number(n || 0).toLocaleString(); }
+
+  function readJson(id) {
+    var el = byId(id);
+    if (!el) { return null; }
+    try { return JSON.parse(el.textContent || 'null'); }
+    catch (error) { return null; }
+  }
+
+  /* ── Section tabs ───────────────────────────────────────────────────────── */
 
   function buildTabs() {
     var tabs = document.querySelectorAll('.mgdb-section-tabs a');
-    if (!tabs.length) return;
+    if (!tabs.length) { return; }
 
     var pairs = [];
     Array.prototype.forEach.call(tabs, function (tab) {
-      var href = tab.getAttribute('href');
-      if (href && href.startsWith('#')) {
-        var section = document.querySelector(href);
-        if (section) {
-          pairs.push({ tab: tab, section: section });
-        }
-      }
+      var href = tab.getAttribute('href') || '';
+      if (href.charAt(0) !== '#') { return; }
+      var section = document.getElementById(href.slice(1));
+      if (section) { pairs.push({ tab: tab, section: section }); }
     });
+    if (!pairs.length) { return; }
 
-    function markCurrent(target) {
+    var heldUntilScroll = null;
+    var heldAtY = 0;
+
+    function mark(section) {
       pairs.forEach(function (pair) {
-        var current = pair.section === target;
+        var current = pair.section === section;
         pair.tab.classList.toggle('is-current', current);
-        if (current) {
-          pair.tab.setAttribute('aria-current', 'true');
-        } else {
-          pair.tab.removeAttribute('aria-current');
-        }
+        if (current) { pair.tab.setAttribute('aria-current', 'true'); }
+        else { pair.tab.removeAttribute('aria-current'); }
       });
     }
 
-    var initial = pairs[0];
-    if (window.location.hash) {
-      pairs.forEach(function (pair) {
-        if ('#' + pair.section.id === window.location.hash) {
-          initial = pair;
-        }
-      });
+    function triggerLine() {
+      var bar = document.querySelector('.mgdb-section-tabs');
+      var barHeight = bar ? bar.getBoundingClientRect().height : 0;
+      var margin = parseFloat(window.getComputedStyle(pairs[0].section).scrollMarginTop) || 0;
+      return Math.max(barHeight + 8, margin + 4);
     }
-    if (initial) {
-      markCurrent(initial.section);
+
+    function update() {
+      if (heldUntilScroll) {
+        if (Math.abs(window.scrollY - heldAtY) < 4) { return; }
+        heldUntilScroll = null;
+      }
+      var line = triggerLine();
+      var current = pairs[0];
+      pairs.forEach(function (pair) {
+        if (pair.section.hasAttribute('hidden')) { return; }
+        if (pair.section.getBoundingClientRect().top <= line) { current = pair; }
+      });
+      if ((window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 2)) {
+        current = pairs[pairs.length - 1];
+      }
+      if (current) { mark(current.section); }
     }
 
     pairs.forEach(function (pair) {
       pair.tab.addEventListener('click', function () {
-        markCurrent(pair.section);
+        mark(pair.section);
+        heldUntilScroll = pair.section;
+        heldAtY = window.scrollY;
       });
     });
 
-    if (!window.IntersectionObserver) return;
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
 
-    var observer = new window.IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          markCurrent(entry.target);
-        }
-      });
-    }, { rootMargin: '-20% 0px -60% 0px' });
+    if (window.IntersectionObserver) {
+      var observer = new window.IntersectionObserver(function () { update(); },
+        { rootMargin: '-20% 0px -60% 0px' });
+      pairs.forEach(function (pair) { observer.observe(pair.section); });
+    }
 
-    pairs.forEach(function (pair) {
-      observer.observe(pair.section);
-    });
+    update();
   }
 
-  /* ── Directory Search & Filter ──────────────────────────────────────────── */
+  /* ── Directory search and filter ────────────────────────────────────────── */
 
+  /* Unlike a record hub, the results here are the hub cards themselves, so
+     they are all visible until a keyword or a category narrows them. */
   function updateDirectory() {
     var queryInput = byId('data-hub-query');
     var query = queryInput ? normalize(queryInput.value) : '';
@@ -86,28 +113,25 @@
         return normalize(card.getAttribute('data-search') + ' ' + card.textContent).indexOf(term) !== -1;
       });
       card.hidden = !(categoryMatch && textMatch);
-      if (!card.hidden) visible += 1;
+      if (!card.hidden) { visible += 1; }
     });
 
     var countEl = byId('data-hub-result-count');
     if (countEl) {
-      countEl.textContent = visible + (visible === 1 ? ' center shown' : ' centers shown');
+      countEl.textContent = visible === 1 ? '1 data hub shown'
+                                          : number(visible) + ' data hubs shown';
     }
 
     var emptyEl = byId('data-hub-empty');
-    if (emptyEl) {
-      emptyEl.hidden = visible !== 0;
-    }
+    if (emptyEl) { emptyEl.hidden = visible !== 0; }
 
     var clearBtn = byId('data-hub-query-clear');
-    if (clearBtn) {
-      clearBtn.hidden = !query;
-    }
+    if (clearBtn) { clearBtn.hidden = !query; }
   }
 
   function setCategory(category) {
     activeCategory = category || 'all';
-    document.querySelectorAll('.data-hub-filter-btn').forEach(function (button) {
+    Array.prototype.forEach.call(document.querySelectorAll('.data-hub-filter-btn'), function (button) {
       var active = button.getAttribute('data-hub-filter') === activeCategory;
       button.classList.toggle('is-active', active);
       button.setAttribute('aria-selected', active ? 'true' : 'false');
@@ -124,117 +148,164 @@
     setCategory('all');
   }
 
-  /* ── Plotly Visualizations ──────────────────────────────────────────────── */
+  /* ── Figures ────────────────────────────────────────────────────────────── */
 
-  function chartLayout() {
-    return {
-      paper_bgcolor: 'rgba(0,0,0,0)',
-      plot_bgcolor: 'rgba(0,0,0,0)',
-      font: { family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', size: 11, color: '#3d4d42' },
-      hoverlabel: { bgcolor: '#ffffff', bordercolor: '#c3d5c6', font: { size: 12, color: '#173824' } },
-      showlegend: false
-    };
+  /* Both figures are rendered server side into #data-hub-chart-data, so they
+     draw without a request of their own, and the donut is right before any
+     script runs -- it used to be tallied from the rendered cards, which meant
+     it was also wrong for the moment before this file executed. */
+  function fillTable(id, rows, render) {
+    var table = byId(id);
+    if (!table) { return; }
+    var body = table.querySelector('tbody');
+    if (body) { body.innerHTML = rows.map(render).join(''); }
   }
 
-  function renderCharts() {
-    if (!window.Plotly) return;
-
-    document.querySelectorAll('.data-hub-chart-fallback').forEach(function (fallback) {
-      fallback.remove();
+  function scaleFigure(rows) {
+    fillTable('data-hub-scale-table', rows, function (row) {
+      return '<tr><td>' + esc(row.label) + '</td>'
+           + '<td class="mgdb-numeric">' + number(row.count) + '</td></tr>';
     });
 
-    var config = { displayModeBar: false, responsive: true };
-    var metricCards = Array.prototype.slice.call(document.querySelectorAll('[data-hub-metric]'));
+    if (!window.MGDB || !window.MGDB.chart) { return; }
+    var el = byId('data-hub-scale-chart');
+    if (!el || !rows.length) { return; }
 
-    var metrics = metricCards.map(function (card) {
+    /* Plotly stacks horizontal bars bottom-up, so the array is reversed to put
+       the largest collection at the top, matching the table. */
+    var ordered = rows.slice().reverse();
+    var height = Math.max(300, ordered.length * 34 + 110);
+    el.style.height = height + 'px';
+
+    /* Margins are sized from the figure, not fixed. MGDB.chart re-runs
+       Plotly.Plots.resize on a window resize, which rescales the figure but
+       keeps the margins it was drawn with, so a desktop gutter would survive
+       onto a phone and squeeze the plot to nothing. */
+    var NARROW = 560;
+    var fullLabels = ordered.map(function (r) { return r.label; });
+    /* Eleven collection names with no short form of their own, so the narrow
+       set is a hard truncation. It has to be short: the gutter comes out of a
+       259px figure, and every character of label is a pixel off the plot. */
+    var shortLabels = fullLabels.map(function (l) {
+      return l.length > 10 ? l.slice(0, 9).replace(/[\s-]+$/, '') + '…' : l;
+    });
+    function metrics() {
+      var width = el.getBoundingClientRect().width;
+      var narrow = width > 0 && width < NARROW;
       return {
-        label: card.getAttribute('data-chart-label'),
-        value: Number(card.getAttribute('data-chart-value'))
+        narrow: narrow,
+        margin: narrow ? { l: 72, r: 16, t: 8, b: 52 } : { l: 176, r: 96, t: 8, b: 56 },
+        /* The full title is 27 characters and is centred on the plot, which is
+           barely 100px wide on a phone -- it overflowed the figure box. */
+        title: narrow ? 'Records (log)' : 'Records (logarithmic scale)',
+        labels: narrow ? shortLabels : fullLabels
       };
-    }).filter(function (m) { return m.value > 0; }).sort(function (a, b) { return a.value - b.value; });
+    }
+    var m = metrics();
 
-    // 1. Horizontal Log Bar Chart
-    var scaleContainer = byId('data-hub-scale-chart');
-    if (scaleContainer && metrics.length) {
-      var scaleLayout = chartLayout();
-      scaleLayout.margin = { l: 140, r: 24, t: 10, b: 40 };
-      scaleLayout.xaxis = {
-        type: 'log',
-        dtick: 1,
-        title: 'Collection size (logarithmic scale)',
-        fixedrange: true,
-        gridcolor: '#e5eee7',
-        zerolinecolor: '#c3d5c6'
-      };
-      scaleLayout.yaxis = { fixedrange: true, automargin: true };
-
-      Plotly.react('data-hub-scale-chart', [{
+    window.MGDB.chart({
+      target: el,
+      traces: [{
         type: 'bar',
         orientation: 'h',
-        y: metrics.map(function (row) { return row.label; }),
-        x: metrics.map(function (row) { return row.value; }),
-        text: metrics.map(function (row) { return row.value.toLocaleString('en-US'); }),
-        textposition: 'none',
-        marker: {
-          color: '#31613d',
-          line: { color: '#235c37', width: 1 }
-        },
-        hovertemplate: '<b>%{y}</b><br>%{x:,} records<extra></extra>'
-      }], scaleLayout, config);
-    }
+        /* The bars are always keyed on the full labels. Plotly pins a category
+           axis's values on first draw, so restyling `y` with a shortened set
+           adds new categories rather than renaming the existing ones and the
+           figure keeps whichever labels it was born with. Swapping the axis's
+           ticktext instead renames what is drawn without touching the data. */
+        y: fullLabels,
+        x: ordered.map(function (r) { return r.count; }),
+        customdata: fullLabels,
+        marker: { color: '#285d46' },
+        /* A non-breaking space: SVG collapses a plain leading one, leaving the
+           label flush against the end of its bar. */
+        text: ordered.map(function (r) { return '\u00A0' + number(r.count); }),
+        textposition: m.narrow ? 'none' : 'outside',
+        cliponaxis: false,
+        hovertemplate: '%{customdata}<br>%{x:,} records<extra></extra>'
+      }],
+      layout: {
+        height: height,
+        showlegend: false,
+        margin: m.margin,
+        /* A log axis, because the smallest collection is 160 and the largest
+           is 1.9 million. dtick 1 puts a gridline at each power of ten. */
+        xaxis: { type: 'log', dtick: 1, title: m.title, zeroline: false },
+        yaxis: { automargin: true, tickmode: 'array', tickvals: fullLabels, ticktext: m.labels }
+      }
+    });
 
-    // 2. Domain Coverage Donut Chart
-    var domainContainer = byId('data-hub-domain-chart');
-    if (domainContainer) {
-      var labels = {
-        'genomes-variation': 'Genomes & variation',
-        'genes-function': 'Genes & function',
-        'phenotype-germplasm': 'Phenotype & germplasm',
-        'literature-media': 'Literature & media'
-      };
-
-      var domainCounts = {};
-      document.querySelectorAll('[data-hub-center]').forEach(function (card) {
-        var category = card.getAttribute('data-category');
-        domainCounts[category] = (domainCounts[category] || 0) + 1;
+    if (window.Plotly && window.Plotly.relayout) {
+      var lastNarrow = m.narrow;
+      var timer = null;
+      window.addEventListener('resize', function () {
+        if (timer) { window.clearTimeout(timer); }
+        timer = window.setTimeout(function () {
+          var next = metrics();
+          if (next.narrow === lastNarrow) { return; }
+          lastNarrow = next.narrow;
+          window.Plotly.relayout(el, {
+            margin: next.margin,
+            'yaxis.ticktext': next.labels,
+            'xaxis.title.text': next.title
+          });
+          window.Plotly.restyle(el, { textposition: next.narrow ? 'none' : 'outside' });
+        }, 180);
       });
+    }
+  }
 
-      var domainKeys = Object.keys(labels);
-      var domainLayout = chartLayout();
-      domainLayout.margin = { l: 10, r: 10, t: 10, b: 40 };
-      domainLayout.showlegend = true;
-      domainLayout.legend = {
-        orientation: 'h',
-        x: 0.5,
-        xanchor: 'center',
-        y: -0.12,
-        font: { size: 10 }
-      };
+  function domainFigure(rows) {
+    fillTable('data-hub-domain-table', rows, function (row) {
+      return '<tr><td>' + esc(row.label) + '</td>'
+           + '<td class="mgdb-numeric">' + number(row.count) + '</td></tr>';
+    });
 
-      Plotly.react('data-hub-domain-chart', [{
+    if (!window.MGDB || !window.MGDB.chart) { return; }
+    var el = byId('data-hub-domain-chart');
+    if (!el || !rows.length) { return; }
+    el.style.height = '330px';
+
+    /* No legend.y here: the shared layout places the legend above the plot and
+       reserves a band for it, and a fixed y is a fraction of the plot height,
+       so it drifts as the figure grows. */
+    window.MGDB.chart({
+      target: el,
+      traces: [{
         type: 'pie',
         hole: 0.55,
-        labels: domainKeys.map(function (key) { return labels[key]; }),
-        values: domainKeys.map(function (key) { return domainCounts[key] || 0; }),
-        marker: {
-          colors: ['#235c37', '#1b4d75', '#d99a0b', '#156d64']
-        },
+        labels: rows.map(function (r) { return r.label; }),
+        values: rows.map(function (r) { return r.count; }),
+        marker: { colors: ['#285d46', '#1a5b7a', '#a96919', '#501719'] },
         textinfo: 'value',
-        textfont: { size: 12, color: '#fff' },
-        hovertemplate: '<b>%{label}</b><br>%{value} data hubs (%{percent})<extra></extra>'
-      }], domainLayout, config);
-    }
+        textfont: { size: 13, color: '#ffffff' },
+        sort: false,
+        direction: 'clockwise',
+        hovertemplate: '%{label}<br>%{value} data hubs (%{percent})<extra></extra>'
+      }],
+      layout: {
+        height: 330,
+        showlegend: true,
+        margin: { l: 12, r: 12, t: 8, b: 8 }
+      }
+    });
+  }
+
+  function initFigures() {
+    var data = readJson('data-hub-chart-data');
+    if (!data) { return; }
+    if (data.scale) { scaleFigure(data.scale); }
+    if (data.domains) { domainFigure(data.domains); }
   }
 
   /* ── Bootstrap ──────────────────────────────────────────────────────────── */
 
   function initialize() {
     buildTabs();
+    initFigures();
 
     var queryInput = byId('data-hub-query');
-    if (queryInput) {
-      queryInput.addEventListener('input', updateDirectory);
-    }
+    if (queryInput) { queryInput.addEventListener('input', updateDirectory); }
 
     var clearBtn = byId('data-hub-query-clear');
     if (clearBtn) {
@@ -248,27 +319,15 @@
     }
 
     var resetBtn = byId('data-hub-reset');
-    if (resetBtn) {
-      resetBtn.addEventListener('click', resetDirectory);
-    }
+    if (resetBtn) { resetBtn.addEventListener('click', resetDirectory); }
 
-    document.querySelectorAll('.data-hub-filter-btn').forEach(function (button) {
+    Array.prototype.forEach.call(document.querySelectorAll('.data-hub-filter-btn'), function (button) {
       button.addEventListener('click', function () {
         setCategory(button.getAttribute('data-hub-filter'));
       });
     });
 
-    setCategory('all');
-    renderCharts();
-
-    window.addEventListener('resize', function () {
-      if (window.Plotly) {
-        var scaleEl = byId('data-hub-scale-chart');
-        if (scaleEl) Plotly.Plots.resize(scaleEl);
-        var domainEl = byId('data-hub-domain-chart');
-        if (domainEl) Plotly.Plots.resize(domainEl);
-      }
-    });
+    updateDirectory();
   }
 
   if (document.readyState === 'loading') {
@@ -276,4 +335,4 @@
   } else {
     initialize();
   }
-}());
+})();

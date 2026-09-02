@@ -1293,6 +1293,106 @@ appear at all. Deleting `controllers/genome2.php` outright would drop the row
 and make the route 404; the redirect was judged worth more than the tidier
 count.
 
+## The Data Hub directory
+
+`/data_center/` on the shell. Tabs: Search, Guided paths, About, References,
+Metrics, Related resources. Files:
+`controllers/data_center/data_center_hub_modern.php`,
+`include/data_center_hub_catalog.php`,
+`templates/static/mgdb_data_center_hub.bau`, `css/mgdb-data-center-hub.css`,
+`js/mgdb-data-center-hub.js`.
+
+This is the one hub whose corpus is the other hubs. The shell's rule that
+results stay hidden until a search is the wrong rule here — the results *are*
+the directory, so all nineteen cards are visible and the search narrows them.
+Everything else is the standard conversion: eyebrows, hero tagline and buttons,
+and the `01`–`05` numerals on the guided-path tiles are gone; the section order
+is search-first; and the Downloads & Support block became the shell's
+Related resources with Internal/External badges.
+
+### Six of ten metric numbers had no query behind them
+
+`162` genome assemblies, `1.88M` gene models, `97K` pan-genes and `1M+`
+predicted structures were literals in the catalog, and a `try/catch` answered
+a failed query with a hard-coded default — the pattern the skill already warns
+about. Every literal had drifted:
+
+| Card said | Actually |
+| --- | --- |
+| 162 genome assemblies | **160** |
+| 1,878,909 gene models | **1,878,920** |
+| 1M+ predicted structures | **40,995** structure models |
+
+The four that *did* run counted whole tables. Every hub on this site counts
+`JOIN id_num i ON i.id = x.id WHERE i.curation_lvl = 0`, so **the directory
+disagreed with the hubs it links to**: 790,208 loci against the Locus hub's
+781,395, 87,397 stocks against the Stock hub's 80,063, 780,086 markers against
+771,097, 55,171 references against 54,900.
+
+Everything is now counted the way the hub that owns it counts it — the
+assemblies come from the very query the Genome hub's table is built from, and
+the structures from the manifest the structure hub reads — and there is no
+fallback at all: a collection whose count fails is dropped from the figure
+rather than drawn at a number nobody measured.
+
+Four cards: **19** data hubs, **1.71M** variation records, **781K** locus
+records, **771K** markers and probes. The other seven collections moved into
+the scale figure below, which is where a list of ten belongs. Cold build
+**3.8 s** (six curated counts over million-row tables), warm **73–76 ms** with
+no SQL.
+
+### The directory did not know about QTL
+
+QTL was split out of the Loci hub earlier in this redesign, given its own
+controller, template, sheet and header-menu entry — and the directory was never
+told. Its Loci card was still called "Loci and QTL" and still carried `qtl` in
+its search terms, so a reader searching the directory for QTL was sent to the
+hub that no longer holds it. There are 19 cards now, the Loci card describes
+loci, and its search terms no longer claim QTL.
+
+That is the same trap as the megamenu one, one level up: **a hub is only split
+when every navigation surface is split**, and the directory is a navigation
+surface.
+
+### A category axis keeps the labels it was born with
+
+Both figures are rendered server side into one JSON block, so they draw with
+no request of their own and the donut is right before any script runs — it used
+to be tallied from the rendered cards.
+
+The scale figure switches to shortened tick labels below 560px, and doing that
+by restyling `y` does not work: **Plotly pins a category axis's values on the
+first draw**, so a shortened set adds new categories rather than renaming the
+existing ones, and the figure keeps whichever labels it was drawn with. The fix
+is to key the bars on the full labels always and swap `yaxis.ticktext`
+instead. The same latent defect was in the EST and SSR figures and is fixed in
+the same commit.
+
+Worth knowing when testing this: **the browser pane's `resize_window` changes
+the viewport without dispatching a `resize` event to the page**, so a
+breakpoint-crossing relayout never fires and the figure looks stale when it is
+not. Reload at each width, or dispatch `new Event('resize')` by hand — the same
+caveat that already applies to `scrollTo` and scrollspy.
+
+### The tab ladder, measured
+
+Seven collections on a log axis and six tabs. Measured by resizing the real
+page: one row (57px) down to somewhere in 701–740, two rows (105px) down to
+somewhere in 396–415, three (153px) below that. Every jump clears by 8px at
+1280, 470 and 375, and by 40px at 740 — the single width where a band takes the
+larger of the two heights it could straddle, which is the safe direction.
+
+### Verified
+
+6/6 distinct section edge colours, no rule under a section title, five
+reference cards, no duplicate `id`, every nav label matching its `<h2>`, both
+figures unclipped at 1280 and 375, no horizontal overflow at 375, and all
+nineteen hub links alive by response size and title. The directory itself was
+driven end to end: 19 shown at rest, `expression` → 2, `qtl` → Loci and QTL,
+a nonsense term → 0 with the empty state, reset → 19 with the field cleared,
+the Literature & media filter → Images and References, and the clear button
+appearing only while the field has content.
+
 ## The SSR Data Hub
 
 `/data_center/ssr` on the shell, and the last of the five archive hubs.

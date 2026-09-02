@@ -187,11 +187,32 @@ nothing else goes wrong visibly.
   where a plain `COUNT(*)` is an index-only scan — 1,735 ms against 699 ms on
   one 781k-row corpus. Keep both shapes and pick by whether the expensive join
   is in play.
-- **A hub is only split when the *navigation* is split.** Two hubs can have
-  their own controllers, templates, sheets and libraries and still be one thing
-  to a reader, because the header menu carries a single combined entry. Check
-  `templates/home/megamenu_modern/data-centers.bau` and `tools/sitemap_data.py`
-  (then re-run `tools/gen_sitemap.py`) whenever a hub is added or separated.
+- **A hub is only split when *every* navigation surface is split.** Two hubs
+  can have their own controllers, templates, sheets and libraries and still be
+  one thing to a reader. Check `templates/home/megamenu_modern/data-centers.bau`,
+  `tools/sitemap_data.py` (then re-run `tools/gen_sitemap.py`), **and
+  `include/data_center_hub_catalog.php`**, which is the /data_center/ directory
+  — a hub split months earlier was still a single combined card there, with the
+  other hub's keywords in its search terms, so the directory sent readers to the
+  wrong one.
+- **A directory must count what its hubs count.** The /data_center/ page counted
+  whole tables while every hub counts
+  `JOIN id_num i ON i.id = x.id WHERE i.curation_lvl = 0`, so it advertised
+  790,208 loci at a hub that says 781,395 and 87,397 stocks at a hub that says
+  80,063. Take each number from the query the owning hub uses, and take counts
+  that live outside the database (a manifest, a JSON file) from the same file
+  that hub reads.
+- **Plotly pins a category axis's values on the first draw.** A figure that
+  swaps to shortened tick labels at a breakpoint cannot do it by restyling `y`
+  — the short strings become *new* categories and the figure keeps the labels
+  it was born with. Key the bars on the full labels and swap
+  `yaxis.ticktext` with `relayout` instead (`tickmode: 'array'`,
+  `tickvals: fullLabels`).
+- **`resize_window` in the browser pane fires no `resize` event.** The viewport
+  changes but the page never hears about it, so any breakpoint-crossing
+  relayout does not run and a figure looks stale when it is not. Reload at each
+  width, or `window.dispatchEvent(new Event('resize'))` by hand — the same
+  caveat as `scrollTo` and scrollspy.
 - **Sibling endpoints disagree about who decodes.** Three hubs in the same
   family shared one search script and three `*_results.php` endpoints; two read
   `urldecode(getCGIParam('term'))` and the third did not. Since the shared

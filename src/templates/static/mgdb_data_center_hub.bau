@@ -6,13 +6,13 @@ $$SYNTAX-LEVEL 2
 <meta property="og:title" content="MaizeGDB Data Hubs | Unified Directory &amp; Dashboard">
 <meta property="og:description" content="Explore MaizeGDB data hubs for genomes, genes, variation, expression, phenotypes, germplasm, protein structures, and curated literature.">
 
-<main class="mgdb-page mgdb-data-center-hub" id="hub-top">
+<main class="mgdb-page mgdb-hub-page mgdb-data-center-hub" id="hub-top">
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
     <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Data hubs</span>
   </nav>
 
-  <section class="data-hub-hero" aria-labelledby="data-hub-title">
-    <div class="data-hub-logo-panel">
+  <section class="mgdb-hero" aria-labelledby="data-hub-title">
+    <div class="mgdb-hero-emblem">
       <svg viewBox="0 0 96 96" class="data-hub-hero-svg" role="img" aria-label="Connected MaizeGDB data network">
         <circle cx="48" cy="48" r="40" fill="none" stroke="#31613d" stroke-width="3" stroke-dasharray="4 4" />
         <line x1="48" y1="20" x2="24" y2="60" stroke="#d99a0b" stroke-width="3" />
@@ -27,168 +27,54 @@ $$SYNTAX-LEVEL 2
         <path d="M44 46 L48 42 L52 46 L48 50 Z" fill="#d99a0b" />
       </svg>
       <strong>MaizeGDB<br />Data Hubs</strong>
-      <span>Unified Discovery Hub</span>
+      <span>Unified directory</span>
     </div>
-    <div class="data-hub-hero-main">
-      <div class="data-hub-hero-copy">
-        <span class="mgdb-eyebrow">Explore MaizeGDB</span>
-        <h1 id="data-hub-title">One place to start with maize data</h1>
-        <p class="data-hub-hero-tagline">Discover the right entry point for genomes, genes, variation, expression, phenotype, germplasm, structures, and curated literature&mdash;then search, analyze, or download the underlying records.</p>
-        <div class="data-hub-hero-actions">
-          <a class="mgdb-button mgdb-button-primary" href="#hub-directory">Browse all data hubs &darr;</a>
-          <a class="mgdb-button mgdb-button-secondary" href="https://download.maizegdb.org">Download common datasets &rarr;</a>
-        </div>
-      </div>
-      <div class="data-hub-hero-route" aria-label="A typical path through MaizeGDB data">
-        <span>How the collections connect</span>
-        <ol>
-          <li><strong>Find</strong><small>an identifier, trait, stock, or paper</small></li>
-          <li><strong>Connect</strong><small>curated biological relationships</small></li>
-          <li><strong>Analyze</strong><small>browsers, plots, and specialized tools</small></li>
-          <li><strong>Reuse</strong><small>downloads, exports, and APIs</small></li>
-        </ol>
-      </div>
+    <div class="mgdb-hero-body">
+      <h1 id="data-hub-title">One place to start with maize data.</h1>
+      <p class="mgdb-hero-description">Every active MaizeGDB data hub in one directory: genomes, genes, variation, expression, phenotypes, germplasm, protein structures, and curated literature. Search it by keyword or filter it by the kind of biological information you are after, then follow a hub into the records themselves.</p>
     </div>
   </section>
 
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#hub-overview">Overview &amp; Metrics</a>
-    <a href="#hub-dashboard">Scale Dashboard</a>
-    <a href="#hub-tasks">Guided Paths</a>
-    <a href="#hub-directory">All Data Hubs</a>
-    <a href="#hub-support">Downloads &amp; Support</a>
+    <a href="#hub-directory" class="is-current" aria-current="true">Search</a>
+    <a href="#hub-tasks">Guided paths</a>
+    <a href="#hub-about">About</a>
+    <a href="#hub-references">References</a>
+    <a href="#hub-metrics">Metrics</a>
+    <a href="#hub-related">Related resources</a>
   </nav>
-
-  <section id="hub-overview" class="data-hub-snapshot" aria-labelledby="data-hub-snapshot-title">
-    <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Collection snapshot &middot; Live Database Metrics</span>
-        <h2 id="data-hub-snapshot-title">The scale of connected maize data</h2>
-      </div>
-      <p>Headline values summarize core PostgreSQL database records and major computed collections across MaizeGDB.</p>
-    </div>
-    <div class="data-hub-metric-grid">
-      @(summary-card
-        <article class="data-hub-metric data-hub-tone-$(tone)" data-hub-metric data-chart-value="$(chart_value)" data-chart-label="$(chart_label)">
-          <span class="data-hub-metric-icon" aria-hidden="true">$(icon)</span>
-          <div>
-            <strong>$(value)</strong>
-            <h3>$(label)</h3>
-            <p>$(detail)</p>
-          </div>
-        </article>
-      )
-    </div>
-  </section>
-
-  <section id="hub-dashboard" class="data-hub-dashboard" aria-labelledby="data-hub-dashboard-title">
-    <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Visual overview &middot; Interactive Charts</span>
-        <h2 id="data-hub-dashboard-title">A connected collection, not a single table</h2>
-      </div>
-      <p>Use these interactive figures to compare orders of magnitude and see how active data hubs span complementary research domains.</p>
-    </div>
-    <div class="data-hub-chart-grid">
-      <article class="data-hub-chart-card">
-        <div>
-          <span class="mgdb-eyebrow">Collection scale</span>
-          <h3>Records &amp; computed objects</h3>
-          <p>Logarithmic scale makes both focused curated collections and high-volume genomic resources easily comparable.</p>
-        </div>
-        <div id="data-hub-scale-chart" class="data-hub-chart" role="img" aria-label="Log scale bar chart of selected MaizeGDB collection sizes">
-          <span class="data-hub-chart-fallback">Loading collection summary&hellip;</span>
-        </div>
-      </article>
-      <article class="data-hub-chart-card">
-        <div>
-          <span class="mgdb-eyebrow">Domain coverage</span>
-          <h3>Active data hubs by research area</h3>
-          <p>Centers overlap in practice; this view groups each by its primary discovery role.</p>
-        </div>
-        <div id="data-hub-domain-chart" class="data-hub-chart" role="img" aria-label="Donut chart of active data hubs grouped by research area">
-          <span class="data-hub-chart-fallback">Loading domain summary&hellip;</span>
-        </div>
-      </article>
-    </div>
-  </section>
-
-  <section id="hub-tasks" class="data-hub-tasks" aria-labelledby="data-hub-tasks-title">
-    <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Start with your question</span>
-        <h2 id="data-hub-tasks-title">Common paths through the data</h2>
-      </div>
-      <p>You do not need to know the database schema. Begin with the biological object or research question you already have.</p>
-    </div>
-    <div class="data-hub-task-grid">
-      <a href="/gene_center/gene">
-        <span class="task-num" aria-hidden="true">01</span>
-        <div>
-          <strong>I have a gene or gene-model ID</strong>
-          <small>Resolve annotation versions and follow function, expression, variation, and evidence.</small>
-        </div>
-        <b aria-hidden="true">&rarr;</b>
-      </a>
-      <a href="/genetic_variation">
-        <span class="task-num" aria-hidden="true">02</span>
-        <div>
-          <strong>I want to explore genomic variation</strong>
-          <small>Move from assemblies and SNP collections to accessions, diversity panels, and effects.</small>
-        </div>
-        <b aria-hidden="true">&rarr;</b>
-      </a>
-      <a href="/data_center/phenotype">
-        <span class="task-num" aria-hidden="true">03</span>
-        <div>
-          <strong>I have a phenotype or mutant trait</strong>
-          <small>Connect visible effects to loci, alleles, stocks, images, and publications.</small>
-        </div>
-        <b aria-hidden="true">&rarr;</b>
-      </a>
-      <a href="/data_center/reference">
-        <span class="task-num" aria-hidden="true">04</span>
-        <div>
-          <strong>I need papers &amp; supporting evidence</strong>
-          <small>Search curated references, view publication trends, and export DOIs or PubMed IDs.</small>
-        </div>
-        <b aria-hidden="true">&rarr;</b>
-      </a>
-      <a href="https://download.maizegdb.org">
-        <span class="task-num" aria-hidden="true">05</span>
-        <div>
-          <strong>I need files for offline analysis</strong>
-          <small>Browse commonly downloaded genomes, annotations, variants, and functional datasets.</small>
-        </div>
-        <b aria-hidden="true">&rarr;</b>
-      </a>
-    </div>
-  </section>
 
   <section id="hub-directory" class="data-hub-directory" aria-labelledby="data-hub-directory-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Interactive Directory</span>
-        <h2 id="data-hub-directory-title">Browse every active data hub</h2>
-      </div>
-      <p>Search descriptions or filter by the primary type of biological information.</p>
+      <div><h2 id="data-hub-directory-title">Search</h2></div>
     </div>
-    <div class="data-hub-finder">
-      <div class="data-hub-search">
-        <svg class="data-hub-search-icon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="7" r="5"/><line x1="11" y1="11" x2="15" y2="15"/></svg>
-        <label class="data-hub-visually-hidden" for="data-hub-query">Search data hubs</label>
-        <input id="data-hub-query" type="search" placeholder="Try expression, stocks, protein structure, QTL, marker, image&hellip;" autocomplete="off" />
-        <button id="data-hub-query-clear" type="button" hidden>Clear</button>
+
+    <article class="data-hub-search-panel">
+      <div class="data-hub-search-intro">
+        <div><h3>Which data hub do you need?</h3><p>Search hub names, descriptions, and what each is best for, or narrow the directory to one kind of biological information. Unlike a record search, the results here are the hubs themselves, so every one is listed until you filter.</p></div>
       </div>
-      <div class="data-hub-filters" role="tablist" aria-label="Filter data hubs">
-        <button type="button" class="data-hub-filter-btn is-active" data-hub-filter="all" role="tab" aria-selected="true">All centers</button>
-        <button type="button" class="data-hub-filter-btn" data-hub-filter="genomes-variation" role="tab" aria-selected="false">Genomes &amp; variation</button>
-        <button type="button" class="data-hub-filter-btn" data-hub-filter="genes-function" role="tab" aria-selected="false">Genes &amp; function</button>
-        <button type="button" class="data-hub-filter-btn" data-hub-filter="phenotype-germplasm" role="tab" aria-selected="false">Phenotype &amp; germplasm</button>
-        <button type="button" class="data-hub-filter-btn" data-hub-filter="literature-media" role="tab" aria-selected="false">Literature &amp; media</button>
-        <span id="data-hub-result-count" aria-live="polite">18 centers shown</span>
+
+      <div class="data-hub-finder">
+        <div class="mgdb-field data-hub-query-field">
+          <label class="mgdb-label" for="data-hub-query">Keyword</label>
+          <div class="data-hub-query-line">
+            <input class="mgdb-input" id="data-hub-query" type="search" autocomplete="off" placeholder="expression, stocks, protein structure, QTL, marker, image&hellip;" />
+            <button class="mgdb-button mgdb-button-quiet data-hub-query-clear" id="data-hub-query-clear" type="button" hidden>Clear</button>
+          </div>
+          <p class="mgdb-hint">Matches a hub's name, its description, and what it is best for.</p>
+        </div>
+
+        <div class="data-hub-filters" role="tablist" aria-label="Filter data hubs">
+          <button type="button" class="data-hub-filter-btn is-active" data-hub-filter="all" role="tab" aria-selected="true">All hubs</button>
+          <button type="button" class="data-hub-filter-btn" data-hub-filter="genomes-variation" role="tab" aria-selected="false">Genomes &amp; variation</button>
+          <button type="button" class="data-hub-filter-btn" data-hub-filter="genes-function" role="tab" aria-selected="false">Genes &amp; function</button>
+          <button type="button" class="data-hub-filter-btn" data-hub-filter="phenotype-germplasm" role="tab" aria-selected="false">Phenotype &amp; germplasm</button>
+          <button type="button" class="data-hub-filter-btn" data-hub-filter="literature-media" role="tab" aria-selected="false">Literature &amp; media</button>
+        </div>
+        <p class="data-hub-result-line" id="data-hub-result-count" aria-live="polite">$(hub_count) data hubs shown</p>
       </div>
-    </div>
+    </article>
+
     <div class="data-hub-center-grid">
       @(center-card
         <article class="data-hub-center-card" data-hub-center data-category="$(category)" data-search="$(search) $(name) $(description) $(best_for)">
@@ -209,38 +95,178 @@ $$SYNTAX-LEVEL 2
     <div id="data-hub-empty" class="data-hub-empty" hidden>
       <strong>No data hubs matched that search.</strong>
       <span>Try a broader keyword or reset the directory filter.</span>
-      <button id="data-hub-reset" type="button">Reset directory</button>
+      <button class="mgdb-button mgdb-button-secondary" id="data-hub-reset" type="button">Reset directory</button>
     </div>
   </section>
 
-  <section id="hub-support" class="data-hub-support" aria-labelledby="data-hub-support-title">
-    <div>
-      <span class="mgdb-eyebrow" style="color: #b1dfbb;">Take the next step</span>
-      <h2 id="data-hub-support-title">Download, contribute, or ask for help</h2>
-      <p>MaizeGDB connects community data with long-term curation. Tell us when a dataset should be added or a relationship needs correction.</p>
+  <section id="hub-tasks" class="data-hub-tasks" aria-labelledby="data-hub-tasks-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="data-hub-tasks-title">Guided paths</h2></div>
     </div>
-    <div class="data-hub-support-links">
+    <p class="data-hub-section-lead">You do not need to know the database schema. Begin with the biological object or research question you already have.</p>
+    <div class="data-hub-task-grid">
+      <a href="/gene_center/gene">
+        <div>
+          <strong>I have a gene or gene-model ID</strong>
+          <small>Resolve annotation versions and follow function, expression, variation, and evidence.</small>
+        </div>
+        <b aria-hidden="true">&rarr;</b>
+      </a>
+      <a href="/genetic_variation">
+        <div>
+          <strong>I want to explore genomic variation</strong>
+          <small>Move from assemblies and SNP collections to accessions, diversity panels, and effects.</small>
+        </div>
+        <b aria-hidden="true">&rarr;</b>
+      </a>
+      <a href="/data_center/phenotype">
+        <div>
+          <strong>I have a phenotype or mutant trait</strong>
+          <small>Connect visible effects to loci, alleles, stocks, images, and publications.</small>
+        </div>
+        <b aria-hidden="true">&rarr;</b>
+      </a>
+      <a href="/data_center/reference">
+        <div>
+          <strong>I need papers and supporting evidence</strong>
+          <small>Search curated references, view publication trends, and export DOIs or PubMed IDs.</small>
+        </div>
+        <b aria-hidden="true">&rarr;</b>
+      </a>
       <a href="https://download.maizegdb.org">
-        <strong>Bulk Downloads</strong>
-        <span>Commonly requested files and genomic datasets</span>
-        <b aria-hidden="true">&rarr;</b>
-      </a>
-      <a href="/contribute_data">
-        <strong>Contribute Data</strong>
-        <span>Submission guidance and supported data types</span>
-        <b aria-hidden="true">&rarr;</b>
-      </a>
-      <a href="/contact">
-        <strong>Contact MaizeGDB</strong>
-        <span>Reach the curation team for questions or corrections</span>
-        <b aria-hidden="true">&rarr;</b>
-      </a>
-      <a href="/archive">
-        <strong>Archived Data Hubs</strong>
-        <span>Legacy resources retained for historical research</span>
+        <div>
+          <strong>I need files for offline analysis</strong>
+          <small>Browse commonly downloaded genomes, annotations, variants, and functional datasets.</small>
+        </div>
         <b aria-hidden="true">&rarr;</b>
       </a>
     </div>
   </section>
+
+  <section id="hub-about" class="mgdb-prose-layout" aria-labelledby="data-hub-about-title">
+    <div class="mgdb-prose">
+      <h2 id="data-hub-about-title" class="mgdb-leaf-heading">About</h2>
+      <p>A data hub is an entry point into one kind of maize record &#8212; a genome, a gene, a stock, a paper &#8212; with its own search, its own metrics, and links out to every other kind of record it connects to. The hubs overlap in practice, so this directory groups each by the question it answers best rather than by the tables behind it.</p>
+      <p>Archived hubs are not listed here. BAC clones, ESTs, Overgo probes, SSR markers, and cytogenetics are preserved as legacy research resources and are collected on the archived data hubs page.</p>
+    </div>
+    <aside class="mgdb-aside-card">
+      <h3>How the collections connect</h3>
+      <ol class="data-hub-route">
+        <li><strong>Find</strong><span>an identifier, trait, stock, or paper</span></li>
+        <li><strong>Connect</strong><span>curated biological relationships</span></li>
+        <li><strong>Analyze</strong><span>browsers, plots, and specialized tools</span></li>
+        <li><strong>Reuse</strong><span>downloads, exports, and APIs</span></li>
+      </ol>
+      <a class="mgdb-button mgdb-button-secondary" href="/archive">Archived data hubs</a>
+    </aside>
+  </section>
+
+  <section id="hub-references" aria-labelledby="data-hub-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="data-hub-references-title">References</h2></div>
+    </div>
+
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
+  <section id="hub-metrics" aria-labelledby="data-hub-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="data-hub-metrics-title">Metrics</h2></div>
+    </div>
+    <div class="mgdb-metric-grid">
+      @(summary-card
+        <article class="mgdb-metric mgdb-tone-$(tone)">
+          <span class="mgdb-metric-icon" aria-hidden="true">$(icon)</span>
+          <div>
+            <strong class="mgdb-metric-value">$(value)</strong>
+            <h3>$(label)</h3>
+            <p>$(detail)</p>
+          </div>
+        </article>
+      )
+    </div>
+
+    <figure class="mgdb-figure data-hub-figure">
+      <h3>Collection scale</h3>
+      <div class="mgdb-chart" id="data-hub-scale-chart" role="img"
+           aria-label="Logarithmic horizontal bar chart comparing the size of each MaizeGDB collection">
+        <div class="mgdb-chart-fallback">Loading the collection summary&hellip;</div>
+      </div>
+      <figcaption>A logarithmic axis, so a collection of 160 and one of 1.9 million are both readable. Each number is counted the same way the hub that owns it counts it.</figcaption>
+    </figure>
+
+    <div class="mgdb-table-scroll data-hub-figure-table">
+      <table class="mgdb-table" id="data-hub-scale-table">
+        <caption>
+          Collection scale
+          <span class="mgdb-muted">The values behind the chart above.</span>
+        </caption>
+        <thead><tr><th scope="col">Collection</th><th scope="col" class="mgdb-numeric">Records</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <figure class="mgdb-figure data-hub-figure">
+      <h3>Data hubs by research area</h3>
+      <div class="mgdb-chart" id="data-hub-domain-chart" role="img"
+           aria-label="Donut chart of the data hubs grouped by research area">
+        <div class="mgdb-chart-fallback">Loading the research-area summary&hellip;</div>
+      </div>
+      <figcaption>Hubs overlap in practice; each is grouped here by the question it answers best, which is the same grouping the directory filter uses.</figcaption>
+    </figure>
+
+    <div class="mgdb-table-scroll data-hub-figure-table">
+      <table class="mgdb-table" id="data-hub-domain-table">
+        <caption>
+          Data hubs by research area
+          <span class="mgdb-muted">The values behind the chart above.</span>
+        </caption>
+        <thead><tr><th scope="col">Research area</th><th scope="col" class="mgdb-numeric">Data hubs</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="hub-related" class="mgdb-hub-related" aria-labelledby="data-hub-related-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="data-hub-related-title">Related resources</h2>
+      </div>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/archive">
+          <strong>Archived data hubs</strong>
+          <span>BAC, EST, Overgo, SSR, and cytogenetics, kept for historical research</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/contribute_data">
+          <strong>Contribute data</strong>
+          <span>Submission guidance and the data types MaizeGDB accepts</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/contact">
+          <strong>Contact MaizeGDB</strong>
+          <span>Reach the curation team about a question or a correction</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/sitemap">
+          <strong>Site map</strong>
+          <span>Every page on the site, hubs and tools alike</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="https://download.maizegdb.org" target="_blank" rel="noopener">
+          <strong>Bulk downloads</strong>
+          <span>Genomes, annotations, variants, and functional datasets as files</span>
+          <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <script type="application/json" id="data-hub-chart-data">$(chart_data)</script>
 </main>
 )
