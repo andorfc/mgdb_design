@@ -247,7 +247,18 @@ nothing else goes wrong visibly.
 - **Check what a metric card counts, not just that it renders.** Three cards on
   one hub named one thing and counted another -- "Trait Categories" showing the
   number of phenotypes that have a trait, not the number of categories. Read the
-  SQL behind each number against the heading above it.
+  SQL behind each number against the heading above it. The other failure mode is
+  a card with no query behind it at all: two archive hubs had cards reading
+  "25 bp", "Archived", "10" and "2", which were respectively a form's maximum
+  input length, a word, the number of tiles further down the page, and the
+  number of links in each tile. A metric card is a measurement of the
+  collection; if it cannot be one, it is not a metric card.
+- **When a narrow label set is derived from the wide one, check it shortens the
+  longest member.** One figure's rule turned "Trinucleotide" into "Tri-nt" and
+  left "Longer than six" untouched -- and that was the longest label, so
+  `automargin` spent 120px of a 259px figure on the gutter and the plot had
+  129px. Deriving the short labels from a different field entirely took the plot
+  back to 169px.
 - **Delete hard-coded stat fallbacks.** A try/catch that answers a failed query
   with literal numbers prints stale values with full confidence; one hub's had
   drifted by almost 2x. Show nothing rather than a confident wrong number.

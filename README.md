@@ -1293,6 +1293,96 @@ appear at all. Deleting `controllers/genome2.php` outright would drop the row
 and make the route 404; the redirect was judged worth more than the tidier
 count.
 
+## The SSR Data Hub
+
+`/data_center/ssr` on the shell, and the last of the five archive hubs.
+Tabs: Search, Mapped SSRs, Reports, About, References, Metrics, Related
+resources — seven, one more than its siblings. Files:
+`controllers/data_center/ssr_search_modern.php`,
+`templates/static/mgdb_ssr.bau`, `css/mgdb-ssr.css`, `js/mgdb-ssr.js`.
+
+The search still posts to the legacy endpoint, which for a 4,646-row corpus
+answers in 80–180 ms even for a term matching everything, so its three nested
+subqueries were left alone. Eyebrows, the hero tagline and its buttons, and
+the decorative `01` are gone.
+
+### Three of the four metric cards were counting the page
+
+They read 4,646 · **10** · **2** · **Archived**. Only the first was a
+measurement: the 10 was the number of chromosome tiles further down the page
+and the 2 was the number of download formats in each tile, so both would have
+gone stale the moment a tile changed, and neither said anything about the
+collection. The four now are 4,646 SSR records, 2,034 with a repeat motif,
+775 distinct motifs, and 1,970 placed on a bin map. Cold build **0.31 s**
+across four statements, warm **71–74 ms** with no SQL.
+
+That makes two hubs running — see the Overgo section above — where a metric
+card turned out to be counting the page's own markup or was simply a word.
+
+### Reading a free-text repeat column
+
+`mgdb.probe.repeat` is not structured. `(AG)6`, `AG(15)`, `AT (10)` and a bare
+`CCG` all appear, so the figure takes the **first run of nucleotide letters**
+as the repeat unit and its length as the answer:
+
+| Repeat unit | Length | Records |
+| --- | --- | --- |
+| Dinucleotide | 2 bp | 936 |
+| Trinucleotide | 3 bp | 739 |
+| Tetranucleotide | 4 bp | 215 |
+| Pentanucleotide | 5 bp | 79 |
+| Hexanucleotide | 6 bp | 52 |
+| Longer than six | 7 bp and up | 9 |
+| Mononucleotide | 1 bp | 3 |
+
+Two edges are real and are named in the caption rather than hidden: 49 motifs
+are compound — `(CT)6AT(CT)9`, `(GA)9N2(GA)28` — and are counted by their
+first unit, and one record's motif reads "InDel" and has no unit at all, which
+is why the bars total 2,033 against the card's 2,034.
+
+### One reference is not in the bibliography
+
+Four of the five cards name DOIs from `data/cite_journal_articles.json`. The
+fifth is Vieira et al. 2016, a review of what microsatellite markers are and
+why they are useful — the one reference on the page about SSRs rather than
+about MaizeGDB, and not a MaizeGDB paper, so not in that file. It is supplied
+through `mgdb_render_references()`'s `fallback`, which fills title, authors,
+journal and year for a DOI the bibliography does not carry. Without a
+fallback the card is skipped silently rather than rendered empty.
+
+### Seven tabs wrap at different widths than six
+
+The shell steps its scroll offset to 113px below 1170px; this bar is still one
+row there and is three rows before the shell's ladder notices. Measured on the
+real page: one row (57px) down to somewhere in 781–820, two rows (105px) down
+to somewhere in 406–429, three rows (153px) below that. Both boundaries sit
+well away from the Overgo hub's, which is the point — a ladder copied from a
+sibling would have left 56px of dead space at 820 and again at 460. Every jump
+now clears by exactly 8px at 1280, 900, 780, 430 and 375.
+
+### The narrow figure labels come from the unit, not the name
+
+Shortening `Trinucleotide` to `Tri-nt` leaves `Longer than six` untouched, and
+it is the longest label, so `automargin` gave it a 120px gutter out of a 259px
+figure — the plot had 129px left. Deriving the narrow labels from the unit
+instead (`2 nt`, `7+ nt`) returned the plot to **169px**. The rule that
+generalises: when a narrow label set is produced by transforming the wide one,
+check the transformation actually shortens the *longest* member, not the
+typical one.
+
+### Verified
+
+7/7 distinct section edge colours, no rule under a section title, five
+reference cards, no duplicate `id`, all seven nav labels matching their
+`<h2>`, results hidden until a search, the figure unclipped at 1280 and 375,
+no horizontal overflow at 375, and the four form controls sharing one line and
+one left edge at 1280 and stacking to one full-width column at 375. The search
+was driven with a stubbed `jQuery.post`: `bnlg1079`, `^cshr002` and `(AAAT)5`
+all reach `/search/ssr/ssr_results.php` with the term **raw**, an empty term
+never reaches the network, an in-range limit is sent as typed, and one over
+the field's maximum is stopped by the browser's own constraint validation
+before the handler's clamp is needed.
+
 ## The Overgo Data Hub
 
 `/data_center/overgo` on the shell. Tabs: Search, Collections, About,

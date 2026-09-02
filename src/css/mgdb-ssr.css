@@ -1,15 +1,102 @@
-/* SSR marker archive — shared MaizeGDB modern design system. */
+/* ==========================================================================
+   SSR Data Hub — /data_center/ssr
+   --------------------------------------------------------------------------
+   Loaded after css/mgdb-modern.css and css/mgdb-hub.css. The hub shell settles
+   the pale blue ground, the white section cards and their coloured top edges,
+   the absence of a rule under a section title, the metric colours, the gold
+   edge a grid tile takes on hover, the green Related resources panel, and the
+   scroll offset.
 
-.mgdb-modern .mgdb-ssr-page { padding-bottom: clamp(3rem, 6vw, 5.5rem); }
+   The archive search still runs through the legacy AJAX endpoint, so what is
+   here is the search form, the chromosome download grid, the report cards, the
+   figure, and the styling that makes the endpoint's 2012-era result tables sit
+   inside a modern card.
+   ========================================================================== */
 
-.mgdb-modern .ssr-hero-mark {
-  display: block;
-  width: 7.2rem;
-  height: 6.3rem;
-  margin: 0 auto 0.7rem;
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
+
+.mgdb-ssr-page .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
 }
 
+.mgdb-ssr-page .ssr-hero-mark {
+  display: block;
+  width: min(100%, 76px);
+  height: auto;
+  margin: 0;
+}
+
+/* ── Sticky section tabs ─────────────────────────────────────────────────── */
+
+.mgdb-ssr-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-5);
+}
+
+.mgdb-ssr-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.mgdb-ssr-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
+
+.mgdb-ssr-page .mgdb-section-tabs a.is-current,
+.mgdb-ssr-page .mgdb-section-tabs a[aria-current="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+/* The offset ladder is set from the measured bar height, not from the tab
+   count, and not from the shell's default -- which steps to 113px at 1170px
+   while this bar may still be one row. Seven labels here rather than the six
+   the sibling archives carry, so its wrap points are its own and sit well clear
+   of theirs. Measured by resizing the real page: one row (57px) down to
+   somewhere in 781-820, two rows (105px) down to somewhere in 406-429, and
+   three (153px) below that. Each band takes the larger of the two heights it
+   could straddle, so a boundary errs towards dead space and never towards a
+   heading hidden behind the bar. */
+@media (max-width: 1170px) and (min-width: 821px) {
+  .mgdb-hub-page.mgdb-ssr-page > section[id] { scroll-margin-top: 65px; }
+}
+
+@media (max-width: 820px) and (min-width: 430px) {
+  .mgdb-hub-page.mgdb-ssr-page > section[id] { scroll-margin-top: 113px; }
+}
+
+@media (max-width: 429px) {
+  .mgdb-hub-page.mgdb-ssr-page > section[id] { scroll-margin-top: 161px; }
+}
+
+.mgdb-ssr-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
 .mgdb-modern .ssr-archive-note { margin-top: 1.25rem; }
+
+.mgdb-modern .ssr-section-lead {
+  max-width: 60rem;
+  margin: 0 0 1.1rem;
+  color: var(--mgdb-muted);
+}
+
+/* ── Search panel ────────────────────────────────────────────────────────── */
 
 .mgdb-modern .ssr-search-panel {
   overflow: hidden;
@@ -37,15 +124,9 @@
   font-size: clamp(1.35rem, 2.5vw, 1.8rem);
 }
 
-.mgdb-modern .ssr-search-intro p { margin: 0; color: var(--mgdb-muted); }
-
-.mgdb-modern .ssr-search-number {
-  color: var(--mgdb-surface-sunken);
-  font-size: clamp(4.8rem, 9vw, 7.5rem);
-  font-weight: 800;
-  line-height: 0.8;
-  letter-spacing: -0.08em;
-  pointer-events: none;
+.mgdb-modern .ssr-search-intro p {
+  margin: 0;
+  color: var(--mgdb-muted);
 }
 
 .mgdb-modern .ssr-search-panel .mgdb-search {
@@ -55,36 +136,51 @@
   box-shadow: none;
 }
 
-.mgdb-modern .ssr-query-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: end;
-  gap: 0.8rem;
+/* The control line. The buttons sit in the same flex row as the input rather
+   than in a neighbouring grid column offset by a hand-measured margin, so they
+   share the input's baseline by construction and stay aligned if the label's
+   line height or spacing token ever changes. */
+.mgdb-modern .ssr-query-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.mgdb-modern .ssr-query-line .mgdb-input {
+  flex: 1 1 16rem;
+  min-width: 0;
 }
 
 .mgdb-modern .ssr-query-field { min-width: 0; }
 
-.mgdb-modern .ssr-search-submit {
+.mgdb-modern .ssr-search-submit,
+.mgdb-modern .ssr-search-reset {
   min-height: var(--mgdb-tap-target);
+  margin-bottom: 0;
   white-space: nowrap;
 }
 
+/* Plain fields on one grid, tops aligned. The stacking margin mgdb-modern.css
+   puts on a second .mgdb-field is zeroed here: margins do not collapse between
+   grid items, so it would push the second column down and the two would never
+   line up. */
 .mgdb-modern .ssr-search-options {
   display: grid;
-  grid-template-columns: minmax(10rem, 14rem) minmax(0, 1fr);
-  gap: 0.9rem;
+  grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
+  align-items: start;
+  gap: 0.9rem 0.8rem;
   margin-top: 1.1rem;
-  padding: 1rem;
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface-alt);
 }
+
+.mgdb-modern .ssr-search-options > .mgdb-field { margin: 0; }
 
 .mgdb-modern .ssr-search-options .mgdb-input { width: 100%; }
 
 .mgdb-modern .ssr-search-guide {
   display: grid;
   align-content: center;
-  gap: 0.2rem;
+  gap: 0.18rem;
   padding-left: 1rem;
   border-left: 1px solid var(--mgdb-line);
 }
@@ -94,7 +190,6 @@
 .mgdb-modern .ssr-search-guide span {
   color: var(--mgdb-muted);
   font-size: 0.84rem;
-  line-height: 1.45;
 }
 
 .mgdb-modern .ssr-examples {
@@ -113,6 +208,8 @@
   letter-spacing: 0.08em;
 }
 
+/* ── Legacy result tables ────────────────────────────────────────────────── */
+
 .mgdb-modern .ssr-results:not(:empty) {
   margin-top: 1.5rem;
   padding-top: 1.25rem;
@@ -123,11 +220,11 @@
   width: 100% !important;
   border-collapse: collapse;
   color: var(--mgdb-ink);
-  font-size: 0.9rem;
+  font-size: 0.92rem;
 }
 
 .mgdb-modern .ssr-results td {
-  padding: 0.55rem 0.35rem;
+  padding: 0.5rem 0.35rem;
   border-bottom: 1px solid var(--mgdb-line-soft);
   vertical-align: top;
 }
@@ -157,6 +254,8 @@
 
 .mgdb-modern .ssr-results img { max-width: 2.5rem; height: auto; }
 
+/* ── Mapped SSR downloads ────────────────────────────────────────────────── */
+
 .mgdb-modern .ssr-chromosome-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -174,6 +273,7 @@
   box-shadow: var(--mgdb-shadow-sm);
 }
 
+/* A banded edge, standing in for the repeat itself. */
 .mgdb-modern .ssr-chromosome-grid > article::before {
   position: absolute;
   top: 0;
@@ -214,6 +314,8 @@
   text-underline-offset: 0.15em;
 }
 
+/* ── Reports ─────────────────────────────────────────────────────────────── */
+
 .mgdb-modern .ssr-resource-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
 .mgdb-modern .ssr-resource-grid .mgdb-card {
@@ -224,20 +326,21 @@
 
 .mgdb-modern .ssr-resource-grid .mgdb-card p { flex: 1; }
 
-.mgdb-modern .ssr-about-layout { margin-top: clamp(2.5rem, 6vw, 5rem); }
+/* ── Repeat unit figure ──────────────────────────────────────────────────── */
 
-.mgdb-modern .ssr-about-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 1.1rem;
+.mgdb-ssr-page .ssr-figure { margin-top: var(--mgdb-space-5); }
+
+.mgdb-ssr-page .ssr-figure .mgdb-chart {
+  height: auto;
+  min-height: 260px;
+  /* The value labels sit outside their bars (cliponaxis:false), so the box
+     must not clip them. */
+  overflow: visible;
 }
 
-.mgdb-modern .ssr-reference-card h3 {
-  margin: 0.55rem 0 0.65rem;
-  color: var(--mgdb-green-dark);
-  font-size: 1.3rem;
-}
+.mgdb-ssr-page .ssr-figure-table { margin-top: var(--mgdb-space-4); }
+
+/* ── Narrow screens ──────────────────────────────────────────────────────── */
 
 @media (max-width: 960px) {
   .mgdb-modern .ssr-chromosome-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -245,7 +348,6 @@
 }
 
 @media (max-width: 700px) {
-  .mgdb-modern .ssr-query-row,
   .mgdb-modern .ssr-search-options { grid-template-columns: 1fr; }
 
   .mgdb-modern .ssr-search-guide {
@@ -254,15 +356,19 @@
     border-left: 0;
   }
 
-  .mgdb-modern .ssr-search-submit { width: 100%; }
+  /* Stacked, both buttons take the full width: the submit alone doing so would
+     leave the reset as a stub under a full-width control. */
+  .mgdb-modern .ssr-search-submit,
+  .mgdb-modern .ssr-search-reset {
+    width: 100%;
+  }
+
   .mgdb-modern .ssr-chromosome-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .mgdb-modern .ssr-resource-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 420px) {
   .mgdb-modern .ssr-search-panel { padding: 1.05rem; }
-  .mgdb-modern .ssr-search-number { font-size: 4.5rem; }
-  .mgdb-modern .ssr-hero-mark { width: 5.8rem; height: 5.1rem; }
 }
 
 @media (max-width: 360px) {
