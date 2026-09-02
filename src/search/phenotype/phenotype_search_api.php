@@ -23,7 +23,7 @@ header('Cache-Control: private, max-age=60');
 
 try {
     $page = phenoSearchInt('page', 1, 1, 500);
-    $pageSize = phenoSearchInt('page_size', 24, 10, 100);
+    $pageSize = phenoSearchInt('page_size', 25, 10, 100);
     $sort = phenoSearchValue('sort', $filter['term'] === '' ? 'name-asc' : 'relevance');
     if (!in_array($sort, array('relevance', 'name-asc', 'name-desc', 'trait', 'stocks'), true)) {
         $sort = $filter['term'] === '' ? 'name-asc' : 'relevance';
@@ -32,19 +32,32 @@ try {
     $started = microtime(true);
     $combined = phenoCombinedQuery($filter, $page, $pageSize, $sort);
 
-    // Count query
-    $countRow = retrieve_row(make_query($DBConn, $combined['countSql'], 1, $combined['countParams']));
-    $total = $countRow ? (int) $countRow['total'] : 0;
-
+    /* The page runs first and asks for one row more than it needs. If fewer
+       come back than were asked for, this is the last page and the total is
+       just what has been read -- so the COUNT, which costs about as much as
+       the page itself here, is skipped entirely. A full page still needs it. */
     $results = array();
-    if ($total > 0) {
-        $stmt = make_query($DBConn, $combined['pageSql'], 1, $combined['pageParams']);
-        while ($row = retrieve_row($stmt)) {
-            $row['id'] = (int) $row['id'];
-            $row['trait_id'] = $row['trait_id'] !== null ? (int) $row['trait_id'] : null;
-            $row['stock_count'] = (int) $row['stock_count'];
-            $results[] = $row;
-        }
+    $stmt = make_query($DBConn, $combined['pageSql'], 1, $combined['pageParams']);
+    while ($row = retrieve_row($stmt)) {
+        $row['id'] = (int) $row['id'];
+        $row['trait_id'] = $row['trait_id'] !== null ? (int) $row['trait_id'] : null;
+        $row['stock_count'] = (int) $row['stock_count'];
+        $results[] = $row;
+    }
+
+    $hasMore = count($results) > $pageSize;
+    if ($hasMore) {
+        array_pop($results);
+    }
+
+    $offset = ($page - 1) * $pageSize;
+    if (!$hasMore) {
+        $total = $offset + count($results);
+        $countMode = 'derived';
+    } else {
+        $countRow = retrieve_row(make_query($DBConn, $combined['countSql'], 1, $combined['countParams']));
+        $total = $countRow ? (int) $countRow['total'] : 0;
+        $countMode = 'counted';
     }
 
     echo json_encode(array(
@@ -61,7 +74,8 @@ try {
             'page' => $page,
             'page_size' => $pageSize,
             'page_count' => $total ? (int) ceil($total / $pageSize) : 0,
-            'elapsed_ms' => (int) round((microtime(true) - $started) * 1000)
+            'elapsed_ms' => (int) round((microtime(true) - $started) * 1000),
+            'count' => $countMode
         ),
         'results' => $results
     ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

@@ -1351,6 +1351,84 @@ normalises a DOI that arrives as a URL, and the file was added to
 `deploy/manifest.txt` — it had never been in it, so edits to it were not
 deployable.
 
+## The Phenotype Data Hub
+
+`/data_center/phenotype` joined the shell on 2026-09-02. **Its back end was
+already fast** — 1,190 curated phenotypes, searches answering in 17–37 ms — so
+almost nothing here is about speed. It is about counts and labels that did not
+match, which is a different kind of wrong and a quieter one.
+
+### Three metric cards named one thing and counted another
+
+The four cards read 1,190 / 733 / 896 / 20,916 under the headings **Curated
+Phenotypes**, **Trait Categories**, **Anatomical Structures** and **Linked
+Stocks**. Two of those numbers do not measure what their heading says:
+
+| heading | showed | which is | the heading's number |
+| --- | --- | --- | --- |
+| Trait Categories | 733 | phenotypes carrying a trait | **256** categories |
+| Anatomical Structures | 896 | phenotypes naming a structure | **70** structures |
+
+Both are real numbers, and both are interesting — they just are not categories
+and structures. The cards now show the counts their headings name, and the
+per-phenotype figures became the context line underneath: "Trait Ontology
+categories in use, classifying 733 of these phenotypes."
+
+The fourth card was right, and now says so more precisely: 20,916 is distinct
+*stocks*, and the line under it adds that they cover 658 of the phenotypes.
+
+### The fallback numbers were fabricated and stale
+
+`getPhenotypeCorpusStats()` wrapped its queries in a try/catch that fell back to
+hard-coded values: `1190 / 709 / 780 / 39769`. Three of the four had drifted
+from the live values, the stock count by almost half — a database outage would
+have printed **39,769 linked stocks** with the same confidence as the real
+20,916. The fallback is gone. A page that cannot reach the database should not
+print a confident wrong number.
+
+### `embryo` was two options, and picking one lost the other
+
+Two `term` rows are named `embryo`, ids `11087` and `983212`, both of type
+Body Part, carrying 18 and 2 phenotypes. The filter was built one option per
+term id, so it offered **`embryo (18)` and `embryo (2)`** — two identical
+labels — and choosing either silently missed the other's phenotypes.
+
+Both filter lists are grouped by term *name* now, so the ids collapse into one
+option carrying both &#40;`value="11087,983212"`, labelled `embryo (20)`&#41;, and the
+search takes an id list rather than a single id. Verified: `part=11087` returns
+18, `part=983212` returns 2, and the merged value returns 20. Recorded as
+AD-036, along with a phenotype trait id that has no `term` row at all.
+
+### The figure reuses a query the page already ran
+
+Same trick as the marker hub: the plant-structure filter's option list is
+already a `GROUP BY` over `phenotype_body_parts`, which is exactly what a
+"phenotypes by plant structure" chart needs. The chart costs no query of its
+own. Structures past the tenth roll into one bar that carries no ids, which is
+what makes clicking it inert.
+
+Worth noting what that bar shows: the 60 remaining structures total 346, more
+than `leaf` at 174. The longest bar in the figure is the tail, which is honest
+and is the most interesting thing in it.
+
+### Elsewhere: two routes that 404 with HTTP 200
+
+Checking this page's outbound links turned up `/data_center/genome` — dead,
+serving the generic "MaizeGDB genome Search Page" 404 body **under HTTP 200** —
+linked from the Related resources of *seven* redesigned pages. `/data_center/mp`
+is dead the same way, in the two gene product record templates. Also dead:
+`/data_center/phenotypeTerms` and `/tools/ems-phenotype`, both on this page.
+
+All are repointed: `/genome`, `/metabolic_pathways`, Planteome's ontology
+browser, and — for the EMS card, which has no live destination anywhere — a
+Locus Data Hub card in its place. **A 404 served as a 200 is invisible to every
+link checker**, which is why these survived; comparing response *sizes* is what
+found them &#40;every dead data-center route answers at almost exactly 39.6 KB&#41;.
+Recorded as AD-037, along with three more the same check found in the **shared
+megamenu** — `/doc`, `/foldseek` and `/effect/maize_v2`. Those are deliberately
+*not* repointed: there is no evident live destination for any of them, and
+guessing in the navigation every page carries is worse than leaving them visible.
+
 ## The Marker Data Hub
 
 `/data_center/marker` joined the shell on 2026-09-01. The corpus is the largest

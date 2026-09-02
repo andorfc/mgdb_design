@@ -8,12 +8,20 @@
   var API_URL = '/search/phenotype/phenotype_search_api.php';
   var STORAGE_VIEW_KEY = 'mgdb-phenotype-view';
 
+  /* The API caps page_size at 100, so "All results" asks for that. */
+  var MAX_PAGE = 100;
+
+  /* trait and part are id *lists*, not ids: the controller merges terms
+     recorded under one name, so "embryo" is the two-id value "11087,983212".
+     They stay strings the whole way through. */
   var state = {
     term: '',
-    trait: 0,
-    part: 0,
+    trait: '',
+    part: '',
     page: 1,
-    pageSize: 24,
+    pageSize: 25,
+    filter: '',
+    searched: false,
     sort: 'relevance',
     view: 'table',
     currentData: null,
@@ -21,6 +29,13 @@
   };
 
   function byId(id) { return document.getElementById(id); }
+
+  function readJson(id) {
+    var el = byId(id);
+    if (!el) { return null; }
+    try { return JSON.parse(el.textContent || 'null'); }
+    catch (error) { return null; }
+  }
 
   function esc(str) {
     if (!str && str !== 0) return '';
@@ -37,64 +52,83 @@
 
   /* ── Section Tabs & Scrollspy ───────────────────────────────────────────── */
 
+  /* Sticky section tabs, driven by scroll, IntersectionObserver and resize
+     together: no single trigger fires everywhere, and the results section
+     appears and disappears under the bar as searches run. */
   function buildTabs() {
     var tabs = document.querySelectorAll('.mgdb-section-tabs a');
-    if (!tabs.length) return;
+    if (!tabs.length) { return; }
 
     var pairs = [];
     Array.prototype.forEach.call(tabs, function (tab) {
-      var href = tab.getAttribute('href');
-      if (href && href.startsWith('#')) {
-        var section = document.querySelector(href);
-        if (section) {
-          pairs.push({ tab: tab, section: section });
-        }
-      }
+      var href = tab.getAttribute('href') || '';
+      if (href.charAt(0) !== '#') { return; }
+      var section = document.getElementById(href.slice(1));
+      if (section) { pairs.push({ tab: tab, section: section }); }
     });
+    if (!pairs.length) { return; }
 
-    function markCurrent(target) {
+    var heldUntilScroll = null;
+    var heldAtY = 0;
+
+    function mark(section) {
       pairs.forEach(function (pair) {
-        var current = pair.section === target;
+        var current = pair.section === section;
         pair.tab.classList.toggle('is-current', current);
-        if (current) {
-          pair.tab.setAttribute('aria-current', 'true');
-        } else {
-          pair.tab.removeAttribute('aria-current');
-        }
+        if (current) { pair.tab.setAttribute('aria-current', 'true'); }
+        else { pair.tab.removeAttribute('aria-current'); }
       });
     }
 
-    var initial = pairs[0];
-    if (window.location.hash) {
-      pairs.forEach(function (pair) {
-        if ('#' + pair.section.id === window.location.hash) {
-          initial = pair;
-        }
-      });
+    function triggerLine() {
+      var bar = document.querySelector('.mgdb-section-tabs');
+      var barHeight = bar ? bar.getBoundingClientRect().height : 0;
+      var margin = parseFloat(window.getComputedStyle(pairs[0].section).scrollMarginTop) || 0;
+      return Math.max(barHeight + 8, margin + 4);
     }
-    if (initial) {
-      markCurrent(initial.section);
+
+    function update() {
+      if (heldUntilScroll) {
+        if (Math.abs(window.scrollY - heldAtY) < 4) { return; }
+        heldUntilScroll = null;
+      }
+      var line = triggerLine();
+      var current = pairs[0];
+      pairs.forEach(function (pair) {
+        if (pair.section.hasAttribute('hidden')) { return; }
+        if (pair.section.getBoundingClientRect().top <= line) { current = pair; }
+      });
+      if ((window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 2)) {
+        current = pairs[pairs.length - 1];
+      }
+      if (current) { mark(current.section); }
     }
 
     pairs.forEach(function (pair) {
       pair.tab.addEventListener('click', function () {
-        markCurrent(pair.section);
+        mark(pair.section);
+        heldUntilScroll = pair.section;
+        heldAtY = window.scrollY;
       });
     });
 
-    if (!window.IntersectionObserver) return;
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
 
-    var observer = new window.IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          markCurrent(entry.target);
-        }
+    if (window.IntersectionObserver) {
+      var observer = new window.IntersectionObserver(function () { update(); },
+        { rootMargin: '-20% 0px -60% 0px' });
+      pairs.forEach(function (pair) { observer.observe(pair.section); });
+    }
+
+    var results = byId('pheno-results-section');
+    if (results && window.MutationObserver) {
+      new window.MutationObserver(update).observe(results, {
+        childList: true, subtree: true, attributes: true, attributeFilter: ['hidden']
       });
-    }, { rootMargin: '-20% 0px -60% 0px' });
+    }
 
-    pairs.forEach(function (pair) {
-      observer.observe(pair.section);
-    });
+    update();
   }
 
   /* ── URL Parameter Sync ─────────────────────────────────────────────────── */
@@ -104,11 +138,13 @@
     if (params.has('q') || params.has('term')) {
       state.term = params.get('q') || params.get('term') || '';
     }
+    /* Digits and commas only: the value is pasted straight back into the
+       select and the query string. */
     if (params.has('trait')) {
-      state.trait = parseInt(params.get('trait'), 10) || 0;
+      state.trait = (params.get('trait') || '').replace(/[^0-9,]/g, '');
     }
     if (params.has('part')) {
-      state.part = parseInt(params.get('part'), 10) || 0;
+      state.part = (params.get('part') || '').replace(/[^0-9,]/g, '');
     }
     if (params.has('page')) {
       state.page = parseInt(params.get('page'), 10) || 1;
@@ -162,6 +198,11 @@
     if (state.loading) return;
     state.loading = true;
 
+    /* The results section is hidden until there is something to show. */
+    var section = byId('pheno-results-section');
+    if (section) { section.hidden = false; }
+    state.searched = true;
+
     var status = byId('pheno-results-status');
     var container = byId('pheno-results');
     var empty = byId('pheno-empty');
@@ -175,7 +216,7 @@
     if (state.trait) params.set('trait', state.trait);
     if (state.part) params.set('part', state.part);
     params.set('page', state.page);
-    params.set('page_size', state.pageSize);
+    params.set('page_size', state.pageSize === 'all' ? MAX_PAGE : state.pageSize);
     params.set('sort', state.sort);
 
     updateUrlParams();
@@ -231,10 +272,19 @@
     var start = (summary.page - 1) * summary.page_size + 1;
     var end = Math.min(summary.total, summary.page * summary.page_size);
     var queryText = data.query.term ? ' for “' + esc(data.query.term) + '”' : '';
+    var timing = ' (' + number(summary.elapsed_ms) + ' ms)';
 
     if (status) {
-      status.textContent = 'Showing ' + number(start) + '–' + number(end) + ' of ' + number(summary.total)
-        + ' phenotypes' + queryText + ' · ' + number(summary.elapsed_ms) + ' ms';
+      if (state.pageSize === 'all' && summary.total > summary.page_size) {
+        /* "All results" is capped by the endpoint, and saying so is better
+           than a count that quietly stops short. */
+        status.textContent = 'Showing the first ' + number(summary.page_size) + ' of '
+          + number(summary.total) + ' phenotypes' + queryText
+          + ', which is as many as the search returns at once.' + timing;
+      } else {
+        status.textContent = 'Showing ' + number(start) + '–' + number(end) + ' of '
+          + number(summary.total) + ' phenotypes' + queryText + '.' + timing;
+      }
     }
 
     if (!container) return;
@@ -246,6 +296,82 @@
     }
 
     initCopyButtons();
+    /* Re-applied last so paging and the card/table toggle do not silently
+       drop a filter the box still shows. */
+    applyResultsFilter();
+  }
+
+  /* Narrows the page already rendered, in both the card and table view. The
+     search pages server side, so this filters what is on screen and the status
+     line says so. */
+  function applyResultsFilter() {
+    var container = byId('pheno-results');
+    if (!container) { return; }
+
+    var items = container.querySelectorAll('.pheno-result-card, tbody tr');
+    var terms = state.filter.toLowerCase().split(/\s+/).filter(Boolean);
+    var shown = 0;
+
+    Array.prototype.forEach.call(items, function (item) {
+      var match = true;
+      if (terms.length) {
+        var hay = (item.textContent || '').toLowerCase();
+        for (var i = 0; i < terms.length; i++) {
+          if (hay.indexOf(terms[i]) === -1) { match = false; break; }
+        }
+      }
+      item.hidden = !match;
+      if (match) { shown++; }
+    });
+
+    if (terms.length) {
+      var status = byId('pheno-results-status');
+      var total = state.currentData && state.currentData.summary ? state.currentData.summary.total : 0;
+      if (status) {
+        status.textContent = shown === 0
+          ? 'Nothing on this page matches the filter “' + state.filter + '”. '
+            + number(total) + ' phenotypes matched the search.'
+          : 'Showing ' + number(shown) + ' of the ' + number(items.length)
+            + ' phenotypes on this page matching “' + state.filter + '”, out of '
+            + number(total) + ' matched by the search.';
+      }
+    }
+  }
+
+  function initResultControls() {
+    var sizeSelect = byId('pheno-page-size');
+    if (sizeSelect) {
+      sizeSelect.addEventListener('change', function () {
+        state.pageSize = this.value === 'all' ? 'all' : parseInt(this.value, 10) || 25;
+        state.page = 1;
+        if (state.searched) { executeSearch(false); }
+      });
+    }
+
+    var filterInput = byId('pheno-results-filter');
+    if (filterInput) {
+      filterInput.addEventListener('input', function () {
+        state.filter = this.value.trim();
+        if (state.filter === '' && state.currentData) {
+          renderResults(state.currentData);
+        }
+        applyResultsFilter();
+      });
+    }
+
+    var advReset = byId('pheno-adv-reset');
+    if (advReset) {
+      advReset.addEventListener('click', function () {
+        var traitSelect = byId('pheno-trait');
+        var partSelect = byId('pheno-part');
+        if (traitSelect) { traitSelect.value = '0'; }
+        if (partSelect) { partSelect.value = '0'; }
+        state.trait = '';
+        state.part = '';
+        state.page = 1;
+        if (state.searched) { executeSearch(false); }
+      });
+    }
   }
 
   function renderCardView(container, results) {
@@ -401,12 +527,8 @@
       });
     }
 
-    if (traitSelect && state.trait) {
-      traitSelect.value = String(state.trait);
-    }
-    if (partSelect && state.part) {
-      partSelect.value = String(state.part);
-    }
+    if (traitSelect && state.trait) { traitSelect.value = state.trait; }
+    if (partSelect && state.part) { partSelect.value = state.part; }
 
     if (clearBtn && input) {
       clearBtn.addEventListener('click', function () {
@@ -421,9 +543,13 @@
     if (form && input) {
       form.addEventListener('submit', function (e) {
         e.preventDefault();
+        /* Every field is read from the DOM here. The advanced selects also
+           update state on 'change', but that event never fires for a value the
+           browser restores itself (autofill, bfcache), and a filter shown in
+           the form must never be missing from the query it describes. */
         state.term = input.value.trim();
-        state.trait = traitSelect ? (parseInt(traitSelect.value, 10) || 0) : 0;
-        state.part = partSelect ? (parseInt(partSelect.value, 10) || 0) : 0;
+        state.trait = traitSelect && traitSelect.value !== '0' ? traitSelect.value : '';
+        state.part = partSelect && partSelect.value !== '0' ? partSelect.value : '';
         state.page = 1;
         executeSearch(true);
       });
@@ -431,7 +557,7 @@
 
     if (traitSelect) {
       traitSelect.addEventListener('change', function () {
-        state.trait = parseInt(traitSelect.value, 10) || 0;
+        state.trait = traitSelect.value !== '0' ? traitSelect.value : '';
         state.page = 1;
         executeSearch(true);
       });
@@ -439,7 +565,7 @@
 
     if (partSelect) {
       partSelect.addEventListener('change', function () {
-        state.part = parseInt(partSelect.value, 10) || 0;
+        state.part = partSelect.value !== '0' ? partSelect.value : '';
         state.page = 1;
         executeSearch(true);
       });
@@ -465,8 +591,8 @@
         if (traitSelect) traitSelect.value = '0';
         if (partSelect) partSelect.value = '0';
         state.term = '';
-        state.trait = 0;
-        state.part = 0;
+        state.trait = '';
+        state.part = '';
         state.page = 1;
         executeSearch(false);
       });
@@ -504,10 +630,139 @@
 
   /* ── Bootstrap ──────────────────────────────────────────────────────────── */
 
+
+  /* ── Phenotypes by plant structure figure ───────────────────────────────── */
+
+  /* The census is rendered server side into #pheno-chart-data by the same
+     GROUP BY that fills the plant-structure filter, so this draws without a
+     request of its own. */
+  function initFigure() {
+    var data = readJson('pheno-chart-data');
+    if (!data || !data.bars || !data.bars.length) { return; }
+
+    var bars = data.bars;
+
+    var table = byId('pheno-part-table');
+    if (table) {
+      var body = table.querySelector('tbody');
+      if (body) {
+        body.innerHTML = bars.map(function (bar) {
+          return '<tr><td>' + esc(bar.label) + '</td>'
+               + '<td class="mgdb-numeric">' + number(bar.count) + '</td></tr>';
+        }).join('');
+      }
+    }
+
+    if (!window.MGDB || !window.MGDB.chart) { return; }
+
+    /* Plotly stacks horizontal bars bottom-up, so the array is reversed to put
+       the largest structure at the top, matching the table. */
+    var ordered = bars.slice().reverse();
+    var el = byId('pheno-part-chart');
+    var height = Math.max(320, ordered.length * 40 + 110);
+    if (el) { el.style.height = height + 'px'; }
+
+    /* Margins are sized from the figure, not fixed. A 150px label gutter plus
+       a 96px label margin is most of a phone's width: left as constants they
+       squeeze the plot to nothing and every bar draws as a sliver. Below the
+       breakpoint the gutter shrinks and the value labels come off, because the
+       table underneath already carries every number. */
+    var NARROW = 560;
+    function metrics() {
+      var width = el ? el.getBoundingClientRect().width : 0;
+      var narrow = width > 0 && width < NARROW;
+      return {
+        narrow: narrow,
+        /* Floors under automargin, which only ever grows a margin. */
+        margin: narrow ? { l: 104, r: 16, t: 8, b: 44 } : { l: 150, r: 72, t: 8, b: 44 },
+        nticks: narrow ? 3 : 0
+      };
+    }
+    var m = metrics();
+
+    var trace = {
+      type: 'bar',
+      orientation: 'h',
+      y: ordered.map(function (bar) { return bar.label; }),
+      x: ordered.map(function (bar) { return bar.count; }),
+      /* The rolled-up tail is not a structure you can search, so it is drawn
+         in a muted tone to read as a summary rather than another category. */
+      marker: {
+        color: ordered.map(function (bar) {
+          return bar.ids ? '#285d46' : '#9aa8a0';
+        })
+      },
+      /* A non-breaking space: SVG collapses a plain leading one, leaving the
+         label flush against the end of its bar. */
+      text: ordered.map(function (bar) { return '\u00A0' + number(bar.count); }),
+      textposition: m.narrow ? 'none' : 'outside',
+      cliponaxis: false,
+      hovertemplate: '%{y}<br>%{x:,} phenotypes<extra></extra>'
+    };
+
+    window.MGDB.chart({
+      target: 'pheno-part-chart',
+      traces: [trace],
+      layout: {
+        height: height,
+        showlegend: false,
+        margin: m.margin,
+        xaxis: { title: 'Phenotypes', zeroline: false, tickformat: ',d', nticks: m.nticks },
+        yaxis: { automargin: true }
+      }
+    });
+
+    /* MGDB.chart re-runs Plotly.Plots.resize on a window resize, which
+       rescales the figure but keeps the margins it was drawn with. Crossing
+       the breakpoint has to relayout. */
+    if (el && window.Plotly && window.Plotly.relayout) {
+      var lastNarrow = m.narrow;
+      var timer = null;
+      window.addEventListener('resize', function () {
+        if (timer) { window.clearTimeout(timer); }
+        timer = window.setTimeout(function () {
+          var next = metrics();
+          if (next.narrow === lastNarrow) { return; }
+          lastNarrow = next.narrow;
+          window.Plotly.relayout(el, { margin: next.margin, 'xaxis.nticks': next.nticks });
+          window.Plotly.restyle(el, { textposition: next.narrow ? 'none' : 'outside' });
+        }, 180);
+      });
+    }
+
+    if (!el || !window.MutationObserver) { return; }
+
+    /* Selecting a bar searches that structure. Plotly only gains its event
+       emitter once it has drawn, so wait for the draw rather than guessing a
+       delay. */
+    var attached = false;
+    var observer = new window.MutationObserver(function () {
+      if (attached || typeof el.on !== 'function') { return; }
+      attached = true;
+      observer.disconnect();
+      el.on('plotly_click', function (event) {
+        if (!event || !event.points || !event.points.length) { return; }
+        var match = ordered[event.points[0].pointIndex];
+        if (!match || !match.ids) { return; }
+
+        var partSelect = byId('pheno-part');
+        if (partSelect) { partSelect.value = match.ids; }
+        var adv = document.querySelector('.pheno-adv');
+        if (adv) { adv.open = true; }
+        state.part = match.ids;
+        state.page = 1;
+        executeSearch(true);
+      });
+    });
+    observer.observe(el, { childList: true, subtree: true });
+  }
+
   function init() {
     readUrlParams();
     buildTabs();
     initForm();
+    initResultControls();
+    initFigure();
     initViewToggle();
     updateExportLinks();
 

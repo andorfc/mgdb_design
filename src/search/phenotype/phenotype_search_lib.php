@@ -30,10 +30,30 @@ function phenoSearchInt($key, $default, $min = null, $max = null) {
     return $int;
 }
 
+/* The trait and body-part filters carry an id *list*, not a single id: the
+   controller merges terms recorded under one name (see getPhenotypeBodyPartRows),
+   so "embryo" arrives as "11087,983212". Everything is cast to int here, which
+   is what keeps the IN () list built below parameterized and safe. */
+function phenoSearchIdList($key) {
+    $raw = phenoSearchValue($key, '');
+    if ($raw === '') {
+        return array();
+    }
+
+    $ids = array();
+    foreach (explode(',', $raw) as $part) {
+        $id = (int) trim($part);
+        if ($id > 0 && !in_array($id, $ids, true)) {
+            $ids[] = $id;
+        }
+    }
+    return $ids;
+}
+
 function phenoBuildFilters($DBConn) {
     $term = phenoSearchValue('term', phenoSearchValue('q', ''));
-    $traitId = phenoSearchInt('trait', 0);
-    $partId = phenoSearchInt('part', 0);
+    $traitIds = phenoSearchIdList('trait');
+    $partIds = phenoSearchIdList('part');
 
     $where = array('i.curation_lvl = 0');
     $whereParams = array();
@@ -65,31 +85,33 @@ function phenoBuildFilters($DBConn) {
         $criteria[] = 'matching "' . htmlspecialchars($term, ENT_QUOTES, 'UTF-8') . '"';
     }
 
-    if ($traitId > 0) {
-        $whereParams[] = $traitId;
-        $whereParams[] = $traitId;
-        $where[] = '(p.trait = ? OR EXISTS (SELECT 1 FROM phenotype_trait pt WHERE pt.id = p.id AND pt.trait = ?))';
-        
-        $traitRow = retrieve_row(make_query($DBConn, "SELECT name FROM term WHERE id=?", 1, array($traitId)));
+    if (count($traitIds) > 0) {
+        $slots = implode(',', array_fill(0, count($traitIds), '?'));
+        foreach ($traitIds as $id) { $whereParams[] = $id; }
+        foreach ($traitIds as $id) { $whereParams[] = $id; }
+        $where[] = "(p.trait IN ($slots) OR EXISTS (SELECT 1 FROM phenotype_trait pt WHERE pt.id = p.id AND pt.trait IN ($slots)))";
+
+        $traitRow = retrieve_row(make_query($DBConn, "SELECT name FROM term WHERE id=?", 1, array($traitIds[0])));
         if ($traitRow && isset($traitRow['name'])) {
             $criteria[] = 'trait: ' . htmlspecialchars($traitRow['name'], ENT_QUOTES, 'UTF-8');
         }
     }
 
-    if ($partId > 0) {
-        $whereParams[] = $partId;
-        $where[] = 'EXISTS (SELECT 1 FROM phenotype_body_parts pbp WHERE pbp.id = p.id AND pbp.body_part = ?)';
-        
-        $partRow = retrieve_row(make_query($DBConn, "SELECT name FROM term WHERE id=?", 1, array($partId)));
+    if (count($partIds) > 0) {
+        $slots = implode(',', array_fill(0, count($partIds), '?'));
+        foreach ($partIds as $id) { $whereParams[] = $id; }
+        $where[] = "EXISTS (SELECT 1 FROM phenotype_body_parts pbp WHERE pbp.id = p.id AND pbp.body_part IN ($slots))";
+
+        $partRow = retrieve_row(make_query($DBConn, "SELECT name FROM term WHERE id=?", 1, array($partIds[0])));
         if ($partRow && isset($partRow['name'])) {
-            $criteria[] = 'body part: ' . htmlspecialchars($partRow['name'], ENT_QUOTES, 'UTF-8');
+            $criteria[] = 'plant structure: ' . htmlspecialchars($partRow['name'], ENT_QUOTES, 'UTF-8');
         }
     }
 
     return array(
         'term' => $term,
-        'trait' => $traitId,
-        'part' => $partId,
+        'trait' => implode(',', $traitIds),
+        'part' => implode(',', $partIds),
         'where' => implode(' AND ', $where),
         'whereParams' => $whereParams,
         'criteria' => $criteria
@@ -150,7 +172,9 @@ function phenoCombinedQuery($filter, $page, $pageSize, $sort) {
             break;
     }
 
-    $limit = (int) $pageSize;
+    /* One row more than the page needs. The API uses the extra row to tell a
+       full page from the last one, which is what lets it skip the COUNT. */
+    $limit = (int) $pageSize + 1;
     $offset = (int) (($page - 1) * $pageSize);
 
     $pageSql = "
