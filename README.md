@@ -1293,6 +1293,73 @@ appear at all. Deleting `controllers/genome2.php` outright would drop the row
 and make the route 404; the redirect was judged worth more than the tidier
 count.
 
+## The EST Data Hub
+
+`/data_center/est` on the shell. Tabs: Search, Mapped ESTs, About,
+References, Metrics, Related resources. Files:
+`controllers/data_center/est_search_modern.php`,
+`templates/static/mgdb_est.bau`, `css/mgdb-est.css`, `js/mgdb-est.js`.
+
+The search itself is untouched — it still posts to the legacy `search.js`
+trio, the same arrangement Cytogenetics and BAC kept. What changed is the
+page around it: the eyebrows, the hero tagline and its buttons, and the
+115px decorative `01` are gone; the four metric cards are counted rather
+than asserted; and a figure and a values table now stand where the page
+used to describe the collection in prose.
+
+### The three-count split, 50 s to 0.9 s
+
+The metrics are three numbers over the same corpus — every EST, those with
+an external accession, those placed on a bin map — so the obvious build is
+one pass with two filtered counts:
+
+```sql
+SELECT COUNT(*),
+       COUNT(*) FILTER (WHERE EXISTS (SELECT 1 FROM mgdb.ext_db_key k WHERE k.id = p.id)),
+       COUNT(*) FILTER (WHERE EXISTS (SELECT 1 FROM mgdb.probe_bin pb WHERE pb.id = p.id))
+FROM mgdb.probe p JOIN mgdb.id_num i ON i.id = p.id
+WHERE p.type = 34 AND i.curation_lvl = 0;
+```
+
+That took **50 seconds**. An `EXISTS` inside an aggregate `FILTER` is not a
+semi-join Postgres can plan; it is a correlated subquery re-executed for
+each of the 59,308 candidate rows. Written as three separate statements,
+each is a join the planner hashes once: **364 ms, 333 ms and 185 ms**,
+identical numbers. The whole cold build, figure included, is **0.88 s**;
+warm it is **65–72 ms** and issues no SQL, cached under
+`est/stats_<mtime of the controller>`.
+
+The lesson generalises past this page: `COUNT(*) FILTER (WHERE EXISTS …)`
+reads like the one-pass version of several counts and is the opposite of
+it. Two counts over the same base are still two queries.
+
+### The chromosome comes from `floor()`, not a join
+
+`mgdb.probe_bin.bin` is a numeric whose integer part is the chromosome and
+whose fraction is the bin — `9.02` is bin 2 of chromosome 9. So the census
+behind the figure groups on `floor(pb.bin)::int` and never touches
+`linkage_group`. Ten bars, 1,967 mapped ESTs, chromosome 1 highest at 382.
+
+The figure is a horizontal bar chart through `MGDB.chart()` with the
+shared responsive-margin treatment, and the same values are repeated
+underneath as `#est-chr-table` for anyone who cannot use the figure.
+
+### Metrics
+
+59,308 ESTs · 59,161 with an accession · 1,967 mapped · 10 chromosomes.
+The first two being three digits apart is real: 147 EST records carry no
+`ext_db_key` row.
+
+### Verified
+
+Distinct section edge colours 6/6, no rule under any section title, five
+reference cards, no duplicate `id`, every nav label matching its `<h2>`,
+results hidden until a search, figure text unclipped at 1280 and 375, tab
+jumps clearing the bar at both widths (57px bar at 1280, 153px at 375),
+no horizontal overflow at 375, and the four form controls sharing one line
+and one left edge at 1280, one column at 375 — the alignment the BAC hub
+was corrected to.
+
 ## The Map Data Hub
 
 `/data_center/map` joined the shell on 2026-09-01. It is the page `/data_center/map2`

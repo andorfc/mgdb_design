@@ -1,15 +1,163 @@
-/* EST collection page — shared MaizeGDB modern design system. */
+/* ==========================================================================
+   EST Data Hub — /data_center/est
+   --------------------------------------------------------------------------
+   Loaded after css/mgdb-modern.css and css/mgdb-hub.css. The hub shell settles
+   the pale blue ground, the white section cards and their coloured top edges,
+   the absence of a rule under a section title, the metric colours, the gold
+   edge a grid tile takes on hover, the green Related resources panel, and the
+   scroll offset.
 
-.mgdb-modern .mgdb-est-page {
-  padding-bottom: clamp(3rem, 6vw, 5.5rem);
+   The collection search still runs through the legacy AJAX helper, so what is
+   here is the search form, the chromosome download grid, the prose layout,
+   and the figure.
+   ========================================================================== */
+
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
+
+.mgdb-est-page .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
 }
 
-.mgdb-modern .est-hero-mark {
+.mgdb-est-page .est-hero-mark {
   display: block;
-  width: 7.2rem;
-  height: 6.3rem;
-  margin: 0 auto 0.7rem;
+  width: min(100%, 72px);
+  height: auto;
+  margin: 0;
 }
+
+/* ── Sticky section tabs ─────────────────────────────────────────────────── */
+
+.mgdb-est-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-5);
+}
+
+.mgdb-est-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.mgdb-est-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
+
+.mgdb-est-page .mgdb-section-tabs a.is-current,
+.mgdb-est-page .mgdb-section-tabs a[aria-current="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+/* The offset ladder is per measured bar height, not per tab count: six tabs
+   here still wrap to three rows on a 375px screen -- a 153px bar -- because
+   the labels are long. Measured 57px / 105px / 153px. */
+@media (max-width: 1000px) and (min-width: 861px) {
+  .mgdb-hub-page.mgdb-est-page > section[id] { scroll-margin-top: 65px; }
+}
+
+@media (max-width: 860px) and (min-width: 521px) {
+  .mgdb-hub-page.mgdb-est-page > section[id] { scroll-margin-top: 113px; }
+}
+
+@media (max-width: 520px) {
+  .mgdb-hub-page.mgdb-est-page > section[id] { scroll-margin-top: 161px; }
+}
+
+.mgdb-est-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+/* ── Records by prefix figure ────────────────────────────────────────────── */
+
+.mgdb-est-page .est-figure { margin-top: var(--mgdb-space-5); }
+
+.mgdb-est-page .est-figure .mgdb-chart {
+  height: auto;
+  min-height: 260px;
+  /* The value labels sit outside their bars (cliponaxis:false), so the box
+     must not clip them. */
+  overflow: visible;
+}
+
+.mgdb-est-page .est-figure-table { margin-top: var(--mgdb-space-4); }
+
+
+/* The control line. The buttons sit in the same flex row as the input rather
+   than in a neighbouring grid column offset by a hand-measured margin, so they
+   share the input's baseline by construction and stay aligned if the label's
+   line height or spacing token ever changes. */
+.mgdb-modern .est-query-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.mgdb-modern .est-query-line .mgdb-input {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.mgdb-modern .est-query-field {
+  min-width: 0;
+}
+
+.mgdb-modern .est-search-submit {
+  min-height: var(--mgdb-tap-target);
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+/* These used to sit in a tinted box with its own 1rem padding, which inset them
+   16px from the query field above and broke the left edge of the form. They are
+   plain fields on the same grid now, and `align-items: start` keeps their labels
+   and controls on the same two lines even when one hint wraps and the other
+   does not. */
+.mgdb-modern .est-search-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 14rem));
+  align-items: start;
+  gap: 0.9rem 0.8rem;
+  margin-top: 1.1rem;
+}
+
+/* mgdb-modern.css stacks consecutive fields with a top margin on the second.
+   Margins do not collapse between grid items, so that rule pushed the second
+   option 16px down its own column and the two labels never lined up. */
+.mgdb-modern .est-search-options > .mgdb-field { margin: 0; }
+
+.mgdb-modern .est-search-options .mgdb-input,
+.mgdb-modern .est-search-options .mgdb-select {
+  width: 100%;
+}
+
+/* These sat in a tinted box with its own padding, which inset them from the
+   query field above and broke the left edge of the form. Plain fields on the
+   same grid now, tops aligned, and the stacking margin mgdb-modern.css puts on
+   a second .mgdb-field zeroed -- margins do not collapse between grid items. */
+.mgdb-modern .est-search-options {
+  display: grid;
+  grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+  align-items: start;
+  gap: 0.9rem 0.8rem;
+  margin-top: 1.1rem;
+}
+
+.mgdb-modern .est-search-options > .mgdb-field { margin: 0; }
 
 .mgdb-modern .est-search-panel {
   overflow: hidden;
@@ -44,46 +192,11 @@
   color: var(--mgdb-muted);
 }
 
-.mgdb-modern .est-search-number {
-  color: var(--mgdb-surface-sunken);
-  font-size: clamp(4.8rem, 9vw, 7.5rem);
-  font-weight: 800;
-  line-height: 0.8;
-  letter-spacing: -0.08em;
-  pointer-events: none;
-}
-
 .mgdb-modern .est-search-panel .mgdb-search {
   padding: 0;
   border: 0;
   background: transparent;
   box-shadow: none;
-}
-
-.mgdb-modern .est-query-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: end;
-  gap: 0.8rem;
-}
-
-.mgdb-modern .est-query-field {
-  min-width: 0;
-}
-
-.mgdb-modern .est-search-submit {
-  min-height: var(--mgdb-tap-target);
-  white-space: nowrap;
-}
-
-.mgdb-modern .est-search-options {
-  display: grid;
-  grid-template-columns: minmax(10rem, 14rem) minmax(0, 1fr);
-  gap: 0.9rem;
-  margin-top: 1.1rem;
-  padding: 1rem;
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface-alt);
 }
 
 .mgdb-modern .est-search-options .mgdb-input {
@@ -287,19 +400,21 @@
 }
 
 @media (max-width: 640px) {
-  .mgdb-modern .est-query-row,
   .mgdb-modern .est-search-options {
     grid-template-columns: 1fr;
+  }
+
+  /* Stacked, both buttons take the full width: the submit alone did, which
+     left the reset as a stub under a full-width control. */
+  .mgdb-modern .est-search-submit,
+  .mgdb-modern .est-search-reset {
+    width: 100%;
   }
 
   .mgdb-modern .est-search-guide {
     padding: 0.9rem 0 0;
     border-top: 1px solid var(--mgdb-line);
     border-left: 0;
-  }
-
-  .mgdb-modern .est-search-submit {
-    width: 100%;
   }
 
   .mgdb-modern .est-chromosome-grid {
@@ -312,11 +427,7 @@
     padding: 1.05rem;
   }
 
-  .mgdb-modern .est-search-number {
-    font-size: 4.5rem;
-  }
-
-  .mgdb-modern .est-hero-mark {
+    .mgdb-modern .est-hero-mark {
     width: 5.8rem;
     height: 5.1rem;
   }

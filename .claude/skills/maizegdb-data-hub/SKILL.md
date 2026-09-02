@@ -141,6 +141,13 @@ nothing else goes wrong visibly.
   generous on a desktop are most of a 375px figure: measure bar widths and every
   text node's bounding box against the SVG box at 375 too. One chart drew every
   bar 1px wide there with no error anywhere.
+- **`COUNT(*) FILTER (WHERE EXISTS ...)` is not one pass, it is N.** Counting a
+  corpus and two subsets of it in a single statement reads like the cheap way
+  to do it; the `EXISTS` is a correlated subquery re-run per candidate row, not
+  a semi-join. One hub's metric build took 50 seconds that way and 0.9 seconds
+  as three separate joined counts with identical numbers. Two counts over the
+  same base are still two queries — write them as such and let the planner hash
+  each join once.
 - **`dashboardCache()` does not fold the caller's mtime into the key** — it uses
   the string it is handed plus a global stamp. Any payload whose *shape* is
   built in the controller needs `'<key>_' . (int) @filemtime(__FILE__)`, or a
