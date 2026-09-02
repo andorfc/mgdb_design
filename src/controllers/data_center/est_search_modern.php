@@ -69,6 +69,9 @@ $content->get('chromosome_count')->replace(number_format(count($est_stats['chr_r
 $content->get('chart_data')->replace(estChartData($est_stats['chr_rows']));
 $content->get('search_limit')->replace($search_limit);
 $content->get('search_limit_max')->replace((int) $system['search_limit_max']);
+/* The same number twice: the number input's max attribute needs it raw, the
+   sentence beside it needs it grouped. */
+$content->get('search_limit_max_text')->replace(number_format((int) $system['search_limit_max']));
 
 /* References: what an EST collection of this vintage underpins, and what
    replaced it. Rendered by include/references_lib.php so these cards match

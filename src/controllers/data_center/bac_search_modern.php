@@ -122,6 +122,9 @@ $content->get('reference_cards')->replace(mgdb_render_references($doc_root, arra
 )));
 $content->get('search_limit')->replace((int) $system['search_limit']);
 $content->get('search_limit_max')->replace((int) $system['search_limit_max']);
+/* The same number twice: the number input's max attribute needs it raw, the
+   sentence beside it needs it grouped. */
+$content->get('search_limit_max_text')->replace(number_format((int) $system['search_limit_max']));
 
 include_once('translation.php');
 $mgdb->get('blast_url')->replace($system['BLAST_URL']);

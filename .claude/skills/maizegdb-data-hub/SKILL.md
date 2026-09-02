@@ -192,6 +192,23 @@ nothing else goes wrong visibly.
   to a reader, because the header menu carries a single combined entry. Check
   `templates/home/megamenu_modern/data-centers.bau` and `tools/sitemap_data.py`
   (then re-run `tools/gen_sitemap.py`) whenever a hub is added or separated.
+- **Sibling endpoints disagree about who decodes.** Three hubs in the same
+  family shared one search script and three `*_results.php` endpoints; two read
+  `urldecode(getCGIParam('term'))` and the third did not. Since the shared
+  script sends `term: encodeURI(...)` and jQuery form-encodes on top of that,
+  the odd endpoint received `%5ECL10` for `^CL10` and matched nothing — every
+  anchored and wildcard search on that hub had been silently empty, including
+  the example chips the page itself offered. Post the term raw, and before
+  trusting any legacy endpoint, diff it against its siblings line by line: page
+  size, decoding, and which types it filters on are all places they drift.
+- **A search hint is a claim you have to test.** If the hint says `^` anchors
+  and `%` is a wildcard, run one of each and compare the response size against
+  the unanchored term. "It returned a page" is not the check.
+- **`validate_input()` does nothing.** It calls `validate_string()`, which is
+  `return $input;`. Any legacy endpoint relying on it to make a term safe is
+  concatenating raw POST data into SQL. Probe with a single quote and read
+  `logs/mgdb.log` for `SQLSTATE`; the page will usually report "no results"
+  rather than an error.
 - **Look for a capped export.** `format=tsv` handlers that reuse the search's
   MAX_RESULTS constant hand back a truncated file under a button that says
   "Download" — one returned 200 of 211 rows and would have got quietly worse as

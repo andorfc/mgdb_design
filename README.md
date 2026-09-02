@@ -1293,6 +1293,115 @@ appear at all. Deleting `controllers/genome2.php` outright would drop the row
 and make the route 404; the redirect was judged worth more than the tidier
 count.
 
+## The Overgo Data Hub
+
+`/data_center/overgo` on the shell. Tabs: Search, Collections, About,
+References, Metrics, Related resources. Files:
+`controllers/data_center/overgo_search_modern.php`,
+`templates/static/mgdb_overgo.bau`, `css/mgdb-overgo.css`,
+`js/mgdb-overgo.js`.
+
+The page had two search panels side by side, numbered `01` and `02`, each
+with its own form, heading and eyebrow. They are one search bar now, with a
+**Search by** select that decides which of the two legacy endpoints the form
+posts to and what the field is allowed to contain. Everything else follows
+the BAC and EST conversions: eyebrows, hero tagline and buttons gone, four
+counted metric cards, a figure with a values table under it.
+
+### The metrics were two measurements and two constants
+
+The old cards read 13,430 · 10,644 · **25 bp** · **Archived**. The third was
+the maximum length of a sequence *query* and the fourth was a word — both
+described the page rather than the collection. The four now are 13,430 Overgo
+probes, 10,644 searchable sequences, 1,199 placed on a bin map, and 1,476
+distinct loci those placements detect.
+
+Cold build **0.30 s** across four statements, warm **67–71 ms** with no SQL.
+The counts are deliberately separate statements rather than one with
+`COUNT(*) FILTER (WHERE EXISTS …)` columns — see the EST hub above for what
+that shape costs.
+
+### The name families are the archive's real structure
+
+One `GROUP BY` over probe type and a `CASE` on the name prefix carries the
+total, the split between the two collections, and the figure's five bars:
+
+| Family | Collection | Records |
+| --- | --- | --- |
+| PCO | Unigene-Overgo | 5,753 |
+| CL | Unigene-Overgo | 3,332 |
+| SOG | Overgo | 2,769 |
+| si | Unigene-Overgo | 1,559 |
+| AOG | Overgo | 17 |
+
+Each family sits entirely within one collection, so the bars are coloured by
+collection and need no legend. Only two families are documented in the
+database: a curator note says the AOG probes were designed from conserved
+Arabidopsis sequences, and the si probes carry notes naming Incyte as the
+source of the clones. **SOG, PCO and CL have no annotation memo at all**, and
+the page does not guess what the letters stand for. A search of every memo on
+these records for "sorghum" returns nothing.
+
+### Four things the endpoints get wrong
+
+Converting this hub meant reading the two legacy endpoints closely, and each
+of the four findings is recorded in `ADMIN_DEPENDENCIES.md`:
+
+- **AD-043, a live SQL injection.** `overgo_seq_results.php` concatenates the
+  term into four `LIKE` clauses. The only sanitiser applied is
+  `validate_input()`, which calls `validate_string()`, which is
+  `return $input;`. Posting `term=A'` raises `SQLSTATE[42725]` in the log and
+  shows the reader "no matching sequences". The hub validates `^[ACGT]{1,25}$`
+  before posting, which protects a person using the page and does nothing for
+  the endpoint's public URL.
+- **AD-044, a page-size parameter that is read from the config instead.**
+  `bac_results.php` calls `getPageSize('bac_pagesize')`; the overgo endpoints
+  do `$pagesize = $system['pagesize']`. So this hub gets no records-per-page
+  select — an unusable control is worse than a stated number — and the hint
+  beside Maximum results says "25 to a page" instead.
+- **AD-045, 569 sequences the sequence search cannot see.** Unigene-Overgo
+  sequences are memo type 487260, "Sequence". The Overgo collection's are memo
+  type 107404, "Sequence Note" — same 40 bp strings, different type — and the
+  query hard-codes the former. The metric card counts what the search can
+  actually reach rather than every sequence in the archive.
+- **AD-046, a missing `urldecode()`.** This one was breaking the page's own
+  examples. `est_results.php` and `bac_results.php` read
+  `urldecode(getCGIParam('term'))`; the overgo endpoints do not. The old page
+  sent `term: encodeURI(query)`, which jQuery then form-encodes, so `^CL10`
+  reached the database as the literal `%5ECL10`: **41,803 bytes of results
+  against none**. Every anchored or wildcard search on this hub had been
+  silently empty. The page now sends the term raw, which is correct because
+  `jQuery.post` already encodes the body. Pagination past page one still goes
+  through `getSearchData()`, which encodes, so the `urldecode()` is still
+  wanted.
+
+The lesson generalises: three sibling hubs share one shared search script and
+three endpoints that disagree about who decodes. Diff the endpoint against its
+siblings, not just against the page.
+
+### The tab offset ladder, measured rather than assumed
+
+The shell steps its scroll offset to 113px below 1170px, which is 56px more
+than this bar needs there and 48px less than it needs once the bar wraps.
+Measured by resizing the real page: the six labels sit on one row (57px) down
+to somewhere in 681–700, two rows (105px) down to somewhere in 376–399, and
+three rows (153px) below that. Each band takes the larger of the two heights
+it could straddle, so every jump clears by exactly 8px at 1280, 800, 560 and
+375 and no boundary can hide a heading.
+
+### Verified
+
+6 distinct section edge colours, no rule under a section title, five reference
+cards, no duplicate `id`, every nav label matching its `<h2>`, results hidden
+until a search, the figure unclipped at 1280 and 375, no horizontal overflow
+at 375, and the five form controls sharing one line and one left edge at 1280
+and stacking to one full-width column at 375. The search itself was driven
+with a stubbed `jQuery.post`: name mode posts to
+`/search/overgo/overgo_results.php`, sequence mode to
+`/search/overgo_seq/overgo_seq_results.php`, ` gcat agga actg ` normalises to
+`GCATAGGAACTG`, `ACGTX` never reaches the network, and `#ovterm` carries the
+cleaned query so the legacy pagination scripts still find it.
+
 ## The EST Data Hub
 
 `/data_center/est` on the shell. Tabs: Search, Mapped ESTs, About,
