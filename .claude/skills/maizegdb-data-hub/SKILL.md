@@ -145,6 +145,17 @@ nothing else goes wrong visibly.
   the string it is handed plus a global stamp. Any payload whose *shape* is
   built in the controller needs `'<key>_' . (int) @filemtime(__FILE__)`, or a
   warm server keeps serving an entry that predates the new fields.
+- **An OR of LIKE arms is not the same cost as the arms run separately.** Two
+  `EXISTS` clauses ORed with two column matches became correlated subqueries per
+  candidate row: 395 + 286 + 613 + 418 ms apart, 3,323 ms together. Rewrite as a
+  `UNION` of independent arms joined back to the base table, and narrow each arm
+  to rows that could possibly join (a column that is NULL 93% of the time is a
+  free filter).
+- **`COUNT(*) OVER ()` is not always the win.** It removes a second pass over an
+  expensive matched set, but with no filter it has to materialise every row
+  where a plain `COUNT(*)` is an index-only scan — 1,735 ms against 699 ms on
+  one 781k-row corpus. Keep both shapes and pick by whether the expensive join
+  is in play.
 - **A hub is only split when the *navigation* is split.** Two hubs can have
   their own controllers, templates, sheets and libraries and still be one thing
   to a reader, because the header menu carries a single combined entry. Check

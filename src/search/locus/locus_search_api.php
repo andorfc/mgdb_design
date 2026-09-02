@@ -62,11 +62,24 @@ try {
         'phenotype'  => isset($_GET['phenotype']) ? trim($_GET['phenotype']) : ''
     );
 
-    $limit = isset($_GET['limit']) ? max(1, min(LOCUS_MAX_RESULTS, (int) $_GET['limit'])) : 50;
-    $offset = isset($_GET['offset']) ? max(0, (int) $_GET['offset']) : 0;
+    /* Two pagination shapes. `limit`/`offset` is what this endpoint has always
+       taken; `page`/`page_size` is what every other hub's search speaks, and
+       what the page's own controls send. Whichever arrives, the response
+       reports both, so neither caller has to translate. */
+    if (isset($_GET['page_size']) || isset($_GET['page'])) {
+        $pageSize = isset($_GET['page_size'])
+            ? max(1, min(LOCUS_MAX_RESULTS, (int) $_GET['page_size']))
+            : 25;
+        $page = isset($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
+        $limit = $pageSize;
+        $offset = ($page - 1) * $pageSize;
+    } else {
+        $limit = isset($_GET['limit']) ? max(1, min(LOCUS_MAX_RESULTS, (int) $_GET['limit'])) : 50;
+        $offset = isset($_GET['offset']) ? max(0, (int) $_GET['offset']) : 0;
+    }
 
     if ($format === 'tsv') {
-        $limit = LOCUS_MAX_RESULTS;
+        $limit = LOCUS_EXPORT_MAX;
         $offset = 0;
     }
 
@@ -85,6 +98,12 @@ try {
             'returned'   => count($searchData['results']),
             'offset'     => $offset,
             'limit'      => $limit,
+            'page'       => $limit > 0 ? (int) floor($offset / $limit) + 1 : 1,
+            'page_size'  => $limit,
+            'page_count' => ($limit > 0 && $searchData['total'] > 0)
+                            ? (int) ceil($searchData['total'] / $limit) : 0,
+            // So the page can say when "Export TSV" will be a truncated file.
+            'export_max' => LOCUS_EXPORT_MAX,
             'elapsed_ms' => $elapsed
         ),
         'filters' => $filters,

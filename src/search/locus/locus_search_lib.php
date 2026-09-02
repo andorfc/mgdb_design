@@ -9,6 +9,17 @@ if (!defined('LOCUS_MAX_RESULTS')) {
     define('LOCUS_MAX_RESULTS', 200);
 }
 
+/* The TSV export used to reuse LOCUS_MAX_RESULTS, so a search matching 58,975
+   loci downloaded 200 of them under a button that said "Export" and said
+   nothing about the other 58,775. A cap is still right on a 781,395-row corpus,
+   but it has to be a useful one and it has to be declared: hydration is cheap
+   next to building the matched set at all -- 200 rows cost 2,275 ms and 7,459
+   rows 2,857 ms on the same query -- so the cap can be much higher than it was.
+   The API reports it so the page can say when an export is truncated. */
+if (!defined('LOCUS_EXPORT_MAX')) {
+    define('LOCUS_EXPORT_MAX', 10000);
+}
+
 function locusSummaryStats($DBConn) {
     $sql = "
         SELECT 
@@ -28,8 +39,10 @@ function locusSummaryStats($DBConn) {
     );
 }
 
-function locusTypeOptions($DBConn) {
-    $options = '<option value="">All locus types</option>' . "\n";
+/* The locus type census. One GROUP BY over 781,395 curated loci, run once
+   inside dashboardCache() and then reused by both the type filter and the
+   figure -- the chart adds no query of its own. */
+function locusTypeRows($DBConn) {
     $sql = "
         SELECT t.id, t.name, COUNT(*) AS count
         FROM mgdb.locus l
@@ -39,13 +52,53 @@ function locusTypeOptions($DBConn) {
         GROUP BY t.id, t.name
         ORDER BY count DESC, t.name ASC";
     $stmt = make_query($DBConn, $sql);
+    $rows = array();
     while ($row = retrieve_row($stmt)) {
+        $rows[] = array(
+            'id'    => (int) $row['id'],
+            'name'  => (string) $row['name'],
+            'count' => (int) $row['count']
+        );
+    }
+    return $rows;
+}
+
+function locusRenderTypeOptions($rows) {
+    $options = '<option value="">All locus types</option>' . "\n";
+    foreach ($rows as $row) {
         $options .= '<option value="' . (int) $row['id'] . '">'
                  . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8')
-                 . ' (' . number_format((int) $row['count']) . ')'
+                 . ' (' . number_format($row['count']) . ')'
                  . "</option>\n";
     }
     return $options;
+}
+
+/* Figure payload, built from the list the type filter already needed.
+ *
+ * The distribution is extremely skewed -- 686,356 Points against 13 Centromeres
+ * -- so everything past the tenth type is rolled into one bar. That bar carries
+ * no id, which is what stops a click on it from filtering by a type that does
+ * not exist. */
+function locusTypeChartData($rows) {
+    $top  = array_slice($rows, 0, 10);
+    $rest = array_slice($rows, 10);
+
+    $bars = array();
+    foreach ($top as $row) {
+        $bars[] = array('id' => $row['id'], 'label' => $row['name'], 'count' => $row['count']);
+    }
+
+    if (count($rest) > 0) {
+        $tail = 0;
+        foreach ($rest as $row) {
+            $tail += $row['count'];
+        }
+        $bars[] = array('id' => 0, 'label' => count($rest) . ' other types', 'count' => $tail);
+    }
+
+    return json_encode(array('types' => count($rows), 'bars' => $bars),
+        JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 }
 
 function locusChrOptions($DBConn) {
@@ -85,19 +138,41 @@ function locusSearch($DBConn, $filters = array(), $limit = 50, $offset = 0) {
     $where = array("i.curation_lvl = 0");
     $params = array();
 
+    /* The term match is a UNION of four independent arms joined back to
+       mgdb.locus, not four conditions ORed inside one WHERE.
+     *
+     * ORed together, the two EXISTS clauses become correlated subqueries run
+     * once per candidate locus -- 790,208 of them -- and no arm can use an
+     * index because every pattern has a leading wildcard. Measured on `b1`:
+     * the four arms cost 395, 286, 613 and 418 ms when run separately, and
+     * 3,323 ms when ORed. As a UNION each arm is one pass.
+     *
+     * Two of the arms are also narrowed to rows that could possibly match:
+     * mgdb.synonyms is 2.8M rows of which 437,245 belong to a locus, and
+     * chado.gene_model is 1.9M rows of which 1,741,224 -- 93% -- have a NULL
+     * locus_id and so can never join. Both restrictions are free.
+     */
     $term = isset($filters['term']) ? trim($filters['term']) : '';
+    $matchJoin = '';
     if ($term !== '') {
         $like = '%' . strtolower($term) . '%';
         $params[] = $like;
         $params[] = $like;
         $params[] = $like;
         $params[] = $like;
-        $where[] = "(
-            LOWER(l.name) LIKE ?
-            OR LOWER(l.full_name) LIKE ?
-            OR EXISTS (SELECT 1 FROM mgdb.synonyms s WHERE s.id = l.id AND LOWER(s.synonyms) LIKE ?)
-            OR EXISTS (SELECT 1 FROM chado.gene_model gm WHERE gm.locus_id = l.id AND LOWER(gm.gene_name) LIKE ?)
-        )";
+        $matchJoin = "
+        JOIN (
+            SELECT ln.id FROM mgdb.locus ln WHERE LOWER(ln.name) LIKE ?
+            UNION
+            SELECT lf.id FROM mgdb.locus lf WHERE LOWER(lf.full_name) LIKE ?
+            UNION
+            SELECT s.id FROM mgdb.synonyms s
+              WHERE LOWER(s.synonyms) LIKE ?
+                AND EXISTS (SELECT 1 FROM mgdb.locus lx WHERE lx.id = s.id)
+            UNION
+            SELECT gm.locus_id FROM chado.gene_model gm
+              WHERE gm.locus_id IS NOT NULL AND LOWER(gm.gene_name) LIKE ?
+        ) matched ON matched.id = l.id";
     }
 
     $type = isset($filters['type']) && $filters['type'] !== '' ? (int) $filters['type'] : null;
@@ -124,28 +199,69 @@ function locusSearch($DBConn, $filters = array(), $limit = 50, $offset = 0) {
 
     $whereSql = implode(' AND ', $where);
 
-    // Count matching
-    $countSql = "SELECT COUNT(*) AS total FROM mgdb.locus l JOIN mgdb.id_num i ON i.id = l.id WHERE {$whereSql}";
-    $countRow = retrieve_row(make_query($DBConn, $countSql, 1, $params));
-    $total = (int) ($countRow['total'] ?? 0);
-
-    if ($total === 0) {
-        return array('total' => 0, 'results' => array());
-    }
-
-    // Exact match prioritization if search term is supplied
+    /* When there is a term, the page carries its own total through
+       COUNT(*) OVER () so the matched set is built once rather than twice --
+       it used to be built for a COUNT and then again for the page, and on this
+       corpus that pass is seconds.
+     *
+     * With no term there is no matched set to reuse, and the window function is
+     * the wrong tool: it has to materialise all 781,395 rows to count them,
+     * where a plain COUNT(*) is an index-only scan. Measured on the unfiltered
+     * listing, 699 ms with a separate COUNT against 1,735 ms with the window.
+     * So the two shapes are kept, and which one runs depends on whether the
+     * expensive join is in play. */
+    $orderParams = array();
     $orderClause = "l.name ASC";
     if ($term !== '') {
-        $exactEscaped = str_replace("'", "''", strtolower($term));
-        $orderClause = "(LOWER(l.name) = '{$exactEscaped}') DESC, (l.type = 101) DESC, l.name ASC";
+        // Bound, not interpolated: the previous version doubled quotes by hand.
+        $orderParams[] = strtolower($term);
+        $orderClause = "(LOWER(l.name) = ?) DESC, (l.type = 101) DESC, l.name ASC";
     }
 
-    // Fetch IDs
-    $idSql = "SELECT l.id, l.name, l.type FROM mgdb.locus l JOIN mgdb.id_num i ON i.id = l.id WHERE {$whereSql} ORDER BY {$orderClause} LIMIT {$limit} OFFSET {$offset}";
-    $idRows = get_all_rows(make_query($DBConn, $idSql, 1, $params));
-    if (!$idRows) {
-        return array('total' => $total, 'results' => array());
+    $limit = (int) $limit;
+    $offset = (int) $offset;
+
+    $windowed = ($matchJoin !== '');
+    $totalCol = $windowed ? ', COUNT(*) OVER () AS total_count' : '';
+
+    $idSql = "SELECT l.id, l.name, l.type{$totalCol}
+              FROM mgdb.locus l
+                JOIN mgdb.id_num i ON i.id = l.id{$matchJoin}
+              WHERE {$whereSql}
+              ORDER BY {$orderClause}
+              LIMIT {$limit} OFFSET {$offset}";
+
+    if (!$windowed) {
+        $countRow = retrieve_row(make_query($DBConn, "SELECT COUNT(*) AS total
+            FROM mgdb.locus l JOIN mgdb.id_num i ON i.id = l.id WHERE {$whereSql}", 1, $params));
+        $plainTotal = (int) ($countRow['total'] ?? 0);
+        if ($plainTotal === 0) {
+            return array('total' => 0, 'results' => array());
+        }
     }
+
+    $idRows = get_all_rows(make_query($DBConn, $idSql, 1, array_merge($params, $orderParams)));
+
+    if (!$idRows) {
+        /* COUNT(*) OVER () rides on the rows, so an offset past the end returns
+           no rows and therefore no total. The count is only run in that case --
+           which is a hand-edited offset, not anything the page does -- and the
+           answer stays what it always was: the real total, and no results. */
+        if (!$windowed) {
+            return array('total' => $plainTotal, 'results' => array());
+        }
+        if ($offset === 0) {
+            return array('total' => 0, 'results' => array());
+        }
+        $countSql = "SELECT COUNT(*) AS total
+                     FROM mgdb.locus l
+                       JOIN mgdb.id_num i ON i.id = l.id{$matchJoin}
+                     WHERE {$whereSql}";
+        $countRow = retrieve_row(make_query($DBConn, $countSql, 1, $params));
+        return array('total' => (int) ($countRow['total'] ?? 0), 'results' => array());
+    }
+
+    $total = $windowed ? (int) $idRows[0]['total_count'] : $plainTotal;
 
     $ids = array();
     foreach ($idRows as $r) {

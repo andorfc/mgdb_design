@@ -1,12 +1,18 @@
-/* file: mgdb-locus.css
- *
- * Page-specific styles for the Locus Data Hub (/data_center/locus).
- * Scoped under .mgdb-locus-page.
- */
+/* ==========================================================================
+   Locus Data Hub — /data_center/locus
+   --------------------------------------------------------------------------
+   Loaded after css/mgdb-modern.css and css/mgdb-hub.css. The hub shell settles
+   the pale blue ground, the white section cards and their coloured top edges,
+   the absence of a rule under a section title, the metric colours, the gold
+   edge a grid tile takes on hover, the zebra striping, the green Related
+   resources panel, the shared form field, and the scroll offset.
 
-/* --------------------------------------------------------------------------
-   Hero Emblem
-   -------------------------------------------------------------------------- */
+   Nothing above is repeated here. What is here is the page's own furniture:
+   the notice banner, the query control, the examples, the advanced accordion,
+   the results controls and pagination, the figure, and the results table.
+   ========================================================================== */
+
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
 
 .mgdb-locus-page .mgdb-hero-emblem {
   background: #ffffff;
@@ -16,58 +22,9 @@
 .mgdb-locus-page .mgdb-hero-emblem svg {
   width: min(100%, 64px);
   height: auto;
-  mix-blend-mode: normal;
 }
 
-/* --------------------------------------------------------------------------
-   Notice Banner (Gene Center vs Locus Data Hub)
-   -------------------------------------------------------------------------- */
-
-.mgdb-locus-page .locus-notice-banner {
-  display: flex;
-  gap: var(--mgdb-space-3);
-  align-items: center;
-  margin-top: var(--mgdb-space-4);
-  margin-bottom: var(--mgdb-space-4);
-  padding: var(--mgdb-space-3) var(--mgdb-space-4);
-  border: 1px solid #b8dbca;
-  border-radius: var(--mgdb-radius);
-  background: #edf7f1;
-  color: var(--mgdb-ink);
-  font-size: var(--mgdb-text-sm);
-}
-
-.mgdb-locus-page .locus-notice-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--mgdb-green);
-  color: #ffffff;
-  font-size: 16px;
-  font-weight: bold;
-  flex-shrink: 0;
-}
-
-.mgdb-locus-page .locus-notice-body strong {
-  display: block;
-  color: var(--mgdb-green-dark);
-  margin-bottom: 2px;
-}
-
-.mgdb-locus-page .locus-notice-body code {
-  padding: 1px 4px;
-  border-radius: 3px;
-  background: #e1efe7;
-  color: var(--mgdb-green-dark);
-  font-size: 0.9em;
-}
-
-/* --------------------------------------------------------------------------
-   Sticky Section Tabs
-   -------------------------------------------------------------------------- */
+/* ── Sticky section tabs ─────────────────────────────────────────────────── */
 
 .mgdb-locus-page .mgdb-section-tabs {
   position: sticky;
@@ -78,9 +35,6 @@
   gap: var(--mgdb-space-2);
   margin-top: var(--mgdb-space-5);
   margin-bottom: var(--mgdb-space-5);
-  padding: var(--mgdb-space-2) 0;
-  background: var(--mgdb-surface);
-  border-bottom: 1px solid var(--mgdb-line);
 }
 
 .mgdb-locus-page .mgdb-section-tabs a {
@@ -88,19 +42,17 @@
   min-height: 40px;
   align-items: center;
   padding: 0 var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
   color: var(--mgdb-ink) !important;
   font-size: var(--mgdb-text-sm);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
-  transition: background .12s, border-color .12s;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
 }
 
-.mgdb-locus-page .mgdb-section-tabs a:hover {
-  background: var(--mgdb-green-soft);
-}
+.mgdb-locus-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
 
 .mgdb-locus-page .mgdb-section-tabs a.is-current,
 .mgdb-locus-page .mgdb-section-tabs a[aria-current="true"] {
@@ -110,21 +62,38 @@
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
-.mgdb-locus-page > section,
-.mgdb-locus-page section[id] {
-  scroll-margin-top: 4.5rem;
+@media (max-width: 1080px) and (min-width: 861px) {
+  .mgdb-hub-page.mgdb-locus-page > section[id] { scroll-margin-top: 65px; }
 }
 
+@media (max-width: 860px) {
+  .mgdb-hub-page.mgdb-locus-page > section[id] { scroll-margin-top: 113px; }
+}
+
+.mgdb-locus-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+/* --------------------------------------------------------------------------
 /* --------------------------------------------------------------------------
    Search Form
    -------------------------------------------------------------------------- */
 
+/* The section is the white card, so the form sits directly on it: the query
+   takes the slack and the button takes what it needs, with the accordion
+   spanning underneath. The type, chromosome and phenotype selects used to sit
+   in their own row above the buttons; all three are advanced criteria and live
+   in the disclosure now. */
 .mgdb-locus-page .locus-search-form {
-  padding: var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface-alt);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-4);
+  align-items: end;
 }
+
+.mgdb-locus-page .locus-field-query { grid-column: 1; }
+/* Scoped with `>` to the search form: `.mgdb-hub-field-action` is a shared
+   class and the results controls use it too. */
+.mgdb-locus-page .locus-search-form > .mgdb-hub-field-action { grid-column: 2; }
+.mgdb-locus-page .locus-adv { grid-column: 1 / -1; }
 
 .mgdb-locus-page .locus-example-btn {
   display: inline-block;
@@ -151,14 +120,44 @@
   margin-top: var(--mgdb-space-5);
 }
 
+.mgdb-locus-page .locus-results-section[hidden] { display: none; }
+
 .mgdb-locus-page .locus-results-heading {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--mgdb-space-3);
-  align-items: flex-start;
+  gap: var(--mgdb-space-3) var(--mgdb-space-5);
+  align-items: end;
   justify-content: space-between;
   margin-bottom: var(--mgdb-space-4);
 }
+
+.mgdb-locus-page .locus-results-heading > div:first-child { min-width: 0; flex: 1 1 18rem; }
+
+/* Fixed tracks in a box sized to its own content: declared with minmax(0, ...)
+   the first tracks take everything the parent offers and the last resolves to
+   0px, which drops its control onto a second row. */
+.mgdb-locus-page .locus-results-controls {
+  display: grid;
+  width: max-content;
+  max-width: 100%;
+  flex: 0 0 auto;
+  grid-template-columns: 13rem 10rem auto;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: end;
+}
+
+@media (max-width: 1000px) {
+  .mgdb-locus-page .locus-results-controls {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .mgdb-locus-page .locus-results-controls { grid-template-columns: minmax(0, 1fr); }
+}
+
+.mgdb-locus-page .locus-export-buttons { display: flex; gap: var(--mgdb-space-2); align-items: center; }
 
 .mgdb-locus-page #locus-notes .mgdb-message {
   margin-bottom: var(--mgdb-space-4);
@@ -289,3 +288,103 @@
     white-space: nowrap;
   }
 }
+
+/* ── Advanced search disclosure ──────────────────────────────────────────── */
+
+.mgdb-locus-page .locus-adv {
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--hub-surface);
+}
+
+.mgdb-locus-page .locus-adv summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+  align-items: baseline;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  color: var(--mgdb-green-dark);
+  cursor: pointer;
+  list-style-position: inside;
+}
+
+.mgdb-locus-page .locus-adv summary strong { font-size: var(--mgdb-text-base); }
+.mgdb-locus-page .locus-adv summary span { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+.mgdb-locus-page .locus-adv[open] summary { border-bottom: 1px solid var(--hub-line-soft); }
+
+.mgdb-locus-page .locus-adv-body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 24rem));
+  gap: var(--mgdb-space-4);
+  align-items: start;
+  padding: var(--mgdb-space-4);
+}
+
+.mgdb-locus-page .locus-adv-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  padding: 0 var(--mgdb-space-4) var(--mgdb-space-4);
+}
+
+@media (max-width: 640px) {
+  .mgdb-locus-page .locus-search-form { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-locus-page .locus-search-form > .mgdb-hub-field-action { grid-column: 1; }
+  .mgdb-locus-page .locus-adv-body { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ── Pagination ──────────────────────────────────────────────────────────── */
+
+.mgdb-locus-page .locus-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-4);
+  border-top: 1px solid var(--hub-line-soft);
+}
+
+.mgdb-locus-page .locus-pagination:empty { display: none; }
+
+.mgdb-locus-page .locus-pagination button {
+  min-width: var(--mgdb-tap-target);
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mgdb-locus-page .locus-pagination button:hover:not([disabled]) {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-locus-page .locus-pagination button.is-active {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+}
+
+.mgdb-locus-page .locus-pagination button[disabled] { opacity: .45; cursor: not-allowed; }
+
+/* ── Analyses by trait figure ────────────────────────────────────────────── */
+
+.mgdb-locus-page .locus-figure { margin-top: var(--mgdb-space-5); }
+
+.mgdb-locus-page .locus-figure .mgdb-chart {
+  height: auto;
+  min-height: 320px;
+  /* The value labels sit outside their bars (cliponaxis:false), so the box
+     must not clip them. */
+  overflow: visible;
+}
+
+.mgdb-locus-page .locus-figure-table { margin-top: var(--mgdb-space-4); }

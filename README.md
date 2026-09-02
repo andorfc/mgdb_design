@@ -1351,6 +1351,84 @@ normalises a DOI that arrives as a URL, and the file was added to
 `deploy/manifest.txt` — it had never been in it, so edits to it were not
 deployable.
 
+## The Locus Data Hub
+
+`/data_center/locus` joined the shell on 2026-09-02, completing the split begun
+with the QTL hub. It searches 781,395 curated loci, and it was **the slowest
+search on the site**: 3.9 to 11.2 seconds.
+
+### Four conditions ORed, evaluated per row
+
+The term clause was one `WHERE` with four arms:
+
+```sql
+LOWER(l.name) LIKE ? OR LOWER(l.full_name) LIKE ?
+OR EXISTS (SELECT 1 FROM mgdb.synonyms   s  WHERE s.id = l.id  AND LOWER(s.synonyms) LIKE ?)
+OR EXISTS (SELECT 1 FROM chado.gene_model gm WHERE gm.locus_id = l.id AND LOWER(gm.gene_name) LIKE ?)
+```
+
+ORed like that the two `EXISTS` clauses become correlated subqueries run once
+per candidate locus — 790,208 of them — and no arm can use an index because
+every pattern has a leading wildcard. Measured on `b1`: the four arms cost 395,
+286, 613 and 418 ms **run separately**, and **3,323 ms ORed together**. As a
+`UNION` of four independent arms joined back to `mgdb.locus`, each is one pass.
+
+Two arms are also narrowed to rows that could possibly match: `mgdb.synonyms`
+is 2.8M rows of which 437,245 belong to a locus, and `chado.gene_model` is 1.9M
+rows of which **1,741,224 — 93% — have a NULL `locus_id`** and so can never
+join. Both restrictions are free.
+
+### And it all ran twice
+
+`locusSearch()` built the matched set for a `COUNT`, then built it again for the
+page. The page carries its own total through `COUNT(*) OVER ()` now — but only
+when there is a term. **With no term the window function is the wrong tool**: it
+has to materialise all 781,395 rows to count them, where a plain `COUNT(*)` is
+an index-only scan. Measured on the unfiltered listing, 699 ms with a separate
+count against 1,735 ms with the window. So both shapes are kept and which one
+runs depends on whether the expensive join is in play.
+
+| query | before | after |
+| --- | --- | --- |
+| `zm` &#40;23,916&#41; | 11,188 ms | **4,917 ms** |
+| `a` &#40;58,975&#41; | 10,228 ms | **5,156 ms** |
+| `b1` &#40;7,459&#41; | 6,351 ms | **2,253 ms** |
+| `lg1` &#40;405&#41; | 4,868 ms | **826 ms** |
+| `wx1` &#40;4&#41; | 3,870 ms | **833 ms** |
+| no term | 699 ms | **643 ms** |
+| `type=101` | — | **81 ms** |
+
+Verified equivalent — totals *and* the full result rows — across 13 filter
+shapes on two pages each, old implementation against new in one process. The
+exact-match ordering term is bound now rather than interpolated with
+hand-doubled quotes.
+
+### The export was 200 rows of up to 781,395
+
+`format=tsv` reused `LOCUS_MAX_RESULTS`, which is 200. A search matching 58,975
+loci downloaded 200 of them and said nothing about the rest. A cap is still
+right on a corpus this size, but it has to be useful and it has to be declared:
+hydration turns out to be cheap next to building the matched set at all — 200
+rows cost 2,275 ms and 7,459 rows 2,857 ms on the same query — so the cap is
+`LOCUS_EXPORT_MAX = 10,000`, the API reports it, and when a search matches more
+than that the button reads **"Export first 10,000"** with the full count in its
+tooltip.
+
+### A figure where nine bars are slivers
+
+`Point` is 686,356 of the 781,395 loci — 88% — so on a linear axis every other
+type renders 1–2px wide. That is the true shape of the corpus and the value
+label beside each bar stays readable, so the chart is kept and the caption says
+what is happening rather than leaving the reader to wonder.
+
+### Also
+
+Same two fixes as the QTL hub, which shares this page's history: the endpoint
+took `limit`/`offset` where every other hub takes `page`/`page_size` and now
+accepts both, and the hero's `Updated: $(data_date)` was `date('F j, Y')`
+captured into the dashboard cache — the day the cache entry was built,
+presented as though it meant something. Removed.
+
 ## The QTL Data Hub, split out from Loci
 
 `/data_center/qtl` joined the shell on 2026-09-02, and stopped sharing a
