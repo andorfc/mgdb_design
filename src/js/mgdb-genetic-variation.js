@@ -49,32 +49,76 @@
 
   /* ── Section Tabs & Scrollspy ───────────────────────────────────────────── */
 
+  /* The shared section-tab behaviour: a wrapping bar, aria-current, and a click
+     hold released by real scrolling. The IntersectionObserver-only version this
+     replaced marked nothing in embedded browsers, which deliver no entries. */
   function buildTabs() {
-    var nav = document.querySelector('.mgdb-section-tabs');
-    if (!nav) return;
-    var links = nav.querySelectorAll('a[href^="#"]');
-    if (!links.length) return;
+    var tabs = document.querySelectorAll('.mgdb-section-tabs a');
+    if (!tabs.length) { return; }
 
-    var sections = [];
-    Array.prototype.forEach.call(links, function (link) {
-      var id = link.getAttribute('href').slice(1);
-      var el = document.getElementById(id);
-      if (el) sections.push({ id: id, link: link, el: el });
+    var pairs = [];
+    Array.prototype.forEach.call(tabs, function (tab) {
+      var href = tab.getAttribute('href') || '';
+      if (href.charAt(0) !== '#') { return; }
+      var section = document.getElementById(href.slice(1));
+      if (section) { pairs.push({ tab: tab, section: section }); }
+    });
+    if (!pairs.length) { return; }
+
+    var heldUntilScroll = null;
+    var heldAtY = 0;
+
+    function mark(section) {
+      pairs.forEach(function (pair) {
+        var current = pair.section === section;
+        pair.tab.classList.toggle('is-current', current);
+        if (current) { pair.tab.setAttribute('aria-current', 'true'); }
+        else { pair.tab.removeAttribute('aria-current'); }
+      });
+    }
+
+    function triggerLine() {
+      var bar = document.querySelector('.mgdb-section-tabs');
+      var barHeight = bar ? bar.getBoundingClientRect().height : 0;
+      var margin = parseFloat(window.getComputedStyle(pairs[0].section).scrollMarginTop) || 0;
+      return Math.max(barHeight + 8, margin + 4);
+    }
+
+    function update() {
+      if (heldUntilScroll) {
+        if (Math.abs(window.scrollY - heldAtY) < 4) { return; }
+        heldUntilScroll = null;
+      }
+      var line = triggerLine();
+      var current = pairs[0];
+      pairs.forEach(function (pair) {
+        if (pair.section.hasAttribute('hidden')) { return; }
+        if (pair.section.getBoundingClientRect().top <= line) { current = pair; }
+      });
+      if ((window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 2)) {
+        current = pairs[pairs.length - 1];
+      }
+      if (current) { mark(current.section); }
+    }
+
+    pairs.forEach(function (pair) {
+      pair.tab.addEventListener('click', function () {
+        mark(pair.section);
+        heldUntilScroll = pair.section;
+        heldAtY = window.scrollY;
+      });
     });
 
-    if (!('IntersectionObserver' in window)) return;
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
 
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          sections.forEach(function (s) {
-            s.link.classList.toggle('is-current', s.el === entry.target);
-          });
-        }
-      });
-    }, { rootMargin: '-20% 0px -70% 0px' });
+    if (window.IntersectionObserver) {
+      var observer = new window.IntersectionObserver(function () { update(); },
+        { rootMargin: '-20% 0px -60% 0px' });
+      pairs.forEach(function (pair) { observer.observe(pair.section); });
+    }
 
-    sections.forEach(function (s) { observer.observe(s.el); });
+    update();
   }
 
   function init() {

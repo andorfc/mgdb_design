@@ -35,9 +35,6 @@
   gap: var(--mgdb-space-2);
   margin-top: var(--mgdb-space-5);
   margin-bottom: var(--mgdb-space-5);
-  padding: var(--mgdb-space-2) 0;
-  background: var(--mgdb-surface);
-  border-bottom: 1px solid var(--mgdb-line);
 }
 
 .mgdb-genetic-variation-page .mgdb-section-tabs a {
@@ -45,14 +42,16 @@
   min-height: 40px;
   align-items: center;
   padding: 0 var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
   color: var(--mgdb-ink) !important;
   font-size: var(--mgdb-text-sm);
   font-weight: 600;
   text-decoration: none;
-  transition: background var(--mgdb-dur-fast), border-color var(--mgdb-dur-fast), color var(--mgdb-dur-fast);
+  /* Literal durations: --mgdb-dur-fast is defined nowhere, and one unknown
+     custom property invalidates the whole transition declaration. */
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
 }
 
 .mgdb-genetic-variation-page .mgdb-section-tabs a:hover {
@@ -67,8 +66,21 @@
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
-/* Scroll-margin so an anchored section is not hidden behind the sticky nav. */
-.mgdb-genetic-variation-page > section[id] { scroll-margin-top: 4.5rem; }
+/* The offset ladder is set from the measured bar height, not the tab count.
+   Below 640px the bar is not sticky at all, so nothing has to clear it there.
+   Values filled in from measurement. */
+.mgdb-genetic-variation-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+/* Measured: eight labels sit on one 57px row from 1280 down to 641, where the
+   bar stops being sticky altogether, so only one band needs a value of its own
+   and below 640 a section has nothing to clear. */
+@media (max-width: 1170px) and (min-width: 641px) {
+  .mgdb-hub-page.mgdb-genetic-variation-page > section[id] { scroll-margin-top: 65px; }
+}
+
+@media (max-width: 640px) {
+  .mgdb-hub-page.mgdb-genetic-variation-page > section[id] { scroll-margin-top: 16px; }
+}
 
 /* --------------------------------------------------------------------------
    Featured workspace — SNPTools
@@ -300,12 +312,20 @@
 
 .mgdb-genetic-variation-page .gv-table-controls .mgdb-filters { margin: 0; }
 
+/* The chips sit on the same line as the filter input, so they take the input's
+   height. At the shared 36px they were bottom-aligned to it and their tops sat
+   8px higher, which reads as two rows that not quite line up; the reset button
+   that appears beside them is 44px and made the mismatch worse. */
+.mgdb-genetic-variation-page .gv-table-controls .mgdb-chip {
+  min-height: var(--mgdb-tap-target);
+}
+
 .mgdb-genetic-variation-page .gv-table-controls .mgdb-result-count {
   grid-column: 1 / -1;
   margin: 0;
 }
 
-.mgdb-genetic-variation-page .gv-reset { padding-block: var(--mgdb-space-1); }
+.mgdb-genetic-variation-page .gv-reset { min-height: var(--mgdb-tap-target); padding-block: 0; }
 
 /* --------------------------------------------------------------------------
    Dataset table
@@ -531,18 +551,6 @@
 /* --------------------------------------------------------------------------
    Connected Resources & Contributor Banner (Bottom Section — Light Green)
    -------------------------------------------------------------------------- */
-
-.mgdb-genetic-variation-page .gv-bottom-section {
-  padding: var(--mgdb-space-6);
-  border: 1px solid #cfe3d6;
-  border-radius: var(--mgdb-radius-lg);
-  background: linear-gradient(135deg, #f2f8f4 0%, var(--mgdb-green-soft) 100%);
-}
-
-.mgdb-genetic-variation-page .gv-bottom-section .mgdb-resource-panel {
-  background: rgba(255, 255, 255, 0.85);
-  border-color: #cfe3d6;
-}
 
 .mgdb-genetic-variation-page .gv-contribute-banner {
   display: flex;

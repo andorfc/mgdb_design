@@ -222,6 +222,14 @@ nothing else goes wrong visibly.
   the example chips the page itself offered. Post the term raw, and before
   trusting any legacy endpoint, diff it against its siblings line by line: page
   size, decoding, and which types it filters on are all places they drift.
+- **`MGDB.filterList` debounces its input by 200 ms.** A test that dispatches
+  `input` and reads the row count straight away sees nothing change and looks
+  like a broken filter. Wait 300 ms or more before measuring.
+- **Chips beside an input have to take the input's height.** The shared
+  `.mgdb-chip` is 36px and a form control is 44px, so a control line holding
+  both is bottom-aligned by `align-items: end` and their tops do not line up —
+  and the reset button that appears among the chips is 44px, which makes it
+  obvious. Raise the chips to `--mgdb-tap-target` inside that row.
 - **A search hint is a claim you have to test.** If the hint says `^` anchors
   and `%` is a wildcard, run one of each and compare the response size against
   the unanchored term. "It returned a page" is not the check.

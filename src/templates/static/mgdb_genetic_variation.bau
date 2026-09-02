@@ -8,7 +8,7 @@ $$SYNTAX-LEVEL 2
 
 <a class="mgdb-skip-link" href="#gv-main">Skip to main content</a>
 
-<main class="mgdb-page mgdb-genetic-variation-page" id="gv-main">
+<main class="mgdb-page mgdb-hub-page mgdb-genetic-variation-page" id="gv-main">
 
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
     <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Genetic variation</span>
@@ -27,26 +27,83 @@ $$SYNTAX-LEVEL 2
   </section>
 
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#gv-tools" class="is-current">Tools</a>
-    <a href="#gv-datasets">Datasets</a>
+    <a href="#gv-datasets" class="is-current" aria-current="true">Search</a>
+    <a href="#gv-tools">Tools</a>
     <a href="#gv-projects">Projects</a>
     <a href="#gv-downloads">Downloads</a>
-    <a href="#gv-types">Variation Types</a>
-    <a href="#gv-overview">Statistics</a>
-    <a href="#gv-related">Related Resources</a>
+    <a href="#gv-about">About</a>
+    <a href="#gv-references">References</a>
+    <a href="#gv-metrics">Metrics</a>
+    <a href="#gv-related">Related resources</a>
   </nav>
+
+<!-- ====================================================================
+       2. Variant Datasets
+       ==================================================================== -->
+  <section id="gv-datasets" aria-labelledby="gv-datasets-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="gv-datasets-title">Search</h2></div>
+    </div>
+
+    <div class="gv-search-intro">
+      <div><h3>Which variant build do you need?</h3><p>This hub's own collection is the variant builds, so they are all listed and the filter narrows them. Every build is selectable in SNPVersity 2 and SNPTools. <strong>High Quality</strong> builds apply linkage-disequilibrium \(LD\) filtering on top of <strong>High Coverage</strong> datasets for reduced redundancy.</p></div>
+    </div>
+
+    <div class="gv-table-controls">
+      <div class="mgdb-field gv-filter-field">
+        <label class="mgdb-label" for="gv-dataset-query">Filter datasets</label>
+        <input class="mgdb-input" id="gv-dataset-query" type="search" autocomplete="off" placeholder="B73 v5, imputation, NAM, Panzea..." />
+      </div>
+      <div class="mgdb-filters" role="group" aria-label="Filter datasets by property">
+        <button class="mgdb-chip" type="button" data-filter="all" aria-pressed="true">All</button>
+        <button class="mgdb-chip" type="button" data-filter="maizegdb" aria-pressed="false">MaizeGDB builds</button>
+        <button class="mgdb-chip" type="button" data-filter="indels" aria-pressed="false">With indels</button>
+        <button class="mgdb-chip" type="button" data-filter="imputed" aria-pressed="false">Imputed</button>
+        <button class="mgdb-button mgdb-button-quiet gv-reset" type="button" id="gv-dataset-reset" hidden>Reset</button>
+      </div>
+      <p class="mgdb-result-count" id="gv-dataset-count" aria-live="polite"></p>
+    </div>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table gv-dataset-table" data-sortable>
+        <caption>
+          Variant builds available through SNPVersity 2 and SNPTools
+          <span class="mgdb-muted">Accession counts and variant-site counts are published values. Sort columns with header buttons.</span>
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col" data-sort="text"><button type="button">Dataset</button></th>
+            <th scope="col" data-sort="text"><button type="button">Reference</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Accessions</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Variant sites</button></th>
+            <th scope="col">Key filters</th>
+            <th scope="col" class="gv-flag-col">Het. sites</th>
+            <th scope="col" class="gv-flag-col">Indels</th>
+            <th scope="col" class="gv-flag-col">Imputation</th>
+            <th scope="col">Paper</th>
+            <th scope="col">Notes</th>
+          </tr>
+        </thead>
+        <tbody id="gv-dataset-rows">
+          $(dataset-rows)
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mgdb-empty" id="gv-dataset-empty" hidden>
+      <h3>No datasets match that filter</h3>
+      <p>Clear the search box or choose <strong>All</strong> to see every build again.</p>
+    </div>
+  </section>
 
   <!-- ====================================================================
        1. Tools & Workspaces
        ==================================================================== -->
   <section id="gv-tools" aria-labelledby="gv-tools-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Workspaces &amp; tools</span>
-        <h2 id="gv-tools-title">Interactive variation tools</h2>
-      </div>
-      <p>Analyze maize variants across shared builds, build targeted VCFs, and explore functional consequences.</p>
+      <div><h2 id="gv-tools-title">Tools</h2></div>
     </div>
+    <p class="gv-section-lead">Analyze maize variants across shared builds, build targeted VCFs, and explore functional consequences.</p>
 
     <article class="gv-featured" aria-labelledby="gv-snptools-title">
       <div class="gv-featured-copy">
@@ -114,76 +171,16 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
-  <!-- ====================================================================
-       2. Variant Datasets
-       ==================================================================== -->
-  <section id="gv-datasets" aria-labelledby="gv-datasets-title">
-    <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Curated builds</span>
-        <h2 id="gv-datasets-title">Variant datasets</h2>
-      </div>
-      <p>Every build below is selectable in SNPVersity 2 and SNPTools. <strong>High Quality</strong> builds apply linkage-disequilibrium \(LD\) filtering on top of <strong>High Coverage</strong> datasets for reduced redundancy.</p>
-    </div>
-
-    <div class="gv-table-controls">
-      <div class="mgdb-field gv-filter-field">
-        <label class="mgdb-label" for="gv-dataset-query">Filter datasets</label>
-        <input class="mgdb-input" id="gv-dataset-query" type="search" autocomplete="off" placeholder="B73 v5, imputation, NAM, Panzea..." />
-      </div>
-      <div class="mgdb-filters" role="group" aria-label="Filter datasets by property">
-        <button class="mgdb-chip" type="button" data-filter="all" aria-pressed="true">All</button>
-        <button class="mgdb-chip" type="button" data-filter="maizegdb" aria-pressed="false">MaizeGDB builds</button>
-        <button class="mgdb-chip" type="button" data-filter="indels" aria-pressed="false">With indels</button>
-        <button class="mgdb-chip" type="button" data-filter="imputed" aria-pressed="false">Imputed</button>
-        <button class="mgdb-button mgdb-button-quiet gv-reset" type="button" id="gv-dataset-reset" hidden>Reset</button>
-      </div>
-      <p class="mgdb-result-count" id="gv-dataset-count" aria-live="polite"></p>
-    </div>
-
-    <div class="mgdb-table-scroll">
-      <table class="mgdb-table gv-dataset-table" data-sortable>
-        <caption>
-          Variant builds available through SNPVersity 2 and SNPTools
-          <span class="mgdb-muted">Accession counts and variant-site counts are published values. Sort columns with header buttons.</span>
-        </caption>
-        <thead>
-          <tr>
-            <th scope="col" data-sort="text"><button type="button">Dataset</button></th>
-            <th scope="col" data-sort="text"><button type="button">Reference</button></th>
-            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Accessions</button></th>
-            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Variant sites</button></th>
-            <th scope="col">Key filters</th>
-            <th scope="col" class="gv-flag-col">Het. sites</th>
-            <th scope="col" class="gv-flag-col">Indels</th>
-            <th scope="col" class="gv-flag-col">Imputation</th>
-            <th scope="col">Paper</th>
-            <th scope="col">Notes</th>
-          </tr>
-        </thead>
-        <tbody id="gv-dataset-rows">
-          $(dataset-rows)
-        </tbody>
-      </table>
-    </div>
-
-    <div class="mgdb-empty" id="gv-dataset-empty" hidden>
-      <h3>No datasets match that filter</h3>
-      <p>Clear the search box or choose <strong>All</strong> to see every build again.</p>
-    </div>
-  </section>
+  
 
   <!-- ====================================================================
        3. Public Resequencing Projects
        ==================================================================== -->
   <section id="gv-projects" aria-labelledby="gv-projects-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Sequencing source data</span>
-        <h2 id="gv-projects-title">Public resequencing projects</h2>
-      </div>
-      <p>Whole-genome resequencing projects for maize and wild relatives. Accessions link to archive records at NCBI, ENA, NGDC, or CNGB.</p>
+      <div><h2 id="gv-projects-title">Projects</h2></div>
     </div>
+    <p class="gv-section-lead">Whole-genome resequencing projects for maize and wild relatives. Accessions link to archive records at NCBI, ENA, the NGDC, and CNGB.</p>
 
     <div class="gv-table-controls">
       <div class="mgdb-field gv-filter-field">
@@ -233,12 +230,9 @@ $$SYNTAX-LEVEL 2
        ==================================================================== -->
   <section id="gv-downloads" aria-labelledby="gv-downloads-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Bulk data transfer</span>
-        <h2 id="gv-downloads-title">Downloads &amp; Public Globus Endpoint</h2>
-      </div>
-      <p>Filtered variant builds download directly. Large whole-genome datasets are available via Box and the upcoming Public Globus collection.</p>
+      <div><h2 id="gv-downloads-title">Downloads</h2></div>
     </div>
+    <p class="gv-section-lead">Filtered variant builds download directly. Large whole-genome datasets are available via Box and the upcoming Public Globus collection.</p>
 
     <div class="gv-downloads-layout">
       <div class="gv-globus-card">
@@ -296,13 +290,9 @@ $$SYNTAX-LEVEL 2
   <!-- ====================================================================
        5. Types of Variation Data
        ==================================================================== -->
-  <section id="gv-types" aria-labelledby="gv-types-title">
+  <section id="gv-about" aria-labelledby="gv-about-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Data scope</span>
-        <h2 id="gv-types-title">Types of variation data at MaizeGDB</h2>
-      </div>
-      <p>Overview of the diversity of sequence, phenotypic, and structural variation cataloged across MaizeGDB.</p>
+      <div><h2 id="gv-about-title">About</h2></div>
     </div>
 
     <div class="gv-types-grid">
@@ -343,60 +333,42 @@ $$SYNTAX-LEVEL 2
   </section>
 
   <!-- ====================================================================
+       6. References
+       ==================================================================== -->
+  <section id="gv-references" aria-labelledby="gv-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="gv-references-title">References</h2></div>
+    </div>
+
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
+  <!-- ====================================================================
        6. Corpus Summary / Statistics \(second to last item\)
        ==================================================================== -->
-  <section id="gv-overview" aria-labelledby="gv-overview-title">
+  <section id="gv-metrics" aria-labelledby="gv-metrics-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Corpus summary</span>
-        <h2 id="gv-overview-title">Genetic variation in numbers</h2>
-      </div>
-      <p>Key metrics across curated whole-genome sequencing builds and resequencing collections.</p>
+      <div><h2 id="gv-metrics-title">Metrics</h2></div>
     </div>
 
     <div class="mgdb-metric-grid">
-      <article class="mgdb-metric">
-        <div class="mgdb-metric-top">
-          <h3>Variant sites</h3>
-          <span class="mgdb-metric-badge">Largest build</span>
-        </div>
-        <div class="mgdb-metric-stat">
-          <strong class="mgdb-metric-value mgdb-metric-value-compact">$(max-variants)</strong>
-        </div>
-        <p class="mgdb-metric-description">In MaizeGDB 2026 \(High Coverage\). High-quality LD-filtered build retains $(hq-variants) sites.</p>
+      <article class="mgdb-metric mgdb-tone-green">
+        <span class="mgdb-metric-icon" aria-hidden="true">SNP</span>
+        <div><strong class="mgdb-metric-value">$(max-variants)</strong><h3>Variant sites</h3><p>In the largest build, MaizeGDB 2026 \(High Coverage\). The LD-filtered build keeps $(hq-variants).</p></div>
       </article>
-
-      <article class="mgdb-metric">
-        <div class="mgdb-metric-top">
-          <h3>Accessions genotyped</h3>
-          <span class="mgdb-metric-badge">2026 Collection</span>
-        </div>
-        <div class="mgdb-metric-stat">
-          <strong class="mgdb-metric-value mgdb-metric-value-compact">$(max-accessions)</strong>
-        </div>
-        <p class="mgdb-metric-description">Diverse maize lines genotyped, up from $(prev-accessions) in 2024. Selectable individually in VCF builders.</p>
+      <article class="mgdb-metric mgdb-tone-amber">
+        <span class="mgdb-metric-icon" aria-hidden="true">Acc</span>
+        <div><strong class="mgdb-metric-value">$(max-accessions)</strong><h3>Accessions genotyped</h3><p>Diverse maize lines in the 2026 collection, up from $(prev-accessions) in 2024.</p></div>
       </article>
-
-      <article class="mgdb-metric">
-        <div class="mgdb-metric-top">
-          <h3>Variant builds</h3>
-          <span class="mgdb-metric-badge">Selectable</span>
-        </div>
-        <div class="mgdb-metric-stat">
-          <strong class="mgdb-metric-value mgdb-metric-value-compact">$(dataset-count)</strong>
-        </div>
-        <p class="mgdb-metric-description">$(b73-dataset-count) called against B73 v5, plus historical GBS v2.7 in AGPv2-v4 coordinates.</p>
+      <article class="mgdb-metric mgdb-tone-blue">
+        <span class="mgdb-metric-icon" aria-hidden="true">Bld</span>
+        <div><strong class="mgdb-metric-value">$(dataset-count)</strong><h3>Variant builds</h3><p>$(b73-dataset-count) called against B73 v5, plus historical GBS in AGPv2-v4 coordinates.</p></div>
       </article>
-
-      <article class="mgdb-metric">
-        <div class="mgdb-metric-top">
-          <h3>Public projects</h3>
-          <span class="mgdb-metric-badge">Resequencing</span>
-        </div>
-        <div class="mgdb-metric-stat">
-          <strong class="mgdb-metric-value mgdb-metric-value-compact">$(project-count)</strong>
-        </div>
-        <p class="mgdb-metric-description">Resequencing projects at NCBI, ENA, NGDC, and CNGB whose reads underpin these calls.</p>
+      <article class="mgdb-metric mgdb-tone-burgundy">
+        <span class="mgdb-metric-icon" aria-hidden="true">Prj</span>
+        <div><strong class="mgdb-metric-value">$(project-count)</strong><h3>Public projects</h3><p>Resequencing projects at NCBI, ENA, NGDC and CNGB whose reads underpin these calls.</p></div>
       </article>
     </div>
   </section>
@@ -404,45 +376,36 @@ $$SYNTAX-LEVEL 2
   <!-- ====================================================================
        7. Connected Resources & Contributor Submission \(final item, light green\)
        ==================================================================== -->
-  <section id="gv-related" class="gv-bottom-section" aria-labelledby="gv-related-title">
+  <section id="gv-related" class="mgdb-hub-related" aria-labelledby="gv-related-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Connected resources</span>
-        <h2 id="gv-related-title">Related data hubs &amp; submissions</h2>
-      </div>
-      <p>Connect variants to biological functions, alleles, gene models, 3D structures, and submit new community datasets.</p>
+      <div><h2 id="gv-related-title">Related resources</h2></div>
     </div>
 
     <div class="mgdb-resource-panel">
       <div class="mgdb-resource-list">
         <a href="/data_center/variation">
-          <strong>Alleles &amp; Polymorphisms</strong>
+          <strong>Variation Data Hub</strong>
           <span>Curated variation records, alleles, and linked genetic loci</span>
           <span class="mgdb-resource-badge">Internal</span>
         </a>
         <a href="/gene_center/gene">
-          <strong>Genes &amp; Gene Models</strong>
+          <strong>Gene Data Hub</strong>
           <span>Gene annotations, functional descriptions, and expression</span>
           <span class="mgdb-resource-badge">Internal</span>
         </a>
         <a href="/uniformmu">
-          <strong>UniformMu &amp; Insertions</strong>
+          <strong>Insertion Data Hub</strong>
           <span>Sequence-indexed transposon insertions and mutant stocks</span>
           <span class="mgdb-resource-badge">Internal</span>
         </a>
         <a href="/data_center/protein_structure">
-          <strong>Protein Structures</strong>
+          <strong>Protein structures</strong>
           <span>Predicted 3D structures to assess missense variant impacts</span>
           <span class="mgdb-resource-badge">Internal</span>
         </a>
         <a href="/genome">
-          <strong>Genomes Data Hub</strong>
+          <strong>Genome Data Hub</strong>
           <span>B73 v5, NAM founder lines, and pan-genome assemblies</span>
-          <span class="mgdb-resource-badge">Internal</span>
-        </a>
-        <a href="/data_center/stock">
-          <strong>Stocks Data Hub</strong>
-          <span>Order seeds for diverse genotyped accessions via Stock Center and GRIN</span>
           <span class="mgdb-resource-badge">Internal</span>
         </a>
       </div>
@@ -450,7 +413,6 @@ $$SYNTAX-LEVEL 2
 
     <div class="gv-contribute-banner">
       <div>
-        <span class="mgdb-eyebrow">Community Data</span>
         <h3>Submitting variation datasets</h3>
         <p>MaizeGDB welcomes SNP, indel, and trait datasets from the maize community. If you have new resequencing data to deposit or a published project to index, reach out to our curation team.</p>
       </div>

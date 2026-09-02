@@ -46,6 +46,7 @@
 
 include_once('./include/db-api.php');
 include_once('./include/dashboard_cache.php');
+include_once('./include/references_lib.php');
 
 $system = getSystemInfo('mgdb.conf');
 logMessage('Starting controllers/genetic_variation.php');
@@ -59,8 +60,10 @@ $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT']
           ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';
 $css_file = $doc_root . '/css/mgdb-genetic-variation.css';
 $js_file = $doc_root . '/js/mgdb-genetic-variation.js';
+$hub_file = $doc_root . '/css/mgdb-hub.css';
 $v_css = file_exists($css_file) ? filemtime($css_file) : time();
 $v_js = file_exists($js_file) ? filemtime($js_file) : time();
+$v_hub = file_exists($hub_file) ? filemtime($hub_file) : time();
 
 function gv_esc($value) {
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
@@ -197,6 +200,11 @@ $bauplan->preHTML('<meta http-equiv="Content-Type" content="text/html; charset=u
 $bauplan->includeCss('/css/static.css');
 $bauplan->includeCss('/css/mgdb-modern.css');
 $bauplan->includeCss('/css/mgdb-megamenu.css');
+/* The shared Data Hub shell -- pale blue ground, white section cards, coloured
+   section edges, the reference card, aligned form rows -- loaded before the
+   page's own sheet, which is the order css/mgdb-hub.css documents.
+   `mgdb-hub-page` on <main> opts in. */
+$bauplan->includeCss('/css/mgdb-hub.css?v=' . $v_hub);
 $bauplan->includeCss('/css/mgdb-genetic-variation.css?v=' . $v_css);
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
@@ -213,7 +221,18 @@ $mgdb->get('server-url')->replace($system['root_url']);
 $content = $mgdb->get('body')->load('templates/static/mgdb_genetic_variation.bau');
 
 // Cached payload rendering (see include/dashboard_cache.php)
-$page_data = dashboardCache($system, 'genetic_variation/page', function () use ($system, $doc_root) {
+/* The key carries this file's mtime and the payload's, because the shape of
+   what is cached is defined here rather than in the database, and the numbers
+   in it come from that JSON file -- dashboardCache() folds in neither by
+   itself. It was keyed on the bare string 'genetic_variation/page', so a field
+   added here would have read an entry that predated it, and a payload edit
+   would not have been picked up until the global stamp moved. See
+   include/dashboard_cache.php. */
+$gv_payload_path = (isset($system['root_dir']) ? $system['root_dir'] : $doc_root)
+                 . '/data/genetic_variation/genetic_variation.json';
+$page_data = dashboardCache($system,
+  'genetic_variation/page_' . (int) @filemtime(__FILE__) . '_' . (int) @filemtime($gv_payload_path),
+  function () use ($system, $doc_root) {
     $gv_payload_rel  = '/data/genetic_variation/genetic_variation.json';
     $gv_payload_file = isset($system['root_dir']) ? $system['root_dir'] . $gv_payload_rel : '';
     if (!is_file($gv_payload_file)) {
@@ -290,6 +309,21 @@ $content->get('snpv-release')->replace($page_data['snpv_release']);
 $content->get('snpv-release-date')->replace($page_data['snpv_release_date']);
 $content->get('dataset-rows')->replace($page_data['dataset_rows']);
 $content->get('project-rows')->replace($page_data['project_rows']);
+
+/* References: the variant collections and the tools that read them. Rendered by
+   include/references_lib.php so these cards match every other hub. */
+$content->get('reference_cards')->replace(mgdb_render_references($doc_root, array(
+    // The unified VCF dataset most of these builds are drawn from.
+    array('doi' => '10.1093/g3journal/jkae281'),
+    // The assemblies these variants are called against.
+    array('doi' => '10.1126/science.abg5289'),
+    // The viewer that reads these builds.
+    array('doi' => '10.1093/database/bay037'),
+    // What a variant means for the protein, which the structure hub answers.
+    array('doi' => '10.1093/bioinformatics/btae073'),
+    // The database of record.
+    array('doi' => '10.1093/nar/gky1046'),
+)));
 
 include_once('translation.php');
 if ($mgdb->has('blast_url')) {

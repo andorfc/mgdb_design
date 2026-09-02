@@ -1293,6 +1293,71 @@ appear at all. Deleting `controllers/genome2.php` outright would drop the row
 and make the route 404; the redirect was judged worth more than the tidier
 count.
 
+## The Genetic Variation Data Hub on the shell
+
+`/genetic_variation` — SNPs and traits. Tabs: Search, Tools, Projects,
+Downloads, About, References, Metrics, Related resources. Files:
+`controllers/genetic_variation.php`,
+`templates/static/mgdb_genetic_variation.bau`,
+`css/mgdb-genetic-variation.css`, `js/mgdb-genetic-variation.js`.
+
+Rendering runs no SQL — everything comes from
+`data/genetic_variation/genetic_variation.json` — so the page is 74 ms warm.
+
+### What the shell changed
+
+Eight eyebrows gone; the four metric cards moved onto the shell's markup with
+tones; the "Related data hubs & submissions" section became the shell's badged
+five on the green wash (its own `.gv-bottom-section` gradient was doing that
+job by hand and is deleted); and References is new.
+
+The section order needed a decision this hub had not made: it had no Search
+tab at all, but it does have a corpus of its own — the eleven variant builds,
+with a keyword filter and four property chips over them. So **Datasets became
+Search** and moved to the front, and the panel intro says plainly that the
+collection being searched is the builds, so every one is listed until you
+filter. That is the same call the `/data_center/` directory needed.
+
+`Types of variation data` became **About**, `Genetic variation in numbers`
+became **Metrics**, and `Interactive variation tools` became **Tools** — the
+tab labels and the headings now match, which they did not before.
+
+### The chips sat 8px above the input they share a line with
+
+`.gv-table-controls` is a two-column grid, filter input on the left and the
+property chips on the right, with `align-items: end`. The chips were the
+shared 36px and the input 44px, so they were bottom-aligned and their tops did
+not line up — and the Reset button that appears beside them when a filter is
+active is 44px, which made it worse. The chips take the input's height now, so
+the whole control line shares one top and one height. Both tables, measured.
+
+### Both filters advertise terms they can actually find
+
+The two placeholders name examples — `B73 v5, imputation, NAM, Panzea…` and
+`PRJNA641489, NAM, landrace, European…`. Each was typed into its own box: 10,
+2, 2 and 3 datasets; 2, 1, 1 and 2 projects. None of them is a claim the
+haystack cannot honour.
+
+Worth noting for anyone testing these: `MGDB.filterList` debounces the input
+handler by **200 ms**, so a test that dispatches `input` and reads the row
+count 120 ms later sees no change and looks like a broken filter. It is not.
+
+### Verified
+
+8/8 distinct section edge colours, no rule under a section title, five
+reference cards, no duplicate `id`, all eight nav labels matching their
+`<h2>`, four equal-height metric cards, eleven dataset rows, five related
+links, and no horizontal overflow at 375.
+
+The tab bar is one 57px row from 1280 down to 641, and below 640 the page
+sheet drops its stickiness altogether — so the ladder needs one band, 65px,
+and 16px below 640 where a section has nothing to clear. Every jump clears by
+8px at 1280 and 900, and lands 32px from the top at 375. The tab script was an
+IntersectionObserver-only scrollspy, which marks nothing in embedded browsers
+that deliver no entries; it is the shared scroll-driven one now. One
+`transition` used `--mgdb-dur-fast`, which is defined nowhere and invalidated
+the whole declaration; it is literal durations now.
+
 ## The Gene Data Hub on the shell
 
 `/gene_center/gene`, the site's second most requested page and the largest of
