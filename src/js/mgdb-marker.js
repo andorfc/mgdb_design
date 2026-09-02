@@ -8,12 +8,18 @@
   var API_URL = '/search/marker/marker_search_api.php';
   var STORAGE_VIEW_KEY = 'mgdb-marker-view';
 
+  var MAX_PAGE = 100;
+
   var state = {
     term: '',
     type: 0,
     bin: '',
     page: 1,
-    pageSize: 24,
+    pageSize: 25,
+    /* The endpoint caps a page at 100, so "All results" means as many as it
+       returns at once; the status line says so rather than truncating. */
+    filter: '',
+    searched: false,
     sort: 'relevance',
     view: 'table',
     currentData: null,
@@ -21,6 +27,13 @@
   };
 
   function byId(id) { return document.getElementById(id); }
+
+  function readJson(id) {
+    var el = byId(id);
+    if (!el) { return null; }
+    try { return JSON.parse(el.textContent || 'null'); }
+    catch (error) { return null; }
+  }
 
   function esc(str) {
     if (!str && str !== 0) return '';
@@ -37,67 +50,84 @@
 
   /* ── Section Tabs & Scrollspy ───────────────────────────────────────────── */
 
+  /* Sticky section tabs, driven by scroll, IntersectionObserver and resize
+     together: no single trigger fires everywhere, and the results section
+     appears and disappears under the bar as searches run. */
   function buildTabs() {
     var tabs = document.querySelectorAll('.mgdb-section-tabs a');
-    if (!tabs.length) return;
+    if (!tabs.length) { return; }
 
     var pairs = [];
     Array.prototype.forEach.call(tabs, function (tab) {
-      var href = tab.getAttribute('href');
-      if (href && href.startsWith('#')) {
-        var section = document.querySelector(href);
-        if (section) {
-          pairs.push({ tab: tab, section: section });
-        }
-      }
+      var href = tab.getAttribute('href') || '';
+      if (href.charAt(0) !== '#') { return; }
+      var section = document.getElementById(href.slice(1));
+      if (section) { pairs.push({ tab: tab, section: section }); }
     });
+    if (!pairs.length) { return; }
 
-    function markCurrent(target) {
+    var heldUntilScroll = null;
+    var heldAtY = 0;
+
+    function mark(section) {
       pairs.forEach(function (pair) {
-        var current = pair.section === target;
+        var current = pair.section === section;
         pair.tab.classList.toggle('is-current', current);
-        if (current) {
-          pair.tab.setAttribute('aria-current', 'true');
-        } else {
-          pair.tab.removeAttribute('aria-current');
-        }
+        if (current) { pair.tab.setAttribute('aria-current', 'true'); }
+        else { pair.tab.removeAttribute('aria-current'); }
       });
     }
 
-    var initial = pairs[0];
-    if (window.location.hash) {
+    function triggerLine() {
+      var bar = document.querySelector('.mgdb-section-tabs');
+      var barHeight = bar ? bar.getBoundingClientRect().height : 0;
+      var margin = parseFloat(window.getComputedStyle(pairs[0].section).scrollMarginTop) || 0;
+      return Math.max(barHeight + 8, margin + 4);
+    }
+
+    function update() {
+      if (heldUntilScroll) {
+        if (Math.abs(window.scrollY - heldAtY) < 4) { return; }
+        heldUntilScroll = null;
+      }
+      var line = triggerLine();
+      var current = pairs[0];
       pairs.forEach(function (pair) {
-        if ('#' + pair.section.id === window.location.hash) {
-          initial = pair;
-        }
+        if (pair.section.hasAttribute('hidden')) { return; }
+        if (pair.section.getBoundingClientRect().top <= line) { current = pair; }
       });
-    }
-    if (initial) {
-      markCurrent(initial.section);
+      if ((window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 2)) {
+        current = pairs[pairs.length - 1];
+      }
+      if (current) { mark(current.section); }
     }
 
     pairs.forEach(function (pair) {
-      pair.tab.addEventListener('click', function (e) {
-        markCurrent(pair.section);
+      pair.tab.addEventListener('click', function () {
+        mark(pair.section);
+        heldUntilScroll = pair.section;
+        heldAtY = window.scrollY;
       });
     });
 
-    if (!window.IntersectionObserver) return;
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
 
-    var observer = new window.IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          markCurrent(entry.target);
-        }
+    if (window.IntersectionObserver) {
+      var observer = new window.IntersectionObserver(function () { update(); },
+        { rootMargin: '-20% 0px -60% 0px' });
+      pairs.forEach(function (pair) { observer.observe(pair.section); });
+    }
+
+    var results = byId('marker-results-section');
+    if (results && window.MutationObserver) {
+      new window.MutationObserver(update).observe(results, {
+        childList: true, subtree: true, attributes: true, attributeFilter: ['hidden']
       });
-    }, { rootMargin: '-20% 0px -60% 0px' });
+    }
 
-    pairs.forEach(function (pair) {
-      observer.observe(pair.section);
-    });
+    update();
   }
-
-  /* ── URL Parameter Sync ─────────────────────────────────────────────────── */
 
   function readUrlParams() {
     var params = new URLSearchParams(window.location.search);
@@ -162,6 +192,10 @@
     if (state.loading) return;
     state.loading = true;
 
+    var section = byId('marker-results-section');
+    if (section) { section.hidden = false; }
+    state.searched = true;
+
     var status = byId('marker-results-status');
     var container = byId('marker-results');
     var empty = byId('marker-empty');
@@ -175,8 +209,8 @@
     if (state.term) params.set('term', state.term);
     if (state.type) params.set('type', state.type);
     if (state.bin) params.set('bin', state.bin);
-    params.set('page', state.page);
-    params.set('page_size', state.pageSize);
+    params.set('page', state.pageSize === 'all' ? 1 : state.page);
+    params.set('page_size', state.pageSize === 'all' ? MAX_PAGE : state.pageSize);
     params.set('sort', state.sort);
 
     updateUrlParams();
@@ -234,8 +268,17 @@
     var queryText = data.query.term ? ' for “' + esc(data.query.term) + '”' : '';
 
     if (status) {
-      status.textContent = 'Showing ' + number(start) + '–' + number(end) + ' of ' + number(summary.total)
-        + ' markers' + queryText + ' · ' + number(summary.elapsed_ms) + ' ms';
+      if (state.pageSize === 'all') {
+        status.textContent = summary.total > summary.page_size
+          ? 'Showing the first ' + number(summary.page_size) + ' of ' + number(summary.total)
+            + ' markers' + queryText + ', which is as many as the search returns at once. ('
+            + number(summary.elapsed_ms) + ' ms)'
+          : 'Showing all ' + number(summary.total) + ' matching markers' + queryText + '. ('
+            + number(summary.elapsed_ms) + ' ms)';
+      } else {
+        status.textContent = 'Showing ' + number(start) + '–' + number(end) + ' of ' + number(summary.total)
+          + ' markers' + queryText + '. (' + number(summary.elapsed_ms) + ' ms)';
+      }
     }
 
     if (!container) return;
@@ -245,6 +288,11 @@
     } else {
       renderCardView(container, data.results);
     }
+
+    /* Every path that repaints the results comes through here -- a new page, a
+       view toggle, a re-render after the filter is cleared -- so re-applying the
+       filter here is what keeps it from being silently dropped. */
+    applyResultsFilter();
 
     initCopyButtons();
   }
@@ -324,8 +372,93 @@
 
   /* ── Pagination ─────────────────────────────────────────────────────────── */
 
+  /* Narrows the page already rendered, in both the card and table view. The
+     search pages server side, so this filters what is on screen and the status
+     line says so. */
+  function applyResultsFilter() {
+    var container = byId('marker-results');
+    if (!container) { return { shown: 0, total: 0 }; }
+
+    var items = container.querySelectorAll('.marker-result-card, tbody tr');
+    var terms = state.filter.toLowerCase().split(/\s+/).filter(Boolean);
+    var shown = 0;
+
+    Array.prototype.forEach.call(items, function (item) {
+      var match = true;
+      if (terms.length) {
+        var hay = (item.textContent || '').toLowerCase();
+        for (var i = 0; i < terms.length; i++) {
+          if (hay.indexOf(terms[i]) === -1) { match = false; break; }
+        }
+      }
+      item.hidden = !match;
+      if (match) { shown++; }
+    });
+
+    if (terms.length) {
+      var status = byId('marker-results-status');
+      var total = state.currentData && state.currentData.summary ? state.currentData.summary.total : 0;
+      if (status) {
+        status.textContent = shown === 0
+          ? 'Nothing on this page matches the filter “' + state.filter + '”. '
+            + number(total) + ' markers matched the search.'
+          : 'Showing ' + number(shown) + ' of the ' + number(items.length)
+            + ' markers on this page matching “' + state.filter + '”, out of '
+            + number(total) + ' matched by the search.';
+      }
+    }
+
+    return { shown: shown, total: items.length };
+  }
+
+  function initResultControls() {
+    var sizeSelect = byId('marker-page-size');
+    if (sizeSelect) {
+      sizeSelect.addEventListener('change', function () {
+        state.pageSize = this.value === 'all' ? 'all' : parseInt(this.value, 10) || 25;
+        state.page = 1;
+        if (state.searched) { executeSearch(false); }
+      });
+    }
+
+    var filterInput = byId('marker-results-filter');
+    if (filterInput) {
+      filterInput.addEventListener('input', function () {
+        state.filter = this.value.trim();
+        if (state.filter === '' && state.currentData) {
+          renderResults(state.currentData);
+        }
+        applyResultsFilter();
+      });
+    }
+
+    var binInput = byId('marker-bin');
+    if (binInput) {
+      binInput.value = state.bin || '';
+      binInput.addEventListener('change', function () {
+        state.bin = this.value.trim();
+        state.page = 1;
+        if (state.searched) { executeSearch(false); }
+      });
+    }
+
+    var advReset = byId('marker-adv-reset');
+    if (advReset) {
+      advReset.addEventListener('click', function () {
+        var typeSelect = byId('marker-type');
+        if (typeSelect) { typeSelect.value = '0'; }
+        if (binInput) { binInput.value = ''; }
+        state.type = 0;
+        state.bin = '';
+        state.page = 1;
+        if (state.searched) { executeSearch(false); }
+      });
+    }
+  }
+
   function renderPagination(page, pageCount) {
     var nav = byId('marker-pagination');
+    if (state.pageSize === 'all' && nav) { nav.innerHTML = ''; return; }
     if (!nav) return;
 
     if (pageCount <= 1) {
@@ -417,8 +550,14 @@
     if (form && input) {
       form.addEventListener('submit', function (e) {
         e.preventDefault();
+        /* Read every field from the DOM here. The advanced inputs also update
+           state on 'change', but that event never fires for a value the browser
+           restores itself (autofill, bfcache), and a bin shown in the form must
+           never be missing from the query it describes. */
         state.term = input.value.trim();
         state.type = typeSelect ? (parseInt(typeSelect.value, 10) || 0) : 0;
+        var binField = byId('marker-bin');
+        state.bin = binField ? binField.value.trim() : '';
         state.page = 1;
         executeSearch(true);
       });
@@ -489,11 +628,162 @@
 
   /* ── Bootstrap ──────────────────────────────────────────────────────────── */
 
+
+  /* ── Markers by type figure ─────────────────────────────────────────────── */
+
+  /* The census is rendered server side into #marker-chart-data, so this draws
+     without a request of its own. */
+  function initFigure() {
+    var data = readJson('marker-chart-data');
+    if (!data || !data.bars || !data.bars.length) { return; }
+
+    var bars = data.bars;
+    var total = data.total || 0;
+    var share = function (count) {
+      return total > 0 ? (count / total) * 100 : 0;
+    };
+    var shareText = function (count) {
+      var pct = share(count);
+      /* A type holding four markers out of 771,097 rounds to 0.00%, which reads
+         as "none". Below a hundredth of a percent say so with a bound instead. */
+      return pct > 0 && pct < 0.01 ? '<0.01%' : pct.toFixed(2) + '%';
+    };
+
+    var table = byId('marker-type-table');
+    if (table) {
+      var body = table.querySelector('tbody');
+      if (body) {
+        body.innerHTML = bars.map(function (bar) {
+          return '<tr><td>' + esc(bar.label) + '</td>'
+               + '<td class="mgdb-numeric">' + number(bar.count) + '</td>'
+               + '<td class="mgdb-numeric">' + shareText(bar.count) + '</td></tr>';
+        }).join('');
+      }
+    }
+
+    if (!window.MGDB || !window.MGDB.chart) { return; }
+
+    /* Plotly stacks horizontal bars bottom-up, so the array is reversed to put
+       the largest type at the top of the figure, matching the table. */
+    var ordered = bars.slice().reverse();
+    var el = byId('marker-type-chart');
+    var height = Math.max(320, ordered.length * 40 + 110);
+    if (el) { el.style.height = height + 'px'; }
+
+    /* Margins are sized from the figure, not fixed. A 150px label gutter plus a
+       96px label margin is most of a phone's width: left as constants they
+       squeezed the plot to 13px and every bar rendered as a 1px sliver. Below
+       the breakpoint the gutter shrinks and the value labels come off, because
+       the table underneath already carries every number. */
+    var NARROW = 560;
+    function metrics() {
+      var width = el ? el.getBoundingClientRect().width : 0;
+      var narrow = width > 0 && width < NARROW;
+      return {
+        narrow: narrow,
+        /* Floors under automargin, which only ever grows a margin: they buy a
+           gutter the longest tick label would otherwise sit flush against. */
+        margin: narrow ? { l: 104, r: 16, t: 8, b: 44 } : { l: 150, r: 96, t: 8, b: 44 },
+        /* Full thousands separators where there is room for them. On a phone
+           they are too wide to sit side by side, so Plotly rotates them to
+           vertical and they cost ~120px of height; SI shorthand stays
+           horizontal and reads as well. */
+        tickformat: narrow ? '~s' : ',d',
+        /* Even as '100k' five ticks collide in a phone's plot width and Plotly
+           turns them vertical. Three fit lying down. */
+        nticks: narrow ? 3 : 0
+      };
+    }
+    var m = metrics();
+
+    var trace = {
+      type: 'bar',
+      orientation: 'h',
+      y: ordered.map(function (bar) { return bar.label; }),
+      x: ordered.map(function (bar) { return bar.count; }),
+      /* The rolled-up tail is not a type you can search, so it is drawn in a
+         muted tone to read as a summary rather than as another category. */
+      marker: {
+        color: ordered.map(function (bar) {
+          return bar.id ? '#285d46' : '#9aa8a0';
+        })
+      },
+      /* A non-breaking space: SVG collapses a plain leading one, leaving the
+         label flush against the end of its bar. */
+      text: ordered.map(function (bar) { return '\u00A0' + number(bar.count); }),
+      textposition: m.narrow ? 'none' : 'outside',
+      cliponaxis: false,
+      hovertemplate: '%{y}<br>%{x:,} markers<extra></extra>'
+    };
+
+    window.MGDB.chart({
+      target: 'marker-type-chart',
+      traces: [trace],
+      layout: {
+        height: height,
+        showlegend: false,
+        margin: m.margin,
+        xaxis: {
+          title: 'Markers',
+          zeroline: false,
+          tickformat: m.tickformat,
+          nticks: m.nticks
+        },
+        yaxis: { automargin: true }
+      }
+    });
+
+    /* MGDB.chart re-runs Plotly.Plots.resize on a window resize, which rescales
+       the figure but keeps the margins it was drawn with. Crossing the
+       breakpoint has to relayout. */
+    if (el && window.Plotly && window.Plotly.relayout) {
+      var lastNarrow = m.narrow;
+      var timer = null;
+      window.addEventListener('resize', function () {
+        if (timer) { window.clearTimeout(timer); }
+        timer = window.setTimeout(function () {
+          var next = metrics();
+          if (next.narrow === lastNarrow) { return; }
+          lastNarrow = next.narrow;
+          window.Plotly.relayout(el, { margin: next.margin, 'xaxis.tickformat': next.tickformat, 'xaxis.nticks': next.nticks });
+          window.Plotly.restyle(el, { textposition: next.narrow ? 'none' : 'outside' });
+        }, 180);
+      });
+    }
+
+    if (!el || !window.MutationObserver) { return; }
+
+    /* Selecting a bar searches that type. Plotly only gains its event emitter
+       once it has drawn, so wait for the draw rather than guessing a delay. */
+    var attached = false;
+    var observer = new window.MutationObserver(function () {
+      if (attached || typeof el.on !== 'function') { return; }
+      attached = true;
+      observer.disconnect();
+      el.on('plotly_click', function (event) {
+        if (!event || !event.points || !event.points.length) { return; }
+        var match = ordered[event.points[0].pointIndex];
+        if (!match || !match.id) { return; }
+
+        var typeSelect = byId('marker-type');
+        if (typeSelect) { typeSelect.value = String(match.id); }
+        var adv = document.querySelector('.marker-adv');
+        if (adv) { adv.open = true; }
+        state.type = match.id;
+        state.page = 1;
+        executeSearch(true);
+      });
+    });
+    observer.observe(el, { childList: true, subtree: true });
+  }
+
   function init() {
     readUrlParams();
     buildTabs();
     initForm();
     initViewToggle();
+    initResultControls();
+    initFigure();
     updateExportLinks();
 
     // If query term or type was in URL on load, execute search immediately

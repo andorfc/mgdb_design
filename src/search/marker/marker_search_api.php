@@ -25,7 +25,7 @@ header('Cache-Control: private, max-age=60');
 
 try {
     $page = markerSearchInt('page', 1, 1, 5000);
-    $pageSize = markerSearchInt('page_size', 24, 10, 100);
+    $pageSize = markerSearchInt('page_size', 25, 10, 100);
     $sort = markerSearchValue('sort', $filter['term'] === '' ? 'name-asc' : 'relevance');
     if (!in_array($sort, array('relevance', 'name-asc', 'name-desc', 'type', 'bin'), true)) {
         $sort = $filter['term'] === '' ? 'name-asc' : 'relevance';
@@ -41,7 +41,29 @@ try {
        makes the count cheap anyway. See include/dashboard_cache.php. */
     $cacheable = count($filter['whereParams']) === 0;
 
-    if ($cacheable) {
+    /* The page runs first. It asks for one row more than it needs, which is how
+       a short page learns its own total without the count -- and the count over
+       this predicate costs exactly what the page does, so a search that fits on
+       one page used to pay twice for nothing. */
+    $results = array();
+    $stmt = make_query($DBConn, $combined['pageSql'], 1, $combined['pageParams']);
+    while ($row = retrieve_row($stmt)) {
+        $row['id'] = (int) $row['id'];
+        $row['type_id'] = (int) $row['type_id'];
+        $row['bin'] = $row['bin'] !== null ? (string) $row['bin'] : null;
+        $results[] = $row;
+    }
+
+    $hasMore = count($results) > $pageSize;
+    if ($hasMore) {
+        array_pop($results);
+    }
+
+    if (!$hasMore) {
+        // The last page: everything before it, plus what is on it.
+        $total = ($page - 1) * $pageSize + count($results);
+        $cacheMeta = array('status' => 'derived', 'built' => null);
+    } elseif ($cacheable) {
         $total = (int) dashboardCache($system, 'marker/total', function () use ($DBConn, $combined) {
             $row = retrieve_row(make_query($DBConn, $combined['countSql'], 1, $combined['countParams']));
             return $row ? (int) $row['total'] : 0;
@@ -50,17 +72,6 @@ try {
         $countRow = retrieve_row(make_query($DBConn, $combined['countSql'], 1, $combined['countParams']));
         $total = $countRow ? (int) $countRow['total'] : 0;
         $cacheMeta = array('status' => 'live', 'built' => null);
-    }
-
-    $results = array();
-    if ($total > 0) {
-        $stmt = make_query($DBConn, $combined['pageSql'], 1, $combined['pageParams']);
-        while ($row = retrieve_row($stmt)) {
-            $row['id'] = (int) $row['id'];
-            $row['type_id'] = (int) $row['type_id'];
-            $row['bin'] = $row['bin'] !== null ? (string) $row['bin'] : null;
-            $results[] = $row;
-        }
     }
 
     echo json_encode(array(

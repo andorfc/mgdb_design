@@ -100,6 +100,28 @@ function sizeChart(id, h) { var el = document.getElementById(id); if (el) el.sty
 ```
 plus `.mgdb-<page>-page .mgdb-chart { height: auto; min-height: 320px; overflow: visible; }`
 
+**Size the margins from the figure's width, not as constants.** `MGDB.chart`
+re-runs `Plotly.Plots.resize` on a resize, which rescales the figure but keeps
+the margins it was drawn with, so a generous desktop gutter survives onto a
+phone and squeezes the plot to nothing:
+
+```js
+function metrics() {
+  var w = el.getBoundingClientRect().width, narrow = w > 0 && w < 560;
+  return { narrow: narrow,
+           margin: narrow ? { l: 104, r: 16, t: 8, b: 44 } : { l: 150, r: 96, t: 8, b: 44 },
+           tickformat: narrow ? '~s' : ',d',
+           nticks: narrow ? 3 : 0 };
+}
+```
+Relayout when the breakpoint is crossed (`Plotly.relayout` with the new margin,
+`xaxis.tickformat` and `xaxis.nticks`), and drop `textposition: 'outside'` on
+narrow — the values table under the figure already carries the numbers.
+
+Also load Plotly: `$bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');`
+**before** the page script. Without it `MGDB.chart` writes its fallback text and
+nothing else goes wrong visibly.
+
 ## Traps that have each cost a debugging cycle
 
 - **A hub sheet's flat `border-color` is a shorthand and eats a card's top
@@ -115,6 +137,17 @@ plus `.mgdb-<page>-page .mgdb-chart { height: auto; min-height: 320px; overflow:
   layout already reserves a standoff; do not re-add a `ticksuffix` hack.
 - **Outside bar labels need `\u00A0`, not a space.** SVG collapses leading
   whitespace.
+- **A chart verified at 1280 has not been verified.** Fixed margins that look
+  generous on a desktop are most of a 375px figure: measure bar widths and every
+  text node's bounding box against the SVG box at 375 too. One chart drew every
+  bar 1px wide there with no error anywhere.
+- **`dashboardCache()` does not fold the caller's mtime into the key** — it uses
+  the string it is handed plus a global stamp. Any payload whose *shape* is
+  built in the controller needs `'<key>_' . (int) @filemtime(__FILE__)`, or a
+  warm server keeps serving an entry that predates the new fields.
+- **Read every field from the DOM in the submit handler.** Advanced inputs that
+  only update state on `change` silently drop a value the browser restored
+  itself (autofill, bfcache), so the form can show a filter the query omits.
 - **Section top-edge colours start at `nth-of-type(2)`** because the hero is the
   first `<section>`. Check the hero really is first before trusting the order.
 - **`--mgdb-dur-fast` is defined nowhere.** Using it invalidates the whole

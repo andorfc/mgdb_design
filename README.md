@@ -1351,6 +1351,89 @@ normalises a DOI that arrives as a URL, and the file was added to
 `deploy/manifest.txt` — it had never been in it, so edits to it were not
 deployable.
 
+## The Marker Data Hub
+
+`/data_center/marker` joined the shell on 2026-09-01. The corpus is the largest
+any hub searches so far — **771,097 curated markers and probes** — and that size
+is what shaped both changes worth recording.
+
+### The count was costing more than the results
+
+`marker_search_lib.php` has no trigram index to lean on (confirmed against
+`pg_indexes`: there is none on `probe.name` or the synonym table), so every term
+search is a sequential scan of the probe corpus, about 1,750 ms per pass. The
+API ran two of them — one for the page, one for `COUNT(*)` — to answer a query
+that returns 25 rows.
+
+The probe pattern the other hubs use applies directly: fetch `page_size + 1`
+rows, and when fewer come back than were asked for, the page is the last one and
+the total is `offset + count(rows)` — no second scan. When the page *is* full the
+count still runs, so broad terms are unchanged.
+
+| query | before | after | note |
+| --- | --- | --- | --- |
+| `umc1013` | 3,543 ms | **1,780 ms** | count skipped, `cache: derived` |
+| `bnlg1867` | 3,540 ms | **1,776 ms** | count skipped, `cache: derived` |
+| `bnlg1` (311 hits) | 3,604 ms | 3,604 ms | page full, count still needed |
+| no term | 689 ms | **56 ms** | `cache: hit` |
+
+Totals were compared before and after on every query used: 1,972 / 311 / 162 /
+771,097, unchanged.
+
+### The figure reuses a query the page already ran
+
+The type filter's `<option>` list came from a `GROUP BY` over all 771,000
+probes. That result is also exactly what a "markers by type" chart needs, so
+`getMarkerTypeOptions()` was split into `getMarkerTypeRows()` — cached once —
+plus `renderMarkerTypeOptions()` and `markerTypeChartData()` reading from it.
+**The chart costs no query of its own.**
+
+The distribution spans six orders of magnitude — 430,550 BAC clones down to a
+single dCAPS marker — so the fourteen types past the tenth are rolled into one
+"other types" bar rather than drawn as fourteen invisible slivers. That bar is
+given no id, which is what stops a click on it from filtering the search. The
+census also double-checks the metric: the 24 type counts sum to 771,097 exactly.
+
+### The cache key had to grow the controller mtime
+
+`dashboardCache()` keys on the string it is handed plus a global stamp — it does
+**not** fold in the caller's mtime. Marker passed a bare `'marker/page'`, which
+was fine while the payload was four integers from SQL. Adding `type_rows` changed
+the payload's shape, and a warm server would have kept serving an entry that
+predates the key, leaving the chart with nothing to draw. The key is now
+`'marker/page_' . (int) @filemtime(__FILE__)`, matching `/insertion`. **Any hub
+whose cached payload is shaped by controller code needs the mtime in its key.**
+
+### Fixed chart margins are a phone-sized bug
+
+`MGDB.chart` re-runs `Plotly.Plots.resize` on a window resize, which rescales a
+figure but keeps **the margins it was drawn with**. This chart was drawn with
+`margin: { l: 150, r: 96 }` — a label gutter and room for the value labels that
+sit outside the bars. That is 246px of a 259px figure on a 375px phone: the plot
+area was 13px and **every bar rendered as a 1px sliver**, with no error anywhere.
+
+The margins are computed from the figure's own width now, and crossing the
+breakpoint issues a `Plotly.relayout`. Below 560px the gutter shrinks, the
+outside value labels come off (the table underneath carries every number), and
+the axis switches to `~s` with `nticks: 3` — as full thousands, even as `100k`,
+five ticks collide and Plotly silently turns them vertical, costing ~120px of
+height. Measured: bars went from 1–12px wide to 1–109px.
+
+Worth carrying to the remaining hubs: **a chart that passes at 1280 has not been
+checked.** Measure bar widths and text bounding boxes against the SVG box at 375
+as well.
+
+### A field the form showed but the query ignored
+
+The submit handler read the term and the type select out of the DOM but took the
+advanced bin from `state`, which only a `change` event on that input ever set.
+`change` does not fire for a value the *browser* restores — autofill, or coming
+back through history — so the form could display a bin that was silently absent
+from the query it described. The handler reads all three fields from the DOM now.
+
+The API's `page_size` default was 24 against a UI that offers 10/25/50; it is 25
+now, so an unparameterized call and the default UI state agree.
+
 ## The Insertion Data Hub
 
 `/insertion` joined the shell on 2026-09-01. **Its back end needed nothing** —

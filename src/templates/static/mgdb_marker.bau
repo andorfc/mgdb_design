@@ -6,7 +6,7 @@ $$SYNTAX-LEVEL 2
 <meta property="og:title" content="MaizeGDB Molecular Marker & Probe Data Hub">
 <meta property="og:description" content="Search over 769,000 curated maize molecular markers, probes, BAC clones, SSRs, RFLPs, and sequence features with chromosome bin coordinates and linked loci.">
 
-<main class="mgdb-page mgdb-marker-page" id="marker-top">
+<main class="mgdb-page mgdb-hub-page mgdb-marker-page" id="marker-top">
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
     <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Markers &amp; Probes</span>
   </nav>
@@ -30,63 +30,91 @@ $$SYNTAX-LEVEL 2
   </section>
 
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#marker-search-panel">Search</a>
-    <a href="#marker-results-section">Results</a>
+    <a href="#marker-search-panel" class="is-current" aria-current="true">Search</a>
     <a href="#marker-collections">Collections</a>
     <a href="#marker-downloads">Downloads</a>
-    <a href="#marker-dashboard">Statistics</a>
+    <a href="#marker-references">References</a>
+    <a href="#marker-dashboard">Metrics</a>
     <a href="#marker-resources">Related resources</a>
   </nav>
 
   <section id="marker-search-panel" class="marker-search-panel" aria-labelledby="marker-search-title">
-    <div class="marker-section-heading">
+    <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Interactive search</span>
-        <h2 id="marker-search-title">Search molecular markers &amp; probes</h2>
+        <h2 id="marker-search-title">Search</h2>
       </div>
-      <p>Enter a marker name, symbol prefix, or partial keyword. Use wildcards \(e.g. <code>bnlg%</code> or <code>csh*</code>\) to find marker series.</p>
     </div>
 
     <form id="marker-search-form" role="search">
-      <div class="marker-main-search">
+      <div class="mgdb-hub-field marker-field-query">
         <label for="marker-query">Marker name or synonym</label>
         <div class="marker-query-control">
           <svg class="marker-search-icon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="7" r="5"/><line x1="11" y1="11" x2="15" y2="15"/></svg>
-          <input id="marker-query" name="q" type="search" placeholder="Try bnlg1079, csh, umc, phi, myb, or phi029" autocomplete="off" />
+          <input id="marker-query" name="q" type="search" placeholder="Marker name, symbol prefix, or synonym" autocomplete="off" />
           <button id="marker-query-clear" type="button" hidden>Clear</button>
         </div>
+        <p class="marker-hint">Wildcards work&#58; <code>bnlg%</code> or <code>csh*</code> finds a whole marker series.</p>
       </div>
 
-      <div class="marker-type-search">
-        <label for="marker-type">Marker type</label>
-        <select id="marker-type" name="type">
-          $(type_options)
-        </select>
-      </div>
-
-      <div class="marker-search-submit">
+      <div class="mgdb-hub-field mgdb-hub-field-action">
         <button class="mgdb-button mgdb-button-primary" type="submit">Search markers</button>
       </div>
 
-      <div class="marker-example-row" aria-label="Example marker searches">
-        <span>Examples</span>
+      <div class="marker-example-row" aria-label="Example searches">
+        <span>Examples&#58;</span>
         <button type="button" data-marker-example="bnlg1079">bnlg1079</button>
         <button type="button" data-marker-example="csh">csh series</button>
         <button type="button" data-marker-example="umc%">umc family</button>
         <button type="button" data-marker-example="phi029">phi029</button>
         <button type="button" data-marker-example="myb">myb-related</button>
       </div>
+
+      <details class="marker-adv" id="marker-adv">
+        <summary>
+          <strong>Advanced search criteria</strong>
+          <span>Restrict to one marker type, or to a chromosome bin</span>
+        </summary>
+        <div class="marker-adv-body">
+          <div class="mgdb-hub-field">
+            <label for="marker-type">Marker type</label>
+            <select id="marker-type" name="type">
+              $(type_options)
+            </select>
+          </div>
+          <div class="mgdb-hub-field">
+            <label for="marker-bin">Chromosome bin</label>
+            <input id="marker-bin" name="bin" type="search" placeholder="1.03, or 1 for the whole chromosome" autocomplete="off" />
+          </div>
+        </div>
+
+        <div class="marker-adv-actions">
+          <button class="mgdb-button mgdb-button-primary" type="submit">Apply advanced filters</button>
+          <button class="mgdb-button mgdb-button-quiet" id="marker-adv-reset" type="button">Reset advanced filters</button>
+        </div>
+      </details>
     </form>
   </section>
 
-  <section id="marker-results-section" class="marker-results-section" aria-labelledby="marker-results-title">
+  <section id="marker-results-section" class="marker-results-section" aria-labelledby="marker-results-title" hidden>
     <div class="marker-results-heading">
       <div>
-        <span class="mgdb-eyebrow">Search results</span>
-        <h2 id="marker-results-title">Matching markers</h2>
+        <h2 id="marker-results-title">Search results</h2>
         <p id="marker-results-status" aria-live="polite">Enter a search term above or select an example to view markers.</p>
       </div>
       <div class="marker-results-controls">
+        <div class="mgdb-hub-field">
+          <label for="marker-results-filter">Filter results</label>
+          <input id="marker-results-filter" type="search" placeholder="Narrow this page" autocomplete="off" />
+        </div>
+        <div class="mgdb-hub-field">
+          <label for="marker-page-size">Results per page</label>
+          <select id="marker-page-size">
+            <option value="10">Top 10</option>
+            <option value="25" selected>Top 25</option>
+            <option value="50">Top 50</option>
+            <option value="all">All results</option>
+          </select>
+        </div>
         <div class="marker-view-toggle" role="group" aria-label="View style">
           <button class="marker-view-btn" type="button" data-view="card" aria-pressed="false">
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>Cards
@@ -116,10 +144,8 @@ $$SYNTAX-LEVEL 2
   <section id="marker-collections" aria-labelledby="marker-collections-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Specialized archives</span>
-        <h2 id="marker-collections-title">Explore marker collections &amp; tools</h2>
+        <h2 id="marker-collections-title">Collections</h2>
       </div>
-      <p>MaizeGDB maintains dedicated data hubs for high-volume marker types with custom tools, chromosome maps, and protocol documentation.</p>
     </div>
 
     <div class="mgdb-card-grid marker-collection-grid">
@@ -170,10 +196,8 @@ $$SYNTAX-LEVEL 2
   <section id="marker-downloads" aria-labelledby="marker-downloads-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Bulk datasets</span>
-        <h2 id="marker-downloads-title">Marker downloads &amp; tables</h2>
+        <h2 id="marker-downloads-title">Downloads</h2>
       </div>
-      <p>Download comprehensive datasets for genome-wide markers, insertion-deletions, and genotyping arrays.</p>
     </div>
 
     <div class="marker-download-grid" aria-label="Bulk marker downloads">
@@ -206,17 +230,26 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
+  <!-- ── References ───────────────────────────────────────────────────────── -->
+  <section id="marker-references" aria-labelledby="marker-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="marker-references-title">References</h2></div>
+    </div>
+
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
   <section id="marker-dashboard" aria-labelledby="marker-dashboard-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Corpus summary</span>
-        <h2 id="marker-dashboard-title">Marker dataset at a glance</h2>
+        <h2 id="marker-dashboard-title">Metrics</h2>
       </div>
-      <p>Curated sequence features, cloned markers, and mapped probes maintained in the MaizeGDB repository.</p>
     </div>
 
     <div class="mgdb-metric-grid">
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-green">
         <div class="mgdb-metric-top">
           <h3>Total Markers</h3>
           <span class="mgdb-metric-badge">Curated</span>
@@ -227,7 +260,7 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Sequenced probes, markers, and clone features across maize.</p>
       </article>
 
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-amber">
         <div class="mgdb-metric-top">
           <h3>Mapped Markers</h3>
           <span class="mgdb-metric-badge">Bin Positions</span>
@@ -238,7 +271,7 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Anchored to chromosome bin coordinates or genetic maps.</p>
       </article>
 
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-blue">
         <div class="mgdb-metric-top">
           <h3>Marker Types</h3>
           <span class="mgdb-metric-badge">Classifications</span>
@@ -250,7 +283,7 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Including SSR, BAC, SNP, RFLP, EST, and Overgo sets.</p>
       </article>
 
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-burgundy">
         <div class="mgdb-metric-top">
           <h3>SSR Microsatellites</h3>
           <span class="mgdb-metric-badge">Repeats</span>
@@ -261,15 +294,39 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Simple sequence repeat markers with primer sequences and maps.</p>
       </article>
     </div>
+
+    <figure class="mgdb-figure marker-figure">
+      <h3>Markers by type</h3>
+      <div class="mgdb-chart" id="marker-type-chart" role="img"
+           aria-label="Horizontal bar chart of how many markers and probes belong to each of the ten largest marker types, with the remaining types grouped together">
+        <div class="mgdb-chart-fallback">Loading the marker type breakdown&hellip;</div>
+      </div>
+      <figcaption>Every curated marker counts once, so the bars total the whole corpus. Select a bar to search that marker type.</figcaption>
+    </figure>
+
+    <div class="mgdb-table-scroll marker-figure-table">
+      <table class="mgdb-table" id="marker-type-table">
+        <caption>
+          Markers by type
+          <span class="mgdb-muted">The values behind the chart above.</span>
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Marker type</th>
+            <th scope="col" class="mgdb-numeric">Markers</th>
+            <th scope="col" class="mgdb-numeric">Share of corpus</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </section>
 
-  <section id="marker-resources" aria-labelledby="marker-resources-title">
+  <section id="marker-resources" class="mgdb-hub-related" aria-labelledby="marker-resources-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Connected tools</span>
         <h2 id="marker-resources-title">Related resources</h2>
       </div>
-      <p>Explore related MaizeGDB data hubs, genome browsers, and external molecular marker databases.</p>
     </div>
 
     <div class="mgdb-resource-panel">
@@ -302,5 +359,7 @@ $$SYNTAX-LEVEL 2
       </div>
     </div>
   </section>
+
+  <script type="application/json" id="marker-chart-data">$(chart_data)</script>
 </main>
 )

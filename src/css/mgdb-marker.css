@@ -1,23 +1,31 @@
-/* Molecular Marker & Probe Data Hub Styles
-   Scoped under .mgdb-marker-page; relies on mgdb-modern.css tokens. */
+/* ==========================================================================
+   Marker Data Hub — /data_center/marker
+   --------------------------------------------------------------------------
+   Loaded after css/mgdb-modern.css and css/mgdb-hub.css. The hub shell settles
+   the pale blue ground, the white section cards and their coloured top edges,
+   the absence of a rule under a section title, the metric colours, the gold
+   edge a grid tile takes on hover, the zebra striping, the green Related
+   resources panel, the shared form field, and the scroll offset.
 
-/* ── Hero Emblem ─────────────────────────────────────────────────────────── */
+   Nothing above is repeated here. What is here is the page's own furniture:
+   the query control, the examples, the advanced accordion, the results
+   controls and pagination, and the card and table views.
+   ========================================================================== */
+
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
 
 .mgdb-marker-page .mgdb-hero-emblem {
-  gap: var(--mgdb-space-2);
-  padding: var(--mgdb-space-4) var(--mgdb-space-3);
-  border-right: 1px solid #cfe3d6;
-  background: linear-gradient(160deg, rgba(255, 255, 255, .92), rgba(255, 255, 255, .55));
-  color: var(--mgdb-green-dark);
+  background: #ffffff;
+  border-color: var(--mgdb-line);
 }
 
 .mgdb-marker-page .mgdb-hero-emblem svg {
-  width: min(100%, 62px);
+  width: min(100%, 64px);
   height: auto;
   mix-blend-mode: normal;
 }
 
-/* ── Sticky Section Tabs ─────────────────────────────────────────────────── */
+/* ── Sticky section tabs ─────────────────────────────────────────────────── */
 
 .mgdb-marker-page .mgdb-section-tabs {
   position: sticky;
@@ -28,9 +36,6 @@
   gap: var(--mgdb-space-2);
   margin-top: var(--mgdb-space-5);
   margin-bottom: var(--mgdb-space-5);
-  padding: var(--mgdb-space-2) 0;
-  background: var(--mgdb-surface);
-  border-bottom: 1px solid var(--mgdb-line);
 }
 
 .mgdb-marker-page .mgdb-section-tabs a {
@@ -38,104 +43,85 @@
   min-height: 40px;
   align-items: center;
   padding: 0 var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
   color: var(--mgdb-ink) !important;
   font-size: var(--mgdb-text-sm);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
-  transition: background .12s, border-color .12s;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
 }
 
-.mgdb-marker-page .mgdb-section-tabs a:hover {
-  background: var(--mgdb-green-soft);
-}
+.mgdb-marker-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
 
-.mgdb-marker-page .mgdb-section-tabs a.is-current {
+.mgdb-marker-page .mgdb-section-tabs a.is-current,
+.mgdb-marker-page .mgdb-section-tabs a[aria-current="true"] {
   border-color: var(--mgdb-green-dark);
   background: var(--mgdb-green-dark);
-  color: #fff !important;
+  color: #ffffff !important;
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
-.mgdb-marker-page > section,
-.mgdb-marker-page section[id] {
-  scroll-margin-top: 4.5rem;
+@media (max-width: 1170px) and (min-width: 861px) {
+  .mgdb-hub-page.mgdb-marker-page > section[id] { scroll-margin-top: 65px; }
 }
 
-/* ── Search Panel ────────────────────────────────────────────────────────── */
-
-.mgdb-marker-page .marker-search-panel {
-  padding: var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface-alt);
+@media (max-width: 860px) {
+  .mgdb-hub-page.mgdb-marker-page > section[id] { scroll-margin-top: 113px; }
 }
 
-.mgdb-marker-page .marker-section-heading h2 {
-  color: var(--mgdb-green-dark);
-}
+.mgdb-marker-page > section[id] { margin-bottom: var(--mgdb-space-5); }
 
-.mgdb-marker-page .marker-section-heading p {
-  max-width: var(--mgdb-measure);
-  margin-top: var(--mgdb-space-2);
-  color: var(--mgdb-muted);
-}
+/* --------------------------------------------------------------------------
+   Search
+
+   The section is the white card, so the form sits directly on it: the query
+   takes the slack and the button takes what it needs, with the examples and
+   the accordion spanning underneath. The marker type filter used to sit in
+   this row; it is an advanced criterion and lives in the disclosure now,
+   alongside the bin filter the endpoint already supported but the page never
+   exposed.
+   -------------------------------------------------------------------------- */
 
 .mgdb-marker-page #marker-search-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-3) var(--mgdb-space-4);
-  align-items: flex-end;
-  margin-top: var(--mgdb-space-4);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-4);
+  align-items: end;
 }
 
-.mgdb-marker-page .marker-main-search {
-  flex: 3 1 20rem;
-  min-width: 0;
-}
-
-.mgdb-marker-page .marker-type-search {
-  flex: 2 1 14rem;
-  min-width: 0;
-}
-
-.mgdb-marker-page .marker-search-submit {
-  flex: 0 0 auto;
-}
-
-.mgdb-marker-page .marker-main-search label,
-.mgdb-marker-page .marker-type-search label {
-  display: block;
-  margin-bottom: var(--mgdb-space-1);
-  color: var(--mgdb-ink);
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-}
+.mgdb-marker-page .marker-field-query { grid-column: 1; }
+/* Scoped with `>` to the search form: `.mgdb-hub-field-action` is a shared
+   class and the results controls use it too. */
+.mgdb-marker-page #marker-search-form > .mgdb-hub-field-action { grid-column: 2; }
+.mgdb-marker-page .marker-example-row,
+.mgdb-marker-page .marker-adv { grid-column: 1 / -1; }
 
 .mgdb-marker-page .marker-query-control {
   display: grid;
+  box-sizing: border-box;
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: var(--mgdb-space-2);
   align-items: center;
   min-height: var(--mgdb-tap-target);
+  height: var(--mgdb-tap-target);
   padding: 0 var(--mgdb-space-3);
   border: 1px solid #b9b2a5;
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
 }
 
 .mgdb-marker-page .marker-query-control:focus-within {
   border-color: var(--mgdb-focus);
+  box-shadow: 0 0 0 2px rgba(11, 87, 164, .18);
 }
 
-.mgdb-marker-page .marker-query-control svg {
-  color: var(--mgdb-muted);
-}
+.mgdb-marker-page .marker-search-icon { color: var(--mgdb-muted); }
 
-.mgdb-marker-page .marker-query-control input {
-  min-height: 40px;
+.mgdb-marker-page .marker-query-control input[type="search"] {
+  width: 100%;
+  min-width: 0;
   padding: 0;
   border: 0;
   background: transparent;
@@ -144,137 +130,256 @@
   font-size: var(--mgdb-text-base);
 }
 
-.mgdb-marker-page .marker-query-control input:focus {
-  outline: none;
-}
+.mgdb-marker-page .marker-query-control input[type="search"]:focus { outline: none; }
 
-.mgdb-marker-page .marker-query-control button {
+.mgdb-marker-page #marker-query-clear {
+  padding: 0 var(--mgdb-space-2);
   border: 0;
-  background: none;
-  color: var(--mgdb-burgundy);
+  background: transparent;
+  color: var(--mgdb-muted);
   font-family: inherit;
   font-size: var(--mgdb-text-sm);
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 
-.mgdb-marker-page select.mgdb-select,
-.mgdb-marker-page .marker-type-search select {
-  display: block;
-  width: 100%;
-  min-height: var(--mgdb-tap-target);
-  padding: var(--mgdb-space-2) var(--mgdb-space-3);
-  border: 1px solid #b9b2a5;
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink);
-  font-family: inherit;
-  font-size: var(--mgdb-text-base);
+.mgdb-marker-page #marker-query-clear:hover { color: var(--mgdb-green-dark); text-decoration: underline; }
+
+.mgdb-marker-page .marker-hint {
+  margin: var(--mgdb-space-1) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
 }
+
+/* ── Examples ────────────────────────────────────────────────────────────── */
 
 .mgdb-marker-page .marker-example-row {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-2);
   align-items: center;
-  flex: 1 0 100%;
-  margin-top: var(--mgdb-space-2);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--hub-line-soft);
+}
+
+.mgdb-marker-page .marker-example-row > span:first-child {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
 }
 
 .mgdb-marker-page .marker-example-row button {
-  padding: 2px 10px;
-  border: 1px solid var(--mgdb-line);
+  padding: var(--mgdb-space-1) var(--mgdb-space-3);
+  border: 1px solid var(--hub-line);
   border-radius: 999px;
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink-soft);
+  background: var(--hub-surface);
+  color: var(--mgdb-green-dark);
   font-family: inherit;
-  font-size: var(--mgdb-text-xs);
+  font-size: var(--mgdb-text-sm);
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
-  transition: background .12s, border-color .12s;
 }
 
 .mgdb-marker-page .marker-example-row button:hover {
+  border-color: var(--mgdb-green-dark);
   background: var(--mgdb-green-soft);
-  border-color: var(--mgdb-green);
+}
+
+/* ── Advanced search ─────────────────────────────────────────────────────── */
+
+.mgdb-marker-page .marker-adv {
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--hub-surface);
+}
+
+.mgdb-marker-page .marker-adv summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+  align-items: baseline;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
   color: var(--mgdb-green-dark);
+  cursor: pointer;
+  list-style-position: inside;
 }
 
-/* ── Results Section ─────────────────────────────────────────────────────── */
+.mgdb-marker-page .marker-adv summary strong { font-size: var(--mgdb-text-base); }
+.mgdb-marker-page .marker-adv summary span { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+.mgdb-marker-page .marker-adv[open] summary { border-bottom: 1px solid var(--hub-line-soft); }
 
-.mgdb-marker-page .marker-results-section {
-  margin-top: var(--mgdb-space-6);
+.mgdb-marker-page .marker-adv-body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 24rem));
+  gap: var(--mgdb-space-4);
+  align-items: start;
+  padding: var(--mgdb-space-4);
 }
+
+.mgdb-marker-page .marker-adv-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  padding: 0 var(--mgdb-space-4) var(--mgdb-space-4);
+}
+
+@media (max-width: 640px) {
+  .mgdb-marker-page #marker-search-form { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-marker-page #marker-search-form > .mgdb-hub-field-action { grid-column: 1; }
+  .mgdb-marker-page .marker-adv-body { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* --------------------------------------------------------------------------
+   Results
+   -------------------------------------------------------------------------- */
+
+.mgdb-marker-page .marker-results-section[hidden] { display: none; }
 
 .mgdb-marker-page .marker-results-heading {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-3) var(--mgdb-space-5);
-  align-items: flex-end;
+  align-items: end;
   justify-content: space-between;
-  padding-bottom: var(--mgdb-space-3);
-  border-bottom: 1px solid var(--mgdb-line);
+  margin-bottom: var(--mgdb-space-4);
 }
+
+.mgdb-marker-page .marker-results-heading h2 { margin: 0; }
+.mgdb-marker-page .marker-results-heading > div:first-child { min-width: 0; flex: 1 1 18rem; }
 
 .mgdb-marker-page #marker-results-status {
-  margin-top: var(--mgdb-space-1);
-  color: var(--mgdb-ink-soft);
+  margin: var(--mgdb-space-1) 0 0;
+  color: var(--mgdb-muted);
   font-size: var(--mgdb-text-sm);
-  font-weight: 600;
 }
 
+/* Fixed tracks in a box sized to its own content: declared with minmax(0, ...)
+   the first tracks take everything the parent offers and the last resolves to
+   0px, which drops its control onto a second row. */
 .mgdb-marker-page .marker-results-controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-3);
-  align-items: center;
+  display: grid;
+  width: max-content;
+  max-width: 100%;
+  flex: 0 0 auto;
+  grid-template-columns: 13rem 10rem auto auto;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: end;
+}
+
+@media (max-width: 1000px) {
+  .mgdb-marker-page .marker-results-controls {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .mgdb-marker-page .marker-results-controls { grid-template-columns: minmax(0, 1fr); }
 }
 
 .mgdb-marker-page .marker-view-toggle {
   display: inline-flex;
-  gap: 2px;
-  border: 1px solid var(--mgdb-line);
+  overflow: hidden;
+  height: var(--mgdb-tap-target);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
-  padding: 2px;
+  background: var(--hub-surface);
 }
 
 .mgdb-marker-page .marker-view-btn {
   display: inline-flex;
-  align-items: center;
+  min-height: 100%;
   gap: var(--mgdb-space-2);
-  padding: 4px var(--mgdb-space-3);
-  border: none;
-  border-radius: var(--mgdb-radius-xs, 4px);
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 0;
   background: transparent;
   color: var(--mgdb-ink-soft);
   font-family: inherit;
   font-size: var(--mgdb-text-sm);
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
-  transition: background .15s, color .15s;
 }
 
-.mgdb-marker-page .marker-view-btn:hover:not([aria-pressed="true"]) {
-  background: var(--mgdb-surface-alt);
-  color: var(--mgdb-ink);
-}
+.mgdb-marker-page .marker-view-btn + .marker-view-btn { border-left: 1px solid var(--hub-line); }
+.mgdb-marker-page .marker-view-btn svg { width: 16px; height: 16px; }
 
+.mgdb-marker-page .marker-view-btn.is-active,
 .mgdb-marker-page .marker-view-btn[aria-pressed="true"] {
   background: var(--mgdb-green-dark);
-  color: #fff;
-}
-
-.mgdb-marker-page .marker-view-btn svg {
-  width: 15px;
-  height: 15px;
+  color: #ffffff;
 }
 
 .mgdb-marker-page .marker-export-buttons {
   display: flex;
   gap: var(--mgdb-space-2);
+  align-items: center;
+}
+
+/* ── Pagination ──────────────────────────────────────────────────────────── */
+
+.mgdb-marker-page .marker-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-4);
+  border-top: 1px solid var(--hub-line-soft);
+}
+
+.mgdb-marker-page .marker-pagination:empty { display: none; }
+
+.mgdb-marker-page .marker-pagination button {
+  min-width: var(--mgdb-tap-target);
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mgdb-marker-page .marker-pagination button:hover:not([disabled]) {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-marker-page .marker-pagination button.is-active {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+}
+
+.mgdb-marker-page .marker-pagination button[disabled] { opacity: .45; cursor: not-allowed; }
+
+/* --------------------------------------------------------------------------
+   Card and download grids
+   -------------------------------------------------------------------------- */
+
+.mgdb-marker-page .marker-collection-grid,
+.mgdb-marker-page .marker-download-grid {
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+@media (max-width: 900px) {
+  .mgdb-marker-page .marker-collection-grid,
+  .mgdb-marker-page .marker-download-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media print {
+  .mgdb-marker-page .mgdb-section-tabs,
+  .mgdb-marker-page #marker-search-form,
+  .mgdb-marker-page .marker-pagination { display: none; }
 }
 
 /* ── Result Cards (Card View) ────────────────────────────────────────────── */
@@ -547,3 +652,19 @@
   .mgdb-marker-page .marker-results-container.marker-view-card { grid-template-columns: 1fr; }
   .mgdb-marker-page .marker-results-heading { flex-direction: column; align-items: flex-start; }
 }
+
+/* ── Markers by type figure ─────────────────────────────────────────────────
+   Mirrors the AI hub's figure block so every hub's chart sits in the same box.
+   The min-height keeps the section from collapsing while Plotly loads; the JS
+   sets the real height from the bar count. */
+.mgdb-marker-page .marker-figure { margin-top: var(--mgdb-space-5); }
+
+.mgdb-marker-page .marker-figure .mgdb-chart {
+  height: auto;
+  min-height: 320px;
+  /* The value labels sit outside their bars (cliponaxis:false), so the box
+     must not clip them. */
+  overflow: visible;
+}
+
+.mgdb-marker-page .marker-figure-table { margin-top: var(--mgdb-space-4); }
