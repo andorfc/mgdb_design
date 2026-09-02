@@ -1,13 +1,32 @@
 /* ==========================================================================
-   Pan-Gene Center search — page-specific styles
+   Pan-Gene Data Hub — /pan_gene_center/pan_gene
    --------------------------------------------------------------------------
-   Everything is scoped under .mgdb-pan-gene-page and composed from the tokens
-   in mgdb-modern.css. No new colours, type sizes, or spacing values are
-   introduced here.
+   Loaded after css/mgdb-modern.css and css/mgdb-hub.css. The hub shell settles
+   the pale blue ground, the white section cards and their coloured top edges,
+   the absence of a rule under a section title, the metric colours, the gold
+   edge a grid tile takes on hover, the zebra striping, the green Related
+   resources panel, the shared form field, and the scroll offset.
+
+   Nothing above is repeated here. What is here is the page's own furniture:
+   the search form, the advanced disclosure, the results controls and table,
+   the figures, and the definitions list.
    ========================================================================== */
 
-/* Section tabs. Sticky so the section list stays reachable on a long page;
-   they are ordinary in-page links, so they work with script disabled. */
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
+
+.mgdb-pan-gene-page .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-pan-gene-page .pan-gene-hero-icon {
+  width: min(100%, 72px);
+  height: auto;
+  object-fit: contain;
+}
+
+/* ── Sticky section tabs ─────────────────────────────────────────────────── */
+
 .mgdb-pan-gene-page .mgdb-section-tabs {
   position: sticky;
   z-index: 20;
@@ -16,8 +35,7 @@
   flex-wrap: wrap;
   gap: var(--mgdb-space-2);
   margin-top: var(--mgdb-space-5);
-  padding: var(--mgdb-space-2) 0;
-  background: var(--mgdb-surface);
+  margin-bottom: var(--mgdb-space-5);
 }
 
 .mgdb-pan-gene-page .mgdb-section-tabs a {
@@ -25,27 +43,79 @@
   min-height: 40px;
   align-items: center;
   padding: 0 var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
   color: var(--mgdb-ink) !important;
   font-size: var(--mgdb-text-sm);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
 }
 
 .mgdb-pan-gene-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
 
-/* The current section is marked by weight and a gold bar as well as colour. */
-.mgdb-pan-gene-page .mgdb-section-tabs a.is-current {
+.mgdb-pan-gene-page .mgdb-section-tabs a.is-current,
+.mgdb-pan-gene-page .mgdb-section-tabs a[aria-current="true"] {
   border-color: var(--mgdb-green-dark);
   background: var(--mgdb-green-dark);
-  color: #fff !important;
+  color: #ffffff !important;
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
-/* Scroll-margin so an anchored section is not hidden behind the sticky tabs. */
-.mgdb-pan-gene-page > section { scroll-margin-top: 4.5rem; }
+/* Seven tabs wrap to two rows sooner than the other hubs' six, so the offset
+   the scrollspy reads back from here has its own breakpoints. */
+@media (max-width: 1290px) and (min-width: 861px) {
+  .mgdb-hub-page.mgdb-pan-gene-page > section[id] { scroll-margin-top: 65px; }
+}
+
+@media (max-width: 860px) {
+  .mgdb-hub-page.mgdb-pan-gene-page > section[id] { scroll-margin-top: 113px; }
+}
+
+.mgdb-pan-gene-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+/* ── Results controls ────────────────────────────────────────────────────── */
+
+/* Fixed tracks in a box sized to its own content: declared with minmax(0, ...)
+   the first tracks take everything the parent offers and the last resolves to
+   0px, which drops its control onto a second row. */
+.mgdb-pan-gene-page .pan-gene-results-controls {
+  display: grid;
+  width: max-content;
+  max-width: 100%;
+  flex: 0 0 auto;
+  grid-template-columns: 13rem 10rem 16rem;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: end;
+}
+
+.mgdb-pan-gene-page .pan-gene-results-controls[hidden] { display: none; }
+
+@media (max-width: 1000px) {
+  .mgdb-pan-gene-page .pan-gene-results-controls {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .mgdb-pan-gene-page .pan-gene-results-controls { grid-template-columns: minmax(0, 1fr); }
+}
+
+.mgdb-pan-gene-page #pan-gene-results[hidden] { display: none; }
+
+/* ── Figures ─────────────────────────────────────────────────────────────── */
+
+.mgdb-pan-gene-page .mgdb-figure .mgdb-chart {
+  height: auto;
+  min-height: 320px;
+  /* Value labels can sit outside their bars, so the box must not clip them. */
+  overflow: visible;
+}
+
+.mgdb-pan-gene-page .pan-gene-tree-figure { margin-top: var(--mgdb-space-5); }
+.mgdb-pan-gene-page .pan-gene-tree-figure img { max-width: 100%; height: auto; }
 
 /* --------------------------------------------------------------------------
    Search
@@ -169,15 +239,6 @@
 /* --------------------------------------------------------------------------
    Results
    -------------------------------------------------------------------------- */
-
-.mgdb-pan-gene-page .pan-gene-sort {
-  display: flex;
-  gap: var(--mgdb-space-2);
-  align-items: center;
-  flex: none;
-}
-
-.mgdb-pan-gene-page .pan-gene-sort .mgdb-select { width: auto; min-width: 14rem; }
 
 .mgdb-pan-gene-page .pan-gene-criteria {
   padding: var(--mgdb-space-3) var(--mgdb-space-4);
@@ -351,165 +412,5 @@
 
   .mgdb-pan-gene-page .mgdb-section-tabs a { white-space: nowrap; }
   .mgdb-pan-gene-page .pan-gene-single { grid-template-columns: 1fr; }
-  .mgdb-pan-gene-page .pan-gene-sort { width: 100%; }
-  .mgdb-pan-gene-page .pan-gene-sort .mgdb-select { width: 100%; min-width: 0; }
   .mgdb-pan-gene-page .pan-gene-values { max-width: none; }
-}
-
-/* --------------------------------------------------------------------------
-   Page header
-
-   The shared .mgdb-hero is a deep burgundy-to-orange gradient built for a
-   data centre that wants to announce itself. This page sits above a long,
-   quiet working surface — a search form and a table — so the header is
-   re-tuned rather than reused as-is: a light green wash that belongs to the
-   same family as the section headings below it, and about a third less
-   height. Only the pan-gene page is affected; every other hero is untouched.
-   -------------------------------------------------------------------------- */
-
-.mgdb-pan-gene-page .pan-gene-hero {
-  align-items: stretch;
-  grid-template-columns: minmax(150px, 17%) minmax(0, 1fr);
-  border: 1px solid #cfe3d6;
-  background: linear-gradient(115deg, #f4faf6 0%, var(--mgdb-green-soft) 46%, #e4f0e6 100%);
-  color: var(--mgdb-ink);
-  /* The shared hero carries a heavy drop shadow to lift it off the page. A
-     hairline and a whisper of shadow are enough for a panel this light. */
-  box-shadow: 0 1px 2px rgba(23, 70, 52, .05);
-}
-
-/* The decorative ring is kept — it is what stops the panel reading as a plain
-   box — but taken down to a tint that only registers at the edge of vision. */
-.mgdb-pan-gene-page .pan-gene-hero::after {
-  top: -210px;
-  right: -130px;
-  width: 380px;
-  height: 380px;
-  border-width: 40px;
-  border-color: rgba(40, 93, 70, .06);
-}
-
-.mgdb-pan-gene-page .pan-gene-hero .mgdb-hero-emblem {
-  gap: var(--mgdb-space-2);
-  padding: var(--mgdb-space-4) var(--mgdb-space-3);
-  border-right: 1px solid #cfe3d6;
-  background: linear-gradient(160deg, rgba(255, 255, 255, .92), rgba(255, 255, 255, .55));
-  /* The mark inherits this, so the icon and the wordmark are one colour. */
-  color: var(--mgdb-green-dark);
-}
-
-.mgdb-pan-gene-page .pan-gene-hero .mgdb-hero-emblem svg {
-  width: min(100%, 62px);
-  mix-blend-mode: normal;
-}
-
-.mgdb-pan-gene-page .pan-gene-hero .mgdb-hero-emblem strong {
-  color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-base);
-  letter-spacing: .01em;
-  line-height: var(--mgdb-leading-snug);
-}
-
-.mgdb-pan-gene-page .pan-gene-hero .mgdb-hero-body {
-  position: relative;
-  padding: var(--mgdb-space-5) var(--mgdb-space-6);
-}
-
-.mgdb-pan-gene-page .pan-gene-hero h1 {
-  margin: 0 0 var(--mgdb-space-2);
-  /* Sized to sit under the section headings further down rather than shout
-     over them; the page's own name is carried by the emblem beside it. */
-  color: var(--mgdb-green-dark);
-  font-size: clamp(1.5rem, 1.1rem + 1.3vw, 1.875rem);
-  /* Room for the stamp, which floats at the top right on a wide screen. */
-  padding-right: 11rem;
-}
-
-.mgdb-pan-gene-page .pan-gene-hero .mgdb-hero-description {
-  max-width: 62ch;
-  margin-top: 0;
-  color: var(--mgdb-ink-soft);
-  font-size: var(--mgdb-text-base);
-  line-height: var(--mgdb-leading);
-}
-
-.mgdb-pan-gene-page .pan-gene-hero .mgdb-hero-actions { margin-top: var(--mgdb-space-4); }
-
-/* Buttons: the shared hero inverts them for a dark ground. On this light one
-   they go back to the page's ordinary treatment. */
-.mgdb-pan-gene-page .pan-gene-hero .mgdb-button-primary {
-  background: var(--mgdb-green-dark);
-  color: #fff !important;
-}
-
-.mgdb-pan-gene-page .pan-gene-hero .mgdb-button-primary:hover { background: #0f3325; }
-
-.mgdb-pan-gene-page .pan-gene-hero .mgdb-button-secondary {
-  border-color: var(--mgdb-green-dark);
-  background: rgba(255, 255, 255, .7);
-  color: var(--mgdb-green-dark) !important;
-}
-
-.mgdb-pan-gene-page .pan-gene-hero .mgdb-button-secondary:hover { background: #fff; }
-
-.mgdb-pan-gene-page .pan-gene-hero :focus-visible { outline-color: var(--mgdb-focus); }
-
-/* The freshness stamp. A dataset that is rebuilt on a cycle should say when it
-   was last rebuilt, and a reader should not have to hunt for it. */
-.mgdb-pan-gene-page .pan-gene-hero-stamp {
-  position: absolute;
-  z-index: 1;
-  top: var(--mgdb-space-5);
-  right: var(--mgdb-space-6);
-  display: inline-flex;
-  gap: var(--mgdb-space-2);
-  align-items: center;
-  padding: var(--mgdb-space-1) var(--mgdb-space-3);
-  border: 1px solid #bcd9c6;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, .9);
-  color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-/* The dot is a freshness cue, not decoration for its own sake — gold picks up
-   the brand accent that the rest of this header deliberately leaves out. */
-.mgdb-pan-gene-page .pan-gene-hero-stamp span {
-  color: var(--mgdb-gold);
-  font-size: .7em;
-  line-height: 1;
-}
-
-@media (max-width: 1023px) {
-  .mgdb-pan-gene-page .pan-gene-hero { grid-template-columns: minmax(130px, 22%) minmax(0, 1fr); }
-  .mgdb-pan-gene-page .pan-gene-hero .mgdb-hero-body { padding: var(--mgdb-space-4) var(--mgdb-space-5); }
-  .mgdb-pan-gene-page .pan-gene-hero-stamp { top: var(--mgdb-space-4); right: var(--mgdb-space-5); }
-}
-
-@media (max-width: 767px) {
-  /* Stacked, the stamp has nowhere to float to; it leads the block instead. */
-  .mgdb-pan-gene-page .pan-gene-hero { grid-template-columns: 1fr; }
-
-  .mgdb-pan-gene-page .pan-gene-hero .mgdb-hero-emblem {
-    flex-flow: row wrap;
-    gap: var(--mgdb-space-3);
-    align-items: center;
-    justify-content: flex-start;
-    padding: var(--mgdb-space-3) var(--mgdb-space-4);
-    border-right: 0;
-    border-bottom: 1px solid #cfe3d6;
-    text-align: left;
-  }
-
-  .mgdb-pan-gene-page .pan-gene-hero .mgdb-hero-emblem svg { width: 38px; }
-  .mgdb-pan-gene-page .pan-gene-hero .mgdb-hero-emblem strong { flex: 1 1 auto; }
-
-  .mgdb-pan-gene-page .pan-gene-hero h1 { padding-right: 0; }
-
-  .mgdb-pan-gene-page .pan-gene-hero-stamp {
-    position: static;
-    margin-bottom: var(--mgdb-space-3);
-  }
 }

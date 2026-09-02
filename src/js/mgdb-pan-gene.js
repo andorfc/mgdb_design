@@ -18,7 +18,8 @@
   if (!MGDB) { return; }
 
   var API = '/search/pan_gene/pan_gene_search_api.php';
-  var PAGE_SIZE = 25;
+  /* The endpoint caps page_size at 100, so "All results" asks for that. */
+  var MAX_PAGE = 100;
   var VALUE_LIMIT = 3;      // list values shown per cell before "+n more"
 
   function byId(id) { return document.getElementById(id); }
@@ -32,11 +33,18 @@
     term: '',
     sort: 'members',
     page: 1,
+    pageSize: 25,
+    filter: '',
+    searched: false,
+    lastPayload: null,
     filters: {}
   };
 
   var ADVANCED_FIELDS = [
-    { key: 'analysis', id: 'pan-gene-analysis', type: 'value' },
+    /* Not 'pan-gene-analysis': that is the id of the section this page's
+       tab bar links to, and two elements sharing an id sent the tab to the
+       select instead of the section. */
+    { key: 'analysis', id: 'pan-gene-analysis-filter', type: 'value' },
     { key: 'gene_models', id: 'pan-gene-gene-models', type: 'value' },
     { key: 'proteins', id: 'pan-gene-proteins', type: 'value' },
     { key: 'min', id: 'pan-gene-min', type: 'value' },
@@ -54,46 +62,83 @@
      Section tabs
      ------------------------------------------------------------------------ */
 
+  /* Sticky section tabs, driven by scroll, IntersectionObserver and resize
+     together: no single trigger fires everywhere, and the results section
+     appears and disappears under the bar as searches run. */
   function buildTabs() {
     var tabs = document.querySelectorAll('.mgdb-section-tabs a');
     if (!tabs.length) { return; }
 
     var pairs = [];
     Array.prototype.forEach.call(tabs, function (tab) {
-      var section = document.querySelector(tab.getAttribute('href'));
+      var href = tab.getAttribute('href') || '';
+      if (href.charAt(0) !== '#') { return; }
+      var section = document.getElementById(href.slice(1));
       if (section) { pairs.push({ tab: tab, section: section }); }
     });
+    if (!pairs.length) { return; }
 
-    function markCurrent(target) {
+    var heldUntilScroll = null;
+    var heldAtY = 0;
+
+    function mark(section) {
       pairs.forEach(function (pair) {
-        var current = pair.section === target;
+        var current = pair.section === section;
         pair.tab.classList.toggle('is-current', current);
         if (current) { pair.tab.setAttribute('aria-current', 'true'); }
         else { pair.tab.removeAttribute('aria-current'); }
       });
     }
 
-    var initial = pairs[0];
-    if (window.location.hash) {
-      pairs.forEach(function (pair) {
-        if ('#' + pair.section.id === window.location.hash) { initial = pair; }
-      });
+    function triggerLine() {
+      var bar = document.querySelector('.mgdb-section-tabs');
+      var barHeight = bar ? bar.getBoundingClientRect().height : 0;
+      var margin = parseFloat(window.getComputedStyle(pairs[0].section).scrollMarginTop) || 0;
+      return Math.max(barHeight + 8, margin + 4);
     }
-    if (initial) { markCurrent(initial.section); }
+
+    function update() {
+      if (heldUntilScroll) {
+        if (Math.abs(window.scrollY - heldAtY) < 4) { return; }
+        heldUntilScroll = null;
+      }
+      var line = triggerLine();
+      var current = pairs[0];
+      pairs.forEach(function (pair) {
+        if (pair.section.hasAttribute('hidden')) { return; }
+        if (pair.section.getBoundingClientRect().top <= line) { current = pair; }
+      });
+      if ((window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 2)) {
+        current = pairs[pairs.length - 1];
+      }
+      if (current) { mark(current.section); }
+    }
 
     pairs.forEach(function (pair) {
-      pair.tab.addEventListener('click', function () { markCurrent(pair.section); });
+      pair.tab.addEventListener('click', function () {
+        mark(pair.section);
+        heldUntilScroll = pair.section;
+        heldAtY = window.scrollY;
+      });
     });
 
-    if (!window.IntersectionObserver) { return; }
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
 
-    var observer = new window.IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) { markCurrent(entry.target); }
+    if (window.IntersectionObserver) {
+      var observer = new window.IntersectionObserver(function () { update(); },
+        { rootMargin: '-20% 0px -60% 0px' });
+      pairs.forEach(function (pair) { observer.observe(pair.section); });
+    }
+
+    var results = byId('pan-gene-results');
+    if (results && window.MutationObserver) {
+      new window.MutationObserver(update).observe(results, {
+        childList: true, subtree: true, attributes: true, attributeFilter: ['hidden']
       });
-    }, { rootMargin: '-25% 0px -65% 0px' });
+    }
 
-    pairs.forEach(function (pair) { observer.observe(pair.section); });
+    update();
   }
 
   /* ------------------------------------------------------------------------
@@ -201,7 +246,7 @@
     var params = new window.URLSearchParams();
     params.set('mode', state.mode);
     params.set('page', String(state.page));
-    params.set('page_size', String(PAGE_SIZE));
+    params.set('page_size', String(state.pageSize === 'all' ? MAX_PAGE : state.pageSize));
     params.set('sort', state.sort);
     if (state.mode === 'simple') {
       params.set('term', state.term);
@@ -503,8 +548,54 @@
     if (summary.page_count > 1) {
       message += ' &mdash; showing ' + first.toLocaleString() + ' to ' + last.toLocaleString();
     }
+    if (state.pageSize === 'all' && total > summary.page_size) {
+      /* "All results" is capped by the endpoint, and saying so is better than
+         a count that quietly stops short. */
+      message = 'Showing the first ' + summary.page_size.toLocaleString() + ' of '
+        + total.toLocaleString() + ' matching pan-genes, which is as many as the '
+        + 'search returns at once';
+    }
     els.status.innerHTML = message;
     MGDB.announce(total.toLocaleString() + ' matching pan-genes');
+
+    state.lastPayload = payload;
+    /* Re-applied last so paging and a re-sort do not silently drop a filter
+       the box still shows. */
+    applyResultsFilter();
+  }
+
+  /* Narrows the page already rendered. The search pages server side, so this
+     filters what is on screen and the status line says so. */
+  function applyResultsFilter() {
+    var body = els.rows;
+    if (!body) { return; }
+
+    var rows = body.querySelectorAll('tr');
+    var terms = state.filter.toLowerCase().split(/\s+/).filter(Boolean);
+    var shown = 0;
+
+    Array.prototype.forEach.call(rows, function (row) {
+      var match = true;
+      if (terms.length) {
+        var hay = (row.textContent || '').toLowerCase();
+        for (var i = 0; i < terms.length; i++) {
+          if (hay.indexOf(terms[i]) === -1) { match = false; break; }
+        }
+      }
+      row.hidden = !match;
+      if (match) { shown++; }
+    });
+
+    if (terms.length && els.status) {
+      var total = state.lastPayload && state.lastPayload.summary
+        ? state.lastPayload.summary.total : 0;
+      els.status.innerHTML = shown === 0
+        ? 'Nothing on this page matches the filter &ldquo;' + MGDB.escapeHtml(state.filter)
+          + '&rdquo;. ' + total.toLocaleString() + ' pan-genes matched the search.'
+        : 'Showing ' + shown.toLocaleString() + ' of the ' + rows.length.toLocaleString()
+          + ' pan-genes on this page matching &ldquo;' + MGDB.escapeHtml(state.filter)
+          + '&rdquo;, out of ' + total.toLocaleString() + ' matched by the search.';
+    }
   }
 
   /* ------------------------------------------------------------------------
@@ -512,6 +603,11 @@
      ------------------------------------------------------------------------ */
 
   function runSearch() {
+    /* The results section is hidden until there is something to show. */
+    var section = byId('pan-gene-results');
+    if (section) { section.hidden = false; }
+    state.searched = true;
+
     show(els.empty, false);
     show(els.error, false);
     show(els.single, false);
@@ -564,6 +660,8 @@
       advancedClear: byId('pan-gene-advanced-clear'),
       sort: byId('pan-gene-sort'),
       sortWrap: byId('pan-gene-sort-wrap'),
+      pageSize: byId('pan-gene-page-size'),
+      resultsFilter: byId('pan-gene-results-filter'),
       status: byId('pan-gene-status'),
       criteria: byId('pan-gene-criteria'),
       loading: byId('pan-gene-loading'),
@@ -634,6 +732,27 @@
         state.sort = els.sort.value;
         state.page = 1;
         runSearch();
+      });
+    }
+
+    if (els.pageSize) {
+      els.pageSize.addEventListener('change', function () {
+        state.pageSize = this.value === 'all' ? 'all' : parseInt(this.value, 10) || 25;
+        state.page = 1;
+        if (state.searched) { runSearch(); }
+      });
+    }
+
+    if (els.resultsFilter) {
+      els.resultsFilter.addEventListener('input', function () {
+        state.filter = this.value.trim();
+        if (state.filter === '' && state.lastPayload) {
+          /* Re-render rather than un-hiding: the status line has to go back to
+             what the search said, not what the filter said. */
+          render(state.lastPayload);
+          return;
+        }
+        applyResultsFilter();
       });
     }
 

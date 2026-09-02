@@ -18,6 +18,8 @@
 
   include_once('./include/db-api.php');
   include_once('./include/pan_gene_lib.php');
+  include_once('./include/dashboard_cache.php');
+  include_once('./include/references_lib.php');
 
   $system = getSystemInfo('mgdb.conf');
   logMessage('Starting pan_gene_search_modern.php');
@@ -27,15 +29,29 @@
   $bauplan = new Bauplan('MaizeGDB Pan-Gene Search | Pan-Zea Pan-Genes and Gene Families');
   $bauplan->modern();
 
+  $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT']
+    ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';
+  $hub_file = $doc_root . '/css/mgdb-hub.css';
+  $css_file = $doc_root . '/css/mgdb-pan-gene.css';
+  $js_file  = $doc_root . '/js/mgdb-pan-gene.js';
+  $v_hub = file_exists($hub_file) ? filemtime($hub_file) : time();
+  $v_css = file_exists($css_file) ? filemtime($css_file) : time();
+  $v_js  = file_exists($js_file)  ? filemtime($js_file)  : time();
+
   $bauplan->preHTML('<meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
   $bauplan->includeCss('/css/static.css');
   $bauplan->includeCss('/css/mgdb-modern.css');
   $bauplan->includeCss('/css/mgdb-megamenu.css');
-  $bauplan->includeCss('/css/mgdb-pan-gene.css');
+  /* The shared Data Hub shell -- pale blue ground, white section cards,
+     coloured section edges, the reference card, aligned form rows -- loaded
+     before the page's own sheet, which is the order css/mgdb-hub.css
+     documents. `mgdb-hub-page` on <main> opts in. */
+  $bauplan->includeCss('/css/mgdb-hub.css?v=' . $v_hub);
+  $bauplan->includeCss('/css/mgdb-pan-gene.css?v=' . $v_css);
   $bauplan->includeScript('/js/lib/plotly/plotly-2.25.2.min.js');
   $bauplan->includeScript('/js/mgdb-modern.js');
   $bauplan->includeScript('/js/mgdb-chrome.js');
-  $bauplan->includeScript('/js/mgdb-pan-gene.js');
+  $bauplan->includeScript('/js/mgdb-pan-gene.js?v=' . $v_js);
   $bauplan->head('<meta name="description" content="Search maize pan-genes by locus, gene model, transcript, or protein. Filter by analysis membership, assembly coverage, traits, and size, and download exemplar sequence.">');
 
   $mgdb = $bauplan->template()->load('templates/maizegdb-main-modern.bau');
@@ -49,26 +65,72 @@
   // The analysis this page describes
   /////
 
-  $metadata = getPanGeneAnalysisMetadata('', $DBConn);
-  $annotations = isset($metadata['annotation_metadata']) ? $metadata['annotation_metadata'] : array();
-  $analysis_meta = isset($metadata['analysis_metadata']) ? $metadata['analysis_metadata'] : array();
-  $analysis_name = isset($analysis_meta['name']) ? $analysis_meta['name'] : '';
+  /* Everything the page renders server side, built once and cached: the
+     analysis metadata, the 66 annotation rows, the size distribution, and the
+     analysis list. Identical for every visitor and static between monthly
+     reloads, so a warm page issues no SQL at all.
 
-  usort($annotations, function($a, $b) {
-    return strcasecmp($a['assembly'], $b['assembly']);
-  });
+     The key carries this file's mtime because the payload's shape is defined
+     here, not in the database -- dashboardCache() folds in only the string it
+     is handed plus a global stamp, so an entry written by an older copy of
+     this file would be reused with fields this one does not expect.
+     See include/dashboard_cache.php. */
+  $page_data = dashboardCache($system, 'pan_gene/page_' . (int) @filemtime(__FILE__),
+    function () use ($DBConn) {
+      $metadata = getPanGeneAnalysisMetadata('', $DBConn);
+      $annotations = isset($metadata['annotation_metadata']) ? $metadata['annotation_metadata'] : array();
+      $analysis_meta = isset($metadata['analysis_metadata']) ? $metadata['analysis_metadata'] : array();
+      $analysis_name = isset($analysis_meta['name']) ? $analysis_meta['name'] : '';
+
+      usort($annotations, function($a, $b) {
+        return strcasecmp($a['assembly'], $b['assembly']);
+      });
+
+      /* One DISTINCT over chado.pan_gene_search, a 2.7 million row view, to
+         find the handful of analysis names -- 131 ms to return a single value.
+         It is only paid on a cold cache, which is why it is left as it is;
+         chado.pan_gene_analysis_stats would answer the same question from 238
+         rows if this ever moves out from behind the cache. */
+      $analysis_names = array();
+      $sth = make_query($DBConn, "
+        SELECT DISTINCT pan_gene_analysis FROM chado.pan_gene_search ORDER BY pan_gene_analysis");
+      while ($row = retrieve_row($sth)) {
+        $analysis_names[] = (string) $row['pan_gene_analysis'];
+      }
+
+      return array(
+        'annotations'      => $annotations,
+        'analysis_meta'    => $analysis_meta,
+        'analysis_name'    => $analysis_name,
+        'analysis_names'   => $analysis_names,
+        'distribution'     => getPanGeneDistribution($analysis_name, 1000000, $DBConn),
+        'annotation_count' => (int) getPanGeneAnnotationCount($analysis_name, $DBConn)
+      );
+    });
+
+  $annotations   = $page_data['annotations'];
+  $analysis_meta = $page_data['analysis_meta'];
+  $analysis_name = $page_data['analysis_name'];
 
   $content->get('analysis_name')->replace(htmlspecialchars($analysis_name, ENT_QUOTES, 'UTF-8'));
   $content->get('analysis_pipeline')->replace(htmlspecialchars(
     trim(($analysis_meta['program'] ?? '') . ' ' . ($analysis_meta['programversion'] ?? '')), ENT_QUOTES, 'UTF-8'));
-  $content->get('analysis_date')->replace(htmlspecialchars(
-    substr((string) ($analysis_meta['timeexecuted'] ?? ''), 0, 10), ENT_QUOTES, 'UTF-8'));
+  $analysis_day = substr((string) ($analysis_meta['timeexecuted'] ?? ''), 0, 10);
+  $content->get('analysis_date')->replace(htmlspecialchars($analysis_day, ENT_QUOTES, 'UTF-8'));
+
+  /* The freshness stamp is derived from the analysis, not written by hand. It
+     read "January 2026" for an analysis executed 2025-08-18 and named
+     "Pan-Zea, Aug 2025" -- a hard-coded date drifts the moment the analysis
+     is rebuilt, and a stamp that contradicts the page under it is worse than
+     no stamp. */
+  $stamp = $analysis_day !== '' ? date('F Y', strtotime($analysis_day)) : '';
+  $content->get('analysis_stamp')->replace(htmlspecialchars($stamp, ENT_QUOTES, 'UTF-8'));
 
   /////
   // Summary figures
   /////
 
-  $distribution = getPanGeneDistribution($analysis_name, 1000000, $DBConn);
+  $distribution = $page_data['distribution'];
   $pan_gene_count = 0;
   $placed_models = 0;
   $largest = 0;
@@ -80,7 +142,7 @@
     }
   }
 
-  $annotation_count = (int) getPanGeneAnnotationCount($analysis_name, $DBConn);
+  $annotation_count = (int) $page_data['annotation_count'];
   $assembly_count = count(array_unique(array_column($annotations, 'assembly')));
 
   $content->get('pan_gene_count')->replace(number_format($pan_gene_count));
@@ -101,10 +163,8 @@
   /////
 
   $analysis_options = '';
-  $sth = make_query($DBConn, "
-    SELECT DISTINCT pan_gene_analysis FROM chado.pan_gene_search ORDER BY pan_gene_analysis");
-  while ($row = retrieve_row($sth)) {
-    $value = htmlspecialchars($row['pan_gene_analysis'], ENT_QUOTES, 'UTF-8');
+  foreach ($page_data['analysis_names'] as $name) {
+    $value = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
     $analysis_options .= '<option value="' . $value . '">' . $value . "</option>\n";
   }
   $content->get('analysis_options')->replace($analysis_options);
@@ -190,6 +250,26 @@
       . "</tr>\n";
   }
   $content->get('annotation_rows')->replace($annotation_rows);
+
+  /////
+  // References
+  //
+  // Rendered by include/references_lib.php from the curated bibliography, so
+  // these cards match every other hub.
+  /////
+
+  $content->get('reference_cards')->replace(mgdb_render_references($doc_root, array(
+    // How the pan-gene resources on this page were built and what they hold.
+    array('doi' => '10.1093/genetics/iyae036'),
+    // The 26 de novo assemblies the analysis is largely drawn from.
+    array('doi' => '10.1126/science.abg5289'),
+    // Why a genome database is organised around a pan-genome at all.
+    array('doi' => '10.1186/s12870-021-03173-5'),
+    // Reading variant effects across the pan-genome.
+    array('doi' => '10.1093/bioinformatics/btae073'),
+    // The database of record.
+    array('doi' => '10.1093/nar/gky1046'),
+  )));
 
   include_once('translation.php');
   $mgdb->get('blast_url')->replace($system['BLAST_URL']);

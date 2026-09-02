@@ -145,6 +145,20 @@ nothing else goes wrong visibly.
   the string it is handed plus a global stamp. Any payload whose *shape* is
   built in the controller needs `'<key>_' . (int) @filemtime(__FILE__)`, or a
   warm server keeps serving an entry that predates the new fields.
+- **Enumerate `[id]` and look for duplicates before trusting the tab bar.** A
+  section id and a form control shared a name on one hub, so
+  `querySelector('#x')` returned the control and the tab scrolled to the wrong
+  place. One line in the console finds it.
+- **`SELECT DISTINCT` over many columns is the slow way to collapse a wide
+  view.** When the extra columns are functionally dependent on one key, GROUP BY
+  that key and take `min()` of the rest — one hash instead of N per row, and 4-7x
+  faster on a 2.7M-row view. Verify the dependency with
+  `GROUP BY key HAVING COUNT(DISTINCT col) > 1` for every column, and check that
+  none mixes NULL with non-NULL, before relying on it.
+- **A join that no filter references may still be running.** Check whether it can
+  change the result set at all: if the joined table has exactly one row per key,
+  an INNER JOIN neither filters nor multiplies, and it can be added only when a
+  filter needs it.
 - **Check what a metric card counts, not just that it renders.** Three cards on
   one hub named one thing and counted another -- "Trait Categories" showing the
   number of phenotypes that have a trait, not the number of categories. Read the

@@ -1351,6 +1351,91 @@ normalises a DOI that arrives as a URL, and the file was added to
 `deploy/manifest.txt` — it had never been in it, so edits to it were not
 deployable.
 
+## The Pan-Gene Data Hub
+
+`/pan_gene_center/pan_gene` joined the shell on 2026-09-02. It was already the
+most capable search on the site — two modes, twelve advanced filters, a real
+size-distribution figure — and also the slowest: **4.5 to 4.8 seconds** for an
+advanced query.
+
+### One `GROUP BY` instead of one `DISTINCT`
+
+`chado.pan_gene_search` is a materialized view of **2,694,483 rows**: one per
+pan-gene per member gene model per protein per trait. The advanced search
+collapsed it with `SELECT DISTINCT` over the seven pan-gene-level columns —
+including `loci`, an array — so every query hashed seven values across 2.7M rows.
+
+Those seven columns are all constant within a `pan_gene_name`, so grouping on
+that one short varchar and taking `min()` of the rest is exactly equivalent and
+hashes one value instead of seven. **That is checked, not assumed:** no
+`pan_gene_name` in the view carries more than one distinct `pan_gene_analysis`,
+`pan_gene_count`, `exemplar_gene_model`, `assembly_count`, `max_annots` or
+`loci`, and none mixes NULL with non-NULL.
+
+### The join that could not matter
+
+The same query joined `chado.pan_gene_assemblies` unconditionally, but only two
+of the twelve filters — `appear` and `not_appear` — reference it. It could not
+change the result set either: that table holds exactly one row for each of the
+97,184 `pan_gene_name`s in the view, so the `INNER JOIN` neither filtered nor
+multiplied. It is added now only when a filter needs it.
+
+### And the count that ran the same query twice
+
+The endpoint counted first and paged second, so both passes built the same
+matched set. The probe pattern removes the count whenever a page comes back
+short — which is every identifier lookup, the common case here.
+
+| query | before | after |
+| --- | --- | --- |
+| `lg1` &#40;simple, 1 hit&#41; | 444 ms | **225 ms** |
+| `Zm00001eb067740` | 446 ms | **233 ms** |
+| `min=60&max=80` &#40;21,577&#41; | 4,500 ms | **1,013 ms** |
+| `locus=1` &#40;23,708&#41; | 4,587 ms | **1,092 ms** |
+| `min_annots=95` &#40;14,171&#41; | 4,797 ms | **1,395 ms** |
+| `min=1&max=1` &#40;5&#41; | — | **5 ms** |
+
+Verified equivalent across **16 filter combinations**, each on four sort orders
+and two pages — counts and the full result rows, old SQL against new, in one
+process. That includes both filters that use the join &#40;`appear` 29,378,
+`not_appear` 67,806, and the two combined 12,530&#41;.
+
+### The page itself ran everything live
+
+There was no `dashboardCache` at all: every request re-read the analysis
+metadata, the 66 annotation rows, the size distribution, and — to fill a
+dropdown with **one** option — a `DISTINCT` over all 2.7M rows, 131 ms to return
+a single value. The whole payload is cached now, keyed with the controller's
+mtime. **250 ms → 78 ms.**
+
+### A stamp that contradicted the page under it
+
+The hero read "Updated: January 2026" as a hard-coded literal, on a page
+describing an analysis named `Pan-Zea, Aug 2025` and executed `2025-08-18`. It
+is derived from the analysis date now, and reads August 2025.
+
+### Two elements shared an id
+
+The section the tab bar links to, `id="pan-gene-analysis"`, and the advanced
+form's analysis dropdown had **the same id**. `querySelector('#pan-gene-analysis')`
+returns the first in document order, so the "The analysis" tab scrolled to the
+select in the search form instead of the section. The select is
+`pan-gene-analysis-filter` now. Worth adding to the check list: enumerate
+`[id]` and look for duplicates, which is how this surfaced.
+
+### Also
+
+The count reported at the top of the page &#40;97,202, summed from the pipeline's
+own distribution table&#41; is 18 higher than the number of pan-genes the search can
+actually return &#40;97,184 in the searchable view&#41;. Both are defensible readings
+and the application cannot tell which is authoritative, so the number is
+unchanged and the discrepancy is recorded as AD-038.
+
+The bespoke green hero this page carried was dropped for the shared one, and a
+Related resources card pointing at `/pan_effect` was **not** added after
+checking: that route is dead, and `/pan_gene_center/pan_effect` merely re-renders
+the pan-gene search. It links `/genomebrowser` instead.
+
 ## The Phenotype Data Hub
 
 `/data_center/phenotype` joined the shell on 2026-09-02. **Its back end was

@@ -73,27 +73,65 @@ try {
         $params = $filters['params'];
         $counter = count($params);
         $criteria = $filters['criteria'];
-        $pickedSql = panGeneAdvancedPickedSql($filters['where']);
+        $pickedSql = panGeneAdvancedPickedSql($filters['where'],
+            !empty($filters['needs_assemblies']));
     }
 
-    // An exact total, so the reader knows how much they matched rather than
-    // only how much is on the page. It is a count over the matched set alone —
-    // none of the per-pan-gene protein and trait lists are built for it.
-    $countRow = retrieve_row(make_query($DBConn, panGeneCountSql($pickedSql), 1, $params));
-    $total = $countRow ? (int) $countRow['total'] : 0;
-    $pageCount = $total > 0 ? (int) ceil($total / $pageSize) : 0;
-    if ($pageCount > 0 && $page > $pageCount) {
-        $page = $pageCount;
+    /* The page runs first and asks for one row more than it needs. When fewer
+       come back than were asked for this is the last page, so the total is the
+       offset plus what was read and the COUNT is skipped -- and the COUNT here
+       costs as much as the page does, because both build the same matched set.
+       That is the whole cost of a one-hit identifier lookup, which is what
+       most searches on this page are.
+
+       A full page still needs the exact total: a reader filtering 23,708
+       pan-genes down should be told how many they matched, not just what fits
+       on one page. */
+    $rowParams = $params;
+    $rowParams['result_limit'] = $pageSize + 1;
+    $rowParams['result_offset'] = ($page - 1) * $pageSize;
+    $sth = make_query($DBConn,
+        panGeneResultSql($pickedSql, panGeneOrderBy($sort)), 1, $rowParams);
+    $rows = get_all_rows($sth);
+
+    $hasMore = count($rows) > $pageSize;
+    if ($hasMore) {
+        array_pop($rows);
+    }
+
+    $offset = ($page - 1) * $pageSize;
+
+    /* An empty page past page 1 says nothing about the total -- it only says
+       this offset is beyond the end, which is what a hand-edited `page=`
+       produces. Count, clamp to the last real page, and fetch that instead. */
+    if (!$hasMore && count($rows) === 0 && $page > 1) {
+        $countRow = retrieve_row(make_query($DBConn, panGeneCountSql($pickedSql), 1, $params));
+        $total = $countRow ? (int) $countRow['total'] : 0;
+        $countMode = 'counted';
+        $pageCount = $total > 0 ? (int) ceil($total / $pageSize) : 0;
+        if ($pageCount > 0) {
+            $page = $pageCount;
+            $rowParams['result_offset'] = ($page - 1) * $pageSize;
+            $sth = make_query($DBConn,
+                panGeneResultSql($pickedSql, panGeneOrderBy($sort)), 1, $rowParams);
+            $rows = get_all_rows($sth);
+            if (count($rows) > $pageSize) {
+                array_pop($rows);
+            }
+        }
+    } elseif (!$hasMore) {
+        $total = $offset + count($rows);
+        $countMode = 'derived';
+        $pageCount = $total > 0 ? (int) ceil($total / $pageSize) : 0;
+    } else {
+        $countRow = retrieve_row(make_query($DBConn, panGeneCountSql($pickedSql), 1, $params));
+        $total = $countRow ? (int) $countRow['total'] : 0;
+        $countMode = 'counted';
+        $pageCount = $total > 0 ? (int) ceil($total / $pageSize) : 0;
     }
 
     $results = array();
-    if ($total > 0) {
-        $rowParams = $params;
-        $rowParams['result_limit'] = $pageSize;
-        $rowParams['result_offset'] = ($page - 1) * $pageSize;
-        $sth = make_query($DBConn,
-            panGeneResultSql($pickedSql, panGeneOrderBy($sort)), 1, $rowParams);
-        $rows = get_all_rows($sth);
+    if (count($rows) > 0) {
 
         // Locus rationale is only fetched for the rows actually being shown.
         $allLoci = array();
@@ -136,7 +174,8 @@ try {
             'page' => $page,
             'page_size' => $pageSize,
             'page_count' => $pageCount,
-            'elapsed_ms' => (int) round((microtime(true) - $started) * 1000)
+            'elapsed_ms' => (int) round((microtime(true) - $started) * 1000),
+            'count' => $countMode
         ),
         'results' => $results
     );
