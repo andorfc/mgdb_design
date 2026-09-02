@@ -27,39 +27,94 @@
 
 .mgdb-modern .nomenclature-symbol-stack span:last-child { grid-column: 1 / -1; font-size: 0.72rem; }
 
-.mgdb-modern .nomenclature-jump-nav {
+/* ── Hero emblem and sticky section tabs ─────────────────────────────────── */
+
+.mgdb-nomenclature-page .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-nomenclature-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
   display: flex;
   flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-5);
+}
+
+.mgdb-nomenclature-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
   align-items: center;
-  gap: 0.35rem 0.55rem;
-  margin: 1rem 0 clamp(2.6rem, 5vw, 4.5rem);
-  padding: 0.75rem 0.9rem;
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-md);
-  background: var(--mgdb-surface);
-  box-shadow: var(--mgdb-shadow-xs);
-}
-
-.mgdb-modern .nomenclature-jump-nav > span {
-  margin-right: 0.25rem;
-  color: var(--mgdb-muted);
-  font-size: 0.76rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.mgdb-modern .nomenclature-jump-nav a {
-  padding: 0.42rem 0.65rem;
-  border-radius: 999px;
-  color: var(--mgdb-green-dark);
-  font-size: 0.83rem;
-  font-weight: 750;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
   text-decoration: none;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
 }
 
-.mgdb-modern .nomenclature-jump-nav a:hover,
-.mgdb-modern .nomenclature-jump-nav a:focus-visible { background: var(--mgdb-surface-sunken); color: var(--mgdb-burgundy); }
+.mgdb-nomenclature-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
+
+.mgdb-nomenclature-page .mgdb-section-tabs a.is-current,
+.mgdb-nomenclature-page .mgdb-section-tabs a[aria-current="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+/* Six labels, one of them long ("Assemblies and gene models"), so the bar wraps
+   to four rows and 201px at 375 -- a quarter of a phone screen, permanently
+   sticky. Below 767px it becomes one scrolling row instead, the pattern the
+   other long-barred pages use. Measured: one row (57px) down to somewhere in
+   901-950, two rows (105px) from there to 768. */
+@media (max-width: 767px) {
+  .mgdb-nomenclature-page .mgdb-section-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mgdb-nomenclature-page .mgdb-section-tabs a {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+}
+
+/* The shell steps to 113px below 1170, which is right once the bar wraps and
+   56px too much while it is still one row. Each band takes the larger of the
+   two heights it could straddle. */
+@media (max-width: 1170px) and (min-width: 951px) {
+  .mgdb-hub-page.mgdb-nomenclature-page > section[id] { scroll-margin-top: 65px; }
+  .mgdb-modern .nomenclature-standard-content a[name] { scroll-margin-top: 65px; }
+}
+
+@media (max-width: 950px) and (min-width: 768px) {
+  .mgdb-hub-page.mgdb-nomenclature-page > section[id] { scroll-margin-top: 113px; }
+  .mgdb-modern .nomenclature-standard-content a[name] { scroll-margin-top: 113px; }
+}
+
+@media (max-width: 767px) {
+  .mgdb-hub-page.mgdb-nomenclature-page > section[id] { scroll-margin-top: 65px; }
+  .mgdb-modern .nomenclature-standard-content a[name] { scroll-margin-top: 65px; }
+}
+
+.mgdb-nomenclature-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+.mgdb-nomenclature-page .nomenclature-section-lead {
+  max-width: 62rem;
+  margin: 0 0 1.1rem;
+  color: var(--mgdb-muted);
+}
+
 
 .mgdb-modern .nomenclature-convention-grid {
   display: grid;
@@ -101,7 +156,6 @@
 .mgdb-modern .nomenclature-route-section { margin-top: clamp(3.5rem, 7vw, 6rem); }
 .mgdb-modern .nomenclature-route-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
 .mgdb-modern .nomenclature-route-grid article { min-width: 0; padding: 1.25rem; border: 1px solid var(--mgdb-line); border-radius: var(--mgdb-radius-md); background: linear-gradient(145deg, var(--mgdb-surface), #fbfaf5); }
-.mgdb-modern .nomenclature-route-number { color: var(--mgdb-gold-dark); font-size: 0.75rem; font-weight: 850; letter-spacing: 0.12em; }
 .mgdb-modern .nomenclature-route-grid h3 { margin: 0.35rem 0 0.35rem; color: var(--mgdb-green-dark); font-size: 1.05rem; }
 .mgdb-modern .nomenclature-route-grid p { margin: 0; color: var(--mgdb-muted); font-size: 0.84rem; line-height: 1.5; }
 .mgdb-modern .nomenclature-route-grid article > div { display: flex; flex-wrap: wrap; gap: 0.35rem 0.65rem; margin-top: 0.9rem; }
@@ -218,7 +272,12 @@
 .mgdb-modern .nomenclature-standard-content h2 { margin: 1.7rem 0 0.75rem; color: var(--mgdb-green-dark); font-size: 1.35rem; }
 .mgdb-modern .nomenclature-standard-content hr { height: 1px; margin: 2rem 0; border: 0; background: var(--mgdb-line); }
 .mgdb-modern .nomenclature-standard-content a { color: var(--mgdb-burgundy); font-weight: 650; text-underline-offset: 0.14em; }
-.mgdb-modern .nomenclature-standard-content a[name] { scroll-margin-top: 1rem; }
+/* The 23 anchors inside the nested standard are what the whole page navigates
+   by, and they now have a sticky tab bar to clear. At the old 1rem they landed
+   41px behind it -- measured -- which was correct while the jump nav above was
+   an ordinary block and wrong the moment it became sticky. Same ladder as the
+   sections. */
+.mgdb-modern .nomenclature-standard-content a[name] { scroll-margin-top: 65px; }
 .mgdb-modern .nomenclature-standard-content a[name] + b,
 .mgdb-modern .nomenclature-standard-content a[name] + b > b {
   color: var(--mgdb-green-dark);
@@ -258,8 +317,6 @@
   .mgdb-modern .nomenclature-convention-grid,
   .mgdb-modern .nomenclature-route-grid,
   .mgdb-modern .nomenclature-standard-content ul.listmenu { grid-template-columns: 1fr; }
-  .mgdb-modern .nomenclature-jump-nav { align-items: stretch; flex-direction: column; }
-  .mgdb-modern .nomenclature-jump-nav a { padding-left: 0; }
   .mgdb-modern .nomenclature-assembly-actions { align-items: flex-start; flex-direction: column; }
   .mgdb-modern .nomenclature-help-actions { width: 100%; }
   .mgdb-modern .nomenclature-help-actions .mgdb-button { width: 100%; }

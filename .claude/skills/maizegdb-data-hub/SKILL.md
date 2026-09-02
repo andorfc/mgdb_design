@@ -315,6 +315,19 @@ nothing else goes wrong visibly.
   itself (autofill, bfcache), so the form can show a filter the query omits.
 - **Section top-edge colours start at `nth-of-type(2)`** because the hero is the
   first `<section>`. Check the hero really is first before trusting the order.
+- **A page that still looks wrong may be loading two chromes.** `redirect.php`
+  loads `templates/maizegdb-main.bau` -- the *legacy* main -- before it looks
+  for a controller, and that template registers `index.css`,
+  `background_static.css`, `ie6.css`, the shadowbox stylesheet, `ngl.js` and
+  friends on the Bauplan object. A modern controller reached through that
+  fallback renders on top of all of it. Compare the page's stylesheet list
+  against a converted one; if `index.css` or `ie6.css` is there, it needs a
+  top-level `controllers/<page>.php`, whatever its own controller does.
+- **Making a nav sticky changes the offset every anchor on the page needs**,
+  including anchors inside content the page nests but does not own. One page
+  had 23 `<a name>` anchors in a nested standard at `scroll-margin-top: 1rem`,
+  correct until the nav above them became sticky and then 41px short. Give them
+  the same measured ladder as the sections.
 - **`--mgdb-dur-fast` is defined nowhere.** Using it invalidates the whole
   `transition` declaration.
 - **Bauplan escaping**: every literal `)` must be `&#41;` or `\)`, `;;` starts a

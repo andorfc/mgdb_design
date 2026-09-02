@@ -3865,6 +3865,78 @@ by eye:
   quick links 1,466px down — and still keeps the foot of the page compact now
   that it sits last.
 
+## The nomenclature standard
+
+`/nomenclature` — not a data hub, but brought onto the same shell so it looks
+like the rest of the site. Tabs: Conventions, Guidance, Assemblies and gene
+models, Before naming, The standard, Related resources. Files:
+`controllers/nomenclature.php` (new), `controllers/community/nomenclature.php`,
+`templates/community/mgdb_nomenclature.bau`, `css/mgdb-nomenclature.css`.
+
+### Why it did not match: it was loading two chromes at once
+
+The page was already written against the modern design system, and still did
+not look like the site. The reason is routing. `/nomenclature` had no
+top-level controller, so `controller.php` fell through to `redirect.php` —
+**and `redirect.php` loads `templates/maizegdb-main.bau`, the legacy main, before
+it goes looking for a controller.** That template's `include-css` block
+registers five stylesheets on the Bauplan object:
+
+    /css/index.css   /css/background_static.css   /css/megamenu.css
+    /ie/ie6.css      /tools/shadowbox/…/shadowbox.css
+
+plus `search.js`, `search_engine.js`, jQuery UI, **`ngl.js`** — the 3D structure
+viewer, on a page of text — and `shadowbox.js`. The modern controller then
+rendered on top of all of it, so the page carried both design systems at once.
+
+`controllers/nomenclature.php` takes the route before that fallback runs, which
+is the same fix `/cite` and `/uniformmu` needed. Its stylesheet list is now
+identical to a converted hub's, minus nothing and plus only
+`/css/nomenclature.css`, which belongs to the curator-maintained standard the
+page nests. 112 KB, 68 ms.
+
+**Worth checking on any page that still looks wrong:** compare its stylesheet
+list against a converted page. If it carries `index.css` or `ie6.css`, it is
+going through `redirect.php` and needs a top-level controller, whatever its own
+controller does.
+
+### What the shell changed
+
+Seven eyebrows, the hero tagline and its two buttons, and the `01`–`04`
+numerals on the guidance tiles are gone. The bespoke `.nomenclature-jump-nav`
+became the shared sticky tab bar, every section got an id and a heading that
+matches its tab, and Related resources was added.
+
+No Metrics and no References. There is nothing here to count, and a metric
+card with no query behind it is the mistake two archive hubs had already made;
+the standard's provenance is a sentence under its own heading, where it
+belongs.
+
+### Making the nav sticky broke the page's own navigation
+
+The complete standard is nested unchanged from the curator's template, and it
+carries **23 `<a name>` anchors** — the index at the top of the standard, and
+every "Read section 12" link on the modern page above it, jump to them. They
+had `scroll-margin-top: 1rem`, which was right while the jump nav was an
+ordinary block and wrong the moment it became a sticky bar: measured, every one
+of them landed **41px behind the bar**. They take the same measured ladder as
+the sections now, and clear by 8px.
+
+That is the general trap: making a nav sticky changes the offset every anchor
+on the page needs, including anchors in content the page does not own.
+
+### Verified
+
+7/7 distinct section edge colours, no rule under a section title, no duplicate
+`id`, all six nav labels matching their `<h2>`, five related links, no
+horizontal overflow at 375. Six labels — one of them "Assemblies and gene
+models" — wrap to four rows and 201px at 375, so below 767px the bar becomes
+one scrolling row; the measured ladder is 65px above 950, 113px from 950 to
+768, and 65px below. Sections and nested anchors both clear by exactly 8px at
+1280, 880 and 375. `/community/nomenclature` still serves the page through the
+community controller; every navigation surface on the site links to
+`/nomenclature`.
+
 ## The site map
 
 `/sitemap` is the complete directory: every page, tool, data hub, and resource

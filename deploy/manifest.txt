@@ -404,6 +404,10 @@ src/js/mgdb-ssr.js                                     js/mgdb-ssr.js
 # templates/community/nomenclature.bau is deliberately NOT listed: it is the
 # curator-maintained standard itself, the modern page nests it unchanged, and
 # the repository must not own it.
+# /nomenclature needs a top-level controller or controller.php falls through to
+# redirect.php, which loads the legacy main template and its whole stylesheet
+# and script block on top of the modern page.
+src/controllers/nomenclature.php                       controllers/nomenclature.php
 src/controllers/community/nomenclature.php             controllers/community/nomenclature.php
 src/templates/community/mgdb_nomenclature.bau          templates/community/mgdb_nomenclature.bau
 src/css/mgdb-nomenclature.css                          css/mgdb-nomenclature.css

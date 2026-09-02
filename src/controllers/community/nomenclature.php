@@ -16,6 +16,13 @@ $bauplan->preHTML('<meta http-equiv="Content-Type" content="text/html; charset=u
 $bauplan->includeCss('/css/static.css');
 $bauplan->includeCss('/css/mgdb-modern.css');
 $bauplan->includeCss('/css/mgdb-megamenu.css');
+/* The shared Data Hub shell. This page is not a data hub, but the shell is
+   where the site's page furniture lives -- the pale ground, the white section
+   cards and their coloured top edges, the absence of a rule under a section
+   title, and the green Related resources panel -- so it is what "matching the
+   rest of the site" means. Loaded before the page's own sheet, which is the
+   order css/mgdb-hub.css documents; `mgdb-hub-page` on <main> opts in. */
+$bauplan->includeCss('/css/mgdb-hub.css?v=' . filemtime($system['root_dir'] . '/css/mgdb-hub.css'));
 $bauplan->includeCss('/css/mgdb-nomenclature.css?v=' . filemtime($system['root_dir'] . '/css/mgdb-nomenclature.css'));
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
