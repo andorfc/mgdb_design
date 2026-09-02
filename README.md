@@ -1351,6 +1351,67 @@ normalises a DOI that arrives as a URL, and the file was added to
 `deploy/manifest.txt` — it had never been in it, so edits to it were not
 deployable.
 
+## The Cytogenetics Data Hub
+
+`/data_center/cytogenetic` joined the shell on 2026-09-02. It is the one hub
+with **no corpus and no search endpoint of its own**: cytogenetic material lives
+in the map, locus, stock and image hubs, and this page is the route into them.
+So there is no search bar here, and no invented one — what the page has instead
+are expander cards that pull locus and stock records inline, and those are kept.
+
+### The metrics were counting cards on the page
+
+They read **10 / 3 / 9 / 3** under "Chromosome maps", "Landmark classes",
+"Stock collections" and "Karyotype sets". Only the 10 was a measurement: the 3
+and the 9 were *the number of expander cards further down this page*, and the
+second 3 the number of karyotype cards. They would have gone stale the moment
+someone added a card, and none of them counted any data.
+
+All four are counted now, and they are the same four ideas properly sourced:
+
+| card | was | is | from |
+| --- | --- | --- | --- |
+| Cytogenetic Maps | 10 | **20** | cytological, FISH and B chromosome maps |
+| Landmark Loci | 3 | **183** | centromere, telomere, cytological structure, chromosomal segment |
+| Cytogenetic Stocks | 9 | **4,109** | stocks of the ten structural-variant types |
+| Variant Types | 3 | **10** | how many such types there are |
+
+The figure — stocks by variant type — reuses the same `GROUP BY` the stock
+metric needed, so it costs no query of its own.
+
+### Three dead links and a page that renders nothing
+
+- **`/data_center/RNmaps`** returns HTTP 200 and renders an *empty page*: just
+  a title, no content. It is the destination of the "View RN maps" link. There
+  are also no recombination-nodule maps in `mgdb.map` at all, so there was
+  nothing to point it at — the card now describes what RN data is and links the
+  Morgan2McClintock Translator, which is the tool built on it.
+- **The UMN oat–maize addition lines page** 404s while the site root is fine.
+  The "Related historical resource" line pointing at it is gone.
+- **The FISH card linked 1 of the 7 FISH maps.** `FSU Cytogenetic FISH` exists
+  for chromosomes 1, 3, 4, 5, 6, 8 and 9; the card offered only chromosome 9.
+  All seven are listed now.
+
+One more the map metric turned up: the third B chromosome map is recorded as
+`B RAPDs TBs 1997`, which the obvious `LIKE 'b chromosome %'` misses. The page
+links it, so the count includes it — 19 became 20.
+
+### Eight tabs need a third scroll-offset step
+
+Every other hub has six or seven tabs and a two-step `scroll-margin-top` ladder:
+57px on one row, 105px on two. Eight tabs wrap to **three** rows on a 375px
+screen — a 153px bar — and the two-step ladder landed every section **29 to 40px
+behind it**. There is a third step now, and the breakpoints are chosen from the
+measured bar heights rather than guessed.
+
+### Also
+
+`https://m2m.dill-picl.org` does not resolve from the development server, so
+the Morgan2McClintock link could not be verified either way. It is left where it
+already was, and is deliberately *not* promoted into Related resources — an
+unverifiable link should not be featured. The three large historical documents
+now say how large they are: 8&nbsp;MB, 40&nbsp;MB, and a 57&nbsp;MB slide deck.
+
 ## The Reference Data Hub, where Metrics are query-driven
 
 `/data_center/reference` joined the shell on 2026-09-02. Its back end needed

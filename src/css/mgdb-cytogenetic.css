@@ -1,15 +1,103 @@
-/* Cytogenetics resource hub — shared MaizeGDB modern design system. */
+/* ==========================================================================
+   Cytogenetics Data Hub — /data_center/cytogenetic
+   --------------------------------------------------------------------------
+   Loaded after css/mgdb-modern.css and css/mgdb-hub.css. The hub shell settles
+   the pale blue ground, the white section cards and their coloured top edges,
+   the absence of a rule under a section title, the metric colours, the gold
+   edge a grid tile takes on hover, the green Related resources panel, and the
+   scroll offset.
 
-.mgdb-modern .mgdb-cytogenetic-page {
-  padding-bottom: clamp(3rem, 6vw, 5.5rem);
+   This hub has no search of its own -- cytogenetic material lives in the map,
+   locus, stock and image hubs and this page is the route into them -- so what
+   is here is the chromosome grid, the landmark and stock expanders, the
+   karyotype cards, the historical resource list, and the figure.
+   ========================================================================== */
+
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
+
+.mgdb-cytogenetic-page .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
 }
 
-.mgdb-modern .cyt-hero-mark {
+.mgdb-cytogenetic-page .cyt-hero-mark {
   display: block;
-  width: 7.2rem;
-  height: 6.4rem;
-  margin: 0 auto 0.65rem;
+  width: min(100%, 84px);
+  height: auto;
 }
+
+/* ── Sticky section tabs ─────────────────────────────────────────────────── */
+
+.mgdb-cytogenetic-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-5);
+}
+
+.mgdb-cytogenetic-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.mgdb-cytogenetic-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
+
+.mgdb-cytogenetic-page .mgdb-section-tabs a.is-current,
+.mgdb-cytogenetic-page .mgdb-section-tabs a[aria-current="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+/* Eight tabs is the most of any hub, so the offset the scrollspy reads back
+   from here has its own breakpoints -- and one more of them than the other
+   hubs need. Measured: the bar is 57px on one row, 105px on two, and 153px on
+   three, which is what a 375px screen gets. The six- and seven-tab hubs never
+   reach three rows, so their two-step ladder lands sections 29-40px behind the
+   bar here. */
+@media (max-width: 1290px) and (min-width: 981px) {
+  .mgdb-hub-page.mgdb-cytogenetic-page > section[id] { scroll-margin-top: 65px; }
+}
+
+@media (max-width: 980px) and (min-width: 621px) {
+  .mgdb-hub-page.mgdb-cytogenetic-page > section[id] { scroll-margin-top: 113px; }
+}
+
+@media (max-width: 620px) {
+  .mgdb-hub-page.mgdb-cytogenetic-page > section[id] { scroll-margin-top: 161px; }
+}
+
+.mgdb-cytogenetic-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+/* ── Stocks by variant type figure ───────────────────────────────────────── */
+
+.mgdb-cytogenetic-page .cyt-figure { margin-top: var(--mgdb-space-5); }
+
+.mgdb-cytogenetic-page .cyt-figure .mgdb-chart {
+  height: auto;
+  min-height: 320px;
+  /* The value labels sit outside their bars (cliponaxis:false), so the box
+     must not clip them. */
+  overflow: visible;
+}
+
+.mgdb-cytogenetic-page .cyt-figure-table { margin-top: var(--mgdb-space-4); }
+
 
 .mgdb-modern .cyt-chromosome-grid {
   display: grid;

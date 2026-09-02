@@ -145,6 +145,14 @@ nothing else goes wrong visibly.
   the string it is handed plus a global stamp. Any payload whose *shape* is
   built in the controller needs `'<key>_' . (int) @filemtime(__FILE__)`, or a
   warm server keeps serving an entry that predates the new fields.
+- **The `scroll-margin-top` ladder is per tab-count, not universal.** Six or
+  seven tabs wrap to at most two rows; eight wrap to three on a 375px screen
+  (a 153px bar), and the usual two-step ladder lands every section 29-40px
+  *behind* it. Measure the bar at 1280, ~900 and 375 and add a step per row.
+- **A hub with no corpus of its own does not get an invented search bar.** Some
+  hubs are routes into other hubs. Keep whatever record-retrieval it does have
+  (inline expanders, curated links), and say plainly that there is no search
+  rather than adding a box that duplicates another hub or does nothing.
 - **If a hub's Metrics follow the search, say so three ways.** The shell's
   Metrics are static corpus figures on every other hub, so a section that
   silently recomputes per query reads as if it never changed: add a standing

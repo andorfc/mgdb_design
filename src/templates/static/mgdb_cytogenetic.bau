@@ -1,11 +1,11 @@
 $$SYNTAX-LEVEL 2
 *(mgdb-cytogenetic
-<main class="mgdb-page mgdb-cytogenetic-page" id="cytogenetic-main">
+<main class="mgdb-page mgdb-hub-page mgdb-cytogenetic-page" id="cytogenetic-main">
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
-    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Cytogenetics</span>
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Cytogenetics</span>
   </nav>
 
-  <section class="mgdb-hero cyt-hero" aria-labelledby="cyt-title">
+  <section class="mgdb-hero" aria-labelledby="cyt-title">
     <div class="mgdb-hero-emblem">
       <svg class="cyt-hero-mark" viewBox="0 0 132 118" role="img" aria-label="Ten stylized maize chromosomes">
         <g fill="#501719">
@@ -18,38 +18,28 @@ $$SYNTAX-LEVEL 2
           <circle cx="15" cy="59" r="5" /><circle cx="38" cy="59" r="5" /><circle cx="61" cy="59" r="5" /><circle cx="84" cy="59" r="5" /><circle cx="107" cy="59" r="5" />
         </g>
       </svg>
-      <strong>Maize<br />Cytogenetics</strong>
-      <span>Chromosomes in context</span>
+      <strong>Cytogenetics<br />Data Hub</strong>
     </div>
     <div class="mgdb-hero-body">
-      <span class="mgdb-eyebrow">MaizeGDB resource collection</span>
       <h1 id="cyt-title">Explore chromosomes at cytological scale.</h1>
-      <p class="mgdb-hero-tagline">Move from chromosome structure to maps, loci, stocks, and karyotype imagery.</p>
       <p class="mgdb-hero-description">This hub brings together classic maize cytogenetics with searchable MaizeGDB records, connecting visible chromosome features to genetic maps and research materials.</p>
-      <div class="mgdb-hero-actions">
-        <a class="mgdb-button mgdb-button-primary" href="#chromosome-maps">Browse chromosome maps</a>
-        <a class="mgdb-button mgdb-button-secondary" href="#cytogenetic-stocks">Explore cytogenetic stocks</a>
-      </div>
     </div>
   </section>
 
-  <section aria-labelledby="cyt-overview-title">
-    <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Collection at a glance</span><h2 id="cyt-overview-title">Cytogenetics across MaizeGDB</h2></div>
-      <p>Start with a chromosome map, inspect landmark loci, or find stocks carrying useful chromosome variants.</p>
-    </div>
-    <div class="mgdb-metric-grid">
-      <article class="mgdb-metric"><span class="mgdb-metric-icon" aria-hidden="true">10</span><div><strong class="mgdb-metric-value">10</strong><h3>Chromosome maps</h3><p>Cytological maps for every maize chromosome.</p></div></article>
-      <article class="mgdb-metric mgdb-tone-green"><span class="mgdb-metric-icon" aria-hidden="true">&#9673;</span><div><strong class="mgdb-metric-value">3</strong><h3>Landmark classes</h3><p>Knobs, centromeres, and telomeres linked to locus records.</p></div></article>
-      <article class="mgdb-metric mgdb-tone-red"><span class="mgdb-metric-icon" aria-hidden="true">&#8644;</span><div><strong class="mgdb-metric-value">9</strong><h3>Stock collections</h3><p>Structural variants and addition-line materials.</p></div></article>
-      <article class="mgdb-metric mgdb-tone-burgundy"><span class="mgdb-metric-icon" aria-hidden="true">&#9681;</span><div><strong class="mgdb-metric-value">3</strong><h3>Karyotype sets</h3><p>FISH images and chromosome-variant views.</p></div></article>
-    </div>
-  </section>
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#chromosome-maps" class="is-current" aria-current="true">Maps</a>
+    <a href="#landmark-loci">Landmarks</a>
+    <a href="#karyotype-images">Karyotypes</a>
+    <a href="#cytogenetic-stocks">Stocks</a>
+    <a href="#cytogenetics-resources">Historical</a>
+    <a href="#cyt-references">References</a>
+    <a href="#cyt-metrics">Metrics</a>
+    <a href="#cyt-related">Related resources</a>
+  </nav>
 
   <section id="chromosome-maps" aria-labelledby="chromosome-maps-title">
     <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Chromosomes 1–10</span><h2 id="chromosome-maps-title">Cytological chromosome maps</h2></div>
-      <p>Open a chromosome map or compare it directly with the corresponding Genetic 2005 map.</p>
+      <div><h2 id="chromosome-maps-title">Maps</h2></div>
     </div>
     <div class="cyt-chromosome-grid" aria-label="Maize chromosome maps">
       <article class="cyt-chromosome-card"><span>Chromosome</span><strong>1</strong><div><a href="/data_center/map?id=40028">View map</a><a href="/compare_maps?map1=40028&map2=940880">Compare</a></div></article>
@@ -65,16 +55,15 @@ $$SYNTAX-LEVEL 2
     </div>
 
     <div class="mgdb-card-grid cyt-map-tool-grid">
-      <article class="mgdb-card"><span class="mgdb-pill mgdb-pill-info">FISH</span><h3>FSU Cytogenetic FISH map</h3><p>Explore the chromosome 9 fluorescence in situ hybridization map.</p><a href="/data_center/map?id=892372">Open chromosome 9 <span aria-hidden="true">&rarr;</span></a></article>
-      <article class="mgdb-card"><span class="mgdb-pill mgdb-pill-ok">Recombination</span><h3>Recombination nodule maps</h3><p>Browse recombination nodule maps across chromosomes 1–10.</p><a href="/data_center/RNmaps">View RN maps <span aria-hidden="true">&rarr;</span></a><a class="cyt-card-secondary" href="https\://m2m.dill-picl.org/v3/">Morgan2McClintock Translator <span aria-hidden="true">&nearr;</span></a></article>
+      <article class="mgdb-card"><span class="mgdb-pill mgdb-pill-info">FISH</span><h3>FSU Cytogenetic FISH maps</h3><p>Fluorescence in situ hybridization maps for seven maize chromosomes.</p><div class="cyt-inline-links"><a href="/data_center/map?id=2772804">1</a><a href="/data_center/map?id=2772806">3</a><a href="/data_center/map?id=2772807">4</a><a href="/data_center/map?id=2772808">5</a><a href="/data_center/map?id=2772809">6</a><a href="/data_center/map?id=2772810">8</a><a href="/data_center/map?id=892372">9</a></div></article>
+      <article class="mgdb-card"><span class="mgdb-pill mgdb-pill-ok">Recombination</span><h3>Recombination nodule maps</h3><p>Recombination nodule data relates genetic distance to physical chromosome position. MaizeGDB holds no RN map records; the Morgan2McClintock Translator is the tool built on them.</p><a href="https://m2m.dill-picl.org/v3/" target="_blank" rel="noopener">Morgan2McClintock Translator <span aria-hidden="true">&nearr;</span></a></article>
       <article class="mgdb-card"><span class="mgdb-pill mgdb-pill-warn">B chromosome</span><h3>B chromosome maps</h3><p>Compare fraction, segment, and RAPD views of the supernumerary B chromosome.</p><div class="cyt-inline-links"><a href="/data_center/map?id=886059">Fractions</a><a href="/data_center/map?id=870727">Segments</a><a href="/data_center/map?id=870728">RAPDs</a></div></article>
     </div>
   </section>
 
   <section id="landmark-loci" aria-labelledby="landmark-loci-title">
     <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Search MaizeGDB loci</span><h2 id="landmark-loci-title">Knobs and chromosome landmarks</h2></div>
-      <p>Expand a landmark class to retrieve its matching MaizeGDB locus records without leaving this page.</p>
+      <div><h2 id="landmark-loci-title">Landmarks</h2></div>
     </div>
     <div class="cyt-query-list">
       <article class="cyt-query-card" id="knobs">
@@ -94,8 +83,7 @@ $$SYNTAX-LEVEL 2
 
   <section id="karyotype-images" aria-labelledby="karyotype-images-title">
     <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Chromosome imagery</span><h2 id="karyotype-images-title">Karyotypes and FISH collections</h2></div>
-      <p>Use chromosome-scale images to compare inbred lines and inspect a well-known chromosome 10 variant.</p>
+      <div><h2 id="karyotype-images-title">Karyotypes</h2></div>
     </div>
     <div class="mgdb-card-grid cyt-image-grid">
       <a class="cyt-image-card cyt-image-b73" href="/B73Mo17FISH"><span class="mgdb-pill">Two inbreds</span><h3>B73 and Mo17</h3><p>Side-by-side FISH karyotypes for two foundational maize inbreds.</p><strong>Open image collection <span aria-hidden="true">&rarr;</span></strong></a>
@@ -106,8 +94,7 @@ $$SYNTAX-LEVEL 2
 
   <section id="cytogenetic-stocks" aria-labelledby="cytogenetic-stocks-title">
     <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Search MaizeGDB stocks</span><h2 id="cytogenetic-stocks-title">Cytogenetic stock collections</h2></div>
-      <p>Expand a collection to retrieve stocks annotated with the corresponding chromosome type or genetic variant.</p>
+      <div><h2 id="cytogenetic-stocks-title">Stocks</h2></div>
     </div>
     <div class="cyt-stock-grid">
       <article class="cyt-query-card"><button class="cyt-query-toggle" type="button" data-cyt-mode="stock" data-cyt-indicator="k10i_open" data-cyt-target="k10i_results" data-cyt-term="k10i" aria-expanded="false" aria-controls="k10i_results"><span><strong>Abnormal Chromosome 10</strong><small>Stocks carrying K10-I</small></span><span class="cyt-toggle-mark" id="k10i_open" aria-hidden="true">+</span></button><div id="k10i_results" class="cyt-query-results" aria-live="polite"></div></article>
@@ -120,30 +107,147 @@ $$SYNTAX-LEVEL 2
       <article class="cyt-query-card"><button class="cyt-query-toggle" type="button" data-cyt-mode="stock" data-cyt-indicator="Reciprocal_Translocations_open" data-cyt-target="Reciprocal_Translocations_results" data-cyt-term="Reciprocal_Translocations" aria-expanded="false" aria-controls="Reciprocal_Translocations_results"><span><strong>Reciprocal translocations</strong><small>Exchange between nonhomologous chromosomes</small></span><span class="cyt-toggle-mark" id="Reciprocal_Translocations_open" aria-hidden="true">+</span></button><div id="Reciprocal_Translocations_results" class="cyt-query-results" aria-live="polite"></div></article>
       <article class="cyt-query-card"><button class="cyt-query-toggle" type="button" data-cyt-mode="stock" data-cyt-indicator="Trisomics_open" data-cyt-target="Trisomics_results" data-cyt-term="Trisomics" aria-expanded="false" aria-controls="Trisomics_results"><span><strong>Trisomics</strong><small>Stocks with an additional chromosome copy</small></span><span class="cyt-toggle-mark" id="Trisomics_open" aria-hidden="true">+</span></button><div id="Trisomics_results" class="cyt-query-results" aria-live="polite"></div></article>
     </div>
-    <p class="cyt-legacy-note">Related historical resource: <a href="http\://agronomy.cfans.umn.edu/Research/ProjectsListedAlphabetically/MaizeGenomics/Oat-MaizeAdditionLines/index.htm">University of Minnesota oat–maize addition lines project <span aria-hidden="true">&nearr;</span></a></p>
   </section>
 
   <section class="cyt-resource-layout" id="cytogenetics-resources" aria-labelledby="cytogenetics-resources-title">
     <div>
       <div class="mgdb-section-heading">
-        <div><span class="mgdb-eyebrow">Books, teaching, and reference works</span><h2 id="cytogenetics-resources-title">Historical cytogenetics resources</h2></div>
-        <p>Foundational maize cytology texts and educational materials preserved for research and teaching.</p>
+        <div><h2 id="cytogenetics-resources-title">Historical</h2></div>
       </div>
       <div class="cyt-resource-list">
-        <a href="https\://documents.maizegdb.org/ancillary/Kato_1975_Cytological_Studies_of_Maize.pdf"><span class="cyt-resource-year">1975</span><span><strong>Cytological Studies of Maize</strong><small>Doctoral dissertation by Takeo Angel Kato Yamakake; shared with the author's permission.</small></span><b>PDF</b></a>
+        <a href="https\://documents.maizegdb.org/ancillary/Kato_1975_Cytological_Studies_of_Maize.pdf"><span class="cyt-resource-year">1975</span><span><strong>Cytological Studies of Maize</strong><small>Doctoral dissertation by Takeo Angel Kato Yamakake; shared with the author's permission. 8&nbsp;MB.</small></span><b>PDF</b></a>
         <a href="https\://documents.maizegdb.org/ancillary/burnham/"><span class="cyt-resource-year">1980</span><span><strong>Discussions in Cytogenetics</strong><small>C. R. Burnham, sixth printing.</small></span><b>Read</b></a>
-        <a href="https\://documents.maizegdb.org/meiosis/AP_HS_NSF_Meiosis.pptx"><span class="cyt-resource-year">2013</span><span><strong>Meiosis in Maize</strong><small>David Weber AP High School Class teaching presentation.</small></span><b>PPTX</b></a>
+        <a href="https\://documents.maizegdb.org/meiosis/AP_HS_NSF_Meiosis.pptx"><span class="cyt-resource-year">2013</span><span><strong>Meiosis in Maize</strong><small>David Weber AP High School Class teaching presentation. 57&nbsp;MB.</small></span><b>PPTX</b></a>
         <a href="https\://documents.maizegdb.org/ancillary/zmdnaamt.php"><span class="cyt-resource-year">1995</span><span><strong>Nuclear and Chromosomal DNA Amounts</strong><small>Reference by Michael D. Bennett.</small></span><b>Read</b></a>
-        <a href="https\://documents.maizegdb.org/ancillary/Longley61.pdf"><span class="cyt-resource-year">1961</span><span><strong>Translocations and Inversions</strong><small>Classic reference by A. E. Longley.</small></span><b>PDF</b></a>
+        <a href="https\://documents.maizegdb.org/ancillary/Longley61.pdf"><span class="cyt-resource-year">1961</span><span><strong>Translocations and Inversions</strong><small>Classic reference by A. E. Longley. 40&nbsp;MB.</small></span><b>PDF</b></a>
       </div>
       <a class="mgdb-button mgdb-button-quiet cyt-meiosis-link" href="$(img_url)/meiosis/">Browse the meiosis image list</a>
     </div>
     <aside class="mgdb-aside-card cyt-about-card">
-      <span class="mgdb-eyebrow">New to the field?</span>
+      
       <h3>Cytogenetics connects what we can see with what we can map.</h3>
       <p>Chromosome shape, banding, knobs, centromeres, and structural changes provide a visible framework for understanding inheritance and genome organization.</p>
       <a class="mgdb-button mgdb-button-secondary" href="https\://en.wikipedia.org/wiki/Cytogenetics">Introduction to cytogenetics <span aria-hidden="true">&nearr;</span></a>
     </aside>
   </section>
+
+  <section id="cyt-references" aria-labelledby="cyt-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="cyt-references-title">References</h2></div>
+    </div>
+
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
+  <section id="cyt-metrics" aria-labelledby="cyt-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="cyt-metrics-title">Metrics</h2></div>
+    </div>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric mgdb-tone-green">
+        <div class="mgdb-metric-top">
+          <h3>Cytogenetic Maps</h3>
+          <span class="mgdb-metric-badge">Maps</span>
+        </div>
+        <div class="mgdb-metric-stat"><strong class="mgdb-metric-value">$(metric_maps)</strong></div>
+        <p class="mgdb-metric-description">Cytological, FISH, and B chromosome maps held as map records.</p>
+      </article>
+
+      <article class="mgdb-metric mgdb-tone-amber">
+        <div class="mgdb-metric-top">
+          <h3>Landmark Loci</h3>
+          <span class="mgdb-metric-badge">Loci</span>
+        </div>
+        <div class="mgdb-metric-stat"><strong class="mgdb-metric-value">$(metric_landmarks)</strong></div>
+        <p class="mgdb-metric-description">Centromere, telomere, cytological structure, and chromosomal segment records.</p>
+      </article>
+
+      <article class="mgdb-metric mgdb-tone-blue">
+        <div class="mgdb-metric-top">
+          <h3>Cytogenetic Stocks</h3>
+          <span class="mgdb-metric-badge">Germplasm</span>
+        </div>
+        <div class="mgdb-metric-stat"><strong class="mgdb-metric-value">$(metric_stocks)</strong></div>
+        <p class="mgdb-metric-description">Seed stocks carrying a structural chromosome variant.</p>
+      </article>
+
+      <article class="mgdb-metric mgdb-tone-burgundy">
+        <div class="mgdb-metric-top">
+          <h3>Variant Types</h3>
+          <span class="mgdb-metric-badge">Classes</span>
+        </div>
+        <div class="mgdb-metric-stat"><strong class="mgdb-metric-value">$(metric_stock_types)</strong></div>
+        <p class="mgdb-metric-description">Translocations, inversions, B chromosomes, ploidy changes, and additions.</p>
+      </article>
+    </div>
+
+    <figure class="mgdb-figure cyt-figure">
+      <h3>Cytogenetic stocks by variant type</h3>
+      <div class="mgdb-chart" id="cyt-stock-chart" role="img"
+           aria-label="Horizontal bar chart of how many maize seed stocks carry each type of structural chromosome variant">
+        <div class="mgdb-chart-fallback">Loading the variant type breakdown&hellip;</div>
+      </div>
+      <figcaption>Every cytogenetic stock counts once, under the variant type it is curated as. Ordering these stocks is done through the Stock Data Hub.</figcaption>
+    </figure>
+
+    <div class="mgdb-table-scroll cyt-figure-table">
+      <table class="mgdb-table" id="cyt-stock-table">
+        <caption>
+          Cytogenetic stocks by variant type
+          <span class="mgdb-muted">The values behind the chart above.</span>
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Variant type</th>
+            <th scope="col" class="mgdb-numeric">Stocks</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="cyt-related" class="mgdb-hub-related" aria-labelledby="cyt-related-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="cyt-related-title">Related resources</h2>
+      </div>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/map">
+          <strong>Map Data Hub</strong>
+          <span>Every cytological, FISH, and B chromosome map, alongside the genetic and physical maps</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/stock">
+          <strong>Stock Data Hub</strong>
+          <span>Order the translocation, inversion, and B chromosome stocks listed here</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Locus Data Hub</strong>
+          <span>Centromere, telomere, and chromosomal segment records in their wider context</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/image">
+          <strong>Image Data Hub</strong>
+          <span>Karyotype and FISH photographs alongside the rest of the visual archive</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="https://documents.maizegdb.org/ancillary/burnham/" target="_blank" rel="noopener">
+          <strong>Discussions in Cytogenetics</strong>
+          <span>C. R. Burnham's classic text on maize chromosome structure and behaviour</span>
+          <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <script type="application/json" id="cyt-chart-data">$(chart_data)</script>
 </main>
 )
