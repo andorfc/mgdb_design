@@ -126,6 +126,24 @@ function stockSimpleTextSql($term, $caseSensitive, &$params, &$counter) {
     $p2 = stockParam($params, $counter, $literal, 'a');
     $p3 = stockParam($params, $counter, $literal, 'a');
 
+    /* The three text tables are shared by every entity type in the database,
+       but only stocks can survive the join further down, so the two big ones
+       are restricted to stock ids here rather than after the fact.
+       mgdb.synonyms is 2.8M rows of which 698k -- 24.8% -- belong to a stock,
+       and mgdb.ext_db_key is 2.3M rows of which 17,822 do: 0.8%. Pushing the
+       restriction into the scan stops millions of rows that cannot match from
+       being materialized into `texts` and grouped in `hits`.
+
+       mgdb.description is left alone deliberately: 93% of it is already
+       stocks, so the test costs more than it saves.
+
+       Measured, best of three, identical results throughout:
+         a     4,787 ms -> 1,995 ms      b73   1,294 ms -> 1,047 ms
+         mu    3,758 ms -> 2,936 ms      Tp1     913 ms ->   938 ms
+       A selective term pays about 25 ms for this; the broadest term saves
+       nearly three seconds. What it cannot fix is the floor -- every one of
+       these is a leading-wildcard LIKE, so Postgres sequentially scans both
+       tables however few rows match. That needs an index. See AD-039. */
     return "
       WITH texts AS MATERIALIZED (
         SELECT d.id, $description AS txt FROM mgdb.description d
@@ -133,9 +151,11 @@ function stockSimpleTextSql($term, $caseSensitive, &$params, &$counter) {
         UNION ALL
         SELECT y.id, $synonyms FROM mgdb.synonyms y
           WHERE $synonyms LIKE ANY ($p2::text[])
+            AND EXISTS (SELECT 1 FROM mgdb.stock st WHERE st.id = y.id)
         UNION ALL
         SELECT x.id, $key FROM mgdb.ext_db_key x
           WHERE $key LIKE ANY ($p3::text[])
+            AND EXISTS (SELECT 1 FROM mgdb.stock st WHERE st.id = x.id)
       ),
       hits AS MATERIALIZED (
         SELECT id FROM texts GROUP BY id

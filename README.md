@@ -1351,6 +1351,90 @@ normalises a DOI that arrives as a URL, and the file was added to
 `deploy/manifest.txt` — it had never been in it, so edits to it were not
 deployable.
 
+## The Stock Data Hub
+
+`/data_center/stock` joined the shell on 2026-09-02, finishing the partial
+conversion that was already in the working tree. Most of what this one turned
+up was not styling: **three separate places where the page and its endpoint did
+not agree**, each of which silently broke a feature.
+
+### The result count was read from the wrong place
+
+`mgdb-stock.js` read `data.total`. The endpoint has never returned a top-level
+`total` — it is `summary.total`. So `state.totalRecords` was `undefined || 0`
+on every search, which meant:
+
+- the status line read **"Showing 1–0 of 0 stocks"** under 25 visible rows, and
+- `Math.ceil(0 / 25) || 1` gave **one page** of pagination, so there was no way
+  to reach result 26 of 7,841.
+
+### The GRIN toggle sent a parameter nothing reads
+
+The MaizeGDB/GRIN switch sent `source=grin`. The endpoint reads `mode`. So the
+toggle changed the button styling and nothing else: pressing "GRIN accessions"
+re-ran the MaizeGDB search. `b73` returned **7,841 MaizeGDB stocks** where it
+should return **8 GRIN accessions**.
+
+Underneath it, a second bug that could not surface while the first one hid it:
+a GRIN row carries `grin_id`, not `id`, and both renderers built the outbound
+link from `row.id` — so every GRIN link would have gone to `?id=undefined`.
+
+### The advanced filters were never sent as filters
+
+The five selects and three checkboxes were sent as bare values with no `mode`
+and none of the `f_<name>` flags the endpoint gates each filter behind. A
+filter-only search therefore hit the simple path, found no term, and answered
+`no-term` with zero results. Selecting a stock type and pressing Search found
+nothing, always.
+
+All three are fixed against the contract in `search/stock/stock_search_lib.php`,
+and verified: `mode=grin&term=b73` returns 8, and
+`mode=advanced&f_type=1&type=9018241` returns 32,930 in 307 ms.
+
+### 0.8% of the rows scanned could possibly match
+
+The simple search matches `LOWER(col) LIKE '%term%'` against `mgdb.description`,
+`mgdb.synonyms` and `mgdb.ext_db_key`. Those tables are shared by every entity
+type in the database, but only rows belonging to a stock survive the join
+further down — and `ext_db_key` is **17,822 stock rows out of 2,319,829**, 0.8%.
+`synonyms` is 24.8%. Restricting the two big scans to stock ids inside the scan,
+rather than after it, avoids materializing millions of rows that cannot match:
+
+| term | before | after |
+| --- | --- | --- |
+| `a` &#40;27,820&#41; | 4,787 ms | **1,995 ms** |
+| `mu` &#40;22,993&#41; | 3,758 ms | **2,936 ms** |
+| `b73` &#40;7,841&#41; | 1,294 ms | **1,047 ms** |
+| `Tp1` &#40;3&#41; | 913 ms | 938 ms |
+
+`description` is left alone on purpose — 93% of it is already stocks, so the
+test costs more than it saves. A selective term pays about 25 ms for this; the
+broadest saves nearly three seconds. Verified identical on eight terms.
+
+What it cannot fix is the floor: every one of these is a leading-wildcard
+`LIKE`, so both large tables are scanned however few rows match — 551 ms and
+328 ms on their own. `pg_trgm` is installed but the application role cannot
+`CREATE INDEX`. Recorded as AD-039.
+
+### And the results section was never hidden
+
+The bootstrap ended with an unconditional `fetchResults(false)`, so the results
+section — `hidden` in the markup like every other hub — was opened and filled
+before the reader asked for anything. It now runs only when the address bar
+carries a query to restore.
+
+### Elsewhere
+
+The chart used raw `Plotly.newPlot` with `margin: { l: 200 }`, which is most of
+a 259px figure on a phone: the plot area was about 35px and the axis title was
+clipped off the side of the box. It is on `MGDB.chart` now with margins sized
+from the figure. Stock type names are long enough that shortening the tick text
+was needed too — "Sequence-indexed insertion" is 26 characters — so the full
+name stays in the hover and in the values table under the figure.
+
+The hero emblem is the Maize Genetics COOP Stock Center's own ear, which was
+sitting in `src/images/stock/` unreferenced and not in the manifest.
+
 ## The Pan-Gene Data Hub
 
 `/pan_gene_center/pan_gene` joined the shell on 2026-09-02. It was already the

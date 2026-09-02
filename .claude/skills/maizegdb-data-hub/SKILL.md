@@ -145,6 +145,19 @@ nothing else goes wrong visibly.
   the string it is handed plus a global stamp. Any payload whose *shape* is
   built in the controller needs `'<key>_' . (int) @filemtime(__FILE__)`, or a
   warm server keeps serving an entry that predates the new fields.
+- **Check the page's request against the endpoint's contract, field by field.**
+  One hub sent `source=grin` where the endpoint read `mode`, sent advanced
+  filter values without the `f_<name>` flags that gate them, and read
+  `data.total` where the payload has `summary.total`. Each silently disabled a
+  feature — a dead toggle, filters that always found nothing, and "of 0" with
+  one page of pagination over 7,841 results. Diff the params the JS builds
+  against what the lib reads, and diff the payload keys against what the JS
+  reads. Nothing errors when these disagree.
+- **A search over shared text tables should be restricted to the entity type
+  first.** `description`/`synonyms`/`ext_db_key` carry every entity in the
+  database; if the hub only wants stocks, push `EXISTS (SELECT 1 FROM <entity>
+  WHERE id = ...)` into the scan rather than leaving it to a later join. On one
+  hub `ext_db_key` was 0.8% stocks and the broadest term went 4,787 -> 1,995 ms.
 - **Enumerate `[id]` and look for duplicates before trusting the tab bar.** A
   section id and a form control shared a name on one hub, so
   `querySelector('#x')` returned the control and the tab scrolled to the wrong

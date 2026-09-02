@@ -7,6 +7,8 @@
   'use strict';
 
   var API_URL = '/search/stock/stock_search_api.php';
+  /* The endpoint caps page_size at 100, so "All results" asks for that. */
+  var MAX_PAGE = 100;
 
   var state = {
     term: '',
@@ -22,7 +24,10 @@
     view: 'table',
     sort: 'relevance',
     page: 1,
-    pageSize: 24,
+    pageSize: 25,
+    filter: '',
+    searched: false,
+    lastData: null,
     totalPages: 1,
     totalRecords: 0,
     grinTotal: 0,
@@ -47,64 +52,83 @@
 
   /* ── Sticky Section Tabs & Scrollspy ────────────────────────────────────── */
 
+  /* Sticky section tabs, driven by scroll, IntersectionObserver and resize
+     together: no single trigger fires everywhere, and the results section
+     appears and disappears under the bar as searches run. */
   function buildTabs() {
     var tabs = document.querySelectorAll('.mgdb-section-tabs a');
-    if (!tabs.length) return;
+    if (!tabs.length) { return; }
 
     var pairs = [];
     Array.prototype.forEach.call(tabs, function (tab) {
-      var href = tab.getAttribute('href');
-      if (href && href.startsWith('#')) {
-        var section = document.querySelector(href);
-        if (section) {
-          pairs.push({ tab: tab, section: section });
-        }
-      }
+      var href = tab.getAttribute('href') || '';
+      if (href.charAt(0) !== '#') { return; }
+      var section = document.getElementById(href.slice(1));
+      if (section) { pairs.push({ tab: tab, section: section }); }
     });
+    if (!pairs.length) { return; }
 
-    function markCurrent(target) {
+    var heldUntilScroll = null;
+    var heldAtY = 0;
+
+    function mark(section) {
       pairs.forEach(function (pair) {
-        var current = pair.section === target;
+        var current = pair.section === section;
         pair.tab.classList.toggle('is-current', current);
-        if (current) {
-          pair.tab.setAttribute('aria-current', 'true');
-        } else {
-          pair.tab.removeAttribute('aria-current');
-        }
+        if (current) { pair.tab.setAttribute('aria-current', 'true'); }
+        else { pair.tab.removeAttribute('aria-current'); }
       });
     }
 
-    var initial = pairs[0];
-    if (window.location.hash) {
-      pairs.forEach(function (pair) {
-        if ('#' + pair.section.id === window.location.hash) {
-          initial = pair;
-        }
-      });
+    function triggerLine() {
+      var bar = document.querySelector('.mgdb-section-tabs');
+      var barHeight = bar ? bar.getBoundingClientRect().height : 0;
+      var margin = parseFloat(window.getComputedStyle(pairs[0].section).scrollMarginTop) || 0;
+      return Math.max(barHeight + 8, margin + 4);
     }
-    if (initial) {
-      markCurrent(initial.section);
+
+    function update() {
+      if (heldUntilScroll) {
+        if (Math.abs(window.scrollY - heldAtY) < 4) { return; }
+        heldUntilScroll = null;
+      }
+      var line = triggerLine();
+      var current = pairs[0];
+      pairs.forEach(function (pair) {
+        if (pair.section.hasAttribute('hidden')) { return; }
+        if (pair.section.getBoundingClientRect().top <= line) { current = pair; }
+      });
+      if ((window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 2)) {
+        current = pairs[pairs.length - 1];
+      }
+      if (current) { mark(current.section); }
     }
 
     pairs.forEach(function (pair) {
       pair.tab.addEventListener('click', function () {
-        markCurrent(pair.section);
+        mark(pair.section);
+        heldUntilScroll = pair.section;
+        heldAtY = window.scrollY;
       });
     });
 
-    if (!window.IntersectionObserver) return;
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
 
-    var observer = new window.IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          markCurrent(entry.target);
-        }
+    if (window.IntersectionObserver) {
+      var observer = new window.IntersectionObserver(function () { update(); },
+        { rootMargin: '-20% 0px -60% 0px' });
+      pairs.forEach(function (pair) { observer.observe(pair.section); });
+    }
+
+    var results = byId('stock-results-section');
+    if (results && window.MutationObserver) {
+      new window.MutationObserver(update).observe(results, {
+        childList: true, subtree: true, attributes: true, attributeFilter: ['hidden']
       });
-    }, { rootMargin: '-20% 0px -60% 0px' });
+    }
 
-    pairs.forEach(function (pair) {
-      observer.observe(pair.section);
-    });
+    update();
   }
 
   /* ── Query Execution ────────────────────────────────────────────────────── */
@@ -118,21 +142,46 @@
       statusEl.textContent = 'Searching stock records…';
     }
 
-    var params = new URLSearchParams({
-      term: state.term,
-      type: state.type,
-      available: state.available,
-      linkage: state.linkage,
-      phenotype: state.phenotype,
-      karyotype: state.karyotype,
-      f_mgsc: state.f_mgsc,
-      f_bank: state.f_bank,
-      f_expvp: state.f_expvp,
-      source: state.source,
-      sort: state.sort,
-      page: state.page,
-      page_size: state.pageSize
-    });
+    /* The endpoint reads `mode`, and gates every advanced filter behind an
+       `f_<name>` flag as well as its value. This was sending `source=grin`
+       for the GRIN toggle -- which the endpoint does not read, so the toggle
+       returned MaizeGDB stocks -- and the five filter values with no `mode`
+       and no flags, so a filter-only search answered "no-term" and found
+       nothing. Both are the contract in search/stock/stock_search_lib.php. */
+    var params = new URLSearchParams();
+
+    var advanced = [
+      ['type', state.type],
+      ['available', state.available],
+      ['linkage', state.linkage],
+      ['phenotype', state.phenotype],
+      ['karyotype', state.karyotype]
+    ].filter(function (pair) { return pair[1]; });
+    var flags = [
+      ['f_mgsc', state.f_mgsc],
+      ['f_bank', state.f_bank],
+      ['f_expvp', state.f_expvp]
+    ].filter(function (pair) { return pair[1]; });
+
+    if (state.source === 'grin') {
+      params.set('mode', 'grin');
+      params.set('term', state.term);
+    } else if (state.term === '' && (advanced.length || flags.length)) {
+      // No term, but something to filter on: that is the advanced search.
+      params.set('mode', 'advanced');
+      advanced.forEach(function (pair) {
+        params.set('f_' + pair[0], '1');
+        params.set(pair[0], pair[1]);
+      });
+      flags.forEach(function (pair) { params.set(pair[0], '1'); });
+    } else {
+      params.set('mode', 'simple');
+      params.set('term', state.term);
+    }
+
+    params.set('sort', state.sort);
+    params.set('page', state.page);
+    params.set('page_size', state.pageSize === 'all' ? MAX_PAGE : state.pageSize);
 
     fetch(API_URL + '?' + params.toString())
       .then(function (response) {
@@ -146,9 +195,20 @@
           return;
         }
 
-        state.totalRecords = data.total || 0;
+        /* The results section is hidden until there is something to show. */
+        var section = byId('stock-results-section');
+        if (section) { section.hidden = false; }
+        state.searched = true;
+
+        /* summary.total, not data.total: the endpoint has never returned a
+           top-level total, so this read undefined and every search reported
+           "of 0 stocks" with a single page of pagination -- no way to reach
+           result 26 of 7,841. */
+        var summary = data.summary || {};
+        state.totalRecords = summary.total || 0;
         state.grinTotal = data.grin_total || 0;
-        state.totalPages = Math.ceil(state.totalRecords / state.pageSize) || 1;
+        var size = summary.page_size || (state.pageSize === 'all' ? MAX_PAGE : state.pageSize);
+        state.totalPages = summary.page_count || (Math.ceil(state.totalRecords / size) || 1);
 
         updateSourceBadges();
         renderResults(data);
@@ -214,10 +274,21 @@
 
     if (emptyEl) emptyEl.hidden = true;
 
-    var start = (state.page - 1) * state.pageSize + 1;
+    var size = state.pageSize === 'all' ? MAX_PAGE : state.pageSize;
+    var start = (state.page - 1) * size + 1;
     var end = Math.min(start + rows.length - 1, state.totalRecords);
+    var noun = state.source === 'grin' ? 'GRIN accessions' : 'stocks';
     if (statusEl) {
-      statusEl.textContent = 'Showing ' + start.toLocaleString() + '–' + end.toLocaleString() + ' of ' + state.totalRecords.toLocaleString() + ' ' + (state.source === 'grin' ? 'GRIN accessions' : 'stocks');
+      if (state.pageSize === 'all' && state.totalRecords > rows.length) {
+        /* "All results" is capped by the endpoint, and saying so is better
+           than a count that quietly stops short. */
+        statusEl.textContent = 'Showing the first ' + rows.length.toLocaleString() + ' of '
+          + state.totalRecords.toLocaleString() + ' ' + noun
+          + ', which is as many as the search returns at once.';
+      } else {
+        statusEl.textContent = 'Showing ' + start.toLocaleString() + '–' + end.toLocaleString()
+          + ' of ' + state.totalRecords.toLocaleString() + ' ' + noun + '.';
+      }
     }
 
     if (state.view === 'card') {
@@ -226,6 +297,47 @@
     } else {
       container.className = 'stock-results-container stock-view-table';
       container.innerHTML = renderTable(rows);
+    }
+
+    state.lastData = data;
+    /* Re-applied last so paging and the card/table toggle do not silently drop
+       a filter the box still shows. */
+    applyResultsFilter();
+  }
+
+  /* Narrows the page already rendered, in both views. The search pages server
+     side, so this filters what is on screen and the status line says so. */
+  function applyResultsFilter() {
+    var container = byId('stock-results');
+    if (!container) { return; }
+
+    var items = container.querySelectorAll('.stock-result-card, tbody tr');
+    var terms = state.filter.toLowerCase().split(/\s+/).filter(Boolean);
+    var shown = 0;
+
+    Array.prototype.forEach.call(items, function (item) {
+      var match = true;
+      if (terms.length) {
+        var hay = (item.textContent || '').toLowerCase();
+        for (var i = 0; i < terms.length; i++) {
+          if (hay.indexOf(terms[i]) === -1) { match = false; break; }
+        }
+      }
+      item.hidden = !match;
+      if (match) { shown++; }
+    });
+
+    if (terms.length) {
+      var statusEl = byId('stock-results-status');
+      var noun = state.source === 'grin' ? 'GRIN accessions' : 'stocks';
+      if (statusEl) {
+        statusEl.textContent = shown === 0
+          ? 'Nothing on this page matches the filter “' + state.filter + '”. '
+            + state.totalRecords.toLocaleString() + ' ' + noun + ' matched the search.'
+          : 'Showing ' + shown.toLocaleString() + ' of the ' + items.length.toLocaleString()
+            + ' ' + noun + ' on this page matching “' + state.filter + '”, out of '
+            + state.totalRecords.toLocaleString() + ' matched by the search.';
+      }
     }
   }
 
@@ -236,8 +348,13 @@
       ? '<span class="mgdb-pill mgdb-pill-warn">' + escapeHtml(row.status) + '</span>'
       : '';
 
+    /* A GRIN row carries grin_id, not id -- the endpoint's GRIN shape is
+       name/accession/grin_id/improvement/genus/origin. This read row.id and
+       produced ?id=undefined, which was invisible while the GRIN toggle was
+       sending a parameter the endpoint did not read and so never returned a
+       GRIN row at all. */
     var linkUrl = state.source === 'grin'
-      ? 'https://npgsweb.ars-grin.gov/gringlobal/accessiondetail.aspx?id=' + encodeURIComponent(row.id)
+      ? 'https://npgsweb.ars-grin.gov/gringlobal/accessiondetail.aspx?id=' + encodeURIComponent(row.grin_id || '')
       : '/data_center/stock?id=' + encodeURIComponent(row.id || row.name);
 
     var metaItems = [];
@@ -259,7 +376,7 @@
       orderLink = '<a href="https://maizecoopsc.org/" target="_blank" rel="noopener">Order seed &nearr;</a>';
     }
 
-    return '<article class="stock-card" data-stock-id="' + row.id + '">' +
+    return '<article class="stock-card" data-stock-id="' + escapeHtml(row.id || row.grin_id || '') + '">' +
       '<div>' +
         '<div class="stock-card-header">' +
           '<h3><a href="' + linkUrl + '">' + escapeHtml(row.name) + '</a></h3>' +
@@ -287,7 +404,7 @@
 
     var tbody = rows.map(function (row) {
       var linkUrl = state.source === 'grin'
-        ? 'https://npgsweb.ars-grin.gov/gringlobal/accessiondetail.aspx?id=' + encodeURIComponent(row.id)
+        ? 'https://npgsweb.ars-grin.gov/gringlobal/accessiondetail.aspx?id=' + encodeURIComponent(row.grin_id || '')
         : '/data_center/stock?id=' + encodeURIComponent(row.id || row.name);
 
       var nameCell = '<strong><a href="' + linkUrl + '">' + escapeHtml(row.name) + '</a></strong>';
@@ -510,24 +627,92 @@
       }).join('');
     }
 
-    if (typeof Plotly === 'undefined') return;
+    if (!window.MGDB || !window.MGDB.chart) { return; }
 
-    var data = [{
-      type: 'bar',
-      x: values.slice().reverse(),
-      y: labels.slice().reverse(),
-      orientation: 'h',
-      marker: { color: '#235c37' }
-    }];
+    var ordered = labels.map(function (l, i) { return { label: l, value: values[i] }; }).reverse();
+    var height = Math.max(320, ordered.length * 40 + 110);
+    el.style.height = height + 'px';
 
-    var layout = {
-      margin: { l: 200, r: 24, t: 24, b: 40 },
-      xaxis: { title: 'Current Stock Records', tickformat: ',d' },
-      yaxis: { automargin: true },
-      font: { family: 'inherit', size: 12 }
-    };
+    /* Margins are sized from the figure, not fixed. A 200px label gutter is
+       most of a phone's width: left as a constant it squeezed the plot to
+       about 35px and clipped the axis title off the side of the box. Below the
+       breakpoint the gutter shrinks, the axis title comes off -- the figure
+       caption already says what is being counted -- and the ticks go to SI
+       shorthand, which stays horizontal where full thousands do not. */
+    var NARROW = 560;
+    /* Stock type names run long -- "Sequence-indexed insertion" is 26
+       characters -- and a 104px gutter cannot hold one. automargin would grow
+       the gutter instead, which on a phone leaves no plot at all, so the tick
+       text is shortened and the full name stays in the hover and in the values
+       table under the figure. */
+    var fullLabels = ordered.map(function (r) { return r.label; });
+    var shortLabels = fullLabels.map(function (l) {
+      return l.length > 16 ? l.slice(0, 15).replace(/[\s-]+$/, '') + '…' : l;
+    });
+    function metrics() {
+      var width = el.getBoundingClientRect().width;
+      var narrow = width > 0 && width < NARROW;
+      return {
+        narrow: narrow,
+        margin: narrow ? { l: 104, r: 16, t: 8, b: 44 } : { l: 200, r: 72, t: 8, b: 44 },
+        title: narrow ? '' : 'Current stock records',
+        tickformat: narrow ? '~s' : ',d',
+        nticks: narrow ? 3 : 0,
+        labels: narrow ? shortLabels : fullLabels
+      };
+    }
+    var m = metrics();
 
-    Plotly.newPlot(el, data, layout, { responsive: true, displayModeBar: false });
+    window.MGDB.chart({
+      target: el,
+      traces: [{
+        type: 'bar',
+        orientation: 'h',
+        y: m.labels,
+        x: ordered.map(function (r) { return r.value; }),
+        customdata: fullLabels,
+        marker: { color: '#235c37' },
+        /* A non-breaking space: SVG collapses a plain leading one, leaving the
+           label flush against the end of its bar. */
+        text: ordered.map(function (r) { return '\u00A0' + Number(r.value).toLocaleString(); }),
+        textposition: m.narrow ? 'none' : 'outside',
+        cliponaxis: false,
+        hovertemplate: '%{customdata}<br>%{x:,} stocks<extra></extra>'
+      }],
+      layout: {
+        height: height,
+        showlegend: false,
+        margin: m.margin,
+        xaxis: { title: m.title, zeroline: false, tickformat: m.tickformat, nticks: m.nticks },
+        yaxis: { automargin: true }
+      }
+    });
+
+    /* MGDB.chart re-runs Plotly.Plots.resize on a window resize, which rescales
+       the figure but keeps the margins it was drawn with. Crossing the
+       breakpoint has to relayout. */
+    if (window.Plotly && window.Plotly.relayout) {
+      var lastNarrow = m.narrow;
+      var timer = null;
+      window.addEventListener('resize', function () {
+        if (timer) { window.clearTimeout(timer); }
+        timer = window.setTimeout(function () {
+          var next = metrics();
+          if (next.narrow === lastNarrow) { return; }
+          lastNarrow = next.narrow;
+          window.Plotly.relayout(el, {
+            margin: next.margin,
+            'xaxis.title': next.title,
+            'xaxis.tickformat': next.tickformat,
+            'xaxis.nticks': next.nticks
+          });
+          window.Plotly.restyle(el, {
+            textposition: next.narrow ? 'none' : 'outside',
+            y: [next.labels]
+          });
+        }, 180);
+      });
+    }
   }
 
   /* ── Initialization ────────────────────────────────────────────────────── */
@@ -550,6 +735,44 @@
     var bankCheck = byId('stock-f-bank');
     var expvpCheck = byId('stock-f-expvp');
     var sortSelect = byId('stock-sort');
+    var pageSizeSelect = byId('stock-page-size');
+    var resultsFilter = byId('stock-results-filter');
+    var advReset = byId('stock-adv-reset');
+
+    if (pageSizeSelect) {
+      pageSizeSelect.addEventListener('change', function () {
+        state.pageSize = this.value === 'all' ? 'all' : parseInt(this.value, 10) || 25;
+        state.page = 1;
+        if (state.searched) { fetchResults(false); }
+      });
+    }
+
+    if (resultsFilter) {
+      resultsFilter.addEventListener('input', function () {
+        state.filter = this.value.trim();
+        if (state.filter === '' && state.lastData) {
+          /* Re-render rather than un-hiding: the status line has to go back to
+             what the search said, not what the filter said. */
+          renderResults(state.lastData);
+          return;
+        }
+        applyResultsFilter();
+      });
+    }
+
+    if (advReset) {
+      advReset.addEventListener('click', function () {
+        ['stock-type', 'stock-available', 'stock-linkage', 'stock-phenotype', 'stock-karyotype']
+          .forEach(function (id) { var el = byId(id); if (el) { el.value = '0'; } });
+        ['stock-f-mgsc', 'stock-f-bank', 'stock-f-expvp']
+          .forEach(function (id) { var el = byId(id); if (el) { el.checked = false; } });
+        state.type = 0; state.available = 0; state.linkage = 0;
+        state.phenotype = 0; state.karyotype = 0;
+        state.f_mgsc = ''; state.f_bank = ''; state.f_expvp = '';
+        state.page = 1;
+        if (state.searched) { fetchResults(false); }
+      });
+    }
 
     var mgdbSourceBtn = byId('stock-source-mgdb');
     var grinSourceBtn = byId('stock-source-grin');
@@ -581,6 +804,19 @@
     if (form) {
       form.addEventListener('submit', function (e) {
         e.preventDefault();
+        /* Every field is read from the DOM here. The advanced controls also
+           update state on 'change', but that event never fires for a value the
+           browser restores itself (autofill, bfcache), and a filter shown in
+           the form must never be missing from the query it describes. */
+        if (queryInput) { state.term = queryInput.value.trim(); }
+        state.type = typeSelect ? (parseInt(typeSelect.value, 10) || 0) : 0;
+        state.available = availSelect ? (parseInt(availSelect.value, 10) || 0) : 0;
+        state.linkage = linkSelect ? (parseInt(linkSelect.value, 10) || 0) : 0;
+        state.phenotype = phenoSelect ? (parseInt(phenoSelect.value, 10) || 0) : 0;
+        state.karyotype = karyoSelect ? (parseInt(karyoSelect.value, 10) || 0) : 0;
+        state.f_mgsc = mgscCheck && mgscCheck.checked ? '1' : '';
+        state.f_bank = bankCheck && bankCheck.checked ? '1' : '';
+        state.f_expvp = expvpCheck && expvpCheck.checked ? '1' : '';
         state.page = 1;
         fetchResults(true);
       });
@@ -730,8 +966,15 @@
       });
     }
 
-    // Initial search on load
-    fetchResults(false);
+    /* Only search on load when the address bar carries a query to restore.
+       This used to run unconditionally, which meant the results section --
+       hidden by default on every other hub -- was open and populated before
+       the reader had asked for anything. */
+    if (state.term || state.type || state.available || state.linkage
+        || state.phenotype || state.karyotype
+        || state.f_mgsc || state.f_bank || state.f_expvp) {
+      fetchResults(false);
+    }
   }
 
   if (document.readyState === 'loading') {

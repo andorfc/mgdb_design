@@ -6,26 +6,15 @@ $$SYNTAX-LEVEL 2
 <meta property="og:title" content="MaizeGDB Stock Center | Genetic Stocks & Germplasm">
 <meta property="og:description" content="Search curated maize genetic stocks, inbred lines, mutant alleles, phenotypes, and germplasm providers, and find where to order them.">
 
-<main class="mgdb-page mgdb-stock-page" id="stock-main">
+<main class="mgdb-page mgdb-hub-page mgdb-stock-page" id="stock-main">
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
     <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Stock Center</span>
   </nav>
 
   <section class="mgdb-hero" aria-labelledby="stock-title">
     <div class="mgdb-hero-emblem">
-      <svg viewBox="0 0 96 96" role="img" aria-label="Maize seedling and germplasm icon">
-        <g fill="none" stroke="#235c37" stroke-width="5" stroke-linecap="round">
-          <path d="M48 86V34" />
-        </g>
-        <g fill="#d99a0b">
-          <path d="M48 44c-3-14-14-22-26-23 1 13 11 24 26 23Z" />
-          <path d="M48 58c3-16 14-25 26-26-1 15-11 27-26 26Z" />
-        </g>
-        <g fill="none" stroke="#235c37" stroke-width="4" stroke-linecap="round">
-          <path d="M32 86h32" />
-        </g>
-      </svg>
-      <strong>Stock<br />Center</strong>
+      <img src="/images/stock/mgcsc-ear.png?v=20260902" alt="" class="stock-hero-icon" width="80" height="80" />
+      <strong>Stock<br />Data Hub</strong>
     </div>
     <div class="mgdb-hero-body">
       <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; August 2026</p>
@@ -34,35 +23,57 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
-  <nav class="mgdb-section-tabs" aria-label="Stock resource sections">
-    <a href="#stock-search-section">Search stocks</a>
-    <a href="#stock-collections">Stock collections</a>
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#stock-search-section" class="is-current" aria-current="true">Search</a>
+    <a href="#stock-collections">Collections</a>
     <a href="#stock-nam">NAM founders</a>
-    <a href="#stock-downloads">Bulk downloads</a>
-    <a href="#stock-statistics">Corpus statistics</a>
+    <a href="#stock-downloads">Downloads</a>
+    <a href="#stock-references">References</a>
+    <a href="#stock-metrics">Metrics</a>
     <a href="#stock-related">Related resources</a>
   </nav>
 
   <section id="stock-search-section" class="stock-search-panel" aria-labelledby="stock-search-title">
-    <div class="stock-search-header">
+    <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Interactive finder</span>
-        <h2 id="stock-search-title">Search &amp; filter maize genetic stocks</h2>
+        <h2 id="stock-search-title">Search</h2>
       </div>
-      <p>Search by stock name, accession, gene or variation in parentheses &#40;e.g. <code>&#40;wx1&#41;</code>&#41;, or filter by stock type and provider.</p>
     </div>
 
     <form id="stock-search-form" class="stock-search-form" role="search">
-      <div class="stock-field-query">
+      <div class="mgdb-hub-field stock-field-query">
         <label for="stock-query">Search term</label>
         <div class="stock-query-control">
           <svg class="stock-search-icon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="7" r="5"/><line x1="11" y1="11" x2="15" y2="15"/></svg>
           <input id="stock-query" name="term" type="search" placeholder="Try B73, Mo17, W22, &#40;wx1-m1&#41;, Ky21, Ames, or NAM…" autocomplete="off" />
           <button id="stock-query-clear" type="button" hidden>Clear</button>
         </div>
+        <p class="stock-hint">A gene or variation goes in parentheses&#58; <code>&#40;wx1-m1&#41;</code>. Descriptions, synonyms and external accessions are all searched.</p>
       </div>
 
-      <div class="stock-field">
+      <div class="mgdb-hub-field mgdb-hub-field-action">
+        <button class="mgdb-button mgdb-button-primary" type="submit">Search stocks</button>
+      </div>
+
+      <div class="stock-example-row" aria-label="Example stock searches">
+        <span>Examples</span>
+        <button type="button" data-stock-example="B73">B73 inbred</button>
+        <button type="button" data-stock-example="Mo17">Mo17 inbred</button>
+        <button type="button" data-stock-example="W22">W22 line</button>
+        <button type="button" data-stock-example="&#40;wx1-m1&#41;">&#40;wx1-m1&#41; alleles</button>
+        <button type="button" data-stock-example="&#40;tb1-ref&#41;">&#40;tb1-ref&#41;</button>
+        <button type="button" data-stock-example="Ky21">Ky21 NAM founder</button>
+        <button type="button" data-stock-example="Ames">Ames panel</button>
+        <button type="button" data-stock-example="TILLING">TILLING project</button>
+      </div>
+
+      <details class="stock-adv" id="stock-adv">
+        <summary>
+          <strong>Advanced search criteria</strong>
+          <span>Restrict by stock type, provider, linkage group, phenotype, karyotype, or availability</span>
+        </summary>
+        <div class="stock-adv-body">
+      <div class="mgdb-hub-field">
         <label for="stock-type">Stock type</label>
         <select id="stock-type" name="type">
           <option value="0">All stock types</option>
@@ -70,7 +81,7 @@ $$SYNTAX-LEVEL 2
         </select>
       </div>
 
-      <div class="stock-field">
+      <div class="mgdb-hub-field">
         <label for="stock-available">Available from</label>
         <select id="stock-available" name="available">
           <option value="0">All providers &amp; centers</option>
@@ -78,7 +89,7 @@ $$SYNTAX-LEVEL 2
         </select>
       </div>
 
-      <div class="stock-field">
+      <div class="mgdb-hub-field">
         <label for="stock-linkage">Focus linkage group</label>
         <select id="stock-linkage" name="linkage">
           <option value="0">All linkage groups</option>
@@ -86,7 +97,7 @@ $$SYNTAX-LEVEL 2
         </select>
       </div>
 
-      <div class="stock-field">
+      <div class="mgdb-hub-field">
         <label for="stock-phenotype">Phenotypic effect</label>
         <select id="stock-phenotype" name="phenotype">
           <option value="0">All phenotypic traits</option>
@@ -94,7 +105,7 @@ $$SYNTAX-LEVEL 2
         </select>
       </div>
 
-      <div class="stock-field">
+      <div class="mgdb-hub-field">
         <label for="stock-karyotype">Karyotypic variation</label>
         <select id="stock-karyotype" name="karyotype">
           <option value="0">All karyotypes</option>
@@ -117,29 +128,20 @@ $$SYNTAX-LEVEL 2
         </label>
       </div>
 
-      <div class="stock-search-submit">
-        <button class="mgdb-button mgdb-button-primary" type="submit">Search stocks</button>
-      </div>
+        </div>
 
-      <div class="stock-example-row" aria-label="Example stock searches">
-        <span>Examples</span>
-        <button type="button" data-stock-example="B73">B73 inbred</button>
-        <button type="button" data-stock-example="Mo17">Mo17 inbred</button>
-        <button type="button" data-stock-example="W22">W22 line</button>
-        <button type="button" data-stock-example="&#40;wx1-m1&#41;">&#40;wx1-m1&#41; alleles</button>
-        <button type="button" data-stock-example="&#40;tb1-ref&#41;">&#40;tb1-ref&#41;</button>
-        <button type="button" data-stock-example="Ky21">Ky21 NAM founder</button>
-        <button type="button" data-stock-example="Ames">Ames panel</button>
-        <button type="button" data-stock-example="TILLING">TILLING project</button>
-      </div>
+        <div class="stock-adv-actions">
+          <button class="mgdb-button mgdb-button-primary" type="submit">Apply advanced filters</button>
+          <button class="mgdb-button mgdb-button-quiet" id="stock-adv-reset" type="button">Reset advanced filters</button>
+        </div>
+      </details>
     </form>
   </section>
 
-  <section id="stock-results-section" class="stock-results-section" aria-labelledby="stock-results-title">
+  <section id="stock-results-section" class="stock-results-section" aria-labelledby="stock-results-title" hidden>
     <div class="stock-results-heading">
       <div>
-        <span class="mgdb-eyebrow">Search results</span>
-        <h2 id="stock-results-title">Matching genetic stocks</h2>
+        <h2 id="stock-results-title">Results</h2>
         <p id="stock-results-status" aria-live="polite">Enter a search term above or choose a filter to inspect stocks.</p>
       </div>
       <div class="stock-results-controls">
@@ -151,12 +153,25 @@ $$SYNTAX-LEVEL 2
             <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><rect x="1" y="2" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="12" width="14" height="2" rx="1" fill="currentColor"/></svg>Table
           </button>
         </div>
-        <div class="stock-sort-control">
-          <label for="stock-sort" class="mgdb-visually-hidden">Sort results</label>
+        <div class="mgdb-hub-field">
+          <label for="stock-results-filter">Filter results</label>
+          <input id="stock-results-filter" type="search" placeholder="Narrow this page" autocomplete="off" />
+        </div>
+        <div class="mgdb-hub-field">
+          <label for="stock-page-size">Results per page</label>
+          <select id="stock-page-size">
+            <option value="10">Top 10</option>
+            <option value="25" selected>Top 25</option>
+            <option value="50">Top 50</option>
+            <option value="all">All results</option>
+          </select>
+        </div>
+        <div class="mgdb-hub-field">
+          <label for="stock-sort">Sort</label>
           <select id="stock-sort">
-            <option value="relevance">Sort&#58; Best match</option>
-            <option value="name">Sort&#58; Identifier A&ndash;Z</option>
-            <option value="name-desc">Sort&#58; Identifier Z&ndash;A</option>
+            <option value="relevance">Best match</option>
+            <option value="name">Identifier A&ndash;Z</option>
+            <option value="name-desc">Identifier Z&ndash;A</option>
           </select>
         </div>
         <div class="stock-export-buttons">
@@ -186,10 +201,8 @@ $$SYNTAX-LEVEL 2
   <section id="stock-collections" aria-labelledby="stock-collections-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Stock distribution &amp; repositories</span>
-        <h2 id="stock-collections-title">Explore stock collections &amp; ordering guides</h2>
+        <h2 id="stock-collections-title">Collections</h2>
       </div>
-      <p>MaizeGDB curates the genetic records; stock centers distribute the seed. These are the primary repositories and tools for obtaining germplasm.</p>
     </div>
 
     <div class="mgdb-card-grid stock-collection-grid">
@@ -210,7 +223,7 @@ $$SYNTAX-LEVEL 2
       <article class="mgdb-card">
         <span class="mgdb-pill mgdb-pill-warn">Nomenclature Guide</span>
         <h3>Decrypt Seed Packet Labels</h3>
-        <p>Comprehensive guide to the Stock Center&rsquo;s pedigree and accession labelling conventions for deciphering seed packets.</p>
+        <p>Comprehensive guide to the Stock Center&rsquo;s pedigree and accession labeling conventions for deciphering seed packets.</p>
         <a href="/stock_decryption">Decrypt Packet <span aria-hidden="true">&rarr;</span></a>
       </article>
 
@@ -240,10 +253,8 @@ $$SYNTAX-LEVEL 2
   <section id="stock-nam" aria-labelledby="stock-nam-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Reference population</span>
-        <h2 id="stock-nam-title">The 26 maize NAM founder lines</h2>
+        <h2 id="stock-nam-title">NAM founders</h2>
       </div>
-      <p>The 26 diverse founder inbreds of the Nested Association Mapping &#40;NAM&#41; population, representing global maize diversity.</p>
     </div>
 
     <p class="stock-section-intro">Stocks may be ordered from the <a href="https\://maizecoopsc.org/nam-rils" target="_blank" rel="noopener">Maize Genetics Cooperation Stock Center <span aria-hidden="true">&nearr;</span></a>. Key reference&#58; <a href="https\://doi.org/10.1534/genetics.107.074245" target="_blank" rel="noopener">Yu et al., 2008 <span aria-hidden="true">&nearr;</span></a>.</p>
@@ -281,10 +292,8 @@ $$SYNTAX-LEVEL 2
   <section id="stock-downloads" aria-labelledby="stock-downloads-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Bulk data</span>
-        <h2 id="stock-downloads-title">Stock downloads &amp; germplasm datasets</h2>
+        <h2 id="stock-downloads-title">Downloads</h2>
       </div>
-      <p>Download comprehensive stock catalogs, diversity population trait values, and measurement files for offline research.</p>
     </div>
 
     <div class="stock-download-grid" aria-label="Stock downloads">
@@ -317,17 +326,25 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
-  <section id="stock-statistics" aria-labelledby="stock-statistics-title">
+  <section id="stock-references" aria-labelledby="stock-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="stock-references-title">References</h2></div>
+    </div>
+
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
+  <section id="stock-metrics" aria-labelledby="stock-metrics-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Corpus summary</span>
-        <h2 id="stock-statistics-title">Stock collection at a glance</h2>
+        <h2 id="stock-metrics-title">Metrics</h2>
       </div>
-      <p>Curated stock records maintained by MaizeGDB. Withdrawn and discontinued stocks remain searchable because published research cites them.</p>
     </div>
 
     <div class="mgdb-metric-grid">
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-green">
         <div class="mgdb-metric-top">
           <h3>Curated Stocks</h3>
           <span class="mgdb-metric-badge">Germplasm</span>
@@ -338,7 +355,7 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Active curated records; $(metric_with_provider) have an assigned provider.</p>
       </article>
 
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-amber">
         <div class="mgdb-metric-top">
           <h3>Stock Types</h3>
           <span class="mgdb-metric-badge">Types</span>
@@ -349,7 +366,7 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">From inbred lines to TILLING and chromosome marker stocks.</p>
       </article>
 
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-blue">
         <div class="mgdb-metric-top">
           <h3>Providers &amp; Centers</h3>
           <span class="mgdb-metric-badge">Centers</span>
@@ -360,7 +377,7 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Stock centers, germplasm banks, and research programs.</p>
       </article>
 
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-burgundy">
         <div class="mgdb-metric-top">
           <h3>GRIN Accessions</h3>
           <span class="mgdb-metric-badge">USDA GRIN</span>
@@ -395,13 +412,11 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
-  <section id="stock-related" aria-labelledby="stock-related-title">
+  <section id="stock-related" class="mgdb-hub-related" aria-labelledby="stock-related-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Connected tools</span>
         <h2 id="stock-related-title">Related resources</h2>
       </div>
-      <p>Explore related genomic hubs, phenotype catalogs, and molecular archives at MaizeGDB.</p>
     </div>
 
     <div class="mgdb-resource-panel">
@@ -421,7 +436,7 @@ $$SYNTAX-LEVEL 2
           <span>Curated observable traits, anatomical mutant profiles, and Plant Ontology terms</span>
           <span class="mgdb-resource-badge">Internal</span>
         </a>
-        <a href="/data_center/genome">
+        <a href="/genome">
           <strong>Genome Data Hub</strong>
           <span>160 hosted genome assemblies across 31 maize and wild relative species</span>
           <span class="mgdb-resource-badge">Internal</span>
@@ -429,11 +444,6 @@ $$SYNTAX-LEVEL 2
         <a href="/ai">
           <strong>AI &amp; Machine Learning Data Hub</strong>
           <span>Machine-learning feature stores, ESM protein scores, and predicted structures</span>
-          <span class="mgdb-resource-badge">Internal</span>
-        </a>
-        <a href="/cite">
-          <strong>How to Cite MaizeGDB</strong>
-          <span>Guidelines and citation formats for database records, tools, and datasets</span>
           <span class="mgdb-resource-badge">Internal</span>
         </a>
       </div>

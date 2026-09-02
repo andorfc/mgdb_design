@@ -1,25 +1,31 @@
 /* ==========================================================================
-   Stock Data Hub (/data_center/stock)
-   Scoped under .mgdb-stock-page; relies on mgdb-modern.css tokens.
+   Stock Data Hub — /data_center/stock
+   --------------------------------------------------------------------------
+   Loaded after css/mgdb-modern.css and css/mgdb-hub.css. The hub shell settles
+   the pale blue ground, the white section cards and their coloured top edges,
+   the absence of a rule under a section title, the metric colours, the gold
+   edge a grid tile takes on hover, the zebra striping, the green Related
+   resources panel, the shared form field, and the scroll offset.
+
+   Nothing above is repeated here. What is here is the page's own furniture:
+   the query control, the examples, the advanced accordion, the results
+   controls and pagination, and the card and table views.
    ========================================================================== */
 
-/* ── Hero Emblem ─────────────────────────────────────────────────────────── */
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
 
 .mgdb-stock-page .mgdb-hero-emblem {
-  gap: var(--mgdb-space-2);
-  padding: var(--mgdb-space-4) var(--mgdb-space-3);
-  border-right: 1px solid #cfe3d6;
-  background: linear-gradient(160deg, rgba(255, 255, 255, .92), rgba(255, 255, 255, .55));
-  color: var(--mgdb-green-dark);
+  background: #ffffff;
+  border-color: var(--mgdb-line);
 }
 
-.mgdb-stock-page .mgdb-hero-emblem svg {
-  width: min(100%, 64px);
+.mgdb-stock-page .stock-hero-icon {
+  width: min(100%, 72px);
   height: auto;
-  mix-blend-mode: normal;
+  object-fit: contain;
 }
 
-/* ── Sticky Section Navigation Tabs ──────────────────────────────────────── */
+/* ── Sticky section tabs ─────────────────────────────────────────────────── */
 
 .mgdb-stock-page .mgdb-section-tabs {
   position: sticky;
@@ -29,10 +35,7 @@
   flex-wrap: wrap;
   gap: var(--mgdb-space-2);
   margin-top: var(--mgdb-space-5);
-  margin-bottom: var(--mgdb-space-6);
-  padding: var(--mgdb-space-2) 0;
-  background: var(--mgdb-surface);
-  border-bottom: 1px solid var(--mgdb-line);
+  margin-bottom: var(--mgdb-space-5);
 }
 
 .mgdb-stock-page .mgdb-section-tabs a {
@@ -40,21 +43,17 @@
   min-height: 40px;
   align-items: center;
   padding: 0 var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
   color: var(--mgdb-ink) !important;
   font-size: var(--mgdb-text-sm);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
-  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
 }
 
-.mgdb-stock-page .mgdb-section-tabs a:hover {
-  background: var(--mgdb-green-soft);
-  border-color: #bcd9c6;
-  color: var(--mgdb-green-dark) !important;
-}
+.mgdb-stock-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
 
 .mgdb-stock-page .mgdb-section-tabs a.is-current,
 .mgdb-stock-page .mgdb-section-tabs a[aria-current="true"] {
@@ -64,39 +63,43 @@
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
-.mgdb-stock-page > section,
-.mgdb-stock-page section[id] {
-  scroll-margin-top: 4.5rem;
+/* Seven tabs wrap sooner than six, so the offset the scrollspy reads back
+   from here has its own breakpoints. */
+@media (max-width: 1245px) and (min-width: 861px) {
+  .mgdb-hub-page.mgdb-stock-page > section[id] { scroll-margin-top: 65px; }
 }
+
+@media (max-width: 860px) {
+  .mgdb-hub-page.mgdb-stock-page > section[id] { scroll-margin-top: 113px; }
+}
+
+.mgdb-stock-page > section[id] { margin-bottom: var(--mgdb-space-5); }
 
 /* ── Search & Filter Panel ───────────────────────────────────────────────── */
 
-.mgdb-stock-page .stock-search-panel {
-  padding: var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface-alt);
-}
-
-.mgdb-stock-page .stock-search-header h2 {
-  color: var(--mgdb-green-dark);
-}
-
-.mgdb-stock-page .stock-search-header p {
-  margin-top: var(--mgdb-space-1);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-}
-
+/* The section is the white card, so the form sits directly on it: the query
+   takes the slack and the button takes what it needs, with the examples and
+   the accordion spanning underneath. Five selects and three checkboxes used to
+   share this row with the query; they are all advanced criteria and live in
+   the disclosure now. */
 .mgdb-stock-page .stock-search-form {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: var(--mgdb-space-3);
-  margin-top: var(--mgdb-space-4);
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-4);
+  align-items: end;
 }
 
-.mgdb-stock-page .stock-field-query {
-  grid-column: 1 / -1;
+.mgdb-stock-page .stock-field-query { grid-column: 1; }
+/* Scoped with `>` to the search form: `.mgdb-hub-field-action` is a shared
+   class and the results controls use it too. */
+.mgdb-stock-page .stock-search-form > .mgdb-hub-field-action { grid-column: 2; }
+.mgdb-stock-page .stock-example-row,
+.mgdb-stock-page .stock-adv { grid-column: 1 / -1; }
+
+.mgdb-stock-page .stock-hint {
+  margin: var(--mgdb-space-1) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
 }
 
 .mgdb-stock-page .stock-field,
@@ -269,12 +272,31 @@
   font-size: var(--mgdb-text-sm);
 }
 
+/* Fixed tracks in a box sized to its own content: declared with minmax(0, ...)
+   the first tracks take everything the parent offers and the last resolves to
+   0px, which drops its control onto a second row. */
 .mgdb-stock-page .stock-results-controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-3);
-  align-items: center;
+  display: grid;
+  width: max-content;
+  max-width: 100%;
+  flex: 0 0 auto;
+  grid-template-columns: 13rem 10rem 12rem auto auto;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: end;
 }
+
+@media (max-width: 1180px) {
+  .mgdb-stock-page .stock-results-controls {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .mgdb-stock-page .stock-results-controls { grid-template-columns: minmax(0, 1fr); }
+}
+
+.mgdb-stock-page .stock-results-section[hidden] { display: none; }
 
 .mgdb-stock-page .stock-view-toggle {
   display: inline-flex;
@@ -304,18 +326,6 @@
 .mgdb-stock-page .stock-view-btn[aria-pressed="true"] {
   background: var(--mgdb-green-dark);
   color: #fff;
-}
-
-.mgdb-stock-page .stock-sort-control select {
-  min-height: 34px;
-  padding: 0 var(--mgdb-space-3);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink);
-  font-family: inherit;
-  font-size: var(--mgdb-text-xs);
-  font-weight: 600;
 }
 
 .mgdb-stock-page .stock-export-buttons {
@@ -637,8 +647,60 @@
     flex-direction: column;
     align-items: flex-start;
   }
-  .mgdb-stock-page .stock-results-controls {
-    width: 100%;
-    justify-content: space-between;
-  }
+}
+
+/* ── Advanced search disclosure ──────────────────────────────────────────── */
+
+.mgdb-stock-page .stock-adv {
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--hub-surface);
+}
+
+.mgdb-stock-page .stock-adv summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+  align-items: baseline;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  color: var(--mgdb-green-dark);
+  cursor: pointer;
+  list-style-position: inside;
+}
+
+.mgdb-stock-page .stock-adv summary strong { font-size: var(--mgdb-text-base); }
+.mgdb-stock-page .stock-adv summary span { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+.mgdb-stock-page .stock-adv[open] summary { border-bottom: 1px solid var(--hub-line-soft); }
+
+.mgdb-stock-page .stock-adv-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 18rem));
+  gap: var(--mgdb-space-4);
+  align-items: start;
+  padding: var(--mgdb-space-4);
+}
+
+/* The three availability checkboxes are one field, not three columns. */
+.mgdb-stock-page .stock-field-options { grid-column: 1 / -1; }
+
+.mgdb-stock-page .stock-adv-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  padding: 0 var(--mgdb-space-4) var(--mgdb-space-4);
+}
+
+@media (max-width: 640px) {
+  .mgdb-stock-page .stock-search-form { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-stock-page .stock-search-form > .mgdb-hub-field-action { grid-column: 1; }
+  .mgdb-stock-page .stock-adv-body { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ── Stock category figure ───────────────────────────────────────────────── */
+
+.mgdb-stock-page .mgdb-stock-figure-wide .mgdb-chart {
+  height: auto;
+  min-height: 320px;
+  /* Value labels can sit outside their bars, so the box must not clip them. */
+  overflow: visible;
 }

@@ -8,6 +8,7 @@
 
 include_once('./include/db-api.php');
 include_once('./include/dashboard_cache.php');
+include_once('./include/references_lib.php');
 
 $system = getSystemInfo('mgdb.conf');
 logMessage('Starting stock_search_modern.php');
@@ -25,20 +26,21 @@ $bauplan->modern();
 $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';
 $css_file = $doc_root . '/css/mgdb-stock.css';
 $js_file = $doc_root . '/js/mgdb-stock.js';
+$hub_file = $doc_root . '/css/mgdb-hub.css';
 $v_css = file_exists($css_file) ? filemtime($css_file) : time();
 $v_js = file_exists($js_file) ? filemtime($js_file) : time();
+$v_hub = file_exists($hub_file) ? filemtime($hub_file) : time();
 
 $bauplan->preHTML('<meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
 $bauplan->includeCss('/css/static.css');
 $bauplan->includeCss('/css/mgdb-modern.css');
 $bauplan->includeCss('/css/mgdb-megamenu.css');
+/* The shared Data Hub shell -- pale blue ground, white section cards, coloured
+   section edges, the reference card, aligned form rows -- loaded before the
+   page's own sheet, which is the order css/mgdb-hub.css documents.
+   `mgdb-hub-page` on <main> opts in. */
+$bauplan->includeCss('/css/mgdb-hub.css?v=' . $v_hub);
 $bauplan->includeCss('/css/mgdb-stock.css?v=' . $v_css);
-
-/* The tinted comparison branch that used to sit here is gone: it loaded
-   css/mgdb-hub-tinted.css for /data_center/stock2, which was retired on
-   2026-09-01 along with /data_center/map2 and /genome2. This hub has not been
-   converted to css/mgdb-hub.css yet; when it is, the shell is loaded here,
-   before the page's own sheet. */
 $bauplan->includeScript('/js/lib/plotly/plotly-2.25.2.min.js');
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
@@ -75,7 +77,7 @@ $dashboard_sql = "
 /* The stock dashboard: one grouped rollup over the available-stock corpus that
    also carries the four headline counts, plus the GRIN total. Collection-wide
    and static between monthly reloads. See include/dashboard_cache.php. */
-$stock_data = dashboardCache($system, 'stock/dashboard', function () use ($DBConn, $dashboard_sql) {
+$stock_data = dashboardCache($system, 'stock/dashboard_' . (int) @filemtime(__FILE__), function () use ($DBConn, $dashboard_sql) {
   $labels = array();
   $values = array();
   $metrics = array('active' => 0, 'with_provider' => 0, 'types' => 0, 'providers' => 0);
@@ -132,7 +134,7 @@ $content->get('chart_caption')->replace(htmlspecialchars($caption, ENT_QUOTES, '
 /* The five filter lists are GROUP BY rollups over the stock corpus -- together
    the slowest part of this page after the dashboard rollup, and just as static
    between monthly reloads. See include/dashboard_cache.php. */
-$stock_options = dashboardCache($system, 'stock/options', function () use ($DBConn) {
+$stock_options = dashboardCache($system, 'stock/options_' . (int) @filemtime(__FILE__), function () use ($DBConn) {
   return array(
     'type_options' => stockOptions($DBConn, "
     SELECT t.id, t.name, COUNT(DISTINCT s.id) AS count
@@ -178,6 +180,22 @@ $content->get('provider_options')->replace($stock_options['provider_options']);
 $content->get('linkage_options')->replace($stock_options['linkage_options']);
 $content->get('phenotype_options')->replace($stock_options['phenotype_options']);
 $content->get('karyotype_options')->replace($stock_options['karyotype_options']);
+
+/* References: the collections these records describe and the papers behind
+   them, rendered by include/references_lib.php so these cards match every
+   other hub. */
+$content->get('reference_cards')->replace(mgdb_render_references($doc_root, array(
+    // The 26 NAM founder assemblies the founder table on this page lists.
+    array('doi' => '10.1126/science.abg5289'),
+    // A transposon-tagged mutant collection distributed as seed stocks.
+    array('doi' => '10.1104/pp.20.00478'),
+    // What marker panels show about the breeding lines these stocks come from.
+    array('doi' => '10.1007/s00122-019-03486-y'),
+    // How this germplasm was curated in the first place.
+    array('doi' => '10.1016/j.cpb.2017.11.001'),
+    // The database of record.
+    array('doi' => '10.1093/nar/gky1046'),
+)));
 
 include_once('translation.php');
 $bauplan->publish();
