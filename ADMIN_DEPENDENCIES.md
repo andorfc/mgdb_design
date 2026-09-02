@@ -873,3 +873,214 @@ Then drop the `/var/www/logs` line from the script, or retire the cron job, so t
       chcon -t httpd_sys_rw_content_t /home/cache/fatcat
 
   The API now reports `summary.cache_error` when a write fails, so the next occurrence is visible from the browser's network tab rather than being invisible.
+
+---
+
+## AD-030 — Gene model search scans a 1.88 million row materialized view for want of one trigram index
+
+- **Date:** 2026-08-29
+- **Affected component:** `chado.gene_model` — the search behind `/gene_center/gene` and `search/gene/gene_search_api.php`
+- **Current limitation:** `chado.gene_model` is a materialized view of 1,878,984 rows and 646 MB. A partial-name search has to test eight columns with `lower(col) LIKE '%term%'`, and a leading wildcard makes every existing btree unusable, so the planner reads the whole view.
+
+  Measured on the development instance with `EXPLAIN (ANALYZE, BUFFERS)`, term `lg1`:
+
+  | Stage | Time | Plan |
+  |---|---|---|
+  | Gene model side | 717 ms | Parallel Seq Scan, 1,878,920 rows read, 167 returned |
+  | Locus side | 704 ms | Parallel Seq Scan on `mgdb.locus` (790,208) and `mgdb.synonyms` (2,803,542) |
+  | **Total** | **1,433 ms** | |
+
+  **Most of the original cost has already been removed in application code and needs nothing from an administrator.** Before this work the same search took 3,440 ms:
+
+  - The locus side was scanning `chado.gene_model` a second time and hash-joining `mgdb.locus` onto 1.88M rows. It now scans the two small tables first and reaches the view through `gene_model_i1` on `locus_id`. 2,660 ms to 704 ms.
+  - An exact-match tier was added ahead of the scan. `gene_model` already carries btree indexes on `lower(gene_name)`, `lower(genbank_name)`, `canonical_transcript_name` and `old_genbank_name`; an equality test against all four is answered by a BitmapOr in 0.7 ms. Transcript and translation identifiers are reduced to their gene model first, so they take the same path. A reader pasting `Zm00001eb067740` now gets an answer in **12 ms instead of 3,440 ms**.
+
+  What remains is the ~1.4 s of sequential scanning on partial-name searches, which cannot be fixed in SQL. It needs an index. This is the same class of problem as AD-020 on `mgdb.locus` and AD-025 on `mgdb.probe`; all three are worth taking to the same person in one conversation.
+
+- **Proposed change:** Create GIN trigram indexes on the columns the search actually tests. **`pg_trgm` is already installed on this database** — verified against `pg_extension` — so no extension work is required. The application role `mgdb` does not hold `CREATE` on the `chado` schema (`has_schema_privilege('mgdb','chado','CREATE')` is false; the view is owned by `postgres`), which is why this cannot be done from the application side.
+
+  ```sql
+  CREATE INDEX CONCURRENTLY idx_gene_model_gene_name_trgm
+    ON chado.gene_model USING gin (lower(gene_name) gin_trgm_ops);
+
+  CREATE INDEX CONCURRENTLY idx_gene_model_locus_name_trgm
+    ON chado.gene_model USING gin (lower(locus_name) gin_trgm_ops);
+
+  CREATE INDEX CONCURRENTLY idx_gene_model_locus_full_name_trgm
+    ON chado.gene_model USING gin (lower(locus_full_name) gin_trgm_ops);
+
+  CREATE INDEX CONCURRENTLY idx_locus_name_trgm
+    ON mgdb.locus USING gin (lower(name) gin_trgm_ops);
+
+  ANALYZE chado.gene_model;
+  ANALYZE mgdb.locus;
+  ```
+
+  `CONCURRENTLY` avoids a write lock and can be run against a live instance; it cannot run inside a transaction.
+
+  **One caveat specific to this table.** `chado.gene_model` is a materialized view, so `REFRESH MATERIALIZED VIEW` rebuilds every index on it. Whoever owns the monthly reload should be told these indexes exist, because they will lengthen that refresh. If that is unacceptable, a `REFRESH ... CONCURRENTLY` needs a unique index on the view, which it does not currently have.
+
+- **Expected benefit:** Partial-name gene searches drop from about 1.4 s to a lookup. `/gene_center/gene` is the second most requested URL on the site, so this is the search most readers touch.
+- **Risk and rollback:** Low. Trigram indexes are additive; the planner ignores them if they do not help. `DROP INDEX CONCURRENTLY` reverses each one. Disk cost is the main consideration — a GIN trigram index over 1.6M gene names is on the order of a few hundred MB.
+- **Required administrator:** PostgreSQL administrator with `CREATE` on `chado` and `mgdb`
+- **Status:** proposed
+- **Validation:** Re-run `search/gene/gene_search_api.php?term=lg1&broad=1` and read `summary.stages` in the response, which reports `exact_ms`, `model_scan_ms` and `locus_scan_ms` separately. The two scan figures are the ones that should fall.
+
+---
+
+## AD-031 — The Jira-backed gene model and assembly issue lists return a PHP fatal error
+
+- **Date:** 2026-08-29
+- **Affected component:** `controllers/curation/geneModelIssues.php` line 28, `controllers/curation/assemblyIssues.php`, both reached from `/gene_center/gene`
+- **Current limitation:** `/curation/geneModelIssues?status=open` and `/curation/assemblyIssues?status=open` both answer HTTP 200 with an uncaught `TypeError: count(): Argument #1 ($value) must be of type Countable|array, null given`. `getJiraIssues()` in `include/jira_lib.php` returns `null` rather than an array, and the caller counts it without checking.
+
+  Both links are on the Gene Data Hub, carried over from the previous page with their original wording, and both are broken on the development instance today. Whether they work in production depends on whether that host can reach the Jira cloud API and holds credentials for it — which is the part an administrator has to answer.
+
+- **Proposed change:** Two separate things, and only the first needs an administrator:
+  1. Confirm whether the development instance is expected to reach the Jira cloud API at all. If it is, the credentials or network path need fixing. If it is not, that is fine and only the second item applies.
+  2. In application code, make `getJiraIssues()` return an empty array on failure and have both controllers render an explanatory empty state instead of a fatal. This is a small change and is not blocked on anything.
+- **Expected benefit:** Two links on the site's second most requested page stop returning a PHP error page.
+- **Risk and rollback:** None for item 2; item 1 is a configuration question.
+- **Required administrator:** MaizeGDB application maintainer, plus whoever owns the Jira integration credentials
+- **Status:** proposed
+- **Validation:** `/curation/geneModelIssues?status=open` returns a page rather than a fatal, whether or not any issues are listed.
+
+---
+
+## AD-032 — The ten core bin marker sequence downloads are gone from the file server
+
+- **Date:** 2026-08-29
+- **Affected component:** `http://ftp.maizegdb.org/cbm/chr<N>_cbm.txt`, linked once per chromosome from `/bin_viewer`
+- **Current limitation:** Each chromosome's core bin marker table ends with a link reading "Download all the core bin marker sequences for Chromosome N". All ten are dead:
+
+      http://ftp.maizegdb.org/cbm/chr1_cbm.txt   301 -> https
+      https://ftp.maizegdb.org/cbm/chr1_cbm.txt  404
+
+  There is no `cbm/` directory in the listing at `https://ftp.maizegdb.org/`, and no equivalent path under `https://download.maizegdb.org/`. Searched `static_datafiles/`, `downloads/`, `MaizeGDB/` and `Bulk_Data/` without finding them.
+
+  This matters more than a normal dead link. The Core Bin Marker curation summary on the same page, written by Jack Gardiner, says these FASTA files "serve to document the EXACT sequence that was used to establish the CBM boundaries since in many cases there were several sequences available and they may or may not agree." They are the provenance for the bin boundaries themselves.
+
+- **Proposed change:** Find out whether the files still exist anywhere and restore them to `ftp.maizegdb.org/cbm/`, or tell us the new location and the links will be repointed. If they are genuinely lost, the group should decide whether the links come down.
+- **Expected benefit:** Ten links on the site's most requested Tools page stop returning 404, and the documented provenance of the bin boundaries is reachable again.
+- **Risk and rollback:** None. The modern page keeps the links and their wording exactly as they were, so restoring the files is the whole fix.
+- **Required administrator:** Whoever owns the `ftp.maizegdb.org` file tree
+- **Status:** proposed
+- **Validation:** `curl -sI https://ftp.maizegdb.org/cbm/chr1_cbm.txt` returns 200.
+
+---
+
+## AD-033 — The `accession` section of the chromosome view has no rows to return, on any chromosome
+
+- **Date:** 2026-08-29
+- **Affected component:** `showAccession()` in `record_data/chromosome_data.php`, the "Accession #s on Chromosome N" section of `/bin_viewer?chrom=N`
+- **Current limitation:** The join this section runs returns zero rows for all ten chromosomes:
+
+  ```sql
+  select distinct(f.seq_id), f.genbank_acc as key
+  from locus a
+    join id_num b on a.id = b.id
+    join locus_detected_by c on a.id = c.id
+    join id_num d on c.probe_id = d.id
+    join id_seq e on c.probe_id = e.id
+    join z_sequence f on e.seq = f.seq_id
+  where a.linkage_group = <lg> and b.curation_lvl = 0 and d.curation_lvl = 0
+  ```
+
+  Two separate faults have been fixed in application code and are not part of this item. The section read its result rows with UPPERCASE array keys while PostgreSQL returns them lower case, so every section of this endpoint rendered an empty list; and the row count was a column index that started at 1, so a section with nothing in it announced "the 1 sequences". Both are corrected and deployed, and the genes and maps sections now return their data — chromosome 1 lists 3,992 genes where it listed none, and 210 maps where it claimed 211.
+
+  What is left is that this particular join genuinely matches nothing. That is a question about the data, not the code: either the section is asking for something that no longer exists in these tables, or the chain through `locus_detected_by` / `id_seq` / `z_sequence` has lost the rows it used to traverse. The equivalent section on the *bin* view does return accessions, so the tables are not empty.
+
+- **Proposed change:** Someone who knows this part of the schema should say what the section was meant to list and whether the join still expresses it. No change is proposed here, because guessing at a replacement join would produce a number nobody can check.
+- **Expected benefit:** One of the five sections of the chromosome view stops being empty, or is deliberately retired.
+- **Risk and rollback:** None; nothing is being changed.
+- **Required administrator:** MaizeGDB curator or database maintainer familiar with `locus_detected_by` and `z_sequence`
+- **Status:** proposed
+- **Validation:** `/record_data/chromosome_data.php?id=1&type=accession&nomaps=1` lists sequence accessions.
+
+## AD-034 — The variation search scans 1.7 million rows for want of a trigram index, and the two indexes named `_gin` on that data are btree
+
+- **Date:** 2026-09-01
+- **Affected component:** `mgdb.variation`, `mgdb.synonyms`, `mgdb.memo` — the search behind `/data_center/variation` and `search/variation/variation_search_api.php`
+- **Current limitation:** `mgdb.variation` holds 1,710,466 rows, of which 1,709,866 are at curation level 0. A partial-name search has to test `variation.name`, `locus.name`, `variation.alleledescriptor` and `synonyms.synonyms` with `ILIKE '%term%'`, and a leading wildcard makes every existing btree unusable, so the planner reads each table end to end.
+
+  Measured on the development instance, term `wx1`:
+
+  | Branch | Time |
+  |---|---|
+  | `variation.name ILIKE` | 459 ms |
+  | `variation.alleledescriptor ILIKE` | 357 ms |
+  | `locus.name ILIKE`, joined | 189 ms |
+  | `synonyms.synonyms ILIKE`, joined | 731 ms |
+  | `memo.memo ILIKE`, joined | 883 ms |
+  | **All five OR-ed in one WHERE clause** | **6,942 ms** |
+
+  **Most of that has already been removed in application code and needs nothing from an administrator.** The OR became a UNION of single-table branches the planner can scan independently; the count and the page became one statement over one materialised CTE instead of two statements each paying for the scan; each branch carries its own LIMIT, because a UNION cannot stream and an outer LIMIT therefore does not stop the scans; and an exact tier was added ahead of the scan, answered by `idx_variation_name`, `idx_locus_name` and `idx_synonyms_lower_synonyms`. A reader typing a gene symbol now gets its whole allele series in **25 ms instead of 6,942 ms**, and the widest term measured, `mu` at 543,021 matches, fell from 6,644 ms to 482 ms.
+
+  What remains is that any substring search still scans, at roughly 0.7–1.2 s, and that above 20,000 candidates the result is a bounded sample rather than the whole match. Both need an index.
+
+  **Separately, and worth knowing before anyone proposes one:** the two indexes on this data whose names promise full-text support are btree, not GIN.
+
+  ```
+  CREATE INDEX variation_gin ON mgdb.variation USING btree (posttext_var)
+  CREATE INDEX synonyms_gin  ON mgdb.synonyms  USING btree (posttext)
+  ```
+
+  Both columns are `tsvector` and every one of the 1,710,466 variation rows has one, so the data for a full-text search is already there and maintained. A btree on a tsvector cannot serve `@@`, so it is never used for that: `SELECT count(*) FROM mgdb.variation WHERE posttext_var @@ to_tsquery('simple','wx1')` sequential-scans in 1,752 ms. The indexes are paying maintenance cost on every load for a query shape nothing can run.
+
+- **Proposed change:** Two things, which can be done together or separately.
+
+  1. GIN trigram indexes on the columns the search tests. `pg_trgm` is already installed on this database — verified against `pg_extension` — so no extension work is required.
+
+     ```sql
+     CREATE INDEX CONCURRENTLY idx_variation_name_trgm ON mgdb.variation USING gin (name gin_trgm_ops);
+     CREATE INDEX CONCURRENTLY idx_variation_alleledesc_trgm ON mgdb.variation USING gin (alleledescriptor gin_trgm_ops);
+     CREATE INDEX CONCURRENTLY idx_synonyms_synonyms_trgm ON mgdb.synonyms USING gin (synonyms gin_trgm_ops);
+     ```
+
+  2. Rebuild `variation_gin` and `synonyms_gin` as GIN, or drop them. Either resolves the mismatch; rebuilding also makes a genuine full-text tier possible on a tsvector that is already being maintained.
+
+     ```sql
+     DROP INDEX mgdb.variation_gin;
+     CREATE INDEX CONCURRENTLY variation_gin ON mgdb.variation USING gin (posttext_var);
+     ```
+
+  The application role `mgdb` does not hold `CREATE` on the `mgdb` schema — `has_schema_privilege('mgdb','mgdb','CREATE')` is false — which is why neither can be done from the application side. This is the same blocker as AD-030 on `chado`, and the same class of problem as AD-020 on `mgdb.locus` and AD-025 on `mgdb.probe`; all of them are worth taking to the same person in one conversation.
+- **Expected benefit:** Substring searches on the variation corpus drop from roughly a second to the low tens of milliseconds, and the 20,000-candidate ceiling that currently turns the widest searches into a sample can be removed.
+- **Risk and rollback:** `CREATE INDEX CONCURRENTLY` does not take a write lock. Trigram indexes on these columns are on the order of 100–200 MB and add time to the monthly reload. Rollback is `DROP INDEX`; the application does not name any of them and keeps working either way.
+- **Required administrator:** PostgreSQL superuser or the owner of the `mgdb` schema
+- **Status:** proposed
+- **Validation:** `/search/variation/variation_search_api.php?term=wx1&scope=broad` returns in well under 200 ms, and `summary.capped` is false for terms that currently set it.
+
+## AD-035 — No trigram index on `web_image.caption`, so every image search scans the archive
+
+- **What is wrong:** `/data_center/image` matches a search term with
+  `wi.caption ILIKE '%term%'` across six `LEFT JOIN`s. A leading wildcard cannot
+  use a b-tree index, so every term search scans the 113,851-row archive and its
+  joined tables. Measured on the development instance: the page query costs
+  about 1.9 s for a selective term and the `COUNT` about 1.95 s. Caption-only
+  counts run in 41–64 ms, which is what the whole search could cost with the
+  right index — the joins are cheap once the candidate set is small.
+- **Why the application cannot fix it:** The same blocker as AD-010 and AD-030.
+  The application role `mgdb` does not hold `CREATE` on the schema. Everything
+  the application *can* do has been done: the redundant `COUNT` is now skipped
+  whenever a page is not full, which took a short search from 3,991 ms to
+  1,924 ms, and the page's corpus statistics were moved behind the dashboard
+  cache, which took the page itself from 2,132 ms to 73 ms.
+- **What is needed:**
+
+     ```sql
+     CREATE INDEX CONCURRENTLY idx_web_image_caption_trgm ON mgdb.web_image USING gin (caption gin_trgm_ops);
+     ```
+
+  Worth doing in the same conversation as AD-010, AD-020, AD-025 and AD-030 —
+  they are one request to one person.
+- **Expected benefit:** Image searches drop from roughly two seconds to the low
+  hundreds of milliseconds. The entity-name arms of the predicate stay as they
+  are: they are not redundant \(`umc90` finds 46 images through them and `B73`
+  3,507\), so they cannot be dropped to buy speed.
+- **Risk and rollback:** `CREATE INDEX CONCURRENTLY` takes no write lock.
+  Rollback is `DROP INDEX`; the application names no index and keeps working
+  either way.
+- **Required administrator:** PostgreSQL superuser or the owner of the `mgdb` schema
+- **Status:** proposed
+- **Validation:** `/search/image/image_search_api.php?term=purple&category=all&page_size=25&sort=latest` returns in well under 500 ms with `summary.total` still 190.

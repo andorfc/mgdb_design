@@ -198,7 +198,11 @@ function imgCombinedQuery($filter, $page, $pageSize, $sort) {
         }
     }
 
-    $limit = (int) $pageSize;
+    /* One row past the page, so a short page can report its own total and the
+       count can be skipped. The COUNT over these six LEFT JOINs measures about
+       1,850 ms against 560 ms for the page itself, so paying for it on every
+       search was three quarters of the request. */
+    $limit = (int) $pageSize + 1;
     $offset = (int) (($page - 1) * $pageSize);
 
     $pageSql = "

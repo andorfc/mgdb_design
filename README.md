@@ -1210,6 +1210,53 @@ gone; it also leaked into the hover text.
 Related: outside bar labels need `\u00A0`, not a space — SVG collapses leading
 whitespace, so a plain space measures as no padding at all.
 
+## The Image Data Hub
+
+`/data_center/image` joined the shell on 2026-09-01. Beyond the usual
+conversion — six eyebrows and their blurbs out, tab labels matched to headings,
+References added, "Image dataset at a glance" renamed to Metrics with a figure
+after it — three things are worth recording.
+
+### The page was paying two seconds for numbers that never change
+
+`getImageCorpusStats()` ran live on every request: a `COUNT` over `web_image`
+at 904 ms and a `GROUP BY` over the same join at 1,048 ms. **1,952 ms of a
+2,132 ms page**, repeated for every visitor, for six figures that change only
+when the database is reloaded. Behind `dashboardCache()` the page renders in
+**73 ms**. Every other hub had this; this one had been missed.
+
+### The gallery loaded itself before anyone asked
+
+The page ran a search on load — 24 images, about two seconds — whether or not
+the reader wanted any. The results section now carries `hidden` and the search
+runs when there is something to search for: a term, a category in the URL, a
+category card, or a bar in the figure.
+
+### The category pill bar became a filter
+
+The search panel carried a seven-button pill bar duplicating what the Categories
+section below already offers. The pills are gone; the category lives in the
+advanced panel like every other hub's secondary filter, and the category cards
+and the figure both drive it, opening the panel so the filter is visible rather
+than applied invisibly.
+
+### What could not be fixed from here
+
+A term search still costs about two seconds, and it is worth knowing why.
+`wi.caption ILIKE '%term%'` cannot use an index, so every search scans the
+113,851-row archive. Caption-only counts run in 41–64 ms, so the index would
+buy nearly all of it — that is filed as **AD-035**. What the application could
+do has been done: the redundant `COUNT` is skipped whenever a page is not full,
+which took `teosinte` from 3,991 ms to 1,924 ms.
+
+**The entity-name arms are not redundant.** Dropping them would make the search
+fast and wrong: `umc90` finds 46 images through them and `B73` finds 3,507.
+Checked before assuming, the same way the gene product hub's tiering was
+checked and rejected.
+
+Also fixed: `page_size` was clamped to a floor of 12, so the hub's smallest page
+of 10 silently returned 12 rows and the pagination disagreed with the screen.
+
 ## The Gene Product Data Hub
 
 `/data_center/gene_product` was brought onto the shell on 2026-09-01. It was in
@@ -1252,6 +1299,42 @@ which is what they honestly cost.
 `total_assemblies`-style hardcoding turned up here too: the class filter's
 GROUP BY already knew there are 27 functional classes, so one query now feeds
 the filter, the hero line, the metric and the figure.
+
+## The Genome Data Hub on the shell
+
+`/genome` moved onto `css/mgdb-hub.css` on 2026-09-01, the same pass that
+built the gene product record page. `/genome2`, the tinted comparison
+variant, now renders identically because the tint it added is the shell.
+
+What changed, so the next hub can copy it:
+
+- **Section order is the hub order**: Search, Assembly statistics, Assemblies
+  in progress, References, Metrics, Related resources. The two chart sections
+  ("Genome datasets hosted", "Assembly counts by species") became the figures
+  under Metrics, with their captions and the growth data note intact. Tab
+  labels are the headings, shortened.
+- **Search carries example buttons and an Advanced search disclosure** holding
+  the status and quality filters and the species chips. The list stays on the
+  page rather than hidden until a search runs: the assembly list *is* the
+  collection, and the field filters it live.
+- **Every list is a collection**: the assembly table and the in-progress table
+  are read once from the server-rendered rows by `collectionFromTable()` in
+  `js/mgdb-genome-center.js`, then rendered as a sortable table (default) or a
+  grid of the same rows, with a page size of 10 / 25 / 50 / all and a TSV
+  download. Without script the full table stays. The prototype statistics
+  table gained the same view toggle, page size and pager on its own state.
+- **A References section** names five DOIs from the curated bibliography (the
+  26 NAM genomes, gapless chromosomes, W22, the pan-genomic database paper,
+  GenomeQC) through `mgdb_render_references()`.
+- **Bulk Downloads is marked External** — it carries its own host.
+- **The page sheet lost what the shell owns**: its own sticky-tab styling, its
+  metric top-edge block (which fought the shell's 4px edge with a 5px one),
+  the section-blurb rules, and the phantom `.mgdb-chart-tall`. The species
+  chart is sized by `sizeChart()`; the growth chart no longer sets `legend.y`.
+- **The sticky identity column of the statistics table paints its own zebra
+  band**, or the striped rows show white where the column overlaps them.
+
+No API row: the hub has no record API, and that row belongs to record pages.
 
 ## The Expression Data Hub
 

@@ -1,20 +1,35 @@
-/* ── Hero Emblem ─────────────────────────────────────────────────────────── */
+/* ==========================================================================
+   Image Data Hub — /data_center/image
+   --------------------------------------------------------------------------
+   Loaded after css/mgdb-modern.css and css/mgdb-hub.css. The hub shell already
+   settles the pale blue ground, the white section cards and their coloured top
+   edges, the absence of a rule under a section title, the metric colours, the
+   gold edge a grid tile takes on hover, the zebra striping, the green Related
+   resources panel, the shared form field, and the scroll offset.
+
+   Nothing above is repeated here. What is here is the page's own furniture:
+   the query control, the examples, the advanced accordion, the results
+   controls and pagination, the gallery card and table views, and the lightbox.
+
+   The category pill bar that used to sit in the search panel is gone. The
+   Categories section is the browse affordance and the advanced panel holds the
+   filter, which is what every other hub does.
+   ========================================================================== */
+
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
 
 .mgdb-image-page .mgdb-hero-emblem {
-  gap: var(--mgdb-space-2);
-  padding: var(--mgdb-space-4) var(--mgdb-space-3);
-  border-right: 1px solid #cfe3d6;
-  background: linear-gradient(160deg, rgba(255, 255, 255, .92), rgba(255, 255, 255, .55));
-  color: var(--mgdb-green-dark);
+  background: #ffffff;
+  border-color: var(--mgdb-line);
 }
 
 .mgdb-image-page .mgdb-hero-emblem svg {
-  width: min(100%, 62px);
+  width: min(100%, 64px);
   height: auto;
   mix-blend-mode: normal;
 }
 
-/* ── Sticky Section Tabs ─────────────────────────────────────────────────── */
+/* ── Sticky section tabs ─────────────────────────────────────────────────── */
 
 .mgdb-image-page .mgdb-section-tabs {
   position: sticky;
@@ -24,10 +39,7 @@
   flex-wrap: wrap;
   gap: var(--mgdb-space-2);
   margin-top: var(--mgdb-space-5);
-  margin-bottom: var(--mgdb-space-6);
-  padding: var(--mgdb-space-2) 0;
-  background: var(--mgdb-surface);
-  border-bottom: 1px solid var(--mgdb-line);
+  margin-bottom: var(--mgdb-space-5);
 }
 
 .mgdb-image-page .mgdb-section-tabs a {
@@ -35,21 +47,17 @@
   min-height: 40px;
   align-items: center;
   padding: 0 var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
   color: var(--mgdb-ink) !important;
   font-size: var(--mgdb-text-sm);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
-  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
 }
 
-.mgdb-image-page .mgdb-section-tabs a:hover {
-  background: var(--mgdb-green-soft);
-  border-color: #bcd9c6;
-  color: var(--mgdb-green-dark) !important;
-}
+.mgdb-image-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
 
 .mgdb-image-page .mgdb-section-tabs a.is-current,
 .mgdb-image-page .mgdb-section-tabs a[aria-current="true"] {
@@ -59,119 +67,58 @@
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
-.mgdb-image-page > section,
-.mgdb-image-page section[id] {
-  scroll-margin-top: 4.5rem;
+@media (max-width: 1170px) and (min-width: 801px) {
+  .mgdb-hub-page.mgdb-image-page > section[id] { scroll-margin-top: 65px; }
 }
 
-/* ── Category Pill Bar ───────────────────────────────────────────────────── */
-
-.mgdb-image-page .image-category-pill-bar,
-.mgdb-image-page .image-category-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  margin-bottom: var(--mgdb-space-4);
+@media (max-width: 800px) {
+  .mgdb-hub-page.mgdb-image-page > section[id] { scroll-margin-top: 113px; }
 }
 
-.mgdb-image-page .image-cat-pill {
-  min-height: 36px;
-  padding: 0 var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
-  border-radius: 999px;
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink-soft);
-  font-family: inherit;
-  font-size: var(--mgdb-text-sm);
-  font-weight: 600;
-  cursor: pointer;
-  transition: background .12s, border-color .12s, color .12s;
+.mgdb-image-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+/* --------------------------------------------------------------------------
+   Search
+   -------------------------------------------------------------------------- */
+
+.mgdb-image-page .image-search-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-4);
+  align-items: end;
 }
 
-.mgdb-image-page .image-cat-pill:hover {
-  background: var(--mgdb-surface-alt);
-  color: var(--mgdb-ink);
-}
-
-.mgdb-image-page .image-cat-pill.is-active,
-.mgdb-image-page .image-cat-pill[aria-selected="true"] {
-  border-color: var(--mgdb-green-dark);
-  background: var(--mgdb-green-dark);
-  color: #fff;
-}
-
-/* ── Search Panel ────────────────────────────────────────────────────────── */
-
-.mgdb-image-page .image-search-panel {
-  padding: var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface-alt);
-}
-
-.mgdb-image-page .image-section-heading h2 {
-  color: var(--mgdb-green-dark);
-}
-
-.mgdb-image-page .image-section-heading p {
-  max-width: var(--mgdb-measure);
-  margin-top: var(--mgdb-space-2);
-  color: var(--mgdb-muted);
-}
-
-.mgdb-image-page #image-search-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-3) var(--mgdb-space-4);
-  align-items: flex-end;
-  margin-top: var(--mgdb-space-4);
-}
-
-.mgdb-image-page .image-main-search {
-  flex: 4 1 20rem;
-  min-width: 0;
-}
-
-.mgdb-image-page .image-sort-select {
-  flex: 2 1 12rem;
-  min-width: 0;
-}
-
-.mgdb-image-page .image-search-submit {
-  flex: 0 0 auto;
-}
-
-.mgdb-image-page .image-main-search label,
-.mgdb-image-page .image-sort-select label {
-  display: block;
-  margin-bottom: var(--mgdb-space-1);
-  color: var(--mgdb-ink);
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-}
+.mgdb-image-page .image-field-query { grid-column: 1; }
+/* Scoped with `>` to the search form: `.mgdb-hub-field-action` is a shared
+   class and the results controls use it too. */
+.mgdb-image-page .image-search-form > .mgdb-hub-field-action { grid-column: 2; }
+.mgdb-image-page .image-example-row,
+.mgdb-image-page .image-adv { grid-column: 1 / -1; }
 
 .mgdb-image-page .image-query-control {
   display: grid;
+  box-sizing: border-box;
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: var(--mgdb-space-2);
   align-items: center;
   min-height: var(--mgdb-tap-target);
+  height: var(--mgdb-tap-target);
   padding: 0 var(--mgdb-space-3);
   border: 1px solid #b9b2a5;
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
 }
 
 .mgdb-image-page .image-query-control:focus-within {
   border-color: var(--mgdb-focus);
+  box-shadow: 0 0 0 2px rgba(11, 87, 164, .18);
 }
 
-.mgdb-image-page .image-query-control svg {
-  color: var(--mgdb-muted);
-}
+.mgdb-image-page .image-search-icon { color: var(--mgdb-muted); }
 
-.mgdb-image-page .image-query-control input {
-  min-height: 40px;
+.mgdb-image-page .image-query-control input[type="search"] {
+  width: 100%;
+  min-width: 0;
   padding: 0;
   border: 0;
   background: transparent;
@@ -180,147 +127,303 @@
   font-size: var(--mgdb-text-base);
 }
 
-.mgdb-image-page .image-query-control input:focus {
-  outline: none;
-}
+.mgdb-image-page .image-query-control input[type="search"]:focus { outline: none; }
 
-.mgdb-image-page .image-query-control button {
+.mgdb-image-page #image-query-clear {
+  padding: 0 var(--mgdb-space-2);
   border: 0;
-  background: none;
-  color: var(--mgdb-burgundy);
+  background: transparent;
+  color: var(--mgdb-muted);
   font-family: inherit;
   font-size: var(--mgdb-text-sm);
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 
-.mgdb-image-page select.mgdb-select,
-.mgdb-image-page .image-sort-select select {
-  display: block;
-  width: 100%;
-  min-height: var(--mgdb-tap-target);
-  padding: var(--mgdb-space-2) var(--mgdb-space-3);
-  border: 1px solid #b9b2a5;
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink);
-  font-family: inherit;
-  font-size: var(--mgdb-text-base);
-}
+.mgdb-image-page #image-query-clear:hover { color: var(--mgdb-green-dark); text-decoration: underline; }
+
+/* ── Examples ────────────────────────────────────────────────────────────── */
 
 .mgdb-image-page .image-example-row {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-2);
   align-items: center;
-  flex: 1 0 100%;
-  margin-top: var(--mgdb-space-2);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--hub-line-soft);
+}
+
+.mgdb-image-page .image-example-row > span {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
 }
 
 .mgdb-image-page .image-example-row button {
-  padding: 2px 10px;
-  border: 1px solid var(--mgdb-line);
+  padding: var(--mgdb-space-1) var(--mgdb-space-3);
+  border: 1px solid var(--hub-line);
   border-radius: 999px;
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink-soft);
+  background: var(--hub-surface);
+  color: var(--mgdb-green-dark);
   font-family: inherit;
-  font-size: var(--mgdb-text-xs);
+  font-size: var(--mgdb-text-sm);
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
-  transition: background .12s, border-color .12s;
 }
 
 .mgdb-image-page .image-example-row button:hover {
+  border-color: var(--mgdb-green-dark);
   background: var(--mgdb-green-soft);
-  border-color: var(--mgdb-green);
+}
+
+/* ── Advanced search ─────────────────────────────────────────────────────── */
+
+.mgdb-image-page .image-adv {
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--hub-surface);
+}
+
+.mgdb-image-page .image-adv summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+  align-items: baseline;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
   color: var(--mgdb-green-dark);
+  cursor: pointer;
+  list-style-position: inside;
 }
 
-/* ── Gallery Results Section ─────────────────────────────────────────────── */
+.mgdb-image-page .image-adv summary strong { font-size: var(--mgdb-text-base); }
+.mgdb-image-page .image-adv summary span { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+.mgdb-image-page .image-adv[open] summary { border-bottom: 1px solid var(--hub-line-soft); }
 
-.mgdb-image-page .image-gallery-section {
-  margin-top: var(--mgdb-space-6);
+.mgdb-image-page .image-adv-body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 22rem));
+  gap: var(--mgdb-space-4);
+  align-items: start;
+  padding: var(--mgdb-space-4);
 }
+
+.mgdb-image-page .image-adv-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  padding: 0 var(--mgdb-space-4) var(--mgdb-space-4);
+}
+
+@media (max-width: 640px) {
+  .mgdb-image-page .image-search-form { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-image-page .image-search-form > .mgdb-hub-field-action { grid-column: 1; }
+  .mgdb-image-page .image-adv-body { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* --------------------------------------------------------------------------
+   Results
+   -------------------------------------------------------------------------- */
+
+.mgdb-image-page .image-gallery-section[hidden] { display: none; }
 
 .mgdb-image-page .image-results-heading {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-3) var(--mgdb-space-5);
-  align-items: flex-end;
+  align-items: end;
   justify-content: space-between;
-  padding-bottom: var(--mgdb-space-3);
-  border-bottom: 1px solid var(--mgdb-line);
+  margin-bottom: var(--mgdb-space-4);
 }
+
+.mgdb-image-page .image-results-heading h2 { margin: 0; }
+
+/* The controls take the width they need and the title column takes the rest. */
+.mgdb-image-page .image-results-heading > div:first-child { min-width: 0; flex: 1 1 18rem; }
 
 .mgdb-image-page #image-results-status {
-  margin-top: var(--mgdb-space-1);
-  color: var(--mgdb-ink-soft);
+  margin: var(--mgdb-space-1) 0 0;
+  color: var(--mgdb-muted);
   font-size: var(--mgdb-text-sm);
-  font-weight: 600;
 }
 
+/* Fixed tracks in a box sized to its own content. Declared with minmax(0, ...)
+   the first tracks take everything the parent offers and the last resolves to
+   0px, which drops its control onto a second row. */
 .mgdb-image-page .image-results-controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-3);
-  align-items: center;
+  display: grid;
+  width: max-content;
+  max-width: 100%;
+  flex: 0 0 auto;
+  grid-template-columns: 13rem 10rem auto auto;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: end;
+}
+
+@media (max-width: 900px) {
+  .mgdb-image-page .image-results-controls {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .mgdb-image-page .image-results-controls { grid-template-columns: minmax(0, 1fr); }
 }
 
 .mgdb-image-page .image-view-toggle {
   display: inline-flex;
-  gap: 2px;
-  border: 1px solid var(--mgdb-line);
+  overflow: hidden;
+  height: var(--mgdb-tap-target);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
-  padding: 2px;
+  background: var(--hub-surface);
 }
 
 .mgdb-image-page .image-view-btn {
   display: inline-flex;
+  min-height: 100%;
   align-items: center;
-  gap: var(--mgdb-space-2);
-  padding: 4px var(--mgdb-space-3);
-  border: none;
-  border-radius: var(--mgdb-radius-xs, 4px);
+  padding: 0 var(--mgdb-space-4);
+  border: 0;
   background: transparent;
   color: var(--mgdb-ink-soft);
   font-family: inherit;
   font-size: var(--mgdb-text-sm);
   font-weight: 600;
   cursor: pointer;
-  transition: background .15s, color .15s;
 }
 
-.mgdb-image-page .image-view-btn:hover:not([aria-pressed="true"]) {
-  background: var(--mgdb-surface-alt);
-  color: var(--mgdb-ink);
-}
+.mgdb-image-page .image-view-btn + .image-view-btn { border-left: 1px solid var(--hub-line); }
 
 .mgdb-image-page .image-view-btn[aria-pressed="true"] {
   background: var(--mgdb-green-dark);
-  color: #fff;
+  color: #ffffff;
 }
 
-.mgdb-image-page .image-view-btn svg {
-  width: 15px;
-  height: 15px;
-}
+/* ── Pagination ──────────────────────────────────────────────────────────── */
 
-.mgdb-image-page .image-export-buttons {
+.mgdb-image-page .image-pagination {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--mgdb-space-2);
-}
-
-.mgdb-image-page .image-results-container {
+  align-items: center;
+  justify-content: center;
   margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-4);
+  border-top: 1px solid var(--hub-line-soft);
 }
 
+.mgdb-image-page .image-pagination:empty { display: none; }
+
+.mgdb-image-page .image-pagination button {
+  min-width: var(--mgdb-tap-target);
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mgdb-image-page .image-pagination button:hover:not([disabled]) {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-image-page .image-pagination button.is-active {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+}
+
+.mgdb-image-page .image-pagination button[disabled] { opacity: .45; cursor: not-allowed; }
+
+/* --------------------------------------------------------------------------
+   Gallery grid
+   -------------------------------------------------------------------------- */
+
+/* The card view renders an inner `.image-results-grid` wrapper, so the grid
+   belongs on that and not on the container -- putting it on the container laid
+   out one child and left the cards in a single column. */
 .mgdb-image-page .image-results-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: var(--mgdb-space-4);
+}
+
+.mgdb-image-page .image-results-container.image-view-table { display: block; }
+
+/* --------------------------------------------------------------------------
+   Category and download card interiors
+
+   The tiles are the shell's, because both grids use .mgdb-card-grid.
+   -------------------------------------------------------------------------- */
+
+.mgdb-image-page .image-category-grid,
+.mgdb-image-page .image-download-grid {
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+@media (max-width: 900px) {
+  .mgdb-image-page .image-category-grid,
+  .mgdb-image-page .image-download-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+.mgdb-image-page .image-category-grid .mgdb-card h3,
+.mgdb-image-page .image-download-header h3 {
+  margin: 0;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-image-page .image-download-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+}
+
+/* The browse shortcut reads as a link into the search above, not a button. */
+.mgdb-image-page .image-category-card-btn {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mgdb-green-dark);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mgdb-image-page .image-category-card-btn:hover { text-decoration: underline; }
+.mgdb-image-page .image-download-card .mgdb-button { align-self: flex-start; }
+
+/* --------------------------------------------------------------------------
+   The figure
+   -------------------------------------------------------------------------- */
+
+.mgdb-image-page .image-figure { margin-top: var(--mgdb-space-5); }
+
+.mgdb-image-page .image-figure .mgdb-chart {
+  height: auto;
+  min-height: 320px;
+  overflow: visible;
+}
+
+@media print {
+  .mgdb-image-page .mgdb-section-tabs,
+  .mgdb-image-page .image-search-form,
+  .mgdb-image-page .image-pagination { display: none; }
 }
 
 /* ── Result Table (Table View) ───────────────────────────────────────────── */
@@ -638,109 +741,4 @@
   flex-wrap: wrap;
   gap: var(--mgdb-space-3);
   align-items: center;
-}
-
-/* ── Category & Download Cards ───────────────────────────────────────────── */
-
-.mgdb-image-page .image-category-card-btn {
-  display: inline-flex;
-  align-items: center;
-  margin-top: var(--mgdb-space-3);
-  padding: 0;
-  border: none;
-  background: none;
-  color: var(--mgdb-burgundy);
-  font-family: inherit;
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.mgdb-image-page .image-category-card-btn:hover {
-  text-decoration: underline;
-}
-
-.mgdb-image-page .image-download-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--mgdb-space-4);
-  margin-top: var(--mgdb-space-4);
-}
-
-.mgdb-image-page .image-download-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
-}
-
-.mgdb-image-page .image-download-header {
-  display: flex;
-  align-items: center;
-  gap: var(--mgdb-space-3);
-  margin-bottom: var(--mgdb-space-2);
-}
-
-.mgdb-image-page .image-download-header h3 {
-  margin: 0;
-  color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-lg);
-}
-
-.mgdb-image-page .image-download-card p {
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-  line-height: var(--mgdb-leading);
-  margin-bottom: var(--mgdb-space-4);
-}
-
-/* ── Pagination ──────────────────────────────────────────────────────────── */
-
-.mgdb-image-page .image-pagination {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  align-items: center;
-  justify-content: center;
-  margin-top: var(--mgdb-space-6);
-}
-
-.mgdb-image-page .image-pagination button {
-  min-width: var(--mgdb-tap-target);
-  min-height: var(--mgdb-tap-target);
-  padding: 0 var(--mgdb-space-3);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink);
-  font-family: inherit;
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-  cursor: pointer;
-  transition: background .12s, border-color .12s;
-}
-
-.mgdb-image-page .image-pagination button:hover:not(:disabled) {
-  background: var(--mgdb-surface-alt);
-}
-
-.mgdb-image-page .image-pagination button[aria-current="page"] {
-  border-color: var(--mgdb-green-dark);
-  background: var(--mgdb-green-dark);
-  color: #fff;
-}
-
-.mgdb-image-page .image-pagination button:disabled {
-  opacity: .4;
-  cursor: not-allowed;
-}
-
-/* Responsive */
-@media (max-width: 767px) {
-  .mgdb-image-page .image-search-panel { padding: var(--mgdb-space-4); }
-  .mgdb-image-page .image-results-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
-  .mgdb-image-page .image-results-heading { flex-direction: column; align-items: flex-start; }
 }

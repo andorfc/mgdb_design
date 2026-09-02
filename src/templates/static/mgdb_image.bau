@@ -4,11 +4,12 @@ $$SYNTAX-LEVEL 2
 <meta name="twitter:site" content="@MaizeGDB">
 <meta property="og:url" content="https://maizegdb.org/data_center/image">
 <meta property="og:title" content="MaizeGDB Image Data Hub">
-<meta property="og:description" content="Explore over 113,000 maize mutant ear photographs, agarose gel patterns, stock germplasm, teosinte species, and anatomical traits.">
+<meta property="og:description" content="Search over 113,000 maize mutant photographs, gel patterns, germplasm stocks, teosinte species, and anatomical illustrations.">
 
-<main class="mgdb-page mgdb-image-page" id="image-top" data-initial-category="$(initial_category)">
+<main class="mgdb-page mgdb-hub-page mgdb-image-page" id="image-main" data-initial-category="$(initial_category)">
+
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
-    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Images</span>
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Image Data Hub</span>
   </nav>
 
   <section class="mgdb-hero" aria-labelledby="image-title">
@@ -24,65 +25,42 @@ $$SYNTAX-LEVEL 2
     </div>
     <div class="mgdb-hero-body">
       <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; August 2026</p>
-      <h1 id="image-title">Explore photographs, mutant specimens, and molecular assays</h1>
-      <p class="mgdb-hero-description">Search over $(total_images) photographs across $(mutant_count) mutant variations, $(gel_count) gel patterns, $(stock_count) germplasm stocks, and wild teosinte species.</p>
+      <h1 id="image-title">Maize photographs, specimens, and molecular assays</h1>
+      <p class="mgdb-hero-description">$(total_images) curated images&#58; $(mutant_count) of mutants and variations, $(gel_count) gel patterns, $(stock_count) germplasm stocks, $(probe_count) probes, and $(species_count) of wild species.</p>
     </div>
   </section>
 
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#image-search-panel">Search &amp; Gallery</a>
+    <a href="#image-search" class="is-current" aria-current="true">Search</a>
     <a href="#image-categories">Categories</a>
     <a href="#image-downloads">Downloads</a>
-    <a href="#image-overview">Statistics</a>
-    <a href="#image-collections">Related resources</a>
+    <a href="#image-references">References</a>
+    <a href="#image-metrics">Metrics</a>
+    <a href="#image-related">Related resources</a>
   </nav>
 
-  <section id="image-search-panel" class="image-search-panel" aria-labelledby="image-search-title">
-    <div class="image-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Visual search &amp; filter</span>
-        <h2 id="image-search-title">Search image archive</h2>
-      </div>
-      <p>Filter by image category or search by gene symbol, mutant name, stock accession, probe identifier, or caption text.</p>
+  <!-- ── Search ───────────────────────────────────────────────────────────── -->
+  <section id="image-search" aria-labelledby="image-search-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="image-search-title">Search</h2></div>
     </div>
 
-    <div class="image-category-pill-bar" role="tablist" aria-label="Image category filter">
-      <button class="image-cat-pill is-active" type="button" data-cat="all" role="tab" aria-selected="true">All Images</button>
-      <button class="image-cat-pill" type="button" data-cat="mutant" role="tab" aria-selected="false">Mutants &amp; Variations</button>
-      <button class="image-cat-pill" type="button" data-cat="gel_pattern" role="tab" aria-selected="false">Gel Patterns</button>
-      <button class="image-cat-pill" type="button" data-cat="stock" role="tab" aria-selected="false">Stocks &amp; Germplasm</button>
-      <button class="image-cat-pill" type="button" data-cat="species" role="tab" aria-selected="false">Species &amp; Teosinte</button>
-      <button class="image-cat-pill" type="button" data-cat="trait" role="tab" aria-selected="false">Traits &amp; Anatomy</button>
-      <button class="image-cat-pill" type="button" data-cat="probe" role="tab" aria-selected="false">Probes &amp; Markers</button>
-    </div>
-
-    <form id="image-search-form" role="search">
-      <div class="image-main-search">
-        <label for="image-query">Search keywords, symbols, or captions</label>
+    <form id="image-search-form" class="image-search-form" role="search">
+      <div class="mgdb-hub-field image-field-query">
+        <label for="image-query">Keyword, gene symbol, stock, or caption text</label>
         <div class="image-query-control">
           <svg class="image-search-icon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="7" r="5"/><line x1="11" y1="11" x2="15" y2="15"/></svg>
-          <input id="image-query" name="q" type="search" placeholder="Try purple, Ac Ds transposon, umc90, teosinte, shrunken, B73, or dwarf" autocomplete="off" />
+          <input id="image-query" name="q" type="search" placeholder="Keyword, gene symbol, stock accession, probe, or caption text" autocomplete="off" />
           <button id="image-query-clear" type="button" hidden>Clear</button>
         </div>
       </div>
 
-      <div class="image-sort-select">
-        <label for="image-sort">Sort order</label>
-        <select id="image-sort" name="sort">
-          <option value="relevance">Relevance</option>
-          <option value="latest" selected>Latest curated</option>
-          <option value="name-asc">Name \(A&ndash;Z\)</option>
-          <option value="name-desc">Name \(Z&ndash;A\)</option>
-          <option value="category">Category</option>
-        </select>
+      <div class="mgdb-hub-field mgdb-hub-field-action">
+        <button class="mgdb-button mgdb-button-primary" type="submit">Search images</button>
       </div>
 
-      <div class="image-search-submit">
-        <button class="mgdb-button mgdb-button-primary" type="submit">Search gallery</button>
-      </div>
-
-      <div class="image-example-row" aria-label="Example image searches">
-        <span>Examples</span>
+      <div class="image-example-row" aria-label="Example searches">
+        <span>Examples&#58;</span>
         <button type="button" data-img-example="purple">purple aleurone</button>
         <button type="button" data-img-example="Ac Ds">Ac/Ds transposon</button>
         <button type="button" data-img-example="umc90">umc90</button>
@@ -90,28 +68,75 @@ $$SYNTAX-LEVEL 2
         <button type="button" data-img-example="shrunken">shrunken kernel</button>
         <button type="button" data-img-example="dwarf">dwarf plant</button>
       </div>
+
+      <details class="image-adv" id="image-adv">
+        <summary>
+          <strong>Advanced search criteria</strong>
+          <span>Restrict to one image category, or change how matches are ordered</span>
+        </summary>
+        <div class="image-adv-body">
+          <div class="mgdb-hub-field">
+            <label for="image-filter-category">Image category</label>
+            <select id="image-filter-category" name="category">
+              <option value="all">All categories</option>
+              <option value="mutant">Mutants and variations</option>
+              <option value="gel_pattern">Gel patterns</option>
+              <option value="stock">Stocks and germplasm</option>
+              <option value="species">Species and teosinte</option>
+              <option value="trait">Traits and anatomy</option>
+              <option value="probe">Probes and markers</option>
+            </select>
+          </div>
+
+          <div class="mgdb-hub-field">
+            <label for="image-sort">Sort order</label>
+            <select id="image-sort" name="sort">
+              <option value="latest" selected>Latest curated</option>
+              <option value="relevance">Best match</option>
+              <option value="name-asc">Name &#40;A&ndash;Z&#41;</option>
+              <option value="name-desc">Name &#40;Z&ndash;A&#41;</option>
+              <option value="category">Category</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="image-adv-actions">
+          <button class="mgdb-button mgdb-button-primary" type="submit">Apply advanced filters</button>
+          <button class="mgdb-button mgdb-button-quiet" id="image-adv-reset" type="button">Reset advanced filters</button>
+        </div>
+      </details>
     </form>
   </section>
 
-  <section id="image-gallery-section" class="image-gallery-section" aria-labelledby="image-gallery-title">
+  <!-- ── Search results: hidden until a search runs ───────────────────────── -->
+  <section id="image-gallery-section" class="image-gallery-section" aria-labelledby="image-gallery-title" hidden>
     <div class="image-results-heading">
       <div>
-        <span class="mgdb-eyebrow">Visual gallery</span>
-        <h2 id="image-gallery-title">Matching images</h2>
-        <p id="image-results-status" aria-live="polite">Loading images&hellip;</p>
+        <h2 id="image-gallery-title">Search results</h2>
+        <p id="image-results-status" role="status" aria-live="polite"></p>
       </div>
       <div class="image-results-controls">
-        <div class="image-view-toggle" role="group" aria-label="View style">
-          <button class="image-view-btn" type="button" data-view="card" aria-pressed="true">
-            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>Cards
-          </button>
-          <button class="image-view-btn" type="button" data-view="table" aria-pressed="false">
-            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="2" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="12" width="14" height="2" rx="1" fill="currentColor"/></svg>Table
-          </button>
+        <div class="mgdb-hub-field">
+          <label for="image-results-filter">Filter results</label>
+          <input id="image-results-filter" type="search" placeholder="Narrow this page" autocomplete="off" />
         </div>
-        <div class="image-export-buttons">
+        <div class="mgdb-hub-field">
+          <label for="image-page-size">Results per page</label>
+          <select id="image-page-size">
+            <option value="10">Top 10</option>
+            <option value="25" selected>Top 25</option>
+            <option value="50">Top 50</option>
+            <option value="all">All results</option>
+          </select>
+        </div>
+        <div class="mgdb-hub-field mgdb-hub-field-action">
+          <div class="image-view-toggle" role="group" aria-label="View style">
+            <button class="image-view-btn" type="button" data-view="card" aria-pressed="true">Cards</button>
+            <button class="image-view-btn" type="button" data-view="table" aria-pressed="false">Table</button>
+          </div>
+        </div>
+        <div class="mgdb-hub-field mgdb-hub-field-action">
           <a class="mgdb-button mgdb-button-quiet" id="image-export-tsv" href="#" download>Export TSV</a>
-          <a class="mgdb-button mgdb-button-quiet" id="image-export-csv" href="#" download>Export CSV</a>
         </div>
       </div>
     </div>
@@ -119,184 +144,196 @@ $$SYNTAX-LEVEL 2
     <div id="image-results" class="image-results-container image-view-card"></div>
 
     <div id="image-empty" class="mgdb-empty" hidden>
-      <h3>No images matched your query</h3>
-      <p>Try searching with a broader keyword or switching to 'All Images'.</p>
+      <h3>No images matched that search</h3>
+      <p>Try a broader keyword such as <code>purple</code> or <code>kernel</code>, or clear the category filter.</p>
       <button class="mgdb-button mgdb-button-secondary" id="image-empty-reset" type="button">Reset search</button>
     </div>
 
-    <nav id="image-pagination" class="image-pagination" aria-label="Image gallery pages"></nav>
+    <nav id="image-pagination" class="image-pagination" aria-label="Search result pages"></nav>
   </section>
 
+  <!-- ── Categories ───────────────────────────────────────────────────────── -->
   <section id="image-categories" aria-labelledby="image-categories-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Category index</span>
-        <h2 id="image-categories-title">Explore by media category</h2>
-      </div>
-      <p>Navigate directly to curated image sets for specific experimental and genetic domains.</p>
+      <div><h2 id="image-categories-title">Categories</h2></div>
     </div>
-
     <div class="mgdb-card-grid image-category-grid">
-      <article class="mgdb-card">
-        <span class="mgdb-pill mgdb-pill-ok">$(mutant_count) Photos</span>
-        <h3>Mutants &amp; Variations</h3>
-        <p>Photographs of mutant ears, seedlings, and kernel mosaicism from the Gerald Neuffer pollen mutagenesis collection and classical alleles.</p>
-        <button class="image-category-card-btn" type="button" data-switch-cat="mutant">Browse Mutants &rarr;</button>
-      </article>
+          <article class="mgdb-card">
+            <span class="mgdb-pill mgdb-pill-ok">$(mutant_count) Photos</span>
+            <h3>Mutants &amp; Variations</h3>
+            <p>Photographs of mutant ears, seedlings, and kernel mosaicism from the Gerald Neuffer pollen mutagenesis collection and classical alleles.</p>
+            <button class="image-category-card-btn" type="button" data-switch-cat="mutant">Browse Mutants &rarr;</button>
+          </article>
 
-      <article class="mgdb-card">
-        <span class="mgdb-pill mgdb-pill-info">$(gel_count) Assays</span>
-        <h3>Gel Pattern Archive</h3>
-        <p>Agarose and polyacrylamide gel hybridization assays linked to restriction fragment length polymorphism \(RFLP\) and SSR markers.</p>
-        <button class="image-category-card-btn" type="button" data-switch-cat="gel_pattern">Browse Gel Patterns &rarr;</button>
-      </article>
+          <article class="mgdb-card">
+            <span class="mgdb-pill mgdb-pill-info">$(gel_count) Assays</span>
+            <h3>Gel Pattern Archive</h3>
+            <p>Agarose and polyacrylamide gel hybridization assays linked to restriction fragment length polymorphism \(RFLP\) and SSR markers.</p>
+            <button class="image-category-card-btn" type="button" data-switch-cat="gel_pattern">Browse Gel Patterns &rarr;</button>
+          </article>
 
-      <article class="mgdb-card">
-        <span class="mgdb-pill mgdb-pill-warn">$(stock_count) Photos</span>
-        <h3>Stocks &amp; Germplasm</h3>
-        <p>Specimen photographs of maize inbred lines, landraces, seed packets, and mutant lines distributed by the COOP Stock Center.</p>
-        <button class="image-category-card-btn" type="button" data-switch-cat="stock">Browse Stocks &rarr;</button>
-      </article>
+          <article class="mgdb-card">
+            <span class="mgdb-pill mgdb-pill-warn">$(stock_count) Photos</span>
+            <h3>Stocks &amp; Germplasm</h3>
+            <p>Specimen photographs of maize inbred lines, landraces, seed packets, and mutant lines distributed by the COOP Stock Center.</p>
+            <button class="image-category-card-btn" type="button" data-switch-cat="stock">Browse Stocks &rarr;</button>
+          </article>
 
-      <article class="mgdb-card">
-        <span class="mgdb-pill">$(species_count) Photos</span>
-        <h3>Species &amp; Teosinte</h3>
-        <p>Field photographs, botanical illustrations, and spikelet architecture across wild Zea species and Tripsacum relatives.</p>
-        <button class="image-category-card-btn" type="button" data-switch-cat="species">Browse Species &rarr;</button>
-      </article>
+          <article class="mgdb-card">
+            <span class="mgdb-pill">$(species_count) Photos</span>
+            <h3>Species &amp; Teosinte</h3>
+            <p>Field photographs, botanical illustrations, and spikelet architecture across wild Zea species and Tripsacum relatives.</p>
+            <button class="image-category-card-btn" type="button" data-switch-cat="species">Browse Species &rarr;</button>
+          </article>
 
-      <article class="mgdb-card">
-        <span class="mgdb-pill mgdb-pill-ok">$(probe_count) Probes</span>
-        <h3>Probes &amp; Clones</h3>
-        <p>Autoradiographs, clone hybridizations, and physical map contig anchoring images for maize genomic probes.</p>
-        <button class="image-category-card-btn" type="button" data-switch-cat="probe">Browse Probes &rarr;</button>
-      </article>
+          <article class="mgdb-card">
+            <span class="mgdb-pill mgdb-pill-ok">$(probe_count) Probes</span>
+            <h3>Probes &amp; Clones</h3>
+            <p>Autoradiographs, clone hybridizations, and physical map contig anchoring images for maize genomic probes.</p>
+            <button class="image-category-card-btn" type="button" data-switch-cat="probe">Browse Probes &rarr;</button>
+          </article>
 
-      <article class="mgdb-card">
-        <span class="mgdb-pill mgdb-pill-warn">300+ Illustrations</span>
-        <h3>Traits &amp; Anatomy</h3>
-        <p>Plant Ontology \(PO\) and Trait Ontology \(TO\) anatomical diagrams, vegetative tissues, and developmental growth stages.</p>
-        <button class="image-category-card-btn" type="button" data-switch-cat="trait">Browse Traits &rarr;</button>
-      </article>
-    </div>
+          <article class="mgdb-card">
+            <span class="mgdb-pill mgdb-pill-warn">300+ Illustrations</span>
+            <h3>Traits &amp; Anatomy</h3>
+            <p>Plant Ontology \(PO\) and Trait Ontology \(TO\) anatomical diagrams, vegetative tissues, and developmental growth stages.</p>
+            <button class="image-category-card-btn" type="button" data-switch-cat="trait">Browse Traits &rarr;</button>
+          </article>
+        </div>
   </section>
 
+  <!-- ── Downloads ────────────────────────────────────────────────────────── -->
   <section id="image-downloads" aria-labelledby="image-downloads-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Bulk data</span>
-        <h2 id="image-downloads-title">Image archives &amp; downloads</h2>
-      </div>
-      <p>High-resolution batch image downloads for offline analysis, teaching, and publication.</p>
+      <div><h2 id="image-downloads-title">Downloads</h2></div>
+    </div>
+    <div class="mgdb-card-grid image-download-grid" aria-label="Image downloads">
+          <article class="mgdb-card image-download-card">
+            <div class="image-download-header">
+              <span class="mgdb-pill mgdb-pill-ok">ZIP Archive</span>
+              <h3>Neuffer High-Res Mutant Images</h3>
+            </div>
+            <p>Download the complete collection of Dr. M. Gerald Neuffer's original high-resolution maize mutant photographs.</p>
+            <a class="mgdb-button mgdb-button-secondary" href="https\://download.maizegdb.org/Neuffer_Mutant_Images/Neuffer_Mutant_Images.zip">Download ZIP Archive <span aria-hidden="true">&darr;</span></a>
+          </article>
+
+          <article class="mgdb-card image-download-card">
+            <div class="image-download-header">
+              <span class="mgdb-pill mgdb-pill-info">Export</span>
+              <h3>Full Image Metadata TSV</h3>
+            </div>
+            <p>Export full metadata for all 113,000+ images with record IDs, direct image URLs, and captions.</p>
+            <a class="mgdb-button mgdb-button-secondary" href="/search/image/image_search_api.php?category=all&amp;format=tsv">Download Metadata TSV <span aria-hidden="true">&darr;</span></a>
+          </article>
+        </div>
+  </section>
+
+  <!-- ── References ───────────────────────────────────────────────────────── -->
+  <section id="image-references" aria-labelledby="image-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="image-references-title">References</h2></div>
     </div>
 
-    <div class="image-download-grid" aria-label="Image downloads">
-      <article class="image-download-card">
-        <div class="image-download-header">
-          <span class="mgdb-pill mgdb-pill-ok">ZIP Archive</span>
-          <h3>Neuffer High-Res Mutant Images</h3>
-        </div>
-        <p>Download the complete collection of Dr. M. Gerald Neuffer's original high-resolution maize mutant photographs.</p>
-        <a class="mgdb-button mgdb-button-secondary" href="https\://download.maizegdb.org/Neuffer_Mutant_Images/Neuffer_Mutant_Images.zip">Download ZIP Archive <span aria-hidden="true">&darr;</span></a>
-      </article>
-
-      <article class="image-download-card">
-        <div class="image-download-header">
-          <span class="mgdb-pill mgdb-pill-info">Export</span>
-          <h3>Full Image Metadata TSV</h3>
-        </div>
-        <p>Export full metadata for all 113,000+ images with record IDs, direct image URLs, and captions.</p>
-        <a class="mgdb-button mgdb-button-secondary" href="/search/image/image_search_api.php?category=all&amp;format=tsv">Download Metadata TSV <span aria-hidden="true">&darr;</span></a>
-      </article>
+    <div class="mgdb-ref-list">
+      $(reference_cards)
     </div>
   </section>
 
-  <section id="image-overview" aria-labelledby="image-overview-title">
+  <!-- ── Metrics ──────────────────────────────────────────────────────────── -->
+  <section id="image-metrics" aria-labelledby="image-metrics-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Corpus summary</span>
-        <h2 id="image-overview-title">Image dataset at a glance</h2>
-      </div>
-      <p>Curated photographs, microscopic images, gel patterns, and anatomical diagrams maintained at MaizeGDB.</p>
+      <div><h2 id="image-metrics-title">Metrics</h2></div>
     </div>
 
     <div class="mgdb-metric-grid">
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-green">
         <div class="mgdb-metric-top">
-          <h3>Curated Images</h3>
-          <span class="mgdb-metric-badge">Gallery</span>
+          <h3>Images</h3>
+          <span class="mgdb-metric-badge">Curated</span>
         </div>
         <div class="mgdb-metric-stat">
           <strong class="mgdb-metric-value">$(total_images)</strong>
         </div>
-        <p class="mgdb-metric-description">Total photographs, gel patterns, and anatomical plates.</p>
+        <p class="mgdb-metric-description">Curated images with a resolvable file, at curation level 0.</p>
       </article>
 
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-amber">
         <div class="mgdb-metric-top">
-          <h3>Mutant Specimens</h3>
+          <h3>Mutants and variations</h3>
           <span class="mgdb-metric-badge">Phenotypes</span>
         </div>
         <div class="mgdb-metric-stat">
           <strong class="mgdb-metric-value">$(mutant_count)</strong>
         </div>
-        <p class="mgdb-metric-description">Ears, seedlings, and kernel mosaicism across mutant lines.</p>
+        <p class="mgdb-metric-description">Photographs attached to a variation record, largely the Neuffer collection.</p>
       </article>
 
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-blue">
         <div class="mgdb-metric-top">
-          <h3>Gel Patterns</h3>
+          <h3>Gel patterns</h3>
           <span class="mgdb-metric-badge">Assays</span>
         </div>
         <div class="mgdb-metric-stat">
           <strong class="mgdb-metric-value">$(gel_count)</strong>
         </div>
-        <p class="mgdb-metric-description">RFLP and SSR marker hybridization assay images.</p>
+        <p class="mgdb-metric-description">Hybridization and electrophoresis assays linked to marker records.</p>
       </article>
 
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-burgundy">
         <div class="mgdb-metric-top">
-          <h3>Germplasm Stocks</h3>
-          <span class="mgdb-metric-badge">Stocks</span>
+          <h3>Stocks and germplasm</h3>
+          <span class="mgdb-metric-badge">Specimens</span>
         </div>
         <div class="mgdb-metric-stat">
           <strong class="mgdb-metric-value">$(stock_count)</strong>
         </div>
-        <p class="mgdb-metric-description">Specimen photos of inbred lines, landraces, and seeds.</p>
+        <p class="mgdb-metric-description">Specimen photographs of inbred lines, landraces, and distributed stocks.</p>
       </article>
     </div>
+
+    <figure class="mgdb-figure image-figure">
+      <h3>Images by category</h3>
+      <div class="mgdb-chart" id="image-category-chart" role="img"
+           aria-label="Horizontal bar chart of the number of curated images in each category"
+           data-labels="$(chart_labels)" data-values="$(chart_values)" data-cats="$(chart_cats)">
+        <div class="mgdb-chart-fallback">Loading the category breakdown&hellip;</div>
+      </div>
+      <figcaption>Traits and anatomy are not shown&#58; they are ontology illustrations rather than photographs and are counted separately. Select a bar to search that category.</figcaption>
+    </figure>
   </section>
 
-  <section id="image-collections" aria-labelledby="image-collections-title">
+  <!-- ── Related resources ────────────────────────────────────────────────── -->
+  <section id="image-related" class="mgdb-hub-related" aria-labelledby="image-related-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Connected tools</span>
-        <h2 id="image-collections-title">Related resources</h2>
-      </div>
-      <p>Explore related MaizeGDB mutant phenotypic guides, marker data hubs, and external resources.</p>
+      <div><h2 id="image-related-title">Related resources</h2></div>
     </div>
 
     <div class="mgdb-resource-panel">
       <div class="mgdb-resource-list">
-        <a href="https\://mutants.maizegdb.org/doku.php" target="_blank" rel="noopener">
-          <strong>Guide to Maize Mutant Phenotypes</strong>
-          <span>Classic online monograph by M. Gerald Neuffer with pollen EMS mutagenesis history and high-res plates</span>
-          <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+        <a href="/data_center/variation">
+          <strong>Variations &amp; Alleles Data Hub</strong>
+          <span>The mutant records most of these photographs are attached to</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/stock">
+          <strong>Stock Center &amp; Germplasm</strong>
+          <span>Order the seed behind the specimen photographs, from the COOP Stock Center</span>
+          <span class="mgdb-resource-badge">Internal</span>
         </a>
         <a href="/data_center/phenotype">
           <strong>Phenotype Data Hub</strong>
-          <span>Search over 1,190 mutant phenotypes classified by plant body part and trait ontologies</span>
+          <span>Curated phenotype descriptions and the trait ontology terms these images illustrate</span>
           <span class="mgdb-resource-badge">Internal</span>
         </a>
-        <a href="/data_center/marker">
-          <strong>Molecular Marker &amp; Probe Center</strong>
-          <span>Over 771,000 marker records with mapped chromosome bin positions and gel assay evidence</span>
+        <a href="/gene_center/gene">
+          <strong>Gene Data Hub</strong>
+          <span>Gene models, annotations, and cross-references for the loci in these captions</span>
           <span class="mgdb-resource-badge">Internal</span>
         </a>
-        <a href="/gene_center">
-          <strong>Gene Model Center</strong>
-          <span>Annotations, cross-references, and functional data by assembly</span>
-          <span class="mgdb-resource-badge">Internal</span>
+        <a href="https://images.maizegdb.org/" target="_blank" rel="noopener">
+          <strong>MaizeGDB image server</strong>
+          <span>The original files behind every thumbnail on this page</span>
+          <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
         </a>
       </div>
     </div>

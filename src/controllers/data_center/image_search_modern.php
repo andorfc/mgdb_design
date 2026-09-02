@@ -7,6 +7,8 @@
  */
 
 include_once('./include/db-api.php');
+include_once('./include/dashboard_cache.php');
+include_once('./include/references_lib.php');
 
 $system = getSystemInfo('mgdb.conf');
 logMessage('Starting image_search_modern.php');
@@ -26,14 +28,22 @@ $css_file = $doc_root . '/css/mgdb-image.css';
 $js_file = $doc_root . '/js/mgdb-image.js';
 $v_css = file_exists($css_file) ? filemtime($css_file) : time();
 $v_js = file_exists($js_file) ? filemtime($js_file) : time();
+$hub_file = $doc_root . '/css/mgdb-hub.css';
+$v_hub = file_exists($hub_file) ? filemtime($hub_file) : time();
 
 $bauplan->preHTML('<meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
 $bauplan->includeCss('/css/static.css');
 $bauplan->includeCss('/css/mgdb-modern.css');
 $bauplan->includeCss('/css/mgdb-megamenu.css');
+/* The shared Data Hub shell -- ground, section cards, coloured section edges,
+   metric colours, reference card, form row -- before the page's own sheet,
+   which is the order css/mgdb-hub.css documents. `mgdb-hub-page` on <main>
+   opts in. */
+$bauplan->includeCss('/css/mgdb-hub.css?v=' . $v_hub);
 $bauplan->includeCss('/css/mgdb-image.css?v=' . $v_css);
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
+$bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
 $bauplan->includeScript('/js/mgdb-image.js?v=' . $v_js);
 $bauplan->head('<meta name="description" content="Explore over 113,000 maize photographs, mutant ear specimens, gel patterns, stock germplasm, teosinte species, and anatomical traits.">');
 
@@ -68,14 +78,60 @@ if (isset($_GET['category']) && $_GET['category'] !== '') {
 }
 $content->get('initial_category')->replace($initialCategory);
 
-// Live corpus statistics
-$stats = getImageCorpusStats($DBConn);
+/* Corpus statistics.
+ *
+ * These were read live on every request and cost 1,952 ms of the page's 2,132:
+ * a COUNT over web_image at 904 ms and a GROUP BY over the same join at
+ * 1,048 ms. They are collection-wide and identical for every visitor, so they
+ * belong behind dashboardCache like every other hub's. The key carries this
+ * file's mtime because the chart series below is built here.
+ */
+$cache_key = 'image/hub_' . (int) @filemtime(__FILE__);
+
+$page_data = dashboardCache($system, $cache_key, function () use ($DBConn) {
+    $stats = getImageCorpusStats($DBConn);
+
+    /* The figure reads the same six counts the metric cards and the category
+       cards do, so nothing is queried twice. Plotly draws a horizontal bar
+       chart bottom-up, so the largest goes last. */
+    $chart = array(
+        array('label' => 'Probes & markers',    'value' => $stats['probes'],  'cat' => 'probe'),
+        array('label' => 'Species & teosinte',  'value' => $stats['species'], 'cat' => 'species'),
+        array('label' => 'Stocks & germplasm',  'value' => $stats['stocks'],  'cat' => 'stock'),
+        array('label' => 'Gel patterns',        'value' => $stats['gels'],    'cat' => 'gel_pattern'),
+        array('label' => 'Mutants & variations','value' => $stats['mutants'], 'cat' => 'mutant')
+    );
+
+    return array('stats' => $stats, 'chart' => $chart);
+});
+
+$stats = $page_data['stats'];
 $content->get('total_images')->replace(number_format($stats['total']));
 $content->get('mutant_count')->replace(number_format($stats['mutants']));
 $content->get('gel_count')->replace(number_format($stats['gels']));
 $content->get('stock_count')->replace(number_format($stats['stocks']));
 $content->get('species_count')->replace(number_format($stats['species']));
 $content->get('probe_count')->replace(number_format($stats['probes']));
+
+$content->get('chart_labels')->replace(htmlspecialchars(json_encode(array_map(function ($r) { return $r['label']; }, $page_data['chart'])), ENT_QUOTES, 'UTF-8'));
+$content->get('chart_values')->replace(htmlspecialchars(json_encode(array_map(function ($r) { return (int) $r['value']; }, $page_data['chart'])), ENT_QUOTES, 'UTF-8'));
+$content->get('chart_cats')->replace(htmlspecialchars(json_encode(array_map(function ($r) { return $r['cat']; }, $page_data['chart'])), ENT_QUOTES, 'UTF-8'));
+
+/* References: the collections and curation this archive is built from,
+   rendered by include/references_lib.php from the curated bibliography so these
+   cards match every other hub. */
+$content->get('reference_cards')->replace(mgdb_render_references($doc_root, array(
+    // How images are curated into the database alongside the other data types.
+    array('doi' => '10.1016/j.cpb.2017.11.001'),
+    // The image database and its genome links.
+    array('doi' => '10.3389/fpls.2019.01050'),
+    // Image analysis for phenomics, and the ground truth it needs.
+    array('doi' => '10.1371/journal.pcbi.1006337'),
+    // The database these image records hang off.
+    array('doi' => '10.1093/nar/gky1046'),
+    // Curation and outreach, which is where the Neuffer collection came in.
+    array('doi' => '10.1093/database/bar022'),
+)));
 
 include_once('translation.php');
 

@@ -13,10 +13,17 @@
     sort: 'latest',
     view: 'card',
     page: 1,
-    pageSize: 24,
+    pageSize: 25,
+    /* The endpoint caps a page at 100, so "All results" means "as many as it
+       returns at once", which the status line says rather than truncating
+       quietly. */
+    filter: '',
+    searched: false,
     currentData: null,
     loading: false
   };
+
+  var MAX_PAGE = 100;
 
   function byId(id) { return document.getElementById(id); }
 
@@ -35,67 +42,87 @@
 
   /* ── Section Tabs & Scrollspy ───────────────────────────────────────────── */
 
+  /* Sticky section tabs, driven by scroll, IntersectionObserver and resize
+     together: no single trigger fires everywhere, and the results section
+     appears and disappears under the bar as searches run. */
   function buildTabs() {
     var tabs = document.querySelectorAll('.mgdb-section-tabs a');
-    if (!tabs.length) return;
+    if (!tabs.length) { return; }
 
     var pairs = [];
     Array.prototype.forEach.call(tabs, function (tab) {
-      var href = tab.getAttribute('href');
-      if (href && href.startsWith('#')) {
-        var section = document.querySelector(href);
-        if (section) {
-          pairs.push({ tab: tab, section: section });
-        }
-      }
+      var href = tab.getAttribute('href') || '';
+      if (href.charAt(0) !== '#') { return; }
+      var section = document.getElementById(href.slice(1));
+      if (section) { pairs.push({ tab: tab, section: section }); }
     });
+    if (!pairs.length) { return; }
 
-    function markCurrent(target) {
+    var heldUntilScroll = null;
+    var heldAtY = 0;
+
+    function mark(section) {
       pairs.forEach(function (pair) {
-        var current = pair.section === target;
+        var current = pair.section === section;
         pair.tab.classList.toggle('is-current', current);
-        if (current) {
-          pair.tab.setAttribute('aria-current', 'true');
-        } else {
-          pair.tab.removeAttribute('aria-current');
-        }
+        if (current) { pair.tab.setAttribute('aria-current', 'true'); }
+        else { pair.tab.removeAttribute('aria-current'); }
       });
     }
 
-    var initial = pairs[0];
-    if (window.location.hash) {
-      pairs.forEach(function (pair) {
-        if ('#' + pair.section.id === window.location.hash) {
-          initial = pair;
-        }
-      });
+    /* The line the spy measures against is the section's own scroll-margin-top,
+       read back from CSS rather than repeated here, so a clicked tab and the
+       scrollspy agree by construction. */
+    function triggerLine() {
+      var bar = document.querySelector('.mgdb-section-tabs');
+      var barHeight = bar ? bar.getBoundingClientRect().height : 0;
+      var margin = parseFloat(window.getComputedStyle(pairs[0].section).scrollMarginTop) || 0;
+      return Math.max(barHeight + 8, margin + 4);
     }
-    if (initial) {
-      markCurrent(initial.section);
+
+    function update() {
+      if (heldUntilScroll) {
+        if (Math.abs(window.scrollY - heldAtY) < 4) { return; }
+        heldUntilScroll = null;
+      }
+      var line = triggerLine();
+      var current = pairs[0];
+      pairs.forEach(function (pair) {
+        if (pair.section.hasAttribute('hidden')) { return; }
+        if (pair.section.getBoundingClientRect().top <= line) { current = pair; }
+      });
+      if ((window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 2)) {
+        current = pairs[pairs.length - 1];
+      }
+      if (current) { mark(current.section); }
     }
 
     pairs.forEach(function (pair) {
       pair.tab.addEventListener('click', function () {
-        markCurrent(pair.section);
+        mark(pair.section);
+        heldUntilScroll = pair.section;
+        heldAtY = window.scrollY;
       });
     });
 
-    if (!window.IntersectionObserver) return;
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
 
-    var observer = new window.IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          markCurrent(entry.target);
-        }
+    if (window.IntersectionObserver) {
+      var observer = new window.IntersectionObserver(function () { update(); },
+        { rootMargin: '-20% 0px -60% 0px' });
+      pairs.forEach(function (pair) { observer.observe(pair.section); });
+    }
+
+    var results = byId('image-gallery-section');
+    if (results && window.MutationObserver) {
+      new window.MutationObserver(update).observe(results, {
+        childList: true, subtree: true, attributes: true, attributeFilter: ['hidden']
       });
-    }, { rootMargin: '-20% 0px -60% 0px' });
+    }
 
-    pairs.forEach(function (pair) {
-      observer.observe(pair.section);
-    });
+    update();
   }
-
-  /* ── URL Parameter Sync ─────────────────────────────────────────────────── */
 
   function readUrlParams() {
     var main = byId('image-top');
@@ -171,12 +198,18 @@
       status.textContent = 'Searching image collection…';
     }
 
+    var section = byId('image-gallery-section');
+    if (section) { section.hidden = false; }
+    state.searched = true;
+
+    var size = state.pageSize === 'all' ? MAX_PAGE : state.pageSize;
+
     var params = new URLSearchParams();
     if (state.term) params.set('term', state.term);
     if (state.category) params.set('category', state.category);
     params.set('sort', state.sort);
-    params.set('page', state.page);
-    params.set('page_size', state.pageSize);
+    params.set('page', state.pageSize === 'all' ? 1 : state.page);
+    params.set('page_size', size);
 
     updateUrlParams();
     updateExportLinks();
@@ -193,6 +226,7 @@
         }
 
         renderResults(data);
+        applyResultsFilter();
         renderPagination(data.summary.page, data.summary.page_count);
 
         if (scrollToResults && container) {
@@ -233,8 +267,12 @@
     var queryText = data.query.term ? ' for “' + esc(data.query.term) + '”' : '';
 
     if (status) {
-      status.textContent = 'Showing ' + number(start) + '–' + number(end) + ' of ' + number(summary.total)
-        + ' images' + queryText + ' · ' + number(summary.elapsed_ms) + ' ms';
+      status.textContent = state.pageSize === 'all'
+        ? 'Showing ' + number(Math.min(summary.total, MAX_PAGE)) + ' of ' + number(summary.total)
+          + ' images' + queryText + ', which is as many as the search returns at once.'
+          + ' (' + number(summary.elapsed_ms) + ' ms)'
+        : 'Showing ' + number(start) + '–' + number(end) + ' of ' + number(summary.total)
+          + ' images' + queryText + '. (' + number(summary.elapsed_ms) + ' ms)';
     }
 
     if (!container) return;
@@ -427,7 +465,7 @@
     var nav = byId('image-pagination');
     if (!nav) return;
 
-    if (pageCount <= 1) {
+    if (state.pageSize === 'all' || pageCount <= 1) {
       nav.innerHTML = '';
       return;
     }
@@ -461,6 +499,43 @@
     });
   }
 
+  /* Narrows the page already rendered, in both the card and the table view.
+     The gallery pages server side, so this filters what is on screen rather
+     than the whole result set, and the status line says so. */
+  function applyResultsFilter() {
+    var container = byId('image-results');
+    if (!container) { return; }
+
+    /* The card view renders `.mgdb-image-card`; the table view renders rows.
+       One selector covers both so the filter works in either. */
+    var items = container.querySelectorAll('.mgdb-image-card, tbody tr');
+    var terms = state.filter.toLowerCase().split(/\s+/).filter(Boolean);
+    var shown = 0;
+
+    Array.prototype.forEach.call(items, function (item) {
+      var hay = (item.textContent || '').toLowerCase();
+      var match = true;
+      for (var i = 0; i < terms.length; i++) {
+        if (hay.indexOf(terms[i]) === -1) { match = false; break; }
+      }
+      item.hidden = !match;
+      if (match) { shown++; }
+    });
+
+    if (!terms.length) { return; }
+
+    var status = byId('image-results-status');
+    var total = state.currentData && state.currentData.summary ? state.currentData.summary.total : 0;
+    if (status) {
+      status.textContent = shown === 0
+        ? 'Nothing on this page matches the filter “' + state.filter + '”. '
+          + number(total) + ' images matched the search.'
+        : 'Showing ' + number(shown) + ' of the ' + number(items.length)
+          + ' images on this page matching “' + state.filter + '”, out of '
+          + number(total) + ' matched by the search.';
+    }
+  }
+
   /* ── View Switcher (Cards vs Table) ─────────────────────────────────────── */
 
   function setView(view) {
@@ -492,11 +567,16 @@
     state.category = cat || 'all';
     state.page = 1;
 
-    Array.prototype.forEach.call(document.querySelectorAll('.image-cat-pill'), function (pill) {
-      var match = pill.getAttribute('data-cat') === state.category;
-      pill.classList.toggle('is-active', match);
-      pill.setAttribute('aria-selected', match ? 'true' : 'false');
-    });
+    /* The category pill bar was removed from the search panel: the Categories
+       section below is the browse affordance, and the advanced panel is where
+       the filter lives, the same as every other hub. Keeping the select in step
+       is what makes the category cards and the figure legible as searches. */
+    var select = byId('image-filter-category');
+    if (select) { select.value = state.category; }
+    if (state.category !== 'all') {
+      var adv = byId('image-adv');
+      if (adv) { adv.open = true; }
+    }
 
     if (executeNow) {
       executeSearch(true);
@@ -550,12 +630,45 @@
       });
     }
 
-    // Category pills
-    Array.prototype.forEach.call(document.querySelectorAll('.image-cat-pill'), function (pill) {
-      pill.addEventListener('click', function () {
-        setCategory(pill.getAttribute('data-cat'), true);
+    // Category select in the advanced panel
+    var catSelect = byId('image-filter-category');
+    if (catSelect) {
+      catSelect.addEventListener('change', function () {
+        setCategory(catSelect.value, state.searched);
       });
-    });
+    }
+
+    // Results-per-page
+    var sizeSelect = byId('image-page-size');
+    if (sizeSelect) {
+      sizeSelect.addEventListener('change', function () {
+        state.pageSize = sizeSelect.value === 'all' ? 'all' : parseInt(sizeSelect.value, 10) || 25;
+        state.page = 1;
+        if (state.searched) { executeSearch(false); }
+      });
+    }
+
+    // Filter within the rendered page
+    var resultsFilter = byId('image-results-filter');
+    if (resultsFilter) {
+      resultsFilter.addEventListener('input', function () {
+        state.filter = resultsFilter.value.trim();
+        if (state.filter === '' && state.currentData) {
+          renderResults(state.currentData);
+        }
+        applyResultsFilter();
+      });
+    }
+
+    var advReset = byId('image-adv-reset');
+    if (advReset) {
+      advReset.addEventListener('click', function () {
+        if (catSelect) { catSelect.value = 'all'; }
+        if (sortSelect) { sortSelect.value = 'latest'; }
+        state.sort = 'latest';
+        setCategory('all', state.searched);
+      });
+    }
 
     // Category jump buttons in category grid
     Array.prototype.forEach.call(document.querySelectorAll('[data-switch-cat]'), function (btn) {
@@ -601,9 +714,82 @@
     setCategory(state.category, false);
     setView(state.view);
     updateExportLinks();
+    initFigure();
 
-    // Execute initial search
-    executeSearch(false);
+    /* The gallery used to load 24 images on every page view -- a 2 s request
+       nobody had asked for. It runs now only when the reader has asked for
+       something: a term or a category in the URL, or a search on the page. */
+    if (state.term || (state.category && state.category !== 'all')) {
+      executeSearch(false);
+    }
+  }
+
+  /* ── Images by category ─────────────────────────────────────────────────── */
+
+  /* .mgdb-chart is a fixed 320px in the design system, so the height has to be
+     set on the element and handed to Plotly from the same variable. */
+  function sizeChart(id, height) {
+    var el = byId(id);
+    if (el) { el.style.height = height + 'px'; }
+    return height;
+  }
+
+  function readAttrJson(el, name) {
+    if (!el) { return null; }
+    try { return JSON.parse(el.getAttribute(name) || 'null'); }
+    catch (error) { return null; }
+  }
+
+  function initFigure() {
+    var el = byId('image-category-chart');
+    if (!el || !window.MGDB || !window.MGDB.chart) { return; }
+
+    var labels = readAttrJson(el, 'data-labels');
+    var values = readAttrJson(el, 'data-values');
+    var cats = readAttrJson(el, 'data-cats') || [];
+    if (!labels || !values || !labels.length) { return; }
+
+    var height = sizeChart('image-category-chart', Math.max(320, labels.length * 40 + 110));
+
+    window.MGDB.chart({
+      target: 'image-category-chart',
+      traces: [{
+        type: 'bar',
+        orientation: 'h',
+        x: values,
+        y: labels,
+        text: values.map(function (value) { return '\u00A0' + Number(value).toLocaleString(); }),
+        textposition: 'outside',
+        textangle: 0,
+        cliponaxis: false,
+        marker: { color: '#285d46' },
+        hovertemplate: '%{y}<br>%{x:,} images<extra></extra>'
+      }],
+      layout: {
+        height: height,
+        margin: { l: 10, r: 88, t: 8, b: 48 },
+        bargap: 0.3,
+        xaxis: { title: { text: 'Curated images' }, automargin: true },
+        yaxis: { type: 'category', automargin: true }
+      }
+    });
+
+    /* Selecting a bar searches that category. Plotly only gains its event
+       emitter once it has drawn, so wait for the draw. */
+    if (!window.MutationObserver) { return; }
+    var attached = false;
+    var observer = new window.MutationObserver(function () {
+      if (attached || typeof el.on !== 'function') { return; }
+      attached = true;
+      observer.disconnect();
+      el.on('plotly_click', function (event) {
+        if (!event || !event.points || !event.points.length) { return; }
+        var index = labels.indexOf(event.points[0].y);
+        if (index === -1 || !cats[index]) { return; }
+        setCategory(cats[index], true);
+      });
+    });
+    observer.observe(el, { childList: true, subtree: true });
   }
 
   if (document.readyState === 'loading') {
