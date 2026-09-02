@@ -15,35 +15,244 @@ $$SYNTAX-LEVEL 2
     </div>
     <div class="mgdb-hero-body">
       <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; August 2026</p>
-      <span class="mgdb-eyebrow">Page modernization standard</span>
       <h1 id="pattern-title">Shared interface components</h1>
       <p class="mgdb-hero-description">This reference renders every component defined in the shared stylesheet so that spacing, contrast, keyboard behavior, and responsive breakpoints can be verified in one place before a pattern is applied to a production page.</p>
     </div>
   </section>
 
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#pattern-headers" class="is-current">Header variants</a>
-    <a href="#pattern-search">Search &amp; filters</a>
+    <a href="#pattern-reference" class="is-current">Reference pages</a>
+    <a href="#pattern-writing">Writing</a>
+    <a href="#pattern-gotchas">Gotchas</a>
+    <a href="#pattern-hub">Data hub shell</a>
+    <a href="#pattern-headers">Header variants</a>
+    <a href="#pattern-search">Search interface</a>
     <a href="#pattern-table">Data table</a>
-    <a href="#pattern-charts">Figures &amp; charts</a>
-    <a href="#pattern-states">Messages &amp; states</a>
+    <a href="#pattern-citations">Citations</a>
+    <a href="#pattern-charts">Charts</a>
+    <a href="#pattern-states">Messages and states</a>
     <a href="#pattern-forms">Form controls</a>
     <a href="#pattern-tokens">Design tokens</a>
     <a href="#pattern-dashboard">Metric cards</a>
     <a href="#pattern-resources">Related resources</a>
   </nav>
 
+  <section id="pattern-reference" aria-labelledby="pattern-reference-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="pattern-reference-title">Reference pages</h2></div>
+      <p>Near-final pages. Match these before inventing anything new.</p>
+    </div>
+
+    <div class="mgdb-message mgdb-message-info" role="note">
+      <div><strong>These pages outrank this one.</strong> Where a component below disagrees with a reference page, the reference page is correct and this library is out of date. Say so rather than copying the older pattern.</div>
+    </div>
+
+    <div class="mgdb-resource-panel mgdb-spaced">
+      <div class="mgdb-resource-list">
+        <a href="/">
+          <strong>Homepage</strong>
+          <span>Global search toolbar, category chips, and the quick-link grid</span>
+          <span class="mgdb-resource-badge">Reference</span>
+        </a>
+        <a href="/sitemap">
+          <strong>Site map</strong>
+          <span>Hero with no buttons, sticky tab bar, live search over a static directory</span>
+          <span class="mgdb-resource-badge">Reference</span>
+        </a>
+        <a href="/genome">
+          <strong>Genome data hub</strong>
+          <span>Search, sortable table, charts read live from the database, metrics last</span>
+          <span class="mgdb-resource-badge">Reference</span>
+        </a>
+        <a href="/data_center">
+          <strong>Data hub directory</strong>
+          <span>Card grid with the &ldquo;Best for&rdquo; line used in place of hover tooltips</span>
+          <span class="mgdb-resource-badge">Reference</span>
+        </a>
+        <a href="/contact">
+          <strong>Contact</strong>
+          <span>Person cards, group filter chips, and the shared filter list behavior</span>
+          <span class="mgdb-resource-badge">Reference</span>
+        </a>
+        <a href="/data_center/reference">
+          <strong>Literature search</strong>
+          <span>Hero stamp, section tabs, and the advanced-filter disclosure</span>
+          <span class="mgdb-resource-badge">Reference</span>
+        </a>
+        <a href="/ai">
+          <strong>AI &amp; Machine Learning data hub</strong>
+          <span>The data hub shell end to end&#58; coloured section edges, a search-first shape, and the shared reference card</span>
+          <span class="mgdb-resource-badge">Reference</span>
+        </a>
+        <a href="/data_center/variation">
+          <strong>Variation data hub</strong>
+          <span>The same shell over a database-backed collection, with three figures on the shared chart layout</span>
+          <span class="mgdb-resource-badge">Reference</span>
+        </a>
+      </div>
+    </div>
+
+    <h3 class="mgdb-spaced">Header, footer, and menu</h3>
+    <p class="mgdb-section-intro">The header, mega menu, and footer are shared templates. Do not restyle them per page and do not add a page-level nav that duplicates a menu item. New destinations belong in the mega menu and on the site map, not in a one-off link row.</p>
+
+    <h3 class="mgdb-spaced">Search toolbar</h3>
+    <p class="mgdb-section-intro">The global toolbar in the header searches every category. A page-level search box searches only that page and always sits inside the section it filters, directly above the list, so a filter click is visibly connected to the result.</p>
+
+    <h3 class="mgdb-spaced">Tooltips: use a visible line instead</h3>
+    <p class="mgdb-section-intro">The data hub cards carry a <strong>Best for</strong> line rather than a <code>title</code> tooltip. A native tooltip never appears on a touch device, is not reachable from the keyboard, and hides exactly the sentence that helps someone choose. If a card needs a hint, give it a visible one.</p>
+    <div class="mgdb-card-grid mgdb-spaced">
+      <article class="mgdb-card">
+        <h3>Do</h3>
+        <p><strong>Markers and probes</strong></p>
+        <p class="mgdb-small">Molecular markers, probes, SSRs, RFLPs, and sequence features.</p>
+        <p class="mgdb-small mgdb-muted"><strong>Best for</strong> finding a marker by name and seeing where it maps.</p>
+      </article>
+      <article class="mgdb-card">
+        <h3>Do not</h3>
+        <p><strong title="Best for finding a marker by name">Markers and probes</strong></p>
+        <p class="mgdb-small">The hint above is in a <code>title</code> attribute. It is invisible on a phone, invisible to a keyboard user, and unsearchable.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="pattern-writing" aria-labelledby="pattern-writing-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="pattern-writing-title">Writing</h2></div>
+      <p>Three rules, in priority order when they conflict.</p>
+    </div>
+
+    <div class="mgdb-prose">
+      <h3 class="mgdb-leaf-heading">1. Leave protocols and scientific descriptions exactly as they are</h3>
+      <p>Laboratory protocols, methods sections, assay descriptions, nomenclature rules, and any text describing what a measurement means are not copy to be improved. Move them, re-heading them, and change the markup around them, but do not reword them, shorten them, or modernize their phrasing. If such a passage also breaks one of the rules below, leave it and flag it rather than editing it.</p>
+
+      <h3 class="mgdb-leaf-heading">2. Standard American English</h3>
+      <p>Color, not colour. Center, not centre. Analyze, catalog, labeling, modeling, behavior, license as a noun. This applies to interface text, headings, help text, and code comments alike.</p>
+      <p>Two MaizeGDB-specific spellings that are not about American English but are settled: the user-facing term is <strong>data hub</strong>, never &ldquo;data center&rdquo; or &ldquo;data centre&rdquo;, while the route <code>/data_center/</code> and every identifier built from it stay as they are. Species names are italic and are never Americanized.</p>
+
+      <h3 class="mgdb-leaf-heading">3. Sound like the people who already write here</h3>
+      <p>New text should read as though it came from the same hand as the page around it. Before writing, read what is already on the page and match its register. In practice that means:</p>
+      <ul class="mgdb-list">
+        <li>Say what the thing is, then what it is for. No build-up.</li>
+        <li>Plain declaratives. &ldquo;Stocks tracked by MaizeGDB.&rdquo; Not &ldquo;Explore our comprehensive collection of stocks.&rdquo;</li>
+        <li>No marketing verbs: <em>unlock</em>, <em>empower</em>, <em>seamless</em>, <em>cutting-edge</em>, <em>dive into</em>, <em>journey</em>, <em>robust</em>, <em>leverage</em>.</li>
+        <li>No sentence that would be equally true of any other database. If it does not name something specific to maize or to this page, it is filler.</li>
+        <li>A number the database can supply beats an adjective. &ldquo;161 genome datasets&rdquo; beats &ldquo;an extensive collection.&rdquo;</li>
+        <li>Do not describe a control the reader can see. A search box does not need a sentence explaining that it searches.</li>
+      </ul>
+      <p>When in doubt, copy a sentence that is already on a reference page and change the nouns.</p>
+    </div>
+  </section>
+
+  <section id="pattern-gotchas" aria-labelledby="pattern-gotchas-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="pattern-gotchas-title">Gotchas</h2></div>
+      <p>Mistakes made on real pages, and what each one looked like.</p>
+    </div>
+
+    <div class="mgdb-prose">
+      <h3 class="mgdb-leaf-heading">Spacing and line breaks</h3>
+      <ul class="mgdb-list">
+        <li><strong>Do not add margin to an <code>h2</code> inside a section heading.</strong> <code>.mgdb-section-heading</code> is <code>align-items: end</code> so the title and its description sit on one line above the rule. It bottom-aligns the wrapper, not the text, so any margin on the <code>h2</code> pushes the title up and it reads as floating. The shared stylesheet now zeroes it; do not put it back per page.</li>
+        <li><strong>One gap between sections, set in one place.</strong> Every section carries <code>margin-top</code>. Adding <code>margin-bottom</code> to whatever sits above it makes the gap the larger of the two, which looks fine until a token changes and one section drifts. Leave the trailing margin at zero.</li>
+        <li><strong>Section descriptions wrap at 46ch.</strong> That cap is right for a paragraph and wrong for a one-line label sitting beside a heading with 500px to spare. If a one-sentence description is breaking to two lines with room left over, lift the cap for the page rather than shortening the sentence.</li>
+        <li><strong>Narrow containers turn short text into three lines.</strong> Card grids, metric tiles, table cells, and sticky tab bars are all narrower than they look. Check a label in place before deciding it fits; a role or a badge that wraps mid-phrase is worse than a shorter word.</li>
+        <li><strong>Anchored sections hide under a sticky tab bar.</strong> <code>scroll-margin-top</code> in the shared stylesheet only matches direct children of <code>.mgdb-page</code>. Nested targets need their own rule or they land behind the bar.</li>
+        <li><strong>A shared sheet's flat <code>border-color</code> takes the top edge with it.</strong> It is a shorthand, and both hub sheets set one on every white card. A page-level <code>border-top-color</code> at the same specificity loses, because the shared sheet loads later &mdash; three category colours came out identical blue-grey that way. Let the shell own the edge, or add one class to outrank it.</li>
+      </ul>
+
+      <h3 class="mgdb-leaf-heading">Headings and labels</h3>
+      <ul class="mgdb-list">
+        <li><strong>Do not add eyebrows above section headings.</strong> The small red line above a title has been removed from every page reviewed so far, in the hero and above sections alike. It repeats the heading in weaker words. The class survives for record identifiers such as &ldquo;Gene model &middot; B73 v5&rdquo;, which is a different job.</li>
+        <li><strong>Tab labels should be their section heading.</strong> Shorten when the heading is long, but keep the same words: <em>Metrics</em> to <em>Metrics</em>, not <em>Statistics</em> to <em>Metrics</em>. A tab whose wording is invented reads as a different destination.</li>
+        <li><strong>Do not caption a control that already has a label.</strong> A heading of &ldquo;Assembly explorer&rdquo; above a field labeled &ldquo;Search assemblies&rdquo; says the same thing twice.</li>
+        <li><strong>One <code>h1</code> per page,</strong> and section headings descend in order. This library uses <code>h2</code> for hero demonstrations for exactly that reason.</li>
+      </ul>
+
+      <h3 class="mgdb-leaf-heading">Bauplan templates</h3>
+      <ul class="mgdb-list">
+        <li><strong>Escape every literal parenthesis</strong> as <code>&#92;&#40;</code> and <code>&#92;&#41;</code>, including inside HTML comments. Bauplan tokenizes on parentheses and does not read HTML. A missed one reports the <em>last</em> <code>&#41;</code> in the file as the error, so the line number is useless. Generate long templates from a script rather than hand-escaping them.</li>
+        <li><strong>A partial cannot be split across two places on a page.</strong> If a block has to appear above a panel and the rest below it, that is two partials, and both need manifest entries.</li>
+        <li><strong>New template files need a manifest line.</strong> A file that is not in <code>deploy/manifest.txt</code> is not backed up and is lost the next time its directory is deployed.</li>
+      </ul>
+
+      <h3 class="mgdb-leaf-heading">JavaScript</h3>
+      <ul class="mgdb-list">
+        <li><strong><code>includeScript</code> emits into <code>&lt;head&gt;</code>.</strong> Page scripts run while the document is still parsing, so every query returns nothing. Wrap the entry point in a <code>DOMContentLoaded</code> check.</li>
+        <li><strong><code>filterList</code> reads <code>data-search</code> and <code>data-filter</code>.</strong> If rows carry the group under a different attribute, pass <code>filterOn</code>. Without it every chip except &ldquo;All&rdquo; silently matches nothing.</li>
+        <li><strong>Reset through <code>filterList</code>, not by hand.</strong> Clearing the input value leaves the internal query state and the <code>?q=</code> parameter stale, and the list stays filtered to nothing. Pass the button as the <code>reset</code> option.</li>
+        <li><strong><code>IntersectionObserver</code> does not fire everywhere.</strong> Some embedded and backgrounded browsers deliver no entries, no <code>scroll</code> events, and no <code>requestAnimationFrame</code> callbacks. Anything a reader would notice missing &mdash; scrollspy, lazy charts &mdash; needs a fallback.</li>
+        <li><strong><code>.cartesianlayer</code> is not the plot rectangle.</strong> It is a <code>&lt;g&gt;</code> whose bounding box spans the whole Plotly SVG, so anything measured against it reports overlaps that do not exist. A check written that way grew a chart's top margin every pass, to 1809px on a 472px figure. <code>rect.nsewdrag</code> is the real plot rect.</li>
+        <li><strong>Outside bar labels need <code>&#92;u00A0</code>, not a space.</strong> SVG collapses leading whitespace, so a plain space is no padding at all and the number reads as touching the bar.</li>
+        <li><strong>A page's own <code>legend.y</code> is ignored.</strong> <code>MGDB.chart</code> normalises the position, because paper coordinates drift with the figure height. Pass <code>legendManual</code> if a figure really needs its own.</li>
+      </ul>
+
+      <h3 class="mgdb-leaf-heading">Data and links</h3>
+      <ul class="mgdb-list">
+        <li><strong>Read counts from the database, not from a constant.</strong> A hardcoded total is wrong the week after it ships and will contradict a live figure elsewhere on the same page.</li>
+        <li><strong>Do not chart a column that is mostly empty.</strong> Measure coverage first. A cumulative curve built from a quarter of the rows peaks at a quarter of the real total, beside a metric tile that states the real one.</li>
+        <li><strong>Cache the derived markup, and key it on every input.</strong> A hub's counts and rendered cards go through <code>dashboardCache</code>. Key the entry on the mtime of the data file <em>and</em> of the controller that renders it&#58; the renderers live in the controller, so a key that watches only the data serves the old HTML after a markup edit, with nothing to show that anything happened.</li>
+        <li><strong>HTTP 200 does not mean the page exists.</strong> Legacy routes return 200 with an empty body or a &ldquo;you must provide a parameter&rdquo; stub inside the normal shell. Strip to the content region and measure the text before linking to a page; under a few hundred characters is almost always a stub.</li>
+        <li><strong>Some working pages look empty to a script.</strong> Iframe wrappers return almost no HTML, and the data hub routes answer <code>curl</code> with a bot check. Confirm in a browser before removing a link.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="pattern-hub" aria-labelledby="pattern-hub-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="pattern-hub-title">Data hub shell</h2></div>
+      <p>One stylesheet and one section order for every data hub landing page.</p>
+    </div>
+
+    <div class="mgdb-message mgdb-message-info" role="note">
+      <div><strong>Opt in, do not restate.</strong> A hub loads <code>css/mgdb-hub.css</code> after <code>css/mgdb-modern.css</code> and before its own stylesheet, and puts <code>mgdb-hub-page</code> on its <code>&lt;main&gt;</code>. Everything listed below then applies. A page stylesheet that repeats any of it will drift from the other hubs the next time the shell changes.</div>
+    </div>
+
+    <div class="mgdb-prose">
+      <h3 class="mgdb-leaf-heading">What the shell settles</h3>
+      <ul class="mgdb-list">
+        <li><strong>The ground and the surfaces.</strong> A pale blue page &#40;<code>#f4f7fc</code>&#41; with every section a white card on it, one drop shadow, and one lift on hover. The three values are sampled from snptools.maizegdb.org rather than chosen.</li>
+        <li><strong>A coloured top edge per section.</strong> Eight colours rotating green, gold, blue, burgundy, leaf, orange, wine, dark gold, so a reader scrolling back finds a section by its edge. The rotation is positional and <strong>starts at <code>nth-of-type&#40;2&#41;</code></strong>, because the hero is the first <code>&lt;section&gt;</code> on every hub and is excluded. A page that needs a particular colour on a particular section says so with <code>mgdb-hub-tone-green</code> and its siblings.</li>
+        <li><strong>No rule under a section title.</strong> <code>.mgdb-section-heading</code> closes with a border in the base stylesheet. That was right when a section was a transparent band on one continuous sheet; inside a bordered card it draws a second line a few pixels inside the first and reads as a box around the title. The shell zeroes it.</li>
+        <li><strong>Four coloured metric cards</strong>, the grid-tile top edge that turns gold on hover, table zebra striping, the green wash on the closing Related resources panel, the <code>mgdb-hub-field</code> form row whose labels share a baseline and whose controls are all 44px, and a scroll offset matched to the sticky tab bar at both its heights.</li>
+      </ul>
+
+      <h3 class="mgdb-leaf-heading">Section order</h3>
+      <p class="mgdb-section-intro">Every hub is the same shape, so a reader who learns one has learned all of them.</p>
+      <ul class="mgdb-list">
+        <li><strong>Search is the first section after the header.</strong> It carries example queries as buttons, and an advanced-criteria disclosure directly underneath the main field that a reader has to open.</li>
+        <li><strong>Results are not on the page until a search runs.</strong> The section carries <code>hidden</code>. It offers the top 10, 25, 50 or all results, pages through them, sorts on any column, and can be filtered within itself.</li>
+        <li><strong>The last two sections are Metrics and Related resources</strong>, in that order. Metrics is four cards; any figures follow them. Related resources lists five, each marked Internal or External, with the chips aligned on the floor of their cards.</li>
+        <li><strong>Tab labels are their section heading</strong>, shortened but not reworded. Sections in between are the hub's own.</li>
+      </ul>
+
+      <h3 class="mgdb-leaf-heading">References</h3>
+      <p class="mgdb-section-intro">A cited paper has one shape, wherever it appears&#58; <code>.mgdb-ref</code> in the shell for the styling and <code>include/references_lib.php</code> for the matching markup, so a page cannot get one without the other. Journal and year as a pill, the DOI in mono beside it, the title, then authors, citation, the abstract in a green-edged well, and the links as buttons.</p>
+      <ul class="mgdb-list">
+        <li><strong>Name DOIs, never citations.</strong> The content comes from <code>data/cite_journal_articles.json</code>, the curated bibliography behind <a href="/cite">/cite</a>, with verified titles, authors, volumes, PubMed IDs and abstracts. A citation retyped into a page is a second copy that will drift.</li>
+        <li><strong>Anything outside that file supplies a <code>fallback</code></strong> and renders without an abstract rather than with an empty well. One record stores a database URL where its abstract should be, so the well only opens for text past 120 characters.</li>
+        <li><strong>Copy citation and Copy DOI need no page script.</strong> <code>mgdb-modern.js</code> binds every <code>.mgdb-ref-copy</code> on the page.</li>
+      </ul>
+
+      <h3 class="mgdb-leaf-heading">Figures</h3>
+      <ul class="mgdb-list">
+        <li><strong>A page does not place its own legend.</strong> <code>MGDB.chart</code> puts it above the plot, anchored to the plot's top edge, and reserves a band for it. <code>legend.y</code> is a fraction of the <em>plot</em> height, so any fixed value drifts as a figure grows&#58; the old shared <code>-0.22</code> sat on the tick labels of a 320px figure and was drawn about 140px below a 700px one, outside the paper and over the caption. A figure that genuinely needs another position passes <code>legendManual</code> and owns its margins.</li>
+        <li><strong>The legend is measured after it is drawn.</strong> A horizontal legend wraps when its entries do not fit one row, and the reserved band is sized for one. <code>fitLegend</code> checks whether the legend is clipped at the top of the figure and grows the band if it is.</li>
+        <li><strong><code>automargin</code> leaves no gap.</strong> It makes the margin exactly as wide as the tick text, so on a horizontal bar chart the longest category name ends one pixel from the first bar and reads as running into it. The shell's base layout reserves a standoff with an outside tick in a transparent colour&#58; 10px on the y axis, 6px on the x.</li>
+        <li><strong><code>.mgdb-chart</code> is a fixed 320px.</strong> Passing <code>layout.height</code> alone leaves a tall chart squashed. Set the element height and hand the same number to Plotly from one variable.</li>
+      </ul>
+    </div>
+  </section>
+
   <section id="pattern-headers" aria-labelledby="pattern-headers-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Page identity</span>
         <h2 id="pattern-headers-title">Header variants</h2>
       </div>
       <p>Three headers for three kinds of page. Each carries one h1; only the depth and emphasis differ.</p>
     </div>
 
-    <h3>Data centre &mdash; two-tone</h3>
-    <p class="mgdb-section-intro">Used above. The emblem panel and light green gradient body give data centres a distinct identity. Kept shallow so the summary dashboard stays visible without scrolling.</p>
+    <h3>Data hub &mdash; two-tone</h3>
+    <p class="mgdb-section-intro">Used above. The emblem panel and light green gradient body give data hubs a distinct identity. Kept shallow so the summary dashboard stays visible without scrolling.</p>
 
     <h3 class="mgdb-spaced">Basic information page</h3>
     <p class="mgdb-section-intro">For prose-led pages such as archives, about pages, and documentation. A light panel with a gold spine and a subject icon.</p>
@@ -57,7 +266,6 @@ $$SYNTAX-LEVEL 2
         </svg>
       </span>
       <div>
-        <span class="mgdb-eyebrow">Maize Genetics Cooperation</span>
         <h2>Maize Newsletter archive</h2>
         <p>The Maize Genetics Cooperation Newsletter &#40;MNL&#41; documents working research, observations, and community information shared across maize science.</p>
       </div>
@@ -84,7 +292,7 @@ $$SYNTAX-LEVEL 2
     </div>
 
     <h3 class="mgdb-spaced">Record page</h3>
-    <p class="mgdb-section-intro">For gene models, maps, references, and stocks. The identifier and its key facts come first; nothing competes with them.</p>
+    <p class="mgdb-section-intro">For gene models, maps, references, and stocks. The identifier and its key facts come first; nothing competes with them. This is the one header that keeps an eyebrow: &ldquo;Gene model &middot; B73 v5&rdquo; says what kind of record and which assembly, which the identifier alone does not.</p>
     <div class="mgdb-hero-record">
       <div>
         <span class="mgdb-eyebrow">Gene model &middot; B73 v5</span>
@@ -108,8 +316,7 @@ $$SYNTAX-LEVEL 2
   <section id="pattern-search" aria-labelledby="pattern-search-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Search and filters</span>
-        <h2 id="pattern-search-title">Search interface &amp; dual views</h2>
+        <h2 id="pattern-search-title">Search interface and dual views</h2>
       </div>
       <p>Search returns two synchronized presentations &mdash; Table and Grid &mdash; with Table configured as the default view.</p>
     </div>
@@ -257,7 +464,6 @@ $$SYNTAX-LEVEL 2
   <section id="pattern-table" aria-labelledby="pattern-table-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Data presentation</span>
         <h2 id="pattern-table-title">Scientific data table</h2>
       </div>
       <p>Monospace tabular figures for alignable numbers, sticky headers on vertical scroll, sort buttons on interactive columns, and explicit <code>caption</code> for assistive tech.</p>
@@ -311,10 +517,85 @@ $$SYNTAX-LEVEL 2
     <p class="mgdb-note" style="margin-top: 1rem;"><strong>Data note:</strong> blank or unreported values are shown as &ldquo;Not reported&rdquo; and always sort last, so a missing measurement is never presented as a zero.</p>
   </section>
 
+  <section id="pattern-citations" aria-labelledby="pattern-citations-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="pattern-citations-title">Citations</h2></div>
+      <p>One published reference. Same shape on every page that lists papers.</p>
+    </div>
+
+    <p class="mgdb-section-intro">Reading order is fixed so that a reader scanning a column of these always finds the same thing in the same place: what and when, then the title, then who, then where it was published, then the abstract, then the ways out. Used by the literature search and the cite page; take it as-is rather than restyling a list of papers per page.</p>
+
+    <div class="mgdb-stack">
+      <article class="reference-result-card">
+        <div class="reference-result-meta"><span>2026</span><span>Article</span><span>PubMed</span><span>DOI</span></div>
+        <h3><a href="/data_center/reference">Delivering artificial intelligence-ready genomics with the Maize Genetics and Genomics Database</a></h3>
+        <p class="reference-result-authors">Haley OC, Tibbs-Cortes LE, Harding SF, Poretsky E, Cannon EK, Portwood JL, Gardiner JM, Sen TZ, Kim HS, Woodhouse MR, Andorf CM.</p>
+        <p class="reference-result-citation">Genetics &middot; 232 &middot; iyag005</p>
+        <p class="reference-result-abstract">The integration of artificial intelligence &#40;AI&#41; into computational biology is changing biological research, particularly in agriculture, where large and complex datasets offer opportunities for discovery and crop improvement&hellip;</p>
+        <div class="reference-result-links">
+          <a href="/data_center/reference">MaizeGDB record</a>
+          <a href="/data_center/reference">DOI &nearr;</a>
+          <button class="reference-copy-id" type="button">Copy DOI</button>
+          <a href="/data_center/reference">PubMed &nearr;</a>
+          <button class="reference-copy-id" type="button">Copy PMID</button>
+        </div>
+      </article>
+
+      <article class="reference-result-card is-editorial-pick">
+        <div class="reference-result-meta"><span>2025</span><span>Article</span><span class="reference-editorial-badge">&starf; Editorial pick</span><span>DOI</span></div>
+        <h3><a href="/data_center/reference">A unified VCF dataset from nearly 1,500 diverse maize accessions and resources to explore the genomic landscape of maize</a></h3>
+        <p class="reference-result-authors">Andorf CM, Ross-Ibarra J, Seetharam AS, Hufford MB, Woodhouse MR.</p>
+        <p class="reference-result-citation">G3 &#40;Bethesda, Md.&#41; &middot; 15 &middot; jkae281</p>
+        <div class="reference-result-links">
+          <a href="/data_center/reference">MaizeGDB record</a>
+          <a href="/data_center/reference">DOI &nearr;</a>
+          <button class="reference-copy-id" type="button">Copy DOI</button>
+        </div>
+      </article>
+
+      <article class="reference-result-card is-selectable">
+        <label class="reference-result-select"><input type="checkbox" aria-label="Select this reference"></label>
+        <div>
+          <div class="reference-result-meta"><span>2025</span><span>Article</span><span>PubMed</span></div>
+          <h3><a href="/data_center/reference">Tools and Resources at the Maize Genetics and Genomics Database &#40;MaizeGDB&#41;</a></h3>
+          <p class="reference-result-authors">Woodhouse MR, Cannon EK, Portwood JL, Gardiner JM, Hayford RK, Haley O, Andorf CM.</p>
+          <p class="reference-result-citation">Cold Spring Harbor protocols &middot; 2025 &middot; db.over108430</p>
+          <div class="reference-result-links">
+            <a href="/data_center/reference">MaizeGDB record</a>
+            <a href="/data_center/reference">PubMed &nearr;</a>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <h3 class="mgdb-spaced">Markup</h3>
+    <p class="mgdb-section-intro">Everything except the title is optional. Omit an element rather than emitting it empty, so a paper with no abstract closes up instead of leaving a gap. The three cards above are the same component: the second adds <code>is-editorial-pick</code>, the third adds <code>is-selectable</code> and a checkbox in a gutter.</p>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table">
+        <caption>Citation card contract<span class="mgdb-muted">Styles live in <code>css/mgdb-modern.css</code>, section 10b. No page-level copy is needed.</span></caption>
+        <thead><tr><th scope="col">Element</th><th scope="col">Holds</th></tr></thead>
+        <tbody>
+          <tr><th scope="row"><code>article.reference-result-card</code></th><td>The card. Add <code>is-editorial-pick</code> for a gold spine and badge, <code>is-selectable</code> for the checkbox gutter.</td></tr>
+          <tr><th scope="row"><code>div.reference-result-meta</code></th><td>Short facts as separate spans: year, publication type, which identifiers exist. Scannable, not prose.</td></tr>
+          <tr><th scope="row"><code>span.reference-editorial-badge</code></th><td>Sits inside the meta row and carries its own text, so the distinction is never color alone.</td></tr>
+          <tr><th scope="row"><code>h3 &gt; a</code></th><td>The title, linked to the MaizeGDB record where one exists, otherwise the DOI.</td></tr>
+          <tr><th scope="row"><code>p.reference-result-authors</code></th><td>The author list as published.</td></tr>
+          <tr><th scope="row"><code>p.reference-result-citation</code></th><td>Journal, volume, pages, joined with <code>&middot;</code>. Drop the parts that are missing rather than printing empty separators.</td></tr>
+          <tr><th scope="row"><code>p.reference-result-abstract</code></th><td>Optional. Truncate before rendering and end with an ellipsis.</td></tr>
+          <tr><th scope="row"><code>div.reference-result-links</code></th><td>Record, DOI, PubMed, and copy buttons. Copy buttons are <code>button</code>, not links.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mgdb-message mgdb-message-info mgdb-spaced" role="note">
+      <div><strong>Published strings are quoted material.</strong> Titles, author lists, and journal names print as the publisher set them. Do not sentence-case a title, expand an author initial, or Americanize a journal name &mdash; &ldquo;Behaviour Genetics&rdquo; keeps its <em>u</em>. This is the same rule as protocols and scientific descriptions: it is a record of what exists, not copy to improve.</div>
+    </div>
+  </section>
+
   <section id="pattern-charts" aria-labelledby="pattern-chart-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Figures</span>
         <h2 id="pattern-chart-title">Interactive charts</h2>
       </div>
       <p>Plotly figures load lazily, resize with the container, use a color-blind-safe palette, and vary marker shape so color is never the only encoding.</p>
@@ -373,7 +654,6 @@ $$SYNTAX-LEVEL 2
   <section id="pattern-states" aria-labelledby="pattern-states-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Feedback</span>
         <h2 id="pattern-states-title">Messages and states</h2>
       </div>
       <p>Every state pairs an icon with a text label, so meaning never depends on color alone.</p>
@@ -389,7 +669,6 @@ $$SYNTAX-LEVEL 2
   <section id="pattern-forms" aria-labelledby="pattern-form-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Input</span>
         <h2 id="pattern-form-title">Form controls</h2>
       </div>
       <p>Labels are visible and associated, hints are linked with aria-describedby, and errors are programmatically tied to their field.</p>
@@ -425,7 +704,6 @@ $$SYNTAX-LEVEL 2
   <section id="pattern-tokens" aria-labelledby="pattern-tokens-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Foundations</span>
         <h2 id="pattern-tokens-title">Design tokens</h2>
       </div>
       <p>Colors are stated with their contrast ratio against white so pairings can be checked without a separate tool.</p>
@@ -457,7 +735,6 @@ $$SYNTAX-LEVEL 2
   <section id="pattern-dashboard" aria-labelledby="pattern-dashboard-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Dashboard</span>
         <h2 id="pattern-dashboard-title">Metric cards</h2>
       </div>
       <p>Summary cards present high-level statistics with an eyebrow header, prominent value, descriptive context, and top-right metadata bubble.</p>
@@ -515,7 +792,6 @@ $$SYNTAX-LEVEL 2
   <section id="pattern-resources" aria-labelledby="pattern-resources-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Connected tools</span>
         <h2 id="pattern-resources-title">Related resources</h2>
       </div>
       <p>Explore modernized MaizeGDB data hubs, design system implementation guides, community projects, and connected external repositories.</p>

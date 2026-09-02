@@ -60,7 +60,7 @@
   --mgdb-surface-alt: #fbf9f5;
   --mgdb-surface-sunken: #f5f1e9;
 
-  /* Status — each is paired with an icon or text label, never colour alone */
+  /* Status — each is paired with an icon or text label, never color alone */
   --mgdb-status-ok: #1c6b45;
   --mgdb-status-ok-soft: #e8f5ee;
   --mgdb-status-warn: #8a5a0f;
@@ -642,7 +642,7 @@ body.mgdb-modern {
 
 /* Category icons ---------------------------------------------------------
 
-   One chip style, tinted per data type. Colour is decoration only: every row
+   One chip style, tinted per data type. Color is decoration only: every row
    carries its label, and the glyph shapes differ from one another, so nothing
    is conveyed by hue alone. Each ink is at least 4.5:1 on white and so clears
    the 3:1 that WCAG 1.4.11 asks of a graphic against its chip.
@@ -761,7 +761,7 @@ body.mgdb-modern {
 
 .mgdb-search-menu button[aria-selected="true"] strong { font-weight: 800; }
 
-/* A check marks the current category, so selection is not colour-only. The
+/* A check marks the current category, so selection is not color-only. The
    element is always in the row and only made visible when selected, so the
    label column does not shift as the selection moves. */
 .mgdb-search-check {
@@ -1345,6 +1345,12 @@ body.mgdb-modern {
 .mgdb-page a { color: var(--mgdb-burgundy); text-decoration: underline; }
 .mgdb-page a:hover { text-decoration-thickness: 2px; }
 
+/* .mgdb-button already sets text-decoration:none, but the rule above is more
+   specific, so an <a class="mgdb-button"> was underlined while a
+   <button class="mgdb-button"> beside it was not. Same control, two looks. */
+.mgdb-page a.mgdb-button,
+.mgdb-page a.mgdb-button:hover { text-decoration: none; }
+
 .mgdb-button {
   display: inline-flex;
   gap: var(--mgdb-space-2);
@@ -1487,11 +1493,15 @@ body.mgdb-modern {
 
 .mgdb-hero .mgdb-eyebrow { color: var(--mgdb-leaf); }
 
+/* The padding reserves the band the absolutely positioned .mgdb-hero-stamp
+   sits in, since an absolute element cannot push the title. 11rem was 24px
+   short of the stamp's measured 200px, so a long h1 ran to within 18px of it
+   and a slightly longer one would have run under it. 13rem clears it by 8. */
 .mgdb-hero h1 {
   margin: 0 0 var(--mgdb-space-2);
   color: var(--mgdb-green-dark);
   font-size: clamp(1.5rem, 1.1rem + 1.3vw, 1.875rem);
-  padding-right: 11rem;
+  padding-right: 13rem;
 }
 
 .mgdb-hero-tagline {
@@ -1564,7 +1574,7 @@ body.mgdb-modern {
 
    For prose-led pages (newsletter archive, about, documentation). A light card
    with a gold spine, a subject icon, and a short description. Quieter and
-   shallower than the data-centre hero.
+   shallower than the data hub hero.
    -------------------------------------------------------------------------- */
 
 .mgdb-hero-basic {
@@ -1934,7 +1944,7 @@ a.mgdb-metric.mgdb-tone-blue:hover     { border-left-color: var(--mgdb-status-in
 }
 
 /* Supporting note beside prose. The green cap marks it as secondary to the
-   main column without relying on colour alone — it is also a distinct card. */
+   main column without relying on color alone — it is also a distinct card. */
 .mgdb-aside-card {
   padding: var(--mgdb-space-5);
   border: 1px solid var(--mgdb-line-soft);
@@ -2057,6 +2067,17 @@ a.mgdb-metric.mgdb-tone-blue:hover     { border-left-color: var(--mgdb-status-in
 }
 
 .mgdb-section-heading > div:first-child { min-width: 0; flex: 1 1 24rem; }
+
+/* align-items:end above is meant to sit the heading and its description on the
+   same line over the rule. It bottom-aligns the h2's *wrapper*, though, and the
+   h2 keeps the browser default 0.83em margin inside it -- so the heading text
+   floated 23px higher than the description it was supposed to line up with.
+   Zeroing the margin makes the wrapper the height of its text. Dropping the top
+   margin also removes 23px of dead space above every section title. */
+.mgdb-section-heading h2 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
 
 .mgdb-section-heading > p {
   max-width: 46ch;
@@ -2249,6 +2270,167 @@ a.mgdb-card h3 { text-decoration: underline; }
 .mgdb-note-info { border-left-color: var(--mgdb-status-info); background: var(--mgdb-status-info-soft); }
 
 /* --------------------------------------------------------------------------
+   10b. Citation card
+
+   One published reference, rendered the same way everywhere it appears: the
+   literature search results, the cite page, and any future page that lists
+   papers. Reading order is fixed so a reader scanning a column of them always
+   finds the same thing in the same place.
+
+     article.reference-result-card[.is-editorial-pick]
+       div.reference-result-meta        year, type, badges -- short, scannable
+         span.reference-editorial-badge optional, carries its own text
+       h3 > a                           title, linked to the record or the DOI
+       p.reference-result-authors       author list as published
+       p.reference-result-citation      journal - volume - pages, dot separated
+       p.reference-result-abstract      optional, truncated by the caller
+       div.reference-result-links       record, DOI, PubMed, copy buttons
+
+   Every part is optional except the title. Omit an element rather than
+   emitting it empty, so a card with no abstract closes up instead of leaving
+   a gap.
+
+   The values here came from the cite page, which was the better-tuned of the
+   two implementations that existed before this was shared: the search results
+   had left the abstract at body size, which made a column of results read as
+   paragraphs rather than as a list.
+
+   Author lists, journal names, and titles are published strings. Print them as
+   the publisher set them -- do not sentence-case a title, expand an author
+   initial, or Americanize a journal name.
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .reference-result-card {
+  display: block;
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.mgdb-modern .reference-result-card + .reference-result-card {
+  margin-top: var(--mgdb-space-3);
+}
+
+.mgdb-modern .reference-result-card:hover {
+  border-color: var(--mgdb-gold-dark);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+/* An editorial pick carries a gold spine and a badge that says so in words, so
+   the distinction never rests on color alone. */
+.mgdb-modern .reference-result-card.is-editorial-pick {
+  border-left: 5px solid var(--mgdb-gold);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-modern .reference-result-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: center;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-modern .reference-editorial-badge {
+  padding: 1px var(--mgdb-space-2);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+  font-weight: 700;
+}
+
+/* padding-bottom and border-bottom are reset because several pages give a bare
+   h3 a rule; inside a card that underline reads as a divider. */
+.mgdb-modern .reference-result-card h3 {
+  margin-top: var(--mgdb-space-1);
+  padding-bottom: 0;
+  border-bottom: none;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-modern .reference-result-card h3 a { color: inherit; text-decoration: underline; }
+.mgdb-modern .reference-result-card h3 a:hover { color: var(--mgdb-leaf); }
+
+.mgdb-modern .reference-result-authors {
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-modern .reference-result-citation {
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-modern .reference-result-abstract {
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-modern .reference-result-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  align-items: center;
+  margin-top: var(--mgdb-space-3);
+}
+
+.mgdb-modern .reference-result-links a {
+  color: var(--mgdb-burgundy);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.mgdb-modern .reference-result-links a:hover { text-decoration: underline; }
+
+/* Copy buttons sit in the same row as the links but must not read as links. */
+.mgdb-modern .reference-copy-id {
+  min-height: 30px;
+  padding: 2px var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink-soft);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease;
+}
+
+.mgdb-modern .reference-copy-id:hover {
+  background: var(--mgdb-surface-alt);
+  border-color: var(--mgdb-muted);
+}
+
+/* Selectable variant: the literature search puts a checkbox in a gutter beside
+   the citation so results can be exported in bulk. */
+.mgdb-modern .reference-result-card.is-selectable {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-modern .reference-result-select { margin: 0; }
+
+.mgdb-modern .reference-result-select input {
+  width: 18px;
+  min-height: 0;
+  margin: 0;
+  accent-color: var(--mgdb-green-dark);
+}
+
+/* --------------------------------------------------------------------------
    11. Forms, search, and filters
 
    Every control carries a visible <label>. Placeholder text is supplementary
@@ -2314,7 +2496,7 @@ a.mgdb-card h3 { text-decoration: underline; }
 .mgdb-textarea[aria-invalid="true"] { border-color: var(--mgdb-status-error); border-width: 2px; }
 
 /* Field-level error, referenced by aria-describedby and prefixed with the
-   word "Error" so the meaning does not depend on the red colour. */
+   word "Error" so the meaning does not depend on the red color. */
 .mgdb-field-error {
   display: flex;
   gap: var(--mgdb-space-2);
@@ -2352,7 +2534,7 @@ a.mgdb-card h3 { text-decoration: underline; }
 }
 
 /* Filter chips are real buttons with aria-pressed; the active state is marked
-   by border weight and a check glyph as well as by colour. */
+   by border weight and a check glyph as well as by color. */
 .mgdb-chip {
   min-height: 36px;
   padding: var(--mgdb-space-1) var(--mgdb-space-4);
@@ -2389,7 +2571,7 @@ a.mgdb-card h3 { text-decoration: underline; }
    12. Data tables
 
    Scientific tables stay dense but never drop below 14px. Wide tables scroll
-   inside a labelled, keyboard-focusable container rather than forcing the page
+   inside a labeled, keyboard-focusable container rather than forcing the page
    to scroll horizontally.
    -------------------------------------------------------------------------- */
 
@@ -2463,7 +2645,7 @@ a.mgdb-card h3 { text-decoration: underline; }
 .mgdb-table th[aria-sort="descending"] button::after { content: "\25BC"; font-size: .7em; }
 .mgdb-table th[aria-sort="none"] button::after { content: "\21C5"; color: var(--mgdb-muted); font-size: .8em; }
 
-/* Status pill — always contains a text label, never colour alone. */
+/* Status pill — always contains a text label, never color alone. */
 .mgdb-pill {
   display: inline-block;
   padding: 0.1em 0.6em;
@@ -2783,7 +2965,7 @@ a.mgdb-card h3 { text-decoration: underline; }
 }
 
 /* --- footer, single block ---------------------------------------------------
-   Two rows: the statement centred across the full width, then the links on the
+   Two rows: the statement centered across the full width, then the links on the
    left and the USDA mark on the right.
 
    The height was 220px for three short rows -- the <footer> carried 40px of its

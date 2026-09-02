@@ -1,15 +1,21 @@
-/* file: mgdb-expression.css
- *
- * Page-specific styles for the Expression Data Hub (/expression & /data_center/expression).
- * Scoped under .mgdb-expression-page.
- */
+/* ==========================================================================
+   Expression Data Hub — /expression, /data_center/expression
+   --------------------------------------------------------------------------
+   Loaded after css/mgdb-modern.css and css/mgdb-hub.css. The hub shell already
+   settles the pale blue ground, the white section cards and their coloured top
+   edges, the absence of a rule under a section title, the metric colours, the
+   gold edge a grid tile takes on hover, the zebra striping, the green Related
+   resources panel, the shared form field, and the scroll offset.
 
-/* --------------------------------------------------------------------------
-   Hero Emblem
-   -------------------------------------------------------------------------- */
+   Nothing above is repeated here. What is here is the page's own furniture:
+   the query control, the examples, the advanced accordion, the results table
+   and its pagination, and the interiors of the tool, atlas and download cards.
+   ========================================================================== */
+
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
 
 .mgdb-expression-page .mgdb-hero-emblem {
-  background: #ffffff !important;
+  background: #ffffff;
   border-color: var(--mgdb-line);
 }
 
@@ -19,9 +25,7 @@
   mix-blend-mode: normal;
 }
 
-/* --------------------------------------------------------------------------
-   Sticky Section Tabs
-   -------------------------------------------------------------------------- */
+/* ── Sticky section tabs ─────────────────────────────────────────────────── */
 
 .mgdb-expression-page .mgdb-section-tabs {
   position: sticky;
@@ -32,9 +36,6 @@
   gap: var(--mgdb-space-2);
   margin-top: var(--mgdb-space-5);
   margin-bottom: var(--mgdb-space-5);
-  padding: var(--mgdb-space-2) 0;
-  background: var(--mgdb-surface);
-  border-bottom: 1px solid var(--mgdb-line);
 }
 
 .mgdb-expression-page .mgdb-section-tabs a {
@@ -42,19 +43,17 @@
   min-height: 40px;
   align-items: center;
   padding: 0 var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
   color: var(--mgdb-ink) !important;
   font-size: var(--mgdb-text-sm);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
-  transition: background .12s, border-color .12s;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
 }
 
-.mgdb-expression-page .mgdb-section-tabs a:hover {
-  background: var(--mgdb-green-soft);
-}
+.mgdb-expression-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
 
 .mgdb-expression-page .mgdb-section-tabs a.is-current,
 .mgdb-expression-page .mgdb-section-tabs a[aria-current="true"] {
@@ -64,418 +63,451 @@
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
-.mgdb-expression-page > section,
-.mgdb-expression-page section[id] {
-  scroll-margin-top: 4.5rem;
+/* Seven tabs wrap to two rows at 900px here rather than the shell's 1170px. */
+@media (max-width: 1170px) and (min-width: 901px) {
+  .mgdb-hub-page.mgdb-expression-page > section[id] { scroll-margin-top: 65px; }
+}
+
+@media (max-width: 900px) {
+  .mgdb-hub-page.mgdb-expression-page > section[id] { scroll-margin-top: 113px; }
+}
+
+.mgdb-expression-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+.mgdb-expression-page .expression-section-link {
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 /* --------------------------------------------------------------------------
-   Search Form
+   Search
    -------------------------------------------------------------------------- */
 
 .mgdb-expression-page .expression-search-form {
-  padding: var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface-alt);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-4);
+  align-items: end;
 }
 
-.mgdb-expression-page .expression-examples-row {
-  font-size: var(--mgdb-text-xs);
-  color: var(--mgdb-muted);
-  margin-top: var(--mgdb-space-2);
+.mgdb-expression-page .expression-field-query { grid-column: 1; }
+.mgdb-expression-page .mgdb-hub-field-action { grid-column: 2; }
+.mgdb-expression-page .expression-example-row,
+.mgdb-expression-page .expression-adv { grid-column: 1 / -1; }
+
+/* The query control is a wrapper, not an <input>, so the shell's field rule
+   does not reach it. It takes the same 44px and the same border. */
+.mgdb-expression-page .expression-query-control {
+  display: grid;
+  box-sizing: border-box;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  min-height: var(--mgdb-tap-target);
+  height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid #b9b2a5;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
 }
 
-.mgdb-expression-page .expression-example-btn {
-  display: inline-block;
-  margin: 0 var(--mgdb-space-1);
+.mgdb-expression-page .expression-query-control:focus-within {
+  border-color: var(--mgdb-focus);
+  box-shadow: 0 0 0 2px rgba(11, 87, 164, .18);
+}
+
+.mgdb-expression-page .expression-search-icon { color: var(--mgdb-muted); }
+
+.mgdb-expression-page .expression-query-control input[type="search"] {
+  width: 100%;
+  min-width: 0;
   padding: 0;
   border: 0;
-  background: none;
-  color: var(--mgdb-green-dark);
-  font: inherit;
-  font-weight: 700;
-  text-decoration: underline;
+  background: transparent;
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-expression-page .expression-query-control input[type="search"]:focus { outline: none; }
+
+.mgdb-expression-page #expression-query-clear {
+  padding: 0 var(--mgdb-space-2);
+  border: 0;
+  background: transparent;
+  color: var(--mgdb-muted);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
   cursor: pointer;
 }
 
-.mgdb-expression-page .expression-example-btn:hover {
-  color: var(--mgdb-green);
+.mgdb-expression-page #expression-query-clear:hover { color: var(--mgdb-green-dark); text-decoration: underline; }
+
+/* ── Examples ────────────────────────────────────────────────────────────── */
+
+.mgdb-expression-page .expression-example-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--hub-line-soft);
 }
 
-/* --------------------------------------------------------------------------
-   Results Section & Table
-   -------------------------------------------------------------------------- */
-
-.mgdb-expression-page .expression-results-section {
-  margin-top: var(--mgdb-space-5);
+.mgdb-expression-page .expression-example-row > span {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
 }
 
-.mgdb-expression-page .expression-results-heading {
+.mgdb-expression-page .expression-example-row button {
+  padding: var(--mgdb-space-1) var(--mgdb-space-3);
+  border: 1px solid var(--hub-line);
+  border-radius: 999px;
+  background: var(--hub-surface);
+  color: var(--mgdb-green-dark);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.mgdb-expression-page .expression-example-row button:hover {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+}
+
+/* ── Advanced search ─────────────────────────────────────────────────────── */
+
+.mgdb-expression-page .expression-adv {
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--hub-surface);
+}
+
+.mgdb-expression-page .expression-adv summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+  align-items: baseline;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  color: var(--mgdb-green-dark);
+  cursor: pointer;
+  list-style-position: inside;
+}
+
+.mgdb-expression-page .expression-adv summary strong { font-size: var(--mgdb-text-base); }
+.mgdb-expression-page .expression-adv summary span { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+.mgdb-expression-page .expression-adv[open] summary { border-bottom: 1px solid var(--hub-line-soft); }
+
+/* One field, but declared as a track rather than left to stretch: an assembly
+   name is long and the select would otherwise run the full width of the card. */
+.mgdb-expression-page .expression-adv-body {
+  display: grid;
+  grid-template-columns: minmax(0, 34rem);
+  gap: var(--mgdb-space-4);
+  align-items: start;
+  padding: var(--mgdb-space-4);
+}
+
+.mgdb-expression-page .expression-adv-actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-3);
-  align-items: flex-start;
+  padding: 0 var(--mgdb-space-4) var(--mgdb-space-4);
+}
+
+@media (max-width: 640px) {
+  .mgdb-expression-page .expression-search-form { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-expression-page .mgdb-hub-field-action { grid-column: 1; }
+  .mgdb-expression-page .expression-adv-body { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* --------------------------------------------------------------------------
+   Results
+   -------------------------------------------------------------------------- */
+
+.mgdb-expression-page .expression-results-section[hidden] { display: none; }
+
+/* No rule under this title either: the section card's own edge closes it. */
+.mgdb-expression-page .expression-results-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3) var(--mgdb-space-5);
+  align-items: end;
   justify-content: space-between;
   margin-bottom: var(--mgdb-space-4);
 }
 
-.mgdb-expression-page .expression-results-count-wrap {
-  display: flex;
-  align-items: center;
-  gap: var(--mgdb-space-3);
-}
+.mgdb-expression-page .expression-results-heading h2 { margin: 0; }
 
-.mgdb-expression-page .expression-table-wrap {
-  overflow-x: auto;
-}
-
-.mgdb-expression-page .expression-table {
-  width: 100%;
-  border-collapse: collapse;
+.mgdb-expression-page #expression-results-status {
+  margin: var(--mgdb-space-1) 0 0;
+  color: var(--mgdb-muted);
   font-size: var(--mgdb-text-sm);
-  text-align: left;
 }
 
-.mgdb-expression-page .expression-table th {
-  background: var(--mgdb-surface-alt);
-  color: var(--mgdb-ink);
+.mgdb-expression-page .expression-results-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 14rem) minmax(0, 11rem) auto;
+  gap: var(--mgdb-space-4);
+  align-items: end;
+}
+
+@media (max-width: 720px) {
+  .mgdb-expression-page .expression-results-controls { grid-template-columns: minmax(0, 1fr); }
+}
+
+.mgdb-expression-page .expression-results-table th button { white-space: nowrap; }
+.mgdb-expression-page .expression-results-table td { vertical-align: top; }
+.mgdb-expression-page .expression-results-table .expression-col-open { white-space: nowrap; }
+
+.mgdb-expression-page .expression-gene-name {
+  display: block;
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xs);
   font-weight: 700;
-  padding: var(--mgdb-space-3);
-  border-bottom: 2px solid var(--mgdb-line);
+}
+
+.mgdb-expression-page .expression-locus-full {
+  display: block;
+  max-width: 44ch;
+  margin-top: 2px;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-expression-page .expression-coords {
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xs);
   white-space: nowrap;
 }
 
-.mgdb-expression-page .expression-table td {
-  padding: var(--mgdb-space-3);
-  border-bottom: 1px solid var(--mgdb-line);
-  vertical-align: middle;
-}
-
-.mgdb-expression-page .expression-table tr:hover {
-  background: var(--mgdb-surface-alt);
-}
-
-.mgdb-expression-page .expression-gene-link {
-  font-weight: 700;
-  color: var(--mgdb-green-dark);
-  text-decoration: none;
-}
-
-.mgdb-expression-page .expression-gene-link:hover {
-  text-decoration: underline;
-}
-
-.mgdb-expression-page .expression-asm-pill {
-  display: inline-block;
-  font-size: var(--mgdb-text-xs);
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: var(--mgdb-radius-sm);
-  background: #e0f2fe;
-  color: #0369a1;
-}
-
-.mgdb-expression-page .expression-actions-cell {
+.mgdb-expression-page .expression-row-links {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--mgdb-space-1);
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
 }
 
-.mgdb-expression-page .expression-tool-btn {
+.mgdb-expression-page .expression-row-links a {
+  color: var(--mgdb-green-dark);
   font-size: var(--mgdb-text-xs);
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: var(--mgdb-radius-sm);
-  text-decoration: none;
-  display: inline-flex;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ── Pagination ──────────────────────────────────────────────────────────── */
+
+.mgdb-expression-page .expression-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
   align-items: center;
-  border: 1px solid;
-  transition: all .12s ease;
+  justify-content: center;
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-4);
+  border-top: 1px solid var(--hub-line-soft);
 }
 
-.mgdb-expression-page .expression-tool-btn-qteller {
-  background: #fef3c7;
-  color: #92400e;
-  border-color: #fde68a;
+.mgdb-expression-page .expression-pagination:empty { display: none; }
+
+.mgdb-expression-page .expression-page-btn {
+  min-width: var(--mgdb-tap-target);
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
 }
 
-.mgdb-expression-page .expression-tool-btn-qteller:hover {
-  background: #fde68a;
+.mgdb-expression-page .expression-page-btn:hover:not([disabled]) {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
 }
 
-.mgdb-expression-page .expression-tool-btn-gene {
-  background: #dcfce7;
-  color: #166534;
-  border-color: #bbf7d0;
+.mgdb-expression-page .expression-page-btn.is-active {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
 }
 
-.mgdb-expression-page .expression-tool-btn-gene:hover {
-  background: #bbf7d0;
-}
-
-.mgdb-expression-page .expression-tool-btn-jbrowse {
-  background: #ede9fe;
-  color: #5b21b6;
-  border-color: #ddd6fe;
-}
-
-.mgdb-expression-page .expression-tool-btn-jbrowse:hover {
-  background: #ddd6fe;
-}
-
-.mgdb-expression-page .expression-tool-btn-feta {
-  background: #fdf2f8;
-  color: #9d174d;
-  border-color: #fbcfe8;
-}
-
-.mgdb-expression-page .expression-tool-btn-feta:hover {
-  background: #fbcfe8;
-}
-
-.mgdb-expression-page .expression-empty-state {
-  text-align: center;
-  padding: var(--mgdb-space-6) var(--mgdb-space-4);
-  color: var(--mgdb-muted);
-}
+.mgdb-expression-page .expression-page-btn[disabled] { opacity: .45; cursor: not-allowed; }
+.mgdb-expression-page .expression-page-ellipsis { padding: 0 var(--mgdb-space-1); color: var(--mgdb-muted); }
 
 /* --------------------------------------------------------------------------
-   Tools Grid & Cards
+   Card interiors
+
+   The tiles themselves -- the flex column, the neutral top edge, the gold on
+   hover, the description taking the slack so the closing links land on one
+   line -- are the shell's, because all three grids use .mgdb-card. Only what
+   is inside the card is described here.
    -------------------------------------------------------------------------- */
 
-.mgdb-expression-page .expression-tools-grid {
+.mgdb-expression-page .expression-tools-grid,
+.mgdb-expression-page .expression-downloads-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: var(--mgdb-space-4);
-  margin-top: var(--mgdb-space-4);
+  align-items: stretch;
 }
 
-.mgdb-expression-page .expression-tool-card {
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  padding: var(--mgdb-space-4);
-  display: flex;
-  flex-direction: column;
+.mgdb-expression-page .expression-atlas-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: var(--mgdb-space-4);
+  align-items: stretch;
+}
+
+@media (max-width: 900px) {
+  .mgdb-expression-page .expression-tools-grid,
+  .mgdb-expression-page .expression-downloads-grid,
+  .mgdb-expression-page .expression-atlas-list { grid-template-columns: minmax(0, 1fr); }
 }
 
 .mgdb-expression-page .expression-tool-header {
-  display: flex;
-  align-items: center;
-  gap: var(--mgdb-space-3);
-  margin-bottom: var(--mgdb-space-2);
-}
-
-.mgdb-expression-page .expression-tool-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-green-soft);
-  color: var(--mgdb-green-dark);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.mgdb-expression-page .expression-tool-title {
-  font-size: var(--mgdb-text-base);
-  font-weight: 700;
-  margin: 0;
-  color: var(--mgdb-ink);
-}
-
-.mgdb-expression-page .expression-tool-badge {
-  font-size: var(--mgdb-text-xs);
-  font-weight: 600;
-  color: var(--mgdb-green-dark);
-}
-
-.mgdb-expression-page .expression-tool-desc {
-  font-size: var(--mgdb-text-sm);
-  color: var(--mgdb-ink-soft);
-  line-height: 1.5;
-  margin: 0 0 var(--mgdb-space-4) 0;
-  flex: 1;
-}
-
-.mgdb-expression-page .expression-tool-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-}
-
-.mgdb-expression-page .expression-link-btn {
-  font-size: var(--mgdb-text-xs);
-  font-weight: 700;
-  color: var(--mgdb-green-dark);
-  background: var(--mgdb-surface-alt);
-  border: 1px solid var(--mgdb-line);
-  padding: var(--mgdb-space-1) var(--mgdb-space-3);
-  border-radius: var(--mgdb-radius-sm);
-  text-decoration: none;
-  transition: all .12s ease;
-}
-
-.mgdb-expression-page .expression-link-btn:hover {
-  background: var(--mgdb-green-soft);
-  border-color: var(--mgdb-green);
-}
-
-/* --------------------------------------------------------------------------
-   Atlases List
-   -------------------------------------------------------------------------- */
-
-.mgdb-expression-page .expression-atlas-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--mgdb-space-3);
-  margin-top: var(--mgdb-space-4);
-}
-
-.mgdb-expression-page .expression-atlas-card {
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  padding: var(--mgdb-space-4);
-}
-
-.mgdb-expression-page .expression-atlas-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  margin-bottom: var(--mgdb-space-2);
-}
-
-.mgdb-expression-page .expression-atlas-title {
-  font-size: var(--mgdb-text-base);
-  font-weight: 700;
-  margin: 0;
-}
-
-.mgdb-expression-page .expression-atlas-title a {
-  color: var(--mgdb-ink);
-  text-decoration: none;
-}
-
-.mgdb-expression-page .expression-atlas-title a:hover {
-  color: var(--mgdb-green);
-}
-
-.mgdb-expression-page .expression-atlas-desc {
-  font-size: var(--mgdb-text-sm);
-  color: var(--mgdb-ink-soft);
-  margin: 0 0 var(--mgdb-space-3) 0;
-  line-height: 1.5;
-}
-
-.mgdb-expression-page .expression-atlas-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-}
-
-/* --------------------------------------------------------------------------
-   Downloads Grid
-   -------------------------------------------------------------------------- */
-
-.mgdb-expression-page .expression-downloads-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: var(--mgdb-space-4);
-  margin-top: var(--mgdb-space-4);
-}
-
-.mgdb-expression-page .expression-download-card {
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  padding: var(--mgdb-space-4);
   display: flex;
   gap: var(--mgdb-space-3);
   align-items: flex-start;
 }
 
-.mgdb-expression-page .expression-dl-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--mgdb-radius-sm);
-  background: #eff6ff;
-  color: #2563eb;
+.mgdb-expression-page .expression-tool-icon {
   display: flex;
+  width: 40px;
+  height: 40px;
+  flex: none;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-expression-page .expression-tool-title,
+.mgdb-expression-page .expression-atlas-title,
+.mgdb-expression-page .expression-dl-title {
+  margin: 0;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-expression-page .expression-atlas-title a,
+.mgdb-expression-page .expression-dl-title a { color: inherit; }
+
+.mgdb-expression-page .expression-tool-badge {
+  display: inline-block;
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+
+/* The description absorbs the slack in a row of unequal cards, so the links
+   below it land on the same line on every card. The shell does this for a
+   direct `> p`; these two sit one level down. */
+.mgdb-expression-page .expression-tool-desc,
+.mgdb-expression-page .expression-atlas-desc {
+  margin: 0;
+  flex: 1 1 auto;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-expression-page .expression-tool-links,
+.mgdb-expression-page .expression-atlas-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  align-items: center;
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--hub-line-soft);
+}
+
+.mgdb-expression-page .expression-tool-links .expression-link {
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.mgdb-expression-page .expression-atlas-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+/* An assembly name is a single unbroken token and will push a card wide. */
+.mgdb-expression-page .expression-atlas-title { overflow-wrap: anywhere; }
+
+/* The download card puts its mark beside the text rather than above it. */
+.mgdb-expression-page .expression-download-card { flex-direction: row; }
+
+.mgdb-expression-page .expression-dl-icon {
+  display: flex;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
 }
 
 .mgdb-expression-page .expression-dl-content {
-  flex: 1;
-}
-
-.mgdb-expression-page .expression-dl-title {
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-  margin: 0 0 var(--mgdb-space-1) 0;
-  color: var(--mgdb-ink);
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--mgdb-space-2);
 }
 
 .mgdb-expression-page .expression-dl-desc {
-  font-size: var(--mgdb-text-xs);
+  margin: 0;
+  flex: 1 1 auto;
   color: var(--mgdb-ink-soft);
-  margin: 0 0 var(--mgdb-space-3) 0;
-  line-height: 1.4;
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
 }
+
+.mgdb-expression-page .expression-dl-content .mgdb-button { align-self: flex-start; }
 
 /* --------------------------------------------------------------------------
-   Connected Resources Bottom Section
+   The figure
+
+   The shared .mgdb-chart is a fixed 320px, which squashes a bar chart that
+   needs a row per assembly. mgdb-expression.js sets an explicit pixel height
+   from the row count and feeds the same number to Plotly; this lets that
+   height take effect.
    -------------------------------------------------------------------------- */
 
-.mgdb-expression-page .expression-bottom-section {
-  background: linear-gradient(180deg, var(--mgdb-surface) 0%, var(--mgdb-green-soft) 100%) !important;
-  border-color: #b8dbca !important;
+.mgdb-expression-page .expression-figure { margin-top: var(--mgdb-space-5); }
+
+.mgdb-expression-page .expression-figure .mgdb-chart {
+  height: auto;
+  min-height: 320px;
+  overflow: visible;
 }
 
-.mgdb-expression-page .expression-related-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--mgdb-space-3);
-  margin-top: var(--mgdb-space-4);
-}
-
-.mgdb-expression-page .expression-related-card {
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-sm);
-  padding: var(--mgdb-space-3);
-  text-decoration: none;
-  color: inherit;
-  transition: border-color .12s, box-shadow .12s;
-}
-
-.mgdb-expression-page .expression-related-card:hover {
-  border-color: var(--mgdb-green);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-
-.mgdb-expression-page .expression-related-title {
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-  color: var(--mgdb-green-dark);
-  margin-bottom: 2px;
-}
-
-.mgdb-expression-page .expression-related-desc {
-  font-size: var(--mgdb-text-xs);
-  color: var(--mgdb-muted);
-  margin: 0;
-  line-height: 1.4;
-}
-
-@media (max-width: 768px) {
-  .mgdb-expression-page .mgdb-section-tabs {
-    position: static;
-  }
+@media print {
+  .mgdb-expression-page .mgdb-section-tabs,
+  .mgdb-expression-page .expression-search-form,
+  .mgdb-expression-page .expression-pagination { display: none; }
 }

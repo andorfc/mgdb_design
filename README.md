@@ -1152,6 +1152,43 @@ gone; it also leaked into the hover text.
 Related: outside bar labels need `\u00A0`, not a space — SVG collapses leading
 whitespace, so a plain space measures as no padding at all.
 
+## The Expression Data Hub
+
+`/expression` was brought onto the shell on 2026-09-01: sections converted from
+`.mgdb-panel` to plain cards, blurbs removed, tab labels matched to their
+headings, the results section hidden until a search runs and given pagination,
+a References section added, and the metrics renamed with a figure after them.
+Two things are worth recording beyond the conversion.
+
+### The lookup was doing three times the work it needed
+
+`expressionSearch()` matched the locus full name through
+`EXISTS (SELECT 1 FROM mgdb.locus l WHERE l.id = gm.locus_id AND LOWER(l.full_name) LIKE ?)`.
+`chado.gene_model` already **carries `locus_full_name` denormalised**, and the
+two agree on all 1,878,920 rows — checked, zero disagreements. Reading the
+column instead takes the count for a term like `adh1` from **1,340 ms to
+468 ms**, with identical counts on every term tested, and lets the `LEFT JOIN`
+come out of the row query too.
+
+The other half was the `COUNT(*)`, which cost about as much as the page it was
+counting and ran on every search. The query now fetches **one row past the
+page**: a short page reports its own total \(`offset + rows`\) and only a full
+one pays for the count. Measured end to end through the API:
+
+| term | before | after |
+| --- | --- | --- |
+| `adh1` \(6 results\) | 2,724 ms | **489 ms** |
+| `kn1` \(12\) | ~2,700 ms | **484 ms** |
+| `Zm00001eb056510` \(1\) | ~2,700 ms | **491 ms** |
+| `o2` \(194, full page\) | ~2,700 ms | **940 ms** |
+
+### The metric that was a constant
+
+`total_assemblies` was `29` written into the library with a comment explaining
+the arithmetic. The GROUP BY that builds the assembly filter already knows the
+answer — it is 36 — so the count comes from there now, and the same query feeds
+the filter, the metric and the figure instead of running twice.
+
 ## The AI & Machine Learning Data Hub
 
 `/ai` is built on `css/mgdb-hub.css`, the generalised Data Hub shell: it puts
