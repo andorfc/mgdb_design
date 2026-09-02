@@ -26,6 +26,9 @@ $bauplan->includeCss('/css/mgdb-hub.css?v=' . filemtime($system['root_dir'] . '/
 $bauplan->includeCss('/css/mgdb-nomenclature.css?v=' . filemtime($system['root_dir'] . '/css/mgdb-nomenclature.css'));
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
+/* Without this the section tab bar is styled but inert: its links scroll, and
+   the active state never leaves the first tab. */
+$bauplan->includeScript('/js/mgdb-nomenclature.js?v=' . filemtime($system['root_dir'] . '/js/mgdb-nomenclature.js'));
 $bauplan->head('<meta name="description" content="Use the Maize Genetics Nomenclature standard for genes, alleles, gene products, genome assemblies, annotations, gene models, markers, and chromosome rearrangements.">');
 
 $mgdb = $bauplan->template()->load('templates/maizegdb-main-modern.bau');
