@@ -145,6 +145,16 @@ nothing else goes wrong visibly.
   the string it is handed plus a global stamp. Any payload whose *shape* is
   built in the controller needs `'<key>_' . (int) @filemtime(__FILE__)`, or a
   warm server keeps serving an entry that predates the new fields.
+- **If a hub's Metrics follow the search, say so three ways.** The shell's
+  Metrics are static corpus figures on every other hub, so a section that
+  silently recomputes per query reads as if it never changed: add a standing
+  badge in the heading, a scope line stating what is being counted right now
+  (rendered server side too, so it is right before any script runs), and a
+  visible busy state while the recomputing request is in flight.
+- **`.mgdb-section-heading > p` is hidden by the shell.** That is how blurbs
+  were removed everywhere at once — so any `<p>` in a heading that carries real
+  live state disappears the moment a page adopts `mgdb-hub-page`. Move it out of
+  the heading, or exempt it by name with a comment.
 - **An OR of LIKE arms is not the same cost as the arms run separately.** Two
   `EXISTS` clauses ORed with two column matches became correlated subqueries per
   candidate row: 395 + 286 + 613 + 418 ms apart, 3,323 ms together. Rewrite as a

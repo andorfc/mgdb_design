@@ -14,6 +14,14 @@
   var searchTimer = null;
   var selectedIds = {};
 
+  /* The endpoint caps page_size at 100, so "All results" asks for that. */
+  var MAX_PAGE = 100;
+  var pageSize = 25;
+  /* Remembered from the first unfiltered load so the scope line can tell "the
+     whole collection" apart from "a search that happens to match everything". */
+  var collectionTotal = null;
+  var resultFilter = '';
+
   function byId(id) {
     return document.getElementById(id);
   }
@@ -60,7 +68,7 @@
       params.set('include_mnl', '0');
     }
     params.set('page', page || 1);
-    params.set('page_size', '20');
+    params.set('page_size', String(pageSize === 'all' ? MAX_PAGE : pageSize));
     return params;
   }
 
@@ -107,6 +115,16 @@
   function setLoading(loading) {
     byId('reference-loading').hidden = !loading;
     byId('reference-results').hidden = loading;
+
+    /* The figures below are recomputed by the same request, so they are marked
+       busy while it runs. Without this the numbers change with no warning and
+       it is easy to miss that they moved at all. */
+    var dashboard = byId('reference-dashboard');
+    if (dashboard) {
+      dashboard.classList.toggle('is-updating', !!loading);
+      if (loading) { dashboard.setAttribute('aria-busy', 'true'); }
+      else { dashboard.removeAttribute('aria-busy'); }
+    }
     if (loading) {
       byId('reference-empty').hidden = true;
       byId('reference-error').hidden = true;
@@ -130,6 +148,12 @@
   /* Resting state: no query has been entered, so there are no results to show.
      The dashboard below still describes the whole collection. */
   function showResting() {
+    /* No query: the results section goes away entirely, as on every other hub.
+       The Metrics section stays, describing the whole collection, and its scope
+       line says so. */
+    var section = byId('reference-results-section');
+    if (section) { section.hidden = true; }
+
     var results = byId('reference-results');
     results.innerHTML = '';
     results.hidden = true;
@@ -165,6 +189,7 @@
       .then(function (data) {
         if (!data.ok) throw new Error(data.message || 'Summary failed');
         currentData = data;
+        if (collectionTotal === null) { collectionTotal = data.summary.total; }
         renderSummary(data);
         renderCharts(data.facets);
         setLoading(false);
@@ -195,6 +220,8 @@
 
   function loadSearch(page, scrollToResults) {
     currentPage = page || 1;
+    var section = byId('reference-results-section');
+    if (section) { section.hidden = false; }
     var params = formParams(currentPage);
     updateUrl(params);
     setLoading(true);
@@ -236,6 +263,9 @@
     renderPagination(data.summary.page, data.summary.page_count);
     updateExports();
     updateSelection();
+    /* Re-applied last so paging and a re-sort do not silently drop a filter the
+       box still shows. */
+    applyResultsFilter();
   }
 
   function renderSummary(data) {
@@ -249,9 +279,20 @@
       ? Math.min.apply(Math, years) + '–' + Math.max.apply(Math, years)
       : '—';
 
-    var description = data.query.term
-      ? 'Figures summarize all papers matching “' + data.query.term + ',” not only the current page.'
-      : 'Figures summarize the complete curated reference collection.';
+    /* The whole point of this section on this hub: the four numbers and the
+       four charts are computed over the *matched set*, not the corpus and not
+       the page. Say which, concretely, every time it changes. */
+    var shown = data.results ? data.results.length : 0;
+    var description;
+    if (data.query.term || summary.total !== collectionTotal) {
+      description = 'These figures cover all ' + number(summary.total) + ' matching reference'
+        + (summary.total === 1 ? '' : 's')
+        + (data.query.term ? ' for “' + data.query.term + '”' : ' for the current filters')
+        + (shown ? ', not just the ' + number(shown) + ' listed above' : '') + '.';
+    } else {
+      description = 'These figures cover the whole collection — all ' + number(summary.total)
+        + ' curated references. Search above and they narrow to your matches.';
+    }
     byId('reference-dashboard-description').textContent = description;
 
     var entitySummary = byId('reference-entity-summary');
@@ -352,7 +393,7 @@
         links += '<button class="reference-copy-id" type="button" data-copy-value="' + escapeHtml(row.pubmed) + '">Copy PMID</button>';
       }
       var editorialPick = row.editorial_pick === true;
-      return '<article class="reference-result-card' + (editorialPick ? ' is-editorial-pick' : '') + '" data-reference-id="' + row.id + '">'
+      return '<article class="reference-result-card is-selectable' + (editorialPick ? ' is-editorial-pick' : '') + '" data-reference-id="' + row.id + '">'
         + '<label class="reference-result-select"><input type="checkbox" data-reference-select="' + row.id + '" aria-label="Select ' + escapeHtml(title) + '"></label>'
         + '<div><div class="reference-result-meta">'
         + (row.year ? '<span>' + row.year + '</span>' : '')
@@ -378,6 +419,42 @@
         copyText(button.getAttribute('data-copy-value'), button);
       });
     });
+  }
+
+  /* Narrows the page already rendered. The search pages server side, so this
+     filters what is on screen -- and, unlike every other hub, it deliberately
+     does NOT touch the figures below: those describe the matched set, and a
+     box that narrows one page should not appear to move them. */
+  function applyResultsFilter() {
+    var container = byId('reference-results');
+    if (!container) { return; }
+
+    var rows = container.querySelectorAll('.reference-result-card');
+    var terms = resultFilter.toLowerCase().split(/\s+/).filter(Boolean);
+    var shown = 0;
+
+    Array.prototype.forEach.call(rows, function (row) {
+      var match = true;
+      if (terms.length) {
+        var hay = (row.textContent || '').toLowerCase();
+        for (var i = 0; i < terms.length; i++) {
+          if (hay.indexOf(terms[i]) === -1) { match = false; break; }
+        }
+      }
+      row.hidden = !match;
+      if (match) { shown++; }
+    });
+
+    var status = byId('reference-results-status');
+    if (terms.length && status) {
+      var total = currentData && currentData.summary ? currentData.summary.total : 0;
+      status.textContent = shown === 0
+        ? 'Nothing on this page matches the filter \u201C' + resultFilter + '\u201D. '
+          + number(total) + ' references matched the search.'
+        : 'Showing ' + number(shown) + ' of the ' + number(rows.length)
+          + ' references on this page matching \u201C' + resultFilter + '\u201D, out of '
+          + number(total) + ' matched by the search.';
+    }
   }
 
   function renderPagination(page, pageCount) {
@@ -490,64 +567,83 @@
 
   /* ── Section Tabs & Scrollspy ───────────────────────────────────────────── */
 
+  /* Sticky section tabs, driven by scroll, IntersectionObserver and resize
+     together: no single trigger fires everywhere, and the results section
+     appears and disappears under the bar as searches run. */
   function buildTabs() {
     var tabs = document.querySelectorAll('.mgdb-section-tabs a');
-    if (!tabs.length) return;
+    if (!tabs.length) { return; }
 
     var pairs = [];
     Array.prototype.forEach.call(tabs, function (tab) {
-      var href = tab.getAttribute('href');
-      if (href && href.startsWith('#')) {
-        var section = document.querySelector(href);
-        if (section) {
-          pairs.push({ tab: tab, section: section });
-        }
-      }
+      var href = tab.getAttribute('href') || '';
+      if (href.charAt(0) !== '#') { return; }
+      var section = document.getElementById(href.slice(1));
+      if (section) { pairs.push({ tab: tab, section: section }); }
     });
+    if (!pairs.length) { return; }
 
-    function markCurrent(target) {
+    var heldUntilScroll = null;
+    var heldAtY = 0;
+
+    function mark(section) {
       pairs.forEach(function (pair) {
-        var current = pair.section === target;
+        var current = pair.section === section;
         pair.tab.classList.toggle('is-current', current);
-        if (current) {
-          pair.tab.setAttribute('aria-current', 'true');
-        } else {
-          pair.tab.removeAttribute('aria-current');
-        }
+        if (current) { pair.tab.setAttribute('aria-current', 'true'); }
+        else { pair.tab.removeAttribute('aria-current'); }
       });
     }
 
-    var initial = pairs[0];
-    if (window.location.hash) {
-      pairs.forEach(function (pair) {
-        if ('#' + pair.section.id === window.location.hash) {
-          initial = pair;
-        }
-      });
+    function triggerLine() {
+      var bar = document.querySelector('.mgdb-section-tabs');
+      var barHeight = bar ? bar.getBoundingClientRect().height : 0;
+      var margin = parseFloat(window.getComputedStyle(pairs[0].section).scrollMarginTop) || 0;
+      return Math.max(barHeight + 8, margin + 4);
     }
-    if (initial) {
-      markCurrent(initial.section);
+
+    function update() {
+      if (heldUntilScroll) {
+        if (Math.abs(window.scrollY - heldAtY) < 4) { return; }
+        heldUntilScroll = null;
+      }
+      var line = triggerLine();
+      var current = pairs[0];
+      pairs.forEach(function (pair) {
+        if (pair.section.hasAttribute('hidden')) { return; }
+        if (pair.section.getBoundingClientRect().top <= line) { current = pair; }
+      });
+      if ((window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 2)) {
+        current = pairs[pairs.length - 1];
+      }
+      if (current) { mark(current.section); }
     }
 
     pairs.forEach(function (pair) {
       pair.tab.addEventListener('click', function () {
-        markCurrent(pair.section);
+        mark(pair.section);
+        heldUntilScroll = pair.section;
+        heldAtY = window.scrollY;
       });
     });
 
-    if (!window.IntersectionObserver) return;
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
 
-    var observer = new window.IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          markCurrent(entry.target);
-        }
+    if (window.IntersectionObserver) {
+      var observer = new window.IntersectionObserver(function () { update(); },
+        { rootMargin: '-20% 0px -60% 0px' });
+      pairs.forEach(function (pair) { observer.observe(pair.section); });
+    }
+
+    var results = byId('reference-results-section');
+    if (results && window.MutationObserver) {
+      new window.MutationObserver(update).observe(results, {
+        childList: true, subtree: true, attributes: true, attributeFilter: ['hidden']
       });
-    }, { rootMargin: '-20% 0px -60% 0px' });
+    }
 
-    pairs.forEach(function (pair) {
-      observer.observe(pair.section);
-    });
+    update();
   }
 
   function initialize() {
@@ -580,6 +676,16 @@
       byId('reference-sort-compact').value = byId('reference-sort').value;
       refresh(1, false);
     });
+    byId('reference-page-size').addEventListener('change', function () {
+      pageSize = this.value === 'all' ? 'all' : parseInt(this.value, 10) || 25;
+      refresh(1, false);
+    });
+
+    byId('reference-results-filter').addEventListener('input', function () {
+      resultFilter = this.value.trim();
+      applyResultsFilter();
+    });
+
     byId('reference-sort-compact').addEventListener('change', function () {
       byId('reference-sort').value = byId('reference-sort-compact').value;
       refresh(1, false);

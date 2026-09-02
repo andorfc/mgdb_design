@@ -6,7 +6,7 @@ $$SYNTAX-LEVEL 2
 <meta property="og:title" content="MaizeGDB Literature Search">
 <meta property="og:description" content="Search curated maize papers, explore publication trends, and export citations, DOIs, PubMed IDs, or references associated with genes and loci.">
 
-<main class="mgdb-page mgdb-reference-page" id="reference-top">
+<main class="mgdb-page mgdb-hub-page mgdb-reference-page" id="reference-top">
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
     <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Literature Search</span>
   </nav>
@@ -31,15 +31,16 @@ $$SYNTAX-LEVEL 2
   </section>
 
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#reference-search-panel">Search</a>
+    <a href="#reference-search-panel" class="is-current" aria-current="true">Search</a>
     <a href="#reference-results-section">Results</a>
-    <a href="#reference-dashboard">Result visuals</a>
+    <a href="#reference-references">References</a>
+    <a href="#reference-dashboard">Metrics</a>
     <a href="#reference-resources">Related resources</a>
   </nav>
 
   <section id="reference-search-panel" class="reference-search-panel" aria-labelledby="reference-search-title">
     <div class="reference-section-heading">
-      <div><span class="mgdb-eyebrow">Literature search</span><h2 id="reference-search-title">What are you looking for?</h2></div>
+      <div><h2 id="reference-search-title">Search</h2></div>
       <p>Use Related gene, gene model, or locus to retrieve papers curated against a biological record rather than papers that merely mention its name.</p>
     </div>
 
@@ -86,21 +87,35 @@ $$SYNTAX-LEVEL 2
     </form>
   </section>
 
-  <section id="reference-results-section" class="reference-results-section" aria-labelledby="reference-results-title">
+  <section id="reference-results-section" class="reference-results-section" aria-labelledby="reference-results-title" hidden>
     <div class="reference-results-heading">
       <div>
-        <span class="mgdb-eyebrow">Search results</span>
-        <h2 id="reference-results-title">Curated references</h2>
+        <h2 id="reference-results-title">Results</h2>
         <p id="reference-results-status" aria-live="polite">Loading references…</p>
       </div>
-      <div class="reference-sort-compact">
-        <label for="reference-sort-compact">Sort</label>
-        <select id="reference-sort-compact">
-          <option value="relevance">Best match</option>
-          <option value="newest">Newest first</option>
-          <option value="oldest">Oldest first</option>
-          <option value="title">Title A–Z</option>
-        </select>
+      <div class="reference-results-controls">
+        <div class="mgdb-hub-field">
+          <label for="reference-results-filter">Filter results</label>
+          <input id="reference-results-filter" type="search" placeholder="Narrow this page" autocomplete="off" />
+        </div>
+        <div class="mgdb-hub-field">
+          <label for="reference-page-size">Results per page</label>
+          <select id="reference-page-size">
+            <option value="10">Top 10</option>
+            <option value="25" selected>Top 25</option>
+            <option value="50">Top 50</option>
+            <option value="all">All results</option>
+          </select>
+        </div>
+        <div class="mgdb-hub-field">
+          <label for="reference-sort-compact">Sort</label>
+          <select id="reference-sort-compact">
+            <option value="relevance">Best match</option>
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="title">Title A&ndash;Z</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -132,14 +147,28 @@ $$SYNTAX-LEVEL 2
     <nav id="reference-pagination" class="reference-pagination" aria-label="Reference result pages"></nav>
   </section>
 
+  <section id="reference-references" aria-labelledby="reference-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="reference-references-title">References</h2></div>
+    </div>
+
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
   <section id="reference-dashboard" class="reference-dashboard" aria-labelledby="reference-dashboard-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Publication patterns</span>
-        <h2 id="reference-dashboard-title">Result visuals</h2>
+        <h2 id="reference-dashboard-title">Metrics</h2>
       </div>
-      <p id="reference-dashboard-description">Visual breakdown, publication trends, and top journals matching your search.</p>
+      <p class="reference-live-badge"><span aria-hidden="true">&#9679;</span> These update with your search</p>
     </div>
+
+    <!-- Not a section blurb: this is live state, and the hub shell hides any
+         <p> inside .mgdb-section-heading. It says what the figures below are
+         currently counting, and it is the only thing on the page that does. -->
+    <p id="reference-dashboard-description" class="reference-scope-note" role="status" aria-live="polite">$(scope_line)</p>
 
     <div class="mgdb-metric-grid">
       <article class="mgdb-metric">
@@ -209,10 +238,9 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
-  <section id="reference-resources" aria-labelledby="reference-resources-title">
+  <section id="reference-resources" class="mgdb-hub-related" aria-labelledby="reference-resources-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Connected tools</span>
         <h2 id="reference-resources-title">Related resources</h2>
       </div>
       <p>Explore related MaizeGDB literature archives, data hubs, and external biomedical indexes.</p>

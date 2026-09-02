@@ -18,6 +18,7 @@
 
   include_once('./include/db-api.php');
   include_once('./include/dashboard_cache.php');
+  include_once('./include/references_lib.php');
 
   $system = getSystemInfo('mgdb.conf');
   logMessage('Starting reference_search_modern.php');
@@ -27,15 +28,29 @@
   $bauplan = new Bauplan('MaizeGDB Literature Search | References and Papers');
   $bauplan->modern();
 
+  $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT']
+    ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';
+  $hub_file = $doc_root . '/css/mgdb-hub.css';
+  $css_file = $doc_root . '/css/mgdb-reference.css';
+  $js_file  = $doc_root . '/js/mgdb-reference.js';
+  $v_hub = file_exists($hub_file) ? filemtime($hub_file) : time();
+  $v_css = file_exists($css_file) ? filemtime($css_file) : time();
+  $v_js  = file_exists($js_file)  ? filemtime($js_file)  : time();
+
   $bauplan->preHTML('<meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
   $bauplan->includeCss('/css/static.css');
   $bauplan->includeCss('/css/mgdb-modern.css');
   $bauplan->includeCss('/css/mgdb-megamenu.css');
-  $bauplan->includeCss('/css/mgdb-reference.css');
+  /* The shared Data Hub shell -- pale blue ground, white section cards, coloured
+     section edges, the reference card, aligned form rows -- loaded before the
+     page's own sheet, which is the order css/mgdb-hub.css documents.
+     `mgdb-hub-page` on <main> opts in. */
+  $bauplan->includeCss('/css/mgdb-hub.css?v=' . $v_hub);
+  $bauplan->includeCss('/css/mgdb-reference.css?v=' . $v_css);
   $bauplan->includeScript('/js/lib/plotly/plotly-2.25.2.min.js');
   $bauplan->includeScript('/js/mgdb-modern.js');
   $bauplan->includeScript('/js/mgdb-chrome.js');
-  $bauplan->includeScript('/js/mgdb-reference.js');
+  $bauplan->includeScript('/js/mgdb-reference.js?v=' . $v_js);
   $bauplan->head('<meta name="description" content="Search more than 50,000 curated maize references by topic, title, author, abstract, gene model, or locus, and explore publication patterns over time.">');
 
   $mgdb = $bauplan->template()->load('templates/maizegdb-main-modern.bau');
@@ -49,7 +64,7 @@
      change only when the database is reloaded, so they are cached as one entry.
      Measured cost of building it: 656 ms, against 804 ms for the whole page.
      See include/dashboard_cache.php. */
-  $page_data = dashboardCache($system, 'reference/page', function () use ($DBConn) {
+  $page_data = dashboardCache($system, 'reference/page_' . (int) @filemtime(__FILE__), function () use ($DBConn) {
       $stats_sql = "
         SELECT COUNT(*) AS reference_count,
                COUNT(*) FILTER (WHERE r.doi IS NOT NULL AND btrim(r.doi) <> '') AS doi_count,
@@ -79,6 +94,30 @@
   $content->get('doi_count')->replace(number_format($page_data['doi_count']));
   $content->get('pubmed_count')->replace(number_format($page_data['pubmed_count']));
   $content->get('year_range')->replace($page_data['min_year'] . '&ndash;' . $page_data['max_year']);
+
+  /* The Metrics section's scope line, rendered server side so it is right
+     before any script runs. js/mgdb-reference.js rewrites it on every search;
+     what it must never say is nothing. */
+  $content->get('scope_line')->replace(
+    'These figures cover the whole collection &mdash; all '
+    . number_format($page_data['reference_count'])
+    . ' curated references. Search above and they narrow to your matches.');
+
+  /* References: how this literature collection is curated and what it feeds.
+     Rendered by include/references_lib.php so these cards match every other
+     hub -- and they are papers *about* the collection, not a sample of it. */
+  $content->get('reference_cards')->replace(mgdb_render_references($doc_root, array(
+      // How the records in this collection are curated in the first place.
+      array('doi' => '10.1016/j.cpb.2017.11.001'),
+      // Curation and outreach at MaizeGDB, which is where this corpus comes from.
+      array('doi' => '10.1093/database/bar022'),
+      // What a community database owes the literature it indexes.
+      array('doi' => '10.1093/database/bay088'),
+      // Querying these records alongside the rest of the warehouse.
+      array('doi' => '10.3389/fpls.2020.592730'),
+      // The database of record.
+      array('doi' => '10.1093/nar/gky1046'),
+  )));
 
   include_once('translation.php');
   $mgdb->get('blast_url')->replace($system['BLAST_URL']);

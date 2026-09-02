@@ -1,29 +1,31 @@
 /* ==========================================================================
-   Reference literature search (/data_center/reference)
+   Reference Data Hub — /data_center/reference
    --------------------------------------------------------------------------
-   Layout and interaction come from the reference search in the MaizeGDB
-   website repository. Restyled onto the shared tokens so the page matches the
-   rest of the redesign instead of carrying its own palette and type scale.
-   Scoped under .mgdb-reference-page.
+   Loaded after css/mgdb-modern.css and css/mgdb-hub.css. The hub shell settles
+   the pale blue ground, the white section cards and their coloured top edges,
+   the absence of a rule under a section title, the metric colours, the gold
+   edge a grid tile takes on hover, the zebra striping, the green Related
+   resources panel, the shared form field, and the scroll offset.
+
+   Nothing above is repeated here. What is here is the page's own furniture:
+   the search panel, the results controls, the selection bar, the figures, and
+   the live-scope treatment that marks the Metrics section on this hub as
+   query-driven rather than corpus-wide.
    ========================================================================== */
 
-/* Hero --------------------------------------------------------------------- */
-
-/* Hero Emblem & Section Tabs ----------------------------------------------- */
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
 
 .mgdb-reference-page .mgdb-hero-emblem {
-  gap: var(--mgdb-space-2);
-  padding: var(--mgdb-space-4) var(--mgdb-space-3);
-  border-right: 1px solid #cfe3d6;
-  background: linear-gradient(160deg, rgba(255, 255, 255, .92), rgba(255, 255, 255, .55));
-  color: var(--mgdb-green-dark);
+  background: #ffffff;
+  border-color: var(--mgdb-line);
 }
 
 .mgdb-reference-page .mgdb-hero-emblem svg {
-  width: min(100%, 62px);
+  width: min(100%, 64px);
   height: auto;
-  mix-blend-mode: normal;
 }
+
+/* ── Sticky section tabs ─────────────────────────────────────────────────── */
 
 .mgdb-reference-page .mgdb-section-tabs {
   position: sticky;
@@ -33,10 +35,7 @@
   flex-wrap: wrap;
   gap: var(--mgdb-space-2);
   margin-top: var(--mgdb-space-5);
-  margin-bottom: var(--mgdb-space-6);
-  padding: var(--mgdb-space-2) 0;
-  background: var(--mgdb-surface);
-  border-bottom: 1px solid var(--mgdb-line);
+  margin-bottom: var(--mgdb-space-5);
 }
 
 .mgdb-reference-page .mgdb-section-tabs a {
@@ -44,21 +43,17 @@
   min-height: 40px;
   align-items: center;
   padding: 0 var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
   color: var(--mgdb-ink) !important;
   font-size: var(--mgdb-text-sm);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
-  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
 }
 
-.mgdb-reference-page .mgdb-section-tabs a:hover {
-  background: var(--mgdb-green-soft);
-  border-color: #bcd9c6;
-  color: var(--mgdb-green-dark) !important;
-}
+.mgdb-reference-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
 
 .mgdb-reference-page .mgdb-section-tabs a.is-current,
 .mgdb-reference-page .mgdb-section-tabs a[aria-current="true"] {
@@ -66,6 +61,103 @@
   background: var(--mgdb-green-dark);
   color: #ffffff !important;
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+@media (max-width: 900px) and (min-width: 861px) {
+  .mgdb-hub-page.mgdb-reference-page > section[id] { scroll-margin-top: 65px; }
+}
+
+@media (max-width: 860px) {
+  .mgdb-hub-page.mgdb-reference-page > section[id] { scroll-margin-top: 113px; }
+}
+
+.mgdb-reference-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+.mgdb-reference-page .reference-results-section[hidden] { display: none; }
+
+/* --------------------------------------------------------------------------
+   The Metrics section on this hub is query-driven
+
+   Every other hub's Metrics describe the whole corpus and never move. Here the
+   four numbers and the four charts are recomputed from whatever the search
+   matched, which is easy to miss precisely because it looks like the others.
+   Three things say so: a standing badge in the heading, a scope line that
+   states what is being counted right now, and a visible busy state while the
+   request that recomputes them is in flight.
+   -------------------------------------------------------------------------- */
+
+.mgdb-reference-page .reference-live-badge {
+  display: inline-flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  align-self: center;
+  margin: 0;
+  padding: var(--mgdb-space-1) var(--mgdb-space-3);
+  border: 1px solid #bcd9c6;
+  border-radius: 999px;
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .01em;
+  white-space: nowrap;
+}
+
+/* The shell hides <p> inside a section heading, and this badge is one. It is
+   live state rather than a section blurb, so it is exempted deliberately. */
+.mgdb-hub-page.mgdb-reference-page .mgdb-section-heading > p.reference-live-badge {
+  display: inline-flex;
+}
+
+.mgdb-reference-page .reference-live-badge span { color: var(--mgdb-gold); font-size: .8em; line-height: 1; }
+
+.mgdb-reference-page .reference-scope-note {
+  margin: 0 0 var(--mgdb-space-4);
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-left: 4px solid var(--mgdb-green-dark);
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* While the request that recomputes them is in flight. Opacity only -- the
+   numbers stay readable, they just visibly belong to the previous answer. */
+.mgdb-reference-page .reference-dashboard.is-updating .mgdb-metric-grid,
+.mgdb-reference-page .reference-dashboard.is-updating .reference-chart-grid {
+  opacity: .45;
+  transition: opacity .15s ease;
+}
+
+.mgdb-reference-page .reference-dashboard.is-updating .reference-scope-note::after {
+  content: " Updating\2026";
+  font-weight: 700;
+}
+
+/* ── Results controls ────────────────────────────────────────────────────── */
+
+/* Fixed tracks in a box sized to its own content: declared with minmax(0, ...)
+   the first tracks take everything the parent offers and the last resolves to
+   0px, which drops its control onto a second row. */
+.mgdb-reference-page .reference-results-controls {
+  display: grid;
+  width: max-content;
+  max-width: 100%;
+  flex: 0 0 auto;
+  grid-template-columns: 13rem 10rem 12rem;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: end;
+}
+
+@media (max-width: 1000px) {
+  .mgdb-reference-page .reference-results-controls {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .mgdb-reference-page .reference-results-controls { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* The submit and reset controls are bare <button> elements in the template;
@@ -413,75 +505,6 @@
 .mgdb-reference-page .reference-select-page input { width: auto; min-height: 0; margin: 0; accent-color: var(--mgdb-green-dark); }
 
 .mgdb-reference-page #reference-results { margin-top: var(--mgdb-space-4); }
-
-/* One result. A hanging layout: checkbox, then the citation block. */
-.mgdb-reference-page .reference-result-card {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: var(--mgdb-space-4);
-  padding: var(--mgdb-space-4) var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
-}
-
-.mgdb-reference-page .reference-result-card + .reference-result-card { margin-top: var(--mgdb-space-3); }
-.mgdb-reference-page .reference-result-card:hover { border-color: var(--mgdb-gold-dark); }
-
-/* Editorial picks carry a gold spine and a text badge, so the distinction is
-   never carried by colour alone. */
-.mgdb-reference-page .reference-result-card.is-editorial-pick {
-  border-left: 5px solid var(--mgdb-gold);
-  background: var(--mgdb-surface-alt);
-}
-
-.mgdb-reference-page .reference-result-select { margin: 0; }
-.mgdb-reference-page .reference-result-select input { width: 18px; min-height: 0; margin: 0; accent-color: var(--mgdb-green-dark); }
-
-.mgdb-reference-page .reference-result-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2) var(--mgdb-space-3);
-  align-items: center;
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-}
-
-.mgdb-reference-page .reference-result-card h3 {
-  margin-top: var(--mgdb-space-1);
-  color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-lg);
-  line-height: var(--mgdb-leading-snug);
-}
-
-.mgdb-reference-page .reference-result-card h3 a { color: inherit; }
-.mgdb-reference-page .reference-result-authors { margin-top: var(--mgdb-space-1); color: var(--mgdb-ink-soft); font-size: var(--mgdb-text-sm); }
-.mgdb-reference-page .reference-result-citation { margin-top: var(--mgdb-space-1); color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
-
-.mgdb-reference-page .reference-result-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2) var(--mgdb-space-4);
-  align-items: center;
-  margin-top: var(--mgdb-space-3);
-}
-
-.mgdb-reference-page .reference-result-links a { color: var(--mgdb-burgundy); font-size: var(--mgdb-text-sm); font-weight: 700; }
-
-.mgdb-reference-page .reference-copy-id {
-  min-height: 32px;
-  padding: 2px var(--mgdb-space-3);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink-soft);
-  font-family: inherit;
-  font-size: var(--mgdb-text-xs);
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.mgdb-reference-page .reference-copy-id:hover { background: var(--mgdb-surface-alt); }
 
 .mgdb-reference-page mark { background: #fdf0c4; color: inherit; font-weight: 700; }
 

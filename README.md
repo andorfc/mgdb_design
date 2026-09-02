@@ -1351,6 +1351,54 @@ normalises a DOI that arrives as a URL, and the file was added to
 `deploy/manifest.txt` — it had never been in it, so edits to it were not
 deployable.
 
+## The Reference Data Hub, where Metrics are query-driven
+
+`/data_center/reference` joined the shell on 2026-09-02. Its back end needed
+nothing: one combined query already returns the results, the facets and the
+counts together, the unfiltered case is cached, and a search answers in
+784&ndash;2,005 ms over 54,900 references.
+
+What makes this hub different is worth stating plainly, because the shell is
+designed around the opposite assumption.
+
+### On every other hub, Metrics never move. Here they are the search.
+
+The four metric cards and the four charts are recomputed from **whatever the
+search matched** — not the corpus, and not the page. Searching `QTL` takes them
+from 54,900 / 8,949 / 490 / 1865&ndash;2026 to **1,855 / 530 / 35 /
+1987&ndash;2026**, and the year chart from 150 bars to 39.
+
+That is genuinely useful and very easy to miss, precisely because the section
+looks identical to the static Metrics on nine other hubs. Three things now say
+so:
+
+- a standing pill in the section heading: **"These update with your search"**;
+- a scope line under it that states what is being counted *right now* —
+  "These figures cover all 1,855 matching references for “QTL”, not just the 25
+  listed above", or, with no query, "These figures cover the whole collection —
+  all 54,900 curated references. Search above and they narrow to your matches";
+- a visible busy state while the request that recomputes them is in flight:
+  `aria-busy`, the grids at 45% opacity, and "Updating…" appended to the scope
+  line. On a hub where a search takes a second or two, the numbers changing with
+  no warning is the thing that makes people miss that they changed at all.
+
+The scope line is rendered server side as well as by the script, so it is right
+before any JavaScript runs.
+
+### The shell would have hidden the one line that explained this
+
+`.mgdb-hub-page .mgdb-section-heading > p { display: none }` is how blurbs were
+removed from every hub in one rule. This page's only statement that the figures
+follow the search was such a `<p>` — adopting the shell would have silently
+deleted it. It lives outside the heading now, and the badge, which *is* inside
+one, is exempted by name with a comment saying why.
+
+### And the page filter deliberately does not touch them
+
+The results filter narrows the rows on screen. It leaves the figures alone —
+they describe the matched set, and a box that filters one page should not appear
+to move them. The status line says which number is which.
+
 ## The Locus Data Hub
 
 `/data_center/locus` joined the shell on 2026-09-02, completing the split begun
