@@ -111,11 +111,6 @@
 }
 
 .mgdb-modern .bac-search-intro {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: start;
-  gap: 1rem;
   margin-bottom: 1.2rem;
 }
 
@@ -136,15 +131,6 @@
   color: var(--mgdb-muted);
 }
 
-.mgdb-modern .bac-search-number {
-  color: var(--mgdb-surface-sunken);
-  font-size: clamp(4.8rem, 9vw, 7.5rem);
-  font-weight: 800;
-  line-height: 0.8;
-  letter-spacing: -0.08em;
-  pointer-events: none;
-}
-
 .mgdb-modern .bac-search-panel .mgdb-search {
   padding: 0;
   border: 0;
@@ -152,11 +138,20 @@
   box-shadow: none;
 }
 
-.mgdb-modern .bac-query-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: end;
-  gap: 0.8rem;
+/* The control line. The buttons sit in the same flex row as the input rather
+   than in a neighbouring grid column offset by a hand-measured margin, so they
+   share the input's baseline by construction and stay aligned if the label's
+   line height or spacing token ever changes. */
+.mgdb-modern .bac-query-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.mgdb-modern .bac-query-line .mgdb-input {
+  flex: 1 1 16rem;
+  min-width: 0;
 }
 
 .mgdb-modern .bac-query-field {
@@ -169,15 +164,23 @@
   white-space: nowrap;
 }
 
+/* These used to sit in a tinted box with its own 1rem padding, which inset them
+   16px from the query field above and broke the left edge of the form. They are
+   plain fields on the same grid now, and `align-items: start` keeps their labels
+   and controls on the same two lines even when one hint wraps and the other
+   does not. */
 .mgdb-modern .bac-search-options {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 14rem));
-  gap: 0.9rem;
+  align-items: start;
+  gap: 0.9rem 0.8rem;
   margin-top: 1.1rem;
-  padding: 1rem;
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface-alt);
 }
+
+/* mgdb-modern.css stacks consecutive fields with a top margin on the second.
+   Margins do not collapse between grid items, so that rule pushed the second
+   option 16px down its own column and the two labels never lined up. */
+.mgdb-modern .bac-search-options > .mgdb-field { margin: 0; }
 
 .mgdb-modern .bac-search-options .mgdb-input,
 .mgdb-modern .bac-search-options .mgdb-select {
@@ -287,12 +290,14 @@
 }
 
 @media (max-width: 640px) {
-  .mgdb-modern .bac-query-row,
   .mgdb-modern .bac-search-options {
     grid-template-columns: 1fr;
   }
 
-  .mgdb-modern .bac-search-submit {
+  /* Stacked, both buttons take the full width: the submit alone did, which
+     left the reset as a 91px stub under a 273px control. */
+  .mgdb-modern .bac-search-submit,
+  .mgdb-modern .bac-search-reset {
     width: 100%;
   }
 }
@@ -300,10 +305,6 @@
 @media (max-width: 480px) {
   .mgdb-modern .bac-search-panel {
     padding: 1.05rem;
-  }
-
-  .mgdb-modern .bac-search-number {
-    font-size: 4.5rem;
   }
 
   .mgdb-modern .bac-hero-mark {

@@ -43,24 +43,24 @@ $$SYNTAX-LEVEL 2
 
     <article class="bac-search-panel">
       <div class="bac-search-intro">
-        <span class="bac-search-number" aria-hidden="true">01</span>
         <div><h3>What BAC are you looking for?</h3><p>Search a clone name, synonym, GenBank accession, or a distinctive portion of any of those identifiers.</p></div>
       </div>
 
       <form id="bac-search-form" class="mgdb-search" role="search">
-        <div class="bac-query-row">
-          <div class="mgdb-field bac-query-field">
-            <label class="mgdb-label" for="bac_term">BAC name, synonym, or accession</label>
-            <p class="mgdb-hint" id="bac-query-hint">Example: <code>c0085K</code>, <code>b0052P04</code>, or <code>^b000</code></p>
+        <div class="mgdb-field bac-query-field">
+          <label class="mgdb-label" for="bac_term">BAC name, synonym, or accession</label>
+          <div class="bac-query-line">
             <input class="mgdb-input" id="bac_term" name="q" type="search" aria-describedby="bac-query-hint" autocomplete="off" placeholder="c0085K" required />
+            <button class="mgdb-button mgdb-button-primary bac-search-submit" type="submit">Search BACs</button>
+            <button class="mgdb-button mgdb-button-quiet bac-search-reset" type="reset">Clear</button>
           </div>
-          <button class="mgdb-button mgdb-button-primary bac-search-submit" type="submit">Search BACs</button>
+          <p class="mgdb-hint" id="bac-query-hint">Example: <code>c0085K</code>, <code>b0052P04</code>, or <code>^b000</code></p>
         </div>
 
         <div class="bac-search-options" aria-label="Search display options">
+          <input id="limit" type="checkbox" checked hidden />
           <div class="mgdb-field">
             <label class="mgdb-label" for="limit_val">Maximum results</label>
-            <input id="limit" type="checkbox" checked hidden />
             <input class="mgdb-input" id="limit_val" type="number" min="1" max="$(search_limit_max)" value="$(search_limit)" inputmode="numeric" />
             <p class="mgdb-hint">Up to $(search_limit_max) records.</p>
           </div>
@@ -78,9 +78,6 @@ $$SYNTAX-LEVEL 2
           </div>
         </div>
 
-        <div class="mgdb-form-actions">
-          <button class="mgdb-button mgdb-button-quiet" type="reset">Clear search</button>
-        </div>
 
         <div class="bac-examples" aria-label="Example BAC searches">
           <span>Try</span>
