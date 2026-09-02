@@ -33,6 +33,12 @@ $bauplan->includeCss('/css/static.css');
 $bauplan->includeCss('/css/mgdb-modern.css');
 $bauplan->includeCss('/css/mgdb-megamenu.css');
 $bauplan->includeCss('/css/mgdb-stock.css?v=' . $v_css);
+
+/* The tinted comparison branch that used to sit here is gone: it loaded
+   css/mgdb-hub-tinted.css for /data_center/stock2, which was retired on
+   2026-09-01 along with /data_center/map2 and /genome2. This hub has not been
+   converted to css/mgdb-hub.css yet; when it is, the shell is loaded here,
+   before the page's own sheet. */
 $bauplan->includeScript('/js/lib/plotly/plotly-2.25.2.min.js');
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');

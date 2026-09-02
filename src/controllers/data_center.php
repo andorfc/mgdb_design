@@ -73,6 +73,16 @@
     return;
   }
 
+  // Retired 2026-09-01. /data_center/stock2 was the Stock hub on the tinted
+  // ground, for comparison against /data_center/stock. The tint is the
+  // standard now, so the variant had nothing left to compare. Kept as a
+  // permanent redirect rather than deleted, so a link saved during the
+  // comparison still lands somewhere.
+  if (PAGE == 'stock2') {
+    header('Location: /data_center/stock', true, 301);
+    exit;
+  }
+
   /* Stock record pages. The modern controller returns false without publishing
      when the identifier does not resolve, so an unknown id falls through to
      the original code and its 404 handling rather than being answered twice.
@@ -120,6 +130,17 @@
     return;
   }
 
+  /* Gene product record pages. The modern controller returns false without
+     publishing when the identifier does not resolve, so an unknown id falls
+     through to the original code and its 404 handling. Originals archived in
+     the redesign repo under legacy/gene-product-record/. Rollback: delete this
+     block. */
+  if (PAGE == 'gene_product' && getCGIParam('id', 'G', ID)) {
+    if (include('controllers/data_center/gene_product_record_modern.php')) {
+      return;
+    }
+  }
+
   if (PAGE == 'assembly' && !getCGIParam('id', 'G', ID)) {
     include('controllers/genome/assembly_modern.php');
     return;
@@ -143,6 +164,13 @@
   if (PAGE == 'map' && !getCGIParam('id', 'G', ID)) {
     include('controllers/data_center/map_search_modern.php');
     return;
+  }
+
+  // Retired 2026-09-01, with /data_center/stock2 and /genome2. See the note on
+  // the stock2 branch above.
+  if (PAGE == 'map2') {
+    header('Location: /data_center/map', true, 301);
+    exit;
   }
 
   if (PAGE == 'map' && getCGIParam('id', 'G', ID)) {
@@ -174,6 +202,12 @@
   if (PAGE == 'ssr' && !getCGIParam('id', 'G', ID)) {
     include('controllers/data_center/ssr_search_modern.php');
     return;
+  }
+
+  if (PAGE == 'variation' && getCGIParam('id', 'G', ID)) {
+    if (include('controllers/data_center/variation_record_modern.php')) {
+      return;
+    }
   }
 
   if (PAGE == 'variation' && !getCGIParam('id', 'G', ID)) {

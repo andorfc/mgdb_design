@@ -1264,6 +1264,35 @@ gone; it also leaked into the hover text.
 Related: outside bar labels need `\u00A0`, not a space — SVG collapses leading
 whitespace, so a plain space measures as no padding at all.
 
+## Retired comparison routes
+
+`/data_center/map2`, `/genome2` and `/data_center/stock2` were the three hubs
+duplicated on the tinted ground so the group could hold the two grounds side by
+side. The tint became the standard, so all three rendered identically to the
+pages they were copies of and had nothing left to compare. Retired 2026-09-01.
+
+**They are permanent redirects, not deletions.** A link saved during the
+comparison still lands on the real page:
+
+| Retired route | Redirects to | Lives in |
+| --- | --- | --- |
+| `/genome2` | `/genome` | `controllers/genome2.php` |
+| `/data_center/map2` | `/data_center/map` | the `PAGE == 'map2'` branch in `controllers/data_center.php` |
+| `/data_center/stock2` | `/data_center/stock` | the `PAGE == 'stock2'` branch in the same file |
+
+`css/mgdb-hub-tinted.css` went with them: it had no consumers left, and
+`css/mgdb-hub.css` is its generalisation. It is deleted from the repository, the
+manifest and the web root. **Rollback is `git revert`** — the sheet and all
+three branches come back together.
+
+One wart worth knowing: `tools/redesign_status.py` walks the web root, so it
+still finds `controllers/genome2.php` and lists `/genome2` as a page. It probes
+the URL, follows the redirect to `/genome`, and therefore counts it as Modern —
+one of the 97. The two `PAGE` branches are not files, so map2 and stock2 do not
+appear at all. Deleting `controllers/genome2.php` outright would drop the row
+and make the route 404; the redirect was judged worth more than the tidier
+count.
+
 ## The Map Data Hub
 
 `/data_center/map` joined the shell on 2026-09-01. It is the page `/data_center/map2`
@@ -1292,14 +1321,11 @@ End to end through the API, `IBM2` went 485 ms → 220 ms and the unfiltered
 listing 1,097 ms → 494 ms. The count query is left alone: on a 2,192-row table
 it costs 38 ms, so the probe trick the other hubs use would buy nothing.
 
-### `/data_center/map2` is now an alias
+### `/data_center/map2` is retired
 
 map2 existed to hold the tinted ground beside the untinted one. The tint is the
 standard now, so the branch that loaded `css/mgdb-hub-tinted.css` for that route
-is gone and the two render byte-identically. **The route still resolves** — it
-was not deleted — but it is an alias rather than a variant and is worth
-retiring, along with `/genome2` and `/data_center/stock2`, which are the same
-situation.
+is gone. See **Retired comparison routes** below.
 
 ### A grid floor that could not shrink
 
