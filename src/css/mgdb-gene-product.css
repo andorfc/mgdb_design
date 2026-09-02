@@ -1,12 +1,18 @@
-/* file: mgdb-gene-product.css
- *
- * Page-specific styles for the Gene Product Data Hub (/data_center/gene_product).
- * Scoped under .mgdb-gene-product-page.
- */
+/* ==========================================================================
+   Gene Product Data Hub — /data_center/gene_product
+   --------------------------------------------------------------------------
+   Loaded after css/mgdb-modern.css and css/mgdb-hub.css. The hub shell already
+   settles the pale blue ground, the white section cards and their coloured top
+   edges, the absence of a rule under a section title, the metric colours, the
+   gold edge a grid tile takes on hover, the zebra striping, the green Related
+   resources panel, the shared form field, and the scroll offset.
 
-/* --------------------------------------------------------------------------
-   Hero Emblem
-   -------------------------------------------------------------------------- */
+   Nothing above is repeated here. What is here is the page's own furniture:
+   the query control, the examples, the advanced accordion, the results table
+   and its pagination, and the interiors of the class and catalog cards.
+   ========================================================================== */
+
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
 
 .mgdb-gene-product-page .mgdb-hero-emblem {
   background: #ffffff;
@@ -19,9 +25,12 @@
   mix-blend-mode: normal;
 }
 
-/* --------------------------------------------------------------------------
-   Sticky Section Tabs
-   -------------------------------------------------------------------------- */
+/* Two words on the first line, so the emblem column needs a little more room
+   than the one-word hubs. */
+.mgdb-gene-product-page .mgdb-hero { grid-template-columns: minmax(165px, 19%) minmax(0, 1fr); }
+.mgdb-gene-product-page .mgdb-hero-emblem strong { line-height: var(--mgdb-leading-snug); }
+
+/* ── Sticky section tabs ─────────────────────────────────────────────────── */
 
 .mgdb-gene-product-page .mgdb-section-tabs {
   position: sticky;
@@ -32,9 +41,6 @@
   gap: var(--mgdb-space-2);
   margin-top: var(--mgdb-space-5);
   margin-bottom: var(--mgdb-space-5);
-  padding: var(--mgdb-space-2) 0;
-  background: var(--mgdb-surface);
-  border-bottom: 1px solid var(--mgdb-line);
 }
 
 .mgdb-gene-product-page .mgdb-section-tabs a {
@@ -42,19 +48,17 @@
   min-height: 40px;
   align-items: center;
   padding: 0 var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
   color: var(--mgdb-ink) !important;
   font-size: var(--mgdb-text-sm);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
-  transition: background .12s, border-color .12s;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
 }
 
-.mgdb-gene-product-page .mgdb-section-tabs a:hover {
-  background: var(--mgdb-green-soft);
-}
+.mgdb-gene-product-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
 
 .mgdb-gene-product-page .mgdb-section-tabs a.is-current,
 .mgdb-gene-product-page .mgdb-section-tabs a[aria-current="true"] {
@@ -64,196 +68,403 @@
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
-.mgdb-gene-product-page > section,
-.mgdb-gene-product-page section[id] {
-  scroll-margin-top: 4.5rem;
+/* Six tabs fit one row down to about 800px here. */
+@media (max-width: 1170px) and (min-width: 801px) {
+  .mgdb-hub-page.mgdb-gene-product-page > section[id] { scroll-margin-top: 65px; }
 }
 
+@media (max-width: 800px) {
+  .mgdb-hub-page.mgdb-gene-product-page > section[id] { scroll-margin-top: 113px; }
+}
+
+.mgdb-gene-product-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
 /* --------------------------------------------------------------------------
-   Search Form
+   Search
    -------------------------------------------------------------------------- */
 
 .mgdb-gene-product-page .gp-search-form {
-  padding: var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface-alt);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-4);
+  align-items: end;
 }
 
-.mgdb-gene-product-page .gp-example-btn {
-  display: inline-block;
-  margin: 0 var(--mgdb-space-1);
+.mgdb-gene-product-page .gp-field-query { grid-column: 1; }
+/* Scoped with `>` to the search form. `.mgdb-hub-field-action` is a shared
+   class, and unscoped this rule also placed the results table's Export button
+   in column 2 of its own grid -- which is why that button kept landing on a
+   second row under the page-size select. */
+.mgdb-gene-product-page .gp-search-form > .mgdb-hub-field-action { grid-column: 2; }
+.mgdb-gene-product-page .gp-example-row,
+.mgdb-gene-product-page .gp-adv { grid-column: 1 / -1; }
+
+/* The query control is a wrapper, not an <input>, so the shell's field rule
+   does not reach it. It takes the same 44px and the same border. */
+.mgdb-gene-product-page .gp-query-control {
+  display: grid;
+  box-sizing: border-box;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  min-height: var(--mgdb-tap-target);
+  height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid #b9b2a5;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+}
+
+.mgdb-gene-product-page .gp-query-control:focus-within {
+  border-color: var(--mgdb-focus);
+  box-shadow: 0 0 0 2px rgba(11, 87, 164, .18);
+}
+
+.mgdb-gene-product-page .gp-search-icon { color: var(--mgdb-muted); }
+
+.mgdb-gene-product-page .gp-query-control input[type="search"] {
+  width: 100%;
+  min-width: 0;
   padding: 0;
   border: 0;
-  background: none;
-  color: var(--mgdb-green-dark);
-  font: inherit;
-  font-weight: 700;
-  text-decoration: underline;
+  background: transparent;
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-gene-product-page .gp-query-control input[type="search"]:focus { outline: none; }
+
+.mgdb-gene-product-page #gp-query-clear {
+  padding: 0 var(--mgdb-space-2);
+  border: 0;
+  background: transparent;
+  color: var(--mgdb-muted);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
   cursor: pointer;
 }
 
-.mgdb-gene-product-page .gp-example-btn:hover {
-  color: var(--mgdb-green);
+.mgdb-gene-product-page #gp-query-clear:hover { color: var(--mgdb-green-dark); text-decoration: underline; }
+
+/* ── Examples ────────────────────────────────────────────────────────────── */
+
+.mgdb-gene-product-page .gp-example-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--hub-line-soft);
 }
 
-/* --------------------------------------------------------------------------
-   Results Section & Table
-   -------------------------------------------------------------------------- */
-
-.mgdb-gene-product-page .gene-product-results-section {
-  margin-top: var(--mgdb-space-5);
+.mgdb-gene-product-page .gp-example-row > span {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
 }
 
-.mgdb-gene-product-page .gp-results-heading {
+.mgdb-gene-product-page .gp-example-row button {
+  padding: var(--mgdb-space-1) var(--mgdb-space-3);
+  border: 1px solid var(--hub-line);
+  border-radius: 999px;
+  background: var(--hub-surface);
+  color: var(--mgdb-green-dark);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.mgdb-gene-product-page .gp-example-row button:hover {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+}
+
+/* ── Advanced search ─────────────────────────────────────────────────────── */
+
+.mgdb-gene-product-page .gp-adv {
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--hub-surface);
+}
+
+.mgdb-gene-product-page .gp-adv summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+  align-items: baseline;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  color: var(--mgdb-green-dark);
+  cursor: pointer;
+  list-style-position: inside;
+}
+
+.mgdb-gene-product-page .gp-adv summary strong { font-size: var(--mgdb-text-base); }
+.mgdb-gene-product-page .gp-adv summary span { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+.mgdb-gene-product-page .gp-adv[open] summary { border-bottom: 1px solid var(--hub-line-soft); }
+
+/* Four fields, four tracks. Halved at tablet width and stacked on a phone, so
+   a select never has to shrink below a readable width. */
+.mgdb-gene-product-page .gp-adv-body {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--mgdb-space-4);
+  align-items: start;
+  padding: var(--mgdb-space-4);
+}
+
+.mgdb-gene-product-page .gp-adv-actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-3);
-  align-items: flex-start;
+  padding: 0 var(--mgdb-space-4) var(--mgdb-space-4);
+}
+
+@media (max-width: 1024px) {
+  .mgdb-gene-product-page .gp-adv-body { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .mgdb-gene-product-page .gp-search-form { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-gene-product-page .gp-search-form > .mgdb-hub-field-action { grid-column: 1; }
+  .mgdb-gene-product-page .gp-adv-body { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* --------------------------------------------------------------------------
+   Results
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-product-page .gp-results-section[hidden] { display: none; }
+
+/* No rule under this title either: the section card's own edge closes it. */
+.mgdb-gene-product-page .gp-results-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3) var(--mgdb-space-5);
+  align-items: end;
   justify-content: space-between;
   margin-bottom: var(--mgdb-space-4);
 }
 
-.mgdb-gene-product-page #gp-notes .mgdb-message {
-  margin-bottom: var(--mgdb-space-4);
+.mgdb-gene-product-page .gp-results-heading h2 { margin: 0; }
+
+/* The controls take the width they need and the title column takes the rest.
+   Without this the title column's long status line claimed the space first and
+   squeezed the controls to 486px against the 569px they want, which wrapped the
+   export button onto its own row. */
+.mgdb-gene-product-page .gp-results-heading > div:first-child { min-width: 0; flex: 1 1 20rem; }
+.mgdb-gene-product-page .gp-results-controls { flex: 0 0 auto; }
+
+.mgdb-gene-product-page #gp-results-status {
+  margin: var(--mgdb-space-1) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
 }
 
-.mgdb-gene-product-page .gp-table td,
-.mgdb-gene-product-page .gp-table th {
-  vertical-align: top;
+/* Three fixed tracks in a box sized to its own content, and `flex: 0 0 auto`
+   so the flex row above hands it that width instead of squeezing it.
+
+   Two earlier attempts failed for the same reason from opposite directions.
+   `minmax(0, 14rem)` tracks let the first two take everything the parent
+   offered, leaving the third at 0px and dropping the export button onto its
+   own row. Sizing the items with `flex-basis` in a wrapping flex container did
+   not help either: the container's own max-content width still came out short
+   of the three items and it wrapped anyway. Fixed tracks plus `width:
+   max-content` state the width the row actually needs. */
+.mgdb-gene-product-page .gp-results-controls {
+  display: grid;
+  width: max-content;
+  max-width: 100%;
+  flex: 0 0 auto;
+  grid-template-columns: 14rem 11rem auto;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: end;
 }
 
-.mgdb-gene-product-page .gp-name-cell strong {
+@media (max-width: 720px) {
+  .mgdb-gene-product-page .gp-results-controls {
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.mgdb-gene-product-page .gp-results-table th button { white-space: nowrap; }
+.mgdb-gene-product-page .gp-results-table td { vertical-align: top; }
+
+.mgdb-gene-product-page .gp-product-name {
   display: block;
-  font-size: var(--mgdb-text-base);
+  font-weight: 700;
 }
 
-.mgdb-gene-product-page .gp-syn-list {
+.mgdb-gene-product-page .gp-synonyms {
+  display: block;
+  max-width: 42ch;
+  margin-top: 2px;
   color: var(--mgdb-muted);
   font-size: var(--mgdb-text-xs);
-  margin-top: 2px;
+  line-height: var(--mgdb-leading-snug);
+}
+
+/* An EC number is a short unbreakable token; a product can carry several. */
+.mgdb-gene-product-page .gp-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1);
 }
 
 .mgdb-gene-product-page .gp-ec-badge {
   display: inline-block;
-  margin: 1px 4px 1px 0;
-  padding: 1px 6px;
-  border-radius: 4px;
-  background: #fdf3d8;
-  color: #7a4a10;
-  font-family: var(--mgdb-font-mono, monospace);
+  padding: 2px var(--mgdb-space-2);
+  border: 1px solid #e8d4a8;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+  font-family: var(--mgdb-font-mono);
   font-size: var(--mgdb-text-xs);
-  font-weight: 700;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
-.mgdb-gene-product-page .gp-attr-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.mgdb-gene-product-page .gp-attr-list li {
-  margin-bottom: var(--mgdb-space-1);
-}
-
-.mgdb-gene-product-page .gp-attr-list li:last-child {
-  margin-bottom: 0;
-}
-
-/* --------------------------------------------------------------------------
-   Functional Class Grid & Shortcut Buttons
-   -------------------------------------------------------------------------- */
-
-.mgdb-gene-product-page .gp-class-grid {
-  margin-top: var(--mgdb-space-5);
-}
-
-.mgdb-gene-product-page .gp-filter-shortcut {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--mgdb-space-1);
-  margin-top: auto;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--mgdb-green-dark);
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.mgdb-gene-product-page .gp-filter-shortcut:hover {
-  text-decoration: underline;
-  color: var(--mgdb-green);
-}
-
-/* --------------------------------------------------------------------------
-   Downloads & Pathways Grid
-   -------------------------------------------------------------------------- */
-
-.mgdb-gene-product-page .gp-download-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
-  gap: var(--mgdb-space-4);
-  margin-top: var(--mgdb-space-5);
-}
-
-.mgdb-gene-product-page .gp-download-card {
+.mgdb-gene-product-page .gp-encoded-list {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+  max-width: 34ch;
+}
+
+.mgdb-gene-product-page .gp-encoded-list a { font-size: var(--mgdb-text-xs); white-space: nowrap; }
+.mgdb-gene-product-page .gp-encoded-list em { font-style: italic; }
+
+.mgdb-gene-product-page .gp-meta-list {
+  display: block;
+  max-width: 38ch;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-gene-product-page .gp-meta-list + .gp-meta-list { margin-top: var(--mgdb-space-1); }
+.mgdb-gene-product-page .gp-meta-list strong { color: var(--mgdb-muted); font-weight: 700; }
+
+/* ── Pagination ──────────────────────────────────────────────────────────── */
+
+.mgdb-gene-product-page .gp-pagination {
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--mgdb-space-2);
-  padding: var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-4);
+  border-top: 1px solid var(--hub-line-soft);
+}
+
+.mgdb-gene-product-page .gp-pagination:empty { display: none; }
+
+.mgdb-gene-product-page .gp-page-btn {
+  min-width: var(--mgdb-tap-target);
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mgdb-gene-product-page .gp-page-btn:hover:not([disabled]) {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-gene-product-page .gp-page-btn.is-active {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+}
+
+.mgdb-gene-product-page .gp-page-btn[disabled] { opacity: .45; cursor: not-allowed; }
+.mgdb-gene-product-page .gp-page-ellipsis { padding: 0 var(--mgdb-space-1); color: var(--mgdb-muted); }
+
+/* --------------------------------------------------------------------------
+   Card interiors
+
+   The tiles themselves -- the flex column, the neutral top edge, the gold on
+   hover, the description taking the slack so the closing link lands on one
+   line -- are the shell's, because both grids use .mgdb-card-grid. Only what is
+   inside the card is described here.
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-product-page .gp-class-grid,
+.mgdb-gene-product-page .gp-download-grid {
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+@media (max-width: 900px) {
+  .mgdb-gene-product-page .gp-class-grid,
+  .mgdb-gene-product-page .gp-download-grid { grid-template-columns: minmax(0, 1fr); }
 }
 
 .mgdb-gene-product-page .gp-download-header {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--mgdb-space-2);
   align-items: center;
 }
 
-.mgdb-gene-product-page .gp-download-header h3 {
+.mgdb-gene-product-page .gp-download-header h3,
+.mgdb-gene-product-page .gp-class-grid .mgdb-card h3 {
   margin: 0;
-  font-size: var(--mgdb-text-base);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+  line-height: var(--mgdb-leading-snug);
 }
 
-.mgdb-gene-product-page .gp-download-card p {
-  margin: 0;
-  color: var(--mgdb-ink-soft);
-  font-size: var(--mgdb-text-sm);
-}
-
-.mgdb-gene-product-page .gp-download-card .mgdb-button {
+/* The shortcut reads as a link into the search above, not as a button. */
+.mgdb-gene-product-page .gp-filter-shortcut {
   align-self: flex-start;
-  margin-top: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mgdb-green-dark);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
 }
+
+.mgdb-gene-product-page .gp-filter-shortcut:hover { text-decoration: underline; }
+
+.mgdb-gene-product-page .gp-download-card .mgdb-button { align-self: flex-start; }
 
 /* --------------------------------------------------------------------------
-   Connected Resources (Bottom Section — Soft Green)
+   The figure
+
+   The shared .mgdb-chart is a fixed 320px, which squashes a bar chart that
+   needs a row per class. mgdb-gene-product.js sets an explicit pixel height
+   from the row count and feeds the same number to Plotly; this lets that
+   height take effect.
    -------------------------------------------------------------------------- */
 
-.mgdb-gene-product-page .gp-bottom-section {
-  padding: var(--mgdb-space-6);
-  border: 1px solid #cfe3d6;
-  border-radius: var(--mgdb-radius-lg);
-  background: linear-gradient(135deg, #f2f8f4 0%, var(--mgdb-green-soft) 100%);
+.mgdb-gene-product-page .gp-figure { margin-top: var(--mgdb-space-5); }
+
+.mgdb-gene-product-page .gp-figure .mgdb-chart {
+  height: auto;
+  min-height: 320px;
+  overflow: visible;
 }
 
-.mgdb-gene-product-page .gp-bottom-section .mgdb-resource-panel {
-  background: rgba(255, 255, 255, 0.85);
-  border-color: #cfe3d6;
-}
-
-@media (max-width: 640px) {
-  .mgdb-gene-product-page .mgdb-section-tabs {
-    position: static;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-  }
-  .mgdb-gene-product-page .mgdb-section-tabs a {
-    white-space: nowrap;
-  }
+@media print {
+  .mgdb-gene-product-page .mgdb-section-tabs,
+  .mgdb-gene-product-page .gp-search-form,
+  .mgdb-gene-product-page .gp-pagination { display: none; }
 }

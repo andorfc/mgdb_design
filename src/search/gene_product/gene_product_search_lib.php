@@ -28,8 +28,16 @@ function gpSummaryStats($DBConn) {
     );
 }
 
-function gpTypeOptions($DBConn) {
-    $options = '<option value="">All product types</option>' . "\n";
+/**
+ * Curated gene products per functional class, largest first.
+ *
+ * One query answers three things the hub needs -- the class filter's option
+ * list, the "functional classes" metric, and the figure -- so it runs once and
+ * the caller keeps the rows. The earlier version built the options and threw
+ * the counts away, which meant the same GROUP BY would have had to run again
+ * for the chart.
+ */
+function gpTypeBreakdown($DBConn) {
     $sql = "
         SELECT t.id, t.name, COUNT(*) AS count
         FROM mgdb.gene_product gp
@@ -38,11 +46,29 @@ function gpTypeOptions($DBConn) {
         WHERE i.curation_lvl = 0
         GROUP BY t.id, t.name
         ORDER BY count DESC, t.name ASC";
+
+    $rows = array();
     $stmt = make_query($DBConn, $sql);
     while ($row = retrieve_row($stmt)) {
-        $options .= '<option value="' . (int) $row['id'] . '">'
+        $rows[] = array(
+            'id'    => (int) $row['id'],
+            'name'  => $row['name'],
+            'count' => (int) $row['count']
+        );
+    }
+
+    return $rows;
+}
+
+/**
+ * Returns HTML <option> list for the class filter, from rows already fetched.
+ */
+function gpTypeOptions($rows) {
+    $options = '<option value="">All product classes</option>' . "\n";
+    foreach ((array) $rows as $row) {
+        $options .= '<option value="' . $row['id'] . '">'
                  . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8')
-                 . ' (' . number_format((int) $row['count']) . ')'
+                 . ' &#40;' . number_format($row['count']) . '&#41;'
                  . "</option>\n";
     }
     return $options;
@@ -143,19 +169,42 @@ function gpSearch($DBConn, $filters = array(), $limit = 50, $offset = 0) {
 
     $whereSql = implode(' AND ', $where);
 
-    // Count matching
-    $countSql = "SELECT COUNT(DISTINCT gp.id) AS total FROM mgdb.gene_product gp JOIN mgdb.id_num i ON i.id = gp.id WHERE {$whereSql}";
-    $countRow = retrieve_row(make_query($DBConn, $countSql, 1, $params));
-    $total = (int) ($countRow['total'] ?? 0);
+    /* The page is fetched one row long so a short page can report its own
+       total, and the COUNT is paid for only when the page comes back full.
 
-    if ($total === 0) {
-        return array('total' => 0, 'results' => array());
+       The count and the id query cost the same -- about 550 ms each -- because
+       both evaluate the same five correlated subqueries, and two of those reach
+       into mgdb.locus and chado.gene_model. Running them twice for a search that
+       returns five rows was half the cost of the request for nothing.
+
+       Rewriting the predicate was tried and rejected. As an uncorrelated UNION
+       of the five arms it returned identical counts on every term but ran twice
+       as slow, because the arm over chado.gene_model then scans all 1,878,920
+       rows instead of stopping early. Running the three cheap arms first and the
+       two expensive ones only on a miss is faster still -- 13 ms against 560 --
+       but it is wrong: a short locus-like term matches both, so "b1" would have
+       returned 18 products instead of 763, silently. */
+    $probe = $limit + 1;
+
+    $idSql = "SELECT DISTINCT gp.id, gp.name FROM mgdb.gene_product gp JOIN mgdb.id_num i ON i.id = gp.id WHERE {$whereSql} ORDER BY gp.name ASC LIMIT {$probe} OFFSET {$offset}";
+    $idRows = get_all_rows(make_query($DBConn, $idSql, 1, $params));
+    $idRows = is_array($idRows) ? $idRows : array();
+
+    $hasMore = count($idRows) > $limit;
+    if ($hasMore) {
+        array_pop($idRows);
     }
 
-    // Fetch IDs
-    $idSql = "SELECT DISTINCT gp.id, gp.name FROM mgdb.gene_product gp JOIN mgdb.id_num i ON i.id = gp.id WHERE {$whereSql} ORDER BY gp.name ASC LIMIT {$limit} OFFSET {$offset}";
-    $idRows = get_all_rows(make_query($DBConn, $idSql, 1, $params));
-    if (!$idRows) {
+    if (!$hasMore) {
+        // The last page: everything before it, plus what is on it.
+        $total = $offset + count($idRows);
+    } else {
+        $countSql = "SELECT COUNT(DISTINCT gp.id) AS total FROM mgdb.gene_product gp JOIN mgdb.id_num i ON i.id = gp.id WHERE {$whereSql}";
+        $countRow = retrieve_row(make_query($DBConn, $countSql, 1, $params));
+        $total = (int) ($countRow['total'] ?? 0);
+    }
+
+    if ($total === 0 || !$idRows) {
         return array('total' => $total, 'results' => array());
     }
 

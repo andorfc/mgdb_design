@@ -498,6 +498,64 @@ database layer in this codebase returns an empty result rather than raising, so
 without that check a broken query is indistinguishable from a record with no
 data. It caught three during development.
 
+## The gene product record page
+
+`/data_center/gene_product?id={id}` is a record page on the Data Hub shell:
+`mgdb-hub-page` on `<main>`, the hub hero with the record's name where the
+hub's tagline would be, and the hub's section order — Search first, the
+record's own sections, References, Metrics, Related resources, and the API row
+last. It resolves by numeric id, product name, or synonym, and the API row
+prints the identifier as the reader typed it, so `?id=ferritin` shows
+`records/gene_product/ferritin` rather than the internal id.
+
+The page is one request to `/api/v1/records/gene_product/{id}`: twenty-one
+parameterized queries, all indexed probes on the resolved id, in about 80 ms.
+The legacy page fired five Ajax calls that ran a query per row for most of what
+they listed and interpolated the request's `id` into SQL.
+
+Every list on the record — encoding loci, UniProt entries, EC numbers, induced
+expression, metabolic constituents and pathways, motif features, ontology
+terms, related gene products, sequences, probes, external entries — is rendered
+by one `collection()` helper in `js/mgdb-gene-product-record.js`: a table by
+default with sortable columns and a grid of the same rows, a filter, a page
+size of 10 / 25 / 50 / all, and a TSV of exactly the columns on screen. The
+grid tiles are `.mgdb-card` inside `.mgdb-card-grid`, so the hub's coloured
+top edge on hover comes free. References use the shell's `.mgdb-ref` card, the
+same markup `include/references_lib.php` emits, built client-side from the
+API's rows, with a table view beside it.
+
+### Three things the legacy page got wrong, not ported
+
+- **Ontology terms were looked up under the wrong table name.** The annotations
+  call asked `getOBOTerms()` for `table_name = 'locus'`, copied from the locus
+  page, so it could never match a gene product. The API asks under
+  `gene_product`. No validated terms exist under that name either — the section
+  is empty for every record, now for the right reason.
+- **Relations were shown in one direction.** `mgdb.relation` stores a row once,
+  so "Subunit of" appeared on one product and nothing on its partner. The API
+  returns both directions and marks the inverse rows.
+- **Related loci carried no gene model.** The B73 v5 model, and the count of
+  earlier models, now sit beside each locus, from one `chado.gene_model` query
+  on `locus_id` (indexed as `gene_model_i1`). The bin comes from
+  `gene_prod_links`, a second table pairing the same product and locus.
+
+### Things worth knowing about the data
+
+- 80 of 2,474 gene products sit at curation levels other than 0 and do not
+  resolve, matching the legacy `check_id()`.
+- A few names are shared by two records; the lower id wins so a name resolves
+  the same way every time.
+- `perm_tables.id_ontology` has no index on `id`. The count subquery pairs it
+  with `table_name`, which is indexed, and costs under 3 ms; on its own the
+  same lookup is 600 ms.
+- Ordering a `UNION` by `LOWER(name)` is a Postgres error, and the database
+  layer returns an empty result rather than raising. The API's own
+  `count_mismatch` warning caught it before the page did.
+- A viewer's own pending community annotations were per-login; the API is
+  public and carries only approved ones, as the stock record does.
+
+Originals are archived under `legacy/gene-product-record/`.
+
 ## The gene record page
 
 `/gene_center/gene/{id}` is the most visited page on the site and was the least
@@ -1151,6 +1209,49 @@ gone; it also leaked into the hover text.
 
 Related: outside bar labels need `\u00A0`, not a space — SVG collapses leading
 whitespace, so a plain space measures as no padding at all.
+
+## The Gene Product Data Hub
+
+`/data_center/gene_product` was brought onto the shell on 2026-09-01. It was in
+better shape than most — already using `.mgdb-section-heading` and the shared
+resource panel — so the work was the shell opt-in, five eyebrows and their
+blurbs out, tab labels matched to their headings, the results section hidden
+until a search runs and given a sortable table with pagination, a References
+section, Corpus Statistics renamed to Metrics with a figure after it, and
+Related resources trimmed from six to five.
+
+### What could and could not be made faster
+
+The search takes about 1.2 s, and it is worth recording why most of that stays.
+`gene_product` holds only **2,474 rows**, but the term predicate is five
+correlated `EXISTS` subqueries and two of them reach into `mgdb.locus` and
+`chado.gene_model`. Measured on `kinase`: the name, synonym and EC arms cost
+7 ms, 19 ms and 2 ms; the locus arm costs 134 ms and the gene-model arm 434 ms.
+
+Two rewrites were tried and **rejected**:
+
+- **As an uncorrelated `UNION` of the five arms** it returned identical counts
+  on every term but ran twice as slow — 1,090 ms against 550 — because the arm
+  over `chado.gene_model` then scans all 1.9 million rows instead of stopping
+  early.
+- **Running the three cheap arms first and the two expensive ones only on a
+  miss** is 13 ms against 560, and wrong. A short locus-like term matches both
+  sides: `b1` returns 763 products through the full predicate and 18 through the
+  cheap arms. `a1`, `p1` and `o2` lose 76, 166 and 25. It would have been a
+  silent, plausible-looking wrong answer.
+
+What did work is the same probe the expression hub uses: fetch one row past the
+page, let a short page report its own total, and pay for the `COUNT` only when
+the page comes back full. The count and the id query cost the same, so that is
+half the request. `alcohol dehydrogenase` went 1,200 ms → **647 ms**, `1.1.1.1`
+1,256 ms → **693 ms**; full pages such as `kinase` and `b1` stay at ~1.2 s,
+which is what they honestly cost.
+
+### And a metric that was a constant
+
+`total_assemblies`-style hardcoding turned up here too: the class filter's
+GROUP BY already knew there are 27 functional classes, so one query now feeds
+the filter, the hero line, the metric and the figure.
 
 ## The Expression Data Hub
 

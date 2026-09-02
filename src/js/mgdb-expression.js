@@ -43,6 +43,8 @@
 
   function byId(id) { return document.getElementById(id); }
 
+  function num(value) { return Number(value || 0).toLocaleString(); }
+
   function esc(value) {
     if (value === null || value === undefined) { return ''; }
     return String(value)
@@ -244,7 +246,11 @@
     if (state.sort) { rows.sort(compare); }
 
     body.innerHTML = rows.map(rowHtml).join('');
-    if (empty) { empty.hidden = rows.length !== 0; }
+    /* The empty panel offers to reset the search, so it belongs to a search
+       that found nothing. When the table filter is what emptied the page the
+       search did match -- the status line says so and the filter can just be
+       cleared. */
+    if (empty) { empty.hidden = state.rows.length !== 0; }
     if (scroll) { scroll.hidden = rows.length === 0; }
 
     updateStatus(summary, rows.length);
@@ -290,6 +296,20 @@
     }
 
     var noun = total === 1 ? 'gene model' : 'gene models';
+
+    /* The table filter narrows the page in the browser, so once it is on the
+       server's total no longer describes what is on screen. Reporting a range
+       against it produced "Showing 1-0 of 110" whenever the filter matched
+       nothing on the page. */
+    if (state.filter) {
+      status.textContent = shown === 0
+        ? 'Nothing on this page matches the table filter \u201C' + state.filter + '\u201D. '
+          + num(total) + ' ' + noun + ' matched the search.'
+        : 'Showing ' + num(shown) + ' of the ' + num(state.rows.length)
+          + ' results on this page matching \u201C' + state.filter + '\u201D, out of '
+          + num(total) + ' ' + noun + ' matched by the search.';
+      return;
+    }
     var text;
     if (state.pageSize === 'all') {
       text = shown >= total

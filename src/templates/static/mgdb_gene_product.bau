@@ -3,12 +3,13 @@ $$SYNTAX-LEVEL 2
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@MaizeGDB">
 <meta property="og:url" content="https://maizegdb.org/data_center/gene_product">
-<meta property="og:title" content="MaizeGDB Gene Product Data Hub | Enzymes, Transporters &amp; Functional Proteins">
-<meta property="og:description" content="Explore curated maize gene products, enzymes, EC numbers, and metabolic pathways mapped to encoding genetic loci and gene models.">
+<meta property="og:title" content="MaizeGDB Gene Product Data Hub">
+<meta property="og:description" content="Search curated maize gene products, enzymes, EC numbers, and metabolic pathways mapped to encoding genetic loci and gene models.">
 
-<main class="mgdb-page mgdb-gene-product-page" id="gene-product-top">
+<main class="mgdb-page mgdb-hub-page mgdb-gene-product-page" id="gene-product-main">
+
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
-    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Gene Products</span>
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Gene Product Data Hub</span>
   </nav>
 
   <section class="mgdb-hero" aria-labelledby="gene-product-title">
@@ -21,214 +22,251 @@ $$SYNTAX-LEVEL 2
         <circle cx="54" cy="54" r="5" fill="#235c37" />
         <path d="M48 20 L48 28 M48 68 L48 76 M20 48 L28 48 M68 48 L76 48" stroke="#d99a0b" stroke-width="3" stroke-linecap="round" />
       </svg>
-      <strong>Gene<br />Products</strong>
+      <strong>Gene Product<br />Data Hub</strong>
     </div>
     <div class="mgdb-hero-body">
-      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data_date)</p>
-      <h1 id="gene-product-title">Explore maize gene products &amp; functional proteins</h1>
-      <p class="mgdb-hero-description">Discover $(total_products) curated maize gene products &mdash; including $(total_enzymes) enzymes across $(distinct_ec_nums) EC numbers &mdash; linked to $(loci_with_products) genetic loci, gene models, and metabolic pathways.</p>
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; August 2026</p>
+      <h1 id="gene-product-title">Maize gene products and functional proteins</h1>
+      <p class="mgdb-hero-description">$(total_products) curated gene products in $(class_count) functional classes, including $(total_enzymes) enzymes across $(distinct_ec_nums) EC numbers, linked to $(loci_with_products) genetic loci.</p>
     </div>
   </section>
 
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#gene-product-search-panel" class="is-current">Search Gene Products</a>
-    <a href="#gene-product-types">Functional Classes</a>
-    <a href="#gene-product-downloads">Catalogs &amp; Pathways</a>
-    <a href="#gene-product-overview">Statistics</a>
-    <a href="#gene-product-related">Related Resources</a>
+    <a href="#gene-product-search" class="is-current" aria-current="true">Search</a>
+    <a href="#gene-product-classes">Classes</a>
+    <a href="#gene-product-catalogs">Catalogs</a>
+    <a href="#gene-product-references">References</a>
+    <a href="#gene-product-metrics">Metrics</a>
+    <a href="#gene-product-related">Related resources</a>
   </nav>
 
-  <!-- ====================================================================
-       1. Search Panel & Results
-       ==================================================================== -->
-  <section id="gene-product-search-panel" class="gene-product-search-panel" aria-labelledby="gp-search-title">
+  <!-- ── Search ───────────────────────────────────────────────────────────── -->
+  <section id="gene-product-search" aria-labelledby="gp-search-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Interactive search</span>
-        <h2 id="gp-search-title">Search gene products</h2>
-      </div>
-      <p>Search by product name, EC number, synonym, encoding locus, or filter by functional class and pathway.</p>
+      <div><h2 id="gp-search-title">Search</h2></div>
     </div>
 
     <form id="gp-search-form" class="gp-search-form" role="search">
-      <div class="mgdb-field">
-        <label class="mgdb-label" for="gp-search-term">Search keyword, enzyme name, or EC number</label>
-        <div class="gp-search-input-wrap">
-          <input class="mgdb-input" id="gp-search-term" name="term" type="search" placeholder="e.g., alcohol dehydrogenase, kinase, EC 1.1.1.1, adh1, Zm00001eb026700" autocomplete="off" />
-        </div>
-        <p class="mgdb-hint">
-          <span>Try an example&#58;</span>
-          <button type="button" class="gp-example-btn" data-term="alcohol dehydrogenase">alcohol dehydrogenase</button>
-          <button type="button" class="gp-example-btn" data-term="1.1.1.1">EC 1.1.1.1</button>
-          <button type="button" class="gp-example-btn" data-term="glutathione transferase">glutathione transferase</button>
-          <button type="button" class="gp-example-btn" data-term="synthase">synthase</button>
-        </p>
-      </div>
-
-      <div class="mgdb-search-row">
-        <div class="mgdb-field">
-          <label class="mgdb-label" for="gp-filter-type">Product class / type</label>
-          <select class="mgdb-select" id="gp-filter-type" name="type">
-            $(type_options)
-          </select>
-        </div>
-
-        <div class="mgdb-field">
-          <label class="mgdb-label" for="gp-filter-ec">EC number filter</label>
-          <input class="mgdb-input" id="gp-filter-ec" name="ec_num" type="text" placeholder="e.g. 1.1.1.* or 2.7.1.1" />
-        </div>
-
-        <div class="mgdb-field">
-          <label class="mgdb-label" for="gp-filter-loc">Subcellular localization</label>
-          <select class="mgdb-select" id="gp-filter-loc" name="localization">
-            $(localization_options)
-          </select>
-        </div>
-
-        <div class="mgdb-field">
-          <label class="mgdb-label" for="gp-filter-pathway">Metabolic pathway</label>
-          <select class="mgdb-select" id="gp-filter-pathway" name="pathway">
-            $(pathway_options)
-          </select>
+      <div class="mgdb-hub-field gp-field-query">
+        <label for="gp-query">Product name, enzyme, EC number, or encoding locus</label>
+        <div class="gp-query-control">
+          <svg class="gp-search-icon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="7" r="5"/><line x1="11" y1="11" x2="15" y2="15"/></svg>
+          <input id="gp-query" name="term" type="search" placeholder="Product name, enzyme, EC number, locus, or gene model" autocomplete="off" />
+          <button id="gp-query-clear" type="button" hidden>Clear</button>
         </div>
       </div>
 
-      <div class="mgdb-form-actions">
+      <div class="mgdb-hub-field mgdb-hub-field-action">
         <button class="mgdb-button mgdb-button-primary" type="submit">Search gene products</button>
-        <button class="mgdb-button mgdb-button-quiet" type="reset" id="gp-reset-btn">Reset filters</button>
       </div>
+
+      <div class="gp-example-row" aria-label="Example searches">
+        <span>Examples&#58;</span>
+        <button type="button" data-gp-example="alcohol dehydrogenase">alcohol dehydrogenase</button>
+        <button type="button" data-gp-example="glutathione transferase">glutathione transferase</button>
+        <button type="button" data-gp-example="synthase">synthase</button>
+        <button type="button" data-gp-example="kinase">kinase</button>
+        <button type="button" data-gp-example="1.1.1.1">EC 1.1.1.1</button>
+        <button type="button" data-gp-example="adh1">adh1</button>
+      </div>
+
+      <details class="gp-adv" id="gp-adv">
+        <summary>
+          <strong>Advanced search criteria</strong>
+          <span>Filter by functional class, EC number, subcellular localization, or metabolic pathway</span>
+        </summary>
+        <div class="gp-adv-body">
+          <div class="mgdb-hub-field">
+            <label for="gp-filter-type">Functional class</label>
+            <select id="gp-filter-type" name="type">
+              $(type_options)
+            </select>
+          </div>
+
+          <div class="mgdb-hub-field">
+            <label for="gp-filter-ec">EC number</label>
+            <input id="gp-filter-ec" name="ec_num" type="search" placeholder="1.1.1.* or 2.7.1.1" autocomplete="off" />
+          </div>
+
+          <div class="mgdb-hub-field">
+            <label for="gp-filter-loc">Subcellular localization</label>
+            <select id="gp-filter-loc" name="localization">
+              $(localization_options)
+            </select>
+          </div>
+
+          <div class="mgdb-hub-field">
+            <label for="gp-filter-pathway">Metabolic pathway</label>
+            <select id="gp-filter-pathway" name="pathway">
+              $(pathway_options)
+            </select>
+          </div>
+        </div>
+
+        <div class="gp-adv-actions">
+          <button class="mgdb-button mgdb-button-primary" type="submit">Apply advanced filters</button>
+          <button class="mgdb-button mgdb-button-quiet" id="gp-adv-reset" type="button">Reset advanced filters</button>
+        </div>
+      </details>
     </form>
   </section>
 
-  <section id="gene-product-results-section" class="gene-product-results-section" aria-labelledby="gp-results-title">
+  <!-- ── Search results: hidden until a search runs ───────────────────────── -->
+  <section id="gene-product-results-section" class="gp-results-section" aria-labelledby="gp-results-title" hidden>
     <div class="gp-results-heading">
       <div>
-        <span class="mgdb-eyebrow">Search results</span>
-        <h2 id="gp-results-title">Matching gene products</h2>
-        <p id="gp-results-status" aria-live="polite">Enter a search keyword or choose a filter above to view matching gene products.</p>
+        <h2 id="gp-results-title">Search results</h2>
+        <p id="gp-results-status" role="status" aria-live="polite"></p>
       </div>
-      <a class="mgdb-button mgdb-button-quiet" id="gp-export-tsv" href="#" download hidden>Export TSV</a>
+      <div class="gp-results-controls">
+        <div class="mgdb-hub-field">
+          <label for="gp-results-filter">Filter results</label>
+          <input id="gp-results-filter" type="search" placeholder="Narrow this table" autocomplete="off" />
+        </div>
+        <div class="mgdb-hub-field">
+          <label for="gp-page-size">Results per page</label>
+          <select id="gp-page-size">
+            <option value="10">Top 10</option>
+            <option value="25" selected>Top 25</option>
+            <option value="50">Top 50</option>
+            <option value="all">All results</option>
+          </select>
+        </div>
+        <div class="mgdb-hub-field mgdb-hub-field-action">
+          <a class="mgdb-button mgdb-button-quiet" id="gp-export" href="#" download>Export TSV</a>
+        </div>
+      </div>
     </div>
 
-    <div id="gp-notes"></div>
-    <div id="gp-results"></div>
-
-    <div id="gp-empty" class="mgdb-empty" hidden>
-      <h3>No gene products matched</h3>
-      <p>Try widening your search terms, checking the EC number format, or resetting one of the dropdown filters.</p>
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table gp-results-table" id="gp-results-table">
+        <caption>
+          Matching gene products
+          <span class="mgdb-muted">Sort any column by activating its header. EC numbers open in ExPASy ENZYME; loci and gene models open at MaizeGDB.</span>
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col" data-gp-sort="name" aria-sort="none"><button type="button">Gene product</button></th>
+            <th scope="col" data-gp-sort="type" aria-sort="none"><button type="button">Class</button></th>
+            <th scope="col" data-gp-sort="ec" aria-sort="none"><button type="button">EC numbers</button></th>
+            <th scope="col" data-gp-sort="encoded" aria-sort="none"><button type="button">Encoded by</button></th>
+            <th scope="col">Pathways &amp; localizations</th>
+          </tr>
+        </thead>
+        <tbody id="gp-results-body"></tbody>
+      </table>
     </div>
+
+    <div class="mgdb-empty" id="gp-results-empty" hidden>
+      <h3>No gene products matched that search</h3>
+      <p>Try a broader term such as <code>kinase</code> or <code>synthase</code>, check the EC number format, or reset the advanced filters.</p>
+      <button class="mgdb-button mgdb-button-secondary" id="gp-empty-reset" type="button">Reset search</button>
+    </div>
+
+    <nav class="gp-pagination" id="gp-pagination" aria-label="Search result pages"></nav>
   </section>
 
-  <!-- ====================================================================
-       2. Curated Functional Classes
-       ==================================================================== -->
-  <section id="gene-product-types" aria-labelledby="gp-types-title">
+  <!-- ── Classes ──────────────────────────────────────────────────────────── -->
+  <section id="gene-product-classes" aria-labelledby="gp-classes-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Functional classification</span>
-        <h2 id="gp-types-title">Browse by functional class</h2>
-      </div>
-      <p>Curated maize proteins categorized by enzymatic, regulatory, transport, and structural roles.</p>
+      <div><h2 id="gp-classes-title">Functional classes</h2></div>
     </div>
-
     <div class="mgdb-card-grid gp-class-grid">
-      <article class="mgdb-card">
-        <span class="mgdb-pill mgdb-pill-ok">Catalytic</span>
-        <h3>Enzymes</h3>
-        <p>$(total_enzymes) cataloged enzymes categorized across $(distinct_ec_nums) EC numbers with associated biochemical reaction pathways.</p>
-        <button type="button" class="gp-filter-shortcut" data-type="1835">Filter enzymes <span aria-hidden="true">&rarr;</span></button>
-      </article>
+          <article class="mgdb-card">
+            <span class="mgdb-pill mgdb-pill-ok">Catalytic</span>
+            <h3>Enzymes</h3>
+            <p>$(total_enzymes) cataloged enzymes categorized across $(distinct_ec_nums) EC numbers with associated biochemical reaction pathways.</p>
+            <button type="button" class="gp-filter-shortcut" data-type="1835">Filter enzymes <span aria-hidden="true">&rarr;</span></button>
+          </article>
 
-      <article class="mgdb-card">
-        <span class="mgdb-pill mgdb-pill-info">Transport</span>
-        <h3>Membrane Transport</h3>
-        <p>Transporters, channel proteins, and pumps mediating ion, sugar, and metabolite flux across cellular membranes.</p>
-        <button type="button" class="gp-filter-shortcut" data-type="24697">Filter transporters <span aria-hidden="true">&rarr;</span></button>
-      </article>
+          <article class="mgdb-card">
+            <span class="mgdb-pill mgdb-pill-info">Transport</span>
+            <h3>Membrane Transport</h3>
+            <p>Transporters, channel proteins, and pumps mediating ion, sugar, and metabolite flux across cellular membranes.</p>
+            <button type="button" class="gp-filter-shortcut" data-type="24697">Filter transporters <span aria-hidden="true">&rarr;</span></button>
+          </article>
 
-      <article class="mgdb-card">
-        <span class="mgdb-pill mgdb-pill-warn">Regulation</span>
-        <h3>Transcription Factors</h3>
-        <p>Sequence-specific DNA binding proteins and transcriptional regulators modulating gene expression networks.</p>
-        <button type="button" class="gp-filter-shortcut" data-type="716013">Filter transcription factors <span aria-hidden="true">&rarr;</span></button>
-      </article>
+          <article class="mgdb-card">
+            <span class="mgdb-pill mgdb-pill-warn">Regulation</span>
+            <h3>Transcription Factors</h3>
+            <p>Sequence-specific DNA binding proteins and transcriptional regulators modulating gene expression networks.</p>
+            <button type="button" class="gp-filter-shortcut" data-type="716013">Filter transcription factors <span aria-hidden="true">&rarr;</span></button>
+          </article>
 
-      <article class="mgdb-card">
-        <span class="mgdb-pill mgdb-pill-warn">Signaling</span>
-        <h3>Regulatory Proteins</h3>
-        <p>Kinases, phosphatases, receptors, and signaling effectors controlling signal transduction cascades.</p>
-        <button type="button" class="gp-filter-shortcut" data-type="24616">Filter regulatory proteins <span aria-hidden="true">&rarr;</span></button>
-      </article>
+          <article class="mgdb-card">
+            <span class="mgdb-pill mgdb-pill-warn">Signaling</span>
+            <h3>Regulatory Proteins</h3>
+            <p>Kinases, phosphatases, receptors, and signaling effectors controlling signal transduction cascades.</p>
+            <button type="button" class="gp-filter-shortcut" data-type="24616">Filter regulatory proteins <span aria-hidden="true">&rarr;</span></button>
+          </article>
+        </div>
+  </section>
+
+  <!-- ── Catalogs ─────────────────────────────────────────────────────────── -->
+  <section id="gene-product-catalogs" aria-labelledby="gp-catalogs-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="gp-catalogs-title">Catalogs and pathways</h2></div>
+    </div>
+    <div class="mgdb-card-grid gp-download-grid" aria-label="Catalogs and pathways">
+          <article class="mgdb-card gp-download-card">
+            <div class="gp-download-header">
+              <span class="mgdb-pill mgdb-pill-ok">Pathways</span>
+              <h3>CornCyc / MaizeCYC</h3>
+            </div>
+            <p>Curated metabolic pathway database for maize, linking enzymes to substrate-product reaction diagrams and metabolic networks.</p>
+            <a class="mgdb-button mgdb-button-secondary" href="https://pathway.gramene.org/gramene/corncyc.shtml">Explore CornCyc <span aria-hidden="true">&nearr;</span></a>
+          </article>
+
+          <article class="mgdb-card gp-download-card">
+            <div class="gp-download-header">
+              <span class="mgdb-pill mgdb-pill-info">Enzyme Nomenclature</span>
+              <h3>Enzyme Commission \(EC\)</h3>
+            </div>
+            <p>Hierarchical enzyme classification system maintained by IUBMB defining catalytic activity and reaction mechanisms.</p>
+            <a class="mgdb-button mgdb-button-secondary" href="https://enzyme.expasy.org/">Browse ExPASy ENZYME <span aria-hidden="true">&nearr;</span></a>
+          </article>
+
+          <article class="mgdb-card gp-download-card">
+            <div class="gp-download-header">
+              <span class="mgdb-pill mgdb-pill-warn">Protein Knowledgebase</span>
+              <h3>UniProtKB</h3>
+            </div>
+            <p>Universal protein resource providing sequence annotations, functional domains, and cross-references for maize proteins.</p>
+            <a class="mgdb-button mgdb-button-secondary" href="https://www.uniprot.org/taxonomy/4577">Search UniProt Maize <span aria-hidden="true">&nearr;</span></a>
+          </article>
+        </div>
+  </section>
+
+  <!-- ── References ───────────────────────────────────────────────────────── -->
+  <section id="gene-product-references" aria-labelledby="gp-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="gp-references-title">References</h2></div>
+    </div>
+
+    <div class="mgdb-ref-list">
+      $(reference_cards)
     </div>
   </section>
 
-  <!-- ====================================================================
-       3. Bulk Catalogs & Metabolic Pathways
-       ==================================================================== -->
-  <section id="gene-product-downloads" aria-labelledby="gp-downloads-title">
+  <!-- ── Metrics ──────────────────────────────────────────────────────────── -->
+  <section id="gene-product-metrics" aria-labelledby="gp-metrics-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Catalogs &amp; pathways</span>
-        <h2 id="gp-downloads-title">Metabolic pathway resources &amp; external catalogs</h2>
-      </div>
-      <p>Connect maize gene products to biochemical reaction networks and international protein databases.</p>
-    </div>
-
-    <div class="gp-download-grid" aria-label="Catalogs and pathways">
-      <article class="gp-download-card">
-        <div class="gp-download-header">
-          <span class="mgdb-pill mgdb-pill-ok">Pathways</span>
-          <h3>CornCyc / MaizeCYC</h3>
-        </div>
-        <p>Curated metabolic pathway database for maize, linking enzymes to substrate-product reaction diagrams and metabolic networks.</p>
-        <a class="mgdb-button mgdb-button-secondary" href="https://pathway.gramene.org/gramene/corncyc.shtml">Explore CornCyc <span aria-hidden="true">&nearr;</span></a>
-      </article>
-
-      <article class="gp-download-card">
-        <div class="gp-download-header">
-          <span class="mgdb-pill mgdb-pill-info">Enzyme Nomenclature</span>
-          <h3>Enzyme Commission \(EC\)</h3>
-        </div>
-        <p>Hierarchical enzyme classification system maintained by IUBMB defining catalytic activity and reaction mechanisms.</p>
-        <a class="mgdb-button mgdb-button-secondary" href="https://enzyme.expasy.org/">Browse ExPASy ENZYME <span aria-hidden="true">&nearr;</span></a>
-      </article>
-
-      <article class="gp-download-card">
-        <div class="gp-download-header">
-          <span class="mgdb-pill mgdb-pill-warn">Protein Knowledgebase</span>
-          <h3>UniProtKB</h3>
-        </div>
-        <p>Universal protein resource providing sequence annotations, functional domains, and cross-references for maize proteins.</p>
-        <a class="mgdb-button mgdb-button-secondary" href="https://www.uniprot.org/taxonomy/4577">Search UniProt Maize <span aria-hidden="true">&nearr;</span></a>
-      </article>
-    </div>
-  </section>
-
-  <!-- ====================================================================
-       4. Corpus Statistics \(Second to Last Item\)
-       ==================================================================== -->
-  <section id="gene-product-overview" aria-labelledby="gp-overview-title">
-    <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Corpus summary</span>
-        <h2 id="gp-overview-title">Gene product dataset at a glance</h2>
-      </div>
-      <p>Key metrics across curated maize gene products, enzymatic classifications, and genomic linkages.</p>
+      <div><h2 id="gp-metrics-title">Metrics</h2></div>
     </div>
 
     <div class="mgdb-metric-grid">
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-green">
         <div class="mgdb-metric-top">
-          <h3>Gene Products</h3>
+          <h3>Gene products</h3>
           <span class="mgdb-metric-badge">Curated</span>
         </div>
         <div class="mgdb-metric-stat">
           <strong class="mgdb-metric-value">$(total_products)</strong>
         </div>
-        <p class="mgdb-metric-description">Curated functional protein and gene product entities cataloged in MaizeGDB.</p>
+        <p class="mgdb-metric-description">Curated functional protein and gene product records at curation level 0.</p>
       </article>
 
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-amber">
         <div class="mgdb-metric-top">
           <h3>Enzymes</h3>
           <span class="mgdb-metric-badge">Catalytic</span>
@@ -236,76 +274,75 @@ $$SYNTAX-LEVEL 2
         <div class="mgdb-metric-stat">
           <strong class="mgdb-metric-value">$(total_enzymes)</strong>
         </div>
-        <p class="mgdb-metric-description">Characterized enzymatic proteins catalyzing metabolic and cellular biochemical reactions.</p>
+        <p class="mgdb-metric-description">Products classed as enzymes, catalyzing metabolic and cellular reactions.</p>
       </article>
 
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-blue">
         <div class="mgdb-metric-top">
-          <h3>EC Numbers</h3>
+          <h3>EC numbers</h3>
           <span class="mgdb-metric-badge">Classification</span>
         </div>
         <div class="mgdb-metric-stat">
           <strong class="mgdb-metric-value">$(distinct_ec_nums)</strong>
         </div>
-        <p class="mgdb-metric-description">Distinct Enzyme Commission numerical identifiers mapped to maize catalytic activities.</p>
+        <p class="mgdb-metric-description">Distinct Enzyme Commission identifiers mapped to maize catalytic activities.</p>
       </article>
 
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-burgundy">
         <div class="mgdb-metric-top">
-          <h3>Encoded Loci</h3>
+          <h3>Encoding loci</h3>
           <span class="mgdb-metric-badge">Genomic</span>
         </div>
         <div class="mgdb-metric-stat">
           <strong class="mgdb-metric-value">$(loci_with_products)</strong>
         </div>
-        <p class="mgdb-metric-description">Genetic loci and gene models linked to functional gene product records.</p>
+        <p class="mgdb-metric-description">Genetic loci linked to at least one functional gene product record.</p>
       </article>
     </div>
+
+    <figure class="mgdb-figure gp-figure">
+      <h3>Gene products by functional class</h3>
+      <div class="mgdb-chart" id="gp-class-chart" role="img"
+           aria-label="Horizontal bar chart of curated gene product counts for each functional class"
+           data-labels="$(chart_labels)" data-values="$(chart_values)" data-ids="$(chart_ids)">
+        <div class="mgdb-chart-fallback">Loading the functional class breakdown&hellip;</div>
+      </div>
+      <figcaption>The ten largest of the $(class_count) functional classes. Select a bar to search that class.</figcaption>
+    </figure>
   </section>
 
-  <!-- ====================================================================
-       5. Connected Resources \(Final Item — Soft Green Surface\)
-       ==================================================================== -->
-  <section id="gene-product-related" class="gp-bottom-section" aria-labelledby="gp-related-title">
+  <!-- ── Related resources ────────────────────────────────────────────────── -->
+  <section id="gene-product-related" class="mgdb-hub-related" aria-labelledby="gp-related-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Connected resources</span>
-        <h2 id="gp-related-title">Related data hubs &amp; tools</h2>
-      </div>
-      <p>Connect gene products to 3D predicted protein structures, gene models, mutant phenotypes, and metabolic pathways.</p>
+      <div><h2 id="gp-related-title">Related resources</h2></div>
     </div>
 
     <div class="mgdb-resource-panel">
       <div class="mgdb-resource-list">
         <a href="/data_center/protein_structure">
           <strong>Protein Structure Data Hub</strong>
-          <span>Search and inspect AlphaFold 3D protein structures, pLDDT scores, and UniProt mappings</span>
+          <span>Predicted 3D structures for the proteins these products describe, with structural search</span>
           <span class="mgdb-resource-badge">Internal</span>
         </a>
-        <a href="/gene_center">
-          <strong>Gene Center</strong>
-          <span>Search B73 gene models, functional descriptions, GO annotations, and expression data</span>
+        <a href="/gene_center/gene">
+          <strong>Gene Data Hub</strong>
+          <span>The gene models that encode these products, with functional descriptions and GO terms</span>
           <span class="mgdb-resource-badge">Internal</span>
         </a>
         <a href="/data_center/locus">
           <strong>Locus Data Hub</strong>
-          <span>Explore classic genetic loci, mutants, and alleles encoding characterized gene products</span>
+          <span>Classic genetic loci, mutants, and alleles encoding characterized gene products</span>
           <span class="mgdb-resource-badge">Internal</span>
         </a>
         <a href="/data_center/phenotype">
           <strong>Phenotype Data Hub</strong>
-          <span>Curated phenotypic variations, mutant descriptions, and trait associations</span>
+          <span>Curated phenotypes for the loci whose products lose or change function</span>
           <span class="mgdb-resource-badge">Internal</span>
         </a>
-        <a href="/data_center/variation">
-          <strong>Variations &amp; Alleles Center</strong>
-          <span>Sequence variants, mutant alleles, and insertion disruptions in encoding genes</span>
-          <span class="mgdb-resource-badge">Internal</span>
-        </a>
-        <a href="/cite">
-          <strong>How to Cite MaizeGDB</strong>
-          <span>Citation standards and attribution guidelines for MaizeGDB datasets and records</span>
-          <span class="mgdb-resource-badge">Internal</span>
+        <a href="https://pathway.gramene.org/gramene/corncyc.shtml" target="_blank" rel="noopener">
+          <strong>CornCyc</strong>
+          <span>The curated maize metabolic pathway database these enzyme assignments feed</span>
+          <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
         </a>
       </div>
     </div>
