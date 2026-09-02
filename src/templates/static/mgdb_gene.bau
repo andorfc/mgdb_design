@@ -1,0 +1,1114 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-gene
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https://maizegdb.org/gene_center/gene">
+<meta property="og:title" content="MaizeGDB Gene Data Hub | Maize Genes and Gene Models">
+<meta property="og:description" content="Search maize genes and gene models by name, identifier, sequence or position, translate identifiers between annotations, and download gene model sets.">
+
+<main class="mgdb-page mgdb-hub-page mgdb-gene-page" id="gene-top">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Genes</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="gene-title">
+    <div class="mgdb-hero-emblem">
+      <img src="/images/quicklinks/gene_center.png" alt="" width="128" height="128" decoding="async" />
+      <strong>Gene<br />Data Hub</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(built_date)</p>
+      <h1 id="gene-title">Maize genes and gene models</h1>
+      <p class="mgdb-hero-description">$(total_gene_models) gene models from $(total_annotations) current annotations of $(total_lines) maize lines, including the $(reference_models) gene models of the B73 reference annotation $(reference_annotation). $(curated_loci) gene loci carry a curated gene symbol.</p>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#gene-search" class="is-current" aria-current="true">Search</a>
+    <a href="#gene-region">Sequence and region</a>
+    <a href="#gene-lists">Gene model lists</a>
+    <a href="#gene-downloads">Downloads</a>
+    <a href="#gene-nomenclature">Nomenclature</a>
+    <a href="#gene-about">About</a>
+    <a href="#gene-references">References</a>
+    <a href="#gene-metrics">Metrics</a>
+    <a href="#gene-related">Related resources</a>
+  </nav>
+
+  <!-- ==================================================================
+       1. Search
+       ================================================================== -->
+  <section id="gene-search" aria-labelledby="gene-search-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="gene-search-title">Search</h2></div>
+    </div>
+
+    <div class="gene-search-intro">
+      <div><h3>Which gene are you looking for?</h3><p>A locus name, gene model ID, transcript ID, translation ID, gene symbol or gene name, whole or partial. Retired gene models are searched too, so an identifier that returns nothing here was never in a MaizeGDB annotation.</p></div>
+    </div>
+
+    <form id="gene-search-form" class="mgdb-search" role="search">
+      <div class="mgdb-field gene-query-field">
+        <label class="mgdb-label" for="gene-search-term">Locus, gene model, transcript or translation</label>
+        <div class="gene-query-line">
+          <input class="mgdb-input" id="gene-search-term" name="term" type="search" placeholder="Zm00001eb067740" autocomplete="off" aria-describedby="gene-search-hint" />
+          <button class="mgdb-button mgdb-button-primary gene-search-submit" type="submit">Search</button>
+          <button class="mgdb-button mgdb-button-quiet gene-search-reset" type="reset" id="gene-search-reset">Reset</button>
+        </div>
+        <p class="mgdb-hint" id="gene-search-hint">Wildcards&#58; <code>^lg1</code> starts with, <code>lg1$</code> ends with, <code>*</code> anywhere.</p>
+      </div>
+
+      <div class="gene-search-options" aria-label="Search options">
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="gene-search-limit">Maximum records</label>
+          <select class="mgdb-select" id="gene-search-limit" name="limit">
+            <option value="50">50</option>
+            <option value="100" selected>100</option>
+            <option value="250">250</option>
+            <option value="500">500</option>
+            <option value="1000">1,000</option>
+            <option value="$(search_limit_max)">$(search_limit_max_label)</option>
+          </select>
+          <p class="mgdb-hint">The most rows a single search returns.</p>
+        </div>
+      </div>
+
+      <p class="mgdb-hint gene-examples">
+        <span>Examples&#58;</span>
+        <button type="button" class="gene-example" data-term="lg1">lg1</button>
+        <button type="button" class="gene-example" data-term="liguleless1">liguleless1</button>
+        <button type="button" class="gene-example" data-term="Zm00001eb067740">Zm00001eb067740</button>
+        <button type="button" class="gene-example" data-term="GRMZM2G036297">GRMZM2G036297</button>
+        <button type="button" class="gene-example" data-term="DAA35605">DAA35605</button>
+        <button type="button" class="gene-example" data-term="Zm00001d002005_T001">Zm00001d002005_T001</button>
+        <button type="button" class="gene-example" data-term="^lg1">^lg1</button>
+        <button type="button" class="gene-example" data-term="lg1$">lg1$</button>
+      </p>
+    </form>
+
+    <div class="gene-results-head">
+      <p id="gene-results-status" aria-live="polite">Enter a locus name or an identifier to search $(total_gene_models) gene models.</p>
+      <a class="mgdb-button mgdb-button-quiet" id="gene-export-tsv" href="#" download hidden>Export TSV</a>
+    </div>
+
+    <div id="gene-notes"></div>
+    <div id="gene-results"></div>
+
+    <div class="mgdb-empty" id="gene-empty" hidden>
+      <h3>No genes or gene models matched</h3>
+      <p>Check the spelling of the identifier, try a synonym, or search the <a href="/data_center/locus">Locus Data Hub</a> for classic genetic loci that carry no gene model. Retired gene models are searched too, so an identifier that returns nothing here was never in a MaizeGDB annotation.</p>
+    </div>
+
+    <details class="gene-advanced" id="gene-advanced">
+      <summary><span class="gene-advanced-title">Advanced search</span></summary>
+      <p class="gene-advanced-intro">Check the boxes next to the fields you want to search; if you just want to find records that have <i>any</i> value for that attribute, check the box and leave the criteria alone.</p>
+
+      <form id="gene-advanced-form" class="gene-advanced-form">
+        <p class="gene-advanced-lead">Show only genes:</p>
+
+        <div class="gene-criterion">
+          <input type="checkbox" id="adv-annotation-box" />
+          <label for="adv-annotation-box">from this <b>annotation</b></label>
+          <select class="mgdb-select" id="adv-annotation" aria-label="Annotation">
+            <option value="all">All annotations</option>
+            $(annotation_options)
+          </select>
+        </div>
+
+        <div class="gene-criterion">
+          <input type="checkbox" id="adv-type-box" />
+          <label for="adv-type-box">of this <b>type</b></label>
+          <select class="mgdb-select" id="adv-type" aria-label="Gene model type">
+            <option value="all">All types</option>
+            $(model_type_options)
+          </select>
+        </div>
+
+        <div class="gene-criterion">
+          <input type="checkbox" id="adv-chr-box" />
+          <label for="adv-chr-box">on this <b>chromosome</b></label>
+          <select class="mgdb-select" id="adv-chr" aria-label="Chromosome">
+            <option value="all">All chromosomes</option>
+            <option value="Chr1">chromosome 1</option>
+            <option value="Chr2">chromosome 2</option>
+            <option value="Chr3">chromosome 3</option>
+            <option value="Chr4">chromosome 4</option>
+            <option value="Chr5">chromosome 5</option>
+            <option value="Chr6">chromosome 6</option>
+            <option value="Chr7">chromosome 7</option>
+            <option value="Chr8">chromosome 8</option>
+            <option value="Chr9">chromosome 9</option>
+            <option value="Chr10">chromosome 10</option>
+            <option value="Unplaced">Unplaced</option>
+            <option value="ChrMt">Mitochondrial</option>
+            <option value="ChrPt">Plastid</option>
+          </select>
+        </div>
+
+        <div class="gene-criterion">
+          <input type="checkbox" id="adv-range-box" />
+          <label for="adv-range-box">between these positions</label>
+          <div class="gene-criterion-controls">
+            <input class="mgdb-input gene-input-short" type="text" id="adv-range-start" inputmode="numeric" aria-label="Start position" />
+            <span class="gene-criterion-join">and</span>
+            <input class="mgdb-input gene-input-short" type="text" id="adv-range-end" inputmode="numeric" aria-label="End position" />
+          </div>
+        </div>
+
+        <div class="gene-criterion">
+          <input type="checkbox" id="adv-locus-box" />
+          <label for="adv-locus-box">associated with a <b>gene locus</b></label>
+        </div>
+
+        <div class="gene-criterion">
+          <input type="checkbox" id="adv-product-box" />
+          <label for="adv-product-box">that produce this <b>gene product</b></label>
+          <select class="mgdb-select" id="adv-product" aria-label="Gene product" data-gene-options="gene_product">
+            <option value="all">Any gene product</option>
+          </select>
+        </div>
+
+        <div class="gene-criterion">
+          <input type="checkbox" id="adv-pheno-box" />
+          <label for="adv-pheno-box">that have this <b>phenotype</b></label>
+          <select class="mgdb-select" id="adv-pheno" aria-label="Phenotype" data-gene-options="phenotype">
+            <option value="0">Any phenotype</option>
+          </select>
+        </div>
+
+        <div class="gene-criterion">
+          <input type="checkbox" id="adv-trait-box" />
+          <label for="adv-trait-box">that are associated with this <b>trait</b></label>
+          <select class="mgdb-select" id="adv-trait" aria-label="Trait" data-gene-options="trait">
+            <option value="0">Any trait</option>
+          </select>
+        </div>
+
+        <div class="gene-criterion">
+          <input type="checkbox" id="adv-tandem-box" />
+          <label for="adv-tandem-box">that belong to a tandem array</label>
+        </div>
+
+        <div class="gene-criterion">
+          <input type="checkbox" id="adv-protein-box" />
+          <label for="adv-protein-box">associated with this protein or enzyme</label>
+          <div class="gene-criterion-controls">
+            <input class="mgdb-input gene-input-medium" type="text" id="adv-protein" aria-label="Protein or enzyme accession" aria-describedby="adv-protein-hint" />
+            <span class="gene-criterion-join" id="adv-protein-hint">UniProt, PFam or EC</span>
+          </div>
+        </div>
+
+        <div class="mgdb-form-actions">
+          <button class="mgdb-button mgdb-button-primary" type="submit">Search</button>
+          <button class="mgdb-button mgdb-button-quiet" type="reset">Clear</button>
+        </div>
+      </form>
+
+      <div id="gene-advanced-notes"></div>
+      <div id="gene-advanced-results"></div>
+    </details>
+  </section>
+
+  
+
+  <!-- ==================================================================
+       3. Search by region
+       ================================================================== -->
+  <section id="gene-region" aria-labelledby="gene-region-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="gene-region-title">Sequence and region</h2></div>
+    </div>
+    <p class="gene-section-lead">Find gene models by the sequence they contain, by a stretch of a genome assembly, or by a list of intervals &#8212; and go the other way, from a list of gene models to their coordinates.</p>
+
+    <h3 class="mgdb-leaf-heading">BLAST a sequence</h3>
+    <form id="gene-blast-form" class="gene-panel" action="/search/gene/gene_seq_search.php" method="POST">
+      <p class="gene-panel-lead">Enter up to 5 sequences, Genbank IDs or gene model names \(Zmdddddadddddd, ZEAMMB73_xxxx or GRMZMxxxxxx\):</p>
+
+      <div class="mgdb-search-row">
+        <div class="mgdb-field">
+          <span class="mgdb-label" id="gene-blast-type-label">Sequence type</span>
+          <div class="gene-radio-row" role="radiogroup" aria-labelledby="gene-blast-type-label">
+            <label><input type="radio" name="seq_type" value="nucleotide" checked /> Nucleotide</label>
+            <label><input type="radio" name="seq_type" value="aminoacid" /> Amino acid</label>
+          </div>
+        </div>
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="gene-blast-target">Target dataset</label>
+          <select class="mgdb-select" name="targets[]" id="gene-blast-target">
+            <option value="">Select a target dataset</option>
+            $(blast_options)
+          </select>
+        </div>
+      </div>
+
+      <div class="mgdb-field">
+        <label class="mgdb-label" for="gene-blast-sequence">Sequence</label>
+        <textarea class="mgdb-textarea" name="sequence" id="gene-blast-sequence" rows="8"></textarea>
+      </div>
+
+      <input type="hidden" name="a" value="START_BLAST" />
+      <input type="hidden" name="max_evalue" value="1e-7" />
+      <input type="hidden" name="max_hits" value="100" />
+
+      <div class="mgdb-form-actions">
+        <button class="mgdb-button mgdb-button-primary" type="submit">Submit</button>
+        <button class="mgdb-button mgdb-button-quiet" type="button" data-gene-fill="gene-blast-sequence" data-gene-value="Zm00001d002005">Sample</button>
+      </div>
+    </form>
+
+    <h3 class="mgdb-leaf-heading mgdb-spaced">Search by region</h3>
+
+    <form id="gene-region-form" class="gene-panel" method="get" target="_blank" action="/search/gene/gene_chr_position.php">
+      <fieldset class="gene-fieldset">
+        <legend class="mgdb-label">Define the region by</legend>
+
+        <div class="gene-region-choice">
+          <label class="gene-region-radio">
+            <input type="radio" name="region" id="region-assembly" value="assembly" checked />
+            <span>assembly coordinates</span>
+          </label>
+
+          <div class="gene-region-fields" data-region="assembly">
+            <div class="mgdb-search-row">
+              <div class="mgdb-field">
+                <label class="mgdb-label" for="region-gm-version">Annotation</label>
+                <select class="mgdb-select" name="gm_version" id="region-gm-version">
+                  $(annotation_options)
+                </select>
+              </div>
+              <div class="mgdb-field">
+                <label class="mgdb-label" for="region-chr">Chromosome</label>
+                <select class="mgdb-select" name="chr" id="region-chr">
+                  <option value="chr1">Chromosome 1</option>
+                  <option value="chr2">Chromosome 2</option>
+                  <option value="chr3">Chromosome 3</option>
+                  <option value="chr4">Chromosome 4</option>
+                  <option value="chr5">Chromosome 5</option>
+                  <option value="chr6">Chromosome 6</option>
+                  <option value="chr7">Chromosome 7</option>
+                  <option value="chr8">Chromosome 8</option>
+                  <option value="chr9">Chromosome 9</option>
+                  <option value="chr10">Chromosome 10</option>
+                  <option value="UNKNOWN">Unmapped</option>
+                  <option value="chrMt">Mitochondria</option>
+                  <option value="chrPt">Chloroplast</option>
+                  <option value="chrAll">All</option>
+                </select>
+              </div>
+            </div>
+            <div class="mgdb-search-row">
+              <div class="mgdb-field">
+                <label class="mgdb-label" for="region-model-type">Model type</label>
+                <select class="mgdb-select" name="model_type" id="region-model-type">
+                  <option value="any">any</option>
+                  <option value="protein_coding">Protein Coding</option>
+                  <option value="miRNA">miRNA</option>
+                  <option value="transposable_element">Transposable Element</option>
+                  <option value="low_confidence">Low Confidence</option>
+                </select>
+              </div>
+              <div class="mgdb-field">
+                <label class="mgdb-label" for="region-data-type">Data type</label>
+                <select class="mgdb-select" name="data_type" id="region-data-type">
+                  <option value="all">All Genes/Gene Models</option>
+                  <option value="canonical">Canonical Transcripts</option>
+                  <option value="genes">Only Gene Models Linked to Genes</option>
+                </select>
+              </div>
+            </div>
+            <div class="mgdb-search-row">
+              <div class="mgdb-field">
+                <label class="mgdb-label" for="region-start">Start position</label>
+                <input class="mgdb-input" type="text" name="start_pos" id="region-start" inputmode="numeric" />
+              </div>
+              <div class="mgdb-field">
+                <label class="mgdb-label" for="region-end">End position</label>
+                <input class="mgdb-input" type="text" name="end_pos" id="region-end" inputmode="numeric" />
+              </div>
+            </div>
+            <p class="mgdb-hint">\(enter positions w/o commas or spaces, or leave both empty for entire chromosome\)</p>
+          </div>
+        </div>
+
+        <div class="gene-region-choice">
+          <label class="gene-region-radio">
+            <input type="radio" name="region" id="region-marker" value="marker" />
+            <span>marker</span>
+          </label>
+
+          <div class="gene-region-fields" data-region="marker">
+            <div class="mgdb-search-row">
+              <div class="mgdb-field">
+                <label class="mgdb-label" for="region-start-marker">Start</label>
+                <input class="mgdb-input" type="text" name="start_marker" id="region-start-marker" />
+              </div>
+              <div class="mgdb-field">
+                <label class="mgdb-label" for="region-end-marker">End</label>
+                <input class="mgdb-input" type="text" name="end_marker" id="region-end-marker" />
+              </div>
+              <div class="mgdb-field">
+                <label class="mgdb-label" for="region-assembly-select">Assembly</label>
+                <select class="mgdb-select" name="assembly" id="region-assembly-select">
+                  $(annotation_options)
+                </select>
+              </div>
+            </div>
+            <p class="mgdb-hint">Enter two markers to get gene models within the span. Both must be on the same chromosome. Only applicable for assemblies with aligned markers.</p>
+          </div>
+        </div>
+
+        <div class="gene-region-choice">
+          <label class="gene-region-radio">
+            <input type="radio" name="region" id="region-gm" value="gm" />
+            <span>Assembly Annotation Positions</span>
+          </label>
+
+          <div class="gene-region-fields" data-region="gm">
+            <div class="mgdb-field">
+              <label class="mgdb-label" for="region-gm-list">Enter List - 8,000 gene model limit</label>
+              <textarea class="mgdb-textarea" name="gm_pos_list" id="region-gm-list" rows="8"></textarea>
+              <p class="mgdb-hint">Enter a list of gene models, transcripts, and/or proteins to retrieve their physical coordinates. <button type="button" class="gene-example" data-gene-fill="region-gm-list" data-gene-example="mixed">Example list</button></p>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="mgdb-form-actions">
+        <button class="mgdb-button mgdb-button-primary" type="submit">Submit</button>
+      </div>
+    </form>
+
+    <h3 class="mgdb-leaf-heading mgdb-spaced">Find gene models by position</h3>
+    <form id="gene-bulk-position-form" class="gene-panel" method="POST" target="_blank" action="/search/gene/gene_bulk_position.php">
+      <div class="mgdb-field">
+        <label class="mgdb-label" for="bulk-positions">Positions</label>
+        <p class="mgdb-hint" id="bulk-positions-hint">Enter one or more lines in comma-separated format with the columns&#58; <i>[chromosome]:[start]..[end]</i> Limit the number of positions to 100 or fewer.</p>
+        <textarea class="mgdb-textarea" name="bulk_positions" id="bulk-positions" rows="6" aria-describedby="bulk-positions-hint"></textarea>
+      </div>
+      <div class="mgdb-field gene-field-narrow">
+        <label class="mgdb-label" for="bulk-position-assembly">in this assembly</label>
+        <select class="mgdb-select" name="bulk_position_assembly" id="bulk-position-assembly">
+          <option value=""></option>
+          $(position_options)
+        </select>
+      </div>
+      <div class="mgdb-form-actions">
+        <button class="mgdb-button mgdb-button-primary" type="submit">Submit</button>
+        <button type="button" class="mgdb-button mgdb-button-quiet" data-gene-fill="bulk-positions" data-gene-example="positions">Example</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ==================================================================
+       4. Gene model lists
+       ================================================================== -->
+  <section id="gene-lists" aria-labelledby="gene-lists-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="gene-lists-title">Gene model lists</h2></div>
+    </div>
+
+    <div class="gene-tool-grid">
+
+      <form id="gene-translate-form" class="gene-panel" method="post" target="_blank" action="/search/gene/gene_translate.php">
+        <h3 class="mgdb-leaf-heading">Translate Gene Model IDs</h3>
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="translate-list">Enter list - 8,000 gene model limit</label>
+          <textarea class="mgdb-textarea" name="gm_list" id="translate-list" rows="8"></textarea>
+          <p class="mgdb-hint"><button type="button" class="gene-example" data-gene-fill="translate-list" data-gene-example="mixed">Example list</button></p>
+        </div>
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="translate-to">Translate to</label>
+          <select class="mgdb-select" name="trans_to" id="translate-to">
+            <option value="all">All gene sets</option>
+            <option value="B73">All B73 gene sets</option>
+            <option value="NAM">All NAM founders</option>
+            <option value="genbank_gene">GenBank Gene accessions \(Entrez\)</option>
+            <option value="genbank_id">GenBank protein accessions \(ZEAMMB*\)</option>
+            $(assembly_options)
+          </select>
+        </div>
+        <div class="mgdb-form-actions">
+          <button class="mgdb-button mgdb-button-primary" type="submit">Submit</button>
+        </div>
+        <p class="mgdb-small">Alternatively, <a href="https://download.maizegdb.org/Pan-genes/Pan-Zea">download the full gene model associations table between the B73 assemblies and all other assemblies in our database.</a></p>
+      </form>
+
+      <form id="gene-fasta-form" class="gene-panel" method="post" target="_blank" action="/search/gene/get_fasta.php">
+        <h3 class="mgdb-leaf-heading">Download sequence for a gene model list</h3>
+        <p class="gene-panel-lead">When downloading sequence please specify which type of input you are entering. For genomic please use the gene model name \(e.g. Zm00001eb067740\). For cDNA, CDS, and mRNA please use the transcript ID \(e.g. Zm00001eb067740_T001\). For protein please use the translation ID \(e.g. Zm00001eb067740_P001\). If you enter only the gene model ID, please choose if you want to see all transcripts or only the canonical transcripts.</p>
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="fasta-list">Enter list - 8,000 gene model limit</label>
+          <textarea class="mgdb-textarea" name="gm_seq_list" id="fasta-list" rows="8"></textarea>
+          <p class="mgdb-hint"><button type="button" class="gene-example" data-gene-fill="fasta-list" data-gene-example="models">Example list</button></p>
+        </div>
+        <div class="mgdb-search-row">
+          <div class="mgdb-field">
+            <label class="mgdb-label" for="fasta-in-type">Input type</label>
+            <select class="mgdb-select" name="in_type" id="fasta-in-type">
+              <option value="gene">Gene Model ID</option>
+              <option value="transcript">Transcript ID</option>
+              <option value="translation">Translation ID</option>
+            </select>
+          </div>
+          <div class="mgdb-field">
+            <label class="mgdb-label" for="fasta-out-type">Output type</label>
+            <select class="mgdb-select" name="out_type" id="fasta-out-type">
+              <option value="genomic">Sequence: genomic</option>
+              <option value="cdna">Sequence: cDNA - all transcripts</option>
+              <option value="cdna-canonical">Sequence: cDNA - canonical transcripts</option>
+              <option value="ncrna">Sequence: ncRNA</option>
+              <option value="protein">Sequence: protein</option>
+            </select>
+          </div>
+        </div>
+        <div class="mgdb-form-actions">
+          <button class="mgdb-button mgdb-button-primary" type="submit">Submit</button>
+        </div>
+      </form>
+
+      <form id="gene-scores-form" class="gene-panel" method="post" target="_blank" action="/search/gene/get_scores.php">
+        <h3 class="mgdb-leaf-heading">Get scores for a set of gene models</h3>
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="scores-list">Enter one or more B73v5 or NAM gene model names</label>
+          <textarea class="mgdb-textarea" name="bulk_score_gms" id="scores-list" rows="6"></textarea>
+          <p class="mgdb-hint"><button type="button" class="gene-example" data-gene-fill="scores-list" data-gene-example="scores">Example</button></p>
+        </div>
+        <div class="mgdb-form-actions">
+          <button class="mgdb-button mgdb-button-primary" type="submit">Submit</button>
+        </div>
+      </form>
+
+      <form id="gene-downloadall-form" class="gene-panel" method="POST" enctype="multipart/form-data">
+        <h3 class="mgdb-leaf-heading">Download all data for a list of gene models</h3>
+        <p class="gene-panel-lead">Enter a list of B73 gene models, separated by newlines, commas, spaces, or semicolons.</p>
+        <div class="mgdb-message mgdb-message-info" role="note">
+          <div>Note: this can take several minutes, even for a short list of gene models.</div>
+        </div>
+        <input type="hidden" id="downloadall_job_id" />
+        <input type="hidden" name="MAX_FILE_SIZE" value="30000" />
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="downloadall_list">Enter a list of gene models</label>
+          <textarea class="mgdb-textarea" id="downloadall_list" rows="8"></textarea>
+        </div>
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="downloadall_file">Or upload a file</label>
+          <input type="file" name="downloadall_file" id="downloadall_file" aria-describedby="downloadall-file-hint" />
+          <p class="mgdb-hint" id="downloadall-file-hint">\(Maximum file size is 50kb\)</p>
+        </div>
+        <div class="mgdb-form-actions">
+          <button class="mgdb-button mgdb-button-primary" type="submit">Submit</button>
+          <button class="mgdb-button mgdb-button-quiet" type="reset">Reset</button>
+        </div>
+        <div id="downloadall_status_div" aria-live="polite"></div>
+        <p class="mgdb-small">To download data from <i>all</i> gene models in a B73 assembly, use the links below:</p>
+        <ul class="gene-link-list">
+          <li><a href="https://download.maizegdb.org/B73_RefGen_v3/B73_RefGen_v3-GMs-GOTerms.csv.gz">B73 RefGen_v3 gene model data</a></li>
+          <li><a href="https://download.maizegdb.org/Zm-B73-REFERENCE-GRAMENE-4.0/Zm-B73-REFERNECE-GRAMENE-4.0-GMs-GOTerms.csv.gz">Zm-B73-REFERENCE-GRAMENE-4.0 gene model data</a></li>
+          <li><a href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0-GMs-GOTerms.csv.gz">Zm-B73-REFERENCE-NAM-5.0 gene model data</a></li>
+        </ul>
+      </form>
+
+    </div>
+
+    <div class="mgdb-resource-panel mgdb-spaced gene-maizemine">
+      <div>
+        <h3 class="mgdb-leaf-heading">MaizeMine</h3>
+        <p><a href="https://maizemine.rnet.missouri.edu/maizemine/begin.do">MaizeMine</a> provides an alternative view into the MaizeGDB data, with an emphasis on genomic, gene expression data, and metabolics.</p>
+        <p>The "Quick Search" feature on the <a href="https://maizemine.rnet.missouri.edu/maizemine/begin.do">MaizeMine home page</a> gives quick access to individual gene models, pathways, proteins, et cetera.</p>
+        <p>To get data associated with a set of gene models, for example expression levels, pathways, GO terms, start by <a href="https://maizemine.rnet.missouri.edu/maizemine/bag.do?subtab=upload">creating a list</a>. Then you can attach data and analyze the list in multiple ways.</p>
+        <p>You can see the list of data sources <a href="https://maizemine.rnet.missouri.edu/maizemine/dataCategories.do">here</a>. The MaizeMine tutorial is <a href="https://maizemine.readthedocs.io/en/v1.4/">here</a>.</p>
+      </div>
+      <div class="gene-maizemine-mark">
+        <img src="/images/maizemine.png" alt="MaizeMine" loading="lazy" decoding="async" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       5. Downloads
+       ================================================================== -->
+  <section id="gene-downloads" aria-labelledby="gene-downloads-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="gene-downloads-title">Downloads</h2></div>
+    </div>
+
+    <div class="mgdb-card-grid gene-download-grid">
+      <article class="mgdb-card">
+        <h3>Zm00001eb.1 gene model files</h3>
+        <ul class="gene-link-list">
+          <li><a href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.gff3.gz">Zm00001eb.1 gene model GFF</a></li>
+          <li><a href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.cdna.fa.gz">Zm00001eb.1 gene model cDNA fasta</a></li>
+          <li><a href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.cds.fa.gz">Zm00001eb.1 gene model CDS fasta</a></li>
+          <li><a href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.gene.fa.gz">Zm00001eb.1 gene model genomic fasta</a></li>
+          <li><a href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.protein.fa.gz">Zm00001eb.1 gene model protein fasta</a></li>
+        </ul>
+      </article>
+
+      <article class="mgdb-card">
+        <h3>Functional annotations and orthologs</h3>
+        <p class="mgdb-small"><b>Zm-B73-REFERENCE-NAM-5.0</b></p>
+        <ul class="gene-link-list">
+          <li><a href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.interproscan.tsv.gz">InterproScan results</a> \(Also available in the <a href="https://download.maizegdb.org">MaizeGDB downloads</a> for all <a href="https://nam-genomes.github.io/">NAM founder assemblies</a>\)</li>
+        </ul>
+        <p class="mgdb-small"><b>Phytozome</b></p>
+        <ul class="gene-link-list">
+          <li><a href="https://genome.jgi.doe.gov/portal/pages/dynamicOrganismDownload.jsf?organism=Zmays">Download files</a> include functional Annotations for B73 RefGen_v2 \("Ensembl-18"\) and B73 RefGen_v4, and orthologs for B73 RefGen_v4. \(account required\)</li>
+        </ul>
+        <p class="mgdb-small"><b>B73 RefGen_v2</b></p>
+        <ul class="gene-link-list">
+          <li>Gramene.org: <a href="ftp://ftp.gramene.org/pub/maize/release-5b/functional-annotations/">Functional Annotations</a> \(B73 RefGen_v2 only\)</li>
+          <li>Freeling Lab: <a href="https://download.maizegdb.org/B73_RefGen_v2/Orthologs/">Syntenic Orthologs</a> \(mapped to RefGen_v2\)</li>
+        </ul>
+      </article>
+
+      <article class="mgdb-card">
+        <h3>Gene models with associated genes</h3>
+        <p class="mgdb-small">\(B73 RefGen_v3 and Zm-B73-REFERENCE-GRAMENE-4.0, aka B73 RefGen_v4\)</p>
+        <div class="mgdb-table-scroll">
+          <table class="mgdb-table gene-assoc-table" aria-label="Gene models with associated genes, by gene set">
+            <tbody>
+              <tr>
+                <th scope="row">Classical Genes</th>
+                <td><a href="/associated_genes?type=classical&amp;style=table">table</a></td>
+                <td><a href="/associated_genes?type=classical&amp;style=tab">tab delimited</a></td>
+              </tr>
+              <tr>
+                <th scope="row">MaizeGDB curated genes</th>
+                <td><a href="/associated_genes?type=maizegdb&amp;style=table">table</a></td>
+                <td><a href="/associated_genes?type=maizegdb&amp;style=tab">tab delimited</a></td>
+              </tr>
+              <tr>
+                <th scope="row">All associated genes</th>
+                <td><a href="/associated_genes?type=all&amp;style=table">table</a></td>
+                <td><a href="/associated_genes?type=all&amp;style=tab">tab delimited</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+
+    <h3 class="mgdb-leaf-heading mgdb-spaced" id="gene-xref">Gene model cross-references and pan-genes</h3>
+    <div class="gene-panel">
+      <p>Please note that there is not a 1-to-1 correspondence between all gene models in all annotations. Some gene models are unique to specific genome assemblies, some have been split or merged between annotation or assembly versions, some direct associations may be difficult to calculate, so multiple gene models that are similar in sequence and position may be listed. And some gene models may be similar in sequence but do not appear in the same syntenic locations.</p>
+      <details class="gene-details">
+        <summary>Click to learn more.</summary>
+        <p>The rules for associating gene models across assemblies require not only close sequence similarity, but also that they both appear in syntenic positions. Because of this, there are gene models that are not associated with all gene models in the current representative assembly annotation in spite of exact or near exact sequence similarity. This is often due to unplaced scaffolds that contain gene models.</p>
+        <p>There are multiple ways to define and generate a pan-genome. Here we use "pan-gene" to mean to an analysis of multiple genome annotations to group gene models by sequence similarity and syntenic position, to identify core gene models \(present in all annotations\) and to identify orphan gene models \(present in only one\).</p>
+      </details>
+      <ul class="gene-link-list">
+        <li><a href="https://download.maizegdb.org/Pan-genes/B73_gene_xref/">Gene model associations across all B73 assemblies</a>.</li>
+        <li><a href="https://download.maizegdb.org/Pan-genes/Pan-Zea">Current pan-gene data</a></li>
+      </ul>
+    </div>
+
+    <h3 class="mgdb-leaf-heading mgdb-spaced" id="gene-insertions">Insertion data sets</h3>
+    <div class="mgdb-card-grid gene-download-grid">
+      <article class="mgdb-card">
+        <h3>UniformMu</h3>
+        <ul class="gene-link-list">
+          <li><a href="/uniformmu">About the UniformMu project</a></li>
+        </ul>
+        <p class="mgdb-small">W22 to B73 cross-reference:</p>
+        <ul class="gene-link-list">
+          <li><a href="https://download.maizegdb.org/Insertions/UniformMu/UniformMu_W22_V4_lookup.xlsx">Excel spreadsheet</a></li>
+        </ul>
+        <p class="mgdb-small">Genomic coordinates for Zm-B73-REFERENCE-NAM-5.0:</p>
+        <ul class="gene-link-list">
+          <li><a href="https://download.maizegdb.org/Insertions/UniformMu/UniformMu_Release-9_B73v5_gene_models.xlsx">Release 9 Excel spreadsheet</a></li>
+        </ul>
+        <p class="mgdb-small">Genomic coordinates for Zm-B73-REFERENCE-GRAMENE-4.0 \(aka B73 RefGen_v4\):</p>
+        <ul class="gene-link-list">
+          <li><a href="https://download.maizegdb.org/Insertions/UniformMu/UniformMu_Release-9_B73v4.xlsx">Release 9 Excel spreadsheet</a></li>
+          <li><a href="https://download.maizegdb.org/Insertions/UniformMu/UniformMu_Release-9_B73v4_exons.xlsx">Release 9 Excel spreadsheet with gene structure</a></li>
+        </ul>
+        <p class="mgdb-small">List of gene models from the B73 RefGen_v3 Filtered Gene Set that have UniformMu insertions:</p>
+        <ul class="gene-link-list">
+          <li><a href="https://download.maizegdb.org/Insertions/UniformMu/UniformMu_Release-8_GeneModel_B73_RefGen_v3.xlsx">Release 8 Excel spreadsheet</a></li>
+        </ul>
+        <p class="mgdb-small">List of gene models from the B73 RefGen_v2 Filtered Gene Set that have UniformMu insertions including 100 bp upstream or downstream:</p>
+        <ul class="gene-link-list">
+          <li><a href="https://download.maizegdb.org/Insertions/UniformMu/UniformMu_Release-7_Insertions_in_RefGenv2_FGS.xlsx">Release 7 Excel spreadsheet</a></li>
+          <li><a href="https://download.maizegdb.org/Insertions/UniformMu/UniformMu_Release-8_Insertions_in_RefGenv2_FGS.xlsx">Release 8 Excel spreadsheet</a></li>
+        </ul>
+        <p class="mgdb-small">List of gene models from the B73 RefGen_v2 Filtered Gene Set that have UniformMu insertions in exons:</p>
+        <ul class="gene-link-list">
+          <li><a href="https://download.maizegdb.org/Insertions/UniformMu/UniformMu_Release-7_Insertions_in_RefGenv2_FGS_exons.xlsx">Release 7 Excel spreadsheet</a></li>
+          <li><a href="https://download.maizegdb.org/Insertions/UniformMu/UniformMu_Release-8_Insertions_in_RefGenv2_FGS_exons.xlsx">Release 8 Excel spreadsheet</a></li>
+        </ul>
+      </article>
+
+      <article class="mgdb-card">
+        <h3>Ac/Ds-GFP</h3>
+        <ul class="gene-link-list">
+          <li><a href="/dooner_du_acds_insertions">Abut the Dooner &amp; Du Ac/Ds-GFP project</a></li>
+        </ul>
+        <p class="mgdb-small">Insertions validated by <a href="/data_center/reference/9043193">Warman et al., 2020</a></p>
+        <ul class="gene-link-list">
+          <li><a href="https://download.maizegdb.org/Insertions/AcDs_Dooner/">Validation table with B73 v3 and v4 gene model assignments</a></li>
+        </ul>
+      </article>
+    </div>
+
+    <h3 class="mgdb-leaf-heading mgdb-spaced" id="gene-older">Older gene model downloads</h3>
+    <div class="mgdb-card-grid gene-download-grid">
+      <article class="mgdb-card">
+        <h3>Zm00001d.2</h3>
+        <p class="mgdb-small">Gene model set <b>Zm00001d.2</b> corresponds to Gramene release 36.</p>
+        <ul class="gene-link-list">
+          <li><a href="https://download.maizegdb.org/Zm-B73-REFERENCE-GRAMENE-4.0/Zm-B73-REFERENCE-GRAMENE-4.0_Zm00001d.2.cDNA.fa.gz">Zm00001d.2 gene model cDNA fasta</a></li>
+          <li><a href="https://download.maizegdb.org/Zm-B73-REFERENCE-GRAMENE-4.0/Zm-B73-REFERENCE-GRAMENE-4.0_Zm00001d.2.ncrna.fa.gz">Zm00001d.2 gene model ncRNA fasta</a></li>
+          <li><a href="https://download.maizegdb.org/Zm-B73-REFERENCE-GRAMENE-4.0/Zm-B73-REFERENCE-GRAMENE-4.0_Zm00001d.2.protein.fa.gz">Zm00001d.2 gene model translations fasta</a></li>
+          <li><a href="https://download.maizegdb.org/Zm-B73-REFERENCE-GRAMENE-4.0/Zm-B73-REFERENCE-GRAMENE-4.0_Zm00001d.2.gff3.gz">Zm00001d.2 gene model GFF3</a></li>
+        </ul>
+      </article>
+
+      <article class="mgdb-card">
+        <h3>Zm00001d.1</h3>
+        <p class="mgdb-small">Gene model set Zm00001d.1 corresponds to Gramene release 32. \(Requires EnsemblPlant login or download as 'Guest'\)</p>
+        <ul class="gene-link-list">
+          <li><a href="ftp://ftp.ensemblgenomes.org/pub/plants/release-32/fasta/zea_mays/cdna">Zm00001d.1 gene model cDNA fasta</a></li>
+          <li><a href="ftp://ftp.ensemblgenomes.org/pub/plants/release-32/fasta/zea_mays/ncrna">Zm00001d.1 gene model ncRNA fasta</a></li>
+          <li><a href="ftp://ftp.ensemblgenomes.org/pub/plants/release-32/fasta/zea_mays/pep">Zm00001d.1 gene model translations fasta</a></li>
+          <li><a href="ftp://ftp.ensemblgenomes.org/pub/plants/release-32/gff3/zea_mays">Zm00001d.1 gene model GFF3</a></li>
+        </ul>
+      </article>
+
+      <article class="mgdb-card">
+        <h3>5b+</h3>
+        <p class="mgdb-small">Gene model set 5b+ for B73 RefGen v3 corresponds to Gramene release 21.</p>
+        <ul class="gene-link-list">
+          <li><a href="https://download.maizegdb.org/B73_RefGen_v3/Zea_mays.AGPv3.22.cdna.all.fa.gz">5b+ gene model cDNA fasta</a></li>
+          <li><a href="https://download.maizegdb.org/B73_RefGen_v3/Zea_mays.AGPv3.22.ncrna.fa.gz">5b+ gene model ncRNA fasta</a></li>
+          <li><a href="https://download.maizegdb.org/B73_RefGen_v3/Zea_mays.AGPv3.22.pep.all.fa.gz">5b+ gene model translations fasta</a></li>
+          <li><a href="https://download.maizegdb.org/B73_RefGen_v3/Zea_mays.AGPv3.21.gff3.gz">5b+ gene model GFF3</a></li>
+          <li><a href="https://download.maizegdb.org/B73_RefGen_v3/MAKERP">B73 RefGen_v3 MAKER-P gene models</a></li>
+        </ul>
+      </article>
+
+      <article class="mgdb-card">
+        <h3>5b</h3>
+        <p class="mgdb-small">Gene model set 5b for B73 RefGen v2.</p>
+        <ul class="gene-link-list">
+          <li><a href="https://download.maizegdb.org/B73_RefGen_v2/ZmB73_5b_FGS_cdna.fasta.gz">5b gene model cDNA fasta</a></li>
+          <li><a href="https://download.maizegdb.org/B73_RefGen_v2/ZmB73_5b.60_FGS.translations.fasta.gz">5b gene model translations fasta</a></li>
+          <li><a href="https://download.maizegdb.org/B73_RefGen_v2/ZmB73_5b.60_FGS.gff3.gz">5b gene model GFF3</a></li>
+        </ul>
+      </article>
+
+      <article class="mgdb-card">
+        <h3>Zm00001d.provisional</h3>
+        <p class="mgdb-small">Gene model set <b>Zm00001d.provisional</b> holds low confidence gene models that were not included in the Zm00001d.2 annotation.</p>
+        <ul class="gene-link-list">
+          <li><a href="https://download.maizegdb.org/Zm-B73-REFERENCE-GRAMENE-4.0/Zm-B73-REFERENCE-GRAMENE-4.0_Zm00001d.provisional.gff3.gz">Zm00001d.provisional \(low confidence\) gene model GFFs</a></li>
+          <li><a href="https://download.maizegdb.org/Zm-B73-REFERENCE-GRAMENE-4.0/Zm-B73-REFERENCE-GRAMENE-4.0_Zm00001d.provisional.transcripts.fa.gz">Zm00001d.provisional \(low confidence\) gene model transcripts</a></li>
+          <li><a href="https://download.maizegdb.org/Zm-B73-REFERENCE-GRAMENE-4.0/Zm-B73-REFERENCE-GRAMENE-4.0_Zm00001d.provisional.protein.fa.gz">Zm00001d.provisional \(low confidence\) gene model proteins</a></li>
+        </ul>
+      </article>
+
+      <article class="mgdb-card">
+        <h3>Earlier assemblies</h3>
+        <ul class="gene-link-list">
+          <li><a href="https://download.maizegdb.org/B73_RefGen_v3/ncbi_gm_xref.txt">Cross reference for 5b+ GRMZM and ZEAMMB73 IDs</a></li>
+          <li><a href="https://download.maizegdb.org/B73_RefGen_v2">5b.60: Filtered Gene Set for B73_RefGen_v2</a></li>
+          <li><a href="https://download.maizegdb.org/B73_RefGen_v2">5a.59: Working Gene Set for B73_RefGen_v2</a></li>
+          <li><a href="https://download.maizegdb.org/B73_RefGen_v1">4a.53: Filtered Gene Set for B73_RefGen_v1</a></li>
+          <li><a href="https://download.maizegdb.org/B73_RefGen_v1">4a.53: Working Gene Set for B73_RefGen_v1</a></li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       6. Nomenclature
+       ================================================================== -->
+  <section id="gene-nomenclature" aria-labelledby="gene-nomenclature-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="gene-nomenclature-title">Nomenclature</h2></div>
+    </div>
+
+    <div class="mgdb-prose gene-prose">
+      <h3 class="mgdb-leaf-heading">Genome assembly names</h3>
+      <p>Genome assemblies have both names and identifiers. The names are intended to bee human-readable, and look like:</p>
+      <p class="gene-indent">[species id] - [cultivar] - [project] - [assembly version]</p>
+      <p>For example: <code>Zm-B73-REFERENCE-NAM-5.0</code></p>
+
+      <h3 class="mgdb-leaf-heading">Genome assembly identifiers</h3>
+      <p>Assemblies are also assigned an identifier, which is used to identify which genome, and which assembly version a gene model belongs to. An assembly identifier looks like:</p>
+      <p class="gene-indent">[species id][5 digits][version]</p>
+      <p>For example: Zm00001e = the 5th version of the B73 reference genome, where 'e' represents the 5th assembly version. This system will permit unique names for up to 99,999 genome assemblies. It is impossible to predict how many genome assemblies will be produced, so the naming scheme accomodates more than what seems a reasonable number.</p>
+
+      <h3 class="mgdb-leaf-heading">Gene model names</h3>
+      <p>The assembly identifier and annotation version are used as prefixes for gene models. For example, the current set official B73 gene models belong to the second annotation of the version 5 assembly, so the gene model prefix is Zm00001eb, where b indicates the second annotation. Gene models in B73v5, second annotation look like:</p>
+      <p class="gene-indent"><code>Zm00001eb001020</code></p>
+      <p>This naming scheme ensures that each gene model has a unique identifier, and indicates which genome, assembly, and annotation version it belongs to.</p>
+    </div>
+
+    <h3 class="mgdb-leaf-heading mgdb-spaced">About the current gene model set</h3>
+    <div class="mgdb-prose gene-prose">
+      <p>The current gene model set \(i.e. structural assembly annotation\) is Zm00001eb.1.</p>
+      <p>See the <a href="/nomenclature/maize_assembly_nomenclature_2016_update.pdf">2016 Whole-Genome Assembly and Annotation nomenclature document</a> for an explanation of the assembly and annotation identifiers, which was first adopted for the Zm-B73-REFERENCE-GRAMENE-4.0 / Zm00001d assembly and structural annotation and subsequent assemblies and annotation for B73 and other accessions.</p>
+      <p>The Zm00001eb.1 gene model set for Zm-B73-REFERENCE-NAM-5.0 is the current recommended set. Other gene model sets are provided for comparison.</p>
+    </div>
+
+    <div class="mgdb-table-scroll mgdb-spaced">
+      <table class="mgdb-table">
+        <caption>Gene model sets and assemblies</caption>
+        <thead>
+          <tr>
+            <th scope="col">set</th>
+            <th scope="col">assembly</th>
+            <th scope="col">Gramene/EnsemblPlant version</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Zm00001eb.1</th><td>Zm-B73-REFERENCE-NAM-5.0</td><td></td></tr>
+          <tr><th scope="row">Zm00001d.2</th><td>Zm-B73-REFERENCE-GRAMENE-4.0</td><td>36/54</td></tr>
+          <tr><th scope="row">Zm00001d.1</th><td>Zm-B73-REFERENCE-GRAMENE-4.0</td><td>32/50</td></tr>
+          <tr><th scope="row">5b+</th><td>B73 RefGen_v3</td><td>18/36 - 31/49</td></tr>
+          <tr><th scope="row">5b</th><td>B73 RefGen_v2</td><td>7/25 - 17/37</td></tr>
+          <tr><th scope="row">4a</th><td>B73 RefGen_v1</td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="mgdb-leaf-heading mgdb-spaced">Reference gene model releases</h3>
+    <div class="mgdb-prose gene-prose">
+      <p>Gene models for the B73 genome assembly are provided at both MaizeGDB and Gramene. <a href="/nomenclature/maize_assembly_nomenclature_2016_update.pdf">Nomenclature guidelines for gene models</a>, as agreed to by the maize research community, indicate that gene model sets are named with the associated assembly identifier. For the B73 reference genome, this is Zm0001d. Gramene, which manages these gene models uses a different versioning system.</p>
+      <p><b>Bold</b> font indicates the current official gene model set.</p>
+    </div>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table">
+        <caption>Reference gene model releases</caption>
+        <thead>
+          <tr>
+            <th scope="col">Version</th>
+            <th scope="col">Gramene Version</th>
+            <th scope="col">Date</th>
+            <th scope="col">Changes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row"><b>Zm00001eb.1</b></th><td></td><td><b>1/15/21</b></td><td></td></tr>
+          <tr><th scope="row">Zm00001e.1</th><td></td><td>1/9/20</td><td>NOTE: preliminary; withdrawn when Zm00001eb.1 was released</td></tr>
+          <tr><th scope="row"></th><td><a href="ftp://ftp.ensemblgenomes.org/pub/release-37/plants/gff3/zea_mays">v38/56 - v43/61</a></td><td>12/7/17 - 3/15/19</td><td>Changes limited to gene models outside the reference set \(ENSRNA, ncRNA, and inferred organelle gene models\)</td></tr>
+          <tr><th scope="row"></th><td><a href="ftp://ftp.ensemblgenomes.org/pub/release-37/plants/gff3/zea_mays">v37/55</a></td><td>09/21/17</td><td>3722 new non-coding gene models, using non-standard prefix, "ENSRNA"; 2318 ncRNA gene models have changed transcripts</td></tr>
+          <tr><th scope="row">Zm00001d.2</th><td><a href="ftp://ftp.ensemblgenomes.org/pub/release-36/plants/gff3/zea_mays">v36/54</a></td><td>06/07/17</td><td>transcripts changed for 28 miRNAs</td></tr>
+          <tr><th scope="row"></th><td><a href="ftp://ftp.ensemblgenomes.org/pub/release-35/plants/gff3/zea_mays">v35/53</a></td><td>04/02/17</td><td><a href="https://dx.doi.org/10.1038/nature22971">published in Nature</a>; transcripts changed for 547 gene models</td></tr>
+          <tr><th scope="row"></th><td><a href="ftp://ftp.ensemblgenomes.org/pub/release-34/plants/gff3/zea_mays">v34/52</a></td><td>12/14/16</td><td>transcripts changed for 28 miRNAs</td></tr>
+          <tr><th scope="row"></th><td><a href="ftp://ftp.ensemblgenomes.org/pub/release-33/plants/gff3/zea_mays">v33/51</a></td><td></td><td>174 Mt and Pt gene models added, transcripts changed for 3127 gene models</td></tr>
+          <tr><th scope="row">Zm00001d.1</th><td><a href="ftp://ftp.ensemblgenomes.org/pub/release-32/plants/gff3/zea_mays">v32/50</a></td><td>09/28/16</td><td>inital release</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mgdb-prose gene-prose mgdb-spaced">
+      <p>To ensure consistency across genomes and to better enable pan-genome analyses, MaizeGDB is the single naming authority for the assignment of identifiers for genome assemblies and annotations.</p>
+      <p>A quick explanation of assembly and annotation identifiers is <a href="/nomenclature_summary">here</a>.<br />The full, detailed document describing the maize assembly and annotation nomenclature can be downloaded <a href="https://documents.maizegdb.org/nomenclature/maize_assembly_nomenclature_2021.pdf">here</a><br />and the complete maize nomenclature guidelines, including for loci, is <a href="/nomenclature">here</a>.</p>
+    </div>
+
+    <h3 class="mgdb-leaf-heading mgdb-spaced">Gene model terms</h3>
+    <div class="gene-definition-list">
+      <details class="gene-definition">
+        <summary>What is a gene?</summary>
+        <div class="gene-definition-body">
+          <p>A gene is a stretch of DNA sequence, a seqment of which is regularly or conditionally transcribed at some time in an organism. The DNA is understood to include not only the exons and introns of the structural gene but the cis 5' and 3' regions in which a sequence change can affect gene expression.</p>
+        </div>
+      </details>
+
+      <details class="gene-definition">
+        <summary>What is a gene model?</summary>
+        <div class="gene-definition-body">
+          <p>A Gene Model is a representation of an mRNA transcript of a gene that contains information about features of the transcript such as exon-intron boundaries, splice sites, UTRs, etc. Due to alternative splicing of mRNA transcripts, there may be more than one gene model for any given gene.</p>
+        </div>
+      </details>
+
+      <details class="gene-definition">
+        <summary>Associated Genes</summary>
+        <div class="gene-definition-body">
+          <p>Associated Genes are genes that have been linked to a gene model by hand curation.</p>
+        </div>
+      </details>
+
+      <details class="gene-definition">
+        <summary>Canonical</summary>
+        <div class="gene-definition-body">
+          <p>The canonical transcript is defined as either the longest CDS, if the gene has translated transcripts, or the longest cDNA. Note: a canonical transcript is not always the first transcript \(T01\) or the longest transcript.</p>
+          <p><b>Non-canonical.</b> All other transcripts for a gene model that are not the canonical transcript.</p>
+        </div>
+      </details>
+
+      <details class="gene-definition">
+        <summary>Evidence Type</summary>
+        <div class="gene-definition-body">
+          <p>The source of evidence to support the gene model.</p>
+        </div>
+      </details>
+
+      <details class="gene-definition">
+        <summary>Model Types</summary>
+        <div class="gene-definition-body">
+          <p><b>Protein Coding</b> A gene model with supporting evidence.</p>
+          <p><b>miRNA</b> small, non-coding RNA.</p>
+          <p><b>TE</b> Transposable elements.</p>
+          <p><b>Low Confidence</b> A gene model with little or no supporting evidence.</p>
+          <p><b>WGS</b>. \(Versions 5a.59 and earlier\) Working Gene Set. This set merges new annotations performed on RefGen_v2 with RefGen_v1 4a gene models mapped onto V2. New annotations were achieved by an evidence-based method \(Gramene GeneBuilder\) and complemented with de novo Fgenesh models performed on masked DNA.</p>
+          <p><b>FGS</b>: \(Versions 5b.60 and earlier\) Filtered Gene Set. The filtered set was generated by screening the working set to remove pseudogenes, TE-encoded genes, and low-confidence hypothetical models.</p>
+        </div>
+      </details>
+
+      <details class="gene-definition">
+        <summary>Transcript Classes</summary>
+        <div class="gene-definition-body">
+          <p><b>WH</b>. With homology to a known non-transposable element in the NR \(non-redundant\) database at GenBank. Protein-coding gene.</p>
+          <p><b>NH</b>. No homology in the NR \(non-redundant\) database at GenBank. Hypothetical gene or pseudogene.</p>
+          <p><b>TE</b>. With homology to a known transposable element \(TE\) in the NR \(non-redundant\) database at GenBank. Transposable element.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  
+
+  <!-- ==================================================================
+       8. Reference assembly
+       ================================================================== -->
+  <section id="gene-about" aria-labelledby="gene-about-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="gene-about-title">About</h2></div>
+    </div>
+
+    <div class="mgdb-prose gene-prose">
+      <p>In-depth metadata for Zm-B73-REFERENCE-NAM-5.0 is available <a href="/genome/assembly/Zm-B73-REFERENCE-NAM-5.0">here</a>.</p>
+      <p>See the paper for B73 RefGen_v1 <a href="http://dx.doi.org/10.1126/science.1178534">here</a>, and for Zm-B73-REFERENCE-GRAMENE-4.0 <a href="http://dx.doi.org/10.1038/nature22971">here</a>.</p>
+      <p><b>Annotations:</b> <a href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0">Zm00001eb.1</a> &middot; <a href="https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Zea_mays/103">NCBI 103</a></p>
+    </div>
+
+    <div class="mgdb-table-scroll mgdb-spaced">
+      <table class="mgdb-table" data-sortable>
+        <caption>Counts for each chromosome.</caption>
+        <thead>
+          <tr>
+            <th scope="col" data-sort="text"><button type="button">Chromosome</button></th>
+            <th scope="col" data-sort="text"><button type="button">Accession</button></th>
+            <th scope="col" data-sort="number" class="mgdb-numeric"><button type="button">Length</button></th>
+            <th scope="col" data-sort="number" class="mgdb-numeric"><button type="button">Protein Coding</button></th>
+            <th scope="col" data-sort="number" class="mgdb-numeric"><button type="button">Transposable Element</button></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Chromosome 1</th><td><a href="http://www.ncbi.nlm.nih.gov/nuccore/LR618874.1">LR618874.1</a></td><td class="mgdb-numeric" data-value="308452471">308,452,471</td><td class="mgdb-numeric" data-value="5892">5892</td><td class="mgdb-numeric" data-value="227345">227,345</td></tr>
+          <tr><th scope="row">Chromosome 2</th><td><a href="http://www.ncbi.nlm.nih.gov/nuccore/LR618875.1">LR618875.1</a></td><td class="mgdb-numeric" data-value="243675191">243,675,191</td><td class="mgdb-numeric" data-value="4751">4751</td><td class="mgdb-numeric" data-value="176504">176,504</td></tr>
+          <tr><th scope="row">Chromosome 3</th><td><a href="http://www.ncbi.nlm.nih.gov/nuccore/LR618876.1">LR618876.1</a></td><td class="mgdb-numeric" data-value="238017767">238,017,767</td><td class="mgdb-numeric" data-value="4103">4103</td><td class="mgdb-numeric" data-value="173251">173,251</td></tr>
+          <tr><th scope="row">Chromosome 4</th><td><a href="http://www.ncbi.nlm.nih.gov/nuccore/LR618877.1">LR618877.1</a></td><td class="mgdb-numeric" data-value="250330460">250,330,460</td><td class="mgdb-numeric" data-value="4093">4093</td><td class="mgdb-numeric" data-value="183689">183,689</td></tr>
+          <tr><th scope="row">Chromosome 5</th><td><a href="http://www.ncbi.nlm.nih.gov/nuccore/LR618878.1">LR618878.1</a></td><td class="mgdb-numeric" data-value="226353449">226,353,449</td><td class="mgdb-numeric" data-value="4485">4485</td><td class="mgdb-numeric" data-value="160922">160,922</td></tr>
+          <tr><th scope="row">Chromosome 6</th><td><a href="http://www.ncbi.nlm.nih.gov/nuccore/LR618879.1">LR618879.1</a></td><td class="mgdb-numeric" data-value="181357234">181,357,234</td><td class="mgdb-numeric" data-value="3412">3412</td><td class="mgdb-numeric" data-value="129220">129,220</td></tr>
+          <tr><th scope="row">Chromosome 7</th><td><a href="http://www.ncbi.nlm.nih.gov/nuccore/LR618880.1">LR618880.1</a></td><td class="mgdb-numeric" data-value="185808916">185,808,916</td><td class="mgdb-numeric" data-value="3070">3070</td><td class="mgdb-numeric" data-value="141993">141,993</td></tr>
+          <tr><th scope="row">Chromosome 8</th><td><a href="http://www.ncbi.nlm.nih.gov/nuccore/LR618881.1">LR618881.1</a></td><td class="mgdb-numeric" data-value="182411202">182,411,202</td><td class="mgdb-numeric" data-value="3536">3536</td><td class="mgdb-numeric" data-value="130992">130,992</td></tr>
+          <tr><th scope="row">Chromosome 9</th><td><a href="http://www.ncbi.nlm.nih.gov/nuccore/LR618882.1">LR618882.1</a></td><td class="mgdb-numeric" data-value="163004744">163,004,744</td><td class="mgdb-numeric" data-value="2988">2988</td><td class="mgdb-numeric" data-value="117200">117,200</td></tr>
+          <tr><th scope="row">Chromosome 10</th><td><a href="http://www.ncbi.nlm.nih.gov/nuccore/LR618883.1">LR618883.1</a></td><td class="mgdb-numeric" data-value="152435371">152,435,371</td><td class="mgdb-numeric" data-value="2705">2705</td><td class="mgdb-numeric" data-value="112766">112,766</td></tr>
+          <tr><th scope="row">Unmapped</th><td></td><td class="mgdb-numeric"></td><td class="mgdb-numeric" data-value="5892">5892</td><td class="mgdb-numeric" data-value="23216">23,216</td></tr>
+          <tr><th scope="row">Nuclear Total</th><td></td><td class="mgdb-numeric" data-value="2182000">~2,182,000</td><td class="mgdb-numeric" data-value="39756">39,756</td><td class="mgdb-numeric" data-value="1577104">1,577,104</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mgdb-table-scroll mgdb-spaced">
+      <table class="mgdb-table gene-stats-table">
+        <caption>Zm-B73-REFERENCE-NAM-5.0/Zm00001eb.1 Stats</caption>
+        <thead>
+          <tr><th scope="col">Gene Feature</th><th scope="col">Value</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Average protein-coding transcript size</th><td>5376 bp</td></tr>
+          <tr><th scope="row">Longest transcript:</th><td>745,091 bp \(Zm00001eb334630_T004\)</td></tr>
+          <tr><th scope="row">Average low confidence transcript size</th><td></td></tr>
+          <tr><th scope="row">Average transposable element size</th><td>1638 bp</td></tr>
+          <tr><th scope="row">Average Exon size</th><td>290 bp</td></tr>
+          <tr><th scope="row">Average Number of exons per gene</th><td>6 exons</td></tr>
+          <tr><th scope="row">Maximum exons per gene</th><td>80 exons \(Zm00001eb126710_T002\)</td></tr>
+          <tr><th scope="row">Average Intron size</th><td>578 bp</td></tr>
+          <tr><th scope="row">Average Coding region size</th><td>1816 bp</td></tr>
+          <tr><th scope="row">Average 5' UTR average length</th><td>n/a</td></tr>
+          <tr><th scope="row">Average 3' UTR average length</th><td>n/a</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="mgdb-leaf-heading mgdb-spaced">NCBI annotation releases</h3>
+    <div class="mgdb-prose gene-prose">
+      <p>The <a href="http://www.ncbi.nlm.nih.gov/genome/annotation_euk/Zea_mays/103">NCBI B73_v5 annotation release 103</a> for B73 v5 assembly, the <a href="http://www.ncbi.nlm.nih.gov/genome/annotation_euk/Zea_mays/101">NCBI B73_v4 annotation release 101</a> and <a href="http://www.ncbi.nlm.nih.gov/genome/annotation_euk/Zea_mays/102">NCBI B73_v4 annotation release 102</a> for the B73 v4 assembly, and the <a href="http://www.ncbi.nlm.nih.gov/genome/annotation_euk/Zea_mays/100">NCBI B73_v3 annotation release 100</a> were developed at NCBI using the <a href="http://www.ncbi.nlm.nih.gov/genome/annotation_euk/process/">NCBI Eukaryotic Genome Annotation Pipeline</a>. The final set of annotated features comprises, in order of preference, pre-existing <a href="http://www.ncbi.nlm.nih.gov/refseq/about/">RefSeq</a> sequences and a subset of well-supported <a href="http://www.ncbi.nlm.nih.gov/genome/guide/gnomon.shtml">Gnomon-predicted</a> models. It is built by evaluating together at each locus the known RefSeq transcripts, the features projected from curated RefSeq genomic alignments and the models predicted by Gnomon.</p>
+    </div>
+
+    <h3 class="mgdb-leaf-heading mgdb-spaced">Gene model issues</h3>
+    <div class="gene-panel">
+      <!-- These two pointed at /curation/GenomeIssue/edit and
+           /curation/GeneModelIssue/edit, which answer with a curator login and
+           the note that new annotation accounts are not being accepted — a wall
+           no reader of this page can pass. They now open the same collector the
+           legacy shell opened from `.trigger_gene_model_issue_form`, which is
+           where these reports were meant to land. -->
+      <p>We need your help! <a class="trigger_gene_model_issue_form" data-mgdb-feedback="gene_model" href="/feedback?kind=gene_model"><b>Please report any assembly or gene model structure problems</b></a>. This includes misassembled regions, evidence for closing gaps, gene models that should be merged or split, evidence supporting low-confidence gene models, et cetera. All issues will be shared with the maize community and with the team charged with improving the B73 assembly and gene models.</p>
+      <ul class="gene-link-list">
+        <li><a class="trigger_gene_model_issue_form" data-mgdb-feedback="gene_model" href="/feedback?kind=gene_model">Report a gene model error</a></li>
+        <li><a href="/curation/geneModelIssues?status=open">All gene model issues</a></li>
+        <li><a href="/curation/assemblyIssues?status=open">All assembly issues</a></li>
+      </ul>
+    </div>
+  </section>
+
+  
+
+  
+
+  
+
+  <!-- ==================================================================
+       7. References
+       ================================================================== -->
+  <section id="gene-references" aria-labelledby="gene-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="gene-references-title">References</h2></div>
+    </div>
+
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       12. Metrics
+       ================================================================== -->
+  <section id="gene-metrics" aria-labelledby="gene-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="gene-metrics-title">Metrics</h2></div>
+    </div>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric mgdb-tone-green">
+        <span class="mgdb-metric-icon" aria-hidden="true">GM</span>
+        <div><strong class="mgdb-metric-value">$(total_gene_models)</strong><h3>Gene models</h3><p>Across every annotation currently loaded.</p></div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-amber">
+        <span class="mgdb-metric-icon" aria-hidden="true">An</span>
+        <div><strong class="mgdb-metric-value">$(total_annotations)</strong><h3>Annotations</h3><p>Structural annotations of $(total_lines) maize lines.</p></div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-blue">
+        <span class="mgdb-metric-icon" aria-hidden="true">B73</span>
+        <div><strong class="mgdb-metric-value">$(reference_models)</strong><h3>B73 reference models</h3><p>Gene models in $(reference_annotation), the recommended set.</p></div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-burgundy">
+        <span class="mgdb-metric-icon" aria-hidden="true">Loc</span>
+        <div><strong class="mgdb-metric-value">$(curated_loci)</strong><h3>Curated loci</h3><p>Gene loci linked to at least one gene model.</p></div>
+      </article>
+    </div>
+
+    <h3 class="mgdb-leaf-heading mgdb-spaced">Gene models by annotation</h3>
+    <figure class="mgdb-figure">
+      <div class="mgdb-chart mgdb-chart-tall" id="gene-annotation-chart" role="img" aria-label="Horizontal bar chart of gene model counts in each current maize annotation, from the largest to the smallest">
+        <span class="mgdb-chart-fallback">Loading annotation counts&hellip;</span>
+      </div>
+      <figcaption>$(annotation_note)</figcaption>
+      <details class="mgdb-chart-data">
+        <summary>View the data behind this chart</summary>
+        <div class="mgdb-table-scroll">
+          <table class="mgdb-table" id="gene-annotation-table" data-sortable>
+            <caption>Gene models in each current annotation</caption>
+            <thead>
+              <tr>
+                <th scope="col" data-sort="text"><button type="button">Annotation</button></th>
+                <th scope="col" data-sort="text"><button type="button">Line</button></th>
+                <th scope="col" data-sort="number" class="mgdb-numeric"><button type="button">Gene models</button></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </details>
+    </figure>
+
+    <h3 class="mgdb-leaf-heading mgdb-spaced">The B73 reference annotation</h3>
+    <figure class="mgdb-figure">
+      <div class="mgdb-chart" id="gene-chromosome-chart" role="img" aria-label="Stacked bar chart of Zm00001eb.1 gene model counts on each chromosome, split by model type">
+        <span class="mgdb-chart-fallback">Loading chromosome distribution&hellip;</span>
+      </div>
+      <figcaption>$(chromosome_note)</figcaption>
+      <details class="mgdb-chart-data">
+        <summary>View the data behind this chart</summary>
+        <div class="mgdb-table-scroll">
+          <table class="mgdb-table" id="gene-chromosome-table">
+            <caption>Zm00001eb.1 gene models by chromosome and model type</caption>
+            <thead><tr></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </details>
+    </figure>
+
+    <figure class="mgdb-figure mgdb-spaced">
+      <div class="mgdb-chart" id="gene-transcript-chart" role="img" aria-label="Bar chart of the number of Zm00001eb.1 gene models against how many transcripts each one has">
+        <span class="mgdb-chart-fallback">Loading transcript distribution&hellip;</span>
+      </div>
+      <figcaption>$(transcript_note)</figcaption>
+      <details class="mgdb-chart-data">
+        <summary>View the data behind this chart</summary>
+        <div class="mgdb-table-scroll">
+          <table class="mgdb-table" id="gene-transcript-table">
+            <caption>Zm00001eb.1 gene models by transcript count</caption>
+            <thead><tr><th scope="col">Transcripts</th><th scope="col" class="mgdb-numeric">Gene models</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </details>
+    </figure>
+  </section>
+
+  <!-- ==================================================================
+       13. Other resources
+       ================================================================== -->
+  <section id="gene-related" class="mgdb-hub-related" aria-labelledby="gene-related-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="gene-related-title">Related resources</h2>
+      </div>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/genome/genomebrowser">
+          <strong>Genome browser</strong>
+          <span>JBrowse tracks for gene models on every assembly</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/pan_gene_center/pan_gene">
+          <strong>Pan-Gene Data Hub</strong>
+          <span>These same gene models grouped across assemblies</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Locus Data Hub</strong>
+          <span>Classic genetic loci, alleles, and the phenotypes they carry</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/expression">
+          <strong>Expression Data Hub</strong>
+          <span>Expression atlases and qTeller comparisons for these models</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="https://maizemine.rnet.missouri.edu/maizemine/begin.do" target="_blank" rel="noopener">
+          <strong>MaizeMine</strong>
+          <span>Build a gene model list and attach expression, pathway, and GO data</span>
+          <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <script id="gene-annotation-data" type="application/json">$(annotation_data)</script>
+  <script id="gene-chromosome-data" type="application/json">$(chromosome_data)</script>
+  <script id="gene-transcript-data" type="application/json">$(transcript_data)</script>
+
+</main>
+)

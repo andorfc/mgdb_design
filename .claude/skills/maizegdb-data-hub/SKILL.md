@@ -251,6 +251,20 @@ nothing else goes wrong visibly.
   database; if the hub only wants stocks, push `EXISTS (SELECT 1 FROM <entity>
   WHERE id = ...)` into the scan rather than leaving it to a later join. On one
   hub `ext_db_key` was 0.8% stocks and the broadest term went 4,787 -> 1,995 ms.
+- **A criteria list built as flex rows never lines up.** `checkbox + label +
+  control` in a flex row puts every control wherever its label happens to end
+  — one advanced search had ten criteria starting at nine different left edges.
+  Make it a three-column grid (checkbox, label, control) with a label column
+  wide enough for the longest label, and put any row that carries two controls
+  in a nested flex row inside the third column. If one label is far longer than
+  the rest, look at whether its tail is really a hint about the field rather
+  than part of the label.
+- **Measure every form on the page, not the search box.** Open every
+  `<details>` first, then per form check: one left edge for the controls that
+  start a row, one right edge for the controls that fill a row, and one height
+  for every input, select and button. Then repeat at 375, where the failure is
+  usually that buttons keep their intrinsic width under a full-width input and
+  a select in an uncollapsed grid stops short of the field above it.
 - **Enumerate `[id]` and look for duplicates before trusting the tab bar.** A
   section id and a form control shared a name on one hub, so
   `querySelector('#x')` returned the control and the tab scrolled to the wrong

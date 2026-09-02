@@ -1293,6 +1293,90 @@ appear at all. Deleting `controllers/genome2.php` outright would drop the row
 and make the route 404; the redirect was judged worth more than the tidier
 count.
 
+## The Gene Data Hub on the shell
+
+`/gene_center/gene`, the site's second most requested page and the largest of
+the hubs: nine forms, three figures, 195 KB of markup. Tabs: Search, Sequence
+and region, Gene model lists, Downloads, Nomenclature, About, References,
+Metrics, Related resources. Files:
+`controllers/gene_center/gene_search_modern.php`,
+`include/gene_hub_lib.php`, `templates/static/mgdb_gene.bau`,
+`css/mgdb-gene.css`, `js/mgdb-gene.js`.
+
+The page was already modern — its own sheet, its own tab rail, four metric
+cards, no eyebrows — but not on the shell, with no References and no
+Related-resources panel. Cold build is still the documented 12 s (the 1.88M
+row aggregate behind the annotation chart); warm is **105–117 ms**.
+
+### Thirteen sections into nine
+
+| Was | Now |
+| --- | --- |
+| Search | **Search** |
+| Sequence search · Search by region | **Sequence and region** |
+| Gene model lists | **Gene model lists** |
+| Downloads | **Downloads** |
+| Nomenclature · Gene model terms | **Nomenclature** |
+| Reference assembly and annotation · Gene model issues | **About** |
+| — | **References** |
+| Gene models by annotation · The B73 reference annotation · Metrics | **Metrics** |
+| Other resources (10 links) | **Related resources** (5, badged) |
+
+The three figures moved under Metrics, which is where the shell puts them.
+Every merged block kept its markup intact, so the nine form endpoints and
+every id the page script hooks are untouched — verified by driving the page
+afterwards.
+
+### The advanced criteria started at nine different left edges
+
+`.gene-criterion` was a flex row of checkbox, label and control, so **every
+control began wherever its label happened to end**: 194, 262, 264, 295, 341,
+350, 359, 585. Ten criteria, nine left edges, and the eye has nothing to
+follow down the form.
+
+It is a three-column grid now — checkbox, label, control — with the label
+column wide enough (21rem) that the longest label still fits on one line.
+Measured after: **every label at x=102, every control at x=446, every control
+44px**. Two rows carry more than one control ("between these positions", and
+the protein accession with its format hint) and those keep them in a nested
+flex row inside the third column, so they start at the same x as every select.
+
+The protein row's label was the reason a fixed column looked impossible — it
+ran to 475px because it carried "(UniProt, PFam, EC)". That parenthetical is
+a hint about the field, not part of the label, and it now sits beside the
+input where hints belong.
+
+### Nine tabs wrap to four rows on a phone
+
+Measured: one row (57px) down to somewhere in 1101–1200, two rows (105px)
+down to 768, three at 520, and **four rows — 201px, a quarter of the
+viewport — at 375**, permanently sticky. Below 767px the bar becomes a single
+scrolling row instead, which is the pattern the other long-barred hubs use,
+so the ladder is 65px above 1200, 113px from 1200 to 768, and 65px below.
+Every jump clears by exactly 8px at 1280, 1000, 760 and 375.
+
+### Verified
+
+9/9 distinct section edge colours, no rule under a section title, five
+reference cards, no duplicate `id`, all nine nav labels matching their `<h2>`,
+all three figures drawn, four equal-height metric cards, and no horizontal
+overflow at 375.
+
+**Every form on the page, measured with all `<details>` open** — at 1280 each
+form's controls share one left edge, its full-width controls share one right
+edge, and every input, select and button is 44px tall; at 375 the four search
+controls are the same width, left edge and right edge, and nothing overflows.
+The one defect that pass found was the search line at 375, where the submit
+and reset kept their intrinsic widths under a full-width input and the
+options select stopped 13px short of the query field; both are fixed.
+
+Function was checked with a stubbed `fetch`: the main search and the example
+chips call `gene_search_api.php?term=…&limit=100`, the advanced form adds
+`mode=advanced` and its `use_*` flags, the three region radios switch both the
+visible field group and the form's action between `gene_chr_position.php`,
+`gene_marker_position.php` and `gene_gm_position.php`, and all six tool forms
+still point at their own endpoints.
+
 ## The Data Hub directory
 
 `/data_center/` on the shell. Tabs: Search, Guided paths, About, References,

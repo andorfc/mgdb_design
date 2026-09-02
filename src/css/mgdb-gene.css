@@ -1,0 +1,618 @@
+/* file: mgdb-gene.css
+ *
+ * purpose: page furniture for the Gene Data Hub (/gene_center/gene).
+ *
+ * Only what the shared stylesheet does not already provide. Every selector is
+ * scoped to .mgdb-gene-page, and every descendant of a page-scope class uses >
+ * so a bare element rule cannot reach into a shared component nested inside.
+ */
+
+/* --------------------------------------------------------------------------
+   Search
+   -------------------------------------------------------------------------- */
+
+/* ── Hero emblem and sticky section tabs ─────────────────────────────────── */
+
+.mgdb-gene-page .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-gene-page .mgdb-hero-emblem img {
+  display: block;
+  width: min(100%, 76px);
+  height: auto;
+  margin: 0;
+}
+
+/* Thirteen destinations used to need a horizontally scrolling rail. Nine wrap
+   into the shared bar, which shows every destination at once rather than
+   hiding some off the end of a rail. */
+.mgdb-gene-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-5);
+}
+
+.mgdb-gene-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.mgdb-gene-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
+
+.mgdb-gene-page .mgdb-section-tabs a.is-current,
+.mgdb-gene-page .mgdb-section-tabs a[aria-current="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+/* Nine labels wrap to four rows at 375px -- a 201px sticky bar, a quarter of a
+   phone screen, permanently. Below 767px the bar becomes one scrolling row
+   instead, which is the pattern the other long-barred hubs use. */
+@media (max-width: 767px) {
+  .mgdb-gene-page .mgdb-section-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mgdb-gene-page .mgdb-section-tabs a {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+}
+
+/* The offset ladder is set from the measured bar height, not the tab count.
+   Measured by resizing the real page: one row (57px) down to somewhere in
+   1101-1200, two rows (105px) from there to 768, and one scrolling row (57px)
+   below that. Each band takes the larger of the two heights it could straddle,
+   so a boundary errs towards dead space and never towards a heading hidden
+   behind the bar. Above 1200 the shell's own 65px is already right. */
+@media (max-width: 1200px) and (min-width: 768px) {
+  .mgdb-hub-page.mgdb-gene-page > section[id] { scroll-margin-top: 113px; }
+}
+
+@media (max-width: 767px) {
+  .mgdb-hub-page.mgdb-gene-page > section[id] { scroll-margin-top: 65px; }
+}
+
+.mgdb-gene-page .gene-section-lead {
+  max-width: 62rem;
+  margin: 0 0 1.1rem;
+  color: var(--mgdb-muted);
+}
+
+/* ── The main search form ────────────────────────────────────────────────── */
+
+.mgdb-gene-page .gene-search-intro { margin-bottom: 1.2rem; }
+
+.mgdb-gene-page .gene-search-intro > div { max-width: 48rem; }
+
+.mgdb-gene-page .gene-search-intro h3 {
+  margin: 0.25rem 0 0.45rem;
+  color: var(--mgdb-green-dark);
+  font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+}
+
+.mgdb-gene-page .gene-search-intro p {
+  margin: 0;
+  color: var(--mgdb-muted);
+}
+
+/* The control line. The buttons sit in the same flex row as the input rather
+   than in a form-actions block below it, so they share the input's baseline by
+   construction and the line ends flush with the form. */
+.mgdb-gene-page .gene-query-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.mgdb-gene-page .gene-query-line .mgdb-input {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.mgdb-gene-page .gene-query-field { min-width: 0; }
+
+.mgdb-gene-page .gene-search-submit,
+.mgdb-gene-page .gene-search-reset {
+  min-height: var(--mgdb-tap-target);
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+/* Plain fields on one grid, tops aligned. The stacking margin mgdb-modern.css
+   puts on a second .mgdb-field is zeroed: margins do not collapse between grid
+   items, so it would push a second column down and the labels would not line
+   up. */
+.mgdb-gene-page .gene-search-options {
+  display: grid;
+  grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
+  align-items: start;
+  gap: 0.9rem 0.8rem;
+  margin-top: 1.1rem;
+}
+
+.mgdb-gene-page .gene-search-options > .mgdb-field { margin: 0; }
+
+@media (max-width: 640px) {
+  /* One column, and both buttons full width. Left at their intrinsic sizes
+     they read as two stubs under a full-width input, and the options select
+     stopped 13px short of the query field's right edge. */
+  .mgdb-gene-page .gene-search-options { grid-template-columns: 1fr; }
+
+  .mgdb-gene-page .gene-search-submit,
+  .mgdb-gene-page .gene-search-reset { width: 100%; }
+}
+
+.mgdb-gene-page .gene-search-options .mgdb-select,
+.mgdb-gene-page .gene-search-options .mgdb-input { width: 100%; }
+
+.mgdb-gene-page .gene-field-narrow { max-width: 16rem; }
+
+.mgdb-gene-page .gene-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-top: var(--mgdb-space-3);
+}
+
+.mgdb-gene-page .gene-example {
+  padding: 2px 8px;
+  border: 1px solid #cfe3d6;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xs);
+  cursor: pointer;
+}
+
+.mgdb-gene-page .gene-example:hover {
+  border-color: var(--mgdb-green-dark);
+  background: #ffffff;
+}
+
+.mgdb-gene-page .gene-results-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-gene-page #gene-results-status {
+  margin: 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* Result groups ----------------------------------------------------------- */
+
+.mgdb-gene-page .gene-result-group { margin-top: var(--mgdb-space-5); }
+
+.mgdb-gene-page .gene-result-group > h3 {
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+}
+
+.mgdb-gene-page .gene-model-id {
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-sm);
+  white-space: nowrap;
+}
+
+.mgdb-gene-page .gene-coords {
+  color: var(--mgdb-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   Advanced search
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-page .gene-advanced {
+  margin-top: var(--mgdb-space-6);
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-gene-page .gene-advanced > summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.mgdb-gene-page .gene-advanced > summary .gene-advanced-title {
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+}
+
+.mgdb-gene-page .gene-advanced-intro,
+.mgdb-gene-page .gene-advanced-lead {
+  max-width: var(--mgdb-measure);
+  margin: var(--mgdb-space-3) 0 0;
+  color: var(--mgdb-ink-soft);
+}
+
+.mgdb-gene-page .gene-advanced-lead { font-weight: 700; }
+
+/* Three columns -- checkbox, label, control -- rather than a flex row. As a
+   flex row every control began wherever its label happened to end, so the ten
+   criteria started at nine different left edges (194, 262, 264, 295, 341, 350,
+   359, 585 ...). A fixed label column lines them all up, and it is wide enough
+   for the longest label so none of them wraps. */
+.mgdb-gene-page .gene-criterion {
+  display: grid;
+  grid-template-columns: auto minmax(0, 21rem) minmax(0, 1fr);
+  gap: 0 var(--mgdb-space-2);
+  align-items: center;
+  padding: var(--mgdb-space-2) 0;
+  border-bottom: 1px solid var(--mgdb-line-soft);
+}
+
+/* The two rows that carry more than one control keep them in one cell. */
+.mgdb-gene-page .gene-criterion-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+}
+
+.mgdb-gene-page .gene-criterion:last-of-type { border-bottom: 0; }
+
+.mgdb-gene-page .gene-criterion > label { color: var(--mgdb-ink); }
+
+.mgdb-gene-page .gene-criterion > select,
+.mgdb-gene-page .gene-criterion > .gene-criterion-controls { width: 100%; }
+
+.mgdb-gene-page .gene-criterion > select { max-width: 26rem; }
+
+.mgdb-gene-page .gene-criterion-join { color: var(--mgdb-muted); }
+
+.mgdb-gene-page .gene-input-short { max-width: 9rem; }
+.mgdb-gene-page .gene-input-medium { max-width: 14rem; }
+
+/* --------------------------------------------------------------------------
+   Tool panels
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-page .gene-panel {
+  /* A code block or a long unbroken identifier inside a grid item sets the
+     item's min-content width unless the floor comes off. See the download page
+     note in the pattern library. */
+  min-width: 0;
+  margin-top: var(--mgdb-space-4);
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-sm);
+  overflow-wrap: anywhere;
+}
+
+.mgdb-gene-page .gene-panel > h3 { margin-top: 0; }
+
+.mgdb-gene-page .gene-panel-lead {
+  max-width: var(--mgdb-measure);
+  margin: 0 0 var(--mgdb-space-4);
+  color: var(--mgdb-ink-soft);
+}
+
+.mgdb-gene-page .gene-panel .mgdb-field + .mgdb-field { margin-top: var(--mgdb-space-4); }
+
+/* The tools vary greatly in height. A row-based grid left several hundred
+   pixels of dead space below each short form while its taller neighbor set the
+   row height. Balanced columns keep the same two-column working surface
+   without separating related controls from their action buttons. */
+.mgdb-gene-page .gene-tool-grid {
+  columns: 2 28rem;
+  column-gap: var(--mgdb-space-4);
+}
+
+.mgdb-gene-page .gene-tool-grid > .gene-panel {
+  width: 100%;
+  margin: 0 0 var(--mgdb-space-4);
+  break-inside: avoid;
+}
+
+.mgdb-gene-page .gene-radio-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+  align-items: center;
+  min-height: var(--mgdb-tap-target);
+}
+
+.mgdb-gene-page .gene-radio-row > label {
+  display: inline-flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+}
+
+/* Search by region -------------------------------------------------------- */
+
+.mgdb-gene-page .gene-fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.mgdb-gene-page .gene-fieldset > legend {
+  padding: 0;
+  color: var(--mgdb-ink);
+  font-weight: 700;
+}
+
+.mgdb-gene-page .gene-region-choice {
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-4);
+  border-top: 1px solid var(--mgdb-line-soft);
+}
+
+.mgdb-gene-page .gene-region-radio {
+  display: inline-flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  font-weight: 700;
+}
+
+.mgdb-gene-page .gene-region-fields {
+  margin-top: var(--mgdb-space-3);
+  padding-left: var(--mgdb-space-5);
+  border-left: 3px solid var(--mgdb-green-soft);
+}
+
+/* The three radio labels describe the available routes. Once JavaScript marks
+   the inactive branches, hide their large control groups so the form shows one
+   task at a time. Without JavaScript all three remain visible and usable. */
+.mgdb-gene-page .gene-region-fields.is-inactive {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   Content furniture
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-page .gene-link-list {
+  margin: var(--mgdb-space-2) 0 0;
+  padding-left: var(--mgdb-space-5);
+}
+
+.mgdb-gene-page .gene-link-list > li { margin-bottom: var(--mgdb-space-2); }
+
+.mgdb-gene-page .gene-details {
+  margin: var(--mgdb-space-3) 0;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-gene-page .gene-details > summary {
+  cursor: pointer;
+  color: var(--mgdb-green-dark);
+  font-weight: 700;
+}
+
+.mgdb-gene-page .gene-details > p { max-width: var(--mgdb-measure); }
+
+.mgdb-gene-page .gene-prose { max-width: var(--mgdb-measure); }
+
+.mgdb-gene-page .gene-indent {
+  margin-left: var(--mgdb-space-5);
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-gene-page .gene-download-grid { align-items: stretch; }
+
+.mgdb-gene-page .gene-download-grid > .mgdb-card {
+  min-width: 0;
+  height: 100%;
+  overflow-wrap: anywhere;
+}
+
+/* Long definitions made seven unrelated card sizes. A compact disclosure
+   list preserves the exact scientific wording while presenting every term as
+   the same easy-to-scan control. */
+.mgdb-gene-page .gene-definition-list {
+  columns: 2 24rem;
+  column-gap: var(--mgdb-space-4);
+}
+
+.mgdb-gene-page .gene-definition {
+  margin: 0 0 var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-sm);
+  break-inside: avoid;
+}
+
+.mgdb-gene-page .gene-definition > summary {
+  position: relative;
+  min-height: var(--mgdb-tap-target);
+  padding: var(--mgdb-space-3) calc(var(--mgdb-space-5) + var(--mgdb-space-4)) var(--mgdb-space-3) var(--mgdb-space-4);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+
+.mgdb-gene-page .gene-definition > summary::-webkit-details-marker { display: none; }
+
+.mgdb-gene-page .gene-definition > summary:hover { background: var(--mgdb-surface-alt); }
+
+.mgdb-gene-page .gene-definition > summary::after {
+  position: absolute;
+  top: 50%;
+  right: var(--mgdb-space-4);
+  content: "+";
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xl);
+  line-height: 1;
+  transform: translateY(-50%);
+}
+
+.mgdb-gene-page .gene-definition[open] > summary {
+  border-bottom: 1px solid var(--mgdb-line-soft);
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-gene-page .gene-definition[open] > summary::after { content: "\2212"; }
+
+.mgdb-gene-page .gene-definition-body {
+  padding: var(--mgdb-space-4);
+  color: var(--mgdb-ink-soft);
+}
+
+.mgdb-gene-page .gene-definition-body > * + * { margin-top: var(--mgdb-space-3); }
+
+.mgdb-gene-page .gene-assoc-table { margin-top: var(--mgdb-space-3); }
+.mgdb-gene-page .gene-assoc-table td { white-space: nowrap; }
+
+.mgdb-gene-page input[type="file"] { max-width: 100%; }
+
+.mgdb-gene-page .gene-stats-table th[scope="row"] { font-weight: 400; }
+
+/* MaizeMine --------------------------------------------------------------- */
+
+.mgdb-gene-page .gene-maizemine {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 200px);
+  gap: var(--mgdb-space-5);
+  align-items: start;
+}
+
+.mgdb-gene-page .gene-maizemine p { max-width: var(--mgdb-measure); }
+
+.mgdb-gene-page .gene-maizemine-mark img {
+  width: 100%;
+  height: auto;
+  mix-blend-mode: multiply;
+}
+
+@media (max-width: 720px) {
+  .mgdb-gene-page .gene-maizemine { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-gene-page .gene-maizemine-mark { max-width: 200px; }
+}
+
+/* --------------------------------------------------------------------------
+   Other resources
+
+   Ten links in two rows of five. auto-fit with a 220px floor resolves to four
+   columns at this page width, which would leave a row of two.
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-page .gene-resource-list { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+
+@media (max-width: 1100px) {
+  .mgdb-gene-page .gene-resource-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 760px) {
+  .mgdb-gene-page .gene-resource-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 480px) {
+  .mgdb-gene-page .gene-resource-list { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 767px) {
+  .mgdb-gene-page .gene-field-narrow { max-width: none; }
+
+  .mgdb-gene-page .gene-panel {
+    padding: var(--mgdb-space-4);
+  }
+
+  .mgdb-gene-page .gene-tool-grid,
+  .mgdb-gene-page .gene-definition-list {
+    columns: 1;
+  }
+
+  .mgdb-gene-page .gene-region-fields {
+    padding-left: var(--mgdb-space-3);
+  }
+
+  .mgdb-gene-page .gene-criterion {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+  }
+
+  /* The control drops onto its own row under the label, spanning both columns
+     so it still starts at the row's left edge rather than under the label. */
+  .mgdb-gene-page .gene-criterion > select,
+  .mgdb-gene-page .gene-criterion > .gene-criterion-controls {
+    grid-column: 1 / -1;
+    max-width: none;
+    margin-top: var(--mgdb-space-2);
+  }
+
+  .mgdb-gene-page .gene-input-short,
+  .mgdb-gene-page .gene-input-medium {
+    max-width: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Anchored sections under the sticky tab bar
+
+   scroll-margin-top in the shared stylesheet only matches direct children of
+   .mgdb-page. The download and cross-reference sub-headings are nested, so
+   they need their own rule or they land behind the bar.
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-page #gene-xref,
+.mgdb-gene-page #gene-insertions,
+.mgdb-gene-page #gene-older { scroll-margin-top: 65px; }
+
+@media (max-width: 1200px) and (min-width: 768px) {
+  .mgdb-gene-page #gene-xref,
+  .mgdb-gene-page #gene-insertions,
+  .mgdb-gene-page #gene-older { scroll-margin-top: 113px; }
+}
+
+/* --------------------------------------------------------------------------
+   Chart height
+
+   .mgdb-chart in the shared stylesheet is a fixed 320px, 260px at narrow
+   widths, and .mgdb-chart-tall is not defined in any stylesheet -- so a chart
+   asking for more was drawn past the bottom of its own figure. The annotation
+   chart wants 860px for its 35 bars. js/mgdb-gene.js sets the height on the
+   element from the same variable it passes to Plotly; this lets that inline
+   height take effect.
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-page .mgdb-chart {
+  height: auto;
+  min-height: 320px;
+  overflow: visible;
+}
