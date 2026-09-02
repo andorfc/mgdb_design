@@ -1351,6 +1351,66 @@ normalises a DOI that arrives as a URL, and the file was added to
 `deploy/manifest.txt` — it had never been in it, so edits to it were not
 deployable.
 
+## The QTL Data Hub, split out from Loci
+
+`/data_center/qtl` joined the shell on 2026-09-02, and stopped sharing a
+navigation entry with the Locus hub at the same time.
+
+### They were one hub in the menu, not in the code
+
+The two pages have had their own controllers, templates, sheets and search
+libraries for a while. What still treated them as one thing was the **Data
+Centers menu in the header**, which carried a single entry —
+
+    Loci & QTL → /data_center/locus   "Locus records, including QTL."
+
+— so there was no way to reach the QTL hub from the site chrome at all. It is
+two entries now, `Loci` and `QTL`, each pointing at its own hub, and the same
+split is made in `tools/sitemap_data.py` and regenerated into the `/sitemap`
+partials. The site search already had a separate `qtl_exp` category, so nothing
+was needed there.
+
+**What is deliberately *not* split is the data.** QTL loci are a locus type —
+1,758 rows of `mgdb.locus` with `type = 25396`, alongside 686,356 Points and
+26,115 Genes — and the Locus hub still returns them. A reader who searches a
+QTL name there should find it. The QTL hub owns the *analyses*: 211 curated
+trait analyses over 62 traits and 58 experiments, which live in
+`mgdb.trait_analysis` and were never in the Locus hub's corpus.
+
+### The export handed back 200 of 211
+
+`format=tsv` set `$limit = QTL_MAX_RESULTS`, which is 200. The corpus is 211
+analyses, so "Download TSV" silently returned 200 of them — and would have gone
+on quietly truncating as the corpus grew. The export is the whole matched set
+now &#40;`LIMIT ALL`&#41;; verified at 211 records with 211 distinct ids.
+
+### Two pagination shapes
+
+This endpoint took `limit`/`offset`; every other hub's search takes
+`page`/`page_size`, which is what the shared results controls send. It now
+accepts both and reports both, so the page could get the standard
+10/25/50/all selector and real pagination without breaking any existing caller.
+
+### A freshness stamp with no data behind it
+
+The hero read `Updated: $(data_date)`, and `data_date` was `date('F j, Y')` —
+*today's date*, captured into the dashboard cache. So it displayed neither the
+data's age nor the current date, but the date the cache entry happened to be
+built, presented as though it meant something. Removed rather than replaced:
+there is no last-curated date available for this corpus, and no stamp is better
+than one that describes nothing.
+
+### The figure reuses a query the page already ran
+
+Same trick as the marker, phenotype and pan-gene hubs: the trait filter's option
+list is already a `GROUP BY` over the 211 analyses, which is exactly what an
+"analyses by trait" chart needs. The chart costs no query of its own. The tail
+is long — 52 of the 62 traits account for 84 analyses between them — so
+everything past the tenth is one bar, carrying no id so a click on it is inert.
+
+The corpus is small and the search was already fast &#40;12-16 ms&#41;, so there was no
+SQL work to do here beyond the export.
+
 ## The Stock Data Hub
 
 `/data_center/stock` joined the shell on 2026-09-02, finishing the partial

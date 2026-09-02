@@ -27,8 +27,14 @@ function qtlSummaryStats($DBConn) {
     );
 }
 
-function qtlTraitOptions($DBConn) {
-    $options = '<option value="">All traits</option>' . "\n";
+/* The trait census. One GROUP BY over the 211 curated analyses, run once
+   inside dashboardCache() and then reused by both the trait filter and the
+   figure -- the chart adds no query of its own.
+
+   Ordered by count, not by name: the filter list reads better with the traits
+   that actually carry analyses at the top, and the figure needs that order
+   anyway. */
+function qtlTraitRows($DBConn) {
     $sql = "
         SELECT t.id, t.name, COUNT(DISTINCT ta.id) AS count
         FROM mgdb.term t
@@ -36,15 +42,54 @@ function qtlTraitOptions($DBConn) {
         JOIN mgdb.id_num i ON i.id = ta.id
         WHERE i.curation_lvl = 0
         GROUP BY t.id, t.name
-        ORDER BY LOWER(t.name) ASC";
+        ORDER BY count DESC, LOWER(t.name) ASC";
     $stmt = make_query($DBConn, $sql);
+    $rows = array();
     while ($row = retrieve_row($stmt)) {
+        $rows[] = array(
+            'id'    => (int) $row['id'],
+            'name'  => (string) $row['name'],
+            'count' => (int) $row['count']
+        );
+    }
+    return $rows;
+}
+
+function qtlRenderTraitOptions($rows) {
+    $options = '<option value="">All traits</option>' . "\n";
+    foreach ($rows as $row) {
         $options .= '<option value="' . (int) $row['id'] . '">'
                  . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8')
-                 . ' (' . number_format((int) $row['count']) . ')'
+                 . ' (' . number_format($row['count']) . ')'
                  . "</option>\n";
     }
     return $options;
+}
+
+/* Figure payload, built from the list the trait filter already needed.
+   62 traits carry the 211 analyses, and the tail is long -- 52 of them account
+   for 84 analyses between them -- so everything past the tenth is rolled into
+   one bar. That bar carries no id, which is what stops a click on it from
+   filtering the search by a trait that does not exist. */
+function qtlTraitChartData($rows) {
+    $top  = array_slice($rows, 0, 10);
+    $rest = array_slice($rows, 10);
+
+    $bars = array();
+    foreach ($top as $row) {
+        $bars[] = array('id' => $row['id'], 'label' => $row['name'], 'count' => $row['count']);
+    }
+
+    if (count($rest) > 0) {
+        $tail = 0;
+        foreach ($rest as $row) {
+            $tail += $row['count'];
+        }
+        $bars[] = array('id' => 0, 'label' => count($rest) . ' other traits', 'count' => $tail);
+    }
+
+    return json_encode(array('traits' => count($rows), 'bars' => $bars),
+        JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 }
 
 function qtlParentOptions($DBConn) {
@@ -125,6 +170,10 @@ function qtlSearch($DBConn, $filters = array(), $limit = 50, $offset = 0) {
         return array('total' => 0, 'results' => array());
     }
 
+    /* A null limit means "every matching row" -- what the TSV export wants.
+       LIMIT ALL is the SQL spelling; an empty string would be a syntax error. */
+    $limitClause = ($limit === null) ? 'ALL' : (int) $limit;
+
     // Fetch IDs
     $idSql = "
         SELECT DISTINCT ta.id, ta.name
@@ -134,7 +183,7 @@ function qtlSearch($DBConn, $filters = array(), $limit = 50, $offset = 0) {
         LEFT JOIN mgdb.qtl_exp qe ON qe.id = ta.qtl_exp
         WHERE {$whereSql}
         ORDER BY ta.name ASC
-        LIMIT {$limit} OFFSET {$offset}";
+        LIMIT {$limitClause} OFFSET {$offset}";
     $idRows = get_all_rows(make_query($DBConn, $idSql, 1, $params));
     if (!$idRows) {
         return array('total' => $total, 'results' => array());

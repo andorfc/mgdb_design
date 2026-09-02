@@ -6,9 +6,9 @@ $$SYNTAX-LEVEL 2
 <meta property="og:title" content="MaizeGDB QTL Data Hub | Quantitative Trait Loci &amp; Mapping Experiments">
 <meta property="og:description" content="Explore maize quantitative trait loci \(QTLs\), mapping populations, agronomic trait evaluations, and LOD score analyses.">
 
-<main class="mgdb-page mgdb-qtl-page" id="qtl-top">
+<main class="mgdb-page mgdb-hub-page mgdb-qtl-page" id="qtl-top">
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
-    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">QTLs</span>
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">QTLs</span>
   </nav>
 
   <section class="mgdb-hero" aria-labelledby="qtl-title">
@@ -20,37 +20,32 @@ $$SYNTAX-LEVEL 2
         <path d="M18 74 C26 74, 32 72, 38 52 C44 32, 48 24, 52 24 C56 24, 60 38, 66 60 C72 74, 76 74, 80 74" fill="none" stroke="#235c37" stroke-width="4" stroke-linecap="round" />
         <circle cx="52" cy="24" r="5" fill="#d99a0b" stroke="#7a4a10" stroke-width="2" />
       </svg>
-      <strong>QTL<br />Center</strong>
+      <strong>QTL<br />Data Hub</strong>
     </div>
     <div class="mgdb-hero-body">
-      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data_date)</p>
       <h1 id="qtl-title">Explore maize quantitative trait loci &amp; mapping studies</h1>
       <p class="mgdb-hero-description">Discover $(total_analyses) curated QTL trait analyses across $(distinct_traits) agronomic traits and $(total_experiments) mapping experiments evaluated in $(mapping_parents) parental inbred lines.</p>
     </div>
   </section>
 
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#qtl-search-panel" class="is-current">Search QTLs</a>
-    <a href="#qtl-traits">Major Agronomic Traits</a>
-    <a href="#qtl-experiments">Mapping Populations</a>
-    <a href="#qtl-overview">Statistics</a>
-    <a href="#qtl-related">Related Resources</a>
+    <a href="#qtl-search-panel" class="is-current" aria-current="true">Search</a>
+    <a href="#qtl-traits">Traits</a>
+    <a href="#qtl-experiments">Populations</a>
+    <a href="#qtl-references">References</a>
+    <a href="#qtl-metrics">Metrics</a>
+    <a href="#qtl-related">Related resources</a>
   </nav>
 
-  <!-- ====================================================================
-       1. Search Panel & Results
-       ==================================================================== -->
   <section id="qtl-search-panel" class="qtl-search-panel" aria-labelledby="qtl-search-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Interactive search</span>
-        <h2 id="qtl-search-title">Search QTL trait analyses</h2>
+        <h2 id="qtl-search-title">Search</h2>
       </div>
-      <p>Search by trait keyword, experiment name, analysis symbol, or filter by specific agronomic trait and parent stock.</p>
     </div>
 
     <form id="qtl-search-form" class="qtl-search-form" role="search">
-      <div class="mgdb-field">
+      <div class="mgdb-hub-field qtl-field-query">
         <label class="mgdb-label" for="qtl-search-term">Search trait name, experiment, or analysis code</label>
         <div class="qtl-search-input-wrap">
           <input class="mgdb-input" id="qtl-search-term" name="term" type="search" placeholder="e.g., kernel weight, plant height, anthesis, yield, B73 x Mo17, Schon" autocomplete="off" />
@@ -64,37 +59,63 @@ $$SYNTAX-LEVEL 2
         </p>
       </div>
 
-      <div class="mgdb-search-row">
-        <div class="mgdb-field">
+
+      <div class="mgdb-hub-field mgdb-hub-field-action">
+        <button class="mgdb-button mgdb-button-primary" type="submit">Search QTLs</button>
+      </div>
+
+      <details class="qtl-adv" id="qtl-adv">
+        <summary>
+          <strong>Advanced search criteria</strong>
+          <span>Restrict to one agronomic trait, or to a mapping parent line</span>
+        </summary>
+        <div class="qtl-adv-body">
+        <div class="mgdb-hub-field">
           <label class="mgdb-label" for="qtl-filter-trait">Agronomic trait</label>
           <select class="mgdb-select" id="qtl-filter-trait" name="trait">
             $(trait_options)
           </select>
         </div>
 
-        <div class="mgdb-field">
+        <div class="mgdb-hub-field">
           <label class="mgdb-label" for="qtl-filter-parent">Mapping parent line</label>
           <select class="mgdb-select" id="qtl-filter-parent" name="parent">
             $(parent_options)
           </select>
-        </div>
-      </div>
+        </div>        </div>
 
-      <div class="mgdb-form-actions">
-        <button class="mgdb-button mgdb-button-primary" type="submit">Search QTLs</button>
-        <button class="mgdb-button mgdb-button-quiet" type="reset" id="qtl-reset-btn">Reset filters</button>
-      </div>
+        <div class="qtl-adv-actions">
+          <button class="mgdb-button mgdb-button-primary" type="submit">Apply advanced filters</button>
+          <button class="mgdb-button mgdb-button-quiet" id="qtl-adv-reset" type="button">Reset advanced filters</button>
+        </div>
+      </details>
     </form>
   </section>
 
-  <section id="qtl-results-section" class="qtl-results-section" aria-labelledby="qtl-results-title">
+  <section id="qtl-results-section" class="qtl-results-section" aria-labelledby="qtl-results-title" hidden>
     <div class="qtl-results-heading">
       <div>
-        <span class="mgdb-eyebrow">Search results</span>
-        <h2 id="qtl-results-title">Matching QTL analyses</h2>
-        <p id="qtl-results-status" aria-live="polite">Enter a search keyword or choose a filter above to view matching QTL records.</p>
+        <h2 id="qtl-results-title">Results</h2>
+        <p id="qtl-results-status" aria-live="polite">Enter a search keyword or choose a filter above to view matching QTL analyses.</p>
       </div>
-      <a class="mgdb-button mgdb-button-quiet" id="qtl-export-tsv" href="#" download hidden>Export TSV</a>
+      <div class="qtl-results-controls">
+        <div class="mgdb-hub-field">
+          <label for="qtl-results-filter">Filter results</label>
+          <input id="qtl-results-filter" type="search" placeholder="Narrow this page" autocomplete="off" />
+        </div>
+        <div class="mgdb-hub-field">
+          <label for="qtl-page-size">Results per page</label>
+          <select id="qtl-page-size">
+            <option value="10">Top 10</option>
+            <option value="25" selected>Top 25</option>
+            <option value="50">Top 50</option>
+            <option value="all">All results</option>
+          </select>
+        </div>
+        <div class="qtl-export-buttons">
+          <a class="mgdb-button mgdb-button-quiet" id="qtl-export-tsv" href="#" download>Export TSV</a>
+        </div>
+      </div>
     </div>
 
     <div id="qtl-notes"></div>
@@ -102,20 +123,17 @@ $$SYNTAX-LEVEL 2
 
     <div id="qtl-empty" class="mgdb-empty" hidden>
       <h3>No QTL analyses matched</h3>
-      <p>Try widening your search terms, selecting a broader trait from the dropdown, or resetting the mapping parent filter.</p>
+      <p>Try widening your search terms, selecting a broader trait, or resetting the mapping parent filter.</p>
     </div>
+
+    <nav id="qtl-pagination" class="qtl-pagination" aria-label="Search result pages"></nav>
   </section>
 
-  <!-- ====================================================================
-       2. Major Agronomic Traits
-       ==================================================================== -->
   <section id="qtl-traits" aria-labelledby="qtl-traits-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Agronomic traits</span>
-        <h2 id="qtl-traits-title">Explore major trait categories</h2>
+        <h2 id="qtl-traits-title">Traits</h2>
       </div>
-      <p>Key agronomic and physiological trait classifications mapped in maize QTL mapping studies.</p>
     </div>
 
     <div class="mgdb-card-grid qtl-traits-grid">
@@ -149,16 +167,11 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
-  <!-- ====================================================================
-       3. Mapping Populations & Experiments
-       ==================================================================== -->
   <section id="qtl-experiments" aria-labelledby="qtl-exp-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Mapping populations</span>
-        <h2 id="qtl-exp-title">Classical mapping crosses &amp; study designs</h2>
+        <h2 id="qtl-exp-title">Populations</h2>
       </div>
-      <p>Well-characterized recombinant inbred line \(RIL\), F2, and backcross populations utilized in maize QTL mapping.</p>
     </div>
 
     <div class="qtl-exp-grid" aria-label="Mapping populations">
@@ -191,20 +204,25 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
-  <!-- ====================================================================
-       4. Corpus Statistics \(Second to Last Item\)
-       ==================================================================== -->
-  <section id="qtl-overview" aria-labelledby="qtl-overview-title">
+  <section id="qtl-references" aria-labelledby="qtl-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="qtl-references-title">References</h2></div>
+    </div>
+
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
+  <section id="qtl-metrics" aria-labelledby="qtl-metrics-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Corpus summary</span>
-        <h2 id="qtl-overview-title">QTL dataset at a glance</h2>
+        <h2 id="qtl-metrics-title">Metrics</h2>
       </div>
-      <p>Key metrics across curated quantitative trait analyses, traits, mapping populations, and inbred parents.</p>
     </div>
 
     <div class="mgdb-metric-grid">
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-green">
         <div class="mgdb-metric-top">
           <h3>Trait Analyses</h3>
           <span class="mgdb-metric-badge">Curated</span>
@@ -215,7 +233,7 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Curated quantitative trait analyses with statistical models and QTL detections.</p>
       </article>
 
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-amber">
         <div class="mgdb-metric-top">
           <h3>Mapped QTL Loci</h3>
           <span class="mgdb-metric-badge">Genomic</span>
@@ -226,7 +244,7 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Individual QTL peak loci placed onto maize genetic and cytological bin maps.</p>
       </article>
 
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-blue">
         <div class="mgdb-metric-top">
           <h3>Distinct Traits</h3>
           <span class="mgdb-metric-badge">Phenotypes</span>
@@ -237,7 +255,7 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Agronomic, morphological, biochemical, and physiological traits evaluated.</p>
       </article>
 
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-burgundy">
         <div class="mgdb-metric-top">
           <h3>Parental Inbreds</h3>
           <span class="mgdb-metric-badge">Germplasm</span>
@@ -248,54 +266,71 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Distinct inbred parent stocks utilized across mapping cross designs.</p>
       </article>
     </div>
+
+    <figure class="mgdb-figure qtl-figure">
+      <h3>Analyses by trait</h3>
+      <div class="mgdb-chart" id="qtl-trait-chart" role="img"
+           aria-label="Horizontal bar chart of how many curated QTL analyses were run on each of the ten most studied traits, with the remaining traits grouped together">
+        <div class="mgdb-chart-fallback">Loading the trait breakdown&hellip;</div>
+      </div>
+      <figcaption>Each analysis is counted once, so the bars total the whole corpus. Select a bar to search that trait.</figcaption>
+    </figure>
+
+    <div class="mgdb-table-scroll qtl-figure-table">
+      <table class="mgdb-table" id="qtl-trait-table">
+        <caption>
+          Analyses by trait
+          <span class="mgdb-muted">The values behind the chart above.</span>
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Trait</th>
+            <th scope="col" class="mgdb-numeric">Analyses</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </section>
 
-  <!-- ====================================================================
-       5. Connected Resources \(Final Item — Soft Green Surface\)
-       ==================================================================== -->
-  <section id="qtl-related" class="qtl-bottom-section" aria-labelledby="qtl-related-title">
+  <section id="qtl-related" class="mgdb-hub-related" aria-labelledby="qtl-related-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Connected resources</span>
-        <h2 id="qtl-related-title">Related data hubs &amp; tools</h2>
+        <h2 id="qtl-related-title">Related resources</h2>
       </div>
-      <p>Explore qualitative mutant phenotypes, genetic variation alleles, chromosome maps, and germplasm stocks.</p>
     </div>
 
     <div class="mgdb-resource-panel">
       <div class="mgdb-resource-list">
-        <a href="/data_center/phenotype">
-          <strong>Phenotype Data Hub</strong>
-          <span>Curated qualitative mutant phenotypes, developmental traits, and morphological variations</span>
-          <span class="mgdb-resource-badge">Internal</span>
-        </a>
-        <a href="/data_center/variation">
-          <strong>Genetic Variation Data Hub</strong>
-          <span>Sequence variants, SNP alleles, and insertion disruptions in quantitative trait candidate genes</span>
-          <span class="mgdb-resource-badge">Internal</span>
-        </a>
         <a href="/data_center/locus">
           <strong>Locus Data Hub</strong>
-          <span>Classic genetic loci, cloned genes, and mutant alleles mapped to chromosomal bins</span>
+          <span>Classic genetic loci and cloned genes, including the QTL loci these analyses place</span>
           <span class="mgdb-resource-badge">Internal</span>
         </a>
         <a href="/data_center/map">
           <strong>Map Data Hub</strong>
-          <span>Genetic linkage maps, physical maps, and cytological bin coordinates</span>
+          <span>The genetic linkage and cytological bin maps these QTL intervals are placed on</span>
           <span class="mgdb-resource-badge">Internal</span>
         </a>
         <a href="/data_center/stock">
           <strong>Stock Data Hub</strong>
-          <span>Inbred parent lines and mapping population seed stocks from the MGCSC</span>
+          <span>The inbred parent lines and mapping population seed stocks behind these crosses</span>
           <span class="mgdb-resource-badge">Internal</span>
         </a>
-        <a href="/gene_center/gene">
-          <strong>Gene Center</strong>
-          <span>B73/NAM reference gene models, functional GO terms, and expression data</span>
+        <a href="/data_center/phenotype">
+          <strong>Phenotype Data Hub</strong>
+          <span>Qualitative mutant phenotypes, alongside the quantitative traits measured here</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/genetic_variation">
+          <strong>SNPs &amp; Traits Data Hub</strong>
+          <span>Association datasets that map traits by a different route</span>
           <span class="mgdb-resource-badge">Internal</span>
         </a>
       </div>
     </div>
   </section>
+
+  <script type="application/json" id="qtl-chart-data">$(chart_data)</script>
 </main>
 )

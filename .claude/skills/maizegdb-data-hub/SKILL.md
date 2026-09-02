@@ -145,6 +145,19 @@ nothing else goes wrong visibly.
   the string it is handed plus a global stamp. Any payload whose *shape* is
   built in the controller needs `'<key>_' . (int) @filemtime(__FILE__)`, or a
   warm server keeps serving an entry that predates the new fields.
+- **A hub is only split when the *navigation* is split.** Two hubs can have
+  their own controllers, templates, sheets and libraries and still be one thing
+  to a reader, because the header menu carries a single combined entry. Check
+  `templates/home/megamenu_modern/data-centers.bau` and `tools/sitemap_data.py`
+  (then re-run `tools/gen_sitemap.py`) whenever a hub is added or separated.
+- **Look for a capped export.** `format=tsv` handlers that reuse the search's
+  MAX_RESULTS constant hand back a truncated file under a button that says
+  "Download" — one returned 200 of 211 rows and would have got quietly worse as
+  the corpus grew. The export is the whole matched set; `LIMIT ALL`.
+- **A date computed at build time and cached is not a freshness stamp.**
+  `date('F j, Y')` inside a `dashboardCache()` builder freezes at whenever the
+  entry was written and then presents itself as meaningful. Derive the stamp
+  from the data, or show none.
 - **Check the page's request against the endpoint's contract, field by field.**
   One hub sent `source=grin` where the endpoint read `mode`, sent advanced
   filter values without the `f_<name>` flags that gate them, and read

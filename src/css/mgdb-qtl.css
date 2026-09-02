@@ -1,12 +1,18 @@
-/* file: mgdb-qtl.css
- *
- * Page-specific styles for the QTL Data Hub (/data_center/qtl).
- * Scoped under .mgdb-qtl-page.
- */
+/* ==========================================================================
+   QTL Data Hub — /data_center/qtl
+   --------------------------------------------------------------------------
+   Loaded after css/mgdb-modern.css and css/mgdb-hub.css. The hub shell settles
+   the pale blue ground, the white section cards and their coloured top edges,
+   the absence of a rule under a section title, the metric colours, the gold
+   edge a grid tile takes on hover, the zebra striping, the green Related
+   resources panel, the shared form field, and the scroll offset.
 
-/* --------------------------------------------------------------------------
-   Hero Emblem
-   -------------------------------------------------------------------------- */
+   Nothing above is repeated here. What is here is the page's own furniture:
+   the query control, the examples, the advanced accordion, the results
+   controls and pagination, the figure, and the results table.
+   ========================================================================== */
+
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
 
 .mgdb-qtl-page .mgdb-hero-emblem {
   background: #ffffff;
@@ -16,12 +22,9 @@
 .mgdb-qtl-page .mgdb-hero-emblem svg {
   width: min(100%, 64px);
   height: auto;
-  mix-blend-mode: normal;
 }
 
-/* --------------------------------------------------------------------------
-   Sticky Section Tabs
-   -------------------------------------------------------------------------- */
+/* ── Sticky section tabs ─────────────────────────────────────────────────── */
 
 .mgdb-qtl-page .mgdb-section-tabs {
   position: sticky;
@@ -32,9 +35,6 @@
   gap: var(--mgdb-space-2);
   margin-top: var(--mgdb-space-5);
   margin-bottom: var(--mgdb-space-5);
-  padding: var(--mgdb-space-2) 0;
-  background: var(--mgdb-surface);
-  border-bottom: 1px solid var(--mgdb-line);
 }
 
 .mgdb-qtl-page .mgdb-section-tabs a {
@@ -42,19 +42,17 @@
   min-height: 40px;
   align-items: center;
   padding: 0 var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
   color: var(--mgdb-ink) !important;
   font-size: var(--mgdb-text-sm);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
-  transition: background .12s, border-color .12s;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
 }
 
-.mgdb-qtl-page .mgdb-section-tabs a:hover {
-  background: var(--mgdb-green-soft);
-}
+.mgdb-qtl-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
 
 .mgdb-qtl-page .mgdb-section-tabs a.is-current,
 .mgdb-qtl-page .mgdb-section-tabs a[aria-current="true"] {
@@ -64,21 +62,37 @@
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
-.mgdb-qtl-page > section,
-.mgdb-qtl-page section[id] {
-  scroll-margin-top: 4.5rem;
+@media (max-width: 1050px) and (min-width: 861px) {
+  .mgdb-hub-page.mgdb-qtl-page > section[id] { scroll-margin-top: 65px; }
 }
+
+@media (max-width: 860px) {
+  .mgdb-hub-page.mgdb-qtl-page > section[id] { scroll-margin-top: 113px; }
+}
+
+.mgdb-qtl-page > section[id] { margin-bottom: var(--mgdb-space-5); }
 
 /* --------------------------------------------------------------------------
    Search Form
    -------------------------------------------------------------------------- */
 
+/* The section is the white card, so the form sits directly on it: the query
+   takes the slack and the button takes what it needs, with the accordion
+   spanning underneath. The trait and mapping-parent selects used to sit in
+   their own row above the buttons; both are advanced criteria and live in the
+   disclosure now. */
 .mgdb-qtl-page .qtl-search-form {
-  padding: var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface-alt);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-4);
+  align-items: end;
 }
+
+.mgdb-qtl-page .qtl-field-query { grid-column: 1; }
+/* Scoped with `>` to the search form: `.mgdb-hub-field-action` is a shared
+   class and the results controls use it too. */
+.mgdb-qtl-page .qtl-search-form > .mgdb-hub-field-action { grid-column: 2; }
+.mgdb-qtl-page .qtl-adv { grid-column: 1 / -1; }
 
 .mgdb-qtl-page .qtl-example-btn {
   display: inline-block;
@@ -105,14 +119,44 @@
   margin-top: var(--mgdb-space-5);
 }
 
+.mgdb-qtl-page .qtl-results-section[hidden] { display: none; }
+
 .mgdb-qtl-page .qtl-results-heading {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--mgdb-space-3);
-  align-items: flex-start;
+  gap: var(--mgdb-space-3) var(--mgdb-space-5);
+  align-items: end;
   justify-content: space-between;
   margin-bottom: var(--mgdb-space-4);
 }
+
+.mgdb-qtl-page .qtl-results-heading > div:first-child { min-width: 0; flex: 1 1 18rem; }
+
+/* Fixed tracks in a box sized to its own content: declared with minmax(0, ...)
+   the first tracks take everything the parent offers and the last resolves to
+   0px, which drops its control onto a second row. */
+.mgdb-qtl-page .qtl-results-controls {
+  display: grid;
+  width: max-content;
+  max-width: 100%;
+  flex: 0 0 auto;
+  grid-template-columns: 13rem 10rem auto;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: end;
+}
+
+@media (max-width: 1000px) {
+  .mgdb-qtl-page .qtl-results-controls {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .mgdb-qtl-page .qtl-results-controls { grid-template-columns: minmax(0, 1fr); }
+}
+
+.mgdb-qtl-page .qtl-export-buttons { display: flex; gap: var(--mgdb-space-2); align-items: center; }
 
 .mgdb-qtl-page #qtl-notes .mgdb-message {
   margin-bottom: var(--mgdb-space-4);
@@ -255,3 +299,103 @@
     white-space: nowrap;
   }
 }
+
+/* ── Advanced search disclosure ──────────────────────────────────────────── */
+
+.mgdb-qtl-page .qtl-adv {
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--hub-surface);
+}
+
+.mgdb-qtl-page .qtl-adv summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+  align-items: baseline;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  color: var(--mgdb-green-dark);
+  cursor: pointer;
+  list-style-position: inside;
+}
+
+.mgdb-qtl-page .qtl-adv summary strong { font-size: var(--mgdb-text-base); }
+.mgdb-qtl-page .qtl-adv summary span { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+.mgdb-qtl-page .qtl-adv[open] summary { border-bottom: 1px solid var(--hub-line-soft); }
+
+.mgdb-qtl-page .qtl-adv-body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 24rem));
+  gap: var(--mgdb-space-4);
+  align-items: start;
+  padding: var(--mgdb-space-4);
+}
+
+.mgdb-qtl-page .qtl-adv-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  padding: 0 var(--mgdb-space-4) var(--mgdb-space-4);
+}
+
+@media (max-width: 640px) {
+  .mgdb-qtl-page .qtl-search-form { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-qtl-page .qtl-search-form > .mgdb-hub-field-action { grid-column: 1; }
+  .mgdb-qtl-page .qtl-adv-body { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ── Pagination ──────────────────────────────────────────────────────────── */
+
+.mgdb-qtl-page .qtl-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-4);
+  border-top: 1px solid var(--hub-line-soft);
+}
+
+.mgdb-qtl-page .qtl-pagination:empty { display: none; }
+
+.mgdb-qtl-page .qtl-pagination button {
+  min-width: var(--mgdb-tap-target);
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mgdb-qtl-page .qtl-pagination button:hover:not([disabled]) {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-qtl-page .qtl-pagination button.is-active {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+}
+
+.mgdb-qtl-page .qtl-pagination button[disabled] { opacity: .45; cursor: not-allowed; }
+
+/* ── Analyses by trait figure ────────────────────────────────────────────── */
+
+.mgdb-qtl-page .qtl-figure { margin-top: var(--mgdb-space-5); }
+
+.mgdb-qtl-page .qtl-figure .mgdb-chart {
+  height: auto;
+  min-height: 320px;
+  /* The value labels sit outside their bars (cliponaxis:false), so the box
+     must not clip them. */
+  overflow: visible;
+}
+
+.mgdb-qtl-page .qtl-figure-table { margin-top: var(--mgdb-space-4); }
