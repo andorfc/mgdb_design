@@ -44,6 +44,7 @@
 
 include_once('./include/db-api.php');
 include_once('./include/dashboard_cache.php');
+include_once('./include/references_lib.php');
 
 $system = getSystemInfo('mgdb.conf');
 logMessage('Starting protein_structure_modern.php');
@@ -67,6 +68,11 @@ $bauplan->preHTML('<meta http-equiv="Content-Type" content="text/html; charset=u
 $bauplan->includeCss('/css/static.css');
 $bauplan->includeCss('/css/mgdb-modern.css');
 $bauplan->includeCss('/css/mgdb-megamenu.css');
+/* The shared Data Hub shell -- pale blue ground, white section cards, coloured
+   section edges, the reference card, aligned form rows -- loaded before the
+   page's own sheet, which is the order css/mgdb-hub.css documents.
+   `mgdb-hub-page` on <main> opts in. */
+$bauplan->includeCss('/css/mgdb-hub.css?v=' . (int) @filemtime($doc_root . '/css/mgdb-hub.css'));
 $bauplan->includeCss('/css/mgdb-protein-structure.css?v=' . $v_css);
 /* 3Dmol is self-hosted rather than pulled from unpkg, which is where the page
    this replaces got NGL. A third-party CDN in the critical path means the
@@ -98,7 +104,17 @@ function ps_manifest_value($manifest, $key) {
 /* -------------------------------------------------------------------------- *
  * The measured payload (cached via include/dashboard_cache.php)
  * -------------------------------------------------------------------------- */
-$page_data = dashboardCache($system, 'protein_structure/page', function () use ($system, $doc_root) {
+/* The key carries this file's mtime and the manifest's, because the shape of
+   what is cached is defined here and its numbers come from that manifest --
+   dashboardCache() folds in neither by itself. It was keyed on the bare string
+   'protein_structure/page', so a field added here would have read an entry that
+   predated it, and a manifest rebuild would not have been picked up until the
+   global stamp moved. See include/dashboard_cache.php. */
+$ps_manifest_path = (isset($system['root_dir']) ? $system['root_dir'] : $doc_root)
+                  . '/data/protein_structure/manifest.json';
+$page_data = dashboardCache($system,
+  'protein_structure/page_' . (int) @filemtime(__FILE__) . '_' . (int) @filemtime($ps_manifest_path),
+  function () use ($system, $doc_root) {
     $ps_manifest_rel  = '/data/protein_structure/manifest.json';
     $ps_manifest_file = isset($system['root_dir']) ? $system['root_dir'] . $ps_manifest_rel : '';
     if (!is_file($ps_manifest_file)) {
@@ -142,6 +158,22 @@ $page_data = dashboardCache($system, 'protein_structure/page', function () use (
         'data_date'         => $ps_generated
     );
 });
+
+/* References: the predictors behind these models and the resources that read
+   them. Rendered by include/references_lib.php so these cards match every other
+   hub. */
+$content->get('reference_cards')->replace(mgdb_render_references($doc_root, array(
+    // The MaizeGDB protein structure resources these models are served by.
+    array('doi' => '10.1093/genetics/iyad016'),
+    // The assemblies and annotations the modelled proteins come from.
+    array('doi' => '10.1126/science.abg5289'),
+    // What a variant does to the protein, read against these structures.
+    array('doi' => '10.1093/bioinformatics/btae073'),
+    // The function assignments carried alongside them.
+    array('doi' => '10.1002/pld3.52'),
+    // The database of record.
+    array('doi' => '10.1093/nar/gky1046'),
+)));
 
 $content->get('monomer-count')->replace($page_data['monomer_count']);
 $content->get('homodimer-count')->replace($page_data['homodimer_count']);

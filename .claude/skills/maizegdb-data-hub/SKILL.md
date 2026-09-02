@@ -152,6 +152,16 @@ nothing else goes wrong visibly.
   the string it is handed plus a global stamp. Any payload whose *shape* is
   built in the controller needs `'<key>_' . (int) @filemtime(__FILE__)`, or a
   warm server keeps serving an entry that predates the new fields.
+- **The shell's 1170px offset boundary is an assumption, not a measurement.**
+  `mgdb-hub.css` steps from 65px to 113px there because it assumes the bar is
+  one row above that width. A hub with long labels can wrap at 1176-1220, and
+  then every jump between 1171 and the wrap lands its heading 40px behind the
+  bar. Measure the wrap point and start the band there.
+- **`mgdb-modern.css` already makes the bar a scrolling rail below 767px** --
+  `overflow-x: auto; flex-wrap: nowrap` on every `.mgdb-section-tabs`. A page
+  sheet that copies the family's tab block sets `flex-wrap: wrap` at higher
+  specificity and defeats it, which is why those bars reach 153-201px on a
+  phone. Leave `flex-wrap` out of a per-page block unless the bar is short.
 - **Set the `scroll-margin-top` ladder from the measured bar height, never from
   the tab count.** Label length decides how many rows the bar takes: one hub
   with six tabs still reached three rows at 375px and landed every section

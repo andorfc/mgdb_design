@@ -44,7 +44,61 @@
   object-fit: contain;
 }
 
-.mgdb-modern .ps-workspace { scroll-margin-top: var(--mgdb-space-5); }
+/* ── Sticky section tabs ─────────────────────────────────────────────────── */
+
+/* mgdb-modern.css gives .mgdb-section-tabs a white sticky bar. On the hub
+   shell's pale ground the family uses tinted chips on a transparent bar, so
+   this matches the other converted hubs. */
+/* The base rule's vertical padding is kept -- it is what makes every other
+   hub's bar 57px, and the scroll ladder is measured against that. Only the
+   white background goes, because the shell's ground is already pale. */
+.mgdb-protein-structure-page .mgdb-section-tabs {
+  margin-bottom: var(--mgdb-space-5);
+  background: none;
+}
+
+.mgdb-protein-structure-page .mgdb-section-tabs a {
+  border: 1px solid var(--hub-line);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink) !important;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.mgdb-protein-structure-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
+
+.mgdb-protein-structure-page .mgdb-section-tabs a.is-current,
+.mgdb-protein-structure-page .mgdb-section-tabs a[aria-current="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+/* The offset ladder, from the measured bar height. The search section used to
+   carry its own small scroll-margin, too little to clear a sticky bar; it takes
+   the section ladder now like every other section.
+
+   Eight labels wrap to two rows (105px) at somewhere in 1176-1220 -- *above*
+   the shell's own 65px/113px boundary at 1170 -- so between 1171 and the wrap
+   the shell would give 65px against a 105px bar and put every heading 40px
+   behind it. This band starts at 1220 instead. Below 767px mgdb-modern.css
+   already turns the bar into one scrolling row, so it is 57px there and needs
+   65px rather than the shell's 113px. */
+@media (max-width: 1220px) and (min-width: 768px) {
+  .mgdb-hub-page.mgdb-protein-structure-page > section[id] { scroll-margin-top: 113px; }
+}
+
+@media (max-width: 767px) {
+  .mgdb-hub-page.mgdb-protein-structure-page > section[id] { scroll-margin-top: 65px; }
+}
+
+.mgdb-protein-structure-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+.mgdb-protein-structure-page .ps-section-lead {
+  max-width: 62rem;
+  margin: 0 0 1.1rem;
+  color: var(--mgdb-muted);
+}
 
 .mgdb-modern .ps-search { margin: 0 0 var(--mgdb-space-4); }
 

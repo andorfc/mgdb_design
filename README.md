@@ -1293,6 +1293,71 @@ appear at all. Deleting `controllers/genome2.php` outright would drop the row
 and make the route 404; the redirect was judged worth more than the tidier
 count.
 
+## The Protein Structure Data Hub on the shell
+
+`/data_center/protein_structure`. Tabs: Search, ESMFold isoforms, Comparison
+tools, Interpreting predictions, Data sources, References, Metrics, Related
+resources. Files:
+`controllers/data_center/protein_structure_modern.php`,
+`templates/static/mgdb_protein_structure.bau`,
+`css/mgdb-protein-structure.css`, `js/mgdb-protein-structure.js`.
+
+Rendering runs no SQL — every number comes from
+`data/protein_structure/manifest.json` — so the page is 70 ms warm.
+
+Seven eyebrows gone; the four metric cards onto the shell's markup with tones
+(33,604 monomers · 4,302 homodimers · 3,089 heterodimers · 40,995 indexed);
+References added; the related section onto the shell's green wash; "Statistics"
+renamed **Metrics**; and every section heading now matches its tab label, which
+none of them did — the Search tab pointed at a heading called "Find predicted
+structures for a protein".
+
+### The hero was showing a hard-coded date beside a computed one
+
+The controller derives `data_date` from the manifest's own `generated` field,
+falling back to its mtime, and the Data sources section prints it. The hero
+stamp beside it read a literal **"August 2026"**. It now reads the same token,
+which on the current manifest is 16 August 2026 — the page can no longer claim
+to be fresher, or staler, than its data.
+
+### The tab bar wrapped above the shell's own breakpoint
+
+`css/mgdb-hub.css` steps its scroll offset from 65px to 113px at **1170px**,
+which assumes a bar that is one row above that width. Measured here: eight
+labels wrap to two rows at somewhere in **1176–1220**. So between 1171 and the
+wrap the shell handed out 65px against a 105px bar and every anchor jump left
+its heading 40px behind the bar. The band starts at 1220 instead.
+
+The general form: **the shell's 1170 boundary is an assumption about the bar,
+not a measurement of it.** Any hub whose labels are long enough to wrap above
+1170 needs its own band, and the only way to know is to measure.
+
+### mgdb-modern.css already turns the bar into a rail below 767px
+
+Worth recording, because it changes what the other hubs should do.
+`css/mgdb-modern.css` carries `@media (max-width: 767px) { .mgdb-section-tabs
+{ overflow-x: auto; flex-wrap: nowrap } }` for every page. This hub inherits
+it, so its bar is one 57px row at 375 rather than several stacked ones.
+
+Every hub sheet that copied the family's tab block, though, sets
+`flex-wrap: wrap` at a higher specificity and **defeats that rule** — which is
+why those bars reach 153px at 375, and why the Gene and nomenclature pages
+needed a rail written out by hand. Dropping `flex-wrap: wrap` from those blocks
+would let the shared rail apply everywhere, but each one's ladder has to be
+re-measured afterwards, so it has been left for a deliberate pass rather than
+folded into this one.
+
+### Verified
+
+8/8 distinct section edge colours, no rule under a section title, five
+reference cards, no duplicate `id`, all eight nav labels matching their `<h2>`,
+four equal-height metric cards, five related links, and no horizontal overflow
+at 375. Jumps clear by 8px at 1280, 900 and 375, and by 40px at 1190 — the one
+width inside the widened band where the bar happens to be a single row, which
+is the safe direction. The scrollspy was IntersectionObserver-only, which marks
+nothing in embedded browsers that deliver no entries, and is the shared
+scroll-driven one now.
+
 ## The Genetic Variation Data Hub on the shell
 
 `/genetic_variation` — SNPs and traits. Tabs: Search, Tools, Projects,

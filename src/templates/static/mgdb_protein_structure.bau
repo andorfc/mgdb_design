@@ -7,7 +7,7 @@ $$SYNTAX-LEVEL 2
 <meta property="og:description" content="Search over 40,000 predicted maize protein structures with pLDDT confidence, ipTM, ipSAE and pDockQ interface scores, plus ESMFold models.">
 
 <a class="mgdb-skip-link" href="#ps-main">Skip to main content</a>
-<main class="mgdb-page mgdb-protein-structure-page" id="ps-main">
+<main class="mgdb-page mgdb-hub-page mgdb-protein-structure-page" id="ps-main">
 
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
     <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Protein Structures</span>
@@ -19,20 +19,21 @@ $$SYNTAX-LEVEL 2
       <strong>Structure<br />Data Hub</strong>
     </div>
     <div class="mgdb-hero-body">
-      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; August 2026</p>
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data-date)</p>
       <h1 id="ps-title">Explore predicted protein structures &amp; complexes</h1>
       <p class="mgdb-hero-description">Search any gene model, locus, gene symbol, or UniProt accession to view predicted AlphaFold monomers, homodimers, and heterodimers with confidence metrics and interface scores, plus ESMFold isoform models.</p>
     </div>
   </section>
 
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#ps-find" class="is-current">Search &amp; Viewer</a>
-    <a href="#ps-esmfold">ESMFold Isoforms</a>
-    <a href="#ps-tools">Comparison Tools</a>
-    <a href="#ps-reading">Interpreting Predictions</a>
-    <a href="#ps-sources">Data Sources</a>
-    <a href="#ps-dashboard">Statistics</a>
-    <a href="#ps-resources">Related Resources</a>
+    <a href="#ps-find" class="is-current" aria-current="true">Search</a>
+    <a href="#ps-esmfold">ESMFold isoforms</a>
+    <a href="#ps-tools">Comparison tools</a>
+    <a href="#ps-reading">Interpreting predictions</a>
+    <a href="#ps-sources">Data sources</a>
+    <a href="#ps-references">References</a>
+    <a href="#ps-metrics">Metrics</a>
+    <a href="#ps-related">Related resources</a>
   </nav>
 
   <!-- ====================================================================
@@ -40,11 +41,7 @@ $$SYNTAX-LEVEL 2
        ==================================================================== -->
   <section class="mgdb-panel ps-workspace marker-search-panel" id="ps-find" aria-labelledby="ps-find-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Interactive search</span>
-        <h2 id="ps-find-title">Find predicted structures for a protein</h2>
-      </div>
-      <p>One identifier, every assembly state. Accepts B73 RefGen_v5 gene models, older annotations that map to one, locus and gene symbols, UniProt accessions, and AlphaFold model identifiers.</p>
+      <div><h2 id="ps-find-title">Search</h2></div>
     </div>
 
     <form class="ps-search" id="ps-search-form" autocomplete="off" role="search">
@@ -87,11 +84,7 @@ $$SYNTAX-LEVEL 2
        ==================================================================== -->
   <section class="mgdb-panel" id="ps-esmfold" aria-labelledby="ps-esmfold-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Second opinion</span>
-        <h2 id="ps-esmfold-title">ESMFold isoform models</h2>
-      </div>
-      <p>AlphaFold is indexed per UniProt accession, which collapses a gene to one canonical protein. ESMFold was run over the official B73 RefGen_v5 annotation isoform by isoform, so it is the way to see a specific splice variant &mdash; and a genuinely independent method to compare a fold against.</p>
+      <div><h2 id="ps-esmfold-title">ESMFold isoforms</h2></div>
     </div>
 
     <form class="ps-search ps-search-compact" id="ps-esm-form" autocomplete="off" role="search">
@@ -120,11 +113,7 @@ $$SYNTAX-LEVEL 2
        ==================================================================== -->
   <section id="ps-tools" aria-labelledby="ps-tools-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Compare</span>
-        <h2 id="ps-tools-title">Structural comparison &amp; search</h2>
-      </div>
-      <p>To go from one structure to its relatives &mdash; across maize, across species, or across methods &mdash; these tools take the same identifiers this page does.</p>
+      <div><h2 id="ps-tools-title">Comparison tools</h2></div>
     </div>
 
     <div class="mgdb-card-grid">
@@ -182,11 +171,7 @@ $$SYNTAX-LEVEL 2
        ==================================================================== -->
   <section id="ps-reading" aria-labelledby="ps-reading-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Interpretation</span>
-        <h2 id="ps-reading-title">How to read a predicted complex</h2>
-      </div>
-      <p>Every model here is a prediction. None of it is experimental evidence that two maize proteins interact, and the scores are the key metrics to evaluate.</p>
+      <div><h2 id="ps-reading-title">Interpreting predictions</h2></div>
     </div>
 
     <div class="mgdb-card-grid ps-reading-grid">
@@ -219,12 +204,9 @@ $$SYNTAX-LEVEL 2
        ==================================================================== -->
   <section id="ps-sources" aria-labelledby="ps-sources-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Provenance</span>
-        <h2 id="ps-sources-title">Where these models come from</h2>
-      </div>
-      <p>Structure collections, underlying computational pipelines, and citation information.</p>
+      <div><h2 id="ps-sources-title">Data sources</h2></div>
     </div>
+    <p class="ps-section-lead">Every model is fetched from the archive that published it; what follows is which archive, and how each set was produced.</p>
 
     <div class="mgdb-table-scroll">
       <table class="mgdb-table">
@@ -270,60 +252,42 @@ $$SYNTAX-LEVEL 2
   </section>
 
   <!-- ====================================================================
+       6. References
+       ==================================================================== -->
+  <section id="ps-references" aria-labelledby="ps-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ps-references-title">References</h2></div>
+    </div>
+
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
+  <!-- ====================================================================
        6. Dashboard / Corpus statistics \(second to last item\)
        ==================================================================== -->
-  <section id="ps-dashboard" aria-labelledby="ps-dashboard-title">
+  <section id="ps-metrics" aria-labelledby="ps-metrics-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Corpus summary</span>
-        <h2 id="ps-dashboard-title">Protein structure dataset at a glance</h2>
-      </div>
-      <p>Curated 3D protein structures, multimeric complexes, and confidence annotations maintained in the MaizeGDB repository.</p>
+      <div><h2 id="ps-metrics-title">Metrics</h2></div>
     </div>
 
     <div class="mgdb-metric-grid">
-      <article class="mgdb-metric">
-        <div class="mgdb-metric-top">
-          <h3>Monomer Models</h3>
-          <span class="mgdb-metric-badge">AlphaFold v2</span>
-        </div>
-        <div class="mgdb-metric-stat">
-          <strong class="mgdb-metric-value">$(monomer-count)</strong>
-        </div>
-        <p class="mgdb-metric-description">Single-chain AlphaFold predictions covering $(gene-count) B73 RefGen_v5 genes.</p>
+      <article class="mgdb-metric mgdb-tone-green">
+        <span class="mgdb-metric-icon" aria-hidden="true">Mon</span>
+        <div><strong class="mgdb-metric-value">$(monomer-count)</strong><h3>Monomer models</h3><p>Single-chain AlphaFold predictions across $(gene-count) B73 RefGen_v5 genes.</p></div>
       </article>
-
-      <article class="mgdb-metric">
-        <div class="mgdb-metric-top">
-          <h3>Homodimer Models</h3>
-          <span class="mgdb-metric-badge">Multimer</span>
-        </div>
-        <div class="mgdb-metric-stat">
-          <strong class="mgdb-metric-value">$(homodimer-count)</strong>
-        </div>
-        <p class="mgdb-metric-description">Self-interacting pairs for classical enzymes and transcription factors.</p>
+      <article class="mgdb-metric mgdb-tone-amber">
+        <span class="mgdb-metric-icon" aria-hidden="true">Hom</span>
+        <div><strong class="mgdb-metric-value">$(homodimer-count)</strong><h3>Homodimer models</h3><p>Self-interacting pairs for classical enzymes and transcription factors.</p></div>
       </article>
-
-      <article class="mgdb-metric">
-        <div class="mgdb-metric-top">
-          <h3>Heterodimer Models</h3>
-          <span class="mgdb-metric-badge">Multimer</span>
-        </div>
-        <div class="mgdb-metric-stat">
-          <strong class="mgdb-metric-value">$(heterodimer-count)</strong>
-        </div>
-        <p class="mgdb-metric-description">Predicted complexes between two distinct maize proteins.</p>
+      <article class="mgdb-metric mgdb-tone-blue">
+        <span class="mgdb-metric-icon" aria-hidden="true">Het</span>
+        <div><strong class="mgdb-metric-value">$(heterodimer-count)</strong><h3>Heterodimer models</h3><p>Predicted complexes between two distinct maize proteins.</p></div>
       </article>
-
-      <article class="mgdb-metric">
-        <div class="mgdb-metric-top">
-          <h3>Total Indexed</h3>
-          <span class="mgdb-metric-badge">3D Models</span>
-        </div>
-        <div class="mgdb-metric-stat">
-          <strong class="mgdb-metric-value">$(model-count)</strong>
-        </div>
-        <p class="mgdb-metric-description">Searchable by gene model, locus, symbol or UniProt accession.</p>
+      <article class="mgdb-metric mgdb-tone-burgundy">
+        <span class="mgdb-metric-icon" aria-hidden="true">3D</span>
+        <div><strong class="mgdb-metric-value">$(model-count)</strong><h3>Models indexed</h3><p>Searchable by gene model, locus, symbol or UniProt accession.</p></div>
       </article>
     </div>
   </section>
@@ -331,13 +295,9 @@ $$SYNTAX-LEVEL 2
   <!-- ====================================================================
        7. External and related resources \(final item\)
        ==================================================================== -->
-  <section id="ps-resources" aria-labelledby="ps-resources-title">
+  <section id="ps-related" class="mgdb-hub-related" aria-labelledby="ps-related-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Connected tools</span>
-        <h2 id="ps-resources-title">Related resources</h2>
-      </div>
-      <p>Explore related MaizeGDB data hubs, protein structure prediction tools, and international archives.</p>
+      <div><h2 id="ps-related-title">Related resources</h2></div>
     </div>
 
     <div class="mgdb-resource-panel">
