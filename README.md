@@ -1210,6 +1210,37 @@ gone; it also leaked into the hover text.
 Related: outside bar labels need `\u00A0`, not a space — SVG collapses leading
 whitespace, so a plain space measures as no padding at all.
 
+## The Insertion Data Hub
+
+`/insertion` joined the shell on 2026-09-01. **Its back end needed nothing** —
+the page was already behind `dashboardCache` at 66 ms and the search endpoint
+answers a gene query in 132 ms with parameterized, capped queries. That is worth
+saying: the conversions before it all turned up something slow, and this one did
+not.
+
+### Three modes stay three modes
+
+Every other hub has one query field. This one has three — by gene model, by
+genome position, by insertion name — and they are three different questions, not
+three filters on one, so the mode tab set stays. What moved is everything
+underneath: **collection, background and gene structure were duplicated across
+the gene and region panels** and are now a single advanced panel below all
+three, which also halved the background-sync wiring in the page script.
+
+### The results table pages in the browser
+
+The endpoint answers a whole search at once — it is bounded by the caps in
+`insertion_search_lib.php` rather than paged — so the 10 / 25 / 50 / all control
+and the filter work on the rendered rows. Paging is therefore instant, and the
+TSV export still covers the whole result rather than the visible page. The
+status line is written in two parts: the grouping line by `updateView`, then
+what the page controls did to it, so the two cannot contradict each other.
+
+The figure is the structure breakdown the summary file already carried —
+`5'UTR`, `intron`, `proximal promoter` and the rest, in the database's own
+casing. Selecting a bar sets the gene-structure filter, opens the advanced
+panel, and switches to the gene mode that filter applies to.
+
 ## The Image Data Hub
 
 `/data_center/image` joined the shell on 2026-09-01. Beyond the usual
@@ -1326,6 +1357,37 @@ What changed, so the next hub can copy it:
 - **A References section** names five DOIs from the curated bibliography (the
   26 NAM genomes, gapless chromosomes, W22, the pan-genomic database paper,
   GenomeQC) through `mgdb_render_references()`.
+- **The history chart is the Codex `/genome2` drawing**, ported on
+  2026-09-01: a hand-built SVG rather than Plotly, with a green area fill,
+  gold landmark pins on stems, a crosshair tooltip, and a Year / Assemblies /
+  Change / Landmark table behind a Show data table button. It spans the full
+  width of the Metrics section, and the species chart stacks below it. The
+  series, the landmark labels and their label heights all come from the
+  controller as JSON, so the drawing decides nothing about the data.
+
+### The release date column still cannot drive the growth chart
+
+Checked again on 2026-09-01, because the column was said to have been updated.
+It has not been, and the chart stays on the curated record:
+
+| Source | Dated | Of |
+| --- | --- | --- |
+| `genome_metadata.release_date` | 44 | 161 |
+| `analysisprop` `assembly_date` | 130 | 160 |
+| Both, earliest wins | 132 | 160 |
+
+Even the combined 82.5% is under the 90% floor `GC_GROWTH_COVERAGE_FLOOR`
+sets, and the series it produces is visibly wrong: it reaches 132 by 2024 and
+stops, because 28 assemblies carry no date anywhere — every G2F draft, most
+of the CAAS founder lines, W22 v2, LH244 and the B chromosome. `release_date`
+itself is 124 blank rows out of 170, and what is there is free text:
+`19-Nov-25`, `1st of February 2017 (pre-release)`, `fall 2017`,
+`11/19/202525`.
+
+What did change: **the final point is now the live published total** rather
+than the hand-kept 158, so the curve ends where the Metrics cards say it
+does. The rest of the curated series is unchanged, and the data note under
+the chart says so.
 - **Bulk Downloads is marked External** — it carries its own host.
 - **The page sheet lost what the shell owns**: its own sticky-tab styling, its
   metric top-edge block (which fought the shell's 4px edge with a 5px one),

@@ -80,13 +80,23 @@
   /* ── Examples ────────────────────────────────────────────────────────── */
 
   function initExamples() {
-    document.querySelectorAll('.ins-example').forEach(function (button) {
+    document.querySelectorAll('[data-ins-example]').forEach(function (button) {
       button.addEventListener('click', function () {
-        var key = button.dataset.example;
+        var key = button.getAttribute('data-ins-example');
         var form = button.closest('form');
+
         if (key === 'genes') { byId('ins-gene-list').value = EXAMPLES.genes; }
-        if (key === 'names') { byId('ins-stock-list').value = EXAMPLES.names; }
-        if (form) { form.dispatchEvent(new Event('submit', { cancelable: true })); }
+        else if (key === 'names') { byId('ins-stock-list').value = EXAMPLES.names; }
+        else if (key === 'region') {
+          byId('ins-region-chromosome').value = 'chr1';
+          byId('ins-region-start').value = '4897501';
+          byId('ins-region-end').value = '5413000';
+        } else if (byId('ins-gene-list')) {
+          // Anything else is a single gene model typed into the example.
+          byId('ins-gene-list').value = key;
+        }
+
+        if (form) { form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })); }
       });
     });
   }
@@ -107,18 +117,26 @@
     var params = new URLSearchParams();
     params.set('mode', mode);
 
+    /* Collection, background and gene structure live in one advanced panel
+       shared by every mode, rather than being repeated per panel. The gene and
+       region modes both honour collection and background; structure only means
+       anything against a gene, and the panel says so. */
+    var dataset = byId('ins-dataset');
+    var background = byId('ins-background');
+    var structure = byId('ins-structure');
+
     if (mode === 'gene') {
       params.set('genes', byId('ins-gene-list').value);
-      params.set('dataset', byId('ins-gene-dataset').value);
-      params.set('background', byId('ins-gene-background').value);
-      params.set('structure', byId('ins-gene-structure').value);
+      if (dataset) { params.set('dataset', dataset.value); }
+      if (background) { params.set('background', background.value); }
+      if (structure) { params.set('structure', structure.value); }
     } else if (mode === 'region') {
       params.set('assembly', byId('ins-region-assembly').value);
       params.set('chromosome', byId('ins-region-chromosome').value);
       params.set('start', byId('ins-region-start').value.replace(/,/g, ''));
       params.set('end', byId('ins-region-end').value.replace(/,/g, ''));
-      params.set('dataset', byId('ins-region-dataset').value);
-      params.set('background', byId('ins-region-background').value);
+      if (dataset) { params.set('dataset', dataset.value); }
+      if (background) { params.set('background', background.value); }
     } else if (mode === 'stock') {
       params.set('names', byId('ins-stock-list').value);
     }
@@ -157,6 +175,9 @@
     emptyEl.hidden = true;
     exportLink.hidden = true;
 
+    var section = byId('insertion-results-section');
+    if (section) { section.hidden = false; }
+
     if (error) {
       notesEl.innerHTML = '<div class="mgdb-message mgdb-message-error" role="alert">' + esc(error) + '</div>';
       return;
@@ -178,6 +199,7 @@
           return;
         }
         renderResults(wrap.data);
+        if (section) { section.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
       })
       .catch(function () {
         resultsEl.innerHTML = '';
@@ -241,6 +263,236 @@
       resultsEl.innerHTML = buildTableHtml(currentData.results);
       exportLink.href = API_URL + '?' + lastQuery + '&format=tsv&group_by=insertion';
     }
+
+    applyResultView();
+  }
+
+  /* ── Page size, paging and the within-results filter ────────────────────
+
+     The endpoint answers a whole search at once -- it is bounded by the caps
+     in insertion_search_lib.php rather than paged -- so the page size and the
+     filter both work on the rendered rows. That keeps paging instant and means
+     the export always covers the whole result rather than the visible page. */
+
+  var viewState = { page: 1, pageSize: 25, filter: '' };
+
+  function currentRows() {
+    var resultsEl = byId('insertion-results');
+    return resultsEl ? Array.prototype.slice.call(resultsEl.querySelectorAll('tbody tr')) : [];
+  }
+
+  function applyResultView() {
+    var rows = currentRows();
+    if (!rows.length) { renderPagination(0); return; }
+
+    var terms = viewState.filter.toLowerCase().split(/\s+/).filter(Boolean);
+    var matched = rows.filter(function (row) {
+      if (!terms.length) { return true; }
+      var hay = (row.textContent || '').toLowerCase();
+      for (var i = 0; i < terms.length; i++) {
+        if (hay.indexOf(terms[i]) === -1) { return false; }
+      }
+      return true;
+    });
+
+    var size = viewState.pageSize === 'all' ? matched.length || 1 : viewState.pageSize;
+    var pageCount = Math.max(1, Math.ceil(matched.length / size));
+    if (viewState.page > pageCount) { viewState.page = pageCount; }
+    var start = (viewState.page - 1) * size;
+
+    rows.forEach(function (row) { row.hidden = true; });
+    matched.slice(start, start + size).forEach(function (row) { row.hidden = false; });
+
+    appendViewStatus(matched.length, rows.length, start, Math.min(size, matched.length - start));
+    renderPagination(pageCount);
+  }
+
+  /* The grouping status line is written by updateView; this adds what the page
+     controls did to it, so the two never contradict each other. */
+  function appendViewStatus(matched, total, start, shown) {
+    var statusEl = byId('insertion-results-status');
+    if (!statusEl) { return; }
+
+    var base = statusEl.textContent.replace(/\s*Showing .*$/, '').replace(/\s*Nothing on this .*$/, '');
+    if (viewState.filter && matched === 0) {
+      statusEl.textContent = base + ' Nothing on this page matches the filter \u201C' + viewState.filter + '\u201D.';
+      return;
+    }
+    if (viewState.filter) {
+      statusEl.textContent = base + ' Showing ' + number(shown) + ' of the ' + number(matched)
+        + ' rows matching \u201C' + viewState.filter + '\u201D, out of ' + number(total) + '.';
+      return;
+    }
+    if (viewState.pageSize !== 'all' && matched > shown) {
+      statusEl.textContent = base + ' Showing rows ' + number(start + 1) + '\u2013' + number(start + shown)
+        + ' of ' + number(matched) + '.';
+    }
+  }
+
+  function renderPagination(pageCount) {
+    var nav = byId('insertion-pagination');
+    if (!nav) { return; }
+
+    if (viewState.pageSize === 'all' || pageCount <= 1) { nav.innerHTML = ''; return; }
+
+    var current = viewState.page;
+    var html = '<button class="ins-page-btn" type="button" data-page="' + (current - 1) + '"'
+             + (current === 1 ? ' disabled' : '') + '>&larr; Previous</button>';
+
+    var pages = [1];
+    if (current > 3) { pages.push('gap'); }
+    for (var pnum = Math.max(2, current - 1); pnum <= Math.min(pageCount - 1, current + 1); pnum++) { pages.push(pnum); }
+    if (current < pageCount - 2) { pages.push('gap'); }
+    if (pageCount > 1) { pages.push(pageCount); }
+
+    pages.forEach(function (page) {
+      if (page === 'gap') {
+        html += '<span class="ins-page-ellipsis" aria-hidden="true">&hellip;</span>';
+      } else {
+        html += '<button class="ins-page-btn' + (page === current ? ' is-active' : '') + '"'
+             +  ' type="button" data-page="' + page + '"'
+             +  (page === current ? ' aria-current="page"' : '') + '>' + page + '</button>';
+      }
+    });
+
+    html += '<button class="ins-page-btn" type="button" data-page="' + (current + 1) + '"'
+         +  (current === pageCount ? ' disabled' : '') + '>Next &rarr;</button>';
+
+    nav.innerHTML = html;
+
+    Array.prototype.forEach.call(nav.querySelectorAll('button[data-page]'), function (btn) {
+      btn.addEventListener('click', function () {
+        var page = parseInt(btn.getAttribute('data-page'), 10);
+        if (!page || page < 1 || page > pageCount || page === viewState.page) { return; }
+        viewState.page = page;
+        applyResultView();
+      });
+    });
+  }
+
+  function initResultControls() {
+    var sizeSelect = byId('ins-page-size');
+    if (sizeSelect) {
+      sizeSelect.addEventListener('change', function () {
+        viewState.pageSize = sizeSelect.value === 'all' ? 'all' : parseInt(sizeSelect.value, 10) || 25;
+        viewState.page = 1;
+        if (currentData) { updateView(); }
+      });
+    }
+
+    var filterInput = byId('ins-results-filter');
+    if (filterInput) {
+      filterInput.addEventListener('input', function () {
+        viewState.filter = filterInput.value.trim();
+        viewState.page = 1;
+        if (currentData) { updateView(); }
+      });
+    }
+
+    var advReset = byId('ins-adv-reset');
+    if (advReset) {
+      advReset.addEventListener('click', function () {
+        ['ins-dataset', 'ins-background', 'ins-structure'].forEach(function (id) {
+          var el = byId(id);
+          if (el) { el.selectedIndex = 0; }
+        });
+      });
+    }
+
+    var emptyReset = byId('insertion-empty-reset');
+    if (emptyReset) {
+      emptyReset.addEventListener('click', function () {
+        ['ins-gene-list', 'ins-stock-list', 'ins-region-start', 'ins-region-end'].forEach(function (id) {
+          var el = byId(id);
+          if (el) { el.value = ''; }
+        });
+        if (filterInput) { filterInput.value = ''; }
+        viewState.filter = '';
+        viewState.page = 1;
+        var section = byId('insertion-results-section');
+        if (section) { section.hidden = true; }
+        var focusTarget = byId('ins-gene-list');
+        if (focusTarget) { focusTarget.focus(); }
+      });
+    }
+  }
+
+  /* ── Alignments by gene structure ───────────────────────────────────────
+
+     .mgdb-chart is a fixed 320px in the design system, so the height has to be
+     set on the element and handed to Plotly from the same variable. */
+
+  function sizeChart(id, height) {
+    var el = byId(id);
+    if (el) { el.style.height = height + 'px'; }
+    return height;
+  }
+
+  function readAttrJson(el, name) {
+    if (!el) { return null; }
+    try { return JSON.parse(el.getAttribute(name) || 'null'); }
+    catch (error) { return null; }
+  }
+
+  function initFigure() {
+    var el = byId('ins-structure-chart');
+    if (!el || !window.MGDB || !window.MGDB.chart) { return; }
+
+    var labels = readAttrJson(el, 'data-labels');
+    var values = readAttrJson(el, 'data-values');
+    if (!labels || !values || !labels.length) { return; }
+
+    var height = sizeChart('ins-structure-chart', Math.max(320, labels.length * 34 + 110));
+
+    window.MGDB.chart({
+      target: 'ins-structure-chart',
+      traces: [{
+        type: 'bar',
+        orientation: 'h',
+        x: values,
+        y: labels,
+        text: values.map(function (value) { return '\u00A0' + Number(value).toLocaleString(); }),
+        textposition: 'outside',
+        textangle: 0,
+        cliponaxis: false,
+        marker: { color: '#285d46' },
+        hovertemplate: '%{y}<br>%{x:,} alignments<extra></extra>'
+      }],
+      layout: {
+        height: height,
+        margin: { l: 10, r: 96, t: 8, b: 48 },
+        bargap: 0.28,
+        xaxis: { title: { text: 'Insertion alignments' }, automargin: true },
+        yaxis: { type: 'category', automargin: true }
+      }
+    });
+
+    /* Selecting a bar sets the gene-structure filter and opens the panel, so
+       the filter is visible rather than applied invisibly. Plotly only gains
+       its event emitter once it has drawn. */
+    if (!window.MutationObserver) { return; }
+    var attached = false;
+    var observer = new window.MutationObserver(function () {
+      if (attached || typeof el.on !== 'function') { return; }
+      attached = true;
+      observer.disconnect();
+      el.on('plotly_click', function (event) {
+        if (!event || !event.points || !event.points.length) { return; }
+        var wanted = String(event.points[0].y).toLowerCase();
+        var select = byId('ins-structure');
+        if (!select) { return; }
+        Array.prototype.forEach.call(select.options, function (option) {
+          if (option.textContent.trim().toLowerCase() === wanted) { select.value = option.value; }
+        });
+        var adv = byId('ins-adv');
+        if (adv) { adv.open = true; }
+        var geneTab = byId('ins-tab-gene');
+        if (geneTab) { geneTab.click(); }
+        var panel = byId('ins-panel-gene');
+        if (panel) { panel.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      });
+    });
+    observer.observe(el, { childList: true, subtree: true });
   }
 
   /* ── Group By Gene Model ────────────────────────────────────────────────── */
@@ -467,38 +719,85 @@
 
   /* ── Section Navigation Tabs & Scrollspy ────────────────────────────────── */
 
+  /* Sticky section tabs, driven by scroll, IntersectionObserver and resize
+     together: no single trigger fires everywhere, and the results section
+     appears and disappears under the bar as searches run. The previous version
+     used IntersectionObserver alone, which delivers nothing in some embedded
+     browsers and left the bar frozen on the first tab. */
   function initSectionTabs() {
-    var nav = document.querySelector('.mgdb-section-tabs');
-    if (!nav) return;
-    var links = nav.querySelectorAll('a[href^="#"]');
-    if (!links.length) return;
+    var tabs = document.querySelectorAll('.mgdb-section-tabs a');
+    if (!tabs.length) { return; }
 
-    var sections = [];
-    Array.prototype.forEach.call(links, function (link) {
-      var id = link.getAttribute('href').slice(1);
-      var el = document.getElementById(id);
-      if (el) sections.push({ id: id, link: link, el: el });
+    var pairs = [];
+    Array.prototype.forEach.call(tabs, function (tab) {
+      var href = tab.getAttribute('href') || '';
+      if (href.charAt(0) !== '#') { return; }
+      var section = document.getElementById(href.slice(1));
+      if (section) { pairs.push({ tab: tab, section: section }); }
+    });
+    if (!pairs.length) { return; }
+
+    var heldUntilScroll = null;
+    var heldAtY = 0;
+
+    function mark(section) {
+      pairs.forEach(function (pair) {
+        var current = pair.section === section;
+        pair.tab.classList.toggle('is-current', current);
+        if (current) { pair.tab.setAttribute('aria-current', 'true'); }
+        else { pair.tab.removeAttribute('aria-current'); }
+      });
+    }
+
+    function triggerLine() {
+      var bar = document.querySelector('.mgdb-section-tabs');
+      var barHeight = bar ? bar.getBoundingClientRect().height : 0;
+      var margin = parseFloat(window.getComputedStyle(pairs[0].section).scrollMarginTop) || 0;
+      return Math.max(barHeight + 8, margin + 4);
+    }
+
+    function update() {
+      if (heldUntilScroll) {
+        if (Math.abs(window.scrollY - heldAtY) < 4) { return; }
+        heldUntilScroll = null;
+      }
+      var line = triggerLine();
+      var current = pairs[0];
+      pairs.forEach(function (pair) {
+        if (pair.section.hasAttribute('hidden')) { return; }
+        if (pair.section.getBoundingClientRect().top <= line) { current = pair; }
+      });
+      if ((window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 2)) {
+        current = pairs[pairs.length - 1];
+      }
+      if (current) { mark(current.section); }
+    }
+
+    pairs.forEach(function (pair) {
+      pair.tab.addEventListener('click', function () {
+        mark(pair.section);
+        heldUntilScroll = pair.section;
+        heldAtY = window.scrollY;
+      });
     });
 
-    if (!('IntersectionObserver' in window)) return;
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
 
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          sections.forEach(function (s) {
-            var current = s.el === entry.target;
-            s.link.classList.toggle('is-current', current);
-            if (current) {
-              s.link.setAttribute('aria-current', 'true');
-            } else {
-              s.link.removeAttribute('aria-current');
-            }
-          });
-        }
+    if (window.IntersectionObserver) {
+      var observer = new window.IntersectionObserver(function () { update(); },
+        { rootMargin: '-20% 0px -60% 0px' });
+      pairs.forEach(function (pair) { observer.observe(pair.section); });
+    }
+
+    var results = byId('insertion-results-section');
+    if (results && window.MutationObserver) {
+      new window.MutationObserver(update).observe(results, {
+        childList: true, subtree: true, attributes: true, attributeFilter: ['hidden']
       });
-    }, { rootMargin: '-20% 0px -70% 0px' });
+    }
 
-    sections.forEach(function (s) { observer.observe(s.el); });
+    update();
   }
 
   /* ── Init ────────────────────────────────────────────────────────────── */
@@ -507,10 +806,11 @@
     initSectionTabs();
     initViewToggle();
     initTabs();
-    initBackgroundSync('ins-gene-dataset', 'ins-gene-background');
-    initBackgroundSync('ins-region-dataset', 'ins-region-background');
+    initBackgroundSync('ins-dataset', 'ins-background');
     initExamples();
     initForms();
+    initResultControls();
+    initFigure();
   }
 
   if (document.readyState === 'loading') {

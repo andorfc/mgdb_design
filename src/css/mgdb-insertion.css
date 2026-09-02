@@ -1,6 +1,24 @@
-/* --------------------------------------------------------------------------
-   Hero Emblem
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   Insertion Data Hub — /insertion
+   --------------------------------------------------------------------------
+   Loaded after css/mgdb-modern.css and css/mgdb-hub.css. The hub shell already
+   settles the pale blue ground, the white section cards and their coloured top
+   edges, the absence of a rule under a section title, the metric colours, the
+   gold edge a grid tile takes on hover, the zebra striping, the green Related
+   resources panel, the shared form field, and the scroll offset.
+
+   Nothing above is repeated here. What is here is the page's own furniture:
+   the three search modes, the shared advanced accordion, the results controls
+   and pagination, and the result table's interior.
+
+   This hub keeps a mode tab set where the others have a single query field,
+   because gene, position and insertion-name are three different questions
+   rather than three filters on one. The secondary filters they share --
+   collection, background, gene structure -- were duplicated across the mode
+   panels and are now one advanced panel underneath them.
+   ========================================================================== */
+
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
 
 .mgdb-insertion-page .mgdb-hero-emblem {
   background: #ffffff;
@@ -13,9 +31,7 @@
   mix-blend-mode: normal;
 }
 
-/* --------------------------------------------------------------------------
-   Sticky Section Tabs
-   -------------------------------------------------------------------------- */
+/* ── Sticky section tabs ─────────────────────────────────────────────────── */
 
 .mgdb-insertion-page .mgdb-section-tabs {
   position: sticky;
@@ -26,9 +42,6 @@
   gap: var(--mgdb-space-2);
   margin-top: var(--mgdb-space-5);
   margin-bottom: var(--mgdb-space-5);
-  padding: var(--mgdb-space-2) 0;
-  background: var(--mgdb-surface);
-  border-bottom: 1px solid var(--mgdb-line);
 }
 
 .mgdb-insertion-page .mgdb-section-tabs a {
@@ -36,144 +49,289 @@
   min-height: 40px;
   align-items: center;
   padding: 0 var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
   color: var(--mgdb-ink) !important;
   font-size: var(--mgdb-text-sm);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
-  transition: background .12s, border-color .12s;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
 }
 
-.mgdb-insertion-page .mgdb-section-tabs a:hover {
-  background: var(--mgdb-green-soft);
-}
+.mgdb-insertion-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
 
 .mgdb-insertion-page .mgdb-section-tabs a.is-current,
 .mgdb-insertion-page .mgdb-section-tabs a[aria-current="true"] {
   border-color: var(--mgdb-green-dark);
   background: var(--mgdb-green-dark);
-  color: #fff !important;
+  color: #ffffff !important;
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
-.mgdb-insertion-page > section,
-.mgdb-insertion-page section[id] {
-  scroll-margin-top: 4.5rem;
+@media (max-width: 1170px) and (min-width: 801px) {
+  .mgdb-hub-page.mgdb-insertion-page > section[id] { scroll-margin-top: 65px; }
 }
 
-.mgdb-insertion-page .insertion-search-panel + .insertion-results-section {
-  margin-top: var(--mgdb-space-5);
+@media (max-width: 800px) {
+  .mgdb-hub-page.mgdb-insertion-page > section[id] { scroll-margin-top: 113px; }
 }
+
+.mgdb-insertion-page > section[id] { margin-bottom: var(--mgdb-space-5); }
 
 /* --------------------------------------------------------------------------
-   Search mode tabs -- same shape as the protein-structure page's .ps-tabs,
-   real buttons in a tablist rather than links, since switching mode changes
-   which form is visible without navigating.
+   Search modes
    -------------------------------------------------------------------------- */
 
 .mgdb-insertion-page .ins-tabs {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-2);
-  margin: var(--mgdb-space-5) 0 var(--mgdb-space-5);
-  border-bottom: 2px solid var(--mgdb-line);
+  margin-bottom: var(--mgdb-space-4);
+  padding-bottom: var(--mgdb-space-3);
+  border-bottom: 1px solid var(--hub-line-soft);
 }
 
 .mgdb-insertion-page .ins-tab {
   min-height: var(--mgdb-tap-target);
-  padding: var(--mgdb-space-3) var(--mgdb-space-4);
-  border: 0;
-  border-bottom: 3px solid transparent;
-  margin-bottom: -2px;
-  background: none;
-  color: var(--mgdb-muted);
-  font: inherit;
-  font-weight: 700;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink-soft);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
   cursor: pointer;
 }
 
-.mgdb-insertion-page .ins-tab:hover { color: var(--mgdb-green-dark); background: var(--mgdb-green-soft); }
-.mgdb-insertion-page .ins-tab:focus-visible { outline: 3px solid var(--mgdb-focus); outline-offset: -3px; }
+.mgdb-insertion-page .ins-tab:hover { border-color: var(--mgdb-green-dark); background: var(--mgdb-green-soft); color: var(--mgdb-green-dark); }
+.mgdb-insertion-page .ins-tab:focus-visible { outline: 3px solid var(--mgdb-focus); outline-offset: 2px; }
 
 .mgdb-insertion-page .ins-tab[aria-selected="true"] {
-  border-bottom-color: var(--mgdb-green);
-  color: var(--mgdb-green-dark);
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
 }
 
 .mgdb-insertion-page .ins-search-form {
-  padding: var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface-alt);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-4);
+  align-items: end;
 }
 
 .mgdb-insertion-page .ins-search-form[hidden] { display: none; }
 
-.mgdb-insertion-page .ins-example {
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--mgdb-green-dark);
-  font: inherit;
+.mgdb-insertion-page .ins-field-query { grid-column: 1; }
+/* Scoped with `>` to the search forms: `.mgdb-hub-field-action` is a shared
+   class and the results controls use it too. */
+.mgdb-insertion-page .ins-search-form > .mgdb-hub-field-action { grid-column: 2; }
+.mgdb-insertion-page .ins-example-row,
+.mgdb-insertion-page .ins-region-row { grid-column: 1 / -1; }
+
+.mgdb-insertion-page .ins-search-form textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  border: 1px solid #b9b2a5;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink);
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-sm);
+  resize: vertical;
+}
+
+.mgdb-insertion-page .ins-search-form textarea:focus {
+  border-color: var(--mgdb-focus);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(11, 87, 164, .18);
+}
+
+.mgdb-insertion-page .ins-hint {
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+/* The button has no label above it, so it bottom-aligns with the textarea
+   rather than reserving a label band of its own. */
+.mgdb-insertion-page .ins-search-form > .mgdb-hub-field-action { align-self: end; }
+
+/* Five controls on one line: four inputs and the submit. */
+.mgdb-insertion-page .ins-region-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, .8fr) minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-3);
+  align-items: end;
+}
+
+@media (max-width: 1024px) {
+  .mgdb-insertion-page .ins-region-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .mgdb-insertion-page .ins-search-form { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-insertion-page .ins-search-form > .mgdb-hub-field-action { grid-column: 1; }
+  .mgdb-insertion-page .ins-region-row { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ── Examples ────────────────────────────────────────────────────────────── */
+
+.mgdb-insertion-page .ins-example-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--hub-line-soft);
+}
+
+.mgdb-insertion-page .ins-example-row > span:first-child {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
   font-weight: 700;
-  text-decoration: underline;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.mgdb-insertion-page .ins-example-row button {
+  padding: var(--mgdb-space-1) var(--mgdb-space-3);
+  border: 1px solid var(--hub-line);
+  border-radius: 999px;
+  background: var(--hub-surface);
+  color: var(--mgdb-green-dark);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
+}
+
+.mgdb-insertion-page .ins-example-row button:hover {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+}
+
+/* ── Advanced search ─────────────────────────────────────────────────────── */
+
+.mgdb-insertion-page .ins-adv {
+  margin-top: var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--hub-surface);
+}
+
+.mgdb-insertion-page .ins-adv summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+  align-items: baseline;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  color: var(--mgdb-green-dark);
+  cursor: pointer;
+  list-style-position: inside;
+}
+
+.mgdb-insertion-page .ins-adv summary strong { font-size: var(--mgdb-text-base); }
+.mgdb-insertion-page .ins-adv summary span { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+.mgdb-insertion-page .ins-adv[open] summary { border-bottom: 1px solid var(--hub-line-soft); }
+
+.mgdb-insertion-page .ins-adv-body {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--mgdb-space-4);
+  align-items: start;
+  padding: var(--mgdb-space-4);
+}
+
+.mgdb-insertion-page .ins-adv-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: center;
+  padding: 0 var(--mgdb-space-4) var(--mgdb-space-4);
+}
+
+@media (max-width: 800px) {
+  .mgdb-insertion-page .ins-adv-body { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* --------------------------------------------------------------------------
    Results
    -------------------------------------------------------------------------- */
 
+.mgdb-insertion-page .insertion-results-section[hidden] { display: none; }
+
 .mgdb-insertion-page .insertion-results-heading {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--mgdb-space-3);
-  align-items: flex-start;
+  gap: var(--mgdb-space-3) var(--mgdb-space-5);
+  align-items: end;
   justify-content: space-between;
   margin-bottom: var(--mgdb-space-4);
 }
 
+.mgdb-insertion-page .insertion-results-heading h2 { margin: 0; }
+.mgdb-insertion-page .insertion-results-heading > div:first-child { min-width: 0; flex: 1 1 18rem; }
+
+.mgdb-insertion-page #insertion-results-status {
+  margin: var(--mgdb-space-1) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* Fixed tracks in a box sized to its own content: declared with minmax(0, ...)
+   the first tracks take everything the parent offers and the last resolves to
+   0px, which drops its control onto a second row. */
 .mgdb-insertion-page .ins-results-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--mgdb-space-3);
+  display: grid;
+  width: max-content;
+  max-width: 100%;
+  flex: 0 0 auto;
+  grid-template-columns: 13rem 10rem auto auto;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: end;
+}
+
+@media (max-width: 900px) {
+  .mgdb-insertion-page .ins-results-controls {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .mgdb-insertion-page .ins-results-controls { grid-template-columns: minmax(0, 1fr); }
 }
 
 .mgdb-insertion-page .ins-view-toggle {
   display: inline-flex;
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
   overflow: hidden;
+  height: var(--mgdb-tap-target);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
 }
 
 .mgdb-insertion-page .ins-view-btn {
   display: inline-flex;
+  min-height: 100%;
   align-items: center;
-  gap: var(--mgdb-space-1);
-  min-height: 36px;
-  padding: 0 var(--mgdb-space-3);
-  border: none;
+  padding: 0 var(--mgdb-space-4);
+  border: 0;
   background: transparent;
   color: var(--mgdb-ink-soft);
   font-family: inherit;
-  font-size: var(--mgdb-text-xs);
+  font-size: var(--mgdb-text-sm);
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
-  transition: background-color .15s ease, color .15s ease;
 }
 
-.mgdb-insertion-page .ins-view-btn svg {
-  flex-shrink: 0;
-}
-
-.mgdb-insertion-page .ins-view-btn:hover {
-  background: var(--mgdb-surface-alt);
-  color: var(--mgdb-ink);
-}
+.mgdb-insertion-page .ins-view-btn + .ins-view-btn { border-left: 1px solid var(--hub-line); }
 
 .mgdb-insertion-page .ins-view-btn.is-active,
 .mgdb-insertion-page .ins-view-btn[aria-pressed="true"] {
@@ -182,6 +340,95 @@
 }
 
 .mgdb-insertion-page #insertion-notes .mgdb-message { margin-bottom: var(--mgdb-space-4); }
+
+/* ── Pagination ──────────────────────────────────────────────────────────── */
+
+.mgdb-insertion-page .ins-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-4);
+  border-top: 1px solid var(--hub-line-soft);
+}
+
+.mgdb-insertion-page .ins-pagination:empty { display: none; }
+
+.mgdb-insertion-page .ins-page-btn {
+  min-width: var(--mgdb-tap-target);
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mgdb-insertion-page .ins-page-btn:hover:not([disabled]) {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-insertion-page .ins-page-btn.is-active {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+}
+
+.mgdb-insertion-page .ins-page-btn[disabled] { opacity: .45; cursor: not-allowed; }
+.mgdb-insertion-page .ins-page-ellipsis { padding: 0 var(--mgdb-space-1); color: var(--mgdb-muted); }
+
+/* --------------------------------------------------------------------------
+   Card grids and the figure
+   -------------------------------------------------------------------------- */
+
+.mgdb-insertion-page .insertion-collection-grid,
+.mgdb-insertion-page .ins-download-grid {
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+@media (max-width: 900px) {
+  .mgdb-insertion-page .insertion-collection-grid,
+  .mgdb-insertion-page .ins-download-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+.mgdb-insertion-page .insertion-collection-grid .mgdb-card h3,
+.mgdb-insertion-page .ins-download-header h3 {
+  margin: 0;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-insertion-page .ins-download-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+}
+
+.mgdb-insertion-page .ins-download-card .mgdb-button { align-self: flex-start; }
+
+.mgdb-insertion-page .ins-figure { margin-top: var(--mgdb-space-5); }
+
+.mgdb-insertion-page .ins-figure .mgdb-chart {
+  height: auto;
+  min-height: 320px;
+  overflow: visible;
+}
+
+@media print {
+  .mgdb-insertion-page .mgdb-section-tabs,
+  .mgdb-insertion-page .ins-tabs,
+  .mgdb-insertion-page .ins-search-form,
+  .mgdb-insertion-page .ins-pagination { display: none; }
+}
 
 .mgdb-insertion-page .ins-table td,
 .mgdb-insertion-page .ins-table th { vertical-align: top; }
