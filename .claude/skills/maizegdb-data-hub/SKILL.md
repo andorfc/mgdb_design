@@ -145,6 +145,18 @@ nothing else goes wrong visibly.
   the string it is handed plus a global stamp. Any payload whose *shape* is
   built in the controller needs `'<key>_' . (int) @filemtime(__FILE__)`, or a
   warm server keeps serving an entry that predates the new fields.
+- **Check what a metric card counts, not just that it renders.** Three cards on
+  one hub named one thing and counted another -- "Trait Categories" showing the
+  number of phenotypes that have a trait, not the number of categories. Read the
+  SQL behind each number against the heading above it.
+- **Delete hard-coded stat fallbacks.** A try/catch that answers a failed query
+  with literal numbers prints stale values with full confidence; one hub's had
+  drifted by almost 2x. Show nothing rather than a confident wrong number.
+- **Verify outbound links by response SIZE, not status.** Unknown
+  `/data_center/<name>` routes answer **HTTP 200** with the generic 404 body at
+  about 39.6 KB, so link checkers pass them. One dead route was sitting in the
+  Related resources of seven redesigned pages. Compare `curl | wc -c` and the
+  `<title>` across every link before shipping a hub.
 - **Read every field from the DOM in the submit handler.** Advanced inputs that
   only update state on `change` silently drop a value the browser restored
   itself (autofill, bfcache), so the form can show a filter the query omits.
