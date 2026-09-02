@@ -18,6 +18,8 @@
     view: 'table',
     page: 1,
     pageSize: 25,
+    filter: '',
+    searched: false,
     total: 0,
     loading: false
   };
@@ -40,64 +42,84 @@
 
   /* ── Sticky Section Tabs & Scrollspy ────────────────────────────────────── */
 
+  /* Sticky section tabs, driven by scroll, IntersectionObserver and resize
+     together: no single trigger fires everywhere, and the results section
+     appears and disappears under the bar as searches run. The previous version
+     used IntersectionObserver alone. */
   function buildTabs() {
     var tabs = document.querySelectorAll('.mgdb-section-tabs a');
-    if (!tabs.length) return;
+    if (!tabs.length) { return; }
 
     var pairs = [];
     Array.prototype.forEach.call(tabs, function (tab) {
-      var href = tab.getAttribute('href');
-      if (href && href.indexOf('#') === 0) {
-        var section = document.querySelector(href);
-        if (section) {
-          pairs.push({ tab: tab, section: section });
-        }
-      }
+      var href = tab.getAttribute('href') || '';
+      if (href.charAt(0) !== '#') { return; }
+      var section = document.getElementById(href.slice(1));
+      if (section) { pairs.push({ tab: tab, section: section }); }
     });
+    if (!pairs.length) { return; }
 
-    function markCurrent(target) {
+    var heldUntilScroll = null;
+    var heldAtY = 0;
+
+    function mark(section) {
       pairs.forEach(function (pair) {
-        var current = pair.section === target;
+        var current = pair.section === section;
         pair.tab.classList.toggle('is-current', current);
-        if (current) {
-          pair.tab.setAttribute('aria-current', 'true');
-        } else {
-          pair.tab.removeAttribute('aria-current');
-        }
+        if (current) { pair.tab.setAttribute('aria-current', 'true'); }
+        else { pair.tab.removeAttribute('aria-current'); }
       });
     }
 
-    var initial = pairs[0];
-    if (window.location.hash) {
-      pairs.forEach(function (pair) {
-        if ('#' + pair.section.id === window.location.hash) {
-          initial = pair;
-        }
-      });
+    function triggerLine() {
+      var bar = document.querySelector('.mgdb-section-tabs');
+      var barHeight = bar ? bar.getBoundingClientRect().height : 0;
+      var margin = parseFloat(window.getComputedStyle(pairs[0].section).scrollMarginTop) || 0;
+      return Math.max(barHeight + 8, margin + 4);
     }
-    if (initial) {
-      markCurrent(initial.section);
+
+    function update() {
+      if (heldUntilScroll) {
+        if (Math.abs(window.scrollY - heldAtY) < 4) { return; }
+        heldUntilScroll = null;
+      }
+      var line = triggerLine();
+      var current = pairs[0];
+      pairs.forEach(function (pair) {
+        if (pair.section.hasAttribute('hidden')) { return; }
+        if (pair.section.getBoundingClientRect().top <= line) { current = pair; }
+      });
+      if ((window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 2)) {
+        current = pairs[pairs.length - 1];
+      }
+      if (current) { mark(current.section); }
     }
 
     pairs.forEach(function (pair) {
       pair.tab.addEventListener('click', function () {
-        markCurrent(pair.section);
+        mark(pair.section);
+        heldUntilScroll = pair.section;
+        heldAtY = window.scrollY;
       });
     });
 
-    if (!window.IntersectionObserver) return;
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
 
-    var observer = new window.IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          markCurrent(entry.target);
-        }
+    if (window.IntersectionObserver) {
+      var observer = new window.IntersectionObserver(function () { update(); },
+        { rootMargin: '-20% 0px -60% 0px' });
+      pairs.forEach(function (pair) { observer.observe(pair.section); });
+    }
+
+    var results = byId('map-results-section');
+    if (results && window.MutationObserver) {
+      new window.MutationObserver(update).observe(results, {
+        childList: true, subtree: true, attributes: true, attributeFilter: ['hidden']
       });
-    }, { rootMargin: '-20% 0px -60% 0px' });
+    }
 
-    pairs.forEach(function (pair) {
-      observer.observe(pair.section);
-    });
+    update();
   }
 
   /* ── Query Execution ────────────────────────────────────────────────────── */
@@ -147,6 +169,10 @@
     state.loading = true;
     updateExportLinks();
 
+    var section = byId('map-results-section');
+    if (section) { section.hidden = false; }
+    state.searched = true;
+
     var statusEl = byId('map-results-status');
     if (statusEl) {
       statusEl.textContent = 'Searching curated maps…';
@@ -160,8 +186,10 @@
     if (state.panel && state.panel !== '0') qs.set('panel', state.panel);
     if (state.has_loci) qs.set('has_loci', state.has_loci);
     if (state.sort) qs.set('sort', state.sort);
-    qs.set('page', state.page);
-    qs.set('page_size', state.pageSize);
+    qs.set('page', state.pageSize === 'all' ? 1 : state.page);
+    /* The endpoint caps a page at 100, so "All results" means as many as it
+       returns at once; updateStatus says so rather than truncating quietly. */
+    qs.set('page_size', state.pageSize === 'all' ? 100 : state.pageSize);
 
     fetch(API_URL + '?' + qs.toString())
       .then(function (res) { return res.json(); })
@@ -173,7 +201,9 @@
         }
         state.total = data.summary.total;
         window._lastMapResults = data.results || [];
+        window._lastMapSummary = data.summary;
         renderResults(data.results);
+        applyResultsFilter();
         renderPagination(data.summary);
         updateStatus(data.summary);
 
@@ -196,9 +226,60 @@
       statusEl.textContent = 'No matching maps found.';
       return;
     }
+
+    /* The table filter narrows the page in the browser, so once it is on the
+       server's total no longer describes what is on screen. */
+    if (state.filter) {
+      var items = visibleItems();
+      statusEl.textContent = items.shown === 0
+        ? 'Nothing on this page matches the filter “' + state.filter + '”. '
+          + summary.total.toLocaleString() + ' maps matched the search.'
+        : 'Showing ' + items.shown.toLocaleString() + ' of the ' + items.total.toLocaleString()
+          + ' maps on this page matching “' + state.filter + '”, out of '
+          + summary.total.toLocaleString() + ' matched by the search.';
+      return;
+    }
+
+    if (state.pageSize === 'all') {
+      statusEl.textContent = summary.total > summary.page_size
+        ? 'Showing the first ' + summary.page_size.toLocaleString() + ' of ' + summary.total.toLocaleString()
+          + ' maps, which is as many as the search returns at once. (' + summary.elapsed_ms + ' ms)'
+        : 'Showing all ' + summary.total.toLocaleString() + ' matching maps. (' + summary.elapsed_ms + ' ms)';
+      return;
+    }
+
     var start = (summary.page - 1) * summary.page_size + 1;
     var end = Math.min(summary.total, summary.page * summary.page_size);
-    statusEl.textContent = 'Showing ' + start.toLocaleString() + '–' + end.toLocaleString() + ' of ' + summary.total.toLocaleString() + ' maps (' + summary.elapsed_ms + ' ms)';
+    statusEl.textContent = 'Showing ' + start.toLocaleString() + '–' + end.toLocaleString() + ' of ' + summary.total.toLocaleString() + ' maps. (' + summary.elapsed_ms + ' ms)';
+  }
+
+  /* The filter narrows the page already rendered, in either view: the card
+     grid and the table both hold one element per map. */
+  function visibleItems() {
+    var container = byId('map-results');
+    if (!container) { return { shown: 0, total: 0 }; }
+    var items = container.querySelectorAll('.map-card-item, tbody tr');
+    var shown = 0;
+    Array.prototype.forEach.call(items, function (item) { if (!item.hidden) { shown++; } });
+    return { shown: shown, total: items.length };
+  }
+
+  function applyResultsFilter() {
+    var container = byId('map-results');
+    if (!container) { return; }
+
+    var items = container.querySelectorAll('.map-card-item, tbody tr');
+    var terms = state.filter.toLowerCase().split(/\s+/).filter(Boolean);
+
+    Array.prototype.forEach.call(items, function (item) {
+      if (!terms.length) { item.hidden = false; return; }
+      var hay = (item.textContent || '').toLowerCase();
+      var match = true;
+      for (var i = 0; i < terms.length; i++) {
+        if (hay.indexOf(terms[i]) === -1) { match = false; break; }
+      }
+      item.hidden = !match;
+    });
   }
 
   function showError(msg) {
@@ -318,7 +399,7 @@
     var paginationEl = byId('map-pagination');
     if (!paginationEl) return;
 
-    if (summary.page_count <= 1) {
+    if (state.pageSize === 'all' || summary.page_count <= 1) {
       paginationEl.innerHTML = '';
       return;
     }
@@ -390,6 +471,15 @@
       }];
 
       var layout = {
+        /* Plotly needs to be told the height. With `responsive: true` and no
+           height in the layout it autosized to 0 -- the container's 340px comes
+           from CSS rather than from content, and nothing here filled it, so the
+           plot-container computed to 0px and the figure drew nothing. The
+           fallback text sitting on top of it was what made the panel look
+           populated; with that removed the figure was simply empty.
+           Plotly.Plots.resize() does not recover it, but an explicit height
+           does. */
+        height: chrChart.clientHeight || 340,
         margin: { t: 20, r: 30, b: 50, l: 200 },
         xaxis: {
           title: 'Total Mapped Markers (Chromosomes 1–10 combined)',
@@ -405,6 +495,18 @@
       };
 
       var config = { responsive: true, displayModeBar: false };
+
+      /* Plotly appends; it does not replace. The fallback div is meant to be
+         "shown until Plotly renders, and left in place if it never loads", but
+         nothing ever took it away, so "Loading top map marker breakdown..."
+         stayed on top of the finished chart. It also filled the container's
+         340px, which left Plotly's own plot-container measuring 0 tall.
+
+         Cleared here rather than earlier: everything that can fail -- a missing
+         Plotly, absent data attributes, a JSON parse error -- has already
+         returned or thrown by this point, so the fallback still survives every
+         case it exists for. */
+      chrChart.innerHTML = '';
 
       Plotly.newPlot(chrChart, data, layout, config);
     } catch (e) {
@@ -476,6 +578,8 @@
         updateClearBtn();
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(function () {
+          // Before the first search, typing must not open the results section.
+          if (!state.searched) { return; }
           state.term = queryInput.value.trim();
           state.page = 1;
           fetchMaps(false);
@@ -559,6 +663,26 @@
       });
     }
 
+    // Results per page
+    var pageSizeSelect = byId('map-page-size');
+    if (pageSizeSelect) {
+      pageSizeSelect.addEventListener('change', function () {
+        state.pageSize = this.value === 'all' ? 'all' : parseInt(this.value, 10) || 25;
+        state.page = 1;
+        if (state.searched) { fetchMaps(false); }
+      });
+    }
+
+    // Filter within the rendered page
+    var resultsFilter = byId('map-results-filter');
+    if (resultsFilter) {
+      resultsFilter.addEventListener('input', function () {
+        state.filter = this.value.trim();
+        applyResultsFilter();
+        if (window._lastMapSummary) { updateStatus(window._lastMapSummary); }
+      });
+    }
+
     // View toggle buttons
     var viewBtns = document.querySelectorAll('.map-view-btn');
     viewBtns.forEach(function (btn) {
@@ -568,6 +692,7 @@
           state.view = view;
           updateViewButtons();
           renderResults(window._lastMapResults || []);
+          applyResultsFilter();
         }
       });
     });
@@ -587,7 +712,15 @@
 
     buildTabs();
     initChart();
-    fetchMaps(false);
+
+    /* The page used to run a search on load, which put 25 maps and a 1.1 s
+       request in front of a reader who had not asked for either. It runs now
+       only when the URL carries a query -- a linked search, or an example
+       followed from elsewhere. */
+    if (state.term || state.locus || state.linkage !== '0' || state.source !== '0'
+        || state.panel !== '0' || state.has_loci === 1) {
+      fetchMaps(false);
+    }
   }
 
   if (document.readyState === 'loading') {

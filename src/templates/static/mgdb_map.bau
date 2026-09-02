@@ -3,12 +3,12 @@ $$SYNTAX-LEVEL 2
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@MaizeGDB">
 <meta property="og:url" content="https://maizegdb.org/data_center/map">
-<meta property="og:title" content="MaizeGDB Map Center | Genetic, Cytogenetic &amp; Physical Maps">
+<meta property="og:title" content="MaizeGDB Map Data Hub | Genetic, Cytogenetic &amp; Physical Maps">
 <meta property="og:description" content="Explore and search over 2,100 curated maize genetic, cytogenetic, physical, and bin maps across chromosomes 1–10.">
 
-<main class="mgdb-page mgdb-map-page" id="map-main">
+<main class="mgdb-page mgdb-hub-page mgdb-map-page" id="map-main">
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
-    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Map Center</span>
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Map Data Hub</span>
   </nav>
 
   <section class="mgdb-hero" aria-labelledby="map-title">
@@ -24,7 +24,7 @@ $$SYNTAX-LEVEL 2
         <line x1="52" y1="56" x2="68" y2="56" stroke="#235c37" stroke-width="3"/>
         <line x1="52" y1="64" x2="68" y2="64" stroke="#d99a0b" stroke-width="3"/>
       </svg>
-      <strong>Map<br />Center</strong>
+      <strong>Map<br />Data Hub</strong>
     </div>
     <div class="mgdb-hero-body">
       <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; August 2026</p>
@@ -34,12 +34,13 @@ $$SYNTAX-LEVEL 2
   </section>
 
   <nav class="mgdb-section-tabs" aria-label="Map resource sections">
-    <a href="#map-search-section" class="is-current" aria-current="true">Search maps</a>
-    <a href="#map-key-maps">Key genetic maps</a>
-    <a href="#map-chromosomes">Chromosome matrix</a>
-    <a href="#map-collections">Map tools &amp; collections</a>
-    <a href="#map-downloads">Bulk downloads</a>
-    <a href="#map-statistics">Corpus statistics</a>
+    <a href="#map-search-section" class="is-current" aria-current="true">Search</a>
+    <a href="#map-key-maps">Key maps</a>
+    <a href="#map-chromosomes">Chromosomes</a>
+    <a href="#map-collections">Collections</a>
+    <a href="#map-downloads">Downloads</a>
+    <a href="#map-references">References</a>
+    <a href="#map-statistics">Metrics</a>
     <a href="#map-related">Related resources</a>
   </nav>
 
@@ -47,10 +48,8 @@ $$SYNTAX-LEVEL 2
   <section id="map-search-section" class="map-search-panel" aria-labelledby="map-search-title">
     <div class="map-search-header">
       <div>
-        <span class="mgdb-eyebrow">Interactive finder</span>
-        <h2 id="map-search-title">Search &amp; filter maize maps</h2>
+        <h2 id="map-search-title">Search</h2>
       </div>
-      <p>Search by map name, mapping population, author, or filter by chromosome and specific mapped loci.</p>
     </div>
 
     <form id="map-search-form" class="map-search-form" role="search">
@@ -132,14 +131,26 @@ $$SYNTAX-LEVEL 2
   </section>
 
   <!-- Results Section -->
-  <section id="map-results-section" class="map-results-section" aria-labelledby="map-results-title">
+  <section id="map-results-section" class="map-results-section" aria-labelledby="map-results-title" hidden>
     <div class="map-results-heading">
       <div>
-        <span class="mgdb-eyebrow">Search results</span>
-        <h2 id="map-results-title">Matching chromosome maps</h2>
+        <h2 id="map-results-title">Search results</h2>
         <p id="map-results-status" aria-live="polite">Enter a search term above or choose a chromosome filter to inspect maps.</p>
       </div>
       <div class="map-results-controls">
+        <div class="mgdb-hub-field">
+          <label for="map-results-filter">Filter results</label>
+          <input id="map-results-filter" type="search" placeholder="Narrow this page" autocomplete="off" />
+        </div>
+        <div class="mgdb-hub-field">
+          <label for="map-page-size">Results per page</label>
+          <select id="map-page-size">
+            <option value="10">Top 10</option>
+            <option value="25" selected>Top 25</option>
+            <option value="50">Top 50</option>
+            <option value="all">All results</option>
+          </select>
+        </div>
         <div class="map-view-toggle" role="group" aria-label="View style">
           <button class="map-view-btn" type="button" data-view="card" aria-pressed="false">
             <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>Cards
@@ -180,10 +191,8 @@ $$SYNTAX-LEVEL 2
   <section id="map-key-maps" aria-labelledby="map-key-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Direct navigation</span>
-        <h2 id="map-key-title">Key genetics &amp; physical maps catalog</h2>
+        <h2 id="map-key-title">Key maps</h2>
       </div>
-      <p>Quick access to all 10 chromosomes across primary community reference frameworks, high-resolution recombinant inbred maps, and SNP array panels.</p>
     </div>
 
     <div class="map-key-matrix">
@@ -379,10 +388,8 @@ $$SYNTAX-LEVEL 2
   <section id="map-chromosomes" aria-labelledby="map-chromosomes-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Genome architecture</span>
-        <h2 id="map-chromosomes-title">Maize chromosome maps matrix &#40;1&ndash;10&#41;</h2>
+        <h2 id="map-chromosomes-title">Chromosomes</h2>
       </div>
-      <p>Quick access to the standard reference bin and genetic maps for each of the 10 maize chromosomes.</p>
     </div>
 
     <div class="map-chr-grid" aria-label="Maize chromosomes 1 through 10">
@@ -502,10 +509,8 @@ $$SYNTAX-LEVEL 2
   <section id="map-collections" aria-labelledby="map-collections-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Mapping utilities</span>
-        <h2 id="map-collections-title">Map comparison tools &amp; collections</h2>
+        <h2 id="map-collections-title">Collections</h2>
       </div>
-      <p>Explore tools for comparing marker orders, viewing bin assignments, and analyzing syntenic maps.</p>
     </div>
 
     <div class="mgdb-card-grid map-collection-grid">
@@ -557,10 +562,8 @@ $$SYNTAX-LEVEL 2
   <section id="map-downloads" aria-labelledby="map-downloads-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Bulk data</span>
-        <h2 id="map-downloads-title">Map catalogs &amp; locus coordinates downloads</h2>
+        <h2 id="map-downloads-title">Downloads</h2>
       </div>
-      <p>Download complete tabulated map listings and locus coordinates for computational and offline analyses.</p>
     </div>
 
     <div class="map-download-grid" aria-label="Map downloads">
@@ -593,18 +596,27 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
-  <!-- Corpus Statistics & Top 10 Map Series Chart Section -->
+  <!-- ── References ───────────────────────────────────────────────────────── -->
+  <section id="map-references" aria-labelledby="map-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="map-references-title">References</h2></div>
+    </div>
+
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
+  <!-- Metrics and the top map series figure -->
   <section id="map-statistics" aria-labelledby="map-statistics-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Corpus summary</span>
-        <h2 id="map-statistics-title">Map collection at a glance</h2>
+        <h2 id="map-statistics-title">Metrics</h2>
       </div>
-      <p>Curated genetic, cytogenetic, and physical maps maintained by MaizeGDB.</p>
     </div>
 
     <div class="mgdb-metric-grid">
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-green">
         <div class="mgdb-metric-top">
           <h3>Curated Maps</h3>
           <span class="mgdb-metric-badge">Frameworks</span>
@@ -615,7 +627,7 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Active curated genetic, bin, and physical maps.</p>
       </article>
 
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-amber">
         <div class="mgdb-metric-top">
           <h3>Mapped Loci</h3>
           <span class="mgdb-metric-badge">Coordinates</span>
@@ -626,7 +638,7 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Positioned genetic loci, markers, and QTLs.</p>
       </article>
 
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-blue">
         <div class="mgdb-metric-top">
           <h3>Chromosomes &amp; LGs</h3>
           <span class="mgdb-metric-badge">Linkage</span>
@@ -637,7 +649,7 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Chromosomes 1–10, B chromosome, and organellar genomes.</p>
       </article>
 
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-burgundy">
         <div class="mgdb-metric-top">
           <h3>Mapping Publications</h3>
           <span class="mgdb-metric-badge">Literature</span>
@@ -664,13 +676,11 @@ $$SYNTAX-LEVEL 2
   </section>
 
   <!-- Related Resources Section -->
-  <section id="map-related" aria-labelledby="map-related-title">
+  <section id="map-related" class="mgdb-hub-related" aria-labelledby="map-related-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Connected tools</span>
         <h2 id="map-related-title">Related resources</h2>
       </div>
-      <p>Explore related genomic hubs, probe databases, and sequence browsers at MaizeGDB.</p>
     </div>
 
     <div class="mgdb-resource-panel">
@@ -698,11 +708,6 @@ $$SYNTAX-LEVEL 2
         <a href="/data_center/cytogenetic">
           <strong>Cytogenetic Data Hub</strong>
           <span>Chromosome FISH coordinates, translocation breakpoints, and karyotypes</span>
-          <span class="mgdb-resource-badge">Internal</span>
-        </a>
-        <a href="/cite">
-          <strong>How to Cite MaizeGDB</strong>
-          <span>Guidelines and citation formats for database records, tools, and datasets</span>
           <span class="mgdb-resource-badge">Internal</span>
         </a>
       </div>

@@ -524,6 +524,60 @@ top edge on hover comes free. References use the shell's `.mgdb-ref` card, the
 same markup `include/references_lib.php` emits, built client-side from the
 API's rows, with a table view beside it.
 
+### The record page layout, settled 2026-09-01
+
+Three changes that apply to every record page on the hub shell, not just this
+one:
+
+- **The header is one tone.** A hub header is two-tone on purpose: the emblem
+  panel beside the washed body is what tells a reader they are on a hub. A
+  record is not a hub, so it drops the emblem column and the decorative ring
+  and takes one flat shade. The shell carries this as
+  `mgdb-hub-record-hero` in `css/mgdb-hub.css`; the section keeps `mgdb-hero`
+  as well, so the shell's `> section:not(.mgdb-hero)` card treatment still
+  passes it over.
+- **No search section.** The page opens on Overview. A reader on a record
+  already found what they were looking for; the search that matters is on the
+  hub, and on the not-found page below.
+- **An identifier that does not resolve gets a real 404**, not a soft 200.
+
+The two-tone hero is still on `/data_center/variation?id=`, which was built
+before this settled.
+
+### The not-found page, and why 404
+
+`/data_center/gene_product?id=adh1` answers **404 Not Found**. The legacy
+route answered 200 with a "not found" template, which is wrong twice over: it
+tells a crawler the page exists and should be indexed, and it tells a client's
+error handling nothing. 404 is the correct code — the resource is absent, and
+nothing suggests it ever existed at that URL, which is what 410 Gone would
+claim. The page also carries `<meta name="robots" content="noindex">`.
+
+The page is not an apology, it is a lookup. `geneProductSuggestions()` runs
+three arms in 32 ms:
+
+| Arm | Answers |
+| --- | --- |
+| Locus | The term read as a gene symbol, and the products that locus encodes |
+| EC number | The term read as an EC number |
+| Contains | Products whose name or a synonym contains the term |
+
+`adh1` is the case that matters and the reason people land here: it is a
+locus, not a gene product, and the page says so and links to alcohol
+dehydrogenase. `1.1.1.1` finds the same product through the EC arm. A term
+matching nothing renders no Suggestions section at all rather than an empty
+one.
+
+Two query notes. The locus arm matches three spellings exactly rather than
+lowering the column, because `idx_locus_name` is a plain btree: `LOWER(name)
+= ?` costs 128 ms where this costs 6 ms. And **`SELECT DISTINCT` with an
+`ORDER BY` expression that is not in the select list is a Postgres error**,
+which this codebase's database layer turns into an empty result rather than a
+failure — the suggestions simply did not appear, on a page that otherwise
+rendered perfectly. The ordering now sits outside the DISTINCT. That is the
+same silent-failure mode the API's `count_mismatch` warning exists to catch,
+and this page has no such check.
+
 ### Three things the legacy page got wrong, not ported
 
 - **Ontology terms were looked up under the wrong table name.** The annotations
@@ -1209,6 +1263,67 @@ gone; it also leaked into the hover text.
 
 Related: outside bar labels need `\u00A0`, not a space — SVG collapses leading
 whitespace, so a plain space measures as no padding at all.
+
+## The Map Data Hub
+
+`/data_center/map` joined the shell on 2026-09-01. It is the page `/data_center/map2`
+was a tinted copy of, so the conversion retires that comparison.
+
+### Three correlated subqueries became one lateral
+
+The locus count and the coordinate range came from three separate correlated
+subqueries over `mgdb.locus_coordinates`, which has 738,826 rows. Postgres ran
+all three per candidate row, and because two of the sort orders cannot use an
+index the candidate set was often the whole corpus rather than the 25 rows being
+returned. One `LEFT JOIN LATERAL` computes all three in a single pass per row.
+
+Verified identical — same ids, counts and coordinate bounds — across six terms
+and all three sort orders, eighteen combinations:
+
+| query | before | after |
+| --- | --- | --- |
+| no term, name sort | 15,914 ms | **245 ms** |
+| `NAM`, name sort | 3,494 ms | **251 ms** |
+| `ISU`, name sort | 3,092 ms | **253 ms** |
+| `UMC 98`, loci sort | 934 ms | **31 ms** |
+| `IBM2`, name sort | 884 ms | **251 ms** |
+
+End to end through the API, `IBM2` went 485 ms → 220 ms and the unfiltered
+listing 1,097 ms → 494 ms. The count query is left alone: on a 2,192-row table
+it costs 38 ms, so the probe trick the other hubs use would buy nothing.
+
+### `/data_center/map2` is now an alias
+
+map2 existed to hold the tinted ground beside the untinted one. The tint is the
+standard now, so the branch that loaded `css/mgdb-hub-tinted.css` for that route
+is gone and the two render byte-identically. **The route still resolves** — it
+was not deleted — but it is an alias rather than a variant and is worth
+retiring, along with `/genome2` and `/data_center/stock2`, which are the same
+situation.
+
+### A grid floor that could not shrink
+
+The tinted sheet's form fix carried `minmax(220px, 1fr) minmax(260px, 1fr)
+minmax(190px, auto)`. Those floors sum to 670px, which a grid cannot shrink
+below: on a 375px phone the form stayed **694px wide and the browser zoomed the
+whole page to 0.52** to fit it. The floors are 0 now and a breakpoint stacks the
+row before the fields get too narrow, which is what the floors were reaching for.
+
+Worth noting how it was found: the usual `visualViewport` check reported 727 and
+so did `innerWidth`, which looks like agreement. `document.documentElement.clientWidth`
+was the one still reading 375, and `visualViewport.scale` was 0.52. **On a page
+zoomed out to fit overflow, `visualViewport.width` inflates too** — compare
+against `clientWidth` and check the scale.
+
+### One bad DOI in the shared bibliography
+
+`data/cite_journal_articles.json` had one record whose `doi` held a
+Bauplan-escaped `https\://doi.org/10.1155/2011/373875` instead of a bare DOI.
+`/cite` printed it as-is and the reference renderer would have pasted it onto
+`https://doi.org/` to make a broken link. The record is fixed, the renderer now
+normalises a DOI that arrives as a URL, and the file was added to
+`deploy/manifest.txt` — it had never been in it, so edits to it were not
+deployable.
 
 ## The Insertion Data Hub
 

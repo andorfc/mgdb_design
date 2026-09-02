@@ -138,6 +138,34 @@
   box-shadow: var(--hub-shadow-lift);
 }
 
+/* --------------------------------------------------------------------------
+   Record pages take the same panel in one tone
+
+   A hub header is two-tone on purpose: the emblem panel beside the washed
+   body is what tells a reader they are on a hub. A record page is not a hub,
+   so it drops the emblem column and the decorative ring and takes one flat
+   shade, leaving the record's own name the only thing in the panel.
+
+   The section keeps `mgdb-hero` so the shell's `> section:not(.mgdb-hero)`
+   card treatment still passes it over; this class is what changes the two
+   tones to one.
+   -------------------------------------------------------------------------- */
+
+.mgdb-hub-page > section.mgdb-hero.mgdb-hub-record-hero {
+  grid-template-columns: minmax(0, 1fr);
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-hub-page > section.mgdb-hero.mgdb-hub-record-hero::after { content: none; }
+
+.mgdb-hub-page > section.mgdb-hub-record-hero .mgdb-hero-body {
+  padding: var(--mgdb-space-5) var(--mgdb-space-6);
+}
+
+/* The 11rem the hub reserves on the right is for the freshness stamp, which a
+   record does not carry. */
+.mgdb-hub-page > section.mgdb-hub-record-hero h1 { padding-right: 0; }
+
 /* The sticky tab bar is navigation, not a record. White on the tint with a
    radius and a shadow gave it an outline it had not asked for. It takes the
    ground instead and marks its own edge with a rule -- still opaque, because
@@ -290,6 +318,11 @@
 .mgdb-hub-page > section:nth-of-type(7) { border-top-color: var(--mgdb-orange); }
 .mgdb-hub-page > section:nth-of-type(8) { border-top-color: var(--mgdb-wine); }
 .mgdb-hub-page > section:nth-of-type(9) { border-top-color: var(--mgdb-gold-dark); }
+/* Ten and eleven were added when /data_center/map turned out to carry nine
+   content sections: the rotation stopped at nine counting the hero, so the
+   page's last section fell back to the neutral line. */
+.mgdb-hub-page > section:nth-of-type(10) { border-top-color: var(--mgdb-red); }
+.mgdb-hub-page > section:nth-of-type(11) { border-top-color: var(--mgdb-green-dark); }
 
 .mgdb-hub-page > section.mgdb-hub-tone-green    { border-top-color: var(--mgdb-green); }
 .mgdb-hub-page > section.mgdb-hub-tone-amber    { border-top-color: var(--mgdb-gold); }

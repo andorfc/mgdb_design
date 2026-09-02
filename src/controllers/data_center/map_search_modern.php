@@ -6,6 +6,7 @@
 
 include_once('./include/db-api.php');
 include_once('./include/dashboard_cache.php');
+include_once('./include/references_lib.php');
 include_once('./search/map/map_search_lib.php');
 
 $system = getSystemInfo('mgdb.conf');
@@ -16,7 +17,7 @@ header("Cache-Control: no-cache, no-store, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-$bauplan = new Bauplan('MaizeGDB Map Center | Genetic, Cytogenetic & Physical Maps');
+$bauplan = new Bauplan('MaizeGDB Map Data Hub | Genetic, Cytogenetic & Physical Maps');
 $bauplan->modern();
 
 $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';
@@ -24,11 +25,23 @@ $css_file = $doc_root . '/css/mgdb-map.css';
 $js_file = $doc_root . '/js/mgdb-map.js';
 $v_css = file_exists($css_file) ? filemtime($css_file) : time();
 $v_js = file_exists($js_file) ? filemtime($js_file) : time();
+$hub_file = $doc_root . '/css/mgdb-hub.css';
+$v_hub = file_exists($hub_file) ? filemtime($hub_file) : time();
 
 $bauplan->preHTML('<meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
 $bauplan->includeCss('/css/static.css');
 $bauplan->includeCss('/css/mgdb-modern.css');
 $bauplan->includeCss('/css/mgdb-megamenu.css');
+/* The shared Data Hub shell -- ground, section cards, coloured section edges,
+   metric colours, reference card, form row -- before the page's own sheet,
+   which is the order css/mgdb-hub.css documents. `mgdb-hub-page` on <main>
+   opts in.
+
+   This replaces the /data_center/map2 branch that used to load
+   css/mgdb-hub-tinted.css here. map2 existed to hold the tinted ground beside
+   the untinted one; now that the tint is the standard the two routes render
+   identically, and map2 is an alias worth retiring rather than a variant. */
+$bauplan->includeCss('/css/mgdb-hub.css?v=' . $v_hub);
 $bauplan->includeCss('/css/mgdb-map.css?v=' . $v_css);
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
@@ -80,6 +93,22 @@ $top_maps_data = $map_data['top_maps'];
 $content->get('chart_labels')->replace(htmlspecialchars(json_encode($top_maps_data['labels']), ENT_QUOTES, 'UTF-8'));
 $content->get('chart_values')->replace(htmlspecialchars(json_encode($top_maps_data['values']), ENT_QUOTES, 'UTF-8'));
 $content->get('chart_caption')->replace('Total markers mapped across chromosomes 1–10 for the top 10 genome-wide maize map series.');
+
+/* References: the tools and analyses built on these maps, rendered by
+   include/references_lib.php from the curated bibliography so these cards match
+   every other hub. */
+$content->get('reference_cards')->replace(mgdb_render_references($doc_root, array(
+    // Turning a genetic map position into a sequence interval.
+    array('doi' => '10.1093/bioinformatics/btp556'),
+    // What the knobs on these maps do to local recombination.
+    array('doi' => '10.1007/s00412-012-0391-8'),
+    // How the genetic maps were tied to the assembly in the first place.
+    array('doi' => '10.1093/database/bap020'),
+    // Viewing whole-genome features against these coordinates.
+    array('doi' => '10.1155/2011/373875'),
+    // The database of record.
+    array('doi' => '10.1093/nar/gky1046'),
+)));
 
 include_once('translation.php');
 $bauplan->publish();

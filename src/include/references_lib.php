@@ -109,7 +109,15 @@ function mgdb_render_reference($row, $seq) {
         return '';
     }
 
+    /* The bibliography is meant to hold a bare DOI, and one record held a
+       Bauplan-escaped `https\://doi.org/10.1155/...` instead -- which would
+       have been printed as the DOI and pasted onto https://doi.org/ to make a
+       broken link. That record is fixed, and normalising here means the next
+       one degrades to a working link rather than a broken one. */
     $doi = isset($row['doi']) ? trim($row['doi']) : '';
+    $doi = preg_replace('#^\\?https?\\?://(dx\\.)?doi\\.org/#i', '', $doi);
+    $doi = str_replace('\\', '', $doi);
+
     $url = !empty($row['url'])
          ? $row['url']
          : ($doi !== '' ? 'https://doi.org/' . $doi : '');

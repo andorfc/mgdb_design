@@ -1,10 +1,19 @@
 /* ==========================================================================
    Map Data Hub — /data_center/map
    --------------------------------------------------------------------------
-   Built on the modern design system (mgdb-modern.css).
+   Loaded after css/mgdb-modern.css and css/mgdb-hub.css. The hub shell settles
+   the pale blue ground, the white section cards and their coloured top edges,
+   the absence of a rule under a section title, the metric colours, the gold
+   edge a grid tile takes on hover, the zebra striping, the green Related
+   resources panel, the shared form field, and the scroll offset.
+
+   css/mgdb-hub-tinted.css is no longer loaded here. It existed so
+   /data_center/map2 could hold the tinted ground beside the untinted one; the
+   tint is the standard now, so the two routes render identically and map2 is
+   an alias rather than a variant.
    ========================================================================== */
 
-/* ── Hero Emblem ─────────────────────────────────────────────────────────── */
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
 
 .mgdb-map-page .mgdb-hero-emblem {
   background: #ffffff;
@@ -17,7 +26,7 @@
   mix-blend-mode: normal;
 }
 
-/* ── Sticky Section Navigation Tabs ──────────────────────────────────────── */
+/* ── Sticky section tabs ─────────────────────────────────────────────────── */
 
 .mgdb-map-page .mgdb-section-tabs {
   position: sticky;
@@ -28,9 +37,6 @@
   gap: var(--mgdb-space-2);
   margin-top: var(--mgdb-space-5);
   margin-bottom: var(--mgdb-space-5);
-  padding: var(--mgdb-space-2) 0;
-  background: var(--mgdb-surface);
-  border-bottom: 1px solid var(--mgdb-line);
 }
 
 .mgdb-map-page .mgdb-section-tabs a {
@@ -38,19 +44,17 @@
   min-height: 40px;
   align-items: center;
   padding: 0 var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
   color: var(--mgdb-ink) !important;
   font-size: var(--mgdb-text-sm);
   font-weight: 600;
   text-decoration: none;
-  transition: background var(--mgdb-dur-fast), border-color var(--mgdb-dur-fast), color var(--mgdb-dur-fast);
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
 }
 
-.mgdb-map-page .mgdb-section-tabs a:hover {
-  background: var(--mgdb-green-soft);
-}
+.mgdb-map-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
 
 .mgdb-map-page .mgdb-section-tabs a.is-current,
 .mgdb-map-page .mgdb-section-tabs a[aria-current="true"] {
@@ -60,25 +64,105 @@
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
-.mgdb-map-page > section,
-.mgdb-map-page section[id] {
-  scroll-margin-top: 5rem;
+/* Eight tabs wrap to two rows below about 1100px here. */
+@media (max-width: 1170px) and (min-width: 1101px) {
+  .mgdb-hub-page.mgdb-map-page > section[id] { scroll-margin-top: 65px; }
 }
 
-.mgdb-map-page .map-search-panel + .map-results-section {
-  margin-top: var(--mgdb-space-5);
+@media (max-width: 1100px) {
+  .mgdb-hub-page.mgdb-map-page > section[id] { scroll-margin-top: 113px; }
 }
+
+.mgdb-map-page > section[id] { margin-bottom: var(--mgdb-space-5); }
 
 /* --------------------------------------------------------------------------
    Search Panel & Advanced Filters
    -------------------------------------------------------------------------- */
 
-.map-search-panel {
-  padding: var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface-alt);
+/* `.map-search-panel` is the <section> itself, and it used to carry its own
+   padding, border and cream surface. The shell's
+   `.mgdb-hub-page > section:not(.mgdb-hero)` is more specific and now supplies
+   all three, so the old declarations are simply gone rather than overridden --
+   the section is one card, not a card inside a card. */
+
+/* --------------------------------------------------------------------------
+   Form rows: one baseline for the labels, one height for the controls
+
+   These were in css/mgdb-hub-tinted.css, which this page no longer loads. They
+   are not tint-specific and the page needs them either way.
+
+   Both rows were ragged for the same two reasons. The labels wrap to one line
+   or two depending on their text -- "Locus filter" against "Chromosome /
+   linkage group" -- so each field's control started wherever its own label
+   happened to end; in the advanced row that put three controls on three
+   different lines. Reserving a fixed two-line band and bottom-aligning the
+   label inside it gives every control the same starting line. And the controls
+   were not the same height: a select was the 44px tap target while a text input
+   was 40px.
+
+   The grids were `auto-fit`, which made five tracks for three fields in the
+   main row and four for three in the advanced one, leaving dead columns on the
+   right. Both are declared to the number of fields they hold.
+   -------------------------------------------------------------------------- */
+
+/* The track minimums are 0, not the 220px/260px the tinted sheet carried. Those
+   floors summed to 670px with the submit column, which a grid cannot shrink
+   below -- on a 375px phone the form stayed 694px wide and the browser zoomed
+   the whole page to 0.52 to fit it. The breakpoint below stacks the row before
+   the fields get too narrow to read, which is what the floors were reaching
+   for. */
+.mgdb-map-page .map-search-form {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, auto);
+  align-items: start;
 }
+
+.mgdb-map-page .map-adv-body {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .mgdb-map-page .map-search-form,
+  .mgdb-map-page .map-adv-body { grid-template-columns: minmax(0, 1fr); }
+
+  /* Stacked, every label is on its own line, so the two-line band that keeps
+     the controls on one baseline is only wasted space. */
+  .mgdb-map-page .map-search-form > .map-field > label:first-child,
+  .mgdb-map-page .map-search-form > .map-field-checkbox > label:first-child,
+  .mgdb-map-page .map-adv-body > .map-field > label:first-child { min-height: 0; }
+}
+
+/* 3.5em is two lines of the label's own 12px type, so a one-line label sits on
+   the same baseline as a two-line one instead of floating up. */
+.mgdb-map-page .map-search-form > .map-field > label:first-child,
+.mgdb-map-page .map-search-form > .map-field-checkbox > label:first-child,
+.mgdb-map-page .map-adv-body > .map-field > label:first-child {
+  display: flex;
+  min-height: 3.5em;
+  align-items: flex-end;
+  margin: 0;
+}
+
+.mgdb-map-page .map-field > select,
+.mgdb-map-page .map-field > input,
+.mgdb-map-page .map-field > .map-checkbox-label {
+  box-sizing: border-box;
+  min-height: var(--mgdb-tap-target);
+  height: var(--mgdb-tap-target);
+}
+
+/* The button has no label above it, so it bottom-aligns with the fields rather
+   than reserving a band of its own -- a fixed top padding would be in the
+   button's font size, not the label's, and land 10px low. */
+.mgdb-map-page .map-search-submit { align-self: end; }
+
+.mgdb-map-page .map-search-submit .mgdb-button {
+  min-height: var(--mgdb-tap-target);
+  height: var(--mgdb-tap-target);
+}
+
+/* With its own column the checkbox no longer has to wrap inside a 44px box. */
+.mgdb-map-page .map-field-checkbox > .map-checkbox-label { white-space: nowrap; }
 
 .map-search-header {
   margin-bottom: var(--mgdb-space-3);
@@ -278,19 +362,26 @@
   background: var(--mgdb-surface);
 }
 
-.map-adv-accordion summary {
+/* Laid out and coloured like the advanced disclosure on every other hub: the
+   strip was a filled cream band while the panel under it was white, which read
+   as a different component from the one the reader met on /ai or /expression. */
+.mgdb-map-page .map-adv-accordion summary {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+  align-items: baseline;
   padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  background: none;
+  color: var(--mgdb-green-dark);
   cursor: pointer;
-  background: var(--mgdb-surface-alt);
-  border-radius: var(--mgdb-radius-sm);
+  list-style-position: inside;
 }
+
+.mgdb-map-page .map-adv-accordion[open] summary { border-bottom: 1px solid var(--hub-line-soft); }
 
 .map-adv-accordion summary strong {
   color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-sm);
+  font-size: var(--mgdb-text-base);
 }
 
 .map-adv-accordion summary span {
@@ -411,6 +502,34 @@
 /* --------------------------------------------------------------------------
    Results Section & Controls
    -------------------------------------------------------------------------- */
+
+.mgdb-map-page .map-results-section[hidden] { display: none; }
+
+/* Fixed tracks in a box sized to its own content: declared with minmax(0, ...)
+   the first tracks take everything the parent offers and the last resolves to
+   0px, which drops its control onto a second row. */
+.mgdb-map-page .map-results-controls {
+  display: grid;
+  width: max-content;
+  max-width: 100%;
+  flex: 0 0 auto;
+  grid-template-columns: 13rem 10rem auto auto auto;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: end;
+}
+
+@media (max-width: 1100px) {
+  .mgdb-map-page .map-results-controls {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .mgdb-map-page .map-results-controls { grid-template-columns: minmax(0, 1fr); }
+}
+
+.mgdb-map-page .map-results-heading > div:first-child { min-width: 0; flex: 1 1 18rem; }
 
 .map-results-section {
   display: flex;
