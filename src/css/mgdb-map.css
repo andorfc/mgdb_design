@@ -69,8 +69,15 @@
   .mgdb-hub-page.mgdb-map-page > section[id] { scroll-margin-top: 65px; }
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1100px) and (min-width: 521px) {
   .mgdb-hub-page.mgdb-map-page > section[id] { scroll-margin-top: 113px; }
+}
+
+/* The tab bar reaches 201px at 375px here -- eight long labels over four
+   rows -- so the ladder gets a third step. Measured: every tab jump lands the
+   section 62px clear of the bar. */
+@media (max-width: 520px) {
+  .mgdb-hub-page.mgdb-map-page > section[id] { scroll-margin-top: 161px; }
 }
 
 .mgdb-map-page > section[id] { margin-bottom: var(--mgdb-space-5); }

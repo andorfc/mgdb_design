@@ -69,6 +69,9 @@
   .mgdb-hub-page.mgdb-pan-gene-page > section[id] { scroll-margin-top: 65px; }
 }
 
+/* No third step here: this sheet keeps the tab bar on one row below 767px by
+   scrolling it horizontally rather than wrapping, so it never grows past two.
+   See the `flex-wrap: nowrap` rule further down. */
 @media (max-width: 860px) {
   .mgdb-hub-page.mgdb-pan-gene-page > section[id] { scroll-margin-top: 113px; }
 }

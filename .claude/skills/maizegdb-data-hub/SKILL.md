@@ -145,10 +145,16 @@ nothing else goes wrong visibly.
   the string it is handed plus a global stamp. Any payload whose *shape* is
   built in the controller needs `'<key>_' . (int) @filemtime(__FILE__)`, or a
   warm server keeps serving an entry that predates the new fields.
-- **The `scroll-margin-top` ladder is per tab-count, not universal.** Six or
-  seven tabs wrap to at most two rows; eight wrap to three on a 375px screen
-  (a 153px bar), and the usual two-step ladder lands every section 29-40px
-  *behind* it. Measure the bar at 1280, ~900 and 375 and add a step per row.
+- **Set the `scroll-margin-top` ladder from the measured bar height, never from
+  the tab count.** Label length decides how many rows the bar takes: one hub
+  with six tabs still reached three rows at 375px and landed every section
+  29-40px *behind* the bar. And some page sheets carry
+  `flex-wrap: nowrap; overflow-x: auto` below 767px, which keeps the bar on one
+  row on a phone and needs no deeper step at all. An offline probe that renders
+  the tab labels under the shared CSS will get those hubs wrong, because it does
+  not carry the per-hub overrides. Load the real page at 1280, ~900 and 375,
+  read the bar height, and click every tab checking
+  `section.top - bar.bottom >= 0`.
 - **A hub with no corpus of its own does not get an invented search bar.** Some
   hubs are routes into other hubs. Keep whatever record-retrieval it does have
   (inline expanders, curated links), and say plainly that there is no search

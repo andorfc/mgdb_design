@@ -1351,6 +1351,53 @@ normalises a DOI that arrives as a URL, and the file was added to
 `deploy/manifest.txt` — it had never been in it, so edits to it were not
 deployable.
 
+## The BAC Data Hub
+
+`/data_center/bac` joined the shell on 2026-09-02. It is an explicitly archived
+hub — the notice under the hero says so — and its search still runs through the
+legacy AJAX helper, which works: a POST to `search/bac/bac_results.php` returns
+results for `c0085K`.
+
+### The fourth metric card was the word "Archived"
+
+Three cards counted things; the fourth read **"Archived"** under the heading
+"Collection status". That is not a metric, and the notice banner at the top of
+the page already says it. It is a count now — **310,653 records carrying a
+GenBank accession** — computed by the same rollup as the other three, so it
+costs no extra query.
+
+The figure is the three-way split by clone prefix, from counts the metric cards
+already needed. It is the only place on the page that shows the **15,576**
+records whose names begin with neither `b` nor `c`.
+
+### `mgdb.zb_chr_v2_clone` is empty
+
+The stats rollup UNIONs three arms, the third joining `locus` against
+`zb_chr_v2_clone` to pick up loci named after a RefGen_v2 clone accession. That
+table has **0 rows**, so the arm contributes nothing and costs a scan on every
+cold cache build. It is **left in place deliberately**: if the v2 clone
+placements are ever reloaded the arm matters again, and the query is behind
+`dashboardCache`, so the cost is about a second a month. Recorded as AD-042 —
+an empty `zb_chr_v2_clone` may itself be the finding.
+
+### The sticky-tab offset ladder is per measured bar height, not per tab count
+
+This is the correction to what the earlier hub sections say. The `scroll-margin-top`
+ladder had been set from the number of tabs, on the assumption that six or seven
+wrap to at most two rows. **Label length decides it, not count**: this hub has
+six tabs and its bar still reaches three rows on a 375px screen, and sections
+landed 29–40px *behind* it.
+
+Checking every converted hub turned up something else worth knowing: three
+sheets — pan-gene, QTL and locus — carry a `flex-wrap: nowrap; overflow-x: auto`
+rule below 767px, so their tab bars stay on **one** row on a phone and never
+needed a deeper step at all. A quick offline probe that rendered each hub's tab
+labels under the shared CSS predicted the opposite for pan-gene, and following
+it would have added 48px of dead space. **The probe was wrong because it did not
+carry the per-hub overrides; the fix was to measure each page as it actually
+renders.** Every hub has now been measured at 375 and every tab jump clears its
+bar.
+
 ## The Cytogenetics Data Hub
 
 `/data_center/cytogenetic` joined the shell on 2026-09-02. It is the one hub

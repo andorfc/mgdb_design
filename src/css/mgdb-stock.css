@@ -69,8 +69,14 @@
   .mgdb-hub-page.mgdb-stock-page > section[id] { scroll-margin-top: 65px; }
 }
 
-@media (max-width: 860px) {
+@media (max-width: 860px) and (min-width: 521px) {
   .mgdb-hub-page.mgdb-stock-page > section[id] { scroll-margin-top: 113px; }
+}
+
+/* The tab bar reaches 153px at 375px here, three rows. Measured with this
+   step: every tab jump lands the section 110px clear of the bar. */
+@media (max-width: 520px) {
+  .mgdb-hub-page.mgdb-stock-page > section[id] { scroll-margin-top: 161px; }
 }
 
 .mgdb-stock-page > section[id] { margin-bottom: var(--mgdb-space-5); }

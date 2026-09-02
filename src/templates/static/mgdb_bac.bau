@@ -1,11 +1,11 @@
 $$SYNTAX-LEVEL 2
 *(mgdb-bac
-<main class="mgdb-page mgdb-bac-page" id="bac-main">
+<main class="mgdb-page mgdb-hub-page mgdb-bac-page" id="bac-main">
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
-    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">BAC clones</span>
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">BAC clones</span>
   </nav>
 
-  <section class="mgdb-hero bac-hero" aria-labelledby="bac-title">
+  <section class="mgdb-hero" aria-labelledby="bac-title">
     <div class="mgdb-hero-emblem">
       <svg class="bac-hero-mark" viewBox="0 0 120 120" role="img" aria-label="BAC clone library tiles">
         <rect x="18" y="22" width="66" height="18" rx="5" fill="#501719" />
@@ -15,18 +15,11 @@ $$SYNTAX-LEVEL 2
         <circle cx="27" cy="59" r="9" fill="none" stroke="#8a5a0f" stroke-width="5" />
         <circle cx="93" cy="87" r="9" fill="none" stroke="#8a5a0f" stroke-width="5" />
       </svg>
-      <strong>BAC Clone<br />Archive</strong>
-      <span>B73 physical map</span>
+      <strong>BAC<br />Data Hub</strong>
     </div>
     <div class="mgdb-hero-body">
-      <span class="mgdb-eyebrow">Archived MaizeGDB data hub</span>
       <h1 id="bac-title">Find a BAC clone.</h1>
-      <p class="mgdb-hero-tagline">Search clone names, synonyms, and accessions from the historical B73 physical-map collection.</p>
       <p class="mgdb-hero-description">Bacterial artificial chromosome clones connected the B73 physical map with the sequence assemblies that preceded the current reference genome. These records remain available for reproducibility and historical research.</p>
-      <div class="mgdb-hero-actions">
-        <a class="mgdb-button mgdb-button-primary" href="#bac-search">Search the archive</a>
-        <a class="mgdb-button mgdb-button-secondary" href="/genome/assembly/Zm-B73-REFERENCE-NAM-5.0">Open the current B73 reference</a>
-      </div>
     </div>
   </section>
 
@@ -34,41 +27,24 @@ $$SYNTAX-LEVEL 2
     <div><strong>Archive notice.</strong> This data hub is no longer actively maintained. BAC records, sequences, alignments, and mapping relationships are preserved as a legacy research resource.</div>
   </div>
 
-  <section aria-labelledby="bac-summary-title">
-    <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Collection summary</span><h2 id="bac-summary-title">Historical B73 clone resources</h2></div>
-      <p>Counts are read from the current MaizeGDB archive. Prefix totals summarize the principal physical-map library naming conventions.</p>
-    </div>
-    <div class="mgdb-metric-grid">
-      <article class="mgdb-metric">
-        <span class="mgdb-metric-icon" aria-hidden="true">&#9638;</span>
-        <div><strong class="mgdb-metric-value">$(bac_count)</strong><h3>BAC records</h3><p>Distinct visible clone and accession records in the archive.</p></div>
-      </article>
-      <article class="mgdb-metric mgdb-tone-green">
-        <span class="mgdb-metric-icon" aria-hidden="true">b</span>
-        <div><strong class="mgdb-metric-value">$(b_prefix_count)</strong><h3><code>b</code>-prefix records</h3><p>Clones associated with the Clemson HindIII library.</p></div>
-      </article>
-      <article class="mgdb-metric mgdb-tone-red">
-        <span class="mgdb-metric-icon" aria-hidden="true">c</span>
-        <div><strong class="mgdb-metric-value">$(c_prefix_count)</strong><h3><code>c</code>-prefix records</h3><p>Clones from the CHORI EcoRI and MboI libraries.</p></div>
-      </article>
-      <article class="mgdb-metric mgdb-tone-burgundy">
-        <span class="mgdb-metric-icon" aria-hidden="true">&#9633;</span>
-        <div><strong class="mgdb-metric-value mgdb-metric-value-compact">Archived</strong><h3>Collection status</h3><p>Preserved for historical access; not actively updated.</p></div>
-      </article>
-    </div>
-  </section>
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#bac-search" class="is-current" aria-current="true">Search</a>
+    <a href="#bac-libraries">Libraries</a>
+    <a href="#bac-about">About</a>
+    <a href="#bac-references">References</a>
+    <a href="#bac-metrics">Metrics</a>
+    <a href="#bac-related">Related resources</a>
+  </nav>
 
   <section id="bac-search" aria-labelledby="bac-search-title">
     <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Search the collection</span><h2 id="bac-search-title">Search BAC names and synonyms</h2></div>
-      <p>Partial names are accepted. Use <code>%</code> or <code>*</code> as a wildcard, <code>^</code> to anchor the beginning, and <code>$</code> to anchor the end.</p>
+      <div><h2 id="bac-search-title">Search</h2></div>
     </div>
 
     <article class="bac-search-panel">
       <div class="bac-search-intro">
         <span class="bac-search-number" aria-hidden="true">01</span>
-        <div><span class="mgdb-eyebrow">Clone identity</span><h3>What BAC are you looking for?</h3><p>Search a clone name, synonym, GenBank accession, or a distinctive portion of any of those identifiers.</p></div>
+        <div><h3>What BAC are you looking for?</h3><p>Search a clone name, synonym, GenBank accession, or a distinctive portion of any of those identifiers.</p></div>
       </div>
 
       <form id="bac-search-form" class="mgdb-search" role="search">
@@ -120,10 +96,9 @@ $$SYNTAX-LEVEL 2
     </article>
   </section>
 
-  <section aria-labelledby="bac-libraries-title">
+  <section id="bac-libraries" aria-labelledby="bac-libraries-title">
     <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Library guide</span><h2 id="bac-libraries-title">Understanding the clone prefixes</h2></div>
-      <p>The physical-map collection combines BACs isolated with three restriction enzymes at two sequencing centers.</p>
+      <div><h2 id="bac-libraries-title">Libraries</h2></div>
     </div>
     <div class="mgdb-card-grid bac-library-grid">
       <article class="mgdb-card"><span class="mgdb-pill mgdb-pill-info">ZMMBBb</span><h3>HindIII library</h3><p><code>b</code>-prefix BACs were isolated from a HindIII digest of B73 PI 550473 at Clemson University.</p><a href="/data_center/bac/330471">Example: b0052P04 <span aria-hidden="true">&rarr;</span></a></article>
@@ -132,10 +107,9 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
-  <section class="mgdb-prose-layout" aria-labelledby="bac-about-title">
+  <section id="bac-about" class="mgdb-prose-layout" aria-labelledby="bac-about-title">
     <div class="mgdb-prose">
-      <span class="mgdb-eyebrow">Physical map and sequence</span>
-      <h2 id="bac-about-title" class="mgdb-leaf-heading">How the BAC collection relates to B73</h2>
+      <h2 id="bac-about-title" class="mgdb-leaf-heading">About</h2>
       <p>BAC clones were used to construct the B73 physical map and to support clone-by-clone genome sequencing. The BACs used in the B73 RefGen_v2 assembly were reassembled independently of the GenBank sequence.</p>
       <p>GenBank BAC records were repaired against RefGen_v2 in September 2013 and also agree with RefGen_v3. Current genome work should begin with the latest B73 assembly, while this archive preserves the clone-level evidence behind earlier references.</p>
     </div>
@@ -146,5 +120,99 @@ $$SYNTAX-LEVEL 2
       <a class="mgdb-button mgdb-button-secondary" href="/genome/assembly/Zm-B73-REFERENCE-NAM-5.0">View B73 NAM 5.0</a>
     </aside>
   </section>
+
+  <section id="bac-references" aria-labelledby="bac-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="bac-references-title">References</h2></div>
+    </div>
+
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
+  <section id="bac-metrics" aria-labelledby="bac-summary-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="bac-summary-title">Metrics</h2></div>
+    </div>
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric mgdb-tone-green">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9638;</span>
+        <div><strong class="mgdb-metric-value">$(bac_count)</strong><h3>BAC records</h3><p>Distinct visible clone and accession records in the archive.</p></div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-amber">
+        <span class="mgdb-metric-icon" aria-hidden="true">b</span>
+        <div><strong class="mgdb-metric-value">$(b_prefix_count)</strong><h3><code>b</code>-prefix records</h3><p>Clones associated with the Clemson HindIII library.</p></div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-blue">
+        <span class="mgdb-metric-icon" aria-hidden="true">c</span>
+        <div><strong class="mgdb-metric-value">$(c_prefix_count)</strong><h3><code>c</code>-prefix records</h3><p>Clones from the CHORI EcoRI and MboI libraries.</p></div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-burgundy">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9633;</span>
+        <div><strong class="mgdb-metric-value">$(accession_count)</strong><h3>With a GenBank accession</h3><p>Clone records carrying an external sequence accession.</p></div>
+      </article>
+    </div>
+
+    <figure class="mgdb-figure bac-figure">
+      <h3>Records by clone prefix</h3>
+      <div class="mgdb-chart" id="bac-prefix-chart" role="img"
+           aria-label="Horizontal bar chart of BAC records grouped by clone name prefix">
+        <div class="mgdb-chart-fallback">Loading the prefix breakdown&hellip;</div>
+      </div>
+      <figcaption>Every archived record counts once. The third group is the 15,576 whose names begin with neither letter &#8212; mostly GenBank accessions carried as clone records.</figcaption>
+    </figure>
+
+    <div class="mgdb-table-scroll bac-figure-table">
+      <table class="mgdb-table" id="bac-prefix-table">
+        <caption>
+          Records by clone prefix
+          <span class="mgdb-muted">The values behind the chart above.</span>
+        </caption>
+        <thead><tr><th scope="col">Prefix group</th><th scope="col" class="mgdb-numeric">Records</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="bac-related" class="mgdb-hub-related" aria-labelledby="bac-related-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="bac-related-title">Related resources</h2>
+      </div>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/genome/assembly/Zm-B73-REFERENCE-NAM-5.0">
+          <strong>B73 NAM 5.0 assembly</strong>
+          <span>The current B73 reference, which superseded the clone-by-clone assemblies</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/marker">
+          <strong>Marker Data Hub</strong>
+          <span>BAC clones as markers and probes, alongside SSRs, SNPs and the rest</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/map">
+          <strong>Map Data Hub</strong>
+          <span>The physical and genetic maps these clones were placed on</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Locus Data Hub</strong>
+          <span>BAC-typed loci in their wider context</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="https://www.genome.arizona.edu" target="_blank" rel="noopener">
+          <strong>Arizona Genomics Institute</strong>
+          <span>The centre behind the CHORI BAC libraries</span>
+          <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <script type="application/json" id="bac-chart-data">$(chart_data)</script>
 </main>
 )
