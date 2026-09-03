@@ -12,14 +12,100 @@
    enough that --mgdb-ink stays above 7:1 on every one of them.
    ========================================================================== */
 
+/* ── The Data Hub shell on a listing page ────────────────────────────────── */
+
+/* Loaded after css/mgdb-modern.css and css/mgdb-hub.css. The shell settles the
+   pale ground, the white section cards and their coloured top edges, the
+   absence of a rule under a section title and the green Related resources
+   panel; what is left here is the page furniture the shell does not own. */
+
+/* Only the tinted chips and the bottom margin: the bar's pale ground, the rule
+   under it and the padding that makes it 57px all come from css/mgdb-hub.css.
+   Overriding its background is what left one hub's bar transparent. */
+.mgdb-projects-page .mgdb-section-tabs { margin-bottom: var(--mgdb-space-5); }
+
+.mgdb-projects-page .mgdb-section-tabs a {
+  border: 1px solid var(--hub-line);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink) !important;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.mgdb-projects-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
+
+.mgdb-projects-page .mgdb-section-tabs a.is-current,
+.mgdb-projects-page .mgdb-section-tabs a[aria-current="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+/* The offset ladder, from the measured bar. Three short labels totalling 333px
+   of chips, so the bar is one 57px row at every width measured -- 1280, 1170,
+   1000, 800, 600 and 420 -- and below that mgdb-modern.css turns it into a
+   scrolling rail rather than letting it wrap, so it is still one row at 375.
+   The shell steps to 113px under 1170px for bars that do wrap, which is 56px
+   too much here; this page keeps 65px the whole way down. */
+@media (max-width: 1170px) {
+  .mgdb-hub-page.mgdb-projects-page > section[id] { scroll-margin-top: 65px; }
+}
+
+.mgdb-projects-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+/* The line that used to sit opposite the section heading. The shell hides
+   anything inside .mgdb-section-heading, so the copy worth keeping moved out
+   to its own paragraph under the heading. */
+.mgdb-projects-page .projects-section-lead {
+  max-width: 62rem;
+  margin: 0 0 1.1rem;
+  color: var(--mgdb-muted);
+}
+
 /* --------------------------------------------------------------------------
    Listing page
    -------------------------------------------------------------------------- */
 
 .mgdb-projects-page .projects-grid { margin-top: var(--mgdb-space-5); }
 
-.mgdb-projects-page .projects-card h3 { font-size: var(--mgdb-text-xl); }
+/* Three lines reserved for the title, so the topic pills under it start at the
+   same height in every card of the row. The titles are full sentences and run
+   to two or three lines at this column width; reserving the taller of the two
+   costs one line of white space on the shorter cards and is what puts every
+   band of every card on the same line as its neighbours'. It reserves rather
+   than fixes, so a longer title still gets the room it needs. */
+.mgdb-projects-page .projects-card h3 {
+  min-height: calc(3 * 1.3em);
+  font-size: var(--mgdb-text-xl);
+  line-height: 1.3;
+}
 .mgdb-projects-page .projects-card h3 a { text-decoration: underline; }
+
+/* Making the row of cards one shape.
+   -------------------------------------------------------------------------
+   The grid already gives the three cards equal width and equal height, but
+   their inner bands did not line up: the facts strip started at 356, 316 and
+   329px down the three cards, and the updated line at 474, 488 and 501.
+
+   The cause is in the shared shell. css/mgdb-hub.css grows every paragraph in
+   a card:
+
+       .mgdb-hub-page .mgdb-card-grid > .mgdb-card > p { flex: 1 1 auto; }
+
+   On a card with one paragraph that is right -- the summary takes the slack
+   and everything under it sits on the floor of the card. These cards have
+   two, the summary and the updated line, so the slack is split between them
+   by their content heights and every band below the summary lands somewhere
+   different in each card. `margin-top: auto` cannot fix it: with both
+   paragraphs growing there is no free space left for an auto margin to take.
+
+   So the meta line stops growing and the summary keeps the whole slack. The
+   facts strip, the pills and the updated line then sit the same distance from
+   the foot of every card in the row. Scoped to this page: the shell rule is
+   shared by every hub and narrowing it there is a separate change. */
+.mgdb-hub-page.mgdb-projects-page .mgdb-card-grid > .projects-card > p.projects-card-meta {
+  flex: 0 0 auto;
+}
 
 .mgdb-projects-page .projects-card-facts {
   display: grid;
@@ -32,7 +118,17 @@
 
 /* Value above label: the number is what the reader scans for. */
 .mgdb-projects-page .projects-card-facts > div { display: flex; flex-direction: column-reverse; }
-.mgdb-projects-page .projects-card-facts dt { color: var(--mgdb-muted); font-size: var(--mgdb-text-xs); }
+/* Two lines reserved for the label. Some labels wrap at this column width and
+   some do not -- "ligand types" fits, "gene assignments" does not -- and an
+   80px strip beside a 102px one puts the two cards' footers at different
+   heights. Reserving the taller of the two makes the strip a constant height
+   whatever the labels say. */
+.mgdb-projects-page .projects-card-facts dt {
+  min-height: 2.6em;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  line-height: 1.3;
+}
 .mgdb-projects-page .projects-card-facts dd {
   margin: 0;
   color: var(--mgdb-green-dark);
@@ -41,10 +137,25 @@
   line-height: var(--mgdb-leading-tight);
 }
 
+/* Two rows of pills reserved, for the same reason the title reserves three
+   lines: a project carries two or three topics, three wrap to a second row at
+   this column width and two do not, and the difference would start the summary
+   34px lower in some cards than in others. 3.7rem is two pill rows (25.4px
+   each, from the pill's 13px/1.6 text, its .1em padding and its border) plus
+   the 8px row gap. Below 720px the grid is a single column, so the cards no
+   longer sit beside each other and nothing here has to match anything. */
 .mgdb-projects-page .projects-card-tags {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-2);
+  align-content: flex-start;
+  min-height: 3.7rem;
+}
+
+@media (max-width: 720px) {
+  .mgdb-projects-page .projects-card h3,
+  .mgdb-projects-page .projects-card-tags,
+  .mgdb-projects-page .projects-card-facts dt { min-height: 0; }
 }
 
 .mgdb-projects-page .projects-card-meta { margin-top: var(--mgdb-space-3); }

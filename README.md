@@ -770,6 +770,94 @@ sitewide rewrite skips any URI matching the unanchored pattern `(.js)`.
 **Adding a project** is an entry in `mgdb_projects()`, a controller, a body
 template, and its data files in the manifest.
 
+### The listing page, on the shell
+
+`/projects` carries `mgdb-hub-page` and loads `css/mgdb-hub.css` before its own
+sheet, so it has the pale ground, the white section cards with their coloured
+top edges, the sticky tab bar and the green Related resources panel that the
+data hubs have. Three sections — **Search**, **About**, **Related resources** —
+and the tab labels are the section headings verbatim.
+
+No Metrics and no References. There is nothing on this page worth counting that
+the reader cannot see (three cards), and a project's references belong on the
+project's own page, next to the analysis they support. The same call was taken
+for `/nomenclature`.
+
+The bar is one 57px row at every width measured from 1280 down to 420, and
+below that `css/mgdb-modern.css` makes it a scrolling rail rather than letting
+it wrap, so it is still one row at 375. The section offset is therefore a flat
+`65px`; the shell's step to `113px` under 1170px is for bars that wrap and is
+56px too much here.
+
+The tab bar's behaviour is `MGDB.sectionTabs()` from `js/mgdb-modern.js`, not a
+copy. That helper is opt-in rather than automatic — a page that ships the bar
+without calling it gets one that scrolls correctly and then names the wrong
+section for the rest of the visit, which is how `/nomenclature` shipped once
+already.
+
+#### Making the row of cards one shape
+
+The card grid gives the cards equal width and equal height, and their inner
+bands still did not line up: the facts strip started 356, 316 and 329px down
+the three cards and the updated line at 474, 488 and 501.
+
+The cause is in the shared shell. `css/mgdb-hub.css` grows *every* paragraph in
+a card:
+
+```css
+.mgdb-hub-page .mgdb-card-grid > .mgdb-card > p { flex: 1 1 auto; }
+```
+
+On a card with one paragraph that is right — the summary takes the slack and
+everything under it sits on the floor of the card. These cards have two, the
+summary and the updated line, so the slack was split between them by their
+content heights and every band below the summary landed somewhere different in
+each card. `margin-top: auto` cannot fix it: with both paragraphs growing there
+is no free space left for an auto margin to take.
+
+Four changes, all scoped to this page, put every band of every card on the same
+line as its neighbours':
+
+| Change | Why |
+| --- | --- |
+| The updated line stops growing | Only the summary takes the slack, so everything below the summary sits on the floor of the card |
+| The topic pills move above the summary | Whatever sits above the growing paragraph can be one row on one card and two on the next without moving anything that follows |
+| Three lines reserved for the title, two rows for the pills | Both sit above the summary, and reserving the taller case is what aligns the summary's own first line |
+| Two lines reserved for each fact label | `ligand types` fits on one line and `gene assignments` does not; an 80px strip beside a 102px one puts the two footers at different heights |
+
+Measured after: title 49, pills 169, summary 228, facts 433, updated 526 — the
+same in all three cards, at equal width and equal height. Below 720px the grid
+is a single column, the cards no longer sit beside each other, and every one of
+those reservations is released.
+
+The shell rule itself is left alone. It is shared by every hub with a card grid
+and narrowing it to `> p:first-of-type` is a separate change with its own
+verification.
+
+### Listing a project that lives somewhere else
+
+A registry entry may carry an explicit `url`. That marks it as **hosted
+elsewhere**: it appears on the listing in the same format as the rest, links to
+where the page actually is, and `/projects/<slug>` `301`s there rather than
+404ing a slug the registry does recognise or including a controller that does
+not exist. `mgdb_project()` returns such an entry early, without the derived
+`controller`, `template` and `data_url` paths, and the card's meta line says
+where it went — `Updated 29 August 2026 · data downloads available · on
+/data_center/alphafill`.
+
+The first of these is **AlphaFill**. `/data_center/alphafill` is a searchable
+page over its own corpus as well as a finished analysis, so it is served from
+the data centre; it is the same kind of work as the projects around it — one
+pipeline, one fixed result set, with its figures, its methods and its downloads
+on the page — so it is listed here too. 624,456 ligand transplants across
+16,933 B73 RefGen_v5 genes and 1,969 ligand types. Listing it is a registry
+entry and nothing else: no controller, no template, no data directory, and no
+change to the AlphaFill page.
+
+It also brought the `methods` topic into use, so **Methods and benchmarking**
+is now a filter chip. Chips are built from the topics the registry actually
+uses, so that happened by itself.
+
 ### The first one: `/projects/interpro_domain_atlas`
 
 A uniform InterProScan 5.78 re-scan of 46 Andropogoneae genomes and 6 outgroup

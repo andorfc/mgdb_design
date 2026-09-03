@@ -25,6 +25,15 @@
   $slug    = trim((string)PAGE);
   $project = mgdb_project($slug);
 
+  /* A project whose page lives elsewhere on the site is listed here but not
+     served here. Send the reader to the real page rather than 404ing a slug the
+     registry does recognise, or including a controller that does not exist. */
+  if ($project !== null && !empty($project['hosted_elsewhere'])) {
+      header('HTTP/1.1 301 Moved Permanently');
+      header('Location: ' . $project['url']);
+      return;
+  }
+
   /* One project. Its controller owns the whole page from here. */
   if ($project !== null) {
       include($project['controller']);
@@ -44,6 +53,7 @@
       $bauplan->includeCss('/css/static.css');
       $bauplan->includeCss('/css/mgdb-modern.css');
       $bauplan->includeCss('/css/mgdb-megamenu.css');
+      $bauplan->includeCss('/css/mgdb-hub.css');
       $bauplan->includeCss('/css/mgdb-projects.css');
       $bauplan->includeScript('/js/mgdb-modern.js');
       $bauplan->includeScript('/js/mgdb-chrome.js');
@@ -123,13 +133,22 @@
           '<article class="mgdb-card projects-card"'
         . ' data-filter="' . mgdb_project_esc(implode(' ', $entry['topics'])) . '"'
         . ' data-search="' . mgdb_project_esc($search) . '">'
-        . '<span class="mgdb-eyebrow">' . mgdb_project_esc($entry['eyebrow']) . '</span>'
         . '<h3><a href="' . mgdb_project_esc($project['url']) . '">' . mgdb_project_esc($entry['title']) . '</a></h3>'
+        /* The topic pills sit above the summary rather than below the facts
+           strip. A card's paragraph is the one part of it that stretches to
+           fill the card's height, so anything above the paragraph can be one
+           row of pills on one card and two on the next without moving what
+           follows, while anything below it carries that difference down into
+           every band under it. With the pills up here the facts strip and the
+           updated line land at the same height in every card of the row. */
+        . '<div class="projects-card-tags">' . $tag_html . '</div>'
         . '<p>' . mgdb_project_esc($entry['card_summary']) . '</p>'
         . $facts_html
-        . '<div class="projects-card-tags">' . $tag_html . '</div>'
         . '<p class="mgdb-small mgdb-muted projects-card-meta">Updated ' . $updated_html
         . (!empty($entry['has_downloads']) ? ' &middot; data downloads available' : '')
+        . (!empty($project['hosted_elsewhere'])
+            ? ' &middot; on ' . mgdb_project_esc($project['url'])
+            : '')
         . '</p>'
         . '</article>';
   }
@@ -141,6 +160,14 @@
   $bauplan->includeCss('/css/static.css');
   $bauplan->includeCss('/css/mgdb-modern.css');
   $bauplan->includeCss('/css/mgdb-megamenu.css');
+  /* The shared Data Hub shell -- pale ground, white section cards, coloured
+     section edges, the green Related resources panel -- before the page's own
+     sheet, which is the order css/mgdb-hub.css documents. `mgdb-hub-page` on
+     <main> opts in. This is not a data hub, but the shell is where the site's
+     page furniture lives. */
+  $bauplan->includeCss('/css/mgdb-hub.css?v=' . (int) @filemtime(
+      (isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT']
+        ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html') . '/css/mgdb-hub.css'));
   $bauplan->includeCss('/css/mgdb-projects.css');
   $bauplan->includeScript('/js/mgdb-modern.js');
   $bauplan->includeScript('/js/mgdb-chrome.js');

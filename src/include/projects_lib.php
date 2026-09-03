@@ -21,6 +21,11 @@
  * plus whatever data files the project ships under
  * /data/projects/<slug>/.
  *
+ * A project whose page already lives elsewhere on the site needs only the
+ * registry entry, with an explicit 'url'. It then appears on the listing in the
+ * same format as the rest and links to where it actually is; /projects/<slug>
+ * redirects there rather than 404ing.
+ *
  * Slug rules. The slug is the URL segment, so it must be lowercase
  * [a-z0-9_] only. It must also not contain the two characters "js": the
  * sitewide .htaccess skips its rewrite for any URI matching the unanchored
@@ -32,6 +37,50 @@
  */
 function mgdb_projects() {
     return array(
+
+        /* Hosted at /data_center/alphafill rather than under /projects/, because
+           it is a searchable page over its own corpus as well as a finished
+           analysis. It is listed here because it is the same kind of work as
+           the projects around it -- one pipeline, one fixed result set, with
+           its figures, its methods and its downloads on the page. An explicit
+           `url` is what marks an entry as living elsewhere; see mgdb_project(). */
+        'alphafill' => array(
+            'title'       => 'Predicted ligands, cofactors and metal sites in maize proteins',
+            'short_title' => 'AlphaFill ligand transplants',
+            'card_summary' => 'AlphaFill run over the maize AlphaFold models: cofactors, substrates and metal ions transplanted from homologous experimental structures onto predicted maize proteins, each with its donor PDB entry, its sequence identity and its local fit, so a predicted binding site can be judged rather than taken on trust.',
+            'description' => 'AlphaFill 2.3.0 transplants against PDB-REDO, giving 624,456 ligand placements across 16,933 B73 RefGen_v5 genes, with donor evidence and confidence for each and the wholly unfilled pockets listed separately.',
+            'topics'      => array('protein-function', 'methods'),
+            'status'      => 'current',
+            'published'   => '2026-08-29',
+            'updated'     => '2026-08-29',
+            'lead'        => 'MaizeGDB',
+            'url'         => '/data_center/alphafill',
+            'card_facts'  => array(
+                array('624K',   'transplants'),
+                array('16,933', 'genes'),
+                array('1,969',  'ligand types'),
+            ),
+            'has_downloads' => true,
+        ),
+
+        'pathway_explorer' => array(
+            'title'       => 'Metabolic pathways across the 26 NAM founder genomes',
+            'short_title' => 'Pan-genome pathway explorer',
+            'eyebrow'     => 'Comparative genomics',
+            'card_summary' => 'E2P2 metabolic pathway annotation run identically on all 26 NAM founder genomes, compared against CornCyc 8.0: which pathways every genome carries, which reaction steps no genome fills, and which gene models sit on each step. Searchable, with a gene-list enrichment test.',
+            'description' => 'E2P2 pathway annotation for the 26 NAM founder genomes beside CornCyc 8.0, with 694 pathways, 2,696 reaction steps and 475,716 gene assignments; browse, compare genomes, list reaction gaps, look up genes, and test a gene list for pathway enrichment.',
+            'topics'      => array('comparative-genomics', 'protein-function', 'methods'),
+            'status'      => 'current',
+            'published'   => '2026-09-02',
+            'updated'     => '2026-09-02',
+            'lead'        => 'MaizeGDB',
+            'card_facts'  => array(
+                array('27',  'annotation tracks'),
+                array('694', 'pathways'),
+                array('476K', 'gene assignments'),
+            ),
+            'has_downloads' => true,
+        ),
 
         'interpro_domain_atlas' => array(
             'title'       => 'Protein domain landscape across maize, its relatives, and outgroups',
@@ -87,7 +136,19 @@ function mgdb_project($slug) {
     }
 
     $project = $projects[$slug];
-    $project['slug']       = $slug;
+    $project['slug'] = $slug;
+
+    /* A registry entry may carry its own `url`, which means the page lives
+       somewhere else on the site and this section only lists it. Such an entry
+       has no controller and no data directory here, and /projects/<slug> must
+       not pretend otherwise -- controllers/projects.php redirects it to the
+       real page rather than including a controller that does not exist. */
+    if (!empty($project['url'])) {
+        $project['hosted_elsewhere'] = true;
+        return $project;
+    }
+
+    $project['hosted_elsewhere'] = false;
     $project['url']        = '/projects/' . $slug;
     $project['data_url']   = '/data/projects/' . $slug;
     $project['controller'] = 'controllers/projects/' . $slug . '.php';

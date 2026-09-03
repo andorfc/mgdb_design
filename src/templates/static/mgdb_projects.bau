@@ -1,7 +1,7 @@
 $$SYNTAX-LEVEL 2
 *(mgdb-projects
 <a class="mgdb-skip-link" href="#mgdb-projects-main">Skip to main content</a>
-<main class="mgdb-page mgdb-projects-page" id="mgdb-projects-main">
+<main class="mgdb-page mgdb-hub-page mgdb-projects-page" id="mgdb-projects-main">
 
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
     <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Analysis projects</span>
@@ -18,35 +18,22 @@ $$SYNTAX-LEVEL 2
       </svg>
     </span>
     <div>
-      <span class="mgdb-eyebrow">MaizeGDB analyses</span>
       <h1 id="projects-title">Analysis projects</h1>
       <p>Small and medium analyses run at MaizeGDB, each published as one self-contained page: the figures, the tables, the methods that produced them, and the underlying data to download.</p>
     </div>
   </section>
 
-  <section aria-labelledby="projects-about-title">
-    <div class="mgdb-prose-layout">
-      <div class="mgdb-prose">
-        <h2 id="projects-about-title" class="mgdb-leaf-heading">What belongs here</h2>
-        <p>A project is a finished analysis rather than a search interface. It answers a specific question over a fixed set of inputs, and its results do not change until the analysis is re-run.</p>
-        <p>That makes it a different kind of page from the rest of the site. A <a href="/data_center/">data hub</a> searches the production database and returns whatever is in it today. A <a href="/sitemap">tool</a> takes your input and computes an answer. A project is neither: it is a result, stated once, with everything needed to check it or reuse it.</p>
-        <p>Every project page carries the same four things &mdash; what was measured, what the numbers mean, how they were produced, and the files behind them &mdash; so a figure on one of these pages can always be traced back to a downloadable table.</p>
-      </div>
-      <aside class="mgdb-aside-card">
-        <h3>Proposing a project</h3>
-        <p>Analyses that would be useful to the maize community are welcome here. Get in touch through the <a href="/contact">contact page</a> with what you have and what it answers.</p>
-      </aside>
-    </div>
-  </section>
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#projects-browse" class="is-current" aria-current="true">Search</a>
+    <a href="#projects-about">About</a>
+    <a href="#projects-related">Related resources</a>
+  </nav>
 
-  <section aria-labelledby="projects-browse-title">
+  <section id="projects-browse" aria-labelledby="projects-browse-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Browse</span>
-        <h2 id="projects-browse-title">Published projects</h2>
-      </div>
-      <p>Search by title or topic. Filtering happens as you type and the filtered view can be shared from the address bar.</p>
+      <div><h2 id="projects-browse-title">Search</h2></div>
     </div>
+    <p class="projects-section-lead">Search by title or topic. Filtering happens as you type, and the filtered view can be shared from the address bar.</p>
 
     <div class="mgdb-search">
       <div class="mgdb-search-row">
@@ -75,19 +62,57 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
-  <section class="mgdb-resource-panel" aria-labelledby="projects-resources-title">
-    <div>
-      <span class="mgdb-eyebrow">Related</span>
-      <h2 id="projects-resources-title">Where else to look</h2>
-      <p>Projects sit alongside the searchable data hubs and the analysis tools rather than replacing either of them.</p>
-    </div>
-    <div class="mgdb-resource-list">
-      <a href="/data_center/"><strong>Data Hubs</strong><span>Search the production database by record type</span></a>
-      <a href="/genome"><strong>Genome Center</strong><span>The assemblies these analyses are built on</span></a>
-      <a href="/ai"><strong>AI and machine learning</strong><span>Model-ready datasets and predictions</span></a>
-      <a href="/contact"><strong>Contact MaizeGDB</strong><span>Propose an analysis or ask about one</span></a>
+  <section id="projects-about" aria-labelledby="projects-about-title">
+    <div class="mgdb-prose-layout">
+      <div class="mgdb-prose">
+        <h2 id="projects-about-title" class="mgdb-leaf-heading">About</h2>
+        <p>A project is a finished analysis rather than a search interface. It answers a specific question over a fixed set of inputs, and its results do not change until the analysis is re-run.</p>
+        <p>That makes it a different kind of page from the rest of the site. A <a href="/data_center/">data hub</a> searches the production database and returns whatever is in it today. A <a href="/sitemap">tool</a> takes your input and computes an answer. A project is neither: it is a result, stated once, with everything needed to check it or reuse it.</p>
+        <p>Every project page carries the same four things &mdash; what was measured, what the numbers mean, how they were produced, and the files behind them &mdash; so a figure on one of these pages can always be traced back to a downloadable table.</p>
+      </div>
+      <aside class="mgdb-aside-card">
+        <h3>Proposing a project</h3>
+        <p>Analyses that would be useful to the maize community are welcome here. Get in touch through the <a href="/contact">contact page</a> with what you have and what it answers.</p>
+      </aside>
     </div>
   </section>
 
+  <section id="projects-related" class="mgdb-hub-related" aria-labelledby="projects-resources-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="projects-resources-title">Related resources</h2>
+      </div>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/">
+          <strong>Data Hubs</strong>
+          <span>Search the production database by record type, rather than a fixed result set</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/genome">
+          <strong>Genome Data Hub</strong>
+          <span>The assemblies and annotations these analyses are built on</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/ai">
+          <strong>AI and machine learning</strong>
+          <span>Model-ready datasets and predictions across the site</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/contact">
+          <strong>Contact MaizeGDB</strong>
+          <span>Propose an analysis, or ask about one that is published</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="https://download.maizegdb.org" target="_blank" rel="noopener">
+          <strong>Bulk downloads</strong>
+          <span>The wider download server these projects' files sit beside</span>
+          <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+        </a>
+      </div>
+    </div>
+  </section>
 </main>
 )

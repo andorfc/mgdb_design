@@ -4,6 +4,13 @@
    The cards are rendered server-side from the registry in
    include/projects_lib.php, so the list is complete and indexable before this
    runs. This only hides and shows cards that are already on the page.
+
+   The sticky section-tab bar is markup the shared shell styles; the shell
+   moves no active state, so a page that ships the bar without asking for the
+   behaviour gets one that scrolls correctly and then names the wrong section
+   for the rest of the visit. MGDB.sectionTabs() is that behaviour, and it is
+   opt-in rather than automatic so pages carrying their own older copy do not
+   end up running two spies over one bar.
    ========================================================================== */
 
 (function (window, document) {
@@ -13,6 +20,12 @@
   if (!MGDB) { return; }
 
   function init() {
+    /* Before the early return below: the tab bar is page furniture and does
+       not depend on the results grid being present. Filtering hides cards, so
+       the grid changes height and every section under it moves -- `watch` is
+       what makes the spy re-measure when that happens. */
+    MGDB.sectionTabs({ watch: '#projects-results' });
+
     var results = document.getElementById('projects-results');
     if (!results) { return; }
 
