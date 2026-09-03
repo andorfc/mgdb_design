@@ -413,6 +413,19 @@ src/templates/community/mgdb_nomenclature.bau          templates/community/mgdb_
 src/css/mgdb-nomenclature.css                          css/mgdb-nomenclature.css
 src/js/mgdb-nomenclature.js                            js/mgdb-nomenclature.js
 
+# BLAST front page. Only the form branch was modernized: BLAST.php now loads the
+# modern main template and templates/static/mgdb_blast.bau when there is no job,
+# BLAST_form.php nests the form inside it, and BLAST_form.bau lost its own page
+# header and fixed-width wrapper. The job submission and results path --
+# BLAST_run.php, BLAST_tasks.php, BLAST.js, BLAST_results*.bau -- is untouched
+# and is deliberately NOT listed here. Originals in legacy/blast/.
+src/controllers/BLAST.php                              controllers/BLAST.php
+src/controllers/BLAST/BLAST_form.php                   controllers/BLAST/BLAST_form.php
+src/controllers/BLAST/BLAST_form.bau                   controllers/BLAST/BLAST_form.bau
+src/templates/static/mgdb_blast.bau                    templates/static/mgdb_blast.bau
+src/css/mgdb-blast.css                                 css/mgdb-blast.css
+src/js/mgdb-blast.js                                   js/mgdb-blast.js
+
 # Coming soon & development roadmap — replaces /coming_soon in place
 src/controllers/coming_soon.php                        controllers/coming_soon.php
 src/templates/static/mgdb_coming_soon.bau             templates/static/mgdb_coming_soon.bau

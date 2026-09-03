@@ -1,0 +1,120 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-blast
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https://maizegdb.org/BLAST">
+<meta property="og:title" content="MaizeGDB BLAST | Search maize sequence">
+<meta property="og:description" content="BLAST a nucleotide or protein sequence against maize and Zea genome assemblies, gene models, transcripts and proteins at MaizeGDB.">
+
+<main class="mgdb-page mgdb-hub-page mgdb-blast-page" id="blast-main">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Tools</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">BLAST</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="blast-title">
+    <div class="mgdb-hero-emblem">
+      <svg class="blast-hero-mark" viewBox="0 0 120 120" role="img" aria-label="A query sequence aligned against a target">
+        <g fill="none" stroke-linecap="round" stroke-width="9">
+          <path d="M14 30h92" stroke="#501719" />
+          <path d="M14 60h34" stroke="#2f5e2a" /><path d="M58 60h48" stroke="#2f5e2a" />
+          <path d="M14 90h92" stroke="#a96919" />
+        </g>
+        <g fill="#f4edd0"><circle cx="53" cy="60" r="6" /></g>
+        <g fill="none" stroke="#8a5a0f" stroke-width="4" stroke-dasharray="5 6">
+          <path d="M30 34v22M74 34v22M40 64v22M88 64v22" />
+        </g>
+      </svg>
+      <strong>MaizeGDB<br />BLAST</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="blast-title">Search maize sequence.</h1>
+      <p class="mgdb-hero-description">Align a nucleotide or protein sequence against maize and other <i>Zea</i> assemblies, gene models, transcripts and predicted proteins. Choose the target datasets, and the right BLAST program is selected from your query and target types.</p>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#blast-search" class="is-current" aria-current="true">Search</a>
+    <a href="#blast-about">About</a>
+    <a href="#blast-references">References</a>
+    <a href="#blast-related">Related resources</a>
+  </nav>
+
+  <section id="blast-search" aria-labelledby="blast-search-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="blast-search-title">Search</h2></div>
+    </div>
+
+    <div class="blast-search-intro">
+      <div><h3>What sequence are you searching with?</h3><p>Paste one or more sequences in FASTA format, or fetch one from GenBank by accession. Then pick the datasets to search against &#8212; the current B73 assembly is selected for you.</p></div>
+    </div>
+
+    ;; The form itself is the pre-redesign template, nested unchanged. Every
+    ;; control id, name and handler in it is what controllers/BLAST/BLAST.js
+    ;; already drives, and the job submission path behind it is untouched.
+    <div class="blast-form-shell">*(blast-form)</div>
+  </section>
+
+  <section id="blast-about" class="mgdb-prose-layout" aria-labelledby="blast-about-title">
+    <div class="mgdb-prose">
+      <h2 id="blast-about-title" class="mgdb-leaf-heading">About</h2>
+      <p>BLAST finds regions of local similarity between your query and a target dataset, and reports each one with an alignment, a bit score and an E&#8209;value. A low E&#8209;value means a match that is unlikely to have arisen by chance in a database of that size &#8212; it is not a measure of biological relevance, which is yours to judge.</p>
+      <p>You do not choose a program. The query sequence type and the target you pick decide it: a nucleotide query against a nucleotide target runs <code>blastn</code>, a protein query against a protein target <code>blastp</code>, and the mixed cases run <code>blastx</code> or <code>tblastn</code>. The parameter set defaults to values suited to that pairing, and every one of them can be overridden.</p>
+      <p>Searches run as jobs. A job keeps its results under a job identifier, so a long search can be left and returned to, and a finished search can be reopened later from the same address.</p>
+    </div>
+    <aside class="mgdb-aside-card">
+      <h3>Choose the right tool</h3>
+      <p>Use BLAST when you have sequence and want to know what it matches.</p>
+      <p>If you already have an identifier &#8212; a gene model, a locus, a marker &#8212; the Gene Data Hub resolves it directly, and for structure similarity rather than sequence similarity, Foldseek on the protein structure hub searches folds instead.</p>
+      <a class="mgdb-button mgdb-button-secondary" href="/gene_center/gene">Search by identifier</a>
+    </aside>
+  </section>
+
+  <section id="blast-references" aria-labelledby="blast-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="blast-references-title">References</h2></div>
+    </div>
+
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
+  <section id="blast-related" class="mgdb-hub-related" aria-labelledby="blast-related-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="blast-related-title">Related resources</h2>
+      </div>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/gene_center/gene">
+          <strong>Gene Data Hub</strong>
+          <span>Resolve a gene model, transcript or translation identifier directly</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/genome">
+          <strong>Genome Data Hub</strong>
+          <span>The assemblies and annotations these target datasets are built from</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/data_center/protein_structure">
+          <strong>Protein structures</strong>
+          <span>Foldseek searches structure where BLAST searches sequence</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="/genome/genomebrowser">
+          <strong>Genome browser</strong>
+          <span>Take a hit's coordinates into JBrowse to see what else is there</span>
+          <span class="mgdb-resource-badge">Internal</span>
+        </a>
+        <a href="https://blast.ncbi.nlm.nih.gov/Blast.cgi" target="_blank" rel="noopener">
+          <strong>NCBI BLAST</strong>
+          <span>Search beyond maize, against the whole of GenBank</span>
+          <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

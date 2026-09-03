@@ -1,0 +1,195 @@
+/* ==========================================================================
+   BLAST front page — /BLAST
+   --------------------------------------------------------------------------
+   Loaded after css/mgdb-modern.css, css/mgdb-hub.css and the page's own
+   controllers/BLAST/BLAST.css. The shell settles the pale ground, the white
+   section cards and their coloured top edges, the absence of a rule under a
+   section title, the reference card and the green Related resources panel.
+
+   The BLAST form itself is the pre-redesign template, nested unchanged, so
+   what is here is the page furniture plus the small number of rules needed to
+   stop the legacy form's own styling fighting the page around it. Nothing here
+   changes a control's size, name or behaviour.
+   ========================================================================== */
+
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
+
+.mgdb-blast-page .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-blast-page .blast-hero-mark {
+  display: block;
+  width: min(100%, 76px);
+  height: auto;
+  margin: 0;
+}
+
+/* ── Sticky section tabs ─────────────────────────────────────────────────── */
+
+/* Only the tinted chips and the bottom margin. The bar's ground, its rule and
+   the padding that makes it 57px come from css/mgdb-hub.css; overriding the
+   background here is what left one hub's bar transparent. */
+.mgdb-blast-page .mgdb-section-tabs { margin-bottom: var(--mgdb-space-5); }
+
+.mgdb-blast-page .mgdb-section-tabs a {
+  border: 1px solid var(--hub-line);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink) !important;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.mgdb-blast-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
+
+.mgdb-blast-page .mgdb-section-tabs a.is-current,
+.mgdb-blast-page .mgdb-section-tabs a[aria-current="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+/* The offset ladder. Four short labels, so the bar is one 57px row at every
+   width measured -- 1280, 1000, 800, 600, 420 and 375 -- and it never wraps.
+   The shell steps to 113px below 1170px for bars that do, which is 56px too
+   much here, so this page keeps 65px the whole way down. */
+@media (max-width: 1170px) {
+  .mgdb-hub-page.mgdb-blast-page > section[id] { scroll-margin-top: 65px; }
+}
+
+.mgdb-blast-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+/* ── Search panel ────────────────────────────────────────────────────────── */
+
+.mgdb-blast-page .blast-search-intro { margin-bottom: 1.2rem; }
+
+.mgdb-blast-page .blast-search-intro > div { max-width: 48rem; }
+
+.mgdb-blast-page .blast-search-intro h3 {
+  margin: 0.25rem 0 0.45rem;
+  color: var(--mgdb-green-dark);
+  font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+}
+
+.mgdb-blast-page .blast-search-intro p {
+  margin: 0;
+  color: var(--mgdb-muted);
+}
+
+.mgdb-blast-page .blast-form-shell {
+  overflow: hidden;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid var(--mgdb-line);
+  border-top: 0.3rem solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+/* ── Restraining the nested legacy form ──────────────────────────────────── */
+
+/* BLAST.css sets `label { padding-right: 20px }` with no scope at all, so it
+   reaches the megamenu, the hero and every other label on the page. Undo it
+   everywhere and put it back only inside the form, which is the only place it
+   was ever meant for. */
+.mgdb-blast-page label { padding-right: 0; }
+.mgdb-blast-page .blast-form-shell label { padding-right: 20px; }
+
+/* The form is set in 13px Verdana by BLAST.css. Inside a modern page that
+   reads as a different document; the size and the family come from the page. */
+.mgdb-blast-page .blast-form-shell .BLAST,
+.mgdb-blast-page .blast-form-shell td.BLAST,
+.mgdb-blast-page .blast-form-shell form.BLAST {
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+}
+
+/* Its layout tables are the 2012 kind: fixed widths and no wrapping rules.
+   They lay out fluidly here so the card can be any width. */
+.mgdb-blast-page .blast-form-shell table {
+  width: 100%;
+  max-width: 100%;
+  border-collapse: collapse;
+}
+
+.mgdb-blast-page .blast-form-shell td { vertical-align: top; }
+
+.mgdb-blast-page .blast-form-shell textarea {
+  width: 100%;
+  max-width: 100%;
+  min-height: 11rem;
+  padding: var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.85rem;
+  resize: vertical;
+}
+
+/* `cols` on the textarea is an author-time hint the browser honours over CSS
+   width in some engines; the width above needs the attribute out of the way. */
+.mgdb-blast-page .blast-form-shell textarea[cols] { width: 100%; }
+
+.mgdb-blast-page .blast-form-shell input[type="text"],
+.mgdb-blast-page .blast-form-shell select {
+  min-height: var(--mgdb-tap-target);
+  max-width: 100%;
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  font: inherit;
+}
+
+/* The legacy buttons are `input type=button|submit` with class="button". */
+.mgdb-blast-page .blast-form-shell input[type="button"],
+.mgdb-blast-page .blast-form-shell input[type="submit"],
+.mgdb-blast-page .blast-form-shell button {
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-green-dark);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-blast-page .blast-form-shell input[type="button"]:hover,
+.mgdb-blast-page .blast-form-shell input[type="submit"]:hover,
+.mgdb-blast-page .blast-form-shell button:hover { background: #0f3325; }
+
+.mgdb-blast-page .blast-form-shell a {
+  color: var(--mgdb-burgundy);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.15em;
+}
+
+/* The target picker is a scrolling list in the legacy markup; keep it scrolling
+   rather than letting it set the card's width. */
+.mgdb-blast-page .blast-form-shell .scrollable {
+  width: 100%;
+  max-width: 100%;
+}
+
+.mgdb-blast-page .blast-form-shell [style*="width"] { max-width: 100%; }
+
+/* ── Narrow screens ──────────────────────────────────────────────────────── */
+
+@media (max-width: 700px) {
+  /* The form's two-column layout tables become one column: a 2012 layout table
+     has no rules of its own for this. */
+  .mgdb-blast-page .blast-form-shell table,
+  .mgdb-blast-page .blast-form-shell tbody,
+  .mgdb-blast-page .blast-form-shell tr,
+  .mgdb-blast-page .blast-form-shell td {
+    display: block;
+    width: 100%;
+  }
+
+  .mgdb-blast-page .blast-form-shell td { padding-bottom: var(--mgdb-space-3); }
+}

@@ -325,6 +325,17 @@ nothing else goes wrong visibly.
   itself (autofill, bfcache), so the form can show a filter the query omits.
 - **Section top-edge colours start at `nth-of-type(2)`** because the hero is the
   first `<section>`. Check the hero really is first before trusting the order.
+- **A legacy form can be nested rather than rewritten.** When a page's form is
+  driven by a script you must not touch, put the modern page around it and take
+  out only its own page furniture -- a fixed-width wrapper, its own header bar.
+  Then *prove* nothing else moved: hash the body between the first control and
+  the last, and compare the counts of `id=`, `name=`, `onclick=` and `$(`
+  before and after.
+- **An unscoped rule in a legacy stylesheet reaches the whole modern page.**
+  One tool's sheet carried a bare `label { padding-right: 20px }`, harmless on
+  its own page and applied to the megamenu and hero once the page was modern.
+  When you keep a legacy sheet loaded, grep it for element selectors with no
+  class in front of them and re-scope each one.
 - **A page that still looks wrong may be loading two chromes.** `redirect.php`
   loads `templates/maizegdb-main.bau` -- the *legacy* main -- before it looks
   for a controller, and that template registers `index.css`,

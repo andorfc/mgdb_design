@@ -189,6 +189,7 @@ immediately. Where a file was overwritten, restore it from
 | Insertion Data Center | `/insertion` | `controllers/insertion/insertion_search_modern.php` | `legacy/insertion/` |
 | Genetic Variation | `/genetic_variation` | `controllers/genetic_variation.php` | `legacy/genetic_variation/` |
 | Homepage | `/` | `index.php` | `legacy/home/` |
+| BLAST front page | `/BLAST` | `controllers/BLAST.php` (form branch only) | `legacy/blast/` |
 
 `/cite` had no top-level controller, so `controller.php` fell through to
 `redirect.php`, which found `controllers/about/cite.php`. Because
@@ -3929,6 +3930,79 @@ by eye:
   that to 283px. This mattered more when the strip led the page — it pushed the
   quick links 1,466px down — and still keeps the foot of the page compact now
   that it sits last.
+
+## The BLAST front page
+
+`/BLAST`. Tabs: Search, About, References, Related resources. Files:
+`controllers/BLAST.php`, `controllers/BLAST/BLAST_form.php`,
+`controllers/BLAST/BLAST_form.bau`, `templates/static/mgdb_blast.bau`,
+`css/mgdb-blast.css`, `js/mgdb-blast.js`. Originals in `legacy/blast/`.
+
+**Only the front page.** Job submission, execution and results — `BLAST_run.php`,
+`BLAST_tasks.php`, `BLAST_visual_alignment.php`, `BLAST.js` and every
+`BLAST_results*.bau` — were not touched, and are deliberately absent from the
+manifest entry.
+
+### Two branches, two chromes
+
+`BLAST.php` computed the form-or-job branch *after* loading
+`templates/maizegdb-main.bau`, so both rendered in the legacy shell. It computes
+the branch first now:
+
+- **no `job_id` and no `submit-form`** → the modern main template, the modern
+  header, `mgdb-hub.css` and `templates/static/mgdb_blast.bau`.
+- **either present** → `templates/maizegdb-main.bau` and the legacy header,
+  byte-for-byte what it did before, straight into `BLAST_run.php`.
+
+Verified both ways: `/BLAST` serves 90 KB with `mgdb-hub-page` on `<main>` and
+no `index.css`, `background_static.css` or `ie6.css`; `/BLAST?job_id=…` serves
+42 KB with all three and no `mgdb-hub-page`.
+
+### The form is the same form
+
+`BLAST_form.bau` was nested rather than rewritten. Two things came out of it —
+the fixed `width=980px` wrapper and the green-curve "MaizeGDB BLAST" header bar
+— because the page around it supplies both. **Everything else is byte-identical**,
+which was checked rather than assumed: the body from the first form control to
+the closing table hashes the same before and after, with the same 35 `id=`, 10
+`name=`, 22 `onclick=` and 56 `$(token)` occurrences. That is what keeps
+`BLAST.js` working without being touched.
+
+`BLAST_form.php` changed by one statement — it loaded the form straight into
+`body` and now loads the wrapper there and nests the form inside it, so `$tmpl`
+still points at the form and every assignment, `restoreSettings()`,
+`setDefaultTargets()` and the species query are unchanged. Everything from the
+database connection onward is byte-identical.
+
+### What a 2012 stylesheet does to a modern page
+
+`BLAST.css` is still loaded, and one of its rules is:
+
+```css
+label { padding-right: 20px; }
+```
+
+No scope at all — on the legacy page that was harmless, and on a modern one it
+reaches the megamenu, the hero and every label on the page. `mgdb-blast.css`
+zeroes it across the page and puts it back only inside the form, which is where
+it was always meant to apply. Measured after: 20px inside the form, 0 outside.
+
+The rest of that sheet needed similar restraint rather than replacement — the
+form is set in 13px Verdana, its layout tables carry fixed widths, and its
+`textarea` carries a `cols` attribute that some engines honour over CSS width.
+None of those are control behaviour, so they are all restyled from outside and
+the markup keeps its attributes.
+
+### Verified
+
+4/4 distinct section edge colours, no rule under a section title, five
+reference cards (BLAST's own 1990 paper supplied through the reference card's
+`fallback`, since it is not in the MaizeGDB bibliography), no duplicate `id`,
+all four nav labels matching their `<h2>`, and every one of the nine controls
+`BLAST.js` drives present with its original tag. Four short labels keep the bar
+at one 57px row at 1280, 1000, 800, 600, 420 and 375, so the ladder is a flat
+65px below the shell's 1170 step; jumps clear by 8px at 900 and 375, and there
+is no horizontal overflow at 375.
 
 ## The nomenclature standard
 

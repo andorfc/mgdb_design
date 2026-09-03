@@ -1,0 +1,78 @@
+/** { padding: 0; margin: 0; }
+
+body {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}*/
+
+.BLAST {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	color: #000000;
+}
+
+label {
+  padding-right: 20px;
+}
+
+.fixed-font {
+  font-family: Courier New, monospace;
+  font-size: 8pt;
+}
+
+.scrollable {
+  overflow-x:auto;
+  overflow-y:hidden;
+  width: 900px;
+}
+
+/* Generic tab and collapsible div styles */
+.section_tab {
+  font-size:               14pt;
+  font-weight:             bold;
+  cursor:                  pointer;
+  padding:                 3px;
+  margin-right:            1px;
+  border-top-left-radius:  10px 5px;
+  border-top-right-radius: 10px 5px;
+}
+.section_tab button {
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 2px 10px 6px;
+  padding-right: 10px;
+  margin-right: 1px;
+  transition: 0.3s;
+  font-size: 14pt;
+  white-space: nowrap;
+  border-top-left-radius: 10px 5px;
+  border-top-right-radius: 10px 5px;
+}
+.section_tab button.active {
+  background-color: #81AD34;
+}
+.section_tab button.inactive {
+  background-color: #BEDAA7;
+  opacity:          0.6;
+  filter:           alpha(opacity=60);
+}
+.section_tabcontent {
+  display: none;
+  margin: 0px;
+  padding: 5px;
+  padding-top: 15px;
+  border: none;
+  width: 99%;
+  height: 100%;
+}
+
+.BLAST_popup {
+  display: none;
+  position: absolute;
+  background-color: #f4f4f4;
+  padding: 10px;
+  border: 1px solid black;
+  border-radius: 10px;
+}
