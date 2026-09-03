@@ -44,14 +44,14 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="blast-search-title">Search</h2></div>
     </div>
 
-    <div class="blast-search-intro">
-      <div><h3>What sequence are you searching with?</h3><p>Paste one or more sequences in FASTA format, or fetch one from GenBank by accession. Then pick the datasets to search against &#8212; the current B73 assembly is selected for you.</p></div>
-    </div>
+    <p class="blast-search-lead">Four steps. The current B73 assembly is already selected, so a sequence and a press of Run BLAST is a complete search.</p>
 
-    ;; The form itself is the pre-redesign template, nested unchanged. Every
-    ;; control id, name and handler in it is what controllers/BLAST/BLAST.js
-    ;; already drives, and the job submission path behind it is untouched.
-    <div class="blast-form-shell">*(blast-form)</div>
+    ;; The form is four numbered steps built from the site's own controls. Every
+    ;; control id, name and class in it is what controllers/BLAST/BLAST.js
+    ;; already drives -- that script and the job submission path behind it are
+    ;; untouched. The wrapper carries no styling of its own now that the form is
+    ;; not a nested page.
+    *(blast-form)
   </section>
 
   <section id="blast-about" class="mgdb-prose-layout" aria-labelledby="blast-about-title">

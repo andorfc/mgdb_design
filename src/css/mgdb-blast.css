@@ -63,29 +63,20 @@
 
 /* ── Search panel ────────────────────────────────────────────────────────── */
 
-.mgdb-blast-page .blast-search-intro { margin-bottom: 1.2rem; }
-
-.mgdb-blast-page .blast-search-intro > div { max-width: 48rem; }
-
-.mgdb-blast-page .blast-search-intro h3 {
-  margin: 0.25rem 0 0.45rem;
-  color: var(--mgdb-green-dark);
-  font-size: clamp(1.35rem, 2.5vw, 1.8rem);
-}
-
-.mgdb-blast-page .blast-search-intro p {
-  margin: 0;
+/* One line under the section heading, where the form's own step headings then
+   take over. The blurb that used to sit here repeated step 1 word for word. */
+.mgdb-blast-page .blast-search-lead {
+  max-width: 62rem;
+  margin: 0 0 var(--mgdb-space-5);
   color: var(--mgdb-muted);
 }
 
-/* ── Undoing BLAST.css ───────────────────────────────────────────────────── */
+/* ── The legacy sheet ────────────────────────────────────────────────────── */
 
-/* BLAST.css sets `label { padding-right: 20px }` with no scope at all, so it
-   reaches the megamenu, the hero and every other label on the page. The form
-   no longer wants it either: its labels are laid out by grid and flex. */
-.mgdb-blast-page label { padding-right: 0; }
-
-/* .BLAST is on the form and would set it in 13px Verdana. */
+/* controllers/BLAST/BLAST.css is no longer loaded on this branch -- see
+   controllers/BLAST.php. `.BLAST` is still on the form element because
+   BLAST.js and the server-rendered target rows carry it, so it is neutralized
+   here rather than removed from the markup. */
 .mgdb-blast-page .BLAST,
 .mgdb-blast-page form.BLAST {
   color: var(--mgdb-ink);

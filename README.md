@@ -4143,23 +4143,32 @@ horizontal overflow.
 
 ### What a 2012 stylesheet does to a modern page
 
-`BLAST.css` is still loaded, and one of its rules is:
+`BLAST.css` contains, among other things:
 
 ```css
 label { padding-right: 20px; }
 ```
 
-No scope at all — on the legacy page that was harmless, and on a modern one it
-reaches the megamenu, the hero and every label on the page. `mgdb-blast.css`
-zeroes it across the page and puts it back only inside the form, which is where
-it was always meant to apply. Measured after: 20px inside the form, 0 outside.
+No scope at all. On a page of its own that was harmless; nested inside another
+page it reached the megamenu, the hero and every label on the site's chrome.
+The first pass neutralized it from `mgdb-blast.css`. Now that the form is built
+from the site's own controls, **the sheet is not loaded on the form branch at
+all** — nothing in it applies any more, and the results branch still gets it.
+`.BLAST` stays on the form element, because `BLAST.js` and the server-rendered
+target rows carry the class, so `mgdb-blast.css` still neutralizes it.
 
-The rest of that sheet mattered less once the layout tables went: what is left
-is `.BLAST`, which is on the form and sets it in 13px Verdana, and which
-`mgdb-blast.css` returns to the page's own type. The scoping problem is the one
-worth remembering — a stylesheet written for a page of its own will have rules
-with no scope in it, and nesting that page inside another one turns every such
-rule into a sitewide rule.
+The same call was made for **Shadowbox**. `BLAST.php` loaded it on both
+branches, before jQuery, so on the modern page it threw `jQuery is not defined`
+on every view and the inline `Shadowbox.init(…)` then threw
+`Shadowbox is not defined`. The form page has no `a.shadow` link at all — it is
+the results page that opens CViT images with it — so it is now on the results
+branch only. Verified: the form branch serves no `shadowbox.*` and no
+`BLAST.css`; `/BLAST?job_id=…` still serves both and no modern asset.
+
+The scoping problem is the one worth remembering — a stylesheet or a script
+written for a page of its own will have rules and globals with no scope in it,
+and nesting that page inside another one turns every one of them into a
+sitewide rule.
 
 ### Verified
 
