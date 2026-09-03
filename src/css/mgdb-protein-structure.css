@@ -49,12 +49,13 @@
 /* mgdb-modern.css gives .mgdb-section-tabs a white sticky bar. On the hub
    shell's pale ground the family uses tinted chips on a transparent bar, so
    this matches the other converted hubs. */
-/* The base rule's vertical padding is kept -- it is what makes every other
-   hub's bar 57px, and the scroll ladder is measured against that. Only the
-   white background goes, because the shell's ground is already pale. */
+/* Only the bottom margin, to match the other hubs. Everything else about the
+   bar belongs to css/mgdb-hub.css, which gives it the pale ground
+   (var(--hub-ground)), the rule under it and the padding that makes it 57px.
+   An earlier `background: none` here overrode that and left the bar
+   transparent, so the page scrolled visibly underneath it. */
 .mgdb-protein-structure-page .mgdb-section-tabs {
   margin-bottom: var(--mgdb-space-5);
-  background: none;
 }
 
 .mgdb-protein-structure-page .mgdb-section-tabs a {
@@ -779,6 +780,31 @@
 }
 
 .mgdb-modern .ps-tool-card .ps-search-row { margin-top: var(--mgdb-space-3); }
+
+/* Two columns, not the shared grid's auto-fit. Five cards at a 280px minimum
+   came out four across on a 1132px page, and a 284px card left its search box
+   77-93px of text space for a 145px gene model identifier -- so every example
+   in this section was cut off mid-ID, which is the one thing an example box
+   must not do. Two columns also give these five tools the weight they deserve
+   next to the sections around them. */
+.mgdb-modern .ps-tool-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* The example is the point of the box, so the input never shrinks below one,
+   and the button wraps under it rather than squeezing it. */
+.mgdb-modern .ps-tool-card .ps-search-row { flex-wrap: wrap; }
+
+.mgdb-modern .ps-tool-card .ps-search-row .mgdb-input {
+  flex: 1 1 14rem;
+  min-width: 14rem;
+}
+
+.mgdb-modern .ps-tool-card .ps-search-row .mgdb-button { flex: 0 0 auto; }
+
+@media (max-width: 900px) {
+  .mgdb-modern .ps-tool-grid { grid-template-columns: minmax(0, 1fr); }
+}
 
 .mgdb-modern .ps-provenance-note { margin-top: var(--mgdb-space-3); }
 
