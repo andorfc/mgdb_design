@@ -6,10 +6,11 @@
    section cards and their coloured top edges, the absence of a rule under a
    section title, the reference card and the green Related resources panel.
 
-   The BLAST form itself is the pre-redesign template, nested unchanged, so
-   what is here is the page furniture plus the small number of rules needed to
-   stop the legacy form's own styling fighting the page around it. Nothing here
-   changes a control's size, name or behaviour.
+   The form is the site's own controls now rather than the 2012 layout tables,
+   but every id the form's script drives is unchanged, so a few rules here
+   exist only to take legacy markup out of legacy layout -- most importantly
+   `#selected_targets`, which has to stay a <table> because addTarget appends
+   <tr> rows to it.
    ========================================================================== */
 
 /* ── Hero emblem ─────────────────────────────────────────────────────────── */
@@ -77,64 +78,128 @@
   color: var(--mgdb-muted);
 }
 
-.mgdb-blast-page .blast-form-shell {
-  overflow: hidden;
-  padding: clamp(1.25rem, 3vw, 2rem);
-  border: 1px solid var(--mgdb-line);
-  border-top: 0.3rem solid var(--mgdb-gold);
+/* ── Undoing BLAST.css ───────────────────────────────────────────────────── */
+
+/* BLAST.css sets `label { padding-right: 20px }` with no scope at all, so it
+   reaches the megamenu, the hero and every other label on the page. The form
+   no longer wants it either: its labels are laid out by grid and flex. */
+.mgdb-blast-page label { padding-right: 0; }
+
+/* .BLAST is on the form and would set it in 13px Verdana. */
+.mgdb-blast-page .BLAST,
+.mgdb-blast-page form.BLAST {
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* ── The form: four numbered steps ───────────────────────────────────────── */
+
+.mgdb-blast-page .blast-form {
+  display: grid;
+  gap: var(--mgdb-space-5);
+  margin: 0;
+}
+
+.mgdb-blast-page .blast-step {
+  padding: clamp(1rem, 2.4vw, 1.5rem);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius-lg);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
   box-shadow: var(--mgdb-shadow-sm);
 }
 
-/* ── Restraining the nested legacy form ──────────────────────────────────── */
+/* The step number is a fixed 2rem circle, so all four headings start at the
+   same left edge whatever the number. */
+.mgdb-blast-page .blast-step-head {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  gap: var(--mgdb-space-3);
+  align-items: start;
+  margin-bottom: var(--mgdb-space-4);
+}
 
-/* BLAST.css sets `label { padding-right: 20px }` with no scope at all, so it
-   reaches the megamenu, the hero and every other label on the page. Undo it
-   everywhere and put it back only inside the form, which is the only place it
-   was ever meant for. */
-.mgdb-blast-page label { padding-right: 0; }
-.mgdb-blast-page .blast-form-shell label { padding-right: 20px; }
+.mgdb-blast-page .blast-step-number {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
 
-/* The form is set in 13px Verdana by BLAST.css. Inside a modern page that
-   reads as a different document; the size and the family come from the page. */
-.mgdb-blast-page .blast-form-shell .BLAST,
-.mgdb-blast-page .blast-form-shell td.BLAST,
-.mgdb-blast-page .blast-form-shell form.BLAST {
-  color: var(--mgdb-ink);
-  font-family: inherit;
+.mgdb-blast-page .blast-step-head h3 {
+  margin: 0.15rem 0 0.2rem;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xl);
+  line-height: 1.25;
+}
+
+.mgdb-blast-page .blast-step-head p {
+  margin: 0;
+  max-width: 62rem;
+  color: var(--mgdb-muted);
   font-size: var(--mgdb-text-sm);
 }
 
-/* Its layout tables are the 2012 kind: fixed widths and no wrapping rules.
-   They lay out fluidly here so the card can be any width. */
-.mgdb-blast-page .blast-form-shell table {
-  width: 100%;
-  max-width: 100%;
-  border-collapse: collapse;
+/* The body lines up under the heading, not under the number. */
+.mgdb-blast-page .blast-step-body {
+  display: grid;
+  gap: var(--mgdb-space-4);
+  padding-left: calc(2rem + var(--mgdb-space-3));
 }
 
-.mgdb-blast-page .blast-form-shell td { vertical-align: top; }
-
-.mgdb-blast-page .blast-form-shell textarea {
-  width: 100%;
-  max-width: 100%;
-  min-height: 11rem;
-  padding: var(--mgdb-space-3);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-sm);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.85rem;
-  resize: vertical;
+@media (max-width: 620px) {
+  .mgdb-blast-page .blast-step-body { padding-left: 0; }
 }
 
-/* `cols` on the textarea is an author-time hint the browser honours over CSS
-   width in some engines; the width above needs the attribute out of the way. */
-.mgdb-blast-page .blast-form-shell textarea[cols] { width: 100%; }
+/* ── Fields ──────────────────────────────────────────────────────────────── */
 
-.mgdb-blast-page .blast-form-shell input[type="text"],
-.mgdb-blast-page .blast-form-shell select {
+.mgdb-blast-page .blast-field {
+  display: grid;
+  gap: var(--mgdb-space-2);
+  align-content: start;
+  min-width: 0;
+}
+
+.mgdb-blast-page .blast-field > .mgdb-label {
+  margin: 0;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: var(--mgdb-muted);
+}
+
+.mgdb-blast-page .blast-field .mgdb-hint { margin: 0; }
+
+.mgdb-blast-page .blast-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Every control on the page is the same height, so a row of them is a row. */
+.mgdb-blast-page .mgdb-input,
+.mgdb-blast-page .mgdb-select,
+.mgdb-blast-page .blast-form .mgdb-button {
   min-height: var(--mgdb-tap-target);
+  box-sizing: border-box;
+}
+
+.mgdb-blast-page .mgdb-select,
+.mgdb-blast-page .mgdb-input {
+  width: 100%;
   max-width: 100%;
   padding: 0 var(--mgdb-space-3);
   border: 1px solid var(--mgdb-line);
@@ -144,12 +209,556 @@
   font: inherit;
 }
 
-/* The legacy buttons are `input type=button|submit` with class="button". */
-.mgdb-blast-page .blast-form-shell input[type="button"],
-.mgdb-blast-page .blast-form-shell input[type="submit"],
-.mgdb-blast-page .blast-form-shell button {
+.mgdb-blast-page .mgdb-select { padding-right: var(--mgdb-space-2); }
+
+.mgdb-blast-page .mgdb-input:focus-visible,
+.mgdb-blast-page .mgdb-select:focus-visible,
+.mgdb-blast-page .blast-textarea:focus-visible {
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: 1px;
+}
+
+/* ── Segmented radio groups ──────────────────────────────────────────────── */
+
+/* One control instead of loose radios: the whole segment is the hit area, and
+   the label is a real <label for>, so clicking it fires the radio's change
+   event. The old markup faked that with an onclick that set the property
+   directly, which never fired change -- the reason the preset labels had to
+   call setParams themselves. */
+.mgdb-blast-page .blast-segmented {
+  position: relative;
+  display: inline-flex;
+  flex-wrap: nowrap;
+  padding: 3px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-md);
+  background: var(--mgdb-surface-sunken);
+  gap: 3px;
+}
+
+.mgdb-blast-page .blast-segmented-wrap { flex-wrap: wrap; }
+
+.mgdb-blast-page .blast-segmented input[type="radio"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mgdb-blast-page .blast-segmented label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(var(--mgdb-tap-target) - 8px);
+  padding: 0 var(--mgdb-space-4);
+  border-radius: var(--mgdb-radius-sm);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+
+.mgdb-blast-page .blast-segmented label:hover { background: var(--mgdb-green-soft); }
+
+.mgdb-blast-page .blast-segmented input:checked + label {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+}
+
+.mgdb-blast-page .blast-segmented input:focus-visible + label {
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: 1px;
+}
+
+/* ── Step 1: the sequence ────────────────────────────────────────────────── */
+
+.mgdb-blast-page .blast-seq-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: end;
+  justify-content: space-between;
+}
+
+.mgdb-blast-page .blast-seq-count {
+  margin: 0 0 0.35rem;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.mgdb-blast-page .blast-seq-count.is-over { color: var(--mgdb-status-error); font-weight: 700; }
+
+.mgdb-blast-page .blast-textarea {
+  width: 100%;
+  min-height: 13rem;
+  padding: var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  font-family: var(--mgdb-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.mgdb-blast-page .blast-seq-warning {
+  margin: 0;
+  padding: var(--mgdb-space-3);
+  border-left: 4px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius-xs);
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-blast-page .blast-seq-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+  align-items: start;
+  justify-content: space-between;
+  padding-top: var(--mgdb-space-2);
+  border-top: 1px solid var(--mgdb-line-soft);
+}
+
+.mgdb-blast-page .blast-seq-tools-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-blast-page .blast-genbank {
+  display: grid;
+  gap: var(--mgdb-space-2);
+  min-width: 0;
+  flex: 0 1 26rem;
+}
+
+.mgdb-blast-page .blast-genbank > .mgdb-label {
+  margin: 0;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: var(--mgdb-muted);
+}
+
+.mgdb-blast-page .blast-genbank-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-blast-page .blast-genbank .mgdb-hint { margin: 0; }
+
+/* ── Step 2: the target picker ───────────────────────────────────────────── */
+
+/* Four controls on one row, all the same height and all starting at the same
+   baseline. The assembly column takes the slack because its values are the
+   long ones -- Zm-B73_B_CHROMOSOME-MBSC-1.0 and the like. */
+.mgdb-blast-page .blast-target-picker {
+  display: grid;
+  grid-template-columns: minmax(11rem, 0.9fr) minmax(14rem, 1.6fr) minmax(10rem, 1fr) auto;
+  gap: var(--mgdb-space-3);
+  align-items: end;
+}
+
+/* Two columns rather than four, and the button keeps the Dataset select
+   company rather than taking a whole row to itself: `align-items: end` on the
+   grid is what keeps its bottom edge level with the select's. */
+@media (max-width: 1080px) {
+  .mgdb-blast-page .blast-target-picker {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .mgdb-blast-page .blast-field-action { justify-items: start; }
+}
+
+@media (max-width: 620px) {
+  .mgdb-blast-page .blast-target-picker { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* The spacer label that keeps the button's top edge level with the controls
+   beside it collapses once the button is on its own row. */
+@media (max-width: 1080px) {
+  .mgdb-blast-page .blast-field-action > .mgdb-label { display: none; }
+}
+
+.mgdb-blast-page .blast-field-action .mgdb-button { white-space: nowrap; }
+
+/* Quick add */
+
+.mgdb-blast-page .blast-quick {
+  display: grid;
+  gap: var(--mgdb-space-2);
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius-md);
+  background: var(--mgdb-gold-soft);
+}
+
+.mgdb-blast-page .blast-quick > .mgdb-label {
+  margin: 0;
+  color: var(--mgdb-gold-dark);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+
+.mgdb-blast-page .blast-quick-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-blast-page .blast-quick-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  min-height: 2.1rem;
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-gold-dark);
+  border-radius: 999px;
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+
+.mgdb-blast-page .blast-quick-chip::before {
+  content: "+";
+  font-weight: 700;
+  color: var(--mgdb-gold-dark);
+}
+
+.mgdb-blast-page .blast-quick-chip:hover { background: #ffffff; }
+
+.mgdb-blast-page .blast-quick-chip[aria-pressed="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+}
+
+.mgdb-blast-page .blast-quick-chip[aria-pressed="true"]::before {
+  content: "\2713";
+  color: #ffffff;
+}
+
+.mgdb-blast-page .blast-quick-chip:focus-visible {
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: 1px;
+}
+
+/* The assembly combobox */
+
+.mgdb-blast-page .blast-combo { position: relative; }
+
+.mgdb-blast-page .blast-combo-toggle {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: calc(var(--mgdb-tap-target) - 2px);
+  border: 0;
+  border-left: 1px solid var(--mgdb-line);
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-muted);
+  cursor: pointer;
+}
+
+.mgdb-blast-page .blast-combo-toggle:hover { background: var(--mgdb-green-soft); color: var(--mgdb-ink); }
+
+.mgdb-blast-page .blast-combo input { padding-right: 2.9rem; }
+
+.mgdb-blast-page .blast-combo-panel {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  display: none;
+  max-height: 19rem;
+  overflow-y: auto;
+  padding: var(--mgdb-space-1);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-lg);
+}
+
+.mgdb-blast-page .blast-combo.is-open .blast-combo-panel { display: block; }
+
+.mgdb-blast-page .blast-combo-option {
+  display: block;
+  width: 100%;
+  padding: 0.45rem var(--mgdb-space-3);
+  border: 0;
+  border-radius: var(--mgdb-radius-xs);
+  background: none;
+  color: var(--mgdb-ink);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  text-align: left;
+  cursor: pointer;
+}
+
+.mgdb-blast-page .blast-combo-option:hover,
+.mgdb-blast-page .blast-combo-option.is-active {
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-blast-page .blast-combo-option mark {
+  background: var(--mgdb-gold-soft);
+  color: inherit;
+  font-weight: 700;
+}
+
+.mgdb-blast-page .blast-combo-empty {
+  padding: 0.45rem var(--mgdb-space-3);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-blast-page .blast-combo-count {
+  position: sticky;
+  top: 0;
+  padding: 0.3rem var(--mgdb-space-3);
+  border-bottom: 1px solid var(--mgdb-line-soft);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+/* Selected datasets */
+
+.mgdb-blast-page .blast-selected {
+  display: grid;
+  gap: var(--mgdb-space-2);
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-md);
+  background: var(--hub-ground);
+}
+
+.mgdb-blast-page .blast-selected-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.mgdb-blast-page .blast-selected-head > .mgdb-label {
+  margin: 0;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: var(--mgdb-muted);
+}
+
+/* #selected_targets has to stay a <table>: addTarget appends <tr> rows to it,
+   and the server renders <tr> rows into it on a restored job. `display:
+   contents` on the table and on the tbody the parser inserts drops both out of
+   table layout, so the rows themselves become the flex items -- which is what
+   lets a row be a chip. It also covers the case where jQuery appends a <tr>
+   as a direct child of the table rather than into the tbody. */
+.mgdb-blast-page .blast-target-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-blast-page #selected_targets,
+.mgdb-blast-page #selected_targets > tbody { display: contents; }
+
+.mgdb-blast-page #selected_targets tr {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  padding: 0.3rem 0.35rem 0.3rem 0.75rem;
+  border: 1px solid var(--mgdb-green);
+  border-radius: 999px;
+  background: var(--mgdb-surface);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-blast-page #selected_targets td {
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: inherit;
+}
+
+.mgdb-blast-page #selected_targets td:empty { display: none; }
+
+/* The remove control is an <a><b>X</b></a> the script writes; it becomes a
+   round button without the markup changing. */
+.mgdb-blast-page #selected_targets td a {
+  display: grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-burgundy);
+  text-decoration: none;
+  line-height: 1;
+}
+
+.mgdb-blast-page #selected_targets td a:hover {
+  background: var(--mgdb-burgundy);
+  color: #ffffff;
+}
+
+.mgdb-blast-page #selected_targets td a b { font-size: 0.72rem; font-weight: 700; }
+
+.mgdb-blast-page .blast-selected-empty {
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* ── Step 3: parameters ──────────────────────────────────────────────────── */
+
+.mgdb-blast-page .blast-advanced {
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-md);
+  background: var(--hub-ground);
+}
+
+.mgdb-blast-page .blast-advanced > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-2);
   min-height: var(--mgdb-tap-target);
   padding: 0 var(--mgdb-space-4);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+
+.mgdb-blast-page .blast-advanced > summary::-webkit-details-marker { display: none; }
+
+.mgdb-blast-page .blast-advanced > summary::before {
+  content: "\25B8";
+  color: var(--mgdb-muted);
+  transition: transform .15s ease;
+}
+
+.mgdb-blast-page .blast-advanced[open] > summary::before { transform: rotate(90deg); }
+
+.mgdb-blast-page .blast-advanced > summary:focus-visible {
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: -3px;
+}
+
+.mgdb-blast-page .blast-advanced-note {
+  margin: 0 var(--mgdb-space-4);
+  padding-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-blast-page .blast-param-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: var(--mgdb-space-4);
+  padding: 0 var(--mgdb-space-4) var(--mgdb-space-4);
+}
+
+/* Label, control, hint — three rows, so the controls of two adjacent
+   parameters start at the same height whatever their labels wrap to. */
+.mgdb-blast-page .blast-param {
+  display: grid;
+  grid-template-rows: auto var(--mgdb-tap-target) auto;
+  gap: var(--mgdb-space-2);
+  align-content: start;
+  min-width: 0;
+}
+
+.mgdb-blast-page .blast-param > .mgdb-label {
+  margin: 0;
+  align-self: end;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: var(--mgdb-muted);
+}
+
+.mgdb-blast-page .blast-param .mgdb-hint { margin: 0; }
+
+/* The help disclosures sit below the hint, in the third row with it. */
+.mgdb-blast-page .blast-param .blast-help { grid-row: 3; }
+
+.mgdb-blast-page .blast-help > summary {
+  color: var(--mgdb-burgundy);
+  font-size: var(--mgdb-text-sm);
+  cursor: pointer;
+}
+
+.mgdb-blast-page .blast-help > summary:focus-visible {
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: 2px;
+}
+
+.mgdb-blast-page .blast-help > *:not(summary) {
+  margin: var(--mgdb-space-2) 0 0;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-blast-page .blast-help-table { width: 100%; font-size: var(--mgdb-text-xs); }
+.mgdb-blast-page .blast-help-table code { font-size: 0.95em; }
+
+/* ── Step 4 and the run bar ──────────────────────────────────────────────── */
+
+.mgdb-blast-page .blast-run-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 30;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--mgdb-space-3) clamp(1rem, 2.4vw, 1.5rem);
+  border: 1px solid var(--mgdb-green-dark);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--hub-surface);
+  box-shadow: 0 -2px 10px rgba(16, 30, 54, .10);
+}
+
+.mgdb-blast-page .blast-run-summary {
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-blast-page .blast-run-summary strong { color: var(--mgdb-ink); }
+
+.mgdb-blast-page .blast-run-actions {
+  display: flex;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+}
+
+.mgdb-blast-page #BLAST_in_progress { font-size: var(--mgdb-text-sm); }
+
+.mgdb-blast-page #run_BLAST {
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-6);
   border: 1px solid var(--mgdb-green-dark);
   border-radius: var(--mgdb-radius-sm);
   background: var(--mgdb-green-dark);
@@ -159,37 +768,56 @@
   cursor: pointer;
 }
 
-.mgdb-blast-page .blast-form-shell input[type="button"]:hover,
-.mgdb-blast-page .blast-form-shell input[type="submit"]:hover,
-.mgdb-blast-page .blast-form-shell button:hover { background: #0f3325; }
+.mgdb-blast-page #run_BLAST:hover:not(:disabled) { background: #0f3325; }
 
-.mgdb-blast-page .blast-form-shell a {
-  color: var(--mgdb-burgundy);
-  text-decoration-thickness: 0.08em;
-  text-underline-offset: 0.15em;
+.mgdb-blast-page #run_BLAST:disabled { opacity: .6; cursor: progress; }
+
+/* ── Recent jobs ─────────────────────────────────────────────────────────── */
+
+.mgdb-blast-page .blast-recent {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: baseline;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-md);
+  background: var(--hub-ground);
 }
 
-/* The target picker is a scrolling list in the legacy markup; keep it scrolling
-   rather than letting it set the card's width. */
-.mgdb-blast-page .blast-form-shell .scrollable {
-  width: 100%;
-  max-width: 100%;
+.mgdb-blast-page .blast-recent-label {
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: var(--mgdb-muted);
 }
 
-.mgdb-blast-page .blast-form-shell [style*="width"] { max-width: 100%; }
+.mgdb-blast-page .blast-recent-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 
 /* ── Narrow screens ──────────────────────────────────────────────────────── */
 
-@media (max-width: 700px) {
-  /* The form's two-column layout tables become one column: a 2012 layout table
-     has no rules of its own for this. */
-  .mgdb-blast-page .blast-form-shell table,
-  .mgdb-blast-page .blast-form-shell tbody,
-  .mgdb-blast-page .blast-form-shell tr,
-  .mgdb-blast-page .blast-form-shell td {
-    display: block;
-    width: 100%;
-  }
+@media (max-width: 620px) {
+  /* The type control and its counter stop sharing a line, so the control can
+     take the full width and its segments become real tap targets. */
+  .mgdb-blast-page .blast-seq-top { flex-direction: column; align-items: stretch; }
+  .mgdb-blast-page .blast-seq-top > .blast-field { width: 100%; }
+  .mgdb-blast-page .blast-segmented { width: 100%; }
+  .mgdb-blast-page .blast-segmented label { flex: 1 1 auto; padding: 0 var(--mgdb-space-2); }
+  .mgdb-blast-page .blast-genbank { flex: 1 1 100%; }
+  .mgdb-blast-page .blast-seq-tools-buttons .mgdb-button { flex: 1 1 auto; }
+  .mgdb-blast-page .blast-run-bar { justify-content: stretch; }
+  .mgdb-blast-page .blast-run-actions { flex: 1 1 100%; justify-content: flex-end; }
+}
 
-  .mgdb-blast-page .blast-form-shell td { padding-bottom: var(--mgdb-space-3); }
+@media (forced-colors: active) {
+  .mgdb-blast-page .blast-segmented input:checked + label,
+  .mgdb-blast-page .blast-quick-chip[aria-pressed="true"] { forced-color-adjust: none; }
 }

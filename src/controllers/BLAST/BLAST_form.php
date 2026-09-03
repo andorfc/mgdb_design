@@ -73,6 +73,18 @@
   
   $tmpl->get('target_species_options')->loop(getSpeciesOptions($DBConn));
 
+  /* Quick-add buttons for the current reference assembly's own datasets.
+     Reaching B73 v5's proteins otherwise means picking a species, typing an
+     assembly name out of 103, picking the dataset and pressing add; these are
+     one click. They add exactly the row addTarget() would, so nothing
+     downstream can tell the difference. */
+  $quick = getQuickTargets($DBConn, $system['cur_ref_gen']);
+  if ($quick) {
+      $tmpl->get('quick_assembly')->replace(htmlspecialchars($system['cur_ref_gen'], ENT_QUOTES, 'UTF-8'));
+      $tmpl->get('quick_target_rows')->loop($quick);
+      $tmpl->get('quick-targets')->unmute();
+  }
+
   if ($cached_jobs = getCGIParam('BLAST_jobs', 'S', false)) {
     $cached_jobs_arr = explode(',', $cached_jobs);
     $cached_job_names = array();
@@ -117,6 +129,45 @@ function getSpeciesOptions($DBConn) {
   return get_all_rows($sth);
 }//getSpeciesOptions
 
+
+
+/*
+ * The current reference assembly's BLAST targets, as quick-add buttons.
+ *
+ * `quick_label` is the text addTarget() puts in the chip -- assembly name, a
+ * hyphen, target type -- so a quick-added row and a picked one are identical.
+ * The ORDER BY puts the whole assembly first and then the gene model datasets,
+ * which is the order they are usually wanted in; ordering by target_type alone
+ * would lead with "Gene model CDS".
+ */
+function getQuickTargets($DBConn, $assembly) {
+  if (!$assembly) {
+    return array();
+  }
+
+  $safe = pg_escape_string($assembly);
+  $sql = "
+    SELECT b.id, b.target_type
+    FROM mgdb.pc_blast_ctl b
+      INNER JOIN mgdb.id_num idn ON idn.id = b.id
+    WHERE idn.curation_lvl = 0 AND b.assembly_name = '$safe'
+    ORDER BY
+      CASE WHEN b.target_type = 'Assembly' THEN 0 ELSE 1 END,
+      b.target_type";
+  $sth = make_query($DBConn, $sql);
+  $rows = get_all_rows($sth);
+
+  $quick = array();
+  foreach ($rows as $row) {
+    $quick[] = array(
+      'quick_id'    => $row['id'],
+      'quick_type'  => htmlspecialchars($row['target_type'], ENT_QUOTES, 'UTF-8'),
+      'quick_label' => htmlspecialchars($assembly . '-' . $row['target_type'], ENT_QUOTES, 'UTF-8'),
+    );
+  }
+
+  return $quick;
+}//getQuickTargets
 
 function restoreSettings($tmpl, $DBConn) {
   global $system;
@@ -164,7 +215,18 @@ function restoreSettings($tmpl, $DBConn) {
   $targets = explode(',', getCGIParam('targets', 'P', ''));
   $html = '';
   foreach ($targets as $blast_id) {
+    /* getBLASTrecord() in BLAST_lib.php interpolates this straight into
+       `WHERE id=$blast_id` with no escaping, and `targets` arrives from the
+       request. A cast is all this file can do about that; the endpoints in
+       BLAST_tasks.php have the same problem and are recorded as AD-049. */
+    $blast_id = (int) $blast_id;
+    if (!$blast_id) {
+      continue;
+    }
     $rec = getBLASTrecord($blast_id, $DBConn);
+    if (!$rec) {
+      continue;
+    }
     $html .= "
       <tr id=\"{$rec['blast_id']}\" class=\"selected_BLAST_target\">
         <td class=\"BLAST\">{$rec['assembly_name']}-{$rec['target_type']}</td>

@@ -1084,3 +1084,58 @@ Then drop the `/var/www/logs` line from the script, or retire the cron job, so t
 - **Required administrator:** PostgreSQL superuser or the owner of the `mgdb` schema
 - **Status:** proposed
 - **Validation:** `/search/image/image_search_api.php?term=purple&category=all&page_size=25&sort=latest` returns in well under 500 ms with `summary.total` still 190.
+
+## AD-048 — BLAST cannot write its query file on the development instance
+
+- **What is wrong:** Every BLAST submission on `claude.maizegdb.org` returns
+  "Unable to write the query sequence file. Contact the MaizeGDB team using the
+  feedback link above." `BLAST_run.php` writes the query FASTA to
+  `$system['temp_dir']`, which `conf/mgdb.conf` sets to
+  `/var/www/claude/html/temp`. The directory's ownership is fine — it is
+  `drwxrwxr-x john:mgdbadmin` and the `apache` user is in `mgdbadmin` — but
+  SELinux is `Enforcing` and the directory is labelled
+  `unconfined_u:object_r:httpd_sys_content_t:s0`, which is read-only to httpd.
+  `fopen($fas_file, 'w')` therefore fails, `showFileError()` renders, and no
+  job is ever created. This is the same trap recorded for the dashboard cache.
+- **Why the application cannot fix it:** Relabelling a directory needs
+  `semanage`/`restorecon` as root. Nothing PHP can do changes an SELinux type,
+  and moving the temp directory would mean editing `conf/mgdb.conf` and the
+  job, results and download paths that read from it.
+- **What is needed:** Give the directory a writable type and make it persist a
+  relabel:
+  `semanage fcontext -a -t httpd_sys_rw_content_t '/var/www/claude/html/temp(/.*)?'`
+  then `restorecon -Rv /var/www/claude/html/temp`. Worth checking the
+  production instance carries the right label too.
+- **Expected benefit:** BLAST searches run on the development instance, which
+  they currently cannot, so the results path can be tested before it ships.
+- **Required administrator:** Server administrator with root
+- **Status:** proposed
+
+
+## AD-049 — Three BLAST endpoints interpolate request parameters into SQL
+
+- **What is wrong:** `controllers/BLAST/BLAST_tasks.php` and
+  `controllers/BLAST/BLAST_lib.php` build SQL by string interpolation from
+  values that come straight off the request. `getCGIParam()` in
+  `include/gp_lib.php` applies `trim()` and nothing else — no escaping, no
+  casting.
+  - `getAssemblies()`: `WHERE ... o.organism_id=$organism_id`, from POST
+    `species`, in an unquoted numeric position.
+  - `getTargets()`: `WHERE idn.curation_lvl=0 AND assembly_name='$assembly'`,
+    from POST `assembly`, inside quotes.
+  - `getBLASTrecord()` in `BLAST_lib.php`: `WHERE id=$blast_id`, reached from
+    `getBLASTtarget()` with POST `blast_id`, unquoted.
+  All three are reachable unauthenticated at `/BLAST/BLAST_tasks.php`, which
+  the form calls on every species change, assembly change and Add.
+- **Why the application cannot fix it:** These are backend files the redesign
+  deliberately does not own — they are shared with the job and results path and
+  are not in `deploy/manifest.txt`. `controllers/BLAST/BLAST_form.php`, which
+  this repository does own, now casts each id to `int` before handing it to
+  `getBLASTrecord()`, but that closes only its own call site.
+- **What is needed:** Cast the two numeric parameters (`(int)`) and escape the
+  string one (`pg_escape_string()`, as `getQuickTargets()` in
+  `BLAST_form.php` does), or move all three to parameterized queries.
+- **Expected benefit:** Closes an unauthenticated SQL injection surface on a
+  heavily used public endpoint.
+- **Required administrator:** MaizeGDB application maintainer
+- **Status:** proposed

@@ -1,266 +1,322 @@
 $$SYNTAX-LEVEL 2
 *(blast_form
-;; The fixed 980px wrapper and the green-curve "MaizeGDB BLAST" header bar that
-;; used to open this template are gone: templates/static/mgdb_blast.bau supplies
-;; the page furniture now. Nothing below this line changed -- every id, name,
-;; value, onclick and token is what BLAST.js and BLAST_form.php already expect.
-  <div class="BLAST" style="margin:10px">
-    <table>
-      <tr>
-        <td>
-          <form class="BLAST" id="blastform">
-            <input type="hidden" id="submit-form" value="true">
-            <input type="hidden" id="eutil_key" value="$(eutil_key)">
-            
-            <div id="sequence_input">
-              <b>Sequence type:</b>
-              <input type="radio" name="query_seq_type" id="query_seq_nuc" 
+;; The BLAST form, rebuilt on the site's own form system.
+;;
+;; Every id, name, class and value the surrounding code reads is unchanged:
+;; controllers/BLAST/BLAST.js drives this form by id and by the classes
+;; .query_seq_type, .param_set, .output_format and .selected_BLAST_target, and
+;; BLAST_form.php fills every replacement token below. What changed is the markup
+;; around them: the 2012 layout tables are gone, the labels are real <label for>
+;; elements rather than onclick handlers, and the controls are the site's.
+;;
+;; Two things here are load-bearing and easy to break:
+;;   * #selected_targets must stay a <table>. addTarget appends a <tr> to it
+;;     and restoreSettings and setDefaultTargets render <tr> rows into it.
+;;     css/mgdb-blast.css takes the table out of table layout with
+;;     `display: contents` instead, so the rows can be chips.
+;;   * #BLAST_target_assembly must stay a text input with its datalist.
+;;     fillAssemblies empties and refills #BLAST_target_assembly_datalist and
+;;     clears the input. js/mgdb-blast.js mirrors that datalist into a real
+;;     listbox; with the script off, the native datalist still works.
+  <form class="BLAST blast-form" id="blastform">
+    <input type="hidden" id="submit-form" value="true">
+    <input type="hidden" id="eutil_key" value="$(eutil_key)">
+
+    @(cached-jobs {display: off}
+      <div class="blast-recent">
+        <span class="blast-recent-label">Recent jobs</span>
+        <ul class="blast-recent-list">
+        @(cached_job_names
+          <li><a href="#!" onclick="restoreJob('$(job_name)'\)">$(job_name)</a></li>
+        )
+        </ul>
+      </div>
+    )
+
+    <section class="blast-step" id="sequence_input" aria-labelledby="blast-step-sequence">
+      <div class="blast-step-head">
+        <span class="blast-step-number" aria-hidden="true">1</span>
+        <div>
+          <h3 id="blast-step-sequence">Enter your sequence</h3>
+          <p>Paste one or more sequences in FASTA format, or fetch one from GenBank by accession.</p>
+        </div>
+      </div>
+
+      <div class="blast-step-body">
+        <div class="blast-seq-top">
+          <div class="blast-field">
+            <span class="mgdb-label" id="blast-seqtype-label">Sequence type</span>
+            <div class="blast-segmented" role="radiogroup" aria-labelledby="blast-seqtype-label">
+              <input type="radio" name="query_seq_type" id="query_seq_nuc"
                      class="query_seq_type" value="nucleotide" $(nucleotide_checked)>
-              <label onclick="\$('#query_seq_nuc'\).prop('checked', 'checked'\)">Nucleotide</label>
-              <input type="radio" name="query_seq_type" id="query_seq_prot" 
+              <label for="query_seq_nuc">Nucleotide</label>
+              <input type="radio" name="query_seq_type" id="query_seq_prot"
                      class="query_seq_type" value="protein" $(protein_checked)>
-              <label onclick="\$('#query_seq_prot'\).prop('checked', 'checked'\)">Protein</label>
-              <br>
-              <table>
-                <tr>
-                  <td class="BLAST">
-                    <b>Enter your sequence below</b> 
-                    (<a href="#!" onclick="addExample(\)">example</a>\)<br>
-                    Queries are limited to $(max_queries) query sequences with combined 
-                    size of $(max_query_size)bp or less.
-                    <textarea id="query_sequence" rows=10 cols=78
-                              style="margin-top: 4px">$(query_sequence)</textarea>
-                  </td>
-                  <td width="10px"></td>
-                  <td class="BLAST" valign="top">
-                    <b>OR enter a Genbank accession:</b><br>
-                    <input type="text" size=12 id="genbank_accesion" placeholder="Accession"
-                           style="margin:4px 0px 4px 0px"><br>
-                    <input type="button" class="button" value="get sequence"
-                           onclick="getGenbankSequence(\)">
-                  </td>
-                </tr>
-              </table>
-            </div><!-- SEQUENCE -->
-            <br>
-            
-            <div class="BLAST" id="select_targets">
-              <b>Select one or more target datasets</b><br>
-              <table name="target_table">
-                <tr>
-                  <th>Species</th>
-                  <th>Assembly</th>
-                  <th>Target</th>
-                </tr>
-                <tr>
-                  <td>
-                    <select id="target_species" onchange="fillAssemblies(\)">
-                      @(target_species_options
-                        <option value=$(organism_id)>$(genus) $(species) $(infraspecific_name)</option>
-                      )
-                    </select>
-                  </td>
-                  <td>
-                    <input type="text" id="BLAST_target_assembly" list="BLAST_target_assembly_datalist" style="margin-top:4px"
-                           size=60 placeholder="Begin typing to see assemblies" onchange="fillTargets(\)">
-                    <datalist id="BLAST_target_assembly_datalist"></datalist>
-                  </td>
-                  <td>
-                    <select id="BLAST_target"></select>
-                  </td>
-                  <td>
-                    <input type="button" class="button" id="select_target" value="add dataset" onclick="addTarget(\)">
-                  </td>
-                </tr>
-              </table><!--target table-->
-              <br>
-              <table id="selected_targets">
-                $(selected_targets)
-              </table>
-            </div><!-- TARGETS -->
-            <br>
-            
-            <div class="BLAST" id="set_parameters">
-              <b>Set BLAST parameters</b><br>
-              <input type="radio" id="BLAST_param_default" name="BLAST_param_set" value='default' 
-                     class="param_set" $(BLAST_param_set_default_checked) onclick="setParams(\)">
-              <label onclick="\$('#BLAST_param_default'\).prop('checked', 'checked'\);setParams(\)">Default parameters</label>
-              <input type="radio" id="BLAST_param_high" name="BLAST_param_set" value="high"
-                     class="param_set" $(BLAST_param_set_high_checked) onclick="setParams(\)">
-              <label onclick="\$('#BLAST_param_high'\).prop('checked', 'checked'\);setParams(\)">High similarity</label>
-              <input type="radio" id="BLAST_param_low" name="BLAST_param_set" value="low"
-                     class="param_set" $(BLAST_param_set_low_checked) onclick="setParams(\)">
-              <label onclick="\$('#BLAST_param_low'\).prop('checked', 'checked'\);setParams(\)">Low similarity</label>
-              <input type="radio" id="BLAST_param_short" name="BLAST_param_set" value="short"
-                     class="param_set" $(BLAST_param_set_short_checked) onclick="setParams(\)">
-              <label onclick="\$('#BLAST_param_short'\).prop('checked', 'checked'\);setParams(\)">Short sequence</label>
-              <div id="blastparameters" style="margin:5px;">
-                <table>
-                  <tr>
-                    <td class="BLAST" align="right">Max target sequences</td>
-                    <td class="BLAST">
-                      <select id="BLAST_max_hits">
-                        <option $(BLAST_max_hits1_selected)>1</option>
-                        <option $(BLAST_max_hits10_selected)>10</option>
-                        <option $(BLAST_max_hits50_selected)>50</option>
-                        <option $(BLAST_max_hits100_selected)>100</option>
-                        <option $(BLAST_max_hits250_selected)>250</option>
-                        <option $(BLAST_max_hits500_selected)>500</option>
-                        <option $(BLAST_max_hits1000_selected)>1000</option>
-                      </select>
-                    </td>
-                    <td width=5px></td>
-                    <td class="BLAST">
-                      Limit target sequences reported to this number.
-                    </td>
-                  </tr><!--max_target-->
-                  <tr>
-                    <td class="BLAST" align="right">E-value</td>
-                    <td>
-                      <input type="text" id="BLAST_max_evalue" size=8 value="$(BLAST_max_evalue)">
-                    </td>
-                    <td></td>
-                    <td class="BLAST">
-                      Maximum e-value. Set this to a value > 1 for short sequences.
-                      <a href="#!" onclick="popupDiv(event, 'evalue_popup'\)">(more\)</a>
-                      <div id="evalue_popup" class="BLAST_popup">
-                        The e-value parameter does not so much filter the results as<br>
-                        change the behavior of the BLAST algorithms. For example, an<br>
-                        e-value of 1e-4 may miss a short sequence even if the<br>
-                        sequence finds a perfect match with an e-value of 0.<br>
-                        <br>
-                        <a href="#!" onclick="closePopup('evalue_popup'\)">close</a>
-                      </div>
-                    </td>
-                  </tr><!--max_evalue-->
-                  <tr>
-                    <td class="BLAST" align="right">Word size</td>
-                    <td>
-                      <select id="BLAST_word_size">
-                        <option $(BLAST_word_size3_selected)>3</option>
-                        <option $(BLAST_word_size6_selected)>6</option>
-                        <option $(BLAST_word_size7_selected)>7</option>
-                        <option $(BLAST_word_size11_selected)>11</option>
-                        <option $(BLAST_word_size15_selected)>15</option>
-                      </select>
-                    </td>
-                    <td></td>
-                    <td class="BLAST">
-                      The length of the initial exact match. A larger word size will 
-                      generally speed up the search. Because different values are
-                      accepted for nucleotide vs protein BLAST searches, the word size 
-                      selected here may be changed. 
-                      <a href="#!" onclick="popupDiv(event, 'word_size_popup'\)">(more\)</a>
-                      <div id="word_size_popup" class="BLAST_popup">
-                        Accepted values for each BLAST program. Default value is bold.
-                        <br><br>
-                        <table>
-                          <tr>
-                            <td>nucleotide - nucleotide (blastn\)</td>
-                            <td>7, <b>11</b></td>
-                          </tr>
-                          <tr>
-                            <td>nucleotide - protein (blastx\)</td>
-                            <td><b>3</b>, 6</td>
-                          </tr>
-                          <tr>
-                            <td>protein - nucleotide (tblastn\)</td>
-                            <td>3, <b>6</b></td>
-                          </tr>
-                          <tr>
-                            <td>protein - protein (blastp\)</td>
-                            <td>2, <b>3</b>, 6</td>
-                          </tr>
-                        </table>
-                        <br>
-                        <a href="#!" onclick="closePopup('word_size_popup'\)">close</a>
-                      </div>
-                    </td>
-                  </tr><!--word_size-->
-                  <tr>
-                    <td class="BLAST" align="right">Percent identity cutoff</td>
-                    <td>
-                      <input type="text" id="BLAST_perc_identity" size=8 value="$(BLAST_perc_identity)">
-                    </td>
-                    <td></td>
-                    <td class="BLAST">
-                      A value between 0 and 100.
-                    </td>
-                  </tr><!--perc_identity-->
-                  <tr>
-                    <td class="BLAST" align="right">Max HSPs</td>
-                    <td>
-                      <input type="text" id="BLAST_max_hsps" size=8 value="$(BLAST_max_hsps)">
-                    </td>
-                    <td></td>
-                    <td class="BLAST">
-                      Maximum number of HSPs to report. 1 = report only the best HSP for 
-                      each hit. Leave blank to report all HSPs.
-                    </td>
-                  </tr><!--max_hsps-->
-                  <tr>
-                    <td class="BLAST" align="right">Match/mismatch costs</td>
-                    <td>
-                      <select id="BLAST_match_mismatch_scores">
-                        <option $(BLAST_match_mismatch_scores1,-1_selected)>1,-1</option>
-                        <option $(BLAST_match_mismatch_scores1,-2_selected)>1,-2</option>
-                        <option $(BLAST_match_mismatch_scores1,-3_selected)>1,-3</option>
-                        <option $(BLAST_match_mismatch_scores1,-4_selected)>1,-4</option>
-                        <option $(BLAST_match_mismatch_scores1,-5_selected)>1,-5</option>
-                        <option $(BLAST_match_mismatch_scores2,-3_selected)>2,-3</option>
-                        <option $(BLAST_match_mismatch_scores2,-5_selected)>2,-5</option>
-                        <option $(BLAST_match_mismatch_scores2,-7_selected)>2,-7</option>
-                        <option $(BLAST_match_mismatch_scores3,-2_selected)>3,-2</option>
-                        <option $(BLAST_match_mismatch_scores3,-4_selected)>3,-4</option>
-                        <option $(BLAST_match_mismatch_scores4,-5_selected)>4,-5</option>
-                        <option $(BLAST_match_mismatch_scores5,-4_selected)>5,-4</option>
-                      </select>
-                    </td>
-                    <td></td>
-                    <td class="BLAST">
-                      Reward/penalty values and gap costs.
-                    </td>
-                  </tr><!--match_mismatch-->
+              <label for="query_seq_prot">Protein</label>
+            </div>
+          </div>
+          <p class="blast-seq-count" id="blast-seq-count" aria-live="polite"></p>
+        </div>
+
+        <label class="mgdb-label blast-sr-only" for="query_sequence">Query sequence in FASTA format</label>
+        <textarea class="blast-textarea" id="query_sequence" rows="12" spellcheck="false"
+                  autocapitalize="off" autocorrect="off" wrap="off"
+                  data-max-queries="$(max_queries)" data-max-bp="$(max_query_size)"
+                  aria-describedby="blast-seq-count blast-seq-limits"
+                  placeholder="&gt;my_sequence&#10;ATGGCGACCAAGCTGGTGCTGGTG...">$(query_sequence)</textarea>
+        <p class="mgdb-hint" id="blast-seq-limits">Up to $(max_queries) sequences, $(max_query_size) bp in total. Def lines, digits and spaces are ignored.</p>
+        <p class="blast-seq-warning" id="blast-seq-warning" role="status" hidden></p>
+
+        <div class="blast-seq-tools">
+          <div class="blast-seq-tools-buttons">
+            <button type="button" class="mgdb-button mgdb-button-secondary" onclick="addExample(\)">Load an example</button>
+            <button type="button" class="mgdb-button mgdb-button-quiet" id="blast-clear-sequence">Clear</button>
+          </div>
+          <div class="blast-genbank">
+            <label class="mgdb-label" for="genbank_accesion">Or fetch from GenBank</label>
+            <div class="blast-genbank-row">
+              <input type="text" class="mgdb-input" id="genbank_accesion" autocomplete="off"
+                     placeholder="NM_001112073" aria-describedby="blast-genbank-hint">
+              <button type="button" class="mgdb-button mgdb-button-secondary"
+                      onclick="getGenbankSequence(\)">Fetch</button>
+            </div>
+            <p class="mgdb-hint" id="blast-genbank-hint">An accession from the nucleotide or protein database, matching the type above.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="blast-step" id="select_targets" aria-labelledby="blast-step-targets">
+      <div class="blast-step-head">
+        <span class="blast-step-number" aria-hidden="true">2</span>
+        <div>
+          <h3 id="blast-step-targets">Choose target datasets</h3>
+          <p>Search as many as you like. The right BLAST program is chosen for each one from your query type and the dataset's.</p>
+        </div>
+      </div>
+
+      <div class="blast-step-body">
+        @(quick-targets {display: off}
+          <div class="blast-quick">
+            <span class="mgdb-label" id="blast-quick-label">$(quick_assembly) &#8212; the current reference</span>
+            <div class="blast-quick-row" role="group" aria-labelledby="blast-quick-label">
+              @(quick_target_rows
+                <button type="button" class="blast-quick-chip" aria-pressed="false"
+                        data-blast-id="$(quick_id)" data-blast-label="$(quick_label)">$(quick_type)</button>
+              )
+            </div>
+          </div>
+        )
+
+        <div class="blast-target-picker">
+          <div class="blast-field">
+            <label class="mgdb-label" for="target_species">Species</label>
+            <select class="mgdb-select" id="target_species" onchange="fillAssemblies(\)">
+              @(target_species_options
+                <option value=$(organism_id)>$(genus) $(species) $(infraspecific_name)</option>
+              )
+            </select>
+          </div>
+
+          <div class="blast-field">
+            <label class="mgdb-label" for="BLAST_target_assembly">Assembly</label>
+            <div class="blast-combo" data-blast-combo>
+              <input type="text" class="mgdb-input" id="BLAST_target_assembly"
+                     list="BLAST_target_assembly_datalist" autocomplete="off"
+                     placeholder="Type or browse assemblies" onchange="fillTargets(\)">
+              <datalist id="BLAST_target_assembly_datalist"></datalist>
+            </div>
+          </div>
+
+          <div class="blast-field">
+            <label class="mgdb-label" for="BLAST_target">Dataset</label>
+            <select class="mgdb-select" id="BLAST_target"></select>
+          </div>
+
+          <div class="blast-field blast-field-action">
+            <span class="mgdb-label" aria-hidden="true">&nbsp;</span>
+            <button type="button" class="mgdb-button mgdb-button-secondary button"
+                    id="select_target" onclick="addTarget(\)">Add dataset</button>
+          </div>
+        </div>
+
+        <div class="blast-selected">
+          <div class="blast-selected-head">
+            <span class="mgdb-label">Selected datasets</span>
+            <span class="mgdb-result-count" id="blast-target-count" aria-live="polite"></span>
+          </div>
+          <div class="blast-target-chips">
+            <table id="selected_targets">
+              $(selected_targets)
+            </table>
+          </div>
+          <p class="blast-selected-empty" id="blast-target-empty" hidden>No datasets selected. Add at least one before running the search.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="blast-step" id="set_parameters" aria-labelledby="blast-step-parameters">
+      <div class="blast-step-head">
+        <span class="blast-step-number" aria-hidden="true">3</span>
+        <div>
+          <h3 id="blast-step-parameters">Set the sensitivity</h3>
+          <p>A preset is enough for most searches. Every value it sets can be changed below it.</p>
+        </div>
+      </div>
+
+      <div class="blast-step-body">
+        <div class="blast-field">
+          <span class="mgdb-label" id="blast-preset-label">Preset</span>
+          <div class="blast-segmented blast-segmented-wrap" role="radiogroup" aria-labelledby="blast-preset-label">
+            <input type="radio" id="BLAST_param_default" name="BLAST_param_set" value='default'
+                   class="param_set" $(BLAST_param_set_default_checked) onclick="setParams(\)">
+            <label for="BLAST_param_default">Default</label>
+            <input type="radio" id="BLAST_param_high" name="BLAST_param_set" value="high"
+                   class="param_set" $(BLAST_param_set_high_checked) onclick="setParams(\)">
+            <label for="BLAST_param_high">High similarity</label>
+            <input type="radio" id="BLAST_param_low" name="BLAST_param_set" value="low"
+                   class="param_set" $(BLAST_param_set_low_checked) onclick="setParams(\)">
+            <label for="BLAST_param_low">Low similarity</label>
+            <input type="radio" id="BLAST_param_short" name="BLAST_param_set" value="short"
+                   class="param_set" $(BLAST_param_set_short_checked) onclick="setParams(\)">
+            <label for="BLAST_param_short">Short sequence</label>
+          </div>
+          <p class="mgdb-hint" id="blast-preset-hint"></p>
+        </div>
+
+        <details class="blast-advanced" id="blastparameters">
+          <summary><span>Advanced parameters</span></summary>
+          <p class="mgdb-hint blast-advanced-note">Choosing a preset above overwrites all six.</p>
+
+          <div class="blast-param-grid">
+            <div class="blast-param">
+              <label class="mgdb-label" for="BLAST_max_hits">Max target sequences</label>
+              <select class="mgdb-select" id="BLAST_max_hits">
+                <option $(BLAST_max_hits1_selected)>1</option>
+                <option $(BLAST_max_hits10_selected)>10</option>
+                <option $(BLAST_max_hits50_selected)>50</option>
+                <option $(BLAST_max_hits100_selected)>100</option>
+                <option $(BLAST_max_hits250_selected)>250</option>
+                <option $(BLAST_max_hits500_selected)>500</option>
+                <option $(BLAST_max_hits1000_selected)>1000</option>
+              </select>
+              <p class="mgdb-hint">Limit target sequences reported to this number.</p>
+            </div>
+
+            <div class="blast-param">
+              <label class="mgdb-label" for="BLAST_max_evalue">E-value</label>
+              <input class="mgdb-input" type="text" id="BLAST_max_evalue" inputmode="decimal"
+                     autocomplete="off" value="$(BLAST_max_evalue)">
+              <p class="mgdb-hint">Maximum e-value. Set this above 1 for short sequences.</p>
+              <details class="blast-help" id="evalue_popup">
+                <summary>Why a small e-value can lose a perfect match</summary>
+                <p>The e-value parameter does not so much filter the results as change the behavior of the BLAST algorithms. For example, an e-value of 1e-4 may miss a short sequence even if the sequence finds a perfect match with an e-value of 0.</p>
+              </details>
+            </div>
+
+            <div class="blast-param">
+              <label class="mgdb-label" for="BLAST_word_size">Word size</label>
+              <select class="mgdb-select" id="BLAST_word_size">
+                <option $(BLAST_word_size3_selected)>3</option>
+                <option $(BLAST_word_size6_selected)>6</option>
+                <option $(BLAST_word_size7_selected)>7</option>
+                <option $(BLAST_word_size11_selected)>11</option>
+                <option $(BLAST_word_size15_selected)>15</option>
+              </select>
+              <p class="mgdb-hint">The length of the initial exact match. A larger word size will generally speed up the search. Because different values are accepted for nucleotide vs protein BLAST searches, the word size selected here may be changed.</p>
+              <details class="blast-help" id="word_size_popup">
+                <summary>Accepted values for each program</summary>
+                <table class="mgdb-table blast-help-table">
+                  <thead>
+                    <tr><th scope="col">Program</th><th scope="col">Accepted</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>nucleotide &#8594; nucleotide <code>blastn</code></td><td>7, <b>11</b></td></tr>
+                    <tr><td>nucleotide &#8594; protein <code>blastx</code></td><td><b>3</b>, 6</td></tr>
+                    <tr><td>protein &#8594; nucleotide <code>tblastn</code></td><td>3, <b>6</b></td></tr>
+                    <tr><td>protein &#8594; protein <code>blastp</code></td><td>2, <b>3</b>, 6</td></tr>
+                  </tbody>
                 </table>
-              </div>
-            </div><!-- PARAMETERS -->
-            <br>
-            
-            <div id="output_format">
-              <b>Select output type</b>
-              <div class="pc-input_elem"> 
-                <input type="radio" class="output_format" name="output_format" id="enhanced" value="enhanced" 
-                       $(output_format_enhanced_checked)>
-                <label onclick="\$('#enhanced'\).prop('checked', 'checked'\)">Enhanced</label>
-                <input type="radio" class="output_format" name="output_format" id="BLAST_table" value="BLAST_table"
-                       $(output_format_BLAST_table_checked)>
-                <label onclick="\$('#BLAST_table'\).prop('checked', 'checked'\)">Table</label>
-                <input type="radio" class="output_format" name="output_format" id="BLAST_text" value="BLAST_text"
-                       $(output_format_BLAST_text_checked)>
-                <label onclick="\$('#BLAST_text'\).prop('checked', 'checked'\)">Text</label>
-              </div>
-            </div><!-- OUTPUT FORMAT -->
-            <br>
-            
-            <input id="run_BLAST" type="button" class="button" value="BLAST" onclick="runBLAST(\)">
-            <span id="BLAST_in_progress"></span>
-          </form>
-        </td>
-        <td valign="top">
-          @(cached-jobs {display: off}
-            <b>Recent jobs:<br>
-            <ul style="margin-left:20px">
-            @(cached_job_names
-              <li>
-                <a href="#!" onclick="restoreJob('$(job_name)'\)">$(job_name)</a>
-              </li>
-            )
-            </ul>
-          )
-        </td>
-      </tr>
-    </table>
-  </div>
+                <p class="mgdb-hint">Default value in bold.</p>
+              </details>
+            </div>
+
+            <div class="blast-param">
+              <label class="mgdb-label" for="BLAST_perc_identity">Percent identity cutoff</label>
+              <input class="mgdb-input" type="number" id="BLAST_perc_identity"
+                     min="0" max="100" step="1" inputmode="numeric"
+                     autocomplete="off" value="$(BLAST_perc_identity)">
+              <p class="mgdb-hint">A value between 0 and 100.</p>
+            </div>
+
+            <div class="blast-param">
+              <label class="mgdb-label" for="BLAST_max_hsps">Max HSPs</label>
+              <input class="mgdb-input" type="number" id="BLAST_max_hsps"
+                     min="0" step="1" inputmode="numeric" placeholder="all"
+                     autocomplete="off" value="$(BLAST_max_hsps)">
+              <p class="mgdb-hint">Maximum number of HSPs to report. 1 = report only the best HSP for each hit. Leave blank to report all HSPs.</p>
+            </div>
+
+            <div class="blast-param">
+              <label class="mgdb-label" for="BLAST_match_mismatch_scores">Match/mismatch costs</label>
+              <select class="mgdb-select" id="BLAST_match_mismatch_scores">
+                <option $(BLAST_match_mismatch_scores1,-1_selected)>1,-1</option>
+                <option $(BLAST_match_mismatch_scores1,-2_selected)>1,-2</option>
+                <option $(BLAST_match_mismatch_scores1,-3_selected)>1,-3</option>
+                <option $(BLAST_match_mismatch_scores1,-4_selected)>1,-4</option>
+                <option $(BLAST_match_mismatch_scores1,-5_selected)>1,-5</option>
+                <option $(BLAST_match_mismatch_scores2,-3_selected)>2,-3</option>
+                <option $(BLAST_match_mismatch_scores2,-5_selected)>2,-5</option>
+                <option $(BLAST_match_mismatch_scores2,-7_selected)>2,-7</option>
+                <option $(BLAST_match_mismatch_scores3,-2_selected)>3,-2</option>
+                <option $(BLAST_match_mismatch_scores3,-4_selected)>3,-4</option>
+                <option $(BLAST_match_mismatch_scores4,-5_selected)>4,-5</option>
+                <option $(BLAST_match_mismatch_scores5,-4_selected)>5,-4</option>
+              </select>
+              <p class="mgdb-hint">Reward/penalty values and gap costs.</p>
+            </div>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section class="blast-step" id="output_format" aria-labelledby="blast-step-output">
+      <div class="blast-step-head">
+        <span class="blast-step-number" aria-hidden="true">4</span>
+        <div>
+          <h3 id="blast-step-output">Choose the result format</h3>
+          <p>All three run the same search. The format decides how the hits are presented.</p>
+        </div>
+      </div>
+
+      <div class="blast-step-body">
+        <div class="blast-field pc-input_elem">
+          <span class="blast-sr-only" id="blast-output-label">Result format</span>
+          <div class="blast-segmented" role="radiogroup" aria-labelledby="blast-output-label">
+            <input type="radio" class="output_format" name="output_format" id="enhanced" value="enhanced"
+                   $(output_format_enhanced_checked)>
+            <label for="enhanced">Enhanced</label>
+            <input type="radio" class="output_format" name="output_format" id="BLAST_table" value="BLAST_table"
+                   $(output_format_BLAST_table_checked)>
+            <label for="BLAST_table">Table</label>
+            <input type="radio" class="output_format" name="output_format" id="BLAST_text" value="BLAST_text"
+                   $(output_format_BLAST_text_checked)>
+            <label for="BLAST_text">Text</label>
+          </div>
+          <p class="mgdb-hint" id="blast-output-hint"></p>
+        </div>
+      </div>
+    </section>
+
+    <div class="blast-run-bar">
+      <p class="blast-run-summary" id="blast-run-summary" aria-live="polite"></p>
+      <div class="blast-run-actions">
+        <span id="BLAST_in_progress"></span>
+        <input id="run_BLAST" type="button" class="button mgdb-button mgdb-button-primary"
+               value="Run BLAST" onclick="runBLAST(\)">
+      </div>
+    </div>
+  </form>
 
 <script language="javascript">
   fillAssemblies(\);

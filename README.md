@@ -4029,7 +4029,8 @@ by eye:
 **Only the front page.** Job submission, execution and results — `BLAST_run.php`,
 `BLAST_tasks.php`, `BLAST_visual_alignment.php`, `BLAST.js` and every
 `BLAST_results*.bau` — were not touched, and are deliberately absent from the
-manifest entry.
+manifest entry. `BLAST.js` in particular is the form's engine *and* the results
+page's, so the form was rebuilt around it rather than with it.
 
 ### Two branches, two chromes
 
@@ -4046,21 +4047,99 @@ Verified both ways: `/BLAST` serves 90 KB with `mgdb-hub-page` on `<main>` and
 no `index.css`, `background_static.css` or `ie6.css`; `/BLAST?job_id=…` serves
 42 KB with all three and no `mgdb-hub-page`.
 
-### The form is the same form
+### The form, rebuilt on the site's own controls
 
-`BLAST_form.bau` was nested rather than rewritten. Two things came out of it —
-the fixed `width=980px` wrapper and the green-curve "MaizeGDB BLAST" header bar
-— because the page around it supplies both. **Everything else is byte-identical**,
-which was checked rather than assumed: the body from the first form control to
-the closing table hashes the same before and after, with the same 35 `id=`, 10
-`name=`, 22 `onclick=` and 56 `$(token)` occurrences. That is what keeps
-`BLAST.js` working without being touched.
+The first pass nested the 2012 form unchanged. That left the page looking right
+and the form working the way it always had, which was the problem: layout
+tables, a 46px-wide dataset select beside a 482px assembly box, help text in
+popups positioned from `event.clientY` so they landed off-screen once the page
+had scrolled, and — the reason the picker was hard to use at all — an
+`<input list=…>` over a datalist holding **103 assemblies** for *Zea mays* ssp.
+*mays* alone, which shows nothing until you type a prefix of a name of the form
+`Zm-<accession>-<SOURCE>-<version>`.
 
-`BLAST_form.php` changed by one statement — it loaded the form straight into
-`body` and now loads the wrapper there and nests the form inside it, so `$tmpl`
-still points at the form and every assignment, `restoreSettings()`,
-`setDefaultTargets()` and the species query are unchanged. Everything from the
-database connection onward is byte-identical.
+The markup is now the site's own controls, in four numbered steps: **enter your
+sequence**, **choose target datasets**, **set the sensitivity**, **choose the
+result format**, with a sticky run bar under them.
+
+**`BLAST.js` is still untouched.** It is shared with the results page and is not
+a file this repository owns, so the rebuild works entirely through the DOM
+contract it already relies on: the same ids, the same
+`.query_seq_type` / `.param_set` / `.output_format` / `.selected_BLAST_target`
+classes, and real events rather than direct property writes. Nothing was dropped
+— the same 35 ids and the same 51 replacement tokens are present, checked
+against `legacy/blast/BLAST_form.bau` rather than assumed.
+
+Two pieces of legacy markup are load-bearing and stayed:
+
+| Element | Why it cannot change |
+| --- | --- |
+| `#selected_targets` is a `<table>` | `addTarget()` appends a `<tr>` to it, and `restoreSettings()` and `setDefaultTargets()` render `<tr>` rows into it server-side. `display: contents` on the table *and* on the `<tbody>` the parser inserts takes it out of table layout so the rows can be chips — and covers jQuery appending a `<tr>` as a direct child rather than into the tbody |
+| `#BLAST_target_assembly` is a text input with its datalist | `fillAssemblies()` empties and refills `#BLAST_target_assembly_datalist` and clears the input. The datalist stays and stays the source of truth; `js/mgdb-blast.js` mirrors it into a listbox and takes the `list` attribute off the input so the browser's own popup does not compete. With the script absent the attribute stays and the datalist behaves as before |
+
+#### `<label for>` instead of an onclick that faked it
+
+Every label in the old form was `<label onclick="$('#x').prop('checked','checked')">`.
+That sets the property without raising a `change` event, which is why the four
+preset labels had to call `setParams()` themselves — the radio's own
+`onclick="setParams()"` never fired from a label click. The labels are real
+`<label for>` elements now, so a label click clicks the radio, and the radio's
+own handler runs. Verified: clicking **High similarity** moves the e-value to
+`1e-20` and the identity cutoff to `95`.
+
+#### The assembly picker
+
+The datalist is mirrored into a panel that can be opened empty, says how many
+entries it holds, filters on a substring anywhere in the name, highlights the
+match, and is walked with the arrow keys. Typing `HiLo` returns the seven
+`-REFERENCE-HiLo-1.0` assemblies — a match in the middle of the string, which
+the native datalist could not find at all. Choosing an entry sets the input's
+value and dispatches `change`, because `fillTargets()` is wired to that event
+and assigning `.value` never raises one.
+
+Above it, a row of quick-add buttons for the current reference assembly's own
+datasets, from one query in `BLAST_form.php`. Reaching B73 v5's proteins
+otherwise meant a species, an assembly typed out of 103, a dataset and a press
+of Add; it is now one click, and clicking again removes it. The row they append
+is the row `addTarget()` builds, from the id and label already in the button's
+data attributes, so nothing downstream can tell the difference.
+
+#### What else the enhancement layer does
+
+- A live count — `1 sequence · 1,411 of 20,000 bp` — against the page's own
+  `MAX_QUERIES` and `MAX_SEQUENCE_LENGTH`, turning red at the limit.
+- A warning when the pasted sequence disagrees with the chosen type, using the
+  same character classes `BLAST.js` checks on submit, so the warning and the
+  rejection never disagree.
+- A running summary in the run bar: what is missing, or
+  *Nucleotide query against 2 datasets · Default parameters · enhanced output*.
+- Two repairs it can reach without editing `BLAST.js`. `getGenbankSequence()`
+  writes the fetched FASTA with jQuery's `.text()`, which sets a textarea's
+  *content*, not its value — so in a box the user had already typed in, the
+  fetched sequence arrived invisibly and the old text was what got submitted. A
+  MutationObserver copies content to value; nothing but a script changes a
+  textarea's text content, so the write is unambiguous. And `fillTargets()`
+  enables the Add button before it knows whether the assembly has any datasets
+  — `B73 RefGen_v4` has none — so Add posted an empty id; the button is now
+  re-disabled, with a title saying why.
+
+The six advanced parameters moved into a disclosure below the preset control,
+`type="number"` with `min`/`max` where the value is numeric, and the two help
+popups became inline `<details>` — the popups were positioned with
+`event.clientY` against an absolutely-positioned box, so they appeared in the
+wrong place on any scrolled page.
+
+#### Alignment
+
+Measured at 1280: all four step cards, the run bar and the recent-jobs panel
+span the same 49→1231; all four step bodies start at 74 and all four headings
+at 118; **every control in the form is 44px tall — one value, not a range**; the
+four picker controls share a top edge and the row's outer edges match the
+textarea's exactly (118→1206); the six parameters lay out 3×2 with all six
+controls 341px wide on three repeated left edges. At 1080 the picker becomes
+2×2 with the button beside the dataset select, at 620 one column, and at 430 the
+segmented controls and the textarea are all 330px at the same left edge with no
+horizontal overflow.
 
 ### What a 2012 stylesheet does to a modern page
 
@@ -4075,22 +4154,49 @@ reaches the megamenu, the hero and every label on the page. `mgdb-blast.css`
 zeroes it across the page and puts it back only inside the form, which is where
 it was always meant to apply. Measured after: 20px inside the form, 0 outside.
 
-The rest of that sheet needed similar restraint rather than replacement — the
-form is set in 13px Verdana, its layout tables carry fixed widths, and its
-`textarea` carries a `cols` attribute that some engines honour over CSS width.
-None of those are control behaviour, so they are all restyled from outside and
-the markup keeps its attributes.
+The rest of that sheet mattered less once the layout tables went: what is left
+is `.BLAST`, which is on the form and sets it in 13px Verdana, and which
+`mgdb-blast.css` returns to the page's own type. The scoping problem is the one
+worth remembering — a stylesheet written for a page of its own will have rules
+with no scope in it, and nesting that page inside another one turns every such
+rule into a sitewide rule.
 
 ### Verified
 
 4/4 distinct section edge colours, no rule under a section title, five
 reference cards (BLAST's own 1990 paper supplied through the reference card's
 `fallback`, since it is not in the MaizeGDB bibliography), no duplicate `id`,
-all four nav labels matching their `<h2>`, and every one of the nine controls
-`BLAST.js` drives present with its original tag. Four short labels keep the bar
-at one 57px row at 1280, 1000, 800, 600, 420 and 375, so the ladder is a flat
-65px below the shell's 1170 step; jumps clear by 8px at 900 and 375, and there
-is no horizontal overflow at 375.
+all four nav labels matching their `<h2>`, no unresolved replacement tokens, and
+the tab spy tracking all four sections with every jump clearing the bar. Four
+short labels keep the bar at one 57px row from 1280 down to 375, so the ladder
+is a flat 65px below the shell's 1170 step.
+
+The form was verified against the backend rather than by eye:
+
+- **The picker.** 103 assemblies load into the datalist; the panel opens with
+  all 103, filters to 3 on `CML2` and to 7 on the mid-string `HiLo`; arrow keys
+  and Enter select; the selection fires `change`, `fillTargets()` runs and
+  returns the assembly's four datasets.
+- **The submission.** Replaying exactly what `runBLAST()` collects and posting
+  it to `BLAST_tasks.php` with `action=verify_input` — the backend's own
+  validation, which creates nothing — returns **SUCCESS**, with all eleven
+  fields present and correct, including the now-`type="number"`
+  `BLAST_perc_identity` and the omitted-when-empty `BLAST_max_hsps`.
+- **The restore path.** POSTing `saved_job_id` with a full parameter set brings
+  back protein type, the High preset, 500 max hits, word size 6, e-value
+  `1e-20`, 95% identity, 1 max HSP, text output and both target chips with the
+  correct labels.
+
+What could *not* be verified here is the results page, because no BLAST job can
+run on the development instance at all: the temp directory it writes the query
+FASTA to is labelled `httpd_sys_content_t` under an enforcing SELinux, so every
+submission returns "Unable to write the query sequence file". That predates this
+work — the submit branch loads none of these files, which the response's own
+`<head>` confirms — and is recorded as **AD-048**. **AD-049** records three
+`BLAST_tasks.php` / `BLAST_lib.php` endpoints that interpolate raw request
+parameters into SQL; `BLAST_form.php` now casts its own target ids to `int`
+before handing them to `getBLASTrecord()`, which closes its own call site and
+nothing else.
 
 ## The nomenclature standard
 
