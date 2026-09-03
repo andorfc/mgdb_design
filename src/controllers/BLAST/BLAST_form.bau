@@ -9,7 +9,7 @@ $$SYNTAX-LEVEL 2
 ;; around them: the 2012 layout tables are gone, the labels are real <label for>
 ;; elements rather than onclick handlers, and the controls are the site's.
 ;;
-;; Two things here are load-bearing and easy to break:
+;; Three things here are load-bearing and easy to break:
 ;;   * #selected_targets must stay a <table>. addTarget appends a <tr> to it
 ;;     and restoreSettings and setDefaultTargets render <tr> rows into it.
 ;;     css/mgdb-blast.css takes the table out of table layout with
@@ -18,6 +18,12 @@ $$SYNTAX-LEVEL 2
 ;;     fillAssemblies empties and refills #BLAST_target_assembly_datalist and
 ;;     clears the input. js/mgdb-blast.js mirrors that datalist into a real
 ;;     listbox; with the script off, the native datalist still works.
+;;   * #BLAST_target must stay a real <select>, just hidden. fillTargets
+;;     empties and refills it with the chosen assembly's datasets; there is no
+;;     visible dropdown or Add button any more because js/mgdb-blast.js reads
+;;     this select's own <option>s and renders them as the "+" buttons in the
+;;     gold panel below the picker instead. With the script off the select is
+;;     merely invisible, not gone -- nothing here removes fillTargets's target.
   <form class="BLAST blast-form" id="blastform">
     <input type="hidden" id="submit-form" value="true">
     <input type="hidden" id="eutil_key" value="$(eutil_key)">
@@ -91,23 +97,11 @@ $$SYNTAX-LEVEL 2
         <span class="blast-step-number" aria-hidden="true">2</span>
         <div>
           <h3 id="blast-step-targets">Choose target datasets</h3>
-          <p>Search as many as you like. The right BLAST program is chosen for each one from your query type and the dataset's.</p>
+          <p>Pick a species and assembly, then add its datasets with the buttons that appear below. Search as many datasets as you like.</p>
         </div>
       </div>
 
       <div class="blast-step-body">
-        @(quick-targets {display: off}
-          <div class="blast-quick">
-            <span class="mgdb-label" id="blast-quick-label">$(quick_assembly) &#8212; the current reference</span>
-            <div class="blast-quick-row" role="group" aria-labelledby="blast-quick-label">
-              @(quick_target_rows
-                <button type="button" class="blast-quick-chip" aria-pressed="false"
-                        data-blast-id="$(quick_id)" data-blast-label="$(quick_label)">$(quick_type)</button>
-              )
-            </div>
-          </div>
-        )
-
         <div class="blast-target-picker">
           <div class="blast-field">
             <label class="mgdb-label" for="target_species">Species</label>
@@ -127,18 +121,24 @@ $$SYNTAX-LEVEL 2
               <datalist id="BLAST_target_assembly_datalist"></datalist>
             </div>
           </div>
-
-          <div class="blast-field">
-            <label class="mgdb-label" for="BLAST_target">Dataset</label>
-            <select class="mgdb-select" id="BLAST_target"></select>
-          </div>
-
-          <div class="blast-field blast-field-action">
-            <span class="mgdb-label" aria-hidden="true">&nbsp;</span>
-            <button type="button" class="mgdb-button mgdb-button-secondary button"
-                    id="select_target" onclick="addTarget(\)">Add dataset</button>
-          </div>
         </div>
+
+        ;; fillTargets's own output, hidden -- see the note on load-bearing
+        ;; elements at the top of this file.
+        <select class="blast-sr-only" id="BLAST_target" aria-hidden="true" tabindex="-1"></select>
+
+        @(quick-targets {display: off}
+          <div class="blast-quick" data-cur-ref="$(quick_assembly_attr)">
+            <span class="mgdb-label" id="blast-quick-label">$(quick_assembly) &#8212; the current reference</span>
+            <div class="blast-quick-row" role="group" aria-labelledby="blast-quick-label">
+              @(quick_target_rows
+                <button type="button" class="blast-quick-chip" aria-pressed="false"
+                        data-blast-id="$(quick_id)" data-blast-label="$(quick_label)">$(quick_type)</button>
+              )
+            </div>
+            <p class="blast-quick-empty" id="blast-quick-empty" hidden>No BLAST datasets for this assembly.</p>
+          </div>
+        )
 
         <div class="blast-selected">
           <div class="blast-selected-head">

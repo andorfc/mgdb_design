@@ -12,14 +12,13 @@
      * a browsable, filterable listbox over the 103-entry assembly datalist
      * a live sequence count against the page's own limits, and a warning when
        the pasted sequence disagrees with the chosen type
-     * one-click quick-add buttons for the reference assembly's datasets
-     * a count, an empty state and a disabled Add button, so the target step
-       says what it is doing
+     * a gold panel of "+" buttons for whichever assembly is chosen, rebuilt
+       from the assembly's own datasets instead of a dropdown and an Add
+       button -- see initDatasetChips() below
      * a running summary of what pressing Run BLAST will do
 
-   It also repairs two things it can reach without editing BLAST.js: a GenBank
-   fetch that never appeared in a textarea the user had typed in, and an Add
-   button left enabled for an assembly with no datasets.
+   It also repairs one thing it can reach without editing BLAST.js: a GenBank
+   fetch that never appeared in a textarea the user had typed in.
    ========================================================================== */
 
 (function (window, document) {
@@ -326,96 +325,138 @@
     readDatalist();
   }
 
-  /* ---- the dataset select and the Add button ---------------------------- */
+  /* ---- the dataset chips -------------------------------------------------
 
-  /* fillTargets() enables the Add button before it knows whether the assembly
-     has any datasets, and some do not -- B73 RefGen_v4 returns none. Pressing
-     Add then posts an empty id. The observer runs after the whole callback, so
-     what it sees is the finished state. */
-  function initAddGuard(summary) {
+     There is no dataset dropdown or Add button any more. #BLAST_target is
+     still a real <select> -- fillTargets() in BLAST.js still empties and
+     refills it exactly as before -- it is just hidden, and this module reads
+     its <option>s back out as the assembly's available datasets, rendering
+     them as "+" buttons in the gold panel instead of asking the reader to
+     pick from a dropdown and press a separate button. Clicking a chip adds or
+     removes the row addTarget() would have built, without the round trip:
+     the id and target type are already known from the option itself.
+
+     fillTargets() calls $('#BLAST_target').empty() synchronously and refills
+     it only after its POST resolves, so the select mutates twice per assembly
+     change -- once empty, once populated. Re-rendering on every mutation keeps
+     the panel honest without extra bookkeeping; the only thing worth
+     debouncing is the "no datasets for this assembly" message, so it does not
+     flash during that round trip for the common case where the assembly does
+     have datasets. -------------------------------------------------------- */
+  function initDatasetChips(summary) {
+    var assemblyInput = byId('BLAST_target_assembly');
     var select = byId('BLAST_target');
-    var button = byId('select_target');
-    if (!select || !button || !window.MutationObserver) { return; }
-
-    var guarding = false;
-
-    function sync() {
-      if (guarding) { return; }
-      var empty = select.options.length === 0;
-      if (empty && !button.disabled) {
-        guarding = true;
-        button.disabled = true;
-        window.setTimeout(function () { guarding = false; }, 0);
-      }
-      button.title = empty ? 'This assembly has no BLAST datasets' : '';
-      summary();
-    }
-
-    new window.MutationObserver(sync).observe(select, { childList: true });
-    new window.MutationObserver(sync).observe(button, { attributes: true, attributeFilter: ['disabled'] });
-    sync();
-  }
-
-  /* ---- selected targets: count, empty state, quick add ------------------ */
-
-  function initTargets(summary) {
+    var quick = document.querySelector('.blast-quick');
     var table = byId('selected_targets');
-    if (!table) { return; }
+    if (!assemblyInput || !select || !quick || !table) { return; }
 
+    var label = byId('blast-quick-label');
+    var row = quick.querySelector('.blast-quick-row');
+    var emptyEl = byId('blast-quick-empty');
     var countEl = byId('blast-target-count');
-    var emptyEl = byId('blast-target-empty');
-    var quickChips = document.querySelectorAll('.blast-quick-chip');
+    var targetsEmptyEl = byId('blast-target-empty');
+    /* The reference assembly's name, so a later pick can tell whether it is
+       still "the current reference" or just some other assembly. Read from a
+       data attribute rather than assumed, since the page already knows it. */
+    var curRef = quick.getAttribute('data-cur-ref') || '';
+    var emptyTimer = null;
+
+    function escapeAttr(s) { return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;'); }
+    function escapeHtml(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
     function selectedIds() {
       return Array.prototype.map.call(
         document.querySelectorAll('.selected_BLAST_target'),
-        function (row) { return row.id; });
+        function (r) { return r.id; });
     }
 
-    function sync() {
+    function markPressed() {
+      var ids = selectedIds();
+      Array.prototype.forEach.call(row.querySelectorAll('.blast-quick-chip'), function (chip) {
+        var pressed = ids.indexOf(chip.getAttribute('data-blast-id')) !== -1;
+        chip.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+      });
+    }
+
+    function targetsSync() {
       var ids = selectedIds();
       if (countEl) {
         countEl.textContent = ids.length
           ? ids.length + (ids.length === 1 ? ' dataset' : ' datasets')
           : '';
       }
-      if (emptyEl) { emptyEl.hidden = ids.length > 0; }
-      Array.prototype.forEach.call(quickChips, function (chip) {
-        var added = ids.indexOf(chip.getAttribute('data-blast-id')) !== -1;
-        chip.setAttribute('aria-pressed', added ? 'true' : 'false');
-      });
+      if (targetsEmptyEl) { targetsEmptyEl.hidden = ids.length > 0; }
+      markPressed();
       summary();
     }
 
-    /* The same row addTarget() builds, without the round trip: the id and the
-       label are already known server-side, and the endpoint would only return
-       what is in the button's own data attributes. */
-    Array.prototype.forEach.call(quickChips, function (chip) {
-      on(chip, 'click', function () {
-        var id = chip.getAttribute('data-blast-id');
-        var label = chip.getAttribute('data-blast-label');
-        var existing = byId(id);
-        if (existing && existing.classList.contains('selected_BLAST_target')) {
-          existing.parentNode.removeChild(existing);
-          sync();
-          return;
-        }
-        var row = document.createElement('tr');
-        row.id = id;
-        row.className = 'selected_BLAST_target';
-        row.innerHTML = '<td class="BLAST"></td>'
-                      + '<td><a href="#!"><b>X</b></a></td>';
-        row.querySelector('td').textContent = label;
-        row.querySelector('a').setAttribute('onclick', 'removeTarget(' + id + ')');
-        table.appendChild(row);
-        sync();
-      });
+    /* Rebuilds the label and the chip row from whatever #BLAST_target holds
+       right now. Never touches the panel while the assembly field is blank,
+       so the server-rendered default (the reference assembly) is what a
+       reader sees before they have picked anything at all. */
+    function renderChips() {
+      var assemblyName = assemblyInput.value.trim();
+      if (!assemblyName) { return; }
+
+      label.textContent = assemblyName + (assemblyName === curRef ? ' — the current reference' : '');
+
+      var options = Array.prototype.slice.call(select.options);
+      if (options.length) {
+        row.innerHTML = options.map(function (option) {
+          var id = option.value;
+          var type = option.text;
+          var chipLabel = assemblyName + '-' + type;
+          return '<button type="button" class="blast-quick-chip" aria-pressed="false"'
+               + ' data-blast-id="' + escapeAttr(id) + '" data-blast-label="' + escapeAttr(chipLabel) + '">'
+               + escapeHtml(type) + '</button>';
+        }).join('');
+        markPressed();
+        if (emptyEl) { emptyEl.hidden = true; }
+      } else {
+        row.innerHTML = '';
+      }
+
+      window.clearTimeout(emptyTimer);
+      if (!options.length) {
+        emptyTimer = window.setTimeout(function () {
+          if (!select.options.length && assemblyInput.value.trim() === assemblyName && emptyEl) {
+            emptyEl.hidden = false;
+          }
+        }, 350);
+      }
+
+      summary();
+    }
+
+    /* Delegated, because the row's own buttons are replaced wholesale on
+       every assembly change -- listeners attached to them would not survive. */
+    on(row, 'click', function (event) {
+      var chip = event.target.closest ? event.target.closest('.blast-quick-chip') : null;
+      if (!chip) { return; }
+      var id = chip.getAttribute('data-blast-id');
+      var chipLabel = chip.getAttribute('data-blast-label');
+      var existing = byId(id);
+      if (existing && existing.classList.contains('selected_BLAST_target')) {
+        existing.parentNode.removeChild(existing);
+        targetsSync();
+        return;
+      }
+      var tr = document.createElement('tr');
+      tr.id = id;
+      tr.className = 'selected_BLAST_target';
+      tr.innerHTML = '<td class="BLAST"></td><td><a href="#!"><b>X</b></a></td>';
+      tr.querySelector('td').textContent = chipLabel;
+      tr.querySelector('a').setAttribute('onclick', 'removeTarget(' + id + ')');
+      table.appendChild(tr);
+      targetsSync();
     });
 
     if (window.MutationObserver) {
-      new window.MutationObserver(sync).observe(table, { childList: true, subtree: true });
+      new window.MutationObserver(renderChips).observe(select, { childList: true });
+      new window.MutationObserver(targetsSync).observe(table, { childList: true, subtree: true });
     }
-    sync();
+
+    targetsSync();
   }
 
   /* ---- the running summary ---------------------------------------------- */
@@ -475,8 +516,7 @@
     var summary = initSummary();
     initSequence(summary);
     initCombo();
-    initAddGuard(summary);
-    initTargets(summary);
+    initDatasetChips(summary);
     summary();
   }
 

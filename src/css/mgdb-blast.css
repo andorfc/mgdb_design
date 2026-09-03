@@ -349,40 +349,27 @@
 
 /* ── Step 2: the target picker ───────────────────────────────────────────── */
 
-/* Four controls on one row, all the same height and all starting at the same
-   baseline. The assembly column takes the slack because its values are the
-   long ones -- Zm-B73_B_CHROMOSOME-MBSC-1.0 and the like. */
+/* Two controls on one row, the same height and the same baseline. Assembly
+   takes the larger share because its values are the long ones --
+   Zm-B73_B_CHROMOSOME-MBSC-1.0 and the like -- and now also carries the browse
+   toggle inside it. There is no third or fourth control any more: the dataset
+   picker and its Add button were replaced by the gold panel below, which reads
+   straight from the hidden #BLAST_target select instead of asking the reader
+   to drive it by hand. */
 .mgdb-blast-page .blast-target-picker {
   display: grid;
-  grid-template-columns: minmax(11rem, 0.9fr) minmax(14rem, 1.6fr) minmax(10rem, 1fr) auto;
+  grid-template-columns: minmax(11rem, 1fr) minmax(16rem, 2.2fr);
   gap: var(--mgdb-space-3);
   align-items: end;
-}
-
-/* Two columns rather than four, and the button keeps the Dataset select
-   company rather than taking a whole row to itself: `align-items: end` on the
-   grid is what keeps its bottom edge level with the select's. */
-@media (max-width: 1080px) {
-  .mgdb-blast-page .blast-target-picker {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  }
-  .mgdb-blast-page .blast-field-action { justify-items: start; }
 }
 
 @media (max-width: 620px) {
   .mgdb-blast-page .blast-target-picker { grid-template-columns: minmax(0, 1fr); }
 }
 
-/* The spacer label that keeps the button's top edge level with the controls
-   beside it collapses once the button is on its own row. */
-@media (max-width: 1080px) {
-  .mgdb-blast-page .blast-field-action > .mgdb-label { display: none; }
-}
-
-.mgdb-blast-page .blast-field-action .mgdb-button { white-space: nowrap; }
-
-/* Quick add */
-
+/* The datasets available for whatever assembly is chosen above. Not a
+   shortcut beside a picker any more -- this panel is the only way to add a
+   dataset, so it is unconditionally styled rather than opt-in. */
 .mgdb-blast-page .blast-quick {
   display: grid;
   gap: var(--mgdb-space-2);
@@ -405,6 +392,13 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-2);
+  min-height: 2.1rem;
+}
+
+.mgdb-blast-page .blast-quick-empty {
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
 }
 
 .mgdb-blast-page .blast-quick-chip {

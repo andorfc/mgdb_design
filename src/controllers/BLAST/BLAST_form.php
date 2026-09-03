@@ -73,14 +73,24 @@
   
   $tmpl->get('target_species_options')->loop(getSpeciesOptions($DBConn));
 
-  /* Quick-add buttons for the current reference assembly's own datasets.
-     Reaching B73 v5's proteins otherwise means picking a species, typing an
-     assembly name out of 103, picking the dataset and pressing add; these are
-     one click. They add exactly the row addTarget() would, so nothing
-     downstream can tell the difference. */
+  /* The current reference assembly's own datasets as "+" buttons -- the only
+     way to add a dataset now, not a shortcut beside a dropdown. Picking a
+     different assembly hands the same panel to js/mgdb-blast.js, which reads
+     the (hidden) #BLAST_target select fillTargets() already populates and
+     rebuilds this same markup for whatever assembly is chosen. This is only
+     the page's starting point: B73 v5, so a sequence and a press of Run BLAST
+     is a complete search without picking anything in step 2 at all. */
   $quick = getQuickTargets($DBConn, $system['cur_ref_gen']);
   if ($quick) {
-      $tmpl->get('quick_assembly')->replace(htmlspecialchars($system['cur_ref_gen'], ENT_QUOTES, 'UTF-8'));
+      $cur_ref_escaped = htmlspecialchars($system['cur_ref_gen'], ENT_QUOTES, 'UTF-8');
+      /* Two tokens for one value: the label text and the `data-cur-ref`
+         attribute js/mgdb-blast.js reads to decide whether a later assembly
+         pick still counts as "the current reference". A single token used
+         twice in one template is not a pattern used elsewhere in this
+         codebase, so this does not rely on guessing whether Bauplan would
+         replace both occurrences. */
+      $tmpl->get('quick_assembly')->replace($cur_ref_escaped);
+      $tmpl->get('quick_assembly_attr')->replace($cur_ref_escaped);
       $tmpl->get('quick_target_rows')->loop($quick);
       $tmpl->get('quick-targets')->unmute();
   }
@@ -132,13 +142,19 @@ function getSpeciesOptions($DBConn) {
 
 
 /*
- * The current reference assembly's BLAST targets, as quick-add buttons.
+ * A BLAST assembly's datasets, as the "+" buttons in the gold panel.
  *
- * `quick_label` is the text addTarget() puts in the chip -- assembly name, a
- * hyphen, target type -- so a quick-added row and a picked one are identical.
- * The ORDER BY puts the whole assembly first and then the gene model datasets,
- * which is the order they are usually wanted in; ordering by target_type alone
- * would lead with "Gene model CDS".
+ * Called once here, for the default reference assembly at page load.
+ * js/mgdb-blast.js calls no PHP at all for later picks -- it rebuilds the same
+ * chip markup client-side from the #BLAST_target select fillTargets() already
+ * populates, so this function's only job is the page's starting state.
+ *
+ * `quick_label` is the text a chip's click handler puts in the row -- assembly
+ * name, a hyphen, target type -- matching what addTarget() used to build, so a
+ * chip-added row and the old picked-and-added one are identical. The ORDER BY
+ * puts the whole assembly first and then the gene model datasets, which is the
+ * order they are usually wanted in; ordering by target_type alone would lead
+ * with "Gene model CDS".
  */
 function getQuickTargets($DBConn, $assembly) {
   if (!$assembly) {

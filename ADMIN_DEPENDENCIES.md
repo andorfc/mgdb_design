@@ -1085,31 +1085,72 @@ Then drop the `/var/www/logs` line from the script, or retire the cron job, so t
 - **Status:** proposed
 - **Validation:** `/search/image/image_search_api.php?term=purple&category=all&page_size=25&sort=latest` returns in well under 500 ms with `summary.total` still 190.
 
-## AD-048 — BLAST cannot write its query file on the development instance
+## AD-048 — BLAST could not write its query file on the development instance
 
-- **What is wrong:** Every BLAST submission on `claude.maizegdb.org` returns
-  "Unable to write the query sequence file. Contact the MaizeGDB team using the
-  feedback link above." `BLAST_run.php` writes the query FASTA to
-  `$system['temp_dir']`, which `conf/mgdb.conf` sets to
-  `/var/www/claude/html/temp`. The directory's ownership is fine — it is
-  `drwxrwxr-x john:mgdbadmin` and the `apache` user is in `mgdbadmin` — but
-  SELinux is `Enforcing` and the directory is labelled
-  `unconfined_u:object_r:httpd_sys_content_t:s0`, which is read-only to httpd.
-  `fopen($fas_file, 'w')` therefore fails, `showFileError()` renders, and no
-  job is ever created. This is the same trap recorded for the dashboard cache.
-- **Why the application cannot fix it:** Relabelling a directory needs
-  `semanage`/`restorecon` as root. Nothing PHP can do changes an SELinux type,
-  and moving the temp directory would mean editing `conf/mgdb.conf` and the
-  job, results and download paths that read from it.
-- **What is needed:** Give the directory a writable type and make it persist a
-  relabel:
-  `semanage fcontext -a -t httpd_sys_rw_content_t '/var/www/claude/html/temp(/.*)?'`
-  then `restorecon -Rv /var/www/claude/html/temp`. Worth checking the
-  production instance carries the right label too.
-- **Expected benefit:** BLAST searches run on the development instance, which
-  they currently cannot, so the results path can be tested before it ships.
+- **What was wrong:** Every BLAST submission on `claude.maizegdb.org` returned
+  "Unable to write the query sequence file." Three independent causes, found
+  one at a time because fixing each one only *changed* the failure rate rather
+  than eliminating it:
+  1. **The temp directory's SELinux type.** `BLAST_run.php` writes the query
+     FASTA to `$system['temp_dir']`
+     (`conf/mgdb.conf` → `/var/www/claude/html/temp`), labelled
+     `unconfined_u:object_r:httpd_sys_content_t:s0` — read-only to httpd under
+     `Enforcing`. This is the same trap recorded for the dashboard cache.
+  2. **A missing SELinux boolean.** Relabelling the directory
+     `httpd_sys_rw_content_t` was not enough on its own: `httpd_t` (php-fpm's
+     domain) still needed `httpd_sys_script_anon_write` — off by default —
+     which specifically governs an httpd-run *script* writing to `_rw_content_t`
+     paths, as opposed to httpd itself. With the label fixed but this boolean
+     off, every write still failed, silently: `Enforcing` denials for this
+     specific (subject, object, class) triple were not appearing in
+     `ausearch -m avc` at all, most likely a policy `dontaudit` rule. Testing
+     under `setenforce 0` (permissive — logs but never blocks) is what proved
+     SELinux was no longer the blocker: the *same* failure rate persisted with
+     enforcement fully out of the picture, which is the decisive way to rule
+     SELinux in or out of an intermittent failure rather than inferring it from
+     an empty audit log.
+  3. **Stale supplementary groups on long-running php-fpm workers.** With both
+     of the above fixed, writes still failed **most** of the time — but now
+     *deterministically per worker*, not randomly: a probe script reporting its
+     own PID and `posix_getgroups()` showed some workers with `groups=48,1001`
+     (`apache`,`mgdbadmin` — succeeded) and others with only `groups=48`
+     (failed), regardless of the directory's permissions or label, both of
+     which were already correct and never changed across working and failing
+     requests. `apache`'s membership in `mgdbadmin` is a static, correct
+     `/etc/group` entry — but this host's NSS `group:` order is `sss files
+     systemd`, querying SSSD before the local file, and a worker's
+     supplementary groups are resolved once, at that worker's own fork/start
+     time, and never refreshed while it keeps running. Long-lived workers
+     (some running since March) that happened to resolve groups during an SSSD
+     hiccup were permanently stuck without `mgdbadmin` until restarted; new
+     workers spawned later were not guaranteed to be luckier, since the flake
+     is in SSSD's answer, not in worker age. `systemctl restart php-fpm` forces
+     every worker to re-fork and re-resolve groups fresh; 20/20 and then 8/8
+     real submissions succeeded immediately after.
+- **Why the application could not fix any of this:** All three are host
+  configuration outside anything PHP touches — an SELinux type and boolean,
+  and a system service's process state. Moving the temp directory would still
+  mean editing `conf/mgdb.conf` and every job/results/download path that reads
+  from it.
+- **What was done** (2026-09-03, as root on the development instance):
+  ```
+  semanage fcontext -a -t httpd_sys_rw_content_t '/var/www/claude/html/temp(/.*)?'
+  restorecon -Rv /var/www/claude/html/temp
+  setsebool -P httpd_sys_script_anon_write on
+  systemctl restart php-fpm
+  ```
+  Worth checking the production instance carries the same label and boolean.
+  The SSSD flakiness behind cause 3 is not fixed by this — only worked around
+  by forcing a fresh resolution now. It can recur after the next
+  `pm.max_requests`-triggered worker recycle if SSSD has another bad moment,
+  and is worth its own investigation (SSSD health, or reordering `nsswitch.conf`
+  to put `files` before `sss` for `group`) separately from BLAST.
+- **Verified:** A real end-to-end submission through the live form (two
+  targets, two assemblies) produced two `DONE` sub-jobs with real `blastn`
+  output; 8/8 repeated real submissions succeeded afterward with no
+  concurrency restriction.
 - **Required administrator:** Server administrator with root
-- **Status:** proposed
+- **Status:** implemented (2026-09-03)
 
 
 ## AD-049 — Three BLAST endpoints interpolate request parameters into SQL

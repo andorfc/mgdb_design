@@ -4104,6 +4104,54 @@ of Add; it is now one click, and clicking again removes it. The row they append
 is the row `addTarget()` builds, from the id and label already in the button's
 data attributes, so nothing downstream can tell the difference.
 
+#### Adding a dataset: one panel instead of a dropdown and a button
+
+The first pass on this form still asked the reader to drive a three-step
+sequence for every dataset: pick a species, pick an assembly, pick a dataset
+from a second dropdown, press **Add dataset**. Wanting an assembly's protein
+set *and* its cDNA set meant repeating the last two steps twice.
+
+The dataset dropdown and its Add button are gone. In their place, the gold
+panel that used to be a B73-only shortcut *above* the picker is now the only
+way to add a dataset, and it moved *below* the picker: pick a species and
+assembly, and the panel updates to name that assembly and offer its available
+datasets as "+" chips — click one to add it, click again to remove it. On load,
+before anything is picked, the panel already shows **Zm-B73-REFERENCE-NAM-5.0
+— the current reference** with its five chips, so a sequence and a press of Run
+BLAST is a complete search without opening the picker at all.
+
+`#BLAST_target` — the dataset `<select>` `fillTargets()` in the untouched
+`BLAST.js` already empties and refills whenever the assembly changes — did not
+go away. It is still exactly that select, just visually hidden
+(`aria-hidden`, `tabindex="-1"`, no click ever reaches it), and
+`js/mgdb-blast.js` reads its own `<option>`s back out to build the chip panel.
+`fillTargets()` does not know its select stopped having a visible dropdown
+next to it, and does not need to: from its side nothing changed.
+
+Two things had to be handled for the panel to behave:
+
+- **`fillTargets()` empties the select synchronously, then repopulates it only
+  after its POST resolves** — so the select mutates twice per assembly change,
+  once empty and once full. Re-rendering on every mutation keeps the panel
+  honest without extra bookkeeping; the only thing debounced is the "No BLAST
+  datasets for this assembly" message (350ms), so it does not flash during
+  that round trip for the ordinary case of an assembly that does have
+  datasets. `B73 RefGen_v4` — which has none — settles to that message; every
+  other assembly settles to chips before the debounce ever fires.
+- **Whether "— the current reference" still applies.** A `data-cur-ref`
+  attribute on the panel carries the reference assembly's name from PHP, so
+  the label can drop the suffix for anything else and restore it if the reader
+  browses back to B73. It is a second token (`quick_assembly_attr`) rather
+  than reusing `$(quick_assembly)` in two places in the same template — no
+  other `.bau` file in this codebase relies on Bauplan replacing every
+  occurrence of one token, so this does not start relying on it either.
+
+`getQuickTargets()` in `BLAST_form.php` still runs exactly once, server-side,
+for the reference assembly at page load — the reader's starting point, and the
+only case that has to work with the script off. Every assembly picked
+afterward is rendered client-side from data `fillTargets()` already fetched;
+no additional PHP endpoint exists for it.
+
 #### What else the enhancement layer does
 
 - A live count — `1 sequence · 1,411 of 20,000 bp` — against the page's own
@@ -4134,12 +4182,12 @@ wrong place on any scrolled page.
 Measured at 1280: all four step cards, the run bar and the recent-jobs panel
 span the same 49→1231; all four step bodies start at 74 and all four headings
 at 118; **every control in the form is 44px tall — one value, not a range**; the
-four picker controls share a top edge and the row's outer edges match the
-textarea's exactly (118→1206); the six parameters lay out 3×2 with all six
-controls 341px wide on three repeated left edges. At 1080 the picker becomes
-2×2 with the button beside the dataset select, at 620 one column, and at 430 the
-segmented controls and the textarea are all 330px at the same left edge with no
-horizontal overflow.
+picker's two controls share a top edge, and the picker, the gold panel and the
+selected-datasets panel all span the same 118→1206 as the textarea. Species and
+Assembly are 336px and 740px — Assembly is the wider share, since its values
+are the long ones and it now also carries the browse toggle. One column below
+620px, matching the breakpoint the rest of the form already uses; no horizontal
+overflow at 430.
 
 ### What a 2012 stylesheet does to a modern page
 
@@ -4196,16 +4244,47 @@ The form was verified against the backend rather than by eye:
   `1e-20`, 95% identity, 1 max HSP, text output and both target chips with the
   correct labels.
 
-What could *not* be verified here is the results page, because no BLAST job can
-run on the development instance at all: the temp directory it writes the query
-FASTA to is labelled `httpd_sys_content_t` under an enforcing SELinux, so every
-submission returns "Unable to write the query sequence file". That predates this
-work — the submit branch loads none of these files, which the response's own
-`<head>` confirms — and is recorded as **AD-048**. **AD-049** records three
-`BLAST_tasks.php` / `BLAST_lib.php` endpoints that interpolate raw request
-parameters into SQL; `BLAST_form.php` now casts its own target ids to `int`
-before handing them to `getBLASTrecord()`, which closes its own call site and
-nothing else.
+**AD-048 — no BLAST job could run on the development instance at all — is now
+implemented.** Three stacked causes, not one: the temp directory's SELinux
+type, a missing SELinux boolean (`httpd_sys_script_anon_write`) that a
+correct type alone did not cover, and long-running php-fpm workers whose
+supplementary groups had gone stale against an SSSD/NSS hiccup and needed the
+service restarted to re-resolve. Each fix only *changed* the failure rate
+until all three were in place; the full story, including how the second and
+third causes were told apart from the first, is in `ADMIN_DEPENDENCIES.md`.
+Verified afterward with a real submission through the live form — two targets
+on two different assemblies — producing two `DONE` sub-jobs with real
+`blastn` output, then 8/8 repeated real submissions with no failures.
+
+**AD-049** records three `BLAST_tasks.php` / `BLAST_lib.php` endpoints that
+interpolate raw request parameters into SQL; `BLAST_form.php` now casts its
+own target ids to `int` before handing them to `getBLASTrecord()`, which
+closes its own call site and nothing else.
+
+### The dataset panel, verified
+
+The picker verification above predates the dataset-panel rework — "returns the
+assembly's four datasets" was about the hidden select, which is still exactly
+how it behaves; what changed is what reads it. Checked afterward, on the live
+form:
+
+- **The default state.** On load, before anything is picked, the panel already
+  reads "Zm-B73-REFERENCE-NAM-5.0 — the current reference" with five chips —
+  Assembly, Gene model cDNA/CDS/genomic/protein — matching `getQuickTargets()`'s
+  output exactly.
+- **A different assembly.** Setting the assembly field and firing `change`
+  (exactly what the combobox and the native datalist both do) replaces the
+  label with the new assembly's name, no suffix, and rebuilds five chips with
+  the ids `fillTargets()`'s own `#BLAST_target` select now holds. Clicking two
+  of them adds both; clicking one again removes it; the previously-selected
+  B73 default is untouched throughout.
+- **The zero-dataset case.** `B73 RefGen_v4` — the same one the old dropdown's
+  disabled-button guard used to catch — settles the panel to "No BLAST
+  datasets for this assembly." after the debounce, with no chips and no flash
+  of that message during the round trip for assemblies that do have datasets.
+- **Back to the reference assembly.** Re-selecting
+  `Zm-B73-REFERENCE-NAM-5.0` restores the "— the current reference" suffix and
+  the original five chips.
 
 ## The nomenclature standard
 
