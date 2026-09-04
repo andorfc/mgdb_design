@@ -1,0 +1,227 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-bin-viewer
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https://maizegdb.org/bin_viewer">
+<meta property="og:title" content="MaizeGDB Bin Viewer | Maize Cytological Bins">
+<meta property="og:description" content="Browse the maize genome by cytological bin. Pick any of the 100 bins to see the genes, gene models, loci, maps, accessions and BACs it holds.">
+
+<main class="mgdb-page mgdb-bin-page" id="bin-top">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/bin_viewer">Bin Viewer</a><span aria-hidden="true">&rsaquo;</span>$(breadcrumb_tail)
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="bin-title">
+    <div class="mgdb-hero-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="Maize chromosome idiogram icon">
+        <rect x="16" y="12" width="16" height="72" rx="7" fill="#e8f4ec" stroke="#235c37" stroke-width="3" />
+        <rect x="40" y="24" width="16" height="56" rx="7" fill="#e8f4ec" stroke="#235c37" stroke-width="3" />
+        <rect x="64" y="18" width="16" height="64" rx="7" fill="#e8f4ec" stroke="#235c37" stroke-width="3" />
+        <rect x="17" y="30" width="14" height="9" fill="#d99a0b" />
+        <rect x="17" y="52" width="14" height="7" fill="#7fae8c" />
+        <rect x="41" y="38" width="14" height="10" fill="#d99a0b" />
+        <rect x="41" y="60" width="14" height="6" fill="#7fae8c" />
+        <rect x="65" y="34" width="14" height="7" fill="#7fae8c" />
+        <rect x="65" y="55" width="14" height="10" fill="#d99a0b" />
+      </svg>
+      <strong>Bin<br />Viewer</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(built_date)</p>
+      <h1 id="bin-title">$(page_title)</h1>
+      <p class="mgdb-hero-description">$(page_description)</p>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">$(section_tabs)</nav>
+
+  <section id="bin-map" aria-labelledby="bin-map-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="bin-map-title">Chromosome map</h2></div>
+      <p>Choose a region of the genome you're interested in from the image below, or read on to find out details about this genome display.</p>
+    </div>
+
+    <div class="bin-map-panel">
+      <div class="bin-map-controls">
+        <fieldset class="bin-destination">
+          <legend class="mgdb-label">Selecting a bin opens</legend>
+          <label><input type="radio" name="bin-destination" value="viewer" checked /> <span>Bin Viewer pages</span></label>
+          <label><input type="radio" name="bin-destination" value="gbrowse" /> <span>Genome Browser pages &#40;B73 RefGen_v3&#41;</span></label>
+        </fieldset>
+
+        <div class="bin-legend">
+          <span class="mgdb-label" id="bin-legend-label">Mapped loci per bin</span>
+          <span class="bin-legend-scale" role="img" aria-labelledby="bin-legend-label">
+            <span class="bin-swatch is-q1"></span>
+            <span class="bin-swatch is-q2"></span>
+            <span class="bin-swatch is-q3"></span>
+            <span class="bin-swatch is-q4"></span>
+            <span class="bin-swatch is-q5"></span>
+          </span>
+          <span class="mgdb-small mgdb-muted">1 to $(max_loci)</span>
+        </div>
+      </div>
+
+      <div class="bin-map-figure">
+        $(idiogram)
+        <p class="bin-map-hint mgdb-small mgdb-muted">Chromosome numbers below the map link to the whole-chromosome view.</p>
+      </div>
+
+      <div class="bin-map-readout" id="bin-readout" aria-live="polite"></div>
+    </div>
+
+    <p class="mgdb-note">$(coverage_note)</p>
+  </section>
+
+  <section id="bin-boundaries" aria-labelledby="bin-boundaries-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="bin-boundaries-title">What Are The Chromosome Splits Called 'Bin Boundaries' Based On?</h2></div>
+    </div>
+
+    <div class="mgdb-prose bin-prose">
+      <p>The following explanation was submitted by Ed Coe.</p>
+      <p>The chromosome splittings above are based on the concept of <i>bins</i>. The genetic maps are divided into 100 segments, called bins, of approximately 20 centiMorgans between two fixed Core Markers \(Gardiner et al. 1993 Genetics 134:917-930\). The segments are designated with the chromosome number followed by a two-digit decimal \( e.g., 1.00, 1.01, 1.02, etc\).  A bin is the interval that includes all loci from the leftmost or top Core Marker to the next Core Marker.  Placement of a locus to a bin is dependent on the precision of mapping data, and increases in certainty as markers increase in number or populations increase.  Whenever the placement is statistically uncertain, 'Bin1' refers to the beginning of a range, and 'Bin2' refers to the end of the range.</p>
+      <p>A Core Marker is a Locus or Probe that defines a bin boundary \(Gardiner et al. 1993 Genetics 134:917-930,  Davis et al. 1999 Genetics 152\(3\):1137-1172\).</p>
+    </div>
+  </section>
+
+  <section id="bin-assignment" aria-labelledby="bin-assignment-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="bin-assignment-title">Core Bin Marker &#40;CBM&#41; Assignment to V2-Curation Summary</h2></div>
+    </div>
+
+    <div class="mgdb-prose bin-prose">
+      <p>The following explanation was provided by Jack Gardiner \(April 2011\).</p>
+      <p>90 CBMs were assigned to the V2 pseudomolecule assemblies.  In most cases, their locations were not significantly different from those in V1 and the resulting changes can easily be reconciled to improvements in the pseudomolecules.  The strategy taken for V2 was to assemble a FASTA file for each of the 10 maize chromosomes so that this process could be done quicker for future assemblies.  These files also serve to document the EXACT sequence that was used to establish the CBM boundaries since in many cases there were several sequences available and they may or may not agree.  In several cases  \(Bins 2.07/umc5a, 4.05/agrr37b, 6.02/umc59a, 10.04/umc64a\) there were CBM's that were localized on V1 that were unable to be placed on V2 and it was unclear why they could be placed on V1 but not V2.  In all cases these were RFLP probes that hit multiple loci that tend to give complex hybridization patterns.  Further inspection indicates that some of these were placed on the assemblies using overgo hybridization to BAC data that gives approximate placement on the assemblies.  Whatever the case may be, going forward, these CBMs were not good choices so it was best to pick alternative markers which were nearby and have reliable sequence.   Lastly, one CBM \(3.03. asg24\(gts\) \) was able to be placed on V2 even though it was unable to be placed on V1 and was replaced by mus2.  In V2, and future assemblies, we will continue to use asg24\(gts\) since it has reliable sequence. The set of core markers are as follows:</p>
+    </div>
+  </section>
+
+  <section id="bin-markers" aria-labelledby="bin-markers-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="bin-markers-title">Table for core bin markers</h2></div>
+      <p>The marker that defines the start of each bin, and where its sequence sits on B73 RefGen_v3.</p>
+    </div>
+
+    <div class="bin-marker-key">
+      <p><b>Notes for table below:</b></p>
+      <ul class="mgdb-list">
+        <li><span class="bin-key-swatch is-unplaced" aria-hidden="true"></span> The sequence for this core bin marker could not be placed on the B73 RefGen_v3 sequence.</li>
+        <li><span class="bin-key-swatch is-alternate" aria-hidden="true"></span> This Bin region used an alternative bin marker so it could be placed on the B73 RefGen_v3 sequence. Alternate markers were selected that have empirically confirmed positions on both genetic and physical map, and a sequence that aligns correctly on B73 RefGen_v3.</li>
+      </ul>
+    </div>
+
+    <div class="bin-chr-tabs" role="tablist" aria-label="Chromosome">
+      <span class="mgdb-label">Chromosome</span>
+      $(marker_tabs)
+    </div>
+
+    $(marker_tables)
+  </section>
+
+  <section id="bin-metrics" aria-labelledby="bin-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="bin-metrics-title">Metrics</h2></div>
+      <p>Read live from the MaizeGDB database.</p>
+    </div>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Bins</h3>
+          <span class="mgdb-metric-badge">Cytological</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(total_bins)</strong>
+        </div>
+        <p class="mgdb-metric-description">Segments of roughly 20 centiMorgans across ten chromosomes.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Core bin markers</h3>
+          <span class="mgdb-metric-badge">Boundaries</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(total_markers)</strong>
+        </div>
+        <p class="mgdb-metric-description">Loci and probes that define where one bin ends and the next begins.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Mapped loci</h3>
+          <span class="mgdb-metric-badge">In a bin</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(total_loci)</strong>
+        </div>
+        <p class="mgdb-metric-description">Curated loci placed in one of the 100 bins.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Densest bin</h3>
+          <span class="mgdb-metric-badge">Bin $(densest_bin)</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(max_loci)</strong>
+        </div>
+        <p class="mgdb-metric-description">Mapped loci in the most crowded bin on the map.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="bin-resources" aria-labelledby="bin-resources-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="bin-resources-title">Other resources</h2></div>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list bin-resource-list">
+        <a href="/data_center/locus">
+          <strong>Locus Data Hub</strong>
+          <span>Classic genetic loci, alleles, and phenotypes</span>
+        </a>
+        <a href="/data_center/marker">
+          <strong>Markers and Probes</strong>
+          <span>Molecular markers, probes, SSRs, and RFLPs</span>
+        </a>
+        <a href="/data_center/map">
+          <strong>Maps</strong>
+          <span>Genetic, physical, and cytological maps</span>
+        </a>
+        <a href="/gene_center/gene">
+          <strong>Gene Data Hub</strong>
+          <span>Genes and gene models by name or position</span>
+        </a>
+        <a href="/genome/genomebrowser">
+          <strong>Genome Browser</strong>
+          <span>JBrowse tracks across every assembly</span>
+        </a>
+        <a href="/data_center/cytogenetic">
+          <strong>Cytogenetics</strong>
+          <span>Cytogenetic stocks and chromosome aberrations</span>
+        </a>
+        <a href="/genome/whole_genome">
+          <strong>Whole-Genome Views</strong>
+          <span>Comparative synteny and karyotype views</span>
+        </a>
+        <a href="/data_center/qtl">
+          <strong>QTL Data Hub</strong>
+          <span>Quantitative trait loci and their intervals</span>
+        </a>
+        <a href="/data_center/bac">
+          <strong>BAC Data Hub</strong>
+          <span>Bacterial artificial chromosome clones</span>
+        </a>
+        <a href="/nomenclature">
+          <strong>Nomenclature</strong>
+          <span>Maize naming rules for loci and assemblies</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+)

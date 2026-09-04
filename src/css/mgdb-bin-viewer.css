@@ -1,0 +1,392 @@
+/* file: mgdb-bin-viewer.css
+ *
+ * purpose: page furniture for the Bin Viewer (/bin_viewer).
+ *
+ * Scoped to .mgdb-bin-page. Descendants of a page-scope class use > so a bare
+ * element rule cannot reach into a shared component nested inside.
+ */
+
+/* --------------------------------------------------------------------------
+   The idiogram
+
+   Drawn from data/bin_viewer/bin_geometry.json, which is the coordinates of
+   the previous page's image map. The SVG keeps the original 200x248 grid, so
+   the chromosomes sit exactly where readers are used to seeing them, and
+   scales to whatever width it is given.
+   -------------------------------------------------------------------------- */
+
+.mgdb-bin-page .bin-map-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 260px) minmax(0, 1fr) minmax(0, 300px);
+  gap: var(--mgdb-space-5);
+  align-items: start;
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-bin-page .bin-map-record { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); }
+
+@media (max-width: 1000px) {
+  .mgdb-bin-page .bin-map-panel,
+  .mgdb-bin-page .bin-map-record { grid-template-columns: minmax(0, 1fr); }
+}
+
+.mgdb-bin-page .bin-map-figure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+}
+
+.mgdb-bin-page .bin-idiogram {
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  overflow: visible;
+}
+
+.mgdb-bin-page .bin-map-hint { margin: 0; text-align: center; }
+
+/* Bins ------------------------------------------------------------------- */
+
+.mgdb-bin-page .bin-cell {
+  stroke: #ffffff;
+  stroke-width: .6;
+  transition: fill .12s ease;
+}
+
+/* Five steps rather than a continuous ramp. A continuous scale is unreadable
+   across 100 rectangles two pixels tall, and a stepped legend can be labelled
+   with real numbers. */
+.mgdb-bin-page .bin-cell.is-empty { fill: #e8e4da; }
+.mgdb-bin-page .bin-cell.is-q1    { fill: #d7e8dc; }
+.mgdb-bin-page .bin-cell.is-q2    { fill: #a9d0b8; }
+.mgdb-bin-page .bin-cell.is-q3    { fill: #6fae8c; }
+.mgdb-bin-page .bin-cell.is-q4    { fill: #3f8760; }
+.mgdb-bin-page .bin-cell.is-q5    { fill: #1d5c3d; }
+
+.mgdb-bin-page .bin-link:hover .bin-cell,
+.mgdb-bin-page .bin-link:focus .bin-cell { fill: var(--mgdb-gold); }
+
+.mgdb-bin-page .bin-link { cursor: pointer; }
+
+/* The bin being viewed, on the bin and chromosome pages. Marked with a stroke
+   rather than a fill so the density shading underneath still reads. */
+.mgdb-bin-page .bin-cell.is-current {
+  stroke: var(--mgdb-red);
+  stroke-width: 1.6;
+  paint-order: stroke;
+}
+
+.mgdb-bin-page .bin-link:focus-visible { outline: none; }
+.mgdb-bin-page .bin-link:focus-visible .bin-cell {
+  stroke: var(--mgdb-focus);
+  stroke-width: 1.8;
+}
+
+/* Chromosome numbers ------------------------------------------------------ */
+
+.mgdb-bin-page .bin-chr-label text {
+  fill: var(--mgdb-ink-soft);
+  font-family: var(--mgdb-font);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.mgdb-bin-page .bin-chr-label:hover text,
+.mgdb-bin-page .bin-chr-label:focus text {
+  fill: var(--mgdb-green-dark);
+  text-decoration: underline;
+}
+
+/* Controls, legend and readout -------------------------------------------- */
+
+.mgdb-bin-page .bin-map-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-5);
+}
+
+.mgdb-bin-page .bin-destination {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.mgdb-bin-page .bin-destination > legend {
+  padding: 0 0 var(--mgdb-space-2);
+}
+
+.mgdb-bin-page .bin-destination > label {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: flex-start;
+  padding: var(--mgdb-space-2) 0;
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-bin-page .bin-legend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-2);
+  align-items: flex-start;
+}
+
+.mgdb-bin-page .bin-legend-scale {
+  display: flex;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  overflow: hidden;
+}
+
+.mgdb-bin-page .bin-swatch {
+  display: block;
+  width: 30px;
+  height: 14px;
+}
+
+.mgdb-bin-page .bin-swatch.is-q1 { background: #d7e8dc; }
+.mgdb-bin-page .bin-swatch.is-q2 { background: #a9d0b8; }
+.mgdb-bin-page .bin-swatch.is-q3 { background: #6fae8c; }
+.mgdb-bin-page .bin-swatch.is-q4 { background: #3f8760; }
+.mgdb-bin-page .bin-swatch.is-q5 { background: #1d5c3d; }
+
+.mgdb-bin-page .bin-map-readout {
+  min-height: 8rem;
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-bin-page .bin-map-readout h3 {
+  margin: 0 0 var(--mgdb-space-2);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+}
+
+.mgdb-bin-page .bin-map-readout p { margin: 0 0 var(--mgdb-space-2); }
+.mgdb-bin-page .bin-map-readout p:last-child { margin-bottom: 0; }
+
+/* --------------------------------------------------------------------------
+   Core bin markers
+   -------------------------------------------------------------------------- */
+
+.mgdb-bin-page .bin-marker-key {
+  margin-bottom: var(--mgdb-space-4);
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-bin-page .bin-marker-key > p { margin: 0 0 var(--mgdb-space-2); }
+
+.mgdb-bin-page .bin-key-swatch {
+  display: inline-block;
+  width: 2.5rem;
+  height: .9rem;
+  margin-right: var(--mgdb-space-2);
+  border: 1px solid var(--mgdb-line);
+  border-radius: 3px;
+  vertical-align: middle;
+}
+
+/* The previous page used a red cell and a yellow row. Those two colours on
+   their own do not carry to a reader who cannot distinguish them, so the row
+   also carries a label -- "alternate" as a pill, and the note as text in the
+   position column. */
+.mgdb-bin-page .bin-key-swatch.is-unplaced { background: var(--mgdb-red-soft); border-color: var(--mgdb-red); }
+.mgdb-bin-page .bin-key-swatch.is-alternate { background: var(--mgdb-gold-soft); border-color: var(--mgdb-gold); }
+
+.mgdb-bin-page .bin-chr-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-bin-page .bin-chr-tab {
+  min-width: 2.75rem;
+  min-height: var(--mgdb-tap-target);
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-bin-page .bin-chr-tab:hover {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-bin-page .bin-chr-tab.is-current {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+}
+
+.mgdb-bin-page .bin-marker-table th[scope="row"] { white-space: nowrap; }
+
+.mgdb-bin-page .bin-marker-table tr.is-alternate > * { background: var(--mgdb-gold-soft); }
+.mgdb-bin-page .bin-marker-table tr.is-unplaced > * { background: var(--mgdb-red-soft); }
+
+.mgdb-bin-page .bin-note {
+  color: var(--mgdb-red);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+  white-space: normal;
+}
+
+.mgdb-bin-page .bin-marker-figure {
+  margin: var(--mgdb-space-4) 0 0;
+  overflow-x: auto;
+}
+
+.mgdb-bin-page .bin-marker-figure img {
+  max-width: 100%;
+  height: auto;
+}
+
+.mgdb-bin-page .bin-marker-download { margin-top: var(--mgdb-space-3); }
+
+/* --------------------------------------------------------------------------
+   Bin and chromosome pages
+   -------------------------------------------------------------------------- */
+
+.mgdb-bin-page .bin-record-side > p { max-width: var(--mgdb-measure); }
+
+.mgdb-bin-page .bin-record-links {
+  margin: var(--mgdb-space-3) 0 0;
+  padding-left: var(--mgdb-space-5);
+}
+
+.mgdb-bin-page .bin-record-links > li { margin-bottom: var(--mgdb-space-2); }
+
+/* Each data section is fetched after the page paints. The container holds its
+   height while loading so the page does not jump as each one lands. */
+.mgdb-bin-page .bin-section-body {
+  min-height: 4rem;
+  container-type: inline-size;
+}
+
+/* The section bodies come from record_data/bin_viewer_data.php, which returns
+   the previous page's markup: nested tables sized in pixels, and inline styles
+   this stylesheet does not control. They are contained rather than restyled --
+   a scroll box keeps a 900px table from widening the page, and the type is
+   brought up to the 16px floor. */
+.mgdb-bin-page .bin-section-body {
+  overflow-x: auto;
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-bin-page .bin-section-body table { max-width: 100%; }
+
+.mgdb-bin-page .bin-section-body td,
+.mgdb-bin-page .bin-section-body th {
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-bin-page .bin-section-body img { max-width: 100%; height: auto; }
+
+.mgdb-bin-page .bin-loading {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  padding: var(--mgdb-space-4) 0;
+  color: var(--mgdb-muted);
+}
+
+/* --------------------------------------------------------------------------
+   Other resources — ten links in two rows of five
+   -------------------------------------------------------------------------- */
+
+.mgdb-bin-page .bin-resource-list { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+
+@media (max-width: 1100px) {
+  .mgdb-bin-page .bin-resource-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 760px) {
+  .mgdb-bin-page .bin-resource-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 480px) {
+  .mgdb-bin-page .bin-resource-list { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Several section descriptions are wording carried over from the previous page
+   and are not ours to shorten; the shared 46ch cap breaks them to three lines. */
+.mgdb-bin-page > section > .mgdb-section-heading > p { max-width: 62ch; }
+
+/* --------------------------------------------------------------------------
+   Collapsible data sections
+
+   The previous page gave every section on a bin page a collapse control. It
+   is needed: the gene models section of a dense bin runs to nearly two
+   thousand rows, and without it the BACs section below sits 40,000 pixels
+   down the page.
+   -------------------------------------------------------------------------- */
+
+.mgdb-bin-page .bin-section > summary {
+  display: flex;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  padding-bottom: var(--mgdb-space-2);
+  border-bottom: 2px solid var(--mgdb-line);
+  cursor: pointer;
+  list-style: none;
+}
+
+.mgdb-bin-page .bin-section > summary::-webkit-details-marker { display: none; }
+
+/* The marker is drawn rather than inherited so it can sit before the heading
+   and rotate, which is the affordance the previous page's collapse.png gave. */
+.mgdb-bin-page .bin-section > summary::before {
+  flex: none;
+  width: 0;
+  height: 0;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-left: 9px solid var(--mgdb-green-dark);
+  content: "";
+  transition: transform .15s ease;
+}
+
+.mgdb-bin-page .bin-section[open] > summary::before { transform: rotate(90deg); }
+
+.mgdb-bin-page .bin-section > summary > h2 { margin: 0; }
+
+.mgdb-bin-page .bin-section > summary:focus-visible {
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: 2px;
+}
+
+/* The two explanatory sections -- the bin boundary definition and the CBM
+   assignment summary -- run the full width of the page. They are long passages
+   of quoted material from Ed Coe and Jack Gardiner that the previous page also
+   set full width, and the shared 68ch measure turned each into a narrow column
+   with most of the rail empty beside it. */
+.mgdb-bin-page .bin-prose { max-width: none; }
+.mgdb-bin-page .bin-prose > p { max-width: none; }
+
+/* --------------------------------------------------------------------------
+   Anchor offset
+
+   The shared rule is scroll-margin-top: 4.5rem on .mgdb-page > section[id].
+   That clears a one-row tab bar. This page's bar carries six to ten tabs and
+   wraps to two rows at every width below about 1400px -- measured at 104px --
+   so an anchor jump left the section heading tucked under it and the scrollspy
+   marked the section above.
+   -------------------------------------------------------------------------- */
+
+.mgdb-bin-page > section[id] { scroll-margin-top: 8rem; }

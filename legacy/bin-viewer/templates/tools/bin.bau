@@ -1,0 +1,21 @@
+*(bin
+  <!-- create AJAX to populate sections-->
+  <script language="JavaScript">  
+  
+    var arrParams = new Array(\);
+    arrParams["bin"] = $(bin);
+    arrParams["sub"] = $(sub);
+    
+    //TODO: use id for bin/sub instead?
+    getDataParameters("bin_viewer", "top", 0, arrParams\); 
+    getDataParameters("bin_viewer", "gb_links", 0, arrParams\);
+    getDataParameters("bin_viewer", "genes", 0, arrParams\);
+    getDataParameters("bin_viewer", "gene_models", 0, arrParams\);
+    getDataParameters("bin_viewer", "other_loci", 0, arrParams\);
+    getDataParameters("bin_viewer", "hd_maps", 0, arrParams\);
+    getDataParameters("bin_viewer", "accession", 0, arrParams\);
+    getDataParameters("bin_viewer", "est_ssr", 0, arrParams\);
+    getDataParameters("bin_viewer", "bac", 0, arrParams\);
+ 
+  </script>
+)

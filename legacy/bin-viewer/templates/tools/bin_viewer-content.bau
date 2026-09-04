@@ -1,0 +1,1390 @@
+*(bin_viewer-content #include-js: /js/bin_viewer.js, include-css: /css/bin_viewer.css#
+<table width="100%" cellpadding=5 cellspacing=5>
+  <tr>
+    <td valign=top>
+      <p style="margin-bottom: 8px;">
+        <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+          Maize Bin Viewer
+        </span>
+      </p>
+      <p>
+        Choose a region of the genome you're interested in from the image below,
+        or read on to find out details about this genome display.
+      </p>
+      <br>
+      <table width='610'>
+        <tr>
+          <td width='33%'>
+            <!-- display_bin_image_map(\); -->
+            <img usemap="#data_map" width="200" height="240" src="../images/bin_big.jpg" border=0>
+            <br><br> 
+            <center><b>
+              Bin Viewer pages
+            </b></center>
+            <br>
+          </td>
+          <td width='34%'></td>
+          <td width='33%'>
+            <!-- display_bin_image_map_gb_v2(\); -->
+            <img usemap="#data_map_gb_v3" width="200" height="240" src="../images/bin_big.jpg" border=0>
+            <br><br>
+            <center><b>
+              Genome Browser pages<br>
+              (B73 RefGen_v3\)
+            </b></center>
+            <br>
+          </td>
+        </tr>
+      </table>
+      
+     <br>
+    <p style="margin-bottom: 8px;">
+     <div id="datacenter_gray_background">
+       <p style="margin-bottom: 8px;">
+        <span style="font-family: Verdana, Arial, sans-serif; font-size: 110%; font-weight: bold; margin-bottom: 6px;">
+         What Are The Chromosome Splits Called 'Bin Boundaries' Based On?
+        </span>
+       </p>
+       <p>
+        The following explanation was submitted by Ed Coe.
+        <br><br> 
+        The chromosome splittings above are based on the concept of <i>bins</i>.
+        The genetic maps are divided into 100 segments, called bins, of approximately
+        20 centiMorgans between two fixed Core Markers (Gardiner et al. 1993 Genetics 134:917-930\).
+        The segments are designated with the chromosome number followed by a two-digit
+        decimal ( e.g., 1.00, 1.01, 1.02, etc\).  A bin is the interval that includes
+        all loci from the leftmost or top Core Marker to the next Core Marker. 
+        Placement of a locus to a bin is dependent on the precision of mapping
+        data, and increases in certainty as markers increase in number or 
+        populations increase.  Whenever the placement is statistically uncertain,
+        'Bin1' refers to the beginning of a range, and 'Bin2' refers to the end of
+        the range. <br><br>A Core Marker is a Locus or Probe that defines a bin 
+        boundary (Gardiner et al. 1993 Genetics 134:917-930,  Davis et al. 1999
+        Genetics 152(3\):1137-1172\).
+       </p>
+     </div>
+     <br>
+     <div id="datacenter_lite_green_background">
+       <p style="margin-bottom: 8px;">
+        <span style="font-family: Verdana, Arial, sans-serif; font-size: 110%; font-weight: bold; margin-bottom: 6px;">
+         Core Bin Marker (CBM\) Assignment to V2-Curation Summary
+        </span>
+       </p>
+       <p>
+        The following explanation was provided by Jack Gardiner (April 2011\).
+        <br><br> 
+        90 CBMs were assigned to the V2 pseudomolecule assemblies.  
+        In most cases, their locations were not significantly different from 
+        those in V1 and the resulting changes can easily be reconciled to 
+        improvements in the pseudomolecules.  The strategy taken for V2 was 
+        to assemble a FASTA file for each of the 10 maize chromosomes so that
+        this process could be done quicker for future assemblies.  These files 
+        also serve to document the EXACT sequence that was used to establish the 
+        CBM boundaries since in many cases there were several sequences available
+        and they may or may not agree.  In several cases  (Bins 2.07/umc5a, 
+        4.05/agrr37b, 6.02/umc59a, 10.04/umc64a\) there were CBM's that were
+        localized on V1 that were unable to be placed on V2 and it was unclear
+        why they could be placed on V1 but not V2.  In all cases these were RFLP
+        probes that hit multiple loci that tend to give complex hybridization patterns. 
+        Further inspection indicates that some of these were placed on the assemblies 
+        using overgo hybridization to BAC data that gives approximate placement
+        on the assemblies.  Whatever the case may be, going forward, these CBMs 
+        were not good choices so it was best to pick alternative markers which
+        were nearby and have reliable sequence.   Lastly, one CBM (3.03. asg24(gts\) \)
+        was able to be placed on V2 even though it was unable to be placed on
+        V1 and was replaced by mus2.  In V2, and future assemblies, we will
+        continue to use asg24(gts\) since it has reliable sequence. The set of core markers 
+        are as follows: <!--TODO: Does the v1 Bin View page need to be converted? Click <a href='/cgi-bin/bin_viewer_refgenv1.cgi'>here</a> to see the
+        core bin marker assignment to B73 RefGen_v1. -->
+       </p>
+     </div>
+     <br>
+     <div id="table_gray_background">     
+     <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+      Table for core bin markers
+     </span>
+     <table>
+      <tr>
+       <td colspan=2>
+        <br>
+        <b><u>Notes for table below:</u></b>
+       </td>
+      </tr>
+      <tr>
+       <td bgcolor='red'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+       <td>The sequence for this core bin marker could not be placed on the B73 RefGen_v3 sequence.</td>
+      </tr>
+      <tr>
+       <td bgcolor='yellow'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+       <td>
+        This Bin region used an alternative bin marker so it could be placed on 
+        the B73 RefGen_v3 sequence. Alternate markers were selected that have empirically
+        confirmed positions on both genetic and physical map, and a sequence that aligns
+        correctly on B73 RefGen_v3.
+       </td>
+      </tr>
+     </table>
+     <br>
+     
+     <table width="100%">
+       <tr height='5px'>
+          <td id="tchr1" onclick="javascript:chr_tab('chr1'\);" class='chr_tab_focus' width="10%" align="center">
+            Chr1
+          </td>
+          <td id="tchr2" onclick="javascript:chr_tab('chr2'\);" class='chr_tab_unfocus' width="10%" align="center">
+            Chr2
+          </td>
+          <td id="tchr3" onclick="javascript:chr_tab('chr3'\);" class='chr_tab_unfocus' width="10%" align="center">
+            Chr3
+          </td>
+          <td id="tchr4" onclick="javascript:chr_tab('chr4'\);" class='chr_tab_unfocus' width="10%" align="center">
+            Chr4
+          </td>
+          <td id="tchr5" onclick="javascript:chr_tab('chr5'\);" class='chr_tab_unfocus' width="10%" align="center">
+            Chr5
+          </td>
+          <td id="tchr6" onclick="javascript:chr_tab('chr6'\);" class='chr_tab_unfocus' width="10%" align="center">
+            Chr6
+          </td>
+          <td id="tchr7" onclick="javascript:chr_tab('chr7'\);" class='chr_tab_unfocus' width="10%" align="center">
+            Chr7
+          </td>
+          <td id="tchr8" onclick="javascript:chr_tab('chr8'\);" class='chr_tab_unfocus' width="10%" align="center">
+            Chr8
+          </td>
+          <td id="tchr9" onclick="javascript:chr_tab('chr9'\);" class='chr_tab_unfocus' width="10%" align="center">
+            Chr9
+          </td>
+          <td id="tchr10" onclick="javascript:chr_tab('chr10'\);" class='chr_tab_unfocus' width="10%" align="center">
+            Chr10
+          </td>
+          <!--<td width='30%' style='align: right; width: 30%;'>
+            &nbsp;&nbsp;&nbsp;
+          </td>-->
+       </tr>
+    </table>
+     <table cellpadding=3 cellspacing=2 width="100%" summary="Core markers" style="background-color: #D3DEBC;"> 
+      <tbody id="chr1">
+      <tr>
+       <td><b><u>Bin</u></b></td>
+       <td><b><u>Core Bin Marker</u></b></td>
+       <td><b>Molecular <br><u>Marker/Probe</u></b></td>
+       <td><b><u>Type</u></b></td>
+       <td><b><u>Insert</u></b></td>
+       <td><b><u>Enzyme(s\)</u></b></td>
+       <td><b>Full Length <br><u>Insert Sequence</u></b></td>
+       <td width='250'><b>B73 RefGen_v3 <br><u>Start Position</u></b></td>
+      </tr>
+      
+      <tr>
+       <td>1.00</td><td colspan=6></td><td>1</td>
+      </tr>
+      <tr>
+       <td>1.01</td>
+       <td><a href="data_center/locus?id=24942">tub1</a></td>
+       <td><a href="/data_center/marker/98224">p-tub1</a></td>
+       <td>genomic</td><td>158</td><td>EcoRI/HindIII</td>
+       <td><a href="/data_center/sequence?id=AY987961">AY987961</a></td>
+       <td>2037772</td>
+      </tr>
+      <tr>
+       <td>1.02</td>
+       <td><a href="/data_center/locus?id=41422">umc157(chn\)</a></td>
+       <td><a href="/data_center/marker/44592">p-umc157</a></td>
+       <td>genomic</td><td>1220</td><td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ123890">DQ123890</a></td>
+       <td>12397449</td>
+      </tr>
+      <tr>
+       <td>1.03</td>
+       <td><a href="/data_center/locus?id=41513">umc76</a></td>
+       <td><a href="/data_center/marker/44534">p-umc76</a></td>
+       <td>genomic</td><td>760</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=AY751079">AY751079</a></td>
+       <td>29259990</td>
+      </tr>
+      <tr>
+       <td>1.04</td>
+       <td><a href="/data_center/locus?id=97241">asg45(ptk\)</a></td>
+       <td><a href="/data_center/marker/86532">p-asg45</a></td>
+       <td>genomic</td><td>350</td><td>PstI</td>
+       <td><a href="/data_center/sequence?id=AY771210">AY771210</a></td>
+       <td>52150220</td>
+      </tr>
+      <tr>
+       <td>1.05</td>
+       <td><a href="/data_center/locus?id=64640">csu3</a></td>
+       <td><a href="/data_center/marker/58021">p-csu3</a></td>
+       <td>cDNA</td><td>1200</td>
+       <td>EcoRI/XhoI</td>
+       <td><a href="/data_center/sequence?id=DQ123891">DQ123891</a></td>
+       <td>82584786</td>
+      </tr>
+      <tr>
+       <td>1.06</td>
+       <td><a href="/data_center/locus?id=41507">umc67a</a></td>
+       <td><a href="/data_center/marker/44573">p-umc67</a></td>
+       <td>genomic</td><td>650</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=AY771211">AY771211</a></td>
+       <td>175670048</td>
+      </tr>
+      <tr>
+       <td>1.07</td>
+       <td><a href="/data_center/locus?id=97250">asg62</a></td>
+       <td><a href="/data_center/marker/86551">p-asg62</a></td>
+       <td>genomic</td><td>500</td><td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ001865">DQ001865</a></td>
+       <td>198887570</td>
+      </tr>
+      <tr> 
+       <td>1.08</td>
+       <td><a href="/data_center/locus?id=41395">umc128</a></td>
+       <td><a href="/data_center/marker/44575">p-umc128</a></td>
+       <td>genomic</td><td>740</td><td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ123892">DQ123892</a></td>
+       <td>228315518</td>
+      </tr>
+      <tr>
+       <td>1.09</td>
+       <td><a href="/data_center/locus?id=57224">cdj2</a></td>
+       <td><a href="/data_center/marker/58040">p-csu164</a></td>
+       <td>cDNA</td><td>700</td><td>EcoRI/XhoI</td>
+       <td><a href="/data_center/sequence?id=DQ642431">DQ642431</a></td>
+       <td>250153976</td>
+      </tr>
+      <tr>
+       <td>1.10</td>
+       <td><a href="/data_center/locus?id=57230">umc107a(croc\)</a></td>
+       <td><a href="/data_center/marker/44522">p-umc107</a></td>
+       <td>genomic</td><td>1090</td><td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ642432">DQ642432</a></td>
+       <td>267926978</td>
+      </tr>
+      <tr>
+       <td>1.11</td>
+       <td><a href="/data_center/locus?id=59575">umc161a</a></td>
+       <td><a href="/data_center/marker/44599">p-umc161</a></td>
+       <td>genomic</td>
+       <td>700</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=AY771212">AY771212</a></td>
+       <td>283259156</td>
+      </tr>
+      <tr>
+       <td>1.12</td>
+       <td><a href="/data_center/locus?id=24381">bnl6.32</a></td>
+       <td><a href="/data_center/marker/44167">p-bnl6.32</a></td>
+       <td>genomic</td><td>2250</td><td>PstI</td>
+       <td><a href="/data_center/sequence?id=G10770">G10770</a></td>
+       <td>298039872</td>
+      </tr>
+      <tr>
+       <td colspan=10>&nbsp;</td>
+      </tr>
+      <tr>
+       <td colspan=10><img src="/images/chr1_bin_v3.png"></img>
+        <br>
+        <a href="http://ftp.maizegdb.org/cbm/chr1_cbm.txt">
+         Download all the core bin marker sequences for Chromosome 1
+        </a>
+       </td>
+      </tr>
+      </tbody>
+      <tbody id="chr2" style="display: none;">
+      <tr>
+       <td><b><u>Bin</u></b></td>
+       <td><b><u>Core Bin Marker</u></b></td>
+       <td><b>Molecular <br><u>Marker/Probe</u></b></td>
+       <td><b><u>Type</u></b></td>
+       <td><b><u>Insert</u></b></td>
+       <td><b><u>Enzyme(s\)</u></b></td>
+       <td><b>Full Length <br><u>Insert Sequence</u></b></td>
+       <td><b>B73 RefGen_v3 <br><u>Start Position</u></b></td>
+      </tr>
+      <tr>
+       <td>2.00</td>
+       <td colspan=6>&nbsp;</td>
+       <td>1</td>
+       <td>&nbsp;</td>
+      </tr>
+      <tr>
+       <td>2.01</td>
+       <td><a href="/data_center/locus?id=40717">bnl8.45a</a></td>
+       <td><a href="/data_center/marker/44202">p-bnl8.45</a></td>
+       <td>genomic</td>
+       <td>2100</td>
+       <td>PstI</td>
+       <td>&nbsp;</td>
+       <td>1553915</td>
+      </tr>
+      <tr>
+       <td>2.02</td>
+       <td><a href="/data_center/locus?id=41487">umc53a</a></td>
+       <td><a href="/data_center/marker/44516">p-umc53</a></td>
+       <td>genomic</td>
+       <td>640</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=AY771214">AY771214</a></td>
+       <td>4193254</td>
+      </tr> 
+      <tr>
+       <td>2.03</td>
+       <td><a href="/data_center/locus?id=41498">umc6a</a></td>
+       <td><a href="/data_center/marker/44532">p-umc6</a></td>
+       <td>genomic</td>
+       <td>590</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=AY771213">AY771213</a></td>
+       <td>15016290</td>
+      </tr>
+      <tr>
+       <td>2.04</td>
+       <td><a href="/data_center/locus?id=41461">umc34</a></td>
+       <td><a href="/data_center/marker/44512">p-umc34</a></td>
+       <td>genomic</td>
+       <td>970</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ001866">DQ001866</a></td>
+       <td>28771109</td>
+      </tr>
+      <tr>
+       <td>2.05</td>
+       <td><a href="/data_center/locus?id=41400">umc131</a></td>
+       <td><a href="/data_center/marker/44574">p-umc131</a></td>
+       <td>genomic</td>
+       <td>810</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=AY771215">AY771215</a></td>
+       <td>71742767</td>
+      </tr>
+      <tr>
+       <td>2.06</td>
+       <td><a href="/data_center/locus?id=97271">umc255a</a></td>
+       <td><a href="/data_center/marker/86233">p-umc255</a></td>
+       <td>genomic</td>
+       <td>1050</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ123893">DQ123893</a></td>
+       <td>153140073</td>
+      </tr>
+      <tr>
+       <td>2.07</td>
+       <td><a href="/data_center/locus?id=41496">umc5a</a></td>
+       <td><a href="/data_center/marker/44595">p-umc5</a></td>
+       <td>genomic</td>
+       <td>850</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=AY771216">AY771216</a></td>
+       <td bgcolor="red" >
+        <font color='white'>
+         The full length sequence for umc5 (AY771216\) goes to an incorrect
+         location on Chromosome 7.  The alternate CBM umc1108 replaces umc5. 
+        </font>
+       </td>
+      </tr>
+      <tr bgcolor="yellow">
+       <td>2.07</td>
+       <td><a href="/data_center/locus?id=41496">umc1108</a></td>
+       <td><a href="/data_center/marker/234912">p-umc1108</a></td>
+       <td>SSR</td>
+       <td>NA</td>
+       <td>NA</td>
+       <td>NA</td>
+       <td>187179001</td>
+      </tr>
+      <tr>
+       <td>2.08</td>
+       <td><a href="/data_center/locus?id=97276">asg20</a></td>
+       <td><a href="/data_center/marker/86505">p-asg20</a></td>
+       <td>genomic</td><td>550</td><td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ123894">DQ123894</a></td>
+       <td>204896812</td>
+      </tr>
+      <tr>
+       <td>2.09</td>
+       <td><a href="/data_center/locus?id=41481">umc49a</a></td>
+       <td><a href="/data_center/marker/44486">p-umc49</a></td>
+       <td>genomic</td>
+       <td>630</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ123895">DQ123895</a></td>
+       <td>223320002</td>
+      </tr>
+      <tr>
+       <td>2.10</td>
+       <td><a href="/data_center/locus?id=41133">php20581b(tb\)</a></td>
+       <td><a href="/data_center/marker/44735">p-php20581</a></td>
+       <td>genomic</td>
+       <td>1400</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=EU190456">EU190456</a></td>
+       <td>235471439</td>
+      </tr>
+      <tr>
+       <td colspan=10>&nbsp;</td>
+      </tr>
+      <tr>
+       <td colspan=10>
+        <img src="/images/chr2_bin_v3.png"></img>
+        <br>
+        <a href="http://ftp.maizegdb.org/cbm/chr2_cbm.txt">
+         Download all the core bin marker sequences for Chromosome 2
+        </a>
+       </td>
+      </tr>
+      </tbody>
+      <tbody id="chr3" style="display: none;">
+      <tr>
+       <td><b><u>Bin</u></b></td>
+       <td><b><u>Core Bin Marker</u></b></td>
+       <td><b>Molecular <br><u>Marker/Probe</u></b></td>
+       <td><b><u>Type</u></b></td>
+       <td><b><u>Insert</u></b></td>
+       <td><b><u>Enzyme(s\)</u></b></td>
+       <td><b>Full Length <br><u>Insert Sequence</u></b></td>
+       <td><b>B73 RefGen_v3 <br><u>Start Position</u></b></td>
+      </tr>
+      <tr>
+       <td>3.00</td>
+       <td colspan=6>&nbsp;</td>
+       <td>1</td>
+       <td>&nbsp;</td>
+      </tr>
+      <tr>
+       <td>3.01</td>
+       <td><a href="/data_center/locus?id=41458">umc32a</a></td>
+       <td><a href="/data_center/marker/44508">p-umc32</a></td>
+       <td>genomic</td>
+       <td>990</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ001867">DQ001867</a></td>
+       <td>1729270</td>
+      </tr>
+      <tr>
+       <td>3.02</td>
+       <td><a href="/data_center/locus?id=66779">csu32</a></td>
+       <td><a href="/data_center/marker/58166">p-csu32</a></td>
+       <td>genomic</td>
+       <td>500</td>
+       <td>EcoRI/XhoI</td>
+       <td><a href="/data_center/sequence?id=DQ123896">DQ123896</a></td>
+       <td>3888331</td>
+      </tr>
+      <tr>
+       <td>3.03</td>
+       <td><a href="/data_center/locus?id=97284">asg24(gts\)</a></td>
+       <td><a href="/data_center/marker/86509">p-asg24</a></td>
+       <td>genomic</td>
+       <td>550</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=G10753">G10753</a></td>
+       <td>8599890</td>
+      </tr>
+      <tr>
+       <td>3.04</td>
+       <td><a href="/data_center/locus?id=97287">asg48</a></td>
+       <td><a href="/data_center/marker/86535">p-asg48</a></td>
+       <td>genomic</td>
+       <td>1600</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ001868">DQ001868</a></td>
+       <td>13109892</td>
+      </tr>
+      <tr>
+       <td>3.05</td>
+       <td><a href="/data_center/locus?id=41362">umc102</a></td>
+       <td><a href="/data_center/marker/44552">p-umc102</a></td>
+       <td>genomic</td>
+       <td>1010</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ005498">DQ005498</a></td>
+       <td>126255823</td>
+      </tr>
+      <tr>
+       <td>3.06</td>
+       <td><a href="/data_center/locus?id=40659">bnl5.37a</a></td>
+       <td><a href="/data_center/marker/44149">p-bnl5.37</a></td>
+       <td>genomic</td>
+       <td>2300</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=G10767">G10767</a></td>
+       <td>168409685</td>
+      </tr>
+      <tr>
+       <td>3.07</td>
+       <td><a href="/data_center/locus?id=40668">bnl6.16a</a></td>
+       <td><a href="/data_center/marker/44161">p-bnl6.16</a></td>
+       <td>genomic</td>
+       <td>2450</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=G10768">G10768</a></td>
+       <td>191113733</td>
+      </tr>
+      <tr>
+       <td>3.08</td>
+       <td><a href="/data_center/locus?id=41438">umc17a</a></td>
+       <td><a href="/data_center/marker/44587">p-umc17</a></td>
+       <td>genomic</td>
+       <td>850</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=AY771218">AY771218</a></td>
+       <td>205370271</td>
+      </tr>
+      <tr>
+       <td>3.09</td>
+       <td><a href="/data_center/locus?id=41502">umc63a</a></td>
+       <td><a href="/data_center/marker/44528">p-umc63</a></td>
+       <td>genomic</td>
+       <td>620</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ123897">DQ123897</a></td>
+       <td>215869148</td>
+      </tr>
+      <tr>
+       <td>3.10</td>
+       <td><a href="/data_center/locus?id=57310">cyp1</a></td>
+       <td><a href="/data_center/marker/58190">p-csu25</a></td>
+       <td>cDNA</td>
+       <td>1100</td>
+       <td>EcoRI/XhoI</td>
+       <td><a href="/data_center/sequence?id=DQ005499">DQ005499</a></td>
+       <td>232162781</td>
+      </tr>
+      <tr><td colspan=10>&nbsp;</td></tr>
+      <tr>
+       <td colspan=10>
+        <img src="/images/chr3_bin_v3.png"></img>
+        <br>
+        <a href="http://ftp.maizegdb.org/cbm/chr3_cbm.txt">
+         Download all the core bin marker sequences for Chromosome 3
+        </a>
+       </td>
+      </tr>
+      </tbody>
+      <tbody id="chr4" style="display: none;">
+      <tr>
+       <td><b><u>Bin</u></b></td>
+       <td><b><u>Core Bin Marker</u></b></td>
+       <td><b>Molecular <br><u>Marker/Probe</u></b></td>
+       <td><b><u>Type</u></b></td>
+       <td><b><u>Insert</u></b></td>
+       <td><b><u>Enzyme(s\)</u></b></td>
+       <td><b>Full Length <br><u>Insert Sequence</u></b></td>
+       <td><b>B73 RefGen_v3 <br><u>Start Position</u></b></td>
+      </tr>
+      <tr>
+       <td>4.00</td>
+       <td colspan=6>&nbsp;</td>
+       <td>1</td>
+       <td>&nbsp;</td>
+      </tr>
+      <tr>
+       <td>4.01</td>
+       <td><a href="/data_center/locus?id=rca1">rca1</a></td>
+       <td>&nbsp;</td>
+       <td>PCR, cDNA </td>
+       <td>NA</td>
+       <td>NA</td>
+       <td><a href="/data_center/sequence?id=AF084478">AF084478</a></td>
+       <td>694004</td>
+      </tr>
+      <tr>
+       <td>4.02</td>
+       <td><a href="/data_center/locus?id=41141">php20725a</a></td>
+       <td><a href="/data_center/marker/44742">p-php20725</a></td>
+       <td>genomic</td>
+       <td>1650</td>
+       <td>PstI</td>
+       <td><a href="/data_center/marker?id=44742">php20725</a></td>
+       <td>5045991</td>
+      </tr>
+      <tr>
+       <td>4.03</td>
+       <td><a href="/data_center/locus?id=41456">umc31a</a></td>
+       <td><a href="/data_center/marker/44507">p-umc31</a></td>
+       <td>genomic</td>
+       <td>550</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ123898">DQ123898</a></td>
+       <td>11403953</td>
+      </tr>
+      <tr>
+       <td>4.04</td>
+       <td><a href="/data_center/locus?id=40975">npi386(eks\)</a></td>
+       <td><a href="/data_center/marker/44340">p-npi386</a></td>
+       <td>genomic</td>
+       <td>1200</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ007988">DQ007988</a></td>
+       <td>21605708</td>
+      </tr>
+      <tr>
+       <td>4.05</td>
+       <td><a href="/data_center/locus?id=115186">agrr37b</a></td>
+       <td><a href="/data_center/marker/86464">p-agrr37</a></td>
+       <td>cDNA</td>
+       <td>949</td>
+       <td>EcoRI/HindIII</td>
+       <td>&nbsp;</td>
+       <td bgcolor="red">
+        <font color='white'>
+         agrr37b maps to an incorrect location.  umc1969 replaces agrr37b. 
+        </font>
+       </td>
+      </tr>
+      <tr bgcolor="yellow">
+       <td>4.05</td>
+       <td><a href="/data_center/locus?id=301947">umc1969</a></td>
+       <td><a href="/data_center/ssr?id=301421">p-umc1969</a></td>
+       <td>SSR</td>
+       <td>NA</td>
+       <td>NA</td>
+       <td>NA</td>
+       <td>32280422</td>
+      </tr>
+      <tr>
+       <td>4.06</td>
+       <td><a href="/data_center/locus?id=41420">umc156a</a></td>
+       <td><a href="/data_center/marker/44683">p-umc156</a></td>
+       <td>genomic</td>
+       <td>570</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=AY771219">AY771219</a></td>
+       <td>151110020</td>
+      </tr>
+      <tr>
+       <td>4.07</td>
+       <td><a href="/data_center/locus?id=41505">umc66a(lcr\)</a></td>
+       <td><a href="/data_center/marker/44558">p-umc66</a></td>
+       <td>genomic</td>
+       <td>1020</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ007989">DQ007989</a></td>
+       <td>171066103</td>
+      </tr>
+      <tr>
+       <td>4.08</td>
+       <td><a href="/data_center/locus?id=95730">umc127c</a></td>
+       <td><a href="/data_center/marker/44572">p-umc127</a></td>
+       <td>genomic</td>
+       <td>1210</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ642433">DQ642433</a></td>
+       <td>179834540</td>
+      </tr>
+      <tr>
+       <td>4.09</td>
+       <td><a href="/data_center/locus?id=41486">umc52</a></td>
+       <td><a href="/data_center/marker/44505">p-umc52</a></td>
+       <td>genomic</td>
+       <td>1500</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ123899">DQ123899</a></td>
+       <td>205136045</td>
+      </tr>
+      <tr>
+       <td>4.10</td>
+       <td><a href="/data_center/locus?id=57339">php20608a</a></td>
+       <td><a href="/data_center/marker/57339">p-php20608</a></td>
+       <td>genomic</td>
+       <td>780</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ007990">DQ007990</a></td>
+       <td>237246237</td>
+      </tr>
+      <tr>
+       <td>4.11</td>
+       <td><a href="/data_center/locus?id=57341">umc169</a></td>
+       <td><a href="/data_center/marker/58396">p-umc169</a></td>
+       <td>genomic</td>
+       <td>670</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ123900">DQ123900</a></td>
+       <td>239987981</td>
+      </tr>
+      <tr><td colspan=10>&nbsp;</td></tr>
+      <tr>
+       <td colspan=10>
+        <img src="/images/chr4_bin_v3.png"></img>
+        <br>
+        <a href="http://ftp.maizegdb.org/cbm/chr4_cbm.txt">
+         Download all the core bin marker sequences for Chromosome 4
+        </a>
+       </td>
+      </tr>
+      </tbody>
+      <tbody id="chr5" style="display: none;">
+      <tr>
+       <td><b><u>Bin</u></b></td>
+       <td><b><u>Core Bin Marker</u></b></td>
+       <td><b>Molecular <br><u>Marker/Probe</u></b></td>
+       <td><b><u>Type</u></b></td>
+       <td><b><u>Insert</u></b></td>
+       <td><b><u>Enzyme(s\)</u></b></td>
+       <td><b>Full Length <br><u>Insert Sequence</u></b></td>
+       <td><b>B73 RefGen_v3 <br><u>Start Position</u></b></td>
+      </tr>
+      <tr>
+       <td>5.00</td>
+       <td colspan=6>&nbsp;</td>
+       <td>1</td>
+       <td>&nbsp;</td>
+      </tr>
+      <tr>
+       <td>5.01</td>
+       <td><a href="/data_center/locus?id=40989">npi409</a></td>
+       <td><a href="/data_center/marker/44336">p-npi409</a></td>
+       <td>genomic</td>
+       <td>710</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=G10788">G10788</a></td>
+       <td>3324163</td>
+      </tr>
+      <tr>
+       <td>5.02</td>
+       <td><a href="/data_center/locus?id=41529">umc90</a></td>
+       <td><a href="/data_center/marker/44588">p-umc90</a></td>
+       <td>genomic</td>
+       <td>1240</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ642434">DQ642434</a></td>
+       <td>8008060</td>
+      </tr>
+      <tr>
+       <td>5.03</td>
+       <td><a href="/data_center/locus?id=56925">tub4</a></td>
+       <td><a href="/data_center/marker/98225">p-tub4</a></td>
+       <td>cDNA</td>
+       <td>200</td>
+       <td>EcoRI/HindIII</td>
+       <td><a href="/data_center/sequence?id=DQ007991">DQ007991</a></td>
+       <td>14870573</td>
+      </tr>
+      <tr>
+       <td>5.04</td>
+       <td><a href="/data_center/locus?id=40650">bnl4.36</a></td>
+       <td><a href="/data_center/marker/44139">p-bnl4.36</a></td>
+       <td>genomic</td>
+       <td>2300</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ642435">DQ642435</a></td>
+       <td>80841383</td>
+      </tr>
+      <tr>
+       <td>5.05</td>
+       <td><a href="/data_center/locus?id=pco131924a">pco131924a</a></td>
+       <td>&nbsp;</td>
+       <td>PCR, cDNA </td>
+       <td>NA</td>
+       <td>NA</td>
+       <td><a href="/data_center/sequence?id=BV129186">BV129186</a></td>
+       <td>172438770</td>
+      </tr>
+      <tr>
+       <td>5.06</td>
+       <td><a href="/data_center/locus?id=41392">umc126a</a></td>
+       <td><a href="/data_center/marker/44571">p-umc126</a></td>
+       <td>genomic</td>
+       <td>670</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=AY771220">AY771220</a></td>
+       <td>195358319</td>
+      </tr>
+      <tr>
+       <td>5.07</td>
+       <td><a href="/data_center/locus?id=41372">umc108</a></td>
+       <td><a href="/data_center/marker/44537">p-umc108</a></td>
+       <td>genomic</td>
+       <td>970</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ642436">DQ642436</a></td>
+       <td>204659857</td>
+      </tr>
+      <tr>
+       <td>5.08</td>
+       <td><a href="/data_center/locus?id=40656">bnl5.24a</a></td>
+       <td><a href="/data_center/marker/44146">p-bnl5.24</a></td>
+       <td>genomic</td>
+       <td>2500</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=G10764">G10764</a></td>
+       <td>211775643</td>
+      </tr>
+      <tr>
+       <td>5.09</td>
+       <td><a href="/data_center/locus?id=41120">php10017</a></td>
+       <td><a href="/data_center/marker/44725">p-php10017</a></td>
+       <td>genomic</td>
+       <td>470</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=AY771221">AY771221</a></td>
+       <td>215521293</td>
+      </tr>
+      <tr><td colspan=10>&nbsp;</td></tr>
+      <tr>
+       <td colspan=10>
+        <img src="/images/chr5_bin_v3.png">
+        <br>
+        <a href="http://ftp.maizegdb.org/cbm/chr5_cbm.txt">
+          Download all the core bin marker sequences for Chromosome 5
+        </a>
+       </td>
+      </tr>
+      <tr><td colspan=10>&nbsp;</td></tr>
+      </tbody>
+      <tbody id="chr6" style="display: none;">
+      <tr>
+       <td><b><u>Bin</u></b></td>
+       <td><b><u>Core Bin Marker</u></b></td>
+       <td><b>Molecular <br><u>Marker/Probe</u></b></td>
+       <td><b><u>Type</u></b></td>
+       <td><b><u>Insert</u></b></td>
+       <td><b><u>Enzyme(s\)</u></b></td>
+       <td><b>Full Length <br><u>Insert Sequence</u></b></td>
+       <td><b>B73 RefGen_v3 <br><u>Start Position</u></b></td>
+      </tr>
+      <tr>
+       <td>6.00</td>
+       <td colspan=6>&nbsp;</td>
+       <td>1</td><td>&nbsp;</td>
+      </tr>
+      <tr>
+       <td>6.01</td>
+       <td><a href="/data_center/locus?id=41520">umc85a</a></td>
+       <td><a href="/data_center/marker/44491">p-umc85</a></td>
+       <td>genomic</td>
+       <td>600</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=AY772450">AY772450</a></td>
+       <td>8276813</td>
+      </tr>
+      <tr>
+       <td>6.02</td>
+       <td><a href="/data_center/locus?id=1200417">TIDP2982</a></td>
+       <td><a href="/data_center/marker?id=1188600">TIDP2982</a></td>
+       <td>InDel</td>
+       <td>NA</td>
+       <td>NA</td>
+       <td>NA</td>
+       <td>86946680</td>
+      </tr>
+      <tr>
+       <td>6.03</td>
+       <td><a href="/data_center/locus?id=40977">npi393</a></td>
+       <td><a href="/data_center/marker/44383">p-G23A-06</a></td>
+       <td>genomic</td>
+       <td>1200</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ015674">DQ015674</a></td>
+       <td>96840186</td>
+      </tr>
+      <tr>
+       <td>6.04</td>
+       <td><a href="/data_center/locus?id=41504">umc65a</a></td>
+       <td><a href="/data_center/marker/44578">p-umc65</a></td>
+       <td>genomic</td>
+       <td>650</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=AY772451">AY772451</a></td>
+       <td>104619429</td>
+      </tr>
+      <tr>
+       <td>6.05</td>
+       <td><a href="/data_center/locus?id=41444">umc21</a></td>
+       <td><a href="/data_center/marker/44499">p-umc21</a></td>
+       <td>genomic</td><td>1050</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ123901">DQ123901</a></td>
+       <td>121033444</td>
+      </tr>
+      <tr>
+       <td>6.06</td>
+       <td><a href="/data_center/locus?id=41466">umc38a</a></td>
+       <td><a href="/data_center/marker/44493">p-umc38</a></td>
+       <td>genomic</td>
+       <td>1010</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ059316">DQ059316</a></td>
+       <td>153956114</td>
+      </tr>
+      <tr>
+       <td>6.07</td>
+       <td><a href="/data_center/locus?id=41401">umc132a(chk\)</a></td>
+       <td><a href="/data_center/marker/44590">p-umc132</a></td>
+       <td>genomic</td>
+       <td>500</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ123902">DQ123902</a></td>
+       <td>161325348</td>
+      </tr>
+      <tr>
+       <td>6.08</td>
+       <td><a href="/data_center/locus?id=97359">asg7a</a></td>
+       <td><a href="/data_center/marker/86562">p-asg7</a></td>
+       <td>genomic</td>
+       <td>550</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ642437">DQ642437</a></td>
+       <td>167092650</td>
+      </tr>
+      <tr><td colspan=10>&nbsp;</td></tr>
+      <tr>
+       <td colspan=10>
+        <img src="/images/chr6_bin_v3.png">
+        <br>
+        <a href="http://ftp.maizegdb.org/cbm/chr6_cbm.txt">
+         Download all the core bin marker sequences for Chromosome 6
+        </a>
+       </td>
+      </tr>
+      <tr><td colspan=10>&nbsp;</td></tr>
+      </tbody>
+      <tbody id="chr7" style="display: none;">
+      <tr>
+       <td><b><u>Bin</u></b></td>
+       <td><b><u>Core Bin Marker</u></b></td>
+       <td><b>Molecular <br><u>Marker/Probe</u></b></td>
+       <td><b><u>Type</u></b></td>
+       <td><b><u>Insert</u></b></td>
+       <td><b><u>Enzyme(s\)</u></b></td>
+       <td><b>Full Length <br><u>Insert Sequence</u></b></td>
+       <td><b>B73 RefGen_v3 <br><u>Start Position</u></b></td>
+      </tr>
+      <tr>
+       <td>7.00</td>
+       <td colspan=6>&nbsp;</td>
+       <td>1</td>
+       <td>&nbsp;</td>
+      </tr>
+      <tr>
+       <td>7.01</td>
+       <td><a href="/data_center/locus?id=97374">asg8(myb\)</a></td>
+       <td><a href="/data_center/marker/86573">p-asg8</a></td>
+       <td>genomic</td>
+       <td>500</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ642438">DQ642438</a></td>
+       <td>4712353</td>
+      </tr>
+      <tr>
+       <td>7.02</td>
+       <td><a href="/data_center/locus?id=60295">asg34a(msd\)</a></td>
+       <td><a href="/data_center/marker/86520">p-asg34</a></td>
+       <td>genomic</td>
+       <td>1350</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=G10755">G10755</a></td>
+       <td>13861507</td>
+      </tr>
+      <tr>
+       <td>7.03</td>
+       <td><a href="/data_center/locus?id=97371">asg49</a></td>
+       <td><a href="/data_center/marker/86536">p-asg49</a></td>
+       <td>genomic</td>
+       <td>400</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ059317">DQ059317</a></td>
+       <td>128175453</td>
+      </tr>
+      <tr>
+       <td>7.04</td>
+       <td><a href="/data_center/locus?id=97369">umc254</a></td>
+       <td><a href="/data_center/marker/86232">p-umc254</a></td>
+       <td>genomic</td>
+       <td>1050</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=EU190457">EU190457</a></td>
+       <td>156050470</td>
+      </tr>
+      <tr>
+       <td>7.05</td>
+       <td><a href="/data_center/locus?id=97361">umc245</a></td>
+       <td><a href="/data_center/marker/86222">p-umc245</a></td>
+       <td>genomic</td>
+       <td>700</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=AY772452">AY772452</a></td>
+       <td>168334968</td>
+      </tr>
+      <tr>
+       <td>7.06</td>
+       <td><a href="/data_center/locus?id=41437">umc168</a></td>
+       <td><a href="/data_center/marker/44555">p-umc168</a></td>
+       <td>genomic</td>
+       <td>1080</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ059318">DQ059318</a></td>
+       <td>174407842</td>
+      </tr>
+      <tr><td colspan=10>&nbsp;</td></tr>
+      <tr>
+       <td colspan=10>
+        <img src="/images/chr7_bin_v3.png">
+        <br>
+        <a href="http://ftp.maizegdb.org/cbm/chr7_cbm.txt">
+         Download all the core bin marker sequences for Chromosome 7
+        </a>
+       </td>
+      </tr>
+      </tbody>
+      <tbody id="chr8" style="display: none;">
+      <tr>
+       <td><b><u>Bin</u></b></td>
+       <td><b><u>Core Bin Marker</u></b></td>
+       <td><b>Molecular <br><u>Marker/Probe</u></b></td>
+       <td><b><u>Type</u></b></td>
+       <td><b><u>Insert</u></b></td>
+       <td><b><u>Enzyme(s\)</u></b></td>
+       <td><b>Full Length <br><u>Insert Sequence</u></b></td>
+       <td><b>B73 RefGen_v3 <br><u>Start Position</u></b></td>
+      </tr>
+      <tr>
+       <td>8.00</td>
+       <td colspan=6>&nbsp;</td>
+       <td>1</td>
+       <td>&nbsp;</td>
+      </tr>
+      <tr>
+       <td>8.01</td>
+       <td><a href="/data_center/locus?id=40864">npi220a</a></td>
+       <td><a href="/data_center/marker/44275">p-G10F-01</a></td>
+       <td>genomic</td>
+       <td>400</td>
+       <td>HindIII</td>
+       <td><a href="/data_center/sequence?id=DQ059319">DQ059319</a></td>
+       <td>1831964</td>
+      </tr>
+      <tr>
+       <td>8.02</td>
+       <td><a href="/data_center/locus?id=40721">bnl9.11a(lts\)</a></td>
+       <td><a href="/data_center/marker/44205">p-bnl9.11</a></td>
+       <td>genomic</td>
+       <td>2400</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=G10779">G10779</a></td>
+       <td>10072434</td>
+      </tr>
+      <tr>
+       <td>8.03</td>
+       <td><a href="/data_center/locus?id=41389">umc124a(chk\)</a></td>
+       <td><a href="/data_center/marker/44569">p-umc124</a></td>
+       <td>genomic</td>
+       <td>1160</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ059320">DQ059320</a></td>
+       <td>21153183</td>
+      </tr>
+      <tr>
+       <td>8.04</td>
+       <td><a href="/data_center/locus?id=rip1">rip1</a></td>
+       <td>&nbsp;</td>
+       <td>cDNA </td>
+       <td>NA</td>
+       <td>NA</td>
+       <td><a href="/data_center/sequence?id=X70154">X70154</a></td>
+       <td>108690693</td>
+      </tr>
+      <tr>
+       <td>8.05</td>
+       <td><a href="/data_center/locus?id=301890">rop7</a></td>
+       <td>&nbsp;</td>
+       <td>cDNA </td>
+       <td>NA</td>
+       <td>NA</td>
+       <td><a href="/data_center/sequence?id=AJ278664">AJ278664</a></td>
+       <td>122478285</td>
+      </tr>
+      <tr>
+       <td>8.06</td>
+       <td><a href="/data_center/locus?id=57407">csu31a</a></td>
+       <td><a href="/data_center/marker/58318">p-csu31</a></td>
+       <td>cDNA</td>
+       <td>800</td>
+       <td>EcoRI/XhoI</td>
+       <td><a href="/data_center/sequence?id=T12667">T12667</a></td>
+       <td>146426603</td>
+      </tr>
+      <tr>
+       <td>8.07</td>
+       <td><a href="/data_center/locus?id=40907">npi268a</a></td>
+       <td><a href="/data_center/marker/44318">p-npi268</a></td>
+       <td>genomic</td>
+       <td>710</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ123903">DQ123903</a></td>
+       <td>165267974</td>
+      </tr>
+      <tr>
+       <td>8.08</td>
+       <td><a href="/data_center/locus?id=40994">npi414a</a></td>
+       <td><a href="/data_center/marker/44349">p-npi414</a></td>
+       <td>genomic</td>
+       <td>870</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=AY772453">AY772453</a></td>
+       <td>169336170</td>
+      </tr>
+      <tr>
+       <td>8.09</td>
+       <td><a href="/data_center/locus?id=86727">agrr21</a></td>
+       <td><a href="/data_center/marker/86424">p-agrr21</a></td>
+       <td>cDNA</td>
+       <td>899</td>
+       <td>EcoRI/HindIII</td>
+       <td><a href="/data_center/sequence?id=AY110127">AY110127</a></td>
+       <td>172961960</td>
+      </tr>
+      <tr><td colspan=10>&nbsp;</td></tr>
+      <tr>
+       <td colspan=10>
+        <img src="/images/chr8_bin_v3.png">
+        <br>
+        <a href="http://ftp.maizegdb.org/cbm/chr8_cbm.txt">
+         Download all the core bin marker sequences for Chromosome 8
+        </a>
+       </td>
+      </tr>
+      </tbody>
+      <tbody id="chr9" style="display: none;">
+      <tr>
+       <td><b><u>Bin</u></b></td>
+       <td><b><u>Core Bin Marker</u></b></td>
+       <td><b>Molecular <br><u>Marker/Probe</u></b></td>
+       <td><b><u>Type</u></b></td>
+       <td><b><u>Insert</u></b></td>
+       <td><b><u>Enzyme(s\)</u></b></td>
+       <td><b>Full Length <br><u>Insert Sequence</u></b></td>
+       <td><b>B73 RefGen_v3 <br><u>Start Position</u></b></td>
+      </tr>
+      <tr>
+       <td>9.00</td>
+       <td colspan=6>&nbsp;</td>
+       <td>1</td>
+       <td>&nbsp;</td>
+      </tr>
+      <tr>
+       <td>9.01</td>
+       <td><a href="/data_center/locus?id=41373">umc109</a></td>
+       <td><a href="/data_center/marker/44543">p-umc109</a></td>
+       <td>genomic</td>
+       <td>840</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=AY772454">AY772454</a></td>
+       <td>3312268</td>
+      </tr>
+      <tr>
+       <td>9.02</td>
+       <td><a href="/data_center/locus?id=12098">bz1</a></td>
+       <td><a href="/data_center/marker/98774">p-umc192</a></td>
+       <td>cDNA</td>
+       <td>1750</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=X07937">X07937</a></td>
+       <td>11781894</td>
+      </tr>
+      <tr>
+       <td>9.03</td>
+       <td><a href="/data_center/locus?id=12768">wx1</a></td>
+       <td><a href="/data_center/marker/58412">p-umc25</a></td>
+       <td>cDNA</td>
+       <td>2300</td>
+       <td>EcoRI</td>
+       <td><a href="/data_center/sequence?id=AY109531">AY109531</a></td>
+       <td>23268159</td>
+      </tr>
+      <tr>
+       <td>9.04</td>
+       <td><a href="/data_center/locus?id=66774">csu147</a></td>
+       <td><a href="/data_center/marker/58334">p-csu147</a></td>
+       <td>cDNA</td>
+       <td>800</td>
+       <td>EcoRI/XhoI</td>
+       <td><a href="/data_center/sequence?id=T12740">T12740</a></td>
+       <td>101747879</td>
+      </tr>
+      <tr>
+       <td>9.05</td>
+       <td><a href="/data_center/locus?id=41535">umc95</a></td>
+       <td><a href="/data_center/marker/44589">p-umc95</a></td>
+       <td>genomic</td>
+       <td>680</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=AY772455">AY772455</a></td>
+       <td>127192550</td>
+      </tr>
+      <tr>
+       <td>9.06</td>
+       <td><a href="/data_center/locus?id=57218">csu61a</a></td>
+       <td><a href="/data_center/marker/58027">p-csu61</a></td>
+       <td>cDNA</td>
+       <td>500</td>
+       <td>EcoRI/XhoI</td>
+       <td>&nbsp;</td>
+       <td bgcolor="red">
+        <font color='white'>csu61a maps to chromosome1.  csu634 replaces this CBM.</font>
+       </td>
+      </tr>
+      <tr bgcolor="yellow">
+       <td>9.06</td>
+       <td><a href="/data_center/locus?id=csu634">csu634</a></td>
+       <td>&nbsp;</td>
+       <td>PCR, cDNA </td>
+       <td>NA</td>
+       <td>NA</td>
+       <td><a href="/data_center/sequence?id=AA054810">AA054810</a></td>
+       <td>136806801</td>
+      </tr>
+      <tr>
+       <td>9.07</td>
+       <td><a href="/data_center/locus?id=97409">asg12</a></td>
+       <td><a href="/data_center/marker/86494">p-asg12</a></td>
+       <td>genomic</td>
+       <td>700</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ123904">DQ123904</a></td>
+       <td>148241346</td>
+      </tr>
+      <tr>
+       <td>9.08</td>
+       <td><a href="/data_center/locus?id=66765">csu54b</a></td>
+       <td><a href="/data_center/marker/58358">p-csu54</a></td>
+       <td>cDNA</td>
+       <td>1400</td>
+       <td>EcoRI/XhoI</td>
+       <td><a href="/data_center/sequence?id=T12684">T12684</a></td>
+       <td>154869700</td>
+      </tr>
+      <tr><td colspan=10>&nbsp;</td></tr>
+      <tr>
+       <td colspan=10>
+        <img src="/images/chr9_bin_v3.png">
+        <br>
+        <a href="http://ftp.maizegdb.org/cbm/chr9_cbm.txt">
+         Download all the core bin marker sequences for Chromosome 9
+        </a>
+       </td>
+      </tr>
+      </tbody>
+      <tbody id="chr10" style="display: none;">
+      <tr>
+       <td><b><u>Bin</u></b></td>
+       <td><b><u>Core Bin Marker</u></b></td>
+       <td><b>Molecular <br><u>Marker/Probe</u></b></td>
+       <td><b><u>Type</u></b></td>
+       <td><b><u>Insert</u></b></td>
+       <td><b><u>Enzyme(s\)</u></b></td>
+       <td><b>Full Length <br><u>Insert Sequence</u></b></td>
+       <td><b>B73 RefGen_v3 <br><u>Start Position</u></b></td>
+      </tr>
+      <tr>
+       <td>10.00</td>
+       <td colspan=6>&nbsp;</td>
+       <td>1</td>
+       <td>&nbsp;</td>
+      </tr>
+      <tr>
+       <td>10.01</td>
+       <td><a href="/data_center/locus?id=57434">php20075a(gast\)</a></td>
+       <td><a href="/data_center/marker/44729">p-php20075</a></td>
+       <td>genomic</td>
+       <td>1400</td>
+       <td>PstI</td>
+       </td>
+       <td><a href="/data_center/sequence?id=DQ059321">DQ059321</a></td>
+       <td>2650397</td>
+      </tr>
+      <tr>
+       <td>10.02</td>
+       <td><a href="/data_center/locus?id=40923">npi285a(cac\)</a></td>
+       <td><a href="/data_center/marker/44339">p-npi285</a></td>
+       <td>genomic</td>
+       <td>1250</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=G10784">G10784</a></td>
+       <td>5008368</td>
+      </tr>
+      <tr>
+       <td>10.03</td>
+       <td><a href="/data_center/locus?id=41399">umc130</a></td>
+       <td><a href="/data_center/marker/44593">p-umc130</a></td>
+       <td>genomic</td>
+       <td>640</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ059322">DQ059322</a></td>
+       <td>13559627</td>
+      </tr>
+      <tr>
+       <td>10.04</td>
+       <td><a href="/data_center/locus?id=41503">umc64a</a></td>
+       <td><a href="/data_center/marker/44577">p-umc64</a></td>
+       <td>genomic</td>
+       <td>710</td>
+       <td>PstI</td>
+       <td>&nbsp;</td>
+       <td bgcolor="red">
+        <font color='white'>
+         umc64a could not be located to chr10
+         <br>
+         Alternative CBM: see next row.
+        </font>
+       </td>
+      </tr>
+      <tr bgcolor="yellow">
+       <td>10.04</td>
+       <td><a href="/data_center/locus?id=1199135">IDP5927</a></td>
+       <td><a href="/data_center/marker?id=942491">IDP5927</a></td>
+       <td>InDel</td>
+       <td>NA</td>
+       <td>NA</td>
+       <td><a href="/data_center/sequence?id=IDP5927">IDP5927</a></td>
+       <td>88348445</td>
+      </tr>
+      <tr>
+       <td>10.05</td>
+       <td><a href="/data_center/locus?id=97418">umc259a</a></td>
+       <td><a href="/data_center/marker/86237">p-umc259</a></td>
+       <td>genomic</td>
+       <td>550</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=DQ123905">DQ123905</a></td>
+       <td>127958713</td>
+      </tr>
+      <tr>
+       <td>10.06</td>
+       <td><a href="/data_center/locus?id=41475">umc44a</a></td>
+       <td><a href="/data_center/marker/44554">p-umc44</a></td>
+       <td>genomic</td>
+       <td>800</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=AY772456">AY772456</a></td>
+       <td>137311961</td>
+      </tr>
+      <tr>
+       <td>10.07</td>
+       <td><a href="/data_center/locus?id=40683">bnl7.49a(hmd\)</a></td>
+       <td><a href="/data_center/marker/44177">p-bnl7.49</a></td>
+       <td>genomic</td>
+       <td>2100</td>
+       <td>PstI</td>
+       <td><a href="/data_center/sequence?id=G10774">G10774</a></td>
+       <td>142812228</td>
+      </tr>
+      <tr><td colspan=10>&nbsp;</td></tr>
+      <tr>
+       <td colspan=10>
+        <img src="/images/chr10_bin_v3.png">
+        <br>
+        <a href="http://ftp.maizegdb.org/cbm/chr10_cbm.txt">
+         Download all the core bin marker sequences for Chromosome 10
+        </a>
+       </td>
+      </tr>
+      </tbody>
+     </table>
+    </td>
+   </tr>
+  </table>
+ </div>
+)

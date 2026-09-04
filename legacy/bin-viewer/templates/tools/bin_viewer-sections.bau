@@ -1,0 +1,446 @@
+$$SYNTAX-LEVEL 2
+*(bin_viewer-sections {include-css: ../css/data_center.css | include-css: ../css/bin_viewer.css | include-js: ../js/bin_viewer.js}
+*(bin_viewer-maps {load: ../templates/tools/bin_viewer-maps.bau}) 
+  @(top {display: off}
+    <table cellpadding=2 cellspacing=2 width="100%">
+      <tr>
+        <td valign="top">
+          <p>
+            This page summarizes the data for features found in bin $(bin_num) in maize.
+            For more information, see the <a href="/bin_viewer">Bin Viewer homepage.</a>
+            <br><br>
+            This region is highlighted in red on the image of maize chromosomes to 
+            the right.<br><br>You can click on regions of that image to move to other 
+            portions of the maize genome.
+         </p>
+         <br>
+         <p>
+           <a href="bin_viewer_locus_accession?bin=$(bin)&sub=$(sub)">
+             Mapped loci w/ accessions in Bin $(bin_num)
+           </a>
+           <br>
+           <b>
+             <a href="bin_viewer_locus_sequence?bin=$(bin)&sub=$(sub)">
+               Map Locations of Sequences in Bin $(bin_num)
+             </a>
+           </b>
+          </p>
+        </td>
+        <td valign="top" align="right">
+          <img usemap="#data_map" height="240" src="/images/bins/bin_$(bin_underbarred).jpg" border=0>
+          <br>
+          <b><center>
+            Bin Viewer Pages
+          </center></b>
+       </td>
+       <td valign="top" align="right">
+         <img usemap="#data_map_gb_v3" height="240" src="/images/bins/bin_$(bin_underbarred).jpg" border=0>
+         <br>
+         <b><center>
+           Genome browser Pages<br>
+           (B73 RefGen_v3\)
+         </center></b> 
+       </td>
+     </tr>
+   </table>
+  )
+  
+  @(genome_browser {display: off}
+     <!--Genome Browser v3 display-->
+     <div id='gb_v3' name='gb_v3' style='display: inline'>
+       <br><br>
+       <table width="100%">
+         <tr height='5px'>
+           <td width='25%' onclick="" class='gb_tab_focus' align="center">
+            B73 RefGen_v3
+             <br>
+           </td>
+           <td width='25%' onclick="toggle_tabs('gb_v2'\);" class='gb_tab_unfocus' align="center">
+             B73 RefGen_v2
+             <br>
+           </td>
+           <td onclick="toggle_tabs('gb_v1'\);" width='25%' 
+               class='gb_tab_unfocus' align="center">
+             B73 RefGen_v1
+             <br>
+           </td>
+           <td onclick="toggle_tabs('gb_bac'\);" width='25%' 
+               class='gb_tab_unfocus' align="center">
+             BAC-based
+             <br>
+           </td>
+         </tr>
+      </table>
+      <div width="95%" style='width: 95%; background-color: white'>
+        <div style="position:relative; left:20px;top:5px;  width:95%;">
+          <br>
+          <a href='http://ensembl.gramene.org/Zea_mays/Info/Index' target="_new">Based on Gramene's 
+            B73 RefGen_v3 sequence</a>
+          <br><br>
+          <p>(Click on image to go to the Genome Browser\) </p>
+          <!-- see note in bin_viewer_data.php -->
+          <br>
+          <a href='/gbrowse/maize_v3?name=$(bin_num)' target="_new"> 
+            <img border='no' width='100%' src="$(gbrowse_img_url_v3)?name=$(bin_num);$(highlight)@lightgreen;width=800;type=BIN+Core_Bin_Marker+RefGen_Assembly">
+          </a>
+          <br><br>
+        </div>
+      </div>
+    </div>
+     
+    <!--Genome Browser v2 display-->
+    <div id='gb_v2' name='gb_v2' style='display: none'>
+      <br><br>
+      <table width="100%">
+        <tr height='5px'>
+          <td onclick="toggle_tabs('gb_v3'\);" width='25%' 
+              class='gb_tab_unfocus' align="center">
+            B73 RefGen_v3
+            <br>
+          </td>
+          <td width='25%' onclick="" class='gb_tab_focus' align="center">
+            B73 RefGen_v2
+            <br>
+          </td>
+          <td onclick="toggle_tabs('gb_v1'\);" width='25%' 
+              class='gb_tab_unfocus' align="center">
+            B73 RefGen_v1
+            <br>
+          </td>
+          <td onclick="toggle_tabs('gb_bac'\);" width='25%' 
+              class='gb_tab_unfocus' align="center">
+            BAC-based
+            <br>
+          </td>
+        </tr>
+      </table>
+      <div width="95%" style='width: 95%; background-color: white'>
+        <div style="position:relative; left:20px;top:5px;  width:95%;">
+          <br>
+          <a href='http://www2.genome.arizona.edu/genomes/maize' target="_new">Based on AGI's 
+            B73 RefGen_v2 sequence
+          </a>
+          <br><br>
+          <p>(Click on image to go to the Genome Browser\) </p>
+          <a href='$(gbrowse_url_v2)?name=$(bin_num)' target="_new"> 
+            <br>
+            <img border='no' width='100%' 
+                 src='$(gbrowse_img_url_v2)?name=$(bin_num);$(highlight)@red;width=800;type=BIN+Core_Bin_Marker+Pseudomolecule'>
+          </a>
+          <br><br>
+        </div>
+      </div>
+    </div>
+      
+     <!-- Genome Browser v1 display -->    
+     <div id='gb_v1' name='gb_v1' style='display: none'>
+      <br><br>
+      <table width="100%">
+        <tr height='5px'>
+          <td onclick="toggle_tabs('gb_v3'\);" width='25%' 
+              class='gb_tab_unfocus' align="center">
+            B73 RefGen_v3
+            <br>
+          </td>
+          <td onclick="toggle_tabs('gb_v2'\);" width='25%' 
+              class='gb_tab_unfocus' align="center">
+            B73 RefGen_v2
+            <br>
+          </td>
+          <td width='25%' class='gb_tab_focus' align="center">
+            B73 RefGen_v1
+            <br>
+          </td>
+          <td onclick="toggle_tabs('gb_bac'\);" width='25%' 
+              class='gb_tab_unfocus' align="center">
+            BAC-based
+            <br>
+          </td>
+        </tr>
+      </table>
+      <div width="95%" style='width: 95%; background-color: white'>
+        <div style="position:relative; left:20px;top:5px;  width:95%;">
+          <br>
+          <a href='http://ftp.maizesequence.org/current/assembly//' target="_new">Based on 
+            MaizeSequence.org B73 RefGen_v1 sequence</a>
+          <br><br>
+          <p>(Click on image to go to the Genome Browser\) </p>
+          <a href='$(gbrowse_url_v1)?name=$(bin_num)' target="_new"> 
+           <br>
+           <img border='no' width='100%' src="$(gbrowse_img_url_v1)?name=$(bin_num);$(highlight)@red;width=800;type=BIN+Pseudomolecule">
+          </a>
+          <br><br>
+        </div>
+      </div>
+    </div>
+      
+    <!--Bac Sequence Display-->
+    <div id="gb_bac" style= "display:none">
+     <br><br>
+      <table width="100%">
+        <tr height='5px'>
+          <td onclick="toggle_tabs('gb_v3'\);" width='25%' 
+              class='gb_tab_unfocus' align="center">
+            B73 RefGen_v3
+            <br>
+          </td>
+          <td onclick="toggle_tabs('gb_v2'\);" width='25%' class='gb_tab_unfocus' align="center">
+            B73 RefGen_v2
+            <br>
+          </td>
+          <td onclick="toggle_tabs('gb_v1'\);" width='25%' 
+              class='gb_tab_unfocus' align="center">
+            B73 RefGen_v1
+            <br>
+          </td>
+          <td width='25%' 
+              class='gb_tab_focus' align="center">
+            BAC-based
+            <br>
+          </td>
+        </tr>
+      </table>
+      <div width="95%" style='width: 95%; background-color: white'>
+        <div style="position:relative; left:20px;top:5px;  width:95%;">
+          <br>
+          <a href='http://ftp.maizesequence.org/release-3b.50/' target="_new">Based on MaizeSequence.org BAC release 3b.50</a>
+          <br><br>
+          <p>(Click on image to go to the Genome Browser\) </p>
+            <br>
+            <a href='$(gbrowse_url_bac)?name=$(bin_num)' target="_new"> 
+              <img border='no' width='100%' src="$(gbrowse_img_url_bac)?name=$(bin_num);$(highlight)@red;width=800;type=BIN+FPCcontig+Sequenced_FPCcontig+BAC">
+            </a>
+            <br><br>
+         </div>
+      </div>
+    </div>
+  )
+  
+  @(genes {display: off}
+    <br>
+    <p> 
+      Here are the <b>$(gene_count)</b> genes found in this chromosomal region.
+    </p>
+    <table width="100%" cellpadding="0" cellspacing="1" summary="This table contains genes found on this chromosome">
+    @(gene_sec
+      <tr>
+        <td width="50%">
+          <a href="/data_center/locus?id=$(id)">$(name) <i>$(full_name)</i></a>
+        </td>
+        <td width="50%">
+          <a href="/data_center/locus?id=$(id_2)">$(name_2) <i>$(full_name_2)</i></a>
+        </td>
+      </tr>
+    )
+    </table>
+  )
+
+  @(gene_models {display: off}
+    <br>
+    <p>
+      Here are the <b>$(gene_m_count)</b> B73 RefGen_v3 gene models found in 
+      this chromosomal region.
+    </p>
+    <p>
+      Models are colored according to their model type: 
+      <a class="protein_coding">protein coding</a>, 
+      <a class="low_confidence">low confidence</a>, 
+      <a class="transposable_element">transposable element</a>.
+    </p>
+    <table width="100%" cellpadding="0" cellspacing="1" summary="This table contains gene models found on this chromosome">
+      @(gene_model_sec
+      <tr>
+        <td width="50%">
+          <a href="/gene_center/gene/$(gm)" class="$(type)">$(gm) <i>$(locus)</i></a>
+        </td>
+        <td width="50%">
+           <a href="/gene_center/gene/$(gm_2)" class="$(type_2)">$(gm_2) <i>$(locus_2)</i></a>
+        </td>
+      </tr>
+      )
+    </table>
+  )
+    
+  @(other_loci {display: off}
+    <br>
+    <p> 
+      Here are the <b>$(loci_count)</b> genes found in this chromosomal region.
+    </p>
+    <table width="100%" cellpadding="0" cellspacing="1" summary="This table contains genes found on this chromosome">
+    @(loci_sec
+      <tr>
+        <td width="50%">
+          <a href="/data_center/locus?id=$(id)">$(name) <i>$(full_name)</i></a> $(open)$(type)$(close)
+        </td>
+        <td width="50%">
+          <a href="/data_center/locus?id=$(id_2)">$(name_2) <i>$(full_name_2)</i></a> $(open_2)$(type_2)$(close_2)
+        </td>
+      </tr>
+    )
+    </table>
+  )
+  
+  @(hd_maps {display: off}
+    <br>
+    <p>
+      Here is this region expressed on four high-density maps.
+    </p>
+    <table width="100%" cellpadding=2 cellspacing=0 summary="Info on nearby loci">
+      <tr>
+        <td width="25%" style="border: 1px dashed #9f6;" valign="top" bgcolor="#e0ffcc">
+          <p style="margin-bottom: 0px; margin-top: 0px;">
+            <b><a href="/data_center/map?id=$(umc98_map)"><u>UMC 98 $(bin)</u></a></b>
+         </p>
+          <table width="100%" style="font-size: 90%" cellpadding=1 cellspacing=0 summary="Loci nearby on UMC 98">
+            @(umc98_loop
+            <tr>
+              <td style="font-size: 90%"> $(umc98_value)</td>
+              <td style="font-size: 90%">
+                <a href="data_center/locus?id=$(umc98_id)">$(umc98_name) <i>$(umc98_fullname)</i></a> 
+              </td>
+            </tr>
+            )
+          </table>
+        </td>
+        <td width="25%" style="border: 1px dashed #9f6;" valign="top" bgcolor="#e0ffcc">
+          <p style="margin-bottom: 0px; margin-top: 0px;">
+            <b><a href="/data_center/map?id=$(bnl96_map)"><u>BNL 96 $(bin)</u></a></b>
+          </p>
+          <table width="100%" style="font-size: 90%" cellpadding=1 cellspacing=0 summary="Loci nearby on BNL 96">
+            @(bnl96_loop
+            <tr>
+              <td style="font-size: 90%"> $(bnl96_value)</td>
+              <td style="font-size: 90%">
+                <a href="/data_center/locus?id=$(bnl96_id)">$(bnl96_name) <i>$(bnl96_fullname)</i></a> 
+              </td>
+            </tr>
+            )
+          </table>
+        </td>
+        <td width="25%" style="border: 1px dashed #9f6;" valign="top" bgcolor="#e0ffcc">
+          <p style="margin-bottom: 0px; margin-top: 0px;">
+           <b><a href="/data_center/map?id=$(ibm_map)"><u>IBM 2004 Neighbors $(bin)</u></a></b>
+          </p>
+          <table width="100%" style="font-size: 90%" cellpadding=1 cellspacing=0 summary="Loci nearby on IBM 2004 Neighbors">
+            @(ibm_loop
+            <tr>
+              <td style="font-size: 90%"> $(ibm_value)</td>
+              <td style="font-size: 90%">
+                <a href="/data_center/locus?id=$(ibm_id)">$(ibm_name) <i>$(ibm_fullname)</i></a> 
+              </td>
+            </tr>
+            )
+          </table>
+        </td>
+        <td width="25%" style="border: 1px dashed #9f6;" valign="top" bgcolor="#e0ffcc">
+          <p style="margin-bottom: 0px; margin-top: 0px;">
+            <b><a href="/data_center/map?id=$(genetic_map)"><u>Genetic 2005 $(bin)</u></a></b>
+          </p>
+          <table width="100%" style="font-size: 90%" cellpadding=1 cellspacing=0 summary="Loci nearby on Genetic 2005">
+           @(genetic_loop
+            <tr>
+              <td style="font-size: 90%"> $(genetic_value)</td>
+              <td style="font-size: 90%">
+                <a href="/data_center/locus?id=$(genetic_id)">$(genetic_name) <i>$(genetic_fullname)</i></a> 
+              </td>
+            </tr>
+           )
+         </table>
+       </td>
+     </tr>
+   </table>
+  )
+  
+  @(accession {display: off}
+    <br>
+    <p>
+      Here are accession numbers of the <b>$(map_count)</b> sequences that 
+      have been verified to be in this chromosomal region.  
+      <a href="fasta_bin_viewer.cgi?bin=$(bin)&amp;sub=$(sub)">Download the DNA sequences in FASTA format</a>.
+    </p>
+    <table width="100%" cellpadding="0" cellspacing="1" summary="This table contains genes found on this chromosome.">
+      @(acc_sec
+      <tr>
+        <td><a href="/data_center/sequence?id=$(seqID_1)">$(genbank_1)</a></td>
+        <td><a href="/data_center/sequence?id=$(seqID_2)">$(genbank_2)</a></td>
+        <td><a href="/data_center/sequence?id=$(seqID_3)">$(genbank_3)</a></td>
+        <td><a href="/data_center/sequence?id=$(seqID_4)">$(genbank_4)</a></td>
+        <td><a href="/data_center/sequence?id=$(seqID_5)">$(genbank_5)</a></td>
+      </tr>
+      )
+    </table>
+  )
+  
+  @(est_ssr {display: off}
+    <br>
+    <span style="font-family: Verdana, Arial, sans-serif; font-size: 110%; font-weight: bold; margin-bottom: 6px;">
+      ESTs in Bin $(bin_num)
+    </span>
+    <br>
+    <p>
+      Here is the set of <b>$(est_count)</b> distinct contigs verified to be in this chromosomal region.
+    </p>
+    <table width="100%" cellpadding="0" cellspacing="1" summary="This table contains genes found on chromosome.">
+      @(est_sec
+        <tr>
+         <td><a href="http://www.plantgdb.org/search/display/data.php?Seq_ID=$(tucID_1)">$(tucID_1)</a></td>
+         <td><a href="http://www.plantgdb.org/search/display/data.php?Seq_ID=$(tucID_2)">$(tucID_2)</a></td>
+         <td><a href="http://www.plantgdb.org/search/display/data.php?Seq_ID=$(tucID_3)">$(tucID_3)</a></td>
+         <td><a href="http://www.plantgdb.org/search/display/data.php?Seq_ID=$(tucID_4)">$(tucID_4)</a></td>
+        </tr>
+      )
+    </table>
+    </p>
+    <br><br>
+    <span style="font-family: Verdana, Arial, sans-serif; font-size: 110%; font-weight: bold; margin-bottom: 6px;">
+      SSRs in Bin $(bin_num)
+    </span>
+    <br>
+    <p>
+      Here is the set of <b>$(ssr_count)</b> distinct contigs verified to be in this chromosomal region.
+    </p>
+    <table width="100%" cellpadding="0" cellspacing="1" summary="This table contains genes found on chromosome.">
+      @(ssr_sec
+        <tr>
+          <td><a href="/data_center/ssr?id=$(ssrID_1)"><b>$(repeat_1)</b><i>$(ssrname_1)</i></a></td>
+          <td><a href="/data_center/ssr?id=$(ssrID_2)"><b>$(repeat_2)</b><i>$(ssrname_2)</i></a></td>
+          <td><a href="/data_center/ssr?id=$(ssrID_3)"><b>$(repeat_3)</b><i>$(ssrname_3)</i></a></td>
+        </tr>
+      )
+    </table>
+    </p>
+  )
+  
+  @(bac {display: off}
+    <br>
+    <p>
+      @(gramene_bac_view {display: off}
+        <img src="/images/Gramene-2013-logo_sm.png" width=75 height=30 class="inline_image">
+        <a href="http://ensembl.gramene.org/Zea_mays/Location/View?r=$(bin-pos)">
+          View bin $(bin_value) at Gramene.org
+        </a> to see the latest genomic alignment of the sequenced BACs.
+        <br><br>
+      )
+      Sequenced BACs in the list below are noted below with an *.
+    </p>
+    <br>
+    <p>
+      Here are the <b>$(bac_count)</b> BACs that have been verified to be in this chromosomal region.
+    </p>
+    <table width="100%" cellpadding="0" cellspacing="1" summary="This table contains genes found on chromosome.">
+      @(bac_sec
+        <tr>
+          <td>
+            <a href="/data_center/bac?id=$(bacID_1)">$(bacname_1)</a>
+            $(open_1)<a href="/data_center/locus?id=$(blocID_1)">$(blocname_1)</a> $(by_1) $(method_1) $(seq_1)$(close_1)
+          </td>
+          <td>
+            <a href="/data_center/bac?id=$(bacID_2)">$(bacname_2)</a>
+            $(open_2)<a href="/data_center/locus?id=$(blocID_2)">$(blocname_2)</a> $(by_2) $(method_2) $(seq_2)$(close_2)
+          </td>
+        </tr>
+      )
+    </table>
+    </p>
+  )
+)
