@@ -68,7 +68,7 @@ function mgdb_projects() {
             'short_title' => 'Pan-genome pathway explorer',
             'eyebrow'     => 'Comparative genomics',
             'card_summary' => 'E2P2 metabolic pathway annotation run identically on all 26 NAM founder genomes, compared against CornCyc 8.0: which pathways every genome carries, which reaction steps no genome fills, and which gene models sit on each step. Searchable, with a gene-list enrichment test.',
-            'description' => 'E2P2 pathway annotation for the 26 NAM founder genomes beside CornCyc 8.0, with 694 pathways, 2,696 reaction steps and 475,716 gene assignments; browse, compare genomes, list reaction gaps, look up genes, and test a gene list for pathway enrichment.',
+            'description' => 'E2P2 pathway annotation for the 26 NAM founder genomes beside CornCyc 8.0, with 694 pathways, 2,696 reaction steps and 259,709 gene-to-step assignments; browse, compare genomes, list reaction gaps, look up genes, and test a gene list for pathway enrichment.',
             'topics'      => array('comparative-genomics', 'protein-function', 'methods'),
             'status'      => 'current',
             'published'   => '2026-09-02',
@@ -77,7 +77,11 @@ function mgdb_projects() {
             'card_facts'  => array(
                 array('27',  'annotation tracks'),
                 array('694', 'pathways'),
-                array('476K', 'gene assignments'),
+                /* Gene-to-step assignments, which is the unit the page states.
+                   The pipeline's own 475,716 counts protein-model rows, and a
+                   card that says 476K sends the reader to a page whose Methods
+                   section exists to keep the two apart. */
+                array('260K', 'gene assignments'),
             ),
             'has_downloads' => true,
         ),

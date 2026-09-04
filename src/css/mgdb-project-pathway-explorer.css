@@ -1,0 +1,441 @@
+/* mgdb-project-pathway-explorer.css
+ *
+ * /projects/pathway_explorer only.
+ *
+ * The page opts into the Data Hub shell with `mgdb-hub-page`, so the ground,
+ * the white section cards, the coloured section top edges, the metric colours,
+ * the table zebra and hover, the green Related resources wash, the
+ * `mgdb-hub-field` form row and the sticky tab bar all come from
+ * css/mgdb-hub.css. Nothing here restates any of that. What is left is this
+ * page's own furniture: the class tree, the completeness heatmap, the pathway
+ * detail panel, and the two form grids.
+ */
+
+/* -------------------------------------------------------------------------- *
+ * Charts
+ *
+ * The shared .mgdb-chart is a fixed 320px, so a passed layout.height is
+ * ignored and a figure that wants 900px is drawn into 320 with its axis labels
+ * painted over whatever follows. This page sets the element height from
+ * JavaScript instead, from the same variable it passes to Plotly, so the two
+ * cannot disagree. `height: auto` is what lets that inline height take effect,
+ * and the min-heights below are the floor the script clamps to -- a computed
+ * height under the min-height would leave the element and the figure out of
+ * step again.
+ * -------------------------------------------------------------------------- */
+
+.mgdb-modern .mgdb-pe-page .mgdb-chart {
+  height: auto;
+  min-height: 320px;
+  /* hidden, not visible. Plotly draws to whatever width the container had at
+     render time and keeps that SVG until something resizes it, so a figure
+     measured before the two-column chart grid settled stayed 700px wide inside
+     a 570px box and pushed the whole page's scrollWidth to 1,373 at a 1,280
+     viewport. settleCharts() in the page script fixes the size; this makes sure
+     a figure that is momentarily wrong cannot expand the page while it is. */
+  overflow: hidden;
+}
+
+.mgdb-modern .mgdb-pe-page .pe-chart-tall {
+  min-height: 620px;
+}
+
+/* -------------------------------------------------------------------------- *
+ * Browse: the class tree beside the results
+ * -------------------------------------------------------------------------- */
+
+.mgdb-modern .mgdb-pe-page .pe-browse {
+  display: grid;
+  /* minmax(0, 1fr) rather than a pixel floor on either track: a track floor is
+     a hard minimum, so a pair of them cannot render narrower than their sum and
+     a phone gets a zoomed-out page instead of a wrapped one. */
+  grid-template-columns: minmax(0, 21rem) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .mgdb-modern .mgdb-pe-page .pe-browse {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.mgdb-modern .mgdb-pe-page .pe-tree-panel {
+  position: sticky;
+  top: 7rem;
+  max-height: calc(100vh - 9rem);
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 900px) {
+  .mgdb-modern .mgdb-pe-page .pe-tree-panel {
+    position: static;
+    max-height: 22rem;
+  }
+}
+
+.mgdb-modern .mgdb-pe-page .pe-tree {
+  overflow-y: auto;
+  margin-top: 0.5rem;
+  min-height: 0;
+}
+
+.mgdb-modern .mgdb-pe-page .pe-tree-row {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.mgdb-modern .mgdb-pe-page .pe-tree-node {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  width: 100%;
+  border: 0;
+  background: none;
+  text-align: left;
+  font: inherit;
+  font-size: 0.875rem;
+  color: var(--mgdb-ink);
+  padding: 0.2rem 0.35rem;
+  border-radius: var(--mgdb-radius-sm);
+  cursor: pointer;
+}
+
+.mgdb-modern .mgdb-pe-page .pe-tree-node:hover {
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-modern .mgdb-pe-page .pe-tree-node[aria-pressed="true"] {
+  background: var(--mgdb-green);
+  color: #fff;
+  font-weight: 600;
+}
+
+.mgdb-modern .mgdb-pe-page .pe-tree-node[aria-pressed="true"] .pe-tree-count {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* The twist is a control BESIDE the node, not inside it: a button inside a
+   button is invalid and, more to the point, unreachable by keyboard. It opens
+   the branch without selecting it, which is the difference between "show me
+   what is under this" and "filter to this". A row with no children renders an
+   inert span of the same width so the labels line up. */
+.mgdb-modern .mgdb-pe-page .pe-tree-twist {
+  flex: 0 0 1.1rem;
+  align-self: stretch;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 0.75rem;
+  line-height: 1;
+  color: var(--mgdb-muted);
+  cursor: pointer;
+  padding: 0;
+  border-radius: var(--mgdb-radius-sm);
+}
+
+.mgdb-modern .mgdb-pe-page button.pe-tree-twist:hover {
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-ink);
+}
+
+.mgdb-modern .mgdb-pe-page .pe-tree-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  /* MetaCyc's top-level class names run to 45 characters and carry no spaces
+     to break at, so a wrapping label breaks mid-word: "Degradation/Utilization/
+     Assim | ilation" over two lines. One line with an ellipsis keeps the rows
+     scannable; the full name is on the node's title, in the table's own class
+     column, and in the heading the filter writes. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mgdb-modern .mgdb-pe-page .pe-tree-count {
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+  color: var(--mgdb-muted);
+  font-size: 0.8125rem;
+}
+
+/* -------------------------------------------------------------------------- *
+ * Form control rows
+ *
+ * .mgdb-hub-field is a labelled cell, not a row -- it is flex-direction:
+ * column, so several of them need a grid around them to sit side by side.
+ * -------------------------------------------------------------------------- */
+
+.mgdb-modern .mgdb-pe-page .pe-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 1rem;
+  align-items: end;
+}
+
+/* -------------------------------------------------------------------------- *
+ * Results tables this page sorts itself
+ *
+ * The shared table[data-sortable] wiring sorts the DOM, which is wrong for a
+ * table the page rebuilds from a filtered array on every keystroke. These
+ * headers are buttons in behaviour, so they carry the affordance and the
+ * aria-sort state without the shared script.
+ * -------------------------------------------------------------------------- */
+
+.mgdb-modern .mgdb-pe-page th[data-pe-sort],
+.mgdb-modern .mgdb-pe-page th[data-pe-gsort],
+.mgdb-modern .mgdb-pe-page th[data-pe-esort] {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.mgdb-modern .mgdb-pe-page th[aria-sort="ascending"]::after { content: " \2191"; }
+.mgdb-modern .mgdb-pe-page th[aria-sort="descending"]::after { content: " \2193"; }
+
+/* An identifier under the thing it names, rather than in its own column. */
+.mgdb-modern .mgdb-pe-page .pe-row-id {
+  display: block;
+  font-family: var(--mgdb-font-mono);
+}
+
+.mgdb-modern .mgdb-pe-page .pe-reference-row > * {
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-modern .mgdb-pe-page .pe-tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid var(--mgdb-line);
+  color: var(--mgdb-muted);
+  white-space: nowrap;
+}
+
+/* -------------------------------------------------------------------------- *
+ * The completeness heatmap
+ *
+ * A canvas, because 590 rows x 27 columns is 15,930 cells and that many DOM
+ * nodes is a second of layout on every filter change. The canvas is redrawn
+ * from the filtered array instead, which is a few milliseconds.
+ * -------------------------------------------------------------------------- */
+
+/* The same edge the shell gives .mgdb-table-scroll, which sits directly under
+   this box in the same section. Restating it with a different token put two
+   boxes one above the other with visibly different lines. */
+.mgdb-modern .mgdb-pe-page .pe-heat-scroll {
+  overflow: auto;
+  max-height: 70vh;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  margin-top: 0.75rem;
+}
+
+.mgdb-modern .mgdb-pe-page .pe-heat-scroll canvas {
+  display: block;
+}
+
+.mgdb-modern .mgdb-pe-page .pe-heat-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.mgdb-modern .mgdb-pe-page .pe-swatch {
+  width: 1.1rem;
+  height: 0.7rem;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 2px;
+}
+
+/* The three stops of the ramp the canvas draws, so the legend and the figure
+   cannot drift apart: these are the same values pathwayColor() produces at 0,
+   0.5 and 1. */
+.mgdb-modern .mgdb-pe-page .pe-swatch-0   { background: #f4f1ea; }
+.mgdb-modern .mgdb-pe-page .pe-swatch-50  { background: #bcd08a; }
+.mgdb-modern .mgdb-pe-page .pe-swatch-100 { background: #3d6b1f; }
+
+/* -------------------------------------------------------------------------- *
+ * The pathway detail panel
+ * -------------------------------------------------------------------------- */
+
+.mgdb-modern .mgdb-pe-page .pe-detail {
+  margin-top: 1.5rem;
+  border: 1px solid var(--mgdb-line);
+  border-top: 4px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius-sm);
+  background: #fff;
+  padding: 1.25rem;
+}
+
+.mgdb-modern .mgdb-pe-page .pe-detail-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.mgdb-modern .mgdb-pe-page .pe-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin: 0.5rem 0 0;
+}
+
+.mgdb-modern .mgdb-pe-page .pe-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
+  gap: 1.5rem;
+  margin-top: 1.25rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .mgdb-modern .mgdb-pe-page .pe-detail-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* The per-track completeness bars. A grid rather than a chart: 27 rows of one
+   number each is a table that happens to be drawn, and it needs no library. */
+.mgdb-modern .mgdb-pe-page .pe-bars {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr) 4.5rem;
+  gap: 0.2rem 0.5rem;
+  align-items: center;
+  font-size: 0.8125rem;
+}
+
+.mgdb-modern .mgdb-pe-page .pe-bar-track {
+  background: var(--mgdb-surface-alt);
+  border-radius: 2px;
+  height: 0.7rem;
+  overflow: hidden;
+}
+
+.mgdb-modern .mgdb-pe-page .pe-bar-fill {
+  display: block;
+  height: 100%;
+  background: var(--mgdb-leaf);
+}
+
+.mgdb-modern .mgdb-pe-page .pe-bar-fill.is-reference {
+  background: var(--mgdb-muted);
+}
+
+.mgdb-modern .mgdb-pe-page .pe-bar-value {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--mgdb-muted);
+}
+
+/* The 27-square presence strip on a step row. Colour is not the only encoding:
+   every square carries its gene count in the title, and a square with no gene
+   is drawn with a dotted edge rather than merely a paler fill. */
+.mgdb-modern .mgdb-pe-page .pe-strip {
+  display: inline-flex;
+  gap: 1px;
+  flex-wrap: nowrap;
+}
+
+.mgdb-modern .mgdb-pe-page .pe-strip span {
+  width: 0.55rem;
+  height: 0.85rem;
+  border-radius: 1px;
+  background: #3d6b1f;
+}
+
+.mgdb-modern .mgdb-pe-page .pe-strip span.is-empty {
+  background: #f0ece3;
+  border: 1px dotted #c3bbab;
+}
+
+.mgdb-modern .mgdb-pe-page .pe-strip span.is-gap {
+  background: #e0b95c;
+}
+
+.mgdb-modern .mgdb-pe-page .pe-strip span.is-reference {
+  margin-right: 0.3rem;
+}
+
+.mgdb-modern .mgdb-pe-page .pe-genes-cell {
+  max-width: 34rem;
+}
+
+.mgdb-modern .mgdb-pe-page .pe-busy {
+  color: var(--mgdb-muted);
+  font-size: 0.875rem;
+  padding: 1rem 0;
+}
+
+/* The curated summary is several paragraphs of MetaCyc prose inside a panel
+   that is otherwise tables, so it needs the paragraph rhythm back. */
+.mgdb-modern .mgdb-pe-page .pe-summary p {
+  margin: 0 0 0.75rem;
+  max-width: 68ch;
+}
+
+.mgdb-modern .mgdb-pe-page .pe-summary p:last-child { margin-bottom: 0; }
+
+/* -------------------------------------------------------------------------- *
+ * Long identifiers in prose
+ *
+ * A 60-character unbroken string -- the E2P2 source path, a gene model list --
+ * has no wrap opportunity, so it sets the min-content width of the grid item
+ * holding it. That is a floor the track cannot go under, so it expands the
+ * PAGE rather than the element, the layout viewport grows to match, and the
+ * browser renders everything zoomed out. It measured 524px inside a 375px
+ * viewport, taking the whole page to a scrollWidth of 561 at a visual scale of
+ * 0.67 -- and `scrollWidth <= innerWidth` still passed, because innerWidth had
+ * grown with it. document.documentElement.clientWidth is what stays honest.
+ * -------------------------------------------------------------------------- */
+
+.mgdb-modern .mgdb-pe-page .mgdb-prose .mgdb-sequence,
+.mgdb-modern .mgdb-pe-page .mgdb-aside-card dd,
+.mgdb-modern .mgdb-pe-page .pe-genes-cell .mgdb-sequence,
+.mgdb-modern .mgdb-pe-page .pe-detail-meta .mgdb-sequence {
+  overflow-wrap: anywhere;
+}
+
+/* -------------------------------------------------------------------------- *
+ * Scroll offset for the sticky tab bar
+ *
+ * The shell steps 65px -> 113px at 1170px, assuming the bar is one row above
+ * that width. That assumption does not hold here, so the ladder is set from
+ * the bar height measured on the rendered page rather than from the tab count.
+ *
+ * The ten labels need 1,032px of content and the page gutters take 48, so the
+ * bar wraps to a second row below a 1,084px viewport: measured 57px at 1,084
+ * and 105px at 1,080. Below 767px mgdb-modern.css turns it into a one-row
+ * scrolling rail, so the single-row offset is right again there.
+ *
+ * The band starts at 1,100 rather than at the measured 1,083. Being a little
+ * generous costs 56px of empty space in a 16px-wide window; being a little
+ * short parks every heading behind the bar, which is the failure that matters.
+ * Verified by clicking each tab at 375, 900, 1,080, 1,180 and 1,280 and
+ * checking section.top - bar.bottom, which is 8px at every width.
+ * -------------------------------------------------------------------------- */
+
+@media (min-width: 768px) and (max-width: 1100px) {
+  .mgdb-modern .mgdb-hub-page.mgdb-pe-page > section[id] { scroll-margin-top: 113px; }
+}
+
+@media (max-width: 767px) {
+  .mgdb-modern .mgdb-hub-page.mgdb-pe-page > section[id] { scroll-margin-top: 65px; }
+}
+
+@media print {
+  .mgdb-modern .mgdb-pe-page .mgdb-section-tabs,
+  .mgdb-modern .mgdb-pe-page .pe-tree-panel,
+  .mgdb-modern .mgdb-pe-page .mgdb-export-buttons {
+    display: none;
+  }
+}

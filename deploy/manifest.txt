@@ -323,6 +323,34 @@ src/js/mgdb-projects.js                          js/mgdb-projects.js
 src/templates/static/mgdb_projects.bau           templates/static/mgdb_projects.bau
 src/templates/static/mgdb_projects_notfound.bau  templates/static/mgdb_projects_notfound.bau
 
+# Project: pan-genome pathway explorer (/projects/pathway_explorer)
+# E2P2 metabolic pathway annotation over the 26 NAM founder genomes beside
+# CornCyc 8.0. A new slug under the existing /projects route; nothing else
+# changes but the registry entry in include/projects_lib.php, which is already
+# deployed by the line above.
+#
+# The payload under data/projects/pathway_explorer/ is NOT deployed from here.
+# It is ~53 MB across 4,800 files -- 694 per-pathway records, 4,096 gene shards
+# and the index -- written by tools/pathway_explorer_index.py from the analysis
+# output, which has never lived on the web host. Build it and ship the tree as
+# one tar rather than one manifest line per file:
+#
+#   python3 tools/pathway_explorer_index.py \
+#       --source <analysis>/data --downloads <analysis>/downloads \
+#       --out /tmp/pathway_explorer
+#   tar -C /tmp -czf /tmp/pe.tgz pathway_explorer
+#   scp /tmp/pe.tgz <host>:/tmp/ && ssh <host> \
+#       'tar -C <webroot>/data/projects -xzf /tmp/pe.tgz && rm /tmp/pe.tgz'
+#
+# See README, "Rebuilding the pathway explorer payload".
+src/controllers/projects/pathway_explorer.php             controllers/projects/pathway_explorer.php
+src/templates/static/mgdb_project_pathway_explorer.bau    templates/static/mgdb_project_pathway_explorer.bau
+src/css/mgdb-project-pathway-explorer.css                 css/mgdb-project-pathway-explorer.css
+src/js/mgdb-project-pathway-explorer.js                   js/mgdb-project-pathway-explorer.js
+src/search/pathway_explorer/pathway_explorer_api.php      search/pathway_explorer/pathway_explorer_api.php
+src/search/pathway_explorer/pathway_explorer_lib.php      search/pathway_explorer/pathway_explorer_lib.php
+tools/pathway_explorer_index.py                           tools/pathway_explorer_index.py
+
 # Project: protein domain atlas (/projects/interpro_domain_atlas)
 src/controllers/projects/interpro_domain_atlas.php               controllers/projects/interpro_domain_atlas.php
 src/templates/static/mgdb_project_interpro_domain_atlas.bau      templates/static/mgdb_project_interpro_domain_atlas.bau

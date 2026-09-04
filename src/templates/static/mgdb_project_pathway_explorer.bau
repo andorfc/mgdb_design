@@ -1,0 +1,711 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-project-pathway-explorer
+<a class="mgdb-skip-link" href="#pe-main">Skip to main content</a>
+<main class="mgdb-page mgdb-hub-page mgdb-pe-page" id="pe-main" data-payload="$(payload-url)" data-root="$(data-url)">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/projects">Analysis projects</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Pan-genome pathway explorer</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="pe-title">
+    <div class="mgdb-hero-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="Three linked reaction steps">
+        <g fill="none" stroke="#4a7024" stroke-width="4" stroke-linecap="round">
+          <path d="M26 34h18M52 34h18M35 43v18M35 68h26" />
+        </g>
+        <circle cx="22" cy="34" r="8" fill="#8fb04a" />
+        <circle cx="48" cy="34" r="8" fill="#d99a0b" />
+        <circle cx="74" cy="34" r="8" fill="#8fb04a" />
+        <circle cx="35" cy="68" r="7" fill="#7a4a10" />
+        <circle cx="66" cy="68" r="7" fill="#8fb04a" />
+      </svg>
+      <strong>Analysis<br />Project</strong>
+      <span>Published $(generated-long)</span>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="pe-title">Metabolic pathways across the 26 NAM founder genomes</h1>
+      <p class="mgdb-hero-tagline">E2P2 pathway annotation run identically on all $(nam-count) NAM founder genomes, beside CornCyc $(corncyc-version) on B73 RefGen_v4.</p>
+      <p class="mgdb-hero-description">$(pathway-count) pathways, $(step-count) reaction steps and $(assignment-count) gene-to-step assignments over $(gene-count) gene models. Because every genome was annotated by the same pipeline against the same reference, a pathway present in one genome and missing from another is a statement about the annotation that can be checked, rather than an artifact of two projects having used different methods.</p>
+      <div class="mgdb-hero-actions">
+        <a class="mgdb-button mgdb-button-primary" href="#pe-pathways">Browse pathways</a>
+        <a class="mgdb-button mgdb-button-secondary" href="#pe-methods">Methods and caveats</a>
+        <a class="mgdb-button mgdb-button-secondary" href="#pe-downloads">Download the data</a>
+      </div>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#pe-dataset" class="is-current" aria-current="true">Dataset</a>
+    <a href="#pe-figures">Distribution</a>
+    <a href="#pe-pathways">Pathways</a>
+    <a href="#pe-genomes">Tracks</a>
+    <a href="#pe-gaps">Gaps</a>
+    <a href="#pe-genes">Genes</a>
+    <a href="#pe-enrichment">Enrichment</a>
+    <a href="#pe-methods">Methods</a>
+    <a href="#pe-downloads">Downloads</a>
+    <a href="#pe-references">References</a>
+  </nav>
+
+  <section aria-labelledby="pe-summary-title">
+    <h2 class="mgdb-visually-hidden" id="pe-summary-title">Metrics</h2>
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <div>
+          <strong class="mgdb-metric-value">$(track-count)</strong>
+          <h3>Annotation tracks</h3>
+          <p>$(nam-count) NAM founder genomes annotated by E2P2, and CornCyc $(corncyc-version) on B73 RefGen_v4 as the curated reference.</p>
+        </div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-green">
+        <div>
+          <strong class="mgdb-metric-value">$(pathway-count)</strong>
+          <h3>Pathways</h3>
+          <p>$(e2p2-count) recovered by E2P2 in at least one genome &mdash; $(core-count) of them in all $(nam-count) &mdash; and $(cconly-count) that are in CornCyc and were recovered in none.</p>
+        </div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-amber">
+        <div>
+          <strong class="mgdb-metric-value">$(step-count)</strong>
+          <h3>Reaction steps</h3>
+          <p>Over $(reaction-count) distinct reactions, because a reaction is a step of more than one pathway. $(any-nam-steps) have a gene in at least one founder genome and $(complete-steps) in every one of them.</p>
+        </div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-blue">
+        <div>
+          <strong class="mgdb-metric-value">$(assignment-count)</strong>
+          <h3>Gene assignments</h3>
+          <p>A gene placed on one reaction step of one pathway, over $(gene-count) gene models. The same gene on the same reaction in two pathways is two of these and one of the $(assignment-pair-count) distinct gene-and-reaction pairs; counted per alternative protein model it is $(protein-row-count) rows.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="pe-dataset" aria-labelledby="pe-dataset-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="pe-dataset-title">What this dataset is</h2></div>
+    </div>
+
+    <p class="mgdb-section-intro">Every protein in each of the $(nam-count) NAM founder genomes was assigned enzymatic function by E2P2, and those assignments were mapped onto the MetaCyc reaction and pathway ontology that CornCyc $(corncyc-version) uses. The pan-genome categories are read against $(pangene-version). Nothing on this page is a database query: it is a fixed pipeline result, and it changes only when the pipeline is re-run.</p>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table">
+        <caption>The three pathway populations<span class="mgdb-muted">Anything this page says about pathways is one of these three rows. They have different denominators, so a percentage taken over the wrong one is wrong by up to $(cconly-count) pathways.</span></caption>
+        <thead>
+          <tr><th scope="col">Population</th><th scope="col" class="mgdb-numeric">Pathways</th><th scope="col">What it is</th></tr>
+        </thead>
+        <tbody>$(population-rows)</tbody>
+      </table>
+    </div>
+
+    <div class="mgdb-note mgdb-spaced">
+      <p><strong>Absent means two different things, and the difference is $(cconly-count) pathways.</strong> $(absent-e2p2) pathways were tested by E2P2 and found in none of the $(nam-count) genomes. A further $(cconly-count) are in CornCyc and were never recovered by E2P2 at all &mdash; they were not tested, so their absence is a property of this annotation and not evidence about maize. The source data labels both groups <span class="mgdb-sequence">absent</span>, which is why a naive count returns $(absent-all). Every figure and filter below states which of the two it means.</p>
+    </div>
+
+    <div class="mgdb-table-scroll mgdb-spaced">
+      <table class="mgdb-table">
+        <caption>Pan-genome classification<span class="mgdb-muted">Over the $(e2p2-count) pathways E2P2 recovered. The category is set by how many of the $(nam-count) founder genomes carry at least one gene anywhere in the pathway; the CornCyc reference track is never counted here.</span></caption>
+        <thead>
+          <tr><th scope="col">Category</th><th scope="col">Definition</th><th scope="col" class="mgdb-numeric">Pathways</th><th scope="col" class="mgdb-numeric">Share</th></tr>
+        </thead>
+        <tbody>$(pan-rows)</tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="pe-figures" aria-labelledby="pe-figures-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="pe-figures-title">How the annotation is distributed</h2></div>
+    </div>
+
+    <div class="mgdb-chart-grid">
+      <figure class="mgdb-figure">
+        <h3>Genomes carrying each pathway</h3>
+        <p>The count of E2P2 pathways present in exactly k of the $(nam-count) founder genomes.</p>
+        <div class="mgdb-chart" id="pe-chart-presence" role="img" aria-label="Bar chart of the number of pathways present in each possible number of the 26 NAM genomes, with a tall bar at 26 and a second at 0.">
+          <span class="mgdb-chart-fallback">Loading chart&hellip;</span>
+        </div>
+        <figcaption>The distribution has two ends and almost no middle: most pathways are in every genome or in none. The values are in the table below.</figcaption>
+        <details class="mgdb-chart-data">
+          <summary>Show the values</summary>
+          <div class="mgdb-table-scroll">
+            <table class="mgdb-table">
+              <caption class="mgdb-visually-hidden">Pathways by number of genomes present</caption>
+              <thead><tr><th scope="col">Genomes present</th><th scope="col" class="mgdb-numeric">Pathways</th><th scope="col" class="mgdb-numeric">Share</th></tr></thead>
+              <tbody>$(presence-rows)</tbody>
+            </table>
+          </div>
+        </details>
+      </figure>
+
+      <figure class="mgdb-figure">
+        <h3>Mean pathway completeness</h3>
+        <p>Completeness is the share of a pathway's reaction steps that have at least one assigned gene, averaged over the $(nam-count) founder genomes.</p>
+        <div class="mgdb-chart" id="pe-chart-completeness" role="img" aria-label="Histogram of mean pathway completeness in ten-percent bins, with the largest bar in the 90 to 100 percent bin.">
+          <span class="mgdb-chart-fallback">Loading chart&hellip;</span>
+        </div>
+        <figcaption>Median completeness is $(pathway-mc-median). The bins below 50% are where the reaction gaps are.</figcaption>
+        <details class="mgdb-chart-data">
+          <summary>Show the values</summary>
+          <div class="mgdb-table-scroll">
+            <table class="mgdb-table">
+              <caption class="mgdb-visually-hidden">Pathways by mean completeness bin</caption>
+              <thead><tr><th scope="col">Completeness</th><th scope="col" class="mgdb-numeric">Pathways</th><th scope="col" class="mgdb-numeric">Share</th></tr></thead>
+              <tbody>$(completeness-rows)</tbody>
+            </table>
+          </div>
+        </details>
+      </figure>
+    </div>
+
+    <figure class="mgdb-figure mgdb-spaced">
+      <h3>Genes with a pathway assignment, per track</h3>
+      <p>The number of distinct gene models each track assigns to at least one reaction.</p>
+      <div class="mgdb-chart pe-chart-tall" id="pe-chart-depth" role="img" aria-label="Horizontal bar chart of the number of genes carrying a pathway assignment in each annotation track, nearly equal across the 26 NAM genomes.">
+        <span class="mgdb-chart-fallback">Loading chart&hellip;</span>
+      </div>
+      <figcaption>The founders agree closely: the range is a few hundred genes on about 4,500, and mean completeness moves only from $(nam-mc-min) to $(nam-mc-max) across all $(nam-count). That flatness is the result. The figure plots genes rather than the assignment rows in the table, because those rows are counted per alternative protein model and two genomes carry about a quarter fewer of them for that reason alone &mdash; plotting them invents an outlier pair that is not there. The CornCyc reference is drawn separately and is not comparable with the founders at all: it is a curated set on another assembly from another pipeline.</figcaption>
+      <details class="mgdb-chart-data">
+        <summary>Show the values</summary>
+        <div class="mgdb-table-scroll">
+          <table class="mgdb-table">
+            <caption class="mgdb-visually-hidden">Assignments, genes, pathways and mean completeness per NAM genome</caption>
+            <thead><tr><th scope="col">Genome</th><th scope="col" class="mgdb-numeric">Genes</th><th scope="col" class="mgdb-numeric">Protein-model rows</th><th scope="col" class="mgdb-numeric">Pathways</th><th scope="col" class="mgdb-numeric">Mean completeness</th></tr></thead>
+            <tbody>$(depth-rows)</tbody>
+          </table>
+        </div>
+      </details>
+    </figure>
+
+    <div class="mgdb-chart-grid mgdb-spaced">
+      <figure class="mgdb-figure">
+        <h3>Pathways by top-level class</h3>
+        <p>The first segment of each pathway's MetaCyc ontology path, over all $(pathway-count) pathways.</p>
+        <div class="mgdb-chart" id="pe-chart-classes" role="img" aria-label="Bar chart of pathway counts by top-level ontology class, dominated by Biosynthesis.">
+          <span class="mgdb-chart-fallback">Loading chart&hellip;</span>
+        </div>
+        <figcaption>Biosynthesis is most of the ontology, which is a property of MetaCyc rather than of maize.</figcaption>
+        <details class="mgdb-chart-data">
+          <summary>Show the values</summary>
+          <div class="mgdb-table-scroll">
+            <table class="mgdb-table">
+              <caption class="mgdb-visually-hidden">Pathways by top-level class</caption>
+              <thead><tr><th scope="col">Class</th><th scope="col" class="mgdb-numeric">Pathways</th><th scope="col" class="mgdb-numeric">Share</th></tr></thead>
+              <tbody>$(class-rows)</tbody>
+            </table>
+          </div>
+        </details>
+      </figure>
+
+      <figure class="mgdb-figure">
+        <h3>Evidence behind the assignments</h3>
+        <p>How each of the $(assignment-count) gene-to-step assignments was justified.</p>
+        <div class="mgdb-chart" id="pe-chart-evidence" role="img" aria-label="Bar chart of gene assignments by evidence code, led by viridiplantae and conditional.">
+          <span class="mgdb-chart-fallback">Loading chart&hellip;</span>
+        </div>
+        <figcaption>$(evidence-transfer-share) of assignments rest on transfer from a green-plant reference or on pathway context. Only the CornCyc and manual codes are curated calls, and the unspecified bucket carries no code at all &mdash; the pipeline's own evidence summary has no entry for it, so a share taken from that summary is about a tenth too large.</figcaption>
+        <details class="mgdb-chart-data">
+          <summary>Show the values</summary>
+          <div class="mgdb-table-scroll">
+            <table class="mgdb-table">
+              <caption class="mgdb-visually-hidden">Assignments by evidence code</caption>
+              <thead><tr><th scope="col">Code</th><th scope="col">What it means</th><th scope="col" class="mgdb-numeric">Assignments</th><th scope="col" class="mgdb-numeric">Share</th></tr></thead>
+              <tbody>$(evidence-rows)</tbody>
+            </table>
+          </div>
+        </details>
+      </figure>
+    </div>
+
+    <figure class="mgdb-figure mgdb-spaced">
+      <h3>The pathways that vary most across genomes</h3>
+      <p>The 20 pathways with the largest standard deviation of completeness across the $(nam-count) founder genomes. Select one to open it in the browser below.</p>
+      <div class="mgdb-table-scroll">
+        <table class="mgdb-table" data-sortable>
+          <caption class="mgdb-visually-hidden">The twenty most variable pathways</caption>
+          <thead>
+            <tr>
+              <th scope="col" data-sort="text"><button type="button">Pathway</button></th>
+              <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">SD</button></th>
+              <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Mean completeness</button></th>
+              <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Genomes present</button></th>
+              <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Variable steps</button></th>
+            </tr>
+          </thead>
+          <tbody>$(variable-rows)</tbody>
+        </table>
+      </div>
+      <figcaption>A high standard deviation with a middling mean is a pathway whose reaction steps are filled in some genomes and not others; a low mean with a low deviation is a pathway nobody has good annotation for.</figcaption>
+    </figure>
+  </section>
+
+  <section id="pe-pathways" aria-labelledby="pe-pathways-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="pe-pathways-title">Browse pathways</h2></div>
+    </div>
+
+    <div class="pe-browse">
+      <div class="pe-tree-panel mgdb-panel">
+        <h3 class="mgdb-label" id="pe-tree-label">Ontology class</h3>
+        <div class="pe-tree" id="pe-tree" role="group" aria-labelledby="pe-tree-label">
+          <p class="mgdb-muted mgdb-small">The class tree loads with the pathway index.</p>
+        </div>
+      </div>
+
+      <div class="pe-browse-main">
+        <div class="mgdb-search">
+          <div class="mgdb-hub-field">
+            <label class="mgdb-label" for="pe-search">Search pathways</label>
+            <input class="mgdb-input" type="search" id="pe-search" placeholder="Pathway name, MetaCyc ID, synonym or EC number" autocomplete="off">
+            <p class="mgdb-hint" id="pe-search-hint">Matches the pathway name, its ID, its synonyms and its EC numbers. Try <span class="mgdb-sequence">lignin</span>, <span class="mgdb-sequence">PWY-5116</span> or <span class="mgdb-sequence">EC-2.1.1</span>.</p>
+          </div>
+
+          <div class="mgdb-filters" role="group" aria-label="Pan-genome category">
+            <button class="mgdb-chip" type="button" data-pe-pan="" aria-pressed="true">All pathways</button>
+            <button class="mgdb-chip" type="button" data-pe-pan="core" aria-pressed="false">Core</button>
+            <button class="mgdb-chip" type="button" data-pe-pan="near-core" aria-pressed="false">Near-core</button>
+            <button class="mgdb-chip" type="button" data-pe-pan="shell" aria-pressed="false">Shell</button>
+            <button class="mgdb-chip" type="button" data-pe-pan="genome-specific" aria-pressed="false">Genome-specific</button>
+            <button class="mgdb-chip" type="button" data-pe-pan="absent" aria-pressed="false">Absent from all $(nam-count)</button>
+          </div>
+
+          <div class="mgdb-filters" role="group" aria-label="Additional filters">
+            <button class="mgdb-chip" type="button" data-pe-flag="" aria-pressed="true">No filter</button>
+            <button class="mgdb-chip" type="button" data-pe-flag="orph" aria-pressed="false">Has a step with no gene</button>
+            <button class="mgdb-chip" type="button" data-pe-flag="var" aria-pressed="false">Has a variable step</button>
+            <button class="mgdb-chip" type="button" data-pe-flag="cconly" aria-pressed="false">CornCyc only</button>
+            <button class="mgdb-chip" type="button" data-pe-flag="inf" aria-pressed="false">Class inferred, not curated</button>
+          </div>
+
+          <div class="mgdb-results-header">
+            <p class="mgdb-result-count" id="pe-count" aria-live="polite">Loading the pathway index&hellip;</p>
+            <div class="mgdb-export-buttons">
+              <button class="mgdb-button mgdb-button-quiet" type="button" id="pe-export-pathways" disabled>Download these pathways as CSV</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mgdb-table-scroll" id="pe-table-scroll" hidden>
+          <table class="mgdb-table" id="pe-table">
+            <caption class="mgdb-visually-hidden">Pathways matching the current filters</caption>
+            <thead>
+              <tr>
+                <th scope="col" data-pe-sort="np"><button type="button">Pathway</button></th>
+                <th scope="col" data-pe-sort="cls"><button type="button">Ontology class</button></th>
+                <th scope="col" class="mgdb-numeric" data-pe-sort="nr"><button type="button">Steps</button></th>
+                <th scope="col" class="mgdb-numeric" data-pe-sort="orph" title="Reaction steps with no gene in any founder genome"><button type="button">Steps with no gene</button></th>
+                <th scope="col" class="mgdb-numeric" data-pe-sort="nvar" title="Reaction steps filled in some founder genomes and not others"><button type="button">Variable steps</button></th>
+                <th scope="col" data-pe-sort="pan"><button type="button">Pan category</button></th>
+                <th scope="col" class="mgdb-numeric" data-pe-sort="mc"><button type="button">Mean completeness</button></th>
+                <th scope="col" class="mgdb-numeric" data-pe-sort="sd" title="Standard deviation of completeness across the founder genomes"><button type="button">SD</button></th>
+                <th scope="col" class="mgdb-numeric" data-pe-sort="npres"><button type="button">Genomes present</button></th>
+              </tr>
+            </thead>
+            <tbody id="pe-table-body"></tbody>
+          </table>
+        </div>
+
+        <div class="mgdb-empty" id="pe-empty" hidden>
+          <p>No pathway matches those filters.</p>
+          <button class="mgdb-button mgdb-button-secondary" type="button" id="pe-reset">Clear the filters</button>
+        </div>
+
+        <div class="mgdb-message mgdb-message-error" id="pe-browse-error" hidden></div>
+      </div>
+    </div>
+
+    <div class="pe-detail" id="pe-detail" hidden aria-live="polite"></div>
+  </section>
+
+  <section id="pe-genomes" aria-labelledby="pe-genomes-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="pe-genomes-title">Compare annotation tracks</h2></div>
+    </div>
+
+    <p class="mgdb-section-intro">Each row is one of the $(e2p2-count) pathways E2P2 recovered and each column is an annotation track. Color is the share of that pathway's reaction steps with at least one assigned gene in that track. The $(cconly-count) CornCyc-only pathways have no row here, because E2P2 never tested them.</p>
+
+    <div class="mgdb-search">
+      <div class="pe-controls">
+        <div class="mgdb-hub-field">
+          <label class="mgdb-label" for="pe-heat-search">Search</label>
+          <input class="mgdb-input" type="search" id="pe-heat-search" placeholder="Pathway name or ID" autocomplete="off">
+        </div>
+        <div class="mgdb-hub-field">
+          <label class="mgdb-label" for="pe-heat-pan">Pan category</label>
+          <select class="mgdb-select" id="pe-heat-pan">
+            <option value="">All categories</option>
+            <option value="core">Core</option>
+            <option value="near-core">Near-core</option>
+            <option value="shell">Shell</option>
+            <option value="genome-specific">Genome-specific</option>
+          </select>
+        </div>
+        <div class="mgdb-hub-field">
+          <label class="mgdb-label" for="pe-heat-class">Ontology class</label>
+          <select class="mgdb-select" id="pe-heat-class">
+            <option value="">All classes</option>
+          </select>
+        </div>
+        <div class="mgdb-hub-field">
+          <label class="mgdb-label" for="pe-heat-sort">Order rows by</label>
+          <select class="mgdb-select" id="pe-heat-sort">
+            <option value="name">Pathway name</option>
+            <option value="sd">Most variable across genomes</option>
+            <option value="mean">Least complete</option>
+            <option value="pres">Fewest genomes</option>
+          </select>
+        </div>
+      </div>
+      <p class="mgdb-result-count" id="pe-heat-count" aria-live="polite">Loading the matrix&hellip;</p>
+    </div>
+
+    <div class="pe-heat-legend" aria-hidden="true">
+      <span class="pe-swatch pe-swatch-0"></span><span class="mgdb-small">0%</span>
+      <span class="pe-swatch pe-swatch-50"></span><span class="mgdb-small">50%</span>
+      <span class="pe-swatch pe-swatch-100"></span><span class="mgdb-small">100% of steps have a gene</span>
+    </div>
+
+    <div class="pe-heat-scroll" id="pe-heat-scroll" tabindex="0" role="region" aria-label="Pathway by annotation track completeness matrix">
+      <canvas id="pe-heat"></canvas>
+    </div>
+    <p class="mgdb-small mgdb-muted" id="pe-heat-note">Select a cell to open that pathway. The values behind every cell are in the pathway by genome matrix under Downloads.</p>
+    <div class="mgdb-message mgdb-message-error" id="pe-heat-error" hidden></div>
+
+    <details class="mgdb-chart-data">
+      <summary>Show these pathways as a table</summary>
+      <div class="mgdb-table-scroll">
+        <table class="mgdb-table">
+          <caption class="mgdb-visually-hidden">Completeness summary for the pathways currently shown in the matrix</caption>
+          <thead>
+            <tr>
+              <th scope="col">Pathway</th>
+              <th scope="col" class="mgdb-numeric">Mean</th>
+              <th scope="col" class="mgdb-numeric">Lowest genome</th>
+              <th scope="col" class="mgdb-numeric">Highest genome</th>
+              <th scope="col" class="mgdb-numeric">Genomes present</th>
+              <th scope="col" class="mgdb-numeric">CornCyc</th>
+            </tr>
+          </thead>
+          <tbody id="pe-heat-table-body"></tbody>
+        </table>
+      </div>
+      <p class="mgdb-small mgdb-muted" id="pe-heat-table-note" hidden></p>
+    </details>
+
+    <div class="mgdb-table-scroll mgdb-spaced">
+      <table class="mgdb-table" data-sortable>
+        <caption>Per-track summary<span class="mgdb-muted">The reference track is marked. Its gene, assignment and pathway counts come from a different pipeline on a different assembly and are not comparable with the founder genomes' &mdash; only the completeness column is computed the same way for both.</span></caption>
+        <thead>
+          <tr>
+            <th scope="col" data-sort="text"><button type="button">Track</button></th>
+            <th scope="col" data-sort="text"><button type="button">Assembly</button></th>
+            <th scope="col">Gene prefix</th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Pathways</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Complete pathways</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Mean completeness</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Genes</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Assignments</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Protein-model rows</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Steps only this track fills</button></th>
+          </tr>
+        </thead>
+        <tbody>$(track-rows)</tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="pe-gaps" aria-labelledby="pe-gaps-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="pe-gaps-title">Reaction gaps</h2></div>
+    </div>
+
+    <p class="mgdb-section-intro">$(gap-count) of the $(step-count) reaction steps are not complete in this annotation, where complete means every one of the $(nam-count) founder genomes assigns a gene. $(any-nam-steps) steps have a gene in at least one founder genome, so most of the difference is steps filled unevenly rather than steps filled nowhere. A gap is a place where the pathway ontology expects an enzyme and the annotation did not put a gene there, which is a candidate for curation rather than a claim that maize lacks the reaction.</p>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table">
+        <caption>Reaction steps by gap class<span class="mgdb-muted">Over all $(pathway-count) pathways. The $(substep-count) references a superpathway makes to a component pathway are not counted: they carry no enzyme and can never be filled.</span></caption>
+        <thead>
+          <tr><th scope="col">Class</th><th scope="col" class="mgdb-numeric">Steps</th><th scope="col" class="mgdb-numeric">Share</th></tr>
+        </thead>
+        <tbody>$(gap-rows)</tbody>
+      </table>
+    </div>
+
+    <div class="mgdb-search mgdb-spaced">
+      <div class="pe-controls">
+        <div class="mgdb-hub-field">
+          <label class="mgdb-label" for="pe-gap-class">Gap class</label>
+          <select class="mgdb-select" id="pe-gap-class">
+            <option value="lost-from-corncyc">Lost from CornCyc &mdash; CornCyc assigns a gene, no founder genome does</option>
+            <option value="orphan-step">Orphan &mdash; no gene in CornCyc or any founder genome</option>
+            <option value="variable">Variable &mdash; filled in some founder genomes and not others</option>
+            <option value="">All gap classes</option>
+          </select>
+        </div>
+        <div class="mgdb-hub-field">
+          <label class="mgdb-label" for="pe-gap-search">Search</label>
+          <input class="mgdb-input" type="search" id="pe-gap-search" placeholder="Reaction ID, EC number, enzyme name or pathway" autocomplete="off">
+        </div>
+      </div>
+      <div class="mgdb-results-header">
+        <p class="mgdb-result-count" id="pe-gap-count" aria-live="polite">Loading the gap list&hellip;</p>
+        <div class="mgdb-export-buttons">
+          <button class="mgdb-button mgdb-button-quiet" type="button" id="pe-export-gaps" disabled>Download these gaps as CSV</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mgdb-table-scroll" id="pe-gap-scroll" hidden>
+      <table class="mgdb-table" id="pe-gap-table">
+        <caption class="mgdb-visually-hidden">Reaction steps matching the current gap filters</caption>
+        <thead>
+          <tr>
+            <th scope="col" data-pe-gsort="pn"><button type="button">Pathway</button></th>
+            <th scope="col" data-pe-gsort="r"><button type="button">Reaction</button></th>
+            <th scope="col" data-pe-gsort="ec"><button type="button">EC</button></th>
+            <th scope="col" data-pe-gsort="en"><button type="button">Enzyme</button></th>
+            <th scope="col">Equation</th>
+            <th scope="col" class="mgdb-numeric" data-pe-gsort="np"><button type="button">Genomes with a gene</button></th>
+            <th scope="col" data-pe-gsort="gc"><button type="button">Gap class</button></th>
+            <th scope="col" class="mgdb-numeric" data-pe-gsort="ccg"><button type="button">Genes in CornCyc</button></th>
+          </tr>
+        </thead>
+        <tbody id="pe-gap-body"></tbody>
+      </table>
+    </div>
+    <p class="mgdb-small mgdb-muted" id="pe-gap-more" hidden></p>
+    <div class="mgdb-empty" id="pe-gap-empty" hidden><p>No reaction step matches those filters.</p></div>
+    <div class="mgdb-message mgdb-message-error" id="pe-gap-error" hidden></div>
+  </section>
+
+  <section id="pe-genes" aria-labelledby="pe-genes-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="pe-genes-title">Gene to pathway lookup</h2></div>
+    </div>
+
+    <p class="mgdb-section-intro">Paste gene model IDs from any of the $(nam-count) founder genomes or from the CornCyc reference. Transcript and protein suffixes such as <span class="mgdb-sequence">_T001</span> and <span class="mgdb-sequence">_P001</span> are removed, and the annotation track is read from the ID prefix, so a list may span genomes.</p>
+
+    <form class="mgdb-search" id="pe-gene-form">
+      <div class="mgdb-hub-field">
+        <label class="mgdb-label" for="pe-gene-ids">Gene model IDs</label>
+        <textarea class="mgdb-textarea" id="pe-gene-ids" rows="5" spellcheck="false" placeholder="Zm00001eb000080&#10;Zm00001eb195860&#10;Zm00018ab085230"></textarea>
+        <p class="mgdb-hint">One per line, or separated by commas or spaces.</p>
+      </div>
+      <div class="mgdb-search-row">
+        <button class="mgdb-button mgdb-button-primary" type="submit">Look up</button>
+        <button class="mgdb-button mgdb-button-secondary" type="button" id="pe-gene-example">Load an example</button>
+      </div>
+      <p class="mgdb-result-count" id="pe-gene-status" aria-live="polite"></p>
+    </form>
+
+    <div class="mgdb-results-header" id="pe-gene-header" hidden>
+      <p class="mgdb-result-count" id="pe-gene-count"></p>
+      <div class="mgdb-export-buttons">
+        <button class="mgdb-button mgdb-button-quiet" type="button" id="pe-export-genes">Download this lookup as CSV</button>
+      </div>
+    </div>
+
+    <div class="mgdb-table-scroll" id="pe-gene-scroll" hidden>
+      <table class="mgdb-table" id="pe-gene-table">
+        <caption class="mgdb-visually-hidden">Pathway assignments for the pasted gene models</caption>
+        <thead>
+          <tr>
+            <th scope="col">Gene model</th>
+            <th scope="col">Track</th>
+            <th scope="col">Pathway</th>
+            <th scope="col">Ontology class</th>
+            <th scope="col">Reaction</th>
+            <th scope="col">Evidence</th>
+          </tr>
+        </thead>
+        <tbody id="pe-gene-body"></tbody>
+      </table>
+    </div>
+    <div class="mgdb-message mgdb-message-error" id="pe-gene-error" hidden></div>
+  </section>
+
+  <section id="pe-enrichment" aria-labelledby="pe-enrichment-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="pe-enrichment-title">Pathway enrichment</h2></div>
+    </div>
+
+    <p class="mgdb-section-intro">Test a gene list &mdash; differentially expressed genes, a QTL interval, a co-expression module &mdash; for over-representation of E2P2 pathways. The background is the set of genes in the chosen track that carry at least one pathway assignment, which is the universe this annotation can speak about; it is not the track's gene complement. The test itself runs in your browser.</p>
+
+    <form class="mgdb-search" id="pe-enrich-form">
+      <div class="mgdb-hub-field">
+        <label class="mgdb-label" for="pe-enrich-ids">Gene model IDs</label>
+        <textarea class="mgdb-textarea" id="pe-enrich-ids" rows="6" spellcheck="false" placeholder="One gene model ID per line."></textarea>
+        <p class="mgdb-hint">At least three IDs. The track is read from the ID prefixes and can be overridden below.</p>
+      </div>
+      <div class="pe-controls">
+        <div class="mgdb-hub-field">
+          <label class="mgdb-label" for="pe-enrich-track">Annotation track</label>
+          <select class="mgdb-select" id="pe-enrich-track">
+            <option value="">Read from the gene IDs</option>
+          </select>
+        </div>
+        <div class="mgdb-hub-field">
+          <label class="mgdb-label" for="pe-enrich-alpha">FDR threshold</label>
+          <select class="mgdb-select" id="pe-enrich-alpha">
+            <option value="0.05">0.05</option>
+            <option value="0.01">0.01</option>
+            <option value="0.1">0.10</option>
+          </select>
+        </div>
+        <div class="mgdb-hub-field">
+          <label class="mgdb-label" for="pe-enrich-mink">Smallest pathway to test</label>
+          <select class="mgdb-select" id="pe-enrich-mink">
+            <option value="2">2 genes in the background</option>
+            <option value="1">1 gene in the background</option>
+            <option value="5">5 genes in the background</option>
+            <option value="10">10 genes in the background</option>
+          </select>
+        </div>
+      </div>
+      <div class="mgdb-search-row">
+        <button class="mgdb-button mgdb-button-primary" type="submit">Run enrichment</button>
+        <button class="mgdb-button mgdb-button-secondary" type="button" id="pe-enrich-example">Load an example</button>
+      </div>
+      <p class="mgdb-result-count" id="pe-enrich-status" aria-live="polite"></p>
+    </form>
+
+    <div class="mgdb-results-header" id="pe-enrich-header" hidden>
+      <p class="mgdb-result-count" id="pe-enrich-count"></p>
+      <div class="mgdb-export-buttons">
+        <button class="mgdb-button mgdb-button-quiet" type="button" id="pe-export-enrich">Download this result as CSV</button>
+      </div>
+    </div>
+
+    <div class="mgdb-table-scroll" id="pe-enrich-scroll" hidden>
+      <table class="mgdb-table" id="pe-enrich-table">
+        <caption class="mgdb-visually-hidden">Pathway enrichment results</caption>
+        <thead>
+          <tr>
+            <th scope="col">Pathway</th>
+            <th scope="col" class="mgdb-numeric" data-pe-esort="k"><button type="button">Genes in list</button></th>
+            <th scope="col" class="mgdb-numeric" data-pe-esort="K"><button type="button">Pathway size</button></th>
+            <th scope="col" class="mgdb-numeric" data-pe-esort="fold"><button type="button">Fold enrichment</button></th>
+            <th scope="col" class="mgdb-numeric" data-pe-esort="p"><button type="button">p</button></th>
+            <th scope="col" class="mgdb-numeric" data-pe-esort="q"><button type="button">q</button></th>
+            <th scope="col">Genes</th>
+          </tr>
+        </thead>
+        <tbody id="pe-enrich-body"></tbody>
+      </table>
+    </div>
+    <p class="mgdb-small mgdb-muted" id="pe-enrich-method" hidden></p>
+    <div class="mgdb-message mgdb-message-error" id="pe-enrich-error" hidden></div>
+  </section>
+
+  <section id="pe-methods" aria-labelledby="pe-methods-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="pe-methods-title">Methods and caveats</h2></div>
+    </div>
+
+    <div class="mgdb-prose-layout">
+      <div class="mgdb-prose">
+        <h3 class="mgdb-leaf-heading">How the annotation was made</h3>
+        <p>Every protein in each of the $(nam-count) NAM founder genome annotations was assigned enzymatic function by E2P2, and those assignments were mapped onto reactions and then onto the MetaCyc pathway ontology, the same ontology CornCyc $(corncyc-version) is built on. The pan-genome categories are read against $(pangene-version). The pathway assignments were taken from <span class="mgdb-sequence">$(e2p2-source)</span>.</p>
+        <p>A pathway counts as present in a genome when at least one gene is assigned to any of its reaction steps. Completeness is the share of a pathway's reaction steps that have at least one assigned gene, and a pathway is complete in a genome when every step does. The mean completeness and its standard deviation are taken over the $(nam-count) founder genomes only; the standard deviation is the sample form.</p>
+
+        <h3 class="mgdb-leaf-heading">The CornCyc track is a reference, not a genome</h3>
+        <p>CornCyc $(corncyc-version) sits on B73 RefGen_v4 and is curated. It was produced by a different pipeline from the E2P2 annotation, and the two are easy to compare on the wrong column: CornCyc carries $(protein-row-count-corncyc) protein-model rows against a founder's roughly eighteen thousand, which reads as half the annotation, while at the gene-to-step level it carries $(corncyc-records) against the founders' $(founder-records-min) to $(founder-records-max) &mdash; within a few per cent. The protein-row difference is that CornCyc's records are one protein each. It is shown beside the founders because it is the reference this annotation was checked against, and it is excluded from every per-genome statistic on this page: mean completeness, standard deviation, the pan-genome categories and the count of genomes carrying a pathway are all over $(nam-count) genomes. The one column that does include it is the last of the per-track table, because a count of steps only one track fills is meaningless if the track is left out of the comparison &mdash; CornCyc is the only track with a gene at $(corncyc-sole-steps) steps, which is the measure of what a curated reference still adds.</p>
+
+        <h3 class="mgdb-leaf-heading">Absence has two meanings</h3>
+        <p>$(absent-e2p2) pathways were tested by E2P2 and recovered in none of the $(nam-count) genomes. A further $(cconly-count) pathways are in CornCyc and were recovered by E2P2 in no genome at all: they have no completeness, no matrix row and no enrichment background, because this annotation never tested them. Treating the two as one number gives $(absent-all), which is the count this page never reports without saying what it is made of.</p>
+
+        <h3 class="mgdb-leaf-heading">A step is not always a reaction</h3>
+        <p>$(superpathway-count) of the pathways are superpathways, and a superpathway's step list includes references to its component pathways. Those $(substep-count) entries carry no EC number, no evidence code and no genes, so counting them as reactions adds gaps that can never be closed. The reaction-step count on this page is $(step-count), over $(reaction-count) distinct reactions &mdash; the two differ because one reaction is a step of more than one pathway. $(nrzero-count) pathways consist of nothing but such references, so they have no reaction step to score and are absent by construction rather than by biology.</p>
+
+        <h3 class="mgdb-leaf-heading">An assignment can be counted two ways</h3>
+        <p>This page counts $(assignment-count) assignments of a gene to a reaction. The same data counted one row per alternative protein model gives $(protein-row-count), which is the figure the pipeline's own summary reports. The two are 1.8 times apart and neither is wrong; they answer different questions, and a per-track comparison of the protein-model figure is not meaningful because two founder annotations name far fewer alternative proteins per gene than the rest without carrying fewer genes.</p>
+
+        <h3 class="mgdb-leaf-heading">Where the downloads and this page differ</h3>
+        <p>Three things to know before using the CSV files. The pathway index and the CornCyc-only list place the $(cconly-count) CornCyc-only pathways under a top-level class that does not appear in the ontology this page reads, and for 42 of them the class is genuinely different, so a class breakdown taken from the CSV will not match the one above. The pathway by genome matrix carries the $(e2p2-count) E2P2 pathways only, so the 62 CornCyc-only pathways that do carry CornCyc genes are not in it. And the per-track summary CSV is the pipeline's own, which reports CornCyc's pathway count over all $(pathway-count) while reporting its completeness over the $(e2p2-count); the table on this page recomputes all three over the $(e2p2-count) so that they can be read together.</p>
+
+        <h3 class="mgdb-leaf-heading">What a gap does and does not mean</h3>
+        <p>An orphan step is one where neither CornCyc nor any founder genome assigns a gene. A step lost from CornCyc is one CornCyc fills and no founder genome does; that is most often a difference between curated assignment and automated prediction, and it is the most useful list on this page for curation. Neither is evidence that maize cannot carry out the reaction. The gap analysis also reports, for each genome that lacks a gene at a step, whether the gene is absent from the genome or present but unannotated for that function.</p>
+
+        <h3 class="mgdb-leaf-heading">Evidence is mostly transferred, not observed</h3>
+        <p>Two thirds of the $(assignment-count) assignments rest on transfer from a green-plant reference protein or on the pathway context accepting a borderline call. Only the CornCyc and manually curated codes are human calls. The evidence code is carried on every assignment in the gene lookup and in the pathway detail, so an individual claim can be weighed rather than taken at face value.</p>
+
+        <h3 class="mgdb-leaf-heading">Enrichment</h3>
+        <p>The test is a one-sided hypergeometric test with Benjamini-Hochberg false discovery rate control. The background is the genes in the chosen track that carry at least one pathway assignment &mdash; about 4,400 of a genome's roughly 40,000 gene models &mdash; because that is the universe this annotation can speak about. The correction is applied over every pathway large enough to be tested in that background, not only over the pathways your list happened to hit, so a q value here is comparable with one from a conventional over-representation tool.</p>
+      </div>
+
+      <aside class="mgdb-aside-card">
+        <h3>At a glance</h3>
+        <dl class="mgdb-stack">
+          <div><dt>Genomes</dt><dd>$(nam-count) NAM founders, plus the CornCyc $(corncyc-version) reference</dd></div>
+          <div><dt>Pathways</dt><dd>$(pathway-count), of which $(e2p2-count) recovered by E2P2</dd></div>
+          <div><dt>Reaction steps</dt><dd>$(step-count) over $(reaction-count) distinct reactions</dd></div>
+          <div><dt>Ontology classes</dt><dd>$(class-count)</dd></div>
+          <div><dt>Compounds</dt><dd>$(compound-count)</dd></div>
+          <div><dt>Assignments</dt><dd>$(assignment-count) gene-to-reaction, $(protein-row-count) protein-model rows</dd></div>
+          <div><dt>Pan-gene set</dt><dd>$(pangene-version)</dd></div>
+          <div><dt>Data generated</dt><dd>$(generated-long)</dd></div>
+        </dl>
+      </aside>
+    </div>
+  </section>
+
+  <section id="pe-downloads" aria-labelledby="pe-downloads-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="pe-downloads-title">Downloads</h2></div>
+    </div>
+
+    <p class="mgdb-section-intro">The files behind every table and figure on this page. Sizes are read from disk when the page renders, so they cannot go stale against a rebuild.</p>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table">
+        <caption class="mgdb-visually-hidden">Downloadable files</caption>
+        <thead>
+          <tr><th scope="col">File</th><th scope="col">What it holds</th><th scope="col" class="mgdb-numeric">Size</th></tr>
+        </thead>
+        <tbody>$(download-rows)</tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="pe-references" aria-labelledby="pe-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="pe-references-title">References</h2></div>
+    </div>
+    <div class="mgdb-ref-list">
+      $(reference-cards)
+    </div>
+  </section>
+
+  <section class="mgdb-hub-related" aria-labelledby="pe-next-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="pe-next-title">Related resources</h2></div>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/metabolic_pathways">
+          <strong>Metabolic Pathways Data Hub</strong>
+          <span>The CornCyc pathway assignments MaizeGDB holds for B73 RefGen_v3 and v4, searchable by pathway, enzyme or gene model</span>
+        </a>
+        <a href="/pan_gene_center">
+          <strong>Pan-gene Data Hub</strong>
+          <span>The pan-gene families the pan-genome categories on this page are read against, with the gene models each family holds in each genome</span>
+        </a>
+        <a href="/gene_center/gene">
+          <strong>Gene Data Hub</strong>
+          <span>Every gene model named on this page has a record with its position, transcripts, expression, variation and literature</span>
+        </a>
+        <a href="/genome">
+          <strong>Genome Data Hub</strong>
+          <span>The NAM founder assemblies and annotations these pathway calls were made on, with their download locations</span>
+        </a>
+        <a href="https://pmn.plantcyc.org/" target="_blank" rel="noopener">
+          <strong>Plant Metabolic Network</strong>
+          <span>The maintained pathway databases for maize and other plants, and the reference ontology the pathway IDs here resolve into</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+)
