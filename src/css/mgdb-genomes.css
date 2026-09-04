@@ -1,12 +1,16 @@
-/* Emblem styling in Hero Header */
-.mgdb-genomes-page .mgdb-hero-emblem {
-  gap: var(--mgdb-space-2);
-  padding: var(--mgdb-space-4) var(--mgdb-space-3);
-  border-right: 1px solid #cfe3d6;
-  background: linear-gradient(160deg, rgba(255, 255, 255, .92), rgba(255, 255, 255, .55));
-  color: var(--mgdb-green-dark);
-}
+/* ==========================================================================
+   Genome Data Hub — /genome
+   --------------------------------------------------------------------------
+   Built on css/mgdb-modern.css for the tokens and css/mgdb-hub.css for the
+   Data Hub shell: the pale ground, the white section cards with their coloured
+   top edges, the metric cards, the grid-tile hover, the zebra striping, the
+   sticky tab bar, and the green Related resources panel all come from there.
+   This file describes only this page's own furniture: the search row, the
+   list blocks with their table and grid views, and the prototype statistics
+   table.
+   ========================================================================== */
 
+/* Emblem styling in the hero header */
 .mgdb-genomes-page .mgdb-hero-emblem img {
   width: min(100%, 72px);
   height: auto;
@@ -16,78 +20,720 @@
   filter: drop-shadow(0 2px 5px rgba(0, 0, 0, .10));
 }
 
-/* Section tabs. Sticky so the section list stays reachable while scrolling a
-   long page; they are ordinary in-page links, so they work without script. */
-.mgdb-genomes-page .mgdb-section-tabs {
-  position: sticky;
-  z-index: 20;
-  top: 0;
+/* Section anchors clear the sticky bar; the scrollspy reads this value back
+   rather than carrying its own copy. */
+.mgdb-genomes-page > section[id] { scroll-margin-top: 6rem; }
+
+/* --------------------------------------------------------------------------
+   Genome history chart
+
+   The same drawing as the "A history of genomes at MaizeGDB" chart on the
+   Codex genome2 page: a hand-drawn SVG with a green area fill, gold landmark
+   pins on stems, a crosshair with a tooltip, and a data table behind a
+   button. The colours are that chart's own. It spans the full width of the
+   Metrics section; the species chart sits below it.
+   -------------------------------------------------------------------------- */
+
+/* One figure per row. The shared .mgdb-chart-grid packs 360px tracks, which
+   left the species chart occupying a third of a row once the history chart
+   spanned all of them. */
+.mgdb-genomes-page .genome-charts { grid-template-columns: minmax(0, 1fr); }
+.mgdb-genomes-page .genome-history-figure { grid-column: 1 / -1; }
+
+.mgdb-genomes-page .genome-history-wrap { position: relative; margin-top: 10px; }
+.mgdb-genomes-page .genome-history-wrap svg { display: block; width: 100%; height: auto; touch-action: pan-y; }
+.mgdb-genomes-page .genome-history-grid { stroke: #eceee6; stroke-width: 1; }
+.mgdb-genomes-page .genome-history-axis { fill: #697065; font-size: 12px; }
+.mgdb-genomes-page .genome-history-year { fill: #697065; font-size: 11px; }
+.mgdb-genomes-page .genome-history-area { fill: url(#genome-history-fill); }
+.mgdb-genomes-page .genome-history-line { fill: none; stroke: #4d8a1c; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.mgdb-genomes-page .genome-history-point { fill: #4d8a1c; stroke: #fff; stroke-width: 2; }
+.mgdb-genomes-page .genome-history-end { fill: #3a6b12; font-size: 14px; font-weight: 900; }
+.mgdb-genomes-page .genome-history-stem { stroke: #d99a0b; stroke-width: 1.5; opacity: .85; }
+.mgdb-genomes-page .genome-history-pin { fill: #d99a0b; stroke: #7a5600; stroke-width: 1.5; }
+.mgdb-genomes-page .genome-history-label { fill: #5b4a12; font-size: 12px; font-weight: 800; }
+.mgdb-genomes-page .genome-history-crosshair { stroke: #3a6b12; stroke-width: 1; stroke-dasharray: 3 3; opacity: 0; }
+.mgdb-genomes-page .genome-history-hover { fill: #d99a0b; stroke: #fff; stroke-width: 2; opacity: 0; }
+
+.mgdb-genomes-page .genome-history-tip {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -115%);
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: #23281c;
+  color: #fff;
+  font-size: var(--mgdb-text-sm);
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(30, 40, 15, .07), 0 9px 24px rgba(30, 40, 15, .06);
+  transition: opacity .1s;
+}
+.mgdb-genomes-page .genome-history-tip.is-visible { opacity: 1; }
+.mgdb-genomes-page .genome-history-tip b { color: #cfe6a8; }
+
+.mgdb-genomes-page .genome-history-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 5px;
+}
+.mgdb-genomes-page .genome-history-actions p { margin: 0; color: #697065; font-size: var(--mgdb-text-sm); }
+.mgdb-genomes-page .genome-history-actions button {
+  padding: 7px 11px;
+  border: 1px solid #dfe4d8;
+  border-radius: 7px;
+  background: #fff;
+  color: #4c5245;
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 800;
+}
+.mgdb-genomes-page .genome-history-actions button:hover { border-color: #b8c8ac; background: #f1f6e8; }
+
+.mgdb-genomes-page .genome-history-table { max-height: 310px; margin-top: 12px; }
+.mgdb-genomes-page .genome-history-table[hidden] { display: none; }
+.mgdb-genomes-page .genome-history-figure figcaption { margin-top: var(--mgdb-space-3); }
+
+@media (max-width: 767px) {
+  .mgdb-genomes-page .genome-history-wrap { margin-right: -8px; margin-left: -8px; overflow-x: auto; }
+  .mgdb-genomes-page .genome-history-wrap svg { min-width: 690px; }
+  .mgdb-genomes-page .genome-history-actions { align-items: flex-start; flex-direction: column; }
+}
+
+/* .mgdb-chart is a fixed 320px; the species chart grows with its rows, so the
+   element takes the inline height the script sets. */
+.mgdb-genomes-page .mgdb-chart { height: auto; min-height: 320px; overflow: visible; }
+.mgdb-genomes-page .genome-charts { margin-top: var(--mgdb-space-5); }
+.mgdb-genomes-page .genome-charts + .mgdb-note { margin-top: var(--mgdb-space-4); }
+
+.mgdb-genomes-page .mgdb-figure > h3 {
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-base);
+}
+
+/* --------------------------------------------------------------------------
+   Search
+   -------------------------------------------------------------------------- */
+
+.mgdb-genomes-page .genome-search { margin-bottom: var(--mgdb-space-5); }
+
+.mgdb-genomes-page .genome-search-row {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) auto;
+  gap: var(--mgdb-space-3);
+  align-items: stretch;
+}
+
+.mgdb-genomes-page .genome-search-row .mgdb-input {
+  min-height: var(--mgdb-tap-target);
+  height: var(--mgdb-tap-target);
+}
+
+.mgdb-genomes-page .genome-search-row .mgdb-button {
+  min-height: var(--mgdb-tap-target);
+  white-space: nowrap;
+}
+
+.mgdb-genomes-page .genome-search .mgdb-hint { margin-top: var(--mgdb-space-2); }
+
+.mgdb-genomes-page .genome-examples {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-2);
-  margin-top: var(--mgdb-space-5);
-  margin-bottom: var(--mgdb-space-6);
-  padding: var(--mgdb-space-2) 0;
-  background: var(--mgdb-surface);
-  border-bottom: 1px solid var(--mgdb-line);
+  align-items: center;
+  margin-top: var(--mgdb-space-3);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
 }
 
-.mgdb-genomes-page .mgdb-section-tabs a {
+.mgdb-genomes-page .genome-examples button {
+  padding: 4px var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface);
+  color: var(--mgdb-green-dark);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease;
+}
+
+.mgdb-genomes-page .genome-examples button:hover { background: var(--mgdb-green-soft); border-color: #bcd9c6; }
+.mgdb-genomes-page .genome-examples button:focus-visible { outline: 3px solid var(--mgdb-focus); outline-offset: 2px; }
+
+.mgdb-genomes-page .genome-advanced {
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--hub-line-soft);
+}
+
+.mgdb-genomes-page .genome-advanced > summary {
   display: inline-flex;
-  min-height: 40px;
+  gap: var(--mgdb-space-2);
   align-items: center;
-  padding: 0 var(--mgdb-space-4);
+  max-width: 100%;
+  color: var(--mgdb-green-dark);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-genomes-page .genome-advanced-count {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--mgdb-green-dark);
+  color: #fff;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.mgdb-genomes-page .genome-advanced-body {
+  display: grid;
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-3);
+  padding: var(--mgdb-space-4);
+  border-radius: var(--mgdb-radius);
+  background: var(--hub-ground);
+}
+
+.mgdb-genomes-page .genome-advanced-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--mgdb-space-3);
+  align-items: end;
+}
+
+.mgdb-genomes-page .genome-advanced-actions .mgdb-button {
+  min-height: var(--mgdb-tap-target);
+  height: var(--mgdb-tap-target);
+  white-space: nowrap;
+}
+
+.mgdb-genomes-page .genome-species-filters { margin: 0; }
+
+/* --------------------------------------------------------------------------
+   List blocks
+
+   Every list on the hub has the same head: the title with its count, then the
+   controls -- filter, view toggle, page size, download. The views are
+   rendered from the same rows, so switching never refetches.
+   -------------------------------------------------------------------------- */
+
+.mgdb-genomes-page .genome-block-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--mgdb-space-3);
+}
+
+.mgdb-genomes-page .genome-block-head h3 {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin: 0;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+}
+
+.mgdb-genomes-page .genome-block-count {
+  display: inline-flex;
+  min-width: 1.6rem;
+  justify-content: center;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.mgdb-genomes-page .genome-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+}
+
+.mgdb-genomes-page .genome-toolbar label {
+  display: inline-flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* The controls in a toolbar share one height, so the row is one line. */
+.mgdb-genomes-page .genome-toolbar input,
+.mgdb-genomes-page .genome-toolbar select,
+.mgdb-genomes-page .genome-toolbar .mgdb-view-toggle,
+.mgdb-genomes-page .genome-toolbar .genome-tsv {
+  box-sizing: border-box;
+  height: 36px;
+  min-height: 36px;
+}
+
+.mgdb-genomes-page .genome-toolbar input,
+.mgdb-genomes-page .genome-toolbar select {
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-genomes-page .genome-toolbar input { width: 14rem; max-width: 100%; }
+.mgdb-genomes-page .genome-toolbar input:focus,
+.mgdb-genomes-page .genome-toolbar select:focus { border-color: var(--mgdb-focus); outline: none; box-shadow: 0 0 0 2px rgba(11, 87, 164, .18); }
+
+.mgdb-genomes-page .genome-toolbar .mgdb-view-toggle { align-items: center; }
+.mgdb-genomes-page .genome-toolbar .mgdb-view-btn { height: 100%; }
+
+.mgdb-genomes-page .genome-toolbar .genome-tsv {
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink-soft);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mgdb-genomes-page .genome-toolbar .genome-tsv:hover { background: var(--mgdb-surface-alt); color: var(--mgdb-ink); }
+
+.mgdb-genomes-page .genome-block-status {
+  margin: 0 0 var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-genomes-page .genome-collection .mgdb-table th,
+.mgdb-genomes-page .genome-collection .mgdb-table td { overflow-wrap: anywhere; }
+.mgdb-genomes-page .genome-collection .mgdb-table thead th { position: static; }
+
+/* Grid view. Tiles are shared cards, so the hub gives them the top edge that
+   colours on hover; the description list inside is this page's. */
+.mgdb-genomes-page .genome-grid.mgdb-card-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.mgdb-genomes-page .genome-grid > .mgdb-card { padding: var(--mgdb-space-4); }
+.mgdb-genomes-page .genome-grid > .mgdb-card > * + * { margin-top: 0; }
+
+.mgdb-genomes-page .genome-tile-title {
+  margin: 0 0 var(--mgdb-space-2);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.mgdb-genomes-page .genome-grid dl { margin: 0; }
+.mgdb-genomes-page .genome-grid dl > div + div { margin-top: var(--mgdb-space-2); padding-top: var(--mgdb-space-2); border-top: 1px solid var(--hub-line-soft); }
+
+.mgdb-genomes-page .genome-grid dt {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.mgdb-genomes-page .genome-grid dd {
+  margin: 2px 0 0;
+  font-size: var(--mgdb-text-sm);
+  overflow-wrap: anywhere;
+}
+
+/* Pagination */
+.mgdb-genomes-page .genome-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1);
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--mgdb-space-3);
+}
+
+.mgdb-genomes-page .genome-page-btn {
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mgdb-genomes-page .genome-page-btn:hover:not(:disabled):not(.is-active) { background: var(--mgdb-surface-alt); }
+.mgdb-genomes-page .genome-page-btn.is-active { background: var(--mgdb-green-dark); border-color: var(--mgdb-green-dark); color: #fff; }
+.mgdb-genomes-page .genome-page-btn:disabled { opacity: .45; cursor: default; }
+.mgdb-genomes-page .genome-page-ellipsis { padding: 0 var(--mgdb-space-1); color: var(--mgdb-muted); }
+
+/* External links carry an arrow, wherever they appear. */
+.mgdb-genomes-page a[target="_blank"]:not(.mgdb-button)::after { content: " \2197"; font-size: .85em; }
+.mgdb-genomes-page .mgdb-resource-list a[target="_blank"]::after { content: none; }
+
+/* --------------------------------------------------------------------------
+   Prototype assembly statistics
+
+   The data is a static JSON demonstration today. The section is deliberately
+   isolated behind this page scope so a later API can replace the source
+   without changing the shared table and form components.
+   -------------------------------------------------------------------------- */
+
+.mgdb-genomes-page .genome-stats-demo-note {
+  display: grid;
+  gap: var(--mgdb-space-2);
+  margin-bottom: var(--mgdb-space-4);
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-status-warn);
+  border-left-width: 4px;
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-status-warn-soft);
+}
+
+.mgdb-genomes-page .genome-stats-demo-note > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+}
+
+.mgdb-genomes-page .genome-stats-demo-note p,
+.mgdb-genomes-page .genome-stats-column-picker p { margin: 0; }
+
+.mgdb-genomes-page .genome-stats-load-status {
+  min-height: var(--mgdb-tap-target);
+  margin: 0;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--hub-ground);
+  color: var(--mgdb-muted);
+}
+
+.mgdb-genomes-page .genome-stats-load-status.is-error {
+  border-color: var(--mgdb-status-error);
+  background: var(--mgdb-status-error-soft);
+  color: var(--mgdb-status-error);
+}
+
+.mgdb-genomes-page .genome-stats-controls {
+  display: grid;
+  gap: var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-4);
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--hub-ground);
+}
+
+.mgdb-genomes-page .genome-stats-filter-grid {
+  display: grid;
+  grid-template-columns: minmax(18rem, 2fr) repeat(3, minmax(10rem, 1fr));
+  gap: var(--mgdb-space-3);
+  align-items: end;
+}
+
+.mgdb-genomes-page .genome-stats-filter-grid .mgdb-hub-field { min-width: 0; }
+.mgdb-genomes-page .genome-stats-filter-grid input,
+.mgdb-genomes-page .genome-stats-filter-grid select { width: 100%; }
+
+.mgdb-genomes-page .genome-stats-toggle-row,
+.mgdb-genomes-page .genome-stats-actions,
+.mgdb-genomes-page .genome-stats-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+}
+
+.mgdb-genomes-page .genome-stats-actions .genome-toolbar { margin-right: auto; }
+
+.mgdb-genomes-page .genome-stats-toggle[aria-pressed="true"],
+.mgdb-genomes-page .genome-stats-group[aria-pressed="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: var(--mgdb-surface);
+}
+
+.mgdb-genomes-page .genome-stats-toggle-row .mgdb-result-count { margin-left: auto; }
+
+.mgdb-genomes-page .genome-stats-column-picker {
+  border-top: 1px solid var(--hub-line);
+  border-bottom: 1px solid var(--hub-line);
+  padding: var(--mgdb-space-3) 0;
+}
+
+.mgdb-genomes-page .genome-stats-column-picker summary {
+  min-height: var(--mgdb-tap-target);
+  color: var(--mgdb-green-dark);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.mgdb-genomes-page .genome-stats-column-picker[open] summary { margin-bottom: var(--mgdb-space-2); }
+.mgdb-genomes-page .genome-stats-groups { margin-top: var(--mgdb-space-3); }
+
+.mgdb-genomes-page .genome-stats-group {
+  min-height: var(--mgdb-tap-target);
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
   border: 1px solid var(--mgdb-line);
   border-radius: var(--mgdb-radius-sm);
   background: var(--mgdb-surface);
-  color: var(--mgdb-ink) !important;
+  color: var(--mgdb-ink);
+  font: inherit;
   font-size: var(--mgdb-text-sm);
   font-weight: 700;
-  text-decoration: none;
-  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+  cursor: pointer;
 }
 
-.mgdb-genomes-page .mgdb-section-tabs a:hover {
-  background: var(--mgdb-green-soft);
-  border-color: #bcd9c6;
-  color: var(--mgdb-green-dark) !important;
+.mgdb-genomes-page .genome-stats-table-stage { min-width: 0; }
+
+.mgdb-genomes-page .genome-stats-fullscreen-bar {
+  display: none;
+  gap: var(--mgdb-space-4);
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
 }
 
-/* The current section is marked by weight and a left bar as well as colour. */
-.mgdb-genomes-page .mgdb-section-tabs a.is-current,
-.mgdb-genomes-page .mgdb-section-tabs a[aria-current="true"] {
-  border-color: var(--mgdb-green-dark);
-  box-shadow: inset 3px 0 0 var(--mgdb-gold);
-  background: var(--mgdb-green-dark);
-  color: #fff !important;
+.mgdb-genomes-page .genome-stats-fullscreen-bar > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  align-items: baseline;
+  min-width: 0;
 }
 
-/* Scroll-margin so an anchored section is not hidden behind the sticky tabs. */
-.mgdb-genomes-page > section { scroll-margin-top: 4.5rem; }
-
-.mgdb-genomes-page .mgdb-chart-tall { height: 380px; }
-
-.mgdb-genomes-page .mgdb-collection-card { border-left: 4px solid var(--mgdb-green); }
-
-.mgdb-genomes-page .mgdb-collection-count {
+.mgdb-genomes-page .genome-stats-fullscreen-bar strong {
   color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-lg);
-  font-weight: 800;
+  font-size: var(--mgdb-text-xl);
 }
 
-/* The explorer has three controls; give the selects a sensible basis so they
-   sit on one row on desktop and stack cleanly on a phone. */
-.mgdb-genomes-page .mgdb-search-row .mgdb-field:first-child { flex: 2 1 20rem; }
-.mgdb-genomes-page .mgdb-search-row .mgdb-field { flex: 1 1 12rem; }
+.mgdb-genomes-page #genome-stats-fullscreen-count {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+/* Native Fullscreen API where available, with a fixed-position fallback for
+   embedded browsers that do not expose it. */
+.mgdb-genomes-page .genome-stats-table-stage:fullscreen,
+.mgdb-genomes-page .genome-stats-table-stage:-webkit-full-screen,
+.mgdb-genomes-page .genome-stats-table-stage.is-fullscreen-fallback {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-3);
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  padding: var(--mgdb-space-4);
+  overflow: hidden;
+  background: var(--mgdb-surface);
+}
+
+.mgdb-genomes-page .genome-stats-table-stage.is-fullscreen-fallback {
+  position: fixed;
+  z-index: 10000;
+  inset: 0;
+}
+
+.mgdb-genomes-page .genome-stats-table-stage:fullscreen .genome-stats-fullscreen-bar,
+.mgdb-genomes-page .genome-stats-table-stage:-webkit-full-screen .genome-stats-fullscreen-bar,
+.mgdb-genomes-page .genome-stats-table-stage.is-fullscreen-fallback .genome-stats-fullscreen-bar { display: flex; }
+
+.mgdb-genomes-page .genome-stats-table-stage:fullscreen .genome-stats-table-wrap,
+.mgdb-genomes-page .genome-stats-table-stage:-webkit-full-screen .genome-stats-table-wrap,
+.mgdb-genomes-page .genome-stats-table-stage.is-fullscreen-fallback .genome-stats-table-wrap {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+}
+
+.mgdb-genomes-page .genome-stats-table-stage:fullscreen .mgdb-empty,
+.mgdb-genomes-page .genome-stats-table-stage:-webkit-full-screen .mgdb-empty,
+.mgdb-genomes-page .genome-stats-table-stage.is-fullscreen-fallback .mgdb-empty { overflow: auto; }
+
+body.genome-stats-fullscreen-open { overflow: hidden; }
+
+.mgdb-genomes-page .genome-stats-table-wrap {
+  max-height: 72vh;
+  overflow: auto;
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  overscroll-behavior: contain;
+}
+
+.mgdb-genomes-page .genome-stats-table-wrap:focus-visible {
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: 2px;
+}
+
+.mgdb-genomes-page .genome-stats-table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.mgdb-genomes-page .genome-stats-table caption {
+  position: sticky;
+  left: 0;
+  max-width: min(100vw, var(--mgdb-max-width));
+  background: var(--mgdb-surface);
+}
+
+.mgdb-genomes-page .genome-stats-table thead th { z-index: 3; }
+
+.mgdb-genomes-page .genome-stats-table th,
+.mgdb-genomes-page .genome-stats-table td { white-space: nowrap; }
+
+.mgdb-genomes-page .genome-stats-table .genome-stats-identity {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  border-right: 1px solid var(--hub-line);
+  background: var(--mgdb-surface);
+}
+
+/* The sticky identity column has to carry the zebra band itself, or the
+   striped row shows white where the column overlaps it. */
+.mgdb-genomes-page .genome-stats-table tbody tr:nth-child(even) .genome-stats-identity { background: var(--hub-ground); }
+
+.mgdb-genomes-page .genome-stats-table thead .genome-stats-identity {
+  z-index: 4;
+  background: var(--mgdb-surface-sunken);
+}
+
+.mgdb-genomes-page .genome-stats-table tbody tr:hover .genome-stats-identity { background: #e6eefb; }
+
+.mgdb-genomes-page .genome-stats-column-group {
+  display: block;
+  margin-bottom: var(--mgdb-space-1);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 500;
+}
+
+.mgdb-genomes-page .genome-stats-assembly-button {
+  min-height: var(--mgdb-tap-target);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mgdb-green-dark);
+  font: inherit;
+  font-weight: 800;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: .15em;
+  cursor: pointer;
+}
+
+.mgdb-genomes-page .genome-stats-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.mgdb-genomes-page .genome-stats-null { color: var(--mgdb-muted); }
+.mgdb-genomes-page .genome-stats-species { font-style: italic; }
+.mgdb-genomes-page .genome-stats-flag { color: var(--mgdb-status-error); font-weight: 800; }
+
+.mgdb-genomes-page .genome-stats-completeness {
+  display: inline-flex;
+  width: 4.75rem;
+  height: .7rem;
+  overflow: hidden;
+  vertical-align: middle;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-sunken);
+}
+
+.mgdb-genomes-page .genome-stats-completeness > span { display: block; height: 100%; }
+.mgdb-genomes-page .genome-stats-completeness .is-single { background: var(--mgdb-status-ok); }
+.mgdb-genomes-page .genome-stats-completeness .is-duplicated { background: var(--mgdb-status-info); }
+.mgdb-genomes-page .genome-stats-completeness .is-fragmented { background: var(--mgdb-gold); }
+.mgdb-genomes-page .genome-stats-completeness .is-missing { background: var(--mgdb-line); }
+
+.mgdb-genomes-page .genome-stats-detail-row td {
+  padding: var(--mgdb-space-4);
+  background: var(--mgdb-surface-alt);
+  white-space: normal;
+}
+
+.mgdb-genomes-page .genome-stats-detail-list {
+  display: grid;
+  grid-template-columns: minmax(12rem, 1fr) minmax(18rem, 3fr);
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  max-width: 72rem;
+  margin: 0;
+}
+
+.mgdb-genomes-page .genome-stats-detail-list dt {
+  color: var(--mgdb-muted);
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-genomes-page .genome-stats-detail-list dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Statistics tiles: the assembly id leads, then every visible column. */
+.mgdb-genomes-page #genome-stats-grid .genome-tile-title button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mgdb-green-dark);
+  font: inherit;
+  font-weight: 800;
+  text-align: left;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* --------------------------------------------------------------------------
+   Narrow screens
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 980px) {
+  .mgdb-genomes-page .genome-stats-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 
 @media (max-width: 767px) {
-  .mgdb-genomes-page .mgdb-section-tabs {
-    /* Sticky tabs eat too much of a short viewport; let them scroll away. */
-    position: static;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    padding-bottom: var(--mgdb-space-2);
-  }
-  .mgdb-genomes-page .mgdb-section-tabs a { white-space: nowrap; }
-  .mgdb-genomes-page .mgdb-chart-tall { height: 440px; }
+  .mgdb-genomes-page .genome-search-row { grid-template-columns: 1fr; }
+  .mgdb-genomes-page .genome-block-head { align-items: flex-start; }
+  .mgdb-genomes-page .genome-toolbar { width: 100%; }
+  .mgdb-genomes-page .genome-toolbar input { width: 100%; }
+  .mgdb-genomes-page .genome-toolbar label:first-child { flex: 1 1 100%; }
+  .mgdb-genomes-page .genome-stats-filter-grid { grid-template-columns: 1fr; }
+  .mgdb-genomes-page .genome-stats-toggle-row { align-items: stretch; }
+  .mgdb-genomes-page .genome-stats-toggle-row .mgdb-button,
+  .mgdb-genomes-page .genome-stats-actions .mgdb-button { width: 100%; }
+  .mgdb-genomes-page .genome-stats-actions .genome-toolbar { width: 100%; margin-right: 0; }
+  .mgdb-genomes-page .genome-stats-toggle-row .mgdb-result-count { width: 100%; margin-left: 0; }
+  .mgdb-genomes-page .genome-stats-table-wrap { max-height: 66vh; }
+  .mgdb-genomes-page .genome-stats-detail-list { grid-template-columns: 1fr; }
+  .mgdb-genomes-page .genome-stats-detail-list dd { margin-bottom: var(--mgdb-space-2); }
+  .mgdb-genomes-page .genome-stats-table-stage:fullscreen,
+  .mgdb-genomes-page .genome-stats-table-stage:-webkit-full-screen,
+  .mgdb-genomes-page .genome-stats-table-stage.is-fullscreen-fallback { padding: var(--mgdb-space-2); }
+  .mgdb-genomes-page .genome-stats-fullscreen-bar { align-items: flex-start; }
 }

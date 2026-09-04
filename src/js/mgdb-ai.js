@@ -608,6 +608,38 @@
     return height;
   }
 
+  /* Chart or table, one at a time. The two used to sit stacked, showing the
+     same numbers twice; this switches between them. `hidden` is what carries
+     the state -- the shared reset restates `[hidden] { display: none }` with
+     enough weight to beat a component's own `display`, so nothing here has to
+     touch style.display. The chart is measured while it is visible, so the
+     toggle asks Plotly to re-fit whenever it comes back on screen. */
+  function initFigureToggle() {
+    var buttons = document.querySelectorAll('[data-ai-figure-view]');
+    var chart = byId('ai-topic-chart');
+    var table = byId('ai-topic-table-wrap');
+    if (!buttons.length || !chart || !table) { return; }
+
+    function show(view) {
+      chart.hidden = (view !== 'chart');
+      table.hidden = (view !== 'table');
+      Array.prototype.forEach.call(buttons, function (b) {
+        b.setAttribute('aria-pressed', b.getAttribute('data-ai-figure-view') === view ? 'true' : 'false');
+      });
+      /* Plotly sizes to the box it drew into. Coming back from the table the
+         box was display:none, so its width was 0 until now. */
+      if (view === 'chart' && window.Plotly && chart.querySelector('.js-plotly-plot')) {
+        window.Plotly.Plots.resize(chart.querySelector('.js-plotly-plot'));
+      }
+    }
+
+    Array.prototype.forEach.call(buttons, function (btn) {
+      btn.addEventListener('click', function () {
+        show(btn.getAttribute('data-ai-figure-view'));
+      });
+    });
+  }
+
   function initFigure() {
     var rows = readJson('ai-chart-data');
     if (!rows || !rows.length) { return; }
@@ -705,6 +737,7 @@
     /* Copy citation / Copy DOI is bound by mgdb-modern.js for every
        .mgdb-ref-copy on the page, so there is nothing to do here. */
     initFigure();
+    initFigureToggle();
   }
 
   if (document.readyState === 'loading') {

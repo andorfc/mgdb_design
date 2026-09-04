@@ -2,7 +2,7 @@ $$SYNTAX-LEVEL 2
 *(mgdb-caas-fil-project
 <a class="mgdb-skip-link" href="#caas-main">Skip to main content</a>
 
-<main class="mgdb-page mgdb-caas-fil-project-page" id="caas-main">
+<main class="mgdb-page mgdb-hub-page mgdb-caas-fil-project-page" id="caas-main">
 
   <!-- Breadcrumb Navigation -->
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
@@ -67,19 +67,17 @@ $$SYNTAX-LEVEL 2
     <a href="#caas-groups">Heterotic groups</a>
     <a href="#caas-publications">Publications</a>
     <a href="#caas-data-hosted">Hosted data</a>
-    <a href="#caas-metrics">Metrics</a>
     <a href="#caas-faqs">FAQs</a>
+    <a href="#caas-metrics">Metrics</a>
     <a href="#caas-related">Related resources</a>
   </nav>
 
   <!-- SECTION 1: INTERACTIVE ASSEMBLIES DIRECTORY TABLE -->
   <section id="caas-assemblies" aria-labelledby="caas-assemblies-title">
     <div class="mgdb-section-heading">
-      <div><h2 id="caas-assemblies-title">CAAS 12 Founder Inbred Lines Directory</h2></div>
-      <p>Explore, sort, and download chromosome-scale reference assemblies for the 12 foundational founder lines.</p>
+      <div><h2 id="caas-assemblies-title">Assemblies</h2></div>
     </div>
 
-    <div class="mgdb-panel">
 <!-- FILTER & SEARCH TOOLBAR -->
     <div class="caas-table-toolbar">
       <div class="caas-filter-chips-wrap" role="group" aria-label="Filter by heterotic group">
@@ -609,18 +607,15 @@ $$SYNTAX-LEVEL 2
         </tbody>
       </table>
     </div>
-  </div>
 
   </section>
 
   <!-- SECTION 2: HETEROTIC GROUPS & ARCHITECTURE -->
   <section id="caas-groups" aria-labelledby="caas-groups-title">
     <div class="mgdb-section-heading">
-      <div><h2 id="caas-groups-title">Heterotic Groups &amp; Genomic Architecture</h2></div>
-      <p>The genomic foundations underlying major Chinese hybrid combinations and breeding group classifications.</p>
+      <div><h2 id="caas-groups-title">Heterotic groups</h2></div>
     </div>
 
-    <div class="mgdb-panel">
 <div class="caas-groups-grid">
       <article class="caas-group-card">
         <h3>Tang Sipingtou \(TSPT\) &amp; Landrace Heritage</h3>
@@ -643,18 +638,15 @@ $$SYNTAX-LEVEL 2
         </p>
       </article>
     </div>
-  </div>
 
   </section>
 
   <!-- SECTION 3: KEY PUBLICATIONS & ABSTRACT PREVIEWS -->
   <section id="caas-publications" aria-labelledby="caas-pub-title">
     <div class="mgdb-section-heading">
-      <div><h2 id="caas-pub-title">Key Publications &amp; Abstract Previews</h2></div>
-      <p>Scientific literature detailing the CAAS founder line assemblies, pan-genomic structural variation, and heterotic patterns.</p>
+      <div><h2 id="caas-pub-title">Publications</h2></div>
     </div>
 
-    <div class="mgdb-panel">
 <div class="caas-publications-grid">
       <!-- Publication 1: CAAS-FIL Landmark Paper -->
       <article class="caas-pub-card">
@@ -678,18 +670,15 @@ $$SYNTAX-LEVEL 2
         </div>
       </article>
     </div>
-  </div>
 
   </section>
 
   <!-- SECTION 4: DATA HOSTED AT MAIZEGDB -->
   <section id="caas-data-hosted" aria-labelledby="caas-hosted-title">
     <div class="mgdb-section-heading">
-      <div><h2 id="caas-hosted-title">CAAS-FIL Datasets Hosted at MaizeGDB</h2></div>
-      <p>Integrated genome browser tracks, sequence BLAST targets, gene models, and bulk download archives.</p>
+      <div><h2 id="caas-hosted-title">Hosted data</h2></div>
     </div>
 
-    <div class="mgdb-panel">
 <div class="caas-hosted-grid">
       <!-- 1: JBrowse 2 -->
       <article class="caas-hosted-card">
@@ -719,18 +708,61 @@ $$SYNTAX-LEVEL 2
         <a class="mgdb-button mgdb-button-secondary" href="/download#downloads-caas-fil">Browse Downloads &#8599;</a>
       </article>
     </div>
-  </div>
 
   </section>
 
   <!-- SECTION 5: SCALE & GENOMIC METRICS DASHBOARD -->
-  <section id="caas-metrics" aria-labelledby="caas-metrics-title">
+  <section id="caas-faqs" aria-labelledby="caas-faqs-title">
     <div class="mgdb-section-heading">
-      <div><h2 id="caas-metrics-title">CAAS-FIL Dataset Scale &amp; Metrics</h2></div>
-      <p>Summary statistics across the 12 founder inbred line assemblies, genome sizes, and annotations.</p>
+      <div><h2 id="caas-faqs-title">FAQs</h2></div>
     </div>
 
-    <div class="mgdb-panel">
+<div class="caas-faq-list">
+      <details class="caas-faq-item">
+        <summary><h3>Why are founder inbred lines \(FILs\) critical for maize genetics?</h3></summary>
+        <div class="caas-faq-body">
+          <p>
+            Founder inbred lines represent the foundational genetic pillars of modern hybrid breeding programs. Over 80% of modern Chinese commercial maize acreage traces to crosses between these founder lines \(for example, the mega-hybrid Zhengdan 958 derived from Zheng58 &times; Chang7-2\). Having high-quality reference genomes for all 12 founders illuminates the genetic combinations and structural alleles driving hybrid vigor.
+          </p>
+        </div>
+      </details>
+
+      <details class="caas-faq-item">
+        <summary><h3>Where can I download FASTA sequences and GFF3 gene annotations?</h3></summary>
+        <div class="caas-faq-body">
+          <p>
+            Full assembly FASTA files, GFF3 gene annotations, CDS/PEP files, and NCBI GenBank accessions are available on the <a href="/download#downloads-caas-fil">MaizeGDB Downloads Portal</a> or via individual assembly links in the table above.
+          </p>
+        </div>
+      </details>
+
+      <details class="caas-faq-item">
+        <summary><h3>How do CAAS-FIL gene models compare with B73 and Mo17?</h3></summary>
+        <div class="caas-faq-body">
+          <p>
+            While B73 and Mo17 represent classical US Stiff Stalk and Lancaster references, the CAAS-FIL assemblies uncover extensive novel gene models, structural rearrangements, and presence-absence variants specific to the Tang Sipingtou and P-Group lineages. Comparative synteny tracks are viewable directly in <a href="/genomebrowser">JBrowse 2</a>.
+          </p>
+        </div>
+      </details>
+
+      <details class="caas-faq-item">
+        <summary><h3>Can I run BLAST against individual CAAS founder genomes?</h3></summary>
+        <div class="caas-faq-body">
+          <p>
+            Yes! MaizeGDB hosts dedicated BLAST databases for all 12 CAAS lines. Navigate to the <a href="$(blast_url)">BLAST Tool</a> and select the desired CAAS assembly or predicted peptide database.
+          </p>
+        </div>
+      </details>
+    </div>
+
+  </section>
+
+  <!-- SECTION 7: CONNECTED RESOURCES -->
+  <section id="caas-metrics" aria-labelledby="caas-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="caas-metrics-title">Metrics</h2></div>
+    </div>
+
 <div class="mgdb-metric-grid">
       <article class="mgdb-metric">
         <div class="mgdb-metric-top">
@@ -769,87 +801,39 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Tang Sipingtou \(TSPT\), P-Group \(PA/PB\), Lancaster, Stiff Stalk, Iodent, and X-Group.</p>
       </article>
     </div>
-  </div>
 
   </section>
 
   <!-- SECTION 6: FAQS & GUIDELINES -->
-  <section id="caas-faqs" aria-labelledby="caas-faqs-title">
+  <section id="caas-related" class="mgdb-hub-related" aria-labelledby="caas-related-title">
     <div class="mgdb-section-heading">
-      <div><h2 id="caas-faqs-title">Frequently Asked Questions &amp; Guidelines</h2></div>
-      <p>Information regarding gene model access, heterotic grouping, and download endpoints.</p>
+      <div><h2 id="caas-related-title">Related resources</h2></div>
     </div>
 
-    <div class="mgdb-panel">
-<div class="caas-faq-list">
-      <details class="caas-faq-item">
-        <summary><h3>Why are founder inbred lines \(FILs\) critical for maize genetics?</h3></summary>
-        <div class="caas-faq-body">
-          <p>
-            Founder inbred lines represent the foundational genetic pillars of modern hybrid breeding programs. Over 80% of modern Chinese commercial maize acreage traces to crosses between these founder lines \(for example, the mega-hybrid Zhengdan 958 derived from Zheng58 &times; Chang7-2\). Having high-quality reference genomes for all 12 founders illuminates the genetic combinations and structural alleles driving hybrid vigor.
-          </p>
-        </div>
-      </details>
-
-      <details class="caas-faq-item">
-        <summary><h3>Where can I download FASTA sequences and GFF3 gene annotations?</h3></summary>
-        <div class="caas-faq-body">
-          <p>
-            Full assembly FASTA files, GFF3 gene annotations, CDS/PEP files, and NCBI GenBank accessions are available on the <a href="/download#downloads-caas-fil">MaizeGDB Downloads Portal</a> or via individual assembly links in the table above.
-          </p>
-        </div>
-      </details>
-
-      <details class="caas-faq-item">
-        <summary><h3>How do CAAS-FIL gene models compare with B73 and Mo17?</h3></summary>
-        <div class="caas-faq-body">
-          <p>
-            While B73 and Mo17 represent classical US Stiff Stalk and Lancaster references, the CAAS-FIL assemblies uncover extensive novel gene models, structural rearrangements, and presence-absence variants specific to the Tang Sipingtou and P-Group lineages. Comparative synteny tracks are viewable directly in <a href="/genomebrowser">JBrowse 2</a>.
-          </p>
-        </div>
-      </details>
-
-      <details class="caas-faq-item">
-        <summary><h3>Can I run BLAST against individual CAAS founder genomes?</h3></summary>
-        <div class="caas-faq-body">
-          <p>
-            Yes! MaizeGDB hosts dedicated BLAST databases for all 12 CAAS lines. Navigate to the <a href="$(blast_url)">BLAST Tool</a> and select the desired CAAS assembly or predicted peptide database.
-          </p>
-        </div>
-      </details>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/NAM_project">
+          <strong>NAM Founder Genomes</strong>
+          <span>26 chromosome-scale assemblies of the US nested association mapping founders</span>
+        </a>
+        <a href="/PanAnd_project">
+          <strong>Pan-Andropogoneae Genomes</strong>
+          <span>36 assemblies across wild panicoid grasses, the teosintes, and sorghum outgroups</span>
+        </a>
+        <a href="/european_flints">
+          <strong>European Flints Project</strong>
+          <span>Four assemblies covering European flint diversity, heterosis, and cold adaptation</span>
+        </a>
+        <a href="/pan_gene_center/pan_gene">
+          <strong>Pan-Gene Data Hub</strong>
+          <span>One gene across every assembly, with its core, dispensable, and ortholog calls</span>
+        </a>
+        <a href="/genome">
+          <strong>Genome Data Hub</strong>
+          <span>Every assembly MaizeGDB hosts, with assembly statistics and download paths</span>
+        </a>
+      </div>
     </div>
-  </div>
-
-  </section>
-
-  <!-- SECTION 7: CONNECTED RESOURCES -->
-  <section id="caas-related" aria-labelledby="caas-related-title">
-    <div class="mgdb-section-heading">
-      <div><h2 id="caas-related-title">Connected MaizeGDB Genomics Projects</h2></div>
-      <p>Explore related pangenomic, diversity, and association mapping resources.</p>
-    </div>
-
-    <div class="mgdb-panel caas-bottom-section">
-<div class="caas-related-grid">
-      <a class="caas-related-card" href="/NAM_project">
-        <div class="caas-related-title">NAM Parent Genomes &rarr;</div>
-        <p class="caas-related-desc">26 de novo chromosome-scale assemblies of the US Nested Association Mapping founder lines.</p>
-      </a>
-      <a class="caas-related-card" href="/PanAnd_project">
-        <div class="caas-related-title">Pan-Andropogoneae Genomes &rarr;</div>
-        <p class="caas-related-desc">36+ reference assemblies across wild panicoid grasses, teosintes, and sorghum outgroups.</p>
-      </a>
-      <a class="caas-related-card" href="/european_flints">
-        <div class="caas-related-title">European Flints Project &rarr;</div>
-        <p class="caas-related-desc">4 reference assemblies exploring European flint diversity, heterosis, and cold adaptation.</p>
-      </a>
-      <a class="caas-related-card" href="/genome">
-        <div class="caas-related-title">Genome Assembly Center &rarr;</div>
-        <p class="caas-related-desc">Browse all reference, founder, diversity, and pan-genomic maize assemblies hosted at MaizeGDB.</p>
-      </a>
-    </div>
-  </div>
-
   </section>
 
 </main>

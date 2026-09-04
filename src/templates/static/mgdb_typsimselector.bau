@@ -54,19 +54,21 @@ $$SYNTAX-LEVEL 2
 
   <!-- STICKY SECTION TABS -->
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#typ-compare" class="is-current">Comparison Console</a>
-    <a href="#typ-about">About the Tool</a>
-    <a href="#typ-method">Methodology &amp; Guidelines</a>
-    <a href="#typ-data">Underlying Data</a>
+    <a href="#typ-compare" class="is-current">Comparison console</a>
+    <a href="#typ-about">About</a>
+    <a href="#typ-method">Methodology</a>
+    <a href="#typ-data">Underlying data</a>
     <a href="#typ-overview">Statistics</a>
-    <a href="#typ-cite">Attribution &amp; Citation</a>
-    <a href="#typ-related">Connected Resources</a>
+    <a href="#typ-cite">Attribution</a>
+    <a href="#typ-related">Related resources</a>
   </nav>
 
   <!-- SECTION 1: INTERACTIVE COMPARISON CONSOLE & RESULTS -->
   <section id="typ-compare" class="mgdb-panel" aria-labelledby="typ-compare-title">
-    <h2 id="typ-compare-title" class="mgdb-panel-title">Interactive Comparison Console</h2>
+    <h2 id="typ-compare-title" class="mgdb-panel-title">Comparison console</h2>
     <p class="mgdb-panel-lead">Select a dataset and reference line to rank the collection by genetic similarity. Results, interactive distribution charts, and exports appear below.</p>
+
+    <div class="mgdb-message mgdb-message-info typ-handoff" id="typ-handoff" role="status" hidden></div>
 
     <form id="typ-form" class="typ-console" novalidate>
       <fieldset class="typ-step" id="typ-step-dataset">
@@ -171,7 +173,7 @@ $$SYNTAX-LEVEL 2
 
   <!-- SECTION 3: METHODOLOGY & INTERPRETATION GUIDELINES -->
   <section id="typ-method" class="mgdb-panel" aria-labelledby="typ-method-title">
-    <h2 id="typ-method-title" class="mgdb-panel-title">Methodology &amp; Interpretation Guidelines</h2>
+    <h2 id="typ-method-title" class="mgdb-panel-title">Methodology and interpretation</h2>
     <p class="mgdb-panel-lead">Guidelines for interpreting identity-by-state scores, understanding replicate spread, and avoiding ascertainment bias pitfalls.</p>
 
     <div class="mgdb-card-grid typ-method-grid">
@@ -203,7 +205,7 @@ $$SYNTAX-LEVEL 2
 
   <!-- SECTION 4: UNDERLYING GENOTYPIC DATA & DOWNLOADS -->
   <section id="typ-data" class="mgdb-panel" aria-labelledby="typ-data-title">
-    <h2 id="typ-data-title" class="mgdb-panel-title">Underlying Genotypic Data &amp; HapMap Downloads</h2>
+    <h2 id="typ-data-title" class="mgdb-panel-title">Underlying data and downloads</h2>
     <p class="mgdb-panel-lead">Complete open-access downloads for the raw Ames Diversity Panel HapMap genotyping matrices and sample identification keys.</p>
 
     <div class="typ-downloads-grid">
@@ -225,7 +227,7 @@ $$SYNTAX-LEVEL 2
 
   <!-- SECTION 5: DATASET STATISTICS & MATRIX SCALE \(DASHBOARD MOVED TO BOTTOM\) -->
   <section id="typ-overview" class="mgdb-panel" aria-labelledby="typ-scale-title">
-    <h2 id="typ-scale-title" class="mgdb-panel-title">Dataset Statistics &amp; Matrix Scale</h2>
+    <h2 id="typ-scale-title" class="mgdb-panel-title">Dataset statistics</h2>
     <p class="mgdb-panel-lead">Pre-computed pairwise similarity matrix scale across the Ames Diversity Panel.</p>
 
     <div class="mgdb-metric-grid">
@@ -277,7 +279,7 @@ $$SYNTAX-LEVEL 2
 
   <!-- SECTION 6: ATTRIBUTION & CITATIONS -->
   <section id="typ-cite" class="mgdb-panel" aria-labelledby="typ-cite-title">
-    <h2 id="typ-cite-title" class="mgdb-panel-title">Attribution &amp; Citing TYPSimSelector</h2>
+    <h2 id="typ-cite-title" class="mgdb-panel-title">Attribution and citation</h2>
     <p class="mgdb-panel-lead">If TYPSimSelector contributed to your research or breeding selections, please cite both MaizeGDB and the Ames panel publication&#58;</p>
 
     <div class="mgdb-table-scroll">
@@ -300,41 +302,33 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
-  <!-- SECTION 7: CONNECTED GENOMICS RESOURCES -->
+  <!-- SECTION 7: RELATED RESOURCES -->
   <section id="typ-related" class="mgdb-panel typ-bottom-section" aria-labelledby="typ-related-title">
-    <h2 id="typ-related-title" class="mgdb-panel-title">Connected Genomics Resources</h2>
-    <p class="mgdb-panel-lead">Explore related stock repositories, genetic variation tools, and reference genome resources.</p>
+    <h2 id="typ-related-title" class="mgdb-panel-title">Related resources</h2>
 
-    <div class="typ-related-grid">
-      <a class="typ-related-card" href="/data_center/stock">
-        <div class="typ-related-title">Stocks Data Hub</div>
-        <p class="typ-related-desc">Search and request maize germplasm stocks, mutant alleles, and NCRPIS seed accessions.</p>
-      </a>
-
-      <a class="typ-related-card" href="/genetic_variation">
-        <div class="typ-related-title">Genetic Variation Center</div>
-        <p class="typ-related-desc">Query SNPs, structural variations, and resequencing catalogs across diverse inbred lines.</p>
-      </a>
-
-      <a class="typ-related-card" href="/assembly">
-        <div class="typ-related-title">B73 Reference Assemblies</div>
-        <p class="typ-related-desc">Explore version histories \(v1&ndash;v5\), chromosome accessions, and FASTA/GFF bulk downloads.</p>
-      </a>
-
-      <a class="typ-related-card" href="/download">
-        <div class="typ-related-title">Bulk Downloads &amp; Globus</div>
-        <p class="typ-related-desc">Access high-speed Globus endpoints and bulk HTTP download directories.</p>
-      </a>
-
-      <a class="typ-related-card" href="https://npgsweb.ars-grin.gov/gringlobal/search.aspx" target="_blank" rel="noopener">
-        <div class="typ-related-title">GRIN-Global Germplasm &#8599;</div>
-        <p class="typ-related-desc">National Plant Germplasm System repository holding NCRPIS Ames maize collections.</p>
-      </a>
-
-      <a class="typ-related-card" href="/data_center">
-        <div class="typ-related-title">All Data Hubs</div>
-        <p class="typ-related-desc">Discover the full catalog of MaizeGDB data hubs, tools, and interactive catalogs.</p>
-      </a>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/stock">
+          <strong>Stocks data hub</strong>
+          <span>Germplasm stocks and seed</span>
+        </a>
+        <a href="/genetic_variation">
+          <strong>Genetic variation</strong>
+          <span>SNP and variation datasets</span>
+        </a>
+        <a href="/download">
+          <strong>Bulk downloads</strong>
+          <span>Globus and bulk downloads</span>
+        </a>
+        <a href="/data_center">
+          <strong>All data hubs</strong>
+          <span>Every curated collection</span>
+        </a>
+        <a href="https\://npgsweb.ars-grin.gov/gringlobal/search" target="_blank" rel="noopener">
+          <strong>GRIN-Global</strong>
+          <span>USDA germplasm accessions</span>
+        </a>
+      </div>
     </div>
   </section>
 </main>

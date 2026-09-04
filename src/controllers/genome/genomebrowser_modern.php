@@ -30,6 +30,8 @@ $bauplan->preHTML('<meta http-equiv="Content-Type" content="text/html; charset=u
 $bauplan->includeCss('/css/static.css');
 $bauplan->includeCss('/css/mgdb-modern.css');
 $bauplan->includeCss('/css/mgdb-megamenu.css');
+// The Data Hub shell, before the page sheet so the page can override it.
+$bauplan->includeCss('/css/mgdb-hub.css');
 $bauplan->includeCss('/css/mgdb-genomebrowser.css?v=' . $v_css);
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');

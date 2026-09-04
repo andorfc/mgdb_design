@@ -370,6 +370,14 @@
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
 
+/* The Download button lands on the card floor.
+
+   The hub shell grows a card's paragraphs so a closing link ends up at the
+   bottom of every card in a row. These cards wrap their text in a div, so
+   there was no paragraph to grow and the third card's button sat 51px above
+   its neighbours'. The wrapper takes the slack instead. */
+.mgdb-phenotype-page .pheno-download-grid > .mgdb-card > div { flex: 1 1 auto; }
+
 @media (max-width: 900px) {
   .mgdb-phenotype-page .pheno-collection-grid,
   .mgdb-phenotype-page .pheno-download-grid { grid-template-columns: minmax(0, 1fr); }

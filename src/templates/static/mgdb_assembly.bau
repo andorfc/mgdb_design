@@ -27,7 +27,6 @@ $$SYNTAX-LEVEL 2
       <strong>Assembly<br />Center</strong>
     </div>
     <div class="mgdb-hero-body">
-      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data_date)</p>
       <h1 id="assembly-title">B73 Maize Genome Assembly</h1>
       <p class="mgdb-hero-description">Explore the maize B73 representative reference genome assemblies \(v1 through v5\), structural gene model annotations, change histories, chromosome accessions, and bulk downloads.</p>
     </div>
@@ -35,33 +34,37 @@ $$SYNTAX-LEVEL 2
 
   <!-- STICKY SECTION TABS -->
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#assembly-versions" class="is-current">Assemblies &amp; Versions</a>
-    <a href="#assembly-details">Assembly Details &amp; Status</a>
-    <a href="#assembly-nomenclature">Gene Models &amp; Nomenclature</a>
-    <a href="#assembly-history">Change History</a>
-    <a href="#assembly-accessions">Chromosome Accessions</a>
-    <a href="#assembly-stocks">Stock &amp; Origin</a>
+    <a href="#assembly-versions" class="is-current">Versions</a>
+    <a href="#assembly-details">Details</a>
+    <a href="#assembly-nomenclature">Nomenclature</a>
+    <a href="#assembly-history">History</a>
+    <a href="#assembly-accessions">Accessions</a>
+    <a href="#assembly-stocks">Stocks</a>
     <a href="#assembly-downloads">Downloads</a>
-    <a href="#assembly-publications">Key Publications</a>
+    <a href="#assembly-publications">Publications</a>
     <a href="#assembly-faqs">FAQs</a>
     <a href="#assembly-overview">Statistics</a>
-    <a href="#assembly-related">Related Resources</a>
+    <a href="#assembly-related">Related</a>
   </nav>
 
   <!-- SECTION 1: ASSEMBLIES & VERSIONS -->
-  <section id="assembly-versions" class="mgdb-panel" aria-labelledby="assembly-versions-heading">
+  <section id="assembly-versions" aria-labelledby="assembly-versions-heading">
+    <div class="mgdb-section-heading">
+      <div><h2 id="assembly-versions-heading">The Maize B73 Representative Reference Genome</h2></div>
+      <p>The maize B73 reference genome has been revised across five generations since its initial BAC-by-BAC release in 2009. The maize nomenclature committee standards accommodate multiple <i>Zea</i> species, accessions, and versions \([<a href="https://documents.maizegdb.org/nomenclature/maize_assembly_nomenclature_2021.pdf" target="_blank" rel="noopener">Nomenclature Standards PDF</a>]\).</p>
+    </div>
+
+    <div class="mgdb-panel">
     <div class="assembly-quick-downloads">
       <div class="assembly-quick-title">Quick Downloads &bull; Current Representative Reference \(v5\)</div>
       <div class="assembly-quick-actions">
-        <a class="mgdb-button mgdb-button-primary mgdb-button-sm" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0.fa.gz" target="_blank" rel="noopener">Assembly FASTA \(v5\)</a>
+        <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0.fa.gz" target="_blank" rel="noopener">Assembly FASTA \(v5\)</a>
         <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/" target="_blank" rel="noopener">Gene Model FASTA \(Zm00001eb.1\)</a>
         <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.gff3.gz" target="_blank" rel="noopener">Gene Model GFF3</a>
         <a class="mgdb-button mgdb-button-quiet mgdb-button-sm" href="https://www.ncbi.nlm.nih.gov/bioproject/PRJEB32225" target="_blank" rel="noopener">GenBank PRJEB32225 &#8599;</a>
       </div>
     </div>
 
-    <h2 id="assembly-versions-heading" class="mgdb-panel-title">The Maize B73 Representative Reference Genome</h2>
-    <p class="mgdb-panel-lead">The maize B73 reference genome has been revised across five generations since its initial BAC-by-BAC release in 2009. The maize nomenclature committee standards accommodate multiple <i>Zea</i> species, accessions, and versions \([<a href="https://documents.maizegdb.org/nomenclature/maize_assembly_nomenclature_2021.pdf" target="_blank" rel="noopener">Nomenclature Standards PDF</a>]\).</p>
 
     <div class="mgdb-table-wrap">
       <table class="mgdb-table assembly-compare-table">
@@ -89,7 +92,7 @@ $$SYNTAX-LEVEL 2
             <td>Release 64+</td>
             <td>
               <div class="assembly-row-actions">
-                <a class="mgdb-button mgdb-button-sm mgdb-button-primary" href="/genome/assembly/Zm-B73-REFERENCE-NAM-5.0">View Assembly</a>
+                <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="/genome/assembly/Zm-B73-REFERENCE-NAM-5.0">View Assembly</a>
                 <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="https://jbrowse.maizegdb.org/?data=data%2FZm-B73-REFERENCE-NAM-5.0" target="_blank" rel="noopener">JBrowse</a>
               </div>
             </td>
@@ -106,7 +109,7 @@ $$SYNTAX-LEVEL 2
             <td>
               <div class="assembly-row-actions">
                 <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="/genome/assembly/Zm-B73-REFERENCE-GRAMENE-4.0">View Assembly</a>
-                <a class="mgdb-button mgdb-button-sm mgdb-button-quiet" href="https://www.maizegdb.org/gbrowse/maize_v4" target="_blank" rel="noopener">GBrowse v4</a>
+                <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="https://www.maizegdb.org/gbrowse/maize_v4" target="_blank" rel="noopener">GBrowse v4</a>
               </div>
             </td>
           </tr>
@@ -122,7 +125,7 @@ $$SYNTAX-LEVEL 2
             <td>
               <div class="assembly-row-actions">
                 <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="/genome/assembly/B73%20RefGen_v3">View Assembly</a>
-                <a class="mgdb-button mgdb-button-sm mgdb-button-quiet" href="https://www.maizegdb.org/gbrowse/maize_v3" target="_blank" rel="noopener">GBrowse v3</a>
+                <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="https://www.maizegdb.org/gbrowse/maize_v3" target="_blank" rel="noopener">GBrowse v3</a>
               </div>
             </td>
           </tr>
@@ -138,7 +141,7 @@ $$SYNTAX-LEVEL 2
             <td>
               <div class="assembly-row-actions">
                 <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="/genome/assembly/B73%20RefGen_v2">View Assembly</a>
-                <a class="mgdb-button mgdb-button-sm mgdb-button-quiet" href="https://www.maizegdb.org/gbrowse/maize_v2" target="_blank" rel="noopener">GBrowse v2</a>
+                <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="https://www.maizegdb.org/gbrowse/maize_v2" target="_blank" rel="noopener">GBrowse v2</a>
               </div>
             </td>
           </tr>
@@ -154,20 +157,25 @@ $$SYNTAX-LEVEL 2
             <td>
               <div class="assembly-row-actions">
                 <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="/genome/assembly/B73%20RefGen_v1">View Assembly</a>
-                <a class="mgdb-button mgdb-button-sm mgdb-button-quiet" href="https://www.maizegdb.org/gbrowse/maize_v1" target="_blank" rel="noopener">GBrowse v1</a>
+                <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="https://www.maizegdb.org/gbrowse/maize_v1" target="_blank" rel="noopener">GBrowse v1</a>
               </div>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
+  
+    </div>
   </section>
 
   <!-- SECTION 2: ASSEMBLY DETAILS & STATUS -->
-  <section id="assembly-details" class="mgdb-panel" aria-labelledby="assembly-details-heading">
-    <h2 id="assembly-details-heading" class="mgdb-panel-title">Assembly Details &amp; Status</h2>
-    <p class="mgdb-panel-lead">Detailed structural composition, contig statistics, and sequencing methodology across each reference assembly release.</p>
+  <section id="assembly-details" aria-labelledby="assembly-details-heading">
+    <div class="mgdb-section-heading">
+      <div><h2 id="assembly-details-heading">Assembly Details &amp; Status</h2></div>
+      <p>Detailed structural composition, contig statistics, and sequencing methodology across each reference assembly release.</p>
+    </div>
 
+    <div class="mgdb-panel">
     <div class="assembly-cards-grid">
       <!-- V5 Card -->
       <article class="assembly-detail-card is-current-card">
@@ -186,7 +194,7 @@ $$SYNTAX-LEVEL 2
         </div>
         <p class="assembly-detail-desc">De novo assembly constructed from PacBio Sequel long-read sequencing technology. Scaffolds validated and anchored by BioNano optical mapping and genetic linkage maps. Annotated with <code>Zm00001eb.1</code> containing sequentially numbered gene models.</p>
         <div class="assembly-detail-links">
-          <a class="mgdb-button mgdb-button-primary mgdb-button-sm" href="/genome/assembly/Zm-B73-REFERENCE-NAM-5.0">Assembly Profile</a>
+          <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="/genome/assembly/Zm-B73-REFERENCE-NAM-5.0">Assembly Profile</a>
           <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/" target="_blank" rel="noopener">Download Directory</a>
           <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://www.ncbi.nlm.nih.gov/bioproject/PRJEB32225" target="_blank" rel="noopener">NCBI BioProject &#8599;</a>
         </div>
@@ -258,13 +266,18 @@ $$SYNTAX-LEVEL 2
         </div>
       </article>
     </div>
+  
+    </div>
   </section>
 
   <!-- SECTION 3: GENE MODELS & NOMENCLATURE -->
-  <section id="assembly-nomenclature" class="mgdb-panel" aria-labelledby="assembly-nomenclature-heading">
-    <h2 id="assembly-nomenclature-heading" class="mgdb-panel-title">B73 Reference Gene Models &amp; Nomenclature Standards</h2>
-    <p class="mgdb-panel-lead">Structural annotation sets, identifier numbering schemes, and cross-reference mapping tables across reference releases.</p>
+  <section id="assembly-nomenclature" aria-labelledby="assembly-nomenclature-heading">
+    <div class="mgdb-section-heading">
+      <div><h2 id="assembly-nomenclature-heading">B73 Reference Gene Models &amp; Nomenclature Standards</h2></div>
+      <p>Structural annotation sets, identifier numbering schemes, and cross-reference mapping tables across reference releases.</p>
+    </div>
 
+    <div class="mgdb-panel">
     <div class="assembly-notice-box">
       <strong>Important Annotation Notice&#58;</strong>
       <p>The B73 v5 and NAM founders genome assemblies were initially released with a preliminary annotation \(<code>Zm00001e.1</code>\). The official annotation \(<code>Zm00001eb.1</code>\) features refined gene models and sequentially numbered identifiers across chromosomes. Use the official <code>Zm00001eb.1</code> gene models for current analyses. Cross-references between preliminary, v4, and v3 models are available below.</p>
@@ -334,13 +347,18 @@ $$SYNTAX-LEVEL 2
         </tbody>
       </table>
     </div>
+  
+    </div>
   </section>
 
   <!-- SECTION 4: CHANGE HISTORY -->
-  <section id="assembly-history" class="mgdb-panel" aria-labelledby="assembly-history-heading">
-    <h2 id="assembly-history-heading" class="mgdb-panel-title">Assembly Change History</h2>
-    <p class="mgdb-panel-lead">Chronological development and key improvements across maize reference genome releases.</p>
+  <section id="assembly-history" aria-labelledby="assembly-history-heading">
+    <div class="mgdb-section-heading">
+      <div><h2 id="assembly-history-heading">Assembly Change History</h2></div>
+      <p>Chronological development and key improvements across maize reference genome releases.</p>
+    </div>
 
+    <div class="mgdb-panel">
     <div class="assembly-history-timeline">
       <div class="timeline-item">
         <div class="timeline-badge">v5</div>
@@ -382,13 +400,18 @@ $$SYNTAX-LEVEL 2
         </div>
       </div>
     </div>
+  
+    </div>
   </section>
 
   <!-- SECTION 5: CHROMOSOME ACCESSIONS -->
-  <section id="assembly-accessions" class="mgdb-panel" aria-labelledby="assembly-accessions-heading">
-    <h2 id="assembly-accessions-heading" class="mgdb-panel-title">Chromosome Names &amp; GenBank Accessions</h2>
-    <p class="mgdb-panel-lead">Primary NCBI GenBank nucleotide accession numbers for Zm-B73-REFERENCE-NAM-5.0 \(PRJEB32225\) and Zm-B73-REFERENCE-GRAMENE-4.0 \(PRJNA10719\).</p>
+  <section id="assembly-accessions" aria-labelledby="assembly-accessions-heading">
+    <div class="mgdb-section-heading">
+      <div><h2 id="assembly-accessions-heading">Chromosome Names &amp; GenBank Accessions</h2></div>
+      <p>Primary NCBI GenBank nucleotide accession numbers for Zm-B73-REFERENCE-NAM-5.0 \(PRJEB32225\) and Zm-B73-REFERENCE-GRAMENE-4.0 \(PRJNA10719\).</p>
+    </div>
 
+    <div class="mgdb-panel">
     <div class="mgdb-table-wrap">
       <table class="mgdb-table">
         <thead>
@@ -416,13 +439,18 @@ $$SYNTAX-LEVEL 2
         </tbody>
       </table>
     </div>
+  
+    </div>
   </section>
 
   <!-- SECTION 6: STOCK & ORIGIN -->
-  <section id="assembly-stocks" class="mgdb-panel" aria-labelledby="assembly-stocks-heading">
-    <h2 id="assembly-stocks-heading" class="mgdb-panel-title">B73 Stock Information &amp; Pedigree Origin</h2>
-    <p class="mgdb-panel-lead">Seed germplasm sources, plant introduction accessions, and BAC library construction lineage.</p>
+  <section id="assembly-stocks" aria-labelledby="assembly-stocks-heading">
+    <div class="mgdb-section-heading">
+      <div><h2 id="assembly-stocks-heading">B73 Stock Information &amp; Pedigree Origin</h2></div>
+      <p>Seed germplasm sources, plant introduction accessions, and BAC library construction lineage.</p>
+    </div>
 
+    <div class="mgdb-panel">
     <div class="assembly-stock-content">
       <p>The seed source for both <strong>Zm-B73-REFERENCE-NAM-5.0</strong> and <strong>Zm-B73-REFERENCE-GRAMENE-4.0</strong> descended from <a class="mgdb-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail.aspx?accid=PI+550473" target="_blank" rel="noopener">PI 550473</a>, maintained at the North Central Regional Plant Introduction Station \(NCRPIS\). The accession closest to the seed lot used for sequencing was deposited as <a class="mgdb-link" href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail.aspx?accid=PI+677128" target="_blank" rel="noopener">PI 677128</a>.</p>
       
@@ -430,13 +458,18 @@ $$SYNTAX-LEVEL 2
       
       <p>Specific details regarding pedigree validation, contig frameworks, and physical maps are described in <a class="mgdb-link" href="/reference/9017907">Coe &amp; Schaeffer \(2005\) <i>Maydica</i> 50&#58;285-303</a> [<a class="mgdb-link" href="/docs/B73materials.pdf" target="_blank" rel="noopener">PDF</a>].</p>
     </div>
+  
+    </div>
   </section>
 
   <!-- SECTION 7: DOWNLOADS -->
-  <section id="assembly-downloads" class="mgdb-panel" aria-labelledby="assembly-downloads-heading">
-    <h2 id="assembly-downloads-heading" class="mgdb-panel-title">B73 Assembly &amp; Gene Model Downloads</h2>
-    <p class="mgdb-panel-lead">Direct download links for reference genome sequences, cDNA, CDS, PEP, ncRNA, and GFF3 structural annotations.</p>
+  <section id="assembly-downloads" aria-labelledby="assembly-downloads-heading">
+    <div class="mgdb-section-heading">
+      <div><h2 id="assembly-downloads-heading">B73 Assembly &amp; Gene Model Downloads</h2></div>
+      <p>Direct download links for reference genome sequences, cDNA, CDS, PEP, ncRNA, and GFF3 structural annotations.</p>
+    </div>
 
+    <div class="mgdb-panel">
     <div class="mgdb-table-wrap">
       <table class="mgdb-table">
         <thead>
@@ -452,7 +485,7 @@ $$SYNTAX-LEVEL 2
             <td><strong>Zm-B73-REFERENCE-NAM-5.0</strong></td>
             <td>Complete Assembly FASTA, GFF3, cDNA, CDS, PEP</td>
             <td>Release 64+</td>
-            <td><a class="mgdb-button mgdb-button-sm mgdb-button-primary" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/" target="_blank" rel="noopener">Download v5 Files</a></td>
+            <td><a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/" target="_blank" rel="noopener">Download v5 Files</a></td>
           </tr>
           <tr>
             <td><strong>Zm-B73-REFERENCE-GRAMENE-4.0</strong></td>
@@ -493,13 +526,18 @@ $$SYNTAX-LEVEL 2
         </tbody>
       </table>
     </div>
+  
+    </div>
   </section>
 
   <!-- SECTION 8: KEY PUBLICATIONS -->
-  <section id="assembly-publications" class="mgdb-panel" aria-labelledby="assembly-pubs-heading">
-    <h2 id="assembly-pubs-heading" class="mgdb-panel-title">Key Reference Genome Publications</h2>
-    <p class="mgdb-panel-lead">Primary landmark peer-reviewed research papers establishing the maize reference genome assemblies, annotations, and pan-genome foundations.</p>
+  <section id="assembly-publications" aria-labelledby="assembly-pubs-heading">
+    <div class="mgdb-section-heading">
+      <div><h2 id="assembly-pubs-heading">Key Reference Genome Publications</h2></div>
+      <p>Primary landmark peer-reviewed research papers establishing the maize reference genome assemblies, annotations, and pan-genome foundations.</p>
+    </div>
 
+    <div class="mgdb-panel">
     <div class="assembly-pubs-list">
       <!-- 1: Hufford et al. 2021 -->
       <article class="reference-result-card">
@@ -650,13 +688,18 @@ $$SYNTAX-LEVEL 2
         </div>
       </article>
     </div>
+  
+    </div>
   </section>
 
   <!-- SECTION 9: FAQS -->
-  <section id="assembly-faqs" class="mgdb-panel" aria-labelledby="assembly-faqs-heading">
-    <h2 id="assembly-faqs-heading" class="mgdb-panel-title">Frequently Asked Questions \(FAQs\)</h2>
-    <p class="mgdb-panel-lead">Common questions regarding maize reference genome definitions, assembly coordinate mapping, and annotations.</p>
+  <section id="assembly-faqs" aria-labelledby="assembly-faqs-heading">
+    <div class="mgdb-section-heading">
+      <div><h2 id="assembly-faqs-heading">Frequently Asked Questions \(FAQs\)</h2></div>
+      <p>Common questions regarding maize reference genome definitions, assembly coordinate mapping, and annotations.</p>
+    </div>
 
+    <div class="mgdb-panel">
     <div class="assembly-faq-list">
       <details class="assembly-faq-item" open>
         <summary class="assembly-faq-question">What is a Representative Reference Genome?</summary>
@@ -700,13 +743,18 @@ $$SYNTAX-LEVEL 2
         </div>
       </details>
     </div>
+  
+    </div>
   </section>
 
   <!-- SECTION 10: CORPUS STATISTICS \(SECOND TO LAST ITEM\) -->
-  <section id="assembly-overview" class="mgdb-panel" aria-labelledby="assembly-overview-heading">
-    <h2 id="assembly-overview-heading" class="mgdb-panel-title">Corpus Statistics</h2>
-    <p class="mgdb-panel-lead">Summary of reference genome versions, pan-genome lineages, and structural annotation sets curated at MaizeGDB.</p>
+  <section id="assembly-overview" aria-labelledby="assembly-overview-heading">
+    <div class="mgdb-section-heading">
+      <div><h2 id="assembly-overview-heading">Corpus Statistics</h2></div>
+      <p>Summary of reference genome versions, pan-genome lineages, and structural annotation sets curated at MaizeGDB.</p>
+    </div>
 
+    <div class="mgdb-panel">
     <div class="mgdb-metric-grid">
       <article class="mgdb-metric">
         <div class="mgdb-metric-top">
@@ -752,13 +800,18 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Structural annotation releases indexed with cross-reference translation tables.</p>
       </article>
     </div>
+  
+    </div>
   </section>
 
   <!-- SECTION 11: CONNECTED RESOURCES \(FINAL ITEM\) -->
-  <section id="assembly-related" class="mgdb-panel assembly-bottom-section" aria-labelledby="assembly-related-heading">
-    <h2 id="assembly-related-heading" class="mgdb-panel-title">Connected Resources</h2>
-    <p class="mgdb-panel-lead">Explore related MaizeGDB centers for genomes, gene models, expression data, and genetic variation.</p>
+  <section id="assembly-related" aria-labelledby="assembly-related-heading">
+    <div class="mgdb-section-heading">
+      <div><h2 id="assembly-related-heading">Connected Resources</h2></div>
+      <p>Explore related MaizeGDB centers for genomes, gene models, expression data, and genetic variation.</p>
+    </div>
 
+    <div class="mgdb-panel assembly-bottom-section">
     <div class="assembly-related-grid">
       <a class="assembly-related-card" href="/genome">
         <div class="assembly-related-title">Genome Data Hub</div>
@@ -785,10 +838,8 @@ $$SYNTAX-LEVEL 2
         <p class="assembly-related-desc">RNA-seq transcriptomics atlases, developmental series, qTeller, and FETA functional enrichments.</p>
       </a>
 
-      <a class="assembly-related-card" href="/genetic_variation">
-        <div class="assembly-related-title">Variation Data Hub</div>
-        <p class="assembly-related-desc">SNPs, indels, structural variants, HapMaps, and diversity matrices across maize accessions.</p>
-      </a>
+    </div>
+  
     </div>
   </section>
 </main>

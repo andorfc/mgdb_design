@@ -16,6 +16,13 @@
 
     var groups = document.querySelectorAll('#contact-list .contact-group');
 
+    /* The tab bar. Shared behaviour rather than a copy of it -- eleven pages
+       shipped a bar that highlighted whatever the template marked is-current
+       and never moved. `watch` is the directory, which changes height as
+       groups are filtered out, so the spy re-measures when it does. */
+    var retab = window.MGDB.sectionTabs ? window.MGDB.sectionTabs({ watch: '#contact-list' })
+                                        : function () {};
+
     var list = window.MGDB.filterList({
       items: people,
       input: byId('contact-query'),
@@ -39,6 +46,8 @@
           });
           group.hidden = visible === 0;
         });
+
+        retab();
       }
     });
 

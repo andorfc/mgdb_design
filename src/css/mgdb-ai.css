@@ -506,3 +506,16 @@
   .mgdb-ai-page .ai-search-form,
   .mgdb-ai-page .ai-pagination { display: none; }
 }
+
+/* The figure's heading row carries the chart/table toggle, so the two views
+   share one title instead of the table repeating it in a caption. */
+.mgdb-ai-page .ai-figure-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--mgdb-space-3);
+}
+
+.mgdb-ai-page .ai-figure-head h3 { margin: 0; }

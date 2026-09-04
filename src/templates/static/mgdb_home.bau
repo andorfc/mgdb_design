@@ -6,7 +6,7 @@ $$SYNTAX-LEVEL 2
 <meta property="og:title" content="MaizeGDB — Maize Genetics and Genomics Database">
 <meta property="og:description" content="The community database for maize genetics and genomics: genome assemblies, gene models, seed stocks, and curated literature, with the tools to search them.">
 
-<main class="mgdb-page mgdb-home-page mgdb-home-v3">
+<main class="mgdb-page mgdb-home-page mgdb-home-v3 mgdb-home-v4">
 
   <!-- A warm welcome header with release details and key actions. -->
   <header class="mgdb-home3-hero">
@@ -450,21 +450,24 @@ $$SYNTAX-LEVEL 2
            reading "B73 ASSEMBLY", "B73 ANNOTATION", "ALL GENOMES" -- which is
            illegible on a phone and invisible to a screen reader. The puzzle art
            is the recognizable part, so it leads as the section emblem and the
-           three destinations become real text. Same three links as production. -->
+           three destinations become real text.
+
+           Two links production carried are gone: the identifier no longer links
+           to the assembly record, and "All genomes" gave way to Download. Both
+           destinations remain in the Genomes menu; Download did not. -->
       <div class="mgdb-aside-card mgdb-refassembly">
-        <h2>Reference assembly</h2>
+        <h2>Representative assembly</h2>
         <div class="mgdb-refassembly-head">
           <img src="/images/home/assembly_puzzle.png" alt="" aria-hidden="true"
                width="160" height="160" loading="lazy" decoding="async" />
           <div>
-            <a class="mgdb-refassembly-current" href="$(server-url)/genome/assembly/Zm-B73-REFERENCE-NAM-5.0">B73 RefGen_v5</a>
-            <span>The current MaizeGDB reference</span>
+            <strong>B73 RefGen_v5</strong>
           </div>
         </div>
-        <ul class="mgdb-refassembly-links">
-          <li><a href="$(server-url)/assembly">B73 assembly<span>How the reference was chosen</span></a></li>
-          <li><a href="$(server-url)/gene_center/gene">B73 annotation<span>Gene models on the reference</span></a></li>
-          <li><a href="$(server-url)/genome">All genomes<span>Every assembly hosted here</span></a></li>
+        <ul class="mgdb-refassembly-actions">
+          <li><a href="$(server-url)/assembly">Assembly</a></li>
+          <li><a href="$(server-url)/gene_center/gene">Annotation</a></li>
+          <li><a href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0" target="_blank" rel="noopener">Download</a></li>
         </ul>
       </div>
 
@@ -509,7 +512,7 @@ $$SYNTAX-LEVEL 2
         <p>The current reference annotation</p>
       </div>
     </a>
-    <a class="mgdb-metric mgdb-metric-link" href="$(server-url)/data_center/stock">
+    <a class="mgdb-metric mgdb-metric-link mgdb-tone-burgundy" href="$(server-url)/data_center/stock">
       <span class="mgdb-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="21" height="21" focusable="false"><use href="#mzg-stocks-and-germplasm"></use></svg></span>
       <div>
         <strong class="mgdb-metric-value">$(metric_stocks)</strong>

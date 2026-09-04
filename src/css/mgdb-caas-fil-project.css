@@ -684,49 +684,13 @@
 }
 
 /* --------------------------------------------------------------------------
- * Section 7: Connected Resources (Matching NAM bottom section)
+ * Section 7: Related resources
+ *
+ * The closing panel is the shared `.mgdb-resource-panel` / `.mgdb-resource-list`
+ * now, so it needs no rules here -- it gets the green wash from mgdb-hub.css
+ * and the off-site arrow from mgdb-modern.css. The page's own
+ * `.caas-bottom-section` / `.caas-related-*` block was removed with it.
  * -------------------------------------------------------------------------- */
-
-.mgdb-caas-fil-project-page .caas-bottom-section {
-  background: linear-gradient(180deg, var(--mgdb-surface) 0%, var(--mgdb-green-soft) 100%) !important;
-  border-color: #b8dbca !important;
-}
-
-.mgdb-caas-fil-project-page .caas-related-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--mgdb-space-3);
-  margin-top: var(--mgdb-space-4);
-}
-
-.mgdb-caas-fil-project-page .caas-related-card {
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-sm);
-  padding: var(--mgdb-space-3);
-  text-decoration: none;
-  color: inherit;
-  transition: border-color .12s, box-shadow .12s;
-}
-
-.mgdb-caas-fil-project-page .caas-related-card:hover {
-  border-color: var(--mgdb-green);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-
-.mgdb-caas-fil-project-page .caas-related-title {
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-  color: var(--mgdb-green-dark);
-  margin-bottom: 2px;
-}
-
-.mgdb-caas-fil-project-page .caas-related-desc {
-  font-size: var(--mgdb-text-xs);
-  color: var(--mgdb-muted);
-  margin: 0;
-  line-height: 1.4;
-}
 
 /* Responsive */
 @media (max-width: 768px) {

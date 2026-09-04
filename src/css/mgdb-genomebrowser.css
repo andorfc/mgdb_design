@@ -10,7 +10,7 @@
 
 .mgdb-genomebrowser-page .mgdb-hero-emblem {
   background: #ffffff !important;
-  border-color: var(--mgdb-line);
+  border-color: var(--hub-line);
 }
 
 .mgdb-genomebrowser-page .mgdb-hero-emblem img {
@@ -32,8 +32,8 @@
   align-items: center;
   gap: 6px;
   padding: 4px 12px;
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
+  background: var(--hub-surface);
+  border: 1px solid var(--hub-line);
   border-radius: 9999px;
   color: #b91c1c !important;
   font-size: var(--mgdb-text-xs);
@@ -69,8 +69,9 @@
   margin-top: var(--mgdb-space-5);
   margin-bottom: var(--mgdb-space-5);
   padding: var(--mgdb-space-2) 0;
-  background: var(--mgdb-surface);
-  border-bottom: 1px solid var(--mgdb-line);
+  /* The ground, not white: the bar is sticky and the page scrolls under it. */
+  background: var(--hub-ground);
+  border-bottom: 1px solid var(--hub-line);
 }
 
 .mgdb-genomebrowser-page .mgdb-section-tabs a {
@@ -78,9 +79,9 @@
   min-height: 40px;
   align-items: center;
   padding: 0 var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
   color: var(--mgdb-ink) !important;
   font-size: var(--mgdb-text-sm);
   font-weight: 700;
@@ -122,8 +123,8 @@
 }
 
 .mgdb-genomebrowser-page .jbrowse2-citation-box {
-  background: var(--mgdb-surface-alt);
-  border: 1px solid var(--mgdb-line);
+  background: var(--hub-ground);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius);
   padding: var(--mgdb-space-3) var(--mgdb-space-4);
   margin-bottom: var(--mgdb-space-5);
@@ -161,8 +162,8 @@
 }
 
 .mgdb-genomebrowser-page .jbrowse2-primary-card {
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
+  background: var(--hub-surface);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius);
   padding: var(--mgdb-space-4);
   display: flex;
@@ -214,10 +215,11 @@
    Case Studies
    -------------------------------------------------------------------------- */
 
-.mgdb-genomebrowser-page .jbrowse2-case-studies {
+.mgdb-genomebrowser-page .jbrowse2-case-studies,
+.mgdb-genomebrowser-page .jbrowse1-case-studies {
   margin-top: var(--mgdb-space-5);
   padding-top: var(--mgdb-space-4);
-  border-top: 1px solid var(--mgdb-line);
+  border-top: 1px solid var(--hub-line);
 }
 
 .mgdb-genomebrowser-page .case-studies-header {
@@ -249,8 +251,8 @@
 }
 
 .mgdb-genomebrowser-page .case-study-card {
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
+  background: var(--hub-surface);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius);
   overflow: hidden;
   display: flex;
@@ -286,6 +288,12 @@
   border-bottom-color: #e9d5ff;
 }
 
+.mgdb-genomebrowser-page .case-badge-green {
+  background: #dcfce7;
+  color: #166534;
+  border-bottom-color: #bbf7d0;
+}
+
 .mgdb-genomebrowser-page .case-badge-blue {
   background: #e0f2fe;
   color: #0369a1;
@@ -295,7 +303,7 @@
 .mgdb-genomebrowser-page .case-study-img-wrap {
   height: 150px;
   background: #f8fafc;
-  border-bottom: 1px solid var(--mgdb-line);
+  border-bottom: 1px solid var(--hub-line);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -344,8 +352,8 @@
 }
 
 .mgdb-genomebrowser-page .launcher-card {
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
+  background: var(--hub-surface);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius);
   padding: var(--mgdb-space-5);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
@@ -429,8 +437,8 @@
 }
 
 .mgdb-genomebrowser-page .jbrowse1-tile {
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
+  background: var(--hub-surface);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius);
   padding: var(--mgdb-space-3);
   text-align: center;
@@ -490,8 +498,8 @@
 
 .mgdb-genomebrowser-page .guide-diagram-card {
   margin: 0;
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
+  background: var(--hub-surface);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius);
   padding: var(--mgdb-space-3);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
@@ -502,7 +510,7 @@
   height: 180px;
   object-fit: cover;
   border-radius: var(--mgdb-radius-sm);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
 }
 
 .mgdb-genomebrowser-page .guide-diagram-card figcaption {
@@ -524,8 +532,8 @@
 }
 
 .mgdb-genomebrowser-page .curated-track-card {
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
+  background: var(--hub-surface);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius);
   padding: var(--mgdb-space-4);
   display: flex;
@@ -598,8 +606,8 @@
 .mgdb-genomebrowser-page .dir-filter-chip {
   padding: 4px 12px;
   border-radius: 9999px;
-  border: 1px solid var(--mgdb-line);
-  background: var(--mgdb-surface);
+  border: 1px solid var(--hub-line);
+  background: var(--hub-surface);
   font-size: var(--mgdb-text-xs);
   font-weight: 700;
   color: var(--mgdb-ink);
@@ -626,7 +634,7 @@
   display: inline-block;
   padding: 1px 6px;
   border-radius: 9999px;
-  background: var(--mgdb-surface-alt);
+  background: var(--hub-ground);
   color: var(--mgdb-muted);
   font-size: 10px;
 }
@@ -673,8 +681,8 @@
 }
 
 .mgdb-genomebrowser-page .gbrowse-archive-card {
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
+  background: var(--hub-surface);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius);
   padding: var(--mgdb-space-4);
 }
@@ -713,10 +721,12 @@
    Connected Resources Section
    -------------------------------------------------------------------------- */
 
-.mgdb-genomebrowser-page .browser-bottom-section {
-  background: linear-gradient(180deg, var(--mgdb-surface) 0%, var(--mgdb-green-soft) 100%) !important;
-  border-color: #b8dbca !important;
-}
+/* The closing panel's green wash now comes from mgdb-hub.css, which paints
+   `> section.mgdb-hub-related` for every hub. The page had its own gradient
+   with two !importants; keeping it would have overridden the shell and left
+   this one hub's closing panel a slightly different green from the rest. The
+   cards on it take the shell's translucent white, so they read as cards on the
+   wash rather than as a second sheet of paper. */
 
 .mgdb-genomebrowser-page .browser-related-grid {
   display: grid;
@@ -726,8 +736,8 @@
 }
 
 .mgdb-genomebrowser-page .browser-related-card {
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
+  background: rgba(255, 255, 255, .9);
+  border: 1px solid #cfe3d6;
   border-radius: var(--mgdb-radius-sm);
   padding: var(--mgdb-space-3);
   text-decoration: none;
@@ -774,4 +784,170 @@
   .mgdb-genomebrowser-page .mgdb-form-row {
     grid-template-columns: 1fr;
   }
+}
+
+
+/* ==========================================================================
+   Review round, 2026-09-03
+   --------------------------------------------------------------------------
+   Three additions the comments asked for: a third launcher, sub-headings
+   inside the JBrowse 1 section, and screenshots that enlarge again.
+   ========================================================================== */
+
+/* The launcher grid is a fixed two columns. The third form is one short text
+   field, so it runs the width underneath rather than squeezing the two
+   coordinate forms into thirds. */
+.mgdb-genomebrowser-page .launcher-card-wide { grid-column: 1 / -1; }
+
+.mgdb-genomebrowser-page .launcher-example {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mgdb-green-dark);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.mgdb-genomebrowser-page .launcher-status {
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-burgundy);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* Sub-headings inside JBrowse 1. They sit a step below .mgdb-panel-title and
+   are separated by a rule, so the section reads as three parts rather than one
+   long scroll. */
+.mgdb-genomebrowser-page .jbrowse1-subsection {
+  margin-top: var(--mgdb-space-5);
+  padding-top: var(--mgdb-space-4);
+  border-top: 1px solid var(--hub-line);
+}
+
+.mgdb-genomebrowser-page .jbrowse1-subsection-title,
+.mgdb-genomebrowser-page .jbrowse1-case-studies .case-studies-header h3,
+.mgdb-genomebrowser-page .jbrowse2-case-studies .case-studies-header h3 {
+  margin: 0 0 var(--mgdb-space-2);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+}
+
+.mgdb-genomebrowser-page .jbrowse1-subsection-lead {
+  margin: 0 0 var(--mgdb-space-4);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+/* Screenshot enlargement. The figure's image is wrapped in a button so the
+   control is reachable from the keyboard; the button has to give back every
+   default a button carries or it draws its own box inside the card. */
+.mgdb-genomebrowser-page .guide-diagram-zoom {
+  display: block;
+  position: relative;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+  font: inherit;
+}
+
+.mgdb-genomebrowser-page .guide-diagram-zoom img { display: block; width: 100%; height: auto; }
+
+.mgdb-genomebrowser-page .guide-diagram-zoom-hint {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(20, 43, 13, .78);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity .12s;
+}
+
+.mgdb-genomebrowser-page .guide-diagram-zoom:hover .guide-diagram-zoom-hint,
+.mgdb-genomebrowser-page .guide-diagram-zoom:focus-visible .guide-diagram-zoom-hint { opacity: 1; }
+
+.mgdb-genomebrowser-page .browser-lightbox {
+  width: min(92vw, 1100px);
+  max-width: none;
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--hub-surface);
+  box-shadow: 0 20px 46px rgba(20, 43, 13, .28);
+}
+
+.mgdb-genomebrowser-page .browser-lightbox::backdrop { background: rgba(16, 30, 54, .55); }
+
+.mgdb-genomebrowser-page .browser-lightbox img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 78vh;
+  object-fit: contain;
+}
+
+.mgdb-genomebrowser-page .browser-lightbox-caption {
+  margin: var(--mgdb-space-3) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-genomebrowser-page .browser-lightbox-close {
+  float: right;
+  width: 2rem;
+  height: 2rem;
+  margin: 0 0 var(--mgdb-space-2) var(--mgdb-space-2);
+  border: 1px solid var(--hub-line);
+  border-radius: 50%;
+  background: var(--hub-surface);
+  color: var(--mgdb-ink);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mgdb-genomebrowser-page .browser-lightbox-close:hover { border-color: var(--mgdb-green); }
+
+/* Section headings sit on the card's padding, not below it -----------------
+
+   `.mgdb-panel-title` is a per-page class that appears in no shared stylesheet
+   — every other page using it defines its own rule, and this sheet never did,
+   so these h2s kept the browser's default heading margins. A heading's top
+   margin sits *inside* the section card's padding rather than collapsing out
+   of it, which put 51px above every section title against 33px below the
+   section's last element: the "extra space above the section header labels".
+
+   Only the margin is restated. The size and colour these headings take from
+   the default h2 are the ones the page shipped with, and the bottom margin is
+   what separates a title from its lead paragraph. */
+.mgdb-genomebrowser-page .mgdb-panel-title { margin-top: 0; }
+
+
+/* Banded sections — gold trial, 2026-09-03 --------------------------------
+
+   Second of two options put side by side. The first used the page ground and
+   was rejected: because the section fill then matched the page fill, the
+   section stopped reading as a card and became an outlined region. This one
+   uses --mgdb-gold-soft, which keeps the section a distinct panel *and* lifts
+   the white cards inside it — measured 1.077 against a white card, where the
+   ground was 1.074 and the very light cream 1.052.
+
+   Same rule as before, so the two are comparable: a section whose content is a
+   grid of cards is banded; prose, form, table and metric sections stay white.
+   That is JBrowse 2, JBrowse 1 and Legacy GBrowse. Related Resources keeps the
+   shell's green wash. */
+.mgdb-genomebrowser-page > section.browser-band { background: var(--mgdb-gold-soft); }
+
+/* This box carries the page ground, which on a gold band reads as a cold patch
+   rather than as a box. White makes it a card on the band like everything
+   else. */
+.mgdb-genomebrowser-page > section.browser-band .jbrowse2-citation-box {
+  background: var(--hub-surface);
 }

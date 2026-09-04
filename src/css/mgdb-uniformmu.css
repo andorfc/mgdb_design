@@ -191,6 +191,19 @@
 
 .mgdb-uniformmu-page .um-chain > li { position: relative; }
 
+/* The four steps are equal-height grid items, but the card is a list-item
+   rather than a flex column -- this container is not `.mgdb-card-grid`, so the
+   hub shell's card rules never reached it, and this page does not load that
+   sheet at all. The closing `Locus record / …` line therefore stopped wherever
+   each step's prose ended, up to 51px apart across the row. Making the card a
+   column and letting the prose take the slack puts all four on one line. */
+.mgdb-uniformmu-page .um-chain > li.mgdb-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.mgdb-uniformmu-page .um-chain > li.mgdb-card > p:not(:last-child) { flex: 1 1 auto; }
+
 .mgdb-uniformmu-page .um-chain h3 { margin-top: var(--mgdb-space-2); }
 
 .mgdb-uniformmu-page .um-chain-step {

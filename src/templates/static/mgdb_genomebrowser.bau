@@ -6,7 +6,7 @@ $$SYNTAX-LEVEL 2
 <meta property="og:title" content="Genome Browser Data Hub | JBrowse 2, JBrowse &amp; Synteny">
 <meta property="og:description" content="Explore MaizeGDB genome browsers including next-generation JBrowse 2, linear synteny viewers, JBrowse 1 pan-genomes, NAM founder inbreds, wild relatives, and curated functional genomics tracks.">
 
-<main class="mgdb-page mgdb-genomebrowser-page" id="browser-top">
+<main class="mgdb-page mgdb-hub-page mgdb-genomebrowser-page" id="browser-top">
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
     <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Genome Browsers</span>
   </nav>
@@ -20,36 +20,30 @@ $$SYNTAX-LEVEL 2
     <div class="mgdb-hero-body">
       <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data_date)</p>
       <h1 id="browser-title">Genome Browser Data Hub</h1>
-      <p class="mgdb-hero-description">Interactive multi-scale genome visualization environments across maize reference assemblies, pan-genomes, wild relatives, syntenic relationships, and functional genomics data tracks.</p>
+      <p class="mgdb-hero-description">Syntenic and linear genome browsers for maize and its wild relatives to visualize functional data, compare two or more genomes, analyze gene model structure, and more.</p>
 
       <div class="browser-hero-actions">
-        <a class="browser-curation-link" href="/curation/GenomeIssue/edit" target="_blank" rel="noopener">
-          <span class="curation-dot" aria-hidden="true"></span> Report an assembly error &#8599;
-        </a>
-        <a class="browser-curation-link" href="/curation/GenomeIssue/edit" target="_blank" rel="noopener">
-          <span class="curation-dot" aria-hidden="true"></span> Report a gene model error &#8599;
-        </a>
+        <a class="mgdb-button mgdb-button-primary" href="https://jbrowse2.maizegdb.org" target="_blank" rel="noopener">JBrowse 2 &bull; B73 v5 &#8599;</a>
+        <a class="mgdb-button mgdb-button-secondary" href="https://jbrowse.maizegdb.org/?data=v5" target="_blank" rel="noopener">JBrowse 1 &bull; B73 v5 &#8599;</a>
       </div>
     </div>
   </section>
 
   <!-- STICKY SECTION TABS -->
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#browser-jbrowse2" class="is-current">JBrowse 2 \(Next-Gen\)</a>
+    <a href="#browser-jbrowse2" class="is-current">JBrowse 2</a>
     <a href="#browser-launch">Interactive Launcher</a>
-    <a href="#browser-jbrowse1">JBrowse \(Classic\)</a>
-    <a href="#browser-curated">Curated Feature Views</a>
+    <a href="#browser-jbrowse1">JBrowse 1</a>
     <a href="#browser-instances">All Browser Instances</a>
     <a href="#browser-gbrowse">Legacy GBrowse</a>
-    <a href="#browser-overview">Statistics</a>
+    <a href="#browser-overview">Metrics</a>
     <a href="#browser-related">Related Resources</a>
   </nav>
 
   <!-- SECTION 1: JBROWSE 2 -->
-  <section id="browser-jbrowse2" class="mgdb-panel" aria-labelledby="browser-jbrowse2-heading">
-    <div class="jbrowse2-banner-badge">Next-Generation Multi-Scale Platform</div>
-    <h2 id="browser-jbrowse2-heading" class="mgdb-panel-title">JBrowse 2 &bull; Comparative &amp; Synteny Visualizations</h2>
-    <p class="mgdb-panel-lead">JBrowse 2 introduces modular genome architectures, multi-assembly linear synteny ribbons, structural variant breakpoints, and pan-genomic comparative alignments.</p>
+  <section id="browser-jbrowse2" class="browser-band" aria-labelledby="browser-jbrowse2-heading">
+    <h2 id="browser-jbrowse2-heading" class="mgdb-panel-title">JBrowse 2</h2>
+    <p class="mgdb-panel-lead">JBrowse 2 facilitates linear synteny comparisons between two or more genomes.</p>
 
     <div class="jbrowse2-citation-box">
       <p><strong>Primary Citation&#58;</strong> <a href="https://doi.org/10.1186/s13059-023-02914-z" target="_blank" rel="noopener">Diesh et al., 2023. JBrowse 2&#58; a modular genome browser with views of synteny and structural variation. <em>Genome Biology</em> 24&#58;74 &#8599;</a></p>
@@ -62,10 +56,10 @@ $$SYNTAX-LEVEL 2
     <div class="jbrowse2-cards-grid">
       <article class="jbrowse2-primary-card">
         <div class="jbrowse2-card-icon-wrap">
-          <img src="/images/JBrowse2_btn.png" alt="JBrowse 2 B73 NAM-5.0" />
+          <img src="/images/JBrowse2_btn.png" alt="JBrowse 2 B73 v5" />
         </div>
         <div class="jbrowse2-card-body">
-          <h3>JBrowse 2 B73 NAM-5.0</h3>
+          <h3>JBrowse 2 B73 v5</h3>
           <p>Launch the default representative reference browser configured with current gene models, functional tracks, and multi-assembly comparative tracks.</p>
           <a class="mgdb-button mgdb-button-primary" href="https://jbrowse2.maizegdb.org" target="_blank" rel="noopener">Launch JBrowse 2 &#8594;</a>
         </div>
@@ -76,8 +70,8 @@ $$SYNTAX-LEVEL 2
           <img src="/images/JBrowse2_tutorials_btn.png" alt="JBrowse 2 Tutorials" />
         </div>
         <div class="jbrowse2-card-body">
-          <h3>Tutorials &amp; Workflows</h3>
-          <p>Step-by-step guides on creating synteny views, managing track visibility, exporting high-resolution publication figures, and sharing sessions.</p>
+          <h3>MaizeGDB Tutorials &amp; Workflows</h3>
+          <p>Step-by-step guides to JBrowse 2 at MaizeGDB, including creating synteny views, managing track visibility, exporting high-resolution publication figures, and sharing sessions.</p>
           <a class="mgdb-button mgdb-button-secondary" href="/genome/jbrowse2_tutorial">Explore Tutorials &#8594;</a>
         </div>
       </article>
@@ -87,8 +81,8 @@ $$SYNTAX-LEVEL 2
           <img src="/images/jbrowse2_doc_btn.png" alt="Official JBrowse 2 Documentation" />
         </div>
         <div class="jbrowse2-card-body">
-          <h3>User Guide &amp; Docs</h3>
-          <p>Official technical documentation from the GMOD consortium detailing track configuration, plugins, SV dotplots, and CLI tooling.</p>
+          <h3>JBrowse 2 User Guide &amp; Docs</h3>
+          <p>Official technical documentation on JBrowse 2 from the GMOD consortium, detailing track configuration, plugins, SV dotplots, and CLI tooling.</p>
           <a class="mgdb-button mgdb-button-secondary" href="https://jbrowse.org/jb2/docs/user_guide/" target="_blank" rel="noopener">Read Documentation &#8599;</a>
         </div>
       </article>
@@ -161,8 +155,8 @@ $$SYNTAX-LEVEL 2
   </section>
 
   <!-- SECTION 2: INTERACTIVE COORDINATE & SYNTENY LAUNCHER -->
-  <section id="browser-launch" class="mgdb-panel" aria-labelledby="browser-launch-heading">
-    <h2 id="browser-launch-heading" class="mgdb-panel-title">Interactive Multi-Assembly Browser Launcher</h2>
+  <section id="browser-launch" aria-labelledby="browser-launch-heading">
+    <h2 id="browser-launch-heading" class="mgdb-panel-title">Interactive Launcher</h2>
     <p class="mgdb-panel-lead">Quickly configure custom genomic coordinates and multi-assembly comparisons to launch directly into JBrowse 2.</p>
 
     <div class="launchers-grid">
@@ -275,147 +269,171 @@ $$SYNTAX-LEVEL 2
           </div>
         </form>
       </div>
+
+      <!-- FORM 3: B73 v5 GENE MODEL AGAINST THE NAM PANGENOME ALIGNMENTS -->
+      <div class="launcher-card launcher-card-wide">
+        <div class="launcher-header">
+          <h3>NAM Pangenome Alignment Track View</h3>
+          <span class="launcher-tag launcher-tag-gold">Gene Model</span>
+        </div>
+        <p class="launcher-desc">Open one B73 v5 gene model with the alignment track for every other NAM founder assembly loaded beside it.</p>
+
+        <form id="jbrowse2_nam_alignments_form" class="launcher-form">
+          <div class="mgdb-form-group">
+            <label for="alignment_gm">B73 v5 gene model ID&#58;</label>
+            <input id="alignment_gm" name="gene" type="text" class="mgdb-input" placeholder="Zm00001eb067740" autocomplete="off" />
+            <p class="mgdb-hint">Example&#58; <button type="button" class="launcher-example" data-gene="Zm00001eb067740">Zm00001eb067740</button></p>
+          </div>
+
+          <div class="launcher-actions">
+            <button type="button" class="mgdb-button mgdb-button-primary" onclick="launchJBrowse2NAMAlignments\(\)">Launch Alignment View &#8594;</button>
+          </div>
+          <p class="launcher-status" id="nam-alignment-status" role="status" hidden></p>
+        </form>
+      </div>
     </div>
   </section>
 
   <!-- SECTION 3: JBROWSE 1 \(CLASSIC\) -->
-  <section id="browser-jbrowse1" class="mgdb-panel" aria-labelledby="browser-jbrowse1-heading">
-    <h2 id="browser-jbrowse1-heading" class="mgdb-panel-title">JBrowse 1 &bull; Pan-Genome &amp; Diversity Presets</h2>
+  <section id="browser-jbrowse1" class="browser-band" aria-labelledby="browser-jbrowse1-heading">
+    <h2 id="browser-jbrowse1-heading" class="mgdb-panel-title">JBrowse 1</h2>
     <p class="mgdb-panel-lead">Fast, lightweight HTML5 genome browsers curated for the 26 NAM founders, highland/lowland landraces, and Pan-Andropogoneae relatives.</p>
 
     <div class="jbrowse1-quick-grid">
       <!-- B73 v5 -->
       <a class="jbrowse1-tile" href="https://jbrowse.maizegdb.org/?data=v5" target="_blank" rel="noopener">
-        <div class="jbrowse1-tile-badge">Representative</div>
         <img src="/images/jbrowse_B73_v5.jpeg" alt="B73 v5 JBrowse" loading="lazy" />
-        <h4>B73 NAM-5.0</h4>
-        <span class="jbrowse1-tile-link">Open v5 Browser &#8599;</span>
+        <h4>B73 v5 &#8599;</h4>
       </a>
 
       <!-- NAM Founders -->
       <a class="jbrowse1-tile" href="https://jbrowse.maizegdb.org/?data=B97" target="_blank" rel="noopener">
-        <div class="jbrowse1-tile-badge jbrowse1-badge-gold">26 Genomes</div>
         <img src="/images/NAMs.png" alt="NAM Founders Genomes" loading="lazy" />
-        <h4>NAM Founders</h4>
-        <span class="jbrowse1-tile-link">Explore NAM Inbreds &#8599;</span>
+        <h4>NAM Founders &#8599;</h4>
       </a>
 
       <!-- Highland / Lowland -->
       <a class="jbrowse1-tile" href="https://jbrowse.maizegdb.org/?data=CML457" target="_blank" rel="noopener">
-        <div class="jbrowse1-tile-badge">Landraces</div>
         <img src="/images/HiLo_btn.png" alt="HiLo Genomes" loading="lazy" />
-        <h4>Highland / Lowland</h4>
-        <span class="jbrowse1-tile-link">Explore HiLo Lines &#8599;</span>
+        <h4>Highland / Lowland &#8599;</h4>
       </a>
 
       <!-- Pan-Andropogoneae -->
       <a class="jbrowse1-tile" href="https://jbrowse.maizegdb.org/?data=Zd-Gigi" target="_blank" rel="noopener">
-        <div class="jbrowse1-tile-badge">Wild Relatives</div>
         <img src="/images/Button_Mo17CAU.jpeg" alt="Pan-Andropogoneae Genomes" loading="lazy" />
-        <h4>Pan-Andropogoneae</h4>
-        <span class="jbrowse1-tile-link">Explore Wild Relatives &#8599;</span>
+        <h4>Pan-Andropogoneae &#8599;</h4>
       </a>
 
       <!-- Mo17 CAU-2.0 -->
       <a class="jbrowse1-tile" href="https://jbrowse.maizegdb.org/?data=Mo17v2" target="_blank" rel="noopener">
-        <div class="jbrowse1-tile-badge">Inbred Line</div>
         <img src="/images/Button_W22.jpeg" alt="Mo17 Genome" loading="lazy" />
-        <h4>Mo17 CAU-2.0</h4>
-        <span class="jbrowse1-tile-link">Open Mo17 Browser &#8599;</span>
+        <h4>Mo17 CAU-2.0 &#8599;</h4>
       </a>
 
       <!-- W22 -->
       <a class="jbrowse1-tile" href="https://jbrowse.maizegdb.org/?data=W22" target="_blank" rel="noopener">
-        <div class="jbrowse1-tile-badge">Inbred Line</div>
         <img src="/images/Button_W22.jpeg" alt="W22 Genome" loading="lazy" />
-        <h4>W22 Reference</h4>
-        <span class="jbrowse1-tile-link">Open W22 Browser &#8599;</span>
+        <h4>W22 Reference &#8599;</h4>
       </a>
 
       <!-- A188 -->
       <a class="jbrowse1-tile" href="https://jbrowse.maizegdb.org/?data=A188" target="_blank" rel="noopener">
-        <div class="jbrowse1-tile-badge">Inbred Line</div>
         <img src="/images/Button_W22.jpeg" alt="A188 Genome" loading="lazy" />
-        <h4>A188 Reference</h4>
-        <span class="jbrowse1-tile-link">Open A188 Browser &#8599;</span>
+        <h4>A188 Reference &#8599;</h4>
       </a>
     </div>
 
-    <!-- Visual Diagrams -->
-    <div class="jbrowse1-guides-grid">
-      <figure class="guide-diagram-card">
-        <img src="/images/jbrowse_at_a_glance.jpeg" alt="MaizeGDB JBrowse Page Format at a Glance" loading="lazy" />
-        <figcaption><strong>MaizeGDB JBrowse Interface at a Glance&#58;</strong> Track selector, location coordinate box, and multi-track display.</figcaption>
-      </figure>
+    <!-- JBROWSE 1 BASICS AND TUTORIALS -->
+    <div class="jbrowse1-subsection">
+      <h3 class="jbrowse1-subsection-title">JBrowse 1 basics and tutorials</h3>
+      <p class="jbrowse1-subsection-lead">The Rat Genome Database maintains a thorough <a href="https://rgd.mcw.edu/wg/help3/tools/rgd-genome-browsers/the-rat-jbrowse-genome-browser/#sequence" target="_blank" rel="noopener">JBrowse tutorial &#8599;</a> that covers the interface in general. Select either screenshot below to enlarge it.</p>
 
-      <figure class="guide-diagram-card">
-        <img src="/images/pangenome-snp.jpeg" alt="Toggle Across Genomes in MaizeGDB JBrowse" loading="lazy" />
-        <figcaption><strong>Pan-Genome Variant Toggling&#58;</strong> Switch tracks and compare SNP alleles across diverse inbred lines in real time.</figcaption>
-      </figure>
+      <div class="jbrowse1-guides-grid">
+        <figure class="guide-diagram-card">
+          <button type="button" class="guide-diagram-zoom" data-full="/images/jbrowse_at_a_glance.jpeg" data-caption="MaizeGDB JBrowse page format at a glance">
+            <img src="/images/jbrowse_at_a_glance.jpeg" alt="MaizeGDB JBrowse page format at a glance" loading="lazy" />
+            <span class="guide-diagram-zoom-hint" aria-hidden="true">Enlarge</span>
+          </button>
+          <figcaption><strong>MaizeGDB JBrowse Interface at a Glance&#58;</strong> Track selector, location coordinate box, and multi-track display.</figcaption>
+        </figure>
+
+        <figure class="guide-diagram-card">
+          <button type="button" class="guide-diagram-zoom" data-full="/images/pangenome-snp.jpeg" data-caption="Toggle across genomes in MaizeGDB JBrowse instances">
+            <img src="/images/pangenome-snp.jpeg" alt="Toggle across genomes in MaizeGDB JBrowse instances" loading="lazy" />
+            <span class="guide-diagram-zoom-hint" aria-hidden="true">Enlarge</span>
+          </button>
+          <figcaption><strong>Pan-Genome Variant Toggling&#58;</strong> Switch tracks and compare SNP alleles across diverse inbred lines in real time.</figcaption>
+        </figure>
+      </div>
     </div>
-  </section>
 
-  <!-- SECTION 4: CURATED FEATURE VIEWS -->
-  <section id="browser-curated" class="mgdb-panel" aria-labelledby="browser-curated-heading">
-    <h2 id="browser-curated-heading" class="mgdb-panel-title">Curated Deep-Link Views &bull; High-Impact Data Tracks</h2>
-    <p class="mgdb-panel-lead">Click any card below to launch pre-configured JBrowse sessions loaded with specialized functional genomics datasets&#58;</p>
+    <!-- FEATURED JBROWSE 1 CASE STUDIES \(was "quick links to useful data"\) -->
+    <div class="jbrowse1-case-studies">
+      <div class="case-studies-header">
+        <div>
+          <h3>Featured JBrowse 1 Case Studies</h3>
+          <p class="case-studies-lead">Click any button below to launch a pre-configured JBrowse 1 session loaded with a specialized functional genomics dataset&#58;</p>
+        </div>
+      </div>
 
-    <div class="curated-tracks-grid">
-      <!-- 1: Annotation Comparison -->
-      <article class="curated-track-card">
-        <div class="curated-track-badge">Annotation</div>
-        <h3 class="curated-track-title">Compare B73 Annotations \(v3, v4 &amp; v5\)</h3>
-        <p class="curated-track-desc">Side-by-side comparative gene model structures across Zm00001eb \(v5\), Zm00001d \(v4\), and GRMZM \(v3\) annotations.</p>
-        <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="https://jbrowse.maizegdb.org/?loc=chr3%3A181594851..181637950&amp;tracks=gene_models%2Cgene_models_v4_json%2Cgene_models_v3_json&amp;highlight=" target="_blank" rel="noopener">Open Annotation Comparison &#8599;</a>
-      </article>
-
-      <!-- 2: NAM GWAS SNPs -->
-      <article class="curated-track-card">
-        <div class="curated-track-badge curated-badge-gold">GWAS &amp; Diversity</div>
-        <h3 class="curated-track-title">NAM Founder Trait-Associated SNPs</h3>
-        <p class="curated-track-desc">Phenotype-associated GWAS single nucleotide polymorphisms across all 26 NAM founder inbred lines mapped to B73 v5.</p>
-        <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="https://jbrowse.maizegdb.org/?loc=chr3%3A181594851..181637400&amp;tracks=gene_models%2Cgwas_B97_snps%2Cgwas_Ky21_snps%2Cgwas_M162W_snps%2Cgwas_Oh43_snps%2Cgwas_CML228_snps%2Cgwas_CML247_snps%2Cgwas_CML322_snps%2Cgwas_CML69_snps&amp;highlight=" target="_blank" rel="noopener">Open NAM GWAS Track &#8599;</a>
-      </article>
-
-      <!-- 3: Epigenetic Marks -->
-      <article class="curated-track-card">
-        <div class="curated-track-badge curated-badge-blue">Epigenomics</div>
-        <h3 class="curated-track-title">Epigenetic Marks &amp; Histone ChIP-seq</h3>
-        <p class="curated-track-desc">DNA methylation profiles \(CHG, CG, CHH\) and histone modification peak regions \(H3K27ac, H3K36me3, H3K4me3, H3K56ac\) in leaf tissue.</p>
-        <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="https://jbrowse.maizegdb.org/?loc=chr3%3A181594851..181637400&amp;tracks=gene_models%2CSRR7889753_chg%2CSRR7889753_cg%2CSRR7889753_chh%2CChip_B73_leaf_H3K27ac_rep1_peaks_region%2CChip_B73_leaf_H3K36me3_rep1_peaks_region%2CChip_B73_leaf_H3K4me1_rep1_peaks_region%2CChip_B73_leaf_H3K4me3_rep2_peaks_region%2CChip_B73_leaf_H3K56ac_rep1_peaks_region&amp;highlight=" target="_blank" rel="noopener">Open Epigenetics Track &#8599;</a>
-      </article>
-
-      <!-- 4: Open Chromatin & DAP-seq -->
-      <article class="curated-track-card">
-        <div class="curated-track-badge curated-badge-purple">Regulation</div>
-        <h3 class="curated-track-title">Open Chromatin &amp; TF Binding Sites</h3>
-        <p class="curated-track-desc">ATAC-seq open chromatin narrow peaks combined with DAP-seq DNA binding profiles for key transcription factor families \(ARF, BZIP, EREB, LBD\).</p>
-        <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="https://jbrowse.maizegdb.org/?loc=chr3%3A181608661..181625680&amp;tracks=gene_models%2CDAP-seq_maize_ARF10%2CDAP-seq_maize_ARF14%2CDAP-seq_maize_ARF25%2CDAP-seq_maize_ARF34%2CDAP-seq_maize_BAD1%2CDAP-seq_maize_BZIP54%2CDAP-seq_maize_BZIP72%2CDAP-seq_maize_EREB127%2CDAP-seq_maize_EREB29%2CDAP-seq_maize_LBD19_IG1%2Catac_leaf_rep1_narrow_peak&amp;highlight=" target="_blank" rel="noopener">Open Regulation Track &#8599;</a>
-      </article>
-
-      <!-- 5: RNA-seq Expression -->
-      <article class="curated-track-card">
-        <div class="curated-track-badge">Transcriptomics</div>
-        <h3 class="curated-track-title">RNA-seq Multi-Tissue Expression</h3>
-        <p class="curated-track-desc">Developmental tissue RNA-seq read coverage depth and splice junction alignments across B73 organs.</p>
-        <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="https://jbrowse.maizegdb.org/?loc=chr3%3A181594851..181637400&amp;tracks=gene_models%2CSRR1620900%2CSRR1620843%2CSRR1620847%2CSRR531200%2CSRR1620944%2CSRR1619669%2Cv11_middle_mn01041&amp;highlight=" target="_blank" rel="noopener">Open RNA-seq Track &#8599;</a>
-      </article>
-
-      <!-- 6: Transposon Insertions -->
-      <article class="curated-track-card">
-        <div class="curated-track-badge curated-badge-green">Mutagenesis</div>
-        <h3 class="curated-track-title">Transposon Insertions \(UniformMu\)</h3>
-        <p class="curated-track-desc">Sequence-indexed <em>Robertson's Mutator</em> transposon insertion flanking sequence tags mapped to B73 v5.</p>
-        <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="https://jbrowse.maizegdb.org/?loc=chr3%3A181594851..181637950&amp;tracks=gene_models%2Cuniformmu&amp;highlight=" target="_blank" rel="noopener">Open UniformMu Track &#8599;</a>
-      </article>
+      <div class="case-studies-grid">
+        <article class="case-study-card">
+          <div class="case-study-badge">Annotation</div>
+          <div class="case-study-content">
+            <h4 class="case-study-title">Compare B73 Annotations \(v3, v4 &amp; v5\)</h4>
+            <p class="case-study-desc">Side-by-side comparative gene model structures across Zm00001eb \(v5\), Zm00001d \(v4\), and GRMZM \(v3\) annotations.</p>
+            <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="https://jbrowse.maizegdb.org/?loc=chr3%3A181594851..181637950&amp;tracks=gene_models%2Cgene_models_v4_json%2Cgene_models_v3_json&amp;highlight=" target="_blank" rel="noopener">Open Annotation Comparison &#8599;</a>
+          </div>
+        </article>
+        <article class="case-study-card">
+          <div class="case-study-badge case-badge-amber">GWAS &amp; Diversity</div>
+          <div class="case-study-content">
+            <h4 class="case-study-title">NAM Founder Trait-Associated SNPs</h4>
+            <p class="case-study-desc">Phenotype-associated GWAS single nucleotide polymorphisms across all 26 NAM founder inbred lines mapped to B73 v5.</p>
+            <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="https://jbrowse.maizegdb.org/?loc=chr3%3A181594851..181637400&amp;tracks=gene_models%2Cgwas_B97_snps%2Cgwas_Ky21_snps%2Cgwas_M162W_snps%2Cgwas_Oh43_snps%2Cgwas_CML228_snps%2Cgwas_CML247_snps%2Cgwas_CML322_snps%2Cgwas_CML69_snps&amp;highlight=" target="_blank" rel="noopener">Open NAM GWAS Track &#8599;</a>
+          </div>
+        </article>
+        <article class="case-study-card">
+          <div class="case-study-badge case-badge-blue">Epigenomics</div>
+          <div class="case-study-content">
+            <h4 class="case-study-title">Epigenetic Marks &amp; Histone ChIP-seq</h4>
+            <p class="case-study-desc">DNA methylation profiles \(CHG, CG, CHH\) and histone modification peak regions \(H3K27ac, H3K36me3, H3K4me3, H3K56ac\) in leaf tissue.</p>
+            <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="https://jbrowse.maizegdb.org/?loc=chr3%3A181594851..181637400&amp;tracks=gene_models%2CSRR7889753_chg%2CSRR7889753_cg%2CSRR7889753_chh%2CChip_B73_leaf_H3K27ac_rep1_peaks_region%2CChip_B73_leaf_H3K36me3_rep1_peaks_region%2CChip_B73_leaf_H3K4me1_rep1_peaks_region%2CChip_B73_leaf_H3K4me3_rep2_peaks_region%2CChip_B73_leaf_H3K56ac_rep1_peaks_region&amp;highlight=" target="_blank" rel="noopener">Open Epigenetics Track &#8599;</a>
+          </div>
+        </article>
+        <article class="case-study-card">
+          <div class="case-study-badge case-badge-purple">Regulation</div>
+          <div class="case-study-content">
+            <h4 class="case-study-title">Open Chromatin &amp; TF Binding Sites</h4>
+            <p class="case-study-desc">ATAC-seq open chromatin narrow peaks combined with DAP-seq DNA binding profiles for key transcription factor families \(ARF, BZIP, EREB, LBD\).</p>
+            <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="https://jbrowse.maizegdb.org/?loc=chr3%3A181608661..181625680&amp;tracks=gene_models%2CDAP-seq_maize_ARF10%2CDAP-seq_maize_ARF14%2CDAP-seq_maize_ARF25%2CDAP-seq_maize_ARF34%2CDAP-seq_maize_BAD1%2CDAP-seq_maize_BZIP54%2CDAP-seq_maize_BZIP72%2CDAP-seq_maize_EREB127%2CDAP-seq_maize_EREB29%2CDAP-seq_maize_LBD19_IG1%2Catac_leaf_rep1_narrow_peak&amp;highlight=" target="_blank" rel="noopener">Open Regulation Track &#8599;</a>
+          </div>
+        </article>
+        <article class="case-study-card">
+          <div class="case-study-badge">Transcriptomics</div>
+          <div class="case-study-content">
+            <h4 class="case-study-title">RNA-seq Multi-Tissue Expression</h4>
+            <p class="case-study-desc">Developmental tissue RNA-seq read coverage depth and splice junction alignments across B73 organs.</p>
+            <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="https://jbrowse.maizegdb.org/?loc=chr3%3A181594851..181637400&amp;tracks=gene_models%2CSRR1620900%2CSRR1620843%2CSRR1620847%2CSRR531200%2CSRR1620944%2CSRR1619669%2Cv11_middle_mn01041&amp;highlight=" target="_blank" rel="noopener">Open RNA-seq Track &#8599;</a>
+          </div>
+        </article>
+        <article class="case-study-card">
+          <div class="case-study-badge case-badge-green">Mutagenesis</div>
+          <div class="case-study-content">
+            <h4 class="case-study-title">Transposon Insertions \(UniformMu\)</h4>
+            <p class="case-study-desc">Sequence-indexed <em>Robertson's Mutator</em> transposon insertion flanking sequence tags mapped to B73 v5.</p>
+            <a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="https://jbrowse.maizegdb.org/?loc=chr3%3A181594851..181637950&amp;tracks=gene_models%2Cuniformmu&amp;highlight=" target="_blank" rel="noopener">Open UniformMu Track &#8599;</a>
+          </div>
+        </article>
+      </div>
     </div>
   </section>
 
   <!-- SECTION 5: COMPLETE DIRECTORY OF BROWSER INSTANCES -->
-  <section id="browser-instances" class="mgdb-panel" aria-labelledby="browser-instances-heading">
+  <section id="browser-instances" aria-labelledby="browser-instances-heading">
     <div class="directory-header-row">
       <div>
-        <h2 id="browser-instances-heading" class="mgdb-panel-title">Directory of All Genome Browser Instances</h2>
+        <h2 id="browser-instances-heading" class="mgdb-panel-title">All Browser Instances</h2>
         <p class="mgdb-panel-lead">Search and filter across all $(total_browsers) curated browser instances available at MaizeGDB.</p>
       </div>
 
@@ -432,7 +450,7 @@ $$SYNTAX-LEVEL 2
       <button type="button" class="dir-filter-chip" data-filter="gbrowse">GBrowse <span class="chip-count">$(gbrowse_count)</span></button>
     </div>
 
-    <div class="mgdb-table-wrapper">
+    <div class="mgdb-table-scroll">
       <table class="mgdb-table" id="browser-dir-table">
         <thead>
           <tr>
@@ -451,8 +469,8 @@ $$SYNTAX-LEVEL 2
   </section>
 
   <!-- SECTION 6: LEGACY GBROWSE ARCHIVE -->
-  <section id="browser-gbrowse" class="mgdb-panel" aria-labelledby="browser-gbrowse-heading">
-    <h2 id="browser-gbrowse-heading" class="mgdb-panel-title">Legacy GBrowse Genome Instances</h2>
+  <section id="browser-gbrowse" class="browser-band" aria-labelledby="browser-gbrowse-heading">
+    <h2 id="browser-gbrowse-heading" class="mgdb-panel-title">Legacy GBrowse</h2>
     <p class="mgdb-panel-lead">Archived GBrowse instances for earlier genome assemblies, BAC tiling paths, and historical research datasets.</p>
 
     <div class="gbrowse-archive-grid">
@@ -493,8 +511,8 @@ $$SYNTAX-LEVEL 2
   </section>
 
   <!-- SECTION 7: STATISTICS -->
-  <section id="browser-overview" class="mgdb-panel" aria-labelledby="browser-overview-heading">
-    <h2 id="browser-overview-heading" class="mgdb-panel-title">Browser Data Hub Statistics</h2>
+  <section id="browser-overview" aria-labelledby="browser-overview-heading">
+    <h2 id="browser-overview-heading" class="mgdb-panel-title">Metrics</h2>
     <p class="mgdb-panel-lead">Summary of visual instances, reference genomes, and data track layers managed across MaizeGDB browsers.</p>
 
     <div class="mgdb-metric-grid">
@@ -545,8 +563,8 @@ $$SYNTAX-LEVEL 2
   </section>
 
   <!-- SECTION 8: CONNECTED RESOURCES -->
-  <section id="browser-related" class="mgdb-panel browser-bottom-section" aria-labelledby="browser-related-heading">
-    <h2 id="browser-related-heading" class="mgdb-panel-title">Connected Genomics Resources</h2>
+  <section id="browser-related" class="mgdb-hub-related browser-bottom-section" aria-labelledby="browser-related-heading">
+    <h2 id="browser-related-heading" class="mgdb-panel-title">Related Resources</h2>
     <p class="mgdb-panel-lead">Navigate to complementary data hubs, analytical platforms, and functional enrichment tools.</p>
 
     <div class="browser-related-grid">
@@ -579,7 +597,25 @@ $$SYNTAX-LEVEL 2
         <div class="browser-related-title">All Data Hubs</div>
         <p class="browser-related-desc">Discover the full catalog of MaizeGDB data hubs, tools, and interactive catalogs.</p>
       </a>
+
+      <a class="browser-related-card" href="/curation/GenomeIssue/edit" target="_blank" rel="noopener">
+        <div class="browser-related-title">Report an assembly error &#8599;</div>
+        <p class="browser-related-desc">Tell the curators about a misassembled region, a gap worth closing, or coordinates that do not match.</p>
+      </a>
+
+      <a class="browser-related-card" href="/curation/GenomeIssue/edit" target="_blank" rel="noopener">
+        <div class="browser-related-title">Report a gene model error &#8599;</div>
+        <p class="browser-related-desc">Flag a gene model that should be merged, split, or corrected in a future annotation release.</p>
+      </a>
     </div>
   </section>
+
+  <!-- Screenshot enlargement. Inside <main> on purpose: the shared reset is
+       scoped to .mgdb-page, and a dialog moved outside it loses box-sizing. -->
+  <dialog class="browser-lightbox" id="browser-lightbox" aria-label="Enlarged screenshot">
+    <button type="button" class="browser-lightbox-close" id="browser-lightbox-close" aria-label="Close">&times;</button>
+    <img id="browser-lightbox-img" src="" alt="" />
+    <p class="browser-lightbox-caption" id="browser-lightbox-caption"></p>
+  </dialog>
 </main>
 )

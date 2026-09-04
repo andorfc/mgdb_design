@@ -683,6 +683,118 @@
      Init
      ------------------------------------------------------------------------ */
 
+  /* ------------------------------------------------------------------------
+     Handoff from a stock record
+
+     /data_center/stock/{id} links here as /TYPSimSelector?line=<entry>, where
+     <entry> is the genotyping run the stock resolves to in the curation
+     matrix. Landing on an empty console after following that link puts the
+     reader back at step one, so the parameter picks the dataset, the
+     accession and the run, applies the defaults, and runs the ranking.
+
+     The parameter is also accepted as a line name or an accession number, so
+     a link someone types or shares by hand resolves the same way.
+     ------------------------------------------------------------------------ */
+
+  function findEntry(lines, token) {
+    var lower = String(token).toLowerCase();
+    var i;
+
+    /* A bare number is a run id. Those live in the r array, not in any name,
+       and are what the stock record hands over. */
+    if (/^\d+$/.test(token)) {
+      var wanted = Number(token);
+      for (i = 0; i < lines.length; i++) {
+        if (lines[i].r && lines[i].r.indexOf(wanted) !== -1) {
+          return { entry: lines[i], run: String(token) };
+        }
+      }
+    }
+    for (i = 0; i < lines.length; i++) {
+      if (String(lines[i].n).toLowerCase() === lower) { return { entry: lines[i], run: '' }; }
+    }
+    for (i = 0; i < lines.length; i++) {
+      if (String(lines[i].l).toLowerCase() === lower) { return { entry: lines[i], run: '' }; }
+    }
+    for (i = 0; i < lines.length; i++) {
+      if (String(lines[i].a || '').toLowerCase() === lower) { return { entry: lines[i], run: '' }; }
+    }
+    return null;
+  }
+
+  function handoffNotice(message) {
+    var box = byId('typ-handoff');
+    if (!box) { return; }
+    box.innerHTML = '<div>' + message + '</div>';
+    box.hidden = false;
+  }
+
+  function applyHandoff(dataset, found, token) {
+    var input = null;
+    Array.prototype.forEach.call(el.datasetCards, function (card) {
+      var candidate = card.querySelector('input');
+      if (candidate.value === dataset) { input = candidate; }
+    });
+    if (input) { input.checked = true; }
+
+    chooseDataset(dataset);
+
+    /* loadLines caches its promise per dataset, so this resolves against the
+       same fetch chooseDataset just started. Registered second, so it runs
+       after the callback that enables the line field. */
+    loadLines(dataset).then(function () {
+      el.lineBox.choose(found.entry);
+
+      if (found.run && found.entry.r && found.entry.r.length > 1) {
+        el.run.value = found.run;
+        state.run = found.run;
+      }
+
+      state.scope = 'all';
+      state.sort = 'desc';
+      state.page = 1;
+      if (el.scope) { el.scope.value = 'all'; }
+      if (el.sort) { el.sort.value = 'desc'; }
+      if (el.compareField) { el.compareField.hidden = true; }
+
+      var label = found.entry.a ? found.entry.l + ', accession ' + found.entry.a : found.entry.l;
+      handoffNotice('<strong>Opened from a stock record.</strong> Ranking the ' +
+        esc(dataset) + ' dataset against <strong>' + esc(label) + '</strong>' +
+        (found.run ? ' (entry ' + esc(found.run) + ')' : '') +
+        '. Change any step above to run a different comparison.');
+
+      run();
+    });
+  }
+
+  function readHandoff() {
+    if (!window.URLSearchParams) { return false; }
+    var params = new window.URLSearchParams(window.location.search);
+    var token = (params.get('line') || '').trim();
+    if (!token) { return false; }
+
+    var asked = params.get('dataset');
+    /* Run ids only exist in the curation matrix, so that is tried first unless
+       the link says otherwise. */
+    var order = (asked === 'breeding') ? ['breeding', 'curation'] : ['curation', 'breeding'];
+
+    (function attempt(i) {
+      if (i >= order.length) {
+        handoffNotice('<strong>No match for &ldquo;' + esc(token) + '&rdquo;.</strong> ' +
+          'Pick a dataset and reference line below to run a comparison.');
+        return;
+      }
+      var dataset = order[i];
+      loadLines(dataset).then(function (lines) {
+        var found = findEntry(lines, token);
+        if (found) { applyHandoff(dataset, found, token); }
+        else { attempt(i + 1); }
+      }).catch(function () { attempt(i + 1); });
+    })(0);
+
+    return true;
+  }
+
   function init() {
     el.main = byId('typ-main');
     if (!el.main) { return; }
@@ -744,6 +856,8 @@
       state.page = 1;
       run();
     });
+
+    readHandoff();
 
     el.form.addEventListener('reset', function () {
       window.setTimeout(function () {

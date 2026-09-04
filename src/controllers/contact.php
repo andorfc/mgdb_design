@@ -21,11 +21,13 @@
   $bauplan->includeCss('/css/static.css');
   $bauplan->includeCss('/css/mgdb-modern.css');
   $bauplan->includeCss('/css/mgdb-megamenu.css');
+  // The Data Hub shell, loaded before the page sheet so the page can override it.
+  $bauplan->includeCss('/css/mgdb-hub.css');
   $bauplan->includeCss('/css/mgdb-contact.css');
   $bauplan->includeScript('/js/mgdb-modern.js');
   $bauplan->includeScript('/js/mgdb-chrome.js');
   $bauplan->includeScript('/js/mgdb-contact.js');
-  $bauplan->head('<meta name="description" content="Contact the MaizeGDB team: general enquiries, data issues, and a searchable directory of staff and collaborators by role and speciality.">');
+  $bauplan->head('<meta name="description" content="Contact the MaizeGDB team: general inquiries, data issues, and a searchable directory of staff and collaborators by role and specialty.">');
 
   $mgdb = $bauplan->template()->load('templates/maizegdb-main-modern.bau');
   $mgdb->get('megamenu')->load('templates/home/maizegdb_header_modern.bau');

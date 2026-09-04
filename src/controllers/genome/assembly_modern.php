@@ -50,8 +50,7 @@ $page_data = dashboardCache($system, 'assembly/page', function () use ($DBConn) 
         'total_assemblies' => 5,
         'nam_genomes'      => 26,
         'chromosomes'      => 10,
-        'gene_model_sets'  => 7,
-        'data_date'        => date('F j, Y')
+        'gene_model_sets'  => 7
     );
 });
 
@@ -59,7 +58,6 @@ $content->get('total_assemblies')->replace(number_format($page_data['total_assem
 $content->get('nam_genomes')->replace(number_format($page_data['nam_genomes']));
 $content->get('chromosomes')->replace(number_format($page_data['chromosomes']));
 $content->get('gene_model_sets')->replace(number_format($page_data['gene_model_sets']));
-$content->get('data_date')->replace($page_data['data_date']);
 
 include_once('translation.php');
 echo $bauplan->publish(); exit;

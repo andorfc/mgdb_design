@@ -1,142 +1,58 @@
 /* ==========================================================================
-   Variations & Alleles Data Hub (/data_center/variation)
-   Scoped under .mgdb-variation-page; relies on mgdb-modern.css tokens.
+   Variation Data Hub (/data_center/variation)
+
+   Page furniture only. The pale blue ground, the white section cards, the
+   drop shadows, the coloured metric edges, the green Related resources panel
+   and the aligned form rows all come from css/mgdb-hub.css, which every Data
+   Hub loads. Anything in this file is specific to this page.
    ========================================================================== */
 
-/* ── Hero Emblem ─────────────────────────────────────────────────────────── */
+/* --------------------------------------------------------------------------
+   Search
+   -------------------------------------------------------------------------- */
 
-.mgdb-variation-page .mgdb-hero-emblem {
-  gap: var(--mgdb-space-2);
-  padding: var(--mgdb-space-4) var(--mgdb-space-3);
-  border-right: 1px solid #cfe3d6;
-  background: linear-gradient(160deg, rgba(255, 255, 255, .92), rgba(255, 255, 255, .55));
-  color: var(--mgdb-green-dark);
-}
-
-.mgdb-variation-page .mgdb-hero-emblem svg {
-  width: min(100%, 64px);
-  height: auto;
-  mix-blend-mode: normal;
-}
-
-/* ── Sticky Section Navigation Tabs ──────────────────────────────────────── */
-
-.mgdb-variation-page .mgdb-section-tabs {
-  position: sticky;
-  z-index: 20;
-  top: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  margin-top: var(--mgdb-space-5);
-  margin-bottom: var(--mgdb-space-6);
-  padding: var(--mgdb-space-2) 0;
-  background: var(--mgdb-surface);
-  border-bottom: 1px solid var(--mgdb-line);
-}
-
-.mgdb-variation-page .mgdb-section-tabs a {
-  display: inline-flex;
-  min-height: 40px;
-  align-items: center;
-  padding: 0 var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink) !important;
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-  text-decoration: none;
-  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
-}
-
-.mgdb-variation-page .mgdb-section-tabs a:hover {
-  background: var(--mgdb-green-soft);
-  border-color: #bcd9c6;
-  color: var(--mgdb-green-dark) !important;
-}
-
-.mgdb-variation-page .mgdb-section-tabs a.is-current,
-.mgdb-variation-page .mgdb-section-tabs a[aria-current="true"] {
-  border-color: var(--mgdb-green-dark);
-  background: var(--mgdb-green-dark);
-  color: #ffffff !important;
-  box-shadow: inset 3px 0 0 var(--mgdb-gold);
-}
-
-.mgdb-variation-page > section,
-.mgdb-variation-page section[id] {
-  scroll-margin-top: 4.5rem;
-}
-
-/* ── Search & Filter Panel ───────────────────────────────────────────────── */
-
-.mgdb-variation-page .variation-search-panel {
-  padding: var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface-alt);
-}
-
-.mgdb-variation-page .variation-search-header h2 {
-  color: var(--mgdb-green-dark);
-}
-
-.mgdb-variation-page .variation-search-header p {
-  margin-top: var(--mgdb-space-1);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-}
-
-.mgdb-variation-page .variation-search-form {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: var(--mgdb-space-3);
-  margin-top: var(--mgdb-space-4);
-}
-
-.mgdb-variation-page .variation-field-query {
-  grid-column: 1 / -1;
-}
-
-.mgdb-variation-page .variation-field,
-.mgdb-variation-page .variation-field-query {
+.mgdb-variation-page .variation-search {
   display: flex;
   flex-direction: column;
-  gap: var(--mgdb-space-1);
+  gap: var(--mgdb-space-3);
 }
 
-.mgdb-variation-page .variation-field label,
-.mgdb-variation-page .variation-field-query label {
-  color: var(--mgdb-ink-soft);
-  font-size: var(--mgdb-text-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .04em;
+/* The field and its button share one row and never wrap: the button is sized
+   by its own content and the field takes what is left, so a long placeholder
+   cannot push the button under it. */
+.mgdb-variation-page .variation-query-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-3);
+  align-items: stretch;
+}
+
+.mgdb-variation-page .variation-query-field {
+  position: relative;
+  min-width: 0;
 }
 
 .mgdb-variation-page .variation-query-control {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: var(--mgdb-space-2);
+  gap: var(--mgdb-space-3);
   align-items: center;
-  min-height: var(--mgdb-tap-target);
-  padding: 0 var(--mgdb-space-3);
+  height: 52px;
+  padding: 0 var(--mgdb-space-4);
   border: 1px solid #b9b2a5;
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface, #fff);
+  color: var(--mgdb-muted);
 }
 
 .mgdb-variation-page .variation-query-control:focus-within {
   border-color: var(--mgdb-focus);
+  box-shadow: 0 0 0 2px rgba(11, 87, 164, .18);
 }
 
-.mgdb-variation-page .variation-search-icon {
-  color: var(--mgdb-muted);
-}
-
-.mgdb-variation-page .variation-query-control input {
-  min-height: 40px;
+.mgdb-variation-page .variation-query-control input[type="search"] {
+  min-width: 0;
+  height: 100%;
   padding: 0;
   border: 0;
   background: transparent;
@@ -145,371 +61,293 @@
   font-size: var(--mgdb-text-base);
 }
 
-.mgdb-variation-page .variation-query-control input:focus {
-  outline: none;
-}
+.mgdb-variation-page .variation-query-control input[type="search"]:focus { outline: none; }
 
-.mgdb-variation-page .variation-query-control button {
-  border: 0;
-  background: none;
-  color: var(--mgdb-burgundy);
-  font-family: inherit;
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.mgdb-variation-page .variation-field select {
-  min-height: var(--mgdb-tap-target);
-  padding: 0 var(--mgdb-space-3);
-  border: 1px solid #b9b2a5;
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink);
-  font-family: inherit;
-  font-size: var(--mgdb-text-sm);
-}
-
-.mgdb-variation-page .variation-field select:focus {
-  border-color: var(--mgdb-focus);
-  outline: none;
-}
-
-.mgdb-variation-page .variation-field-options {
-  grid-column: 1 / -1;
-  display: flex;
-  align-items: center;
-  gap: var(--mgdb-space-3);
-  margin-top: var(--mgdb-space-1);
-}
-
-.mgdb-variation-page .variation-checkbox-label {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--mgdb-space-2);
-  color: var(--mgdb-ink);
-  font-size: var(--mgdb-text-sm);
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.mgdb-variation-page .variation-checkbox-label input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--mgdb-green-dark);
-}
-
-.mgdb-variation-page .variation-search-submit {
-  grid-column: 1 / -1;
-  display: flex;
-  justify-content: flex-start;
-  margin-top: var(--mgdb-space-2);
-}
-
-.mgdb-variation-page .variation-example-row {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  align-items: center;
-  margin-top: var(--mgdb-space-3);
-  padding-top: var(--mgdb-space-3);
-  border-top: 1px solid var(--mgdb-line);
-}
-
-.mgdb-variation-page .variation-example-row span {
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-}
-
-.mgdb-variation-page .variation-example-row button {
-  padding: 3px 10px;
-  border: 1px solid var(--mgdb-line);
-  border-radius: 999px;
-  background: var(--mgdb-surface);
-  color: var(--mgdb-burgundy);
-  font-family: inherit;
-  font-size: var(--mgdb-text-xs);
-  font-weight: 600;
-  cursor: pointer;
-  transition: background .12s, border-color .12s;
-}
-
-.mgdb-variation-page .variation-example-row button:hover {
-  background: var(--mgdb-green-soft);
-  border-color: #bcd9c6;
-  color: var(--mgdb-green-dark);
-}
-
-/* ── Results Section ─────────────────────────────────────────────────────── */
-
-.mgdb-variation-page .variation-results-section {
-  margin-top: var(--mgdb-space-6);
-}
-
-.mgdb-variation-page .variation-results-heading {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-4);
-  align-items: flex-end;
-  justify-content: space-between;
-  margin-bottom: var(--mgdb-space-4);
-}
-
-.mgdb-variation-page .variation-results-heading h2 {
-  color: var(--mgdb-green-dark);
-}
-
-.mgdb-variation-page #variation-results-status {
-  margin-top: var(--mgdb-space-1);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-}
-
-.mgdb-variation-page .variation-results-controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-3);
-  align-items: center;
-}
-
-.mgdb-variation-page .variation-view-toggle {
-  display: inline-flex;
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
-  overflow: hidden;
-}
-
-.mgdb-variation-page .variation-view-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--mgdb-space-1);
-  min-height: 34px;
-  padding: 0 var(--mgdb-space-3);
+.mgdb-variation-page #variation-query-clear {
+  padding: 4px 8px;
   border: 0;
   background: transparent;
-  color: var(--mgdb-ink-soft);
+  color: var(--mgdb-muted);
   font-family: inherit;
   font-size: var(--mgdb-text-xs);
   font-weight: 700;
   cursor: pointer;
-  transition: background .12s, color .12s;
 }
 
-.mgdb-variation-page .variation-view-btn.is-active,
-.mgdb-variation-page .variation-view-btn[aria-pressed="true"] {
-  background: var(--mgdb-green-dark);
-  color: #fff;
-}
+.mgdb-variation-page #variation-query-clear:hover { color: var(--mgdb-ink); }
 
-.mgdb-variation-page .variation-sort-control select {
-  min-height: 34px;
-  padding: 0 var(--mgdb-space-3);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink);
-  font-family: inherit;
-  font-size: var(--mgdb-text-xs);
-  font-weight: 600;
-}
-
-.mgdb-variation-page .variation-export-buttons {
-  display: flex;
-  gap: var(--mgdb-space-2);
-}
-
-/* ── Card View ───────────────────────────────────────────────────────────── */
-
-.mgdb-variation-page .variation-results-container.variation-view-card {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: var(--mgdb-space-4);
-}
-
-.mgdb-variation-page .variation-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: var(--mgdb-space-4) var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
-  transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
-}
-
-.mgdb-variation-page .variation-card:hover {
-  border-color: var(--mgdb-gold-dark);
-  box-shadow: var(--mgdb-shadow-sm);
-  transform: translateY(-2px);
-}
-
-.mgdb-variation-page .variation-card-header {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--mgdb-space-2);
-}
-
-.mgdb-variation-page .variation-card h3 {
-  margin: 0;
-  color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-lg);
-  line-height: var(--mgdb-leading-snug);
-}
-
-.mgdb-variation-page .variation-card h3 a {
-  color: inherit;
-  text-decoration: underline;
-}
-
-.mgdb-variation-page .variation-card h3 a:hover {
-  color: var(--mgdb-leaf);
-}
-
-.mgdb-variation-page .variation-card-locus {
-  margin-top: var(--mgdb-space-1);
-  color: var(--mgdb-ink-soft);
-  font-size: var(--mgdb-text-sm);
-}
-
-.mgdb-variation-page .variation-card-locus strong {
-  color: var(--mgdb-green-dark);
-}
-
-.mgdb-variation-page .variation-card-meta {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: var(--mgdb-space-1) var(--mgdb-space-3);
-  margin-top: var(--mgdb-space-3);
-  padding: var(--mgdb-space-3) 0;
-  border-top: 1px solid var(--mgdb-line);
-  border-bottom: 1px solid var(--mgdb-line);
-  font-size: var(--mgdb-text-xs);
-}
-
-.mgdb-variation-page .variation-card-meta dt {
-  color: var(--mgdb-muted);
-  font-weight: 700;
-}
-
-.mgdb-variation-page .variation-card-meta dd {
-  margin: 0;
-  color: var(--mgdb-ink);
-}
-
-.mgdb-variation-page .variation-card-pheno {
-  margin-top: var(--mgdb-space-2);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-xs);
-  line-height: var(--mgdb-leading);
-}
-
-.mgdb-variation-page .variation-card-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-3);
-  align-items: center;
-  margin-top: var(--mgdb-space-4);
-  padding-top: var(--mgdb-space-2);
-}
-
-.mgdb-variation-page .variation-card-actions a {
-  color: var(--mgdb-burgundy);
-  font-size: var(--mgdb-text-xs);
-  font-weight: 700;
-  text-decoration: underline;
-}
-
-.mgdb-variation-page .variation-card-actions a:hover {
-  color: var(--mgdb-leaf);
-}
-
-/* ── Table View ──────────────────────────────────────────────────────────── */
-
-.mgdb-variation-page .variation-results-container.variation-view-table {
-  display: block;
-  overflow-x: auto;
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
-}
-
-.mgdb-variation-page .variation-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--mgdb-text-sm);
-  text-align: left;
-}
-
-.mgdb-variation-page .variation-table th {
-  padding: var(--mgdb-space-3) var(--mgdb-space-4);
-  background: var(--mgdb-surface-alt);
-  border-bottom: 1px solid var(--mgdb-line);
-  color: var(--mgdb-ink-soft);
-  font-size: var(--mgdb-text-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .04em;
+.mgdb-variation-page .variation-query-submit {
+  height: 52px;
+  padding-inline: var(--mgdb-space-6);
   white-space: nowrap;
 }
 
-.mgdb-variation-page .variation-table td {
-  padding: var(--mgdb-space-3) var(--mgdb-space-4);
-  border-bottom: 1px solid var(--mgdb-line);
-  color: var(--mgdb-ink);
-  vertical-align: top;
+.mgdb-variation-page .mgdb-hint {
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
 }
 
-.mgdb-variation-page .variation-table tr:hover td {
-  background: var(--mgdb-surface-alt);
+.mgdb-variation-page .variation-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
 }
 
-.mgdb-variation-page .variation-table a {
-  color: var(--mgdb-burgundy);
+.mgdb-variation-page .variation-examples > span {
   font-weight: 700;
-  text-decoration: underline;
+  letter-spacing: .04em;
+  text-transform: uppercase;
 }
 
-.mgdb-variation-page .variation-table a:hover {
-  color: var(--mgdb-leaf);
+.mgdb-variation-page .variation-examples button {
+  padding: 5px 12px;
+  border: 1px solid var(--hub-line, #e3e9f2);
+  border-radius: 999px;
+  background: var(--hub-surface, #fff);
+  color: var(--mgdb-ink);
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xs);
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease;
 }
 
-/* ── Pagination ──────────────────────────────────────────────────────────── */
+.mgdb-variation-page .variation-examples button:hover {
+  border-color: var(--mgdb-gold-dark);
+  background: var(--mgdb-gold-soft);
+}
+
+/* Advanced search ---------------------------------------------------------- */
+
+.mgdb-variation-page .variation-advanced {
+  border: 1px solid var(--hub-line, #e3e9f2);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface, #fff);
+}
+
+.mgdb-variation-page .variation-advanced > summary {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-radius: var(--mgdb-radius-sm);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+
+.mgdb-variation-page .variation-advanced > summary::-webkit-details-marker { display: none; }
+
+/* The disclosure triangle is drawn rather than inherited, so it points the
+   same way in every browser and turns when the panel opens. */
+.mgdb-variation-page .variation-advanced > summary::before {
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 7px solid currentColor;
+  content: "";
+  transition: transform .15s ease;
+}
+
+.mgdb-variation-page .variation-advanced[open] > summary::before { transform: rotate(90deg); }
+
+.mgdb-variation-page .variation-advanced > summary:focus-visible {
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: -3px;
+}
+
+.mgdb-variation-page .variation-advanced-count {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--mgdb-green-dark);
+  color: #fff;
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-variation-page .variation-advanced-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-4);
+  padding: var(--mgdb-space-4);
+  border-top: 1px solid var(--hub-line-soft, #eef2f8);
+}
+
+/* Three declared tracks rather than auto-fit, so six fields make two even rows
+   instead of leaving a dead column on the right at some widths. */
+.mgdb-variation-page .variation-advanced-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: start;
+}
+
+.mgdb-variation-page .variation-advanced-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-5);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px dashed var(--hub-line-soft, #eef2f8);
+}
+
+.mgdb-variation-page .variation-advanced-toggles .mgdb-hub-check {
+  min-height: var(--mgdb-tap-target);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-variation-page .variation-advanced-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px dashed var(--hub-line-soft, #eef2f8);
+}
+
+/* --------------------------------------------------------------------------
+   Results
+   -------------------------------------------------------------------------- */
+
+.mgdb-variation-page .variation-results-status {
+  margin: 0 0 var(--mgdb-space-4);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-variation-page .variation-results-status strong { color: var(--mgdb-green-dark); }
+
+.mgdb-variation-page .variation-scope-button {
+  margin-left: var(--mgdb-space-2);
+  padding: 3px 10px;
+  border: 1px solid var(--mgdb-green-dark);
+  border-radius: 999px;
+  background: var(--hub-surface, #fff);
+  color: var(--mgdb-green-dark);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-variation-page .variation-scope-button:hover { background: var(--mgdb-green-soft); }
+
+/* The three controls share the label band and the 44px control height that
+   css/mgdb-hub.css sets, so they line up along both edges. The export pair has
+   no label, so it bottom-aligns rather than reserving a band of its own. */
+.mgdb-variation-page .variation-results-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: end;
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-variation-page .variation-results-actions {
+  display: flex;
+  flex-direction: row;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-variation-page .variation-results-actions .mgdb-button {
+  height: var(--mgdb-tap-target);
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.mgdb-variation-page .variation-results-note {
+  margin: 0 0 var(--mgdb-space-4);
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-left: 4px solid var(--mgdb-gold);
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-variation-page .variation-table { font-size: var(--mgdb-text-sm); }
+
+.mgdb-variation-page .variation-table td { vertical-align: top; }
+
+/* Striping is driven by a class the page script sets from the visible row
+   index rather than by :nth-child, which keeps counting rows the results
+   filter has hidden and leaves the bands ragged as soon as anything is typed.
+   The hover state has to be restated after it, or a striped row would not
+   respond to the pointer. */
+.mgdb-variation-page .variation-table tbody tr:nth-child(even) { background: transparent; }
+.mgdb-variation-page .variation-table tbody tr.is-alt { background: var(--hub-ground, #f4f7fc); }
+.mgdb-variation-page .variation-table tbody tr:hover { background: #e6eefb; }
+
+/* The live count sits on the label's line, taken out of flow, so a field that
+   is sometimes empty and sometimes not stays exactly as tall as the two
+   controls beside it and the toolbar's bottom edge holds. */
+.mgdb-variation-page .variation-results-filter { position: relative; }
+
+.mgdb-variation-page .variation-results-filter .mgdb-result-count {
+  position: absolute;
+  right: 0;
+  bottom: calc(var(--mgdb-tap-target) + 6px);
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-variation-page .variation-table .variation-name a {
+  color: var(--mgdb-green-dark);
+  font-weight: 700;
+}
+
+.mgdb-variation-page .variation-table .variation-synonyms {
+  display: block;
+  margin-top: 2px;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading-snug);
+}
+
+/* Free text that can run long. A measure keeps a phenotype list from setting
+   the width of the whole table. */
+.mgdb-variation-page .variation-table .variation-phenotypes,
+.mgdb-variation-page .variation-table .variation-mutagens { max-width: 26ch; }
+
+.mgdb-variation-page .variation-table .variation-empty-cell { color: var(--mgdb-muted); }
 
 .mgdb-variation-page .variation-pagination {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
+  gap: var(--mgdb-space-1);
   align-items: center;
   justify-content: center;
-  margin-top: var(--mgdb-space-6);
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-4);
+  border-top: 1px solid var(--hub-line-soft, #eef2f8);
 }
 
 .mgdb-variation-page .variation-pagination button {
-  min-width: var(--mgdb-tap-target);
-  min-height: var(--mgdb-tap-target);
+  display: inline-flex;
+  min-width: 38px;
+  min-height: 38px;
   padding: 0 var(--mgdb-space-3);
-  border: 1px solid var(--mgdb-line);
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--hub-line, #e3e9f2);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface, #fff);
   color: var(--mgdb-ink);
   font-family: inherit;
   font-size: var(--mgdb-text-sm);
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
-  transition: background .12s, border-color .12s;
 }
 
-.mgdb-variation-page .variation-pagination button:hover:not(:disabled) {
-  background: var(--mgdb-surface-alt);
-  border-color: var(--mgdb-muted);
+.mgdb-variation-page .variation-pagination button:hover:not(:disabled):not([aria-current]) {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
 }
 
 .mgdb-variation-page .variation-pagination button[aria-current="page"] {
@@ -518,61 +356,128 @@
   color: #fff;
 }
 
-.mgdb-variation-page .variation-pagination button:disabled {
-  opacity: .4;
-  cursor: not-allowed;
+.mgdb-variation-page .variation-pagination button:disabled { opacity: .4; cursor: not-allowed; }
+
+.mgdb-variation-page .variation-pagination .variation-page-gap {
+  min-width: 24px;
+  color: var(--mgdb-muted);
+  text-align: center;
 }
 
-/* ── Collections & Downloads ─────────────────────────────────────────────── */
+/* --------------------------------------------------------------------------
+   Browse by type
+   -------------------------------------------------------------------------- */
 
-.mgdb-variation-page .variation-collection-grid,
+/* Six tiles in three declared tracks, so the grid is a 3 by 2 rectangle rather
+   than the 4 and 2 that auto-fit gives at a desktop width. The six collection
+   cards are laid out the same way; the four downloads make one row of four,
+   which lines up with the four metrics further down. */
+.mgdb-variation-page .variation-type-grid,
+.mgdb-variation-page .variation-collection-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--mgdb-space-4);
+}
+
 .mgdb-variation-page .variation-download-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--mgdb-space-4);
-  margin-top: var(--mgdb-space-4);
 }
 
-.mgdb-variation-page .variation-download-card {
+.mgdb-variation-page .variation-type-tile {
   display: flex;
+  min-width: 0;
   flex-direction: column;
-  justify-content: space-between;
+  gap: var(--mgdb-space-1);
   padding: var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
+  border: 1px solid var(--hub-line, #e3e9f2);
+  border-radius: 12px;
+  background: var(--hub-surface, #fff);
+  box-shadow: var(--hub-shadow);
+  color: var(--mgdb-ink) !important;
+  text-decoration: none;
 }
 
-.mgdb-variation-page .variation-download-header h3 {
-  margin-top: var(--mgdb-space-2);
+.mgdb-variation-page .variation-type-count {
   color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-lg);
+  font-size: var(--mgdb-text-2xl);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
 }
 
-.mgdb-variation-page .variation-download-card p {
-  margin-top: var(--mgdb-space-2);
-  color: var(--mgdb-muted);
+.mgdb-variation-page .variation-type-tile > strong {
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-variation-page .variation-type-tile:hover > strong { text-decoration: underline; }
+
+.mgdb-variation-page .variation-type-blurb {
+  flex: 1 1 auto;
+  color: var(--mgdb-ink-soft);
   font-size: var(--mgdb-text-sm);
-  line-height: var(--mgdb-leading);
+  line-height: var(--mgdb-leading-snug);
 }
 
-.mgdb-variation-page .variation-download-card .mgdb-button {
-  margin-top: var(--mgdb-space-4);
-  align-self: flex-start;
+.mgdb-variation-page .variation-type-table { margin-top: var(--mgdb-space-5); }
+
+/* --------------------------------------------------------------------------
+   Charts
+
+   .mgdb-chart is a fixed 320px in the design system, so a layout.height passed
+   to MGDB.chart() does nothing on its own -- Plotly draws to the box and a
+   chart that wanted 420px is squashed into 320. Releasing the height here lets
+   the page script set it, and one variable then feeds both the element and the
+   Plotly layout.
+   -------------------------------------------------------------------------- */
+
+.mgdb-variation-page .mgdb-chart {
+  height: auto;
+  min-height: 320px;
+  overflow: hidden;
 }
 
-/* ── Responsive ──────────────────────────────────────────────────────────── */
+/* Two columns for the two short-labelled charts, and the phenotype chart --
+   whose category names run to fifty characters -- across both. Plotly
+   automargins the tick column, so at a third of the row that chart had a
+   plot area narrower than its own labels. */
+.mgdb-variation-page .variation-charts {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: var(--mgdb-space-5);
+}
 
-@media (max-width: 767px) {
-  .mgdb-variation-page .variation-search-form {
-    grid-template-columns: 1fr;
-  }
-  .mgdb-variation-page .variation-results-heading {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .mgdb-variation-page .variation-results-controls {
-    width: 100%;
-    justify-content: space-between;
-  }
+.mgdb-variation-page .variation-chart-wide { grid-column: 1 / -1; }
+
+@media (max-width: 900px) {
+  .mgdb-variation-page .variation-charts { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* --------------------------------------------------------------------------
+   Narrow widths
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 1080px) {
+  .mgdb-variation-page .variation-advanced-grid,
+  .mgdb-variation-page .variation-type-grid,
+  .mgdb-variation-page .variation-collection-grid,
+  .mgdb-variation-page .variation-download-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 900px) {
+  .mgdb-variation-page .variation-results-toolbar { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-variation-page .variation-results-actions { justify-content: flex-start; }
+}
+
+@media (max-width: 640px) {
+  .mgdb-variation-page .variation-query-row { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-variation-page .variation-query-submit { width: 100%; }
+  .mgdb-variation-page .variation-advanced-grid,
+  .mgdb-variation-page .variation-type-grid,
+  .mgdb-variation-page .variation-collection-grid,
+  .mgdb-variation-page .variation-download-grid { grid-template-columns: minmax(0, 1fr); }
+
+  /* Two lines of label are only needed where labels sit side by side. */
+  .mgdb-variation-page .mgdb-hub-field > label:first-child { min-height: 0; }
 }

@@ -41,6 +41,31 @@
   // NOTE: CONTROLLER, PAGE and ID are set in controller.php
   logMessage("gene_center.php: CONTROLLER: " . CONTROLLER . ", PAGE: " . PAGE . ", ID: " . ID);
 
+  /* Retired route. /gene_center/gene_product has never had a controller in this
+     tree -- controllers/gene_center/gene_product.php does not exist -- so the
+     route did not 404, it died on an uncaught "Failed opening required" from
+     the include at the bottom of this file, printing a stack trace with server
+     paths in it. Gene products live in the Data Hub, hub and record page both,
+     so send the whole route there permanently.
+
+     Both identifier forms are carried across because /data_center/gene_product
+     accepts both: getCGIParam('id', 'G', ID) there reads ?id= first and falls
+     back to the third path segment. The query string is rebuilt from $_GET
+     rather than passed through from QUERY_STRING so nothing unparsed reaches a
+     Location header. */
+  if (PAGE == 'gene_product') {
+    $gene_product_target = '/data_center/gene_product';
+    if (ID !== null && ID !== '') {
+      $gene_product_target .= '/' . rawurlencode(ID);
+    }
+    if (!empty($_GET)) {
+      $gene_product_target .= '?' . http_build_query($_GET);
+    }
+
+    header('Location: ' . $gene_product_target, true, 301);
+    exit;
+  }
+
   /* Gene record pages on the modern design system.
    *
    * The modern controller returns false without publishing when the identifier
@@ -54,6 +79,28 @@
    */
   if (PAGE == 'gene' && trim((string) getCGIParam('id', 'G', ID)) !== '') {
     if (include('controllers/gene_center/gene_record_modern.php')) {
+      return;
+    }
+  }
+
+  /* Gene Data Hub landing page on the modern design system.
+   *
+   * The id test is repeated rather than relying on the block above having
+   * returned: gene_record_modern.php returns false for an identifier it cannot
+   * resolve, and without this guard an unknown id would land on the hub with a
+   * 200 instead of falling through to the original not-found handling.
+   *
+   * Results come from search/gene/gene_search_api.php;
+   * every other form on the page still posts to its original endpoint under
+   * search/gene/, and those endpoints are untouched -- the site-wide all-data
+   * search and the shadowbox search still call gene_results.php and
+   * gene_adv_results.php.
+   *
+   * Rollback: delete this block. Pre-redesign originals are archived in the
+   * redesign repository under legacy/gene-search/.
+   */
+  if (PAGE == 'gene' && trim((string) getCGIParam('id', 'G', ID)) === '') {
+    if (include('controllers/gene_center/gene_search_modern.php')) {
       return;
     }
   }

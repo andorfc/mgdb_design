@@ -31,6 +31,12 @@
   $bauplan->includeCss('/css/static.css');
   $bauplan->includeCss('/css/mgdb-modern.css');
   $bauplan->includeCss('/css/mgdb-megamenu.css');
+  /* The shared Data Hub shell -- pale ground, white section cards, coloured
+     section edges, the green Related resources panel -- before the page's own
+     sheet, which is the order css/mgdb-hub.css documents. `mgdb-hub-page` on
+     <main> opts in. A project page is not a data hub, but the shell is where
+     the site's page furniture lives. */
+  $bauplan->includeCss('/css/mgdb-hub.css?v=' . (int) @filemtime($doc_root . '/css/mgdb-hub.css'));
   $bauplan->includeCss('/css/mgdb-caas-fil-project.css?v=' . $v_css);
   $bauplan->includeScript('/js/mgdb-modern.js');
   $bauplan->includeScript('/js/mgdb-chrome.js');

@@ -1,0 +1,278 @@
+$$SYNTAX-LEVEL 2
+*(chromosome-sections-nomaps {include-css: ../css/data_center.css | include-js: ../js/bin_viewer.js}
+  ;; Identical to chromosome-sections.bau with one line removed: the load of
+  ;; bin_viewer-maps.bau. That partial is two HTML image maps, 220 <area>
+  ;; tags and 21 KB, and only the 'top' section uses them -- but the endpoint
+  ;; loads this template whole for every section, so all eight sections of a
+  ;; bin page carried them. 172 KB per bin page for markup nothing read.
+  ;; Selected by passing nomaps=1; without it the original template is used
+  ;; and the previous page is byte-identical.
+  @(top {display: off}
+    <table cellpadding=2 cellspacing=2 width="100%">
+     <tr>
+      <td valign="top">
+       <p>
+        This page summarizes the data for features found on chromosome $(chrom) in maize.
+        You can use the map to the right to zoom in on more specific segments of any chromosome you'd like.
+       </p>
+       <br>
+     </td>
+     <td valign="top" align="right">
+      <br>
+      <img usemap="#data_map" height="240" src="/images/bins/chrom$(chrom).jpg" border=0>
+      <br> <b><center>Bin Viewer Pages</center></b>
+     </td>
+     <td valign="top" align="right">
+      <img usemap="#data_map_gb_v3" height="240" src="/images/bins/chrom$(chrom).jpg" border=0>
+      <br> <b><center>Genome browser Pages</center></b> 
+     </td>
+    </tr>
+   </table>
+  )
+  
+  @(genome_browser {display: off}
+   <!--Genome Browser v3 display-->
+  <div id='gb_v3' name='gb_v3' style='display: inline'>
+    <br><br>
+    <table width="95%">
+       <tr height='5px'>
+          <td width='25%' onclick="" class='gb_tab_focus' align="center">
+            &nbsp;&nbsp;&nbsp;B73 RefGen_v3 &nbsp;&nbsp;&nbsp;
+            <br>
+          </td>
+          <td width='25%' onclick="toggle_tabs('gb_v2'\);" class='gb_tab_unfocus' align="center">
+            &nbsp;&nbsp;&nbsp;B73 RefGen_v2 &nbsp;&nbsp;&nbsp;
+            <br>
+          </td>
+          <td onclick="toggle_tabs('gb_v1'\);" width='25%' 
+              class='gb_tab_unfocus' align="center">
+            &nbsp;&nbsp;&nbsp;B73 RefGen_v1 &nbsp;&nbsp;&nbsp;
+            <br>
+          </td>
+          <td onclick="toggle_tabs('gb_bac'\);" width='25%' 
+              class='gb_tab_unfocus' align="center">
+            &nbsp;&nbsp;&nbsp;BAC-based&nbsp;&nbsp;&nbsp;
+            <br>
+          </td>
+       </tr>
+    </table>
+      <div width="95%" style='width: 95%; background-color: white'>
+        <div style="position:relative; left:20px;top:5px;  width:95%;">
+          <br>
+          <a href='http://ensembl.gramene.org/Zea_mays/Info/Index' target="_new">Based on Gramene's
+            B73 RefGen_v3 sequence</a>
+          <br><br>
+          <p>(Click on image to go to the Genome Browser\) </p>
+          <a href='$(gbrowse_url)?name=chr$(chrom)' target="_new"> 
+           <br>
+           <img border='no' width='100%' src="/images/chr$(chrom)_bin_v3.png">
+          </a>
+          <br><br>
+        </div>
+      </div>
+    </div>
+   <!--Genome Browser v3 display-->
+  <div id='gb_v2' name='gb_v2' style='display: none'>
+    <br><br>
+    <table width="100%">
+       <tr height='5px'>
+          <td onclick="toggle_tabs('gb_v3'\);" width='25%' 
+              class='gb_tab_unfocus' align="center">
+            &nbsp;&nbsp;&nbsp;B73 RefGen_v3 &nbsp;&nbsp;&nbsp;
+            <br>
+          </td>
+          <td width='25%' onclick="" class='gb_tab_focus' align="center">
+            &nbsp;&nbsp;&nbsp;B73 RefGen_v2 &nbsp;&nbsp;&nbsp;
+            <br>
+          </td>
+          <td onclick="toggle_tabs('gb_v1'\);" width='25%' 
+              class='gb_tab_unfocus' align="center">
+            &nbsp;&nbsp;&nbsp;B73 RefGen_v1 &nbsp;&nbsp;&nbsp;
+            <br>
+          </td>
+          <td onclick="toggle_tabs('gb_bac'\);" width='25%' 
+              class='gb_tab_unfocus' align="center">
+            &nbsp;&nbsp;&nbsp;BAC-based&nbsp;&nbsp;&nbsp;
+            <br>
+          </td>
+       </tr>
+    </table>
+      <div width="95%" style='width: 95%; background-color: white'>
+        <div style="position:relative; left:20px;top:5px;  width:95%;">
+          <br>
+          <a href='http://www2.genome.arizona.edu/genomes/maize' target="_new">Based on AGI's 
+            B73 RefGen_v2 sequence</a>
+          <br><br>
+          <p>(Click on image to go to the Genome Browser\) </p>
+          <a href='$(gbrowse_url_v2)?name=chr$(chrom)' target="_new"> 
+           <br>
+           <img border='no' width='100%' src="/images/chr$(chrom)_bin_v2.png">
+          </a>
+          <br><br>
+        </div>
+      </div>
+    </div>
+    
+   <!-- Genome Browser v1 display -->    
+    <div id='gb_v1' name='gb_v1' style='display: none'>
+      <br><br>
+      <table width="100%">
+        <tr height='5px'>
+          <td onclick="toggle_tabs('gb_v3'\);" width='25%' 
+              class='gb_tab_unfocus' align="center">
+            &nbsp;&nbsp;&nbsp;B73 RefGen_v3 &nbsp;&nbsp;&nbsp;
+            <br>
+          </td>
+          <td onclick="toggle_tabs('gb_v2'\);" width='25%' 
+              class='gb_tab_unfocus' align="center">
+            B73 RefGen_v2 
+            <br>
+          </td>
+          <td width='25%' class='gb_tab_focus' align="center">
+            B73 RefGen_v1 
+            <br>
+          </td>
+          <td onclick="toggle_tabs('gb_bac'\);" width='25%' 
+              class='gb_tab_unfocus' align="center">
+            BAC-based
+            <br>
+          </td>
+        </tr>
+      </table> 
+      <div width="95%" style='width: 95%; background-color: white'>
+        <div style="position:relative; left:20px;top:5px;  width:95%;">
+          <br>
+          <a href='http://ftp.maizesequence.org/current/assembly//' target="_new">Based on 
+            MaizeSequence.org B73 RefGen_v1 sequence</a>
+          <br><br>
+          <p>(Click on image to go to the Genome Browser\) </p>
+          <a href='$(gbrowse_url_v1)?name=chr$(chrom)' target="_new"> 
+           <br>
+           <img border='no' width='100%' src="/images/bins/chr$(chrom)_bin.png">
+          </a>
+          <br><br>
+        </div>
+      </div>
+    </div>
+    
+    <!--Bac Sequence Display-->
+    <div id="gb_bac" style= "display:none">
+     <br><br>
+      <table width="95%">
+        <tr height='5px'>
+          <td onclick="toggle_tabs('gb_v3'\);" width='25%' 
+              class='gb_tab_unfocus' align="center">
+            &nbsp;&nbsp;&nbsp;B73 RefGen_v3 &nbsp;&nbsp;&nbsp;
+            <br>
+          </td>
+          <td onclick="toggle_tabs('gb_v2'\);" width='25%' class='gb_tab_unfocus' align="center">
+            B73 RefGen_v2 
+            <br>
+          </td>
+          <td onclick="toggle_tabs('gb_v1'\);" width='25%' 
+              class='gb_tab_unfocus' align="center">
+            B73 RefGen_v1
+            <br>
+          </td>
+          <td width='25%' 
+              class='gb_tab_focus' align="center">
+            BAC-based
+            <br>
+          </td>
+        </tr>
+      </table>
+      <div width="95%" style='width: 95%; background-color: white'>
+       <div style="position:relative; left:20px;top:5px;  width:95%;">
+         <br>
+        <a href='http://ftp.maizesequence.org/release-3b.50/' target="_new">Based on MaizeSequence.org BAC release 3b.50</a>
+        <br><br>
+        <p>(Click on image to go to the Genome Browser\) </p>
+          <a href='$(gbrowse_url_bac)?name=$(chrom)' target="_new"> 
+           <br>
+           <img border='no' width='100%' src="/images/bins/chr$(chrom)_bac.png">
+          </a>
+          <br><br>
+       </div>
+      </div>
+    </div>
+  )
+  
+  @(genes {display: off}
+  <br>
+   <p> 
+    Here are the <b>$(gene_count)</b> genes found on chromosome $(chrom).
+   </p>
+   <table width="100%" cellpadding="0" cellspacing="1" summary="This table contains genes found on this chromosome">
+    @(gene_sec
+     <tr>
+      <td width="50%">
+       <a href="/data_center/locus?id=$(id)">$(name) <i>$(full_name)</i></a>
+      </td>
+      <td width="50%">
+       <a href="/data_center/locus?id=$(id_2)">$(name_2) <i>$(full_name_2)</i></a>
+      </td>
+     </tr>
+    )
+    </table>
+  )
+    
+  @(other_loci {display: off}
+  <br>
+   @(loci_pretext
+    <div id="hide_loci" style="display: inline;">
+     $(loci_text)There are <b>$(loci_count)</b> additional loci on chromosome $(chrom). 
+     <a href="#other_loci" onclick='getData("chromosome", "other_loci_list", $(chrom)\);'>Click here</a> to load a full
+     list of these loci.
+    </div>
+   )
+   <div id="other_loci_list">
+   <table width="100%" cellpadding="0" cellspacing="1" summary="This table contains genes found on this chromosome">
+    @(loci_sec
+     <tr>
+      <td width="50%">
+       <a href="/data_center/locus?id=$(id)">$(name) <i>$(full_name)</i></a>
+      </td>
+      <td width="50%">
+       <a href="/data_center/locus?id=$(id_2)">$(name_2) <i>$(full_name_2)</i></a>
+      </td>
+     </tr>
+    )
+    </table>
+    <div>
+  )
+  @(hd_maps {display: off}
+  <br>
+   <p>
+    Here are the <b>$(map_count)</b> maps of chromosome $(chrom).
+   </p>
+   <table width="100%" cellpadding="0" cellspacing="1" summary="This table contains genes found on this chromosome.">
+    @(map_sec
+      <tr >
+       <td><a href="/data_center/map?id=$(mapID_1)">$(mapName_1)</a></td>
+       <td><a href="/data_center/map?id=$(mapID_2)">$(mapName_2)</a></td>
+       <!--<td><a href="/data_center/map?id=$(mapID_3)">$(mapName_3)</a></td>
+       <td><a href="/data_center/map?id=$(mapID_4)">$(mapName_4)</a></td>
+       <td><a href="/data_center/map?id=$(mapID_5)">$(mapName_5)</a></td>-->
+      </tr>
+    )
+   </table>
+  )
+  @(accession {display: off}
+  <br>
+   <p>
+    Here are accession numbers of the <b>$(acc_count)</b> sequences that 
+    have been verified to be on chromosome $(chrom).  
+   </p>
+   <table width="100%" cellpadding="0" cellspacing="1" summary="This table contains genes found on this chromosome.">
+    @(acc_sec
+      <tr>
+       <td><a href="/data_center/sequence?id=$(seqID_1)">$(genbank_1)</a></td>
+       <td><a href="/data_center/sequence?id=$(seqID_2)">$(genbank_2)</a></td>
+       <td><a href="/data_center/sequence?id=$(seqID_3)">$(genbank_3)</a></td>
+       <td><a href="/data_center/sequence?id=$(seqID_4)">$(genbank_4)</a></td>
+       <td><a href="/data_center/sequence?id=$(seqID_5)">$(genbank_5)</a></td>
+      </tr>
+    )
+   </table>
+  )
+)

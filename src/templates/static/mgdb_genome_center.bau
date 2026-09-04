@@ -1,9 +1,9 @@
 $$SYNTAX-LEVEL 2
 *(mgdb-genome-center
-<main class="mgdb-page mgdb-genomes-page" id="mgdb-genome-main">
+<main class="mgdb-page mgdb-hub-page mgdb-genomes-page" id="mgdb-genome-main">
 
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
-    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Genome Center</span>
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Genome Data Hub</span>
   </nav>
 
   <section class="mgdb-hero" aria-labelledby="genome-title">
@@ -13,68 +13,102 @@ $$SYNTAX-LEVEL 2
     </div>
     <div class="mgdb-hero-body">
       <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; August 2026</p>
-      <h1 id="genome-title">Explore maize and Andropogoneae genomes</h1>
-      <p class="mgdb-hero-description">Search and compare $(total-assemblies) hosted genome assemblies across $(total-species) species. Filter reference pseudomolecules, cultivar sequences, and downstream annotation tools.</p>
+      <h1 id="genome-title">MaizeGDB genomic datasets</h1>
+      <p class="mgdb-hero-description">MaizeGDB hosts $(total-assemblies) genome datasets from $(total-species) species, including five versions of the representative maize genome, B73.</p>
     </div>
   </section>
 
-  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#genome-assemblies">Assemblies</a>
+  <nav class="mgdb-section-tabs" id="genome-tabs" aria-label="Sections on this page">
+    <a href="#genome-assemblies">Search</a>
+    <a href="#genome-statistics">Assembly statistics</a>
     <a href="#genome-progress">In progress</a>
-    <a href="#genome-history">History</a>
-    <a href="#genome-taxa">Taxa</a>
-    <a href="#genome-overview">Statistics</a>
+    <a href="#genome-references">References</a>
+    <a href="#genome-overview">Metrics</a>
     <a href="#genome-tools">Related resources</a>
   </nav>
 
+  <!-- ====================================================================
+       Search
+       ==================================================================== -->
   <section id="genome-assemblies" aria-labelledby="genome-assemblies-title">
     <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Find an assembly</span><h2 id="genome-assemblies-title">Assembly explorer</h2></div>
-      <p>Search and filter every hosted assembly. Sort any column by activating its header.</p>
+      <div><h2 id="genome-assemblies-title">Search</h2></div>
     </div>
 
-    <div class="mgdb-search">
-      <div class="mgdb-search-row">
-        <div class="mgdb-field">
-          <label class="mgdb-label" for="genome-query">Search assemblies</label>
-          <p class="mgdb-hint" id="genome-query-hint">Match an assembly, cultivar, species, or accession. Example: <code>B73</code>, <code>Mo17</code>, or <code>Tripsacum</code></p>
-          <input class="mgdb-input" id="genome-query" name="q" type="search" aria-describedby="genome-query-hint" autocomplete="off">
-        </div>
-        <div class="mgdb-field">
-          <label class="mgdb-label" for="genome-status">Status</label>
-          <select class="mgdb-select" id="genome-status">
-            <option value="">Any status</option>
-            <option value="current">Current</option>
-            <option value="superseded">Superseded</option>
-          </select>
-        </div>
-        <button class="mgdb-button mgdb-button-quiet" id="genome-reset" type="button" hidden>Reset</button>
+    <form class="genome-search" id="genome-search-form" role="search">
+      <div class="genome-search-row">
+        <label class="mgdb-visually-hidden" for="genome-query">Search assemblies</label>
+        <input class="mgdb-input" id="genome-query" name="q" type="search" autocomplete="off" placeholder="Assembly, cultivar, species, or accession" aria-describedby="genome-query-hint" />
+        <button class="mgdb-button mgdb-button-primary" id="genome-search-submit" type="submit">Search</button>
       </div>
-      <div class="mgdb-filters">
-        <span aria-hidden="true" class="mgdb-small mgdb-muted">Taxon:</span>
-        $(group-chips)
-        <span class="mgdb-result-count" id="genome-count" aria-live="polite"></span>
-      </div>
-    </div>
+      <p class="mgdb-hint" id="genome-query-hint">Matches any part of an assembly name, cultivar, species, or BioProject accession. The list below filters as you type.</p>
 
-    <div class="mgdb-table-scroll mgdb-spaced">
-      <table class="mgdb-table" id="genome-table" data-sortable>
-        <caption>
-          Genome assemblies hosted at MaizeGDB
-          <span class="mgdb-muted">Read live from the assembly database, B73 reference first. Quality is taken from the assembly name, which carries the REFERENCE or DRAFT designation; blank fields are shown as &ldquo;Not reported&rdquo; rather than left empty.</span>
-        </caption>
-        <thead>
-          <tr>
-            <th scope="col" data-sort="text"><button type="button">Assembly</button></th>
-            <th scope="col" data-sort="text"><button type="button">Cultivar</button></th>
-            <th scope="col" data-sort="text"><button type="button">Species</button></th>
-            <th scope="col" data-sort="text"><button type="button">Quality</button></th>
-            <th scope="col" data-sort="text"><button type="button">Accession</button></th>
-            <th scope="col" data-sort="text"><button type="button">Status</button></th>
-          </tr>
-        </thead>
-        <tbody>$(assembly-rows)</tbody>
-      </table>
+      <div class="genome-examples" aria-label="Example searches">
+        <span>Examples&#58;</span>
+        <button type="button" data-genome-example="B73">B73</button>
+        <button type="button" data-genome-example="Mo17">Mo17</button>
+        <button type="button" data-genome-example="W22">W22</button>
+        <button type="button" data-genome-example="Tripsacum">Tripsacum</button>
+        <button type="button" data-genome-example="PanAnd">PanAnd</button>
+      </div>
+
+      <details class="genome-advanced" id="genome-advanced">
+        <summary>
+          <span class="genome-advanced-label">Advanced search</span>
+          <span class="genome-advanced-count" id="genome-advanced-count" hidden></span>
+        </summary>
+        <div class="genome-advanced-body">
+          <div class="genome-advanced-grid">
+            <div class="mgdb-hub-field">
+              <label for="genome-filter-status">Status</label>
+              <select id="genome-filter-status" name="status">
+                <option value="all">All</option>
+                <option value="current">Current</option>
+                <option value="superseded">Superseded</option>
+              </select>
+            </div>
+            <div class="mgdb-hub-field">
+              <label for="genome-filter-quality">Assembly quality</label>
+              <select id="genome-filter-quality" name="quality">
+                <option value="all">All</option>
+                <option value="Representative">Representative</option>
+                <option value="Reference">Reference</option>
+                <option value="Draft">Draft</option>
+                <option value="none">Not reported</option>
+              </select>
+            </div>
+            <div class="mgdb-hub-field genome-advanced-actions">
+              <label>&nbsp;</label>
+              <button class="mgdb-button mgdb-button-secondary" id="genome-reset" type="button">Clear search and filters</button>
+            </div>
+          </div>
+          <div class="mgdb-filters genome-species-filters" aria-label="Filter by species">
+            <span aria-hidden="true" class="mgdb-small mgdb-muted">Species&#58;</span>
+            $(group-chips)
+          </div>
+        </div>
+      </details>
+    </form>
+
+    <div class="genome-collection" id="genome-assembly-collection" data-title="Genome assemblies hosted at MaizeGDB" data-filename="maizegdb_genome_assemblies.tsv" data-noun="assemblies">
+      <div class="mgdb-table-scroll">
+        <table class="mgdb-table" id="genome-table">
+          <caption>
+            <span class="mgdb-muted">Read live from the assembly database, B73 reference first. Quality is taken from the assembly name, which carries the REFERENCE or DRAFT designation; blank fields are shown as &ldquo;Not reported&rdquo; rather than left empty.</span>
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col" data-sort="text">Assembly</th>
+              <th scope="col" data-sort="text">Cultivar</th>
+              <th scope="col" data-sort="text">Species</th>
+              <th scope="col" data-sort="text">Quality</th>
+              <th scope="col" data-sort="text">Accession</th>
+              <th scope="col" data-sort="text">Status</th>
+            </tr>
+          </thead>
+          <tbody>$(assembly-rows)</tbody>
+        </table>
+      </div>
     </div>
 
     <div class="mgdb-empty" id="genome-empty" hidden>
@@ -84,75 +118,150 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
-  <section id="genome-progress" aria-labelledby="genome-progress-title">
+  <!-- ====================================================================
+       Assembly statistics \(prototype\)
+       ==================================================================== -->
+  <section id="genome-statistics" class="genome-stats-section" aria-labelledby="genome-statistics-title" data-source="/data/genome/genome_assembly_stats_demo.js?v=20260830-2">
     <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Announced</span><h2 id="genome-progress-title">Assemblies in progress</h2></div>
-      <p>$(total-progress) sequencing projects recorded in the database but not yet released.</p>
+      <div><h2 id="genome-statistics-title">Assembly statistics</h2></div>
     </div>
-    <div class="mgdb-table-scroll">
-      <table class="mgdb-table">
-        <caption>Genome assemblies in progress</caption>
-        <thead>
-          <tr>
-            <th scope="col">Assembly</th>
-            <th scope="col">Cultivar</th>
-            <th scope="col">Sequencing technologies</th>
-            <th scope="col">Collaborators</th>
-          </tr>
-        </thead>
-        <tbody>$(progress-rows)</tbody>
-      </table>
-    </div>
-  </section>
 
-  <section id="genome-history" aria-labelledby="genome-history-title">
-    <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Growth over time</span><h2 id="genome-history-title">A history of genome stewardship</h2></div>
-      <p>Assemblies hosted at MaizeGDB from 2008 to 2026, with landmark releases marked.</p>
-    </div>
-    <figure class="mgdb-figure">
-      <div class="mgdb-chart" id="genome-growth-chart" role="img" aria-label="Line chart of genome assemblies hosted at MaizeGDB from 2008 to 2026, rising from 1 to 158, with landmark releases annotated">
-        <span class="mgdb-chart-fallback">Loading assembly history&hellip;</span>
+    <div class="genome-stats-demo-note" role="note">
+      <div>
+        <span class="mgdb-pill mgdb-pill-warn">Prototype dataset</span>
+        <strong>This table is a demonstration and is not yet database-backed.</strong>
       </div>
-      <figcaption>Growth was slow through 2015, when fewer than five assemblies were hosted. Sequencing of the NAM founders lifted the total past fifty by 2020, and the Andropogoneae and landrace panels roughly tripled it again by 2026.</figcaption>
-      <details class="mgdb-chart-data">
-        <summary>View the data behind this chart</summary>
-        <div class="mgdb-table-scroll">
-          <table class="mgdb-table" id="genome-growth-table">
-            <caption>Genome assemblies hosted at MaizeGDB by year</caption>
-            <thead><tr><th scope="col">Year</th><th scope="col" class="mgdb-numeric">Assemblies</th><th scope="col">Landmark release</th></tr></thead>
-            <tbody></tbody>
+      <p id="genome-stats-meta">The statistics were computed from files published at <a href="https\://download.maizegdb.org/" target="_blank" rel="noopener">download.maizegdb.org</a>. A dash means not measured, never zero.</p>
+    </div>
+
+    <p class="genome-stats-load-status" id="genome-stats-load-status" role="status" aria-live="polite">Loading prototype assembly statistics&hellip;</p>
+
+    <div class="genome-stats-app" id="genome-stats-app" hidden>
+      <div class="genome-stats-controls" aria-label="Assembly statistics filters">
+        <div class="genome-stats-filter-grid">
+          <div class="mgdb-hub-field genome-stats-query-field">
+            <label for="genome-stats-query">Search statistics</label>
+            <input id="genome-stats-query" type="search" autocomplete="off" placeholder="Assembly, genotype, species, producer, or annotation">
+          </div>
+          <div class="mgdb-hub-field">
+            <label for="genome-stats-species">Species</label>
+            <select id="genome-stats-species"></select>
+          </div>
+          <div class="mgdb-hub-field">
+            <label for="genome-stats-status-filter">Status</label>
+            <select id="genome-stats-status-filter"></select>
+          </div>
+          <div class="mgdb-hub-field">
+            <label for="genome-stats-producer">Producer</label>
+            <select id="genome-stats-producer"></select>
+          </div>
+        </div>
+
+        <div class="genome-stats-toggle-row" aria-label="Quick filters">
+          <button class="mgdb-button mgdb-button-secondary genome-stats-toggle" id="genome-stats-chromosome" type="button" aria-pressed="false">Chromosome-scale only</button>
+          <button class="mgdb-button mgdb-button-secondary genome-stats-toggle" id="genome-stats-annotation" type="button" aria-pressed="false">Has annotation</button>
+          <button class="mgdb-button mgdb-button-secondary genome-stats-toggle" id="genome-stats-flag" type="button" aria-pressed="false">Has curation flag</button>
+          <span class="mgdb-result-count" id="genome-stats-count" aria-live="polite"></span>
+        </div>
+
+        <details class="genome-stats-column-picker">
+          <summary>Choose metric groups</summary>
+          <p class="mgdb-hint">Highlighted groups have one or more columns visible. Select a highlighted group to hide its columns, or select an unhighlighted group to add all of its columns. Assembly ID always remains visible.</p>
+          <div class="genome-stats-groups" id="genome-stats-groups" aria-label="Metric column groups"></div>
+        </details>
+
+        <div class="genome-stats-actions">
+          <div class="genome-toolbar">
+            <div class="mgdb-view-toggle" role="group" aria-label="Statistics view">
+              <button class="mgdb-view-btn" type="button" data-stats-view="table" aria-pressed="true"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="2" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="12" width="14" height="2" rx="1" fill="currentColor"/></svg>Table</button>
+              <button class="mgdb-view-btn" type="button" data-stats-view="grid" aria-pressed="false"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>Grid</button>
+            </div>
+            <label>Show <select id="genome-stats-page-size" aria-label="Assemblies per page"><option value="10">10</option><option value="25" selected>25</option><option value="50">50</option><option value="all">All</option></select></label>
+          </div>
+          <button class="mgdb-button mgdb-button-secondary" id="genome-stats-reset" type="button">Reset table</button>
+          <button class="mgdb-button mgdb-button-primary" id="genome-stats-csv" type="button">Download current view as CSV</button>
+          <button class="mgdb-button mgdb-button-secondary" id="genome-stats-fullscreen" type="button" aria-pressed="false" aria-controls="genome-stats-table-stage">View table full screen</button>
+        </div>
+      </div>
+
+      <div class="genome-stats-table-stage" id="genome-stats-table-stage">
+        <div class="genome-stats-fullscreen-bar">
+          <div>
+            <strong>Assembly statistics</strong>
+            <span id="genome-stats-fullscreen-count"></span>
+          </div>
+          <button class="mgdb-button mgdb-button-secondary" id="genome-stats-fullscreen-exit" type="button">Exit full screen</button>
+        </div>
+
+        <div class="genome-stats-table-wrap" id="genome-stats-table-wrap" tabindex="0" role="region" aria-label="Scrollable genome assembly statistics table">
+          <table class="mgdb-table genome-stats-table" id="genome-stats-table">
+            <caption>Prototype genome assembly statistics. Activate a column heading to sort. Activate an assembly ID to inspect every available field.</caption>
+            <thead><tr id="genome-stats-head"></tr></thead>
+            <tbody id="genome-stats-body"></tbody>
           </table>
         </div>
-      </details>
-    </figure>
-    <p class="mgdb-note"><strong>Data note:</strong> this timeline is a curated historical record maintained for the redesign, not a figure derived from the assembly table. The database stores a release date for only some assemblies and in inconsistent formats, so a year-by-year count cannot be computed from it reliably. Every other figure on this page is read directly from the database.</p>
-  </section>
 
-  <section id="genome-taxa" aria-labelledby="genome-taxa-title">
-    <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">How the collection breaks down</span><h2 id="genome-taxa-title">Assemblies by taxon</h2></div>
-      <p>Live counts grouped the same way the Genome Center has always grouped them.</p>
-    </div>
-    <figure class="mgdb-figure">
-      <div class="mgdb-chart mgdb-chart-tall" id="genome-taxa-chart" role="img" aria-label="Horizontal bar chart of assembly counts by taxonomic group">
-        <span class="mgdb-chart-fallback">Loading taxon breakdown&hellip;</span>
+        <div class="mgdb-card-grid genome-grid" id="genome-stats-grid" hidden></div>
+
+        <div class="mgdb-empty" id="genome-stats-empty" hidden>
+          <h3>No prototype assemblies match those filters</h3>
+          <p>Clear one or more filters or reset the table to restore all rows.</p>
+        </div>
+
+        <nav class="genome-pagination" id="genome-stats-pagination" aria-label="Assembly statistics pages" hidden></nav>
       </div>
-      <figcaption>Cultivated maize accounts for most of the collection, with the remainder spread across the wild <i>Zea</i> subspecies and the wider Andropogoneae.</figcaption>
-    </figure>
+    </div>
+
+    <noscript><p class="mgdb-note">This interactive prototype requires JavaScript. The database-backed assembly search above remains available without it.</p></noscript>
   </section>
 
+  <!-- ====================================================================
+       Assemblies in progress
+       ==================================================================== -->
+  <section id="genome-progress" aria-labelledby="genome-progress-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="genome-progress-title">Assemblies in progress</h2></div>
+    </div>
+    <div class="genome-collection" id="genome-progress-collection" data-title="Genome assemblies in progress" data-filename="maizegdb_assemblies_in_progress.tsv" data-noun="projects">
+      <div class="mgdb-table-scroll">
+        <table class="mgdb-table" id="genome-progress-table">
+          <caption><span class="mgdb-muted">$(total-progress) sequencing projects recorded in the database but not yet released.</span></caption>
+          <thead>
+            <tr>
+              <th scope="col" data-sort="text">Assembly</th>
+              <th scope="col" data-sort="text">Cultivar</th>
+              <th scope="col" data-sort="text">Sequencing technologies</th>
+              <th scope="col" data-sort="text">Collaborators</th>
+            </tr>
+          </thead>
+          <tbody>$(progress-rows)</tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       References
+       ==================================================================== -->
+  <section id="genome-references" aria-labelledby="genome-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="genome-references-title">References</h2></div>
+    </div>
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       Metrics
+       ==================================================================== -->
   <section id="genome-overview" aria-labelledby="genome-overview-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Corpus summary</span>
-        <h2 id="genome-overview-title">Genome dataset at a glance</h2>
-      </div>
-      <p>Curated assembly statistics read live from the MaizeGDB database.</p>
+      <div><h2 id="genome-overview-title">Metrics</h2></div>
     </div>
 
     <div class="mgdb-metric-grid">
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-green">
         <div class="mgdb-metric-top">
           <h3>Total Assemblies</h3>
           <span class="mgdb-metric-badge">Hosted</span>
@@ -163,7 +272,7 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Completed and publicly visible genome assemblies.</p>
       </article>
 
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-amber">
         <div class="mgdb-metric-top">
           <h3>Species Count</h3>
           <span class="mgdb-metric-badge">Taxa</span>
@@ -175,10 +284,10 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Distinct species across the tribe Andropogoneae.</p>
       </article>
 
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-burgundy">
         <div class="mgdb-metric-top">
           <h3>Cultivated Maize</h3>
-          <span class="mgdb-metric-badge">Z. mays</span>
+          <span class="mgdb-metric-badge">Maize</span>
         </div>
         <div class="mgdb-metric-stat">
           <strong class="mgdb-metric-value">$(maize-count)</strong>
@@ -186,7 +295,7 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Assemblies of cultivated maize lines and landraces.</p>
       </article>
 
-      <article class="mgdb-metric">
+      <article class="mgdb-metric mgdb-tone-blue">
         <div class="mgdb-metric-top">
           <h3>Reference Quality</h3>
           <span class="mgdb-metric-badge">Reference</span>
@@ -197,15 +306,45 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Chromosome-level references, including the B73 benchmark.</p>
       </article>
     </div>
+
+    <div class="mgdb-chart-grid genome-charts">
+      <figure class="mgdb-figure genome-history-figure" id="genome-history">
+        <h3>Genome datasets hosted at MaizeGDB</h3>
+        <div class="genome-history-wrap">
+          <svg id="genome-growth-chart" viewBox="0 0 960 420" role="img" aria-label="Line chart of genome assemblies hosted at MaizeGDB from 2008 to 2026, with landmark releases annotated"></svg>
+          <div class="genome-history-tip" id="genome-history-tip" role="status" aria-live="polite"></div>
+        </div>
+        <div class="genome-history-actions">
+          <p><span aria-hidden="true">&#9644;</span> Assemblies hosted &nbsp;&middot;&nbsp; <span aria-hidden="true">&#9679;</span> landmark release &nbsp;&middot;&nbsp; hover or tap for exact values</p>
+          <button type="button" id="genome-history-toggle" aria-expanded="false" aria-controls="genome-history-table-wrap">Show data table</button>
+        </div>
+        <div class="genome-history-table mgdb-table-scroll" id="genome-history-table-wrap" hidden>
+          <table class="mgdb-table" id="genome-growth-table">
+            <caption>Genome assemblies hosted at MaizeGDB by year</caption>
+            <thead><tr><th scope="col">Year</th><th scope="col" class="mgdb-numeric">Assemblies</th><th scope="col" class="mgdb-numeric">Change</th><th scope="col">Landmark release</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <figcaption>Growth was slow through 2015, when fewer than five assemblies were hosted. Sequencing of the NAM founders lifted the total past fifty by 2020, and the Andropogoneae and landrace panels roughly tripled it again by 2026.</figcaption>
+      </figure>
+
+      <figure class="mgdb-figure">
+        <h3>Assembly counts by species</h3>
+        <div class="mgdb-chart" id="genome-taxa-chart" role="img" aria-label="Horizontal bar chart of assembly counts by taxonomic group">
+          <span class="mgdb-chart-fallback">Loading taxon breakdown&hellip;</span>
+        </div>
+        <figcaption>Cultivated maize accounts for most of the collection, with the remainder spread across the wild <i>Zea</i> subspecies and the wider Andropogoneae.</figcaption>
+      </figure>
+    </div>
+    <p class="mgdb-note">$(growth-note)</p>
   </section>
 
-  <section id="genome-tools" aria-labelledby="genome-tools-title">
+  <!-- ====================================================================
+       Related resources
+       ==================================================================== -->
+  <section class="mgdb-hub-related" id="genome-tools" aria-labelledby="genome-tools-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Connected tools</span>
-        <h2 id="genome-tools-title">Related resources</h2>
-      </div>
-      <p>Explore related MaizeGDB tools, comparative maps, and downstream annotation resources.</p>
+      <div><h2 id="genome-tools-title">Related resources</h2></div>
     </div>
 
     <div class="mgdb-resource-panel">
@@ -213,38 +352,29 @@ $$SYNTAX-LEVEL 2
         <a href="/genome/genomebrowser">
           <strong>Genome Browser</strong>
           <span>Browse JBrowse tracks and gene models across all assemblies</span>
-          <span class="mgdb-resource-badge">Internal</span>
         </a>
         <a href="/blast">
           <strong>Sequence Search &#40;BLAST&#41;</strong>
           <span>BLAST a nucleotide or protein sequence against any hosted genome</span>
-          <span class="mgdb-resource-badge">Internal</span>
         </a>
-        <a href="https\://download.maizegdb.org">
+        <a href="https\://download.maizegdb.org" target="_blank" rel="noopener">
           <strong>Bulk Downloads</strong>
           <span>FASTA, GFF3, pseudomolecules, and related annotation archives</span>
-          <span class="mgdb-resource-badge">Internal</span>
         </a>
         <a href="/gene_center">
           <strong>Gene Model Center</strong>
           <span>Annotations, cross-references, and functional data by assembly</span>
-          <span class="mgdb-resource-badge">Internal</span>
         </a>
         <a href="/pan_gene_center/pan_gene">
           <strong>Pan-Gene Center</strong>
           <span>Syntenic orthology relationships across 66 maize genome assemblies</span>
-          <span class="mgdb-resource-badge">Internal</span>
-        </a>
-        <a href="/genome/whole_genome">
-          <strong>Whole-Genome Views</strong>
-          <span>Comparative synteny and karyotype chromosome views</span>
-          <span class="mgdb-resource-badge">Internal</span>
         </a>
       </div>
     </div>
   </section>
 
   <script id="genome-group-data" type="application/json">$(group-data)</script>
+  <script id="genome-growth-data" type="application/json">$(growth-data)</script>
 
 </main>
 )

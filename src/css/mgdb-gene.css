@@ -439,6 +439,15 @@
   overflow-wrap: anywhere;
 }
 
+/* ...and its description does not absorb the row's slack. The hub shell grows
+   every paragraph in a card so a closing *link* lands on the card floor, which
+   is right when the last child is a link row. Here the last child is a table in
+   one card and a list of links in another, and pushing those to the floor left
+   a hole between a description and the thing it describes -- measured 317px of
+   gap in the widest row. Let them sit under their description and leave the
+   slack at the bottom, where a card with less content is meant to carry it. */
+.mgdb-gene-page .gene-download-grid > .mgdb-card > p { flex: 0 0 auto; }
+
 /* Long definitions made seven unrelated card sizes. A compact disclosure
    list preserves the exact scientific wording while presenting every term as
    the same easy-to-scan control. */

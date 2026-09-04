@@ -280,41 +280,32 @@
    Version 3 — the Reference assembly card
    =========================================================================== */
 
-.mgdb-modern .mgdb-refassembly {
-  /* A white ground, not the header's cream: the puzzle art is amber, and on
-     cream it washed out to almost nothing. The warmth comes from the accent
-     bar instead, which also marks this as the featured card in the rail. */
-  position: relative;
-  overflow: hidden;
-  border-color: #f0e2c2;
-  background: var(--mgdb-surface);
-}
-
-.mgdb-modern .mgdb-refassembly::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--mgdb-gold) 0%, var(--mgdb-orange) 60%, var(--mgdb-wine) 100%);
-}
+/* The card takes the standard .mgdb-aside-card chrome -- 4px solid green top
+   edge, sage ground -- the same as the news card beside it in the rail. It
+   used to carry the welcome hero's gold-to-wine gradient bar and a white
+   ground, which borrowed the hero's signature for a sidebar card and made the
+   rail read as two unrelated things. */
 
 .mgdb-modern .mgdb-refassembly-head {
   display: flex;
   align-items: center;
-  gap: var(--mgdb-space-2);
-  margin-bottom: var(--mgdb-space-3);
+  gap: var(--mgdb-space-3);
+  margin-bottom: var(--mgdb-space-2);
   padding-bottom: var(--mgdb-space-3);
-  border-bottom: 1px solid #ecdcb8;
+  border-bottom: 1px solid var(--mgdb-line-soft);
 }
 
-/* The puzzle is the recognizable part of the production block, so give it room
-   to be recognized. */
+/* 64px rather than 84px. The art is still recognizable at this size, and the
+   20px it gives back is what lets the caption beside it set on one or two
+   comfortable lines instead of four in a narrow rail. */
 .mgdb-modern .mgdb-refassembly-head img {
   flex: 0 0 auto;
-  width: 84px;
-  height: 84px;
+  width: 64px;
+  height: 64px;
   object-fit: contain;
 }
+
+.mgdb-modern .mgdb-refassembly-head > div { min-width: 0; }
 
 .mgdb-modern .mgdb-refassembly-head strong {
   display: block;
@@ -325,9 +316,10 @@
 
 .mgdb-modern .mgdb-refassembly-head span {
   display: block;
+  margin-top: 2px;
   font-size: var(--mgdb-text-xs);
   line-height: var(--mgdb-leading-snug);
-  color: var(--mgdb-ink-soft);
+  color: var(--mgdb-muted);
 }
 
 .mgdb-modern .mgdb-refassembly-links {
@@ -337,26 +329,40 @@
 }
 
 .mgdb-modern .mgdb-refassembly-links li + li {
-  border-top: 1px solid var(--mgdb-line-soft);
+  border-top: 1px solid #e4e9e0;
 }
 
+/* One line of text each since the descriptions came out, so the padding
+   carries the whole tap target: 12px either side of a 20px line is 44px,
+   which is the floor. The chevron gives the row something to end on -- three
+   short labels in a wide rail otherwise read as an empty table. */
 .mgdb-modern .mgdb-refassembly-links a {
-  /* 10px vertical keeps the row at 44px with the two lines of text, which is
-     the tap-target floor. */
-  display: block;
-  padding: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mgdb-space-2);
+  padding: 12px 0;
   font-size: var(--mgdb-text-sm);
   font-weight: 600;
   color: var(--mgdb-green-dark);
   text-decoration: none;
 }
 
-.mgdb-modern .mgdb-refassembly-links a span {
-  display: block;
-  font-size: var(--mgdb-text-xs);
-  font-weight: 400;
-  line-height: var(--mgdb-leading-snug);
-  color: var(--mgdb-muted);
+.mgdb-modern .mgdb-refassembly-links a::after {
+  content: "";
+  flex: 0 0 auto;
+  width: 6px;
+  height: 6px;
+  border-top: 2px solid var(--mgdb-muted);
+  border-right: 2px solid var(--mgdb-muted);
+  transform: rotate(45deg);
+  transition: border-color .15s ease, transform .15s ease;
+}
+
+.mgdb-modern .mgdb-refassembly-links a:hover::after,
+.mgdb-modern .mgdb-refassembly-links a:focus-visible::after {
+  border-color: var(--mgdb-gold-dark);
+  transform: rotate(45deg) translate(1px, -1px);
 }
 
 .mgdb-modern .mgdb-refassembly-links a:hover,
@@ -421,12 +427,15 @@
   font-size: var(--mgdb-text-base);
   font-weight: 600;
   color: var(--mgdb-green-dark);
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  text-decoration: none;
 }
 
 .mgdb-modern .mgdb-refassembly-current:hover,
-.mgdb-modern .mgdb-refassembly-current:focus-visible { color: var(--mgdb-gold-dark); }
+.mgdb-modern .mgdb-refassembly-current:focus-visible {
+  color: var(--mgdb-gold-dark);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 
 /* --- Common tasks -----------------------------------------------------------
    A <details> rather than a scripted dropdown: it opens and closes, takes
@@ -633,3 +642,154 @@
 
 /* Set by js/mgdb-home.js when the list runs tall -- see the note there. */
 .mgdb-modern .mgdb-home-news > li.mgdb-home-news-trimmed { display: none; }
+
+/* ===========================================================================
+   Version 4 — smaller quick links set further apart, and a tightened
+   Representative assembly card
+
+   The rail is the homepage's own 340px. The gutter between the two panels is
+   32px rather than 24px, so they read as two panels.
+
+   The tiles carry an 88px mark rather than version 3's 116px, which takes the
+   tile from 172px to 142px, and they sit 20px apart rather than 12px. Five
+   rows come to 790px against version 3's 910px -- smaller tiles with more air
+   around them, and still four columns and five rows.
+
+   The Representative assembly card loses its description and its three stacked
+   rows. The identifier is no longer a link -- it names what the card is about
+   rather than going anywhere -- and Assembly, Annotation and Download sit
+   beside each other under it.
+   =========================================================================== */
+
+/* One step warmer and darker than --mgdb-gold-soft: the frame has to be
+   visible against the cream it surrounds and against the white page behind
+   it, and --mgdb-line-soft is too grey to do either next to gold. */
+.mgdb-modern .mgdb-home-v4 { --mgdb-gold-line: #ecdfc0; }
+
+.mgdb-modern .mgdb-home-v4 .mgdb-home-layout {
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: var(--mgdb-space-6);
+}
+
+@media (max-width: 1100px) {
+  .mgdb-modern .mgdb-home-v4 .mgdb-home-layout { gap: var(--mgdb-space-5); }
+}
+
+@media (max-width: 900px) {
+  .mgdb-modern .mgdb-home-v4 .mgdb-home-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* --- the quick links ------------------------------------------------------ */
+
+.mgdb-modern .mgdb-home-v4 .mgdb-quicklinks {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.mgdb-modern .mgdb-home-v4 .mgdb-quicklink-art {
+  width: 88px;
+  height: 88px;
+}
+
+.mgdb-modern .mgdb-home-v4 .mgdb-quicklink-art img {
+  width: 80px;
+  height: 80px;
+}
+
+/* Below 640px version 4 hands the layout back to version 3 -- but it has to say
+   so. The .mgdb-home-v4 rules above match with the same specificity as the
+   .mgdb-home-v3 ones and are later in the file, so they win inside the version 3
+   media query as well: dropping this block does not restore version 3's mobile
+   layout, it leaves four 71px columns overflowing to 469px on a 375px phone.
+   Every measurement version 4 changes has to be changed back here.
+
+   The values are version 3's, and they are not negotiable downward: the mark
+   cannot grow past 54px and the gap cannot open past 0, because the tile is a
+   horizontal row at this width and cannot shrink below the mark plus its
+   padding. A 104px mark with an 8px gap put the layout viewport at 389px on a
+   375px device -- the whole page rendered zoomed out. window.innerWidth grows
+   along with the overflow and reports nothing wrong; window.visualViewport.width
+   is the measurement that catches it. */
+@media (max-width: 640px) {
+  .mgdb-modern .mgdb-home-v4 .mgdb-quicklinks {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+  }
+  .mgdb-modern .mgdb-home-v4 .mgdb-quicklink-art { width: 54px; height: 54px; }
+  .mgdb-modern .mgdb-home-v4 .mgdb-quicklink-art img { width: 48px; height: 48px; }
+}
+
+/* --- Representative assembly ---------------------------------------------- */
+
+/* The two rail cards were both plain .mgdb-aside-card -- same dark green top
+   border, same sage fill -- so they read as one stack rather than as the
+   assembly and the news. This one takes the gold from the logo kernels:
+   --mgdb-gold is the same accent the amber metrics carry, and --mgdb-gold-soft
+   is its light fill, warm against the news card's cool sage. The 1px frame
+   warms with it, or the cream sits inside a grey outline and looks unfinished.
+
+   Measured on the rendered card: the heading is 14.21:1 on the cream and the
+   assembly name and the three links are 9.94:1, both well past 4.5:1. Do not
+   put the gold itself on the cream as text -- #f2a515 on #fff6df is 1.9:1,
+   which is why that token is labelled borders-and-fills only. */
+.mgdb-modern .mgdb-home-v4 .mgdb-refassembly {
+  border-top-color: var(--mgdb-gold);
+  border-right-color: var(--mgdb-gold-line);
+  border-bottom-color: var(--mgdb-gold-line);
+  border-left-color: var(--mgdb-gold-line);
+  background: var(--mgdb-gold-soft);
+}
+
+/* Nothing sits below the head any more, so the rule under it separated the
+   card from its own bottom edge. */
+.mgdb-modern .mgdb-home-v4 .mgdb-refassembly-head {
+  align-items: center;
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.mgdb-modern .mgdb-home-v4 .mgdb-refassembly-head img {
+  width: 72px;
+  height: 72px;
+}
+
+.mgdb-modern .mgdb-home-v4 .mgdb-refassembly-head strong {
+  display: block;
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-lg);
+  color: var(--mgdb-green-dark);
+}
+
+/* The three destinations on one line. They were three full-width rows with a
+   rule between each, which is a lot of card for three short words.
+
+   The row spans the whole card rather than sitting in the column beside the
+   puzzle: measured at the 340px rail the three come to 239px, the column
+   beside the puzzle is 206px, and the card's full inside width is 292px. In
+   the narrower column they wrapped and put the card back up to 188px. */
+.mgdb-modern .mgdb-home-v4 .mgdb-refassembly-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1) var(--mgdb-space-4);
+  margin: var(--mgdb-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mgdb-modern .mgdb-home-v4 .mgdb-refassembly-actions a {
+  display: inline-block;
+  padding: 8px 0;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  color: var(--mgdb-green-dark);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.mgdb-modern .mgdb-home-v4 .mgdb-refassembly-actions a:hover,
+.mgdb-modern .mgdb-home-v4 .mgdb-refassembly-actions a:focus-visible {
+  color: var(--mgdb-gold-dark);
+}

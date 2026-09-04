@@ -19,7 +19,7 @@ $$SYNTAX-LEVEL 2
     </div>
     <div class="mgdb-hero-body">
       <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; August 2026</p>
-      <h1 id="ai-title">Maize artificial intelligence and machine learning resources</h1>
+      <h1 id="ai-title">MaizeGDB artificial intelligence and machine learning resources</h1>
       <p class="mgdb-hero-description">$(metric_total) resources for machine learning on maize&#58; $(metric_tools) analysis tools, $(metric_data) AI-ready datasets, $(metric_code) code repositories, and $(metric_pubs) references.</p>
     </div>
   </section>
@@ -263,34 +263,45 @@ $$SYNTAX-LEVEL 2
       </article>
     </div>
 
+    <!-- One figure, two presentations. The chart and the table were stacked,
+         which showed the same numbers twice down the page; the toggle makes
+         them one block a reader switches between. Chart is the default; the
+         table is what you reach for to read a value exactly. -->
     <figure class="mgdb-figure ai-figure">
-      <h3>Resources by data type</h3>
+      <div class="ai-figure-head">
+        <h3>Resources by data type</h3>
+        <div class="mgdb-view-toggle" role="group" aria-label="Resources by data type view">
+          <button class="mgdb-view-btn" type="button" data-ai-figure-view="chart" aria-pressed="true" aria-controls="ai-topic-chart"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="9" width="4" height="6" rx="1" fill="currentColor"/><rect x="6" y="5" width="4" height="10" rx="1" fill="currentColor"/><rect x="11" y="1" width="4" height="14" rx="1" fill="currentColor"/></svg>Chart</button>
+          <button class="mgdb-view-btn" type="button" data-ai-figure-view="table" aria-pressed="false" aria-controls="ai-topic-table-wrap"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="2" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="12" width="14" height="2" rx="1" fill="currentColor"/></svg>Table</button>
+        </div>
+      </div>
+
       <div class="mgdb-chart" id="ai-topic-chart" role="img"
            aria-label="Stacked horizontal bar chart counting the analysis tools, datasets, code repositories, and references that cover each data type">
         <div class="mgdb-chart-fallback">Loading the data type breakdown&hellip;</div>
       </div>
+
+      <div class="mgdb-table-scroll ai-figure-table" id="ai-topic-table-wrap" hidden>
+        <table class="mgdb-table" id="ai-topic-table">
+          <caption class="mgdb-visually-hidden">
+            Resources by data type&#58; the values behind the chart.
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Data type</th>
+              <th scope="col" class="mgdb-numeric">Tools</th>
+              <th scope="col" class="mgdb-numeric">Data</th>
+              <th scope="col" class="mgdb-numeric">Code</th>
+              <th scope="col" class="mgdb-numeric">References</th>
+              <th scope="col" class="mgdb-numeric">Total</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
       <figcaption>Each resource is counted once per data type it covers, so the bars total more than the $(metric_total) resources in the catalog. Select a bar to search that data type.</figcaption>
     </figure>
-
-    <div class="mgdb-table-scroll ai-figure-table">
-      <table class="mgdb-table" id="ai-topic-table">
-        <caption>
-          Resources by data type
-          <span class="mgdb-muted">The values behind the chart above.</span>
-        </caption>
-        <thead>
-          <tr>
-            <th scope="col">Data type</th>
-            <th scope="col" class="mgdb-numeric">Tools</th>
-            <th scope="col" class="mgdb-numeric">Data</th>
-            <th scope="col" class="mgdb-numeric">Code</th>
-            <th scope="col" class="mgdb-numeric">References</th>
-            <th scope="col" class="mgdb-numeric">Total</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
   </section>
 
   <!-- ── Related resources ────────────────────────────────────────────────── -->
@@ -304,27 +315,22 @@ $$SYNTAX-LEVEL 2
         <a href="/genome">
           <strong>Genome Data Hub</strong>
           <span>Hosted genome assemblies across maize and its wild relatives, with assembly statistics</span>
-          <span class="mgdb-resource-badge">Internal</span>
         </a>
         <a href="/pan_gene_center/pan_gene">
           <strong>Pan-Gene Data Hub</strong>
           <span>Syntenic pan-genes, core and dispensable loci, and structural variation across the pan-genome</span>
-          <span class="mgdb-resource-badge">Internal</span>
         </a>
         <a href="/data_center/variation">
           <strong>Variations &amp; Alleles Data Hub</strong>
           <span>Curated variations, gene mutations, and allele descriptors underlying the variant effect scores</span>
-          <span class="mgdb-resource-badge">Internal</span>
         </a>
         <a href="https://download.maizegdb.org/" target="_blank" rel="noopener">
           <strong>MaizeGDB downloads</strong>
           <span>Bulk sequence, annotation, expression, and function files, including the sets listed on this page</span>
-          <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
         </a>
         <a href="/cite">
           <strong>How to cite MaizeGDB</strong>
           <span>Citation formats, primary database manuscripts, and the publication bibliography</span>
-          <span class="mgdb-resource-badge">Internal</span>
         </a>
       </div>
     </div>

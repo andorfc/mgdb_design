@@ -120,9 +120,14 @@
   text-decoration: underline;
 }
 
+/* Ten buttons in this column, all the same. A flex row sized each to its own
+   label, so "JBrowse" and "GBrowse v4" came out narrower than "View Assembly"
+   and the column read as ragged. One max-content track sizes to the longest
+   label and every button fills it; stacked rather than side by side because
+   two 168px buttons abreast pushed the table 73px past its container. */
 .mgdb-assembly-page .assembly-row-actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: max-content;
   gap: var(--mgdb-space-1);
 }
 
@@ -130,9 +135,12 @@
    Assembly Details Cards Grid
    -------------------------------------------------------------------------- */
 
+/* Two across, not auto-fit. At 1182px a 320px minimum gave three columns and
+   left the fourth card alone on a second row, so the cards were narrow and
+   tall. Two makes them wide enough for the metrics row to sit on one line. */
 .mgdb-assembly-page .assembly-cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--mgdb-space-4);
   margin-top: var(--mgdb-space-4);
 }
@@ -563,7 +571,56 @@
 }
 
 @media (max-width: 768px) {
+  .mgdb-assembly-page .assembly-cards-grid { grid-template-columns: minmax(0, 1fr); }
   .mgdb-assembly-page .mgdb-section-tabs {
     position: static;
   }
 }
+
+/* --------------------------------------------------------------------------
+ * Hero, after the project-page pass
+ *
+ * No "Updated" stamp: it printed the day the page was served, so it always
+ * claimed the data had just changed. With it gone the title has the whole
+ * width, and the description is no longer clamped to the shared 62ch measure,
+ * which was wrapping one sentence into three short lines with the right half
+ * of the panel empty.
+ * -------------------------------------------------------------------------- */
+
+.mgdb-assembly-page .mgdb-hero h1 { padding-right: 0; }
+.mgdb-assembly-page .mgdb-hero-description { max-width: none; }
+
+/* Two of the five assembly identifiers were breaking mid-name
+   \("Zm-B73-" / "REFERENCE-NAM-5.0"\) because every th is nowrap, so the
+   headers set the column widths and the first column got what was left.
+   Letting the headers wrap frees enough for the names; the nowrap goes on the
+   link rather than the cell, so the "Current Gold Standard" badge beside it can
+   still drop to its own line instead of forcing a 399px column. */
+.mgdb-assembly-page .mgdb-table thead th,
+.mgdb-assembly-page .mgdb-table thead th button { white-space: normal; text-align: left; }
+.mgdb-assembly-page .assembly-name-link { white-space: nowrap; }
+
+/* The Actions column holds two buttons per row. They now share a variant, so
+   give them a shared width as well -- "JBrowse" and "GBrowse v4" set different
+   widths otherwise and the column read as ragged. */
+.mgdb-assembly-page .assembly-row-actions .mgdb-button {
+  justify-content: center;
+  width: 100%;
+  white-space: nowrap;
+}
+
+/* The v5 card carries three buttons where the others carry two, and at the
+   shared 24px inline padding the three measured 590px against a 549px card and
+   dropped onto a second line. Equal flex tracks put them on one row and give
+   every button in a card the same width; the tighter padding is what leaves
+   "Download Directory" room to sit inside its own padding box rather than
+   spilling into it. */
+.mgdb-assembly-page .assembly-detail-links { flex-wrap: nowrap; }
+
+.mgdb-assembly-page .assembly-detail-links .mgdb-button {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-inline: var(--mgdb-space-3);
+  white-space: nowrap;
+}
+

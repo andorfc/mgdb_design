@@ -1,6 +1,6 @@
 $$SYNTAX-LEVEL 2
 *(mgdb-contact
-<main class="mgdb-page mgdb-contact-page" id="mgdb-contact-main">
+<main class="mgdb-page mgdb-hub-page mgdb-contact-page" id="mgdb-contact-main">
 
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
     <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/about">About</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Contact</span>
@@ -15,27 +15,31 @@ $$SYNTAX-LEVEL 2
       </svg>
     </span>
     <div>
-      <span class="mgdb-eyebrow">About MaizeGDB</span>
       <h1 id="contact-title">Connect with the MaizeGDB team</h1>
-      <p>Questions about data, tools, curation, or the site itself reach a real person. Write to the team address for anything general, or contact a specialist directly.</p>
+      <p>Questions about data, tools, curation, or the site itself reach a real person. Send anything general through the feedback form, or contact a specialist directly.</p>
     </div>
   </section>
 
-  <section aria-labelledby="contact-paths-title">
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#contact-paths" class="is-current" aria-current="true">How can we help?</a>
+    <a href="#contact-team">Team members</a>
+    <a href="#contact-directory">Find a specialist</a>
+  </nav>
+
+  <section id="contact-paths" aria-labelledby="contact-paths-title">
     <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Start here</span><h2 id="contact-paths-title">How can we help?</h2></div>
-      <p>General questions are routed to whoever can answer them fastest.</p>
+      <div><h2 id="contact-paths-title">How can we help?</h2></div>
     </div>
     <div class="mgdb-card-grid">
       <article class="mgdb-card">
         <h3>General questions</h3>
         <p>Data, tools, accounts, or anything you cannot place.</p>
-        <p><a href="mailto:mgdb-tech@iastate.edu">mgdb-tech@iastate.edu</a></p>
+        <p><a class="feedback-form" href="$(server-url)/feedback">Send a message</a></p>
       </article>
       <article class="mgdb-card">
         <h3>Report a data problem</h3>
         <p>Something that looks wrong in a record, gene model, or annotation.</p>
-        <p><a href="mailto:mgdb-tech@iastate.edu">Report an issue</a></p>
+        <p><a class="feedback-form" href="$(server-url)/feedback">Report an issue</a></p>
       </article>
       <article class="mgdb-card">
         <h3>Cite MaizeGDB</h3>
@@ -45,12 +49,11 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
-  <section class="contact-core" aria-labelledby="contact-core-title">
+  <section id="contact-team" class="contact-core" aria-labelledby="contact-core-title">
     <figure>
       <img src="/images/contact/maizegdb-core-usda-team-2026.jpg" alt="Margaret Woodhouse, John Portwood, Carson Andorf, and Ethalinda Cannon standing together" loading="lazy" />
       <figcaption>
         <div>
-          <span class="mgdb-eyebrow">Core USDA-ARS team</span>
           <h2 id="contact-core-title">Permanent MaizeGDB team members</h2>
           <p>Left to right: Margaret Woodhouse, John Portwood, Carson Andorf, and Ethalinda Cannon.</p>
         </div>
@@ -61,15 +64,14 @@ $$SYNTAX-LEVEL 2
 
   <section id="contact-directory" aria-labelledby="contact-directory-title">
     <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Who does what</span><h2 id="contact-directory-title">Find a MaizeGDB specialist</h2></div>
-      <p>Search by name, role, or area of expertise.</p>
+      <div><h2 id="contact-directory-title">Find a MaizeGDB specialist</h2></div>
     </div>
 
     <div class="mgdb-search">
       <div class="mgdb-search-row">
         <div class="mgdb-field">
           <label class="mgdb-label" for="contact-query">Search the team</label>
-          <p class="mgdb-hint" id="contact-query-hint">Match a name, role, or speciality. Example: <code>curation</code>, <code>pan-genome</code>, or <code>Andorf</code></p>
+          <p class="mgdb-hint" id="contact-query-hint">Match a name, role, or specialty. Example: <code>curation</code>, <code>pan-genome</code>, or <code>Andorf</code></p>
           <input class="mgdb-input" id="contact-query" name="q" type="search" aria-describedby="contact-query-hint" autocomplete="off">
         </div>
         <button class="mgdb-button mgdb-button-quiet" id="contact-reset" type="button" hidden>Reset</button>
@@ -78,7 +80,7 @@ $$SYNTAX-LEVEL 2
         <span aria-hidden="true" class="mgdb-small mgdb-muted">Group:</span>
         <button class="mgdb-chip" type="button" data-filter="all" aria-pressed="true">All</button>
         <button class="mgdb-chip" type="button" data-filter="usda" aria-pressed="false">USDA-ARS staff</button>
-        <button class="mgdb-chip" type="button" data-filter="nonfed" aria-pressed="false">Non-federal collaborators</button>
+        <button class="mgdb-chip" type="button" data-filter="postdoc" aria-pressed="false">Post-doctoral fellows</button>
         <button class="mgdb-chip" type="button" data-filter="alumni" aria-pressed="false">Alumni</button>
         <span class="mgdb-result-count" id="contact-count" aria-live="polite"></span>
       </div>
@@ -88,34 +90,34 @@ $$SYNTAX-LEVEL 2
       <section class="contact-group" data-group-section="usda" aria-labelledby="contact-h-usda">
         <h3 id="contact-h-usda">USDA-ARS staff <span class="contact-group-count">4</span></h3>
         <div class="contact-person-grid">
-          <article class="contact-person" data-group="usda" data-photo="/images/person/maizegdb/Dark/small/andorf.jpg" data-search="Carson Andorf Lead Scientist Computational Biologist Genomics, AI/machine learning, bioinformatics, tool development"><h4>Carson Andorf</h4><p class="contact-person-role">Lead Scientist, Computational Biologist</p><p class="contact-person-expertise">Genomics, AI/machine learning, bioinformatics, tool development</p><p class="contact-person-links"><a href="mailto:carson.andorf@usda.gov">carson.andorf@usda.gov</a> &middot; <a href="/person?id=1204262">MaizeGDB record</a></p></article>
-          <article class="contact-person" data-group="usda" data-photo="/images/person/maizegdb/Dark/small/cannon.jpg" data-search="Ethy Cannon Computational Biologist and Bioinformaticist Genomic data, integrated gene model data, pan-genomics, tool development"><h4>Ethy Cannon</h4><p class="contact-person-role">Computational Biologist and Bioinformaticist</p><p class="contact-person-expertise">Genomic data, integrated gene model data, pan-genomics, tool development</p><p class="contact-person-links"><a href="mailto:ethy.cannon@usda.gov">ethy.cannon@usda.gov</a> &middot; <a href="/person?id=1079092">MaizeGDB record</a></p></article>
-          <article class="contact-person" data-group="usda" data-photo="/images/person/maizegdb/Dark/small/portwood.jpg" data-search="John Portwood IT-Specialist Website/Database/Systems Administration, tool development"><h4>John Portwood</h4><p class="contact-person-role">IT-Specialist</p><p class="contact-person-expertise">Website/Database/Systems Administration, tool development</p><p class="contact-person-links"><a href="mailto:john.portwood@usda.gov">john.portwood@usda.gov</a> &middot; <a href="/person?id=2772801">MaizeGDB record</a></p></article>
-          <article class="contact-person" data-group="usda" data-photo="/images/person/maizegdb/Dark/small/woodhouse.jpg" data-search="Margaret Woodhouse Computational Biologist, sequence curator Bioinformatics, genome curation, comparative genomics, and pan-genomics"><h4>Margaret Woodhouse</h4><p class="contact-person-role">Computational Biologist, sequence curator</p><p class="contact-person-expertise">Bioinformatics, genome curation, comparative genomics, and pan-genomics</p><p class="contact-person-links"><a href="mailto:margaret.woodhouse@usda.gov">margaret.woodhouse@usda.gov</a> &middot; <a href="/person?id=595845">MaizeGDB record</a></p></article>
+          <article class="contact-person" data-group="usda" data-photo="/images/person/maizegdb/Dark/small/andorf.jpg" data-search="Carson M. Andorf Carson Andorf Lead Scientist Computational Biologist Genomics, AI/machine learning, bioinformatics, tool development"><h4>Carson M. Andorf</h4><p class="contact-person-role">Lead Scientist, Computational Biologist</p><p class="contact-person-expertise">Genomics, AI/machine learning, bioinformatics, tool development</p><p class="contact-person-links"><a href="mailto:carson.andorf@usda.gov">carson.andorf@usda.gov</a><br><a href="/person?id=1204262">MaizeGDB record</a></p></article>
+          <article class="contact-person" data-group="usda" data-photo="/images/person/maizegdb/Dark/small/cannon.jpg" data-search="Ethalinda K. Cannon Ethy Cannon Computational Biologist and Bioinformaticist Genomic data, integrated gene model data, pan-genomics, tool development"><h4>Ethalinda K. Cannon</h4><p class="contact-person-role">Computational Biologist and Bioinformaticist</p><p class="contact-person-expertise">Genomic data, integrated gene model data, pan-genomics, tool development</p><p class="contact-person-links"><a href="mailto:ethy.cannon@usda.gov">ethy.cannon@usda.gov</a><br><a href="/person?id=1079092">MaizeGDB record</a></p></article>
+          <article class="contact-person" data-group="usda" data-photo="/images/person/maizegdb/Dark/small/portwood.jpg" data-search="John L. Portwood III John Portwood IT-Specialist Website/Database/Systems Administration, tool development"><h4>John L. Portwood III</h4><p class="contact-person-role">IT-Specialist</p><p class="contact-person-expertise">Website/Database/Systems Administration, tool development</p><p class="contact-person-links"><a href="mailto:john.portwood@usda.gov">john.portwood@usda.gov</a><br><a href="/person?id=2772801">MaizeGDB record</a></p></article>
+          <article class="contact-person" data-group="usda" data-photo="/images/person/maizegdb/Dark/small/woodhouse.jpg" data-search="Margaret R. Woodhouse Margaret Woodhouse Computational Biologist, sequence curator Bioinformatics, genome curation, comparative genomics, pan-genomics"><h4>Margaret R. Woodhouse</h4><p class="contact-person-role">Computational Biologist, sequence curator</p><p class="contact-person-expertise">Bioinformatics, genome curation, comparative genomics, pan-genomics</p><p class="contact-person-links"><a href="mailto:margaret.woodhouse@usda.gov">margaret.woodhouse@usda.gov</a><br><a href="/person?id=595845">MaizeGDB record</a></p></article>
         </div>
       </section>
-      <section class="contact-group" data-group-section="nonfed" aria-labelledby="contact-h-nonfed">
-        <h3 id="contact-h-nonfed">Non-federal collaborators <span class="contact-group-count">3</span></h3>
+      <section class="contact-group" data-group-section="postdoc" aria-labelledby="contact-h-postdoc">
+        <h3 id="contact-h-postdoc">Post-doctoral fellows <span class="contact-group-count">3</span></h3>
         <div class="contact-person-grid">
-          <article class="contact-person" data-group="nonfed" data-photo="/images/person/maizegdb/StephenHarding.jpg" data-search="Stephen Harding Post-doctoral Fellow Molecular Biology, Bioinformatics, and Biostatistics"><h4>Stephen Harding</h4><p class="contact-person-role">Post-doctoral Fellow</p><p class="contact-person-expertise">Molecular Biology, Bioinformatics, and Biostatistics</p><p class="contact-person-links"><a href="mailto:stephen.harding84@gmail.com">stephen.harding84@gmail.com</a> &middot; <a href="/person?id=10043227">MaizeGDB record</a></p></article>
-          <article class="contact-person" data-group="nonfed" data-photo="/images/person/maizegdb/OliviaHaley.jpg" data-search="Olivia Haley Post-doctoral Fellow Machine learning; protein function; food safety; protein-protein interaction"><h4>Olivia Haley</h4><p class="contact-person-role">Post-doctoral Fellow</p><p class="contact-person-expertise">Machine learning; protein function; food safety; protein-protein interaction</p><p class="contact-person-links"><a href="mailto:ochaley@ksu.edu">ochaley@ksu.edu</a> &middot; <a href="/person?id=10040859">MaizeGDB record</a></p></article>
-          <article class="contact-person" data-group="nonfed" data-photo="/images/person/maizegdb/LauraTibbs-Cortes.jpg" data-search="Laura Tibbs-Cortes Post-doctoral Fellow Genomics, Bioinformatics, GWAS."><h4>Laura Tibbs-Cortes</h4><p class="contact-person-role">Post-doctoral Fellow</p><p class="contact-person-expertise">Genomics, Bioinformatics, GWAS.</p><p class="contact-person-links"><a href="mailto:laura.tibbs-cortes@usda.gov">laura.tibbs-cortes@usda.gov</a> &middot; <a href="/person?id=3218447">MaizeGDB record</a></p></article>
+          <article class="contact-person" data-group="postdoc" data-photo="/images/person/maizegdb/StephenHarding.jpg" data-search="Stephen Harding Post-doctoral Fellow Molecular Biology, Bioinformatics, Biostatistics"><h4>Stephen Harding</h4><p class="contact-person-role">Post-doctoral Fellow</p><p class="contact-person-expertise">Molecular Biology, Bioinformatics, Biostatistics</p><p class="contact-person-links"><a href="mailto:stephen.harding@usda.gov">stephen.harding@usda.gov</a><br><a href="/person?id=10043227">MaizeGDB record</a></p></article>
+          <article class="contact-person" data-group="postdoc" data-photo="/images/person/maizegdb/OliviaHaley.jpg" data-search="Olivia C. Haley Olivia Haley Post-doctoral Fellow Machine learning, protein function, food safety, protein-protein interaction"><h4>Olivia C. Haley</h4><p class="contact-person-role">Post-doctoral Fellow</p><p class="contact-person-expertise">Machine learning, protein function, food safety, protein-protein interaction</p><p class="contact-person-links"><a href="mailto:olivia.haley@usda.gov">olivia.haley@usda.gov</a><br><a href="/person?id=10040859">MaizeGDB record</a></p></article>
+          <article class="contact-person" data-group="postdoc" data-photo="/images/person/maizegdb/LauraTibbs-Cortes.jpg" data-search="Laura E. Tibbs-Cortes Laura Tibbs-Cortes Post-doctoral Fellow Genomics, Bioinformatics, GWAS"><h4>Laura E. Tibbs-Cortes</h4><p class="contact-person-role">Post-doctoral Fellow</p><p class="contact-person-expertise">Genomics, Bioinformatics, GWAS</p><p class="contact-person-links"><a href="mailto:laura.tibbs-cortes@usda.gov">laura.tibbs-cortes@usda.gov</a><br><a href="/person?id=3218447">MaizeGDB record</a></p></article>
         </div>
       </section>
       <section class="contact-group" data-group-section="alumni" aria-labelledby="contact-h-alumni">
         <h3 id="contact-h-alumni">Alumni <span class="contact-group-count">11</span></h3>
         <div class="contact-person-grid">
-          <article class="contact-person" data-group="alumni" data-photo="/images/person/maizegdb/silloutte.jpg" data-search="Sagnik Banerjee Former Graduate Student Genome assembly and annotation, RNA-Seq"><h4>Sagnik Banerjee</h4><p class="contact-person-role">Former Graduate Student</p><p class="contact-person-expertise">Genome assembly and annotation, RNA-Seq</p><p class="contact-person-links"><span class="mgdb-muted">No contact listed</span></p></article>
-          <article class="contact-person" data-group="alumni" data-photo="/images/person/maizegdb/Dark/small/campbell.jpg" data-search="Darwin Campbell Former IT-Specialist Systems Administration, IT management, logistics coordinator"><h4>Darwin Campbell</h4><p class="contact-person-role">Former IT-Specialist</p><p class="contact-person-expertise">Systems Administration, IT management, logistics coordinator</p><p class="contact-person-links"><a href="mailto:darwin@iastate.edu">darwin@iastate.edu</a> &middot; <a href="/person?id=882336">MaizeGDB record</a></p></article>
-          <article class="contact-person" data-group="alumni" data-photo="/images/person/maizegdb/Dark/small/Cho_KT.jpg" data-search="Kyoung Cho Former Graduate Student Interface development, machine learning"><h4>Kyoung Cho</h4><p class="contact-person-role">Former Graduate Student</p><p class="contact-person-expertise">Interface development, machine learning</p><p class="contact-person-links"><span class="mgdb-muted">No contact listed</span></p></article>
-          <article class="contact-person" data-group="alumni" data-photo="/images/person/maizegdb/Dark/small/gardiner.jpg" data-search="Jack Gardiner Curator Microarrays, RNA-Seq, gene expression, physical and genetic mapping, epigenetics, podcasts"><h4>Jack Gardiner</h4><p class="contact-person-role">Curator</p><p class="contact-person-expertise">Microarrays, RNA-Seq, gene expression, physical and genetic mapping, epigenetics, podcasts</p><p class="contact-person-links"><a href="mailto:gardinerj@missouri.edu">gardinerj@missouri.edu</a> &middot; <a href="/person?id=12890">MaizeGDB record</a></p></article>
-          <article class="contact-person" data-group="alumni" data-photo="/images/person/maizegdb/Dark/small/harper.jpg" data-search="Lisa Harper Curator &amp; Outreach Coordinator Emeritus Plant development, phenotypes, meiosis, cell biology, cytogenetics, outreach"><h4>Lisa Harper</h4><p class="contact-person-role">Curator &amp; Outreach Coordinator Emeritus</p><p class="contact-person-expertise">Plant development, phenotypes, meiosis, cell biology, cytogenetics, outreach</p><p class="contact-person-links"><a href="mailto:lisaharper@me.com">lisaharper@me.com</a> &middot; <a href="/person?id=16267">MaizeGDB record</a></p></article>
-          <article class="contact-person" data-group="alumni" data-photo="/images/person/maizegdb/RitaHayford.jpg" data-search="Rita Hayford Post-doctoral Fellow Bioinformatics, Genomics, Gene and Genome Curation"><h4>Rita Hayford</h4><p class="contact-person-role">Post-doctoral Fellow</p><p class="contact-person-expertise">Bioinformatics, Genomics, Gene and Genome Curation</p><p class="contact-person-links"><a href="mailto:Rita.Hayford@usda.gov">Rita.Hayford@usda.gov</a> &middot; <a href="/person?id=10000118">MaizeGDB record</a></p></article>
-          <article class="contact-person" data-group="alumni" data-photo="/images/person/maizegdb/silloutte.jpg" data-search="Carolyn Lawrence-Dill Former Lead Scientist Bioinformatics, plant biology, computer science"><h4>Carolyn Lawrence-Dill</h4><p class="contact-person-role">Former Lead Scientist</p><p class="contact-person-expertise">Bioinformatics, plant biology, computer science</p><p class="contact-person-links"><a href="mailto:triffid@iastate.edu">triffid@iastate.edu</a> &middot; <a href="/person?id=146822">MaizeGDB record</a></p></article>
-          <article class="contact-person" data-group="alumni" data-photo="/images/person/maizegdb/silloutte.jpg" data-search="Nancy Manchanda Former Graduate Student B104 Genome, genome assembly and annotation"><h4>Nancy Manchanda</h4><p class="contact-person-role">Former Graduate Student</p><p class="contact-person-expertise">B104 Genome, genome assembly and annotation</p><p class="contact-person-links"><span class="mgdb-muted">No contact listed</span></p></article>
-          <article class="contact-person" data-group="alumni" data-photo="/images/person/maizegdb/Dark/small/schaeffer.jpg" data-search="Mary Schaeffer Curator Emeritus Functional annotation and ontologies;  phenotypic variations; metabolic networks; genetic and physical maps."><h4>Mary Schaeffer</h4><p class="contact-person-role">Curator Emeritus</p><p class="contact-person-expertise">Functional annotation and ontologies;  phenotypic variations; metabolic networks; genetic and physical maps.</p><p class="contact-person-links"><a href="mailto:schaefferm@missouri.edu ">schaefferm@missouri.edu </a> &middot; <a href="/person?id=16635">MaizeGDB record</a></p></article>
-          <article class="contact-person" data-group="alumni" data-photo="/images/person/maizegdb/silloutte.jpg" data-search="Shatabdi Sen Graduate Student Genetics, genomics, computational biology"><h4>Shatabdi Sen</h4><p class="contact-person-role">Graduate Student</p><p class="contact-person-expertise">Genetics, genomics, computational biology</p><p class="contact-person-links"><a href="mailto:shatabdi@iastate.edu">shatabdi@iastate.edu</a></p></article>
-          <article class="contact-person" data-group="alumni" data-photo="/images/person/maizegdb/Dark/small/sen.jpg" data-search="Taner Sen Computational Biologist Genomics, metabolic pathways, bioinformatics."><h4>Taner Sen</h4><p class="contact-person-role">Computational Biologist</p><p class="contact-person-expertise">Genomics, metabolic pathways, bioinformatics.</p><p class="contact-person-links"><a href="mailto:taner.sen@usda.gov">taner.sen@usda.gov</a> &middot; <a href="/person?id=1080055">MaizeGDB record</a></p></article>
+          <article class="contact-person" data-group="alumni" data-photo="/images/person/maizegdb/silloutte.jpg" data-search="Sagnik Banerjee Graduate Student Genome assembly and annotation, RNA-Seq"><h4>Sagnik Banerjee</h4><p class="contact-person-role">Graduate Student</p><p class="contact-person-expertise">Genome assembly and annotation, RNA-Seq</p><p class="contact-person-links"><span class="mgdb-muted">No contact listed</span></p></article>
+          <article class="contact-person" data-group="alumni" data-photo="/images/person/maizegdb/Dark/small/campbell.jpg" data-search="Darwin Campbell IT-Specialist Systems Administration, IT management, logistics coordinator"><h4>Darwin Campbell</h4><p class="contact-person-role">IT-Specialist</p><p class="contact-person-expertise">Systems Administration, IT management, logistics coordinator</p><p class="contact-person-links"><a href="/person?id=882336">MaizeGDB record</a></p></article>
+          <article class="contact-person" data-group="alumni" data-photo="/images/person/maizegdb/Dark/small/Cho_KT.jpg" data-search="Kyoung Cho Graduate Student Interface development, machine learning"><h4>Kyoung Cho</h4><p class="contact-person-role">Graduate Student</p><p class="contact-person-expertise">Interface development, machine learning</p><p class="contact-person-links"><span class="mgdb-muted">No contact listed</span></p></article>
+          <article class="contact-person" data-group="alumni" data-photo="/images/person/maizegdb/Dark/small/gardiner.jpg" data-search="Jack Gardiner Curator Microarrays, RNA-Seq, gene expression, physical and genetic mapping, epigenetics, podcasts"><h4>Jack Gardiner</h4><p class="contact-person-role">Curator</p><p class="contact-person-expertise">Microarrays, RNA-Seq, gene expression, physical and genetic mapping, epigenetics, podcasts</p><p class="contact-person-links"><a href="/person?id=12890">MaizeGDB record</a></p></article>
+          <article class="contact-person" data-group="alumni" data-photo="/images/person/maizegdb/Dark/small/harper.jpg" data-search="Lisa Harper Curator &amp; Outreach Coordinator Emeritus Plant development, phenotypes, meiosis, cell biology, cytogenetics, outreach"><h4>Lisa Harper</h4><p class="contact-person-role">Curator &amp; Outreach Coordinator Emeritus</p><p class="contact-person-expertise">Plant development, phenotypes, meiosis, cell biology, cytogenetics, outreach</p><p class="contact-person-links"><a href="/person?id=16267">MaizeGDB record</a></p></article>
+          <article class="contact-person" data-group="alumni" data-photo="/images/person/maizegdb/RitaHayford.jpg" data-search="Rita Hayford Post-doctoral Fellow Bioinformatics, Genomics, Gene and Genome Curation"><h4>Rita Hayford</h4><p class="contact-person-role">Post-doctoral Fellow</p><p class="contact-person-expertise">Bioinformatics, Genomics, Gene and Genome Curation</p><p class="contact-person-links"><a href="/person?id=10000118">MaizeGDB record</a></p></article>
+          <article class="contact-person" data-group="alumni" data-photo="/images/person/maizegdb/silloutte.jpg" data-search="Carolyn Lawrence-Dill Lead Scientist Bioinformatics, plant biology, computer science"><h4>Carolyn Lawrence-Dill</h4><p class="contact-person-role">Lead Scientist</p><p class="contact-person-expertise">Bioinformatics, plant biology, computer science</p><p class="contact-person-links"><a href="/person?id=146822">MaizeGDB record</a></p></article>
+          <article class="contact-person" data-group="alumni" data-photo="/images/person/maizegdb/silloutte.jpg" data-search="Nancy Manchanda Graduate Student B104 Genome, genome assembly and annotation"><h4>Nancy Manchanda</h4><p class="contact-person-role">Graduate Student</p><p class="contact-person-expertise">B104 Genome, genome assembly and annotation</p><p class="contact-person-links"><span class="mgdb-muted">No contact listed</span></p></article>
+          <article class="contact-person" data-group="alumni" data-photo="/images/person/maizegdb/Dark/small/schaeffer.jpg" data-search="Mary Schaeffer Curator Emeritus Functional annotation and ontologies, phenotypic variations, metabolic networks, genetic and physical maps"><h4>Mary Schaeffer</h4><p class="contact-person-role">Curator Emeritus</p><p class="contact-person-expertise">Functional annotation and ontologies, phenotypic variations, metabolic networks, genetic and physical maps</p><p class="contact-person-links"><a href="/person?id=16635">MaizeGDB record</a></p></article>
+          <article class="contact-person" data-group="alumni" data-photo="/images/person/maizegdb/silloutte.jpg" data-search="Shatabdi Sen Graduate Student Genetics, genomics, computational biology"><h4>Shatabdi Sen</h4><p class="contact-person-role">Graduate Student</p><p class="contact-person-expertise">Genetics, genomics, computational biology</p><p class="contact-person-links"><span class="mgdb-muted">No contact listed</span></p></article>
+          <article class="contact-person" data-group="alumni" data-photo="/images/person/maizegdb/Dark/small/sen.jpg" data-search="Taner Sen Computational Biologist Genomics, metabolic pathways, bioinformatics"><h4>Taner Sen</h4><p class="contact-person-role">Computational Biologist</p><p class="contact-person-expertise">Genomics, metabolic pathways, bioinformatics</p><p class="contact-person-links"><a href="/person?id=1080055">MaizeGDB record</a></p></article>
         </div>
       </section>
     </div>
@@ -124,18 +126,6 @@ $$SYNTAX-LEVEL 2
       <h3>No team members match that search</h3>
       <p>Check the spelling, or clear the filters to see everyone.</p>
       <button class="mgdb-button mgdb-button-secondary" id="contact-empty-reset" type="button">Clear search and filters</button>
-    </div>
-  </section>
-
-  <section class="mgdb-resource-panel" aria-labelledby="contact-cta-title">
-    <div>
-      <span class="mgdb-eyebrow">Not sure who to ask?</span>
-      <h2 id="contact-cta-title">Send a general message and we will route it.</h2>
-      <p>Anything that does not fit a category above still reaches the team.</p>
-    </div>
-    <div class="mgdb-resource-list">
-      <a href="mailto:mgdb-tech@iastate.edu"><strong>Email the MaizeGDB team</strong><span>mgdb-tech@iastate.edu</span></a>
-      <a href="/cite"><strong>How to cite MaizeGDB</strong><span>The current reference for the resource</span></a>
     </div>
   </section>
 

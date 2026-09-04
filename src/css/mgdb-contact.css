@@ -1,7 +1,16 @@
 /* ==========================================================================
    Contact (/contact)
    --------------------------------------------------------------------------
-   Scoped under .mgdb-contact-page, built on the shared tokens.
+   Scoped under .mgdb-contact-page, on the Data Hub shell: <main> carries
+   `mgdb-hub-page`, so the page ground, the white section cards, their coloured
+   top edges and the sticky tab offset all come from css/mgdb-hub.css. What is
+   left here is the three things the shell has no component for -- the group
+   photograph, the group headings, and the person card.
+
+   Those three were drawn with the default warm line and surface. On the hub's
+   cool white cards a warm hairline reads as a smudge, so each one now takes the
+   --hub-* token instead. Keep them in step: a value added here should be a
+   --hub-* one unless it is deliberately warm, like the green accent edge.
 
    Portraits are deliberately not rendered: the ones available are 58px and
    look poor at any usable size. Each person card keeps its portrait path in
@@ -10,17 +19,17 @@
    out and ready.
    ========================================================================== */
 
-.mgdb-contact-page > section { margin-top: var(--mgdb-space-7); }
+.mgdb-contact-page > section { margin-top: var(--mgdb-space-5); }
 
 /* Group photograph --------------------------------------------------------- */
 
 .mgdb-contact-page .contact-core figure {
   margin: 0;
   overflow: hidden;
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-lg);
-  background: var(--mgdb-surface);
-  box-shadow: var(--mgdb-shadow);
+  border: 1px solid var(--hub-line);
+  border-radius: 12px;
+  background: var(--hub-surface);
+  box-shadow: var(--hub-shadow);
 }
 
 .mgdb-contact-page .contact-core img { display: block; width: 100%; height: auto; }
@@ -32,8 +41,8 @@
   align-items: end;
   justify-content: space-between;
   padding: var(--mgdb-space-5);
-  border-top: 1px solid var(--mgdb-line-soft);
-  background: var(--mgdb-surface-alt);
+  border-top: 1px solid var(--hub-line-soft);
+  background: var(--hub-ground);
 }
 
 .mgdb-contact-page .contact-core h2 { color: var(--mgdb-green-dark); }
@@ -57,7 +66,7 @@
   gap: var(--mgdb-space-3);
   align-items: baseline;
   padding-bottom: var(--mgdb-space-2);
-  border-bottom: 2px solid var(--mgdb-line);
+  border-bottom: 2px solid var(--hub-line);
   color: var(--mgdb-green-dark);
 }
 
@@ -79,11 +88,11 @@
 
 .mgdb-contact-page .contact-person {
   padding: var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-left: 4px solid var(--mgdb-green);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
-  box-shadow: var(--mgdb-shadow-sm);
+  border-radius: 12px;
+  background: var(--hub-surface);
+  box-shadow: var(--hub-shadow);
 }
 
 .mgdb-contact-page .contact-person h4 { color: var(--mgdb-green-dark); font-size: var(--mgdb-text-lg); }
@@ -99,7 +108,7 @@
 .mgdb-contact-page .contact-person-links a { color: var(--mgdb-burgundy); font-weight: 600; }
 
 /* Alumni are historical rather than current contacts. */
-.mgdb-contact-page .contact-person[data-group="alumni"] { border-left-color: var(--mgdb-line); }
+.mgdb-contact-page .contact-person[data-group="alumni"] { border-left-color: var(--hub-line); }
 
 /* A group whose members are all filtered out disappears with them. */
 .mgdb-contact-page .contact-group[hidden] { display: none !important; }
@@ -128,6 +137,35 @@
   height: 64px;
   border-radius: 50%;
   object-fit: cover;
-  background: var(--mgdb-surface-sunken);
+  background: var(--hub-ground);
 }
    -------------------------------------------------------------------------- */
+
+/* Card white space ---------------------------------------------------------
+
+   The three effects behind this -- a heading's margin sitting inside the card
+   padding, `.mgdb-card > * + *` never reaching a paragraph, and every paragraph
+   in a hub card absorbing the row's slack -- were fixed in the shared sheets on
+   2026-09-03, so a .mgdb-card on this page needs nothing of its own.
+
+   A person card is not a .mgdb-card, so it still states the first of those
+   here. */
+
+.mgdb-contact-page .contact-person > h4 { margin-top: 0; }
+
+/* The same treatment for a person card, which needed it more: the grid
+   stretches every card in a row to the tallest, but the content does not
+   stretch with it, so the links line finished wherever that person's role and
+   expertise happened to end -- 25px above the floor on one card and 70px on
+   the one beside it. Letting the expertise absorb the slack puts every links
+   line on the floor of its own card, so a row reads as one band.
+
+   If the portraits at the end of this file are ever switched back on, that
+   block's `display: grid` replaces this flex column and takes the slack
+   absorption with it -- it needs its own way of doing this. */
+.mgdb-contact-page .contact-person {
+  display: flex;
+  flex-direction: column;
+}
+
+.mgdb-contact-page .contact-person > .contact-person-expertise { flex: 1 1 auto; }

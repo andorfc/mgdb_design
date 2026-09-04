@@ -585,12 +585,7 @@
   border-color: #b8dbca !important;
 }
 
-.mgdb-typsimselector-page .typ-related-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--mgdb-space-3);
-  margin-top: var(--mgdb-space-4);
-}
+
 
 .mgdb-typsimselector-page .typ-related-card {
   background: var(--mgdb-surface);
@@ -634,3 +629,29 @@
     position: static;
   }
 }
+
+
+/* --------------------------------------------------------------------------
+   Panel headings
+
+   These classes were used in the markup but never styled on this page, so the
+   titles and leads rendered as bare h2/p while the sibling project pages
+   styled theirs. Matching them here, with the lead uncapped so a one-sentence
+   description does not wrap with room to spare.
+   -------------------------------------------------------------------------- */
+
+.mgdb-typsimselector-page .mgdb-panel-title {
+  margin: 0 0 var(--mgdb-space-1);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-2xl);
+}
+
+.mgdb-typsimselector-page .mgdb-panel-lead {
+  max-width: none;
+  margin: 0 0 var(--mgdb-space-4);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* The handoff banner sits between the lead and the form. */
+.mgdb-typsimselector-page .typ-handoff { margin-bottom: var(--mgdb-space-4); }

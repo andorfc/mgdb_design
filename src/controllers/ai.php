@@ -80,8 +80,8 @@ function ai_esc($value) {
    root-relative. That is deliberately about the *host*, not the domain: the
    MaizeGDB tool subdomains -- snptools, feta, mfs -- are separate applications
    a reader leaves this site to reach, and they are marked as such.
-   One test decides the arrow, the target, the rel, and the Internal/External
-   chip, so a link cannot be labelled one way and behave the other. */
+   One test decides the arrow, the target, the rel and the search filter, so a
+   link cannot be treated one way and behave the other. */
 function ai_is_external($url) {
     return (bool) preg_match('#^[a-z][a-z0-9+.-]*://#i', $url);
 }
@@ -106,9 +106,11 @@ function ai_render_card($r) {
     if (!empty($r['badge'])) {
         $html .= '<span class="ai-card-badge">' . ai_esc($r['badge']) . '</span>';
     }
-    $external = ai_is_external($r['primary']['url']);
-    $html .= '<span class="ai-card-access ai-card-access-' . ($external ? 'external' : 'internal') . '">'
-           . ($external ? 'External' : 'Internal') . '</span>';
+    /* The Internal/External chip was removed 2026-09-03 on review: every link
+       already carries the distinction in its arrow -- &nearr; leaves the site,
+       &rarr; stays on it -- so the chip repeated it in words. ai_is_external()
+       still decides the arrow, the target and the rel, and still feeds the
+       search filter; it just no longer prints a label. */
     $html .= '</div>';
     $html .= '<h3>' . ai_esc($r['name']) . '</h3>';
     $html .= '<p>' . ai_esc($r['summary']) . '</p>';
@@ -317,7 +319,6 @@ if (!empty($page['featured_tool'])) {
     $featured_html  = '<article class="mgdb-card ai-card ai-card-tool ai-card-featured" id="ai-card-' . ai_esc($f['id']) . '">';
     $featured_html .= '<div class="ai-card-top">';
     $featured_html .= '<span class="ai-card-badge">' . ai_esc($f['badge']) . '</span>';
-    $featured_html .= '<span class="ai-card-access ai-card-access-external">External</span>';
     $featured_html .= '</div>';
     $featured_html .= '<h3>' . ai_esc($f['name']) . '</h3>';
     $featured_html .= '<p>' . ai_esc($f['summary']) . '</p>';

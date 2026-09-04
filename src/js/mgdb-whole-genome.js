@@ -81,9 +81,18 @@
     });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initWholeGenomeViewer);
-  } else {
+  /* The sticky section tabs. `.mgdb-section-tabs` is styled by the shell but
+     driven per page, and this page shipped without a spy: the bar highlighted
+     whatever the template marked and never changed, silently. MGDB.sectionTabs
+     is that behaviour, shared, so this is the only line a page needs. */
+  function boot() {
     initWholeGenomeViewer();
+    if (window.MGDB && MGDB.sectionTabs) { MGDB.sectionTabs(); }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
   }
 })();

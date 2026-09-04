@@ -1,8 +1,32 @@
 <?php
 /* file: variation_search_api.php
  *
- * purpose: REST API endpoint for variation searches (/data_center/variation).
- *          Returns JSON search results with pagination and supports TSV/CSV exports.
+ * purpose: JSON endpoint for the Variation Data Hub (/data_center/variation),
+ *          plus the TSV and CSV exports of the same search.
+ *
+ * Request
+ * -------
+ *   term       search text; `*` is accepted as a wildcard in the broad tier
+ *   type, dominance, viability, mutagen, phenotype
+ *              term ids from the advanced panel, 0 for no filter
+ *   has_stock  1 to keep only variations that can be ordered as a stock
+ *   has_pheno  1 to keep only variations with a recorded phenotype
+ *   notes      1 to search curation notes as well (broad tier only)
+ *   scope      auto (default) runs the exact tier and falls through to the
+ *              scan only if it finds nothing; broad runs the scan outright
+ *   sort       relevance | name-asc | name-desc | locus-asc | locus-desc | type-asc
+ *   page       1-based
+ *   page_size  10 | 25 | 50 | 100 | all
+ *   format     tsv | csv to download instead of reading JSON
+ *
+ * Response
+ * --------
+ * summary.scope says which tier answered. summary.broader_available is true
+ * when the exact tier answered and the wider search has not been run, which is
+ * what the results header offers as "Search all fields". summary.capped is
+ * true when the match was larger than the ceiling in variation_search_lib.php
+ * and the totals and ordering describe a bounded sample rather than the whole
+ * match.
  */
 
 include_once('../../include/db-api.php');
@@ -10,11 +34,30 @@ include_once('../../include/gp_lib.php');
 include_once('variation_search_lib.php');
 
 $DBConn = connect_to_database(false);
-$filter = varBuildFilters($DBConn);
-$format = varSearchValue('format');
+varTuneSession($DBConn);
 
+$filter = varBuildFilters($DBConn);
+
+$sort = varSearchValue('sort', $filter['term'] === '' ? 'name-asc' : 'relevance');
+if (!in_array($sort, varSortOptions(), true)) {
+    $sort = $filter['term'] === '' ? 'name-asc' : 'relevance';
+}
+
+$scope = varSearchValue('scope', 'auto');
+if ($scope !== 'broad') {
+    $scope = 'auto';
+}
+
+/* Curation notes only exist as a branch of the broad tier, so asking for them
+   is asking for the broad tier. Without this the box could be ticked, the
+   exact tier would answer, and nothing would appear to happen. */
+if ($filter['notes'] === '1') {
+    $scope = 'broad';
+}
+
+$format = varSearchValue('format');
 if ($format !== '') {
-    varSendExport($DBConn, $filter, $format);
+    varSendExport($DBConn, $filter, $format, $sort, $scope);
     exit;
 }
 
@@ -22,53 +65,51 @@ header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: private, max-age=60');
 
 try {
-    $page = varSearchInt('page', 1, 1, 1000);
-    $pageSize = varSearchInt('page_size', 24, 10, 100);
-    $sort = varSearchValue('sort', $filter['term'] === '' ? 'name-asc' : 'relevance');
-    if (!in_array($sort, array('relevance', 'name-asc', 'name-desc', 'locus-asc', 'locus-desc', 'type-asc'), true)) {
-        $sort = $filter['term'] === '' ? 'name-asc' : 'relevance';
+    $pageSizeRaw = varSearchValue('page_size', '25');
+    if (strtolower($pageSizeRaw) === 'all') {
+        $pageSize = VAR_ALL_PAGE_SIZE;
+        $pageSizeLabel = 'all';
+    } else {
+        $pageSize = varSearchInt('page_size', 25, 10, 100);
+        $pageSizeLabel = (string) $pageSize;
     }
+
+    $page = varSearchInt('page', 1, 1, 10000);
 
     $started = microtime(true);
-    $combined = varCombinedQuery($filter, $page, $pageSize, $sort);
+    $search = varRunSearch($DBConn, $filter, $page, $pageSize, $sort, $scope);
 
-    // Count query
-    $countRow = retrieve_row(make_query($DBConn, $combined['countSql'], 1, $combined['countParams']));
-    $total = $countRow ? (int) $countRow['total'] : 0;
-
-    $results = array();
-    if ($total > 0) {
-        $stmt = make_query($DBConn, $combined['pageSql'], 1, $combined['pageParams']);
-        while ($row = retrieve_row($stmt)) {
-            $row['id'] = (int) $row['id'];
-            $row['locus_id'] = $row['locus_id'] !== null ? (int) $row['locus_id'] : null;
-            $row['prog_stock_id'] = $row['prog_stock_id'] !== null ? (int) $row['prog_stock_id'] : null;
-            $row['stock_count'] = (int) $row['stock_count'];
-            $results[] = $row;
-        }
-    }
+    $total = $search['total'];
+    $pageCount = $total > 0 ? (int) ceil($total / $pageSize) : 0;
 
     echo json_encode(array(
         'ok' => true,
         'query' => array(
-            'term' => $filter['term'],
-            'type' => $filter['type'],
+            'term'      => $filter['term'],
+            'type'      => $filter['type'],
             'dominance' => $filter['dominance'],
             'viability' => $filter['viability'],
-            'mutagen' => $filter['mutagen'],
+            'mutagen'   => $filter['mutagen'],
             'phenotype' => $filter['phenotype'],
             'has_stock' => $filter['has_stock'],
-            'sort' => $sort
+            'has_pheno' => $filter['has_pheno'],
+            'notes'     => $filter['notes'],
+            'sort'      => $sort
         ),
         'criteria' => $filter['criteria'],
         'summary' => array(
-            'total' => $total,
-            'page' => $page,
-            'page_size' => $pageSize,
-            'page_count' => $total ? (int) ceil($total / $pageSize) : 0,
-            'elapsed_ms' => (int) round((microtime(true) - $started) * 1000)
+            'total'             => $total,
+            'capped'            => $search['capped'],
+            'cap'               => VAR_MATCH_CAP,
+            'page'              => $page,
+            'page_size'         => $pageSize,
+            'page_size_label'   => $pageSizeLabel,
+            'page_count'        => $pageCount,
+            'scope'             => $search['scope'],
+            'broader_available' => $search['broader_available'],
+            'elapsed_ms'        => (int) round((microtime(true) - $started) * 1000)
         ),
-        'results' => $results
+        'results' => $search['results']
     ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 } catch (Exception $error) {
     http_response_code(500);

@@ -19,6 +19,23 @@
   // NOTE: CONTROLLER and PAGE are set in controller.php
   logMessage("CONTROLLER: " . CONTROLLER . ", PAGE: " . PAGE . ", ID: " . ID);
 
+  /* The Editorial Board reading list on the modern design system.
+   *
+   * Hooked before the legacy shell is built rather than beside the other
+   * modern blocks below, because the modern controller creates its own
+   * Bauplan and publishes it. /hot_new_papers reaches the same controller
+   * through controllers/hot_new_papers.php; this is the /community/ form of
+   * the same route, which the site map and older links both use.
+   *
+   * Rollback: delete this block. controllers/community/hot_new_papers.php and
+   * its templates are untouched.
+   */
+  if (PAGE == 'hot_new_papers') {
+    if (include('controllers/community/hot_new_papers_modern.php')) {
+      return;
+    }
+  }
+
   $bauplan = new Bauplan('Welcome to MaizeGDB');
   $bauplan->includeCss('/css/static.css');
 

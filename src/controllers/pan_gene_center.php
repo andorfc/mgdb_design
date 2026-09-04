@@ -41,14 +41,24 @@
     header("Location: $gene_search_url\n\n");
   }
 
-  /* The pan-gene search page is modernized. Pan-gene *record* pages — anything
-     with an id — continue through the original code below, unchanged.
+  /* The pan-gene search page is modernized.
      Rollback: delete this block.
      Pre-redesign originals are archived in the redesign repo under
      legacy/pan_gene/. */
   if (PAGE == 'pan_gene' && !trim(urldecode(getCGIParam('id', 'G', ID)))) {
     include('controllers/pan_gene_center/pan_gene_search_modern.php');
     return;
+  }
+
+  /* The pan-gene record page is modernized: one API call, the shared record
+     shell, and a real 404 for an identifier that resolves to nothing.
+     Rollback: delete this block; the original code below still works.
+     Pre-redesign originals are archived in the redesign repo under
+     legacy/pan-gene-record/. */
+  if (PAGE == 'pan_gene' && trim(urldecode(getCGIParam('id', 'G', ID)))) {
+    if (include('controllers/pan_gene_center/pan_gene_record_modern.php')) {
+      return;
+    }
   }
 
   $bauplan = new Bauplan("MaizeGDB Pan-Gene Search Page");

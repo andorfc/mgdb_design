@@ -28,7 +28,10 @@
 
 .mgdb-cite-page .mgdb-cite-group { margin-top: var(--mgdb-space-6); }
 
-.mgdb-cite-page .mgdb-cite-group h3 {
+/* Direct child only. As a descendant selector this also matched the h3 title
+   inside every citation card nested under the group, giving card titles the
+   group heading's underline. */
+.mgdb-cite-page .mgdb-cite-group > h3 {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-3);
@@ -140,109 +143,6 @@
 }
 
 /* ── Reference result card (matching Reference Data Hub) ─────────────── */
-
-.mgdb-cite-page .reference-result-card {
-  display: block;
-  padding: var(--mgdb-space-4) var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
-  transition: border-color .15s, box-shadow .15s;
-}
-
-.mgdb-cite-page .reference-result-card + .reference-result-card {
-  margin-top: var(--mgdb-space-3);
-}
-
-.mgdb-cite-page .reference-result-card:hover {
-  border-color: var(--mgdb-gold-dark);
-  box-shadow: var(--mgdb-shadow-sm);
-}
-
-.mgdb-cite-page .reference-result-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2) var(--mgdb-space-3);
-  align-items: center;
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-}
-
-.mgdb-cite-page .reference-result-card h3 {
-  margin-top: var(--mgdb-space-1);
-  padding-bottom: 0;
-  border-bottom: none;
-  color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-lg);
-  line-height: var(--mgdb-leading-snug);
-}
-
-.mgdb-cite-page .reference-result-card h3 a {
-  color: inherit;
-  text-decoration: underline;
-}
-
-.mgdb-cite-page .reference-result-card h3 a:hover {
-  color: var(--mgdb-leaf);
-}
-
-.mgdb-cite-page .reference-result-authors {
-  margin-top: var(--mgdb-space-1);
-  color: var(--mgdb-ink-soft);
-  font-size: var(--mgdb-text-sm);
-  line-height: var(--mgdb-leading-snug);
-}
-
-.mgdb-cite-page .reference-result-citation {
-  margin-top: var(--mgdb-space-1);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-}
-
-.mgdb-cite-page .reference-result-abstract {
-  margin-top: var(--mgdb-space-2);
-  color: var(--mgdb-ink);
-  font-size: var(--mgdb-text-sm);
-  line-height: var(--mgdb-leading);
-}
-
-.mgdb-cite-page .reference-result-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2) var(--mgdb-space-4);
-  align-items: center;
-  margin-top: var(--mgdb-space-3);
-}
-
-.mgdb-cite-page .reference-result-links a {
-  color: var(--mgdb-burgundy);
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.mgdb-cite-page .reference-result-links a:hover {
-  text-decoration: underline;
-}
-
-.mgdb-cite-page .reference-copy-id {
-  min-height: 30px;
-  padding: 2px var(--mgdb-space-3);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink-soft);
-  font-family: inherit;
-  font-size: var(--mgdb-text-xs);
-  font-weight: 700;
-  cursor: pointer;
-  transition: background .15s, border-color .15s;
-}
-
-.mgdb-cite-page .reference-copy-id:hover {
-  background: var(--mgdb-surface-alt);
-  border-color: var(--mgdb-muted);
-}
 
 /* ── Card grid view modifier ─────────────────────────────────────────────── */
 
