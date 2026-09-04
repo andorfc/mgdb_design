@@ -189,6 +189,7 @@ immediately. Where a file was overwritten, restore it from
 | Insertion Data Center | `/insertion` | `controllers/insertion/insertion_search_modern.php` | `legacy/insertion/` |
 | Genetic Variation | `/genetic_variation` | `controllers/genetic_variation.php` | `legacy/genetic_variation/` |
 | Homepage | `/` | `index.php` | `legacy/home/` |
+| Feedback | `/feedback` | `controllers/feedback.php` | `legacy/feedback/` |
 | BLAST front page | `/BLAST` | `controllers/BLAST.php` (form branch only) | `legacy/blast/` |
 
 `/cite` had no top-level controller, so `controller.php` fell through to
@@ -525,6 +526,25 @@ top edge on hover comes free. References use the shell's `.mgdb-ref` card, the
 same markup `include/references_lib.php` emits, built client-side from the
 API's rows, with a table view beside it.
 
+### The record page shell
+
+Two files, added when the variation record page joined the gene product one on
+this layout:
+
+| File | What it owns |
+| --- | --- |
+| `css/mgdb-record.css` | The furniture: the header type scale, the facts grid, a list block and its toolbar, the tables and card grids, the pagers, curator notes, the image grid, the API row, and the not-found page's search and lead |
+| `js/mgdb-record.js` | The engine: `collection()`, `notes()`, `images()`, `references()`, `metrics()`, the two figures, `tabs()` and `apiCard()` |
+
+A record page loads both after `css/mgdb-hub.css`, puts `mgdb-record-page` on
+its `<main>` beside `mgdb-hub-page`, and its own script is glue: it maps one
+API payload onto those pieces and names its columns. The gene product script
+went from 1,109 lines to 426 that way, and the variation script is 330.
+Neither file knows what a gene product or a variation is.
+
+The class names in the stylesheet are the ones the engine emits. The two are a
+pair; changing a name in one without the other breaks the page silently.
+
 ### The record page layout, settled 2026-09-01
 
 Three changes that apply to every record page on the hub shell, not just this
@@ -544,6 +564,888 @@ one:
 
 The two-tone hero is still on `/data_center/variation?id=`, which was built
 before this settled.
+
+
+### A record page's references cannot show a DOI
+
+The reference card is the same on a hub and on a record page, but they read
+different sources, and it shows. A hub names DOIs from
+`data/cite_journal_articles.json`, the curated bibliography behind `/cite`,
+where every record has one. A record page reads `mgdb.reference`, where **538
+of 55,171 references carry a DOI — 1.0%**, and none at all since 2023.
+
+So a record page's card shows the badge, title, authors, citation and the
+abstract, and simply has no DOI line or Full text button to show. That is the
+data, not the markup; recorded as AD-036. The API already extracts a DOI from
+the citation text when the column is empty, which is how the few that exist
+are found.
+
+**The variation resource was not returning abstracts at all**, which is what
+made its references look unlike the hub's. It now selects the same abstract
+subquery the stock and gene product resources use, plus the publication type
+for the badge and the same DOI extraction. The abstracts were always in
+`mgdb.reference_abstract`; nothing else had to change.
+
+### The gene record page
+
+`/gene_center/gene/{id}` moved onto the record shell on 2026-09-02, the ninth
+and last record page. Its stylesheet went from 596 lines to 259 and it gained
+a real 404, Metrics, and the standard Related resources and API sections.
+Three things stayed as they were because the shell has nothing better for
+them: the protein domain track, the pan-gene presence strip, and — rebuilt —
+the eFP viewer.
+
+**The eFP section was requesting atlases that do not exist.** Every image on it
+was an HTTP 500. The names it inherited — `Maize_Atlas_V5`, `Maize_Seed_V5`,
+`Maize_Leaf_V5`, `Maize_Tassel_V5`, `Maize_Embryonic_V5`, `Maize_Stress_V5`,
+`Maize_Root_V5` — name nothing the BAR serves; its own form offers
+`Hoopes_et_al_Atlas_V5`, `Sekhon_et_al_Atlas`, `Maize_Kernel_V5` and the rest.
+Nine of the BAR's names return real PNGs and three still 500 for every gene, so
+nine are offered. The service works: an Arabidopsis control returned a 190 KB
+image throughout, which is how the maize failure was isolated as a name
+problem rather than an outage.
+
+**And it is now one atlas at a time.** An eFP figure is a labelled anatomical
+diagram about 1,000 px wide; eight of them at 180 px each were unreadable even
+when they loaded. One fills the column, with the other eight one click away, an
+Absolute/Relative scale toggle, and a link to the BAR.
+
+**v3 and v4 gene models get expression too.** The BAR resolves a v3, v4 or v5
+identifier of the same gene to the same data — verified: the three identifiers
+of `lg1` return a byte-identical image — so the atlases are offered for
+`B73 RefGen_v3` and `Zm-B73-REFERENCE-GRAMENE-4.0` as well, paired with the
+non-V5 datasets that match those annotations.
+
+**B73 has seven annotations and the page now says which one you are on.**
+RefGen_v1, v2 and v3, two GRAMENE-4.0 releases and NAM-5.0. `is_current` is
+true *within* each of them, so it cannot tell a reader that v3 is superseded;
+a record on an older B73 assembly now carries a notice naming the current one
+and linking to it, and Assembly and annotation are header facts.
+
+**Two legacy sections were missing and are back.** *Nearby loci* had been
+dropped as "~22 queries producing a 73 KB fragment", which the legacy
+implementation was — two queries per named map set, and a full re-request
+whenever the reader moved the centimorgan window, through a control that had
+been commented out as broken since 2013. One query returns the widest window
+and the control filters in the browser, so it is instant and costs nothing.
+53 ms, once the join stops casting `locus_coordinates.map` — it is
+`numeric(10,0)` and the index is on the raw column. *Additional genetic
+information* — primers and enzymes, related BACs, gel patterns, map scores,
+recombination — had never been ported; five legacy readers became one UNION at
+22 ms.
+
+**A variable name cost an hour of confusion.** The genetic-information loop
+used `$kind`, which is also the record's own kind, set 1,000 lines above and
+read again below it. Every gene with genetic data reported itself as a
+"recombination" record until it was renamed.
+
+**The 404's suggestions are deliberately exact.** A contains or prefix match
+cost 1.5–2.6 s: the collation is `en_US.UTF-8` so a btree cannot serve LIKE at
+all, and `chado.gene_model` is a 1.88M-row matview. Matching the four spellings
+a reader types against the raw indexed columns costs 2–12 ms, and the fuzzy
+case goes to the hub search, which is already tiered for it.
+
+#### Three follow-ups on the gene record page
+
+**Its references did not look like anyone else's** because its query selected
+only id, name, title, year and relevance. The shared reference card renders a
+DOI line, a publication-type badge, an author line and an abstract preview, and
+had none of them to render. Selecting the same columns the phenotype and
+variation resources select — plus the DOI-from-citation fallback, since
+`mgdb.reference.doi` is filled for 1.0% of rows — gives 48 DOIs, 94 abstracts
+and 70 author lines on the 111 references of `lg1`, for about 20 ms.
+
+**CDS was missing from Sequences and downloads.** Probing sequence2 directly:
+`nuc` wants the gene model, `cds` and `cdna` want the transcript, `protein`
+wants the protein; `mrna`, `transcript`, `genomic` and `pep` are not recognised.
+CDS is the coding sequence without the UTRs, a different thing from cDNA, and it
+is what most people mean by "the sequence" of a gene. The section is now a
+per-transcript table with CDS, cDNA and Protein columns — the glue had also been
+written against the wrong payload shape, so it was rendering almost nothing.
+The service itself is intermittent: the same request answers with FASTA, with
+"SEQUENCE SERVICE IS DOWN", or with a not-found error on different attempts, and
+the section says so rather than letting a reader conclude the sequence is gone.
+
+**Protein names cannot be derived from transcript names.**
+`Zm00001eb334630_P001` returns a protein; `_P002` does not, though `_T002`
+exists. Where the annotation does not name a protein the column stays empty.
+
+**The JBrowse preview was lost in the port and is back.** The legacy Overview
+embedded a 300px frame of the gene with 1,500 bp either side; it is 420px here,
+because 300 cut the track stack off. It came back blank at first: `loc` and
+`tracks` were percent-encoded, and JBrowse parses the track list on literal
+commas and the location on a literal colon, so the tracks silently did not load.
+Unencoded, the frame draws the v5, v4 and v3 models of the gene together. Only
+JBrowse assemblies can be framed — B73 v3 and v4 point at GBrowse, which serves
+a snapshot image — so those get the link alone.
+
+### The stock record page
+
+`/data_center/stock?id={id}` moved onto the record shell on 2026-09-02, the
+last of the eight and the one the whole series was modelled on. Like the
+reference page it was already modern, so this was a refactor.
+
+**Its stylesheet went from 1,284 lines to 559**, and what is left is the three
+things that are genuinely this page's own: the pedigree viewer, the
+TYPSimSelector card, and the ordering panel. Page layout, tabs, facts, the
+provenance footer, the lightbox and the list/table view switch are the shell's
+and were deleted rather than duplicated. The script went from 1,236 lines to
+747 the same way.
+
+**Three things were kept as they were, deliberately.** The pedigree viewer is
+not a shell collection — the graph is the point and the table beside it is a
+second reading of the same rows, not an alternative layout of a list — so its
+markup, its search, its sort and its CSV are untouched. The TYPSimSelector card
+and its score bars are likewise its own. And the ordering panel keeps its
+disabled button and its "Cart handoff coming soon" note: the cart is not built
+yet, and a control that looks live but does nothing is worse than one that says
+so.
+
+**The image gallery came back to where it started.** The shell's gallery was
+modelled on this page, so moving to it preserves the cards, the badges and the
+lightbox exactly, and adds the table view, the filter, the page size and the
+TSV. One thing went the other way: this page's `onerror` fallback to the site
+mark, for a record naming an image file the image server no longer has, is now
+in the shell for every record page.
+
+**GRIN is fetched on its own now.** It is a live BrAPI call to
+npgsWeb.ars-grin.gov and cost **461 ms of the record's 724**; everything else
+answers in about 250 ms. The section and its tab appear when it lands.
+
+**Which meant the ordering panel had to stop depending on it.** The panel picks
+the Stock Center or GRIN, and it was reading the GRIN section — which would
+have made it appear half a second late on every GRIN-distributed stock. The
+GRIN *accession* is a MaizeGDB fact and the offsite list already carries it, so
+the panel is settled by the first response.
+
+**An unresolved identifier used to return a soft 200** here too. It now
+publishes a real 404 whose first arm reads the term as a variation and lists
+the stocks carrying it — `bz1` is an allele, and what someone typing it into a
+stock URL wants is seed.
+
+## The term and trait record pages
+
+`/data_center/term?id={id}` and `/data_center/trait?id={id}` came onto the
+record shell on 2026-09-02. They are **one record**: both legacy pages read
+`mgdb.term`, and they differ only in which sections they draw — `/trait` shows
+phenotypes, QTL analyses and trait values, `/term` shows related terms,
+external entries and images. The modern page draws all of them and lets the
+data decide, so both routes render the same record and the route chooses only
+the noun in the title. 6,815 curated terms across **105 types**.
+
+### The GWAS trait map is curated data, not a code smell
+
+`check_gwas_trait()` was a 41-case switch mapping JBrowse GWAS display names to
+term ids, with a comment saying that adding real ids to 52 GFF3 files was not
+worth it. The obvious cleanup is to turn underscores into spaces and match on
+name.
+
+**That cleanup is wrong, and checking it is what proved it.** The rule
+reproduces 6 of the 41, and for several it resolves to a *different record*:
+`Plant_height` is term 3097755, "plant height, PANZEA", while the name rule
+lands on 64851; `Stalk_strength` is "rind puncture resistance PANZEA";
+`Nodes_above_ear` is "node number, tassel to ear". These are curated aliases.
+The map is ported verbatim, with the evidence in the comment above it.
+
+**Check a lookup table against the data before replacing it with a rule.**
+
+### The trait-values download has been broken
+
+The legacy trait page offers "Download all values for '<trait>' to a text file".
+Its endpoint answers with a PHP fatal — `fwrite(): Argument #1 ($stream) must be
+of type resource, bool given` — so it has been dead for every one of the **121
+traits** that carry values. The modern page summarises them instead (count,
+stocks, range, mean, units) and links the IBM/NAM viewer and the bulk download
+directory, both of which work. The broken endpoint has other callers and was
+not touched; it is reported, not fixed.
+
+### The reference card is a shape, not a helper call
+
+`R.references()` renders the shared publication card, but it reads **flat**
+fields off each row — `citation`, `title`, `authors`, `year`, `doi`,
+`pub_type`, `relevance`, `abstract`, `html`. Both the locus and term resources
+first shipped a nested `{ref: {...}, title, year, contents}` instead, so the
+helper found no `html`, no `authors` and no `doi`: the section rendered, and
+rendered wrong — bare titles with no card, no DOI badge, no abstract, no Copy
+citation. Nothing errored, because every missing field is optional.
+
+Calling the shared helper is not the same as matching the shared shape. When a
+section is meant to look like another page's, diff the **row keys** against a
+page that already has it (`include/api/v1/records/marker.php` is the reference
+implementation), not just the function name.
+
+The DOI needs its own handling: it is stored bare, prefixed with `doi:`, or as
+a full `doi.org` URL, and sometimes only inside the citation string. One
+pattern pulls the bare DOI out of any of those, and the card's Copy DOI button
+depends on it.
+
+### The comparison caught a wrong route
+
+The first draft linked a QTL experiment as `/data_center/qtl_analysis?id=`.
+These are `mgdb.qtl_exp` rows, and that route renders an all-but-empty page for
+them; `/data_center/qtl?id=` is what the legacy page uses and what works. Ten
+terms compared by distinct linked id, **0 gaps** after the fix.
+
+Also: `trait_means_values.value` is `numeric(20,10)`, so a plant height of 46
+arrives as `46.0000000000` and a range line reads as noise until the trailing
+zeros are trimmed for display.
+
+## The locus record page
+
+`/data_center/locus?id={id}` came onto the record shell on 2026-09-02 — the
+site's **second-busiest record page**: 19,774 requests over six days of
+production logs, across 9,444 distinct records and 15,771 client addresses,
+every user agent a browser and none a crawler. It was the last big legacy
+record page, and the one every modern hub and record already linked into.
+
+### Twenty-six types, one section set
+
+`mgdb.locus` holds 26 curated types — 686,356 Points, 48,301 Probed Sites,
+26,115 Genes, 15,565 BACs, 1,758 QTL, then a tail of 21 types with 517 or
+fewer. **They share one page.** The legacy code has exactly one type branch
+(`type_name == 'Gene'` labels the identity fields "Gene symbol / Gene name"),
+and everything else that differs between a Centromere and a QTL is which
+sections have rows. So nothing in the modern page is conditioned on type
+either: a section appears when its data does.
+
+**Loci of type `Gene` never render here.** `check_id()` redirected them to
+`/gene_center/gene/{id}` and the modern controller does the same, with a 302 —
+which type a locus carries is curated data, and a 301 would be cached past the
+next reload.
+
+### Verifying that nothing was lost
+
+Every distinct record the legacy page links was compared against the modern API
+for the richest example of each of the 25 non-Gene types: **25 of 25 complete,
+0 gaps.** Comparing *link counts* is not the check — the legacy HTML links the
+same map or probe from two places, so raw counts differ by design. Comparing
+the **set of distinct ids per record type** is.
+
+That comparison is what caught the real bug, below.
+
+### Six sections were silently empty
+
+`SELECT DISTINCT … ORDER BY LOWER(col)` is rejected by Postgres when the
+expression is not in the DISTINCT select list, and this codebase's database
+layer turns that rejection into an **empty result rather than an error**. Six
+queries were written that way — phenotypes, stocks, related BACs, recombination
+data, variation external keys, and gene-product external keys — so six sections
+rendered as "no data" on a record that had plenty. Nothing logged.
+
+The fix is to put the ORDER BY outside the DISTINCT
+(`SELECT * FROM (SELECT DISTINCT …) s ORDER BY LOWER(s.name)`). **Grep every
+new resource for `DISTINCT` and an `ORDER BY` expression before trusting an
+empty section.**
+
+### A numeric join column cost 500 ms of a 120 ms record
+
+`locus_coordinates.map` is `numeric(10,0)` and `map.id` is `bigint`. Written as
+`m.id = lc.map`, Postgres casts the **indexed** side — the plan becomes
+`lc.map = m.id::numeric`, the index on `map.id` is unusable, and a four-row
+lookup becomes a parallel merge join over 66,005 buffers: **502 ms**. Casting
+the numeric column instead (`m.id = lc.map::bigint`) makes it **0.4 ms**. The
+whole record went 500 ms → 120 ms.
+
+### Ported, dropped, and why
+
+Kept: identity and description, functional statements, critical comments,
+curator notes, properties, expression induction, gene products, the Maize Gene
+Review flag, assembly issues, map positions, nearby loci on four mapsets,
+alleles with their phenotypes and images, stocks, the probes that detect it,
+primers and enzymes, related BACs, gel patterns, map scores, recombination
+data, related loci, associated gene models, external entries at five levels,
+ontology terms, and references.
+
+Dropped with evidence, all recorded in `legacy/locus-record/README.md`:
+Chromosome Coordinates (`showChrCoords()` opens with `return;` and a comment
+saying it was removed on request), Molecular/Sequences (`mgdb.z_sequence` has 0
+rows), domain experts (defined, never called), Quick Summary (commented out),
+Jira issues (commented out, service 502s), and the logged-in curator's
+annotation editor.
+
+**Images hang off the variations, not the locus.** Joining `web_image` to the
+locus finds 2 records; joining it through the locus's variations finds 75,020 —
+which is the section the legacy page actually renders. Measuring the wrong join
+would have looked like a dead feature.
+
+**Physical positions are alive.** `gblade.usda.iastate.edu` still answers with
+real coordinates, so the feature was ported — as an opt-in section
+(`?fields=physical`) the page fetches after the rest has rendered, with both
+assemblies requested together. It is the record's only outbound dependency.
+
+### Two shell rules, relearned the hard way
+
+- **Bauplan emits page scripts in `<head>`**, so the root element lookup at
+  parse time returned null and the whole file returned early — the page sat on
+  "Loading the full record" with no error anywhere. Same trap as the Metabolic
+  Pathways hub, in the same week.
+- **A figure must be drawn after its section is visible.** Plotly measures the
+  container at draw time, and a container inside a `hidden` section measures
+  zero, so the chart fell back to its own 700px default and overflowed a 533px
+  column — taking the whole page into horizontal scroll.
+
+## The section-tab sweep
+
+Swept every template carrying `.mgdb-section-tabs` on 2026-09-02, after the
+Metabolic Pathways hub shipped with an inert one. **65 templates have a tab
+bar; eleven had no tab behaviour behind it at all** — the bar highlighted
+whichever tab the template marked and never changed:
+
+`/amaizing_project`, `/CAAS_FIL_project`, `/european_flints`, `/fatcat`,
+`/14InbredsFISH`, `/HiLo_project`, `/historic`, `/genome/jbrowse2_tutorial`,
+`/person`, `/genome/whole_genome`, `/pattern_library/`.
+
+`/person` was the worst: no tab was marked at any scroll position, because its
+template carries no static `is-current` either.
+
+**Why it went unnoticed.** Clicking a tab works on inert markup — the browser
+handles the `#` anchor itself — so a page tests fine unless you scroll and watch
+the bar. Nothing logs and nothing throws. The check is one line, run at two
+scroll positions; if the answer is the same both times, the bar is inert:
+
+```js
+[...document.querySelectorAll('.mgdb-section-tabs a')].filter(a => a.classList.contains('is-current'))
+```
+
+**The fix is one implementation, not a twelfth copy.** `MGDB.sectionTabs()` in
+`mgdb-modern.js`: scroll, `IntersectionObserver` and resize together, the
+trigger line read back from each section's own `scroll-margin-top`, a click-hold
+so a smooth scroll does not drag the highlight through every section on the way,
+at-bottom handling so the last section is reachable, and an optional `watch`
+selector for a region whose height changes.
+
+It is **opt-in, deliberately not auto-wired from `init()`** — the twenty pages
+that already have their own copy would otherwise run two spies over one bar and
+fight over the click hold. Each of the eleven now calls it in one line, and the
+Metabolic Pathways hub's own private copy was replaced by the same call rather
+than left as a twelfth duplicate.
+
+The 13 record pages were never affected: `mgdb-record.js` has always driven
+their tabs through `R.tabs()`, and it was not touched.
+
+**One page left as found.** `/genomes_modern/` (`mgdb-genomes.js`) has an
+`IntersectionObserver`-only spy — no scroll or resize fallback and no at-bottom
+handling, so its last section may never be reachable. A weaker variant, not an
+inert bar, so it was reported rather than changed.
+
+## The Metabolic Pathways Data Hub
+
+`/metabolic_pathways` came onto the Data Hub shell on 2026-09-02, together with
+its three documentation pages, which `redirect.php` had been serving as raw
+templates. It is also where the CornCyc instances MaizeGDB hosted were retired.
+
+### The data was already here
+
+The page had no search and no metrics because nobody had looked for a corpus.
+**`mgdb.corncyc_gene_model_pathway` holds 23,957 rows** — gene model, CornCyc
+enzyme, CornCyc pathway, for B73 RefGen_v3 and RefGen_v4 — which collapse to
+**549 distinct pathways over 14,041 gene models and 1,474 enzymes**. That table
+is MaizeGDB's own; it never lived on the hosted websites, so retiring them did
+not touch it. Check for a table before concluding a page is a link list.
+
+**A pathway is the record, not a row.** The census is built once (a full scan,
+~150 ms) and cached; pathway search then runs over the cached array with no SQL
+at all, and only a gene-model term reaches the database — on `gene_model`, the
+table's one indexed column. Every query answers in **3–65 ms**.
+
+### The names carry MetaCyc's own markup
+
+2,414 pathway names and 2,337 enzyme names contain a tag — `<i>`, `<em>`,
+`<sub>`, `<sup>`, `<small>` in either case — and 1,269 names are additionally
+wrapped in literal double quotes (`"2,4,6-trinitrotoluene degradation"`).
+Printing them raw puts database content into the page unescaped; escaping them
+wholesale shows the reader `<i>de novo</i>`.
+
+So `mpRich()` strips the wrapping quotes, escapes everything, then re-enables
+exactly those seven tags **bare** — `&lt;i&gt;` is restored, `&lt;i onclick=…&gt;`
+is not. A second helper, `mpPlain()`, strips them for the TSV, the title
+attribute, and **for matching**: searching `de novo` has to hit
+`<i>de novo</i>`, and it would not if the index held the markup.
+
+### A pathway ID is sometimes also an English word
+
+`GLYCOLYSIS` is the CornCyc ID of *glycolysis I (from glucose 6-phosphate)*, so
+an arm order of "exact ID wins, stop" answered **glycolysis** with one pathway
+when the corpus holds three. The ID and name arms are merged now, ID first,
+de-duplicated — and `matched_by` says `pathway_id_and_name` rather than
+claiming an ID match for a set that is mostly name matches. **A search that
+reports which arm matched has to report the arm that actually produced the
+rows.**
+
+### Retiring CornCyc at MaizeGDB
+
+`corncyc-b73-v4.maizegdb.org` and `corncyc-b73-v3.maizegdb.org` were both still
+answering (HTTP 200, ~36 KB) when they were unlinked. They are unlinked from
+**four** modern surfaces, not one — the page itself, the Tools megamenu
+(`templates/home/megamenu_modern/tools.bau`), the site map (via
+`tools/sitemap_data.py`, then re-run `tools/gen_sitemap.py`), and the EC-number
+link list on every gene product record
+(`include/api/v1/records/gene_product.php`, now
+`pmn.plantcyc.org/CORN/substring-search`, the same Pathway Tools search on the
+maintained host).
+
+Three **legacy** surfaces still link the retired instances and are not under
+repo control: `templates/home/megamenu/tools.bau`,
+`templates/data_center/gene_product_sections.bau`, and
+`search/alldata/syn_results.php` — the last pointing at `corncyc.maizegdb.org`,
+which already 301s to an unreachable target. Editing files the manifest does not
+own means the next deploy reverts them.
+
+**Unlinking is not decommissioning.** Whether the two subdomains stay up is a
+server decision and was not made here.
+
+### An automated link check cannot confirm PMN
+
+`pmn.plantcyc.org` sits behind an Incapsula bot check: from the dev server it
+returns 212 bytes of challenge, and a real browser gets Michigan State's
+"additional security check is required" page. That is not a dead link, and it
+was **not** recorded as one — the same caution as the `m2m.dill-picl.org`
+lookup on the cytogenetics hub. The pathway rows therefore offer MetaCyc
+(`metacyc.org/pathway?orgid=META&id=…`, verified, 58 KB) as the reachable
+second address for the same CornCyc ID.
+
+`http://www.genome.jp/dbget-bin/get_linkdb?-t+2+gn:T01088`, the KEGG maize link
+the old page carried, **is** dead: HTTP 400 with a browser user agent too.
+Replaced with `kegg-bin/show_organism?menu_type=pathway_maps&org=zma`.
+
+### Three shell rules this page relearned
+
+- **`.mgdb-hub-field` is a labelled *cell*, not a search row.** It is
+  `flex-direction: column`, so putting the input and the submit button in one
+  stacked them full width. The form is the same
+  `grid-template-columns: minmax(0,1fr) auto` every other hub search uses, with
+  the field and the button as separate cells.
+- **`.mgdb-hero` is a two-column grid with an emblem column.** A documentation
+  page with only `.mgdb-hero-body` put its `<h1>` in the 150px column, one
+  character per line. The shell already has the fix: `mgdb-hub-record-hero`
+  collapses it to one column.
+- **Bauplan emits page scripts in `<head>`.** Reading elements at parse time
+  returned null for all of them, and because every use was guarded, nothing
+  errored — the figure and the search simply never appeared. Every element
+  lookup belongs in an `init()` behind the `readyState` check, which is what
+  `mgdb-ai.js` and `mgdb-qtl.js` already do.
+- **There was no shared scrollspy, and eleven other pages had none at all.**
+  `.mgdb-section-tabs` is markup the shell styles; the behaviour was a per-page
+  `initTabs()` that twenty pages each carried their own copy of. A page that
+  ships without one has an inert tab bar — it highlights whatever the template
+  marked `is-current` and never changes — and nothing errors, so it looks fine
+  until someone scrolls. There is one implementation now,
+  `MGDB.sectionTabs()`; see **The section-tab sweep** below.
+
+Also: the chart height floor has to be the sheet's own `min-height`. A computed
+304px lost to `min-height: 320px` and left a 304px element around a 320px
+figure.
+
+### The cytogenetics `?id=` route
+
+`/data_center/cytogenetic?id={id}` came onto the record shell on 2026-09-02 —
+as a **router**, because there is no cytogenetics record to put on it.
+
+**Cytogenetics is not a record type.** There is no `cytogenetic.php` record
+controller and no `cytogenetic_data.php`; the hub gathers three kinds of record
+that each already have their own modern record page: cytological maps
+(`mgdb.map`, `Cytological 1` = 40028) to `/data_center/map/{id}`, cytological
+landmarks (`mgdb.locus`, types 121, 122, 24978, 111) to
+`/data_center/locus?id=`, and structural-variant stocks (`mgdb.stock`, `922D` =
+14566) to `/data_center/stock?id=`.
+
+**What it did before was worse than a 404.** `?id=Cytological%201` answered
+HTTP 200 with the *pre-redesign* search page and ignored the id, so a real
+identifier looked like a page that had simply forgotten it. It now resolves the
+identifier against all three collections in about 9 ms and issues a 302 to the
+page that holds it, or renders a real 404 on the record shell with suggestions
+drawn from all three.
+
+**302, not 301.** Which collection an identifier belongs to is a property of
+the data, and the data is reloaded. A permanent redirect would be cached by the
+browser past the next curation change.
+
+**A suggestion's second column has to say something the first does not.** The
+Kind column already named the collection, and the map arm's type was the
+literal `'Cytological map'` — so every map row read *Cytological map /
+Cytological map*. The columns are Collection and Detail now, and a map's detail
+is its chromosome, from `mgdb.linkage_group` (`m.linkage_group` does not join
+to `mgdb.locus`, which is the obvious wrong guess).
+
+### The BAC record page
+
+`/data_center/bac?id={id}` came onto the record shell on 2026-09-02, the fourth
+and largest probe collection: `mgdb.probe` type 171715, "BAC clone", 430,550
+rows. Unlike SSR, overgo and EST it was **not** a twenty-line lib — the legacy
+BAC page had eight sections where they had five or six.
+
+**Four of those eight cannot produce content**, which is why the page is still
+mostly the marker record. Sequence and Genome Browser both read
+`mgdb.z_sequence` (0 rows) and `mgdb.zb_chr_v2_clone` (0 rows); Alignment is a
+`file_exists()` check against `images/BAC_alignments`, which is not on the
+server; Issues is a live Jira call to `collect.maizegdb.org`, which returns
+502. Checked first, then not ported, with the evidence in
+`legacy/bac-record/README.md`.
+
+**Related probes was the one real gap, and it went on the marker resource.**
+"This BAC is detected by overgo X" is a `mgdb.relation` row — 269,440 of them
+for BACs alone — and the relation is not particular to BACs, so every marker
+record page gets the section. Each row routes to whichever collection owns the
+related probe, which the legacy page did by hand in a chain of type-id
+comparisons and which is only possible now that all four collection pages
+exist.
+
+**BACs resolve by GenBank accession.** 303,536 of them carry one, in
+`ext_db_key`, where the name and synonym arms do not look. The legacy page's own
+documented test URL was `/data_center/bac/AC205396` and it threw a PHP fatal
+there; it now resolves to `c0040M18`, in 6 ms.
+
+### The EST record page
+
+`/data_center/est?id={id}` came onto the record shell on 2026-09-02, the third
+probe collection. `p-bcd98` is `mgdb.probe` id 110916 of type 34, "cDNA - EST"
+— 59,308 of them. `include/est_record_lib.php` is twenty lines: the type id,
+and four wrappers over `probe_collection_lib.php`. That was the point of
+factoring it after the second one.
+
+**And the third one found a bug in the shared code.** The suggestion query's
+synonym arm was a prefix match, which makes Postgres scan `mgdb.synonyms`
+(2.8M rows) — no index can serve LIKE under `en_US.UTF-8`, AD-030 again. It had
+looked cheap because on 13,430 overgos the planner drove from the probe side
+instead; at the EST collection's 59,308 it flipped to the scan and the 404 went
+to **1.8 s**. **A plan that holds only because a table is small is not one to
+rely on.** The synonym arm is now an exact match in the spellings a reader
+types, which `idx_synonyms_synonyms` serves in 6 ms, and it still answers the
+case it exists for. Every collection 404 is now 0.13–0.16 s, overgo and SSR
+included.
+
+### The overgo record page, and probe collections
+
+`/data_center/overgo?id={id}` came onto the record shell on 2026-09-02,
+immediately after the SSR page and for the same reason: `CL0_-2_ov` is
+`mgdb.probe` id 389357 of type 393660, "Unigene-Overgo". The collection is that
+type plus 747274, "Overgo" — 13,430 probes between them, the pair the modern
+overgo search page already filters on.
+
+**The second one is what makes it a pattern.** Everything the SSR and overgo
+record pages share beyond the marker record itself now lives in
+`include/probe_collection_lib.php`: resolving inside a set of probe types,
+naming the marker a stray identifier actually reached, prefix suggestions
+within the collection, and the cached collection total. Each page's own lib is
+a dozen lines saying which types it contains. A third such page is a
+`define` and a template.
+
+**Sequence Match is a dead section and was not ported.** The legacy overgo page
+joined `z_sequence` to `id_seq`; **`mgdb.z_sequence` has 0 rows**. 11,384
+overgos carry 12,132 `id_seq` links and none resolve, so that section has been
+empty for every overgo since the table was emptied. The marker record page's
+own Sequences block reaches `z_sequence` by a different path and is empty for
+the same reason — worth knowing before anyone reports it as a regression.
+
+### The SSR record page
+
+`/data_center/ssr?id={id}` came onto the record shell on 2026-09-02. It is the
+tenth record page and the only one that is not really its own page.
+
+**An SSR is a probe.** `p-umc1246` is `mgdb.probe` id 242172 with
+`type = 104436`, "PCR - SSR" — the same table, and the same record shape, the
+marker page already reads. `/api/v1/records/marker/242172` answers it in full:
+17 queries, 68 ms, with the detected locus, its 20 map positions, 11 gel
+patterns and primers, 6 external entries and a curator note.
+
+**So the page shares the marker record's everything** — API resource, element
+ids, script and stylesheet. What is its own is the framing, resolution inside
+the SSR collection, and a 404 whose first arm names the marker page: an
+identifier like `p-umc10` is a real probe of another type, not a mistake, and
+the reader should be sent to it rather than told nothing exists. Writing a
+second resource and a second script would have bought nothing and guaranteed
+the two drifted.
+
+All five legacy sections — Overview, Annotations, Related Data, Detected Loci,
+Map Coordinates — are present, alongside the Offsite resources, Metrics,
+Related resources and API sections the shell adds.
+
+### The reference record page
+
+`/data_center/reference?id={id}` moved onto the record shell on 2026-09-02.
+It had been modernized before the shell existed, so this was a refactor rather
+than a port: the API resource, which already answers in about 70 ms over nine
+queries, did not change at all. What changed was everything above it.
+
+**Its own 580-line stylesheet is gone.** The page had hand-built an author
+list, a locus card, a chip grid, a citation block and a link list; all five are
+shell collections now, which means each one gained a table view, a grid view, a
+filter, a page size and a TSV that it did not have before. The script is the
+same length it was and no longer knows what a reference is. The only CSS the
+page needed that the shell did not have is the citation block, which went into
+`css/mgdb-record.css` because it is record furniture rather than reference
+furniture.
+
+**An unresolved identifier used to return a soft 200.** The controller returned
+false and let the legacy handler answer. It now publishes a real 404 with two
+suggestion arms: the term read as an author, which is what someone typing
+`Schnable` into an id parameter wants, and references whose title contains it.
+
+**The corpus count on that 404 was most of its cost.** Counting 54,900
+references against `id_num` takes about 320 ms; through `dashboardCache` the
+page went from 555 ms to 245 ms. A number that describes the whole collection
+belongs in that cache even on a page that is already an error.
+
+**Volume 0, issue 0, and a pages field holding the DOI** are what this table
+records when a paper was indexed before the publisher assigned them. Rendering
+`0` as a volume would be a claim the data does not make, so Overview drops
+those rows, and drops the pages row when it is holding the DOI that already has
+its own.
+
+**A paper can be curated against 36,006 records.** The API caps embedded lists,
+and the block now says what it is a slice of rather than leaving a reader to
+infer it from a count of 500.
+
+**The Editorial Board's own comments are on the record now.** They live in
+`mgdb.memo` under the term `Editorial Board Member Comment` (and its CODIE
+variant), which is where `/hot_new_papers` has always read them; the record
+page never showed them. 795 of the 845 picks carry one, and it is the only
+prose on a reference record that MaizeGDB wrote rather than the publisher.
+
+**The comment is attributed only where the data attributes it.** `memo.source`
+is set on 31 of them. The nominating member is very often the person who wrote
+the comment — 826 of 846 picks have a single nominator — but nothing in the
+schema says so and the site has never claimed it, so the page does not either.
+Many comments sign themselves in their own last line, which is the curators'
+attribution and needs no help.
+
+**A nomination can name two board members** and the API was reading only the
+first. `ed_board_papers.person_id2` is set on 43 of its 881 rows; those names
+were missing from the record and are now a column of the nominations table,
+beside the month, which was also being dropped.
+
+### The pan-gene record page
+
+`/pan_gene_center/pan_gene/{id}` joined the record shell on 2026-09-02, the
+sixth page on it and by a distance the largest: nineteen sections, against the
+eleven of the phenotype record. New: a `pan_gene` record type in the API,
+`include/pan_gene_record_lib.php`, the controller, two templates and 830 lines
+of glue.
+
+**Fifteen Ajax calls became one request.** Opened one after another the legacy
+sections cost **9.3 s**; the replacement is twenty parameterized queries in
+about **550 ms**, of which roughly 190 ms is a single parallel round trip to
+another host to ask whether four files exist. The section-by-section table is
+in `legacy/pan-gene-record/README.md`.
+
+**One CTE defines the members, and every section joins against it.** A pan-gene
+of 65 members has 30 with gene pages and 35 without, and the legacy page ran
+two queries per page-less member to name its annotation and assembly, then
+repeated that loop in two more sections. Recomputing the member set inside each
+query — one indexed lookup on `pan_gene_name`, one lateral against
+`chado.genome_metadata` by gene model prefix — replaces over 200 round trips
+with one bind parameter and no escaping.
+
+**Postgres will not take a PHP regex as written.** `getGeneModelPrefix()` is
+`preg_replace('/(\w\w\d+\w+?)\d+.*/', '$1', $gm)`, and moving it into SQL
+looked trivial. It is not: Postgres decides greedy or non-greedy for a *whole*
+regular expression from its first quantifier, so the `\w+?` stops being
+non-greedy and `Zd00001ab007194` captures as `Zd00001ab00719` rather than
+`Zd00001ab`. The SQL uses explicit character classes instead.
+
+**The exemplar arm of the resolver had to move last.** Five of the six
+identifier forms hit a btree index and answer in 1–6 ms. The sixth,
+`exemplar_gene_model`, has only a gin index, which serves containment rather
+than equality: as part of the main UNION it made every lookup cost 124 ms. Run
+only after the indexed arms miss — and against `chado.pan_gene_exemplar`, whose
+seq scan of 177,953 rows costs 29 ms — it is a fallback for the **62 of 97,184
+pan-genes** whose exemplar is not one of their own member rows.
+
+**The section colour rotation now rotates.** `mgdb-hub.css` enumerated ten
+colours over `nth-of-type(2)` to `(11)`, extended twice as pages got longer. At
+nineteen sections enumerating stops being sensible, so the same ten colours
+repeat with a period of ten. Positions 2 to 11 keep exactly the colours they
+had.
+
+**jQuery loads after the controller's own scripts.** The modern shell emits
+jQuery from its header template, which comes after every `includeScript()` a
+controller adds — and `js/phylotree.js` touches `$.ui.dialog` at load time. Any
+page that reuses a legacy jQuery viewer has to load jQuery and jQuery UI itself,
+first, or the viewer throws before it defines anything.
+
+**Two defects in the legacy code**, both in
+`legacy/pan-gene-record/README.md`: the CornCyc pathway lookup joined its gene
+model and transcript lists with no separator between them, silently dropping
+one of each from every result; and the insertions table captioned itself with
+whichever gene model came last in the loop.
+
+### The phenotype record page
+
+`/data_center/phenotype?id={id}` joined the record shell on 2026-09-02, the
+fifth page on it. Sections: Overview, Genes, Variations, Stocks, Images,
+Offsite resources, Annotations, References, Metrics, Related resources, API.
+New: a `phenotype` record type in the API,
+`include/phenotype_record_lib.php`, the controller, two templates and 300
+lines of glue. Fourteen queries, about 120 ms on `dwarf plant` — the largest
+phenotype in the database, with 309 variations, 112 stocks and 203 images.
+
+**The header counted rows the sections did not.** `phenotypeIdentity()` first
+counted `var_pheno_effects` and `stock_phenotypes` unfiltered, so the header
+claimed 311 variations and 203 stocks while the metric cards below said 309
+and 112. Both now apply `id_num.curation_lvl = 0`, the filter every section
+already used. Any record page that computes a count server-side for the header
+has to apply the same filter as the resource that fills the body, or the page
+contradicts itself above the fold.
+
+**The images belong to the variations, not the phenotype.** A phenotype rarely
+carries pictures of its own; the 203 on `dwarf plant` are pictures of the
+variations that show it. Each card names its variation and links to that
+record, which is what `subject` and `record` in the images section carry.
+
+**Two figures beside each other are now the same shape.** The genes chart and
+the connections chart sat side by side at 372px and 386px. `connectionsHeight()`
+in `js/mgdb-record.js` exposes the height the connections chart would choose,
+so a page can size a neighbouring figure to match before either is drawn, and
+cut its own series to the number of bars that fits. `connectionsChart()` takes
+that height as an optional fifth argument. Both are additive; the four earlier
+record pages are unaffected.
+
+**What the legacy page did that this one does not** is in
+`legacy/phenotype-record/README.md`: a locus query per variation (309 extra
+round trips on `dwarf plant`), genes rendered as a `<br>`-joined string of
+links to the dead `/gene_center/gene/{id}` route with no counts, and stocks
+packed into three unlabelled columns with the provider dropped.
+
+### The marker record page
+
+`/data_center/marker?id={id}` joined the record shell on 2026-09-02, the
+fourth page on it and the first built from nothing: markers had no modern page
+and no API resource, only the legacy Ajax page. New: a `marker` record type in
+the API, `include/marker_record_lib.php`, the controller, two templates and
+300 lines of glue. Sections: Overview, Detected loci, Map positions, Related
+records, Offsite resources, Annotations, References, Metrics, Related
+resources, API. Seventeen queries, about 75 ms.
+
+**Names resolve with or without the `p-` prefix.** The record is `p-umc10`,
+people type `umc10`, and `umc10` is also one of its synonyms. Both spellings
+are tried against the name and the synonym table before any case-insensitive
+pass, so both reach the record on an indexed probe.
+
+**Two things in the legacy page could never have worked**, found while porting
+and recorded in `legacy/marker-record/README.md`:
+
+- **`show_detected_loci()` never advanced its counter.** `$count` is set to 0
+  and incremented nowhere in the loop, so every locus overwrote
+  `$loci_results[0]` and the page showed **one** locus however many the probe
+  detected. `p-umc10` detects four.
+- **`probe_contains_probe` does not exist** in the schema, and
+  `read_contains()` selects from it twice. That section was always empty. Not
+  ported.
+
+The figure is map positions by chromosome. A probe that detects one locus sits
+on one chromosome; one that detects several usually does not, and that is the
+thing worth seeing. `p-umc10` has 73 positions across 4 chromosomes.
+
+**A metric that restated another.** The first draft counted distinct maps
+beside map positions, and on this record both read 73 — nearly every position
+is on a different map, so the pair said one thing twice. Chromosomes replaced
+it.
+
+**Related resources now keeps its green edge on every record page.** The
+shell rotates eight colours over `nth-of-type(2)` to `(9)` and the rotation is
+declared after the Related resources block, so on a nine-section record page
+the closing green panel took a rotation colour while a ten-section one stayed
+green. `css/mgdb-record.css` pins it.
+
+### The map record page
+
+`/data_center/map/{id}` joined the record shell on 2026-09-01, the third page
+on it. Sections: Overview, Mapped loci, Maps in this series, Other maps on
+this chromosome, QTL experiments, References, Metrics, Related resources, API.
+Its own 610-line stylesheet and 859-line script are gone; the script is 300
+lines of glue.
+
+**Two defects in its API, found by putting it on the shared engine:**
+
+- **It was the only record type not using the standard envelope.** It called
+  `MgdbApi::sendDocument()`, which takes a payload and a max-age and nothing
+  else — so the third argument, carrying `counts` and `truncated`, was accepted
+  by PHP and thrown away. No client ever learned that the coordinates list had
+  been capped. `/data_center/map/978377` carries **5,271 loci and was sending
+  500** with nothing to say so; the page now shows "Only the first 500
+  coordinates are shown; the record has 5,271." It answers in the standard
+  envelope now, like the other four.
+- **`truncated` named `sections.coordinates`**, a path that matches no key
+  anywhere else, so even a client that looked would not have matched it.
+
+**The one figure a map deserves is marker density.** Twenty buckets between the
+first and last coordinate, computed in the API over *every* locus rather than
+the page of 500 — a histogram built from the capped list would describe the cap
+rather than the map. On IBM2 2005 Neighbors 1 the densest 61 cM interval holds
+636 loci.
+
+The not-found page's suggestion arms are different again, because a
+name-contains arm would be pointless here: `mapResolveId()` already ends with
+`m.name ILIKE '%term%'`, so anything a contains-search could find has already
+resolved to a record. What is left is the question people actually arrive with:
+
+| Arm | Cost | Answers |
+| --- | --- | --- |
+| Locus | 9 ms | The term read as a locus name, and every map it is placed on with its coordinate |
+| Largest maps | 130 ms | Somewhere to start when the term matches nothing |
+
+`/data_center/map/bz1` is the case: bz1 is a locus, not a map, and the page
+says so and lists the eight maps it sits on.
+
+### Images, and where the reference card lives
+
+Two corrections on 2026-09-01, both about a component appearing in more than
+one shape:
+
+- **The image gallery is the stock record page's**, ported into
+  `js/mgdb-record.js` and `css/mgdb-record.css` so every record page shows
+  images the same way: a card per image with the picture, a category chip, a
+  linked subject, the caption, and Zoom / Record / Open file / Copy URL, over
+  a lightbox. It is a `collection()` like any other, so the gallery is its
+  grid view and the same block still offers a table of the rows, a filter, a
+  page size and a TSV. The default page size is **16**, a four-by-four grid,
+  which is what the group asked for; `collection()` now adds a non-standard
+  size to its own select, or the control would read 10 while the block paged
+  at 16.
+- **The cited-paper card moved from `css/mgdb-hub.css` to
+  `css/mgdb-modern.css`.** It is a shared component, not a hub one: the hubs,
+  the record pages and the stock record page all render one, and only the
+  first of those loads the hub sheet. Every page that loads the hub sheet
+  loads the base sheet before it, so nothing changed for the hubs.
+
+The stock record page was rendering its references as
+`.reference-result-card` — the literature **search result** card — which is
+why they did not look like the references anywhere else. It now emits the
+standard `.mgdb-ref` markup, keeps its own pagination, and lets
+`mgdb-modern.js` bind Copy citation and Copy DOI like every other page.
+
+Three renderers now emit that card and have to agree:
+`include/references_lib.php` server-side, `js/mgdb-record.js` from an API
+payload, and `js/mgdb-stock-record.js` from its own.
+
+### The variation record page
+
+`/data_center/variation?id=` moved onto the same shell on 2026-09-01. It had
+its own stylesheet, its own two-tone header with an emblem, its own collection
+helper and its own palette; all of that is gone. Sections in the hub order:
+Overview, Phenotypes, Stocks, Related records, Annotations, Images,
+References, Metrics, Related resources, API. Images are the shared
+sixteen-then-See-all grid with a lightbox.
+
+Its not-found page has **two** suggestion arms rather than the gene product's
+three, and the missing one is deliberate. `mgdb.variation` holds **1.7 million
+rows**, so a contains-search costs 1,220 ms on the name alone and more on the
+synonym table. What it offers instead:
+
+| Arm | Cost | Answers |
+| --- | --- | --- |
+| Allele series | 10 ms | The term read as a gene symbol, and that locus's curated alleles, with a link to the whole series in the hub |
+| Name prefix | 160 ms | Variations whose name begins with the term, in the three spellings the maize convention uses |
+
+A trailing wildcard is the whole difference: `LIKE 'bz1-m%'` is 160 ms where
+`ILIKE '%bz1-m%'` is 1,220 ms. Anything broader belongs to the hub's own
+two-tier search, which is built for it and says when a result set is a bounded
+sample.
+
+Most classical symbols never reach this page, because the symbol is also a
+variation name or a synonym: `wx1`, `sh2`, `y1`, `lg1`, `a1` and `tb1` all
+resolve to a record. `ra1` is one that does not, and it shows the allele
+series.
 
 ### The not-found page, and why 404
 
@@ -889,6 +1791,174 @@ scale for both leaves one of them blank. The page states the resulting fold
 change next to the legend.
 
 `docs/DATA_SEMANTICS.md` and `docs/METHODS.md` ship with the downloads.
+
+### The second one: `/projects/pathway_explorer`
+
+E2P2 metabolic pathway annotation run identically on all 26 NAM founder genomes,
+beside CornCyc 8.0 on B73 RefGen_v4. 694 pathways, 2,696 reaction steps,
+259,709 gene-to-reaction assignments over 121,581 gene models. The page
+describes the dataset, draws five figures over it, and carries the whole
+explorer: browse with a class tree, a pathway detail panel, a 590 x 27
+completeness heatmap, the reaction-gap list, a gene-to-pathway lookup and a
+gene-list enrichment test.
+
+```
+controllers/projects/pathway_explorer.php            the page. Runs zero SQL
+templates/static/mgdb_project_pathway_explorer.bau   its body
+css/mgdb-project-pathway-explorer.css                its sheet, on the hub shell
+js/mgdb-project-pathway-explorer.js                  the explorer
+search/pathway_explorer/pathway_explorer_api.php     the gene lookup endpoint
+search/pathway_explorer/pathway_explorer_lib.php     its reads. No SQL either
+data/projects/pathway_explorer/                      the payload, ~53 MB
+tools/pathway_explorer_index.py                      what writes it
+```
+
+**This is the first project page on the Data Hub shell.** It carries
+`mgdb-hub-page` and loads `css/mgdb-hub.css` before its own sheet, so it gets
+the pale ground, the white section cards, the coloured section top edges, the
+table zebra and the sticky tab bar that every hub has. `/projects` and
+`/projects/interpro_domain_atlas` do not yet, so the section is currently two
+looks; bringing the older two across is a small change and has not been made.
+
+#### How it is served
+
+Everything except one action is a static file. `index.json` (694 pathway rows
+plus the class tree), `matrix.json`, `gaps.json`, the 694 per-pathway records
+and the 27 enrichment backgrounds are read by the browser straight off disk,
+because Apache serving a file that Cloudflare compresses at the edge beats
+anything PHP could do in front of it — and a static read cannot fail in a new
+way. Measured: the page renders in 83 ms with no database contact at all.
+
+The exception is the gene lookup. Served statically, resolving a pasted list
+would be one 3 KB shard fetch per gene. `pathway_explorer_api.php` reads those
+shards server-side instead: a 400-gene list scattered across the corpus is 401
+local file reads in **25-37 ms**, one request, 55 KB. Gene models shard on the
+sha1 of the lowercased ID, 4,096 ways — about 30 genes and 3 KB a shard, so a
+single lookup decodes 3 KB to read 200 bytes. The depth is recorded in the
+manifest rather than assumed.
+
+SQLite was measured as an alternative (21 MB, one file, indexed) and not taken:
+the shard layout is what `data/alphafill/` and `data/protein_structure/`
+already do, it needs no new storage engine in the tree, and the heaviest read —
+36 MB of pathway detail — never touches PHP at all.
+
+#### Six ways to state a number wrong
+
+Every one of these was found by recomputing the pipeline's own summaries from
+its raw records, which is why `tools/pathway_explorer_index.py` recomputes
+rather than copies, and writes anything that still disagrees into
+`manifest.json` under `disagreements`.
+
+- **CornCyc is a reference track, not one of the 26 genomes.** It is B73 v4,
+  curated, from a different pipeline. Every per-genome statistic on the page is
+  over the 26 founders and the track is shown beside them, never inside them.
+  Note that `is_reference` is 1 for **two** tracks, CornCyc *and* B73, so
+  filtering on it gives 25 founders.
+- **"Absent" is two populations.** 17 pathways were tested by E2P2 and found in
+  no genome; a further 104 are CornCyc-only and were never tested. The source
+  labels both `absent`, so the naive count is 121. The page's absent filter
+  returns 17 and its CornCyc-only filter returns the 104.
+- **A step is not always a reaction.** 140 of the 2,836 step entries are a
+  superpathway's references to its component pathways: no EC, no evidence, no
+  genes. Counting them adds 140 gaps that can never be closed. 32 pathways
+  consist of nothing else, so they are absent by construction.
+- **Three numbers are called "reactions".** 2,089 distinct reactions; 2,696
+  reaction steps, because a reaction is a step of more than one pathway; and
+  the source's own 2,203, which is the 2,089 plus 114 sub-pathway references.
+- **An assignment can be counted two ways.** 259,709 gene-to-reaction
+  assignments, or 475,716 protein-model rows — 1.8x apart. The per-track
+  protein-model count is not comparable across tracks at all: two founders
+  carry about a quarter fewer without carrying fewer genes, which is why the
+  per-genome figure plots genes and says so.
+- **The evidence summary drops a bucket.** The pipeline's seven evidence codes
+  sum to 423,799 of 475,716 rows, because assignments with no code have no
+  entry. Recounted at gene level the eight buckets sum exactly, and the page's
+  shares are taken over that.
+
+The pipeline's own per-track record also mixes populations: CornCyc's pathway
+count is over all 694 while its completeness is over the 590, so reading the
+pair says it completes 269 of 596 when the within-scope figure is 269 of 534.
+The build tool recomputes all three over the 590 so the row can be read as a
+row. The 26 founders are unaffected, which is exactly why it stays invisible.
+
+Four more the page itself got wrong first, found by an adversarial review pass
+and fixed. Each is the same shape -- a field whose name is a fair description of
+a different quantity:
+
+- **`gap_class = 'complete'` means every founder genome, not any of them.** The
+  page's metric card said "1,371 steps have a gene in at least one genome" and
+  its gap table defined Complete as "at least one genome assigns a gene". Under
+  that wording Complete and Variable overlap and a reader subtracting 1,371 from
+  2,696 concludes 1,325 steps have no gene anywhere, when 106 of them do. The
+  count filled by at least one founder is **1,477**, and 2,038 counting CornCyc.
+- **`n_unique_steps` is scoped to the 26 founders**, so the CornCyc row of a
+  per-track table is structurally 0 -- printed under "Steps only this track
+  fills" that reads as "CornCyc contributes nothing unique", when over all 27
+  tracks CornCyc is the only one with a gene at **561** of the 2,696 steps. The
+  build tool now computes both scopes and the column is the 27-track one.
+- **`gaps.json`'s `cc` is in_corncyc8 for the REACTION**, not "CornCyc assigns a
+  gene to this step", and is 0 on 17 of the 578 rows classed "lost from
+  CornCyc" -- a column built on it contradicts the class in the cell beside it.
+  The build tool now writes the step's actual CornCyc gene count.
+- **259,709 assignments are (gene, pathway, reaction) triples**, so a gene on
+  one reaction in two pathways counts twice. Distinct (gene, reaction) pairs are
+  **180,689**. And at the *gene* level CornCyc's 9,169 records sit inside the
+  founders' 9,169-10,005, not at half of them -- the 2x gap is protein-model
+  rows only, because CornCyc's records are one protein each.
+
+Two rendering faults from the same pass are worth recording because both fail
+silently. A pathway summary is curated prose already sanitized upstream to
+`<i b em strong sub sup a p br>`, so running it through a bare-tag restorer
+printed the tags as text on 553 of the 694 detail panels; and rebuilding its
+anchors from the escaped stream cannot be done with a regex -- once `<` and `>`
+are entities an attribute tail has no terminator, and a pattern permissive
+enough to cross `target=&quot;_blank&quot;` walks into the next paragraph.
+Anchors are dropped to their text instead. Some summaries also carry a
+double-encoded entity, so the stored `&amp;beta;` needs collapsing twice.
+
+And **Plotly keeps whatever width it was drawn at.** A figure in the two-column
+chart grid was measured before the grid settled and stayed 700px wide in a 570px
+box, taking the page's scrollWidth to 1,373 at a 1,280 viewport. `MGDB.chart()`
+re-runs `Plotly.Plots.resize` on a window resize, but nothing fires one on load.
+The page checks each figure against its box a few times after render, and the
+chart box is `overflow: hidden` so a momentarily wrong figure cannot expand the
+page while it is.
+
+Three differences between this page and the CSV downloads are stated in
+Methods: the CSVs place the 104 CornCyc-only pathways under a top-level class
+that is not in the ontology the page reads (and for 42 of them the class is
+genuinely different), the matrix CSV omits the 62 CornCyc-only pathways that do
+carry genes, and the per-track CSV is the pipeline's own mixed-population copy.
+
+#### Statistics
+
+Enrichment is a one-sided hypergeometric test with Benjamini-Hochberg control,
+run in the browser. Two things are done differently from the prototype it came
+from. The background is the genes in the chosen track carrying at least one
+pathway assignment — about 4,400 of a genome's ~40,000 gene models — not the
+gene complement. And the correction is applied over **every pathway large
+enough to be tested in that background** rather than only the pathways the list
+hit; correcting over the hit set makes every q value smaller than it should be
+and is not comparable with topGO or g:Profiler.
+
+### Rebuilding the pathway explorer payload
+
+`data/projects/pathway_explorer/` is **not** in `deploy/manifest.txt`. It is
+~53 MB across 4,800 files, and the analysis output it is built from has never
+lived on the web host. Build it and ship the tree as one tar:
+
+```bash
+python3 tools/pathway_explorer_index.py \
+    --source <analysis>/data --downloads <analysis>/downloads \
+    --out /tmp/pathway_explorer
+tar -C /tmp -czf /tmp/pe.tgz pathway_explorer
+scp /tmp/pe.tgz <host>:/tmp/
+ssh <host> 'tar -C /var/www/claude/html/data/projects -xzf /tmp/pe.tgz && rm /tmp/pe.tgz'
+```
+
+The tool prints every summary it recomputed and every disagreement it found.
+Read that output: a new disagreement means the analysis changed shape, and the
+page states numbers the tool derived rather than numbers it was handed.
 
 ## The UniformMu insertion resource
 
@@ -5043,6 +6113,177 @@ enhancement rather than the only way in.
 
 The removed footer held **Archived Data Hubs** \(`/archive`\), which now has no
 link anywhere in the menu. It is still reachable from the site map.
+
+## The feedback form
+
+The Feedback button in the header did nothing on modernized pages. The legacy
+shell carried two Atlassian issue collectors — declared as
+`window.ATL_JQ_PAGE_PROPS` in `templates/maizegdb-main.bau` — and each one
+loads a script from maizegdb.atlassian.net that binds a click handler to a
+class and opens Atlassian's dialog in an iframe. The modern header kept the
+`.feedback-form` link and lost the handler. ADMIN_DEPENDENCIES.md recorded it
+as AD-009.
+
+`/feedback` replaces it with a MaizeGDB form that posts to the collector's own
+endpoint **from the server**, so nothing third-party loads on any page and the
+form is built from the shared controls: `.mgdb-field`, `.mgdb-label`,
+`.mgdb-input`, `.mgdb-textarea`, `.mgdb-form-actions`, `.mgdb-message`.
+
+The route was not empty. `controllers/static/feedback.php` answered it with an
+older email-based form — and answered it with a Bauplan error, on the
+development instance and on <https://www.maizegdb.org/feedback> alike, because
+the template it loads never declares the identifiers the controller sets. Its
+POST branch would have mailed the message and then fatalled on an unassigned
+`$mgdb`, and it took the recipient address from the request. It is shadowed
+rather than overwritten, and archived with the details in `legacy/feedback/`.
+
+### The collector endpoint
+
+Feedback collector `883299e6` is a *custom template* collector. Its form at
+`/rest/collectors/1.0/template/form/883299e6` posts to
+`/rest/collectors/1.0/template/custom/883299e6` with `pid=10001` — project WEB
+— plus `summary`, `description`, and the collector's own `fullname`, `email`,
+`recordWebInfo` and `webInfo`.
+
+Measured against the live collector on 2026-09-01: **the POST needs no
+`atl_token` and no cookie jar.** Posting with neither returns exactly what
+posting with both returns, so a submission is one request rather than a GET for
+a token followed by a POST. The reply is JSON wrapped in a `<textarea>`, which
+is how the collector answers the iframe that normally posts to it:
+
+```
+<html><body><textarea>{"errorMessages":[],"errors":{"summary":"You must specify a summary of the issue."}}</textarea></body></html>
+```
+
+`feedbackParseCollectorReply()` unwraps that, and the `errors` object comes back
+keyed by the collector's own field names — which are the names this form uses,
+so a rejection can be shown against the right control without a lookup table.
+
+The type chooser does not map to a Jira field, because the collector accepts a
+summary and a description and nothing else. It is carried as a bracketed tag on
+the summary — `[Data] Wrong gene model` — which is a shape a queue can sort on,
+and repeated as a line in the description.
+
+### One copy of the markup
+
+`feedbackFormMarkup()` in `include/feedback_lib.php` renders the form, and two
+things use it: the page, and `/feedback?embed=form`, which returns the form on
+its own for the dialog to fetch. That is why there is no `.bau` partial for it —
+the dialog and the page cannot drift apart if there is one function.
+
+On `/feedback` the header button does not open the dialog. A second copy of the
+form in the same document would duplicate every field id, so the click scrolls
+to the form already on the page.
+
+### It works without JavaScript
+
+The form is a real `<form method="post" action="/feedback">`. With the script it
+posts through `fetch` and the answer lands in place; without it the controller
+redirects to `/feedback?sent=1&key=WEB-nnn` on success and re-renders with the
+field errors and the reader's own values on failure. A feedback form whose job
+is to report that something is broken should not itself need everything to work.
+
+### Guards
+
+The collector endpoint is unauthenticated — anyone can post to it directly — so
+these do not protect Jira. They keep this form from being the convenient way to
+fill the queue, and keep obvious junk out of it:
+
+- a honeypot field, positioned off-screen rather than `display: none`, since
+  form fillers skip hidden inputs;
+- a minimum time on the form, checked only when the browser filled in the start
+  stamp, and ignoring negative elapsed times so a skewed clock cannot block a
+  real sender;
+- length caps, enforced again server-side after the browser's `maxlength`;
+- six messages per address per hour, counted in `<search_cache_path>/feedback`.
+
+A submission that trips the honeypot or the timer is answered as though it
+worked and quietly dropped — a script that is told it was blocked retries with
+the check removed. Both are logged.
+
+Rate limiting **fails open**: an unwritable directory lets the message through,
+the same way `include/dashboard_cache.php` falls back to serving live. Silently
+swallowing feedback is worse than letting a determined sender through twice.
+
+### Configuration
+
+All optional, in `conf/mgdb.conf`. Without them the collector, project and paths
+above are used.
+
+```
+feedback_collector_id=883299e6
+feedback_project_pid=10001
+feedback_collector_base=https://maizegdb.atlassian.net/rest/collectors/1.0
+feedback_rate_path=/home/cache/feedback
+feedback_enabled=false          # turns the form off and says so
+```
+
+### Verification
+
+From the server, since the dev instance is behind Cloudflare:
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' --resolve claude.maizegdb.org:80:10.24.27.235 \
+  http://claude.maizegdb.org/feedback
+
+# field validation, no Jira call
+curl -s --resolve claude.maizegdb.org:80:10.24.27.235 -H 'Accept: application/json' \
+  -d 'feedback_summary=&feedback_details=' http://claude.maizegdb.org/feedback
+
+# the collector's own contract, without creating an issue: it rejects a
+# submission that has no summary
+curl -s -X POST -H 'X-Atlassian-Token: no-check' \
+  --data-urlencode 'pid=10001' \
+  https://maizegdb.atlassian.net/rest/collectors/1.0/template/custom/883299e6
+```
+
+Anything that actually sends opens a real issue in project WEB.
+
+### The second collector: gene model and assembly errors
+
+`dddb1a6c` is what the legacy shell opened from `.trigger_gene_model_issue_form`
+on gene and pan-gene records. Same endpoint shape, different everything else,
+read from its own form template:
+
+| | site feedback | gene model report |
+| --- | --- | --- |
+| collector | `883299e6` | `dddb1a6c` |
+| project | WEB, pid 10001 | ASMBLY, pid 10003, issue type 10008 |
+| fields | summary, description | + `customfield_10050` "Affected gene models and/or loci", `customfield_10051` "Publication", `screenshots` |
+| reporter | optional | both marked required by the collector's own labels |
+
+So the form has two shapes, chosen by `kind`: `/feedback?kind=gene_model`, and
+`?id=Zm00001eb067740` prefills the affected model. `feedbackKinds()` holds the
+difference — collector, project, whether the type chooser appears, whether the
+reporter is required, and the words the page and the dialog use. Nothing else
+in the library branches on it.
+
+The type tag is not applied to a gene model summary. The site form prefixes
+`[Data]` and the like because everything it files lands in one project; this
+collector has a project of its own, so the summary is the reporter's own words.
+
+**The attachment is not offered.** The collector accepts one, but forwarding an
+upload means proxying multipart with its own size and type handling. A reporter
+can attach the image to the issue once it exists.
+
+### Where the report links are
+
+- **Gene record** (`/gene_center/gene/{id}`) — "Report a gene model error" under
+  the identity block, prefilled with the gene model. This is where the
+  pre-redesign page had it.
+- **Gene hub** (`/gene_center/gene`), *Gene model issues* — both links there
+  pointed at `/curation/GenomeIssue/edit` and `/curation/GeneModelIssue/edit`,
+  which answer with a curator login *and* the note that new annotation accounts
+  are not being accepted. No reader of that page could pass it. They now open
+  the report.
+- **Pan-gene** still points at `/contact`. The legacy page had "Report a
+  pan-gene error" on the same collector; whether it comes back is a call for the
+  group, since a pan-gene assignment is not an assembly defect.
+
+Any link carrying `.trigger_gene_model_issue_form` opens it, which is the class
+the legacy collector bound to, so old markup keeps working. `data-mgdb-feedback`
+is the explicit form for anything new, and `data-feedback-id` (or an `id=` in
+the href) carries the gene model.
 
 ## Why "B73" did not return the B73 v5 genome
 

@@ -514,7 +514,7 @@ Pool-member issue? No.  One endpoint only (:29977), and the 195,275 errors
       <h3>Two record pages reference JavaScript files that do not exist</h3>
       <span class="pill high">High</span>
     </div>
-    <p>Real 404s, requested from real record pages, meaning these pages ship with broken behaviour:</p>
+    <p>Real 404s, requested from real record pages, meaning these pages ship with broken behavior:</p>
     <div class="tbl-wrap">
       <table>
         <thead><tr><th>Missing file</th><th class="num">404s</th><th>Referred from</th></tr></thead>
@@ -655,7 +655,7 @@ Pool-member issue? No.  One endpoint only (:29977), and the 195,275 errors
     <ul>
       <li><strong>31 SNI mismatches.</strong> 30 requests reached <code>mgdb-proxy9</code> with an SNI name but no <code>Host</code> header; one hit <code>usage.maizegdb.org</code> via a bare IP with "no compatible SSL setup". The proxy hostnames are directly reachable, bypassing vhost routing.</li>
       <li><strong>44 HTTP/0.9-style requests</strong> with no Host line, forced onto <code>archive.maizegdb.org</code> — all probing <code>/admin/conf</code>.</li>
-      <li><strong>87 malformed-URI rejections</strong> (<code>AH10244</code>), all the CVE-2021-41773 traversal string. Apache rejected them at parse time, which is the correct behaviour and confirms the server is patched.</li>
+      <li><strong>87 malformed-URI rejections</strong> (<code>AH10244</code>), all the CVE-2021-41773 traversal string. Apache rejected them at parse time, which is the correct behavior and confirms the server is patched.</li>
       <li><strong>Two truncated request bodies</strong> to <code>c2s2</code> (<code>AH01097</code>/<code>AH02608</code>) — the same backend as BRK‑2, failing mid-upload.</li>
     </ul>
   </div>
@@ -729,7 +729,7 @@ One page load, one client, same second:
     </div>
     <div class="tbl-wrap">
       <table>
-        <thead><tr><th>Source</th><th class="num">Requests</th><th>Behaviour</th></tr></thead>
+        <thead><tr><th>Source</th><th class="num">Requests</th><th>Behavior</th></tr></thead>
         <tbody>
           <tr><td class="path">2604:2d80:5c04:9800::/64</td><td class="num">1,059,956</td><td>Declares Chrome/149 on Linux; fetches only record_data, get_sequence and jbrowse config — never CSS, JS or images</td></tr>
           <tr><td class="path">202.112.160.19</td><td class="num">234,751</td><td>Exclusively <code>gene_locus_data.php</code> + <code>gene_data.php</code></td></tr>
@@ -809,7 +809,7 @@ One page load, one client, same second:
 </section>
 
 <footer>
-  <p><strong>Method.</strong> Full-pass parse of all 5,655,317 access log lines (zero unparsed) and all 370,203 error log lines, aggregating status, vhost, path, byte, user-agent, referer and client-IP dimensions, plus a nineteen-pattern security scan. The error log was analysed independently for backend attribution, hourly failure-rate correlation against request volume, burst detection at one-minute resolution, and application-error capture. Every suspicious request returning 2xx was individually re-checked against response size to separate genuine exposure from the soft-404 page; heuristic matches on <code>cm=10</code> (read as a command parameter) and <code>gcv</code>'s <code>config.json</code> were confirmed false positives and excluded.</p>
+  <p><strong>Method.</strong> Full-pass parse of all 5,655,317 access log lines (zero unparsed) and all 370,203 error log lines, aggregating status, vhost, path, byte, user-agent, referer and client-IP dimensions, plus a nineteen-pattern security scan. The error log was analyzed independently for backend attribution, hourly failure-rate correlation against request volume, burst detection at one-minute resolution, and application-error capture. Every suspicious request returning 2xx was individually re-checked against response size to separate genuine exposure from the soft-404 page; heuristic matches on <code>cm=10</code> (read as a command parameter) and <code>gcv</code>'s <code>config.json</code> were confirmed false positives and excluded.</p>
   <p><strong>Limits.</strong> POST bodies are not logged, so ~205,000 form submissions could not be inspected. The log format records no response time, so slow-but-successful requests are invisible. Client IPs arrive via Cloudflare's forwarded-for chain and are not independently verified. The window is six days (23–28 Aug 2026), with 28 Aug partial — ending 13:26.</p>
 </footer>
 

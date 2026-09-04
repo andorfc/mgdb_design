@@ -133,8 +133,40 @@ Status values: `proposed` · `approved` · `implemented` · `rejected` · `defer
 - **Expected benefit:** Restores the only in-page route for reporting a data error; removes a link that silently does nothing.
 - **Risk and rollback:** Low. Until it is resolved, the modernized pan-gene search points readers at `/contact` for error reports rather than carrying a dead collector link.
 - **Required administrator:** MaizeGDB application maintainer (Atlassian collector IDs and their field configuration)
-- **Status:** proposed
-- **Validation:** Click the feedback link in the megamenu on a modernized page and confirm a dialog opens.
+- **Status:** the feedback half is **resolved in application code, 2026-09-01**; the gene-model report is still open and still needs no administrator.
+
+  `/feedback` and the dialog the header button opens now post to collector
+  `883299e6` from the server rather than loading Atlassian's script. It turned
+  out to need nothing from an administrator: the collector's endpoint is
+  unauthenticated, so no credential, token or cookie is involved, and the
+  collector id and project id were already in the legacy template. See
+  "The feedback form" in README.md.
+
+  Two things an administrator may still want to decide:
+
+  1. Whether project **WEB** and issue type 10006 are still where site feedback
+     should land. `feedback_collector_id` and `feedback_project_pid` in
+     `conf/mgdb.conf` repoint it without a code change.
+  2. Atlassian has been retiring Jira issue collectors. This one answered
+     normally on 2026-09-01, but if it is withdrawn the form needs a different
+     destination — a Service Management request type, or the team address.
+     `feedback_enabled=false` turns the form off and tells readers to write to
+     mgdb-tech@iastate.edu in the meantime.
+
+  **Both collectors are wired as of 2026-09-01.** `dddb1a6c`, the gene model and
+  assembly error report, reaches project ASMBLY with its two custom fields
+  ("Affected gene models and/or loci", "Publication") from the gene record page
+  and the Gene model issues section of the gene hub. It needed no administrator
+  either. Two notes for one:
+
+  - Its collector accepts a file attachment and this form does not offer one.
+  - The two links in that hub section previously pointed at
+    `/curation/GenomeIssue/edit` and `/curation/GeneModelIssue/edit`, which
+    answer with a curator login and the note that new annotation accounts are
+    not being accepted. If those curation forms are meant to be reachable by
+    the community again, that *is* an administrator question — separate from
+    this one.
+- **Validation:** Click the feedback link in the megamenu on a modernized page and confirm the dialog opens; send a message and confirm the issue appears in project WEB.
 
 ---
 
@@ -626,7 +658,30 @@ Status values: `proposed` · `approved` · `implemented` · `rejected` · `defer
   | `q=csh` | 7431 ms | 5357 |
   | `q=bnlg1079` | 6150 ms | 1 |
 
-  The time is flat regardless of how many rows come back — the signature of a full scan rather than a lookup. `EXPLAIN (ANALYZE, BUFFERS)` on the count for `q=bnlg` attributes it to three things:
+  The time is flat regardless of how many rows come back — the signature of a full scan rather than a lookup.
+
+  **Re-measured 2026-09-01, after two application-side changes.** The predicate
+  was rewritten from a correlated `EXISTS` into a union of two independent
+  scans, and the endpoint now fetches one row past the page so a search that
+  fits on one page skips the count entirely:
+
+  | Query | Was | Now | Hits |
+  |---|---|---|---|
+  | `term=umc` | 7444 ms | 3562 ms | 1972 |
+  | `term=bnlg1` | — | 3636 ms | 311 |
+  | `term=phi` | 7445 ms | 3365 ms | 162 |
+  | `term=umc1013` | — | **1777 ms** | 1 |
+  | `term=bnlg1867` | — | **1804 ms** | 1 |
+  | no term \(cached count\) | — | **56 ms** | 771,097 |
+
+  What is left is exactly one scan of each table, at about 1,750 ms — the count
+  and the page cost the same, so a full page still pays twice and a single-hit
+  lookup now pays once. **Nothing further can be done from the application
+  side**: the remaining time is the two sequential scans the indexes below
+  would remove. Confirmed still absent on 2026-09-01 — `pg_indexes` on
+  `mgdb.probe` and `mgdb.synonyms` shows only btrees, and `synonyms_gin` is a
+  btree on `posttext` despite its name \(see AD-010\).
+ `EXPLAIN (ANALYZE, BUFFERS)` on the count for `q=bnlg` attributes it to three things:
 
   - **Seq Scan on `probe`**, 780,086 rows, 1.8 s. The predicate is `name ILIKE '%bnlg%'`. The leading wildcard makes the existing btree `idx_probe_name` unusable, so every row is read and 779,662 are discarded.
   - **Parallel Seq Scan on `synonyms`**, 2,807,952 rows, 1.08 s, for the same reason against `idx_synonyms_synonyms`.
@@ -1084,6 +1139,387 @@ Then drop the `/var/www/logs` line from the script, or retire the cron job, so t
 - **Required administrator:** PostgreSQL superuser or the owner of the `mgdb` schema
 - **Status:** proposed
 - **Validation:** `/search/image/image_search_api.php?term=purple&category=all&page_size=25&sort=latest` returns in well under 500 ms with `summary.total` still 190.
+
+## AD-036 — `mgdb.reference.doi` is empty for 99% of the literature
+
+- **Symptom:** A reference card on a record page shows no DOI line and no
+  Full text button, while the same card on a Data Hub page shows both. The hub
+  reads the curated bibliography behind `/cite`, where every record carries a
+  DOI; a record page reads `mgdb.reference`, where almost none do.
+- **Measured on the development instance:** 538 of 55,171 references carry a
+  DOI, **1.0%**. Coverage peaks at about 20% for 2012–2014 and is **zero for
+  2023, 2024, 2025 and 2026** — the years with the most new references. The
+  `bz1` variation record, for example, has 12 references and no DOI on any of
+  them.
+- **Why the application cannot fix it:** There is nothing to render. The API
+  already falls back to extracting a DOI from the citation string when the
+  column is empty, which is how the stock and gene product records find the few
+  that exist, but the citations do not carry them either. `mgdb.reference` has
+  no PubMed column to resolve against.
+- **What is needed:** A backfill of `mgdb.reference.doi`, most cheaply by
+  matching title and year against Crossref, and then a curation step that
+  populates it going forward. This is a data task, not a schema change.
+- **Expected benefit:** Every record page gains the DOI line, the Full text
+  link and the Copy DOI button on its references, which is what the Data Hub
+  pages already show. It would also let the record pages link out to the
+  publisher, which today they cannot.
+- **Required administrator:** MaizeGDB curation staff
+- **Status:** proposed
+- **Validation:** `/api/v1/records/variation/bz1` returns a non-null `doi` on
+  its references, and the card on `/data_center/variation?id=bz1` shows the DOI
+  line above the title.
+
+## AD-036 — Two phenotype term references the curation cannot reach
+
+Both of these are curation data, not schema. Neither blocks the page, and the
+application has worked around both — but the workaround hides the cause, so it
+is worth writing down.
+
+- **What is wrong:**
+
+  1. **`embryo` exists twice as a body-part term.** Term ids `11087` and
+     `983212` are both named `embryo` and both of type `Body Part` &#40;32466&#41;. They
+     carry 18 and 2 phenotypes respectively. Because the plant-structure filter
+     was built one option per term id, `/data_center/phenotype` offered two
+     options reading `embryo (18)` and `embryo (2)`, and picking either one
+     silently missed the other's phenotypes.
+  2. **One phenotype trait id has no `term` row.** Trait `61259` is carried by 3
+     curated phenotypes and has a row in `id_num`, but nothing in `term`. It
+     therefore cannot be named, and the trait filter — which joins to `term` to
+     get a label — cannot offer it. Those 3 phenotypes are still findable by
+     name or keyword; they just cannot be reached through the trait filter.
+
+- **Why the application cannot fix it:** Both are decisions about the
+  vocabulary. Merging two term ids, or deciding whether `61259` should be named
+  or removed, changes what the records mean; the application can only decide how
+  to present what is there.
+- **What the application does now:** The filter lists are grouped by term *name*
+  rather than by id, so the two `embryo` ids collapse into one option carrying
+  both — `value="11087,983212"`, labelled `embryo (20)` — and the search accepts
+  an id list, so selecting it matches all 20. The dangling trait is simply
+  absent from the filter, as before.
+- **What is needed:** For 1, either merge the two `embryo` terms and repoint
+  `phenotype_body_parts.body_part`, or confirm they are meant to be distinct and
+  give them distinguishing names. For 2, either add the missing `term` row for
+  `61259` or repoint those 3 phenotypes at a term that exists.
+- **Expected benefit:** The plant-structure filter stops needing the merge, and
+  the 3 phenotypes on the dangling trait become reachable by category. Both also
+  make the metric counts &#40;70 structures, 256 categories&#41; exact rather than
+  "as many as can be named".
+- **Required administrator:** MaizeGDB curation staff
+- **Status:** proposed
+- **Validation:** `SELECT id, name FROM term WHERE name = 'embryo'` returns one
+  row, and `SELECT 1 FROM term WHERE id = 61259` returns a row.
+
+## AD-037 — Two `/data_center/` routes in the navigation do not exist
+
+- **What is wrong:** `/data_center/genome` and `/data_center/mp` both answer
+  **HTTP 200** with the generic "MaizeGDB &lt;name&gt; Search Page" 404 body, about
+  39.6 KB. `/data_center/genome` was linked from the Related resources of seven
+  redesigned pages — AI, expression, genetic variation, map, marker, protein
+  structure and stock — and `/data_center/mp` from the two gene product record
+  templates. Because the 404 is served as a 200, no link checker flags them.
+- **Why the application cannot fix it:** It can, and has: the links now point at
+  `/genome` and `/metabolic_pathways`, which are the live pages with that
+  content. What the application cannot fix is the response code.
+- **What is needed:** The `/data_center/<name>` handler should answer an unknown
+  data center with HTTP 404, not 200. Until it does, every future dead
+  `/data_center/` link will look healthy to any automated check — this pair was
+  found by eye, comparing response sizes.
+- **Also dead, and left alone:** the same size comparison across every link on
+  a rendered page finds three more in the **shared megamenu**, which is site
+  chrome rather than any one hub's content:
+
+  | link | in | answers |
+  | --- | --- | --- |
+  | `/doc` | `megamenu_modern/community.bau` | "Welcome to MaizeGDB", 42.8 KB |
+  | `/foldseek` | `megamenu_modern/tools.bau` | "Welcome to MaizeGDB", 42.5 KB |
+  | `/effect/maize_v2` | `megamenu_modern/tools.bau` | "Welcome to MaizeGDB", 39.4 KB |
+
+  These are **not** repointed. Unlike `/data_center/genome`, whose content is
+  plainly at `/genome`, there is no evident live destination for any of the
+  three, and guessing at one in the navigation every page carries is worse than
+  leaving them visible. `/foldseek` may want `/fatcat`, which is live and does
+  structural comparison, but that is a decision about what the menu item means.
+- **Expected benefit:** Broken navigation becomes detectable.
+- **Required administrator:** MaizeGDB application maintainer
+- **Status:** proposed
+- **Validation:** `curl -o /dev/null -w '%{http_code}' https://maizegdb.org/data_center/does_not_exist`
+  returns 404.
+
+## AD-038 — The pan-gene count differs by 18 between the distribution table and the searchable view
+
+- **What is wrong:** `/pan_gene_center/pan_gene` reports **97,202 pan-genes**,
+  summed from `chado.pan_gene_distribution`, which is the analysis pipeline's own
+  account of what it produced. The view the page actually searches,
+  `chado.pan_gene_search`, holds **97,184** distinct `pan_gene_name` values for
+  the same analysis &#40;`Pan-Zea, Aug 2025`&#41;. So 18 pan-genes are counted in the
+  headline figure that no search on the page can return.
+- **Why the application cannot fix it:** It cannot tell which number is right.
+  Both are legitimate readings of "pan-genes in this analysis": one is what the
+  pipeline recorded, the other is what was loaded into the searchable view. The
+  gap is 0.02%, which is small enough that it has gone unnoticed and small
+  enough that guessing at a cause would be wrong.
+- **What is needed:** A check of how `chado.pan_gene_search` is built against
+  `chado.pan_gene_distribution` for the same analysis — most likely a filter in
+  the view definition that drops a handful of pan-genes &#40;an empty exemplar, or
+  a member with no annotation row&#41;. Whichever is authoritative, the two should
+  agree, or the metric should be sourced from the view the page searches.
+- **Expected benefit:** The number at the top of the page and the number of
+  things a reader can find become the same number.
+- **Required administrator:** MaizeGDB curation or database staff
+- **Status:** proposed
+- **Validation:** `SELECT COUNT(DISTINCT pan_gene_name) FROM chado.pan_gene_search`
+  equals the sum of `member_count` over `chado.pan_gene_distribution` for the
+  same analysis.
+
+## AD-039 — No trigram index on the three tables the stock search reads
+
+- **What is wrong:** `/data_center/stock` matches a term with
+  `LOWER(col) LIKE '%term%'` against `mgdb.description` &#40;77,064 rows&#41;,
+  `mgdb.synonyms` &#40;2,809,176&#41; and `mgdb.ext_db_key` &#40;2,319,829&#41;. A leading
+  wildcard cannot use a b-tree, so Postgres sequentially scans the two large
+  tables on **every** search, however selective the term. Measured on the
+  development instance: `synonyms` 551 ms and `ext_db_key` 328 ms for a term
+  matching 4 rows and 0 rows respectively. That ~880 ms is the floor under
+  every stock search on the site.
+- **Why the application cannot fix it:** The same blocker as AD-010, AD-030 and
+  AD-035 — the application role `mgdb` does not hold `CREATE` on the schema.
+  `pg_trgm` **is already installed**, so this is one statement away.
+
+  What the application *can* do has been done: the two big scans are now
+  restricted to stock ids inside the scan rather than after it, since only
+  0.8% of `ext_db_key` and 24.8% of `synonyms` belong to a stock at all. That
+  took the broadest term from 4,787 ms to 1,995 ms and a mid-sized one from
+  3,758 ms to 2,936 ms, with identical results — but it cannot move the floor.
+- **What is needed:**
+
+     ```sql
+     CREATE INDEX CONCURRENTLY idx_synonyms_synonyms_trgm    ON mgdb.synonyms   USING gin (lower(synonyms) gin_trgm_ops);
+     CREATE INDEX CONCURRENTLY idx_ext_db_key_key_trgm       ON mgdb.ext_db_key USING gin (lower(key) gin_trgm_ops);
+     CREATE INDEX CONCURRENTLY idx_description_desc_trgm     ON mgdb.description USING gin (lower(description) gin_trgm_ops);
+     ```
+
+  Worth doing in the same conversation as AD-010, AD-020, AD-025, AD-030 and
+  AD-035 — every one of them is a trigram index the search layer is waiting on,
+  and `mgdb.synonyms` in particular is read by more than this hub.
+- **Expected benefit:** A selective stock search should drop from ~900 ms to
+  the tens of milliseconds, which is what the same query costs once the
+  candidate set is small — the advanced search, which touches none of these
+  three tables, already answers in 9-346 ms.
+- **Required administrator:** MaizeGDB database administrator
+- **Status:** proposed
+- **Validation:** `EXPLAIN` on the search shows a Bitmap Index Scan rather than
+  a Seq Scan on `mgdb.synonyms`, and `?term=Tp1` answers in well under 200 ms.
+
+## AD-040 — `/data_center/RNmaps` renders an empty page, and there are no RN map records
+
+- **What is wrong:** `/data_center/RNmaps` answers **HTTP 200** with a page
+  containing nothing but its title, "MaizeGDB RNmaps Search Page". It was linked
+  from the Cytogenetics hub as "View RN maps". Separately,
+  `SELECT ... FROM mgdb.map WHERE name ILIKE '%nodule%' OR name ILIKE '%recomb%'`
+  returns **no rows** — there are no recombination-nodule maps in the map table
+  to point such a route at.
+- **Why the application cannot fix it:** It can stop linking a page that shows
+  nothing, and has: the card now describes what recombination nodule data is and
+  links the Morgan2McClintock Translator, which is the tool built on it. What
+  the application cannot do is decide whether RN maps should exist as map
+  records, or whether the route should be retired.
+- **What is needed:** Either load the recombination nodule maps as map records
+  and give the route a handler, or retire `/data_center/RNmaps` so it answers
+  404 rather than an empty 200. Related to AD-037, which asks for unknown
+  `/data_center/` names to 404 in the first place.
+- **Expected benefit:** A reader following "recombination nodule maps" reaches
+  either the maps or an honest error, rather than a blank page.
+- **Required administrator:** MaizeGDB application maintainer, with curation
+  input on whether the RN maps should be loaded
+- **Status:** proposed
+- **Validation:** `/data_center/RNmaps` either renders map content or returns 404.
+
+## AD-041 — Two external links on the Cytogenetics hub cannot be reached
+
+- **What is wrong:**
+  1. `http://agronomy.cfans.umn.edu/Research/ProjectsListedAlphabetically/MaizeGenomics/Oat-MaizeAdditionLines/index.htm`
+     returns **404** &#40;the site root answers 200, so it is that page that is gone&#41;.
+     It was the "Related historical resource" line under the cytogenetic stock
+     collections. The link has been removed.
+  2. `https://m2m.dill-picl.org/v3/` — the Morgan2McClintock Translator — **does
+     not resolve from the development server**: `getent hosts m2m.dill-picl.org`
+     returns nothing and curl fails in 2 ms. Other external hosts resolve fine
+     from the same machine, so this is specific to that domain. It is not
+     possible to tell from here whether the site is gone or the name is simply
+     not resolvable from this network.
+- **Why the application cannot fix it:** It cannot restore someone else's page,
+  and it should not guess a replacement URL. The m2m link is left exactly where
+  it already was rather than removed on a single failed lookup, and was
+  deliberately not promoted into Related resources.
+- **What is needed:** Confirm from a machine with general internet access
+  whether m2m.dill-picl.org is still running; if it is gone, decide whether the
+  recombination nodule card should point somewhere else or be retired. For the
+  UMN page, a replacement URL if the oat–maize addition line project has moved.
+- **Expected benefit:** The two external destinations on this hub either work or
+  are known to be gone.
+- **Required administrator:** MaizeGDB application maintainer
+- **Status:** proposed
+- **Validation:** `curl -sI https://m2m.dill-picl.org/v3/` returns 200 from a
+  machine with unrestricted DNS.
+
+## AD-042 — `mgdb.zb_chr_v2_clone` is empty
+
+- **What is wrong:** The table has **0 rows**. The BAC hub's corpus rollup
+  UNIONs three arms, the third of which joins `mgdb.locus` against
+  `zb_chr_v2_clone` on `accession = locus.name` to pick up loci named after a
+  RefGen_v2 clone. With the table empty that arm returns nothing on every run.
+- **Why the application cannot fix it:** It cannot know whether the table is
+  empty because the v2 clone placements were never loaded on this instance,
+  because they were deliberately retired, or because a load failed. Removing the
+  arm would make the query slightly cheaper today and silently wrong if the data
+  ever returns, so it has been left in place with a comment.
+- **What is needed:** Confirm whether `zb_chr_v2_clone` should hold the
+  RefGen_v2 clone placements. If it should, load it. If the v2 placements are
+  retired, drop the table and the UNION arm can go with it.
+- **Expected benefit:** Either the BAC archive regains the v2 clone-placement
+  records it is written to include, or a dead join comes out of a rollup that
+  scans 446,115 records.
+- **Required administrator:** MaizeGDB database administrator
+- **Status:** proposed
+- **Validation:** `SELECT COUNT(*) FROM mgdb.zb_chr_v2_clone` returns a non-zero
+  count, or the table no longer exists.
+
+## AD-043 — `overgo_seq_results.php` interpolates the search term into SQL unescaped
+
+- **What is wrong:** `search/overgo_seq/overgo_seq_results.php` builds its query
+  by string concatenation:
+  `... AND (B.MEMO LIKE '%" . strtoupper($term) . "%' OR ...)`, four times over,
+  where `$term` comes straight from the POST body. The only thing applied to it
+  is `validate_input()`, which calls `validate_string()`, which is
+  `return $input;` — it does nothing at all. Posting `term=A'` produces
+  `B.MEMO LIKE '%A'%'`, the string literal closes early, and Postgres raises
+  `SQLSTATE[42725]`. The exception is swallowed and the page reports "no overgo
+  sequences matching your search criteria", so the break is invisible to a
+  reader and the attacker still controls everything after the closing quote.
+- **Why the application cannot fix it:** The redesigned hub validates the field
+  against `^[ACGT]{1,25}$` before posting, which protects a person using the
+  page, but the endpoint is a public URL that accepts a POST from anywhere.
+  Client-side validation is not a fix for server-side injection, and the file
+  is not in this repository — it is part of the legacy application tree.
+- **What is needed:** Bind the term as a parameter, or at minimum restrict it to
+  `[ACGTacgt]` in the endpoint before it reaches the query. `validate_string()`
+  should either be given an implementation or removed, since every caller that
+  relies on it is currently unprotected — this endpoint is unlikely to be the
+  only one.
+- **Expected benefit:** Removes a live SQL injection vector, and stops a class
+  of failure that currently presents itself to users as "no results".
+- **Required administrator:** MaizeGDB application maintainer
+- **Status:** proposed
+- **Validation:** `curl -X POST .../search/overgo_seq/overgo_seq_results.php
+  --data-urlencode "term=A'"` leaves no `SQLSTATE[42725]` in `logs/mgdb.log`.
+
+## AD-044 — The Overgo endpoints ignore the page size the page sends
+
+- **What is wrong:** `getSearchData()` in `js/search.js` posts a `pagesize`
+  parameter, and `bac_results.php` reads it through `getPageSize('bac_pagesize')`.
+  The two overgo endpoints instead do `$pagesize = $system['pagesize'];` and
+  never look at the parameter, so a records-per-page control on the Overgo hub
+  would be a dead input.
+- **Why the application cannot fix it:** The hub can only choose not to offer a
+  control that does nothing, which is what it does — it states the fixed page
+  size of 25 in the hint beside "Maximum results" instead. Making the control
+  real is a one-line change in a file this repository does not carry.
+- **What is needed:** Replace `$pagesize = $system['pagesize'];` with
+  `$pagesize = getPageSize('overgo_pagesize');` in
+  `search/overgo/overgo_results.php` and
+  `search/overgo_seq/overgo_seq_results.php`, matching the BAC endpoint.
+- **Expected benefit:** The Overgo hub can offer the same 5/10/25/50/100/250
+  page-size control every other hub has.
+- **Required administrator:** MaizeGDB application maintainer
+- **Status:** proposed
+- **Validation:** Posting `pagesize=50` to the overgo endpoint returns 50 rows
+  on the first page.
+
+## AD-045 — 569 archived Overgo sequences cannot be reached by the sequence search
+
+- **What is wrong:** Sequences for the Unigene-Overgo collection (probe type
+  393660) are stored as memos of type 487260, "Sequence" — 10,644 of them. The
+  Overgo collection (type 747274) stores its sequences as memos of type 107404,
+  "Sequence Note" — 569 of them, also 40 bp, also nucleotide strings. The
+  sequence search hard-codes `A.TYPE = 393660 AND B.TYPE_TERM = 487260`, so
+  those 569 are visible on their record pages and invisible to the search.
+- **Why the application cannot fix it:** The hub can say so, and now does: the
+  metric card counts what the search can actually reach, and the About section
+  states which collection the sequence search covers. Whether the 569 are the
+  same kind of thing as the 10,644 — and so whether they should be re-typed,
+  or the query widened — is a curation decision.
+- **What is needed:** Decide whether those 569 sequences belong under memo type
+  487260. If they do, re-type them and the search reaches them with no code
+  change. If they are notes rather than sequence records, widen the query to
+  include type 107404 for probe type 747274, or leave it and keep the
+  distinction documented.
+- **Expected benefit:** Either 5% more of the archive becomes searchable by
+  sequence, or the distinction is confirmed rather than assumed.
+- **Required administrator:** MaizeGDB curator, with application maintainer if
+  the query is widened
+- **Status:** proposed
+- **Validation:** A sequence search for a snippet of one of the 569 returns its
+  record, or the memo typing is confirmed as intentional.
+
+## AD-046 — The Overgo endpoints do not urldecode their term, unlike every sibling
+
+- **What is wrong:** `est_results.php` and `bac_results.php` both read their
+  term as `urldecode(getCGIParam('term', ...))`. The two overgo endpoints omit
+  the `urldecode()`. Because `getSearchData()` in `js/search.js` sends
+  `term: encodeURI(id_val)`, every term containing `%`, `^` or `$` — exactly
+  the wildcard and anchor characters the search hints advertise — arrives at
+  the overgo endpoints percent-escaped and matches nothing. Posting `^CL10`
+  raw returns 41,803 bytes of results; posting `%5ECL10`, which is what the
+  page sent, returns "There are no records".
+- **Why the application cannot fix it:** The redesigned hub posts the term raw
+  and so is correct on its own request. It cannot fix the *pagination*: page
+  two of a result set is fetched by `getSearchData()`, which encodes, so an
+  anchored or wildcard search still loses its results from page two onward.
+  `js/search.js` is shared by every search on the site, so removing the encode
+  there is not a change this hub can make alone.
+- **What is needed:** Add `urldecode()` to the term in
+  `search/overgo/overgo_results.php` and
+  `search/overgo_seq/overgo_seq_results.php`, matching the EST and BAC
+  endpoints. That fixes pagination without touching the shared script.
+- **Expected benefit:** Wildcard and anchored Overgo searches keep working past
+  the first page, which they have not done since the AJAX search was
+  introduced.
+- **Required administrator:** MaizeGDB application maintainer
+- **Status:** proposed
+- **Validation:** Posting `term=%5ECL10` to `overgo_results.php` returns the
+  same result count as posting `term=^CL10`.
+
+## AD-047 — The pathway explorer payload has no home on the web host
+
+- **What is wrong:** `/projects/pathway_explorer` reads
+  `data/projects/pathway_explorer/` — 53 MB across about 4,800 files: 694
+  per-pathway records, 4,096 gene shards, the pathway index, the genome matrix,
+  the gap list and 27 enrichment backgrounds. That tree is built by
+  `tools/pathway_explorer_index.py` from a pan-genome E2P2 analysis output that
+  has never lived on the web host, and it is deliberately not in
+  `deploy/manifest.txt`: one manifest line per file would add about 48 minutes
+  to every full deploy of the whole site. It is currently on the development
+  instance only, put there by hand as a tar.
+- **Why the application cannot fix it:** The source analysis is a research
+  output on a workstation. Nothing on the server can regenerate the payload,
+  so a server rebuilt from the repository alone comes up with the page
+  returning its 503 "temporarily unavailable" body.
+- **What is needed:** A durable home for the source analysis on MaizeGDB
+  infrastructure — the same problem AD-028 records for AlphaFill — and, once it
+  is there, a scheduled or documented run of
+  `tools/pathway_explorer_index.py --source <analysis>/data --out
+  <webroot>/data/projects/pathway_explorer` after each re-analysis. Until then
+  the rebuild procedure is in README under "Rebuilding the pathway explorer
+  payload".
+- **Expected benefit:** The page survives a server rebuild, and a re-run of the
+  pathway analysis reaches the website without a workstation in the loop.
+- **Required administrator:** MaizeGDB system administrator
+- **Status:** proposed
+- **Validation:** `curl -s -o /dev/null -w '%{http_code}'
+  https://claude.maizegdb.org/data/projects/pathway_explorer/manifest.json`
+  returns 200 after a rebuild that did not involve a workstation.
 
 ## AD-048 — BLAST could not write its query file on the development instance
 

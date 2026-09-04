@@ -69,7 +69,6 @@ SECTIONS = [
     ("tools", "tools", "All research tools", "", [
         ("BLAST", "/BLAST", "Sequence search against the full set of genome datasets hosted at MaizeGDB."),
         ("Bin Viewer", "/bin_viewer", "Explore data in regions defined by genetic bin boundaries."),
-        ("CornCyc", "https://corncyc-b73-v4.maizegdb.org/", "Metabolic pathways resource for maize."),
         ("FATCAT comparison tool", "/fatcat", "Structural alignments between a maize protein and its top structural hits."),
         ("FETA", "https://feta.maizegdb.org", "A suite of tools for exploring gene functional enrichment in Zea mays and relatives."),
         ("Foldseek search", "/foldseek", "Fast comparisons against large protein structure sets."),
@@ -82,8 +81,10 @@ SECTIONS = [
         ("JBrowse genome browsers", "https://jbrowse.maizegdb.org", "The GBrowse replacement, hosting B73 v5 and most assemblies here."),
         ("JBrowse 2 tutorial", "/genome/jbrowse2_tutorial", "How to drive the JBrowse 2 interface."),
         ("Maize Feature Store", "https://mfs.maizegdb.org/", "Central repository of raw and transformed data, suited to machine learning."),
+        ("Metabolic Pathways", "/metabolic_pathways", "Maize pathway assignments, and the maintained databases that curate them. Replaces the retired CornCyc instances."),
         ("PanEffect", "/effect/maize_v2/", "Explore variant effects across the maize pan-genome."),
         ("Pangenome graph", "https://pangenome-viewer.maizegdb.org/", "Structural and sequence variation across Zea genomes."),
+        ("Pan-genome pathway explorer", "/projects/pathway_explorer", "E2P2 metabolic pathway annotation across the 26 NAM founder genomes, with gap analysis and gene-list enrichment."),
         ("Pathway Association Study Tool (PAST)", "/past", "Assigns SNPs to genes and genes to metabolic pathways."),
         ("PedigreeNet", "/breeders_toolbox", "Pedigree relationships between maize varieties, drawn as a network."),
         ("Phylostrata", "https://phylostrata.maizegdb.org", "Phylostratigraphy: evolutionary conservation level of a protein."),
@@ -177,7 +178,7 @@ SECTIONS = [
     ("download", "curated", "Downloads", "", [
         ("Download server", "https://download.maizegdb.org", "Assemblies, annotations, insertions, expression, and more."),
         ("Downloads page", "/download", "Guided index of what is downloadable, including Globus transfer."),
-        ("Maize Feature Store", "https://mfs.maizegdb.org/", "Assembled feature tables for modelling."),
+        ("Maize Feature Store", "https://mfs.maizegdb.org/", "Assembled feature tables for modeling."),
     ]),
 
     # Dropped per review: FPC physical maps and Gel patterns (data exists, no
@@ -207,6 +208,7 @@ SECTIONS = [
     ("about", "community", "About MaizeGDB", "", [
         ("Cite us", "/cite", ""),
         ("Contact us", "/contact", ""),
+        ("Send feedback", "/feedback", ""),
         ("Credits", "/credit", ""),
         ("AgBioData member", "https://www.agbiodata.org", ""),
     ]),

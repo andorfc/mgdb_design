@@ -44,7 +44,11 @@ never reworded.
 3. …the hub's own sections…
 4. **References** — `.mgdb-ref-list` filled by `mgdb_render_references()`.
 5. **Metrics** — four cards, then any figures.
-6. **Related resources** — exactly five, each marked Internal or External.
+6. **Related resources** — exactly five. A card that leaves MaizeGDB carries
+   an arrow after its title; maizegdb.org and its subdomains carry nothing.
+   The arrow comes from the card's `href` in `mgdb-modern.css`, so do not
+   write it into the markup and do not add an Internal / External chip —
+   both were retired site-wide on 2026-09-03.
 
 ## References: name DOIs, never citations
 

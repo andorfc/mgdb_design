@@ -1,0 +1,633 @@
+<title>MaizeGDB PHP Error Audit</title>
+
+<style>
+  :root{
+    --ground:#FAFBFC;
+    --surface:#FFFFFF;
+    --surface-2:#F1F4F6;
+    --ink:#171A1F;
+    --ink-2:#3A424D;
+    --muted:#5A6472;
+    --line:#DCE2E8;
+    --line-2:#C6D0D9;
+    --accent:#15646F;
+    --accent-soft:#E2F0F2;
+    --crit:#A9302A;
+    --crit-soft:#FAE9E7;
+    --warn:#8A6008;
+    --warn-soft:#FBF0DA;
+    --ok:#256B48;
+    --ok-soft:#E3F1E9;
+    --info:#3F4E63;
+    --info-soft:#EAEEF4;
+    --shadow:0 1px 2px rgba(20,30,45,.05), 0 6px 18px -10px rgba(20,30,45,.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0E1116;
+      --surface:#171B21;
+      --surface-2:#1F252D;
+      --ink:#E7EAEE;
+      --ink-2:#C2C9D2;
+      --muted:#929CAA;
+      --line:#2A323C;
+      --line-2:#3A444F;
+      --accent:#54B4C1;
+      --accent-soft:#13323A;
+      --crit:#F0837A;
+      --crit-soft:#3A1E1D;
+      --warn:#E0AC42;
+      --warn-soft:#352A15;
+      --ok:#63C193;
+      --ok-soft:#16301F;
+      --info:#A8B6CC;
+      --info-soft:#1D242F;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0E1116;
+    --surface:#171B21;
+    --surface-2:#1F252D;
+    --ink:#E7EAEE;
+    --ink-2:#C2C9D2;
+    --muted:#929CAA;
+    --line:#2A323C;
+    --line-2:#3A444F;
+    --accent:#54B4C1;
+    --accent-soft:#13323A;
+    --crit:#F0837A;
+    --crit-soft:#3A1E1D;
+    --warn:#E0AC42;
+    --warn-soft:#352A15;
+    --ok:#63C193;
+    --ok-soft:#16301F;
+    --info:#A8B6CC;
+    --info-soft:#1D242F;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+
+  *{box-sizing:border-box}
+
+  body{
+    background:var(--ground);
+    color:var(--ink);
+    font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    margin:0;
+    padding:0 24px 96px;
+  }
+
+  .wrap{max-width:900px;margin:0 auto}
+
+  code,.mono{
+    font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+    font-size:.88em;
+    font-variant-ligatures:none;
+  }
+  code{
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:.08em .34em;
+    word-break:break-word;
+  }
+
+  h1,h2,h3{
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,ui-serif,serif;
+    text-wrap:balance;
+    font-weight:600;
+    letter-spacing:-.005em;
+    margin:0;
+  }
+
+  /* ---------- masthead ---------- */
+  header.mast{
+    padding:64px 0 34px;
+    border-bottom:2px solid var(--ink);
+    margin-bottom:40px;
+  }
+  .eyebrow{
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:11.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 18px;
+    display:flex;
+    gap:10px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+  .eyebrow::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--line-2);
+    min-width:24px;
+  }
+  h1{font-size:clamp(34px,5.4vw,52px);line-height:1.08}
+  .standfirst{
+    color:var(--muted);
+    font-size:17px;
+    max-width:66ch;
+    margin:18px 0 0;
+  }
+  .meta-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 26px;
+    margin-top:26px;
+    font-size:12.5px;
+    color:var(--muted);
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  .meta-row b{color:var(--ink-2);font-weight:600}
+
+  /* ---------- scorecard ---------- */
+  .scorecard{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(158px,1fr));
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    border-radius:8px;
+    overflow:hidden;
+    margin:0 0 20px;
+  }
+  .stat{background:var(--surface);padding:18px 18px 16px;display:flex;flex-direction:column;gap:5px}
+  .stat .k{
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  }
+  .stat .v{
+    font-size:26px;font-weight:650;line-height:1.1;
+    font-variant-numeric:tabular-nums;letter-spacing:-.02em;
+  }
+  .stat .n{font-size:12px;color:var(--muted);line-height:1.35}
+  .stat.is-crit .v{color:var(--crit)}
+  .stat.is-warn .v{color:var(--warn)}
+  .stat.is-ok .v{color:var(--ok)}
+
+  /* ---------- sections ---------- */
+  section{margin:56px 0 0;scroll-margin-top:20px}
+  .sec-head{
+    display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+    padding-bottom:12px;border-bottom:1px solid var(--line-2);margin-bottom:8px;
+  }
+  .sec-head h2{font-size:26px}
+  .sec-tag{
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);margin-left:auto;white-space:nowrap;
+  }
+  .sec-intro{color:var(--muted);max-width:70ch;margin:14px 0 4px}
+
+  p{max-width:72ch}
+
+  /* ---------- findings ---------- */
+  .finding{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-left:4px solid var(--line-2);
+    border-radius:7px;
+    padding:20px 22px;
+    margin:16px 0;
+    box-shadow:var(--shadow);
+  }
+  .finding.crit{border-left-color:var(--crit)}
+  .finding.high{border-left-color:var(--warn)}
+  .finding.med{border-left-color:var(--info)}
+  .finding.good{border-left-color:var(--ok)}
+
+  .f-top{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;margin-bottom:9px}
+  .f-id{
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.04em;
+  }
+  .finding h3{font-size:18.5px;line-height:1.3;flex:1;min-width:220px}
+  .pill{
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:10px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;
+    padding:3px 9px;border-radius:100px;white-space:nowrap;
+  }
+  .pill.crit{background:var(--crit-soft);color:var(--crit)}
+  .pill.high{background:var(--warn-soft);color:var(--warn)}
+  .pill.med{background:var(--info-soft);color:var(--info)}
+  .pill.good{background:var(--ok-soft);color:var(--ok)}
+  .finding p{margin:9px 0;color:var(--ink-2)}
+  .finding p:last-child{margin-bottom:0}
+
+  .evidence{
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:12px 14px;
+    margin:13px 0;
+    overflow-x:auto;
+  }
+  .evidence pre{
+    margin:0;
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:12.5px;line-height:1.65;color:var(--ink-2);
+    font-variant-numeric:tabular-nums;white-space:pre;
+  }
+  .fix{
+    border-top:1px dashed var(--line-2);
+    margin-top:14px;padding-top:12px;
+    display:flex;gap:10px;align-items:flex-start;
+  }
+  .fix .lab{
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--accent);white-space:nowrap;padding-top:3px;font-weight:600;
+  }
+  .fix p{margin:0}
+
+  /* ---------- tables ---------- */
+  .tbl-wrap{overflow-x:auto;margin:20px 0;border:1px solid var(--line);border-radius:7px;background:var(--surface)}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:520px}
+  th,td{padding:9px 14px;text-align:left;border-bottom:1px solid var(--line)}
+  thead th{
+    background:var(--surface-2);
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+    font-weight:600;white-space:nowrap;
+  }
+  tbody tr:last-child td{border-bottom:none}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+  td.path{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:12.5px;word-break:break-all}
+  .bad{color:var(--crit);font-weight:600}
+  .good-t{color:var(--ok);font-weight:600}
+
+  ul,ol{max-width:72ch;padding-left:22px;color:var(--ink-2)}
+  li{margin:7px 0}
+  li::marker{color:var(--accent)}
+
+  .callout{
+    background:var(--accent-soft);
+    border:1px solid var(--line);
+    border-left:4px solid var(--accent);
+    border-radius:7px;padding:18px 22px;margin:22px 0;
+  }
+  .callout h3{font-size:17px;margin-bottom:7px}
+  .callout p{margin:7px 0 0;color:var(--ink-2)}
+  .callout p:first-of-type{margin-top:0}
+
+  footer{
+    margin-top:64px;padding-top:22px;border-top:1px solid var(--line-2);
+    color:var(--muted);font-size:13px;
+  }
+  footer p{max-width:74ch}
+  a{color:var(--accent)}
+  a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
+
+  @media (max-width:620px){
+    body{padding:0 16px 64px}
+    header.mast{padding-top:40px}
+    .stat .v{font-size:22px}
+  }
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <p class="eyebrow">Application error log · companion to the access &amp; error log review</p>
+  <h1>MaizeGDB PHP Error Audit</h1>
+  <p class="standfirst">The application errors the proxy logs could never see. Four weeks of <code>www-error.log</code> — which turns out to name the exact line behind the proteomics failure the last audit could only localize, and to expose two config faults generating 95% of the noise.</p>
+  <div class="meta-row">
+    <span><b>Window</b> 3–31 Aug 2026 (28 days)</span>
+    <span><b>Lines</b> 4,893,529</span>
+    <span><b>Source</b> 2028-08-31_www-error.log.gz</span>
+    <span><b>Host root</b> /var/www/html</span>
+  </div>
+</header>
+
+<div class="scorecard">
+  <div class="stat is-crit">
+    <span class="k">Error volume</span>
+    <span class="v">170k</span>
+    <span class="n">per day, every day</span>
+  </div>
+  <div class="stat is-crit">
+    <span class="k">Two faults</span>
+    <span class="v">94.9%</span>
+    <span class="n">of all log lines, both config-level</span>
+  </div>
+  <div class="stat is-crit">
+    <span class="k">Fatal errors</span>
+    <span class="v">18,727</span>
+    <span class="n">83% from a single missing function</span>
+  </div>
+  <div class="stat is-warn">
+    <span class="k">Parse errors</span>
+    <span class="v">51</span>
+    <span class="n">production edited live, twice, on 20 Aug</span>
+  </div>
+  <div class="stat is-warn">
+    <span class="k">User input</span>
+    <span class="v">→ require()</span>
+    <span class="n">unvalidated path in gene_center</span>
+  </div>
+  <div class="stat is-ok">
+    <span class="k">SQL / RCE</span>
+    <span class="v">0</span>
+    <span class="n">no injection or dangerous-sink errors</span>
+  </div>
+</div>
+
+<div class="callout">
+  <h3>This log closes the loop on the last audit</h3>
+  <p>The previous report identified 2,905 HTTP 500s on <code>gene_data.php?type=proteomics</code>, deterministic for v3 <code>GRMZM</code> gene models, and flagged that the stack traces existed only on the backend and were not shipped anywhere. They are in this file. The cause is a call to an undefined function <code>unmute()</code>, and it is still firing as of the last day of the window.</p>
+</div>
+
+<!-- ============ NOISE ============ -->
+<section id="noise">
+  <div class="sec-head">
+    <h2>Two faults, 95% of the log</h2>
+    <span class="sec-tag">Fix first — they hide everything else</span>
+  </div>
+  <p class="sec-intro">Before any individual bug is worth chasing, note that 4.6 of the 4.9 million lines come from exactly two persistent misconfigurations. Both fire on every single day of the window. Until they are fixed, this log is unreadable as an operational signal — which is presumably why the bugs below went unnoticed.</p>
+
+  <div class="finding crit">
+    <div class="f-top">
+      <span class="f-id">PHP‑1</span>
+      <h3>A required library file has been missing for the entire window</h3>
+      <span class="pill crit">Critical</span>
+    </div>
+    <p><code>/var/www/html/tools/sequence/include/gp_lib.php</code> does not exist, but <code>include/db-api.php</code> line 15 tries to load it on every request that touches the database API. Each attempt emits two warnings:</p>
+    <div class="evidence"><pre>include_once(/var/www/html/tools/sequence/include/gp_lib.php):
+    Failed to open stream: No such file or directory
+    in /var/www/html/include/db-api.php on line 15
+
+include_once(): Failed opening '…/gp_lib.php' for inclusion
+    (include_path='.:/usr/share/pear:/usr/share/php')
+
+1,591,100 occurrences × 2 lines  =  3,182,203 log lines  =  65.0% of the file</pre></div>
+    <p>Because <code>include_once</code> only warns, the request continues — until something calls a function that file was supposed to define. That is almost certainly what PHP‑3 below is: a call to <code>unmute()</code>, undefined, from code that has no idea its library never loaded.</p>
+    <p><em>Stated as a hypothesis, not a fact:</em> I could not confirm that <code>unmute()</code> was defined in <code>gp_lib.php</code> — the dev host requires an interactive PIN, so I could not read the source. The two are consistent in shape and timing, and checking is a one-line grep.</p>
+    <div class="fix"><span class="lab">Fix</span><p>Find out whether <code>gp_lib.php</code> was deleted, moved, or never deployed. Restore it, or delete the <code>include_once</code> and whatever depends on it. Then check whether <code>unmute()</code> starts resolving. Do this one first — it may fix PHP‑3 for free.</p></div>
+  </div>
+
+  <div class="finding crit">
+    <div class="f-top">
+      <span class="f-id">PHP‑2</span>
+      <h3>The template engine cannot write its compiled cache</h3>
+      <span class="pill crit">Critical · performance</span>
+    </div>
+    <p>Bauplan compiles <code>.bauc</code> templates and caches the result. <code>lib/libbau/Loader.php</code> line 140 cannot open those files — <strong>1,464,192 permission failures across 77 distinct templates</strong>, every day of the window.</p>
+    <div class="evidence"><pre>fopen(../templates/data_center/map_sections.bauc)        534,954
+fopen(../templates/data_center/variation_sections.bauc)  158,813
+fopen(../templates/data_center/reference_sections.bauc)  121,428
+fopen(../templates/partials/image_table.bauc)             74,221
+fopen(../templates/data_center/stock_sections.bauc)       74,221
+fopen(templates/maizegdb-main.bauc)                       22,559
+fopen(templates/home/megamenu/*.bauc)              ~22,548 each
+                        → Failed to open stream: Permission denied
+                          in /var/www/html/lib/libbau/Loader.php on line 140</pre></div>
+    <p>The megamenu partials sit on every page of the site; <code>maizegdb-main.bauc</code> is the master layout. So this is not a corner case — <strong>the template cache is disabled in practice, and every page render recompiles its templates from source</strong>. That cost is paid on every request MaizeGDB serves.</p>
+    <p>The relative paths (<code>../templates/…</code> and <code>templates/…</code>) are also worth noting: the loader resolves templates relative to the current working directory, so the same template is a different path depending on which script is entry point.</p>
+    <div class="fix"><span class="lab">Fix</span><p>Give the web user write access to the template cache directory. On this host, check the SELinux context as well as the Unix mode — a correct <code>chmod</code> with the wrong context fails exactly like this, silently. Then confirm the <code>.bauc</code> files are actually being written, rather than assuming the warning's disappearance means success.</p></div>
+  </div>
+</section>
+
+<!-- ============ FATALS ============ -->
+<section id="fatals">
+  <div class="sec-head">
+    <h2>Fatal errors — pages that return 500</h2>
+    <span class="sec-tag">18,727 fatals</span>
+  </div>
+  <p class="sec-intro">Every one of these is a request that died. They are uncaught, so the user gets a blank page or a 500, never a useful message.</p>
+
+  <div class="finding crit">
+    <div class="f-top">
+      <span class="f-id">PHP‑3</span>
+      <h3>The proteomics failure, finally with a line number</h3>
+      <span class="pill crit">Critical</span>
+    </div>
+    <p><strong>15,623 fatals — 83.4% of every fatal in the log</strong> — from one undefined function:</p>
+    <div class="evidence"><pre>PHP Fatal error: Uncaught Error: Call to undefined function unmute()
+  in /var/www/html/record_data/gene_page/gene_data_proteomics.php:962
+
+Stack trace:
+  #0 gene_data_proteomics.php(75): showPhosProteinCoverage()
+  #1 record_data/gene_data.php(117):  showProteomics()
+  #2 {main}</pre></div>
+    <p>This is the exact bug the previous audit isolated from the access log as "deterministic for v3 GRMZM gene models, 2,905 × HTTP 500 in six days." The counts line up: 15,623 over 28 days is ~3,350 per six days, against 3,260 observed 500s across the three vhosts. Same bug, now with a file and a line.</p>
+    <p>It is in the phospho-protein coverage panel, and it is <strong>still live</strong> — 161 fatals on 31 Aug, the last day of data.</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Date</th><th class="num">26 Aug</th><th class="num">27 Aug</th><th class="num">28 Aug</th><th class="num">29 Aug</th><th class="num">30 Aug</th><th class="num">31 Aug</th></tr></thead>
+        <tbody><tr><td>unmute() fatals</td><td class="num">719</td><td class="num">418</td><td class="num">252</td><td class="num">283</td><td class="num">167</td><td class="num">161</td></tr></tbody>
+      </table>
+    </div>
+    <div class="fix"><span class="lab">Fix</span><p>Try PHP‑1 first — if <code>unmute()</code> lives in the missing <code>gp_lib.php</code>, restoring that file fixes this too. If not, define or remove the call at <code>gene_data_proteomics.php:962</code>. Either way, wrap the panel so a missing helper degrades to an empty section rather than killing the whole tab.</p></div>
+  </div>
+
+  <div class="finding high">
+    <div class="f-top">
+      <span class="f-id">PHP‑4</span>
+      <h3>User input reaches <code>require()</code> in the gene center router</h3>
+      <span class="pill high">High · security</span>
+    </div>
+    <p><code>controllers/gene_center.php:107</code> builds a <code>require</code> path from the URL segment. Arbitrary user strings demonstrably land in it — including URL-encoded Chinese text with quote and asterisk characters, which can only have come from someone pasting into the address bar:</p>
+    <div class="evidence"><pre>Uncaught Error: Failed opening required 'controllers/gene_center/&lt;SEGMENT&gt;.php'
+  in /var/www/html/controllers/gene_center.php:107
+  #0 /var/www/html/controller.php(88): include()
+
+observed &lt;SEGMENT&gt; values:
+  ""                        327   ← trailing-slash URL /gene_center/
+  id_converter                7
+  sitemap / gene_list         5
+  geneZm00001eb097850         5   ← malformed link, missing separator
+  gene%EF%BC%89…**Translate   3   ← pasted text, quotes and asterisks
+                            ───
+                            369 uncaught fatals</pre></div>
+    <p>Two things to be precise about. First, <strong>no traversal was attempted</strong> in 28 days — I checked every observed value for <code>..</code>, encoded dot-dot, slashes and null bytes, and found none. Second, I cannot tell from logs alone whether traversal would <em>work</em>; the fixed <code>controllers/gene_center/</code> prefix and appended <code>.php</code> constrain it considerably, and Apache normalizes <code>../</code> before PHP sees the path. So this is a dangerous shape, not a demonstrated vulnerability.</p>
+    <p>It is also a plain bug: any unrecognized sub-path under <code>/gene_center/</code> returns an uncaught fatal instead of a 404 — which compounds the soft-404 problem from the previous report.</p>
+    <div class="fix"><span class="lab">Fix</span><p>Replace the dynamic <code>require</code> with an explicit allowlist mapping known route names to files, and return a real 404 for anything else. In the redesign, never let a request-derived string reach an include path — use a route table.</p></div>
+  </div>
+
+  <div class="finding high">
+    <div class="f-top">
+      <span class="f-id">PHP‑5</span>
+      <h3>Type errors killing record pages and AJAX endpoints</h3>
+      <span class="pill high">High</span>
+    </div>
+    <p>The remaining fatals are unguarded <code>count()</code>, <code>preg_replace()</code> and <code>fwrite()</code> calls on values that are sometimes null, bool or string. Each is a page or panel that dies for a subset of records:</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Location</th><th class="num">Fatals</th><th>Error</th><th>Effect</th></tr></thead>
+        <tbody>
+          <tr><td class="path">lib/libbau/Section.php</td><td class="num">1,443</td><td><code>count()</code> on string</td><td>Template section fails mid-render</td></tr>
+          <tr><td class="path">record_data/stock_data.php</td><td class="num">496</td><td><code>count()</code> on null</td><td>Stock record pages die</td></tr>
+          <tr><td class="path">popcorn/inc/lib.php</td><td class="num">338</td><td><code>preg_replace()</code> arg mismatch</td><td>POPcorn pages die</td></tr>
+          <tr><td class="path">tools/ajax/locus_lookup/*.php</td><td class="num">296</td><td><code>fwrite()</code> on bool</td><td>4 endpoints; <code>fopen</code> failed and the result was never checked</td></tr>
+          <tr><td class="path">record_data/est_data.php</td><td class="num">91</td><td><code>string + int</code></td><td>EST records die</td></tr>
+          <tr><td class="path">search/gene/gene_search_functions.php</td><td class="num">15</td><td>Max execution time</td><td>Gene search times out entirely</td></tr>
+          <tr><td class="path">controllers/help.php</td><td class="num">12</td><td>Undefined constant <code>ANCHOR</code></td><td>Help pages die</td></tr>
+          <tr><td class="path">search/pan_gene/pan_gene_results.php</td><td class="num">9</td><td><code>isSingletonPanGene()</code> undefined</td><td>Pan-gene search dies</td></tr>
+          <tr><td class="path">lib/libbau/Nary.php</td><td class="num">9</td><td><code>_symbols()</code> on null</td><td>Bauplan parser fails on malformed template</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The <code>locus_lookup</code> group is the clearest instance of a general pattern: <code>fopen()</code> returns <code>false</code>, nobody checks, and <code>fwrite()</code> then throws. Given PHP‑2, an <code>fopen</code> failing for permissions is exactly what you would expect here.</p>
+    <div class="fix"><span class="lab">Fix</span><p>These are individually small. The systemic fix is to stop letting a failed panel take down the whole response — render sections independently and catch per section.</p></div>
+  </div>
+</section>
+
+<!-- ============ SEQUENCE ============ -->
+<section id="sequence">
+  <div class="sec-head">
+    <h2><code>get_sequence.php</code> in detail</h2>
+    <span class="sec-tag">The endpoint from the last report</span>
+  </div>
+  <p class="sec-intro">The previous audit found this endpoint failing on 31.8% of requests and could not explain why from proxy logs. This log adds three separate defects in the same file — none of which is the whole answer, but two of which matter.</p>
+
+  <div class="finding crit">
+    <div class="f-top">
+      <span class="f-id">PHP‑6</span>
+      <h3>Production was edited live and left syntactically broken — twice</h3>
+      <span class="pill crit">Critical · process</span>
+    </div>
+    <p>All 51 parse errors in 28 days are the same file, in two tight windows on one afternoon:</p>
+    <div class="evidence"><pre>20-Aug-2026 11:43    25 ×  syntax error, unexpected token "else"  … line 181
+20-Aug-2026 13:10    22 ×  syntax error, unexpected token ".="    … line 180
+20-Aug-2026 13:11     4 ×  syntax error, unexpected token ".="    … line 180</pre></div>
+    <p>A PHP parse error means the file does not run at all — not a degraded response, a dead one. For roughly a minute on each occasion, <strong>every sequence request on the site failed</strong>. The two distinct syntax errors an hour and a half apart show a file being edited in place on the production host, saved mid-edit, twice.</p>
+    <div class="fix"><span class="lab">Fix</span><p>This is a process finding, not a code one. Editing production directly also means those edits are silently reverted by the next deploy. A staging path and a syntax check (<code>php -l</code>) in the deploy step would have caught both.</p></div>
+  </div>
+
+  <div class="finding high">
+    <div class="f-top">
+      <span class="f-id">PHP‑7</span>
+      <h3>A blocking HTTP call to a sibling service sits inside the request path</h3>
+      <span class="pill high">High</span>
+    </div>
+    <div class="evidence"><pre>get_headers(https://fasta.maizegdb.org/): Failed to open stream: Connection timed out    67
+get_headers(https://fasta.maizegdb.org/): Failed to open stream: HTTP request failed!    51
+    in /var/www/html/tools/sequence/get_sequence.php on line 89</pre></div>
+    <p><code>get_sequence.php</code> makes a synchronous <code>get_headers()</code> call to <code>fasta.maizegdb.org</code> before doing its work. The previous audit established that the FASTA service is the least healthy component on the estate. So the sequence endpoint blocks on a health check against a service known to hang — and PHP's default socket timeout is 60 seconds, comfortably longer than the proxy's patience.</p>
+    <p>This is a plausible contributor to the 21,386 HTTP 504s the last report found on this endpoint, and it explains why failures were <em>load-independent</em>: the wait depends on the FASTA service's state, not on how busy the sequence server is. It is unlikely to be the whole story — only 118 of these calls timed out outright, against 84,730 failed requests — but a slow-and-succeeding <code>get_headers()</code> logs nothing at all.</p>
+    <div class="fix"><span class="lab">Fix</span><p>Remove the pre-flight check, or give it an explicit short timeout and a cached result. Never make an uncached, unbounded HTTP call to another service inside a request handler.</p></div>
+  </div>
+
+  <div class="finding med">
+    <div class="f-top">
+      <span class="f-id">PHP‑8</span>
+      <h3><code>$flank</code> is read but never set</h3>
+      <span class="pill med">Medium</span>
+    </div>
+    <p>133,379 warnings — essentially all of the "undefined variable" category — are a single variable read at six different lines of <code>get_sequence.php</code>:</p>
+    <div class="evidence"><pre>Undefined variable $flank    line 472   79,823
+                             line 487   52,875
+                             line 494      311
+                             line 484      166
+                             line 491      113
+                             line 490       57</pre></div>
+    <p>PHP evaluates an undefined variable as null, so the flanking-sequence option silently behaves as though zero flanking bases were requested. Users asking for flanking sequence are getting output that looks valid and is not what they asked for. That is worse than an error.</p>
+    <div class="fix"><span class="lab">Fix</span><p>Initialize <code>$flank</code> from the request with a validated default. Worth checking against a known record whether the feature has been quietly returning wrong output.</p></div>
+  </div>
+</section>
+
+<!-- ============ SECURITY ============ -->
+<section id="security">
+  <div class="sec-head">
+    <h2>Security read</h2>
+    <span class="sec-tag">Mostly reassuring</span>
+  </div>
+
+  <div class="finding good">
+    <div class="f-top">
+      <span class="f-id">SEC‑7</span>
+      <h3>No database or code-execution errors at all</h3>
+      <span class="pill good">Verified</span>
+    </div>
+    <p>Searches across all 4.9 million lines for SQL and dangerous-sink error signatures return nothing:</p>
+    <div class="evidence"><pre>SQL syntax / mysqli_ / "error in your SQL" / Access denied for user / table missing    0
+eval() / unserialize() / assert() / shell_exec / proc_open / popen / passthru        0
+move_uploaded_file                                                                   0</pre></div>
+    <p>This is meaningful corroboration of the previous audit's conclusion. Injection attempts that reach a database almost always leave syntax errors behind; there are none. Combined with the access-log finding that every probe hit a soft-404 or a rejection, there is no evidence of compromise in either log.</p>
+    <p>One caveat worth keeping: this shows no <em>errored</em> queries. A successful injection leaves no error. The absence is evidence, not proof.</p>
+  </div>
+
+  <div class="finding med">
+    <div class="f-top">
+      <span class="f-id">SEC‑8</span>
+      <h3>Malformed session identifiers, and unreadable session storage</h3>
+      <span class="pill med">Medium</span>
+    </div>
+    <div class="evidence"><pre>session_start(): Session ID is too long or contains illegal characters …    77
+session_start(): Failed to read session data: files
+                 (path: /var/lib/php/session)                              77</pre></div>
+    <p>The first is a client sending a hostile or corrupted session cookie — routine probing, correctly rejected by PHP. The second is the session store itself being unreadable, which is a server-side fault in the same family as PHP‑2 and worth checking while you are fixing directory permissions.</p>
+  </div>
+
+  <div class="finding med">
+    <div class="f-top">
+      <span class="f-id">SEC‑9</span>
+      <h3>Check whether errors are being displayed to users</h3>
+      <span class="pill med">Verify</span>
+    </div>
+    <p>Every fatal in this log is <em>uncaught</em>, and each carries absolute filesystem paths, function names and a full stack trace. If <code>display_errors</code> is on in production, all of that is being rendered into the response body for the 18,727 requests that died — a free architecture map for anyone probing the site.</p>
+    <p>I cannot determine this from the logs; it is a one-line check on the host.</p>
+    <div class="fix"><span class="lab">Fix</span><p>Confirm <code>display_errors=Off</code> and <code>log_errors=On</code> in the production <code>php.ini</code>. Keep it that way in the redesign, and put a generic error page in front of uncaught exceptions.</p></div>
+  </div>
+</section>
+
+<!-- ============ REDESIGN ============ -->
+<section id="redesign">
+  <div class="sec-head">
+    <h2>Carry into the redesign</h2>
+    <span class="sec-tag">Design rules earned from this log</span>
+  </div>
+
+  <div class="callout">
+    <h3>The deeper problem is that none of this was visible</h3>
+    <p>A missing library file for 28 days. A disabled template cache on every page render. 15,623 fatals on one gene tab. None of it surfaced, because 170,000 errors a day is the normal background and nobody can read that. The redesign's error handling matters more than any single bug below.</p>
+  </div>
+
+  <ol>
+    <li><strong>Treat warnings as failures in development.</strong> Both 95%-of-the-log faults are warnings, not errors — the application ran "fine" while missing a library and recompiling every template. Run the new stack at <code>E_ALL</code> with warnings escalated in CI, so this class of fault cannot reach production silently.</li>
+    <li><strong>Never build an include path from a request.</strong> PHP‑4's dynamic <code>require</code> should be an explicit route table. This is the single highest-risk pattern in the current codebase.</li>
+    <li><strong>Fail per section, not per page.</strong> Most fatals here kill an entire record page because one panel hit a null. The new record API should return partial data with a per-section error, matching the tabbed structure the previous report recommended consolidating.</li>
+    <li><strong>No synchronous calls to sibling services in a request handler.</strong> PHP‑7 puts an unbounded HTTP call to the least reliable service on the estate inside the sequence path. Cache, timeout, or drop such checks.</li>
+    <li><strong>Verify the template cache is actually writing.</strong> Bauplan's cache has been silently disabled for at least 28 days. Whatever the new stack uses, add a startup assertion that the cache directory is writable rather than trusting a warning to be noticed.</li>
+    <li><strong>Ship application errors somewhere a human sees them.</strong> The previous audit flagged that backend PHP traces were not aggregated. This file proves the cost: the answer to that report's biggest open question was sitting in a log nobody was reading.</li>
+    <li><strong>Stop editing production.</strong> PHP‑6 caught it happening twice in one afternoon. A <code>php -l</code> gate and a staging path would have prevented both outages, and would also stop live edits being silently reverted by the next deploy.</li>
+  </ol>
+</section>
+
+<!-- ============ PRIORITY ============ -->
+<section id="priority">
+  <div class="sec-head">
+    <h2>Suggested order</h2>
+    <span class="sec-tag">Current site</span>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Action</th><th>Ref</th><th>Effort</th><th>Impact</th></tr></thead>
+      <tbody>
+        <tr><td class="num">1</td><td>Restore or remove <code>gp_lib.php</code>; re-test <code>unmute()</code></td><td class="path">PHP‑1 / 3</td><td>Hours</td><td class="bad">65% of log; may fix the top fatal</td></tr>
+        <tr><td class="num">2</td><td>Make the Bauplan cache directory writable (check SELinux)</td><td class="path">PHP‑2</td><td>Hours</td><td class="bad">30% of log; every page render</td></tr>
+        <tr><td class="num">3</td><td>Fix or guard <code>unmute()</code> at <code>gene_data_proteomics.php:962</code></td><td class="path">PHP‑3</td><td>Hours</td><td class="bad">15,623 fatals; still live</td></tr>
+        <tr><td class="num">4</td><td>Allowlist the gene center router; return 404 not fatal</td><td class="path">PHP‑4</td><td>Hours</td><td>Removes a user-input <code>require</code></td></tr>
+        <tr><td class="num">5</td><td>Confirm <code>display_errors=Off</code> in production</td><td class="path">SEC‑9</td><td>Minutes</td><td>Stops trace disclosure</td></tr>
+        <tr><td class="num">6</td><td>Initialize <code>$flank</code> in <code>get_sequence.php</code></td><td class="path">PHP‑8</td><td>Minutes</td><td>Feature silently returns wrong output</td></tr>
+        <tr><td class="num">7</td><td>Bound or cache the <code>get_headers()</code> pre-flight</td><td class="path">PHP‑7</td><td>Hours</td><td>Likely contributor to 504s</td></tr>
+        <tr><td class="num">8</td><td>Guard the <code>count()</code> / <code>fwrite()</code> type errors</td><td class="path">PHP‑5</td><td>Days</td><td>~2,700 fatals across 9 pages</td></tr>
+        <tr><td class="num">9</td><td>Add <code>php -l</code> to deploy; stop live production edits</td><td class="path">PHP‑6</td><td>Hours</td><td>Prevents repeat outages</td></tr>
+        <tr><td class="num">10</td><td>Ship PHP error logs to a place someone reads</td><td class="path">—</td><td>Days</td><td>Prerequisite for noticing any of this</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  <p><strong>Method.</strong> Full parse of all 4,893,529 lines (4,801,080 timestamped entries plus 92,449 stack-trace continuations). Messages were normalized — numbers and quoted strings replaced with placeholders, the <code>in FILE on line N</code> suffix split off — then grouped by pattern and by emitting location, giving the counts above. Fatals were grouped separately and their stack traces read. Security signatures for SQL errors, dangerous sinks, traversal and file inclusion were searched across the raw file.</p>
+  <p><strong>Limits.</strong> This log records errors, not requests — it has no URLs, client IPs, or response codes, so findings here cannot be attributed to individual users or joined to the access log except by inference (as done for PHP‑3, where counts and behavior match). Successful-but-wrong behavior leaves no trace: a silently null <code>$flank</code> appears here only because PHP happens to warn. The <code>unmute()</code>/<code>gp_lib.php</code> link is a hypothesis — the dev host requires interactive authentication, so I could not read the source to confirm it. Window is 3–31 Aug 2026; the access-log audit covered 23–28 Aug, so the two overlap by six days.</p>
+</footer>
+
+</div>
