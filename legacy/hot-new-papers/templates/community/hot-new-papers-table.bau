@@ -1,0 +1,99 @@
+*(hot-new-papers-table #include-js: js/hot_new_papers.js#
+  <div id='rightcolumn-hotnewpapers'>
+    <a style='color:black'><img src='../icon/up_down.png'></img>click to sort</a>
+<!--    <a href='' style='padding-left:550px; text-decoration:underline'>Subscribe To RSSFeed</a><img src='../icon/rss_new_sm.gif'></img>-->
+    <table width='854px' id='hot-new-papers-tab' cellpadding=0 cellspacing=0 style="border-collapse: collapse;">
+      <tr class='lite_green_background'>
+        @(lambda #display: off#
+            $(row-no-selected #default: 0#)
+        )
+        <th style='width:64px; border: 1px solid white;text-align: center;'>
+          Date
+          <table align='right'>
+            <tr>
+              <td>
+                <a href="javascript:DoNav(%(lambda return $this->reflect(\)->upstream('hot-new-papers-table'\)->get('row-no-selected'\)->value(\);),1\)">
+                <img src='../icon/up.png' style='border-style: none'></a>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <a href='javascript:DoNav(%(lambda return $this->reflect(\)->upstream('hot-new-papers-table'\)->get('row-no-selected'\)->value(\);),2\)'>
+                <img src='../icon/down.png' style='border-style: none'></a>
+              </td>
+            </tr>
+          </table>
+        </th>
+        <th style='width:189px; border: 1px solid white;text-align: center;'>
+          Recommending Member
+          <table align='right'>
+            <tr>
+              <td>
+                <a href='javascript:DoNav(%(lambda return $this->reflect(\)->upstream('hot-new-papers-table'\)->get('row-no-selected'\)->value(\);),3\)'>
+                <img src='../icon/up.png' style='border-style: none'></a>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <a href='javascript:DoNav(%(lambda return $this->reflect(\)->upstream('hot-new-papers-table'\)->get('row-no-selected'\)->value(\);),4\)'>
+                <img src='../icon/down.png' style='border-style: none'></img></a>
+              </td>
+            </tr>
+          </table>
+        </th>
+        <th style='width:474px; border: 1px solid white;'>Citation</th>
+        <th style='width:118px; border: 1px solid white;text-align: center;'>Full Text Link</th>
+      </tr>
+              
+      @(lambda #display: off#
+          $(index #default: 1#)
+      )            
+      @(hot-new-recom-table-row
+        <tr style='background-color:$(row_color)' %(color-row
+            $index = $this->reflect(\)->upstream('hot-new-papers-table'\)->get('index'\);
+            $idval = $index->value(\);
+            $idstr = "";
+            if ($idval % 2 == 0\) {
+                $idstr = "id='contact-table-even'";
+            }
+            else {
+                $idstr = "id='contact-table-odd'";
+            }
+            $index->replace($idval + 1\);
+            return $idstr;)>
+          <td style='text-align: center;'>$(date)</td>
+          <td style='text-align: center;'>
+            $(recom-member) <a href="/person?id=$(personid)"><img src="../icon/person_16.png"></a>
+          </td>
+          <td>
+<!--
+            <div id=expanded_%(lambda return $this->reflect(\)->upstream('hot-new-papers-table'\)->get('index'\)->value(\)-1;) style='display:inline'>
+-->
+            <div>
+              $(citation)
+<!--
+              <a href='javascript:citation_collapse(%(scr-param return $this->reflect(\)->upstream('hot-new-papers-table'\)->get('index'\)->value(\)-1;)\)'>
+              <img src='../icon/collapse.png' style='border: none'></img></a><br><br>
+-->
+            </div>
+            <div id=collapsed_%(lambda return $this->reflect(\)->upstream('hot-new-papers-table'\)->get('index'\)->value(\)-1;) style='display:none'>
+              $(citation-collapsed)<br>
+              <a style='color:blue;font-style:italic'>Read More..</a>
+              <a href='javascript:citation_expand(%(scr-param1 return $this->reflect(\)->upstream('hot-new-papers-table'\)->get('index'\)->value(\)-1;)\)'>
+              <img src='../icon/expand.png' style='border: none'></img></a><br><br>
+            </div>
+            <div>
+              $(abstract)
+              <br><br>
+            </div>
+          </td>
+          <td style='text-align: center;'>
+            <a href=$(abstractlink)> <img src='../icon/pubmed_24.png' style='border: none; display: $(display_ab)'></a>
+            <a href=$(pdflink)><img src='../icon/pdf_24.png' style='border: none; display: $(display_pdf)'></a>
+            <a href=$(htmllink)> <img src='../icon/website_24.png' style='border: none; display: $(display_html)'></a>
+          </td>
+        </tr>
+      )
+    </table>    
+  </div>
+)

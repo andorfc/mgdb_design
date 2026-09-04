@@ -1,0 +1,46 @@
+*(hot-new-papers
+  <table width=100% cellpadding=0 cellspacing=0>
+    <tr>
+      <td>
+        <div id="centercolumn_record">
+          <div class='navarea'>
+  	        <font size="1">
+  	          <span class='underlinedlink'><a href='/index.php'>Home </a >> <a href=''>Community </a></span> >
+  	          <span class='greylink' align='right'><a href='/hot_new_papers'>Hot New Papers</a></span></font>
+  	      </div>
+  	      <br>
+          <table width='100%'  cellpadding=0 cellspacing=0>
+  			  <tr valign='center' class='green_curve_background'>
+  				  <td align='left'>
+  					  <img src='/images/header_left.gif'></img>
+  				  </td>
+  				  <td width='97%' valign='center' class='green_curve_background'>
+  					  Hot New Papers
+  				  </td>
+  				  <td align='right'>
+  					  <img src='/images/header_right.gif'></img>
+  				  </td>
+  			  </tr>
+        </table>
+        <br>
+        <div style='width:1025px;padding-left:8px' class='bluelink'>
+          The MaizeGDB Editorial Board is charged with the task of recommending 
+          noteworthy maize primary literature on a monthly basis. This list 
+          highlights research of interest to maize researchers and is 
+          appropriate for use in by journal clubs. The inaugural board was 
+          convened in January 2005 by 
+          <a href="/person?id=16906">Virginia Walbot</a>. 
+          <br><br>
+          @(membership #display: off#
+            Membership for the year $(year) includes: 
+            $(ed-board-members).
+          )
+          Below is the $(year) Editorial Board's recommended reading list along with their comments.
+        </div>
+      </div>
+      *(contact-table #load: templates/community/hot-new-papers-year-table.bau#)
+      *(contact-table-2 #load: templates/community/hot-new-papers-table.bau#)
+    </td>
+  </tr>
+</table>
+)

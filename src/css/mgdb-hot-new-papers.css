@@ -1,0 +1,266 @@
+/* file: mgdb-hot-new-papers.css
+ *
+ * purpose: page furniture for Hot New Papers (/hot_new_papers).
+ *
+ * Scoped to .mgdb-hnp-page. Descendants of a page-scope class use > so a bare
+ * element rule cannot reach into a shared component nested inside.
+ */
+
+.mgdb-hnp-page .hnp-field-narrow { max-width: 16rem; }
+
+.mgdb-hnp-page .hnp-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-top: var(--mgdb-space-3);
+}
+
+.mgdb-hnp-page .hnp-example {
+  padding: 2px 8px;
+  border: 1px solid #cfe3d6;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xs);
+  cursor: pointer;
+}
+
+.mgdb-hnp-page .hnp-example:hover {
+  border-color: var(--mgdb-green-dark);
+  background: #ffffff;
+}
+
+.mgdb-hnp-page .hnp-results-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-hnp-page #hnp-status {
+  margin: 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* --------------------------------------------------------------------------
+   One recommendation
+
+   The date sits in its own rail so a reader scanning down the list reads the
+   months without the titles shifting under them.
+   -------------------------------------------------------------------------- */
+
+.mgdb-hnp-page .hnp-list { margin-top: var(--mgdb-space-4); }
+
+.mgdb-hnp-page .hnp-paper {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  gap: var(--mgdb-space-5);
+  padding: var(--mgdb-space-5) 0;
+  border-top: 1px solid var(--mgdb-line-soft);
+}
+
+.mgdb-hnp-page .hnp-paper:first-child { border-top: 0; }
+
+@media (max-width: 620px) {
+  .mgdb-hnp-page .hnp-paper { grid-template-columns: minmax(0, 1fr); gap: var(--mgdb-space-2); }
+}
+
+.mgdb-hnp-page .hnp-paper-date {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-top: 2px;
+  line-height: var(--mgdb-leading-tight);
+}
+
+.mgdb-hnp-page .hnp-quarter {
+  margin-bottom: 2px;
+  padding: 1px 7px;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.mgdb-hnp-page .hnp-month {
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.mgdb-hnp-page .hnp-year {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 620px) {
+  .mgdb-hnp-page .hnp-paper-date { flex-direction: row; gap: var(--mgdb-space-2); }
+}
+
+.mgdb-hnp-page .hnp-paper-body { min-width: 0; }
+
+.mgdb-hnp-page .hnp-paper-title {
+  margin: 0 0 var(--mgdb-space-2);
+  font-size: var(--mgdb-text-lg);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-hnp-page .hnp-citation {
+  max-width: var(--mgdb-measure);
+  margin: 0 0 var(--mgdb-space-2);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-hnp-page .hnp-recommender {
+  margin: 0 0 var(--mgdb-space-2);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-hnp-page .hnp-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1);
+  align-items: center;
+  margin: 0 0 var(--mgdb-space-3);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* The board's comment is the reason this page exists rather than a plain
+   reference list, so it is set as a quotation rather than as body text. */
+.mgdb-hnp-page .hnp-comment {
+  max-width: var(--mgdb-measure);
+  margin: 0 0 var(--mgdb-space-3);
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-left: 3px solid var(--mgdb-gold);
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-hnp-page .hnp-comment > p {
+  margin: 0;
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-base);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-hnp-page .hnp-comment > footer {
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-hnp-page .hnp-comment cite { font-style: italic; }
+
+.mgdb-hnp-page .hnp-abstract {
+  max-width: var(--mgdb-measure);
+  padding: var(--mgdb-space-2) 0;
+  border-top: 1px dashed var(--mgdb-line);
+}
+
+.mgdb-hnp-page .hnp-abstract > summary {
+  cursor: pointer;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+/* The abstract and the board's comment are both the paper's prose, so they are
+   set at the same size. They were 14px and 16px; the larger is used. */
+.mgdb-hnp-page .hnp-abstract > p {
+  margin: var(--mgdb-space-2) 0 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-base);
+  line-height: var(--mgdb-leading);
+}
+
+/* --------------------------------------------------------------------------
+   Editorial Board
+   -------------------------------------------------------------------------- */
+
+.mgdb-hnp-page .hnp-prose { max-width: var(--mgdb-measure); }
+
+.mgdb-hnp-page .hnp-board-panel {
+  margin-top: var(--mgdb-space-5);
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-hnp-page .hnp-board-members {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-hnp-page .hnp-board-members a {
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  border: 1px solid #cfe3d6;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark) !important;
+  font-size: var(--mgdb-text-sm);
+  text-decoration: none;
+}
+
+.mgdb-hnp-page .hnp-board-members a:hover {
+  border-color: var(--mgdb-green-dark);
+  background: #ffffff;
+  text-decoration: underline;
+}
+
+.mgdb-hnp-page .hnp-board-empty { color: var(--mgdb-muted); }
+
+/* --------------------------------------------------------------------------
+   Other resources — ten links in two rows of five
+   -------------------------------------------------------------------------- */
+
+.mgdb-hnp-page .hnp-resource-list { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+
+@media (max-width: 1100px) {
+  .mgdb-hnp-page .hnp-resource-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 760px) {
+  .mgdb-hnp-page .hnp-resource-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 480px) {
+  .mgdb-hnp-page .hnp-resource-list { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* --------------------------------------------------------------------------
+   Anchor offset
+
+   The shared rule is scroll-margin-top: 4.5rem, which clears a one-row tab
+   bar. Five tabs fit on one row at desktop width and wrap below it, so the
+   page sets its own and the scrollspy reads this value rather than guessing.
+   -------------------------------------------------------------------------- */
+
+.mgdb-hnp-page > section[id] { scroll-margin-top: 8rem; }
+
+/* --------------------------------------------------------------------------
+   Chart height
+
+   .mgdb-chart in the shared stylesheet is a fixed 320px, and .mgdb-chart-tall
+   is not defined in any stylesheet -- so a chart asking for more was drawn at
+   320 whatever its layout said, and a seventeen-row heat map painted its axis
+   labels and colorbar over the section below. The page script sets the height
+   on the element from the same variable it passes to Plotly; this lets that
+   inline height take effect and stops the box from clipping what is drawn.
+   -------------------------------------------------------------------------- */
+
+.mgdb-hnp-page .mgdb-chart {
+  height: auto;
+  min-height: 320px;
+  overflow: visible;
+}
