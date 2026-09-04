@@ -877,6 +877,18 @@ src/pages/index2/index.php                       index2/index.php
 src/pages/index3/index.php                       index3/index.php
 src/pages/index4/index.php                       index4/index.php
 
+# Feedback — the form the header button opens, and the /feedback page behind it.
+# Restores the Atlassian issue collector the legacy shell carried (AD-009), as
+# a MaizeGDB form posting to the collector's endpoint from the server rather
+# than a third-party script and iframe. The stylesheet and script load from
+# templates/home/maizegdb_header_modern.bau, so every modern page has the
+# dialog; the controller also serves the form on its own at
+# /feedback?embed=form, which is what the dialog fetches.
+src/include/feedback_lib.php                     include/feedback_lib.php
+src/controllers/feedback.php                     controllers/feedback.php
+src/templates/static/mgdb_feedback.bau           templates/static/mgdb_feedback.bau
+src/css/mgdb-feedback.css                        css/mgdb-feedback.css
+src/js/mgdb-feedback.js                          js/mgdb-feedback.js
 src/include/api/v1/records/pan_gene.php                       include/api/v1/records/pan_gene.php
 src/templates/static/mgdb_pan_gene_notfound.bau               templates/static/mgdb_pan_gene_notfound.bau
 src/templates/static/mgdb_ssr_notfound.bau                    templates/static/mgdb_ssr_notfound.bau

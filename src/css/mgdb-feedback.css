@@ -1,0 +1,366 @@
+/* ==========================================================================
+   MaizeGDB Modern — feedback form and dialog
+   --------------------------------------------------------------------------
+   Two things share one set of rules:
+
+     1. /feedback, where the form is the page.
+     2. The dialog the Feedback button in the header opens on every other page,
+        which fetches the same markup from /feedback?embed=form.
+
+   So nothing here may be scoped to the page class — only the layout block at
+   the end is. The rest is scoped under `.mgdb-modern` because the legacy
+   sheets style bare `fieldset`, `legend` and `label` sitewide and those rules
+   would otherwise reach into the dialog.
+
+   The controls themselves are the shared ones: .mgdb-field, .mgdb-label,
+   .mgdb-input, .mgdb-textarea, .mgdb-form-actions, .mgdb-message. What is
+   added here is the type chooser, the two-up name/email row, the consent line,
+   the character count, and the dialog shell.
+
+   Loaded on every modern page from templates/home/maizegdb_header_modern.bau,
+   because that is where the button lives. It is the last stylesheet in the
+   document, so every rule is written to win only inside its own component —
+   nothing here uses a bare element selector without a .mgdb-feedback ancestor.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. The form
+   -------------------------------------------------------------------------- */
+
+.mgdb-modern .mgdb-feedback-form > * + * { margin-top: var(--mgdb-space-5); }
+
+.mgdb-modern .mgdb-feedback-form .mgdb-field + .mgdb-field { margin-top: var(--mgdb-space-5); }
+
+/* The status line the script writes into: a failed send, or the confirmation
+   after a successful one. Carries no styling of its own — it is filled with a
+   .mgdb-message, so an empty one is invisible even before [hidden] applies. */
+.mgdb-modern .mgdb-feedback-status:not([hidden]) { display: block; }
+
+/* Type chooser
+   --------------------------------------------------------------------------
+   Four choices, each with a line saying what belongs under it, so the reader
+   picks the right one without having to guess from a one-word label. The radio
+   stays visible: it is the control, and hiding it in favour of a styled box
+   loses the state cue in forced-colors mode. */
+.mgdb-modern .mgdb-feedback-types {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.mgdb-modern .mgdb-feedback-types > legend {
+  margin-bottom: var(--mgdb-space-3);
+  padding: 0;
+  float: none;
+  width: auto;
+}
+
+.mgdb-modern .mgdb-feedback-type-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--mgdb-space-3);
+}
+
+.mgdb-modern .mgdb-feedback-type {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 2px var(--mgdb-space-3);
+  align-items: start;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  cursor: pointer;
+}
+
+.mgdb-modern .mgdb-feedback-type:hover { border-color: var(--mgdb-green); }
+
+.mgdb-modern .mgdb-feedback-type input[type="radio"] {
+  grid-row: 1 / span 2;
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+  accent-color: var(--mgdb-green-dark);
+}
+
+.mgdb-modern .mgdb-feedback-type-label {
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-modern .mgdb-feedback-type-hint {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+/* :has is the only way to reach the label from the input's state without a
+   script. Where it is unsupported the radio still shows which is chosen, so
+   the card simply stays unhighlighted rather than the choice being unreadable. */
+.mgdb-modern .mgdb-feedback-type:has(input:checked) {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+  box-shadow: inset 0 0 0 1px var(--mgdb-green-dark);
+}
+
+.mgdb-modern .mgdb-feedback-type:has(input:focus-visible) {
+  outline: 2px solid var(--mgdb-focus);
+  outline-offset: 2px;
+}
+
+/* Name and email sit side by side on a wide form and stack on a narrow one.
+   The shared .mgdb-field margin is cancelled inside the row, or the second
+   field keeps its stacked spacing while sitting beside the first.
+
+   Both columns hold a label and then an input, and nothing else — the email
+   hint moved below its input for exactly this reason. Anything that varies in
+   height above a control pushes that control out of line with its neighbour,
+   and no amount of aligning inside the item fixes it. */
+.mgdb-modern .mgdb-feedback-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--mgdb-space-4);
+  align-items: start;
+}
+
+/* Grid items floor at min-width:auto, which is the input's own intrinsic
+   width. Without this a field can be wider than its track and run under the
+   column beside it. */
+.mgdb-modern .mgdb-feedback-pair > .mgdb-field { min-width: 0; }
+
+.mgdb-modern .mgdb-feedback-pair .mgdb-field + .mgdb-field { margin-top: 0; }
+
+/* .mgdb-hint is written to sit above a control. Under one it needs its margin
+   on the other side. */
+.mgdb-modern .mgdb-feedback-form .mgdb-feedback-help {
+  margin-top: var(--mgdb-space-2);
+  margin-bottom: 0;
+}
+
+.mgdb-modern .mgdb-feedback-count {
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  text-align: right;
+}
+
+.mgdb-modern .mgdb-feedback-count[data-near-limit] {
+  color: var(--mgdb-status-warn);
+  font-weight: 600;
+}
+
+.mgdb-modern .mgdb-feedback-consent {
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-modern .mgdb-feedback-check {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--mgdb-space-3);
+  align-items: start;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+  cursor: pointer;
+}
+
+.mgdb-modern .mgdb-feedback-check input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 1px 0 0;
+  accent-color: var(--mgdb-green-dark);
+}
+
+/* The honeypot. Off-screen rather than display:none, because form fillers and
+   simple scrapers skip hidden inputs and this one is meant to be filled in. */
+.mgdb-modern .mgdb-feedback-trap {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.mgdb-modern .mgdb-feedback-form .mgdb-form-actions { align-items: center; }
+
+/* While a submission is in flight the button says so and the form stops
+   accepting a second one. */
+.mgdb-modern .mgdb-feedback-form[data-sending] { opacity: .7; }
+
+@media (max-width: 640px) {
+  .mgdb-modern .mgdb-feedback-type-row,
+  .mgdb-modern .mgdb-feedback-pair { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* --------------------------------------------------------------------------
+   2. The dialog
+
+   A native <dialog> opened with showModal, so the browser supplies the top
+   layer, the backdrop, focus containment, and Escape. The script only fills it
+   and opens it. Where <dialog> is missing the button is left alone and follows
+   its href to /feedback instead.
+   -------------------------------------------------------------------------- */
+
+/* The dialog is a child of <body>, not of .mgdb-page, and the shared sheet
+   scopes its reset to .mgdb-page — so inside the dialog `box-sizing` fell back
+   to content-box and every `width: 100%` control drew 26px wider than its
+   column, running under the column beside it. The element carries `mgdb-page`
+   for that reset; the rules below take back the page padding and width it also
+   sets, and win on both specificity and order. */
+.mgdb-modern .mgdb-feedback-dialog {
+  display: none;
+  box-sizing: border-box;
+  width: min(46rem, calc(100vw - 2rem));
+  max-width: none;
+  max-height: min(88vh, 52rem);
+  padding: 0;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  box-shadow: var(--mgdb-shadow-lg);
+  font-family: var(--mgdb-font);
+  font-size: var(--mgdb-text-base);
+  line-height: var(--mgdb-leading);
+  overflow: hidden;
+}
+
+.mgdb-modern .mgdb-feedback-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.mgdb-modern .mgdb-feedback-dialog::backdrop {
+  background: rgba(12, 26, 20, .55);
+}
+
+.mgdb-modern .mgdb-feedback-dialog-head {
+  display: flex;
+  gap: var(--mgdb-space-4);
+  align-items: flex-start;
+  justify-content: space-between;
+  flex: 0 0 auto;
+  padding: var(--mgdb-space-5) var(--mgdb-space-6);
+  border-bottom: 1px solid var(--mgdb-line-soft);
+  background: linear-gradient(135deg, #f8fbf5 0%, var(--mgdb-green-soft) 100%);
+}
+
+.mgdb-modern .mgdb-feedback-dialog-head h2 {
+  margin: 0 0 var(--mgdb-space-1);
+  padding: 0;
+  border: 0;
+  color: var(--mgdb-green-dark);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xl);
+  font-weight: 700;
+  line-height: var(--mgdb-leading-snug);
+  text-shadow: none;
+}
+
+.mgdb-modern .mgdb-feedback-dialog-head p {
+  max-width: 44ch;
+  margin: 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-modern .mgdb-feedback-dialog-close {
+  display: flex;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--mgdb-radius-sm);
+  background: transparent;
+  color: var(--mgdb-ink-soft);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mgdb-modern .mgdb-feedback-dialog-close:hover {
+  border-color: var(--mgdb-line);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+}
+
+.mgdb-modern .mgdb-feedback-dialog-body {
+  flex: 1 1 auto;
+  padding: var(--mgdb-space-5) var(--mgdb-space-6) var(--mgdb-space-6);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* The dialog is narrower than the page, so its type chooser stacks earlier
+   than the page's breakpoint would. */
+@media (max-width: 720px) {
+  .mgdb-modern .mgdb-feedback-dialog-head,
+  .mgdb-modern .mgdb-feedback-dialog-body { padding-inline: var(--mgdb-space-4); }
+}
+
+.mgdb-modern .mgdb-feedback-dialog-loading {
+  display: flex;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  padding: var(--mgdb-space-6) 0;
+  color: var(--mgdb-muted);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mgdb-modern .mgdb-feedback-dialog[open] { animation: mgdb-feedback-in .18s ease-out; }
+  .mgdb-modern .mgdb-feedback-dialog[open]::backdrop { animation: mgdb-feedback-fade .18s ease-out; }
+}
+
+@keyframes mgdb-feedback-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes mgdb-feedback-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* --------------------------------------------------------------------------
+   3. /feedback itself
+   -------------------------------------------------------------------------- */
+
+.mgdb-page.mgdb-feedback-page .mgdb-feedback-layout { margin-top: var(--mgdb-space-6); }
+
+.mgdb-page.mgdb-feedback-page > .mgdb-message { margin-top: var(--mgdb-space-5); }
+
+.mgdb-page.mgdb-feedback-page .mgdb-feedback-panel {
+  padding: var(--mgdb-space-5) var(--mgdb-space-6) var(--mgdb-space-6);
+  border: 1px solid var(--mgdb-line);
+  border-top: 4px solid var(--mgdb-green-dark);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-page.mgdb-feedback-page .mgdb-feedback-panel > .mgdb-section-heading {
+  margin-bottom: var(--mgdb-space-5);
+}
+
+.mgdb-page.mgdb-feedback-page .mgdb-feedback-rail {
+  display: grid;
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-page.mgdb-feedback-page .mgdb-feedback-rail .mgdb-list { color: var(--mgdb-muted); }
+
+@media (max-width: 900px) {
+  .mgdb-page.mgdb-feedback-page .mgdb-feedback-layout { grid-template-columns: minmax(0, 1fr); }
+}

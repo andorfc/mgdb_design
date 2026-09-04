@@ -1,0 +1,54 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-feedback
+<main class="mgdb-page mgdb-feedback-page" id="mgdb-feedback-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Feedback</span>
+  </nav>
+
+  <section class="mgdb-hero-basic" aria-labelledby="feedback-title">
+    <span class="mgdb-hero-basic-icon" aria-hidden="true">
+      <svg viewBox="0 0 84 84" role="presentation" focusable="false">
+        <path d="M13 17h58a5 5 0 0 1 5 5v33a5 5 0 0 1-5 5H35L20 72V60h-7a5 5 0 0 1-5-5V22a5 5 0 0 1 5-5z" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/>
+        <path d="M23 32h38M23 45h26" fill="none" stroke="#2f5e2a" stroke-width="5" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <div>
+      <h1 id="feedback-title">$(feedback-title)</h1>
+      <p>$(feedback-intro)</p>
+    </div>
+  </section>
+
+  $(feedback-banner)
+
+  <div class="mgdb-prose-layout mgdb-feedback-layout">
+    <section class="mgdb-feedback-panel" aria-labelledby="feedback-form-title">
+      <div class="mgdb-section-heading">
+        <div><h2 id="feedback-form-title">$(feedback-heading)</h2></div>
+      </div>
+      $(feedback-form)
+    </section>
+
+    <aside class="mgdb-feedback-rail">
+      <div class="mgdb-aside-card">
+        <h2>Other ways to reach us</h2>
+        <ul class="mgdb-list">
+          <li><a href="mailto:mgdb-tech@iastate.edu">mgdb-tech@iastate.edu</a> for anything general.</li>
+          <li><a href="/contact">Contact page</a> to reach a curator or developer by name.</li>
+          <li><a href="/cite">How to cite</a> for the current MaizeGDB reference.</li>
+        </ul>
+      </div>
+
+      <div class="mgdb-aside-card">
+        <h2>What helps most</h2>
+        <ul class="mgdb-list">
+          <li>The identifier of the record: a gene model, stock, or reference.</li>
+          <li>The address of the page you were on.</li>
+          <li>What you expected to see, and what you saw instead.</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+</main>
+)
