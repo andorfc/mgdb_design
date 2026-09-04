@@ -1,0 +1,65 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-map-notfound
+<meta name="robots" content="noindex">
+<meta property="og:title" content="No map found &mdash; MaizeGDB">
+<meta property="og:description" content="$(notfound_summary)">
+
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-record-notfound-page" id="map-notfound-top">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/map">Map Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Not found</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-notfound-hero" aria-labelledby="map-notfound-title">
+    <div class="mgdb-hero-body">
+      <h1 id="map-notfound-title">No map matches &ldquo;$(requested_display)&rdquo;</h1>
+      <p class="mgdb-rec-lead">No genetic, cytogenetic, or physical map in MaizeGDB carries that name or MaizeGDB ID.</p>
+    </div>
+  </section>
+
+  <section id="map-notfound-search" aria-labelledby="map-notfound-search-title">
+    <div class="mgdb-section-heading"><div><h2 id="map-notfound-search-title">Search</h2></div></div>
+    <form class="mgdb-rec-search" action="/data_center/map" method="get" role="search">
+      <label class="mgdb-visually-hidden" for="map-notfound-query">Map name or MaizeGDB ID</label>
+      <input class="mgdb-input" id="map-notfound-query" name="term" type="search" autocomplete="off" value="$(requested_value)" placeholder="Map name or MaizeGDB ID" />
+      <button class="mgdb-button mgdb-button-primary" type="submit">Search maps</button>
+    </form>
+    <p class="mgdb-rec-examples">
+      <span>Try an example&#58;</span>
+      <a class="mgdb-rec-example" href="/data_center/map/64489">bins 1</a>
+      <a class="mgdb-rec-example" href="/data_center/map/978377">IBM2 2005 Neighbors 1</a>
+      <a class="mgdb-rec-example" href="/data_center/map/978692">IBM2 2005 Neighbors Frame 1</a>
+    </p>
+    <p class="mgdb-rec-hint">A record page needs one map&#58; its name or its MaizeGDB ID. A map name usually ends in its chromosome number, as in <em>bins 1</em>. A gene symbol names a locus, and a locus is placed on many maps rather than being one.</p>
+  </section>
+
+  $(suggestion_sections)
+
+  <section class="mgdb-hub-related" id="map-notfound-resources" aria-labelledby="map-notfound-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="map-notfound-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/map">
+          <strong>Map Data Hub</strong>
+          <span>Search every genetic, cytogenetic, and physical chromosome map</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>Classical loci and the gene models that represent them</span>
+        </a>
+        <a href="/data_center/qtl">
+          <strong>QTL Experiments</strong>
+          <span>Trait experiments and the map intervals their QTL fall in</span>
+        </a>
+        <a href="/searchall">
+          <strong>Search all MaizeGDB data</strong>
+          <span>One search across genes, loci, stocks, references, and every other data type</span>
+        </a>
+        <a href="https\://jbrowse.maizegdb.org/" target="_blank" rel="noopener">
+          <strong>MaizeGDB JBrowse 2</strong>
+          <span>Explore maize features in their genomic context</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

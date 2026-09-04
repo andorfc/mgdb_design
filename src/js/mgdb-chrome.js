@@ -154,11 +154,11 @@
 
   /* Description hint
      ------------------------------------------------------------------------
-     The Data Hubs panel lists twenty destinations with no room for a
-     description under each. Rather than twenty native tooltips -- which do not
-     appear on touch at all, wait about a second, and cannot be styled -- each
-     link carries data-desc and the panel carries one region that shows the
-     description of whatever the pointer or keyboard is on.
+     The Data Hubs and Tools panels list their destinations with no room for a
+     description under each. Rather than a native tooltip per link -- which do
+     not appear on touch at all, wait about a second, and cannot be styled --
+     each link carries data-desc and the panel carries one region that shows
+     the description of whatever the pointer or keyboard is on.
 
      The default text is kept on the region itself so a panel can word its own
      resting state. Nothing here runs when the markup is absent, so the other
@@ -191,11 +191,22 @@
       });
 
       // Resetting per-link on mouseleave would flicker while crossing the gap
-      // between two rows; reset once, when the pointer leaves the whole panel.
-      panel.addEventListener('mouseleave', function () { show(''); });
-      panel.addEventListener('focusout', function () {
+      // between two rows; reset once, when the pointer leaves the list.
+      //
+      // The list, not the whole panel: the hint sits in the panel heading, so
+      // resetting on the panel left the last description standing while the
+      // pointer travelled up across the heading and out of the menu. Every
+      // described link shares the .mega-grid that holds the lists; the panel
+      // is the fallback for a layout that has no grid.
+      var region = described[0].closest ? described[0].closest('.mega-grid') : null;
+      if (!region || described.some(function (link) { return !region.contains(link); })) {
+        region = panel;
+      }
+
+      region.addEventListener('mouseleave', function () { show(''); });
+      region.addEventListener('focusout', function () {
         window.setTimeout(function () {
-          if (!panel.contains(document.activeElement)) { show(''); }
+          if (!region.contains(document.activeElement)) { show(''); }
         }, 0);
       });
     });

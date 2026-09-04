@@ -53,10 +53,12 @@
     return;
   }
 
-  /* Reference record pages. The modern controller returns false without
-     publishing when the identifier does not resolve, so an unknown id falls
-     through to the original code and its 404 handling.
-     Rollback: delete this block. */
+  /* Reference record pages, on the shared record shell. An identifier that
+     does not resolve gets a real 404 from the modern controller rather than
+     falling through, so this block answers every reference id.
+     Rollback: delete this block.
+     Pre-redesign originals are archived in the redesign repo under
+     legacy/reference-record/. */
   if (PAGE == 'reference' && getCGIParam('id', 'G', ID)) {
     if (include('controllers/data_center/reference_record_modern.php')) {
       return;
@@ -83,10 +85,12 @@
     exit;
   }
 
-  /* Stock record pages. The modern controller returns false without publishing
-     when the identifier does not resolve, so an unknown id falls through to
-     the original code and its 404 handling rather than being answered twice.
-     Rollback: delete this block. */
+  /* Stock record pages, on the shared record shell. An identifier that does
+     not resolve gets a real 404 from the modern controller rather than falling
+     through, so this block answers every stock id.
+     Rollback: delete this block.
+     Pre-redesign originals are archived in the redesign repo under
+     legacy/stock-record/. */
   if (PAGE == 'stock' && getCGIParam('id', 'G', ID)) {
     if (include('controllers/data_center/stock_record_modern.php')) {
       return;
@@ -105,14 +109,47 @@
      on disk unreachable. Keeping the guards in the repository is what stops
      that: this file is deployed from the manifest, so anything not written
      here does not survive the next deploy. */
+  /* BAC record pages, on the shared record shell. A BAC is a probe, so the
+     page shares the marker record's API resource and script.
+     Rollback: delete this block.
+     Pre-redesign originals are archived in the redesign repo under
+     legacy/bac-record/. */
+  if (PAGE == 'bac' && getCGIParam('id', 'G', ID)) {
+    if (include('controllers/data_center/bac_record_modern.php')) {
+      return;
+    }
+  }
+
   if (PAGE == 'bac' && !getCGIParam('id', 'G', ID)) {
     include('controllers/data_center/bac_search_modern.php');
     return;
   }
 
+  /* A cytogenetic id names a map, a locus or a stock -- there is no
+     cytogenetic record type -- so this routes to the record page that holds
+     it, or answers a real 404. Before this the id was ignored and the
+     pre-redesign search page was served with a 200.
+     Rollback: delete this block. */
+  if (PAGE == 'cytogenetic' && getCGIParam('id', 'G', ID)) {
+    if (include('controllers/data_center/cytogenetic_record_modern.php')) {
+      return;
+    }
+  }
+
   if (PAGE == 'cytogenetic' && !getCGIParam('id', 'G', ID)) {
     include('controllers/data_center/cytogenetic_search_modern.php');
     return;
+  }
+
+  /* EST record pages, on the shared record shell. An EST is a probe, so the
+     page shares the marker record's API resource and script.
+     Rollback: delete this block.
+     Pre-redesign originals are archived in the redesign repo under
+     legacy/est-record/. */
+  if (PAGE == 'est' && getCGIParam('id', 'G', ID)) {
+    if (include('controllers/data_center/est_record_modern.php')) {
+      return;
+    }
   }
 
   if (PAGE == 'est' && !getCGIParam('id', 'G', ID)) {
@@ -161,6 +198,53 @@
     return;
   }
 
+  /* The locus record page. It publishes its own 404 and its own redirect for
+     loci of type 'Gene', so it always returns true and never falls through to
+     the legacy record code. */
+  if (PAGE == 'locus' && getCGIParam('id', 'G', ID)) {
+    if (include('controllers/data_center/locus_record_modern.php')) {
+      return;
+    }
+  }
+
+  /* Primer record page. Also serves restriction enzymes: gel_pattern.enzyme
+     points at mgdb.primer, so XbaI is a primer record. */
+  if (PAGE == 'primer' && getCGIParam('id', 'G', ID)) {
+    if (include('controllers/data_center/primer_record_modern.php')) {
+      return;
+    }
+  }
+
+  /* Gel pattern record page. */
+  if (PAGE == 'gel' && getCGIParam('id', 'G', ID)) {
+    if (include('controllers/data_center/gel_record_modern.php')) {
+      return;
+    }
+  }
+
+  /* Recombination dataset record page. */
+  if (PAGE == 'recombination' && getCGIParam('id', 'G', ID)) {
+    if (include('controllers/data_center/recombination_record_modern.php')) {
+      return;
+    }
+  }
+
+  /* Map score record page. */
+  if (PAGE == 'map_scores' && getCGIParam('id', 'G', ID)) {
+    if (include('controllers/data_center/map_scores_record_modern.php')) {
+      return;
+    }
+  }
+
+  /* Term and trait are one record over mgdb.term, drawn two ways by the legacy
+     pages. Both routes reach the same modern page, which shows whichever
+     sections have rows; the route decides only the noun in the title. */
+  if ((PAGE == 'term' || PAGE == 'trait') && getCGIParam('id', 'G', ID)) {
+    if (include('controllers/data_center/term_record_modern.php')) {
+      return;
+    }
+  }
+
   if (PAGE == 'map' && !getCGIParam('id', 'G', ID)) {
     include('controllers/data_center/map_search_modern.php');
     return;
@@ -184,6 +268,27 @@
     return;
   }
 
+  /* Marker record pages. The modern controller answers a 404 itself when the
+     identifier does not resolve, so it always returns true and the legacy
+     not-found template is not reached. Originals archived in the redesign
+     repo under legacy/marker-record/. Rollback: delete this block. */
+  if (PAGE == 'marker' && getCGIParam('id', 'G', ID)) {
+    if (include('controllers/data_center/marker_record_modern.php')) {
+      return;
+    }
+  }
+
+  /* Overgo record pages, on the shared record shell. An overgo is a probe, so
+     the page shares the marker record's API resource and script.
+     Rollback: delete this block.
+     Pre-redesign originals are archived in the redesign repo under
+     legacy/overgo-record/. */
+  if (PAGE == 'overgo' && getCGIParam('id', 'G', ID)) {
+    if (include('controllers/data_center/overgo_record_modern.php')) {
+      return;
+    }
+  }
+
   if (PAGE == 'overgo' && !getCGIParam('id', 'G', ID)) {
     include('controllers/data_center/overgo_search_modern.php');
     return;
@@ -194,9 +299,30 @@
     return;
   }
 
+  /* Phenotype record pages. The modern controller answers a 404 itself when
+     the identifier does not resolve, so it always returns true. Originals
+     archived in the redesign repo under legacy/phenotype-record/. Rollback:
+     delete this block. */
+  if (PAGE == 'phenotype' && getCGIParam('id', 'G', ID)) {
+    if (include('controllers/data_center/phenotype_record_modern.php')) {
+      return;
+    }
+  }
+
   if (PAGE == 'qtl' && !getCGIParam('id', 'G', ID)) {
     include('controllers/data_center/qtl_search_modern.php');
     return;
+  }
+
+  /* SSR record pages, on the shared record shell. An SSR is a probe, so the
+     page shares the marker record's API resource and script.
+     Rollback: delete this block.
+     Pre-redesign originals are archived in the redesign repo under
+     legacy/ssr-record/. */
+  if (PAGE == 'ssr' && getCGIParam('id', 'G', ID)) {
+    if (include('controllers/data_center/ssr_record_modern.php')) {
+      return;
+    }
   }
 
   if (PAGE == 'ssr' && !getCGIParam('id', 'G', ID)) {

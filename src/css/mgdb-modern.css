@@ -2106,7 +2106,30 @@ a.mgdb-metric.mgdb-tone-blue:hover     { border-left-color: var(--mgdb-status-in
   box-shadow: var(--mgdb-shadow-sm);
 }
 
-.mgdb-card > * + * { margin-top: var(--mgdb-space-3); }
+/* Card rhythm.
+
+   The sibling gap needs the `.mgdb-page` ancestor to reach a paragraph. `*`
+   contributes nothing to specificity, so `.mgdb-card > * + *` alone weighs
+   (0,1,0) and loses to `.mgdb-page p, .mgdb-page ul, … { margin: 0 }` at
+   (0,1,1) about 1,900 lines above -- for every p, ul, ol, dl, figure and table
+   in a card, on every page that has one. The gap has therefore never applied to
+   a card built out of paragraphs: on /contact the closing link of each card sat
+   1px below the description. The bare selector is kept beside it so a card that
+   ever lands outside .mgdb-page still gets the spacing (as of 2026-09-03 there
+   is none: checked on all 30 pages that draw a card).
+
+   The first child then has to give its own margin back, because a heading's
+   margin sits inside the card's padding rather than collapsing out of it: a
+   .mgdb-card measured 46px above its h3 (24px of padding plus the h3's 22px)
+   against 25px below its last line, so every card rode low in its own box.
+
+   Page sheets load after this one and several already carry their own version
+   of one of these rules; each still outranks this one, so `.mgdb-rec-grid` and
+   `.genome-grid` keep their deliberate zero gap and /fatcat keeps its 8px. */
+.mgdb-card > * + *,
+.mgdb-page .mgdb-card > * + * { margin-top: var(--mgdb-space-3); }
+
+.mgdb-card > :first-child { margin-top: 0; }
 
 .mgdb-card-grid {
   display: grid;
@@ -2216,6 +2239,25 @@ a.mgdb-card h3 { text-decoration: underline; }
   text-decoration: underline;
 }
 
+/* A card whose link leaves MaizeGDB says so with an arrow after its title.
+   maizegdb.org and its subdomains -- jbrowse, wgs, download, images, gcv,
+   qteller, snptools, documents -- are the same site, so they carry none, and
+   neither do the relative links, which cannot leave. Writing the rule against
+   the href rather than a hand-placed chip means a new card is marked correctly
+   the moment it is written, and can never drift out of step with its own
+   destination. */
+.mgdb-resource-list a[href^="http"] > strong::after,
+.mgdb-resource-list a[href^="//"] > strong::after {
+  content: " \2197";
+  font-size: .85em;
+  font-weight: 600;
+}
+
+.mgdb-resource-list a[href*="//maizegdb.org"] > strong::after,
+.mgdb-resource-list a[href*=".maizegdb.org"] > strong::after {
+  content: none;
+}
+
 .mgdb-resource-list span {
   display: block;
   margin-top: var(--mgdb-space-2);
@@ -2224,6 +2266,8 @@ a.mgdb-card h3 { text-decoration: underline; }
   line-height: var(--mgdb-leading-snug);
 }
 
+/* The only chip left on a resource card is the pattern library's "Reference"
+   marker. Internal / External chips were retired in favor of the arrow above. */
 .mgdb-resource-list .mgdb-resource-badge {
   display: inline-flex;
   align-items: center;
@@ -2236,18 +2280,6 @@ a.mgdb-card h3 { text-decoration: underline; }
   font-weight: 700;
   background: var(--mgdb-green-soft);
   color: var(--mgdb-green-dark);
-}
-
-.mgdb-resource-list .mgdb-resource-badge-external {
-  background: var(--mgdb-gold-soft);
-  color: var(--mgdb-gold-dark);
-}
-
-.mgdb-resource-list .mgdb-resource-badge-external::after {
-  content: "\2197";
-  font-size: 1.1em;
-  line-height: 1;
-  margin-left: 2px;
 }
 
 .mgdb-resource-list a.mgdb-external::after {
@@ -2644,6 +2676,142 @@ a.mgdb-card h3 { text-decoration: underline; }
 .mgdb-table th[aria-sort="ascending"] button::after { content: "\25B2"; font-size: .7em; }
 .mgdb-table th[aria-sort="descending"] button::after { content: "\25BC"; font-size: .7em; }
 .mgdb-table th[aria-sort="none"] button::after { content: "\21C5"; color: var(--mgdb-muted); font-size: .8em; }
+
+/* --------------------------------------------------------------------------
+   References
+
+   One shape for a cited paper, wherever it appears. Taken from /NAM_project,
+   which is where the group settled it: journal and year as a pill, the DOI in
+   mono beside it, the title in burgundy, then authors, citation, the abstract
+   in a green-edged well, and the links as buttons.
+
+   It lives here rather than in the hub sheet because it is a shared component:
+   the hubs, the record pages and the stock record page all render one, and
+   only the first of those loads css/mgdb-hub.css. `include/references_lib.php`
+   emits the same markup server-side, and js/mgdb-record.js emits it from an
+   API payload; all three have to agree.
+   -------------------------------------------------------------------------- */
+
+.mgdb-ref-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-ref {
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--hub-line, var(--mgdb-line));
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-ref-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-ref-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.mgdb-ref-doi {
+  color: var(--mgdb-muted);
+  font-family: var(--mgdb-font-mono);
+  font-size: 11px;
+  /* A DOI is one unbroken token and will push a narrow card wide. */
+  overflow-wrap: anywhere;
+}
+
+.mgdb-ref-title {
+  margin: 0 0 var(--mgdb-space-2);
+  color: var(--mgdb-burgundy);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.mgdb-ref-title a { color: inherit; }
+
+.mgdb-ref-authors {
+  margin: 0 0 var(--mgdb-space-1);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.4;
+}
+
+.mgdb-ref-citation {
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-ref-abstract {
+  margin-bottom: var(--mgdb-space-4);
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-left: 3px solid var(--mgdb-green);
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-ref-abstract h4 {
+  margin: 0 0 4px;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.mgdb-ref-abstract p {
+  margin: 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  line-height: 1.6;
+}
+
+.mgdb-ref-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+}
+
+/* The copy buttons sit beside the link buttons and must match their height, or
+   the row steps. */
+.mgdb-ref-actions .mgdb-ref-copy {
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--hub-line, var(--mgdb-line));
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink-soft);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mgdb-ref-actions .mgdb-ref-copy:hover {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+}
+
+@media (max-width: 640px) {
+  .mgdb-ref { padding: var(--mgdb-space-4); }
+  .mgdb-ref-title { font-size: 1.1rem; }
+}
+
 
 /* Status pill — always contains a text label, never color alone. */
 .mgdb-pill {

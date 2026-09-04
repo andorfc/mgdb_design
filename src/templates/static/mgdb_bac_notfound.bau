@@ -1,0 +1,65 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-bac-notfound
+<meta name="robots" content="noindex">
+<meta property="og:title" content="No BAC found &mdash; MaizeGDB">
+<meta property="og:description" content="$(notfound_summary)">
+
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-record-notfound-page" id="bac-notfound-top">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/bac">BAC Data Center</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Not found</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-notfound-hero" aria-labelledby="bac-notfound-title">
+    <div class="mgdb-hero-body">
+      <h1 id="bac-notfound-title">No BAC matches &ldquo;$(requested_display)&rdquo;</h1>
+      <p class="mgdb-rec-lead">MaizeGDB holds $(total_bacs) expressed sequence tags. None of them carries that name, synonym, or MaizeGDB ID.</p>
+    </div>
+  </section>
+
+  <section id="bac-notfound-search" aria-labelledby="bac-notfound-search-title">
+    <div class="mgdb-section-heading"><div><h2 id="bac-notfound-search-title">Search</h2></div></div>
+    <form class="mgdb-rec-search" action="/data_center/bac" method="get" role="search">
+      <label class="mgdb-visually-hidden" for="bac-notfound-query">BAC name, accession, or MaizeGDB ID</label>
+      <input class="mgdb-input" id="bac-notfound-query" name="term" type="search" autocomplete="off" value="$(requested_value)" placeholder="BAC name, accession, or MaizeGDB ID" />
+      <button class="mgdb-button mgdb-button-primary" type="submit">Search BACs</button>
+    </form>
+    <p class="mgdb-rec-examples">
+      <span>Try an example&#58;</span>
+      <a class="mgdb-rec-example" href="/data_center/bac?id=b0002A02">b0002A02</a>
+      <a class="mgdb-rec-example" href="/data_center/bac?id=c0192J22">c0192J22</a>
+      <a class="mgdb-rec-example" href="/data_center/bac?id=320812">320812</a>
+    </p>
+    <p class="mgdb-rec-hint">A record page needs one BAC&#58; its clone name, one of its synonyms, or its MaizeGDB ID. A BAC is one kind of molecular marker, so a marker that is not a BAC has its record in the Molecular Marker Data Hub instead.</p>
+  </section>
+
+  $(suggestion_sections)
+
+  <section class="mgdb-hub-related" id="bac-notfound-resources" aria-labelledby="bac-notfound-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="bac-notfound-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/bac">
+          <strong>BAC Data Center</strong>
+          <span>Search the BAC clone collection by name, accession, or the library it came from</span>
+        </a>
+        <a href="/data_center/marker">
+          <strong>Molecular Marker Data Hub</strong>
+          <span>Every marker and probe MaizeGDB holds, of which BACs are one kind</span>
+        </a>
+        <a href="/data_center/map">
+          <strong>Map Data Hub</strong>
+          <span>The genetic and physical maps these probes are placed on</span>
+        </a>
+        <a href="/searchall">
+          <strong>Search all MaizeGDB data</strong>
+          <span>One search across genes, loci, stocks, references, and every other data type</span>
+        </a>
+        <a href="/downloads">
+          <strong>Downloads</strong>
+          <span>Marker and mapping datasets, including the BAC collection</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

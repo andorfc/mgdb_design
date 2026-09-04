@@ -267,6 +267,12 @@
 .mgdb-hub-page .mgdb-card-grid > .mgdb-card > .mgdb-pill { align-self: flex-start; }
 .mgdb-hub-page .mgdb-card-grid > .mgdb-card > p { flex: 1 1 auto; }
 
+/* ...but not the paragraph holding the closing link, which is what the slack
+   was being shared with. With both growing, the description and the link ended
+   up a hairline apart and the gap moved inside the two boxes instead of between
+   them. Only the description should absorb the row. */
+.mgdb-hub-page .mgdb-card-grid > .mgdb-card > p:last-child { flex: 0 0 auto; }
+
 /* --------------------------------------------------------------------------
    Related resources keeps its green wash
 
@@ -295,34 +301,28 @@
   box-shadow: none;
 }
 
-/* The Internal / External chip follows the description in the card's flex
-   column, so it lands wherever that description happens to end. Letting the
-   description take the slack puts every chip on the floor of its card and
-   still leaves it a real margin, which `margin-top: auto` does not on a card
-   whose description runs the full three lines. */
-.mgdb-hub-page .mgdb-resource-list > a > span:not(.mgdb-resource-badge) { flex: 1 1 auto; }
-
-.mgdb-hub-page .mgdb-resource-list > a > .mgdb-resource-badge {
-  margin-top: var(--mgdb-space-3);
-  align-self: flex-start;
-}
-
 /* The rotation itself, and the override classes. See the note above the
    `border-top-width` rule for why they live here rather than beside it. */
 
-.mgdb-hub-page > section:nth-of-type(2) { border-top-color: var(--mgdb-green); }
-.mgdb-hub-page > section:nth-of-type(3) { border-top-color: var(--mgdb-gold); }
-.mgdb-hub-page > section:nth-of-type(4) { border-top-color: var(--mgdb-status-info); }
-.mgdb-hub-page > section:nth-of-type(5) { border-top-color: var(--mgdb-burgundy); }
-.mgdb-hub-page > section:nth-of-type(6) { border-top-color: var(--mgdb-leaf); }
-.mgdb-hub-page > section:nth-of-type(7) { border-top-color: var(--mgdb-orange); }
-.mgdb-hub-page > section:nth-of-type(8) { border-top-color: var(--mgdb-wine); }
-.mgdb-hub-page > section:nth-of-type(9) { border-top-color: var(--mgdb-gold-dark); }
-/* Ten and eleven were added when /data_center/map turned out to carry nine
-   content sections: the rotation stopped at nine counting the hero, so the
-   page's last section fell back to the neutral line. */
-.mgdb-hub-page > section:nth-of-type(10) { border-top-color: var(--mgdb-red); }
-.mgdb-hub-page > section:nth-of-type(11) { border-top-color: var(--mgdb-green-dark); }
+/* Ten colours over positions 2 to 11 -- the hero is the first section, so the
+   first content section is the second child.
+
+   These were an enumeration, extended twice as a new page turned out to be
+   longer than the last: to nine, then to eleven for /data_center/map. The
+   pan-gene record page carries nineteen sections, at which point enumerating
+   stops being sensible, so the same ten colours now repeat with a period of
+   ten. Positions 2 to 11 keep exactly the colours they had, and nothing after
+   them falls back to the neutral line. */
+.mgdb-hub-page > section:nth-of-type(10n+2)  { border-top-color: var(--mgdb-green); }
+.mgdb-hub-page > section:nth-of-type(10n+3)  { border-top-color: var(--mgdb-gold); }
+.mgdb-hub-page > section:nth-of-type(10n+4)  { border-top-color: var(--mgdb-status-info); }
+.mgdb-hub-page > section:nth-of-type(10n+5)  { border-top-color: var(--mgdb-burgundy); }
+.mgdb-hub-page > section:nth-of-type(10n+6)  { border-top-color: var(--mgdb-leaf); }
+.mgdb-hub-page > section:nth-of-type(10n+7)  { border-top-color: var(--mgdb-orange); }
+.mgdb-hub-page > section:nth-of-type(10n+8)  { border-top-color: var(--mgdb-wine); }
+.mgdb-hub-page > section:nth-of-type(10n+9)  { border-top-color: var(--mgdb-gold-dark); }
+.mgdb-hub-page > section:nth-of-type(10n+10) { border-top-color: var(--mgdb-red); }
+.mgdb-hub-page > section:nth-of-type(10n+11) { border-top-color: var(--mgdb-green-dark); }
 
 .mgdb-hub-page > section.mgdb-hub-tone-green    { border-top-color: var(--mgdb-green); }
 .mgdb-hub-page > section.mgdb-hub-tone-amber    { border-top-color: var(--mgdb-gold); }
@@ -336,135 +336,11 @@
 /* --------------------------------------------------------------------------
    References
 
-   One shape for a cited paper, wherever it appears. Taken from /NAM_project,
-   which is where the group settled it: journal and year as a pill, the DOI in
-   mono beside it, the title in burgundy, then authors, citation, the abstract
-   in a green-edged well, and the links as buttons.
-
-   This is the one block in this file that does not require `mgdb-hub-page`, so
-   a page outside the hub set can load the sheet and get the same references.
+   The cited-paper card moved to css/mgdb-modern.css on 2026-09-01. It is a
+   shared component, not a hub one: record pages and the stock record page use
+   it too, and they do not load this sheet. Every page that loads this file
+   loads mgdb-modern.css before it, so nothing changed for the hubs.
    -------------------------------------------------------------------------- */
-
-.mgdb-ref-list {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--mgdb-space-4);
-}
-
-.mgdb-ref {
-  padding: var(--mgdb-space-5);
-  border: 1px solid var(--hub-line, var(--mgdb-line));
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
-  box-shadow: var(--mgdb-shadow-sm);
-}
-
-.mgdb-ref-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  align-items: center;
-  margin-bottom: var(--mgdb-space-2);
-}
-
-.mgdb-ref-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 9999px;
-  background: var(--mgdb-gold-soft);
-  color: var(--mgdb-gold-dark);
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.mgdb-ref-doi {
-  color: var(--mgdb-muted);
-  font-family: var(--mgdb-font-mono);
-  font-size: 11px;
-  /* A DOI is one unbroken token and will push a narrow card wide. */
-  overflow-wrap: anywhere;
-}
-
-.mgdb-ref-title {
-  margin: 0 0 var(--mgdb-space-2);
-  color: var(--mgdb-burgundy);
-  font-size: 1.25rem;
-  font-weight: 700;
-  line-height: 1.35;
-}
-
-.mgdb-ref-title a { color: inherit; }
-
-.mgdb-ref-authors {
-  margin: 0 0 var(--mgdb-space-1);
-  color: var(--mgdb-ink);
-  font-size: var(--mgdb-text-sm);
-  line-height: 1.4;
-}
-
-.mgdb-ref-citation {
-  margin: 0 0 var(--mgdb-space-3);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-xs);
-}
-
-.mgdb-ref-abstract {
-  margin-bottom: var(--mgdb-space-4);
-  padding: var(--mgdb-space-3) var(--mgdb-space-4);
-  border-left: 3px solid var(--mgdb-green);
-  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
-  background: var(--mgdb-surface-alt);
-}
-
-.mgdb-ref-abstract h4 {
-  margin: 0 0 4px;
-  color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-xs);
-  font-weight: 700;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-}
-
-.mgdb-ref-abstract p {
-  margin: 0;
-  color: var(--mgdb-ink-soft);
-  font-size: var(--mgdb-text-xs);
-  line-height: 1.6;
-}
-
-.mgdb-ref-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  align-items: center;
-}
-
-/* The copy buttons sit beside the link buttons and must match their height, or
-   the row steps. */
-.mgdb-ref-actions .mgdb-ref-copy {
-  min-height: var(--mgdb-tap-target);
-  padding: 0 var(--mgdb-space-4);
-  border: 1px solid var(--hub-line, var(--mgdb-line));
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink-soft);
-  font-family: inherit;
-  font-size: var(--mgdb-text-sm);
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.mgdb-ref-actions .mgdb-ref-copy:hover {
-  border-color: var(--mgdb-green-dark);
-  background: var(--mgdb-green-soft);
-  color: var(--mgdb-green-dark);
-}
-
-@media (max-width: 640px) {
-  .mgdb-ref { padding: var(--mgdb-space-4); }
-  .mgdb-ref-title { font-size: 1.1rem; }
-}
-
 /* --------------------------------------------------------------------------
    Form rows: one baseline for the labels, one height for the controls
 

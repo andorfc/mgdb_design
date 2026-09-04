@@ -1,0 +1,65 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-gene-notfound
+<meta name="robots" content="noindex">
+<meta property="og:title" content="No gene found &mdash; MaizeGDB">
+<meta property="og:description" content="$(notfound_summary)">
+
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-record-notfound-page" id="gene-notfound-top">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/gene_center/gene">Gene and Locus Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Not found</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-notfound-hero" aria-labelledby="gene-notfound-title">
+    <div class="mgdb-hero-body">
+      <h1 id="gene-notfound-title">No gene matches &ldquo;$(requested_display)&rdquo;</h1>
+      <p class="mgdb-rec-lead">MaizeGDB holds gene models from every maize assembly it hosts, and the classical genes curated alongside them. None of them carries that name, accession, or symbol.</p>
+    </div>
+  </section>
+
+  <section id="gene-notfound-search" aria-labelledby="gene-notfound-search-title">
+    <div class="mgdb-section-heading"><div><h2 id="gene-notfound-search-title">Search</h2></div></div>
+    <form class="mgdb-rec-search" action="/gene_center/gene" method="get" role="search">
+      <label class="mgdb-visually-hidden" for="gene-notfound-query">Gene model, transcript, gene symbol, or function</label>
+      <input class="mgdb-input" id="gene-notfound-query" name="term" type="search" autocomplete="off" value="$(requested_value)" placeholder="Gene model, transcript, gene symbol, or function" />
+      <button class="mgdb-button mgdb-button-primary" type="submit">Search genes</button>
+    </form>
+    <p class="mgdb-rec-examples">
+      <span>Try an example&#58;</span>
+      <a class="mgdb-rec-example" href="/gene_center/gene/Zm00001eb067740">Zm00001eb067740</a>
+      <a class="mgdb-rec-example" href="/gene_center/gene/lg1">lg1</a>
+      <a class="mgdb-rec-example" href="/gene_center/gene/GRMZM2G036297">GRMZM2G036297</a>
+    </p>
+    <p class="mgdb-rec-hint">A record page needs one gene&#58; a gene model accession from any assembly, one of its transcripts, or a classical gene symbol. A partial accession is a search rather than a record, and the search above is built for it&#58; it matches on part of a name, a function, or a position.</p>
+  </section>
+
+  $(suggestion_sections)
+
+  <section class="mgdb-hub-related" id="gene-notfound-resources" aria-labelledby="gene-notfound-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="gene-notfound-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/gene_center/gene">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>Find gene models and classical genes by name, function, or position</span>
+        </a>
+        <a href="/pan_gene_center/pan_gene">
+          <strong>Pan-Gene Data Hub</strong>
+          <span>The same gene across every maize assembly, under each of its names</span>
+        </a>
+        <a href="/nomenclature">
+          <strong>Maize nomenclature</strong>
+          <span>How gene symbols and gene model accessions are formed</span>
+        </a>
+        <a href="/searchall">
+          <strong>Search all MaizeGDB data</strong>
+          <span>One search across genes, loci, stocks, references, and every other data type</span>
+        </a>
+        <a href="https\://jbrowse.maizegdb.org/" target="_blank" rel="noopener">
+          <strong>Genome browser</strong>
+          <span>Browse an assembly by position when you do not have an accession</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

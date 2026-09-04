@@ -1,0 +1,966 @@
+/* ==========================================================================
+   Record page furniture — shared by every record page on the Data Hub shell
+   --------------------------------------------------------------------------
+   Loaded after css/mgdb-hub.css and before a page's own sheet. A record page
+   opts in with `mgdb-record-page` on its <main>, alongside `mgdb-hub-page`.
+
+   What this settles, so a page stylesheet does not have to:
+
+     - the record header's type scale, and the synonym line under it
+     - the facts grid with its gold spine
+     - a list block: the heading with its count, the toolbar carrying filter,
+       view toggle, page size and TSV, then a sortable table or a card grid,
+       then a pager
+     - curator notes on their warm surface
+     - the reference list, the metric row and the figures under it
+     - the API row that closes every record page
+     - the search, lead and suggestion styling the not-found page needs
+
+   The class names are the ones js/mgdb-record.js emits; the two files are a
+   pair and neither works without the other.
+   ========================================================================== */
+
+
+/* One gap between everything, set in one place. The shared `.mgdb-page >
+   section` margin is zeroed so the gap is the single source of spacing. */
+.mgdb-record-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-6);
+}
+
+.mgdb-page.mgdb-record-page > * {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Header
+
+   One flat panel, from `mgdb-hub-record-hero` in the shell. This page adds
+   only the size of the record's name.
+   -------------------------------------------------------------------------- */
+
+.mgdb-rec-hero h1,
+.mgdb-rec-notfound-hero h1 {
+  font-size: clamp(1.6rem, 1.1rem + 1.6vw, 2.25rem);
+  line-height: var(--mgdb-leading-snug);
+  overflow-wrap: anywhere;
+}
+
+/* No reading measure: the synonym list is a scan, not prose, and a cap wrapped
+   it to three lines while the panel had room. Same reason as the not-found
+   page's text below. */
+.mgdb-rec-synonyms {
+  margin: 0 0 var(--mgdb-space-2);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  overflow-wrap: anywhere;
+}
+
+.mgdb-rec-synonyms a { font-weight: 600; }
+
+.mgdb-rec-headfacts { margin-top: var(--mgdb-space-2); }
+.mgdb-rec-headfacts dd { font-size: var(--mgdb-text-base); }
+.mgdb-rec-headfacts dd.mgdb-record-id { font-family: var(--mgdb-font-mono); font-size: var(--mgdb-text-sm); }
+
+/* A header fact can carry a hint the same way a body fact does. The body rule
+   is on .mgdb-rec-facts and the header uses .mgdb-record-facts, so without
+   this the hint runs straight on from the value: "chr2:4,493,424-4,497,434"
+   followed by "4,010 bp on the genome" with nothing between them. */
+.mgdb-rec-headfacts dd small {
+  display: block;
+  margin-top: 2px;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 400;
+}
+
+/* --------------------------------------------------------------------------
+   Tabs
+
+   Section anchors clear the sticky bar. The bar wraps to two rows at narrow
+   widths, so the offset is larger than the shared 4.5rem; the scrollspy reads
+   this value back rather than carrying its own copy.
+   -------------------------------------------------------------------------- */
+
+.mgdb-record-page > section[id] { scroll-margin-top: 6.5rem; }
+
+.mgdb-rec-tabs .mgdb-rec-tab-count { margin-left: var(--mgdb-space-2); }
+
+/* --------------------------------------------------------------------------
+   Search, and the not-found page
+
+   The record page carries no search of its own -- it starts at Overview. This
+   is the search on the 404 page, which is the one place a reader needs it.
+   -------------------------------------------------------------------------- */
+
+.mgdb-rec-lead {
+  margin: var(--mgdb-space-2) 0 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-rec-hint {
+  margin: var(--mgdb-space-4) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* Text runs the width of the panel it sits in.
+
+   The shared prose measure is 68ch and several components carry their own
+   cap, which on a 1180px page wrapped a two-line sentence at a little over
+   half the width and left the rest of the panel empty. A reader on this page
+   is scanning for what to do next, not settling in to read, so the line
+   length is the panel's.
+
+   `>` rather than a descendant selector: a shared component nested inside one
+   of these sections keeps its own measure. */
+.mgdb-record-notfound-page > section > p,
+.mgdb-record-notfound-page > section > .mgdb-hint,
+.mgdb-record-notfound-page .mgdb-rec-lead,
+.mgdb-record-notfound-page .mgdb-rec-hint,
+.mgdb-record-notfound-page .mgdb-hero-body > p,
+.mgdb-record-notfound-page .mgdb-rec-block > p { max-width: none; }
+
+.mgdb-record-notfound-page .mgdb-rec-block-head h3 {
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+}
+
+.mgdb-rec-search {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) auto;
+  gap: var(--mgdb-space-3);
+  align-items: stretch;
+}
+
+.mgdb-rec-search .mgdb-input {
+  min-height: var(--mgdb-tap-target);
+  height: var(--mgdb-tap-target);
+}
+
+.mgdb-rec-search .mgdb-button {
+  min-height: var(--mgdb-tap-target);
+  white-space: nowrap;
+}
+
+.mgdb-rec-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin: var(--mgdb-space-3) 0 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-rec-example {
+  display: inline-block;
+  padding: 4px var(--mgdb-space-3);
+  text-decoration: none;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface);
+  color: var(--mgdb-green-dark);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease;
+}
+
+.mgdb-rec-example:hover { background: var(--mgdb-green-soft); border-color: #bcd9c6; }
+.mgdb-rec-example:focus-visible { outline: 3px solid var(--mgdb-focus); outline-offset: 2px; }
+
+
+/* --------------------------------------------------------------------------
+   Facts
+
+   Single-valued fields of the overview, as cards with a gold spine so they
+   read as facts rather than as another table.
+   -------------------------------------------------------------------------- */
+
+.mgdb-rec-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--mgdb-space-3);
+  margin: 0;
+}
+
+.mgdb-rec-facts > div {
+  min-width: 0;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-left: 3px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+}
+
+.mgdb-rec-facts dt {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.mgdb-rec-facts dd {
+  margin: var(--mgdb-space-1) 0 0;
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.mgdb-rec-facts dd small {
+  display: block;
+  margin-top: 2px;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 400;
+}
+
+/* --------------------------------------------------------------------------
+   List blocks
+
+   Every list on the record has the same head: a title with its count, then
+   the controls -- filter, view toggle, page size, download. The views are
+   rendered from the same rows, so switching never refetches.
+   -------------------------------------------------------------------------- */
+
+.mgdb-rec-block { margin-top: var(--mgdb-space-5); }
+.mgdb-rec-block:first-child { margin-top: 0; }
+
+.mgdb-rec-block-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--mgdb-space-3);
+}
+
+.mgdb-rec-block-head h3 {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin: 0;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+}
+
+.mgdb-rec-block-count {
+  display: inline-flex;
+  min-width: 1.6rem;
+  justify-content: center;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.mgdb-rec-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+}
+
+.mgdb-rec-toolbar label {
+  display: inline-flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* The three controls in a toolbar share one height, so the row is one line. */
+.mgdb-rec-toolbar input,
+.mgdb-rec-toolbar select,
+.mgdb-rec-toolbar .mgdb-view-toggle,
+.mgdb-rec-toolbar .mgdb-rec-tsv {
+  box-sizing: border-box;
+  height: 36px;
+  min-height: 36px;
+}
+
+.mgdb-rec-toolbar input,
+.mgdb-rec-toolbar select {
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-rec-toolbar input { width: 14rem; max-width: 100%; }
+.mgdb-rec-toolbar input:focus,
+.mgdb-rec-toolbar select:focus { border-color: var(--mgdb-focus); outline: none; box-shadow: 0 0 0 2px rgba(11, 87, 164, .18); }
+
+.mgdb-rec-toolbar .mgdb-view-toggle { align-items: center; }
+.mgdb-rec-toolbar .mgdb-view-btn { height: 100%; }
+
+.mgdb-rec-toolbar .mgdb-rec-tsv {
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink-soft);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mgdb-rec-toolbar .mgdb-rec-tsv:hover { background: var(--mgdb-surface-alt); color: var(--mgdb-ink); }
+
+.mgdb-rec-block-status {
+  margin: 0 0 var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* Table view. The shell zebra-stripes and colours the hover; the numeric
+   cells and sort arrows come from the shared table. */
+.mgdb-rec-table td,
+.mgdb-rec-table th { overflow-wrap: anywhere; }
+.mgdb-rec-table th[scope="row"] { color: var(--mgdb-ink); }
+.mgdb-rec-table td small { display: block; color: var(--mgdb-muted); font-size: var(--mgdb-text-xs); }
+.mgdb-rec-table thead th { position: static; }
+
+.mgdb-rec-table .mgdb-rec-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+}
+
+/* Grid view. Tiles are shared cards, so the hub gives them the top edge that
+   colours on hover; the description list inside is this page's. */
+.mgdb-rec-grid.mgdb-card-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+
+.mgdb-rec-grid > .mgdb-card { padding: var(--mgdb-space-4); }
+.mgdb-rec-grid > .mgdb-card > * + * { margin-top: 0; }
+
+.mgdb-rec-grid .mgdb-rec-tile-title {
+  margin: 0 0 var(--mgdb-space-2);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.mgdb-rec-grid dl { margin: 0; }
+.mgdb-rec-grid dl > div + div { margin-top: var(--mgdb-space-2); padding-top: var(--mgdb-space-2); border-top: 1px solid var(--hub-line-soft); }
+
+.mgdb-rec-grid dt {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.mgdb-rec-grid dd {
+  margin: 2px 0 0;
+  font-size: var(--mgdb-text-sm);
+  overflow-wrap: anywhere;
+}
+
+.mgdb-rec-grid dd small,
+.mgdb-rec-tile-title small {
+  display: block;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+/* Pagination */
+.mgdb-rec-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1);
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--mgdb-space-3);
+}
+
+.mgdb-rec-page-btn {
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mgdb-rec-page-btn:hover:not(:disabled):not(.is-active) { background: var(--mgdb-surface-alt); }
+.mgdb-rec-page-btn.is-active { background: var(--mgdb-green-dark); border-color: var(--mgdb-green-dark); color: #fff; }
+.mgdb-rec-page-btn:disabled { opacity: .45; cursor: default; }
+.mgdb-rec-page-ellipsis { padding: 0 var(--mgdb-space-1); color: var(--mgdb-muted); }
+
+.mgdb-rec-empty {
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* --------------------------------------------------------------------------
+   Comments and community annotations
+
+   Prose that a curator wrote, so it sits on a note surface rather than in a
+   table: the one place on the page where a section is not plain white.
+   -------------------------------------------------------------------------- */
+
+.mgdb-rec-notes { display: grid; gap: var(--mgdb-space-3); }
+
+.mgdb-rec-note {
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 1px solid #e9dcb8;
+  border-left: 4px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius-sm);
+  background: #fffaf0;
+}
+
+.mgdb-rec-note p { margin: 0; color: var(--mgdb-ink); }
+
+.mgdb-rec-note small {
+  display: block;
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+/* --------------------------------------------------------------------------
+   Metrics and figures
+   -------------------------------------------------------------------------- */
+
+.mgdb-rec-charts { margin-top: var(--mgdb-space-5); }
+
+/* .mgdb-chart is a fixed 320px; the connections chart grows with its rows, so
+   the element takes the inline height the script sets. */
+.mgdb-record-page .mgdb-chart { height: auto; min-height: 320px; overflow: visible; }
+
+.mgdb-record-page .mgdb-figure > h3 {
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-record-page .mgdb-figure figcaption {
+  margin-top: var(--mgdb-space-3);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* --------------------------------------------------------------------------
+   API row
+   -------------------------------------------------------------------------- */
+
+.mgdb-rec-api-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mgdb-rec-api-row code {
+  display: block;
+  min-width: 0;
+  flex: 1 1 24rem;
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-ground);
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-sm);
+  overflow-wrap: anywhere;
+}
+
+.mgdb-rec-api-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-rec-api-note {
+  margin: var(--mgdb-space-3) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* External links carry an arrow, wherever they appear. */
+.mgdb-record-page a[target="_blank"]:not(.mgdb-button)::after {
+  content: " \2197";
+  font-size: .85em;
+}
+
+.mgdb-record-page a[target="_blank"] > span[aria-hidden] { display: none; }
+
+/* A resource card marks its own off-site links on the title, from the href --
+   see `.mgdb-resource-list a[href^="http"] > strong::after` in mgdb-modern.css
+   -- so the page-wide arrow stays off the card as a whole. */
+.mgdb-record-page .mgdb-resource-list a[target="_blank"]::after,
+.mgdb-record-page .mgdb-button[target="_blank"]::after { content: none; }
+
+/* --------------------------------------------------------------------------
+   Narrow screens
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 720px) {
+  .mgdb-rec-search { grid-template-columns: 1fr; }
+  .mgdb-rec-block-head { align-items: flex-start; }
+  .mgdb-rec-toolbar { width: 100%; }
+  .mgdb-rec-toolbar input { width: 100%; }
+  .mgdb-rec-toolbar label:first-child { flex: 1 1 100%; }
+  .mgdb-rec-api-row { align-items: stretch; flex-direction: column; }
+}
+
+/* --------------------------------------------------------------------------
+   Related resources keeps its green edge wherever it lands
+
+   The shell rotates eight colours over `nth-of-type(2)` through `(9)`, and the
+   rotation is declared after the Related resources block so it wins. On a
+   record page with nine sections that puts a rotation colour on the closing
+   green panel, while a page with ten leaves it green -- the same section
+   edged differently on two pages for no reason a reader could see.
+   -------------------------------------------------------------------------- */
+
+.mgdb-record-page > section.mgdb-hub-related { border-top-color: #cfe3d6; }
+
+/* --------------------------------------------------------------------------
+   Images
+
+   The gallery the stock record page settled on, ported here so every record
+   page shows images the same way: a card per image with the picture, a
+   category chip, a linked title, the caption, and a row of actions, over a
+   lightbox. The grid is the collection's grid view, so the same block also
+   offers a table, a filter, a page size and a TSV.
+   -------------------------------------------------------------------------- */
+
+.mgdb-record-page .mgdb-rec-image-grid.mgdb-card-grid {
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  align-items: stretch;
+}
+
+.mgdb-record-page .mgdb-rec-image-card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  padding: var(--mgdb-space-3);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--hub-surface);
+  transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+.mgdb-record-page .mgdb-rec-image-card:hover {
+  border-color: var(--mgdb-gold-dark);
+  box-shadow: var(--hub-shadow-hover);
+  transform: translateY(-2px);
+}
+
+.mgdb-record-page .mgdb-rec-image-figure {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  margin: 0 0 var(--mgdb-space-3);
+  padding: 0;
+  border: 0;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-sunken);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.mgdb-record-page .mgdb-rec-image-figure img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--mgdb-radius-sm);
+  transition: transform .25s ease;
+}
+
+.mgdb-record-page .mgdb-rec-image-figure:hover img { transform: scale(1.05); }
+
+.mgdb-record-page .mgdb-rec-image-body {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+.mgdb-record-page .mgdb-rec-image-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-bottom: var(--mgdb-space-1);
+}
+
+.mgdb-record-page .mgdb-rec-image-badge,
+.mgdb-rec-lightbox .mgdb-rec-image-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #e6f0fa;
+  color: #1a568c;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+/* The stock record page marks a variation image gold and a germplasm image
+   blue; keeping that here means an image reads the same wherever it appears. */
+.mgdb-record-page .mgdb-rec-image-badge[data-cat="Variation / Mutant"],
+.mgdb-record-page .mgdb-rec-image-badge[data-cat="Mutant / Allele"],
+.mgdb-rec-lightbox .mgdb-rec-image-badge[data-cat="Variation / Mutant"],
+.mgdb-rec-lightbox .mgdb-rec-image-badge[data-cat="Mutant / Allele"] {
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+}
+
+.mgdb-record-page .mgdb-rec-image-card h3 {
+  margin: 0 0 var(--mgdb-space-1);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  line-height: var(--mgdb-leading-snug);
+  word-break: break-word;
+}
+
+.mgdb-record-page .mgdb-rec-image-card h3 a { color: inherit; text-decoration: underline; }
+.mgdb-record-page .mgdb-rec-image-card h3 a:hover { color: var(--mgdb-leaf); }
+
+.mgdb-record-page .mgdb-rec-image-caption {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: var(--mgdb-space-1) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading-snug);
+  word-break: break-word;
+}
+
+/* The three actions share one line at the card's narrowest, 260px. They are
+   an equal-width row rather than three natural-width buttons: at 12px type
+   with 12px of padding each they came to 236px against 236px of content box
+   and wrapped "Copy URL" onto a second line. */
+.mgdb-record-page .mgdb-rec-image-links {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  align-items: stretch;
+  margin-top: var(--mgdb-space-3);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--hub-line);
+}
+
+.mgdb-record-page .mgdb-rec-image-btn {
+  display: inline-flex;
+  min-width: 0;
+  flex: 1 1 0;
+  min-height: 28px;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 6px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink-soft);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .12s, border-color .12s;
+}
+
+.mgdb-record-page .mgdb-rec-image-btn:hover {
+  border-color: var(--mgdb-muted);
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-ink);
+}
+
+/* The arrow on an external link is already in the button's own label here. */
+.mgdb-record-page .mgdb-rec-image-btn[target="_blank"]::after { content: none; }
+
+/* --------------------------------------------------------------------------
+   The lightbox
+
+   Unscoped, like the dialog it styles: a <dialog> in the top layer is not a
+   descendant of anything for the purposes of a page scope.
+   -------------------------------------------------------------------------- */
+
+.mgdb-rec-lightbox {
+  width: 90vw;
+  max-width: 900px;
+  padding: 0;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, .4);
+}
+
+.mgdb-rec-lightbox::backdrop {
+  background: rgba(15, 25, 20, .75);
+  backdrop-filter: blur(4px);
+}
+
+.mgdb-rec-lightbox-content {
+  position: relative;
+  display: flex;
+  max-height: 90vh;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.mgdb-rec-lightbox-close {
+  position: absolute;
+  top: var(--mgdb-space-3);
+  right: var(--mgdb-space-3);
+  z-index: 10;
+  display: flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, .6);
+  color: #fff;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mgdb-rec-lightbox-close:hover { background: rgba(0, 0, 0, .9); }
+
+.mgdb-rec-lightbox-image {
+  display: flex;
+  min-height: 280px;
+  max-height: 60vh;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #111;
+}
+
+.mgdb-rec-lightbox-image img { max-width: 100%; max-height: 60vh; object-fit: contain; }
+
+.mgdb-rec-lightbox-details { padding: var(--mgdb-space-5); background: var(--mgdb-surface); }
+
+.mgdb-rec-lightbox-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-rec-lightbox-meta h3 { margin: 0; color: var(--mgdb-green-dark); font-size: var(--mgdb-text-lg); }
+.mgdb-rec-lightbox-caption { margin: 0; color: var(--mgdb-ink-soft); }
+
+.mgdb-rec-lightbox-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-4);
+  border-top: 1px solid var(--mgdb-line);
+}
+
+/* The status pill sits on the title line, not under it. */
+.mgdb-record-page .mgdb-rec-hero h1 .mgdb-pill {
+  margin-left: var(--mgdb-space-3);
+  vertical-align: middle;
+  font-size: var(--mgdb-text-sm);
+}
+
+@media (max-width: 980px) {
+  .mgdb-record-page .mgdb-rec-image-grid.mgdb-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 560px) {
+  .mgdb-record-page .mgdb-rec-image-grid.mgdb-card-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ==========================================================================
+   Shared record furniture added with the pan-gene record page
+   --------------------------------------------------------------------------
+   A warning message tone, a row of action buttons inside a block, and the
+   "report an error" line the pan-gene page carries over from its legacy
+   header. All three are record-shell furniture rather than pan-gene furniture,
+   so they live here and any record page can use them.
+   ========================================================================== */
+
+.mgdb-record-page .mgdb-message-warn {
+  border-color: var(--mgdb-status-warn);
+  background: var(--mgdb-status-warn-soft);
+  color: var(--mgdb-status-warn);
+}
+.mgdb-record-page .mgdb-message-warn::before { content: "\26A0"; }
+
+.mgdb-record-page .mgdb-rec-alert { margin: var(--mgdb-space-4) 0 0; }
+.mgdb-record-page .mgdb-rec-alert span { display: block; }
+.mgdb-record-page .mgdb-rec-alert span + span { margin-top: var(--mgdb-space-2); }
+
+.mgdb-record-page .mgdb-rec-linkrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-3);
+}
+
+.mgdb-record-page .mgdb-rec-report {
+  margin: calc(var(--mgdb-space-3) * -1) 0 var(--mgdb-space-4);
+  text-align: right;
+  font-size: var(--mgdb-text-sm);
+}
+.mgdb-record-page .mgdb-rec-report a { color: var(--mgdb-burgundy, #7a2c43); font-weight: 600; }
+
+/* ==========================================================================
+   Pan-gene record page
+   --------------------------------------------------------------------------
+   Only the three embedded viewers. Everything else on the page is shell.
+   ========================================================================== */
+
+/* The scroll container is a wrapper around #msa-div, not #msa-div itself: the
+   MSA library overwrites the class list of the element it renders into, so a
+   class put there is gone by the time the alignment arrives. The alignment is
+   about 3,900px wide, and without this the whole document scrolls sideways. */
+.mgdb-pan-gene-record-page .mgdb-pg-msa {
+  max-width: 100%;
+  margin-top: var(--mgdb-space-3);
+  overflow-x: auto;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm, 6px);
+  background: #fff;
+}
+
+/* The alignment toolbar is the shell's own toolbar with the same controls at
+   the same 36px height, so it reads as a row rather than four loose buttons.
+   An <a> styled as a toolbar button needs the flex centring the <button> gets
+   for free. */
+.mgdb-pan-gene-record-page .mgdb-pg-msa-toolbar { margin: var(--mgdb-space-3) 0 0; }
+.mgdb-pan-gene-record-page .mgdb-pg-msa-toolbar a.mgdb-rec-tsv {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.mgdb-pan-gene-record-page .mgdb-pg-tree {
+  min-height: 320px;
+  margin-top: var(--mgdb-space-3);
+  overflow-x: auto;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm, 6px);
+  background: #fff;
+}
+
+.mgdb-pan-gene-record-page .mgdb-pg-gcv {
+  display: block;
+  width: 100%;
+  height: 560px;
+  margin-top: var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm, 6px);
+  background: #fff;
+}
+
+.mgdb-pan-gene-record-page .mgdb-pg-exemplar { color: #239b2d; }
+
+/* ==========================================================================
+   Citation blocks
+   --------------------------------------------------------------------------
+   Added with the reference record page. A block whose body is a citation to
+   be copied rather than a table: the text keeps its line breaks, wraps rather
+   than scrolling, and reads at the size of body copy so it can be checked by
+   eye before it is copied.
+   ========================================================================== */
+
+.mgdb-record-page .mgdb-rec-citation-text {
+  margin: var(--mgdb-space-3) 0 0;
+  padding: var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm, 6px);
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.55;
+}
+
+.mgdb-record-page pre.mgdb-rec-citation-text {
+  font-family: var(--mgdb-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.mgdb-record-page .mgdb-rec-block-head [data-copy-target][data-copied] {
+  border-color: var(--mgdb-status-ok);
+  color: var(--mgdb-status-ok);
+}
+
+/* --------------------------------------------------------------------------
+   Map score genotype string
+
+   One character per line in a mapping panel, printed as a run. Monospaced and
+   grouped so a reader can count to a position in it; wrapping on the group
+   boundaries keeps a column of ten under a column of ten.
+   -------------------------------------------------------------------------- */
+
+.mgdb-map-scores-record-page .ms-scores {
+  overflow-x: auto;
+  max-width: 100%;
+  margin: 0;
+  padding: var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-sunken);
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.9;
+  letter-spacing: .08em;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* A primer sequence: monospaced, wrapping on any character because a 60-mer
+   has no spaces to break at. */
+.mgdb-primer-record-page .primer-sequence {
+  overflow-x: auto;
+  max-width: 100%;
+  margin: 0;
+  padding: var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-sunken);
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.8;
+  letter-spacing: .06em;
+  white-space: pre-wrap;
+  word-break: break-all;
+}

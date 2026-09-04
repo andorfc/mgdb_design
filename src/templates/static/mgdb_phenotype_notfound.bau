@@ -1,0 +1,64 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-phenotype-notfound
+<meta name="robots" content="noindex">
+<meta property="og:title" content="No phenotype found &mdash; MaizeGDB">
+<meta property="og:description" content="$(notfound_summary)">
+
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-record-notfound-page" id="pheno-notfound-top">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/phenotype">Phenotype Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Not found</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-notfound-hero" aria-labelledby="pheno-notfound-title">
+    <div class="mgdb-hero-body">
+      <h1 id="pheno-notfound-title">No phenotype matches &ldquo;$(requested_display)&rdquo;</h1>
+      <p class="mgdb-rec-lead">MaizeGDB curates $(total_phenotypes) phenotypes. None of them carries that name, synonym, or MaizeGDB ID.</p>
+    </div>
+  </section>
+
+  <section id="pheno-notfound-search" aria-labelledby="pheno-notfound-search-title">
+    <div class="mgdb-section-heading"><div><h2 id="pheno-notfound-search-title">Search</h2></div></div>
+    <form class="mgdb-rec-search" action="/data_center/phenotype" method="get" role="search">
+      <label class="mgdb-visually-hidden" for="pheno-notfound-query">Phenotype name, synonym, or MaizeGDB ID</label>
+      <input class="mgdb-input" id="pheno-notfound-query" name="term" type="search" autocomplete="off" value="$(requested_value)" placeholder="Phenotype name, synonym, or MaizeGDB ID" />
+      <button class="mgdb-button mgdb-button-primary" type="submit">Search phenotypes</button>
+    </form>
+    <p class="mgdb-rec-examples">
+      <span>Try an example&#58;</span>
+      <a class="mgdb-rec-example" href="/data_center/phenotype?id=dwarf%20plant">dwarf plant</a>
+      <a class="mgdb-rec-example" href="/data_center/phenotype?id=11041">11041</a>
+    </p>
+    <p class="mgdb-rec-hint">A record page needs one phenotype&#58; its name, one of its synonyms, or its MaizeGDB ID. A gene symbol names a locus, and a gene shows phenotypes rather than being one.</p>
+  </section>
+
+  $(suggestion_sections)
+
+  <section class="mgdb-hub-related" id="pheno-notfound-resources" aria-labelledby="pheno-notfound-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="pheno-notfound-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/phenotype">
+          <strong>Phenotype Data Hub</strong>
+          <span>Search every curated phenotype by trait, value, plant part, or growth stage</span>
+        </a>
+        <a href="/data_center/variation">
+          <strong>Variation Data Hub</strong>
+          <span>Alleles, mutations, and the phenotypic effects recorded for them</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>Classical loci and the gene models that represent them</span>
+        </a>
+        <a href="/searchall">
+          <strong>Search all MaizeGDB data</strong>
+          <span>One search across genes, loci, stocks, references, and every other data type</span>
+        </a>
+        <a href="https\://browser.planteome.org/amigo" target="_blank" rel="noopener">
+          <strong>Planteome</strong>
+          <span>Plant trait and anatomy ontologies behind these terms</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

@@ -1,0 +1,65 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-pan-gene-notfound
+<meta name="robots" content="noindex">
+<meta property="og:title" content="No pan-gene found &mdash; MaizeGDB">
+<meta property="og:description" content="$(notfound_summary)">
+
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-record-notfound-page" id="pg-notfound-top">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/pan_gene_center/pan_gene">Pan-Gene Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Not found</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-notfound-hero" aria-labelledby="pg-notfound-title">
+    <div class="mgdb-hero-body">
+      <h1 id="pg-notfound-title">No pan-gene contains &ldquo;$(requested_display)&rdquo;</h1>
+      <p class="mgdb-rec-lead">The Pan-Zea analysis grouped maize gene models into $(total_pan_genes) pan-genes. None of them contains that gene model, transcript, locus, or accession.</p>
+    </div>
+  </section>
+
+  <section id="pg-notfound-search" aria-labelledby="pg-notfound-search-title">
+    <div class="mgdb-section-heading"><div><h2 id="pg-notfound-search-title">Search</h2></div></div>
+    <form class="mgdb-rec-search" action="/pan_gene_center/pan_gene" method="get" role="search">
+      <label class="mgdb-visually-hidden" for="pg-notfound-query">Gene model, transcript, pan-gene name, or locus</label>
+      <input class="mgdb-input" id="pg-notfound-query" name="term" type="search" autocomplete="off" value="$(requested_value)" placeholder="Gene model, transcript, pan-gene name, or locus" />
+      <button class="mgdb-button mgdb-button-primary" type="submit">Search pan-genes</button>
+    </form>
+    <p class="mgdb-rec-examples">
+      <span>Try an example&#58;</span>
+      <a class="mgdb-rec-example" href="/pan_gene_center/pan_gene/Zm00023ab070050_T001">Zm00023ab070050_T001</a>
+      <a class="mgdb-rec-example" href="/pan_gene_center/pan_gene/lg1">lg1</a>
+      <a class="mgdb-rec-example" href="/pan_gene_center/pan_gene/pan-zea.v4.pan02070">pan-zea.v4.pan02070</a>
+    </p>
+    <p class="mgdb-rec-hint">A record page needs one pan-gene, and any of its members reaches it&#58; a gene model or transcript from any supported annotation, the pan-gene identifier itself, a locus symbol, or a UniProt accession. A gene model that no analysis placed has no pan-gene, and its own gene record is the page that holds its data.</p>
+  </section>
+
+  $(suggestion_sections)
+
+  <section class="mgdb-hub-related" id="pg-notfound-resources" aria-labelledby="pg-notfound-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="pg-notfound-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/pan_gene_center/pan_gene">
+          <strong>Pan-Gene Data Hub</strong>
+          <span>Search every pan-gene by identifier, locus, size, or the annotations it spans</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>Classical loci and the gene models that represent them across assemblies</span>
+        </a>
+        <a href="/genome">
+          <strong>Genomes and assemblies</strong>
+          <span>Every assembly and annotation MaizeGDB hosts, and what is in them</span>
+        </a>
+        <a href="/searchall">
+          <strong>Search all MaizeGDB data</strong>
+          <span>One search across genes, loci, stocks, references, and every other data type</span>
+        </a>
+        <a href="https\://gcv.maizegdb.org" target="_blank" rel="noopener">
+          <strong>Genomic Context Viewer</strong>
+          <span>Explore synteny at the gene model level across every annotation</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

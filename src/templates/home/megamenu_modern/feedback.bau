@@ -1,6 +1,11 @@
 $$SYNTAX-LEVEL 2
 *(feedback
   @(feedback_link {display: on}
-    <a href="#" class="feedback-form mega-feedback-link">$(feedback_name)</a>
+    ;; href, not "#": js/mgdb-feedback.js opens the dialog and cancels the
+    ;; navigation, and without it -- or without <dialog> -- the link still
+    ;; reaches the form at /feedback. The .feedback-form class is the one the
+    ;; legacy Atlassian collector bound to, so any other link still carrying it
+    ;; opens the dialog too.
+    <a href="$(server-url)/feedback" class="feedback-form mega-feedback-link">$(feedback_name)</a>
   )
 )

@@ -1,0 +1,66 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-variation-notfound
+<meta name="robots" content="noindex">
+<meta property="og:title" content="No variation found &mdash; MaizeGDB">
+<meta property="og:description" content="$(notfound_summary)">
+
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-record-notfound-page" id="var-notfound-top">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/variation">Variation Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Not found</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-notfound-hero" aria-labelledby="var-notfound-title">
+    <div class="mgdb-hero-body">
+      <h1 id="var-notfound-title">No variation matches &ldquo;$(requested_display)&rdquo;</h1>
+      <p class="mgdb-rec-lead">No allele, mutation, rearrangement, or polymorphism in MaizeGDB carries that name, synonym, or MaizeGDB ID.</p>
+    </div>
+  </section>
+
+  <section id="var-notfound-search" aria-labelledby="var-notfound-search-title">
+    <div class="mgdb-section-heading"><div><h2 id="var-notfound-search-title">Search</h2></div></div>
+    <form class="mgdb-rec-search" action="/data_center/variation" method="get" role="search">
+      <label class="mgdb-visually-hidden" for="var-notfound-query">Variation name, gene symbol, synonym, or MaizeGDB ID</label>
+      <input class="mgdb-input" id="var-notfound-query" name="term" type="search" autocomplete="off" value="$(requested_value)" placeholder="Variation name, gene symbol, synonym, or MaizeGDB ID" />
+      <button class="mgdb-button mgdb-button-primary" type="submit">Search variations</button>
+    </form>
+    <p class="mgdb-rec-examples">
+      <span>Try an example&#58;</span>
+      <a class="mgdb-rec-example" href="/data_center/variation?id=bz1">bz1</a>
+      <a class="mgdb-rec-example" href="/data_center/variation?id=c1-n">c1-n</a>
+      <a class="mgdb-rec-example" href="/data_center/variation?id=o2-676">o2-676</a>
+      <a class="mgdb-rec-example" href="/data_center/variation?id=p1-ww">p1-ww</a>
+    </p>
+    <p class="mgdb-rec-hint">A record page needs one variation&#58; its name, one of its synonyms, or its MaizeGDB ID. A gene symbol names a locus and returns its whole allele series, which the hub search is built to page through.</p>
+  </section>
+
+  $(suggestion_sections)
+
+  <section class="mgdb-hub-related" id="var-notfound-resources" aria-labelledby="var-notfound-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="var-notfound-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/variation">
+          <strong>Variation Data Hub</strong>
+          <span>Search all alleles, mutations, rearrangements, and polymorphisms</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>Classical loci and their associated gene models</span>
+        </a>
+        <a href="/data_center/phenotype">
+          <strong>Phenotype Data Hub</strong>
+          <span>Observable traits and controlled phenotype terms</span>
+        </a>
+        <a href="/searchall">
+          <strong>Search all MaizeGDB data</strong>
+          <span>One search across genes, loci, stocks, references, and every other data type</span>
+        </a>
+        <a href="https\://jbrowse.maizegdb.org/" target="_blank" rel="noopener">
+          <strong>MaizeGDB JBrowse 2</strong>
+          <span>Explore maize features in their genomic context</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

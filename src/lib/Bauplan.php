@@ -118,9 +118,52 @@ class Bauplan {
     echo $this->getHTML();
 	}
 
+	//
+	// Fill in the megamenu's BLAST link on pages that never set it.
+	//
+	// The Tools panel's BLAST href is $(blast_url), and the value comes from
+	// BLAST_URL in conf/mgdb.conf. index.php replaces it, and so do the page
+	// controllers that were written from a copy of one that does -- but 30 of
+	// the 87 controllers loading the modern shell never did, and an unreplaced
+	// Bauplan variable renders as the empty string. href="" resolves to the
+	// current page, so on /data_center/stock, /expression, the project pages
+	// and 27 others the menu's BLAST link quietly reloaded whatever the reader
+	// was already on. The project pages' own "Run BLAST Search" buttons, which
+	// use the same variable, went nowhere for the same reason.
+	//
+	// Defaulting here rather than in each of the 30 means the next page added
+	// cannot ship without it. has() is the non-throwing lookup, so a template
+	// tree with no $(blast_url) in it -- a page that does not draw the megamenu
+	// -- is left untouched; hasBeenSet() means a controller that sets its own
+	// value still wins, including amaizing_project.php, which has a fallback of
+	// its own.
+	//
+	private function defaultBlastUrl() {
+		if ($this->template == null || !$this->template->has('blast_url')) {
+			return;
+		}
+
+		$node = $this->template->get('blast_url');
+		if ($node->hasBeenSet()) {
+			return;
+		}
+
+		global $system;
+		$conf = is_array($system)
+			? $system
+			: (function_exists('getSystemInfo') ? getSystemInfo('mgdb.conf') : array());
+
+		$url = (isset($conf['BLAST_URL']) && $conf['BLAST_URL'] !== '')
+			? $conf['BLAST_URL']
+			: '/BLAST';
+
+		$node->replace($url);
+	}
+
 	//eksc
 	public function getHTML() {
 	    $html = "";
+		$this->defaultBlastUrl();
 		if ($this->modern) {
 			$html .= "<!DOCTYPE html>\n";
 		}

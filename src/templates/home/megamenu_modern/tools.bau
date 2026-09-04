@@ -4,9 +4,20 @@ $$SYNTAX-LEVEL 2
   <span id="tool_menu">
     <div class="dropdown_fullwidth mega-dropdown mega-dropdown-wide">
       <div class="mega-panel-heading mega-panel-heading-row">
-        <h2>Search, analyze, and visualize maize data &#8212; commonly-used tools</h2>
+        <div class="mega-heading-text">
+          <h2>Search, analyze, and visualize maize data &#8212; commonly-used tools</h2>
+          <!-- The same one-line hint the Data Hubs panel carries: filled in by
+               mgdb-chrome.js from the pointed-at tool's data-desc, and reset to
+               the default below once the pointer or focus leaves the list.
+               Descriptions are the sitemap's own wording so a tool reads the
+               same in both places. aria-hidden because it is a pointer
+               affordance duplicating the link the reader is already on; screen
+               readers get the label, and the heading action leads to the full
+               list with its descriptions. -->
+          <p class="mega-hint" data-mgdb-hint data-mgdb-hint-default="Point at a tool to see what it does." aria-hidden="true">Point at a tool to see what it does.</p>
+        </div>
         <div class="mega-heading-actions">
-          <a class="mega-heading-action" href="$(server-url)/sitemap">View every tool <span aria-hidden="true">&#8594;</span></a>
+          <a class="mega-heading-action" href="$(server-url)/sitemap">All tools <span aria-hidden="true">&#8594;</span></a>
         </div>
       </div>
       <!-- The featured-tool column is gone, so this is four lists rather than a
@@ -15,33 +26,32 @@ $$SYNTAX-LEVEL 2
       <div class="mega-grid mega-grid-4 mega-grid-tools mega-compact-groups">
         <section class="mega-group">
           <h3>Search &amp; compare</h3>
-          <a href="$(blast_url)"><strong>BLAST</strong></a>
-          <a href="$(server-url)/gene_center/gene"><strong>Gene model search</strong></a>
-          <a href="https://gcv.maizegdb.org" target="_blank" rel="noopener"><strong>Genome Context Viewer</strong></a>
-          <a href="$(server-url)/foldseek"><strong>Foldseek</strong></a>
-          <a href="$(server-url)/fatcat"><strong>FATCAT</strong></a>
+          <a href="$(blast_url)" data-desc="Sequence search against every genome dataset hosted here."><strong>BLAST</strong></a>
+          <a href="$(server-url)/gene_center/gene" data-desc="Look up a gene model, symbol, or locus."><strong>Gene model search</strong></a>
+          <a href="https://gcv.maizegdb.org" data-desc="Explore gene families in genomic context across multiple assemblies." target="_blank" rel="noopener"><strong>Genome Context Viewer</strong></a>
+          <a href="$(server-url)/foldseek" data-desc="Fast comparisons against large protein structure sets."><strong>Foldseek</strong></a>
+          <a href="$(server-url)/fatcat" data-desc="Structural alignments between a maize protein and its top structural hits."><strong>FATCAT</strong></a>
         </section>
         <section class="mega-group">
           <h3>Genes &amp; function</h3>
-          <a href="https://qteller.maizegdb.org" target="_blank" rel="noopener"><strong>qTeller</strong></a>
-          <a href="https://corncyc-b73-v4.maizegdb.org" target="_blank" rel="noopener"><strong>CornCyc</strong></a>
-          <a href="$(server-url)/data_center/protein_structure"><strong>Protein structures <span class="mega-tag mega-tag-updated">Updated</span></strong></a>
-          <a href="https://phylostrata.maizegdb.org" target="_blank" rel="noopener"><strong>Phylostrata <span class="mega-tag mega-tag-new">New</span></strong></a>
+          <a href="https://qteller.maizegdb.org" data-desc="Comparative RNA-seq expression across multiple data sources." target="_blank" rel="noopener"><strong>qTeller</strong></a>
+          <a href="$(server-url)/metabolic_pathways" data-desc="Maize pathway assignments, and the maintained databases that curate them."><strong>Metabolic Pathways</strong></a>
+          <a href="$(server-url)/data_center/protein_structure" data-desc="Predicted structures for gene model proteins, with Foldseek and FATCAT."><strong>Protein structures <span class="mega-tag mega-tag-updated">Updated</span></strong></a>
+          <a href="https://phylostrata.maizegdb.org" data-desc="Phylostratigraphy: evolutionary conservation level of a protein." target="_blank" rel="noopener"><strong>Phylostrata <span class="mega-tag mega-tag-new">New</span></strong></a>
         </section>
         <section class="mega-group">
           <h3>Genomes &amp; variation</h3>
-          <a href="https://pangenome-viewer.maizegdb.org/?set=NAM&amp;geneID=Zm00001eb406090" target="_blank" rel="noopener"><strong>NAM pangenome gene viewer <span class="mega-tag mega-tag-new">New</span></strong></a>
-          <a href="https://pangenome-viewer.maizegdb.org" target="_blank" rel="noopener"><strong>Pangenome graph <span class="mega-tag mega-tag-new">New</span></strong></a>
-          <a href="https://snptools.maizegdb.org" target="_blank" rel="noopener"><strong>SNPTools <span class="mega-tag mega-tag-new">New</span></strong></a>
-          <a href="https://wgs.maizegdb.org" target="_blank" rel="noopener"><strong>SNPversity</strong></a>
-          <a href="https://genomeqc.maizegdb.org" target="_blank" rel="noopener"><strong>GenomeQC</strong></a>
+          <a href="https://pangenome-viewer.maizegdb.org" data-desc="Structural and sequence variation across Zea genomes." target="_blank" rel="noopener"><strong>Pangenome graph <span class="mega-tag mega-tag-new">New</span></strong></a>
+          <a href="https://snptools.maizegdb.org" data-desc="Variant browsing and per-gene structure views." target="_blank" rel="noopener"><strong>SNPTools <span class="mega-tag mega-tag-new">New</span></strong></a>
+          <a href="https://wgs.maizegdb.org" data-desc="Build a VCF for a region of B73 across a subset of diverse accessions." target="_blank" rel="noopener"><strong>SNPversity 2.0</strong></a>
+          <a href="https://genomeqc.maizegdb.org" data-desc="Assess genome assembly and gene model annotation quality." target="_blank" rel="noopener"><strong>GenomeQC</strong></a>
         </section>
         <section class="mega-group">
           <h3>AI &amp; machine learning</h3>
-          <a href="$(server-url)/ai"><strong>AI at MaizeGDB</strong></a>
-          <a href="https://feta.maizegdb.org" target="_blank" rel="noopener"><strong>FETA <span class="mega-tag mega-tag-new">New</span></strong></a>
-          <a href="$(server-url)/effect/maize_v2"><strong>PanEffect</strong></a>
-          <a href="https://mfs.maizegdb.org/" target="_blank" rel="noopener"><strong>MaizeGDB Feature Store</strong></a>
+          <a href="$(server-url)/ai" data-desc="Overview of the AI-derived datasets and tools hosted here."><strong>AI at MaizeGDB</strong></a>
+          <a href="https://feta.maizegdb.org" data-desc="A suite of tools for exploring gene functional enrichment in Zea mays and relatives." target="_blank" rel="noopener"><strong>FETA <span class="mega-tag mega-tag-new">New</span></strong></a>
+          <a href="$(server-url)/effect/maize_v2" data-desc="Explore variant effects across the maize pan-genome."><strong>PanEffect</strong></a>
+          <a href="https://mfs.maizegdb.org/" data-desc="Central repository of raw and transformed data, suited to machine learning." target="_blank" rel="noopener"><strong>MaizeGDB Feature Store</strong></a>
         </section>
       </div>
     </div>

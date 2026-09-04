@@ -109,7 +109,10 @@ $content->get('metric_grin')->replace(number_format($summary['grin_accessions'])
 
 $content->get('ql_version')->replace(homeIconVersion($doc_root));
 
-$content->get('news_items')->replace(homeNewsHTML($doc_root, 3));
+/* Four, not three. The quick-link tiles are shorter than they were, so the
+   grid lost height the rail did not; a fourth entry keeps the news card running
+   alongside the grid instead of ending well above it. */
+$content->get('news_items')->replace(homeNewsHTML($doc_root, 4));
 
 if ($username && $password && $userid) {
   $mgdb->get('logout')->toggle();

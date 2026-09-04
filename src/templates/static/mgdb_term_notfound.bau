@@ -1,0 +1,65 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-term-notfound
+<meta name="robots" content="noindex">
+<meta property="og:title" content="No term found &mdash; MaizeGDB">
+<meta property="og:description" content="$(notfound_summary)">
+
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-record-notfound-page" id="term-notfound-top">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Not found</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-notfound-hero" aria-labelledby="term-notfound-title">
+    <div class="mgdb-hero-body">
+      <h1 id="term-notfound-title">No term matches &ldquo;$(requested_display)&rdquo;</h1>
+      <p class="mgdb-rec-lead">MaizeGDB's controlled vocabulary holds $(total_terms) terms across 105 types. None of them carries that name, synonym, or MaizeGDB ID.</p>
+    </div>
+  </section>
+
+  <section id="term-notfound-search" aria-labelledby="term-notfound-search-title">
+    <div class="mgdb-section-heading"><div><h2 id="term-notfound-search-title">Search</h2></div></div>
+    <form class="mgdb-rec-search" action="/searchall" method="get" role="search">
+      <label class="mgdb-visually-hidden" for="term-notfound-query">Term name, synonym, or MaizeGDB ID</label>
+      <input class="mgdb-input" id="term-notfound-query" name="term" type="search" autocomplete="off" value="$(requested_value)" placeholder="Term name, synonym, or MaizeGDB ID" />
+      <button class="mgdb-button mgdb-button-primary" type="submit">Search MaizeGDB</button>
+    </form>
+    <p class="mgdb-rec-examples">
+      <span>Try an example&#58;</span>
+      <a class="mgdb-rec-example" href="/data_center/term?id=Plant_height">Plant_height</a>
+      <a class="mgdb-rec-example" href="/data_center/term?id=leaf%20primordia">leaf primordia</a>
+      <a class="mgdb-rec-example" href="/data_center/term?id=3097755">3097755</a>
+    </p>
+    <p class="mgdb-rec-hint">A record page needs an exact term name, one of its synonyms, or its MaizeGDB ID. The GWAS display names used by the genome browser tracks &#40;for example <em>Plant_height</em>&#41; also resolve.</p>
+  </section>
+
+  $(suggestion_sections)
+
+  <section class="mgdb-hub-related" id="term-notfound-resources" aria-labelledby="term-notfound-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="term-notfound-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/phenotype">
+          <strong>Phenotype Data Hub</strong>
+          <span>Curated phenotypes, and the trait terms that classify them</span>
+        </a>
+        <a href="/data_center/qtl">
+          <strong>QTL Data Hub</strong>
+          <span>QTL analyses searchable by the trait they measured</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>Loci classified by the locus-type terms in this vocabulary</span>
+        </a>
+        <a href="/traits_ibm_nam">
+          <strong>Trait values for IBM and NAM</strong>
+          <span>Measured values for the traits in this vocabulary</span>
+        </a>
+        <a href="/searchall">
+          <strong>Search all MaizeGDB data</strong>
+          <span>One search across terms, phenotypes, loci, stocks, references, and everything else</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

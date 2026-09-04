@@ -250,6 +250,7 @@ src/include/api/v1/records/gene.php              include/api/v1/records/gene.php
 # Stock record page — replaces /data_center/stock/{id}
 src/include/stock_record_lib.php                 include/stock_record_lib.php
 src/templates/static/mgdb_stock_record.bau       templates/static/mgdb_stock_record.bau
+src/templates/static/mgdb_stock_notfound.bau       templates/static/mgdb_stock_notfound.bau
 src/css/mgdb-stock-record.css                    css/mgdb-stock-record.css
 src/images/grin/GGlogo-color-sm.gif              images/grin/GGlogo-color-sm.gif
 src/images/stock/mgcsc-ear.png                   images/stock/mgcsc-ear.png
@@ -260,13 +261,14 @@ src/controllers/data_center/stock_record_modern.php  controllers/data_center/sto
 src/include/api/v1/records/reference.php         include/api/v1/records/reference.php
 src/include/reference_record_lib.php             include/reference_record_lib.php
 src/templates/static/mgdb_reference_record.bau   templates/static/mgdb_reference_record.bau
-src/css/mgdb-reference-record.css                css/mgdb-reference-record.css
+src/templates/static/mgdb_reference_notfound.bau  templates/static/mgdb_reference_notfound.bau
 src/js/mgdb-reference-record.js                  js/mgdb-reference-record.js
 src/controllers/data_center/reference_record_modern.php  controllers/data_center/reference_record_modern.php
 
 # Gene record page — replaces /gene_center/gene/{id}
 src/include/gene_record_lib.php                  include/gene_record_lib.php
 src/templates/static/mgdb_gene_record.bau        templates/static/mgdb_gene_record.bau
+src/templates/static/mgdb_gene_notfound.bau        templates/static/mgdb_gene_notfound.bau
 src/css/mgdb-gene-record.css                     css/mgdb-gene-record.css
 src/js/mgdb-gene-record.js                       js/mgdb-gene-record.js
 src/controllers/gene_center/gene_record_modern.php  controllers/gene_center/gene_record_modern.php
@@ -494,7 +496,7 @@ src/controllers/data_center/variation_record_modern.php  controllers/data_center
 src/include/variation_record_lib.php                     include/variation_record_lib.php
 src/include/api/v1/records/variation.php                 include/api/v1/records/variation.php
 src/templates/static/mgdb_variation_record.bau           templates/static/mgdb_variation_record.bau
-src/css/mgdb-variation-record.css                        css/mgdb-variation-record.css
+src/templates/static/mgdb_variation_notfound.bau     templates/static/mgdb_variation_notfound.bau
 src/js/mgdb-variation-record.js                          js/mgdb-variation-record.js
 
 # Unified Image Data Center — unifies image, image_phenotype, image_trait, image_species, image_gel_pattern, image_mutant
@@ -516,9 +518,13 @@ src/js/mgdb-gene-product.js                                   js/mgdb-gene-produ
 # Gene product record page — replaces /data_center/gene_product?id={id}
 src/include/gene_product_record_lib.php                       include/gene_product_record_lib.php
 src/include/api/v1/records/gene_product.php                   include/api/v1/records/gene_product.php
+src/templates/static/mgdb_marker_notfound.bau                 templates/static/mgdb_marker_notfound.bau
+src/templates/static/mgdb_phenotype_notfound.bau              templates/static/mgdb_phenotype_notfound.bau
 src/templates/static/mgdb_gene_product_record.bau             templates/static/mgdb_gene_product_record.bau
 src/templates/static/mgdb_gene_product_notfound.bau           templates/static/mgdb_gene_product_notfound.bau
-src/css/mgdb-gene-product-record.css                          css/mgdb-gene-product-record.css
+# Record page shell: the furniture and the engine every record page shares.
+src/css/mgdb-record.css                                       css/mgdb-record.css
+src/js/mgdb-record.js                                         js/mgdb-record.js
 src/js/mgdb-gene-product-record.js                            js/mgdb-gene-product-record.js
 src/controllers/data_center/gene_product_record_modern.php    controllers/data_center/gene_product_record_modern.php
 
@@ -737,6 +743,7 @@ src/controllers/data_center/map_search_modern.php      controllers/data_center/m
 src/controllers/data_center/map_record_modern.php      controllers/data_center/map_record_modern.php
 src/templates/static/mgdb_map.bau                      templates/static/mgdb_map.bau
 src/templates/static/mgdb_map_record.bau               templates/static/mgdb_map_record.bau
+src/templates/static/mgdb_map_notfound.bau           templates/static/mgdb_map_notfound.bau
 src/css/mgdb-map.css                                   css/mgdb-map.css
 # Tinted-ground comparison variant of the Map hub, served at
 # /data_center/map2. Loaded by that route only; delete with the map2 guard
@@ -744,7 +751,6 @@ src/css/mgdb-map.css                                   css/mgdb-map.css
 # /genome2, the tinted Genome hub. A top-level route, so it needs its own
 # controller rather than a PAGE guard the way map2 and stock2 do.
 src/controllers/genome2.php                            controllers/genome2.php
-src/css/mgdb-map-record.css                            css/mgdb-map-record.css
 src/js/mgdb-map.js                                     js/mgdb-map.js
 src/js/mgdb-map-record.js                              js/mgdb-map-record.js
 
@@ -868,3 +874,16 @@ src/images/home/assembly_puzzle.png              images/home/assembly_puzzle.png
 src/pages/index2/index.php                       index2/index.php
 src/pages/index3/index.php                       index3/index.php
 src/pages/index4/index.php                       index4/index.php
+
+src/templates/static/mgdb_pan_gene_notfound.bau               templates/static/mgdb_pan_gene_notfound.bau
+src/templates/static/mgdb_ssr_notfound.bau                    templates/static/mgdb_ssr_notfound.bau
+src/templates/static/mgdb_overgo_notfound.bau                 templates/static/mgdb_overgo_notfound.bau
+src/templates/static/mgdb_est_notfound.bau                    templates/static/mgdb_est_notfound.bau
+src/templates/static/mgdb_bac_notfound.bau                    templates/static/mgdb_bac_notfound.bau
+src/templates/static/mgdb_cytogenetic_notfound.bau            templates/static/mgdb_cytogenetic_notfound.bau
+src/templates/static/mgdb_locus_notfound.bau                  templates/static/mgdb_locus_notfound.bau
+src/templates/static/mgdb_term_notfound.bau                   templates/static/mgdb_term_notfound.bau
+src/templates/static/mgdb_map_scores_notfound.bau             templates/static/mgdb_map_scores_notfound.bau
+src/templates/static/mgdb_recombination_notfound.bau          templates/static/mgdb_recombination_notfound.bau
+src/templates/static/mgdb_gel_notfound.bau                    templates/static/mgdb_gel_notfound.bau
+src/templates/static/mgdb_primer_notfound.bau                 templates/static/mgdb_primer_notfound.bau

@@ -1,0 +1,59 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-primer-notfound
+<meta name="robots" content="noindex">
+<meta property="og:title" content="No primer found &mdash; MaizeGDB">
+<meta property="og:description" content="$(notfound_summary)">
+
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-record-notfound-page" id="primer-notfound-top">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/marker">Marker Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Not found</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-notfound-hero" aria-labelledby="primer-notfound-title">
+    <div class="mgdb-hero-body">
+      <h1 id="primer-notfound-title">No primer matches &ldquo;$(requested_display)&rdquo;</h1>
+      <p class="mgdb-rec-lead">MaizeGDB holds $(total_primers) curated primers and enzymes. None of them carries that name or MaizeGDB ID.</p>
+    </div>
+  </section>
+
+  <section id="primer-notfound-search" aria-labelledby="primer-notfound-search-title">
+    <div class="mgdb-section-heading"><div><h2 id="primer-notfound-search-title">Search</h2></div></div>
+    <form class="mgdb-rec-search" action="/data_center/marker" method="get" role="search">
+      <label class="mgdb-visually-hidden" for="primer-notfound-query">Primer name, sequence, or MaizeGDB ID</label>
+      <input class="mgdb-input" id="primer-notfound-query" name="term" type="search" autocomplete="off" value="$(requested_value)" placeholder="Primer name, sequence, or MaizeGDB ID" />
+      <button class="mgdb-button mgdb-button-primary" type="submit">Search markers</button>
+    </form>
+    <p class="mgdb-rec-hint">A primer record covers both PCR primers and restriction enzymes. A nucleotide sequence resolves too, so pasting the primer itself will find it. Primers are usually reached from the marker, SSR, and locus records that use them.</p>
+  </section>
+
+  $(suggestion_sections)
+
+  <section class="mgdb-hub-related" id="primer-notfound-resources" aria-labelledby="primer-notfound-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="primer-notfound-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/map">
+          <strong>Map Data Hub</strong>
+          <span>The probes primers are the source DNA for</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>Loci list their primers and enzymes in the Genetic information section</span>
+        </a>
+        <a href="/data_center/ssr">
+          <strong>SSR Data Hub</strong>
+          <span>SSRs, which almost all carry a primer pair</span>
+        </a>
+        <a href="/data_center/est">
+          <strong>EST Data Hub</strong>
+          <span>Expressed sequence tags built from primer pairs</span>
+        </a>
+        <a href="/searchall">
+          <strong>Search all MaizeGDB data</strong>
+          <span>One search across every data type</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

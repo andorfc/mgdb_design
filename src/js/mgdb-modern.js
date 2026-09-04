@@ -703,6 +703,121 @@
     document.body.removeChild(area);
   }
 
+  /* ======================================================================
+     Section tabs (scrollspy)
+
+     `.mgdb-section-tabs` is markup the shell styles; the behaviour was never
+     shared, so twenty pages each carried their own copy of this and eleven
+     shipped without one. Those bars highlighted whatever the template marked
+     `is-current` and never changed -- and nothing errored, so the fault was
+     invisible until someone scrolled. This is that behaviour, once.
+
+     Deliberately NOT auto-wired from init(): the pages that already have their
+     own copy would then run two spies over the same bar, and the two would
+     fight over the click hold. Opt in with MGDB.sectionTabs().
+
+     Driven by scroll, IntersectionObserver and resize together, because no one
+     trigger fires in every case. Pass `watch` (an element, or a selector) for a
+     region whose height changes -- a results panel that unhides moves every
+     section below it.
+
+     Returns the update function, so a caller with its own reason to re-measure
+     can call it.
+     ====================================================================== */
+
+  function sectionTabs(options) {
+    var opts = options || {};
+    var bar = typeof opts.bar === 'string' ? document.querySelector(opts.bar)
+            : (opts.bar || document.querySelector('.mgdb-section-tabs'));
+    if (!bar) { return function () {}; }
+
+    var links = bar.querySelectorAll('a');
+    if (!links.length) { return function () {}; }
+
+    var pairs = [];
+    Array.prototype.forEach.call(links, function (tab) {
+      var href = tab.getAttribute('href') || '';
+      if (href.charAt(0) !== '#') { return; }
+      var section = document.getElementById(href.slice(1));
+      if (section) { pairs.push({ tab: tab, section: section }); }
+    });
+    if (!pairs.length) { return function () {}; }
+
+    var heldSection = null;
+    var heldAtY = 0;
+
+    function mark(section) {
+      pairs.forEach(function (pair) {
+        var current = pair.section === section;
+        pair.tab.classList.toggle('is-current', current);
+        if (current) { pair.tab.setAttribute('aria-current', 'true'); }
+        else { pair.tab.removeAttribute('aria-current'); }
+      });
+    }
+
+    /* The line to measure against is the section's own scroll-margin-top, read
+       back from CSS rather than repeated here, so a clicked tab and the spy
+       agree by construction even when the bar wraps to a second row. */
+    function triggerLine() {
+      var barHeight = bar.getBoundingClientRect().height;
+      var margin = parseFloat(window.getComputedStyle(pairs[0].section).scrollMarginTop) || 0;
+      return Math.max(barHeight + 8, margin + 4);
+    }
+
+    function update() {
+      /* A click marks its own tab at once; hold that until the reader really
+         scrolls, or a smooth scroll drags the highlight through every section
+         on the way down. */
+      if (heldSection) {
+        if (Math.abs(window.scrollY - heldAtY) < 4) { return; }
+        heldSection = null;
+      }
+
+      var line = triggerLine();
+      var current = pairs[0];
+
+      pairs.forEach(function (pair) {
+        if (pair.section.hasAttribute('hidden')) { return; }
+        if (pair.section.getBoundingClientRect().top <= line) { current = pair; }
+      });
+
+      /* At the foot of the document the last section may never reach the line,
+         so it would otherwise be unreachable. */
+      if ((window.innerHeight + window.scrollY) >= (document.body.scrollHeight - 2)) {
+        current = pairs[pairs.length - 1];
+      }
+
+      mark(current.section);
+    }
+
+    pairs.forEach(function (pair) {
+      pair.tab.addEventListener('click', function () {
+        mark(pair.section);
+        heldSection = pair.section;
+        heldAtY = window.scrollY;
+      });
+    });
+
+    window.addEventListener('scroll', debounce(update, 50), { passive: true });
+    window.addEventListener('resize', update);
+
+    if (window.IntersectionObserver) {
+      var observer = new window.IntersectionObserver(function () { update(); },
+        { rootMargin: '-20% 0px -60% 0px' });
+      pairs.forEach(function (pair) { observer.observe(pair.section); });
+    }
+
+    var watched = typeof opts.watch === 'string' ? document.querySelector(opts.watch) : opts.watch;
+    if (watched && window.MutationObserver) {
+      new window.MutationObserver(update).observe(watched, {
+        childList: true, subtree: true, attributes: true, attributeFilter: ['hidden']
+      });
+    }
+
+    update();
+    return update;
+  }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
@@ -716,6 +831,7 @@
   MGDB.request = request;
   MGDB.filterList = filterList;
   MGDB.sortTable = sortTable;
+  MGDB.sectionTabs = sectionTabs;
   MGDB.chart = chart;
   MGDB.mergeLayout = mergeLayout;
   MGDB.CHART_COLORS = CHART_COLORS;

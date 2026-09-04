@@ -408,29 +408,26 @@
 	opacity:.88;
 }
 
-/* Tools is wider than the other two fullwidth panels. Its four lists need
-   921px of track between them — measured widest label per column, plus the
-   16px the link padding takes:
+/* Tools held a 1010px width override while "NAM pangenome gene viewer" — the
+   longest label the panel ever carried — needed a 263px track on its own. That
+   item is gone, so the panel is back on the shared 920px the other two
+   fullwidth panels use, and its right edge lines up with theirs again.
 
-     Search & compare       203px   "Genome Context Viewer"
-     Genes & function       228px   "Protein structures" + Updated tag
-     Genomes & variation    285px   "NAM pangenome gene viewer" + New tag
-     AI & machine learning  205px   "MaizeGDB Feature Store"
+   What the four lists need now, measured on the live panel as each link's
+   nowrap box — widest label in the column plus the 16px the link padding takes:
 
-   At the shared 920px that leaves 842px of track — 79px short however the
-   tracks are divided, which is why the pangenome label wrapped. 1010px with
-   tighter gutters gives 952px, and the weights below resolve to
-   210 / 236 / 295 / 212, clearing each column by 7-10px.
+     Search & compare       183px   "Genome Context Viewer"
+     Genes & function       210px   "Protein structures" + Updated tag
+     Genomes & variation    184px   "Pangenome graph" + New tag
+     AI & machine learning  184px   "MaizeGDB Feature Store"
 
-   The ceiling is 1037px, set by the narrowest desktop band: at a 1165px
-   viewport this panel starts at x=104 and the bar ends at 1141. Do not widen
-   past that, and re-measure if a label or tag changes. */
-.mgdb-modern #menu_bar > li.mega-tools-item .mega-dropdown-wide {
-	width:1010px;
-}
-
+   920px less 28px of grid padding and three 10px gutters leaves 862px of
+   track, and the weights below resolve to 208 / 235 / 209 / 209 — about 25px
+   of slack per column. Re-measure if a label or tag changes: a column that
+   needs more than its track wraps to two lines rather than widening the
+   panel. */
 .mgdb-modern #menu_bar .mega-grid-tools {
-	grid-template-columns:minmax(0, 1fr) minmax(0, 1.124fr) minmax(0, 1.405fr) minmax(0, 1.01fr);
+	grid-template-columns:minmax(0, 1fr) minmax(0, 1.13fr) minmax(0, 1.005fr) minmax(0, 1.005fr);
 	gap:10px;
 	padding:12px 14px 14px;
 }
