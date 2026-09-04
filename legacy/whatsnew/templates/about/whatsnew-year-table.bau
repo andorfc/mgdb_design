@@ -1,0 +1,28 @@
+*(whatsnew-year-table
+  *(scripts #include-js: js/whatsnew.js#)
+  <div id='leftcolumn-whatsnew'>
+    <table width='155px' height='335px' id='whatsnew-tab' cellpadding=0 cellspacing=0>
+	    @(inits #display: off#
+			  $(row-no #default:1#)
+      )
+      @(whatsnew-table-row
+ 			  <tr %(get-year
+		   	      $row=$this->reflect(\)->upstream('whatsnew-year-table'\)->get('row-no'\);
+		   			  $row_val=$row->value(\);
+		   			  $idstr='id='.$row_val;
+		   			  $row->replace($row_val + 1\);
+						  return $idstr;) 
+					  onmouseover='javascript:ChangeColor(this, true\);' 
+					  onmouseout='javascript:ChangeColor(this, false\);' 
+            onclick='LoadNews(%(send-row 
+					                	    return $this->reflect(\)->upstream('whatsnew-year-table'\)->get('row-no'\)->value(\)-1;)\);
+							  		javascript:ChangeColor(this, true\);' 
+						class='lite_green_background_1'>
+          <td style='border-top:1px solid #5B6E1F; border-bottom:1px solid #5B6E1F;font-size: 12px; padding-top:2px; padding-bottom:2px;padding-left:2px;'>
+				    $(whatsnew-year)
+				  </td>
+			  </tr>
+		  )
+    </table>		
+  </div>
+)

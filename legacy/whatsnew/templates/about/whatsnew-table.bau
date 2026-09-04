@@ -1,0 +1,28 @@
+*(whatsnew-table #include-js: /js/news_section.js#
+<div style='line-height:200%'>
+  @(whatsnew-title 
+	  <span style='padding-left:70px;font-weight:bold;'>
+		  <font size='2'>$(title)</font>
+		</span>
+	)
+	<a href='feed://maizegdb.org/maizegdb_news_feed.php' style='padding-left:400px;text-decoration:underline;color:black;'>
+	<font size='2'>Subscribe To RSSFeed</a></font><img src='../images/rss.png'>
+	<br>
+</div>
+<div id='rightcolumn-whatsnew'>    
+	<hr size=2 width='87%'><br> 
+	
+	@(whatsnew-news-table-row
+  	<table id='hot-new-papers-tab' cellpadding=0 cellspacing=0>
+	  	<tr>
+			  <td width='140px' style='color:#5A6D1B;padding:5px;'>
+				  <font size='2'>$(date)</font>
+				</td>
+		    <td width='620px' style='padding:5px;'>
+				  <font size='2'>$(news)</font>
+				</td>
+			</tr>
+	  </table>	
+	)
+</div>
+)

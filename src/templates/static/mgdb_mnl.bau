@@ -1,0 +1,184 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-mnl
+<a class="mgdb-skip-link" href="#mnl-main">Skip to main content</a>
+
+<main class="mgdb-page mgdb-mnl-page" id="mnl-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Community</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Maize Newsletter</span>
+  </nav>
+
+  <section class="mgdb-hero-basic" aria-labelledby="mnl-title">
+    <span class="mgdb-hero-basic-icon" aria-hidden="true">
+      <svg viewBox="0 0 84 84" role="presentation" focusable="false">
+        <path d="M42 22c-7-5-16-7-25-7v48c9 0 18 2 25 7 7-5 16-7 25-7V15c-9 0-18 2-25 7z" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round" />
+        <line x1="42" y1="22" x2="42" y2="70" stroke="currentColor" stroke-width="5" />
+        <line x1="24" y1="32" x2="34" y2="32" stroke="#d99a0b" stroke-width="4" stroke-linecap="round" />
+        <line x1="24" y1="43" x2="34" y2="43" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+        <line x1="50" y1="32" x2="60" y2="32" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+        <line x1="50" y1="43" x2="60" y2="43" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+      </svg>
+    </span>
+    <div>
+      <h1 id="mnl-title">Maize Genetics Cooperation Newsletter</h1>
+      <p>Published annually from $(first-year) to $(last-year) and fully electronic from volume $(electronic-from) onward. A compendium of notes and information on working research, shared throughout the maize research community.</p>
+      <p class="mnl-status"><span class="mgdb-pill mgdb-pill-info">No longer published</span> All $(volume-count) volumes remain online and citable.</p>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#mnl-archive" class="is-current">Archive</a>
+    <a href="#mnl-about">About the newsletter</a>
+    <a href="#mnl-history">History</a>
+    <a href="#mnl-related">Related resources</a>
+  </nav>
+
+  <section id="mnl-archive" aria-labelledby="mnl-archive-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="mnl-archive-title">Archive</h2></div>
+      <p>$(volume-count) volumes across $(decade-count) decades. $(pdf-count) have a whole-volume PDF; every volume opens on mnl.maizegdb.org.</p>
+    </div>
+
+    <div class="mnl-finder">
+      <form id="mnl-form" class="mgdb-search" role="search">
+        <div class="mgdb-search-row">
+          <div class="mgdb-field">
+            <label class="mgdb-label" for="mnl-query">Search volumes</label>
+            <p class="mgdb-hint" id="mnl-query-hint">Match a volume number or a year. Example: <code>89</code>, <code>1975</code>, or <code>1930s</code></p>
+            <input class="mgdb-input" id="mnl-query" name="q" type="search" aria-describedby="mnl-query-hint" autocomplete="off" />
+          </div>
+          <div class="mgdb-field mnl-decade-field">
+            <label class="mgdb-label" for="mnl-decade">Decade</label>
+            <select class="mgdb-select" id="mnl-decade">
+              <option value="">All decades</option>
+              $(decade-options)
+            </select>
+          </div>
+        </div>
+        <div class="mnl-controls">
+          <div class="mnl-view-switch" role="group" aria-label="Archive view">
+            <button class="mnl-view-btn" type="button" data-view="grid" aria-pressed="true">Grid</button>
+            <button class="mnl-view-btn" type="button" data-view="list" aria-pressed="false">List</button>
+          </div>
+          <button class="mgdb-button mgdb-button-quiet" id="mnl-reset" type="button" hidden>Clear</button>
+          <span class="mgdb-result-count" id="mnl-count" aria-live="polite"></span>
+        </div>
+      </form>
+    </div>
+
+    <div class="mnl-view" id="mnl-view-grid" data-view-panel="grid">
+      <ul class="mnl-grid" id="mnl-grid">$(volume-cards)</ul>
+    </div>
+
+    <div class="mnl-view" id="mnl-view-list" data-view-panel="list" hidden>
+      <div class="mgdb-table-scroll">
+        <table class="mgdb-table" id="mnl-table">
+          <caption>Every volume of the Maize Genetics Cooperation Newsletter<span class="mgdb-muted">Volume, publication date, the whole-volume PDF where one exists, and where the volume is hosted. Volumes $(electronic-from) and later were published electronically, as separate per-article PDFs.</span></caption>
+          <thead>
+            <tr>
+              <th scope="col">Volume</th>
+              <th scope="col">Published</th>
+              <th scope="col">Whole volume</th>
+              <th scope="col">Format</th>
+              <th scope="col">Address</th>
+            </tr>
+          </thead>
+          <tbody>$(volume-rows)</tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="mgdb-empty" id="mnl-empty" hidden>
+      <h3>No volumes match those filters</h3>
+      <p>Try a volume number or a four-digit year, or widen the decade back to all.</p>
+      <button class="mgdb-button mgdb-button-secondary" id="mnl-empty-reset" type="button">Clear search and filters</button>
+    </div>
+  </section>
+
+  <section id="mnl-about" aria-labelledby="mnl-about-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="mnl-about-title">About the newsletter</h2></div>
+    </div>
+    <div class="mgdb-prose-layout">
+      <div class="mgdb-prose">
+        <p>The Maize Genetics Cooperation Newsletter has been published annually since $(first-year), and became fully electronic with volume $(electronic-from), 2015. It is a compendium of notes and information on working research intended to be shared throughout the maize research community.</p>
+        <p>Articles submitted to the newsletter may not be used as references without the consent of the author.</p>
+      </div>
+      <aside class="mgdb-aside-card">
+        <h3>Citing a volume</h3>
+        <p>Each volume keeps the address it was published under. Both <code>mnl.maizegdb.org/94</code> and the older <code>mnl.maizegdb.org/mnl/60/</code> form are live, so existing citations continue to resolve.</p>
+      </aside>
+    </div>
+  </section>
+
+  <section id="mnl-history" aria-labelledby="mnl-history-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="mnl-history-title">History</h2></div>
+      <p>Published accounts of how the newsletter began at Cornell in 1929.</p>
+    </div>
+
+    <div class="mgdb-stack">
+      <article class="reference-result-card">
+        <div class="reference-result-meta"><span>2019</span><span>Book</span></div>
+        <h3><a href="https\://ecommons.cornell.edu/handle/1813/66550" target="_blank" rel="noopener">Founding of the Maize Genetics Cooperation News Letter at Cornell University: A 90th Anniversary Tribute</a></h3>
+        <p class="reference-result-authors">Kass, L.B., E.H. Coe, M.N. Cook, M.E. Smith, J.L. Singer &#40;Eds.&#41; 2019. Foreword by E.S. Buckler.</p>
+        <p class="reference-result-citation">Internet-First University Press &middot; Ithaca, New York</p>
+        <div class="reference-result-links">
+          <a href="https\://ecommons.cornell.edu/handle/1813/66550" target="_blank" rel="noopener">Cornell eCommons &nearr;</a>
+        </div>
+      </article>
+
+      <article class="reference-result-card">
+        <div class="reference-result-meta"><span>2005</span><span>Article</span><span>PubMed</span></div>
+        <h3><a href="http\://www.genetics.org/content/169/4/1787.long" target="_blank" rel="noopener">Cornfests, cornfabs and cooperation: the origins and beginnings of the maize genetics cooperation news letter</a></h3>
+        <p class="reference-result-authors">Lee B. Kass, Christophe Bonneuil, Edward H. Coe Jr.</p>
+        <p class="reference-result-citation">Genetics &middot; 169 &middot; 1787&ndash;1797</p>
+        <div class="reference-result-links">
+          <a href="http\://www.genetics.org/content/169/4/1787.long" target="_blank" rel="noopener">Full text &nearr;</a>
+          <a href="http\://www.ncbi.nlm.nih.gov/pubmed/?term=15879515" target="_blank" rel="noopener">PubMed &nearr;</a>
+        </div>
+      </article>
+
+      <article class="reference-result-card">
+        <div class="reference-result-meta"><span>2019</span><span>Seminar</span></div>
+        <h3><a href="https\://www.youtube.com/watch?v=tKrRBfwlyEY" target="_blank" rel="noopener">Celebration of the 90th anniversary of the founding of the Maize Genetics Cooperation News Letter at Cornell University</a></h3>
+        <p class="reference-result-authors">Presented by Dr. Lee B. Kass on April 23, 2019.</p>
+        <div class="reference-result-links">
+          <a href="https\://www.youtube.com/watch?v=tKrRBfwlyEY" target="_blank" rel="noopener">Watch on YouTube &nearr;</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="mnl-related" aria-labelledby="mnl-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="mnl-related-title">Related resources</h2></div>
+    </div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/maize_history">
+          <strong>Maize history</strong>
+          <span>A century of maize genetics</span>
+        </a>
+        <a href="/data_center/reference">
+          <strong>Reference search</strong>
+          <span>The curated maize literature</span>
+        </a>
+        <a href="/classic_reads">
+          <strong>Classic papers</strong>
+          <span>Influential maize genetics</span>
+        </a>
+        <a href="/cooperators">
+          <strong>Maize Genetics Cooperation</strong>
+          <span>The organization behind it</span>
+        </a>
+        <a href="/whatsnew">
+          <strong>News archive</strong>
+          <span>MaizeGDB announcements</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+)

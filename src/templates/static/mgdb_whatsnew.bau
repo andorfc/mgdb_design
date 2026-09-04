@@ -1,0 +1,111 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-whatsnew
+<a class="mgdb-skip-link" href="#whatsnew-main">Skip to main content</a>
+
+<main class="mgdb-page mgdb-whatsnew-page" id="whatsnew-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Community</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">News archive</span>
+  </nav>
+
+  <section class="mgdb-hero-basic" aria-labelledby="whatsnew-title">
+    <span class="mgdb-hero-basic-icon" aria-hidden="true">
+      <svg viewBox="0 0 84 84" role="presentation" focusable="false">
+        <rect x="12" y="16" width="52" height="54" rx="5" fill="none" stroke="currentColor" stroke-width="5" />
+        <path d="M64 30h8v34a6 6 0 0 1-6 6H24" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+        <line x1="22" y1="30" x2="54" y2="30" stroke="#d99a0b" stroke-width="4" stroke-linecap="round" />
+        <line x1="22" y1="42" x2="54" y2="42" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+        <line x1="22" y1="54" x2="42" y2="54" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+      </svg>
+    </span>
+    <div>
+      <h1 id="whatsnew-title">News archive</h1>
+      <p>Every MaizeGDB announcement since $(news-first-year): releases, new tools, meetings, jobs, and news from the maize community.</p>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#whatsnew-find" class="is-current">Find an item</a>
+    <a href="#whatsnew-archive">Archive</a>
+    <a href="#whatsnew-related">Related resources</a>
+  </nav>
+
+  <section id="whatsnew-find" aria-labelledby="whatsnew-find-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="whatsnew-find-title">Find an item</h2></div>
+      <p>$(news-total) items across $(news-years) years. Everything is on this page, so your browser&rsquo;s find also works.</p>
+    </div>
+
+    <div class="news-finder">
+      <form id="whatsnew-form" class="mgdb-search" role="search">
+        <div class="mgdb-search-row">
+          <div class="mgdb-field">
+            <label class="mgdb-label" for="whatsnew-query">Search the archive</label>
+            <p class="mgdb-hint" id="whatsnew-query-hint">Match any word in an announcement. Example: <code>JBrowse</code>, <code>McClintock</code>, or <code>release</code></p>
+            <input class="mgdb-input" id="whatsnew-query" name="q" type="search" aria-describedby="whatsnew-query-hint" autocomplete="off" />
+          </div>
+          <div class="mgdb-field news-year-field">
+            <label class="mgdb-label" for="whatsnew-year">Year</label>
+            <select class="mgdb-select" id="whatsnew-year">
+              <option value="">All years</option>
+              $(year-options)
+            </select>
+          </div>
+        </div>
+        <div class="mgdb-filters">
+          <button class="mgdb-button mgdb-button-quiet" id="whatsnew-reset" type="button" hidden>Clear</button>
+          <span class="mgdb-result-count" id="whatsnew-count" aria-live="polite"></span>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section id="whatsnew-archive" aria-labelledby="whatsnew-archive-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="whatsnew-archive-title">Archive</h2></div>
+      <p>Newest first, grouped by year. $(news-image-count) items carry a photograph or release graphic.</p>
+    </div>
+
+    <div id="whatsnew-list">
+      $(news-sections)
+    </div>
+
+    <div class="mgdb-empty" id="whatsnew-empty" hidden>
+      <h3>No announcements match those filters</h3>
+      <p>Try a shorter word, or widen the year back to all years.</p>
+      <button class="mgdb-button mgdb-button-secondary" id="whatsnew-empty-reset" type="button">Clear search and filters</button>
+    </div>
+  </section>
+
+  <section id="whatsnew-related" aria-labelledby="whatsnew-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="whatsnew-related-title">Related resources</h2></div>
+    </div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/maize_history">
+          <strong>Maize history</strong>
+          <span>A century of maize genetics</span>
+        </a>
+        <a href="/hot_new_papers">
+          <strong>Editorial board picks</strong>
+          <span>A recommended paper monthly</span>
+        </a>
+        <a href="/maize_meeting">
+          <strong>Maize Genetics Conference</strong>
+          <span>Past and upcoming meetings</span>
+        </a>
+        <a href="/jobs">
+          <strong>Jobs</strong>
+          <span>Positions shared with MaizeGDB</span>
+        </a>
+        <a href="/contact">
+          <strong>Contact MaizeGDB</strong>
+          <span>Send us news to post</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+)

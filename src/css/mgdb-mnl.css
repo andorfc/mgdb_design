@@ -1,0 +1,200 @@
+/* ==========================================================================
+   Maize Genetics Cooperation Newsletter — /mnl
+   --------------------------------------------------------------------------
+   Built on css/mgdb-modern.css. Two views over one list: a grid of volume
+   chips for scanning ninety-odd volumes at once, and the shared table for
+   reading them as rows. The mockup's third view, a timeline, is not built —
+   the volumes are one per year with no gaps to speak of, so a timeline drew
+   a straight line and said nothing the year label did not.
+   ========================================================================== */
+
+.mgdb-mnl-page .mgdb-section-heading > p { max-width: none; }
+.mgdb-mnl-page .mgdb-section-heading > div:first-child { flex: 0 1 auto; }
+
+.mgdb-mnl-page .mnl-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-top: var(--mgdb-space-3);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* --------------------------------------------------------------------------
+   Finder and view switch
+   -------------------------------------------------------------------------- */
+
+.mgdb-mnl-page .mnl-finder {
+  margin-bottom: var(--mgdb-space-5);
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-top: 3px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-mnl-page .mnl-finder .mgdb-search {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.mgdb-mnl-page .mgdb-search-row .mgdb-field:first-child { flex: 3 1 22rem; }
+.mgdb-mnl-page .mnl-decade-field { flex: 1 1 12rem; }
+
+.mgdb-mnl-page .mnl-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--mgdb-line);
+}
+
+.mgdb-mnl-page .mnl-view-switch { display: flex; gap: var(--mgdb-space-2); }
+
+.mgdb-mnl-page .mnl-view-btn {
+  min-height: 34px;
+  padding: 2px var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink-soft);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-mnl-page .mnl-view-btn:hover:not([aria-pressed="true"]) { background: var(--mgdb-surface-alt); }
+
+.mgdb-mnl-page .mnl-view-btn[aria-pressed="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #fff;
+}
+
+.mgdb-mnl-page .mnl-view[hidden] { display: none !important; }
+
+/* --------------------------------------------------------------------------
+   Grid view
+
+   Ninety-four volumes want to be scannable at a glance, so each is a small
+   chip carrying the number large and the date small. auto-fill rather than
+   auto-fit so the chips keep their size instead of stretching when a decade
+   filter leaves only three of them.
+   -------------------------------------------------------------------------- */
+
+.mgdb-mnl-page .mnl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: var(--mgdb-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mgdb-mnl-page .mnl-card {
+  position: relative;
+  border: 1px solid var(--mgdb-line);
+  border-left: 3px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.mgdb-mnl-page .mnl-card:hover,
+.mgdb-mnl-page .mnl-card:focus-within {
+  border-left-color: var(--mgdb-green);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-mnl-page .mnl-card-link {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  color: inherit;
+  text-decoration: none;
+}
+
+.mgdb-mnl-page .mnl-card-link:hover .mnl-card-number { text-decoration: underline; }
+
+/* Tabular figures so the numbers line up column to column. */
+.mgdb-mnl-page .mnl-card-number {
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xl);
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.mgdb-mnl-page .mnl-card-year {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+}
+
+.mgdb-mnl-page .mnl-card-badge {
+  position: absolute;
+  top: var(--mgdb-space-2);
+  right: var(--mgdb-space-2);
+}
+
+/* The pill carries its own text, so shrinking it in the grid keeps the volume
+   number dominant without making the distinction colour-only. */
+.mgdb-mnl-page .mnl-card-badge .mgdb-pill {
+  padding: 0 6px;
+  font-size: 10px;
+  letter-spacing: .02em;
+}
+
+.mgdb-mnl-page .mnl-card[hidden] { display: none !important; }
+.mgdb-mnl-page #mnl-table tr[hidden] { display: none !important; }
+
+.mgdb-mnl-page .mnl-row-url {
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-sm);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 767px) {
+  .mgdb-mnl-page .mnl-grid { grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr)); }
+  .mgdb-mnl-page .mnl-controls { align-items: flex-start; }
+}
+
+/* --------------------------------------------------------------------------
+   Whole-volume PDF
+
+   87 of the 94 volumes have one. The size is shown because these are scans:
+   the largest is 127 MB and a reader on a phone should see that before
+   tapping, which a title tooltip would not give them.
+   -------------------------------------------------------------------------- */
+
+.mgdb-mnl-page .mnl-card-pdf {
+  padding: 0 var(--mgdb-space-4) var(--mgdb-space-3);
+  margin-top: -2px;
+}
+
+.mgdb-mnl-page .mnl-pdf-link {
+  display: inline-flex;
+  gap: 6px;
+  align-items: baseline;
+  color: var(--mgdb-burgundy);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.mgdb-mnl-page .mnl-pdf-link:hover { text-decoration: underline; }
+
+.mgdb-mnl-page .mnl-pdf-size {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}

@@ -1,0 +1,170 @@
+/* ==========================================================================
+   News archive — /whatsnew
+   --------------------------------------------------------------------------
+   Built on css/mgdb-modern.css: that file provides the tokens and the shell,
+   this one lays out the year groups and the news items.
+   ========================================================================== */
+
+.mgdb-whatsnew-page .mgdb-section-heading > p { max-width: none; }
+.mgdb-whatsnew-page .mgdb-section-heading > div:first-child { flex: 0 1 auto; }
+
+/* --------------------------------------------------------------------------
+   Finder
+   -------------------------------------------------------------------------- */
+
+.mgdb-whatsnew-page .news-finder {
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-top: 3px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-whatsnew-page .news-finder .mgdb-search {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.mgdb-whatsnew-page .mgdb-search-row .mgdb-field:first-child { flex: 3 1 22rem; }
+.mgdb-whatsnew-page .news-year-field { flex: 1 1 12rem; }
+
+/* --------------------------------------------------------------------------
+   Year groups
+
+   The heading is sticky so that while scrolling a long run of items it stays
+   clear which year is being read. It clears the section tab bar above it.
+   -------------------------------------------------------------------------- */
+
+.mgdb-whatsnew-page .news-year + .news-year { margin-top: var(--mgdb-space-6); }
+
+.mgdb-whatsnew-page .news-year-heading {
+  position: sticky;
+  top: 3.25rem;
+  z-index: 5;
+  display: flex;
+  gap: var(--mgdb-space-3);
+  align-items: baseline;
+  margin: 0 0 var(--mgdb-space-4);
+  padding: var(--mgdb-space-2) 0;
+  border-bottom: 2px solid var(--mgdb-line);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xl);
+}
+
+.mgdb-whatsnew-page .news-year-count {
+  padding: 1px 9px;
+  border-radius: 999px;
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.mgdb-whatsnew-page .news-year-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-3);
+}
+
+/* --------------------------------------------------------------------------
+   One announcement
+
+   Date in a fixed left rail so the eye can run down it, body to the right.
+   The rail collapses above the text on a phone.
+   -------------------------------------------------------------------------- */
+
+.mgdb-whatsnew-page .news-item {
+  display: grid;
+  grid-template-columns: 10.5rem minmax(0, 1fr);
+  gap: var(--mgdb-space-4);
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-left: 3px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.mgdb-whatsnew-page .news-item:hover,
+.mgdb-whatsnew-page .news-item:focus-within {
+  border-left-color: var(--mgdb-green);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+/* An item linked to by fragment gets the gold spine so it is findable after
+   the jump. */
+.mgdb-whatsnew-page .news-item:target {
+  border-left-color: var(--mgdb-gold);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-whatsnew-page .news-item-date {
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+/* min-width:0 on the text column: without it a long unbroken URL in an
+   announcement sets the column's min-content width and widens the page. */
+.mgdb-whatsnew-page .news-item-main {
+  display: flex;
+  gap: var(--mgdb-space-4);
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.mgdb-whatsnew-page .news-item-body {
+  min-width: 0;
+  color: var(--mgdb-ink);
+  line-height: var(--mgdb-leading);
+  overflow-wrap: anywhere;
+}
+
+.mgdb-whatsnew-page .news-item-body p { margin: 0 0 var(--mgdb-space-2); }
+.mgdb-whatsnew-page .news-item-body p:last-child { margin-bottom: 0; }
+
+/* Images restored from the imgg field in data/news.xml. They vary from square
+   headshots to wide release graphics, so the box is capped in both directions
+   and the image is contained rather than cropped. */
+.mgdb-whatsnew-page .news-item-image {
+  flex: 0 0 auto;
+  /* The width/height attributes give the browser the aspect ratio so the box
+     is reserved before the lazy image arrives; these caps then scale it down
+     without distorting it. */
+  width: auto;
+  height: auto;
+  max-width: 9rem;
+  max-height: 8rem;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-alt);
+  object-fit: contain;
+}
+
+.mgdb-whatsnew-page .news-item-actions {
+  margin: var(--mgdb-space-2) 0 0;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-whatsnew-page .news-item-link { color: var(--mgdb-burgundy); font-weight: 700; }
+
+/* Hidden by the filter. */
+.mgdb-whatsnew-page .news-item[hidden],
+.mgdb-whatsnew-page .news-year[hidden] { display: none !important; }
+
+@media (max-width: 767px) {
+  .mgdb-whatsnew-page .news-item {
+    grid-template-columns: 1fr;
+    gap: var(--mgdb-space-2);
+  }
+  .mgdb-whatsnew-page .news-item-main {
+    flex-direction: column;
+    gap: var(--mgdb-space-3);
+  }
+  .mgdb-whatsnew-page .news-item-image { max-width: 100%; max-height: 12rem; }
+  .mgdb-whatsnew-page .news-year-heading { position: static; }
+}
