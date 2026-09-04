@@ -1,0 +1,234 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-pan-gene-record
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:title" content="$(pan_gene_name) &mdash; MaizeGDB pan-gene record">
+<meta property="og:description" content="$(pan_gene_summary)">
+
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-pan-gene-record-page" id="pg-record-top" data-requested-id="$(requested_identifier)" data-pan-gene="$(pan_gene_name)">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/pan_gene_center/pan_gene">Pan-Gene Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(pan_gene_name)</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-hero" aria-labelledby="pg-record-title">
+    <div class="mgdb-hero-body">
+      <h1 id="pg-record-title">$(pan_gene_name)</h1>
+      <p class="mgdb-rec-synonyms" id="pg-record-synonyms" hidden></p>
+      <dl class="mgdb-record-facts mgdb-rec-headfacts" id="pg-record-facts">$(identity_facts)</dl>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs mgdb-rec-tabs" id="pg-record-tabs" aria-label="Sections on this record">
+    <a href="#pg-record-overview">Overview</a>
+  </nav>
+
+  <div class="mgdb-loading" id="pg-record-loading"><span class="mgdb-spinner" aria-hidden="true"></span><span>Loading the full record&hellip;</span></div>
+
+  <div class="mgdb-message mgdb-message-error" id="pg-record-error" role="alert" hidden>
+    <div>
+      <strong>The rest of this record could not be loaded.</strong>
+      <span>The identity above is correct. Reload to try again, or report it if it keeps happening.</span>
+      <button class="mgdb-button mgdb-button-secondary" id="pg-record-retry" type="button">Retry</button>
+    </div>
+  </div>
+
+  <div class="mgdb-message mgdb-message-info" id="pg-record-notice" role="status" hidden></div>
+
+  ;; The class is the one the legacy Atlassian collector bound to and the one
+  ;; js/mgdb-feedback.js still binds; data-feedback-id names the record so the
+  ;; report carries it, and the href keeps the link working without the script.
+  <p class="mgdb-rec-report"><a class="mgdb-report-link trigger_gene_model_issue_form" href="/feedback?id=$(requested_identifier_path)" data-feedback-id="$(requested_identifier)">Report a pan-gene error</a></p>
+
+  <section id="pg-record-overview" aria-labelledby="pg-record-overview-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pg-record-overview-title">Overview</h2></div></div>
+    <div id="pg-record-overview-body"></div>
+  </section>
+
+  <section id="pg-record-members" aria-labelledby="pg-record-members-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pg-record-members-title">Members</h2></div></div>
+    <div id="pg-record-members-body"></div>
+  </section>
+
+  <section id="pg-record-function" aria-labelledby="pg-record-function-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pg-record-function-title">Function</h2></div></div>
+    <div id="pg-record-function-body"></div>
+  </section>
+
+  <section id="pg-record-domains" aria-labelledby="pg-record-domains-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pg-record-domains-title">Protein domains</h2></div></div>
+    <div id="pg-record-domains-body"></div>
+  </section>
+
+  <section id="pg-record-expression" aria-labelledby="pg-record-expression-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pg-record-expression-title">Expression</h2></div></div>
+    <div id="pg-record-expression-body"></div>
+  </section>
+
+  <section id="pg-record-insertions" aria-labelledby="pg-record-insertions-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pg-record-insertions-title">Insertions</h2></div></div>
+    <div id="pg-record-insertions-body"></div>
+  </section>
+
+  <section id="pg-record-traits" aria-labelledby="pg-record-traits-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pg-record-traits-title">SNPs and traits</h2></div></div>
+    <div id="pg-record-traits-body"></div>
+  </section>
+
+  <section id="pg-record-proteins" aria-labelledby="pg-record-proteins-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pg-record-proteins-title">Proteins and structures</h2></div></div>
+    <div id="pg-record-proteins-body"></div>
+  </section>
+
+  <section id="pg-record-pathways" aria-labelledby="pg-record-pathways-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pg-record-pathways-title">Metabolic pathways</h2></div></div>
+    <div id="pg-record-pathways-body"></div>
+  </section>
+
+  <section id="pg-record-sequence" aria-labelledby="pg-record-sequence-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pg-record-sequence-title">Sequence and alignment</h2></div></div>
+    <div id="pg-record-sequence-body"></div>
+    <div class="mgdb-rec-block" id="pg-record-msa-block" hidden>
+      <div class="mgdb-rec-block-head"><h3>MSA Viewer</h3></div>
+      <p class="mgdb-rec-block-status"><strong>Instructions&#58;</strong> Drag image or use top scroll bar to scroll.</p>
+      <div class="mgdb-rec-toolbar mgdb-pg-msa-toolbar">
+        <div class="mgdb-view-toggle" role="group" aria-label="Alignment to show">
+          <button class="mgdb-view-btn" type="button" id="pg-msa-cds" aria-pressed="true">CDS</button>
+          <button class="mgdb-view-btn" type="button" id="pg-msa-protein" aria-pressed="false">Protein</button>
+        </div>
+        <label>Colours <select id="msa_color_select" aria-label="Colour scheme">
+          <option value="clustal2">Clustal2 &#40;default&#41;</option>
+          <option value="clustal">Clustal</option>
+          <option value="zappo">Zappo</option>
+          <option value="taylor">Taylor</option>
+          <option value="hydro">Hydrophobicity</option>
+          <option value="cinema">Cinema</option>
+          <option value="mae">MAE</option>
+          <option value="buried">Buried</option>
+          <option value="helix">Helix</option>
+        </select></label>
+        <button class="mgdb-rec-tsv" type="button" id="pg-msa-expand">Expand</button>
+        <button class="mgdb-rec-tsv" type="button" id="pg-msa-contract">Contract</button>
+        <a class="mgdb-rec-tsv" id="msa_view-download" href="#" target="_blank" rel="noopener">Export alignment</a>
+      </div>
+      ;; The MSA library replaces the class list on the element it renders into,
+      ;; so the scroll container has to be a wrapper it never touches. Without
+      ;; it the alignment is 3,892px wide and the whole document scrolls.
+      <div class="mgdb-pg-msa"><div id="msa-div"></div></div>
+      <p class="mgdb-rec-block-status"><strong>Reference</strong>&#58; Guy Yachdav, Sebastian Wilzbach, Benedikt Rauscher, Robert Sheridan, Ian Sillitoe, James Procter, Suzanna Lewis, Burkhard Rost and Tatyana Goldberg. &ldquo;MSAViewer&#58; interactive JavaScript visualization of multiple sequence alignments.&rdquo; Bioinformatics &#40;2016&#41; <a href="http\://dx.doi.org/10.1093/bioinformatics/btw474" target="_blank" rel="noopener">http\://dx.doi.org/10.1093/bioinformatics/btw474 <span aria-hidden="true">&nearr;</span></a></p>
+    </div>
+  </section>
+
+  <section id="pg-record-tree" aria-labelledby="pg-record-tree-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pg-record-tree-title">Phylogenetic tree</h2></div></div>
+    <div id="pg-record-tree-body"></div>
+    <div id="pan_gene_phylotree" class="mgdb-pg-tree"></div>
+    <p class="mgdb-rec-block-status" id="pg-record-tree-credit" hidden>Generated with <a href="https\://icytree.org" target="_blank" rel="noopener">IcyTree <span aria-hidden="true">&nearr;</span></a></p>
+  </section>
+
+  <section id="pg-record-pangenome" aria-labelledby="pg-record-pangenome-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pg-record-pangenome-title">Pangenome graph</h2></div></div>
+    <div id="pg-record-pangenome-body"></div>
+  </section>
+
+  <section id="pg-record-context" aria-labelledby="pg-record-context-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pg-record-context-title">Genome context</h2></div></div>
+    <div id="pg-record-context-body"></div>
+  </section>
+
+  <section id="pg-record-analysis" aria-labelledby="pg-record-analysis-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pg-record-analysis-title">Analysis</h2></div></div>
+    <div id="pg-record-analysis-body"></div>
+  </section>
+
+  <section id="pg-record-downloads" aria-labelledby="pg-record-downloads-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pg-record-downloads-title">Downloads</h2></div></div>
+    <div id="pg-record-downloads-body"></div>
+  </section>
+
+  <section id="pg-record-viewers" aria-labelledby="pg-record-viewers-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pg-record-viewers-title">Comparative viewers</h2></div></div>
+    <div id="pg-record-viewers-body"></div>
+  </section>
+
+  <section id="pg-record-metrics" aria-labelledby="pg-record-metrics-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pg-record-metrics-title">Metrics</h2></div></div>
+    <div class="mgdb-metric-grid" id="pg-record-metrics-body"></div>
+    <div class="mgdb-chart-grid mgdb-rec-charts" id="pg-record-charts">
+      <figure class="mgdb-figure" id="pg-record-size-figure" hidden>
+        <h3>Pan-gene sizes across the analysis</h3>
+        <div class="mgdb-chart" id="pg-record-size-chart" role="img" aria-label="Bar chart of how many pan-genes the analysis produced at each member count, with this pan-gene's own size marked">
+          <div class="mgdb-chart-fallback">Loading the size distribution&hellip;</div>
+        </div>
+        <figcaption id="pg-record-size-caption"></figcaption>
+      </figure>
+      <figure class="mgdb-figure" id="pg-record-connections-figure">
+        <h3>Record connections</h3>
+        <div class="mgdb-chart" id="pg-record-connections-chart" role="img" aria-label="Horizontal bar chart of how many members, ontology terms, insertions and other records are attached to this pan-gene">
+          <div class="mgdb-chart-fallback">Loading the record connections&hellip;</div>
+        </div>
+        <figcaption id="pg-record-connections-caption"></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="mgdb-hub-related" id="pg-record-resources" aria-labelledby="pg-record-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="pg-record-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/pan_gene_center/pan_gene">
+          <strong>Pan-Gene Data Hub</strong>
+          <span>Search every pan-gene by identifier, locus, size, or the annotations it spans</span>
+        </a>
+        <a href="/genome">
+          <strong>Genomes and assemblies</strong>
+          <span>The assemblies and annotations this analysis grouped gene models across</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>The classical loci behind these gene models, and their gene records</span>
+        </a>
+        <a href="/downloads">
+          <strong>Downloads</strong>
+          <span>Bulk pan-gene files, sequences, and alignments for every analysis</span>
+        </a>
+        <a href="https\://gcv.maizegdb.org" target="_blank" rel="noopener">
+          <strong>Genomic Context Viewer</strong>
+          <span>Explore synteny around this pan-gene across every annotation</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="mgdb-rec-api mgdb-hub-tone-blue" id="pg-record-api" aria-labelledby="pg-record-api-title">
+    <div class="mgdb-section-heading"><div><h2 id="pg-record-api-title">API data access</h2></div></div>
+    <div class="mgdb-rec-api-row">
+      <code id="pg-record-api-endpoint">GET /api/v1/records/pan_gene/$(requested_identifier)</code>
+      <div class="mgdb-rec-api-actions">
+        <a class="mgdb-button mgdb-button-quiet" id="pg-record-api-link" href="/api/v1/records/pan_gene/$(requested_identifier_path)" target="_blank" rel="noopener">Raw JSON <span aria-hidden="true">&nearr;</span></a>
+        <button class="mgdb-button mgdb-button-quiet" id="pg-copy-json-btn" type="button">Copy JSON</button>
+        <a class="mgdb-button mgdb-button-quiet" href="/api/v1/openapi">API documentation</a>
+      </div>
+    </div>
+    <p class="mgdb-rec-api-note">Every member, ontology term, protein domain, insertion, SNP, pathway and viewer link on this page is retrieved in one structured JSON response.</p>
+  </section>
+
+  <dialog class="mgdb-rec-lightbox" id="pg-record-image-dialog" aria-labelledby="pg-lightbox-title">
+    <div class="mgdb-rec-lightbox-content">
+      <button class="mgdb-rec-lightbox-close" type="button" aria-label="Close preview">&times;</button>
+      <div class="mgdb-rec-lightbox-image"><img src="" alt=""></div>
+      <div class="mgdb-rec-lightbox-details">
+        <div class="mgdb-rec-lightbox-meta">
+          <span class="mgdb-rec-image-badge"></span>
+          <h3 id="pg-lightbox-title"></h3>
+        </div>
+        <p class="mgdb-rec-lightbox-caption"></p>
+        <div class="mgdb-rec-lightbox-actions">
+          <a class="mgdb-button mgdb-button-primary" data-role="record" href="#" hidden>View database record <span aria-hidden="true">&rarr;</span></a>
+          <a class="mgdb-button mgdb-button-secondary" data-role="file" href="#" target="_blank" rel="noopener">Open original file <span aria-hidden="true">&nearr;</span></a>
+          <button class="mgdb-button mgdb-button-quiet mgdb-ref-copy" data-role="copy" type="button" data-copy-value="">Copy URL</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+</main>
+)

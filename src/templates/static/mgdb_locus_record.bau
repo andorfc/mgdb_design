@@ -1,0 +1,184 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-locus-record
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:title" content="$(locus_name) &mdash; MaizeGDB locus record">
+<meta property="og:description" content="$(locus_summary)">
+
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-locus-record-page" id="locus-record-top" data-locus-id="$(locus_id)" data-requested-id="$(requested_identifier)">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/locus">Gene and Locus Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(locus_name)</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-hero" aria-labelledby="locus-record-title">
+    <div class="mgdb-hero-body">
+      <h1 id="locus-record-title">$(locus_name)</h1>
+      <p class="mgdb-rec-fullname" id="locus-record-fullname">$(locus_full_name)</p>
+      <p class="mgdb-rec-synonyms" id="locus-record-synonyms" hidden></p>
+      <dl class="mgdb-record-facts mgdb-rec-headfacts" id="locus-record-facts">$(identity_facts)</dl>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs mgdb-rec-tabs" id="locus-record-tabs" aria-label="Sections on this record">
+    <a href="#locus-record-overview">Overview</a>
+  </nav>
+
+  <div class="mgdb-loading" id="locus-record-loading"><span class="mgdb-spinner" aria-hidden="true"></span><span>Loading the full record&hellip;</span></div>
+
+  <div class="mgdb-message mgdb-message-error" id="locus-record-error" role="alert" hidden>
+    <div>
+      <strong>The rest of this record could not be loaded.</strong>
+      <span>The identity above is correct. Reload to try again, or report it if it keeps happening.</span>
+      <button class="mgdb-button mgdb-button-secondary" id="locus-record-retry" type="button">Retry</button>
+    </div>
+  </div>
+
+  <div class="mgdb-message mgdb-message-info" id="locus-record-notice" role="status" hidden></div>
+
+  <section id="locus-record-overview" aria-labelledby="locus-record-overview-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="locus-record-overview-title">Overview</h2></div></div>
+    <div id="locus-record-overview-body"></div>
+  </section>
+
+  <section id="locus-record-positions" aria-labelledby="locus-record-positions-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="locus-record-positions-title">Map positions</h2></div></div>
+    <div id="locus-record-positions-body"></div>
+  </section>
+
+  <section id="locus-record-nearby" aria-labelledby="locus-record-nearby-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="locus-record-nearby-title">Nearby loci</h2></div></div>
+    <div class="locus-nearby-controls">
+      <label for="locus-nearby-cm">Window</label>
+      <select class="mgdb-select" id="locus-nearby-cm">
+        <option value="5">&plusmn; 5 cM</option>
+        <option value="10" selected>&plusmn; 10 cM</option>
+        <option value="20">&plusmn; 20 cM</option>
+        <option value="50">&plusmn; 50 cM</option>
+      </select>
+      <span class="locus-nearby-status" id="locus-nearby-status"></span>
+    </div>
+    <div id="locus-record-nearby-body"></div>
+  </section>
+
+  <section id="locus-record-alleles" aria-labelledby="locus-record-alleles-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="locus-record-alleles-title">Alleles and variations</h2></div></div>
+    <div id="locus-record-alleles-body"></div>
+  </section>
+
+  <section id="locus-record-stocks" aria-labelledby="locus-record-stocks-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="locus-record-stocks-title">Stocks</h2></div></div>
+    <div id="locus-record-stocks-body"></div>
+  </section>
+
+  <section id="locus-record-detected" aria-labelledby="locus-record-detected-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="locus-record-detected-title">Detected by</h2></div></div>
+    <div id="locus-record-detected-body"></div>
+  </section>
+
+  <section id="locus-record-genetic" aria-labelledby="locus-record-genetic-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="locus-record-genetic-title">Genetic information</h2></div></div>
+    <div id="locus-record-genetic-body"></div>
+  </section>
+
+  <section id="locus-record-related" aria-labelledby="locus-record-related-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="locus-record-related-title">Related records</h2></div></div>
+    <div id="locus-record-related-body"></div>
+  </section>
+
+  <section id="locus-record-offsite" aria-labelledby="locus-record-offsite-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="locus-record-offsite-title">Offsite resources</h2></div></div>
+    <div id="locus-record-offsite-body"></div>
+  </section>
+
+  <section id="locus-record-annotations" aria-labelledby="locus-record-annotations-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="locus-record-annotations-title">Annotations</h2></div></div>
+    <div id="locus-record-annotations-body"></div>
+  </section>
+
+  <section id="locus-record-references" aria-labelledby="locus-record-references-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="locus-record-references-title">References</h2></div></div>
+    <div id="locus-record-references-body"></div>
+  </section>
+
+  <section id="locus-record-metrics" aria-labelledby="locus-record-metrics-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="locus-record-metrics-title">Metrics</h2></div></div>
+    <div class="mgdb-metric-grid" id="locus-record-metrics-body"></div>
+    <div class="mgdb-chart-grid mgdb-rec-charts" id="locus-record-charts">
+      <figure class="mgdb-figure" id="locus-record-connections-figure">
+        <h3>Record connections</h3>
+        <div class="mgdb-chart" id="locus-record-connections-chart" role="img" aria-label="Horizontal bar chart of how many map positions, alleles, stocks, probes, related loci, external entries, and references are attached to this locus">
+          <div class="mgdb-chart-fallback">Loading the record connections&hellip;</div>
+        </div>
+        <figcaption id="locus-record-connections-caption"></figcaption>
+      </figure>
+      <figure class="mgdb-figure" id="locus-record-years-figure" hidden>
+        <h3>References by year</h3>
+        <div class="mgdb-chart" id="locus-record-years-chart" role="img" aria-label="Bar chart of the number of references attached to this locus, by publication year">
+          <div class="mgdb-chart-fallback">Loading the publication years&hellip;</div>
+        </div>
+        <figcaption id="locus-record-years-caption"></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="mgdb-hub-related" id="locus-record-resources" aria-labelledby="locus-record-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="locus-record-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/locus">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>Search classical loci by name, synonym, type, chromosome, or map position</span>
+        </a>
+        <a href="/gene_center/gene">
+          <strong>Gene Data Hub</strong>
+          <span>B73 gene models across assembly versions, and the loci they represent</span>
+        </a>
+        <a href="/data_center/variation">
+          <strong>Variations &amp; Alleles Data Hub</strong>
+          <span>The curated variations and alleles recorded against loci like this one</span>
+        </a>
+        <a href="/data_center/map">
+          <strong>Map Data Hub</strong>
+          <span>The genetic, cytogenetic, and physical maps this locus is placed on</span>
+        </a>
+        <a href="/nomenclature">
+          <strong>Maize nomenclature guidelines</strong>
+          <span>How maize gene symbols and locus names are formed and curated</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="mgdb-rec-api mgdb-hub-tone-blue" id="locus-record-api" aria-labelledby="locus-record-api-title">
+    <div class="mgdb-section-heading"><div><h2 id="locus-record-api-title">API data access</h2></div></div>
+    <div class="mgdb-rec-api-row">
+      <code id="locus-record-api-endpoint">GET /api/v1/records/locus/$(requested_identifier)</code>
+      <div class="mgdb-rec-api-actions">
+        <a class="mgdb-button mgdb-button-quiet" id="locus-record-api-link" href="/api/v1/records/locus/$(requested_identifier_path)" target="_blank" rel="noopener">Raw JSON <span aria-hidden="true">&nearr;</span></a>
+        <button class="mgdb-button mgdb-button-quiet" id="locus-copy-json-btn" type="button">Copy JSON</button>
+        <a class="mgdb-button mgdb-button-quiet" href="/api/v1/openapi">API documentation</a>
+      </div>
+    </div>
+    <p class="mgdb-rec-api-note">Every fact, map position, allele, stock, probe, external entry, and reference on this page is retrieved in one structured JSON response.</p>
+  </section>
+
+  <dialog class="mgdb-rec-lightbox" id="locus-image-dialog" aria-labelledby="locus-lightbox-title">
+    <div class="mgdb-rec-lightbox-content">
+      <button class="mgdb-rec-lightbox-close" type="button" aria-label="Close preview">&times;</button>
+      <div class="mgdb-rec-lightbox-image"><img src="" alt=""></div>
+      <div class="mgdb-rec-lightbox-details">
+        <div class="mgdb-rec-lightbox-meta">
+          <span class="mgdb-rec-image-badge"></span>
+          <h3 id="locus-lightbox-title"></h3>
+        </div>
+        <p class="mgdb-rec-lightbox-caption"></p>
+        <div class="mgdb-rec-lightbox-actions">
+          <a class="mgdb-button mgdb-button-primary" data-role="record" href="#" hidden>View database record <span aria-hidden="true">&rarr;</span></a>
+          <a class="mgdb-button mgdb-button-secondary" data-role="file" href="#" target="_blank" rel="noopener">Open original file <span aria-hidden="true">&nearr;</span></a>
+          <button class="mgdb-button mgdb-button-quiet mgdb-ref-copy" data-role="copy" type="button" data-copy-value="">Copy URL</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+</main>
+)

@@ -1,0 +1,99 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-primer-record
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:title" content="$(record_name) &mdash; MaizeGDB primer">
+<meta property="og:description" content="$(record_summary)">
+
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-primer-record-page" id="primer-record-top" data-record-id="$(record_id)" data-requested-id="$(requested_identifier)">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/marker">Marker Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(record_name)</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-hero" aria-labelledby="primer-record-title">
+    <div class="mgdb-hero-body">
+      <h1 id="primer-record-title">$(record_name)</h1>
+      <p class="mgdb-rec-synonyms" id="primer-record-synonyms" hidden></p>
+      <dl class="mgdb-record-facts mgdb-rec-headfacts" id="primer-record-facts">$(identity_facts)</dl>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs mgdb-rec-tabs" id="primer-record-tabs" aria-label="Sections on this record">
+    <a href="#primer-record-overview">Overview</a>
+  </nav>
+
+  <div class="mgdb-loading" id="primer-record-loading"><span class="mgdb-spinner" aria-hidden="true"></span><span>Loading the full record&hellip;</span></div>
+
+  <div class="mgdb-message mgdb-message-error" id="primer-record-error" role="alert" hidden>
+    <div>
+      <strong>The rest of this record could not be loaded.</strong>
+      <span>The identity above is correct. Reload to try again, or report it if it keeps happening.</span>
+      <button class="mgdb-button mgdb-button-secondary" id="primer-record-retry" type="button">Retry</button>
+    </div>
+  </div>
+
+  <div class="mgdb-message mgdb-message-info" id="primer-record-notice" role="status" hidden></div>
+
+  <section id="primer-record-overview" aria-labelledby="primer-record-overview-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="primer-record-overview-title">Overview</h2></div></div>
+    <div id="primer-record-overview-body"></div>
+  </section>
+
+  <section id="primer-record-probes" aria-labelledby="primer-record-probes-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="primer-record-probes-title">Probes built from this primer</h2></div></div>
+    <div id="primer-record-probes-body"></div>
+  </section>
+
+  <section id="primer-record-isoschizomers" aria-labelledby="primer-record-isoschizomers-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="primer-record-isoschizomers-title">Isoschizomers</h2></div></div>
+    <div id="primer-record-isoschizomers-body"></div>
+  </section>
+
+  <section id="primer-record-references" aria-labelledby="primer-record-references-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="primer-record-references-title">References</h2></div></div>
+    <div id="primer-record-references-body"></div>
+  </section>
+
+  <section class="mgdb-hub-related" id="primer-record-resources" aria-labelledby="primer-record-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="primer-record-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/marker">
+          <strong>Marker Data Hub</strong>
+          <span>The probes this primer is the source DNA for</span>
+        </a>
+        <a href="/data_center/ssr">
+          <strong>SSR Data Hub</strong>
+          <span>Simple sequence repeats, most of which carry primer pairs</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>Loci list their primers and enzymes in the Genetic information section</span>
+        </a>
+        <a href="/data_center/est">
+          <strong>EST Data Hub</strong>
+          <span>Expressed sequence tags built from primer pairs</span>
+        </a>
+        <a href="/BLAST">
+          <strong>BLAST</strong>
+          <span>Search this primer sequence against the hosted genome datasets</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="mgdb-rec-api mgdb-hub-tone-blue" id="primer-record-api" aria-labelledby="primer-record-api-title">
+    <div class="mgdb-section-heading"><div><h2 id="primer-record-api-title">API data access</h2></div></div>
+    <div class="mgdb-rec-api-row">
+      <code id="primer-record-api-endpoint">GET /api/v1/records/primer/$(requested_identifier)</code>
+      <div class="mgdb-rec-api-actions">
+        <a class="mgdb-button mgdb-button-quiet" id="primer-record-api-link" href="/api/v1/records/primer/$(requested_identifier_path)" target="_blank" rel="noopener">Raw JSON <span aria-hidden="true">&nearr;</span></a>
+        <button class="mgdb-button mgdb-button-quiet" id="primer-copy-json-btn" type="button">Copy JSON</button>
+        <a class="mgdb-button mgdb-button-quiet" href="/api/v1/openapi">API documentation</a>
+      </div>
+    </div>
+    <p class="mgdb-rec-api-note">Every fact and related probe on this page is retrieved in one structured JSON response.</p>
+  </section>
+
+</main>
+)

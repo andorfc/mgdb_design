@@ -1,0 +1,124 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-gene-product-record
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:title" content="$(product_name) &mdash; MaizeGDB gene product record">
+<meta property="og:description" content="$(product_summary)">
+
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-gene-product-record-page" id="gp-record-top" data-gene-product-id="$(gene_product_id)" data-requested-id="$(requested_identifier)">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/gene_product">Gene Product Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(product_name)</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-hero" aria-labelledby="gp-record-title">
+    <div class="mgdb-hero-body">
+      <h1 id="gp-record-title">$(product_name)</h1>
+      <p class="mgdb-rec-synonyms" id="gp-record-synonyms" hidden></p>
+      <dl class="mgdb-record-facts mgdb-rec-headfacts" id="gp-record-facts">$(identity_facts)</dl>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs mgdb-rec-tabs" id="gp-record-tabs" aria-label="Sections on this record">
+    <a href="#gp-record-overview">Overview</a>
+  </nav>
+
+  <div class="mgdb-loading" id="gp-record-loading"><span class="mgdb-spinner" aria-hidden="true"></span><span>Loading the full record&hellip;</span></div>
+
+  <div class="mgdb-message mgdb-message-error" id="gp-record-error" role="alert" hidden>
+    <div>
+      <strong>The rest of this record could not be loaded.</strong>
+      <span>The identity above is correct. Reload to try again, or report it if it keeps happening.</span>
+      <button class="mgdb-button mgdb-button-secondary" id="gp-record-retry" type="button">Retry</button>
+    </div>
+  </div>
+
+  <div class="mgdb-message mgdb-message-info" id="gp-record-notice" role="status" hidden></div>
+
+  <section id="gp-record-overview" aria-labelledby="gp-record-overview-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="gp-record-overview-title">Overview</h2></div></div>
+    <div id="gp-record-overview-body"></div>
+  </section>
+
+  <section id="gp-record-annotations" aria-labelledby="gp-record-annotations-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="gp-record-annotations-title">Annotations</h2></div></div>
+    <div id="gp-record-annotations-body"></div>
+  </section>
+
+  <section id="gp-record-related" aria-labelledby="gp-record-related-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="gp-record-related-title">Other related records</h2></div></div>
+    <div id="gp-record-related-body"></div>
+  </section>
+
+  <section id="gp-record-offsite" aria-labelledby="gp-record-offsite-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="gp-record-offsite-title">Offsite resources</h2></div></div>
+    <div id="gp-record-offsite-body"></div>
+  </section>
+
+  <section id="gp-record-references" aria-labelledby="gp-record-references-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="gp-record-references-title">References</h2></div></div>
+    <div id="gp-record-references-body"></div>
+  </section>
+
+  <section id="gp-record-metrics" aria-labelledby="gp-record-metrics-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="gp-record-metrics-title">Metrics</h2></div></div>
+    <div class="mgdb-metric-grid" id="gp-record-metrics-body"></div>
+    <div class="mgdb-chart-grid mgdb-rec-charts" id="gp-record-charts">
+      <figure class="mgdb-figure" id="gp-record-connections-figure">
+        <h3>Record connections</h3>
+        <div class="mgdb-chart" id="gp-record-connections-chart" role="img" aria-label="Horizontal bar chart of how many loci, gene models, references, related products, and external entries are attached to this gene product">
+          <div class="mgdb-chart-fallback">Loading the record connections&hellip;</div>
+        </div>
+        <figcaption id="gp-record-connections-caption"></figcaption>
+      </figure>
+      <figure class="mgdb-figure" id="gp-record-years-figure" hidden>
+        <h3>References by year</h3>
+        <div class="mgdb-chart" id="gp-record-years-chart" role="img" aria-label="Bar chart of the number of references attached to this gene product, by publication year">
+          <div class="mgdb-chart-fallback">Loading the publication years&hellip;</div>
+        </div>
+        <figcaption id="gp-record-years-caption"></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="mgdb-hub-related" id="gp-record-resources" aria-labelledby="gp-record-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="gp-record-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/gene_product">
+          <strong>Gene Product Data Hub</strong>
+          <span>Search all curated gene products by name, EC number, class, localization, or pathway</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>Classical loci and the gene models that represent them across assemblies</span>
+        </a>
+        <a href="/metabolic_pathways">
+          <strong>Metabolic Pathways</strong>
+          <span>Curated maize pathways and the reactions and enzymes they comprise</span>
+        </a>
+        <a href="https\://www.uniprot.org/" target="_blank" rel="noopener">
+          <strong>UniProt</strong>
+          <span>Protein sequence and functional annotation for the entries cited on this record</span>
+        </a>
+        <a href="https\://www.brenda-enzymes.org/" target="_blank" rel="noopener">
+          <strong>BRENDA</strong>
+          <span>Enzyme function, kinetics, and literature by EC number</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="mgdb-rec-api mgdb-hub-tone-blue" id="gp-record-api" aria-labelledby="gp-record-api-title">
+    <div class="mgdb-section-heading"><div><h2 id="gp-record-api-title">API data access</h2></div></div>
+    <div class="mgdb-rec-api-row">
+      <code id="gp-record-api-endpoint">GET /api/v1/records/gene_product/$(requested_identifier)</code>
+      <div class="mgdb-rec-api-actions">
+        <a class="mgdb-button mgdb-button-quiet" id="gp-record-api-link" href="/api/v1/records/gene_product/$(requested_identifier_path)" target="_blank" rel="noopener">Raw JSON <span aria-hidden="true">&nearr;</span></a>
+        <button class="mgdb-button mgdb-button-quiet" id="gp-copy-json-btn" type="button">Copy JSON</button>
+        <a class="mgdb-button mgdb-button-quiet" href="/api/v1/openapi">API documentation</a>
+      </div>
+    </div>
+    <p class="mgdb-rec-api-note">Every fact, locus, annotation, related record, external entry, and reference on this page is retrieved in one structured JSON response.</p>
+  </section>
+</main>
+)

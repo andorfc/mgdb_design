@@ -33,3 +33,16 @@ The replacement is one request and nine queries.
 `reference_data.php?type=annotations` rendered per-viewer user annotations keyed
 on the login cookie. The API is public and cacheable, so it does not carry them
 and the modern page does not show them.
+
+## Update, 2026-09-02
+
+The modern page moved onto the shared record shell (`css/mgdb-record.css` +
+`js/mgdb-record.js`). Two things changed for this archive:
+
+- **`css/mgdb-reference-record.css` is deleted**, not superseded. Every piece
+  of furniture it described — the author list, the locus cards, the chip grid,
+  the citation blocks, the link list — is a shell collection now.
+- **An unresolved identifier no longer falls through to the original
+  controller.** `reference_record_modern.php` publishes its own 404 with
+  suggestions, so `reference.php` and `reference_data.php` are unreachable from
+  this route in every case rather than in most of them.

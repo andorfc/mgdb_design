@@ -35,3 +35,18 @@ it does not carry them and the modern page does not show them. The legacy code
 that produced them is preserved here; the section was already dead in practice,
 its curation half disabled in the source with the comment "broken, and no one
 used it when it worked".
+
+## Update, 2026-09-02
+
+The modern page moved onto the shared record shell (`css/mgdb-record.css` +
+`js/mgdb-record.js`), the last of the eight record pages to do so.
+
+- **`css/mgdb-stock-record.css` shrank from 1,284 lines to 559.** It now
+  describes only the pedigree viewer, the TYPSimSelector card and the ordering
+  panel; everything else it carried is the shell's.
+- **An unresolved identifier no longer falls through to the original
+  controller.** `stock_record_modern.php` publishes its own 404 with
+  suggestions, so `stock.php` and `stock_data.php` are unreachable from this
+  route in every case rather than in most of them.
+- **The ordering panel is unchanged and still disabled.** The cart handoff is
+  not built; the button says so.

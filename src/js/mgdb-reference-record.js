@@ -1,257 +1,276 @@
 /* ==========================================================================
-   Reference record page — page behavior
+   Reference record page — /data_center/reference?id={id}
    --------------------------------------------------------------------------
-   Companion to /css/mgdb-reference-record.css and
-   templates/static/mgdb_reference_record.bau.
-
-   One request to /api/v1/records/reference/{id} builds the whole page. The
-   page it replaces made five, each returning a fragment of HTML.
-
-   The title, journal, year, and the Editorial Board badge are already on the
-   page, server-rendered, so a failure here degrades to a citation a reader can
-   still use.
+   Glue over js/mgdb-record.js, the same engine the gene product, variation,
+   map, marker, phenotype and pan-gene record pages use. This file maps one
+   call to /api/v1/records/reference/{id} onto it.
    ========================================================================== */
 
 (function (window, document) {
   'use strict';
 
   var MGDB = window.MGDB;
-  if (!MGDB) { return; }
-
-  var CHIP_LIMIT = 60;
-
-  function byId(id) { return document.getElementById(id); }
-  function escape(value) { return MGDB.escapeHtml(value); }
-  function show(el, visible) { if (el) { el.hidden = !visible; } }
+  var R = window.MGDBRecord;
+  if (!MGDB || !R) { return; }
 
   var els = {};
+  var payload = null;
 
   /* ------------------------------------------------------------------------
      Header
      ------------------------------------------------------------------------ */
 
+  /* Authors as one line, the way a citation reads them. Beyond six the middle
+     is elided: the byline is for recognising the paper, and the Authors
+     section below lists every one of them. */
   function renderByline(authors) {
     if (!authors || !authors.length) { return; }
-
-    // Long author lists are elided the way a journal would: first three, then
-    // "and N others", then the last author, who is usually the senior one.
-    var parts;
-    if (authors.length <= 6) {
-      parts = authors.map(authorLink);
-    } else {
-      parts = authors.slice(0, 3).map(authorLink);
-      parts.push('and ' + (authors.length - 4) + ' others');
-      parts.push(authorLink(authors[authors.length - 1]));
-    }
-    els.byline.innerHTML = parts.join(', ');
-  }
-
-  function authorLink(author) {
-    var label = escape(author.full_name || author.name);
-    return author.html
-      ? '<a href="' + escape(author.html) + '">' + label + '</a>'
-      : label;
-  }
-
-  function renderHeader(data, sections) {
-    var attributes = data.attributes || {};
-    var overview = sections.overview || {};
-
-    renderByline(sections.authors);
-
-    var facts = '';
-    if (attributes.journal) { facts += '<div><dt>Journal</dt><dd>' + escape(attributes.journal) + '</dd></div>'; }
-    if (attributes.year) { facts += '<div><dt>Year</dt><dd>' + attributes.year + '</dd></div>'; }
-    if (overview.volume && overview.volume !== '0') {
-      var locator = overview.volume + (overview.issue && overview.issue !== '0' ? '(' + overview.issue + ')' : '');
-      facts += '<div><dt>Volume</dt><dd>' + escape(locator) + '</dd></div>';
-    }
-    facts += '<div><dt>MaizeGDB ID</dt><dd class="mgdb-record-id">' + escape(data.id) + '</dd></div>';
-    els.facts.innerHTML = facts;
-
-    // The actions a reader wants first: the paper itself, then the record it
-    // is indexed under, then the means to cite it.
-    var actions = [];
-    var citation = sections.citation || {};
-
-    if (citation.doi_url) {
-      actions.push('<a class="mgdb-button mgdb-button-primary" href="' + escape(citation.doi_url) +
-        '">Read the paper</a>');
-    }
-    if (citation.pubmed_url) {
-      actions.push('<a class="mgdb-button mgdb-button-secondary" href="' + escape(citation.pubmed_url) +
-        '">PubMed</a>');
-    }
-    if (citation.formatted || citation.bibtex) {
-      actions.push('<a class="mgdb-button mgdb-button-quiet" href="#reference-record-citation">Cite</a>');
-    }
-    els.actions.innerHTML = actions.join('');
+    var names = authors.map(function (author) {
+      var label = R.escape(author.full_name || author.name);
+      return author.html ? R.link(author.html, author.full_name || author.name) : label;
+    });
+    var shown = names.length > 6
+      ? names.slice(0, 3).concat(['<span class="mgdb-muted">&hellip; ' +
+          (names.length - 4) + ' more &hellip;</span>'], names.slice(-1))
+      : names;
+    els.byline.innerHTML = shown.join(', ') + '.';
+    R.show(els.byline, true);
   }
 
   /* ------------------------------------------------------------------------
-     Sections
+     Overview
      ------------------------------------------------------------------------ */
+
+  function renderOverview(overview, citation) {
+    if (!overview) { return false; }
+    var out = els.overviewBody;
+    out.innerHTML = '';
+
+    /* Volume 0, issue 0 and a "pages" field holding the DOI are all what this
+       table records when a paper was indexed before the publisher assigned
+       them. Showing 0 as a volume would be a claim; leaving it out is not. */
+    function real(value) {
+      var text = value === null || value === undefined ? '' : String(value).trim();
+      return (text === '' || text === '0') ? '' : text;
+    }
+    var locator = real(overview.volume);
+    if (locator && real(overview.issue)) { locator += '(' + real(overview.issue) + ')'; }
+
+    var pages = real(overview.pages);
+    if (pages && overview.doi && pages.indexOf(overview.doi) !== -1) {
+      pages = '';   // the pages field is holding the DOI, which has its own row
+    }
+
+    var factsHtml = R.facts([
+      ['Publication type', overview.publication_type ? R.escape(overview.publication_type.name) : ''],
+      ['Journal', overview.journal
+        ? (overview.journal.html ? R.refLink(overview.journal) : R.escape(overview.journal.name)) : ''],
+      ['Year', overview.year == null ? '' : String(overview.year)],
+      ['Volume', locator ? R.escape(locator) : ''],
+      ['Pages', pages ? R.escape(pages) : ''],
+      ['DOI', overview.doi ? R.link('https://doi.org/' + overview.doi, overview.doi, true) : ''],
+      ['PubMed ID', overview.pubmed_id
+        ? R.link('https://pubmed.ncbi.nlm.nih.gov/' + overview.pubmed_id + '/', overview.pubmed_id, true) : ''],
+      ['ISSN', overview.issn ? R.escape(overview.issn) : ''],
+      ['Publisher', overview.publisher ? R.escape(overview.publisher) : ''],
+      ['Institution', overview.institution ? R.escape(overview.institution) : ''],
+      ['Maize Newsletter issue', overview.maize_newsletter_issue ? R.escape(overview.maize_newsletter_issue) : '']
+    ]);
+    if (factsHtml) { out.insertAdjacentHTML('beforeend', factsHtml); }
+
+    /* The two things a reader wants first: the paper itself, then the record
+       it is indexed under at PubMed. */
+    var actions = [];
+    if (citation && citation.doi_url) {
+      actions.push('<a class="mgdb-button mgdb-button-primary" href="' + R.escape(citation.doi_url) +
+        '" target="_blank" rel="noopener">Read the paper <span aria-hidden="true">&nearr;</span></a>');
+    }
+    if (citation && citation.pubmed_url) {
+      actions.push('<a class="mgdb-button mgdb-button-secondary" href="' + R.escape(citation.pubmed_url) +
+        '" target="_blank" rel="noopener">PubMed <span aria-hidden="true">&nearr;</span></a>');
+    }
+    actions.push('<a class="mgdb-button mgdb-button-quiet" href="#ref-record-citation">Cite this paper</a>');
+    out.insertAdjacentHTML('beforeend', '<div class="mgdb-rec-linkrow">' + actions.join('') + '</div>');
+
+    return true;
+  }
+
+  /* ------------------------------------------------------------------------
+     Editorial Board
+     ------------------------------------------------------------------------ */
+
+  var BOARD_TEXT = 'The MaizeGDB Editorial Board is a panel of working maize geneticists who ' +
+    'each year nominate papers of particular interest to the community.';
 
   function renderEditorial(editorial) {
     if (!editorial || !editorial.is_editorial_pick) { return false; }
+    var out = els.editorialBody;
+    out.innerHTML = '<div class="mgdb-message mgdb-message-ok mgdb-rec-alert" role="note"><div>' +
+      '<strong>Nominated by the MaizeGDB Editorial Board</strong>' +
+      '<span>' + R.escape(BOARD_TEXT) + '</span></div></div>';
 
-    var who = (editorial.recommendations || []).map(function (item) {
-      var name = item.recommended_by_full_name ||
-                 (item.recommended_by ? item.recommended_by.name : null);
-      var linked = (item.recommended_by && item.recommended_by.html && name)
-        ? '<a href="' + escape(item.recommended_by.html) + '">' + escape(name) + '</a>'
-        : escape(name || 'a Board member');
-      return linked + (item.year ? ' in ' + item.year : '');
+    /* The comment first. It is the only prose on the record that MaizeGDB
+       wrote rather than the publisher, and it says why a working geneticist
+       thought the paper was worth reading -- which is the whole point of the
+       nomination.
+
+       The writer is named only where the memo names them. The nominating
+       member below is very often the person who wrote it, but nothing in the
+       schema says so, so the page does not say so either. */
+    var comments = editorial.comments || [];
+    R.notes(out, comments.length === 1 ? 'Editorial Board Member Comment'
+                                       : 'Editorial Board Member Comments',
+      comments.map(function (comment) {
+        return {
+          text: comment.text,
+          meta: [
+            comment.is_codie ? 'CODIE Member Comment' : '',
+            comment.written_by
+              ? (comment.written_by.html
+                  ? R.link(comment.written_by.html, comment.written_by_full_name || comment.written_by.name)
+                  : R.escape(comment.written_by_full_name || comment.written_by.name))
+              : ''
+          ]
+        };
+      }));
+    if (!comments.length) {
+      out.insertAdjacentHTML('beforeend',
+        '<p class="mgdb-rec-empty">There are currently no comments for this article.</p>');
+    }
+
+    R.collection(out, {
+      title: 'Nominations',
+      items: editorial.recommendations,
+      filename: 'reference-editorial-nominations.tsv',
+      columns: [
+        { key: 'recommended_by', label: 'Recommended by', tile: true,
+          get: function (r) { return r.recommended_by_full_name ||
+                 (r.recommended_by ? r.recommended_by.name : ''); },
+          html: function (r) {
+            var name = r.recommended_by_full_name || (r.recommended_by ? r.recommended_by.name : 'A Board member');
+            return (r.recommended_by && r.recommended_by.html)
+              ? R.link(r.recommended_by.html, name) : R.escape(name);
+          } },
+        // A nomination can carry a second board member; 43 of them do.
+        { key: 'recommended_by_2', label: 'Also recommended by',
+          get: function (r) { return r.recommended_by_2_full_name ||
+                 (r.recommended_by_2 ? r.recommended_by_2.name : ''); },
+          html: function (r) {
+            if (!r.recommended_by_2) { return '<span class="mgdb-muted">&mdash;</span>'; }
+            var name = r.recommended_by_2_full_name || r.recommended_by_2.name;
+            return r.recommended_by_2.html ? R.link(r.recommended_by_2.html, name) : R.escape(name);
+          } },
+        { key: 'month', label: 'Month' },
+        { key: 'year', label: 'Year', sort: 'number', numeric: true,
+          get: function (r) { return r.year == null ? '' : String(r.year); } }
+      ]
     });
 
-    els.editorialBody.innerHTML =
-      '<div class="reference-record-editorial">' +
-        '<p><strong>Nominated by the MaizeGDB Editorial Board</strong>' +
-        (who.length ? ' &mdash; put forward by ' + who.join(', ') + '.' : '.') +
-        ' Board members are working maize geneticists who each year select papers ' +
-        'they consider of particular interest to the community.</p>' +
-        '<a class="mgdb-button mgdb-button-secondary" href="' +
-        escape(editorial.about_html || '/hot_new_papers') + '">See all Editorial Board picks</a>' +
-      '</div>';
+    out.insertAdjacentHTML('beforeend',
+      '<div class="mgdb-rec-linkrow"><a class="mgdb-button mgdb-button-secondary" href="' +
+      R.escape(editorial.about_html || '/hot_new_papers') +
+      '">See all Editorial Board picks</a></div>');
     return true;
   }
+
+  /* ------------------------------------------------------------------------
+     Abstract
+     ------------------------------------------------------------------------ */
 
   function renderAbstract(abstract) {
     if (!abstract) { return false; }
-    els.abstractBody.innerHTML = '<div class="reference-record-abstract">' +
-      escape(abstract) + '</div>';
-    return true;
+    return R.notes(els.abstractBody, 'Abstract', [{ text: abstract }]);
   }
 
-  function initials(author) {
-    var source = author.full_name || author.name || '';
-    var letters = source.replace(/[^A-Za-z\s,]/g, ' ').split(/[\s,]+/)
-      .filter(Boolean).map(function (word) { return word.charAt(0).toUpperCase(); });
-    if (!letters.length) { return '?'; }
-    return letters.length === 1 ? letters[0] : letters[0] + letters[letters.length - 1];
-  }
+  /* ------------------------------------------------------------------------
+     What this paper describes
+     ------------------------------------------------------------------------ */
 
-  function renderAuthors(authors) {
-    if (!authors || !authors.length) { return false; }
-
-    els.authorsBody.innerHTML = '<ul class="reference-record-authors">' +
-      authors.map(function (author) {
-        var role = '';
-        if (author.is_first) { role = 'First author'; }
-        else if (author.is_last) { role = 'Last author'; }
-
-        // The count is what MaizeGDB holds for that author. Saying how many
-        // *other* papers there are is the useful form: it answers "is this
-        // someone who publishes in maize regularly?" without the reader
-        // having to subtract the one they are looking at.
-        var papers = '';
-        if (author.paper_count) {
-          var others = author.other_papers;
-          papers = '<span class="reference-record-papers">' +
-            (others > 0
-              ? '<strong>' + others.toLocaleString() + '</strong> other paper' +
-                (others === 1 ? '' : 's') + ' in MaizeGDB'
-              : 'Only this paper in MaizeGDB') +
-            (others > 0 && author.papers_html
-              ? ' &middot; <a href="' + escape(author.papers_html) + '">see them</a>'
-              : '') +
-            '</span>';
-        }
-
-        return '<li class="reference-record-author">' +
-          '<span class="reference-record-initials" aria-hidden="true">' + escape(initials(author)) + '</span>' +
-          '<div class="reference-record-author-body">' +
-            '<h3>' + (author.html
-              ? '<a href="' + escape(author.html) + '">' + escape(author.full_name || author.name) + '</a>'
-              : escape(author.full_name || author.name)) + '</h3>' +
-            (author.full_name && author.name && author.full_name !== author.name
-              ? '<span class="reference-record-author-name">' + escape(author.name) + '</span>' : '') +
-            (role ? '<span class="reference-record-role">' + role + '</span>' : '') +
-            papers +
-          '</div></li>';
-      }).join('') + '</ul>';
-    return true;
-  }
-
-  /* A described locus carries its gene models, so a reader can go from "this
-     paper describes lg2" to the annotation they work in without a search. */
-  function locusCard(item) {
-    var html = '<li class="reference-record-locus">' +
-      '<h4>' + (item.html
-        ? '<a href="' + escape(item.html) + '">' + escape(item.name) + '</a>'
-        : escape(item.name)) + '</h4>' +
-      (item.full_name ? '<span class="reference-record-locus-full">' + escape(item.full_name) + '</span>' : '') +
-      (item.relevance ? '<span class="reference-record-relevance">' + escape(item.relevance) + '</span>' : '');
-
+  function geneModelsHtml(item) {
     var models = item.gene_models || [];
-    if (models.length) {
-      html += '<div class="reference-record-models"><span>Gene models</span><ul>' +
-        models.map(function (model) {
-          return '<li><a href="' + escape(model.html) + '">' +
-            '<span class="reference-record-model-id">' + escape(model.name) + '</span>' +
-            (model.assembly ? '<span class="reference-record-model-assembly">' +
-              escape(model.assembly) + '</span>' : '') +
-            (model.is_reference ? '<span class="reference-record-model-current">Current</span>' : '') +
-            '</a></li>';
-        }).join('') + '</ul></div>';
-    }
-
-    return html + '</li>';
-  }
-
-  function chip(item) {
-    var label = escape(item.name) +
-      (item.relevance ? ' <span class="mgdb-muted">&middot; ' + escape(item.relevance) + '</span>' : '');
-    return '<li>' + (item.html
-      ? '<a href="' + escape(item.html) + '">' + label + '</a>'
-      : '<span class="reference-record-chip">' + label + '</span>') + '</li>';
+    if (!models.length) { return '<span class="mgdb-muted">&mdash;</span>'; }
+    return models.map(function (model) {
+      return (model.html ? R.link(model.html, model.name) : R.escape(model.name)) +
+             (model.is_reference ? ' <span class="mgdb-pill mgdb-pill-ok">Current</span>' : '');
+    }).join(', ');
   }
 
   function renderDescribes(groups) {
     if (!groups || !groups.length) { return false; }
+    var out = els.describesBody;
+    out.innerHTML = '';
+    var rendered = false;
 
-    els.describesBody.innerHTML = groups.map(function (group) {
-      var heading = '<h3>' + escape(group.record_type) +
-        '<span>' + group.count.toLocaleString() +
-        (group.count === 1 ? ' record' : ' records') +
-        (group.truncated ? ', first ' + group.items.length + ' shown' : '') + '</span></h3>';
+    groups.forEach(function (group) {
+      /* A locus carries its gene models, so a reader can go from "this paper
+         describes an1" to the annotation they work in without a search. Every
+         other record type is a name and what the paper said about it. */
+      var columns = group.record_type === 'Locus'
+        ? [
+            { key: 'name', label: 'Locus', tile: true,
+              html: function (i) { return i.html ? R.link(i.html, i.name) : R.escape(i.name); } },
+            { key: 'full_name', label: 'Full name' },
+            { key: 'relevance', label: 'Relevance' },
+            { key: 'gene_models', label: 'Gene models', sort: false,
+              get: function (i) {
+                return (i.gene_models || []).map(function (m) { return m.name; }).join(', ');
+              },
+              html: geneModelsHtml }
+          ]
+        : [
+            { key: 'name', label: group.record_type, tile: true,
+              html: function (i) { return i.html ? R.link(i.html, i.name) : R.escape(i.name); } },
+            { key: 'full_name', label: 'Full name' },
+            { key: 'relevance', label: 'Relevance' }
+          ];
 
-      var body;
-      if (group.record_type === 'Locus') {
-        body = '<ul class="reference-record-loci">' + group.items.map(locusCard).join('') + '</ul>';
-      } else {
-        var visible = group.items.slice(0, CHIP_LIMIT);
-        body = '<ul class="reference-record-chips">' + visible.map(chip).join('') + '</ul>';
-        if (group.items.length > CHIP_LIMIT) {
-          body += '<details class="stock-record-more"><summary>Show the remaining ' +
-            (group.items.length - CHIP_LIMIT).toLocaleString() + '</summary>' +
-            '<ul class="reference-record-chips">' +
-            group.items.slice(CHIP_LIMIT).map(chip).join('') + '</ul></details>';
+      var shown = R.collection(out, {
+        title: group.record_type + ' records',
+        items: group.items,
+        filename: 'reference-describes-' + String(group.record_type).toLowerCase() + '.tsv',
+        pageSize: 25,
+        columns: columns
+      });
+      rendered = shown || rendered;
+
+      /* A paper can be curated against tens of thousands of records -- one
+         here carries 36,006 probes -- so the API caps what it embeds. The
+         block's own count is what arrived; this says what it is a slice of. */
+      if (shown && group.truncated) {
+        var blocks = out.querySelectorAll('.mgdb-rec-block');
+        var block = blocks[blocks.length - 1];
+        if (block) {
+          block.insertAdjacentHTML('beforeend',
+            '<p class="mgdb-rec-block-status">The first ' + R.number(group.items.length) +
+            ' of ' + R.number(group.count) + ' ' + R.escape(String(group.record_type).toLowerCase()) +
+            ' records this paper is curated against. Download the TSV for what is shown, or ' +
+            'search the ' + R.escape(String(group.record_type).toLowerCase()) +
+            ' collection for the rest.</p>');
         }
       }
+    });
 
-      return '<div class="reference-record-group">' + heading + body + '</div>';
-    }).join('');
-    return true;
+    return rendered;
   }
+
+  /* ------------------------------------------------------------------------
+     Cite this paper
+     ------------------------------------------------------------------------ */
 
   function citationBlock(key, heading, note, text, monospace) {
     if (!text) { return ''; }
     var body = monospace
-      ? '<pre id="reference-citation-' + key + '">' + escape(text) + '</pre>'
-      : '<p class="reference-record-text" id="reference-citation-' + key + '">' + escape(text) + '</p>';
-
-    return '<div class="reference-record-citation">' +
-      '<div class="reference-record-citation-head">' +
-        '<h3>' + escape(heading) + (note ? '<small>' + escape(note) + '</small>' : '') + '</h3>' +
-        '<button class="reference-record-copy" type="button" data-copy-target="reference-citation-' + key + '">' +
-        'Copy</button>' +
-      '</div>' + body + '</div>';
+      ? '<pre class="mgdb-rec-citation-text" id="ref-citation-' + key + '">' + R.escape(text) + '</pre>'
+      : '<p class="mgdb-rec-citation-text" id="ref-citation-' + key + '">' + R.escape(text) + '</p>';
+    return '<div class="mgdb-rec-block">' +
+      '<div class="mgdb-rec-block-head"><h3>' + R.escape(heading) + '</h3>' +
+        '<button class="mgdb-rec-tsv" type="button" data-copy-target="ref-citation-' + key + '">Copy</button>' +
+      '</div>' +
+      '<p class="mgdb-rec-block-status">' + R.escape(note) + '</p>' + body + '</div>';
   }
 
   function renderCitation(citation) {
     if (!citation) { return false; }
-
     var html =
       citationBlock('formatted', 'Citation',
         'Authors, year, title, and where it appeared.', citation.formatted, false) +
@@ -261,19 +280,17 @@
         'For LaTeX, Zotero, JabRef, and most reference managers.', citation.bibtex, true) +
       citationBlock('ris', 'RIS',
         'For EndNote, Mendeley, and Papers.', citation.ris, true);
-
     if (!html) { return false; }
-    els.citationBody.innerHTML = '<div class="reference-record-citations">' + html + '</div>';
+    els.citationBody.innerHTML = html;
 
-    // Copy without leaving the page. The clipboard API needs a secure context;
-    // where it is unavailable the text is selected instead, which still turns
-    // the task into one keystroke.
+    /* Copy without leaving the page. The clipboard API needs a secure context;
+       where it is unavailable the text is selected instead, which still turns
+       the task into one keystroke. */
     Array.prototype.forEach.call(
       els.citationBody.querySelectorAll('[data-copy-target]'), function (button) {
         button.addEventListener('click', function () {
-          var source = byId(button.getAttribute('data-copy-target'));
+          var source = R.byId(button.getAttribute('data-copy-target'));
           if (!source) { return; }
-          var text = source.textContent;
 
           function done() {
             button.textContent = 'Copied';
@@ -285,12 +302,6 @@
             }, 2000);
           }
 
-          if (window.navigator && window.navigator.clipboard && window.isSecureContext) {
-            window.navigator.clipboard.writeText(text).then(done).catch(selectInstead);
-          } else {
-            selectInstead();
-          }
-
           function selectInstead() {
             var range = document.createRange();
             range.selectNodeContents(source);
@@ -300,186 +311,232 @@
             button.textContent = 'Selected — press Ctrl+C';
             window.setTimeout(function () { button.textContent = 'Copy'; }, 3000);
           }
+
+          if (window.navigator && window.navigator.clipboard && window.isSecureContext) {
+            window.navigator.clipboard.writeText(source.textContent).then(done).catch(selectInstead);
+          } else {
+            selectInstead();
+          }
         });
       });
 
     return true;
   }
 
-  var LINK_MARKS = {
-    doi: 'DOI',
-    pubmed: 'PMID',
-    mnl: 'MNL',
-    ancillary: 'FILE',
-    gene_review: 'MGR'
-  };
-
-  function renderLinks(links) {
-    if (!links || !links.length) { return false; }
-
-    els.linksBody.innerHTML = '<ul class="reference-record-links">' +
-      links.filter(function (link) { return link.url; }).map(function (link) {
-        var mark = LINK_MARKS[link.kind] || 'LINK';
-        return '<li><a class="reference-record-link" href="' + escape(link.url) + '"' +
-          (link.is_external ? ' rel="noopener"' : '') + '>' +
-          '<span class="reference-record-mark reference-record-mark-' + escape(link.kind) +
-            '" aria-hidden="true">' + escape(mark) + '</span>' +
-          '<span><strong>' + escape(link.database) +
-            (link.is_external ? '<span class="mgdb-external" aria-hidden="true"></span>' : '') +
-            '</strong>' +
-          '<span class="reference-record-link-accession">' + escape(link.accession) + '</span>' +
-          '<span class="reference-record-link-where">' + escape(link.destination) + '</span>' +
-          '</span></a></li>';
-      }).join('') + '</ul>';
-    return true;
-  }
-
   /* ------------------------------------------------------------------------
-     Tabs
+     Metrics and figures
      ------------------------------------------------------------------------ */
 
-  var TAB_COUNTS = {
-    'reference-record-authors': ['authors'],
-    'reference-record-describes': ['describes'],
-    'reference-record-links': ['links']
-  };
+  function renderMetrics(counts, sections) {
+    var groups = sections.describes || [];
+    var links = sections.links || [];
 
-  function buildTabs(rendered, counts) {
-    var labels = {
-      'reference-record-editorial': 'Editorial pick',
-      'reference-record-abstract': 'Abstract',
-      'reference-record-authors': 'Authors',
-      'reference-record-describes': 'Describes',
-      'reference-record-citation': 'Cite',
-      'reference-record-links': 'Links'
-    };
+    R.metrics(els.metricsBody, [
+      ['Authors', 'People', counts.authors, 'Authors credited on this paper.', 'green'],
+      ['Records described', 'Curation', counts.describes, 'MaizeGDB records a curator connected to this paper.', 'amber'],
+      ['Record types', 'Coverage', groups.length, 'Kinds of record those connections span.', 'blue'],
+      ['Identifiers', 'Elsewhere', links.length, 'External identifiers and full-text links.', 'burgundy']
+    ]);
 
-    els.tabs.innerHTML = rendered.map(function (id) {
-      var total = 0;
-      (TAB_COUNTS[id] || []).forEach(function (key) { total += (counts[key] || 0); });
-      return '<a href="#' + id + '">' + labels[id] +
-        (total > 0 ? '<span class="reference-record-tab-count">' + total.toLocaleString() + '</span>' : '') +
-        '</a>';
-    }).join('');
-    show(els.tabs, rendered.length > 1);
+    var series = [
+      ['Authors', counts.authors], ['Records described', counts.describes],
+      ['Record types', groups.length], ['Identifiers', links.length],
+      ['Editorial nominations', counts.editorial]
+    ];
+    var height = R.connectionsHeight(series);
 
-    var pairs = [];
-    Array.prototype.forEach.call(els.tabs.querySelectorAll('a'), function (tab) {
-      var section = document.querySelector(tab.getAttribute('href'));
-      if (section) { pairs.push({ tab: tab, section: section }); }
-    });
-
-    function markCurrent(target) {
-      pairs.forEach(function (pair) {
-        var current = pair.section === target;
-        pair.tab.classList.toggle('is-current', current);
-        if (current) { pair.tab.setAttribute('aria-current', 'true'); }
-        else { pair.tab.removeAttribute('aria-current'); }
+    /* How much of the maize literature each author has in MaizeGDB. It answers
+       the question a reader actually has about a name they do not recognise --
+       is this someone who publishes in maize regularly? -- and it is the one
+       number on the page that is about the people rather than the paper. */
+    var authors = (sections.authors || []).filter(function (a) { return a.paper_count > 0; });
+    if (authors.length > 1 && MGDB.chart) {
+      R.show(R.byId('ref-record-authors-figure'), true);
+      var fits = Math.max(3, Math.floor((height - 80) / 34));
+      var top = authors.slice(0, fits);
+      R.sizeChart('ref-record-authors-chart', height);
+      R.byId('ref-record-authors-caption').textContent =
+        (top.length < authors.length
+          ? 'The first ' + top.length + ' of ' + R.number(authors.length) + ' authors. '
+          : '') +
+        'Counts are what MaizeGDB holds for that author, which is a floor rather than a complete bibliography.';
+      var ordered = top.slice().reverse();
+      MGDB.chart({
+        target: 'ref-record-authors-chart',
+        traces: function () {
+          return [{
+            type: 'bar', orientation: 'h',
+            y: ordered.map(function (a) { return a.full_name || a.name; }),
+            x: ordered.map(function (a) { return a.paper_count; }),
+            marker: { color: '#285d46' },
+            // A leading non-breaking space is the only padding Plotly offers
+            // for an outside bar label; SVG collapses a plain leading space.
+            text: ordered.map(function (a) { return ' ' + R.number(a.paper_count); }),
+            textposition: 'outside', textangle: 0, cliponaxis: false,
+            hovertemplate: '%{y}<br>%{x:,} papers<extra></extra>'
+          }];
+        },
+        layout: {
+          height: height,
+          margin: { l: 10, r: 60, t: 8, b: 44 },
+          bargap: 0.3,
+          xaxis: { title: { text: 'Papers in MaizeGDB' }, rangemode: 'tozero', automargin: true },
+          yaxis: { type: 'category', automargin: true }
+        }
       });
+      R.watchChartWidth('ref-record-authors-chart');
     }
 
-    if (pairs.length) { markCurrent(pairs[0].section); }
-    pairs.forEach(function (pair) {
-      pair.tab.addEventListener('click', function () { markCurrent(pair.section); });
-    });
-
-    if (!window.IntersectionObserver) { return; }
-    var observer = new window.IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) { markCurrent(entry.target); }
-      });
-    }, { rootMargin: '-25% 0px -65% 0px' });
-    pairs.forEach(function (pair) { observer.observe(pair.section); });
+    R.connectionsChart('ref-record-connections-chart', 'ref-record-connections-caption',
+                       'ref-record-connections-figure', series, height);
+    return true;
   }
 
   /* ------------------------------------------------------------------------
      Assembly
      ------------------------------------------------------------------------ */
 
+  var TAB_COUNTS = {
+    'ref-record-editorial': ['editorial'],
+    'ref-record-authors': ['authors'],
+    'ref-record-describes': ['describes'],
+    'ref-record-links': ['links']
+  };
+
+  var LABELS = {
+    'ref-record-overview': 'Overview',
+    'ref-record-editorial': 'Editorial Board pick',
+    'ref-record-abstract': 'Abstract',
+    'ref-record-authors': 'Authors',
+    'ref-record-describes': 'What this paper describes',
+    'ref-record-citation': 'Cite this paper',
+    'ref-record-links': 'Identifiers and full text',
+    'ref-record-metrics': 'Metrics',
+    'ref-record-resources': 'Related resources',
+    'ref-record-api': 'API'
+  };
+
   function render(response) {
+    payload = response;
     var data = response.data || {};
     var sections = data.sections || {};
     var meta = response.meta || {};
     var counts = meta.counts || {};
 
-    show(els.loading, false);
-    show(els.error, false);
+    R.show(els.loading, false);
+    R.show(els.error, false);
 
-    renderHeader(data, sections);
+    renderByline(sections.authors);
 
-    // Order matters here: a scientist reads the abstract, judges the authors,
-    // then wants what MaizeGDB adds on top — the curated links. Citation and
-    // identifiers are tasks, and tasks come after reading.
     var rendered = [];
-    if (renderEditorial(sections.editorial)) { rendered.push('reference-record-editorial'); }
-    if (renderAbstract(sections.abstract)) { rendered.push('reference-record-abstract'); }
-    if (renderAuthors(sections.authors)) { rendered.push('reference-record-authors'); }
-    if (renderDescribes(sections.describes)) { rendered.push('reference-record-describes'); }
-    if (renderCitation(sections.citation)) { rendered.push('reference-record-citation'); }
-    if (renderLinks(sections.links)) { rendered.push('reference-record-links'); }
+    if (renderOverview(sections.overview, sections.citation)) { rendered.push('ref-record-overview'); }
+    if (renderEditorial(sections.editorial)) { rendered.push('ref-record-editorial'); }
+    if (renderAbstract(sections.abstract)) { rendered.push('ref-record-abstract'); }
 
-    rendered.forEach(function (id) { show(byId(id), true); });
-    buildTabs(rendered, counts);
+    if (R.collection(els.authorsBody, {
+      title: 'Authors credited on this paper',
+      items: sections.authors,
+      filename: 'reference-authors.tsv',
+      pageSize: 25,
+      columns: [
+        { key: 'full_name', label: 'Author', tile: true,
+          get: function (a) { return a.full_name || a.name; },
+          html: function (a) {
+            var name = a.full_name || a.name;
+            return (a.html ? R.link(a.html, name) : R.escape(name)) +
+              (a.is_first ? ' <span class="mgdb-pill mgdb-pill-ok">First author</span>' : '') +
+              (a.is_last ? ' <span class="mgdb-pill">Last author</span>' : '');
+          } },
+        { key: 'name', label: 'As cited' },
+        { key: 'position', label: 'Position', sort: 'number', numeric: true,
+          get: function (a) { return a.position == null ? '' : String(a.position); } },
+        { key: 'other_papers', label: 'Other papers in MaizeGDB', sort: 'number', numeric: true,
+          get: function (a) { return a.other_papers == null ? '' : R.number(a.other_papers); },
+          html: function (a) {
+            if (!a.other_papers) { return '<span class="mgdb-muted">None</span>'; }
+            return a.papers_html
+              ? R.link(a.papers_html, R.number(a.other_papers))
+              : R.number(a.other_papers);
+          } }
+      ]
+    })) { rendered.push('ref-record-authors'); }
 
-    var notices = [];
-    (meta.truncated || []).forEach(function (list) {
-      notices.push('Only the first ' + meta.max_items.toLocaleString() + ' of ' + list + ' are shown.');
+    if (renderDescribes(sections.describes)) { rendered.push('ref-record-describes'); }
+    if (renderCitation(sections.citation)) { rendered.push('ref-record-citation'); }
+
+    if (R.collection(els.linksBody, {
+      title: 'Identifiers and full text',
+      items: sections.links,
+      filename: 'reference-identifiers.tsv',
+      columns: [
+        { key: 'database', label: 'Database', tile: true },
+        { key: 'accession', label: 'Accession',
+          html: function (l) { return l.url
+            ? R.link(l.url, l.accession, l.is_external)
+            : R.escape(l.accession); } },
+        { key: 'destination', label: 'Where it goes' },
+        R.urlColumn(function (l) { return l.url; })
+      ]
+    })) { rendered.push('ref-record-links'); }
+
+    rendered.forEach(function (id) { R.show(R.byId(id), true); });
+
+    // Revealed before the charts are drawn: Plotly sizes a figure to its
+    // container, and a hidden container has no width.
+    R.show(R.byId('ref-record-metrics'), true);
+    if (renderMetrics(counts, sections)) { rendered.push('ref-record-metrics'); }
+
+    R.tabs({
+      el: els.tabs,
+      order: rendered.concat(['ref-record-resources', 'ref-record-api']),
+      labels: LABELS, counts: counts, tabCounts: TAB_COUNTS
     });
-    (meta.warnings || []).forEach(function (warning) { notices.push(warning.detail); });
 
-    if (notices.length) {
-      els.notice.innerHTML = '<div><strong>Note</strong><span>' + notices.map(escape).join(' ') + '</span></div>';
-      show(els.notice, true);
-    }
-
-    if (els.apiLink) {
-      els.apiLink.href = '/api/v1/records/reference/' + encodeURIComponent(data.id);
-    }
-
+    R.notice(els.notice, meta, counts);
     MGDB.announce('Record loaded, ' + rendered.length + ' sections.');
   }
 
   function load() {
-    var main = byId('reference-record-top');
+    var main = R.byId('ref-record-top');
     if (!main) { return; }
-    var id = main.getAttribute('data-reference-id');
-    if (!id) { return; }
+    var requested = main.getAttribute('data-requested-id') || main.getAttribute('data-reference-id');
+    if (!requested) { return; }
 
-    show(els.error, false);
-    show(els.loading, true);
+    R.show(els.error, false);
+    R.show(els.loading, true);
 
-    MGDB.request('/api/v1/records/reference/' + encodeURIComponent(id), { key: 'reference-record' })
+    MGDB.request('/api/v1/records/reference/' + encodeURIComponent(requested), { key: 'reference-record' })
       .then(function (response) {
         if (!response || !response.data) { throw new Error('unexpected payload'); }
         render(response);
       })
       .catch(function (error) {
         if (error && error.name === 'AbortError') { return; }
-        show(els.loading, false);
-        show(els.error, true);
+        R.show(els.loading, false);
+        R.show(els.error, true);
       });
   }
 
   function init() {
     els = {
-      byline: byId('reference-record-byline'),
-      facts: byId('reference-record-facts'),
-      actions: byId('reference-record-actions'),
-      tabs: byId('reference-record-tabs'),
-      loading: byId('reference-record-loading'),
-      error: byId('reference-record-error'),
-      retry: byId('reference-record-retry'),
-      notice: byId('reference-record-notice'),
-      editorialBody: byId('reference-record-editorial-body'),
-      abstractBody: byId('reference-record-abstract-body'),
-      authorsBody: byId('reference-record-authors-body'),
-      describesBody: byId('reference-record-describes-body'),
-      citationBody: byId('reference-record-citation-body'),
-      linksBody: byId('reference-record-links-body'),
-      apiLink: byId('reference-record-api-link')
+      byline: R.byId('ref-record-byline'),
+      facts: R.byId('ref-record-facts'),
+      tabs: R.byId('ref-record-tabs'),
+      loading: R.byId('ref-record-loading'),
+      error: R.byId('ref-record-error'),
+      retry: R.byId('ref-record-retry'),
+      notice: R.byId('ref-record-notice'),
+      overviewBody: R.byId('ref-record-overview-body'),
+      editorialBody: R.byId('ref-record-editorial-body'),
+      abstractBody: R.byId('ref-record-abstract-body'),
+      authorsBody: R.byId('ref-record-authors-body'),
+      describesBody: R.byId('ref-record-describes-body'),
+      citationBody: R.byId('ref-record-citation-body'),
+      linksBody: R.byId('ref-record-links-body'),
+      metricsBody: R.byId('ref-record-metrics-body')
     };
-
     if (els.retry) { els.retry.addEventListener('click', load); }
+    R.apiCard('ref-copy-json-btn', 'ref-record-api-link', function () { return payload; });
     load();
   }
 

@@ -2,51 +2,26 @@ $$SYNTAX-LEVEL 2
 *(mgdb-gene-record
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@MaizeGDB">
-<meta property="og:title" content="$(gene_name) &mdash; MaizeGDB gene record">
+<meta property="og:title" content="$(gene_title) &mdash; MaizeGDB gene record">
 <meta property="og:description" content="$(gene_summary)">
 
-<main class="mgdb-page mgdb-gene-record-page" id="gene-record-top" data-gene-id="$(gene_api_id)" data-gene-state="$(gene_state)">
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-gene-record-page" id="gene-record-top" data-requested-id="$(requested_identifier)" data-gene-id="$(gene_api_id)" data-gene-state="$(gene_state)">
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
-    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/gene_center/gene">Gene Center</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(gene_name)</span>
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/gene_center/gene">Gene and Locus Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(gene_title)</span>
   </nav>
 
-  @(withdrawn_notice {display: off}
-  <div class="mgdb-message mgdb-message-error" role="alert">
-    <div>
-      <strong>This gene model has been withdrawn.</strong>
-      <span>$(withdrawn_message)</span>
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-hero" aria-labelledby="gene-record-title">
+    <div class="mgdb-hero-body">
+      <h1 id="gene-record-title">$(gene_title)$(gene_badge)</h1>
+      <p class="mgdb-rec-synonyms" id="gene-record-function" hidden></p>
+      <p class="mgdb-rec-synonyms" id="gene-record-synonyms" hidden></p>
+      <dl class="mgdb-record-facts mgdb-rec-headfacts" id="gene-record-facts">$(gene_facts)</dl>
     </div>
-  </div>
-  )
+  </section>
 
-  <header class="mgdb-hero-record">
-    <div>
-      <span class="mgdb-eyebrow">$(gene_eyebrow)</span>
-      <h1>
-        <span class="gene-record-title">$(gene_name)</span>
-        $(status_badge)
-      </h1>
-      @(gene_full_name_block {display: off}<p class="gene-record-fullname">$(gene_full_name)</p>)
-      @(gene_accession_block {display: off}<p class="gene-record-accession">Gene model <code id="gene-record-accession">$(gene_accession)</code> <button class="mgdb-button mgdb-button-quiet gene-record-copy" type="button" data-copy-target="gene-record-accession">Copy</button></p>)
-      <p class="gene-record-function" id="gene-record-function" hidden></p>
-      <p class="gene-record-synonyms" id="gene-record-synonyms" hidden></p>
-      <dl class="mgdb-record-facts" id="gene-record-facts">$(gene_facts)</dl>
-    </div>
-    <div class="mgdb-hero-record-actions" id="gene-record-actions"></div>
-  </header>
-
-  <div class="gene-record-chips" id="gene-record-chips" hidden></div>
-
-  <details class="gene-record-primer" id="gene-record-primer">
-    <summary>What am I looking at?</summary>
-    <div>
-      <p>A <strong>gene model</strong> is a computational prediction of where a gene sits in a particular genome assembly and what protein it makes. Its name, such as <code>Zm00001eb067740</code>, is tied to one assembly and one annotation version, and it can change when the genome is re-annotated.</p>
-      <p>A <strong>classical gene</strong> is a curated maize locus, usually named decades ago from a mutant phenotype &mdash; <code>lg1</code>, <em>liguleless1</em>. Its name does not change. When a gene model has been matched to a classical gene, this page shows both, and the curated literature, alleles and phenotypes below belong to the classical gene.</p>
-      <p>A <strong>pan-gene</strong> groups the gene models that represent the same gene across many maize and wild <em>Zea</em> assemblies, which is how you tell whether a gene is present in one line or in all of them.</p>
-    </div>
-  </details>
-
-  <nav class="mgdb-section-tabs" id="gene-record-tabs" aria-label="Sections on this record" hidden></nav>
+  <nav class="mgdb-section-tabs mgdb-rec-tabs" id="gene-record-tabs" aria-label="Sections on this record">
+    <a href="#gene-record-overview">Overview</a>
+  </nav>
 
   <div class="mgdb-loading" id="gene-record-loading"><span class="mgdb-spinner" aria-hidden="true"></span><span>Loading the full record&hellip;</span></div>
 
@@ -60,110 +35,151 @@ $$SYNTAX-LEVEL 2
 
   <div class="mgdb-message mgdb-message-info" id="gene-record-notice" role="status" hidden></div>
 
+  ;; A withdrawn model is rendered server-side: a record that is correctly and
+  ;; permanently gone must say so in the first paint.
+  $(withdrawn_notice)
+
+  ;; Raised by the glue when the record is an older B73 annotation than the
+  ;; current one.
+  <div class="mgdb-message mgdb-message-warn mgdb-rec-alert" id="gene-record-version-notice" role="note" hidden></div>
+
+  <p class="mgdb-rec-report"><a class="mgdb-report-link" id="gene-record-report" href="/curation/GeneModelIssue/edit" target="_blank" rel="noopener">Report a gene model error</a></p>
+
   <section id="gene-record-overview" aria-labelledby="gene-record-overview-title" hidden>
-    <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Record</span><h2 id="gene-record-overview-title">Overview</h2></div>
-    </div>
+    <div class="mgdb-section-heading"><div><h2 id="gene-record-overview-title">Overview</h2></div></div>
     <div id="gene-record-overview-body"></div>
   </section>
 
   <section id="gene-record-structure" aria-labelledby="gene-record-structure-title" hidden>
-    <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Transcripts and protein</span><h2 id="gene-record-structure-title">Structure</h2></div>
-      <p>The transcripts this gene model produces and the protein domains found in them.</p>
-    </div>
+    <div class="mgdb-section-heading"><div><h2 id="gene-record-structure-title">Structure</h2></div></div>
     <div id="gene-record-structure-body"></div>
   </section>
 
   <section id="gene-record-function" aria-labelledby="gene-record-function-title" hidden>
-    <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">What it does</span><h2 id="gene-record-function-title">Function</h2></div>
-      <p>Ontology terms, gene products and protein-family assignments, each with the evidence behind it.</p>
-    </div>
+    <div class="mgdb-section-heading"><div><h2 id="gene-record-function-title">Function</h2></div></div>
     <div id="gene-record-function-body"></div>
   </section>
 
   <section id="gene-record-expression" aria-labelledby="gene-record-expression-title" hidden>
-    <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Where it is expressed</span><h2 id="gene-record-expression-title">Expression</h2></div>
-      <p>Held by external services and loaded by your browser, not by MaizeGDB.</p>
-    </div>
+    <div class="mgdb-section-heading"><div><h2 id="gene-record-expression-title">Expression</h2></div></div>
     <div id="gene-record-expression-body"></div>
   </section>
 
   <section id="gene-record-variation" aria-labelledby="gene-record-variation-title" hidden>
-    <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Mutants and association</span><h2 id="gene-record-variation-title">Variation</h2></div>
-      <p>Insertion alleles you can order, trait associations from GWAS, and curated classical alleles.</p>
-    </div>
+    <div class="mgdb-section-heading"><div><h2 id="gene-record-variation-title">Variation</h2></div></div>
     <div id="gene-record-variation-body"></div>
   </section>
 
   <section id="gene-record-pan_gene" aria-labelledby="gene-record-pan_gene-title" hidden>
-    <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Across the pan-genome</span><h2 id="gene-record-pan_gene-title">Pan-gene</h2></div>
-      <p>The same gene in every assembly where it has been found, and its orthologs in other grasses.</p>
-    </div>
+    <div class="mgdb-section-heading"><div><h2 id="gene-record-pan_gene-title">Pan-gene</h2></div></div>
     <div id="gene-record-pan_gene-body"></div>
   </section>
 
+  <section id="gene-record-orthologs" aria-labelledby="gene-record-orthologs-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="gene-record-orthologs-title">Orthologs in other species</h2></div></div>
+    <div id="gene-record-orthologs-body"></div>
+  </section>
+
   <section id="gene-record-locus" aria-labelledby="gene-record-locus-title" hidden>
-    <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Curated by MaizeGDB</span><h2 id="gene-record-locus-title">Classical gene</h2></div>
-      <p>What curators have recorded about this gene, independent of any one assembly.</p>
-    </div>
+    <div class="mgdb-section-heading"><div><h2 id="gene-record-locus-title">Classical gene</h2></div></div>
     <div id="gene-record-locus-body"></div>
   </section>
 
+  <section id="gene-record-map" aria-labelledby="gene-record-map-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="gene-record-map-title">Map coordinates</h2></div></div>
+    <div id="gene-record-map-body"></div>
+  </section>
+
+  <section id="gene-record-nearby" aria-labelledby="gene-record-nearby-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="gene-record-nearby-title">Nearby loci</h2></div></div>
+    <div id="gene-record-nearby-body"></div>
+  </section>
+
+  <section id="gene-record-genetic" aria-labelledby="gene-record-genetic-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="gene-record-genetic-title">Additional genetic information</h2></div></div>
+    <div id="gene-record-genetic-body"></div>
+  </section>
+
   <section id="gene-record-references" aria-labelledby="gene-record-references-title" hidden>
-    <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Literature</span><h2 id="gene-record-references-title">References</h2></div>
-      <p>Papers curated against this gene, newest first.</p>
-    </div>
+    <div class="mgdb-section-heading"><div><h2 id="gene-record-references-title">References</h2></div></div>
     <div id="gene-record-references-body"></div>
   </section>
 
   <section id="gene-record-sequences" aria-labelledby="gene-record-sequences-title" hidden>
-    <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Get the sequence</span><h2 id="gene-record-sequences-title">Sequences and downloads</h2></div>
-    </div>
+    <div class="mgdb-section-heading"><div><h2 id="gene-record-sequences-title">Sequences and downloads</h2></div></div>
     <div id="gene-record-sequences-body"></div>
   </section>
 
   <section id="gene-record-xrefs" aria-labelledby="gene-record-xrefs-title" hidden>
-    <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Elsewhere</span><h2 id="gene-record-xrefs-title">Cross-references</h2></div>
-      <p>This gene in other databases.</p>
-    </div>
+    <div class="mgdb-section-heading"><div><h2 id="gene-record-xrefs-title">Cross-references</h2></div></div>
     <div id="gene-record-xrefs-body"></div>
   </section>
 
   <section id="gene-record-provenance" aria-labelledby="gene-record-provenance-title" hidden>
-    <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">How good is this model?</span><h2 id="gene-record-provenance-title">Model quality</h2></div>
-      <p>Automated assessments of the gene model and its predicted protein. Each score is reported with what it means, not just its value.</p>
-    </div>
+    <div class="mgdb-section-heading"><div><h2 id="gene-record-provenance-title">Model quality</h2></div></div>
     <div id="gene-record-provenance-body"></div>
   </section>
 
-  <section class="mgdb-resource-panel" aria-labelledby="gene-record-next-title">
-    <div>
-      <span class="mgdb-eyebrow">Keep going</span>
-      <h2 id="gene-record-next-title">From this gene</h2>
-      <p>The searches and tools that take a single gene further.</p>
-    </div>
-    <div class="mgdb-resource-list">
-      <a href="/gene_center/gene"><strong>Search genes</strong><span>Find gene models and classical genes by name, function, or position.</span></a>
-      <a href="/pan_gene_center/pan_gene"><strong>Pan-gene search</strong><span>Explore gene presence and absence across the maize pan-genome.</span></a>
-      <a href="https\://jbrowse.maizegdb.org/"><strong>Genome browser</strong><span>See this region and its neighbours in JBrowse.</span></a>
-      <a href="https\://wgs.maizegdb.org/"><strong>SNPversity 2.0</strong><span>Genotype data across the diversity panels.</span></a>
+  <section id="gene-record-metrics" aria-labelledby="gene-record-metrics-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="gene-record-metrics-title">Metrics</h2></div></div>
+    <div class="mgdb-metric-grid" id="gene-record-metrics-body"></div>
+    <div class="mgdb-chart-grid mgdb-rec-charts" id="gene-record-charts">
+      <figure class="mgdb-figure" id="gene-record-years-figure" hidden>
+        <h3>Publications about this gene by year</h3>
+        <div class="mgdb-chart" id="gene-record-years-chart" role="img" aria-label="Bar chart of how many publications about this gene MaizeGDB holds in each year">
+          <div class="mgdb-chart-fallback">Loading the publication years&hellip;</div>
+        </div>
+        <figcaption id="gene-record-years-caption"></figcaption>
+      </figure>
+      <figure class="mgdb-figure" id="gene-record-connections-figure">
+        <h3>Record connections</h3>
+        <div class="mgdb-chart" id="gene-record-connections-chart" role="img" aria-label="Horizontal bar chart of how many transcripts, ontology terms, insertions and other records are attached to this gene">
+          <div class="mgdb-chart-fallback">Loading the record connections&hellip;</div>
+        </div>
+        <figcaption id="gene-record-connections-caption"></figcaption>
+      </figure>
     </div>
   </section>
 
-  <p class="gene-record-provenance-note">
-    This page is assembled from one call to the MaizeGDB API.
-    <a id="gene-record-api-link" href="/api/v1/records/gene/$(gene_api_id)">View this record as JSON</a>
-    &middot; <a href="/api/v1/openapi">API documentation</a>
-  </p>
+  <section class="mgdb-hub-related" id="gene-record-resources" aria-labelledby="gene-record-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="gene-record-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/gene_center/gene">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>Find gene models and classical genes by name, function, or position</span>
+        </a>
+        <a href="/pan_gene_center/pan_gene">
+          <strong>Pan-Gene Data Hub</strong>
+          <span>The same gene across every maize assembly, and its orthologs</span>
+        </a>
+        <a href="/data_center/variation">
+          <strong>Variation Data Hub</strong>
+          <span>Alleles, insertions, and the phenotypes they produce</span>
+        </a>
+        <a href="https\://jbrowse.maizegdb.org/" target="_blank" rel="noopener">
+          <strong>Genome browser</strong>
+          <span>See this region and its neighbours in JBrowse</span>
+        </a>
+        <a href="https\://wgs.maizegdb.org/" target="_blank" rel="noopener">
+          <strong>SNPversity 2.0</strong>
+          <span>Genotype data for this gene across the diversity panels</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="mgdb-rec-api mgdb-hub-tone-blue" id="gene-record-api" aria-labelledby="gene-record-api-title">
+    <div class="mgdb-section-heading"><div><h2 id="gene-record-api-title">API data access</h2></div></div>
+    <div class="mgdb-rec-api-row">
+      <code id="gene-record-api-endpoint">GET /api/v1/records/gene/$(requested_identifier)</code>
+      <div class="mgdb-rec-api-actions">
+        <a class="mgdb-button mgdb-button-quiet" id="gene-record-api-link" href="/api/v1/records/gene/$(requested_identifier_path)" target="_blank" rel="noopener">Raw JSON <span aria-hidden="true">&nearr;</span></a>
+        <button class="mgdb-button mgdb-button-quiet" id="gene-copy-json-btn" type="button">Copy JSON</button>
+        <a class="mgdb-button mgdb-button-quiet" href="/api/v1/openapi">API documentation</a>
+      </div>
+    </div>
+    <p class="mgdb-rec-api-note">Every transcript, ontology term, insertion, map position, nearby locus, sequence link and reference on this page is retrieved in one structured JSON response.</p>
+  </section>
 </main>
 )

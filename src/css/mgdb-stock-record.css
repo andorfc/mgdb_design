@@ -1,131 +1,27 @@
 /* ==========================================================================
-   Stock record page — /data_center/stock/{id}
+   Stock record page — /data_center/stock?id={id}
    --------------------------------------------------------------------------
-   Built on the MaizeGDB design system: css/mgdb-modern.css provides the
-   tokens and the shell, this file lays out the stock-specific sections.
+   On the Data Hub shell and the shared record shell: css/mgdb-hub.css gives
+   the ground and the section cards, css/mgdb-record.css the record furniture
+   -- header, tabs, collections, tables, image gallery, lightbox, API card.
+
+   What is left here is the three things that are this page's own:
+
+     the pedigree viewer   a two-generation graph with a table view, a search
+                           and a TSV. It is not a shell collection: the graph
+                           is the point, and the table beside it is a second
+                           reading of the same rows rather than an alternative
+                           layout of a list.
+     TYPSimSelector        the genetic-similarity card and its score bars.
+     the ordering panel    the Stock Center / GRIN cart. The button is
+                           deliberately disabled: the cart handoff is not
+                           built yet, and a control that looks live but does
+                           nothing is worse than one that says so.
+
+   Everything else this file used to carry -- page layout, tabs, facts, the
+   provenance footer, the lightbox, the list/table view switch -- is the
+   shell's now and was deleted rather than duplicated.
    ========================================================================== */
-
-.mgdb-stock-record-page {
-  display: flex;
-  flex-direction: column;
-  gap: var(--mgdb-space-6);
-}
-
-/* --------------------------------------------------------------------------
-   Tabs
-   -------------------------------------------------------------------------- */
-
-.mgdb-stock-record-page .mgdb-section-tabs {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  padding: 4px;
-  box-shadow: var(--mgdb-shadow-sm);
-}
-
-.mgdb-stock-record-page .mgdb-section-tabs a {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--mgdb-space-2);
-  padding: 6px var(--mgdb-space-3);
-  border-radius: var(--mgdb-radius-sm);
-  color: var(--mgdb-ink-soft);
-  font-size: var(--mgdb-text-sm);
-  font-weight: 600;
-  text-decoration: none;
-  transition: background .15s, color .15s;
-}
-
-.mgdb-stock-record-page .mgdb-section-tabs a:hover:not(.is-current) {
-  background: var(--mgdb-surface-alt);
-  color: var(--mgdb-ink);
-}
-
-.mgdb-stock-record-page .mgdb-section-tabs a.is-current {
-  background: var(--mgdb-green-dark);
-  color: #fff;
-  box-shadow: inset 3px 0 0 var(--mgdb-gold);
-}
-
-.mgdb-stock-record-page .mgdb-section-tabs .stock-record-tab-count {
-  padding: 1px 7px;
-  border-radius: 999px;
-  background: var(--mgdb-surface-sunken);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-xs);
-  font-variant-numeric: tabular-nums;
-}
-
-.mgdb-stock-record-page .mgdb-section-tabs a.is-current .stock-record-tab-count {
-  background: rgba(255, 255, 255, .22);
-  color: #fff;
-}
-
-.mgdb-stock-record-page > section { scroll-margin-top: 4.5rem; }
-
-/* --------------------------------------------------------------------------
-   Facts
-   -------------------------------------------------------------------------- */
-
-.mgdb-stock-record-page .stock-record-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: var(--mgdb-space-4);
-  margin: 0;
-}
-
-.mgdb-stock-record-page .stock-record-grid > div {
-  padding: var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line-soft);
-  border-left: 3px solid var(--mgdb-gold);
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
-}
-
-.mgdb-stock-record-page .stock-record-grid dt {
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-  font-weight: 600;
-}
-
-.mgdb-stock-record-page .stock-record-grid dd {
-  margin: var(--mgdb-space-1) 0 0;
-  color: var(--mgdb-ink);
-  font-size: var(--mgdb-text-base);
-  font-weight: 700;
-}
-
-.mgdb-stock-record-page .stock-record-grid dd small {
-  display: block;
-  margin-top: var(--mgdb-space-1);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-  font-weight: 400;
-  line-height: var(--mgdb-leading-snug);
-}
-
-/* --------------------------------------------------------------------------
-   Sub-blocks within a section
-   -------------------------------------------------------------------------- */
-
-.mgdb-stock-record-page .stock-record-block { margin-top: var(--mgdb-space-5); }
-.mgdb-stock-record-page .stock-record-block:first-child { margin-top: 0; }
-
-.mgdb-stock-record-page .stock-record-block > h3 {
-  margin-bottom: var(--mgdb-space-1);
-  color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-lg);
-}
-
-.mgdb-stock-record-page .stock-record-block > p {
-  max-width: var(--mgdb-measure);
-  margin-bottom: var(--mgdb-space-3);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-}
 
 /* --------------------------------------------------------------------------
    Pedigree & relationships
@@ -491,123 +387,6 @@
   font-weight: 700;
 }
 
-.mgdb-stock-record-page .stock-record-notes dd {
-  max-width: var(--mgdb-measure);
-  margin: var(--mgdb-space-1) 0 var(--mgdb-space-3);
-  color: var(--mgdb-ink-soft);
-}
-
-.mgdb-stock-record-page .stock-record-notes dd:last-child { margin-bottom: 0; }
-
-/* --------------------------------------------------------------------------
-   Provenance footer
-   -------------------------------------------------------------------------- */
-
-.mgdb-stock-record-page .stock-record-provenance {
-  margin-top: var(--mgdb-space-6);
-  padding-top: var(--mgdb-space-4);
-  border-top: 1px solid var(--mgdb-line-soft);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-}
-
-.mgdb-stock-record-page .stock-record-empty {
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-}
-
-/* --------------------------------------------------------------------------
-   Modern Reference Cards (matching /data_center/reference and /ai)
-   -------------------------------------------------------------------------- */
-
-.mgdb-stock-record-page .reference-result-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: var(--mgdb-space-4) var(--mgdb-space-5);
-  margin-bottom: var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
-  transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
-}
-
-.mgdb-stock-record-page .reference-result-card:hover {
-  border-color: var(--mgdb-gold-dark);
-  box-shadow: var(--mgdb-shadow-sm);
-  transform: translateY(-2px);
-}
-
-.mgdb-stock-record-page .reference-result-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--mgdb-space-2);
-  margin-bottom: var(--mgdb-space-2);
-  font-size: var(--mgdb-text-xs);
-}
-
-.mgdb-stock-record-page .reference-year {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--mgdb-surface-sunken);
-  color: var(--mgdb-ink);
-  font-weight: 700;
-}
-
-.mgdb-stock-record-page .reference-copy-id {
-  color: var(--mgdb-muted);
-  font-family: var(--mgdb-font-mono, monospace);
-  font-size: var(--mgdb-text-xs);
-}
-
-.mgdb-stock-record-page .reference-card-title {
-  margin: 0 0 var(--mgdb-space-2);
-  color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-lg);
-  line-height: var(--mgdb-leading-snug);
-}
-
-.mgdb-stock-record-page .reference-card-title a {
-  color: inherit;
-  text-decoration: underline;
-}
-
-.mgdb-stock-record-page .reference-card-title a:hover {
-  color: var(--mgdb-leaf);
-}
-
-.mgdb-stock-record-page .reference-card-authors {
-  margin: 0 0 var(--mgdb-space-1);
-  color: var(--mgdb-ink);
-  font-size: var(--mgdb-text-sm);
-  font-weight: 500;
-}
-
-.mgdb-stock-record-page .reference-card-journal {
-  margin: 0 0 var(--mgdb-space-3);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-xs);
-}
-
-.mgdb-stock-record-page .reference-card-journal em {
-  color: var(--mgdb-ink-soft);
-  font-style: italic;
-  font-weight: 600;
-}
-
-.mgdb-stock-record-page .reference-card-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--mgdb-space-2);
-  margin-top: var(--mgdb-space-3);
-  padding-top: var(--mgdb-space-3);
-  border-top: 1px solid var(--mgdb-line-soft);
-}
-
 /* --------------------------------------------------------------------------
    TYPSimSelector Genetic Similarity Section
    -------------------------------------------------------------------------- */
@@ -709,335 +488,71 @@
 }
 
 /* --------------------------------------------------------------------------
-   Image Cards (matching /data_center/image)
+   Ordering panel
+
+   Sits under the identity facts in the record header, where a reader looking
+   for seed finds it without scrolling. The record hero is a single column on
+   this shell, so the panel is a row inside it rather than an aside beside it.
    -------------------------------------------------------------------------- */
 
-.mgdb-stock-record-page .stock-record-images {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: var(--mgdb-space-4);
-  padding: 0;
-  margin: var(--mgdb-space-3) 0 0;
-  list-style: none;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.mgdb-stock-record-page .mgdb-image-card {
-  position: relative;
+/* Logo beside the controls rather than above them: a third of the height for
+   the same information. */
+.mgdb-stock-record-page .stock-cart {
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-width: 0;
-  max-width: 100%;
-  box-sizing: border-box;
-  padding: var(--mgdb-space-3);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
-  overflow: hidden;
-  transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
-}
-
-.mgdb-stock-record-page .mgdb-image-card:hover {
-  border-color: var(--mgdb-gold-dark);
-  box-shadow: var(--mgdb-shadow-sm);
-  transform: translateY(-2px);
-}
-
-.mgdb-stock-record-page .image-card-figure {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface-sunken);
-  cursor: pointer;
-  margin: 0 0 var(--mgdb-space-3) 0;
-  padding: 0;
-  border: none;
-}
-
-.mgdb-stock-record-page .image-card-figure img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: var(--mgdb-radius-sm);
-  transition: transform .25s ease;
-}
-
-.mgdb-stock-record-page .image-card-figure:hover img {
-  transform: scale(1.05);
-}
-
-.mgdb-stock-record-page .image-card-body {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.mgdb-stock-record-page .image-card-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  align-items: center;
-  margin-bottom: var(--mgdb-space-1);
-}
-
-.mgdb-stock-record-page .image-card-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: #e6f0fa;
-  color: #1a568c;
-  font-size: var(--mgdb-text-xs);
-  font-weight: 700;
-}
-
-.mgdb-stock-record-page .image-card-badge[data-cat="Variation / Mutant"],
-.mgdb-stock-record-page .image-card-badge[data-cat="Mutant / Allele"] {
-  background: var(--mgdb-gold-soft);
-  color: var(--mgdb-gold-dark);
-}
-
-.mgdb-stock-record-page .mgdb-image-card h3 {
-  margin: 0 0 var(--mgdb-space-1);
-  color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-base);
-  font-weight: 700;
-  line-height: var(--mgdb-leading-snug);
-  word-break: break-word;
-}
-
-.mgdb-stock-record-page .mgdb-image-card h3 a {
-  color: inherit;
-  text-decoration: underline;
-}
-
-.mgdb-stock-record-page .mgdb-image-card h3 a:hover {
-  color: var(--mgdb-leaf);
-}
-
-.mgdb-stock-record-page .image-card-caption {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  margin: var(--mgdb-space-1) 0 0;
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-xs);
-  line-height: var(--mgdb-leading-snug);
-  word-break: break-word;
-}
-
-.mgdb-stock-record-page .image-card-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  align-items: center;
-  margin-top: var(--mgdb-space-3);
-  padding-top: var(--mgdb-space-3);
-  border-top: 1px solid var(--mgdb-line);
-}
-
-.mgdb-stock-record-page .image-card-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 30px;
-  padding: 2px var(--mgdb-space-3);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink-soft);
-  font-family: inherit;
-  font-size: var(--mgdb-text-xs);
-  font-weight: 700;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background .12s, border-color .12s;
-}
-
-.mgdb-stock-record-page .image-card-btn:hover {
-  background: var(--mgdb-surface-alt);
-  border-color: var(--mgdb-muted);
-  color: var(--mgdb-ink);
-}
-
-/* Lightbox Modal */
-.image-lightbox-modal {
-  padding: 0;
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-  max-width: 900px;
-  width: 90vw;
-}
-
-.image-lightbox-modal::backdrop {
-  background: rgba(15, 25, 20, 0.75);
-  backdrop-filter: blur(4px);
-}
-
-.image-lightbox-modal .lightbox-dialog-content {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.image-lightbox-modal .lightbox-close-btn {
-  position: absolute;
-  top: var(--mgdb-space-3);
-  right: var(--mgdb-space-3);
-  z-index: 10;
-  width: 36px;
-  height: 36px;
-  border: none;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.6);
-  color: #fff;
-  font-size: 24px;
-  line-height: 1;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.image-lightbox-modal .lightbox-close-btn:hover {
-  background: rgba(0, 0, 0, 0.9);
-}
-
-.image-lightbox-modal .lightbox-image-wrap {
-  background: #111;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 280px;
-  max-height: 60vh;
-  overflow: hidden;
-}
-
-.image-lightbox-modal .lightbox-image-wrap img {
-  max-width: 100%;
-  max-height: 60vh;
-  object-fit: contain;
-}
-
-.image-lightbox-modal .lightbox-details {
-  padding: var(--mgdb-space-5);
-  background: var(--mgdb-surface);
-}
-
-.image-lightbox-modal .lightbox-meta {
-  display: flex;
-  flex-wrap: wrap;
   gap: var(--mgdb-space-3);
   align-items: center;
-  margin-bottom: var(--mgdb-space-2);
-}
-
-.image-lightbox-modal .lightbox-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-3);
-  margin-top: var(--mgdb-space-4);
-  padding-top: var(--mgdb-space-4);
-  border-top: 1px solid var(--mgdb-line);
-}
-
-/* --------------------------------------------------------------------------
-   Pagination (Reference pagination matching standard data hubs)
-   -------------------------------------------------------------------------- */
-
-.mgdb-stock-record-page .stock-pagination {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: var(--mgdb-space-1);
-  margin-top: var(--mgdb-space-4);
-  padding-top: var(--mgdb-space-4);
-  border-top: 1px solid var(--mgdb-line-soft);
-}
-
-.mgdb-stock-record-page .stock-page-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 36px;
-  min-height: 36px;
-  padding: 0 var(--mgdb-space-3);
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
   border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-sm);
+  border-left: 3px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius);
   background: var(--mgdb-surface);
+}
+
+.mgdb-stock-record-page .stock-cart-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.mgdb-stock-record-page .stock-cart-logo {
+  flex: 0 0 auto;
+  width: auto;
+  height: 46px;
+}
+
+/* The Stock Center ear is a tall portrait mark, the GRIN one a squat wordmark;
+   sizing them the same makes the ear look shrunken. */
+.mgdb-stock-record-page .stock-cart[data-cart-source="coop"] .stock-cart-logo { height: 58px; }
+
+.mgdb-stock-record-page .stock-cart-lead {
   color: var(--mgdb-ink);
-  font-family: inherit;
   font-size: var(--mgdb-text-sm);
-  font-weight: 600;
-  cursor: pointer;
-  transition: background .12s, border-color .12s;
+  font-weight: 700;
+  line-height: var(--mgdb-leading-snug);
+  white-space: nowrap;
 }
 
-.mgdb-stock-record-page .stock-page-btn:hover:not(:disabled):not(.is-active) {
-  background: var(--mgdb-surface-alt);
-  border-color: var(--mgdb-muted);
+.mgdb-stock-record-page .stock-cart-add {
+  min-height: 34px;
+  padding-inline: var(--mgdb-space-4);
+  font-size: var(--mgdb-text-sm);
 }
 
-.mgdb-stock-record-page .stock-page-btn.is-active {
-  background: var(--mgdb-green-dark);
-  border-color: var(--mgdb-green-dark);
-  color: #fff;
-}
-
-.mgdb-stock-record-page .stock-page-btn:disabled {
-  opacity: .4;
+.mgdb-stock-record-page .stock-cart-add[disabled] {
+  opacity: .55;
   cursor: not-allowed;
 }
 
-.mgdb-stock-record-page .stock-page-ellipsis {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 32px;
+.mgdb-stock-record-page .stock-cart-note {
   color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading-snug);
 }
-
-/* --------------------------------------------------------------------------
-   Responsive
-   -------------------------------------------------------------------------- */
 
 @media (max-width: 767px) {
-  .mgdb-stock-record-page .mgdb-section-tabs {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    margin-inline: calc(-1 * var(--mgdb-space-4));
-    padding-inline: var(--mgdb-space-4);
-  }
-
-  .mgdb-stock-record-page .mgdb-section-tabs a { white-space: nowrap; }
-  .mgdb-stock-record-page .stock-pedigree-metrics { grid-template-columns: 1fr; }
-  .mgdb-stock-record-page .stock-pedigree-toolbar { align-items: stretch; }
-  .mgdb-stock-record-page .stock-pedigree-view-toggle,
-  .mgdb-stock-record-page .stock-pedigree-actions { width: 100%; }
-  .mgdb-stock-record-page .stock-pedigree-view-toggle button,
-  .mgdb-stock-record-page .stock-pedigree-actions .mgdb-button { flex: 1 1 auto; }
-  .mgdb-stock-record-page .stock-pedigree-node-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .mgdb-stock-record-page .stock-pedigree-table-tools { grid-template-columns: 1fr; }
-  .mgdb-stock-record-page #stock-pedigree-result-count { grid-column: 1; grid-row: auto; }
-  .mgdb-stock-record-page .stock-record-images { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  /* Nothing sits beside the panel at phone width, so it takes the full column
+     and the lead is allowed to wrap. */
+  .mgdb-stock-record-page .stock-cart { align-items: flex-start; }
+  .mgdb-stock-record-page .stock-cart-lead { white-space: normal; }
 }
-
-@media (max-width: 479px) {
-  .mgdb-stock-record-page .stock-pedigree-node-grid { grid-template-columns: 1fr; }
-}
-
-.mgdb-stock-record-page .mgdb-message > div > strong { display: block; }
-.mgdb-stock-record-page .mgdb-message > div > span { display: block; margin-top: var(--mgdb-space-1); }
-.mgdb-stock-record-page .mgdb-message .mgdb-button { margin-top: var(--mgdb-space-3); }

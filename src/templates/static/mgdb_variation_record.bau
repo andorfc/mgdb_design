@@ -1,0 +1,153 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-variation-record
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:title" content="$(variation_name) &mdash; MaizeGDB variation record">
+<meta property="og:description" content="$(variation_summary)">
+
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-variation-record-page" id="var-record-top" data-requested-id="$(requested_identifier)" data-canonical-id="$(variation_id)">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/variation">Variation Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(variation_name)</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-hero" aria-labelledby="var-record-title">
+    <div class="mgdb-hero-body">
+      <h1 id="var-record-title">$(variation_name) $(status_badge)</h1>
+      <p class="mgdb-rec-synonyms" id="var-record-synonyms" hidden></p>
+      <dl class="mgdb-record-facts mgdb-rec-headfacts" id="var-record-facts">$(identity_facts)</dl>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs mgdb-rec-tabs" id="var-record-tabs" aria-label="Sections on this record">
+    <a href="#var-record-overview">Overview</a>
+  </nav>
+
+  <div class="mgdb-loading" id="var-record-loading"><span class="mgdb-spinner" aria-hidden="true"></span><span>Loading the full record&hellip;</span></div>
+
+  <div class="mgdb-message mgdb-message-error" id="var-record-error" role="alert" hidden>
+    <div>
+      <strong>The rest of this record could not be loaded.</strong>
+      <span>The identity above is correct. Reload to try again, or report it if it keeps happening.</span>
+      <button class="mgdb-button mgdb-button-secondary" id="var-record-retry" type="button">Retry</button>
+    </div>
+  </div>
+
+  <div class="mgdb-message mgdb-message-info" id="var-record-notice" role="status" hidden></div>
+
+  <section id="var-record-overview" aria-labelledby="var-record-overview-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="var-record-overview-title">Overview</h2></div></div>
+    <div id="var-record-overview-body"></div>
+  </section>
+
+  <section id="var-record-phenotypes" aria-labelledby="var-record-phenotypes-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="var-record-phenotypes-title">Phenotypes</h2></div></div>
+    <div id="var-record-phenotypes-body"></div>
+  </section>
+
+  <section id="var-record-stocks" aria-labelledby="var-record-stocks-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="var-record-stocks-title">Stocks</h2></div></div>
+    <div id="var-record-stocks-body"></div>
+  </section>
+
+  <section id="var-record-related" aria-labelledby="var-record-related-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="var-record-related-title">Related records</h2></div></div>
+    <div id="var-record-related-body"></div>
+  </section>
+
+  <section id="var-record-annotations" aria-labelledby="var-record-annotations-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="var-record-annotations-title">Annotations</h2></div></div>
+    <div id="var-record-annotations-body"></div>
+  </section>
+
+  <section id="var-record-images" aria-labelledby="var-record-images-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="var-record-images-title">Images</h2></div></div>
+    <div id="var-record-images-body"></div>
+  </section>
+
+  <section id="var-record-references" aria-labelledby="var-record-references-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="var-record-references-title">References</h2></div></div>
+    <div id="var-record-references-body"></div>
+  </section>
+
+  <section id="var-record-metrics" aria-labelledby="var-record-metrics-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="var-record-metrics-title">Metrics</h2></div></div>
+    <div class="mgdb-metric-grid" id="var-record-metrics-body"></div>
+    <div class="mgdb-chart-grid mgdb-rec-charts" id="var-record-charts">
+      <figure class="mgdb-figure" id="var-record-connections-figure">
+        <h3>Record connections</h3>
+        <div class="mgdb-chart" id="var-record-connections-chart" role="img" aria-label="Horizontal bar chart of how many phenotypes, stocks, references, related variations, and images are attached to this variation">
+          <div class="mgdb-chart-fallback">Loading the record connections&hellip;</div>
+        </div>
+        <figcaption id="var-record-connections-caption"></figcaption>
+      </figure>
+      <figure class="mgdb-figure" id="var-record-years-figure" hidden>
+        <h3>References by year</h3>
+        <div class="mgdb-chart" id="var-record-years-chart" role="img" aria-label="Bar chart of the number of references attached to this variation, by publication year">
+          <div class="mgdb-chart-fallback">Loading the publication years&hellip;</div>
+        </div>
+        <figcaption id="var-record-years-caption"></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="mgdb-hub-related" id="var-record-resources" aria-labelledby="var-record-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="var-record-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/variation">
+          <strong>Variation Data Hub</strong>
+          <span>Search all alleles, mutations, rearrangements, and polymorphisms</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>Classical loci and their associated gene models</span>
+        </a>
+        <a href="/data_center/phenotype">
+          <strong>Phenotype Data Hub</strong>
+          <span>Observable traits and controlled phenotype terms</span>
+        </a>
+        <a href="/data_center/stock">
+          <strong>Stock Data Hub</strong>
+          <span>Germplasm carrying curated variations</span>
+        </a>
+        <a href="https\://jbrowse.maizegdb.org/" target="_blank" rel="noopener">
+          <strong>MaizeGDB JBrowse 2</strong>
+          <span>Explore maize features in their genomic context</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="mgdb-rec-api mgdb-hub-tone-blue" id="var-record-api" aria-labelledby="var-record-api-title">
+    <div class="mgdb-section-heading"><div><h2 id="var-record-api-title">API data access</h2></div></div>
+    <div class="mgdb-rec-api-row">
+      <code id="var-record-api-endpoint">GET /api/v1/records/variation/$(requested_identifier)</code>
+      <div class="mgdb-rec-api-actions">
+        <a class="mgdb-button mgdb-button-quiet" id="var-record-api-link" href="/api/v1/records/variation/$(requested_identifier_path)" target="_blank" rel="noopener">Raw JSON <span aria-hidden="true">&nearr;</span></a>
+        <button class="mgdb-button mgdb-button-quiet" id="var-copy-json-btn" type="button">Copy JSON</button>
+        <a class="mgdb-button mgdb-button-quiet" href="/api/v1/openapi">API documentation</a>
+      </div>
+    </div>
+    <p class="mgdb-rec-api-note">Every fact, phenotype, stock, related record, annotation, image, and reference on this page is retrieved in one structured JSON response.</p>
+  </section>
+
+  <dialog class="mgdb-rec-lightbox" id="var-record-image-dialog" aria-labelledby="var-lightbox-title">
+    <div class="mgdb-rec-lightbox-content">
+      <button class="mgdb-rec-lightbox-close" type="button" aria-label="Close preview">&times;</button>
+      <div class="mgdb-rec-lightbox-image"><img src="" alt=""></div>
+      <div class="mgdb-rec-lightbox-details">
+        <div class="mgdb-rec-lightbox-meta">
+          <span class="mgdb-rec-image-badge"></span>
+          <h3 id="var-lightbox-title"></h3>
+        </div>
+        <p class="mgdb-rec-lightbox-caption"></p>
+        <div class="mgdb-rec-lightbox-actions">
+          <a class="mgdb-button mgdb-button-primary" data-role="record" href="#" hidden>View database record <span aria-hidden="true">&rarr;</span></a>
+          <a class="mgdb-button mgdb-button-secondary" data-role="file" href="#" target="_blank" rel="noopener">Open original file <span aria-hidden="true">&nearr;</span></a>
+          <button class="mgdb-button mgdb-button-quiet mgdb-ref-copy" data-role="copy" type="button" data-copy-value="">Copy URL</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+</main>
+)

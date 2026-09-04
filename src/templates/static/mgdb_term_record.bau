@@ -1,0 +1,158 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-term-record
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:title" content="$(term_name) &mdash; MaizeGDB $(term_noun) record">
+<meta property="og:description" content="$(term_summary)">
+
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-term-record-page" id="term-record-top" data-term-id="$(term_id)" data-requested-id="$(requested_identifier)">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/">Data Hubs directory</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(term_name)</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-hero" aria-labelledby="term-record-title">
+    <div class="mgdb-hero-body">
+      <h1 id="term-record-title">$(term_name)</h1>
+      <p class="mgdb-rec-synonyms" id="term-record-synonyms" hidden></p>
+      <dl class="mgdb-record-facts mgdb-rec-headfacts" id="term-record-facts">$(identity_facts)</dl>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs mgdb-rec-tabs" id="term-record-tabs" aria-label="Sections on this record">
+    <a href="#term-record-overview">Overview</a>
+  </nav>
+
+  <div class="mgdb-loading" id="term-record-loading"><span class="mgdb-spinner" aria-hidden="true"></span><span>Loading the full record&hellip;</span></div>
+
+  <div class="mgdb-message mgdb-message-error" id="term-record-error" role="alert" hidden>
+    <div>
+      <strong>The rest of this record could not be loaded.</strong>
+      <span>The identity above is correct. Reload to try again, or report it if it keeps happening.</span>
+      <button class="mgdb-button mgdb-button-secondary" id="term-record-retry" type="button">Retry</button>
+    </div>
+  </div>
+
+  <div class="mgdb-message mgdb-message-info" id="term-record-notice" role="status" hidden></div>
+
+  <section id="term-record-overview" aria-labelledby="term-record-overview-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="term-record-overview-title">Overview</h2></div></div>
+    <div id="term-record-overview-body"></div>
+  </section>
+
+  <section id="term-record-values" aria-labelledby="term-record-values-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="term-record-values-title">Measured values</h2></div></div>
+    <div id="term-record-values-body"></div>
+  </section>
+
+  <section id="term-record-phenotypes" aria-labelledby="term-record-phenotypes-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="term-record-phenotypes-title">Phenotypes</h2></div></div>
+    <div id="term-record-phenotypes-body"></div>
+  </section>
+
+  <section id="term-record-analyses" aria-labelledby="term-record-analyses-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="term-record-analyses-title">QTL trait analyses</h2></div></div>
+    <div id="term-record-analyses-body"></div>
+  </section>
+
+  <section id="term-record-related" aria-labelledby="term-record-related-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="term-record-related-title">Related terms</h2></div></div>
+    <div id="term-record-related-body"></div>
+  </section>
+
+  <section id="term-record-images" aria-labelledby="term-record-images-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="term-record-images-title">Images</h2></div></div>
+    <div id="term-record-images-body"></div>
+  </section>
+
+  <section id="term-record-offsite" aria-labelledby="term-record-offsite-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="term-record-offsite-title">Offsite resources</h2></div></div>
+    <div id="term-record-offsite-body"></div>
+  </section>
+
+  <section id="term-record-references" aria-labelledby="term-record-references-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="term-record-references-title">References</h2></div></div>
+    <div id="term-record-references-body"></div>
+  </section>
+
+  <section id="term-record-metrics" aria-labelledby="term-record-metrics-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="term-record-metrics-title">Metrics</h2></div></div>
+    <div class="mgdb-metric-grid" id="term-record-metrics-body"></div>
+    <div class="mgdb-chart-grid mgdb-rec-charts" id="term-record-charts">
+      <figure class="mgdb-figure" id="term-record-connections-figure">
+        <h3>Record connections</h3>
+        <div class="mgdb-chart" id="term-record-connections-chart" role="img" aria-label="Horizontal bar chart of how many phenotypes, analyses, related terms, external entries, and references are attached to this term">
+          <div class="mgdb-chart-fallback">Loading the record connections&hellip;</div>
+        </div>
+        <figcaption id="term-record-connections-caption"></figcaption>
+      </figure>
+      <figure class="mgdb-figure" id="term-record-years-figure" hidden>
+        <h3>References by year</h3>
+        <div class="mgdb-chart" id="term-record-years-chart" role="img" aria-label="Bar chart of the number of references attached to this term, by publication year">
+          <div class="mgdb-chart-fallback">Loading the publication years&hellip;</div>
+        </div>
+        <figcaption id="term-record-years-caption"></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="mgdb-hub-related" id="term-record-resources" aria-labelledby="term-record-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="term-record-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/phenotype">
+          <strong>Phenotype Data Hub</strong>
+          <span>Curated phenotypes, and the traits and variations behind them</span>
+        </a>
+        <a href="/data_center/qtl">
+          <strong>QTL Data Hub</strong>
+          <span>QTL analyses and experiments, searchable by the trait they measured</span>
+        </a>
+        <a href="/traits_ibm_nam">
+          <strong>Trait values for IBM and NAM</strong>
+          <span>The measured trait values behind the summaries on this page</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>Loci classified by the locus-type terms in this vocabulary</span>
+        </a>
+        <a href="https\://download.maizegdb.org/SNPs_and_Maps/Traits/" target="_blank" rel="noopener">
+          <strong>Bulk trait downloads</strong>
+          <span>All IBM and NAM trait values as files, rather than one trait at a time</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="mgdb-rec-api mgdb-hub-tone-blue" id="term-record-api" aria-labelledby="term-record-api-title">
+    <div class="mgdb-section-heading"><div><h2 id="term-record-api-title">API data access</h2></div></div>
+    <div class="mgdb-rec-api-row">
+      <code id="term-record-api-endpoint">GET /api/v1/records/term/$(requested_identifier)</code>
+      <div class="mgdb-rec-api-actions">
+        <a class="mgdb-button mgdb-button-quiet" id="term-record-api-link" href="/api/v1/records/term/$(requested_identifier_path)" target="_blank" rel="noopener">Raw JSON <span aria-hidden="true">&nearr;</span></a>
+        <button class="mgdb-button mgdb-button-quiet" id="term-copy-json-btn" type="button">Copy JSON</button>
+        <a class="mgdb-button mgdb-button-quiet" href="/api/v1/openapi">API documentation</a>
+      </div>
+    </div>
+    <p class="mgdb-rec-api-note">Every fact, phenotype, analysis, related term, external entry, and reference on this page is retrieved in one structured JSON response.</p>
+  </section>
+
+  <dialog class="mgdb-rec-lightbox" id="term-image-dialog" aria-labelledby="term-lightbox-title">
+    <div class="mgdb-rec-lightbox-content">
+      <button class="mgdb-rec-lightbox-close" type="button" aria-label="Close preview">&times;</button>
+      <div class="mgdb-rec-lightbox-image"><img src="" alt=""></div>
+      <div class="mgdb-rec-lightbox-details">
+        <div class="mgdb-rec-lightbox-meta">
+          <span class="mgdb-rec-image-badge"></span>
+          <h3 id="term-lightbox-title"></h3>
+        </div>
+        <p class="mgdb-rec-lightbox-caption"></p>
+        <div class="mgdb-rec-lightbox-actions">
+          <a class="mgdb-button mgdb-button-primary" data-role="record" href="#" hidden>View database record <span aria-hidden="true">&rarr;</span></a>
+          <a class="mgdb-button mgdb-button-secondary" data-role="file" href="#" target="_blank" rel="noopener">Open original file <span aria-hidden="true">&nearr;</span></a>
+          <button class="mgdb-button mgdb-button-quiet mgdb-ref-copy" data-role="copy" type="button" data-copy-value="">Copy URL</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+</main>
+)

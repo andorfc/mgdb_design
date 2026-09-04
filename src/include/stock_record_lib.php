@@ -99,3 +99,103 @@ function stockIdentity($DBConn, $id) {
     'status' => ($curation === 101) ? 'unavailable' : (($curation === 102) ? 'discontinued' : 'available')
   );
 }//stockIdentity
+
+
+/* What to offer a reader whose identifier did not resolve.
+
+   Two arms:
+
+     variations  the term read as a variation or allele name, and the stocks
+                 that carry it. This is the arm that matters: someone holding
+                 an allele symbol wants seed, and the stock is the answer.
+     matches     stocks whose name or alternate description contains the term.
+
+   Both are bounded by LIMIT and neither runs unless the exact arms in
+   stockResolveId() have already missed.
+
+   Returns array('variations' => ..., 'matches' => ...), each a list. */
+function stockSuggestions($DBConn, $term, $limit = 8) {
+  $out = array('variations' => array(), 'matches' => array());
+  $term = trim((string) $term);
+  if ($term === '' || strlen($term) > 200) {
+    return $out;
+  }
+
+  $visible = 'i.type_term = 26 AND i.curation_lvl IN (0, 101, 102)';
+
+  /////
+  // The term as a variation or allele
+  /////
+
+  $sth = make_query($DBConn, "
+    SELECT s.id, s.name, v.id AS variation_id, v.name AS variation,
+           t.name AS stock_type, p.name AS provider
+    FROM mgdb.variation v
+      INNER JOIN mgdb.id_num vi ON vi.id = v.id AND vi.curation_lvl = 0
+      INNER JOIN mgdb.stock_genotypic_var sgv ON sgv.variation = v.id
+      INNER JOIN mgdb.stock s ON s.id = sgv.id
+      INNER JOIN mgdb.id_num i ON i.id = s.id
+      LEFT JOIN mgdb.term t ON t.id = s.type
+      LEFT JOIN mgdb.person p ON p.id = s.available_from
+    WHERE $visible AND v.name IN (:v1, :v2)
+    ORDER BY LOWER(s.name)
+    LIMIT :lim", 1, array('v1' => $term, 'v2' => strtolower($term), 'lim' => (int) $limit));
+  while ($row = retrieve_row($sth)) {
+    $out['variations'][] = array(
+      'id' => (int) $row['id'],
+      'name' => trim((string) $row['name']),
+      'variation' => trim((string) $row['variation']),
+      'variation_id' => (int) $row['variation_id'],
+      'type' => trim((string) $row['stock_type']),
+      'provider' => trim((string) $row['provider'])
+    );
+  }
+
+  /////
+  // Stocks whose name or alternate description contains the term
+  //
+  // The UNION is wrapped because Postgres orders a UNION by its output columns
+  // only, and shortest-name-first needs an expression. Shortest first puts the
+  // closer match at the top, the same rule the gene product page uses.
+  /////
+
+  $like = '%' . addcslashes($term, '%_\\') . '%';
+  $sth = make_query($DBConn, "
+    SELECT * FROM (
+      SELECT DISTINCT s.id, s.name, t.name AS stock_type, p.name AS provider,
+             NULL::varchar AS matched_description, 0 AS arm
+      FROM mgdb.stock s
+        INNER JOIN mgdb.id_num i ON i.id = s.id
+        LEFT JOIN mgdb.term t ON t.id = s.type
+        LEFT JOIN mgdb.person p ON p.id = s.available_from
+      WHERE $visible AND s.name ILIKE :like1
+      UNION
+      SELECT DISTINCT s.id, s.name, t.name, p.name, d.description, 1
+      FROM mgdb.description d
+        INNER JOIN mgdb.stock s ON s.id = d.id
+        INNER JOIN mgdb.id_num i ON i.id = s.id
+        LEFT JOIN mgdb.term t ON t.id = s.type
+        LEFT JOIN mgdb.person p ON p.id = s.available_from
+      WHERE $visible AND d.description ILIKE :like2
+    ) m
+    ORDER BY m.arm, length(m.name), LOWER(m.name)
+    LIMIT :lim", 1, array('like1' => $like, 'like2' => $like, 'lim' => (int) $limit * 2));
+  $seen = array();
+  foreach ($out['variations'] as $row) { $seen[$row['id']] = true; }
+  while ($row = retrieve_row($sth)) {
+    $id = (int) $row['id'];
+    if (isset($seen[$id])) { continue; }
+    if (count($out['matches']) >= $limit) { break; }
+    $seen[$id] = true;
+    $out['matches'][] = array(
+      'id' => $id,
+      'name' => trim((string) $row['name']),
+      'type' => trim((string) $row['stock_type']),
+      'provider' => trim((string) $row['provider']),
+      'matched_description' => trim((string) $row['matched_description'])
+    );
+  }
+
+  return $out;
+}//stockSuggestions
+?>

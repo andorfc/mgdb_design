@@ -1,0 +1,98 @@
+/* file: css/mgdb-locus-record.css
+ *
+ * The locus record page's own furniture, and nothing else.
+ *
+ * The ground, the section cards and their coloured edges, the record header,
+ * the fact lists, the collection blocks with their filter/view/TSV toolbar,
+ * the metric tones, the figures and the API card all come from
+ * css/mgdb-hub.css and css/mgdb-record.css, which load first.
+ */
+
+/* The full name under the title. Hidden when the controller had nothing to put
+   in it -- most Points have no full name, and an empty line under an <h1>
+   reads as a rendering fault. */
+.mgdb-locus-record-page .mgdb-rec-fullname {
+  margin: 2px 0 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-lg);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-locus-record-page .mgdb-rec-fullname:empty { display: none; }
+
+/* The description leads the overview, so it reads at body size rather than as
+   another fact row. */
+.mgdb-locus-record-page .locus-description p {
+  max-width: var(--mgdb-measure);
+  margin: 0;
+  font-size: var(--mgdb-text-base);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-locus-record-page .locus-critical { margin: 0 0 var(--mgdb-space-4); }
+
+.mgdb-locus-record-page .locus-review p { margin: 0; }
+
+.mgdb-locus-record-page .locus-pheno-list {
+  max-width: var(--mgdb-measure);
+  margin: 0;
+  line-height: var(--mgdb-leading);
+}
+
+/* --------------------------------------------------------------------------
+   Nearby loci
+
+   The window control sits above the four mapset blocks and applies to all of
+   them, so it belongs to the section rather than to any one block.
+   -------------------------------------------------------------------------- */
+
+.mgdb-locus-record-page .locus-nearby-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: center;
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-locus-record-page .locus-nearby-controls label {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+/* A four-option window select does not need the full column width the shell
+   gives a form control; sized to its content it reads as a control rather
+   than as an empty field. */
+.mgdb-locus-record-page .locus-nearby-controls select {
+  width: auto;
+  min-width: 9rem;
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-3);
+}
+
+.mgdb-locus-record-page .locus-nearby-status {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* --------------------------------------------------------------------------
+   Issue flags
+
+   The legacy page used two 16px flag images. A CSS dot carries the same
+   open/closed distinction without a request, and the status is also in its own
+   column, so the colour is not the only cue.
+   -------------------------------------------------------------------------- */
+
+.mgdb-locus-record-page .locus-issue-flag {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 6px;
+  border-radius: 50%;
+  vertical-align: baseline;
+}
+
+.mgdb-locus-record-page .locus-issue-open { background: var(--mgdb-red); }
+.mgdb-locus-record-page .locus-issue-closed { background: var(--mgdb-sage); }

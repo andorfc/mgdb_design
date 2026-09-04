@@ -43,12 +43,14 @@
   $gene_request = rawurldecode((string) getCGIParam('id', 'G', ID));
   $gene_resolved = geneResolveId($DBConn, $gene_request);
   if ($gene_resolved === false) {
-    return false;   // let the original controller answer
+    geneRecordNotFound($DBConn, $system, $gene_request);
+    return true;
   }
 
   $gene_identity = geneIdentity($DBConn, $gene_resolved);
   if (!$gene_identity) {
-    return false;
+    geneRecordNotFound($DBConn, $system, $gene_request);
+    return true;
   }
 
   logMessage('Starting gene_record_modern.php for ' . $gene_identity['name']);
@@ -108,14 +110,23 @@
   $bauplan = new Bauplan($gene_title);
   $bauplan->modern();
 
+  $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';
+  $v = function ($path) use ($doc_root) {
+    return file_exists($doc_root . $path) ? filemtime($doc_root . $path) : time();
+  };
+
   $bauplan->preHTML('<meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
   $bauplan->includeCss('/css/static.css');
   $bauplan->includeCss('/css/mgdb-modern.css');
   $bauplan->includeCss('/css/mgdb-megamenu.css');
-  $bauplan->includeCss('/css/mgdb-gene-record.css');
+  $bauplan->includeCss('/css/mgdb-hub.css?v=' . $v('/css/mgdb-hub.css'));
+  $bauplan->includeCss('/css/mgdb-record.css?v=' . $v('/css/mgdb-record.css'));
+  $bauplan->includeCss('/css/mgdb-gene-record.css?v=' . $v('/css/mgdb-gene-record.css'));
+  $bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
   $bauplan->includeScript('/js/mgdb-modern.js');
   $bauplan->includeScript('/js/mgdb-chrome.js');
-  $bauplan->includeScript('/js/mgdb-gene-record.js');
+  $bauplan->includeScript('/js/mgdb-record.js?v=' . $v('/js/mgdb-record.js'));
+  $bauplan->includeScript('/js/mgdb-gene-record.js?v=' . $v('/js/mgdb-gene-record.js'));
   $bauplan->head('<meta name="description" content="'
     . htmlspecialchars($gene_summary, ENT_QUOTES, 'UTF-8') . '">');
 
@@ -131,49 +142,53 @@
   $api_id = ($gene_name !== '') ? $gene_name : $gene_request;
 
   $content->get('gene_api_id')->replace(htmlspecialchars($api_id, ENT_QUOTES, 'UTF-8'));
+  $content->get('requested_identifier')->replace(htmlspecialchars($gene_request, ENT_QUOTES, 'UTF-8'));
+  $content->get('requested_identifier_path')->replace(htmlspecialchars(rawurlencode($gene_request), ENT_QUOTES, 'UTF-8'));
+  $content->get('gene_title')->replace(htmlspecialchars($gene_display, ENT_QUOTES, 'UTF-8'));
 
   /* A withdrawn record has nothing for the API to return — the resource answers
      410 — so the page tells the script not to ask. Without this the reader would
      see "the rest of this record could not be loaded", which frames a record
      that is correctly and permanently gone as a transient failure. */
   $content->get('gene_state')->replace($gene_withdrawn ? 'withdrawn' : 'current');
-  $content->get('gene_name')->replace(htmlspecialchars($gene_display, ENT_QUOTES, 'UTF-8'));
   $content->get('gene_summary')->replace(htmlspecialchars($gene_summary, ENT_QUOTES, 'UTF-8'));
 
-  /* The accession, shown beside the symbol only when the two differ, so the
-     heading never repeats itself. Blocks in a .bau are declared
-     {display: off} and unmuted, rather than muted away. */
-  if ($gene_name !== '' && $gene_display !== $gene_name) {
-    $block = $content->get('gene_accession_block');
-    $block->get('gene_accession')->replace(htmlspecialchars($gene_name, ENT_QUOTES, 'UTF-8'));
-    $block->unmute();
-  }
-
-  if ($gene_full_name !== '' && strcasecmp($gene_full_name, $gene_display) !== 0) {
-    $block = $content->get('gene_full_name_block');
-    $block->get('gene_full_name')->replace(htmlspecialchars($gene_full_name, ENT_QUOTES, 'UTF-8'));
-    $block->unmute();
-  }
-
-  // Eyebrow: what kind of record this is and which annotation it comes from.
+  /* What kind of record this is, and which annotation it comes from. This was
+     an eyebrow above the title; the design system does not use eyebrows, and
+     these are facts, so they are facts. */
   $kind_labels = array(
     'gene_model' => 'Gene model',
     'gene_model_and_locus' => 'Gene model and classical gene',
     'locus' => 'Classical gene',
     'withdrawn' => 'Withdrawn gene model'
   );
-  $eyebrow = isset($kind_labels[$gene_identity['kind']])
-           ? $kind_labels[$gene_identity['kind']] : 'Gene';
+  $identity_facts = '';
+  $identity_facts .= '<div><dt>Record</dt><dd>'
+    . (isset($kind_labels[$gene_identity['kind']]) ? $kind_labels[$gene_identity['kind']] : 'Gene')
+    . '</dd></div>';
+  if ($gene_name !== '' && $gene_display !== $gene_name) {
+    $identity_facts .= '<div><dt>Gene model</dt><dd class="mgdb-record-id">'
+      . htmlspecialchars($gene_name, ENT_QUOTES, 'UTF-8') . '</dd></div>';
+  }
+  if ($gene_full_name !== '' && strcasecmp($gene_full_name, $gene_display) !== 0) {
+    $identity_facts .= '<div><dt>Full name</dt><dd>'
+      . htmlspecialchars($gene_full_name, ENT_QUOTES, 'UTF-8') . '</dd></div>';
+  }
   if ($gene_identity['line'] !== '') {
-    $eyebrow .= ' &middot; ' . htmlspecialchars($gene_identity['line'], ENT_QUOTES, 'UTF-8');
+    $identity_facts .= '<div><dt>Line</dt><dd>'
+      . htmlspecialchars($gene_identity['line'], ENT_QUOTES, 'UTF-8') . '</dd></div>';
   }
+  /* Assembly and annotation together, because a B73 gene has seven of them --
+     RefGen_v1 through NAM-5.0 -- and which one a reader is looking at is the
+     single most confusing thing about this page. */
   if ($gene_identity['assembly'] !== '') {
-    $eyebrow .= ' &middot; ' . htmlspecialchars($gene_identity['assembly'], ENT_QUOTES, 'UTF-8');
+    $identity_facts .= '<div><dt>Assembly</dt><dd>'
+      . htmlspecialchars($gene_identity['assembly'], ENT_QUOTES, 'UTF-8')
+      . ($gene_identity['annotation'] !== ''
+         ? '<small>annotation ' . htmlspecialchars($gene_identity['annotation'], ENT_QUOTES, 'UTF-8') . '</small>'
+         : '')
+      . '</dd></div>';
   }
-  if ($gene_identity['annotation'] !== '') {
-    $eyebrow .= ' / ' . htmlspecialchars($gene_identity['annotation'], ENT_QUOTES, 'UTF-8');
-  }
-  $content->get('gene_eyebrow')->replace($eyebrow);
 
   /* Status is server-rendered rather than left to the API call: a superseded or
      withdrawn model must say so in the first paint, not a moment later. Built
@@ -183,15 +198,15 @@
     'obsolete' => array('mgdb-pill-warn', 'Obsolete'),
     'withdrawn' => array('mgdb-pill-error', 'Withdrawn')
   );
-  $content->get('status_badge')->replace(isset($badges[$gene_identity['status']])
-    ? '<span class="mgdb-pill ' . $badges[$gene_identity['status']][0] . '">'
+  $content->get('gene_badge')->replace(isset($badges[$gene_identity['status']])
+    ? ' <span class="mgdb-pill ' . $badges[$gene_identity['status']][0] . '">'
       . $badges[$gene_identity['status']][1] . '</span>'
     : '');
 
   /* Server-rendered facts. These are the ones already in hand from resolution,
      so they paint with the document; the rest of the fact list is filled in from
      the API. */
-  $facts = '';
+  $facts = $identity_facts;
   if ($gene_identity['chromosome'] !== '' && $gene_identity['start'] !== null) {
     $facts .= '<div><dt>Location</dt><dd>'
       . htmlspecialchars($gene_identity['chromosome'], ENT_QUOTES, 'UTF-8') . ':'
@@ -215,6 +230,7 @@
   $content->get('gene_facts')->replace($facts);
 
   // The withdrawal banner, with its replacement, rendered server-side.
+  $withdrawn_notice = '';
   if ($gene_withdrawn) {
     $replacement = $gene_identity['replacement'];
     $message = $replacement !== ''
@@ -222,10 +238,10 @@
         . rawurlencode($replacement) . '">' . htmlspecialchars($replacement, ENT_QUOTES, 'UTF-8')
         . '</a>.'
       : 'This gene model was withdrawn from the annotation and has no replacement.';
-    $notice = $content->get('withdrawn_notice');
-    $notice->get('withdrawn_message')->replace($message);
-    $notice->unmute();
+    $withdrawn_notice = '<div class="mgdb-message mgdb-message-warn mgdb-rec-alert" role="note">'
+      . '<div><strong>Withdrawn gene model</strong><span>' . $message . '</span></div></div>';
   }
+  $content->get('withdrawn_notice')->replace($withdrawn_notice);
 
   include_once('translation.php');
   $mgdb->get('blast_url')->replace($system['BLAST_URL']);
@@ -233,4 +249,131 @@
 
   $bauplan->publish();
   return true;
+
+
+/////
+// FUNCTIONS
+/////////////////////////////////////////////////////////////////////////////////////////
+
+/* The 404 page.
+
+   Publishes and returns; the caller returns true so the guard in
+   gene_center.php does not fall through to the legacy not-found template. The
+   page this replaced returned false here and let the original controller
+   answer with a soft 200. */
+function geneRecordNotFound($DBConn, $system, $requested) {
+  http_response_code(404);
+  header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
+  header('Pragma: no-cache');
+  header('Expires: 0');
+
+  logMessage('gene_record_modern.php: no record for ' . $requested);
+
+  $display = $requested;
+  if (function_exists('mb_strlen') ? mb_strlen($display, 'UTF-8') > 80 : strlen($display) > 80) {
+    $display = (function_exists('mb_substr') ? mb_substr($display, 0, 79, 'UTF-8') : substr($display, 0, 79)) . "\xE2\x80\xA6";
+  }
+  $esc = function ($value) { return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8'); };
+
+  $suggestions = geneSuggestions($DBConn, $requested);
+  $summary = 'No MaizeGDB gene matches ' . $display
+           . '. Search the Gene and Locus Data Hub, or follow one of the suggested records.';
+
+  $blocks = '';
+
+  if (count($suggestions['loci']) > 0) {
+    $rows = '';
+    foreach ($suggestions['loci'] as $item) {
+      $models = '';
+      foreach ($item['models'] as $model) {
+        $models .= ($models === '' ? '' : ', ')
+                 . '<a href="/gene_center/gene/' . rawurlencode($model['name']) . '">'
+                 . $esc($model['name']) . '</a>';
+      }
+      $rows .= '<tr><th scope="row"><a href="/gene_center/gene/' . rawurlencode($item['name']) . '">'
+             . $esc($item['name']) . '</a></th>'
+             . '<td>' . ($item['full_name'] !== '' ? $esc($item['full_name']) : '<span class="mgdb-muted">Not recorded</span>') . '</td>'
+             . '<td>' . ($models !== '' ? $models : '<span class="mgdb-muted">None</span>') . '</td>'
+             . '<td class="mgdb-sequence">' . (int) $item['id'] . '</td></tr>';
+    }
+    $blocks .= geneNotFoundBlock($esc($display) . ' as a classical gene symbol',
+      count($suggestions['loci']),
+      array('Symbol', 'Full name', 'Gene models', 'MaizeGDB ID'), $rows,
+      '<p class="mgdb-rec-block-status">A classical gene is curated across assemblies; its gene '
+      . 'models are the per-assembly annotations of it.</p>');
+  }
+
+  if (count($suggestions['models']) > 0) {
+    $rows = '';
+    foreach ($suggestions['models'] as $item) {
+      $rows .= '<tr><th scope="row"><a href="/gene_center/gene/' . rawurlencode($item['name']) . '">'
+             . $esc($item['name']) . '</a></th>'
+             . '<td>' . ($item['assembly'] !== '' ? $esc($item['assembly']) : '<span class="mgdb-muted">Not recorded</span>') . '</td>'
+             . '<td>' . ($item['annotation'] !== '' ? $esc($item['annotation']) : '<span class="mgdb-muted">Not recorded</span>') . '</td>'
+             . '<td>' . ($item['chr'] !== '' ? $esc($item['chr']) : '<span class="mgdb-muted">Not recorded</span>') . '</td>'
+             . '<td>' . ($item['locus'] !== '' ? $esc($item['locus']) : '<span class="mgdb-muted">None</span>') . '</td></tr>';
+    }
+    $blocks .= geneNotFoundBlock($esc($display) . ' in other annotations',
+      count($suggestions['models']),
+      array('Gene model', 'Assembly', 'Annotation', 'Chromosome', 'Classical gene'), $rows,
+      '<p class="mgdb-rec-block-status">The same gene is annotated separately in each assembly, '
+      . 'and B73 alone has seven of them.</p>');
+  }
+
+  $suggestion_sections = '';
+  if ($blocks !== '') {
+    $suggestion_sections =
+        '<section id="gene-notfound-suggestions" aria-labelledby="gene-notfound-suggestions-title">'
+      . '<div class="mgdb-section-heading"><div><h2 id="gene-notfound-suggestions-title">Suggestions</h2></div></div>'
+      . $blocks . '</section>';
+  }
+
+  $bauplan = new Bauplan('MaizeGDB Gene: not found');
+  $bauplan->modern();
+
+  $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT']
+    ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';
+  $hub_file = $doc_root . '/css/mgdb-hub.css';
+  $rec_css = $doc_root . '/css/mgdb-record.css';
+
+  $bauplan->preHTML('<meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
+  $bauplan->includeCss('/css/static.css');
+  $bauplan->includeCss('/css/mgdb-modern.css');
+  $bauplan->includeCss('/css/mgdb-megamenu.css');
+  $bauplan->includeCss('/css/mgdb-hub.css?v=' . (file_exists($hub_file) ? filemtime($hub_file) : time()));
+  $bauplan->includeCss('/css/mgdb-record.css?v=' . (file_exists($rec_css) ? filemtime($rec_css) : time()));
+  $bauplan->includeScript('/js/mgdb-modern.js');
+  $bauplan->includeScript('/js/mgdb-chrome.js');
+  $bauplan->head('<meta name="description" content="' . $esc($summary) . '">');
+
+  $mgdb = $bauplan->template()->load('templates/maizegdb-main-modern.bau');
+  $mgdb->get('megamenu')->load('templates/home/maizegdb_header_modern.bau');
+  $mgdb->get('image-dir')->replace($system['image_url']);
+  $mgdb->get('server-url')->replace($system['root_url']);
+
+  $content = $mgdb->get('body')->load('templates/static/mgdb_gene_notfound.bau');
+  $content->get('requested_display')->replace($esc($display));
+  $content->get('requested_value')->replace($esc($requested));
+  $content->get('notfound_summary')->replace($esc($summary));
+  $content->get('suggestion_sections')->replace($suggestion_sections);
+
+  include_once('translation.php');
+  $bauplan->publish();
+}//geneRecordNotFound
+
+
+/* One suggestion block: a heading with its count, a table, and a line under it. */
+function geneNotFoundBlock($title, $count, $columns, $rows, $footer) {
+  $head = '';
+  foreach ($columns as $column) {
+    $head .= '<th scope="col">' . htmlspecialchars($column, ENT_QUOTES, 'UTF-8') . '</th>';
+  }
+  return '<div class="mgdb-rec-block">'
+       . '<div class="mgdb-rec-block-head"><h3>' . $title
+       . '<span class="mgdb-rec-block-count">' . (int) $count . '</span></h3></div>'
+       . '<div class="mgdb-table-scroll"><table class="mgdb-table mgdb-rec-table">'
+       . '<thead><tr>' . $head . '</tr></thead><tbody>' . $rows . '</tbody></table></div>'
+       . $footer . '</div>';
+}//geneNotFoundBlock
+
 ?>

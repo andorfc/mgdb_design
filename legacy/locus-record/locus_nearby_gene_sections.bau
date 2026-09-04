@@ -1,0 +1,256 @@
+$$SYNTAX-LEVEL 2
+*(gene-locus-nearby-sections
+
+  @(nearby_loci {display: off}
+    @(found_nearby_loci
+      @(cent
+        <br>
+        <form method="get" action="javascript:refresh_cm($(locus_id)\);" class="tiny">
+           These are nearby loci on a selection of high-res maps.
+<!-- NEED TO ADD - BROKEN FEATURE - works on locus pages - CMA 3/9/13 
+          <br>Currently, the centimorgan range is <b>$(centimorgan)</b>.  
+          Change it to <input type="hidden" name="id" value="$(locus_id)">
+          <select class="tiny" id="cm" name="cm">
+            <option value="5">5
+            <option value="10">10
+            <option value="15">15
+            <option value="20">20
+            <option value="25">25
+            <option value="30">30
+            <option value="35">35
+            <option value="40">40
+            <option value="45">45
+            <option value="50">50
+          </select> 
+          <input type="button" name="button" class="button" 
+                 onclick="javascript:refresh_cm($(locus_id)\);" value="Go!"> 
+-->
+        </form>
+        <div id="locinearby_background">
+          <table width="100%" cellpadding=2 cellspacing=0 summary="Info on nearby loci">
+            <tr> 
+      )
+    
+      @(column_1
+        <td width="25%" style="border-right: 1px solid;" valign="top">
+          <div id='col1'>
+            <b>Change Map:</b> 
+            <select onChange="refresh_col('$(locus_id)','$(centimorgan)','1'\);"  id="s1" class="tiny" name="change">
+              <!-- col#_s# is replaced by "selected" if it's the option the user selects -->
+              <option $(col1_s6) value="6">cIBM2006</option>
+              <option $(col1_s3) value="3">Genetic</option>
+              <option $(col1_s12) value="12">IBM2</option>
+              <option $(col1_s2) value="2">IBM2 2008 Neighbors</option>
+              <option $(col1_s0) value="0">IBM2 2008 Neighbors Frame</option>
+              <option $(col1_s8) value="8">IBM2 FPC0507</option>
+              <option $(col1_s4) value="4">ISU IBM Map7</option>
+              <option $(col1_s11) value="11">ISU Integrated IBM 2009</option>
+              <option $(col1_s7) value="7">LHRF Gnp</option>
+              <option $(col1_s1) value="1">NAM</option>
+            </select>
+            <br><br>
+          
+            @(col1
+              <p style="margin-bottom: 0px; margin-top: 0px;">
+                <b>
+                  <a href="/data_center/map?id=$(col1_map_id)&amp;reflocus=$(locus_id)#reflocus" title="IBM2 loci and well-ordered (on frame, backbone\) loci from other maps">
+                    <u>$(col1_map_name)</u>
+                  </a>
+                </b>
+              </p>
+              <table width="100%" style="font-size: 90%" cellpadding=1 cellspacing=0 summary="Loci nearby on $(col1_map_name)">
+                @(col1_sec
+                  <tr>
+                    <td style="font-size: 90%">$(col1_val)</td>
+                    <td style="font-size: 90%">$(col1_link)</td>
+                  </tr>
+                )
+              </table>
+              @(col1_none {display: off}
+                <p><span style="font-size: 80%">There are no nearby loci on $(col1_map_name).</span></p>
+              )
+            )
+            @(col1_not_mapped {bind: col1 | display: off}
+              <p style="margin-top: 0px; margin-bottom: 0px;">
+                <b><u>$(col1_map_name)</u></b>
+              </p>
+              <p>
+                <span style="font-size: 80%">This locus is not mapped on $(col1_map_name).</span>
+              </p>
+            )
+          </div>
+        </td>
+      )
+    
+      @(column_2
+        <td width="25%" style="border-right: 1px solid;" valign="top">
+          <div id='col2'>
+            <b>Change Map:</b>   
+            <select onChange="refresh_col('$(locus_id)','$(centimorgan)','2'\)"  id="s2" class="tiny" name="change">
+              <!-- c#_s# is replaced by "selected" depending on the option the user selects -->
+              <option $(col2_s6) value="6">cIBM2006</option>
+              <option $(col2_s3) value="3">Genetic</option>
+              <option $(col2_s12) value="12">IBM2</option>
+              <option $(col2_s2) value="2">IBM2 2008 Neighbors</option>
+              <option $(col2_s0) value="0">IBM2 2008 Neighbors Frame</option>
+              <option $(col2_s8) value="8">IBM2 FPC0507</option>
+              <option $(col2_s4) value="4">ISU IBM Map7</option>
+              <option $(col2_s11) value="11">ISU Integrated IBM 2009</option>
+              <option $(col2_s7) value="7">LHRF Gnp</option>
+              <option $(col2_s1) value="1">NAM</option>
+            </select>
+            <br><br>
+            @(col2
+              <p style="margin-bottom: 0px; margin-top: 0px;">
+                <b><a href="/data_center/map?id=$(col2_map_id)&amp;reflocus=$(locus_id)#reflocus"><u>$(col2_map_name)</u></a></b>
+              </p>
+              <table width="100%" style="font-size: 90%" cellpadding=1 cellspacing=0 summary="Loci nearby on $(col2_map_name)">
+                @(col2_sec
+                  <tr>
+                    <td style="font-size: 90%">$(col2_val)</td>
+                    <td style="font-size: 90%">$(col2_link)</td>
+                  </tr>
+                )
+              </table>
+              @(col2_none {display: off}
+                <p>
+                  <span style="font-size: 80%">
+                    There are no nearby loci on $(col2_map_name).
+                  </span>
+                </p>
+              )
+            )
+            @(col2_not_mapped {bind: col2 | display: off}
+              <p style="margin-top: 0px; margin-bottom: 0px;">
+                <b><u>$(col2_map_name)</u></b>
+              </p>
+              <p>
+                <span style="font-size: 80%">This locus is not mapped on $(col2_map_name).</span>
+              </p>
+            )
+          </div>
+        </td>
+      )
+      
+      @(column_3
+        <td  width="25%" style="border-right: 1px solid;" valign="top">
+          <div id='col3'>
+            <b>Change Map:</b> 
+            <select onChange="refresh_col('$(locus_id)', '$(centimorgan)','3'\);"  id="s3" class="tiny" name="change">
+              <!-- col#_s# is replaced by "selected" if it's the option the user selects -->
+              <option $(col3_s6) value="6">cIBM2006</option>
+              <option $(col3_s3) value="3">Genetic</option>
+              <option $(col3_s12) value="12">IBM2</option>
+              <option $(col3_s2) value="2">IBM2 2008 Neighbors</option>
+              <option $(col3_s0) value="0">IBM2 2008 Neighbors Frame</option>
+              <option $(col3_s8) value="8">IBM2 FPC0507</option>
+              <option $(col3_s4) value="4">ISU IBM Map7</option>
+              <option $(col3_s11) value="11">ISU Integrated IBM 2009</option>
+              <option $(col3_s7) value="7">LHRF Gnp</option>
+              <option $(col3_s1) value="1">NAM</option>
+            </select>
+            <br><br>
+          
+            @(col3
+              <p style="margin-bottom: 0px; margin-top: 0px;">
+                <b>
+                  <a href="/data_center/map?id=$(col3_map_id)&amp;reflocus=$(locus_id)#reflocus">
+                    <u>$(col3_map_name)</u>
+                  </a>
+                </b>
+              </p>
+              <table width="100%" style="font-size: 90%" cellpadding=1 cellspacing=0 summary="Loci nearby on $(col3_map_name)">
+               @(col3_sec
+                 <tr>
+                  <td style="font-size: 90%">$(col3_val)</td>
+                  <td style="font-size: 90%">$(col3_link)</td>
+                 </tr>
+               )
+              </table>
+              @(col3_none {display: off}
+                <p>
+                  <span style="font-size: 80%">
+                    There are no nearby loci on $(col3_map_name).
+                  </span>
+                </p>
+              )
+            )
+            @(col3_not_mapped {bind: col3 | display: off}
+              <p style="margin-top: 0px; margin-bottom: 0px;">
+                <b><u>$(col3_map_name)</u></b>
+              </p>
+              <p>
+                <span style="font-size: 80%">
+                  This locus is not mapped on $(col3_map_name).
+                </span>
+              </p>
+            )
+          </div>
+        </td>
+      )
+      
+      @(column_4
+        <td  width="25%" style="" valign="top">
+          <div id='col4'>
+            <b>Change Map: </b>
+            <select onChange="refresh_col('$(locus_id)', '$(centimorgan)','4'\);"  id="s4" class="tiny" name="change">
+              <!-- col#_s# is replaced by "selected" if it's the option the user selects -->
+              <option $(col4_s6) value="6">cIBM2006</option>
+              <option $(col4_s3) value="3">Genetic</option>
+              <option $(col4_s12) value="12">IBM2</option>
+              <option $(col4_s2) value="2">IBM2 2008 Neighbors</option>
+              <option $(col4_s0) value="0">IBM2 2008 Neighbors Frame</option>
+              <option $(col4_s8) value="8">IBM2 FPC0507</option>
+              <option $(col4_s4) value="4">ISU IBM Map7</option>
+              <option $(col4_s11) value="11">ISU Integrated IBM 2009</option>
+              <option $(col4_s7) value="7">LHRF Gnp</option>
+              <option $(col4_s1) value="1">NAM</option>
+            </select>
+            <br><br>
+          
+            @(col4
+              <p style="margin-bottom: 0px; margin-top: 0px;">
+                <b>
+                  <a href="/data_center/map?id=$(col4_map_id)&amp;reflocus=$(locus_id)#reflocus">
+                    <u>$(col4_map_name)</u>
+                  </a>
+                </b>
+              </p>
+              <table width="100%" style="font-size: 90%" cellpadding=1 cellspacing=0 summary="Loci nearby on $(col4_map_name)">
+                @(col4_sec
+                  <tr>
+                    <td style="font-size: 90%">$(col4_val)</td>
+                    <td style="font-size: 90%">$(col4_link)</td>
+                  </tr>
+                )
+              </table>
+              @(col4_none {display: off}
+                <p>
+                  <span style="font-size: 80%">
+                    There are no nearby loci on $(col4_map_name).
+                  </span>
+                </p>
+              )
+            )
+            @(col4_not_mapped {bind: col4 | display: off}
+              <p style="margin-top: 0px; margin-bottom: 0px;">
+                <b><u>$(col4_map_name)</u></b>
+              </p>
+              <p>
+                <span style="font-size: 80%">This locus is not mapped on $(col4_map_name).</span>
+              </p>
+            )
+          </div>
+        </td>
+      </tr>
+    </table>
+      )
+    )
+
+    @(no_nearby_loci {bind: found_nearby_loci | display: off}
+      <br><b>There are no nearby loci for this record.</b>
+    )
+    </div>
+  ) <!-- nearby_loci -->
+ 
+)

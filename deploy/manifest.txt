@@ -546,10 +546,22 @@ src/js/mgdb-gene-product.js                                   js/mgdb-gene-produ
 # Gene product record page — replaces /data_center/gene_product?id={id}
 src/include/gene_product_record_lib.php                       include/gene_product_record_lib.php
 src/include/api/v1/records/gene_product.php                   include/api/v1/records/gene_product.php
+
+# Marker record page — replaces /data_center/marker?id={id}
+src/include/marker_record_lib.php                             include/marker_record_lib.php
 src/include/api/v1/records/marker.php                         include/api/v1/records/marker.php
+src/templates/static/mgdb_marker_record.bau                   templates/static/mgdb_marker_record.bau
 src/templates/static/mgdb_marker_notfound.bau                 templates/static/mgdb_marker_notfound.bau
+src/js/mgdb-marker-record.js                                  js/mgdb-marker-record.js
+src/controllers/data_center/marker_record_modern.php          controllers/data_center/marker_record_modern.php
+
+# Phenotype record page — replaces /data_center/phenotype?id={id}
+src/include/phenotype_record_lib.php                          include/phenotype_record_lib.php
 src/include/api/v1/records/phenotype.php                      include/api/v1/records/phenotype.php
+src/templates/static/mgdb_phenotype_record.bau                templates/static/mgdb_phenotype_record.bau
 src/templates/static/mgdb_phenotype_notfound.bau              templates/static/mgdb_phenotype_notfound.bau
+src/js/mgdb-phenotype-record.js                               js/mgdb-phenotype-record.js
+src/controllers/data_center/phenotype_record_modern.php       controllers/data_center/phenotype_record_modern.php
 src/templates/static/mgdb_gene_product_record.bau             templates/static/mgdb_gene_product_record.bau
 src/templates/static/mgdb_gene_product_notfound.bau           templates/static/mgdb_gene_product_notfound.bau
 # Record page shell: the furniture and the engine every record page shares.
@@ -917,13 +929,54 @@ src/controllers/feedback.php                     controllers/feedback.php
 src/templates/static/mgdb_feedback.bau           templates/static/mgdb_feedback.bau
 src/css/mgdb-feedback.css                        css/mgdb-feedback.css
 src/js/mgdb-feedback.js                          js/mgdb-feedback.js
+
+# Pan-gene record page — replaces /pan_gene_center/pan_gene/{id}
+src/include/pan_gene_record_lib.php                           include/pan_gene_record_lib.php
 src/include/api/v1/records/pan_gene.php                       include/api/v1/records/pan_gene.php
+src/templates/static/mgdb_pan_gene_record.bau                 templates/static/mgdb_pan_gene_record.bau
 src/templates/static/mgdb_pan_gene_notfound.bau               templates/static/mgdb_pan_gene_notfound.bau
+src/js/mgdb-pan-gene-record.js                                js/mgdb-pan-gene-record.js
+src/controllers/pan_gene_center/pan_gene_record_modern.php    controllers/pan_gene_center/pan_gene_record_modern.php
+
+# SSR record page — replaces /data_center/ssr?id={id}. An SSR is a probe, so
+# the page shares the marker record's API resource, template ids and script;
+# only the framing and the SSR-only resolution are its own.
+src/include/probe_collection_lib.php                          include/probe_collection_lib.php
+src/include/ssr_record_lib.php                                include/ssr_record_lib.php
+src/templates/static/mgdb_ssr_record.bau                      templates/static/mgdb_ssr_record.bau
 src/templates/static/mgdb_ssr_notfound.bau                    templates/static/mgdb_ssr_notfound.bau
+src/controllers/data_center/ssr_record_modern.php             controllers/data_center/ssr_record_modern.php
+
+# Overgo record page — replaces /data_center/overgo?id={id}. Like the SSR page,
+# an overgo is a probe, so it shares the marker record's resource and script.
+src/include/overgo_record_lib.php                             include/overgo_record_lib.php
+src/templates/static/mgdb_overgo_record.bau                   templates/static/mgdb_overgo_record.bau
 src/templates/static/mgdb_overgo_notfound.bau                 templates/static/mgdb_overgo_notfound.bau
+src/controllers/data_center/overgo_record_modern.php          controllers/data_center/overgo_record_modern.php
+
+# EST record page — replaces /data_center/est?id={id}. The third probe
+# collection: an EST is a probe, so it shares the marker record's resource and
+# script, and include/probe_collection_lib.php does the rest.
+src/include/est_record_lib.php                                include/est_record_lib.php
+src/templates/static/mgdb_est_record.bau                      templates/static/mgdb_est_record.bau
 src/templates/static/mgdb_est_notfound.bau                    templates/static/mgdb_est_notfound.bau
+src/controllers/data_center/est_record_modern.php             controllers/data_center/est_record_modern.php
+
+# BAC record page — replaces /data_center/bac?id={id}. The fourth and largest
+# probe collection. Four of the legacy page's eight sections read tables that
+# are empty or services that are down; legacy/bac-record/README.md says which.
+src/include/bac_record_lib.php                                include/bac_record_lib.php
+src/templates/static/mgdb_bac_record.bau                      templates/static/mgdb_bac_record.bau
 src/templates/static/mgdb_bac_notfound.bau                    templates/static/mgdb_bac_notfound.bau
+src/controllers/data_center/bac_record_modern.php             controllers/data_center/bac_record_modern.php
+
+# Cytogenetics record router — answers /data_center/cytogenetic?id={id}.
+# Cytogenetics is a topic, not a record type: the id names a map, a locus or a
+# stock, and this sends the reader to that record page. It answered the
+# pre-redesign search page with a 200 before.
+src/include/cytogenetic_record_lib.php                        include/cytogenetic_record_lib.php
 src/templates/static/mgdb_cytogenetic_notfound.bau            templates/static/mgdb_cytogenetic_notfound.bau
+src/controllers/data_center/cytogenetic_record_modern.php     controllers/data_center/cytogenetic_record_modern.php
 
 # Metabolic Pathways Data Hub — /metabolic_pathways and its three
 # documentation pages, which redirect.php used to serve as raw templates.
@@ -942,15 +995,66 @@ src/templates/static/mgdb_metabolic_pathways_compare.bau      templates/static/m
 src/templates/static/mgdb_metabolic_pathways_install.bau      templates/static/mgdb_metabolic_pathways_install.bau
 src/templates/static/mgdb_metabolic_pathways_omics.bau        templates/static/mgdb_metabolic_pathways_omics.bau
 src/controllers/metabolic_pathways.php                        controllers/metabolic_pathways.php
+
+# Locus record page — replaces /data_center/locus?id={id}, the site's #2 record
+# page (19,774 requests over six days, 9,444 distinct records, 15,771 clients).
+# 25 locus types share one section set; loci of type 'Gene' redirect to the
+# gene record page, which is what the legacy check_id() did.
+src/include/locus_record_lib.php                              include/locus_record_lib.php
 src/include/api/v1/records/locus.php                          include/api/v1/records/locus.php
+src/css/mgdb-locus-record.css                                 css/mgdb-locus-record.css
+src/js/mgdb-locus-record.js                                   js/mgdb-locus-record.js
+src/templates/static/mgdb_locus_record.bau                    templates/static/mgdb_locus_record.bau
 src/templates/static/mgdb_locus_notfound.bau                  templates/static/mgdb_locus_notfound.bau
+src/controllers/data_center/locus_record_modern.php           controllers/data_center/locus_record_modern.php
+
+# Term / trait record page — replaces /data_center/term?id={id} and
+# /data_center/trait?id={id}, which are the same mgdb.term record drawn two
+# ways. 6,815 curated terms across 105 types. The JBrowse GWAS display-name
+# map is curated data, not a mechanical rule; see include/term_record_lib.php.
+src/include/term_record_lib.php                               include/term_record_lib.php
 src/include/api/v1/records/term.php                           include/api/v1/records/term.php
+src/css/mgdb-term-record.css                                  css/mgdb-term-record.css
+src/js/mgdb-term-record.js                                    js/mgdb-term-record.js
+src/templates/static/mgdb_term_record.bau                     templates/static/mgdb_term_record.bau
 src/templates/static/mgdb_term_notfound.bau                   templates/static/mgdb_term_notfound.bau
+src/controllers/data_center/term_record_modern.php            controllers/data_center/term_record_modern.php
+
+# Map score record page — /data_center/map_scores?id={id}. One marker scored
+# across a mapping panel: the 1/2/3 genotype string, the probe and probed site
+# behind it, and the maps that consumed it.
+src/include/map_scores_record_lib.php                         include/map_scores_record_lib.php
 src/include/api/v1/records/map_scores.php                     include/api/v1/records/map_scores.php
+src/js/mgdb-map-scores-record.js                              js/mgdb-map-scores-record.js
+src/templates/static/mgdb_map_scores_record.bau               templates/static/mgdb_map_scores_record.bau
 src/templates/static/mgdb_map_scores_notfound.bau             templates/static/mgdb_map_scores_notfound.bau
+src/controllers/data_center/map_scores_record_modern.php      controllers/data_center/map_scores_record_modern.php
+
+# Recombination dataset record page — /data_center/recombination?id={id}. One
+# mapping cross: loci, parental alleles, class frequencies, and the pairwise
+# recombination frequencies with Haldane and Kosambi distances.
+src/include/recombination_record_lib.php                      include/recombination_record_lib.php
 src/include/api/v1/records/recombination.php                  include/api/v1/records/recombination.php
+src/js/mgdb-recombination-record.js                           js/mgdb-recombination-record.js
+src/templates/static/mgdb_recombination_record.bau            templates/static/mgdb_recombination_record.bau
 src/templates/static/mgdb_recombination_notfound.bau          templates/static/mgdb_recombination_notfound.bau
+src/controllers/data_center/recombination_record_modern.php   controllers/data_center/recombination_record_modern.php
+
+# Gel pattern record page — /data_center/gel?id={id}. One probe/enzyme
+# combination run against one stock: bands, sizes, and the DNA polymorphisms
+# called from them. The legacy Sequence section reads z_sequence (0 rows).
+src/include/gel_record_lib.php                                include/gel_record_lib.php
 src/include/api/v1/records/gel.php                            include/api/v1/records/gel.php
+src/js/mgdb-gel-record.js                                     js/mgdb-gel-record.js
+src/templates/static/mgdb_gel_record.bau                      templates/static/mgdb_gel_record.bau
 src/templates/static/mgdb_gel_notfound.bau                    templates/static/mgdb_gel_notfound.bau
+src/controllers/data_center/gel_record_modern.php             controllers/data_center/gel_record_modern.php
+
+# Primer record page — /data_center/primer?id={id}. 331,140 rows holding both
+# PCR primers and restriction enzymes; gel_pattern.enzyme points here.
+src/include/primer_record_lib.php                             include/primer_record_lib.php
 src/include/api/v1/records/primer.php                         include/api/v1/records/primer.php
+src/js/mgdb-primer-record.js                                  js/mgdb-primer-record.js
+src/templates/static/mgdb_primer_record.bau                   templates/static/mgdb_primer_record.bau
 src/templates/static/mgdb_primer_notfound.bau                 templates/static/mgdb_primer_notfound.bau
+src/controllers/data_center/primer_record_modern.php          controllers/data_center/primer_record_modern.php

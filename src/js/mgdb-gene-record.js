@@ -1,196 +1,83 @@
 /* ==========================================================================
-   Gene record page — page behavior
+   Gene record page — /gene_center/gene/{id}
    --------------------------------------------------------------------------
-   Companion to /css/mgdb-gene-record.css and
-   templates/static/mgdb_gene_record.bau.
+   Glue over js/mgdb-record.js, the same engine every other record page uses.
+   This file maps one call to /api/v1/records/gene/{id} onto it.
 
-   One request to /api/v1/records/gene/{id} builds the whole page. The record
-   page this replaces made nineteen, sharded across ajax0..6.maizegdb.org
-   subdomains to get around the browser's per-host connection limit — a
-   workaround that one request makes unnecessary — and cost over 1,700 database
-   queries between them.
+   Three things are this page's own and are not shell collections:
 
-   A second, parallel request fetches the canonical protein's length. That value
-   is not in the database and has to be read from the sequence service, which
-   takes about 470 ms; keeping it out of the main request means the page is
-   interactive in around 130 ms and the domain track fills in when the length
-   arrives. If it never arrives, the domains are listed as a table instead.
-
-   The identity is already on the page, server-rendered, so a failure here
-   degrades to a record that still says what gene it is and links to its data.
+     the protein domain track     domains drawn against the protein, to scale.
+     the pan-gene presence strip  one square per assembly, grouped by Zea
+                                  species.
+     the eFP viewer               one atlas at a time, large enough to read.
    ========================================================================== */
 
 (function (window, document) {
   'use strict';
 
   var MGDB = window.MGDB;
-  if (!MGDB) { return; }
-
-  var CHIP_LIMIT = 40;    // chips shown before the rest collapse behind a toggle
-  var ROW_LIMIT = 25;     // table rows shown before the rest collapse
-
-  function byId(id) { return document.getElementById(id); }
-  function escape(value) { return MGDB.escapeHtml(value); }
-  function show(el, visible) { if (el) { el.hidden = !visible; } }
-  function num(value) { return (value === null || value === undefined) ? '' : Number(value).toLocaleString(); }
+  var R = window.MGDBRecord;
+  if (!MGDB || !R) { return; }
 
   var els = {};
   var payload = null;
 
-  /* ------------------------------------------------------------------------
-     Small builders
-     ------------------------------------------------------------------------ */
+  function num(value) { return (value === null || value === undefined) ? '' : R.number(value); }
 
-  /* A reference from the API is {type, id, name, html}. Anything without a page
-     is still named, just not linked. */
-  function refLink(ref) {
-    if (!ref || !ref.name) { return ''; }
-    if (!ref.html) { return escape(ref.name); }
-    return '<a href="' + escape(ref.html) + '">' + escape(ref.name) + '</a>';
-  }
-
-  function extLink(url, label) {
-    if (!url) { return escape(label); }
-    return '<a href="' + escape(url) + '" rel="noopener" class="gene-record-ext">' +
-           escape(label) + '</a>';
-  }
-
-  function fact(label, value, note) {
-    if (!value && value !== 0) { return ''; }
-    return '<div><dt>' + escape(label) + '</dt><dd>' + value +
-           (note ? '<small>' + escape(note) + '</small>' : '') + '</dd></div>';
-  }
-
-  function block(title, description, body) {
-    if (!body) { return ''; }
-    return '<div class="gene-record-block"><h3>' + escape(title) + '</h3>' +
-           (description ? '<p class="gene-record-block-note">' + escape(description) + '</p>' : '') +
-           body + '</div>';
-  }
-
-  function empty(message) {
-    return '<p class="mgdb-empty">' + escape(message) + '</p>';
-  }
-
-  /* A table whose long tail collapses. The hidden rows stay in the DOM so
-     find-in-page and assistive technology can still reach them. */
-  function table(headers, rows, options) {
-    if (!rows || !rows.length) { return ''; }
-    options = options || {};
-    var head = '<thead><tr>' + headers.map(function (h) {
-      return '<th scope="col">' + escape(h) + '</th>';
-    }).join('') + '</tr></thead>';
-
-    var visible = rows.slice(0, options.limit || ROW_LIMIT);
-    var rest = rows.slice(options.limit || ROW_LIMIT);
-
-    var html = '<div class="mgdb-table-scroll"><table class="mgdb-table">' + head +
-               '<tbody>' + visible.join('') + '</tbody></table></div>';
-
-    if (rest.length) {
-      html += '<details class="gene-record-more"><summary>Show the remaining ' +
-              rest.length.toLocaleString() + '</summary>' +
-              '<div class="mgdb-table-scroll"><table class="mgdb-table">' + head +
-              '<tbody>' + rest.join('') + '</tbody></table></div></details>';
-    }
-    return html;
-  }
-
-  function chipList(items) {
-    if (!items || !items.length) { return ''; }
-    function chip(item) {
-      return '<li>' + (item.html
-        ? '<a href="' + escape(item.html) + '">' + escape(item.name) + '</a>'
-        : '<span>' + escape(item.name) + '</span>') + '</li>';
-    }
-    var visible = items.slice(0, CHIP_LIMIT).map(chip).join('');
-    var html = '<ul class="gene-record-chips-list">' + visible + '</ul>';
-    if (items.length > CHIP_LIMIT) {
-      html += '<details class="gene-record-more"><summary>Show the remaining ' +
-              (items.length - CHIP_LIMIT).toLocaleString() + '</summary>' +
-              '<ul class="gene-record-chips-list">' +
-              items.slice(CHIP_LIMIT).map(chip).join('') + '</ul></details>';
-    }
-    return html;
-  }
+  /* The B73 assembly a reader should normally be looking at. A B73 gene has
+     seven annotations -- RefGen_v1, v2, v3, two GRAMENE-4.0 releases and
+     NAM-5.0 -- and `is_current` is true within each of them, so it cannot tell
+     a reader that v3 is superseded. This can. */
+  var CURRENT_B73 = 'Zm-B73-REFERENCE-NAM-5.0';
 
   /* ------------------------------------------------------------------------
      Header
      ------------------------------------------------------------------------ */
 
-  function renderHeader(data, sections, counts) {
-    var overview = sections.overview || {};
-    var fn = sections['function'] || {};
-
-    // The one-line answer to "what does this gene do", which on the page this
-    // replaces was three clicks deep.
+  function renderHeader(data, sections) {
+    var attributes = data.attributes || {};
+    var fn = sections.function || {};
     if (fn.summary) {
-      els.functionLine.innerHTML = escape(fn.summary);
-      show(els.functionLine, true);
+      els.functionLine.textContent = fn.summary;
+      R.show(els.functionLine, true);
+    }
+    var locus = sections.locus || {};
+    var synonyms = locus.synonyms || [];
+    if (synonyms.length) {
+      els.synonyms.innerHTML = 'Also known as ' + synonyms.map(function (s) {
+        return '<strong>' + R.escape(typeof s === 'string' ? s : (s.value || s.name)) + '</strong>';
+      }).join(' <span class="mgdb-muted" aria-hidden="true">&middot;</span> ') + '.';
+      R.show(els.synonyms, true);
     }
 
-    var locus = sections.locus;
-    if (locus && locus.synonyms && locus.synonyms.length) {
-      els.synonyms.innerHTML = 'Also known as ' +
-        locus.synonyms.map(function (s) { return '<em>' + escape(s.name) + '</em>'; }).join(', ');
-      show(els.synonyms, true);
+    /* A B73 record from an older assembly says so, and points at the current
+       one. The list of every annotation of the gene is on the classical gene
+       section below; this is the one line a reader needs before reading
+       anything else on the page. */
+    var assembly = attributes.assembly || '';
+    if (assembly && assembly.indexOf('B73') !== -1 && assembly !== CURRENT_B73) {
+      var models = (locus.associated_gene_models || []).filter(function (m) {
+        return m.assembly === CURRENT_B73;
+      });
+      var link = models.length
+        ? ' The current B73 annotation of this gene is ' +
+          R.link('/gene_center/gene/' + encodeURIComponent(models[0].name), models[0].name) + '.'
+        : '';
+      els.versionNotice.innerHTML = '<div><strong>An earlier B73 assembly</strong>' +
+        '<span>This record is the ' + R.escape(assembly) + ' annotation. B73 has been ' +
+        'assembled and annotated several times, and each release numbers its genes ' +
+        'differently.' + link + '</span></div>';
+      R.show(els.versionNotice, true);
     }
 
-    /* The server already rendered location, model type and transcript count.
-       These are the facts that need the API. */
-    var extra = '';
-    if (overview.species) { extra += fact('Species', '<em>' + escape(overview.species) + '</em>'); }
-    if (overview.assembly && overview.assembly.name) {
-      extra += fact('Assembly',
-        '<a href="' + escape(overview.assembly.html) + '">' + escape(overview.assembly.name) + '</a>',
-        [overview.assembly.provider, overview.assembly.date].filter(Boolean).join(', '));
+    /* The legacy "report a gene model error" link called popUpAnnotation(),
+       which opens a Shadowbox iframe that modern pages do not load. It goes
+       straight to the curation form instead. */
+    if (els.report && attributes.feature_id) {
+      els.report.setAttribute('href', '/curation/GeneModelIssue/edit?gene_model_id=' +
+        encodeURIComponent(attributes.feature_id) + '&gene_model_version=' +
+        encodeURIComponent(attributes.annotation || '') + '&auto_num=');
     }
-    if (overview.annotation && overview.annotation.name) {
-      extra += fact('Annotation', escape(overview.annotation.name));
-    }
-    if (els.facts) { els.facts.insertAdjacentHTML('beforeend', extra); }
-
-    // Actions: the things a reader came here to do.
-    var actions = [];
-    var seq = sections.sequences;
-    if (seq && seq.genomic) {
-      actions.push('<a class="mgdb-button mgdb-button-primary" href="' + escape(seq.genomic) +
-        '" rel="noopener">Genomic FASTA</a>');
-    }
-    if (overview.chromosome && overview.start) {
-      actions.push('<a class="mgdb-button mgdb-button-secondary" rel="noopener" href="' +
-        escape('https://jbrowse.maizegdb.org/?data=' + encodeURIComponent(overview.assembly && overview.assembly.name || '') +
-               '&loc=' + encodeURIComponent(overview.chromosome + ':' + overview.start + '..' + overview.end)) +
-        '">Genome browser</a>');
-    }
-    var pan = sections.pan_gene;
-    if (pan && pan.pan_gene && pan.pan_gene.name) {
-      actions.push('<a class="mgdb-button mgdb-button-quiet" href="/pan_gene_center/pan_gene/' +
-        encodeURIComponent(pan.pan_gene.name) + '">Pan-gene</a>');
-    }
-    els.actions.innerHTML = actions.join('');
-
-    // Availability chips. Each links to its section; a count of zero renders
-    // greyed and unclickable, so an empty section is visible without a click.
-    var chips = [
-      { key: 'ontology', label: 'GO terms', target: 'function' },
-      { key: 'protein_domains', label: 'domains', target: 'structure' },
-      { key: 'pan_gene_members', label: 'pan-gene members', target: 'pan_gene' },
-      { key: 'insertions', label: 'insertions', target: 'variation' },
-      { key: 'snp_traits', label: 'GWAS associations', target: 'variation' },
-      { key: 'alleles', label: 'alleles', target: 'locus' },
-      { key: 'references', label: 'references', target: 'references' }
-    ];
-    var chipHtml = chips.map(function (chip) {
-      var count = counts[chip.key] || 0;
-      if (!count) {
-        return '<span class="gene-record-chip is-zero">no ' + escape(chip.label) + '</span>';
-      }
-      return '<a class="gene-record-chip" href="#gene-record-' + chip.target + '">' +
-             '<strong>' + count.toLocaleString() + '</strong> ' + escape(chip.label) + '</a>';
-    }).join('');
-    els.chips.innerHTML = chipHtml;
-    show(els.chips, true);
   }
 
   /* ------------------------------------------------------------------------
@@ -199,65 +86,51 @@
 
   function renderOverview(overview) {
     if (!overview) { return false; }
-    var html = '';
+    var out = els.overviewBody;
+    out.innerHTML = '';
 
-    var facts = '';
-    facts += fact('Gene model', overview.name ? '<code>' + escape(overview.name) + '</code>' : '');
-    if (overview.symbol) { facts += fact('Gene symbol', '<em>' + escape(overview.symbol) + '</em>'); }
-    if (overview.full_name) { facts += fact('Full name', escape(overview.full_name)); }
-    if (overview.chromosome && overview.start) {
-      facts += fact('Position',
-        escape(overview.chromosome) + ':' + num(overview.start) + '&ndash;' + num(overview.end),
-        num(overview.span_bp) + ' bp on the genome');
-    }
-    /* Strand is deliberately shown as unrecorded rather than omitted. It is NULL
-       for every row in the database, and a reader who knows a gene is on the
-       minus strand should be told that MaizeGDB does not hold it, not left to
-       assume the page forgot. */
-    if (overview.strand_note) {
-      facts += fact('Strand', '<span class="gene-record-unknown">not recorded</span>',
-        overview.strand_note);
-    }
-    if (overview.model_type) {
-      facts += fact('Model type', escape(overview.model_type.replace(/_/g, ' ')));
-    }
-    if (overview.is_reference_gene_model) {
-      facts += fact('Reference model', 'Yes', 'the representative model for this locus');
-    }
-    if (overview.is_current === false) {
-      facts += fact('Annotation status', 'Superseded',
-        'a newer annotation of this assembly exists');
-    }
-    if (overview.updated) { facts += fact('Annotation note', escape(overview.updated)); }
-
-    html += '<dl class="gene-record-facts-grid">' + facts + '</dl>';
-
-    if (overview.loci && overview.loci.length) {
-      var rows = overview.loci.map(function (locus) {
-        return '<tr><td><a href="' + escape(locus.html) + '"><em>' + escape(locus.name) + '</em></a></td>' +
-               '<td>' + escape(locus.full_name || '') + '</td>' +
-               '<td>' + escape(locus.type || '') + '</td></tr>';
-      });
-      if (overview.loci.length > 1) {
-        html += block('Classical genes at this model',
-          'This gene model has been matched to more than one curated locus.',
-          table(['Symbol', 'Full name', 'Type'], rows));
-      }
+    var position = '';
+    if (overview.chromosome && overview.start !== null && overview.start !== undefined) {
+      position = R.escape(overview.chromosome) + ':' + R.number(overview.start) +
+                 '\u2013' + R.number(overview.end);
     }
 
-    els.overviewBody.innerHTML = html;
-    return true;
+    var factsHtml = R.facts([
+      ['Species', overview.species ? '<em>' + R.escape(overview.species) + '</em>' : ''],
+      ['Line', overview.line ? R.escape(overview.line) : ''],
+      ['Position', position, overview.span_bp ? R.number(overview.span_bp) + ' bp on the genome' : ''],
+      ['Strand', overview.strand ? R.escape(overview.strand) : '', overview.strand_note || ''],
+      ['Model type', overview.model_type ? R.escape(String(overview.model_type).replace(/_/g, ' ')) : ''],
+      ['Transcripts', overview.transcript_count == null ? '' : String(overview.transcript_count)]
+    ]);
+    if (factsHtml) { out.insertAdjacentHTML('beforeend', factsHtml); }
+
+    /* The genome browser preview. The legacy Overview carried a 300px JBrowse
+       frame of this gene in its neighbourhood; it was lost in the port. Only
+       JBrowse can be framed -- B73 v3 and v4 point at GBrowse, which serves a
+       snapshot image rather than a frameable view -- so those get the link. */
+    var browser = overview.browser;
+    if (browser && browser.url) {
+      out.insertAdjacentHTML('beforeend',
+        '<div class="mgdb-rec-block"><div class="mgdb-rec-block-head">' +
+          '<h3>Genome browser</h3>' +
+          '<a class="mgdb-rec-tsv" href="' + R.escape(browser.url) +
+            '" target="_blank" rel="noopener">Open in ' + R.escape(browser.label) + '</a>' +
+        '</div>' +
+        '<p class="mgdb-rec-block-status">' + R.escape(browser.location) +
+          ', the gene model with 1,500 bp either side.</p>' +
+        (browser.embed_url
+          ? '<iframe class="gene-record-browser" src="' + R.escape(browser.embed_url) +
+            '" title="' + R.escape(browser.label + ' view of ' + (overview.name || 'this gene')) +
+            '" loading="lazy"></iframe>'
+          : '<p class="mgdb-rec-empty">This assembly is served by GBrowse, which cannot be ' +
+            'embedded. Use the link above.</p>') +
+        '</div>');
+    }
+
+    return !!factsHtml;
   }
 
-  /* ------------------------------------------------------------------------
-     Structure
-     ------------------------------------------------------------------------ */
-
-  /* The domain track. Drawn only when the protein's length is known, because
-     without it the domains cannot be placed: scaling to the last domain's end
-     would imply the protein stops there. For lg1 that would show a domain
-     ending at residue 258 as if it ran to the C-terminus, when the protein is
-     399 residues long. */
   function domainTrack(domains, protein) {
     if (!protein || !protein.length_aa) { return ''; }
     var length = protein.length_aa;
@@ -271,91 +144,96 @@
       var width = Math.max(((domain.end - domain.start + 1) / length) * 100, 0.6);
       return '<span class="gene-record-domain gene-record-domain-' + (index % 5) + '" ' +
              'style="left:' + left.toFixed(2) + '%;width:' + width.toFixed(2) + '%" ' +
-             'title="' + escape(domain.name + ' ' + domain.start + '–' + domain.end) + '">' +
+             'title="' + R.escape(domain.name + ' ' + domain.start + '–' + domain.end) + '">' +
              '<span class="mgdb-visually-hidden">' +
-             escape(domain.name + ', residues ' + domain.start + ' to ' + domain.end) +
+             R.escape(domain.name + ', residues ' + domain.start + ' to ' + domain.end) +
              '</span></span>';
     }).join('');
 
     var legend = canonical.map(function (domain, index) {
       return '<li><span class="gene-record-swatch gene-record-domain-' + (index % 5) + '"></span>' +
-             (domain.url ? '<a href="' + escape(domain.url) + '" rel="noopener">' + escape(domain.name) + '</a>'
-                         : escape(domain.name)) +
+             (domain.url ? '<a href="' + R.escape(domain.url) + '" rel="noopener">' + R.escape(domain.name) + '</a>'
+                         : R.escape(domain.name)) +
              ' <span class="gene-record-muted">' + domain.start + '–' + domain.end + '</span></li>';
     }).join('');
 
     return '<figure class="gene-record-track">' +
            '<div class="gene-record-track-bar" role="img" aria-label="Protein domain positions">' +
            bars + '</div>' +
-           '<div class="gene-record-track-scale"><span>1</span><span>' + num(length) + ' aa</span></div>' +
+           '<div class="gene-record-track-scale"><span>1</span><span>' + R.number(length) + ' aa</span></div>' +
            '<ul class="gene-record-track-legend">' + legend + '</ul>' +
            '</figure>';
   }
 
+  /* ------------------------------------------------------------------------
+     Structure
+     ------------------------------------------------------------------------ */
+
   function renderStructure(structure) {
     if (!structure) { return false; }
-    var html = '';
+    var out = els.structureBody;
+    out.innerHTML = '';
+    var protein = structure.protein || {};
+    var rendered = false;
 
-    var transcripts = structure.transcripts || [];
-    if (transcripts.length) {
-      var rows = transcripts.map(function (t) {
-        return '<tr>' +
-          '<td><code>' + escape(t.name) + '</code>' +
-            (t.canonical ? ' <span class="mgdb-pill mgdb-pill-ok">canonical</span>' : '') + '</td>' +
-          '<td>' + (t.protein ? '<code>' + escape(t.protein) + '</code>' : '&mdash;') + '</td>' +
-          '<td>' + escape((t.model_type || '').replace(/_/g, ' ')) + '</td>' +
-          '<td class="mgdb-numeric">' + num(t.span_bp) + '</td>' +
-          '</tr>';
-      });
-      /* The column is "genomic span", not "length". The page this replaces
-         labelled this number "Canonical Length", which reads as the protein's
-         length and is not: for lg1 it showed 4,010 for a 399-residue protein. */
-      html += block('Transcripts', null,
-        table(['Transcript', 'Protein', 'Type', 'Genomic span (bp)'], rows));
-    } else {
-      html += block('Transcripts', null, empty('No transcript records for this gene model.'));
+    var factsHtml = R.facts([
+      ['Canonical transcript', protein.transcript ? R.escape(protein.transcript) : ''],
+      ['Protein', protein.name ? R.escape(protein.name) : ''],
+      ['Protein length', protein.length_aa ? R.number(protein.length_aa) + ' aa' : '',
+        protein.length_note || '']
+    ]);
+    if (factsHtml) { out.insertAdjacentHTML('beforeend', factsHtml); rendered = true; }
+
+    rendered = R.collection(out, {
+      title: 'Transcripts',
+      items: structure.transcripts,
+      filename: 'gene-transcripts.tsv',
+      pageSize: 25,
+      columns: [
+        { key: 'name', label: 'Transcript', tile: true },
+        { key: 'is_canonical', label: 'Canonical',
+          get: function (t) { return t.is_canonical ? 'Yes' : 'No'; },
+          html: function (t) { return t.is_canonical
+            ? '<span class="mgdb-pill mgdb-pill-ok">Canonical</span>'
+            : '<span class="mgdb-muted">&mdash;</span>'; } },
+        { key: 'protein', label: 'Protein' },
+        { key: 'length_bp', label: 'Length (bp)', sort: 'number', numeric: true,
+          get: function (t) { return t.length_bp == null ? '' : R.number(t.length_bp); } }
+      ]
+    }) || rendered;
+
+    /* Drawn to scale when the protein's length is known. Without it the domains
+       cannot be placed against the protein, and the table below is all there
+       is to show. */
+    var trackHtml = domainTrack(structure.protein_domains || [], protein);
+    if (trackHtml) {
+      out.insertAdjacentHTML('beforeend',
+        '<div class="mgdb-rec-block"><div class="mgdb-rec-block-head">' +
+        '<h3>Protein domains, to scale</h3></div>' + trackHtml + '</div>');
+      rendered = true;
     }
 
-    var protein = structure.protein;
-    if (protein && protein.length_aa) {
-      html += '<p class="gene-record-protein-length">Canonical protein <code>' +
-              escape(protein.name) + '</code> is <strong>' + num(protein.length_aa) +
-              ' residues</strong>.</p>';
-    }
+    rendered = R.collection(out, {
+      title: 'Protein domains',
+      items: structure.protein_domains,
+      filename: 'gene-protein-domains.tsv',
+      columns: [
+        { key: 'name', label: 'Domain', tile: true,
+          html: function (d) { return d.url ? R.link(d.url, d.name, true) : R.escape(d.name); } },
+        { key: 'accession', label: 'Accession' },
+        { key: 'start', label: 'Start', sort: 'number', numeric: true,
+          get: function (d) { return d.start == null ? '' : String(d.start); } },
+        { key: 'end', label: 'End', sort: 'number', numeric: true,
+          get: function (d) { return d.end == null ? '' : String(d.end); } },
+        { key: 'transcript', label: 'Transcript' }
+      ]
+    }) || rendered;
 
-    var domains = structure.protein_domains || [];
-    if (domains.length) {
-      var track = domainTrack(domains, protein);
-      var domainRows = domains.map(function (d) {
-        return '<tr>' +
-          '<td>' + (d.url ? '<a href="' + escape(d.url) + '" rel="noopener">' + escape(d.accession) + '</a>'
-                          : escape(d.accession)) + '</td>' +
-          '<td>' + escape(d.name || '') + '</td>' +
-          '<td>' + escape(d.description || '') + '</td>' +
-          '<td class="mgdb-numeric">' + num(d.start) + '&ndash;' + num(d.end) + '</td>' +
-          '<td><code>' + escape(d.transcript || '') + '</code></td>' +
-          '</tr>';
-      });
-      html += block('Protein domains',
-        track ? null : 'Protein length is not recorded in this database, so the domains are listed by position rather than drawn to scale.',
-        '<div id="gene-record-domain-track">' + track + '</div>' +
-        table(['Accession', 'Name', 'Description', 'Residues', 'Transcript'], domainRows));
-    } else {
-      html += block('Protein domains', null,
-        empty('No protein domains have been assigned to this gene model.'));
-    }
-
-    /* Exon and UTR structure is stated as absent rather than left out. There are
-       no exon, CDS or UTR features anywhere in the database, for any organism,
-       so no transcript diagram can be drawn from it. */
     if (structure.exon_structure_note) {
-      html += '<p class="gene-record-gap">' + escape(structure.exon_structure_note) +
-              ' To see exon and intron structure, open this region in the ' +
-              '<a href="https://jbrowse.maizegdb.org/" rel="noopener">genome browser</a>.</p>';
+      out.insertAdjacentHTML('beforeend',
+        '<p class="mgdb-rec-block-status">' + R.escape(structure.exon_structure_note) + '</p>');
     }
-
-    els.structureBody.innerHTML = html;
-    return true;
+    return rendered;
   }
 
   /* ------------------------------------------------------------------------
@@ -364,563 +242,687 @@
 
   function renderFunction(fn) {
     if (!fn) { return false; }
-    var html = '';
-    var terms = fn.ontology || [];
+    var out = els.functionBody;
+    out.innerHTML = '';
+    var rendered = false;
 
-    if (terms.length) {
-      // Grouped by aspect, which is how a reader reads GO — what it does, where
-      // it is, what process it takes part in.
-      var groups = {};
-      terms.forEach(function (term) {
-        var key = term.domain || (term.ontology || 'Other');
-        if (!groups[key]) { groups[key] = []; }
-        groups[key].push(term);
-      });
+    rendered = R.collection(out, {
+      title: 'Ontology terms',
+      items: fn.ontology,
+      filename: 'gene-ontology-terms.tsv',
+      pageSize: 25,
+      columns: [
+        { key: 'term', label: 'Term', tile: true,
+          html: function (t) { return t.url ? R.link(t.url, t.term, true) : R.escape(t.term); } },
+        { key: 'name', label: 'Name' },
+        { key: 'ontology', label: 'Ontology' },
+        { key: 'evidence_label', label: 'Evidence',
+          get: function (t) { return t.evidence_label || t.evidence_code || ''; } },
+        { key: 'source', label: 'Source' },
+        { key: 'attached_to', label: 'Attached to' }
+      ]
+    }) || rendered;
 
-      Object.keys(groups).sort().forEach(function (key) {
-        var rows = groups[key].map(function (term) {
-          var provenance = term.evidence_label || term.evidence_code || 'source not recorded';
-          return '<tr>' +
-            '<td>' + (term.url ? '<a href="' + escape(term.url) + '" rel="noopener">' + escape(term.term) + '</a>'
-                               : escape(term.term)) + '</td>' +
-            '<td>' + escape(term.name || '') + '</td>' +
-            '<td><span class="gene-record-evidence">' + escape(provenance) + '</span></td>' +
-            '<td>' + escape(term.source || '') +
-              (term.reference ? ' ' + refLink(term.reference) : '') + '</td>' +
-            '<td>' + (term.scope === 'locus'
-                      ? '<span class="mgdb-pill mgdb-pill-info">classical gene</span>'
-                      : '<span class="mgdb-pill">gene model</span>') + '</td>' +
-            '</tr>';
-        });
-        html += block(key, null,
-          table(['Term', 'Name', 'Evidence', 'Asserted by', 'Applies to'], rows));
-      });
-    } else {
-      html += block('Ontology terms', null,
-        empty('No ontology terms have been assigned to this gene.'));
-    }
+    rendered = R.collection(out, {
+      title: 'Gene products',
+      items: fn.gene_products,
+      filename: 'gene-products.tsv',
+      columns: [
+        { key: 'name', label: 'Gene product', tile: true,
+          html: function (g) { return g.html ? R.link(g.html, g.name) : R.escape(g.name); } },
+        R.urlColumn(function (g) { return g.html; })
+      ]
+    }) || rendered;
 
-    var products = fn.gene_products || [];
-    if (products.length) {
-      html += block('Gene products', 'What curators record this gene as making.',
-        table(['Product', 'Type', 'Evidence'], products.map(function (p) {
-          return '<tr><td>' + escape(p.name) + '</td><td>' + escape(p.type || '') +
-                 '</td><td>' + escape(p.evidence || '') + '</td></tr>';
-        })));
-    }
+    rendered = R.collection(out, {
+      title: 'Protein accessions',
+      items: fn.protein_accessions,
+      filename: 'gene-protein-accessions.tsv',
+      columns: [
+        { key: 'accession', label: 'Accession', tile: true,
+          html: function (a) { return a.url ? R.link(a.url, a.accession, true) : R.escape(a.accession); } },
+        { key: 'database', label: 'Database' },
+        { key: 'description', label: 'Description' }
+      ]
+    }) || rendered;
 
-    var accessions = fn.protein_accessions || [];
-    if (accessions.length) {
-      html += block('Protein family assignments', null,
-        table(['Accession', 'Database', 'Analysis'], accessions.map(function (a) {
-          return '<tr><td>' + extLink(a.url, a.accession) + '</td><td>' +
-                 escape(a.database || '') + '</td><td>' + escape(a.analysis || '') + '</td></tr>';
-        })));
-    }
-
-    els.functionBody.innerHTML = html;
-    return true;
+    return rendered;
   }
 
+
   /* ------------------------------------------------------------------------
-     Expression
+     Expression, and the eFP viewer
+
+     The section used to lay eight atlas images out at 180px each. Two things
+     were wrong with that. An eFP figure is a labelled anatomical diagram and
+     none of it is legible at 180px; and the atlas names it was requesting --
+     Maize_Atlas_V5, Maize_Seed_V5 and the rest -- name nothing the BAR serves,
+     so every one of those eight images was a 500. The names are corrected in
+     the API; here the figures are shown one at a time, as large as the column
+     allows.
      ------------------------------------------------------------------------ */
+
+  var efpState = { atlas: 0, mode: 'Absolute', atlases: [] };
+
+  function efpShow() {
+    var atlas = efpState.atlases[efpState.atlas];
+    if (!atlas) { return; }
+    var stage = R.byId('gene-record-efp-stage');
+    var img = stage.querySelector('img');
+    var link = R.byId('gene-record-efp-open');
+    stage.classList.remove('is-missing');
+    stage.classList.add('is-loading');
+    img.alt = atlas.label + ' expression pattern, ' + efpState.mode.toLowerCase() + ' scale';
+    img.src = efpState.mode === 'Relative' ? atlas.image_relative : atlas.image;
+    if (link) { link.setAttribute('href', atlas.browser); }
+    Array.prototype.forEach.call(
+      R.byId('gene-record-efp-atlases').querySelectorAll('[data-atlas]'), function (button) {
+        button.setAttribute('aria-pressed',
+          String(Number(button.getAttribute('data-atlas')) === efpState.atlas));
+      });
+    Array.prototype.forEach.call(
+      R.byId('gene-record-efp-toolbar').querySelectorAll('[data-mode]'), function (button) {
+        button.setAttribute('aria-pressed',
+          String(button.getAttribute('data-mode') === efpState.mode));
+      });
+  }
+
+  function renderEfp(out, efp) {
+    if (!efp || !efp.available || !efp.atlases || !efp.atlases.length) { return false; }
+    efpState.atlases = efp.atlases;
+    efpState.atlas = 0;
+    efpState.mode = 'Absolute';
+
+    out.insertAdjacentHTML('beforeend',
+      '<div class="mgdb-rec-block"><div class="mgdb-rec-block-head"><h3>eFP Browser' +
+      '<span class="mgdb-rec-block-count">' + efp.atlases.length + '</span></h3></div>' +
+      '<div class="mgdb-rec-toolbar gene-record-efp-toolbar" id="gene-record-efp-toolbar">' +
+        '<div class="mgdb-view-toggle" role="group" aria-label="Colour scale">' +
+          '<button class="mgdb-view-btn" type="button" data-mode="Absolute" aria-pressed="true">Absolute</button>' +
+          '<button class="mgdb-view-btn" type="button" data-mode="Relative" aria-pressed="false">Relative</button>' +
+        '</div>' +
+        '<a class="mgdb-rec-tsv" id="gene-record-efp-open" href="' + R.escape(efp.browser) +
+          '" target="_blank" rel="noopener">Open at the BAR</a>' +
+      '</div>' +
+      '<div class="gene-record-efp-atlases" id="gene-record-efp-atlases" role="group" aria-label="Atlas">' +
+        efp.atlases.map(function (atlas, index) {
+          return '<button class="gene-record-efp-atlas" type="button" data-atlas="' + index +
+                 '" aria-pressed="' + (index === 0) + '">' + R.escape(atlas.label) + '</button>';
+        }).join('') +
+      '</div>' +
+      '<div class="gene-record-efp-stage is-loading" id="gene-record-efp-stage"><img src="" alt=""></div>' +
+      (efp.note ? '<p class="mgdb-rec-block-status">' + R.escape(efp.note) + '</p>' : '') +
+      '<p class="mgdb-rec-block-status">' + R.escape(efp.source) + '. ' +
+        R.link(efp.eplant, 'Explore this gene in ePlant', true) + '.</p>' +
+      '</div>');
+
+    var stage = R.byId('gene-record-efp-stage');
+    var img = stage.querySelector('img');
+    img.addEventListener('load', function () { stage.classList.remove('is-loading'); });
+    img.addEventListener('error', function () {
+      stage.classList.remove('is-loading');
+      stage.classList.add('is-missing');
+    });
+    Array.prototype.forEach.call(
+      R.byId('gene-record-efp-atlases').querySelectorAll('[data-atlas]'), function (button) {
+        button.addEventListener('click', function () {
+          efpState.atlas = Number(button.getAttribute('data-atlas'));
+          efpShow();
+        });
+      });
+    Array.prototype.forEach.call(
+      R.byId('gene-record-efp-toolbar').querySelectorAll('[data-mode]'), function (button) {
+        button.addEventListener('click', function () {
+          efpState.mode = button.getAttribute('data-mode');
+          efpShow();
+        });
+      });
+
+    efpShow();
+    return true;
+  }
 
   function renderExpression(expression) {
     if (!expression) { return false; }
-    var html = '';
-    var any = false;
+    var out = els.expressionBody;
+    out.innerHTML = '';
+    var rendered = false;
 
     if (expression.qteller && expression.qteller.available) {
-      any = true;
-      html += block('qTeller', 'Expression across tissues and experiments, at qTeller.',
-        '<p><a class="mgdb-button mgdb-button-secondary" rel="noopener" href="' +
-        escape(expression.qteller.url) + '">Open in qTeller</a></p>');
+      out.insertAdjacentHTML('beforeend',
+        '<div class="mgdb-rec-block"><div class="mgdb-rec-block-head"><h3>qTeller</h3></div>' +
+        '<div class="mgdb-rec-linkrow"><a class="mgdb-button mgdb-button-primary" href="' +
+        R.escape(expression.qteller.url) + '" target="_blank" rel="noopener">' +
+        'Open the expression atlas <span aria-hidden="true">&nearr;</span></a></div></div>');
+      rendered = true;
     }
 
-    if (expression.efp && expression.efp.available && expression.efp.atlases.length) {
-      any = true;
-      /* Loaded lazily and one at a time by the browser. The page this replaces
-         emitted every atlas image unconditionally, having had its availability
-         check commented out with the note that checking eleven images per page
-         load put too much load on the upstream server. */
-      var cells = expression.efp.atlases.map(function (atlas) {
-        return '<figure class="gene-record-efp">' +
-          '<img loading="lazy" alt="' + escape(atlas.label + ' expression pattern') +
-          '" src="' + escape(atlas.image) + '" ' +
-          'onerror="this.closest(\'figure\').classList.add(\'is-missing\')">' +
-          '<figcaption>' + escape(atlas.label) + '</figcaption></figure>';
-      }).join('');
-      html += block('eFP browser', expression.efp.source,
-        '<div class="gene-record-efp-grid">' + cells + '</div>');
-    }
+    rendered = renderEfp(out, expression.efp) || rendered;
 
-    var relatives = [];
+    var gaps = [];
     if (expression.rnaseq_histogram && !expression.rnaseq_histogram.available) {
-      html += '<p class="gene-record-gap">' + escape(expression.rnaseq_histogram.reason) + '</p>';
+      gaps.push(expression.rnaseq_histogram.reason);
     }
     if (expression.proteomics && !expression.proteomics.available) {
-      html += '<p class="gene-record-gap">' + escape(expression.proteomics.reason) + '</p>';
+      gaps.push(expression.proteomics.reason);
     }
-    void relatives;
-
+    if (gaps.length) {
+      R.notes(out, 'Not available for this gene', gaps.map(function (t) { return { text: t }; }));
+      rendered = true;
+    }
     if (expression.note) {
-      html += '<p class="gene-record-block-note">' + escape(expression.note) + '</p>';
+      out.insertAdjacentHTML('beforeend',
+        '<p class="mgdb-rec-block-status">' + R.escape(expression.note) + '</p>');
     }
-
-    if (!any) {
-      html = empty('No expression resources cover this assembly.') + html;
-    }
-
-    els.expressionBody.innerHTML = html;
-    return true;
+    return rendered;
   }
+
 
   /* ------------------------------------------------------------------------
      Variation
      ------------------------------------------------------------------------ */
 
-  function renderVariation(variation, counts) {
+  function renderVariation(variation) {
     if (!variation) { return false; }
-    var html = '';
-    var insertions = variation.insertions || [];
-    var snps = variation.snp_traits || [];
-    var alleles = variation.alleles || [];
+    var out = els.variationBody;
+    out.innerHTML = '';
+    var rendered = false;
 
-    if (!insertions.length && !snps.length && !alleles.length) {
-      els.variationBody.innerHTML =
-        empty('No insertions, trait associations, or alleles have been reported for this gene.');
-      return true;
-    }
+    rendered = R.collection(out, {
+      title: 'Insertions',
+      items: variation.insertions,
+      filename: 'gene-insertions.tsv',
+      pageSize: 25,
+      columns: [
+        { key: 'name', label: 'Insertion', tile: true,
+          html: function (i) { return i.html ? R.link(i.html, i.name) : R.escape(i.name); } },
+        { key: 'source', label: 'Source' },
+        { key: 'structure', label: 'Gene structure' },
+        { key: 'position', label: 'Position',
+          html: function (i) { return i.position
+            ? '<span class="mgdb-sequence">' + R.escape(i.position) + '</span>'
+            : '<span class="mgdb-muted">Not recorded</span>'; } },
+        { key: 'stocks', label: 'Stock' }
+      ]
+    }) || rendered;
 
-    if (insertions.length) {
-      var rows = insertions.map(function (ins) {
-        var stocks = (ins.stocks || []).map(function (s) {
-          return '<a href="' + escape(s.html) + '">' + escape(s.name) + '</a>';
-        }).join(', ');
-        return '<tr>' +
-          '<td>' + escape(ins.name) + '</td>' +
-          '<td>' + escape(ins.gene_structures || '') + '</td>' +
-          '<td>' + escape(ins.source || '') + '</td>' +
-          '<td class="mgdb-numeric">' + (ins.start ? num(ins.start) : '') + '</td>' +
-          '<td>' + (stocks || '<span class="gene-record-muted">no stock</span>') + '</td>' +
-          '</tr>';
-      });
-      html += block('Insertion alleles',
-        'Mutant lines carrying an insertion in this gene. Where a stock is listed, it can be ordered.',
-        table(['Insertion', 'Disrupts', 'Collection', 'Position', 'Stock'], rows));
-    }
+    rendered = R.collection(out, {
+      title: 'SNPs and traits',
+      items: variation.snp_traits,
+      filename: 'gene-snp-traits.tsv',
+      pageSize: 25,
+      columns: [
+        { key: 'snp', label: 'SNP', tile: true },
+        { key: 'trait', label: 'Trait' },
+        { key: 'structure', label: 'Structure' },
+        { key: 'position', label: 'Position', sort: 'number', numeric: true,
+          get: function (t) { return t.position == null ? '' : R.number(t.position); } },
+        { key: 'reference', label: 'Reference',
+          get: function (t) { return t.reference ? t.reference.name : ''; },
+          html: function (t) { return t.reference ? (R.refLink(t.reference) || R.escape(t.reference.name)) : '\u2014'; } }
+      ]
+    }) || rendered;
 
-    if (snps.length) {
-      // Grouped by study, because a trait association only means something
-      // alongside the experiment that produced it.
-      var studies = {};
-      snps.forEach(function (snp) {
-        var key = (snp.study && snp.study.name) || 'Unattributed';
-        if (!studies[key]) { studies[key] = { study: snp.study, rows: [] }; }
-        studies[key].rows.push(snp);
-      });
-      var studyHtml = Object.keys(studies).map(function (key) {
-        var group = studies[key];
-        var rows = group.rows.map(function (snp) {
-          return '<tr>' +
-            '<td>' + escape(snp.snp || '') + '</td>' +
-            '<td class="mgdb-numeric">' + num(snp.position) + '</td>' +
-            '<td>' + escape(snp.gene_structure || '') + '</td>' +
-            '<td>' + escape(snp.trait || '') + '</td>' +
-            '<td class="gene-record-property">' + escape(snp.property || '') + '</td>' +
-            '</tr>';
-        });
-        return '<h4>' + refLink(group.study) + '</h4>' +
-               table(['Variant', 'Position', 'Region', 'Trait', 'Reported value'], rows);
-      }).join('');
-      html += block('Trait associations',
-        'Variants in or near this gene that were associated with a trait in a genome-wide association study.',
-        studyHtml);
-    }
+    rendered = R.collection(out, {
+      title: 'Alleles and variations',
+      items: variation.alleles,
+      filename: 'gene-alleles.tsv',
+      pageSize: 25,
+      columns: [
+        { key: 'name', label: 'Allele', tile: true,
+          html: function (a) { return a.html ? R.link(a.html, a.name) : R.escape(a.name); } },
+        { key: 'type', label: 'Type' },
+        R.urlColumn(function (a) { return a.html; })
+      ]
+    }) || rendered;
 
-    if (alleles.length) {
-      html += block('Classical alleles',
-        'Curated alleles of this gene, named in the literature.',
-        chipList(alleles.map(function (a) { return { name: a.name, html: null }; })));
-    }
-
-    void counts;
-    els.variationBody.innerHTML = html;
-    return true;
+    return rendered;
   }
 
   /* ------------------------------------------------------------------------
      Pan-gene
      ------------------------------------------------------------------------ */
 
-  function renderPanGene(pan, orthologs) {
-    var hasPan = pan && pan.pan_gene && pan.pan_gene.name;
-    var orthoList = (orthologs && orthologs.orthologs) || [];
-    if (!hasPan && !orthoList.length) {
-      els.panGeneBody.innerHTML =
-        empty('This gene model is not placed in a pan-gene, and no orthologs are recorded.');
-      return true;
-    }
+  function renderPanGene(pan) {
+    if (!pan || !pan.pan_gene || !pan.pan_gene.name) { return false; }
+    var out = els.panGeneBody;
+    out.innerHTML = '';
+    var pg = pan.pan_gene;
 
-    var html = '';
+    out.insertAdjacentHTML('beforeend', R.facts([
+      ['Pan-gene', R.link('/pan_gene_center/pan_gene/' + encodeURIComponent(pg.name), pg.name)],
+      ['Members', num(pg.member_count), 'gene models across all assemblies'],
+      ['Assemblies', num(pan.assembly_count), 'genomes where this gene was found'],
+      ['Analysis', pg.analysis ? R.escape(pg.analysis) : '']
+    ]));
 
-    if (hasPan) {
-      var pg = pan.pan_gene;
-      html += '<dl class="gene-record-facts-grid">' +
-        fact('Pan-gene', '<a href="/pan_gene_center/pan_gene/' + encodeURIComponent(pg.name) + '">' +
-             escape(pg.name) + '</a>') +
-        fact('Members', num(pg.member_count), 'gene models across all assemblies') +
-        fact('Assemblies', num(pan.assembly_count), 'genomes where this gene was found') +
-        fact('Analysis', escape(pg.analysis || '')) +
-        '</dl>';
-
-      /* The presence strip. This is the thing MaizeGDB has that nobody else
-         does: whether a gene is present across cultivated maize only, or across
-         the wild Zea species too. */
-      if (pan.species && pan.species.length) {
-        var strip = pan.species.map(function (group) {
-          var cells = group.assemblies.map(function (assembly) {
-            return '<li title="' + escape(assembly) + '"><span class="mgdb-visually-hidden">' +
-                   escape(assembly) + '</span></li>';
-          }).join('');
-          return '<div class="gene-record-species">' +
-            '<h4><em>' + escape(group.species) + '</em> <span class="gene-record-muted">' +
-            group.count + '</span></h4>' +
-            '<ul class="gene-record-presence">' + cells + '</ul></div>';
+    /* The presence strip. This is the thing MaizeGDB has that nobody else
+       does: whether a gene is present across cultivated maize only, or across
+       the wild Zea species too. */
+    if (pan.species && pan.species.length) {
+      var strip = pan.species.map(function (group) {
+        var cells = group.assemblies.map(function (assembly) {
+          return '<li title="' + R.escape(assembly) + '"><span class="mgdb-visually-hidden">' +
+                 R.escape(assembly) + '</span></li>';
         }).join('');
-        html += block('Present in', 'One square per assembly in which this gene was found.', strip);
-      }
-
-      var members = pan.members || [];
-      if (members.length) {
-        var rows = members.map(function (m) {
-          return '<tr' + (m.is_current_record ? ' class="is-current"' : '') + '>' +
-            '<td>' + (m.html ? '<a href="' + escape(m.html) + '"><code>' + escape(m.name) + '</code></a>'
-                             : '<code>' + escape(m.name) + '</code>') +
-            (m.is_current_record ? ' <span class="mgdb-pill mgdb-pill-ok">this record</span>' : '') + '</td>' +
-            '<td>' + escape(m.assembly || '') + '</td>' +
-            '<td>' + escape(m.annotation || '') + '</td>' +
-            '<td>' + escape(m.chromosome || '') + '</td>' +
-            '</tr>';
-        });
-        html += block('Members', null,
-          table(['Gene model', 'Assembly', 'Annotation', 'Chromosome'], rows));
-      }
+        return '<div class="gene-record-species">' +
+          '<h4><em>' + R.escape(group.species) + '</em> <span class="gene-record-muted">' +
+          group.count + '</span></h4>' +
+          '<ul class="gene-record-presence">' + cells + '</ul></div>';
+      }).join('');
+      out.insertAdjacentHTML('beforeend',
+        '<div class="mgdb-rec-block"><div class="mgdb-rec-block-head"><h3>Present in' +
+        '<span class="mgdb-rec-block-count">' + num(pan.assembly_count) + '</span></h3></div>' +
+        '<p class="mgdb-rec-block-status">One square per assembly in which this gene was found.</p>' +
+        strip + '</div>');
     }
 
-    if (orthoList.length) {
-      var direct = orthoList.filter(function (o) { return o.is_direct; });
-      var indirect = orthoList.filter(function (o) { return !o.is_direct; });
-      function orthoRows(list) {
-        return list.map(function (o) {
-          return '<tr><td><em>' + escape(o.species || o.kind.replace(/_ortholog.*/, '')) + '</em></td>' +
-                 '<td><code>' + escape(o.identifier) + '</code></td>' +
-                 '<td>' + escape(o.analysis || '') + '</td>' +
-                 (list === indirect ? '<td><code>' + escape(o.via || '') + '</code></td>' : '') +
-                 '</tr>';
-        });
-      }
-      if (direct.length) {
-        html += block('Orthologs in other grasses', null,
-          table(['Species', 'Ortholog', 'Analysis'], orthoRows(direct)));
-      }
-      if (indirect.length) {
-        html += block('Orthologs via other pan-gene members',
-          'Recorded against a different gene model in the same pan-gene.',
-          table(['Species', 'Ortholog', 'Analysis', 'Via'], orthoRows(indirect)));
-      }
-    }
+    R.collection(out, {
+      title: 'Related gene models in maize',
+      items: pan.members,
+      filename: 'gene-pan-gene-members.tsv',
+      pageSize: 25,
+      columns: [
+        { key: 'name', label: 'Gene model', tile: true,
+          html: function (m) { return (m.html ? R.link(m.html, m.name) : R.escape(m.name)) +
+                 (m.is_current_record ? ' <span class="mgdb-pill mgdb-pill-ok">This record</span>' : ''); } },
+        { key: 'assembly', label: 'Assembly' },
+        { key: 'annotation', label: 'Annotation' },
+        R.urlColumn(function (m) { return m.html; })
+      ]
+    });
 
-    els.panGeneBody.innerHTML = html;
     return true;
   }
 
+  function renderOrthologs(orthologs) {
+    var list = (orthologs && orthologs.orthologs) || [];
+    return R.collection(els.orthologsBody, {
+      title: 'Orthologs in other species',
+      items: list,
+      filename: 'gene-orthologs.tsv',
+      pageSize: 25,
+      columns: [
+        { key: 'name', label: 'Gene', tile: true,
+          html: function (o) { return o.url ? R.link(o.url, o.name, true) : R.escape(o.name); } },
+        { key: 'species', label: 'Species',
+          html: function (o) { return o.species ? '<em>' + R.escape(o.species) + '</em>' : '\u2014'; } },
+        { key: 'source', label: 'Source' },
+        { key: 'relationship', label: 'Relationship' }
+      ]
+    });
+  }
+
   /* ------------------------------------------------------------------------
-     Classical locus
+     Classical gene, and the three locus sections the legacy page had
      ------------------------------------------------------------------------ */
 
   function renderLocus(locus) {
-    if (!locus) { return false; }
-    var html = '';
+    if (!locus || !locus.id) { return false; }
+    var out = els.locusBody;
+    out.innerHTML = '';
 
-    html += '<dl class="gene-record-facts-grid">' +
-      fact('Symbol', '<em>' + escape(locus.name || '') + '</em>') +
-      fact('Full name', escape(locus.full_name || '')) +
-      fact('Type', escape(locus.type || '')) +
-      fact('Chromosome bin', escape(locus.bin || '')) +
-      '</dl>';
+    out.insertAdjacentHTML('beforeend', R.facts([
+      ['Symbol', locus.name ? R.escape(locus.name) : ''],
+      ['Full name', locus.full_name ? R.escape(locus.full_name) : ''],
+      ['Type', locus.type ? R.escape(locus.type) : ''],
+      ['Chromosome bin', locus.bin ? R.escape(locus.bin) : ''],
+      ['Locus record', R.link(locus.locus_html, 'Open the locus record')]
+    ]));
 
-    if (locus.phenotypes && locus.phenotypes.length) {
-      html += block('Mutant phenotypes',
-        'What is seen when this gene is disrupted. This is usually why the gene was named.',
-        chipList(locus.phenotypes.map(function (p) { return { name: p.name, html: null }; })));
-    }
+    /* c.text, not c.value: the field is `text` and reading `value` rendered ten
+       empty notes with nothing but their labels. c.reference is a ref object,
+       not a string, so it is linked rather than concatenated. */
+    R.notes(out, 'Curator notes', (locus.comments || []).map(function (c) {
+      return {
+        text: c.text,
+        meta: [
+          c.label,
+          c.reference ? 'Source: ' + (R.refLink(c.reference) || R.escape(c.reference.name)) : '',
+          c.authority ? 'Authority: ' + R.escape(c.authority) : ''
+        ]
+      };
+    }));
 
-    if (locus.comments && locus.comments.length) {
-      var notes = locus.comments.map(function (c) {
-        return '<div class="gene-record-note">' +
-          '<h4>' + escape(c.label) + '</h4><p>' + escape(c.text) + '</p>' +
-          (c.reference ? '<p class="gene-record-muted">' + refLink(c.reference) + '</p>' : '') +
-          '</div>';
-      }).join('');
-      html += block('Curator notes', null, notes);
-    }
+    /* Every annotation of this gene, in every assembly. B73 alone has seven,
+       and this is where a reader compares them. */
+    R.collection(out, {
+      title: 'Gene models for this classical gene',
+      items: locus.associated_gene_models,
+      filename: 'gene-associated-models.tsv',
+      pageSize: 25,
+      columns: [
+        { key: 'name', label: 'Gene model', tile: true,
+          html: function (m) { return R.link('/gene_center/gene/' + encodeURIComponent(m.name), m.name); } },
+        { key: 'assembly', label: 'Assembly' },
+        { key: 'annotation', label: 'Annotation' },
+        { key: 'is_current', label: 'Current in its annotation',
+          get: function (m) { return m.is_current ? 'Yes' : 'No'; },
+          html: function (m) { return m.is_current
+            ? '<span class="mgdb-pill mgdb-pill-ok">Current</span>'
+            : '<span class="mgdb-pill mgdb-pill-warn">Superseded</span>'; } }
+      ]
+    });
 
-    if (locus.synonyms && locus.synonyms.length) {
-      html += block('Synonyms', 'Other names this gene has been published under.',
-        table(['Name', 'Authority'], locus.synonyms.map(function (s) {
-          return '<tr><td><em>' + escape(s.name) + '</em></td><td>' +
-                 (s.reference ? refLink(s.reference) : escape(s.authority || '')) + '</td></tr>';
-        })));
-    }
+    R.collection(out, {
+      title: 'Phenotypes',
+      items: locus.phenotypes,
+      filename: 'gene-phenotypes.tsv',
+      pageSize: 25,
+      columns: [
+        { key: 'name', label: 'Phenotype', tile: true,
+          html: function (p) { return R.link('/data_center/phenotype?id=' + p.id, p.name); } },
+        R.urlColumn(function (p) { return '/data_center/phenotype?id=' + p.id; })
+      ]
+    });
 
-    if (locus.associated_gene_models && locus.associated_gene_models.length) {
-      html += block('Gene models for this gene',
-        'The same classical gene as annotated in each assembly.',
-        table(['Gene model', 'Assembly', 'Annotation', 'Position'],
-          locus.associated_gene_models.map(function (g) {
-            return '<tr' + (g.is_current_record ? ' class="is-current"' : '') + '>' +
-              '<td><a href="' + escape(g.html) + '"><code>' + escape(g.name) + '</code></a>' +
-              (g.is_current_record ? ' <span class="mgdb-pill mgdb-pill-ok">this record</span>' : '') + '</td>' +
-              '<td>' + escape(g.assembly || '') + '</td>' +
-              '<td>' + escape(g.annotation || '') + '</td>' +
-              '<td>' + (g.chromosome ? escape(g.chromosome) + ':' + num(g.start) : '') + '</td>' +
-              '</tr>';
-          })));
-    }
+    R.collection(out, {
+      title: 'Related loci',
+      items: locus.related_loci,
+      filename: 'gene-related-loci.tsv',
+      columns: [
+        { key: 'name', label: 'Locus', tile: true,
+          html: function (l) { return R.link('/data_center/locus?id=' + l.id, l.name); } },
+        { key: 'qualifier', label: 'Relationship' }
+      ]
+    });
 
-    if (locus.map_positions && locus.map_positions.length) {
-      html += block('Genetic map positions',
-        'Where this gene sits on the classical genetic maps.',
-        table(['Map', 'Position (cM)', 'Bin'], locus.map_positions.map(function (m) {
-          return '<tr><td>' + escape(m.map) + '</td>' +
-                 '<td class="mgdb-numeric">' + (m.position === null ? '' : m.position) + '</td>' +
-                 '<td>' + escape(m.bin || m.bin2 || '') + '</td></tr>';
-        })));
-    }
-
-    if (locus.related_loci && locus.related_loci.length) {
-      html += block('Related genes', null,
-        table(['Gene', 'Relationship'], locus.related_loci.map(function (r) {
-          return '<tr><td><em>' + escape(r.name) + '</em></td><td>' +
-                 escape(r.qualifier || '') + '</td></tr>';
-        })));
-    }
-
-    els.locusBody.innerHTML = html;
     return true;
+  }
+
+  function renderMap(locus) {
+    return R.collection(els.mapBody, {
+      title: 'Map coordinates',
+      items: (locus && locus.map_positions) || [],
+      filename: 'gene-map-positions.tsv',
+      pageSize: 25,
+      columns: [
+        { key: 'map', label: 'Map', tile: true },
+        { key: 'position', label: 'Position', sort: 'number', numeric: true,
+          get: function (m) { return m.position == null ? '' : String(m.position); } },
+        { key: 'bin', label: 'Bin' },
+        { key: 'bin2', label: 'Bin 2' },
+        { key: 'is_backbone', label: 'Backbone',
+          get: function (m) { return m.is_backbone ? 'Yes' : 'No'; },
+          html: function (m) { return m.is_backbone
+            ? '<span class="mgdb-pill mgdb-pill-ok">Backbone</span>'
+            : '<span class="mgdb-muted">\u2014</span>'; } }
+      ]
+    });
+  }
+
+  /* Nearby loci. The legacy page fetched these again from the server every time
+     the reader changed the window, through a control that had been commented
+     out as broken since 2013. The API returns the widest window once and the
+     control filters what is already here. */
+  var nearbyAll = [];
+
+  function nearbyRender(window_cm) {
+    var visible = nearbyAll.filter(function (n) {
+      return n.distance_cm === null || n.distance_cm <= window_cm;
+    });
+    var body = R.byId('gene-record-nearby-list');
+    if (!body) { return; }
+    body.innerHTML = '';
+    R.collection(body, {
+      title: 'Loci within ' + window_cm + ' cM',
+      items: visible,
+      filename: 'gene-nearby-loci.tsv',
+      pageSize: 25,
+      columns: [
+        { key: 'name', label: 'Locus', tile: true,
+          html: function (n) { return (n.html ? R.link(n.html, n.name) : R.escape(n.name)) +
+                 (n.is_self ? ' <span class="mgdb-pill mgdb-pill-ok">This gene</span>' : ''); } },
+        { key: 'map', label: 'Map' },
+        { key: 'position', label: 'Position', sort: 'number', numeric: true,
+          get: function (n) { return n.position == null ? '' : String(n.position); } },
+        { key: 'distance_cm', label: 'Distance (cM)', sort: 'number', numeric: true,
+          get: function (n) { return n.distance_cm == null ? '' : String(n.distance_cm); } }
+      ]
+    });
+  }
+
+  function renderNearby(locus) {
+    var list = (locus && locus.nearby_loci) || [];
+    if (!list.length) { return false; }
+    nearbyAll = list;
+    var maxWindow = (locus && locus.nearby_window_cm) || 10;
+    var choices = [1, 2, 5, 10].filter(function (c) { return c <= maxWindow; });
+
+    els.nearbyBody.innerHTML =
+      '<div class="mgdb-rec-toolbar" id="gene-record-nearby-toolbar">' +
+        '<div class="mgdb-view-toggle" role="group" aria-label="Window">' +
+          choices.map(function (c) {
+            return '<button class="mgdb-view-btn" type="button" data-window="' + c +
+                   '" aria-pressed="' + (c === maxWindow) + '">\u00b1' + c + ' cM</button>';
+          }).join('') +
+        '</div>' +
+      '</div>' +
+      '<div id="gene-record-nearby-list"></div>';
+
+    Array.prototype.forEach.call(
+      els.nearbyBody.querySelectorAll('[data-window]'), function (button) {
+        button.addEventListener('click', function () {
+          Array.prototype.forEach.call(els.nearbyBody.querySelectorAll('[data-window]'), function (b) {
+            b.setAttribute('aria-pressed', String(b === button));
+          });
+          nearbyRender(Number(button.getAttribute('data-window')));
+        });
+      });
+
+    nearbyRender(maxWindow);
+    return true;
+  }
+
+  var GENETIC_KINDS = [
+    ['primer', 'Primers and enzymes', 'Primer'],
+    ['bac', 'Related BACs', 'BAC'],
+    ['gel_pattern', 'Gel patterns', 'Gel pattern'],
+    ['map_score', 'Map scores', 'Map score'],
+    ['recombination', 'Recombination data', 'Recombination']
+  ];
+
+  function renderGenetic(locus) {
+    var list = (locus && locus.genetic) || [];
+    if (!list.length) { return false; }
+    var out = els.geneticBody;
+    out.innerHTML = '';
+    var rendered = false;
+
+    GENETIC_KINDS.forEach(function (spec) {
+      var items = list.filter(function (g) { return g.kind === spec[0]; });
+      var columns = [
+        { key: 'name', label: spec[2], tile: true,
+          html: function (g) { return g.html ? R.link(g.html, g.name) : R.escape(g.name); } }
+      ];
+      if (spec[0] === 'primer') {
+        columns.push({ key: 'detail', label: 'Sequence',
+          html: function (g) { return g.detail
+            ? '<span class="mgdb-sequence">' + R.escape(g.detail) + '</span>'
+            : '<span class="mgdb-muted">Not recorded</span>'; } });
+      }
+      /* Four of the five kinds carry a name and nothing else, and a one-column
+         table is not a table. The MaizeGDB id is the second real fact each of
+         them has -- not a constant repeated down the column. */
+      columns.push({ key: 'id', label: 'MaizeGDB ID', sort: 'number', numeric: true,
+        get: function (g) { return g.id == null ? '' : String(g.id); },
+        html: function (g) { return g.id == null ? '\u2014'
+          : '<span class="mgdb-sequence">' + g.id + '</span>'; } });
+      columns.push(R.urlColumn(function (g) { return g.html; }));
+      rendered = R.collection(out, {
+        title: spec[1],
+        items: items,
+        filename: 'gene-' + spec[0] + '.tsv',
+        pageSize: 25,
+        columns: columns
+      }) || rendered;
+    });
+
+    return rendered;
   }
 
   /* ------------------------------------------------------------------------
-     References, sequences, cross-references, model quality
+     Sequences, cross-references, model quality
      ------------------------------------------------------------------------ */
-
-  function renderReferences(section) {
-    var refs = (section && section.references) || [];
-    if (!refs.length) { return false; }
-    els.referencesBody.innerHTML = table(['Year', 'Reference', 'Relevance'],
-      refs.map(function (r) {
-        return '<tr><td class="mgdb-numeric">' + (r.year || '') + '</td>' +
-               '<td><a href="' + escape(r.html) + '">' + escape(r.name) + '</a></td>' +
-               '<td>' + escape(r.relevance || '') + '</td></tr>';
-      }), { limit: 15 });
-    return true;
-  }
 
   function renderSequences(seq) {
     if (!seq || !seq.set) { return false; }
-    var html = '';
+    var out = els.sequencesBody;
+    out.innerHTML = '';
 
-    var links = [];
-    if (seq.genomic) {
-      links.push('<a class="mgdb-button mgdb-button-secondary" rel="noopener" href="' +
-        escape(seq.genomic) + '">Genomic FASTA</a>');
-    }
-    (seq.transcripts || []).forEach(function (t) {
-      if (t.cdna) {
-        links.push('<a class="mgdb-button mgdb-button-quiet" rel="noopener" href="' + escape(t.cdna) +
-          '">cDNA ' + escape(t.name) + '</a>');
-      }
-      if (t.protein_url) {
-        links.push('<a class="mgdb-button mgdb-button-quiet" rel="noopener" href="' + escape(t.protein_url) +
-          '">Protein ' + escape(t.protein) + '</a>');
-      }
+    out.insertAdjacentHTML('beforeend', R.facts([
+      ['Annotation set', R.escape(seq.set)],
+      ['Assembly', seq.assembly ? R.escape(seq.assembly) : ''],
+      ['Whole gene', seq.genomic
+        ? R.link(seq.genomic, 'Genomic FASTA', true) : '', 'the model and its introns']
+    ]));
+
+    /* One row per transcript, one column per sequence type. CDS was missing
+       from this section: it is the coding sequence without the UTRs, a
+       different thing from cDNA, and it is what most people mean when they ask
+       for the sequence of a gene. */
+    R.collection(out, {
+      title: 'Transcript sequences',
+      items: seq.transcripts,
+      filename: 'gene-sequences.tsv',
+      pageSize: 25,
+      columns: [
+        { key: 'name', label: 'Transcript', tile: true,
+          html: function (t) { return R.escape(t.name) +
+                 (t.canonical ? ' <span class="mgdb-pill mgdb-pill-ok">Canonical</span>' : ''); } },
+        { key: 'cds', label: 'CDS', sort: false,
+          get: function (t) { return t.cds || ''; },
+          html: function (t) { return t.cds ? R.link(t.cds, 'CDS', true) : '\u2014'; } },
+        { key: 'cdna', label: 'cDNA', sort: false,
+          get: function (t) { return t.cdna || ''; },
+          html: function (t) { return t.cdna ? R.link(t.cdna, 'cDNA', true) : '\u2014'; } },
+        { key: 'protein_url', label: 'Protein', sort: false,
+          get: function (t) { return t.protein_url || ''; },
+          html: function (t) { return t.protein_url
+            ? R.link(t.protein_url, t.protein || 'Protein', true) : '\u2014'; } }
+      ]
     });
 
-    html += block('Download sequence',
-      'Served by the MaizeGDB sequence service for gene model set ' + seq.set + '.',
-      '<div class="gene-record-actions-row">' + links.join('') + '</div>');
-
-    if (seq.downloads && seq.downloads.length) {
-      html += block('Bulk downloads',
-        'The whole assembly and annotation, including GFF3 and every FASTA.',
-        '<ul class="gene-record-links">' + seq.downloads.map(function (url) {
-          return '<li><a href="' + escape(url) + '" rel="noopener">' + escape(url) + '</a></li>';
-        }).join('') + '</ul>');
+    var downloads = (seq.downloads || []).filter(Boolean);
+    if (downloads.length) {
+      out.insertAdjacentHTML('beforeend',
+        '<div class="mgdb-rec-block"><div class="mgdb-rec-block-head"><h3>Bulk downloads' +
+        '<span class="mgdb-rec-block-count">' + downloads.length + '</span></h3></div>' +
+        '<div class="mgdb-rec-linkrow">' + downloads.map(function (url) {
+          return '<a class="mgdb-button mgdb-button-secondary" href="' + R.escape(url) +
+                 '" target="_blank" rel="noopener">Every sequence for this assembly ' +
+                 '<span aria-hidden="true">&nearr;</span></a>';
+        }).join('') + '</div></div>');
     }
 
-    els.sequencesBody.innerHTML = html;
+    if (seq.note) {
+      out.insertAdjacentHTML('beforeend',
+        '<p class="mgdb-rec-block-status">' + R.escape(seq.note) + '</p>');
+    }
     return true;
   }
 
   function renderXrefs(section) {
-    var xrefs = ((section && section.xrefs) || []).filter(function (x) { return x.display; });
-    if (!xrefs.length) { return false; }
-    els.xrefsBody.innerHTML = table(['Database', 'Identifier', 'Note'],
-      xrefs.map(function (x) {
-        return '<tr><td>' + escape(x.database) + '</td>' +
-               '<td>' + extLink(x.url, x.key) + '</td>' +
-               '<td>' + escape(x.comment || '') + '</td></tr>';
-      }));
-    return true;
+    return R.collection(els.xrefsBody, {
+      title: 'Cross-references',
+      items: (section && section.xrefs) || [],
+      filename: 'gene-cross-references.tsv',
+      pageSize: 25,
+      columns: [
+        { key: 'accession', label: 'Accession', tile: true,
+          html: function (x) { return x.url ? R.link(x.url, x.accession, true) : R.escape(x.accession); } },
+        { key: 'database', label: 'Database' },
+        { key: 'description', label: 'Description' },
+        { key: 'url', label: 'URL', sort: false, get: function (x) { return x.url || ''; },
+          html: function (x) { return x.url ? R.link(x.url, x.url, true) : '\u2014'; } }
+      ]
+    });
   }
 
-  /* Model quality. Every score is shown with what it means, because the number
-     alone is misleading — a reader who sees a pLDDT of 57.72 and no context
-     reads it as "57%, fine" rather than "below the threshold where the fold
-     should be trusted". */
-  function renderProvenance(structure, overview) {
+  function renderProvenance(structure) {
     var scores = (structure && structure.scores) || [];
-    if (!scores.length) { return false; }
+    return R.collection(els.provenanceBody, {
+      title: 'Model quality scores',
+      items: scores,
+      filename: 'gene-model-scores.tsv',
+      columns: [
+        { key: 'label', label: 'Score', tile: true,
+          get: function (s) { return s.label || s.metric; } },
+        { key: 'value', label: 'Value' },
+        { key: 'interpretation', label: 'What it means' }
+      ]
+    });
+  }
 
-    // Frame-by-frame pSAURON scores are specialist detail and bury the rest.
-    var primary = scores.filter(function (s) { return s.interpretation; });
-    var detail = scores.filter(function (s) { return !s.interpretation; });
+  /* ------------------------------------------------------------------------
+     Metrics and figures
+     ------------------------------------------------------------------------ */
 
-    var html = '';
-    if (primary.length) {
-      html += table(['Measure', 'Value', 'What it means', 'From'],
-        primary.map(function (s) {
-          return '<tr><td>' + escape(s.label) + '</td>' +
-            '<td class="mgdb-numeric">' + (Math.round(s.value * 10000) / 10000) + '</td>' +
-            '<td>' + escape(s.interpretation) + '</td>' +
-            '<td>' + escape(s.analysis || '') +
-              (s.version ? ' <span class="gene-record-muted">' + escape(s.version) + '</span>' : '') +
-            '</td></tr>';
-        }), { limit: 20 });
+  function renderMetrics(counts, sections) {
+    R.metrics(els.metricsBody, [
+      ['Ontology terms', 'Function', counts.ontology, 'GO and other ontology terms attached to this gene.', 'green'],
+      ['Insertions', 'Mutants', counts.insertions, 'Insertion alleles recorded in this gene.', 'amber'],
+      ['SNP associations', 'Traits', counts.snp_traits, 'SNPs in this gene with a recorded trait association.', 'blue'],
+      ['References', 'Literature', counts.references, 'Curated publications associated with this gene.', 'burgundy']
+    ]);
+
+    var series = [
+      ['Transcripts', counts.transcripts], ['Protein domains', counts.protein_domains],
+      ['Ontology terms', counts.ontology], ['Insertions', counts.insertions],
+      ['SNP associations', counts.snp_traits], ['Alleles', counts.alleles],
+      ['Map positions', counts.map_positions], ['Gene products', counts.gene_products],
+      ['Cross-references', counts.xrefs], ['Pan-gene members', counts.pan_gene_members],
+      ['Gene models of this gene', counts.locus_gene_models],
+      ['Curator notes', counts.comments], ['References', counts.references]
+    ];
+    var height = R.connectionsHeight(series);
+
+    var refs = (sections.references && sections.references.references) || [];
+    if (R.yearsChart('gene-record-years-chart', 'gene-record-years-caption',
+                     'gene-record-years-figure', refs, height)) {
+      R.watchChartWidth('gene-record-years-chart');
     }
 
-    if (detail.length) {
-      html += '<details class="gene-record-more"><summary>Show ' + detail.length +
-        ' additional raw scores</summary>' +
-        table(['Measure', 'Value', 'From'], detail.map(function (s) {
-          return '<tr><td>' + escape(s.label) + '</td>' +
-            '<td class="mgdb-numeric">' + (Math.round(s.value * 10000) / 10000) + '</td>' +
-            '<td>' + escape(s.analysis || '') + '</td></tr>';
-        }), { limit: 100 }) + '</details>';
-    }
-
-    // Reproducibility: a gene model name means nothing without the annotation
-    // version it came from, because models change between annotations.
-    if (overview && overview.assembly && overview.assembly.name) {
-      html += block('Cite this record',
-        'Gene model identifiers are specific to an annotation version. Record both.',
-        '<p class="gene-record-cite"><code>' + escape(overview.name || '') + '</code>, ' +
-        escape(overview.assembly.name) +
-        (overview.annotation && overview.annotation.name
-          ? ', annotation ' + escape(overview.annotation.name) : '') +
-        (overview.assembly.accession ? ' (' + escape(overview.assembly.accession) + ')' : '') +
-        '. MaizeGDB, accessed ' + new Date().toISOString().slice(0, 10) + '.</p>');
-    }
-
-    els.provenanceBody.innerHTML = html;
+    R.connectionsChart('gene-record-connections-chart', 'gene-record-connections-caption',
+                       'gene-record-connections-figure', series, height);
     return true;
-  }
-
-  /* ------------------------------------------------------------------------
-     Tabs and scrollspy
-     ------------------------------------------------------------------------ */
-
-  var TAB_LABELS = {
-    'gene-record-overview': ['Overview', null],
-    'gene-record-structure': ['Structure', 'protein_domains'],
-    'gene-record-function': ['Function', 'ontology'],
-    'gene-record-expression': ['Expression', null],
-    'gene-record-variation': ['Variation', 'insertions'],
-    'gene-record-pan_gene': ['Pan-gene', 'pan_gene_members'],
-    'gene-record-locus': ['Classical gene', null],
-    'gene-record-references': ['References', 'references'],
-    'gene-record-sequences': ['Sequences', null],
-    'gene-record-xrefs': ['Cross-references', 'xrefs'],
-    'gene-record-provenance': ['Model quality', null]
-  };
-
-  function buildTabs(rendered, counts) {
-    if (rendered.length < 2) { return; }
-    els.tabs.innerHTML = rendered.map(function (id) {
-      var entry = TAB_LABELS[id] || [id, null];
-      var count = entry[1] ? (counts[entry[1]] || 0) : null;
-      return '<a href="#' + id + '">' + escape(entry[0]) +
-        (count ? '<span class="gene-record-tab-count">' + count.toLocaleString() + '</span>' : '') +
-        '</a>';
-    }).join('');
-    show(els.tabs, true);
-
-    var pairs = rendered.map(function (id) {
-      return { tab: els.tabs.querySelector('a[href="#' + id + '"]'), section: byId(id) };
-    }).filter(function (pair) { return pair.tab && pair.section; });
-
-    function markCurrent(section) {
-      pairs.forEach(function (pair) {
-        var current = pair.section === section;
-        pair.tab.classList.toggle('is-current', current);
-        if (current) { pair.tab.setAttribute('aria-current', 'true'); }
-        else { pair.tab.removeAttribute('aria-current'); }
-      });
-    }
-
-    if (pairs.length) { markCurrent(pairs[0].section); }
-    pairs.forEach(function (pair) {
-      pair.tab.addEventListener('click', function () { markCurrent(pair.section); });
-    });
-
-    if (!window.IntersectionObserver) { return; }
-    var observer = new window.IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) { markCurrent(entry.target); }
-      });
-    }, { rootMargin: '-25% 0px -65% 0px' });
-    pairs.forEach(function (pair) { observer.observe(pair.section); });
-  }
-
-  /* ------------------------------------------------------------------------
-     Copy to clipboard
-     ------------------------------------------------------------------------ */
-
-  function wireCopy() {
-    document.addEventListener('click', function (event) {
-      var button = event.target.closest && event.target.closest('[data-copy-target]');
-      if (!button) { return; }
-      var source = byId(button.getAttribute('data-copy-target'));
-      if (!source) { return; }
-      var text = source.textContent.trim();
-      var original = button.textContent;
-
-      function done(message) {
-        button.textContent = message;
-        window.setTimeout(function () { button.textContent = original; }, 2000);
-      }
-
-      // navigator.clipboard is absent outside a secure context; selecting the
-      // text is the honest fallback rather than a button that does nothing.
-      if (window.navigator.clipboard && window.isSecureContext) {
-        window.navigator.clipboard.writeText(text).then(function () { done('Copied'); },
-          function () { done('Press Ctrl+C'); });
-      } else {
-        var range = document.createRange();
-        range.selectNodeContents(source);
-        var selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-        done('Press Ctrl+C');
-      }
-    });
   }
 
   /* ------------------------------------------------------------------------
      Assembly
      ------------------------------------------------------------------------ */
+
+  var TAB_COUNTS = {
+    'gene-record-structure': ['transcripts', 'protein_domains'],
+    'gene-record-function': ['ontology', 'gene_products'],
+    'gene-record-variation': ['insertions', 'snp_traits', 'alleles'],
+    'gene-record-pan_gene': ['pan_gene_members'],
+    'gene-record-locus': ['locus_gene_models', 'comments'],
+    'gene-record-map': ['map_positions'],
+    'gene-record-references': ['references'],
+    'gene-record-xrefs': ['xrefs']
+  };
+
+  var LABELS = {
+    'gene-record-overview': 'Overview',
+    'gene-record-structure': 'Structure',
+    'gene-record-function': 'Function',
+    'gene-record-expression': 'Expression',
+    'gene-record-variation': 'Variation',
+    'gene-record-pan_gene': 'Pan-gene',
+    'gene-record-orthologs': 'Orthologs',
+    'gene-record-locus': 'Classical gene',
+    'gene-record-map': 'Map coordinates',
+    'gene-record-nearby': 'Nearby loci',
+    'gene-record-genetic': 'Additional genetic information',
+    'gene-record-references': 'References',
+    'gene-record-sequences': 'Sequences and downloads',
+    'gene-record-xrefs': 'Cross-references',
+    'gene-record-provenance': 'Model quality',
+    'gene-record-metrics': 'Metrics',
+    'gene-record-resources': 'Related resources',
+    'gene-record-api': 'API'
+  };
 
   function render(response) {
     payload = response;
@@ -929,148 +931,113 @@
     var meta = response.meta || {};
     var counts = meta.counts || {};
 
-    show(els.loading, false);
-    show(els.error, false);
+    R.show(els.loading, false);
+    R.show(els.error, false);
 
-    renderHeader(data, sections, counts);
+    renderHeader(data, sections);
 
     var rendered = [];
     if (renderOverview(sections.overview)) { rendered.push('gene-record-overview'); }
     if (renderStructure(sections.structure)) { rendered.push('gene-record-structure'); }
-    if (renderFunction(sections['function'])) { rendered.push('gene-record-function'); }
+    if (renderFunction(sections.function)) { rendered.push('gene-record-function'); }
     if (renderExpression(sections.expression)) { rendered.push('gene-record-expression'); }
-    if (renderVariation(sections.variation, counts)) { rendered.push('gene-record-variation'); }
-    if (renderPanGene(sections.pan_gene, sections.orthologs)) { rendered.push('gene-record-pan_gene'); }
+    if (renderVariation(sections.variation)) { rendered.push('gene-record-variation'); }
+    if (renderPanGene(sections.pan_gene)) { rendered.push('gene-record-pan_gene'); }
+    if (renderOrthologs(sections.orthologs)) { rendered.push('gene-record-orthologs'); }
     if (renderLocus(sections.locus)) { rendered.push('gene-record-locus'); }
-    if (renderReferences(sections.references)) { rendered.push('gene-record-references'); }
+    if (renderMap(sections.locus)) { rendered.push('gene-record-map'); }
+    if (renderNearby(sections.locus)) { rendered.push('gene-record-nearby'); }
+    if (renderGenetic(sections.locus)) { rendered.push('gene-record-genetic'); }
+
+    if (R.references(els.referencesBody, (sections.references || {}).references,
+                     els.referencesSection, 'gene-ref')) {
+      rendered.push('gene-record-references');
+    }
+
     if (renderSequences(sections.sequences)) { rendered.push('gene-record-sequences'); }
     if (renderXrefs(sections.xrefs)) { rendered.push('gene-record-xrefs'); }
-    if (renderProvenance(sections.structure, sections.overview)) { rendered.push('gene-record-provenance'); }
+    if (renderProvenance(sections.structure)) { rendered.push('gene-record-provenance'); }
 
-    rendered.forEach(function (id) { show(byId(id), true); });
-    buildTabs(rendered, counts);
+    rendered.forEach(function (id) { R.show(R.byId(id), true); });
 
-    // Anything the API held back is said out loud rather than left to look like
-    // the record simply contains less than it does.
-    var notices = [];
-    (meta.truncated || []).forEach(function (list) {
-      var key = list.split('.').pop();
-      notices.push('Only the first ' + meta.max_items.toLocaleString() + ' of ' +
-        (counts[key] || 0).toLocaleString() + ' ' + key.replace(/_/g, ' ') + ' are shown.');
+    // Revealed before the charts are drawn: Plotly sizes a figure to its
+    // container, and a hidden container has no width.
+    R.show(R.byId('gene-record-metrics'), true);
+    if (renderMetrics(counts, sections)) { rendered.push('gene-record-metrics'); }
+
+    R.tabs({
+      el: els.tabs,
+      order: rendered.concat(['gene-record-resources', 'gene-record-api']),
+      labels: LABELS, counts: counts, tabCounts: TAB_COUNTS
     });
-    (meta.warnings || []).forEach(function (warning) { notices.push(warning.detail); });
 
-    if (meta.other_matches && meta.other_matches.length) {
-      notices.push('This identifier also matches ' +
-        meta.other_matches.slice(0, 5).map(function (m) {
-          return m.name + (m.assembly ? ' (' + m.assembly + ')' : '');
-        }).join(', ') + '.');
-    }
-
-    if (notices.length) {
-      els.notice.innerHTML = '<div><strong>Note</strong><span>' +
-        notices.map(escape).join(' ') + '</span></div>';
-      show(els.notice, true);
-    }
-
-    if (els.apiLink) {
-      els.apiLink.href = '/api/v1/records/gene/' + encodeURIComponent(data.id);
-    }
-
+    R.notice(els.notice, meta, counts);
     MGDB.announce('Record loaded, ' + rendered.length + ' sections.');
-
-    // The domain track needs the protein's length, which is not in the database
-    // and costs about 470 ms to read from the sequence service. Fetched
-    // separately so it never delays the page.
-    upgradeDomainTrack(data.id, sections.structure);
-  }
-
-  function upgradeDomainTrack(id, structure) {
-    if (!structure || !(structure.protein_domains || []).length) { return; }
-    if (structure.protein && structure.protein.length_aa) { return; }
-
-    MGDB.request('/api/v1/records/gene/' + encodeURIComponent(id) +
-                 '?fields=structure&protein_length=1', { key: 'gene-record-protein' })
-      .then(function (response) {
-        var upgraded = response && response.data && response.data.sections &&
-                       response.data.sections.structure;
-        if (!upgraded || !upgraded.protein || !upgraded.protein.length_aa) { return; }
-
-        var target = byId('gene-record-domain-track');
-        if (target) {
-          target.innerHTML = domainTrack(structure.protein_domains, upgraded.protein);
-        }
-        var note = byId('gene-record-structure-body');
-        if (note) {
-          var stale = note.querySelector('.gene-record-block-note');
-          if (stale && /not recorded in this database/.test(stale.textContent)) {
-            stale.remove();
-          }
-        }
-      })
-      .catch(function () { /* the table already says what the track would */ });
   }
 
   function load() {
-    var main = byId('gene-record-top');
+    var main = R.byId('gene-record-top');
     if (!main) { return; }
-    var id = main.getAttribute('data-gene-id');
-    if (!id) { return; }
 
-    /* A withdrawn gene model has no record to fetch — the API answers 410 — and
-       the server has already rendered the banner saying so. Asking anyway would
-       replace that with "the rest of this record could not be loaded", which
-       reads as a transient failure rather than a permanent, correct answer. */
+    /* A withdrawn model has nothing for the API to return -- the resource
+       answers 410 -- so the page does not ask. Without this the reader would
+       see "the rest of this record could not be loaded", which frames a record
+       that is correctly and permanently gone as a transient failure. */
     if (main.getAttribute('data-gene-state') === 'withdrawn') {
-      show(els.loading, false);
+      R.show(els.loading, false);
       return;
     }
 
-    show(els.error, false);
-    show(els.loading, true);
+    var requested = main.getAttribute('data-gene-id') || main.getAttribute('data-requested-id');
+    if (!requested) { return; }
 
-    MGDB.request('/api/v1/records/gene/' + encodeURIComponent(id), { key: 'gene-record' })
+    R.show(els.error, false);
+    R.show(els.loading, true);
+
+    MGDB.request('/api/v1/records/gene/' + encodeURIComponent(requested), { key: 'gene-record' })
       .then(function (response) {
         if (!response || !response.data) { throw new Error('unexpected payload'); }
         render(response);
       })
       .catch(function (error) {
         if (error && error.name === 'AbortError') { return; }
-        show(els.loading, false);
-        show(els.error, true);
+        R.show(els.loading, false);
+        R.show(els.error, true);
       });
   }
 
   function init() {
     els = {
-      functionLine: byId('gene-record-function'),
-      synonyms: byId('gene-record-synonyms'),
-      facts: byId('gene-record-facts'),
-      actions: byId('gene-record-actions'),
-      chips: byId('gene-record-chips'),
-      tabs: byId('gene-record-tabs'),
-      loading: byId('gene-record-loading'),
-      error: byId('gene-record-error'),
-      retry: byId('gene-record-retry'),
-      notice: byId('gene-record-notice'),
-      overviewBody: byId('gene-record-overview-body'),
-      structureBody: byId('gene-record-structure-body'),
-      functionBody: byId('gene-record-function-body'),
-      expressionBody: byId('gene-record-expression-body'),
-      variationBody: byId('gene-record-variation-body'),
-      panGeneBody: byId('gene-record-pan_gene-body'),
-      locusBody: byId('gene-record-locus-body'),
-      referencesBody: byId('gene-record-references-body'),
-      sequencesBody: byId('gene-record-sequences-body'),
-      xrefsBody: byId('gene-record-xrefs-body'),
-      provenanceBody: byId('gene-record-provenance-body'),
-      apiLink: byId('gene-record-api-link')
+      functionLine: R.byId('gene-record-function'),
+      synonyms: R.byId('gene-record-synonyms'),
+      versionNotice: R.byId('gene-record-version-notice'),
+      report: R.byId('gene-record-report'),
+      tabs: R.byId('gene-record-tabs'),
+      loading: R.byId('gene-record-loading'),
+      error: R.byId('gene-record-error'),
+      retry: R.byId('gene-record-retry'),
+      notice: R.byId('gene-record-notice'),
+      overviewBody: R.byId('gene-record-overview-body'),
+      structureBody: R.byId('gene-record-structure-body'),
+      functionBody: R.byId('gene-record-function-body'),
+      expressionBody: R.byId('gene-record-expression-body'),
+      variationBody: R.byId('gene-record-variation-body'),
+      panGeneBody: R.byId('gene-record-pan_gene-body'),
+      orthologsBody: R.byId('gene-record-orthologs-body'),
+      locusBody: R.byId('gene-record-locus-body'),
+      mapBody: R.byId('gene-record-map-body'),
+      nearbyBody: R.byId('gene-record-nearby-body'),
+      geneticBody: R.byId('gene-record-genetic-body'),
+      referencesBody: R.byId('gene-record-references-body'),
+      referencesSection: R.byId('gene-record-references'),
+      sequencesBody: R.byId('gene-record-sequences-body'),
+      xrefsBody: R.byId('gene-record-xrefs-body'),
+      provenanceBody: R.byId('gene-record-provenance-body'),
+      metricsBody: R.byId('gene-record-metrics-body')
     };
-
     if (els.retry) { els.retry.addEventListener('click', load); }
-    wireCopy();
+    R.apiCard('gene-copy-json-btn', 'gene-record-api-link', function () { return payload; });
     load();
-    void payload;
   }
 
   if (document.readyState === 'loading') {

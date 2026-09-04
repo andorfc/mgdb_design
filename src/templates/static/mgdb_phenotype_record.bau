@@ -1,0 +1,158 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-phenotype-record
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:title" content="$(phenotype_name) &mdash; MaizeGDB phenotype record">
+<meta property="og:description" content="$(phenotype_summary)">
+
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-phenotype-record-page" id="pheno-record-top" data-requested-id="$(requested_identifier)" data-canonical-id="$(phenotype_id)">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/phenotype">Phenotype Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(phenotype_name)</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-hero" aria-labelledby="pheno-record-title">
+    <div class="mgdb-hero-body">
+      <h1 id="pheno-record-title">$(phenotype_name)</h1>
+      <p class="mgdb-rec-synonyms" id="pheno-record-synonyms" hidden></p>
+      <dl class="mgdb-record-facts mgdb-rec-headfacts" id="pheno-record-facts">$(identity_facts)</dl>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs mgdb-rec-tabs" id="pheno-record-tabs" aria-label="Sections on this record">
+    <a href="#pheno-record-overview">Overview</a>
+  </nav>
+
+  <div class="mgdb-loading" id="pheno-record-loading"><span class="mgdb-spinner" aria-hidden="true"></span><span>Loading the full record&hellip;</span></div>
+
+  <div class="mgdb-message mgdb-message-error" id="pheno-record-error" role="alert" hidden>
+    <div>
+      <strong>The rest of this record could not be loaded.</strong>
+      <span>The identity above is correct. Reload to try again, or report it if it keeps happening.</span>
+      <button class="mgdb-button mgdb-button-secondary" id="pheno-record-retry" type="button">Retry</button>
+    </div>
+  </div>
+
+  <div class="mgdb-message mgdb-message-info" id="pheno-record-notice" role="status" hidden></div>
+
+  <section id="pheno-record-overview" aria-labelledby="pheno-record-overview-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pheno-record-overview-title">Overview</h2></div></div>
+    <div id="pheno-record-overview-body"></div>
+  </section>
+
+  <section id="pheno-record-genes" aria-labelledby="pheno-record-genes-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pheno-record-genes-title">Genes</h2></div></div>
+    <div id="pheno-record-genes-body"></div>
+  </section>
+
+  <section id="pheno-record-variations" aria-labelledby="pheno-record-variations-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pheno-record-variations-title">Variations</h2></div></div>
+    <div id="pheno-record-variations-body"></div>
+  </section>
+
+  <section id="pheno-record-stocks" aria-labelledby="pheno-record-stocks-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pheno-record-stocks-title">Stocks</h2></div></div>
+    <div id="pheno-record-stocks-body"></div>
+  </section>
+
+  <section id="pheno-record-images" aria-labelledby="pheno-record-images-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pheno-record-images-title">Images</h2></div></div>
+    <div id="pheno-record-images-body"></div>
+  </section>
+
+  <section id="pheno-record-offsite" aria-labelledby="pheno-record-offsite-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pheno-record-offsite-title">Offsite resources</h2></div></div>
+    <div id="pheno-record-offsite-body"></div>
+  </section>
+
+  <section id="pheno-record-annotations" aria-labelledby="pheno-record-annotations-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pheno-record-annotations-title">Annotations</h2></div></div>
+    <div id="pheno-record-annotations-body"></div>
+  </section>
+
+  <section id="pheno-record-references" aria-labelledby="pheno-record-references-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pheno-record-references-title">References</h2></div></div>
+    <div id="pheno-record-references-body"></div>
+  </section>
+
+  <section id="pheno-record-metrics" aria-labelledby="pheno-record-metrics-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="pheno-record-metrics-title">Metrics</h2></div></div>
+    <div class="mgdb-metric-grid" id="pheno-record-metrics-body"></div>
+    <div class="mgdb-chart-grid mgdb-rec-charts" id="pheno-record-charts">
+      <figure class="mgdb-figure" id="pheno-record-genes-figure" hidden>
+        <h3>Genes with the most variations showing this phenotype</h3>
+        <div class="mgdb-chart" id="pheno-record-genes-chart" role="img" aria-label="Horizontal bar chart of the genes with the most variations showing this phenotype">
+          <div class="mgdb-chart-fallback">Loading the gene breakdown&hellip;</div>
+        </div>
+        <figcaption id="pheno-record-genes-caption"></figcaption>
+      </figure>
+      <figure class="mgdb-figure" id="pheno-record-connections-figure">
+        <h3>Record connections</h3>
+        <div class="mgdb-chart" id="pheno-record-connections-chart" role="img" aria-label="Horizontal bar chart of how many genes, variations, stocks, images and references are attached to this phenotype">
+          <div class="mgdb-chart-fallback">Loading the record connections&hellip;</div>
+        </div>
+        <figcaption id="pheno-record-connections-caption"></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="mgdb-hub-related" id="pheno-record-resources" aria-labelledby="pheno-record-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="pheno-record-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/phenotype">
+          <strong>Phenotype Data Hub</strong>
+          <span>Search every curated phenotype by trait, value, plant part, or growth stage</span>
+        </a>
+        <a href="/data_center/variation">
+          <strong>Variation Data Hub</strong>
+          <span>The alleles and mutations recorded as showing this phenotype</span>
+        </a>
+        <a href="/data_center/stock">
+          <strong>Stock Data Hub</strong>
+          <span>Germplasm carrying this phenotype, and how to request it</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>The genes behind those variations, and their gene models</span>
+        </a>
+        <a href="https\://browser.planteome.org/amigo" target="_blank" rel="noopener">
+          <strong>Planteome</strong>
+          <span>Plant trait and anatomy ontologies behind these terms</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="mgdb-rec-api mgdb-hub-tone-blue" id="pheno-record-api" aria-labelledby="pheno-record-api-title">
+    <div class="mgdb-section-heading"><div><h2 id="pheno-record-api-title">API data access</h2></div></div>
+    <div class="mgdb-rec-api-row">
+      <code id="pheno-record-api-endpoint">GET /api/v1/records/phenotype/$(requested_identifier)</code>
+      <div class="mgdb-rec-api-actions">
+        <a class="mgdb-button mgdb-button-quiet" id="pheno-record-api-link" href="/api/v1/records/phenotype/$(requested_identifier_path)" target="_blank" rel="noopener">Raw JSON <span aria-hidden="true">&nearr;</span></a>
+        <button class="mgdb-button mgdb-button-quiet" id="pheno-copy-json-btn" type="button">Copy JSON</button>
+        <a class="mgdb-button mgdb-button-quiet" href="/api/v1/openapi">API documentation</a>
+      </div>
+    </div>
+    <p class="mgdb-rec-api-note">Every fact, gene, variation, stock, image, external entry, and reference on this page is retrieved in one structured JSON response.</p>
+  </section>
+
+  <dialog class="mgdb-rec-lightbox" id="pheno-record-image-dialog" aria-labelledby="pheno-lightbox-title">
+    <div class="mgdb-rec-lightbox-content">
+      <button class="mgdb-rec-lightbox-close" type="button" aria-label="Close preview">&times;</button>
+      <div class="mgdb-rec-lightbox-image"><img src="" alt=""></div>
+      <div class="mgdb-rec-lightbox-details">
+        <div class="mgdb-rec-lightbox-meta">
+          <span class="mgdb-rec-image-badge"></span>
+          <h3 id="pheno-lightbox-title"></h3>
+        </div>
+        <p class="mgdb-rec-lightbox-caption"></p>
+        <div class="mgdb-rec-lightbox-actions">
+          <a class="mgdb-button mgdb-button-primary" data-role="record" href="#" hidden>View database record <span aria-hidden="true">&rarr;</span></a>
+          <a class="mgdb-button mgdb-button-secondary" data-role="file" href="#" target="_blank" rel="noopener">Open original file <span aria-hidden="true">&nearr;</span></a>
+          <button class="mgdb-button mgdb-button-quiet mgdb-ref-copy" data-role="copy" type="button" data-copy-value="">Copy URL</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+</main>
+)

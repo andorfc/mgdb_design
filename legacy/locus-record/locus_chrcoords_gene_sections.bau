@@ -1,0 +1,44 @@
+$$SYNTAX-LEVEL 2
+*(gene-locus-chrcoords-sections
+
+  @(chr_coords_gene {display: off}
+<!--  LL REMOVED
+  <div class="error">
+    NOTICE: The Locus Lookup tool will be removed from this page in the 
+    June, 2019 update. Locus Lookup will still be available on the
+    <a href="/gbrowse/maize_v1" class="error">v1</a> and 
+    <a href="/gbrowse/maize_v2" class="error">v2</a> genome browsers, and 
+    <a href="/locus_lookup" class="error">from the tools menu</a>.
+    Please <a href="/contact" class="error">contact us</a> if you have concerns 
+    about this change.
+  </div>
+-->  
+  <!--Genome Browser v2 display-->
+  <div id='gb_v2_cc' name='gb_v2_cc' style='display: inline'>
+    <br><br>
+    <table width="95%">
+       <tr height='5px'>
+          <td width='40%' onclick="runLL('IBM2', '$(name)', 'refgen_v2_cc'\);" 
+              class='genomebrowser_tab_focus' align="center">
+            &nbsp;&nbsp;&nbsp;B73 RefGen_v2 sequence&nbsp;&nbsp;&nbsp;
+            <br>
+          </td>
+       </tr>
+    </table>
+      <div width="95%" style='width: 95%; background-color: white'>
+        <div style="position:relative; left:20px;top:5px;  width:95%;">
+          <br>
+          <div align="center"> 
+            <img height='50px' src="/images/locuslookup.jpg" 
+                 onload="runLL('IBM2', '$(name)', 'refgen_v1_cc'\)"></img>
+            <br>
+            <a href='http://www2.genome.arizona.edu/genomes/maize'>
+              Based on AGI's B73 RefGen_v2 sequence</a>
+          </div>
+          <br><br>
+        </div>
+      </div>
+    </div>
+  ) <!-- chr_coords_gene -->
+
+)

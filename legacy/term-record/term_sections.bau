@@ -1,0 +1,163 @@
+$$SYNTAX-LEVEL 2
+*(term-sections
+  @(top {display: off}
+    <p class='data_center_title'>
+      <table>
+       <tr>
+        <td valign='middle'>
+         <span class='data_center_title'>
+          Information about '$(name)'
+        </span>
+       </td>
+       <td valign='middle'></td>
+      </tr>
+     </table>
+    </p>
+  )
+  
+  @(overview {display: off}
+    <p>
+    @(definition_sec {display: off}
+      <br><b>Definition:</b>
+      <div class="small_tab">$(definition)</div>
+    )
+    @(type_sec {display: off}
+      <br>
+      <b>Term type:</b> $(term_type)<br>
+    )
+    @(synonyms_sec {display: off}
+      <br>
+      <b>Synonyms:</b>
+      <div class="small_tab">
+        @(synonyms
+          <b>$(synonym)</b> $(authority)<br>
+        )
+      </div>
+    )
+    @(comments_sec {display: off}
+      <br>
+      <b>Additional information:</b>
+      <div class="small_tab">$(comments_list)</div>
+    )
+    @(references_sec {display: off}
+      <br><b>References: </b>
+      <div class="small_tab">
+        @(references
+         <a href="/data_center/reference?id=$(id)">$(title)</a>
+         <i>$(name)</i> $(abstract)<br>
+        )
+      </div>
+    )
+    @(related_terms_sec {display: off}
+      <br><b>Related Terms:</b> <br>
+      @(related_terms
+        &nbsp;<a href="/data_center/term?id=$(related_id)"> $(name)</a><br>
+      )
+    )
+    @(offsite_resources_sec {display: off}
+      <br><b> Offsite Resources: </b> <br>
+      <div class="small_tab">
+      @(offsite_resources
+        <a href="/person?id=$(id)">$(name)</a> -> 
+        <a href="$(url_prefix)$(key)">$(key)</a><br>
+      )
+      </div>
+    )
+  
+    @(image_sec {display: off}
+       <br><b>Related Images:</b> <br>
+       Click image for higher resolution.
+       @(images
+       <br> <a rel="shadowbox" href='$(img_url)/db_images/Term/$(url)'>
+        <img style='border-style: none' src='$(img_url)/db_images/Term/$(downsized)' onclick='javascript:Shadowbox.setup(\);'>
+       </a><br>$(caption)<br>
+       )
+    )
+    @(no_overview {display: off}
+      <br><b>There is no overview data to display for this record.</b>
+    )
+    </p>
+  )
+    
+  @(annotations {display: off}
+    @(curation {display: off}
+    <!-- unused -->
+      <table cellpadding=0 cellspacing=0 width="90%">
+        <tr>
+          <td><img src="/images/lite_green_lt.gif"></td>
+          <td class=lite_green_background width="100%"></td>
+          <td><img src="/images/lite_green_rt.gif"></td>
+        </tr>
+        <tr>
+          <td class=lite_green_background></td>
+          <td class=lite_green_background style="padding:2px">
+            <p>
+              <b>Add annotation to this record</b>
+              <form action="javascript:popUpAnnotation('curationform', '/curation/FreeText/edit'\);" method="post"
+                    id="curationform">
+                <input type="hidden" id="table_name" value="phenotype">
+                <input type="hidden" id="mgdb_id" value="$(id)">
+                <input type="hidden" id="rec_name" value="$(rec_name)">
+                <input type="hidden" id="auto_num" name="auto_num" value="">
+                &nbsp;<a onclick="curationform.submit(\)"
+                         href="#">Add free text annotation</a>
+              </form>
+            </p>
+          </td>
+          <td class=lite_green_background></td>
+        </tr>
+        <tr>
+          <td><img src="/images/lite_green_lb.gif"></td>
+          <td class=lite_green_background width="100%"></td>
+          <td><img src="/images/lite_green_rb.gif"></td>
+        </tr>
+      </table>
+      <br>
+    )
+
+    @(no-user {display: off}
+      <p><b>No user annotations</b></p>
+      <br>
+    )
+    @(annotation-user {display: off}
+      <p><b>User Annotations:</b></p>
+      @(annotation-user-list
+        <form name="ft_edit_$(auto_num)" id="ft_edit_$(auto_num)" method="post"
+              target="annotation">
+          <input type="hidden" name="auto_num" id="auto_num" value="$(auto_num)">
+          <input type="hidden" name="mgdb_id" id="mgdb_id" value="$(mgdb_id)">
+          <input type="hidden" name="table_name" id="table_name" value="phenotype">
+          From:
+          <b><a href="/person/$(person_id)">$(first_name) $(last_name)</a></b>
+          (<i>$(mod_date)</i>\)
+          <br>
+          <span style="margin-left: 10px;">$(memo)</span>
+        </form>
+      )
+      <br>
+    )
+    @(annotation-user-curator {display: off}
+      <p><b>User Annotations: (curator's view\)</b></p>
+      @(annotation-user-list-ex
+        <form name="ft_edit_$(auto_num)" id="ft_edit_$(auto_num)" method="post"
+              target="annotation">
+          <input type="hidden" name="auto_num" id="auto_num" value="$(auto_num)">
+          <input type="hidden" name="mgdb_id" id="mgdb_id" value="$(mgdb_id)">
+          <input type="hidden" name="table_name" id="table_name" value="phenotype">
+          From:
+          <b><a href="/person/$(person_id)">$(first_name) $(last_name)</a></b>
+          (<i>$(mod_date)</i>\)
+          <br>
+          <span style="margin-left: 10px;">$(memo)</span>
+          <br>
+          <i>
+            <a href="#"
+               onclick="popUpAnnotation('ft_edit_$(auto_num)', '/curation/FreeText/edit'\);">Edit this annotation</a>
+          </i>
+        </form>
+      )
+      <br>
+    )
+  )
+
+)

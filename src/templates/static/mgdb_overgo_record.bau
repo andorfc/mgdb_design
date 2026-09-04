@@ -1,0 +1,134 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-overgo-record
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:title" content="$(marker_name) &mdash; MaizeGDB overgo record">
+<meta property="og:description" content="$(marker_summary)">
+
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-marker-record-page mgdb-overgo-record-page" id="marker-record-top" data-requested-id="$(requested_identifier)" data-canonical-id="$(marker_id)">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/overgo">Overgo Data Center</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(marker_name)</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-hero" aria-labelledby="marker-record-title">
+    <div class="mgdb-hero-body">
+      <h1 id="marker-record-title">$(marker_name)</h1>
+      <p class="mgdb-rec-synonyms" id="marker-record-synonyms" hidden></p>
+      <dl class="mgdb-record-facts mgdb-rec-headfacts" id="marker-record-facts">$(identity_facts)</dl>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs mgdb-rec-tabs" id="marker-record-tabs" aria-label="Sections on this record">
+    <a href="#marker-record-overview">Overview</a>
+  </nav>
+
+  <div class="mgdb-loading" id="marker-record-loading"><span class="mgdb-spinner" aria-hidden="true"></span><span>Loading the full record&hellip;</span></div>
+
+  <div class="mgdb-message mgdb-message-error" id="marker-record-error" role="alert" hidden>
+    <div>
+      <strong>The rest of this record could not be loaded.</strong>
+      <span>The identity above is correct. Reload to try again, or report it if it keeps happening.</span>
+      <button class="mgdb-button mgdb-button-secondary" id="marker-record-retry" type="button">Retry</button>
+    </div>
+  </div>
+
+  <div class="mgdb-message mgdb-message-info" id="marker-record-notice" role="status" hidden></div>
+
+  <section id="marker-record-overview" aria-labelledby="marker-record-overview-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="marker-record-overview-title">Overview</h2></div></div>
+    <div id="marker-record-overview-body"></div>
+  </section>
+
+  <section id="marker-record-loci" aria-labelledby="marker-record-loci-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="marker-record-loci-title">Detected loci</h2></div></div>
+    <div id="marker-record-loci-body"></div>
+  </section>
+
+  <section id="marker-record-positions" aria-labelledby="marker-record-positions-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="marker-record-positions-title">Map positions</h2></div></div>
+    <div id="marker-record-positions-body"></div>
+  </section>
+
+  <section id="marker-record-related" aria-labelledby="marker-record-related-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="marker-record-related-title">Related records</h2></div></div>
+    <div id="marker-record-related-body"></div>
+  </section>
+
+  <section id="marker-record-offsite" aria-labelledby="marker-record-offsite-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="marker-record-offsite-title">Offsite resources</h2></div></div>
+    <div id="marker-record-offsite-body"></div>
+  </section>
+
+  <section id="marker-record-annotations" aria-labelledby="marker-record-annotations-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="marker-record-annotations-title">Annotations</h2></div></div>
+    <div id="marker-record-annotations-body"></div>
+  </section>
+
+  <section id="marker-record-references" aria-labelledby="marker-record-references-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="marker-record-references-title">References</h2></div></div>
+    <div id="marker-record-references-body"></div>
+  </section>
+
+  <section id="marker-record-metrics" aria-labelledby="marker-record-metrics-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="marker-record-metrics-title">Metrics</h2></div></div>
+    <div class="mgdb-metric-grid" id="marker-record-metrics-body"></div>
+    <div class="mgdb-chart-grid mgdb-rec-charts" id="marker-record-charts">
+      <figure class="mgdb-figure" id="marker-record-chromosome-figure" hidden>
+        <h3>Map positions by chromosome</h3>
+        <div class="mgdb-chart" id="marker-record-chromosome-chart" role="img" aria-label="Bar chart of how many curated map positions this marker has on each chromosome">
+          <div class="mgdb-chart-fallback">Loading the chromosome breakdown&hellip;</div>
+        </div>
+        <figcaption id="marker-record-chromosome-caption"></figcaption>
+      </figure>
+      <figure class="mgdb-figure" id="marker-record-connections-figure">
+        <h3>Record connections</h3>
+        <div class="mgdb-chart" id="marker-record-connections-chart" role="img" aria-label="Horizontal bar chart of how many loci, map positions, related records and references are attached to this marker">
+          <div class="mgdb-chart-fallback">Loading the record connections&hellip;</div>
+        </div>
+        <figcaption id="marker-record-connections-caption"></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="mgdb-hub-related" id="marker-record-resources" aria-labelledby="marker-record-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="marker-record-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/overgo">
+          <strong>Overgo Data Center</strong>
+          <span>Search the overgo probe collection by name, synonym, or the unigene it came from</span>
+        </a>
+        <a href="/data_center/marker">
+          <strong>Molecular Marker Data Hub</strong>
+          <span>Every marker and probe MaizeGDB holds, of which overgos are one kind</span>
+        </a>
+        <a href="/data_center/map">
+          <strong>Map Data Hub</strong>
+          <span>The genetic maps this marker is placed on</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>The loci this marker detects, and their gene models</span>
+        </a>
+        <a href="/downloads">
+          <strong>Downloads</strong>
+          <span>Marker and mapping datasets, including the overgo collection</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="mgdb-rec-api mgdb-hub-tone-blue" id="marker-record-api" aria-labelledby="marker-record-api-title">
+    <div class="mgdb-section-heading"><div><h2 id="marker-record-api-title">API data access</h2></div></div>
+    <div class="mgdb-rec-api-row">
+      <code id="marker-record-api-endpoint">GET /api/v1/records/marker/$(requested_identifier)</code>
+      <div class="mgdb-rec-api-actions">
+        <a class="mgdb-button mgdb-button-quiet" id="marker-record-api-link" href="/api/v1/records/marker/$(requested_identifier_path)" target="_blank" rel="noopener">Raw JSON <span aria-hidden="true">&nearr;</span></a>
+        <button class="mgdb-button mgdb-button-quiet" id="marker-copy-json-btn" type="button">Copy JSON</button>
+        <a class="mgdb-button mgdb-button-quiet" href="/api/v1/openapi">API documentation</a>
+      </div>
+    </div>
+    <p class="mgdb-rec-api-note">An overgo is a probe in the MaizeGDB schema, so this record is served by the marker resource rather than one of its own. Every fact, detected locus, map position, related record, external entry, and reference on this page is retrieved in one structured JSON response.</p>
+  </section>
+</main>
+)

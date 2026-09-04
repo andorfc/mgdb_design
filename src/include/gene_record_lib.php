@@ -431,4 +431,122 @@ function geneIdentity($DBConn, $resolved) {
     'replacement' => ''
   );
 }//geneIdentity
+
+/* What to offer a reader whose identifier did not resolve.
+
+   Two arms, both indexed:
+
+     loci    the term read as a classical gene symbol, matched against
+             mgdb.locus.name in the four spellings a reader types. idx_locus_name
+             is a plain btree on the raw column, so lower(name) = ? seq-scans
+             790K rows at 357 ms where this costs 4 ms.
+     models  the term read as a gene model accession, matched against
+             gene_model_i5, which is on lower(gene_name).
+
+   Deliberately not fuzzy. A contains or prefix match here cost 1.5-2.6 s: the
+   database collation is en_US.UTF-8, so a btree cannot serve LIKE at all
+   (AD-030), and chado.gene_model is a 1.88M-row materialized view. The hub
+   search at /gene_center/gene is built for that case and already tiered, so
+   the 404 links to it rather than reimplementing it slowly.
+
+   Returns array('loci' => ..., 'models' => ...), each a list. */
+function geneSuggestions($DBConn, $term, $limit = 8) {
+  $out = array('loci' => array(), 'models' => array());
+  $term = trim((string) $term);
+  if ($term === '' || strlen($term) > 200) {
+    return $out;
+  }
+
+  $spellings = array_values(array_unique(array(
+    $term, strtolower($term), ucfirst(strtolower($term)), strtoupper($term)
+  )));
+  $names = array();
+  $params = array();
+  foreach ($spellings as $n => $spelling) {
+    $names[] = ':n' . $n;
+    $params['n' . $n] = $spelling;
+  }
+  $params['lim'] = (int) $limit;
+
+  $sth = make_query($DBConn, "
+    SELECT l.id, l.name, l.full_name
+    FROM mgdb.locus l
+      JOIN mgdb.id_num i ON i.id = l.id AND i.curation_lvl = 0
+    WHERE l.name IN (" . implode(',', $names) . ")
+    ORDER BY lower(l.name)
+    LIMIT :lim", 1, $params);
+  $locus_ids = array();
+  while ($row = retrieve_row($sth)) {
+    $locus_ids[] = (int) $row['id'];
+    $out['loci'][] = array(
+      'id' => (int) $row['id'],
+      'name' => trim((string) $row['name']),
+      'full_name' => trim((string) $row['full_name']),
+      'models' => array()
+    );
+  }
+
+  /* The gene models of a locus that matched. gene_model_i1 is on locus_id, so
+     this is 0.23 ms; reaching the same rows through locus_name would be a
+     270 ms scan of the matview. */
+  if (count($locus_ids) > 0) {
+    $ids = array();
+    $mparams = array();
+    foreach ($locus_ids as $n => $id) {
+      $ids[] = ':l' . $n;
+      $mparams['l' . $n] = $id;
+    }
+    $sth = make_query($DBConn, "
+      SELECT locus_id, gene_name, assembly_version, version
+      FROM chado.gene_model
+      WHERE locus_id IN (" . implode(',', $ids) . ") AND analysis_is_current = 'yes'
+      ORDER BY assembly_version DESC, gene_name", 1, $mparams);
+    $by_locus = array();
+    while ($row = retrieve_row($sth)) {
+      $lid = (int) $row['locus_id'];
+      if (!isset($by_locus[$lid])) { $by_locus[$lid] = array(); }
+      if (count($by_locus[$lid]) >= 6) { continue; }
+      $by_locus[$lid][] = array(
+        'name' => trim((string) $row['gene_name']),
+        'assembly' => trim((string) $row['assembly_version']),
+        'annotation' => trim((string) $row['version'])
+      );
+    }
+    foreach ($out['loci'] as $index => $locus) {
+      if (isset($by_locus[$locus['id']])) {
+        $out['loci'][$index]['models'] = $by_locus[$locus['id']];
+      }
+    }
+  }
+
+  /* The term as a gene model accession, including the transcript and
+     translation forms of it. */
+  $stripped = preg_replace('/_[TP]\d+$/i', '', $term);
+  $model_forms = array_values(array_unique(array(strtolower($term), strtolower($stripped))));
+  $forms = array();
+  $fparams = array();
+  foreach ($model_forms as $n => $form) {
+    $forms[] = ':m' . $n;
+    $fparams['m' . $n] = $form;
+  }
+  $fparams['lim'] = (int) $limit;
+  $sth = make_query($DBConn, "
+    SELECT gene_name, assembly_version, version, chr, locus_name
+    FROM chado.gene_model
+    WHERE lower(gene_name) IN (" . implode(',', $forms) . ")
+    ORDER BY assembly_version DESC
+    LIMIT :lim", 1, $fparams);
+  while ($row = retrieve_row($sth)) {
+    $out['models'][] = array(
+      'name' => trim((string) $row['gene_name']),
+      'assembly' => trim((string) $row['assembly_version']),
+      'annotation' => trim((string) $row['version']),
+      'chr' => trim((string) $row['chr']),
+      'locus' => trim((string) $row['locus_name'])
+    );
+  }
+
+  return $out;
+}//geneSuggestions
+
 ?>

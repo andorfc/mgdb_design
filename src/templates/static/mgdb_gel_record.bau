@@ -1,0 +1,122 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-gel-record
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:title" content="$(record_name) &mdash; MaizeGDB gel pattern">
+<meta property="og:description" content="$(record_summary)">
+
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-gel-record-page" id="gel-record-top" data-record-id="$(record_id)" data-requested-id="$(requested_identifier)">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/marker">Marker Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(record_name)</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-hero" aria-labelledby="gel-record-title">
+    <div class="mgdb-hero-body">
+      <h1 id="gel-record-title">$(record_name)</h1>
+      <p class="mgdb-rec-synonyms" id="gel-record-synonyms" hidden></p>
+      <dl class="mgdb-record-facts mgdb-rec-headfacts" id="gel-record-facts">$(identity_facts)</dl>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs mgdb-rec-tabs" id="gel-record-tabs" aria-label="Sections on this record">
+    <a href="#gel-record-overview">Overview</a>
+  </nav>
+
+  <div class="mgdb-loading" id="gel-record-loading"><span class="mgdb-spinner" aria-hidden="true"></span><span>Loading the full record&hellip;</span></div>
+
+  <div class="mgdb-message mgdb-message-error" id="gel-record-error" role="alert" hidden>
+    <div>
+      <strong>The rest of this record could not be loaded.</strong>
+      <span>The identity above is correct. Reload to try again, or report it if it keeps happening.</span>
+      <button class="mgdb-button mgdb-button-secondary" id="gel-record-retry" type="button">Retry</button>
+    </div>
+  </div>
+
+  <div class="mgdb-message mgdb-message-info" id="gel-record-notice" role="status" hidden></div>
+
+  <section id="gel-record-overview" aria-labelledby="gel-record-overview-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="gel-record-overview-title">Overview</h2></div></div>
+    <div id="gel-record-overview-body"></div>
+  </section>
+
+  <section id="gel-record-bands" aria-labelledby="gel-record-bands-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="gel-record-bands-title">Bands</h2></div></div>
+    <div id="gel-record-bands-body"></div>
+  </section>
+
+  <section id="gel-record-polymorphisms" aria-labelledby="gel-record-polymorphisms-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="gel-record-polymorphisms-title">DNA polymorphisms</h2></div></div>
+    <div id="gel-record-polymorphisms-body"></div>
+  </section>
+
+  <section id="gel-record-images" aria-labelledby="gel-record-images-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="gel-record-images-title">Images</h2></div></div>
+    <div id="gel-record-images-body"></div>
+  </section>
+
+  <section id="gel-record-references" aria-labelledby="gel-record-references-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="gel-record-references-title">References</h2></div></div>
+    <div id="gel-record-references-body"></div>
+  </section>
+
+  <section class="mgdb-hub-related" id="gel-record-resources" aria-labelledby="gel-record-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="gel-record-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/marker">
+          <strong>Marker Data Hub</strong>
+          <span>The probe this pattern was run with, and the rest of the collection</span>
+        </a>
+        <a href="/data_center/variation">
+          <strong>Variations &amp; Alleles Data Hub</strong>
+          <span>The DNA polymorphisms called from these bands</span>
+        </a>
+        <a href="/data_center/stock">
+          <strong>Stock Data Hub</strong>
+          <span>The line whose DNA was run on this gel</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>Loci list their gel patterns in the Genetic information section</span>
+        </a>
+        <a href="/data_center/image">
+          <strong>Image Data Hub</strong>
+          <span>The gel photographs, alongside the rest of the image collection</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="mgdb-rec-api mgdb-hub-tone-blue" id="gel-record-api" aria-labelledby="gel-record-api-title">
+    <div class="mgdb-section-heading"><div><h2 id="gel-record-api-title">API data access</h2></div></div>
+    <div class="mgdb-rec-api-row">
+      <code id="gel-record-api-endpoint">GET /api/v1/records/gel/$(requested_identifier)</code>
+      <div class="mgdb-rec-api-actions">
+        <a class="mgdb-button mgdb-button-quiet" id="gel-record-api-link" href="/api/v1/records/gel/$(requested_identifier_path)" target="_blank" rel="noopener">Raw JSON <span aria-hidden="true">&nearr;</span></a>
+        <button class="mgdb-button mgdb-button-quiet" id="gel-copy-json-btn" type="button">Copy JSON</button>
+        <a class="mgdb-button mgdb-button-quiet" href="/api/v1/openapi">API documentation</a>
+      </div>
+    </div>
+    <p class="mgdb-rec-api-note">Every fact, band, polymorphism, and image on this page is retrieved in one structured JSON response.</p>
+  </section>
+
+  <dialog class="mgdb-rec-lightbox" id="gel-image-dialog" aria-labelledby="gel-lightbox-title">
+    <div class="mgdb-rec-lightbox-content">
+      <button class="mgdb-rec-lightbox-close" type="button" aria-label="Close preview">&times;</button>
+      <div class="mgdb-rec-lightbox-image"><img src="" alt=""></div>
+      <div class="mgdb-rec-lightbox-details">
+        <div class="mgdb-rec-lightbox-meta">
+          <span class="mgdb-rec-image-badge"></span>
+          <h3 id="gel-lightbox-title"></h3>
+        </div>
+        <p class="mgdb-rec-lightbox-caption"></p>
+        <div class="mgdb-rec-lightbox-actions">
+          <a class="mgdb-button mgdb-button-primary" data-role="record" href="#" hidden>View database record <span aria-hidden="true">&rarr;</span></a>
+          <a class="mgdb-button mgdb-button-secondary" data-role="file" href="#" target="_blank" rel="noopener">Open original file <span aria-hidden="true">&nearr;</span></a>
+          <button class="mgdb-button mgdb-button-quiet mgdb-ref-copy" data-role="copy" type="button" data-copy-value="">Copy URL</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+</main>
+)

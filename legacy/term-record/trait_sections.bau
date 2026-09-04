@@ -1,0 +1,243 @@
+$$SYNTAX-LEVEL 2
+*(trait-sections 
+  @(top {display: off}
+    <script language="javascript">
+      recordAccess('trait', '$(trait_name)'\);
+    </script>
+
+    <p class='data_center_title'>
+     <span class='data_center_title'>
+        $(trait_name) (trait\)
+     </span>
+     @(syn {display: off}
+      <br><br>
+      This trait is also known by the following names: 
+      @(syn_sec
+        <br>&nbsp;&nbsp;<b>$(synonyms)</b>
+      )
+     )      
+    </p>
+
+    @(references {display:off}
+      <br>
+      @(show_ref 
+      <p>
+       @(print {display:off}
+           <a name="show_ref"></a>
+           <a onclick="javascript:toggle_references('hide'\);" href="#" title="Hide these papers!">
+             <img src="/images/collapse.png" border=0 alt="Hide these papers!">
+           </a>
+           <b>Related Papers:</b> (click the arrow to the left to hide these\)<br>
+        )
+       <div id="show_ref" name="show_ref" style="display: none">
+
+            <a name="show_ref"></a>
+            <a onclick="javascript:toggle_references('hide'\);" href="#" title="Hide these papers!">
+              <img src="/images/collapse.png" border=0 alt="Hide these papers!">
+            </a> 
+            <b>Related Papers:</b> (click the arrow to the left to hide these\)<br>
+
+          @(fill_ref
+           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<i>$(cont_name)</i>\) 
+           <a href="/data_center/reference?id=$(ref_id)" title="$(ref_title)">$(ref_name)</a><br>
+          )
+
+       </div>
+      )
+      @(hide_ref
+       <p>
+        @(hide_print {display:off}
+         <a onclick="javascript:toggle_references('show'\);" href="#" title="Show related references">
+           <img alt="Show related references" src="/images/expand.png" border=0>
+         </a>
+          This trait has <b>$(match_count)</b> references that describe it.  
+          Click the arrow to the left to view these references.
+        )
+        <div id="hide_ref" name="hide_ref" style="display: $(display)">
+
+         <a onclick="javascript:toggle_references('show'\);" href="#" title="Show related references">
+           <img alt="Show related references" src="/images/expand.png" border=0>
+         </a>
+          This trait has <b>$(match_count)</b> references that describe it.  
+          Click the arrow to the left to view these references.
+
+        </div>
+       </p>
+      )
+    )
+  )
+  
+  @(overview {display: off}
+    <p>
+    @(summary_sec {display: off}
+      <br><b> Summary: </b> $(summary)<br>
+    )
+    @(phenotype_sec {display: off}
+      <br><b> Phenotypes: </b><br>
+      @(phenotypes
+       &nbsp;&nbsp;&nbsp;
+       <a href="/data_center/phenotype?id=$(id)">$(name)</a><br>
+      )      
+    )
+    
+    @(additional_comments {display: off}
+        <b>
+        <br>
+         <span title="Comments are additional notes relevant to this trait that might be of interest to you.">
+           Additional Comments:
+         </span>
+       </b>
+       <br>
+       @(addl_comments
+         $(trait_comments)<br>
+       )
+    )
+     <!-- jCarousel -->
+    @(img_carousel {display: off}
+     <br>
+     <b>Related Images: </b><br>
+     <div id="gen_images">
+       <iframe id="carousel" name="carousel" marginheight='0' marginwidth='0' width='110%' height='115' frameborder='0' scrolling='no' src="../../tools/car/examples/trait_carousel.php?id=$(id)">
+       
+       </iframe> 
+       <table cellpadding='15' cellspacing='0' width='100%'>
+          <tr style='background-color: #D3DEBC;' valign='top'>
+            <td width='10%' valign='top'><b>Image</b></td>
+            <td><b>Caption</b></td>
+          </tr>
+          @(trait_img_tbl
+            <tr style='background-color:$(bgcolor)' valign='top' width='100%'>
+             <td valign='top'><a class="shadow" href="#" onclick="javascript:open_sb('$(img_url)/db_images/SpeciesGenome/$(url)', 'image $(img_count)'\);" rel="shadowbox">image $(img_count)</a>:</td>
+             <td valign='top' width='60%'>$(caption)<br><br></td>
+            </tr>
+           )
+        </table>
+        <br>
+      </div>
+     )
+     @(trait_vals_sec {display: off}
+      <!-- unused as of 05/14/20 -->
+      <p id="trait_vals">
+       <div id="datacenter_lite_green_background">
+        <a href="#!" onclick="javascript:trait_val_search('$(name)', 'trait_val_results'\)">
+         <img id="trait_val_icon" src="/images/expand.jpg"/> Browse trait values for $(name)
+        </a>
+        <div id="trait_val_results"></div>
+        </div>
+      </p>
+    )
+    @(download_vals {display: off}
+      <br>
+      <a href="javascript:doTraitDownload('$(stock_name)','$(box_stock)','$(box_name)','$(trait_name)'\)">Download 
+         all values for '$(trait_name)' to a text file</a> (May take several seconds
+         if there are many values.\)
+      <div name="download_status_div" id="download_status_div"></div>
+      <iframe name="download_iframe" id="download_iframe" width=0 height=0 style="border:none"></iframe>
+      <a href="https://download.maizegdb.org/SNPs_and_Maps/Traits/">Download <b>all</b> trait values</a> 
+      for IBM and NAM lines.<br>
+    )
+    
+    @(no_overview {display: off}
+      <br><b>There is no overview information for this trait.</b>
+    )
+    </p>
+  )
+  
+  @(annotations {display: off}
+    @(curation {display: off}
+    <!-- UNUSED -->
+      <table cellpadding=0 cellspacing=0 width="90%">
+        <tr>
+          <td><img src="/images/lite_green_lt.gif"></td>
+          <td class=lite_green_background width="100%"></td>
+          <td><img src="/images/lite_green_rt.gif"></td>
+        </tr>
+        <tr>
+          <td class=lite_green_background></td>
+          <td class=lite_green_background style="padding:2px">
+            <p>
+              <b>Add annotation to this record</b>
+              <form action="javascript:popUpAnnotation('curationform', '/curation/FreeText/edit'\);" method="post" 
+                    id="curationform">
+                <input type="hidden" id="table_name" value="phenotype">
+                <input type="hidden" id="mgdb_id" value="$(id)">
+                <input type="hidden" id="rec_name" value="$(rec_name)">
+                <input type="hidden" id="auto_num" name="auto_num" value="">
+                &nbsp;<a onclick="curationform.submit(\)"
+                   href="#" >Add free text annotation</a>
+              </form>
+            </p>
+          </td>
+          <td class=lite_green_background></td>
+        </tr>
+        <tr>
+          <td><img src="/images/lite_green_lb.gif"></td>
+          <td class=lite_green_background width="100%"></td>
+          <td><img src="/images/lite_green_rb.gif"></td>
+        </tr>
+      </table>
+      <br>
+    )
+    
+    @(no-user {display: off}
+      <p><b>No user annotations</b></p>
+      <br>
+    )
+    @(annotation-user {display: off}
+      <p><b>User Annotations:</b></p>
+      @(annotation-user-list
+        <form name="ft_edit_$(auto_num)" id="ft_edit_$(auto_num)" method="post" 
+              target="annotation">
+          <input type="hidden" name="auto_num" id="auto_num" value="$(auto_num)">
+          <input type="hidden" name="mgdb_id" id="mgdb_id" value="$(mgdb_id)">
+          <input type="hidden" name="table_name" id="table_name" value="phenotype">
+          From:
+          <b><a href="/person/$(person_id)">$(first_name) $(last_name)</a></b>
+          (<i>$(mod_date)</i>\)
+          <br>
+          <span style="margin-left: 10px;">$(memo)</span>
+        </form>
+      )
+      <br>
+    )
+    @(annotation-user-curator {display: off}
+      <p><b>User Annotations: (curator's view\)</b></p>
+      @(annotation-user-list-ex
+        <form name="ft_edit_$(auto_num)" id="ft_edit_$(auto_num)" method="post" 
+              target="annotation">
+          <input type="hidden" name="auto_num" id="auto_num" value="$(auto_num)">
+          <input type="hidden" name="mgdb_id" id="mgdb_id" value="$(mgdb_id)">
+          <input type="hidden" name="table_name" id="table_name" value="phenotype">
+          From:
+          <b><a href="/person/$(person_id)">$(first_name) $(last_name)</a></b>
+          (<i>$(mod_date)</i>\)
+          <br> 
+          <span style="margin-left: 10px;">$(memo)</span>
+          <br>
+          <i><a href="#" 
+                onclick="popUpAnnotation('ft_edit_$(auto_num)', '/curation/FreeText/edit'\);">Edit this annotation</a>
+          </i>
+        </form>
+      )
+      <br>
+    )
+    
+    *(lambda {load: ../templates/partials/ontology_terms.bau})
+    
+  )
+
+  @(qtl {display: off}
+   <br>
+   @(qtl_analysis_sec
+    <b>QTL Trait Analyses</b>:<br>
+    @(qtl_analysis
+     <a href="/data_center/trait_analysis?id=$(analysis_id)">$(analysis_name)</a>
+     (from QTL experiment <a href="/data_center/qtl?id=$(qtl_exp_id)">$(qtl_exp_name)</a>\)<br>
+    )    
+   )
+   @(no_qtl {display: off | bind: qtl_analysis_sec}
+    <b>There are no QTL Analyses for this trait.</b>
+   )
+  )  
+   
+)

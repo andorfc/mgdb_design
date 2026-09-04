@@ -1,354 +1,27 @@
 /* ==========================================================================
-   Gene record page — page-specific styles
+   Gene record page — /gene_center/gene/{id}
    --------------------------------------------------------------------------
-   Scoped under .mgdb-gene-record-page and composed from the tokens in
-   mgdb-modern.css. The record header is the shared .mgdb-hero-record
-   component; everything here is the body of the record.
+   On the Data Hub shell and the shared record shell: css/mgdb-hub.css gives
+   the ground and the section cards, css/mgdb-record.css the record furniture
+   -- header, tabs, collections, tables, notes, API card.
+
+   What is left here is the three things that are this page's own:
+
+     the protein domain track   domains drawn against the protein, to scale.
+                                Drawn only when the protein's length is known;
+                                without it the domains cannot be placed and the
+                                block falls back to a table.
+     the pan-gene presence strip  one square per assembly, grouped by Zea
+                                species. Whether a gene is confined to
+                                cultivated maize or is present across the wild
+                                relatives is a biological statement, and it is
+                                the thing MaizeGDB holds that nothing else does.
+     the eFP viewer             one atlas at a time, large enough to read.
+
+   Everything else this file carried -- page layout, identity block, tabs,
+   availability chips, facts, blocks, chips, the provenance footnote -- is the
+   shell's now and was deleted rather than duplicated.
    ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   Identity
-   -------------------------------------------------------------------------- */
-
-.mgdb-gene-record-page .mgdb-hero-record h1 {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-3);
-  align-items: center;
-}
-
-.mgdb-gene-record-page .gene-record-title {
-  font-family: var(--mgdb-font-mono);
-  font-size: 0.92em;
-  letter-spacing: -0.01em;
-}
-
-/* The full name is a peer of the symbol, not a parenthetical. On the page this
-   replaces, "liguleless1" appeared only in brackets after the accession. */
-.mgdb-gene-record-page .gene-record-fullname {
-  margin-top: var(--mgdb-space-1);
-  color: var(--mgdb-ink-soft);
-  font-size: var(--mgdb-text-lg);
-  font-style: italic;
-}
-
-.mgdb-gene-record-page .gene-record-accession {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  align-items: center;
-  margin-top: var(--mgdb-space-2);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-}
-
-.mgdb-gene-record-page .gene-record-accession code {
-  padding: 2px 6px;
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface-sunken);
-  font-family: var(--mgdb-font-mono);
-  font-size: var(--mgdb-text-sm);
-}
-
-/* The one-line answer to "what does this gene do". */
-.mgdb-gene-record-page .gene-record-function {
-  max-width: var(--mgdb-measure);
-  margin-top: var(--mgdb-space-3);
-  color: var(--mgdb-ink);
-  font-size: var(--mgdb-text-lg);
-  line-height: var(--mgdb-leading-snug);
-}
-
-/* The shared .mgdb-record-facts component leaves <small> inline, which runs the
-   qualifier straight into the value: "Transcripts 1canonical Zm00001eb067740_T001". */
-.mgdb-gene-record-page .mgdb-record-facts dd small {
-  display: block;
-  margin-top: 2px;
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-  line-height: var(--mgdb-leading-snug);
-}
-
-.mgdb-gene-record-page .gene-record-synonyms {
-  max-width: var(--mgdb-measure);
-  margin-top: var(--mgdb-space-2);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-}
-
-.mgdb-gene-record-page .gene-record-synonyms em { font-style: italic; }
-
-/* --------------------------------------------------------------------------
-   Availability chips
-
-   What this record actually contains, before any clicking. A count of zero is
-   shown greyed rather than hidden, so an empty section is discoverable without
-   opening it — on the legacy page you found out by expanding.
-   -------------------------------------------------------------------------- */
-
-.mgdb-gene-record-page .gene-record-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  margin-top: var(--mgdb-space-5);
-}
-
-.mgdb-gene-record-page .gene-record-chip {
-  display: inline-flex;
-  gap: var(--mgdb-space-2);
-  align-items: baseline;
-  padding: var(--mgdb-space-2) var(--mgdb-space-3);
-  border: 1px solid var(--mgdb-line);
-  border-radius: 999px;
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink) !important;
-  font-size: var(--mgdb-text-sm);
-  text-decoration: none;
-}
-
-.mgdb-gene-record-page a.gene-record-chip:hover {
-  border-color: var(--mgdb-green-dark);
-  background: var(--mgdb-green-soft);
-}
-
-.mgdb-gene-record-page .gene-record-chip strong {
-  color: var(--mgdb-green-dark);
-  font-variant-numeric: tabular-nums;
-}
-
-.mgdb-gene-record-page .gene-record-chip.is-zero {
-  border-style: dashed;
-  background: transparent;
-  color: var(--mgdb-muted) !important;
-}
-
-/* --------------------------------------------------------------------------
-   "What am I looking at?"
-
-   The single most confusing thing about this page is that a gene model and a
-   classical gene are the same gene under two naming systems. The legacy page
-   presented them as two tabs and never explained the difference.
-   -------------------------------------------------------------------------- */
-
-.mgdb-gene-record-page .gene-record-primer {
-  margin-top: var(--mgdb-space-4);
-  padding: var(--mgdb-space-3) var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line-soft);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface-alt);
-}
-
-.mgdb-gene-record-page .gene-record-primer > summary {
-  color: var(--mgdb-green-dark);
-  cursor: pointer;
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-}
-
-.mgdb-gene-record-page .gene-record-primer > div {
-  max-width: var(--mgdb-measure);
-  margin-top: var(--mgdb-space-3);
-}
-
-.mgdb-gene-record-page .gene-record-primer p + p { margin-top: var(--mgdb-space-3); }
-
-.mgdb-gene-record-page .gene-record-primer code {
-  font-family: var(--mgdb-font-mono);
-  font-size: 0.92em;
-}
-
-/* --------------------------------------------------------------------------
-   Section tabs — sticky, so a long record keeps its section list reachable
-   -------------------------------------------------------------------------- */
-
-.mgdb-gene-record-page .mgdb-section-tabs {
-  position: sticky;
-  z-index: 20;
-  top: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  margin-top: var(--mgdb-space-5);
-  padding: var(--mgdb-space-2) 0;
-  background: var(--mgdb-surface);
-}
-
-.mgdb-gene-record-page .mgdb-section-tabs a {
-  display: inline-flex;
-  min-height: 40px;
-  gap: var(--mgdb-space-2);
-  align-items: center;
-  padding: 0 var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink) !important;
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.mgdb-gene-record-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
-
-.mgdb-gene-record-page .mgdb-section-tabs a.is-current {
-  border-color: var(--mgdb-green-dark);
-  background: var(--mgdb-green-dark);
-  color: #fff !important;
-  box-shadow: inset 3px 0 0 var(--mgdb-gold);
-}
-
-.mgdb-gene-record-page .mgdb-section-tabs .gene-record-tab-count {
-  padding: 1px 7px;
-  border-radius: 999px;
-  background: var(--mgdb-surface-sunken);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-xs);
-  font-variant-numeric: tabular-nums;
-}
-
-.mgdb-gene-record-page .mgdb-section-tabs a.is-current .gene-record-tab-count {
-  background: rgba(255, 255, 255, .22);
-  color: #fff;
-}
-
-.mgdb-gene-record-page > section { scroll-margin-top: 4.5rem; }
-
-/* --------------------------------------------------------------------------
-   Blocks and facts
-   -------------------------------------------------------------------------- */
-
-.mgdb-gene-record-page .gene-record-block {
-  margin-top: var(--mgdb-space-5);
-  padding-top: var(--mgdb-space-4);
-  border-top: 1px solid var(--mgdb-line-soft);
-}
-
-.mgdb-gene-record-page .gene-record-block:first-child {
-  padding-top: 0;
-  border-top: 0;
-}
-
-.mgdb-gene-record-page .gene-record-block h3 {
-  font-size: var(--mgdb-text-xl);
-  line-height: var(--mgdb-leading-snug);
-}
-
-.mgdb-gene-record-page .gene-record-block h4 {
-  margin-top: var(--mgdb-space-4);
-  font-size: var(--mgdb-text-base);
-}
-
-.mgdb-gene-record-page .gene-record-block-note {
-  max-width: var(--mgdb-measure);
-  margin-top: var(--mgdb-space-1);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-}
-
-.mgdb-gene-record-page .gene-record-facts-grid {
-  display: grid;
-  gap: var(--mgdb-space-4);
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  margin-top: var(--mgdb-space-4);
-}
-
-.mgdb-gene-record-page .gene-record-facts-grid dt {
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-}
-
-.mgdb-gene-record-page .gene-record-facts-grid dd {
-  margin: var(--mgdb-space-1) 0 0;
-  color: var(--mgdb-ink);
-}
-
-.mgdb-gene-record-page .gene-record-facts-grid dd small {
-  display: block;
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-}
-
-.mgdb-gene-record-page .gene-record-facts-grid code,
-.mgdb-gene-record-page .mgdb-table code {
-  font-family: var(--mgdb-font-mono);
-  font-size: 0.92em;
-}
-
-.mgdb-gene-record-page .gene-record-muted { color: var(--mgdb-muted); }
-
-/* An absent value that is absent in the database, not on the page. */
-.mgdb-gene-record-page .gene-record-unknown {
-  color: var(--mgdb-muted);
-  font-style: italic;
-}
-
-.mgdb-gene-record-page .gene-record-gap {
-  max-width: var(--mgdb-measure);
-  margin-top: var(--mgdb-space-4);
-  padding: var(--mgdb-space-3) var(--mgdb-space-4);
-  border-left: 3px solid var(--mgdb-line);
-  background: var(--mgdb-surface-alt);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-}
-
-.mgdb-gene-record-page .gene-record-more { margin-top: var(--mgdb-space-3); }
-
-.mgdb-gene-record-page .gene-record-more > summary {
-  color: var(--mgdb-green-dark);
-  cursor: pointer;
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-}
-
-.mgdb-gene-record-page .mgdb-numeric {
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-}
-
-.mgdb-gene-record-page .mgdb-table tr.is-current > td {
-  background: var(--mgdb-gold-soft);
-  box-shadow: inset 3px 0 0 var(--mgdb-gold);
-}
-
-.mgdb-gene-record-page .gene-record-actions-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  margin-top: var(--mgdb-space-3);
-}
-
-.mgdb-gene-record-page .gene-record-links {
-  margin-top: var(--mgdb-space-3);
-  padding-left: var(--mgdb-space-5);
-  list-style: disc;
-}
-
-.mgdb-gene-record-page .gene-record-links a { word-break: break-all; }
-
-/* --------------------------------------------------------------------------
-   Chips (phenotypes, alleles)
-   -------------------------------------------------------------------------- */
-
-.mgdb-gene-record-page .gene-record-chips-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  margin-top: var(--mgdb-space-3);
-  padding: 0;
-  list-style: none;
-}
-
-.mgdb-gene-record-page .gene-record-chips-list li > a,
-.mgdb-gene-record-page .gene-record-chips-list li > span {
-  display: inline-block;
-  padding: var(--mgdb-space-1) var(--mgdb-space-3);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface-alt);
-  font-size: var(--mgdb-text-sm);
-}
 
 /* --------------------------------------------------------------------------
    Protein domain track
@@ -491,84 +164,117 @@
 }
 
 /* --------------------------------------------------------------------------
-   eFP expression images — loaded lazily by the browser, never by the server
+   eFP viewer
+
+   The section used to lay eight atlases out at 180px each. An eFP figure is a
+   labelled anatomical diagram; at 180px none of it is legible, and the images
+   it was requesting were 500s anyway. One atlas at a time, as large as the
+   column allows, with the rest one click away.
    -------------------------------------------------------------------------- */
 
-.mgdb-gene-record-page .gene-record-efp-grid {
-  display: grid;
-  gap: var(--mgdb-space-4);
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+.mgdb-gene-record-page .gene-record-efp-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
   margin-top: var(--mgdb-space-3);
 }
 
-.mgdb-gene-record-page .gene-record-efp {
-  margin: 0;
-  padding: var(--mgdb-space-2);
-  border: 1px solid var(--mgdb-line-soft);
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
-  text-align: center;
+.mgdb-gene-record-page .gene-record-efp-atlases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-3);
 }
 
-.mgdb-gene-record-page .gene-record-efp img {
+.mgdb-gene-record-page .gene-record-efp-atlas {
+  min-height: 32px;
+  padding: 2px var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink-soft);
+  font: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-gene-record-page .gene-record-efp-atlas:hover:not([aria-pressed="true"]) {
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-gene-record-page .gene-record-efp-atlas[aria-pressed="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #fff;
+}
+
+/* The figure is as wide as the section and as tall as it needs to be. The BAR
+   returns PNGs up to 400 KB and around 1,000px wide; letting one fill the
+   column is the whole point of showing one at a time. */
+.mgdb-gene-record-page .gene-record-efp-stage {
+  position: relative;
+  margin-top: var(--mgdb-space-3);
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: #fff;
+  text-align: center;
+  min-height: 320px;
+}
+
+.mgdb-gene-record-page .gene-record-efp-stage img {
   max-width: 100%;
   height: auto;
 }
 
-.mgdb-gene-record-page .gene-record-efp figcaption {
-  margin-top: var(--mgdb-space-2);
+.mgdb-gene-record-page .gene-record-efp-stage.is-loading::after {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
   color: var(--mgdb-muted);
+  content: "Loading the atlas\2026";
   font-size: var(--mgdb-text-sm);
 }
 
-/* An atlas that did not load says so, rather than leaving a blank box. */
-.mgdb-gene-record-page .gene-record-efp.is-missing img { display: none; }
+.mgdb-gene-record-page .gene-record-efp-stage.is-loading img { visibility: hidden; }
 
-.mgdb-gene-record-page .gene-record-efp.is-missing::before {
+/* An atlas the BAR could not render says so in place, rather than leaving a
+   blank frame or a broken-image icon. */
+.mgdb-gene-record-page .gene-record-efp-stage.is-missing img { display: none; }
+
+.mgdb-gene-record-page .gene-record-efp-stage.is-missing::before {
   display: block;
-  padding: var(--mgdb-space-5) var(--mgdb-space-2);
+  padding: var(--mgdb-space-6) var(--mgdb-space-3);
   color: var(--mgdb-muted);
-  content: "Not available for this gene";
+  content: "The eFP Browser has no figure for this gene in this atlas.";
   font-size: var(--mgdb-text-sm);
 }
-
-/* --------------------------------------------------------------------------
-   Provenance footnote
-   -------------------------------------------------------------------------- */
-
-.mgdb-gene-record-page .gene-record-provenance-note {
-  margin-top: var(--mgdb-space-7);
-  padding-top: var(--mgdb-space-4);
-  border-top: 1px solid var(--mgdb-line-soft);
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-}
-
-.mgdb-gene-record-page .gene-record-ext::after {
-  content: " \2197";
-  font-size: 0.85em;
-}
-
-/* --------------------------------------------------------------------------
-   Responsive
-   -------------------------------------------------------------------------- */
 
 @media (max-width: 720px) {
-  .mgdb-gene-record-page .mgdb-section-tabs {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    scrollbar-width: thin;
-  }
-
-  .mgdb-gene-record-page .mgdb-section-tabs a { white-space: nowrap; }
-
-  .mgdb-gene-record-page .gene-record-facts-grid { grid-template-columns: 1fr 1fr; }
-
-  .mgdb-gene-record-page .gene-record-efp-grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  }
+  .mgdb-gene-record-page .gene-record-efp-stage { padding: var(--mgdb-space-2); }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .mgdb-gene-record-page * { transition: none !important; }
+/* --------------------------------------------------------------------------
+   Genome browser preview
+
+   The legacy Overview embedded JBrowse at a fixed 300px. Taller here: the
+   frame shows the gene with 1,500 bp either side and its neighbours' models,
+   and 300px cut the track stack off.
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-record-page .gene-record-browser {
+  display: block;
+  width: 100%;
+  height: 420px;
+  margin-top: var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm, 6px);
+  background: #fff;
+}
+
+@media (max-width: 720px) {
+  .mgdb-gene-record-page .gene-record-browser { height: 320px; }
 }

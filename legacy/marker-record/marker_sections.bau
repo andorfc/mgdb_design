@@ -1,0 +1,491 @@
+$$SYNTAX-LEVEL 2
+*(probe-sections
+  @(top {display: off}
+    <script language="javascript">
+      recordAccess('marker', '$(name)'\);
+    </script>
+    
+    <p class='data_center_title'>
+      <span class='data_center_title'>
+        $(name)
+     </span>
+      <br>
+      <br>
+      @(synonyms {display: off}
+        This probe is also known by the following names:
+        @(synonym_list
+          <b>$(synonym)</b> $(authority)
+        )
+      )      
+    </p>
+   @(user-annotation {display: off}
+     <br>     
+     <p>
+        <b>
+          <a href="create_pheno_annotation.cgi?id=$(id)" target="new">Add your 
+            own annotation to this record!</a>
+        </b>
+      </p>
+    )
+  )
+  
+  @(overview {display: off}
+    <p>
+    @(contains {display: off}
+      This probe contains probe 
+      <a href="/data_center/marker?id=$(cont_id)">$(cont_name)</a>
+    )
+    @(contained_by {display: off}
+      This probe is contained by 
+      <a href="/data_center/marker?id=$(contained_id)">$(contained_name)</a>
+    )
+    @(qualitys {display: off}
+      <br><b>
+        <span title="Quality refers to a numerical indication of the relative quality of the probe.">
+          Quality:
+        </span>
+      </b>
+      $(quality)<br>
+    )
+    @(types
+      <br><b>
+        <span title="Type refers to the specific type of probe. There are many types of probes, each with unique biological characteristics.">
+        Type:
+        </span>
+      </b> 
+      <span title="$(term_comments)">
+        $(type_name)
+      </span><br>
+    )
+    <b>
+      <br><span title="Insert size refers to the length of the insert caused by this Probe.">
+        Insert Size:
+      </span>
+    </b> $(insert)<br>
+     @(full_length {display: off}
+      <br><b>Full Length Insert:</b> 
+      <a href="http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=nucleotide&val=$(flis)">
+        $(flis)
+      </a>
+      <br>
+    )
+     @(species  {display:off}
+        <br><b>
+          <span title="Species refers to the specific species that this probe was developed for.">
+            Species:
+          </span>
+        </b> 
+        <a href="/data_center/species?id=$(spec_id)">$(spec_name)</a><br>
+      )
+      @(procedures
+         <br><b>
+          <span title="Procedure refers to a known procedure for the use of this Probe.  
+            Standard procedures may be used if there is no data here.">
+            Procedure:
+          </span>
+        </b> 
+        $(procedure)<br>
+      )
+      @(prepared_by
+        <br><b>
+          <span title="This probe was originally prepared by this person.">
+            Prepared by:
+          </span>
+        </b>
+         <a href="/person?id=$(prep_id)">$(prep_name)</a>
+        $(p_unassigned)<br>
+      )
+      @(available 
+        <br><b>
+          <span title="This probe is currently available from the place listed here.">
+            Available from:
+          </span>
+        </b>
+        <a href="/person?id=$(pers_id)">$(pers_name)</a>
+        $(a_unassigned)<br>
+      )
+      @(vector 
+        <br><b>
+          <span title="If there are any vectors appropriate for this probe, they are listed here">
+            Vector:
+          </span>
+        </b>
+        <a href="/data_center/lg?id=$(vector_id)">$(vector_name)</a>
+        $(v_unassigned)<br>
+      )   
+      @(bin {display:off}
+        <br><b>
+          <span title="The bin number comes from the 1998 UMC 1 maize map. This is a useful map for navigating the maize chromosomes.">
+            <a href="/bin_viewer" target="new">Bin</a> 
+            #:
+          </span>
+        </b>
+        $(bin_info)<br>
+      )
+      @(properties {display: off} 
+        <br><b>Properties:</b> $(props)<br>
+      )
+      @(primer {display:off} 
+        <br><b>Primers and Enzymes:</b><br>
+         <table>
+          @(primer_sec
+             <tr>
+               <td>$(prim_end)</td>
+               <td><a href="/data_center/primer?id=$(prim_id)">$(prim_seq)</a></td>
+               <td>&nbsp;&nbsp;(<a href="/data_center/primer?id=$(prim_id)">$(prim_name)</a>\)</td>
+             </tr>
+          )
+          </table>
+       )
+      @(other_links {display:off} 
+        <br>
+        <b>Links to other Databases:</b>
+        <br>
+        @(other_links_sec
+          $(db_name) -> $(db_key)<br>
+        )
+      )
+      @(gel_patterns {display:off} 
+       <br><b>Gel Patterns:</b>
+       <br>
+       <table>
+         @(gel_sec
+           <tr>
+             <td><a href="/data_center/gel?id=$(gelid_1)">$(gelname_1)</a></td>
+             <td><a href="/data_center/gel?id=$(gelid_2)">$(gelname_2)</a></td>
+             <td><a href="/data_center/gel?id=$(gelid_3)">$(gelname_3)</a></td>
+             <td><a href="/data_center/gel?id=$(gelid_4)">$(gelname_4)</a></td>
+             <td><a href="/data_center/gel?id=$(gelid_5)">$(gelname_5)</a></td>
+           </tr>
+          )
+        </table>
+      )
+      @(gm_transcripts {display: off}
+        <br><b>
+          <span title="This probe is associated with the following gene model.">
+            Gene Model Transcripts:
+          </span>
+        </b>
+        @(gm_transcripts_sec
+          <a href="/data_center/gene_model?id=$(bgi)">$(bgm)</a>$(sep)
+        )
+      )
+      @(vector_cutters {display: off}
+        <br><br>
+        <b>Vector Cutter(s\):</b>
+        @(vec_cut_sec
+          <a href="/data_center/primer?id=$(vec_cut_id)">$(vec_cut_name)</a>$(vec_sep)
+        )
+          
+      )
+      @(comments {display: off}
+        <br><br>
+        <b>
+         <span title="Comments are additional notes relevant to this probe record that might be of interest to you.">
+           Comments:
+         </span>
+       </b>
+       <div class="small_tab">$(probe_comments)</div>
+       <br>
+      )
+    </p>
+  )
+  
+  @(annotations {display: off}
+    @(curation {display: off}
+    <!-- UNUSED -->
+      <table cellpadding=0 cellspacing=0 width="90%">
+        <tr>
+          <td><img src="/images/lite_green_lt.gif"></td>
+          <td class=lite_green_background width="100%"></td>
+          <td><img src="/images/lite_green_rt.gif"></td>
+        </tr>
+        <tr>
+          <td class=lite_green_background></td>
+          <td class=lite_green_background style="padding:2px">
+            <p>
+              <b>Add annotation to this record</b>
+              <form action="javascript:popUpAnnotation('curationform', '/curation/FreeText/edit'\);" method="post" 
+                    id="curationform">
+                <input type="hidden" id="table_name" value="phenotype">
+                <input type="hidden" id="mgdb_id" value="$(id)">
+                <input type="hidden" id="rec_name" value="$(rec_name)">
+                <input type="hidden" id="auto_num" name="auto_num" value="">
+                &nbsp;<a onclick="curationform.submit(\)"
+                   href="#" >Add free text annotation</a>
+              </form>
+            </p>
+          </td>
+          <td class=lite_green_background></td>
+        </tr>
+        <tr>
+          <td><img src="/images/lite_green_lb.gif"></td>
+          <td class=lite_green_background width="100%"></td>
+          <td><img src="/images/lite_green_rb.gif"></td>
+        </tr>
+      </table>
+      <br>
+    )
+    
+    @(no-user {display: off}
+      <p><b>No user annotations</b></p>
+      <br>
+    )
+    @(annotation-user {display: off}
+      <p><b>User Annotations:</b></p>
+      @(annotation-user-list
+        <form name="ft_edit_$(auto_num)" id="ft_edit_$(auto_num)" method="post" 
+              target="annotation">
+          <input type="hidden" name="auto_num" id="auto_num" value="$(auto_num)">
+          <input type="hidden" name="mgdb_id" id="mgdb_id" value="$(mgdb_id)">
+          <input type="hidden" name="table_name" id="table_name" value="phenotype">
+          From:
+          <b><a href="/person/$(person_id)">$(first_name) $(last_name)</a></b>
+          (<i>$(mod_date)</i>\)
+          <br>
+          <span style="margin-left: 10px;">$(memo)</span>
+        </form>
+      )
+      <br>
+    )
+    @(annotation-user-curator {display: off}
+      <p><b>User Annotations: (curator's view\)</b></p>
+      @(annotation-user-list-ex
+        <form name="ft_edit_$(auto_num)" id="ft_edit_$(auto_num)" method="post" 
+              target="annotation">
+          <input type="hidden" name="auto_num" id="auto_num" value="$(auto_num)">
+          <input type="hidden" name="mgdb_id" id="mgdb_id" value="$(mgdb_id)">
+          <input type="hidden" name="table_name" id="table_name" value="phenotype">
+          From:
+          <b><a href="/person/$(person_id)">$(first_name) $(last_name)</a></b>
+          (<i>$(mod_date)</i>\)
+          <br> 
+          <span style="margin-left: 10px;">$(memo)</span>
+          <br>
+          <i><a href="#" 
+                onclick="popUpAnnotation('ft_edit_$(auto_num)', '/curation/FreeText/edit'\);">Edit this annotation</a>
+          </i>
+        </form>
+      )
+      <br>
+    )
+  ) 
+  
+  @(related_data {display: off}
+    @(related_probes {display: off}
+    <br>
+    <b>Related Probes: </b>
+    <br>
+    <p>
+      @(related_probes_sec 
+        $(rel_label)
+        $(rel_type).<br>
+      )
+    </p>
+    @(no_probe {display: off}
+    <p>
+      <b>&nbsp;&nbsp;No related probes found for this probe.</b>
+    </p>
+    )
+   )
+   @(copies {display: off}
+    <p>
+      <b>Copies:</b>
+      <br>
+      @(copies_sec
+        $(copy) $(date_add) $(person_add)
+        <br>
+      )
+     </p>
+   )
+    @(related_papers {display: off}
+      <p>
+        <b>Related Papers:</b><br>
+        @(related_papers_sec
+          (<i>$(cont_name)</i>\) 
+          <a href="/data_center/reference?id=$(ref_id)" title="$(ref_title)">
+            $(ref_name)
+          </a>
+          <br>
+        )
+      </p>
+    )
+    @(no_related {display: off}
+      <p>
+        <br>
+        <b>&nbsp;&nbsp;No related data for this probe.</b>
+      </p>
+    )
+   )
+  
+  @(detected_loci {display: off}
+   <p>
+    @(loci_results 
+      <br>
+      &nbsp;&nbsp;&nbsp;
+      <a href="/data_center/locus?id=$(loci_id)">
+        <b>$(loci_name)</b>
+        $(loci_full_name)
+      </a>
+      ($(loci_type); detected via $(loci_type_name)\)<br>
+    )
+   </p>
+    @(no_loci {display: off | bind: loci_results}
+      <p>
+        <br>
+        <b>&nbsp;&nbsp;No detected loci found for this probe.</b>
+      </p>
+    )
+  )
+  
+  @(map_coordinates {display: off}
+    @(map_tbl
+     (* indicates backbone locus\)
+     <table cellpadding=1 cellspacing=1>
+       <tr>
+        <td width="100"><u>Locus</u></td>
+        <td width="230"><u>Map</u></td>
+        <td align="right"><u>Coordinate</u></td>
+        <td width="75" style="text-align: right;">
+          <u><a href="/bin_viewer" target="new">Bin</a></u>
+        </td>
+       </tr>
+       @(map_sec
+         <tr>
+           <td>
+             <a href="/data_center/locus?id=$(map_loc_id)">$(map_loc_name)</a>
+             $(backbone)
+           </td>
+           <td>
+             <a href="/data_center/map?id=$(map)&amp;reflocus=$(map_loc_id)#reflocus">
+               $(map_name)
+             </a>
+           </td>
+           <td style="font-family: Courier New,Courier,serif; text-align: right;">
+             $(map_value)
+           </td>
+           <td style="text-align: right;">
+             $(map_bin1) $(map_bin2)
+           </td>
+         </tr>
+       )
+       </table>
+     )
+     @(no_map {display: off | bind: map_tbl}
+      <p>
+        <br>
+        <b>&nbsp;&nbsp;No map coordinates found for this probe.</b>
+      </p>
+    )
+    @(chrom_tbl {display: off}
+      @(chrom_sec
+      <br><br>
+      <b>Chromosome Coordinates:</b><br>
+      This table shows the Chromosome, Contig, and sequenced BAC coordinates for 
+      this probe.  Clicking in the View Column will show details 
+      of an alignment in the <i>View Area.</i> <br><br>
+      <img border="no" src='../images/checkmark.jpg'> This sequence is in the MaizeGDB Genome Browser
+      <table cellpadding=1 cellspacing=1>
+       <tr>
+        <td width="6%"> &nbsp;</td>
+        <td width="230" colspan='4' align='center'><b>Chromosome</b></td>
+        <td colspan="3" align="center"><b>Coordinate</b></td>
+        <td colspan="3" align="center">
+          <b>BAC</b>
+        </td>
+       </tr>
+       <tr>
+         <td width="6%"> View </td>
+         <td align=right width="4%"> CHR </td>
+         <td align=center width="11%"> Start </td>
+         <td align=center width="11%"> End </td>
+         <td align=right width="10%"> Orientation </td>
+         <td align=right width="9%"> Contig </td>
+         <td align=right width="11%"> Start </td>
+         <td align=right width="11%"> Stop </td>
+         <td align=right width="9%"> BAC </td>
+         <td align=right width="9%"> Start </td>
+         <td align=right width="9%"> End </td>
+        </tr>
+       </table>
+       <br>
+       <table width="1000" cellpadding=1 cellspacing=0 border=0>
+         <tr>
+           <td  width="6"> 
+             &nbsp;&nbsp; 
+             <a href="javascript:doGB3('$(bac_chr)', '$(bac_pstart)'  , '$(bac_pend)', '$(bac_bacc), $(bac_contig), $(pname), $(bac_num_pstart), $(bac_num_pend), '1'\)"> 
+               <img border="no" src='../images/checkmark.jpg'> 
+             </a> 
+           </td>
+           <td align='right' width='4%'>
+             $(bac_chr)
+           </td>
+           <td align=right width="11%">$(bac_num_pstart_2)</td>
+           <td align=right width="11%">$(bac_num_pend_2)</td>
+           <td align=right width="10%">$(dir)</td>
+<!-- no longer supported 
+           <td align=right width="9%"> 
+             <a href='displayfpccontigrecord.cgi?id=$(bac_contig)'>$(bac_contig)</a>
+           </td>
+-->
+           <td align=right width="11%">$(tstart)</td>
+           <td align=right width="11%">$(tend)</td>  
+           <td align=right width="11%">
+             <a href='/data_center/bac?id=$(bac_cname)'>$(bac_bacc)</a>
+           </td> 
+           <td align=right width="11%">$(tstart)</td>   
+           <td align=right width="11%">$(tend)</td>
+          </tr>           
+       
+         <tr>
+           <td>
+             <a href="/data_center/locus?id=$(map_loc_id)">$(map_loc_name)</a>
+             $(backbone)
+           </td>
+           <td>
+             <a href="/data_center/map?id=$(map)&amp;reflocus=$(map_loc_id)#reflocus">
+               $(map_name)
+             </a>
+           </td>
+           <td style="font-family: Courier New,Courier,serif; text-align: right;">
+             $(map_value)
+           </td>
+           <td style="text-align: right;">
+             $(map_bin1) $(map_bin2)
+           </td>
+         </tr>
+       )
+       </table>
+    )
+  )
+  
+  @(sequence_match {display: off}
+    @(sequence_sec
+      <p>
+        <br>
+        <b>Sequence:</b> $(seq_type)
+        <b><a href="/data_center/sequence?id=$(genbank_acc)">$(genbank_acc)</a></b>.
+        <br>
+        <u>Title:</u>$(seq_title)
+        <br>
+        <u>Sequence</u>: (see also 
+        <a href="http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?cmd=Search&db=Nucleotide&term=$(genbank_acc)&doptcmdl=GenBank" target="new">
+         Genbank
+        </a> format\)<br> 
+        <iframe style="background-color:white;"  width='100%' height='200'  
+         src='https://sequence.maizegdb.org/get_sequence.php?id=$(genbank_acc)'> </iframe><br>
+         <a href="$(blast_url)">
+          Blast against MaizeGDB
+         </a> | 
+         <a href="https://sequence.maizegdb.org//get_sequence.php?dbtype=nuc&id=$(genbank_acc)&download=1 ">
+          Download FASTA File
+         </a><br>
+      </p>
+    )
+    @(no_seq {bind: sequence_sec | display: off}
+     <p>
+      <br> <b>&nbsp;&nbsp;No sequence match found for this probe.</b>
+     </p>
+    )
+  )
+)

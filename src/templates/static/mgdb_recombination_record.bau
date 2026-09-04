@@ -1,0 +1,113 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-recombination-record
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:title" content="$(record_name) &mdash; MaizeGDB recombination dataset">
+<meta property="og:description" content="$(record_summary)">
+
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-recombination-record-page" id="rc-record-top" data-record-id="$(record_id)" data-requested-id="$(requested_identifier)">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/map">Map Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(record_name)</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-hero" aria-labelledby="rc-record-title">
+    <div class="mgdb-hero-body">
+      <h1 id="rc-record-title">$(record_name)</h1>
+      <p class="mgdb-rec-synonyms" id="rc-record-synonyms" hidden></p>
+      <dl class="mgdb-record-facts mgdb-rec-headfacts" id="rc-record-facts">$(identity_facts)</dl>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs mgdb-rec-tabs" id="rc-record-tabs" aria-label="Sections on this record">
+    <a href="#rc-record-overview">Overview</a>
+  </nav>
+
+  <div class="mgdb-loading" id="rc-record-loading"><span class="mgdb-spinner" aria-hidden="true"></span><span>Loading the full record&hellip;</span></div>
+
+  <div class="mgdb-message mgdb-message-error" id="rc-record-error" role="alert" hidden>
+    <div>
+      <strong>The rest of this record could not be loaded.</strong>
+      <span>The identity above is correct. Reload to try again, or report it if it keeps happening.</span>
+      <button class="mgdb-button mgdb-button-secondary" id="rc-record-retry" type="button">Retry</button>
+    </div>
+  </div>
+
+  <div class="mgdb-message mgdb-message-info" id="rc-record-notice" role="status" hidden></div>
+
+  <section id="rc-record-overview" aria-labelledby="rc-record-overview-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="rc-record-overview-title">Overview</h2></div></div>
+    <div id="rc-record-overview-body"></div>
+  </section>
+
+  <section id="rc-record-loci" aria-labelledby="rc-record-loci-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="rc-record-loci-title">Loci scored</h2></div></div>
+    <div id="rc-record-loci-body"></div>
+  </section>
+
+  <section id="rc-record-frequencies" aria-labelledby="rc-record-frequencies-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="rc-record-frequencies-title">Recombination frequencies</h2></div></div>
+    <div id="rc-record-frequencies-body"></div>
+  </section>
+
+  <section id="rc-record-alleles" aria-labelledby="rc-record-alleles-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="rc-record-alleles-title">Parental alleles</h2></div></div>
+    <div id="rc-record-alleles-body"></div>
+  </section>
+
+  <section id="rc-record-classes" aria-labelledby="rc-record-classes-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="rc-record-classes-title">Class frequencies</h2></div></div>
+    <div id="rc-record-classes-body"></div>
+  </section>
+
+  <section id="rc-record-overlaps" aria-labelledby="rc-record-overlaps-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="rc-record-overlaps-title">Overlapping datasets</h2></div></div>
+    <div id="rc-record-overlaps-body"></div>
+  </section>
+
+  <section id="rc-record-references" aria-labelledby="rc-record-references-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="rc-record-references-title">References</h2></div></div>
+    <div id="rc-record-references-body"></div>
+  </section>
+
+  <section class="mgdb-hub-related" id="rc-record-resources" aria-labelledby="rc-record-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="rc-record-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/locus">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>The loci scored in this cross, and their map positions</span>
+        </a>
+        <a href="/data_center/map">
+          <strong>Map Data Hub</strong>
+          <span>The genetic maps these recombination distances contributed to</span>
+        </a>
+        <a href="/data_center/variation">
+          <strong>Variations &amp; Alleles Data Hub</strong>
+          <span>The alleles each parent carried into the cross</span>
+        </a>
+        <a href="/data_center/qtl">
+          <strong>QTL Data Hub</strong>
+          <span>QTL analyses built on mapping populations like this one</span>
+        </a>
+        <a href="/data_center/stock">
+          <strong>Stock Data Hub</strong>
+          <span>The lines behind the mapping populations</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="mgdb-rec-api mgdb-hub-tone-blue" id="rc-record-api" aria-labelledby="rc-record-api-title">
+    <div class="mgdb-section-heading"><div><h2 id="rc-record-api-title">API data access</h2></div></div>
+    <div class="mgdb-rec-api-row">
+      <code id="rc-record-api-endpoint">GET /api/v1/records/recombination/$(requested_identifier)</code>
+      <div class="mgdb-rec-api-actions">
+        <a class="mgdb-button mgdb-button-quiet" id="rc-record-api-link" href="/api/v1/records/recombination/$(requested_identifier_path)" target="_blank" rel="noopener">Raw JSON <span aria-hidden="true">&nearr;</span></a>
+        <button class="mgdb-button mgdb-button-quiet" id="rc-copy-json-btn" type="button">Copy JSON</button>
+        <a class="mgdb-button mgdb-button-quiet" href="/api/v1/openapi">API documentation</a>
+      </div>
+    </div>
+    <p class="mgdb-rec-api-note">Every fact, locus, allele, and frequency on this page is retrieved in one structured JSON response.</p>
+  </section>
+</main>
+)

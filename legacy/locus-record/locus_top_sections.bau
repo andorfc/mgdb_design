@@ -1,0 +1,85 @@
+$$SYNTAX-LEVEL 2
+*(gene-locus-top-sections
+
+  @(top {display: off}
+    <script language="javascript">
+      recordAccess('locus', '$(locus_name)'\);
+    </script>
+
+    <p class='data_center_title'>
+	  @(matching_locus_section {display: off}
+          <span class='data_center_title'>$(locus_name)$(locus_fullname)</span>
+        )
+
+      <!--@(locus-species {display: off}
+        <br>
+        <b>Species</b>: <a href="/data_center/species?id=$(species)">$(species_name)</a>
+        &nbsp;
+      )
+      <br>
+              
+      <b>Synonyms</b>: $(synonyms)-->
+    </p>
+          
+    @(classical-gene {display: off}
+      <td width=250>
+        <div id='classical_div'>
+          <table cellspacing=5 cellpadding=3>
+            <tr> 
+              <td>
+                <img src="/images/classical_gene.png">
+              </td>
+              <td>
+                <b>Classical Gene</b><br>
+                with associated gene model 
+                <a href="/gene_center/gene/$(gm_id)">$(gm_id)</a>
+                <br>
+                by <a href="/person/?id=981154">J. Schnable</a> and 
+                <a href="/person/?id=12887">M. Freeling</a>
+                <br>
+                Reference: 
+                <a href="http://www.ncbi.nlm.nih.gov/pubmed/21423772" alt="PubMed Abstract"> 
+                  <img src="/icon/pubmed.gif" style="border:none;" alt="PubMed Abstract">
+                  <font size=1> PubMed </font>
+                </a>
+                <a href="http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0017855"> 
+                  <img src="/icon/html.gif" style="border:none;" alt="HTML">
+                  <font size=1> HTML</font>
+                </a>
+                <br>
+                <a href="http://genomevolution.org/wiki/index.php/Classical_Maize_Genes"> 
+                  View the classical genes list. 
+                </a>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </td>
+    )
+    
+    @(gene-review {display: off}
+      <div id='genereview_div'>
+        <table cellspacing='5' cellpadding='3'>
+          <tr>
+            <td>
+              <img src='/images/gene_review.png'>
+            </td>
+            <td>
+              <b>Maize Gene Review</b><br>
+              <a href="/data_center/reference/?id=$(bid)"><u><b>$(btitle)</b></u></a>
+              <br>
+              @(author-list
+                by 
+                <a href="/data_center/person/?id=$(cid)">$(fname) $(lname)</a>
+              )
+              <br>
+              <a href='http://www.maizegenereview.org/$(name).html'> Read the review </a>
+            </td>
+          </tr>
+        </table>
+        <br>
+      </div>
+    )
+  )<!-- top_gene -->
+ 
+)

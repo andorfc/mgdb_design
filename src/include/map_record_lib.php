@@ -54,6 +54,83 @@ if (!defined('MAP_RECORD_LIB')) {
     return false;
   }
 
+  /* What to offer a reader whose identifier did not resolve.
+
+     A name-contains arm would be pointless here: mapResolveId() already ends
+     with `m.name ILIKE '%term%'`, so anything a contains-search could find has
+     already been resolved to a record. The two arms that can still help:
+
+       loci   the term read as a locus name, and the maps that locus is placed
+              on with its coordinate. "Where is bz1 mapped?" is the question
+              behind most of these misses, and 11 ms answers it.
+       maps   the largest curated maps, as somewhere to start.
+
+     locus_coordinates.map is numeric while map.id is bigint; the numeric side
+     is cast so the join uses the index on map.id rather than casting it. */
+  function mapSuggestions($DBConn, $term, $limit = 8) {
+    $out = array('locus' => null, 'loci_maps' => array(), 'largest' => array());
+    $term = trim((string) $term);
+    if ($term === '' || strlen($term) > 200) {
+      return $out;
+    }
+
+    $spellings = array_values(array_unique(array(
+      $term, strtolower($term), ucfirst(strtolower($term)), strtoupper($term)
+    )));
+    $names = array();
+    $params = array();
+    foreach ($spellings as $n => $spelling) {
+      $names[] = ':n' . $n;
+      $params['n' . $n] = $spelling;
+    }
+
+    $sth = make_query($DBConn, "
+      SELECT * FROM (
+        SELECT DISTINCT m.id, m.name, lc.value AS coordinate,
+               lg.name AS linkage_group, l.id AS locus_id, l.name AS locus
+        FROM mgdb.locus l
+          INNER JOIN mgdb.locus_coordinates lc ON lc.id = l.id
+          INNER JOIN mgdb.map m ON m.id = lc.map::bigint
+          INNER JOIN mgdb.id_num i ON i.id = m.id AND i.curation_lvl = 0
+          LEFT JOIN mgdb.linkage_group lg ON lg.id = m.linkage_group
+        WHERE l.name IN (" . implode(',', $names) . ")
+      ) s
+      ORDER BY LOWER(s.name)
+      LIMIT " . ((int) $limit), 1, $params);
+    while ($row = retrieve_row($sth)) {
+      if ($out['locus'] === null) {
+        $out['locus'] = array('id' => (int) $row['locus_id'], 'name' => trim((string) $row['locus']));
+      }
+      $out['loci_maps'][] = array(
+        'id' => (int) $row['id'],
+        'name' => trim((string) $row['name']),
+        'linkage_group' => trim((string) $row['linkage_group']),
+        'coordinate' => $row['coordinate'] === null ? null : (float) $row['coordinate']
+      );
+    }
+
+    if (count($out['loci_maps']) === 0) {
+      $sth = make_query($DBConn, "
+        SELECT m.id, m.name, lg.name AS linkage_group,
+               (SELECT COUNT(*) FROM mgdb.locus_coordinates lc WHERE lc.map = m.id) AS locus_count
+        FROM mgdb.map m
+          INNER JOIN mgdb.id_num i ON i.id = m.id AND i.curation_lvl = 0
+          LEFT JOIN mgdb.linkage_group lg ON lg.id = m.linkage_group
+        ORDER BY locus_count DESC, m.name
+        LIMIT " . ((int) $limit), 1, array());
+      while ($row = retrieve_row($sth)) {
+        $out['largest'][] = array(
+          'id' => (int) $row['id'],
+          'name' => trim((string) $row['name']),
+          'linkage_group' => trim((string) $row['linkage_group']),
+          'locus_count' => (int) $row['locus_count']
+        );
+      }
+    }
+
+    return $out;
+  }
+
   /**
    * Fetch core identity facts for a map.
    */

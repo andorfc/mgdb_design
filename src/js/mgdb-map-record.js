@@ -1,715 +1,281 @@
-/**
- * Map Record Page — Client Controller (/data_center/map/{id})
- * Built on the MaizeGDB modern design system (Pattern Library & Stock Record patterns).
- */
+/* ==========================================================================
+   Map record page — /data_center/map/{id}
+   --------------------------------------------------------------------------
+   Glue over js/mgdb-record.js, the same engine the gene product and variation
+   record pages use. This file maps one call to /api/v1/records/map/{id} onto
+   it, and adds the one figure that belongs to a map: marker density.
+   ========================================================================== */
 
 (function (window, document) {
   'use strict';
 
-  var REF_PAGE_SIZE = 5;
-  var LOCI_PAGE_SIZE = 50;
+  var MGDB = window.MGDB;
+  var R = window.MGDBRecord;
+  if (!MGDB || !R) { return; }
 
-  var state = {
-    mapId: null,
-    record: null,
-    lociFilter: '',
-    backboneOnly: false,
-    lociPage: 1,
-    filteredLoci: [],
-    allReferences: [],
-    refCurrentPage: 1
+  var els = {};
+  var payload = null;
+  var unit = 'cM';
+
+  function coordinate(value) {
+    return value === null || value === undefined ? '' : Number(value).toFixed(1);
+  }
+
+  /* ------------------------------------------------------------------------
+     Overview
+     ------------------------------------------------------------------------ */
+
+  function renderOverview(overview) {
+    if (!overview) { return false; }
+    var out = els.overviewBody;
+    out.innerHTML = '';
+
+    var span = '';
+    if (overview.min_coord !== null && overview.max_coord !== null) {
+      span = coordinate(overview.min_coord) + ' – ' + coordinate(overview.max_coord) + ' ' + R.escape(unit);
+    }
+
+    var factsHtml = R.facts([
+      ['Chromosome', overview.linkage_group && overview.linkage_group !== '—' ? R.escape(overview.linkage_group) : ''],
+      ['Coordinate type', overview.coordinate_type ? R.escape(overview.coordinate_type) : ''],
+      ['Mapped loci', overview.locus_count ? R.number(overview.locus_count) : ''],
+      ['Span', span],
+      ['Source', overview.author ? (R.refLink(overview.author) || R.escape(overview.author.name)) : '']
+    ]);
+    if (factsHtml) { out.insertAdjacentHTML('beforeend', factsHtml); }
+
+    var notes = (overview.memos || []).filter(Boolean).map(function (text) {
+      return { text: text, meta: ['Curator note'] };
+    });
+    var hasNotes = R.notes(out, 'Notes on this map', notes);
+
+    return !!factsHtml || hasNotes;
+  }
+
+  /* ------------------------------------------------------------------------
+     Metrics and figures
+     ------------------------------------------------------------------------ */
+
+  function renderMetrics(counts, overview, references) {
+    R.metrics(els.metricsBody, [
+      ['Mapped loci', 'Coordinates', counts.coordinates, 'Loci placed on this map with a coordinate.', 'green'],
+      ['Maps in this series', 'Series', counts.sister_maps, 'The other chromosomes of the same map series.', 'amber'],
+      ['Maps on this chromosome', 'Chromosome', counts.same_chromosome_maps, 'Other maps of the same chromosome, for comparison.', 'blue'],
+      ['References', 'Literature', counts.references, 'Curated publications attached to this record.', 'burgundy']
+    ]);
+
+    /* Marker density comes from the API, bucketed over every locus on the map
+       rather than the page of 500 the client is sent -- a histogram built from
+       the capped list would describe the cap, not the map. */
+    var distribution = (overview && overview.distribution) || [];
+    if (distribution.length > 1 && MGDB.chart) {
+      R.show(R.byId('map-record-density-figure'), true);
+      var height = R.sizeChart('map-record-density-chart', 320);
+      var busiest = distribution.slice().sort(function (a, b) { return b.loci - a.loci; })[0];
+      R.byId('map-record-density-caption').textContent =
+        R.number(counts.coordinates) + ' loci across ' + distribution.length +
+        ' intervals of about ' + coordinate((overview.max_coord - overview.min_coord) / distribution.length) +
+        ' ' + unit + '. The densest interval starts at ' + coordinate(busiest.start) +
+        ' ' + unit + ' and holds ' + R.number(busiest.loci) + '.';
+
+      MGDB.chart({
+        target: 'map-record-density-chart',
+        traces: function () {
+          return [{
+            type: 'bar',
+            x: distribution.map(function (d) { return d.start; }),
+            y: distribution.map(function (d) { return d.loci; }),
+            marker: { color: '#285d46' },
+            hovertemplate: 'From %{x} ' + unit + '<br>%{y:,} loci<extra></extra>'
+          }];
+        },
+        layout: {
+          height: height,
+          margin: { l: 56, r: 16, t: 8, b: 48 },
+          bargap: 0.08,
+          xaxis: { title: { text: 'Position (' + unit + ')' }, automargin: true },
+          yaxis: { title: { text: 'Loci' }, rangemode: 'tozero', automargin: true }
+        }
+      });
+      R.watchChartWidth('map-record-density-chart');
+    }
+
+    R.connectionsChart('map-record-connections-chart', 'map-record-connections-caption', 'map-record-connections-figure', [
+      ['Mapped loci', counts.coordinates], ['Maps in this series', counts.sister_maps],
+      ['Maps on this chromosome', counts.same_chromosome_maps],
+      ['QTL experiments', counts.qtl_experiments], ['References', counts.references],
+      ['Curator notes', counts.memos]
+    ]);
+    void references;
+    return true;
+  }
+
+  /* ------------------------------------------------------------------------
+     Assembly
+     ------------------------------------------------------------------------ */
+
+  var TAB_COUNTS = {
+    'map-record-overview': ['memos'],
+    'map-record-loci': ['coordinates'],
+    'map-record-series': ['sister_maps'],
+    'map-record-alt': ['same_chromosome_maps'],
+    'map-record-qtls': ['qtl_experiments'],
+    'map-record-references': ['references']
   };
 
-  var el = {};
+  var LABELS = {
+    'map-record-overview': 'Overview',
+    'map-record-loci': 'Mapped loci',
+    'map-record-series': 'Maps in this series',
+    'map-record-alt': 'Other maps on this chromosome',
+    'map-record-qtls': 'QTL experiments',
+    'map-record-references': 'References',
+    'map-record-metrics': 'Metrics',
+    'map-record-resources': 'Related resources',
+    'map-record-api': 'API'
+  };
 
-  function byId(id) {
-    return document.getElementById(id);
-  }
+  function render(response) {
+    payload = response;
+    var data = response.data || {};
+    var sections = data.sections || {};
+    var meta = response.meta || {};
+    var counts = meta.counts || {};
+    var overview = sections.overview;
+    var related = sections.related_maps || {};
+    unit = (data.attributes && data.attributes.coordinate_type) || 'cM';
 
-  function escapeHtml(str) {
-    if (str === null || str === undefined) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  }
+    R.show(els.loading, false);
+    R.show(els.error, false);
 
-  function show(element, isVisible) {
-    if (element) element.hidden = !isVisible;
-  }
+    var rendered = [];
+    if (renderOverview(overview)) { rendered.push('map-record-overview'); }
 
-  function copyToClipboard(text, btnEl, successMsg) {
-    navigator.clipboard.writeText(text).then(function () {
-      if (btnEl) {
-        var orig = btnEl.textContent;
-        btnEl.textContent = successMsg || 'Copied!';
-        btnEl.classList.add('is-copied');
-        setTimeout(function () {
-          btnEl.textContent = orig;
-          btnEl.classList.remove('is-copied');
-        }, 2000);
-      }
-    }).catch(function (err) {
-      console.error('Clipboard copy failed', err);
+    if (R.collection(els.lociBody, {
+      title: 'Loci placed on this map',
+      items: sections.coordinates,
+      filename: 'map-loci.tsv',
+      pageSize: 25,
+      columns: [
+        R.recordColumn('Locus', 'name', function (l) { return l; }),
+        { key: 'full_name', label: 'Full name' },
+        { key: 'coordinate', label: 'Position (' + unit + ')', sort: 'number', numeric: true,
+          get: function (l) { return coordinate(l.coordinate); } },
+        { key: 'bin', label: 'Bin' },
+        { key: 'locus_type', label: 'Type' },
+        { key: 'is_backbone', label: 'Backbone',
+          get: function (l) { return l.is_backbone ? 'Yes' : 'No'; },
+          html: function (l) { return l.is_backbone
+            ? '<span class="mgdb-pill mgdb-pill-ok">Backbone</span>'
+            : '<span class="mgdb-muted">—</span>'; } },
+        R.urlColumn(function (l) { return l.html; })
+      ]
+    })) { rendered.push('map-record-loci'); }
+
+    if (R.collection(els.seriesBody, {
+      title: related.series_name ? 'Other chromosomes of ' + related.series_name : 'Maps in this series',
+      items: related.sister_maps,
+      filename: 'map-series.tsv',
+      columns: [
+        R.recordColumn('Map', 'name', function (m) { return m; }),
+        { key: 'linkage_group', label: 'Chromosome' },
+        { key: 'locus_count', label: 'Mapped loci', sort: 'number', numeric: true,
+          get: function (m) { return R.number(m.locus_count); } },
+        R.urlColumn(function (m) { return m.html; })
+      ]
+    })) { rendered.push('map-record-series'); }
+
+    if (R.collection(els.altBody, {
+      title: 'Other maps of this chromosome',
+      items: related.same_chromosome_maps,
+      filename: 'map-same-chromosome.tsv',
+      columns: [
+        R.recordColumn('Map', 'name', function (m) { return m; }),
+        { key: 'locus_count', label: 'Mapped loci', sort: 'number', numeric: true,
+          get: function (m) { return R.number(m.locus_count); } },
+        { key: 'compare', label: 'Compare', sort: false,
+          get: function (m) { return R.absoluteUrl(m.compare_html); },
+          html: function (m) { return m.compare_html
+            ? '<a href="' + R.escape(m.compare_html) + '">Compare with this map <span aria-hidden="true">&rarr;</span></a>'
+            : '—'; } },
+        R.urlColumn(function (m) { return m.html; })
+      ]
+    })) { rendered.push('map-record-alt'); }
+
+    if (R.collection(els.qtlBody, {
+      title: 'QTL experiments mapped here',
+      items: sections.qtl_experiments,
+      filename: 'map-qtl-experiments.tsv',
+      columns: [
+        R.recordColumn('Experiment', 'name', function (q) { return q; }),
+        { key: 'trait', label: 'Traits measured' },
+        R.urlColumn(function (q) { return q.html; })
+      ]
+    })) { rendered.push('map-record-qtls'); }
+
+    if (R.references(els.referencesBody, sections.references, els.referencesSection, 'map-ref')) {
+      rendered.push('map-record-references');
+    }
+
+    rendered.forEach(function (id) { R.show(R.byId(id), true); });
+
+    // Revealed before the charts are drawn: Plotly sizes a figure to its
+    // container, and a hidden container has no width.
+    R.show(R.byId('map-record-metrics'), true);
+    if (renderMetrics(counts, overview, sections.references)) { rendered.push('map-record-metrics'); }
+
+    R.tabs({
+      el: els.tabs,
+      order: rendered.concat(['map-record-resources', 'map-record-api']),
+      labels: LABELS, counts: counts, tabCounts: TAB_COUNTS
     });
+
+    R.notice(els.notice, meta, counts);
+    MGDB.announce('Record loaded, ' + rendered.length + ' sections.');
   }
 
-  function fact(label, value, note) {
-    if (!value && value !== 0) return '';
-    return '<div><dt>' + escapeHtml(label) + '</dt><dd>' + value +
-           (note ? '<small>' + escapeHtml(note) + '</small>' : '') + '</dd></div>';
-  }
+  function load() {
+    var main = R.byId('map-record-top');
+    if (!main) { return; }
+    var requested = main.getAttribute('data-requested-id') || main.getAttribute('data-canonical-id');
+    if (!requested) { return; }
 
-  function block(title, description, body) {
-    if (!body) return '';
-    return '<div class="map-record-block"><h3>' + escapeHtml(title) + '</h3>' +
-           (description ? '<p>' + escapeHtml(description) + '</p>' : '') + body + '</div>';
-  }
+    R.show(els.error, false);
+    R.show(els.loading, true);
 
-  /* ── Initialization ─────────────────────────────────────────────────────── */
+    MGDB.request('/api/v1/records/map/' + encodeURIComponent(requested), { key: 'map-record' })
+      .then(function (response) {
+        if (!response || !response.data) { throw new Error('unexpected payload'); }
+        render(response);
+      })
+      .catch(function (error) {
+        if (error && error.name === 'AbortError') { return; }
+        R.show(els.loading, false);
+        R.show(els.error, true);
+      });
+  }
 
   function init() {
-    var top = document.querySelector('[data-map-id]');
-    if (!top) return;
-
-    state.mapId = top.getAttribute('data-map-id');
-    if (!state.mapId) return;
-
-    el = {
-      loading: byId('map-record-loading'),
-      error: byId('map-record-error'),
-      notice: byId('map-record-notice'),
-      facts: byId('map-record-facts'),
-      actions: byId('map-record-actions'),
-      tabs: byId('map-record-tabs'),
-      overviewSection: byId('map-record-overview'),
-      overviewBody: byId('map-record-overview-body'),
-      lociSection: byId('map-record-loci'),
-      lociBody: byId('map-record-loci-body'),
-      seriesSection: byId('map-record-series'),
-      seriesBody: byId('map-record-series-body'),
-      altSection: byId('map-record-alt'),
-      altBody: byId('map-record-alt-body'),
-      qtlsSection: byId('map-record-qtls'),
-      qtlsBody: byId('map-record-qtls-body'),
-      referencesSection: byId('map-record-references'),
-      referencesBody: byId('map-record-references-body'),
-      referencesStatus: byId('map-record-ref-status'),
-      referencesPagination: byId('map-record-ref-pagination'),
-      copyJsonBtn: byId('map-copy-json-btn'),
-      retryBtn: byId('map-record-retry')
+    els = {
+      synonyms: R.byId('map-record-synonyms'),
+      facts: R.byId('map-record-facts'),
+      tabs: R.byId('map-record-tabs'),
+      loading: R.byId('map-record-loading'),
+      error: R.byId('map-record-error'),
+      retry: R.byId('map-record-retry'),
+      notice: R.byId('map-record-notice'),
+      overviewBody: R.byId('map-record-overview-body'),
+      lociBody: R.byId('map-record-loci-body'),
+      seriesBody: R.byId('map-record-series-body'),
+      altBody: R.byId('map-record-alt-body'),
+      qtlBody: R.byId('map-record-qtls-body'),
+      referencesBody: R.byId('map-record-references-body'),
+      referencesSection: R.byId('map-record-references'),
+      metricsBody: R.byId('map-record-metrics-body')
     };
-
-    if (el.retryBtn) {
-      el.retryBtn.addEventListener('click', function () {
-        loadRecord();
-      });
-    }
-
-    if (el.copyJsonBtn) {
-      el.copyJsonBtn.addEventListener('click', function () {
-        if (state.record) {
-          copyToClipboard(JSON.stringify(state.record, null, 2), el.copyJsonBtn, 'JSON copied!');
-        }
-      });
-    }
-
-    loadRecord();
-  }
-
-  function loadRecord() {
-    show(el.loading, true);
-    show(el.error, false);
-
-    fetch('/api/v1/records/map/' + encodeURIComponent(state.mapId))
-      .then(function (res) {
-        if (!res.ok) throw new Error('API returned HTTP ' + res.status);
-        return res.json();
-      })
-      .then(function (data) {
-        var mapData = (data && data.data) ? data.data : data;
-        if (!mapData || !mapData.sections) {
-          throw new Error('Malformed API payload: sections missing');
-        }
-        show(el.loading, false);
-        state.record = mapData;
-        renderRecord(mapData, (data.meta && data.meta.counts) || {});
-      })
-      .catch(function (err) {
-        show(el.loading, false);
-        show(el.error, true);
-        console.error('Failed to load map record', err);
-      });
-  }
-
-  /* ── Render Record ──────────────────────────────────────────────────────── */
-
-  function renderRecord(mapData, counts) {
-    var attr = mapData.attributes || {};
-    var sections = mapData.sections || {};
-    var overview = sections.overview || {};
-    var coords = sections.coordinates || [];
-    var related = sections.related_maps || {};
-    var refs = sections.references || [];
-    var qtls = sections.qtl_experiments || [];
-
-    // Hero facts and actions
-    renderHero(attr, overview, counts, coords);
-
-    // Overview section (Pattern Library .map-record-grid)
-    renderOverview(overview, attr);
-
-    // Mapped loci section
-    if (coords && coords.length > 0) {
-      renderLociSection(coords, overview, attr);
-      show(el.lociSection, true);
-    }
-
-    // Sister maps series
-    if (related.sister_maps && related.sister_maps.length > 0) {
-      renderSisterMaps(related.sister_maps, related.series_name);
-      show(el.seriesSection, true);
-    }
-
-    // Same chromosome alternatives
-    if (related.same_chromosome_maps && related.same_chromosome_maps.length > 0) {
-      renderSameChromosomeMaps(related.same_chromosome_maps, overview.linkage_group || attr.linkage_group);
-      show(el.altSection, true);
-    }
-
-    // QTL experiments
-    if (qtls && qtls.length > 0) {
-      renderQTLs(qtls);
-      show(el.qtlsSection, true);
-    }
-
-    // References
-    if (refs && refs.length > 0) {
-      renderReferences(refs);
-      show(el.referencesSection, true);
-    }
-
-    // Dynamic sticky section tabs and scrollspy
-    buildDynamicTabs(sections, coords, related, refs, qtls);
-  }
-
-  /* ── Hero Facts & Actions ───────────────────────────────────────────────── */
-
-  function renderHero(attr, overview, counts, coords) {
-    if (el.facts) {
-      var minC = (overview.min_coord !== undefined && overview.min_coord !== null) ? overview.min_coord : null;
-      var maxC = (overview.max_coord !== undefined && overview.max_coord !== null) ? overview.max_coord : null;
-      var units = overview.coordinate_type || attr.coordinate_type || 'cM';
-
-      var spanStr = (minC !== null && maxC !== null)
-        ? minC.toFixed(1) + ' &ndash; ' + maxC.toFixed(1) + ' ' + escapeHtml(units)
-        : escapeHtml(units);
-
-      var totalLoci = overview.locus_count || attr.locus_count || (counts && counts.coordinates) || coords.length;
-      var authorName = overview.author ? overview.author.name : '';
-
-      var factsHtml = '';
-      factsHtml += fact('Map ID', escapeHtml(overview.id || state.mapId));
-      factsHtml += fact('Chromosome', overview.linkage_group ? ('Chr ' + escapeHtml(overview.linkage_group)) : (attr.linkage_group ? ('Chr ' + escapeHtml(attr.linkage_group)) : ''));
-      factsHtml += fact('Units & Span', spanStr);
-      factsHtml += fact('Mapped Loci', totalLoci ? totalLoci.toLocaleString() : '');
-      if (authorName) factsHtml += fact('Author / Source', escapeHtml(authorName));
-
-      el.facts.innerHTML = factsHtml;
-    }
-
-    if (el.actions) {
-      var actionsHtml =
-        '<a class="mgdb-button mgdb-button-primary" href="/compare_maps?map1=' + encodeURIComponent(state.mapId) + '">Compare this map</a>' +
-        '<a class="mgdb-button mgdb-button-secondary" href="/displaycompletemaprecord.cgi?id=' + encodeURIComponent(state.mapId) + '">Full map set</a>';
-
-      el.actions.innerHTML = actionsHtml;
-    }
-  }
-
-  /* ── Overview Section (Pattern Library Grid & Blocks) ───────────────────── */
-
-  function renderOverview(overview, attr) {
-    if (!el.overviewBody) return;
-
-    var minC = (overview.min_coord !== undefined && overview.min_coord !== null) ? overview.min_coord : null;
-    var maxC = (overview.max_coord !== undefined && overview.max_coord !== null) ? overview.max_coord : null;
-    var units = overview.coordinate_type || attr.coordinate_type || 'cM';
-
-    var spanFormatted = (minC !== null && maxC !== null)
-      ? minC.toFixed(2) + ' &ndash; ' + maxC.toFixed(2) + ' ' + escapeHtml(units)
-      : escapeHtml(units);
-
-    var lengthNote = (minC !== null && maxC !== null)
-      ? 'Total map length: ' + (maxC - minC).toFixed(2) + ' ' + escapeHtml(units)
-      : '';
-
-    var totalLoci = overview.locus_count || attr.locus_count || 0;
-    var authorName = overview.author ? overview.author.name : 'MaizeGDB Curation';
-
-    var factsHtml = '';
-    factsHtml += fact('Map Name', escapeHtml(overview.name || attr.name || ''));
-    factsHtml += fact('Chromosome / Linkage Group', 'Chromosome ' + escapeHtml(overview.linkage_group || attr.linkage_group || '—'));
-    factsHtml += fact('Coordinate Units', escapeHtml(units));
-    factsHtml += fact('Mapped Span', spanFormatted, lengthNote);
-    factsHtml += fact('Mapped Loci', totalLoci ? (totalLoci.toLocaleString() + ' positioned markers') : '0 positioned markers');
-    factsHtml += fact('Source / Contributor', escapeHtml(authorName));
-
-    var html = factsHtml ? '<dl class="map-record-grid">' + factsHtml + '</dl>' : '';
-
-    if (overview.memos && overview.memos.length) {
-      var memoBody = overview.memos.map(function (m) {
-        return '<p>' + m + '</p>';
-      }).join('');
-      html += block('Curator notes &amp; methodology', '',
-        '<div class="map-record-notes">' + memoBody + '</div>');
-    }
-
-    el.overviewBody.innerHTML = html;
-    show(el.overviewSection, true);
-  }
-
-  /* ── Mapped Loci & Coordinates Table ────────────────────────────────────── */
-
-  function renderLociSection(coords, overview, attr) {
-    if (!el.lociBody) return;
-
-    state.filteredLoci = coords;
-
-    var toolbarHtml =
-      '<div class="map-loci-toolbar">' +
-      '  <div class="map-loci-filters">' +
-      '    <input class="map-loci-search" id="map-loci-search-input" type="search" placeholder="Filter by locus name, symbol, or bin…" />' +
-      '    <label class="map-checkbox-label">' +
-      '      <input type="checkbox" id="map-loci-backbone-toggle" />' +
-      '      <span>Backbone markers only</span>' +
-      '    </label>' +
-      '  </div>' +
-      '  <div>' +
-      '    <button class="mgdb-button mgdb-button-quiet" id="map-loci-export-tsv" type="button">Download TSV &darr;</button>' +
-      '  </div>' +
-      '</div>' +
-      '<div id="map-loci-table-container"></div>' +
-      '<nav class="map-pagination" id="map-loci-pagination" aria-label="Loci table pages"></nav>';
-
-    el.lociBody.innerHTML = toolbarHtml;
-
-    var searchInput = byId('map-loci-search-input');
-    var backboneToggle = byId('map-loci-backbone-toggle');
-    var exportBtn = byId('map-loci-export-tsv');
-
-    if (searchInput) {
-      searchInput.addEventListener('input', function () {
-        state.lociFilter = this.value.trim().toLowerCase();
-        state.lociPage = 1;
-        applyLociFilter(coords);
-      });
-    }
-
-    if (backboneToggle) {
-      backboneToggle.addEventListener('change', function () {
-        state.backboneOnly = this.checked;
-        state.lociPage = 1;
-        applyLociFilter(coords);
-      });
-    }
-
-    if (exportBtn) {
-      exportBtn.addEventListener('click', function () {
-        exportLociTsv(coords, overview, attr);
-      });
-    }
-
-    applyLociFilter(coords);
-  }
-
-  function applyLociFilter(allCoords) {
-    state.filteredLoci = allCoords.filter(function (locus) {
-      if (state.backboneOnly && !locus.is_backbone) return false;
-      if (state.lociFilter) {
-        var matchName = locus.name && locus.name.toLowerCase().indexOf(state.lociFilter) !== -1;
-        var matchFullName = locus.full_name && locus.full_name.toLowerCase().indexOf(state.lociFilter) !== -1;
-        var matchBin = locus.bin && String(locus.bin).toLowerCase().indexOf(state.lociFilter) !== -1;
-        var matchType = locus.locus_type && locus.locus_type.toLowerCase().indexOf(state.lociFilter) !== -1;
-        if (!matchName && !matchFullName && !matchBin && !matchType) return false;
-      }
-      return true;
-    });
-
-    renderLociPage();
-  }
-
-  function renderLociPage() {
-    var container = byId('map-loci-table-container');
-    var paginationEl = byId('map-loci-pagination');
-    if (!container) return;
-
-    var total = state.filteredLoci.length;
-    var totalPages = Math.ceil(total / LOCI_PAGE_SIZE);
-    if (state.lociPage > totalPages) state.lociPage = Math.max(1, totalPages);
-
-    if (total === 0) {
-      container.innerHTML = '<div class="mgdb-message mgdb-message-info"><div><span>No locus coordinates matched your filter.</span></div></div>';
-      if (paginationEl) paginationEl.innerHTML = '';
-      return;
-    }
-
-    var start = (state.lociPage - 1) * LOCI_PAGE_SIZE;
-    var end = Math.min(start + LOCI_PAGE_SIZE, total);
-    var pageItems = state.filteredLoci.slice(start, end);
-
-    var html = '<div class="map-table-wrapper">' +
-      '<table class="map-loci-table">' +
-      '<thead><tr>' +
-      '  <th>Locus Symbol</th>' +
-      '  <th>Coordinate</th>' +
-      '  <th>Bin</th>' +
-      '  <th>Backbone</th>' +
-      '  <th>Locus Type</th>' +
-      '  <th>Full Name / Description</th>' +
-      '</tr></thead><tbody>';
-
-    pageItems.forEach(function (locus) {
-      var coordStr = (locus.coordinate !== null && locus.coordinate !== undefined) ? locus.coordinate.toFixed(2) : '—';
-      var binStr = locus.bin ? escapeHtml(locus.bin) : '<span style="color:var(--mgdb-muted);">—</span>';
-      var backboneStr = locus.is_backbone
-        ? '<span class="map-backbone-pill">Backbone</span>'
-        : '<span style="color:var(--mgdb-muted);">—</span>';
-
-      html += '<tr>' +
-        '  <td class="map-locus-cell"><strong><a href="' + escapeHtml(locus.html) + '">' + escapeHtml(locus.name) + '</a></strong></td>' +
-        '  <td><strong>' + coordStr + '</strong></td>' +
-        '  <td>' + binStr + '</td>' +
-        '  <td>' + backboneStr + '</td>' +
-        '  <td>' + (locus.locus_type ? escapeHtml(locus.locus_type) : '—') + '</td>' +
-        '  <td>' + (locus.full_name ? escapeHtml(locus.full_name) : '<span style="color:var(--mgdb-muted);">—</span>') + '</td>' +
-        '</tr>';
-    });
-
-    html += '</tbody></table></div>';
-    container.innerHTML = html;
-
-    if (paginationEl) {
-      renderTablePagination(paginationEl, totalPages, state.lociPage, function (newPage) {
-        state.lociPage = newPage;
-        renderLociPage();
-      });
-      show(paginationEl, totalPages > 1);
-    }
-  }
-
-  function exportLociTsv(coords, overview, attr) {
-    var tsv = 'Locus Name\tCoordinate\tBin\tIs Backbone\tLocus Type\tFull Name\tURL\n';
-    coords.forEach(function (l) {
-      tsv += (l.name || '') + '\t' +
-             (l.coordinate !== null ? l.coordinate : '') + '\t' +
-             (l.bin || '') + '\t' +
-             (l.is_backbone ? 'YES' : 'NO') + '\t' +
-             (l.locus_type || '') + '\t' +
-             (l.full_name || '') + '\t' +
-             ('https://maizegdb.org' + (l.html || '')) + '\n';
-    });
-
-    var mapName = overview.name || attr.name || ('map_' + state.mapId);
-    var blob = new Blob([tsv], { type: 'text/tab-separated-values;charset=utf-8' });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = mapName.replace(/\s+/g, '_') + '_loci.tsv';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
-
-  /* ── Sister Series & Alternative Maps ───────────────────────────────────── */
-
-  function renderSisterMaps(sisterMaps, seriesName) {
-    if (!el.seriesBody) return;
-
-    var html = '<div class="map-sister-grid">';
-    sisterMaps.forEach(function (m) {
-      html += '<article class="map-sister-card">' +
-        '  <div>' +
-        '    <span class="map-chr-pill">Chr ' + escapeHtml(m.linkage_group) + '</span>' +
-        '    <h3 style="margin:var(--mgdb-space-1) 0 2px;font-size:var(--mgdb-text-base);"><a href="' + escapeHtml(m.html) + '">' + escapeHtml(m.name) + '</a></h3>' +
-        '  </div>' +
-        '  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:var(--mgdb-space-2);padding-top:var(--mgdb-space-2);border-top:1px dashed var(--mgdb-line-soft);">' +
-        '    <span class="map-loci-badge">' + (m.locus_count ? m.locus_count.toLocaleString() : '0') + ' loci</span>' +
-        '    <a class="mgdb-button mgdb-button-quiet" href="' + escapeHtml(m.html) + '">View map &rarr;</a>' +
-        '  </div>' +
-        '</article>';
-    });
-    html += '</div>';
-
-    el.seriesBody.innerHTML = html;
-  }
-
-  function renderSameChromosomeMaps(altMaps, linkage) {
-    if (!el.altBody) return;
-
-    var html = '<div class="map-alt-grid">';
-    altMaps.forEach(function (m) {
-      html += '<article class="map-alt-card">' +
-        '  <div>' +
-        '    <strong><a href="' + escapeHtml(m.html) + '">' + escapeHtml(m.name) + '</a></strong>' +
-        '    <p style="margin:2px 0 0;color:var(--mgdb-muted);font-size:var(--mgdb-text-xs);">' + (m.locus_count ? m.locus_count.toLocaleString() : '0') + ' mapped loci</p>' +
-        '  </div>' +
-        '  <div class="map-alt-actions">' +
-        '    <a class="mgdb-button mgdb-button-secondary" href="' + escapeHtml(m.html) + '">View map &rarr;</a>' +
-        '    <a class="mgdb-button mgdb-button-quiet" href="' + escapeHtml(m.compare_html) + '">Compare &nearr;</a>' +
-        '  </div>' +
-        '</article>';
-    });
-    html += '</div>';
-
-    el.altBody.innerHTML = html;
-  }
-
-  /* ── QTL Experiments ────────────────────────────────────────────────────── */
-
-  function renderQTLs(qtls) {
-    if (!el.qtlsBody) return;
-
-    var html = '<div class="map-table-wrapper">' +
-      '<table class="map-loci-table">' +
-      '<thead><tr>' +
-      '  <th>QTL Experiment</th>' +
-      '  <th>Trait</th>' +
-      '  <th>Actions</th>' +
-      '</tr></thead><tbody>';
-
-    qtls.forEach(function (q) {
-      html += '<tr>' +
-        '  <td><strong><a href="' + escapeHtml(q.html) + '">' + escapeHtml(q.name) + '</a></strong></td>' +
-        '  <td>' + escapeHtml(q.trait || '—') + '</td>' +
-        '  <td><a href="' + escapeHtml(q.html) + '">View experiment &rarr;</a></td>' +
-        '</tr>';
-    });
-
-    html += '</tbody></table></div>';
-    el.qtlsBody.innerHTML = html;
-  }
-
-  /* ── Curated References (Matching Reference & Stock Center) ─────────────── */
-
-  function renderReferences(references) {
-    if (!references || !references.length) return;
-    state.allReferences = references;
-    state.refCurrentPage = 1;
-    renderReferencePage();
-  }
-
-  function renderReferencePage() {
-    var total = state.allReferences.length;
-    var totalPages = Math.ceil(total / REF_PAGE_SIZE);
-    if (state.refCurrentPage > totalPages) state.refCurrentPage = totalPages;
-    if (state.refCurrentPage < 1) state.refCurrentPage = 1;
-
-    var start = (state.refCurrentPage - 1) * REF_PAGE_SIZE;
-    var end = Math.min(start + REF_PAGE_SIZE, total);
-    var pageSlice = state.allReferences.slice(start, end);
-
-    var html = pageSlice.map(function (ref) {
-      var yearBadge = ref.year ? '<span class="reference-year">' + escapeHtml(ref.year) + '</span>' : '';
-      var topicBadge = ref.relevance ? '<span class="mgdb-pill mgdb-pill-ok">' + escapeHtml(ref.relevance) + '</span>' : '';
-      var typeBadge = ref.pub_type ? '<span class="mgdb-pill mgdb-pill-info">' + escapeHtml(ref.pub_type) + '</span>' : '<span class="mgdb-pill mgdb-pill-info">Journal article</span>';
-      var idBadge = ref.id ? '<span class="reference-copy-id">ID: ' + ref.id + '</span>' : '';
-
-      var title = ref.title || ref.citation || 'Untitled publication';
-      var authors = ref.authors ? '<p class="reference-card-authors">' + escapeHtml(ref.authors) + '</p>' : '';
-      var citation = ref.citation ? '<p class="reference-card-journal">' + escapeHtml(ref.citation) + '</p>' : '';
-
-      var readBtn = ref.doi
-        ? '<a class="mgdb-button mgdb-button-quiet" href="https://doi.org/' + encodeURIComponent(ref.doi) + '" target="_blank" rel="noopener">Read paper &nearr;</a>'
-        : '';
-
-      var fullCitation = (ref.authors ? ref.authors + '. ' : '') +
-                         (ref.year ? '(' + ref.year + '). ' : '') +
-                         title + '. ' +
-                         (ref.citation ? ref.citation + '. ' : '') +
-                         (ref.doi ? 'doi:' + ref.doi : '');
-
-      return '<article class="reference-result-card">' +
-        '<div>' +
-          '<div class="reference-result-meta">' +
-            yearBadge + topicBadge + typeBadge + idBadge +
-          '</div>' +
-          '<h3 class="reference-card-title"><a href="' + escapeHtml(ref.html) + '">' + escapeHtml(title) + '</a></h3>' +
-          authors +
-          citation +
-        '</div>' +
-        '<div class="reference-card-actions">' +
-          '<a class="mgdb-button mgdb-button-secondary" href="' + escapeHtml(ref.html) + '">Reference record &rarr;</a>' +
-          readBtn +
-          '<button class="mgdb-button mgdb-button-quiet" type="button" data-copy-citation="' + escapeHtml(fullCitation) + '">Copy citation</button>' +
-          (ref.doi ? '<button class="mgdb-button mgdb-button-quiet" type="button" data-copy-doi="' + escapeHtml(ref.doi) + '">Copy DOI</button>' : '') +
-        '</div>' +
-      '</article>';
-    }).join('');
-
-    el.referencesBody.innerHTML = html;
-    bindReferenceCopyHandlers();
-
-    if (el.referencesStatus) {
-      el.referencesStatus.textContent = 'Showing ' + (start + 1) + '–' + end + ' of ' + total.toLocaleString() + ' curated publications.';
-    }
-
-    if (el.referencesPagination) {
-      renderTablePagination(el.referencesPagination, totalPages, state.refCurrentPage, function (newPage) {
-        state.refCurrentPage = newPage;
-        renderReferencePage();
-      });
-      show(el.referencesPagination, totalPages > 1);
-    }
-  }
-
-  function bindReferenceCopyHandlers() {
-    Array.prototype.forEach.call(document.querySelectorAll('[data-copy-citation]'), function (btn) {
-      btn.addEventListener('click', function () {
-        var text = btn.getAttribute('data-copy-citation');
-        copyToClipboard(text, btn, 'Citation copied!');
-      });
-    });
-
-    Array.prototype.forEach.call(document.querySelectorAll('[data-copy-doi]'), function (btn) {
-      btn.addEventListener('click', function () {
-        var doi = btn.getAttribute('data-copy-doi');
-        copyToClipboard('https://doi.org/' + doi, btn, 'DOI copied!');
-      });
-    });
-  }
-
-  /* ── Generic Table Pagination ───────────────────────────────────────────── */
-
-  function renderTablePagination(paginationEl, totalPages, curPage, onPageChange) {
-    if (totalPages <= 1) {
-      paginationEl.innerHTML = '';
-      return;
-    }
-
-    var html = '';
-    html += '<button class="map-page-btn" type="button" data-page="' + (curPage - 1) + '" ' + (curPage === 1 ? 'disabled' : '') + '>&larr; Prev</button>';
-
-    var pages = [];
-    pages.push(1);
-    if (curPage > 3) pages.push('...');
-    for (var p = Math.max(2, curPage - 1); p <= Math.min(totalPages - 1, curPage + 1); p++) {
-      pages.push(p);
-    }
-    if (curPage < totalPages - 2) pages.push('...');
-    if (totalPages > 1) pages.push(totalPages);
-
-    pages.forEach(function (p) {
-      if (p === '...') {
-        html += '<span class="map-page-ellipsis">&hellip;</span>';
-      } else {
-        html += '<button class="map-page-btn ' + (p === curPage ? 'is-active' : '') + '" type="button" data-page="' + p + '">' + p + '</button>';
-      }
-    });
-
-    html += '<button class="map-page-btn" type="button" data-page="' + (curPage + 1) + '" ' + (curPage === totalPages ? 'disabled' : '') + '>Next &rarr;</button>';
-
-    paginationEl.innerHTML = html;
-
-    paginationEl.querySelectorAll('button[data-page]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var page = parseInt(this.getAttribute('data-page'), 10);
-        if (page && page !== curPage && page >= 1 && page <= totalPages) {
-          onPageChange(page);
-        }
-      });
-    });
-  }
-
-  /* ── Dynamic Section Tabs & Scrollspy ────────────────────────────────────── */
-
-  function buildDynamicTabs(sections, coords, related, refs, qtls) {
-    if (!el.tabs) return;
-
-    var tabs = [];
-    tabs.push({ id: 'map-record-overview', label: 'Overview' });
-
-    if (coords && coords.length > 0) {
-      tabs.push({ id: 'map-record-loci', label: 'Mapped loci', count: coords.length });
-    }
-    if (related.sister_maps && related.sister_maps.length > 0) {
-      tabs.push({ id: 'map-record-series', label: 'Sister chromosome maps', count: related.sister_maps.length });
-    }
-    if (related.same_chromosome_maps && related.same_chromosome_maps.length > 0) {
-      tabs.push({ id: 'map-record-alt', label: 'Same chromosome maps', count: related.same_chromosome_maps.length });
-    }
-    if (qtls && qtls.length > 0) {
-      tabs.push({ id: 'map-record-qtls', label: 'QTL experiments', count: qtls.length });
-    }
-    if (refs && refs.length > 0) {
-      tabs.push({ id: 'map-record-references', label: 'Curated references', count: refs.length });
-    }
-    tabs.push({ id: 'map-record-related', label: 'Related resources' });
-    tabs.push({ id: 'map-record-provenance', label: 'Provenance' });
-
-    var html = tabs.map(function (t, i) {
-      var countBadge = t.count !== undefined
-        ? ' <span class="map-record-tab-count">' + t.count.toLocaleString() + '</span>'
-        : '';
-      var activeClass = i === 0 ? ' class="is-current" aria-current="true"' : '';
-      return '<a href="#' + t.id + '"' + activeClass + '>' + escapeHtml(t.label) + countBadge + '</a>';
-    }).join('');
-
-    el.tabs.innerHTML = html;
-    show(el.tabs, true);
-
-    bindScrollspy();
-  }
-
-  function bindScrollspy() {
-    var tabs = document.querySelectorAll('.mgdb-section-tabs a');
-    if (!tabs.length) return;
-
-    var pairs = [];
-    Array.prototype.forEach.call(tabs, function (tab) {
-      var href = tab.getAttribute('href');
-      if (href && href.indexOf('#') === 0) {
-        var section = document.querySelector(href);
-        if (section) {
-          pairs.push({ tab: tab, section: section });
-        }
-      }
-    });
-
-    function markCurrent(target) {
-      pairs.forEach(function (pair) {
-        var current = pair.section === target;
-        pair.tab.classList.toggle('is-current', current);
-        if (current) {
-          pair.tab.setAttribute('aria-current', 'true');
-        } else {
-          pair.tab.removeAttribute('aria-current');
-        }
-      });
-    }
-
-    pairs.forEach(function (pair) {
-      pair.tab.addEventListener('click', function () {
-        markCurrent(pair.section);
-      });
-    });
-
-    if (!window.IntersectionObserver) return;
-
-    var observer = new window.IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          markCurrent(entry.target);
-        }
-      });
-    }, { rootMargin: '-20% 0px -60% 0px' });
-
-    pairs.forEach(function (pair) {
-      observer.observe(pair.section);
-    });
+    if (els.retry) { els.retry.addEventListener('click', load); }
+    R.apiCard('map-copy-json-btn', 'map-record-api-link', function () { return payload; });
+    load();
   }
 
   if (document.readyState === 'loading') {

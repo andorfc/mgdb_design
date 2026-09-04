@@ -1,0 +1,376 @@
+$$SYNTAX-LEVEL 2
+*(gene_product-sections {include-js: ../js/gene_product.js}
+    @(top {display: off}
+    <script language="javascript">
+      recordAccess('gene_product', '$(escaped_name)'\);
+    </script>
+
+    <p class='data_center_title'>
+      <span class='data_center_title'>
+        $(name)
+     </span>
+     @(syn {display: off}
+      <br><br>
+      This Gene Product is also known by the following names: 
+      @(syn_sec
+        <br><b>$(synonym)</b> $(authority) 
+      )
+    )      
+    </p>
+
+    @(references {display:off}
+      <br>
+      @(show_ref 
+        <p>
+        @(print {display:off}
+          <a name="show_ref"></a>
+          <a onclick="javascript:toggle_references('hide'\);" href="#" title="Hide these papers!">
+            <img src="/images/collapse.png" border=0 alt="Hide these papers!">
+          </a>
+          <b>Related Papers:</b> (click the arrow to the left to hide these\)<br>
+        )
+        
+        <div id="show_ref" name="show_ref" style="display: none">
+          <a name="show_ref"></a>
+          <a onclick="javascript:toggle_references('hide'\);" href="#" title="Hide these papers!">
+            <img src="/images/collapse.png" border=0 alt="Hide these papers!">
+          </a> 
+          <b>Related Papers:</b> (click the arrow to the left to hide these\)<br>
+
+          @(fill_ref
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<i>$(cont_name)</i>\) 
+            <a href="/data_center/reference?id=$(ref_id)" title="$(ref_title)">$(ref_name)</a><br>
+          )
+       </div>
+      )
+      
+      @(hide_ref
+        <p>
+          @(hide_print {display:off}
+            <a onclick="javascript:toggle_references('show'\);" href="#" title="Show related references">
+              <img alt="Show related references" src="/images/expand.png" border=0>
+            </a>
+            This Gene Product has <b>$(match_count)</b> references that describe it.  
+            Click the arrow to the left to view these references.
+          )
+          
+          <div id="hide_ref" name="hide_ref" style="display: $(display)">
+            <a onclick="javascript:toggle_references('show'\);" href="#" title="Show related references">
+              <img alt="Show related references" src="/images/expand.png" border=0>
+            </a>
+            This Gene Product has <b>$(match_count)</b> references that describe it.  
+            Click the arrow to the left to view these references.
+          </div>
+        </p>
+      )
+    )
+  )
+  
+  @(overview {display: off}
+    <p>
+  	  @(related_loci {display: off}
+       <br>
+	   <b>Related Loci:</b><br>
+       @(loci_sec
+        &nbsp;&nbsp;&nbsp;
+        <a href="/data_center/locus?id=$(loc_id)">
+          <b>$(loc_name)</b> <i>$(loc_fullname)</i>
+        </a>
+        <br>
+       )
+      )
+      @(uniprot_sec {display: off}
+        <br>
+		<b>UniProts Links:</b><br>
+	   @(uniprots
+	   &nbsp;&nbsp;&nbsp;
+        <a href="$(uurl_prefix)$(ukey)">$(ukey)</a> (@ $(upers_name)\)<br>
+	   )
+      )
+      @(gp_type {display: off}
+        <br><b> Type: </b> $(type)<br>
+      )
+      @(gp_species  {display: off}
+        <br><b>Species: </b> $(species)<br>
+      )
+      @(hs {display: off}
+        <br><b>Holoenzyme Substructure: </b>
+        $(holoenzyme)<br>
+      )
+      @(properties {display: off} 
+        <br><b>Properties:</b> $(props)<br>
+      )
+      @(ec_numbers {display: off}
+        <br><b>EC Number(s\):</b>
+        @(ec_num_sec
+          <br>
+          $(ec_num)
+          (see more info at 
+		   <a href="http://www.brenda-enzymes.org/php/result_flat.php4?ecno=$(ec_num)">
+            BRENDA
+		  </a> | 
+		  <a href="http://corncyc-b73-v4.maizegdb.org/CORN/substring-search?type=NIL&quickSearch=Quick+Search&object=$(ec_num)">
+            CornCyc
+		  </a> | 
+          <a href="http://pmn.plantcyc.org/PLANT/substring-search?type=NIL&object=$(ec_num)">
+            PlantCyc
+          </a> |
+          <a href="http://biocyc.org/ARA/substring-search?type=NIL&quickSearch=Quick+Search&object=$(ec_num)">
+            BioCyc (Arabidopsis\)
+          </a> | 
+          <a href="http://www.genome.jp/dbget-bin/www_bget?ec:$(ec_num)">
+            KEGG
+          </a> | 
+          <a href="http://metacyc.org/META/search-query?type=GENE&pname=$(ec_num)">
+            MetaCyc
+          </a> | <a href="http://enzyme.expasy.org/EC/$(ec_num)">
+            SwissProt</a>\)
+        )
+        <br>
+      )
+      @(localization {display: off}
+       <br><b>Localization:</b>
+       $(loc)<br>
+      )
+      @(induced_exp {display: off}
+        <br><b>Induced Expression:</b><br>
+        @(induced_sec
+          &nbsp;&nbsp;This gene product is induced by $(condition)$(evidence)<br> 
+        )      
+      )
+      @(metabolic_constituents {display: off}
+        <br><b>Metabolic Constituents:</b><br>
+        @(meta_sec
+          &nbsp;&nbsp;<acronym $(mbc_description)>$(metabolic_constituent)</acronym>
+          <br>
+        )
+      )
+      @(metabolic_paths {display: off}
+        <br><b>Metabolic Path(s\):</b><br>
+        <!--
+          TODO:  
+            Use which URL for MPs? 
+            This one redirects to a generic page unrelated to 
+            the listed MP: http://maizecyc.maizegdb.org/MAIZE/?id= 
+        -->
+        @(metapath_sec
+          &nbsp;&nbsp;<a href="mp?id=$(path_id)">$(path_name)</a>
+          <br>
+        )
+      )
+      @(motif_feature {display: off}
+        <br>
+        <b>Motif Feature(s\):</b><br>
+        @(motif_sec
+          &nbsp;&nbsp;$(mf_type) $(mf_description)<br>
+        )
+      )
+      @(no_overview {display: off}
+        <br><b>There is no overview data for this Gene Product.</b>
+      )
+    </p>
+  )
+  
+  @(annotations {display: off}
+    @(curation {display: off}
+    <!-- UNUSED -->
+      <table cellpadding=0 cellspacing=0 width="90%">
+        <tr>
+          <td><img src="/images/lite_green_lt.gif"></td>
+          <td class=lite_green_background width="100%"></td>
+          <td><img src="/images/lite_green_rt.gif"></td>
+        </tr>
+        <tr>
+          <td class=lite_green_background></td>
+          <td class=lite_green_background style="padding:2px">
+            <p>
+              <b>Add annotation to this record</b>
+              <form method="post" id="obo_curationform"
+                    action="javascript:popUpAnnotation('obo_curationform', '/curation/OBO/edit'\);"> 
+                <input type="hidden" id="mgdb_id" name="mgdb_id" value="$(mgdb_id)">
+                <input type="hidden" id="table_name" name="table_name" value="gene_product">
+                <input type="hidden" id="rec_name" name="rec_name" value="$(rec_name)">
+                &nbsp;<a onclick="obo_curationform.submit(\);"
+                   href="#">Add ontology terms</a> 
+              </form>
+              <form method="post" id="curationform"
+                    action="javascript:popUpAnnotation('curationform', '/curation/FreeText/edit'\)" method="post">
+                <input type="hidden" id="table_name" value="gene_product">
+                <input type="hidden" id="mgdb_id" value="$(mgdb_id)">
+                <input type="hidden" id="rec_name" value="$(rec_name)">
+                <input type="hidden" id="auto_num" name="auto_num" value="">
+                &nbsp;<a onclick="curationform.submit(\)"
+                   href="#">Add free text annotation</a>
+              </form>
+            </p>
+          </td>
+          <td class=lite_green_background></td>
+        </tr>
+        <tr>
+          <td><img src="/images/lite_green_lb.gif"></td>
+          <td class=lite_green_background width="100%"></td>
+          <td><img src="/images/lite_green_rb.gif"></td>
+        </tr>
+      </table>
+      <br>
+    )
+    
+    @(no-ont-terms {display: off}
+      <p><b>No ontology terms attached to this record</b></p>
+      <br>
+    )
+    @(ont-terms {display: off}
+      <p><b>Ontology Terms</b></p>
+      <table>  
+        <tr>
+          <th>term</th>
+          <th>name</th>
+          <th>evidence</th>
+          <th>reference</th>
+        </tr>      
+        @(ontology-list
+          <tr>
+            <td><a href="$(purl)" target="_blank">$(obo_term)</a></td>
+            <td>$(obo_name)</td>
+            <td align="center">$(evidence_code)</td>
+            <td align="center">$(reference)</td>
+          </tr>
+        )
+      </table>
+      <br>
+    )
+    @(ont-terms-curator {display: off}
+      <p><b>Ontology Terms</b> \(curator's view\)</p>
+      <table>  
+        <tr>
+          <th>term</th>
+          <th>name</th>
+          <th>evidence</th>
+          <th>reference</th>
+          <th>curator</th>
+          <th>validation</th>
+          <th>edit</th>
+        </tr>      
+        @(ontology-list-ex
+          <tr>
+            <td><a href="$(purl)">$(obo_term)</a></td>
+            <td>$(obo_name)</td>
+            <td align="center">$(evidence_code)</td>
+            <td align="center">$(reference)</td>
+            <td>$(first_name) $(last_name)</td>
+            <td>$(validation_lvl)</td>
+            <td>                                                
+              <form id="edit_$(auto_num)" method="post" action="javascript:popUpAnnotation\('edit_$(auto_num)', '/curation/OBO/edit'\);">
+                <input type="hidden" name="mgdb_id" id="mgdb_id" value="$(mgdb_id)">
+                <input type="hidden" name="table_name" id="table_name" value="gene_product">
+                <input type="hidden" name="rec_name" id="rec_name" value="$(rec_name)">
+                <input type="hidden" name="auto_num" id="auto_num" value="$(auto_num)">
+                <a onclick="edit_$(auto_num).submit(\);" 
+                   href="#">edit</a>
+              </form>
+            </td>
+          </tr>
+        )
+      </table>
+    )
+
+    @(no-comments {display: off}
+      <b>There are no annotations for this BAC.</b>
+    )
+    @(comments {display: off}
+      <p>
+        <b>
+          <span title="Comments are additional notes relevant to this BAC record that might be of interest to you.">
+            Comments:
+          </span>
+        </b>
+        <br>
+        <div class="small_tab">$(comment-list)</div>
+      </p>
+      <br>
+    )
+    
+    @(no-user {display: off}
+      <p><b>No user annotations</b></p>
+      <br>
+    )
+    @(annotation-user {display: off}
+      <p><b>User Annotations:</b></p>
+      @(annotation-user-list
+        <form name="ft_edit_$(auto_num)" id="ft_edit_$(auto_num)" method="post" 
+              target="annotation">
+          <input type="hidden" name="auto_num" id="auto_num" value="$(auto_num)">
+          <input type="hidden" name="mgdb_id" id="mgdb_id" value="$(mgdb_id)">
+          <input type="hidden" name="table_name" id="table_name" value="gene_product">
+          From:
+          <b><a href="/person/$(person_id)">$(first_name) $(last_name)</a></b>
+          (<i>$(mod_date)</i>\)
+          <br>
+          <span style="margin-left: 10px;">$(memo)</span>
+        </form>
+      )
+      <br>
+    )
+    @(annotation-user-curator {display: off}
+      <p><b>User Annotations: (curator's view\)</b></p>
+      @(annotation-user-list-ex
+        <form name="ft_edit_$(auto_num)" id="ft_edit_$(auto_num)" method="post" 
+              target="annotation">
+          <input type="hidden" name="auto_num" id="auto_num" value="$(auto_num)">
+          <input type="hidden" name="mgdb_id" id="mgdb_id" value="$(mgdb_id)">
+          <input type="hidden" name="table_name" id="table_name" value="gene_product">
+          From:
+          <b><a href="/person/$(person_id)">$(first_name) $(last_name)</a></b>
+          (<i>$(mod_date)</i>\)
+          <br> 
+          <span style="margin-left: 10px;">$(memo)</span>
+          <br>
+          <i><a href="#" 
+                onclick="popUpAnnotation('ft_edit_$(auto_num)', '/curation/FreeText/edit'\);">Edit this annotation</a>
+          </i>
+        </form>
+      )
+      <br>
+    )
+  )
+  
+  @(related_data {display: off}
+    @(related_sequences {display: off}
+      <br>
+      <b>Related Sequences:</b><br>
+      @(seq_sec
+        &nbsp;&nbsp;&nbsp;
+        <a href='/data_center/sequence?id=$(seq_id)'>$(genbank_acc)</a>
+       ($(seq_type)\)<br>
+      )
+    )
+    @(related_gp {display: off}
+      <br>
+      <b>Related Gene Products:</b>
+      @(related_gp_sec
+        <br>&nbsp;&nbsp;&nbsp;
+        <acronym $(term_comment)>$(desc_name)</acronym>
+        <a href='/data_center/gene_product?id=$(gp_id)'>
+          $(gp_name)
+        </a>
+      )
+    )
+    @(no_related {display: off}
+      <p>
+        <br>
+        <b>&nbsp;&nbsp;There is no other related data for this Gene Product.</b>
+      </p>
+    )
+   )
+   
+   @(offsite_resources {display: off}
+     <br>
+     @(offsite_sec
+       <a href="$(url_prefix)$(key)">$(key)</a> (@ $(pers_name)\)<br>
+     )
+     @(no_offsite {display: off | bind: offsite_sec}
+       <b> No offsite resources available for this Gene Product. </b>
+     )
+   )
+   
+)

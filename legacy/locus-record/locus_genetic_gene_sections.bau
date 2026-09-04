@@ -1,0 +1,90 @@
+$$SYNTAX-LEVEL 2
+*(gene-locus-genetic-sections
+ 
+  @(genetic {display: off}
+    @(primers_enzymes {display: off}
+      <br>
+      <b>Primers and Enzymes:</b><br>
+      <table width="100%" cellpadding=1 cellspacing=0 summary="A table describing primers for finding this locus">
+        <tr>
+          <td align=left><u>Primer/Enzyme</u></td>
+          <td align=left><u>Probe</u></td>
+        </tr>
+        @(primezyme_sec
+          <tr>
+            <td>
+              <a href="/data_center/primer/$(prim_id)">
+                <font style="font-face:Courier New,Courier;">$(prim_seq)</font>
+              </a>
+            </td>
+            <td>
+              <a href="/data_center/marker/?id=$(probe_id)">$(probe_name)</a>
+            </td>
+          </tr>
+        )
+      </table>
+    )
+    
+    @(related_bacs {display: off}
+      <br>
+      <b>Related BACs:</b>
+      (BACs identified to be anchored by probes for this locus\):
+      <table cellpadding=1 cellspacing=0 width="100%">
+        @(bac_sec
+         <tr>
+           <td><a href="/data_center/bac?id=$(bacid_1)">$(bacname_1)</a></td>
+           <td><a href="/data_center/bac?id=$(bacid_2)">$(bacname_2)</a></td>
+           <td><a href="/data_center/bac?id=$(bacid_3)">$(bacname_3)</a></td>
+           <td><a href="/data_center/bac?id=$(bacid_4)">$(bacname_4)</a></td>
+         </tr>
+        )
+      </table>
+    )
+    @(gel_patterns {display:off} 
+     <br>
+     <b>Gel Patterns:</b>
+     <table width="100%">
+       @(gel_sec
+         <tr>
+           <td><a href="/data_center/gel?id=$(gelid_1)">$(gelname_1)</a></td>
+           <td><a href="/data_center/gel?id=$(gelid_2)">$(gelname_2)</a></td>
+           <td><a href="/data_center/gel?id=$(gelid_3)">$(gelname_3)</a></td>
+           <td><a href="/data_center/gel?id=$(gelid_4)">$(gelname_4)</a></td>
+           <td><a href="/data_center/gel?id=$(gelid_5)">$(gelname_5)</a></td>
+         </tr>
+        )
+      </table>
+      <br>
+      <p>
+       <div id="datacenter_lite_green_background">
+        <a href="#!" onclick="javascript:gelImgSearch('gel_img_results', 'locus_id=$(g_id)'\);">
+         <img id="gel_img_icon" src="/images/expand.jpg"/> Visually browse through these gel patterns
+        </a>
+        <div id="gel_img_results"></div>
+        </div>
+      </p>
+    )
+    @(map_scores {display: off}
+      <br>
+      <b>Map Scores:</b><br>
+      @(map_sec
+        <a href="/data_center/map_scores?id=$(map_score_id)">
+          $(map_score_name)
+        </a><br>
+      )
+    )
+    @(recombination {display: off}
+      <br>
+      <b>Recombination Data:</b><br>
+      @(recom_sec
+        <a href="/data_center/recombination?id=$(recom_id)">$(recom_name)</a>
+        <br>
+      )
+    )
+    @(no_genetic {display: off}
+      <br>
+      <b>There is no genetic information for this record.</b>
+    )
+  ) <!-- genetic -->
+ 
+)
