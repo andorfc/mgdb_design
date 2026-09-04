@@ -114,6 +114,226 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
           )
         )
       ),
+      '/records/gene_product/{id}' => array(
+        'get' => array(
+          'tags' => array('records'),
+          'summary' => 'One gene product record, fully assembled',
+          'description' =>
+            "Accepts a numeric MaizeGDB id, the product name, or a synonym. The "
+            . "canonical id is returned in `data.id`; the supplied identifier "
+            . "is retained in `meta.resolved_from` and the page link.",
+          'operationId' => 'getGeneProduct',
+          'parameters' => array(
+            array(
+              'name' => 'id', 'in' => 'path', 'required' => true,
+              'description' => 'Gene product id, name, or synonym.',
+              'schema' => array('type' => 'string', 'maxLength' => 200),
+              'examples' => array(
+                'by name' => array('value' => 'ferritin'),
+                'by synonym' => array('value' => 'delta zein'),
+                'by id' => array('value' => '58066')
+              )
+            ),
+            array(
+              'name' => 'fields', 'in' => 'query', 'required' => false,
+              'description' => 'Comma-separated sections: overview, annotations, related, offsite, references.',
+              'schema' => array('type' => 'string')
+            ),
+            array(
+              'name' => 'max_items', 'in' => 'query', 'required' => false,
+              'description' => 'Maximum embedded items per list, from 1 to 5000.',
+              'schema' => array('type' => 'integer', 'minimum' => 1, 'maximum' => 5000)
+            )
+          ),
+          'responses' => array(
+            '200' => array(
+              'description' => 'The complete gene product record.',
+              'content' => array('application/json' => array(
+                'schema' => array('$ref' => '#/components/schemas/Envelope')
+              ))
+            ),
+            '304' => array('description' => 'Unchanged since the supplied ETag.'),
+            '404' => array('description' => 'No gene product matches that identifier.')
+          )
+        )
+      ),
+      '/records/marker/{id}' => array(
+        'get' => array(
+          'tags' => array('records'),
+          'summary' => 'One marker record, fully assembled',
+          'description' =>
+            "Accepts a numeric MaizeGDB id, the marker name, or a synonym. "
+            . "Marker names carry a `p-` prefix by convention and both "
+            . "spellings resolve: `p-umc10` and `umc10` reach the same record.",
+          'operationId' => 'getMarker',
+          'parameters' => array(
+            array(
+              'name' => 'id', 'in' => 'path', 'required' => true,
+              'description' => 'Marker id, name, or synonym.',
+              'schema' => array('type' => 'string', 'maxLength' => 200),
+              'examples' => array(
+                'by name' => array('value' => 'p-umc10'),
+                'without the prefix' => array('value' => 'umc10'),
+                'by id' => array('value' => '44544')
+              )
+            ),
+            array(
+              'name' => 'fields', 'in' => 'query', 'required' => false,
+              'description' => 'Comma-separated sections: overview, loci, positions, related, offsite, annotations, references.',
+              'schema' => array('type' => 'string')
+            ),
+            array(
+              'name' => 'max_items', 'in' => 'query', 'required' => false,
+              'description' => 'Maximum embedded items per list, from 1 to 5000.',
+              'schema' => array('type' => 'integer', 'minimum' => 1, 'maximum' => 5000)
+            )
+          ),
+          'responses' => array(
+            '200' => array(
+              'description' => 'The complete marker record.',
+              'content' => array('application/json' => array(
+                'schema' => array('$ref' => '#/components/schemas/Envelope')
+              ))
+            ),
+            '304' => array('description' => 'Unchanged since the supplied ETag.'),
+            '404' => array('description' => 'No marker matches that identifier.')
+          )
+        )
+      ),
+      '/records/pan_gene/{id}' => array(
+        'get' => array(
+          'tags' => array('records'),
+          'summary' => 'One pan-gene record, fully assembled',
+          'description' =>
+            "Accepts any member of the pan-gene: a gene model or transcript "
+            . "from any supported annotation, the pan-gene identifier itself, "
+            . "a locus symbol, a UniProt or EC accession, or a numeric chado "
+            . "feature id. The record carries the members the analysis "
+            . "grouped, their ontology terms, protein domains, insertions, "
+            . "SNP and trait associations, pathways, sequence alignments, and "
+            . "the viewer links.",
+          'operationId' => 'getPanGene',
+          'parameters' => array(
+            array(
+              'name' => 'id', 'in' => 'path', 'required' => true,
+              'description' => 'Gene model, transcript, pan-gene name, locus, or accession.',
+              'schema' => array('type' => 'string', 'maxLength' => 200),
+              'examples' => array(
+                'by transcript' => array('value' => 'Zm00023ab070050_T001'),
+                'by gene model' => array('value' => 'Zm00001eb067740'),
+                'by locus' => array('value' => 'lg1'),
+                'by pan-gene name' => array('value' => 'pan-zea.v4.pan02070')
+              )
+            ),
+            array(
+              'name' => 'fields', 'in' => 'query', 'required' => false,
+              'description' => 'Comma-separated sections: overview, members, analysis, function, domains, expression, insertions, traits, proteins, pathways, sequence, tree, pangenome, downloads, viewers.',
+              'schema' => array('type' => 'string')
+            ),
+            array(
+              'name' => 'max_items', 'in' => 'query', 'required' => false,
+              'description' => 'Maximum embedded items per list, from 1 to 5000.',
+              'schema' => array('type' => 'integer', 'minimum' => 1, 'maximum' => 5000)
+            )
+          ),
+          'responses' => array(
+            '200' => array(
+              'description' => 'The complete pan-gene record.',
+              'content' => array('application/json' => array(
+                'schema' => array('$ref' => '#/components/schemas/Envelope')
+              ))
+            ),
+            '304' => array('description' => 'Unchanged since the supplied ETag.'),
+            '404' => array('description' => 'No pan-gene contains that identifier.')
+          )
+        )
+      ),
+      '/records/phenotype/{id}' => array(
+        'get' => array(
+          'tags' => array('records'),
+          'summary' => 'One phenotype record, fully assembled',
+          'description' =>
+            "Accepts a numeric MaizeGDB id, the phenotype name, or a synonym. "
+            . "The record carries the genes and variations that show the "
+            . "phenotype, the stocks that carry it, images of those "
+            . "variations, and the literature.",
+          'operationId' => 'getPhenotype',
+          'parameters' => array(
+            array(
+              'name' => 'id', 'in' => 'path', 'required' => true,
+              'description' => 'Phenotype id, name, or synonym.',
+              'schema' => array('type' => 'string', 'maxLength' => 200),
+              'examples' => array(
+                'by name' => array('value' => 'dwarf plant'),
+                'by id' => array('value' => '11041')
+              )
+            ),
+            array(
+              'name' => 'fields', 'in' => 'query', 'required' => false,
+              'description' => 'Comma-separated sections: overview, genes, variations, stocks, images, offsite, annotations, references.',
+              'schema' => array('type' => 'string')
+            ),
+            array(
+              'name' => 'max_items', 'in' => 'query', 'required' => false,
+              'description' => 'Maximum embedded items per list, from 1 to 5000.',
+              'schema' => array('type' => 'integer', 'minimum' => 1, 'maximum' => 5000)
+            )
+          ),
+          'responses' => array(
+            '200' => array(
+              'description' => 'The complete phenotype record.',
+              'content' => array('application/json' => array(
+                'schema' => array('$ref' => '#/components/schemas/Envelope')
+              ))
+            ),
+            '304' => array('description' => 'Unchanged since the supplied ETag.'),
+            '404' => array('description' => 'No phenotype matches that identifier.')
+          )
+        )
+      ),
+      '/records/variation/{id}' => array(
+        'get' => array(
+          'tags' => array('records'),
+          'summary' => 'One variation record, fully assembled',
+          'description' =>
+            "Accepts a numeric MaizeGDB id, variation name, or synonym. The "
+            . "canonical id is returned in `data.id`; the supplied identifier "
+            . "is retained in `meta.resolved_from` and the page link.",
+          'operationId' => 'getVariation',
+          'parameters' => array(
+            array(
+              'name' => 'id', 'in' => 'path', 'required' => true,
+              'description' => 'Variation id, name, or synonym.',
+              'schema' => array('type' => 'string', 'maxLength' => 200),
+              'examples' => array(
+                'by name' => array('value' => 'bz1'),
+                'by synonym' => array('value' => '6709H'),
+                'by id' => array('value' => '10691698')
+              )
+            ),
+            array(
+              'name' => 'fields', 'in' => 'query', 'required' => false,
+              'description' => 'Comma-separated sections: overview, phenotypes, stocks, related, annotations, images, references.',
+              'schema' => array('type' => 'string')
+            ),
+            array(
+              'name' => 'max_items', 'in' => 'query', 'required' => false,
+              'description' => 'Maximum embedded items per list, from 1 to 5000.',
+              'schema' => array('type' => 'integer', 'minimum' => 1, 'maximum' => 5000)
+            )
+          ),
+          'responses' => array(
+            '200' => array(
+              'description' => 'The complete variation record.',
+              'content' => array('application/json' => array(
+                'schema' => array('$ref' => '#/components/schemas/Envelope')
+              ))
+            ),
+            '304' => array('description' => 'Unchanged since the supplied ETag.'),
+            '404' => array('description' => 'No variation matches that identifier.')
+          )
+        )
+      ),
       '/records/stock/{id}' => array(
         'get' => array(
           'tags' => array('records'),

@@ -219,15 +219,21 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
       (SELECT COUNT(*) FROM mgdb.ext_db_key x
          INNER JOIN mgdb.id_num i ON i.id = x.db_person AND i.curation_lvl = 0
        WHERE x.id = :c3 AND (x.obsolete IS NULL OR x.obsolete <> 'Y')) AS links,
-      (SELECT COUNT(*) FROM mgdb.ed_board_papers WHERE reference_id = :c4) AS editorial",
-    1, array('c1' => $id, 'c2' => $id, 'c3' => $id, 'c4' => $id)));
+      (SELECT COUNT(*) FROM mgdb.ed_board_papers WHERE reference_id = :c4) AS editorial,
+      (SELECT COUNT(*) FROM mgdb.memo m
+         INNER JOIN mgdb.term t ON t.id = m.type_term
+       WHERE m.id = :c5
+         AND t.name IN ('Editorial Board Member Comment',
+                        'Editorial Board CODIE Member Comment')) AS editorial_comments",
+    1, array('c1' => $id, 'c2' => $id, 'c3' => $id, 'c4' => $id, 'c5' => $id)));
   MgdbApi::countQuery();
 
   $counts = array(
     'authors' => MgdbApi::int($counts_row['authors']),
     'describes' => MgdbApi::int($counts_row['describes']),
     'links' => MgdbApi::int($counts_row['links']),
-    'editorial' => MgdbApi::int($counts_row['editorial'])
+    'editorial' => MgdbApi::int($counts_row['editorial']),
+    'editorial_comments' => MgdbApi::int($counts_row['editorial_comments'])
   );
 
   $sections = array();
@@ -466,26 +472,72 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   /////
 
   if (isset($want['editorial'])) {
+    /* A nomination can carry two board members. ed_board_papers.person_id2 is
+       set on 43 of its 881 rows and this query used to read only person_id, so
+       the second name was dropped from the record. */
     $recommendations = array();
     $sth = make_query($DBConn, "
-      SELECT ebp.rec_year, p.id, p.name, p.name_first, p.name_last
+      SELECT ebp.rec_year, ebp.rec_month,
+             p1.id, p1.name, p1.name_first, p1.name_last,
+             p2.id AS id2, p2.name AS name2, p2.name_first AS name_first2,
+             p2.name_last AS name_last2
       FROM mgdb.ed_board_papers ebp
-        LEFT JOIN mgdb.person p ON p.id = ebp.person_id
+        LEFT JOIN mgdb.person p1 ON p1.id = ebp.person_id
+        LEFT JOIN mgdb.person p2 ON p2.id = ebp.person_id2
       WHERE ebp.reference_id = :id
       ORDER BY ebp.rec_year DESC", 1, array('id' => $id));
     MgdbApi::countQuery();
     while ($row = retrieve_row($sth)) {
       $full = trim(MgdbApi::text($row['name_first']) . ' ' . MgdbApi::text($row['name_last']));
+      $full2 = trim(MgdbApi::text($row['name_first2']) . ' ' . MgdbApi::text($row['name_last2']));
       $recommendations[] = array(
         'year' => MgdbApi::int($row['rec_year']),
+        'month' => MgdbApi::text($row['rec_month']),
         'recommended_by' => MgdbApi::ref('person', $row['id'], $row['name'], '/person?id='),
-        'recommended_by_full_name' => $full !== '' ? $full : null
+        'recommended_by_full_name' => $full !== '' ? $full : null,
+        'recommended_by_2' => MgdbApi::ref('person', $row['id2'], $row['name2'], '/person?id='),
+        'recommended_by_2_full_name' => $full2 !== '' ? $full2 : null
+      );
+    }
+
+    /* What the Board member wrote about the paper. This is the part of a
+       nomination that says why it is worth reading, and it is the only prose
+       on the record that MaizeGDB wrote rather than the publisher.
+
+       795 of the 845 picks carry one. The memo's own source is set on just 31
+       of them, so the writer is named only when the data names them: the
+       nominating member is very often the author of the comment, but nothing
+       in the schema says so, and the site has never claimed it either. */
+    $comments = array();
+    $sth = make_query($DBConn, "
+      SELECT m.memo, t.name AS comment_type,
+             p.id AS person_id, p.name AS person_name,
+             p.name_first, p.name_last
+      FROM mgdb.memo m
+        INNER JOIN mgdb.term t ON t.id = m.type_term
+        LEFT JOIN mgdb.person p ON p.id = m.source
+      WHERE m.id = :id
+        AND t.name IN ('Editorial Board Member Comment',
+                       'Editorial Board CODIE Member Comment')
+      ORDER BY m.order1 NULLS LAST, m.auto_num", 1, array('id' => $id));
+    MgdbApi::countQuery();
+    while ($row = retrieve_row($sth)) {
+      $text = MgdbApi::text($row['memo']);
+      if ($text === null) { continue; }
+      $full = trim(MgdbApi::text($row['name_first']) . ' ' . MgdbApi::text($row['name_last']));
+      $comments[] = array(
+        'text' => $text,
+        'type' => MgdbApi::text($row['comment_type']),
+        'is_codie' => (strpos((string) $row['comment_type'], 'CODIE') !== false),
+        'written_by' => MgdbApi::ref('person', $row['person_id'], $row['person_name'], '/person?id='),
+        'written_by_full_name' => $full !== '' ? $full : null
       );
     }
 
     $sections['editorial'] = array(
       'is_editorial_pick' => count($recommendations) > 0,
       'recommendations' => $recommendations,
+      'comments' => $comments,
       'about_html' => '/hot_new_papers'
     );
   }

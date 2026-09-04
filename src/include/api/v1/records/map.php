@@ -81,9 +81,39 @@ if (isset($want['overview'])) {
     $memos[] = MgdbApi::text($m_row['memo']);
   }
 
+  /* Marker density over the whole map, not the capped page: twenty buckets
+     between the first and last coordinate. The figure would misread the map
+     if it were built from the 500 loci the client is sent. */
+  $distribution = array();
+  if ($record['min_coord'] !== null && $record['max_coord'] !== null
+      && (float) $record['max_coord'] > (float) $record['min_coord']) {
+    $dist_sth = make_query($DBConn, "
+      WITH bounds AS (
+        SELECT MIN(value) AS lo, MAX(value) AS hi
+        FROM mgdb.locus_coordinates WHERE map = :id1
+      )
+      SELECT width_bucket(lc.value, b.lo, b.hi + 0.0001, 20) AS bucket,
+             MIN(b.lo) + (width_bucket(lc.value, b.lo, b.hi + 0.0001, 20) - 1)
+               * (MAX(b.hi) - MIN(b.lo)) / 20.0 AS start,
+             COUNT(*) AS loci
+      FROM mgdb.locus_coordinates lc, bounds b
+      WHERE lc.map = :id2
+      GROUP BY 1 ORDER BY 1", 1, array('id1' => $id, 'id2' => $id));
+    MgdbApi::countQuery();
+    while ($d_row = retrieve_row($dist_sth)) {
+      $distribution[] = array(
+        'start' => round((float) $d_row['start'], 1),
+        'loci' => (int) $d_row['loci']
+      );
+    }
+  }
+
+  $counts['memos'] = count($memos);
+
   $sections['overview'] = array(
     'id' => $id,
     'name' => $name,
+    'distribution' => $distribution,
     'linkage_group' => $record['linkage_group_name'] ?: '—',
     'linkage_group_id' => $record['linkage_group_id'] ? (int) $record['linkage_group_id'] : null,
     'coordinate_type' => $record['coordinate_type_name'] ?: 'cM',
@@ -131,7 +161,7 @@ if (isset($want['coordinates'])) {
   }
 
   if (count($loci) < $counts['coordinates']) {
-    $truncated[] = 'sections.coordinates';
+    $truncated[] = 'coordinates';
   }
 
   $sections['coordinates'] = $loci;
@@ -195,6 +225,8 @@ if (isset($want['related_maps'])) {
     }
   }
 
+  $counts['sister_maps'] = count($sister_maps);
+  $counts['same_chromosome_maps'] = count($same_chromosome_maps);
   $sections['related_maps'] = array(
     'series_name' => $base_series,
     'sister_maps' => $sister_maps,
@@ -243,6 +275,7 @@ if (isset($want['references'])) {
       'html' => '/data_center/reference?id=' . (int) $r_row['id']
     );
   }
+  $counts['references'] = count($references);
   $sections['references'] = $references;
 }
 
@@ -252,13 +285,23 @@ if (isset($want['references'])) {
 
 if (isset($want['qtl_experiments'])) {
   $qtls = array();
+  /* mgdb.qtl_exp has no `trait` column -- its columns are id, name,
+     mapping_panel, marker_summary, prog_genotype_eval and prog_trait_eval.
+     This joined `t.id = q.trait`, so Postgres failed on an unknown column and
+     the query returned nothing: the QTL section never appeared on any map
+     record, even where qtl_exp_map had rows. The traits hang off
+     mgdb.trait_analysis, which carries both `qtl_exp` and `trait`, and an
+     experiment usually measures several. */
   $qtl_sth = make_query($DBConn, "
-    SELECT q.id, q.name, t.name AS trait_name
+    SELECT q.id, q.name,
+           string_agg(DISTINCT t.name, ', ' ORDER BY t.name) AS trait_name
     FROM mgdb.qtl_exp_map qm
     JOIN mgdb.qtl_exp q ON q.id = qm.id
     JOIN mgdb.id_num i ON i.id = q.id AND i.curation_lvl = 0
-    LEFT JOIN mgdb.term t ON t.id = q.trait
+    LEFT JOIN mgdb.trait_analysis ta ON ta.qtl_exp = q.id
+    LEFT JOIN mgdb.term t ON t.id = ta.trait
     WHERE qm.map = :id
+    GROUP BY q.id, q.name
     ORDER BY q.name ASC", 1, array('id' => $id));
   MgdbApi::countQuery();
 
@@ -270,27 +313,38 @@ if (isset($want['qtl_experiments'])) {
       'html' => '/data_center/qtl?id=' . (int) $q_row['id']
     );
   }
+  $counts['qtl_experiments'] = count($qtls);
   $sections['qtl_experiments'] = $qtls;
 }
 
-MgdbApi::sendDocument(
+/* The standard envelope, the same one every other record type answers in.
+
+   This resource used to call sendDocument(), which takes a payload and a
+   max-age and nothing else: the third argument carrying counts and truncated
+   was accepted by PHP and thrown away, so no client ever learned that the
+   coordinates list had been capped at 500 of 5,271. */
+MgdbApi::send('map', $id,
   array(
-    'type' => 'map',
-    'id' => (string) $id,
-    'attributes' => array(
-      'name' => $name,
-      'linkage_group' => $record['linkage_group_name'] ?: '',
-      'coordinate_type' => $record['coordinate_type_name'] ?: 'cM',
-      'locus_count' => (int) $record['locus_count']
-    ),
-    'sections' => $sections
+    'name' => $name,
+    'linkage_group' => $record['linkage_group_name'] ?: '',
+    'coordinate_type' => $record['coordinate_type_name'] ?: 'cM',
+    'locus_count' => (int) $record['locus_count'],
+    'author' => $author
   ),
-  300,
+  $sections,
   array(
+    'html' => MgdbApi::baseUrl() . '/data_center/map/' . $id,
+    'search' => MgdbApi::baseUrl() . '/data_center/map'
+  ),
+  array(
+    'resolved_from' => $api_identifier,
+    'sections_returned' => array_values($wanted),
+    'sections_available' => $SECTIONS,
     'partial' => count($wanted) !== count($SECTIONS),
     'max_items' => $max_items,
     'truncated' => $truncated,
     'counts' => $counts
-  )
+  ),
+  300
 );
 ?>

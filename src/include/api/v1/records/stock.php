@@ -550,7 +550,17 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
     $references = array();
     $sth = make_query($DBConn, "
       SELECT r.id, r.name, r.title, r.year, r.doi, r.author_desc, t.name AS contents,
-             t_type.name AS pub_type
+             t_type.name AS pub_type,
+             -- Same shape the literature search returns, so a card built from
+             -- either source previews the same text. idx_reference_ab_id keeps
+             -- this at ~0.1ms per reference.
+             (
+               SELECT substring(regexp_replace(string_agg(
+                 concat_ws(' ', rab.abstract_1, rab.abstract_2), ' '
+               ), '\s+', ' ', 'g') from 1 for 700)
+               FROM mgdb.reference_abstract rab
+               WHERE rab.id = r.id
+             ) AS abstract
       FROM mgdb.id_reference ir
         INNER JOIN mgdb.reference r ON r.id = ir.reference
         INNER JOIN mgdb.id_num i ON i.id = ir.reference AND i.curation_lvl = 0
@@ -578,6 +588,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
         'doi' => $doi,
         'pub_type' => MgdbApi::text($row['pub_type']) ?: 'Journal article',
         'relevance' => MgdbApi::text($row['contents']),
+        'abstract' => MgdbApi::text($row['abstract']),
         'html' => '/data_center/reference?id=' . (int) $row['id']
       );
     }

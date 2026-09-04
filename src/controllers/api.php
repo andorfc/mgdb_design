@@ -25,6 +25,11 @@
   include_once('./include/stock_record_lib.php');
   include_once('./include/gene_record_lib.php');
   include_once('./include/map_record_lib.php');
+  include_once('./include/variation_record_lib.php');
+  include_once('./include/gene_product_record_lib.php');
+  include_once('./include/marker_record_lib.php');
+  include_once('./include/phenotype_record_lib.php');
+  include_once('./include/pan_gene_record_lib.php');
   define('MGDB_API', true);
   include_once('./include/api/v1/lib/mgdb_api.php');
 
@@ -183,10 +188,76 @@ function api_record_types() {
       'example' => $base . '/api/v1/records/gene/Zm00001eb067740'
     ),
     array(
+      'type' => 'variation',
+      'description' => 'Maize alleles, mutations, chromosome rearrangements, and other genetic variations.',
+      'href' => $base . '/api/v1/records/variation/{id}',
+      'example' => $base . '/api/v1/records/variation/bz1'
+    ),
+    array(
+      'type' => 'gene_product',
+      'description' => 'Maize gene products: enzymes, structural and storage proteins, transporters, and regulatory proteins, with the loci that encode them.',
+      'href' => $base . '/api/v1/records/gene_product/{id}',
+      'example' => $base . '/api/v1/records/gene_product/ferritin'
+    ),
+    array(
+      'type' => 'marker',
+      'description' => 'Maize markers and probes: the loci they detect, where those loci map, and the gel patterns and sequences behind them.',
+      'href' => $base . '/api/v1/records/marker/{id}',
+      'example' => $base . '/api/v1/records/marker/p-umc10'
+    ),
+    array(
+      'type' => 'phenotype',
+      'description' => 'Maize phenotypes: the trait and value they describe, the genes and variations that show them, and the stocks that carry them.',
+      'href' => $base . '/api/v1/records/phenotype/{id}',
+      'example' => $base . '/api/v1/records/phenotype/dwarf%20plant'
+    ),
+    array(
+      'type' => 'pan_gene',
+      'description' => 'Pan-genes: the gene models a pan-gene analysis grouped as the same gene across maize assemblies, and everything recorded about them.',
+      'href' => $base . '/api/v1/records/pan_gene/{id}',
+      'example' => $base . '/api/v1/records/pan_gene/Zm00023ab070050_T001'
+    ),
+    array(
       'type' => 'map',
       'description' => 'Maize genetic, cytogenetic, and physical chromosome maps.',
       'href' => $base . '/api/v1/records/map/{id}',
       'example' => $base . '/api/v1/records/map/64489'
+    ),
+    array(
+      'type' => 'primer',
+      'description' => 'Primers and restriction enzymes: the sequence, melting temperature, and the probes each is the source DNA for.',
+      'href' => $base . '/api/v1/records/primer/{id}',
+      'example' => $base . '/api/v1/records/primer/51551'
+    ),
+    array(
+      'type' => 'gel',
+      'description' => 'Gel patterns: one probe and enzyme run against one stock, with the bands scored and the DNA polymorphisms called from them.',
+      'href' => $base . '/api/v1/records/gel/{id}',
+      'example' => $base . '/api/v1/records/gel/888243'
+    ),
+    array(
+      'type' => 'recombination',
+      'description' => 'Recombination datasets: one mapping cross, with the loci scored, the parental alleles, the observed class frequencies, and pairwise recombination frequencies in Haldane and Kosambi centimorgans.',
+      'href' => $base . '/api/v1/records/recombination/{id}',
+      'example' => $base . '/api/v1/records/recombination/24634'
+    ),
+    array(
+      'type' => 'map_scores',
+      'description' => 'Map scores: one marker scored across a mapping panel, with the probe and probed site behind it and the maps that used it.',
+      'href' => $base . '/api/v1/records/map_scores/{id}',
+      'example' => $base . '/api/v1/records/map_scores/1181'
+    ),
+    array(
+      'type' => 'term',
+      'description' => 'Controlled-vocabulary terms across 105 types -- traits, body parts, chemicals, methods, keywords -- with their definitions, synonyms, related terms, and the phenotypes and QTL analyses that use them.',
+      'href' => $base . '/api/v1/records/term/{id}',
+      'example' => $base . '/api/v1/records/term/Plant_height'
+    ),
+    array(
+      'type' => 'locus',
+      'description' => 'Classical loci across 25 kinds -- points, probed sites, QTL, centromeres, transposable elements and the rest -- with their map positions, alleles, and the probes that detect them. Loci of type Gene are served by the gene resource.',
+      'href' => $base . '/api/v1/records/locus/{id}',
+      'example' => $base . '/api/v1/records/locus/adh1'
     )
   );
 }//api_record_types

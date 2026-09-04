@@ -234,7 +234,65 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
     $start = $record ? MgdbApi::int($record['gm_start']) : null;
     $end = $record ? MgdbApi::int($record['gm_end']) : null;
 
+    /* The genome browser view of this gene, and the embeddable form of it.
+
+       The legacy Overview carried a 300px JBrowse iframe padded 1,500 bp either
+       side of the model; it was lost in the port and is restored here. Only
+       JBrowse assemblies can be embedded: chado.genome_metadata.browser points
+       at a GBrowse instance for B73 v3 and v4, which serves a snapshot image
+       rather than a frameable view, so those get the link alone. */
+    $browser = null;
+    if ($record && $assembly_version !== null && $start !== null && $end !== null) {
+      $row = retrieve_row(make_query($DBConn, "
+        SELECT browser FROM chado.genome_metadata
+        WHERE assembly_name = :asm AND browser IS NOT NULL
+        LIMIT 1", 1, array('asm' => $assembly_version)));
+      MgdbApi::countQuery();
+      $browse_url = $row ? trim((string) $row['browser']) : '';
+      if ($browse_url !== '') {
+        $chr = MgdbApi::text($record['chr']);
+        $pad_start = max(1, $start - 1500);
+        $pad_end = $end + 1500;
+        $location = $chr . ':' . $pad_start . '..' . $pad_end;
+        $non_coding = (trim((string) $record['model_type']) === 'non_coding')
+                    ? ',gene_models_nc' : '';
+        $is_jbrowse = (stripos($browse_url, 'gbrowse') === false);
+        if ($is_jbrowse) {
+          $join = (strpos($browse_url, 'data=') === false) ? '?' : '&';
+          $tracks = 'gene_models_official' . $non_coding
+                  . ((strpos($browse_url, 'data=') === false)
+                     ? ',gene_models_v4_json,gene_models_v3_json' : '');
+          /* loc and tracks go in unencoded. JBrowse parses the track list on
+             literal commas and the location on a literal colon; percent-encoded
+             they arrive as one opaque string and the tracks silently do not
+             load -- which is what the restored frame did at first, showing two
+             track labels and an empty viewport. */
+          $link = $browse_url . $join . 'loc=' . $location . '&tracks=' . $tracks;
+          $browser = array(
+            'kind' => 'jbrowse',
+            'url' => $link,
+            /* tracklist, nav and overview off: the frame is a preview of this
+               gene in its neighbourhood, and the controls belong to the full
+               browser the link opens. */
+            'embed_url' => $link . '&tracklist=0&nav=0&overview=0',
+            'location' => $location,
+            'label' => 'JBrowse'
+          );
+        } else {
+          $browser = array(
+            'kind' => 'gbrowse',
+            'url' => rtrim($browse_url, '/') . '/?name=' . rawurlencode((string) $gene_name)
+                   . ';h_feat=' . rawurlencode((string) $gene_name),
+            'embed_url' => null,
+            'location' => $location,
+            'label' => 'GBrowse'
+          );
+        }
+      }
+    }
+
     $sections['overview'] = array(
+      'browser' => $browser,
       'name' => $gene_name,
       'symbol' => $symbol,
       'full_name' => $full_name,
@@ -1004,6 +1062,131 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
       }
     }
 
+    /* Nearby loci.
+
+       Restored 2026-09-02. It was dropped as "~22 queries producing a 73 KB
+       fragment", which the legacy implementation was: two queries per named
+       map set, then a full re-request whenever the reader changed the
+       centimorgan window -- a control that had been commented out as broken
+       since 2013.
+
+       One query does it. The window is fixed at the widest the page offers and
+       the page narrows it in the browser, so the control that never worked is
+       now instant and costs nothing.
+
+       Two things make it 53 ms rather than 389: locus_coordinates.map is
+       numeric(10,0) and idx_locus_coordi_map is on the raw column, so the
+       join stays in numeric rather than casting the indexed side; and the
+       backbone map sorts first, so three maps is the useful set rather than
+       all thirteen. */
+    $nearby_loci = array();
+    $sth = make_query($DBConn, "
+      WITH home AS (
+        SELECT lc.map AS map_num, m.name AS map_name, lc.value AS pos
+        FROM mgdb.locus_coordinates lc
+          JOIN mgdb.id_num mi ON mi.id = lc.map::bigint AND mi.curation_lvl = 0
+          JOIN mgdb.map m ON m.id = lc.map::bigint
+        WHERE lc.id = :l1 AND lc.value IS NOT NULL
+        ORDER BY lc.back_bone DESC NULLS LAST, lower(m.name)
+        LIMIT 3
+      )
+      SELECT h.map_name, h.pos AS home_pos, n.id, n.name, n.value
+      FROM home h
+        JOIN LATERAL (
+          SELECT l.id, l.name, lc.value
+          FROM mgdb.locus_coordinates lc
+            JOIN mgdb.locus l ON l.id = lc.id
+            JOIN mgdb.id_num i ON i.id = l.id AND i.curation_lvl = 0
+          WHERE lc.map = h.map_num
+            AND lc.value IS NOT NULL
+            AND lc.value BETWEEN h.pos - 10 AND h.pos + 10
+          ORDER BY abs(lc.value - h.pos)
+          LIMIT 40
+        ) n ON true
+      ORDER BY lower(h.map_name), n.value", 1, array('l1' => $locus_id));
+    MgdbApi::countQuery();
+    while ($row = retrieve_row($sth)) {
+      $position = ($row['value'] === null || $row['value'] === '') ? null : (float) $row['value'];
+      $home = ($row['home_pos'] === null || $row['home_pos'] === '') ? null : (float) $row['home_pos'];
+      $nearby_loci[] = array(
+        'map' => MgdbApi::text($row['map_name']),
+        'id' => MgdbApi::int($row['id']),
+        'name' => MgdbApi::text($row['name']),
+        'position' => $position,
+        'distance_cm' => ($position === null || $home === null) ? null
+                       : round(abs($position - $home), 2),
+        'is_self' => ((int) $row['id'] === (int) $locus_id),
+        'html' => '/data_center/locus?id=' . (int) $row['id']
+      );
+    }
+
+    /* Additional genetic information.
+
+       Restored 2026-09-02, and never present in the modern page before now.
+       The legacy section ran five separate readers -- primers and enzymes,
+       related BACs, gel patterns, map scores, recombination data -- and laid
+       three of them out by packing five or four records into numbered keys per
+       row to fake a grid. One UNION ALL returns all five kinds in 22 ms and
+       the page lists each as its own table. */
+    $genetic = array();
+    $sth = make_query($DBConn, "
+      SELECT kind, id, name, detail FROM (
+        SELECT 'primer'::text AS kind, pri.id, pro.name, pri.sequence::text AS detail
+        FROM mgdb.locus_detected_by ld
+          JOIN mgdb.probe pro ON pro.id = ld.probe_id
+          JOIN mgdb.probe_source_dna ps ON ps.id = pro.id
+          JOIN mgdb.primer pri ON pri.id = ps.enzyme_primer
+        WHERE ld.id = :g1
+        UNION ALL
+        SELECT 'bac', a.id, a.name, NULL
+        FROM mgdb.probe a
+          JOIN mgdb.relation r ON r.related_id = a.id
+          JOIN mgdb.id_num i ON i.id = a.id AND i.curation_lvl = 0
+        WHERE a.type = 171715
+          AND r.id IN (SELECT probe_id FROM mgdb.locus_detected_by WHERE id = :g2)
+        UNION ALL
+        SELECT 'gel_pattern', g.id, g.name, NULL
+        FROM mgdb.gel_pattern g
+          JOIN mgdb.id_num b ON b.id = g.id AND b.curation_lvl = 0
+          JOIN mgdb.locus_detected_by c ON c.probe_id = g.probe
+        WHERE c.id = :g3
+        UNION ALL
+        SELECT 'map_score', ms.id, ms.name, NULL
+        FROM mgdb.map_scores ms
+          JOIN mgdb.id_num b ON b.id = ms.id AND b.curation_lvl = 0
+        WHERE ms.probed_site = :g4
+        UNION ALL
+        SELECT 'recombination', rb.id, rb.name, NULL
+        FROM mgdb.recomb rb
+          JOIN mgdb.id_num c ON c.id = rb.id AND c.curation_lvl = 0
+        WHERE rb.id IN (
+          SELECT a.id FROM mgdb.recomb_loci_2 a WHERE a.locus = :g5
+          UNION SELECT a.id FROM mgdb.recomb_loci a WHERE a.locus = :g6
+          UNION SELECT a.id FROM mgdb.recomb_freq a WHERE a.before = :g7
+          UNION SELECT a.id FROM mgdb.recomb_freq a WHERE a.after = :g8)
+      ) t ORDER BY kind, lower(name)", 1, array(
+        'g1' => $locus_id, 'g2' => $locus_id, 'g3' => $locus_id, 'g4' => $locus_id,
+        'g5' => $locus_id, 'g6' => $locus_id, 'g7' => $locus_id, 'g8' => $locus_id));
+    MgdbApi::countQuery();
+    $genetic_paths = array(
+      'primer' => '/data_center/primer?id=', 'bac' => '/data_center/bac?id=',
+      'gel_pattern' => '/data_center/gel_pattern?id=', 'map_score' => '/data_center/map_score?id=',
+      'recombination' => '/data_center/recomb?id='
+    );
+    while ($row = retrieve_row($sth)) {
+      /* Not $kind: that names the record's own kind, set far above and read
+         again after this loop. */
+      $genetic_kind = trim((string) $row['kind']);
+      $genetic[] = array(
+        'kind' => $genetic_kind,
+        'id' => MgdbApi::int($row['id']),
+        'name' => MgdbApi::text($row['name']),
+        'detail' => MgdbApi::text($row['detail']),
+        'html' => isset($genetic_paths[$genetic_kind])
+                ? ($genetic_paths[$genetic_kind] . (int) $row['id']) : null
+      );
+    }
+
     $measured['locus.map_positions'] = count($map_positions);
     $measured['locus.associated_gene_models'] = count($associated);
 
@@ -1026,10 +1209,9 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
       'map_positions' => $map_positions,
       'phenotypes' => $phenotypes,
       'related_loci' => $related_loci,
-      /* Nearby loci is not carried over. It was ~22 queries producing a 73 KB
-         fragment whose centimorgan control has been commented out as broken
-         since 2013, and it is a locus-page feature that never belonged on a
-         gene-model page. */
+      'nearby_loci' => $nearby_loci,
+      'nearby_window_cm' => 10,
+      'genetic' => $genetic,
       'locus_html' => '/data_center/locus?id=' . $locus_id
     );
   }
@@ -1041,22 +1223,52 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   if (isset($want['references'])) {
     $refs = array();
     if ($locus_id) {
+      /* The same columns every other record page's references section reads.
+         This query used to select only id, name, title, year and relevance,
+         so the shared reference card had no DOI line, no publication-type
+         badge, no author line and no abstract preview to show, and this page's
+         references looked nothing like the ones on every other record. */
       $sth = make_query($DBConn, "
-        SELECT r.id AS ref_id, r.name AS ref_name, r.title, r.year, t.name AS relevance
+        SELECT r.id AS ref_id, r.name AS ref_name, r.title, r.year, r.doi,
+               r.author_desc, t.name AS relevance, t_type.name AS pub_type,
+               (
+                 SELECT substring(regexp_replace(string_agg(
+                   concat_ws(' ', rab.abstract_1, rab.abstract_2), ' '
+                 ), '\s+', ' ', 'g') from 1 for 700)
+                 FROM mgdb.reference_abstract rab WHERE rab.id = r.id
+               ) AS abstract
         FROM mgdb.id_reference ir
           JOIN mgdb.reference r ON r.id = ir.reference
           JOIN mgdb.id_num n ON n.id = r.id AND n.curation_lvl = 0
           LEFT JOIN mgdb.term t ON t.id = ir.contents
+          LEFT JOIN mgdb.term t_type ON t_type.id = r.type
         WHERE ir.id = :lid
         ORDER BY r.year DESC NULLS LAST, lower(r.name)", 1, array('lid' => $locus_id));
       MgdbApi::countQuery();
       while ($row = retrieve_row($sth)) {
+        /* mgdb.reference.doi is filled for 1.0% of rows, so the citation text
+           is the fallback: it often carries the DOI inline. Recorded as
+           AD-036. */
+        $doi = MgdbApi::text($row['doi']);
+        if ($doi && preg_match('/(?:doi:\s*|https?:\/\/doi\.org\/)?(10\.\d{4,9}\/[-._;()\/:A-Z0-9]+)/i', $doi, $m)) {
+          $doi = $m[1];
+        } elseif (preg_match('/(?:doi:\s*|https?:\/\/doi\.org\/)?(10\.\d{4,9}\/[-._;()\/:A-Z0-9]+)/i', (string) $row['ref_name'], $m)) {
+          $doi = $m[1];
+        } else {
+          $doi = null;
+        }
         $refs[] = array(
+          'type' => 'reference',
           'id' => MgdbApi::int($row['ref_id']),
           'name' => MgdbApi::text($row['ref_name']),
+          'citation' => MgdbApi::text($row['ref_name']),
           'title' => MgdbApi::text($row['title']),
+          'authors' => MgdbApi::text($row['author_desc']),
           'year' => MgdbApi::int($row['year']),
+          'doi' => $doi,
+          'pub_type' => MgdbApi::text($row['pub_type']) ?: 'Journal article',
           'relevance' => MgdbApi::text($row['relevance']),
+          'abstract' => MgdbApi::text($row['abstract']),
           'html' => '/data_center/reference?id=' . MgdbApi::int($row['ref_id'])
         );
       }
@@ -1534,29 +1746,66 @@ function gene_api_expression($gene_name, $assembly_version) {
   $chart = isset($qteller_charts[$assembly_version]) ? $qteller_charts[$assembly_version]
          : (substr((string) $assembly_version, -14) === '-REFERENCE-NAM' ? 'bar_chart_NAM.php' : null);
 
-  // v5 eFP atlases. The legacy v5 map silently lacks the Downs atlas that the
-  // v3/v4 maps carry, so that panel disappears without explanation.
-  $efp_atlases = array(
-    'Zm-B73-REFERENCE-NAM-5.0' => array(
-      array('key' => 'Maize_Atlas_V5', 'label' => 'Development atlas'),
-      array('key' => 'Maize_Kernel_V5', 'label' => 'Kernel'),
-      array('key' => 'Maize_Seed_V5', 'label' => 'Seed'),
-      array('key' => 'Maize_Root_V5', 'label' => 'Root'),
-      array('key' => 'Maize_Leaf_V5', 'label' => 'Leaf'),
-      array('key' => 'Maize_Tassel_V5', 'label' => 'Tassel'),
-      array('key' => 'Maize_Embryonic_V5', 'label' => 'Embryo'),
-      array('key' => 'Maize_Stress_V5', 'label' => 'Abiotic stress')
-    )
+  /* eFP atlases at the BAR.
+
+     The names below are the data sources the BAR's own eFP form offers today.
+     The set this code inherited from the legacy page -- Maize_Atlas_V5,
+     Maize_Seed_V5, Maize_Leaf_V5, Maize_Tassel_V5, Maize_Embryonic_V5,
+     Maize_Stress_V5, Maize_Root_V5 -- names nothing the service has, and every
+     one of those requests came back 500 "Data for the given gene may not
+     exist". The section rendered eight broken images for every maize gene.
+
+     Three of the BAR's own names still fail for every gene we tried
+     (Downs_et_al_Atlas, maize_iplant, maize_rice_comparison), so they are not
+     offered. The nine below return real PNGs.
+
+     The V5 datasets are the same experiments re-mapped onto the v5 annotation,
+     so the pair is chosen by the assembly. The BAR resolves a v3, v4 or v5
+     identifier of the same gene to the same expression data -- verified: the
+     three identifiers of lg1 return a byte-identical image -- so v3 and v4
+     gene models get the section too, which the legacy code did not offer. */
+  $efp_shared = array(
+    array('key' => 'Maize_Root', 'label' => 'Root'),
+    array('key' => 'Sekhon_et_al_Atlas', 'label' => 'Sekhon atlas'),
+    array('key' => 'Early_Seed', 'label' => 'Early seed'),
+    array('key' => 'Tassel_and_Ear_Primordia', 'label' => 'Tassel and ear primordia'),
+    array('key' => 'Embryonic_Leaf_Development', 'label' => 'Embryonic leaf development'),
+    array('key' => 'maize_leaf_gradient', 'label' => 'Leaf gradient')
+  );
+  $efp_v5 = array(
+    array('key' => 'Hoopes_et_al_Atlas_V5', 'label' => 'Hoopes development atlas'),
+    array('key' => 'Hoopes_et_al_Stress_V5', 'label' => 'Hoopes abiotic stress'),
+    array('key' => 'Maize_Kernel_V5', 'label' => 'Kernel')
+  );
+  $efp_v4 = array(
+    array('key' => 'Hoopes_et_al_Atlas', 'label' => 'Hoopes development atlas'),
+    array('key' => 'Hoopes_et_al_Stress', 'label' => 'Hoopes abiotic stress'),
+    array('key' => 'Maize_Kernel', 'label' => 'Kernel')
+  );
+
+  $efp_for = array(
+    'Zm-B73-REFERENCE-NAM-5.0' => array_merge($efp_v5, $efp_shared),
+    'Zm-B73-REFERENCE-GRAMENE-4.0' => array_merge($efp_v4, $efp_shared),
+    'B73 RefGen_v3' => array_merge($efp_v4, $efp_shared)
   );
 
   $atlases = array();
-  if (isset($efp_atlases[$assembly_version])) {
-    foreach ($efp_atlases[$assembly_version] as $atlas) {
+  if (isset($efp_for[$assembly_version])) {
+    foreach ($efp_for[$assembly_version] as $atlas) {
+      $base = 'https://bar.utoronto.ca/api/efp_image/efp_maize/'
+            . rawurlencode($atlas['key']) . '/';
       $atlases[] = array(
         'key' => $atlas['key'],
         'label' => $atlas['label'],
-        'image' => 'https://bar.utoronto.ca/api/efp_image/efp_maize/' .
-                   rawurlencode($atlas['key']) . '/Absolute/' . rawurlencode($gene_name)
+        /* Absolute is the default view and the one the legacy page used;
+           Relative rescales each tissue against the gene's own mean, which is
+           what you want when a gene is expressed everywhere at a low level.
+           Both are offered rather than only the first. */
+        'image' => $base . 'Absolute/' . rawurlencode($gene_name),
+        'image_relative' => $base . 'Relative/' . rawurlencode($gene_name),
+        'browser' => 'https://bar.utoronto.ca/efp_maize/cgi-bin/efpWeb.cgi?dataSource='
+                   . rawurlencode($atlas['key']) . '&mode=Absolute&primaryGene='
+                   . rawurlencode($gene_name)
       );
     }
   }
@@ -1571,7 +1820,16 @@ function gene_api_expression($gene_name, $assembly_version) {
     'efp' => array(
       'available' => count($atlases) > 0,
       'atlases' => $atlases,
-      'source' => 'BAR eFP Browser, University of Toronto'
+      'source' => 'BAR eFP Browser, University of Toronto',
+      'browser' => 'https://bar.utoronto.ca/efp_maize/cgi-bin/efpWeb.cgi',
+      'eplant' => 'https://bar.utoronto.ca/eplant_maize/',
+      /* The service answers 200 with a rendered all-grey figure for a gene it
+         has no data for, so neither this API nor the page can tell "no data"
+         from "no expression" by asking. Say so rather than implying the
+         picture means something it might not. */
+      'note' => 'A gene with no data in an atlas is drawn in the neutral colour '
+              . 'rather than reported as missing, so an entirely uncoloured figure '
+              . 'means the experiment did not measure this gene.'
     ),
     /* Confirmed absent for B73 v5: the upstream id service returns an empty
        string for every v5 gene model, so the legacy code fetched, got nothing,
@@ -1611,36 +1869,53 @@ function gene_api_sequences($gene_name, $annotation_version, $assembly_version,
   $base = 'https://sequence2.maizegdb.org/get_sequence.php?gene-model-set='
         . rawurlencode($annotation_version);
 
-  $entries = array();
-  foreach ($transcripts as $transcript) {
-    if ($transcript['name'] === null) { continue; }
-    $entries[] = array(
-      'name' => $transcript['name'],
-      'protein' => $transcript['protein'],
-      'canonical' => $transcript['canonical'],
-      'cdna' => $base . '&dbtype=cdna&id=' . rawurlencode($transcript['name']),
-      'protein_url' => $transcript['protein'] === null ? null
-                     : $base . '&dbtype=protein&id=' . rawurlencode($transcript['protein'])
-    );
+  /* Four sequence types, each with the identifier shape the service expects.
+     Probed against sequence2 directly: nuc wants the gene model, cds and cdna
+     want the transcript, protein wants the protein. dbtype=mrna,
+     dbtype=transcript, dbtype=genomic and dbtype=pep are not recognised and
+     return "sequence not found".
+
+     CDS was missing. It is the coding sequence without the UTRs, it is a
+     different thing from cdna, and it is what most people mean when they ask
+     for "the sequence" of a gene. */
+  function gene_api_seq_url($base, $type, $id) {
+    return $id === null ? null : ($base . '&dbtype=' . $type . '&id=' . rawurlencode($id));
   }
 
+  $entries = array();
+  $rows = $transcripts;
   // A record fetched with ?fields=sequences has no transcript list; fall back to
   // the canonical pair so the section is never empty for lack of another section.
-  if (count($entries) === 0 && $canonical_transcript !== null) {
+  if (count($rows) === 0 && $canonical_transcript !== null) {
+    $rows = array(array('name' => $canonical_transcript, 'protein' => $canonical_protein,
+                        'canonical' => true));
+  }
+  foreach ($rows as $transcript) {
+    if (!isset($transcript['name']) || $transcript['name'] === null) { continue; }
     $entries[] = array(
-      'name' => $canonical_transcript,
-      'protein' => $canonical_protein,
-      'canonical' => true,
-      'cdna' => $base . '&dbtype=cdna&id=' . rawurlencode($canonical_transcript),
-      'protein_url' => $canonical_protein === null ? null
-                     : $base . '&dbtype=protein&id=' . rawurlencode($canonical_protein)
+      'name' => $transcript['name'],
+      'protein' => isset($transcript['protein']) ? $transcript['protein'] : null,
+      'canonical' => isset($transcript['canonical']) ? $transcript['canonical'] : false,
+      'cds' => gene_api_seq_url($base, 'cds', $transcript['name']),
+      'cdna' => gene_api_seq_url($base, 'cdna', $transcript['name']),
+      'protein_url' => gene_api_seq_url($base, 'protein',
+                         isset($transcript['protein']) ? $transcript['protein'] : null)
     );
   }
 
   return array(
     'set' => $annotation_version,
+    'assembly' => $assembly_version,
     'genomic' => $base . '&dbtype=nuc&id=' . rawurlencode($gene_name),
+    'gene' => $gene_name,
     'transcripts' => $entries,
+    /* The service is intermittent: the same request answers with FASTA, with
+       "SEQUENCE SERVICE IS DOWN", or with a not-found error on different
+       attempts. Nothing here can fix that, and a reader who gets one of those
+       should know to try again rather than conclude the sequence is missing. */
+    'note' => 'Sequences are served by sequence2.maizegdb.org. If a link returns '
+            . 'an error rather than FASTA, the sequence service is briefly '
+            . 'unavailable; the same link usually works on a retry.',
     'downloads' => $assembly_version === null ? array()
                  : array('https://download.maizegdb.org/' . rawurlencode($assembly_version) . '/')
   );

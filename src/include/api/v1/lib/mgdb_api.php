@@ -386,6 +386,63 @@ class MgdbApi {
 
   /* A reference to another record, in one consistent shape: enough to render a
      link without a second request, and enough to fetch the full record. */
+  /* Synonyms worth printing.
+
+     A synonym row that just repeats the record's own name tells a reader
+     nothing, and mgdb.synonyms is full of them: 5,436 of 7,339 primer synonyms
+     and 75,011 of 437,245 locus synonyms are the name again. Dropping them
+     stops every such record opening with "Also known as <its own name>".
+
+     Case- and whitespace-insensitive, and it also de-duplicates synonyms that
+     differ only in case. */
+  public static function synonyms($rows, $name) {
+    $clean = function ($value) { return strtolower(trim((string) $value)); };
+    $skip = array($clean($name) => true);
+    $out = array();
+    foreach ((array) $rows as $row) {
+      $label = is_array($row) ? (isset($row['name']) ? $row['name'] : '') : $row;
+      $key = $clean($label);
+      if ($key === '' || isset($skip[$key])) { continue; }
+      $skip[$key] = true;
+      $out[] = is_array($row) ? $row : array('name' => trim((string) $row), 'kind' => null);
+    }
+    return $out;
+  }
+
+  /* An absolute image URL on the image server.
+
+     Image rows store a path relative to a per-record-type directory --
+     "rflpchromatin/nfd104.jpg" -- and the legacy pages prepend
+     `{image_server_url}/db_images/{Type}/` in the *template*, which is why the
+     prefix is easy to miss when porting the PHP. Without it the page resolves
+     the path against its own origin and every image 404s.
+
+     $kind is the directory: GelPattern, Term, Variation, Phenotype, Map,
+     SpeciesGenome.
+
+     `thumbnail` inserts "downsized/" before the file name, which is the
+     convention the image server follows for GelPattern and Variation. Term
+     thumbnails are not generated, so a caller should fall back to the full
+     image rather than trust it. */
+  public static function imageUrl($kind, $path, $thumbnail = false) {
+    global $system;
+    $path = trim((string) $path);
+    if ($path === '') { return null; }
+
+    $base = isset($system['image_server_url']) && $system['image_server_url'] !== ''
+          ? rtrim($system['image_server_url'], '/')
+          : 'https://images.maizegdb.org';
+
+    if ($thumbnail) {
+      $slash = strrpos($path, '/');
+      $path = $slash === false
+        ? 'downsized/' . $path
+        : substr($path, 0, $slash) . '/downsized/' . substr($path, $slash + 1);
+    }
+
+    return $base . '/db_images/' . $kind . '/' . $path;
+  }
+
   public static function ref($type, $id, $name, $htmlPath = null) {
     $id = self::int($id);
     $name = self::text($name);
