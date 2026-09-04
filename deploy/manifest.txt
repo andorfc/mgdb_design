@@ -844,6 +844,15 @@ src/controllers/tools/download_modern.php      controllers/tools/download_modern
 src/templates/static/mgdb_download.bau         templates/static/mgdb_download.bau
 src/css/mgdb-download.css                      css/mgdb-download.css
 src/js/mgdb-download.js                        js/mgdb-download.js
+# The guided genome file finder's catalog: an index of every assembly directory
+# on the genome download server. Regenerate with tools/gen_download_catalog.py.
+src/data/download_catalog.json                 data/download_catalog.json
+# Globus transfer guide linked from the Globus card. Source HTML lives beside
+# the PDF in the repo; only the PDF is served.
+src/docs/maizegdb-globus-guide.pdf             docs/maizegdb-globus-guide.pdf
+# Third download-source icon, built to match images/maize_download.png and
+# images/box_download.png: the same cloud and arrow with the service logo inside.
+src/images/globus_download.png                 images/globus_download.png
 
 # Homepage design alternatives for group review, at /index2/, /index3/ and
 # /index4/. Version 4 is version 3 with smaller quick-link tiles and a wider

@@ -14,14 +14,7 @@ $$SYNTAX-LEVEL 2
   <!-- HERO SECTION -->
   <section class="mgdb-hero" aria-labelledby="download-title">
     <div class="mgdb-hero-emblem">
-      <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <!-- Cloud outline & base server layers -->
-        <path d="M48 38C52.4183 38 56 34.4183 56 30C56 25.8254 52.8021 22.3978 48.7188 22.0368C47.8016 15.1741 41.9366 10 34.8 10C28.6186 10 23.3601 13.9161 21.464 19.467C20.3541 19.1607 19.1934 19 18 19C12.4772 19 8 23.4772 8 29C8 34.2045 11.9796 38.4807 17.0652 38.9507" stroke="#1b5e20" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-        <!-- Download Arrow -->
-        <path d="M32 24V46M32 46L23 37M32 46L41 37" stroke="#2e7d32" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <!-- Storage Base Trays -->
-        <path d="M12 50H52M16 56H48" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
-      </svg>
+      <img src="/images/quicklinks/download.png" alt="" width="64" height="64">
       <strong>Bulk<br />Downloads</strong>
     </div>
     <div class="mgdb-hero-body">
@@ -33,8 +26,9 @@ $$SYNTAX-LEVEL 2
 
   <!-- STICKY SECTION TABS -->
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#downloads-globus" class="is-current">Globus High-Speed Endpoint</a>
-    <a href="#downloads-server">HTTP Bulk Server</a>
+    <a href="#downloads-sources" class="is-current">Download source</a>
+    <a href="#downloads-quick">B73 v5 quick downloads</a>
+    <a href="#downloads-finder">Genome file finder</a>
     <a href="#downloads-b73">B73 Reference Genomes</a>
     <a href="#downloads-nam">NAM Founder Genomes</a>
     <a href="#downloads-panand">Pan-Andropogoneae &amp; Relatives</a>
@@ -44,154 +38,205 @@ $$SYNTAX-LEVEL 2
     <a href="#downloads-related">Connected Resources</a>
   </nav>
 
-  <!-- SECTION 1: GLOBUS PUBLIC COLLECTION \(SCINet - JUNO\) -->
-  <section id="downloads-globus" class="mgdb-panel globus-hero-panel" aria-labelledby="globus-panel-heading">
-    <div class="globus-badge-row">
-      <span class="globus-tag-badge">High-Throughput Data Transfer</span>
-      <span class="globus-subtag-badge">USDA SCINet HPC Infrastructure</span>
-    </div>
-    <h2 id="globus-panel-heading" class="mgdb-panel-title">MaizeGDB Public Collection \(SCINet - JUNO\)</h2>
-    <p class="mgdb-panel-lead">High-speed, multi-gigabit automated data transfer powered by Globus. Ideal for multi-gigabyte to multi-terabyte datasets including complete genome assemblies, pre-indexed browser tracks, intermediate pipeline outputs, massive variant matrices, and AI/ML models.</p>
+  <!-- SECTION 1: CHOOSE A DOWNLOAD SOURCE -->
+  <section id="downloads-sources" class="mgdb-panel" aria-labelledby="downloads-sources-heading">
+    <h2 id="downloads-sources-heading" class="mgdb-panel-title">Choose a download source</h2>
 
-    <!-- GLOBUS COLLECTION IDENTITY CARD -->
-    <div class="globus-id-card">
-      <div class="globus-id-icon-wrap">
-        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <!-- Globus multi-node network graphic -->
-          <polygon points="24,6 40,15 40,33 24,42 8,33 8,15" stroke="#16a34a" stroke-width="2.5" fill="#f0fdf4" />
-          <circle cx="24" cy="6" r="3.5" fill="#15803d" />
-          <circle cx="40" cy="15" r="3.5" fill="#15803d" />
-          <circle cx="40" cy="33" r="3.5" fill="#15803d" />
-          <circle cx="24" cy="42" r="3.5" fill="#15803d" />
-          <circle cx="8" cy="33" r="3.5" fill="#15803d" />
-          <circle cx="8" cy="15" r="3.5" fill="#15803d" />
-          <circle cx="24" cy="24" r="5" fill="#ca8a04" />
-          <line x1="24" y1="24" x2="24" y2="6" stroke="#16a34a" stroke-width="2" />
-          <line x1="24" y1="24" x2="40" y2="15" stroke="#16a34a" stroke-width="2" />
-          <line x1="24" y1="24" x2="40" y2="33" stroke="#16a34a" stroke-width="2" />
-          <line x1="24" y1="24" x2="24" y2="42" stroke="#16a34a" stroke-width="2" />
-          <line x1="24" y1="24" x2="8" y2="33" stroke="#16a34a" stroke-width="2" />
-          <line x1="24" y1="24" x2="8" y2="15" stroke="#16a34a" stroke-width="2" />
-        </svg>
-      </div>
-      <div class="globus-id-body">
-        <div class="globus-header-flex">
-          <h3 class="globus-collection-name">MaizeGDB Public Collection \(SCINet - JUNO\)</h3>
-          <span class="globus-guest-chip">Guest Collection \(GCS\) on <strong>SCINet-Juno</strong></span>
+    <div class="source-grid">
+
+      <!-- Source 1: FTP -->
+      <article class="source-card">
+        <h3 class="source-card-title"><a class="source-card-main" href="https://ftp.maizegdb.org/" target="_blank" rel="noopener">
+          <img class="source-card-icon" src="/images/maize_download.png" alt="">
+          <span class="source-card-id">
+            <span class="source-card-name">MaizeGDB FTP</span>
+            <code class="source-card-host">ftp.maizegdb.org</code>
+          </span>
+        </a></h3>
+        <p class="source-card-desc">The complete MaizeGDB file tree, served over HTTPS. Genome assemblies and annotations sit under <code>/downloads/</code>, which is also reachable as <code>download.maizegdb.org</code>. The rest of the tree holds bulk data sets, MGSC and MIPS repeat files, BLAST databases, and the Maize Genetics Cooperation Newsletter archive.</p>
+        <dl class="source-card-facts">
+          <div><dt>Best for</dt><dd>Single files, scripted <code>wget</code> and <code>curl</code> retrieval</dd></div>
+          <div><dt>Account</dt><dd>None &#8212; open access</dd></div>
+        </dl>
+        <div class="source-card-actions">
+          <a href="https://download.maizegdb.org/" target="_blank" rel="noopener">Go straight to the genome downloads &#8599;</a>
         </div>
+      </article>
 
-        <div class="globus-meta-grid">
-          <div class="globus-meta-item">
-            <span class="meta-label">Collection Owner&#58;</span>
-            <span class="meta-value"><code>carson.andorf@scinet.usda.gov</code></span>
+      <!-- Source 2: Box -->
+      <article class="source-card">
+        <h3 class="source-card-title"><a class="source-card-main" href="https://iastate.app.box.com/v/maizegdb-public" target="_blank" rel="noopener">
+          <img class="source-card-icon" src="/images/box_download.png" alt="">
+          <span class="source-card-id">
+            <span class="source-card-name">MaizeGDB Box</span>
+            <code class="source-card-host">iastate.app.box.com</code>
+          </span>
+        </a></h3>
+        <p class="source-card-desc">Iowa State University cloud storage for data that does not belong in the file tree&#58; machine learning model weights, deep learning training sets, and bundled JBrowse track archives for the NAM projects.</p>
+        <dl class="source-card-facts">
+          <div><dt>Best for</dt><dd>Project collections and model files</dd></div>
+          <div><dt>Account</dt><dd>None to download</dd></div>
+        </dl>
+        <div class="source-card-actions">
+          <a href="#downloads-thematic">See what is stored on Box &#8595;</a>
+        </div>
+      </article>
+
+      <!-- Source 3: Globus -->
+      <article class="source-card source-card-globus">
+        <span class="source-card-flag">New</span>
+        <h3 class="source-card-title"><a class="source-card-main" href="https://app.globus.org/file-manager?origin_id=g-3126c1.67741c.a567.data.globus.org" target="_blank" rel="noopener">
+          <img class="source-card-icon" src="/images/globus_download.png" alt="">
+          <span class="source-card-id">
+            <span class="source-card-name">MaizeGDB Globus Endpoint</span>
+            <code class="source-card-host">app.globus.org</code>
+          </span>
+        </a></h3>
+        <p class="source-card-desc">Globus moves large data sets in the background. A transfer resumes by itself after a dropped connection, verifies every file by checksum, and emails you when it finishes, so a multi-terabyte copy does not depend on a browser window staying open. It runs on USDA SCINet infrastructure and can transfer straight to a campus cluster, a laptop, or cloud storage.</p>
+        <dl class="source-card-facts">
+          <div><dt>Best for</dt><dd>Whole-genome sets, variant matrices, and other multi-gigabyte transfers</dd></div>
+          <div><dt>Account</dt><dd>Free Globus login &#8212; institutional or Globus ID</dd></div>
+          <div class="source-card-fact-wide">
+            <dt>Collection</dt>
+            <dd>MaizeGDB Public Collection \(SCINet - JUNO\)</dd>
           </div>
-          <div class="globus-meta-item">
-            <span class="meta-label">Globus Domain Endpoint&#58;</span>
-            <span class="meta-value">
+          <div class="source-card-fact-wide">
+            <dt>Endpoint</dt>
+            <dd>
               <code id="globus-domain-str">g-3126c1.67741c.a567.data.globus.org</code>
-              <button type="button" class="copy-btn-inline" onclick="copyText\('globus-domain-str', this\)" title="Copy Domain">Copy</button>
-            </span>
+              <button type="button" class="copy-btn-inline" onclick="copyText\('globus-domain-str', this\)" title="Copy the endpoint domain">Copy</button>
+            </dd>
           </div>
+        </dl>
+        <div class="source-card-actions">
+          <a href="/docs/maizegdb-globus-guide.pdf" target="_blank" rel="noopener">Transfer guide \(PDF\) &#8595;</a>
         </div>
+      </article>
 
-        <p class="globus-collection-desc">
-          <strong>Dataset Scope&#58;</strong> This public collection provides unrestricted, read-only access to curated datasets from MaizeGDB. It hosts a comprehensive suite of genetics, genomics, and breeding data including whole-genome FASTA/GFF files, pre-formatted JBrowse tracks \(BigWig, BAM, CRAM, VCF\), intermediate pipeline analyses, high-density SNP matrices, and AI machine learning weights and inference outputs.
-        </p>
-
-        <div class="globus-actions-row">
-          <a class="mgdb-button mgdb-button-primary" href="https://app.globus.org/file-manager?origin_id=g-3126c1.67741c.a567.data.globus.org" target="_blank" rel="noopener">Open in Globus Web App &#8599;</a>
-          <a class="mgdb-button mgdb-button-secondary" href="https://g-3126c1.67741c.a567.data.globus.org/" target="_blank" rel="noopener">Direct HTTPS Browse &#8599;</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- GLOBUS HOW-TO CONNECTION GUIDE -->
-    <div class="globus-guide-container">
-      <h3 class="guide-heading">How to Connect &amp; Transfer Data via Globus</h3>
-
-      <!-- Step Cards Grid -->
-      <div class="globus-methods-grid">
-        <!-- METHOD 1: WEB APP -->
-        <article class="method-card">
-          <div class="method-badge">Method 1 &bull; Web Interface</div>
-          <h4>Globus Web App \(Interactive GUI\)</h4>
-          <p>Ideal for point-and-click transfers between MaizeGDB and your personal workstation, university cluster, or cloud storage \(AWS S3, Google Drive, Box\).</p>
-          <ol class="method-steps-list">
-            <li>Navigate to <a href="https://app.globus.org" target="_blank" rel="noopener">app.globus.org &#8599;</a> and log in with your institutional credentials or Globus ID.</li>
-            <li>In the <strong>File Manager</strong> search bar, enter <code>MaizeGDB Public Collection \(SCINet - JUNO\)</code> or domain <code>g-3126c1.67741c.a567.data.globus.org</code>.</li>
-            <li>Select the files or directories you wish to retrieve on the left pane.</li>
-            <li>Select your target destination endpoint on the right pane and click <strong>Start Transfer</strong>. Globus manages checksum verification, fire-and-forget background transfer, and email notification upon completion.</li>
-          </ol>
-        </article>
-
-        <!-- METHOD 2: CLI -->
-        <article class="method-card">
-          <div class="method-badge method-badge-blue">Method 2 &bull; Command Line</div>
-          <h4>Globus CLI \(Automated Pipelines\)</h4>
-          <p>Ideal for batch compute jobs, bioinformatic workflows, and scheduled cron synchronization scripts on high-performance computing clusters.</p>
-          
-          <div class="code-block-wrap">
-            <div class="code-block-header">
-              <span>Terminal Command Snippets</span>
-              <button type="button" class="copy-btn-inline" onclick="copySnippet\('cli-snippet-1', this\)">Copy Code</button>
-            </div>
-            <pre><code id="cli-snippet-1"># 1. Install Globus CLI via pip or conda
-pip install globus-cli
-
-# 2. Authenticate session
-globus login
-
-# 3. List top-level directories in the MaizeGDB collection
-globus ls g-3126c1.67741c.a567.data.globus.org:/
-
-# 4. Initiate recursive background transfer to your local HPC endpoint
-globus transfer g-3126c1.67741c.a567.data.globus.org:/genomes/ &lt;YOUR_ENDPOINT_ID&gt;:/scratch/maize/ --recursive --label "MaizeGDB Genome Sync"</code></pre>
-          </div>
-        </article>
-      </div>
     </div>
   </section>
 
-  <!-- SECTION 2: DIRECT HTTP BULK DOWNLOAD SERVER -->
-  <section id="downloads-server" class="mgdb-panel" aria-labelledby="downloads-server-heading">
-    <h2 id="downloads-server-heading" class="mgdb-panel-title">Direct HTTP Download Server &amp; Box Repository</h2>
-    <p class="mgdb-panel-lead">Standard web-based FTP-style directories and institutional data stores for direct file downloads and automated scripting via curl or wget.</p>
-
-    <div class="servers-grid">
-      <!-- Card 1: HTTP Download Server -->
-      <article class="server-card">
-        <div class="server-card-top">
-          <div class="server-icon-wrap">
-            <img src="/images/maize_download.png" alt="MaizeGDB Download Server" />
-          </div>
-          <div>
-            <h3>MaizeGDB HTTP Download Server</h3>
-            <span class="server-url-badge">https&#58;//download.maizegdb.org/</span>
-          </div>
-        </div>
-        <p class="server-card-desc">Comprehensive open-access file tree holding all released B73 assemblies \(v1&ndash;v5\), 26 NAM founder inbreds, wild relatives, genetic maps, transcriptomics matrices, and supplementary publication files.</p>
-        <div class="server-card-actions">
-          <a class="mgdb-button mgdb-button-primary" href="https://download.maizegdb.org/" target="_blank" rel="noopener">Browse Download Server &#8599;</a>
-        </div>
-      </article>
-
-      <!-- Card 2: Box Data Store -->
-      <article class="server-card">
-        <div class="server-card-top">
-          <div class="server-icon-wrap">
-            <img src="/images/box_download.png" alt="MaizeGDB Box Data Store" />
-          </div>
-          <div>
-            <h3>Institutional Box Data Store</h3>
-            <span class="server-url-badge">iastate.app.box.com/v/maizegdb-public</span>
-          </div>
-        </div>
-        <p class="server-card-desc">Public cloud storage repository dedicated to large machine learning models, neural network weights, deep learning datasets, and bundled NAM project JBrowse track archives.</p>
-        <div class="server-card-actions">
-          <a class="mgdb-button mgdb-button-secondary" href="https://iastate.app.box.com/v/maizegdb-public" target="_blank" rel="noopener">Browse Box Repository &#8599;</a>
-        </div>
-      </article>
+  <!-- QUICK DOWNLOADS: the B73 v5 reference, far and away the most requested -->
+  <section id="downloads-quick" class="mgdb-panel quick-panel" aria-labelledby="downloads-quick-heading">
+    <div class="quick-head">
+      <h2 id="downloads-quick-heading" class="mgdb-panel-title">B73 v5 quick downloads</h2>
+      <div class="quick-head-actions">
+        <a href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/" target="_blank" rel="noopener">All 52 B73 v5 files &#8599;</a>
+        <button type="button" class="copy-btn-inline" onclick="copyText\('b73-wget-block', this\)">Copy all four wget commands</button>
+      </div>
     </div>
+
+    <div class="quick-grid">
+        <a class="quick-tile" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0.fa.gz" download>
+          <span class="quick-tile-kind">FASTA</span>
+          <span class="quick-tile-label">Genome assembly</span>
+          <code class="quick-tile-file">Zm-B73-REFERENCE-NAM-5.0.fa.gz</code>
+          <span class="quick-tile-size">616M</span>
+        </a>
+        <a class="quick-tile" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.gff3.gz" download>
+          <span class="quick-tile-kind">GFF3</span>
+          <span class="quick-tile-label">Gene annotation</span>
+          <code class="quick-tile-file">Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.gff3.gz</code>
+          <span class="quick-tile-size">12M</span>
+        </a>
+        <a class="quick-tile" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.protein.fa.gz" download>
+          <span class="quick-tile-kind">FASTA</span>
+          <span class="quick-tile-label">Protein sequences</span>
+          <code class="quick-tile-file">Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.protein.fa.gz</code>
+          <span class="quick-tile-size">10M</span>
+        </a>
+        <a class="quick-tile" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.canonical.cds.fa.gz" download>
+          <span class="quick-tile-kind">FASTA</span>
+          <span class="quick-tile-label">Coding sequences</span>
+          <code class="quick-tile-file">Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.canonical.cds.fa.gz</code>
+          <span class="quick-tile-size">13M</span>
+        </a>
+    </div>
+
+    <pre id="b73-wget-block" hidden>wget -c "https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0.fa.gz"
+wget -c "https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.gff3.gz"
+wget -c "https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.protein.fa.gz"
+wget -c "https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.canonical.cds.fa.gz"</pre>
+  </section>
+
+  <!-- SECTION 2: GUIDED GENOME FILE FINDER -->
+  <section id="downloads-finder" class="mgdb-panel" data-manifest-url="/data/download_catalog.json" aria-labelledby="downloads-finder-heading">
+    <div class="finder-head">
+      <h2 id="downloads-finder-heading" class="mgdb-panel-title">Guided genome file finder</h2>
+      <div class="finder-stats" aria-label="Catalog contents">
+        <span><strong id="download-manifest-assemblies">&#8212;</strong> assemblies</span>
+        <span><strong id="download-manifest-files">&#8212;</strong> files indexed</span>
+        <span><strong id="download-manifest-updated">&#8212;</strong> catalog date</span>
+      </div>
+    </div>
+
+    <ol class="finder-workflow">
+      <li><b>1</b><strong>Find an assembly</strong><small>Search by inbred, accession, species, or project</small></li>
+      <li><b>2</b><strong>Choose a file type</strong><small>Recommended biological files come first</small></li>
+      <li><b>3</b><strong>Download or copy a command</strong><small>Browser download, wget, curl, or the direct URL</small></li>
+    </ol>
+
+    <div id="download-explorer-loading" class="finder-message" role="status">Loading the file catalog&#8230;</div>
+    <div id="download-explorer-error" class="finder-message finder-message-error" role="alert" hidden>
+      <strong>The file catalog is unavailable.</strong>
+      <span>Every file is still reachable in the <a href="https://download.maizegdb.org/">genome download directory</a>.</span>
+    </div>
+
+    <div id="download-explorer-app" class="finder-app" hidden>
+
+      <div class="finder-picker">
+        <div class="finder-step-head">
+          <span class="finder-step">Step 1</span>
+          <h3 id="download-assembly-title">Find an assembly</h3>
+        </div>
+        <label class="finder-label" for="download-assembly-search">Genome, accession, species, or project</label>
+        <div class="finder-search-wrap">
+          <input id="download-assembly-search" type="search" placeholder="Try B73, PH207, Mo17, NAM, or Tripsacum" autocomplete="off">
+          <button id="download-assembly-clear" type="button" hidden aria-label="Clear the assembly search">&times;</button>
+        </div>
+        <p id="download-assembly-status" class="finder-picker-status" aria-live="polite"></p>
+        <div id="download-assembly-results" class="finder-assembly-results" role="listbox" aria-label="Matching genome assemblies"></div>
+      </div>
+
+      <div class="finder-browser">
+        <div class="finder-selected">
+          <div class="finder-step-head">
+            <span class="finder-step">Step 2</span>
+            <h3 id="download-selected-name">Select an assembly</h3>
+          </div>
+          <p id="download-selected-meta" class="finder-selected-meta"></p>
+          <div class="finder-selected-actions">
+            <button id="download-copy-core" type="button" class="mgdb-button mgdb-button-secondary">Copy core wget commands</button>
+            <a id="download-open-directory" class="mgdb-button mgdb-button-secondary" href="https://download.maizegdb.org/" target="_blank" rel="noopener">Open directory &#8599;</a>
+          </div>
+        </div>
+
+        <div class="finder-controls">
+          <div id="download-role-filters" class="finder-role-filters" aria-label="Filter by file type"></div>
+          <label class="finder-recommended"><input id="download-recommended-only" type="checkbox" checked> Recommended files only</label>
+        </div>
+
+        <p id="download-file-summary" class="finder-file-summary" aria-live="polite"></p>
+        <div id="download-file-results" class="finder-file-results"></div>
+
+        <div id="download-command-guide" class="finder-command" hidden>
+          <div class="finder-command-head">
+            <div class="finder-step-head">
+              <span class="finder-step">Step 3</span>
+              <h3 id="download-command-title">Download from the command line</h3>
+            </div>
+            <button id="download-command-close" type="button" class="finder-command-close" aria-label="Close the command guide">&times;</button>
+          </div>
+          <p id="download-command-file" class="finder-command-file"></p>
+          <div class="finder-command-row"><span>wget</span><code id="download-command-wget"></code><button type="button" data-copy-command="wget">Copy</button></div>
+          <div class="finder-command-row"><span>curl</span><code id="download-command-curl"></code><button type="button" data-copy-command="curl">Copy</button></div>
+          <div class="finder-command-row"><span>URL</span><code id="download-command-url"></code><button type="button" data-copy-command="url">Copy</button></div>
+          <p class="finder-command-note"><code>wget -c</code> resumes an interrupted transfer. With curl, <code>-L</code> follows redirects and <code>-O</code> keeps the server filename.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="finder-footer">The catalog is generated from the genome download directory, so every file keeps its stable URL. Files outside the assembly directories are listed in the sections below.</p>
   </section>
 
   <!-- SECTION 3: B73 REFERENCE GENOMES -->
@@ -199,7 +244,7 @@ globus transfer g-3126c1.67741c.a567.data.globus.org:/genomes/ &lt;YOUR_ENDPOINT
     <h2 id="downloads-b73-heading" class="mgdb-panel-title">B73 Representative Reference Genome Releases</h2>
     <p class="mgdb-panel-lead">Complete sequence assemblies, GFF3 gene model annotations, canonical CDS/PEP FASTA, and MAKER-P support packages for all 5 B73 reference versions.</p>
 
-    <div class="mgdb-table-wrapper">
+    <div class="mgdb-table-scroll">
       <table class="mgdb-table">
         <thead>
           <tr>
@@ -544,7 +589,7 @@ globus transfer g-3126c1.67741c.a567.data.globus.org:/genomes/ &lt;YOUR_ENDPOINT
         <p class="thematic-desc">Trained deep learning model weights, embeddings, benchmark training/validation splits, and pipeline inference outputs.</p>
         <div class="thematic-links">
           <a class="thematic-link" href="https://iastate.app.box.com/v/maizegdb-public/folder/323424248589" target="_blank" rel="noopener">Box Repository &#8599;</a>
-          <a class="thematic-link" href="#downloads-globus">Globus Endpoint &uarr;</a>
+          <a class="thematic-link" href="#downloads-sources">Globus Endpoint &uarr;</a>
         </div>
       </article>
 

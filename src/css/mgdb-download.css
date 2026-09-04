@@ -13,7 +13,8 @@
   border-color: var(--mgdb-line);
 }
 
-.mgdb-download-page .mgdb-hero-emblem svg {
+.mgdb-download-page .mgdb-hero-emblem svg,
+.mgdb-download-page .mgdb-hero-emblem img {
   width: min(100%, 64px);
   height: auto;
 }
@@ -63,343 +64,826 @@
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
+/* The shared 4.5rem under-clears this bar: nine tabs wrap to two rows at
+   common widths, so a clicked section landed under the bar. The scrollspy
+   reads this value back rather than hardcoding its own line. */
 .mgdb-download-page > section,
 .mgdb-download-page section[id] {
-  scroll-margin-top: 4.5rem;
+  scroll-margin-top: 8rem;
 }
 
 /* --------------------------------------------------------------------------
-   Section 1: Globus High-Speed Endpoint
+   Section headings
+
+   .mgdb-panel-title is a per-page class — it appears in no shared stylesheet —
+   so without this rule the h2 keeps the browser's default 0.83em margin and
+   every section title sits 23px lower than the section's own padding intends.
+   Same declaration the other panel pages use (whole_genome, TYPSimSelector,
+   european_flints and six more); the font size and colour already matched.
    -------------------------------------------------------------------------- */
 
-.mgdb-download-page .globus-hero-panel {
-  background: linear-gradient(180deg, #f0fdf4 0%, var(--mgdb-surface) 100%) !important;
-  border-color: #86efac !important;
+.mgdb-download-page .mgdb-panel-title {
+  margin: 0 0 var(--mgdb-space-1);
 }
 
-.mgdb-download-page .globus-badge-row {
+/* --------------------------------------------------------------------------
+   B73 v5 quick downloads
+
+   B73 v5 is 55% of everything fetched from the download server (six days of
+   logs, Aug 2026), so it gets a fixed shortcut ahead of the search. Sizes and
+   file names come from data/download_catalog.json; if an annotation release
+   supersedes Zm00001eb.1 these four hrefs need updating with it.
+   -------------------------------------------------------------------------- */
+
+.mgdb-download-page .quick-head {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  margin-bottom: var(--mgdb-space-2);
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
 }
 
-.mgdb-download-page .globus-tag-badge {
-  display: inline-block;
-  background: #166534;
-  color: #ffffff;
-  padding: 3px 10px;
-  border-radius: 9999px;
-  font-size: 11px;
-  font-weight: 800;
-  text-transform: uppercase;
+.mgdb-download-page .quick-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mgdb-space-3);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-download-page .quick-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-download-page .quick-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-left: 3px solid var(--mgdb-green);
+  border-radius: var(--mgdb-radius-sm);
+  color: var(--mgdb-ink) !important;
+  text-decoration: none;
+}
+
+.mgdb-download-page .quick-tile:hover {
+  background: var(--mgdb-green-soft);
+  border-left-color: var(--mgdb-gold);
+}
+
+.mgdb-download-page .quick-tile:focus-visible {
+  outline: 3px solid var(--mgdb-gold);
+  outline-offset: 2px;
+}
+
+.mgdb-download-page .quick-tile-kind {
+  align-self: flex-start;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-size: 0.66rem;
+  font-weight: 700;
   letter-spacing: 0.04em;
 }
 
-.mgdb-download-page .globus-subtag-badge {
-  display: inline-block;
-  background: #dcfce7;
-  color: #166534;
-  border: 1px solid #bbf7d0;
-  padding: 3px 10px;
-  border-radius: 9999px;
-  font-size: 11px;
+.mgdb-download-page .quick-tile-label {
+  font-size: var(--mgdb-text-sm);
   font-weight: 700;
 }
 
-.mgdb-download-page .globus-id-card {
-  background: var(--mgdb-surface);
-  border: 2px solid #86efac;
-  border-radius: var(--mgdb-radius);
-  padding: var(--mgdb-space-5);
-  margin-top: var(--mgdb-space-4);
-  margin-bottom: var(--mgdb-space-6);
-  display: flex;
-  gap: var(--mgdb-space-4);
-  box-shadow: 0 4px 14px rgba(22, 101, 52, 0.08);
+.mgdb-download-page .quick-tile-file {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  overflow-wrap: anywhere;
 }
 
-.mgdb-download-page .globus-id-icon-wrap {
-  flex-shrink: 0;
-  display: flex;
-  align-items: flex-start;
+.mgdb-download-page .quick-tile-size {
+  margin-top: auto;
   padding-top: 4px;
-}
-
-.mgdb-download-page .globus-id-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--mgdb-space-3);
-}
-
-.mgdb-download-page .globus-header-flex {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--mgdb-space-2);
-}
-
-.mgdb-download-page .globus-collection-name {
-  font-size: 1.3rem;
-  font-weight: 800;
-  color: var(--mgdb-green-dark);
-  margin: 0;
-}
-
-.mgdb-download-page .globus-guest-chip {
-  display: inline-block;
-  padding: 3px 10px;
-  background: #f1f5f9;
-  color: #334155;
-  border: 1px solid var(--mgdb-line);
-  border-radius: 9999px;
-  font-size: 11px;
-}
-
-.mgdb-download-page .globus-meta-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--mgdb-space-3);
-  background: #f8fafc;
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-sm);
-  padding: var(--mgdb-space-3) var(--mgdb-space-4);
-}
-
-.mgdb-download-page .globus-meta-item {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.mgdb-download-page .meta-label {
-  font-size: 11px;
-  font-weight: 700;
   color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------------------
+   Section 1: Choose a download source
+
+   Three identical cards. Each one's icon and name together form a single large
+   link to that service; the row below carries the secondary links. Globus is
+   marked only by the gold "New" chip.
+   -------------------------------------------------------------------------- */
+
+/* An explicit track count, not repeat(auto-fit, minmax(0, 1fr)). With a zero
+   floor auto-fit generates dozens of tracks and merely *collapses* the empty
+   ones, so any child spanning `1 / -1` keeps every one of them alive and the
+   row divides into slivers. Explicit counts plus breakpoints below. */
+.mgdb-download-page .source-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* One row per card part: title, description, facts, actions. The cards are
+     subgrids over these four rows, so each part starts at the same y in all
+     three cards and the dashed rule above "Best for" reads as one line across
+     the row. Without subgrid the cards still stack correctly, just unaligned. */
+  grid-template-rows: auto auto auto auto;
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-download-page .source-card {
+  position: relative;
+  display: grid;
+  grid-row: span 4;
+  grid-template-rows: subgrid;
+  row-gap: var(--mgdb-space-3);
+  align-content: start;
+  min-width: 0;
+  padding: var(--mgdb-space-5);
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-top: 4px solid var(--mgdb-green);
+  border-radius: var(--mgdb-radius);
+}
+
+/* The Globus card is the same card as the other two — the gold "New" chip is
+   the only thing marking it out. It previously also carried a gold top edge and
+   a tinted header band; both were dropped as too much for one distinction. */
+
+.mgdb-download-page .source-card-flag {
+  position: absolute;
+  top: var(--mgdb-space-4);
+  right: var(--mgdb-space-4);
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--mgdb-gold);
+  color: #3d2a04;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
-.mgdb-download-page .meta-value {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: var(--mgdb-text-sm);
-  font-weight: 600;
-  color: var(--mgdb-ink);
+/* The icon plus the name is one large link to the service. Making the *whole*
+   card the click target was rejected: the overlay that pattern needs also
+   swallows text selection, and the Globus card carries an endpoint string
+   people copy by hand. */
+.mgdb-download-page .source-card-title {
+  margin: 0;
+  font-size: 1rem;
 }
 
-.mgdb-download-page .meta-value code {
-  background: #ffffff;
-  border: 1px solid var(--mgdb-line);
-  padding: 2px 6px;
-  border-radius: 4px;
-  color: #0f172a;
+.mgdb-download-page .source-card-main {
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-4);
+  min-width: 0;
+  margin: calc(-1 * var(--mgdb-space-2));
+  padding: var(--mgdb-space-2);
+  border-radius: var(--mgdb-radius-sm);
+  color: inherit !important;
+  text-decoration: none;
+}
+
+.mgdb-download-page .source-card-globus > .source-card-title > .source-card-main {
+  /* Keeps the name clear of the New chip. */
+  padding-right: 3.25rem;
+}
+
+.mgdb-download-page .source-card-main:hover {
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-download-page .source-card-main:hover .source-card-name {
+  text-decoration: underline;
+}
+
+.mgdb-download-page .source-card-main:focus-visible {
+  outline: 3px solid var(--mgdb-gold);
+  outline-offset: 2px;
+}
+
+.mgdb-download-page .source-card-icon {
+  flex: none;
+  width: 84px;
+  height: 84px;
+  object-fit: contain;
+}
+
+.mgdb-download-page .source-card-id {
+  display: block;
+  min-width: 0;
+}
+
+.mgdb-download-page .source-card-name {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--mgdb-green-dark);
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.mgdb-download-page .source-card-host {
+  display: block;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 400;
+  word-break: break-word;
+}
+
+.mgdb-download-page .source-card-desc {
+  margin: 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.55;
+}
+
+.mgdb-download-page .source-card-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  margin: 0;
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px dashed var(--mgdb-line);
+}
+
+.mgdb-download-page .source-card-facts > div {
+  min-width: 0;
+}
+
+.mgdb-download-page .source-card-fact-wide {
+  grid-column: 1 / -1;
+}
+
+.mgdb-download-page .source-card-facts dt {
+  margin-bottom: 2px;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.mgdb-download-page .source-card-facts dd {
+  margin: 0;
+  /* wrap, or the Copy button beside a long endpoint is pushed off-screen */
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-download-page .source-card-facts dd code {
+  word-break: break-all;
+}
+
+.mgdb-download-page .source-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  margin-top: auto;
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--mgdb-line);
+}
+
+.mgdb-download-page .source-card-actions a {
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
 }
 
 .mgdb-download-page .copy-btn-inline {
-  padding: 2px 8px;
-  border-radius: 4px;
+  padding: 3px 10px;
   border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
   background: var(--mgdb-surface);
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--mgdb-green-dark);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-xs);
   cursor: pointer;
-  transition: all .12s ease;
 }
 
 .mgdb-download-page .copy-btn-inline:hover {
   background: var(--mgdb-green-soft);
-  border-color: var(--mgdb-green);
 }
 
-.mgdb-download-page .globus-collection-desc {
-  font-size: var(--mgdb-text-sm);
-  color: var(--mgdb-ink);
-  line-height: 1.6;
-  margin: 0;
-}
+/* --------------------------------------------------------------------------
+   Section 2: Guided genome file finder
+   -------------------------------------------------------------------------- */
 
-.mgdb-download-page .globus-actions-row {
+.mgdb-download-page .finder-head {
   display: flex;
   flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
   gap: var(--mgdb-space-3);
-  margin-top: var(--mgdb-space-2);
 }
 
-/* --------------------------------------------------------------------------
-   Globus Guide Grid & CLI Snippets
-   -------------------------------------------------------------------------- */
-
-.mgdb-download-page .globus-guide-container {
-  border-top: 1px solid #bbf7d0;
-  padding-top: var(--mgdb-space-5);
-}
-
-.mgdb-download-page .guide-heading {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--mgdb-ink);
-  margin: 0 0 var(--mgdb-space-4) 0;
-}
-
-.mgdb-download-page .globus-methods-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+.mgdb-download-page .finder-stats {
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--mgdb-space-4);
-}
-
-.mgdb-download-page .method-card {
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  padding: var(--mgdb-space-4);
-  display: flex;
-  flex-direction: column;
-}
-
-.mgdb-download-page .method-badge {
-  display: inline-block;
-  align-self: flex-start;
-  padding: 2px 8px;
-  border-radius: 9999px;
-  background: #dcfce7;
-  color: #166534;
-  font-size: 11px;
-  font-weight: 700;
-  margin-bottom: var(--mgdb-space-2);
-}
-
-.mgdb-download-page .method-badge-blue {
-  background: #dbeafe;
-  color: #1e40af;
-}
-
-.mgdb-download-page .method-card h4 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin: 0 0 var(--mgdb-space-2) 0;
-  color: var(--mgdb-ink);
-}
-
-.mgdb-download-page .method-card p {
-  font-size: var(--mgdb-text-xs);
   color: var(--mgdb-ink-soft);
-  line-height: 1.5;
-  margin-bottom: var(--mgdb-space-3);
+  font-size: var(--mgdb-text-sm);
 }
 
-.mgdb-download-page .method-steps-list {
-  margin: 0;
-  padding-left: var(--mgdb-space-4);
-  font-size: var(--mgdb-text-xs);
-  line-height: 1.7;
+.mgdb-download-page .finder-stats strong {
   color: var(--mgdb-ink);
+  font-variant-numeric: tabular-nums;
 }
 
-.mgdb-download-page .method-steps-list a {
-  color: var(--mgdb-green-dark);
-  font-weight: 600;
-  text-decoration: none;
+/* The three steps are a real sequence, so they are numbered and ordered. */
+.mgdb-download-page .finder-workflow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--mgdb-space-3);
+  margin: var(--mgdb-space-4) 0 0;
+  padding: 0;
+  list-style: none;
 }
 
-.mgdb-download-page .method-steps-list a:hover {
-  text-decoration: underline;
-}
-
-.mgdb-download-page .code-block-wrap {
-  margin-top: var(--mgdb-space-2);
-  background: #0f172a;
+.mgdb-download-page .finder-workflow li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  gap: 0 var(--mgdb-space-3);
+  align-items: center;
+  min-width: 0;
+  padding: var(--mgdb-space-3);
+  background: var(--mgdb-green-soft);
   border-radius: var(--mgdb-radius-sm);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
 }
 
-.mgdb-download-page .code-block-header {
+.mgdb-download-page .finder-workflow b {
+  grid-row: 1 / 3;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 6px 12px;
-  background: #1e293b;
-  color: #94a3b8;
-  font-size: 11px;
-  font-weight: 700;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--mgdb-green-dark);
+  color: #fff;
+  font-size: var(--mgdb-text-sm);
 }
 
-.mgdb-download-page .code-block-wrap pre {
-  margin: 0;
-  padding: var(--mgdb-space-3);
-  overflow-x: auto;
+.mgdb-download-page .finder-workflow strong {
+  font-size: var(--mgdb-text-sm);
 }
 
-.mgdb-download-page .code-block-wrap code {
-  color: #f1f5f9;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 12px;
-  line-height: 1.6;
+.mgdb-download-page .finder-workflow small {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
 }
 
-/* --------------------------------------------------------------------------
-   Section 2: Server Cards
-   -------------------------------------------------------------------------- */
+.mgdb-download-page .finder-message {
+  margin-top: var(--mgdb-space-4);
+  padding: var(--mgdb-space-4);
+  background: var(--mgdb-green-soft);
+  border-radius: var(--mgdb-radius-sm);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
 
-.mgdb-download-page .servers-grid {
+.mgdb-download-page .finder-message-error {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-ink);
+}
+
+.mgdb-download-page .finder-app {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
   gap: var(--mgdb-space-4);
   margin-top: var(--mgdb-space-4);
 }
 
-.mgdb-download-page .server-card {
+.mgdb-download-page .finder-picker,
+.mgdb-download-page .finder-browser {
+  min-width: 0;
+}
+
+.mgdb-download-page .finder-picker {
+  display: flex;
+  flex-direction: column;
+  padding: var(--mgdb-space-4);
   background: var(--mgdb-surface);
   border: 1px solid var(--mgdb-line);
   border-radius: var(--mgdb-radius);
-  padding: var(--mgdb-space-5);
+}
+
+.mgdb-download-page .finder-step-head {
   display: flex;
-  flex-direction: column;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  align-items: baseline;
+  gap: var(--mgdb-space-2);
 }
 
-.mgdb-download-page .server-card-top {
-  display: flex;
-  align-items: center;
-  gap: var(--mgdb-space-3);
-  margin-bottom: var(--mgdb-space-3);
+.mgdb-download-page .finder-step-head > h3 {
+  margin: 0;
+  font-size: 1rem;
 }
 
-.mgdb-download-page .server-icon-wrap img {
-  height: 48px;
-  width: auto;
-  border-radius: var(--mgdb-radius-sm);
+.mgdb-download-page .finder-step {
+  flex: none;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--mgdb-green-dark);
+  color: #fff;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
-.mgdb-download-page .server-card h3 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin: 0 0 2px 0;
-  color: var(--mgdb-ink);
-}
-
-.mgdb-download-page .server-url-badge {
-  font-size: 11px;
-  color: var(--mgdb-green-dark);
-  font-family: ui-monospace, monospace;
+.mgdb-download-page .finder-label {
+  margin-top: var(--mgdb-space-3);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
   font-weight: 600;
 }
 
-.mgdb-download-page .server-card-desc {
-  font-size: var(--mgdb-text-xs);
-  color: var(--mgdb-ink-soft);
-  line-height: 1.5;
-  margin-bottom: var(--mgdb-space-4);
-  flex: 1;
+.mgdb-download-page .finder-search-wrap {
+  position: relative;
+  margin-top: 6px;
 }
 
-.mgdb-download-page .server-card-actions {
-  margin-top: auto;
+.mgdb-download-page .finder-search-wrap input {
+  width: 100%;
+  padding: 9px 34px 9px 12px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-download-page .finder-search-wrap input:focus {
+  outline: none;
+  border-color: var(--mgdb-green-dark);
+  box-shadow: inset 0 -3px 0 var(--mgdb-gold);
+}
+
+.mgdb-download-page .finder-search-wrap button {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--mgdb-ink-soft);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mgdb-download-page .finder-picker-status {
+  margin: var(--mgdb-space-2) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-download-page .finder-assembly-results {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: var(--mgdb-space-2);
+  max-height: 27rem;
+  overflow-y: auto;
+}
+
+.mgdb-download-page .finder-assembly-option {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0 var(--mgdb-space-2);
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--mgdb-radius-sm);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mgdb-download-page .finder-assembly-option:hover {
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-download-page .finder-assembly-option.is-selected {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-download-page .finder-assembly-option strong {
+  min-width: 0;
+  font-size: var(--mgdb-text-sm);
+  overflow-wrap: anywhere;
+}
+
+.mgdb-download-page .finder-assembly-option span {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  white-space: nowrap;
+}
+
+.mgdb-download-page .finder-assembly-option small {
+  grid-column: 1 / -1;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-download-page .finder-assembly-empty {
+  margin: 0;
+  padding: var(--mgdb-space-3);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-download-page .finder-browser {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-3);
+}
+
+.mgdb-download-page .finder-selected {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--mgdb-space-4);
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+}
+
+.mgdb-download-page .finder-selected-meta {
+  margin: 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-download-page .finder-selected-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: 4px;
+}
+
+.mgdb-download-page .finder-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mgdb-space-3);
+}
+
+.mgdb-download-page .finder-role-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mgdb-download-page .finder-role-filter {
+  padding: 4px 10px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-xs);
+  cursor: pointer;
+}
+
+.mgdb-download-page .finder-role-filter:hover {
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-download-page .finder-role-filter.is-active {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #fff;
+}
+
+.mgdb-download-page .finder-recommended {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  white-space: nowrap;
+}
+
+.mgdb-download-page .finder-file-summary {
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-download-page .finder-file-results {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mgdb-download-page .finder-file-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  padding: var(--mgdb-space-3);
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+}
+
+.mgdb-download-page .finder-file-row:hover {
+  border-color: var(--mgdb-green-dark);
+}
+
+.mgdb-download-page .finder-file-icon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 30px;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.mgdb-download-page .finder-file-copy {
+  min-width: 0;
+}
+
+.mgdb-download-page .finder-file-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-download-page .finder-file-heading strong {
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-download-page .finder-file-badge {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.mgdb-download-page .finder-file-copy code {
+  display: block;
+  margin-top: 2px;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  overflow-wrap: anywhere;
+}
+
+.mgdb-download-page .finder-file-copy small {
+  display: block;
+  margin-top: 2px;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-download-page .finder-file-actions {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mgdb-download-page .finder-file-actions a,
+.mgdb-download-page .finder-file-actions button {
+  padding: 5px 12px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-xs);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.mgdb-download-page .finder-file-actions a:hover,
+.mgdb-download-page .finder-file-actions button:hover {
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-download-page .finder-file-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--mgdb-space-4);
+  background: var(--mgdb-green-soft);
+  border-radius: var(--mgdb-radius-sm);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-download-page .finder-command {
+  /* min-width: 0 — a long unwrapped command inside this block would otherwise
+     set the grid item's min-content width and blow the track past the viewport. */
+  min-width: 0;
+  padding: var(--mgdb-space-4);
+  background: var(--mgdb-surface);
+  border: 1px solid var(--mgdb-green-dark);
+  border-radius: var(--mgdb-radius);
+}
+
+.mgdb-download-page .finder-command-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--mgdb-space-3);
+}
+
+.mgdb-download-page .finder-command-close {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 50%;
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mgdb-download-page .finder-command-file {
+  margin: var(--mgdb-space-2) 0 var(--mgdb-space-3);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  overflow-wrap: anywhere;
+}
+
+.mgdb-download-page .finder-command-row {
+  display: grid;
+  grid-template-columns: 3.4rem minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  padding: 6px 0;
+  border-top: 1px solid var(--mgdb-line);
+}
+
+.mgdb-download-page .finder-command-row > span {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+}
+
+.mgdb-download-page .finder-command-row > code {
+  min-width: 0;
+  padding: 5px 8px;
+  background: #f6f8f6;
+  border-radius: var(--mgdb-radius-sm);
+  font-size: var(--mgdb-text-xs);
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.mgdb-download-page .finder-command-row > button {
+  padding: 4px 11px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-xs);
+  cursor: pointer;
+}
+
+.mgdb-download-page .finder-command-row > button:hover {
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-download-page .finder-command-note {
+  margin: var(--mgdb-space-3) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-download-page .finder-footer {
+  margin: var(--mgdb-space-4) 0 0;
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--mgdb-line);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
 }
 
 /* --------------------------------------------------------------------------
@@ -783,15 +1267,60 @@
    Responsive
    -------------------------------------------------------------------------- */
 
-@media (max-width: 900px) {
-  .mgdb-download-page .globus-methods-grid {
-    grid-template-columns: 1fr;
+/* The finder's two columns need real width; below this the assembly picker
+   sits above the file list rather than beside it. */
+@media (max-width: 1000px) {
+  .mgdb-download-page .finder-app {
+    grid-template-columns: minmax(0, 1fr);
   }
-  .mgdb-download-page .servers-grid {
-    grid-template-columns: 1fr;
+  .mgdb-download-page .finder-assembly-results {
+    max-height: 20rem;
   }
-  .mgdb-download-page .globus-id-card {
-    flex-direction: column;
+}
+
+/* Three source cards need real width before the fact columns get cramped. */
+@media (max-width: 1150px) {
+  .mgdb-download-page .source-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .mgdb-download-page .quick-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .mgdb-download-page .quick-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 780px) {
+  .mgdb-download-page .source-grid,
+  .mgdb-download-page .finder-workflow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 460px) {
+  .mgdb-download-page .source-card-facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .mgdb-download-page .finder-file-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .mgdb-download-page .finder-file-actions {
+    grid-column: 1 / -1;
+  }
+  /* A fixed label column plus a code block cannot shrink below the label
+     width; stack the three rows instead. */
+  .mgdb-download-page .finder-command-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .mgdb-download-page .finder-command-row > span {
+    grid-column: 1 / -1;
   }
 }
 

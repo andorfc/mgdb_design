@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Transferring MaizeGDB Data with Globus</title>
+<style>
+  @page { size: letter; margin: 0.75in 0.7in 0.7in; }
+
+  :root{
+    --gold:#f2a515; --gold-dark:#8a5a0f; --gold-soft:#fff6df;
+    --green:#285d46; --green-dark:#174634; --green-soft:#edf6f1;
+    --ink:#1f2723; --ink-soft:#39423c; --muted:#5b655e;
+    --line:#dcd8cf; --line-soft:#ece7dd; --surface-alt:#fbf9f5;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  body{
+    margin:0; color:var(--ink); background:#fff;
+    font:10.5pt/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+  h1,h2,h3{ margin:0; color:var(--green-dark); line-height:1.2; }
+  p{ margin:0; }
+  code{ font-family:"SF Mono", Menlo, Consolas, monospace; font-size:9pt; }
+
+  /* --- masthead --- */
+  .masthead{
+    display:flex; align-items:flex-start; justify-content:space-between; gap:18pt;
+    padding-bottom:10pt; border-bottom:2.5pt solid var(--green-dark);
+  }
+  .masthead h1{ font-size:20pt; letter-spacing:-.2pt; }
+  .masthead .sub{ margin-top:4pt; color:var(--muted); font-size:9.5pt; }
+  .stamp{
+    flex:none; text-align:right; font-size:8pt; color:var(--muted); line-height:1.5;
+  }
+  .stamp .draft{
+    display:inline-block; margin-bottom:4pt; padding:2pt 7pt; border-radius:2pt;
+    background:var(--gold); color:#3d2a04; font-size:8pt; font-weight:700;
+    letter-spacing:.6pt; text-transform:uppercase;
+  }
+
+  .lede{ margin-top:12pt; font-size:11pt; color:var(--ink-soft); }
+
+  /* --- sections --- */
+  section{ margin-top:15pt; break-inside:avoid; }
+  h2{
+    font-size:12.5pt; padding-bottom:3pt; margin-bottom:8pt;
+    border-bottom:1pt solid var(--line);
+  }
+  h2 .n{
+    display:inline-block; width:15pt; height:15pt; margin-right:6pt;
+    border-radius:50%; background:var(--green-dark); color:#fff;
+    font-size:8.5pt; line-height:15pt; text-align:center; vertical-align:1pt;
+  }
+  h3{ font-size:10.5pt; margin:10pt 0 4pt; }
+
+  /* --- the collection identity card --- */
+  .identity{
+    margin-top:12pt; padding:10pt 12pt;
+    background:var(--gold-soft); border:1pt solid var(--gold); border-radius:3pt;
+  }
+  .identity dl{ margin:0; display:grid; grid-template-columns:auto 1fr; gap:4pt 12pt; }
+  .identity dt{ color:var(--gold-dark); font-size:8.5pt; font-weight:700;
+    letter-spacing:.4pt; text-transform:uppercase; white-space:nowrap; }
+  .identity dd{ margin:0; font-size:9.5pt; word-break:break-all; }
+
+  ol,ul{ margin:6pt 0 0; padding-left:16pt; }
+  li{ margin-bottom:5pt; }
+  li:last-child{ margin-bottom:0; }
+
+  .note{
+    margin-top:9pt; padding:8pt 10pt;
+    background:var(--green-soft); border-left:2.5pt solid var(--green);
+    font-size:9.5pt; color:var(--ink-soft);
+  }
+  .note strong{ color:var(--green-dark); }
+
+  pre{
+    margin:6pt 0 0; padding:8pt 10pt;
+    background:#f4f6f4; border:1pt solid var(--line-soft); border-radius:3pt;
+    font-family:"SF Mono", Menlo, Consolas, monospace; font-size:8.5pt; line-height:1.6;
+    white-space:pre-wrap; word-break:break-word;
+  }
+  pre .c{ color:var(--muted); }
+
+  table{ width:100%; border-collapse:collapse; margin-top:8pt; font-size:9.5pt; }
+  th,td{ padding:5pt 7pt; text-align:left; border-bottom:1pt solid var(--line-soft);
+    vertical-align:top; }
+  th{ background:var(--surface-alt); color:var(--green-dark); font-size:8.5pt;
+    letter-spacing:.3pt; text-transform:uppercase; }
+  td code{ word-break:break-all; }
+
+  footer{
+    margin-top:18pt; padding-top:8pt; border-top:1pt solid var(--line);
+    color:var(--muted); font-size:8.5pt; display:flex;
+    justify-content:space-between; gap:12pt;
+  }
+  .page-break{ break-before:page; }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div>
+    <h1>Transferring MaizeGDB Data with Globus</h1>
+    <p class="sub">MaizeGDB Public Collection &middot; SCINet&nbsp;&ndash;&nbsp;JUNO</p>
+  </div>
+  <div class="stamp">
+    <span class="draft">Draft</span><br>
+    maizegdb.org/download<br>
+    September 2026
+  </div>
+</div>
+
+<p class="lede">
+  Globus is a file transfer service for research data. It runs transfers in the
+  background on servers rather than in your browser, restarts them by itself
+  after a network failure, verifies every file by checksum, and emails you when
+  the job finishes. That makes it the right tool for whole-genome sets, variant
+  matrices, and anything else large enough that an interrupted browser download
+  would cost you an afternoon.
+</p>
+
+<div class="identity">
+  <dl>
+    <dt>Collection</dt><dd>MaizeGDB Public Collection (SCINet&nbsp;&ndash;&nbsp;JUNO)</dd>
+    <dt>Endpoint</dt><dd><code>g-3126c1.67741c.a567.data.globus.org</code></dd>
+    <dt>Type</dt><dd>Guest collection on SCINet-Juno</dd>
+    <dt>Contact</dt><dd><code>carson.andorf@scinet.usda.gov</code></dd>
+  </dl>
+</div>
+
+<section>
+  <h2><span class="n">1</span>Before you start</h2>
+  <p>
+    You need a Globus account. It is free, and most researchers already have
+    access through their institution.
+  </p>
+  <ol>
+    <li>Go to <code>app.globus.org</code> and choose <strong>Log In</strong>.</li>
+    <li>Search for your university, agency, or lab in the organization list and
+      sign in with those credentials. If your organization is not listed, create
+      a Globus ID from the same screen instead.</li>
+  </ol>
+  <div class="note">
+    <strong>If the collection refuses you after login:</strong> the MaizeGDB
+    collection is intended for open, read-only public access, but access is
+    administered per identity. Email the contact address above with the identity
+    you signed in with and it can be checked.
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>Choose where the data should land</h2>
+  <p>
+    Globus copies between two <em>collections</em>. MaizeGDB is the source; you
+    supply the destination. Which one you use depends on where you want the files.
+  </p>
+  <table>
+    <thead>
+      <tr><th>Destination</th><th>What to use</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>University or agency cluster</td>
+        <td>Almost always already a Globus collection. Search your institution's
+          name in the File Manager; ask your research computing group for the
+          exact collection name if several appear.</td>
+      </tr>
+      <tr>
+        <td>Your own laptop or lab workstation</td>
+        <td><strong>Globus Connect Personal</strong> &mdash; a small free
+          application that turns the machine into a collection. Install it from
+          <code>globus.org/globus-connect-personal</code>, sign in, and give the
+          collection a name.</td>
+      </tr>
+      <tr>
+        <td>Cloud storage</td>
+        <td>Google Drive, Amazon S3, and Box connectors exist but are enabled per
+          institution. Check with your research computing group first.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2><span class="n">3</span>Transfer in the web interface</h2>
+  <p>The point-and-click route. Nothing to install beyond the destination collection.</p>
+  <ol>
+    <li>Open <code>app.globus.org/file-manager</code> and log in.</li>
+    <li>Click <strong>Collection</strong> in the left panel and paste the endpoint
+      <code>g-3126c1.67741c.a567.data.globus.org</code>, or search for
+      <em>MaizeGDB Public Collection</em>.</li>
+    <li>Browse to the files you want and select them. Selecting a folder
+      transfers everything beneath it.</li>
+    <li>Switch to the right panel with <strong>Transfer or Sync to&hellip;</strong>
+      and choose your destination collection and folder.</li>
+    <li>Click <strong>Start</strong>. The transfer now runs without you &mdash; you
+      can close the browser. Globus emails you when it completes.</li>
+  </ol>
+  <div class="note">
+    <strong>Transfer Settings</strong> is worth one look before a large job.
+    <em>Sync &mdash; only transfer new or changed files</em> makes a repeated
+    transfer resumable and cheap, which is what you want when refreshing a local
+    copy of a genome release.
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>Transfer from the command line</h2>
+  <p>
+    The command line route suits batch jobs, scheduled refreshes, and anything
+    that belongs in a pipeline script.
+  </p>
+
+  <h3>Install and sign in</h3>
+<pre><span class="c"># Install the CLI (pip or conda both work)</span>
+pip install globus-cli
+
+<span class="c"># Authenticate once; the session persists</span>
+globus login</pre>
+
+  <h3>Find the collection and look around</h3>
+<pre><span class="c"># MaizeGDB's endpoint ID, used as SOURCE below</span>
+export SOURCE=g-3126c1.67741c.a567.data.globus.org
+
+<span class="c"># List the top level of the collection</span>
+globus ls $SOURCE:/
+
+<span class="c"># Find your own destination collection's ID</span>
+globus endpoint search --filter-scope my-endpoints</pre>
+
+  <h3>Start a transfer</h3>
+<pre><span class="c"># One directory, recursively, to your endpoint</span>
+globus transfer $SOURCE:/genomes/ &lt;YOUR_ENDPOINT_ID&gt;:/scratch/maize/ \
+  --recursive --label "MaizeGDB genome sync"
+
+<span class="c"># Watch it, or let it run and check back later</span>
+globus task list
+globus task wait &lt;TASK_ID&gt;</pre>
+
+  <div class="note">
+    <strong>Paths are collection-relative.</strong> <code>/genomes/</code> here is
+    a path inside the MaizeGDB collection, not a path on your own machine, and it
+    is not the same as a URL on the download server. Run
+    <code>globus ls $SOURCE:/</code> first and copy the directory name you see
+    rather than assuming one.
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>When Globus is not the right tool</h2>
+  <p>
+    Globus earns its setup cost on large or repeated transfers. For a handful of
+    files, the other two MaizeGDB sources are faster to reach:
+  </p>
+  <ul>
+    <li><strong>MaizeGDB FTP</strong> &mdash; <code>ftp.maizegdb.org</code>, served
+      over HTTPS. Genome assemblies and annotations are under <code>/downloads/</code>,
+      also reachable as <code>download.maizegdb.org</code>. Every file has a stable
+      URL, so <code>wget</code> and <code>curl</code> work without an account. The
+      guided genome file finder at <code>maizegdb.org/download</code> will build
+      those commands for you.</li>
+    <li><strong>MaizeGDB Box</strong> &mdash; project collections, machine learning
+      model weights, and bundled genome-browser track archives.</li>
+  </ul>
+</section>
+
+<section>
+  <h2><span class="n">6</span>Getting help</h2>
+  <table>
+    <thead>
+      <tr><th>Question</th><th>Where to go</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>What is in a file, or which release to use</td>
+        <td>MaizeGDB contact form at <code>maizegdb.org/contact</code></td></tr>
+      <tr><td>Access denied to the collection after login</td>
+        <td><code>carson.andorf@scinet.usda.gov</code>, quoting the identity you used</td></tr>
+      <tr><td>Globus accounts, connectors, and endpoints at your institution</td>
+        <td>Your local research computing group</td></tr>
+      <tr><td>Globus itself &mdash; errors, CLI reference</td>
+        <td><code>docs.globus.org</code></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<footer>
+  <span>MaizeGDB &middot; maizegdb.org/download</span>
+  <span>Draft &mdash; September 2026</span>
+</footer>
+
+</body>
+</html>

@@ -70,6 +70,19 @@
 }
 
 /* --------------------------------------------------------------------------
+   Section headings
+
+   .mgdb-panel-title is a per-page class and appears in no shared stylesheet,
+   so without this the h2 keeps the browser's default 0.83em margin and every
+   section title sits 23px below the section's own padding. Same declaration
+   the other panel pages use; font size and colour already resolved correctly.
+   -------------------------------------------------------------------------- */
+
+.mgdb-history-page .mgdb-panel-title {
+  margin: 0 0 var(--mgdb-space-1);
+}
+
+/* --------------------------------------------------------------------------
    Filter Bar
    -------------------------------------------------------------------------- */
 
