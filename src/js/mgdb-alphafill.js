@@ -65,10 +65,18 @@
     gene: null,          /* the gene payload currently shown */
     detail: null,        /* its raw transplants, once fetched */
     pockets: [],
+    domains: [],         /* canonical-protein InterPro/Pfam spans, loaded lazily */
+    domainsLoaded: false,
+    domainsError: false,
     activeCcd: null,
+    activePocket: null,
     viewer: null,
+    proteinModel: null,
     ligModels: {},       /* asym id -> 3Dmol model */
     profile: null,       /* per-residue pLDDT, from the B-factor column */
+    chem: {},            /* CCD -> lazy RCSB chemical metadata promise */
+    suggestVersion: 0,   /* prevents a late typeahead response reopening after submit */
+    submittedTerm: '',   /* also suppresses a debounce queued before the submit click */
     index: null,         /* the tier-1 browse index */
     browseFilters: { strong: true, moderate: true, ion: false, weak: false, additive: false },
     browsePocketOnly: false
@@ -237,7 +245,7 @@
       var pocketLine = gene.np
         ? ' P2Rank still predicts <b>' + gene.np + ' confident pocket'
           + (gene.np > 1 ? 's' : '') + '</b>'
-          + (gene.tp ? ' (best probability ' + num(gene.tp, 3) + ')' : '')
+          + (gene.tp ? ' (best P2Rank probability ' + num(gene.tp, 3) + ')' : '')
           + ', so structure says there is a site here and the databank has nothing to fill it from.'
         : '';
       return '<div class="af-state af-state-no-donor">'
@@ -250,6 +258,7 @@
         + (gene.m ? '<p><a class="mgdb-button mgdb-button-secondary" href="' + escape(gene.m)
             + '" download>Download the AlphaFold model</a></p>' : '')
         + '</div>'
+        + (gene.m ? viewerMarkup(gene) : '')
         /* A confident pocket with nothing to put in it is the case where the
            genomic projection is most worth having. */
         + pocketTrack(gene, data.pockets || []);
@@ -283,8 +292,11 @@
         + 'low-confidence hypothesis.</p>';
     }
 
-    return '<button class="af-ligand-card" type="button" data-af-ccd-card="' + escape(item.ccd) + '"'
-      + ' data-af-evidence="' + escape(item.ev) + '" aria-pressed="false">'
+    var donor = String(item.pdb || '').toUpperCase();
+    return '<article class="af-ligand-card" data-af-ccd-card="' + escape(item.ccd) + '"'
+      + ' data-af-evidence="' + escape(item.ev) + '">'
+      + '<button class="af-ligand-focus" type="button" data-af-focus aria-pressed="false"'
+      + ' aria-label="Focus ' + escape(item.ccd) + ' in the structure viewer">'
       + '<span class="af-ligand-head">'
       + '<span class="af-ligand-swatch" style="background:' + hex(ligandColor(index)) + '"></span>'
       + '<span class="af-ligand-ccd">' + escape(item.ccd) + '</span>'
@@ -304,13 +316,25 @@
       + '</span>'
       + '<span class="af-ligand-name">Best donor <b>' + escape(item.pdb || '—') + '</b></span>'
       + flags
-      + '</button>';
+      + '</button>'
+      + '<span class="af-ligand-links" data-af-chem-links="' + escape(item.ccd) + '">'
+      + '<a href="https://www.rcsb.org/ligand/' + encodeURIComponent(item.ccd)
+      + '" target="_blank" rel="noopener">' + escape(item.ccd) + ' ligand summary</a>'
+      + (donor ? '<a href="https://www.rcsb.org/structure/' + encodeURIComponent(donor)
+        + '" target="_blank" rel="noopener">Donor ' + escape(donor) + '</a>' : '')
+      + '<span data-af-pubchem>PubChem ID loading&hellip;</span>'
+      + '</span></article>';
   }
 
   function renderGene(data) {
     var gene = data.gene;
     if (!gene || data.state !== 'transplant') {
       els.results.innerHTML = stateMarkup(data);
+      if (gene && data.state === 'no_donor' && gene.m) {
+        bindPocketTrack();
+        bindViewer();
+        openViewer(gene);
+      }
       return;
     }
 
@@ -359,10 +383,15 @@
     els.results.innerHTML = html;
 
     Array.prototype.forEach.call(els.results.querySelectorAll('[data-af-ccd-card]'), function (card) {
-      card.addEventListener('click', function () {
+      var focus = card.querySelector('[data-af-focus]');
+      if (!focus) { return; }
+      focus.addEventListener('click', function () {
         focusLigand(card.getAttribute('data-af-ccd-card'));
+        hydrateChemicalLinks(card.getAttribute('data-af-ccd-card'), card);
       });
     });
+
+    bindPocketTrack();
 
     bindViewer();
     openViewer(gene);
@@ -380,6 +409,131 @@
    * and the question "does this variant sit in a predicted pocket?" becomes
    * answerable.
    * --------------------------------------------------------------------- */
+
+  function pocketDownload(format) {
+    var gene = state.gene || {};
+    var pockets = (state.pockets || []).filter(function (pocket) {
+      return pocket.gb && pocket.gb.length;
+    });
+    if (!gene.g || !gene.c || !pockets.length) { return; }
+
+    var stem = String(gene.g + '-' + (gene.p || 'protein') + '-p2rank-pockets')
+      .replace(/[^A-Za-z0-9_.-]/g, '_');
+    var lines = [];
+    if (format === 'bed') {
+      lines.push('track name="' + gene.g + ' P2Rank pockets" description="P2Rank pocket residues projected through the CDS"');
+      pockets.forEach(function (pocket) {
+        var score = pocket.pr === null || pocket.pr === undefined
+          ? 0 : Math.max(0, Math.min(1000, Math.round(Number(pocket.pr) * 1000)));
+        pocket.gb.forEach(function (block, blockIndex) {
+          /* BED is 0-based, half-open; the index stores 1-based inclusive GFF
+             coordinates, so only the start needs subtracting. */
+          lines.push([
+            gene.c, Math.max(0, Number(block[0]) - 1), Number(block[1]),
+            [gene.g, pocket.p, 'block' + (blockIndex + 1)].join('|'), score, '.'
+          ].join('\t'));
+        });
+      });
+      saveBlob(lines.join('\n') + '\n', 'text/plain;charset=utf-8', stem + '.bed');
+      MGDB.announce('Genome-projected pockets downloaded as BED.');
+      return;
+    }
+
+    lines.push([
+      'gene', 'protein', 'chromosome', 'pocket', 'probability', 'confident',
+      'residue_count', 'protein_residues', 'block_start_1based',
+      'block_end_1based', 'coordinate_system'
+    ].join('\t'));
+    pockets.forEach(function (pocket) {
+      pocket.gb.forEach(function (block) {
+        lines.push([
+          gene.g, gene.p || '', gene.c, pocket.p || '',
+          pocket.pr === null || pocket.pr === undefined ? '' : pocket.pr,
+          pocket.cf ? 'yes' : 'no', (pocket.res || []).length,
+          (pocket.res || []).join(','), block[0], block[1], '1-based inclusive'
+        ].join('\t'));
+      });
+    });
+    saveBlob(lines.join('\n') + '\n', 'text/tab-separated-values;charset=utf-8', stem + '.tsv');
+    MGDB.announce('Genome-projected pockets downloaded as TSV.');
+  }
+
+  function domainContext(gene, pockets, domains) {
+    if (!state.domainsLoaded) {
+      return '<div class="af-domain-context" data-af-domain-context>'
+        + '<h4>Protein-domain context</h4>'
+        + (state.domainsError
+          ? '<p class="mgdb-small">Domain annotations could not be loaded. The pocket coordinates above are unaffected.</p>'
+          : '<p class="mgdb-small"><span class="mgdb-spinner" aria-hidden="true"></span> Loading InterPro/Pfam domains&hellip;</p>')
+        + '</div>';
+    }
+
+    var length = Number(gene.aa || 0);
+    var valid = (domains || []).filter(function (domain) {
+      return length > 0 && Number(domain.start) > 0 && Number(domain.end) >= Number(domain.start);
+    }).sort(function (first, second) {
+      return Number(first.start) - Number(second.start) || Number(first.end) - Number(second.end);
+    });
+    if (!valid.length) {
+      return '<div class="af-domain-context" data-af-domain-context>'
+        + '<h4>Protein-domain context</h4>'
+        + '<p class="mgdb-small">No InterPro/Pfam domains are assigned to this protein isoform.</p></div>';
+    }
+
+    var colors = ['#2f6f55', '#4f7cac', '#8a5a9e', '#b46a3c', '#6b7b3f', '#287f88'];
+    var laneEnds = [];
+    valid.forEach(function (domain) {
+      var lane = 0;
+      while (lane < laneEnds.length && laneEnds[lane] >= Number(domain.start)) { lane++; }
+      if (lane === laneEnds.length) { laneEnds.push(0); }
+      laneEnds[lane] = Number(domain.end);
+      domain._lane = lane;
+    });
+    var domainHeight = 10 + laneEnds.length * 22;
+    var trackHeight = domainHeight + 22;
+    var bars = valid.map(function (domain, index) {
+      var x = Math.max(0, ((Number(domain.start) - 1) / length) * 100);
+      var w = Math.max(((Number(domain.end) - Number(domain.start) + 1) / length) * 100, 0.6);
+      var color = colors[index % colors.length];
+      return '<rect x="' + x.toFixed(3) + '%" y="' + (6 + domain._lane * 22)
+        + '" width="' + w.toFixed(3) + '%" height="15" rx="3" fill="' + color + '">'
+        + '<title>' + escape(domain.accession || domain.name || 'Domain') + ' · residues '
+        + Number(domain.start).toLocaleString('en-US') + '–' + Number(domain.end).toLocaleString('en-US')
+        + '</title></rect>';
+    }).join('');
+
+    var seenResidues = {};
+    (pockets || []).forEach(function (pocket) {
+      (pocket.res || []).forEach(function (residue) { seenResidues[Number(residue)] = true; });
+    });
+    var pocketTicks = Object.keys(seenResidues).map(function (residue) {
+      var x = Math.max(0, ((Number(residue) - 1) / length) * 100);
+      return '<line x1="' + x.toFixed(3) + '%" y1="' + domainHeight + '" x2="'
+        + x.toFixed(3) + '%" y2="' + (domainHeight + 12)
+        + '" stroke="#b43f72" stroke-width="1.4"><title>P2Rank pocket residue '
+        + escape(residue) + '</title></line>';
+    }).join('');
+
+    var legend = valid.map(function (domain, index) {
+      var label = escape(domain.accession || domain.name || 'Domain');
+      return '<li><span class="af-track-key" style="background:' + colors[index % colors.length] + '"></span>'
+        + (domain.url ? '<a href="' + escape(domain.url) + '" target="_blank" rel="noopener">' + label + '</a>' : label)
+        + ' <span>' + escape(domain.name || domain.description || '') + ' · '
+        + Number(domain.start).toLocaleString('en-US') + '–'
+        + Number(domain.end).toLocaleString('en-US') + '</span></li>';
+    }).join('');
+
+    return '<div class="af-domain-context" data-af-domain-context>'
+      + '<h4>Protein-domain context</h4>'
+      + '<p class="mgdb-small">InterPro/Pfam spans use protein residue coordinates; the magenta ticks are residues in P2Rank pockets. '
+      + 'The chromosome track above shows the same pocket residues after CDS projection.</p>'
+      + '<svg class="af-domain-svg" width="100%" height="' + trackHeight
+      + '" role="img" aria-label="InterPro and Pfam domains with predicted pocket residues">'
+      + bars + '<line x1="0" y1="' + (domainHeight + 6) + '" x2="100%" y2="'
+      + (domainHeight + 6) + '" stroke="var(--mgdb-line)" stroke-width="1"/>' + pocketTicks + '</svg>'
+      + '<div class="af-track-scale"><span>1</span><span>' + length.toLocaleString('en-US') + ' aa</span></div>'
+      + '<ul class="af-domain-legend">' + legend + '</ul></div>';
+  }
 
   function pocketTrack(gene, pockets) {
     var withBlocks = pockets.filter(function (pocket) {
@@ -414,28 +568,34 @@
     var height = 8 + Math.min(withBlocks.length, 8) * 20 + 4;
     var legend = withBlocks.map(function (pocket, index) {
       if (index >= 8) { return ''; }
-      return '<li><span class="af-track-key" style="background:'
+      return '<li><button class="af-pocket-link" type="button" data-af-pocket-focus="' + index
+        + '"><span class="af-track-key" style="background:'
         + (pocket.cf ? '#285d46' : '#8a8f8b') + '"></span>'
         + escape(pocket.p) + ' — ' + pocket.res.length + ' residues'
         + (pocket.pr !== null && pocket.pr !== undefined
-            ? ', p = ' + num(pocket.pr, 3) : '')
+            ? ', probability = ' + num(pocket.pr, 3) : '')
         + (pocket.cf ? ' <b>confident</b>' : '')
         + (pocket.lig ? ' · holds <b>' + escape(pocket.lig) + '</b> at '
             + num(pocket.d, 1) + ' Å' : '')
-        + '</li>';
+        + '</button></li>';
     }).join('');
 
-    return '<section class="af-track" aria-labelledby="af-track-title">'
-      + '<h3 id="af-track-title">Predicted pockets on the genome</h3>'
+    return '<section class="af-track" data-af-pocket-track aria-labelledby="af-track-title">'
+      + '<div class="af-track-head"><h3 id="af-track-title">Predicted pockets on the genome</h3>'
+      + '<div class="af-track-actions" aria-label="Download genome-projected pocket coordinates">'
+      + '<button class="mgdb-button mgdb-button-secondary" type="button" data-af-pocket-download="bed">Download BED</button>'
+      + '<button class="mgdb-button mgdb-button-quiet" type="button" data-af-pocket-download="tsv">Download TSV</button>'
+      + '</div></div>'
       + '<p class="mgdb-small">Pocket residues projected through the CDS of '
       + escape(gene.p) + ' onto ' + escape(gene.c) + ' '
       + lo.toLocaleString('en-US') + '–' + hi.toLocaleString('en-US')
       + '. A variant falling inside one of these blocks falls inside a predicted '
-      + 'ligand-binding site.</p>'
+      + 'ligand-binding site. <b>Probability</b> is P2Rank’s 0–1 model score, not a statistical p-value.</p>'
       + '<svg class="af-track-svg" width="100%" height="' + height
       + '" role="img" aria-label="Predicted pocket residues along the gene">'
       + rows + '</svg>'
       + '<ul class="af-track-legend">' + legend + '</ul>'
+      + domainContext(gene, pockets, state.domains || [])
       + '<p class="mgdb-small"><a href="/genomebrowser?loc=' + encodeURIComponent(gene.c)
       + '%3A' + lo + '..' + hi + '">Open this interval in the genome browser</a>'
       + ' · pocket predictions are P2Rank, computed independently of AlphaFill, so '
@@ -443,9 +603,57 @@
       + '</section>';
   }
 
+  function bindPocketTrack() {
+    Array.prototype.forEach.call(els.results.querySelectorAll('[data-af-pocket-focus]'), function (button) {
+      button.addEventListener('click', function () {
+        focusPredictedPocket(Number(button.getAttribute('data-af-pocket-focus')));
+      });
+    });
+    Array.prototype.forEach.call(els.results.querySelectorAll('[data-af-pocket-download]'), function (button) {
+      button.addEventListener('click', function () {
+        pocketDownload(button.getAttribute('data-af-pocket-download'));
+      });
+    });
+  }
+
+  function refreshPocketTrack() {
+    var current = els.results.querySelector('[data-af-pocket-track]');
+    if (!current || !state.gene) { return; }
+    var wrapper = document.createElement('div');
+    wrapper.innerHTML = pocketTrack(state.gene, state.pockets || []);
+    if (!wrapper.firstElementChild) { return; }
+    current.replaceWith(wrapper.firstElementChild);
+    bindPocketTrack();
+  }
+
+  function loadDomainContext(gene) {
+    var hasProjection = (state.pockets || []).some(function (pocket) {
+      return pocket.gb && pocket.gb.length;
+    });
+    if (!gene || !gene.g || !gene.p || !hasProjection) { return; }
+    var requestedProtein = gene.p;
+    MGDB.request(API + '?action=domains&term=' + encodeURIComponent(gene.g), { key: 'af-domains' })
+      .then(function (data) {
+        if (!state.gene || state.gene.p !== requestedProtein) { return; }
+        state.domains = data.domains || [];
+        state.domainsLoaded = true;
+        state.domainsError = false;
+        refreshPocketTrack();
+      })
+      .catch(function () {
+        if (!state.gene || state.gene.p !== requestedProtein) { return; }
+        state.domains = [];
+        state.domainsLoaded = false;
+        state.domainsError = true;
+        refreshPocketTrack();
+      });
+  }
+
   function loadGene(term) {
     term = String(term || '').trim();
     if (!term) { return; }
+    state.submittedTerm = term.toLowerCase();
+    state.suggestVersion++;
     closeSuggestions();
     els.results.innerHTML = '<div class="mgdb-loading" role="status">'
       + '<span class="mgdb-spinner" aria-hidden="true"></span> Looking up predicted ligands…</div>';
@@ -455,9 +663,13 @@
       .then(function (data) {
         state.gene = data.gene || null;
         state.pockets = data.pockets || [];
+        state.domains = [];
+        state.domainsLoaded = false;
+        state.domainsError = false;
         state.detail = null;
         state.activeCcd = null;
         renderGene(data);
+        loadDomainContext(state.gene);
         MGDB.announce('AlphaFill results for ' + term + ' loaded.');
       })
       .catch(function () {
@@ -476,6 +688,13 @@
         + escape(gene.p) + ' is not published here yet, so there is nothing to draw. Every metric '
         + 'below is unaffected.</p></div>';
     }
+    var pocketOptions = '<option value="">P2Rank pockets</option>';
+    (state.pockets || []).forEach(function (pocket, index) {
+      pocketOptions += '<option value="' + index + '">' + escape(pocket.p || ('Pocket ' + (index + 1)))
+        + (pocket.pr !== null && pocket.pr !== undefined
+            ? ' · probability ' + num(pocket.pr, 3) : '')
+        + '</option>';
+    });
     return '<div class="af-viewer" data-af-viewer>'
       + '<div class="af-viewer-bar">'
       + '<label>Protein <select data-af-color>'
@@ -489,18 +708,29 @@
       + '<option value="sphere">spheres</option>'
       + '<option value="hide">hidden</option>'
       + '</select></label>'
-      + '<button type="button" data-af-pocket class="is-on">Pocket residues</button>'
+      + '<label>Background <select data-af-background>'
+      + '<option value="dark">dark</option><option value="white">white</option>'
+      + '</select></label>'
+      + ((state.pockets || []).length ? '<label class="af-p2rank-control">Pocket <select data-af-p2rank>'
+        + pocketOptions + '</select></label>' : '')
+      + '<button type="button" data-af-pocket class="is-on" aria-pressed="true"'
+      + ' title="Show residues that contact transplanted ligands">Contact residues</button>'
       + '<button type="button" data-af-reset>Reset view</button>'
       + '<button type="button" data-af-spin>Spin</button>'
-      + '<a class="mgdb-button mgdb-button-quiet" href="' + escape(gene.m) + '" download>Model</a>'
-      + (gene.lc ? '<a class="mgdb-button mgdb-button-quiet" href="' + escape(gene.lc)
-                 + '" download>Ligands</a>' : '')
+      + '<button type="button" data-af-fullscreen aria-pressed="false">Full screen</button>'
+      + '<span class="af-viewer-downloads" aria-label="Download structure or image">'
+      + '<button type="button" data-af-export="pdb">PDB</button>'
+      + '<button type="button" data-af-export="cif">mmCIF</button>'
+      + '<button type="button" data-af-export="png">PNG</button>'
+      + '<button type="button" data-af-export="svg">SVG</button>'
+      + '</span>'
       + '</div>'
       + '<div class="af-viewport" data-af-viewport>'
       + '<div class="af-viewer-status" data-af-status>Loading the model…</div>'
       + '<div class="af-viewer-legend" data-af-legend></div>'
       + '</div>'
       + '<canvas class="af-strip" data-af-strip></canvas>'
+      + '<div class="af-strip-axis" data-af-strip-axis aria-hidden="true"></div>'
       + '<p class="af-strip-meta" data-af-strip-meta></p>'
       + '</div>';
   }
@@ -520,6 +750,7 @@
       try { state.viewer.clear(); } catch (error) { /* the canvas is going away anyway */ }
     }
     state.viewer = null;
+    state.proteinModel = null;
     state.ligModels = {};
     state.profile = null;
   }
@@ -537,6 +768,7 @@
   function drawStrip() {
     var canvas = viewerEl('[data-af-strip]');
     var meta = viewerEl('[data-af-strip-meta]');
+    var axis = viewerEl('[data-af-strip-axis]');
     if (!canvas || !state.profile || !state.profile.length) { return; }
 
     var ratio = window.devicePixelRatio || 1;
@@ -561,10 +793,22 @@
     });
 
     if (meta) {
-      meta.innerHTML = 'Per-residue pLDDT across ' + profile.length + ' residues · mean <b>'
+      var firstRes = profile[0].resi;
+      var lastRes = profile[profile.length - 1].resi;
+      meta.innerHTML = '<b>' + escape((state.gene && state.gene.p) || 'Protein') + '</b>'
+        + ' · residues <b>' + firstRes + '–' + lastRes + '</b>'
+        + ' · per-residue pLDDT across ' + profile.length + ' positions · mean <b>'
         + (total / profile.length).toFixed(1) + '</b> · <b>'
         + Math.round(100 * confident / profile.length) + '%</b> at 70 or above'
         + ' · read from the model’s B-factor column';
+    }
+    if (axis) {
+      var ticks = [0, 0.25, 0.5, 0.75, 1];
+      axis.innerHTML = ticks.map(function (fraction) {
+        var index = Math.min(profile.length - 1, Math.round((profile.length - 1) * fraction));
+        return '<span style="left:' + (fraction * 100).toFixed(1) + '%">'
+          + profile[index].resi + '</span>';
+      }).join('');
     }
   }
 
@@ -683,40 +927,83 @@
     state.viewer.render();
   }
 
-  function showPocket(residues) {
+  function contactResidues() {
+    if (!state.detail) { return []; }
+    var residues = [];
+    state.detail.rows.forEach(function (row) {
+      if (state.activeCcd && row.ccd !== state.activeCcd) { return; }
+      (row.res || []).forEach(function (value) {
+        if (residues.indexOf(value) < 0) { residues.push(value); }
+      });
+    });
+    return residues;
+  }
+
+  function applyViewerHighlights() {
     if (!state.viewer) { return; }
     applyProteinStyle();
     var toggle = viewerEl('[data-af-pocket]');
-    if (toggle && !toggle.classList.contains('is-on')) { return; }
-    if (!residues || !residues.length) { return; }
-    state.viewer.addStyle({ model: 0, resi: residues },
-                          { stick: { radius: 0.11, colorscheme: 'cyanCarbon' } });
+    var residues = contactResidues();
+    if (toggle && toggle.classList.contains('is-on') && residues.length) {
+      state.viewer.addStyle({ model: 0, resi: residues },
+                            { stick: { radius: 0.11, colorscheme: 'cyanCarbon' } });
+    }
+    var pocket = state.activePocket !== null ? (state.pockets || [])[state.activePocket] : null;
+    if (pocket && pocket.res && pocket.res.length) {
+      state.viewer.addStyle({ model: 0, resi: pocket.res },
+                            { stick: { radius: 0.14, colorscheme: 'magentaCarbon' },
+                              sphere: { radius: 0.22, color: '#d63384' } });
+    }
+  }
+
+  function focusPredictedPocket(index) {
+    var pocket = (state.pockets || [])[index];
+    if (!pocket || !state.viewer) { return; }
+    state.activePocket = index;
+    state.activeCcd = null;
+    var select = viewerEl('[data-af-p2rank]');
+    if (select) { select.value = String(index); }
+    Array.prototype.forEach.call(els.results.querySelectorAll('[data-af-ccd-card]'), function (card) {
+      card.classList.remove('is-active');
+      var focus = card.querySelector('[data-af-focus]');
+      if (focus) { focus.setAttribute('aria-pressed', 'false'); }
+    });
+    applyViewerHighlights();
+    drawLigands();
+    state.viewer.zoomTo({ model: 0, resi: pocket.res }, 500);
+    state.viewer.render();
+    setStatus('<b>' + escape(pocket.p || ('Pocket ' + (index + 1))) + '</b> · '
+      + pocket.res.length + ' residues · P2Rank probability '
+      + num(pocket.pr, 3) + ' · magenta highlights');
+    var viewer = els.results.querySelector('[data-af-viewer]');
+    if (viewer) { viewer.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   }
 
   function focusLigand(ccd) {
     state.activeCcd = state.activeCcd === ccd ? null : ccd;
 
+    state.activePocket = null;
+    var p2rank = viewerEl('[data-af-p2rank]');
+    if (p2rank) { p2rank.value = ''; }
     Array.prototype.forEach.call(els.results.querySelectorAll('[data-af-ccd-card]'), function (card) {
       var on = card.getAttribute('data-af-ccd-card') === state.activeCcd;
       card.classList.toggle('is-active', on);
-      card.setAttribute('aria-pressed', on ? 'true' : 'false');
+      var focus = card.querySelector('[data-af-focus]');
+      if (focus) { focus.setAttribute('aria-pressed', on ? 'true' : 'false'); }
     });
 
     if (!state.viewer || !state.detail) { return; }
 
-    var residues = [];
     var target = null;
     if (state.activeCcd) {
       state.detail.rows.forEach(function (row) {
         if (row.ccd !== state.activeCcd) { return; }
-        (row.res || []).forEach(function (value) {
-          if (residues.indexOf(value) < 0) { residues.push(value); }
-        });
         if (!target && state.ligModels[row.a]) { target = state.ligModels[row.a]; }
       });
     }
 
-    showPocket(residues);
+    var residues = contactResidues();
+    applyViewerHighlights();
     drawLigands();
     if (target) {
       state.viewer.zoomTo({ model: target }, 400);
@@ -750,6 +1037,169 @@
       + ' · select a ligand card to focus it';
   }
 
+  function allStructureAtoms() {
+    var atoms = state.proteinModel ? state.proteinModel.selectedAtoms({}).slice() : [];
+    Object.keys(state.ligModels).forEach(function (key) {
+      atoms = atoms.concat(state.ligModels[key].selectedAtoms({}));
+    });
+    return atoms;
+  }
+
+  function pdbText() {
+    var atoms = allStructureAtoms();
+    var lines = ['REMARK   Generated by the MaizeGDB AlphaFill viewer'];
+    atoms.forEach(function (atom, index) {
+      var record = atom.hetflag ? 'HETATM' : 'ATOM  ';
+      var serial = String((index + 1) % 100000).padStart(5, ' ');
+      var name = String(atom.atom || atom.elem || 'X').slice(0, 4).padStart(4, ' ');
+      var resn = String(atom.resn || 'UNK').slice(0, 3).padStart(3, ' ');
+      var chain = String(atom.chain || atom.chainid || 'A').slice(0, 1);
+      var resi = String(atom.resi || 1).slice(-4).padStart(4, ' ');
+      var xyz = [atom.x, atom.y, atom.z].map(function (value) {
+        return Number(value || 0).toFixed(3).padStart(8, ' ');
+      }).join('');
+      var occupancy = Number(atom.occupancy === undefined ? 1 : atom.occupancy).toFixed(2).padStart(6, ' ');
+      var b = Number(atom.b || 0).toFixed(2).padStart(6, ' ');
+      var elem = String(atom.elem || '').slice(0, 2).padStart(2, ' ');
+      lines.push(record + serial + ' ' + name + ' ' + resn + ' ' + chain + resi
+        + '    ' + xyz + occupancy + b + '          ' + elem);
+    });
+    lines.push('END');
+    return lines.join('\n') + '\n';
+  }
+
+  function cifToken(value) {
+    value = String(value === undefined || value === null || value === '' ? '?' : value);
+    return /^[A-Za-z0-9_.+\-]+$/.test(value) ? value : "'" + value.replace(/'/g, "''") + "'";
+  }
+
+  function cifText() {
+    var lines = ['data_' + String((state.gene && state.gene.p) || 'alphafill').replace(/[^A-Za-z0-9_]/g, '_'),
+      '#', 'loop_', '_atom_site.group_PDB', '_atom_site.id', '_atom_site.type_symbol',
+      '_atom_site.label_atom_id', '_atom_site.label_comp_id', '_atom_site.label_asym_id',
+      '_atom_site.label_seq_id', '_atom_site.Cartn_x', '_atom_site.Cartn_y', '_atom_site.Cartn_z',
+      '_atom_site.occupancy', '_atom_site.B_iso_or_equiv'];
+    allStructureAtoms().forEach(function (atom, index) {
+      lines.push([
+        atom.hetflag ? 'HETATM' : 'ATOM', index + 1, atom.elem || '?', atom.atom || '?',
+        atom.resn || 'UNK', atom.chain || atom.chainid || 'A', atom.resi || 1,
+        Number(atom.x || 0).toFixed(3), Number(atom.y || 0).toFixed(3),
+        Number(atom.z || 0).toFixed(3),
+        Number(atom.occupancy === undefined ? 1 : atom.occupancy).toFixed(2),
+        Number(atom.b || 0).toFixed(2)
+      ].map(cifToken).join(' '));
+    });
+    lines.push('#');
+    return lines.join('\n') + '\n';
+  }
+
+  function saveBlob(content, type, filename) {
+    var url = window.URL.createObjectURL(new window.Blob([content], { type: type }));
+    var anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    window.setTimeout(function () { window.URL.revokeObjectURL(url); }, 1000);
+  }
+
+  function saveDataUri(uri, filename) {
+    var anchor = document.createElement('a');
+    anchor.href = uri;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+  }
+
+  function exportViewer(format) {
+    if (!state.viewer || !state.proteinModel) {
+      setStatus('The model must finish loading before it can be exported.');
+      return;
+    }
+    var stem = String((state.gene && state.gene.p) || 'maize-alphafill').replace(/[^A-Za-z0-9_.-]/g, '_');
+    if (format === 'pdb') {
+      saveBlob(pdbText(), 'chemical/x-pdb;charset=utf-8', stem + '-alphafill.pdb');
+      return;
+    }
+    if (format === 'cif') {
+      saveBlob(cifText(), 'chemical/x-mmcif;charset=utf-8', stem + '-alphafill.cif');
+      return;
+    }
+    var png = state.viewer.pngURI();
+    if (format === 'png') {
+      saveDataUri(png, stem + '-alphafill.png');
+      return;
+    }
+    var host = viewerEl('[data-af-viewport]');
+    var width = Math.max(1, host ? host.clientWidth : 1200);
+    var height = Math.max(1, host ? host.clientHeight : 800);
+    var svg = '<?xml version="1.0" encoding="UTF-8"?>\n'
+      + '<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + height
+      + '" viewBox="0 0 ' + width + ' ' + height + '"><title>' + escape(stem)
+      + ' AlphaFill structure</title><image width="100%" height="100%" href="' + png + '"/></svg>';
+    saveBlob(svg, 'image/svg+xml;charset=utf-8', stem + '-alphafill.svg');
+  }
+
+  function hydrateChemicalLinks(ccd, root) {
+    ccd = String(ccd || '').toUpperCase();
+    if (!ccd || !root) { return; }
+    if (!state.chem[ccd]) {
+      state.chem[ccd] = window.fetch('https://data.rcsb.org/rest/v1/core/chemcomp/'
+        + encodeURIComponent(ccd), { mode: 'cors' })
+        .then(function (response) { return response.ok ? response.json() : null; })
+        .catch(function () { return null; });
+    }
+    state.chem[ccd].then(function (data) {
+      var target = root.querySelector('[data-af-pubchem]');
+      if (!target) { return; }
+      var related = data && data.rcsb_chem_comp_related ? data.rcsb_chem_comp_related : [];
+      var pubchem = related.find(function (item) { return item.resource_name === 'PubChem'; });
+      if (pubchem && pubchem.resource_accession_code) {
+        target.innerHTML = '<a href="https://pubchem.ncbi.nlm.nih.gov/compound/'
+          + encodeURIComponent(pubchem.resource_accession_code) + '" target="_blank" rel="noopener">'
+          + 'PubChem CID ' + escape(pubchem.resource_accession_code) + '</a>';
+      } else {
+        target.textContent = 'No PubChem cross-reference';
+      }
+    });
+  }
+
+  function setViewerBackground(value) {
+    var root = els.results.querySelector('[data-af-viewer]');
+    var light = value === 'white';
+    if (root) { root.classList.toggle('is-light', light); }
+    if (state.viewer) {
+      state.viewer.setBackgroundColor(light ? '#ffffff' : '#05080b');
+      state.viewer.render();
+    }
+  }
+
+  function syncFullscreenButton() {
+    var root = els.results.querySelector('[data-af-viewer]');
+    var button = viewerEl('[data-af-fullscreen]');
+    if (!root || !button) { return; }
+    var on = document.fullscreenElement === root || document.webkitFullscreenElement === root;
+    button.textContent = on ? 'Exit full screen' : 'Full screen';
+    button.setAttribute('aria-pressed', on ? 'true' : 'false');
+    window.setTimeout(function () {
+      if (state.viewer) { state.viewer.resize(); state.viewer.render(); drawStrip(); }
+    }, 80);
+  }
+
+  function toggleFullscreen() {
+    var root = els.results.querySelector('[data-af-viewer]');
+    if (!root) { return; }
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      var exit = document.exitFullscreen || document.webkitExitFullscreen;
+      if (exit) { exit.call(document); }
+      return;
+    }
+    var request = root.requestFullscreen || root.webkitRequestFullscreen;
+    if (request) { request.call(root); }
+  }
+
   function openViewer(gene) {
     if (!gene.m || !window.$3Dmol) { return; }
     var host = viewerEl('[data-af-viewport]');
@@ -781,8 +1231,9 @@
       })
       .then(function (text) {
         var model = state.viewer.addModel(text, 'pdb');
+        state.proteinModel = model;
         state.profile = residueProfile(model);
-        applyProteinStyle();
+        applyViewerHighlights();
         state.viewer.zoomTo({ model: 0 });
         state.viewer.render();
         drawStrip();
@@ -818,6 +1269,7 @@
       });
 
       drawLigands();
+      applyViewerHighlights();
       state.viewer.zoomTo({ model: 0 });
       state.viewer.render();
       setStatus(defaultStatus());
@@ -841,8 +1293,7 @@
     var color = root.querySelector('[data-af-color]');
     if (color) {
       color.addEventListener('change', function () {
-        applyProteinStyle();
-        if (state.activeCcd) { focusLigand(state.activeCcd); focusLigand(state.activeCcd); }
+        applyViewerHighlights();
         state.viewer.render();
       });
     }
@@ -852,16 +1303,40 @@
     var pocket = root.querySelector('[data-af-pocket]');
     if (pocket) {
       pocket.addEventListener('click', function () {
-        pocket.classList.toggle('is-on');
-        var active = state.activeCcd;
-        state.activeCcd = null;
-        if (active) { focusLigand(active); } else { applyProteinStyle(); state.viewer.render(); }
+        var on = pocket.classList.toggle('is-on');
+        pocket.setAttribute('aria-pressed', on ? 'true' : 'false');
+        applyViewerHighlights();
+        state.viewer.render();
+        var count = contactResidues().length;
+        setStatus(on
+          ? '<b>Contact residues shown.</b> ' + count + ' residues are outlined in cyan.'
+          : '<b>Contact residues hidden.</b> Ligands and P2Rank pockets are unchanged.');
       });
+    }
+    var p2rank = root.querySelector('[data-af-p2rank]');
+    if (p2rank) {
+      p2rank.addEventListener('change', function () {
+        if (p2rank.value === '') {
+          state.activePocket = null;
+          applyViewerHighlights();
+          state.viewer.zoomTo({ model: 0 }, 400);
+          state.viewer.render();
+          setStatus(defaultStatus() || 'P2Rank pocket highlight cleared.');
+          return;
+        }
+        focusPredictedPocket(Number(p2rank.value));
+      });
+    }
+    var background = root.querySelector('[data-af-background]');
+    if (background) {
+      background.addEventListener('change', function () { setViewerBackground(background.value); });
     }
     var reset = root.querySelector('[data-af-reset]');
     if (reset) {
       reset.addEventListener('click', function () {
         state.activeCcd = null;
+        state.activePocket = null;
+        if (p2rank) { p2rank.value = ''; }
         focusLigand(null);
         state.viewer.zoomTo({ model: 0 });
         state.viewer.render();
@@ -874,6 +1349,15 @@
         state.viewer.spin(on ? 'y' : false);
       });
     }
+    var fullscreen = root.querySelector('[data-af-fullscreen]');
+    if (fullscreen) { fullscreen.addEventListener('click', toggleFullscreen); }
+    Array.prototype.forEach.call(root.querySelectorAll('[data-af-export]'), function (button) {
+      button.addEventListener('click', function () {
+        exportViewer(button.getAttribute('data-af-export'));
+      });
+    });
+    document.addEventListener('fullscreenchange', syncFullscreenButton);
+    document.addEventListener('webkitfullscreenchange', syncFullscreenButton);
 
     /* 3Dmol sizes its canvas once, from the container's width at creation. A
        page opened in a background tab, or in a pane that starts collapsed,
@@ -914,6 +1398,7 @@
       + '<span>' + summary + '</span>'
       + '<span><a href="https://www.rcsb.org/ligand/' + encodeURIComponent(ligand.ccd)
       + '" target="_blank" rel="noopener">RCSB entry</a></span>'
+      + '<span data-af-pubchem>PubChem ID loading&hellip;</span>'
       + '</div></div>';
 
     html += '<p class="af-result-count">Showing ' + intFmt(data.rows.length) + ' of '
@@ -941,6 +1426,7 @@
     html += '</tbody></table></div>';
 
     els.ligandResults.innerHTML = html;
+    hydrateChemicalLinks(ligand.ccd, els.ligandResults.querySelector('.af-ligand-summary'));
   }
 
   function loadLigand(ccd) {
@@ -1090,7 +1576,7 @@
           + 'AlphaFill donor</caption><thead><tr>'
           + '<th scope="col">Gene</th><th scope="col">Model</th><th scope="col">Chr</th>'
           + '<th scope="col">pLDDT</th><th scope="col">Confident pockets</th>'
-          + '<th scope="col">Best probability</th></tr></thead><tbody>';
+          + '<th scope="col">Best P2Rank probability</th></tr></thead><tbody>';
         data.rows.forEach(function (row) {
           html += '<tr><td>' + geneLink(row[0]) + '</td>'
             + '<td class="af-table-gene">' + escape(row[1]) + '</td>'
@@ -1153,7 +1639,53 @@
    * Init
    * --------------------------------------------------------------------- */
 
+  function bindSectionTabs() {
+    var nav = document.querySelector('.mgdb-alphafill-page .mgdb-section-tabs');
+    if (!nav) { return; }
+    var links = Array.prototype.slice.call(nav.querySelectorAll('a[href^="#"]'));
+    if (!links.length) { return; }
+
+    function setCurrent(link) {
+      links.forEach(function (item) {
+        var on = item === link;
+        item.classList.toggle('is-current', on);
+        if (on) { item.setAttribute('aria-current', 'location'); }
+        else { item.removeAttribute('aria-current'); }
+      });
+    }
+
+    links.forEach(function (link) {
+      link.addEventListener('click', function () { setCurrent(link); });
+    });
+
+    var hashLink = links.find(function (link) {
+      return link.getAttribute('href') === window.location.hash;
+    });
+    if (hashLink) { setCurrent(hashLink); }
+
+    if (!window.IntersectionObserver) { return; }
+    var byId = {};
+    links.forEach(function (link) {
+      var target = document.getElementById(link.getAttribute('href').slice(1));
+      if (target) { byId[target.id] = link; }
+    });
+    var visible = {};
+    var observer = new window.IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        visible[entry.target.id] = entry.isIntersecting ? entry.boundingClientRect.top : null;
+      });
+      var candidates = Object.keys(visible).filter(function (id) { return visible[id] !== null; });
+      if (!candidates.length) { return; }
+      candidates.sort(function (first, second) {
+        return Math.abs(visible[first]) - Math.abs(visible[second]);
+      });
+      if (byId[candidates[0]]) { setCurrent(byId[candidates[0]]); }
+    }, { rootMargin: '-96px 0px -58% 0px', threshold: [0, 0.05] });
+    Object.keys(byId).forEach(function (id) { observer.observe(document.getElementById(id)); });
+  }
+
   function init() {
+    bindSectionTabs();
     els.searchForm = document.getElementById('af-search-form');
     if (!els.searchForm) { return; }
 
@@ -1179,8 +1711,12 @@
     els.searchInput.addEventListener('input', MGDB.debounce(function () {
       var term = els.searchInput.value.trim();
       if (term.length < 2) { closeSuggestions(); return; }
+      if (term.toLowerCase() === state.submittedTerm) { closeSuggestions(); return; }
+      var requestVersion = ++state.suggestVersion;
       MGDB.request(API + '?action=suggest&term=' + encodeURIComponent(term), { key: 'af-suggest' })
-        .then(renderSuggestions)
+        .then(function (payload) {
+          if (requestVersion === state.suggestVersion) { renderSuggestions(payload); }
+        })
         .catch(closeSuggestions);
     }, 140));
 
@@ -1242,11 +1778,13 @@
       });
     }
 
-    loadIndex();
+    if (els.browseResults) { loadIndex(); }
 
-    MGDB.request(API + '?action=stats', { key: 'af-stats' })
-      .then(function (data) { renderCharts(data.stats); })
-      .catch(function () { /* the metric grid above is server-rendered and stands alone */ });
+    if (els.charts) {
+      MGDB.request(API + '?action=stats', { key: 'af-stats' })
+        .then(function (data) { renderCharts(data.stats); })
+        .catch(function () { /* the server-rendered corpus summary stands alone */ });
+    }
 
     /* A gene or ligand can be linked to directly: the protein structure page
        and the gene record both do it. */

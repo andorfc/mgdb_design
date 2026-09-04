@@ -161,6 +161,29 @@ function afLigand($code) {
     return isset($shard[$key]) ? $shard[$key] : null;
 }
 
+/* Fetch metadata for several CCD codes with at most one read per shard. Gene
+   results often contain many ligands; reading one tiny file per ligand would
+   work but would waste filesystem calls when two codes share a shard. */
+function afLigands($codes) {
+    $groups = array();
+    foreach ((array) $codes as $code) {
+        $key = afNormalize($code);
+        if ($key === '' || !afValidCcd($key)) { continue; }
+        $shard = afShard($key, AF_LIGAND_DEPTH);
+        if (!isset($groups[$shard])) { $groups[$shard] = array(); }
+        $groups[$shard][$key] = true;
+    }
+    $found = array();
+    foreach ($groups as $shard => $keys) {
+        $rows = afReadJson(afDataRoot() . '/ligands/' . $shard . '.json');
+        if (!is_array($rows)) { continue; }
+        foreach ($keys as $key => $_unused) {
+            if (isset($rows[$key])) { $found[$key] = $rows[$key]; }
+        }
+    }
+    return $found;
+}
+
 /* The inverted index: every gene predicted to bind one ligand, already ranked
    at build time by evidence then donor identity. This is the query a
    gene-centric layout cannot answer at all, and it is one file read. */

@@ -57,7 +57,10 @@ header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
 header('Pragma: no-cache');
 header('Expires: 0');
 
-$bauplan = new Bauplan('MaizeGDB AlphaFill | Predicted Ligands, Cofactors & Metal Sites in Maize Proteins');
+$af_is_faq = defined('ID') && strtolower((string) ID) === 'faq';
+$bauplan = new Bauplan($af_is_faq
+    ? 'AlphaFill FAQ, Interpretation & Methods | MaizeGDB'
+    : 'MaizeGDB AlphaFill | Predicted Ligands, Cofactors & Metal Sites in Maize Proteins');
 $bauplan->modern();
 
 $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT']
@@ -72,23 +75,26 @@ $bauplan->includeCss('/css/static.css');
 $bauplan->includeCss('/css/mgdb-modern.css');
 $bauplan->includeCss('/css/mgdb-megamenu.css');
 $bauplan->includeCss('/css/mgdb-alphafill.css?v=' . $v_css);
-/* Same vendored 3Dmol the protein structure page uses. A third-party CDN in
-   the critical path means the viewer is down whenever they are, and it hands a
-   log line for every MaizeGDB reader to somebody else. */
-$bauplan->includeScript('/js/lib/3dmol/3Dmol-min.js');
+/* Same vendored 3Dmol the protein structure page uses. The FAQ has no viewer,
+   so it does not pay to parse the WebGL library. */
+if (!$af_is_faq) {
+    $bauplan->includeScript('/js/lib/3dmol/3Dmol-min.js');
+}
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
 $bauplan->includeScript('/js/mgdb-alphafill.js?v=' . $v_js);
-$bauplan->head('<meta name="description" content="Ligands, cofactors and metal ions transplanted onto '
-    . 'predicted maize protein structures by AlphaFill. Browse 16,933 B73 genes with a predicted ligand, '
-    . 'search by ligand, and view transplants in 3D with donor provenance and confidence metrics.">');
+$bauplan->head($af_is_faq
+    ? '<meta name="description" content="Interpret AlphaFill ligand hypotheses, understand P2Rank pockets, review provenance and corpus statistics, and choose a bulk data file.">'
+    : '<meta name="description" content="Search AlphaFill ligand, cofactor and metal-ion hypotheses for B73 proteins, inspect predicted pockets in 3D, and download the complete dataset.">');
 
 $mgdb = $bauplan->template()->load('templates/maizegdb-main-modern.bau');
 $mgdb->get('megamenu')->load('templates/home/maizegdb_header_modern.bau');
 $mgdb->get('image-dir')->replace($system['image_url']);
 $mgdb->get('server-url')->replace($system['root_url']);
 
-$content = $mgdb->get('body')->load('templates/static/mgdb_alphafill.bau');
+$content = $mgdb->get('body')->load($af_is_faq
+    ? 'templates/static/mgdb_alphafill_faq.bau'
+    : 'templates/static/mgdb_alphafill.bau');
 
 function af_num($value) {
     return isset($value) && $value !== '' ? number_format((int) $value) : '&mdash;';
@@ -196,26 +202,23 @@ $page_data = dashboardCache($system, $af_cache_key, function () use ($system, $d
     );
 });
 
-foreach (array('model-count'    => 'model_count',
-               'transplants'    => 'transplants',
-               'pairs'          => 'pairs',
-               'genes-with'     => 'genes_with',
-               'genes-no-donor' => 'genes_no_donor',
-               'genes-no-model' => 'genes_no_model',
-               'hit-rate'       => 'hit_rate',
-               'ligand-count'   => 'ligand_count',
-               'target-count'   => 'target_count',
-               'pocket-count'   => 'pocket_count',
-               'ev-strong'      => 'strong',
-               'ev-moderate'    => 'moderate',
-               'ev-ion'         => 'ion',
-               'ev-weak'        => 'weak',
-               'ev-additive'    => 'additive',
-               'ion-share'      => 'ion_share',
-               'ion-pair-share' => 'ion_pair_share',
-               'additive-share' => 'additive_share',
-               'median-id'      => 'median_id',
-               'below-030'      => 'below_030') as $slot => $key) {
+$af_landing_slots = array(
+    'transplants' => 'transplants', 'pairs' => 'pairs',
+    'genes-with' => 'genes_with', 'ligand-count' => 'ligand_count',
+    'target-count' => 'target_count',
+);
+$af_faq_slots = array(
+    'model-count' => 'model_count', 'transplants' => 'transplants',
+    'pairs' => 'pairs', 'genes-with' => 'genes_with',
+    'genes-no-donor' => 'genes_no_donor', 'genes-no-model' => 'genes_no_model',
+    'hit-rate' => 'hit_rate', 'ligand-count' => 'ligand_count',
+    'pocket-count' => 'pocket_count', 'ev-strong' => 'strong',
+    'ev-moderate' => 'moderate', 'ev-ion' => 'ion', 'ev-weak' => 'weak',
+    'ev-additive' => 'additive', 'ion-share' => 'ion_share',
+    'ion-pair-share' => 'ion_pair_share', 'additive-share' => 'additive_share',
+    'median-id' => 'median_id', 'below-030' => 'below_030',
+);
+foreach (($af_is_faq ? $af_faq_slots : $af_landing_slots) as $slot => $key) {
     $content->get($slot)->replace($page_data[$key]);
 }
 
@@ -228,7 +231,9 @@ foreach (array('af-version'    => 'version',
 /* Named blast-url rather than blast_url: the megamenu already declares a
    blast_url in the same tree and $mgdb->get() resolves by identifier across it.
    A distinct name here keeps the two independent. */
-$content->get('blast-url')->replace(htmlspecialchars($system['BLAST_URL'], ENT_QUOTES, 'UTF-8'));
+if (!$af_is_faq) {
+    $content->get('blast-url')->replace(htmlspecialchars($system['BLAST_URL'], ENT_QUOTES, 'UTF-8'));
+}
 
 include_once('translation.php');
 $mgdb->get('blast_url')->replace($system['BLAST_URL']);

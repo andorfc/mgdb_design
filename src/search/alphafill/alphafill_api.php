@@ -10,15 +10,19 @@
  *            suggest    typeahead over gene models, CCD codes, chemical names
  *            gene       one gene: collapsed ligands, pockets, model URLs, and
  *                       which of the three empty states it is in
+ *            domains    canonical-protein InterPro/Pfam spans for one indexed
+ *                       gene (one indexed SQL query, loaded after gene)
  *            detail     every raw transplant behind one protein's collapse
  *            ligand     one CCD: what it is, and every gene predicted to bind it
  *            targets    the confident-pocket / no-donor target list
  *
  * Query cost
  * ----------
- * Every action but one runs no SQL: they read the prebuilt index in
+ * Every primary search action runs no SQL: it reads the prebuilt index in
  * data/alphafill/. suggest is one routing read plus one shard read. gene is one
  * shard read plus one pocket read. ligand is one shard read plus one file.
+ * domains is the intentionally lazy exception: one indexed query, requested
+ * only after a gene result needs its protein-domain context.
  *
  * gene falls through to the database only when the index has already missed,
  * which means the identifier is not one of the 39,756 B73 RefGen_v5 genes the
@@ -26,6 +30,11 @@
  * geneResolveId(), and it exists so the page can tell "this is not a maize
  * gene" apart from "this gene has no transplant", which are different answers
  * with different next steps.
+ *
+ * domains is deliberately separate from gene. The main result remains a
+ * zero-SQL file-index lookup; readers who have a projected pocket then pay for
+ * one parameterized query against protein_domain_gene_model_idx to add domain
+ * context to the protein track.
  *
  * Three empty states, not one
  * ---------------------------
@@ -133,6 +142,73 @@ if ($afAction === 'suggest') {
 }
 
 /* -------------------------------------------------------------------------- *
+ * domains
+ *
+ * Protein-domain spans already power the redesigned gene record. AlphaFill
+ * asks for only the isoform it is actually drawing, rather than fetching the
+ * gene record's transcripts, scores and counts as well. That keeps this to one
+ * indexed query and avoids the sequence service: the AlphaFill index already
+ * carries the model length.
+ * -------------------------------------------------------------------------- */
+
+if ($afAction === 'domains') {
+    if ($afTerm === '') {
+        afFail(400, 'Enter a gene model or protein isoform.');
+    }
+
+    $lookup = preg_replace('/_P\d+$/i', '', $afTerm);
+    $gene = afGene($lookup);
+    if (!$gene || empty($gene['p'])) {
+        afFail(404, 'That protein is not in the indexed AlphaFill corpus.');
+    }
+
+    $protein = (string) $gene['p'];
+    $transcript = preg_replace('/_P(\d+)$/i', '_T$1', $protein);
+    $domains = array();
+    $DBConn = connect_to_database(false);
+    if (!$DBConn) {
+        afFail(503, 'Protein-domain annotations are temporarily unavailable.');
+    }
+
+    $sth = make_query($DBConn, "
+        SELECT pd.transcript, pd.accession, pd.name, pd.description,
+               pd.start_pos, pd.end_pos
+        FROM perm_tables.protein_domain pd
+        WHERE pd.gene_model = :gm AND pd.transcript = :tr
+        ORDER BY pd.start_pos, pd.end_pos, pd.accession", 1,
+        array('gm' => $gene['g'], 'tr' => $transcript));
+    $afQueries++;
+
+    while ($row = retrieve_row($sth)) {
+        $accession = isset($row['accession']) ? trim((string) $row['accession']) : '';
+        $url = null;
+        if (strpos($accession, 'PF') === 0) {
+            $url = 'https://www.ebi.ac.uk/interpro/entry/pfam/' . rawurlencode($accession) . '/';
+        } elseif (strpos($accession, 'IPR') === 0) {
+            $url = 'https://www.ebi.ac.uk/interpro/entry/InterPro/' . rawurlencode($accession) . '/';
+        }
+        $domains[] = array(
+            'transcript'  => isset($row['transcript']) ? (string) $row['transcript'] : null,
+            'accession'   => $accession,
+            'name'        => isset($row['name']) ? (string) $row['name'] : null,
+            'description' => isset($row['description']) ? (string) $row['description'] : null,
+            'start'       => isset($row['start_pos']) ? (int) $row['start_pos'] : null,
+            'end'         => isset($row['end_pos']) ? (int) $row['end_pos'] : null,
+            'url'         => $url,
+        );
+    }
+
+    afSend(array(
+        'query'      => $afTerm,
+        'gene'       => $gene['g'],
+        'protein'    => $protein,
+        'length_aa'  => isset($gene['aa']) ? (int) $gene['aa'] : null,
+        'domains'    => $domains,
+        'provenance' => 'MaizeGDB protein-domain annotations; Pfam entries are linked through InterPro.',
+    ));
+}
+
+/* -------------------------------------------------------------------------- *
  * gene
  * -------------------------------------------------------------------------- */
 
@@ -183,6 +259,24 @@ if ($afAction === 'gene') {
 
     $protein = isset($gene['p']) ? $gene['p'] : null;
     $pockets = $protein ? afPockets($protein) : array();
+
+    /* The compact gene shard stores only CCD codes. Add display names in one
+       batched metadata pass, grouped by the existing ligand shards, so result
+       cards can explain unfamiliar codes without any SQL or external call. */
+    if (!empty($gene['lig']) && is_array($gene['lig'])) {
+        $codes = array_map(function ($row) {
+            return isset($row['ccd']) ? $row['ccd'] : '';
+        }, $gene['lig']);
+        $metadata = afLigands($codes);
+        foreach ($gene['lig'] as &$row) {
+            $key = isset($row['ccd']) ? strtolower((string) $row['ccd']) : '';
+            if (isset($metadata[$key])) {
+                $row['name'] = isset($metadata[$key]['name']) ? $metadata[$key]['name'] : '';
+                $row['formula'] = isset($metadata[$key]['formula']) ? $metadata[$key]['formula'] : '';
+            }
+        }
+        unset($row);
+    }
 
     afSend(array(
         'query'         => $afTerm,

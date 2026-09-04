@@ -4,7 +4,7 @@ $$SYNTAX-LEVEL 2
 <meta name="twitter:site" content="@MaizeGDB">
 <meta property="og:url" content="https\://maizegdb.org/data_center/alphafill">
 <meta property="og:title" content="MaizeGDB AlphaFill | Predicted Ligands, Cofactors &amp; Metal Sites">
-<meta property="og:description" content="624,456 ligand transplants over 68,262 predicted maize protein structures. Browse by gene or by ligand, with donor provenance and confidence on every row.">
+<meta property="og:description" content="Explore AlphaFill ligand hypotheses for B73 RefGen_v5 proteins, inspect predicted binding sites in 3D, and download the complete dataset.">
 
 <a class="mgdb-skip-link" href="#af-main">Skip to main content</a>
 <main class="mgdb-page mgdb-alphafill-page" id="af-main">
@@ -20,61 +20,43 @@ $$SYNTAX-LEVEL 2
     </div>
     <div class="mgdb-hero-body">
       <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> AlphaFill $(af-version) &middot; PDB-REDO $(databank-date) &middot; Indexed $(data-date)</p>
-      <h1 id="af-title">What does this maize protein bind?</h1>
-      <p class="mgdb-hero-description">AlphaFill copies ligands, cofactors and metal ions from experimentally solved PDB structures onto predicted models, by finding sequence-homologous donors and superposing them locally on the binding site. This is a proteome-wide run over all $(model-count) B73 RefGen_v5 AlphaFold models &mdash; $(transplants) transplants, collapsing to $(pairs) gene &times; ligand pairs.</p>
+      <h1 id="af-title">What might this maize protein bind?</h1>
+      <p class="mgdb-hero-description">Search a B73 RefGen_v5 gene or protein to inspect ligands transferred from similar experimental structures. Select a result to focus the predicted site in 3D, compare confidence, and follow its donor evidence.</p>
       <p class="mgdb-hero-actions">
+        <a class="mgdb-button mgdb-button-primary" href="#af-gene">Search a gene</a>
+        <a class="mgdb-button mgdb-button-secondary" href="/data_center/alphafill/faq">How to interpret results</a>
         <a class="mgdb-button mgdb-button-quiet" href="/data_center/protein_structure">Protein structure hub <span aria-hidden="true">&rarr;</span></a>
       </p>
     </div>
   </section>
 
-  <!-- ====================================================================
-       The caveat rail. Deliberately above the fold and not dismissible:
-       ions are 43.8% of transplants and additives 9.9%, so a reader who
-       sorts by raw count without knowing that will rank ion-decorated
-       surfaces at the top and call it biology.
-       ==================================================================== -->
-  <aside class="af-caveats" aria-label="How to read this dataset">
-    <div class="af-caveat">
-      <span class="af-caveat-mark" aria-hidden="true">&#9888;</span>
-      <div><b>Every row is a hypothesis.</b> A transplant is a ligand copied from a homologous donor crystal after local superposition &mdash; a structural prediction, never an observation in maize and not a docking result.</div>
+  <aside class="af-intro" aria-label="What AlphaFill results mean">
+    <div>
+      <strong>Every row is a hypothesis.</strong>
+      <span>A transplant is a ligand copied from a related PDB structure after its local binding site is aligned to the maize model. It is a prediction, not an observation in maize and not a docking result.</span>
     </div>
-    <div class="af-caveat">
-      <span class="af-caveat-mark" aria-hidden="true">&#9889;</span>
-      <div><b>Ions are $(ion-share) of all transplants</b> &#40;$(ion-pair-share) of pairs after collapsing&#41;. Na&#8314;, Ca&#178;&#8314; and Mg&#178;&#8314; are frequently adventitious in the donor crystal. A high transplant count is not evidence of biological importance.</div>
+    <div>
+      <strong>Ligand is a broad term.</strong>
+      <span>Results include cofactors, metabolites, drugs, metal ions, small molecules, peptides and proteins. Crystallization additives and likely adventitious ions are retained but clearly flagged.</span>
     </div>
-    <div class="af-caveat">
-      <span class="af-caveat-mark" aria-hidden="true">&#9878;</span>
-      <div><b>$(additive-share) of transplants are crystallization additives.</b> Nitrate, dioxane, PEG and glycerol are properties of the donor's buffer, not of maize. They are flagged, never hidden.</div>
-    </div>
-    <div class="af-caveat">
-      <span class="af-caveat-mark" aria-hidden="true">&#9711;</span>
-      <div><b>No donor is not no ligand.</b> $(genes-no-donor) genes ran and found no PDB homolog above the 25% identity floor. That is a coverage gap in the PDB, not a claim about the protein.</div>
+    <div>
+      <strong>No donor does not mean no ligand.</strong>
+      <span>If no PDB homolog clears AlphaFill's 25% identity floor, the result reports a coverage gap rather than claiming that the protein binds nothing.</span>
     </div>
   </aside>
 
-  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#af-gene" class="is-current">Gene lookup</a>
-    <a href="#af-ligand">Search by ligand</a>
-    <a href="#af-browse">Browse</a>
-    <a href="#af-targets">Target list</a>
-    <a href="#af-reading">Interpreting</a>
-    <a href="#af-methods">Methods &amp; limits</a>
+  <nav class="mgdb-section-tabs" aria-label="AlphaFill sections">
+    <a href="#af-gene" class="is-current" aria-current="location">Gene lookup</a>
+    <a href="#af-ligand">Ligand lookup</a>
     <a href="#af-downloads">Downloads</a>
-    <a href="#af-dashboard">Statistics</a>
+    <a href="/data_center/alphafill/faq">FAQ &amp; methods</a>
   </nav>
 
-  <!-- ====================================================================
-       1. Gene lookup and the 3D workspace
-       ==================================================================== -->
   <section class="mgdb-panel af-workspace marker-search-panel" id="af-gene" aria-labelledby="af-gene-title">
-    <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Interactive search</span>
-        <h2 id="af-gene-title">Find the predicted ligands for a gene</h2>
-      </div>
-      <p>Accepts B73 RefGen_v5 gene models, protein isoforms, and older identifiers, locus names and gene symbols that resolve to one. Ligand codes and chemical names work here too and jump to the ligand view.</p>
+    <div class="mgdb-section-heading af-heading-stacked">
+      <div><h2 id="af-gene-title">Find the predicted ligands for a gene</h2></div>
     </div>
+    <p class="af-section-intro">Accepts B73 RefGen_v5 gene models, protein isoforms, and older identifiers, locus names and gene symbols that resolve to one. Ligand codes and chemical names work here too and open the ligand view.</p>
 
     <form class="af-search" id="af-search-form" autocomplete="off" role="search">
       <label class="mgdb-label" for="af-search-input">Gene model, protein isoform, or ligand</label>
@@ -89,39 +71,32 @@ $$SYNTAX-LEVEL 2
         </div>
         <button class="mgdb-button mgdb-button-primary af-search-submit" type="submit">Show ligands</button>
       </div>
-      <p class="mgdb-hint" id="af-search-hint">Type at least two characters. The numeric tail of a gene model works on its own &mdash; <code>086870</code> finds <code>Zm00001eb086870</code>.</p>
-      <div class="marker-example-row af-examples" aria-label="Example searches">
-        <span>Examples</span>
-        <button class="mgdb-chip" type="button" data-af-example="Zm00001eb086870">strongest transplant</button>
-        <button class="mgdb-chip" type="button" data-af-example="Zm00001eb000080">five ligands</button>
-        <button class="mgdb-chip" type="button" data-af-example="Zm00001eb034000">pocket, no donor</button>
-        <button class="mgdb-chip" type="button" data-af-example="Zm00001eb380210">additives flagged</button>
+      <p class="mgdb-hint" id="af-search-hint">Type at least two characters. A gene's numeric tail works on its own &mdash; <code>086870</code> finds <code>Zm00001eb086870</code>.</p>
+      <div class="marker-example-row af-examples" aria-label="Example gene searches">
+        <span>Example genes</span>
+        <button class="mgdb-chip" type="button" data-af-example="Zm00001eb086870" title="Strong transplant example">Zm00001eb086870</button>
+        <button class="mgdb-chip" type="button" data-af-example="Zm00001eb000080" title="Multiple ligand example">Zm00001eb000080</button>
+        <button class="mgdb-chip" type="button" data-af-example="Zm00001eb034000" title="Predicted pocket with no donor">Zm00001eb034000</button>
+        <button class="mgdb-chip" type="button" data-af-example="Zm00001eb380210" title="Additive flags example">Zm00001eb380210</button>
       </div>
     </form>
 
     <noscript>
-      <p class="mgdb-message mgdb-message-info">The ligand search and the 3D viewer need JavaScript. The full dataset is also available as bulk downloads further down this page.</p>
+      <p class="mgdb-message mgdb-message-info">The ligand search and 3D viewer need JavaScript. The full dataset remains available in the downloads below.</p>
     </noscript>
 
     <div id="af-results" class="af-results" aria-live="polite">
       <div class="mgdb-empty af-welcome">
         <p><strong>Search a gene to see what it is predicted to bind.</strong></p>
-        <p>Results open in a viewer with the AlphaFold model, every transplanted ligand overlaid, and the contacting pocket residues drawn on request. Each ligand carries its donor PDB entry, the sequence identity behind it, and both AlphaFill confidence metrics.</p>
+        <p>The result combines the AlphaFold model, transplanted ligands, predicted P2Rank pockets, donor structures and confidence measures in one workspace.</p>
       </div>
     </div>
   </section>
 
-  <!-- ====================================================================
-       2. Ligand-first search. The inverted index makes this one file read;
-          a gene-keyed layout cannot answer it at all.
-       ==================================================================== -->
   <section class="mgdb-panel" id="af-ligand" aria-labelledby="af-ligand-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Ligand first</span>
-        <h2 id="af-ligand-title">Every maize gene predicted to bind one ligand</h2>
-      </div>
-      <p>$(ligand-count) distinct PDB chemical components appear somewhere in this run. Pick one to see every gene that received it, ranked by evidence and then by the sequence identity of the donor behind it.</p>
+      <div><h2 id="af-ligand-title">Find maize genes by ligand</h2></div>
+      <p>$(ligand-count) distinct PDB Chemical Component Dictionary entries occur in this run. Results are ranked by evidence and donor identity.</p>
     </div>
 
     <form class="af-search af-search-compact" id="af-ligand-form" autocomplete="off" role="search">
@@ -131,344 +106,72 @@ $$SYNTAX-LEVEL 2
                placeholder="NAD, FAD, ATP, HEM, SAM&hellip;" />
         <button class="mgdb-button mgdb-button-secondary" type="submit">List genes</button>
       </div>
+      <p class="mgdb-hint">Codes follow the <a href="https\://www.wwpdb.org/data/ccd" target="_blank" rel="noopener">wwPDB Chemical Component Dictionary</a>. Search accepts either a code such as <code>FAD</code> or a name such as <code>flavin</code>.</p>
       <div class="marker-example-row af-examples" aria-label="Example ligands">
         <span>Common cofactors</span>
         <button class="mgdb-chip" type="button" data-af-ligand="NAD">NAD</button>
         <button class="mgdb-chip" type="button" data-af-ligand="FAD">FAD</button>
         <button class="mgdb-chip" type="button" data-af-ligand="ATP">ATP</button>
-        <button class="mgdb-chip" type="button" data-af-ligand="HEM">heme</button>
+        <button class="mgdb-chip" type="button" data-af-ligand="HEM">HEM</button>
         <button class="mgdb-chip" type="button" data-af-ligand="SAM">SAM</button>
         <button class="mgdb-chip" type="button" data-af-ligand="PLP">PLP</button>
       </div>
     </form>
 
     <div id="af-ligand-results" class="af-results" aria-live="polite">
-      <div class="mgdb-empty">
-        <p>Choose a ligand to list the genes predicted to bind it. Ion and additive codes are searchable too &mdash; they are simply labelled for what they are.</p>
-      </div>
+      <div class="mgdb-empty"><p>Choose a ligand to list every maize gene that received it. Ions and additives remain searchable and are labelled by class.</p></div>
     </div>
   </section>
 
-  <!-- ====================================================================
-       3. Browse. The tier-1 index is 16,933 compact rows, so filtering and
-          sorting happen in the browser with no request per keystroke.
-       ==================================================================== -->
-  <section class="mgdb-panel" id="af-browse" aria-labelledby="af-browse-title">
-    <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Browse</span>
-        <h2 id="af-browse-title">All $(genes-with) genes with a predicted ligand</h2>
-      </div>
-      <p>The whole gene-level table loads in one request and filters in the browser. Default view is the confident subset; ions and additives are one click away rather than hidden.</p>
-    </div>
-
-    <div class="af-filters" id="af-browse-filters" role="group" aria-label="Filter the gene table">
-      <span class="af-filter-label">Best evidence</span>
-      <button class="mgdb-chip is-on" type="button" data-af-filter="strong">strong</button>
-      <button class="mgdb-chip is-on" type="button" data-af-filter="moderate">moderate</button>
-      <button class="mgdb-chip" type="button" data-af-filter="ion">ion</button>
-      <button class="mgdb-chip" type="button" data-af-filter="weak">weak</button>
-      <button class="mgdb-chip" type="button" data-af-filter="additive">additive</button>
-      <span class="af-filter-label">Also</span>
-      <button class="mgdb-chip" type="button" data-af-flag="pocket">P2Rank pocket only</button>
-      <label class="af-filter-inline">
-        <span>Chromosome</span>
-        <select class="mgdb-select" id="af-browse-chrom">
-          <option value="">all</option>
-        </select>
-      </label>
-      <label class="af-filter-inline">
-        <span>Sort</span>
-        <select class="mgdb-select" id="af-browse-sort">
-          <option value="strong">most strong ligands</option>
-          <option value="ligands">most ligands</option>
-          <option value="plddt">highest model pLDDT</option>
-          <option value="gene">gene model</option>
-        </select>
-      </label>
-    </div>
-
-    <div id="af-browse-results" class="af-results" aria-live="polite">
-      <div class="mgdb-loading"><span class="mgdb-spinner" aria-hidden="true"></span> Loading the gene index&hellip;</div>
-    </div>
-  </section>
-
-  <!-- ====================================================================
-       4. The target list. Published as a list rather than apologised for as
-          a gap: it is the most interesting thing here that is not a
-          prediction.
-       ==================================================================== -->
-  <section class="mgdb-panel af-targets-panel" id="af-targets" aria-labelledby="af-targets-title">
-    <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Known unknowns</span>
-        <h2 id="af-targets-title">$(target-count) genes with a confident pocket and no donor</h2>
-      </div>
-      <p>Well-modelled proteins &#40;pLDDT &ge; 70&#41; where P2Rank predicts a confident ligand-binding pocket and no PDB entry cleared AlphaFill's identity floor. Structure says there is a site; the databank has nothing to fill it from. This is a target list for the community, not a gap to apologise for.</p>
-    </div>
-
-    <div class="af-filters" role="group" aria-label="Filter the target list">
-      <label class="af-filter-inline">
-        <span>Chromosome</span>
-        <select class="mgdb-select" id="af-targets-chrom">
-          <option value="">all</option>
-        </select>
-      </label>
-      <button class="mgdb-button mgdb-button-secondary" type="button" id="af-targets-load">Show the target list</button>
-    </div>
-
-    <div id="af-targets-results" class="af-results" aria-live="polite"></div>
-  </section>
-
-  <!-- ====================================================================
-       5. How to read a transplant
-       ==================================================================== -->
-  <section id="af-reading" aria-labelledby="af-reading-title">
-    <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Interpretation</span>
-        <h2 id="af-reading-title">How to read a transplant</h2>
-      </div>
-      <p>Four numbers sit behind every row. The badge collapses them into one word, but the numbers are on every card because the collapse is a judgement and yours may differ.</p>
-    </div>
-
-    <div class="mgdb-card-grid af-reading-grid">
-      <article class="mgdb-card">
-        <h3>Local RMSD &mdash; did the site superpose?</h3>
-        <p>Backbone agreement between the donor's binding site and the model, over a 6 &#197; shell around the ligand. This is the metric that says whether the pocket the ligand was copied into is really the same pocket. Published bands: high below 0.92 &#197;, low above 3.10 &#197;.</p>
-      </article>
-      <article class="mgdb-card">
-        <h3>TCS &mdash; does the ligand fit?</h3>
-        <p>Transplant clash score: how badly the copied ligand overlaps protein atoms in its new home. A low RMSD with a high clash score means the site aligned but the ligand does not fit in it. Bands: high below 0.64, low above 1.27.</p>
-      </article>
-      <article class="mgdb-card af-card-flag">
-        <h3>Donor identity &mdash; how related?</h3>
-        <p>Sequence identity to the donor over the aligned region. The median across this run is <b>$(median-id)</b> and <b>$(below-030)</b> of transplants fall below 0.30 &mdash; donors pile up against AlphaFill's 25% floor. That is monocot PDB sparsity, not maize biology.</p>
-      </article>
-      <article class="mgdb-card">
-        <h3>Model pLDDT &mdash; is the fold right?</h3>
-        <p>Yield tracks model quality steeply: 10.5% of genes below pLDDT 50 receive a transplant, against 74.3% at pLDDT 85 and above. A confident transplant on a poor model is still a poor model. Per-gene pLDDT is on every row so you can calibrate.</p>
-      </article>
-    </div>
-
-    <div class="af-evidence-key">
-      <h3>The evidence badge</h3>
-      <table class="mgdb-table af-evidence-table">
-        <caption class="mgdb-visually-hidden">What each evidence class means and how many gene-ligand pairs are in it</caption>
-        <thead>
-          <tr><th scope="col">Badge</th><th scope="col">Means</th><th scope="col">Pairs</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><span class="af-badge af-badge-strong">strong</span></td><td>High on local RMSD <em>and</em> TCS, a biological ligand, model pLDDT &ge; 70</td><td>$(ev-strong)</td></tr>
-          <tr><td><span class="af-badge af-badge-moderate">moderate</span></td><td>High on both metrics and a biological ligand, but model pLDDT &lt; 70</td><td>$(ev-moderate)</td></tr>
-          <tr><td><span class="af-badge af-badge-ion">ion</span></td><td>Single-atom metal. Easy to superpose, easy to over-count, often adventitious in the donor crystal</td><td>$(ev-ion)</td></tr>
-          <tr><td><span class="af-badge af-badge-weak">weak</span></td><td>A biological ligand that missed the confidence bands on one or both metrics</td><td>$(ev-weak)</td></tr>
-          <tr><td><span class="af-badge af-badge-additive">additive</span></td><td>Crystallization artifact &mdash; buffer, cryoprotectant or precipitant from the donor's conditions</td><td>$(ev-additive)</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <aside class="mgdb-note mgdb-note-info">
-      <p><strong>Predicted is not observed.</strong> A strong badge means a well-superposed homolog carried this compound in the same place. It does not mean the compound has been seen in maize, that it is present in the tissue you care about, or that the protein is expressed there. The gene record linked from every result is where to check.</p>
-    </aside>
-  </section>
-
-  <!-- ====================================================================
-       6. Methods and honest limits
-       ==================================================================== -->
-  <section id="af-methods" aria-labelledby="af-methods-title">
-    <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Provenance</span>
-        <h2 id="af-methods-title">How this was made, and what it cannot tell you</h2>
-      </div>
-      <p>AlphaFill $(af-version) against the PDB-REDO databank of $(databank-date), run over every B73 RefGen_v5 AlphaFold model. Indexed for this site on $(data-date).</p>
-    </div>
-
-    <div class="mgdb-table-scroll">
-      <table class="mgdb-table">
-        <caption class="mgdb-visually-hidden">Coverage of the AlphaFill run across B73 RefGen_v5 genes</caption>
-        <thead>
-          <tr><th scope="col">State</th><th scope="col">Genes</th><th scope="col">What it means</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>Transplant present</strong></td>
-            <td class="af-num">$(genes-with)</td>
-            <td>At least one ligand, cofactor or ion was transplanted. Browse them above.</td>
-          </tr>
-          <tr>
-            <td><strong>Ran, no qualifying donor</strong></td>
-            <td class="af-num">$(genes-no-donor)</td>
-            <td>The model was processed and no PDB homolog met the 25% identity threshold. <b>This is not evidence the protein binds nothing</b> &mdash; it is a statement about PDB coverage of maize protein families.</td>
-          </tr>
-          <tr>
-            <td><strong>Not analysed</strong></td>
-            <td class="af-num">$(genes-no-model)</td>
-            <td>No AlphaFold model exists for the gene, so AlphaFill never saw it.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="mgdb-card-grid af-limits-grid">
-      <article class="mgdb-card af-card-flag">
-        <h3>Recall is bounded by the PDB, not by maize</h3>
-        <p>The overall hit rate is $(hit-rate) of canonical genes, against 58.9% for the published AlphaFold-DB comparison. The gap is donor availability: median identity $(median-id), with $(below-030) of transplants below 0.30. On well-modelled proteins &#40;pLDDT &ge; 85&#41; the rate is 74.3%, which exceeds the published figure.</p>
-      </article>
-      <article class="mgdb-card">
-        <h3>Experimental validation is thin</h3>
-        <p>Benchmarked against solved maize structures, pocket location was correct in <b>9 of 12</b> clean cases &#40;95% CI 0.47&ndash;0.91&#41;, median all-atom pocket RMSD 1.59 &#197;. Twelve is the honest n. 84% of candidate benchmark cases had to be discarded because some maize PDB entries <em>are</em> the donor &mdash; relevant to anyone benchmarking against this resource.</p>
-      </article>
-      <article class="mgdb-card">
-        <h3>A pocket is a second opinion, not a confirmation</h3>
-        <p>P2Rank pockets are predicted independently of AlphaFill, so agreement between them is real corroboration. $(pocket-count) pockets were predicted across the proteome; a pocket is only called ligand-supported here when its centre is within 5 &#197; of a transplant. Without that cutoff the nearest-transplant field means "closest anywhere", and its median is 12.4 &#197;.</p>
-      </article>
-      <article class="mgdb-card">
-        <h3>3.2% of transplants have no coordinates</h3>
-        <p>AlphaFill records some hits in its metadata whose ligand it did not ultimately write into the structure. Those rows are listed with their donor and metrics and are marked as not drawable, rather than being dropped &mdash; a silently shorter list is worse than a labelled one.</p>
-      </article>
-    </div>
-
-    <p class="mgdb-small af-provenance-note">Citing anything from this page means citing AlphaFill: Hekkelman et al. \(2023\) <i>Nature Methods</i> 20:205&ndash;213. The donor structures are PDB-REDO re-refinements: Joosten et al. \(2014\) <i>IUCrJ</i> 1:213&ndash;220. Pocket predictions are P2Rank: Krivak and Hoksza \(2018\) <i>Journal of Cheminformatics</i> 10:39. The underlying models are AlphaFold: Jumper et al. \(2021\) <i>Nature</i> 596:583&ndash;589. For the MaizeGDB structure resource: Andorf et al. \(2023\) <i>Genetics</i> 223:iyad016.</p>
-  </section>
-
-  <!-- ====================================================================
-       7. Downloads
-       ==================================================================== -->
   <section id="af-downloads" aria-labelledby="af-downloads-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Bulk data</span>
-        <h2 id="af-downloads-title">Take the whole dataset</h2>
-      </div>
-      <p>Everything behind this page is available as a file. The per-gene table is small enough to work with in a spreadsheet; the transplant table is the full record.</p>
+      <div><h2 id="af-downloads-title">Download AlphaFill data</h2></div>
+      <p>Use the compact gene tables for browsing and spreadsheets, or download the complete transplant record for reproducible analysis.</p>
     </div>
 
     <div class="mgdb-card-grid af-download-grid">
-      <article class="mgdb-card">
+      <article class="mgdb-card af-download-card">
         <span class="mgdb-pill mgdb-pill-info">JSON &middot; ~0.6 MB</span>
-        <h3>Gene index</h3>
-        <p>One row per gene with a transplant: gene, chromosome, model pLDDT, ligand count, strong count, best evidence class and confident pocket count. This is what the browse table above loads.</p>
-        <p><a class="mgdb-button mgdb-button-quiet" href="/search/alphafill/alphafill_download.php?file=index">Download index <span aria-hidden="true">&darr;</span></a></p>
+        <h3>Browse-ready gene index</h3>
+        <p>One row for each of the $(genes-with) genes with a transplant: chromosome, model pLDDT, ligand counts, best evidence class and confident-pocket count.</p>
+        <p class="af-card-action"><a class="mgdb-button mgdb-button-quiet" href="/search/alphafill/alphafill_download.php?file=index">Download gene index <span aria-hidden="true">&darr;</span></a></p>
       </article>
-      <article class="mgdb-card">
+      <article class="mgdb-card af-download-card">
+        <span class="mgdb-pill mgdb-pill-warn">CSV &middot; ~3 MB</span>
+        <h3>Predicted pockets with no donor</h3>
+        <p>The $(target-count) well-modelled genes where P2Rank finds a confident pocket but AlphaFill finds no qualifying donor, with pLDDT and pocket probability.</p>
+        <p class="af-card-action"><a class="mgdb-button mgdb-button-quiet" href="/search/alphafill/alphafill_download.php?file=targets">Download target list <span aria-hidden="true">&darr;</span></a></p>
+      </article>
+      <article class="mgdb-card af-download-card">
         <span class="mgdb-pill mgdb-pill-info">JSON &middot; ~15 MB</span>
         <h3>Gene &times; ligand table</h3>
-        <p>The collapsed table: every gene with every distinct ligand transplanted into it, the best donor, sequence identity, local RMSD, TCS, supporting donor count and evidence class. $(pairs) rows.</p>
-        <p><a class="mgdb-button mgdb-button-quiet" href="/search/alphafill/alphafill_download.php?file=by_gene">Download table <span aria-hidden="true">&darr;</span></a></p>
+        <p>All $(pairs) distinct gene&ndash;ligand pairs with the best donor, identity, local RMSD, TCS, donor count and evidence class.</p>
+        <p class="af-card-action"><a class="mgdb-button mgdb-button-quiet" href="/search/alphafill/alphafill_download.php?file=by_gene">Download pair table <span aria-hidden="true">&darr;</span></a></p>
       </article>
-      <article class="mgdb-card">
-        <span class="mgdb-pill">TSV &middot; ~64 MB</span>
-        <h3>Every transplant</h3>
-        <p>All $(transplants) raw transplants before collapsing, one row each: protein, donor PDB entry, ligand and donor CCD codes, identity, alignment length, global and local RMSD, clash count, TCS and ligand class.</p>
-        <p><a class="mgdb-button mgdb-button-quiet" href="/search/alphafill/alphafill_download.php?file=transplants">Download transplants <span aria-hidden="true">&darr;</span></a></p>
-      </article>
-      <article class="mgdb-card">
-        <span class="mgdb-pill mgdb-pill-warn">CSV &middot; ~3 MB</span>
-        <h3>Target list</h3>
-        <p>The $(target-count) genes with a confident predicted pocket and no qualifying donor, with model pLDDT and pocket probability. The community target list from the section above.</p>
-        <p><a class="mgdb-button mgdb-button-quiet" href="/search/alphafill/alphafill_download.php?file=targets">Download targets <span aria-hidden="true">&darr;</span></a></p>
+      <article class="mgdb-card af-download-card">
+        <span class="mgdb-pill">TSV.GZ &middot; ~64 MB</span>
+        <h3>Every raw transplant</h3>
+        <p>All $(transplants) transplants before collapsing, including donor PDB entry, ligand and donor CCD codes, identity, alignment, RMSD, clashes, TCS and ligand class.</p>
+        <p class="af-card-action"><a class="mgdb-button mgdb-button-quiet" href="/search/alphafill/alphafill_download.php?file=transplants">Download transplants <span aria-hidden="true">&darr;</span></a></p>
       </article>
     </div>
 
-    <p class="mgdb-small">Structure files are served per protein: the AlphaFold model at <code>/data/alphafill/models/</code> and the transplanted ligands, as a coordinates-only mmCIF, at <code>/data/alphafill/lig/</code>. Both are gzipped on disk and decompressed by your browser. The full filled mmCIFs &#40;4.9 GB&#41; are not served, because the protein half of every one of them is byte-identical to the model already published beside it.</p>
+    <aside class="mgdb-note mgdb-note-info af-download-help">
+      <p><strong>Need field definitions, corpus statistics or provenance?</strong> The <a href="/data_center/alphafill/faq">AlphaFill FAQ and methods page</a> documents each file, explains P2Rank, and describes the limits of these hypotheses.</p>
+    </aside>
   </section>
 
-  <!-- ====================================================================
-       8. Dashboard
-       ==================================================================== -->
-  <section id="af-dashboard" aria-labelledby="af-dashboard-title">
-    <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Corpus summary</span>
-        <h2 id="af-dashboard-title">The run at a glance</h2>
-      </div>
-      <p>Every figure here is measured on the completed run and read from the same index the search answers out of, so the header cannot disagree with the data.</p>
-    </div>
-
-    <div class="mgdb-metric-grid">
-      <article class="mgdb-metric">
-        <div class="mgdb-metric-top">
-          <h3>Models Processed</h3>
-          <span class="mgdb-metric-badge">Complete</span>
-        </div>
-        <div class="mgdb-metric-stat"><strong class="mgdb-metric-value">$(model-count)</strong></div>
-        <p class="mgdb-metric-description">Every B73 RefGen_v5 AlphaFold model, with zero processing failures.</p>
-      </article>
-      <article class="mgdb-metric">
-        <div class="mgdb-metric-top">
-          <h3>Transplants</h3>
-          <span class="mgdb-metric-badge">Raw</span>
-        </div>
-        <div class="mgdb-metric-stat"><strong class="mgdb-metric-value">$(transplants)</strong></div>
-        <p class="mgdb-metric-description">Collapsing 4.7&times; to $(pairs) distinct gene &times; ligand pairs.</p>
-      </article>
-      <article class="mgdb-metric">
-        <div class="mgdb-metric-top">
-          <h3>Genes Covered</h3>
-          <span class="mgdb-metric-badge">$(hit-rate)</span>
-        </div>
-        <div class="mgdb-metric-stat"><strong class="mgdb-metric-value">$(genes-with)</strong></div>
-        <p class="mgdb-metric-description">Genes with at least one transplant, of the canonical annotation.</p>
-      </article>
-      <article class="mgdb-metric">
-        <div class="mgdb-metric-top">
-          <h3>Distinct Ligands</h3>
-          <span class="mgdb-metric-badge">CCD codes</span>
-        </div>
-        <div class="mgdb-metric-stat"><strong class="mgdb-metric-value">$(ligand-count)</strong></div>
-        <p class="mgdb-metric-description">Searchable by code or chemical name in the ligand view above.</p>
-      </article>
-    </div>
-
-    <div id="af-charts" class="af-charts" aria-live="polite"></div>
-  </section>
-
-  <!-- ====================================================================
-       9. Related resources
-       ==================================================================== -->
   <section id="af-resources" aria-labelledby="af-resources-title">
     <div class="mgdb-section-heading">
-      <div>
-        <span class="mgdb-eyebrow">Connected tools</span>
-        <h2 id="af-resources-title">Related resources</h2>
-      </div>
-      <p>Where to go next with a gene, a structure or a ligand.</p>
+      <div><h2 id="af-resources-title">Related resources</h2></div>
+      <p>Continue from a gene, structure or ligand without losing context.</p>
     </div>
-
     <div class="mgdb-resource-panel">
       <div class="mgdb-resource-list">
-        <a href="/data_center/protein_structure">
-          <strong>Protein Structure Data Hub</strong>
-          <span>AlphaFold monomers, homodimers and heterodimers, with ESMFold isoform models</span>
-          <span class="mgdb-resource-badge">Internal</span>
-        </a>
-        <a href="/projects/interpro_domain_atlas">
-          <strong>InterPro Domain Atlas</strong>
-          <span>Check whether a predicted pocket falls inside a known functional domain</span>
-          <span class="mgdb-resource-badge">Internal</span>
-        </a>
-        <a href="/data_center/genetic_variation">
-          <strong>Genetic Variation</strong>
-          <span>Natural variants across the maize pan-genome &mdash; does a SNP land in a predicted pocket?</span>
-          <span class="mgdb-resource-badge">Internal</span>
-        </a>
-        <a href="$(blast-url)">
-          <strong>Sequence search</strong>
-          <span>No transplant for your protein? Find a close homolog that has one</span>
-          <span class="mgdb-resource-badge">Internal</span>
-        </a>
-        <a href="https\://alphafill.science/" target="_blank" rel="noopener">
-          <strong>AlphaFill databank</strong>
-          <span>The reference implementation and its own databank at NKI</span>
-          <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
-        </a>
-        <a href="https\://pdb-redo.eu/" target="_blank" rel="noopener">
-          <strong>PDB-REDO</strong>
-          <span>The re-refined donor structures every transplant here came from</span>
-          <span class="mgdb-resource-badge mgdb-resource-badge-external">External</span>
-        </a>
+        <a href="/data_center/protein_structure"><strong>Protein Structure Data Hub</strong><span>AlphaFold monomers, homodimers and heterodimers, with ESMFold isoform models</span></a>
+        <a href="/projects/interpro_domain_atlas"><strong>InterPro Domain Atlas</strong><span>Check whether a predicted pocket falls inside a known functional domain</span></a>
+        <a href="$(blast-url)"><strong>Sequence search</strong><span>No transplant for your protein? Find a close homolog that has one</span></a>
+        <a href="https\://alphafill.science/" target="_blank" rel="noopener"><strong>AlphaFill databank</strong><span>The reference implementation and source databank</span></a>
       </div>
     </div>
   </section>
