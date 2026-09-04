@@ -1,0 +1,213 @@
+$$SYNTAX-LEVEL 2
+*(metabolic_pathways-tutorial
+<table width=100% cellpadding=0 cellspacing=0>
+  <tr>
+    <td>
+      <div id="centercolumn_record">
+        <div class='navarea'>
+          <font size="1">
+            <span class='underlinedlink' align=right>
+              <a href='/'>Home</a> > 
+              <a href="/metabolic_pathways">Metabolic Pathways</a> >
+              Tutorial
+            </span>
+          </font>
+        </div>
+        <br>
+        <table width='100%'  cellpadding=0 cellspacing=0>
+          <tr valign='center' class='green_curve_background'>
+            <td align='left'>
+              <img src='/images/header_left.gif'></img>
+            </td>
+            <td width='97%' valign='center' class='green_curve_background'>
+              Metabolic Pathways at MaizeGDB - Tutorial    
+            </td>
+            <td align='right'>
+              <img src='/images/header_right.gif'></img>
+            </td>
+          </tr>
+        </table>
+        
+        <table>
+          <tr>
+            <td>
+        
+  (This tutorial is a revised version from Monaco et al., Plant Genome, 2013\)
+  <br><br>
+  <h3>Expression OMICs viewer tutorial:</h3>
+  <br>
+  <div class="mp_text_box">
+  <p>
+    The OMICs viewer tools enables users analyze the expression datasets from 
+    transcriptomics (microarray and RNA-Seq experiments\), proteomics, 
+    metabolomics, reaction flux and or any the data that can be assigned to 
+    genes, proteins, compounds, or reactions in reference to the metabolic 
+    network. Using this tool, users can upload their expression datasets and 
+    create a visual representation of cellular overview of all the pathways 
+    colored according to the values provided in the file and the cutoffs 
+    selected before uploading the datasets. We would like to mention that this 
+    tool is available with varying choices in the online vs. the locally 
+    installed desktop version of Pathway Tools. We will describe only the 
+    online version. While using the online version, user's data are not 
+    compromised for security and are not available for sharing with other users, 
+    neither is it tracked by our webservers. Once users quit the session, the 
+    data views are discarded and users will be required to restart the session 
+    if desired. However, the data views can be saved in HTML and GIF image 
+    formats.
+  </p>
+  <br>
+  <p>
+    The Omics viewer is accessible from a link on the MaizeCyc home page or from 
+    the 'Tools' option of the MaizeCyc/CornCyc section of the navigation bar 
+    highlighted in 'orange' colored stripe. Once on the OMICs viewer page, be 
+    prepared to have your own expression data (See standard format files HELP 
+    link on the OMICS viewer page\), or download the gene expression data file 
+    used in this tutorial by downloading the table ST3. The same file is also 
+    available from 
+    <a href="https://download.maizegdb.org/MetabolicResources/Kaeppler_data/">here</a>.  
+  </p>
+  <br>
+  <p>
+    For simplification, in this tutorial we choose 5 tissue types as examples 
+    and provide the columns they can be found (note that the first column in 
+    the data file is considered 0th column\): (1\) 16DAP_Embryo, (2\) 
+    16DAP_endosperm, (3\) V1_Primary root, (4\) R1_Anther, and (5\) V1_Pooled 
+    leaves. The data file has 10,058 rows including the header row. The users 
+    need to download the file to their local computers before uploading on the 
+    OMICs viewer tool. 
+  </p>
+  <br>
+  <p>
+    Now select 'Choose File' button and select the appropriate expression data 
+    file by identifying the file at its location on your local computer. Then 
+    specify whether the data values are absolute or relative (for the example 
+    dataset, please choose absolute\) and select single column or the ratio of 
+    two data columns as desired. Data values can either be '0-centered scale' 
+    (e.g. log scale\) or '1-centered scale'. The example dataset is not in 
+    logarithmic scale therefore, the users should choose '1-centered scale'. 
+    Next, inform the Omics Viewer what type of biological entities the data 
+    values are assigned to. Options include 'Gene names and/or identifiers', 
+    'Protein names and/or identifiers', 'Compound names and/or identifiers', 
+    'Reaction identifiers and/or EC numbers', and 'Any of the above'. For our 
+    example set, choose 'Gene name and/or identifiers'. The last option 'Any of 
+    the above' can be very useful for the users, in cases when users receive a 
+    large dataset from a collaborator and are not familiar with the type of the
+    biological data that the data values are provided for in the column-0. By 
+    default column-0 (column-1 in user file is always the ID/name/synonym of the 
+    entity like gene, protein, compound\). This is followed by entering the data 
+    column number users are interested in evaluating. It is worthwhile to remind 
+    the users one more time that the first column in the data file is actually 
+    considered 0th column by the Omics Viewer. Two boxes are located under the 
+    title 'Single Experiment Time Step or Animated Time Series'.  The users 
+    should enter in the first box the data column(s\) they are interested. If 
+    there is more than one column they would like to display, the column numbers 
+    can be entered one per each line. The second box is useful only when the 
+    user is interested in relative values; the columns entered in this box will 
+    be used as denominators. For the example set, the user should put any number 
+    between 1 and 5 in the first box. These columns are selected for tissue 
+    types mentioned above. Following the data selection, users get three options 
+    to select for color schema, (1\) Full color spectrum, computed from data 
+    provided (default\), (2\) full color spectrum with a maximum cutoff, and (3\) 
+    three color display with specified threshold. The first option is 
+    self-explanatory. In the second option, the data values over the maximum 
+    cutoff are displayed in red, and the rest in the full color spectrum. In 
+    the third option, three colors are used. By default it uses red if data 
+    values are greater than the threshold, purple if data values are smaller 
+    than the inverse of the threshold, and grey for the values in between. You 
+    can also choose your threshold cutoff. For example for this tutorial we used 
+    400. A more detailed explanation can be found on the Omics Viewer page. For 
+    the example set, the users can choose the first option. In the final step 
+    before hitting the submit button, users get to select the display type: (1\) 
+    Paint data on cellular overview chart (default\), (2\) paint data on genome 
+    overview chart, and (3\) generate a table of individual pathways exceeding 
+    threshold.  In this manuscript, we will focus on the cellular overview. Now 
+    click the "Submit" button. The Omics Viewer will then start creating views. 
+    The time necessary to create these files depends on the size of the data 
+    file provided by the users. For the example data file, it might take about 
+    10 minutes and 5 minutes to generate the cellular overview and genome 
+    overview respectively. 
+  </p>
+  <br>
+  <p>
+    On the cellular overviews with painted expression data, users will find 
+    legends explaining the color schema and cutoffs. If the data is from a time 
+    series or multiple columns (such as in the example file\), users will see the 
+    moving images with expression levels marked for up-, down-regulated or no 
+    change. By hovering the mouse over the painted reaction and pathway it 
+    provides a pop-up option to zoom on the pathway view to visualize the 
+    expression for each gene associated to the given reaction. If for example 
+    there are multiple genes in a complex or multiple isomer (paralog\) gene ids 
+    that are listed each one will be colored respectively for its specific 
+    expression value. The 'save views' option is available at the bottom of the 
+    painted overview page.
+  </p>
+  <br>
+  <p>
+    Highlighting overexpressed genes. The Omics viewer itself does not provide 
+    tools to test whether the expression level of a given gene is statistically 
+    significant. However, it allows quick visual comparisons of overexpressed 
+    genes and pathways. The users can choose a specific threshold for their data 
+    by going back to the Omics Viewer main page, and enter that the desired 
+    threshold next to "Three color display with specified threshold" under the 
+    Color Scheme section. The users can then see the highlighted pathways from a 
+    bird's eye view. If they know where their pathways of interests are located, 
+    they can get a quick glimpse of their expression patterns. The Omics viewer 
+    also provides a list of overexpressed genes when "generate a table of 
+    individual pathways exceeding threshold" option is chosen on the main Omics 
+    page. 
+  </p>
+  <br>
+  <p>
+    Differential expression. Instead of looking at each data column separately 
+    that specifies a single condition, the Omics Viewer allows displaying the 
+    ratio of two data columns that provides relative expression levels. 
+    Supplementary Figure S1 shows the ratio of expressed genes in shoot apical 
+    meristem and stem V4 vs. leaf base of expanding leaf V5 (Step 3a\), and 
+    embryo, 24 days after pollination vs. kernel, 24 days after pollination 
+    (Step 3b\). Looking at the relative expression levels can inform the users 
+    about the tissue-specific genes and pathways. A quick comparison of pathways 
+    reveals change in expression patterns. In Steps 3 and 4, suberin 
+    biosynthesis (red box\) and C4 photosynthetic carbon assimilation cycle 
+    pathways (blue box\) are highlighted to show tissue-specific expression 
+    differences.
+  </p>
+  <br>
+  <p>
+    Visualizing specific pathways. Although the global view of the cellular 
+    pathways is definitely useful, the users may also want to look at specific 
+    pathways of their interest at a higher resolution for analysis or maybe for 
+    publications. The Omics Viewer has the capability of displaying each pathway 
+    individually, which enables to save them as image files.  At the end of the 
+    page of the colored cellular overview, there is a link that says 
+    "Instructions for saving this diagram to your local disk." This link 
+    contains more than the instructions. It also has a link to the set of 
+    pathway image files. The users can click in the "Link" in the second bullet 
+    point that says. The link takes you to a webpage that has all the pathway 
+    images with expression levels displayed on them.  These figures can be 
+    copied and pasted in presentations and used in publications. As an example, 
+    Supplementary Figure S1 shows a detailed comparison of expressions of 
+    biosynthesis pathways for shoot apical meristem and stem V4 vs. leaf base of 
+    expanding leaf V5 (Step 3a\), (Step 4a\) and embryo, 24 days after pollination 
+    vs. kernel, 24 days after pollination (Step 4b\). The figures also allow a 
+    visual comparison of expression levels in the isozymes associated with the 
+    suberin biosynthesis pathway, differentiated with colors as well as with the 
+    number of lines designating pathways.
+  </p>
+        
+            </td>
+            <td valign="top">
+              <a href="/docs/metabolic_pathways/Figure S1.pdf">
+                <img src="/images/metabolic_pathways_tn.png" 
+                     style="border: 1px #386F0D solid">
+              </a>
+            </td>
+          </tr>
+        </table>
+      </div>
+    <td>
+  </tr>
+</table>
+)
+
+
+

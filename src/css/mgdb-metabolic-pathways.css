@@ -1,0 +1,310 @@
+/* file: css/mgdb-metabolic-pathways.css
+ *
+ * The Metabolic Pathways Data Hub's own furniture, and nothing else.
+ *
+ * The pale blue ground, the white section cards, the coloured section edges,
+ * the metric card tones, the card-grid top edge and its hover highlight, the
+ * table zebra, the Related resources wash and the scroll offset all come from
+ * css/mgdb-hub.css, which loads first. Repeating any of it here would be a
+ * second definition to keep in step -- and a flat `border-color` shorthand at
+ * this level would silently eat the shell's card edge.
+ */
+
+/* --------------------------------------------------------------------------
+   The retirement notice
+
+   It sits between the hero and the tab bar, which is a gap the shell does not
+   otherwise style, so it needs its own spacing rather than a section's.
+   -------------------------------------------------------------------------- */
+
+.mgdb-metabolic-pathways-page .mp-retired {
+  margin: var(--mgdb-space-4) 0 0;
+  align-items: flex-start;
+}
+
+.mgdb-metabolic-pathways-page .mp-retired a { font-weight: 700; }
+
+/* --------------------------------------------------------------------------
+   Search
+   -------------------------------------------------------------------------- */
+
+/* The field and its button on one row, the examples and the advanced panel
+   spanning both -- the same grid every other hub's search uses.
+   `.mgdb-hub-field` is a labelled *cell* (a column of label over control), not
+   a row: putting the input and the submit button in one made them stack. */
+.mgdb-metabolic-pathways-page .mp-search-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-4);
+  align-items: end;
+}
+
+.mgdb-metabolic-pathways-page .mp-field-query { grid-column: 1; }
+.mgdb-metabolic-pathways-page .mgdb-hub-field-action { grid-column: 2; }
+.mgdb-metabolic-pathways-page .mp-examples,
+.mgdb-metabolic-pathways-page .mp-advanced { grid-column: 1 / -1; }
+
+.mgdb-metabolic-pathways-page .mp-advanced {
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-metabolic-pathways-page .mp-advanced > summary {
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-metabolic-pathways-page .mp-advanced-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--mgdb-space-3);
+  padding: 0 var(--mgdb-space-3) var(--mgdb-space-3);
+}
+
+/* The example chips are buttons, not links: they fill the field and submit
+   rather than navigating, so the reader can edit the term before searching. */
+.mgdb-metabolic-pathways-page .mp-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: baseline;
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-metabolic-pathways-page .mp-example {
+  padding: 3px var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface);
+  color: var(--mgdb-green-dark);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  cursor: pointer;
+}
+
+.mgdb-metabolic-pathways-page .mp-example:hover,
+.mgdb-metabolic-pathways-page .mp-example:focus-visible {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+}
+
+/* Resources whose name or keywords match the term, shown under the search box
+   rather than in the pathway results table -- they are a different kind of
+   answer and mixing them into a table of pathways would misreport the count. */
+.mgdb-metabolic-pathways-page .mp-resource-hits {
+  margin-top: var(--mgdb-space-3);
+  padding: var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-left: 3px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-metabolic-pathways-page .mp-resource-hits ul {
+  margin: var(--mgdb-space-2) 0 0;
+  padding-left: var(--mgdb-space-4);
+}
+
+/* --------------------------------------------------------------------------
+   Results
+   -------------------------------------------------------------------------- */
+
+.mgdb-metabolic-pathways-page .mp-results-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.mgdb-metabolic-pathways-page .mp-results-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+}
+
+.mgdb-metabolic-pathways-page .mp-results-scope {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-metabolic-pathways-page .mp-results[aria-busy="true"] .mp-results-scope::after {
+  content: " \2026";
+}
+
+.mgdb-metabolic-pathways-page .mp-pager {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-top: var(--mgdb-space-3);
+}
+
+.mgdb-metabolic-pathways-page .mp-pager button {
+  min-height: 32px;
+  padding: 2px var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink-soft);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  cursor: pointer;
+}
+
+.mgdb-metabolic-pathways-page .mp-pager button[disabled] {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.mgdb-metabolic-pathways-page .mp-pager-status {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* --------------------------------------------------------------------------
+   Resource cards
+
+   The grid's top edge and its hover colour belong to the shell. What is left
+   is the inside of a card: the provider line, the Internal/External chip, and
+   the closing link.
+   -------------------------------------------------------------------------- */
+
+/* nowrap, not wrap: a long provider name ("Kyoto Encyclopedia of Genes and
+   Genomes") pushed the Internal/External chip onto a second line, so one card
+   in a row of three had its chip half a line lower than its neighbours. The
+   provider wraps inside its own column instead and the chip stays pinned. */
+.mgdb-metabolic-pathways-page .mp-card-top {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--mgdb-space-2);
+  align-items: flex-start;
+  justify-content: space-between;
+  min-height: 2.4em;
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-metabolic-pathways-page .mp-card-badge {
+  min-width: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .01em;
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-metabolic-pathways-page .mp-card-access {
+  flex: none;
+  padding: 1px var(--mgdb-space-2);
+  border-radius: 999px;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.mgdb-metabolic-pathways-page .mp-card-access-internal {
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-metabolic-pathways-page .mp-card-access-external {
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+}
+
+.mgdb-metabolic-pathways-page .mp-card h3 {
+  margin: 0 0 var(--mgdb-space-2);
+  font-size: var(--mgdb-text-lg);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-metabolic-pathways-page .mp-card-links {
+  margin-top: var(--mgdb-space-3);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   Figure
+
+   .mgdb-chart is a fixed 320px in the shell. This figure has two categories
+   and is sized from JavaScript, so the element has to be allowed to grow and
+   the height comes from the same variable that sets the Plotly layout height.
+   -------------------------------------------------------------------------- */
+
+.mgdb-metabolic-pathways-page .mgdb-chart {
+  height: auto;
+  min-height: 320px;
+  overflow: visible;
+}
+
+/* --------------------------------------------------------------------------
+   The three documentation pages
+
+   Prose on the hub shell. They carry no corpus, so they get measure control
+   and a figure that sits beside the text on a wide screen and above it on a
+   narrow one.
+   -------------------------------------------------------------------------- */
+
+.mgdb-metabolic-pathways-page.mp-doc-page p,
+.mgdb-metabolic-pathways-page .mp-doc-page p { max-width: var(--mgdb-measure); }
+
+.mp-doc-page section > h3 {
+  margin: var(--mgdb-space-4) 0 var(--mgdb-space-2);
+  font-size: var(--mgdb-text-base);
+}
+
+.mp-doc-page section > ul,
+.mp-doc-page section > ol { max-width: var(--mgdb-measure); line-height: var(--mgdb-leading); }
+
+.mp-doc-page code {
+  padding: 1px 4px;
+  border-radius: var(--mgdb-radius-xs);
+  background: var(--mgdb-surface-sunken);
+  font-family: var(--mgdb-font-mono);
+  font-size: .92em;
+}
+
+.mp-doc-figure-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 240px);
+  gap: var(--mgdb-space-5);
+  align-items: start;
+}
+
+.mp-doc-figure { margin: 0; }
+
+.mp-doc-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--mgdb-green-dark);
+  border-radius: var(--mgdb-radius-sm);
+}
+
+.mp-doc-figure figcaption {
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+@media (max-width: 900px) {
+  .mp-doc-figure-row { grid-template-columns: minmax(0, 1fr); }
+  .mp-doc-figure { max-width: 320px; }
+}
+
+@media (max-width: 767px) {
+  /* One column: the submit button goes under the field rather than beside it. */
+  .mgdb-metabolic-pathways-page .mp-search-form { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-metabolic-pathways-page .mgdb-hub-field-action { grid-column: 1; }
+  .mgdb-metabolic-pathways-page .mp-advanced-body { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-metabolic-pathways-page .mp-results-head,
+  .mgdb-metabolic-pathways-page .mp-results-tools { align-items: stretch; }
+}

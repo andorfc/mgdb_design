@@ -1,0 +1,89 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-metabolic-pathways-install
+<main class="mgdb-page mgdb-hub-page mgdb-metabolic-pathways-page mp-doc-page" id="mp-doc">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/metabolic_pathways">Metabolic Pathways Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Local installation</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero" aria-labelledby="mp-doc-title">
+    <div class="mgdb-hero-body">
+      <h1 id="mp-doc-title">Installing Pathway Tools locally</h1>
+      <p class="mgdb-hero-description">Pathway Tools + MaizeCyc database installation and download guide for Mac. Created March 28, 2013.</p>
+    </div>
+  </section>
+
+  <div class="mgdb-message mgdb-message-info" role="note">
+    <div>
+      <strong>These instructions are for a local installation.</strong>
+      MaizeGDB no longer hosts a CornCyc web instance; the maintained build is at the
+      <a href="https\://pmn.plantcyc.org/organism-summary?object=Corn" target="_blank" rel="noopener">Plant Metabolic Network <span aria-hidden="true">&nearr;</span></a>.
+      The resource files below are unchanged and still install locally.
+    </div>
+  </div>
+
+  <section id="mp-doc-intro" aria-labelledby="mp-doc-intro-title">
+    <div class="mgdb-section-heading"><div><h2 id="mp-doc-intro-title">Before you start</h2></div></div>
+    <p>Installing Pathway Tools to your computer has the advantage of reaching and visualizing the data quickly.</p>
+    <p>The instructions here are provided for MaizeCyc on a Mac, but it is straightforward to install CornCyc on a Linux-based system as well.</p>
+  </section>
+
+  <section id="mp-doc-tools" aria-labelledby="mp-doc-tools-title">
+    <div class="mgdb-section-heading"><div><h2 id="mp-doc-tools-title">Installing Pathway Tools</h2></div></div>
+    <ol>
+      <li>Go to the Pathway Tools site download site: <a href="https\://biocyc.org/download.shtml" target="_blank" rel="noopener">biocyc.org/download.shtml <span aria-hidden="true">&nearr;</span></a>.</li>
+      <li>You will need to obtain a license for download (free for academia&#41;</li>
+      <li>Download Pathway tools .dmg file from the Pathway Tools FTP site (Tier 1 is sufficient&#41;</li>
+      <li>Folllow the instructions provided by the Pathway Tools team, but double-clicking the .dmg file to install it on your machine by accepting the default parameters works in most cases.</li>
+    </ol>
+  </section>
+
+  <section id="mp-doc-download" aria-labelledby="mp-doc-download-title">
+    <div class="mgdb-section-heading"><div><h2 id="mp-doc-download-title">Downloading the MaizeCyc database</h2></div></div>
+    <ol>
+      <li>Go to the FTP site: <a href="https\://download.maizegdb.org/MetabolicResources/MaizeCyc_install_files/" target="_blank" rel="noopener">download.maizegdb.org/MetabolicResources/MaizeCyc_install_files/ <span aria-hidden="true">&nearr;</span></a></li>
+      <li>Download maizecyc2.0.2.tar.gz to your machine (the version number can be different&#41;</li>
+      <li>Open the "Finder"</li>
+      <li>Go to this directory: <code>/Users/taner/ptools-local/pgdbs/user</code> (change "taner" with your username&#41;</li>
+      <li>Put the maizecyc file in that directory</li>
+      <li>Create and keep a copy of the tarred maizecyc database somewhere in case you mess up the database when you are playing with Pathway Tools.</li>
+    </ol>
+  </section>
+
+  <section id="mp-doc-unzip" aria-labelledby="mp-doc-unzip-title">
+    <div class="mgdb-section-heading"><div><h2 id="mp-doc-unzip-title">Unzipping the MaizeCyc database</h2></div></div>
+    <ol>
+      <li>Open a "Terminal" Window. (If you don't know where it is, go to "Applications" folder in the Finder, then "Utilities", and double-click Terminal&#41;</li>
+      <li>Type <code>cd /Users/taner/ptools-local/pgdbs/user</code> and press "return" (change "taner" with your username&#41;</li>
+      <li>Type <code>ls</code> and press "return". You should see maizecyc2.0.2.tar.gz file there.</li>
+      <li>Type <code>tar -xvzf maizecyc2.0.2.tar.gz</code> and press "return". You should now see the maizecyc directory.</li>
+    </ol>
+  </section>
+
+  <section id="mp-doc-start" aria-labelledby="mp-doc-start-title">
+    <div class="mgdb-section-heading"><div><h2 id="mp-doc-start-title">Starting Pathway Tools</h2></div></div>
+    <ol>
+      <li>Open a "Terminal" window</li>
+      <li>Type <code>cd /Users/taner/pathway-tools</code> and press "return" (change "taner" with your username&#41;</li>
+      <li>Type <code>./pathway-tools</code> and press "return".</li>
+      <li>Wait just a little: you should now see the X-windows open up.</li>
+      <li>There are some survey questions: you can ignore bunch of them.</li>
+      <li>You should now see "Pathway Tools".</li>
+      <li>Press the "Escherichia Coli" in the drop-down menu on the top left corner, choose "Zea mays". That's our database!</li>
+    </ol>
+  </section>
+
+  <section class="mgdb-hub-related" id="mp-doc-related" aria-labelledby="mp-doc-related-title">
+    <div class="mgdb-section-heading"><div><h2 id="mp-doc-related-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/metabolic_pathways"><strong>Metabolic Pathways Data Hub</strong><span>Search the CornCyc pathways MaizeGDB holds, and the maintained databases that curate them</span></a>
+        <a href="/metabolic_pathways/omics_viewer"><strong>Visualizing expression data on pathways</strong><span>Painting an RNA-seq dataset onto a pathway diagram with the Omics viewer</span></a>
+        <a href="/metabolic_pathways/compare"><strong>CornCyc and MaizeCyc compared</strong><span>How the two pipelines assigned enzymatic function, and what each produced</span></a>
+        <a href="https\://download.maizegdb.org/MetabolicResources/" target="_blank" rel="noopener"><strong>MetabolicResources downloads</strong><span>The full download directory holding both CornCyc and MaizeCyc install files</span></a>
+        <a href="https\://biocyc.org/webinar.shtml" target="_blank" rel="noopener"><strong>BioCyc webinars</strong><span>Recorded sessions on Pathway Tools and the BioCyc database collection</span></a>
+      </div>
+    </div>
+  </section>
+</main>
+)

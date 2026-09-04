@@ -1,0 +1,237 @@
+$$SYNTAX-LEVEL 2
+*(metabolic_pathways-compare
+<table width=100% cellpadding=0 cellspacing=0>
+  <tr>
+    <td>
+      <div id="centercolumn_record">
+        <div class='navarea'>
+          <font size="1">
+            <span class='underlinedlink' align=right>
+              <a href='/'>Home</a> > 
+              <a href="/metabolic_pathways">Metabolic Pathways</a> >
+              Comparison
+            </span>
+          </font>
+        </div>
+        <br>
+        <table width='100%'  cellpadding=0 cellspacing=0>
+          <tr valign='center' class='green_curve_background'>
+            <td align='left'>
+              <img src='/images/header_left.gif'></img>
+            </td>
+            <td width='97%' valign='center' class='green_curve_background'>
+              Metabolic Pathways at MaizeGDB - Comparison    
+            </td>
+            <td align='right'>
+              <img src='/images/header_right.gif'></img>
+            </td>
+          </tr>
+        </table>
+        
+        <div id='metabolic_pathways_content'>
+        
+  <div class="mp_text_box">
+    <h3>THE MAIZECYC PIPELINE</h3>
+    <p>
+      MaizeCyc 2.0.2 pathways were computationally inferred using Pathway Tools 
+      software (SRI\) (Monaco et al, Plant Genome, 2013\)
+    </p>
+    <br>
+    <p>
+      SOURCES OF FUNCTIONAL ANNOTATIONS INCLUDE:
+      <ul class="mp">
+        <li>Classical Maize Genes mapped to FGS</li>
+        <li>MaizeSequence.org (coordinates, cross-references, etc.\)</li>
+        <li>MaizeGDB (locus names/ synonyms, molecular function, etc\)</li>
+        <li>UniProtKB/SwissProt (functional descriptions and EC #\)</li>
+        <li>Gene Ontology (mol. function, biol. process, cellular location\)</li>
+        <li>Proteomics-supported gene annotations (e.g., cellular location\)</li>
+      </ul>
+    </p>
+    <br>
+    <p>
+      DATA CURATION 
+      <ul class="mp">
+        <li>772 literature-based GO-term annotations (MaizeGDB\)</li>
+        <li>Carotenoid, flavonoid, and flavonol biosynthesis pathways </li>
+      </ul>
+    </p>
+    <br>
+    <p>
+      <h3>THE CORNCYC PIPELINE</h3>
+      CornCyc 2.0 is based on the Ensemble Enzyme Prediction Pipeline (E2P2 v1.0\) 
+      (Lee Chae and Seung Y. Rhee, unpublished\)
+      <ul class="mp">
+        <li>
+          Uses an averaged weighted integration algorithm based on BLAST / 
+          CatFam / Priam results
+          <ul class="mp" style="margin-left:10px">
+            <li>
+              BLAST: e-value cutoff <= 1e-30, subset of SwissProt 15.3 
+            </li>
+            <li>
+              CatFam: version 2.0, 1% FDR profile library
+            </li>
+            <li>
+              Priam: Release November 2010 
+            </li>
+          </ul>
+        </li>
+        <li>
+          Weights were determined via a 0.632 bootstrap process over 1000 rounds 
+          of testing based on experimentally assigned functional annotation
+        </li>
+      </ul>
+    </p>
+    <br>
+    <p>
+      DATA CURATION
+      <ul class="mp">
+        <li>Auxin, brassinosteroid, gibberellin pathways (MaizeGDB\)</li>
+      </ul>
+    </p>
+    <br>
+    <p>
+      <h3>COMPARING MAIZECYC AND CORNCYC STATISTICS</h3>
+      <table>
+        <tr>
+          <th width=20"></td>
+          <th></th>
+          <th width=4></th>
+          <th bgcolor="#e0e0e0">MAIZECYC</th>
+          <th bgcolor="#e0e0e0">CORNCYC</th>
+        </tr>
+        <tr>
+          <td></td>
+          <td>Transport Rxns</td>
+          <td></td>
+          <td>68</td>
+          <td>24</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>Transporters</td>
+          <td></td>
+          <td>291</td>
+          <td>175</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>Proteins</td>
+          <td></td>
+          <td>39,655</td>
+          <td>10,511</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>Enzymes</td>
+          <td></td>
+          <td>8,889</td>
+          <td>10,478</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>Enzymatic Rxns</td>
+          <td></td>
+          <td>2,110</td>
+          <td>2,081</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>Pathways</td>
+          <td></td>
+          <td>391</td>
+          <td>334</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>Genes</td>
+          <td></td>
+          <td>39,655</td>
+          <td>6575 (splicing\)</td>
+        </tr>
+      </table>
+      <ul class="mp">
+        <li>
+          More transporter proteins and reactions in MaizeCyc
+        </li>
+        <li>
+          No alternative splicing in MaizeCyc; CornCyc has alternatively 
+          spliced protein variants (~4,000 variants\)
+        </li>
+        <li>
+          Fewer genes in CornCyc (lower coverage\)
+        </li>
+        <li>
+          More (spliced variant\) enzymes are assigned to fewer reactions and 
+          pathways in CornCyc [high stringency/lower coverage] (Corollary: 
+          Fewer enzymes are assigned to more reactions and pathways in MaizeCyc\)
+        </li>
+      </ul>
+    </p>
+    <br>
+    <p>
+      <h3>PERFORMANCE TESTING</h3>
+      A set of 197 UniProt proteins with experimental evidence and alignment 
+      to B73 RefGen_v2 FGS protein models are used for performance testing
+    </p>
+    <br>
+    <p>
+      PERFORMANCE MEASURES
+      <ul class="mp">
+        <li>
+          TP (True Positive\): perfect gene model-EC match
+        </li>
+        <li>
+          FP (False Positive\): EC mismatch for a given gene model 
+        </li>
+        <li>
+          FN  (False Negative\): missing gene be multiple Uniprot IDs associated 
+          with the same gene model, and multiple EC for the same gene model\)
+        </li>
+        <li>
+          TN (True Negative\) not defined: pairs missing in the Uniprot set as 
+          well as in the database  
+        </li>
+      </ul>
+    </p>
+    <br>
+    <p>
+      DEFINITIONS<br>
+      Precision (P\) = TP / (TP +FP\)<br>
+      Recall (R\)  = TP  / (TP+FN\)<br>
+      F-measure =  2 * (P * R\) /  (P + R\)<br>
+    </p>
+    <br>
+    <p>
+      RESULTS<br>
+      MaizeCyc<br>
+      Precision = 0.711<br>
+      Recall = 0.245<br>
+      F = 0.365<br>
+    </p>
+    <br>
+    <p>
+      CornCyc<br>
+      Precision = 0.873<br>
+      Recall = 0.913<br>
+      F = 0.893<br>
+    </p>
+    <br>
+    <p>
+      <h3>CONCLUSION</h3>
+      MaizeCyc and CornCyc are complementary. While MaizeCyc is a higher 
+      coverage in terms of assigned enzymatic reactions and pathways, CornCyc, 
+      which includes spliced variants, is a higher stringency resource in 
+      assigning functions to enzymes.  
+    </p>
+      
+        </div>
+      </div>
+    <td>
+  </tr>
+</table>
+)
+
+
+

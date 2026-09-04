@@ -1,0 +1,122 @@
+{
+  "_comment": [
+    "External metabolic pathway and enzyme resources linked from /metabolic_pathways.",
+    "",
+    "This file is the single source for the resource sections, the metric cards and",
+    "the client search index, in the same way data/ai/ai_resources.json drives /ai.",
+    "Add a resource here and it appears in all three places at once.",
+    "",
+    "Every URL is the one the host actually serves after redirects, not the older",
+    "address it still honours: http://www.chem.qmul.ac.uk/iubmb/enzyme/ answers 301",
+    "to https://iubmb.qmul.ac.uk/enzyme/, and http://ca.expasy.org/enzyme/ answers",
+    "301 to https://enzyme.expasy.org/. Recording the destination saves every reader",
+    "a redirect and keeps the link working when the old host is eventually retired.",
+    "",
+    "'group' selects the section. 'maize' marks a resource that is specific to Zea",
+    "mays rather than a general reference, which is what the first metric counts."
+  ],
+
+  "groups": [
+    { "key": "maize",   "title": "Maize pathway databases",
+      "lead": "Pathway databases that carry a maize organism build." },
+    { "key": "pathway", "title": "Pathway and reaction databases",
+      "lead": "General pathway resources that maize pathways are built from and compared against." },
+    { "key": "enzyme",  "title": "Enzyme nomenclature and kinetics",
+      "lead": "The reference works behind the EC numbers and enzyme names used above." }
+  ],
+
+  "resources": [
+    {
+      "name": "CornCyc at the Plant Metabolic Network",
+      "group": "maize",
+      "maize": true,
+      "url": "https://pmn.plantcyc.org/organism-summary?object=Corn",
+      "provider": "Plant Metabolic Network (PMN)",
+      "description": "The maintained CornCyc build: maize metabolic pathways, enzymes and reactions predicted with the E2P2 pipeline and curated by PMN. This is the resource that replaced the CornCyc instances MaizeGDB used to host.",
+      "keywords": ["corncyc", "pmn", "plantcyc", "pathway tools", "e2p2", "maize", "zea mays"]
+    },
+    {
+      "name": "Plant Reactome",
+      "group": "maize",
+      "maize": true,
+      "url": "https://plantreactome.gramene.org/",
+      "provider": "Gramene",
+      "description": "Curated and orthology-projected plant pathways, including Zea mays, with pathway diagrams, comparative analysis across species and expression overlays.",
+      "keywords": ["reactome", "gramene", "pathway", "orthology", "projection", "maize", "zea mays"]
+    },
+    {
+      "name": "KEGG maize pathway maps",
+      "group": "maize",
+      "maize": true,
+      "url": "https://www.genome.jp/kegg-bin/show_organism?menu_type=pathway_maps&org=zma",
+      "provider": "Kyoto Encyclopedia of Genes and Genomes",
+      "description": "The KEGG pathway maps built for Zea mays (organism code zma), each linking to the maize genes assigned to it.",
+      "keywords": ["kegg", "zma", "pathway map", "maize", "zea mays", "t01088"]
+    },
+
+    {
+      "name": "Reactome",
+      "group": "pathway",
+      "maize": false,
+      "url": "https://reactome.org/",
+      "provider": "Reactome Consortium",
+      "description": "Open, peer-reviewed pathway database covering reactions, complexes and regulatory events, and the framework Plant Reactome is built on.",
+      "keywords": ["reactome", "pathway", "reaction", "curated"]
+    },
+    {
+      "name": "BioCyc",
+      "group": "pathway",
+      "maize": false,
+      "url": "https://www.biocyc.org/",
+      "provider": "SRI International",
+      "description": "The Pathway/Genome Database collection that CornCyc, MetaCyc and PlantCyc belong to, with the Pathway Tools software behind them.",
+      "keywords": ["biocyc", "metacyc", "pathway tools", "sri", "pgdb"]
+    },
+    {
+      "name": "Plant Metabolic Network",
+      "group": "pathway",
+      "maize": false,
+      "url": "https://plantcyc.org/",
+      "provider": "Plant Metabolic Network",
+      "description": "PlantCyc and the family of species databases, including CornCyc, with the release notes and pipeline documentation for each build.",
+      "keywords": ["plantcyc", "pmn", "plant metabolic network", "release"]
+    },
+    {
+      "name": "KEGG pathway database",
+      "group": "pathway",
+      "maize": false,
+      "url": "https://www.genome.jp/kegg/pathway.html",
+      "provider": "Kyoto Encyclopedia of Genes and Genomes",
+      "description": "The reference pathway maps for metabolism, genetic and environmental information processing, and disease, from which the per-organism maps are drawn.",
+      "keywords": ["kegg", "pathway", "reference map", "metabolism"]
+    },
+
+    {
+      "name": "IUBMB Enzyme Nomenclature",
+      "group": "enzyme",
+      "maize": false,
+      "url": "https://iubmb.qmul.ac.uk/enzyme/",
+      "provider": "International Union of Biochemistry and Molecular Biology",
+      "description": "The authoritative list of EC numbers, accepted enzyme names, reactions and systematic names, maintained by the IUBMB nomenclature committee.",
+      "keywords": ["iubmb", "ec number", "enzyme nomenclature", "systematic name"]
+    },
+    {
+      "name": "BRENDA",
+      "group": "enzyme",
+      "maize": false,
+      "url": "https://www.brenda-enzymes.info/",
+      "provider": "Technische Universitat Braunschweig",
+      "description": "Enzyme functional data collected from the literature: kinetic parameters, substrates and products, inhibitors, stability and organism-specific measurements.",
+      "keywords": ["brenda", "enzyme", "kinetics", "km", "substrate", "inhibitor"]
+    },
+    {
+      "name": "ENZYME at Expasy",
+      "group": "enzyme",
+      "maize": false,
+      "url": "https://enzyme.expasy.org/",
+      "provider": "SIB Swiss Institute of Bioinformatics",
+      "description": "A nomenclature repository keyed on EC number, cross-referenced to UniProtKB/Swiss-Prot entries for the proteins that carry each activity.",
+      "keywords": ["expasy", "enzyme", "ec number", "uniprot", "swiss-prot"]
+    }
+  ]
+}

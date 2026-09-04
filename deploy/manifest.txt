@@ -896,6 +896,24 @@ src/templates/static/mgdb_overgo_notfound.bau                 templates/static/m
 src/templates/static/mgdb_est_notfound.bau                    templates/static/mgdb_est_notfound.bau
 src/templates/static/mgdb_bac_notfound.bau                    templates/static/mgdb_bac_notfound.bau
 src/templates/static/mgdb_cytogenetic_notfound.bau            templates/static/mgdb_cytogenetic_notfound.bau
+
+# Metabolic Pathways Data Hub — /metabolic_pathways and its three
+# documentation pages, which redirect.php used to serve as raw templates.
+#
+# The CornCyc instances MaizeGDB hosted (corncyc-b73-v3 and -v4.maizegdb.org)
+# are retired here: the page points at the maintained third-party builds and
+# carries a notice saying where CornCyc went. The pathway *data* is MaizeGDB's
+# own (mgdb.corncyc_gene_model_pathway) and is what the search reads.
+src/data/metabolic_pathways/resources.json                    data/metabolic_pathways/resources.json
+src/search/metabolic_pathway/metabolic_pathway_search_lib.php search/metabolic_pathway/metabolic_pathway_search_lib.php
+src/search/metabolic_pathway/metabolic_pathway_search_api.php search/metabolic_pathway/metabolic_pathway_search_api.php
+src/css/mgdb-metabolic-pathways.css                           css/mgdb-metabolic-pathways.css
+src/js/mgdb-metabolic-pathways.js                             js/mgdb-metabolic-pathways.js
+src/templates/static/mgdb_metabolic_pathways.bau              templates/static/mgdb_metabolic_pathways.bau
+src/templates/static/mgdb_metabolic_pathways_compare.bau      templates/static/mgdb_metabolic_pathways_compare.bau
+src/templates/static/mgdb_metabolic_pathways_install.bau      templates/static/mgdb_metabolic_pathways_install.bau
+src/templates/static/mgdb_metabolic_pathways_omics.bau        templates/static/mgdb_metabolic_pathways_omics.bau
+src/controllers/metabolic_pathways.php                        controllers/metabolic_pathways.php
 src/include/api/v1/records/locus.php                          include/api/v1/records/locus.php
 src/templates/static/mgdb_locus_notfound.bau                  templates/static/mgdb_locus_notfound.bau
 src/include/api/v1/records/term.php                           include/api/v1/records/term.php

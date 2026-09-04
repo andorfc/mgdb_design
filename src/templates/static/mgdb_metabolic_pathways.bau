@@ -1,0 +1,366 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-metabolic-pathways
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https://maizegdb.org/metabolic_pathways">
+<meta property="og:title" content="MaizeGDB Metabolic Pathways Data Hub">
+<meta property="og:description" content="Search CornCyc metabolic pathways assigned to B73 gene models, and the maintained pathway and enzyme databases maize metabolism is curated in.">
+
+<main class="mgdb-page mgdb-hub-page mgdb-metabolic-pathways-page" id="mp-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Metabolic Pathways Data Hub</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="mp-title">
+    <div class="mgdb-hero-emblem">
+      <img src="/images/quicklinks/pathway.png" alt="" width="128" height="128" decoding="async" />
+      <strong>Metabolic Pathways<br />Data Hub</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="mp-title">Maize metabolic pathways</h1>
+      <p class="mgdb-hero-description">$(metric_pathways) CornCyc pathways assigned to $(metric_in_pathway) B73 gene models through $(metric_proteins) enzymes, and the $(metric_resources) maintained databases where maize metabolism is curated.</p>
+    </div>
+  </section>
+
+  ;; The retirement notice. It sits above the tab bar rather than inside a
+  ;; section because it answers a question the reader arrives with -- "where did
+  ;; CornCyc at MaizeGDB go?" -- and a reader who came from a bookmark or a
+  ;; paper should not have to find the right section first.
+  <div class="mgdb-message mgdb-message-info mp-retired" role="note">
+    <div>
+      <strong>CornCyc is no longer hosted at MaizeGDB.</strong>
+      The two Pathway Tools instances that ran here, for B73 RefGen_v3 and RefGen_v4, have been retired.
+      The maintained CornCyc build is at the <a href="https\://pmn.plantcyc.org/organism-summary?object=Corn" target="_blank" rel="noopener">Plant Metabolic Network <span aria-hidden="true">&nearr;</span></a>, which curates it against current gene models.
+      The pathway assignments MaizeGDB itself holds are unchanged and are searchable below.
+    </div>
+  </div>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#mp-search" class="is-current" aria-current="true">Search</a>
+    <a href="#mp-pathways">Pathways</a>
+    <a href="#mp-maize">Maize databases</a>
+    <a href="#mp-pathway">Pathway databases</a>
+    <a href="#mp-enzyme">Enzymes</a>
+    <a href="#mp-tutorials">Tutorials</a>
+    <a href="#mp-downloads">Downloads</a>
+    <a href="#mp-references">References</a>
+    <a href="#mp-metrics">Metrics</a>
+    <a href="#mp-related">Related resources</a>
+  </nav>
+
+  <!-- Search ................................................................ -->
+  <section id="mp-search" aria-labelledby="mp-search-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="mp-search-title">Search</h2></div>
+    </div>
+
+    <form class="mp-search-form" id="mp-search-form" role="search">
+      <div class="mgdb-hub-field mp-field-query">
+        <label for="mp-term">Search term</label>
+        <input class="mgdb-input" id="mp-term" name="term" type="search" autocomplete="off"
+               placeholder="Pathway name, CornCyc ID, or B73 gene model" />
+      </div>
+
+      <div class="mgdb-hub-field mgdb-hub-field-action">
+        <button class="mgdb-button mgdb-button-primary" type="submit">Search pathways</button>
+      </div>
+
+      <div class="mp-examples" aria-label="Example searches">
+        <span>Try an example&#58;</span>
+        <button type="button" class="mp-example" data-term="glycolysis">glycolysis</button>
+        <button type="button" class="mp-example" data-term="starch biosynthesis">starch biosynthesis</button>
+        <button type="button" class="mp-example" data-term="PWY-3781">PWY-3781</button>
+        <button type="button" class="mp-example" data-term="Zm00001d053174">Zm00001d053174</button>
+        <button type="button" class="mp-example" data-term="GRMZM2G345493">GRMZM2G345493</button>
+      </div>
+
+      <details class="mp-advanced">
+        <summary>Advanced criteria</summary>
+        <div class="mp-advanced-body">
+          <div class="mgdb-hub-field">
+            <label for="mp-assembly">Assembly</label>
+            <select class="mgdb-select" id="mp-assembly" name="assembly">$(assembly_options)</select>
+          </div>
+          <div class="mgdb-hub-field">
+            <label for="mp-page-size">Results per page</label>
+            <select class="mgdb-select" id="mp-page-size" name="page_size">
+              <option value="10">10</option>
+              <option value="25" selected>25</option>
+              <option value="50">50</option>
+              <option value="600">All</option>
+            </select>
+          </div>
+        </div>
+      </details>
+    </form>
+
+    <p class="mgdb-rec-hint">A gene model returns the pathways it is assigned to. RefGen_v4 rows are gene IDs &#40;Zm00001d&hellip;&#41; and RefGen_v3 rows are protein IDs &#40;GRMZM&hellip;_P01&#41;, so a bare GRMZM accession is matched as a prefix.</p>
+
+    <div class="mp-resource-hits" id="mp-resource-hits" hidden></div>
+  </section>
+
+  <!-- Results ............................................................... -->
+  <section id="mp-results" class="mp-results" aria-labelledby="mp-results-title" hidden>
+    <div class="mgdb-section-heading mp-results-head">
+      <div><h2 id="mp-results-title">Search results</h2></div>
+      <div class="mp-results-tools">
+        <span class="mp-results-scope" id="mp-results-scope"></span>
+        <a class="mgdb-button mgdb-button-quiet" id="mp-results-tsv" href="#" download>Download TSV</a>
+      </div>
+    </div>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table mgdb-table-zebra" id="mp-results-table" data-sortable>
+        <caption class="mgdb-visually-hidden">CornCyc pathways matching the current search</caption>
+        <thead>
+          <tr>
+            <th scope="col" data-sort="text"><button type="button">Pathway</button></th>
+            <th scope="col" data-sort="text"><button type="button">CornCyc ID</button></th>
+            <th scope="col" data-sort="text"><button type="button">Assemblies</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Gene models</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Enzymes</button></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <nav class="mp-pager" id="mp-pager" aria-label="Result pages"></nav>
+  </section>
+
+  <!-- Pathways .............................................................. -->
+  <section id="mp-pathways" aria-labelledby="mp-pathways-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="mp-pathways-title">Pathways</h2></div>
+    </div>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table mgdb-table-zebra" id="mp-top-table" data-sortable>
+        <caption class="mgdb-visually-hidden">The $(pathway_shown) CornCyc pathways carrying the most B73 gene models</caption>
+        <thead>
+          <tr>
+            <th scope="col" data-sort="text"><button type="button">Pathway</button></th>
+            <th scope="col" data-sort="text"><button type="button">CornCyc ID</button></th>
+            <th scope="col" data-sort="text"><button type="button">Assemblies</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Gene models</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Enzymes</button></th>
+          </tr>
+        </thead>
+        <tbody>$(pathway_rows)</tbody>
+      </table>
+    </div>
+    <p class="mgdb-rec-block-status">The $(pathway_shown) pathways carrying the most gene models, of $(metric_pathways). The name opens the maize build at the Plant Metabolic Network; the CornCyc ID opens the reference pathway at MetaCyc. Search above for the rest.</p>
+  </section>
+
+  <!-- Maize databases ....................................................... -->
+  <section id="mp-maize" aria-labelledby="mp-maize-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="mp-maize-title">Maize pathway databases</h2></div>
+    </div>
+    <div class="mgdb-card-grid mp-card-grid">$(maize_cards)</div>
+  </section>
+
+  <!-- Pathway databases ..................................................... -->
+  <section id="mp-pathway" aria-labelledby="mp-pathway-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="mp-pathway-title">Pathway and reaction databases</h2></div>
+    </div>
+    <div class="mgdb-card-grid mp-card-grid">$(pathway_cards)</div>
+  </section>
+
+  <!-- Enzymes ............................................................... -->
+  <section id="mp-enzyme" aria-labelledby="mp-enzyme-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="mp-enzyme-title">Enzyme nomenclature and kinetics</h2></div>
+    </div>
+    <div class="mgdb-card-grid mp-card-grid">$(enzyme_cards)</div>
+  </section>
+
+  <!-- Tutorials ............................................................. -->
+  <section id="mp-tutorials" aria-labelledby="mp-tutorials-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="mp-tutorials-title">Information and tutorials</h2></div>
+    </div>
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table mgdb-table-zebra">
+        <caption class="mgdb-visually-hidden">Documentation about maize metabolic pathway resources</caption>
+        <thead>
+          <tr><th scope="col">Document</th><th scope="col">What it covers</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row"><a href="/metabolic_pathways/compare">CornCyc and MaizeCyc compared</a></th>
+            <td>How the two pipelines assigned enzymatic function, and the pathway, enzyme and reaction counts each produced.</td>
+          </tr>
+          <tr>
+            <th scope="row"><a href="/metabolic_pathways/install">Installing Pathway Tools locally</a></th>
+            <td>Running a Cyc database on your own machine from the resource files in Downloads below.</td>
+          </tr>
+          <tr>
+            <th scope="row"><a href="/metabolic_pathways/omics_viewer">Visualizing expression data on pathways</a></th>
+            <td>Painting an RNA-seq dataset onto a pathway diagram with the Pathway Tools Omics viewer.</td>
+          </tr>
+          <tr>
+            <th scope="row"><a href="https\://archive.gramene.org/tutorials/pathways_intro/" target="_blank" rel="noopener">Metabolic pathways at Gramene <span aria-hidden="true">&nearr;</span></a></th>
+            <td>Gramene's own video introduction to plant pathway browsing and comparative analysis.</td>
+          </tr>
+          <tr>
+            <th scope="row"><a href="https\://biocyc.org/webinar.shtml" target="_blank" rel="noopener">BioCyc webinars <span aria-hidden="true">&nearr;</span></a></th>
+            <td>Recorded sessions on Pathway Tools, the Omics viewers, and the BioCyc database collection.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Downloads ............................................................. -->
+  <section id="mp-downloads" aria-labelledby="mp-downloads-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="mp-downloads-title">Downloads</h2></div>
+    </div>
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table mgdb-table-zebra">
+        <caption class="mgdb-visually-hidden">Metabolic pathway files at download.maizegdb.org</caption>
+        <thead>
+          <tr><th scope="col">File set</th><th scope="col">Contents</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row"><a href="https\://download.maizegdb.org/MetabolicResources/CornCyc_install_files/" target="_blank" rel="noopener">CornCyc resource files <span aria-hidden="true">&nearr;</span></a></th>
+            <td>The CornCyc database in the form Pathway Tools reads, for a local installation.</td>
+          </tr>
+          <tr>
+            <th scope="row"><a href="https\://download.maizegdb.org/MetabolicResources/MaizeCyc_install_files/" target="_blank" rel="noopener">MaizeCyc resource files <span aria-hidden="true">&nearr;</span></a></th>
+            <td>The MaizeCyc 2.0.2 database for a local installation.</td>
+          </tr>
+          <tr>
+            <th scope="row"><a href="https\://download.maizegdb.org/MetabolicResources/MaizeCyc%20paper_supp_data/" target="_blank" rel="noopener">MaizeCyc paper supplements <span aria-hidden="true">&nearr;</span></a></th>
+            <td>Supplementary data accompanying Monaco et al., <em>The Plant Genome</em>, 2013.</td>
+          </tr>
+          <tr>
+            <th scope="row"><a href="https\://download.maizegdb.org/MetabolicResources/Reports/maizecyc2.0.2_goterms.txt" target="_blank" rel="noopener">MaizeCyc GO terms <span aria-hidden="true">&nearr;</span></a></th>
+            <td>Gene Ontology terms associated with MaizeCyc 2.0.2 gene models.</td>
+          </tr>
+          <tr>
+            <th scope="row"><a href="https\://download.maizegdb.org/MetabolicResources/Kaeppler_data/" target="_blank" rel="noopener">Sekhon et al. expression data <span aria-hidden="true">&nearr;</span></a></th>
+            <td>The example dataset used by the Omics viewer tutorial, from Sekhon et al., <em>The Plant Journal</em>, 2011.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- References ............................................................ -->
+  <section id="mp-references" aria-labelledby="mp-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="mp-references-title">References</h2></div>
+    </div>
+    <div class="mgdb-ref-list">$(reference_cards)</div>
+  </section>
+
+  <!-- Metrics ............................................................... -->
+  <section id="mp-metrics" aria-labelledby="mp-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="mp-metrics-title">Metrics</h2></div>
+    </div>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric mgdb-tone-green">
+        <div class="mgdb-metric-top">
+          <span class="mgdb-metric-badge">Pathways</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(metric_pathways)</strong>
+        </div>
+        <p class="mgdb-metric-description">Distinct CornCyc pathways with at least one B73 gene model assigned.</p>
+      </article>
+
+      <article class="mgdb-metric mgdb-tone-amber">
+        <div class="mgdb-metric-top">
+          <span class="mgdb-metric-badge">Gene models</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(metric_in_pathway)</strong>
+        </div>
+        <p class="mgdb-metric-description">B73 gene models placed in a pathway. A further $(metric_orphans) carry an enzyme assignment but no pathway.</p>
+      </article>
+
+      <article class="mgdb-metric mgdb-tone-blue">
+        <div class="mgdb-metric-top">
+          <span class="mgdb-metric-badge">Enzymes</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(metric_proteins)</strong>
+        </div>
+        <p class="mgdb-metric-description">Distinct CornCyc enzyme names across the $(metric_assignments) gene model assignments.</p>
+      </article>
+
+      <article class="mgdb-metric mgdb-tone-burgundy">
+        <div class="mgdb-metric-top">
+          <span class="mgdb-metric-badge">Databases</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(metric_resources)</strong>
+        </div>
+        <p class="mgdb-metric-description">External pathway and enzyme resources listed above, $(metric_maize) of them carrying a maize build.</p>
+      </article>
+    </div>
+
+    <figure class="mgdb-figure">
+      <div class="mgdb-chart" id="mp-assembly-chart"></div>
+      <figcaption>CornCyc coverage of the two B73 assemblies MaizeGDB holds assignments for.</figcaption>
+    </figure>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table mgdb-table-zebra">
+        <caption class="mgdb-visually-hidden">CornCyc coverage per assembly</caption>
+        <thead>
+          <tr>
+            <th scope="col">Assembly</th>
+            <th scope="col" class="mgdb-numeric">Pathways</th>
+            <th scope="col" class="mgdb-numeric">Gene models</th>
+            <th scope="col" class="mgdb-numeric">Enzymes</th>
+          </tr>
+        </thead>
+        <tbody id="mp-assembly-rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Related resources ..................................................... -->
+  <section id="mp-related" class="mgdb-hub-related" aria-labelledby="mp-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="mp-related-title">Related resources</h2></div>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/gene_product">
+          <strong>Gene Product Data Hub</strong>
+          <span>Curated gene products and the EC numbers that connect them to enzymatic reactions</span>
+        </a>
+        <a href="/gene_center/gene">
+          <strong>Gene Data Hub</strong>
+          <span>B73 gene models across assembly versions, with function, expression, and pathway membership</span>
+        </a>
+        <a href="/expression">
+          <strong>Expression Data Hub</strong>
+          <span>RNA-seq atlases to paint onto a pathway diagram with the Omics viewer</span>
+        </a>
+        <a href="https\://download.maizegdb.org/MetabolicResources/" target="_blank" rel="noopener">
+          <strong>MetabolicResources downloads</strong>
+          <span>The full download directory behind the file sets listed above</span>
+        </a>
+        <a href="/cite">
+          <strong>How to cite MaizeGDB</strong>
+          <span>Citation formats and the publication bibliography behind the references above</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <script type="application/json" id="mp-search-index">$(search_index)</script>
+  <script type="application/json" id="mp-chart-data">$(chart_data)</script>
+</main>
+)

@@ -1,0 +1,132 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-metabolic-pathways-compare
+<main class="mgdb-page mgdb-hub-page mgdb-metabolic-pathways-page mp-doc-page" id="mp-doc">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/metabolic_pathways">Metabolic Pathways Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Comparison</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero" aria-labelledby="mp-doc-title">
+    <div class="mgdb-hero-body">
+      <h1 id="mp-doc-title">CornCyc and MaizeCyc compared</h1>
+      <p class="mgdb-hero-description">How the two pipelines assigned enzymatic function, and the pathway, enzyme and reaction counts each produced.</p>
+    </div>
+  </section>
+
+  <section id="mp-doc-maizecyc" aria-labelledby="mp-doc-maizecyc-title">
+    <div class="mgdb-section-heading"><div><h2 id="mp-doc-maizecyc-title">The MaizeCyc pipeline</h2></div></div>
+    <p>MaizeCyc 2.0.2 pathways were computationally inferred using Pathway Tools software (SRI&#41; (Monaco et al, Plant Genome, 2013&#41;.</p>
+
+    <h3>Sources of functional annotations</h3>
+    <ul>
+      <li>Classical Maize Genes mapped to FGS</li>
+      <li>MaizeSequence.org (coordinates, cross-references, etc.&#41;</li>
+      <li>MaizeGDB (locus names/ synonyms, molecular function, etc&#41;</li>
+      <li>UniProtKB/SwissProt (functional descriptions and EC #&#41;</li>
+      <li>Gene Ontology (mol. function, biol. process, cellular location&#41;</li>
+      <li>Proteomics-supported gene annotations (e.g., cellular location&#41;</li>
+    </ul>
+
+    <h3>Data curation</h3>
+    <ul>
+      <li>772 literature-based GO-term annotations (MaizeGDB&#41;</li>
+      <li>Carotenoid, flavonoid, and flavonol biosynthesis pathways</li>
+    </ul>
+  </section>
+
+  <section id="mp-doc-corncyc" aria-labelledby="mp-doc-corncyc-title">
+    <div class="mgdb-section-heading"><div><h2 id="mp-doc-corncyc-title">The CornCyc pipeline</h2></div></div>
+    <p>CornCyc 2.0 is based on the Ensemble Enzyme Prediction Pipeline (E2P2 v1.0&#41; (Lee Chae and Seung Y. Rhee, unpublished&#41;.</p>
+    <ul>
+      <li>Uses an averaged weighted integration algorithm based on BLAST / CatFam / Priam results
+        <ul>
+          <li>BLAST: e-value cutoff &lt;= 1e-30, subset of SwissProt 15.3</li>
+          <li>CatFam: version 2.0, 1% FDR profile library</li>
+          <li>Priam: Release November 2010</li>
+        </ul>
+      </li>
+      <li>Weights were determined via a 0.632 bootstrap process over 1000 rounds of testing based on experimentally assigned functional annotation</li>
+    </ul>
+
+    <h3>Data curation</h3>
+    <ul>
+      <li>Auxin, brassinosteroid, gibberellin pathways (MaizeGDB&#41;</li>
+    </ul>
+  </section>
+
+  <section id="mp-doc-statistics" aria-labelledby="mp-doc-statistics-title">
+    <div class="mgdb-section-heading"><div><h2 id="mp-doc-statistics-title">Comparing MaizeCyc and CornCyc statistics</h2></div></div>
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table mgdb-table-zebra" data-sortable>
+        <caption class="mgdb-visually-hidden">MaizeCyc and CornCyc content counts</caption>
+        <thead>
+          <tr><th scope="col" data-sort="text"><button type="button">Content</button></th><th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">MaizeCyc</button></th><th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">CornCyc</button></th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Transport Rxns</th><td class="mgdb-numeric">68</td><td class="mgdb-numeric">24</td></tr>
+          <tr><th scope="row">Transporters</th><td class="mgdb-numeric">291</td><td class="mgdb-numeric">175</td></tr>
+          <tr><th scope="row">Proteins</th><td class="mgdb-numeric">39,655</td><td class="mgdb-numeric">10,511</td></tr>
+          <tr><th scope="row">Enzymes</th><td class="mgdb-numeric">8,889</td><td class="mgdb-numeric">10,478</td></tr>
+          <tr><th scope="row">Enzymatic Rxns</th><td class="mgdb-numeric">2,110</td><td class="mgdb-numeric">2,081</td></tr>
+          <tr><th scope="row">Pathways</th><td class="mgdb-numeric">391</td><td class="mgdb-numeric">334</td></tr>
+          <tr><th scope="row">Genes</th><td class="mgdb-numeric">39,655</td><td class="mgdb-numeric">6,575 (splicing&#41;</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul>
+      <li>More transporter proteins and reactions in MaizeCyc</li>
+      <li>No alternative splicing in MaizeCyc; CornCyc has alternatively spliced protein variants (~4,000 variants&#41;</li>
+      <li>Fewer genes in CornCyc (lower coverage&#41;</li>
+      <li>More (spliced variant&#41; enzymes are assigned to fewer reactions and pathways in CornCyc [high stringency/lower coverage] (Corollary: Fewer enzymes are assigned to more reactions and pathways in MaizeCyc&#41;</li>
+    </ul>
+  </section>
+
+  <section id="mp-doc-performance" aria-labelledby="mp-doc-performance-title">
+    <div class="mgdb-section-heading"><div><h2 id="mp-doc-performance-title">Performance testing</h2></div></div>
+    <p>A set of 197 UniProt proteins with experimental evidence and alignment to B73 RefGen_v2 FGS protein models are used for performance testing.</p>
+
+    <h3>Performance measures</h3>
+    <ul>
+      <li>TP (True Positive&#41;: perfect gene model-EC match</li>
+      <li>FP (False Positive&#41;: EC mismatch for a given gene model</li>
+      <li>FN (False Negative&#41;: missing gene be multiple Uniprot IDs associated with the same gene model, and multiple EC for the same gene model&#41;</li>
+      <li>TN (True Negative&#41; not defined: pairs missing in the Uniprot set as well as in the database</li>
+    </ul>
+
+    <h3>Definitions</h3>
+    <p>Precision (P&#41; = TP / (TP +FP&#41;<br />Recall (R&#41; = TP / (TP+FN&#41;<br />F-measure = 2 * (P * R&#41; / (P + R&#41;</p>
+
+    <h3>Results</h3>
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table mgdb-table-zebra">
+        <caption class="mgdb-visually-hidden">Precision, recall and F-measure for each pipeline</caption>
+        <thead>
+          <tr><th scope="col">Resource</th><th scope="col" class="mgdb-numeric">Precision</th><th scope="col" class="mgdb-numeric">Recall</th><th scope="col" class="mgdb-numeric">F</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">MaizeCyc</th><td class="mgdb-numeric">0.711</td><td class="mgdb-numeric">0.245</td><td class="mgdb-numeric">0.365</td></tr>
+          <tr><th scope="row">CornCyc</th><td class="mgdb-numeric">0.873</td><td class="mgdb-numeric">0.913</td><td class="mgdb-numeric">0.893</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="mp-doc-conclusion" aria-labelledby="mp-doc-conclusion-title">
+    <div class="mgdb-section-heading"><div><h2 id="mp-doc-conclusion-title">Conclusion</h2></div></div>
+    <p>MaizeCyc and CornCyc are complementary. While MaizeCyc is a higher coverage in terms of assigned enzymatic reactions and pathways, CornCyc, which includes spliced variants, is a higher stringency resource in assigning functions to enzymes.</p>
+  </section>
+
+  <section class="mgdb-hub-related" id="mp-doc-related" aria-labelledby="mp-doc-related-title">
+    <div class="mgdb-section-heading"><div><h2 id="mp-doc-related-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/metabolic_pathways"><strong>Metabolic Pathways Data Hub</strong><span>Search the CornCyc pathways MaizeGDB holds, and the maintained databases that curate them</span></a>
+        <a href="/metabolic_pathways/install"><strong>Installing Pathway Tools locally</strong><span>Running a Cyc database on your own machine from the MaizeGDB resource files</span></a>
+        <a href="/metabolic_pathways/omics_viewer"><strong>Visualizing expression data on pathways</strong><span>Painting an RNA-seq dataset onto a pathway diagram with the Omics viewer</span></a>
+        <a href="https\://pmn.plantcyc.org/organism-summary?object=Corn" target="_blank" rel="noopener"><strong>CornCyc at PMN</strong><span>The maintained CornCyc build, curated against current maize gene models</span></a>
+        <a href="/cite"><strong>How to cite MaizeGDB</strong><span>Citation formats and the publication bibliography, including both pipeline papers</span></a>
+      </div>
+    </div>
+  </section>
+</main>
+)
