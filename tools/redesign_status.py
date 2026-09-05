@@ -98,7 +98,7 @@ CATEGORY_ORDER = [
     "Information pages",
     "Community",
     "Documentation",
-    "Analysis projects",
+    "Research projects",
     "Standalone apps in the web root",
     "Search and API",
     "Curation and internal",
@@ -352,7 +352,7 @@ class Scanner(object):
         if url.startswith("/genome") or leaf.startswith("controllers/genome/"):
             return "Genome"
         if url.startswith("/projects"):
-            return "Analysis projects"
+            return "Research projects"
         if url.startswith("/curation") or url.startswith("/BLAST") or leaf.startswith("controllers/curation/"):
             return "Curation and internal"
         if url.startswith("/api") or url.startswith("/search_engine") or url.startswith("/searchall"):

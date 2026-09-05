@@ -1640,17 +1640,37 @@ JavaScriptCore with a small DOM shim — all eleven sections, the empty-record a
 locus-less variants, the request-failure and abort paths, and the domain-track
 geometry.
 
-## Analysis projects
+## Research projects
 
 `/projects` is a third kind of page, alongside the data centres and the tools.
 A data centre searches the production database and returns whatever is in it
-today; a tool takes input and computes an answer; a project is a *finished
-analysis* — a fixed result with its figures, tables, methods and downloads,
-which does not change until the analysis is re-run. None of it touches the
-database.
+today; a tool takes input and computes an answer; a project is a body of work
+with a beginning and an end — a fixed result with its figures, tables, methods
+and downloads, which does not change until the work is repeated. None of it
+touches the database.
+
+**It widened on 2026-09-05** from MaizeGDB's own analyses to the whole projects
+directory, on Carson's call: "one /projects directory". The site had four
+things called projects — this section, the six root-level `*_project` pages,
+`/doc` with `/documentation/*`, and a third under-construction placeholder at
+`/maizeprojects` — and the two legacy listings between them pointed at two dead
+hosts and a PHP fatal error. See **The two listings /projects replaced** below.
+
+Three categories, which is what `category` names in the registry:
+
+| Category | What it is | Count |
+| --- | --- | --- |
+| `analysis` | Run and published at MaizeGDB | 3 |
+| `genome` | A sequencing and assembly effort whose genomes the site serves | 7 |
+| `resource` | A mutant collection, map or protocol set hosted or documented here | 5 |
+
+**`maizegdb => true` marks a project MaizeGDB itself runs**, and those cards
+carry the kernels from the site mark — `/images/kernels.png`, the same file the
+homepage hero uses — in the upper right. It is an explicit flag rather than a
+test on `lead`, so a project co-led with someone else can still carry it.
 
 ```
-include/projects_lib.php                the registry: every project, and the topic vocabulary
+include/projects_lib.php                the registry: every project, the categories, the topics
 controllers/projects.php                routes /projects, /projects/<slug>, and the 404
 controllers/projects/<slug>.php         one project's page controller
 templates/static/mgdb_project_<slug>.bau  its body
@@ -1661,6 +1681,16 @@ The registry is the single source of truth: the listing cards, the routing, the
 filter chips and the breadcrumbs all derive from it, so a project cannot appear
 in one and be missing from another. An unrecognized slug is a real `404` rather
 than the listing page with a message.
+
+**Optional registry fields are omitted rather than faked.** `lead` is set only
+where a source page states it — an invented consortium name is a failure this
+part of the site has had once already, on a citation. `updated` is set only for
+work published here, because a project run elsewhere has no date we can stand
+behind and a card that printed the day it was served would claim the data had
+just changed. `card_facts` values come from the project's own page or from a
+query, never from memory: the UniformMu numbers are read from
+`data/uniformmu/uniformmu_summary.json`, the same file `/uniformmu` reads, so
+the card and the page cannot disagree.
 
 There is deliberately **no `projects/` directory in the web root**. A real
 directory at that path would stop `.htaccess` rewriting `/projects/...` to
@@ -1681,9 +1711,26 @@ data hubs have. Three sections — **Search**, **About**, **Related resources** 
 and the tab labels are the section headings verbatim.
 
 No Metrics and no References. There is nothing on this page worth counting that
-the reader cannot see (three cards), and a project's references belong on the
-project's own page, next to the analysis they support. The same call was taken
-for `/nomenclature`.
+the reader cannot see, and a project's references belong on the project's own
+page, next to the work they support. The same call was taken for
+`/nomenclature`.
+
+**The filter chips run on the category axis**, not on topics. They were topic
+chips until the section grew from three projects to fifteen, at which point the
+useful first cut became what kind of project it is rather than what it is
+about. Topics are still the pills on every card and still part of the text the
+search box matches, so typing `immunity`, `cytogenetics` or `Dooner` finds a
+project whose card copy never uses the word. Each chip carries its count, and a
+category with no projects in it emits no chip. The URL key moved with the axis:
+`?topic=` became `?category=`.
+
+**Three columns, not four.** The shared grid is `minmax(280px, 1fr)`, which at
+the page's 1200px of content fits four 288px tracks. That was invisible while
+the section held three projects — `auto-fit` collapses the empty track, so
+three cards took three 389px columns, which is the layout that was reviewed.
+Fifteen cards fill the fourth, and at 288px these titles, which are sentences,
+wrapped to five lines. The listing sets `minmax(320px, 1fr)`, which holds three
+columns from 992px of content up to 1328px.
 
 The bar is one 57px row at every width measured from 1280 down to 420, and
 below that `css/mgdb-modern.css` makes it a scrolling rail rather than letting
@@ -1726,11 +1773,41 @@ line as its neighbours':
 | The topic pills move above the summary | Whatever sits above the growing paragraph can be one row on one card and two on the next without moving anything that follows |
 | Three lines reserved for the title, two rows for the pills | Both sit above the summary, and reserving the taller case is what aligns the summary's own first line |
 | Two lines reserved for each fact label | `ligand types` fits on one line and `gene assignments` does not; an 80px strip beside a 102px one puts the two footers at different heights |
+| Two lines reserved for the meta line | Added 2026-09-05. Measured across the fifteen cards it is 22px or 45px and never more; a one-line meta lifts the facts strip a whole line above its neighbours', and reserving the taller case also pulls the one card with no facts strip at all back into line |
 
-Measured after: title 49, pills 169, summary 228, facts 433, updated 526 — the
-same in all three cards, at equal width and equal height. Below 720px the grid
-is a single column, the cards no longer sit beside each other, and every one of
-those reservations is released.
+Below 720px the grid is a single column, the cards no longer sit beside each
+other, and every one of those reservations is released. **The release for the
+meta line has to be written after its own declaration**, not with the other
+releases higher up the file: a media query carries no extra specificity, so the
+later rule wins whatever the viewport is. Measured at 375px with it in the
+earlier block and the reserve was still applying.
+
+Measured across all fifteen cards at 1280px, per grid row, as offsets from the
+top of the card: facts strip 435/435/435, 358/358/358, 358/358/358,
+358/358/358, 384/384/— and meta line 528/528/528, 451/451/451, 451/451/451,
+451/451/451, 477/477/477. The last card in the last row is Panzea, which has no
+numbers and so no facts strip, and its meta line still lands with its
+neighbours'.
+
+#### The kernels mark
+
+`maizegdb => true` puts `/images/kernels.png` in the card's upper right at
+46px, which is the mark at about an eighth of its natural size. It goes
+**inside the `<h3>`, floated right**, so the title wraps around it on the first
+line and runs the full width of the card underneath.
+
+The first version positioned it absolutely and padded the heading 58px to clear
+it. That reserve applies to every line, not just the one beside the mark: it
+cost each of the three marked cards three extra lines of title, and their pill
+rows started 69px lower than their unmarked neighbours' in the same grid row —
+the exact fault the four changes above exist to prevent. The heading's
+`min-height` is three lines and the mark is 27px tall, so a float can never
+escape the bottom of the heading.
+
+It is decorative — empty `alt`, `aria-hidden` — because the card's meta line
+already opens `MaizeGDB analysis · led by MaizeGDB` in words. Under
+`forced-colors` it is hidden, where a decorative PNG can render as a grey
+block.
 
 The shell rule itself is left alone. It is shared by every hub with a card grid
 and narrowing it to `> p:first-of-type` is a separate change with its own
@@ -1743,9 +1820,16 @@ elsewhere**: it appears on the listing in the same format as the rest, links to
 where the page actually is, and `/projects/<slug>` `301`s there rather than
 404ing a slug the registry does recognise or including a controller that does
 not exist. `mgdb_project()` returns such an entry early, without the derived
-`controller`, `template` and `data_url` paths, and the card's meta line says
-where it went — `Updated 29 August 2026 · data downloads available · on
-/data_center/alphafill`.
+`controller`, `template` and `data_url` paths.
+
+Twelve of the fifteen entries are now hosted elsewhere, which changed what the
+card's meta line says. It used to name the internal path it redirects to; with
+twelve of them that is twelve repetitions of a URL the card title already links
+to, so the path is gone. **An offsite `url` is different**: `mgdb_project()`
+sets `external` when the url begins `http`, and such a card opens in a new tab,
+carries the `↗` cue, and names the host — `Community resource · hosted at
+panzea.org`. That is a promise about where the click lands, so it is still
+made. Panzea is the only one.
 
 The first of these is **AlphaFill**. `/data_center/alphafill` is a searchable
 page over its own corpus as well as a finished analysis, so it is served from
@@ -1759,6 +1843,67 @@ change to the AlphaFill page.
 It also brought the `methods` topic into use, so **Methods and benchmarking**
 is now a filter chip. Chips are built from the topics the registry actually
 uses, so that happened by itself.
+
+### The two listings `/projects` replaced
+
+`/doc` and `/documentation/projects` were both "project documentation" pages,
+both in the legacy chrome, and the modern megamenu linked one while the legacy
+megamenu linked the other. Both now `301` to `/projects`.
+
+`/doc` — "MaizeGDB Project Documentation" — carried ten links. As of
+2026-09-05:
+
+| Link | State |
+| --- | --- |
+| Maize Gene Discovery Project → `cur.maizegdb.org` | **502**. `archive.maizegdb.org` does not resolve either, from inside the network or outside |
+| Maize Mapping Project → `cur.maizegdb.org` | **502** |
+| Other Maize Projects → `/popcorn/…/project_search.php` | **PHP fatal error**, `Cannot redeclare getSystemInfo()` |
+| Project Documentation & Protocols → `/projects` | **Wrong target.** The redesign gave `/projects` a meaning and nobody updated this |
+| Linking to MaizeGDB → `/api` | **Mislabelled.** `/api` returns a JSON service index |
+| Cytogenetic Map of Maize → `/CMMprotocols` | Fine. Now a card |
+| UniformMu → `/uniformmu` | Fine. Now a card |
+| How to Cite MaizeGDB → `/cite` | Fine. On the site map |
+| Maize Genetics Nomenclature → `/nomenclature` | Fine. On the site map |
+| MaizeGDB Schema → `/docs/MaizeGDBSchema.pdf` | Fine, and this page was its **only** route. Moved to the site map's Documentation and help |
+
+The name was the other half of the problem: "documentation" reads as
+documentation *of the website*, and the page existed to give maize research
+projects with no page of their own somewhere to put information.
+
+`/documentation/projects` was the better of the two — eight entries, better
+copy — and six of its eight are cards now. The two that are not are the Maize
+Gene Discovery Project (already commented out in its own template) and the
+Maize Mapping Project, whose controller `302`s to `curation.maizegdb.org`,
+which `502`s. **A directory whose entries 502 is worse than one that does not
+list them.**
+
+Their placeholder pages are untouched and still serve: `/mgdp` and
+`/maizemap` under `controllers/documentation/`, and `/maizeprojects` under
+`controllers/community/`, all three of which render an "under construction"
+image. Retiring them is separate work — see `## Retiring pages`.
+
+Three inbound links were repointed at the same time:
+
+| File | Was | Now |
+| --- | --- | --- |
+| `templates/home/megamenu_modern/about.bau` | About → Learn → **Documentation** → `/doc` | **Research projects** → `/projects` |
+| `templates/home/megamenu/about.bau` | Helpful Links → **Project documentation** → `/doc` | **Research projects** → `/projects` |
+| `templates/home/megamenu/community.bau` | Resources → **Project documentation** → `/documentation/projects` | **Research projects** → `/projects` |
+
+`templates/static/ssr_protocols-content.bau` carried a fourth, in the trail
+across the top of `/ssr_protocols`: "Project Documentation & Protocols: Maize
+Mapping Project: SSR Protocols", where the first link was `/doc` and the second
+was `archive.maizegdb.org`. Both were broken. The Maize Mapping Project is now
+named without a link, because there is nowhere working to send anyone.
+
+On the site map the entry moved section as well as name: `/doc` was under
+**Documentation and help**, which is where documentation of the site itself
+belongs; **Research projects** is under **Community and people**. Counts went
+11 → 12 and 13 → 13 (one out, the schema PDF in). Edit
+`tools/sitemap_data.py` and regenerate — and note that regenerating reverts
+hand edits made straight to the `.bau`, which is how the `/handyref` entry,
+renamed to "Genetic maps" on the server on 2026-09-04, came back as "Handy
+reference" the first time. It is in the model now.
 
 ### The first one: `/projects/interpro_domain_atlas`
 
