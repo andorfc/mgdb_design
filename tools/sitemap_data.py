@@ -74,10 +74,8 @@ SECTIONS = [
         ("Foldseek search", "/foldseek", "Fast comparisons against large protein structure sets."),
         ("Fusarium Protein Toolkit", "https://fusarium.maizegdb.org", "Tools and datasets for the functions and structures of the Fusarium proteome."),
         ("GBrowse genome browsers", "/gbrowse", "Older browser hosting B73 v1-v4, NRGene W22, and other historic assemblies."),
-        ("GBS genotyping data", "/gbs", "Genotyping-by-sequencing datasets, served from the Panzea genotype tools."),
         ("Genome Context Viewer", "https://gcv.maizegdb.org", "Explore gene families in genomic context across multiple assemblies."),
         ("GenomeQC", "https://genomeqc.maizegdb.org/", "Assess genome assembly and gene model annotation quality."),
-        ("Genotype viewer", "/genotype", "SNPs and indels for the maize inbreds used in each genotyping experiment."),
         ("JBrowse genome browsers", "https://jbrowse.maizegdb.org", "The GBrowse replacement, hosting B73 v5 and most assemblies here."),
         ("JBrowse 2 tutorial", "/genome/jbrowse2_tutorial", "How to drive the JBrowse 2 interface."),
         ("Maize Feature Store", "https://mfs.maizegdb.org/", "Central repository of raw and transformed data, suited to machine learning."),
@@ -132,13 +130,14 @@ SECTIONS = [
     # the Data hubs list entry for entry.
 
     ("community", "community", "Community and people", "", [
+        ("Research projects", "/projects", "Every maize research project with data, results, or documentation here."),
         ("Find researchers", "/person", "Search the MaizeGDB people directory."),
         ("Maize Genetics Conference", "/maize_meeting", "Past, present, and future annual meetings."),
         ("Meeting cover art", "/maize_meeting_coverart", "Cover art from past meeting programs."),
-        ("Maize Genetics Cooperation", "/cooperators", "The organization coordinating maize research cooperation."),
+        ("Maize Genetics Cooperation", "https://www.maizegenetics.org", "The organization coordinating maize research cooperation."),
         ("MGEC", "/mgec", "Maize Genetics Executive Committee."),
         ("Steering committee", "/steering_committee", "Committee membership and role."),
-        ("Awards", "/community/awards", "Maize Genetics Cooperation awards."),
+        ("Awards", "https://www.maizegenetics.org/awards/community-awards", "Maize Genetics Cooperation community awards."),
         ("McClintock Prize", "/mcclintockprize", "The McClintock Prize for Plant Genetics and Genome Studies."),
         ("Jobs", "/jobs", "Positions shared with MaizeGDB."),
         ("Order stocks from the Stock Center", "/ordering/coop_order", "Request seed from the Maize Genetics Cooperation Stock Center."),
@@ -149,8 +148,8 @@ SECTIONS = [
         ("Reference search", "/data_center/reference", "Search the curated maize literature."),
         ("Maize Newsletter (MNL)", "/mnl", "Every issue since 1929."),
         ("Editorial board picks", "/hot_new_papers", "A recommended paper each month."),
-        ("Classic papers", "/classic_reads", "Influential papers in maize genetics."),
-        ("Videos", "/community/videos", "Talks and pollination demonstrations."),
+        ("Classic papers", "/maize_history#history-classic-reads", "Influential papers in maize genetics."),
+        ("Videos", "/community/videos", "Recorded talks on the history of maize genetics, and six demonstrations of controlled pollination."),
         ("Controlled pollination of maize", "/controlled_pollination", "How to make controlled crosses, with video demonstrations."),
         ("NCGA podcasts", "/podcast", "National Corn Growers Association podcasts, 2012-2013."),
         ("Maize history and timelines", "/maize_history", "A century of maize genetics, and the history of MaizeGDB."),
@@ -159,9 +158,14 @@ SECTIONS = [
     ]),
 
     ("docs", "community", "Documentation and help", "", [
-        ("Project documentation", "/doc", "Pages maintained for major maize research projects."),
-        ("FAQs", "/faq", "Frequently asked questions."),
-        ("Handy reference", "/handyref", "Quick reference for the genetic maps held here."),
+        # "Project documentation" pointed at /doc, retired 2026-09-05. Its
+        # subject moved to "Research projects" under Community and people;
+        # what is left here is documentation of the site itself, which is what
+        # the section name has always promised.
+        # Renamed in the emitted .bau on 2026-09-04 when /handyref itself became
+        # "Genetic maps at MaizeGDB"; carried back into the model here so a
+        # regeneration stops reverting it.
+        ("Genetic maps", "/handyref", "The handy reference to the genetic maps held here: the composite map, the IBM panel, the Neighbors maps and NAM."),
         ("Nomenclature", "/nomenclature", "Maize genetics nomenclature rules."),
         ("Nomenclature service", "https://nomenclature.maizegdb.org", "Check or request standard names for genes, alleles, and stocks."),
         ("Assembly and annotation nomenclature", "/nomenclature_summary", "Naming for assemblies and annotations."),
@@ -173,6 +177,9 @@ SECTIONS = [
         ("Coordinate definitions", "/coordinateDef", "How map coordinates are defined here."),
         ("FAIR practices", "/FAIRpractices", "FAIR and AI-readiness at MaizeGDB."),
         ("Redesign status", "/redesign_status", "Which pages have moved to the current design."),
+        # /doc was this file's only route. It is real, current documentation of
+        # the back end, so it moves here rather than going with the page.
+        ("Database schema", "/docs/MaizeGDBSchema.pdf", "The schema of the database behind MaizeGDB, as a PDF."),
     ]),
 
     ("download", "curated", "Downloads", "", [
@@ -192,13 +199,9 @@ SECTIONS = [
         ("SSR markers", "/data_center/ssr", "SSR marker archive."),
         ("QTL", "/data_center/qtl", "Quantitative trait loci, from the older mapping literature."),
         ("Recombination maps", "/data_center/RNmaps", "Recombination nodule maps."),
-        ("Incongruency tool", "/incongruency", "B73 v2 sequence order compared against the ISU Integrated IBM 2009 genetic map."),
-        ("Locus lookup", "/locus_lookup", "Find the location of a gene on the B73 assembly."),
-        ("Locus pair lookup", "/locus_pair_lookup", "Chromosomal coordinates bounding two named loci."),
-        ("Locus summary table", "/locus_summary_table", "Loci listed by chromosome."),
         ("MapMan add-ons", "/mapman", "MaizeGDB mappings for the MapMan pathway visualization tool."),
         ("MapMan two-tissue comparison", "/mapman_two_tissue_comp", "Compare expression between two tissues in MapMan."),
-        ("SSR reports", "/ssrreports", "Reports across SSR marker sets."),
+        ("SSR reports", "/ssrreports", "Every archived SSR record carrying a repeat motif, and the SSRs derived from mapped genes."),
         ("IBM map scores", "/mapscore_ibmlist", "Scored IBM mapping data."),
         ("IBM 302 list", "/mapscore_ibm302list", "IBM 302 line list."),
     ]),
@@ -209,7 +212,6 @@ SECTIONS = [
         ("Cite us", "/cite", ""),
         ("Contact us", "/contact", ""),
         ("Send feedback", "/feedback", ""),
-        ("Credits", "/credit", ""),
         ("AgBioData member", "https://www.agbiodata.org", ""),
     ]),
 

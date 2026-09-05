@@ -35,10 +35,16 @@
   // NOTE: CONTROLLER, PAGE and ID are set in controller.php
   logMessage("pan_gene_center.php: CONTROLLER: " . CONTROLLER . ", PAGE: " . PAGE . ", ID: " . ID);
 
-  // Hack! Make "/pan_gene_center/" a valid URL
-  if (!PAGE || PAGE == '') {
-    $gene_search_url = $system['root_url'] . '/pan_gene_center/pan_gene';
-    header("Location: $gene_search_url\n\n");
+  /* The same missing exit as controllers/gene_center.php had. This file has no
+     require() to fall into, so instead of a fatal it rendered the whole
+     pan-gene search page -- 124 KB -- into the body of a 302 that is thrown
+     away on arrival. Permanent, and a path rather than $system['root_url'], for
+     the same reasons given there.
+
+     Rollback: restore the three lines this replaced. */
+  if (PAGE === null || PAGE === '') {
+    header('Location: /pan_gene_center/pan_gene', true, 301);
+    exit;
   }
 
   /* The pan-gene search page is modernized.

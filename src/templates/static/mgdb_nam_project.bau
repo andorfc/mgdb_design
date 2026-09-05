@@ -2,7 +2,7 @@ $$SYNTAX-LEVEL 2
 *(mgdb-nam-project
 <a class="mgdb-skip-link" href="#nam-main">Skip to main content</a>
 
-<main class="mgdb-page mgdb-nam-project-page" id="nam-main">
+<main class="mgdb-page mgdb-hub-page mgdb-nam-project-page" id="nam-main">
 
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
     <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/genome">Genomes</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">NAM Parent Assemblies</span>
@@ -54,9 +54,13 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="nam-assemblies-title">Assemblies</h2></div>
     </div>
 
-    <div class="mgdb-panel">
 <!-- FILTER & SEARCH TOOLBAR -->
     <div class="nam-table-toolbar">
+      <div class="nam-search-wrap">
+        <label for="nam-search-input" class="mgdb-visually-hidden">Search NAM assemblies</label>
+        <input type="text" id="nam-search-input" class="mgdb-input nam-search-input" placeholder="Search line, subpopulation, PI, stock, or accession..." autocomplete="off" spellcheck="false" />
+      </div>
+
       <div class="nam-filter-chips-wrap" role="group" aria-label="Filter by subpopulation">
         <span class="nam-toolbar-label">Subpopulation&#58;</span>
         <button type="button" class="nam-chip is-active" data-subpop-filter="all">All \(26\)</button>
@@ -66,11 +70,6 @@ $$SYNTAX-LEVEL 2
         <button type="button" class="nam-chip nam-chip-mixed" data-subpop-filter="mixed">Mixed \(3\)</button>
         <button type="button" class="nam-chip nam-chip-popcorn" data-subpop-filter="popcorn">Popcorn \(1\)</button>
         <button type="button" class="nam-chip nam-chip-sweet" data-subpop-filter="sweet-corn">Sweet Corn \(2\)</button>
-      </div>
-
-      <div class="nam-search-wrap">
-        <label for="nam-search-input" class="mgdb-visually-hidden">Search NAM assemblies</label>
-        <input type="text" id="nam-search-input" class="mgdb-input nam-search-input" placeholder="Search line, subpopulation, PI, stock, or accession..." autocomplete="off" spellcheck="false" />
       </div>
     </div>
 
@@ -665,7 +664,6 @@ $$SYNTAX-LEVEL 2
         </tbody>
       </table>
     </div>
-  </div>
 
   </section>
 
@@ -675,7 +673,6 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="nam-subpop-title">Subpopulations</h2></div>
     </div>
 
-    <div class="mgdb-panel">
 <div class="nam-subpop-grid">
       <!-- Stiff Stalk -->
       <article class="nam-subpop-card">
@@ -755,7 +752,6 @@ $$SYNTAX-LEVEL 2
         </div>
       </article>
     </div>
-  </div>
 
   </section>
 
@@ -765,75 +761,9 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="nam-pub-title">Publications</h2></div>
     </div>
 
-    <div class="mgdb-panel">
-      <div class="nam-publications-grid">
-      <!-- Publication 1: Hufford et al. 2021 -- the paper describing these
-           assemblies and their annotations, so the one to cite for the data -->
-      <article class="nam-pub-card">
-        <div class="nam-pub-meta-top">
-          <span class="nam-pub-journal-badge">Science &bull; 2021</span>
-          <span class="nam-pub-doi">DOI&#58; 10.1126/science.abg5289</span>
-        </div>
-        <h3 class="nam-pub-title">De novo assembly, annotation, and comparative analysis of 26 diverse maize genomes</h3>
-        <p class="nam-pub-authors">Matthew B. Hufford, Arun S. Seetharam, Margaret R. Woodhouse, Kapeel Chougule, Fang Ou, Jianing Liu, Scott T. Higgins, John L. Portwood II, Carson M. Andorf, et al. \(NAM Consortium\)</p>
-        <p class="nam-pub-citation"><em>Science</em> 2021 Aug 6; 373\(6555\)&#58;655&ndash;662.</p>
-        
-        <div class="nam-pub-abstract-wrap">
-          <h4 class="nam-pub-abstract-heading">Abstract</h4>
-          <p class="nam-pub-abstract-text">Maize is an important crop with extraordinary levels of genetic and phenotypic diversity. To understand this diversity, we produced de novo chromosome-scale genome assemblies for 26 inbred lines representing the founders of the nested association mapping population. Comparative analyses revealed that although the genome architecture is broadly conserved, the maize pan-genome contains substantial structural variation, with thousands of genes exhibiting presence-absence variation or copy number variation across lines. We identified widespread structural diversity in intergenic regulatory regions, demonstrating how transposable element proliferation and local sequence divergence shape the transcriptional landscape and phenotypic diversity of modern maize.</p>
-        </div>
-
-        <div class="nam-pub-actions">
-          <a class="mgdb-button mgdb-button-primary" href="https://www.science.org/doi/10.1126/science.abg5289" target="_blank" rel="noopener">Full Text on Science &#8599;</a>
-          <a class="mgdb-button mgdb-button-secondary" href="https://pubmed.ncbi.nlm.nih.gov/34353948/" target="_blank" rel="noopener">PubMed 34353948 &#8599;</a>
-          <a class="mgdb-button mgdb-button-quiet" href="/data_center/reference?id=9023933">MaizeGDB Record</a>
-        </div>
-      </article>
-
-      <!-- Publication 2: McMullen et al. 2009 -->
-      <article class="nam-pub-card">
-        <div class="nam-pub-meta-top">
-          <span class="nam-pub-journal-badge">Science &bull; 2009</span>
-          <span class="nam-pub-doi">DOI&#58; 10.1126/science.1174320</span>
-        </div>
-        <h3 class="nam-pub-title">Genetic Properties of the Maize Nested Association Mapping Population</h3>
-        <p class="nam-pub-authors">Michael D. McMullen, Stephen Kresovich, Hector Sanchez Villeda, Peter Bradbury, Huihui Li, Qi Sun, Sherry Flint-Garcia, Jeffrey Thornsberry, Charlotte Acharya, Christopher Bottoms, et al.</p>
-        <p class="nam-pub-citation"><em>Science</em> 2009 Aug 7; 325\(5941\)&#58;737&ndash;740.</p>
-        
-        <div class="nam-pub-abstract-wrap">
-          <h4 class="nam-pub-abstract-heading">Abstract</h4>
-          <p class="nam-pub-abstract-text">Nested association mapping \(NAM\) takes advantage of both historical recombination events and structured biparental crosses to provide high statistical power and high resolution for dissecting complex quantitative traits. The maize NAM population consists of 25 recombinant inbred line \(RIL\) families with 200 lines each \(5,000 RILs total\) crossed to the common parent B73. We characterized recombination landscapes and genetic architecture across the population, demonstrating the utility of NAM for high-resolution QTL mapping in crops.</p>
-        </div>
-
-        <div class="nam-pub-actions">
-          <a class="mgdb-button mgdb-button-primary" href="https://www.science.org/doi/10.1126/science.1174320" target="_blank" rel="noopener">Full Text on Science &#8599;</a>
-          <a class="mgdb-button mgdb-button-secondary" href="https://pubmed.ncbi.nlm.nih.gov/19661427/" target="_blank" rel="noopener">PubMed 19661427 &#8599;</a>
-        </div>
-      </article>
-
-      <!-- Publication 3: Yu et al. 2008 -->
-      <article class="nam-pub-card">
-        <div class="nam-pub-meta-top">
-          <span class="nam-pub-journal-badge">Genetics &bull; 2008</span>
-          <span class="nam-pub-doi">DOI&#58; 10.1534/genetics.107.074245</span>
-        </div>
-        <h3 class="nam-pub-title">Genetic Design and Statistical Power of a Nested Association Mapping Population in Maize</h3>
-        <p class="nam-pub-authors">Jianming Yu, James B. Holland, Michael D. McMullen, Edward S. Buckler</p>
-        <p class="nam-pub-citation"><em>Genetics</em> 2008 Jan; 178\(1\)&#58;539&ndash;551.</p>
-        
-        <div class="nam-pub-abstract-wrap">
-          <h4 class="nam-pub-abstract-heading">Abstract</h4>
-          <p class="nam-pub-abstract-text">We evaluate the genetic properties and statistical power of the Nested Association Mapping \(NAM\) strategy. By nesting diverse parental lines into a reference design, NAM integrates the benefits of linkage analysis with association mapping, circumventing allele frequency limitations and population structure confounding.</p>
-        </div>
-
-        <div class="nam-pub-actions">
-          <a class="mgdb-button mgdb-button-primary" href="https://doi.org/10.1534/genetics.107.074245" target="_blank" rel="noopener">Full Text on Genetics &#8599;</a>
-          <a class="mgdb-button mgdb-button-secondary" href="https://pubmed.ncbi.nlm.nih.gov/18202393/" target="_blank" rel="noopener">PubMed 18202393 &#8599;</a>
-        </div>
-      </article>
+    <div class="mgdb-ref-list">
+      $(reference_cards)
     </div>
-  </div>
-
   </section>
 
   <!-- SECTION 4: DATA HOSTED AT MAIZEGDB -->
@@ -842,7 +772,6 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="nam-hosted-title">Hosted data</h2></div>
     </div>
 
-    <div class="mgdb-panel">
 <div class="nam-hosted-grid">
       <!-- 1: JBrowse 2 -->
       <article class="nam-hosted-card">
@@ -924,7 +853,6 @@ $$SYNTAX-LEVEL 2
         </a>
       </div>
     </div>
-  </div>
 
   </section>
 
@@ -934,7 +862,6 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="nam-faqs-title">FAQs</h2></div>
     </div>
 
-    <div class="mgdb-panel">
 <div class="mgdb-card-grid nam-faqs-grid">
       <!-- FAQ 1: What is NAM -->
       <article class="mgdb-card">
@@ -964,7 +891,6 @@ $$SYNTAX-LEVEL 2
         <p>If you encounter sequence anomalies, scaffold misorientations, or questionable gene annotations in any NAM assembly, you can submit an issue report directly to MaizeGDB curators via the <a href="/curation/GenomeIssue/edit">Genome Issue Curation Form &#8599;</a> to assist ongoing community curation.</p>
       </article>
     </div>
-  </div>
 
   </section>
 
@@ -974,11 +900,10 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="nam-metrics-title">Metrics</h2></div>
     </div>
 
-    <div class="mgdb-panel">
 <div class="mgdb-metric-grid">
       <article class="mgdb-metric">
         <div class="mgdb-metric-top">
-          <h3>Founder Genomes</h3>
+          <h3>Founder genomes</h3>
           <span class="mgdb-metric-badge">PacBio</span>
         </div>
         <div class="mgdb-metric-stat">
@@ -989,7 +914,7 @@ $$SYNTAX-LEVEL 2
 
       <article class="mgdb-metric">
         <div class="mgdb-metric-top">
-          <h3>Mapping Lines</h3>
+          <h3>Mapping lines</h3>
           <span class="mgdb-metric-badge">COOP RILs</span>
         </div>
         <div class="mgdb-metric-stat">
@@ -1000,7 +925,7 @@ $$SYNTAX-LEVEL 2
 
       <article class="mgdb-metric">
         <div class="mgdb-metric-top">
-          <h3>SNP Markers</h3>
+          <h3>SNP markers</h3>
           <span class="mgdb-metric-badge">GBS / HapMap</span>
         </div>
         <div class="mgdb-metric-stat">
@@ -1011,7 +936,7 @@ $$SYNTAX-LEVEL 2
 
       <article class="mgdb-metric">
         <div class="mgdb-metric-top">
-          <h3>Genetic Maps</h3>
+          <h3>Genetic maps</h3>
           <span class="mgdb-metric-badge">Chromosomes</span>
         </div>
         <div class="mgdb-metric-stat">
@@ -1020,46 +945,39 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Curated linkage maps indexed in the MaizeGDB Map Viewer for all 10 chromosomes.</p>
       </article>
     </div>
-  </div>
 
   </section>
 
   <!-- SECTION 7: CONNECTED GENOMICS RESOURCES -->
-  <section id="nam-related" aria-labelledby="nam-related-title">
+  <section id="nam-related" class="mgdb-hub-related" aria-labelledby="nam-related-title">
     <div class="mgdb-section-heading">
       <div><h2 id="nam-related-title">Related resources</h2></div>
     </div>
 
-    <div class="mgdb-panel nam-bottom-section">
-<div class="nam-related-grid">
-      <a class="nam-related-card" href="/assembly">
-        <div class="nam-related-title">B73 Reference Assembly</div>
-        <p class="nam-related-desc">Explore release histories \(v1&ndash;v5\), chromosome accessions, and assembly statistics.</p>
-      </a>
-
-      <a class="nam-related-card" href="/PanAnd_project">
-        <div class="nam-related-title">Pan-Andropogoneae Genomes</div>
-        <p class="nam-related-desc">Assemblies for wild relatives and outgroup panicoid grasses across the Andropogoneae tribe.</p>
-      </a>
-
-      <a class="nam-related-card" href="/genomebrowser">
-        <div class="nam-related-title">Genome Browser Hub</div>
-        <p class="nam-related-desc">Launch JBrowse 2 linear and synteny comparison views across maize assemblies.</p>
-      </a>
-
-      <a class="nam-related-card" href="/genetic_variation">
-        <div class="nam-related-title">Genetic Variation Center</div>
-        <p class="nam-related-desc">Explore SNP matrices, HapMap datasets, and structural variant tracks.</p>
-      </a>
-
-
-      <a class="nam-related-card" href="/data_center">
-        <div class="nam-related-title">All Data Hubs</div>
-        <p class="nam-related-desc">Discover the complete catalog of MaizeGDB data hubs, tools, and databases.</p>
-      </a>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/assembly">
+          <strong>B73 Reference Assembly</strong>
+          <span>Explore release histories \(v1&ndash;v5\), chromosome accessions, and assembly statistics</span>
+        </a>
+        <a href="/PanAnd_project">
+          <strong>Pan-Andropogoneae Genomes</strong>
+          <span>Assemblies for wild relatives and outgroup panicoid grasses across the Andropogoneae tribe</span>
+        </a>
+        <a href="/genomebrowser">
+          <strong>Genome Browser Hub</strong>
+          <span>Launch JBrowse 2 linear and synteny comparison views across maize assemblies</span>
+        </a>
+        <a href="/genetic_variation">
+          <strong>Genetic Variation Center</strong>
+          <span>Explore SNP matrices, HapMap datasets, and structural variant tracks</span>
+        </a>
+        <a href="/data_center">
+          <strong>All Data Hubs</strong>
+          <span>Discover the complete catalog of MaizeGDB data hubs, tools, and databases</span>
+        </a>
+      </div>
     </div>
-  </div>
-
   </section>
 </main>
 )

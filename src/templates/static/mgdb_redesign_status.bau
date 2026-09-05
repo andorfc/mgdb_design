@@ -16,7 +16,6 @@ $$SYNTAX-LEVEL 2
       </svg>
     </span>
     <div>
-      <span class="mgdb-eyebrow">Page modernization standard</span>
       <h1 id="redesign-status-title">Redesign status</h1>
       <p>Every URL MaizeGDB exposes to the web, and whether it is on the modern interface or still on the old one. Measured from the codebase on this instance, not from a hand-kept list.</p>
       <p class="mgdb-small mgdb-muted">Last measured $(generated). $(evidence-note)</p>
@@ -26,10 +25,9 @@ $$SYNTAX-LEVEL 2
   <section aria-labelledby="redesign-status-summary-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Where it stands</span>
         <h2 id="redesign-status-summary-title">The whole site</h2>
       </div>
-      <p>A page counts as modern when it opts in to the modern document shell and loads the shared design system. Partial means it has one of the two and not the other.</p>
+      <p>A page counts as modern when it opts in to the modern document shell and loads the shared design system. Partial means it has one of the two and not the other. Retired means the URL still answers, with a permanent redirect to wherever its content went, but has no page of its own &#8212; so it is counted out of the percentage rather than against it.</p>
     </div>
 
     <div class="mgdb-metric-grid">
@@ -41,7 +39,7 @@ $$SYNTAX-LEVEL 2
       <div class="mgdb-metric">
         <span class="mgdb-label">Modern</span>
         <span class="mgdb-metric-value">$(modern-count)</span>
-        <span class="mgdb-small mgdb-muted">$(percent-modern)% of the site</span>
+        <span class="mgdb-small mgdb-muted">$(percent-modern)% of the pages that still exist</span>
       </div>
       <div class="mgdb-metric mgdb-metric-quiet">
         <span class="mgdb-label">Partial</span>
@@ -53,6 +51,11 @@ $$SYNTAX-LEVEL 2
         <span class="mgdb-metric-value">$(legacy-count)</span>
         <span class="mgdb-small mgdb-muted">Untouched</span>
       </div>
+      <div class="mgdb-metric mgdb-metric-quiet">
+        <span class="mgdb-label">Retired</span>
+        <span class="mgdb-metric-value">$(retired-count)</span>
+        <span class="mgdb-small mgdb-muted">Routes kept as a redirect, with no page left</span>
+      </div>
     </div>
 
     <div class="status-overall">
@@ -61,6 +64,7 @@ $$SYNTAX-LEVEL 2
         <span class="status-key status-key-modern">Modern</span>
         <span class="status-key status-key-partial">Partial</span>
         <span class="status-key status-key-legacy">Legacy</span>
+        <span class="status-key status-key-retired">Retired</span>
       </p>
     </div>
   </section>
@@ -68,7 +72,6 @@ $$SYNTAX-LEVEL 2
   <section aria-labelledby="redesign-status-category-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">By area</span>
         <h2 id="redesign-status-category-title">Progress by category</h2>
       </div>
       <p>The data hubs are the largest single block of work and the most linked-to part of the site, so they move the total more than anything else on this list.</p>
@@ -83,6 +86,7 @@ $$SYNTAX-LEVEL 2
             <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Modern</button></th>
             <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Partial</button></th>
             <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Legacy</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Retired</button></th>
             <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Total</button></th>
             <th scope="col" data-sort="number"><button type="button">Progress</button></th>
           </tr>
@@ -97,7 +101,6 @@ $$SYNTAX-LEVEL 2
   <section aria-labelledby="redesign-status-next-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Priority</span>
         <h2 id="redesign-status-next-title">Work on these next</h2>
       </div>
       <p>Ranked by exposure: anything reachable from the mega menu first, then by how many places in the codebase link to it. Curation and internal pages are left out.</p>
@@ -127,7 +130,6 @@ $$SYNTAX-LEVEL 2
   <section aria-labelledby="redesign-status-orphans-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Nearly free</span>
         <h2 id="redesign-status-orphans-title">Built on the design system but not routed</h2>
       </div>
       <p>$(orphan-count) controllers are already written against the design system and nothing reaches them. Wiring one up is a guard in its parent controller rather than a rebuild.</p>
@@ -152,7 +154,6 @@ $$SYNTAX-LEVEL 2
   <section aria-labelledby="redesign-status-inventory-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Everything</span>
         <h2 id="redesign-status-inventory-title">Full inventory</h2>
       </div>
       <p>Search by URL, category, or the file that serves it. Filtering happens as you type and the filtered view can be shared from the address bar.</p>
@@ -211,7 +212,6 @@ $$SYNTAX-LEVEL 2
   <section aria-labelledby="redesign-status-hosts-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Outside this codebase</span>
         <h2 id="redesign-status-hosts-title">MaizeGDB applications on their own subdomain</h2>
       </div>
       <p>$(host-count) MaizeGDB subdomains are linked from the codebase. A visitor reads them as MaizeGDB, but they are separate applications with their own interfaces, so they sit outside the counts above and each is its own piece of work.</p>
@@ -253,7 +253,6 @@ $$SYNTAX-LEVEL 2
 
   <section class="mgdb-resource-panel" aria-labelledby="redesign-status-related-title">
     <div>
-      <span class="mgdb-eyebrow">Related</span>
       <h2 id="redesign-status-related-title">Where to start</h2>
       <p>Every modernized page is composed from the same components, so the pattern library is the first stop before rebuilding anything on this list.</p>
     </div>

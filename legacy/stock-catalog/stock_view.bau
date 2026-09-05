@@ -1,0 +1,237 @@
+*(stock-view
+<!-- STOCK VIEW -->
+<table cellpadding=0 cellspacing=0>
+  <tr>
+    <td>
+      <!-- Top heading-->
+      <div id="centercolumn_record">
+        <div align="right">
+          <a href="/">Home</a> > 
+          <a href="/bin_viewer">Tools</a> > 
+          <a href="/bin_viewer">Stock Catalog</a> 
+          <input type="hidden" name="id" value="$(id)">
+        </div>
+        <br>
+        <table width='100%'  cellpadding=0 cellspacing=0>
+          <tr valign='center' class='green_curve_background'>
+            <td align='left'>
+              <img src='/images/header_left.gif'>
+            </td>
+            <td width='97%' valign='center' class='green_curve_background'>
+              $(title)
+            </td>
+            <td align='right'>
+              <img src='/images/header_right.gif'>
+            </td>
+          </tr>
+        </table>
+      </div> <!--centercolumn_record-->
+      
+      <div id="leftcolumn_record">
+        <div id="top"></div>
+        <!-- create left column sections-->
+        You can click on the record names in the menu on the right to obtain more detailed information about that particular stock or click on a link below for additional information.
+        <br><br>
+        $(main_link)
+        <br><a href="/stock_catalog/translocations">Reciprocal Translocations (comprehensive list\)</a>
+        <br><a href="/stock_catalog/RIL">Catalog of Intermated B73 x Mo17 Recombinant Inbred Populations</a>
+        <br><a href="https://maizecoopsc.org/nam-rils">Nested Association Mapping Recombinant Inbred Lines</a>
+        <br><a href="/stock_catalog/phenotype">Catalog of Stocks Characterized Only by Phenotype</a>
+<!-- no longer supported
+		    <br><a href="/rescuemu-phenotype">Maize Gene Discovery Project stock database</a>
+        <br><a href="/ems-phenotype">Maize Inflorescence Architecture Project stock database</a>
+-->
+        <br><a href="https://maizecoopsc.org/cornell-cytos">Catalog of Cornell Cytoplasm Stocks</a>
+        <br><a href="/stock_catalog/chromdb">Catalog of ChromDB Stocks</a>
+        <br>
+		
+        @(main_section
+          <a name="section_$(dom_id1)"></a>
+          <br>
+          <table width='100%' cellpadding=0 cellspacing=0>    
+            <tr valign='center' class='$(color1)_background'>
+              <td align='left'>
+                <img src='/images/$(color1)_lt.gif'>
+              </td>
+              <td width='97%' valign='center' class='$(color3)_background'></td>
+              <td valign='top' align="right"></td>
+              <td align='right'>
+                <img src='/images/$(color1)_rt.gif'>
+              </td>
+            </tr>
+            
+            <tr valign='center' class='$(color1)_background'>
+              <td colspan=3 align='left'>
+                <h2 class="subtitle">
+                  <span class="ec_icon">
+                    <a href="javascript:toggleItem\('$(dom_id1)'\)">
+                      <img id="$(dom_id1)_img" frameborder='no' border=0 src="/images/collapse.png">
+                    </a>
+                  <span>
+                  $(section_name)
+                </h2>
+                <div class="column_collapsible_section" id="$(dom_id1)" style="display:block;"></div>
+              </td>
+              <td valign='top' align="right">
+                <div class="calendar_Section" id="$(dom_var)" style="display:block;">
+                  &nbsp;&nbsp;&nbsp;
+                </div>
+              </td>
+            </tr>
+            
+            <tr valign='center' class='$(color1)_background'>
+              <td align='left'>
+                <img src='/images/$(color1)_lb.gif'>
+              </td>
+              <td width='97%' valign='center' class='$(color1)_background'></td>
+              <td valign='top' align="right"></td>
+              <td align='right'>
+                <img src='/images/$(color1)_rb.gif'>
+              </td>
+            </tr>
+          </table>
+        )
+      </div> <!--leftcolumn_record-->
+      
+      <!-- create right column sections-->
+      <div id="rightcolumn_record">
+      
+        <!-- create navigation menu-->
+        <table width='100%'  cellpadding=0 cellspacing=0>
+          <tr valign='center' class='$(navmenu_color)_background'>
+            <td align='left'>
+              <img src='/images/$(navmenu_color)_lt.gif'>
+            </td>
+            <td width='97%' valign='center' class='$(navmenu_color)_background'>
+            </td>
+            <td align='right'>
+              <img src='/images/$(navmenu_color)_rt.gif'>
+            </td>
+          </tr>
+          <tr valign='center' class='$(navmenu_color)_background'>
+            <td colspan=3 align='left'>
+              <ul class="record_navigation">    
+                @(nav_section
+                  <li><a class='seg' href="#$(nav_id0)">$(nav_name)</a></li>
+                )
+              </ul>
+            </td>
+          </tr>
+          <tr valign='center' class='$(navmenu_color)_background'>
+            <td align='left'>
+              <img src='/images/$(navmenu_color)_lb.gif'>
+            </td>
+            <td width='97%' valign='center' class='$(navmenu_color)_background'>
+            </td>
+            <td align='right'>
+              <img src='/images/$(navmenu_color)_rb.gif'>
+            </td>
+          </tr>
+          <tr><td height="15"><!-- section separator --></td></tr> 
+          
+          @(rcontent_section #display: off#
+          <tr valign='center' class='$(rcont_color)_background'>
+            <td align='left'>
+              <img src='/images/$(rcont_color)_lt.gif'>
+            </td>
+            <td width='97%' valign='center' class='$(rcont_color)_background'>
+            </td>
+            <td align='right'>
+              <img src='/images/$(rcont_color)_rt.gif'>
+            </td>
+          </tr>     
+          <tr valign='center' class='$(rcont_color)_background'>
+            <td colspan=3 align='left'>    
+                @(right_content
+                  &nbsp;&nbsp;<b>$(heading)</b><br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;$(content)    
+                )
+            </td>
+          </tr>
+           <tr valign='center' class='$(rcont_color)_background'>
+            <td align='left'>
+              <img src='/images/$(rcont_color)_lb.gif'>
+            </td>
+            <td width='97%' valign='center' class='$(rcont_color)_background'>
+            </td>
+            <td align='right'>
+              <img src='/images/$(rcont_color)_rb.gif'>
+            </td>
+          </tr>
+          )
+        </table>
+        <br>
+          
+        <!-- create quick summary section-->
+<!--
+        <table width='100%'  cellpadding=0 cellspacing=0>
+          <tr valign='center' class='$(countmenu_color)_background'>
+            <td align='left'>
+              <img src='/images/$(countmenu_color)_lt.gif'>
+            </td>
+            <td width='97%' valign='center' class='$(countmenu_color)_background'>
+            </td>
+            <td align='right'>
+              <img src='/images/$(countmenu_color)_rt.gif'>
+            </td>
+          </tr>
+          <tr valign='center' class='$(countmenu_color)_background'>
+            <td colspan=3 align='left'>    
+              <div id="quick_summary_section">
+                <table width="100%">
+                  <tr width="100%">
+                    <td width='50%'><div id="map_count_id"></div></td>
+                    <td width='50%'><div id="gp_count_id"></div></td>
+                  </tr><tr>
+                    <td><div id="bac_count_id"></div></td>
+                    <td><div id="est_count_id"></div></td>
+                  </tr><tr>
+                    <td><div id="overgos_count_id"></div></td>
+                    <td><div id="ssr_count_id"></div></td>
+                  </tr><tr>
+                    <td><div id="probe_count_id"></div></td>
+                    <td><div id="primer_count_id"></div></td>
+                  </tr><tr>
+                    <td><div id="rbac_count_id"></div></td>
+                    <td><div id="var_count_id"></div></td>
+                  </tr><tr>
+                    <td><div id="pheno_count_id"></div></td>
+                    <td><div id="rloci_count_id"></div></td>
+                  </tr><tr>
+                    <td><div id="gel_count_id"></div></td>
+                    <td><div id="mapscore_count_id"></div></td>
+                  </tr><tr>
+                    <td><div id="rec_count_id"></div></td>
+                    <td><div id="off_count_id"></div></td>
+                  </tr><tr>
+                    <td></td>
+                    <td><br><table align='right'><tr><td><img src="/images/updated_16.png"></td><td valign='center'><i>recently updated</i></td><tr></table></td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+          </tr>
+          <tr valign='center' class='$(countmenu_color)_background'>
+            <td align='left'>
+              <img src='/images/$(countmenu_color)_lb.gif'>
+            </td>
+            <td width='97%' valign='center' class='$(countmenu_color)_background'>
+            </td>
+            <td align='right'>
+              <img src='/images/$(countmenu_color)_rb.gif'>
+            </td>
+          </tr>
+        </table>
+	--!>	
+
+      </div><!--rightcolumn_record-->
+          
+    </td>
+  </tr>
+</table>
+
+<!-- SPECIFIC DATA VIEW -->
+
+*(specific-data-view)
+
+)

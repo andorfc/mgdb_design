@@ -87,11 +87,12 @@
  * Filter & Search Toolbar
  * -------------------------------------------------------------------------- */
 
+/* The search field takes its own row above the filters, as it does on every
+   hub. Side by side in one wrapping flex row the chips claimed the width and
+   shrank the field to 180px -- below its own 280px basis, since flex-shrink
+   applies to the basis too. */
 .mgdb-caas-fil-project-page .caas-table-toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
+  display: grid;
   gap: var(--mgdb-space-3);
   margin-bottom: var(--mgdb-space-3);
 }
@@ -135,13 +136,12 @@
 }
 
 .mgdb-caas-fil-project-page .caas-search-wrap {
-  flex: 1 1 280px;
-  max-width: 380px;
+  max-width: 640px;
 }
 
 .mgdb-caas-fil-project-page .caas-search-input {
   width: 100%;
-  height: 38px;
+  height: var(--mgdb-tap-target);
   padding: 6px 12px;
   font-size: var(--mgdb-text-sm);
   border: 1px solid var(--mgdb-line);
@@ -457,98 +457,12 @@
 }
 
 /* --------------------------------------------------------------------------
- * Section 3: Publications (FORMATTED EXACTLY LIKE NAM)
+ * Publications
+ *
+ * The cards are the shared reference card now -- `.mgdb-ref*` in mgdb-hub.css,
+ * markup from include/references_lib.php, content from the DOIs the controller
+ * names. The page's own `.caas-pub-*` block was removed with it.
  * -------------------------------------------------------------------------- */
-
-.mgdb-caas-fil-project-page .caas-publications-grid {
-  display: grid;
-  gap: var(--mgdb-space-4);
-  margin-top: var(--mgdb-space-4);
-}
-
-.mgdb-caas-fil-project-page .caas-pub-card {
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  padding: var(--mgdb-space-5);
-  box-shadow: var(--mgdb-shadow-sm);
-}
-
-.mgdb-caas-fil-project-page .caas-pub-meta-top {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  align-items: center;
-  margin-bottom: var(--mgdb-space-2);
-}
-
-.mgdb-caas-fil-project-page .caas-pub-journal-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  background: #fef3c7;
-  color: #92400e;
-  border-radius: 9999px;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.mgdb-caas-fil-project-page .caas-pub-doi {
-  font-family: var(--mgdb-font-mono, monospace);
-  font-size: 11px;
-  color: var(--mgdb-muted);
-}
-
-.mgdb-caas-fil-project-page .caas-pub-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  line-height: 1.35;
-  color: var(--mgdb-burgundy);
-  margin: 0 0 var(--mgdb-space-2) 0;
-}
-
-.mgdb-caas-fil-project-page .caas-pub-authors {
-  font-size: var(--mgdb-text-sm);
-  color: var(--mgdb-ink);
-  margin: 0 0 var(--mgdb-space-1) 0;
-  line-height: 1.4;
-}
-
-.mgdb-caas-fil-project-page .caas-pub-citation {
-  font-size: var(--mgdb-text-xs);
-  color: var(--mgdb-muted);
-  margin: 0 0 var(--mgdb-space-3) 0;
-}
-
-.mgdb-caas-fil-project-page .caas-pub-abstract-wrap {
-  background: var(--mgdb-surface-alt);
-  border-left: 3px solid var(--mgdb-green);
-  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
-  padding: var(--mgdb-space-3) var(--mgdb-space-4);
-  margin-bottom: var(--mgdb-space-4);
-}
-
-.mgdb-caas-fil-project-page .caas-pub-abstract-heading {
-  font-size: var(--mgdb-text-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-  color: var(--mgdb-green-dark);
-  margin: 0 0 4px 0;
-}
-
-.mgdb-caas-fil-project-page .caas-pub-abstract-text {
-  font-size: var(--mgdb-text-xs);
-  line-height: 1.6;
-  color: var(--mgdb-ink-soft);
-  margin: 0;
-}
-
-.mgdb-caas-fil-project-page .caas-pub-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-}
-
 /* --------------------------------------------------------------------------
  * Section 4: Data Hosted at MaizeGDB Cards (NO ICONS, LIKE NAM)
  * -------------------------------------------------------------------------- */
@@ -694,10 +608,6 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .mgdb-caas-fil-project-page .caas-table-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
   .mgdb-caas-fil-project-page .caas-search-wrap {
     max-width: 100%;
   }

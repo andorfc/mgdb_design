@@ -31,12 +31,11 @@
   gap: var(--mgdb-space-4);
   align-items: center;
   padding: var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink) !important;
-  text-decoration: none;
-  box-shadow: var(--mgdb-shadow-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink);
+  box-shadow: var(--hub-shadow);
 }
 
 .mgdb-meeting-page .meeting-event-card:hover { border-color: var(--mgdb-gold-dark); background: var(--mgdb-surface-alt); }
@@ -45,14 +44,14 @@
    more than colour. */
 .mgdb-meeting-page .meeting-event-featured {
   border-left: 5px solid var(--mgdb-gold);
-  background: linear-gradient(135deg, var(--mgdb-gold-soft), var(--mgdb-surface) 70%);
+  background: linear-gradient(135deg, var(--mgdb-gold-soft), var(--hub-surface) 70%);
 }
 
 /* Venue photograph with the year over it. */
 .mgdb-meeting-page .meeting-event-visual {
   position: relative;
   display: grid;
-  width: 96px;
+  width: 150px;
   height: 96px;
   flex: none;
   place-items: center;
@@ -61,10 +60,15 @@
   background: var(--mgdb-green-dark);
 }
 
+/* The upcoming cards carry the meeting's own artwork now, as the previous page
+   did, and that artwork is a wide banner rather than a square photograph. It is
+   letterboxed rather than cropped: `cover` in the old 96px square cut a 231x84
+   banner down to its middle third. */
 .mgdb-meeting-page .meeting-event-visual img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  padding: 6px;
 }
 
 .mgdb-meeting-page .meeting-event-visual strong {
@@ -105,10 +109,10 @@
   grid-template-columns: auto minmax(0, 1fr);
   gap: var(--mgdb-space-4);
   padding: var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-top: 3px solid var(--mgdb-gold);
   border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
   box-shadow: var(--mgdb-shadow-sm);
 }
 
@@ -150,7 +154,7 @@
   padding: var(--mgdb-space-6) var(--mgdb-space-5);
   border-top: 1px solid var(--mgdb-line-soft);
   border-bottom: 1px solid var(--mgdb-line-soft);
-  background: linear-gradient(180deg, var(--mgdb-surface-alt), var(--mgdb-surface));
+  background: linear-gradient(180deg, var(--mgdb-surface-alt), var(--hub-surface));
 }
 
 .mgdb-meeting-page .meeting-chart-grid {
@@ -162,9 +166,9 @@
 .mgdb-meeting-page .meeting-chart-card {
   min-width: 0;
   padding: var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
   box-shadow: var(--mgdb-shadow-sm);
 }
 
@@ -181,49 +185,113 @@
 .mgdb-meeting-page .meeting-chart-card p { margin-top: var(--mgdb-space-1); color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
 .mgdb-meeting-page .meeting-chart { width: 100%; height: 320px; margin-top: var(--mgdb-space-3); }
 
-/* Milestones timeline ------------------------------------------------------ */
+/* Milestones timeline ------------------------------------------------------
+
+   Rebuilt 2026-09-03: this was a grid of cards, which is the one shape a
+   timeline should not be -- a row of equal boxes says these are categories,
+   not a sequence. The years now hang off a single rail, so the reader sees the
+   order and the gaps in it. Runs from the first meeting in 1959 to last year.
+
+   The rail is drawn on the <ol> rather than as a border on each <li>, so it
+   can stop short at both ends: a line that runs past the first and last node
+   implies a record that continues in both directions. */
 
 .mgdb-meeting-page .meeting-timeline {
   position: relative;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: var(--mgdb-space-3);
   margin: 0;
-  padding: 0;
+  padding: 0 0 0 var(--mgdb-space-6);
   list-style: none;
+}
+
+.mgdb-meeting-page .meeting-timeline::before {
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  left: 7px;
+  width: 2px;
+  background: linear-gradient(180deg, var(--mgdb-gold) 0%, #d8b878 55%, var(--hub-line) 100%);
+  content: "";
 }
 
 .mgdb-meeting-page .meeting-timeline li {
   position: relative;
-  min-width: 0;
-  padding: var(--mgdb-space-6) var(--mgdb-space-4) var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
+  display: grid;
+  grid-template-columns: 68px minmax(0, 1fr);
+  gap: var(--mgdb-space-4);
+  align-items: baseline;
+  padding: var(--mgdb-space-3) 0;
 }
 
+/* The node. Sits on the rail, not beside it, so the eye follows one line. */
 .mgdb-meeting-page .meeting-timeline li::before {
   position: absolute;
-  top: var(--mgdb-space-3);
-  left: var(--mgdb-space-4);
+  top: 20px;
+  left: calc(var(--mgdb-space-6) * -1 + 2px);
   width: 12px;
   height: 12px;
-  border: 3px solid var(--mgdb-surface);
+  border: 3px solid var(--hub-surface);
   border-radius: 50%;
   background: var(--mgdb-gold);
   box-shadow: 0 0 0 1px var(--mgdb-gold-dark);
   content: "";
 }
 
-.mgdb-meeting-page .meeting-timeline span { color: var(--mgdb-red); font-size: var(--mgdb-text-sm); font-weight: 900; letter-spacing: .06em; }
-.mgdb-meeting-page .meeting-timeline strong { display: block; margin-top: var(--mgdb-space-2); color: var(--mgdb-green-dark); font-size: var(--mgdb-text-base); }
-.mgdb-meeting-page .meeting-timeline small { display: block; margin-top: var(--mgdb-space-2); color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); line-height: var(--mgdb-leading-snug); }
+/* The three years that are not just another stop: the first meeting, the one
+   that did not happen, and the most recent. */
+/* Qualified with `li` on purpose: the node above is `... .meeting-timeline
+   li::before`, which carries a type selector, so a bare class here loses to it
+   and these three never paint. */
+.mgdb-meeting-page .meeting-timeline li.meeting-timeline-start::before,
+.mgdb-meeting-page .meeting-timeline li.meeting-timeline-end::before {
+  width: 16px;
+  height: 16px;
+  top: 18px;
+  left: calc(var(--mgdb-space-6) * -1);
+  background: var(--mgdb-green-dark);
+  box-shadow: 0 0 0 1px var(--mgdb-green-dark);
+}
+
+.mgdb-meeting-page .meeting-timeline li.meeting-timeline-break::before {
+  background: var(--hub-surface);
+  box-shadow: 0 0 0 2px var(--mgdb-red);
+}
+
+.mgdb-meeting-page .meeting-timeline-year {
+  color: var(--mgdb-red);
+  font-size: var(--mgdb-text-lg);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .02em;
+}
+
+.mgdb-meeting-page .meeting-timeline strong {
+  display: block;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-meeting-page .meeting-timeline small {
+  display: block;
+  margin-top: 2px;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-meeting-page .meeting-timeline-break strong { color: var(--mgdb-red); }
+
+@media (max-width: 600px) {
+  .mgdb-meeting-page .meeting-timeline li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+}
 
 /* Archive ------------------------------------------------------------------ */
 
 .mgdb-meeting-page .meeting-archive-tools {
   padding: var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius);
   background: var(--mgdb-surface-alt);
 }
@@ -238,7 +306,7 @@
   padding: 0 var(--mgdb-space-3);
   border: 1px solid #b9b2a5;
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
 }
 
 .mgdb-meeting-page .meeting-archive-search:focus-within { border-color: var(--mgdb-focus); }
@@ -280,7 +348,7 @@
   padding: var(--mgdb-space-1) var(--mgdb-space-4);
   border: 1px solid #c7bda8;
   border-radius: 999px;
-  background: var(--mgdb-surface);
+  background: var(--hub-surface);
   color: var(--mgdb-burgundy);
   font-family: inherit;
   font-size: var(--mgdb-text-sm);
@@ -313,24 +381,23 @@
   margin-top: var(--mgdb-space-4);
 }
 
-.mgdb-meeting-page .meeting-archive-grid a {
+.mgdb-meeting-page .meeting-archive-card {
   display: flex;
   min-width: 0;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink) !important;
-  text-decoration: none;
-  box-shadow: var(--mgdb-shadow-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink);
+  box-shadow: var(--hub-shadow);
 }
 
-.mgdb-meeting-page .meeting-archive-grid a:hover { border-color: var(--mgdb-gold-dark); }
+.mgdb-meeting-page .meeting-archive-card:hover { border-color: var(--mgdb-gold-dark); }
 
 /* A canceled meeting is marked by its placeholder text and reduced emphasis,
    never by colour alone. */
-.mgdb-meeting-page .meeting-archive-grid a.is-canceled { opacity: .78; }
+.mgdb-meeting-page .meeting-archive-card.is-canceled { opacity: .78; }
 
 .mgdb-meeting-page .meeting-archive-thumb {
   display: grid;
@@ -362,42 +429,10 @@
 .mgdb-meeting-page .meeting-archive-copy strong { margin-top: var(--mgdb-space-1); color: var(--mgdb-green-dark); font-size: var(--mgdb-text-base); }
 .mgdb-meeting-page .meeting-archive-copy small { margin-top: var(--mgdb-space-1); color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
 
-/* Closing resource panel --------------------------------------------------- */
-
-.mgdb-meeting-page .meeting-resources {
-  display: grid;
-  grid-template-columns: minmax(240px, .7fr) minmax(0, 1.3fr);
-  gap: var(--mgdb-space-6);
-  padding: var(--mgdb-space-6);
-  border-radius: var(--mgdb-radius-lg);
-  background: linear-gradient(125deg, #331315, #5b1a1c);
-  color: #fff;
-}
-
-.mgdb-meeting-page .meeting-resources .mgdb-eyebrow { color: #ffc65d; }
-.mgdb-meeting-page .meeting-resources h2 { color: #fff; }
-.mgdb-meeting-page .meeting-resources > div:first-child > p { margin-top: var(--mgdb-space-3); color: #f5dfe0; }
-.mgdb-meeting-page .meeting-resources :focus-visible { outline-color: #fff; }
-
-.mgdb-meeting-page .meeting-resources > div:last-child {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: var(--mgdb-space-3);
-}
-
-.mgdb-meeting-page .meeting-resources a {
-  display: block;
-  padding: var(--mgdb-space-4);
-  border: 1px solid rgba(255, 255, 255, .18);
-  border-radius: var(--mgdb-radius-sm);
-  background: rgba(255, 255, 255, .07);
-  color: #fff !important;
-  text-decoration: none;
-}
-
-.mgdb-meeting-page .meeting-resources a:hover { background: rgba(255, 255, 255, .14); }
-.mgdb-meeting-page .meeting-resources a strong { display: block; font-size: var(--mgdb-text-base); text-decoration: underline; }
-.mgdb-meeting-page .meeting-resources a span { display: block; margin-top: var(--mgdb-space-1); color: #eccfd1; font-size: var(--mgdb-text-sm); }
+/* The closing panel is the shell's green Related resources block now
+   (css/mgdb-hub.css), the same one every other hub ends with. It replaced a
+   dark burgundy panel of this page's own, which was the only one like it on
+   the site. */
 
 /* Responsive --------------------------------------------------------------- */
 
@@ -431,7 +466,7 @@
 .mgdb-meeting-page .meeting-photo-credits {
   margin-top: var(--mgdb-space-5);
   padding-top: var(--mgdb-space-3);
-  border-top: 1px solid var(--mgdb-line);
+  border-top: 1px solid var(--hub-line);
 }
 
 .mgdb-meeting-page .meeting-photo-credits > summary {
@@ -453,3 +488,233 @@
 
 .mgdb-meeting-page .meeting-photo-credits li + li { margin-top: var(--mgdb-space-2); }
 .mgdb-meeting-page .meeting-photo-credits strong { color: var(--mgdb-ink); }
+
+
+/* Review round, 2026-09-03 ------------------------------------------------
+
+   The metric number icons ("01" beside 68 annual meetings) are gone from the
+   markup, so the tone classes only carry the card edge now. */
+
+/* Upcoming meeting cards are no longer one big link -- they hold a link of
+   their own and an expander -- so the card is an <article> and only the real
+   links are links. */
+.mgdb-meeting-page .meeting-event-body { min-width: 0; }
+
+.mgdb-meeting-page .meeting-event-venue {
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-ink);
+  font-weight: 600;
+}
+
+.mgdb-meeting-page .meeting-event-dates,
+.mgdb-meeting-page .meeting-event-pending {
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-meeting-page .meeting-event-links { margin-top: var(--mgdb-space-3); }
+.mgdb-meeting-page .meeting-event-links a { font-weight: 700; }
+
+/* "More details" -- the steering committee, the local host and the ex-officio
+   members, which the previous page listed in full and this one had dropped.
+   Closed by default so two long name lists do not push the second meeting off
+   the screen. */
+.mgdb-meeting-page .meeting-event-details {
+  margin-top: var(--mgdb-space-3);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--hub-line);
+}
+
+.mgdb-meeting-page .meeting-event-details > summary {
+  cursor: pointer;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.mgdb-meeting-page .meeting-event-people {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-3);
+}
+
+.mgdb-meeting-page .meeting-event-people h4 {
+  margin: 0 0 var(--mgdb-space-2);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-meeting-page .meeting-event-people h4 + ul + h4 { margin-top: var(--mgdb-space-4); }
+
+.mgdb-meeting-page .meeting-event-people ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-meeting-page .meeting-event-people li { margin-bottom: 3px; color: var(--mgdb-ink); }
+.mgdb-meeting-page .meeting-event-people li span { color: var(--mgdb-muted); }
+.mgdb-meeting-page .meeting-event-people li span::before { content: " \2014 "; }
+
+/* Website and abstract book, the two links the archive list used to carry. */
+.mgdb-meeting-page .meeting-archive-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-3);
+}
+
+.mgdb-meeting-page .meeting-archive-link {
+  color: var(--mgdb-burgundy);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+
+/* Upcoming meeting cards, second pass -------------------------------------
+
+   The pair is the first thing on the page, so the two cards are built to the
+   same measurements: one banner band of the same height, then the same five
+   lines. The steering committee moved out from under the 2027 card -- an
+   expander on one card and an apology on the other is what made them look
+   uneven. */
+.mgdb-meeting-page .meeting-event-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.mgdb-meeting-page .meeting-event-visual {
+  width: 100%;
+  height: 104px;
+  border-radius: var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0 0;
+}
+
+.mgdb-meeting-page .meeting-event-visual img {
+  /* 231x84 native. Held at its own size rather than stretched across the card,
+     where a 400px-wide draw of a 231px image goes soft. */
+  width: auto;
+  height: auto;
+  max-width: 231px;
+  max-height: 84px;
+  padding: 0;
+  object-fit: none;
+}
+
+.mgdb-meeting-page .meeting-event-plate strong {
+  position: static;
+  padding: 0;
+  background: none;
+  color: #f6d99a;
+  font-size: 2.4rem;
+  font-weight: 900;
+  letter-spacing: .04em;
+}
+
+.mgdb-meeting-page .meeting-event-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  padding: var(--mgdb-space-4);
+}
+
+/* The link sits on the floor of both cards even when one venue line wraps. */
+.mgdb-meeting-page .meeting-event-links { margin-top: auto; padding-top: var(--mgdb-space-3); }
+
+.mgdb-meeting-page .meeting-leadership {
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-4);
+  border-top: 1px solid var(--hub-line);
+}
+
+.mgdb-meeting-page .meeting-leadership > summary {
+  cursor: pointer;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+/* Cover art ----------------------------------------------------------------
+
+   The thumbnails are all exactly 100px tall and between 71 and 238 wide, so
+   they are centred on a band at their own size rather than stretched to fill
+   one -- upscaling a 71px-wide cover to a card width is what would make this
+   section look worse than the legacy page it came from. The band is dark so a
+   cover with a white ground still reads as a card.
+
+   The link opens the full-size original, which for some years is very large
+   (2019 is 23 MB). See AD-054. */
+
+.mgdb-meeting-page .meeting-art-lead {
+  margin-bottom: var(--mgdb-space-4);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-meeting-page .meeting-art-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-meeting-page .meeting-art-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--hub-surface);
+  box-shadow: var(--hub-shadow);
+}
+
+.mgdb-meeting-page .meeting-art-card:hover { border-color: var(--mgdb-gold-dark); }
+
+.mgdb-meeting-page .meeting-art-thumb {
+  display: grid;
+  height: 132px;
+  place-items: center;
+  overflow: hidden;
+  background: var(--mgdb-green-dark);
+}
+
+.mgdb-meeting-page .meeting-art-thumb img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100px;
+}
+
+.mgdb-meeting-page .meeting-art-copy {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  padding: var(--mgdb-space-4);
+}
+
+.mgdb-meeting-page .meeting-art-year {
+  color: var(--mgdb-red);
+  font-size: var(--mgdb-text-lg);
+  font-weight: 900;
+}
+
+.mgdb-meeting-page .meeting-art-copy strong {
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-meeting-page .meeting-art-copy small {
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+/* The artist is the credit, so it sits on the floor of every card and the row
+   reads as one band rather than stepping with the length of each affiliation. */
+.mgdb-meeting-page .meeting-art-artist { margin-top: auto; padding-top: var(--mgdb-space-2); color: var(--mgdb-ink); }

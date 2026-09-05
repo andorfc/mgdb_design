@@ -142,7 +142,27 @@
   height: 15px;
 }
 
-/* ── Reference result card (matching Reference Data Hub) ─────────────── */
+/* ── The journal list ────────────────────────────────────────────────────
+
+   The cards are the shared reference card -- `.mgdb-ref`, rendered by
+   include/references_lib.php -- so nothing here restyles one. What the page
+   owns is how sixty of them are laid out: a column, or a grid, and an abstract
+   short enough that a reader can still scan the list.
+   ------------------------------------------------------------------------- */
+
+/* Sixty full abstracts would be most of the page. The well stays, clamped to a
+   few lines; the whole abstract is still in the document, and the card's own
+   Full text link is the way to the paper. The search reads data-search rather
+   than the card's text, so nothing matches on a line that is clipped. */
+.mgdb-cite-page .mgdb-ref-abstract p {
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* A year heading is a row of its own in either view. */
+.mgdb-cite-page .cite-journal-cards-wrapper > .mgdb-cite-year { grid-column: 1 / -1; }
 
 /* ── Card grid view modifier ─────────────────────────────────────────────── */
 
@@ -158,27 +178,25 @@
   margin-top: var(--mgdb-space-4);
 }
 
-.mgdb-cite-page .mgdb-cite-group[data-group="journal"].cite-view-card .reference-result-card + .reference-result-card {
-  margin-top: 0;
-}
-
-.mgdb-cite-page .mgdb-cite-group[data-group="journal"].cite-view-card .reference-result-card {
+.mgdb-cite-page .mgdb-cite-group[data-group="journal"].cite-view-card .mgdb-ref {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
 }
 
-.mgdb-cite-page .mgdb-cite-group[data-group="journal"].cite-view-card .reference-result-abstract {
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+/* Cards sit side by side here, so the actions line up along the bottom of the
+   row rather than wherever each abstract happens to end. */
+.mgdb-cite-page .mgdb-cite-group[data-group="journal"].cite-view-card .mgdb-ref-actions {
+  margin-top: auto;
+}
+
+.mgdb-cite-page .mgdb-cite-group[data-group="journal"].cite-view-card .mgdb-ref-abstract p {
+  -webkit-line-clamp: 3;
 }
 
 /* Responsive */
 @media (max-width: 767px) {
   .mgdb-cite-page p.mgdb-cite-entry { padding-left: 1.1em; text-indent: -1.1em; }
-  .mgdb-cite-page .reference-result-card { padding: var(--mgdb-space-4); }
+  .mgdb-cite-page .mgdb-ref { padding: var(--mgdb-space-4); }
   .mgdb-cite-page .mgdb-cite-group[data-group="journal"].cite-view-card .cite-journal-cards-wrapper {
     grid-template-columns: 1fr;
   }

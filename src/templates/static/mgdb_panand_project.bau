@@ -2,7 +2,7 @@ $$SYNTAX-LEVEL 2
 *(mgdb-panand-project
 <a class="mgdb-skip-link" href="#panand-main">Skip to main content</a>
 
-<main class="mgdb-page mgdb-panand-project-page" id="panand-main">
+<main class="mgdb-page mgdb-hub-page mgdb-panand-project-page" id="panand-main">
 
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
     <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/genome">Genomes</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Pan-Andropogoneae Project</span>
@@ -61,7 +61,6 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="panand-phylo-title">Phylogeny</h2></div>
     </div>
 
-    <div class="mgdb-panel">
 <div class="panand-phylo-content-wrap">
       <div class="panand-tree-img-box">
         <img src="/images/andropogoneae_tree.jpg" alt="Phylogenetic tree of the Andropogoneae grass tribe showing evolutionary divergence and sampled species" class="panand-tree-img" />
@@ -79,7 +78,6 @@ $$SYNTAX-LEVEL 2
         </div>
       </div>
     </div>
-  </div>
 
   </section>
 
@@ -89,33 +87,9 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="panand-pub-title">Publications</h2></div>
     </div>
 
-    <div class="mgdb-panel">
-<div class="panand-publications-grid">
-      <!-- Publication 1: Stitzer et al. 2025 \(bioRxiv\) -->
-      <article class="panand-pub-card">
-        <div class="panand-pub-meta-top">
-          <span class="panand-pub-journal-badge">bioRxiv &bull; 2025</span>
-          <span class="panand-pub-doi">DOI&#58; 10.1101/2025.01.22.633974</span>
-          <span class="panand-pub-award">NSF Award #1822330</span>
-        </div>
-        <h3 class="panand-pub-title">Extensive genome evolution distinguishes maize within a stable tribe of grasses</h3>
-        <p class="panand-pub-authors">Michelle C. Stitzer, Arun S. Seetharam, Armin Scheben, San-Kuo Hsu, Andrew J. Schulz, Tiffany AuBuchon-Elder, Matthew El-Walid, Tyler H. Ferebee, Christian O. Hale, Thien La, Zhi-Ying Liu, Samuel J. McMorrow, Philip Minx, Austin Phillips, Miranda Syring, Travis Wrightsman, Jiarui Zhai, Remy Pasquet, Colin McAllister, Simon Malcomber, Paweena Traiperm, Delanie Layton, Jane Zhong, Denise E. Costich, R. Kelly Dawe, Kevin Fengler, Carly Harris, Zachary Irelan, Victor Llaca, Preethi Parakkal, Gina Zastrow-Hayes, Margaret R. Woodhouse, Ethalinda K. Cannon, John L. Portwood II, Carson M. Andorf, Paul S. Albert, James A. Birchler, Adam Siepel, Jeffrey Ross-Ibarra, M. Cinta Romay, Elizabeth Kellogg, Edward S. Buckler, Matthew B. Hufford</p>
-        <p class="panand-pub-citation"><em>bioRxiv</em> 2025.01.22.633974; doi&#58; https&#58;//doi.org/10.1101/2025.01.22.633974</p>
-        
-        <div class="panand-pub-abstract-wrap">
-          <h4 class="panand-pub-abstract-heading">Abstract</h4>
-          <p class="panand-pub-abstract-text">Over the last 20 million years, the Andropogoneae tribe of grasses has evolved to dominate 17% of global land area. Domestication of these grasses in the last 10,000 years has yielded our most productive crops, including maize, sugarcane, and sorghum. The majority of Andropogoneae species, including maize, show a history of polyploidy &mdash; a condition that, while offering the evolutionary advantage of multiple gene copies, poses challenges to basic cellular processes, gene expression, and epigenetic regulation. Genomic studies of polyploidy have been limited by sparse sampling of taxa in groups with multiple polyploidy events. Here, we present 33 genome assemblies from 27 species, including chromosome-scale assemblies of maize relatives <em>Zea</em> and <em>Tripsacum</em>. In maize, the after-effects of polyploidy have been widely studied, showing reduced chromosome number, biased fractionation of duplicate genes, and transposable element \(TE\) expansions. While we observe these patterns within the genus <em>Zea</em>, 12 other polyploidy events deviate significantly. Those tetraploids and hexaploids retain elevated chromosome number, maintain nearly complete complements of duplicate genes, and have only stochastic TE amplifications. These genomes reveal variable outcomes of polyploidy, challenging simple predictions and providing a foundation for understanding its evolutionary implications in an ecologically and economically important clade.</p>
-        </div>
-
-        <div class="panand-pub-actions">
-          <a class="mgdb-button mgdb-button-primary" href="https://www.biorxiv.org/content/10.1101/2025.01.22.633974v1" target="_blank" rel="noopener">Read on bioRxiv &#8599;</a>
-          <a class="mgdb-button mgdb-button-secondary" href="https://nsf.gov/awardsearch/showAward?AWD_ID=1822330&HistoricalAwards" target="_blank" rel="noopener">NSF Award 1822330 &#8599;</a>
-          <a class="mgdb-button mgdb-button-quiet" href="https://panandropogoneae.com/" target="_blank" rel="noopener">PanAnd Consortium &#8599;</a>
-        </div>
-      </article>
+    <div class="mgdb-ref-list">
+      $(reference_cards)
     </div>
-  </div>
-
   </section>
 
   <!-- SECTION 1: INTERACTIVE ASSEMBLIES DIRECTORY TABLE -->
@@ -124,9 +98,13 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="panand-assemblies-title">Assemblies</h2></div>
     </div>
 
-    <div class="mgdb-panel">
 <!-- FILTER & SEARCH TOOLBAR -->
     <div class="panand-table-toolbar">
+      <div class="panand-search-wrap">
+        <label for="panand-search-input" class="mgdb-visually-hidden">Search PanAnd assemblies</label>
+        <input type="text" id="panand-search-input" class="mgdb-input panand-search-input" placeholder="Search assembly ID, species name, common name, or annotation..." autocomplete="off" spellcheck="false" />
+      </div>
+
       <div class="panand-filter-chips-wrap" role="group" aria-label="Filter by clade or release round">
         <span class="panand-toolbar-label">Filter&#58;</span>
         <button type="button" class="panand-chip is-active" data-filter="all">All \(36\)</button>
@@ -135,11 +113,6 @@ $$SYNTAX-LEVEL 2
         <button type="button" class="panand-chip panand-chip-grass" data-filter="grass">Andropogoneae Grasses \(22\)</button>
         <button type="button" class="panand-chip panand-chip-round1" data-filter="round1">Round 1 Release \(13\)</button>
         <button type="button" class="panand-chip panand-chip-round2" data-filter="round2">Round 2 Release \(23\)</button>
-      </div>
-
-      <div class="panand-search-wrap">
-        <label for="panand-search-input" class="mgdb-visually-hidden">Search PanAnd assemblies</label>
-        <input type="text" id="panand-search-input" class="mgdb-input panand-search-input" placeholder="Search assembly ID, species name, common name, or annotation..." autocomplete="off" spellcheck="false" />
       </div>
     </div>
 
@@ -789,7 +762,6 @@ $$SYNTAX-LEVEL 2
         </tbody>
       </table>
     </div>
-  </div>
 
   </section>
 
@@ -799,7 +771,6 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="panand-clades-title">Clades</h2></div>
     </div>
 
-    <div class="mgdb-panel">
 <div class="panand-clades-grid">
       <!-- Clade 1: Wild Zea / Teosintes -->
       <article class="panand-clade-card">
@@ -853,7 +824,6 @@ $$SYNTAX-LEVEL 2
         </div>
       </article>
     </div>
-  </div>
 
   </section>
 
@@ -863,7 +833,6 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="panand-hosted-title">Hosted data</h2></div>
     </div>
 
-    <div class="mgdb-panel">
 <div class="panand-hosted-grid">
       <!-- 1: JBrowse 2 -->
       <article class="panand-hosted-card">
@@ -893,7 +862,6 @@ $$SYNTAX-LEVEL 2
         <a class="mgdb-button mgdb-button-secondary" href="/popcorn/search/sequence_search/home.php?a=BLAST_UI">Launch Comparative Tools &#8599;</a>
       </article>
     </div>
-  </div>
 
   </section>
 
@@ -903,7 +871,6 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="panand-faqs-title">FAQs</h2></div>
     </div>
 
-    <div class="mgdb-panel">
 <div class="mgdb-card-grid panand-faqs-grid">
       <!-- FAQ 1: Project Scope -->
       <article class="mgdb-card">
@@ -933,7 +900,6 @@ $$SYNTAX-LEVEL 2
         <p>If you identify sequence anomalies, assembly gaps, or problematic gene annotations in any PanAnd genome, please submit a report to MaizeGDB curators via the <a href="/curation/GenomeIssue/edit">Genome Issue Curation Form &#8599;</a> to assist ongoing community curation.</p>
       </article>
     </div>
-  </div>
 
   </section>
 
@@ -943,11 +909,10 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="panand-metrics-title">Metrics</h2></div>
     </div>
 
-    <div class="mgdb-panel">
 <div class="mgdb-metric-grid">
       <article class="mgdb-metric">
         <div class="mgdb-metric-top">
-          <h3>Assembled Genomes</h3>
+          <h3>Assembled genomes</h3>
           <span class="mgdb-metric-badge">PacBio HiFi</span>
         </div>
         <div class="mgdb-metric-stat">
@@ -958,7 +923,7 @@ $$SYNTAX-LEVEL 2
 
       <article class="mgdb-metric">
         <div class="mgdb-metric-top">
-          <h3>Species Content</h3>
+          <h3>Species content</h3>
           <span class="mgdb-metric-badge">Gene / Regulatory</span>
         </div>
         <div class="mgdb-metric-stat">
@@ -969,7 +934,7 @@ $$SYNTAX-LEVEL 2
 
       <article class="mgdb-metric">
         <div class="mgdb-metric-top">
-          <h3>WGS Surveys</h3>
+          <h3>WGS surveys</h3>
           <span class="mgdb-metric-badge">Pan-Tribe</span>
         </div>
         <div class="mgdb-metric-stat">
@@ -980,7 +945,7 @@ $$SYNTAX-LEVEL 2
 
       <article class="mgdb-metric">
         <div class="mgdb-metric-top">
-          <h3>Evolutionary Depth</h3>
+          <h3>Evolutionary depth</h3>
           <span class="mgdb-metric-badge">Adaptation</span>
         </div>
         <div class="mgdb-metric-stat">
@@ -989,46 +954,39 @@ $$SYNTAX-LEVEL 2
         <p class="mgdb-metric-description">Years of shared evolutionary history and environmental adaptation captured in the dataset.</p>
       </article>
     </div>
-  </div>
 
   </section>
 
   <!-- SECTION 8: CONNECTED GENOMICS RESOURCES -->
-  <section id="panand-related" aria-labelledby="panand-related-title">
+  <section id="panand-related" class="mgdb-hub-related" aria-labelledby="panand-related-title">
     <div class="mgdb-section-heading">
       <div><h2 id="panand-related-title">Related resources</h2></div>
     </div>
 
-    <div class="mgdb-panel panand-bottom-section">
-<div class="panand-related-grid">
-      <a class="panand-related-card" href="/NAM_project">
-        <div class="panand-related-title">NAM Parent Genomes</div>
-        <p class="panand-related-desc">Chromosome-scale assemblies for 26 diverse founder inbred lines representing modern maize diversity.</p>
-      </a>
-
-      <a class="panand-related-card" href="/assembly">
-        <div class="panand-related-title">B73 Reference Assembly</div>
-        <p class="panand-related-desc">Explore release histories \(v1&ndash;v5\), chromosome accessions, and assembly statistics.</p>
-      </a>
-
-      <a class="panand-related-card" href="/genomebrowser">
-        <div class="panand-related-title">Genome Browser Hub</div>
-        <p class="panand-related-desc">Launch JBrowse 2 linear and synteny comparison views across maize and wild grass assemblies.</p>
-      </a>
-
-      <a class="panand-related-card" href="/genetic_variation">
-        <div class="panand-related-title">Genetic Variation Center</div>
-        <p class="panand-related-desc">Explore SNP matrices, HapMap datasets, and structural variant tracks.</p>
-      </a>
-
-
-      <a class="panand-related-card" href="/data_center">
-        <div class="panand-related-title">All Data Hubs</div>
-        <p class="panand-related-desc">Discover the complete catalog of MaizeGDB data hubs, tools, and databases.</p>
-      </a>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/NAM_project">
+          <strong>NAM Parent Genomes</strong>
+          <span>Chromosome-scale assemblies for 26 diverse founder inbred lines representing modern maize diversity</span>
+        </a>
+        <a href="/assembly">
+          <strong>B73 Reference Assembly</strong>
+          <span>Explore release histories \(v1&ndash;v5\), chromosome accessions, and assembly statistics</span>
+        </a>
+        <a href="/genomebrowser">
+          <strong>Genome Browser Hub</strong>
+          <span>Launch JBrowse 2 linear and synteny comparison views across maize and wild grass assemblies</span>
+        </a>
+        <a href="/genetic_variation">
+          <strong>Genetic Variation Center</strong>
+          <span>Explore SNP matrices, HapMap datasets, and structural variant tracks</span>
+        </a>
+        <a href="/data_center">
+          <strong>All Data Hubs</strong>
+          <span>Discover the complete catalog of MaizeGDB data hubs, tools, and databases</span>
+        </a>
+      </div>
     </div>
-  </div>
-
   </section>
 </main>
 )

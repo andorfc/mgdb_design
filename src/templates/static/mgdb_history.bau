@@ -6,9 +6,9 @@ $$SYNTAX-LEVEL 2
 <meta property="og:title" content="History of Maize Genetics &amp; MaizeGDB Timelines | Community Milestones">
 <meta property="og:description" content="Explore over a century of maize genetics discoveries, landmark research papers, community cooperation milestones, and the evolution of the MaizeGDB database infrastructure.">
 
-<main class="mgdb-page mgdb-history-page" id="history-top">
+<main class="mgdb-page mgdb-hub-page mgdb-history-page" id="history-top">
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
-    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/community">Community</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Maize History &amp; Timelines</span>
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Maize History &amp; Timelines</span>
   </nav>
 
   <!-- HERO SECTION -->
@@ -26,28 +26,70 @@ $$SYNTAX-LEVEL 2
         <path d="M48 48 L48 28 M48 48 L64 48" stroke="#d99a0b" stroke-width="4" stroke-linecap="round" />
         <circle cx="48" cy="48" r="6" fill="#235c37" />
       </svg>
-      <strong>Maize<br />History</strong>
+      <strong>Community<br />History</strong>
     </div>
     <div class="mgdb-hero-body">
       <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(data_date)</p>
-      <h1 id="history-title">History of Maize Genetics &amp; MaizeGDB Timelines</h1>
-      <p class="mgdb-hero-description">Explore over a century of maize genetics discoveries, landmark research papers, community cooperation milestones, and the evolution of the MaizeGDB database infrastructure.</p>
+      <h1 id="history-title">Maize genetics community history</h1>
+      <p class="mgdb-hero-description">How a letter between three researchers in 1929 became a worldwide community&#58; its meetings, its organizations, its database, and a century of maize genetics behind them.</p>
     </div>
   </section>
 
   <!-- STICKY SECTION TABS -->
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#history-timeline" class="is-current">Interactive Timeline</a>
-    <a href="#history-maizegdb">MaizeGDB Evolution</a>
-    <a href="#history-classic-reads">Classic Maize Papers</a>
-    <a href="#history-galleries">Historic Image Galleries</a>
-    <a href="#history-domestication">Domestication &amp; Origins</a>
-    <a href="#history-overview">Statistics</a>
-    <a href="#history-related">Related Resources</a>
+    <a href="#history-origins" class="is-current">Origins</a>
+    <a href="#history-timeline">Timeline</a>
+    <a href="#history-community">The community</a>
+    <a href="#history-maizegdb">MaizeGDB</a>
+    <a href="#history-classic-reads">Classic papers</a>
+    <a href="#history-galleries">Galleries</a>
+    <a href="#history-domestication">Domestication</a>
+    <a href="#history-overview">Metrics</a>
+    <a href="#history-related">Related resources</a>
   </nav>
 
   <!-- SECTION 1: INTERACTIVE TIMELINE -->
-  <section id="history-timeline" class="mgdb-panel" aria-labelledby="history-timeline-heading">
+  <!-- Origins. Drawn from /cooperators, which tells this story in prose the
+       group wrote; the photograph and the people links are that page's. -->
+  <section id="history-origins" aria-labelledby="history-origins-heading">
+    <div class="mgdb-section-heading">
+      <div><h2 id="history-origins-heading" class="mgdb-panel-title">Origins</h2></div>
+    </div>
+
+    <div class="history-origins-layout">
+      <figure class="history-origins-figure">
+        <img src="/images/ithaca.gif" alt="Maize researchers photographed in Ithaca, New York in 1929" loading="lazy" />
+        <figcaption>
+          Ithaca, New York, 1929. In the foreground, <a href="/person?id=12822">George Beadle</a> and his dog Toto;
+          behind him, left to right, <a href="/person?id=12839">C. R. Burnham</a>,
+          <a href="/person?id=13011">Marcus Rhoades</a>, <a href="/person?id=12877">Rollins Emerson</a>,
+          and <a href="/person?id=12966">Barbara McClintock</a>.
+        </figcaption>
+      </figure>
+
+      <div class="history-origins-copy">
+        <h3>The spirit of maize cooperation</h3>
+        <p>The maize research community has a long history of cooperation. It began in the 1920s, when
+        researchers held &ldquo;cornfabs&rdquo; to share ideas. In 1929 Rollins A. Emerson, his student
+        George Beadle, and Professor Allan C. Fraser sent a letter sharing published and unpublished
+        maize linkage data.</p>
+        <p>That single act of data sharing grew into a worldwide community of thousands of maize
+        cooperators, and into the free public resources and leadership committees that organize the
+        work today.</p>
+
+        <div class="history-origins-define">
+          <h4>What is a maize cooperator?</h4>
+          <p>Someone who shares an interest in maize genetics, genomics, and breeding research, and who
+          embraces collaboration by sharing published and unpublished materials, data, and ideas.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="history-timeline" aria-labelledby="history-timeline-heading">
+    <div class="mgdb-section-heading">
+      <div><h2 id="history-timeline-heading" class="mgdb-panel-title">Timeline</h2></div>
+    </div>
     <div class="history-filter-bar">
       <div class="history-filter-group" role="tablist" aria-label="Timeline category filter">
         <button class="history-filter-btn is-active" type="button" data-filter="all">All Milestones <span class="history-filter-count">$(total_events)</span></button>
@@ -67,9 +109,76 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
+  <!-- How the community organizes itself. The MGC is current and its business
+       lives on maizegenetics.org; the MGEC is closed and this is the record of
+       it. Both are summarized here rather than linked away to a legacy page. -->
+  <section id="history-community" aria-labelledby="history-community-heading">
+    <div class="mgdb-section-heading">
+      <div><h2 id="history-community-heading" class="mgdb-panel-title">The community</h2></div>
+    </div>
+
+    <div class="history-org-grid">
+
+      <article class="history-org-card history-org-current">
+        <span class="history-org-era">2019 &ndash; present</span>
+        <h3>Maize Genetics Cooperation</h3>
+        <p>In 2019 the Maize Genetics Executive Committee voted to incorporate as a 501&#40;c&#41;&#40;3&#41;
+        non-profit, the Maize Genetics Cooperation &#40;MGC&#41;. Its purpose is to advance the interests of
+        people who research maize genetics, genomics, and breeding, and to train the next generation
+        of scientists.</p>
+        <p>An elected Board of Directors manages the MGC and coordinates its committees&#58; the Meeting
+        Steering Committee, the Advocacy Committee, the Awards and Nominations Committee, and the
+        Membership Committee.</p>
+        <p>Current MGC business &mdash; the board, the committees, the awards, the code of conduct,
+        and membership &mdash; is on the MGC&rsquo;s own site.</p>
+        <!-- One destination, so one link: the membership call to action points at
+             maizegenetics.org, which is also where the card's other link went. -->
+        <p class="history-org-links">
+          <a href="https\://www.maizegenetics.org/" target="_blank" rel="noopener">Become a MGC member <span aria-hidden="true">&nearr;</span></a>
+        </p>
+      </article>
+
+      <article class="history-org-card history-org-closed">
+        <span class="history-org-era">2000 &ndash; 2019</span>
+        <h3>Maize Genetics Executive Committee</h3>
+        <blockquote>
+          <p>It is the mission of the Maize Genetics Executive Committee to identify both the needs and
+          the opportunities for maize genetics, and to communicate this information to the broadest
+          possible life science community. This community includes scientists, funding sources for
+          scientists, and the end users for the accomplishments of maize genetics, from farmers to
+          consumers.</p>
+          <cite>Jeff Bennetzen, Maize Genetics Cooperation Newsletter 75</cite>
+        </blockquote>
+        <p>The MGEC ceased activity once the MGC was formed. Its record &mdash; community surveys from
+        2006 to 2019, the Maize RCN white papers, the Allerton retreat report, and its activities year
+        by year &mdash; is preserved.</p>
+        <p class="history-org-links"><a href="/mgec">The MGEC record <span aria-hidden="true">&rarr;</span></a></p>
+      </article>
+
+      <article class="history-org-card">
+        <span class="history-org-era">Since 1959</span>
+        <h3>The annual meeting</h3>
+        <p>Twelve maize geneticists met at Allerton Park, Illinois in 1959. The meeting has run every
+        year since, in six countries, and twice online. It is organized by the MGC&rsquo;s Meeting
+        Steering Committee.</p>
+        <p class="history-org-links"><a href="/maize_meeting/">Maize Genetics Meeting <span aria-hidden="true">&rarr;</span></a></p>
+      </article>
+
+      <article class="history-org-card">
+        <span class="history-org-era">Since 1932</span>
+        <h3>The newsletter and the stock center</h3>
+        <p>Two of the community&rsquo;s oldest shared resources&#58; the Maize Genetics Cooperation
+        Newsletter, which has carried working notes and unpublished observations since 1932, and the
+        Maize Genetics Stock Center, which has distributed seed since 1953.</p>
+        <p class="history-org-links"><a href="/mnl">Newsletter archive <span aria-hidden="true">&rarr;</span></a></p>
+      </article>
+
+    </div>
+  </section>
+
   <!-- SECTION 2: MAIZEGDB EVOLUTION & REDESIGNS -->
-  <section id="history-maizegdb" class="mgdb-panel" aria-labelledby="history-maizegdb-heading">
-    <h2 id="history-maizegdb-heading" class="mgdb-panel-title">MaizeGDB Evolution &amp; Database History</h2>
+  <section id="history-maizegdb" aria-labelledby="history-maizegdb-heading">
+    <h2 id="history-maizegdb-heading" class="mgdb-panel-title">MaizeGDB</h2>
     <p class="mgdb-panel-lead">The history of community database informatics, from the inception of MaizeDB in 1991 to the modern MaizeGDB pan-genomics ecosystem.</p>
 
     <div class="history-maizegdb-grid">
@@ -140,8 +249,8 @@ $$SYNTAX-LEVEL 2
   </section>
 
   <!-- SECTION 3: CLASSIC MAIZE PAPERS -->
-  <section id="history-classic-reads" class="mgdb-panel" aria-labelledby="history-classic-heading">
-    <h2 id="history-classic-heading" class="mgdb-panel-title">Classic Maize Literature &amp; Historic Papers</h2>
+  <section id="history-classic-reads" aria-labelledby="history-classic-heading">
+    <h2 id="history-classic-heading" class="mgdb-panel-title">Classic papers</h2>
     <p class="mgdb-panel-lead">Landmark foundational papers and seminal publications that shaped early maize genetics, linkage mapping, cytogenetics, and genome structure.</p>
 
     <div class="classic-reads-grid">
@@ -247,8 +356,8 @@ $$SYNTAX-LEVEL 2
   </section>
 
   <!-- SECTION 4: HISTORIC IMAGE GALLERIES -->
-  <section id="history-galleries" class="mgdb-panel" aria-labelledby="history-galleries-heading">
-    <h2 id="history-galleries-heading" class="mgdb-panel-title">Historic Image Galleries</h2>
+  <section id="history-galleries" aria-labelledby="history-galleries-heading">
+    <h2 id="history-galleries-heading" class="mgdb-panel-title">Galleries</h2>
     <p class="mgdb-panel-lead">Archival photographic records documenting historical maize genetics conferences, pioneering researchers, and community gatherings.</p>
 
     <div class="history-galleries-grid">
@@ -271,8 +380,8 @@ $$SYNTAX-LEVEL 2
   </section>
 
   <!-- SECTION 5: DOMESTICATION & ORIGINS -->
-  <section id="history-domestication" class="mgdb-panel" aria-labelledby="history-domestication-heading">
-    <h2 id="history-domestication-heading" class="mgdb-panel-title">Maize Domestication &amp; Evolutionary Origins</h2>
+  <section id="history-domestication" aria-labelledby="history-domestication-heading">
+    <h2 id="history-domestication-heading" class="mgdb-panel-title">Domestication</h2>
     <p class="mgdb-panel-lead">The 9,000-year evolutionary journey of maize from its wild progenitor teosinte in southwestern Mexico to a global agricultural staple.</p>
 
     <div class="history-domestication-content">
@@ -290,8 +399,8 @@ $$SYNTAX-LEVEL 2
   </section>
 
   <!-- SECTION 6: CORPUS STATISTICS -->
-  <section id="history-overview" class="mgdb-panel" aria-labelledby="history-overview-heading">
-    <h2 id="history-overview-heading" class="mgdb-panel-title">Corpus Statistics</h2>
+  <section id="history-overview" aria-labelledby="history-overview-heading">
+    <h2 id="history-overview-heading" class="mgdb-panel-title">Metrics</h2>
     <p class="mgdb-panel-lead">Summary of community milestones, literature archives, and database chronology curated at MaizeGDB.</p>
 
     <div class="mgdb-metric-grid">
@@ -342,8 +451,8 @@ $$SYNTAX-LEVEL 2
   </section>
 
   <!-- SECTION 7: CONNECTED RESOURCES -->
-  <section id="history-related" class="mgdb-panel history-bottom-section" aria-labelledby="history-related-heading">
-    <h2 id="history-related-heading" class="mgdb-panel-title">Connected Community Resources</h2>
+  <section id="history-related" class="mgdb-hub-related history-bottom-section" aria-labelledby="history-related-heading">
+    <h2 id="history-related-heading" class="mgdb-panel-title">Related resources</h2>
     <p class="mgdb-panel-lead">Explore related community archives, annual meeting summaries, newsletters, and cooperator catalogs.</p>
 
     <div class="history-related-grid">
@@ -360,11 +469,6 @@ $$SYNTAX-LEVEL 2
       <a class="history-related-card" href="/mnl">
         <div class="history-related-title">Maize Newsletter \(MNL\) Archive</div>
         <p class="history-related-desc">Browse volumes of the Maize Genetics Cooperation Newsletter published continuously since 1932.</p>
-      </a>
-
-      <a class="history-related-card" href="/cooperators">
-        <div class="history-related-title">Cooperator History</div>
-        <p class="history-related-desc">Genealogical records and collaborative networks of pioneering maize geneticists.</p>
       </a>
 
       <a class="history-related-card" href="/person">

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Analysis projects listing (/projects)
+   Research projects listing (/projects)
    --------------------------------------------------------------------------
    The cards are rendered server-side from the registry in
    include/projects_lib.php, so the list is complete and indexable before this
@@ -39,13 +39,13 @@
       empty: document.getElementById('projects-empty'),
       reset: document.getElementById('projects-reset'),
       noun:  'projects',
-      urlKeys: { query: 'q', filter: 'topic' },
-      /* A project carries several topics, so data-filter holds them all
-         space-separated and a chip matches if it is one of them. */
+      urlKeys: { query: 'q', filter: 'category' },
+      /* One category per project, so this is an equality test. It was a
+         set-membership test while the chips ran on topics, which a project
+         carries several of; the chips moved to the category axis on
+         2026-09-05 when the section grew from three projects to fifteen. */
       filterOn: function (el, value) {
-        if (value === 'all') { return true; }
-        var topics = (el.getAttribute('data-filter') || '').split(/\s+/);
-        return topics.indexOf(value) !== -1;
+        return value === 'all' || el.getAttribute('data-filter') === value;
       },
       /* The shared count is written as "<n> projects shown", which reads badly
          while the section is small enough to hold a single project. Rewriting

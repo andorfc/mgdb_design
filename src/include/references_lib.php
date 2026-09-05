@@ -28,6 +28,18 @@
  *
  * A DOI that is neither in the bibliography nor given a fallback title is
  * skipped rather than rendered empty.
+ *
+ * An item may also carry 'abstract_limit', a character count past which the
+ * abstract is cut on a word boundary. A page citing three papers prints them
+ * whole; /cite lists sixty and would otherwise ship about 90 KB of abstract
+ * that its own layout clamps to five lines. This host serves no gzip.
+ *
+ * An item may also carry 'attrs', a map of extra attributes for the card's
+ * <article>, so a page that filters or sorts its own list can hang its handles
+ * on the shared card instead of wrapping it in a second element. Only 'class'
+ * (appended to the card's own class, never replacing it) and data-* names are
+ * accepted, so a caller cannot rewrite the shape from outside. /cite uses it
+ * to carry the year and category its filter reads.
  */
 
 //
@@ -61,6 +73,41 @@ function mgdb_reference_index($doc_root) {
 
 function mgdb_ref_esc($value) {
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+}
+
+//
+// The card's own attributes, plus whatever hooks the page asked for.
+//
+function mgdb_ref_attributes($attrs) {
+    $class = 'mgdb-ref';
+    $extra = '';
+
+    foreach ((array) $attrs as $name => $value) {
+        $name = strtolower(trim((string) $name));
+        if ($name === 'class') {
+            $value = trim((string) $value);
+            if ($value !== '') {
+                $class .= ' ' . $value;
+            }
+            continue;
+        }
+        if (preg_match('/^data-[a-z0-9-]+$/', $name)) {
+            $extra .= ' ' . $name . '="' . mgdb_ref_esc($value) . '"';
+        }
+    }
+
+    return ' class="' . mgdb_ref_esc($class) . '"' . $extra;
+}
+
+//
+// One sequence per request, not per call. The id it builds is the target of
+// the card's Copy citation button, so a page that renders its list in several
+// calls -- /cite starts a new one at each year heading -- would otherwise emit
+// the same id on every card and copy the first card's citation from all of them.
+//
+function mgdb_reference_seq() {
+    static $seq = 0;
+    return ++$seq;
 }
 
 //
@@ -128,7 +175,7 @@ function mgdb_render_reference($row, $seq) {
     $plain = trim($row['authors'] . ' (' . $row['year'] . ') ' . $row['title'] . '. '
            . $row['journal'] . '.' . ($doi !== '' ? ' doi:' . $doi : ''));
 
-    $html  = '<article class="mgdb-ref">';
+    $html  = '<article' . mgdb_ref_attributes(isset($row['attrs']) ? $row['attrs'] : array()) . '>';
 
     $html .= '<div class="mgdb-ref-meta">';
     $html .= '<span class="mgdb-ref-badge">' . mgdb_ref_esc(mgdb_reference_short_journal($row['journal']));
@@ -162,6 +209,17 @@ function mgdb_render_reference($row, $seq) {
        should be -- 49 characters in one case. A stub reads as a broken panel,
        so the well is only opened for text long enough to be an abstract. */
     $abstract = isset($row['abstract']) ? trim($row['abstract']) : '';
+
+    $limit = isset($row['abstract_limit']) ? (int) $row['abstract_limit'] : 0;
+    if ($limit > 0 && mb_strlen($abstract, 'UTF-8') > $limit) {
+        $cut   = mb_substr($abstract, 0, $limit, 'UTF-8');
+        $space = mb_strrpos($cut, ' ', 0, 'UTF-8');
+        if ($space !== false && $space > $limit / 2) {
+            $cut = mb_substr($cut, 0, $space, 'UTF-8');
+        }
+        $abstract = rtrim($cut, " \t,;:.-") . "\xE2\x80\xA6";
+    }
+
     if (mb_strlen($abstract, 'UTF-8') > 120) {
         $html .= '<div class="mgdb-ref-abstract"><h4>Abstract</h4><p>'
                . mgdb_ref_esc($abstract) . '</p></div>';
@@ -199,7 +257,6 @@ function mgdb_render_reference($row, $seq) {
 function mgdb_render_references($doc_root, $items) {
     $index = mgdb_reference_index($doc_root);
     $html  = '';
-    $seq   = 0;
 
     foreach ((array) $items as $item) {
         $doi = isset($item['doi']) ? strtolower(trim($item['doi'])) : '';
@@ -213,7 +270,7 @@ function mgdb_render_references($doc_root, $items) {
                 $row[$key] = $value;
             }
         }
-        foreach (array('kind', 'record', 'url') as $key) {
+        foreach (array('kind', 'record', 'url', 'attrs', 'abstract_limit') as $key) {
             if (!empty($item[$key])) {
                 $row[$key] = $item[$key];
             }
@@ -222,7 +279,7 @@ function mgdb_render_references($doc_root, $items) {
             $row['doi'] = $item['doi'];
         }
 
-        $card = mgdb_render_reference($row, ++$seq);
+        $card = mgdb_render_reference($row, mgdb_reference_seq());
         if ($card === '') {
             reportError('references_lib: no record and no fallback for DOI ' . $doi);
             continue;

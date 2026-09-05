@@ -1,0 +1,472 @@
+/* ==========================================================================
+   /breeders_toolbox -- the MaizeGDB Pedigree Viewer
+
+   Loaded after css/mgdb-hub.css, which supplies the ground, the white section
+   cards and the coloured section edges. The pedigree bands deliberately reuse
+   the visual language of the single-stock pedigree on /data_center/stock:
+   gold-edged nodes above the selected variety, green-edged below, the variety
+   itself on the dark green plate.
+   ========================================================================== */
+
+.mgdb-breeders-page .bt-hero-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-breeders-page .bt-hero-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .8);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.mgdb-breeders-page .bt-hero-link:hover {
+  border-color: var(--mgdb-green-dark);
+  background: #fff;
+}
+
+.mgdb-breeders-page .bt-dot { width: 8px; height: 8px; border-radius: 50%; }
+.mgdb-breeders-page .bt-dot-green { background: #16a34a; }
+.mgdb-breeders-page .bt-dot-gold  { background: #d97706; }
+.mgdb-breeders-page .bt-dot-blue  { background: #2563eb; }
+
+/* --------------------------------------------------------------------------
+   The two forms
+
+   `.mgdb-hub-field` gives the shared label-and-control row; these only set the
+   track widths. Scoped with `>` so the rule cannot reach a field inside a
+   result rendered below it -- the trap recorded on /data_center/gene_product.
+   -------------------------------------------------------------------------- */
+
+.mgdb-breeders-page .bt-form {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-3);
+  align-items: end;
+  margin-bottom: var(--mgdb-space-3);
+}
+
+.mgdb-breeders-page #bt-path-form { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; }
+
+@media (max-width: 720px) {
+  .mgdb-breeders-page .bt-form,
+  .mgdb-breeders-page #bt-path-form { grid-template-columns: minmax(0, 1fr); }
+}
+
+.mgdb-breeders-page .bt-examples {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  margin: 0 0 var(--mgdb-space-4);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-breeders-page .bt-example {
+  padding: 4px 12px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mgdb-breeders-page .bt-example:hover {
+  border-color: var(--mgdb-green-dark);
+  background: #fff;
+}
+
+.mgdb-breeders-page .bt-loading {
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* --------------------------------------------------------------------------
+   Result summary and toolbar
+   -------------------------------------------------------------------------- */
+
+.mgdb-breeders-page .bt-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--mgdb-space-3);
+  margin: 0 0 var(--mgdb-space-4);
+}
+
+.mgdb-breeders-page .bt-summary > div {
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-breeders-page .bt-summary dt {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.mgdb-breeders-page .bt-summary dd {
+  margin: 2px 0 0;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-2xl);
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.mgdb-breeders-page .bt-summary span {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-breeders-page .bt-toolbar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-breeders-page .bt-filter-label { display: none; }
+
+@media (max-width: 860px) {
+  .mgdb-breeders-page .bt-toolbar { grid-template-columns: minmax(0, 1fr); }
+}
+
+.mgdb-breeders-page .bt-view-toggle {
+  display: inline-flex;
+  overflow: hidden;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-breeders-page .bt-view-toggle button {
+  padding: 8px 18px;
+  border: 0;
+  background: none;
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-breeders-page .bt-view-toggle button.is-active {
+  background: var(--mgdb-green-dark);
+  color: #fff;
+}
+
+.mgdb-breeders-page .bt-filter {
+  width: 100%;
+  height: var(--mgdb-tap-target);
+  padding: 6px 12px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: #fff;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-breeders-page .bt-filter:focus {
+  outline: none;
+  border-color: var(--mgdb-green-dark);
+  box-shadow: 0 0 0 3px rgba(27, 94, 32, .15);
+}
+
+/* --------------------------------------------------------------------------
+   Facet chips
+
+   Developer and state, because "show me the Iowa ones" is a click rather than
+   something a breeder should have to type. One selection per row; the row is
+   only drawn when the result holds more than one value for it, so Huangzaosi
+   -- whose 1,972 descendants carry no developer or state at all -- gets none.
+   -------------------------------------------------------------------------- */
+
+.mgdb-breeders-page .bt-facets {
+  display: grid;
+  gap: var(--mgdb-space-2);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-breeders-page .bt-facet {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-breeders-page .bt-facet-label {
+  min-width: 74px;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.mgdb-breeders-page .bt-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mgdb-breeders-page .bt-chip:hover:not(.is-active) {
+  border-color: var(--mgdb-green-dark);
+  background: #fff;
+}
+
+.mgdb-breeders-page .bt-chip.is-active {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #fff;
+}
+
+.mgdb-breeders-page .bt-chip span {
+  color: var(--mgdb-muted);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.mgdb-breeders-page .bt-chip.is-active span { color: rgba(255, 255, 255, .8); }
+
+.mgdb-breeders-page .bt-chip-more {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-style: italic;
+}
+
+/* --------------------------------------------------------------------------
+   The generational map
+
+   One band per generation, ancestors reading down to the selected variety and
+   descendants away from it. A band is capped at 24 nodes because a single
+   generation in this graph runs to 1,972; the filter above narrows the band in
+   place and the table always holds every row.
+   -------------------------------------------------------------------------- */
+
+.mgdb-breeders-page .bt-map {
+  padding: clamp(var(--mgdb-space-4), 4vw, var(--mgdb-space-6));
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background:
+    linear-gradient(180deg, rgba(242, 165, 21, .08), transparent 30%),
+    var(--mgdb-surface-alt);
+}
+
+.mgdb-breeders-page .bt-band h3 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mgdb-space-2);
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-base);
+  text-align: center;
+}
+
+.mgdb-breeders-page .bt-band h3 span {
+  display: inline-flex;
+  min-width: 24px;
+  min-height: 24px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.mgdb-breeders-page .bt-node-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: var(--mgdb-space-2);
+  width: 100%;
+}
+
+.mgdb-breeders-page .bt-node {
+  display: flex;
+  min-width: 0;
+  min-height: 58px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-burgundy) !important;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: var(--mgdb-shadow-sm);
+  transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+.mgdb-breeders-page .bt-node[hidden] { display: none; }
+
+.mgdb-breeders-page .bt-node:hover {
+  border-color: var(--mgdb-gold-dark);
+  box-shadow: var(--mgdb-shadow);
+  transform: translateY(-2px);
+}
+
+.mgdb-breeders-page .bt-node strong {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-breeders-page .bt-node span {
+  margin-top: 2px;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-breeders-page .bt-node-ancestor { border-bottom: 3px solid var(--mgdb-gold); }
+.mgdb-breeders-page .bt-node-descendant { border-top: 3px solid var(--mgdb-green-dark); }
+
+.mgdb-breeders-page .bt-flow {
+  display: flex;
+  min-height: 56px;
+  align-items: center;
+  justify-content: center;
+  color: var(--mgdb-gold-dark);
+}
+
+.mgdb-breeders-page .bt-flow b { font-size: 2rem; line-height: 1; }
+
+.mgdb-breeders-page .bt-seed {
+  display: flex;
+  width: min(100%, 420px);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 3px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-green-dark);
+  color: #fff;
+  text-align: center;
+  box-shadow: var(--mgdb-shadow);
+}
+
+.mgdb-breeders-page .bt-seed span {
+  color: rgba(255, 255, 255, .8);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.mgdb-breeders-page .bt-seed a {
+  margin-top: var(--mgdb-space-1);
+  color: #fff !important;
+  font-size: var(--mgdb-text-xl);
+  font-weight: 800;
+  line-height: var(--mgdb-leading-snug);
+  overflow-wrap: anywhere;
+}
+
+.mgdb-breeders-page .bt-seed small {
+  margin-top: var(--mgdb-space-2);
+  color: rgba(255, 255, 255, .85);
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-breeders-page .bt-band-note,
+.mgdb-breeders-page .bt-band-empty,
+.mgdb-breeders-page .bt-table-empty {
+  margin: var(--mgdb-space-3) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  text-align: center;
+}
+
+.mgdb-breeders-page .bt-band-empty[hidden],
+.mgdb-breeders-page .bt-table-empty[hidden] { display: none; }
+
+.mgdb-breeders-page .bt-table-wrap[hidden] { display: none; }
+
+/* --------------------------------------------------------------------------
+   The relationship chain
+
+   Small by construction -- the longest path the search will return is twelve
+   steps -- so it reads as a list rather than a graph.
+   -------------------------------------------------------------------------- */
+
+.mgdb-breeders-page .bt-chain-summary {
+  margin: 0 0 var(--mgdb-space-3);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-breeders-page .bt-chain {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  margin: 0;
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+  list-style: none;
+}
+
+.mgdb-breeders-page .bt-chain li {
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-breeders-page .bt-chain-node {
+  display: inline-block;
+  padding: 8px 14px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-burgundy) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-breeders-page .bt-chain-node:hover { border-color: var(--mgdb-gold-dark); }
+
+.mgdb-breeders-page .bt-chain-rel {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.mgdb-breeders-page .bt-chain-rel::after {
+  content: " \2192";
+  font-style: normal;
+}

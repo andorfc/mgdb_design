@@ -87,11 +87,11 @@
  * Filter & Search Toolbar
  * -------------------------------------------------------------------------- */
 
+/* The search field takes its own row above the filters, as it does on every
+   hub. Side by side in one wrapping flex row the chips claimed the width and
+   shrank the field below its own basis, cutting off its placeholder. */
 .mgdb-hilo-project-page .hilo-table-toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
+  display: grid;
   gap: var(--mgdb-space-3);
   margin-bottom: var(--mgdb-space-3);
 }
@@ -135,13 +135,12 @@
 }
 
 .mgdb-hilo-project-page .hilo-search-wrap {
-  flex: 1 1 280px;
-  max-width: 380px;
+  max-width: 640px;
 }
 
 .mgdb-hilo-project-page .hilo-search-input {
   width: 100%;
-  height: 38px;
+  height: var(--mgdb-tap-target);
   padding: 6px 12px;
   font-size: var(--mgdb-text-sm);
   border: 1px solid var(--mgdb-line);
@@ -460,98 +459,12 @@
 }
 
 /* --------------------------------------------------------------------------
- * Section 3: Publications (FORMATTED EXACTLY LIKE NAM)
+ * Publications
+ *
+ * The cards are the shared reference card now -- `.mgdb-ref*` in mgdb-hub.css,
+ * markup from include/references_lib.php, content from the DOIs the controller
+ * names. The page's own `.hilo-pub-*` block was removed with it.
  * -------------------------------------------------------------------------- */
-
-.mgdb-hilo-project-page .hilo-publications-grid {
-  display: grid;
-  gap: var(--mgdb-space-4);
-  margin-top: var(--mgdb-space-4);
-}
-
-.mgdb-hilo-project-page .hilo-pub-card {
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  padding: var(--mgdb-space-5);
-  box-shadow: var(--mgdb-shadow-sm);
-}
-
-.mgdb-hilo-project-page .hilo-pub-meta-top {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  align-items: center;
-  margin-bottom: var(--mgdb-space-2);
-}
-
-.mgdb-hilo-project-page .hilo-pub-journal-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  background: #fef3c7;
-  color: #92400e;
-  border-radius: 9999px;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.mgdb-hilo-project-page .hilo-pub-doi {
-  font-family: var(--mgdb-font-mono, monospace);
-  font-size: 11px;
-  color: var(--mgdb-muted);
-}
-
-.mgdb-hilo-project-page .hilo-pub-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  line-height: 1.35;
-  color: var(--mgdb-burgundy);
-  margin: 0 0 var(--mgdb-space-2) 0;
-}
-
-.mgdb-hilo-project-page .hilo-pub-authors {
-  font-size: var(--mgdb-text-sm);
-  color: var(--mgdb-ink);
-  margin: 0 0 var(--mgdb-space-1) 0;
-  line-height: 1.4;
-}
-
-.mgdb-hilo-project-page .hilo-pub-citation {
-  font-size: var(--mgdb-text-xs);
-  color: var(--mgdb-muted);
-  margin: 0 0 var(--mgdb-space-3) 0;
-}
-
-.mgdb-hilo-project-page .hilo-pub-abstract-wrap {
-  background: var(--mgdb-surface-alt);
-  border-left: 3px solid var(--mgdb-green);
-  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
-  padding: var(--mgdb-space-3) var(--mgdb-space-4);
-  margin-bottom: var(--mgdb-space-4);
-}
-
-.mgdb-hilo-project-page .hilo-pub-abstract-heading {
-  font-size: var(--mgdb-text-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-  color: var(--mgdb-green-dark);
-  margin: 0 0 4px 0;
-}
-
-.mgdb-hilo-project-page .hilo-pub-abstract-text {
-  font-size: var(--mgdb-text-xs);
-  line-height: 1.6;
-  color: var(--mgdb-ink-soft);
-  margin: 0;
-}
-
-.mgdb-hilo-project-page .hilo-pub-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-}
-
 /* --------------------------------------------------------------------------
  * Section 4: Data Hosted at MaizeGDB Cards (NO ICONS, LIKE NAM)
  * -------------------------------------------------------------------------- */
@@ -717,56 +630,16 @@
 }
 
 /* --------------------------------------------------------------------------
- * Section 8: Connected Resources (Matching NAM bottom section)
+ * Related resources
+ *
+ * The closing panel is the shared `.mgdb-resource-panel` / `.mgdb-resource-list`
+ * now, so it needs no rules here -- it gets the green wash from mgdb-hub.css
+ * and the off-site arrow from mgdb-modern.css. The page's own
+ * `.hilo-bottom-section` / `.hilo-related-*` block was removed with it.
  * -------------------------------------------------------------------------- */
-
-.mgdb-hilo-project-page .hilo-bottom-section {
-  background: linear-gradient(180deg, var(--mgdb-surface) 0%, var(--mgdb-green-soft) 100%) !important;
-  border-color: #b8dbca !important;
-}
-
-.mgdb-hilo-project-page .hilo-related-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--mgdb-space-3);
-  margin-top: var(--mgdb-space-4);
-}
-
-.mgdb-hilo-project-page .hilo-related-card {
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-sm);
-  padding: var(--mgdb-space-3);
-  text-decoration: none;
-  color: inherit;
-  transition: border-color .12s, box-shadow .12s;
-}
-
-.mgdb-hilo-project-page .hilo-related-card:hover {
-  border-color: var(--mgdb-green);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-
-.mgdb-hilo-project-page .hilo-related-title {
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-  color: var(--mgdb-green-dark);
-  margin-bottom: 2px;
-}
-
-.mgdb-hilo-project-page .hilo-related-desc {
-  font-size: var(--mgdb-text-xs);
-  color: var(--mgdb-muted);
-  margin: 0;
-  line-height: 1.4;
-}
-
 /* Responsive */
 @media (max-width: 768px) {
-  .mgdb-hilo-project-page .hilo-table-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
+  
   .mgdb-hilo-project-page .hilo-search-wrap {
     max-width: 100%;
   }

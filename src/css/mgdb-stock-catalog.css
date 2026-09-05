@@ -1,0 +1,342 @@
+/* ==========================================================================
+   /stock_catalog -- the Maize Genetics Cooperation Stock Center catalog
+
+   Loaded after css/mgdb-hub.css, which supplies the ground, the white section
+   cards, the coloured section edges and the closing Related resources panel.
+   This sheet owns only what is particular to a catalog: the six-way catalog
+   picker, the category jump list, and the stock entries themselves.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Hero link row
+
+   The same shape the project pages use: a row of destinations under the
+   description rather than a date stamp, because a catalog changes whenever
+   the Stock Center curates, not on a publication date.
+   -------------------------------------------------------------------------- */
+
+.mgdb-stock-catalog-page .sc-hero-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-stock-catalog-page .sc-hero-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .8);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.mgdb-stock-catalog-page .sc-hero-link:hover {
+  border-color: var(--mgdb-green-dark);
+  background: #fff;
+}
+
+.mgdb-stock-catalog-page .sc-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.mgdb-stock-catalog-page .sc-dot-green { background: #16a34a; }
+.mgdb-stock-catalog-page .sc-dot-blue  { background: #2563eb; }
+.mgdb-stock-catalog-page .sc-dot-gold  { background: #d97706; }
+
+/* --------------------------------------------------------------------------
+   The catalog picker
+
+   Six catalogs, one of which you are reading. The current one is a <div>
+   rather than an <a>, so it is not a link to the page it is on; it keeps the
+   card shape so the row does not develop a hole.
+   -------------------------------------------------------------------------- */
+
+/* Three columns, not `auto-fit`: there are exactly six catalogs, and auto-fit
+   resolved to five at desktop width, leaving ChromDB alone on a second row.
+   Three and two both divide six, so the row is never ragged. */
+.mgdb-stock-catalog-page .sc-views {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--mgdb-space-3);
+}
+
+@media (max-width: 900px) {
+  .mgdb-stock-catalog-page .sc-views { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 560px) {
+  .mgdb-stock-catalog-page .sc-views { grid-template-columns: minmax(0, 1fr); }
+}
+
+.mgdb-stock-catalog-page .sc-view {
+  display: flex;
+  flex-direction: column;
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-top: 3px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  text-decoration: none;
+  transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+.mgdb-stock-catalog-page a.sc-view:hover {
+  border-color: var(--mgdb-line);
+  border-top-color: var(--mgdb-gold);
+  box-shadow: 0 4px 12px rgba(23, 70, 52, .08);
+  transform: translateY(-1px);
+}
+
+.mgdb-stock-catalog-page .sc-view.is-current {
+  border-top-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-stock-catalog-page .sc-view strong {
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-stock-catalog-page a.sc-view:hover strong {
+  color: var(--mgdb-leaf);
+  text-decoration: underline;
+}
+
+.mgdb-stock-catalog-page .sc-view span {
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+/* --------------------------------------------------------------------------
+   Filter row
+
+   The field takes its own line above the jump list, at the shared tap target,
+   for the reason recorded on the project pages: sharing a wrapping flex row
+   with a chip set lets flex-shrink pull it below its own basis.
+   -------------------------------------------------------------------------- */
+
+.mgdb-stock-catalog-page .sc-toolbar {
+  display: grid;
+  gap: var(--mgdb-space-2);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-stock-catalog-page .sc-search-wrap { max-width: 640px; }
+
+.mgdb-stock-catalog-page .sc-filter {
+  width: 100%;
+  height: var(--mgdb-tap-target);
+  padding: 6px 12px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: #fff;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-stock-catalog-page .sc-filter:focus {
+  outline: none;
+  border-color: var(--mgdb-green-dark);
+  box-shadow: 0 0 0 3px rgba(27, 94, 32, .15);
+}
+
+.mgdb-stock-catalog-page .sc-status {
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* --------------------------------------------------------------------------
+   Category jump list
+
+   Twenty-five categories will not fit in the sticky tab bar, so they are a
+   wrapping list of links inside the section they move within. Each carries
+   its own count, which is also what tells a reader a category is small before
+   they jump into it.
+   -------------------------------------------------------------------------- */
+
+.mgdb-stock-catalog-page .sc-jumps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-bottom: var(--mgdb-space-5);
+  padding-bottom: var(--mgdb-space-4);
+  border-bottom: 1px solid var(--mgdb-line-soft);
+}
+
+.mgdb-stock-catalog-page .sc-jump {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.mgdb-stock-catalog-page .sc-jump:hover {
+  border-color: var(--mgdb-green-dark);
+  background: #fff;
+}
+
+.mgdb-stock-catalog-page .sc-jump span {
+  color: var(--mgdb-muted);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.mgdb-stock-catalog-page .sc-jump[hidden] { display: none; }
+
+/* --------------------------------------------------------------------------
+   A category and its stocks
+
+   The list is multi-column rather than one long ribbon: an entry is a short
+   name and a short link, so a single column would leave most of the row empty
+   and make the page four times longer than it needs to be. `break-inside`
+   keeps an entry from being split across the column boundary.
+   -------------------------------------------------------------------------- */
+
+.mgdb-stock-catalog-page .sc-group + .sc-group {
+  margin-top: var(--mgdb-space-6);
+  padding-top: var(--mgdb-space-5);
+  border-top: 1px solid var(--mgdb-line-soft);
+}
+
+.mgdb-stock-catalog-page .sc-group[hidden] { display: none; }
+
+/* --------------------------------------------------------------------------
+   Filtering is a class on the container, not 7,469 element writes
+
+   Hiding each non-matching entry meant touching every entry in the catalog on
+   every keystroke, and touching all of them again to clear -- around 900 ms of
+   style and layout per pass at 7,469 entries. Here the container carries the
+   filtering state and only the matches carry a class, so a filter costs one
+   class per match (usually tens) and clearing costs one class on the
+   container. `columns` is dropped while filtering because balancing a
+   multi-column list whose items are display:none is work with nothing to show
+   for it.
+   -------------------------------------------------------------------------- */
+
+.mgdb-stock-catalog-page .sc-groups.is-filtering .sc-entry { display: none; }
+.mgdb-stock-catalog-page .sc-groups.is-filtering .sc-entry.is-match { display: flex; }
+.mgdb-stock-catalog-page .sc-groups.is-filtering .sc-group:not(.has-match) { display: none; }
+.mgdb-stock-catalog-page .sc-groups.is-filtering .sc-list { columns: auto; }
+
+.mgdb-stock-catalog-page .sc-group-title {
+  scroll-margin-top: 8rem;
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+  font-weight: 700;
+}
+
+.mgdb-stock-catalog-page .sc-count {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xs);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.mgdb-stock-catalog-page .sc-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  columns: 3 260px;
+  column-gap: var(--mgdb-space-5);
+}
+
+.mgdb-stock-catalog-page .sc-entry {
+  break-inside: avoid;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 3px 0;
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-stock-catalog-page .sc-entry[hidden] { display: none; }
+
+.mgdb-stock-catalog-page .sc-name {
+  color: var(--mgdb-ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.mgdb-stock-catalog-page .sc-name:hover {
+  color: var(--mgdb-leaf);
+  text-decoration: underline;
+}
+
+.mgdb-stock-catalog-page .sc-note {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+/* The order link is quiet until the row is wanted: it repeats on every entry,
+   so at full strength it would out-shout the stock names it sits beside. */
+.mgdb-stock-catalog-page .sc-order {
+  flex: 0 0 auto;
+  margin-left: auto;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.mgdb-stock-catalog-page .sc-entry:hover .sc-order,
+.mgdb-stock-catalog-page .sc-order:focus-visible {
+  color: var(--mgdb-green-dark);
+  text-decoration: underline;
+}
+
+.mgdb-stock-catalog-page .sc-order::after {
+  content: " \2197";
+  font-size: .9em;
+}
+
+.mgdb-stock-catalog-page .sc-none {
+  margin: var(--mgdb-space-3) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-stock-catalog-page .sc-none[hidden] { display: none; }
+
+/* --------------------------------------------------------------------------
+   Narrow screens
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 720px) {
+  .mgdb-stock-catalog-page .sc-list { columns: 1; }
+  .mgdb-stock-catalog-page .sc-search-wrap { max-width: 100%; }
+  .mgdb-stock-catalog-page .sc-group-title { scroll-margin-top: 9rem; }
+}
+
+@media print {
+  .mgdb-stock-catalog-page .sc-toolbar,
+  .mgdb-stock-catalog-page .sc-jumps,
+  .mgdb-stock-catalog-page .sc-order { display: none; }
+  .mgdb-stock-catalog-page .sc-list { columns: 2; }
+}

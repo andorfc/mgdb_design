@@ -701,3 +701,111 @@
     right: auto !important;
   }
 }
+
+/* Community history sections, 2026-09-04 -----------------------------------
+
+   Two sections added when this page became the community's history rather than
+   only a timeline: where the cooperation started, and how it organizes itself
+   now. The page also moved onto the Data Hub shell, so the cool --hub- tokens
+   are the ones to reach for here. */
+
+.mgdb-history-page .mgdb-panel-title { margin-top: 0; }
+
+.mgdb-history-page .history-origins-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: var(--mgdb-space-5);
+  align-items: start;
+}
+
+.mgdb-history-page .history-origins-figure {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--hub-line);
+  border-radius: 12px;
+  background: var(--hub-surface);
+  box-shadow: var(--hub-shadow);
+}
+
+.mgdb-history-page .history-origins-figure img { display: block; width: 100%; height: auto; }
+
+.mgdb-history-page .history-origins-figure figcaption {
+  padding: var(--mgdb-space-4);
+  border-top: 1px solid var(--hub-line-soft);
+  background: var(--hub-ground);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-history-page .history-origins-copy h3 { margin: 0 0 var(--mgdb-space-3); color: var(--mgdb-green-dark); }
+.mgdb-history-page .history-origins-copy p + p { margin-top: var(--mgdb-space-3); }
+
+/* The definition is the one line a reader is most likely to have come for, so
+   it is lifted out of the prose rather than buried in it. */
+.mgdb-history-page .history-origins-define {
+  margin-top: var(--mgdb-space-4);
+  padding: var(--mgdb-space-4);
+  border-left: 4px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-ground);
+}
+
+.mgdb-history-page .history-origins-define h4 { margin: 0 0 var(--mgdb-space-2); color: var(--mgdb-green-dark); font-size: var(--mgdb-text-base); }
+
+.mgdb-history-page .history-org-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-history-page .history-org-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--hub-line);
+  border-top: 4px solid var(--hub-line);
+  border-radius: 12px;
+  background: var(--hub-surface);
+  box-shadow: var(--hub-shadow);
+}
+
+/* One is running, one is closed, and the top edge is what says which. */
+.mgdb-history-page .history-org-current { border-top-color: var(--mgdb-green); }
+.mgdb-history-page .history-org-closed { border-top-color: var(--mgdb-burgundy); }
+
+.mgdb-history-page .history-org-era {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.mgdb-history-page .history-org-card h3 { margin: var(--mgdb-space-2) 0 var(--mgdb-space-3); color: var(--mgdb-green-dark); font-size: var(--mgdb-text-lg); }
+.mgdb-history-page .history-org-card p { color: var(--mgdb-ink-soft); font-size: var(--mgdb-text-sm); line-height: var(--mgdb-leading-snug); }
+.mgdb-history-page .history-org-card p + p { margin-top: var(--mgdb-space-3); }
+
+.mgdb-history-page .history-org-card blockquote {
+  margin: 0 0 var(--mgdb-space-3);
+  padding-left: var(--mgdb-space-4);
+  border-left: 3px solid var(--mgdb-gold);
+}
+
+.mgdb-history-page .history-org-card blockquote p { color: var(--mgdb-ink); font-style: italic; }
+.mgdb-history-page .history-org-card blockquote cite { display: block; margin-top: var(--mgdb-space-2); color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); font-style: normal; }
+
+/* The links land on the floor of every card, so a row reads as one band. */
+.mgdb-history-page .history-org-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  margin-top: auto;
+  padding-top: var(--mgdb-space-4);
+  font-weight: 700;
+}
+
+@media (max-width: 860px) {
+  .mgdb-history-page .history-origins-layout { grid-template-columns: minmax(0, 1fr); }
+}

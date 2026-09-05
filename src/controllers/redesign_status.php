@@ -43,6 +43,12 @@
       'modern'  => array('mgdb-pill-ok',   'Modern'),
       'partial' => array('mgdb-pill-warn', 'Partial'),
       'legacy'  => array('mgdb-pill-info', 'Legacy'),
+      /* Retired is neither done nor outstanding: the route answers a 301 and
+         has no page of its own left to modernize. It takes the page's own
+         class rather than one of the four shared pill tones, so it reads as
+         neither progress nor work. mgdb-pill-muted does not exist in any
+         stylesheet -- see the .mgdb-table-wrapper lesson. */
+      'retired' => array('status-pill-retired', 'Retired'),
     );
     $entry = isset($tone[$state]) ? $tone[$state] : array('', $state);
     return '<span class="mgdb-pill ' . $entry[0] . '">' . rs_esc($entry[1]) . '</span>';
@@ -50,10 +56,10 @@
 
   /* A three-part bar rather than a single percentage. The proportion of a
      category still untouched is the thing being read, and one number hides it. */
-  function rs_bar($modern, $partial, $legacy) {
-    $total = max(1, $modern + $partial + $legacy);
+  function rs_bar($modern, $partial, $legacy, $retired = 0) {
+    $total = max(1, $modern + $partial + $legacy + $retired);
     $parts = '';
-    foreach (array('modern' => $modern, 'partial' => $partial, 'legacy' => $legacy) as $state => $count) {
+    foreach (array('modern' => $modern, 'partial' => $partial, 'legacy' => $legacy, 'retired' => $retired) as $state => $count) {
       if ($count <= 0) { continue; }
       $parts .= '<span class="status-bar-part status-bar-' . $state . '"'
               . ' style="width:' . round(100 * $count / $total, 2) . '%"></span>';
@@ -105,16 +111,22 @@
   $category_rows = '';
   foreach ($categories as $category) {
       $bucket  = $status['by_category'][$category];
-      $percent = $bucket['total'] ? round(100 * $bucket['modern'] / $bucket['total']) : 0;
+      $retired = isset($bucket['retired']) ? $bucket['retired'] : 0;
+      /* Percent of the pages that still exist. A retired route is finished, so
+         leaving it in the denominator would report a category as less complete
+         the more of it was cleared away. */
+      $live    = $bucket['total'] - $retired;
+      $percent = $live > 0 ? round(100 * $bucket['modern'] / $live) : 0;
       $category_rows .=
           '<tr>'
         . '<th scope="row">' . rs_esc($category) . '</th>'
         . '<td class="mgdb-numeric" data-value="' . $bucket['modern'] . '">' . $bucket['modern'] . '</td>'
         . '<td class="mgdb-numeric" data-value="' . $bucket['partial'] . '">' . $bucket['partial'] . '</td>'
         . '<td class="mgdb-numeric" data-value="' . $bucket['legacy'] . '">' . $bucket['legacy'] . '</td>'
+        . '<td class="mgdb-numeric" data-value="' . $retired . '">' . $retired . '</td>'
         . '<td class="mgdb-numeric" data-value="' . $bucket['total'] . '">' . $bucket['total'] . '</td>'
         . '<td class="status-progress" data-value="' . $percent . '">'
-        . rs_bar($bucket['modern'], $bucket['partial'], $bucket['legacy'])
+        . rs_bar($bucket['modern'], $bucket['partial'], $bucket['legacy'], $retired)
         . '<span class="status-progress-value">' . $percent . '%</span>'
         . '</td>'
         . '</tr>';
@@ -255,6 +267,7 @@
   $body->get('modern-count')->replace(number_format($counts['modern']));
   $body->get('partial-count')->replace(number_format($counts['partial']));
   $body->get('legacy-count')->replace(number_format($counts['legacy']));
+  $body->get('retired-count')->replace(number_format(isset($counts['retired']) ? $counts['retired'] : 0));
   $body->get('percent-modern')->replace(number_format($status['percent_modern'], 1));
   $body->get('overall-bar')->replace(rs_bar($counts['modern'], $counts['partial'], $counts['legacy']));
   $body->get('evidence-note')->replace(

@@ -1616,3 +1616,598 @@ is worth writing down.
   heavily used public endpoint.
 - **Required administrator:** MaizeGDB application maintainer
 - **Status:** proposed
+
+
+## AD-050 — BLAST jobs ran but every result file came back empty
+
+- **What was wrong:** With AD-048 fixed, submissions on `claude.maizegdb.org`
+  wrote their query FASTA, launched `blastn`/`blastx`, and then produced a
+  zero-byte `.bla` file every time, so the results page polled `check_results`
+  forever and never rendered. Two independent causes, both host configuration:
+  1. **`BLAST_dbs` was missing from `conf/mgdb.conf`.** `BLAST_run.php` builds
+     the database argument as
+     `$system['BLAST_dbs'] . '/' . db_path . '/' . db_name`. With the key
+     absent, `$system['BLAST_dbs']` is the empty string and the command ran
+     against an absolute path from `/` — the logged command was
+     `-db /REFGEN_V5/chr/Zm-B73-REFERENCE-NAM-5.0`, which does not exist.
+     `blastn` exited 3 and wrote nothing. Only the `chi` instance on this host
+     carried the key (`BLAST_dbs=/home/Data/Blast`); `claude`, `codex`, `john`,
+     `gamma` and `redesign` all lack it. The failure is silent in the browser
+     because `BLAST_run.pl` writes `<sub_job_id>.err` next to the empty `.bla`,
+     and `checkResults()` only reports `ERROR` when the `.bla` is *absent* — an
+     empty results file plus an error file reads as "still running". That is the
+     symptom for `enhanced` (XML) output only; for table and text output the job
+     reports **success with no hits** instead, which is worse. See AD-053.
+  2. **`httpd_use_nfs` was off.** `/home/Data` is an NFS4 mount
+     (`10.24.26.122:/var/www/html/blast-data`), so every BLAST database file is
+     labelled `system_u:object_r:nfs_t:s0`. `httpd_t` — php-fpm's domain, and
+     therefore the domain the `exec()`-ed `blastn` inherits — cannot read
+     `nfs_t` unless that boolean is on, and it was off. As with AD-048 the
+     denials never appeared in `ausearch -m avc` (a `dontaudit` rule);
+     `setenforce 0` was again the decisive test — the identical submission that
+     had produced a zero-byte file produced 27,091 bytes of BLAST XML under
+     permissive.
+- **Why the application could not fix any of this:** `conf/mgdb.conf` is
+  server-side configuration deliberately outside the repository (it is called
+  out as such in `deploy/manifest.txt`), and the boolean is host SELinux
+  policy. Nothing in the redesign's own files is involved; `BLAST_run.php` is
+  fenced off from the redesign entirely.
+- **What was done** (2026-09-03, on the development instance):
+  ```
+  # conf/mgdb.conf, in the directories block (backup: mgdb.conf.bak-20260903)
+  BLAST_dbs=/home/Data/Blast
+
+  setsebool -P httpd_use_nfs on
+  ```
+  `httpd_use_nfs` is host-wide, so this also unblocks the `chi` instance, which
+  had the config key but not the SELinux permission. Worth checking that the
+  production instance carries both. The other development vhosts (`codex`,
+  `john`, `gamma`, `redesign`) still lack `BLAST_dbs` and will fail the same
+  way if BLAST is exercised on them.
+- **Verified:** Under `Enforcing`, ten consecutive real submissions through
+  `/BLAST` across all three output formats and three target types (assembly
+  `blastn`, CDS `blastn`, protein `blastx`) produced ten non-empty `.bla`
+  files (3,328 / 27,091 / 58,123 bytes by format) and zero new `.err` files.
+  `check_results` returns `DONE` and `process_results` returns 62,861 bytes of
+  rendered alignments for a completed job.
+- **Required administrator:** Server administrator with root
+- **Status:** implemented (2026-09-03)
+
+
+## AD-051 — `BLAST_run.php` builds a `-perc_identify` flag that does not exist
+
+- **What is wrong:** `controllers/BLAST/BLAST_run.php` reads the form's
+  percent-identity value into `$perc_identity`, then gates the flag on
+  `$perc_identify` (note the spelling) — an undefined variable — and emits
+  `-perc_identify` rather than BLAST's real `-perc_identity`. Two consequences:
+  the percent-identity control on the form is silently ignored for every
+  submission, and if the typo in the guard were ever corrected without also
+  correcting the flag, every job would fail with an unrecognised-argument
+  error and a zero-byte result file — the same invisible failure mode as
+  AD-050.
+- **Why the application cannot fix it:** `BLAST_run.php` is part of the job
+  path that the redesign does not own and is not in `deploy/manifest.txt`.
+- **What is needed:** Change both occurrences to `perc_identity` in the guard
+  and in the flag, and confirm against `blastn -help` that the value is only
+  passed to programs that accept it (`blastn`; `blastp`/`blastx` do not take
+  `-perc_identity`).
+- **Expected benefit:** Makes a control the form already offers actually do
+  something, and removes a latent whole-site BLAST outage.
+- **Required administrator:** MaizeGDB application maintainer
+- **Status:** proposed
+
+
+## AD-052 — One bad string edit broke six BLAST targets and their descriptions
+
+- **What is wrong:** With `BLAST_dbs` restored (AD-050), 473 of the 479
+  form-reachable BLAST targets resolve to a database on disk. The six that do
+  not are all `Td-KS_B6_1-REFERENCE-PanAnd-2.0`, and all six were damaged by a
+  single botched find/replace that hit **two columns in different ways**:
+
+  1. **`db_name` — a hyphen was doubled** (6 rows). The database stores
+     `Td-KS_B6_1--REFERENCE-…` where every file on disk has
+     `Td-KS_B6_1-REFERENCE-…`. Since `BLAST_run.php` builds its `-db` argument
+     as `<BLAST_dbs>/<db_path>/<db_name>`, `blastn`/`blastp` exits 3 with
+     "BLAST Database error: Database memory map file error" and leaves a
+     zero-byte `.bla`. This is the AD-050 symptom, surviving in six places after
+     AD-050 was otherwise fixed — and it presents two different ways depending on
+     the output format the user picked: `enhanced` (XML) hangs in the browser
+     forever, while table and text output report **success with no hits** (AD-053).
+     A user who picks one of these six targets with table output is told, plainly
+     and wrongly, that their sequence has no match in that assembly.
+  2. **`display_info` — characters were deleted instead** (4 of the same 6
+     rows). The two CDS rows read `Td-KS_B6_1REFERENCE-…` (hyphen gone) and the
+     two genomic rows read `Td-KS_B6_1-ERENCE-…` ("REF" gone). The two protein
+     rows escaped and carry the correct text, which is what the repair is
+     modelled on. Exactly these four rows are affected table-wide. This column
+     is **user-visible**, not just curator-visible: the legacy sequence-search
+     interface renders it at `popcorn/search/sequence_search/showallblast.php:33`
+     and `showmore.php:43`, and `blastsearch.js:281` puts it in the description
+     panel. Confirmed rather than inferred: `makeDatasetList()`'s category join
+     (`BLAST_helpers.php:751`) is a LEFT OUTER JOIN and its no-filter branch is
+     `AND (cat.name IS NULL OR cat.name != 'Unsupported')`, so running that exact
+     query returns all six rows, damaged text and all — having no category row
+     does not hide them.
+  3. **`target_type` — one missing space.** Row 10741991 reads
+     `Gene model protein -haplotype a` where its five siblings have
+     `- haplotype`. Cosmetic, but it is the label on the BLAST form's dataset
+     chips.
+
+  | id | `db_name` as stored | `display_info` |
+  |----|---------------------|----------------|
+  | 10741989 | `Td-KS_B6_1--REFERENCE-PanAnd-2.0a_Td00002bc.1.cds` | `…Td-KS_B6_1REFERENCE-…` |
+  | 10741990 | `Td-KS_B6_1--REFERENCE-PanAnd-2.0a_Td00002bc.1.gene` | `…Td-KS_B6_1-ERENCE-…` |
+  | 10741991 | `Td-KS_B6_1--REFERENCE-PanAnd-2.0a_Td00002bc.1.protein` | correct |
+  | 10741993 | `Td-KS_B6_1--REFERENCE-PanAnd-2.0b_Td00002bc.1.cds` | `…Td-KS_B6_1REFERENCE-…` |
+  | 10741994 | `Td-KS_B6_1--REFERENCE-PanAnd-2.0b_Td00002bc.1.gene` | `…Td-KS_B6_1-ERENCE-…` |
+  | 10741995 | `Td-KS_B6_1--REFERENCE-PanAnd-2.0b_Td00002bc.1.protein` | correct |
+
+  `db_path`, `name`, `short_name`, `type` and `assembly_name` are all correct on
+  these rows, and the two sibling assembly rows (10741988 haplotype a, 10741992
+  haplotype b) point at `chrs/` and are undamaged.
+
+- **How certain the repair is:** the `db_name` correction is exactly
+  `replace(db_name,'--','-')`, verified byte-for-byte —
+  `md5(replace(db_name,'--','-'))` computed in Postgres equals the md5 of the
+  on-disk basename for all six ids. All six corrected databases open under the
+  site's own `/usr/bin/blastn`/`blastp` 2.16.0+ (exit 0), and the stored
+  doubled-hyphen name reproduces the exit-3 failure on demand.
+
+- **Why this cannot be fixed by the application, or by us:** two separate
+  reasons, and the second is the operative one.
+  1. These are data rows in the shared `mgdb` database, and the reader
+     (`getBLASTrecord()` in `controllers/BLAST/BLAST_lib.php`) is on the
+     fenced-off job path.
+  2. **The application role cannot write this table.** `mgdb`, the only DB
+     account present in any `conf/db.conf` on dev8, holds SELECT only on
+     `mgdb.pc_blast_ctl` — `relacl` is `{postgres=arwdDxt/postgres,mgdb=r/postgres}`,
+     owner `postgres`. Attempting the UPDATE returns
+     `ERROR: permission denied for table pc_blast_ctl`. This is deliberate
+     least-privilege, not an oversight: `mgdb` holds UPDATE on exactly 1 of the
+     226 tables in the schema, its own `pc_job_ctl`. The same SELECT-only grant
+     applies on the curation host.
+
+- **Scope — this is three databases, not one.** The dev vhosts do not share a
+  database, and all three hosts carry byte-identical copies of the defect (same
+  six ids; `md5(string_agg(id||'|'||db_name ORDER BY id))` identical across all
+  three):
+
+  | database host | vhosts | role |
+  |---|---|---|
+  | `maizegdb-core3.usda.iastate.edu` | claude | the redesign instance |
+  | `maizegdb-core2.usda.iastate.edu` | codex, john, redesign | |
+  | `curation-tools-dev.usda.iastate.edu` | chi, gamma | **the curation source** |
+
+  Fixing only core3 leaves the other five instances hanging, and leaves the
+  corrupt spelling as the value of record upstream —
+  `popcorn/curation/lib_curation_db.php` holds both an INSERT (line 2105) and an
+  UPDATE (line 3096) into `pc_blast_ctl`, so correcting the curation copy is
+  what stops the damage returning at the next reload.
+
+- **Where it came from, and whether it will come back:** the only writers to
+  `mgdb.pc_blast_ctl` anywhere are `insertBlast()` and `updateBlast()` in
+  `popcorn/curation/lib_curation_db.php` (lines 2105 and 3096);
+  `popcorn/curation/blastDB_parser.php` is dead read-only Oracle-era code, and no
+  loader script exists on the web host or under `/home/Data/Blast`. `db_name` is a
+  plain free-text field on the curation form with no derivation from the filename,
+  so the doubled hyphen is a hand-typed error rather than a generated one — but
+  the `id_num` audit timestamps show these six rows were **not** created through
+  that form, so the bulk-insert path that actually made them is unidentified.
+  Reintroduction risk is therefore unknown, which is the second reason to correct
+  the curation copy rather than only the instance you are looking at.
+
+- **What is needed:** run
+  [`tools/sql/ad052_fix_td_ks_b6_1_db_name.sql`](tools/sql/ad052_fix_td_ks_b6_1_db_name.sql)
+  as a role with UPDATE on `mgdb.pc_blast_ctl`, against all three hosts. It is
+  wrapped in a transaction with two guards that abort rather than proceed if the
+  table is not in the expected state (exactly six rows needing the fix; no
+  collision with an existing `db_name`), a verification SELECT with the expected
+  output inline, and the rollback SQL commented at the foot. Prefer the curation
+  interface if a curator can reach these rows: a raw `psql` UPDATE bypasses the
+  audit trail the curation UI writes for `PC_BLAST_CTL`
+  (`lib_curation_db.php:3093`, `captureParentChanges`).
+
+- **Why the collision guard matters:** `getBLASTinfoFromDBname()` in
+  `BLAST_run.php` reverse-looks-up a saved result file's target by `db_name`
+  alone and takes the first row, so two rows sharing a `db_name` would silently
+  mislabel results. There is no unique index on that column to prevent it.
+  Checked: the table currently holds zero duplicate `db_name` values, and no row
+  holds any of the six corrected spellings, so the repair creates no collision.
+
+- **Known residue, not worth fixing:** 35 rows in `mgdb.pc_job_ctl` have a
+  `blast_target` matching no `pc_blast_ctl.db_name`. Exactly 4 of them carry the
+  doubled-hyphen string — the historical job records written by these six broken
+  targets — and they stay orphaned after the repair. (13 rows mention
+  Td-KS_B6_1 at all; the other 9 are the unrelated DRAFT-1.0 assembly.) Nothing reads them back — the
+  jobs never produced a `.bla` file to reverse-look-up — so they are harmless.
+
+- **Expected benefit:** restores the last six BLAST targets that silently hang,
+  and repairs four user-visible dataset descriptions.
+- **Required administrator:** database administrator with UPDATE on
+  `mgdb.pc_blast_ctl` (the `postgres` role), or a MaizeGDB curator working
+  through the curation interface
+- **Status:** proposed — SQL written and verified, blocked on privileges
+
+
+## AD-053 — A failed BLAST job reports success with no hits, for two of three output formats
+
+- **What is wrong:** `controllers/BLAST/BLAST_run.pl` appends its completion
+  marker unconditionally, outside the branch that handles a failed BLAST:
+
+  ```perl
+  if ($! != 0 || ($output_format eq 'enhanced' && (-s $outfile == 0))) {
+      ... write <sub_job>.err ...
+  }
+
+  if ($output_format eq 'BLAST_table' || $output_format eq 'BLAST_text') {
+      # Append "DONE" to indicate BLAST has completed
+      print OUT "\ndb_name = $db_name\n";
+      print OUT "DONE";
+  }
+  ```
+
+  So when `blastn`/`blastp` exits non-zero and writes nothing, a table- or
+  text-format job still ends up with a results file whose entire contents are the
+  trailer. `checkResults()` in `BLAST_tasks.php` greps that file for `DONE`,
+  finds it, calls `updateJobRecord($sub_job_id, 'completed')` and returns `DONE`.
+  The user is shown an empty results table — a confident, wrong "no hits in this
+  assembly" — and the job is recorded as completed. The `.err` file sitting
+  beside it is never consulted, because the `.bla` exists.
+
+  Only the `enhanced` (XML) format behaves differently, and only by accident: its
+  completion test is `str_contains($results, '</BlastOutput>')`, which an empty
+  file fails, so it hangs instead. A visible hang is the *better* of the two
+  outcomes.
+- **How to see it:** the artefacts are still on the development instance from the
+  AD-050 investigation. `cat -A /var/www/claude/html/temp/xhp0h1g6bsoQ_OlHdG.bla`
+  is 40 bytes and reads, in full: a blank line, `db_name = Zm-B73-REFERENCE-NAM-5.0`,
+  `DONE`. That job failed with `BLAST command failed with value 3` recorded in the
+  matching `.err`, and the site reported it complete.
+- **Why this matters beyond the two bugs that exposed it:** every future cause of
+  a non-zero BLAST exit — a database mid-rebuild, a full disk, an NFS stall, a
+  bad parameter — will present as "your sequence has no matches" rather than as
+  an error. AD-050 and AD-052 were both found only because someone noticed a
+  *hang*; the same faults on a table-format submission would have looked like a
+  legitimate negative result.
+- **Why the application cannot fix it:** `BLAST_run.pl` and `BLAST_tasks.php` are
+  on the job path the redesign does not own and are not in `deploy/manifest.txt`.
+- **What is needed:** gate the `DONE` trailer on the BLAST command having
+  succeeded, and have `checkResults()` check for the `.err` file before it checks
+  for `DONE` rather than only when the `.bla` is missing. A failed job should
+  reach `showError()`, which already exists as an action in `BLAST_tasks.php`.
+- **Expected benefit:** turns a silent wrong answer into a visible error — the
+  difference between a user rerunning their search and a user believing a
+  negative result.
+- **Required administrator:** MaizeGDB application maintainer
+- **Status:** proposed
+
+---
+
+## AD-054 — Meeting cover art stops at 2019, and the originals are unoptimized
+
+- **Date:** 2026-09-03
+- **Affected component:** `/maize_meeting/` (Cover art section) and `/maize_meeting/coverart/` (image directory)
+- **Current limitation:** The cover art collection runs 2009–2019 and nothing has been added since. `/maize_meeting/coverart/` holds exactly eleven `coverart_<year>` pairs, so the years 2020–2026 are missing entirely — the 2020 virtual meeting, 2021 virtual, 2022, 2023, 2024 (Raleigh), 2025 (St. Louis) and 2026 (Cologne). Separately, the full-size originals were never resized for the web: 2019 is **23 MB**, 2015 is 6.8 MB, and 2012, 2013 and 2014 are about 4 MB each. The cards link to those originals, so opening one is a large download on a phone.
+- **Proposed change:** (1) Collect the cover art for 2020 onward and drop each pair into `/maize_meeting/coverart/` as `coverart_<year>.<ext>` plus a `coverart_<year>_small.<ext>` thumbnail 100px tall, then add a card to the Cover art section — the markup comment there says what a card needs. (2) Re-encode the originals to a sensible long edge (2000px is ample for a program cover) so the "open the full image" link is not a multi-megabyte download.
+- **Expected benefit:** The section covers the whole modern run of the meeting rather than ending seven years ago, and the full-size links stop costing 23 MB.
+- **Risk and rollback:** None to the site. New images are additive; re-encoding should keep the originals archived elsewhere first.
+- **Required administrator:** MaizeGDB content maintainer (meeting materials) for the art; application maintainer for the re-encode.
+- **Status:** proposed
+- **Validation:** Each new year renders a card with a sharp thumbnail; `curl -sI` on every `coverart_<year>` original returns a `Content-Length` under about 1 MB.
+- **Note:** `/maize_meeting_coverart` is the existing legacy-shell page holding the same eleven images. It is not part of the redesign; the Cover art section on `/maize_meeting/` is now the maintained copy.
+
+
+## AD-054 — Nested quotes silently strip `-num_threads` and the custom column list from every table/text BLAST job
+
+- **What is wrong:** `controllers/BLAST/BLAST_run.php` builds the BLAST command
+  into `$cmd`, then wraps it in single quotes to hand to the perl launcher:
+  ```php
+  $cmd .= " -word_size $adj_word_size -outfmt $output_format_param -num_threads 4";
+  $run_blast = "perl controllers/BLAST/BLAST_run.pl $output_format '$cmd'";
+  exec("$run_blast > /dev/null &");
+  ```
+  For table output, `getOutputFormatParam()` returns a value that already
+  contains single quotes:
+  `'6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore sseq'`.
+  Nesting those inside the outer single-quoted argument terminates it. The
+  launcher receives **15 arguments instead of 2**:
+  ```
+  [0] BLAST_table
+  [1] blastn -query … -outfmt 6      <-- the only thing perl runs
+  [2] qseqid   [3] sseqid   [4] pident   …   [14] 4
+  ```
+  Consequences, all silent:
+  1. The 13-column format degrades to the **default 12** — `sseq` is never
+     produced, so no table-format result has ever carried subject sequence.
+  2. **`-num_threads 4` is discarded**, so every table and text job has been
+     running single-threaded.
+  3. Anything appended after `-outfmt` is discarded too, which is what makes
+     AD-051's `-perc_identify` harmless today — the malformed flag never
+     reaches BLAST either.
+
+  The `enhanced` path is unaffected: its format parameter is the bare `5`, with
+  no quotes to nest.
+- **Proof:** every `BLAST_table` `.bla` file on disk has 12 tab-separated
+  columns, not 13. Reproduced directly by handing the same string to a perl
+  script that prints `@ARGV` (output above).
+- **Why the application cannot fix it:** `BLAST_run.php` is on the job path the
+  redesign does not own and is not in `deploy/manifest.txt`.
+- **What is needed:** pass the command as an argument vector rather than a
+  quoted string — `escapeshellarg()` on the whole command, or better,
+  `proc_open()` with an array. If the string form is kept, the fix is
+  `escapeshellarg($cmd)` in place of `'$cmd'`.
+- **Expected benefit:** restores 4-thread execution for the majority of jobs and
+  makes the requested column set actually reach BLAST.
+- **Required administrator:** MaizeGDB application maintainer
+- **Status:** proposed
+
+
+## AD-055 — `chado.gene_model` has no coordinate index, so every genomic BLAST hit costs a sequential scan
+
+- **What is wrong:** turning a genomic BLAST hit into a gene means asking which
+  gene models overlap an interval. `chado.gene_model` is a materialized view of
+  626,306 rows with no index supporting that question, so the lookup is a
+  parallel sequential scan:
+  ```
+  WHERE assembly_version='Zm-B73-REFERENCE-NAM-5.0' AND chr='chr2'
+    AND gm_start <= 4496967 AND gm_end >= 4493490
+  -> Parallel Seq Scan, Rows Removed by Filter: 626306, Execution Time: 158 ms
+  ```
+- **The mitigation already applied in the new code:** batching every locus of a
+  result into one `VALUES`-joined query makes the cost independent of hit count
+  — 12 loci resolve in 147 ms, the same as one. The results interface therefore
+  issues one such query per assembly rather than one per hit. This is enough to
+  keep the page usable, and no index is required for it to work.
+- **What would make it fast:** a composite index on
+  `(assembly_version, chr, gm_start, gm_end)`, or a GiST index on an int4range
+  over the coordinates. Either should take this from ~150 ms to sub-millisecond
+  and would also speed the gene-neighborhood panel, which asks the same question
+  over a wider window.
+- **Why the application cannot do it:** the `mgdb` role holds SELECT only (see
+  AD-052); creating an index needs the owner.
+- **Required administrator:** database administrator
+- **Status:** proposed (optimization — the interface works without it)
+
+## AD-056 — Retired MGC committee sites are parked on the dev server, not deleted
+
+- **What was done:** the Maize Genetics Cooperation now maintains its awards,
+  advocacy and membership material on its own website, so on 2026-09-04 (Carson)
+  the four directories that held MaizeGDB's copies were moved out of the
+  document root:
+  ```
+  /var/www/claude/html/mgc/{awards,advocacy,membership,outreach}
+    -> /var/www/claude/retired/2026-09-04-mgc/
+  ```
+  32 files. `/var/www/claude/retired/` is outside `html/`, so nothing in
+  it is served. Both it and the dated directory carry a README saying what is
+  in them, what replaced each path, and how to put it back.
+- **The routes still answer.** `src/mgc/.htaccess` gained five rules, so an old
+  link 301s to its replacement instead of 404ing:
+
+  | Path | Replacement |
+  |---|---|
+  | `/mgc/awards/…` | `https://www.maizegenetics.org/awards/community-awards` |
+  | `/mgc/advocacy/…` | `https://www.maizegenetics.org/mgac` |
+  | `/mgc/membership/…` | `https://www.maizegenetics.org/membership` |
+  | `/mgc/membership/code_of_conduct.php` | `https://www.maizegenetics.org/code-of-conduct` |
+  | `/mgc/outreach/…` | `https://www.maizegenetics.org/codie` |
+
+  The rules match the whole subtree, not just each index, because the files are
+  gone. `mgc/maizemeeting/<year>` is deliberately not matched — it is the
+  meeting archive every "Past meetings" card links to, and it still resolves.
+- **`/mgc/awards/` was not orphaned, despite appearances.**
+  `controllers/community/awards.php` is a bare `header('Location: /mgc/awards/')`
+  and the site map linked `/community/awards`. The site map entry now points at
+  the MGC site directly; the old route still resolves, in two hops.
+- **What the administrator needs to do at full release:** delete
+  `/var/www/claude/retired/` once no one has asked for anything in it. Keep the
+  five RewriteRules — they are what stops old links, including printed and cited
+  ones, from 404ing after the files are gone.
+- **`mgc/outreach/` is CODIE** — the Committee on Outreach, Diversity,
+  Inclusion and Education — and went the same way on Carson's instruction. Its
+  `funding.php` was the largest page of the set (22 KB of funding
+  opportunities); the README says to check that maizegenetics.org/codie still
+  carries the equivalent before the directory is deleted.
+- **One directory was deleted rather than parked:**
+  `mgc/outreach_tmp-rm-au4mf8/`, a web-accessible copy of `outreach/` left by
+  someone's earlier removal attempt. Verified byte-identical to `outreach/`
+  except one nav href (`../maizemeeting/` against `../maizemeeting/2025`),
+  i.e. it was the older copy and held nothing unique.
+- **Required administrator:** web server administrator (at full release only)
+- **Status:** applied — the move and the redirects are live and verified; the
+  final deletion is the outstanding admin action
+
+## AD-057 — Five short routes retired to 301s; their pages are still served
+
+- **What was done:** on 2026-09-04 (Carson) five MaizeGDB routes were retired.
+  Each got a top-level redirect controller in the repo — `controller.php` checks
+  `controllers/<name>.php` before falling through, so the file *is* the route:
+
+  | Retired | Redirects to | Page still served at |
+  |---|---|---|
+  | `/classic_reads` | `/maize_history#history-classic-reads` | `/community/classic_reads` |
+  | `/credit` | `/cite` | `/about/credit` |
+  | `/faq` | `/contact` | `/about/faq` |
+  | `/gbs` | `/data_center/variation` | **nothing — off the site** |
+  | `/genotype` | `/data_center/variation` | **nothing — off the site** |
+
+  **Nothing was deleted**, but only three of the five keep a working URL.
+  `/about/<page>` serves because `controllers/about.php` dispatches
+  `controllers/about/<page>.php`; **there is no `controllers/tools.php`**, so
+  `/tools/<page>` is not dispatched at all — it falls through to `redirect.php`,
+  which answers **200 with the generic shell**. A soft 404: status code and
+  page size look fine, and the content is absent. Check for a distinctive
+  string, never a 200, when claiming a page still serves. Rolling one back is
+  deleting one file; the controllers and templates are untouched on disk.
+- **`/gbs` and `/genotype` were the same page twice.** Both embed one iframe,
+  `cbsusrv04.tc.cornell.edu/users/panzea/filegateway.aspx?category=Genotypes`,
+  and differ only in prose. That host still answers 200, but the pages' own
+  instructions say the embed needs third-party cookies, which browsers now block
+  by default — so it has been failing silently for most readers for some time.
+  Panzea serves the same data directly at panzea.org/genotypes.
+- **The credits and FAQ content is obsolete and is not being ported anywhere**
+  (Carson, 2026-09-04, asked directly). `/about/credit` still holds the data
+  source, funding source, guidance and software lists and `/about/faq` still
+  holds the answers, but both describe a version of the project that no longer
+  exists. No follow-up work is owed on either.
+- **Still linking the retired routes, and fine because of the 301s:**
+  `/diversity` (`/faq`, `/gbs`, `/genotype`) and `/doc` (`/faq`), both legacy
+  pages in templates this repo does not own. The site map's four entries were
+  removed — 133 directory entries down to 129 — because every destination it
+  would have redirected through is already listed in it.
+- **Required administrator:** none
+- **Status:** applied and verified — five 301s, five pages still served, site map
+  regenerated
+
+## AD-058 — The three B73 RefGen_v2 locus tools are retired
+
+- **What was done:** on 2026-09-04 (Carson: "they are based on really old
+  versions of the maize reference assembly") three tools were retired with
+  top-level redirect controllers, and their site map entries removed:
+
+  | Retired | Redirects to |
+  |---|---|
+  | `/incongruency` | `/data_center/map` |
+  | `/locus_lookup` | `/data_center/locus` |
+  | `/locus_pair_lookup` | `/data_center/locus` |
+
+  All three were built on **B73 RefGen_v2**, three major versions behind the
+  current B73 v5 (`Zm00001eb`), so the coordinates they returned were not the
+  ones a reader wants. `/locus_lookup` returned coordinates for a named locus
+  from one of five genetic maps; `/locus_pair_lookup` did the same for the
+  region bounding two loci; `/incongruency` tabulated, per chromosome, loci
+  placed on the assembly by BLAST against their predicted position on the ISU
+  Integrated IBM 2009 map, to flag regions where *that* assembly needed
+  improvement.
+- **These three have no alternate route** — see AD-057 on `/tools/<page>` not
+  being dispatched. Nothing was deleted; restoring one is deleting one file.
+- **The modern Map hub linked `/incongruency`.** `templates/static/mgdb_map.bau`
+  carried a "Map vs Genome Incongruencies" card in its Collections grid; left
+  alone it would have linked a redirect back to the hub it sits on. The card was
+  removed, taking that grid from six cards to five.
+- **`/tools/locus_pair_lookup` was never a route at all**: a real directory of
+  that name exists under `html/tools/` holding the tool's `lpl.php` backend, so
+  Apache's DirectorySlash answered it with a 301 to the trailing-slash URL and
+  then 403. The backend file is still there and still answers 200; it is not
+  reachable from any page now.
+- **Required administrator:** none
+- **Status:** applied and verified — three 301s, the Map hub card removed, site
+  map regenerated (129 entries down to 126)
+
+## AD-059 — Orphaned tool backends parked, and every remaining link to a retired route removed
+
+- **Orphaned files moved** to `/var/www/claude/retired/2026-09-04-orphans/`
+  (outside the document root, README included):
+
+  | Was at | Why |
+  |---|---|
+  | `html/tools/locus_pair_lookup/lpl.php` | Query backend for the retired `/locus_pair_lookup`; referenced only by that tool's own template, yet still answering 200 on the web after the page was gone |
+  | `html/templates/gene_center/locus_chrcoords_gene_sections.bau` | Loaded by no controller at all; its only live content was a link to `/locus_lookup` |
+
+  Removing that directory also cleared the DirectorySlash collision that made
+  `/tools/locus_pair_lookup` answer 301-then-403 (AD-058).
+- **Links removed from live pages.** Every page a reader can reach is now free
+  of links to retired routes:
+  - `/doc` — the "Frequently Asked Questions" heading and the
+    "Of Interest to Maize Cooperators" sentence. `/doc` is linked from the
+    modern About megamenu, so this was the most visible of them.
+  - `/diversity` — the two "Search genotype/GBS data at Panzea" paragraphs.
+    SNPversity and TYPSimSelector kept.
+  - **The legacy megamenu** (`templates/home/megamenu/about.bau`) — the FAQs
+    item, which put a `/faq` link in the chrome of *every* legacy page. Same
+    reason "Cooperator history" came out of it earlier.
+  - **19 `mgec-*.bau` pages** — the "Of Interest to Maize Cooperators" line in
+    the footer nav of every MGEC sub-page. Those pages are live and the modern
+    history page links `/mgec`.
+  - `/tools/update_person` and the legacy home — the phrase kept, the link
+    dropped.
+- **Two references left, both unreachable:**
+  `templates/tools/locus_lookup-content.bau` (the retired tool's own template)
+  and `templates/static/genetic_variation.bau` (dead — its controller is
+  shadowed by the modern `controllers/genetic_variation.php`).
+- **`tools/ajax/locus_lookup/` was moved on 2026-09-04**, after Carson said to
+  take the v2 lookup out of search. It carried a zero-byte `RETIRED` marker
+  someone left on 2024-08-04 but was still wired up. Two callers came out first:
+  `templates/search_engine/search.bau` ran `runLL('IBM2', code, 'refgen_v2')` on
+  search category 4, and `controllers/gene_center.php` included
+  `/js/locus_lookup.js` on every gene_center page reaching that line — in
+  practice `locus_family`, which calls nothing in it and renders none of the
+  `ll_results_*` containers it writes into. **Neither was reaching a reader**:
+  `/search_engine/search` already returned 0 bytes, and the live search is
+  `/search_engine/searchall`, which never loaded any of it. Verified after the
+  move: the gene hub, gene record, locus hub, locus_family and searchall all
+  render clean.
+- **`js/locus_lookup.js` and `js/locus_search.js` were left in place.** Nothing
+  loads `locus_search.js` at all; `locus_lookup.js` is still named by
+  `templates/gene_center/gene.bau` and `templates/data_center/locus.bau`,
+  neither of which puts it into a rendered page.
+- **Everything under `/tools/` answers 200 with the generic shell**, because
+  there is no `controllers/tools.php` and `redirect.php` catches the fall-through
+  — 39,075 bytes, identical for every unmatched path. A 200 there means nothing;
+  compare the body.
+- **All edits above are to server-only files** not in `deploy/manifest.txt`, so
+  an upstream deploy will restore them. Each file has a `.bak-<timestamp>`
+  beside it.
+- **Required administrator:** none
+- **Status:** applied and verified
+
+## AD-060 — Ten old or broken pages retired; /unsubscribe deliberately kept
+
+- **Retired 2026-09-04** (Carson: "old or broken"), each a 301, nothing deleted:
+
+  | Retired | Redirects to | Note |
+  |---|---|---|
+  | `/site_tour` | `/sitemap` | Tour of the pre-redesign site; still at `/about/site_tour` |
+  | `/data_center/mapped_accession` | `/data_center/locus` | guard in `controllers/data_center.php` |
+  | `/data_center/sequence` | `/genome` | guard in `controllers/data_center.php` |
+  | `/mapped_elements` | `/data_center/est` | **was emitting a public PHP fatal error** |
+  | `/locus_summary_table` | `/data_center/locus` | |
+  | `/complete_map` | `/data_center/map` | bare URL always showed "Record not found" |
+  | `/fcfair` | `/FAIRpractices` | Field Crop FAIR Data Demonstrator, 2019; rendered nothing |
+  | `/single_tissue_comp` | `/data_center/expression` | **broken by a `</php` typo in its own first line** |
+  | `/var_keys` | `/data_center/variation` | rendered an empty content block |
+  | `/challenge/` | `/` | one line of PHP redirecting to a Google Form; `html/challenge/` moved to `retired/2026-09-04-orphans/` |
+
+- **`/unsubscribe` was retired on 2026-09-04**, but only after Carson confirmed
+  the mailing-list opt-out is no longer needed — it was held back from the batch
+  for a week's worth of checking first, and the reasoning is worth keeping:
+  it looks broken from
+  the bare URL — it renders "This key is invalid and no unsubscribe request has
+  been sent" — but that is the correct response to a request with no parameters.
+  `controllers/tools/unsubscribe.php` reads `?id=` and `?key=`, validates the
+  key against `keygen_unsub($id)`, looks the person up in `PERSON`, checks the
+  `Cooperator` attribute and lists their addresses from `person_email`. **It is
+  the opt-out endpoint for the maize community mailing list, and its links are
+  already out in sent email.** Retiring it would break every unsubscribe link
+  ever mailed, which is a compliance problem as well as a user-hostile one.
+  It now 301s to `/contact` rather than the homepage, because someone arriving
+  from an old unsubscribe link still wants off a list and needs a way to say so.
+- **Two pages were broken in ways worth recording**, since both failed silently
+  or ugly rather than 404ing:
+  - `/mapped_elements` built its SQL from `?type=` and `?chrom=`, so a bare
+    request reached `PDO::prepare()` with an empty string and returned a
+    518-byte **uncaught ValueError with the file path and full stack trace
+    exposed publicly**.
+  - `/single_tissue_comp` opens with `</php` instead of `<?php`, so PHP emitted
+    nothing at all and the page rendered an empty content block. It has
+    presumably been that way since it was written.
+- **Inbound links:** only `/locus_summary_table` was in the site map (removed;
+  129 entries down to 125). The one remaining reference,
+  `templates/data_center/sequence-search-left.bau -> /data_center/mapped_accession`,
+  is inside the retired `/data_center/sequence` page itself.
+- **`/locus_search` was retired the same day**, after it turned up during the
+  endpoint cleanup: it rendered four `ll_results_*` containers but loaded **no
+  JavaScript at all**, so nothing could ever fill them — non-functional before
+  any of this, and nothing linked it. It 301s to `/data_center/locus`, and
+  `js/locus_search.js`, referenced by nothing, went to the orphans area. That
+  completes the B73 RefGen_v2 locus tools: `/locus_lookup`,
+  `/locus_pair_lookup`, `/incongruency`, `/locus_summary_table`,
+  `/locus_search`.
+- **Do not confuse it with the modern locus search**, which is untouched and is
+  the redirect target: `controllers/data_center/locus_search_modern.php`,
+  `search/locus/locus_search_lib.php`, `search/locus/locus_search_api.php` and
+  `js/mgdb-locus.js`, serving `/data_center/locus`. Verified after the change —
+  the API returns waxy1 for "wx1" in 817 ms.
+- **Required administrator:** none
+- **Status:** applied and verified — eleven 301s, site map regenerated,
+  `/unsubscribe` retired to `/contact` on Carson's confirmation

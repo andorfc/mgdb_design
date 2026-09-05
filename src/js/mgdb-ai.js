@@ -626,10 +626,13 @@
       Array.prototype.forEach.call(buttons, function (b) {
         b.setAttribute('aria-pressed', b.getAttribute('data-ai-figure-view') === view ? 'true' : 'false');
       });
-      /* Plotly sizes to the box it drew into. Coming back from the table the
-         box was display:none, so its width was 0 until now. */
-      if (view === 'chart' && window.Plotly && chart.querySelector('.js-plotly-plot')) {
-        window.Plotly.Plots.resize(chart.querySelector('.js-plotly-plot'));
+      /* Plotly sizes to the box it drew into, and the box was display:none
+         while the table was up, so re-fit it on the way back. Plotly marks the
+         element it drew into -- the target itself, not a child of it, which is
+         what makes a querySelector for .js-plotly-plot here silently never
+         match. */
+      if (view === 'chart' && window.Plotly && chart.classList.contains('js-plotly-plot')) {
+        window.Plotly.Plots.resize(chart);
       }
     }
 

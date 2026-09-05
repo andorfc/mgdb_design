@@ -217,9 +217,12 @@
         if (show) { visible += 1; }
       });
 
+      /* Grouped, because every other number the design system prints is.
+         The first list long enough to notice was /ssrreports, which announced
+         "2034 records shown" under a metric card reading "2,034". */
       var message = visible === items.length
-        ? String(items.length) + ' ' + noun + ' shown'
-        : String(visible) + ' of ' + items.length + ' ' + noun + ' shown';
+        ? items.length.toLocaleString() + ' ' + noun + ' shown'
+        : visible.toLocaleString() + ' of ' + items.length.toLocaleString() + ' ' + noun + ' shown';
 
       if (countEl) { countEl.textContent = message; }
       if (emptyEl) { emptyEl.hidden = visible !== 0; }
@@ -812,6 +815,15 @@
       new window.MutationObserver(update).observe(watched, {
         childList: true, subtree: true, attributes: true, attributeFilter: ['hidden']
       });
+    }
+
+    /* A fragment arrival -- /maize_history#history-classic-reads from the
+       Community menu -- is scrolled by the browser around the time this runs,
+       and whether that scroll reaches the listener above depends on when the
+       document settles. Re-measure once after load so the bar cannot sit on
+       the first tab while the reader is already halfway down the page. */
+    if (document.readyState !== 'complete') {
+      window.addEventListener('load', function () { window.setTimeout(update, 0); });
     }
 
     update();

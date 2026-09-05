@@ -1,0 +1,33 @@
+# The Maize Genetics Cooperation's own pages moved to maizegenetics.org.
+#
+# This directory still holds a copy of the old MGC site -- the board of
+# directors, elections, minutes, the calendar, The Kernel, the forum. That
+# content is maintained on maizegenetics.org now, so those pages redirect there
+# rather than serving a stale second copy. Carson, 2026-09-04.
+#
+# One thing in here is NOT the old site and must keep working:
+#
+#   mgc/maizemeeting/<year>   the archived meeting websites, which every
+#                             "Past meetings" card on /maize_meeting/ links to
+#
+# The patterns below are anchored to this directory's own files and named
+# subdirectories, so a request for maizemeeting/2025 does not match any of them.
+
+RewriteEngine On
+
+RewriteRule ^$ https://www.maizegenetics.org/ [R=301,L]
+RewriteRule ^(index|index2|bod|elections|forum|minutes|thekernel|past_committees)\.php$ https://www.maizegenetics.org/ [R=301,L]
+RewriteRule ^calendar[0-9]*\.php$ https://www.maizegenetics.org/ [R=301,L]
+
+# The four committee sites, replaced by the MGC's own website and moved off the
+# server on 2026-09-04 to /var/www/claude/retired/2026-09-04-mgc/ (Carson).
+# These rules are what keeps an old link working now that the files are gone,
+# so they answer for the whole subtree, not just its index. The code of conduct
+# has its own page over there and is matched before the general membership rule.
+# outreach/ is CODIE, the Committee on Outreach, Diversity, Inclusion and
+# Education; maizegenetics.org/codie is the same committee.
+RewriteRule ^membership/code_of_conduct\.php$ https://www.maizegenetics.org/code-of-conduct [R=301,L]
+RewriteRule ^awards(/.*)?$ https://www.maizegenetics.org/awards/community-awards [R=301,L]
+RewriteRule ^advocacy(/.*)?$ https://www.maizegenetics.org/mgac [R=301,L]
+RewriteRule ^membership(/.*)?$ https://www.maizegenetics.org/membership [R=301,L]
+RewriteRule ^outreach(/.*)?$ https://www.maizegenetics.org/codie [R=301,L]

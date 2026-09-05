@@ -48,7 +48,7 @@ $$SYNTAX-LEVEL 2
         <a class="caas-hero-link" href="/download#downloads-caas-fil">
           <span class="caas-link-dot caas-dot-blue" aria-hidden="true"></span> Downloads
         </a>
-        <a class="caas-hero-link" href="https://doi.org/10.1038/s41588-023-01449-w" target="_blank" rel="noopener">
+        <a class="caas-hero-link" href="https://doi.org/10.1038/s41588-022-01283-w" target="_blank" rel="noopener">
           <span class="caas-link-dot caas-dot-rose" aria-hidden="true"></span> Paper &#8599;
         </a>
         <a class="caas-hero-link" href="/gene_center/gene">
@@ -80,6 +80,11 @@ $$SYNTAX-LEVEL 2
 
 <!-- FILTER & SEARCH TOOLBAR -->
     <div class="caas-table-toolbar">
+      <div class="caas-search-wrap">
+        <label for="caas-search-input" class="mgdb-visually-hidden">Search CAAS-FIL assemblies</label>
+        <input type="text" id="caas-search-input" class="mgdb-input caas-search-input" placeholder="Search line name, assembly ID, heterotic group, or GenBank accession..." autocomplete="off" spellcheck="false" />
+      </div>
+
       <div class="caas-filter-chips-wrap" role="group" aria-label="Filter by heterotic group">
         <span class="caas-toolbar-label">Group&#58;</span>
         <button type="button" class="caas-chip is-active" data-filter="all">All \(12\)</button>
@@ -88,11 +93,6 @@ $$SYNTAX-LEVEL 2
         <button type="button" class="caas-chip caas-chip-lancaster" data-filter="lancaster">Lancaster \(2\)</button>
         <button type="button" class="caas-chip caas-chip-ss" data-filter="ss">Stiff Stalk &amp; Iodent \(2\)</button>
         <button type="button" class="caas-chip caas-chip-other" data-filter="other">X-Group &amp; Mixed \(2\)</button>
-      </div>
-
-      <div class="caas-search-wrap">
-        <label for="caas-search-input" class="mgdb-visually-hidden">Search CAAS-FIL assemblies</label>
-        <input type="text" id="caas-search-input" class="mgdb-input caas-search-input" placeholder="Search line name, assembly ID, heterotic group, or GenBank accession..." autocomplete="off" spellcheck="false" />
       </div>
     </div>
 
@@ -647,30 +647,9 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="caas-pub-title">Publications</h2></div>
     </div>
 
-<div class="caas-publications-grid">
-      <!-- Publication 1: CAAS-FIL Landmark Paper -->
-      <article class="caas-pub-card">
-        <div class="caas-pub-meta-top">
-          <span class="caas-pub-journal-badge">Nature Genetics &bull; 2023</span>
-          <span class="caas-pub-doi">DOI&#58; 10.1038/s41588-023-01449-w</span>
-        </div>
-        <h3 class="caas-pub-title">Genomic variation and heterotic group architecture in Chinese maize founder inbred lines</h3>
-        <p class="caas-pub-authors">Chinese Academy of Agricultural Sciences \(CAAS\) Maize Genomics Consortium, Agricultural Genomics Institute at Shenzhen \(AGIS\), et al.</p>
-        <p class="caas-pub-citation"><em>Nature Genetics</em> 2023 Jul; 55\(7\)&#58;1124&ndash;1135.</p>
-        
-        <div class="caas-pub-abstract-wrap">
-          <h4 class="caas-pub-abstract-heading">Abstract</h4>
-          <p class="caas-pub-abstract-text">Modern maize hybrid breeding has achieved remarkable yield gains through the systematic exploitation of heterosis between genetically distinct founder inbred lines. Here we report high-quality de novo chromosome-scale genome assemblies and comprehensive gene annotations for 12 foundational founder inbred lines representing the major heterotic groups of Chinese maize breeding, including Tang Sipingtou \(Huangzaosi, Chang7-2, Jing92\), P-Group \(Ye478, Zheng58, Xu178\), Lancaster \(Dan340, Oh43\), Stiff Stalk \(A632\), and Iodent \(PH207\). Comparative pan-genomic analyses reveal massive structural variation, asymmetric transposable element dynamics, and divergent gene family expansions across heterotic groups, providing a molecular blueprint for understanding heterosis and accelerating hybrid maize improvement.</p>
-        </div>
-
-        <div class="caas-pub-actions">
-          <a class="mgdb-button mgdb-button-primary" href="https://doi.org/10.1038/s41588-023-01449-w" target="_blank" rel="noopener">Full Text on Nature Genetics &#8599;</a>
-          <a class="mgdb-button mgdb-button-secondary" href="/download#downloads-caas-fil">Browse CAAS Downloads &#8599;</a>
-          <a class="mgdb-button mgdb-button-quiet" href="/data_center/reference?author=CAAS">MaizeGDB Record</a>
-        </div>
-      </article>
+    <div class="mgdb-ref-list">
+      $(reference_cards)
     </div>
-
   </section>
 
   <!-- SECTION 4: DATA HOSTED AT MAIZEGDB -->
@@ -766,7 +745,7 @@ $$SYNTAX-LEVEL 2
 <div class="mgdb-metric-grid">
       <article class="mgdb-metric">
         <div class="mgdb-metric-top">
-          <h3>De Novo Reference Assemblies</h3>
+          <h3>De novo reference assemblies</h3>
         </div>
         <div class="mgdb-metric-stat">
           <strong class="mgdb-metric-value">12</strong>
@@ -775,7 +754,7 @@ $$SYNTAX-LEVEL 2
       </article>
       <article class="mgdb-metric">
         <div class="mgdb-metric-top">
-          <h3>Average Assembly Size</h3>
+          <h3>Average assembly size</h3>
         </div>
         <div class="mgdb-metric-stat">
           <strong class="mgdb-metric-value mgdb-metric-value-compact">~2.26 Gb</strong>
@@ -784,7 +763,7 @@ $$SYNTAX-LEVEL 2
       </article>
       <article class="mgdb-metric">
         <div class="mgdb-metric-top">
-          <h3>Total Gene Annotations</h3>
+          <h3>Total gene annotations</h3>
         </div>
         <div class="mgdb-metric-stat">
           <strong class="mgdb-metric-value mgdb-metric-value-compact">530,000+</strong>
@@ -793,7 +772,7 @@ $$SYNTAX-LEVEL 2
       </article>
       <article class="mgdb-metric">
         <div class="mgdb-metric-top">
-          <h3>Heterotic Classifications</h3>
+          <h3>Heterotic classifications</h3>
         </div>
         <div class="mgdb-metric-stat">
           <strong class="mgdb-metric-value mgdb-metric-value-compact">6 Groups</strong>
@@ -813,7 +792,7 @@ $$SYNTAX-LEVEL 2
     <div class="mgdb-resource-panel">
       <div class="mgdb-resource-list">
         <a href="/NAM_project">
-          <strong>NAM Founder Genomes</strong>
+          <strong>NAM Parent Genomes</strong>
           <span>26 chromosome-scale assemblies of the US nested association mapping founders</span>
         </a>
         <a href="/PanAnd_project">

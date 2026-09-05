@@ -1,0 +1,292 @@
+/* Genetic maps in MaizeGDB (/handyref) — MaizeGDB modern design system.
+ *
+ * The ground, the white section cards, their colored top edges, the metric and
+ * Related resources treatments and the tab bar all come from css/mgdb-hub.css,
+ * which is loaded first. Only what is specific to this page lives here: the
+ * centimorgan-scale hero emblem, the reading measure for a page that is mostly
+ * prose, the prose-and-figure split, and the map-set tables.
+ */
+
+.mgdb-modern .mgdb-handyref-page { padding-bottom: clamp(3rem, 6vw, 5.5rem); }
+
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
+
+/* A map is a scale with loci on it, so the emblem is a scale. Three ticks, not
+   a picture of a chromosome: the page is about coordinates. */
+.mgdb-handyref-page .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-handyref-page .handyref-emblem-scale {
+  position: relative;
+  display: flex;
+  width: min(100%, 12rem);
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  padding-top: 0.9rem;
+}
+
+.mgdb-handyref-page .handyref-emblem-scale::before {
+  content: "";
+  position: absolute;
+  top: 0.45rem;
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: var(--mgdb-green-dark);
+}
+
+.mgdb-handyref-page .handyref-emblem-tick {
+  position: relative;
+  color: var(--mgdb-green-dark);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.mgdb-handyref-page .handyref-emblem-tick::before {
+  content: "";
+  position: absolute;
+  top: -0.5rem;
+  left: 50%;
+  width: 2px;
+  height: 0.5rem;
+  background: var(--mgdb-green-dark);
+  transform: translateX(-50%);
+}
+
+/* The shell uppercases everything in the emblem, which turns the unit into
+   "CM". A centimorgan is cM -- lowercase c, capital M -- and the two are
+   different units, so this tick opts out of the transform. */
+.mgdb-handyref-page .handyref-emblem-tick,
+.mgdb-handyref-page .handyref-emblem-tick em {
+  font-style: normal;
+  text-transform: none;
+}
+
+/* ── Sticky section tabs ─────────────────────────────────────────────────── */
+
+
+.mgdb-handyref-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.mgdb-handyref-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
+
+.mgdb-handyref-page .mgdb-section-tabs a.is-current,
+.mgdb-handyref-page .mgdb-section-tabs a[aria-current="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+/* This bar never wraps, at any width, and that is the point.
+ *
+ * The shell's scroll offset ladder assumes a bar that wraps to two rows below
+ * 1170px, which is true of a four-tab bar and not of this seven-tab one:
+ * measured, it stays one row from 1280px all the way down to 810px and only
+ * then wraps. Following the shell would have scrolled every section 48px too
+ * far for 360px of that range, and the shared scrollspy reads scroll-margin-top
+ * back from computed style, so the active tab would have been wrong over the
+ * same range.
+ *
+ * Rather than tune breakpoints around an 805-ish wrap point that depends on how
+ * the tab labels happen to render, the bar scrolls horizontally instead of
+ * wrapping. It is then exactly one row and exactly 57px tall at every width, so
+ * one offset is right everywhere and no measurement can go stale. Above 810px
+ * the tabs fit and no scrollbar appears, so on a desktop this looks like any
+ * other hub's bar.
+ */
+.mgdb-handyref-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-5);
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mgdb-hub-page.mgdb-handyref-page > section[id] { scroll-margin-top: 65px; }
+
+.mgdb-handyref-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+/* ── Prose ───────────────────────────────────────────────────────────────── */
+
+/* This page is read, not scanned, so the measure is set for running text. */
+.mgdb-handyref-page .handyref-prose { max-width: 62rem; }
+
+.mgdb-handyref-page .handyref-prose p {
+  margin: 0 0 1.05rem;
+  color: var(--mgdb-ink);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.mgdb-handyref-page .handyref-prose p:last-child { margin-bottom: 0; }
+.mgdb-handyref-page .handyref-prose cite { font-style: italic; }
+
+.mgdb-handyref-page .handyref-note {
+  padding-left: 0.85rem;
+  border-left: 3px solid var(--mgdb-gold);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm) !important;
+}
+
+.mgdb-handyref-page .handyref-provenance {
+  max-width: 62rem;
+  margin: 1.4rem 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.55;
+}
+
+/* A quotation is someone else's voice, so it is set apart rather than styled
+   like an aside of ours. */
+.mgdb-handyref-page .handyref-quote {
+  margin: 0 0 1.05rem;
+  padding: 0.9rem 1.1rem;
+  border-left: 4px solid var(--mgdb-green-dark);
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-handyref-page .handyref-quote p {
+  margin: 0 0 0.7rem;
+  font-size: 0.96rem;
+}
+
+.mgdb-handyref-page .handyref-quote p:last-child { margin-bottom: 0; }
+
+/* ── Prose beside the crossing diagram ───────────────────────────────────── */
+
+.mgdb-handyref-page .handyref-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--mgdb-space-5);
+}
+
+.mgdb-handyref-page .handyref-figure {
+  width: 280px;
+  margin: 0;
+  padding: 0.85rem;
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: #ffffff;
+}
+
+/* The legacy page drew this 280x470 image at 256x298, which squashed it. Height
+   is left to the aspect ratio. */
+.mgdb-handyref-page .handyref-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 0;
+}
+
+.mgdb-handyref-page .handyref-figure figcaption {
+  margin-top: 0.6rem;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .mgdb-handyref-page .handyref-split { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-handyref-page .handyref-figure { width: min(280px, 100%); }
+}
+
+/* ── Map-set tables ──────────────────────────────────────────────────────── */
+
+/* Three columns never need to scroll on a desktop, but a long set name plus two
+   figures does overflow a phone, and the page body must not scroll sideways. */
+.mgdb-handyref-page .handyref-table-scroll {
+  overflow-x: auto;
+  margin-top: var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: #ffffff;
+}
+
+.mgdb-handyref-page .handyref-sets {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-handyref-page .handyref-sets th,
+.mgdb-handyref-page .handyref-sets td {
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--hub-line);
+  text-align: left;
+  vertical-align: baseline;
+}
+
+.mgdb-handyref-page .handyref-sets thead th {
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-ink);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.mgdb-handyref-page .handyref-sets tbody tr:last-child th,
+.mgdb-handyref-page .handyref-sets tbody tr:last-child td { border-bottom: 0; }
+
+.mgdb-handyref-page .handyref-sets tbody tr:nth-child(even) { background: var(--hub-zebra, rgba(0, 0, 0, 0.02)); }
+
+.mgdb-handyref-page .handyref-sets tbody th {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Counts are compared down the column, so the digits line up. */
+.mgdb-handyref-page .handyref-sets .handyref-num {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.mgdb-handyref-page .handyref-set-note {
+  display: block;
+  color: var(--mgdb-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+/* ── Related resources ───────────────────────────────────────────────────── */
+
+/* The shell lays this panel out with `repeat(auto-fit, minmax(220px, 1fr))`,
+   which gives five columns at full width. Six cards then leave one alone on a
+   second row with a thousand pixels of nothing beside it -- the ragged row that
+   /projects hit for the same reason. Six divides by three, two and one, so the
+   column count is pinned to those and every row is full at every width. */
+.mgdb-handyref-page .mgdb-resource-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 1000px) {
+  .mgdb-handyref-page .mgdb-resource-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 620px) {
+  .mgdb-handyref-page .mgdb-resource-list { grid-template-columns: minmax(0, 1fr); }
+}

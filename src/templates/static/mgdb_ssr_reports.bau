@@ -1,0 +1,194 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-ssr-reports
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https://maizegdb.org/ssrreports">
+<meta property="og:title" content="SSR Reports | MaizeGDB">
+<meta property="og:description" content="Every archived MaizeGDB SSR marker record that carries a repeat motif, and the SSR markers derived from mapped genes.">
+
+<a class="mgdb-skip-link" href="#ssrr-main">Skip to main content</a>
+
+<main class="mgdb-page mgdb-hub-page mgdb-ssr-reports-page" id="ssrr-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/ssr">SSR markers</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Reports</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="ssrr-title">
+    <div class="mgdb-hero-emblem">
+      <svg class="ssrr-hero-mark" viewBox="0 0 132 116" role="img" aria-label="Repeating DNA motif blocks arranged as table rows">
+        <path d="M11 29h110M11 58h110M11 87h110" stroke="#d4b44f" stroke-width="3" stroke-linecap="round" opacity=".75" />
+        <g>
+          <rect x="13" y="18" width="22" height="22" rx="6" fill="#501719" /><rect x="40" y="18" width="22" height="22" rx="6" fill="#2f5e2a" /><rect x="67" y="18" width="22" height="22" rx="6" fill="#501719" /><rect x="94" y="18" width="22" height="22" rx="6" fill="#2f5e2a" />
+          <rect x="13" y="47" width="22" height="22" rx="11" fill="#a96919" /><rect x="40" y="47" width="22" height="22" rx="11" fill="#501719" /><rect x="67" y="47" width="22" height="22" rx="11" fill="#a96919" /><rect x="94" y="47" width="22" height="22" rx="11" fill="#501719" />
+          <rect x="13" y="76" width="22" height="22" rx="6" fill="#2f5e2a" /><rect x="40" y="76" width="22" height="22" rx="6" fill="#a96919" /><rect x="67" y="76" width="22" height="22" rx="6" fill="#2f5e2a" /><rect x="94" y="76" width="22" height="22" rx="6" fill="#a96919" />
+        </g>
+      </svg>
+      <strong>SSR<br />Reports</strong>
+      <span>Microsatellite markers</span>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="ssrr-title">Two reports over the SSR archive.</h1>
+      <p class="mgdb-hero-description">Every archived SSR marker record that carries a repeat motif, and the SSR markers that detect a mapped gene. Both tables are filterable, sortable by any column, and available as a tab-delimited file.</p>
+    </div>
+  </section>
+
+  <div class="mgdb-message mgdb-message-info ssrr-archive-note" role="status">
+    <div><strong>Archive notice.</strong> The SSR collection is no longer updated. These reports are regenerated from the archived records and remain available as a legacy research resource.</div>
+  </div>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#ssrr-repeats" class="is-current" aria-current="true">Repeat motifs</a>
+    <a href="#ssrr-gene-derived">Gene-derived SSRs</a>
+    <a href="#ssrr-references">References</a>
+    <a href="#ssrr-metrics">Metrics</a>
+    <a href="#ssrr-related">Related resources</a>
+  </nav>
+
+  <section id="ssrr-repeats" aria-labelledby="ssrr-repeats-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ssrr-repeats-title">Repeat motifs</h2></div>
+    </div>
+
+    <div class="ssrr-toolbar">
+      <div class="ssrr-filter-field">
+        <label class="mgdb-label" for="ssrr-repeat-filter">Filter by marker name, motif, or repeat unit</label>
+        <input class="mgdb-input" id="ssrr-repeat-filter" type="search" autocomplete="off" spellcheck="false" placeholder="umc1369, AG, or \(AAAT\)5" />
+      </div>
+      <div class="ssrr-toolbar-actions">
+        <p class="ssrr-count" id="ssrr-repeat-count" role="status" aria-live="polite">$(repeat_total) records shown</p>
+        <div class="mgdb-export-buttons">
+          <button class="mgdb-button mgdb-button-quiet" id="ssrr-repeat-reset" type="button" hidden>Clear filter</button>
+          <a class="mgdb-button mgdb-button-quiet" href="/ssrreports?report=repeats&amp;format=tsv">Download TSV</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mgdb-table-scroll ssrr-table-scroll" id="ssrr-repeat-scroll" tabindex="0" role="region" aria-label="Repeat motifs table">
+      <table class="mgdb-table ssrr-table" data-sortable id="ssrr-repeat-table">
+        <caption class="mgdb-visually-hidden">Archived SSR marker records that carry a repeat motif, ordered by motif</caption>
+        <thead>
+          <tr>
+            <th scope="col" data-sort="text"><button type="button">SSR marker</button></th>
+            <th scope="col" data-sort="text"><button type="button">Repeat motif</button></th>
+            <th scope="col" data-sort="text"><button type="button">Repeat unit</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Unit length</button></th>
+          </tr>
+        </thead>
+        <tbody id="ssrr-repeat-body">$(repeat_rows)</tbody>
+      </table>
+    </div>
+
+    <p class="mgdb-empty ssrr-empty" id="ssrr-repeat-empty" hidden>No record matches that filter. Clear it to see all $(repeat_total) records again.</p>
+
+    <p class="mgdb-note ssrr-note"><strong>Data note:</strong> the motif is stored as free text, so <code>\(AG\)6</code>, <code>AG\(15\)</code> and a bare <code>CCG</code> all appear. The repeat unit is the first run of nucleotide letters in the motif, and its length is the unit length &#8212; the same rule the SSR Data Hub figure uses. $(compound_count) motifs are compound, such as <code>\(CT\)6AT\(CT\)9</code>, and are marked as such because only their first unit is shown. $(repeat_total) records carry $(repeat_distinct) distinct motifs.</p>
+  </section>
+
+  <section id="ssrr-gene-derived" aria-labelledby="ssrr-gene-derived-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ssrr-gene-derived-title">Gene-derived SSRs</h2></div>
+    </div>
+
+    <div class="ssrr-toolbar">
+      <div class="ssrr-filter-field">
+        <label class="mgdb-label" for="ssrr-gene-filter">Filter by marker name, motif, or locus</label>
+        <input class="mgdb-input" id="ssrr-gene-filter" type="search" autocomplete="off" spellcheck="false" placeholder="bnlg1079, adh1, or sh2" />
+      </div>
+      <div class="ssrr-toolbar-actions">
+        <p class="ssrr-count" id="ssrr-gene-count" role="status" aria-live="polite">$(gene_total) pairs shown</p>
+        <div class="mgdb-export-buttons">
+          <button class="mgdb-button mgdb-button-quiet" id="ssrr-gene-reset" type="button" hidden>Clear filter</button>
+          <a class="mgdb-button mgdb-button-quiet" href="/ssrreports?report=gene_derived&amp;format=tsv">Download TSV</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="ssrr-chips" id="ssrr-gene-chips" role="group" aria-label="Filter by chromosome">$(gene_chips)</div>
+
+    <div class="mgdb-table-scroll ssrr-table-scroll" id="ssrr-gene-scroll" tabindex="0" role="region" aria-label="Gene-derived SSR markers table">
+      <table class="mgdb-table ssrr-table" data-sortable id="ssrr-gene-table">
+        <caption class="mgdb-visually-hidden">SSR markers that detect a mapped gene, ordered by chromosome and locus name</caption>
+        <thead>
+          <tr>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Chr.</button></th>
+            <th scope="col" data-sort="text"><button type="button">SSR marker</button></th>
+            <th scope="col" data-sort="text"><button type="button">Repeat motif</button></th>
+            <th scope="col" data-sort="text"><button type="button">Locus</button></th>
+          </tr>
+        </thead>
+        <tbody id="ssrr-gene-body">$(gene_rows)</tbody>
+      </table>
+    </div>
+
+    <p class="mgdb-empty ssrr-empty" id="ssrr-gene-empty" hidden>No marker-locus pair matches that filter. Clear it to see all $(gene_total) pairs again.</p>
+
+    <p class="mgdb-note ssrr-note"><strong>Data note:</strong> one row is one marker-locus pair, so a marker that detects two loci appears twice and a locus detected by two markers appears twice. The chromosome is the linkage group the locus is placed on.</p>
+  </section>
+
+  <section id="ssrr-references" aria-labelledby="ssrr-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ssrr-references-title">References</h2></div>
+    </div>
+
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
+  <section id="ssrr-metrics" aria-labelledby="ssrr-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ssrr-metrics-title">Metrics</h2></div>
+    </div>
+
+    <div class="mgdb-metric-grid">$(metric_cards)</div>
+
+    <figure class="ssrr-figure">
+      <figcaption id="ssrr-chart-caption">Gene-derived SSR markers by chromosome</figcaption>
+      <div class="mgdb-chart" id="ssrr-chrom-chart" role="img" aria-labelledby="ssrr-chart-caption"></div>
+      <div class="mgdb-table-scroll">
+        <table class="mgdb-table" id="ssrr-chrom-table">
+          <caption class="mgdb-visually-hidden">Marker-locus pairs per chromosome</caption>
+          <thead>
+            <tr><th scope="col">Chromosome</th><th scope="col" class="mgdb-numeric">Marker-locus pairs</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </figure>
+
+    <script type="application/json" id="ssrr-chart-data">$(chart_data)</script>
+  </section>
+
+  <section id="ssrr-related" class="mgdb-hub-related" aria-labelledby="ssrr-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ssrr-related-title">Related resources</h2></div>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/ssr">
+          <strong>SSR Marker Archive</strong>
+          <span>Search the archived SSR records by name, synonym, or repeat motif</span>
+        </a>
+        <a href="/data_center/marker">
+          <strong>Marker Data Hub</strong>
+          <span>The whole marker collection, where SSRs sit alongside SNPs, RFLPs, and the rest</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Locus Data Hub</strong>
+          <span>The mapped loci these markers detect, with their map positions and references</span>
+        </a>
+        <a href="/ssr_protocols">
+          <strong>SSR protocols</strong>
+          <span>DNA preparation, PCR, screening, gel, and mapping protocols from the Maize Mapping Project</span>
+        </a>
+        <a href="https://download.maizegdb.org/SNPs_and_Maps/SSRs/">
+          <strong>Mapped SSR downloads</strong>
+          <span>Per-chromosome TSV summaries and XLS detail tables for mapped SSR markers</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+)

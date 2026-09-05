@@ -12,47 +12,16 @@
     initTimelineFilter();
   }
 
+  /* The tab bar. This page carried an IntersectionObserver-only spy, which is
+     the shape that ships looking fine and never moves off the first tab -- one
+     trigger does not fire in every case and there is no bottom-of-page case.
+     MGDB.sectionTabs() is that behaviour written once, driven by scroll,
+     IntersectionObserver and resize together. `watch` is the timeline, whose
+     height changes when the category filter narrows it. */
   function initScrollSpy() {
-    var tabs = document.querySelectorAll('.mgdb-section-tabs a');
-    if (!tabs.length || !('IntersectionObserver' in window)) return;
-
-    var sectionIds = [];
-    tabs.forEach(function (tab) {
-      var href = tab.getAttribute('href');
-      if (href && href.charAt(0) === '#') {
-        sectionIds.push(href.substring(1));
-      }
-    });
-
-    var sections = sectionIds.map(function (id) {
-      return document.getElementById(id);
-    }).filter(Boolean);
-
-    if (!sections.length) return;
-
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          var id = entry.target.id;
-          tabs.forEach(function (tab) {
-            if (tab.getAttribute('href') === '#' + id) {
-              tab.classList.add('is-current');
-              tab.setAttribute('aria-current', 'true');
-            } else {
-              tab.classList.remove('is-current');
-              tab.removeAttribute('aria-current');
-            }
-          });
-        }
-      });
-    }, {
-      rootMargin: '-10% 0px -75% 0px',
-      threshold: 0
-    });
-
-    sections.forEach(function (sec) {
-      observer.observe(sec);
-    });
+    if (window.MGDB && window.MGDB.sectionTabs) {
+      window.MGDB.sectionTabs({ watch: '.timeline-container' });
+    }
   }
 
   function initTimelineFilter() {

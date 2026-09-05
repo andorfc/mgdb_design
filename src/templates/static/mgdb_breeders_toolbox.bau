@@ -1,0 +1,189 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-breeders-toolbox
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https\://maizegdb.org/breeders_toolbox">
+<meta property="og:title" content="MaizeGDB Pedigree Viewer">
+<meta property="og:description" content="Trace maize variety pedigrees generation by generation, find how two varieties are related, and see the founder lines the breeding network is built on.">
+
+<a class="mgdb-skip-link" href="#bt-main">Skip to main content</a>
+
+<main class="mgdb-page mgdb-hub-page mgdb-breeders-page" id="bt-main"
+      data-initial-variety="$(initial_variety)" data-initial-depth="$(initial_depth)">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span>
+    <a href="/tools">Tools</a><span aria-hidden="true">&rsaquo;</span>
+    <span aria-current="page">Pedigree Viewer</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="bt-title">
+    <div class="mgdb-hero-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="Pedigree tree icon">
+        <circle cx="30" cy="20" r="9" fill="#e8f4ec" stroke="#235c37" stroke-width="3" />
+        <circle cx="66" cy="20" r="9" fill="#e8f4ec" stroke="#235c37" stroke-width="3" />
+        <circle cx="48" cy="48" r="10" fill="#d99a0b" stroke="#235c37" stroke-width="3" />
+        <circle cx="26" cy="78" r="8" fill="#e8f4ec" stroke="#235c37" stroke-width="3" />
+        <circle cx="48" cy="78" r="8" fill="#e8f4ec" stroke="#235c37" stroke-width="3" />
+        <circle cx="70" cy="78" r="8" fill="#e8f4ec" stroke="#235c37" stroke-width="3" />
+        <path d="M35 27 L44 40 M61 27 L52 40 M45 58 L30 71 M48 58 L48 70 M51 58 L66 71"
+              stroke="#7fae8c" stroke-width="3" fill="none" stroke-linecap="round" />
+      </svg>
+      <strong>Pedigree<br />Viewer</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="bt-title">MaizeGDB Pedigree Viewer</h1>
+      <p class="mgdb-hero-description">Trace a maize variety's ancestors and descendants one generation at a time, find how any two varieties are related, and see the founder lines the breeding network is built on.</p>
+      <div class="bt-hero-links">
+        <a class="bt-hero-link" href="#bt-explore">
+          <span class="bt-dot bt-dot-green" aria-hidden="true"></span> Trace a variety
+        </a>
+        <a class="bt-hero-link" href="#bt-relate">
+          <span class="bt-dot bt-dot-gold" aria-hidden="true"></span> Relate two varieties
+        </a>
+        <a class="bt-hero-link" href="/breeders_toolbox?view=network">
+          <span class="bt-dot bt-dot-blue" aria-hidden="true"></span> Network view
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#bt-explore" class="is-current">Trace a variety</a>
+    <a href="#bt-relate">Relate two varieties</a>
+    <a href="#bt-common">Common lines</a>
+    <a href="#bt-references">References</a>
+    <a href="#bt-metrics">Metrics</a>
+    <a href="#bt-related">Related resources</a>
+  </nav>
+
+  <section id="bt-explore" aria-labelledby="bt-explore-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="bt-explore-title">Trace a variety</h2></div>
+    </div>
+
+    <form class="bt-form" id="bt-walk-form" autocomplete="off">
+      <div class="mgdb-hub-field bt-field-variety">
+        <label for="bt-variety">Variety</label>
+        <input type="text" id="bt-variety" name="variety" list="bt-variety-options"
+               placeholder="B73, Mo17, W22, Huangzaosi&hellip;" spellcheck="false" />
+        <datalist id="bt-variety-options"></datalist>
+      </div>
+      <div class="mgdb-hub-field bt-field-depth">
+        <label for="bt-depth">Generations</label>
+        <select id="bt-depth" name="depth">
+          <option value="1">1</option>
+          <option value="2" selected>2</option>
+          <option value="3">3</option>
+        </select>
+      </div>
+      <div class="mgdb-hub-field mgdb-hub-field-action">
+        <button type="submit" class="mgdb-button mgdb-button-primary">Trace</button>
+      </div>
+    </form>
+
+    <p class="bt-examples">Examples&#58;
+      <button type="button" class="bt-example" data-variety="B73">B73</button>
+      <button type="button" class="bt-example" data-variety="Mo17">Mo17</button>
+      <button type="button" class="bt-example" data-variety="W22">W22</button>
+      <button type="button" class="bt-example" data-variety="Huangzaosi">Huangzaosi</button>
+      <button type="button" class="bt-example" data-variety="A632">A632</button>
+    </p>
+
+    <div id="bt-walk-result" class="bt-result" aria-live="polite"></div>
+  </section>
+
+  <section id="bt-relate" aria-labelledby="bt-relate-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="bt-relate-title">Relate two varieties</h2></div>
+    </div>
+
+    <form class="bt-form" id="bt-path-form" autocomplete="off">
+      <div class="mgdb-hub-field">
+        <label for="bt-from">From</label>
+        <input type="text" id="bt-from" name="from" placeholder="B73" spellcheck="false" />
+      </div>
+      <div class="mgdb-hub-field">
+        <label for="bt-to">To</label>
+        <input type="text" id="bt-to" name="to" placeholder="Mo17" spellcheck="false" />
+      </div>
+      <div class="mgdb-hub-field mgdb-hub-field-action">
+        <button type="submit" class="mgdb-button mgdb-button-primary">Find the shortest path</button>
+      </div>
+    </form>
+
+    <div id="bt-path-result" class="bt-result" aria-live="polite"></div>
+  </section>
+
+  <section id="bt-common" aria-labelledby="bt-common-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="bt-common-title">Common lines</h2></div>
+    </div>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table" id="bt-hub-table">
+        <thead>
+          <tr>
+            <th scope="col">Variety</th>
+            <th scope="col" class="mgdb-numeric">Relationships</th>
+            <th scope="col" class="mgdb-numeric">Progeny</th>
+            <th scope="col" class="mgdb-numeric">Parents</th>
+            <th scope="col">Developer and country</th>
+          </tr>
+        </thead>
+        <tbody>$(hub_rows)</tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="bt-references" aria-labelledby="bt-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="bt-references-title">References</h2></div>
+    </div>
+
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
+  <section id="bt-metrics" aria-labelledby="bt-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="bt-metrics-title">Metrics</h2></div>
+    </div>
+
+    <div class="mgdb-metric-grid">$(metric_cards)</div>
+  </section>
+
+  <section id="bt-related" class="mgdb-hub-related" aria-labelledby="bt-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="bt-related-title">Related resources</h2></div>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/stock">
+          <strong>Stock Data Hub</strong>
+          <span>Every stock record, each carrying its own two-generation pedigree</span>
+        </a>
+        <a href="/stock_catalog">
+          <strong>Stock Center catalog</strong>
+          <span>The genetic stocks the Maize Genetics Cooperation distributes, free to order</span>
+        </a>
+        <a href="/genome">
+          <strong>Genome Data Hub</strong>
+          <span>Assemblies for the founder lines these pedigrees are built on</span>
+        </a>
+        <a href="/data_center/variation">
+          <strong>Variation Data Hub</strong>
+          <span>Alleles and insertions carried by the varieties in this network</span>
+        </a>
+        <a href="/breeders_toolbox?view=network">
+          <strong>Network view</strong>
+          <span>The free-form Cytoscape graph, with filters, file upload, and image export</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+)

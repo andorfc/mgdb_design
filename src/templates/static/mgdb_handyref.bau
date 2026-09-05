@@ -1,0 +1,173 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-handyref
+<main class="mgdb-page mgdb-hub-page mgdb-handyref-page" id="handyref-main">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/map">Maps</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Genetic maps</span>
+  </nav>
+
+  <section class="mgdb-hero handyref-hero" aria-labelledby="handyref-title">
+    <div class="mgdb-hero-emblem handyref-emblem">
+      <div class="handyref-emblem-scale" aria-hidden="true">
+        <span class="handyref-emblem-tick"><em>0</em></span>
+        <span class="handyref-emblem-tick"><em>cM</em></span>
+        <span class="handyref-emblem-tick"><em>500</em></span>
+      </div>
+      <strong>$(total_maps) maps</strong>
+      <span>$(total_loci) placed loci</span>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="handyref-title">Genetic maps in MaizeGDB</h1>
+      <p class="mgdb-hero-description">A handy reference to the genetic maps held here &mdash; what each one is, how it was made, and how many loci it places. Every count on this page is read from the database, so it follows the collection rather than describing it as it once was.</p>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#handyref-overview" class="is-current" aria-current="true">Overview</a>
+    <a href="#handyref-composite">Composite</a>
+    <a href="#handyref-ibm">IBM</a>
+    <a href="#handyref-neighbors">Neighbors</a>
+    <a href="#handyref-panels">Other panels</a>
+    <a href="#handyref-nam">NAM</a>
+    <a href="#handyref-related">Related resources</a>
+  </nav>
+
+  <section id="handyref-overview" aria-labelledby="handyref-overview-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="handyref-overview-title">Overview</h2></div>
+    </div>
+
+    <div class="handyref-prose">
+      <p>MaizeGDB holds <strong>$(total_maps) maps</strong> contributed by community members, placing <strong>$(total_loci) loci</strong> between them. You can browse or search all of them in the <a href="/data_center/map">Map Data Hub</a>.</p>
+
+      <p>In the most general sense, genetic maps are made by setting up a testcross or mapping population and measuring the amount of recombination between any two markers for which two different alleles segregate in the mapping population. Many genetic maps stored at MaizeGDB have been made from single testcrosses or single mapping populations. However, the most commonly used maps are &ldquo;composite&rdquo; genetic maps, meaning that they have data from many different mapping populations merged into one map.</p>
+
+      <p class="handyref-note">MaizeGDB stores one map record per chromosome, so a map set covering chromosomes 1 to 10 counts as ten maps. The tables below give each set&rsquo;s own figures; the set name links to that search in the Map Data Hub.</p>
+    </div>
+
+    <p class="handyref-provenance">Descriptions on this page are adapted from Lisa Harper&rsquo;s article in the Maize Genetics Cooperation Newsletter, lightly copy-edited. Quoted passages are reproduced as their authors wrote them. Map and locus counts are read from MaizeGDB.</p>
+  </section>
+
+  <section id="handyref-composite" aria-labelledby="handyref-composite-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="handyref-composite-title">The composite genetic map</h2></div>
+    </div>
+
+    <div class="handyref-prose">
+      <p>This is the composite genetic map developed and maintained by Ed Coe. For 50 years Ed compiled reported mapping information into one genetic map. It therefore contains information from crosses between many different inbreds, hybrids and &ldquo;mongrels&rdquo;, and from crosses where recombination occurred in the female parent, in the male parent, or both. Any two markers on this map may not have been mapped in the same population.</p>
+
+      <p>All recombination information used to place a marker on this map can be found by clicking that marker in the MaizeGDB map display. Comments attached to each map record give the strategies used to update and curate it, including genes incorporated on the basis of genome sequencing and sequence matching. Earlier releases are kept alongside the current one rather than overwritten.</p>
+    </div>
+
+    $(composite_table)
+  </section>
+
+  <section id="handyref-ibm" aria-labelledby="handyref-ibm-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="handyref-ibm-title">IBM &mdash; the intermated B73 &times; Mo17 panel</h2></div>
+    </div>
+
+    <div class="handyref-split">
+      <div class="handyref-prose">
+        <p>This map is called &ldquo;high resolution&rdquo; because the method used to generate the mapping population created more detectable recombinations per chromosome after several generations. To generate the population, the two inbreds B73 and Mo17 were crossed to make the F1 hybrid, which was self-pollinated. F2 progeny were then intermated for four generations, followed by repeated selfing to generate recombinant inbred lines. This type of population is often referred to as intermated recombinant inbred lines, or IRILs.</p>
+
+        <p>Every cross after the F1 provided more opportunity for recombination between linked loci. These recombinations remain detectable at any genomic position where B73 and Mo17 are polymorphic for the markers used in the subsequent mapping steps. The fact that these inbreds are so polymorphic relative to each other allows a greater number of markers to break linkage, which leads to a high-resolution genetic map. Markers cannot, however, be mapped anywhere in the genome where there is no polymorphism between Mo17 and B73. It is useful to keep in mind that the units on the IBM maps are not really centimorgans.</p>
+
+        <p>The IBM population is described in more detail by Lee <em>et al.</em>, <cite>Plant Molecular Biology</cite> 48&#58;453&ndash;63. After genotyping these IRILs with 2,046 markers, the Maize Mapping Project constructed a genetic map &#40;IBM2&#41; that contains 2,026 markers &#40;Coe <em>et al.</em> 2002; Cone <em>et al.</em> 2002&#41;. Core markers placed with strong statistical support are called <strong>frame</strong> markers. <strong>Neighbors</strong> are markers added to the map by calculation rather than by actual mapping.</p>
+      </div>
+
+      <figure class="handyref-figure">
+        <img src="/images/handyref.jpg" width="280" height="470" alt="Crossing diagram: B73 crossed with Mo17 gives an F1 hybrid, which is self-pollinated to F2, intermated for four generations, then repeatedly selfed to give intermated recombinant inbred lines." loading="lazy">
+        <figcaption><strong>Figure 1.</strong> Generation of IRILs, a special mapping population.</figcaption>
+      </figure>
+    </div>
+
+    $(ibm_table)
+  </section>
+
+  <section id="handyref-neighbors" aria-labelledby="handyref-neighbors-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="handyref-neighbors-title">Neighbors maps</h2></div>
+    </div>
+
+    <div class="handyref-prose">
+      <p>The following description is taken directly from Cone <em>et al.</em>, <cite>Plant Physiology</cite> 130&#58;1598&ndash;</p>
+
+      <blockquote class="handyref-quote">
+        <p>We are implementing a &ldquo;neighbors&rdquo; map approach in which we extrapolate locations of loci from non-IBM maps to their nearest neighbors on the IBM map, such that the framework loci on the IBM serve as a fixed backbone onto which additional loci are added. To extrapolate, we look for shared loci on the two maps that define an interval containing a locus of interest, calculate the distance between the shared and target loci on the non-IBM map as a ratio of the distance for the interval, and use the ratio to estimate a map coordinate for the target locus in that interval on the IBM. In choosing which neighbors to extrapolate, we consider the depth of the genetic data and the confidence levels for locus assignment to the non-IBM map. The new map is called &ldquo;IBM Neighbors.&rdquo;</p>
+        <p>The key distinction between the IBM and IBM Neighbors maps lies in the confidence level of locus order; the IBM has fewer well-ordered loci and IBM Neighbors has more loci, but confidence in the order is lower.</p>
+      </blockquote>
+
+      <p>A <strong>frame</strong> set holds only those loci of its parent map that are well ordered &mdash; backbone, on-frame or skeletal &mdash; which is why each frame set below places fewer loci than the set it comes from. Successive releases refine locus order rather than replace the map, so several generations are kept side by side.</p>
+    </div>
+
+    $(neighbors_table)
+  </section>
+
+  <section id="handyref-panels" aria-labelledby="handyref-panels-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="handyref-panels-title">Other maps built on these panels</h2></div>
+    </div>
+
+    <div class="handyref-prose">
+      <p><strong>ISU-IBM.</strong> Map4 was prepared by Fu <em>et al.</em>, <cite>Genetics</cite> 174&#58;1671&ndash;1683, using a panel of 91 IBM lines. They mapped 1,329 new gene-based insertion&ndash;deletion polymorphism markers &#40;IDPs, or indels&#41; and 2,029 previously developed markers on the IBM map. That group calls a marker <strong>skeleton</strong> where there is excellent statistical support for its position and <strong>muscle</strong> where support is weaker. Map7 is a later release from the same group.</p>
+
+      <p><strong>LHRF Gnp2004 and IBM Gnp2004.</strong> Falque <em>et al.</em>, <cite>Genetics</cite> 170&#58;1957&ndash;1966, generated an IRIL population from the inbreds F2 &times; F252 to map loci monomorphic on IBM. In their paper they state&#58; &ldquo;We built framework maps of 237 loci from the IBM panel and 271 loci from the LHRF panel. Both maps were used to place 1454 loci &#40;1056 on map IBM_Gnp2004 and 398 on map LHRF_Gnp2004&#41; that corresponded to 954 cDNA probes previously unmapped.&rdquo;</p>
+
+      <p><strong>SNP-genotyped maps.</strong> The MaizeSNP50 and SNP 2007 sets place markers from SNP genotyping arrays on the same two panels. They postdate the article this page is adapted from and are listed here because they are part of the same series.</p>
+    </div>
+
+    $(panels_table)
+  </section>
+
+  <section id="handyref-nam" aria-labelledby="handyref-nam-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="handyref-nam-title">Nested association mapping</h2></div>
+    </div>
+
+    <div class="handyref-prose">
+      <p>Recall that markers cannot be genetically mapped in any region that is not polymorphic between B73 and Mo17. To overcome this, Yu <em>et al.</em>, <cite>Genetics</cite> 178&#58;539&ndash;551, crossed B73 to 25 diverse maize lines called founders. Twenty-five F1s were generated, from which 200 RILs were made from each F1. The F1s were never intermated, so these are RILs, not IRILs.</p>
+
+      <p>While each mapping set from an individual F1 has less resolution than the IBM map, together the 25 sets &#40;5,000 RILs&#41; are much more powerful. The large number of founders greatly increases the likelihood that most regions in the genome will be polymorphic in at least one mapping set, allowing markers to be mapped in those regions. Figures describing the generation of the NAM populations are in the Yu <em>et al.</em> paper above. The <a href="https://www.panzea.org">Panzea project</a> genetically mapped very large numbers of SNP markers using these lines.</p>
+
+      <p>MaizeGDB holds the composite NAM map alongside the individual populations&#58; <strong>$(nam_populations) populations</strong>, <strong>$(nam_pop_maps) maps</strong> and <strong>$(nam_pop_loci) placed loci</strong> in total. Each population is named for its cross &mdash; <a href="/data_center/map?term=NAM%20%20Z001">NAM Z001 B73xB97 RI</a> and its siblings &mdash; and all of them can be listed together by searching the Map Data Hub for <a href="/data_center/map?term=NAM">NAM</a>.</p>
+    </div>
+
+    $(nam_table)
+  </section>
+
+  <section id="handyref-related" class="mgdb-hub-related" aria-labelledby="handyref-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="handyref-related-title">Related resources</h2></div>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/map">
+          <strong>Map Data Hub</strong>
+          <span>Search every map by name, linkage group, source or mapping panel, and see the loci each one places</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Locus Data Hub</strong>
+          <span>Find a locus and see every map that places it, with its coordinate on each</span>
+        </a>
+        <a href="/data_center/marker">
+          <strong>Marker Data Hub</strong>
+          <span>The probes, SSRs and SNPs used to build these maps</span>
+        </a>
+        <a href="/bin_viewer">
+          <strong>Bin viewer</strong>
+          <span>The core bin markers that divide each chromosome, and what falls in each bin</span>
+        </a>
+        <a href="/coordinate_definition">
+          <strong>Coordinate definitions</strong>
+          <span>What a coordinate on a MaizeGDB map means, and how the different systems relate</span>
+        </a>
+        <a href="/genome">
+          <strong>Genomes and assemblies</strong>
+          <span>The sequenced assemblies that genetic maps are anchored against</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

@@ -116,6 +116,16 @@ src/templates/home/megamenu_modern/data-centers.bau    templates/home/megamenu_m
 # modernized. Pulled into the repo on 2026-08-25 for the Data Hub rename;
 # it was server-only and nothing was backing it up.
 src/templates/home/megamenu/data-centers.bau     templates/home/megamenu/data-centers.bau
+# The legacy megamenu's Classic reads link pointed at
+# /community/maize_history/classic_reads -- answers 200, but the trailing
+# segment is ignored, so it landed at the top of the history page instead of the
+# section. Now matches megamenu_modern/community.bau. Adopted into the repo
+# 2026-09-05 to make the fix; the rest of the file is untouched.
+# The legacy megamenu, still the chrome on every unmodernized page. Tracked
+# from 2026-09-05, when its two "Project documentation" links -- one to /doc,
+# one to /documentation/projects, both now 301s -- became "Research projects".
+src/templates/home/megamenu/about.bau            templates/home/megamenu/about.bau
+src/templates/home/megamenu/community.bau        templates/home/megamenu/community.bau
 src/templates/home/megamenu_modern/feedback.bau        templates/home/megamenu_modern/feedback.bau
 src/templates/home/megamenu_modern/gb.bau              templates/home/megamenu_modern/gb.bau
 src/templates/home/megamenu_modern/genomes.bau         templates/home/megamenu_modern/genomes.bau
@@ -309,7 +319,9 @@ src/css/mgdb-hot-new-papers.css                   css/mgdb-hot-new-papers.css
 src/js/mgdb-hot-new-papers.js                     js/mgdb-hot-new-papers.js
 src/controllers/community/hot_new_papers_modern.php  controllers/community/hot_new_papers_modern.php
 src/controllers/hot_new_papers.php                controllers/hot_new_papers.php
-src/controllers/community.php                     controllers/community.php
+# controllers/community.php carries this route's hook too, and is already listed
+# with the /person block above -- deploy.sh copies every matching line, so a
+# second entry deploys the same file twice.
 src/record_data/bin_viewer_data.php              record_data/bin_viewer_data.php
 src/record_data/chromosome_data.php              record_data/chromosome_data.php
 
@@ -322,6 +334,15 @@ src/css/mgdb-projects.css                        css/mgdb-projects.css
 src/js/mgdb-projects.js                          js/mgdb-projects.js
 src/templates/static/mgdb_projects.bau           templates/static/mgdb_projects.bau
 src/templates/static/mgdb_projects_notfound.bau  templates/static/mgdb_projects_notfound.bau
+
+# The two legacy listings /projects replaced, 2026-09-05. Both are one-line
+# 301s now. controllers/doc.php is a NEW file: /doc previously fell through
+# controller.php to redirect.php, which found templates/about/doc.bau; a
+# controller of that name intercepts it. Removing the file restores the page.
+# controllers/documentation/projects.php REPLACES a file that existed only on
+# the server -- the rollback line is in its own header comment.
+src/controllers/doc.php                          controllers/doc.php
+src/controllers/documentation/projects.php       controllers/documentation/projects.php
 
 # Project: pan-genome pathway explorer (/projects/pathway_explorer)
 # E2P2 metabolic pathway annotation over the 26 NAM founder genomes beside
@@ -442,6 +463,17 @@ src/controllers/community/nomenclature.php             controllers/community/nom
 src/templates/community/mgdb_nomenclature.bau          templates/community/mgdb_nomenclature.bau
 src/css/mgdb-nomenclature.css                          css/mgdb-nomenclature.css
 src/js/mgdb-nomenclature.js                            js/mgdb-nomenclature.js
+
+# /nomenclature_summary — the short assembly and annotation naming page, the
+# companion /gene and the homepage link to. Same top-level-controller reason as
+# /nomenclature above. It carries no stylesheet of its own: it reuses the
+# identifier diagram components in css/mgdb-nomenclature.css so the two pages
+# cannot draw the same diagram two different ways.
+# controllers/community/nomenclature_summary.php is deliberately NOT listed:
+# that is the legacy page, still reachable at /community/nomenclature_summary.
+src/controllers/nomenclature_summary.php               controllers/nomenclature_summary.php
+src/templates/community/mgdb_nomenclature_summary.bau  templates/community/mgdb_nomenclature_summary.bau
+src/js/mgdb-nomenclature-summary.js                    js/mgdb-nomenclature-summary.js
 
 # BLAST front page. Only the form branch was modernized: BLAST.php now loads the
 # modern main template and templates/static/mgdb_blast.bau when there is no job,
@@ -1058,3 +1090,185 @@ src/js/mgdb-primer-record.js                                  js/mgdb-primer-rec
 src/templates/static/mgdb_primer_record.bau                   templates/static/mgdb_primer_record.bau
 src/templates/static/mgdb_primer_notfound.bau                 templates/static/mgdb_primer_notfound.bau
 src/controllers/data_center/primer_record_modern.php          controllers/data_center/primer_record_modern.php
+
+# /stock_catalog -- the Maize Genetics Cooperation Stock Center catalog, on the
+# Data Hub shell. controllers/stock_catalog.php is the top-level route
+# interceptor; the legacy controller, its Ajax endpoint and its templates are
+# untouched on the server and archived under legacy/stock-catalog/.
+src/controllers/stock_catalog.php             controllers/stock_catalog.php
+src/controllers/tools/stock_catalog_modern.php controllers/tools/stock_catalog_modern.php
+src/templates/static/mgdb_stock_catalog.bau   templates/static/mgdb_stock_catalog.bau
+src/css/mgdb-stock-catalog.css                css/mgdb-stock-catalog.css
+src/js/mgdb-stock-catalog.js                  js/mgdb-stock-catalog.js
+
+# BLAST results interface (/BLAST?job_id=...)
+#
+# One search per target, run with `-outfmt 15`; the table, text, enhanced and
+# discovery views are all renderings of that single report, so switching view
+# never re-runs a search. See ADMIN_DEPENDENCIES AD-054 for the shell-quoting
+# defect this submit path avoids, and AD-055 for the index that would make
+# genomic annotation instant rather than merely batched.
+#
+# The legacy job path (BLAST_run.php, BLAST_run.pl, BLAST_tasks.php, BLAST.js
+# and the BLAST_results*.bau set) is deliberately NOT listed: it still serves
+# reports written before this existed, and ?ui=legacy forces it.
+src/include/blast_results_lib.php               include/blast_results_lib.php
+src/include/blast_enrich_lib.php                include/blast_enrich_lib.php
+src/include/blast_text_view.php                 include/blast_text_view.php
+src/controllers/BLAST/blast_results_api.php     controllers/BLAST/blast_results_api.php
+src/controllers/BLAST/blast_submit.php          controllers/BLAST/blast_submit.php
+src/templates/static/mgdb_blast_results.bau     templates/static/mgdb_blast_results.bau
+src/css/mgdb-blast-results.css                  css/mgdb-blast-results.css
+src/js/mgdb-blast-results.js                    js/mgdb-blast-results.js
+
+# One genome assembly as a record page -- /genome/assembly/<name> and the older
+# /genome/genome_assembly/<name>. controllers/genome.php routes both here when
+# an ID is present; the legacy record_data/assembly_data.php and its three-tab
+# templates are untouched on the server and archived under legacy/genome-assembly/.
+src/controllers/genome/assembly_record_modern.php controllers/genome/assembly_record_modern.php
+src/templates/static/mgdb_assembly_record.bau  templates/static/mgdb_assembly_record.bau
+src/css/mgdb-assembly-record.css               css/mgdb-assembly-record.css
+
+# The old MGC site copy redirects to maizegenetics.org; the meeting archive and
+# the document folders under mgc/ are deliberately left alone.
+src/mgc/.htaccess                                mgc/.htaccess
+
+# /cooperators is retired: its content is on /maize_history, so the route is a
+# 301 there. A redirect rather than twenty edits -- the ~20 legacy mgec-*.bau
+# pages, /doc, /tools/update_person and the legacy home all link /cooperators,
+# and none of those templates is in this manifest. The page itself is untouched
+# and still served at /community/cooperators.
+src/controllers/cooperators.php                  controllers/cooperators.php
+
+# Five more retired routes, 2026-09-04. Each is a 301 only -- no controller or
+# template was deleted -- but only three of the five pages have another URL that
+# still serves them. /about/* works because controllers/about.php dispatches
+# controllers/about/<page>.php; there is no controllers/tools.php, so /tools/<page>
+# falls through to redirect.php and answers 200 with the generic shell.
+#   /classic_reads -> /maize_history#history-classic-reads   (still at /community/classic_reads)
+#   /credit        -> /cite                                  (still at /about/credit)
+#   /faq           -> /contact                               (still at /about/faq)
+#   /gbs, /genotype -> /data_center/variation                (NO alternate route)
+src/controllers/classic_reads.php                controllers/classic_reads.php
+src/controllers/gbs.php                          controllers/gbs.php
+src/controllers/genotype.php                     controllers/genotype.php
+src/controllers/credit.php                       controllers/credit.php
+src/controllers/faq.php                          controllers/faq.php
+
+# Three more, 2026-09-04: the B73 RefGen_v2 locus tools, retired as obsolete.
+# 301 only, nothing deleted, but NO alternate route -- see the note above about
+# /tools/<page>. The modern Map hub's "Map vs Genome Incongruencies" card was
+# removed with /incongruency, or it would have linked a redirect back to the hub
+# it sits on.
+src/controllers/incongruency.php                 controllers/incongruency.php
+src/controllers/locus_lookup.php                 controllers/locus_lookup.php
+src/controllers/locus_pair_lookup.php            controllers/locus_pair_lookup.php
+
+# Eight more retired routes, 2026-09-04 -- old or broken pages. 301 only,
+# nothing deleted. /site_tour keeps a working URL at /about/site_tour; the rest
+# are under /tools/<page>, which is not dispatched, so they go off the site.
+#   /site_tour          -> /sitemap
+#   /mapped_elements    -> /data_center/est          (was a public PHP fatal error)
+#   /locus_summary_table-> /data_center/locus
+#   /complete_map       -> /data_center/map
+#   /fcfair             -> /FAIRpractices
+#   /single_tissue_comp -> /data_center/expression   (broken by a '</php' typo)
+#   /var_keys           -> /data_center/variation
+#   /challenge          -> /                          (html/challenge/ moved to retired/)
+# /data_center/mapped_accession and /data_center/sequence are retired in
+# src/controllers/data_center.php instead, beside the stock2 guard.
+src/controllers/site_tour.php                    controllers/site_tour.php
+src/controllers/mapped_elements.php              controllers/mapped_elements.php
+src/controllers/locus_summary_table.php          controllers/locus_summary_table.php
+src/controllers/complete_map.php                 controllers/complete_map.php
+src/controllers/fcfair.php                       controllers/fcfair.php
+src/controllers/single_tissue_comp.php           controllers/single_tissue_comp.php
+src/controllers/var_keys.php                     controllers/var_keys.php
+src/controllers/challenge.php                    controllers/challenge.php
+
+# /unsubscribe, retired 2026-09-04 after Carson confirmed the mailing-list
+# opt-out is no longer needed. Held back from the batch above because it was a
+# working endpoint, not a broken page -- see the file's own comment.
+src/controllers/unsubscribe.php                  controllers/unsubscribe.php
+
+# /locus_search, retired 2026-09-04 -- the last of the B73 RefGen_v2 locus tools,
+# and already non-functional (it rendered result containers but loaded no JS).
+# Nothing here touches the MODERN locus search, which is
+# controllers/data_center/locus_search_modern.php and serves /data_center/locus.
+src/controllers/locus_search.php                 controllers/locus_search.php
+
+# /breeders_toolbox -- the Pedigree Viewer, on the Data Hub shell. A bounded
+# generational walk replaces the force-directed default; ?view=network still
+# reaches the previous Cytoscape page, which is untouched on the server and
+# archived under legacy/breeders-toolbox/.
+src/controllers/breeders_toolbox.php           controllers/breeders_toolbox.php
+src/controllers/tools/breeders_toolbox_modern.php controllers/tools/breeders_toolbox_modern.php
+src/templates/static/mgdb_breeders_toolbox.bau templates/static/mgdb_breeders_toolbox.bau
+src/css/mgdb-breeders-toolbox.css              css/mgdb-breeders-toolbox.css
+src/js/mgdb-breeders-toolbox.js                js/mgdb-breeders-toolbox.js
+
+# /ssrreports -- the two SSR reports combined onto the Data Hub shell.
+# controllers/ssrreports.php is the top-level route interceptor; without it
+# controller.php falls through to redirect.php and the legacy chrome loads too.
+src/controllers/ssrreports.php                controllers/ssrreports.php
+src/controllers/tools/ssrreports_modern.php   controllers/tools/ssrreports_modern.php
+src/templates/static/mgdb_ssr_reports.bau     templates/static/mgdb_ssr_reports.bau
+
+# /ssr_protocols. Tracked from 2026-09-05 for one line: its trail linked /doc,
+# retired, and archive.maizegdb.org, which does not resolve.
+src/templates/static/ssr_protocols-content.bau   templates/static/ssr_protocols-content.bau
+src/css/mgdb-ssr-reports.css                  css/mgdb-ssr-reports.css
+src/js/mgdb-ssr-reports.js                    js/mgdb-ssr-reports.js
+
+# /community/videos and /videos -- the community video library on the Data Hub
+# shell. The catalog is data/community_videos.json and the posters are Vimeo's
+# own thumbnails, served from here so no third party is contacted until play.
+# controllers/videos.php takes the bare /videos alias before redirect.php can
+# build the legacy chrome; /community/videos is hooked in community.php.
+src/controllers/videos.php                    controllers/videos.php
+src/controllers/community/videos_modern.php   controllers/community/videos_modern.php
+# controllers/community.php carries the /community/videos hook and is already
+# listed above; it is not repeated here.
+src/templates/static/mgdb_videos.bau          templates/static/mgdb_videos.bau
+src/css/mgdb-videos.css                       css/mgdb-videos.css
+src/js/mgdb-videos.js                         js/mgdb-videos.js
+src/data/community_videos.json                data/community_videos.json
+src/images/videos/peterson-history-of-maize-genetics.jpg  images/videos/peterson-history-of-maize-genetics.jpg
+src/images/videos/birchler-mcclintock-stadler.jpg         images/videos/birchler-mcclintock-stadler.jpg
+src/images/videos/coe-history-of-the-maize-meeting.jpg    images/videos/coe-history-of-the-maize-meeting.jpg
+src/images/videos/earshoot-bagging.jpg                    images/videos/earshoot-bagging.jpg
+src/images/videos/cutting-back-earshoot.jpg               images/videos/cutting-back-earshoot.jpg
+src/images/videos/pollen-collection.jpg                   images/videos/pollen-collection.jpg
+src/images/videos/tassel-bagging.jpg                      images/videos/tassel-bagging.jpg
+src/images/videos/pollination-detail.jpg                  images/videos/pollination-detail.jpg
+src/images/videos/glassine-bag-pollinations.jpg           images/videos/glassine-bag-pollinations.jpg
+
+# /FAIRpractices -- FAIR data and AI-readiness. Adopted into the repo 2026-09-04
+# after a link sweep found it was the one modern template with no repo copy at
+# all; its controller and stylesheet were missing too, so the whole page lived
+# only on the server and a rebuild would have lost it.
+src/controllers/community/FAIRpractices.php   controllers/community/FAIRpractices.php
+src/templates/community/mgdb_fair_practices.bau templates/community/mgdb_fair_practices.bau
+src/css/mgdb-fair-practices.css               css/mgdb-fair-practices.css
+
+# /handyref -- the guide to MaizeGDB's genetic maps, 2026-09-05. Same reason as
+# /nomenclature_summary for the top-level controller: redirect.php loads the
+# LEGACY main template before it looks for a page, so a page served that way
+# carries index.css and the shadowbox sheet however modern its markup is. The
+# legacy page is untouched and still served at /about/handyref.
+#
+# The prose is Lisa Harper's, lightly copy-edited. Everything the page asserted
+# about the collection is now read from the database, because none of it held:
+# the "over 1789 genetic maps" was a typed 2009 figure, the "list of all maps"
+# link had an EMPTY href, and the seven expandable map searches ran on hand-typed
+# terms -- the first of which, 'Genetic 2008', matches no map set that exists, so
+# it answered "There are no records" every time the page was opened.
+src/controllers/handyref.php                  controllers/handyref.php
+src/templates/static/mgdb_handyref.bau        templates/static/mgdb_handyref.bau
+src/css/mgdb-handyref.css                     css/mgdb-handyref.css
+src/js/mgdb-handyref.js                       js/mgdb-handyref.js
+
+# /neighbors retired, 2026-09-05: 301 to /handyref, whose Neighbors section now
+# carries its subject with live counts. A 301 only -- nothing deleted -- and the
+# page is still served at /about/neighbors, the same arrangement as /about/faq.
+src/controllers/neighbors.php                 controllers/neighbors.php

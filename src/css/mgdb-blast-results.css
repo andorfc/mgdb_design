@@ -1,0 +1,1177 @@
+/* ==========================================================================
+   BLAST results — /BLAST?job_id=...
+   --------------------------------------------------------------------------
+   Sits on the shared hub shell (css/mgdb-hub.css): pale ground, white section
+   cards, colored section edges. Only what the results interface adds lives
+   here.
+
+   Color carries meaning in exactly three places and nowhere else:
+     - match quality      a single-hue ramp, light to dark (never a rainbow)
+     - the selected hit   one accent, used only for selection
+     - alignment glyphs   mismatch / gap / masked
+   The quality ramp is a lightness ramp, so it survives grayscale and every
+   common color-vision deficiency; the categorical accents come from the
+   site's Okabe-Ito chart palette for the same reason.
+   ========================================================================== */
+
+.mgdb-blast-results {
+  --blast-q0: #eef4f8;   /* weakest match  */
+  --blast-q1: #c5dcea;
+  --blast-q2: #8ebdd6;
+  --blast-q3: #4f96bd;
+  --blast-q4: #0072b2;   /* strongest      */
+  --blast-select: #d55e00;
+  --blast-mismatch: #d55e00;
+  --blast-gap: #7a5195;
+  /* 4.5:1 on white. The previous #98a2a8 measured 2.60:1 and carried the
+     truncation notices, error text and every unlinked accession. */
+  --blast-masked: #667079;
+  --blast-rule: #d8e2e6;
+  --blast-ink-soft: #5b6a72;
+}
+
+/* --------------------------------------------------------------------------
+   Header and biological summary
+   -------------------------------------------------------------------------- */
+
+.blast-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.blast-reading {
+  font-size: 1.05rem;
+  line-height: 1.5;
+  margin: 0 0 6px;
+}
+
+.blast-reading-detail {
+  color: var(--blast-ink-soft);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* The best-match block. A definition list, because that is what it is. */
+.blast-best {
+  border: 1px solid var(--blast-rule);
+  border-left: 4px solid var(--blast-q4);
+  border-radius: 4px;
+  padding: 14px 16px;
+  background: #fff;
+}
+
+.blast-best dt {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--blast-ink-soft);
+  margin-top: 8px;
+}
+
+.blast-best dt:first-of-type { margin-top: 0; }
+
+.blast-best dd {
+  margin: 2px 0 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.blast-best-gene {
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.blast-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+/* --------------------------------------------------------------------------
+   Query coverage plot
+   --------------------------------------------------------------------------
+   One row per hit, positioned along a shared query axis. This is the figure
+   that answers "full-length or partial?" at a glance, so it is first and it is
+   the widest.
+   -------------------------------------------------------------------------- */
+
+.blast-coverage { width: 100%; overflow-x: auto; }
+.blast-coverage svg { display: block; min-width: 520px; }
+
+.blast-cov-track { fill: #f2f6f8; }
+.blast-cov-bar { cursor: pointer; }
+.blast-cov-bar:hover { stroke: #1f2723; stroke-width: 1; }
+
+/* A discontinuous alignment is drawn as separate blocks joined by a thin rule,
+   so an exon-split match reads as one hit rather than several. */
+.blast-cov-join { stroke: var(--blast-masked); stroke-width: 1; stroke-dasharray: 2 2; }
+
+.blast-cov-label {
+  font-size: 11px;
+  fill: #1f2723;
+  cursor: pointer;
+}
+.blast-cov-label:hover { text-decoration: underline; }
+
+.blast-axis text { font-size: 10px; fill: var(--blast-ink-soft); }
+.blast-axis line, .blast-axis path { stroke: var(--blast-rule); }
+
+/* Selection is a ring, not a fill change: the fill already encodes identity. */
+.blast-selected .blast-cov-bar,
+.blast-cov-bar.is-selected {
+  stroke: var(--blast-select);
+  stroke-width: 2;
+}
+
+/* --------------------------------------------------------------------------
+   Chromosome overview
+   -------------------------------------------------------------------------- */
+
+.blast-chr { width: 100%; overflow-x: auto; }
+.blast-chr svg { display: block; min-width: 520px; }
+.blast-chr-track { fill: #e9eff2; }
+.blast-chr-label { font-size: 11px; fill: var(--blast-ink-soft); }
+.blast-chr-hit { cursor: pointer; }
+.blast-chr-hit:hover { stroke: #1f2723; stroke-width: 1; }
+.blast-chr-hit.is-selected { stroke: var(--blast-select); stroke-width: 2; }
+
+/* --------------------------------------------------------------------------
+   Filters
+   -------------------------------------------------------------------------- */
+
+.blast-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  align-items: flex-end;
+}
+
+.blast-filter { display: flex; flex-direction: column; gap: 4px; }
+
+.blast-filter label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--blast-ink-soft);
+}
+
+.blast-filter input[type="number"],
+.blast-filter input[type="search"],
+.blast-filter select {
+  border: 1px solid var(--blast-rule);
+  border-radius: 3px;
+  padding: 5px 8px;
+  font: inherit;
+  min-width: 8ch;
+}
+
+.blast-filter input[type="search"] { min-width: 22ch; }
+
+.blast-filter-summary {
+  margin-left: auto;
+  font-size: 0.85rem;
+  color: var(--blast-ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------------------
+   Hit table
+   -------------------------------------------------------------------------- */
+
+.blast-table-wrap { max-height: 60vh; overflow: auto; }
+
+.blast-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+
+.blast-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #fff;
+  border-bottom: 2px solid var(--blast-rule);
+  padding: 7px 10px;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--blast-ink-soft);
+}
+
+.blast-table th[aria-sort="ascending"]::after { content: " \25B2"; }
+.blast-table th[aria-sort="descending"]::after { content: " \25BC"; }
+
+.blast-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid #eef2f4;
+  vertical-align: top;
+}
+
+.blast-table tbody tr { cursor: pointer; }
+.blast-table tbody tr:hover { background: #f6fafb; }
+.blast-table tbody tr.is-selected { background: #fdf0e6; }
+.blast-table tbody tr.is-selected td:first-child { box-shadow: inset 3px 0 0 var(--blast-select); }
+
+.blast-num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* A quality chip: the number, on the quality ramp. Reads without the color. */
+.blast-chip {
+  display: inline-block;
+  min-width: 5.5ch;
+  padding: 1px 6px;
+  border-radius: 3px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.blast-chip-q0 { background: var(--blast-q0); color: #1f2723; }
+.blast-chip-q1 { background: var(--blast-q1); color: #1f2723; }
+.blast-chip-q2 { background: var(--blast-q2); color: #1f2723; }
+/* Dark ink on q3, not white: white on #4f96bd measures 3.27:1. Dark ink on the
+   same fill is 4.68:1, and the ramp still reads light-to-dark because the
+   background is what carries the scale. */
+.blast-chip-q3 { background: var(--blast-q3); color: #1f2723; }
+.blast-chip-q4 { background: var(--blast-q4); color: #fff; }
+
+.blast-pending { color: var(--blast-masked); font-style: italic; }
+
+/* --------------------------------------------------------------------------
+   Detail drawer
+   -------------------------------------------------------------------------- */
+
+.blast-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(560px, 94vw);
+  height: 100vh;
+  background: #fff;
+  border-left: 1px solid var(--blast-rule);
+  box-shadow: -4px 0 18px rgba(31, 39, 35, 0.12);
+  /* Above the site header, which sits at 99000 because megamenu.css climbs to
+     98999 (see mgdb-modern.css .mgdb-site-header). At the old value of 60 the
+     header painted straight over the top of the open drawer: on desktop that
+     buried the Overview / Alignment / Genomic context tabs, and on a phone it
+     covered the close button too, leaving no way out of the drawer. */
+  z-index: 99500;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 160ms ease;
+}
+
+.blast-drawer.is-open { transform: translateX(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  /* No slide, and therefore no reason to delay the hide. */
+  .blast-drawer,
+  .blast-drawer.is-open { transition: none; }
+}
+
+.blast-drawer-head {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--blast-rule);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.blast-drawer-title { margin: 0; font-size: 1.05rem; }
+.blast-drawer-sub { margin: 2px 0 0; font-size: 0.85rem; color: var(--blast-ink-soft); }
+
+.blast-drawer-close {
+  margin-left: auto;
+  border: 1px solid var(--blast-rule);
+  background: #fff;
+  border-radius: 3px;
+  width: 28px; height: 28px;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.blast-drawer-body { overflow: auto; padding: 16px 18px; flex: 1; }
+
+.blast-drawer-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--blast-rule);
+}
+
+.blast-drawer-tab {
+  border: none;
+  background: none;
+  padding: 9px 12px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.88rem;
+  color: var(--blast-ink-soft);
+  border-bottom: 2px solid transparent;
+}
+
+.blast-drawer-tab[aria-selected="true"] {
+  color: #1f2723;
+  font-weight: 600;
+  border-bottom-color: var(--blast-q4);
+}
+
+.blast-stats { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; margin: 0; }
+.blast-stats dt { color: var(--blast-ink-soft); font-size: 0.85rem; }
+.blast-stats dd { margin: 0; font-variant-numeric: tabular-nums; font-size: 0.9rem; }
+
+/* A scrim under the drawer: it dims the page, gives a click target for
+   dismissal, and — because it also sits above the header — stops the site nav
+   being operable underneath an open drawer. */
+.blast-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 24, 20, 0.34);
+  z-index: 99400;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.blast-scrim.is-open { opacity: 1; pointer-events: auto; }
+
+@media (prefers-reduced-motion: reduce) { .blast-scrim { transition: none; } }
+
+/* --------------------------------------------------------------------------
+   Alignment viewer and difference strip
+   -------------------------------------------------------------------------- */
+
+.blast-aln {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+  line-height: 1.35;
+  white-space: pre;
+  overflow-x: auto;
+  background: #fbfdfd;
+  border: 1px solid var(--blast-rule);
+  border-radius: 3px;
+  padding: 10px 12px;
+  margin: 0;
+}
+
+/* Mismatches must be findable by shape as well as color, hence the underline. */
+.blast-aln-mm {
+  color: var(--blast-mismatch);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+.blast-aln-gap { color: var(--blast-gap); font-weight: 700; background: #f3edf8; }
+.blast-aln-masked { color: var(--blast-masked); }
+
+.blast-diffstrip { width: 100%; overflow-x: auto; margin-bottom: 10px; }
+.blast-diffstrip svg { display: block; }
+.blast-diff-mark { cursor: pointer; }
+.blast-diff-sub { fill: var(--blast-mismatch); }
+.blast-diff-ins, .blast-diff-del { fill: var(--blast-gap); }
+
+.blast-legend {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: var(--blast-ink-soft);
+  margin: 8px 0 0;
+}
+.blast-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.blast-legend i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+/* --------------------------------------------------------------------------
+   Pan-gene grouping
+   -------------------------------------------------------------------------- */
+
+.blast-pangene-group {
+  border: 1px solid var(--blast-rule);
+  border-radius: 4px;
+  margin-bottom: 10px;
+  background: #fff;
+}
+
+.blast-pangene-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  width: 100%;
+  border: none;
+  background: none;
+  font: inherit;
+  text-align: left;
+}
+
+.blast-pangene-name { font-weight: 600; }
+.blast-pangene-breadth { color: var(--blast-ink-soft); font-size: 0.86rem; margin-left: auto; }
+
+/* A presence bar: how much of the pan-genome carries this gene. */
+.blast-breadth-bar {
+  display: inline-block;
+  width: 90px; height: 8px;
+  background: #eef2f4;
+  border-radius: 2px;
+  overflow: hidden;
+  vertical-align: middle;
+}
+.blast-breadth-fill { display: block; height: 100%; background: var(--blast-q3); }
+
+/* --------------------------------------------------------------------------
+   Text and enhanced views
+   -------------------------------------------------------------------------- */
+
+.blast-textview {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.35;
+  white-space: pre;
+  overflow-x: auto;
+  margin: 0;
+}
+
+.blast-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--blast-ink-soft);
+}
+.blast-empty h3 { margin: 0 0 8px; color: #1f2723; }
+.blast-empty ul { display: inline-block; text-align: left; margin: 12px 0 0; }
+
+/* --------------------------------------------------------------------------
+   Narrow screens
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .blast-summary { grid-template-columns: minmax(0, 1fr); }
+  .blast-filter-summary { margin-left: 0; width: 100%; }
+  .blast-table-wrap { max-height: none; }
+}
+
+/* --------------------------------------------------------------------------
+   Multi-assembly grouping
+   -------------------------------------------------------------------------- */
+
+.blast-pangene-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.blast-group-id {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+  color: var(--blast-ink-soft);
+}
+
+/* How many of the assemblies the user actually searched carry this gene. Kept
+   visually distinct from the pan-genome breadth beside it, because they answer
+   different questions and reading one as the other would mislead. */
+.blast-group-here { font-size: 0.86rem; }
+.blast-group-here strong { font-variant-numeric: tabular-nums; }
+
+.blast-group-stats {
+  margin: 0;
+  padding: 0 14px 10px;
+  font-size: 0.84rem;
+  color: var(--blast-ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.blast-group-members {
+  border-top: 1px solid var(--blast-rule);
+  padding: 4px 14px 10px;
+}
+
+.blast-group-members table { font-size: 0.84rem; }
+.blast-group-members td { border-bottom: 1px solid #f1f5f6; }
+
+.blast-pangene-head[aria-expanded="true"] { background: #f6fafb; }
+.blast-pangene-head::after {
+  content: "\25B8";
+  margin-left: 4px;
+  color: var(--blast-ink-soft);
+}
+.blast-pangene-head[aria-expanded="true"]::after { content: "\25BE"; }
+
+/* --------------------------------------------------------------------------
+   View switcher
+   --------------------------------------------------------------------------
+   Four readings of one search. Styled as the site's section tabs so it reads
+   as navigation within a page rather than as four separate reports.
+   -------------------------------------------------------------------------- */
+
+.blast-views {
+  display: flex;
+  gap: 2px;
+  margin: 0 0 18px;
+  border-bottom: 1px solid var(--blast-rule);
+  overflow-x: auto;
+}
+
+.blast-view-tab {
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 0.92rem;
+  padding: 10px 16px;
+  cursor: pointer;
+  color: var(--blast-ink-soft);
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+}
+
+.blast-view-tab[aria-selected="true"] {
+  color: #1f2723;
+  font-weight: 600;
+  border-bottom-color: var(--blast-q4);
+}
+
+.blast-view-tab:hover { color: #1f2723; }
+.blast-view-tab:focus-visible { outline: 2px solid var(--blast-select); outline-offset: -2px; }
+
+/* --------------------------------------------------------------------------
+   Pairwise alignment list
+   -------------------------------------------------------------------------- */
+
+.blast-aln-item {
+  border: 1px solid var(--blast-rule);
+  border-radius: 4px;
+  margin-bottom: 8px;
+  background: #fff;
+}
+
+.blast-aln-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.blast-aln-head:hover { background: #f6fafb; }
+.blast-aln-head[aria-expanded="true"] { background: #f6fafb; border-bottom: 1px solid var(--blast-rule); }
+.blast-aln-head::after { content: "\25B8"; margin-left: auto; color: var(--blast-ink-soft); }
+.blast-aln-head[aria-expanded="true"]::after { content: "\25BE"; }
+
+.blast-aln-name { font-weight: 600; }
+.blast-aln-stats {
+  font-size: 0.84rem;
+  color: var(--blast-ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.blast-aln-body { padding: 12px 14px; }
+
+/* The Plotly target needs an explicit height. Without one the graph collapsed
+   to roughly 50px, leaving a two-pixel plot area with the y-axis labels
+   overprinting each other and every point squashed into a band. */
+#blast-scatter { min-height: 420px; }
+
+/* A conservative substitution — BLAST's '+' in the midline. Distinct from a
+   plain mismatch because for a protein alignment that distinction is most of
+   what is being read: a radical change is a candidate functional difference,
+   a conservative one usually is not. Teal reads as "different but tolerated"
+   against the orange used for a true mismatch, and the two differ in lightness
+   as well as hue so they survive color-vision deficiency. */
+.blast-aln-sim {
+  color: #1a7f6b;
+  font-weight: 600;
+  border-bottom: 2px dotted currentColor;
+}
+
+/* --------------------------------------------------------------------------
+   Multi-FASTA query selector
+   -------------------------------------------------------------------------- */
+
+.blast-querybar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  border: 1px solid var(--blast-rule);
+  border-left: 3px solid var(--blast-q3);
+  border-radius: 4px;
+  background: #f6fafb;
+}
+
+.blast-querybar label { font-weight: 600; font-size: 0.86rem; }
+
+.blast-querybar select {
+  border: 1px solid var(--blast-rule);
+  border-radius: 3px;
+  padding: 5px 8px;
+  font: inherit;
+  max-width: min(100%, 60ch);
+}
+
+.blast-querybar-note { font-size: 0.84rem; color: var(--blast-ink-soft); }
+
+/* --------------------------------------------------------------------------
+   Protein domain lane
+   --------------------------------------------------------------------------
+   Amber, outlined, sitting on the query ruler — deliberately not on the blue
+   quality ramp, because a domain is a fact about the sequence rather than a
+   measure of match quality, and the two must not read as the same scale.
+   -------------------------------------------------------------------------- */
+
+.blast-domain {
+  fill: #fbe6bf;
+  stroke: #b07a12;
+  stroke-width: 1;
+}
+
+.blast-domain-label {
+  font-size: 10px;
+  fill: #6b4a08;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.blast-domain-label-out { fill: var(--blast-ink-soft); font-weight: 400; }
+
+.blast-domain-note { color: var(--blast-ink-soft); }
+
+/* --------------------------------------------------------------------------
+   Pan-genome matrix
+   --------------------------------------------------------------------------
+   Only measured cells take the quality ramp. "Present but not searched" is an
+   outline, because it is knowledge about the gene rather than a result of this
+   search, and shading it on the same scale would invite reading it as a weak
+   match.
+   -------------------------------------------------------------------------- */
+
+.blast-matrix-scroll { overflow: auto; max-height: 66vh; }
+
+.blast-matrix {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.8rem;
+}
+
+.blast-matrix th,
+.blast-matrix td { border-bottom: 1px solid #eef2f4; }
+
+.blast-matrix-corner,
+.blast-matrix-row {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: #fff;
+  text-align: left;
+  padding: 4px 10px 4px 2px;
+  white-space: nowrap;
+  border-right: 1px solid var(--blast-rule);
+}
+
+.blast-matrix-row { cursor: pointer; }
+.blast-matrix-row:hover { background: #f6fafb; }
+
+.blast-matrix-symbol { display: block; font-weight: 600; }
+.blast-matrix-pg {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--blast-ink-soft);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.blast-matrix-corner { z-index: 3; top: 0; }
+
+/* Rotated column headers keep 60-odd assemblies legible without a table three
+   screens wide. */
+.blast-matrix-col {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #fff;
+  height: 96px;
+  vertical-align: bottom;
+  padding: 0;
+  width: 22px;
+  min-width: 22px;
+}
+
+.blast-matrix-col span {
+  display: block;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-weight: 400;
+  font-size: 0.74rem;
+  color: var(--blast-ink-soft);
+  padding-bottom: 4px;
+  max-height: 92px;
+  overflow: hidden;
+}
+
+.blast-matrix-col.is-searched span { color: #1f2723; font-weight: 600; }
+
+.blast-matrix-cell {
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.7rem;
+  border-right: 1px solid #f4f8f9;
+}
+
+.blast-matrix-cell.is-hit { cursor: pointer; color: #1f2723; }
+.blast-matrix-cell.is-hit.q0 { background: var(--blast-q0); }
+.blast-matrix-cell.is-hit.q1 { background: var(--blast-q1); }
+.blast-matrix-cell.is-hit.q2 { background: var(--blast-q2); }
+.blast-matrix-cell.is-hit.q3 { background: var(--blast-q3); color: #1f2723; }
+.blast-matrix-cell.is-hit.q4 { background: var(--blast-q4); color: #fff; }
+.blast-matrix-cell.is-hit:hover { outline: 2px solid var(--blast-select); outline-offset: -2px; }
+
+/* Searched, gene present, nothing above threshold — a real negative result. */
+.blast-matrix-cell.is-miss { color: var(--blast-masked); background: #fbfdfd; }
+
+/* Present in the pan-genome but never looked at. */
+.blast-matrix-cell.is-present { color: #b07a12; background: #fffdf7; }
+
+.blast-matrix-cell.is-absent { background: #fff; }
+
+.blast-swatch {
+  width: 12px; height: 12px; border-radius: 2px; display: inline-block;
+  border: 1px solid var(--blast-rule);
+}
+.blast-swatch.q4 { background: var(--blast-q4); border-color: var(--blast-q4); }
+.blast-swatch.miss { background: #fbfdfd; }
+.blast-swatch.present { background: #fffdf7; border-color: #b07a12; }
+.blast-swatch.absent { background: #fff; }
+
+.blast-linkbtn {
+  border: none; background: none; padding: 0;
+  font: inherit; color: var(--blast-q4);
+  text-decoration: underline; cursor: pointer;
+}
+
+/* --------------------------------------------------------------------------
+   Gene neighborhood
+   --------------------------------------------------------------------------
+   Orientation only — it places the match among its neighbours and hands off to
+   JBrowse for anything more. Genes are spans, not models: strand and exons are
+   not in this annotation load and drawing either would be an invention.
+   -------------------------------------------------------------------------- */
+
+.blast-hood { overflow-x: auto; margin-bottom: 12px; }
+.blast-hood svg { display: block; }
+
+.blast-hood-match { fill: var(--blast-select); }
+
+.blast-hood-gene { fill: #c5dcea; stroke: #4f96bd; stroke-width: 1; cursor: pointer; }
+.blast-hood-gene:hover { fill: #8ebdd6; }
+.blast-hood-gene.is-focus { fill: var(--blast-q4); stroke: #004c77; }
+
+.blast-hood-label { font-size: 10px; fill: var(--blast-ink-soft); pointer-events: none; }
+.blast-hood-label.is-focus { fill: #1f2723; font-weight: 600; }
+
+.blast-hood a { text-decoration: none; }
+
+/* Outstanding or failed targets. Amber rather than red: an unfinished job is
+   not an error, but it must not be mistaken for a finished one. */
+.blast-warn {
+  border-left: 3px solid #b07a12;
+  background: #fffdf7;
+  padding: 8px 12px;
+  border-radius: 3px;
+}
+
+/* --------------------------------------------------------------------------
+   Per-target bar
+   --------------------------------------------------------------------------
+   A merged multi-target result still has to show what each target contributed,
+   and let a reader look at one. Chips rather than tabs: this filters the one
+   merged result, it does not switch between separate reports.
+   -------------------------------------------------------------------------- */
+
+.blast-targetbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin: 0 0 18px;
+}
+
+.blast-targetbar-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--blast-ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-right: 4px;
+}
+
+.blast-chipbtn {
+  border: 1px solid var(--blast-rule);
+  background: #fff;
+  border-radius: 14px;
+  padding: 5px 12px;
+  font: inherit;
+  font-size: 0.84rem;
+  line-height: 1.25;
+  cursor: pointer;
+  text-align: left;
+  color: #1f2723;
+}
+
+.blast-chipbtn span {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--blast-ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.blast-chipbtn:hover { border-color: var(--blast-q3); }
+.blast-chipbtn:focus-visible { outline: 2px solid var(--blast-select); outline-offset: 1px; }
+
+/* Selection is a filled chip AND aria-pressed, so it is not carried by color
+   alone. */
+.blast-chipbtn.is-on {
+  background: var(--blast-q4);
+  border-color: var(--blast-q4);
+  color: #fff;
+  font-weight: 600;
+}
+.blast-chipbtn.is-on span { color: #dcecf5; }
+
+/* Not yet annotated: presence in this assembly is genuinely unknown. Visually
+   distinct from both "no match" and "absent", because conflating them is what
+   made the matrix state something false. */
+.blast-matrix-cell.is-unknown { color: #8a6d1f; background: #fdf6e6; font-weight: 600; }
+.blast-swatch.unknown { background: #fdf6e6; border-color: #8a6d1f; }
+
+
+/* --------------------------------------------------------------------------
+   Keyboard focus
+   --------------------------------------------------------------------------
+   Every interactive thing on this page needs a visible focus ring. The table
+   rows, matrix cells and scroll regions became focusable to give keyboard users
+   a route to a hit's details; without a ring that route is invisible.
+   -------------------------------------------------------------------------- */
+
+.blast-table tbody tr:focus-visible,
+.blast-matrix-cell:focus-visible,
+.blast-matrix-row:focus-visible,
+.blast-table-wrap:focus-visible,
+.blast-matrix-scroll:focus-visible,
+.blast-coverage:focus-visible,
+.blast-chr:focus-visible,
+.blast-hood:focus-visible,
+.blast-aln:focus-visible {
+  outline: 3px solid var(--blast-select);
+  outline-offset: -3px;
+}
+
+.blast-sortbtn {
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.blast-sortbtn:focus-visible { outline: 2px solid var(--blast-select); outline-offset: 2px; }
+
+/* The sort direction is on the button, not the header, so it is announced with
+   the control a reader activates. */
+.blast-table th[aria-sort="ascending"] .blast-sortbtn::after { content: "\25B2"; font-size: 0.7em; }
+.blast-table th[aria-sort="descending"] .blast-sortbtn::after { content: "\25BC"; font-size: 0.7em; }
+.blast-table th[aria-sort]:not([aria-sort="none"]) { color: #1f2723; }
+
+/* Only sortable headers look clickable. The one non-sortable header used to
+   carry the same pointer cursor and no sort behavior. */
+.blast-table th { cursor: default; }
+.blast-table th:has(.blast-sortbtn) { cursor: pointer; }
+
+/* A legend for the quality ramp, shared by both hand-drawn figures. */
+.blast-ramp-legend {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  font-size: 0.78rem;
+  color: var(--blast-ink-soft);
+  margin: 8px 0 0;
+}
+
+.blast-ramp-legend i {
+  width: 14px; height: 10px; border-radius: 2px;
+  display: inline-block; vertical-align: middle;
+  border: 1px solid rgba(31, 39, 35, 0.18);
+}
+
+.blast-ramp-legend span { display: inline-flex; align-items: center; gap: 5px; }
+
+/* ==========================================================================
+   Overview band
+   --------------------------------------------------------------------------
+   Reworked for room to breathe. Previously the query line, the reading, the
+   metric tiles and two separate action rows were stacked at similar weight
+   inside one column, so nothing led and long deflines broke raggedly across
+   the numbers beside them.
+   ========================================================================== */
+
+.blast-overview { display: flex; flex-direction: column; gap: 18px; }
+.blast-overview > * { margin: 0; }
+
+/* The query's own name. Constrained measure, and it may wrap — but on its own,
+   away from the figures. */
+.blast-queryname {
+  font-size: 1rem;
+  line-height: 1.45;
+  max-width: 78ch;
+  color: #1f2723;
+  overflow-wrap: anywhere;
+}
+
+/* Facts as discrete items rather than a run-on sentence joined by dots, which
+   is what produced the awkward breaks. */
+.blast-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  list-style: none;
+  padding: 0;
+  font-size: 0.88rem;
+  color: var(--blast-ink-soft);
+}
+
+.blast-facts li { display: flex; align-items: baseline; gap: 6px; }
+.blast-facts b { color: #1f2723; font-variant-numeric: tabular-nums; font-weight: 600; }
+
+.blast-summary { gap: 28px; align-items: stretch; }
+
+/* Prose gets a readable measure; without this the reading ran the full width
+   of a wide screen and was hard to track back to. */
+.blast-reading-block { display: flex; flex-direction: column; gap: 10px; max-width: 68ch; }
+.blast-reading { font-size: 1.12rem; line-height: 1.45; }
+.blast-reading-detail { font-size: 0.95rem; line-height: 1.55; }
+.blast-note { font-size: 0.88rem; }
+
+.blast-best { align-self: start; }
+
+/* Counts get their own band, full width, instead of being squeezed beside the
+   prose. */
+.blast-metrics { gap: 14px; }
+
+/* One actions row. Best-match actions lead; job-level utilities sit apart at
+   the end so "New search" is never mistaken for something that acts on the
+   result in front of you. */
+.blast-actionbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  align-items: center;
+  padding-top: 4px;
+  border-top: 1px solid var(--blast-rule);
+}
+
+.blast-actionbar .blast-actions { margin-top: 0; }
+.blast-actions-utility { margin-left: auto; }
+
+.mgdb-button-primary {
+  background: var(--blast-q4);
+  border-color: var(--blast-q4);
+  color: #fff;
+}
+.mgdb-button-primary:hover { background: #005c8f; border-color: #005c8f; }
+
+@media (max-width: 900px) {
+  .blast-actions-utility { margin-left: 0; }
+  .blast-reading-block { max-width: none; }
+}
+
+/* ==========================================================================
+   Loading state
+   --------------------------------------------------------------------------
+   Per section, not one spinner for the page: the table arrives long before the
+   pan-gene groups and the matrix, and without this a half-filled page looked
+   finished. A spinner rather than a skeleton because these sections vary in
+   height and a skeleton would guess wrong.
+   ========================================================================== */
+
+.blast-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 0;
+  font-size: 0.85rem;
+  color: var(--blast-ink-soft);
+}
+
+.blast-spinner {
+  width: 13px;
+  height: 13px;
+  border: 2px solid var(--blast-q1);
+  border-top-color: var(--blast-q4);
+  border-radius: 50%;
+  display: inline-block;
+  animation: blast-spin 700ms linear infinite;
+  flex: none;
+}
+
+@keyframes blast-spin { to { transform: rotate(360deg); } }
+
+/* Motion is decoration here; the text beside it carries the meaning. */
+@media (prefers-reduced-motion: reduce) {
+  .blast-spinner { animation: none; border-top-color: var(--blast-q1); }
+}
+
+[aria-busy="true"] .blast-coverage,
+[aria-busy="true"] .blast-chr,
+[aria-busy="true"] #blast-groups,
+[aria-busy="true"] #blast-pangenes,
+[aria-busy="true"] #blast-matrix { opacity: 0.55; transition: opacity 150ms; }
+
+/* ==========================================================================
+   View tabs, made obvious
+   --------------------------------------------------------------------------
+   These choose between four readings of the result and are the most important
+   control on the page, but they read as quiet text links. Bigger, boxed, with
+   a filled active state so the current view is unmistakable — and the active
+   one is marked by fill, weight AND an underline, so it does not rely on
+   color alone.
+   ========================================================================== */
+
+.blast-views {
+  gap: 4px;
+  padding: 4px;
+  background: #eef2f4;
+  border: 1px solid var(--blast-rule);
+  border-radius: 8px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid var(--blast-rule);
+}
+
+.blast-view-tab {
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 9px 18px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #33474f;
+  background: transparent;
+  border-bottom: 3px solid transparent;
+}
+
+.blast-view-tab:hover {
+  background: #fff;
+  border-color: var(--blast-rule);
+  color: #1f2723;
+}
+
+.blast-view-tab[aria-pressed="true"] {
+  background: #fff;
+  color: #10333f;
+  font-weight: 700;
+  border-color: var(--blast-rule);
+  border-bottom-color: var(--blast-q4);
+  box-shadow: 0 1px 3px rgba(31, 39, 35, 0.10);
+}
+
+@media (max-width: 700px) {
+  .blast-view-tab { padding: 8px 12px; font-size: 0.88rem; }
+}
+
+/* --------------------------------------------------------------------------
+   Target chips, enlarged
+   --------------------------------------------------------------------------
+   These are the primary way into a multi-target result, and at chip size they
+   read as decoration. Three stacked lines — assembly, what was searched in it,
+   and the counts — because several targets commonly share one assembly and the
+   assembly name alone identifies none of them.
+   -------------------------------------------------------------------------- */
+
+.blast-chipbtn-target {
+  border-radius: 8px;
+  padding: 10px 16px;
+  min-width: 132px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1.3;
+}
+
+.blast-chip-name {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: inherit;
+}
+
+/* The sequence type. Distinct weight and case so it never reads as part of the
+   assembly name. */
+.blast-chip-type {
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--blast-ink-soft);
+  font-weight: 600;
+}
+
+.blast-chip-stats {
+  font-size: 0.78rem;
+  color: var(--blast-ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.blast-chipbtn-target.is-on .blast-chip-type,
+.blast-chipbtn-target.is-on .blast-chip-stats { color: #cfe6f3; }
+
+.blast-targetbar { gap: 8px; }
+
+/* --------------------------------------------------------------------------
+   Empty state
+   --------------------------------------------------------------------------
+   A search that found nothing is a result, not a failure, and it is the moment
+   a reader most needs to know what was actually run. Facts on the left, what to
+   try on the right — rather than a page of empty figure cards.
+   -------------------------------------------------------------------------- */
+
+.blast-empty-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 28px;
+  margin-top: 6px;
+}
+
+.blast-empty-h {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--blast-ink-soft);
+  margin: 0 0 10px;
+}
+
+.blast-empty-facts dd { overflow-wrap: anywhere; }
+
+.blast-empty-tips {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.blast-empty-tips li { max-width: 58ch; }
+
+@media (max-width: 860px) {
+  .blast-empty-grid { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+}

@@ -1003,3 +1003,29 @@
   min-width: 32px;
   color: var(--mgdb-muted);
 }
+
+/* --------------------------------------------------------------------------
+   Related resources
+
+   The shell lays this panel out with `repeat(auto-fit, minmax(220px, 1fr))`,
+   which resolves to five columns at this page's width. That was one clean row
+   while there were five cards; adding the genetic map guide made six, and the
+   sixth sat alone on a second row with four empty columns beside it. Six
+   divides by three, two and one, so the column count is pinned to those and
+   every row is full at every width.
+
+   Scoped to this page rather than fixed in mgdb-hub.css: the same auto-fit rule
+   serves every hub's panel, and changing it there would reflow all of them.
+   -------------------------------------------------------------------------- */
+
+.mgdb-map-page .mgdb-resource-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 1000px) {
+  .mgdb-map-page .mgdb-resource-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 620px) {
+  .mgdb-map-page .mgdb-resource-list { grid-template-columns: minmax(0, 1fr); }
+}

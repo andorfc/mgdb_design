@@ -1,0 +1,309 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-blast-results
+<main class="mgdb-page mgdb-hub-page mgdb-blast-results" id="blast-results-main"
+      data-blast-job="$(job_id)">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/BLAST">BLAST</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Results</span>
+  </nav>
+
+  <!-- =====================================================================
+       Header and biological reading. Rendered from the report alone, so it
+       paints before any annotation query has run.
+       ===================================================================== -->
+  <section class="mgdb-hub-surface blast-overview" id="blast-summary-section"
+           aria-labelledby="blast-title">
+    <div class="mgdb-section-heading">
+      <h1 id="blast-title">BLAST results</h1>
+    </div>
+
+    <!-- Identity of the search. Outside .mgdb-section-heading deliberately: the
+         hub shell hides any <p> inside a heading — see mgdb-hub.css, "No section
+         descriptions" — and this is data, not a blurb. Split into the query name
+         and its facts so a long FASTA defline cannot drag the numbers onto a
+         ragged second line. -->
+    <p class="blast-queryname" id="blast-query-line">Loading&hellip;</p>
+    <ul class="blast-facts" id="blast-query-facts"></ul>
+
+    <p class="blast-warn" id="blast-completeness" hidden></p>
+
+    <!-- Per-target summary and filter. One search against several targets is
+         merged into one result — that is what pan-gene grouping needs — so this
+         is how a reader sees what each target gave, and looks at just one. -->
+    <div class="blast-targetbar" id="blast-targetbar" role="group"
+         aria-label="Filter results by search target" hidden></div>
+
+    <!-- Multi-FASTA: shown only when the submission held more than one
+         sequence. Each is a separate BLAST result and only one can be on
+         screen at a time, so the choice has to be explicit. -->
+    <div class="blast-querybar" id="blast-querybar" hidden>
+      <label for="blast-query-select">Query</label>
+      <select id="blast-query-select"></select>
+      <span class="blast-querybar-note" id="blast-query-note"></span>
+    </div>
+
+    <!-- The reading and the best match, side by side. The reading gets the wide
+         column because it is prose and needs a readable measure; the best match
+         is a fixed set of figures and does not. -->
+    <div class="blast-summary">
+      <div class="blast-reading-block">
+        <p class="blast-reading" id="blast-reading"></p>
+        <p class="blast-reading-detail" id="blast-reading-detail"></p>
+        <p class="blast-reading-detail blast-note" id="blast-annotation-note" hidden></p>
+      </div>
+      <dl class="blast-best" id="blast-best"></dl>
+    </div>
+
+    <!-- Counts get their own full-width band rather than being squeezed into a
+         column beside the prose. -->
+    <div class="mgdb-metric-grid blast-metrics" id="blast-metrics"></div>
+
+    <!-- One actions row, grouped: what to do with the best match first, then
+         what to do with the job. Previously these were two rows in different
+         places, one of them orphaned below the grid. -->
+    <div class="blast-actionbar">
+      <div class="blast-actions" id="blast-best-actions"></div>
+      <div class="blast-actions blast-actions-utility">
+        <button type="button" class="mgdb-button" id="blast-download-table">Download table</button>
+        <a class="mgdb-button" href="/BLAST/blast_results_api.php?job=$(job_id)&amp;view=text"
+           download="blast-$(job_id).txt">Download report</a>
+        <a class="mgdb-button" href="$(reload_url)">Permanent link</a>
+        <a class="mgdb-button mgdb-button-primary" href="/BLAST">New search</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       View switcher. The search ran once; these are four readings of the same
+       report, so switching costs no search and loses nothing.
+       ===================================================================== -->
+  <div class="mgdb-section-tabs blast-views" id="blast-views" role="group"
+       aria-label="Choose how to read these results">
+    <button type="button" class="blast-view-tab" data-view="discovery" aria-pressed="true">Discovery</button>
+    <button type="button" class="blast-view-tab" data-view="table" aria-pressed="false">Table</button>
+    <button type="button" class="blast-view-tab" data-view="alignments" aria-pressed="false">Alignments</button>
+    <button type="button" class="blast-view-tab" data-view="text" aria-pressed="false">Text report</button>
+  </div>
+  <p id="blast-view-announce" class="mgdb-visually-hidden" aria-live="polite"></p>
+
+  <!-- =====================================================================
+       Nothing matched. A dedicated panel rather than a page of empty figures:
+       it says what was searched, with which settings, and what to try next.
+       ===================================================================== -->
+  <section class="mgdb-hub-surface blast-empty-section" id="blast-empty-section"
+           aria-labelledby="blast-empty-h" hidden>
+    <div class="mgdb-section-heading">
+      <h2 id="blast-empty-h">No matches found</h2>
+    </div>
+    <div id="blast-empty"></div>
+  </section>
+
+  <!-- =====================================================================
+       Query coverage. First because it answers the question a reader has
+       before any other: is this a full-length match or only part of one?
+       ===================================================================== -->
+  <section class="mgdb-hub-surface mgdb-hub-tone-blue" id="blast-coverage-section" aria-labelledby="blast-coverage-h">
+    <div class="mgdb-section-heading">
+      <h2 id="blast-coverage-h">Query coverage</h2>
+      <label class="blast-filter" for="blast-coverage-top">
+        <span>Show</span>
+        <select id="blast-coverage-top">
+          <option value="10">Top 10 by bit score</option>
+          <option value="25" selected>Top 25 by bit score</option>
+          <option value="50">Top 50 by bit score</option>
+        </select>
+      </label>
+    </div>
+    <p class="mgdb-section-intro blast-domain-note" id="blast-domain-note" hidden></p>
+    <div class="blast-coverage" id="blast-coverage" tabindex="0" role="region"
+         aria-label="Query coverage figure, scrollable"></div>
+  </section>
+
+  <!-- =====================================================================
+       Where in the genome, and how good. Two figures side by side.
+       ===================================================================== -->
+  <section class="mgdb-hub-surface mgdb-hub-tone-green" id="blast-chromosomes-section"
+           aria-labelledby="blast-chr-h" hidden>
+    <div class="mgdb-section-heading">
+      <h2 id="blast-chr-h">Genomic location</h2>
+    </div>
+    <div class="blast-chr" id="blast-chromosomes" tabindex="0" role="region"
+         aria-label="Genomic location figure, scrollable"></div>
+  </section>
+
+  <section class="mgdb-hub-surface mgdb-hub-tone-amber" id="blast-scatter-section"
+           aria-labelledby="blast-scatter-h" hidden>
+    <div class="mgdb-section-heading">
+      <h2 id="blast-scatter-h">Identity against coverage</h2>
+    </div>
+    <p class="mgdb-section-intro" id="blast-scatter-note"></p>
+    <div class="mgdb-figure" id="blast-scatter"></div>
+  </section>
+
+  <!-- =====================================================================
+       Pan-gene grouping. The MaizeGDB-specific view: the same gene across
+       many assemblies, collapsed into one row rather than dozens.
+       ===================================================================== -->
+  <section class="mgdb-hub-surface mgdb-hub-tone-burgundy" id="blast-pangene-section"
+           aria-labelledby="blast-pangene-h" hidden>
+    <div class="mgdb-section-heading">
+      <h2 id="blast-pangene-h">Pan-gene groups</h2>
+    </div>
+    <div id="blast-pangenes"></div>
+  </section>
+
+  <!-- =====================================================================
+       Multi-assembly grouping. Shown only when the job searched more than one
+       target; a single-assembly search has nothing to group across.
+       ===================================================================== -->
+  <section class="mgdb-hub-surface mgdb-hub-tone-burgundy" id="blast-group-section"
+           aria-labelledby="blast-group-h" hidden>
+    <div class="mgdb-section-heading">
+      <h2 id="blast-group-h">Matches by pan-gene</h2>
+      <label class="blast-filter" for="blast-grouping">
+        <span>Group by</span>
+        <select id="blast-grouping">
+          <option value="pan_gene" selected>Pan-gene</option>
+          <option value="none">No grouping</option>
+        </select>
+      </label>
+    </div>
+    <div id="blast-groups"></div>
+  </section>
+
+  <!-- =====================================================================
+       Pan-genome matrix. Pan-genes down, assemblies across. Four cell states,
+       kept distinct so a blank cell cannot be read as either "absent" or
+       "not searched" — see renderMatrix in js/mgdb-blast-results.js.
+       ===================================================================== -->
+  <section class="mgdb-hub-surface mgdb-hub-tone-leaf" id="blast-matrix-section"
+           aria-labelledby="blast-matrix-h" hidden>
+    <div class="mgdb-section-heading">
+      <h2 id="blast-matrix-h">Pan-genome matrix</h2>
+      <div class="blast-filters">
+        <div class="blast-filter">
+          <label for="blast-matrix-metric">Shade by</label>
+          <select id="blast-matrix-metric">
+            <option value="identity" selected>Percent identity</option>
+            <option value="coverage">Query coverage</option>
+            <option value="bits">Bit score</option>
+          </select>
+        </div>
+        <div class="blast-filter">
+          <label for="blast-matrix-scope">Assemblies</label>
+          <select id="blast-matrix-scope">
+            <option value="auto" selected>Automatic</option>
+            <option value="searched">Searched only</option>
+            <option value="all">All in the pan-genome</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div id="blast-matrix"></div>
+  </section>
+
+  <!-- =====================================================================
+       Filters and the hit table.
+       ===================================================================== -->
+  <section class="mgdb-hub-surface mgdb-hub-tone-gold" id="blast-table-section" aria-labelledby="blast-table-h">
+    <div class="mgdb-section-heading">
+      <h2 id="blast-table-h">All matches</h2>
+    </div>
+
+    <div class="blast-filters" role="search">
+      <div class="blast-filter">
+        <label for="blast-filter-text">Search within results</label>
+        <input type="search" id="blast-filter-text" placeholder="gene, symbol or pan-gene">
+      </div>
+      <div class="blast-filter">
+        <label for="blast-filter-identity">Min identity %</label>
+        <input type="number" id="blast-filter-identity" min="0" max="100" step="1" placeholder="0">
+      </div>
+      <div class="blast-filter">
+        <label for="blast-filter-coverage">Min coverage %</label>
+        <input type="number" id="blast-filter-coverage" min="0" max="100" step="1" placeholder="0">
+      </div>
+      <div class="blast-filter">
+        <label for="blast-filter-evalue">Max E-value</label>
+        <input type="number" id="blast-filter-evalue" step="any" placeholder="any">
+      </div>
+      <p class="blast-filter-summary" id="blast-filter-summary" aria-live="polite"></p>
+    </div>
+
+    <div class="blast-table-wrap mgdb-table-scroll" tabindex="0" role="region"
+         aria-label="All matches, scrollable">
+      <table class="blast-table mgdb-table">
+        <thead id="blast-table-head">
+          <tr>
+            <th scope="col" data-sort="subject">Match</th>
+            <th scope="col" data-sort="assembly" id="blast-th-assembly" hidden>Assembly</th>
+            <th scope="col">Pan-gene</th>
+            <th scope="col" data-sort="h_start">Position</th>
+            <th scope="col" data-sort="pident" aria-sort="none">Identity</th>
+            <th scope="col" data-sort="q_coverage">Coverage</th>
+            <th scope="col" data-sort="align_len">Length</th>
+            <th scope="col" data-sort="mismatches">Mism.</th>
+            <th scope="col" data-sort="gaps">Gaps</th>
+            <th scope="col" data-sort="evalue">E-value</th>
+            <th scope="col" data-sort="bit_score_total" aria-sort="descending">Bit score</th>
+          </tr>
+        </thead>
+        <tbody id="blast-table-body">
+          <tr><td colspan="11" class="blast-pending">
+            <span class="blast-spinner" aria-hidden="true"></span> Loading matches&hellip;
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+  <!-- =====================================================================
+       Pairwise alignments, collapsed. This is where the sequence alignment
+       lives for anyone who wants to read it directly rather than selecting a
+       hit; each one is fetched only when its row is opened, so a result with
+       thousands of matches never puts thousands of alignments in the DOM.
+       ===================================================================== -->
+  <section class="mgdb-hub-surface mgdb-hub-tone-blue" id="blast-alignments-section"
+           aria-labelledby="blast-aln-h" hidden>
+    <div class="mgdb-section-heading">
+      <h2 id="blast-aln-h">Pairwise alignments</h2>
+    </div>
+    <div id="blast-alignments"></div>
+  </section>
+
+  <!-- =====================================================================
+       The classic text report, rendered from the same JSON as everything else.
+       ===================================================================== -->
+  <section class="mgdb-hub-surface" id="blast-text-section" aria-labelledby="blast-text-h" hidden>
+    <div class="mgdb-section-heading">
+      <h2 id="blast-text-h">Text report</h2>
+    </div>
+    <pre class="blast-textview" id="blast-textview">Loading&hellip;</pre>
+  </section>
+</main>
+
+<!-- =======================================================================
+     Selected-hit drawer. Outside <main> so it overlays the page rather than
+     reflowing it; nothing is rendered into it until a hit is selected.
+     ======================================================================= -->
+<div class="blast-scrim" id="blast-scrim" hidden></div>
+<aside class="blast-drawer" id="blast-drawer" aria-hidden="true"
+       aria-labelledby="blast-drawer-title" role="complementary">
+  <div class="blast-drawer-head">
+    <div>
+      <h2 class="blast-drawer-title" id="blast-drawer-title"></h2>
+      <p class="blast-drawer-sub" id="blast-drawer-sub"></p>
+    </div>
+    <button type="button" class="blast-drawer-close" id="blast-drawer-close"
+            aria-label="Close details">&times;</button>
+  </div>
+  <div class="blast-drawer-tabs" role="tablist">
+    <button type="button" class="blast-drawer-tab" role="tab" data-tab="overview"
+            aria-selected="true">Overview</button>
+    <button type="button" class="blast-drawer-tab" role="tab" data-tab="alignment"
+            aria-selected="false">Alignment</button>
+    <button type="button" class="blast-drawer-tab" role="tab" data-tab="context"
+            aria-selected="false">Genomic context</button>
+  </div>
+  <div class="blast-drawer-body" id="blast-drawer-body"></div>
+</aside>
+)*

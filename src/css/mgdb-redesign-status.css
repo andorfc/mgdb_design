@@ -29,6 +29,9 @@
 .mgdb-redesign-status-page .status-bar-modern  { background: var(--mgdb-status-ok); }
 .mgdb-redesign-status-page .status-bar-partial { background: var(--mgdb-status-warn); }
 .mgdb-redesign-status-page .status-bar-legacy  { background: var(--mgdb-line); }
+/* Retired: a hatched neutral, so a category that has been cleared away does not
+   read as either finished or outstanding at a glance. */
+.mgdb-redesign-status-page .status-bar-retired { background: repeating-linear-gradient(45deg, var(--mgdb-line-soft) 0 3px, var(--mgdb-surface-sunken) 3px 6px); }
 
 .mgdb-redesign-status-page .status-overall {
   margin-top: var(--mgdb-space-5);
@@ -61,6 +64,15 @@
 .mgdb-redesign-status-page .status-key-modern::before  { background: var(--mgdb-status-ok); }
 .mgdb-redesign-status-page .status-key-partial::before { background: var(--mgdb-status-warn); }
 .mgdb-redesign-status-page .status-key-legacy::before  { background: var(--mgdb-line); }
+.mgdb-redesign-status-page .status-key-retired::before { background: repeating-linear-gradient(45deg, var(--mgdb-line-soft) 0 3px, var(--mgdb-surface-sunken) 3px 6px); }
+
+/* The Retired pill. Not one of the four shared tones: a retired route is not a
+   state of the page's health, it is the absence of a page. */
+.mgdb-redesign-status-page .mgdb-pill.status-pill-retired {
+  border: 1px dashed var(--mgdb-line);
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-muted);
+}
 
 /* --------------------------------------------------------------------------
    Tables

@@ -40,6 +40,18 @@
     return;
   }
 
+  /* One assembly, as a modern record page. Both spellings of the route reach
+     it, and it returns false without publishing when the name is not in
+     chado.genome_metadata, in which case the original code below answers.
+     Rollback: delete this block. */
+  if ((PAGE == 'assembly' || PAGE == 'genome_assembly')
+      && defined('ID') && ID && ID != '') {
+    $assembly_name = urldecode(ID);
+    if (include('controllers/genome/assembly_record_modern.php')) {
+      return;
+    }
+  }
+
   /* When /genome/genomebrowser is requested without an ID, render the modernized Genome Browser Data Hub */
   if (PAGE == 'genomebrowser' && (!defined('ID') || !ID || ID == '')) {
     include('controllers/genome/genomebrowser_modern.php');

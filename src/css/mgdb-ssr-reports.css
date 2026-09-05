@@ -1,0 +1,187 @@
+/* ==========================================================================
+   SSR reports — /ssrreports
+   --------------------------------------------------------------------------
+   Loaded after css/mgdb-modern.css and css/mgdb-hub.css. The hub shell settles
+   the pale blue ground, the white section cards and their coloured top edges,
+   the absence of a rule under a section title, the metric colours, the sticky
+   tab bar, the green Related resources panel and the table zebra — none of
+   that is restated here.
+
+   What is here is the page's own furniture: the two report toolbars, the
+   chromosome chip row, the bounded scroll region the long tables need, and the
+   figure.
+   ========================================================================== */
+
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
+
+.mgdb-ssr-reports-page .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-ssr-reports-page .ssrr-hero-mark {
+  display: block;
+  width: min(100%, 76px);
+  height: auto;
+  margin: 0;
+}
+
+/* ── Where a tab jump lands ──────────────────────────────────────────────── */
+
+/* The shell steps from 65px to 113px at 1170px because it assumes the bar has
+   wrapped to two rows by then. This one never wraps: its five labels need
+   688px of content width against the 719px a 767px viewport leaves after the
+   page's own 24px gutters, and below 767px mgdb-modern.css turns it into a
+   one-row scrolling rail. Measured at 57px at 1280, 900, 768 and 375, so the
+   offset is flat -- 57px of bar plus 8px so the heading is not against it. The
+   page script reads this value back, so the spy's trigger line and this ladder
+   agree by construction. */
+
+.mgdb-hub-page.mgdb-ssr-reports-page > section[id] { scroll-margin-top: 65px; }
+
+.mgdb-ssr-reports-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+.mgdb-modern .ssrr-archive-note { margin-top: 1.25rem; }
+
+/* ── Report toolbar ──────────────────────────────────────────────────────── */
+
+/* The filter field takes the slack and the actions sit at the end of the row.
+   Both columns have a floor of 0 so the row wraps rather than setting a
+   minimum width the page cannot render under. */
+.mgdb-modern .ssrr-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-modern .ssrr-filter-field {
+  flex: 1 1 22rem;
+  min-width: 0;
+}
+
+.mgdb-modern .ssrr-filter-field .mgdb-input { width: 100%; }
+
+.mgdb-modern .ssrr-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  min-width: 0;
+}
+
+.mgdb-modern .ssrr-count {
+  margin: 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The export links are anchors, not buttons, so they do not pick up the
+   min-height the shared export block gives a .mgdb-button inside it. */
+.mgdb-modern .ssrr-toolbar-actions .mgdb-export-buttons > * {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+}
+
+/* ── Chromosome chips ────────────────────────────────────────────────────── */
+
+.mgdb-modern .ssrr-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-modern .ssrr-chip-count {
+  margin-left: .35rem;
+  color: inherit;
+  font-variant-numeric: tabular-nums;
+  opacity: .72;
+}
+
+/* ── The two report tables ───────────────────────────────────────────────── */
+
+/* Both tables are rendered whole — 2,034 rows and 1,535 — so the reader can
+   use the browser's own find, and so a filter is a local pass rather than a
+   request. A bounded region is what makes that usable: the shared sticky
+   <thead> sticks to the top of this box instead of to the viewport, where the
+   sticky tab bar already sits. */
+.mgdb-modern .ssrr-table-scroll {
+  max-height: min(70vh, 44rem);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.mgdb-modern .ssrr-table-scroll .mgdb-table thead th {
+  /* The shared rule already sets position: sticky; top: 0. Inside a scrolling
+     box the header can show the surface behind it at the corners, so it takes
+     an opaque background of its own. */
+  z-index: 1;
+  background: var(--mgdb-surface-sunken);
+}
+
+.mgdb-modern .ssrr-table code {
+  font-size: var(--mgdb-text-xs);
+  white-space: nowrap;
+}
+
+.mgdb-modern .ssrr-table th[scope="row"] { white-space: nowrap; }
+
+.mgdb-modern .ssrr-none {
+  color: var(--mgdb-muted);
+  font-style: italic;
+}
+
+.mgdb-modern .ssrr-pill-compound {
+  border-color: #d8c48a;
+  background: #fbf3dd;
+  color: #6d5411;
+  font-size: var(--mgdb-text-xs);
+}
+
+/* A row the filter has excluded. `hidden` on a <tr> is display: none in every
+   browser that matters, but the shared [hidden] reset is worth restating here
+   because a table row's own display value is a common place for it to lose. */
+.mgdb-modern .ssrr-table tbody tr[hidden] { display: none; }
+
+.mgdb-modern .ssrr-note {
+  margin-top: var(--mgdb-space-3);
+  max-width: 78ch;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-modern .ssrr-empty { margin-top: var(--mgdb-space-4); }
+
+/* ── Figure ──────────────────────────────────────────────────────────────── */
+
+.mgdb-modern .ssrr-figure {
+  margin: var(--mgdb-space-6) 0 0;
+}
+
+.mgdb-modern .ssrr-figure figcaption {
+  margin-bottom: var(--mgdb-space-3);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+  font-weight: 700;
+}
+
+/* .mgdb-chart is a fixed 320px in the shared sheet, so passing layout.height
+   alone does nothing: the CSS height wins and Plotly draws to the box. The
+   page script sets an inline height and feeds the same number to the layout;
+   this is what lets the inline value take effect. */
+.mgdb-ssr-reports-page .mgdb-chart {
+  height: auto;
+  min-height: 320px;
+  margin-bottom: var(--mgdb-space-4);
+  overflow: visible;
+}
+
+@media (max-width: 720px) {
+  .mgdb-modern .ssrr-toolbar-actions { width: 100%; justify-content: space-between; }
+  .mgdb-modern .ssrr-table-scroll { max-height: min(70vh, 32rem); }
+}

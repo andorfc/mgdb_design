@@ -1,0 +1,198 @@
+/* ==========================================================================
+   /genome/assembly/<name> -- one genome assembly
+
+   Loaded after css/mgdb-hub.css and css/mgdb-record.css, which supply the
+   ground, the white section cards, the coloured section edges and the record
+   furniture. This sheet owns the header action row and the label/value rows
+   the metadata is rendered as.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Header actions
+
+   The three tabs the previous page carried -- Project Details, Browser, and a
+   downloads link buried in the metadata -- are these buttons. They sit under
+   the summary rather than beside the title, so a long assembly name and a row
+   of five buttons never compete for the same line.
+   -------------------------------------------------------------------------- */
+
+.mgdb-assembly-record-page .ar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-4);
+}
+
+/* The shared button is sized for a form row; in a header row of five it reads
+   heavy, so the type steps down and the box tightens. */
+.mgdb-assembly-record-page .ar-actions .mgdb-button {
+  padding: 8px 14px;
+  font-size: var(--mgdb-text-sm);
+}
+
+/* A header button that leaves MaizeGDB says so, from its href -- the same rule
+   the resource cards use. mgdb-record.css both hides hand-placed arrow spans
+   inside a button and suppresses its own page-wide arrow on `.mgdb-button`, so
+   without this every one of these buttons is unmarked, including the ones that
+   go to GenBank or figshare. This sheet loads after it and ties on
+   specificity, so it wins. */
+.mgdb-assembly-record-page .ar-actions a[href^="http"]::after {
+  content: " \2197";
+  font-size: .85em;
+  font-weight: 600;
+}
+
+.mgdb-assembly-record-page .ar-actions a[href*="//maizegdb.org"]::after,
+.mgdb-assembly-record-page .ar-actions a[href*=".maizegdb.org"]::after {
+  content: none;
+}
+
+.mgdb-assembly-record-page .ar-summary code {
+  padding: 1px 6px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: rgba(255, 255, 255, .75);
+  font-size: .9em;
+}
+
+/* --------------------------------------------------------------------------
+   Metadata rows
+
+   A label column that stops growing and a value column that takes the rest.
+   `minmax(0, 1fr)` on the value, or a long unbroken accession sets the track's
+   min-content width and pushes the row past the card.
+   -------------------------------------------------------------------------- */
+
+.mgdb-assembly-record-page .ar-rows {
+  margin: 0;
+  display: grid;
+  gap: 0;
+}
+
+.mgdb-assembly-record-page .ar-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 200px) minmax(0, 1fr);
+  gap: var(--mgdb-space-4);
+  padding: var(--mgdb-space-3) 0;
+  border-top: 1px solid var(--mgdb-line-soft);
+}
+
+.mgdb-assembly-record-page .ar-row:first-child { border-top: 0; padding-top: 0; }
+
+.mgdb-assembly-record-page .ar-row dt {
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.mgdb-assembly-record-page .ar-row dd {
+  margin: 0;
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+  overflow-wrap: anywhere;
+}
+
+/* The assembly and sequencing descriptions are curator-authored fragments that
+   underline their own sub-headings and break their own lines. */
+.mgdb-assembly-record-page .ar-row dd u {
+  display: inline-block;
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-green-dark);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.mgdb-assembly-record-page .ar-row dd u:first-child { margin-top: 0; }
+
+.mgdb-assembly-record-page .ar-none {
+  color: var(--mgdb-muted);
+  font-style: italic;
+}
+
+/* --------------------------------------------------------------------------
+   Gene model sets
+   -------------------------------------------------------------------------- */
+
+.mgdb-assembly-record-page .ar-annots {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-assembly-record-page .ar-annots li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+}
+
+.mgdb-assembly-record-page .ar-flag {
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.mgdb-assembly-record-page .ar-flag-current {
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-assembly-record-page .ar-flag-withdrawn {
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+}
+
+.mgdb-assembly-record-page .ar-count {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 9px;
+  border-radius: 999px;
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+/* --------------------------------------------------------------------------
+   Downloads
+
+   The shared resource card, carrying the URL as its description so a reader
+   can see which host they are being sent to before they go.
+   -------------------------------------------------------------------------- */
+
+.mgdb-assembly-record-page .ar-downloads span {
+  font-family: var(--mgdb-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: var(--mgdb-text-xs);
+  overflow-wrap: anywhere;
+}
+
+.mgdb-assembly-record-page .ar-browser-note {
+  margin: 0;
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+}
+
+/* --------------------------------------------------------------------------
+   Narrow screens
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 720px) {
+  .mgdb-assembly-record-page .ar-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+  .mgdb-assembly-record-page .ar-actions .mgdb-button { flex: 1 1 auto; text-align: center; }
+}

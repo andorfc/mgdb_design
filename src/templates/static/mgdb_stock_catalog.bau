@@ -1,0 +1,136 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-stock-catalog
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https\://maizegdb.org/stock_catalog">
+<meta property="og:title" content="Maize Genetics Cooperation Stock Center catalog | MaizeGDB">
+<meta property="og:description" content="Every genetic stock the Maize Genetics Cooperation Stock Center distributes, grouped by chromosome and by chromosomal or cytoplasmic feature.">
+
+<a class="mgdb-skip-link" href="#sc-main">Skip to main content</a>
+
+<main class="mgdb-page mgdb-hub-page mgdb-stock-catalog-page" id="sc-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span>
+    <a href="/tools">Tools</a><span aria-hidden="true">&rsaquo;</span>
+    $(breadcrumb_tail)
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="sc-title">
+    <div class="mgdb-hero-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="Seed packet icon">
+        <path d="M26 20h44a6 6 0 0 1 6 6v50a6 6 0 0 1-6 6H26a6 6 0 0 1-6-6V26a6 6 0 0 1 6-6z"
+              fill="#e8f4ec" stroke="#235c37" stroke-width="3" />
+        <path d="M20 34h56" stroke="#235c37" stroke-width="3" />
+        <ellipse cx="40" cy="54" rx="7" ry="9" fill="#d99a0b" />
+        <ellipse cx="56" cy="66" rx="7" ry="9" fill="#7fae8c" />
+        <ellipse cx="58" cy="48" rx="6" ry="8" fill="#d99a0b" opacity=".65" />
+      </svg>
+      <strong>Stock<br />Catalog</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="sc-title">$(page_title)</h1>
+      <p class="mgdb-hero-description">$(page_description)</p>
+      <div class="sc-hero-links">
+        <a class="sc-hero-link" href="https\://maizecoopsc.org/" target="_blank" rel="noopener">
+          <span class="sc-dot sc-dot-green" aria-hidden="true"></span> Stock Center
+        </a>
+        <a class="sc-hero-link" href="/data_center/stock">
+          <span class="sc-dot sc-dot-blue" aria-hidden="true"></span> Stock Data Hub
+        </a>
+        <a class="sc-hero-link" href="/ordering/coop_order">
+          <span class="sc-dot sc-dot-gold" aria-hidden="true"></span> Your order
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#sc-catalogs" class="is-current">Catalogs</a>
+    <a href="#sc-stocks">Stocks</a>
+    <a href="#sc-references">References</a>
+    <a href="#sc-metrics">Metrics</a>
+    <a href="#sc-related">Related resources</a>
+  </nav>
+
+  <section id="sc-catalogs" aria-labelledby="sc-catalogs-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="sc-catalogs-title">Catalogs</h2></div>
+    </div>
+
+    <div class="sc-views">$(view_cards)</div>
+  </section>
+
+  <section id="sc-stocks" aria-labelledby="sc-stocks-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="sc-stocks-title">$(list_title)</h2></div>
+    </div>
+
+    <div class="sc-toolbar">
+      <div class="sc-search-wrap">
+        <label for="sc-filter" class="mgdb-visually-hidden">Filter this catalog by stock name</label>
+        <input type="search" id="sc-filter" class="mgdb-input sc-filter"
+               placeholder="Filter by stock name, gene symbol, or translocation&hellip;"
+               autocomplete="off" spellcheck="false" />
+      </div>
+      <p class="sc-status" id="sc-status" role="status" aria-live="polite">Showing all $(total_count) stocks</p>
+    </div>
+
+    $(jump_links)
+
+    <div class="sc-groups" id="sc-groups">$(stock_sections)</div>
+
+    <p class="sc-none" id="sc-none" hidden>No stock matches that filter. Clear it to see the whole catalog again.</p>
+  </section>
+
+  <section id="sc-references" aria-labelledby="sc-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="sc-references-title">References</h2></div>
+    </div>
+
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
+  <section id="sc-metrics" aria-labelledby="sc-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="sc-metrics-title">Metrics</h2></div>
+    </div>
+
+    <div class="mgdb-metric-grid">$(metric_cards)</div>
+  </section>
+
+  <section id="sc-related" class="mgdb-hub-related" aria-labelledby="sc-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="sc-related-title">Related resources</h2></div>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/stock">
+          <strong>Stock Data Hub</strong>
+          <span>Search every stock record by identifier, variation, phenotype, provider, or parentage</span>
+        </a>
+        <a href="/data_center/phenotype">
+          <strong>Phenotype Data Hub</strong>
+          <span>The traits these stocks show, and the other records that carry them</span>
+        </a>
+        <a href="/data_center/variation">
+          <strong>Variation Data Hub</strong>
+          <span>Alleles and insertions, and the stocks that carry each one</span>
+        </a>
+        <a href="https\://maizecoopsc.org/" target="_blank" rel="noopener">
+          <strong>Maize Genetics COOP Stock Center</strong>
+          <span>Seed requests, growing notes, and the Stock Center's own catalog pages</span>
+        </a>
+        <a href="https\://npgsweb.ars-grin.gov/gringlobal/search" target="_blank" rel="noopener">
+          <strong>GRIN-Global</strong>
+          <span>USDA-ARS germplasm accessions, passport data, and seed requests</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+)

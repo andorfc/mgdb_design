@@ -30,6 +30,12 @@
   $bauplan->includeCss('/css/static.css');
   $bauplan->includeCss('/css/mgdb-modern.css');
   $bauplan->includeCss('/css/mgdb-megamenu.css');
+  /* The shared Data Hub shell -- pale ground, white section cards, coloured
+     section edges, the green Related resources panel -- before the page's own
+     sheet, which is the order css/mgdb-hub.css documents. `mgdb-hub-page` on
+     <main> opts in. A project page is not a data hub, but the shell is where
+     the site's page furniture lives. */
+  $bauplan->includeCss('/css/mgdb-hub.css?v=' . (int) @filemtime($doc_root . '/css/mgdb-hub.css'));
   $bauplan->includeCss('/css/mgdb-nam-project.css?v=' . $v_css);
   $bauplan->includeScript('/js/mgdb-modern.js');
   $bauplan->includeScript('/js/mgdb-chrome.js');
@@ -47,6 +53,40 @@
   include_once('translation.php');
   $blast_url = isset($system['BLAST_URL']) && !empty($system['BLAST_URL']) ? $system['BLAST_URL'] : '/blast';
   $body->get('blast_url')->replace($blast_url);
+
+
+/* Publications: rendered by include/references_lib.php so these cards match
+   every other page. Crossref-verified metadata -- the hand-typed versions
+   these replaced carried a DOI that does not resolve and two PubMed IDs
+   pointing at unrelated papers. */
+  include_once('./include/references_lib.php');
+  $body->get('reference_cards')->replace(mgdb_render_references($doc_root, array(
+    array('doi' => '10.1126/science.abg5289'),
+    // The genetic properties of the NAM population itself.
+    array('doi' => '10.1126/science.1174320',
+          'fallback' => array(
+              'title'    => 'Genetic properties of the maize nested association mapping population',
+              'authors'  => 'McMullen MD, Kresovich S, Villeda HS, Bradbury P, Li H, Sun Q, Flint-Garcia S, Thornsberry J, Acharya C, Bottoms C, Brown P, Browne C, Eller M, Guill K, Harjes C, Kroon D, Lepak N, Mitchell SE, Peterson B, Pressoir G, Romero S, Oropeza Rosas M, Salvo S, Yates H, Hanson M, Jones E, Smith S, Glaubitz JC, Goodman M, Ware D, Holland JB, Buckler ES.',
+              'journal'  => 'Science',
+              'year'     => '2009',
+              'volume'   => '325',
+              'pages'    => '737-740',
+              'pubmed'   => '19661427',
+              'abstract' => 'Maize genetic diversity has been used to understand the molecular basis of phenotypic variation and to improve agricultural efficiency and sustainability. We crossed 25 diverse inbred maize lines to the B73 reference line, capturing a total of 136,000 recombination events. Variation for recombination frequencies was observed among families, influenced by local (cis) genetic variation. We identified evidence for numerous minor single-locus effects but little two-locus linkage disequilibrium or segregation distortion, which indicated a limited role for genes with large effects and epistatic interactions on fitness. We observed excess residual heterozygosity in pericentromeric regions, which suggested that selection in inbred lines has been less efficient in these regions because of reduced recombination frequency. This implies that pericentromeric regions may contribute disproportionally to heterosis.',
+          )),
+    // The design and the statistical power behind that population.
+    array('doi' => '10.1534/genetics.107.074245',
+          'fallback' => array(
+              'title'    => 'Genetic design and statistical power of nested association mapping in maize',
+              'authors'  => 'Yu J, Holland JB, McMullen MD, Buckler ES.',
+              'journal'  => 'Genetics',
+              'year'     => '2008',
+              'volume'   => '178',
+              'pages'    => '539-551',
+              'pubmed'   => '18202393',
+              'abstract' => 'We investigated the genetic and statistical properties of the nested association mapping (NAM) design currently being implemented in maize (26 diverse founders and 5000 distinct immortal genotypes) to dissect the genetic basis of complex quantitative traits. The NAM design simultaneously exploits the advantages of both linkage analysis and association mapping. We demonstrated the power of NAM for high-power cost-effective genome scans through computer simulations based on empirical marker data and simulated traits with different complexities. With common-parent-specific (CPS) markers genotyped for the founders and the progenies, the inheritance of chromosome segments nested within two adjacent CPS markers was inferred through linkage. Genotyping the founders with additional high-density markers enabled the projection of genetic information, capturing linkage disequilibrium information, from founders to progenies. With 5000 genotypes, 30-79% of the simulated quantitative trait loci (QTL) were precisely identified. By integrating genetic design, natural diversity, and genomics technologies, this new complex trait dissection strategy should greatly facilitate endeavors to link molecular variation with phenotypic variation for various complex traits.',
+          )),
+  )));
 
   $bauplan->publish();
   return;

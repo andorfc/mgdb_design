@@ -2,110 +2,118 @@ $$SYNTAX-LEVEL 2
 
 *(mgdb-maize-meeting
 
-<main class="mgdb-page mgdb-meeting-page" id="mgdb-meeting-main">
-
-
+<main class="mgdb-page mgdb-hub-page mgdb-meeting-page" id="mgdb-meeting-main">
 
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
-
     <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Maize Genetics Meeting</span>
-
   </nav>
 
-
-
+  <!-- The header carried four stacked lines -- eyebrow, title, tagline and a
+       written description. Two remain, and the description is the sentence the
+       previous page used rather than a new one. -->
   <section class="mgdb-hero" aria-labelledby="meeting-title">
     <div class="mgdb-hero-emblem">
       <img src="/images/maize_meeting/mgc-mark.png?v=1" alt="" />
       <strong>Maize Genetics<br />Meeting</strong>
-      <span>Established 1959</span>
     </div>
     <div class="mgdb-hero-body">
-      <span class="mgdb-eyebrow">Maize Genetics Cooperation</span>
-      <h1 id="meeting-title">Where the maize community meets</h1>
-      <p class="mgdb-hero-tagline">The annual gathering of the international maize genetics community.</p>
-      <p class="mgdb-hero-description">Share discoveries, start collaborations, and connect across disciplines. Meeting details, historical attendance and program trends, and the archive of past meeting websites.</p>
-      <div class="mgdb-hero-actions">
-        <a class="mgdb-button mgdb-button-primary" href="#meeting-upcoming">See upcoming meetings</a>
-        <a class="mgdb-button mgdb-button-secondary" href="#meeting-archive">Browse the archive</a>
-      </div>
+      <h1 id="meeting-title">Maize Genetics Meeting</h1>
+      <p class="mgdb-hero-description">Here, you can find information about Maize Genetics Meetings past, present, and future.</p>
     </div>
   </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#meeting-upcoming" class="is-current" aria-current="true">Upcoming meetings</a>
+    <a href="#meeting-archive">Past meetings</a>
+    <a href="#meeting-art">Cover art</a>
+    <a href="#meeting-journey">Milestones</a>
+    <a href="#meeting-dashboard">Meeting history</a>
+    <a href="#meeting-overview">Metrics</a>
+    <a href="#meeting-related">Related resources</a>
+  </nav>
 
   <section id="meeting-upcoming" class="meeting-upcoming" aria-labelledby="meeting-upcoming-title">
     <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Plan ahead</span><h2 id="meeting-upcoming-title">Upcoming meetings</h2></div>
-      <p>Dates and locations link to the official Maize Genetics Meeting site.</p>
+      <div><h2 id="meeting-upcoming-title">Upcoming meetings</h2></div>
     </div>
     <div class="meeting-upcoming-grid">
-      <a href="https\://www.maizegenetics.org/maize-meeting/2027" class="meeting-event-card meeting-event-featured"><span class="meeting-event-visual"><img src="/images/maize_meeting/chicago.png" alt="" /><strong>2027</strong></span><div><small>69th annual meeting</small><h3>Chicago, Illinois</h3><p>March 11–14 · Connect with maize researchers in the heart of the Midwest.</p></div><b aria-hidden="true">↗</b></a>
-      <a href="https\://www.maizegenetics.org/maize-meeting/2028" class="meeting-event-card"><span class="meeting-event-visual"><img src="/images/maize_meeting/sacramento.png" alt="" /><strong>2028</strong></span><div><small>70th annual meeting</small><h3>Sacramento, California</h3><p>March 2–5 · A milestone edition at the SAFE Credit Union Convention Center.</p></div><b aria-hidden="true">↗</b></a>
-    </div>
-  </section>
 
-  <section class="meeting-overview" aria-labelledby="meeting-overview-title">
-    <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">A long-running scientific community</span><h2 id="meeting-overview-title">From twelve colleagues to a global meeting</h2></div>
-      <p>Figures summarize the supplied meeting-history workbook through 2026. Blank historical fields are treated as not reported, never as zero.</p>
-    </div>
-    <div class="meeting-metric-grid">
-      <article class="meeting-metric meeting-tone-gold"><span class="meeting-metric-icon" aria-hidden="true">01</span><div><strong>68</strong><h3>annual meetings</h3><p>From the first gathering in 1959 through Cologne in 2026.</p></div></article>
-      <article class="meeting-metric meeting-tone-red"><span class="meeting-metric-icon" aria-hidden="true">12</span><div><strong>12</strong><h3>first attendees</h3><p>The community’s recorded starting point at Allerton Park.</p></div></article>
-      <article class="meeting-metric meeting-tone-amber"><span class="meeting-metric-icon" aria-hidden="true">06</span><div><strong>6</strong><h3>host countries</h3><p>United States, Mexico, Italy, China, France, and Germany.</p></div></article>
-      <article class="meeting-metric meeting-tone-brown"><span class="meeting-metric-icon" aria-hidden="true">721</span><div><strong>721</strong><h3>peak reported attendance</h3><p>The 2021 virtual meeting; the in-person peak was 677 in 2017.</p></div></article>
-    </div>
-  </section>
-
-  <section class="meeting-dashboard" aria-labelledby="meeting-dashboard-title">
-    <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Meeting history at a glance</span><h2 id="meeting-dashboard-title">How the gathering has grown</h2></div>
-      <p>Hover or tap the figures for exact values. The canceled Hawaii meeting is omitted; v2020 denotes its virtual replacement.</p>
-    </div>
-    <div class="meeting-chart-grid">
-      <article class="meeting-chart-card">
-        <div><span>Reported attendance</span><h3>Participation, 2000–2026</h3><p>Exact reported totals only. Virtual meetings are highlighted, and international hosts are labeled directly.</p></div>
-        <div id="meeting-attendance-chart" class="meeting-chart" role="img" aria-label="Line chart of reported Maize Genetics Meeting attendance from 2000 through 2026"><span class="meeting-chart-fallback">Loading attendance history…</span></div>
+      <article class="meeting-event-card">
+        <span class="meeting-event-visual"><img src="/images/MGC2027_img.png" alt="69th Annual Maize Genetics Meeting" /></span>
+        <div class="meeting-event-body">
+          <small>69th annual meeting</small>
+          <h3>Chicago, Illinois, USA</h3>
+          <p class="meeting-event-venue">Hyatt Regency O&rsquo;Hare Chicago, Rosemont, IL, USA</p>
+          <p class="meeting-event-dates">March 11&ndash;14, 2027</p>
+          <p class="meeting-event-links"><a href="https\://www.maizegenetics.org/maize-meeting/2027" target="_blank" rel="noopener">Meeting website <span aria-hidden="true">&nearr;</span></a></p>
+        </div>
       </article>
-      <article class="meeting-chart-card">
-        <div><span>Scientific program</span><h3>Talks, posters, and lightning talks</h3><p>Program counts for years with exact values; unreported categories remain blank.</p></div>
-        <div id="meeting-program-chart" class="meeting-chart" role="img" aria-label="Stacked bar chart of talks, posters, and lightning talks from 2000 through 2026"><span class="meeting-chart-fallback">Loading program history…</span></div>
-      </article>
-    </div>
-  </section>
 
-  <section class="meeting-journey" aria-labelledby="meeting-journey-title">
-    <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">A widening footprint</span><h2 id="meeting-journey-title">Milestones across seven decades</h2></div>
-      <p>The meeting’s home has expanded from Allerton Park to international and virtual venues.</p>
+      <article class="meeting-event-card">
+        <!-- No MGC2028 artwork exists yet. Rather than stretch a 101px city
+             photograph, the plate carries the year in the same band the 2027
+             artwork occupies, so the two cards are the same shape. -->
+        <span class="meeting-event-visual meeting-event-plate" aria-hidden="true"><strong>2028</strong></span>
+        <div class="meeting-event-body">
+          <small>70th annual meeting</small>
+          <h3>Sacramento, California, USA</h3>
+          <p class="meeting-event-venue">SAFE Credit Union Convention Center, Sacramento, CA, USA</p>
+          <p class="meeting-event-dates">March 2&ndash;5, 2028</p>
+          <p class="meeting-event-links"><a href="https\://www.maizegenetics.org/maize-meeting/2028" target="_blank" rel="noopener">Meeting website <span aria-hidden="true">&nearr;</span></a></p>
+        </div>
+      </article>
+
     </div>
-    <ol class="meeting-timeline">
-      <li><span>1959</span><strong>Allerton Park</strong><small>The first meeting brought together 12 maize geneticists in Illinois.</small></li>
-      <li><span>2004</span><strong>Mexico City</strong><small>The first meeting in the supplied history held outside the United States.</small></li>
-      <li><span>2008</span><strong>Washington, DC</strong><small>The 50th anniversary meeting convened in the nation’s capital to honor a half-century of achievement.</small></li>
-      <li><span>2010–2018</span><strong>Italy, China, and France</strong><small>The international cadence broadened across Europe and Asia.</small></li>
-      <li><span>2020–2021</span><strong>Virtual community</strong><small>Two online meetings kept research exchange moving during the pandemic.</small></li>
-      <li><span>2026</span><strong>Cologne, Germany</strong><small>The 68th meeting continued the international tradition.</small></li>
-    </ol>
+
+    <details class="meeting-leadership">
+      <summary>2027 steering committee, local host, and ex-officio members</summary>
+      <div class="meeting-event-people">
+        <div>
+          <h4>Steering committee</h4>
+          <ul>
+            <li>Anthony Studer <span>Chair</span></li>
+            <li>Cinta Romay <span>Co-Chair</span></li>
+            <li>Frank Hochholdinger <span>Previous Chair</span></li>
+            <li>Addie Thompson <span>2029 Chair</span></li>
+            <li>Pearl Abu</li>
+            <li>Hank Bass</li>
+            <li>Jordan Cummings</li>
+            <li>Rachel Egger</li>
+            <li>Sara Larsson</li>
+            <li>Katie Murphy</li>
+            <li>Samantha Snodgrass</li>
+            <li>Sylvia Morais de Sousa Tinoco</li>
+            <li>Graziana Taramino</li>
+            <li>Feng Tian</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Local host</h4>
+          <ul><li>Anthony Studer</li></ul>
+          <h4>Ex-officio members</h4>
+          <ul>
+            <li>Carson Andorf</li>
+            <li>Darwin Campbell</li>
+            <li>Sara Miller</li>
+            <li>John Portwood</li>
+            <li>Marty Sachs</li>
+            <li>Beth Thompson</li>
+          </ul>
+        </div>
+      </div>
+    </details>
   </section>
 
   <section id="meeting-archive" class="meeting-archive" aria-labelledby="meeting-archive-title">
     <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Explore the record</span><h2 id="meeting-archive-title">Meeting website archive</h2></div>
-      <p>Search archived meeting sites by year or location. Digital sites are available for selected years.</p>
+      <div><h2 id="meeting-archive-title">Past meetings</h2></div>
     </div>
     <div class="meeting-archive-tools">
-      <label class="meeting-archive-search"><span aria-hidden="true">⌕</span><span class="mgdb-visually-hidden">Search meeting archives</span><input id="meeting-archive-query" type="search" placeholder="Search year or location…" autocomplete="off" /><button id="meeting-archive-clear" type="button" hidden>Clear</button></label>
-      <div class="meeting-archive-filters" aria-label="Filter archives by period"><button type="button" class="is-active" data-meeting-period="all">All</button><button type="button" data-meeting-period="2020s">2020s</button><button type="button" data-meeting-period="2010s">2010s</button><button type="button" data-meeting-period="2000s">2000s</button><button type="button" data-meeting-period="1990s">1990s</button><button type="button" data-meeting-period="historic">Historic</button><span id="meeting-archive-count" aria-live="polite"></span></div>
+      <label class="meeting-archive-search"><span aria-hidden="true">&#9906;</span><span class="mgdb-visually-hidden">Search past meetings</span><input id="meeting-archive-query" type="search" placeholder="Search year or location&hellip;" autocomplete="off" /><button id="meeting-archive-clear" type="button" hidden>Clear</button></label>
+      <div class="meeting-archive-filters" aria-label="Filter meetings by period"><button type="button" class="is-active" data-meeting-period="all">All</button><button type="button" data-meeting-period="2020s">2020s</button><button type="button" data-meeting-period="2010s">2010s</button><button type="button" data-meeting-period="2000s">2000s</button><button type="button" data-meeting-period="1990s">1990s</button><button type="button" data-meeting-period="historic">Historic</button><span id="meeting-archive-count" aria-live="polite"></span></div>
     </div>
-    <div id="meeting-archive-grid" class="meeting-archive-grid" aria-live="polite">
-      <a href="/mgc/maizemeeting/2025"><span class="meeting-archive-thumb"><img src="/images/maize_meeting/stlouis.png" alt="" /></span><span class="meeting-archive-copy"><span class="meeting-archive-year">2025</span><strong>St. Louis, Missouri</strong><small>67th annual meeting</small></span></a>
-      <a href="/mgc/maizemeeting/2024"><span class="meeting-archive-thumb"><img src="/images/maize_meeting/raleigh.png" alt="" /></span><span class="meeting-archive-copy"><span class="meeting-archive-year">2024</span><strong>Raleigh, North Carolina</strong><small>66th annual meeting</small></span></a>
-      <a href="/mgc/maizemeeting/2023"><span class="meeting-archive-thumb"><img src="/images/maize_meeting/stlouis.png" alt="" /></span><span class="meeting-archive-copy"><span class="meeting-archive-year">2023</span><strong>St. Louis, Missouri</strong><small>65th annual meeting</small></span></a>
-      <a href="/maize_meeting/v2020"><span class="meeting-archive-thumb"><img src="/images/maize_meeting/virtual.jpg" alt="" /></span><span class="meeting-archive-copy"><span class="meeting-archive-year">v2020</span><strong>Virtual</strong><small>62nd annual meeting · 670 attendees</small></span></a>
-      <a href="/maize_meeting/2019"><span class="meeting-archive-thumb"><img src="/images/maize_meeting/stlouis.png" alt="" /></span><span class="meeting-archive-copy"><span class="meeting-archive-year">2019</span><strong>St. Louis, Missouri</strong><small>61st annual meeting</small></span></a>
-      <a href="/maize_meeting/1959"><span class="meeting-archive-thumb"><img src="/maize_meeting/1959/images/allerton.jpg" alt="" /></span><span class="meeting-archive-copy"><span class="meeting-archive-year">1959</span><strong>Allerton Park, Illinois</strong><small>Original-meeting mock-up</small></span></a>
-    </div>
-    <div id="meeting-archive-empty" class="mgdb-empty" hidden><strong>No archived meeting sites match that search.</strong><button id="meeting-archive-reset" type="button">Reset archive</button></div>
+    <div id="meeting-archive-grid" class="meeting-archive-grid" aria-live="polite"></div>
+    <div id="meeting-archive-empty" class="mgdb-empty" hidden><strong>No past meetings match that search.</strong><button id="meeting-archive-reset" type="button">Reset</button></div>
 
     <details class="meeting-photo-credits">
       <summary>Photograph credits</summary>
@@ -115,17 +123,236 @@ $$SYNTAX-LEVEL 2
     </details>
   </section>
 
-  <section class="meeting-resources" aria-label="Maize Genetics Meeting resources">
-    <div><span class="mgdb-eyebrow">Keep exploring</span><h2>Meeting information, community leadership, and history.</h2><p>Use the official sites for current details and MaizeGDB for the preserved scientific record.</p></div>
-    <div>
-      <a href="https\://www.maizegenetics.org/maize-meeting/2027"><strong>Official meeting website</strong><span>Registration, program, travel, and attendee resources</span><b aria-hidden="true">↗</b></a>
-      <a href="https\://www.maizegenetics.org/maize-meeting/mgmsc"><strong>Steering committee</strong><span>Current members and meeting governance</span><b aria-hidden="true">↗</b></a>
-      <a href="/maize_meeting/1959/"><strong>Visit the original meeting</strong><span>A playful reconstruction of the 1959 gathering</span><b aria-hidden="true">→</b></a>
-      <a href="https\://documents.maizegdb.org/maizemeeting/abstracts/"><strong>Abstract books</strong><span>Programs and abstracts preserved by MaizeGDB</span><b aria-hidden="true">↗</b></a>
+  <section id="meeting-art" class="meeting-art" aria-labelledby="meeting-art-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="meeting-art-title">Cover art</h2></div>
+    </div>
+    <p class="meeting-art-lead">Artwork from past meeting programs, contributed by members of the community. Select a cover to open the full-size image.</p>
+    <div class="meeting-art-grid">
+      <article class="meeting-art-card">
+        <a class="meeting-art-thumb" href="/maize_meeting/coverart/coverart_2019.png">
+          <img src="/maize_meeting/coverart/coverart_2019_small.png" alt="2019 meeting cover art" loading="lazy" />
+        </a>
+        <div class="meeting-art-copy">
+          <span class="meeting-art-year">2019</span>
+          <strong>St. Louis, MO, USA</strong>
+          <small>March 14&ndash;17, 2019</small>
+          <small class="meeting-art-artist">Maike Stam, University of Amsterdam, Netherlands</small>
+        </div>
+      </article>
+      <article class="meeting-art-card">
+        <a class="meeting-art-thumb" href="/maize_meeting/coverart/coverart_2018.jpg">
+          <img src="/maize_meeting/coverart/coverart_2018_small.jpg" alt="2018 meeting cover art" loading="lazy" />
+        </a>
+        <div class="meeting-art-copy">
+          <span class="meeting-art-year">2018</span>
+          <strong>Saint-Malo, France</strong>
+          <small>March 22&ndash;25, 2018</small>
+          <small class="meeting-art-artist">Lele Wang, University of Regensburg, Germany</small>
+        </div>
+      </article>
+      <article class="meeting-art-card">
+        <a class="meeting-art-thumb" href="/maize_meeting/coverart/coverart_2017.jpg">
+          <img src="/maize_meeting/coverart/coverart_2017_small.jpg" alt="2017 meeting cover art" loading="lazy" />
+        </a>
+        <div class="meeting-art-copy">
+          <span class="meeting-art-year">2017</span>
+          <strong>St. Louis, MO, USA</strong>
+          <small>March 9&ndash;12, 2017</small>
+          <small class="meeting-art-artist">Norman Best, Purdue University, West Lafayette, IN</small>
+        </div>
+      </article>
+      <article class="meeting-art-card">
+        <a class="meeting-art-thumb" href="/maize_meeting/coverart/coverart_2016.jpg">
+          <img src="/maize_meeting/coverart/coverart_2016_small.jpg" alt="2016 meeting cover art" loading="lazy" />
+        </a>
+        <div class="meeting-art-copy">
+          <span class="meeting-art-year">2016</span>
+          <strong>Jacksonville, Florida, USA</strong>
+          <small>March 17&ndash;20, 2016</small>
+          <small class="meeting-art-artist">Stefania Vendramin Alegre, Florida State University, Tallahassee, FL</small>
+        </div>
+      </article>
+      <article class="meeting-art-card">
+        <a class="meeting-art-thumb" href="/maize_meeting/coverart/coverart_2015.jpg">
+          <img src="/maize_meeting/coverart/coverart_2015_small.jpg" alt="2015 meeting cover art" loading="lazy" />
+        </a>
+        <div class="meeting-art-copy">
+          <span class="meeting-art-year">2015</span>
+          <strong>St. Charles, Illinois, USA</strong>
+          <small>March 12&ndash;15, 2015</small>
+          <small class="meeting-art-artist">Jason G. Wallace, Cornell University, Ithaca, NY</small>
+        </div>
+      </article>
+      <article class="meeting-art-card">
+        <a class="meeting-art-thumb" href="/maize_meeting/coverart/coverart_2014.png">
+          <img src="/maize_meeting/coverart/coverart_2014_small.png" alt="2014 meeting cover art" loading="lazy" />
+        </a>
+        <div class="meeting-art-copy">
+          <span class="meeting-art-year">2014</span>
+          <strong>Beijing, China</strong>
+          <small>March 13&ndash;16, 2014</small>
+          <small class="meeting-art-artist">Haijun Liu, National Key Laboratory of Crop Genetic Improvement, Huazhong Agricultural University</small>
+        </div>
+      </article>
+      <article class="meeting-art-card">
+        <a class="meeting-art-thumb" href="/maize_meeting/coverart/coverart_2013.png">
+          <img src="/maize_meeting/coverart/coverart_2013_small.png" alt="2013 meeting cover art" loading="lazy" />
+        </a>
+        <div class="meeting-art-copy">
+          <span class="meeting-art-year">2013</span>
+          <strong>St. Charles, Illinois, USA</strong>
+          <small>March 14&ndash;17, 2013</small>
+          <small class="meeting-art-artist">Gerald Neuffer, Agronomy Department, University of Missouri</small>
+        </div>
+      </article>
+      <article class="meeting-art-card">
+        <a class="meeting-art-thumb" href="/maize_meeting/coverart/coverart_2012.png">
+          <img src="/maize_meeting/coverart/coverart_2012_small.png" alt="2012 meeting cover art" loading="lazy" />
+        </a>
+        <div class="meeting-art-copy">
+          <span class="meeting-art-year">2012</span>
+          <strong>Portland, Oregon, USA</strong>
+          <small>March 15&ndash;18, 2012</small>
+          <small class="meeting-art-artist">Josh Strable, Department of Genetics, Development and Cell Biology, Iowa State University</small>
+        </div>
+      </article>
+      <article class="meeting-art-card">
+        <a class="meeting-art-thumb" href="/maize_meeting/coverart/coverart_2011.png">
+          <img src="/maize_meeting/coverart/coverart_2011_small.png" alt="2011 meeting cover art" loading="lazy" />
+        </a>
+        <div class="meeting-art-copy">
+          <span class="meeting-art-year">2011</span>
+          <strong>St. Charles, Illinois, USA</strong>
+          <small>March 17&ndash;20, 2011</small>
+          <small class="meeting-art-artist">Thomas Kono, Department of Plant Sciences, UC Davis</small>
+        </div>
+      </article>
+      <article class="meeting-art-card">
+        <a class="meeting-art-thumb" href="/maize_meeting/coverart/coverart_2010.png">
+          <img src="/maize_meeting/coverart/coverart_2010_small.png" alt="2010 meeting cover art" loading="lazy" />
+        </a>
+        <div class="meeting-art-copy">
+          <span class="meeting-art-year">2010</span>
+          <strong>Riva del Garda, Italy</strong>
+          <small>March 18&ndash;21, 2010</small>
+          <small class="meeting-art-artist">Enrico Coen, John Innes Centre, England</small>
+        </div>
+      </article>
+      <article class="meeting-art-card">
+        <a class="meeting-art-thumb" href="/maize_meeting/coverart/coverart_2009.png">
+          <img src="/maize_meeting/coverart/coverart_2009_small.png" alt="2009 meeting cover art" loading="lazy" />
+        </a>
+        <div class="meeting-art-copy">
+          <span class="meeting-art-year">2009</span>
+          <strong>St. Charles, IL, USA</strong>
+          <small>March 12&ndash;15, 2009</small>
+          <small class="meeting-art-artist">Yujun Han, University of Georgia</small>
+        </div>
+      </article>
+    </div>
+    <!-- ADMIN NOTE \(AD-054\): the collection stops at 2019. Add a card here as
+         each year's cover art is collected -- the images live in
+         /maize_meeting/coverart/ as coverart_<year>.<ext> with a _small
+         thumbnail beside it, and a card needs only those two files plus the
+         meeting location, its dates, and the artist's name and affiliation. -->
+  </section>
+
+  <section id="meeting-journey" class="meeting-journey" aria-labelledby="meeting-journey-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="meeting-journey-title">Milestones</h2></div>
+    </div>
+    <!-- A spine rather than a row of cards: the meeting is a continuous
+         sequence, so the years hang off one line and the gaps between them are
+         visible. Every entry is a fact from the meeting record -- the first
+         meeting, the first host country on each continent, the two attendance
+         peaks, the cancellation and its replacement, and the year lightning
+         talks joined the program. -->
+    <ol class="meeting-timeline">
+      <li class="meeting-timeline-start">
+        <span class="meeting-timeline-year">1959</span>
+        <div><strong>Allerton Park, Illinois</strong><small>Twelve maize geneticists at the first meeting.</small></div>
+      </li>
+      <li>
+        <span class="meeting-timeline-year">2004</span>
+        <div><strong>Mexico City, Mexico</strong><small>The first meeting held outside the United States.</small></div>
+      </li>
+      <li>
+        <span class="meeting-timeline-year">2008</span>
+        <div><strong>Washington, DC</strong><small>The 50th annual meeting.</small></div>
+      </li>
+      <li>
+        <span class="meeting-timeline-year">2010</span>
+        <div><strong>Riva del Garda, Italy</strong><small>The first meeting in Europe.</small></div>
+      </li>
+      <li>
+        <span class="meeting-timeline-year">2014</span>
+        <div><strong>Beijing, China</strong><small>The first meeting in Asia.</small></div>
+      </li>
+      <li>
+        <span class="meeting-timeline-year">2017</span>
+        <div><strong>St. Louis, Missouri</strong><small>The highest in-person attendance on record, 677.</small></div>
+      </li>
+      <li class="meeting-timeline-break">
+        <span class="meeting-timeline-year">2020</span>
+        <div><strong>Keauhou Bay, Hawaii &mdash; canceled</strong><small>Replaced by the community&rsquo;s first virtual meeting.</small></div>
+      </li>
+      <li>
+        <span class="meeting-timeline-year">2021</span>
+        <div><strong>Virtual</strong><small>The highest reported attendance of any meeting, 721.</small></div>
+      </li>
+      <li>
+        <span class="meeting-timeline-year">2024</span>
+        <div><strong>Raleigh, North Carolina</strong><small>Lightning talks joined the program.</small></div>
+      </li>
+      <li class="meeting-timeline-end">
+        <span class="meeting-timeline-year">2025</span>
+        <div><strong>St. Louis, Missouri</strong><small>The 67th annual meeting.</small></div>
+      </li>
+    </ol>
+  </section>
+
+  <section id="meeting-dashboard" class="meeting-dashboard" aria-labelledby="meeting-dashboard-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="meeting-dashboard-title">Meeting history</h2></div>
+    </div>
+    <div class="meeting-chart-grid">
+      <article class="meeting-chart-card">
+        <div><h3>Attendance, 2000&ndash;2026</h3></div>
+        <div id="meeting-attendance-chart" class="meeting-chart" role="img" aria-label="Line chart of reported Maize Genetics Meeting attendance from 2000 through 2026"><span class="meeting-chart-fallback">Loading attendance history&hellip;</span></div>
+      </article>
+      <article class="meeting-chart-card">
+        <div><h3>Talks, posters, and lightning talks</h3></div>
+        <div id="meeting-program-chart" class="meeting-chart" role="img" aria-label="Stacked bar chart of talks, posters, and lightning talks from 2000 through 2026"><span class="meeting-chart-fallback">Loading program history&hellip;</span></div>
+      </article>
     </div>
   </section>
 
+  <section id="meeting-overview" class="meeting-overview" aria-labelledby="meeting-overview-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="meeting-overview-title">Metrics</h2></div>
+    </div>
+    <div class="meeting-metric-grid">
+      <article class="meeting-metric meeting-tone-gold"><div><strong>68</strong><h3>annual meetings</h3><p>From the first gathering in 1959 through Cologne in 2026.</p></div></article>
+      <article class="meeting-metric meeting-tone-red"><div><strong>12</strong><h3>first attendees</h3><p>The community&rsquo;s recorded starting point at Allerton Park.</p></div></article>
+      <article class="meeting-metric meeting-tone-amber"><div><strong>6</strong><h3>host countries</h3><p>United States, Mexico, Italy, China, France, and Germany.</p></div></article>
+      <article class="meeting-metric meeting-tone-brown"><div><strong>721</strong><h3>peak reported attendance</h3><p>The 2021 virtual meeting; the in-person peak was 677 in 2017.</p></div></article>
+    </div>
+  </section>
 
+  <section id="meeting-related" class="mgdb-hub-related" aria-labelledby="meeting-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="meeting-related-title">Related resources</h2></div>
+    </div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="https\://www.maizegenetics.org/maize-meeting/2027" target="_blank" rel="noopener"><strong>Current meeting website</strong><span>Registration, program, travel, and attendee resources</span></a>
+        <a href="https\://www.maizegenetics.org/maize-meeting/mgmsc" target="_blank" rel="noopener"><strong>Steering committee</strong><span>Current members and meeting governance</span></a>
+        <a href="https\://documents.maizegdb.org/maizemeeting/abstracts/" target="_blank" rel="noopener"><strong>Abstract books</strong><span>Programs and abstracts preserved by MaizeGDB</span></a>
+        <a href="/maize_meeting/1959/"><strong>Visit the original meeting</strong><span>A reconstruction of the 1959 gathering</span></a>
+      </div>
+    </div>
+  </section>
 
 </main>
 

@@ -2,7 +2,7 @@ $$SYNTAX-LEVEL 2
 *(mgdb-hilo-project
 <a class="mgdb-skip-link" href="#hilo-main">Skip to main content</a>
 
-<main class="mgdb-page mgdb-hilo-project-page" id="hilo-main">
+<main class="mgdb-page mgdb-hub-page mgdb-hilo-project-page" id="hilo-main">
 
   <!-- Breadcrumb Navigation -->
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
@@ -61,9 +61,9 @@ $$SYNTAX-LEVEL 2
     <a href="#hilo-adaptation">Adaptation</a>
     <a href="#hilo-publications">Publications</a>
     <a href="#hilo-data-hosted">Hosted data</a>
-    <a href="#hilo-metrics">Metrics</a>
     <a href="#hilo-collab">Partners</a>
     <a href="#hilo-faqs">FAQs</a>
+    <a href="#hilo-metrics">Metrics</a>
     <a href="#hilo-related">Related resources</a>
   </nav>
 
@@ -73,20 +73,19 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="hilo-assemblies-title">Assemblies</h2></div>
     </div>
 
-    <div class="mgdb-panel">
 <!-- FILTER & SEARCH TOOLBAR -->
     <div class="hilo-table-toolbar">
+      <div class="hilo-search-wrap">
+        <label for="hilo-search-input" class="mgdb-visually-hidden">Search HiLo assemblies</label>
+        <input type="text" id="hilo-search-input" class="mgdb-input hilo-search-input" placeholder="Search assembly ID, cultivar name, accession, or elevation..." autocomplete="off" spellcheck="false" />
+      </div>
+
       <div class="hilo-filter-chips-wrap" role="group" aria-label="Filter by elevation zone">
         <span class="hilo-toolbar-label">Elevation&#58;</span>
         <button type="button" class="hilo-chip is-active" data-filter="all">All \(7\)</button>
         <button type="button" class="hilo-chip hilo-chip-highland" data-filter="highland">Highland &gt;2000m \(4\)</button>
         <button type="button" class="hilo-chip hilo-chip-mid" data-filter="mid">Mid-Elevation \(1\)</button>
         <button type="button" class="hilo-chip hilo-chip-lowland" data-filter="lowland">Lowland \(2\)</button>
-      </div>
-
-      <div class="hilo-search-wrap">
-        <label for="hilo-search-input" class="mgdb-visually-hidden">Search HiLo assemblies</label>
-        <input type="text" id="hilo-search-input" class="mgdb-input hilo-search-input" placeholder="Search assembly ID, cultivar name, accession, or elevation..." autocomplete="off" spellcheck="false" />
       </div>
     </div>
 
@@ -405,7 +404,6 @@ $$SYNTAX-LEVEL 2
         </tbody>
       </table>
     </div>
-  </div>
 
   </section>
 
@@ -415,7 +413,6 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="hilo-adaptation-title">Adaptation</h2></div>
     </div>
 
-    <div class="mgdb-panel">
 <div class="hilo-adaptation-grid">
       <article class="hilo-adaptation-card">
         <h3>Phosphorus Efficiency &amp; Low-Temperature Growth</h3>
@@ -438,7 +435,6 @@ $$SYNTAX-LEVEL 2
         </p>
       </article>
     </div>
-  </div>
 
   </section>
 
@@ -448,53 +444,9 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="hilo-pub-title">Publications</h2></div>
     </div>
 
-    <div class="mgdb-panel">
-<div class="hilo-publications-grid">
-      <!-- Publication 1: Perez-Limón et al. 2022 -->
-      <article class="hilo-pub-card">
-        <div class="hilo-pub-meta-top">
-          <span class="hilo-pub-journal-badge">G3 \(Bethesda\) &bull; 2022</span>
-          <span class="hilo-pub-doi">DOI&#58; 10.1093/g3journal/jkab447</span>
-        </div>
-        <h3 class="hilo-pub-title">A B73 &times; Palomero Toluque&ntilde;o mapping population reveals local adaptation in Mexican highland maize</h3>
-        <p class="hilo-pub-authors">Sergio Perez-Lim&oacute;n, Meng Li, Gina C. Cintora-Martinez, M. Rosario Aguilar-Rangel, M. Nicole Salazar-Vidal, Enrique Gonz&aacute;lez-Segovia, Kevin Bl&ouml;cher-Ju&aacute;rez, Alejandra Guerrero-Zavala, Bernardo Barrales-Gamez, Jonathan Carca&ntilde;o-Macias, et al.</p>
-        <p class="hilo-pub-citation"><em>G3&#58; Genes, Genomes, Genetics</em> 2022 Feb; 12\(2\)&#58;jkab447.</p>
-        
-        <div class="hilo-pub-abstract-wrap">
-          <h4 class="hilo-pub-abstract-heading">Abstract</h4>
-          <p class="hilo-pub-abstract-text">Maize was domesticated in the warm lowlands of southwestern Mexico and subsequently adapted to the cold volcanic highlands of central Mexico and the Andes. Highland landraces display distinctive phenotypes including stem pigmentation, macro-hair development, modified root architecture, and cold tolerance. To characterize the genetic architecture of highland adaptation, we generated a recombinant inbred line population between B73 and the Mexican highland landrace Palomero Toluque&ntilde;o. Quantitative trait locus \(QTL\) mapping across multi-environment highland and lowland field trials identified key genomic regions governing anthocyanin pigmentation, flowering time, plant height, and tillering, providing insight into the genetic basis of altitudinal adaptation in traditional landraces.</p>
-        </div>
-
-        <div class="hilo-pub-actions">
-          <a class="mgdb-button mgdb-button-primary" href="https://doi.org/10.1093/g3journal/jkab447" target="_blank" rel="noopener">Full Text on G3 &#8599;</a>
-          <a class="mgdb-button mgdb-button-secondary" href="https://pubmed.ncbi.nlm.nih.gov/34994770/" target="_blank" rel="noopener">PubMed 34994770 &#8599;</a>
-          <a class="mgdb-button mgdb-button-quiet" href="/data_center/reference?author=Perez-Limon">MaizeGDB Record</a>
-        </div>
-      </article>
-
-      <!-- Publication 2: Eagles & Lothrop 1994 -->
-      <article class="hilo-pub-card">
-        <div class="hilo-pub-meta-top">
-          <span class="hilo-pub-journal-badge">Crop Science &bull; 1994</span>
-          <span class="hilo-pub-doi">DOI&#58; 10.2135/cropsci1994.0011183X003400010002x</span>
-        </div>
-        <h3 class="hilo-pub-title">Highland Maize from Central Mexico - Its Origin, Characteristics, and Use in Breeding Programs</h3>
-        <p class="hilo-pub-authors">Howard A. Eagles, J. E. Lothrop</p>
-        <p class="hilo-pub-citation"><em>Crop Science</em> 1994 Jan; 34\(1\)&#58;11&ndash;19.</p>
-        
-        <div class="hilo-pub-abstract-wrap">
-          <h4 class="hilo-pub-abstract-heading">Abstract</h4>
-          <p class="hilo-pub-abstract-text">Highland maize from the Central Mexican plateau \(elevations &gt;2000 m\) represents a unique germplasm pool characterized by rapid early growth under low temperatures, high tolerance to night frosts, and distinctive grain quality. This foundational review outlines the geographical distribution, evolutionary origins, morphological attributes, and potential of Central Mexican highland landraces for introducing cold tolerance and phosphorus efficiency into temperate hybrid breeding programs worldwide.</p>
-        </div>
-
-        <div class="hilo-pub-actions">
-          <a class="mgdb-button mgdb-button-primary" href="https://doi.org/10.2135/cropsci1994.0011183X003400010002x" target="_blank" rel="noopener">Full Text on Crop Science &#8599;</a>
-          <a class="mgdb-button mgdb-button-quiet" href="/data_center/reference?author=Eagles">MaizeGDB Record</a>
-        </div>
-      </article>
+    <div class="mgdb-ref-list">
+      $(reference_cards)
     </div>
-  </div>
-
   </section>
 
   <!-- SECTION 4: DATA HOSTED AT MAIZEGDB -->
@@ -503,7 +455,6 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="hilo-hosted-title">Hosted data</h2></div>
     </div>
 
-    <div class="mgdb-panel">
 <div class="hilo-hosted-grid">
       <!-- 1: JBrowse 2 -->
       <article class="hilo-hosted-card">
@@ -533,66 +484,15 @@ $$SYNTAX-LEVEL 2
         <a class="mgdb-button mgdb-button-secondary" href="/download#downloads-hilo">Browse Downloads &#8599;</a>
       </article>
     </div>
-  </div>
 
   </section>
 
   <!-- SECTION 5: SCALE & GENOMIC METRICS DASHBOARD -->
-  <section id="hilo-metrics" aria-labelledby="hilo-metrics-title">
-    <div class="mgdb-section-heading">
-      <div><h2 id="hilo-metrics-title">Metrics</h2></div>
-    </div>
-
-    <div class="mgdb-panel">
-<div class="mgdb-metric-grid">
-      <article class="mgdb-metric">
-        <div class="mgdb-metric-top">
-          <h3>De Novo Reference Assemblies</h3>
-        </div>
-        <div class="mgdb-metric-stat">
-          <strong class="mgdb-metric-value">7</strong>
-        </div>
-        <p class="mgdb-metric-description">Traditional landraces \(PT, PDJ, TAB, ZAP\) and CIMMYT inbreds \(CML457, CML459, CML530\).</p>
-      </article>
-      <article class="mgdb-metric">
-        <div class="mgdb-metric-top">
-          <h3>Elevation Range</h3>
-        </div>
-        <div class="mgdb-metric-stat">
-          <strong class="mgdb-metric-value mgdb-metric-value-compact">50–2520m</strong>
-        </div>
-        <p class="mgdb-metric-description">Spanning lowland coastal tropics \(50 masl\) to high-altitude volcanic plateaus \(2,520 masl\).</p>
-      </article>
-      <article class="mgdb-metric">
-        <div class="mgdb-metric-top">
-          <h3>Gene Models per Line</h3>
-        </div>
-        <div class="mgdb-metric-stat">
-          <strong class="mgdb-metric-value mgdb-metric-value-compact">40,000+</strong>
-        </div>
-        <p class="mgdb-metric-description">High-confidence structural and functional gene annotations across all 7 assembled lines.</p>
-      </article>
-      <article class="mgdb-metric">
-        <div class="mgdb-metric-top">
-          <h3>Supported Collaboration</h3>
-        </div>
-        <div class="mgdb-metric-stat">
-          <strong class="mgdb-metric-value mgdb-metric-value-compact">NSF #1546719</strong>
-        </div>
-        <p class="mgdb-metric-description">Multi-institutional effort across CINVESTAV/LANGEBIO, UNAM, NC State, UC Davis, ISU, and USDA.</p>
-      </article>
-    </div>
-  </div>
-
-  </section>
-
-  <!-- SECTION 6: COLLABORATING INSTITUTIONS & ACKNOWLEDGMENTS -->
   <section id="hilo-collab" aria-labelledby="hilo-collab-title">
     <div class="mgdb-section-heading">
       <div><h2 id="hilo-collab-title">Partners</h2></div>
     </div>
 
-    <div class="mgdb-panel">
 <div class="hilo-collab-wrap">
       <p>
         The HiLo project was supported by National Science Foundation Award <a href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1546719" target="_blank" rel="noopener">#1546719</a> and developed in close collaboration with <strong>CINVESTAV Unidad de Gen&oacute;mica Avanzada \(LANGEBIO\)</strong>, <strong>Universidad Nacional Aut&oacute;noma de M&eacute;xico \(UNAM\)</strong>, <strong>North Carolina State University</strong>, <strong>Iowa State University</strong>, <strong>University of California Davis</strong>, <strong>Penn State University</strong>, <strong>USDA-ARS</strong>, and <strong>Corteva Agriscience</strong>.
@@ -603,7 +503,6 @@ $$SYNTAX-LEVEL 2
         </p>
       </div>
     </div>
-  </div>
 
   </section>
 
@@ -613,7 +512,6 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="hilo-faqs-title">FAQs</h2></div>
     </div>
 
-    <div class="mgdb-panel">
 <div class="hilo-faq-list">
       <details class="hilo-faq-item">
         <summary><h3>How do I obtain physical seed stocks for the HiLo landraces and inbreds?</h3></summary>
@@ -655,37 +553,86 @@ $$SYNTAX-LEVEL 2
         </div>
       </details>
     </div>
-  </div>
 
   </section>
 
   <!-- SECTION 8: CONNECTED RESOURCES -->
-  <section id="hilo-related" aria-labelledby="hilo-related-title">
+  <section id="hilo-metrics" aria-labelledby="hilo-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="hilo-metrics-title">Metrics</h2></div>
+    </div>
+
+<div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>De novo reference assemblies</h3>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">7</strong>
+        </div>
+        <p class="mgdb-metric-description">Traditional landraces \(PT, PDJ, TAB, ZAP\) and CIMMYT inbreds \(CML457, CML459, CML530\).</p>
+      </article>
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Elevation range</h3>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value mgdb-metric-value-compact">50–2520m</strong>
+        </div>
+        <p class="mgdb-metric-description">Spanning lowland coastal tropics \(50 masl\) to high-altitude volcanic plateaus \(2,520 masl\).</p>
+      </article>
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Gene models per line</h3>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value mgdb-metric-value-compact">40,000+</strong>
+        </div>
+        <p class="mgdb-metric-description">High-confidence structural and functional gene annotations across all 7 assembled lines.</p>
+      </article>
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Supported collaboration</h3>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value mgdb-metric-value-compact">NSF #1546719</strong>
+        </div>
+        <p class="mgdb-metric-description">Multi-institutional effort across CINVESTAV/LANGEBIO, UNAM, NC State, UC Davis, ISU, and USDA.</p>
+      </article>
+    </div>
+
+  </section>
+
+  <!-- SECTION 6: COLLABORATING INSTITUTIONS & ACKNOWLEDGMENTS -->
+  <section id="hilo-related" class="mgdb-hub-related" aria-labelledby="hilo-related-title">
     <div class="mgdb-section-heading">
       <div><h2 id="hilo-related-title">Related resources</h2></div>
     </div>
 
-    <div class="mgdb-panel hilo-bottom-section">
-<div class="hilo-related-grid">
-      <a class="hilo-related-card" href="/NAM_project">
-        <div class="hilo-related-title">NAM Parent Genomes &rarr;</div>
-        <p class="hilo-related-desc">26 de novo chromosome-scale assemblies of the US Nested Association Mapping founder lines.</p>
-      </a>
-      <a class="hilo-related-card" href="/PanAnd_project">
-        <div class="hilo-related-title">Pan-Andropogoneae Genomes &rarr;</div>
-        <p class="hilo-related-desc">36+ reference assemblies across wild panicoid grasses, teosintes, and sorghum outgroups.</p>
-      </a>
-      <a class="hilo-related-card" href="/european_flints">
-        <div class="hilo-related-title">European Flints Project &rarr;</div>
-        <p class="hilo-related-desc">4 reference assemblies exploring European flint diversity, heterosis, and cold adaptation.</p>
-      </a>
-      <a class="hilo-related-card" href="/genome">
-        <div class="hilo-related-title">Genome Assembly Center &rarr;</div>
-        <p class="hilo-related-desc">Browse all reference, founder, diversity, and pan-genomic maize assemblies hosted at MaizeGDB.</p>
-      </a>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/NAM_project">
+          <strong>NAM Parent Genomes</strong>
+          <span>26 de novo chromosome-scale assemblies of the US Nested Association Mapping founder lines</span>
+        </a>
+        <a href="/PanAnd_project">
+          <strong>Pan-Andropogoneae Genomes</strong>
+          <span>36+ reference assemblies across wild panicoid grasses, teosintes, and sorghum outgroups</span>
+        </a>
+        <a href="/european_flints">
+          <strong>European Flints Project</strong>
+          <span>4 reference assemblies exploring European flint diversity, heterosis, and cold adaptation</span>
+        </a>
+        <a href="/genome">
+          <strong>Genome Data Hub</strong>
+          <span>Browse all reference, founder, diversity, and pan-genomic maize assemblies hosted at MaizeGDB</span>
+        </a>
+        <a href="/gene_center/gene">
+          <strong>Gene Data Hub</strong>
+          <span>Gene models and functional annotation across every hosted assembly</span>
+        </a>
+      </div>
     </div>
-  </div>
-
   </section>
 
 </main>

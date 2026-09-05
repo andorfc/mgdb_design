@@ -7,6 +7,37 @@
  * history:
  *  7/13/2011 andorf - Fixed old log-in code; throw 404 if file does not exist or is empty
  */
+  /* /community is not a page, and never was.
+   *
+   * This controller serves the whole /community/<page> namespace, but the bare
+   * route carries no PAGE, so the $page_filename built further down resolves to
+   * "controllers//.php". That file does not exist, so the request fell through
+   * to reportError() and published the shell with an empty body: HTTP 200 and
+   * ~39 KB of chrome carrying no content. Against a deliberately bogus route
+   * the two bodies differed only by asset tags, so a link checker that reads
+   * the status code saw a healthy page and every breadcrumb pointing here
+   * looked fine.
+   *
+   * There is no Community landing page and there is not going to be one. The
+   * Community megamenu is the index, and the community's own material lives on
+   * /maize_history, which absorbed the cooperator and MGEC history when the
+   * history pages were consolidated on 2026-09-04. So /community permanently
+   * redirects there (Carson, 2026-09-04), on the controllers/cooperators.php
+   * pattern.
+   *
+   * The guard keys on CONTROLLER as well as PAGE because controller.php also
+   * routes /person and /annotator into this file, and both of those are
+   * legitimately PAGE-less -- !PAGE alone would redirect the modernized person
+   * search. PAGE is compared against null and '' rather than tested with !PAGE
+   * so a path segment of "0" is not swept up with them.
+   *
+   * Rollback: delete this block and /community serves the empty shell again.
+   */
+  if (CONTROLLER == 'community' && (PAGE === null || PAGE === '')) {
+    header('Location: /maize_history', true, 301);
+    exit;
+  }
+
   include_once('./include/gp_lib.php');
 
   // Get system configuration
@@ -32,6 +63,24 @@
    */
   if (PAGE == 'hot_new_papers') {
     if (include('controllers/community/hot_new_papers_modern.php')) {
+      return;
+    }
+  }
+
+  /* The community video library on the modern design system.
+   *
+   * Hooked here for the same reason as hot_new_papers above: the modern
+   * controller creates its own Bauplan and publishes it, so it has to run
+   * before the legacy shell below is built. The bare /videos alias does not
+   * come through this file at all -- it reaches redirect.php -- and is taken by
+   * controllers/videos.php.
+   *
+   * Rollback: delete this block and controllers/videos.php.
+   * controllers/community/videos.php and templates/community/videos.bau are
+   * untouched.
+   */
+  if (PAGE == 'videos') {
+    if (include('controllers/community/videos_modern.php')) {
       return;
     }
   }

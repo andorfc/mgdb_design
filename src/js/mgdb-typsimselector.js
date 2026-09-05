@@ -643,7 +643,7 @@
     loadPlotly().then(function () { paint(); }).catch(function () {
       var fallback = document.querySelector('#typ-chart .mgdb-chart-fallback');
       if (fallback) {
-        fallback.textContent = 'The chart could not be loaded. The five numbers below summarise the same distribution.';
+        fallback.textContent = 'The chart could not be loaded. The five numbers below summarize the same distribution.';
       }
     });
 

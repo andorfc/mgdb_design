@@ -105,10 +105,22 @@
     }
   }
 
-  // Hack! Make "/gene_center/" a valid URL
-  if (!PAGE || PAGE == '') {
-    $gene_search_url = $system['root_url'] . '/gene_center/gene';
-    header("Location: $gene_search_url\n\n");
+  /* "/gene_center" is not a page; the gene search is, so the bare route has
+     redirected there for years. What it never did was stop. PHP carried on
+     past the header and reached the require() below with an empty PAGE, which
+     asks for `controllers/gene_center/.php` and is a fatal -- written into the
+     body of a 302 that no browser ever displays, so the only trace was one
+     entry per hit in the PHP error log. Eight links point at this route,
+     including the home page quick links.
+
+     The redirect is also permanent rather than a 302, and names a path rather
+     than $system['root_url'], which sent visitors to http:// for a hop.
+
+     Rollback: restore the three lines this replaced. The route redirected
+     before and redirects now; only the fatal underneath it is gone. */
+  if (PAGE === null || PAGE === '') {
+    header('Location: /gene_center/gene', true, 301);
+    exit;
   }
   
   $bauplan = new Bauplan('MaizeGDB ' . PAGE . ' Search Page');
@@ -116,7 +128,11 @@
   $bauplan->includeScript('/js/search.js');
   $bauplan->includeScript('/js/gene_model.js');
   $bauplan->includeScript('/js/locus.js');
-  $bauplan->includeScript('/js/locus_lookup.js');
+  /* /js/locus_lookup.js came off 2026-09-04. It was loaded on every gene_center
+     page that reaches this line -- in practice locus_family -- which calls no
+     function in it and renders none of the ll_results_* containers it writes
+     into, so it was doing nothing but a request. Its Locus Lookup was built on
+     B73 RefGen_v2 and was retired with /locus_lookup. */
   
   $bauplan->includeCss('/css/data_center.css');
   $bauplan->includeCss('/css/tooltip.css');

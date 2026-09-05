@@ -128,12 +128,12 @@
    Section 1: Assemblies Table Toolbar & Filtering
    -------------------------------------------------------------------------- */
 
+/* The search field takes its own row above the filters, as it does on every
+   hub. Side by side in one wrapping flex row the chips claimed the width and
+   shrank the field below its own basis, cutting off its placeholder. */
 .mgdb-panand-project-page .panand-table-toolbar {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: var(--mgdb-space-3);
-  align-items: center;
-  justify-content: space-between;
   margin-top: var(--mgdb-space-4);
   margin-bottom: var(--mgdb-space-3);
 }
@@ -186,12 +186,12 @@
 .mgdb-panand-project-page .panand-chip-round2.is-active { background: #0f766e; border-color: #0f766e; }
 
 .mgdb-panand-project-page .panand-search-wrap {
-  flex: 1 1 240px;
-  max-width: 380px;
+  max-width: 640px;
 }
 
 .mgdb-panand-project-page .panand-search-input {
   width: 100%;
+  height: var(--mgdb-tap-target);
   font-size: var(--mgdb-text-xs);
 }
 
@@ -497,109 +497,12 @@
 }
 
 /* --------------------------------------------------------------------------
-   Section 3: Key Publications & Abstract Previews
-   -------------------------------------------------------------------------- */
-
-.mgdb-panand-project-page .panand-publications-grid {
-  display: grid;
-  gap: var(--mgdb-space-4);
-  margin-top: var(--mgdb-space-4);
-}
-
-.mgdb-panand-project-page .panand-pub-card {
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  padding: var(--mgdb-space-5);
-  box-shadow: var(--mgdb-shadow-sm);
-}
-
-.mgdb-panand-project-page .panand-pub-meta-top {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  align-items: center;
-  margin-bottom: var(--mgdb-space-2);
-}
-
-.mgdb-panand-project-page .panand-pub-journal-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  background: #ffe4e6;
-  color: #9f1239;
-  border-radius: 9999px;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.mgdb-panand-project-page .panand-pub-doi {
-  font-family: var(--mgdb-font-mono);
-  font-size: 11px;
-  color: var(--mgdb-muted);
-}
-
-.mgdb-panand-project-page .panand-pub-award {
-  display: inline-block;
-  padding: 2px 8px;
-  background: #f0fdf4;
-  color: #166534;
-  border: 1px solid #bbf7d0;
-  border-radius: 9999px;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.mgdb-panand-project-page .panand-pub-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  line-height: 1.35;
-  color: var(--mgdb-burgundy);
-  margin: 0 0 var(--mgdb-space-2) 0;
-}
-
-.mgdb-panand-project-page .panand-pub-authors {
-  font-size: var(--mgdb-text-sm);
-  color: var(--mgdb-ink);
-  margin: 0 0 var(--mgdb-space-1) 0;
-  line-height: 1.4;
-}
-
-.mgdb-panand-project-page .panand-pub-citation {
-  font-size: var(--mgdb-text-xs);
-  color: var(--mgdb-muted);
-  margin: 0 0 var(--mgdb-space-3) 0;
-}
-
-.mgdb-panand-project-page .panand-pub-abstract-wrap {
-  background: var(--mgdb-surface-alt);
-  border-left: 3px solid var(--mgdb-green);
-  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
-  padding: var(--mgdb-space-3) var(--mgdb-space-4);
-  margin-bottom: var(--mgdb-space-4);
-}
-
-.mgdb-panand-project-page .panand-pub-abstract-heading {
-  font-size: var(--mgdb-text-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-  color: var(--mgdb-green-dark);
-  margin: 0 0 4px 0;
-}
-
-.mgdb-panand-project-page .panand-pub-abstract-text {
-  font-size: var(--mgdb-text-xs);
-  line-height: 1.6;
-  color: var(--mgdb-ink-soft);
-  margin: 0;
-}
-
-.mgdb-panand-project-page .panand-pub-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-}
-
+ * Publications
+ *
+ * The cards are the shared reference card now -- `.mgdb-ref*` in mgdb-hub.css,
+ * markup from include/references_lib.php, content from the DOIs the controller
+ * names. The page's own `.panand-pub-*` block was removed with it.
+ * -------------------------------------------------------------------------- */
 /* --------------------------------------------------------------------------
    Section 4: Data Hosted at MaizeGDB
    -------------------------------------------------------------------------- */
@@ -717,50 +620,13 @@
 }
 
 /* --------------------------------------------------------------------------
-   Section 8: Connected Genomics Resources
-   -------------------------------------------------------------------------- */
-
-.mgdb-panand-project-page .panand-bottom-section {
-  background: linear-gradient(180deg, var(--mgdb-surface) 0%, var(--mgdb-green-soft) 100%) !important;
-  border-color: #b8dbca !important;
-}
-
-.mgdb-panand-project-page .panand-related-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--mgdb-space-3);
-  margin-top: var(--mgdb-space-4);
-}
-
-.mgdb-panand-project-page .panand-related-card {
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-sm);
-  padding: var(--mgdb-space-3);
-  text-decoration: none;
-  color: inherit;
-  transition: border-color .12s, box-shadow .12s;
-}
-
-.mgdb-panand-project-page .panand-related-card:hover {
-  border-color: var(--mgdb-green);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-
-.mgdb-panand-project-page .panand-related-title {
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-  color: var(--mgdb-green-dark);
-  margin-bottom: 2px;
-}
-
-.mgdb-panand-project-page .panand-related-desc {
-  font-size: var(--mgdb-text-xs);
-  color: var(--mgdb-muted);
-  margin: 0;
-  line-height: 1.4;
-}
-
+ * Related resources
+ *
+ * The closing panel is the shared `.mgdb-resource-panel` / `.mgdb-resource-list`
+ * now, so it needs no rules here -- it gets the green wash from mgdb-hub.css
+ * and the off-site arrow from mgdb-modern.css. The page's own
+ * `.panand-bottom-section` / `.panand-related-*` block was removed with it.
+ * -------------------------------------------------------------------------- */
 @media (max-width: 54rem) {
   .mgdb-panand-project-page .panand-phylo-content-wrap {
     grid-template-columns: 1fr;

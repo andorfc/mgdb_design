@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Analysis projects (/projects and /projects/<slug>)
+   Research projects (/projects and /projects/<slug>)
    --------------------------------------------------------------------------
    Two scopes, both under .mgdb-page so nothing here can reach another page:
 
@@ -68,12 +68,68 @@
 
 .mgdb-projects-page .projects-grid { margin-top: var(--mgdb-space-5); }
 
+/* Three columns, not four.
+   -------------------------------------------------------------------------
+   The shared grid is minmax(280px, 1fr), which at the page's 1200px of content
+   fits four 288px tracks. That was invisible while the section held three
+   projects -- auto-fit collapses the empty track, so three cards took three
+   389px columns, which is the layout that was reviewed. Fifteen cards fill the
+   fourth, and at 288px these titles, which are sentences, wrap to five lines.
+
+   320px keeps three columns from 992px of content up to 1328px, which covers
+   every width the site is served at, and drops to two and then one below that
+   exactly as the shared grid does. */
+.mgdb-projects-page .projects-grid {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+/* The kernels from the site mark, on the projects MaizeGDB itself runs.
+   -------------------------------------------------------------------------
+   Floated inside the heading, so the title wraps around it on the first line
+   and runs the full width of the card underneath. The first version positioned
+   it absolutely and padded the heading 58px to clear it: that reserve applies
+   to every line, not just the one beside the mark, and it cost each of the
+   three marked cards three extra lines of title -- their pill rows started
+   69px lower than their unmarked neighbours' in the same grid row, which is
+   the exact fault the rest of this file exists to prevent.
+
+   46px is the mark at about an eighth of its natural size: small enough to
+   read as a badge beside a heading rather than as a picture, large enough that
+   the two kernels stay distinguishable. The source PNG carries its own alpha,
+   so it needs no plate behind it. The heading's min-height is three lines and
+   the mark is 27px tall, so it can never escape the bottom of the heading. */
+.mgdb-projects-page .projects-card-mark {
+  float: right;
+  width: 46px;
+  height: auto;
+  margin: 0.1em 0 var(--mgdb-space-2) var(--mgdb-space-3);
+}
+
+/* Forced-colours drops background images and can leave a decorative PNG as a
+   grey block. The meta line says "led by MaizeGDB" in words, so nothing is
+   lost by hiding it. */
+@media (forced-colors: active) {
+  .mgdb-projects-page .projects-card-mark { display: none; }
+}
+
+/* The count beside a chip label. Tabular so the chips do not change width by a
+   pixel between "3" and "7", which is visible when the row re-renders. */
+.mgdb-projects-page .projects-chip-count {
+  margin-left: 0.35em;
+  color: var(--mgdb-muted);
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+}
+
+.mgdb-projects-page .mgdb-chip[aria-pressed="true"] .projects-chip-count { color: inherit; }
+
 /* Three lines reserved for the title, so the topic pills under it start at the
    same height in every card of the row. The titles are full sentences and run
    to two or three lines at this column width; reserving the taller of the two
    costs one line of white space on the shorter cards and is what puts every
    band of every card on the same line as its neighbours'. It reserves rather
-   than fixes, so a longer title still gets the room it needs. */
+   than fixes, so a longer title still gets the room it needs -- which matters
+   more now the section holds fifteen projects with titles of every length. */
 .mgdb-projects-page .projects-card h3 {
   min-height: calc(3 * 1.3em);
   font-size: var(--mgdb-text-xl);
@@ -158,7 +214,31 @@
   .mgdb-projects-page .projects-card-facts dt { min-height: 0; }
 }
 
-.mgdb-projects-page .projects-card-meta { margin-top: var(--mgdb-space-3); }
+/* Two lines reserved for the meta line, for the same reason the title reserves
+   three and the facts labels reserve two.
+   -------------------------------------------------------------------------
+   The summary is the band that absorbs the card's slack, so everything under
+   it is pinned to the floor of the card and a one-line meta line lifts the
+   facts strip above it by a whole line. Measured across the fifteen cards the
+   line is 22px or 45px and never more, so reserving the taller case makes the
+   facts strip land at the same height in every card of a row -- and it also
+   pulls the one card with no facts strip at all back into line, because its
+   summary then grows by exactly the strip's height instead of the strip's
+   height minus a line. Released with the other reserves once the grid is a
+   single column and no card sits beside another. */
+.mgdb-projects-page .projects-card-meta {
+  margin-top: var(--mgdb-space-3);
+  min-height: calc(2 * 1.6em);
+}
+
+/* The release has to come after the declaration, not with the other releases
+   above it: a media query carries no extra specificity, so the later rule wins
+   whatever the viewport is. Measured at 375px with the reserve still in the
+   earlier block and it was, leaving 23px of white space under the last line of
+   every single-column card. */
+@media (max-width: 720px) {
+  .mgdb-projects-page .projects-card-meta { min-height: 0; }
+}
 
 /* --------------------------------------------------------------------------
    Shared project-page furniture

@@ -173,6 +173,7 @@ class Scanner(object):
         self.menu_links = set()
         self.offsite = {}     # host -> {count, examples, linked_from}
         self.notes = []
+        self._interceptors = None   # '/url' -> file a top-level route displaced
 
     # -- file access -------------------------------------------------------
 
@@ -306,8 +307,44 @@ class Scanner(object):
         if not record["urls"]:
             del self.pages[serving_file]
 
+    def interceptors(self):
+        """`/name` -> the file that answered it before a route interceptor took it.
+
+        Modernizing a page in place adds a top-level `controllers/<name>.php`,
+        because `controller.php` has to answer the URL itself or the request
+        falls through to `redirect.php`, which reaches the old file and loads
+        the legacy chrome with it. The interceptor is a routing detail: the
+        page is the same page it was, so its category has to come from the file
+        the interceptor displaced rather than from its own top-level path.
+
+        Only URLs that really are intercepted are listed, and the search order
+        is `redirect.php`'s own, so the displaced file is the one that would
+        have answered.
+        """
+        if self._interceptors is None:
+            mapping = {}
+            for directory in FALLBACK_DIRS:
+                for name in self.listing(directory):
+                    if not name.endswith(".php"):
+                        continue
+                    if name.endswith(HELPER_SUFFIXES) or name.endswith("_modern.php"):
+                        continue
+                    url = "/" + name[:-4]
+                    if url in mapping:
+                        continue
+                    if self.exists("controllers/" + name):
+                        mapping[url] = "%s/%s" % (directory, name)
+            self._interceptors = mapping
+        return self._interceptors
+
     def category_for(self, url, chain):
         leaf = chain[-1]
+        # A top-level controller that intercepted a route is categorised on the
+        # file it displaced, so a page does not change category by being
+        # modernized. Anything reached through a sub-controller already names
+        # its own directory and is left alone.
+        if leaf.count("/") == 1 and leaf.startswith("controllers/"):
+            leaf = self.interceptors().get(url, leaf)
         if url.startswith("/data_center"):
             return "Data hubs"
         if url.startswith("/gene_center") or url.startswith("/pan_gene_center"):
@@ -676,9 +713,18 @@ class Scanner(object):
                 http_status, body, location = get(url)
                 redirected = None
 
-                # Apache redirects a directory URL missing its trailing slash.
-                # Following one hop keeps the row pointed at the page a visitor
-                # actually lands on rather than at the redirect.
+                # Two very different things arrive as a 3xx here.
+                #
+                # Apache redirects a directory URL missing its trailing slash;
+                # following that hop keeps the row pointed at the page a visitor
+                # actually lands on. But a *retirement* redirect goes somewhere
+                # else entirely, and following it made the retired route inherit
+                # the destination's title and "modern" classification -- so
+                # /faq reported itself as modern and titled "Contact MaizeGDB".
+                # Eighteen retired routes were counted as modern pages that way.
+                # Only the normalising hop is followed; a move is reported as a
+                # move.
+                moved_to = None
                 if http_status in (301, 302, 303, 307, 308) and location:
                     target = location
                     if "://" in target:
@@ -688,19 +734,35 @@ class Scanner(object):
                         else:
                             target = "/" + rest.split("/", 1)[1] if "/" in rest else "/"
                     if target and target != url:
-                        redirected = target
-                        http_status, body, _ = get(target)
+                        bare = target.split("?")[0].split("#")[0]
+                        # Two kinds of hop are not a retirement and must not be
+                        # counted as one:
+                        #   the trailing slash Apache adds to a directory URL,
+                        #   and an index alias -- /gene_center sending a reader
+                        #   to /gene_center/gene, which is a real URL landing on
+                        #   its own hub. Calling those "retired" took 24 pages
+                        #   out of the modern count on the first run.
+                        normalising = (bare.rstrip("/") == url.split("?")[0].rstrip("/")
+                                       or bare.startswith(url.split("?")[0].rstrip("/") + "/"))
+                        if normalising:
+                            redirected = target
+                            http_status, body, _ = get(target)
+                        else:
+                            moved_to = target
 
                 title = re.search(r"<title[^>]*>(.*?)</title>", body, re.I | re.S)
                 status, markers = classify_live(body)
                 return key, {
                     "http": http_status,
                     "redirected_to": redirected,
+                    "moved_to": moved_to,
                     "bytes": len(body),
                     "ms": int((time.time() - started) * 1000),
-                    "title": title.group(1).strip()[:140] if title else None,
-                    "markers": markers,
-                    "status": status if http_status == 200 else None,
+                    # A moved route has no page of its own, so it takes neither
+                    # the destination's title nor its classification.
+                    "title": None if moved_to else (title.group(1).strip()[:140] if title else None),
+                    "markers": [] if moved_to else markers,
+                    "status": "retired" if moved_to else (status if http_status == 200 else None),
                 }
             except Exception as error:  # a probe failure must not lose the row
                 return key, {"error": "%s: %s" % (type(error).__name__, error)}
@@ -734,6 +796,7 @@ class Scanner(object):
                 "links_in": record.get("links_in", 0),
                 "in_menu": record.get("in_menu", False),
                 "title": probe.get("title"),
+                "moved_to": probe.get("moved_to"),
                 "http": probe.get("http"),
                 "probe_error": probe.get("error"),
                 "probed": bool(live) or bool(probe.get("http")),
@@ -746,21 +809,24 @@ class Scanner(object):
             row["url"],
         ))
 
-        counts = {"modern": 0, "partial": 0, "legacy": 0}
+        counts = {"modern": 0, "partial": 0, "legacy": 0, "retired": 0}
         for row in rows:
             counts[row["status"]] = counts.get(row["status"], 0) + 1
 
         by_category = {}
         for row in rows:
-            bucket = by_category.setdefault(row["category"], {"modern": 0, "partial": 0, "legacy": 0, "total": 0})
+            bucket = by_category.setdefault(row["category"], {"modern": 0, "partial": 0, "legacy": 0, "retired": 0, "total": 0})
             bucket[row["status"]] += 1
             bucket["total"] += 1
 
         # What to do next: legacy pages, most exposed first. A page in the mega
         # menu is reachable from every page on the site, so it outranks a page
         # with more inbound links but no menu entry.
+        # A retired route is finished work, not outstanding work: it has no
+        # page left to modernize.
         next_up = [row for row in rows
-                   if row["status"] != "modern" and row["category"] != "Curation and internal"]
+                   if row["status"] not in ("modern", "retired")
+                   and row["category"] != "Curation and internal"]
         next_up.sort(key=lambda row: (not row["in_menu"], -row["links_in"], row["url"]))
 
         # Offsite links split three ways. The maizegdb.org subdomains are
@@ -785,7 +851,10 @@ class Scanner(object):
             "site": self.site,
             "counts": counts,
             "total": len(rows),
-            "percent_modern": round(100.0 * counts["modern"] / len(rows), 1) if rows else 0.0,
+            # Retired routes are excluded from the denominator: they are not
+            # pages waiting to be modernized, so counting them drags the
+            # figure down for work that is done.
+            "percent_modern": round(100.0 * counts["modern"] / (len(rows) - counts["retired"]), 1) if (len(rows) - counts["retired"]) else 0.0,
             "by_category": by_category,
             "category_order": [c for c in CATEGORY_ORDER if c in by_category],
             "rows": rows,
@@ -823,6 +892,7 @@ STATUS_LABEL = {
     "modern": "Modern",
     "partial": "Partial",
     "legacy": "Legacy",
+    "retired": "Retired",
 }
 
 
@@ -851,12 +921,14 @@ def write_markdown(data, path):
     add("| Modern | %d (%.1f%%) |" % (counts["modern"], data["percent_modern"]))
     add("| Partial | %d |" % counts["partial"])
     add("| Legacy | %d |" % counts["legacy"])
+    add("| Retired | %d |" % counts.get("retired", 0))
     add("| Classified by live response | %s |" % ("yes" if data["probed"] else "no, source analysis only"))
     add("")
     add("```")
     add("modern   %s %d" % (bar(counts["modern"] / float(total or 1)), counts["modern"]))
     add("partial  %s %d" % (bar(counts["partial"] / float(total or 1)), counts["partial"]))
     add("legacy   %s %d" % (bar(counts["legacy"] / float(total or 1)), counts["legacy"]))
+    add("retired  %s %d" % (bar(counts.get("retired", 0) / float(total or 1)), counts.get("retired", 0)))
     add("```")
     add("")
     add("**Modern** is a page on the shared design system: it calls `modern()` for the")
@@ -1027,6 +1099,10 @@ def write_markdown(data, path):
     add("5. Guards of the form `if (PAGE == 'x' && ...) include('..._modern.php')` are")
     add("   read out of each controller, so a page swapped in for one route without")
     add("   touching its siblings is attributed to that route alone.")
+    add("6. A page modernized in place gains a `controllers/<name>.php` interceptor so")
+    add("   that `controller.php` answers the URL rather than `redirect.php`. Those")
+    add("   routes are categorised on the file the interceptor displaced, so a page")
+    add("   keeps its category when it is modernized.")
     add("")
     add("A file reachable at more than one URL is one row carrying both, so the totals")
     add("count pages rather than paths.")

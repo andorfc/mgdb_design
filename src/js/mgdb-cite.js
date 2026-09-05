@@ -1,12 +1,12 @@
 /* How to cite MaizeGDB.
 
-   Citations are rendered server-side in full semantic card markup matching
-   the Reference Data Hub.
+   The journal articles are rendered server-side by include/references_lib.php,
+   the shared reference card. Its Copy citation and Copy DOI buttons are bound
+   by mgdb-modern.js, which is why there is no copy handler for them here.
    This script handles:
      1. Primary citation clipboard copy
-     2. Copy DOI / Copy PMID inline button actions
-     3. List / Card view toggle with localStorage persistence
-     4. Real-time client-side search and year/category filtering
+     2. List / Card view toggle with localStorage persistence
+     3. Real-time client-side search and year/category filtering
 */
 
 (function () {
@@ -59,28 +59,7 @@
     });
   }
 
-  /* ── Copy DOI / PMID button helper ──────────────────────────────────────── */
-
-  function initCopyButtons() {
-    Array.prototype.forEach.call(document.querySelectorAll('.reference-copy-id'), function (btn) {
-      btn.addEventListener('click', function () {
-        var val = btn.getAttribute('data-copy-value');
-        if (!val) { return; }
-        var original = btn.textContent;
-        function finish(ok) {
-          btn.textContent = ok ? 'Copied!' : 'Press Cmd+C';
-          window.setTimeout(function () { btn.textContent = original; }, 1800);
-        }
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(val).then(function () { finish(true); }).catch(function () { finish(false); });
-        } else {
-          finish(false);
-        }
-      });
-    });
-  }
-
-  /* ── List / Cards View Toggle ───────────────────────────────────────────── */
+    /* ── List / Cards View Toggle ───────────────────────────────────────────── */
 
   function initViewToggle() {
     var group = document.querySelector('.mgdb-cite-group[data-group="journal"]');
@@ -183,7 +162,6 @@
 
   function init() {
     initCopy();
-    initCopyButtons();
     initViewToggle();
     initFilters();
   }

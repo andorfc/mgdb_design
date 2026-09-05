@@ -1,0 +1,127 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-assembly-record
+<a class="mgdb-skip-link" href="#ar-main">Skip to main content</a>
+
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-assembly-record-page" id="ar-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span>
+    <a href="/genome">Genomes</a><span aria-hidden="true">&rsaquo;</span>
+    <span aria-current="page">$(assembly_name)</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="ar-title">
+    <div class="mgdb-hero-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="Genome assembly icon">
+        <rect x="18" y="14" width="18" height="68" rx="8" fill="#e8f4ec" stroke="#235c37" stroke-width="3" />
+        <rect x="42" y="22" width="18" height="52" rx="8" fill="#e8f4ec" stroke="#235c37" stroke-width="3" />
+        <rect x="66" y="18" width="14" height="60" rx="6" fill="#e8f4ec" stroke="#235c37" stroke-width="3" />
+        <rect x="19" y="32" width="16" height="8" fill="#d99a0b" />
+        <rect x="19" y="56" width="16" height="6" fill="#7fae8c" />
+        <rect x="43" y="36" width="16" height="9" fill="#d99a0b" />
+        <rect x="43" y="58" width="16" height="5" fill="#7fae8c" />
+        <rect x="67" y="30" width="12" height="6" fill="#7fae8c" />
+        <rect x="67" y="52" width="12" height="9" fill="#d99a0b" />
+      </svg>
+      <strong>Genome<br />Assembly</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="ar-title">$(assembly_name)</h1>
+      <p class="mgdb-hero-description ar-summary">$(assembly_summary)</p>
+      <div class="ar-actions">$(header_buttons)</div>
+    </div>
+  </section>
+
+  $(notices)
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#ar-assembly" class="is-current">Assembly</a>
+    <a href="#ar-sample">Sample</a>
+    <a href="#ar-project">Project</a>
+    <a href="#ar-annotations">Gene models</a>
+    <a href="#ar-browsers">Browsers</a>
+    <a href="#ar-downloads">Downloads</a>
+    <a href="#ar-related">Related resources</a>
+  </nav>
+
+  <section id="ar-assembly" aria-labelledby="ar-assembly-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ar-assembly-title">Assembly</h2></div>
+    </div>
+
+    <dl class="ar-rows">$(assembly_rows)</dl>
+  </section>
+
+  <section id="ar-sample" aria-labelledby="ar-sample-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ar-sample-title">Sample</h2></div>
+    </div>
+
+    <dl class="ar-rows">$(sample_rows)</dl>
+  </section>
+
+  <section id="ar-project" aria-labelledby="ar-project-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ar-project-title">Project</h2></div>
+    </div>
+
+    <dl class="ar-rows">$(project_rows)</dl>
+  </section>
+
+  <section id="ar-annotations" aria-labelledby="ar-annotations-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ar-annotations-title">Gene models $(annotation_count)</h2></div>
+    </div>
+
+    $(annotation_list)
+  </section>
+
+  <section id="ar-browsers" aria-labelledby="ar-browsers-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ar-browsers-title">Browsers</h2></div>
+    </div>
+
+    $(browser_note)
+  </section>
+
+  <section id="ar-downloads" aria-labelledby="ar-downloads-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ar-downloads-title">Downloads</h2></div>
+    </div>
+
+    $(download_links)
+  </section>
+
+  <section id="ar-related" class="mgdb-hub-related" aria-labelledby="ar-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ar-related-title">Related resources</h2></div>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/genome">
+          <strong>Genome Data Hub</strong>
+          <span>Every assembly MaizeGDB hosts, with assembly statistics and download paths</span>
+        </a>
+        <a href="/gene_center/gene">
+          <strong>Gene Data Hub</strong>
+          <span>Gene models called against this assembly, and their function and expression</span>
+        </a>
+        <a href="/pan_gene_center/pan_gene">
+          <strong>Pan-Gene Data Hub</strong>
+          <span>The same gene across every assembly, with its core and dispensable calls</span>
+        </a>
+        <a href="/genomebrowser">
+          <strong>Genome Browser Data Hub</strong>
+          <span>Every browser instance MaizeGDB runs, and which assemblies each one holds</span>
+        </a>
+        <a href="/data_center/stock">
+          <strong>Stock Data Hub</strong>
+          <span>The germplasm this assembly was sequenced from, and how to order it</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+)

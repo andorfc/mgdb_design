@@ -1,0 +1,631 @@
+$$SYNTAX-LEVEL 2
+*(genome_assembly {include-css: /css/data_center.css}
+@(not_found {display: off}
+  <br><br>
+  <h3>&nbsp;The genome assembly "$(assembly-name)" does not exist.</h3>
+)
+
+@(found {display:off}
+<div style="padding:10px">
+  <table cellpadding=0 cellspacing=0 width="100%">
+    <tr>
+      <td colspan=3>    
+        <h2>Information about assembly $(assembly-name)
+        @(genome-aka {display:off}
+          (also known as $(aka)\)
+        )
+        </h2>
+        <span style="font-weight:bold;font-size:11pt">Assembly identifier: $(assembly-identifier)</span>
+        <br><br>
+      </td>
+    </tr>
+    
+    <tr height="15px"><td></td></tr>
+    
+      <td colspan=2>
+        <b>Click 
+        <a href="/nomenclature/maize_assembly_nomenclature_2016_update.pdf"
+           target="_blank">here</a> 
+        to learn about maize genome and gene model nomenclature rules.</b>
+      </td>
+    </tr> 
+       
+    <tr height="10px"><td></td></tr>
+    
+    @(replaced-with {display: off}
+      <tr>
+        <td>
+          <span class="notice" style="font-size:14px">
+            This assembly has been replaced with 
+            <a href="/genome/assembly/$(replaced-with-assembly)">$(replaced-with-assembly)</a>.
+          </span>
+        </td>
+      </tr>
+      <tr height="10px"><td></td></tr>
+    )
+    
+    <!-- Genome Sequencing Project Information -->
+    <tr class="lite_grey_background">
+      <td colspan=3 width="100%">
+        <table width="100%" cellpadding=0 cellspacing=0>
+          <tr>
+            <td align="left">
+              <img src="/images/lite_grey_lt.gif">
+            </td>
+            <td width="97%" valign="center"></td>
+            <td align="right">
+              <img src="/images/lite_grey_rt.gif">
+            </td>
+          </tr>
+          <tr>
+            <td colspan=3><h3>Genome Sequencing Project Information</h3></td>
+          </tr>
+          <tr height=4px><td></td></tr>
+          <tr>
+            <td width=10></td>
+            <td valign="top">
+              <table>
+                $(toronto_agreement)
+                <tr>
+                  <td>&nbsp;&nbsp;</td>
+                  <td align="right" valign="top"><b class=\"nowrap\">Project name</b>&nbsp;&nbsp;</td>
+                  <td width='100%'>$(project_name)</td>
+                </tr>
+                $(withdrawn-statement)
+                $(bioproject)
+                $(project_PI)
+                $(project_start_date)
+                $(release_date)
+                $(change_history)
+                $(replaced_by)
+                $(consortium)
+                $(award)
+                $(publication_status)
+                @(project_reference {display: off}
+                <tr>
+                  <td></td>
+                  <td align="right" valign="top"><b class="nowrap">Project reference</b></td>
+                  <td>
+                    <i>$(reference_title)</i>
+                    $(publication_authors)
+                    $(mgdb_project_reference)
+                    $(project_PMID)
+                    $(project_DOI)
+                  </td>
+                </tr>
+                )
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td align="left">
+              <img src="/images/lite_grey_lb.gif">
+            </td>
+            <td colspan=2></td>
+            <td align="right">
+              <img src="/images/lite_grey_rb.gif">
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr height="20px"><td></td></tr>
+    
+    <!-- Stock and Biosample Information -->
+    <tr class="lite_blue_background">
+      <td colspan=3 width="100%">
+        <table width="100%" cellpadding=0 cellspacing=0>
+          <tr>
+            <td align="left">
+              <img src="/images/lite_blue_lt.gif">
+            </td>
+            <td width="97%" valign="center"></td>
+            <td align="right">
+              <img src="/images/lite_blue_rt.gif">
+            </td>
+          </tr>
+            </td>
+          </tr>
+          <tr>
+            <td width=10></td>
+            <td>
+              <table>
+                <tr>
+                  <td colspan=3><h3>Stock and Biosample Information</h3></td>
+                </tr>
+                <tr height=4px><td></td></tr>
+                <tr>
+                  <td valign="top" width="40%">
+                    <table>
+                      <tr>
+                        <td colspan=2 nowrap><b>Stock information</b></td>
+                      </tr>
+                      $(stock_name)
+                      @(MaizeGDB_stock_ID_row {display: off}
+                        $(MaizeGDB_stock_ID)
+                      )
+                      $(source_mat_id)
+                      $(source_mat_derived_id)
+                      $(biomaterial_provider)
+                      <tr height=4px><td></td></tr>
+                    </table>
+                  </td>
+                  <td valign="top" width="60%">
+                    <table>
+                      <tr>
+                        <td colspan=2 nowrap><b>Biosample information</b></td>
+                      </tr>
+                      $(species)
+                      $(sample_name)
+                      $(sample_type)
+                      $(sample_description)
+                      $(biosample)
+                      $(collection_date)
+                      $(collected_by)
+                      $(geo_location)
+                      @(age_row {display: off}
+                        $(age)
+                      )
+                      @(life_stage_row {display: off}
+                        $(life_stage)
+                      )
+                      @(plant_structure_row {display: off}
+                        $(plant_structure)
+                      )
+                      @(developmental_stage_row {display: off}
+                        $(developmental_stage)
+                      )
+                      @(env_biome_row {display: off}
+                        $(env_biome)
+                      )
+                      @(sample_reference {display: off}
+                      <tr>
+                        <td></td>
+                        <td><b class="nowrap">Sample reference:</b></td>
+                        <td>
+                          $(mgdb_sample_reference)
+                          $(sample_PMID)
+                          $(sample_DOI)
+                        </td>
+                      </tr>
+                      )
+                      $(estimated_size)
+                    </table>
+                  </tr>
+                </td>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td align="left">
+              <img src="/images/lite_blue_lb.gif">
+            </td>
+            <td width="97%" valign="center"></td>
+            <td align="right">
+              <img src="/images/lite_blue_rb.gif">
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr height="10px"><td></td></tr>
+
+    <!-- Sequencing and Assembly Information -->
+    <tr class="lite_grey_background">
+      <td colspan=3 width="100%">
+        <table width="100%" cellpadding=0 cellspacing=0>
+          <tr>
+            <td align="left">
+              <img src="/images/lite_grey_lt.gif">
+            </td>
+            <td width="97%" valign="center"></td>
+            <td align="right">
+              <img src="/images/lite_grey_rt.gif">
+            </td>
+          </tr>
+          <tr>
+            <td width=10></td>
+            <td>
+              <table>
+                <tr>
+                  <td colspan=3><h3>Sequencing and Assembly Information</h3></td>
+                </tr>
+                <tr height=2px><td></td></tr>
+                
+                $(assembly_name)
+                $(assembly_date)
+                $(Assembly_accession)
+                $(WGS_accession)
+                $(contributors)
+                $(assembly_provider)
+                $(assembly_methods)
+                $(sequencing_description)
+                $(assembly_description)
+                $(MaizeGDB_browser_URL)
+                $(download_URLs)
+                $(release_date)
+                $(seq_meth)
+                $(finishing_strategy)
+                $(comment)
+                @(seq_hardware_row {display: off}
+                  $(seq_hardware)
+                )
+                @(seq_chemistry_row {display: off}
+                  $(seq_chemistry)
+                )
+                @(seq_chemistry_version_row {display: off}
+                  $(seq_chemistry_version)
+                )
+                @(genome_alignment_row {display: off}
+                  $(genome_alignment)
+                )
+                @(seq_service_provider_row {display: off}
+                  $(seq_service_provider)
+                )
+                
+                <tr height=4px><td></td></tr>
+                <tr><td colspan=3><b>Assembly statistics</b></td></tr>
+                <tr>
+                  <td colspan=2>
+                    <table>
+                      @(total_psuedomolecule_length_row {display: off}
+                        $(total_psuedomolecule_length)
+                      )
+                      @(scaff_num_row {display: off}
+                        $(scaff_num)
+                      )
+                      @(total_pseudomolecule_length_row {display: off}
+                        $(total_pseudomolecule_length)
+                      )
+                      @(perc_seq_scaffold_row {display: off}
+                        $(perc_seq_scaffold)
+                      )
+                      @(perc_seq_unscaffold_row {display: off}
+                        $(perc_seq_unscaffold)
+                      )
+                      @(total_scaff_length_row {display: off}
+                        $(total_scaff_length)
+                      )
+                      @(longest_scaff_row {display: off}
+                        $(longest_scaff)
+                      )
+                      @(shortest_scaff_row {display: off}
+                        $(shortest_scaff)
+                      )
+                      @(mean_scaff_row {display: off}
+                        $(mean_scaff)
+                      )
+                      @(median_scaff_row {display: off}
+                        $(median_scaff)
+                      )
+                      @(N50_scaff_length_row {display: off}
+                        $(N50_scaff_length)
+                      )
+                      @(N50_scaff_count_row {display: off}
+                        $(N50_scaff_count)
+                      )
+                      @(N90_scaff_length_row {display: off}
+                        $(N90_scaff_length)
+                      )
+                      @(N90_scaff_count_row {display: off}
+                        $(N90_scaff_count)
+                      )
+                      @(scaff_ns_row {display: off}
+                        $(scaff_ns)
+                      )
+                      @(contig_num__row {display: off}
+                        $(contig_num_)
+                      )
+                      @(ave_contigs_per_scaff_row {display: off}
+                        $(ave_contigs_per_scaff)
+                      )
+                     @(total_contig_length_row {display: off}
+                        $(total_contig_length)
+                      )
+                      @(longest_contig_row {display: off}
+                        $(longest_contig)
+                      )
+                      @(shortest_contig_row {display: off}
+                        $(shortest_contig)
+                      )
+                      @(mean_contig_row {display: off}
+                        $(mean_contig)
+                      )
+                      @(median_contig_row {display: off}
+                        $(median_contig)
+                      )
+                      @(N50_contig_length_row {display: off}
+                        $(N50_contig_length)
+                      )
+                      @(N50_contig_count_row {display: off}
+                        $(N50_contig_count)
+                      )
+                      @(N90_contig_length_row {display: off}
+                        $(N90_contig_length)
+                      )
+                      @(N90_contig_count_row {display: off}
+                        $(N90_contig_count)
+                      )
+                      @(contig_ns_row {display: off}
+                        $(contig_ns)
+                      )
+                    </table>
+                  </td>
+                  <td>
+                    <table style="margin:0px 0px 0px 20px">
+                      @(scaff_num_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>Total number of scaffolds in assembly.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(total_pseudomolecule_length_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>Total sequence length represented by pseudomolecules.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(perc_seq_scaffold_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>% assembly in scaffolded contigs.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(perc_seq_unscaffold_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>% assembly in UNscaffolded contigs.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(total_scaff_length_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>Total sequence length represented by scaffolds.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(longest_scaff_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>Longest scaffold in assembly.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(shortest_scaff_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>Shortest scaffold in assembly.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(mean_scaff_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>The mean scaffold length.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(median_scaff_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>The median scaffold length.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(N50_scaff_length_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>The length of scaffold which takes the sum length (summing from longest to shortest scaffold\) past 50% of the total assembly size.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(N50_scaff_count_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>How many scaffolds are counted in reaching the N50 threshold.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(N90_scaff_length_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>The length of scaffold which takes the sum length (summing from longest to shortest scaffold\) past 90% of the total assembly size.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(N90_scaff_count_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>How many scaffolds are counted in reaching the N90 threshold.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(scaff_ns_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>Percentage of ambiguous bases (Ns\) in contig sequences.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(contig_num_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>Total number of contigs used in assembly.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(ave_contigs_per_scaff_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>The average number of contigs in a scaffold.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(total_contig_length_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>Total sequence length represented by contigs.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(longest_contig_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>The longest contig.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(shortest_contig_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>The shortest contig.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(mean_contig_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>The mean contig length.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(median_contig_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>The median contig length.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(N50_contig_length_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>The length of contig which takes the sum length (summing from longest to shortest contig\) past 50% of the total assembly size.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(N50_contig_count_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>How many contig are counted in reaching the N50 threshold.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(N90_contig_length_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>The length of contig which takes the sum length (summing from longest to shortest contig\) past 90% of the total assembly size.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(N90_contig_count_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>How many contig are counted in reaching the N90 threshold.</i>
+                          </td>
+                        </tr>
+                      )
+                      @(contig_ns_gloss {display: off}
+                        <tr>
+                          <td>
+                            <i>Percentage of ambiguous bases (Ns\) in contig sequences.</i>
+                          </td>
+                        </tr>
+                      )
+                    </table>
+                  </td>
+                </tr>
+                <tr height=4px><td></td></tr>
+                <tr>
+                  <td></td>
+                  <td colspan=3>
+                    A <b>contig</b> is a contiguous consensus sequence that is 
+                    derived from a collection of overlapping reads.
+                    <br>
+                    A <b>scaffold</b> is set of a ordered and orientated contigs 
+                    that are linked to one another by mate pairs of sequencing reads.
+                  </td>                    
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td align="left">
+              <img src="/images/lite_grey_lb.gif">
+            </td>
+            <td width="97%" valign="center"></td>
+            <td align="right">
+              <img src="/images/lite_grey_rb.gif">
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    
+    @(structural-annotation {display: off}
+    <tr height="20px"><td></td></tr>
+    
+    <!-- Annotation -->
+    <tr class="lite_blue_background">
+      <td colspan=3 width="100%">
+        <table width="100%" cellpadding=0 cellspacing=0>
+          <tr>
+            <td align="left">
+              <img src="/images/lite_blue_lt.gif">
+            </td>
+            <td width="97%" valign="center"></td>
+            <td align="right">
+              <img src="/images/lite_blue_rt.gif">
+            </td>
+          </tr>
+            </td>
+          </tr>
+          <tr>
+            <td width=10></td>
+            <td>
+              <table>
+                <tr>
+                  <td colspan=3><h3>Annotation</h3></td>
+                </tr>
+                <tr height=2px><td></td></tr>
+                
+                @(structural-annotation-list
+                    $(annotation_name)
+                    $(annotation_provider)
+                    $(annotation_date)
+                    $(is_current)
+                    $(withdrawn)
+                    $(annotation_software)
+                    $(annotation_description)
+                    $(annotation_method)
+                    $(annotation_accession)
+                    $(annotation_download)
+                    <tr height=20px><td></td></tr>
+                )
+                
+            </table>
+            </td>
+          </tr>
+          <tr>
+            <td align="left">
+              <img src="/images/lite_blue_lb.gif">
+            </td>
+            <td width="97%" valign="center"></td>
+            <td align="right">
+              <img src="/images/lite_blue_rb.gif">
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    )
+  </table>
+</div>
+)
+)

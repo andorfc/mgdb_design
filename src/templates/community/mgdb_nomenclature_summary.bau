@@ -1,0 +1,158 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-nomenclature-summary
+<main class="mgdb-page mgdb-hub-page mgdb-nomenclature-summary-page" id="nomenclature-summary-main">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/maize_history">Community</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Assembly and annotation nomenclature</span>
+  </nav>
+
+  <section class="mgdb-hero nomenclature-summary-hero" aria-labelledby="nomenclature-summary-title">
+    <div class="mgdb-hero-emblem nomenclature-summary-emblem">
+      <div class="nomenclature-symbol-stack" aria-hidden="true"><span>Zm</span><span>Zm00001e</span><span>Zm00001ea036589_T001</span></div>
+      <strong>Assembly and annotation names</strong>
+      <span>Genomes to transcripts</span>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="nomenclature-summary-title">Maize assembly and annotation nomenclature</h1>
+      <p class="mgdb-hero-description">Every maize genome assembly and annotation carries an identifier that is unique, persistent, readable by both people and machines, and consistent across genomes. This page shows how those identifiers are built and how to read one.</p>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#summary-overview" class="is-current" aria-current="true">Overview</a>
+    <a href="#summary-anatomy">How to read an identifier</a>
+    <a href="#summary-example">Worked example</a>
+    <a href="#summary-related">Related resources</a>
+  </nav>
+
+  <section id="summary-overview" aria-labelledby="summary-overview-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="summary-overview-title">Overview</h2></div>
+    </div>
+
+    <div class="nomenclature-summary-prose">
+      <p>As the number of genome assemblies and annotations increases, unambiguous identification of each of these entities is necessary for clarity and precision. Identifiers must be unique and persistent, be both machine and human readable, and be consistent across genomes. We realize that tradeoffs between these goals and simplicity are inevitable. To ensure that identifiers are unique, MaizeGDB will be the single naming authority for the assignment of identifiers. In addition to unique, persistent identifiers, metadata is required to properly identify and describe genome assembly datasets.</p>
+
+      <p>Because of the large number of existing and expected genome assemblies, assemblies are identified by a unique number rather than a name. While this is not easily human-readable, it handles cases in which the same cultivar is sequenced by multiple projects \(e.g. Mo17\) and cases where the cultivar name is a seed bank accession number. Additionally, chromosomes are not indicated in the gene model names as doing so could cause confusion, given the existence of large chromosomal rearrangements in maize. For example, in the NAM founder Oh7B, a large portion of chromosome 10 broke off and attached to chromosome 9. The gene model numbers are, however, numbered in sequential order along the chromosomes.</p>
+
+      <p>Genome assembly and annotation project personnel should work with MaizeGDB personnel to acquire genome and annotation names that comply with the guidelines herein, and to provide the required metadata using the <a href="https://download.maizegdb.org/data_templates/Genome_metadata_template.v6.1.xlsx">genome metadata template</a>.</p>
+
+      <p>To learn more, read the <a href="https://documents.maizegdb.org/nomenclature/maize_assembly_nomenclature_2021.pdf">maize genome and annotation nomenclature document</a>, or the <a href="/nomenclature">complete maize nomenclature page</a>, which covers genes, alleles, gene products, markers and chromosome rearrangements as well.</p>
+    </div>
+  </section>
+
+  <section id="summary-anatomy" aria-labelledby="summary-anatomy-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="summary-anatomy-title">How to read an identifier</h2></div>
+    </div>
+
+    <article class="nomenclature-id-card" aria-labelledby="summary-assembly-name-heading">
+      <div class="nomenclature-id-copy">
+        <span class="nomenclature-id-step" aria-hidden="true">01</span>
+        <div><h3 id="summary-assembly-name-heading">Genome assembly name</h3><p>The public name identifies the maize species, the sequenced cultivar or accession, the project responsible for the assembly, and its version. A change to the exact sequenced cultivar or to the sequencing group receives a new genome identifier.</p></div>
+      </div>
+      <div class="nomenclature-id-diagram" aria-label="Genome assembly name: Zm-ZZ99-XGROUP-1.0">
+        <div class="nomenclature-id-parts nomenclature-id-parts-name">
+          <div class="nomenclature-id-part nomenclature-part-blue"><span>Species</span><code>Zm</code></div>
+          <span class="nomenclature-id-separator" aria-hidden="true">&ndash;</span>
+          <div class="nomenclature-id-part nomenclature-part-green"><span>Cultivar</span><code>ZZ99</code></div>
+          <span class="nomenclature-id-separator" aria-hidden="true">&ndash;</span>
+          <div class="nomenclature-id-part nomenclature-part-orange"><span>Sequencing group</span><code>XGROUP</code></div>
+          <span class="nomenclature-id-separator" aria-hidden="true">&ndash;</span>
+          <div class="nomenclature-id-part nomenclature-part-purple"><span>Version</span><code>1.0</code></div>
+        </div>
+      </div>
+      <p class="nomenclature-id-note"><strong>Pattern&#58;</strong> <code>&lt;species ID&gt;-&lt;cultivar&gt;-&lt;project&gt;-&lt;assembly version&gt;.&lt;sub-version&gt;</code></p>
+    </article>
+
+    <article class="nomenclature-id-card" aria-labelledby="summary-assembly-code-heading">
+      <div class="nomenclature-id-copy">
+        <span class="nomenclature-id-step" aria-hidden="true">02</span>
+        <div><h3 id="summary-assembly-code-heading">Genome assembly identifier</h3><p>The short identifier is a stable synonym for the assembly name and is assigned by MaizeGDB. The five-digit genome number identifies one genome; the version letter advances with every major or minor assembly update: <strong>a</strong> is the first version, <strong>b</strong> the next, and so on.</p></div>
+      </div>
+      <div class="nomenclature-id-diagram" aria-label="Genome assembly identifier: Zm00001e">
+        <div class="nomenclature-id-parts nomenclature-id-parts-code">
+          <div class="nomenclature-id-part nomenclature-part-blue"><span>Species ID</span><code>Zm</code></div>
+          <div class="nomenclature-id-part nomenclature-part-green"><span>Genome number</span><code>00001</code></div>
+          <div class="nomenclature-id-part nomenclature-part-orange"><span>Version letter</span><code>e</code></div>
+        </div>
+      </div>
+      <p class="nomenclature-id-note"><strong>Pattern&#58;</strong> <code>&lt;species ID&gt;&lt;five-digit genome number&gt;&lt;assembly version letter&gt;</code></p>
+    </article>
+
+    <article class="nomenclature-id-card" aria-labelledby="summary-gene-model-heading">
+      <div class="nomenclature-id-copy">
+        <span class="nomenclature-id-step" aria-hidden="true">03</span>
+        <div><h3 id="summary-gene-model-heading">Gene model and transcript</h3><p>A gene model starts with its assembly identifier, adds the annotation major-version letter, and ends in a six-digit model suffix. A transcript appends <strong>_T</strong> and a three-digit isoform number; a protein uses <strong>_P</strong> instead.</p></div>
+      </div>
+      <div class="nomenclature-id-diagram" aria-label="Transcript identifier: Zm00001ea036589_T001">
+        <div class="nomenclature-id-parts nomenclature-id-parts-gene">
+          <div class="nomenclature-id-part nomenclature-part-blue"><span>Subspecies ID</span><code>Zm</code></div>
+          <div class="nomenclature-id-part nomenclature-part-red"><span>Cultivar ID</span><code>00001</code></div>
+          <div class="nomenclature-id-part nomenclature-part-green"><span>Assembly version</span><code>e</code></div>
+          <div class="nomenclature-id-part nomenclature-part-orange"><span>Annotation version</span><code>a</code></div>
+          <div class="nomenclature-id-part nomenclature-part-purple"><span>Gene model suffix</span><code>036589</code></div>
+          <div class="nomenclature-id-part nomenclature-part-cyan"><span>Transcript number</span><code>_T001</code></div>
+        </div>
+      </div>
+      <div class="nomenclature-id-details">
+        <p><strong>Annotation set&#58;</strong> <code>Zm00001ea.1</code> means the first major annotation of assembly <code>Zm00001e</code>, first minor release. A new major annotation changes the letter; a minor release changes the number after the period while retained models keep their identifiers.</p>
+        <p><strong>Model behavior&#58;</strong> the six-digit suffix is unique within the assembly and allows gaps for later additions or splits. Transcript and protein numbers are not conserved across gene model set versions.</p>
+      </div>
+      <p class="nomenclature-id-note"><strong>Patterns&#58;</strong> gene model <code>Zm00001ea036589</code>; transcript <code>Zm00001ea036589_T001</code>; protein <code>Zm00001ea036589_P001</code></p>
+    </article>
+  </section>
+
+  <section id="summary-example" aria-labelledby="summary-example-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="summary-example-title">Worked example</h2></div>
+    </div>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table nomenclature-example-table">
+        <thead>
+          <tr><th scope="col">Identifier</th><th scope="col">What it names</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row"><code>Zm</code></th><td><i>Zea mays</i></td></tr>
+          <tr><th scope="row"><code>Zm00001</code></th><td><i>Zea mays</i> B73 reference genome \(CSHL / NAM project\)</td></tr>
+          <tr><th scope="row"><code>Zm00001e</code></th><td>Zm-B73-REFERENCE-NAM-5.0 \(B73 RefGen_v5\)</td></tr>
+          <tr><th scope="row"><code>Zm00001ea</code></th><td>Zm-B73-REFERENCE-NAM-5.0 annotation set 1.0</td></tr>
+          <tr><th scope="row"><code>Zm00001ea036589</code></th><td>Gene model \(<i>wx1</i>\) in B73 v5 a1</td></tr>
+          <tr><th scope="row"><code>Zm00001ea036589_T001</code></th><td>Transcript 001 for gene model \(<i>wx1</i>\) in B73 v5 a1</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="summary-related" class="mgdb-hub-related" aria-labelledby="summary-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="summary-related-title">Related resources</h2></div>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/nomenclature">
+          <strong>Maize genetics nomenclature</strong>
+          <span>The complete community standard for genes, alleles, gene products, markers and rearrangements</span>
+        </a>
+        <a href="https://documents.maizegdb.org/nomenclature/maize_assembly_nomenclature_2021.pdf">
+          <strong>Assembly nomenclature, 2021</strong>
+          <span>The whole-genome assembly and annotation naming document</span>
+        </a>
+        <a href="https://download.maizegdb.org/data_templates/Genome_metadata_template.v6.1.xlsx">
+          <strong>Genome metadata template</strong>
+          <span>The metadata required with a new assembly, version 6.1</span>
+        </a>
+        <a href="/genome">
+          <strong>Genome Data Hub</strong>
+          <span>The assemblies and annotations these identifiers version</span>
+        </a>
+        <a href="/contact">
+          <strong>Contact MaizeGDB</strong>
+          <span>Reach the naming authority before an assembly or annotation is released</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

@@ -24,33 +24,33 @@
   };
 
   var archives = [
-    {year:'2025', annual:67, location:'St. Louis, Missouri', url:'/mgc/maizemeeting/2025', image:'/images/maize_meeting/stlouis.png'},
-    {year:'2024', annual:66, location:'Raleigh, North Carolina', url:'/mgc/maizemeeting/2024', image:'/images/maize_meeting/raleigh.png'},
-    {year:'2023', annual:65, location:'St. Louis, Missouri', url:'/mgc/maizemeeting/2023', image:'/images/maize_meeting/stlouis.png'},
-    {year:'2022', annual:64, location:'St. Louis, Missouri', url:'/mgc/maizemeeting/2022', image:'/images/maize_meeting/stlouis.png'},
-    {year:'2021', annual:63, location:'Virtual', url:'/mgc/maizemeeting/2021', image:'/images/maize_meeting/virtual.jpg'},
-    {year:'v2020', annual:62, location:'Virtual', url:'/maize_meeting/v2020', note:'virtual meeting · 670 attendees', image:'/images/maize_meeting/virtual.jpg'},
+    {year:'2025', annual:67, location:'St. Louis, Missouri', url:'/mgc/maizemeeting/2025', image:'/images/maize_meeting/stlouis.png', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2025Program.pdf'},
+    {year:'2024', annual:66, location:'Raleigh, North Carolina', url:'/mgc/maizemeeting/2024', image:'/images/maize_meeting/raleigh.png', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2024Program.pdf'},
+    {year:'2023', annual:65, location:'St. Louis, Missouri', url:'/mgc/maizemeeting/2023', image:'/images/maize_meeting/stlouis.png', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2023Program.pdf'},
+    {year:'2022', annual:64, location:'St. Louis, Missouri', url:'/mgc/maizemeeting/2022', image:'/images/maize_meeting/stlouis.png', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2022Program.pdf'},
+    {year:'2021', annual:63, location:'Virtual', url:'/mgc/maizemeeting/2021', image:'/images/maize_meeting/virtual.jpg', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2021Program.pdf'},
+    {year:'v2020', annual:62, location:'Virtual', url:'/maize_meeting/v2020', note:'virtual meeting', image:'/images/maize_meeting/virtual.jpg', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2020Program.pdf'},
     {year:'2020', annual:62, location:'Keauhou Bay, Hawaii', url:'/maize_meeting/2020', note:'planned in-person meeting · canceled', canceled:true},
-    {year:'2019', annual:61, location:'St. Louis, Missouri', url:'/maize_meeting/2019', image:'/images/maize_meeting/stlouis.png'},
-    {year:'2018', annual:60, location:'Saint-Malo, France', url:'/maize_meeting/2018', image:'/images/maize_meeting/stmalo.png'},
-    {year:'2017', annual:59, location:'St. Louis, Missouri', url:'/maize_meeting/2017', image:'/images/maize_meeting/stlouis.png'},
-    {year:'2016', annual:58, location:'Jacksonville, Florida', url:'/maize_meeting/2016', image:'/images/maize_meeting/jacksonville.jpg'},
-    {year:'2015', annual:57, location:'St. Charles, Illinois', url:'/maize_meeting/2015', image:'/images/maize_meeting/chicago.jpg'},
-    {year:'2014', annual:56, location:'Beijing, China', url:'/maize_meeting/2014', image:'/images/maize_meeting/beijing.jpg'},
-    {year:'2013', annual:55, location:'St. Charles, Illinois', url:'/maize_meeting/2013', image:'/images/maize_meeting/chicago.jpg'},
-    {year:'2012', annual:54, location:'Portland, Oregon', url:'/maize_meeting/2012', image:'/images/maize_meeting/portland.jpg'},
-    {year:'2011', annual:53, location:'St. Charles, Illinois', url:'/maize_meeting/2011', image:'/images/maize_meeting/chicago.jpg'},
-    {year:'2010', annual:52, location:'Riva del Garda, Italy', url:'/maize_meeting/2010', image:'/images/maize_meeting/italy.jpg'},
-    {year:'2009', annual:51, location:'St. Charles, Illinois', url:'/maize_meeting/2009', image:'/images/maize_meeting/chicago.jpg'},
-    {year:'2008', annual:50, location:'Washington, DC', url:'/maize_meeting/2008', image:'/images/maize_meeting/dc.jpg'},
-    {year:'2007', annual:49, location:'St. Charles, Illinois', url:'/maize_meeting/2007', image:'/images/maize_meeting/chicago.jpg'},
-    {year:'2006', annual:48, location:'Pacific Grove, California', url:'/maize_meeting/2006', image:'/images/maize_meeting/asilomar.jpg'},
-    {year:'2005', annual:47, location:'Lake Geneva, Wisconsin', url:'/maize_meeting/2005', image:'/images/maize_meeting/geneva.jpg'},
-    {year:'2004', annual:46, location:'Mexico City, Mexico', url:'/maize_meeting/2004', image:'/images/maize_meeting/mexico.jpg'},
-    {year:'2003', annual:45, location:'Lake Geneva, Wisconsin', url:'/maize_meeting/2003', image:'/images/maize_meeting/geneva.jpg'},
-    {year:'2002', annual:44, location:'Kissimmee, Florida', url:'/maize_meeting/2002', image:'/images/maize_meeting/florida2.jpg'},
-    {year:'2001', annual:43, location:'Lake Geneva, Wisconsin', url:'/maize_meeting/2001', image:'/images/maize_meeting/geneva.jpg'},
-    {year:'2000', annual:42, location:"Coeur d'Alene, Idaho", url:'/maize_meeting/2000', image:'/images/maize_meeting/idaho.jpg'},
+    {year:'2019', annual:61, location:'St. Louis, Missouri', url:'/maize_meeting/2019', image:'/images/maize_meeting/stlouis.png', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2019Program.pdf'},
+    {year:'2018', annual:60, location:'Saint-Malo, France', url:'/maize_meeting/2018', image:'/images/maize_meeting/stmalo.png', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2018Program.pdf'},
+    {year:'2017', annual:59, location:'St. Louis, Missouri', url:'/maize_meeting/2017', image:'/images/maize_meeting/stlouis.png', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2017Program.pdf'},
+    {year:'2016', annual:58, location:'Jacksonville, Florida', url:'/maize_meeting/2016', image:'/images/maize_meeting/jacksonville.jpg', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2016Program.pdf'},
+    {year:'2015', annual:57, location:'St. Charles, Illinois', url:'/maize_meeting/2015', image:'/images/maize_meeting/chicago.jpg', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2015Program.pdf'},
+    {year:'2014', annual:56, location:'Beijing, China', url:'/maize_meeting/2014', image:'/images/maize_meeting/beijing.jpg', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2014Program.pdf'},
+    {year:'2013', annual:55, location:'St. Charles, Illinois', url:'/maize_meeting/2013', image:'/images/maize_meeting/chicago.jpg', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2013Program.pdf'},
+    {year:'2012', annual:54, location:'Portland, Oregon', url:'/maize_meeting/2012', image:'/images/maize_meeting/portland.jpg', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2012Program.pdf'},
+    {year:'2011', annual:53, location:'St. Charles, Illinois', url:'/maize_meeting/2011', image:'/images/maize_meeting/chicago.jpg', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2011Program.pdf'},
+    {year:'2010', annual:52, location:'Riva del Garda, Italy', url:'/maize_meeting/2010', image:'/images/maize_meeting/italy.jpg', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2010Program.pdf'},
+    {year:'2009', annual:51, location:'St. Charles, Illinois', url:'/maize_meeting/2009', image:'/images/maize_meeting/chicago.jpg', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2009Program.pdf'},
+    {year:'2008', annual:50, location:'Washington, DC', url:'/maize_meeting/2008', image:'/images/maize_meeting/dc.jpg', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2008Program.pdf'},
+    {year:'2007', annual:49, location:'St. Charles, Illinois', url:'/maize_meeting/2007', image:'/images/maize_meeting/chicago.jpg', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2007Program.pdf'},
+    {year:'2006', annual:48, location:'Pacific Grove, California', url:'/maize_meeting/2006', image:'/images/maize_meeting/asilomar.jpg', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2006Program.pdf'},
+    {year:'2005', annual:47, location:'Lake Geneva, Wisconsin', url:'/maize_meeting/2005', image:'/images/maize_meeting/geneva.jpg', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2005Program.pdf'},
+    {year:'2004', annual:46, location:'Mexico City, Mexico', url:'/maize_meeting/2004', image:'/images/maize_meeting/mexico.jpg', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2004Program.pdf'},
+    {year:'2003', annual:45, location:'Lake Geneva, Wisconsin', url:'/maize_meeting/2003', image:'/images/maize_meeting/geneva.jpg', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2003Program.pdf'},
+    {year:'2002', annual:44, location:'Kissimmee, Florida', url:'/maize_meeting/2002', image:'/images/maize_meeting/florida2.jpg', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2002Program.pdf'},
+    {year:'2001', annual:43, location:'Lake Geneva, Wisconsin', url:'/maize_meeting/2001', image:'/images/maize_meeting/geneva.jpg', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2001Program.pdf'},
+    {year:'2000', annual:42, location:"Coeur d'Alene, Idaho", url:'/maize_meeting/2000', image:'/images/maize_meeting/idaho.jpg', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2000Program.pdf'},
     {year:'1999', annual:41, location:'Lake Geneva, Wisconsin', url:'/maize_meeting/1999', image:'/images/maize_meeting/geneva.jpg'},
     {year:'1998', annual:40, location:'Lake Geneva, Wisconsin', url:'/maize_meeting/1998', image:'/images/maize_meeting/geneva.jpg'},
     {year:'1997', annual:39, location:'Clearwater Beach, Florida', url:'/maize_meeting/1997', image:'/images/maize_meeting/florida1.jpg'},
@@ -129,14 +129,19 @@
       var media = row.image
         ? '<span class="meeting-archive-thumb"><img src="' + photoUrl(row.image) + '" alt="" loading="lazy" /></span>'
         : '<span class="meeting-archive-thumb meeting-archive-placeholder" aria-hidden="true">Canceled</span>';
-      var credit = creditFor(row.image);
-      var creditHtml = credit
-        ? '<span class="meeting-archive-credit">Photo: ' + escapeHtml(credit.creator) + ' / ' + escapeHtml(credit.license) + '</span>'
-        : '';
-      return '<a href="' + row.url + '"' + (row.canceled ? ' class="is-canceled"' : '') + '>' + media
+      /* The card is no longer one big link: it carries two of its own -- the
+         archived meeting website and the abstract book -- and a link inside a
+         link is not markup a browser will honour. The photographer credit that
+         used to sit here is gone; it is repeated in full under Photograph
+         credits below, and this is space the links needed. */
+      var links = '<a class="meeting-archive-link" href="' + row.url + '">Website</a>';
+      if (row.abstracts) {
+        links += '<a class="meeting-archive-link" href="' + row.abstracts + '" target="_blank" rel="noopener">Abstract book <span aria-hidden="true">&nearr;</span></a>';
+      }
+      return '<article class="meeting-archive-card' + (row.canceled ? ' is-canceled' : '') + '">' + media
         + '<span class="meeting-archive-copy"><span class="meeting-archive-year">' + row.year
         + '</span><strong>' + row.location + '</strong><small>' + note + '</small>'
-        + creditHtml + '</span></a>';
+        + '<span class="meeting-archive-links">' + links + '</span></span></article>';
     }).join('');
     byId('meeting-archive-count').textContent = visible.length + (visible.length === 1 ? ' site shown' : ' sites shown');
     byId('meeting-archive-clear').hidden = !query;
@@ -186,7 +191,7 @@
       paper_bgcolor: 'rgba(0,0,0,0)',
       plot_bgcolor: 'rgba(0,0,0,0)',
       font: {family: 'Arial, sans-serif', size: 9, color: '#68716b'},
-      hoverlabel: {bgcolor: '#ffffff', bordercolor: '#e2ddd3'},
+      hoverlabel: {bgcolor: '#ffffff', bordercolor: '#c9cfc6', font: {color: '#1b2a20', size: 12}},
       showlegend: true,
       legend: {orientation: 'h', x: 0, y: 1.11, font: {size: 8}}
     };
@@ -232,7 +237,17 @@
     ]});
   }
 
+  /* The tab bar is new on this page. Shared behaviour rather than another
+     hand-rolled spy; `watch` is the archive grid, which changes height as the
+     period filter narrows it. */
+  function initTabs() {
+    if (window.MGDB && window.MGDB.sectionTabs) {
+      window.MGDB.sectionTabs({ watch: '#meeting-archive-grid' });
+    }
+  }
+
   function initialize() {
+    initTabs();
     if (!byId('meeting-title')) return;
     if (byId('meeting-archive-query')) {
       byId('meeting-archive-query').addEventListener('input', renderArchive);

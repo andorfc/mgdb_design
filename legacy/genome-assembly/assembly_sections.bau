@@ -1,0 +1,141 @@
+$$SYNTAX-LEVEL 2
+*(assembly
+<script language="javascript">
+  recordAccess('genome', '$(record_name)'\);
+</script>
+
+<table cellpadding=0 cellspacing=0>
+  <tr>
+    <td>
+      <!-- Top heading-->
+      <div id="centercolumn_record">
+        <div align="right">
+          <a href="/">Home</a> >
+          <a href="/genome">Genome Center</a> >
+          <a href="/genome/assembly/$(record_name)">$(record_name)</a>
+        </div>
+        <br>
+        <table width='100%'  cellpadding=0 cellspacing=0>
+          <tr valign='center' class='green_curve_background'>
+            <td align='left'>
+              <img src='/images/header_left.gif'>
+            </td>
+            <td width='97%' valign='center' class='green_curve_background'>
+              $(record_name) genome assembly
+            </td>
+            <td align='right'>
+              <img src='/images/header_right.gif'>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- project detail tab -->
+      <div id='detail_tab' name='detail_tab' style='display: inline'>
+        <table width="95%">
+          <tr height='10px'>
+            <td class='genome_center_tab genome_center_tab_focus' align="center">
+              &nbsp;&nbsp;&nbsp;Project Details &nbsp;&nbsp;&nbsp;
+            </td>
+            <td onclick="setGenomeTab('metadata_tab'\)"
+                class='genome_center_tab genome_center_tab_unfocus' align="center">
+              &nbsp;&nbsp;&nbsp;Metadata &nbsp;&nbsp;&nbsp;
+            </td>
+            <td onclick="setGenomeTab('browser_tab'\)"
+                class='genome_center_tab genome_center_tab_unfocus' align="center">
+              &nbsp;&nbsp;&nbsp;Browser &nbsp;&nbsp;&nbsp;
+            </td>
+            <td width='25%' style='align: right;'>
+              &nbsp;&nbsp;&nbsp;
+            </td>
+          </tr>
+        </table>
+
+        *(main_section_project_details)
+      </div> <!-- project detail tab-->
+      
+      <!-- metadata tab-->
+      <div id='metadata_tab' name='metadata_tab' style='display:none'>
+        <table width="95%">
+          <tr height='10px'>
+            @(assembly-detail-tab-metadata {display:off}
+              <td onclick="setGenomeTab('detail_tab'\)"
+                  class='genome_center_tab genome_center_tab_unfocus' align="center">
+                &nbsp;&nbsp;&nbsp;Project Details &nbsp;&nbsp;&nbsp;
+              </td>
+            )
+            <td class='genome_center_tab genome_center_tab_focus' align="center">
+              &nbsp;&nbsp;&nbsp;Metadata &nbsp;&nbsp;&nbsp;
+            </td>
+            <td onclick="setGenomeTab('browser_tab'\)"
+                class='genome_center_tab genome_center_tab_unfocus' align="center">
+              &nbsp;&nbsp;&nbsp;Browser $(locus_name)&nbsp;&nbsp;&nbsp;
+            </td>
+            <td width='25%' style='align: right;'>
+              &nbsp;&nbsp;&nbsp;
+            </td>
+          </tr>
+        </table>
+
+        *(main_section_metadata)
+      </div> <!-- metadata tab-->
+
+      <!-- browser tab-->
+      <div id='browser_tab' name='browser_tab' style='display:none'>
+        <table width="95%">
+          <tr height='10px'>
+            @(assembly-detail-tab-browser {display:off}
+              <td onclick="setGenomeTab('detail_tab'\)"
+                  class='genome_center_tab genome_center_tab_unfocus' align="center">
+                &nbsp;&nbsp;&nbsp;Project details &nbsp;&nbsp;&nbsp;
+              </td>
+            )
+            <td onclick="setGenomeTab('metadata_tab'\)"
+                class='genome_center_tab genome_center_tab_unfocus' align="center">
+              &nbsp;&nbsp;&nbsp;Metadata &nbsp;&nbsp;&nbsp;
+            </td>
+            <td class='genome_center_tab genome_center_tab_focus' align="center">
+              &nbsp;&nbsp;&nbsp;Browser &nbsp;&nbsp;&nbsp;
+            </td>
+            <td width='25%' style='align: right'>
+              &nbsp;&nbsp;&nbsp;
+            </td>
+          </tr>
+        </table>
+
+        @(main_section_browser {display:off}
+          <div id="loading_gbrowse" name="loading_gbrowse">
+            <br><br>
+            <center><img src='/images/cornloading_trans.gif'></center>
+          </div>
+          <div style="vertical-align:middle;display:inline-block;border:solid 1px #AAAAAA;border-radius:15px;
+                           padding:2px 10px 5px 10px;height:16px;text-align: center; margin: 1px 5px 5px 5px;background-color: #07528A;color: white; 
+                           font-size: 14px;">
+            <a href="$(browser-link)" target="_blank" style="color: white">View the browser in full screen</a>
+          </div>
+          <div style='font-weight: bold; color: crimson;'></div>
+          <iframe id="browser-frame" name="browser-frame" 
+            height="1050px" width="100%" frameborder=0           
+            src="$(browser-link)" 
+            onload="document.getElementById('loading_gbrowse'\).style.display='none';">
+          </iframe>
+        
+          <script language="JavaScript">
+            setGenomeTab('browser_tab'\);
+          </script>
+        )
+        
+        @(no-browser {display:off}
+          <h2>Genome browser is not available for assembly $(record_name)</h2>
+          
+          <script language="JavaScript">
+            setGenomeTab('metadata_tab'\);
+          </script>
+        )
+      </div> <!-- browser tab-->
+        
+    </td>
+  </tr>
+</table>
+
+)

@@ -85,6 +85,29 @@
     exit;
   }
 
+  // Retired 2026-09-04 (Carson: old or broken).
+  //
+  // mapped_accession took up to 50 comma- or space-delimited sequence accession
+  // numbers and reported which were mapped, to which locus, and where. The
+  // Locus Data Hub answers the same question from the same corpus, and is the
+  // only page that linked it -- templates/data_center/sequence-search-left.bau,
+  // part of the sequence page retired alongside it.
+  //
+  // sequence was the legacy Sequence Data hub: a links page to the B73, Mo17
+  // and Palomero project pages and a simple accession search. Assemblies and
+  // their sequence now live on the Genome Data Hub.
+  //
+  // Rollback: delete the block. Both pages are untouched at
+  // controllers/data_center/<page>.php.
+  if (PAGE == 'mapped_accession') {
+    header('Location: /data_center/locus', true, 301);
+    exit;
+  }
+  if (PAGE == 'sequence') {
+    header('Location: /genome', true, 301);
+    exit;
+  }
+
   /* Stock record pages, on the shared record shell. An identifier that does
      not resolve gets a real 404 from the modern controller rather than falling
      through, so this block answers every stock id.

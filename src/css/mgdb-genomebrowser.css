@@ -930,19 +930,22 @@
 .mgdb-genomebrowser-page .mgdb-panel-title { margin-top: 0; }
 
 
-/* Banded sections — gold trial, 2026-09-03 --------------------------------
+/* Banded sections — gold. Kept, 2026-09-04 (Carson) ----------------------
 
-   Second of two options put side by side. The first used the page ground and
-   was rejected: because the section fill then matched the page fill, the
-   section stopped reading as a card and became an outlined region. This one
-   uses --mgdb-gold-soft, which keeps the section a distinct panel *and* lifts
-   the white cards inside it — measured 1.077 against a white card, where the
-   ground was 1.074 and the very light cream 1.052.
+   Second of two options put side by side, and the one chosen. The first used
+   the page ground and was rejected: because the section fill then matched the
+   page fill, the section stopped reading as a card and became an outlined
+   region. This one uses --mgdb-gold-soft, which keeps the section a distinct
+   panel *and* lifts the white cards inside it — measured 1.077 against a white
+   card, where the ground was 1.074 and the very light cream 1.052.
 
-   Same rule as before, so the two are comparable: a section whose content is a
-   grid of cards is banded; prose, form, table and metric sections stay white.
-   That is JBrowse 2, JBrowse 1 and Legacy GBrowse. Related Resources keeps the
-   shell's green wash. */
+   Which sections band: one whose content is a grid of cards. Prose, form,
+   table and metric sections stay white. That is JBrowse 2, JBrowse 1 and
+   Legacy GBrowse. Related Resources keeps the shell's green wash.
+
+   This is a per-page treatment, not part of the shell. Nothing in
+   css/mgdb-hub.css changed for it, so no other hub is affected; a page opts in
+   by putting `browser-band` on a section and writing its own rule. */
 .mgdb-genomebrowser-page > section.browser-band { background: var(--mgdb-gold-soft); }
 
 /* This box carries the page ground, which on a gold band reads as a cold patch

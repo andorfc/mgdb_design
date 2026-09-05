@@ -17,7 +17,7 @@ header("Cache-Control: no-cache, no-store, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-$bauplan = new Bauplan('History of Maize Genetics & MaizeGDB Timelines | Community Milestones');
+$bauplan = new Bauplan('Maize genetics community history | MaizeGDB');
 $bauplan->modern();
 
 $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';
@@ -30,11 +30,13 @@ $bauplan->preHTML('<meta http-equiv="Content-Type" content="text/html; charset=u
 $bauplan->includeCss('/css/static.css');
 $bauplan->includeCss('/css/mgdb-modern.css');
 $bauplan->includeCss('/css/mgdb-megamenu.css');
+// The Data Hub shell, before the page sheet so the page can override it.
+$bauplan->includeCss('/css/mgdb-hub.css');
 $bauplan->includeCss('/css/mgdb-history.css?v=' . $v_css);
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
 $bauplan->includeScript('/js/mgdb-history.js?v=' . $v_js);
-$bauplan->head('<meta name="description" content="Explore the history of maize genetics research, landmark breakthroughs, community meetings, cooperative resources, and the evolution of the MaizeGDB database infrastructure.">');
+$bauplan->head('<meta name="description" content="The history of the maize genetics community: the cornfabs and the 1929 letter it began with, the annual meeting, the Maize Genetics Cooperation and the Executive Committee before it, MaizeGDB, and a century of research milestones.">');
 
 $mgdb = $bauplan->template()->load('templates/maizegdb-main-modern.bau');
 $mgdb->get('megamenu')->load('templates/home/maizegdb_header_modern.bau');

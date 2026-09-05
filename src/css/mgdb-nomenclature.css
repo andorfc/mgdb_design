@@ -342,3 +342,57 @@
 @media (max-width: 480px) {
   .mgdb-modern .nomenclature-hero-emblem { display: none; }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   /nomenclature_summary — the short assembly and annotation page
+   --------------------------------------------------------------------------
+   This page shares this sheet rather than carrying one of its own: it is built
+   from the same identifier diagram components as /nomenclature's primer
+   (.nomenclature-id-*, .nomenclature-part-*, .nomenclature-symbol-stack), all
+   of which are scoped to .mgdb-modern and so apply anywhere. Only the page
+   furniture below is its own — the tab bar, the ground, the section cards and
+   their coloured edges all come from css/mgdb-hub.css, so nothing here
+   restates them.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.mgdb-modern .mgdb-nomenclature-summary-page { padding-bottom: clamp(3rem, 6vw, 5.5rem); }
+
+.mgdb-nomenclature-summary-page .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-nomenclature-summary-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+/* Four short labels keep this bar on one row at every width -- measured 57px
+   at 1280, 1100, 900, 768 and 375, where mgdb-modern.css has already turned it
+   into a scrolling rail. The shell's ladder steps to 113px below 1170 because
+   it assumes a bar that has wrapped to two rows by then, so on this page every
+   jump below that width would park its heading 48px lower than it needs to.
+   One row, one offset. */
+.mgdb-hub-page.mgdb-nomenclature-summary-page > section[id] { scroll-margin-top: 65px; }
+
+/* The shared reset zeroes every paragraph margin, so prose has to restate its
+   own rhythm. Measured against the source page's <br>-separated paragraphs. */
+.mgdb-nomenclature-summary-page .nomenclature-summary-prose { max-width: 62rem; }
+.mgdb-nomenclature-summary-page .nomenclature-summary-prose > p { line-height: 1.68; }
+.mgdb-nomenclature-summary-page .nomenclature-summary-prose > p + p { margin-top: 1rem; }
+
+/* Identifiers read as identifiers wherever they appear on this page: the same
+   monospace and burgundy the id-card notes already use. */
+.mgdb-nomenclature-summary-page .nomenclature-example-table code {
+  font-family: var(--mgdb-font-mono);
+  font-size: 0.86em;
+  color: var(--mgdb-burgundy);
+  overflow-wrap: anywhere;
+}
+
+.mgdb-nomenclature-summary-page .nomenclature-example-table th[scope="row"] { white-space: nowrap; }
+
+@media (max-width: 560px) {
+  .mgdb-nomenclature-summary-page .nomenclature-example-table th[scope="row"] { white-space: normal; }
+}
+
+@media (max-width: 480px) {
+  .mgdb-modern .mgdb-nomenclature-summary-page .mgdb-hero-emblem { display: none; }
+}
