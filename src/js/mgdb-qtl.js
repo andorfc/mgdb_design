@@ -346,7 +346,10 @@
     if (!item.experiment_name) {
       return '<td class="mgdb-muted">&mdash;</td>';
     }
-    var link = item.exp_id ? '<a href="/data_center/qtl_exp?id=' + item.exp_id + '">' + esc(item.experiment_name) + '</a>' : esc(item.experiment_name);
+    /* The experiment goes to /data_center/qtl, which is the modern QTL
+       experiment record. /data_center/qtl_exp, which this used to link, is
+       the legacy page for the same row. */
+    var link = item.exp_id ? '<a href="/data_center/qtl?id=' + item.exp_id + '">' + esc(item.experiment_name) + '</a>' : esc(item.experiment_name);
     return '<td>' + link + '</td>';
   }
 

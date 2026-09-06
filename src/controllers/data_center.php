@@ -283,6 +283,17 @@
     }
   }
 
+  /* QTL experiment record page. The id may be the experiment's own or that of
+     a trait analysis belonging to one -- the QTL hub searches trait analyses,
+     so its result links carry the latter, and before 2026-09-06 every one of
+     them reached the legacy page's "not found" with HTTP 200. The resolver in
+     include/qtl_record_lib.php accepts both. */
+  if (PAGE == 'qtl' && getCGIParam('id', 'G', ID)) {
+    if (include('controllers/data_center/qtl_record_modern.php')) {
+      return;
+    }
+  }
+
   /* Term and trait are one record over mgdb.term, drawn two ways by the legacy
      pages. Both routes reach the same modern page, which shows whichever
      sections have rows; the route decides only the noun in the title. */

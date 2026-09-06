@@ -50,19 +50,24 @@ $$SYNTAX-LEVEL 2
         <div class="qtl-search-input-wrap">
           <input class="mgdb-input" id="qtl-search-term" name="term" type="search" placeholder="e.g., kernel weight, plant height, anthesis, yield, B73 x Mo17, Schon" autocomplete="off" />
         </div>
-        <p class="mgdb-hint">
-          <span>Try an example&#58;</span>
-          <button type="button" class="qtl-example-btn" data-term="kernel weight">kernel weight</button>
-          <button type="button" class="qtl-example-btn" data-term="anthesis">anthesis</button>
-          <button type="button" class="qtl-example-btn" data-term="plant height">plant height</button>
-          <button type="button" class="qtl-example-btn" data-term="borer">corn borer</button>
-        </p>
       </div>
-
 
       <div class="mgdb-hub-field mgdb-hub-field-action">
         <button class="mgdb-button mgdb-button-primary" type="submit">Search QTLs</button>
       </div>
+
+      ;; The examples sit on their own full-width row rather than inside the
+      ;; query field. The form is `align-items: end`, so while this paragraph
+      ;; was a child of that field the Search button bottom-aligned to the
+      ;; field -- label, input and hint -- and sat 26px below the search bar,
+      ;; which is exactly this line's 22px plus the field's 4px gap.
+      <p class="mgdb-hint qtl-example-row">
+        <span>Try an example&#58;</span>
+        <button type="button" class="qtl-example-btn" data-term="kernel weight">kernel weight</button>
+        <button type="button" class="qtl-example-btn" data-term="anthesis">anthesis</button>
+        <button type="button" class="qtl-example-btn" data-term="plant height">plant height</button>
+        <button type="button" class="qtl-example-btn" data-term="borer">corn borer</button>
+      </p>
 
       <details class="qtl-adv" id="qtl-adv">
         <summary>

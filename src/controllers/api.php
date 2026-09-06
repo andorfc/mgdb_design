@@ -248,6 +248,12 @@ function api_record_types() {
       'example' => $base . '/api/v1/records/map_scores/1181'
     ),
     array(
+      'type' => 'qtl',
+      'description' => 'QTL experiments: the mapping panel and marker set behind a study, one entry per trait evaluated with the method and environment it was scored under, and the QTL detected with the statistics reported for each. A trait analysis id resolves to the experiment that owns it.',
+      'href' => $base . '/api/v1/records/qtl/{id}',
+      'example' => $base . '/api/v1/records/qtl/86159'
+    ),
+    array(
       'type' => 'term',
       'description' => 'Controlled-vocabulary terms across 105 types -- traits, body parts, chemicals, methods, keywords -- with their definitions, synonyms, related terms, and the phenotypes and QTL analyses that use them.',
       'href' => $base . '/api/v1/records/term/{id}',

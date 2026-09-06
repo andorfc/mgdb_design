@@ -1,0 +1,110 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-qtl-record
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:title" content="$(record_name) &mdash; MaizeGDB QTL experiment">
+<meta property="og:description" content="$(record_summary)">
+
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-qtl-record-page" id="qtl-record-top" data-record-id="$(record_id)" data-requested-id="$(requested_identifier)" data-analysis-id="$(analysis_id)">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/qtl">QTL Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(record_name)</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-hero" aria-labelledby="qtl-record-title">
+    <div class="mgdb-hero-body">
+      <h1 id="qtl-record-title">$(record_name)</h1>
+      <p class="mgdb-rec-synonyms" id="qtl-record-synonyms" hidden></p>
+      <dl class="mgdb-record-facts mgdb-rec-headfacts" id="qtl-record-facts">$(identity_facts)</dl>
+    </div>
+  </section>
+
+  ;; Shown only when the reader arrived on a trait analysis id rather than the
+  ;; experiment's own. The QTL hub searches trait analyses, so its result links
+  ;; carry that id; saying so is better than silently showing a record whose
+  ;; name does not match the link that was followed.
+  @(analysis_notice {display: off}
+  <div class="mgdb-message mgdb-message-info" id="qtl-record-context" role="status">
+    <div>
+      <strong>$(analysis_name) is one trait evaluated in this experiment.</strong>
+      <span>Its method, design and environment are in <a href="#qtl-record-evaluations">Traits evaluated</a> below, alongside the other traits scored in the same study.</span>
+    </div>
+  </div>
+  )
+
+  <nav class="mgdb-section-tabs mgdb-rec-tabs" id="qtl-record-tabs" aria-label="Sections on this record">
+    <a href="#qtl-record-overview">Overview</a>
+  </nav>
+
+  <div class="mgdb-loading" id="qtl-record-loading"><span class="mgdb-spinner" aria-hidden="true"></span><span>Loading the full record&hellip;</span></div>
+
+  <div class="mgdb-message mgdb-message-error" id="qtl-record-error" role="alert" hidden>
+    <div>
+      <strong>The rest of this record could not be loaded.</strong>
+      <span>The identity above is correct. Reload to try again, or report it if it keeps happening.</span>
+      <button class="mgdb-button mgdb-button-secondary" id="qtl-record-retry" type="button">Retry</button>
+    </div>
+  </div>
+
+  <section id="qtl-record-overview" aria-labelledby="qtl-record-overview-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="qtl-record-overview-title">Overview</h2></div></div>
+    <div id="qtl-record-overview-body"></div>
+  </section>
+
+  <section id="qtl-record-evaluations" aria-labelledby="qtl-record-evaluations-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="qtl-record-evaluations-title">Traits evaluated</h2></div></div>
+    <div id="qtl-record-evaluations-body"></div>
+  </section>
+
+  <section id="qtl-record-loci" aria-labelledby="qtl-record-loci-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="qtl-record-loci-title">QTL detected</h2></div></div>
+    <div id="qtl-record-loci-body"></div>
+  </section>
+
+  <section id="qtl-record-maps" aria-labelledby="qtl-record-maps-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="qtl-record-maps-title">Maps</h2></div></div>
+    <div id="qtl-record-maps-body"></div>
+  </section>
+
+  <section id="qtl-record-references" aria-labelledby="qtl-record-references-title" hidden>
+    <div class="mgdb-section-heading"><div><h2 id="qtl-record-references-title">References</h2></div></div>
+    <div id="qtl-record-references-body"></div>
+  </section>
+
+  <section class="mgdb-hub-related" id="qtl-record-resources" aria-labelledby="qtl-record-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="qtl-record-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/qtl">
+          <strong>QTL Data Hub</strong>
+          <span>Every trait evaluated in a maize mapping study, searchable by trait, experiment or parent</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>The QTL loci this study detected, and where they map</span>
+        </a>
+        <a href="/data_center/stock">
+          <strong>Stock Data Hub</strong>
+          <span>The mapping panel and the parent lines behind it</span>
+        </a>
+        <a href="/data_center/phenotype">
+          <strong>Traits and Phenotypes Data Hub</strong>
+          <span>The traits scored here, and what else has been recorded against them</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="mgdb-rec-api mgdb-hub-tone-blue" id="qtl-record-api" aria-labelledby="qtl-record-api-title">
+    <div class="mgdb-section-heading"><div><h2 id="qtl-record-api-title">API data access</h2></div></div>
+    <div class="mgdb-rec-api-row">
+      <code id="qtl-record-api-endpoint">GET /api/v1/records/qtl/$(requested_identifier)</code>
+      <div class="mgdb-rec-api-actions">
+        <a class="mgdb-button mgdb-button-quiet" id="qtl-record-api-link" href="/api/v1/records/qtl/$(requested_identifier_path)" target="_blank" rel="noopener">Raw JSON <span aria-hidden="true">&nearr;</span></a>
+        <button class="mgdb-button mgdb-button-quiet" id="qtl-copy-json-btn" type="button">Copy JSON</button>
+        <a class="mgdb-button mgdb-button-quiet" href="/api/v1/openapi">API documentation</a>
+      </div>
+    </div>
+    <p class="mgdb-rec-api-note">Every trait, statistic and QTL on this page is retrieved in one structured JSON response.</p>
+  </section>
+</main>
+)

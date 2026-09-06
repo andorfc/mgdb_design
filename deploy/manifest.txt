@@ -503,6 +503,20 @@ src/data/projects/interpro_domain_atlas/figures/fig_class_variation.png         
 src/data/projects/interpro_domain_atlas/figures/fig_immunity_classes.png        data/projects/interpro_domain_atlas/figures/fig_immunity_classes.png
 src/data/projects/interpro_domain_atlas/figures/fig_nlr_subclass.png            data/projects/interpro_domain_atlas/figures/fig_nlr_subclass.png
 
+# QTL experiment record page (/data_center/qtl?id=...). Replaces the legacy
+# record_data/qtl_data.php sections. The hub's result links used to carry a
+# trait_analysis id into this route, which reads qtl_exp, so every one of them
+# answered "Qtl record not found" with HTTP 200; the resolver here accepts both
+# id spaces. See README, "The QTL hub linked an id the record page could not
+# read".
+src/include/qtl_record_lib.php                         include/qtl_record_lib.php
+src/include/api/v1/records/qtl.php                     include/api/v1/records/qtl.php
+src/controllers/data_center/qtl_record_modern.php      controllers/data_center/qtl_record_modern.php
+src/templates/static/mgdb_qtl_record.bau               templates/static/mgdb_qtl_record.bau
+src/templates/static/mgdb_qtl_notfound.bau             templates/static/mgdb_qtl_notfound.bau
+src/js/mgdb-qtl-record.js                              js/mgdb-qtl-record.js
+src/css/mgdb-qtl-record.css                            css/mgdb-qtl-record.css
+
 # Redesign status — /redesign_status. The JSON is written by
 # tools/redesign_status.py; rerun it before deploying this group.
 src/controllers/redesign_status.php                    controllers/redesign_status.php

@@ -3670,6 +3670,81 @@ everything past the tenth is one bar, carrying no id so a click on it is inert.
 The corpus is small and the search was already fast &#40;12-16 ms&#41;, so there was no
 SQL work to do here beyond the export.
 
+### The QTL hub linked an id the record page could not read
+
+Found 2026-09-06, from Carson: "the search results in QTL go to broken pages".
+Every one of them did.
+
+The hub searches `mgdb.trait_analysis` — one row per trait evaluated per
+experiment, which is what its result table shows: `plht14`, plant height,
+Abler 1991f. It built each result link as `/data_center/qtl?id=<trait_analysis
+id>`. But `/data_center/qtl` reads `mgdb.qtl_exp`. **The two id spaces do not
+overlap**, so every result led to "Qtl record not found" — and the legacy page
+answered that with **HTTP 200**, so nothing on the site or in the logs showed a
+broken link. Two different ids rendered byte-for-byte identical pages, which is
+what makes it easy to miss: the page looked like a page.
+
+The experiment link in the same table went to `/data_center/qtl_exp?id=`, which
+resolved but was the legacy record for a row the hub already owns.
+
+**What was built instead of repointing the link.** There was no modern record
+page for either type, so Carson's call was to build the substantial one: the
+**QTL experiment** record at `/data_center/qtl?id=`. The experiment is where the
+mapping panel, marker summary, contributors, detected QTL and the study's own
+caveats live; the trait analysis is five fields, all of which are a row of the
+experiment's Traits evaluated table. One modern page therefore replaces two
+legacy ones — `/data_center/qtl` and `/data_center/trait_analysis`.
+
+**Both id spaces resolve.** `qtlResolveId()` tries the experiment's own id
+first, then a trait analysis id, then name and synonym. A hub link keeps
+carrying the analysis id, deliberately: sending the experiment id instead would
+lose which trait the reader clicked. Arriving that way, the page names the
+analysis in a notice and marks its row, rather than silently showing a record
+whose title does not match the link that was followed.
+
+**Three rows cannot be linked at all, and are no longer offered as links.**
+Of 211 curated analyses, 208 reach a curated experiment. Two record no
+experiment (`anthsr1`, `maysin1`) and one belongs to an experiment held at
+curation level 10. `buildNameCell` already renders an unlinked name when a row
+has no `url`, so the fix was to stop emitting one — a name that is not a link
+beats a link to a 404.
+
+**Two silent defects in the legacy queries, fixed on the way past.** Its trait
+evaluation query inner-joined `qtl_link_analysis`, so an analysis with no
+linkage analysis vanished from the table (6 of 243) and one with two was listed
+twice (2 of them). It is a LEFT JOIN with the linkage analyses aggregated here,
+so every analysis appears exactly once carrying however many it has. Its bin
+lookup took whatever row an unordered query returned first; it is ordered now.
+
+**One query where the page ran four.** The legacy page fetched `top`,
+`overview`, `annotations` and `detected_QTL_Loci` as separate Ajax calls, plus a
+`cache_data.php` POST that answers **403**, and inside those ran a bin lookup
+per locus, an environment lookup per trait and a person and term lookup per
+contributor. The record page makes one request to `/api/v1/records/qtl/{id}`.
+
+**A 420 ms join, from a cast in the wrong direction.** `qtl_link_exp.high_score_var`
+is `numeric` and `variation.id` is `bigint`, so Postgres cast the *column* and
+scanned all of `mgdb.variation` — 21,316 buffers for four rows. Casting the
+value instead (`hv.id = le.high_score_var::bigint`) keeps the primary key: 8 ms.
+
+### The Search QTLs button sat 26px below the search bar
+
+The same fault as the stock hub a day earlier. The form is `align-items: end`
+and the example line was a child of the query field, so the button
+bottom-aligned to the field — label, input and examples — rather than to the
+input. The 26px is exactly the line's 22px plus the field's 4px gap. The line
+moved onto its own full-width row, which fixes it structurally: both are 44px
+and land on each other, and the line can wrap at narrow widths without pushing
+the button off again. Measured after: top 681 / bottom 725 for both at 1280 and
+at 900, and at 375 the form stacks bar, button, examples with the page itself
+not scrolling sideways.
+
+**Not a bug:** a Plotly figure measured 700px wide at 375px during this work,
+which looked like a responsive failure. It was an artifact of changing the
+emulated viewport after the chart had been drawn — `Plotly.Plots.resize` is
+debounced by 150ms. On a fresh 375px load the plot is 259px inside a 309px
+container and the page does not scroll horizontally.
+
 ## The Stock Data Hub
 
 `/data_center/stock` joined the shell on 2026-09-02, finishing the partial

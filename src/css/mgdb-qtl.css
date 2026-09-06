@@ -94,6 +94,22 @@
 .mgdb-qtl-page .qtl-search-form > .mgdb-hub-field-action { grid-column: 2; }
 .mgdb-qtl-page .qtl-adv { grid-column: 1 / -1; }
 
+/* The example line is a row of the search grid, not a child of the query
+   field. While it sat inside that field, `align-items: end` bottom-aligned the
+   Search button to the field rather than to the input, putting the button 26px
+   below the search bar -- the line's 22px plus the field's 4px gap. On its own
+   row both are 44px and land on each other, and the line is free to wrap at
+   narrow widths without moving the button again, which a fixed offset would
+   not have survived.
+
+   The negative top margin cancels most of the form's 16px row gap so the line
+   still sits just under the bar, where it was. */
+.mgdb-qtl-page .qtl-search-form > .qtl-example-row {
+  grid-column: 1 / -1;
+  margin: calc(-1 * var(--mgdb-space-2)) 0 0;
+}
+
+
 .mgdb-qtl-page .qtl-example-btn {
   display: inline-block;
   margin: 0 var(--mgdb-space-1);

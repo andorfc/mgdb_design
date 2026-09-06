@@ -1,0 +1,43 @@
+/* file: css/mgdb-qtl-record.css
+ *
+ * The QTL experiment record page. Everything structural comes from
+ * mgdb-hub.css and mgdb-record.css; this file carries only what is particular
+ * to this record.
+ */
+
+/* The row a hub result asked for.
+   The QTL hub searches trait analyses, so a result link names one row of the
+   Traits evaluated table rather than the page as a whole. The page opens with
+   a notice saying which, and this marks the row so the eye lands on it. A left
+   edge rather than a fill, because the table is already zebra-striped and a
+   background would fight it on every other row. */
+.mgdb-qtl-record-page .qtl-row-current > *:first-child {
+  box-shadow: inset 3px 0 0 var(--mgdb-green-dark);
+}
+
+.mgdb-qtl-record-page .qtl-row-current > * {
+  background: var(--mgdb-green-pale, #eef4ea);
+}
+
+/* R-squared and the effect sizes are read down the column, so the digits line
+   up rather than drifting with the glyph widths. */
+.mgdb-qtl-record-page .mgdb-table td:nth-child(4),
+.mgdb-qtl-record-page .mgdb-table td:nth-child(5) {
+  font-variant-numeric: tabular-nums;
+}
+
+/* The evaluation method and design are full sentences from the paper, so the
+   table needs its columns to keep some width rather than collapsing them to
+   one word per line. The wrapper in mgdb-record.css already scrolls. */
+.mgdb-qtl-record-page .mgdb-table th:nth-child(3),
+.mgdb-qtl-record-page .mgdb-table td:nth-child(3),
+.mgdb-qtl-record-page .mgdb-table th:nth-child(4),
+.mgdb-qtl-record-page .mgdb-table td:nth-child(4) {
+  min-width: 14rem;
+}
+
+/* The notice sits between the hero and the tab bar, so it needs the tab bar's
+   own top spacing rather than butting against the hero. */
+.mgdb-qtl-record-page #qtl-record-context {
+  margin-top: var(--mgdb-space-4);
+}
