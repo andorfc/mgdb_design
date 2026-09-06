@@ -14,7 +14,12 @@
    site's Okabe-Ito chart palette for the same reason.
    ========================================================================== */
 
-.mgdb-blast-results {
+/* #blast-drawer is a SIBLING of <main>, not a descendant, so it inherits none
+   of these. Both selectors carry the block: everything the drawer draws — the
+   alignment glyphs, the neighborhood, its buttons — reads the same tokens as
+   the page behind it, and a value can only be changed in one place. */
+.mgdb-blast-results,
+.blast-drawer {
   --blast-q0: #eef4f8;   /* weakest match  */
   --blast-q1: #c5dcea;
   --blast-q2: #8ebdd6;
@@ -33,13 +38,6 @@
 /* --------------------------------------------------------------------------
    Header and biological summary
    -------------------------------------------------------------------------- */
-
-.blast-summary {
-  display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-  gap: 24px;
-  align-items: start;
-}
 
 .blast-reading {
   font-size: 1.05rem;
@@ -82,9 +80,11 @@
   font-weight: 600;
 }
 
+/* A row of controls, wherever one appears: the drawer's actions, the genomic
+   context tab, and the page's own action bar. One line, and one appearance. */
 .blast-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
   margin-top: 14px;
 }
@@ -179,7 +179,11 @@
    Hit table
    -------------------------------------------------------------------------- */
 
-.blast-table-wrap { max-height: 60vh; overflow: auto; }
+/* The filter row sat flush against the table: both edges measured at the same
+   y, so the search boxes read as part of the header rather than as controls
+   above it. The gap is on the wrap rather than on .blast-filters, because the
+   filters are used in more than one place and only this pairing was tight. */
+.blast-table-wrap { max-height: 60vh; overflow: auto; margin-top: 16px; }
 
 .blast-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
 
@@ -445,7 +449,6 @@
    -------------------------------------------------------------------------- */
 
 @media (max-width: 900px) {
-  .blast-summary { grid-template-columns: minmax(0, 1fr); }
   .blast-filter-summary { margin-left: 0; width: 100%; }
   .blast-table-wrap { max-height: none; }
 }
@@ -927,8 +930,49 @@
    the numbers beside them.
    ========================================================================== */
 
-.blast-overview { display: flex; flex-direction: column; gap: 18px; }
+/* Two columns from the top.
+   -------------------------------------------------------------------------
+   The identity of the search -- title, defline, facts, target filter, the
+   reading -- is one column; the Best match card is the other, starting level
+   with the <h1>. It was a stack of full-width blocks with a two-column band
+   underneath, so on a search with a target bar the card began about 200px down
+   and the prose column ended in a field of white space. The metric tiles and
+   the action row stay full width under both.
+
+   340px for the card: its widest value is a coordinate range like
+   `chr2:4,493,490-4,496,967`, which sets the floor, and beyond that the column
+   only takes width away from the prose. */
+.blast-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 18px 28px;
+  align-items: start;
+}
+
 .blast-overview > * { margin: 0; }
+
+.blast-overview-main {
+  grid-column: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+.mgdb-blast-results .blast-overview > .blast-best { grid-column: 2; grid-row: 1; }
+
+/* Full width, under both columns. */
+.mgdb-blast-results .blast-overview > .blast-metrics,
+.mgdb-blast-results .blast-overview > .blast-actionbar { grid-column: 1 / -1; }
+
+/* The gap under "BLAST results" was 58px: three spacings stacked, and only one
+   of them was doing anything. `.blast-overview > *` zeroes the margins of its
+   direct children, but the <h1> is a grandchild -- it sits inside
+   .mgdb-section-heading -- so its own 24px bottom margin survived, under the
+   heading wrapper's 16px, under the column's 18px gap. The flex gap is the one
+   that should own the spacing, so the other two go. */
+.mgdb-blast-results .blast-overview .mgdb-section-heading { margin-bottom: 0; }
+.mgdb-blast-results .blast-overview .mgdb-section-heading h1 { margin: 0; }
 
 /* The query's own name. Constrained measure, and it may wrap — but on its own,
    away from the figures. */
@@ -955,7 +999,25 @@
 .blast-facts li { display: flex; align-items: baseline; gap: 6px; }
 .blast-facts b { color: #1f2723; font-variant-numeric: tabular-nums; font-weight: 600; }
 
-.blast-summary { gap: 28px; align-items: stretch; }
+/* The two columns line up at the top, by both readings of "the top".
+   -------------------------------------------------------------------------
+   The left column is prose with no box, so its top reads as its first line of
+   text. The right column is a card, so its top reads as its border. Two things
+   have to be true at once for the pair to look level:
+
+     the card's top border  ==  the prose's first line   (the boxes agree)
+     the card's first label ~=  the prose's first line   (the ink agrees)
+
+   The first attempt only did the second, by insetting the prose 15px. That
+   lined the text up and left the card's border floating 15px above where the
+   prose started, which is what the review caught. Both hold only if the card
+   is tight at the top, so its label sits close to its own border: 8px instead
+   of 14px, against a 14px floor. The first <dt> also drops the 8px top margin
+   the others carry, which was half the original 15px offset. Measured after:
+   card border and prose first line both at the grid row top, card label 9px
+   below it. */
+.mgdb-blast-results .blast-best { padding: 8px 16px 14px; }
+.mgdb-blast-results .blast-best dt:first-child { margin-top: 0; }
 
 /* Prose gets a readable measure; without this the reading ran the full width
    of a wide screen and was hard to track back to. */
@@ -966,35 +1028,110 @@
 
 .blast-best { align-self: start; }
 
+/* One column below 900px: the card follows the reading rather than sitting
+   beside it, and the prose loses its measure cap because it has the width. */
+@media (max-width: 900px) {
+  .blast-overview { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-blast-results .blast-overview > .blast-best { grid-column: 1; grid-row: auto; }
+}
+
 /* Counts get their own band, full width, instead of being squeezed beside the
    prose. */
 .blast-metrics { gap: 14px; }
 
-/* One actions row. Best-match actions lead; job-level utilities sit apart at
-   the end so "New search" is never mistaken for something that acts on the
-   result in front of you. */
+/* One actions row, seven identical controls.
+   -------------------------------------------------------------------------
+   It used to be two groups: best-match actions on the left, job utilities
+   pushed to the right by `margin-left: auto`, with "New search" filled in
+   blue. Three things were wrong with that. The seven together measured 1193px
+   against a 1182px bar, so they wrapped to two rows at the page's own width.
+   The auto margin split them into two clusters with a 200px hole between.
+   And the shared .mgdb-button on this page renders with a transparent
+   background AND a transparent border, so six of the seven read as bold text
+   rather than as controls, while the seventh was a solid blue button -- two
+   different things offered for the same kind of act.
+
+   Now: one row, one treatment. `nowrap` because the row fits; the padding
+   below is what makes it fit. */
 .blast-actionbar {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px 24px;
+  flex-wrap: nowrap;
+  gap: 8px;
   align-items: center;
-  padding-top: 4px;
+  padding-top: 10px;
   border-top: 1px solid var(--blast-rule);
 }
 
-.blast-actionbar .blast-actions { margin-top: 0; }
-.blast-actions-utility { margin-left: auto; }
-
-.mgdb-button-primary {
-  background: var(--blast-q4);
-  border-color: var(--blast-q4);
-  color: #fff;
+.blast-actionbar .blast-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  margin-top: 0;
 }
-.mgdb-button-primary:hover { background: #005c8f; border-color: #005c8f; }
 
+/* Every control in a row of them, whether <a> or <button>, gets the same
+   chrome: a visible edge, a surface it sits on, and ink that reads as a control
+   rather than as running text. 14px of side padding against the shared 24px is
+   what brings the page's seven-button bar from 1193px to about 1050px, and what
+   lets the drawer's three sit on one line in a 350px panel.
+
+   `.blast-actions` as well as `.blast-actionbar`: the drawer's buttons were
+   still rendering as the shared .mgdb-button's transparent background and
+   transparent border, which is the ghost the action bar was fixed for.
+
+   AND THE DRAWER NEEDS ITS OWN SELECTOR. `#blast-drawer` is an <aside> that is
+   a SIBLING of <main>, not a descendant, so nothing scoped
+   `.mgdb-blast-results …` reaches inside it. Scoping the first attempt that way
+   left the drawer's three buttons on one line and still looking like plain
+   links. */
+.mgdb-blast-results .blast-actionbar .mgdb-button,
+.mgdb-blast-results .blast-actionbar .mgdb-button-primary,
+.mgdb-blast-results .blast-actions .mgdb-button,
+.blast-drawer .blast-actions .mgdb-button {
+  flex: 0 0 auto;
+  padding: 8px 14px;
+  /* --blast-q1 rather than --blast-rule: the bar sits on the white overview
+     card, and a #d8e2e6 edge around a white fill left them reading as ghosts.
+     This is the same blue family the rest of the page scores matches in, one
+     step up in weight, on the --blast-q0 tint. */
+  border: 1px solid var(--blast-q1);
+  border-radius: 6px;
+  background: var(--blast-q0);
+  color: #14405c;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.mgdb-blast-results .blast-actionbar .mgdb-button:hover,
+.mgdb-blast-results .blast-actions .mgdb-button:hover,
+.blast-drawer .blast-actions .mgdb-button:hover {
+  border-color: var(--blast-q4);
+  background: var(--blast-q1);
+  color: #0b2f45;
+}
+
+.mgdb-blast-results .blast-actionbar .mgdb-button:focus-visible,
+.mgdb-blast-results .blast-actions .mgdb-button:focus-visible,
+.blast-drawer .blast-actions .mgdb-button:focus-visible {
+  outline: 3px solid var(--mgdb-focus, #0072b2);
+  outline-offset: 2px;
+}
+
+/* Below 900px seven controls cannot sit on one row at any sensible size, so
+   the bar wraps rather than overflowing the page. */
 @media (max-width: 900px) {
-  .blast-actions-utility { margin-left: 0; }
+  .blast-actionbar { flex-wrap: wrap; }
+  .blast-actionbar .blast-actions { flex-wrap: wrap; }
   .blast-reading-block { max-width: none; }
+  /* The drawer is a full-width panel here and its three buttons need 362px in
+     a 317px row, so nowrap spilled them past its edge. Wrapping is the right
+     answer at this width; one line is a desktop affordance. */
+  .blast-actions,
+  .blast-drawer .blast-actions { flex-wrap: wrap; }
 }
 
 /* ==========================================================================

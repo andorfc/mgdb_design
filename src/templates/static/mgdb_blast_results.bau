@@ -13,54 +13,63 @@ $$SYNTAX-LEVEL 2
        ===================================================================== -->
   <section class="mgdb-hub-surface blast-overview" id="blast-summary-section"
            aria-labelledby="blast-title">
-    <div class="mgdb-section-heading">
-      <h1 id="blast-title">BLAST results</h1>
-    </div>
+    ;; Two columns from the top, not one full-width header with a two-column
+    ;; band under it. Everything that identifies the search -- title, defline,
+    ;; facts, target filter, the reading -- is one column; the Best match card
+    ;; is the other, and it starts level with "BLAST results". It used to sit
+    ;; inside a .blast-summary band below all of that, so on a search with a
+    ;; target bar the card began 200px down the page and left the prose column
+    ;; with a field of white space under it.
+    <div class="blast-overview-main">
+      <div class="mgdb-section-heading">
+        <h1 id="blast-title">BLAST results</h1>
+      </div>
 
-    <!-- Identity of the search. Outside .mgdb-section-heading deliberately: the
-         hub shell hides any <p> inside a heading — see mgdb-hub.css, "No section
-         descriptions" — and this is data, not a blurb. Split into the query name
-         and its facts so a long FASTA defline cannot drag the numbers onto a
-         ragged second line. -->
-    <p class="blast-queryname" id="blast-query-line">Loading&hellip;</p>
-    <ul class="blast-facts" id="blast-query-facts"></ul>
+      <!-- Identity of the search. Outside .mgdb-section-heading deliberately:
+           the hub shell hides any <p> inside a heading — see mgdb-hub.css, "No
+           section descriptions" — and this is data, not a blurb. Split into the
+           query name and its facts so a long FASTA defline cannot drag the
+           numbers onto a ragged second line. -->
+      <p class="blast-queryname" id="blast-query-line">Loading&hellip;</p>
+      <ul class="blast-facts" id="blast-query-facts"></ul>
 
-    <p class="blast-warn" id="blast-completeness" hidden></p>
+      <p class="blast-warn" id="blast-completeness" hidden></p>
 
-    <!-- Per-target summary and filter. One search against several targets is
-         merged into one result — that is what pan-gene grouping needs — so this
-         is how a reader sees what each target gave, and looks at just one. -->
-    <div class="blast-targetbar" id="blast-targetbar" role="group"
-         aria-label="Filter results by search target" hidden></div>
+      <!-- Per-target summary and filter. One search against several targets is
+           merged into one result — that is what pan-gene grouping needs — so
+           this is how a reader sees what each target gave, and looks at just
+           one. -->
+      <div class="blast-targetbar" id="blast-targetbar" role="group"
+           aria-label="Filter results by search target" hidden></div>
 
-    <!-- Multi-FASTA: shown only when the submission held more than one
-         sequence. Each is a separate BLAST result and only one can be on
-         screen at a time, so the choice has to be explicit. -->
-    <div class="blast-querybar" id="blast-querybar" hidden>
-      <label for="blast-query-select">Query</label>
-      <select id="blast-query-select"></select>
-      <span class="blast-querybar-note" id="blast-query-note"></span>
-    </div>
+      <!-- Multi-FASTA: shown only when the submission held more than one
+           sequence. Each is a separate BLAST result and only one can be on
+           screen at a time, so the choice has to be explicit. -->
+      <div class="blast-querybar" id="blast-querybar" hidden>
+        <label for="blast-query-select">Query</label>
+        <select id="blast-query-select"></select>
+        <span class="blast-querybar-note" id="blast-query-note"></span>
+      </div>
 
-    <!-- The reading and the best match, side by side. The reading gets the wide
-         column because it is prose and needs a readable measure; the best match
-         is a fixed set of figures and does not. -->
-    <div class="blast-summary">
       <div class="blast-reading-block">
         <p class="blast-reading" id="blast-reading"></p>
         <p class="blast-reading-detail" id="blast-reading-detail"></p>
         <p class="blast-reading-detail blast-note" id="blast-annotation-note" hidden></p>
       </div>
-      <dl class="blast-best" id="blast-best"></dl>
     </div>
+
+    <!-- The second column. A definition list, because that is what it is. -->
+    <dl class="blast-best" id="blast-best"></dl>
 
     <!-- Counts get their own full-width band rather than being squeezed into a
          column beside the prose. -->
     <div class="mgdb-metric-grid blast-metrics" id="blast-metrics"></div>
 
-    <!-- One actions row, grouped: what to do with the best match first, then
-         what to do with the job. Previously these were two rows in different
-         places, one of them orphaned below the grid. -->
+    <!-- One actions row. The best-match actions lead and the job utilities
+         follow, but all seven are one control type in one row now -- "New
+         search" lost its primary fill on 2026-09-05, because offering one act
+         in a different shape from the six beside it said it was a different
+         kind of thing when it is not. -->
     <div class="blast-actionbar">
       <div class="blast-actions" id="blast-best-actions"></div>
       <div class="blast-actions blast-actions-utility">
@@ -68,7 +77,7 @@ $$SYNTAX-LEVEL 2
         <a class="mgdb-button" href="/BLAST/blast_results_api.php?job=$(job_id)&amp;view=text"
            download="blast-$(job_id).txt">Download report</a>
         <a class="mgdb-button" href="$(reload_url)">Permanent link</a>
-        <a class="mgdb-button mgdb-button-primary" href="/BLAST">New search</a>
+        <a class="mgdb-button" href="/BLAST">New search</a>
       </div>
     </div>
   </section>

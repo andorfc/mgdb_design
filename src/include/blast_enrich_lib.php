@@ -509,6 +509,115 @@ function mgdb_blast_enrich_domains($ids, $DBConn) {
    -------------------------------------------------------------------------- */
 
 /**
+ * The browser URL MaizeGDB records for an assembly, or null.
+ *
+ * `chado.analysisprop` carries a `MaizeGDB_browser_URL` per assembly — the same
+ * value the gene record page's getBrowseLink() reads — and it is the only place
+ * that knows which browser actually serves a given assembly. It is a mixture:
+ * JBrowse 1 for the NAM, HiLo and PanAnd assemblies, GBrowse for B73 v1 to v4
+ * and a few drafts. Only the JBrowse 1 ones can take a custom track.
+ *
+ * One query for the whole request, cached: this is called once per row on a
+ * page that can carry seventy.
+ */
+function mgdb_blast_browser_urls($DBConn) {
+  static $map = null;
+  if ($map !== null) { return $map; }
+
+  $map = array();
+  $sth = make_query($DBConn, "
+    SELECT gm.assembly_name, ap.value
+      FROM chado.analysisprop ap
+      INNER JOIN chado.genome_metadata gm ON gm.analysis_id = ap.analysis_id
+     WHERE ap.type_id = (SELECT cvterm_id FROM chado.cvterm
+                          WHERE name = 'MaizeGDB_browser_URL')");
+  if ($sth) {
+    while ($row = retrieve_row($sth)) {
+      /* An assembly can carry the row twice; first wins, they agree. */
+      if (!isset($map[$row['assembly_name']])) {
+        $map[$row['assembly_name']] = trim($row['value']);
+      }
+    }
+  }
+  return $map;
+}
+
+/**
+ * A JBrowse 1 URL that opens the region with the BLAST match drawn on it.
+ *
+ * This is what the pre-redesign BLAST results linked to, and it is better than
+ * a plain coordinate link because the reader arrives with their own hits drawn
+ * as a track rather than having to find them among the gene models. JBrowse 1
+ * builds a track from URL parameters:
+ *
+ *   addFeatures  the HSP segments, as {seq_id,start,end,type,name} objects
+ *   addTracks    one CanvasFeatures track, Segments glyph, to draw them
+ *   tracks       the track list to open, which must name that track
+ *
+ * Returns null when the assembly's recorded browser is not JBrowse 1 — B73 v1
+ * to v4 are GBrowse, which has no equivalent, and a link that silently drops
+ * the features is worse than no link.
+ *
+ * The base URL already carries the dataset (`?data=CML247`), or carries none at
+ * all for B73 v5, which is JBrowse 1's default. Both forms come straight from
+ * the database, so a new assembly needs no change here.
+ */
+function mgdb_blast_jbrowse1_url($base, $chr, $intervals, $window = null) {
+  $base = (string) $base;
+  if (strpos($base, 'jbrowse.maizegdb.org') === false) { return null; }
+  if (!$intervals) { return null; }
+
+  $features = array();
+  $min = null; $max = null;
+  foreach ($intervals as $iv) {
+    $from = (int) $iv[0];
+    $to   = (int) $iv[1];
+    if ($from > $to) { $t = $from; $from = $to; $to = $t; }
+    $features[] = array(
+      'seq_id' => (string) $chr,
+      /* Strings, not integers: this is the shape the previous BLAST emitted
+         and the shape JBrowse 1's URL feature parser accepts. */
+      'start'  => (string) $from,
+      'end'    => (string) $to,
+      'type'   => 'match',
+      'name'   => 'BLASThit',
+    );
+    $min = ($min === null) ? $from : min($min, $from);
+    $max = ($max === null) ? $to   : max($max, $to);
+  }
+  if (!$features) { return null; }
+
+  if (is_array($window) && isset($window[0], $window[1])) {
+    $loc_from = (int) $window[0];
+    $loc_to   = (int) $window[1];
+  } else {
+    /* Enough context that the match is not flush against the viewport edge. */
+    $pad = max(2000, (int) round(($max - $min) * 0.5));
+    $loc_from = max(1, $min - $pad);
+    $loc_to   = $max + $pad;
+  }
+
+  $params = array(
+    'loc'        => $chr . ':' . $loc_from . '..' . $loc_to,
+    'addFeatures' => json_encode($features),
+    'addTracks'  => json_encode(array(array(
+      'label' => 'BLAST',
+      'key'   => 'BLASThits',
+      'type'  => 'JBrowse/View/Track/CanvasFeatures',
+      'store' => 'url',
+      'glyph' => 'JBrowse/View/FeatureGlyph/Segments',
+    ))),
+    'tracks'     => 'BLAST',
+    'highlight'  => '',
+  );
+
+  /* The base may already carry `?data=...`, so join with the right separator
+     and keep whatever query it brought. */
+  $sep = (strpos($base, '?') === false) ? '?' : '&';
+  return $base . $sep . http_build_query($params);
+}
+
+/**
  * A JBrowse 2 deep link for a genomic interval.
  *
  * Coordinates, never a gene name: with a name in `loc` JBrowse resolves the

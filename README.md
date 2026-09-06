@@ -5656,6 +5656,138 @@ form:
   `Zm-B73-REFERENCE-NAM-5.0` restores the "— the current reference" suffix and
   the original five chips.
 
+### The results page header, 2026-09-05
+
+Three fixes to `/BLAST?job_id=…`, all in `css/mgdb-blast-results.css` plus one
+class in the template. Measured on job `4cJeH1E5vqaE` at 1280px.
+
+**The gap under "BLAST results" was 58px, and three spacings were stacked in
+it.** `.blast-overview > * { margin: 0 }` zeroes its *direct* children, but the
+`<h1>` is a grandchild — it sits inside `.mgdb-section-heading` — so its own
+24px bottom margin survived, under the wrapper's 16px, under the column's 18px
+`gap`. The flex gap should own that spacing, so the other two are now zeroed
+and the gap is 18px.
+
+**The real fault was the layout, not the alignment — and it took three passes
+to see it.** The overview was a stack of full-width blocks — title, defline,
+facts, target bar — with a two-column band underneath holding the reading and
+the Best match card. So the card could not start until every full-width block
+above it had finished. On a two-target search that put its top edge about 200px
+down the page while the prose column beside it ended in a field of white space.
+The first two passes both tried to align the card against the *reading*, which
+is the wrong thing to align it to.
+
+It is one grid now, two columns from the top: everything that identifies the
+search in column 1, the card in column 2 at `grid-row: 1`, the metric tiles and
+the action row spanning both underneath. The card's top border is level with
+the `<h1>`. Measured on a two-target search at 1280px: `<h1>` ink and card
+border both at y=289, main column 814px, card 340px, and the two columns end
+19px apart instead of 200.
+
+340px for the card because its widest value is a coordinate range like
+`chr2:4,493,490-4,496,967`; past that the column only takes width from the
+prose. Below 900px it is one column and the card follows the reading.
+
+The card's own inner spacing still matters, and is what the second pass
+settled: `padding: 8px 16px 14px` with `dt:first-child { margin-top: 0 }`, so
+its first label sits close to its own top border rather than 15px below it.
+
+**The seven actions were two rows in two treatments.** Three things caused it:
+
+- They measured **1193px against a 1182px bar**, so they wrapped.
+- `margin-left: auto` on the utility group split them into two clusters with a
+  200px hole between.
+- The shared `.mgdb-button` renders on this page with a **transparent
+  background and a transparent border**, so six of the seven read as bold text
+  rather than as controls — while the seventh, "New search", was a solid blue
+  `mgdb-button-primary`. Two different shapes offered for the same kind of act.
+
+Now one row, one treatment: `flex-wrap: nowrap`, 8px gaps, and every control —
+`<a>` and `<button>` alike — on `--blast-q0` with a `--blast-q1` border, which
+is the same blue family the page scores matches in. Side padding went from 24px
+to 14px, which is what brings the row to **957px** and lets it fit. `New search`
+lost its primary fill. Below 900px the bar wraps rather than overflowing.
+
+**The table view's filters sat flush against the table.** `.blast-filters`
+bottom and `.blast-table-wrap` top both measured y=1325 in the All matches
+section, so the search boxes read as part of the table header rather than as
+controls above it. 16px on the wrap, not on the filters, because the filter row
+is used in more than one place and only this pairing was tight.
+
+### Genomic context labels, and the genome-browser link
+
+**The neighborhood labels overlapped each other and the gene bars.** Two faults
+in one drawing:
+
+- **Lanes were packed on the gene bar's footprint, not the label's.** 155 kb of
+  neighborhood in 512px makes most gene bars 2px wide, so eight genes packed
+  happily into one lane — and then eight ~80px labels were drawn at those eight
+  x positions and piled on top of one another. Packing now reserves
+  `max(barWidth, labelWidth)`, with the label width estimated at 5.6px per
+  character, the measured average advance for the identifiers that actually
+  appear here (`Zm00001eb067760`, `GRMZM2G045049`, `prx16`).
+- **The label was drawn at `gy + 9`, inside the 10px bar.** A lane is 26px now:
+  an 8px bar with its name on the line below it.
+
+Verified geometrically with `getBBox()` rather than by eye: on the eight-gene
+`lg1` neighborhood, **0 label-label overlaps and 0 label-bar overlaps**, in a
+viewBox that grew from 92px to 144px tall.
+
+### The drawer's own buttons, and a scope that could not reach them
+
+The drawer's three actions — View gene, Genome Browser, Pan-gene — were on two
+lines and still rendering as the shared `.mgdb-button`'s transparent background
+and transparent border, the same ghost the page's action bar had been fixed for.
+`nowrap` and the shared chrome fixed the first two symptoms. **Two scoping
+mistakes had to be found first, and both fail silently:**
+
+- **`#blast-drawer` is an `<aside>` that is a SIBLING of `<main>`**, not a
+  descendant. Every rule scoped `.mgdb-blast-results …` misses it. The first
+  attempt scoped the button chrome that way and changed nothing.
+- **The token block was on `.mgdb-blast-results` too**, so inside the drawer
+  `var(--blast-q0)` resolved to nothing: `border-color` fell back to the
+  element's `color` and the background stayed transparent, which looked like the
+  rule had half-applied. The block is on `.mgdb-blast-results, .blast-drawer`
+  now, so everything the drawer draws reads the same tokens as the page behind
+  it and a value still changes in one place.
+
+Verified by comparing computed styles rather than by eye: the drawer's buttons
+and the page bar's buttons return the same background, border, colour, padding
+and radius. "See on the Genome Browser" is **"Genome Browser"** — at 14px
+padding the three fit 356px of a 524px row. Below 900px the drawer is a
+full-width panel where they need 362px in 317px, so they wrap there.
+
+### JBrowse 1, with the hits drawn on it
+
+The pre-redesign results had a **See on the Genome Browser** button that opened
+JBrowse 1 with the reader's own HSPs as a custom track. The rewrite had replaced
+it with a plain JBrowse 2 coordinate link, which drops the reader into the right
+region with nothing of their search on screen. The old behaviour is back.
+
+JBrowse 1 builds a track from URL parameters — `addFeatures` carries the
+segments, `addTracks` declares one CanvasFeatures track with the Segments glyph,
+`tracks=BLAST` opens it. Three things had to be added to build one:
+
+| | |
+|---|---|
+| `h_intervals` | The merged HSP spans on the subject. `mgdb_blast_summarize_group` already computed them for `h_aligned` and threw them away; they are on the row now, and are what makes the feature *segmented* rather than one block from `h_start` to `h_end` |
+| `mgdb_blast_browser_urls` | `chado.analysisprop`'s `MaizeGDB_browser_URL` per assembly — the same value the gene record page's `getBrowseLink` reads, and the only place that knows which browser serves which assembly. One query per request, cached |
+| `browsers` / `browser_base` | The bases, sent with the rows and with the neighborhood, so the client builds the link from a row's own intervals with no extra round trip |
+
+**Only JBrowse 1 assemblies get the button.** The recorded URLs are a mixture:
+JBrowse 1 for the NAM, HiLo and PanAnd assemblies, GBrowse for B73 v1 to v4 and
+a few drafts. A base that is not `jbrowse.maizegdb.org` is not sent, and the
+JBrowse 2 coordinate link stays as the fallback in that case — one button, not
+two offering the same thing.
+
+The base already carries its dataset (`?data=CML247`), or carries none at all
+for B73 v5, which is JBrowse 1's default. Both forms come straight from the
+database, so a new assembly needs no change in the code.
+
+Verified against the example in the review: the `lg1` locus produces
+`addFeatures` for `4493490-4494003`, `4494214-4494371` and `4496229-4496967` —
+the same three segments, and the URL returns 200.
+
 ## The nomenclature standard
 
 `/nomenclature` — not a data hub, but brought onto the same shell so it looks

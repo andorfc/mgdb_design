@@ -547,6 +547,7 @@ function blast_api_unit($model, $target = null) {
             'q_start'     => $s['q_start'],
             'q_end'       => $s['q_end'],
             'q_intervals' => $s['q_intervals'],
+            'h_intervals' => $s['h_intervals'],
             'q_coverage'  => $s['q_coverage'],
             'pident'      => $s['pident'],
             'pident_weighted' => $s['pident_weighted'],
@@ -569,6 +570,7 @@ function blast_api_unit($model, $target = null) {
               'q_start'     => $L['q_start'],
               'q_end'       => $L['q_end'],
               'q_intervals' => $L['q_intervals'],
+              'h_intervals' => $L['h_intervals'],
               'q_coverage'  => $L['q_coverage'],
               'pident'      => $L['pident'],
               'pident_weighted' => $L['pident_weighted'],
@@ -593,6 +595,22 @@ function blast_api_unit($model, $target = null) {
       return ($x < $y) ? 1 : -1;
     });
 
+    /* The browser base for every assembly in this job, so the client can build
+       a "See on the Genome Browser" link from a row's own h_intervals without a
+       round trip per row. One query, cached for the request; only the JBrowse 1
+       entries are sent, because only JBrowse 1 takes a custom track. */
+    $browsers = array();
+    $browser_map = mgdb_blast_browser_urls(connect_to_database());
+    foreach ($models as $m) {
+      /* $models entries are array('target' => …, 'model' => …); the assembly is
+         on the target, which is the row from the job's .targets manifest. */
+      $asm = isset($m['target']['assembly']) ? $m['target']['assembly'] : null;
+      if ($asm && isset($browser_map[$asm]) && !isset($browsers[$asm])
+          && strpos($browser_map[$asm], 'jbrowse.maizegdb.org') !== false) {
+        $browsers[$asm] = $browser_map[$asm];
+      }
+    }
+
     blast_api_send(array(
       'status'    => 'ok',
       'multi'     => $multi,
@@ -603,6 +621,7 @@ function blast_api_unit($model, $target = null) {
       'query_len' => $models[0]['model']['query']['len'],
       'targets'   => count($models),
       'rows'      => array_slice($rows, $offset, $limit),
+      'browsers'  => $browsers,
       'complete'  => !$incomplete,
     ), $incomplete ? 0 : 3600);
   }
@@ -759,6 +778,14 @@ function blast_api_unit($model, $target = null) {
     $DBConn = connect_to_database();
     $hood = mgdb_blast_neighborhood($assembly, $chr, $start, $end, $DBConn);
     if (!$hood) { blast_api_fail(422, 'bad-interval', 'That interval could not be resolved.'); }
+
+    /* The JBrowse 1 base for this assembly, so the drawer can offer the region
+       with the reader's own hits drawn on it. Null for a GBrowse assembly. */
+    $browser_map = mgdb_blast_browser_urls($DBConn);
+    $hood['browser_base'] =
+      (isset($browser_map[$assembly])
+        && strpos($browser_map[$assembly], 'jbrowse.maizegdb.org') !== false)
+      ? $browser_map[$assembly] : null;
 
     blast_api_send(array_merge(array('status' => 'ok'), $hood), 3600);
   }

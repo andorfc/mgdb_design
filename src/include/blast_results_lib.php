@@ -376,6 +376,10 @@ function mgdb_blast_summarize_group($hsps, $extra = array()) {
     'q_aligned'       => mgdb_blast_interval_length($merged),
     'h_start'         => isset($extra['h_start']) ? $extra['h_start'] : $h_min,
     'h_end'           => isset($extra['h_end'])   ? $extra['h_end']   : $h_max,
+    /* The merged HSP spans on the subject, which is what a genome browser needs
+       to draw this match as a segmented feature rather than as one block from
+       h_start to h_end. h_aligned above is already computed from them. */
+    'h_intervals'     => $h_merged,
     'orientation'     => $best['orientation'],
     'pident'          => $best['pident'],
     'pident_weighted' => $alen_sum > 0 ? round($ident_sum * 100.0 / $alen_sum, 2) : 0.0,

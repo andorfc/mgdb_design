@@ -543,8 +543,14 @@
     var best = state.summary && state.summary.best;
     if (!best || !els.bestActions) { return; }
     var key = null;
+    state.bestRow = null;
     state.rows.forEach(function (r) {
-      if (r.subject === best.subject && r.h_start === best.h_start) { key = r.key; }
+      if (r.subject === best.subject && r.h_start === best.h_start) {
+        key = r.key;
+        /* Kept so the genome-browser link can carry this locus's own HSP
+           segments rather than one block from its start to its end. */
+        state.bestRow = r;
+      }
     });
     var ann = key && state.annotations[key];
     if (!ann) { return; }
@@ -558,7 +564,15 @@
 
     var actions = [];
     actions.push('<a class="mgdb-button" href="' + esc(ann.links.gene) + '">View gene</a>');
-    if (ann.links.jbrowse) {
+
+    /* Same rule as the row drawer: JBrowse 1 with the match drawn as its own
+       track where the assembly has a JBrowse 1 dataset, the JBrowse 2
+       coordinate link only where it does not. `bestRow` is the row this
+       annotation came from, so the link carries that locus's own HSPs. */
+    var bestLink = browserButton(state.bestRow || null);
+    if (bestLink) {
+      actions.push(bestLink);
+    } else if (ann.links.jbrowse) {
       actions.push('<a class="mgdb-button" href="' + esc(ann.links.jbrowse) +
                    '" target="_blank" rel="noopener">Open in JBrowse</a>');
     }
@@ -577,6 +591,9 @@
       .then(function (data) {
         state.unit = data.unit;
         state.rows = data.rows || [];
+        /* assembly -> JBrowse 1 base, for the genome-browser links. Sent only
+           for assemblies whose recorded browser IS JBrowse 1. */
+        state.browsers = data.browsers || {};
         /* Loaded-and-empty is not the same as still-loading. Keying the
            progress indicators on rows.length left a no-hit search showing seven
            spinners for ever. */
@@ -2007,7 +2024,12 @@
       if (ann.assembly) { html += '<dt>Assembly</dt><dd>' + esc(ann.assembly) + '</dd>'; }
       html += '</dl><div class="blast-actions">';
       html += '<a class="mgdb-button" href="' + esc(ann.links.gene) + '">View gene</a>';
-      if (ann.links.jbrowse) {
+      /* The genome browser, with this match drawn on it. The JBrowse 2
+         coordinate link is the fallback for an assembly JBrowse 1 has no
+         dataset for, not a second button offering the same thing twice. */
+      var browserLink = browserButton(row);
+      html += browserLink;
+      if (!browserLink && ann.links.jbrowse) {
         html += '<a class="mgdb-button" href="' + esc(ann.links.jbrowse) +
                 '" target="_blank" rel="noopener">Open in JBrowse</a>';
       }
@@ -2223,28 +2245,134 @@
   /* Deliberately not a miniature genome browser — it orients, and hands off to
      JBrowse for anything more. Genes are packed into lanes only as far as
      needed to stop overlapping models drawing on top of each other. */
+  /* Estimated width of a label in the SVG's own units.
+     -------------------------------------------------------------------------
+     .blast-hood-label is 10px in the page's sans face. There is no way to
+     measure text before it is in the document, and the lanes have to be packed
+     before the markup exists, so this is an estimate: 5.6px per character is
+     the measured average advance for the identifiers that actually appear here
+     -- `Zm00001eb067760`, `GRMZM2G045049`, `prx16` -- which are digits, capital
+     letters and lower-case letters in roughly fixed proportions. It only has to
+     be close: a few px of slack is absorbed by LABEL_GAP. */
+  function hoodLabelWidth(text) {
+    return text.length * 5.6;
+  }
+
+  /* A JBrowse 1 URL that opens the region with this match drawn on it.
+     -------------------------------------------------------------------------
+     This is what the pre-redesign BLAST results linked to, and it is better
+     than a plain coordinate link: the reader arrives with their own HSPs drawn
+     as a track rather than having to find them among the gene models. JBrowse 1
+     builds a track from URL parameters — addFeatures carries the segments,
+     addTracks declares one CanvasFeatures track to draw them, and `tracks`
+     opens it.
+
+     `base` comes from the API, which reads chado.analysisprop's
+     MaizeGDB_browser_URL per assembly. It already carries the dataset
+     (`?data=CML247`), or carries none for B73 v5, which is JBrowse 1's default.
+     The API sends a base only for assemblies whose browser IS JBrowse 1, so a
+     GBrowse assembly — B73 v1 to v4 — yields no button rather than a link that
+     silently drops the features. */
+  function jbrowse1Url(base, chr, intervals) {
+    if (!base || !chr || !intervals || !intervals.length) { return null; }
+
+    var features = [], min = null, max = null;
+    intervals.forEach(function (iv) {
+      var from = Math.min(iv[0], iv[1]), to = Math.max(iv[0], iv[1]);
+      features.push({
+        seq_id: String(chr),
+        /* Strings, which is the shape the previous BLAST emitted and what
+           JBrowse 1's URL feature parser accepts. */
+        start: String(from), end: String(to), type: 'match', name: 'BLASThit'
+      });
+      min = (min === null) ? from : Math.min(min, from);
+      max = (max === null) ? to : Math.max(max, to);
+    });
+
+    var pad = Math.max(2000, Math.round((max - min) * 0.5));
+    var params = {
+      loc: chr + ':' + Math.max(1, min - pad) + '..' + (max + pad),
+      addFeatures: JSON.stringify(features),
+      addTracks: JSON.stringify([{
+        label: 'BLAST', key: 'BLASThits',
+        type: 'JBrowse/View/Track/CanvasFeatures',
+        store: 'url', glyph: 'JBrowse/View/FeatureGlyph/Segments'
+      }]),
+      tracks: 'BLAST',
+      highlight: ''
+    };
+
+    var qs = Object.keys(params).map(function (k) {
+      return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]);
+    }).join('&');
+    return base + (base.indexOf('?') === -1 ? '?' : '&') + qs;
+  }
+
+  /* The browser base for a row's assembly, from the rows payload. */
+  function browserBase(row) {
+    var map = state.browsers || {};
+    return (row && row.assembly && map[row.assembly]) ? map[row.assembly] : null;
+  }
+
+  /* The genome-browser button for one row, or ''. */
+  function browserButton(row, label) {
+    var url = jbrowse1Url(browserBase(row), row && row.subject, row && row.h_intervals);
+    if (!url) { return ''; }
+    return '<a class="mgdb-button" href="' + esc(url) + '" target="_blank" rel="noopener">' +
+           (label || 'Genome Browser') + '</a>';
+  }
+
+  var HOOD_LABEL_GAP = 10;
+
   function neighborhoodSvg(data, row, ann) {
     var w = data.window, genes = data.genes || [];
     var span = Math.max(1, w.end - w.start);
     var W = 520, padL = 4, padR = 4, plotW = W - padL - padR;
-    var laneH = 16, axisH = 22, matchH = 10;
+    var axisH = 22, matchH = 10;
+
+    /* A lane holds a gene bar with its label underneath, not beside it: the
+       label used to be drawn at `gy + 9`, which is inside the 10px bar. */
+    var barH = 8, laneH = 26, labelDrop = 18;
 
     var x = function (pos) {
       return padL + ((Math.min(Math.max(pos, w.start), w.end) - w.start) / span) * plotW;
     };
 
-    // Lane packing: a gene goes in the first lane whose last gene ended before it.
-    var lanes = [];
+    /* Lane packing on the LABEL's footprint, not the bar's.
+       -----------------------------------------------------------------------
+       This is the bug the packing had. A gene bar can be 2px wide -- 155 kb of
+       neighborhood in 512px makes most of them that -- so eight genes packed
+       happily into one lane, and then eight ~80px labels were drawn at those
+       eight positions and piled on top of one another. What has to not overlap
+       is the label, so the footprint is the wider of the two. */
     var placed = genes.map(function (g) {
+      var gx = x(g.start);
+      var gw = Math.max(2, x(g.end) - gx);
+      var label = g.locus || g.gene_model;
+      if (label.length > 16) { label = label.slice(0, 15) + '\u2026'; }
+      var lw = hoodLabelWidth(label);
+
+      /* The label sits at the bar's left edge, pulled back inside the plot if
+         that would push it past the right margin. */
+      var lx = gx;
+      if (lx + lw > W - padR) { lx = Math.max(padL, W - padR - lw); }
+
+      return { g: g, label: label, gx: gx, gw: gw, lx: lx,
+               from: Math.min(gx, lx), to: Math.max(gx + gw, lx + lw) };
+    });
+
+    var lanes = [];
+    placed.forEach(function (p) {
       var i = 0;
       for (; i < lanes.length; i++) {
-        if (x(g.start) > lanes[i] + 4) { break; }
+        if (p.from > lanes[i] + HOOD_LABEL_GAP) { break; }
       }
-      lanes[i] = x(g.end);
-      return { g: g, lane: i };
+      lanes[i] = p.to;
+      p.lane = i;
     });
+
     var laneCount = Math.max(1, lanes.length);
-    var H = axisH + matchH + 6 + laneCount * laneH + 6;
+    var H = axisH + matchH + 8 + laneCount * laneH;
 
     var parts = ['<div class="blast-hood"><svg viewBox="0 0 ' + W + ' ' + H +
                  '" width="100%" height="' + H + '" role="img" aria-label="Gene neighborhood of this match on ' +
@@ -2268,29 +2396,23 @@
     var mx = x(data.match.start), mw = Math.max(2, x(data.match.end) - x(data.match.start));
     parts.push('<rect class="blast-hood-match" x="' + mx + '" y="' + axisH +
                '" width="' + mw + '" height="' + matchH + '" rx="2"><title>BLAST match ' +
-               commas(data.match.start) + '–' + commas(data.match.end) + '</title></rect>');
+               commas(data.match.start) + '\u2013' + commas(data.match.end) + '</title></rect>');
 
-    // Gene models
-    var top = axisH + matchH + 6;
+    // Gene models: a bar, and its name on the line below it.
+    var top = axisH + matchH + 8;
     placed.forEach(function (p) {
       var g = p.g;
-      var gx = x(g.start), gw = Math.max(2, x(g.end) - x(g.start));
       var gy = top + p.lane * laneH;
       var isFocus = ann && g.gene_model === ann.gene_model;
       parts.push('<a href="' + esc(g.link) + '">');
       parts.push('<rect class="blast-hood-gene' + (isFocus ? ' is-focus' : '') +
-                 '" x="' + gx + '" y="' + gy + '" width="' + gw + '" height="10" rx="2"><title>' +
-                 esc((g.locus ? g.locus + ' — ' : '') + g.gene_model) + '\n' +
-                 commas(g.start) + '–' + commas(g.end) + '</title></rect>');
-      var label = g.locus || g.gene_model;
-      /* Label to whichever side has room, so a gene at either edge is still
-         named rather than pushed out of the viewBox. */
-      var anchor = 'middle', lx = gx + gw / 2;
-      if (lx < 40) { anchor = 'start'; lx = gx; }
-      else if (lx > W - 40) { anchor = 'end'; lx = gx + gw; }
+                 '" x="' + p.gx + '" y="' + gy + '" width="' + p.gw + '" height="' + barH +
+                 '" rx="2"><title>' +
+                 esc((g.locus ? g.locus + ' \u2014 ' : '') + g.gene_model) + '\n' +
+                 commas(g.start) + '\u2013' + commas(g.end) + '</title></rect>');
       parts.push('<text class="blast-hood-label' + (isFocus ? ' is-focus' : '') +
-                 '" x="' + lx + '" y="' + (gy + 9) + '" text-anchor="' + anchor + '">' +
-                 esc(label.length > 16 ? label.slice(0, 15) + '…' : label) + '</text>');
+                 '" x="' + p.lx + '" y="' + (gy + labelDrop) + '" text-anchor="start">' +
+                 esc(p.label) + '</text>');
       parts.push('</a>');
     });
 
@@ -2317,9 +2439,20 @@
       html += '</ul>';
     }
 
-    html += '<div class="blast-actions">' +
-            '<a class="mgdb-button" href="' + esc(data.jbrowse) +
-            '" target="_blank" rel="noopener">Open full region in JBrowse</a></div>';
+    /* The genome-browser link, with this match drawn as its own track. The
+       JBrowse 2 coordinate link stays as a second option where JBrowse 1 has no
+       dataset for the assembly, so a reader is never left without a browser. */
+    var custom = jbrowse1Url(data.browser_base, w.chr,
+                             (row && row.h_intervals) || [[data.match.start, data.match.end]]);
+    html += '<div class="blast-actions">';
+    if (custom) {
+      html += '<a class="mgdb-button" href="' + esc(custom) +
+              '" target="_blank" rel="noopener">Genome Browser</a>';
+    } else if (data.jbrowse) {
+      html += '<a class="mgdb-button" href="' + esc(data.jbrowse) +
+              '" target="_blank" rel="noopener">Open full region in JBrowse</a>';
+    }
+    html += '</div>';
 
     /* Say what is NOT drawn. The same two facts the gene record page reports,
        in the same words: neither is in this annotation load, and a reader
@@ -2328,7 +2461,7 @@
     if (data.notes) {
       html += '<p class="blast-drawer-sub">' + esc(data.notes.strand) + ' ' +
               esc(data.notes.exons) + ' Genes are drawn as spans; open the region ' +
-              'in JBrowse for strand and exon structure.</p>';
+              'in the genome browser for strand and exon structure.</p>';
     }
     return html;
   }
