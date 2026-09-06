@@ -3702,6 +3702,15 @@ lose which trait the reader clicked. Arriving that way, the page names the
 analysis in a notice and marks its row, rather than silently showing a record
 whose title does not match the link that was followed.
 
+**The page opens at the top.** The first version also called `scrollIntoView`
+on the marked row, which landed the reader in the middle of the Traits
+evaluated table before they had seen the experiment's name or its overview —
+Carson: "going into a QTL record page moves to the Trait anchor instead of the
+top of the page". A record page that does not start at its own title reads as
+broken, and the reader has no way back to a heading they never saw. The notice
+links down to the row instead, which leaves the jump as the reader's choice;
+it lands the section heading 104px down, clear of the 57px sticky tab bar.
+
 **Three rows cannot be linked at all, and are no longer offered as links.**
 Of 211 curated analyses, 208 reach a curated experiment. Two record no
 experiment (`anthsr1`, `maysin1`) and one belongs to an experiment held at

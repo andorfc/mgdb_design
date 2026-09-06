@@ -205,7 +205,13 @@
   }
 
   /* A reader who followed a hub result asked for one trait, not the whole
-     study. Once the table exists, mark that row and bring it into view. */
+     study, so its row is marked once the table exists.
+     The page still opens at the top. Marking the row used to be followed by
+     scrollIntoView, which threw the reader into the middle of the Traits
+     evaluated table before they had seen the experiment's name or its
+     overview -- a record page that does not start at its own title reads as
+     broken. The notice under the hero names the analysis and links down to it,
+     which is the reader's choice to make rather than the page's. */
   function highlightAnalysis() {
     if (!analysisId) { return; }
     var cell = document.getElementById('analysis-' + analysisId);
@@ -213,10 +219,6 @@
     var row = cell.closest ? cell.closest('tr') : null;
     if (!row) { return; }
     row.classList.add('qtl-row-current');
-    var section = R.byId('qtl-record-evaluations');
-    if (section && !section.hidden) {
-      row.scrollIntoView({ block: 'center', behavior: 'auto' });
-    }
   }
 
   function render(doc) {
