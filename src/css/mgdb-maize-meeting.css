@@ -605,6 +605,66 @@
   object-fit: none;
 }
 
+/* The whole upcoming card is the link ---------------------------------------
+
+   Not by wrapping the card in an <a>: that makes the link's accessible name
+   the entire card -- photograph alt, heading, venue, dates and all -- which is
+   what a screen reader then reads out for it. Instead the real link keeps its
+   own text and grows a transparent ::after over the card, the pattern
+   Bootstrap calls a stretched link. One link, named by what it points at,
+   with the whole card as its hit area.
+
+   The page's earlier rule that "a card is not one big link" applied while
+   these cards each carried two links of their own. They do not any more -- the
+   steering committee moved out to its own expander below the pair -- so a
+   single destination per card is exactly the case where this is right.
+
+   One cost worth knowing: the overlay sits above the text, so the venue line
+   cannot be selected by dragging across it. That is inherent to the pattern,
+   and the address is one right-click away on the link itself. */
+.mgdb-meeting-page .meeting-event-card {
+  position: relative;
+  cursor: pointer;
+}
+
+.mgdb-meeting-page .meeting-event-go::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--mgdb-radius);
+}
+
+/* Focus belongs on the card, because the card is what activates. Browsers
+   without :has\() still outline the link text itself, which is correct if less
+   emphatic -- so this is an enhancement, not a requirement. */
+.mgdb-meeting-page .meeting-event-card:has(.meeting-event-go:focus-visible) {
+  outline: 3px solid var(--mgdb-focus, var(--mgdb-gold-dark));
+  outline-offset: 3px;
+}
+
+/* Two rings for one focus is noise, so the link drops its own -- but only
+   inside the same :has\() guard, so a browser that could not draw the card's
+   ring keeps the link's and focus stays visible either way. */
+.mgdb-meeting-page .meeting-event-card:has(.meeting-event-go:focus-visible) .meeting-event-go:focus-visible {
+  outline: none;
+}
+
+/* A little life on the photograph, so the hit area is discoverable before the
+   pointer reaches the link text. The page-wide prefers-reduced-motion rule in
+   mgdb-modern.css already collapses the duration. */
+.mgdb-meeting-page .meeting-event-photo img {
+  transition: transform .35s ease;
+}
+
+.mgdb-meeting-page .meeting-event-card:hover .meeting-event-photo img,
+.mgdb-meeting-page .meeting-event-card:focus-within .meeting-event-photo img {
+  transform: scale(1.035);
+}
+
+.mgdb-meeting-page .meeting-event-card:hover .meeting-event-go {
+  text-decoration: underline;
+}
+
 /* The upcoming pair leads with the destination -----------------------------
 
    Both cards used to open on a green band: the 2027 meeting's own banner
