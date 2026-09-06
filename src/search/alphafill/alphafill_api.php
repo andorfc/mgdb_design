@@ -191,7 +191,7 @@ if ($afAction === 'domains') {
             'transcript'  => isset($row['transcript']) ? (string) $row['transcript'] : null,
             'accession'   => $accession,
             'name'        => isset($row['name']) ? (string) $row['name'] : null,
-            'description' => isset($row['description']) ? (string) $row['description'] : null,
+            'description' => isset($row['description']) ? mgdb_safe_html((string) $row['description']) : null,
             'start'       => isset($row['start_pos']) ? (int) $row['start_pos'] : null,
             'end'         => isset($row['end_pos']) ? (int) $row['end_pos'] : null,
             'url'         => $url,

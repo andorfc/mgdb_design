@@ -18,7 +18,6 @@
 
   include_once('./include/db-api.php');
   include_once('./include/dashboard_cache.php');
-  include_once('./include/references_lib.php');
 
   $system = getSystemInfo('mgdb.conf');
   logMessage('Starting reference_search_modern.php');
@@ -102,22 +101,6 @@
     'These figures cover the whole collection &mdash; all '
     . number_format($page_data['reference_count'])
     . ' curated references. Search above and they narrow to your matches.');
-
-  /* References: how this literature collection is curated and what it feeds.
-     Rendered by include/references_lib.php so these cards match every other
-     hub -- and they are papers *about* the collection, not a sample of it. */
-  $content->get('reference_cards')->replace(mgdb_render_references($doc_root, array(
-      // How the records in this collection are curated in the first place.
-      array('doi' => '10.1016/j.cpb.2017.11.001'),
-      // Curation and outreach at MaizeGDB, which is where this corpus comes from.
-      array('doi' => '10.1093/database/bar022'),
-      // What a community database owes the literature it indexes.
-      array('doi' => '10.1093/database/bay088'),
-      // Querying these records alongside the rest of the warehouse.
-      array('doi' => '10.3389/fpls.2020.592730'),
-      // The database of record.
-      array('doi' => '10.1093/nar/gky1046'),
-  )));
 
   include_once('translation.php');
   $mgdb->get('blast_url')->replace($system['BLAST_URL']);

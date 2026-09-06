@@ -28,58 +28,43 @@
 
 /* ── Sticky section tabs ─────────────────────────────────────────────────── */
 
-.mgdb-cytogenetic-page .mgdb-section-tabs {
-  position: sticky;
-  z-index: 20;
-  top: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  margin-top: var(--mgdb-space-5);
-  margin-bottom: var(--mgdb-space-5);
-}
+/* Nothing here. The bar, the pill, the green current-tab with its gold inset,
+   and the scrolling rail below 767px all come from mgdb-modern.css, and the hub
+   ground and bottom border from mgdb-hub.css.
 
-.mgdb-cytogenetic-page .mgdb-section-tabs a {
-  display: inline-flex;
-  min-height: 40px;
-  align-items: center;
-  padding: 0 var(--mgdb-space-4);
-  border: 1px solid var(--hub-line);
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--hub-surface);
-  color: var(--mgdb-ink) !important;
-  font-size: var(--mgdb-text-sm);
-  font-weight: 600;
-  text-decoration: none;
-  transition: background .15s ease, border-color .15s ease, color .15s ease;
-}
+   What used to be here restated all of that and added one declaration that
+   actively broke it: `flex-wrap: wrap` at (0,2,0) beat the shared rail's
+   `flex-wrap: nowrap` at (0,1,0), so the bar wrapped to three rows on a phone
+   instead of scrolling on one. That is what the three-step offset ladder below
+   was compensating for. Removed 2026-09-06 along with the References tab.
 
-.mgdb-cytogenetic-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
+   The offset ladder below replaces a three-step one written for the old
+   eight-tab wrapping bar. */
 
-.mgdb-cytogenetic-page .mgdb-section-tabs a.is-current,
-.mgdb-cytogenetic-page .mgdb-section-tabs a[aria-current="true"] {
-  border-color: var(--mgdb-green-dark);
-  background: var(--mgdb-green-dark);
-  color: #ffffff !important;
-  box-shadow: inset 3px 0 0 var(--mgdb-gold);
-}
+/* Measured, not counted. Seven tabs need 773px on one row (72 + 111 + 113 + 82
+   + 101 + 87 + 159, plus six 8px gaps), and the bar is the page container,
+   48px narrower than the viewport. So:
 
-/* Eight tabs is the most of any hub, so the offset the scrollspy reads back
-   from here has its own breakpoints -- and one more of them than the other
-   hubs need. Measured: the bar is 57px on one row, 105px on two, and 153px on
-   three, which is what a 375px screen gets. The six- and seven-tab hubs never
-   reach three rows, so their two-step ladder lands sections 29-40px behind the
-   bar here. */
-@media (max-width: 1290px) and (min-width: 981px) {
+     >= 821px   one row,   57px  -- the container still fits 773
+     768-820px  two rows, 105px  -- the only width where this bar wraps
+     <= 767px   one row,   57px  -- mgdb-modern.css turns it into a scrolling
+                                    rail, which the page sheet used to defeat
+
+   mgdb-hub.css steps to 113px below 1170px on the assumption the bar has
+   wrapped there; on this page it has not, so 821-1170 has to be put back.
+   Specificity (0,3,1) beats the shell's (0,2,1). Re-measure if a tab is added
+   or a label changes -- the wrap point moves with the label text, and 773 is
+   only 48px below the 821 boundary. */
+@media (max-width: 1170px) and (min-width: 821px) {
   .mgdb-hub-page.mgdb-cytogenetic-page > section[id] { scroll-margin-top: 65px; }
 }
 
-@media (max-width: 980px) and (min-width: 621px) {
+@media (max-width: 820px) and (min-width: 768px) {
   .mgdb-hub-page.mgdb-cytogenetic-page > section[id] { scroll-margin-top: 113px; }
 }
 
-@media (max-width: 620px) {
-  .mgdb-hub-page.mgdb-cytogenetic-page > section[id] { scroll-margin-top: 161px; }
+@media (max-width: 767px) {
+  .mgdb-hub-page.mgdb-cytogenetic-page > section[id] { scroll-margin-top: 65px; }
 }
 
 .mgdb-cytogenetic-page > section[id] { margin-bottom: var(--mgdb-space-5); }

@@ -13,7 +13,11 @@ $$SYNTAX-LEVEL 2
   <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-hero" aria-labelledby="gene-record-title">
     <div class="mgdb-hero-body">
       <h1 id="gene-record-title">$(gene_title)$(gene_badge)</h1>
-      <p class="mgdb-rec-synonyms" id="gene-record-function" hidden></p>
+      <!-- NOT gene-record-function: that id belongs to the Function section
+           below. This paragraph is the one-line function summary in the hero,
+           and giving it the section's id made getElementById return THIS
+           element to everything that asked for the section. -->
+      <p class="mgdb-rec-synonyms" id="gene-record-function-line" hidden></p>
       <p class="mgdb-rec-synonyms" id="gene-record-synonyms" hidden></p>
       <dl class="mgdb-record-facts mgdb-rec-headfacts" id="gene-record-facts">$(gene_facts)</dl>
     </div>

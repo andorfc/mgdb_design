@@ -816,6 +816,112 @@
      tab cannot mark the section above the one it jumped to.
      ------------------------------------------------------------------------ */
 
+  /* ------------------------------------------------------------------------
+     The URL fragment, re-applied
+
+     Every section on a record page carries `hidden` in the served HTML and is
+     revealed only once the API response has been rendered. The browser's own
+     jump to #section therefore happens while there is nothing to jump to, and a
+     reader following a deep link lands at the top of the record instead. That is
+     not a rare path: /new_genes alone builds 3,305 of these links -- 979 to
+     overview, 973 to references, 840 to function, 461 to variation, 52 to
+     structure -- and none of them arrived where they were aimed.
+
+     Called once per render, from tabs(), after the sections exist.
+     ------------------------------------------------------------------------ */
+
+  var hashApplied = false;
+
+  /* Whether the reader has actually done something, tracked from the moment this
+     file runs. Scroll POSITION cannot answer that question: the browser does its
+     own fragment scrolling as the target element appears, so by the time a
+     record has rendered, scrollY is already large without anyone having touched
+     anything. A `scrollY > 8` guard therefore reads the browser's own jump as
+     "the reader is busy" and declines to fix the very thing it was added for. */
+  var userMoved = false;
+  var INPUT_EVENTS = ['wheel', 'touchstart', 'keydown', 'mousedown'];
+  INPUT_EVENTS.forEach(function (evt) {
+    window.addEventListener(evt, function () { userMoved = true; }, { passive: true, capture: true });
+  });
+
+  function focusHash(after) {
+    if (hashApplied) { return; }
+
+    var id = (window.location.hash || '').slice(1);
+    if (!id) { hashApplied = true; return; }
+
+    /* If the reader has started reading, the record has loaded around them and
+       moving the page under them is worse than ignoring the fragment. */
+    if (userMoved) { hashApplied = true; return; }
+
+    var target;
+    try { target = document.getElementById(id); } catch (e) { target = null; }
+    if (!target) { hashApplied = true; return; }
+
+    /* A section with no data keeps its `hidden` attribute, and scrolling to a
+       display:none element lands at the top of the document -- which looks
+       exactly like the bug this fixes. Leave the reader where they are. */
+    if (target.hidden || !target.getBoundingClientRect().height) {
+      hashApplied = true;
+      return;
+    }
+
+    hashApplied = true;
+
+    /* Hold the target in place while the record finishes settling.
+     *
+     * A single jump at render time is not enough: the page keeps growing and
+     * shrinking after its sections are revealed -- charts size themselves,
+     * collections collapse from their loading height, tables paginate -- and a
+     * jump taken then ended up 6,190px from the section. Waiting for the
+     * document height to hold still is not enough either, because on the gene
+     * record it does not hold still inside any deadline worth waiting for; the
+     * jump fired on the timeout, mid-reflow, and stranded the reader 23,051px
+     * away.
+     *
+     * So the position is re-asserted on a short interval until it holds, and
+     * abandoned the moment the reader does anything. The reader's INPUT is the
+     * test, never their scroll position: when content above the viewport
+     * resizes, the browser moves scrollY by itself, and a loop that reads that
+     * as "the reader took over" quits while the reader is still sitting at the
+     * top of a record they asked to be shown the middle of.
+     *
+     * scrollIntoView honours the section's scroll-margin-top, so the heading
+     * clears the sticky tab bar by the same measure a clicked tab uses.
+     * Explicitly instant: animating a jump of this size under a
+     * `scroll-behavior: smooth` rule is a long ride through content nobody
+     * asked to see. */
+    var deadline = new Date().getTime() + 15000;
+    var settled = 0;
+    var timer = null;
+
+    function stop() {
+      if (timer) { window.clearInterval(timer); timer = null; }
+    }
+
+    function hold() {
+      var margin = parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+      if (Math.abs(target.getBoundingClientRect().top - margin) <= 2) {
+        /* Let go only after two full seconds of the target holding still. A
+           record page pauses between collections loading, so a shorter quiet
+           period ends the hold in a gap and the next reflow carries the reader
+           away -- measured, 8,327px away with a five-check test. */
+        if (++settled >= 10) { stop(); }
+        return;
+      }
+      settled = 0;
+      try { target.scrollIntoView({ block: 'start', behavior: 'auto' }); }
+      catch (e) { target.scrollIntoView(true); }
+      if (typeof after === 'function') { after(); }
+    }
+
+    hold();
+    timer = window.setInterval(function () {
+      if (userMoved || new Date().getTime() > deadline) { stop(); return; }
+      hold();
+    }, 200);
+  }
+
   function tabs(spec) {
     var bar = spec.el;
     if (!bar) { return; }
@@ -835,7 +941,7 @@
       var section = document.querySelector(tab.getAttribute('href'));
       if (section) { pairs.push({ tab: tab, section: section }); }
     });
-    if (!pairs.length) { return; }
+    if (!pairs.length) { focusHash(); return; }
 
     var held = null;
     var heldScroll = 0;
@@ -883,6 +989,7 @@
       pairs.forEach(function (pair) { observer.observe(pair.section); });
     }
     spy();
+    focusHash(spy);
   }
 
   /* ------------------------------------------------------------------------
@@ -954,6 +1061,6 @@
     sizeChart: sizeChart, watchChartWidth: watchChartWidth,
     connectionsChart: connectionsChart, connectionsHeight: connectionsHeight,
     yearsChart: yearsChart,
-    tabs: tabs, apiCard: apiCard, notice: notice
+    tabs: tabs, apiCard: apiCard, notice: notice, focusHash: focusHash
   };
 })(window, document);

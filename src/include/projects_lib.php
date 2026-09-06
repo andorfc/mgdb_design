@@ -274,9 +274,9 @@ function mgdb_projects() {
 
         /* ── Community resource projects ────────────────────────────────────
            The four that /doc and /documentation/projects were the only route
-           to. Three of them still render in the legacy chrome; they are listed
-           here because they work and the content is sound, not because the
-           pages are finished. Porting them to the shell is separate work. */
+           to. Three of them were still in the legacy chrome when this section
+           widened; they were ported onto the shell on 2026-09-05 and now have
+           real pages under /projects/, with their old URLs redirecting. */
 
         'uniformmu' => array(
             'title'       => 'UniformMu transposon resource',
@@ -307,10 +307,10 @@ function mgdb_projects() {
             'topics'      => array('mutagenesis', 'stocks'),
             'status'      => 'current',
             'lead'        => 'Dooner and Du',
-            'url'         => '/documentation/dooner_du_acds_insertions',
             'card_facts'  => array(
-                array('14,184',  'Ds-GFP insertions'),
-                array('3',       'browser assemblies'),
+                array('14,184',  'in the collection'),
+                array('7,510',   'searchable here'),
+                array('13,145',  'seed stocks'),
             ),
         ),
 
@@ -323,12 +323,12 @@ function mgdb_projects() {
             'topics'      => array('mutagenesis', 'methods'),
             'status'      => 'current',
             'lead'        => 'Maize Gametophyte Project',
-            'url'         => '/documentation/fowler_insertion_validation',
             'card_facts'  => array(
                 array('83',  'lines tested'),
                 array('64',  'PCR verified'),
                 array('10',  'transmission defects'),
             ),
+            'has_downloads' => true,
         ),
 
         'cytogenetic_map' => array(
@@ -340,7 +340,6 @@ function mgdb_projects() {
             'topics'      => array('cytogenetics', 'methods'),
             'status'      => 'historic',
             'lead'        => 'Bass lab, Florida State University',
-            'url'         => '/CMMprotocols',
             'card_facts'  => array(
                 array('7', 'chromosomes mapped'),
             ),

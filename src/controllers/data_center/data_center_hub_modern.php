@@ -21,7 +21,7 @@ header("Cache-Control: no-cache, no-store, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-$bauplan = new Bauplan('MaizeGDB Data Hubs | Unified Directory & Big Dashboard');
+$bauplan = new Bauplan('MaizeGDB Data Hubs');
 $bauplan->modern();
 
 $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';
@@ -46,7 +46,7 @@ $bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
 $bauplan->includeScript('/js/mgdb-data-center-hub.js?v=' . $v_js);
-$bauplan->head('<meta name="description" content="Explore MaizeGDB data hubs for genomes, genes, variation, expression, phenotypes, germplasm, protein structures, and curated literature.">');
+$bauplan->head('<meta name="description" content="MaizeGDB data is hosted through data hubs, each dedicated to a specific class of data.">');
 
 $mgdb = $bauplan->template()->load('templates/maizegdb-main-modern.bau');
 $mgdb->get('megamenu')->load('templates/home/maizegdb_header_modern.bau');
@@ -96,10 +96,6 @@ $hub->get('reference_cards')->replace(mgdb_render_references($doc_root, array(
     array('doi' => '10.1093/genetics/iyae036'),
     // What the AI hub and the machine-readable endpoints are for.
     array('doi' => '10.1093/genetics/iyag005'),
-    // Querying these collections together rather than one hub at a time.
-    array('doi' => '10.3389/fpls.2020.592730'),
-    // How the curation behind all of it is done.
-    array('doi' => '10.1016/j.cpb.2017.11.001'),
 )));
 
 include_once('translation.php');

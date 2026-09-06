@@ -4,7 +4,15 @@ $$SYNTAX-LEVEL 2
   <span id="genomes_menu">
     <div class="dropdown_5columns mega-dropdown mega-dropdown-genomes">
       <div class="mega-panel-heading mega-panel-heading-row">
-        <h2>Maize Genomics Data and Tools</h2>
+        <div class="mega-heading-text">
+          <h2>Maize Genomics Data and Tools</h2>
+          <!-- Filled in by mgdb-chrome.js from the pointed-at link's data-desc,
+               and reset once the pointer or focus leaves the grid. It replaced
+               the "Collections" and "Explore and browse" group headings on
+               2026-09-05. aria-hidden because it duplicates the link the reader
+               is already on. -->
+          <p class="mega-hint" data-mgdb-hint data-mgdb-hint-default="Point at a link to see what it covers." aria-hidden="true">Point at a link to see what it covers.</p>
+        </div>
         <!-- The panel carries no footer, so the section destination sits here
              beside the heading. /genome is the modernized Genome Center, which
              is the hub itself -- not /data_center/genome, the legacy
@@ -30,40 +38,44 @@ $$SYNTAX-LEVEL 2
         <aside class="mega-feature mega-feature-green mega-feature-compact">
           <span class="mega-badge">Representative</span>
           <h3>B73 v5</h3>
-          <a class="mega-feature-open" href="$(server-url)/genome/genome_assembly/Zm-B73-REFERENCE-NAM-5.0">Open B73 genome page <span aria-hidden="true">&#8594;</span></a>
+          <a class="mega-feature-open" href="$(server-url)/genome/genome_assembly/Zm-B73-REFERENCE-NAM-5.0" data-desc="The representative maize assembly: statistics, annotations and downloads.">Open B73 genome page <span aria-hidden="true">&#8594;</span></a>
           <!-- The visible "Earlier B73 assemblies" caption is gone, so the rail
                carries that text as its accessible name instead: on their own,
                "v4" and "BAC" say nothing about what they are versions of.
                Assembly names carry spaces and must arrive percent-encoded. -->
           <div class="mega-version-rail" role="group" aria-label="Earlier B73 assemblies">
-            <a href="$(server-url)/genome/genome_assembly/Zm-B73-REFERENCE-GRAMENE-4.0">v4</a>
-            <a href="$(server-url)/genome/genome_assembly/B73%20RefGen_v3">v3</a>
-            <a href="$(server-url)/genome/genome_assembly/B73%20RefGen_v2">v2</a>
-            <a href="$(server-url)/genome/genome_assembly/B73%20RefGen_v1">v1</a>
-            <a href="$(server-url)/genome/genome_assembly/BAC-based%20maize%20B73">BAC</a>
+            <a href="$(server-url)/genome/genome_assembly/Zm-B73-REFERENCE-GRAMENE-4.0" data-desc="An earlier B73 assembly: RefGen v4, the Gramene release.">v4</a>
+            <a href="$(server-url)/genome/genome_assembly/B73%20RefGen_v3" data-desc="An earlier B73 assembly: RefGen v3.">v3</a>
+            <a href="$(server-url)/genome/genome_assembly/B73%20RefGen_v2" data-desc="An earlier B73 assembly: RefGen v2.">v2</a>
+            <a href="$(server-url)/genome/genome_assembly/B73%20RefGen_v1" data-desc="An earlier B73 assembly: RefGen v1.">v1</a>
+            <a href="$(server-url)/genome/genome_assembly/BAC-based%20maize%20B73" data-desc="An earlier B73 assembly: the BAC-based assembly.">BAC</a>
           </div>
         </aside>
-        <section class="mega-group">
-          <h3>Collections</h3>
-          <a href="$(server-url)/NAM_project"><strong>NAM founders</strong></a>
-          <a href="$(server-url)/PanAnd_project"><strong>Pan-Andropogoneae</strong></a>
-          <a href="$(server-url)/european_flints"><strong>European flints</strong></a>
-          <a href="$(server-url)/HiLo_project"><strong>Highland&#8211;lowland</strong></a>
-          <a href="$(server-url)/amaizing_project"><strong>AMAIZING European maize</strong></a>
-          <a href="$(server-url)/CAAS_FIL_project"><strong>CAAS 12 founder inbreds</strong></a>
-        </section>
-        <section class="mega-group">
-          <h3>Explore and browse</h3>
-          <a href="https://pangenome-viewer.maizegdb.org/?set=NAM&amp;geneID=Zm00001eb406090" target="_blank" rel="noopener"><strong>NAM pangenome gene viewer</strong></a>
-          <a href="https://jbrowse2.maizegdb.org" target="_blank" rel="noopener"><strong>JBrowse 2</strong></a>
-          <a href="https://jbrowse.maizegdb.org/?data=v5" target="_blank" rel="noopener"><strong>JBrowse</strong></a>
-          <a href="https://pangenome-viewer.maizegdb.org" target="_blank" rel="noopener"><strong>Pangenome graph</strong></a>
-          <a href="https://gcv.maizegdb.org" target="_blank" rel="noopener"><strong>Genome Context Viewer</strong></a>
-          <a href="$(server-url)/14InbredsFISH"><strong>Karyotype views</strong></a>
+        <!-- No group headings; divs rather than sections, because a <section>
+             with no heading has no accessible name. The two columns keep the
+             split they always had -- assembly collections, then the viewers
+             that browse them -- so only the labels are gone. Descriptions are
+             the site map's wording where it has one, trimmed to two lines at
+             this panel's column width. -->
+        <div class="mega-group">
+          <a href="$(server-url)/NAM_project" data-desc="De novo assemblies and annotations for the 26 NAM founder inbreds."><strong>NAM founders</strong></a>
+          <a href="$(server-url)/PanAnd_project" data-desc="Chromosome-scale assemblies across 36 wild Zea, Tripsacum and Andropogoneae grasses."><strong>Pan-Andropogoneae</strong></a>
+          <a href="$(server-url)/european_flints" data-desc="Assemblies and structural variation for four European flint inbreds."><strong>European flints</strong></a>
+          <a href="$(server-url)/HiLo_project" data-desc="Assemblies for Mexican landraces and CIMMYT inbreds from 50 to 2,520 metres."><strong>Highland&#8211;lowland</strong></a>
+          <a href="$(server-url)/amaizing_project" data-desc="Assemblies and transcriptomes for seven European breeding lines."><strong>AMAIZING European maize</strong></a>
+          <a href="$(server-url)/CAAS_FIL_project" data-desc="Assemblies for the 12 Chinese and international founder lines."><strong>CAAS 12 founder inbreds</strong></a>
+        </div>
+        <div class="mega-group">
+          <a href="https://pangenome-viewer.maizegdb.org/?set=NAM&amp;geneID=Zm00001eb406090" data-desc="Compare one gene across the NAM assemblies." target="_blank" rel="noopener"><strong>NAM pangenome gene viewer</strong></a>
+          <a href="https://jbrowse2.maizegdb.org" data-desc="Current browser: B73 v5 and most assemblies here, with synteny views." target="_blank" rel="noopener"><strong>JBrowse 2</strong></a>
+          <a href="https://jbrowse.maizegdb.org/?data=v5" data-desc="Older browser, still serving B73 v1-v4 and other retired assemblies." target="_blank" rel="noopener"><strong>JBrowse</strong></a>
+          <a href="https://pangenome-viewer.maizegdb.org" data-desc="Structural and sequence variation across Zea genomes." target="_blank" rel="noopener"><strong>Pangenome graph</strong></a>
+          <a href="https://gcv.maizegdb.org" data-desc="Explore gene families in genomic context across assemblies." target="_blank" rel="noopener"><strong>Genome Context Viewer</strong></a>
+          <a href="$(server-url)/14InbredsFISH" data-desc="Chromosome painting across 14 inbred lines, and B73 against Mo17."><strong>Karyotype views</strong></a>
           <!-- Last in the column on purpose: the oldest viewer here, though it
                still carries the current B73 and NAM chromosome paintings. -->
-          <a href="$(server-url)/whole_genome"><strong>Whole-genome views</strong></a>
-        </section>
+          <a href="$(server-url)/whole_genome" data-desc="Ideograms, gene density and repeats for B73 v5 and the NAM founders."><strong>Whole-genome views</strong></a>
+        </div>
       </div>
     </div>
   </span>

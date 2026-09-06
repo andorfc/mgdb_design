@@ -1689,11 +1689,16 @@ hosts and a PHP fatal error. See **The two listings /projects replaced** below.
 
 Three categories, which is what `category` names in the registry:
 
-| Category | What it is | Count |
-| --- | --- | --- |
-| `analysis` | Run and published at MaizeGDB | 3 |
-| `genome` | A sequencing and assembly effort whose genomes the site serves | 7 |
-| `resource` | A mutant collection, map or protocol set hosted or documented here | 5 |
+| Category | What it is | Count | Pages served here |
+| --- | --- | --- | --- |
+| `analysis` | Run and published at MaizeGDB | 3 | 2 |
+| `genome` | A sequencing and assembly effort whose genomes the site serves | 7 | 0 |
+| `resource` | A mutant collection, map or protocol set hosted or documented here | 5 | 3 |
+
+"Pages served here" is the number with a real `/projects/<slug>` page rather
+than a registry entry pointing elsewhere. It went from 2 to 5 on 2026-09-05
+when the three legacy resource pages were ported onto the shell; see
+**Porting the three resource pages**.
 
 **`maizegdb => true` marks a project MaizeGDB itself runs**, and those cards
 carry the kernels from the site mark — `/images/kernels.png`, the same file the
@@ -1853,8 +1858,8 @@ where the page actually is, and `/projects/<slug>` `301`s there rather than
 not exist. `mgdb_project()` returns such an entry early, without the derived
 `controller`, `template` and `data_url` paths.
 
-Twelve of the fifteen entries are now hosted elsewhere, which changed what the
-card's meta line says. It used to name the internal path it redirects to; with
+Ten of the fifteen entries are hosted elsewhere — twelve before the three
+resource pages were ported — which changed what the card's meta line says. It used to name the internal path it redirects to; with
 twelve of them that is twelve repetitions of a URL the card title already links
 to, so the path is gone. **An offsite `url` is different**: `mgdb_project()`
 sets `external` when the url begins `http`, and such a card opens in a new tab,
@@ -1935,6 +1940,110 @@ belongs; **Research projects** is under **Community and people**. Counts went
 hand edits made straight to the `.bau`, which is how the `/handyref` entry,
 renamed to "Genetic maps" on the server on 2026-09-04, came back as "Handy
 reference" the first time. It is in the model now.
+
+### Porting the three resource pages
+
+Three of the five community resources were still in the legacy chrome when the
+section widened. They came onto the shell on 2026-09-05 as ordinary
+`/projects/<slug>` pages: a registry entry, a controller, a body template, and
+for one of them a data file.
+
+| Now | Was, both of which 301 |
+|---|---|
+| `/projects/cytogenetic_map` | `/CMMprotocols`, `/documentation/CMMprotocols` |
+| `/projects/dooner_du_acds` | `/dooner_du_acds_insertions`, `/documentation/dooner_du_acds_insertions` |
+| `/projects/fowler_insertion_validation` | `/fowler_insertion_validation`, `/documentation/fowler_insertion_validation` |
+
+**One redirect file covers two URLs.** `controller.php` reaches
+`controllers/documentation/<page>.php` for `/documentation/<page>`, and
+`redirect.php` reaches *the same file* for the root-level `/<page>`, because it
+falls through to `controllers/documentation/` when nothing else matches. Both
+forms were live for all three pages, and one `header('Location: …', true, 301)`
+retires both. The legacy Bauplan partials are archived under
+`legacy/cytogenetic-map/`, `legacy/dooner-du-acds/` and
+`legacy/fowler-insertion-validation/`.
+
+They share `css/mgdb-project-resources.css` and `js/mgdb-project-resources.js`,
+and carry `.mgdb-resource-page` on `<main>` alongside their own page class. The
+tab bar is the shell's, not the listing's tinted one — five short jump links,
+one 57px row at every width from 1280 down to 375, so the section offset is a
+flat 65px and the shell's step to 113px under 1170px is overridden.
+
+#### 47 primer sequences were being shown short
+
+`/documentation/fowler_insertion_validation` carried its data as two tables that
+were an Excel "save as HTML" export. Excel had split 47 cells so their last one
+to three characters sat inside a hidden span:
+
+```html
+<td>GCAGCTGCAGTTGTACACAGTACA<span style='display:none'>GAG</span></td>
+```
+
+The browser rendered `GCAGCTGCAGTTGTACACAGTACA` and hid `GAG`. Text inside a
+`display:none` element is not copied either, so **anyone who read a PCR primer
+off that page, or copied one to order oligos, got a sequence up to three bases
+short of the real one.** 46 of the 47 are in the two primer columns; the 47th
+made an expression class read `vegetative_cell_hig`.
+
+`tools/fowler_lines.py` parses the archived partials, keeps the hidden text as
+part of the cell value, and writes both
+`data/projects/fowler_insertion_validation/lines.json` and a TSV for download.
+It asserts what the page's prose has always claimed — 64 verified, 19
+unverified, 83 total, 10 with a significant male transmission defect, every
+primer a run of ACGT — and exits non-zero if any of that stops holding, so a
+re-run cannot quietly produce a different table. Nothing on the page is typed
+from the rendered tables, which is the only way the bug could have survived the
+port.
+
+The two tables became one, with a Status column and a chip to filter it: Table A
+was the 64 verified and Table B the 19 unverified, side by side with identical
+columns, and the question a reader arrives with is about an allele rather than
+about which table it is in.
+
+#### What else the port changed
+
+- **Dooner and Du: the two insertion counts are different numbers.** The
+  published collection is 14,184 insertions; MaizeGDB holds 7,510 of them as
+  records, with 18,428 alignments. The legacy page printed only 14,184 and then
+  said the flanking sequence and genome position "can be found in this table" —
+  a table that page never had. Both numbers are on the page now, each labelled,
+  and the dangling reference is replaced by a Find these insertions section
+  pointing at the Insertion Data Hub, the browsers and the Stock Center. The
+  holdings figure is read from `data/insertion/insertion_summary.json`, the file
+  `/insertion` reads, so the two cannot disagree.
+- **The stock count is a range, not a prefix match.** `mgdb.stock` has a btree
+  on `name` in the database collation, so a left-anchored `LIKE` cannot use it —
+  that needs `text_pattern_ops`. Measured: `LIKE 'tdsg%'` seq scan 13.9 ms,
+  `ILIKE 'tdsg%'` seq scan 58.4 ms, `name >= 'tdsg' AND name < 'tdsh'`
+  **index-only scan 7.2 ms with zero heap fetches**. All three return the same
+  13,145 rows.
+- **Three dead links were not carried over.** `acdsinsertions.org`, the Dooner
+  and Du project site, did not respond on 2026-09-05 and the page says so rather
+  than sending readers to it; the BACman utilities at `chibba.agtec.uga.edu`
+  are named in the published FISH method and are gone, so step 7 keeps the step
+  and drops the link.
+- **One citation was superseded.** The legacy Fowler page cited the 2020 bioRxiv
+  preprint of the ear phenotyping paper. It was published in *The Plant Journal*
+  in 2021 as `10.1111/tpj.15166`, which is what is cited now. All eight
+  citations across the three pages were checked at Crossref and given abstracts
+  from Europe PMC; the Cytogenetic Map page had carried no DOI at all.
+- **A typo on `/gene_center/gene`.** The link to this project read "Abut the
+  Dooner & Du Ac/Ds-GFP project".
+
+#### In the site map
+
+All three are listed under **Documentation and help**, beside SSR protocols and
+Coordinate definitions, because that is what they are: the methods and naming
+references for major maize projects, which is the material `/doc` used to
+gather. The Cytogenetic Map is **cross-listed** in **Genomic data** next to FISH
+karyotypes as well, since that is where someone hunting cytogenetics looks;
+duplicates across sections are legitimate in `tools/gen_sitemap.py` and only
+within one section are a mistake.
+
+Adding them turned up a gap in the same list: **`/HiLo_project` and
+`/amaizing_project` were missing from Genomic data** while their four siblings
+— NAM, PanAnd, European flints and CAAS — were listed. Both are in now. Section
+counts went 13 → 16 for Documentation and help and 14 → 17 for Genomic data.
 
 ### The first one: `/projects/interpro_domain_atlas`
 
@@ -5242,8 +5351,9 @@ is archived in `legacy/home-dashboard/` with rollback steps.
 
 The `.mgdb-home-v3` body class and `css/mgdb-home-alt.css` came across as they
 were rather than being renamed, so `/` is byte-for-byte what the group approved
-at `/index3/`. Folding those rules into `mgdb-home.css` and dropping the class
-is tidying, not a fix, and is best done when nobody is mid-review.
+at `/index3/` — a URL that no longer serves; see **Design alternatives,
+retired** below. Folding those rules into `mgdb-home.css` and dropping the
+class is tidying, not a fix.
 
 The homepage opens on **quick links** — the icon buttons from the production
 site — with the modernized list a click away. Keeping the familiar grid was a
@@ -5270,26 +5380,44 @@ The `<h2>` names the view rather than the section — "Quick links" over the gri
 "All resources" over the list — so the JS rewrites it alongside the panels. A
 fixed heading would be wrong in one of the two states.
 
-### Design alternatives for review
+### Design alternatives, retired
 
-Two variants sit alongside the default for the group to compare. Both are
-`noindex` and neither is linked from anywhere:
+`/index2/`, `/index3/` and `/index4/` were the review copies the group compared
+while the design was being chosen. **Removed 2026-09-05** on Carson's call; the
+chosen design is what `/` serves.
 
 | | Art (desktop) | Caption | Card | Header |
 |---|---|---|---|---|
-| `/` and `/index3/` | 132px, no disc, 116px art | label only | none until hover | warm header |
-| `/index2/` | 104px disc, 84px art | label only | bordered | record hero |
+| `/` | 132px, no disc, 116px art | label only | none until hover | warm header |
 | *`legacy/home-dashboard/`* | 74px disc, 56px art | label + description | bordered | record hero |
 
-`/index3/` still serves the same page as `/` — it is left in place so the group
-can keep using the review URL. Delete it, `pages/index2`, and their manifest
-entries once nobody needs the comparison.
+Their files are at
+`/var/www/claude/retired/2026-09-05-homepage-alternatives/`, with a README
+naming the `mv` that restores them. Nothing linked to the three URLs — no
+template, script, stylesheet or controller referenced them, and they were never
+in the site map.
 
-Everything behind the three pages is shared. `include/home_lib.php` holds the
-release-date query, the precomputed metric counts, and the news rendering, so
-all three show identical data and only the presentation differs. That library
-was extracted from `index.php` on 2026-08-25 for exactly this reason — the
-alternative was three copies that would drift.
+**Removing the page directory was not enough to retire the URL.** With
+`html/index2/` gone the request fell through `controller.php` to `redirect.php`,
+which matched no controller and rendered `templates/error/error-404.bau` — the
+"Oops, Sorry!" body, served with a **200** status and a "Welcome to MaizeGDB"
+title. `controllers/index2.php`, `index3.php` and `index4.php` are now one-line
+`301`s to `/`. Same trap as `/tools/<anything>`: compare the body, never the
+status.
+
+**Two files arrived with the alternatives and stayed, because production needs
+them.** `css/mgdb-home-alt.css` holds the version 3 and version 4 blocks, and
+`/` carries *both* classes on `<main>`; `images/home/assembly_puzzle.png` is
+rendered by `mgdb_home.bau`. The version 2 block went with `index2` — only
+`mgdb_home2.bau` ever carried `mgdb-home-v2` — and the shared rules at the top
+of that file lost their `.mgdb-home-v2` selector. Verified after: the 28
+`.mgdb-home-v3` / `.mgdb-home-v4` selectors are byte-identical, and the tiles
+still measure 200×144 with 88px art at 1280px.
+
+`include/home_lib.php` holds the release-date query, the precomputed metric
+counts and the news rendering. It was extracted from `index.php` on 2026-08-25
+so the alternatives could not drift from the real homepage; it stays where it
+is, since `index.php` still uses all of it.
 
 `css/mgdb-home-alt.css` loads only on the two variants, after `mgdb-home.css`,
 and contains nothing but overrides scoped to `.mgdb-home-v2` / `.mgdb-home-v3`.
@@ -5350,9 +5478,11 @@ classes) *even inside a narrower media query*. Both breakpoints therefore have
 to be restated in the variant sheet; without that, version 3 fell to a single
 very wide column at 375px.
 
-When a design is chosen, fold its template and rules back into `index.php` and
-`mgdb_home.bau`, then delete `pages/index2`, `pages/index3`,
-`mgdb-home-alt.css`, the two variant templates, and their five manifest entries.
+The design was chosen and the alternatives are gone (2026-09-05). What was
+*not* done is folding the variant rules back into `mgdb-home.css` and dropping
+the `mgdb-home-v3` / `mgdb-home-v4` classes: production still depends on both
+blocks of `mgdb-home-alt.css` under names that read like scratch artifacts.
+That rename is a separate change with its own verification.
 
 ### The icons
 
@@ -6638,8 +6768,13 @@ Three details:
   wrapped inside it and a two-line reserve was needed, which left an empty line
   under every short one. Taking the row's spare width gives the hint 684px, and
   all twenty descriptions then sit on one line, so the reserve is one line.
-- **`min-height` matches the line height**, so the panel does not jog as the
-  text changes. Verified by hovering all twenty: the panel stays 234px.
+- **`min-height` reserves two lines, in every panel.** It was one line here,
+  which is all the Data Hubs panel needs at its 684px hint width. The pattern
+  then spread to About, Community and Genomes \(2026-09-05\), and the About
+  panel is only 584px wide, so three of its five descriptions wrap — and the
+  panel grew 20px under the pointer as the reader moved down a column. Two
+  lines is the measured maximum across all five panels; see **The hover
+  descriptions spread to every panel** below.
 - **Reset happens on the panel's `mouseleave`, not each link's.** Per-link reset
   flickers while the pointer crosses the gap between two rows.
 
@@ -6652,6 +6787,59 @@ announcing it on every hover would be noise. Screen reader and touch users get
 the labels plus the **"Data hub descriptions"** heading action, which is the
 accessible route to the same information and the reason the hover version is an
 enhancement rather than the only way in.
+
+### The hover descriptions spread to every panel
+
+2026-09-05, on Carson's call. **About**, **Community** and **Genomes** lost
+their group headings and gained `data-desc` on every link, so four of the five
+panels now carry descriptions and only **Tools** still groups its links under
+headings — it is the biggest and most heterogeneous of them, 17 links across
+four themes.
+
+A heading names the shelf; a description says what the thing is. "Project" and
+"Learn" on the About panel were the clearest case, but "Collections" /
+"Explore and browse" and "Community" / "Literature & media" / "Share data" were
+doing the same approximate work that a per-link description does exactly. The
+columns keep their old grouping and reading order — only the labels are gone.
+
+`<div class="mega-group">` rather than `<section>`: a `<section>` with no
+heading has no accessible name.
+
+**Every link inside the `.mega-grid` needs a description, including the ones in
+the feature cards.** The hint resets on the grid's `mouseleave`, not each
+link's, so a described link followed by an undescribed one leaves the previous
+description standing while the pointer is somewhere else. The B73 card's five
+version-rail links and the Maize Meeting card's two links carry them for that
+reason.
+
+#### The panel used to shake, and now cannot
+
+A description that wrapped to a second line grew the open panel by 20px under
+the pointer. The hint is the only thing in an open panel whose height changes,
+and it sits above the link lists, so everything below it moved.
+
+`p.mega-hint` now reserves `min-height: 40px` — two lines at its 20px
+line-height — so a one-line and a two-line description occupy the same box.
+Two lines is measured, not guessed. Every description in all five panels, at
+the hint width each panel actually gets:
+
+| Panel | Hint width | Longest description |
+|---|---|---|
+| About | 381px | **two lines** \(3 of 5\) |
+| Genomes | 628px | one line |
+| Data hubs | 684px | one line |
+| Community | 686px | one line |
+| Tools | 768px | one line |
+
+Those widths do not vary with the viewport: the dropdowns are fixed-width, and
+below 1164px the drawer takes over and `.mega-hint` is `display: none`, so the
+reserve costs nothing on a phone. Verified after by writing every description
+into its panel's hint and reading the panel height back — one value per panel,
+unchanged across all of them: About 266px, Community 389px, Genomes 334px,
+Tools 293px, Data hubs 281px.
+
+**Keep a new description inside two lines at 381px**, roughly 110 characters,
+or the jump comes back on the About panel.
 
 ### One link lost
 

@@ -82,10 +82,12 @@ function dataCenterHubCounts($DBConn) {
         $counts['genomes'] = (int) $row['c'];
     }
 
-    $row = @retrieve_row(make_query($DBConn, "SELECT COUNT(*) AS c FROM chado.gene_model"));
-    if ($row && isset($row['c'])) {
-        $counts['gene_models'] = (int) $row['c'];
-    }
+    /* No gene-model count. `chado.gene_model` holds only the models the database
+       stores as records, and the ones distributed in flat files are not in it --
+       though they are represented in the pan-genes and connected to everything
+       else. A figure comparing collection sizes would have shown maize as having
+       far fewer gene models than it has (Carson, 2026-09-05). Counting it
+       honestly is a question for the gene hub, not a bar on a directory page. */
 
     $row = @retrieve_row(make_query($DBConn, "
         SELECT COUNT(DISTINCT pan_gene_name) AS c FROM chado.pan_gene_search"));
@@ -152,7 +154,6 @@ function getDataCenterHubMetrics($DBConn, $counts = null, $hub_count = 0) {
    $counts is simply absent -- there is no placeholder bar. */
 function getDataCenterHubScale($counts) {
     $names = array(
-        'gene_models' => 'Gene models',
         'variations'  => 'Variation records',
         'loci'        => 'Locus records',
         'markers'     => 'Markers and probes',

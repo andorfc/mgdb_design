@@ -1,0 +1,201 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-project-dooner-du-acds
+<a class="mgdb-skip-link" href="#dd-main">Skip to main content</a>
+<main class="mgdb-page mgdb-hub-page mgdb-resource-page mgdb-dd-page" id="dd-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/projects">Projects</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Dooner and Du Ds-GFP insertions</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="dd-title">
+    <div class="mgdb-hero-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="A transposon inserted into a chromosome">
+        <rect x="10" y="40" width="76" height="16" rx="8" fill="#c9d6bd" />
+        <rect x="38" y="28" width="20" height="40" rx="6" fill="#2f5e2a" />
+        <path d="M44 40l8 8-8 8" fill="none" stroke="#f2f7ee" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      <strong>Community<br />Resource</strong>
+      <span>NSF award 1339238</span>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="dd-title">Dooner and Du sequence-indexed Ds-GFP insertions</h1>
+      <p class="mgdb-hero-tagline">A sequence-indexed collection of single transposed Ds elements tagged with GFP, spread through the maize genome.</p>
+      <p class="mgdb-hero-description">Hugo Dooner and Chunguang Du generated $(collection-count) Ds-GFP insertions, called <i>trdsg</i> for &ldquo;transposed Ds-GFP&rdquo;, using next-generation sequencing, three-dimensional pooling, and a software package written for the project. A line in which a single gene has been disrupted is a direct tool for working out what that gene does. MaizeGDB holds $(insertion-count) of these insertions as searchable records and $(stock-count) matching seed stocks.</p>
+      <div class="mgdb-hero-actions">
+        <a class="mgdb-button mgdb-button-primary" href="#dd-find">Find these insertions</a>
+        <a class="mgdb-button mgdb-button-secondary" href="#dd-selection">How they were made</a>
+        <a class="mgdb-button mgdb-button-secondary" href="#dd-ordering">Before you order seed</a>
+      </div>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#dd-find" class="is-current" aria-current="true">Find insertions</a>
+    <a href="#dd-selection">How they were made</a>
+    <a href="#dd-ordering">Ordering seed</a>
+    <a href="#dd-references">References</a>
+    <a href="#dd-related">Related resources</a>
+  </nav>
+
+  <!-- ── Metrics ─────────────────────────────────────────────────────────── -->
+  <section aria-labelledby="dd-summary-title">
+    <h2 class="mgdb-visually-hidden" id="dd-summary-title">The collection in numbers</h2>
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric mgdb-tone-green">
+        <div class="mgdb-metric-top">
+          <h3>In the collection</h3>
+          <span class="mgdb-metric-badge">Published</span>
+        </div>
+        <div class="mgdb-metric-stat"><strong class="mgdb-metric-value">$(collection-count)</strong></div>
+        <p class="mgdb-metric-description">Ds-GFP insertions reported by Dooner and Du across the genome.</p>
+      </article>
+      <article class="mgdb-metric mgdb-tone-amber">
+        <div class="mgdb-metric-top">
+          <h3>Searchable here</h3>
+          <span class="mgdb-metric-badge">MaizeGDB</span>
+        </div>
+        <div class="mgdb-metric-stat"><strong class="mgdb-metric-value">$(insertion-count)</strong></div>
+        <p class="mgdb-metric-description">Insertion records in the Insertion Data Hub, with $(alignment-count) alignments to current assemblies.</p>
+      </article>
+      <article class="mgdb-metric mgdb-tone-blue">
+        <div class="mgdb-metric-top">
+          <h3>Seed stocks</h3>
+          <span class="mgdb-metric-badge">Stock Center</span>
+        </div>
+        <div class="mgdb-metric-stat"><strong class="mgdb-metric-value">$(stock-count)</strong></div>
+        <p class="mgdb-metric-description">Stocks whose name begins <code>tdsg</code>, orderable from the Maize Genetics Cooperation Stock Center.</p>
+      </article>
+      <article class="mgdb-metric mgdb-tone-burgundy">
+        <div class="mgdb-metric-top">
+          <h3>Genome browsers</h3>
+          <span class="mgdb-metric-badge">Tracks</span>
+        </div>
+        <div class="mgdb-metric-stat"><strong class="mgdb-metric-value">3</strong></div>
+        <p class="mgdb-metric-description">B73 RefGen_v3, B73 v5 and W22 v2 carry the insertions as a browser track.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ── Find these insertions ───────────────────────────────────────────── -->
+  <section id="dd-find" aria-labelledby="dd-find-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="dd-find-title">Find these insertions</h2></div>
+    </div>
+    <p class="mgdb-section-intro">For each insertion, MaizeGDB holds the 3&prime; flanking sequence, the genome position, and the genes tagged or nearby. There are four ways in, depending on whether you are starting from a gene, from a region, or from a stock name.</p>
+
+    <div class="mgdb-card-grid">
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-ok">Search</span>
+        <h3>Insertion Data Hub</h3>
+        <p>Search all insertion collections held here by gene model, by position, or by insertion name, and filter to the Dooner-Du Ac/Ds dataset.</p>
+        <a href="/insertion">Search insertions <span aria-hidden="true">&rarr;</span></a>
+      </article>
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-info">Browse</span>
+        <h3>Genome browsers</h3>
+        <p>The insertions as a track on B73 v5 and on W22 v2, alongside the gene models.</p>
+        <a href="https://jbrowse.maizegdb.org/?tracks=doonerDs" target="_blank" rel="noopener">B73 v5 in JBrowse <span aria-hidden="true">&nearr;</span></a>
+        <a href="https://jbrowse.maizegdb.org/?tracks=gene_models%2CdoonerDs" target="_blank" rel="noopener">W22 v2 in JBrowse <span aria-hidden="true">&nearr;</span></a>
+      </article>
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-warn">Order</span>
+        <h3>Seed stocks</h3>
+        <p>Stocks are held at the Maize Genetics Cooperation Stock Center. Enter <code>tdsg</code> in the simple search to list them all.</p>
+        <a href="/data_center/stock">Search stocks <span aria-hidden="true">&rarr;</span></a>
+      </article>
+      <article class="mgdb-card">
+        <span class="mgdb-pill">Verify</span>
+        <h3>PCR-verified lines</h3>
+        <p>The Maize Gametophyte Project tested 83 of these lines by PCR and published transmission rates and primer sequences for each.</p>
+        <a href="/projects/fowler_insertion_validation">Fowler insertion verification <span aria-hidden="true">&rarr;</span></a>
+      </article>
+    </div>
+
+    <div class="mgdb-note mgdb-note-info">
+      <strong>The project's own site is not answering.</strong> <code>acdsinsertions.org</code>, which published the collection's own tables, did not respond when this page was last checked on 5 September 2026. Everything above is held at MaizeGDB and does not depend on it.
+    </div>
+  </section>
+
+  <!-- ── How they were made ──────────────────────────────────────────────── -->
+  <section id="dd-selection" aria-labelledby="dd-selection-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="dd-selection-title">How the insertions were selected</h2></div>
+    </div>
+
+    <div class="mgdb-prose-layout">
+      <div class="mgdb-prose">
+        <p>The T-DNA launching platforms carry the <i>c1-m\(Dsg\)</i> engineered GFP-tagged reporter allele \(T0\) and produce a green fluorescent, <i>Ac</i>-dependent spotted phenotype \(T2\). <i>Ac</i> activity comes from the native <i>wx-m7\(Ac\)</i> allele on chromosome 9 \(T1\).</p>
+        <p>From any given launching platform, Dooner and Du selected transpositions of <i>Dsg</i> \(T3\) as exceptional purple revertants that keep green fluorescence \(C&prime;+Dsg\), so the spotted phenotype is lost at the outset. Those selections were crossed to a <i>c1</i> tester to confirm that revertants were concordant &mdash; that the selection is heritable &mdash; and to measure the linkage between the transposed <i>Dsg</i> \(<i>trDsg</i>\) and its launching platform \(T3\).</p>
+        <p>Where a transposition was unlinked or loosely linked, colourless, green fluorescent \(<i>Dsg</i>\) kernels were selected from the testcross progeny \(T4\) for sequence-indexing and seed propagation. Where a <i>trDsg</i> was so closely linked that the testcross produced few or no colourless fluorescent seed, purple \(C&prime;\) green fluorescent kernels were used instead; these are rare among the material sent to the Stock Center. All sequence-indexed selfed progenies \(T5\) were deposited in the Maize Genetics Cooperation Stock Center.</p>
+      </div>
+      <aside class="mgdb-aside-card">
+        <h3>Sequence-indexing</h3>
+        <p>Insertion sites were recovered by next-generation sequencing of three-dimensional pools, deconvoluted with InsertionMapper, a pipeline written for this project \(Xiong et al. 2013\).</p>
+      </aside>
+    </div>
+
+    <figure class="dd-figure">
+      <img src="/images/Dooner_Du_Ds-GFP_figure.png" alt="Crossing scheme from the T-DNA launching platform through to sequence-indexed selfed progeny, showing the kernel phenotypes selected at each generation." loading="lazy" decoding="async" />
+      <figcaption>Selection and use of transposed Ds-GFP \(<i>trDsg</i>\) elements, from the launching platform \(T0\) to the sequence-indexed selfed progeny \(T5\) deposited at the Stock Center.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ── Ordering ────────────────────────────────────────────────────────── -->
+  <section id="dd-ordering" aria-labelledby="dd-ordering-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="dd-ordering-title">Before you order seed</h2></div>
+    </div>
+
+    <div class="mgdb-note">
+      <strong>The <i>trDsg</i> element is segregating in the progeny.</strong> Dooner and Du did not select for or against <i>wx</i>, so what arrives from the Stock Center is a segregating family rather than a homozygous line.
+    </div>
+
+    <div class="mgdb-prose">
+      <p>If the waxy endosperm phenotype is still segregating, selecting for it should retain <i>Ac</i> &mdash; useful if you want to start secondary movements of the mapped <i>trDsg</i>. <i>Ac</i> can transpose out of <i>wx1-m7\(Ac\)</i> and leave a defective <i>wx</i> allele, but such transpositions are rare.</p>
+      <p>Selecting against <i>wx</i> should eliminate <i>Ac</i>, unless <i>Ac</i> transposed away from <i>wx</i> while the <i>trDsg</i> stock was being derived. The presence or absence of <i>Ac</i> can be settled definitively by crossing to the native <i>c1-m2</i> allele, which is also available from the Stock Center.</p>
+    </div>
+  </section>
+
+  <!-- ── References ──────────────────────────────────────────────────────── -->
+  <section id="dd-references" aria-labelledby="dd-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="dd-references-title">References</h2></div>
+    </div>
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
+  <!-- ── Related ─────────────────────────────────────────────────────────── -->
+  <section id="dd-related" class="mgdb-hub-related" aria-labelledby="dd-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="dd-related-title">Related resources</h2></div>
+    </div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/insertion">
+          <strong>Insertion Data Hub</strong>
+          <span>Every insertion collection held here, searchable together</span>
+        </a>
+        <a href="/projects/fowler_insertion_validation">
+          <strong>Fowler insertion verification</strong>
+          <span>PCR verification and transmission rates for 83 of these lines</span>
+        </a>
+        <a href="/uniformmu">
+          <strong>UniformMu</strong>
+          <span>The other large sequence-indexed insertion resource hosted here</span>
+        </a>
+        <a href="/data_center/stock">
+          <strong>Stock Data Hub</strong>
+          <span>Search the Stock Center catalogue, including the tdsg stocks</span>
+        </a>
+        <a href="/projects">
+          <strong>All research projects</strong>
+          <span>Every maize project with data, results or documentation at MaizeGDB</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+)

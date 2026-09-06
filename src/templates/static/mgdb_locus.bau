@@ -25,13 +25,14 @@ $$SYNTAX-LEVEL 2
     </div>
     <div class="mgdb-hero-body">
       <h1 id="locus-title">Explore classic maize genetic loci &amp; mutant genes</h1>
-      <p class="mgdb-hero-description">Discover $(total_loci) curated genetic loci &mdash; including $(gene_loci) characterized genes, $(total_alleles) mutant alleles, and $(distinct_phenotypes) phenotypic classes &mdash; mapped across chromosomes and linked to reference gene models.</p>
+      <p class="mgdb-hero-description">Search $(total_loci) curated genetic loci, covering $(gene_loci) characterized genes, $(total_alleles) mutant alleles, and $(distinct_phenotypes) phenotypic classes, mapped across chromosomes and linked to reference gene models.</p>
     </div>
   </section>
 
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
     <a href="#locus-search-panel" class="is-current" aria-current="true">Search</a>
     <a href="#locus-top-genes">Classic genes</a>
+    <a href="#locus-types">Locus types</a>
     <a href="#locus-downloads">Downloads</a>
     <a href="#locus-references">References</a>
     <a href="#locus-metrics">Metrics</a>
@@ -40,11 +41,8 @@ $$SYNTAX-LEVEL 2
 
   <!-- Notice: Gene Models vs Classic Loci -->
   <div class="locus-notice-banner" role="note">
-    <div class="locus-notice-icon" aria-hidden="true">&#9432;</div>
-    <div class="locus-notice-body">
-      <strong>Looking for annotated gene models or transcript IDs?</strong>
-      <span>B73 reference gene models \(e.g., <code>Zm00001eb026700</code>, <code>GRMZM2G098346</code>\) are indexed in the <a href="/gene_center/gene">Gene Center &rarr;</a>. Classic genetic loci, characterized mutant symbols, and mapped marker loci are searched below.</span>
-    </div>
+    <span class="locus-notice-icon" aria-hidden="true">&#9432;</span>
+    <span class="locus-notice-body"><strong>Looking for the functional annotations of gene models?</strong> Search the <a href="/gene_center/gene">Gene Center &rarr;</a></span>
   </div>
 
   <section id="locus-search-panel" class="locus-search-panel" aria-labelledby="locus-search-title">
@@ -209,7 +207,44 @@ $$SYNTAX-LEVEL 2
         <p>Granule-bound starch synthase responsible for amylose synthesis in the endosperm and pollen grains.</p>
         <span class="mgdb-muted locus-card-footer">Model&#58; Zm00001eb378290 &middot; 95 alleles</span>
       </article>
+
+      <article class="mgdb-card">
+        <div class="locus-card-top">
+          <span class="mgdb-pill mgdb-pill-ok">Chr 4 &middot; Bin 4.05</span>
+        </div>
+        <h3><a href="/data_center/locus?id=12664"><em>su1</em> &mdash; sugary1</a></h3>
+        <p>Starch debranching enzyme \(isoamylase1\) whose loss leaves the sugary endosperm that sweet corn is grown for.</p>
+        <span class="mgdb-muted locus-card-footer">Model&#58; Zm00001eb174590 &middot; 78 alleles</span>
+      </article>
+
+      <!-- These seven are examples, not a ranking. The card below says where the
+           whole list lives, so the section cannot be mistaken for the corpus. -->
+      <article class="mgdb-card locus-card-more">
+        <div class="locus-card-top">
+          <span class="mgdb-pill">Naming</span>
+        </div>
+        <h3><a href="/data_center/gene-symbols">Gene symbol prefixes</a></h3>
+        <p>The seven above are a sample. All 1,181 symbol prefixes used when naming maize genes, such as <em>adh</em> behind <em>adh1</em>, are listed and searchable on one page.</p>
+        <span class="locus-card-footer"><a class="mgdb-button mgdb-button-secondary" href="/data_center/gene-symbols">Browse gene symbols <span aria-hidden="true">&rarr;</span></a></span>
+      </article>
     </div>
+  </section>
+
+  <section id="locus-types" aria-labelledby="locus-types-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="locus-types-title">Locus types</h2>
+      </div>
+    </div>
+
+    <p class="mgdb-note">Every result carries a type tag. A locus here is any mapped
+      position, so the tag says what kind of thing was mapped &#58; a characterized
+      gene, a probed site, a transgene, a segment of chromosome. The wording below is
+      MaizeGDB's own definition of each type, the same text the term record shows.</p>
+
+    <dl class="locus-type-list">
+      $(type_glossary)
+    </dl>
   </section>
 
   <section id="locus-downloads" aria-labelledby="locus-downloads-title">
@@ -234,8 +269,8 @@ $$SYNTAX-LEVEL 2
           <span class="mgdb-pill mgdb-pill-info">Bulk Data</span>
           <h3>Locus to Gene Model Mapping</h3>
         </div>
-        <p>Download comprehensive tab-delimited mapping tables correlating classic locus symbols to B73/W22 gene model identifiers.</p>
-        <a class="mgdb-button mgdb-button-secondary" href="https://download.maizegdb.org/Gene_Models/">Browse Download Files <span aria-hidden="true">&nearr;</span></a>
+        <p>Every curated locus with the gene models it has been associated with, in one sortable table.</p>
+        <a class="mgdb-button mgdb-button-secondary" href="/associated_genes?type=all&amp;style=table">View the mapping table <span aria-hidden="true">&rarr;</span></a>
       </article>
 
       <article class="locus-download-card">

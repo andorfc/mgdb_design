@@ -67,7 +67,7 @@
   /* The measured-value summary. The legacy trait page offered a download link
      driven by an endpoint that answers with a PHP fatal, so the numbers are
      given here and the bulk files linked instead. */
-  function renderValues(data) {
+  function renderValues(data, attributes) {
     var out = R.byId('term-record-values-body');
     if (!out) { return false; }
     out.innerHTML = '';
@@ -82,9 +82,16 @@
       ['Units', (v.units || []).map(R.escape).join(', ')]
     ];
     out.insertAdjacentHTML('beforeend', R.facts(pairs));
+    /* The viewer link carries this trait, so the reader lands on its values
+       rather than on an empty form. The name is the term's own, which is what
+       the search resolves against. */
+    /* `data` here is doc.data.sections, so the term's own name comes in
+       separately -- reading data.attributes would be undefined. */
+    var name = (attributes && attributes.name) || '';
+    var viewer = '/traits_ibm_nam' + (name ? '?trait=' + encodeURIComponent(name) : '');
     out.insertAdjacentHTML('beforeend',
       '<p class="mgdb-rec-block-status">Per-line values for this trait are in the ' +
-      R.link('/traits_ibm_nam', 'IBM and NAM trait viewer') + ', and as files at ' +
+      R.link(viewer, 'IBM and NAM trait viewer') + ', and as files at ' +
       R.link(v.bulk_download, 'download.maizegdb.org') + '.</p>');
     return true;
   }
@@ -232,7 +239,7 @@
 
     var rendered = {};
     rendered['term-record-overview'] = renderOverview(data);
-    rendered['term-record-values'] = renderValues(data);
+    rendered['term-record-values'] = renderValues(data, doc.data.attributes || {});
     rendered['term-record-phenotypes'] = renderPhenotypes(data);
     rendered['term-record-analyses'] = renderAnalyses(data);
     rendered['term-record-related'] = renderRelated(data);

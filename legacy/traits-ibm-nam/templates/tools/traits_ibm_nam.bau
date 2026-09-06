@@ -1,0 +1,105 @@
+$$SYNTAX-LEVEL 2
+*(traits_ibm_nam-content {include-css: /css/data_center.css}
+<div id="search_gray_background" style="width: 98%">
+<table summary="A table within which you can set filtering criteria." width="100%">
+    <tr>
+      <td>
+        <div>
+          <p style="margin-bottom: 8px;">
+            <span style="font-family: Verdana,Arial,sans-serif; font-size: 110%; font-weight: bold; margin-bottom: 6px;">
+              Set up Search Criteria
+            </span>
+          </p>
+          <p>
+            Use this form to search through the catalog of <b>$(count)</b> Trait Values. 
+            Additionally, you can
+            <a href="https://download.maizegdb.org/SNPs_and_Maps/Traits/Trait_Values_IBM_NAM.zip">
+            download the full list of lines in text format</a>.<br><br>            
+            Check the boxes next to the fields you want to search; if you 
+            just want to find records that have <i>any</i> value for that 
+            attribute, check the box and leave the criteria alone.  You can 
+            use <b>%</b> or <b>*</b> as a wildcard in the text fields. <br><br>
+            There are two ways to conduct a search. "Search" will load results below 
+            the form and is useful for small searches, such as trait values from a specific Stock. 
+            "Search & Download" will download the results in a text file and is useful for large
+            searches, such as all trait values from a specific trait name, reference, environment, or PO term.          
+          </p>
+          <br>
+          Show only traits:
+          <form method="post" 
+                action="javascript:traits_ibm_nam_adv_search('adv_results'\);" 
+                style="margin-bottom:0px;margin-top:0px;padding-bottom:0px;line-height:210%"
+                id="traits_ibm_nam_form">
+            <!-- PO name -->
+            <input name="check" value="true" type="hidden">
+            <input id="box_po" name="box_po" value="true" type="checkbox"> 
+            <label for="box_po"> </label> with 
+            <label for="po_name">this <b>Plant Ontology Term</b></label>: 
+            <select class="small" name="po_name" 
+                      onchange="document.getElementById('box_po'\).checked = true;" 
+                      id="po_name">
+              <option value="0">All PO Terms</option>
+              $(po-list)
+            </select><br>
+            <!-- trait name -->
+            <input name="check" value="true" type="hidden">
+            <input id="box_name" name="box_name" value="true" type="checkbox"> 
+            <label for="box_name"> </label> with 
+            <label for="trait_name">this <b>Name</b></label>: 
+            <select class="small" name="trait_name" 
+                      onchange="document.getElementById('box_name'\).checked = true;" 
+                      id="trait_name">
+              <option value="0">All Trait Names</option>
+              $(tname-list)
+            </select><br>
+            <!-- stock -->
+            <input id="box_stock" name="box_stock" value="true" type="checkbox"> 
+            <label for="box_stock"> </label> of 
+            <label for="stock">this <b>Stock</b></label>:
+            <input name="stock" size="20" maxlength="30" class="small" 
+                   onchange="document.getElementById('box_stock'\).checked = true;" type="text"
+                   id="stock"> (e.g. <a href="#!" onclick="document.getElementById('stock'\).value='NAM-Z012E0148'; document.getElementById('box_stock'\).checked = true;">NAM-Z012E0148</a>\)
+            <br>
+            <!-- reference -->
+            <input id="box_ref" name="box_ref" value="true" type="checkbox"> 
+            <label for="box_ref"> </label> from
+            <label for="reference">
+              this 
+              <b>
+                Reference
+              </b>
+            </label>: 
+            <select class="small" name="reference" id="reference"
+                    onchange="document.getElementById('box_ref'\).checked = true;">
+              <option value="0">All References</option>
+              $(ref-list);
+            </select>
+            <br>
+            <!-- environments -->
+            <input id="box_env" name="box_env" value="true" type="checkbox"> 
+            <label for="box_env"> </label> <label for="env"><b>from</b> 
+            this <b>Environment</b></label>: 
+            <select class="small" name="env" id="env"
+                    onchange="document.getElementById('box_env'\).checked = true;">
+              <option value="0">All environments</option>
+              $(env-list)
+            </select>
+            <br>
+            <input id="download" name="download" type="hidden" value="">
+            <input class="button" value="Search" type="button" onclick="javascript:traits_ibm_nam_adv_search('adv_results'\);">
+            &nbsp;
+            <input class="button" value="Search & Download" type="button" onclick="javascript:traits_ibm_nam_dl(\);">
+            &nbsp;
+            <input class="button" value="Clear" type="button" onclick="javascript:this.form.reset(\);">
+          @(adv_limits
+              *(adv_adjust_limits {load: templates/data_center/set_adv_search_limit.bau})
+            )
+          </form>
+
+          <div id="adv_results"></div>
+        </div>
+      </td>
+    </tr>
+  </table>
+ </div>
+)

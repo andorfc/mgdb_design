@@ -26,16 +26,30 @@
    Sticky Section Tabs
    -------------------------------------------------------------------------- */
 
+/* One row at every width. Eight labels do NOT fit on one row from 1280 down to
+   641 as the offset note below used to claim: measured, this bar wraps to two
+   rows and 105px from about 830px all the way down to 641, so the flat 65px
+   offset was 40px short across roughly 190px of width -- every tablet held in
+   portrait. The bar scrolls instead of wrapping, which makes it exactly one tab
+   tall everywhere and stops the offset depending on label widths. */
 .mgdb-genetic-variation-page .mgdb-section-tabs {
   position: sticky;
   z-index: 20;
   top: 0;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: var(--mgdb-space-2);
   margin-top: var(--mgdb-space-5);
   margin-bottom: var(--mgdb-space-5);
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
 }
+
+/* The other half: an item that cannot wrap the row still shrinks, so without
+   this "Related resources" breaks over two lines and the bar is tall again for
+   a different reason. */
+.mgdb-genetic-variation-page .mgdb-section-tabs a { white-space: nowrap; }
 
 .mgdb-genetic-variation-page .mgdb-section-tabs a {
   display: inline-flex;
@@ -71,9 +85,9 @@
    Values filled in from measurement. */
 .mgdb-genetic-variation-page > section[id] { margin-bottom: var(--mgdb-space-5); }
 
-/* Measured: eight labels sit on one 57px row from 1280 down to 641, where the
-   bar stops being sticky altogether, so only one band needs a value of its own
-   and below 640 a section has nothing to clear. */
+/* The bar is held to one 57px row at every width by the rule above, so this
+   band needs only the flat value. Below 640 the bar stops being sticky, so a
+   section there has nothing to clear. */
 @media (max-width: 1170px) and (min-width: 641px) {
   .mgdb-hub-page.mgdb-genetic-variation-page > section[id] { scroll-margin-top: 65px; }
 }
@@ -598,12 +612,9 @@
 }
 
 @media (max-width: 640px) {
-  .mgdb-genetic-variation-page .mgdb-section-tabs {
-    position: static;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-  }
-  .mgdb-genetic-variation-page .mgdb-section-tabs a { white-space: nowrap; }
+  /* Only the sticky behaviour changes here now; the bar has scrolled rather
+     than wrapped since the base rule. */
+  .mgdb-genetic-variation-page .mgdb-section-tabs { position: static; }
   .mgdb-genetic-variation-page .gv-globus-features { grid-template-columns: 1fr; }
   .mgdb-genetic-variation-page .gv-tool-facts > div { flex-direction: column; gap: 0; }
   .mgdb-genetic-variation-page .gv-tool-facts dd { text-align: left; }

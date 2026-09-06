@@ -863,32 +863,41 @@ $$SYNTAX-LEVEL 2
     </div>
 
 <div class="mgdb-card-grid nam-faqs-grid">
-      <!-- FAQ 1: What is NAM -->
+      <!-- FAQ 1: why the founders were sequenced. The group's own text, used as
+           written; the two links carry the phrase rather than the word "here",
+           so no word changes and the link still says where it goes. -->
+      <article class="mgdb-card nam-faq-wide">
+        <h3>Why were the NAM founder genomes sequenced, and how?</h3>
+        <p>Currently, many or most forms of sequence analyses are referenced to the single B73 inbred. Beyond B73, some of the most extensively researched maize lines are the core set of 25 inbreds known as the NAM founder lines, which represent a broad cross-section of modern maize genetic variation. Prior data show that gene content can differ by more than 5% across lines and that as much as half of the functional genetic information lies outside of genes in highly variable intergenic spaces. To capture and utilize this variation, B73 and the NAM founder inbreds have been sequenced and assembled by the NAM Consortium using PacBio long reads and a mate-pair strategy. Scaffolds were validated by BioNano optical mapping, and ordered and oriented using linkage and pan-genome marker data. RNA-seq data from multiple tissues were used to annotate each genome using a pipeline that includes BRAKER, Mikado, and PASA. These data will help the maize community assess the role of structural variation such as presence-absence variation and copy number variation in the determination of agronomic traits.</p>
+        <p>Learn more about <a href="/genome">maize genome sequencing</a> here. Explore the NAM assemblies at the <a href="/whole_genome">whole genome level</a> here.</p>
+      </article>
+
+      <!-- FAQ 2: preliminary vs official annotations. "the table below" in the
+           source reads "above" here, because the assemblies table with the xref
+           links is the section above this one. -->
+      <article class="mgdb-card nam-faq-wide">
+        <h3>Preliminary vs official gene identifiers</h3>
+        <p><strong>Important note:</strong> The NAM founders genome assemblies were released with a preliminary annotation. The official annotations are sufficiently different from the preliminary annotations that they have been given new names and gene models were given new identifiers. For example, the preliminary annotation for B97, <code>Zm00018a.1</code> was replaced with annotation <code>Zm00018ab.1</code>. The new identifiers are numbered in sequential order.</p>
+        <p>Cross-reference files that translate between the preliminary and official annotations can be found in the <a href="/download#downloads-nam">MaizeGDB downloads</a> and are linked in the table above.</p>
+      </article>
+
+      <!-- FAQ 3: What is NAM -->
       <article class="mgdb-card">
-        <span class="mgdb-pill mgdb-pill-info">Concept</span>
         <h3>What is Nested Association Mapping?</h3>
         <p>Nested Association Mapping \(NAM\) combines the advantages of linkage analysis \(high statistical power\) with genome-wide association studies \(high genetic resolution\). A common reference parent \(B73\) was crossed to 25 diverse founder lines, and 200 recombinant inbred lines \(RILs\) were generated per family to create ~5,000 lines with high historical and recent recombination density.</p>
       </article>
 
-      <!-- FAQ 2: Annotation IDs -->
+      <!-- FAQ 4: Ordering Seed -->
       <article class="mgdb-card">
-        <span class="mgdb-pill mgdb-pill-warn">Annotation Note</span>
-        <h3>Preliminary vs Official Gene Identifiers</h3>
-        <p>The NAM founder assemblies were initially released with preliminary gene annotations \(e.g., <code>Zm00018a.1</code> for B97\). The official annotations \(e.g., <code>Zm00018ab.1</code>\) replaced the preliminary models with improved evidence-based structures and sequential numbering. Use the cross-reference translation files linked in the table above to map between versions.</p>
-      </article>
-
-      <!-- FAQ 3: Ordering Seed -->
-      <article class="mgdb-card">
-        <span class="mgdb-pill mgdb-pill-ok">Seed Ordering</span>
         <h3>How to Order NAM RIL Seed Lines</h3>
         <p>Seed packets for the NAM founder lines and the ~5,000 recombinant inbred lines are maintained and distributed by the <strong>Maize Genetics Cooperation Stock Center</strong>. You can place seed requests directly through the <a href="https://maizecoopsc.org/nam-rils.php" target="_blank" rel="noopener">Maize COOP Stock Center NAM Portal &#8599;</a> or browse individual stock records linked above.</p>
       </article>
 
-      <!-- FAQ 4: Reporting Issues -->
+      <!-- FAQ 5: Reporting Issues -->
       <article class="mgdb-card">
-        <span class="mgdb-pill">Curation</span>
         <h3>Report Assembly or Gene Model Issues</h3>
         <p>If you encounter sequence anomalies, scaffold misorientations, or questionable gene annotations in any NAM assembly, you can submit an issue report directly to MaizeGDB curators via the <a href="/curation/GenomeIssue/edit">Genome Issue Curation Form &#8599;</a> to assist ongoing community curation.</p>
+      </article>
       </article>
     </div>
 

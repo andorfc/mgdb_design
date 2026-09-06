@@ -1,0 +1,49 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-stock-order
+<main class="mgdb-page mgdb-stock-order-page" id="mgdb-stock-order-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/stock">Stocks</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Stock order</span>
+  </nav>
+
+  <section class="mgdb-hero-basic" aria-labelledby="stock-order-title">
+    <span class="mgdb-hero-basic-icon" aria-hidden="true">
+      <svg viewBox="0 0 84 84" role="presentation" focusable="false">
+        <path d="M14 22h56l-6 44H20z" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/>
+        <path d="M31 32V20a11 11 0 0 1 22 0v12" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+        <path d="M33 46h18" stroke="#2f5e2a" stroke-width="5" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <div>
+      <h1 id="stock-order-title">Stock order</h1>
+      <p>Stocks you add from a stock record collect here until you submit them. The order goes to the Maize Genetics Cooperation Stock Center as one request.</p>
+    </div>
+  </section>
+
+  $(status_message)
+
+  <section aria-labelledby="stock-order-list-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="stock-order-list-title">Your order</h2></div>
+      <span class="mgdb-result-count">$(order_count)</span>
+    </div>
+
+    $(order_body)
+  </section>
+
+  <section aria-labelledby="stock-order-source-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="stock-order-source-title">Where this order goes</h2></div>
+    </div>
+
+    <div class="mgdb-card stock-order-source">
+      <img src="/images/mgcsc-banner-small.png" alt="Maize Genetics Cooperation Stock Center">
+      <div class="stock-order-source-body">
+        <p>The Maize Genetics Cooperation Stock Center holds and distributes the seed. Submitting hands the list to its request form, where you give the shipping address and any notes for the curators.</p>
+        <p><a class="mgdb-external" href="https://maizecoopsc.org/about" target="_blank" rel="noopener">About the Stock Center</a></p>
+      </div>
+    </div>
+  </section>
+
+</main>
+)

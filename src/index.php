@@ -19,6 +19,12 @@
  *              carried over from that review rather than renamed, so the page
  *              is byte-for-byte what the group approved at /index3/. Folding
  *              those rules into mgdb-home.css is a tidy-up, not a fix.
+ *  2026-09-05  /index2/, /index3/ and /index4/ removed; the review is over.
+ *              They are one-line 301s to / in controllers/index<n>.php, and
+ *              their files are under /var/www/claude/retired/. This file still
+ *              depends on css/mgdb-home-alt.css, which came from that review:
+ *              <main> carries mgdb-home-v3 AND mgdb-home-v4, so both blocks of
+ *              it are live.
  *
  * Where the page's numbers come from
  * ----------------------------------

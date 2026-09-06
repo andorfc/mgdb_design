@@ -809,3 +809,81 @@
 @media (max-width: 860px) {
   .mgdb-history-page .history-origins-layout { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* ── The MGEC section ────────────────────────────────────────────────────── */
+
+/* Added 2026-09-05 with the /mgec consolidation. Prose beside a figures card,
+   the same shape the About sections use elsewhere; minmax(0, …) so the text
+   column can shrink and the row stacks rather than overflowing. */
+.mgdb-history-page .history-mgec-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--mgdb-space-5);
+  align-items: start;
+}
+
+@media (min-width: 880px) {
+  .mgdb-history-page .history-mgec-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 19rem);
+  }
+}
+
+/* `.mgdb-prose` only sets a measure; paragraph margins come from the page, and
+   `.mgdb-page p { margin: 0 }` in the shared reset zeroes them. Without this the
+   section's three paragraphs run together as one block. */
+.mgdb-history-page .history-mgec-layout .mgdb-prose p {
+  margin: 0 0 var(--mgdb-space-3);
+}
+
+.mgdb-history-page .history-mgec-layout .mgdb-prose p:last-child { margin-bottom: 0; }
+
+.mgdb-history-page .history-mgec-quote {
+  margin: 0 0 var(--mgdb-space-4);
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-left: 4px solid var(--mgdb-gold);
+  border-radius: 0 var(--mgdb-radius) var(--mgdb-radius) 0;
+  background: var(--mgdb-surface-sunken);
+}
+
+.mgdb-history-page .history-mgec-quote p {
+  margin: 0;
+  font-size: var(--mgdb-text-base);
+  line-height: 1.55;
+}
+
+.mgdb-history-page .history-mgec-quote cite {
+  display: block;
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-style: normal;
+}
+
+.mgdb-history-page .history-mgec-figures {
+  margin: 0 0 var(--mgdb-space-4);
+  padding: 0;
+}
+
+.mgdb-history-page .history-mgec-figures > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--mgdb-space-3);
+  padding: var(--mgdb-space-2) 0;
+  border-bottom: 1px solid var(--mgdb-line-soft);
+}
+
+.mgdb-history-page .history-mgec-figures > div:last-child { border-bottom: 0; }
+
+.mgdb-history-page .history-mgec-figures dt {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-history-page .history-mgec-figures dd {
+  margin: 0;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}

@@ -1,0 +1,123 @@
+/* Archived data hubs -- /archive. On the Data Hub shell, so this sheet holds
+   only what is this page's own: the emblem mark, the collection card's badge
+   row, and its action row.
+
+   Deliberately not here any more, because css/mgdb-hub.css supplies it and
+   loads after this file:
+
+     - the card surface, radius, shadow and hairlines;
+     - the 3px top edge on `.mgdb-card-grid > .mgdb-card` and its hover. The
+       five per-collection edge colours this page used to set could not have
+       survived anyway: the shell's flat `border-color` is a shorthand, so a
+       page-level `border-top-color` at equal specificity loses to it. The
+       category pill on each card carries that distinction instead;
+     - the card grid itself. The old 6-column span layout (two wide, three
+       narrow) was this page's alone; `.mgdb-card-grid` gives the family's
+       auto-fit columns and makes the row heights agree with every other hub.
+*/
+
+.mgdb-modern .mgdb-archive-page { padding-bottom: clamp(3rem, 6vw, 5.5rem); }
+
+.mgdb-modern .archive-hero-mark {
+  display: block;
+  width: 7.2rem;
+  height: 6.3rem;
+  margin: 0 auto 0.7rem;
+}
+
+/* The category pill and the collection's letters, on one line above the title. */
+.mgdb-modern .archive-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+/* No top margin: the card's top row is now just the pill, and the giant
+   watermark letter that used to set this gap is gone. */
+.mgdb-modern .archive-collection-card h3 {
+  margin: 0 0 0.45rem;
+  color: var(--mgdb-green-dark);
+  font-size: 1.35rem;
+}
+
+/* The description takes the row's slack so the actions sit on one line across
+   a row of cards. `mgdb-hub.css` already gives `> p` `flex: 1 1 auto`; the
+   colour and measure are this page's. */
+.mgdb-modern .archive-collection-card > p {
+  margin: 0;
+  color: var(--mgdb-muted);
+  line-height: 1.6;
+}
+
+.mgdb-modern .archive-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 0.9rem;
+  margin-top: 1.2rem;
+}
+
+.mgdb-modern .archive-card-actions > a:not(.mgdb-button) {
+  color: var(--mgdb-burgundy);
+  font-size: 0.84rem;
+  font-weight: 750;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.15em;
+}
+
+.mgdb-modern .archive-help-card h3 {
+  margin: 0 0 0.65rem;
+  color: var(--mgdb-green-dark);
+  font-size: 1.3rem;
+  line-height: 1.25;
+}
+
+.mgdb-modern .archive-metric-note { margin-top: var(--mgdb-space-4); }
+
+@media (max-width: 420px) {
+  .mgdb-modern .archive-card-actions { align-items: stretch; flex-direction: column; }
+  .mgdb-modern .archive-card-actions .mgdb-button { width: 100%; }
+  .mgdb-modern .archive-hero-mark { width: 5.8rem; height: 5.1rem; }
+}
+
+/* The tab bar on this page never wraps. mgdb-modern.css makes it a scrolling
+   rail below 767px, and four short tabs fit one row above that, so it measures
+   57px at every width from 375 to 1920 -- checked, not assumed.
+
+   mgdb-hub.css steps the offset to 113px below 1170px because it assumes the
+   bar has gone to two rows there. On this page it has not, so every section
+   was landing about 48px below the sticky bar. Specificity (0,3,1) beats the
+   shell's (0,2,1). If a tab is ever added back, re-measure before deleting
+   this: the wrap point moves with the label text, not with the tab count. */
+@media (max-width: 1170px) {
+  .mgdb-hub-page.mgdb-archive-page > section[id] { scroll-margin-top: 65px; }
+}
+
+/* Named column counts, because there are five cards and `auto-fit` was giving
+   four of them a row and stranding the fifth.
+
+   Five is prime, so only 1 and 5 divide it. Five across was measured and
+   rejected: the page's content column is capped at 1182px, so a five-column
+   card is 224px at *any* viewport width, which pushes the card to 496px tall
+   and wraps "Open Cytogenetics" onto a second line. Three is the next best —
+   it leaves the fullest possible last row (3 + 2) at a card width that reads.
+
+   The breakpoints come from the 280px minimum the shared .mgdb-card-grid uses:
+   three columns need a 872px container (~992px viewport), two need 576px
+   (~700px). Below that they stack. */
+.mgdb-modern .archive-collection-grid {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 700px) {
+  .mgdb-modern .archive-collection-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 992px) {
+  .mgdb-modern .archive-collection-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

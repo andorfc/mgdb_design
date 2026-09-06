@@ -8,7 +8,6 @@
 
 include_once('./include/db-api.php');
 include_once('./include/dashboard_cache.php');
-include_once('./include/references_lib.php');
 
 $system = getSystemInfo('mgdb.conf');
 logMessage('Starting bac_search_modern.php');
@@ -106,20 +105,6 @@ $content->get('chart_data')->replace(json_encode(array('bars' => array(
     array('label' => 'Other names', 'count' => $bac_stats['other_prefix'])
 )), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 
-/* References: the physical map and assemblies this archive underpins.
-   Rendered by include/references_lib.php so these cards match every other hub. */
-$content->get('reference_cards')->replace(mgdb_render_references($doc_root, array(
-    // The reference these clones were repaired against.
-    array('doi' => '10.1126/science.abg5289'),
-    // How MaizeGDB became sequence-centric, which is what retired this archive.
-    array('doi' => '10.1093/database/bap020'),
-    // Turning a clone's map position into a sequence interval.
-    array('doi' => '10.1093/bioinformatics/btp556'),
-    // Querying these records alongside the rest of the warehouse.
-    array('doi' => '10.3389/fpls.2020.592730'),
-    // The database of record.
-    array('doi' => '10.1093/nar/gky1046'),
-)));
 $content->get('search_limit')->replace((int) $system['search_limit']);
 $content->get('search_limit_max')->replace((int) $system['search_limit_max']);
 /* The same number twice: the number input's max attribute needs it raw, the

@@ -72,6 +72,8 @@ $page_data = dashboardCache($system, 'locus/page_' . (int) @filemtime(__FILE__),
         'distinct_phenotypes' => $stats['distinct_phenotypes'],
         // One GROUP BY feeds both the type filter and the figure below the metrics.
         'type_rows'           => locusTypeRows($DBConn),
+        // Locus types with their curated definitions, for the glossary section.
+        'type_glossary'       => locusTypeGlossary($DBConn),
         'chr_options'         => locusChrOptions($DBConn),
         'pheno_options'       => locusPhenotypeOptions($DBConn)
     );
@@ -88,6 +90,13 @@ $content->get('type_options')->replace(locusRenderTypeOptions($type_rows));
 $content->get('chr_options')->replace($page_data['chr_options']);
 $content->get('pheno_options')->replace($page_data['pheno_options']);
 $content->get('chart_data')->replace(locusTypeChartData($type_rows));
+
+/* The tag glossary. Rendered from the same term memos the record pages show,
+   so a reader who meets "Lapsed Locus" on a result row can find out here what
+   it means without leaving the hub. */
+$content->get('type_glossary')->replace(
+    locusRenderTypeGlossary(isset($page_data['type_glossary']) ? $page_data['type_glossary'] : array())
+);
 
 /* References: the resources these locus records tie together, rendered by
    include/references_lib.php so these cards match every other hub. */

@@ -4,7 +4,16 @@ $$SYNTAX-LEVEL 2
   <span id="community_menu">
     <div class="dropdown_fullwidth mega-dropdown mega-dropdown-wide">
       <div class="mega-panel-heading mega-panel-heading-row">
-        <h2>Maize Genetics Community</h2>
+        <div class="mega-heading-text">
+          <h2>Maize Genetics Community</h2>
+          <!-- Filled in by mgdb-chrome.js from the pointed-at link's data-desc,
+               and reset once the pointer or focus leaves the grid. It replaced
+               the "Community", "Literature & media" and "Share data" group
+               headings on 2026-09-05: a heading names the shelf, a description
+               says what the thing is. aria-hidden because it duplicates the
+               link the reader is already on. -->
+          <p class="mega-hint" data-mgdb-hint data-mgdb-hint-default="Point at a link to see what it covers." aria-hidden="true">Point at a link to see what it covers.</p>
+        </div>
         <!-- Wrapped like the About and Genomes panels so all three stack the
              same way in the drawer. -->
         <div class="mega-heading-actions">
@@ -12,38 +21,42 @@ $$SYNTAX-LEVEL 2
         </div>
       </div>
       <div class="mega-grid mega-grid-4 mega-grid-community mega-compact-groups">
-        <section class="mega-group">
-          <h3>Community</h3>
-          <a href="https://www.maizegenetics.org" target="_blank" rel="noopener"><strong>Maize Genetics Cooperation</strong></a>
-          <a href="https://www.maizegenetics.org/mgac" target="_blank" rel="noopener"><strong>Advocacy</strong></a>
-          <a href="https://www.maizegenetics.org/awards/community-awards" target="_blank" rel="noopener"><strong>Awards</strong></a>
-          <a href="$(server-url)/person"><strong>Find researchers</strong></a>
-          <a href="$(server-url)/jobs"><strong>Jobs</strong></a>
-          <a href="$(server-url)/maize_history"><strong>Maize research history</strong></a>
-        </section>
-        <section class="mega-group">
-          <h3>Literature &amp; media</h3>
-          <a href="$(server-url)/data_center/reference"><strong>Find a paper</strong></a>
-          <a href="$(server-url)/hot_new_papers"><strong>Editorial picks</strong></a>
-          <a href="$(server-url)/maize_history#history-classic-reads"><strong>Classic reads</strong></a>
-          <a href="$(server-url)/mnl"><strong>Maize News Letter</strong></a>
-          <a href="$(server-url)/community/videos"><strong>Videos</strong></a>
-        </section>
-        <section class="mega-group">
-          <h3>Share data</h3>
-          <a href="$(server-url)/contribute_data"><strong>Contribute data</strong></a>
-          <a href="$(server-url)/FAIRpractices"><strong>FAIR practices</strong></a>
-          <a href="$(server-url)/nomenclature"><strong>Nomenclature</strong></a>
-          <a href="https://download.maizegdb.org" target="_blank" rel="noopener"><strong>Bulk downloads</strong></a>
-        </section>
+        <!-- No group headings; divs rather than sections, because a <section>
+             with no heading has no accessible name. The three columns keep the
+             grouping they always had -- people, then literature, then sharing
+             data -- so the reading order is unchanged; only the labels are
+             gone. Descriptions are the site map's own wording wherever it has
+             one, so a destination reads the same in both places, and are held
+             to two lines at this panel's column width. -->
+        <div class="mega-group">
+          <a href="https://www.maizegenetics.org" data-desc="The organization coordinating maize research cooperation." target="_blank" rel="noopener"><strong>Maize Genetics Cooperation</strong></a>
+          <a href="https://www.maizegenetics.org/mgac" data-desc="The Maize Genetics Advocacy Committee, at maizegenetics.org." target="_blank" rel="noopener"><strong>Advocacy</strong></a>
+          <a href="https://www.maizegenetics.org/awards/community-awards" data-desc="Maize Genetics Cooperation community awards." target="_blank" rel="noopener"><strong>Awards</strong></a>
+          <a href="$(server-url)/person" data-desc="Search the MaizeGDB people directory." ><strong>Find researchers</strong></a>
+          <a href="$(server-url)/jobs" data-desc="Positions shared with MaizeGDB."><strong>Jobs</strong></a>
+          <a href="$(server-url)/maize_history" data-desc="A century of maize genetics, and the history of MaizeGDB."><strong>Maize research history</strong></a>
+        </div>
+        <div class="mega-group">
+          <a href="$(server-url)/data_center/reference" data-desc="Search the curated maize literature."><strong>Find a paper</strong></a>
+          <a href="$(server-url)/hot_new_papers" data-desc="A recommended paper each month."><strong>Editorial picks</strong></a>
+          <a href="$(server-url)/maize_history#history-classic-reads" data-desc="Influential papers in maize genetics."><strong>Classic reads</strong></a>
+          <a href="$(server-url)/mnl" data-desc="Every issue since 1929."><strong>Maize News Letter</strong></a>
+          <a href="$(server-url)/community/videos" data-desc="Recorded talks, and demonstrations of controlled pollination."><strong>Videos</strong></a>
+        </div>
+        <div class="mega-group">
+          <a href="$(server-url)/contribute_data" data-desc="What we accept, in what formats, and how to send it."><strong>Contribute data</strong></a>
+          <a href="$(server-url)/FAIRpractices" data-desc="FAIR and AI-readiness at MaizeGDB."><strong>FAIR practices</strong></a>
+          <a href="$(server-url)/nomenclature" data-desc="Maize genetics nomenclature rules."><strong>Nomenclature</strong></a>
+          <a href="https://download.maizegdb.org" data-desc="Assemblies, annotations, insertions, expression, and more." target="_blank" rel="noopener"><strong>Bulk downloads</strong></a>
+        </div>
         <aside class="mega-feature mega-feature-blue">
           <span class="mega-badge">Upcoming</span>
           <h3>69th Maize Genetics Meeting</h3>
           <p>March 11–14, 2027<br>Rosemont, Illinois</p>
-          <a class="mega-feature-art" href="https://www.maizegenetics.org/maize-meeting/2027" target="_blank" rel="noopener">
+          <a class="mega-feature-art" href="https://www.maizegenetics.org/maize-meeting/2027" data-desc="The 69th Annual Maize Genetics Meeting, March 11-14 2027, Rosemont, Illinois." target="_blank" rel="noopener">
             <img src="/images/MGC2027_img.png" alt="69th Annual Maize Genetics Meeting, 2027" width="231" height="84" loading="lazy" decoding="async" />
           </a>
-          <a class="mega-secondary-link" href="$(server-url)/maize_meeting/">Past meetings &amp; abstracts</a>
+          <a class="mega-secondary-link" href="$(server-url)/maize_meeting/" data-desc="Programmes and abstracts from past annual meetings.">Past meetings &amp; abstracts</a>
         </aside>
       </div>
     </div>

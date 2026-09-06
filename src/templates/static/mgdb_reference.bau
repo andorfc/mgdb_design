@@ -33,7 +33,6 @@ $$SYNTAX-LEVEL 2
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
     <a href="#reference-search-panel" class="is-current" aria-current="true">Search</a>
     <a href="#reference-results-section">Results</a>
-    <a href="#reference-references">References</a>
     <a href="#reference-dashboard">Metrics</a>
     <a href="#reference-resources">Related resources</a>
   </nav>
@@ -120,7 +119,7 @@ $$SYNTAX-LEVEL 2
     </div>
 
     <div class="reference-export-bar">
-      <div><strong>Download matches</strong><span>Export up to 20,000 matching citations&#58;</span></div>
+      <div><strong>Download matches</strong></div>
       <div>
         <a href="#" data-reference-export="csv">CSV</a>
         <a href="#" data-reference-export="doi">DOI list</a>
@@ -145,16 +144,6 @@ $$SYNTAX-LEVEL 2
     <div id="reference-empty" class="mgdb-empty" hidden><strong>No matching references found.</strong><span>Try fewer words, a broader field, or clear one of the filters.</span></div>
     <div id="reference-error" class="reference-empty reference-error" hidden><strong>The search could not be completed.</strong><span>Please retry. If the problem continues, send the query to the MaizeGDB team.</span><button id="reference-retry" type="button">Retry search</button></div>
     <nav id="reference-pagination" class="reference-pagination" aria-label="Reference result pages"></nav>
-  </section>
-
-  <section id="reference-references" aria-labelledby="reference-references-title">
-    <div class="mgdb-section-heading">
-      <div><h2 id="reference-references-title">References</h2></div>
-    </div>
-
-    <div class="mgdb-ref-list">
-      $(reference_cards)
-    </div>
   </section>
 
   <section id="reference-dashboard" class="reference-dashboard" aria-labelledby="reference-dashboard-title">

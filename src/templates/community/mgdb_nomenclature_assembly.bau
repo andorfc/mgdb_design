@@ -1,0 +1,251 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-nomenclature-assembly
+<main class="mgdb-page mgdb-hub-page mgdb-nomenclature-assembly-page" id="nomenclature-assembly-main">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/nomenclature">Nomenclature</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Assembly and annotation</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="na-title">
+    <div class="mgdb-hero-emblem">
+      <div class="nomenclature-symbol-stack" aria-hidden="true"><span>Zm-B73-NAM-5.0</span><span>Zm00001e</span><span>Zm00001eb.1</span><span>Zm00001eb067740</span></div>
+      <strong>Assembly and annotation</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="na-title">Whole-Genome Assembly and Annotation Nomenclature for <i>Zea mays</i></h1>
+      <p class="mgdb-hero-description">The 2021 update to the community standard for naming genome assemblies, gene model sets, and gene models. MaizeGDB is the single naming authority for these identifiers.</p>
+    </div>
+  </section>
+
+  <p class="mgdb-note na-source"><strong>This page is the 2021 update in full.</strong> It replaces the PDF the nomenclature page used to link to, which is still available: <a href="https://documents.maizegdb.org/nomenclature/maize_assembly_nomenclature_2021.pdf" target="_blank" rel="noopener">maize_assembly_nomenclature_2021.pdf</a>. The text is reproduced as published, including its examples.</p>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#na-intro" class="is-current" aria-current="true">Introduction</a>
+    <a href="#na-assembly">Assembly names</a>
+    <a href="#na-sets">Gene model sets</a>
+    <a href="#na-models">Gene model IDs</a>
+    <a href="#na-related">Related resources</a>
+  </nav>
+
+  <section id="na-intro" aria-labelledby="na-intro-title">
+    <div class="mgdb-section-heading"><div><h2 id="na-intro-title">Introduction</h2></div></div>
+    <div class="na-prose">
+      <p>As the number of genome assemblies, gene model sets and gene models increase, unambiguous identification of each of these entities is necessary for clarity and precision. Our objective is to define identifiers that are unique across genomes, will not change, and will follow a nomenclature that is both machine and human readable. To ensure that identifiers are unique, MaizeGDB will be the single naming authority for the assignment of identifiers. The intent here is to provide a system for assigning unique and stable identifiers, so that researchers can be confident a genome and its gene models are all uniquely identified.</p>
+      <p>Genome assembly and annotation Project Personnel should work with MaizeGDB Personnel to acquire genome and annotation names that comply with the guidelines herein. In addition to the need for unique persistent identifiers, metadata is required to properly identify and describe genome assembly datasets. Project Personnel from genome assembly and annotation groups will also work with MaizeGDB Personnel to provide required metadata, as outlined here: <a href="/contribute_data">maizegdb.org/contribute_data</a>.</p>
+    </div>
+  </section>
+
+  <section id="na-assembly" aria-labelledby="na-assembly-title">
+    <div class="mgdb-section-heading"><div><h2 id="na-assembly-title">1. Genome Assembly Names</h2></div></div>
+    <div class="na-prose">
+      <h3>1a. Preamble</h3>
+      <p>A genome assembly is defined here as a group of sequences representing an entire genome, their relative order and metadata that allows unambiguous identification of the genome. A genome assembly dataset contains several entities including; a unique name, unambiguous identification of the sample from which DNA was taken, the type and quality of the assembly, the program and methods used to assemble the sequences, and the contig, scaffold and/or chromosomal sequences \(more details <a href="/contribute_data">here</a>\). Each new public genome assembly will be given a globally unique, persistent name and identifier. MaizeGDB will be the naming authority for these names. Genome assembly Project Personnel preparing to deposit genome assemblies into NCBI/EBI/DDBJ should first contact MaizeGDB to be assigned official identifiers.</p>
+
+      <h3>1b. Genome assembly name</h3>
+      <p class="na-pattern"><code>&lt;species id&gt;-&lt;cultivar&gt;-&lt;project&gt;-&lt;assembly version&gt;.&lt;sub-version&gt;</code></p>
+      <p>The name for the first assembly version of a cultivar named ZZ99, sequenced by group XGROUP: <code>Zm-ZZ99-XGROUP-1.0</code></p>
+
+      <h3>1c. Definition of each element in the name</h3>
+      <dl class="na-defs">
+        <dt><code>&lt;species id&gt;</code></dt>
+        <dd>An uppercase letter &ldquo;Z&rdquo; and lowercase letter &ldquo;m&rdquo; to indicate the maize species <i>Zea mays</i>; further information about the species will be included in the metadata of the assembly. Additional two letter codes can be used for other species in the genus <i>Zea</i> as follows:
+          <div class="mgdb-table-scroll">
+            <table class="mgdb-table na-species-table">
+              <caption class="mgdb-visually-hidden">Two-letter species codes for the genus Zea</caption>
+              <thead><tr><th scope="col">Species</th><th scope="col">Code</th></tr></thead>
+              <tbody>
+                <tr><td><i>Zea mays</i> subspecies <i>mays</i></td><td><code>Zm</code></td></tr>
+                <tr><td><i>Zea mays</i> subspecies <i>parviglumis</i></td><td><code>Zv</code></td></tr>
+                <tr><td><i>Zea mays</i> subspecies <i>mexicana</i></td><td><code>Zx</code></td></tr>
+                <tr><td><i>Zea mays</i> subspecies <i>huehuetenangensis</i></td><td><code>Zh</code></td></tr>
+                <tr><td><i>Zea diploperennis</i></td><td><code>Zd</code></td></tr>
+                <tr><td><i>Zea perennis</i></td><td><code>Zp</code></td></tr>
+                <tr><td><i>Zea luxurians</i></td><td><code>Zi</code></td></tr>
+                <tr><td><i>Zea nicaraguensis</i></td><td><code>Zn</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </dd>
+        <dt><code>&lt;cultivar&gt;</code></dt>
+        <dd>A short, descriptive name of the cultivar/inbred/accession/land race used. The name must be descriptive and distinguishable from lines with similar names. <strong>Note:</strong> To further uniquely identify the <code>&lt;cultivar&gt;</code>, seed representing the cultivar/inbred/accession/land race \(often bulk lots of sibling seeds\) should be made publicly available by depositing seed at, e.g. Plant Introduction Station or Maize Genetics COOP Stock Center, and their unique accession must be given in the metadata.</dd>
+        <dt><code>&lt;project&gt;</code></dt>
+        <dd>A short name or abbreviation that uniquely identifies the project responsible for the assembly. The project identifies the original generators of the sequence and the owners of that sequence in NCBI. More information to uniquely identify the sequence generators must be given in the metadata.</dd>
+        <dt><code>&lt;assembly version&gt;</code></dt>
+        <dd>A numerical value representing the version of the assembly. A new assembly version will be given when a sequence assembly is significantly improved by the original Project Personnel, or when the exact accession is sequenced again and a new assembly is created by the original Project Personnel. If the sequenced cultivar is not the exact same as previous versions, a new genome identifier is given. If a different group sequences the same exact cultivar, a new genome identifier is given.</dd>
+        <dt><code>&lt;sub-version&gt;</code></dt>
+        <dd>Indicates a minor update rather than a complete resequencing and/or re-assembly.</dd>
+      </dl>
+
+      <p class="mgdb-note"><strong>NOTE:</strong> Between 2016 and 2021, genome names included a quality field, which could contain either REFERENCE or DRAFT. In short order, given the rapid improvement of genome sequencing technologies, nearly all new maize genomes were of quality &lsquo;REFERENCE&rsquo;. Thus it is no longer necessary to include quality in all assembly names. This provides an added benefit of shortening genome assembly names. This change will be made for assemblies completed in 2021 and beyond and will not apply retroactively to older assemblies.</p>
+
+      <h3>1d. Genome assembly code</h3>
+      <p>Each genome assembly will also get a &ldquo;shorthand&rdquo; genome assembly code. This short code will be a synonym for the Genome Assembly Name and will be the connection between a genome assembly and its annotations and gene models. MaizeGDB will be the single naming authority to assign genome identifiers. The genome assembly code is:</p>
+      <p class="na-pattern"><code>&lt;species id&gt;&lt;genome id #&gt;&lt;genome assembly version letter&gt;</code></p>
+      <p>Examples \(note that older assemblies use 2016 naming rules\):</p>
+      <ul class="na-examples">
+        <li><code>Zm00001e</code> = Zm-B73-REFERENCE-NAM-5.0</li>
+        <li><code>Zm00004b</code> = Zm-W22-REFERENCE-NRGENE-2.0</li>
+        <li><code>Zm00018a</code> = Zm-B97-REFERENCE-NAM-1.0</li>
+      </ul>
+
+      <h4>1d.1 Definition of each element in the genome assembly code</h4>
+      <dl class="na-defs">
+        <dt><code>&lt;species id&gt;</code></dt>
+        <dd>See <code>&lt;species id&gt;</code> explanation above.</dd>
+        <dt><code>&lt;genome id #&gt;</code></dt>
+        <dd>A 5 digit number that represents a single genome, linked to a single genome assembly name. This number is assigned by MaizeGDB. If the 100,000 unique 5 digit numbers IDs run out, IDs can include alphabetic characters \(with the only restriction that there cannot be more than 2 consecutive alphabetic characters, to avoid words\). Adding alphabetic characters in the assembly code will produce an identifier range from 0000A &ndash; ZZ9ZZ, providing 50 million additional identifiers.</dd>
+        <dt><code>&lt;genome assembly version letter&gt;</code></dt>
+        <dd>An alphabetic representation of the assembly version number, incrementing the letter for each major or minor update. The first assembly version would be indicated with an &lsquo;a&rsquo;, the next with a &lsquo;b&rsquo;, and so on. For example, a set of assembly versions might be: 1.0=a, 1.1=b, 2.0=c. If an assembly has more than 26 versions, then it will be assigned a new assembly ID #, starting at version 27=&lsquo;a&rsquo;, and will be linked to the original assembly ID in its metadata.</dd>
+      </dl>
+
+      <h3>1e. Process required for official assignment of a genome ID</h3>
+      <p>To receive a Genome Assembly Name and Genome Assembly Code, Project Personnel should contact MaizeGDB before submitting a genome sequence assembly to NCBI/EBI/DDBJ. All genomes served and supported through MaizeGDB will be required to comply with this nomenclature convention.</p>
+    </div>
+  </section>
+
+  <section id="na-sets" aria-labelledby="na-sets-title">
+    <div class="mgdb-section-heading"><div><h2 id="na-sets-title">2. Gene Model Set IDs</h2></div></div>
+    <div class="na-prose">
+      <h3>2a. Preamble</h3>
+      <p>A Gene Model Set is defined here as the complete group of predicted genes from a single genome assembly. A Gene Model Set is the outcome of an annotation pipeline that calculates the structure of potential genes based on their sequence, and includes genome coordinates for each predicted gene. Gene model sets are specific to the genome assembly from which they were derived. Each Gene Model Set resulting from the annotation of a specific genome assembly will be given a globally unique, persistent identifier. MaizeGDB will be the naming authority to assign identifiers for Gene Model Sets.</p>
+      <p>The identification of two types of Gene Model Sets are described in this document. The first type is the &ldquo;project gene model set.&rdquo; This is the set of gene models produced by the genome assembly Project Personnel, or by a group collaborating closely with the Project Personnel. The second type is a &ldquo;2nd party gene model set,&rdquo; which is a set of gene models from annotation carried out by a group not associated with the original genome assembly Project Personnel. No indication of quality is inherent in either group. Distinguishing these two groups allows for the coexistence of independent gene model sets that do not require integration with each other.</p>
+
+      <h3>2b. ID convention for the Project Gene Model Set</h3>
+      <p>Since the 2016 recommendations for naming gene model sets, it became necessary to add a character to indicate the version of gene model sets in cases when an assembly is re-annotated by the sequencing group using new methods.</p>
+      <p>Used for B73 v4 \(Zm-B73-REFERENCE-GRAMENE-4.0; Zm00001d\) and earlier:</p>
+      <p class="na-pattern"><code>&lt;genome assembly code&gt;.&lt;annotation minor version number&gt;</code></p>
+      <p>B73 v5 \(Zm-B73-REFERENCE-NAM-5.0\) and later:</p>
+      <p class="na-pattern"><code>&lt;genome assembly code&gt;&lt;annotation major version letter&gt;.&lt;annotation minor version number&gt;</code></p>
+      <p>Major version: all gene model identifiers change. Minor version: a few gene models might be added, removed or changed but identifiers are otherwise retained.</p>
+      <p>Examples \(2016 style\):</p>
+      <ul class="na-examples">
+        <li><code>Zm00001c.1</code> &ndash; Gene model set for B73 RefGen_v3</li>
+        <li><code>Zm00001d.1</code> &ndash; Gene model set for Zm-B73-REFERENCE-GRAMENE-4.0</li>
+        <li><code>Zm00001d.2</code> &ndash; Revised Gene model set for Zm-B73-REFERENCE-GRAMENE-4.0</li>
+        <li><code>Zm00004b.1</code> &ndash; Gene model set for Zm-W22-REFERENCE-NRGENE-2.0</li>
+      </ul>
+      <p>Examples of 2021 update:</p>
+      <ul class="na-examples">
+        <li><code>Zm00001eb.1</code> &ndash; 2nd annotation of Zm00001e \(Zm-B73-REFERENCE-NAM-5.0\), 1st release</li>
+        <li><code>Zm00001eb.2</code> &ndash; 2nd annotation of Zm00001e \(Zm-B73-REFERENCE-NAM-5.0\), 2nd release \(gene model ids retained\)</li>
+        <li><code>Zm00018ab.1</code> = 2nd annotation of Zm00018a \(Zm-B97-REFERENCE-NAM-1.0\), 1st release.</li>
+        <li><code>Zm00056aa.1</code> = 1st annotation of Zm00056a \(Zm-A188-REFERENCE-KSU-1.0\), 1st release</li>
+      </ul>
+
+      <h3>2c. Definition of each element in the ID convention for the Representative Gene Model Set</h3>
+      <dl class="na-defs">
+        <dt><code>&lt;genome assembly code&gt;</code></dt>
+        <dd>See section 1d above.</dd>
+        <dt><code>&lt;annotation major version letter&gt;</code></dt>
+        <dd>A letter indicating the major version number. a=1st full annotation, b=the 2nd full annotation \(a complete reannotation that does not retain ids from the 1st\), et cetera.</dd>
+        <dt><code>&lt;annotation minor version number&gt;</code></dt>
+        <dd>A sequential number indicating the minor version of the gene model annotation set, which is assigned by the annotation group. New versions should be assigned when the group makes a change to the set, which includes only new, improved, and/or deleted gene models within the set. Gene models in common between the minor versions retain their ids. New versions should be communicated to MaizeGDB.</dd>
+      </dl>
+
+      <h3>2d. Recommendation for Alternative Gene Model Set IDs</h3>
+      <p>As annotation methods improve, there are likely to be increasing numbers of independent annotation analyses for any genome assembly. Naming of the resulting Alternative Gene Model Sets should not resemble the naming of the Representative Gene Model Set, but should have a similar number of characters, and should be flexible. The important issue for Alternative Gene Model Sets is to create a name that can be used as a prefix for the individual gene models in the Alternative Gene Model Set. We recognize that this means that the Genome Assembly Code will thus not feature in The Alternative Gene Model Set name, and linking the set to the Assembly will be done through the metadata. MaizeGDB will be the naming authority to assign IDs for Alternative Gene Model Sets.</p>
+      <dl class="na-defs">
+        <dt><code>&lt;alternative gene model set ID&gt;</code></dt>
+        <dd>8 alphanumeric characters that meet the following criteria:
+          <ul class="na-rules">
+            <li>does not start with &lsquo;Z&rsquo; or &lsquo;z&rsquo;,</li>
+            <li>contains no spaces, punctuation, or special characters,</li>
+            <li>will be used as a prefix for gene model ids \(see section 3a below\),</li>
+            <li>does not end with a digit.</li>
+          </ul>
+        </dd>
+      </dl>
+      <p>Examples: <code>ISU2019a</code>, <code>ISU19gpg</code>, <code>B73v4ISU</code></p>
+      <p>A version annotation code can also be added, at the discretion of the annotation group. New versions should be communicated to MaizeGDB.</p>
+      <p class="mgdb-note"><strong>Note:</strong> Exceptions are made for long-standing gene annotation pipelines with their own established naming conventions, such as the <a href="https://www.ncbi.nlm.nih.gov/genome/annotation_euk/process/" target="_blank" rel="noopener">NCBI Eukaryotic Genome Annotation Pipeline</a>.</p>
+    </div>
+  </section>
+
+  <section id="na-models" aria-labelledby="na-models-title">
+    <div class="mgdb-section-heading"><div><h2 id="na-models-title">3. Gene Model IDs</h2></div></div>
+    <div class="na-prose">
+      <h3>3a. Preamble</h3>
+      <p>A gene model is here defined as the genomic DNA sequence of a predicted gene defined by all of its alternative transcripts and 5&prime; and 3&prime; regulatory region. As a gene model is a computed entity, it may or may not be associated with a functional gene. Gene models result from annotation of individual genome assemblies; and thus, each gene model is tied to the genome assembly from which it was calculated.</p>
+
+      <h3>3b. ID convention for Gene Models from the Representative Gene Model Set</h3>
+      <p class="na-pattern"><code>&lt;genome assembly code&gt;&lt;annotation major version letter&gt;&lt;six digits&gt;</code></p>
+      <p>For transcripts and proteins:</p>
+      <p class="na-pattern"><code>&lt;genome assembly code&gt;&lt;annotation major version letter&gt;&lt;six digits&gt;&lt;transcript/protein&gt;</code></p>
+      <p>Examples \(2016 style; see section 2b above\): <code>Zm00001a459310</code>, <code>Zm00001d459384</code>, <code>Zm00004a845733</code></p>
+      <p>Examples \(updated 2021 style\):</p>
+      <ul class="na-examples">
+        <li><code>Zm00001ea000353</code> &ndash; first annotation</li>
+        <li><code>Zm00001eb000040</code> &ndash; second annotation</li>
+      </ul>
+      <dl class="na-defs">
+        <dt><code>&lt;genome assembly code&gt;</code></dt>
+        <dd>See details in section 1b above.</dd>
+        <dt><code>&lt;annotation major version&gt;</code></dt>
+        <dd>See details in section 2b above.</dd>
+        <dt><code>&lt;six digits&gt;</code></dt>
+        <dd>A random six-digit number that is unique per gene model within the assembly. As genome assemblies appear to now be sufficiently stable to have some confidence in gene order, gene models should be named sequentially, with gaps of at least 10 to permit inserted gene models that are found after the annotation was completed, or to accommodate merged gene models that should be split into two or more separate gene models. If there are no sequential numbers available when adding a new, split, or merged gene model, choose the closest available number.</dd>
+        <dt><code>&lt;transcript/protein&gt;</code></dt>
+        <dd>A transcript is indicated by appending Tddd, where &lsquo;ddd&rsquo; is the number of the isoform, for example <code>Zm00001ea002340_T001</code>, <code>Zm00001ea002340_T002</code>. For proteins, &lsquo;P&rsquo; is substituted: <code>Zm00001ea002340_P001</code>, <code>Zm00001ea002340_P002</code>.</dd>
+      </dl>
+
+      <h4>Additional gene model ID rules</h4>
+      <ul class="na-rules">
+        <li>Merged gene models will retain the name of the upstream gene model.</li>
+        <li>Split gene models: the first retains the original gene model identifier, subsequent models get sequential numbers, with even gaps, if possible.</li>
+        <li>Gene models that have minor improvements \(improved exon/intron structure, sequence error corrections, changes that don&rsquo;t significantly change the length of the gene model\) keep their ID.</li>
+        <li>When the ownership of an annotation set is transferred to another group it will retain the same assembly code, but subsequent versions will reflect the new ownership in the metadata.</li>
+        <li>Metadata about the sequenced entity is attached to the assembly version, and will follow the <a href="http://gensc.org/projects/mixs-gsc-project/" target="_blank" rel="noopener">MIxS recommendation</a>. This information will be available for any given gene model through its membership in a gene model set.</li>
+        <li>Transcript and translation IDs are not conserved within assemblies or across gene model set versions. Transcripts and translations are renumbered for each new assembly.</li>
+        <li>Coding and noncoding genes are numbered the same and this information is not encoded in the ID. This information may be in the metadata. It is acceptable to only submit coding genes to GenBank, but this information needs to be in the metadata.</li>
+      </ul>
+
+      <h3>3c. ID convention for Gene Models from an Alternative Gene Model Set</h3>
+      <p class="na-pattern"><code>&lt;alternative gene model set ID&gt;&lt;gene model number&gt;</code></p>
+      <dl class="na-defs">
+        <dt><code>&lt;alternative gene model set ID&gt;</code></dt>
+        <dd>Defined as 8 alphanumeric characters in 2d above.</dd>
+        <dt><code>&lt;gene model number&gt;</code></dt>
+        <dd>6 additional characters unique to each gene model.</dd>
+      </dl>
+
+      <h4>Additional guidelines</h4>
+      <ul class="na-rules">
+        <li>Gene model IDs must be 14 characters in length.</li>
+        <li>The Gene model ID will be made up of an 8 alphanumeric prefix and 6 digit gene model number. No spaces, punctuation, or special characters are allowed. The prefix represents the project and genome assembly and is constant for each gene model. This prefix must be preregistered with MaizeGDB to guarantee uniqueness.</li>
+        <li>The prefix cannot start with &lsquo;Z&rsquo; or &lsquo;z&rsquo; as these leading letters are reserved for official annotation sets.</li>
+        <li>The last 6 characters are numeric only. Each gene model has a unique 6 digit number.</li>
+        <li>All transcript IDs begin with the Gene Model ID and ends with &lsquo;_T&rsquo; followed by a three-digit number \(e.g., _T001\). The three-digit number starts with 001 and increments with each additional transcript.</li>
+        <li>All translation IDs begin with the Gene Model ID and ends with &lsquo;_P&rsquo; followed by a three-digit number \(e.g., _P001\). The three-digit number starts with 001 and increments with each additional translation.</li>
+      </ul>
+      <p>Exceptions are made for long-standing gene annotation pipelines, such as the NCBI Eukaryotic Genome Annotation Pipeline.</p>
+    </div>
+  </section>
+
+  <section id="na-related" class="mgdb-hub-related" aria-labelledby="na-related-title">
+    <div class="mgdb-section-heading"><div><h2 id="na-related-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/nomenclature">
+          <strong>Maize genetics nomenclature</strong>
+          <span>The standard for genes, alleles, gene products and markers</span>
+        </a>
+        <a href="/nomenclature_summary">
+          <strong>How to read an identifier</strong>
+          <span>The short explanation of assembly, annotation and gene model IDs</span>
+        </a>
+        <a href="/genome">
+          <strong>Genome Data Hub</strong>
+          <span>The assemblies and annotations these identifiers name</span>
+        </a>
+        <a href="/contribute_data">
+          <strong>Contribute data</strong>
+          <span>The metadata required alongside an assembly submission</span>
+        </a>
+        <a href="https://documents.maizegdb.org/nomenclature/maize_assembly_nomenclature_2016_update.pdf" target="_blank" rel="noopener">
+          <strong>2016 gene-model description</strong>
+          <span>The previous version of this document</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

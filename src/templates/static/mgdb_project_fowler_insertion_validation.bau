@@ -1,0 +1,240 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-project-fowler-insertion-validation
+<a class="mgdb-skip-link" href="#fw-main">Skip to main content</a>
+<main class="mgdb-page mgdb-hub-page mgdb-resource-page mgdb-fw-page" id="fw-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/projects">Projects</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Fowler insertion verification</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="fw-title">
+    <div class="mgdb-hero-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="A maize ear with fluorescent and non-fluorescent kernels">
+        <rect x="34" y="12" width="28" height="72" rx="14" fill="#c9d6bd" />
+        <circle cx="43" cy="27" r="5" fill="#2f5e2a" /><circle cx="55" cy="27" r="5" fill="#501719" />
+        <circle cx="43" cy="41" r="5" fill="#501719" /><circle cx="55" cy="41" r="5" fill="#2f5e2a" />
+        <circle cx="43" cy="55" r="5" fill="#2f5e2a" /><circle cx="55" cy="55" r="5" fill="#501719" />
+        <circle cx="43" cy="69" r="5" fill="#501719" /><circle cx="55" cy="69" r="5" fill="#2f5e2a" />
+      </svg>
+      <strong>Community<br />Resource</strong>
+      <span>NSF IOS-1340050</span>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="fw-title">Maize Gametophyte Project validated Ds-GFP insertions</h1>
+      <p class="mgdb-hero-tagline">PCR verification, transmission rates and genotyping primers for $(total-count) Ds-GFP insertion lines from the Dooner and Du collection.</p>
+      <p class="mgdb-hero-description">$(verified-count) of $(total-count) putative insertions obtained from the <a href="/projects/dooner_du_acds">Dooner and Du Ds-GFP collection</a> at the Maize Genetics Cooperation Stock Center were confirmed by PCR to carry a Ds-GFP insertion at the predicted site. Because these insertions were chosen to sit in coding sequence, they are putative knockout alleles for the gene they disrupt. The predicted site was not recovered in the remaining $(unverified-count); extensive PCR optimization was not pursued for that material, so those lines are recorded as not verified rather than as wrong predictions.</p>
+      <div class="mgdb-hero-actions">
+        <a class="mgdb-button mgdb-button-primary" href="#fw-lines">The $(total-count) lines</a>
+        <a class="mgdb-button mgdb-button-secondary" href="#fw-methods">Methods</a>
+        <a class="mgdb-button mgdb-button-secondary" href="/projects/dooner_du_acds">The parent collection</a>
+      </div>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#fw-lines" class="is-current" aria-current="true">The lines</a>
+    <a href="#fw-segregation">Segregation</a>
+    <a href="#fw-methods">Methods</a>
+    <a href="#fw-references">References</a>
+    <a href="#fw-related">Related resources</a>
+  </nav>
+
+  <!-- ── Metrics ─────────────────────────────────────────────────────────── -->
+  <section aria-labelledby="fw-summary-title">
+    <h2 class="mgdb-visually-hidden" id="fw-summary-title">The verification in numbers</h2>
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric mgdb-tone-green">
+        <div class="mgdb-metric-top">
+          <h3>Lines tested</h3>
+          <span class="mgdb-metric-badge">Total</span>
+        </div>
+        <div class="mgdb-metric-stat"><strong class="mgdb-metric-value">$(total-count)</strong></div>
+        <p class="mgdb-metric-description">Putative Ds-GFP insertions drawn from the Dooner and Du collection.</p>
+      </article>
+      <article class="mgdb-metric mgdb-tone-blue">
+        <div class="mgdb-metric-top">
+          <h3>PCR verified</h3>
+          <span class="mgdb-metric-badge">Confirmed</span>
+        </div>
+        <div class="mgdb-metric-stat"><strong class="mgdb-metric-value">$(verified-count)</strong></div>
+        <p class="mgdb-metric-description">Insertions found at the predicted site by PCR, using two gene-specific primers and one Ds-specific primer.</p>
+      </article>
+      <article class="mgdb-metric mgdb-tone-amber">
+        <div class="mgdb-metric-top">
+          <h3>Not recovered</h3>
+          <span class="mgdb-metric-badge">Unverified</span>
+        </div>
+        <div class="mgdb-metric-stat"><strong class="mgdb-metric-value">$(unverified-count)</strong></div>
+        <p class="mgdb-metric-description">Predicted site not amplified. Not a conclusion that the prediction is wrong.</p>
+      </article>
+      <article class="mgdb-metric mgdb-tone-burgundy">
+        <div class="mgdb-metric-top">
+          <h3>Transmission defects</h3>
+          <span class="mgdb-metric-badge">Male-specific</span>
+        </div>
+        <div class="mgdb-metric-stat"><strong class="mgdb-metric-value">$(defect-count)</strong></div>
+        <p class="mgdb-metric-description">Lines whose male transmission rate differs significantly from 50%, likely caused by the insertion.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ── The lines ───────────────────────────────────────────────────────── -->
+  <section id="fw-lines" aria-labelledby="fw-lines-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fw-lines-title">The $(total-count) insertion lines</h2></div>
+    </div>
+    <p class="mgdb-section-intro">Transmission rates through the male and the primer sequences used for PCR genotyping, reproducing S6 Table of Warman et al. \(2020\). Filter by allele, gene model or primer; the filtered view can be shared from the address bar.</p>
+
+    <div class="fw-controls">
+      <div class="mgdb-field">
+        <label class="mgdb-label" for="fw-query">Filter lines</label>
+        <p class="mgdb-hint" id="fw-query-hint">A Ds-GFP allele, a v4 or v3 gene model, or a primer sequence. Example: <code>tdsgR63F09</code> or <code>Zm00001d002266</code></p>
+        <input class="mgdb-input" id="fw-query" name="q" type="search" aria-describedby="fw-query-hint" autocomplete="off" placeholder="tdsgR" />
+      </div>
+      <div class="mgdb-filters">
+        <span aria-hidden="true" class="mgdb-small mgdb-muted">Show:</span>
+        $(status-chips)
+        <span class="mgdb-result-count fw-count" id="fw-count" aria-live="polite"></span>
+        <button class="mgdb-button mgdb-button-quiet" id="fw-reset" type="button" hidden>Reset</button>
+      </div>
+    </div>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table fw-table" id="fw-table">
+        <caption class="mgdb-visually-hidden">Ds-GFP insertion lines, their PCR verification status, male transmission rate, associated gene models, pollen expression class and genotyping primers</caption>
+        <thead>
+          <tr>
+            <th scope="col" data-sort="text">Ds-GFP allele</th>
+            <th scope="col" data-sort="text">Status</th>
+            <th scope="col" data-sort="number">Male transmission</th>
+            <th scope="col" data-sort="text">v4 gene</th>
+            <th scope="col" data-sort="text">v3 gene</th>
+            <th scope="col" data-sort="text">Expression class</th>
+            <th scope="col">Primer 1</th>
+            <th scope="col">Primer 2</th>
+          </tr>
+        </thead>
+        <tbody id="fw-rows">
+          $(line-rows)
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mgdb-empty fw-empty" id="fw-empty" hidden>
+      <h3>No lines match that filter</h3>
+      <p>There are $(total-count) lines in this table. Clear the filter to see all of them.</p>
+      <button class="mgdb-button mgdb-button-secondary" id="fw-empty-reset" type="button">Clear the filter</button>
+    </div>
+
+    <div class="mgdb-export-buttons">
+      <a class="mgdb-button mgdb-button-secondary" href="$(data-tsv)" download>Download the table \(TSV\)</a>
+      <a class="mgdb-button mgdb-button-secondary" href="$(data-json)">The same data as JSON</a>
+    </div>
+
+    <div class="mgdb-note mgdb-note-info">
+      <strong>Primer sequences here are longer than they were.</strong> The legacy table was an Excel HTML export in which 47 cells carried their last one to three characters inside a <code>display:none</code> span, so the page showed primers up to three bases short of the real sequence, and one expression class as <code>vegetative_cell_hig</code>. Those characters are restored in the table above and in both downloads. If you took primer sequences from this page before 5 September 2026, check them against S6 Table of Warman et al. \(2020\).
+    </div>
+  </section>
+
+  <!-- ── Segregation ─────────────────────────────────────────────────────── -->
+  <section id="fw-segregation" aria-labelledby="fw-segregation-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fw-segregation-title">Segregation and single-copy testing</h2></div>
+    </div>
+
+    <div class="mgdb-prose-layout">
+      <div class="mgdb-prose">
+        <p>Every line was tested for the presence of a single Ds-GFP insertion by outcrossing and identifying co-segregating single elements in progeny kernels, using the fluorescent GFP endosperm phenotype together with a diagnostic PCR band. As acquired from the Stock Center a few lines appeared to carry more than one Ds-GFP element, judged by outcross segregation patterns; from those, only progeny segregating for a single insertion were tested further. Several lines also carried the <i>wx1-m7::Ac</i> element by PCR, which was used in the original mobilization of the Ds-GFP element \(Li et al. 2013\).</p>
+        <p>On the GFP endosperm phenotype, all $(total-count) single insertions segregate 1:1 when the insertion line is the female in an outcross. Through the male, $(defect-count) do not: nine of the $(verified-count) verified and one of the $(unverified-count) non-verified lines show a male-specific transmission defect, likely caused by the mutation the Ds-GFP insertion creates.</p>
+      </div>
+      <aside class="mgdb-aside-card">
+        <h3>Contact</h3>
+        <p><a href="/person?id=12885">John Fowler</a> for questions about these lines and the verification work.</p>
+        <h3>Funding</h3>
+        <p>National Science Foundation grants <a href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1340050" target="_blank" rel="noopener">IOS-1340050</a> and <a href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1832186" target="_blank" rel="noopener">MCB-1832186</a>.</p>
+      </aside>
+    </div>
+
+    <figure class="dd-figure">
+      <img src="/images/Fowler_fig_1.png" alt="A maize ear imaged under blue light through an orange filter, showing green fluorescent kernels alternating with non-fluorescent purple kernels in roughly equal numbers." loading="lazy" decoding="async" />
+      <figcaption><b>Figure 1.</b> 1:1 segregation of the <i>tdsgR99B02</i> Ds-GFP element on a maize ear, from an outcross in which the male parent was heterozygous for the element. The element carries a GFP coding sequence driven by the &alpha;-zein promoter \(Li et al. 2013\), giving a fluorescent green endosperm that is easily told apart from wild-type, non-fluorescent seed &mdash; which appears purple here because of the orange filter used for imaging.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ── Methods ─────────────────────────────────────────────────────────── -->
+  <section id="fw-methods" aria-labelledby="fw-methods-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fw-methods-title">Methods</h2></div>
+    </div>
+    <p class="mgdb-section-intro">Validation of Ds-GFP insertion sites, from Warman et al. \(2020\).</p>
+
+    <div class="mgdb-prose">
+      <h3 class="mgdb-leaf-heading">Primer design</h3>
+      <p>A FASTA file containing 2&nbsp;kb of genomic sequence around each Ds-GFP insertion site was given to a primer3-based tool to generate a pair of specific primers for genotyping individual plants from each line. The primers used for each line are in S6 Table of Warman et al., and in the table above.</p>
+
+      <h3 class="mgdb-leaf-heading">Genotyping</h3>
+      <p>Two 7&nbsp;mm discs of leaf tissue were collected from each plant with a modified paper punch into 1.2&nbsp;ml tubes in a labelled 96-well rack. Genomic DNA was isolated from the leaf punches with one modification to the standard protocol: a further centrifugation at 3,000&nbsp;g for 10&nbsp;minutes to clear the leaf extracts before loading onto a 96-well glass fibre filter plate \(Pall, 8032\). DNA was eluted in 125&nbsp;&micro;L water and 2&nbsp;&micro;L used as PCR template.</p>
+      <p>Amplification followed standard PCR conditions using GoTaq Green Master Mix \(Promega\) with 4% DMSO \(v/v\), and amplicons were resolved by agarose gel electrophoresis. Lines were genotyped with the pair of gene-specific primers, designed to amplify flanking sequence at the predicted insertion site, plus one Ds-specific primer &mdash; JSR01 <code>GTTCGAAATCGATCGGGATA</code> or JGP3 <code>ACCCGACCGGATCGTATCGG</code>. All lines were also screened by PCR for <i>wx1-m7::Ac</i>, using primers for <i>wx1</i> \(<code>CACAGCACGTTGCGGATTTC</code>\) and <i>Ac</i> \(<code>CCGGATCGTATCGGTTTTCG</code>\). Follow-up PCR testing co-segregation of GFP fluorescence with the insertion used the appropriate set of three primers and DNA prepared from either endosperm or seedling leaves.</p>
+
+      <h3 class="mgdb-leaf-heading">Field work and scoring</h3>
+      <p>Heterozygous lines with PCR-validated Ds-GFP alleles were planted at the Botany and Plant Pathology Field Lab, Oregon State University, Corvallis. All insertions were in coding sequence. Heterozygous Ds-GFP plants were outcrossed to tester plants \(<i>c1 wx1</i>/<i>c1 wx1</i> or <i>c1</i>/<i>c1</i> background\) through both the female and the male, with male pollinations made using a heavy pollen load on extended silks &mdash; silks allowed to grow for at least two days after cutback.</p>
+      <p>After harvest, ears were imaged on a custom rotational scanner with a blue light source and an orange filter for GFP illumination: videos of rotating ears were processed into flat cylindrical projections covering the whole ear surface, and seeds counted by hand with the Cell Counter plugin of the Fiji distribution of ImageJ.</p>
+
+      <div class="mgdb-resource-panel">
+        <div class="mgdb-resource-list">
+          <a href="https://vollbrechtlab.gdcb.iastate.edu/tools/primer-server/" target="_blank" rel="noopener">
+            <strong>Primer server</strong>
+            <span>The primer3-based tool used to design the genotyping primers</span>
+          </a>
+          <a href="https://vollbrechtlab.gdcb.iastate.edu/tools/tissue-sample-plate-mapper/" target="_blank" rel="noopener">
+            <strong>Tissue sample plate mapper</strong>
+            <span>The plate-layout tool used when collecting the leaf punches</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── References ──────────────────────────────────────────────────────── -->
+  <section id="fw-references" aria-labelledby="fw-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fw-references-title">References</h2></div>
+    </div>
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
+  <!-- ── Related ─────────────────────────────────────────────────────────── -->
+  <section id="fw-related" class="mgdb-hub-related" aria-labelledby="fw-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="fw-related-title">Related resources</h2></div>
+    </div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/projects/dooner_du_acds">
+          <strong>Dooner and Du Ds-GFP insertions</strong>
+          <span>The collection these lines were drawn from</span>
+        </a>
+        <a href="/insertion">
+          <strong>Insertion Data Hub</strong>
+          <span>Every insertion collection held here, searchable together</span>
+        </a>
+        <a href="/data_center/stock">
+          <strong>Stock Data Hub</strong>
+          <span>Order the tdsg stocks from the Maize Genetics Cooperation Stock Center</span>
+        </a>
+        <a href="https://mgp.dpb.carnegiescience.edu/" target="_blank" rel="noopener">
+          <strong>Maize Gametophyte Project</strong>
+          <span>The project this verification work was part of</span>
+        </a>
+        <a href="/projects">
+          <strong>All research projects</strong>
+          <span>Every maize project with data, results or documentation at MaizeGDB</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+)

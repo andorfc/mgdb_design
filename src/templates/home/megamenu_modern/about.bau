@@ -4,10 +4,22 @@ $$SYNTAX-LEVEL 2
   <span id="about_menu">
     <div class="dropdown_5columns mega-dropdown mega-dropdown-about">
       <div class="mega-panel-heading mega-panel-heading-row">
-        <!-- Fits on one line at the panel's 560px: the string measures 361px
-             at the h2's 19px/700, against 396px left beside the action. Both
-             numbers move if the panel narrows or the action's label grows. -->
-        <h2>Maize Genetics and Genomics Database</h2>
+        <div class="mega-heading-text">
+          <!-- Fits on one line at the panel's 560px: the string measures 361px
+               at the h2's 19px/700, against 396px left beside the action. Both
+               numbers move if the panel narrows or the action's label grows.
+               The .mega-heading-text wrapper is flex:1 1 auto / min-width:0, so
+               it hands the h2 the same width it had before the hint arrived. -->
+          <h2>Maize Genetics and Genomics Database</h2>
+          <!-- The same one-line hint the Tools and Data Hubs panels carry:
+               filled in by mgdb-chrome.js from the pointed-at link's data-desc,
+               and reset to the default below once the pointer or focus leaves
+               the grid. It replaces the "Project" and "Learn" group headings,
+               which named categories rather than saying what anything was.
+               aria-hidden because it is a pointer affordance duplicating the
+               link the reader is already on; screen readers get the label. -->
+          <p class="mega-hint" data-mgdb-hint data-mgdb-hint-default="Point at a link to see what it covers." aria-hidden="true">Point at a link to see what it covers.</p>
+        </div>
         <!-- Same shape as the Genomes panel: no eyebrow, no footer, and the
              section destination sits here beside the heading. The site map is
              that destination rather than /about, which is a page about the
@@ -17,21 +29,29 @@ $$SYNTAX-LEVEL 2
         </div>
       </div>
       <div class="mega-grid mega-grid-2 mega-compact-groups">
-        <section class="mega-group">
-          <h3>Project</h3>
-          <a href="$(server-url)/contact"><strong>People &amp; contact</strong></a>
-          <a href="$(server-url)/cite"><strong>Cite MaizeGDB</strong></a>
-        </section>
+        <!-- No group headings. Four links do not need to be sorted into
+             "Project" and "Learn", and those two words described the shelf
+             rather than what was on it; the hover description in the heading
+             does the work instead. Divs rather than sections, because a
+             <section> with no heading has no accessible name. The two-column
+             split is kept so the panel keeps its shape above the affiliation
+             row. Descriptions use the site map's wording where the site map
+             has one, so a destination reads the same in both places; /contact
+             and /cite carry no site map description, so theirs are drawn from
+             the pages' own opening lines. -->
+        <div class="mega-group">
+          <a href="$(server-url)/contact" data-desc="Questions about data, tools, curation, or the site itself, and who to ask."><strong>People &amp; contact</strong></a>
+          <a href="$(server-url)/cite" data-desc="The current reference for MaizeGDB, and how to cite it."><strong>Cite MaizeGDB</strong></a>
+        </div>
         <!-- "Documentation" pointed at /doc, a legacy page of ten links of
              which four were dead or aimed at the wrong target, and the word
              itself read as documentation of the website rather than of the
              research projects the page was for. /projects is that directory
              now; /doc redirects to it. -->
-        <section class="mega-group">
-          <h3>Learn</h3>
-          <a href="$(server-url)/projects"><strong>Research projects</strong></a>
-          <a href="$(server-url)/whatsnew"><strong>News &amp; updates</strong></a>
-        </section>
+        <div class="mega-group">
+          <a href="$(server-url)/projects" data-desc="Every maize research project with data, results, or documentation here."><strong>Research projects</strong></a>
+          <a href="$(server-url)/whatsnew" data-desc="MaizeGDB news, by year, back to 2007."><strong>News &amp; updates</strong></a>
+        </div>
         <!-- The membership was a full feature column, which gave a partner
              organization the same weight as MaizeGDB's own sections. It is an
              affiliation, so it reads as one: a single row across the foot of
@@ -39,7 +59,7 @@ $$SYNTAX-LEVEL 2
              member" is the site's existing wording, used verbatim in the
              footer of every unmodernized page.
              The whole row is one link, so it is one tap target in the drawer. -->
-        <a class="mega-affiliation" href="https://www.agbiodata.org" target="_blank" rel="noopener">
+        <a class="mega-affiliation" href="https://www.agbiodata.org" data-desc="AgBioData: the consortium making agricultural research data findable, accessible, interoperable and reusable." target="_blank" rel="noopener">
           <img class="mega-affiliation-mark" src="$(image-dir)/quicklinks/agbiodata.png" alt="" width="128" height="128" loading="lazy" decoding="async" />
           <span class="mega-affiliation-text">
             <strong>Founding member of AgBioData</strong>

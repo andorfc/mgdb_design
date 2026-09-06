@@ -1,0 +1,77 @@
+/* ==========================================================================
+   Gene symbols (/data_center/gene-symbols)
+
+   Opts into the Data Hub shell (mgdb-hub-page), so this sheet describes only
+   this page's own furniture: the filter row, the two-column table, and the
+   count line. Ground, section cards, section top edges, metric cards and the
+   green Related resources wash all come from css/mgdb-hub.css.
+   ========================================================================== */
+
+.mgdb-gene-symbols-page .gs-filter-field { max-width: 32rem; }
+
+.mgdb-gene-symbols-page .gs-count {
+  margin: var(--mgdb-space-3) 0 var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The table is 1,181 rows, so the header stays put while it is scrolled. */
+.mgdb-gene-symbols-page .mgdb-table-scroll {
+  max-height: 34rem;
+  overflow: auto;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+}
+
+.mgdb-gene-symbols-page .gs-table { width: 100%; margin: 0; border-collapse: collapse; }
+
+.mgdb-gene-symbols-page .gs-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--mgdb-surface-alt);
+  box-shadow: inset 0 -1px 0 var(--mgdb-line);
+  text-align: left;
+}
+
+.mgdb-gene-symbols-page .gs-table th,
+.mgdb-gene-symbols-page .gs-table td {
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+  vertical-align: top;
+}
+
+/* A symbol is an identifier: monospace, and never wrapped mid-symbol. */
+.mgdb-gene-symbols-page .gs-symbol { width: 12rem; white-space: nowrap; }
+.mgdb-gene-symbols-page .gs-symbol code {
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-weight: 600;
+}
+
+.mgdb-gene-symbols-page .gs-empty {
+  margin: var(--mgdb-space-4) 0 0;
+  padding: var(--mgdb-space-4);
+  border: 1px dashed var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  color: var(--mgdb-muted);
+  text-align: center;
+}
+
+.mgdb-gene-symbols-page .gs-conflict-note { margin-top: var(--mgdb-space-4); }
+.mgdb-gene-symbols-page .gs-conflict-note code { font-weight: 600; }
+
+/* Three short tabs: one row at every width, so the shell's step to 113px below
+   1170px would put every section 48px behind the bar. Measured, not assumed. */
+@media (max-width: 1170px) {
+  .mgdb-hub-page.mgdb-gene-symbols-page > section[id] { scroll-margin-top: 65px; }
+}
+
+@media (max-width: 640px) {
+  .mgdb-gene-symbols-page .gs-symbol { width: auto; }
+  .mgdb-gene-symbols-page .mgdb-table-scroll { max-height: 26rem; }
+}

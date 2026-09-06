@@ -1,0 +1,198 @@
+/* ==========================================================================
+   The three community resource project pages
+   --------------------------------------------------------------------------
+   /projects/cytogenetic_map          .mgdb-cmm-page
+   /projects/dooner_du_acds           .mgdb-dd-page
+   /projects/fowler_insertion_validation  .mgdb-fw-page
+
+   All three carry .mgdb-resource-page as well, which is where anything shared
+   between them lives. They were ported off the legacy chrome on 2026-09-05;
+   see README.md, "Porting the three resource pages".
+
+   Loaded after css/mgdb-modern.css, css/mgdb-hub.css and css/mgdb-projects.css.
+   The shell settles the pale ground, the white section cards with their
+   coloured top edges, the sticky tab bar and the green Related resources
+   panel. Nothing here restyles the tab bar: the listing page tints its chips
+   as a page choice, and the other project pages take the shell's, which is
+   what these do too.
+
+   Everything is composed from the tokens in css/mgdb-modern.css. No new
+   colours are introduced.
+   ========================================================================== */
+
+.mgdb-resource-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+/* The offset ladder, from the measured bar.
+   -------------------------------------------------------------------------
+   Each of the three carries five short jump links, and the bar is one 57px row
+   at every width measured -- 1280, 1170, 1000, 900, 800, 700, 600, 500, 420
+   and 375 -- because css/mgdb-modern.css turns it into a scrolling rail rather
+   than letting it wrap. The shell steps its section offset to 113px under
+   1170px for bars that do wrap, which is 56px too much here: a jump link would
+   land the heading half a section below the bar. Flat 65px all the way down,
+   the same correction /projects makes. Re-measure if a sixth tab is added. */
+@media (max-width: 1170px) {
+  .mgdb-hub-page.mgdb-resource-page > section[id] { scroll-margin-top: 65px; }
+}
+
+/* The lead paragraph under a section heading. The shell hides anything inside
+   .mgdb-section-heading, so the line that used to sit opposite the title moves
+   out to its own paragraph -- the same move /projects made. */
+.mgdb-resource-page .mgdb-section-intro {
+  max-width: 62rem;
+  margin: 0 0 var(--mgdb-space-4);
+  color: var(--mgdb-muted);
+}
+
+/* --------------------------------------------------------------------------
+   Cytogenetic Map of Maize — probe nomenclature
+   -------------------------------------------------------------------------- */
+
+/* Two worked examples side by side, because reading them together is the point:
+   the difference between a core bin marker name and every other name is one
+   segment. minmax(340px, …) rather than the shared 280px so the definition
+   list's term column and its text stay on one line at the narrower of the two. */
+.mgdb-cmm-page .cmm-name-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-cmm-page .cmm-name-card h3 {
+  margin-top: var(--mgdb-space-2);
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-lg);
+}
+
+/* Term above definition rather than beside it. A two-column layout would put
+   `\(rgpr3235a\)` in a column sized for `spb`, and the segments are the thing
+   being read, so they get their own line. */
+.mgdb-cmm-page .cmm-name-parts { margin: var(--mgdb-space-3) 0 0; }
+.mgdb-cmm-page .cmm-name-parts > div + div { margin-top: var(--mgdb-space-3); }
+
+.mgdb-cmm-page .cmm-name-parts dt {
+  margin-bottom: var(--mgdb-space-1);
+  color: var(--mgdb-burgundy);
+  font-weight: 700;
+}
+
+.mgdb-cmm-page .cmm-name-parts dt code {
+  background: var(--mgdb-gold-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-cmm-page .cmm-name-parts dd {
+  margin: 0;
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+}
+
+/* The sentence that puts the segments back together. Set apart from the list
+   above it, because it is the answer rather than another part. */
+.mgdb-cmm-page .cmm-name-reading {
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--mgdb-line-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* The detection method carries a qualifying line -- "to sorghum BAC filter
+   grids" -- which is part of the method, not a second row. */
+.mgdb-cmm-page .cmm-probe-table th[scope="row"] { white-space: normal; }
+.mgdb-cmm-page .cmm-probe-table th[scope="row"] span {
+  display: block;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 400;
+}
+
+.mgdb-cmm-page .cmm-steps {
+  max-width: 62rem;
+  margin: 0;
+  padding-left: var(--mgdb-space-5);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-cmm-page .cmm-steps > li + li { margin-top: var(--mgdb-space-3); }
+.mgdb-cmm-page .cmm-steps ul { margin-top: var(--mgdb-space-2); }
+.mgdb-cmm-page .cmm-steps ul > li + li { margin-top: var(--mgdb-space-2); }
+
+.mgdb-cmm-page .cmm-extra-refs { margin-top: var(--mgdb-space-4); }
+
+/* --------------------------------------------------------------------------
+   Dooner and Du — where the data is
+   -------------------------------------------------------------------------- */
+
+.mgdb-dd-page .dd-figure { max-width: 52rem; margin: 0; }
+
+.mgdb-dd-page .dd-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: #fff;
+}
+
+.mgdb-dd-page .dd-figure figcaption {
+  margin-top: var(--mgdb-space-3);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+}
+
+/* --------------------------------------------------------------------------
+   Fowler — the 83 insertion lines
+   -------------------------------------------------------------------------- */
+
+/* The filter row above the table. The field takes a row of its own above the
+   chips: a flex row with `justify-content: space-between` shrinks a
+   `flex: 1 1 280px` field below its own basis, which is what cut the
+   placeholder off on six community project pages. */
+.mgdb-fw-page .fw-controls {
+  display: grid;
+  gap: var(--mgdb-space-3);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-fw-page .fw-controls .mgdb-field { max-width: 30rem; }
+
+.mgdb-fw-page .fw-count {
+  margin-left: auto;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* Seven columns of which two are 20-27 base primers, so the table is wider
+   than the card at every viewport. .mgdb-table-scroll carries the horizontal
+   scroll; nothing here may let the page itself scroll sideways. */
+.mgdb-fw-page .fw-table { width: 100%; }
+.mgdb-fw-page .fw-table th, .mgdb-fw-page .fw-table td { white-space: nowrap; }
+
+.mgdb-fw-page .fw-table .fw-primer {
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xs);
+  letter-spacing: .01em;
+}
+
+.mgdb-fw-page .fw-table .fw-allele { font-family: var(--mgdb-font-mono); font-weight: 600; }
+.mgdb-fw-page .fw-table .fw-gene   { font-family: var(--mgdb-font-mono); font-size: var(--mgdb-text-xs); }
+
+/* A rate that differs significantly from 50% is the finding, so it is marked
+   in words as well as by the dagger the legacy table used. */
+.mgdb-fw-page .fw-rate { font-variant-numeric: tabular-nums; }
+.mgdb-fw-page .fw-rate-flagged { color: var(--mgdb-burgundy); font-weight: 700; }
+.mgdb-fw-page .fw-rate-nd { color: var(--mgdb-muted); }
+
+.mgdb-fw-page .fw-empty { margin-top: var(--mgdb-space-4); }
+
+@media (max-width: 720px) {
+  .mgdb-cmm-page .cmm-name-grid { grid-template-columns: 1fr; }
+}
+
+@media print {
+  .mgdb-modern .mgdb-resource-page .mgdb-section-tabs,
+  .mgdb-modern .mgdb-fw-page .fw-controls,
+  .mgdb-modern .mgdb-resource-page .mgdb-export-buttons { display: none; }
+  .mgdb-modern .mgdb-fw-page .mgdb-table-scroll { overflow: visible; }
+}

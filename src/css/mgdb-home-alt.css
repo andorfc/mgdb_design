@@ -1,68 +1,34 @@
-/* Homepage design alternatives, for /index2 and /index3.
+/* Homepage overrides, loaded by / after mgdb-home.css.
  *
- * Loaded only by those two pages, after mgdb-home.css, so everything here is an
- * override of the default homepage rather than a fork of it. The default at /
- * is untouched by this file.
+ * Everything here is an override of the default homepage rather than a fork of
+ * it. The file began as the three design alternatives that ran at /index2/,
+ * /index3/ and /index4/ for group review; those pages were removed on
+ * 2026-09-05 once the design was settled, and the v2 block went with index2.
  *
- * Both drop the one-line description under each tile and enlarge the art.
- * Version 3 goes further: larger again, no card border until you touch it, and
- * a warmer header in place of the record-page hero.
+ * WHAT PRODUCTION DEPENDS ON. `/` carries BOTH `mgdb-home-v3` and
+ * `mgdb-home-v4` on <main>, because the chosen design was folded in by adding
+ * the v4 class to mgdb_home.bau rather than by moving CSS. So both blocks
+ * below are live, despite "Version 3" and "Version 4" reading like scratch
+ * names. Renaming them is a separate change with its own verification.
+ *
+ * The tiles drop the one-line description under each and enlarge the art;
+ * version 3 goes further, with no card border until you touch it and a warmer
+ * header in place of the record-page hero; version 4 shrinks the tiles again
+ * and widens the rail.
  */
 
 /* ===========================================================================
-   Shared by both alternatives
+   Shared by the version 3 and version 4 tiles
    =========================================================================== */
 
 /* With no description the label is the whole caption, so it can carry a little
    more weight and sit closer to the art. */
-.mgdb-modern .mgdb-home-v2 .mgdb-quicklink-label,
 .mgdb-modern .mgdb-home-v3 .mgdb-quicklink-label {
   font-size: var(--mgdb-text-base);
 }
 
-.mgdb-modern .mgdb-home-v2 .mgdb-quicklink-text,
 .mgdb-modern .mgdb-home-v3 .mgdb-quicklink-text {
   gap: 0;
-}
-
-/* ===========================================================================
-   Version 2 — bigger art, labels only, card kept
-   =========================================================================== */
-
-.mgdb-modern .mgdb-home-v2 .mgdb-quicklinks {
-  grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
-}
-
-.mgdb-modern .mgdb-home-v2 .mgdb-quicklink {
-  gap: var(--mgdb-space-3);
-  padding: var(--mgdb-space-4) var(--mgdb-space-3);
-}
-
-.mgdb-modern .mgdb-home-v2 .mgdb-quicklink-art {
-  width: 104px;
-  height: 104px;
-}
-
-.mgdb-modern .mgdb-home-v2 .mgdb-quicklink-art img {
-  width: 84px;
-  height: 84px;
-}
-
-@media (max-width: 640px) {
-  /* Restated because the desktop override above is more specific than the base
-     two-column mobile rule in mgdb-home.css and would otherwise win here,
-     leaving one very wide column. */
-  .mgdb-modern .mgdb-home-v2 .mgdb-quicklinks {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .mgdb-modern .mgdb-home-v2 .mgdb-quicklink {
-    gap: var(--mgdb-space-2);
-    padding: var(--mgdb-space-2);
-  }
-  .mgdb-modern .mgdb-home-v2 .mgdb-quicklink-art { width: 52px; height: 52px; }
-  .mgdb-modern .mgdb-home-v2 .mgdb-quicklink-art img { width: 40px; height: 40px; }
-  .mgdb-modern .mgdb-home-v2 .mgdb-quicklink-label { font-size: var(--mgdb-text-sm); }
 }
 
 /* ===========================================================================

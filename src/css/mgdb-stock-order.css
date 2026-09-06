@@ -1,0 +1,71 @@
+/* /ordering/stock -- the stock order basket. Scoped under .mgdb-stock-order-page;
+   everything else on the page is a shared component. */
+
+/* The status line sits between the hero and the list, so it needs the section
+   rhythm rather than being flush against the heading below it. */
+.mgdb-stock-order-page .mgdb-message {
+  margin-top: var(--mgdb-space-6);
+}
+
+/* A stock id is a number in a column of numbers: tabular figures keep it from
+   wandering, and the column only needs to be as wide as the values. */
+.mgdb-stock-order-page .stock-order-id {
+  width: 1%;
+  color: var(--mgdb-ink-soft);
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-sm);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.mgdb-stock-order-page .mgdb-note {
+  margin-top: var(--mgdb-space-4);
+}
+
+/* Submit is the page's one consequential action -- it hands the order to the
+   Stock Center -- so it leads, and Clear sits at the far end rather than beside
+   it, where the two read as a pair of equal choices. */
+.mgdb-stock-order-page .stock-order-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-stock-order-page .stock-order-actions .mgdb-button-quiet {
+  margin-left: auto;
+}
+
+/* Where this order goes: the Stock Center banner beside its explanation.
+   minmax(0, …) on the text column, or a long word would set the floor and push
+   the row past the viewport. */
+.mgdb-stock-order-page .stock-order-source {
+  display: grid;
+  grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
+  gap: var(--mgdb-space-5);
+  align-items: center;
+}
+
+.mgdb-stock-order-page .stock-order-source img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--mgdb-radius-sm);
+}
+
+/* The card's children are paragraphs, so they take the shared sibling gap; this
+   only stops the first one from carrying its own top margin into the grid. */
+.mgdb-stock-order-page .stock-order-source-body > :first-child {
+  margin-top: 0;
+}
+
+@media (max-width: 700px) {
+  .mgdb-stock-order-page .stock-order-source {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Stacked, an auto margin would push Clear a full row away from Submit. */
+  .mgdb-stock-order-page .stock-order-actions .mgdb-button-quiet {
+    margin-left: 0;
+  }
+}

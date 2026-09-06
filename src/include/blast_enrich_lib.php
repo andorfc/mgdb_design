@@ -494,7 +494,7 @@ function mgdb_blast_enrich_domains($ids, $DBConn) {
       'end'         => (int) $row['end_pos'],
       'accession'   => $row['accession'],
       'name'        => $row['name'],
-      'description' => $row['description'],
+      'description' => mgdb_safe_html($row['description']),
     );
   }
   foreach ($to_tx as $original => $t) {

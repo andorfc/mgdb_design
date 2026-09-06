@@ -1,0 +1,293 @@
+/* ==========================================================================
+   Maize Genetics Executive Committee — /mgec
+   --------------------------------------------------------------------------
+   Loaded after css/mgdb-modern.css and css/mgdb-hub.css. The hub shell settles
+   the ground, the white section cards and their coloured top edges, the sticky
+   tab bar, the table zebra, the green Related resources panel and the scroll
+   offset. None of that is restated here.
+
+   What is here is the shapes this record needs: a dated timeline, a roster
+   card, an activity entry, and the disclosure holding the 2011 minutes.
+   ========================================================================== */
+
+/* .mgdb-panel-title is a per-page class styled in no shared sheet; without this
+   the h2 keeps the browser's default 0.83em margin above and below. */
+.mgdb-mgec-page .mgdb-panel-title { margin: 0 0 var(--mgdb-space-1); }
+
+.mgdb-mgec-page .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-mgec-page .mgec-hero-mark {
+  display: block;
+  width: min(100%, 76px);
+  height: auto;
+  margin: 0;
+}
+
+/* The offset is flat -- the bar's height plus 8px -- and the bar is held to one
+ * row so that it stays true.
+ *
+ * The comment here used to claim the six labels measured one row at every
+ * width. They do not: measured, the bar wraps to two rows and 105px between
+ * 768px and about 774px, where this rule still said 65px. Forty pixels too
+ * little, so a section jumped to in that band landed with its heading behind
+ * the bar, and because MGDB.sectionTabs() reads scroll-margin-top back from
+ * computed style, the active tab was wrong there too. The band is only about
+ * seven pixels wide, but 768 is iPad portrait, so it is a real width rather
+ * than a gap between them.
+ *
+ * Two rules are needed, and the second is not obvious. `flex-wrap: nowrap`
+ * stops the ROW wrapping; a flex item that cannot wrap the row still shrinks,
+ * so "Related resources" broke over two lines instead and the bar was tall
+ * again for a different reason. `white-space: nowrap` on the links is the other
+ * half. Together they make the bar exactly one tab tall at every width, so one
+ * offset is right everywhere and no future label can quietly invalidate it.
+ * Same treatment as /working_group and /handyref. */
+.mgdb-mgec-page .mgdb-section-tabs {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mgdb-mgec-page .mgdb-section-tabs a { white-space: nowrap; }
+
+.mgdb-hub-page.mgdb-mgec-page > section[id] { scroll-margin-top: 65px; }
+
+.mgdb-mgec-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+.mgdb-modern .mgec-archive-note { margin-top: 1.25rem; }
+
+.mgdb-modern .mgec-lead {
+  max-width: 74ch;
+  margin: 0 0 var(--mgdb-space-5);
+  color: var(--mgdb-ink-soft);
+}
+
+/* ── Mission statement ───────────────────────────────────────────────────── */
+
+.mgdb-modern .mgec-mission {
+  max-width: 74ch;
+  margin: 0 0 var(--mgdb-space-5);
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border-left: 4px solid var(--mgdb-gold);
+  border-radius: 0 var(--mgdb-radius) var(--mgdb-radius) 0;
+  background: var(--mgdb-surface-sunken);
+}
+
+.mgdb-modern .mgec-mission p {
+  margin: 0;
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-lg);
+  line-height: 1.55;
+}
+
+.mgdb-modern .mgec-mission cite {
+  display: block;
+  margin-top: var(--mgdb-space-3);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-style: normal;
+}
+
+/* ── Origins timeline ────────────────────────────────────────────────────── */
+
+/* A two-column grid rather than a flex row: the years then share one right
+   edge, which is what makes a dated list scannable. `max-content` lets the
+   column take the widest year and no more. */
+.mgdb-modern .mgec-timeline {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mgdb-modern .mgec-timeline li {
+  display: contents;
+}
+
+.mgdb-modern .mgec-year {
+  color: var(--mgdb-green-dark);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  text-align: right;
+}
+
+.mgdb-modern .mgec-event { color: var(--mgdb-ink); }
+
+/* ── Procedures prose ────────────────────────────────────────────────────── */
+
+.mgdb-modern .mgec-prose { max-width: 74ch; }
+.mgdb-modern .mgec-prose h3 {
+  margin: var(--mgdb-space-5) 0 var(--mgdb-space-2);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-base);
+}
+.mgdb-modern .mgec-prose > h3:first-child { margin-top: 0; }
+.mgdb-modern .mgec-prose p { margin: 0 0 var(--mgdb-space-3); color: var(--mgdb-ink); }
+
+.mgdb-modern .mgec-motions {
+  margin: 0;
+  padding-left: 1.4rem;
+  color: var(--mgdb-ink);
+}
+.mgdb-modern .mgec-motions li { margin-bottom: var(--mgdb-space-2); }
+.mgdb-modern .mgec-motions-alpha { list-style-type: lower-alpha; }
+
+/* ── Activities ──────────────────────────────────────────────────────────── */
+
+.mgdb-modern .mgec-activities,
+.mgdb-modern .mgec-terms {
+  display: grid;
+  gap: var(--mgdb-space-4);
+}
+
+@media (min-width: 900px) {
+  .mgdb-modern .mgec-terms { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.mgdb-modern .mgec-activity,
+.mgdb-modern .mgec-term {
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 1px solid var(--hub-line);
+  border-left: 4px solid var(--mgdb-green);
+  border-radius: var(--mgdb-radius);
+  background: var(--hub-surface);
+}
+
+.mgdb-modern .mgec-term { border-left-color: var(--mgdb-status-info); }
+
+.mgdb-modern .mgec-activity h3,
+.mgdb-modern .mgec-term h3 {
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-base);
+  font-variant-numeric: tabular-nums;
+}
+
+.mgdb-modern .mgec-activity-list {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+}
+.mgdb-modern .mgec-activity-list li { margin-bottom: var(--mgdb-space-2); }
+.mgdb-modern .mgec-activity-list li:last-child { margin-bottom: 0; }
+
+.mgdb-modern .mgec-activity-docs,
+.mgdb-modern .mgec-term-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  margin: var(--mgdb-space-3) 0 0 !important;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-modern .mgec-activity-docs > span:first-child,
+.mgdb-modern .mgec-term-group > span:first-child,
+.mgdb-modern .mgec-role {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.mgdb-modern .mgec-term-group { display: block; color: var(--mgdb-ink-soft); }
+.mgdb-modern .mgec-term-group > span:first-child { display: block; margin-bottom: 2px; }
+
+.mgdb-modern .mgec-contributed,
+.mgdb-modern .mgec-term-note {
+  margin: var(--mgdb-space-3) 0 0 !important;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-style: italic;
+}
+
+.mgdb-modern .mgec-term-none { margin: 0 !important; color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+
+/* A link whose target is gone keeps its label and reads as unavailable rather
+   than as something you failed to click. */
+.mgdb-modern .mgec-doc-dead { color: var(--mgdb-muted); }
+.mgdb-modern .mgec-doc-note {
+  font-size: var(--mgdb-text-xs);
+  font-style: italic;
+}
+
+/* ── Rosters ─────────────────────────────────────────────────────────────── */
+
+.mgdb-modern .mgec-roster {
+  margin: 0;
+  padding: 0;
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  list-style: none;
+}
+
+.mgdb-modern .mgec-roster li { margin-bottom: 3px; }
+
+/* The label and the name share a line, so the label needs its own gutter as
+   well as a floor: "Vice chair" fills the 5.2rem floor exactly and ran straight
+   into the name without the padding. */
+.mgdb-modern .mgec-role {
+  display: inline-block;
+  min-width: 5.2rem;
+  padding-right: var(--mgdb-space-2);
+}
+
+/* ── The 2011 minutes ────────────────────────────────────────────────────── */
+
+.mgdb-modern .mgec-minutes {
+  margin-top: var(--mgdb-space-3);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-sunken);
+}
+
+.mgdb-modern .mgec-minutes > summary {
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  color: var(--mgdb-green-dark);
+  cursor: pointer;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.mgdb-modern .mgec-minutes > summary:focus-visible {
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: 2px;
+}
+
+.mgdb-modern .mgec-minutes-body {
+  max-width: 74ch;
+  padding: 0 var(--mgdb-space-3) var(--mgdb-space-3);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-modern .mgec-minutes-body h4 {
+  margin: var(--mgdb-space-4) 0 var(--mgdb-space-1);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-modern .mgec-minutes-body p { margin: 0 0 var(--mgdb-space-2); color: var(--mgdb-ink); }
+.mgdb-modern .mgec-minutes-session {
+  color: var(--mgdb-muted) !important;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.mgdb-modern .mgec-minutes-signoff { color: var(--mgdb-muted) !important; font-style: italic; }
+
+.mgdb-modern .mgec-note { margin-top: var(--mgdb-space-4); max-width: 78ch; color: var(--mgdb-ink-soft); font-size: var(--mgdb-text-sm); }
+
+@media (max-width: 620px) {
+  .mgdb-modern .mgec-timeline { grid-template-columns: minmax(0, 1fr); gap: var(--mgdb-space-1); }
+  .mgdb-modern .mgec-timeline li { display: block; margin-bottom: var(--mgdb-space-3); }
+  .mgdb-modern .mgec-year { display: block; text-align: left; }
+  .mgdb-modern .mgec-role { min-width: 0; margin-right: .4rem; }
+}

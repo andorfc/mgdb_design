@@ -2959,6 +2959,20 @@ a.mgdb-card h3 { text-decoration: underline; }
 .mgdb-empty p { max-width: 50ch; margin: var(--mgdb-space-2) auto 0; color: var(--mgdb-ink-soft); }
 .mgdb-empty .mgdb-button { margin-top: var(--mgdb-space-4); }
 
+/* The panel centers its contents, but the heading reset near the top of this
+   sheet -- `.mgdb-page h1, ... h6 { text-align: left }` -- matches a heading
+   inside it at the same specificity, so every empty panel on the site drew its
+   heading hard left while the paragraph and button below it centered. Restated
+   here, which wins on order the same way the colour above does. All six levels,
+   because /projects' not-found panel is an h1 and the other 31 are h3.
+   Promoted from a page-scoped fix on /ordering/stock, 2026-09-05 (Carson). */
+.mgdb-empty h1,
+.mgdb-empty h2,
+.mgdb-empty h3,
+.mgdb-empty h4,
+.mgdb-empty h5,
+.mgdb-empty h6 { text-align: center; }
+
 /* Page-level message. role="alert" or role="status" belongs in the markup. */
 .mgdb-message {
   display: flex;

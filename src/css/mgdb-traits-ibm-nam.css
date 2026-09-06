@@ -1,0 +1,153 @@
+/* ==========================================================================
+   Trait values for IBM and NAM lines — /traits_ibm_nam
+   --------------------------------------------------------------------------
+   Loaded after css/mgdb-modern.css and css/mgdb-hub.css. The hub shell settles
+   the ground, the white section cards and their coloured edges, the sticky tab
+   bar, the metric colours, the table zebra, the green Related resources panel
+   and the scroll offset — none of it restated here.
+   ========================================================================== */
+
+.mgdb-traits-page .mgdb-panel-title { margin: 0 0 var(--mgdb-space-1); }
+
+.mgdb-traits-page .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-traits-page .traits-hero-mark {
+  display: block;
+  width: min(100%, 76px);
+  height: auto;
+  margin: 0;
+}
+
+/* Four labels, measured one row at every width. */
+.mgdb-hub-page.mgdb-traits-page > section[id] { scroll-margin-top: 65px; }
+.mgdb-traits-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+/* ── The form ────────────────────────────────────────────────────────────── */
+
+.mgdb-modern .traits-form { display: block; }
+
+.mgdb-modern .traits-stock-field { margin-bottom: var(--mgdb-space-4); }
+
+/* The field takes the slack and the two buttons keep their intrinsic width.
+   `minmax(0, 1fr)` so the input can shrink and the row wraps rather than
+   setting a floor the page cannot render under. */
+.mgdb-modern .traits-stock-line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content max-content;
+  gap: var(--mgdb-space-2);
+  align-items: stretch;
+}
+
+.mgdb-modern .traits-stock-line .mgdb-input { width: 100%; }
+
+/* Every control on this page is one height, including the buttons beside the
+   field — a 36px button next to a 44px input is the mismatch the pattern
+   library calls out. */
+.mgdb-modern .traits-stock-line .mgdb-button,
+.mgdb-modern .traits-criteria .mgdb-input {
+  min-height: var(--mgdb-tap-target);
+}
+
+/* Three criteria in a row, each with its label above its control, so the
+   controls share a left edge and a top edge. A flex row would put each one
+   wherever its label happened to end. */
+.mgdb-modern .traits-criteria {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+}
+
+@media (max-width: 780px) {
+  .mgdb-modern .traits-criteria { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-modern .traits-stock-line { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* A select holding 123 trait names, several of them long, must not set the
+   grid's width. */
+.mgdb-modern .traits-criteria select { max-width: 100%; }
+
+/* The shared `.mgdb-field` carries a 16px top margin that a :first-child rule
+   suppresses on the first one. In a flow that is right; in a grid it means the
+   first column starts 16px above the other two -- measured 792px against 808px.
+   The grid's own gap is the spacing here, so the margin comes off all three. */
+.mgdb-modern .traits-criteria > .mgdb-field { margin-top: 0; }
+
+.mgdb-modern .traits-examples {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-modern .traits-examples > span {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+/* Chips beside a control line take the control height, or the row is
+   bottom-aligned and their tops do not line up. */
+.mgdb-modern .traits-examples .mgdb-chip { min-height: var(--mgdb-tap-target); }
+
+.mgdb-modern .traits-empty-hint { margin-top: var(--mgdb-space-3); }
+
+/* ── Results ─────────────────────────────────────────────────────────────── */
+
+.mgdb-modern .traits-results { margin-top: var(--mgdb-space-5); }
+
+.mgdb-modern .traits-results-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-3);
+}
+
+.mgdb-modern .traits-count {
+  margin: 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.mgdb-modern .traits-results-head .mgdb-export-buttons > * {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+}
+
+/* A bounded region so the shared sticky <thead> sticks to the top of this box
+   rather than to the viewport, where the sticky tab bar already sits. */
+.mgdb-modern .traits-table-scroll {
+  max-height: min(70vh, 40rem);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.mgdb-modern .traits-table-scroll .mgdb-table thead th {
+  z-index: 1;
+  background: var(--mgdb-surface-sunken);
+}
+
+.mgdb-modern .traits-table td { font-size: var(--mgdb-text-sm); }
+
+/* The reference string is a whole citation; it gets the slack and everything
+   else stays on one line. */
+.mgdb-modern .traits-table .traits-reference { min-width: 18rem; }
+.mgdb-modern .traits-table .traits-trait { min-width: 12rem; }
+.mgdb-modern .traits-table th[scope="row"] { white-space: normal; }
+
+.mgdb-modern .traits-more {
+  margin-top: var(--mgdb-space-3);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-modern .traits-note { margin-top: var(--mgdb-space-4); max-width: 78ch; color: var(--mgdb-ink-soft); font-size: var(--mgdb-text-sm); }
+
+.mgdb-modern .traits-empty-value { color: var(--mgdb-muted); font-style: italic; }

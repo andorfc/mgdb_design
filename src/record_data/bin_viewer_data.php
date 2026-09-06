@@ -206,7 +206,7 @@ function showGeneModels($tmpl, $DBConn) {
     from chado.gene_model gm
     left join ext_db_key edb on gm.gene_name = edb.key
     left join locus l on edb.id = l.id
-    where gm.chr = 'Chr$bin'
+    where gm.chr = " . $DBConn->quote('Chr' . $bin) . "
       and gm.assembly_version = 'B73 RefGen_v3'
       and gm.gm_start >= (select chr_start from bin_coordinates where bin like '1.01')
       and gm.gm_end <= (select chr_end from bin_coordinates where bin like '1.01')

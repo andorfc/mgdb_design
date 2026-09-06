@@ -1,0 +1,268 @@
+$$SYNTAX-LEVEL 2
+*(traits_ibm_nam-adv-results
+
+  @(comments {display: off
+    <!-----------------------------------------------------------------------------------
+      This template is no longer used as in-page trait value search was disabled 05/15/20
+    --------------------------------------------------------------------------------- -->
+  )
+  
+  @(no-term {display: off}
+    <br><b>You did not specify any search criteria.</b><br>
+  )
+  
+  @(no-results_adv {display: off}
+    <br>
+    <table cellpadding=8 cellspacing=3 width="100%" 
+           summary="A table containing the main page content.">
+      <tr>
+        <td width="100%">
+          <p><b>Trait Values Search Results - None</b></p>
+          <p>There are either no records matching your search criteria or you did 
+            not select any search criteria. Please check your search and try again.
+          </p>
+        </td>
+      </tr>
+    </table>
+  )
+  
+  @(adv_results {display: off}
+    <table cellpadding=8 cellspacing=3 width="100%" summary="A table containing the main page content.">
+      <tr>
+        <td width="100%">
+          <p style="margin-bottom: 8px;">
+            <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+              Trait Values Search Results - Complete List
+            </span>
+          </p>
+          There are <b>$(count)</b> results matching your search criteria, which is summarized below.
+                    
+          <a href="#!" onclick="advSearchOrderBy('traits_ibm_nam', 'false', 'download'\);">Download these $(count) results</a> to a text file.<br>
+          <a href="https://download.maizegdb.org/SNPs_and_Maps/Traits">Download <b>all</b> Trait Values</a>.
+          <br><br>
+          <span style="font-family: Verdana, Arial, sans-serif; font-size: 100%; font-weight: bold; margin-bottom: 6px;">
+            Search Criteria:
+          </span>
+          <br>
+          $(criteria)
+          <input type="hidden" name="$(div)_rows_adv" id="$(div)_rows_adv" value="$(rows)">
+          <br>
+          <table width="100%" cellpadding=0 cellspacing=0>
+            <tr>
+              <th style="text-align: center; width: 10%">
+               <img src="/images/collapse.jpg" onclick=""/>
+                Plant <br>Ontology
+                <img src="/images/expand.jpg" onclick=""/>
+              </th>
+              <th style="text-align: center; width: 20%">Reference</th>
+              $(trait_headers)
+              <!--These are not included in the table displayed on the Stock page-->
+              $(stock_headers)
+              <!--<th style="text-align: center; width: 10%">Stock</th> 
+              <th style="text-align: center; width: 10%">Stock <br>Synonym</th>-->
+              <th style="text-align: center; width: 10%">Value</th>
+              <th style="text-align: center; width: 5%">Units</th>
+              <th style="text-align: center; width: 5%">Means</th>
+              <th style="text-align: center; width: 5%">Condition</th>
+              <th style="text-align: center; width: 15%">Environment</th>
+            </tr>
+            @(adv_traits_ibm_nam-row
+            <tr style="background-color: $(bgcolor); height:25px;">
+              <td align="center"><a target="_new" href="http://browser.planteome.org/amigo/term/$(key)">$(key) $(ext_db_comment)</a></td>
+              <td align="center"><a href="/data_center/reference?id=$(reference_id)">$(ref_name) $(year)</a></td>
+              $(trait)
+              $(stock)
+              $(synonyms)
+              <td align="center">$(value)</td>
+              <td align="center">$(unit_name)</td>
+              <td align="center">$(stat_name)</td>
+              <td align="center">$(cond_name)</td>
+              <td align="center"><a href="/data_center/environment?id=$(environment_id)">$(env_name)</a></td>
+            </tr>
+            )
+          </table>
+        </td>
+      <tr>
+    </table>
+  )
+  
+  @(adv_results-paged {display: off}
+    <table cellpadding=8 cellspacing=3 width="100%" summary="A table containing the main page content.">
+      <tr>
+        <td width="100%">
+          
+          @(results
+            <p style="margin-bottom: 8px;">
+            <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+              Trait Values Search Results - Complete List
+            </span>
+          </p>
+            There are <b>$(count)</b> results matching your search criteria, which is summarized below.
+            
+          )
+          @(results_limited {bind: results | display: off}
+           <p style="margin-bottom: 8px;">
+            <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+              Trait Values Search Results - Limited List
+            </span>
+          </p>
+           There were a large amount of results matching your search criteria, and so <span style="color:red;"> only the first 
+           <b>$(limit)</b> are shown</span>. <!-- Please refine your search to narrow down your results. -->
+           )
+           @(download_results {display: off}
+             <form method="post" 
+                  action="/search/traits_ibm_nam/traits_ibm_nam_adv_results.php" 
+                  style="margin-bottom:0px;margin-top:0px;padding-bottom:0px;line-height:210%"
+                  id="traits_ibm_nam_results_form">
+               <input type="hidden" id="stock" name="stock" value="$(stock_name)">
+               <input type="hidden" id="box_stock" name="box_stock" value="$(box_stock)">
+               <input type="hidden" id="box_name" name="box_name" value="$(box_name)">
+               <input type="hidden" id="trait_name" name="trait_name" value="$(trait_name)">
+               <input type="hidden" id="download" name="download" value="true">
+               <a href="#!" onclick="document.getElementById('traits_ibm_nam_results_form'\).submit(\);">Download these $(count) results</a> to a text file. <br>
+               <a href="https://download.maizegdb.org/SNPs_and_Maps/Traits/">Download <b>all</b> trait values</a> for IBM and NAM lines.
+             </form>           
+           )
+           <br><br>
+          <span style="font-family: Verdana, Arial, sans-serif; font-size: 100%; font-weight: bold; margin-bottom: 6px;">
+              Search Criteria:
+          </span>
+          <br>
+          $(criteria)
+          <input type="hidden" name="$(div)_rows_adv" id="$(div)_rows_adv" value="$(rows)">
+
+          <br>
+          @(pages
+            <div name="traits_ibm_nam_adv_results_page$(pagenum)" id="traits_ibm_nam_adv_results_page$(pagenum)" 
+                 style="display:$(displayval)">
+              <table width="100%" cellpadding="7" cellspacing="7">
+                <tr>
+                  <td>
+                   <b> Results $(startnum) - $(endnum)</b> out of <b>$(total)</b>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                     <table>
+                     <tr>
+                      <td style="vertical-align:bottom; width:32px; height: 36.4px;">
+                       $(prev-page) 
+                      </td>
+                      <td> $(page-list) </td>
+                      <td style="vertical-align:top;">
+                       $(next-page)
+                      </td> 
+                     </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div name="traits_ibm_nam_adv_results_list$(pagenum)" 
+                         id="traits_ibm_nam_adv_results_list$(pagenum)">
+                      <table width="100%" cellpadding=0 cellspacing=0>
+                        <tr>
+                           <th style="text-align: center; width: 10%">
+                             <a href="#!" title="Sort by Plant Ontology in ascending order" >
+                              <img src="/icon/up.png" 
+                                    onclick="advSearchOrderBy('traits_ibm_nam', 'xref.ext_db_comment ASC'\);"/>
+                             </a>
+                             <center><table><tr><th style="text-align: center;">Plant <br>Ontology</th></tr></table></center>
+                             <a href="#!" title="Sort by Plant Ontology in descending order" >
+                              <img src="/icon/down.png" onclick="advSearchOrderBy('traits_ibm_nam', 'xref.ext_db_comment DESC'\);"/>
+                             </a>
+                          </th>
+                          <th style="text-align: center; width: 20%">
+                            <a href="#!" title="Sort by reference in ascending order" >
+                              <img src="/icon/up.png" 
+                                    onclick="advSearchOrderBy('traits_ibm_nam', 'r.name ASC'\);"/>
+                             </a>
+                             <center><table><tr><th style="text-align: center;">Reference</th></tr></table></center>
+                             <a href="#!" title="Sort by reference in descending order" >
+                              <img src="/icon/down.png" onclick="advSearchOrderBy('traits_ibm_nam', 'r.name DESC'\);"/>
+                             </a>
+                          </th>
+                          $(trait_headers)
+                          $(stock_headers)
+                          <!--<th style="text-align: center; width: 10%">Stock</th>
+                          <th style="text-align: center; width: 10%">Stock <br>Synonym</th>-->
+                          <th style="text-align: center; width: 10%">
+                            <a href="#!" title="Sort by value in ascending order" >
+                              <img src="/icon/up.png" 
+                                    onclick="advSearchOrderBy('traits_ibm_nam', 'tmv.value ASC'\);"/>
+                             </a>
+                             <center><table><tr><th style="text-align: center;">Value</th></tr></table></center>
+                             <a href="#!" title="Sort by value in descending order">
+                              <img src="/icon/down.png" onclick="advSearchOrderBy('traits_ibm_nam', 'tmv.value DESC'\);"/>
+                             </a>
+                           </th>
+                          <th style="text-align: center; width: 5%">
+                            <a href="#!" title="Sort by units in ascending order" >
+                              <img src="/icon/up.png" 
+                                    onclick="advSearchOrderBy('traits_ibm_nam', 'units.name ASC'\);"/>
+                             </a>
+                             <center><table><tr><th style="text-align: center;">Units</th></tr></table></center>
+                             <a href="#!" title="Sort by units in descending order">
+                              <img src="/icon/down.png" onclick="advSearchOrderBy('traits_ibm_nam', 'units.name DESC'\);"/>
+                             </a>
+                           </th>
+                          <th style="text-align: center; width: 5%">
+                           <a href="#!" title="Sort by means in ascending order" >
+                              <img src="/icon/up.png" 
+                                    onclick="advSearchOrderBy('traits_ibm_nam', 'stats.name ASC'\);"/>
+                             </a>
+                             <center><table><tr><th style="text-align: center;">Means</th></tr></table></center>
+                             <a href="#!" title="Sort by meansin descending order">
+                              <img src="/icon/down.png" onclick="advSearchOrderBy('traits_ibm_nam', 'stats.name DESC'\);"/>
+                             </a>
+                           </th>
+                          <th style="text-align: center; width: 5%">
+                            <a href="#!" title="Sort by condition in ascending order" >
+                              <img src="/icon/up.png" 
+                                    onclick="advSearchOrderBy('traits_ibm_nam', 'c.name ASC'\);"/>
+                             </a>
+                             <center><table><tr><th style="text-align: center;">Condition</th></tr></table></center>
+                             <a href="#!" title="Sort by condition in descending order">
+                              <img src="/icon/down.png" onclick="advSearchOrderBy('traits_ibm_nam', 'c.name DESC'\);"/>
+                             </a>
+                          </th>
+                          <th style="text-align: center; width: 15%">
+                            <a href="#!" title="Sort by environment in ascending order" >
+                              <img src="/icon/up.png" 
+                                    onclick="advSearchOrderBy('traits_ibm_nam', 'e.name ASC'\);"/>
+                             </a>
+                             <center><table><tr><th style="text-align: center;">Environment</th></tr></table></center>
+                             <a href="#!" title="Sort by environment in descending order">
+                              <img src="/icon/down.png" onclick="advSearchOrderBy('traits_ibm_nam', 'e.name DESC'\);"/>
+                             </a>
+                           </th>
+                        </tr>
+                        @(adv_traits_ibm_nam-page-row
+                         <tr style="background-color: $(bgcolor); height:25px;">
+                          <td align="center"><a target="_new" href="http://browser.planteome.org/amigo/term/$(key)">$(key) $(ext_db_comment)</a></td>
+                          <td align="center"><a href="/data_center/reference?id=$(reference_id)">$(ref_name) $(year)</a></td>
+                          $(trait)
+                          $(stock)
+                          $(synonyms)
+                          <td align="center">$(value)</td>
+                          <td align="center">$(unit_name)</td>
+                          <td align="center">$(stat_name)</td>
+                          <td align="center">$(cond_name)</td>
+                          <td align="center"><a href="/data_center/environment?id=$(environment_id)">$(env_name)</a></td>
+                         </tr>
+                        )
+                    </table>
+                   </div>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          )
+          <script language="javascript">
+            traits_ibm_nam_adv_search('traits_ibm_nam_adv_results_list2', 2\);
+          </script>
+        </td>
+      <tr>
+    </table>
+  )
+)

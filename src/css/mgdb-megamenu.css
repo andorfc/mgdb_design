@@ -467,6 +467,37 @@
 	line-height:19px;
 }
 
+/* A link that leaves MaizeGDB says so with an arrow after its title, the same
+   way a Related resources card does -- see
+   `.mgdb-resource-list a[href^="http"] > strong::after` in mgdb-modern.css.
+   maizegdb.org and its subdomains (download, jbrowse, jbrowse2, gcv, qteller,
+   wgs, pangenome-viewer, phylostrata, snptools, genomeqc, feta, mfs) are the
+   same site and carry none, and neither do the relative links, which cannot
+   leave.
+
+   Keyed on the href rather than a hand-placed glyph, so a link added later is
+   marked correctly the moment it is written and can never drift out of step
+   with its own destination.
+
+   Keyed on `strong` so it marks the text links only. The megamenu's other
+   off-domain links are logos and images -- AgBioData, Gramene, GenoMaize and
+   the meeting poster -- where an arrow after a picture would read as part of
+   the picture.
+
+   Today this marks the three maizegenetics.org links in the Community panel;
+   every other absolute link in the megamenu is a maizegdb subdomain. */
+.mgdb-modern #menu_bar .mega-group > a[href^="http"] strong::after,
+.mgdb-modern #menu_bar .mega-group > a[href^="//"] strong::after {
+	content:" \2197";
+	font-size:.85em;
+	font-weight:600;
+}
+
+.mgdb-modern #menu_bar .mega-group > a[href*="//maizegdb.org"] strong::after,
+.mgdb-modern #menu_bar .mega-group > a[href*=".maizegdb.org"] strong::after {
+	content:none;
+}
+
 .mgdb-modern #menu_bar .mega-group > a span {
 	margin-top:1px;
 	color:#687365;
@@ -626,11 +657,33 @@
 
 /* Written as `p.mega-hint` so it beats `.mega-panel-heading p` \(1 id, 2
    classes, 1 element\), which otherwise holds this at the 12px it sets for
-   heading body copy. */
+   heading body copy.
+
+   TWO LINES ARE RESERVED, ALWAYS. The hint is the only thing in an open panel
+   whose height changes, and it sits above the link lists, so a description that
+   wraps to a second line grew the panel by 20px under the pointer -- a shake
+   as the reader moved down a column. 40px is two lines at the 20px
+   line-height, so a one-line and a two-line description occupy the same box
+   and the panel never moves.
+
+   Two lines is the measured maximum, not a guess. Every description in all
+   five panels, at the hint width each panel actually gets:
+
+     About        381px   3 of 5 wrap to two lines
+     Genomes      628px   all one line
+     Data hubs    684px   all one line
+     Community    686px   all one line
+     Tools        768px   all one line
+
+   Those widths do not vary with the viewport -- the dropdowns are fixed-width,
+   and below 1164px the drawer takes over and hides the hint entirely -- so the
+   measurement holds at every width the bar is shown at. **Keep new
+   descriptions inside two lines at 381px**, which is roughly 110 characters;
+   past that the jump comes back. */
 .mgdb-modern #menu_bar .mega-panel-heading p.mega-hint {
 	box-sizing:border-box;
 	max-width:none;
-	min-height:20px;
+	min-height:40px;
 	margin:5px 0 0;
 	color:#5b6a57;
 	font-size:14px;

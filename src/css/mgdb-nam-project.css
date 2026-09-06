@@ -644,11 +644,33 @@
    Section 5: FAQs Grid
    -------------------------------------------------------------------------- */
 
+/* Three named columns rather than auto-fit. Two of these cards carry the
+   project's own description -- a 150-word paragraph each -- and auto-fit made
+   four ~290px columns of it, a very tall thin block beside two short cards and
+   one card orphaned on a row of its own. The long pair spans the full width and
+   the three short ones make one even row. */
 .mgdb-nam-project-page .nam-faqs-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--mgdb-space-4);
   margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-nam-project-page .nam-faq-wide { grid-column: 1 / -1; }
+
+/* The long cards read as prose, so hold them to a measure rather than letting a
+   line run the full 1232px. */
+.mgdb-nam-project-page .nam-faq-wide > p { max-width: var(--mgdb-measure); }
+
+/* Three 383px columns become two ~393px ones rather than three cramped 257px
+   ones: below 900 the container cannot give three columns the 280px the card
+   grids elsewhere treat as the floor. */
+@media (max-width: 900px) and (min-width: 621px) {
+  .mgdb-nam-project-page .nam-faqs-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 620px) {
+  .mgdb-nam-project-page .nam-faqs-grid { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* --------------------------------------------------------------------------

@@ -156,6 +156,37 @@ $content->get('breakthrough_count')->replace(number_format($page_data['breakthro
 $content->get('meeting_count')->replace(number_format($page_data['meeting_count']));
 $content->get('coop_count')->replace(number_format($page_data['coop_count']));
 $content->get('year_range')->replace($page_data['year_range']);
+
+/* The MGEC figures on this page are counted from data/mgec.json -- the same
+   file /mgec renders -- so the two pages cannot drift. The record closed in
+   2019 and these numbers will not change, which is exactly why typing them
+   here would have been the easy mistake: a later correction to the record
+   would have left this page quietly wrong. Falls back to hiding nothing and
+   showing an em dash if the file cannot be read. */
+$mgec_doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT']
+  ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';
+$mgec_record = @json_decode(@file_get_contents($mgec_doc_root . '/data/mgec.json'), true);
+
+$mgec_people = array();
+if (is_array($mgec_record) && !empty($mgec_record['committees'])) {
+    foreach ($mgec_record['committees'] as $mgec_term) {
+        foreach ($mgec_term['members'] as $mgec_member) { $mgec_people[$mgec_member['name']] = true; }
+        foreach (array('chair', 'vice_chair') as $mgec_field) {
+            if (!empty($mgec_term[$mgec_field])) {
+                $mgec_people[preg_replace('/,\s*\d{4}$/', '', $mgec_term[$mgec_field])] = true;
+            }
+        }
+    }
+}
+
+function mgecHistoryCount($record, $key) {
+    return (is_array($record) && !empty($record[$key])) ? number_format(count($record[$key])) : '&#8212;';
+}
+
+$content->get('mgec_terms')->replace(mgecHistoryCount($mgec_record, 'committees'));
+$content->get('mgec_members')->replace($mgec_people ? number_format(count($mgec_people)) : '&#8212;');
+$content->get('mgec_activities')->replace(mgecHistoryCount($mgec_record, 'activities'));
+$content->get('mgec_documents')->replace(mgecHistoryCount($mgec_record, 'documents'));
 $content->get('data_date')->replace($page_data['data_date']);
 
 include_once('translation.php');

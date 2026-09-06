@@ -147,40 +147,6 @@
   font-weight: 750;
 }
 
-/* ── How the collections connect ─────────────────────────────────────────── */
-
-.mgdb-data-center-hub .data-hub-route {
-  display: grid;
-  gap: 0.6rem;
-  margin: 0 0 1.1rem;
-  padding: 0;
-  list-style: none;
-  counter-reset: route;
-}
-
-.mgdb-data-center-hub .data-hub-route li {
-  display: grid;
-  grid-template-columns: 1.6rem minmax(0, 1fr);
-  align-items: baseline;
-  gap: 0 0.55rem;
-  counter-increment: route;
-}
-
-.mgdb-data-center-hub .data-hub-route li::before {
-  content: counter(route);
-  color: var(--mgdb-gold-dark);
-  font-size: 0.82rem;
-  font-weight: 850;
-}
-
-.mgdb-data-center-hub .data-hub-route strong { color: var(--mgdb-green-dark); }
-
-.mgdb-data-center-hub .data-hub-route span {
-  grid-column: 2;
-  color: var(--mgdb-muted);
-  font-size: 0.84rem;
-}
-
 /* ── Figures ─────────────────────────────────────────────────────────────── */
 
 .mgdb-data-center-hub .data-hub-figure { margin-top: var(--mgdb-space-5); }

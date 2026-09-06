@@ -1008,7 +1008,7 @@
 
   function init() {
     els = {
-      functionLine: R.byId('gene-record-function'),
+      functionLine: R.byId('gene-record-function-line'),
       synonyms: R.byId('gene-record-synonyms'),
       versionNotice: R.byId('gene-record-version-notice'),
       report: R.byId('gene-record-report'),

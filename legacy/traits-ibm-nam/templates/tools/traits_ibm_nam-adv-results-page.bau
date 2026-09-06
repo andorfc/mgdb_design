@@ -1,0 +1,132 @@
+$$SYNTAX-LEVEL 2
+*(traits_ibm_nam-adv-results-page
+  <table width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+               <th style="text-align: center; width: 10%">
+                             <a href="#!" title="Sort by Plant Ontology in ascending order" >
+                              <img src="/icon/up.png" 
+                                    onclick="advSearchOrderBy('traits_ibm_nam', 'xref.ext_db_comment ASC'\);"/>
+                             </a>
+                             <center><table><tr><th style="text-align: center;">Plant <br>Ontology</th></tr></table></center>
+                             <a href="#!" title="Sort by Plant Ontology in descending order" >
+                              <img src="/icon/down.png" onclick="advSearchOrderBy('traits_ibm_nam', 'xref.ext_db_comment DESC'\);"/>
+                             </a>
+                          </th>
+                          <th style="text-align: center; width: 20%">
+                            <a href="#!" title="Sort by reference in ascending order" >
+                              <img src="/icon/up.png" 
+                                    onclick="advSearchOrderBy('traits_ibm_nam', 'r.name ASC'\);"/>
+                             </a>
+                             <center><table><tr><th style="text-align: center;">Reference</th></tr></table></center>
+                             <a href="#!" title="Sort by reference in descending order" >
+                              <img src="/icon/down.png" onclick="advSearchOrderBy('traits_ibm_nam', 'r.name DESC'\);"/>
+                             </a>
+                          </th>
+              @(traits_trait_th {display: off}
+                <th style="text-align: center; width: 10%">
+                <a href="#!" title="Sort by trait in ascending order" >
+                   <img src="/icon/up.png" 
+                        onclick="advSearchOrderBy('traits_ibm_nam', 't.name ASC'\);"/>
+                </a>
+                <center><table><tr><th style="text-align: center;">Trait</th></tr></table></center>
+                <a href="#!" title="Sort by trait in descending order">
+                   <img src="/icon/down.png" onclick="advSearchOrderBy('traits_ibm_nam', 't.name DESC'\);"/>
+                </a>
+               </th>
+              )
+              @(traits_stock_th {display: off}
+                <th style="text-align: center; width: 10%">
+                <a href="#!" title="Sort by stock in ascending order" >
+                   <img src="/icon/up.png" 
+                        onclick="advSearchOrderBy('traits_ibm_nam', 's.name ASC'\);"/>
+                </a>
+                <center><table><tr><th style="text-align: center;">Stock</th></tr></table></center>
+                <a href="#!" title="Sort by stock in descending order">
+                   <img src="/icon/down.png" onclick="advSearchOrderBy('traits_ibm_nam', 's.name DESC'\);"/>
+                </a>
+               </th>
+             <!-- <th style="text-align: center; width: 10%">
+                <a href="#!" title="Sort by synonyms in ascending order" >
+                   <img src="/icon/up.png" 
+                        onclick="advSearchOrderBy('traits_ibm_nam', 'syn.synonyms ASC'\);"/>
+                </a>
+                <center><table><tr><th style="text-align: center;">Stock <br>Synonym</th></tr></table></center>
+                <a href="#!" title="Sort by synonyms in descending order">
+                   <img src="/icon/down.png" onclick="advSearchOrderBy('traits_ibm_nam', 'syn.synonyms DESC'\);"/>
+                </a>
+              </th> -->
+              )
+              <th style="text-align: center; width: 10%">
+                            <a href="#!" title="Sort by value in ascending order" >
+                              <img src="/icon/up.png" 
+                                    onclick="advSearchOrderBy('traits_ibm_nam', 'tmv.value ASC'\);"/>
+                             </a>
+                             <center><table><tr><th style="text-align: center;">Value</th></tr></table></center>
+                             <a href="#!" title="Sort by value in descending order">
+                              <img src="/icon/down.png" onclick="advSearchOrderBy('traits_ibm_nam', 'tmv.value DESC'\);"/>
+                             </a>
+                           </th>
+                          <th style="text-align: center; width: 5%">
+                            <a href="#!" title="Sort by units in ascending order" >
+                              <img src="/icon/up.png" 
+                                    onclick="advSearchOrderBy('traits_ibm_nam', 'units.name ASC'\);"/>
+                             </a>
+                             <center><table><tr><th style="text-align: center;">Units</th></tr></table></center>
+                             <a href="#!" title="Sort by units in descending order">
+                              <img src="/icon/down.png" onclick="advSearchOrderBy('traits_ibm_nam', 'units.name DESC'\);"/>
+                             </a>
+                           </th>
+                          <th style="text-align: center; width: 5%">
+                           <a href="#!" title="Sort by means in ascending order" >
+                              <img src="/icon/up.png" 
+                                    onclick="advSearchOrderBy('traits_ibm_nam', 'stats.name ASC'\);"/>
+                             </a>
+                             <center><table><tr><th style="text-align: center;">Means</th></tr></table></center>
+                             <a href="#!" title="Sort by meansin descending order">
+                              <img src="/icon/down.png" onclick="advSearchOrderBy('traits_ibm_nam', 'stats.name DESC'\);"/>
+                             </a>
+                           </th>
+                          <th style="text-align: center; width: 5%">
+                            <a href="#!" title="Sort by condition in ascending order" >
+                              <img src="/icon/up.png" 
+                                    onclick="advSearchOrderBy('traits_ibm_nam', 'c.name ASC'\);"/>
+                             </a>
+                             <center><table><tr><th style="text-align: center;">Condition</th></tr></table></center>
+                             <a href="#!" title="Sort by condition in descending order">
+                              <img src="/icon/down.png" onclick="advSearchOrderBy('traits_ibm_nam', 'c.name DESC'\);"/>
+                             </a>
+                          </th>
+                          <th style="text-align: center; width: 15%">
+                            <a href="#!" title="Sort by environment in ascending order" >
+                              <img src="/icon/up.png" 
+                                    onclick="advSearchOrderBy('traits_ibm_nam', 'e.name ASC'\);"/>
+                             </a>
+                             <center><table><tr><th style="text-align: center;">Environment</th></tr></table></center>
+                             <a href="#!" title="Sort by environment in descending order">
+                              <img src="/icon/down.png" onclick="advSearchOrderBy('traits_ibm_nam', 'e.name DESC'\);"/>
+                             </a>
+                           </th>
+  </tr>
+  @(traits_ibm_nam-adv-row 
+   <tr style="background-color: $(bgcolor); height:25px;">
+     <td align="center"><a target="_new" href="http://browser.planteome.org/amigo/term/$(key)">$(key) $(ext_db_comment)</a></td>
+              <td align="center"><a href="/data_center/reference?id=$(reference_id)">$(ref_name) $(year)</a></td>
+              $(trait)
+              $(stock)
+              <!--$(synonyms)-->
+              <td align="center">$(value)</td>
+              <td align="center">$(unit_name)</td>
+              <td align="center">$(stat_name)</td>
+              <td align="center">$(cond_name)</td>
+              <td align="center"><a href="/data_center/environment?id=$(environment_id)">$(env_name)</a></td>
+    </tr>
+  )
+  </table>
+  
+  @(load-next-page_adv {display: off}
+    <script language="javascript">
+      traits_ibm_nam_adv_search('traits_ibm_nam_adv_results_list$(nextpage)', $(nextpage)\);
+    </script>
+    
+  )
+)

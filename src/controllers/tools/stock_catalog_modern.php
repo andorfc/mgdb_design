@@ -199,7 +199,7 @@ if ($view === 'catalog' || $view === 'new') {
       ORDER BY LOWER(d.description)";
     $sth = make_query($DBConn, $sql);
     while ($row = retrieve_row($sth)) {
-        $entry = sc_entry($row['id'], $row['description']);
+        $entry = sc_entry($row['id'], mgdb_safe_html($row['description']));
         if ($entry === '') {
             continue;
         }
@@ -222,7 +222,7 @@ if ($view === 'catalog' || $view === 'new') {
       ORDER BY sort_key";
     $sth = make_query($DBConn, $sql_wx1);
     while ($row = retrieve_row($sth)) {
-        $entry = sc_entry($row['id'], $row['description']);
+        $entry = sc_entry($row['id'], mgdb_safe_html($row['description']));
         if ($entry !== '') {
             $groups['wx1'][] = $entry;
         }
@@ -316,7 +316,7 @@ if ($view === 'catalog' || $view === 'new') {
     $sth = make_query($DBConn, $sql);
     $entries = array();
     while ($row = retrieve_row($sth)) {
-        $entry = sc_entry($row['id'], $row['description']);
+        $entry = sc_entry($row['id'], mgdb_safe_html($row['description']));
         if ($entry !== '') {
             $entries[] = $entry;
         }

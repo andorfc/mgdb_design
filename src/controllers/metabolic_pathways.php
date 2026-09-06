@@ -169,7 +169,7 @@ function mp_render_resource($r) {
            . ($external ? 'External' : 'Internal') . '</span>';
     $html .= '</div>';
     $html .= '<h3>' . mp_esc($r['name']) . '</h3>';
-    $html .= '<p>' . mp_esc($r['description']) . '</p>';
+    $html .= '<p>' . mp_esc(mgdb_safe_html($r['description'])) . '</p>';
     $html .= '<div class="mp-card-links">' . mp_link('Open ' . $r['name'], $r['url'], 'mp-card-cta') . '</div>';
     $html .= '</article>';
     return $html;
@@ -227,7 +227,7 @@ $page = dashboardCache($system, $cache_key, function () use ($DBConn, $catalog_f
             'section'  => isset($group_titles[$key]) ? $group_titles[$key] : $key,
             'url'      => $r['url'],
             'provider' => isset($r['provider']) ? $r['provider'] : '',
-            'summary'  => $r['description'],
+            'summary'  => mgdb_safe_html($r['description']),
             'keywords' => isset($r['keywords']) ? $r['keywords'] : array()
         );
     }

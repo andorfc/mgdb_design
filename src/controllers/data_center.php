@@ -36,6 +36,30 @@
   $password = getCookie('password', false);
   $userid =   getCookie('userid', false);
 
+  /* The gene symbol list (/data_center/gene-symbols) is modernized. The page
+     was a 1,197-line hand-maintained table with no way to search it; the rows
+     now come from data/gene_symbols.json and the page carries a filter.
+     Rollback: delete this block -- the original template and its 9-line
+     controller are untouched on disk. */
+  if (defined('PAGE') && PAGE == 'gene-symbols') {
+    include('controllers/data_center/gene-symbols_modern.php');
+    return;
+  }
+
+  /* Retired 2026-09-06 (Carson): /data_center/qtl-data. Its content -- the QTL
+     experiment listing -- is the QTL Data Hub's own search, which covers the
+     same records with filters the old page did not have. 301 rather than a
+     deletion, because the page is linked from twelve templates and from
+     outside the site.
+
+     The original controller and its templates are untouched on disk
+     (controllers/data_center/qtl-data_search.php, templates/data_center/qtl-data*).
+     Rollback: delete this block. */
+  if (defined('PAGE') && PAGE == 'qtl-data') {
+    header('Location: /data_center/qtl', true, 301);
+    exit;
+  }
+
   /* The Data Hub directory (/data_center/). The controller root is an
      interactive discovery hub and metrics dashboard across all active data hubs. */
   if (!defined('PAGE') || !PAGE || PAGE == 'data_center' || PAGE == 'index') {

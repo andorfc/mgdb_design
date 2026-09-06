@@ -253,7 +253,20 @@ function hnpSearch($DBConn, $filters) {
 
     $recommender = isset($filters['recommender']) ? (int) $filters['recommender'] : 0;
     if ($recommender > 0) {
-        $where[] = '(ebp.person_id = ? OR ebp.person_id2 = ?)';
+        /* Match the whole recommendation, not just the row carrying this name.
+           A recommendation by three people spans two rows (see
+           hnpMergeSameMonthRows), so selecting only the matching row would
+           merge a partial list and the entry would name fewer people than it
+           does unfiltered. The direct comparison stays first so a row with no
+           reference_id -- which the EXISTS cannot match -- is still found. */
+        $where[] = "(ebp.person_id = ? OR ebp.person_id2 = ?
+                     OR EXISTS (SELECT 1 FROM mgdb.ed_board_papers e2
+                                 WHERE e2.reference_id = ebp.reference_id
+                                   AND e2.rec_month = ebp.rec_month
+                                   AND e2.rec_year = ebp.rec_year
+                                   AND (e2.person_id = ? OR e2.person_id2 = ?)))";
+        $params[] = $recommender;
+        $params[] = $recommender;
         $params[] = $recommender;
         $params[] = $recommender;
     }
@@ -312,6 +325,10 @@ function hnpSearch($DBConn, $filters) {
     $rows = get_all_rows(make_query($DBConn, $sql, 1, $params));
     if (!$rows) { return array('papers' => array(), 'total' => 0, 'truncated' => false); }
 
+    /* Merge before counting, so the total is a count of recommendations as a
+       reader sees them rather than a count of table rows. */
+    $rows = hnpMergeSameMonthRows($rows);
+
     $total = count($rows);
     $truncated = empty($filters['no_limit']) && $total > HNP_MAX_RESULTS;
     if ($truncated) { $rows = array_slice($rows, 0, HNP_MAX_RESULTS); }
@@ -321,6 +338,88 @@ function hnpSearch($DBConn, $filters) {
         'total'     => $total,
         'truncated' => $truncated
     );
+}
+
+/* ---------------------------------------------------------------------------
+   ed_board_papers holds only person_id and person_id2, so a paper recommended
+   by three people in one month needs a SECOND row just to carry the third
+   name. That second row then rendered as its own list entry -- the paper
+   appeared twice, each entry showing all of the paper's reports but only its
+   own row's one or two names. That is what "three reports, two names" was.
+
+   So rows that share a reference AND a month are one recommendation: merge
+   them and union the recommenders. Rows for the same paper in DIFFERENT months
+   are left alone -- 18 papers were recommended again later, sometimes years
+   apart (May 2010 and February 2012), and each of those belongs to its own
+   month in the list.
+
+   This also folds away exact duplicate rows: reference 9043491 has the same
+   person recorded twice for July 2020, which was rendering as two identical
+   entries.
+
+   Reports are NOT filtered per entry. mgdb.memo carries an author for only 147
+   of the 812 editorial reports, so attributing them would hide the other 665.
+   --------------------------------------------------------------------------- */
+function hnpRowRecommenders($row) {
+    $list = array();
+    $first = hnpPersonName($row['rec1_first'], $row['rec1_last']);
+    if ($first !== '') {
+        $list[] = array('id' => (int) $row['person_id'], 'name' => $first);
+    }
+    $second = hnpPersonName($row['rec2_first'], $row['rec2_last']);
+    if ($second !== '') {
+        $list[] = array('id' => (int) $row['person_id2'], 'name' => $second);
+    }
+    return $list;
+}
+
+function hnpMergeSameMonthRows($rows) {
+    $out = array();
+    $seen = array();
+
+    foreach ($rows as $row) {
+        $recommenders = hnpRowRecommenders($row);
+        $referenceId = (int) $row['reference_id'];
+
+        /* A row with no reference cannot be matched to another; keep it as is. */
+        if ($referenceId <= 0) {
+            $row['recommenders'] = $recommenders;
+            $out[] = $row;
+            continue;
+        }
+
+        $key = $referenceId . '|' . strtolower(trim((string) $row['rec_month']))
+             . '|' . (int) $row['rec_year'];
+
+        if (!isset($seen[$key])) {
+            $row['recommenders'] = $recommenders;
+            $seen[$key] = count($out);
+            $out[] = $row;
+            continue;
+        }
+
+        /* Fold into the row already holding this slot, keeping its position in
+           the sort. Match on person id where there is one, and on name where
+           there is not, so a duplicate row cannot list the same person twice. */
+        $i = $seen[$key];
+        foreach ($recommenders as $candidate) {
+            $duplicate = false;
+            foreach ($out[$i]['recommenders'] as $have) {
+                if ($candidate['id'] > 0 && $have['id'] === $candidate['id']) { $duplicate = true; break; }
+                if ($candidate['id'] <= 0 && strcasecmp($have['name'], $candidate['name']) === 0) { $duplicate = true; break; }
+            }
+            if (!$duplicate) { $out[$i]['recommenders'][] = $candidate; }
+        }
+
+        /* Keep any link the surviving row happens not to carry. */
+        foreach (array('abstract_link', 'html_link', 'pdf_link') as $field) {
+            if (empty($out[$i][$field]) && !empty($row[$field])) {
+                $out[$i][$field] = $row[$field];
+            }
+        }
+    }
+
+    return $out;
 }
 
 /* One query for every comment on the whole result set, rather than one per
@@ -348,7 +447,7 @@ function hnpAttachComments($DBConn, $rows) {
             $id = (int) $memo['id'];
             if (!isset($comments[$id])) { $comments[$id] = array(); }
             $comments[$id][] = array(
-                'comment' => hnpStr($memo['memo']),
+                'comment' => hnpStr(mgdb_safe_html($memo['memo'])),
                 'author'  => hnpPersonName($memo['name_first'], $memo['name_last'])
             );
         }
@@ -367,15 +466,9 @@ function hnpShapePaper($row, $comments) {
     $citation = hnpStr($row['citation']);
     if ($title === '') { $title = $citation; }
 
-    $recommenders = array();
-    $first = hnpPersonName($row['rec1_first'], $row['rec1_last']);
-    if ($first !== '') {
-        $recommenders[] = array('id' => (int) $row['person_id'], 'name' => $first);
-    }
-    $second = hnpPersonName($row['rec2_first'], $row['rec2_last']);
-    if ($second !== '') {
-        $recommenders[] = array('id' => (int) $row['person_id2'], 'name' => $second);
-    }
+    /* Set by hnpMergeSameMonthRows(), which unions the recommenders across
+       every row describing this month's recommendation. */
+    $recommenders = isset($row['recommenders']) ? $row['recommenders'] : hnpRowRecommenders($row);
 
     $doi = hnpDoi($row['doi']);
     $pubmed = preg_replace('/\D+/', '', hnpStr($row['pubmed']));
@@ -401,6 +494,21 @@ function hnpShapePaper($row, $comments) {
     );
 }
 
+
+/* "A", "A and B", "A, B, and C". Until a paper could carry more than two
+   recommenders this was implode(' and ', ...), which read
+   "DeTemple and Bilgici and Zimmerman" the moment one did. Serial comma,
+   matching the site's American English. */
+function hnpNameList($names) {
+    $count = count($names);
+    if ($count === 0) { return ''; }
+    if ($count === 1) { return $names[0]; }
+    if ($count === 2) { return $names[0] . ' and ' . $names[1]; }
+
+    $last = array_pop($names);
+
+    return implode(', ', $names) . ', and ' . $last;
+}
 
 /* ---------------------------------------------------------------------------
    Rendering
@@ -464,7 +572,7 @@ function hnpRenderPaper($paper) {
                 : hnpEsc($person['name']);
         }
         $html .= '<p class="hnp-recommender"><span class="mgdb-muted">Recommended by</span> '
-               . implode(' and ', $names) . '</p>';
+               . hnpNameList($names) . '</p>';
     }
 
     $links = hnpLinkList($paper);

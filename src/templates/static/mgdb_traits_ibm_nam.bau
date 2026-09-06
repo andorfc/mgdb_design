@@ -1,0 +1,186 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-traits-ibm-nam
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https://maizegdb.org/traits_ibm_nam">
+<meta property="og:title" content="Trait Values for IBM and NAM Lines | MaizeGDB">
+<meta property="og:description" content="Search measured trait values for IBM and NAM maize lines by stock, trait, reference, or environment.">
+
+<a class="mgdb-skip-link" href="#traits-main">Skip to main content</a>
+
+<main class="mgdb-page mgdb-hub-page mgdb-traits-page" id="traits-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/tools">Tools</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Trait values</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="traits-title">
+    <div class="mgdb-hero-emblem">
+      <svg class="traits-hero-mark" viewBox="0 0 96 96" role="img" aria-label="Measured values plotted against a scale">
+        <path d="M16 78V20M16 78h64" stroke="#235c37" stroke-width="4" stroke-linecap="round" />
+        <g fill="#2f5e2a">
+          <rect x="26" y="56" width="12" height="18" rx="3" />
+          <rect x="44" y="42" width="12" height="32" rx="3" />
+          <rect x="62" y="50" width="12" height="24" rx="3" />
+        </g>
+        <circle cx="32" cy="46" r="5" fill="#d99a0b" /><circle cx="50" cy="30" r="5" fill="#d99a0b" /><circle cx="68" cy="38" r="5" fill="#d99a0b" />
+        <path d="M32 46 50 30 68 38" stroke="#a96919" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      <strong>Trait<br />Values</strong>
+      <span>IBM and NAM lines</span>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="traits-title">Measured trait values for IBM and NAM lines.</h1>
+      <p class="mgdb-hero-description">$(value_count) values across $(trait_count) traits and $(stock_count) stocks, drawn from $(reference_count) published studies. Search by stock, trait, reference, or environment, and take the whole matched set as a tab-delimited file.</p>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#traits-search" class="is-current" aria-current="true">Search</a>
+    <a href="#traits-references">References</a>
+    <a href="#traits-metrics">Metrics</a>
+    <a href="#traits-related">Related resources</a>
+  </nav>
+
+  <section id="traits-search" aria-labelledby="traits-search-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="traits-search-title" class="mgdb-panel-title">Search</h2></div>
+    </div>
+
+    <form id="traits-form" class="mgdb-search traits-form" role="search">
+      <div class="mgdb-field traits-stock-field">
+        <label class="mgdb-label" for="traits-stock">Stock name or synonym</label>
+        <div class="traits-stock-line">
+          <input class="mgdb-input" id="traits-stock" name="stock" type="search" autocomplete="off" spellcheck="false" placeholder="NAM-Z012E0148" aria-describedby="traits-stock-hint" />
+          <button class="mgdb-button mgdb-button-primary" id="traits-submit" type="submit">Search</button>
+          <button class="mgdb-button mgdb-button-quiet" id="traits-reset" type="reset">Clear</button>
+        </div>
+        <p class="mgdb-hint" id="traits-stock-hint">Matched exactly unless you add a wildcard&#58; <code>%</code> or <code>*</code> stands for any run of characters. Synonyms are searched alongside names.</p>
+      </div>
+
+      <div class="traits-criteria">
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="traits-trait">Trait</label>
+          <select class="mgdb-input" id="traits-trait" name="trait">
+            <option value="">Any trait</option>
+            $(trait_options)
+          </select>
+        </div>
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="traits-reference">Reference</label>
+          <select class="mgdb-input" id="traits-reference" name="reference">
+            <option value="">Any reference</option>
+            $(reference_options)
+          </select>
+        </div>
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="traits-environment">Environment</label>
+          <select class="mgdb-input" id="traits-environment" name="environment">
+            <option value="">Any environment</option>
+            $(environment_options)
+          </select>
+        </div>
+      </div>
+
+      <div class="traits-examples" aria-label="Example searches">
+        <span>Try</span>
+        <button class="mgdb-chip" type="button" data-traits-example='{"stock":"NAM-Z012E0148"}'>a single stock</button>
+        <button class="mgdb-chip" type="button" data-traits-example='{"trait":"anthesis-silking interval PANZEA"}'>anthesis-silking interval</button>
+        <button class="mgdb-chip" type="button" data-traits-example='{"stock":"IBM*"}'>IBM* wildcard</button>
+      </div>
+
+      <p class="mgdb-hint traits-empty-hint" id="traits-empty-hint">Choose at least one criterion. An unfiltered search would return every one of the $(value_count) values.</p>
+    </form>
+
+    <p id="traits-status" class="mgdb-visually-hidden" aria-live="polite"></p>
+
+    <div id="traits-results" class="traits-results" hidden>
+      <div class="traits-results-head">
+        <p class="traits-count" id="traits-count" role="status" aria-live="polite"></p>
+        <div class="mgdb-export-buttons">
+          <a class="mgdb-button mgdb-button-quiet" id="traits-export" href="#">Download TSV</a>
+        </div>
+      </div>
+
+      <div class="mgdb-table-scroll traits-table-scroll" tabindex="0" role="region" aria-label="Trait value results">
+        <table class="mgdb-table traits-table" data-sortable id="traits-table">
+          <caption class="mgdb-visually-hidden">Trait values matching the current search</caption>
+          <thead>
+            <tr>
+              <th scope="col" data-sort="text"><button type="button">Trait</button></th>
+              <th scope="col" data-sort="text"><button type="button">Stock</button></th>
+              <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Value</button></th>
+              <th scope="col" data-sort="text"><button type="button">Units</button></th>
+              <th scope="col" data-sort="text"><button type="button">Statistic</button></th>
+              <th scope="col" data-sort="text"><button type="button">Environment</button></th>
+              <th scope="col" data-sort="text"><button type="button">Reference</button></th>
+            </tr>
+          </thead>
+          <tbody id="traits-tbody"></tbody>
+        </table>
+      </div>
+
+      <p class="traits-more" id="traits-more" hidden></p>
+    </div>
+
+    <div id="traits-none" class="mgdb-empty" hidden>
+      <h3>No trait values match</h3>
+      <p>No measured value matches those criteria. Try a wildcard on the stock name, or drop one of the other filters.</p>
+    </div>
+  </section>
+
+  <section id="traits-references" aria-labelledby="traits-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="traits-references-title" class="mgdb-panel-title">References</h2></div>
+    </div>
+    <div class="mgdb-ref-list">$(reference_cards)</div>
+  </section>
+
+  <section id="traits-metrics" aria-labelledby="traits-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="traits-metrics-title" class="mgdb-panel-title">Metrics</h2></div>
+    </div>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric"><div class="mgdb-metric-top"><h3>Trait values</h3></div><div class="mgdb-metric-stat"><strong class="mgdb-metric-value">$(value_count)</strong></div><p class="mgdb-metric-description">Measured values in the collection, each a stock, a trait, and an environment.</p></article>
+      <article class="mgdb-metric"><div class="mgdb-metric-top"><h3>Traits</h3></div><div class="mgdb-metric-stat"><strong class="mgdb-metric-value">$(trait_count)</strong></div><p class="mgdb-metric-description">Distinct traits measured across those values.</p></article>
+      <article class="mgdb-metric"><div class="mgdb-metric-top"><h3>Stocks</h3></div><div class="mgdb-metric-stat"><strong class="mgdb-metric-value">$(stock_count)</strong></div><p class="mgdb-metric-description">Distinct IBM and NAM lines carrying at least one value.</p></article>
+      <article class="mgdb-metric"><div class="mgdb-metric-top"><h3>References</h3></div><div class="mgdb-metric-stat"><strong class="mgdb-metric-value">$(reference_count)</strong></div><p class="mgdb-metric-description">Published studies these measurements were taken from.</p></article>
+    </div>
+
+    <p class="mgdb-note traits-note"><strong>Data note:</strong> the whole collection is also available as a single archive from the <a href="https://download.maizegdb.org/SNPs_and_Maps/Traits/Trait_Values_IBM_NAM.zip">MaizeGDB download server</a>, which is the better route when you want all of it rather than a subset.</p>
+  </section>
+
+  <section id="traits-related" class="mgdb-hub-related" aria-labelledby="traits-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="traits-related-title" class="mgdb-panel-title">Related resources</h2></div>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/stock">
+          <strong>Stock Data Hub</strong>
+          <span>The IBM and NAM lines themselves, with their parentage, providers, and variations</span>
+        </a>
+        <a href="/data_center/phenotype">
+          <strong>Phenotype Data Hub</strong>
+          <span>Scored phenotypes and the records that carry them, alongside these measured values</span>
+        </a>
+        <a href="/data_center/reference">
+          <strong>Reference Data Hub</strong>
+          <span>The published studies these measurements come from, with their abstracts</span>
+        </a>
+        <a href="/NAM_project">
+          <strong>NAM genomes</strong>
+          <span>Assemblies and annotations for the NAM founder lines</span>
+        </a>
+        <a href="https://download.maizegdb.org/SNPs_and_Maps/Traits/">
+          <strong>Trait value downloads</strong>
+          <span>The whole collection as one archive, on the MaizeGDB download server</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+)

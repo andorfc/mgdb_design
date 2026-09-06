@@ -63,6 +63,61 @@ function locusTypeRows($DBConn) {
     return $rows;
 }
 
+/* Every locus type, with how many curated loci carry it and MaizeGDB's own
+   definition of it.
+
+   The definitions are the curator-written memos on the type term itself, not
+   text invented for this page, so the glossary and the term record cannot
+   disagree. 19 of the 26 types have one; the rest are shown with their count
+   and no definition rather than a plausible sentence, which is also how a
+   curator can see which ones still need writing.
+
+   min(memo) because a couple of terms carry more than one memo -- Chromosomal
+   Segment has both the type definition and a note about haplotypes -- and the
+   first is the definition in every case checked. */
+function locusTypeGlossary($DBConn) {
+    $sql = "
+        SELECT t.name AS type, COUNT(DISTINCT l.id) AS count, min(m.memo) AS definition
+        FROM mgdb.locus l
+          JOIN mgdb.id_num i ON i.id = l.id AND i.curation_lvl = 0
+          JOIN mgdb.term t ON t.id = l.type
+          LEFT JOIN mgdb.memo m ON m.id = t.id
+        GROUP BY t.name
+        ORDER BY count DESC, t.name ASC";
+    $stmt = make_query($DBConn, $sql);
+
+    $rows = array();
+    while ($row = retrieve_row($stmt)) {
+        $definition = trim(preg_replace('/\s+/', ' ', (string) $row['definition']));
+        $rows[] = array(
+            'type'       => (string) $row['type'],
+            'count'      => (int) $row['count'],
+            'definition' => $definition
+        );
+    }
+
+    return $rows;
+}
+
+function locusRenderTypeGlossary($rows) {
+    if (!$rows) { return ''; }
+
+    $html = '';
+    foreach ($rows as $row) {
+        $html .= '<div class="locus-type-entry">'
+               . '<dt><span class="mgdb-pill mgdb-pill-info">' . mgdb_html($row['type']) . '</span>'
+               . '<span class="locus-type-count">' . number_format($row['count'])
+               . ' ' . ($row['count'] === 1 ? 'locus' : 'loci') . '</span></dt>'
+               . '<dd>'
+               . ($row['definition'] !== ''
+                    ? mgdb_html($row['definition'])
+                    : '<span class="locus-type-undefined">No curated definition yet.</span>')
+               . '</dd></div>';
+    }
+
+    return $html;
+}
+
 function locusRenderTypeOptions($rows) {
     $options = '<option value="">All locus types</option>' . "\n";
     foreach ($rows as $row) {

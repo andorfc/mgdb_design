@@ -135,6 +135,27 @@
 
 .mgdb-gene-page .gene-query-field { min-width: 0; }
 
+/* The wildcard hint was flush against the input it explains. */
+.mgdb-gene-page #gene-search-hint { margin-top: 0.55rem; }
+
+/* The query field and the Maximum records control on one row, so their labels
+   share a line and their controls share a baseline. Stacked -- which is what
+   they did -- the select read as a separate step below the search rather than
+   as one of its settings. Below this width they stack, because a 16rem select
+   beside a shrinking input leaves neither enough room. */
+@media (min-width: 900px) {
+  .mgdb-gene-page .mgdb-search {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 16rem;
+    align-items: start;
+    column-gap: var(--mgdb-space-4);
+  }
+
+  .mgdb-gene-page .mgdb-search > .gene-query-field { grid-column: 1; }
+  .mgdb-gene-page .mgdb-search > .gene-search-options { grid-column: 2; margin-top: 0; }
+  .mgdb-gene-page .mgdb-search > .gene-examples { grid-column: 1 / -1; }
+}
+
 .mgdb-gene-page .gene-search-submit,
 .mgdb-gene-page .gene-search-reset {
   min-height: var(--mgdb-tap-target);
@@ -241,7 +262,11 @@
   padding: var(--mgdb-space-4) var(--mgdb-space-5);
   border: 1px solid var(--mgdb-line);
   border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface-alt);
+  /* White, like every other panel and card on this page. This block used to be
+     the only tinted surface here, which read as a different KIND of thing
+     rather than as one more panel. */
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-sm);
 }
 
 .mgdb-gene-page .gene-advanced > summary {
@@ -327,20 +352,32 @@
 
 .mgdb-gene-page .gene-panel .mgdb-field + .mgdb-field { margin-top: var(--mgdb-space-4); }
 
-/* The tools vary greatly in height. A row-based grid left several hundred
-   pixels of dead space below each short form while its taller neighbor set the
-   row height. Balanced columns keep the same two-column working surface
-   without separating related controls from their action buttons. */
+/* A real grid, not CSS columns.
+ *
+ * `columns: 2 28rem` flowed the panels like text, so two cards sitting side by
+ * side had unrelated heights and their Submit buttons landed at different
+ * points down the page -- the crammed, ragged look. The earlier objection to a
+ * grid was dead space below the shorter form; that is answered by making each
+ * panel a flex column and letting its action row sink to the bottom, so the
+ * card grows to the row height instead of leaving a gap under its content and
+ * every Submit sits on one line across the row. */
 .mgdb-gene-page .gene-tool-grid {
-  columns: 2 28rem;
-  column-gap: var(--mgdb-space-4);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 28rem), 1fr));
+  align-items: stretch;
+  gap: var(--mgdb-space-4);
 }
 
 .mgdb-gene-page .gene-tool-grid > .gene-panel {
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  margin: 0 0 var(--mgdb-space-4);
-  break-inside: avoid;
+  margin: 0;
 }
+
+/* Everything above the actions keeps its natural size; the actions take the
+   slack, which is what puts them on a common baseline. */
+.mgdb-gene-page .gene-tool-grid > .gene-panel > .mgdb-form-actions { margin-top: auto; }
 
 .mgdb-gene-page .gene-radio-row {
   display: flex;
@@ -625,3 +662,111 @@
   min-height: 320px;
   overflow: visible;
 }
+
+/* --------------------------------------------------------------------------
+   Section and heading leads, 2026-09-06
+
+   Every h2 section and several of the h3 leaf headings now say what they are
+   before the reader meets a form, a chart or a table. The shell hides a <p>
+   inside .mgdb-section-heading deliberately -- that is the "no section
+   descriptions" guard in css/mgdb-hub.css -- so these are siblings after the
+   heading block rather than children of it.
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-page .gene-section-lead,
+.mgdb-gene-page .gene-leaf-lead {
+  max-width: none;
+  margin: 0 0 var(--mgdb-space-4);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.65;
+}
+
+.mgdb-gene-page .gene-leaf-lead { margin-top: calc(var(--mgdb-space-2) * -1); }
+
+/* The nomenclature standards, hoisted to the top of the section. A row of
+   links, not a paragraph with links in it. */
+.mgdb-gene-page .gene-doc-links {
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-left: 3px solid var(--mgdb-gold);
+  background: var(--mgdb-green-soft);
+  line-height: 1.9;
+}
+
+/* --------------------------------------------------------------------------
+   Prose width
+
+   .gene-prose is capped at the reading measure, which is right for the short
+   explanatory blocks it was written for. Nomenclature, About and the NCBI
+   release note are reference text that is read in place and compared against
+   the tables beside them, and they were asked to run the full width instead.
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-page .gene-prose-wide { max-width: none; }
+.mgdb-gene-page .gene-prose-wide > p { max-width: none; }
+
+/* Paragraphs in the reference prose sat tight enough to read as one block. */
+.mgdb-gene-page .gene-prose > p { margin-bottom: var(--mgdb-space-4); line-height: 1.7; }
+.mgdb-gene-page .gene-prose > p:last-child { margin-bottom: 0; }
+.mgdb-gene-page .gene-prose > .gene-indent { margin-bottom: var(--mgdb-space-4); }
+.mgdb-gene-page .gene-prose > h3 { margin-top: var(--mgdb-space-6); }
+.mgdb-gene-page .gene-prose > h3:first-child { margin-top: 0; }
+
+/* --------------------------------------------------------------------------
+   Older gene model downloads
+
+   Six cards of link lists. The shared card grid fits as many 22rem columns as
+   there is room for, which put four across at full width and left each one too
+   narrow for the file names it holds. Three per row instead, so a name like
+   ZmB73_5b.60_FGS.translations.fasta.gz has somewhere to sit.
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-page .gene-older-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 1000px) {
+  .mgdb-gene-page .gene-older-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .mgdb-gene-page .gene-older-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* --------------------------------------------------------------------------
+   Example buttons
+
+   The example chips sat flush against the control they fill in, so they read
+   as part of the field rather than as an offer beside it.
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-page .mgdb-hint > .gene-example,
+.mgdb-gene-page .mgdb-form-actions > .gene-example { margin-top: var(--mgdb-space-2); }
+
+.mgdb-gene-page .gene-panel .mgdb-hint:has(> .gene-example) { margin-top: var(--mgdb-space-3); }
+
+/* :has() is recent enough to want a floor under it: without the rule above the
+   chips still work, they are simply closer to the field. */
+.mgdb-gene-page .gene-panel .mgdb-field > .mgdb-hint { margin-top: var(--mgdb-space-2); }
+
+/* --------------------------------------------------------------------------
+   Maize Feature Store panel
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-page .gene-featurestore > div { max-width: none; }
+.mgdb-gene-page .gene-featurestore p { margin-bottom: var(--mgdb-space-3); }
+.mgdb-gene-page .gene-featurestore p:last-child { margin-bottom: 0; }
+
+/* MaizeMine's text was asked to run the full width of the page rather than sit
+   in a narrow column beside its mark. */
+.mgdb-gene-page .gene-maizemine > div:first-child { max-width: none; }
+
+/* --------------------------------------------------------------------------
+   Tool run status
+
+   The spinner and the "results are ready" fallback that replace the empty tab
+   these forms used to open the moment they were submitted.
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-page .gene-run-status { margin-top: var(--mgdb-space-3); }
+.mgdb-gene-page .gene-run-status:empty { margin-top: 0; }
+.mgdb-gene-page .gene-run-status > p { margin: 0 0 var(--mgdb-space-2); }

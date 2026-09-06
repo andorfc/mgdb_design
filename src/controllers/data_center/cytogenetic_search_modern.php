@@ -14,7 +14,6 @@
 
 include_once('./include/db-api.php');
 include_once('./include/dashboard_cache.php');
-include_once('./include/references_lib.php');
 
 $system = getSystemInfo('mgdb.conf');
 logMessage('Starting cytogenetic_search_modern.php');
@@ -38,7 +37,7 @@ $bauplan->includeCss('/css/static.css');
 $bauplan->includeCss('/css/mgdb-modern.css');
 $bauplan->includeCss('/css/mgdb-megamenu.css');
 /* The shared Data Hub shell -- pale blue ground, white section cards, coloured
-   section edges, the reference card, aligned form rows -- loaded before the
+   section edges, aligned form rows -- loaded before the
    page's own sheet, which is the order css/mgdb-hub.css documents.
    `mgdb-hub-page` on <main> opts in. */
 $bauplan->includeCss('/css/mgdb-hub.css?v=' . $v_hub);
@@ -79,21 +78,6 @@ $content->get('metric_landmarks')->replace(number_format($page_data['landmarks']
 $content->get('metric_stocks')->replace(number_format($page_data['stocks']));
 $content->get('metric_stock_types')->replace(number_format(count($page_data['stock_rows'])));
 $content->get('chart_data')->replace(cytogeneticChartData($page_data['stock_rows']));
-
-/* References: the works these maps, stocks and landmark records come out of.
-   Rendered by include/references_lib.php so these cards match every other hub. */
-$content->get('reference_cards')->replace(mgdb_render_references($doc_root, array(
-    // Where the chromosome knobs on these maps sit, and why that matters.
-    array('doi' => '10.1007/s00412-012-0391-8'),
-    // Reading a cytological position as a sequence interval.
-    array('doi' => '10.1093/bioinformatics/btp556'),
-    // The assemblies these cytological features are now anchored against.
-    array('doi' => '10.1126/science.abg5289'),
-    // How this material is curated.
-    array('doi' => '10.1016/j.cpb.2017.11.001'),
-    // The database of record.
-    array('doi' => '10.1093/nar/gky1046'),
-)));
 
 include_once('translation.php');
 $mgdb->get('blast_url')->replace($system['BLAST_URL']);

@@ -1,6 +1,6 @@
 $$SYNTAX-LEVEL 2
 *(mgdb-fair-practices
-<main class="mgdb-page mgdb-fair-page" id="fair-main">
+<main class="mgdb-page mgdb-hub-page mgdb-fair-page" id="fair-main">
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
     <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/maize_history">Community</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">FAIR data practices</span>
   </nav>
@@ -12,7 +12,7 @@ $$SYNTAX-LEVEL 2
       <span>Ready for people and machines</span>
     </div>
     <div class="mgdb-hero-body">
-      <span class="mgdb-eyebrow">Data stewardship at MaizeGDB</span>
+      
       <h1 id="fair-title">FAIR data that works for research, software, and AI.</h1>
       <p class="mgdb-hero-tagline">Make maize data easier to discover, combine, understand, and responsibly reuse.</p>
       <p class="mgdb-hero-description">FAIR is a set of guiding principles for digital research objects, their metadata, and the infrastructure that connects them. The goal is machine-actionable data with enough human context to support trustworthy science.</p>
@@ -27,21 +27,23 @@ $$SYNTAX-LEVEL 2
     <div><strong>FAIR does not automatically mean open.</strong> Data may have appropriate access controls and still be FAIR when the access conditions are explicit and machine-readable. FAIR also does not by itself guarantee data quality, ethics, or fitness for a particular use.</div>
   </div>
 
-  <nav class="fair-jump-nav" aria-label="On this page">
-    <span>On this page</span>
-    <a href="#fair-principles">FAIR principles</a>
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#fair-principles" class="is-current" aria-current="true">FAIR principles</a>
     <a href="#maizegdb-practice">At MaizeGDB</a>
     <a href="#ai-ready">AI-ready data</a>
     <a href="#agbiodata">AgBioData</a>
     <a href="#researcher-checklist">Researcher checklist</a>
+    <a href="#fair-deposit">Where to deposit</a>
+    <a href="#fair-responsible">Responsible data</a>
     <a href="#resources">Resources</a>
   </nav>
 
   <section id="fair-principles" aria-labelledby="fair-principles-title">
     <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">The current FAIR view</span><h2 id="fair-principles-title">A practice, not a badge</h2></div>
-      <p>FAIRness is a continuum. The Research Data Alliance maturity model uses indicators and priorities to show what is working and what can improve.</p>
+      <div><h2 id="fair-principles-title">A practice, not a badge</h2></div>
     </div>
+
+    <p class="fair-lead">FAIRness is a continuum. The Research Data Alliance maturity model uses indicators and priorities to show what is working and what can improve.</p>
 
     <div class="fair-principle-grid">
       <article class="fair-principle-card fair-findable">
@@ -90,9 +92,10 @@ $$SYNTAX-LEVEL 2
 
   <section id="maizegdb-practice" class="fair-maize-section" aria-labelledby="maizegdb-practice-title">
     <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Putting FAIR into practice</span><h2 id="maizegdb-practice-title">How this fits with MaizeGDB</h2></div>
-      <p>MaizeGDB connects community data to stable biological entities and preserves the context needed to interpret those relationships over time.</p>
+      <div><h2 id="maizegdb-practice-title">How this fits with MaizeGDB</h2></div>
     </div>
+
+    <p class="fair-lead">MaizeGDB connects community data to stable biological entities and preserves the context needed to interpret those relationships over time.</p>
 
     <div class="fair-maize-grid">
       <article class="fair-commitment-card"><span class="fair-card-icon" aria-hidden="true">ID</span><div><h3>Stable identity and cross-references</h3><p>Resolvable record pages, identifiers, synonyms, and external accessions help researchers find the same gene, locus, stock, marker, or dataset across systems.</p></div></article>
@@ -106,9 +109,10 @@ $$SYNTAX-LEVEL 2
 
   <section id="ai-ready" class="fair-ai-section" aria-labelledby="ai-ready-title">
     <div class="mgdb-section-heading fair-ai-heading">
-      <div><span class="mgdb-eyebrow">Beyond machine-readable</span><h2 id="ai-ready-title">AI-ready starts with FAIR&mdash;and goes further.</h2></div>
-      <p>AI-ready data are well documented, reliably computable, traceable to source, characterized for quality and coverage, responsibly governed, and sustainable enough to support evaluation and reuse.</p>
+      <div><h2 id="ai-ready-title">AI-ready starts with FAIR&mdash;and goes further.</h2></div>
     </div>
+
+    <p class="fair-lead">AI-ready data are well documented, reliably computable, traceable to source, characterized for quality and coverage, responsibly governed, and sustainable enough to support evaluation and reuse.</p>
 
     <div class="mgdb-message mgdb-message-info fair-ai-callout" role="note">
       <div><strong>AI-ready is use-specific.</strong> A dataset may support one prediction task and be unsuitable for another. Readiness must be assessed against the intended question, organism scope, model, and risk.</div>
@@ -125,7 +129,7 @@ $$SYNTAX-LEVEL 2
 
     <div class="fair-ai-maize-grid">
       <div class="fair-ai-maize-copy">
-        <span class="mgdb-eyebrow">Before training with maize data</span>
+        
         <h3>Preserve the biological context.</h3>
         <p>Machine learning can amplify hidden gaps in a dataset. Check whether germplasm, environments, tissues, developmental stages, technologies, or reference genomes are unevenly represented.</p>
         <p>Record the MaizeGDB access date, entity identifiers, assembly and annotation versions, filters, transformations, and the exact records used for training, validation, and testing.</p>
@@ -146,7 +150,7 @@ $$SYNTAX-LEVEL 2
   <section id="agbiodata" class="fair-agbiodata-section" aria-labelledby="agbiodata-title">
     <div class="fair-agbiodata-visual"><img src="/images/agbiodata-agriculture-mark.png" alt="Agricultural crops, livestock, biological samples, and a DNA helix" /></div>
     <div class="fair-agbiodata-copy">
-      <span class="mgdb-eyebrow">Community standards at agricultural scale</span>
+      
       <h2 id="agbiodata-title">A founding member of the AgBioData Consortium</h2>
       <p>MaizeGDB team members co-founded AgBioData, a consortium of agricultural biological databases working together on standards and best practices for acquiring, displaying, curating, and reusing genomic, genetic, and breeding data.</p>
       <p>That collaboration helps align maize data with the broader agricultural data ecosystem through shared vocabularies, formats, curation practices, training, and sustainable infrastructure.</p>
@@ -160,9 +164,10 @@ $$SYNTAX-LEVEL 2
 
   <section id="researcher-checklist" aria-labelledby="researcher-checklist-title">
     <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">A practical workflow</span><h2 id="researcher-checklist-title">Eight things every data contributor can do</h2></div>
-      <p>Plan for reuse before data collection begins. Good stewardship is part of the research method, not a final publishing task.</p>
+      <div><h2 id="researcher-checklist-title">Eight things every data contributor can do</h2></div>
     </div>
+
+    <p class="fair-lead">Plan for reuse before data collection begins. Good stewardship is part of the research method, not a final publishing task.</p>
 
     <ol class="fair-action-grid">
       <li><span>1</span><div><h3>Start with a data plan</h3><p>Budget time, people, storage, curation, and long-term repository costs. Identify sensitive or community-governed data early.</p></div></li>
@@ -176,11 +181,12 @@ $$SYNTAX-LEVEL 2
     </ol>
   </section>
 
-  <section class="fair-deposit-section" aria-labelledby="fair-deposit-title">
+  <section id="fair-deposit" class="fair-deposit-section" aria-labelledby="fair-deposit-title">
     <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Repository and standard starting points</span><h2 id="fair-deposit-title">Put each data type in the right ecosystem</h2></div>
-      <p>Deposit primary data with an established repository, then connect its persistent identifier to MaizeGDB and your publication.</p>
+      <div><h2 id="fair-deposit-title">Put each data type in the right ecosystem</h2></div>
     </div>
+
+    <p class="fair-lead">Deposit primary data with an established repository, then connect its persistent identifier to MaizeGDB and your publication.</p>
 
     <div class="fair-deposit-grid">
       <article><h3>Sequence and assemblies</h3><p>Use the International Nucleotide Sequence Database Collaboration repositories for durable accessions.</p><div><a href="https://www.ncbi.nlm.nih.gov/">NCBI</a><a href="https://www.ebi.ac.uk/ena/browser/home">ENA</a><a href="https://www.ddbj.nig.ac.jp/">DDBJ</a></div></article>
@@ -190,16 +196,16 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
-  <section class="fair-responsible-section" aria-labelledby="fair-responsible-title">
+  <section id="fair-responsible" class="fair-responsible-section" aria-labelledby="fair-responsible-title">
     <div class="fair-responsible-copy">
-      <span class="mgdb-eyebrow">FAIR plus responsible stewardship</span>
+      
       <h2 id="fair-responsible-title">Keep people, communities, and purpose in view.</h2>
       <p>FAIR focuses on the properties that enable discovery and reuse. When data concern Indigenous Peoples, lands, or knowledge, the CARE Principles add Collective benefit, Authority to control, Responsibility, and Ethics.</p>
       <p>More broadly, disclose data limitations, respect appropriate governance and consent, preserve attribution, and consider who may benefit or be harmed by downstream reuse&mdash;especially in AI applications.</p>
       <a href="https://www.gida-global.org/care-principles-copy">Explore the CARE Principles <span aria-hidden="true">&rarr;</span></a>
     </div>
     <aside class="mgdb-aside-card fair-contact-card">
-      <span class="mgdb-eyebrow">Working with maize data?</span>
+      
       <h3>Connect your publication and datasets to MaizeGDB.</h3>
       <p>Share repository accessions, persistent identifiers, metadata, and relevant maize entities. Our team can help identify the right contribution path.</p>
       <div><a class="mgdb-button mgdb-button-primary" href="/contribute_data">Contribute data</a><a class="mgdb-button mgdb-button-secondary" href="/contact">Ask MaizeGDB</a></div>
@@ -208,9 +214,10 @@ $$SYNTAX-LEVEL 2
 
   <section id="resources" class="fair-resources-section" aria-labelledby="resources-title">
     <div class="mgdb-section-heading">
-      <div><span class="mgdb-eyebrow">Standards and further reading</span><h2 id="resources-title">Authoritative resources</h2></div>
-      <p>Use these references when writing data-management plans, choosing metadata standards, or assessing readiness for reuse.</p>
+      <div><h2 id="resources-title">Authoritative resources</h2></div>
     </div>
+
+    <p class="fair-lead">Use these references when writing data-management plans, choosing metadata standards, or assessing readiness for reuse.</p>
     <div class="fair-resource-list">
       <a href="https://www.nature.com/articles/sdata201618"><strong>FAIR Guiding Principles</strong><span>The original 2016 Scientific Data paper.</span></a>
       <a href="https://www.go-fair.org/fair-principles/"><strong>GO FAIR</strong><span>Principles, explanations, and implementation guidance.</span></a>

@@ -189,8 +189,15 @@ src/css/mgdb-reference.css                        css/mgdb-reference.css
 src/js/mgdb-reference.js                          js/mgdb-reference.js
 src/controllers/data_center/reference_search_modern.php  controllers/data_center/reference_search_modern.php
 src/controllers/data_center.php                   controllers/data_center.php
+# Archived data hubs. On the Data Hub shell since 2026-09-05; controllers/
+# archive.php is the top-level route interceptor, without which redirect.php
+# builds the legacy chrome first and the page renders on top of index.css,
+# background_static.css and ie6.css. css/mgdb-archive.css was server-only until
+# this date.
+src/controllers/archive.php                      controllers/archive.php
 src/controllers/static/archive.php               controllers/static/archive.php
 src/templates/static/mgdb_archive.bau            templates/static/mgdb_archive.bau
+src/css/mgdb-archive.css                         css/mgdb-archive.css
 
 # Maize Genetics Meeting — replaces /maize_meeting/ in place
 src/templates/static/mgdb_maize_meeting.bau      templates/static/mgdb_maize_meeting.bau
@@ -200,6 +207,42 @@ src/pages/maize_meeting/index.php                maize_meeting/index.php
 src/images/maize_meeting/CREDITS.json            images/maize_meeting/CREDITS.json
 src/images/maize_meeting/chicago2027.jpg         images/maize_meeting/chicago2027.jpg
 src/images/maize_meeting/sacramento2028.jpg      images/maize_meeting/sacramento2028.jpg
+
+# The 2020 virtual meeting's poster and video walls. Not a redesign: these four
+# files are here because their password gate redirected without stopping, so a
+# failed check printed the whole wall -- presenter names, emails, titles and
+# abstracts -- into the body of the 302 it had just sent. conf.php also fataled
+# on a registrant list that is not on every host, which is the only reason
+# nothing leaked here, and made both pages answer 200 with a stack trace.
+# The pages themselves are unchanged and still closed; the copies taken before
+# the fix are in backups/20260905-*.
+src/pages/maize_meeting/v2020/conf.php           maize_meeting/v2020/conf.php
+src/pages/maize_meeting/v2020/posters.php        maize_meeting/v2020/posters.php
+src/pages/maize_meeting/v2020/videos.php         maize_meeting/v2020/videos.php
+src/pages/maize_meeting/v2020/poster_login.php   maize_meeting/v2020/poster_login.php
+
+# Two more redirects that did not stop, from the same sweep. Neither page is
+# part of the redesign; they are here so the fix survives a deploy.
+#
+# ordering/stock.php: submitting a stock order redirected to the Stock Center's
+# order form and then let ordering.php publish the whole ordering page into the
+# body of that 302. The redirect URL is untouched -- it is a live order form.
+#
+# controllers/data_center/est_functions.php had the same shape and is fixed too,
+# but it is listed with the SQL-injection sweep's resolvers further down rather
+# than here, because that block adopted it first.
+src/controllers/ordering/stock.php               controllers/ordering/stock.php
+
+# /ordering/stock -- the stock order basket, on the design system. The guard in
+# ordering.php takes every route except `submit`, which stays in the legacy
+# stock.php because it redirects to a live order form at the Stock Center. The
+# basket is still the `stock_order` cookie in its original shape, so an order
+# started before the change still submits. templates/ordering/stock.bau and its
+# two partials are untouched and serve the route again if the guard is removed.
+src/controllers/ordering.php                     controllers/ordering.php
+src/controllers/ordering/stock_modern.php        controllers/ordering/stock_modern.php
+src/templates/ordering/mgdb_stock_order.bau      templates/ordering/mgdb_stock_order.bau
+src/css/mgdb-stock-order.css                     css/mgdb-stock-order.css
 
 # Maize Newsletter archive — replaces /mnl in place. The legacy controller and
 # its community/ templates are untouched and archived in legacy/mnl/; rollback
@@ -294,6 +337,16 @@ src/templates/static/mgdb_gene.bau               templates/static/mgdb_gene.bau
 src/css/mgdb-gene.css                            css/mgdb-gene.css
 src/js/mgdb-gene.js                              js/mgdb-gene.js
 src/controllers/gene_center/gene_search_modern.php  controllers/gene_center/gene_search_modern.php
+# Adopted into the repo 2026-09-06: it lived only on the server, like
+# FAIRpractices did. Now returns the four protein structure scores that its
+# query was already fetching and throwing away -- AlphaFold2 and ESMFold average
+# pLDDT, IUPred2 and ANCHOR2 percentages -- offers the same table as TSV or CSV,
+# and binds the gene model list instead of interpolating it into the statement.
+src/search/gene/get_scores.php                   search/gene/get_scores.php
+# TSV and CSV output beside the plain-text view. $format is passed into
+# printTranslations() rather than read as a global: the function could not see
+# the file-level variable, so a .csv download arrived tab-separated.
+src/search/gene/gene_translate.php               search/gene/gene_translate.php
 
 # Bin Viewer — replaces /bin_viewer in all three modes
 # bin_geometry.json and core_bin_markers.json are generated once by
@@ -346,6 +399,36 @@ src/templates/static/mgdb_projects_notfound.bau  templates/static/mgdb_projects_
 src/controllers/doc.php                          controllers/doc.php
 src/controllers/about/doc.php                    controllers/about/doc.php
 src/controllers/documentation/projects.php       controllers/documentation/projects.php
+
+# The three community resource pages, ported off the legacy chrome onto the hub
+# shell, 2026-09-05. Each is a normal /projects/<slug> page now: registry entry,
+# controller, body template. See README.md, "Porting the three resource pages".
+#
+# Each redirect covers TWO old URLs. controller.php reaches
+# controllers/documentation/<page>.php for /documentation/<page>, and
+# redirect.php reaches the same file for the root-level /<page>, so
+# /CMMprotocols and /documentation/CMMprotocols both 301 from one file.
+src/controllers/documentation/CMMprotocols.php               controllers/documentation/CMMprotocols.php
+src/controllers/documentation/dooner_du_acds_insertions.php  controllers/documentation/dooner_du_acds_insertions.php
+src/controllers/documentation/fowler_insertion_validation.php controllers/documentation/fowler_insertion_validation.php
+
+src/css/mgdb-project-resources.css                css/mgdb-project-resources.css
+src/js/mgdb-project-resources.js                  js/mgdb-project-resources.js
+
+src/controllers/projects/cytogenetic_map.php                 controllers/projects/cytogenetic_map.php
+src/templates/static/mgdb_project_cytogenetic_map.bau        templates/static/mgdb_project_cytogenetic_map.bau
+
+src/controllers/projects/dooner_du_acds.php                  controllers/projects/dooner_du_acds.php
+src/templates/static/mgdb_project_dooner_du_acds.bau         templates/static/mgdb_project_dooner_du_acds.bau
+
+# The Fowler payload is small enough to ship through the manifest, unlike the
+# pathway explorer's. Regenerate with tools/fowler_lines.py before deploying;
+# it re-derives both files from the archived legacy tables and refuses to write
+# if the counts stop matching what the page says.
+src/controllers/projects/fowler_insertion_validation.php     controllers/projects/fowler_insertion_validation.php
+src/templates/static/mgdb_project_fowler_insertion_validation.bau  templates/static/mgdb_project_fowler_insertion_validation.bau
+src/data/projects/fowler_insertion_validation/lines.json     data/projects/fowler_insertion_validation/lines.json
+src/data/projects/fowler_insertion_validation/fowler_ds_gfp_lines.tsv  data/projects/fowler_insertion_validation/fowler_ds_gfp_lines.tsv
 
 # Project: pan-genome pathway explorer (/projects/pathway_explorer)
 # E2P2 metabolic pathway annotation over the 26 NAM founder genomes beside
@@ -461,6 +544,17 @@ src/js/mgdb-ssr.js                                     js/mgdb-ssr.js
 # /nomenclature needs a top-level controller or controller.php falls through to
 # redirect.php, which loads the legacy main template and its whole stylesheet
 # and script block on top of the modern page.
+# The complete standard, nested into /nomenclature by the controller. CURATOR-
+# MAINTAINED: this is the community's own text and MaizeGDB curators edit it on
+# the server. Refresh this copy from the server before touching it, or a deploy
+# will revert their edit. Adopted 2026-09-06 only to remove the legacy "Return
+# to the homepage" link and the rule above it from the foot of the appendix --
+# page furniture from the pre-redesign page, not part of the standard.
+src/templates/community/nomenclature.bau         templates/community/nomenclature.bau
+# /nomenclature_assembly -- the 2021 whole-genome assembly and annotation
+# nomenclature standard as a page instead of a PDF. Shares css/mgdb-nomenclature.css.
+src/controllers/nomenclature_assembly.php        controllers/nomenclature_assembly.php
+src/templates/community/mgdb_nomenclature_assembly.bau  templates/community/mgdb_nomenclature_assembly.bau
 src/controllers/nomenclature.php                       controllers/nomenclature.php
 src/controllers/community/nomenclature.php             controllers/community/nomenclature.php
 src/templates/community/mgdb_nomenclature.bau          templates/community/mgdb_nomenclature.bau
@@ -937,20 +1031,24 @@ src/docs/maizegdb-globus-guide.pdf             docs/maizegdb-globus-guide.pdf
 # images/box_download.png: the same cloud and arrow with the service logo inside.
 src/images/globus_download.png                 images/globus_download.png
 
-# Homepage design alternatives for group review, at /index2/, /index3/ and
-# /index4/. Version 4 is version 3 with smaller quick-link tiles and a wider
-# rail, so it shares mgdb-home-alt.css and adds only its own template.
-# All share include/home_lib.php with the real homepage, so every version shows
-# the same data. Delete these entries and the page directories once a design
-# is chosen. See README.md, "Homepage alternatives".
+# Homepage overrides. This block was the three design alternatives that ran at
+# /index2/, /index3/ and /index4/ for group review; those were removed on
+# 2026-09-05 once the design was chosen, and their files are under
+# /var/www/claude/retired/2026-09-05-homepage-alternatives/.
+#
+# THESE TWO ARE NOT ALTERNATIVES AND MUST NOT GO WITH THEM. The real homepage
+# carries mgdb-home-v3 and mgdb-home-v4 on <main> and renders the puzzle art,
+# so both files are production dependencies despite having arrived with the
+# review copies.
 src/css/mgdb-home-alt.css                        css/mgdb-home-alt.css
-src/templates/static/mgdb_home2.bau              templates/static/mgdb_home2.bau
-src/templates/static/mgdb_home3.bau              templates/static/mgdb_home3.bau
-src/templates/static/mgdb_home4.bau              templates/static/mgdb_home4.bau
 src/images/home/assembly_puzzle.png              images/home/assembly_puzzle.png
-src/pages/index2/index.php                       index2/index.php
-src/pages/index3/index.php                       index3/index.php
-src/pages/index4/index.php                       index4/index.php
+
+# The three retired review URLs. Without these controllers the paths answer 200
+# with the legacy "Oops, Sorry!" body, because redirect.php catches the
+# fall-through -- the same trap as /tools/<anything>.
+src/controllers/index2.php                       controllers/index2.php
+src/controllers/index3.php                       controllers/index3.php
+src/controllers/index4.php                       controllers/index4.php
 
 # Feedback — the form the header button opens, and the /feedback page behind it.
 # Restores the Atlassian issue collector the legacy shell carried (AD-009), as
@@ -1253,6 +1351,7 @@ src/images/videos/glassine-bag-pollinations.jpg           images/videos/glassine
 src/controllers/community/FAIRpractices.php   controllers/community/FAIRpractices.php
 src/templates/community/mgdb_fair_practices.bau templates/community/mgdb_fair_practices.bau
 src/css/mgdb-fair-practices.css               css/mgdb-fair-practices.css
+src/js/mgdb-fair-practices.js                 js/mgdb-fair-practices.js
 
 # /handyref -- the guide to MaizeGDB's genetic maps, 2026-09-05. Same reason as
 # /nomenclature_summary for the top-level controller: redirect.php loads the
@@ -1276,6 +1375,32 @@ src/js/mgdb-handyref.js                       js/mgdb-handyref.js
 # page is still served at /about/neighbors, the same arrangement as /about/faq.
 src/controllers/neighbors.php                 controllers/neighbors.php
 
+# /mgec -- the Maize Genetics Executive Committee record, twenty pages combined
+# onto the Data Hub shell. The record itself is data/mgec.json; the retired
+# sub-routes (/mgec/origins, /procedures, /committees, /activities<year>) 301
+# into their sections. controllers/mgec.php takes /mgec and /mgec/<subpage>
+# before redirect.php can build the legacy chrome; /community/mgec is hooked in
+# community.php, already listed above.
+src/controllers/mgec.php                      controllers/mgec.php
+src/controllers/community/mgec_modern.php     controllers/community/mgec_modern.php
+src/templates/static/mgdb_mgec.bau            templates/static/mgdb_mgec.bau
+src/css/mgdb-mgec.css                         css/mgdb-mgec.css
+src/js/mgdb-mgec.js                           js/mgdb-mgec.js
+src/data/mgec.json                            data/mgec.json
+
+# /traits_ibm_nam -- trait values for IBM and NAM lines, on the Data Hub shell
+# with a search-first shape. The JSON endpoint binds its parameters and resolves
+# each filter to ids before the main query; the legacy
+# search/traits_ibm_nam/traits_ibm_nam_adv_results.php is untouched and is the
+# rollback path.
+src/controllers/traits_ibm_nam.php            controllers/traits_ibm_nam.php
+src/controllers/tools/traits_ibm_nam_modern.php controllers/tools/traits_ibm_nam_modern.php
+src/search/traits_ibm_nam/traits_ibm_nam_search_lib.php search/traits_ibm_nam/traits_ibm_nam_search_lib.php
+src/search/traits_ibm_nam/traits_ibm_nam_search_api.php search/traits_ibm_nam/traits_ibm_nam_search_api.php
+src/templates/static/mgdb_traits_ibm_nam.bau  templates/static/mgdb_traits_ibm_nam.bau
+src/css/mgdb-traits-ibm-nam.css               css/mgdb-traits-ibm-nam.css
+src/js/mgdb-traits-ibm-nam.js                 js/mgdb-traits-ibm-nam.js
+
 # Working Group — replaces the legacy /working_group and /about/working_group.
 # The record of the MaizeGDB Working Group: membership, past members, and the
 # status reports and guidance exchanged with the MaizeGDB team 2006-2018. The
@@ -1289,6 +1414,49 @@ src/templates/static/mgdb_working_group.bau       templates/static/mgdb_working_
 src/css/mgdb-working-group.css                    css/mgdb-working-group.css
 src/controllers/working_group.php                 controllers/working_group.php
 
+# SQL injection fixes, 2026-09-05. Each of these built a WHERE clause by pasting
+# a request value between quotes; they now go through PDO::quote, which adds the
+# quotes and escapes the content. All were server-only before this -- adopted
+# into the repo so the fix cannot be reverted by an upstream deploy.
+# The audit and what was and was not reachable is in
+# legacy/sql-injection-audit-20260905.md.
+src/controllers/static/forgot_password.php    controllers/static/forgot_password.php
+src/search/locus/locus_adv_results.php        search/locus/locus_adv_results.php
+src/search/phenotype/phenotype_adv_results.php search/phenotype/phenotype_adv_results.php
+src/search/variation/variation_adv_results.php search/variation/variation_adv_results.php
+src/record_data/fpc_data.php                  record_data/fpc_data.php
+src/tools/ajax/getGeneReview.php              tools/ajax/getGeneReview.php
+src/tools/car/examples/stocks_ajax_php.php    tools/car/examples/stocks_ajax_php.php
+
+# Missed by the 2026-09-05 audit, fixed 2026-09-06. getCalendar.php was recorded
+# as dead code because its one commented-out query sits inside a `no longer
+# supported` block; three live interpolations of $_GET['id'] sit outside it.
+# Confirmed against the running site before the fix: ?id=zzz reached Postgres as
+# `WHERE ID = zzz`. All three columns are bigint, so the value is cast to (int).
+src/tools/ajax/getCalendar.php                tools/ajax/getCalendar.php
+
+# Numeric SQL interpolations cast to (int), 2026-09-05 -- 96 sites across these
+# 19 search endpoints. `WHERE ID = " . $id` is injectable even where an integer
+# is expected, because `1 OR 1=1` is valid there. Four of them were already in
+# the manifest from the string-injection pass and are not repeated.
+# Audit: legacy/sql-injection-audit-20260905.md
+src/search/alldata/searchcount_ajax.php                      search/alldata/searchcount_ajax.php
+src/search/est/est_results.php                               search/est/est_results.php
+src/search/gene/gene_adv_results.php                         search/gene/gene_adv_results.php
+src/search/image_gel_pattern/image_gel_pattern_adv_results.php search/image_gel_pattern/image_gel_pattern_adv_results.php
+src/search/metabolic_pathway/metabolic_pathway_results.php   search/metabolic_pathway/metabolic_pathway_results.php
+src/search/overgo/overgo_results.php                         search/overgo/overgo_results.php
+src/search/overgo_seq/overgo_seq_results.php                 search/overgo_seq/overgo_seq_results.php
+src/search/overgo_sequence/overgo_seq_results.php            search/overgo_sequence/overgo_seq_results.php
+src/search/qtl/qtl_adv_results.php                           search/qtl/qtl_adv_results.php
+src/search/reference/reference_adv_results.php               search/reference/reference_adv_results.php
+src/search/sequence/sequence_results.php                     search/sequence/sequence_results.php
+src/search/ssr/ssr_results.php                               search/ssr/ssr_results.php
+src/search/stock/grin_results.php                            search/stock/grin_results.php
+src/search/stock/stock_adv_results.php                       search/stock/stock_adv_results.php
+src/search/gene_product/gene_product_adv_results.php         search/gene_product/gene_product_adv_results.php
+src/search/map/map_adv_results.php                           search/map/map_adv_results.php
+
 # /about -- the bare route was an empty shell (HTTP 200, no body), the same bug
 # as /community: the controller builds "controllers/about/.php" when there is no
 # PAGE. It now 301s to the site map's About section. Adopted into the repo
@@ -1298,6 +1466,133 @@ src/controllers/working_group.php                 controllers/working_group.php
 # NOTE: this means the repo now owns a legacy dispatcher for the whole /about/*
 # namespace. Pre-guard original: backups/<stamp>/controllers/about.php.
 src/controllers/about.php                         controllers/about.php
+
+# SQL injection fixes in the record-page layer, 2026-09-05. Numeric ids cast to
+# (int), string ids quoted through PDO. Includes the shared helpers in include/ --
+# read_synonyms() alone is called from most record pages -- and the resolvers in
+# controllers/data_center/*_functions.php, which run before record_data and were
+# the reason fixing record_data alone left the pages injectable.
+# Audit: legacy/sql-injection-audit-20260905.md
+src/controllers/data_center/bac_functions.php                  controllers/data_center/bac_functions.php
+src/controllers/data_center/bp_functions.php                   controllers/data_center/bp_functions.php
+src/controllers/data_center/clone_functions.php                controllers/data_center/clone_functions.php
+src/controllers/data_center/ecr_functions.php                  controllers/data_center/ecr_functions.php
+src/controllers/data_center/environment_functions.php          controllers/data_center/environment_functions.php
+src/controllers/data_center/est_functions.php                  controllers/data_center/est_functions.php
+src/controllers/data_center/fish_functions.php                 controllers/data_center/fish_functions.php
+src/controllers/data_center/fpc_functions.php                  controllers/data_center/fpc_functions.php
+src/controllers/data_center/gel_functions.php                  controllers/data_center/gel_functions.php
+src/controllers/data_center/gene_product_functions.php         controllers/data_center/gene_product_functions.php
+src/controllers/data_center/journal_functions.php              controllers/data_center/journal_functions.php
+src/controllers/data_center/kv_functions.php                   controllers/data_center/kv_functions.php
+src/controllers/data_center/lg_functions.php                   controllers/data_center/lg_functions.php
+src/controllers/data_center/locus_functions.php                controllers/data_center/locus_functions.php
+src/controllers/data_center/map_functions.php                  controllers/data_center/map_functions.php
+src/controllers/data_center/map_scores_functions.php           controllers/data_center/map_scores_functions.php
+src/controllers/data_center/marker_functions.php               controllers/data_center/marker_functions.php
+src/controllers/data_center/metabolic_pathway_functions.php    controllers/data_center/metabolic_pathway_functions.php
+src/controllers/data_center/mp_functions.php                   controllers/data_center/mp_functions.php
+src/controllers/data_center/overgo_functions.php               controllers/data_center/overgo_functions.php
+src/controllers/data_center/phenotype_functions.php            controllers/data_center/phenotype_functions.php
+src/controllers/data_center/pos_functions.php                  controllers/data_center/pos_functions.php
+src/controllers/data_center/primer_functions.php               controllers/data_center/primer_functions.php
+src/controllers/data_center/probe_functions.php                controllers/data_center/probe_functions.php
+src/controllers/data_center/qtl_analysis_functions.php         controllers/data_center/qtl_analysis_functions.php
+src/controllers/data_center/qtl_functions.php                  controllers/data_center/qtl_functions.php
+src/controllers/data_center/reaction_functions.php             controllers/data_center/reaction_functions.php
+src/controllers/data_center/recombination_functions.php        controllers/data_center/recombination_functions.php
+src/controllers/data_center/reference_functions.php            controllers/data_center/reference_functions.php
+src/controllers/data_center/sequence_functions.php             controllers/data_center/sequence_functions.php
+src/controllers/data_center/species_functions.php              controllers/data_center/species_functions.php
+src/controllers/data_center/ssr_functions.php                  controllers/data_center/ssr_functions.php
+src/controllers/data_center/stock_functions.php                controllers/data_center/stock_functions.php
+src/controllers/data_center/term_functions.php                 controllers/data_center/term_functions.php
+src/controllers/data_center/termdoclist_functions.php          controllers/data_center/termdoclist_functions.php
+src/controllers/data_center/trait_analysis_functions.php       controllers/data_center/trait_analysis_functions.php
+src/controllers/data_center/trait_functions.php                controllers/data_center/trait_functions.php
+src/controllers/data_center/variation_functions.php            controllers/data_center/variation_functions.php
+src/include/annotation_lib.php                                 include/annotation_lib.php
+src/include/api_tools.php                                      include/api_tools.php
+src/include/counts_lib.php                                     include/counts_lib.php
+src/record_data/bp_data.php                                    record_data/bp_data.php
+src/record_data/clone_data.php                                 record_data/clone_data.php
+src/record_data/ecr_data.php                                   record_data/ecr_data.php
+src/record_data/environment_data.php                           record_data/environment_data.php
+src/record_data/est_data.php                                   record_data/est_data.php
+src/record_data/fish_data.php                                  record_data/fish_data.php
+src/record_data/gel_data.php                                   record_data/gel_data.php
+src/record_data/gene_product_data.php                          record_data/gene_product_data.php
+src/record_data/lg_data.php                                    record_data/lg_data.php
+src/record_data/map_data.php                                   record_data/map_data.php
+src/record_data/map_scores_data.php                            record_data/map_scores_data.php
+src/record_data/marker_data.php                                record_data/marker_data.php
+src/record_data/mp_data.php                                    record_data/mp_data.php
+src/record_data/overgo_data.php                                record_data/overgo_data.php
+src/record_data/phenotype_data.php                             record_data/phenotype_data.php
+src/record_data/pos_data.php                                   record_data/pos_data.php
+src/record_data/primer_data.php                                record_data/primer_data.php
+src/record_data/qtl_analysis_data.php                          record_data/qtl_analysis_data.php
+src/record_data/qtl_data.php                                   record_data/qtl_data.php
+src/record_data/reaction_data.php                              record_data/reaction_data.php
+src/record_data/recombination_data.php                         record_data/recombination_data.php
+src/record_data/species_data.php                               record_data/species_data.php
+src/record_data/ssr_data.php                                   record_data/ssr_data.php
+src/record_data/stock_catalog_data.php                         record_data/stock_catalog_data.php
+src/record_data/stock_data.php                                 record_data/stock_data.php
+src/record_data/term_data.php                                  record_data/term_data.php
+src/record_data/termdoclist_data.php                           record_data/termdoclist_data.php
+src/record_data/trait_analysis_data.php                        record_data/trait_analysis_data.php
+src/record_data/trait_data.php                                 record_data/trait_data.php
+src/record_data/variation_data.php                             record_data/variation_data.php
+
+# SQL-injection hardening 2026-09-05: record_data files that existed only
+# on the dev server. Adopted so a rebuild cannot revert the fix.
+src/record_data/annotator_data.php                             record_data/annotator_data.php
+src/record_data/assembly_data.php                              record_data/assembly_data.php
+src/record_data/bac_data.php                                   record_data/bac_data.php
+src/record_data/curation/OBO_ajax.php                          record_data/curation/OBO_ajax.php
+src/record_data/gene_data.php                                  record_data/gene_data.php
+src/record_data/gene_data_lib.php                              record_data/gene_data_lib.php
+src/record_data/gene_page/gene_model_annotations.php           record_data/gene_page/gene_model_annotations.php
+src/record_data/gene_page/gene_model_browsers.php              record_data/gene_page/gene_model_browsers.php
+src/record_data/gene_page/gene_model_overview.php              record_data/gene_page/gene_model_overview.php
+src/record_data/gene_page/gene_model_snps_traits.php           record_data/gene_page/gene_model_snps_traits.php
+src/record_data/gene_sequence_data.php                         record_data/gene_sequence_data.php
+src/record_data/insertion_data.php                             record_data/insertion_data.php
+src/record_data/journal_data.php                               record_data/journal_data.php
+src/record_data/kv_data.php                                    record_data/kv_data.php
+src/record_data/locus_data_lib.php                             record_data/locus_data_lib.php
+src/record_data/pan_gene_data.php                              record_data/pan_gene_data.php
+src/record_data/pan_gene_locus_data.php                        record_data/pan_gene_locus_data.php
+src/record_data/person_data.php                                record_data/person_data.php
+src/record_data/reference_data.php                             record_data/reference_data.php
+src/record_data/sequence_data.php                              record_data/sequence_data.php
+
+# validate_string() no-op fix 2026-09-05: files that were server-only.
+src/controllers/curation/OBO.php                               controllers/curation/OBO.php
+src/popcorn/search/sequence_search/startsearch.php             popcorn/search/sequence_search/startsearch.php
+src/search/gene/gene_bulk_position.php                         search/gene/gene_bulk_position.php
+src/search/gene/gene_marker_position.php                       search/gene/gene_marker_position.php
+# search/gene/gene_translate.php is listed with the Gene Translate block
+# further up; its IN-list and version-filter fixes ship with that entry.
+src/search/image_mutant/image_mutant_results.php               search/image_mutant/image_mutant_results.php
+src/search/image_species/image_species_results.php             search/image_species/image_species_results.php
+src/tools/ajax/person_search/personusstatequery_ajax.php       tools/ajax/person_search/personusstatequery_ajax.php
+
+# Reflected-XSS fix 2026-09-05: the advanced-search "Search Criteria"
+# summaries were splicing the raw search term into HTML. mgdb_html()
+# lives in gp_lib.php; stock_adv_functions.php is the breeders_toolbox
+# copy of the stock criteria builder. Both were server-only.
+src/include/gp_lib.php                                         include/gp_lib.php
+src/include/stock_adv_functions.php                            include/stock_adv_functions.php
+
+# Output-escaping sweep 2026-09-05: the results tables are an HTML-by-design
+# pipeline (58,656 memo rows carry curator <a href> links), so these are
+# allowlist-sanitised via mgdb_safe_html() rather than escaped. Server-only.
+src/search/image/image_search.php                              search/image/image_search.php
+src/search/image_phenotype/image_phenotype_results.php         search/image_phenotype/image_phenotype_results.php
+src/search/image_trait/image_trait_results.php                 search/image_trait/image_trait_results.php
+src/search/insertion/insertion_images.php                      search/insertion/insertion_images.php
 
 # /new_genes -- genes with new annotations, on the Data Hub shell.
 #
@@ -1318,6 +1613,46 @@ src/controllers/new_genes.php                     controllers/new_genes.php
 src/templates/static/mgdb_new_genes.bau           templates/static/mgdb_new_genes.bau
 src/css/mgdb-new-genes.css                        css/mgdb-new-genes.css
 src/js/mgdb-new-genes.js                          js/mgdb-new-genes.js
+
+# Output-escaping sweep, part 2 (2026-09-05): the remaining
+# memo/caption/description sinks outside the results tables. Server-only files.
+src/controllers/community/hot_new_papers.php                   controllers/community/hot_new_papers.php
+src/controllers/community/image_gallery.php                    controllers/community/image_gallery.php
+src/controllers/community/maize_history.php                    controllers/community/maize_history.php
+src/controllers/curation/FreeText.php                          controllers/curation/FreeText.php
+src/controllers/data_center/locus-reports_search.php           controllers/data_center/locus-reports_search.php
+src/controllers/static/reference_images.php                    controllers/static/reference_images.php
+src/include/gene_center_lib.php                                include/gene_center_lib.php
+src/include/pan_gene_lib.php                                   include/pan_gene_lib.php
+src/js/OBO.js                                                  js/OBO.js
+src/popcorn/curation/lib_curation_UI.php                       popcorn/curation/lib_curation_UI.php
+src/popcorn/curation/lib_curation_db.php                       popcorn/curation/lib_curation_db.php
+src/popcorn/curation/lib_curation_utils.php                    popcorn/curation/lib_curation_utils.php
+src/popcorn/search/project_search/project_search_lib.php       popcorn/search/project_search/project_search_lib.php
+src/record_data/gene_pangenome_data.php                        record_data/gene_pangenome_data.php
+src/tools/ajax/person_search/displaypersonrecord.php           tools/ajax/person_search/displaypersonrecord.php
+
+# The MaizeDB to MaizeGDB transition Steering Committee folded into
+# /working_group, 2026-09-06, and its two pages retired.
+#
+# TWO copies of the committee page existed, with the same paragraph, the same
+# ten people and the same affiliations: /steering_committee (community) and
+# /steering (about). They differed in one way, and it decided the merge rather
+# than a port: every name on /steering_committee was `<a href="">` -- ten empty
+# links under a `<!-- TODO: Add URLs to the names -->` that outlived the page.
+# The /about copy had the person ids, so the new section uses those, verified
+# name by name against mgdb.person.
+#
+# Both top-level routes 301 to /working_group#wg-steering. Nothing is deleted:
+# the pages are still served at /community/steering_committee and
+# /about/steering, the same arrangement as /about/faq.
+# The scrollspy the page never had: MGDB.sectionTabs() is opt-in and
+# working_group.php had not called it, so the active tab never left "Membership".
+# Harmless at four sections, visible at five.
+src/js/mgdb-working-group.js                  js/mgdb-working-group.js
+
+src/controllers/steering_committee.php        controllers/steering_committee.php
+src/controllers/steering.php                  controllers/steering.php
 
 # Five LEGACY stylesheets, adopted 2026-09-06 for preservation only.
 #
@@ -1345,6 +1680,20 @@ src/css/foldseek.css                              css/foldseek.css
 src/css/fpc.css                                   css/fpc.css
 src/css/gene_family.css                           css/gene_family.css
 src/css/gene_model.css                            css/gene_model.css
+
+# Locus reports 2026-09-06: report=genes and report=candidate retired to the
+# Locus Data Hub's prefiltered search; transgene and family kept with a
+# historical note dated from the records' own add dates. Template was server-only.
+src/templates/data_center/locus-reports-content.bau            templates/data_center/locus-reports-content.bau
+
+# Gene symbols 2026-09-06: /data_center/gene-symbols on the Data Hub shell.
+# The 1,197-line hand-maintained table became data/gene_symbols.json plus a
+# filterable page. The original template and controller stay on disk.
+src/templates/static/mgdb_gene_symbols.bau                     templates/static/mgdb_gene_symbols.bau
+src/controllers/data_center/gene-symbols_modern.php            controllers/data_center/gene-symbols_modern.php
+src/css/mgdb-gene-symbols.css                                  css/mgdb-gene-symbols.css
+src/js/mgdb-gene-symbols.js                                    js/mgdb-gene-symbols.js
+src/data/gene_symbols.json                                     data/gene_symbols.json
 
 # /contribute_data on the site's shell. The top-level controller has to exist or
 # controller.php falls through to redirect.php, which loads the legacy main

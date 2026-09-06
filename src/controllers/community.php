@@ -85,6 +85,21 @@
     }
   }
 
+  /* The MGEC record on the modern design system -- twenty pages combined into
+   * one, with the retired sub-routes redirecting into it. Hooked here for the
+   * same reason as the two blocks above: the modern controller creates its own
+   * Bauplan and publishes it, so it has to run before the legacy shell below is
+   * built. /mgec and /mgec/<subpage> do not come through this file at all --
+   * they reach redirect.php -- and are taken by controllers/mgec.php.
+   *
+   * Rollback: delete this block and controllers/mgec.php.
+   */
+  if (PAGE == 'mgec') {
+    if (include('controllers/community/mgec_modern.php')) {
+      return;
+    }
+  }
+
   $bauplan = new Bauplan('Welcome to MaizeGDB');
   $bauplan->includeCss('/css/static.css');
 

@@ -91,7 +91,7 @@ SECTIONS = [
         ("reelGene", "https://reelgene.maizegdb.org/", "Look up a gene model for its reelGene functionality score, conservation level, and pan-gene class."),
         ("SNPTools", "https://snptools.maizegdb.org", "Variant browsing and per-gene structure views."),
         ("SNPversity 2.0", "https://wgs.maizegdb.org/", "Build a VCF for a region of B73 across a subset of diverse accessions."),
-        ("Trait values for IBM and NAM", "/traits_ibm_nam", "Phenotype values measured on IBM and NAM lines."),
+        ("Trait values for IBM and NAM", "/traits_ibm_nam", "Measured trait values, searchable by stock, trait, reference, or environment."),
         ("TYPSimSelector", "/TYPSimSelector", "Rank USDA Ames inbred lines by genetic similarity to a reference accession."),
     ]),
 
@@ -121,7 +121,15 @@ SECTIONS = [
         ("Pan-Andropogoneae genomes", "/PanAnd_project", "Chromosome-scale assemblies across 36 wild Zea, Tripsacum, and Andropogoneae grasses."),
         ("European flint genomes", "/european_flints", "Assemblies and structural variation for four European flint inbreds: DK105, EP1, F7, and PE0075."),
         ("CAAS founder inbred genomes", "/CAAS_FIL_project", "Assemblies for the 12 Chinese and international founder lines behind modern hybrid breeding."),
+        # Both of these were missing while their four siblings were listed,
+        # found while adding the resource project pages on 2026-09-05.
+        ("HiLo elevation genomes", "/HiLo_project", "Assemblies and gene models for Mexican landraces and CIMMYT inbreds sampled from 50 to 2,520 metres."),
+        ("AMAIZING genomes", "/amaizing_project", "Assemblies, watered and drought transcriptomes, and panEDTA annotation for seven European breeding lines."),
         ("FISH karyotypes", "/14InbredsFISH", "Multicolor chromosome painting across 14 inbred lines, and high-resolution B73 versus Mo17 somatic karyotypes."),
+        # Cross-listed: it is also in Documentation and help with the other two
+        # resource project pages. Duplicates across sections are legitimate --
+        # this is where someone hunting cytogenetics will look.
+        ("Cytogenetic Map of Maize project", "/projects/cytogenetic_map", "Probe nomenclature and FISH methods for placing genetically mapped markers on pachytene chromosomes."),
     ]),
 
     ("data_center", "curated", "Data hubs", "", []),
@@ -135,7 +143,7 @@ SECTIONS = [
         ("Maize Genetics Conference", "/maize_meeting", "Past, present, and future annual meetings."),
         ("Meeting cover art", "/maize_meeting_coverart", "Cover art from past meeting programs."),
         ("Maize Genetics Cooperation", "https://www.maizegenetics.org", "The organization coordinating maize research cooperation."),
-        ("MGEC", "/mgec", "Maize Genetics Executive Committee."),
+        ("MGEC", "/mgec", "The Maize Genetics Executive Committee record, 2000-2019: origins, procedures, committees, activities, and documents."),
         ("Steering committee", "/steering_committee", "Committee membership and role."),
         # Documentation rather than a live body, and the description says so:
         # the group is not currently active and the page is its record. Kept out
@@ -178,6 +186,13 @@ SECTIONS = [
         ("Submit an assembly to GenBank", "https://download.maizegdb.org/Tutorials/GenBank_protocols/", "Protocols for depositing a maize assembly."),
         ("Submit an assembly to ENA", "https://ena-docs.readthedocs.io/en/latest/submit/assembly.html", "European Nucleotide Archive submission documentation."),
         ("SSR protocols", "/ssr_protocols", "Laboratory protocols for SSR markers."),
+        # The three community resource project pages, ported onto the shell on
+        # 2026-09-05. They sit beside SSR protocols and Coordinate definitions
+        # because that is what they are: the methods and naming references for
+        # major maize projects, which is the material /doc used to gather.
+        ("Cytogenetic Map of Maize project", "/projects/cytogenetic_map", "Probe nomenclature and FISH methods for the sorghum-BAC probes used to map maize markers cytogenetically."),
+        ("Dooner and Du Ds-GFP insertions", "/projects/dooner_du_acds", "The sequence-indexed Ds-GFP collection: how it was made, where to search it, and what to expect from the seed."),
+        ("Ds-GFP insertion verification", "/projects/fowler_insertion_validation", "PCR verification, male transmission rates and genotyping primers for 83 Ds-GFP lines."),
         ("Coordinate definitions", "/coordinateDef", "How map coordinates are defined here."),
         ("FAIR practices", "/FAIRpractices", "FAIR and AI-readiness at MaizeGDB."),
         ("Redesign status", "/redesign_status", "Which pages have moved to the current design."),

@@ -29,39 +29,9 @@
 
 .mgdb-modern .fair-open-note { margin-top: 1.25rem; }
 
-.mgdb-modern .fair-jump-nav {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.35rem 0.55rem;
-  margin: 1rem 0 clamp(2.6rem, 5vw, 4.5rem);
-  padding: 0.75rem 0.9rem;
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-md);
-  background: var(--mgdb-surface);
-  box-shadow: var(--mgdb-shadow-xs);
-}
 
-.mgdb-modern .fair-jump-nav > span {
-  margin-right: 0.25rem;
-  color: var(--mgdb-muted);
-  font-size: 0.76rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
 
-.mgdb-modern .fair-jump-nav a {
-  padding: 0.42rem 0.65rem;
-  border-radius: 999px;
-  color: var(--mgdb-green-dark);
-  font-size: 0.83rem;
-  font-weight: 750;
-  text-decoration: none;
-}
 
-.mgdb-modern .fair-jump-nav a:hover,
-.mgdb-modern .fair-jump-nav a:focus-visible { background: var(--mgdb-surface-sunken); color: var(--mgdb-burgundy); }
 
 .mgdb-modern .fair-principle-grid {
   display: grid;
@@ -264,8 +234,8 @@
   .mgdb-modern .fair-action-grid,
   .mgdb-modern .fair-deposit-grid,
   .mgdb-modern .fair-resource-list { grid-template-columns: 1fr; }
-  .mgdb-modern .fair-jump-nav { align-items: stretch; flex-direction: column; }
-  .mgdb-modern .fair-jump-nav a { padding-left: 0; }
+  
+  
   .mgdb-modern .fair-agbiodata-actions { align-items: flex-start; flex-direction: column; }
 }
 
@@ -273,3 +243,48 @@
   .mgdb-modern .fair-contact-card > div { flex-direction: column; }
   .mgdb-modern .fair-contact-card .mgdb-button { width: 100%; }
 }
+
+/* ==========================================================================
+   Data Hub shell adoption, 2026-09-06
+   --------------------------------------------------------------------------
+   The shell (css/mgdb-hub.css) now owns the ground, the white section cards and
+   their coloured top edges, the sticky tab bar and the scroll offset. The page's
+   own `.fair-jump-nav` was removed with its rules: it was styled here and marked
+   current by nothing, because this page shipped without a scrollspy.
+   ========================================================================== */
+
+/* Six section paragraphs were moved OUT of `.mgdb-section-heading`, which the
+   shell hides -- that is how decorative blurbs were dropped site-wide, but these
+   are the group's own guidance on a policy page, so hiding them would have
+   deleted content. They read as the section's opening line. */
+.mgdb-modern .fair-lead {
+  max-width: 74ch;
+  margin: 0 0 var(--mgdb-space-5);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-lg);
+  line-height: 1.55;
+}
+
+/* Offset ladder, measured on the live page at 1600/1280/1240/1210/1205/1200/
+   1185/1170/1024/960/900/768/375 rather than inferred from the tab count. Eight
+   labels of this length are one row at 1200 and above (57px), TWO rows from 768
+   to 1199 (105px), and one row again below 768, where mgdb-modern.css turns the
+   bar into a scrolling rail (57px). Each step is the measured height plus 8px.
+
+   The two-row band is why this is written out rather than left to the shell.
+   mgdb-hub.css steps 65px -> 113px at 1170px, on the assumption that a bar is one
+   row above that width. This bar wraps at ~1186-1199, so at 1170-1199 the shell
+   would apply 65px against a 105px bar and land every heading 40px behind it --
+   measured at 1170 before this rule: bar 105px, scroll-margin 65px. Re-measure if
+   a tab is added, renamed or removed. */
+.mgdb-hub-page.mgdb-fair-page > section[id] { scroll-margin-top: 113px; }
+
+@media (min-width: 1200px) {
+  .mgdb-hub-page.mgdb-fair-page > section[id] { scroll-margin-top: 65px; }
+}
+
+@media (max-width: 767px) {
+  .mgdb-hub-page.mgdb-fair-page > section[id] { scroll-margin-top: 65px; }
+}
+
+.mgdb-fair-page > section[id] { margin-bottom: var(--mgdb-space-5); }

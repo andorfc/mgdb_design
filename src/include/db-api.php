@@ -161,14 +161,27 @@
 
 
   /**
-   * Checks the user's input for safety before sending it into an SQL query.
+   * Basic hygiene on user input. NOT SQL escaping -- do not rely on this to
+   * make a value safe to interpolate into a statement.
    *
-   * MongoDB takes care of SQL injection prevention, but MongoDB is disabled
-   * in a few places, so it's still prudent to do some filtering here.
+   * It cannot be SQL escaping: the same values are also bound as parameters,
+   * passed to PDO::quote() and printed into HTML, and escaping here would
+   * double-escape all three. SQL safety belongs at the query, one of:
    *
-   * @param $DBConn - the database connection resource
-   * @param $input - the input string to be validated
-   * @return the string of the input after it has been validated.
+   *     "... WHERE id = " . (int) $id                  numeric column
+   *     "... WHERE name = " . $DBConn->quote($name)    text column
+   *     make_query($DBConn, "... = ?", 1, array($v))   bound parameter
+   *     "... IN (" . mgdb_quote_list($DBConn, $a) . ")"  list of values
+   *
+   * The doc comment here used to claim this checked input "for safety before
+   * sending it into an SQL query", and validate_string() was `return $input;`
+   * -- so ~156 call sites were relying on a function that did nothing. The
+   * call sites were fixed at their queries on 2026-09-05; see
+   * legacy/sql-injection-audit-20260905.md.
+   *
+   * @param $DBConn - unused; kept so the existing call sites still work
+   * @param $input - string or array of strings
+   * @return the input with NUL bytes removed
    */
   function validate_input($DBConn, $input) {
     if (is_array($input)) {
@@ -183,7 +196,31 @@
   }
   
   function validate_string($input) {
-    return $input;
+    // A NUL byte is never legitimate in any input this site accepts, and it
+    // truncates strings in several C-backed extensions. Everything else is
+    // left alone: sequence searches carry newlines, and search terms carry
+    // quotes and % wildcards that callers depend on.
+    if (!is_string($input)) {
+      return $input;
+    }
+
+    return str_replace("\0", '', $input);
+  }
+
+
+  /**
+   * Quote every element of an array for use in an IN () list.
+   *
+   * Returns "''" for an empty array, because "IN ()" is a syntax error where
+   * "IN ('')" is merely a comparison that matches nothing -- which is what the
+   * hand-rolled implode("','", ...) idiom this replaces used to produce.
+   */
+  function mgdb_quote_list($DBConn, $values) {
+    if (!is_array($values) || !count($values)) {
+      return "''";
+    }
+
+    return implode(',', array_map(array($DBConn, 'quote'), $values));
   }  
 
   /**
@@ -271,7 +308,7 @@
         LEFT OUTER JOIN term t ON t.id=m.type_term
         LEFT OUTER JOIN reference r ON r.id=m.source
         lEFT OUTER JOIN person p ON p.id=m.source
-      WHERE m.id = $id ORDER BY m.order1";
+      WHERE m.id = " . (int) $id . " ORDER BY m.order1";
     $stmt_comments = make_query($DBConn, $query_comments);
   
     $comment_string = false;
@@ -279,14 +316,17 @@
       if ($arrComments['memo'] && $arrComments['memo'] != '') {
         $comment_string .= "<br>&nbsp;&nbsp;&nbsp;";
         if ($arrComments['type'] && $arrComments['type'] != '') {
-          $comment_string .= '<b>' . $arrComments['type'] . ':</b> ';
+          $comment_string .= '<b>' . mgdb_html($arrComments['type']) . ':</b> ';
         }
-        $comment_string .= $arrComments['memo'];
+        // memo is curator-authored HTML -- 58,656 rows carry <a href> links --
+        // so it is allowlist-sanitised. The names around it are plain text and
+        // are escaped.
+        $comment_string .= mgdb_safe_html($arrComments['memo']);
         if ($arrComments['person_authority'] && $arrComments['person_authority'] != '') {
-          $comment_string .= ' (per ' . $arrComments['person_authority'] . ')';
+          $comment_string .= ' (per ' . mgdb_html($arrComments['person_authority']) . ')';
         }
         else if ($arrComments['reference_authority'] && $arrComments['reference_authority'] != '') {
-          $comment_string .= ' (per ' . $arrComments['reference_authority'] . ')';
+          $comment_string .= ' (per ' . mgdb_html($arrComments['reference_authority']) . ')';
         }
         $comment_string .= '<br>';
       }
@@ -300,13 +340,15 @@
    * Grabs the synonyms and returns them in a string (will replace display_synoynms)
    */
   function read_synonyms($DBConn, $id, $name='') {
-    $query_synonyms = "SELECT synonyms FROM synonyms WHERE id=$id ORDER BY synonyms";
+    $query_synonyms = "SELECT synonyms FROM synonyms WHERE id=" . (int) $id . " ORDER BY synonyms";
     $stmt_synonyms = make_query($DBConn, $query_synonyms);
     
     $synonyms = array();
     while ($arrSyn = retrieve_row($stmt_synonyms)) {
       if ($arrSyn['synonyms'] != $name) {
-        array_push($synonyms, $arrSyn['synonyms']);
+        // Sanitised rather than escaped: synonyms carry allele nomenclature
+        // like P1-pr<sup>TP</sup> that has to render. See mgdb_safe_html().
+        array_push($synonyms, mgdb_safe_html($arrSyn['synonyms']));
       }
     }
     return implode('<br>', $synonyms);

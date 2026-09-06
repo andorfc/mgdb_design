@@ -1,0 +1,113 @@
+$$SYNTAX-LEVEL 2
+*(gene-symbols
+<main class="mgdb-page mgdb-hub-page mgdb-gene-symbols-page" id="gene-symbols-main">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/locus">Locus</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Gene symbols</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="gs-title">
+    <div class="mgdb-hero-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="A gene symbol and its meaning">
+        <rect x="12" y="22" width="72" height="52" rx="8" fill="#e8f4ec" stroke="#235c37" stroke-width="4" />
+        <line x1="42" y1="22" x2="42" y2="74" stroke="#235c37" stroke-width="3" />
+        <rect x="20" y="34" width="14" height="6" rx="3" fill="#d99a0b" />
+        <rect x="20" y="46" width="14" height="6" rx="3" fill="#d99a0b" />
+        <rect x="20" y="58" width="14" height="6" rx="3" fill="#d99a0b" />
+        <rect x="50" y="34" width="26" height="6" rx="3" fill="#7a4a10" opacity="0.55" />
+        <rect x="50" y="46" width="22" height="6" rx="3" fill="#7a4a10" opacity="0.55" />
+        <rect x="50" y="58" width="26" height="6" rx="3" fill="#7a4a10" opacity="0.55" />
+      </svg>
+      <strong>Gene<br />Symbols</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="gs-title">Maize gene symbols</h1>
+      <p class="mgdb-hero-description">The $(entry_count) symbol prefixes used when naming maize genes, and what each one stands for. Check here before coining a symbol for a gene you have characterized, so a new name does not collide with an established one.</p>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#gs-symbols" class="is-current" aria-current="true">Symbols</a>
+    <a href="#gs-metrics">Metrics</a>
+    <a href="#gs-related">Related resources</a>
+  </nav>
+
+  <section id="gs-symbols" aria-labelledby="gs-symbols-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="gs-symbols-title">Symbols</h2></div>
+    </div>
+
+    <p class="mgdb-note">These are prefixes, not gene records. <em>adh</em> is the symbol
+      behind <em>adh1</em> and <em>adh2</em>&#58; to reach a gene itself, search the
+      <a href="/data_center/locus">Locus Data Hub</a> or the
+      <a href="/gene_center/gene">Gene Center</a>.</p>
+
+    <div class="mgdb-hub-field gs-filter-field">
+      <label class="mgdb-label" for="gs-filter">Filter symbols</label>
+      <input class="mgdb-input" type="search" id="gs-filter" placeholder="Try adh, kinase, or zebra" autocomplete="off" />
+    </div>
+
+    <p class="gs-count"><span id="gs-count">$(entry_count)</span> of $(entry_count) entries</p>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table gs-table" id="gs-table">
+        <caption class="mgdb-visually-hidden">Maize gene symbol prefixes and their meanings</caption>
+        <thead>
+          <tr>
+            <th scope="col" data-sort="text">Symbol</th>
+            <th scope="col" data-sort="text">Meaning</th>
+          </tr>
+        </thead>
+        <tbody id="gs-rows">
+          $(symbol_rows)
+        </tbody>
+      </table>
+    </div>
+
+    <p class="gs-empty" id="gs-empty" hidden>No symbol matches that filter.</p>
+  </section>
+
+  <section id="gs-metrics" aria-labelledby="gs-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="gs-metrics-title">Metrics</h2></div>
+    </div>
+
+    <div class="mgdb-metric-grid">
+      <div class="mgdb-metric-card">
+        <span class="mgdb-metric-value">$(entry_count)</span>
+        <span class="mgdb-metric-label">Entries in the list</span>
+      </div>
+      <div class="mgdb-metric-card">
+        <span class="mgdb-metric-value">$(distinct_count)</span>
+        <span class="mgdb-metric-label">Distinct symbols</span>
+      </div>
+      <div class="mgdb-metric-card">
+        <span class="mgdb-metric-value">$(repeat_count)</span>
+        <span class="mgdb-metric-label">Symbols listed twice</span>
+      </div>
+      <div class="mgdb-metric-card">
+        <span class="mgdb-metric-value">$(conflict_count)</span>
+        <span class="mgdb-metric-label">With differing meanings</span>
+      </div>
+    </div>
+
+    <p class="mgdb-note gs-conflict-note">The last two numbers are a curation note rather
+      than a feature. Every row of the original list is kept here, so a symbol recorded
+      twice appears twice&#58; $(conflict_list). Filtering on one of those shows both
+      readings side by side.</p>
+  </section>
+
+  <section id="gs-related" class="mgdb-hub-related" aria-labelledby="gs-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="gs-related-title">Related resources</h2></div>
+    </div>
+
+    <ul class="mgdb-resource-list">
+      <li><a href="/data_center/locus"><strong>Locus Data Hub</strong><span>Search 781,395 curated genetic loci, including every characterized gene these symbols name.</span></a></li>
+      <li><a href="/gene_center/gene"><strong>Gene Center</strong><span>B73 and NAM reference gene models, with functional annotation and expression.</span></a></li>
+      <li><a href="/nomenclature"><strong>Maize nomenclature rules</strong><span>How maize genes, alleles and loci are named, and how to propose a new symbol.</span></a></li>
+      <li><a href="/data_center/gene_product"><strong>Gene products</strong><span>The proteins and RNAs these genes encode.</span></a></li>
+      <li><a href="/contact"><strong>Suggest a correction</strong><span>Tell the curators about a missing symbol, or one recorded two ways.</span></a></li>
+    </ul>
+  </section>
+</main>
+)

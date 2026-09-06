@@ -617,6 +617,135 @@
 
     var fasta = byId('gene-fasta-form');
     if (fasta) { requireValue(fasta, 'fasta-list', 'No gene models provided.'); }
+
+    deferResults(bulk);
+    deferResults(scores);
+    deferResults(translate);
+    deferResults(fasta);
+  }
+
+  /* ======================================================================
+     Results that arrive before the window does
+
+     These four tools all posted straight to their endpoint with
+     target="_blank". A new tab therefore opened at once and then sat empty
+     while the query ran -- on a long gene model list, for a minute or more,
+     with nothing in it to say anything was happening and the page behind it
+     giving no sign either.
+
+     Now the form is posted in the background with the card showing a spinner,
+     and the tab is opened only when there is something to put in it.
+
+     Popup blockers are the catch: window.open() called from a fetch callback
+     is not a user gesture, so a browser may refuse it. When that happens the
+     card offers an "Open results" button instead -- one click, and because the
+     text is already in hand the window it opens is filled immediately.
+     ====================================================================== */
+
+  function busyBox(form) {
+    var box = form.querySelector('.gene-run-status');
+    if (!box) {
+      box = document.createElement('div');
+      box.className = 'gene-run-status';
+      box.setAttribute('aria-live', 'polite');
+      var actions = form.querySelector('.mgdb-form-actions');
+      if (actions) { actions.parentNode.insertBefore(box, actions.nextSibling); }
+      else { form.appendChild(box); }
+    }
+    return box;
+  }
+
+  function showResults(text, title) {
+    var win = window.open('', '_blank');
+    if (!win) { return false; }
+    win.document.open();
+    win.document.write('<!doctype html><html><head><meta charset="utf-8"><title>' +
+      esc(title) + '</title><style>body{margin:0;padding:1rem;}' +
+      'pre{margin:0;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;' +
+      'white-space:pre;}</style></head><body><pre></pre></body></html>');
+    win.document.close();
+    /* Written as a text node, not as HTML: the payload is data from the
+       database and must never be parsed as markup. */
+    win.document.querySelector('pre').textContent = text;
+    return true;
+  }
+
+  function deferResults(form) {
+    if (!form || !form.getAttribute('action')) { return; }
+    var action = form.getAttribute('action');
+    var title = (form.querySelector('h3') || {}).textContent || 'Results';
+
+    form.addEventListener('submit', function (event) {
+      if (event.defaultPrevented) { return; }   /* a validator already refused it */
+      event.preventDefault();
+
+      var box = busyBox(form);
+      box.innerHTML = '<div class="mgdb-loading"><span class="mgdb-spinner" aria-hidden="true"></span>' +
+                      '<span>Running your query&hellip;</span></div>';
+
+      /* Which button was pressed. A submitter carrying name="format" means the
+         reader asked for a file, and a file must go through a real navigation
+         so the browser's download machinery sees Content-Disposition -- fetch
+         would hand back the bytes and open nothing. */
+      var submitter = event.submitter ||
+        (document.activeElement && form.contains(document.activeElement) ? document.activeElement : null);
+      if (submitter && submitter.name === 'format') {
+        var dl = new FormData(form);
+        dl.append('format', submitter.value);
+        var post = document.createElement('form');
+        post.method = 'POST';
+        post.action = action;
+        post.style.display = 'none';
+        dl.forEach(function (value, key) {
+          var input = document.createElement('input');
+          input.type = 'hidden'; input.name = key; input.value = value;
+          post.appendChild(input);
+        });
+        document.body.appendChild(post);
+        post.submit();
+        document.body.removeChild(post);
+        box.innerHTML = '<p class="mgdb-hint">Preparing your ' + esc(submitter.value.toUpperCase()) + ' file&hellip;</p>';
+        return;
+      }
+
+      var data = new FormData(form);
+      var options = { method: 'POST', body: data };
+      var url = action;
+      if ((form.getAttribute('method') || 'post').toLowerCase() === 'get') {
+        url = action + (action.indexOf('?') === -1 ? '?' : '&') +
+              new URLSearchParams(data).toString();
+        options = { method: 'GET' };
+      }
+
+      window.fetch(url, options)
+        .then(function (response) {
+          if (!response.ok) { throw new Error('HTTP ' + response.status); }
+          return response.text();
+        })
+        .then(function (text) {
+          if (showResults(text, title)) {
+            box.innerHTML = '<p class="mgdb-hint">Results opened in a new tab.</p>';
+            return;
+          }
+          /* Blocked. Hand the reader the click that will not be blocked. */
+          box.innerHTML = '';
+          var msg = document.createElement('p');
+          msg.className = 'mgdb-hint';
+          msg.textContent = 'Results are ready. Your browser blocked the new tab.';
+          var open = document.createElement('button');
+          open.type = 'button';
+          open.className = 'mgdb-button mgdb-button-primary';
+          open.textContent = 'Open results';
+          open.addEventListener('click', function () { showResults(text, title); });
+          box.appendChild(msg);
+          box.appendChild(open);
+        })
+        .catch(function (error) {
+          box.innerHTML = '<div class="mgdb-message mgdb-message-error" role="alert"><div>' +
+            'The query could not be completed&#58; ' + esc(String(error && error.message || error)) +
+            '. Try a shorter list, or report it through <a href="/feedback">Feedback</a>.</div></div>';
+        });
+    });
   }
 
   /* ======================================================================

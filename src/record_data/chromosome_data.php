@@ -196,7 +196,7 @@ logMessage("chromosome_data.php: chrom=$chrom, type=$type");
       SELECT A.ID, A.NAME 
       FROM MAP A 
         JOIN ID_NUM B ON A.ID = B.ID 
-      WHERE B.CURATION_LVL = 0 AND A.NAME LIKE '%$chrom' 
+      WHERE B.CURATION_LVL = 0 AND A.NAME LIKE " . $DBConn->quote('%' . $chrom) . " 
             AND A.NAME NOT LIKE 'Oryza sativa%' 
       ORDER BY LOWER(A.NAME)";
     $statement_maps = make_query($DBConn,$query_maps,100);

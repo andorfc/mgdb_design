@@ -28,55 +28,32 @@
 
 /* ── Sticky section tabs ─────────────────────────────────────────────────── */
 
-.mgdb-bac-page .mgdb-section-tabs {
-  position: sticky;
-  z-index: 20;
-  top: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  margin-top: var(--mgdb-space-5);
-  margin-bottom: var(--mgdb-space-5);
-}
+/* Nothing here. mgdb-modern.css supplies the bar, the pill, the green
+   current-tab with its gold inset, and the scrolling rail below 767px;
+   mgdb-hub.css supplies the hub ground and bottom border.
 
-.mgdb-bac-page .mgdb-section-tabs a {
-  display: inline-flex;
-  min-height: 40px;
-  align-items: center;
-  padding: 0 var(--mgdb-space-4);
-  border: 1px solid var(--hub-line);
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--hub-surface);
-  color: var(--mgdb-ink) !important;
-  font-size: var(--mgdb-text-sm);
-  font-weight: 600;
-  text-decoration: none;
-  transition: background .15s ease, border-color .15s ease, color .15s ease;
-}
+   What used to be here restated all of it and added `flex-wrap: wrap` at
+   (0,2,0), which beat the shared rail's `flex-wrap: nowrap` at (0,1,0) -- so
+   the bar wrapped to three rows on a phone instead of scrolling on one. That
+   wrapping is what the old three-step offset ladder was compensating for.
+   Removed 2026-09-06 with the References tab.
 
-.mgdb-bac-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
+   The offset ladder below replaces a three-step one written for that wrapping
+   bar. */
 
-.mgdb-bac-page .mgdb-section-tabs a.is-current,
-.mgdb-bac-page .mgdb-section-tabs a[aria-current="true"] {
-  border-color: var(--mgdb-green-dark);
-  background: var(--mgdb-green-dark);
-  color: #ffffff !important;
-  box-shadow: inset 3px 0 0 var(--mgdb-gold);
-}
+/* Measured, not counted. Five tabs need 532px on one row (83 + 95 + 76 + 87 +
+   159 plus four 8px gaps) and the bar is the page container, 48px narrower than
+   the viewport -- so it would only wrap below a 580px viewport, and by then
+   mgdb-modern.css has already turned it into a scrolling rail. **This bar never
+   wraps**: 57px at 1280, 900, 780, 600 and 375, all measured on the live page.
 
-/* The offset ladder is per measured bar height, not per tab count: six tabs
-   here still wrap to three rows on a 375px screen -- a 153px bar -- because
-   the labels are long. Measured 57px / 105px / 153px. */
-@media (max-width: 1000px) and (min-width: 861px) {
+   So there is one step, not three: mgdb-hub.css moves to 113px below 1170px
+   assuming a wrap that does not happen here. Specificity (0,3,1) beats the
+   shell's (0,2,1). Re-measure if a tab is added or a label grows -- 532 has
+   208px of headroom before the rail takes over, but that is a property of these
+   five labels. */
+@media (max-width: 1170px) {
   .mgdb-hub-page.mgdb-bac-page > section[id] { scroll-margin-top: 65px; }
-}
-
-@media (max-width: 860px) and (min-width: 521px) {
-  .mgdb-hub-page.mgdb-bac-page > section[id] { scroll-margin-top: 113px; }
-}
-
-@media (max-width: 520px) {
-  .mgdb-hub-page.mgdb-bac-page > section[id] { scroll-margin-top: 161px; }
 }
 
 .mgdb-bac-page > section[id] { margin-bottom: var(--mgdb-space-5); }
