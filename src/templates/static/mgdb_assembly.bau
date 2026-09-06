@@ -1,5 +1,11 @@
 $$SYNTAX-LEVEL 2
 *(mgdb-assembly
+<!-- The four tables below use `mgdb-table-scroll`. They previously used
+     `mgdb-table-wrap`, which is defined in no stylesheet, so they were not
+     scroll containers at all and the page overflowed to 1,016px on a 375px
+     phone. Same silent-failure family as `mgdb-table-wrapper` and
+     `mgdb-chart-tall`: grep src/css/ before trusting a wrapper class.
+     Fixed 2026-09-05. -->
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@MaizeGDB">
 <meta property="og:url" content="https://maizegdb.org/assembly">
@@ -66,7 +72,7 @@ $$SYNTAX-LEVEL 2
     </div>
 
 
-    <div class="mgdb-table-wrap">
+    <div class="mgdb-table-scroll">
       <table class="mgdb-table assembly-compare-table">
         <thead>
           <tr>
@@ -283,7 +289,7 @@ $$SYNTAX-LEVEL 2
       <p>The B73 v5 and NAM founders genome assemblies were initially released with a preliminary annotation \(<code>Zm00001e.1</code>\). The official annotation \(<code>Zm00001eb.1</code>\) features refined gene models and sequentially numbered identifiers across chromosomes. Use the official <code>Zm00001eb.1</code> gene models for current analyses. Cross-references between preliminary, v4, and v3 models are available below.</p>
     </div>
 
-    <div class="mgdb-table-wrap">
+    <div class="mgdb-table-scroll">
       <table class="mgdb-table">
         <thead>
           <tr>
@@ -412,7 +418,7 @@ $$SYNTAX-LEVEL 2
     </div>
 
     <div class="mgdb-panel">
-    <div class="mgdb-table-wrap">
+    <div class="mgdb-table-scroll">
       <table class="mgdb-table">
         <thead>
           <tr>
@@ -470,7 +476,7 @@ $$SYNTAX-LEVEL 2
     </div>
 
     <div class="mgdb-panel">
-    <div class="mgdb-table-wrap">
+    <div class="mgdb-table-scroll">
       <table class="mgdb-table">
         <thead>
           <tr>

@@ -1395,6 +1395,33 @@ body.mgdb-modern {
 .mgdb-button[aria-disabled="true"],
 .mgdb-button:disabled { opacity: .55; cursor: not-allowed; }
 
+/* The compact button. Same specificity as .mgdb-button, so it has to sit after
+   it to win on padding, font size and height.
+
+   Added 2026-09-05. It was used by four templates and one controller -- 73
+   occurrences across /assembly, /expression, /maize_history, /genomebrowser and
+   genomebrowser_modern.php -- and defined in NO stylesheet, so every one of them
+   rendered a full-size button and had done since they were written. Same silent
+   failure as .mgdb-table-wrapper and .mgdb-chart-tall: a class that matches
+   nothing looks deliberate in review.
+
+   Defining it here can only affect elements that already carry the class, which
+   is exactly the markup that was asking for it.
+
+   The height drops to 36px for a pointer, because these are secondary actions
+   that sit several to a card -- but a coarse pointer keeps the full 44px tap
+   target, since a small button is a visual affordance and not a licence to
+   shrink a touch target. */
+.mgdb-button-sm {
+  min-height: 36px;
+  padding: var(--mgdb-space-1) var(--mgdb-space-3);
+  font-size: var(--mgdb-text-sm);
+}
+
+@media (pointer: coarse) {
+  .mgdb-button-sm { min-height: var(--mgdb-tap-target); }
+}
+
 /* Icon-only controls still need a real tap target and an accessible name
    supplied via aria-label in the markup. */
 .mgdb-button-icon {

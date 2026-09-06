@@ -32,16 +32,16 @@ $$SYNTAX-LEVEL 2
             <span class="mgdb-hero-updated">Updated: $(data_date)</span>
           </div>
           <h1>Find a Person or Organization</h1>
-          <p class="mgdb-hero-desc">
+          <p class="mgdb-hero-description">
             Search <strong>57,000+</strong> maize researchers, cooperator profiles, and agricultural research institutions across the global genetics community.
           </p>
           <div class="mgdb-hero-actions">
-            <a class="mgdb-btn mgdb-btn-primary" href="/contact">Community Hub <span aria-hidden="true">&#8599;</span></a>
-            <a class="mgdb-btn mgdb-btn-secondary" href="https://www.maizegenetics.org" target="_blank" rel="noopener">Maize Genetics Cooperation <span aria-hidden="true">&#8599;</span></a>
-            <a class="mgdb-btn mgdb-btn-secondary" href="https://www.maizegenetics.org/maize-meeting/2027" target="_blank" rel="noopener">69th Maize Meeting \(2027\) <span aria-hidden="true">&#8599;</span></a>
-            <a class="mgdb-btn mgdb-btn-secondary" href="/hot_new_papers">Editorial Board Papers <span aria-hidden="true">&#8599;</span></a>
-            <a class="mgdb-btn mgdb-btn-secondary" href="/data_center/reference">Literature Search <span aria-hidden="true">&#8599;</span></a>
-            <a class="mgdb-btn mgdb-btn-secondary" href="/contribute_data">Contribute Data <span aria-hidden="true">&#8599;</span></a>
+            <a class="mgdb-button mgdb-button-primary" href="/contact">Community Hub <span aria-hidden="true">&#8599;</span></a>
+            <a class="mgdb-button mgdb-button-secondary" href="https://www.maizegenetics.org" target="_blank" rel="noopener">Maize Genetics Cooperation <span aria-hidden="true">&#8599;</span></a>
+            <a class="mgdb-button mgdb-button-secondary" href="https://www.maizegenetics.org/maize-meeting/2027" target="_blank" rel="noopener">69th Maize Meeting \(2027\) <span aria-hidden="true">&#8599;</span></a>
+            <a class="mgdb-button mgdb-button-secondary" href="/hot_new_papers">Editorial Board Papers <span aria-hidden="true">&#8599;</span></a>
+            <a class="mgdb-button mgdb-button-secondary" href="/data_center/reference">Literature Search <span aria-hidden="true">&#8599;</span></a>
+            <a class="mgdb-button mgdb-button-secondary" href="/contribute_data">Contribute Data <span aria-hidden="true">&#8599;</span></a>
           </div>
         </div>
       </div>
@@ -49,12 +49,12 @@ $$SYNTAX-LEVEL 2
 
     <!-- Sticky Section Navigation Tabs -->
     <nav class="mgdb-section-tabs" aria-label="Page sections">
-      <a class="mgdb-section-tab is-active" href="#person-search-section">Directory Search &amp; Results</a>
-      <a class="mgdb-section-tab" href="#person-metrics-section">Community Scale &amp; Metrics</a>
-      <a class="mgdb-section-tab" href="#person-browse-section">Alphabetical Directory \(A–Z\)</a>
-      <a class="mgdb-section-tab" href="#person-pioneers-section">Pioneering Geneticists</a>
-      <a class="mgdb-section-tab" href="#person-faqs-section">FAQs &amp; Profile Updates</a>
-      <a class="mgdb-section-tab" href="#person-related-section">Connected Resources</a>
+      <a class="is-current" aria-current="true" href="#person-search-section">Directory Search &amp; Results</a>
+      <a href="#person-metrics-section">Community Scale &amp; Metrics</a>
+      <a href="#person-browse-section">Alphabetical Directory \(A–Z\)</a>
+      <a href="#person-pioneers-section">Pioneering Geneticists</a>
+      <a href="#person-faqs-section">FAQs &amp; Profile Updates</a>
+      <a href="#person-related-section">Connected Resources</a>
     </nav>
 
     <!-- Section 1: Directory Search & Results Table -->
@@ -86,7 +86,7 @@ $$SYNTAX-LEVEL 2
                    aria-autocomplete="list" aria-controls="person-suggestions"
                    aria-expanded="false">
             <button type="button" id="person-search-clear" class="person-search-clear" aria-label="Clear search input" hidden>&times;</button>
-            <button type="submit" class="mgdb-btn mgdb-btn-primary person-search-submit">Search</button>
+            <button type="submit" class="mgdb-button mgdb-button-primary person-search-submit">Search</button>
 
             <!-- Autocomplete Dropdown -->
             <div id="person-suggestions" class="person-suggestions" role="listbox" hidden></div>
@@ -138,26 +138,26 @@ $$SYNTAX-LEVEL 2
         </div>
       </div>
 
-      <div class="mgdb-metric-grid mgdb-metric-grid-4">
-        <div class="mgdb-metric-card mgdb-metric-card-green">
-          <div class="mgdb-metric-number">57,000+</div>
+      <div class="mgdb-metric-grid">
+        <div class="mgdb-metric mgdb-tone-green">
+          <div class="mgdb-metric-value">57,000+</div>
           <div class="mgdb-metric-title">Active Researchers &amp; Authors</div>
-          <div class="mgdb-metric-desc">Cooperators, geneticists, bioinformaticians, and authors indexed in MaizeGDB.</div>
+          <div class="mgdb-metric-description">Cooperators, geneticists, bioinformaticians, and authors indexed in MaizeGDB.</div>
         </div>
-        <div class="mgdb-metric-card mgdb-metric-card-gold">
-          <div class="mgdb-metric-number">1,500+</div>
+        <div class="mgdb-metric mgdb-tone-amber">
+          <div class="mgdb-metric-value">1,500+</div>
           <div class="mgdb-metric-title">Institutions &amp; Organizations</div>
-          <div class="mgdb-metric-desc">Universities, USDA-ARS stations, international institutes, and seed centers.</div>
+          <div class="mgdb-metric-description">Universities, USDA-ARS stations, international institutes, and seed centers.</div>
         </div>
-        <div class="mgdb-metric-card mgdb-metric-card-blue">
-          <div class="mgdb-metric-number">125,000+</div>
+        <div class="mgdb-metric mgdb-tone-blue">
+          <div class="mgdb-metric-value">125,000+</div>
           <div class="mgdb-metric-title">Linked Publications</div>
-          <div class="mgdb-metric-desc">Direct attribution connecting researchers to reference records, gene loci, and datasets.</div>
+          <div class="mgdb-metric-description">Direct attribution connecting researchers to reference records, gene loci, and datasets.</div>
         </div>
-        <div class="mgdb-metric-card mgdb-metric-card-orange">
-          <div class="mgdb-metric-number">70+</div>
+        <div class="mgdb-metric mgdb-tone-red">
+          <div class="mgdb-metric-value">70+</div>
           <div class="mgdb-metric-title">Countries Represented</div>
-          <div class="mgdb-metric-desc">Worldwide collaboration across the Americas, Europe, Asia, Africa, and Oceania.</div>
+          <div class="mgdb-metric-description">Worldwide collaboration across the Americas, Europe, Asia, Africa, and Oceania.</div>
         </div>
       </div>
     </section>

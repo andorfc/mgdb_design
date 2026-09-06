@@ -1,7 +1,7 @@
 $$SYNTAX-LEVEL 2
 *(mgdb-uniformmu
 <a class="mgdb-skip-link" href="#um-main">Skip to main content</a>
-<main class="mgdb-page mgdb-uniformmu-page" id="um-main" data-payload="$(payload-url)">
+<main class="mgdb-page mgdb-hub-page mgdb-uniformmu-page" id="um-main" data-payload="$(payload-url)">
 
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
     <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/insertion">Insertions</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">UniformMu</span>
@@ -22,7 +22,6 @@ $$SYNTAX-LEVEL 2
       <span>Data measured $(data-date)</span>
     </div>
     <div class="mgdb-hero-body">
-      <span class="mgdb-eyebrow">Sequence-indexed transposon population</span>
       <h1 id="um-title">UniformMu</h1>
       <p class="mgdb-hero-tagline">A maize population in which almost the only genetic variation between plants is the <em>Mu</em> insertions themselves &mdash; so a phenotype has a short list of candidate causes, and the seed carrying each one is free.</p>
       <p class="mgdb-hero-description">Active <em>Mu</em> transposons were introgressed into the genetically uniform W22 inbred background, then the insertion sites were sequenced and mapped rather than screened for one gene at a time. Every insertion, the allele it creates, and the seed stock that carries it is a record at MaizeGDB, and the seed is distributed by the Maize Genetics Cooperation Stock Center free of charge.</p>
@@ -34,53 +33,18 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
-  <section aria-labelledby="um-summary-title">
-    <h2 class="mgdb-visually-hidden" id="um-summary-title">The collection in numbers</h2>
-    <div class="mgdb-metric-grid">
-      <article class="mgdb-metric">
-        <span class="mgdb-metric-icon" aria-hidden="true">&#9678;</span>
-        <div>
-          <strong class="mgdb-metric-value">$(insertion-count)</strong>
-          <h3>Insertion records</h3>
-          <p>$(aligned-count) of them carry genome coordinates. The other $(unaligned-count) are recorded, and have seed, but were never aligned to an assembly on file here.</p>
-        </div>
-      </article>
-      <article class="mgdb-metric mgdb-tone-green">
-        <span class="mgdb-metric-icon" aria-hidden="true">&#9707;</span>
-        <div>
-          <strong class="mgdb-metric-value">$(stock-count)</strong>
-          <h3>Seed stocks</h3>
-          <p>UFMu lines at the Stock Center, distributed free of charge. $(mapped-stock-count) of them have at least one sequence-indexed insertion linked to them; the median line carries $(stock-insertions-median) insertions.</p>
-        </div>
-      </article>
-      <article class="mgdb-metric mgdb-tone-red">
-        <span class="mgdb-metric-icon" aria-hidden="true">&#9633;</span>
-        <div>
-          <strong class="mgdb-metric-value">$(reference-genes)</strong>
-          <h3>Genes hit on $(reference-label)</h3>
-          <p>$(reference-fraction) of the $(reference-universe) reference gene models. $(reference-genic) of those &#40;$(reference-genic-fraction)&#41; are hit inside the transcript rather than only in the flank.</p>
-        </div>
-      </article>
-      <article class="mgdb-metric mgdb-tone-burgundy">
-        <span class="mgdb-metric-icon" aria-hidden="true">&#9998;</span>
-        <div>
-          <strong class="mgdb-metric-value">$(assembly-count)</strong>
-          <h3>Assemblies aligned</h3>
-          <p>$(alignment-count) alignments in total, so an insertion found on one assembly can be followed to its position on the others.</p>
-        </div>
-      </article>
-    </div>
-  </section>
 
-  <nav class="um-section-nav" aria-label="Sections of this page">
-    <a href="#um-find">Find insertions</a>
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#um-find" class="is-current" aria-current="true">Find insertions</a>
     <a href="#um-records">How it is recorded</a>
-    <a href="#um-coverage">Coverage</a>
+    <a href="#um-coverage">What it covers</a>
     <a href="#um-browsers">Genome browsers</a>
-    <a href="#um-order">Ordering seed</a>
+    <a href="#um-order">Ordering</a>
     <a href="#um-downloads">Downloads</a>
     <a href="#um-methods">Methods</a>
     <a href="#um-references">References</a>
+    <a href="#um-metrics">Metrics</a>
+    <a href="#um-related">Related resources</a>
   </nav>
 
   <!-- ==================================================================== -->
@@ -88,7 +52,6 @@ $$SYNTAX-LEVEL 2
   <section id="um-find" aria-labelledby="um-find-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Live lookup</span>
         <h2 id="um-find-title">Find insertions</h2>
       </div>
       <p>Four ways in, all of them ending at the same place: the insertion record, the allele it creates, and the seed you can order.</p>
@@ -190,7 +153,6 @@ $$SYNTAX-LEVEL 2
   <section id="um-records" aria-labelledby="um-records-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Where the data lives</span>
         <h2 id="um-records-title">How a UniformMu insertion is recorded</h2>
       </div>
       <p>Four record types, in a chain. Knowing the chain is what turns &ldquo;there is an insertion in my gene&rdquo; into an envelope of seed.</p>
@@ -244,11 +206,15 @@ $$SYNTAX-LEVEL 2
   <section id="um-coverage" aria-labelledby="um-coverage-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Measured from the database</span>
         <h2 id="um-coverage-title">What the collection covers</h2>
       </div>
-      <p>Everything in this section was counted on $(data-date). Nothing here is typed in by hand.</p>
     </div>
+
+    <!-- Out of the section heading deliberately: the shell hides
+         `.mgdb-section-heading > p`, which is how blurbs were removed site-wide,
+         and this paragraph is not a blurb -- it is the freshness stamp for every
+         number below it. -->
+    <p class="mgdb-note um-counted-on">Everything in this section was counted on $(data-date). Nothing here is typed in by hand.</p>
 
     <div class="mgdb-table-scroll">
       <table class="mgdb-table" data-sortable>
@@ -347,7 +313,6 @@ $$SYNTAX-LEVEL 2
   <section id="um-browsers" aria-labelledby="um-browsers-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Visual context</span>
         <h2 id="um-browsers-title">In the genome browsers</h2>
       </div>
       <p>The UniformMu track sits under &ldquo;insertions&rdquo; in each browser. Use it to see what else is nearby &mdash; other insertion collections, and the gene model an insertion sits in.</p>
@@ -360,7 +325,6 @@ $$SYNTAX-LEVEL 2
   <section id="um-order" aria-labelledby="um-order-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Getting the seed</span>
         <h2 id="um-order-title">Ordering, and what to do with what arrives</h2>
       </div>
       <p>Seed is distributed by the Maize Genetics Cooperation Stock Center free of charge. The advice below is the authors&rsquo;, carried over from the UniformMu methods document.</p>
@@ -411,7 +375,6 @@ $$SYNTAX-LEVEL 2
   <section id="um-downloads" aria-labelledby="um-downloads-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Bulk data</span>
         <h2 id="um-downloads-title">Downloads</h2>
       </div>
       <p>Coordinate files by release. Each says which assembly it is against, because that is the thing that most often goes wrong.</p>
@@ -424,7 +387,6 @@ $$SYNTAX-LEVEL 2
   <section id="um-methods" aria-labelledby="um-methods-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">The resource in detail</span>
         <h2 id="um-methods-title">Methods</h2>
       </div>
       <p>The genetics, the sequencing and the bioinformatics behind the collection, as described by the group that built it. This text dates from the 2011 methods document and describes how the resource was made; the counts elsewhere on this page are current.</p>
@@ -501,7 +463,6 @@ $$SYNTAX-LEVEL 2
   <section id="um-references" aria-labelledby="um-references-title">
     <div class="mgdb-section-heading">
       <div>
-        <span class="mgdb-eyebrow">Literature</span>
         <h2 id="um-references-title">Papers and references</h2>
       </div>
       <p>Cite the resource papers if you use UniformMu seed or the mapped insertion data.</p>
@@ -514,17 +475,60 @@ $$SYNTAX-LEVEL 2
     <div class="um-reference-list">$(references)</div>
   </section>
 
-  <section class="mgdb-resource-panel" aria-labelledby="um-related-title">
-    <div>
-      <span class="mgdb-eyebrow">Related</span>
-      <h2 id="um-related-title">Other insertion resources</h2>
-      <p>UniformMu is one of several insertion collections at MaizeGDB. A gene page shows what every collection has for that gene, side by side.</p>
+  <section id="um-metrics" aria-labelledby="um-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="um-metrics-title">Metrics</h2></div>
     </div>
-    <div class="mgdb-resource-list">
-      <a href="/insertion"><strong>Insertion data at MaizeGDB</strong><span>Every insertion collection held here, and where each came from</span></a>
-      <a href="/data_center/stock"><strong>Stock data hub</strong><span>Search seed stocks and place an order</span></a>
-      <a href="/data_center/locus"><strong>Locus data hub</strong><span>Search insertion and marker records by name</span></a>
-      <a href="https://download.maizegdb.org/Insertions/UniformMu/"><strong>UniformMu downloads</strong><span>The full download directory<span class="mgdb-visually-hidden"> &#40;opens download.maizegdb.org&#41;</span></span></a>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9678;</span>
+        <div>
+          <strong class="mgdb-metric-value">$(insertion-count)</strong>
+          <h3>Insertion records</h3>
+          <p>$(aligned-count) of them carry genome coordinates. The other $(unaligned-count) are recorded, and have seed, but were never aligned to an assembly on file here.</p>
+        </div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-green">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9707;</span>
+        <div>
+          <strong class="mgdb-metric-value">$(stock-count)</strong>
+          <h3>Seed stocks</h3>
+          <p>UFMu lines at the Stock Center, distributed free of charge. $(mapped-stock-count) of them have at least one sequence-indexed insertion linked to them; the median line carries $(stock-insertions-median) insertions.</p>
+        </div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-red">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9633;</span>
+        <div>
+          <strong class="mgdb-metric-value">$(reference-genes)</strong>
+          <h3>Genes hit on $(reference-label)</h3>
+          <p>$(reference-fraction) of the $(reference-universe) reference gene models. $(reference-genic) of those &#40;$(reference-genic-fraction)&#41; are hit inside the transcript rather than only in the flank.</p>
+        </div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-burgundy">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9998;</span>
+        <div>
+          <strong class="mgdb-metric-value">$(assembly-count)</strong>
+          <h3>Assemblies aligned</h3>
+          <p>$(alignment-count) alignments in total, so an insertion found on one assembly can be followed to its position on the others.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="um-related" class="mgdb-hub-related" aria-labelledby="um-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="um-related-title">Related resources</h2></div>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/insertion"><strong>Insertion Data Hub</strong><span>Every insertion collection held here, and where each came from</span></a>
+        <a href="/gene_center/gene"><strong>Gene Data Hub</strong><span>A gene page shows what every insertion collection has for that gene, side by side</span></a>
+        <a href="/data_center/stock"><strong>Stock Data Hub</strong><span>Search seed stocks and place an order</span></a>
+        <a href="/data_center/locus"><strong>Locus Data Hub</strong><span>Search insertion and marker records by name</span></a>
+        <a href="https://download.maizegdb.org/Insertions/UniformMu/"><strong>UniformMu downloads</strong><span>The full download directory</span></a>
+      </div>
     </div>
   </section>
 

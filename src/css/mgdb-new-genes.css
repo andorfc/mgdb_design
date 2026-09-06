@@ -1,0 +1,185 @@
+/* ==========================================================================
+   /new_genes — genes with new annotations
+   --------------------------------------------------------------------------
+   Loaded after css/mgdb-modern.css and css/mgdb-hub.css. The hub shell owns the
+   ground, the white section cards and their coloured top edges, the sticky tab
+   bar, the table zebra and header, the green Related resources panel and the
+   scroll offset. None of that is restated here.
+
+   What is here is this page's own furniture: the window chips, the per-type
+   date cells, and the gene-model pills.
+   ========================================================================== */
+
+/* .mgdb-panel-title is a per-page class styled in no shared sheet; without this
+   the h2 keeps the browser's default 0.83em margin above and below. */
+.mgdb-new-genes-page .mgdb-panel-title { margin: 0 0 var(--mgdb-space-1); }
+
+/* Three labels, measured one row at every width from 1600 down to 375, so the
+   offset is flat: the bar's height plus 8px. */
+.mgdb-hub-page.mgdb-new-genes-page > section[id] { scroll-margin-top: 65px; }
+
+.mgdb-new-genes-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+.mgdb-new-genes-page .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-new-genes-page .ng-hero-mark {
+  display: block;
+  width: min(100%, 76px);
+  height: auto;
+  margin: 0;
+}
+
+.mgdb-modern .ng-snapshot-note { margin-top: 1.25rem; }
+
+/* ── Controls ─────────────────────────────────────────────────────────────
+   The chips and the filter share a row and have to agree on height: the shared
+   .mgdb-chip is 36px and a form control is 44px, so without this the chip tops
+   sit 8px below the input's. */
+.mgdb-modern .ng-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--mgdb-space-3) var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-modern .ng-windows {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-modern .ng-windows .mgdb-chip {
+  min-height: var(--mgdb-tap-target);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  text-decoration: none;
+}
+
+.mgdb-modern .ng-windows .mgdb-chip.is-current {
+  background: var(--mgdb-green-dark);
+  border-color: var(--mgdb-green-dark);
+  color: #ffffff;
+}
+
+.mgdb-modern .ng-chip-n {
+  font-variant-numeric: tabular-nums;
+  font-size: var(--mgdb-text-sm);
+  opacity: 0.75;
+}
+
+/* min-width: 0 so the field can shrink inside the flex row rather than setting
+   its own min-content floor and pushing the row wide. */
+.mgdb-modern .ng-filter-field {
+  flex: 1 1 16rem;
+  min-width: 0;
+  max-width: 26rem;
+  margin: 0;
+}
+
+.mgdb-modern .ng-scope { margin: 0 0 var(--mgdb-space-3); }
+
+/* ── Table ───────────────────────────────────────────────────────────────── */
+
+.mgdb-new-genes-page .ng-table { font-variant-numeric: tabular-nums; }
+
+.mgdb-new-genes-page .ng-table th[scope="row"] { white-space: nowrap; }
+
+.mgdb-new-genes-page .ng-table td > time { display: block; white-space: nowrap; }
+
+/* The relative line under a date. It reads against the SNAPSHOT, not against
+   today, which is why it says "9 days before" rather than "9 days ago" -- the
+   legacy page's "today"/"yesterday" were relative to a curation server this
+   database is a month behind. */
+.mgdb-modern .ng-rel {
+  display: block;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  white-space: nowrap;
+}
+
+.mgdb-modern .ng-none { color: var(--mgdb-muted); }
+
+.mgdb-new-genes-page .ng-num { text-align: right; }
+
+.mgdb-new-genes-page .ng-fullname { min-width: 14rem; }
+
+.mgdb-new-genes-page .ng-models { min-width: 11rem; }
+
+.mgdb-modern .ng-model {
+  display: inline-block;
+  margin: 0 var(--mgdb-space-1) var(--mgdb-space-1) 0;
+  padding: 0.05em 0.45em;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-sunken);
+  font-size: var(--mgdb-text-sm);
+  white-space: nowrap;
+}
+
+.mgdb-modern .ng-model-more {
+  display: inline-block;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-modern .ng-empty {
+  padding: var(--mgdb-space-5);
+  color: var(--mgdb-ink-soft);
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .mgdb-modern .ng-filter-field { flex-basis: 100%; max-width: none; }
+}
+
+/* ── Linked cells ─────────────────────────────────────────────────────────
+   Every date and the stock count are links into the section of the gene's
+   record that holds those annotations. They are styled as the cell rather than
+   as inline links so a column of them does not read as a wall of underlines;
+   the underline arrives on hover and focus. */
+.mgdb-modern .ng-date {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.mgdb-modern .ng-date:hover time,
+.mgdb-modern .ng-date:focus-visible time { text-decoration: underline; }
+
+.mgdb-new-genes-page .ng-num .ng-date { text-align: right; }
+
+/* Gene models are links now, one per model. Keeps the pill shape it had as a
+   span so the column reads the same. */
+.mgdb-modern a.ng-model { text-decoration: none; }
+.mgdb-modern a.ng-model:hover,
+.mgdb-modern a.ng-model:focus-visible {
+  border-color: var(--mgdb-green-dark);
+  text-decoration: underline;
+}
+
+.mgdb-modern a.ng-model-more { text-decoration: none; }
+.mgdb-modern a.ng-model-more:hover { text-decoration: underline; }
+
+/* ── Scope line and download ─────────────────────────────────────────────── */
+
+.mgdb-modern .ng-scope-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mgdb-space-3);
+  margin: 0 0 var(--mgdb-space-3);
+}
+
+.mgdb-modern .ng-scope-row .ng-scope { margin: 0; }
+
+/* Sizing comes from .mgdb-button-sm, which was defined in mgdb-modern.css on
+   2026-09-05 -- until then it was used by four templates and a controller and
+   matched nothing. All this page needs is to stop the button stretching in the
+   flex row. */
+.mgdb-modern .ng-download { flex: 0 0 auto; }

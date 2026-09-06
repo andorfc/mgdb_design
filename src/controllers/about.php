@@ -1,0 +1,104 @@
+<?PHP
+/* file: about.php
+ *
+ * purpose: main controller for all about pages
+ *
+ *
+ * history:
+ *  7/13/2011 andorf - Fixed old log-in code; throw 404 if file does not exist or is empty
+ */
+ 
+  /* /about is not a page, and never was.
+   *
+   * This controller serves the whole /about/<page> namespace, but the bare
+   * route carries no PAGE, so the $page_filename built at the foot of this file
+   * resolves to "controllers/about/.php". That file does not exist, so the
+   * request fell through to reportError() and published the shell with an empty
+   * body: HTTP 200 and ~39 KB of chrome carrying no content, byte-identical to
+   * a deliberately bogus /about/<nonsense>. A link checker reading the status
+   * code saw a healthy page, and the breadcrumbs on /contact and /cite both
+   * pointed here.
+   *
+   * Identical to the /community bug fixed on 2026-09-04, and fixed the same way
+   * (Carson, 2026-09-05). There is no About landing page: the About megamenu is
+   * the index, and its own heading action is "Explore site map", so the bare
+   * route goes to the site map's About section -- a real, expanded, four-entry
+   * section of a modern page.
+   *
+   * PAGE is compared against null and '' rather than tested with !PAGE so that a
+   * path segment of "0" is not swept up with them. controller.php routes
+   * nothing but CONTROLLER == 'about' into this file, but the check is kept
+   * explicit to match controllers/community.php, where /person and /annotator
+   * make it load-bearing.
+   *
+   * Rollback: delete this block and /about serves the empty shell again.
+   */
+  if (CONTROLLER == 'about' && (PAGE === null || PAGE === '')) {
+    header('Location: /sitemap#sm-about', true, 301);
+    exit;
+  }
+
+  // The site map opts in to the shared responsive design-system shell.
+  // All other About routes continue through the legacy controller unchanged.
+  if (PAGE == 'sitemap') {
+    include('controllers/about/sitemap.php');
+    return;
+  }
+
+  // Get system configuration
+  $system = getSystemInfo('mgdb.conf');
+
+  $username = getCookie('username', false);
+  $password = getCookie('password', false);
+  $userid =   getCookie('userid', false);
+
+  $bauplan = new Bauplan('About MaizeGDB');
+  $bauplan->includeCss('../css/static.css');
+  
+  $css_filename = "../css/" . PAGE . ".css";
+  if (file_exists($css_filename)) {
+    $bauplan->includeCss($css_filename);
+  } 
+  
+  if (preg_match('/(?i)msie [1-8]/',$_SERVER['HTTP_USER_AGENT'])) {
+    // if IE<=8
+    $bauplan->preHTML('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">');
+  }
+  else {
+    // if IE>8
+    $bauplan->preHTML('<meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
+  }
+  $bauplan->head('<!--[if IE 6]><link rel="stylesheet" href="/ie/ie6.css" type="text/css" media="screen" /><![endif]--><!--[if lt IE 9]><link rel="stylesheet" type="text/css" href="/ie/ie.css" /><![endif]-->');
+  
+  $mgdb = $bauplan->template()->load('templates/maizegdb-main.bau');
+  $header = $mgdb->get('megamenu')->load('templates/home/maizegdb_header.bau');
+  $mgdb->get('image-dir')->replace($system['image_url']);
+  $mgdb->get('server-url')->replace($system['root_url']);
+  
+  // Toggle log in/out section based on login status
+  if ($username && $password && $userid) {
+    $mgdb->get('logout')->toggle();
+    $mgdb->get('username')->replace($username);
+  }
+  
+  $page_filename = "controllers/" . CONTROLLER . "/" . PAGE . ".php";
+  $page_filename_id = "controllers/" . CONTROLLER . "/" . PAGE . ID . ".php";
+ 
+  if (file_exists($page_filename_id)) {
+    include ($page_filename_id);
+  } 
+  else if (file_exists($page_filename)) {
+    include ($page_filename);
+  } 
+  else{
+    reportError("Unable to find page $page_filename");
+    $mgdb->get('body')->load('templates/error/error-404.bau');
+  }
+
+  // Bauplan variables in global templates
+//  $mgdb->get('gbrowse_url')->replace($system['GBROWSE_URL']);
+//  $mgdb->get('blast_url')->replace($system['BLAST_URL']);
+
+  include_once('translation.php');
+  $bauplan->publish();
+?>

@@ -502,11 +502,26 @@
   $bauplan->includeCss('/css/static.css');
   $bauplan->includeCss('/css/mgdb-modern.css');
   $bauplan->includeCss('/css/mgdb-megamenu.css');
-  $bauplan->includeCss('/css/mgdb-uniformmu.css');
+  /* Asset paths are versioned on mtime so a shell or page-sheet edit is not
+     served from cache. Resolved the same way as the payload above: root_dir
+     first, DOCUMENT_ROOT as the fallback. A missing file yields 0, which is a
+     stable key rather than a cache-buster that changes every request. */
+  $um_doc_root = rtrim($system['root_dir'], '/');
+  if (!is_dir($um_doc_root . '/css') && isset($_SERVER['DOCUMENT_ROOT'])) {
+      $um_doc_root = rtrim($_SERVER['DOCUMENT_ROOT'], '/');
+  }
+
+  /* The shared Data Hub shell, loaded BEFORE the page sheet so the page can
+     override it. It supplies the ground, the white section cards and their
+     coloured top edges, the sticky tab bar, the table zebra, the green Related
+     resources wash and the scroll offset -- none of which mgdb-uniformmu.css
+     restates any more. Converted 2026-09-05. */
+  $bauplan->includeCss('/css/mgdb-hub.css?v=' . (int) @filemtime($um_doc_root . '/css/mgdb-hub.css'));
+  $bauplan->includeCss('/css/mgdb-uniformmu.css?v=' . (int) @filemtime($um_doc_root . '/css/mgdb-uniformmu.css'));
   $bauplan->includeScript('/js/lib/plotly/plotly-2.25.2.min.js');
   $bauplan->includeScript('/js/mgdb-modern.js');
   $bauplan->includeScript('/js/mgdb-chrome.js');
-  $bauplan->includeScript('/js/mgdb-uniformmu.js');
+  $bauplan->includeScript('/js/mgdb-uniformmu.js?v=' . (int) @filemtime($um_doc_root . '/js/mgdb-uniformmu.js'));
   $bauplan->head('<meta name="description" content="UniformMu is a sequence-indexed Mu transposon insertion population in a uniform W22 background. '
       . 'Find insertions by gene, insertion identifier, seed stock or genomic region, and order the seed free of charge from the Maize Genetics Cooperation Stock Center.">');
 

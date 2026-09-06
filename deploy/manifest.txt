@@ -1275,3 +1275,73 @@ src/js/mgdb-handyref.js                       js/mgdb-handyref.js
 # carries its subject with live counts. A 301 only -- nothing deleted -- and the
 # page is still served at /about/neighbors, the same arrangement as /about/faq.
 src/controllers/neighbors.php                 controllers/neighbors.php
+
+# Working Group — replaces the legacy /working_group and /about/working_group.
+# The record of the MaizeGDB Working Group: membership, past members, and the
+# status reports and guidance exchanged with the MaizeGDB team 2006-2018. The
+# group is not currently meeting, so the content is static in the template
+# rather than in a data file. controllers/about/working_group.php is a
+# server-side 301 onto /working_group and is NOT in this manifest — it is a
+# john:mgdbadmin legacy file, so an upstream deploy will restore the legacy
+# loader and /about/working_group will serve the old page again.
+# Pre-redesign originals archived in legacy/working-group/.
+src/templates/static/mgdb_working_group.bau       templates/static/mgdb_working_group.bau
+src/css/mgdb-working-group.css                    css/mgdb-working-group.css
+src/controllers/working_group.php                 controllers/working_group.php
+
+# /about -- the bare route was an empty shell (HTTP 200, no body), the same bug
+# as /community: the controller builds "controllers/about/.php" when there is no
+# PAGE. It now 301s to the site map's About section. Adopted into the repo
+# rather than patched on the server, because the fix has to survive a deploy --
+# and because the file ALREADY carried a server-only modern hook (the
+# PAGE == 'sitemap' block) that an upstream deploy would have silently reverted.
+# NOTE: this means the repo now owns a legacy dispatcher for the whole /about/*
+# namespace. Pre-guard original: backups/<stamp>/controllers/about.php.
+src/controllers/about.php                         controllers/about.php
+
+# /new_genes -- genes with new annotations, on the Data Hub shell.
+#
+# Replaces a page that rendered nothing itself: templates/tools/new_genes*.bau
+# #load-static'd a fragment from /home/cache/newgene/ that the curation server
+# built and rsync'd across. That directory has been empty on this instance since
+# 2023, so the route served 178 bytes of Bauplan error -- a missing file killed
+# the page instead of degrading it. The new page reads THIS server's database,
+# so every gene it lists has a record here, and it states its snapshot date
+# rather than implying it is live. A link to cur.maizegdb.org covers anyone who
+# needs curation newer than the snapshot (Carson, 2026-09-05).
+#
+# The legacy controller and its five templates are untouched on the server and
+# archived in legacy/new-genes/; deleting src/controllers/new_genes.php restores
+# them via redirect.php.
+src/search/new_genes/new_genes_lib.php            search/new_genes/new_genes_lib.php
+src/controllers/new_genes.php                     controllers/new_genes.php
+src/templates/static/mgdb_new_genes.bau           templates/static/mgdb_new_genes.bau
+src/css/mgdb-new-genes.css                        css/mgdb-new-genes.css
+src/js/mgdb-new-genes.js                          js/mgdb-new-genes.js
+
+# Five LEGACY stylesheets, adopted 2026-09-06 for preservation only.
+#
+# These are John's files (john:mgdbadmin, all dated 2026-08-04) and are NOT
+# redesign work. They are here because they are live, were server-only, and are
+# invisible to a textual search: nothing references them by name anywhere.
+# redirect.php:36 builds `/css/<CONTROLLER>.css` at runtime, so a request for
+# /foldseek loads foldseek.css purely from the route name. A basename grep
+# called all five orphans; fetching each route and finding the sheet in the
+# rendered <head> is what proved otherwise, and nine genuinely dead sheets were
+# removed in the same pass.
+#
+#   coop_order.css    /ordering/coop_order   (ordering.php also builds /css/<PAGE>.css)
+#   foldseek.css      /foldseek
+#   fpc.css           /fpc
+#   gene_family.css   /gene_family
+#   gene_model.css    /gene_model
+#
+# CAUTION: deploying these overwrites whatever is on the server. They are not
+# ours to edit — if John changes one upstream, refresh the repo copy from the
+# server before any deploy, or a stale copy here will clobber his newer one.
+# Copied byte-identical (md5 verified against the server on adoption).
+src/css/coop_order.css                            css/coop_order.css
+src/css/foldseek.css                              css/foldseek.css
+src/css/fpc.css                                   css/fpc.css
+src/css/gene_family.css                           css/gene_family.css
+src/css/gene_model.css                            css/gene_model.css

@@ -137,6 +137,10 @@ SECTIONS = [
         ("Maize Genetics Cooperation", "https://www.maizegenetics.org", "The organization coordinating maize research cooperation."),
         ("MGEC", "/mgec", "Maize Genetics Executive Committee."),
         ("Steering committee", "/steering_committee", "Committee membership and role."),
+        # Documentation rather than a live body, and the description says so:
+        # the group is not currently active and the page is its record. Kept out
+        # of the megamenu for the same reason (Carson, 2026-09-05).
+        ("MaizeGDB Working Group", "/working_group", "Documentation on the MaizeGDB Working Group, which is not currently active: membership, past members, and the status reports and guidance exchanged with the MaizeGDB team, 2006-2018."),
         ("Awards", "https://www.maizegenetics.org/awards/community-awards", "Maize Genetics Cooperation community awards."),
         ("McClintock Prize", "/mcclintockprize", "The McClintock Prize for Plant Genetics and Genome Studies."),
         ("Jobs", "/jobs", "Positions shared with MaizeGDB."),
@@ -206,8 +210,9 @@ SECTIONS = [
         ("IBM 302 list", "/mapscore_ibm302list", "IBM 302 line list."),
     ]),
 
-    # No descriptions in this section, per review. /about currently 404s, so
-    # the "About MaizeGDB" entry is gone until a general about page exists.
+    # No descriptions in this section, per review. There is still no general
+    # about page: /about was an empty shell answering 200 and now 301s to this
+    # very section, /sitemap#sm-about (2026-09-05), so it is not listed here.
     ("about", "community", "About MaizeGDB", "", [
         ("Cite us", "/cite", ""),
         ("Contact us", "/contact", ""),

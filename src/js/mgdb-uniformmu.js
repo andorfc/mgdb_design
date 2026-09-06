@@ -633,6 +633,13 @@
 
     wireZoom();
     loadPayload();
+
+    /* The sticky section tabs. `.mgdb-section-tabs` is styled by the hub shell
+       but driven per page, and this page shipped without a spy at all: its old
+       `.um-section-nav` linked to the sections and never marked the one you
+       were in, which its own stylesheet comment admitted. MGDB.sectionTabs is
+       that behaviour, shared, so this is the only line the page needs. */
+    if (window.MGDB && MGDB.sectionTabs) { MGDB.sectionTabs(); }
   }
 
   if (document.readyState === 'loading') {

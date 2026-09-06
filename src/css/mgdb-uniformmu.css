@@ -10,62 +10,37 @@
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   Section navigation
+   Section tabs — now the shell's
 
-   Sticks to the top of the viewport once it is scrolled past. This page is
-   long — eight sections, a methods document among them — and a nav that
-   scrolls away is a nav that only works before you need it.
+   This page carried its own `.um-section-nav`: a sticky bar it styled itself,
+   whose `[aria-current]` rule was, by its own comment, "set by nothing today".
+   The bar was decoration — it linked to the sections and never said which one
+   you were in.
 
-   The site header is position:relative, not sticky, so top:0 is the right
-   offset. The z-index has to clear .mgdb-table thead th, which is itself
-   sticky at top:0 with no z-index of its own; without this the header row of
-   a long table paints over the nav as it scrolls under.
+   `.mgdb-section-tabs` in css/mgdb-hub.css is the same bar, styled once, and
+   MGDB.sectionTabs() in mgdb-modern.js is the behaviour. Both are opted into
+   rather than restated, so nothing about the bar lives in this file any more —
+   including the max-height escape hatch, which the shell handles, and the
+   scrolling rail below 767px, which mgdb-modern.css already provides and which
+   a per-page `flex-wrap` here would silently defeat.
    -------------------------------------------------------------------------- */
 
-.mgdb-uniformmu-page .um-section-nav {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  padding: var(--mgdb-space-3) var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface-alt);
-  box-shadow: var(--mgdb-shadow-sm);
-}
+/* The scroll offset ladder, measured on the live page at 1600/1280/1024/768/767
+   /375 rather than inferred from the tab count. Ten labels of this length wrap
+   to TWO rows at every width down to 768px -- 105px, unchanged even at 1600 --
+   and below 768 mgdb-modern.css turns the bar into a one-row scrolling rail at
+   57px. So the ladder is two steps at the shell's own 767/768 breakpoint, and
+   each step is the measured height plus 8px.
 
-.mgdb-uniformmu-page .um-section-nav a {
-  padding: var(--mgdb-space-2) var(--mgdb-space-3);
-  border-radius: var(--mgdb-radius-sm);
-  font-size: var(--mgdb-text-sm);
-  font-weight: 600;
-  text-decoration: none;
-}
+   Note this is the inverse of the shell's own default, which steps 65px -> 113px
+   at 1170px on the assumption that a bar is one row above that width. This bar
+   never is, so the wide value has to apply all the way down to 768; taking the
+   shell's default would leave every heading 40px behind the bar between 768 and
+   1170. Re-measure if a tab is added, renamed, or removed. */
+.mgdb-hub-page.mgdb-uniformmu-page > section[id] { scroll-margin-top: 113px; }
 
-.mgdb-uniformmu-page .um-section-nav a:hover {
-  background: var(--mgdb-gold-soft);
-  text-decoration: underline;
-}
-
-/* Marks the section currently in view. Set by nothing today — the highlight is
-   a scroll-spy that IntersectionObserver would provide and that the dev
-   instance cannot be checked in — so the rule sits here unused rather than
-   shipping behaviour that cannot be verified. */
-.mgdb-uniformmu-page .um-section-nav a[aria-current="true"] {
-  background: var(--mgdb-green-soft);
-  color: var(--mgdb-green-dark);
-}
-
-/* A jump link must not land its target underneath the sticky nav. */
-.mgdb-uniformmu-page > section[id] { scroll-margin-top: 4.5rem; }
-
-/* Sticky positioning inside a scroll container behaves differently, and on a
-   short viewport the bar would eat the screen. Below that height it scrolls
-   with the page like any other element. */
-@media (max-height: 34rem) {
-  .mgdb-uniformmu-page .um-section-nav { position: static; box-shadow: none; }
+@media (max-width: 767px) {
+  .mgdb-hub-page.mgdb-uniformmu-page > section[id] { scroll-margin-top: 65px; }
 }
 
 /* --------------------------------------------------------------------------

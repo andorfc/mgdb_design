@@ -1,0 +1,158 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-new-genes
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https://maizegdb.org/new_genes">
+<meta property="og:title" content="Genes with new annotations | MaizeGDB">
+<meta property="og:description" content="Maize genes whose annotation changed recently, with a separate date for each kind of annotation: references, gene products, variations and seed stocks.">
+
+<a class="mgdb-skip-link" href="#ng-main">Skip to main content</a>
+
+<main class="mgdb-page mgdb-hub-page mgdb-new-genes-page" id="ng-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/gene_center/gene">Genes</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">New annotations</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="ng-title">
+    <div class="mgdb-hero-emblem">
+      <svg class="ng-hero-mark" viewBox="0 0 96 96" role="img" aria-label="A gene with a new-annotation marker">
+        <path d="M30 14c0 18 36 22 36 40s-36 22-36 28" fill="none" stroke="#235c37" stroke-width="4" stroke-linecap="round" />
+        <path d="M66 14c0 18-36 22-36 40s36 22 36 28" fill="none" stroke="#235c37" stroke-width="4" stroke-linecap="round" />
+        <g stroke="#4c7038" stroke-width="3" stroke-linecap="round">
+          <path d="M35 26h26M33 38h30M33 62h30M35 74h26" />
+        </g>
+        <circle cx="72" cy="26" r="13" fill="#d99a0b" />
+        <path d="M72 20v12M66 26h12" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" />
+      </svg>
+      <strong>New<br />annotations</strong>
+      <span>$(snapshot)</span>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="ng-title">Genes with new annotations.</h1>
+      <p class="mgdb-hero-description">Maize genes a curator has named, ordered by the most recent change to anything attached to them. Each kind of annotation carries its own date, so a gene that gained a reference is distinguishable from one that gained a seed stock.</p>
+    </div>
+  </section>
+
+  <div class="mgdb-message mgdb-message-info ng-snapshot-note" role="status">
+    <div><strong>This database is a snapshot taken $(snapshot).</strong> Every gene listed here has a record on this server, and each date below is a date in this copy. Curation continues between snapshots &#8212; for changes made since, see <a href="https://cur.maizegdb.org/" rel="noopener">the curation server</a>.</div>
+  </div>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#ng-genes" class="is-current" aria-current="true">Genes</a>
+    <a href="#ng-metrics">Metrics</a>
+    <a href="#ng-related">Related resources</a>
+  </nav>
+
+  <section id="ng-genes" aria-labelledby="ng-genes-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ng-genes-title" class="mgdb-panel-title">Genes</h2></div>
+    </div>
+
+    <div class="ng-controls">
+      <div class="ng-windows" role="group" aria-label="How far back to look">$(window-chips)</div>
+      <div class="mgdb-field ng-filter-field">
+        <label class="mgdb-label" for="ng-filter">Filter these genes</label>
+        <input type="search" id="ng-filter" class="mgdb-input" placeholder="Gene symbol or name" autocomplete="off">
+      </div>
+    </div>
+
+    <div class="ng-scope-row">
+      <p class="mgdb-note ng-scope" id="ng-scope">$(scope-line)</p>
+      <a class="mgdb-button mgdb-button-secondary mgdb-button-sm ng-download" href="$(download-url)" download>Download this table &#40;TSV&#41;</a>
+    </div>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table ng-table" id="ng-table" data-sortable>
+        <caption class="mgdb-visually-hidden">Characterized maize genes ordered by their most recent annotation change, with a date for each kind of annotation</caption>
+        <thead>
+          <tr>
+            <th scope="col" data-sort="text"><button type="button">Gene</button></th>
+            <th scope="col" data-sort="text"><button type="button">Full name</button></th>
+            <th scope="col">Gene models</th>
+            <th scope="col" data-sort="text"><button type="button">Reference</button></th>
+            <th scope="col" data-sort="text"><button type="button">Gene product</button></th>
+            <th scope="col" data-sort="text"><button type="button">Variation</button></th>
+            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Stock count</button></th>
+            <th scope="col" data-sort="text"><button type="button">Last change</button></th>
+          </tr>
+        </thead>
+        <tbody id="ng-rows">$(gene-rows)</tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="ng-metrics" aria-labelledby="ng-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ng-metrics-title" class="mgdb-panel-title">Metrics</h2></div>
+    </div>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9678;</span>
+        <div>
+          <strong class="mgdb-metric-value">$(count-month)</strong>
+          <h3>Changed in the last month</h3>
+          <p>Characterized genes whose reference, gene product, variation or stock records changed in the month before this snapshot.</p>
+        </div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-green">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9707;</span>
+        <div>
+          <strong class="mgdb-metric-value">$(count-year)</strong>
+          <h3>Changed in the last year</h3>
+          <p>The same measure over twelve months, which is the window most curation activity shows up in.</p>
+        </div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-red">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9633;</span>
+        <div>
+          <strong class="mgdb-metric-value">$(count-all)</strong>
+          <h3>Characterized genes</h3>
+          <p>Maize loci a curator has given a full name. Every gene on this page is drawn from this set.</p>
+        </div>
+      </article>
+      <article class="mgdb-metric mgdb-tone-burgundy">
+        <span class="mgdb-metric-icon" aria-hidden="true">&#9998;</span>
+        <div>
+          <strong class="mgdb-metric-value">4</strong>
+          <h3>Annotation types tracked</h3>
+          <p>References, gene products, variations and seed stocks, each dated separately rather than collapsed into one update line.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="ng-related" class="mgdb-hub-related" aria-labelledby="ng-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ng-related-title" class="mgdb-panel-title">Related resources</h2></div>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/gene_center/gene">
+          <strong>Gene Data Hub</strong>
+          <span>Search every maize gene and gene model, characterized or not</span>
+        </a>
+        <a href="https://cur.maizegdb.org/" rel="noopener">
+          <strong>MaizeGDB curation server</strong>
+          <span>Curation as it happens, ahead of the snapshot this page reads</span>
+        </a>
+        <a href="/data_center/reference">
+          <strong>Literature Search</strong>
+          <span>The curated maize literature these annotations cite</span>
+        </a>
+        <a href="/data_center/stock">
+          <strong>Stock Data Hub</strong>
+          <span>Seed stocks carrying the variations listed here, and how to order them</span>
+        </a>
+        <a href="/nomenclature">
+          <strong>Nomenclature</strong>
+          <span>How maize genes, alleles and gene products are named</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+)

@@ -1,0 +1,143 @@
+/* ==========================================================================
+   MaizeGDB Working Group — /working_group
+   --------------------------------------------------------------------------
+   Loaded after css/mgdb-modern.css and css/mgdb-hub.css. The hub shell settles
+   the ground, the white section cards and their coloured top edges, the sticky
+   tab bar, the table zebra, the green Related resources panel and the scroll
+   offset. None of that is restated here.
+
+   What is here is the two shapes this record needs: a name roster that wraps
+   into columns, and the markers for a document whose file is gone.
+   ========================================================================== */
+
+/* .mgdb-panel-title is a per-page class styled in no shared sheet; without this
+   the h2 keeps the browser's default 0.83em margin above and below, which reads
+   as extra padding at the top of every section. */
+.mgdb-working-group-page .mgdb-panel-title { margin: 0 0 var(--mgdb-space-1); }
+
+.mgdb-working-group-page .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-working-group-page .wg-hero-mark {
+  display: block;
+  width: min(100%, 76px);
+  height: auto;
+  margin: 0;
+}
+
+/* The offset is flat -- the bar's height plus 8px -- and the bar is held to one
+   row so that it stays true.
+ *
+ * It used to be flat because four short labels happened to fit at every width.
+ * Adding "Steering Committee" as a fifth broke that: measured, the bar wrapped
+ * to two rows and 105px between 768px and about 790px, where this rule still
+ * claimed 65px, so a section jumped to in that band landed with its heading
+ * hidden under the bar. The shared scrollspy reads scroll-margin-top back from
+ * computed style, so the active tab was wrong over the same band.
+ *
+ * Making the bar scroll rather than wrap fixes it for good and, more to the
+ * point, stops the offset depending on how many labels a future edit adds or
+ * how wide they render. Above the wrap point the tabs fit and no scrollbar
+ * appears, so this looks like any other hub's bar. */
+.mgdb-working-group-page .mgdb-section-tabs {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Without this the fix above trades one variable height for another: a flex
+   item that cannot wrap the ROW still shrinks, so at 768px "Steering Committee"
+   and "Related resources" broke over two lines and the bar measured 64px
+   against the same 65px offset -- 1px of clearance, and none at all wherever a
+   platform draws a fatter scrollbar. Labels are held on one line so the bar is
+   one tab tall, always. */
+.mgdb-working-group-page .mgdb-section-tabs a { white-space: nowrap; }
+
+.mgdb-hub-page.mgdb-working-group-page > section[id] { scroll-margin-top: 65px; }
+
+.mgdb-working-group-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+.mgdb-modern .wg-archive-note { margin-top: 1.25rem; }
+
+/* ── Rosters ─────────────────────────────────────────────────────────────
+   minmax(0, 1fr) rather than a pixel floor: a track floor is a hard minimum
+   and would make a phone zoom out to fit rather than wrap. */
+.mgdb-modern .wg-roster {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mgdb-modern .wg-roster > li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--mgdb-space-2);
+  padding: var(--mgdb-space-2) 0;
+  border-bottom: 1px solid var(--mgdb-line);
+}
+
+.mgdb-modern .wg-roster > li > a { font-weight: 600; }
+
+/* ── Role markers ────────────────────────────────────────────────────────── */
+
+.mgdb-modern .wg-role {
+  flex: 0 0 auto;
+  padding: 0.05em 0.5em;
+  border-radius: 999px;
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.mgdb-modern .wg-role-quiet {
+  background: none;
+  padding-left: 0;
+  font-style: italic;
+}
+
+/* ── Documents ───────────────────────────────────────────────────────────── */
+
+/* A meeting that produced no reports, and a document whose file is gone. Both
+   keep their row so the record still says what happened; neither is a link. */
+.mgdb-modern .wg-doc-none { color: var(--mgdb-ink-soft); font-style: italic; }
+
+.mgdb-modern .wg-doc-lost { color: var(--mgdb-ink-soft); }
+
+.mgdb-working-group-page .wg-doc-table td:first-child { white-space: nowrap; }
+
+.mgdb-modern .wg-note { margin-top: var(--mgdb-space-3); }
+
+/* ── Steering Committee roster ───────────────────────────────────────────── */
+
+/* The same roster component as the two Working Group lists, with one more line
+   where there is more to say: the transition committee's record kept each
+   member's affiliation, and dropping it while folding /steering_committee into
+   this page would have lost the only thing that page held beyond the names.
+   Wider tracks than the name-only rosters, because an affiliation is a phrase
+   rather than a word. */
+.mgdb-modern .wg-roster-detailed {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 24rem), 1fr));
+}
+
+.mgdb-modern .wg-affiliation {
+  flex: 1 0 100%;
+  margin-top: 0.15rem;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.45;
+}
+
+.mgdb-modern .wg-lede {
+  max-width: 62rem;
+  margin: 0 0 var(--mgdb-space-4);
+  line-height: 1.65;
+}
