@@ -1,0 +1,293 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-contribute-data
+<main class="mgdb-page mgdb-hub-page mgdb-contribute-page" id="contribute-main">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/maize_history">Community</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Contribute Data</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="contribute-title">
+    <div class="mgdb-hero-emblem">
+      <img src="/images/quicklinks/download.png" alt="" width="64" height="64" class="contribute-hero-icon">
+      <strong>Contribute<br />Data</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="contribute-title">How to Contribute Data to MaizeGDB</h1>
+      <p class="mgdb-hero-description">What MaizeGDB accepts, which repository each data type belongs in, and how to get your data hosted, curated and linked to the rest of the database.</p>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#contribute-criteria" class="is-current" aria-current="true">What we accept</a>
+    <a href="#contribute-types">How to contribute</a>
+    <a href="#contribute-curator">Become a community curator</a>
+    <a href="#contribute-faqs">FAQs</a>
+    <a href="#contribute-related">Related resources</a>
+  </nav>
+
+  <!-- ============ WHAT WE ACCEPT ============ -->
+  <section id="contribute-criteria" aria-labelledby="contribute-criteria-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="contribute-criteria-title">What we accept</h2></div>
+    </div>
+
+    <p class="contribute-lead">MaizeGDB accepts data that meets these criteria&#58;</p>
+    <ul class="contribute-criteria-list">
+      <li>Data adheres to the <a href="/FAIRpractices">FAIR data principles</a></li>
+      <li>Data and metadata have been published in a publically available scientific journal</li>
+      <li>Primary data is deposited in the appropriate repository &#40;like NCBI&#41;</li>
+      <li>Data is licensed as public data &#40;see <a href="https://creativecommons.org/licenses" target="_blank" rel="noopener">creativecommons.org/licenses</a>&#41;</li>
+      <li>Comprehensive metadata &#40;information about your dataset&#41; is provided and meets MaizeGDB standards for the data type</li>
+      <li>Additional criteria may be required depending on the data type</li>
+    </ul>
+
+    <p>MaizeGDB will accept data directly from researchers. Some types of data must also be deposited at standard repositories, as MaizeGDB is not a permanent repository for primary data. The <a href="/contact">MaizeGDB team</a> can advise on the correct repository and help with the submission, if needed. More detailed information on criteria by datatype is below.</p>
+
+    <div class="contribute-note">
+      <p>It is particularly important that all sequence data be submitted to NCBI's <a href="https://www.ncbi.nlm.nih.gov" target="_blank" rel="noopener">GenBank</a> &#40;US&#41;, EBI's <a href="https://www.ebi.ac.uk/ena" target="_blank" rel="noopener">ENA</a> &#40;Europe&#41;, or the <a href="https://www.ddbj.nig.ac.jp" target="_blank" rel="noopener">DDBJ</a> &#40;Japan&#41;. These repositories share all of their data on a daily basis, so data submitted to any of these will be visible at all three.</p>
+    </div>
+  </section>
+
+  <!-- ============ HOW TO CONTRIBUTE, BY DATA TYPE ============ -->
+  <section id="contribute-types" aria-labelledby="contribute-types-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="contribute-types-title">How to contribute</h2></div>
+    </div>
+
+    <nav class="contribute-jump" aria-label="Data types on this page">
+      <a href="#function">New genes and gene function</a>
+      <a href="#genomic">Genome assemblies</a>
+      <a href="#annotated">Sequence annotation</a>
+      <a href="#nucleotide">Other nucleotide sequences</a>
+      <a href="#protein">Protein sequences</a>
+      <a href="#sra">Next generation sequence reads</a>
+      <a href="#geo">Mapped reads and expression data</a>
+      <a href="#snps">Non-human SNPs</a>
+      <a href="#genopheno">Genotype and phenotype data</a>
+      <a href="#other">Metabolomics, ionomics and other types</a>
+      <a href="#maps">Maps</a>
+    </nav>
+
+    <article class="contribute-type" id="function">
+      <h3>New genes, gene function, and gene to gene model associations</h3>
+      <p>If your research is identifying new genes, providing evidence of gene function, and/or linking gene loci to gene models, it would be very helpful to MaizeGDB and the maize community, as well as increasing visibility of your research, if you submit this information directly to MaizeGDB rather than relying on the MaizeGDB curators reading your paper and extracting this information to load into the database. The number of maize papers published each month is much greater than the number of papers that can be curated. Send your paper to a <a href="/contact">MaizeGDB curator</a> to have your gene function information loaded into the MaizeGDB database.</p>
+      <p>Notes can be added directly to records at MaizeGDB by researchers. To add a note, you will need a community curation account. Log in to the site using the login/register link displayed at the top of any MaizeGDB page. Once logged in, click "Add free text annotation" in the annotation section of most data record displays.</p>
+    </article>
+
+    <article class="contribute-type" id="genomic">
+      <h3>Genome assemblies</h3>
+      <p>When your genomic data is hosted at MaizeGDB, it increases the visibility and usability of your data. Depending on the level of hosting, genomic datasets are presented as downloads and BLAST targets, and via a variety of visualizations and browsers. Selected genomic datasets are also included in pan-Zea analyses, and linked to other data hosted by MaizeGDB.</p>
+      <p>Preparing a genome assembly for hosting at MaizeGDB is a lengthy process. Start by contacting a <a href="/contact">MaizeGDB sequence curator</a> to receive identifiers for your assembly and annotations and for additional instructions before submitting your assembly to GenBank or another INSDC database. The MaizeGDB <a href="https://download.maizegdb.org/data_templates/Genome_metadata_template.v7.xlsx">metadata template</a> contains information required by GenBank &#40;also ENA and DDBJ&#41; for genome assembly submissions, along with additional information required by MaizeGDB for hosting genomes.</p>
+
+      <h4>Requirements at any hosting level</h4>
+      <ol class="contribute-ol">
+        <li>Must follow the <a href="https://documents.maizegdb.org/nomenclature/maize_assembly_nomenclature_2021.pdf">maize nomenclature rules</a>.</li>
+        <li>Chromosome names should be prefaced with "chr", for example chr1, chr2, et cetera. Unplaced scaffolds should be named individually, NOT combined into one. That is, there should be no "chr0" or "chrUnplaced".</li>
+        <li>Must be deposited in an INSDC database &#40;GenBank, EBI, or DDBJ&#41;.</li>
+        <li>Include a completed <a href="https://download.maizegdb.org/data_templates">metadata spreadsheet</a>.</li>
+        <li>If possible, sibling seed and pedigree should be deposited at GRIN.</li>
+        <li>A contact person from your team or consortium should be assigned to coordinate with MaizeGDB staff.</li>
+      </ol>
+
+      <p>To submit your data to EBI's ENA, see the <a href="https://ena-docs.readthedocs.io/en/latest/submit/assembly.html" target="_blank" rel="noopener">ENA assembly instructions</a>. Note that ENA submission requires command line skills, as there is no longer a web portal for submitting genome assemblies. Additional tutorials for submitting data to ENA are available for <a href="https://bioinformaticsworkbook.org/dataWrangling/submit-raw-data-to-ena.html" target="_blank" rel="noopener">raw datasets</a> and <a href="https://bioinformaticsworkbook.org/dataWrangling/ena-genome-submission.html" target="_blank" rel="noopener">chromosome-level assemblies</a>.</p>
+      <p>To submit your data to GenBank, see these <a href="https://download.maizegdb.org/Tutorials/GenBank_protocols">tutorials</a>. Note that NCBI checks for vector and primer contamination, so you may need to warn in advance about known chloroplast sequence in the maize nuclear genome.</p>
+
+      <h4>Hosting levels</h4>
+      <div class="contribute-levels">
+        <article class="contribute-level">
+          <span class="contribute-level-tag">Level 1</span>
+          <ol class="contribute-ol">
+            <li>Web page describing the dataset &#40;from the metadata spreadsheet&#41;.</li>
+            <li>Downloads of the assembly FASTA, annotation GFF, annotation CDS and protein files. Additional download files will be considered if available.</li>
+            <li>Public BLAST targets.</li>
+            <li>Will be tagged as a pre-release under Toronto if requested.</li>
+          </ol>
+        </article>
+
+        <article class="contribute-level">
+          <span class="contribute-level-tag">Level 2</span>
+          <p>To qualify, the assembly must be of reference quality, the dataset must include gene model annotation and at least two additional datasets aligned on the assembly, and the data must be published, at least as a preprint, and therefore not under the Toronto agreement.</p>
+          <p class="contribute-level-note">Everything from Level 1, and&#58;</p>
+          <ol class="contribute-ol" start="5">
+            <li>A genome browser.</li>
+            <li>Inclusion in <i>Zea</i> pan-gene analyses.</li>
+            <li>If part of a larger sequencing project, a page describing the project.</li>
+          </ol>
+        </article>
+
+        <article class="contribute-level">
+          <span class="contribute-level-tag">Level 3</span>
+          <p>To qualify, the dataset must meet all requirements above and the cultivar or accession must be considered to be of significant importance by the community.</p>
+          <p class="contribute-level-note">Everything from Levels 1 and 2, and&#58;</p>
+          <ol class="contribute-ol" start="8">
+            <li>Browser enhancements, for example gene models from other assemblies lifted over.</li>
+            <li>Individual gene model pages that link gene models to other data held by MaizeGDB.</li>
+            <li>Inclusion in the PanEffect tool, and possibly others.</li>
+          </ol>
+        </article>
+      </div>
+
+      <h4>Revisions</h4>
+      <p>When a genome assembly is updated, the latest version only is used in the <i>Zea</i> pan-gene analysis. The exception is the representative maize genome, B73, and the commonly used Mo17, where all versions are included. Downloads, BLAST targets, and &#40;depending on hosting level&#41; browsers are maintained for the earlier version as well.</p>
+
+      <h4>New assembly by a different group</h4>
+      <p>If a cultivar or accession is reassembled by another group, and one is significantly improved over the other, only the more improved dataset is used in <i>Zea</i> pan-gene analyses. Downloads, BLAST targets, and &#40;depending on hosting level&#41; browsers are maintained for both versions.</p>
+    </article>
+
+    <article class="contribute-type" id="annotated">
+      <h3>Sequence annotation &#40;gene models&#41;</h3>
+      <p>Genome annotations &#40;gene models&#41; can be hosted at MaizeGDB in the form of browser tracks and/or downloads of GFF or FASTA files. It is best to have both transcript and protein FASTA. Additional data is also accepted, for example SNP alignments, orthologs, et cetera. Contact a <a href="/contact">MaizeGDB sequence curator</a> for more information.</p>
+      <p>See the <a href="https://documents.maizegdb.org/nomenclature/maize_assembly_nomenclature_2016_update.pdf">nomenclature guidelines</a> for naming your gene models.</p>
+    </article>
+
+    <article class="contribute-type" id="nucleotide">
+      <h3>Other nucleotide sequences, including individual genes</h3>
+      <p>Non-genome nucleotide sequences should also be submitted to <a href="https://www.ncbi.nlm.nih.gov/genbank/submit" target="_blank" rel="noopener">GenBank</a>, <a href="https://www.ebi.ac.uk/ena/submit/sequence-submission" target="_blank" rel="noopener">EBI's ENA</a>, or the <a href="https://www.ddbj.nig.ac.jp/submission-e.html" target="_blank" rel="noopener">DDBJ</a>. GenBank &#40;US&#41;, EBI &#40;Europe&#41; and DDBJ &#40;Japan&#41; share sequence data on a daily basis, so data can be submitted to any of the three.</p>
+      <p>Data sets that can be aligned to one or more reference genomes hosted by MaizeGDB can also be added to genome browsers. Contact a <a href="/contact">MaizeGDB sequence curator</a> for more information.</p>
+    </article>
+
+    <article class="contribute-type" id="protein">
+      <h3>Protein sequences</h3>
+      <p>Protein sequences should be submitted to <a href="https://www.ncbi.nlm.nih.gov/genbank/submit" target="_blank" rel="noopener">GenBank</a>, <a href="https://www.uniprot.org/help/submissions" target="_blank" rel="noopener">EBI's UniProt</a>, or the <a href="https://www.ddbj.nig.ac.jp/submission-e.html" target="_blank" rel="noopener">DDBJ</a>.</p>
+    </article>
+
+    <article class="contribute-type" id="sra">
+      <h3>Next generation sequence reads</h3>
+      <p>Next generation sequence reads should be submitted to GenBank's <a href="https://submit.ncbi.nlm.nih.gov/subs/sra" target="_blank" rel="noopener">Sequence Read Archive &#40;SRA&#41;</a>.</p>
+    </article>
+
+    <article class="contribute-type" id="geo">
+      <h3>Mapped sequence reads and other expression data</h3>
+      <p>Gene expression data should be submitted to GenBank's <a href="https://www.ncbi.nlm.nih.gov/geo/info/submission.html" target="_blank" rel="noopener">Gene Expression Omnibus &#40;GEO&#41;</a>.</p>
+      <p>MaizeGDB can also host gene and protein expression tracks on genome browsers. Contact a <a href="/contact">MaizeGDB team member</a> for more information.</p>
+    </article>
+
+    <article class="contribute-type" id="snps">
+      <h3>Non-human SNPs</h3>
+      <p>GenBank dbSNP no longer accepts non-human SNPs. Maize SNPs should be submitted to <a href="https://www.ebi.ac.uk/training/online/course/european-variation-archive-quick-tour/submitting-data-european-variation-archive" target="_blank" rel="noopener">EBI's EVA</a>. It is important to submit SNPs to EVA because EVA will provide permanent identifiers for each SNP, and will collapse identical SNPs into one record, maintaining the original submission identifier as well as a consensus identifier.</p>
+      <p>MaizeGDB will also host tracks of aligned SNPs on the genome browsers. Note that MaizeGDB does not have sufficient personnel to do the alignments. Contact a <a href="/contact">MaizeGDB team member</a> for more information.</p>
+    </article>
+
+    <article class="contribute-type" id="genopheno">
+      <h3>Genotype and phenotype data</h3>
+      <p>MaizeGDB has a long history of curating genotype and phenotype data from individual genes or small sets of genes. Detailed lab-driven data about any gene is important to the maize community, as this is the best functional data we can have. We want to curate as much of this type of data as possible. This includes detailed descriptions of mutant phenotypes and phenotypic changes to mutant expression in various genotypes. This type of data can be submitted by email to the <a href="/contact">MaizeGDB curators</a>.</p>
+    </article>
+
+    <article class="contribute-type" id="other">
+      <h3>Metabolomics, ionomics and other data types</h3>
+      <p>Contact a <a href="/contact">MaizeGDB team member</a> if you have a dataset you would like hosted at MaizeGDB which is not listed here. We will work with you to see if and how your data can be hosted. To learn more about data repositories for these types of data, please see the <a href="/FAIRpractices">FAIR data page</a>.</p>
+    </article>
+
+    <article class="contribute-type" id="maps">
+      <h3>Maps</h3>
+      <p>The MaizeGDB team welcomes genetic maps. Please contact a <a href="/contact">MaizeGDB curator</a> for more information.</p>
+    </article>
+  </section>
+
+  <!-- ============ COMMUNITY CURATION ============ -->
+  <section id="contribute-curator" aria-labelledby="contribute-curator-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="contribute-curator-title">Become a community curator</h2></div>
+    </div>
+
+    <p>Members of the maize community are encouraged to become community curators. Community curators can contribute comments to most data types, including gene loci, gene models, markers, et cetera.</p>
+    <p>To create a community annotator account, follow the link at the top of the page marked <a href="/login">login/register</a> and check the box labeled "<strong>I am interested in being a MaizeGDB curator</strong>" when you fill out the form to "Create an Annotation Account". You will be contacted by e-mail when your account is activated.</p>
+    <p>If you already have a MaizeGDB login but are not a community curator, <a href="/feedback">request curator permission</a>.</p>
+  </section>
+
+  <!-- ============ FAQS ============ -->
+  <section id="contribute-faqs" aria-labelledby="contribute-faqs-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="contribute-faqs-title">FAQs</h2></div>
+    </div>
+
+    <details class="contribute-faq" id="contribute_data_faq1">
+      <summary>Where does the data stored at MaizeGDB come from?</summary>
+      <div class="contribute-faq-body">
+        <p>The original data was inherited from the MaizeDB and ZmDB projects.</p>
+        <p>Sequence data comes from GenBank, genome assembly and annotation groups, and other research groups that are producing genomic, transcriptomic and proteomic sequence data for maize.</p>
+        <p>Other types of bulk data are contributed by community members, usually in standard file formats like GFF, VCF and BED, and are added to the database by members of the MaizeGDB team.</p>
+        <p>Public data from published literature is hand curated and entered record by record by MaizeGDB and community curators.</p>
+      </div>
+    </details>
+
+    <details class="contribute-faq" id="contribute_data_faq2">
+      <summary>How do I become a community curator?</summary>
+      <div class="contribute-faq-body">
+        <p>To create a community annotator account, follow the link at the top of the page marked <a href="/login">login/register</a> and check the box labeled "I am interested in being a MaizeGDB curator" when you fill out the form to "Create an Annotation Account". You will be contacted by e-mail when your account is activated.</p>
+      </div>
+    </details>
+
+    <details class="contribute-faq" id="contribute_data_faq3">
+      <summary>How can community members contribute data?</summary>
+      <div class="contribute-faq-body">
+        <p>MaizeGDB staff regularly attend the Plant and Animal Genome Conference in San Diego, California, and the Annual Maize Genetics Conference. To schedule a meeting at either, use the <a href="/feedback">feedback form</a> to contact the MaizeGDB team, or <a href="/person">contact a specific MaizeGDB member</a>.</p>
+        <p>Contact MaizeGDB directly with a request to host your data, using the <a href="/feedback">feedback form</a> or by contacting a specific team member.</p>
+        <p>Notes can be added directly to records at MaizeGDB by researchers. To add a note, you will need a community curation account. Log in using the login/register link displayed at the top of any MaizeGDB page. Once logged in, click "Add free text annotation" in the annotation section of most data record displays.</p>
+        <p>Although researchers are encouraged to use a standard long-term repository appropriate for the type of data, large datasets can be made available through MaizeGDB by special arrangement. Use the <a href="/feedback">feedback form</a> to contact the MaizeGDB team, or contact a specific team member, to find out what arrangements can be made to accommodate your data. If possible, it is best to contact the MaizeGDB team before you begin to generate large datasets, so that a standardized format can be agreed upon and a customized pipeline created for importing your data in a timely and efficient manner.</p>
+      </div>
+    </details>
+
+    <details class="contribute-faq" id="contribute_data_faq4">
+      <summary>When can I expect data I generated to appear at MaizeGDB?</summary>
+      <div class="contribute-faq-body">
+        <p>The MaizeGDB database is typically updated the first Tuesday of each month.</p>
+        <p>Unless you have contacted us to make specific arrangements to accommodate your data, you should not expect it to appear at the MaizeGDB site unless our data curators have curated your paper, usually because it was recommended by the Editorial Board. Use the <a href="/feedback">feedback form</a> to contact the MaizeGDB team and find out what arrangements can be made to make your data available through MaizeGDB.</p>
+      </div>
+    </details>
+
+    <details class="contribute-faq" id="contribute_data_faq5">
+      <summary>My funding agency has encouraged me to contribute data to MaizeGDB. What can I do to ensure MaizeGDB will take my data?</summary>
+      <div class="contribute-faq-body">
+        <p>If you wish to contribute a large dataset, you should contact the <a href="/contact">MaizeGDB team</a> to make special arrangements for its inclusion at MaizeGDB.</p>
+        <p>Contacting MaizeGDB personnel well in advance, and committing funds from your grants to cover the cost of personnel to curate your data into MaizeGDB, are the best ways of ensuring that MaizeGDB can accommodate your requests for data storage.</p>
+        <p>In general, if the data you are generating have historically been stored at MaizeGDB &#40;for example, your project is planning to generate genetic maps using a new set of probes&#41;, it is very easy for us to commit to including your data in the database. However, if you are proposing to create data of a type that is not currently stored at MaizeGDB, more work would be required of the staff at MaizeGDB &#40;for example, it may be necessary to make new tables in which to store your data, and new data displays would be needed for the website&#41;.</p>
+        <p>Unless you have contacted the MaizeGDB team, please do not assume that we can accommodate your data. We are happy to make special arrangements to create new tables and data displays &#8212; for example, we collaborate with the FSU <a href="http://www.cytomaize.org/" target="_blank" rel="noopener">Cytogenetic Map of Maize Project</a> to make their cytological <a href="/cmm">images and data</a> available.</p>
+        <p>In summary, we encourage you to contact us prior to reporting to the funding agencies that we will take any and all maize data your project plans to generate.</p>
+      </div>
+    </details>
+
+    <details class="contribute-faq" id="contribute_data_faq6">
+      <summary>What should I do if I am planning a genome assembly or annotation project?</summary>
+      <div class="contribute-faq-body">
+        <p>It is strongly advised that you contact a <a href="/contact">MaizeGDB sequence curator</a> well in advance of producing any data. See the guidelines for <a href="#genomic">genome assemblies</a> and <a href="#annotated">annotations</a> above.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ RELATED ============ -->
+  <section id="contribute-related" class="mgdb-hub-related" aria-labelledby="contribute-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="contribute-related-title">Related resources</h2></div>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/contact">
+          <strong>Contact MaizeGDB</strong>
+          <span>Reach a curator before you begin generating data</span>
+        </a>
+        <a href="/FAIRpractices">
+          <strong>FAIR practices</strong>
+          <span>The data principles every contribution is measured against</span>
+        </a>
+        <a href="/nomenclature">
+          <strong>Nomenclature standard</strong>
+          <span>Name genes, alleles and gene models before submitting</span>
+        </a>
+        <a href="https://download.maizegdb.org/data_templates">
+          <strong>Metadata templates</strong>
+          <span>The spreadsheets required for genome assembly submissions</span>
+        </a>
+        <a href="/download">
+          <strong>Bulk downloads</strong>
+          <span>How hosted data is published once it is loaded</span>
+        </a>
+        <a href="/feedback">
+          <strong>Feedback form</strong>
+          <span>Ask the team about hosting a dataset</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

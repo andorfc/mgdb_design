@@ -1,0 +1,284 @@
+/* file: mgdb-contribute-data.css
+ *
+ * Scoped styling for How to Contribute Data (/contribute_data).
+ * Scoped under .mgdb-contribute-page. Loads after css/mgdb-hub.css, which
+ * supplies the ground, the white section cards and their coloured top edges,
+ * and the green Related resources panel.
+ */
+
+/* Five tabs wrap to two rows at common widths, so the shared 4.5rem does not
+   clear the bar and a clicked section lands under it. The scrollspy in
+   MGDB.sectionTabs() reads this value back rather than hardcoding its own.
+
+   The offset has to reach the *nested* anchors too, not just the sections.
+   Seventeen ids the pre-redesign page published live on the data-type
+   <article>s and the FAQ <details> -- and contribute_data#genomic is linked
+   from other pages -- so without these two selectors every deep link lands
+   with its heading behind the sticky bar. Measured: #genomic arrived at
+   top 0 against a 57px bar until they were added. */
+.mgdb-contribute-page > section,
+.mgdb-contribute-page section[id],
+.mgdb-contribute-page .contribute-type,
+.mgdb-contribute-page .contribute-faq {
+  scroll-margin-top: 8rem;
+}
+
+.mgdb-contribute-page .contribute-hero-icon {
+  width: min(100%, 64px);
+  height: auto;
+}
+
+/* --------------------------------------------------------------------------
+   Body copy
+
+   `.mgdb-page p, ul, ol { margin: 0 }` in the shared sheet zeroes every one of
+   these, so spacing has to be restated. Scoped to the page's own containers
+   with `>` where the element could otherwise be a shared component's child --
+   the Related resources panel holds <span>s inside links, not paragraphs, but
+   a bare descendant selector here would reach anything nested later.
+   -------------------------------------------------------------------------- */
+
+.mgdb-contribute-page > section > p,
+.mgdb-contribute-page .contribute-type > p,
+.mgdb-contribute-page .contribute-faq-body > p,
+.mgdb-contribute-page .contribute-note > p,
+.mgdb-contribute-page .contribute-level > p {
+  margin: 0 0 var(--mgdb-space-3);
+  max-width: 78ch;
+  line-height: 1.6;
+}
+
+.mgdb-contribute-page > section > p:last-child,
+.mgdb-contribute-page .contribute-type > p:last-child,
+.mgdb-contribute-page .contribute-faq-body > p:last-child,
+.mgdb-contribute-page .contribute-note > p:last-child,
+.mgdb-contribute-page .contribute-level > p:last-child {
+  margin-bottom: 0;
+}
+
+.mgdb-contribute-page .contribute-lead {
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   What we accept
+   -------------------------------------------------------------------------- */
+
+.mgdb-contribute-page .contribute-criteria-list {
+  margin: 0 0 var(--mgdb-space-4);
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-contribute-page .contribute-criteria-list li {
+  position: relative;
+  padding-left: 1.6rem;
+  max-width: 78ch;
+  line-height: 1.55;
+}
+
+.mgdb-contribute-page .contribute-criteria-list li::before {
+  content: "";
+  position: absolute;
+  top: 0.55em;
+  left: 0.35rem;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--mgdb-green);
+}
+
+.mgdb-contribute-page .contribute-note {
+  margin-top: var(--mgdb-space-4);
+  padding: var(--mgdb-space-4);
+  background: var(--mgdb-green-soft);
+  border-left: 3px solid var(--mgdb-green);
+  border-radius: var(--mgdb-radius-sm);
+}
+
+/* --------------------------------------------------------------------------
+   How to contribute
+   -------------------------------------------------------------------------- */
+
+.mgdb-contribute-page .contribute-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-bottom: var(--mgdb-space-5);
+  padding-bottom: var(--mgdb-space-4);
+  border-bottom: 1px solid var(--mgdb-line);
+}
+
+.mgdb-contribute-page .contribute-jump a {
+  padding: 5px 12px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.mgdb-contribute-page .contribute-jump a:hover {
+  background: var(--mgdb-green-soft);
+  border-color: var(--mgdb-green);
+}
+
+.mgdb-contribute-page .contribute-type {
+  padding-top: var(--mgdb-space-5);
+  border-top: 1px dashed var(--mgdb-line);
+}
+
+.mgdb-contribute-page .contribute-type:first-of-type {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.mgdb-contribute-page .contribute-type > h3 {
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-green-dark);
+  font-size: 1.15rem;
+}
+
+.mgdb-contribute-page .contribute-type > h4 {
+  margin: var(--mgdb-space-4) 0 var(--mgdb-space-2);
+  font-size: 0.95rem;
+}
+
+.mgdb-contribute-page .contribute-ol {
+  margin: 0 0 var(--mgdb-space-3);
+  padding-left: 1.4rem;
+  max-width: 78ch;
+  list-style: decimal;
+}
+
+.mgdb-contribute-page .contribute-ol li {
+  margin-bottom: var(--mgdb-space-2);
+  line-height: 1.55;
+}
+
+.mgdb-contribute-page .contribute-ol li:last-child {
+  margin-bottom: 0;
+}
+
+/* Hosting levels. minmax(0, 1fr) rather than an auto-fit track floor: a floor
+   cannot shrink below its minimum and zooms the page out on a phone instead of
+   wrapping. */
+.mgdb-contribute-page .contribute-levels {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--mgdb-space-3);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-contribute-page .contribute-level {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-2);
+  min-width: 0;
+  padding: var(--mgdb-space-4);
+  background: var(--mgdb-surface-alt);
+  border: 1px solid var(--mgdb-line);
+  border-top: 3px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius-sm);
+}
+
+.mgdb-contribute-page .contribute-level-tag {
+  align-self: flex-start;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--mgdb-green-dark);
+  color: #fff;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.mgdb-contribute-page .contribute-level-note {
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   FAQs
+   -------------------------------------------------------------------------- */
+
+.mgdb-contribute-page .contribute-faq {
+  border-bottom: 1px solid var(--mgdb-line);
+}
+
+.mgdb-contribute-page .contribute-faq:last-of-type {
+  border-bottom: 0;
+}
+
+.mgdb-contribute-page .contribute-faq > summary {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--mgdb-space-3);
+  padding: var(--mgdb-space-3) 0;
+  color: var(--mgdb-green-dark);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+  cursor: pointer;
+  list-style: none;
+}
+
+.mgdb-contribute-page .contribute-faq > summary::-webkit-details-marker {
+  display: none;
+}
+
+.mgdb-contribute-page .contribute-faq > summary::before {
+  content: "+";
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  border-radius: 50%;
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-size: 1rem;
+  line-height: 22px;
+  text-align: center;
+}
+
+.mgdb-contribute-page .contribute-faq[open] > summary::before {
+  content: "\2212";
+}
+
+.mgdb-contribute-page .contribute-faq > summary:hover {
+  color: var(--mgdb-green);
+}
+
+.mgdb-contribute-page .contribute-faq-body {
+  padding: 0 0 var(--mgdb-space-4) calc(22px + var(--mgdb-space-3));
+}
+
+/* --------------------------------------------------------------------------
+   Responsive
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .mgdb-contribute-page .contribute-levels {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Five tabs cannot fit one row on a phone; the bar becomes a scrolling rail
+   rather than stacking to four rows, the same call the gene hub needed. */
+@media (max-width: 767px) {
+  .mgdb-contribute-page .mgdb-section-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+  .mgdb-contribute-page .mgdb-section-tabs a {
+    flex: none;
+  }
+  .mgdb-contribute-page .contribute-faq-body {
+    padding-left: 0;
+  }
+}

@@ -1345,3 +1345,15 @@ src/css/foldseek.css                              css/foldseek.css
 src/css/fpc.css                                   css/fpc.css
 src/css/gene_family.css                           css/gene_family.css
 src/css/gene_model.css                            css/gene_model.css
+
+# /contribute_data on the site's shell. The top-level controller has to exist or
+# controller.php falls through to redirect.php, which loads the legacy main
+# template and its chrome before any controller runs. Pre-redesign originals are
+# archived in the redesign repo under legacy/contribute-data/;
+# controllers/community/contribute_data.php is left in place so
+# /community/contribute_data still serves the original.
+src/controllers/contribute_data.php                       controllers/contribute_data.php
+src/controllers/community/contribute_data_modern.php      controllers/community/contribute_data_modern.php
+src/templates/static/mgdb_contribute_data.bau             templates/static/mgdb_contribute_data.bau
+src/css/mgdb-contribute-data.css                          css/mgdb-contribute-data.css
+src/js/mgdb-contribute-data.js                            js/mgdb-contribute-data.js
