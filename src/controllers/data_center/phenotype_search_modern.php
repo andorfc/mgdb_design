@@ -177,7 +177,7 @@ function getPhenotypeStats($DBConn) {
  *
  * The join to `term` also drops trait ids with no term row: one such id is in
  * the data, carried by 3 phenotypes. Those phenotypes are still searchable,
- * they just cannot be reached through this filter. Recorded as AD-036.
+ * they just cannot be reached through this filter. Recorded as AD-063.
  */
 function getPhenotypeTraitRows($DBConn) {
     $sql = "

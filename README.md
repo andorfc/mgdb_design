@@ -26,6 +26,7 @@ tools/redesign_status.py       Measures how much of the site is modernized
 REDESIGN_STATUS.md             Its report. Generated; do not edit by hand
 docs/BASELINE_AUDIT.md         Architecture and findings from the initial audit
 ADMIN_DEPENDENCIES.md          Changes that need an administrator
+tools/admin_index.py           Rebuilds that file's index. Only the index
 backups/<timestamp>/           Automatic pre-deploy snapshot of every server file
 deploy/manifest.txt            local path -> webroot destination mapping
 ```
@@ -3884,7 +3885,7 @@ Both filter lists are grouped by term *name* now, so the ids collapse into one
 option carrying both &#40;`value="11087,983212"`, labelled `embryo (20)`&#41;, and the
 search takes an id list rather than a single id. Verified: `part=11087` returns
 18, `part=983212` returns 2, and the merged value returns 20. Recorded as
-AD-036, along with a phenotype trait id that has no `term` row at all.
+AD-063, along with a phenotype trait id that has no `term` row at all.
 
 ### The figure reuses a query the page already ran
 
@@ -4770,7 +4771,7 @@ The shell runs no query at all, so the first paint never waits on the database.
 and which card layout to render. **A text source that is not in some type's
 `sources` is invisible to the search.** The map was derived by cross-tabulating
 `table_name` against `id_num.type_term` over the whole corpus and is recorded in
-AD-021 — `table_name` is the table the *text* came from, not the type of the
+AD-062 — `table_name` is the table the *text* came from, not the type of the
 record, and the two are not the same.
 
 ### Volume is bounded everywhere

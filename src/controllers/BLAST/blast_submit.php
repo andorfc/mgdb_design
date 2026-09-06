@@ -26,7 +26,7 @@
  *             format string contains single quotes of its own, so the argument
  *             terminates early: the launcher receives 15 arguments instead of
  *             2, the requested column list is discarded, and `-num_threads 4`
- *             is silently dropped (AD-054). escapeshellarg() closes that.
+ *             is silently dropped (AD-064). escapeshellarg() closes that.
  *
  *          3. It redirects. The job's reports are addressed by job id, so the
  *             browser is sent to /BLAST?job_id=... rather than being handed a
