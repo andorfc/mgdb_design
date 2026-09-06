@@ -2211,3 +2211,61 @@ is worth writing down.
 - **Required administrator:** none
 - **Status:** applied and verified — eleven 301s, site map regenerated,
   `/unsubscribe` retired to `/contact` on Carson's confirmation
+
+## AD-061 — Four data defects that made the all-data search count wrong, and how it now works around each
+
+Found while reconciling `/search_engine/searchall`'s counts with the records it
+can actually return. Each is a property of the data, not of the search, and each
+is worked around in `search/searchall/searchall_lib.php` rather than fixed — the
+fixes belong to whoever loads these tables.
+
+1. **221 references carry `mgdb.id_num.type_term = 0`.** They are real records
+   (2014 literature, ids 3152385-3152605) with titles, years and abstracts, and
+   they are returned by every search that matches them. But nothing joins
+   `type_term = 0` to `mgdb.term`, so any count that asks "what type is this
+   record" through `id_num` loses them: "maize" counted 17,392 references and
+   listed 17,613. 222 rows in the whole table have `type_term = 0`; 221 are
+   references and one is not a record of any type the site shows.
+   *Worked around by:* deciding a record's type from the record table it lives
+   in rather than from `id_num.type_term`.
+   *Proper fix:* set `type_term` to the Reference term id on those 221 rows.
+
+2. **`mgdb.primer` is not keyed by MaizeGDB id.** 331,140 rows over 307,930
+   distinct ids; 21,693 ids carry more than one row, identical except for
+   `auto_num`. Joining it by id therefore returns a record more than once — the
+   search counted 60,372 primers and listed 62,690, and a search that matched a
+   duplicated primer showed the same card twice.
+   *Worked around by:* a `LATERAL … ORDER BY auto_num LIMIT 1` in place of the
+   join, so one record yields one row.
+   *Proper fix:* deduplicate, or document what a second row means.
+
+3. **`mgdb.reference_abstract` holds several rows for three references**
+   (10043275 has 8, 10745324 has 7, 10752234 has 6). A `LEFT JOIN` on it
+   multiplied the reference: "Chao Wu" counted 18 and listed 23 cards, five of
+   them the same paper. `mgdb.ext_db_key` has the same shape at much larger
+   scale — 155,352 `(id, source)` pairs carry more than one row — and was safe
+   here only because the PubMed source happens to have none.
+   *Worked around by:* both are now `LEFT JOIN LATERAL … LIMIT 1`, and
+   `saShapeRows()` drops a repeated id as a second guard.
+   *Proper fix:* one abstract row per reference.
+
+4. **`mgdb.all_text_search` concatenates fields with no separator**, so the
+   token at every field boundary is a word that exists nowhere. A locus's row is
+   `name || full_name || plant_wide_gene_name`: wx1's reads `wx1gss1waxy1` and
+   WPGD1's reads `wpgd1waxy1 chloroplast targeting…`. Since locus names contain
+   no spaces, everything after the first name is unreachable — searching "waxy1"
+   through the text index returned **no loci at all**, while the header
+   suggestions, which read the columns, offered three. The same junction damage
+   exists in `person`, `journal`, `qtl_exp`, `variation` and `primer` rows, but
+   only for the first word of the second field, because those fields contain
+   spaces.
+   *Worked around by:* Genes and Loci also match `mgdb.locus.name`,
+   `full_name` and `plant_wide_gene_name` directly through their btree indexes
+   (`saLocusNameIdsSql()`), which is what the suggestions already did.
+   *Proper fix:* separate the fields with a space when the table is built. That
+   would let the text index answer for every type, and would let this search
+   drop its per-type name lookup.
+- **Required administrator:** database administrator (1-3); whoever owns the
+  `all_text_search` loader (4)
+- **Status:** proposed. The search is correct today without any of them; each
+  fix would let it be simpler or faster.

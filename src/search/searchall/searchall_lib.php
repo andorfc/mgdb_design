@@ -42,16 +42,49 @@
 
 /* A prefix tsquery: "starch synthase" becomes 'starch:* & synthase:*'. Returns
    '' when the term holds nothing indexable, which callers treat as no match
-   rather than as a match-everything. */
+   rather than as a match-everything.
+
+   Underscores split. They did not, and the mismatch was expensive: PHP kept
+   "b73_x" as one word and handed Postgres `b73_x:*`, which its own parser then
+   split into the *phrase* query `'b73':* <-> 'x':*`. A phrase query has to
+   check lexeme positions after the index match, so it cost 1,576 ms where the
+   conjunction `'b73':* & 'x':*` costs 35 ms and matches marginally more.
+   Splitting the same way the tokenizer does keeps the two in step. */
 function saTsQuery($term) {
-    $words = preg_split('/[^a-z0-9_]+/i', strtolower((string) $term), -1, PREG_SPLIT_NO_EMPTY);
-    if (!$words) {
-        return '';
+    $words = array();
+    foreach (saTsWords($term) as $word) {
+        $words[] = $word . ':*';
     }
-    $words = array_slice($words, 0, 8);
-    return implode(' & ', array_map(function ($word) {
-        return $word . ':*';
-    }, $words));
+    return $words ? implode(' & ', $words) : '';
+}
+
+/* The words Postgres will see, in the order it will see them, capped at eight:
+   nobody types nine words, and an unbounded conjunction is an unbounded query. */
+function saTsWords($term) {
+    $words = preg_split('/[^a-z0-9]+/i', strtolower((string) $term), -1, PREG_SPLIT_NO_EMPTY);
+    return $words ? array_slice($words, 0, 8) : array();
+}
+
+/*
+ * Whether a term is specific enough to search the whole corpus with.
+ *
+ * A one-character prefix is not a search: `2:*` matches 2,610,080 of the
+ * 8.8 M text rows, and resolving that many records to their types took 22
+ * seconds and finished as a 503 — the per-statement timeout never fired
+ * because no single statement was over it. The header suggestions have always
+ * required two characters; this is the same rule, applied to the same corpus,
+ * and it is stated to the reader rather than left to time out.
+ *
+ * The test is per word, not on the whole string: "a b" is three characters and
+ * two one-character prefixes.
+ */
+function saTermIsSearchable($term) {
+    foreach (saTsWords($term) as $word) {
+        if (strlen($word) >= 2) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function saCleanTerm($term) {
@@ -95,12 +128,19 @@ function saTruncate($value, $limit) {
 
 function saTypeRegistry() {
     return array(
+        /* Genes and Loci are one match set split in two: a locus that carries
+           gene models is a gene, a locus that carries none is a locus. They
+           therefore share their text sources, and saBuildTypeTable resolves
+           both in a single pass so a record cannot land in both or in
+           neither. Genes additionally answers model identifiers, which are in
+           chado.gene_model and in no text source at all. */
         'gene' => array(
             'label' => 'Genes',
             'cat' => 'gene_model',
             'view' => 'gene',
-            'sources' => array(),          // served by its own handler
+            'sources' => array('locus', 'synonyms', 'locus_gene_products'),
             'type_name' => null,
+            'table' => 'mgdb.locus',
             'blurb' => 'Named maize genes and the gene models annotated for them.',
         ),
         'locus' => array(
@@ -393,14 +433,42 @@ function saSourceList($sources, &$params, $tag) {
  * indexing by source table turns the per-section cost from 400-550 ms into
  * 10-26 ms, and the counts from 793 ms into 86 ms.
  *
+ * The curated-out records are removed here rather than by an `id_num` join in
+ * every downstream query. mgdb.id_num is unique on `id`, so
+ * `EXISTS (... AND curation_lvl=0)` is one index probe per distinct match and
+ * says exactly what the join said; doing it once instead of seventeen times
+ * takes "b73" from 889 ms to 754 ms. (Folding the same test into the CREATE,
+ * before the DISTINCT, is slower — it runs per matching row rather than per
+ * matched record: 356 ms of build against 240 ms.)
+ *
  * The connection is not persistent — include/db-api.php builds a fresh PDO per
  * request — so the table dies with the request. The DROP is belt and braces.
  *
  * Returns false if the table could not be built, and the callers fall back to
  * matching inline, so a database that disallows temp tables still works.
  */
+/*
+ * A term matching more text rows than this is a browse, not a search.
+ *
+ * Everything downstream is roughly linear in the size of the match, so a term
+ * that matches most of the corpus takes most of a minute: "zm", the prefix of
+ * every maize gene identifier, matches 458,536 rows and took 13.5 seconds —
+ * 3.1 s to match, 6.2 s to resolve types, 3.4 s to count identifiers — and no
+ * per-statement timeout fired, because no single statement was over one. The
+ * page it produces is five rows of four data types, which is not an answer to
+ * "zm" anyway.
+ *
+ * The ceiling is set from measurement, not taste. The largest match that
+ * returns a usable page is "b73" with comments included, at 245,764 rows and
+ * 5.8 s; the largest without comments is "ac" at 84,754 and 2.6 s. 300,000
+ * admits both and refuses only the terms that were already unusable.
+ */
+define('SA_MATCH_CEILING', 300000);
+
 function saBuildMatchTable($DBConn, $term, $includeComments) {
     $GLOBALS['sa_match_ready'] = false;
+    $GLOBALS['sa_match_overflow'] = false;
+    $GLOBALS['sa_types_ready'] = array();
     $tsquery = saTsQuery($term);
     if ($tsquery === '') {
         return false;
@@ -413,14 +481,30 @@ function saBuildMatchTable($DBConn, $term, $includeComments) {
     $sourceList = saSourceList($sources, $params, 'src');
 
     try {
+        $DBConn->exec('DROP TABLE IF EXISTS sa_type');
+        $DBConn->exec('DROP TABLE IF EXISTS sa_ids');
         $DBConn->exec('DROP TABLE IF EXISTS sa_match');
+        /* One row past the ceiling is all it takes to know the term is over it,
+           and the LIMIT lets the scan stop there: 656 ms for "zm" rather than
+           the 870 ms of matching it all, and none of the work after. */
         $sth = $DBConn->prepare("
             CREATE TEMP TABLE sa_match AS
             SELECT DISTINCT s.id, s.table_name
             FROM mgdb.all_text_search s
             WHERE to_tsvector('english', s.text) @@ to_tsquery('english', :tsq)
-              AND s.table_name IN ($sourceList)");
+              AND s.table_name IN ($sourceList)
+            LIMIT " . (SA_MATCH_CEILING + 1));
         $sth->execute($params);
+        $matched = (int) $DBConn->query('SELECT count(*) FROM sa_match')->fetchColumn();
+        if ($matched > SA_MATCH_CEILING) {
+            $DBConn->exec('DROP TABLE IF EXISTS sa_match');
+            $GLOBALS['sa_match_overflow'] = true;
+            return false;
+        }
+        $DBConn->exec("
+            DELETE FROM sa_match
+            WHERE NOT EXISTS (SELECT 1 FROM mgdb.id_num i
+                               WHERE i.id=sa_match.id AND i.curation_lvl=0)");
         $DBConn->exec('CREATE INDEX sa_match_table_name ON sa_match (table_name)');
         /* Without stats the planner assumes the default 1000 rows and picks a
            nested loop over id_num that is an order of magnitude slower. */
@@ -438,49 +522,217 @@ function saMatchReady() {
     return !empty($GLOBALS['sa_match_ready']);
 }
 
+/* True when the term was refused for matching too much, rather than failing.
+   The two look the same to saBuildMatchTable's caller and must not: falling
+   back to matching inline is the slowest thing that could be done with a term
+   that already matched too much. */
+function saMatchOverflow() {
+    return !empty($GLOBALS['sa_match_overflow']);
+}
+
+/*
+ * Resolve every match to the data type it will be displayed as, once.
+ *
+ * A match is of a type when it appears under one of that type's text sources
+ * *and* has a row in that type's record table *and* satisfies the type's own
+ * predicate. That is one definition, evaluated here, and both the counts and
+ * the section rows read the answer out of this table — so a rail count is by
+ * construction the number of records the section can list.
+ *
+ * The count used to be a `GROUP BY term.name` over `id_num.type_term`, which
+ * is a different definition and disagreed with the sections twice over:
+ *
+ *   - it counted loci that carry gene models, which the Loci section filters
+ *     out because they are shown as Genes ("kn1": 2 counted, 1 listed;
+ *     "protein": 11,784 counted, 280 listed);
+ *   - it dropped the 221 references whose `id_num.type_term` is 0, which the
+ *     section listed anyway ("maize": 17,392 counted, 17,613 listed).
+ *
+ * $keys limits the work to the types actually wanted — the single-type view
+ * needs one, the overview needs all of them.
+ */
+function saBuildTypeTable($DBConn, $term, $includeComments, $keys = null) {
+    if (!saMatchReady()) {
+        return false;
+    }
+    $registry = saTypeRegistry();
+    $wanted = $keys === null ? array_keys($registry) : $keys;
+
+    $arms = array();
+    $params = array();
+    $built = array();
+
+    /*
+     * With comments in scope, every type's source list gains `memo`, and memo
+     * is 1.76 M rows that belong to records of every type — so restricting a
+     * type's match to its own sources narrows almost nothing while costing
+     * sixteen separate passes over a large table. One shared set of matched
+     * ids, with the record join left to decide the type, is 1.8x faster there:
+     * "b73" with comments on resolves in 2,436 ms rather than 4,253 ms.
+     *
+     * It can only widen the match — a record now counts when any text about it
+     * matched, rather than only text from its own type's sources — which is
+     * what the checkbox offers. Off, the restriction is worth keeping: it is
+     * what makes References search 18,949 rows rather than 8.8 M, and the
+     * shared set is three times slower.
+     */
+    $sharedIds = false;
+    if ($includeComments) {
+        try {
+            $DBConn->exec('DROP TABLE IF EXISTS sa_ids');
+            $DBConn->exec('CREATE TEMP TABLE sa_ids AS SELECT DISTINCT id FROM sa_match');
+            $DBConn->exec('ANALYZE sa_ids');
+            $sharedIds = true;
+        }
+        catch (Throwable $error) {
+            $sharedIds = false;
+        }
+    }
+
+    /* Genes and Loci are one set split by a single test, so they are resolved
+       together: `EXISTS (gene models)` is evaluated once per matched locus
+       rather than once for each of the two arms. On "protein", which matches
+       11,784 loci, that is the difference between one pass and two. */
+    $wantsGene = in_array('gene', $wanted, true);
+    $wantsLocus = in_array('locus', $wanted, true);
+    if ($wantsGene || $wantsLocus) {
+        if ($sharedIds) {
+            $names = saLocusNameIdsSql($term, $params, 'loln');
+            $locusIds = 'SELECT id FROM sa_ids'
+                      . ($names === '' ? '' : "\n            UNION\n            " . $names);
+        }
+        else {
+            $locusIds = saLocusMatchIdsSql($term, $includeComments, $params, 'lo');
+        }
+        $branch = "CASE WHEN EXISTS (SELECT 1 FROM chado.gene_model gm
+                                      WHERE gm.locus_id=l.id AND gm.is_obsolete IS NOT TRUE)
+                        THEN 'gene' ELSE 'locus' END";
+        $keep = ($wantsGene && $wantsLocus) ? ''
+              : ($wantsGene ? " WHERE EXISTS (SELECT 1 FROM chado.gene_model gm2
+                                               WHERE gm2.locus_id=l.id AND gm2.is_obsolete IS NOT TRUE)"
+                            : " WHERE NOT EXISTS (SELECT 1 FROM chado.gene_model gm2
+                                                   WHERE gm2.locus_id=l.id AND gm2.is_obsolete IS NOT TRUE)");
+        $arms[] = "SELECT ($branch)::text AS type_key, m.id
+                   FROM (SELECT DISTINCT id FROM ($locusIds) ids) m
+                     INNER JOIN mgdb.locus l ON l.id=m.id" . $keep;
+        if ($wantsGene) { $built[] = 'gene'; }
+        if ($wantsLocus) { $built[] = 'locus'; }
+    }
+
+    foreach ($wanted as $index => $key) {
+        if ($key === 'gene' || $key === 'locus') {
+            continue;               // resolved together above
+        }
+        if (!isset($registry[$key]) || empty($registry[$key]['sources'])) {
+            continue;               // genome has its own handler
+        }
+        $shape = saTypeQuery($key, $registry[$key], $term);
+        if (!$shape) {
+            continue;
+        }
+        if ($sharedIds) {
+            $matchedIds = 'SELECT id FROM sa_ids';
+        }
+        else {
+            $sourceList = saSourceList($registry[$key]['sources'], $params, 'k' . $index);
+            $matchedIds = "SELECT DISTINCT id FROM sa_match WHERE table_name IN ($sourceList)";
+        }
+        /* The type key is a registry constant, never reader input. */
+        $arms[] = "SELECT '" . $key . "'::text AS type_key, m.id
+                   FROM ($matchedIds) m
+                   " . saRecordJoin($shape);
+        $built[] = $key;
+    }
+    if (!$arms) {
+        return false;
+    }
+
+    try {
+        $DBConn->exec('DROP TABLE IF EXISTS sa_type');
+        /* DISTINCT, not UNION: one row per record, whatever the record table
+           looks like. A count is only a count of records if the set it is
+           taken over holds each record once. */
+        $sth = $DBConn->prepare('CREATE TEMP TABLE sa_type AS SELECT DISTINCT type_key, id FROM ('
+                                . implode("\nUNION ALL\n", $arms) . ') resolved');
+        $sth->execute($params);
+        $DBConn->exec('CREATE INDEX sa_type_key ON sa_type (type_key)');
+        $DBConn->exec('ANALYZE sa_type');
+        /* array_fill_keys, not array_flip: flipping makes the first key's value
+           0, and saTypeReady() tests it with !empty(). The single-type view
+           builds one key, so that key was always the first one and always
+           looked unresolved — every deep link fell back to the slower path,
+           and for Loci the fallback cannot see name matches, so
+           /searchall?type=locus for "waxy" listed one locus where the overview
+           listed three. */
+        $GLOBALS['sa_types_ready'] = array_fill_keys($built, true);
+        return true;
+    }
+    catch (Throwable $error) {
+        $GLOBALS['sa_types_ready'] = array();
+        return false;
+    }
+}
+
+function saTypeReady($key) {
+    return !empty($GLOBALS['sa_types_ready'][$key]);
+}
+
+/* --------------------------------------------------------------------------
+   Counts
+
+   One grouped read of the resolved table, so every number on the page comes
+   from the set the sections list.
+   -------------------------------------------------------------------------- */
+
 function saCountsByType($DBConn, $term, $includeComments) {
-    $tsquery = saTsQuery($term);
-    if ($tsquery === '') {
+    if (saTsQuery($term) === '') {
         return array();
     }
 
-    $params = array();
-    if (saMatchReady()) {
-        $matched = "SELECT DISTINCT m0.id FROM sa_match m0";
-    }
-    else {
-        $sources = saIdentitySources();
-        if ($includeComments) {
-            $sources = array_merge($sources, saCommentSources());
+    if (!empty($GLOBALS['sa_types_ready'])) {
+        $sth = $DBConn->query('SELECT type_key, count(*) AS n FROM sa_type GROUP BY type_key');
+        $counts = array();
+        foreach ($sth->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            if ((int) $row['n'] > 0) {
+                $counts[$row['type_key']] = (int) $row['n'];
+            }
         }
-        $params[':tsq'] = $tsquery;
-        $sourceList = saSourceList($sources, $params, 'src');
-        $matched = "
-          SELECT DISTINCT s.id
-          FROM mgdb.all_text_search s
-          WHERE to_tsvector('english', s.text) @@ to_tsquery('english', :tsq)
-            AND s.table_name IN ($sourceList)";
+        return $counts;
     }
 
-    $sql = "
-        WITH matched AS ($matched)
-        SELECT t.name AS type_name, count(*) AS n
-        FROM matched m
-          INNER JOIN mgdb.id_num idn ON idn.id=m.id AND idn.curation_lvl=0
-          INNER JOIN mgdb.term t ON t.id=idn.type_term
-        GROUP BY t.name";
-
-    $sth = $DBConn->prepare($sql);
+    /* Fallback: no temp tables. Same definition, one query, one arm per type. */
+    $registry = saTypeRegistry();
+    $arms = array();
+    $params = array();
+    foreach ($registry as $key => $type) {
+        if (empty($type['sources'])) {
+            continue;
+        }
+        $shape = saTypeQuery($key, $type, $term);
+        if (!$shape) {
+            continue;
+        }
+        $armParams = array();
+        $tag = 'c' . count($arms);
+        $matched = ($key === 'gene' || $key === 'locus')
+            ? saLocusMatchIdsSql($term, $includeComments, $armParams, $tag)
+            : saMatchedIdsSql($type, $term, $includeComments, $armParams, $tag);
+        $params = array_merge($params, $armParams);
+        $arms[] = "SELECT '" . $key . "'::text AS type_key, count(*) AS n
+                   FROM (SELECT DISTINCT id FROM ($matched) ids) m
+                     INNER JOIN mgdb.id_num idn ON idn.id=m.id AND idn.curation_lvl=0
+                     " . saRecordJoin($shape);
+    }
+    if (!$arms) {
+        return array();
+    }
+    $sth = $DBConn->prepare(implode("\nUNION ALL\n", $arms));
     $sth->execute($params);
-
-    $index = saTypeNameIndex();
     $counts = array();
     foreach ($sth->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        if (!isset($index[$row['type_name']])) {
-            continue;                       // internal type with no reader-facing view
+        if ((int) $row['n'] > 0) {
+            $counts[$row['type_key']] = (int) $row['n'];
         }
-        $key = $index[$row['type_name']];
-        $counts[$key] = isset($counts[$key]) ? $counts[$key] + (int) $row['n'] : (int) $row['n'];
     }
     return $counts;
 }
@@ -494,64 +746,158 @@ function saCountsByType($DBConn, $term, $includeComments) {
    then a prefix match, so the record someone typed the name of leads the page.
    -------------------------------------------------------------------------- */
 
-function saMatchedIdsSql($type, $term, $includeComments, &$params) {
+function saMatchedIdsSql($type, $term, $includeComments, &$params, $tag = 'src') {
     $sources = $type['sources'];
     if ($includeComments) {
         $sources = array_merge($sources, saCommentSources());
     }
-    $sourceList = saSourceList($sources, $params, 'src');
+    $sourceList = saSourceList($sources, $params, $tag);
 
     if (saMatchReady()) {
         return "SELECT DISTINCT m0.id FROM sa_match m0 WHERE m0.table_name IN ($sourceList)";
     }
-    $params[':tsq'] = saTsQuery($term);
+    $params[':tsq_' . $tag] = saTsQuery($term);
     return "
         SELECT DISTINCT s.id
         FROM mgdb.all_text_search s
-        WHERE to_tsvector('english', s.text) @@ to_tsquery('english', :tsq)
+        WHERE to_tsvector('english', s.text) @@ to_tsquery('english', :tsq_$tag)
           AND s.table_name IN ($sourceList)";
 }
 
-/* The SELECT list, joins, and ordering for each view. Kept in one place so the
-   count and the page agree on what the match set is. */
+/* Genes and Loci order the same way: the record whose own name was typed
+   first, then one matched by a fuller name, then everything else shortest
+   first. A locus carries three names and any of them is what someone typed. */
+function saLocusOrder() {
+    return "CASE WHEN lower(l.name)=:exact THEN 0
+                 WHEN lower(l.full_name)=:exact OR lower(l.plant_wide_gene_name)=:exact THEN 1
+                 WHEN lower(l.name) LIKE :prefix THEN 2
+                 WHEN lower(l.full_name) LIKE :prefix
+                      OR lower(l.plant_wide_gene_name) LIKE :prefix THEN 3
+                 ELSE 4 END,
+            length(l.name), l.name, l.id";
+}
+
+/*
+ * Loci whose own names match, which the text index cannot find.
+ *
+ * mgdb.all_text_search stores a locus's three names run together as one
+ * token — wx1's row reads "wx1gss1waxy1", WPGD1's reads
+ * "wpgd1waxy1 chloroplast targeting…" — so a prefix tsquery reaches the first
+ * name and nothing after it. Searching "waxy1" through the text index alone
+ * therefore returns no loci at all, while the header suggestions, which do
+ * look at the columns, offer three.
+ *
+ * mgdb.locus carries btree indexes on all three name columns in the database
+ * collation, so a left-anchored LIKE cannot use them but a range can: hence
+ * the case variants in saPrefixRanges. Measured 2-28 ms for the terms people
+ * type, 171 ms for the worst two-letter prefix.
+ *
+ * One letter is excluded. "b" alone is 466,437 loci and two seconds, and it
+ * is not a search anyone means — the header suggestions have always required
+ * two characters for the same reason.
+ */
+function saLocusNameIdsSql($term, &$params, $tag) {
+    if (strlen($term) < 2) {
+        return '';
+    }
+    $branches = array();
+    foreach (array('name', 'full_name', 'plant_wide_gene_name') as $index => $column) {
+        $branches[] = "SELECT id FROM mgdb.locus WHERE "
+                    . saPrefixRanges($column, $term, $params, $tag . $index);
+    }
+    return "SELECT n.id FROM (" . implode("\n                UNION\n                ", $branches) . ") n
+             WHERE EXISTS (SELECT 1 FROM mgdb.id_num i
+                            WHERE i.id=n.id AND i.curation_lvl=0)";
+}
+
+/* Every id that could be a gene or a locus: what the text index found, plus
+   what only the name columns can find. One set, split by whether the locus
+   carries gene models. */
+function saLocusMatchIdsSql($term, $includeComments, &$params, $tag) {
+    $registry = saTypeRegistry();
+    $text = saMatchedIdsSql($registry['locus'], $term, $includeComments, $params, $tag);
+    $names = saLocusNameIdsSql($term, $params, $tag . 'ln');
+    return $names === '' ? $text : $text . "\n            UNION\n            " . $names;
+}
+
+/*
+ * The joins, columns and ordering for each view, in three pieces:
+ *
+ *   record   the INNER JOIN that confirms the type and supplies the ordering
+ *            columns. An id lives in exactly one record table, so this is what
+ *            actually decides whether a match is of this type.
+ *   filter   an extra predicate the type carries. Only Loci has one.
+ *   display  the LEFT JOINs that add columns for the card and nothing else.
+ *
+ * They are kept apart because the counts, the id page and the display query
+ * each need a different pair, and composing them here is what guarantees the
+ * count and the rows describe the same set. When `count_from` was one opaque
+ * string, the rail counted loci one way and the section listed them another:
+ * "kn1" reported two Loci and showed one.
+ */
 function saTypeQuery($key, $type, $term) {
     $lower = strtolower($term);
 
     switch ($key) {
+        /* The abstract and the PubMed key are laterals, not plain joins.
+           mgdb.reference_abstract holds up to eight rows for one reference —
+           three references have more than one — and a plain LEFT JOIN turned
+           each into that many cards: "Chao Wu" counted 18 references and
+           listed 23. mgdb.ext_db_key is the same shape (155,352 id/source
+           pairs carry more than one row) and is only safe today because the
+           PubMed source happens to have none. A card is one row per record, so
+           the query says so. */
         case 'reference':
             return array(
                 'select' => "r.id, r.title, r.author_desc, r.year, j.name AS journal,
                              r.volume, r.pages, r.doi,
                              left(coalesce(ra.abstract_1, ''), 420) AS abstract,
                              x.key AS pubmed",
-                'count_from' => "INNER JOIN mgdb.reference r ON r.id=m.id",
-                'from' => "INNER JOIN mgdb.reference r ON r.id=m.id
-                           LEFT JOIN mgdb.journal j ON j.id=r.in1
-                           LEFT JOIN mgdb.reference_abstract ra ON ra.id=r.id
-                           LEFT JOIN mgdb.ext_db_key x ON x.id=r.id
-                                AND x.db_person=(SELECT id FROM mgdb.person WHERE name='Medline -- PubMed')",
+                'record' => "INNER JOIN mgdb.reference r ON r.id=m.id",
+                'display' => "LEFT JOIN mgdb.journal j ON j.id=r.in1
+                              LEFT JOIN LATERAL (SELECT a.abstract_1 FROM mgdb.reference_abstract a
+                                                  WHERE a.id=r.id
+                                                    AND coalesce(a.abstract_1, '') <> ''
+                                                  LIMIT 1) ra ON true
+                              LEFT JOIN LATERAL (SELECT k.key FROM mgdb.ext_db_key k
+                                                  WHERE k.id=r.id
+                                                    AND k.db_person=(SELECT id FROM mgdb.person
+                                                                      WHERE name='Medline -- PubMed')
+                                                  LIMIT 1) x ON true",
                 'order' => "r.year DESC NULLS LAST, r.id",
             );
 
         /*
          * A locus that carries gene models is presented as a gene, so it is
          * filtered out of this section rather than listed twice — its record
-         * page redirects to the gene page anyway. The same predicate is used
-         * for the count and the page, so the two cannot disagree.
+         * page redirects to the gene page anyway. This predicate is the one
+         * place any type narrows its own set, and it is applied when the match
+         * is resolved to a type, so the count and the page cannot diverge.
          */
         case 'locus':
-            $notAGene = "AND NOT EXISTS (SELECT 1 FROM chado.gene_model gm
-                                          WHERE gm.locus_id=l.id AND gm.is_obsolete IS NOT TRUE)";
             return array(
                 'select' => "l.id, l.name, l.full_name, l.plant_wide_gene_name,
                              lg.name AS chromosome, l.arm, 0 AS model_count",
-                'count_from' => "INNER JOIN mgdb.locus l ON l.id=m.id $notAGene",
-                'from' => "INNER JOIN mgdb.locus l ON l.id=m.id $notAGene
-                           LEFT JOIN mgdb.linkage_group lg ON lg.id=l.linkage_group",
-                'order' => "CASE WHEN lower(l.name)=:exact THEN 0
-                                 WHEN lower(l.full_name)=:exact THEN 1
-                                 WHEN lower(l.name) LIKE :prefix THEN 2 ELSE 3 END,
-                            length(l.name), l.name, l.id",
+                'record' => "INNER JOIN mgdb.locus l ON l.id=m.id",
+                'filter' => "AND NOT EXISTS (SELECT 1 FROM chado.gene_model gm
+                                              WHERE gm.locus_id=l.id AND gm.is_obsolete IS NOT TRUE)",
+                'display' => "LEFT JOIN mgdb.linkage_group lg ON lg.id=l.linkage_group",
+                'order' => saLocusOrder(),
+                'params' => array(':exact' => $lower, ':prefix' => $lower . '%'),
+            );
+
+        /* The other half of the same set. Model names and counts are read for
+           the twenty-five rows of the page afterwards, not joined here: a
+           locus can carry hundreds of models across assemblies. */
+        case 'gene':
+            return array(
+                'select' => "l.id, l.name, l.full_name, l.plant_wide_gene_name,
+                             lg.name AS chromosome, l.arm",
+                'record' => "INNER JOIN mgdb.locus l ON l.id=m.id",
+                'filter' => "AND EXISTS (SELECT 1 FROM chado.gene_model gm
+                                          WHERE gm.locus_id=l.id AND gm.is_obsolete IS NOT TRUE)",
+                'display' => "LEFT JOIN mgdb.linkage_group lg ON lg.id=l.linkage_group",
+                'order' => saLocusOrder(),
                 'params' => array(':exact' => $lower, ':prefix' => $lower . '%'),
             );
 
@@ -560,10 +906,9 @@ function saTypeQuery($key, $type, $term) {
                 'select' => "st.id, st.name, st.coop_id, st.pedigree,
                              src.name AS available_from,
                              st.country, st.mktclass, t.name AS stock_type",
-                'count_from' => "INNER JOIN mgdb.stock st ON st.id=m.id",
-                'from' => "INNER JOIN mgdb.stock st ON st.id=m.id
-                           LEFT JOIN mgdb.term t ON t.id=st.type
-                           LEFT JOIN mgdb.person src ON src.id=st.available_from",
+                'record' => "INNER JOIN mgdb.stock st ON st.id=m.id",
+                'display' => "LEFT JOIN mgdb.term t ON t.id=st.type
+                              LEFT JOIN mgdb.person src ON src.id=st.available_from",
                 'order' => "CASE WHEN lower(st.name)=:exact OR lower(st.coop_id)=:exact THEN 0
                                  WHEN lower(st.name) LIKE :prefix THEN 1 ELSE 2 END,
                             length(st.name), st.name, st.id",
@@ -576,9 +921,8 @@ function saTypeQuery($key, $type, $term) {
                              t.name AS probe_type,
                              (SELECT string_agg(DISTINCT pb.bin::text, ', ')
                                 FROM mgdb.probe_bin pb WHERE pb.id=p.id) AS bins",
-                'count_from' => "INNER JOIN mgdb.probe p ON p.id=m.id",
-                'from' => "INNER JOIN mgdb.probe p ON p.id=m.id
-                           LEFT JOIN mgdb.term t ON t.id=p.type",
+                'record' => "INNER JOIN mgdb.probe p ON p.id=m.id",
+                'display' => "LEFT JOIN mgdb.term t ON t.id=p.type",
                 'order' => "CASE WHEN lower(p.name)=:exact THEN 0
                                  WHEN lower(p.name) LIKE :prefix THEN 1 ELSE 2 END,
                             length(p.name), p.name, p.id",
@@ -589,9 +933,8 @@ function saTypeQuery($key, $type, $term) {
             return array(
                 'select' => "v.id, v.name, v.alleledescriptor, v.function, v.inbred,
                              l.name AS locus_name, l.id AS locus_id",
-                'count_from' => "INNER JOIN mgdb.variation v ON v.id=m.id",
-                'from' => "INNER JOIN mgdb.variation v ON v.id=m.id
-                           LEFT JOIN mgdb.locus l ON l.id=v.variationof",
+                'record' => "INNER JOIN mgdb.variation v ON v.id=m.id",
+                'display' => "LEFT JOIN mgdb.locus l ON l.id=v.variationof",
                 'order' => "CASE WHEN lower(v.name)=:exact THEN 0
                                  WHEN lower(v.name) LIKE :prefix THEN 1 ELSE 2 END,
                             length(v.name), v.name, v.id",
@@ -601,8 +944,7 @@ function saTypeQuery($key, $type, $term) {
         case 'phenotype':
             return array(
                 'select' => "ph.id, ph.name, ph.comments, ph.inheritance, ph.trait",
-                'count_from' => "INNER JOIN mgdb.phenotype ph ON ph.id=m.id",
-                'from' => "INNER JOIN mgdb.phenotype ph ON ph.id=m.id",
+                'record' => "INNER JOIN mgdb.phenotype ph ON ph.id=m.id",
                 'order' => "CASE WHEN lower(ph.name)=:exact THEN 0
                                  WHEN lower(ph.name) LIKE :prefix THEN 1 ELSE 2 END,
                             length(ph.name), ph.name, ph.id",
@@ -612,9 +954,8 @@ function saTypeQuery($key, $type, $term) {
         case 'term':
             return array(
                 'select' => "tm.id, tm.name, tm.term_comments, ty.name AS term_type",
-                'count_from' => "INNER JOIN mgdb.term tm ON tm.id=m.id",
-                'from' => "INNER JOIN mgdb.term tm ON tm.id=m.id
-                           LEFT JOIN mgdb.term ty ON ty.id=tm.type",
+                'record' => "INNER JOIN mgdb.term tm ON tm.id=m.id",
+                'display' => "LEFT JOIN mgdb.term ty ON ty.id=tm.type",
                 'order' => "CASE WHEN lower(tm.name)=:exact THEN 0
                                  WHEN lower(tm.name) LIKE :prefix THEN 1 ELSE 2 END,
                             length(tm.name), tm.name, tm.id",
@@ -624,8 +965,7 @@ function saTypeQuery($key, $type, $term) {
         case 'qtl_exp':
             return array(
                 'select' => "q.id, q.name, q.mapping_panel, q.marker_summary",
-                'count_from' => "INNER JOIN mgdb.qtl_exp q ON q.id=m.id",
-                'from' => "INNER JOIN mgdb.qtl_exp q ON q.id=m.id",
+                'record' => "INNER JOIN mgdb.qtl_exp q ON q.id=m.id",
                 'order' => "CASE WHEN lower(q.name)=:exact THEN 0 ELSE 1 END, q.name, q.id",
                 'params' => array(':exact' => $lower),
             );
@@ -633,9 +973,8 @@ function saTypeQuery($key, $type, $term) {
         case 'map':
             return array(
                 'select' => "mp.id, mp.name, lg.name AS chromosome, mp.source",
-                'count_from' => "INNER JOIN mgdb.map mp ON mp.id=m.id",
-                'from' => "INNER JOIN mgdb.map mp ON mp.id=m.id
-                           LEFT JOIN mgdb.linkage_group lg ON lg.id=mp.linkage_group",
+                'record' => "INNER JOIN mgdb.map mp ON mp.id=m.id",
+                'display' => "LEFT JOIN mgdb.linkage_group lg ON lg.id=mp.linkage_group",
                 'order' => "CASE WHEN lower(mp.name)=:exact THEN 0
                                  WHEN lower(mp.name) LIKE :prefix THEN 1 ELSE 2 END,
                             mp.name, mp.id",
@@ -645,8 +984,7 @@ function saTypeQuery($key, $type, $term) {
         case 'person':
             return array(
                 'select' => "pe.id, pe.name, pe.institution, pe.country, pe.city, pe.state",
-                'count_from' => "INNER JOIN mgdb.person pe ON pe.id=m.id",
-                'from' => "INNER JOIN mgdb.person pe ON pe.id=m.id",
+                'record' => "INNER JOIN mgdb.person pe ON pe.id=m.id",
                 'order' => "CASE WHEN lower(pe.name)=:exact THEN 0
                                  WHEN lower(pe.name) LIKE :prefix THEN 1 ELSE 2 END,
                             pe.name, pe.id",
@@ -656,8 +994,7 @@ function saTypeQuery($key, $type, $term) {
         case 'gene_product':
             return array(
                 'select' => "gp.id, gp.name",
-                'count_from' => "INNER JOIN mgdb.gene_product gp ON gp.id=m.id",
-                'from' => "INNER JOIN mgdb.gene_product gp ON gp.id=m.id",
+                'record' => "INNER JOIN mgdb.gene_product gp ON gp.id=m.id",
                 'order' => "CASE WHEN lower(gp.name)=:exact THEN 0
                                  WHEN lower(gp.name) LIKE :prefix THEN 1 ELSE 2 END,
                             length(gp.name), gp.name, gp.id",
@@ -667,38 +1004,54 @@ function saTypeQuery($key, $type, $term) {
         case 'recomb':
             return array(
                 'select' => "rc.id, rc.name",
-                'count_from' => "INNER JOIN mgdb.recomb rc ON rc.id=m.id",
-                'from' => "INNER JOIN mgdb.recomb rc ON rc.id=m.id",
+                'record' => "INNER JOIN mgdb.recomb rc ON rc.id=m.id",
                 'order' => "rc.name, rc.id",
             );
 
+        /* mgdb.primer is the one record table that is not keyed by MaizeGDB
+           id: 331,140 rows over 307,930 ids, 21,693 of which carry more than
+           one row, identical but for auto_num. A plain join therefore listed
+           the same primer twice and counted it twice — "2" counted 60,372 and
+           listed 62,690. The lateral takes one row per record, which is what a
+           card is; index_primer_id makes it a lookup. */
         case 'primer':
             return array(
-                'select' => "pr.id, pr.name",
-                'count_from' => "INNER JOIN mgdb.primer pr ON pr.id=m.id",
-                'from' => "INNER JOIN mgdb.primer pr ON pr.id=m.id",
-                'order' => "CASE WHEN lower(pr.name)=:exact THEN 0 ELSE 1 END, length(pr.name), pr.name, pr.id",
+                'select' => "m.id, pr.name",
+                'record' => "INNER JOIN LATERAL (SELECT p.name FROM mgdb.primer p
+                                                  WHERE p.id=m.id
+                                                  ORDER BY p.auto_num LIMIT 1) pr ON true",
+                'order' => "CASE WHEN lower(pr.name)=:exact THEN 0 ELSE 1 END, length(pr.name), pr.name, m.id",
                 'params' => array(':exact' => $lower),
             );
 
         case 'species':
             return array(
                 'select' => "sp.id, sp.species AS name",
-                'count_from' => "INNER JOIN mgdb.species sp ON sp.id=m.id",
-                'from' => "INNER JOIN mgdb.species sp ON sp.id=m.id",
+                'record' => "INNER JOIN mgdb.species sp ON sp.id=m.id",
                 'order' => "sp.species, sp.id",
             );
 
         case 'journal':
             return array(
                 'select' => "j.id, j.name",
-                'count_from' => "INNER JOIN mgdb.journal j ON j.id=m.id",
-                'from' => "INNER JOIN mgdb.journal j ON j.id=m.id",
+                'record' => "INNER JOIN mgdb.journal j ON j.id=m.id",
                 'order' => "CASE WHEN lower(j.name)=:exact THEN 0 ELSE 1 END, j.name, j.id",
                 'params' => array(':exact' => $lower),
             );
     }
     return null;
+}
+
+/* The record join plus the type's own predicate: the definition of "a record
+   of this type that matched". Everything that counts or lists rows starts
+   here, which is what keeps a rail count and a section total the same number. */
+function saRecordJoin($shape) {
+    return $shape['record'] . (isset($shape['filter']) ? ' ' . $shape['filter'] : '');
+}
+
+/* The same, plus the columns-only LEFT JOINs. */
+function saDisplayJoin($shape) {
+    return saRecordJoin($shape) . (isset($shape['display']) ? ' ' . $shape['display'] : '');
 }
 
 /*
@@ -728,22 +1081,44 @@ function saTypeRows($DBConn, $term, $key, $page, $pageSize, $includeComments, $k
         return array('rows' => array(), 'total' => 0);
     }
 
-    $params = array();
-    $matched = saMatchedIdsSql($type, $term, $includeComments, $params);
+    /* The matches are already resolved to this type, so the record join is
+       only needed for the columns the ordering reads — the membership test and
+       the type predicate have both been applied. */
+    if (saTypeReady($key)) {
+        $params = array(':type_key' => $key);
+        $matched = "SELECT id FROM sa_type WHERE type_key=:type_key";
+        $narrow = $shape['record'];
+    }
+    else {
+        $params = array();
+        $matched = saMatchedIdsSql($type, $term, $includeComments, $params);
+        if (!saMatchReady()) {
+            $narrow = "INNER JOIN mgdb.id_num idn ON idn.id=m.id AND idn.curation_lvl=0 "
+                    . saRecordJoin($shape);
+        }
+        else {
+            $narrow = saRecordJoin($shape);
+        }
+    }
 
-    /* The count joins only the record table — the display joins add columns,
-       never rows, so they cannot change the total and are not worth paying for
-       on a query whose whole job is to return one number. */
+    /* The count joins only what decides membership — the display joins add
+       columns, never rows, so they cannot change the total and are not worth
+       paying for on a query whose whole job is to return one number. */
     if ($knownTotal !== null) {
         $total = (int) $knownTotal;
     }
+    elseif (saTypeReady($key)) {
+        /* Membership was decided when the table was built, so the count is the
+           table. Re-joining the record table here would count rows rather than
+           records, which is the mistake this whole file exists to stop. */
+        $sth = $DBConn->prepare("SELECT count(*) AS n FROM sa_type WHERE type_key=:type_key");
+        $sth->execute(array(':type_key' => $key));
+        $countRow = $sth->fetch(PDO::FETCH_ASSOC);
+        $total = $countRow ? (int) $countRow['n'] : 0;
+    }
     else {
-        $countSql = "
-            WITH m AS ($matched)
-            SELECT count(*) AS n
-            FROM m
-              INNER JOIN mgdb.id_num idn ON idn.id=m.id AND idn.curation_lvl=0
-              " . $shape['count_from'];
+        $countSql = "WITH m AS (SELECT DISTINCT id FROM ($matched) ids)
+                     SELECT count(*) AS n FROM m $narrow";
         $sth = $DBConn->prepare($countSql);
         $sth->execute($params);
         $countRow = $sth->fetch(PDO::FETCH_ASSOC);
@@ -777,14 +1152,13 @@ function saTypeRows($DBConn, $term, $key, $page, $pageSize, $includeComments, $k
         page AS (
           SELECT m.id
           FROM matched m
-            INNER JOIN mgdb.id_num idn ON idn.id=m.id AND idn.curation_lvl=0
-            " . $shape['count_from'] . "
+            $narrow
           ORDER BY " . $shape['order'] . "
           LIMIT " . (int) $pageSize . " OFFSET " . (int) $offset . "
         )
         SELECT " . $shape['select'] . "
         FROM page m
-          " . $shape['from'] . "
+          " . saDisplayJoin($shape) . "
         ORDER BY " . $shape['order'];
 
     $sth = $DBConn->prepare($pageSql);
@@ -832,86 +1206,134 @@ function saPrefixRanges($column, $prefix, &$params, $tag) {
     return implode(' OR ', $clauses);
 }
 
-/* Loci matched by name, full name, plant-wide name, or curated synonym. */
-function saLocusNameMatches($DBConn, $term, $limit = 60) {
+/*
+ * Genes: named loci that carry gene models, plus, when the query looks like a
+ * model identifier, the identifiers themselves.
+ *
+ * The two halves are counted and paged as one list, symbols first. What
+ * changed here, and why:
+ *
+ *   - The symbol half used to be whatever a capped name lookup returned under
+ *     its LIMIT 60, and the count was `count($genes)` — the size of that
+ *     fetch, not the size of the result. "gl" matches 457 named genes and
+ *     reported at most 60.
+ *   - It also matched by name only, so the 11,504 genes that "protein" finds
+ *     through a synonym or a full name appeared in neither section: Genes
+ *     never looked for them and Loci excludes anything with a gene model.
+ *   - The identifier half reported the size of its own LIMIT 200 fetch.
+ *     "zm00001eb" matches 44,303 model identifiers and reported 250.
+ *
+ * Both counts are now real. The identifier count is one index-only scan of
+ * gene_model_i5 — 0.2 ms for a whole identifier, 74 ms for a bare assembly
+ * prefix — because it counts `DISTINCT lower(gene_name)`, which is what that
+ * index stores; counting `DISTINCT gene_name` reads the heap and costs 283 ms.
+ */
+function saGeneIdentifierRange($term) {
+    if (!preg_match('/^(zm|grm|ac|zeammb73)/i', $term)) {
+        return null;
+    }
     $lower = strtolower($term);
-    $params = array();
-    $sql = "
-        WITH hits AS (
-          (SELECT id FROM mgdb.locus WHERE " . saPrefixRanges('name', $term, $params, 'n') . " LIMIT 40)
-          UNION
-          (SELECT id FROM mgdb.locus WHERE " . saPrefixRanges('full_name', $term, $params, 'f') . " LIMIT 40)
-          UNION
-          (SELECT id FROM mgdb.locus WHERE " . saPrefixRanges('plant_wide_gene_name', $term, $params, 'p') . " LIMIT 40)
-          UNION
-          (SELECT s.id FROM mgdb.synonyms s
-            WHERE lower(s.synonyms) >= :syn_start AND lower(s.synonyms) < :syn_end LIMIT 40)
-        )
-        SELECT l.id, l.name, l.full_name, l.plant_wide_gene_name,
-          (SELECT lg.name FROM mgdb.linkage_group lg WHERE lg.id=l.linkage_group) AS chromosome,
-          CASE WHEN lower(l.name)=:exact OR lower(l.full_name)=:exact
-                    OR lower(l.plant_wide_gene_name)=:exact THEN 0
-               WHEN lower(l.name) LIKE :prefix THEN 1
-               WHEN lower(l.full_name) LIKE :prefix
-                    OR lower(l.plant_wide_gene_name) LIKE :prefix THEN 2
-               ELSE 3 END AS match_rank
-        FROM hits h
-          INNER JOIN mgdb.locus l ON l.id=h.id
-        WHERE NOT EXISTS (SELECT 1 FROM mgdb.id_num idn WHERE idn.id=l.id AND idn.curation_lvl<>0)
-          AND EXISTS     (SELECT 1 FROM mgdb.id_num idn WHERE idn.id=l.id)
-        ORDER BY match_rank,
-          LEAST(
-            CASE WHEN lower(l.name) LIKE :prefix THEN length(l.name) ELSE 9999 END,
-            CASE WHEN lower(l.full_name) LIKE :prefix THEN length(l.full_name) ELSE 9999 END,
-            CASE WHEN lower(l.plant_wide_gene_name) LIKE :prefix THEN length(l.plant_wide_gene_name) ELSE 9999 END
-          ),
-          length(l.name), l.id
-        LIMIT " . (int) $limit;
-    $params[':syn_start'] = $lower;
-    $params[':syn_end'] = saPrefixEnd($lower);
-    $params[':exact'] = $lower;
-    $params[':prefix'] = $lower . '%';
-    $sth = $DBConn->prepare($sql);
-    $sth->execute($params);
-    return $sth->fetchAll(PDO::FETCH_ASSOC);
+    return array(':start' => $lower, ':end' => saPrefixEnd($lower));
 }
 
-/*
- * A gene row is a named locus with the models annotated for it. A query that
- * looks like a model identifier is answered from chado.gene_model directly,
- * because those names are not attached to any locus in the general case.
- */
 function saGeneRows($DBConn, $term, $page, $pageSize) {
     $lower = strtolower($term);
-    $identifierQuery = preg_match('/^(zm|grm|ac|zeammb73)/i', $term) ? true : false;
+    $range = saGeneIdentifierRange($term);
 
-    $genes = array();
+    /* ---- how many of each ---- */
 
-    $loci = saLocusNameMatches($DBConn, $term, 60);
-    if ($loci) {
-        $ids = array_map('intval', array_column($loci, 'id'));
+    $symbolTotal = 0;
+    $symbolSql = null;
+    $symbolParams = array();
+    if (saTypeReady('gene')) {
+        $symbolSql = "SELECT id FROM sa_type WHERE type_key='gene'";
+        $row = $DBConn->query("SELECT count(*) AS n FROM sa_type WHERE type_key='gene'")
+                      ->fetch(PDO::FETCH_ASSOC);
+        $symbolTotal = $row ? (int) $row['n'] : 0;
+    }
+    else {
+        /* No temp table: match inline, same definition. */
+        $registry = saTypeRegistry();
+        $ids = saLocusMatchIdsSql($term, false, $symbolParams, 'g');
+        $symbolSql = "SELECT DISTINCT ids.id FROM ($ids) ids
+                      WHERE EXISTS (SELECT 1 FROM mgdb.id_num i
+                                     WHERE i.id=ids.id AND i.curation_lvl=0)
+                        AND EXISTS (SELECT 1 FROM chado.gene_model gm
+                                     WHERE gm.locus_id=ids.id AND gm.is_obsolete IS NOT TRUE)";
+        $sth = $DBConn->prepare("SELECT count(*) AS n FROM ($symbolSql) t");
+        $sth->execute($symbolParams);
+        $row = $sth->fetch(PDO::FETCH_ASSOC);
+        $symbolTotal = $row ? (int) $row['n'] : 0;
+    }
+
+    $identifierTotal = 0;
+    if ($range) {
         $sth = $DBConn->prepare("
-            SELECT gm.locus_id,
-                   count(DISTINCT gm.gene_name) AS model_count,
-                   (array_agg(DISTINCT gm.gene_name ORDER BY gm.gene_name))[1:4] AS models
-            FROM chado.gene_model gm
-            WHERE gm.is_obsolete IS NOT TRUE AND gm.locus_id IN (" . implode(',', $ids) . ")
-            GROUP BY gm.locus_id");
-        $sth->execute();
+            SELECT count(*) AS n FROM (
+              SELECT DISTINCT lower(gene_name) FROM chado.gene_model
+              WHERE is_obsolete IS NOT TRUE
+                AND lower(gene_name) >= :start AND lower(gene_name) < :end) t");
+        $sth->execute($range);
+        $row = $sth->fetch(PDO::FETCH_ASSOC);
+        $identifierTotal = $row ? (int) $row['n'] : 0;
+    }
+
+    $total = $symbolTotal + $identifierTotal;
+    if (!$total) {
+        return array('rows' => array(), 'total' => 0);
+    }
+
+    /* ---- the page, which may span both halves ---- */
+
+    $offset = ($page - 1) * $pageSize;
+    $rows = array();
+
+    $symbolWanted = 0;
+    if ($offset < $symbolTotal) {
+        $symbolWanted = min($pageSize, $symbolTotal - $offset);
+        $params = $symbolParams;
+        $params[':exact'] = $lower;
+        $params[':prefix'] = $lower . '%';
+        $sth = $DBConn->prepare("
+            WITH page AS (
+              SELECT m.id
+              FROM ($symbolSql) m
+                INNER JOIN mgdb.locus l ON l.id=m.id
+              ORDER BY " . saLocusOrder() . "
+              LIMIT " . (int) $symbolWanted . " OFFSET " . (int) $offset . "
+            )
+            SELECT l.id, l.name, l.full_name, l.plant_wide_gene_name,
+                   lg.name AS chromosome,
+                   CASE WHEN lower(l.name)=:exact OR lower(l.full_name)=:exact
+                             OR lower(l.plant_wide_gene_name)=:exact THEN 1 ELSE 0 END AS is_exact
+            FROM page m
+              INNER JOIN mgdb.locus l ON l.id=m.id
+              LEFT JOIN mgdb.linkage_group lg ON lg.id=l.linkage_group
+            ORDER BY " . saLocusOrder());
+        $sth->execute($params);
+        $loci = $sth->fetchAll(PDO::FETCH_ASSOC);
+
+        /* Model names for this page only — a locus can carry hundreds across
+           assemblies, and joining them into the page query multiplies it. */
         $models = array();
-        foreach ($sth->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            $models[(string) $row['locus_id']] = $row;
+        if ($loci) {
+            $ids = array_map('intval', array_column($loci, 'id'));
+            $sth = $DBConn->prepare("
+                SELECT gm.locus_id,
+                       count(DISTINCT gm.gene_name) AS model_count,
+                       (array_agg(DISTINCT gm.gene_name ORDER BY gm.gene_name))[1:4] AS models
+                FROM chado.gene_model gm
+                WHERE gm.is_obsolete IS NOT TRUE AND gm.locus_id IN (" . implode(',', $ids) . ")
+                GROUP BY gm.locus_id");
+            $sth->execute();
+            foreach ($sth->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                $models[(string) $row['locus_id']] = $row;
+            }
         }
 
         foreach ($loci as $locus) {
-            $id = (string) $locus['id'];
-            $model = isset($models[$id]) ? $models[$id] : null;
-            /* No model, no gene: the Loci section takes it, and its query
-               excludes exactly the loci this one keeps. */
-            if (!$model) {
-                continue;
-            }
-            $genes[] = array(
+            $model = isset($models[(string) $locus['id']]) ? $models[(string) $locus['id']] : null;
+            $rows[] = array(
                 'id' => (int) $locus['id'],
                 'name' => $locus['name'],
                 'full_name' => $locus['full_name'],
@@ -920,27 +1342,29 @@ function saGeneRows($DBConn, $term, $page, $pageSize) {
                 'model_count' => $model ? (int) $model['model_count'] : 0,
                 'models' => $model ? saParsePgArray($model['models']) : array(),
                 'url' => '/gene_center/gene/' . rawurlencode($locus['name']),
-                'exact' => ((int) $locus['match_rank'] === 0),
+                'exact' => ((int) $locus['is_exact'] === 1),
             );
         }
     }
 
-    /* Model identifiers: only worth a query when the term looks like one, since
-       the indexed range scan is on lower(gene_name). */
-    if ($identifierQuery) {
+    /* Identifiers fill whatever the symbols left of the page. */
+    $identifierWanted = $pageSize - count($rows);
+    if ($range && $identifierWanted > 0) {
+        $identifierOffset = max(0, $offset - $symbolTotal);
         $sth = $DBConn->prepare("
-            SELECT DISTINCT ON (gene_name) gene_name, locus_name, locus_id, assembly_version, version
+            SELECT DISTINCT ON (lower(gene_name))
+                   gene_name, locus_name, locus_id, assembly_version, version
             FROM chado.gene_model
             WHERE is_obsolete IS NOT TRUE
               AND lower(gene_name) >= :start AND lower(gene_name) < :end
-            ORDER BY gene_name,
+            ORDER BY lower(gene_name),
               CASE WHEN assembly_version ILIKE '%NAM-5.0%' THEN 0
                    WHEN assembly_version ILIKE '%RefGen_v4%' THEN 1 ELSE 2 END,
               version DESC
-            LIMIT 200");
-        $sth->execute(array(':start' => $lower, ':end' => saPrefixEnd($lower)));
+            LIMIT " . (int) $identifierWanted . " OFFSET " . (int) $identifierOffset);
+        $sth->execute($range);
         foreach ($sth->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            $genes[] = array(
+            $rows[] = array(
                 'id' => null,
                 'name' => $row['gene_name'],
                 'full_name' => $row['locus_name'] ? 'Locus ' . $row['locus_name'] : '',
@@ -955,9 +1379,7 @@ function saGeneRows($DBConn, $term, $page, $pageSize) {
         }
     }
 
-    $total = count($genes);
-    $offset = ($page - 1) * $pageSize;
-    return array('rows' => array_slice($genes, $offset, $pageSize), 'total' => $total);
+    return array('rows' => $rows, 'total' => $total);
 }
 
 /* array_agg returns a Postgres array literal over PDO; unpack the simple case. */
@@ -986,18 +1408,24 @@ function saGenomeRows($DBConn, $term, $page, $pageSize) {
        Zm-B73-REFERENCE-NAM-5.0 came back ninth of nine for "B73": last in its
        tier because "Z" is last in the alphabet.
 
-       Nine rows for eight assemblies: this table is one row per assembly per
-       annotation set, and Zm-B73-REFERENCE-GRAMENE-4.0 carries two \(NCBI 101
-       and Zm00001d.2\). Both are real records and both are listed. */
+       One row per assembly, not one per annotation set. chado.genome_metadata
+       holds a row for each, so Zm-B73-REFERENCE-GRAMENE-4.0 appears twice
+       \(NCBI 101 and Zm00001d.2\) -- and both rows carried the same name and
+       the same /genome/assembly/<name> link, so "B73" listed nine cards for
+       eight assemblies and counted nine. The annotations are what differ, so
+       they are gathered onto the one card. */
     $sth = $DBConn->prepare("
-        SELECT assembly_name, project, annotation,
-               CASE WHEN assembly_name = :representative THEN 0
-                    WHEN lower(assembly_name) = :exact THEN 1
-                    WHEN lower(assembly_name) LIKE :prefix THEN 2
-                    WHEN assembly_name ILIKE '%REFERENCE%' THEN 3
-                    ELSE 4 END AS assembly_rank
+        SELECT assembly_name,
+               min(project) AS project,
+               string_agg(DISTINCT annotation, ', ' ORDER BY annotation) AS annotation,
+               min(CASE WHEN assembly_name = :representative THEN 0
+                        WHEN lower(assembly_name) = :exact THEN 1
+                        WHEN lower(assembly_name) LIKE :prefix THEN 2
+                        WHEN assembly_name ILIKE '%REFERENCE%' THEN 3
+                        ELSE 4 END) AS assembly_rank
         FROM chado.genome_metadata
         WHERE assembly_name ILIKE :contains OR project ILIKE :contains OR annotation ILIKE :contains
+        GROUP BY assembly_name
         ORDER BY assembly_rank, assembly_name");
     $sth->execute(array(':contains' => '%' . $term . '%', ':exact' => $lower, ':prefix' => $lower . '%',
                         ':representative' => SA_REPRESENTATIVE_ASSEMBLY));
@@ -1025,8 +1453,19 @@ function saGenomeRows($DBConn, $term, $page, $pageSize) {
 function saShapeRows($key, $rows, $type) {
     $url = isset($type['url']) ? $type['url'] : '';
     $shaped = array();
+    $seen = array();
 
     foreach ($rows as $row) {
+        /* One card per record, whatever the query returned. Every display join
+           is written to yield one row per record, but a card is what the
+           reader counts, so the guarantee is enforced here too rather than
+           resting on the shape of eleven tables staying as it is today. */
+        if (isset($row['id']) && $row['id'] !== null) {
+            if (isset($seen[(string) $row['id']])) {
+                continue;
+            }
+            $seen[(string) $row['id']] = true;
+        }
         $item = array('id' => isset($row['id']) ? (int) $row['id'] : null);
         $item['url'] = $url . (isset($row['id']) ? rawurlencode($row['id']) : '');
 

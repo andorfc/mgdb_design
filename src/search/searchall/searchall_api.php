@@ -68,18 +68,50 @@ function saRespond($payload, $status = 200) {
     exit;
 }
 
+/* The rail: every type that has records, in reading order, with the count its
+   section will show. Both actions can need it — a link straight to one type
+   still has to draw the list of the others. */
+function saRail($DBConn, $term, $includeComments, $registry, $genes = null, $genomes = null) {
+    $counts = saCountsByType($DBConn, $term, $includeComments);
+    if ($genes === null)   { $genes = saGeneRows($DBConn, $term, 1, 1); }
+    if ($genomes === null) { $genomes = saGenomeRows($DBConn, $term, 1, 1); }
+    $counts['gene'] = (int) $genes['total'];
+    $counts['genome'] = (int) $genomes['total'];
+
+    $types = array();
+    foreach (saTypeOrder() as $key) {
+        if (empty($counts[$key])) {
+            continue;
+        }
+        $types[] = array(
+            'key' => $key,
+            'label' => $registry[$key]['label'],
+            'cat' => $registry[$key]['cat'],
+            'view' => $registry[$key]['view'],
+            'blurb' => $registry[$key]['blurb'],
+            'count' => (int) $counts[$key],
+        );
+    }
+    return $types;
+}
+
 $term = saCleanTerm(saParam('q'));
 $action = saParam('action', 'summary');
 $includeComments = saParam('comments') === '1';
 $started = microtime(true);
 
-if ($term === '' || saTsQuery($term) === '') {
+if ($term === '' || saTsQuery($term) === '' || !saTermIsSearchable($term)) {
+    /* Answered without touching the database. A one-character term is the case
+       that matters: it used to run for 22 seconds and end in a 503. */
     saRespond(array(
         'ok' => true,
         'query' => array('term' => $term, 'comments' => $includeComments),
         'types' => array(),
         'sections' => array(),
         'total' => 0,
+        'notice' => ($term !== '' && !saTermIsSearchable($term))
+            ? 'Search terms need at least two letters or digits in a word.'
+            : '',
         'elapsed_ms' => 0,
     ));
 }
@@ -95,6 +127,23 @@ try {
        set. Falls back to matching inline if the temp table cannot be built. */
     saBuildMatchTable($DBConn, $term, $includeComments);
 
+    /* Refused for matching too much, which is a different thing from failing to
+       match — see SA_MATCH_CEILING. Answered here, before any of the work that
+       would have taken the rest of the minute. */
+    if (saMatchOverflow()) {
+        saRespond(array(
+            'ok' => true,
+            'query' => array('term' => $term, 'comments' => $includeComments),
+            'types' => array(),
+            'sections' => array(),
+            'rows' => array(),
+            'total' => 0,
+            'notice' => '“' . $term . '” matches more of the database than this page '
+                      . 'can summarize. Add another word, or search a data hub directly.',
+            'elapsed_ms' => (int) round((microtime(true) - $started) * 1000),
+        ));
+    }
+
     $registry = saTypeRegistry();
 
     if ($action === 'type') {
@@ -102,12 +151,21 @@ try {
         if (!isset($registry[$key])) {
             saRespond(array('ok' => false, 'message' => 'Unknown data type.'), 400);
         }
+        /* `rail=1` asks for the type list as well. A reader arriving on a link
+           to one type needs both, and the two used to be two requests, each
+           paying for its own scan of the text index — 560 ms of it twice on
+           "b73". Resolving every type costs about as much as resolving one and
+           then doing it again. A click from the overview does not send it: the
+           rail is already on the page. */
+        $withRail = saParam('rail') === '1';
+        saBuildTypeTable($DBConn, $term, $includeComments,
+                         $withRail ? null : array($key));
         $page = saIntParam('page', 1, 1, MAX_PAGE);
         $result = saTypeRows($DBConn, $term, $key, $page, PAGE_SIZE, $includeComments);
         $total = (int) $result['total'];
         $pageCount = $total ? (int) ceil($total / PAGE_SIZE) : 0;
 
-        saRespond(array(
+        $payload = array(
             'ok' => true,
             'query' => array('term' => $term, 'comments' => $includeComments),
             'type' => array(
@@ -123,40 +181,35 @@ try {
             'page_count' => $pageCount,
             'capped' => $pageCount > MAX_PAGE,
             'rows' => $result['rows'],
-            'elapsed_ms' => (int) round((microtime(true) - $started) * 1000),
-        ));
+        );
+        if ($withRail) {
+            $payload['types'] = saRail($DBConn, $term, $includeComments, $registry,
+                                       $key === 'gene' ? $result : null);
+            $payload['grand_total'] = 0;
+            foreach ($payload['types'] as $type) {
+                $payload['grand_total'] += $type['count'];
+            }
+        }
+        $payload['elapsed_ms'] = (int) round((microtime(true) - $started) * 1000);
+        saRespond($payload);
     }
 
     /* ---- summary ---- */
 
-    $counts = saCountsByType($DBConn, $term, $includeComments);
+    /* Resolve every match to the type it will be shown as, once. The counts
+       and the section rows then both read that one answer, which is what makes
+       a rail count the number of records its section can list. */
+    saBuildTypeTable($DBConn, $term, $includeComments);
 
-    /* Genes and genomes are not in all_text_search, so their counts come from
-       their own handlers rather than from the grouped query. */
+    /* Genes carry a second half the resolved table cannot hold — model
+       identifiers live in chado.gene_model and have no MaizeGDB id — and
+       genomes are not in all_text_search at all, so both are counted by their
+       own handler. Their first rows are wanted here anyway, so they are
+       fetched once and handed to the rail rather than counted twice. */
     $genes = saGeneRows($DBConn, $term, 1, SUMMARY_ROWS);
-    if ($genes['total'] > 0) {
-        $counts['gene'] = $genes['total'];
-    }
     $genomes = saGenomeRows($DBConn, $term, 1, SUMMARY_ROWS);
-    if ($genomes['total'] > 0) {
-        $counts['genome'] = $genomes['total'];
-    }
-
+    $types = saRail($DBConn, $term, $includeComments, $registry, $genes, $genomes);
     $order = saTypeOrder();
-    $types = array();
-    foreach ($order as $key) {
-        if (empty($counts[$key])) {
-            continue;
-        }
-        $types[] = array(
-            'key' => $key,
-            'label' => $registry[$key]['label'],
-            'cat' => $registry[$key]['cat'],
-            'view' => $registry[$key]['view'],
-            'blurb' => $registry[$key]['blurb'],
-            'count' => (int) $counts[$key],
-        );
-    }
 
     /* Sections lead with the types most likely to be the answer: an exact gene
        or genome hit first, then whatever has the most records. */

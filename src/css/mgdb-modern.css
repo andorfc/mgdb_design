@@ -859,6 +859,10 @@ body.mgdb-modern {
   overscroll-behavior: contain;
 }
 
+/* Empty until the count arrives from the results API, and empty for good when
+   it does not — so it must not reserve space or draw anything of its own. */
+.mgdb-suggestions-count { color: var(--mgdb-muted); font-weight: 600; }
+
 .mgdb-suggestions-heading {
   display: flex;
   gap: var(--mgdb-space-3);
@@ -872,8 +876,6 @@ body.mgdb-modern {
   font-size: var(--mgdb-text-sm);
   font-weight: 800;
 }
-
-.mgdb-suggestions-count { color: var(--mgdb-muted); font-weight: 600; }
 
 /* Flex rather than a fixed grid: a row carries a leading data-type icon when
    the record has one and only two children when it does not. */

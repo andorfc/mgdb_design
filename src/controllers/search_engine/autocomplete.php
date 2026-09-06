@@ -85,7 +85,11 @@ function acFetchById($db, $sql, $ids) {
 function acDetailRows($db, $group, $ids) {
   switch ($group) {
     case 'locus':
-      return acFetchById($db, "SELECT id, name, full_name, plant_wide_gene_name FROM mgdb.locus WHERE id IN (__IDS__)", $ids);
+      return acFetchById($db, "SELECT id, name, full_name, plant_wide_gene_name,
+                                 EXISTS (SELECT 1 FROM chado.gene_model gm
+                                          WHERE gm.locus_id=mgdb.locus.id
+                                            AND gm.is_obsolete IS NOT TRUE) AS has_models
+                               FROM mgdb.locus WHERE id IN (__IDS__)", $ids);
     case 'stock':
       return acFetchById($db, "SELECT id, name, coop_id, pedigree, country FROM mgdb.stock WHERE id IN (__IDS__)", $ids);
     case 'probe':
@@ -170,6 +174,8 @@ function acLocusNameLookup($db, $query, $limit=24) {
         WHERE lower(s.synonyms) >= :syn_start AND lower(s.synonyms) < :syn_end LIMIT 12)
     )
     SELECT l.id, l.name, l.full_name, l.plant_wide_gene_name,
+      EXISTS (SELECT 1 FROM chado.gene_model gm
+               WHERE gm.locus_id=l.id AND gm.is_obsolete IS NOT TRUE) AS has_models,
       CASE WHEN lower(l.name)=:exact OR lower(l.full_name)=:exact
                 OR lower(l.plant_wide_gene_name)=:exact THEN 0
            WHEN lower(l.name) LIKE :prefix THEN 1
@@ -390,11 +396,10 @@ try {
           GROUP BY 1, 2
         ), ranked AS (
           SELECT id, group_name, match_rank,
-                 ROW_NUMBER() OVER (PARTITION BY group_name ORDER BY match_rank, id) AS group_rank,
-                 COUNT(*) OVER (PARTITION BY group_name) AS group_count
+                 ROW_NUMBER() OVER (PARTITION BY group_name ORDER BY match_rank, id) AS group_rank
           FROM direct_matches
         )
-        SELECT id, group_name, match_rank, group_count
+        SELECT id, group_name, match_rank
         FROM ranked WHERE group_rank <= 4
         ORDER BY group_name, group_rank";
       $sth = $DBConn->prepare($sql);
@@ -415,6 +420,11 @@ try {
         foreach ($groupCandidates as $candidate) {
           $id = (string)$candidate['id'];
           if (!isset($details[$id])) continue;
+          /* A locus that carries gene models is a gene: it leads the Genes
+             group and /data_center/locus/<id> redirects to the gene page. The
+             results page splits the two the same way, so a record listed here
+             under Loci has to be a record listed there under Loci. */
+          if ($group === 'locus' && !empty($details[$id]['has_models'])) continue;
           $item = acRecordItem($group, $candidate, $details[$id], $groupMeta[$group]);
           if ($item) $items[] = $item;
         }
@@ -423,7 +433,6 @@ try {
             'key' => $group,
             'label' => $groupMeta[$group]['label'],
             'cat' => $group,
-            'total' => (int)$groupCandidates[0]['group_count'],
             'items' => $items,
           );
         }
@@ -524,7 +533,12 @@ try {
     $symbolItems = array();
     $seenSymbols = array();
     foreach ($locusMatches as $locus) {
-      if (!isset($locusHasModels[(string)$locus['id']])) continue;
+      /* mgdb.locus itself says whether the locus carries models. Reading it
+         off the gene-model query instead meant a locus whose models did not
+         make that query's LIMIT 12 was treated as having none, and it then
+         appeared under Loci — where the results page, which asks the same
+         question of every match, does not put it. */
+      if (empty($locus['has_models']) && !isset($locusHasModels[(string)$locus['id']])) continue;
       $symbol = trim((string)$locus['name']);
       if ($symbol === '' || isset($seenSymbols[strtolower($symbol)])) continue;
       $seenSymbols[strtolower($symbol)] = true;
@@ -564,9 +578,7 @@ try {
       if (count($symbolItems) + count($modelItems) >= 5) break;
     }
 
-    $items = array_merge($symbolItems, $modelItems);
-    $hasMoreGenes = count($items) > 4;
-    $items = array_slice($items, 0, 4);
+    $items = array_slice(array_merge($symbolItems, $modelItems), 0, 4);
 
     foreach ($items as $item) {
       if ($topHit !== null) break;
@@ -577,8 +589,7 @@ try {
     if ($items) {
       $groupsByKey['gene_model'] = array(
         'key' => 'gene_model', 'label' => $groupMeta['gene_model']['label'],
-        'cat' => 'gene_model', 'total' => count($items),
-        'has_more' => $hasMoreGenes, 'items' => $items,
+        'cat' => 'gene_model', 'items' => $items,
       );
     }
   }
@@ -600,6 +611,7 @@ try {
     $named = array();
     $seenUrls = $shown;
     foreach ($locusMatches as $locus) {
+      if (!empty($locus['has_models'])) continue;     // filed under Genes
       $item = acRecordItem('locus', $locus, $locus, $groupMeta['locus']);
       if (!$item || isset($seenUrls[$item['url']])) continue;
       $seenUrls[$item['url']] = true;
@@ -620,7 +632,6 @@ try {
     if ($merged) {
       $groupsByKey['locus'] = array(
         'key' => 'locus', 'label' => $groupMeta['locus']['label'], 'cat' => 'locus',
-        'total' => max($existing ? (int)$existing['total'] : 0, count($merged)),
         'items' => $merged,
       );
     }
@@ -670,7 +681,7 @@ try {
     if ($items) {
       $groupsByKey['genome'] = array(
         'key' => 'genome', 'label' => $groupMeta['genome']['label'], 'cat' => 'genome',
-        'total' => count($items), 'items' => $items,
+        'items' => $items,
       );
     }
   }
@@ -685,7 +696,7 @@ try {
         'Person'=>'/person/', 'Gene Product'=>'/data_center/gene_product/');
       if (isset($recordTypeToUrl[$row['record_type']])) {
         $groupsByKey['id'] = array(
-          'key'=>'id', 'label'=>$groupMeta['id']['label'], 'cat'=>'id', 'total'=>1,
+          'key'=>'id', 'label'=>$groupMeta['id']['label'], 'cat'=>'id',
           'items'=>array(array('label'=>'MaizeGDB ID ' . $row['id'], 'secondary'=>$row['record_type'],
             'url'=>$recordTypeToUrl[$row['record_type']] . rawurlencode($row['id']),
             'cat'=>'id', 'badge'=>'ID', 'exact'=>true)),

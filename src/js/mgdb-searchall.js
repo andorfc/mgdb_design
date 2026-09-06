@@ -353,8 +353,14 @@
   function renderOverview(data) {
     clear(resultsEl);
     if (!data.sections.length) {
-      renderEmpty('No records match “' + state.term + '”.',
-        'Try a shorter term, a gene symbol such as wx1, or turn on “Also search comments and notes”.');
+      /* The API answers a term it will not search with a notice saying why,
+         rather than the empty result that would suggest it looked. */
+      if (data.notice) {
+        renderEmpty(data.notice, 'A single letter or digit matches most of the database.');
+      } else {
+        renderEmpty('No records match “' + state.term + '”.',
+          'Try a shorter term, a gene symbol such as wx1, or turn on “Also search comments and notes”.');
+      }
       return;
     }
 
@@ -500,8 +506,14 @@
     showSkeleton();
     setStatus('Searching for ' + state.term + '.');
 
+    /* A type view with no rail yet — a link straight to one data type — asks
+       for both in one request. Fetching them separately made the server match
+       the term against the text index twice. A click from the overview leaves
+       `rail` off, because the rail is already on the page. */
+    var needsRail = state.type && !state.types.length;
     var url = state.type
-      ? apiUrl({ action: 'type', type: state.type, page: state.page })
+      ? apiUrl({ action: 'type', type: state.type, page: state.page,
+                 rail: needsRail ? '1' : '' })
       : apiUrl({ action: 'summary' });
 
     fetchJson(url).then(function (data) {
@@ -513,14 +525,23 @@
         return;
       }
 
+      /* A term the API refused to run says why, in both views. */
+      if (data.notice && !data.total) {
+        renderEmpty(data.notice, 'A term this broad matches most of the database.');
+        summaryEl.textContent = data.notice;
+        setStatus(data.notice);
+        return;
+      }
+
       if (state.type) {
         renderType(data);
         summaryEl.textContent = plural(data.total, 'record', 'records') + ' in ' +
           data.type.label.toLowerCase() + ' · ' + data.elapsed_ms + ' ms';
-        /* The rail comes from the overview; on a direct link to a type view
-           there is nothing to show in it until that arrives. */
-        if (!state.types.length) { loadRail(); }
-        else { renderRail(state.types, state.type); }
+        if (data.types && data.types.length) {
+          state.types = data.types;
+          state.total = data.grand_total || data.total;
+        }
+        renderRail(state.types, state.type);
         setStatus(plural(data.total, 'record', 'records') + ' found.');
       } else {
         state.types = data.types;
@@ -530,7 +551,7 @@
         summaryEl.textContent = data.total
           ? plural(data.total, 'record', 'records') + ' across ' +
             plural(data.types.length, 'data type', 'data types') + ' · ' + data.elapsed_ms + ' ms'
-          : 'No records found';
+          : (data.notice || 'No records found');
         setStatus(plural(data.total, 'record', 'records') + ' found.');
       }
     }).catch(function (error) {
@@ -538,20 +559,6 @@
       resultsEl.setAttribute('aria-busy', 'false');
       renderEmpty('The search could not be completed.', 'Reload the page to try again.');
     });
-  }
-
-  /* A type view opened from a link has no counts yet; fetch them so the rail
-     fills in without blocking the rows the reader came for. */
-  function loadRail() {
-    window.fetch(apiUrl({ action: 'summary' }), {
-      headers: { 'Accept': 'application/json' }, credentials: 'same-origin'
-    }).then(function (response) { return response.json(); })
-      .then(function (data) {
-        if (!data.ok) { return; }
-        state.types = data.types;
-        state.total = data.total;
-        renderRail(data.types, state.type);
-      }).catch(function () { /* the rail is navigation, not content */ });
   }
 
   function go(type, page) {

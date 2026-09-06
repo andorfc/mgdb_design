@@ -4694,6 +4694,161 @@ appear on two pages or on none; 6 pages deep on the four largest result sets
 returns 150 distinct rows and no duplicates. The temp-table path and the inline
 fallback were checked to return identical results across 132 type queries.
 
+### Every number on the page is the number of records behind it
+
+This was not true, and it is the property the rest of this section now exists to
+hold. The rail counted records one way — `GROUP BY term.name` over
+`id_num.type_term` — and each section listed them another, so the two disagreed
+whenever the definitions did:
+
+| Search | The rail said | The section listed | Why |
+| --- | ---: | ---: | --- |
+| `kn1` Loci | 2 | 1 | kn1 carries gene models, so it is shown as a gene |
+| `protein` Loci | 11,784 | 280 | the same, 11,504 times |
+| `maize` References | 17,392 | 17,613 | 221 references have `id_num.type_term = 0` |
+| `gl` Genes | 60 | 457 exist | the count was the size of a `LIMIT 60` fetch |
+| `zm00001eb` Genes | 250 | 44,303 exist | the same, for the identifier branch |
+| `2` primers | 60,372 | 62,690 | `mgdb.primer` has several rows per record |
+| `"Chao Wu"` References | 18 | 23 cards | one paper has six abstract rows |
+| `waxy1` Loci | 0 | 2 exist | the text index cannot see a locus's second name |
+
+The fix is structural: `saBuildTypeTable()` resolves every match to the one data
+type it will be displayed as, once, into a second temp table. A match is of a
+type when it appears under one of that type's text sources, has a row in that
+type's record table, and satisfies that type's own predicate — one definition,
+evaluated in one place. The counts are then `GROUP BY type_key` over that table
+and the sections read their rows out of it, so **a rail count is the number of
+records its section can list, by construction rather than by agreement.**
+
+Two consequences worth knowing:
+
+- **Genes and Loci are one set split by one test.** A locus carrying gene models
+  is a gene; a locus carrying none is a locus. They are resolved in a single
+  pass — `CASE WHEN EXISTS (gene models)` — so a record cannot land in both or,
+  as `protein`'s 11,504 did, in neither.
+- **Genes and Loci also match `mgdb.locus`'s name columns directly**, through
+  their btree indexes, because `all_text_search` runs a locus's three names
+  together into one token (`wx1gss1waxy1`) and the text index can only reach the
+  first. See AD-061 for that and for the three data defects the rest of this
+  works around.
+
+`tools/tests/searchall_consistency.php` is the proof. For each term it checks,
+for every type, that the rail count equals the count the section computes for
+itself, that the count comes back the same on the single-type path a deep link
+uses, that the first page holds the rows the total promises, and — for sets small
+enough to walk — that paging to the end returns exactly that many distinct
+records with no repeats. It takes a term list, or `--sample=N` to draw random
+real record names from eight tables, or `--comments`.
+
+```bash
+scp tools/tests/searchall_consistency.php development-server:/tmp/
+ssh development-server 'cd <webroot> && php /tmp/searchall_consistency.php --sample=250'
+```
+
+Over 1,500 terms and 4,000 type checks, it reports no failures. It has already
+caught two bugs that no amount of reading found: the `mgdb.primer` duplication
+above, and an `array_flip()` whose first key gets the value `0`, which made
+`saTypeReady()` false for exactly the type a deep link asks for — so every
+`?type=` link silently took the slower fallback, and for Loci that fallback
+cannot see name matches.
+
+### What it costs
+
+Resolving sixteen types honestly is more work than one grouped count, and the
+searches that were wrong were wrong because they were doing less. Measured
+end to end, before and after, on the development instance:
+
+| Term | Before | After | |
+| --- | ---: | ---: | --- |
+| `2` | 21,900 ms → 503 | 0 ms | refused: one character is not a search |
+| `zm` | 13,500 ms | 840 ms | refused: over the match ceiling |
+| `maize` | 941 ms | 303 ms | |
+| `b73` | 751 ms | 571 ms | |
+| `b73_x` | 1,782 ms | 309 ms | `_` now splits, as Postgres splits it |
+| `zm00001eb` | 216 ms | 112 ms | and the Genes count went 250 → 45,384 |
+| `mo17` | 188 ms | 181 ms | |
+| `kn1` | 48 ms | 57 ms | |
+| `waxy` | 24 ms | 33 ms | |
+| `protein` | 386 ms | 578 ms | it now finds the 11,530 genes it was losing |
+
+Three changes paid for most of it:
+
+1. **The curation filter moved into the match table.** `mgdb.id_num` is unique
+   on `id`, so `EXISTS (… AND curation_lvl = 0)` is one index probe per matched
+   record; doing it once at build time rather than as a join in seventeen
+   downstream queries took `b73` from 889 ms to 754 ms. Folding it into the
+   `CREATE` instead is slower — it then runs per matching *row* rather than per
+   matched record.
+2. **`saTsQuery()` splits on `_`.** It did not, and Postgres does: `b73_x:*`
+   reached the parser as the phrase query `'b73':* <-> 'x':*`, which has to
+   check lexeme positions after the index match. 1,576 ms against 35 ms for the
+   conjunction.
+3. **A deep link is one request, not two.** `action=type&rail=1` returns the
+   rows and the type list together; they were two requests, each paying for its
+   own scan of the text index.
+
+And one for the opt-in path: with **“Also search comments and notes”** on, every
+type's source list gains `memo`, which is 1.76 M rows belonging to records of
+every type — so restricting each type's match to its own sources narrows almost
+nothing and costs sixteen passes over a large table. That mode resolves types
+from one shared set of matched ids instead, letting the record join decide the
+type: `b73` with comments on went from 7.6 s to 5.8 s. It is still the slowest
+thing the search can be asked to do, and it is still a checkbox: `b73` with
+memos in scope reports 147,719 loci, one for every locus whose curator note
+mentions the reference line.
+
+### One character is not a search
+
+`2:*` matches 2,610,080 of the 8.8 M text rows. Resolving that many records to
+their types took **22 seconds and finished as a 503** — the 8-second
+per-statement timeout never fired, because no single statement was over it. The
+API now requires one word of two or more characters, which is the rule the
+header suggestions have always applied, and says so instead of timing out.
+
+### The suggestion dropdown gets its "N matches" from the results API
+
+It used to count for itself, over rows of a single `all_text_search`
+table_name rather than records of a data type across all of that type's
+sources, so its numbers never matched the page they led to: `kn1` offered "2
+matches" under Loci for a page that lists one, and `gl` offered "4 matches"
+under Genes for a page that lists 1,360.
+
+Counting the page's way inside the suggestion endpoint is not an option — that
+resolution costs 13.6 s on `zm` and 0.9 s on `pr`, on an endpoint that fires
+while someone is still typing. So the dropdown asks the results API instead.
+`mgdb-search.js` renders the suggestions immediately, then 400 ms after the last
+keystroke — one request per settled query, not per keystroke — fetches
+`searchall_api.php?action=summary` and fills each group's number in, matching
+group to type on the registry's `cat`. The counts are therefore the page's
+counts, the same values from the same query.
+
+Three properties worth keeping:
+
+- **The list never waits on the numbers.** They arrive after, because finding
+  four records to show is the cheap half and counting every data type honestly
+  is the expensive half. A count that never arrives leaves no gap — the span is
+  empty and stays empty, which is also what a term over the ceiling gets.
+- **It is a prefetch.** `searchall_api.php` is cached for a minute, so pressing
+  Enter usually lands on a response already made.
+- **The dropdown files records the way the page does.** A locus carrying gene
+  models appears under Genes there too, read from `mgdb.locus` rather than from
+  whatever happened to make that request's `LIMIT 12`.
+
+### A term can be too broad to answer
+
+Everything in this search is roughly linear in the size of the match, so a term
+matching most of the corpus takes most of a minute. `zm` — the prefix of every
+maize gene identifier — matches **458,536 text rows** and took **13.5 s**: 3.1 s
+to match, 6.2 s to resolve types, 3.4 s to count identifiers. No per-statement
+timeout fired, because no single statement was over one.
+
+`SA_MATCH_CEILING` is 300,000 matched rows, and the build stops one row past it,
+so an over-broad term is refused in 0.8 s with a line saying what to do about
+it. The number is set from measurement: the largest match that still returns a
+usable page is `b73` with comments included, at 245,764 rows and 5.8 s, and the
+largest without comments is `ac` at 84,754 and 2.6 s. Both still work; only the
+terms that were already unusable are refused.
+
 ## Redesign status
 
 How much of the site is on the design system is measured rather than tracked by

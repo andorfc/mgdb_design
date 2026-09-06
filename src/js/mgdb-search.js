@@ -30,6 +30,10 @@
 
   var MIN_QUERY_LENGTH = 2;
   var DEBOUNCE_MS = 220;
+  /* Counts wait a little longer than the list: one request per settled query
+     rather than one per keystroke, since counting every data type honestly is
+     the expensive half. */
+  var COUNT_DELAY_MS = 400;
   var CACHE_TTL_MS = 5 * 60 * 1000;
   var CACHE_MAX = 60;
   var RECENT_KEY = 'maizegdb_recent_searches_v1';
@@ -247,6 +251,9 @@
     var timer = null;
     var controller = null;
     var requestSeq = 0;
+    var countTimer = null;
+    var countController = null;
+    var counts = new Map();
     var activeIndex = -1;
     var optionEls = [];
     var cache = new Map();
@@ -486,10 +493,15 @@
         var title = document.createElement('span');
         title.textContent = group.label;
         var count = document.createElement('span');
-        var total = Number(group.total || group.items.length);
         count.className = 'mgdb-suggestions-count';
-        count.textContent = total.toLocaleString() + (group.has_more ? '+' : '') +
-          (total === 1 && !group.has_more ? ' match' : ' matches');
+        /* Filled in by fetchCounts() from the results API, which is the one
+           place that counts. The suggestion endpoint used to count for itself,
+           over rows of a single text source rather than records of a data type
+           across all of that type's sources, so its numbers never matched the
+           page they led to — "kn1" offered 2 loci for a page listing 1, "gl"
+           offered 4 genes for a page listing 1,360. `cat` is the key both
+           sides agree on. */
+        count.setAttribute('data-count-for', group.cat || group.key);
         heading.appendChild(title);
         heading.appendChild(count);
         /* The heading is decorative: aria-label on the group already names it. */
@@ -508,6 +520,59 @@
       open();
       setStatus(optionEls.length + ' search suggestion' + (optionEls.length === 1 ? '' : 's') +
         ' available. Use the up and down arrow keys to review them.');
+      applyCounts(query);
+    }
+
+    /* -- match counts --------------------------------------------------------
+       The numbers come from the results API rather than from the suggestion
+       endpoint, so the dropdown and the page it leads to cannot say different
+       things. They arrive after the list, because counting every data type
+       honestly costs more than finding four records to show, and the list is
+       what the reader is reading. A count that never arrives leaves no gap.
+
+       This request is also a prefetch: the results API is cached for a minute,
+       so pressing Enter usually lands on a response already made. */
+
+    function countsKey(query) { return query.toLowerCase(); }
+
+    function applyCounts(query) {
+      var known = counts.get(countsKey(query));
+      if (known) { paintCounts(known); return; }
+      window.clearTimeout(countTimer);
+      countTimer = window.setTimeout(function () { fetchCounts(query); }, COUNT_DELAY_MS);
+    }
+
+    function paintCounts(byCat) {
+      Array.prototype.forEach.call(
+        content.querySelectorAll('[data-count-for]'),
+        function (node) {
+          var total = byCat[node.getAttribute('data-count-for')];
+          if (total === undefined) { node.textContent = ''; return; }
+          node.textContent = Number(total).toLocaleString() +
+            (Number(total) === 1 ? ' match' : ' matches');
+        }
+      );
+    }
+
+    function fetchCounts(query) {
+      if (countController && countController.abort) { countController.abort(); }
+      countController = window.AbortController ? new window.AbortController() : null;
+      var options = { headers: { 'Accept': 'application/json' }, credentials: 'same-origin' };
+      if (countController) { options.signal = countController.signal; }
+
+      window.fetch('/search/searchall/searchall_api.php?action=summary&q=' +
+                   encodeURIComponent(query), options)
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+          if (!data || !data.ok) { return; }
+          var byCat = {};
+          (data.types || []).forEach(function (type) { byCat[type.cat] = type.count; });
+          counts.set(countsKey(query), byCat);
+          while (counts.size > CACHE_MAX) { counts.delete(counts.keys().next().value); }
+          /* Only paint if the reader is still looking at this term. */
+          if (input.value.trim().toLowerCase() === countsKey(query)) { paintCounts(byCat); }
+        })
+        .catch(function () { /* the list stands on its own without numbers */ });
     }
 
     /* -- request handling -- */
@@ -571,6 +636,7 @@
 
     function schedule(immediate) {
       window.clearTimeout(timer);
+      window.clearTimeout(countTimer);
       var query = input.value.trim();
 
       // Static page search is handled by an external engine; no suggestions.
