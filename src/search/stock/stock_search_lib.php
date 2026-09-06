@@ -70,9 +70,19 @@ function stockSimpleTokens($term) {
 
    A bare token is a substring match. A parenthesized token is a variation
    name, so it is matched as a whole word — delimited by spaces, terminated by
-   a semicolon, or sitting at the end of the value. Stock descriptions and
-   synonyms are genotype strings like "901C yg2 C1 sh1 bz1 wx1; A1 A2 C2 R1",
-   which is exactly the shape that rule is for. */
+   a semicolon, closed by an insertion, or sitting at the end of the value.
+   Stock descriptions and synonyms are genotype strings like
+   "901C yg2 C1 sh1 bz1 wx1; A1 A2 C2 R1", which is exactly the shape that
+   rule is for, and the rule is what keeps "(a1)" from also returning a10,
+   a1s and every accession containing "a1".
+
+   The "::" delimiter is not optional. Maize notation appends the insertion to
+   the allele, and for most mutable alleles that is the *only* way they are
+   written — the sole text containing "wx1-m1" is "923z wx1-m1::ds". 83% of
+   stock text rows carry a "::", across 536k distinct tokens, nearly all of
+   them "-m" alleles. Without these two patterns a parenthesized search for
+   any of them returns nothing at all: measured 11 of 12 real alleles at zero
+   before they were added, and the hub's own "(wx1-m1)" example among them. */
 function stockTokenPatterns($token, $caseSensitive) {
     $isVariation = (strlen($token) > 2 && $token[0] === '(' && substr($token, -1) === ')');
     if ($isVariation) {
@@ -83,7 +93,8 @@ function stockTokenPatterns($token, $caseSensitive) {
     if (!$isVariation) {
         return array('%' . $value . '%');
     }
-    return array('% ' . $value . ' %', '% ' . $value . '; %', '% ' . $value, $value . ' %');
+    return array('% ' . $value . ' %', '% ' . $value . '; %', '% ' . $value, $value . ' %',
+                 '% ' . $value . '::%', $value . '::%');
 }
 
 /* The searchable text for a stock lives in three tables totalling five million
