@@ -46,10 +46,23 @@ $$SYNTAX-LEVEL 2
         <span class="mgdb-metric-value">$(partial-count)</span>
         <span class="mgdb-small mgdb-muted">Design system inside the old shell</span>
       </div>
+      ;; "Legacy" counted three unlike things and called them all untouched.
+      ;; The card leads on the one that is actually outstanding, and the other
+      ;; two ride underneath it rather than inflating the headline.
       <div class="mgdb-metric mgdb-metric-quiet">
-        <span class="mgdb-label">Legacy</span>
-        <span class="mgdb-metric-value">$(legacy-count)</span>
-        <span class="mgdb-small mgdb-muted">Untouched</span>
+        <span class="mgdb-label">Still to convert</span>
+        <span class="mgdb-metric-value">$(outstanding-count)</span>
+        <span class="mgdb-small mgdb-muted">Legacy pages still reachable from the modern site</span>
+      </div>
+      <div class="mgdb-metric mgdb-metric-quiet">
+        <span class="mgdb-label">Part converted</span>
+        <span class="mgdb-metric-value">$(record-modern-count)</span>
+        <span class="mgdb-small mgdb-muted">Record page modern, search page not</span>
+      </div>
+      <div class="mgdb-metric mgdb-metric-quiet">
+        <span class="mgdb-label">Not linked</span>
+        <span class="mgdb-metric-value">$(orphaned-count)</span>
+        <span class="mgdb-small mgdb-muted">Nothing modern links to these &#8212; a retirement decision, not a rebuild</span>
       </div>
       <div class="mgdb-metric mgdb-metric-quiet">
         <span class="mgdb-label">Retired</span>

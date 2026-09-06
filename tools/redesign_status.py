@@ -171,6 +171,8 @@ class Scanner(object):
         self.pages = {}       # serving file -> page record
         self.links = {}       # normalized internal path -> count
         self.menu_links = set()
+        self.modern_links = {}   # path -> set of modern files that link to it
+        self.record_modern = set()  # routes already serving a modern ?id= record
         self.offsite = {}     # host -> {count, examples, linked_from}
         self.notes = []
         self._interceptors = None   # '/url' -> file a top-level route displaced
@@ -601,7 +603,37 @@ class Scanner(object):
                         continue
                     self.harvest(rel, read_text(full))
 
+    # A file is modern-owned when it is part of the redesign rather than the
+    # codebase it replaces. classify_source() answers for a PHP page, but the
+    # links a modern page hands a reader are just as often written in its .bau
+    # template or its own script, neither of which carries a shell marker, so
+    # the naming convention counts too. Getting this wrong in the generous
+    # direction is the safe one: it can only move a legacy route out of
+    # "orphaned" and into "still to convert", which is a page getting looked at
+    # rather than a page being dropped.
+    MODERN_FILE = re.compile(
+        r"(_modern\.php$"
+        r"|/mgdb[-_][a-z0-9_-]+\.(bau|js)$"
+        r"|_record_lib\.php$"
+        r"|^include/api/v1/"
+        r"|/megamenu_modern/)")
+
+    # These two enumerate every URL on the site, so a link from either says
+    # nothing about whether a page is reachable in the ordinary way.
+    LINK_ENUMERATORS = re.compile(r"(sitemap|redesign_status)")
+
+    def is_modern_file(self, rel, text):
+        if self.LINK_ENUMERATORS.search(rel):
+            return False
+        if self.MODERN_FILE.search(rel):
+            return True
+        if rel.endswith(".php"):
+            status, _ = classify_source(text)
+            return status == "modern"
+        return False
+
     def harvest(self, rel, text):
+        modern_source = self.is_modern_file(rel, text)
         in_menu = (
             "megamenu" in rel
             or "maizegdb_header" in rel
@@ -638,8 +670,88 @@ class Scanner(object):
                 continue
             path = path.rstrip("/") or "/"
             self.links[path] = self.links.get(path, 0) + 1
+            if modern_source:
+                self.modern_links.setdefault(path, set()).add(rel)
             if in_menu:
                 self.menu_links.add(path)
+
+    BODY_HREF = re.compile(r"""href=["']([^"'#][^"']*)["']""", re.I)
+
+    def body_links(self, body):
+        """Internal route paths a rendered page offers a reader."""
+        out = set()
+        for raw in self.BODY_HREF.findall(body):
+            url = raw.strip().replace("&amp;", "&")
+            if url.startswith(("javascript:", "mailto:", "data:", "tel:")):
+                continue
+            if url.startswith("http://") or url.startswith("https://"):
+                rest = url.split("//", 1)[1]
+                host = rest.split("/", 1)[0].split(":")[0].lower()
+                # The production hosts count as this site for the purpose of
+                # "can a reader still get there from a modern page". /whatsnew
+                # writes its record links as absolute www.maizegdb.org URLs, so
+                # treating those as offsite hid every legacy route it links --
+                # the route is the same route, whichever host serves it.
+                # Elsewhere in this report a production-host link is a finding
+                # in its own right, because on a development instance it
+                # silently leaves the instance; that is unchanged.
+                if host not in (self.site.split("//")[-1], "www.maizegdb.org", "maizegdb.org"):
+                    continue
+                url = "/" + rest.split("/", 1)[1] if "/" in rest else "/"
+            elif not url.startswith("/"):
+                continue
+            path = url.split("?")[0].split("#")[0]
+            if re.search(r"\.(css|js|png|jpg|jpeg|gif|svg|ico|pdf|zip|gz|txt|xml|json|csv|tsv|fa|fasta)$",
+                         path, re.I):
+                continue
+            out.add(path.rstrip("/") or "/")
+        return sorted(out)
+
+    @staticmethod
+    def link_keys(url):
+        key = url.rstrip("/") or "/"
+        if key.endswith("/{id}"):
+            return [key, key[: -len("/{id}")] or "/"]
+        return [key]
+
+    def scan_record_modern(self):
+        """Routes whose record page is already modern while their search page is not.
+
+        `/data_center/gel` is the case: the bare URL still serves the old
+        per-type search form, but `?id=` is dispatched to a `*_record_modern.php`
+        and comes back on the record shell. The probe only ever sees the bare
+        URL, so it files the whole route as legacy -- which reads as "nothing
+        has been done here" when in fact the record half is finished.
+
+        The guards are read out of the dispatcher rather than inferred from
+        file names, so a controller that exists but is not wired up does not
+        count, and a route serving two PAGE values -- term and trait share one
+        record page -- is picked up for both.
+        """
+        text = self.source.get("controllers/data_center.php")
+        if text is None:
+            path = self.path("controllers/data_center.php")
+            text = read_text(path) if os.path.isfile(path) else ""
+        if not text:
+            return
+        # Matched backwards from the include rather than forwards from the
+        # guard: the guard is `PAGE == 'gel' && getCGIParam('id', 'G', ID)`,
+        # whose own brackets defeat any attempt to read it as one
+        # parenthesis-free run.
+        for match in re.finditer(
+                r"include\('controllers/data_center/[a-z0-9_\-]+_record_modern\.php'\)",
+                text, re.I):
+            window = text[max(0, match.start() - 220):match.start()]
+            # The nearest preceding `if (` is the inner `if (include(...))`,
+            # which carries no PAGE at all -- anchoring on that found nothing.
+            # The guard wanted is the last `if (PAGE` before the include.
+            # `if ((PAGE == 'term' || PAGE == 'trait') && ...)` opens with two
+            # brackets, so a literal search for "if (page" missed the one route
+            # that serves a record page under two PAGE values.
+            opens = list(re.finditer(r"if\s*\(\(?\s*PAGE", window, re.I))
+            guard = window[opens[-1].start():] if opens else ""
+            for slug in re.findall(r"PAGE\s*==\s*'([a-z0-9_\-]+)'", guard, re.I):
+                self.record_modern.add("/data_center/" + slug)
 
     def record_offsite(self, host, url, rel):
         entry = self.offsite.setdefault(host, {"count": 0, "examples": [], "linked_from": []})
@@ -752,6 +864,16 @@ class Scanner(object):
 
                 title = re.search(r"<title[^>]*>(.*?)</title>", body, re.I | re.S)
                 status, markers = classify_live(body)
+
+                # What this page actually offers a reader. Static analysis
+                # misses a link a modern page builds at run time from data --
+                # /whatsnew lists recently changed records and links each one,
+                # so its links exist in no file -- and reading them out of the
+                # response is the only way to see them.
+                outbound = []
+                if status == "modern" and not moved_to and not self.LINK_ENUMERATORS.search(url):
+                    outbound = self.body_links(body)
+
                 return key, {
                     "http": http_status,
                     "redirected_to": redirected,
@@ -763,6 +885,8 @@ class Scanner(object):
                     "title": None if moved_to else (title.group(1).strip()[:140] if title else None),
                     "markers": [] if moved_to else markers,
                     "status": "retired" if moved_to else (status if http_status == 200 else None),
+                    "outbound": outbound,
+                    "from_url": url,
                 }
             except Exception as error:  # a probe failure must not lose the row
                 return key, {"error": "%s: %s" % (type(error).__name__, error)}
@@ -770,6 +894,13 @@ class Scanner(object):
         with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as pool:
             for key, result in pool.map(fetch, targets):
                 self.pages[key]["probe"] = result
+                # Fold what each modern page actually links into the same map
+                # the static pass fills, so a route counts as reachable if
+                # either signal sees it. The rendered page is recorded as the
+                # source so the report can name it.
+                for path in result.get("outbound", ()):
+                    self.modern_links.setdefault(path, set()).add(
+                        "rendered: " + result.get("from_url", "?"))
 
     # -- result ------------------------------------------------------------
 
@@ -801,6 +932,16 @@ class Scanner(object):
                 "probe_error": probe.get("error"),
                 "probed": bool(live) or bool(probe.get("http")),
                 "notes": record["notes"],
+                "record_modern": any(
+                    (url.rstrip("/") or "/") in self.record_modern for url in record["urls"]),
+                # A record route inherits its parent's links: a link to a
+                # record is written `/data_center/sequence?id=123`, whose path
+                # is the parent, so nothing is ever written against the
+                # `/{id}` form the inventory lists it under.
+                "modern_linkers": sorted(set(sum(
+                    [sorted(self.modern_links.get(key_url, ()))
+                     for url in record["urls"]
+                     for key_url in self.link_keys(url)], []))),
             })
 
         rows.sort(key=lambda row: (
@@ -809,14 +950,47 @@ class Scanner(object):
             row["url"],
         ))
 
+        """Split what is left into work and not-work.
+
+        "Legacy" counts three very different things together, and the headline
+        number is misleading because of it. A route whose record page is
+        already modern is half converted. A route nothing on the modern site
+        links to is not waiting on a conversion at all -- it is either
+        superseded by a page built elsewhere or simply unreferenced, and the
+        decision it needs is whether to retire it. What is actually outstanding
+        is the rest: legacy pages a reader can still reach from the modern
+        site.
+        """
+        for row in rows:
+            if row["status"] in ("modern", "retired"):
+                row["disposition"] = row["status"]
+            elif row["record_modern"]:
+                row["disposition"] = "record-modern"
+            elif row["modern_linkers"]:
+                row["disposition"] = "outstanding"
+            else:
+                row["disposition"] = "orphaned"
+
         counts = {"modern": 0, "partial": 0, "legacy": 0, "retired": 0}
         for row in rows:
             counts[row["status"]] = counts.get(row["status"], 0) + 1
 
+        dispositions = {}
+        for row in rows:
+            dispositions[row["disposition"]] = dispositions.get(row["disposition"], 0) + 1
+
         by_category = {}
         for row in rows:
-            bucket = by_category.setdefault(row["category"], {"modern": 0, "partial": 0, "legacy": 0, "retired": 0, "total": 0})
+            bucket = by_category.setdefault(row["category"], {
+                "modern": 0, "partial": 0, "legacy": 0, "retired": 0, "total": 0,
+                "outstanding": 0, "record-modern": 0, "orphaned": 0})
             bucket[row["status"]] += 1
+            # Only the three legacy dispositions are counted here. "modern" and
+            # "retired" are dispositions too, and adding them would increment
+            # the same key twice -- which briefly reported 78 modern data hubs
+            # out of 77 rows.
+            if row["disposition"] in ("outstanding", "record-modern", "orphaned"):
+                bucket[row["disposition"]] += 1
             bucket["total"] += 1
 
         # What to do next: legacy pages, most exposed first. A page in the mega
@@ -825,7 +999,7 @@ class Scanner(object):
         # A retired route is finished work, not outstanding work: it has no
         # page left to modernize.
         next_up = [row for row in rows
-                   if row["status"] not in ("modern", "retired")
+                   if row["disposition"] == "outstanding"
                    and row["category"] != "Curation and internal"]
         next_up.sort(key=lambda row: (not row["in_menu"], -row["links_in"], row["url"]))
 
@@ -850,6 +1024,7 @@ class Scanner(object):
             "generator": "tools/redesign_status.py %s" % VERSION,
             "site": self.site,
             "counts": counts,
+            "dispositions": dispositions,
             "total": len(rows),
             # Retired routes are excluded from the denominator: they are not
             # pages waiting to be modernized, so counting them drags the
@@ -873,6 +1048,7 @@ def run_scan(root, site, do_probe):
     scanner = Scanner(root, site)
     scanner.discover()
     scanner.scan_links()
+    scanner.scan_record_modern()
     scanner.attach_links()
     if do_probe:
         host_header = site.split("//")[-1].rstrip("/")
@@ -903,6 +1079,7 @@ def bar(fraction, width=28):
 
 def write_markdown(data, path):
     counts = data["counts"]
+    disp = data.get("dispositions", {})
     total = data["total"]
     out = []
     add = out.append
@@ -921,44 +1098,88 @@ def write_markdown(data, path):
     add("| Modern | %d (%.1f%%) |" % (counts["modern"], data["percent_modern"]))
     add("| Partial | %d |" % counts["partial"])
     add("| Legacy | %d |" % counts["legacy"])
+    add("| &nbsp;&nbsp;&mdash; still to convert | %d |" % disp.get("outstanding", 0))
+    add("| &nbsp;&nbsp;&mdash; record page already modern | %d |" % disp.get("record-modern", 0))
+    add("| &nbsp;&nbsp;&mdash; not linked from the modern site | %d |" % disp.get("orphaned", 0))
     add("| Retired | %d |" % counts.get("retired", 0))
     add("| Classified by live response | %s |" % ("yes" if data["probed"] else "no, source analysis only"))
     add("")
     add("```")
-    add("modern   %s %d" % (bar(counts["modern"] / float(total or 1)), counts["modern"]))
-    add("partial  %s %d" % (bar(counts["partial"] / float(total or 1)), counts["partial"]))
-    add("legacy   %s %d" % (bar(counts["legacy"] / float(total or 1)), counts["legacy"]))
-    add("retired  %s %d" % (bar(counts.get("retired", 0) / float(total or 1)), counts.get("retired", 0)))
+    add("modern        %s %d" % (bar(counts["modern"] / float(total or 1)), counts["modern"]))
+    add("to convert    %s %d" % (bar(disp.get("outstanding", 0) / float(total or 1)), disp.get("outstanding", 0)))
+    add("record done   %s %d" % (bar(disp.get("record-modern", 0) / float(total or 1)), disp.get("record-modern", 0)))
+    add("not linked    %s %d" % (bar(disp.get("orphaned", 0) / float(total or 1)), disp.get("orphaned", 0)))
+    add("retired       %s %d" % (bar(counts.get("retired", 0) / float(total or 1)), counts.get("retired", 0)))
     add("```")
     add("")
     add("**Modern** is a page on the shared design system: it calls `modern()` for the")
     add("document shell and loads `mgdb-modern.css`. **Partial** has one of the two and")
     add("not the other, which usually means a page borrowing components inside the old")
-    add("shell. **Legacy** is everything untouched.")
+    add("shell.")
+    add("")
+    add("**Legacy splits three ways, and only one of them is work.** Counting them")
+    add("together is what made the figure look worse than it is:")
+    add("")
+    add("- **Still to convert** &mdash; a legacy page a reader can still reach from the")
+    add("  modern site. This is the real backlog, and the list below is it.")
+    add("- **Record page already modern** &mdash; the bare URL still serves the old")
+    add("  per-type search form, but `?id=` is already dispatched to a record page on")
+    add("  the record shell. Half converted, not untouched.")
+    add("- **Not linked from the modern site** &mdash; nothing modern links to it. These")
+    add("  are old routes superseded by a page built elsewhere, or simply unreferenced.")
+    add("  They need a retirement decision, not a rebuild.")
+    add("")
+    add("Reachability is measured two ways, and either one counts. **In the source**, a")
+    add("modern-owned file links to it: a `*_modern.php` controller, an `mgdb-*` template")
+    add("or script, a record library, or any PHP page that itself classifies as modern.")
+    add("**In the response**, the rendered HTML of a page that came back modern links to")
+    add("it &mdash; which is the only way to see a link built at run time from data, as")
+    add("`/whatsnew` does when it lists recently changed records. The site map and this")
+    add("report are excluded as sources: both list every URL on the site, so a link from")
+    add("either says nothing about whether a page is reachable in the ordinary way.")
+    add("")
+    add("One limit worth knowing: record routes are not probed, so a legacy page linked")
+    add("only from a modern record page is seen in the source pass or not at all. A link")
+    add("written against `www.maizegdb.org` does count here &mdash; the route is the same")
+    add("route whichever host serves it &mdash; even though the same link is reported")
+    add("separately below as an offsite link, which on a development instance it is.")
     add("")
 
     # ---- progress by category
     add("## By category")
     add("")
-    add("| Category | Modern | Partial | Legacy | Total | Progress |")
-    add("| --- | ---: | ---: | ---: | ---: | --- |")
+    add("Progress is measured against the pages that still need converting, so a")
+    add("category whose remaining routes are all orphaned or already half done reads as")
+    add("finished, because it is.")
+    add("")
+    add("| Category | Modern | To convert | Record done | Not linked | Retired | Progress |")
+    add("| --- | ---: | ---: | ---: | ---: | ---: | --- |")
     for category in data["category_order"]:
         bucket = data["by_category"][category]
-        fraction = bucket["modern"] / float(bucket["total"] or 1)
-        add("| %s | %d | %d | %d | %d | %s %.0f%% |" % (
-            category, bucket["modern"], bucket["partial"], bucket["legacy"],
-            bucket["total"], bar(fraction, 14), fraction * 100))
+        live = bucket["modern"] + bucket.get("outstanding", 0) + bucket.get("record-modern", 0)
+        fraction = bucket["modern"] / float(live or 1)
+        add("| %s | %d | %d | %d | %d | %d | %s %.0f%% |" % (
+            category, bucket["modern"], bucket.get("outstanding", 0),
+            bucket.get("record-modern", 0), bucket.get("orphaned", 0),
+            bucket.get("retired", 0), bar(fraction, 14), fraction * 100))
     add("")
 
     # ---- what to work on next
     add("## Work on these next")
     add("")
-    add("Not-yet-modern pages ranked by how exposed they are: everything reachable from")
-    add("the mega menu first, then by how many places in the codebase link to it.")
-    add("Curation and internal pages are left out.")
+    add("The pages that still need converting, ranked by how exposed they are:")
+    add("everything reachable from the mega menu first, then by how many places in the")
+    add("codebase link to it. Curation and internal pages are left out, as are the two")
+    add("groups above that are not waiting on a conversion.")
     add("")
-    add("| # | URL | Category | Status | In menu | Inbound links | Serving file |")
-    add("| ---: | --- | --- | --- | :---: | ---: | --- |")
+    add("**Reached from** is why the page is in this list at all &mdash; the first modern")
+    add("page or file found linking to it. It is not the same measure as **Inbound**,")
+    add("which counts links from anywhere in the codebase, legacy pages included: a page")
+    add("can show 0 inbound and still be reachable, because the link is built at run")
+    add("time and exists in no file.")
+    add("")
+    add("| # | URL | Category | In menu | Inbound | Reached from | Serving file |")
+    add("| ---: | --- | --- | :---: | ---: | --- | --- |")
     index = 0
     by_url = dict((row["url"], row) for row in data["rows"])
     for url in data["next_up"]:
@@ -966,10 +1187,54 @@ def write_markdown(data, path):
         if not row:
             continue
         index += 1
-        add("| %d | `%s` | %s | %s | %s | %d | `%s` |" % (
-            index, url, row["category"], STATUS_LABEL[row["status"]],
-            "yes" if row["in_menu"] else "", row["links_in"], row["serves"]))
+        linkers = row.get("modern_linkers") or []
+        reached = linkers[0] if linkers else ""
+        if reached.startswith("rendered: "):
+            reached = "`%s` (rendered)" % reached[len("rendered: "):]
+        elif reached:
+            reached = "`%s`" % reached
+        if len(linkers) > 1:
+            reached += " +%d" % (len(linkers) - 1)
+        add("| %d | `%s` | %s | %s | %d | %s | `%s` |" % (
+            index, url, row["category"],
+            "yes" if row["in_menu"] else "", row["links_in"], reached, row["serves"]))
     add("")
+
+    # ---- half-converted routes
+    half = [row for row in data["rows"] if row.get("disposition") == "record-modern"]
+    if half:
+        add("## Record page already modern, search page not")
+        add("")
+        add("`?id=` on these routes is dispatched to a record page on the record shell;")
+        add("the bare URL still serves the old per-type search form. The probe only sees")
+        add("the bare URL, which is why they were being counted as untouched. What is")
+        add("left on each is the search half.")
+        add("")
+        add("| URL | Category | Serving file |")
+        add("| --- | --- | --- |")
+        for row in half:
+            add("| `%s` | %s | `%s` |" % (row["url"], row["category"], row["serves"]))
+        add("")
+
+    # ---- orphans
+    orphans = [row for row in data["rows"] if row.get("disposition") == "orphaned"]
+    if orphans:
+        add("## Not linked from the modern site")
+        add("")
+        add("No modern-owned file links to any of these. Each is either superseded by a")
+        add("page built elsewhere &mdash; `/metabolic_pathways`, `/insertion` and")
+        add("`/ordering/stock` between them replace several &mdash; or simply")
+        add("unreferenced. **These need a retirement decision rather than a rebuild**, and")
+        add("converting one would be work nobody can reach. Inbound links are counted")
+        add("across the whole codebase, so a number here means legacy pages still link to")
+        add("it; the modern site does not.")
+        add("")
+        add("| URL | Category | Inbound links | Serving file |")
+        add("| --- | --- | ---: | --- |")
+        for row in sorted(orphans, key=lambda r: (-r["links_in"], r["url"])):
+            add("| `%s` | %s | %d | `%s` |" % (
+                row["url"], row["category"], row["links_in"], row["serves"]))
+        add("")
 
     # ---- already modern
     modern_rows = [row for row in data["rows"] if row["status"] == "modern"]

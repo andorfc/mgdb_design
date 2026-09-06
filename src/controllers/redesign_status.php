@@ -266,7 +266,21 @@
   $body->get('inventory-total')->replace(number_format($total));
   $body->get('modern-count')->replace(number_format($counts['modern']));
   $body->get('partial-count')->replace(number_format($counts['partial']));
-  $body->get('legacy-count')->replace(number_format($counts['legacy']));
+  /* The legacy figure is split three ways by the scanner. Nary::get throws on
+     an identifier the template does not declare, and the template no longer
+     declares legacy-count, so the three dispositions are bound instead. An
+     older redesign_status.json has no `dispositions` key at all; falling back
+     to the whole legacy count for "still to convert" keeps the page honest in
+     that case rather than showing three zeros. */
+  $dispositions = isset($status['dispositions']) && is_array($status['dispositions'])
+      ? $status['dispositions'] : array();
+  $outstanding = isset($dispositions['outstanding'])
+      ? (int) $dispositions['outstanding'] : (int) $counts['legacy'];
+  $record_modern = isset($dispositions['record-modern']) ? (int) $dispositions['record-modern'] : 0;
+  $orphaned = isset($dispositions['orphaned']) ? (int) $dispositions['orphaned'] : 0;
+  $body->get('outstanding-count')->replace(number_format($outstanding));
+  $body->get('record-modern-count')->replace(number_format($record_modern));
+  $body->get('orphaned-count')->replace(number_format($orphaned));
   $body->get('retired-count')->replace(number_format(isset($counts['retired']) ? $counts['retired'] : 0));
   $body->get('percent-modern')->replace(number_format($status['percent_modern'], 1));
   $body->get('overall-bar')->replace(rs_bar($counts['modern'], $counts['partial'], $counts['legacy']));
