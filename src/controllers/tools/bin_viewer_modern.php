@@ -226,7 +226,10 @@ if ($mode === 'bin') {
         array('id' => 'gene_models', 'name' => 'Gene Models in Bin ' . $label),
         array('id' => 'other_loci',  'name' => 'Other Loci in Bin ' . $label),
         array('id' => 'hd_maps',     'name' => 'High-Density Maps Focusing on Bin ' . $label),
-        array('id' => 'accession',   'name' => 'Accession #s in Bin ' . $label),
+        /* "Accession #s in Bin" removed for the same reason as the chromosome
+           view's: its query joins Z_SEQUENCE, which has 0 rows, so the section
+           rendered five anchors with an empty /data_center/sequence?id= and no
+           link text, under "the 1 sequences" from a count of an empty loop. */
         array('id' => 'est_ssr',     'name' => 'EST Contigs and SSRs in Bin ' . $label),
         array('id' => 'bac',         'name' => 'BACs in Bin ' . $label)
     );
@@ -258,9 +261,18 @@ if ($mode === 'bin') {
         array('id' => 'gb_links',   'name' => 'Genome Browser Links for Chromosome ' . $chromosome),
         array('id' => 'genes',      'name' => 'Genes on Chromosome ' . $chromosome),
         array('id' => 'other_loci', 'name' => 'Other Loci on Chromosome ' . $chromosome),
-        array('id' => 'hd_maps',    'name' => 'Maps of Chromosome ' . $chromosome),
-        array('id' => 'accession',  'name' => 'Accession #s on Chromosome ' . $chromosome)
+        array('id' => 'hd_maps',    'name' => 'Maps of Chromosome ' . $chromosome)
     );
+    /* The "Accession #s" section is deliberately absent. It listed GenBank
+       accessions linking to /data_center/sequence, but its query ends in a
+       join to mgdb.z_sequence, which has 0 rows -- the join reaches 19,328
+       rows through id_seq for chromosome 1 and then drops to nothing, and
+       every chromosome is the same. The section therefore rendered its
+       template's row skeleton with no data: five anchors with an empty
+       ?id= and empty link text, under a sentence reading "accession numbers
+       of the sequences" with the count missing. /data_center/sequence itself
+       now redirects to /genome. Restore this line if z_sequence is ever
+       repopulated; chromosome_data.php still answers type=accession. */
     $endpoint = '/record_data/chromosome_data.php?nomaps=1&id=' . $chromosome . '&type=';
 
     $title = 'Chromosome ' . $chromosome;

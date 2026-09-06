@@ -128,9 +128,6 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
          INNER JOIN mgdb.id_num ri ON ri.id = r.related_id AND ri.curation_lvl = 0
          INNER JOIN mgdb.probe rp ON rp.id = r.related_id
        WHERE r.id = :c5b) AS related_probes,
-      (SELECT COUNT(DISTINCT z.seq_id) FROM mgdb.ext_db_key x
-         INNER JOIN mgdb.z_sequence z ON z.genbank_acc = x.key
-       WHERE x.id = :c6) AS sequences,
       (SELECT COUNT(*) FROM mgdb.ext_db_key x WHERE x.id = :c7
          AND (x.obsolete IS NULL OR x.obsolete <> 'Y')) AS offsite,
       (SELECT COUNT(*) FROM mgdb.memo m WHERE m.id = :c8) AS comments,
@@ -145,7 +142,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   MgdbApi::countQuery();
 
   $counts = array();
-  foreach (array('loci', 'positions', 'copies', 'gel_patterns', 'gene_products', 'related_probes', 'sequences',
+  foreach (array('loci', 'positions', 'copies', 'gel_patterns', 'gene_products', 'related_probes',
                  'offsite', 'comments', 'properties', 'bins', 'primers') as $key) {
     $counts[$key] = $counts_row ? (int) $counts_row[$key] : 0;
   }
@@ -313,7 +310,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
 
   if (isset($want['related'])) {
     $related = array('copies' => array(), 'gel_patterns' => array(),
-                     'gene_products' => array(), 'sequences' => array(),
+                     'gene_products' => array(),
                      'probes' => array());
 
     /* Probes related to this one, and how.
@@ -414,25 +411,11 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
       );
     }
 
-    $sth = make_query($DBConn, "
-      SELECT DISTINCT z.seq_id, z.genbank_acc, z.seq_type, z.seq_length, z.seq_title
-      FROM mgdb.ext_db_key x
-        INNER JOIN mgdb.z_sequence z ON z.genbank_acc = x.key
-      WHERE x.id = :id
-      ORDER BY z.genbank_acc", 1, array('id' => $id));
-    MgdbApi::countQuery();
-    while ($row = retrieve_row($sth)) {
-      $seq_id = MgdbApi::text($row['seq_id']);
-      $related['sequences'][] = array(
-        'type' => 'sequence',
-        'id' => $seq_id,
-        'accession' => MgdbApi::text($row['genbank_acc']),
-        'sequence_type' => MgdbApi::text($row['seq_type']),
-        'length' => MgdbApi::int($row['seq_length']),
-        'title' => MgdbApi::text($row['seq_title']),
-        'html' => '/data_center/sequence?id=' . rawurlencode((string) $seq_id)
-      );
-    }
+    /* The sequences block is removed: it read mgdb.z_sequence, which has 0
+       rows, so it always produced an empty list and a link to
+       /data_center/sequence -- a record page that renders no sequence fields
+       and whose route now redirects to /genome. Two queries per record view
+       saved. Restore from git if z_sequence is ever repopulated. */
 
     $sections['related'] = $related;
   }
@@ -568,7 +551,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
     'references' => null,
     'related' => array('copies' => 'copies', 'gel_patterns' => 'gel_patterns',
                        'probes' => 'related_probes',
-                       'gene_products' => 'gene_products', 'sequences' => 'sequences'),
+                       'gene_products' => 'gene_products'),
     'annotations' => array('comments' => 'comments')
   );
   foreach ($expected as $section => $keys) {

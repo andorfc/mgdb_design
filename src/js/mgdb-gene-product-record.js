@@ -245,17 +245,6 @@
       ]
     }) || rendered;
 
-    rendered = R.collection(out, {
-      title: 'Related sequences',
-      items: related.sequences,
-      filename: 'gene-product-sequences.tsv',
-      columns: [
-        { key: 'accession', label: 'GenBank accession', tile: true, html: function (s) { return R.link(s.html, s.accession); } },
-        { key: 'sequence_type', label: 'Type' },
-        { key: 'length', label: 'Length (bp)', sort: 'number', numeric: true, get: function (s) { return s.length == null ? '' : R.number(s.length); } },
-        { key: 'title', label: 'Title' }
-      ]
-    }) || rendered;
 
     rendered = R.collection(out, {
       title: 'Probes and markers',
@@ -324,7 +313,7 @@
   var TAB_COUNTS = {
     'gp-record-overview': ['loci'],
     'gp-record-annotations': ['comments', 'ontology_terms', 'user_annotations'],
-    'gp-record-related': ['related_products', 'sequences', 'probes'],
+    'gp-record-related': ['related_products', 'probes'],
     'gp-record-offsite': ['offsite'],
     'gp-record-references': ['references']
   };

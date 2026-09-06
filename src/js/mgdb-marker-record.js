@@ -134,19 +134,6 @@
       ]
     }) || rendered;
 
-    rendered = R.collection(out, {
-      title: 'Sequences',
-      items: related.sequences,
-      filename: 'marker-sequences.tsv',
-      columns: [
-        { key: 'accession', label: 'GenBank accession', tile: true,
-          html: function (s) { return R.link(s.html, s.accession); } },
-        { key: 'sequence_type', label: 'Type' },
-        { key: 'length', label: 'Length (bp)', sort: 'number', numeric: true,
-          get: function (s) { return s.length == null ? '' : R.number(s.length); } },
-        { key: 'title', label: 'Title' }
-      ]
-    }) || rendered;
 
     rendered = R.collection(out, {
       title: 'Gel patterns',
@@ -231,7 +218,7 @@
       ['Detected loci', counts.loci], ['Map positions', counts.positions], ['Maps', counts.maps],
       ['Genetic bins', counts.bins], ['Primers', counts.primers],
       ['Gene products', counts.gene_products], ['Gel patterns', counts.gel_patterns],
-      ['Sequences', counts.sequences], ['External entries', counts.offsite],
+      ['External entries', counts.offsite],
       ['References', counts.references], ['Synonyms', counts.synonyms]
     ]);
     void references;
@@ -246,7 +233,7 @@
     'marker-record-overview': ['bins', 'primers', 'properties'],
     'marker-record-loci': ['loci'],
     'marker-record-positions': ['positions'],
-    'marker-record-related': ['related_probes', 'gene_products', 'sequences', 'gel_patterns', 'copies'],
+    'marker-record-related': ['related_probes', 'gene_products', 'gel_patterns', 'copies'],
     'marker-record-offsite': ['offsite'],
     'marker-record-annotations': ['comments'],
     'marker-record-references': ['references']

@@ -227,8 +227,21 @@ logMessage("chromosome_data.php: chrom=$chrom, type=$type");
     $tmpl->get('hd_maps')->unmute();
   }//showHDMaps
   
+  /* Renders nothing. The section listed GenBank accessions linking to
+     /data_center/sequence, but the query below ends in a join to
+     mgdb.z_sequence, which has 0 rows -- it reaches 19,328 rows through
+     id_seq for chromosome 1 and then drops to none, and every chromosome is
+     the same. With an empty loop the template still emitted its row skeleton:
+     five anchors with an empty ?id= and no link text, under a sentence whose
+     count was blank. /data_center/sequence now redirects to /genome.
+
+     The section is no longer requested by the page, but the endpoint is still
+     directly callable, so it returns early here rather than relying on that.
+     Delete the early return if z_sequence is ever repopulated. */
   function showAccession($tmpl, $chrom, $DBConn) 
   { 
+    return;
+
     $linkage_group = getLG($chrom);
     $query_accessions = "
       select distinct(f.seq_id), f.genbank_acc as key 

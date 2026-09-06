@@ -181,9 +181,6 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
            INNER JOIN mgdb.id_num i ON i.id = g.id AND i.curation_lvl = 0
          WHERE r.related_id = :c14
        ) rel) AS related_products,
-      (SELECT COUNT(DISTINCT z.seq_id) FROM mgdb.ext_db_key x
-         INNER JOIN mgdb.z_sequence z ON z.genbank_acc = x.key
-       WHERE x.id = :c15) AS sequences,
       (SELECT COUNT(*) FROM mgdb.probe_gene_product pg
          INNER JOIN mgdb.id_num i ON i.id = pg.id AND i.curation_lvl = 0
        WHERE pg.gene_product = :c16) AS probes,
@@ -202,7 +199,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   foreach (array('loci', 'ec_numbers', 'localizations', 'induced_expression',
                  'metabolic_constituents', 'metabolic_pathways', 'motif_features',
                  'uniprot', 'offsite', 'comments', 'ontology_terms', 'user_annotations',
-                 'related_products', 'sequences', 'probes') as $key) {
+                 'related_products', 'probes') as $key) {
     $counts[$key] = $counts_row ? (int) $counts_row[$key] : 0;
   }
   $counts['references'] = $counts_row ? (int) $counts_row['references_count'] : 0;
@@ -554,7 +551,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   /////
 
   if (isset($want['related'])) {
-    $related = array('gene_products' => array(), 'sequences' => array(), 'probes' => array());
+    $related = array('gene_products' => array(), 'probes' => array());
 
     // Both directions of the relation table. A row is stored once, from one
     // product to the other, so the legacy page showed "Subunit of" on one
@@ -592,25 +589,11 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
       );
     }
 
-    $sth = make_query($DBConn, "
-      SELECT DISTINCT z.seq_id, z.genbank_acc, z.seq_type, z.seq_length, z.seq_title
-      FROM mgdb.ext_db_key x
-        INNER JOIN mgdb.z_sequence z ON z.genbank_acc = x.key
-      WHERE x.id = :id
-      ORDER BY z.genbank_acc", 1, array('id' => $id));
-    MgdbApi::countQuery();
-    while ($row = retrieve_row($sth)) {
-      $seq_id = MgdbApi::text($row['seq_id']);
-      $related['sequences'][] = array(
-        'type' => 'sequence',
-        'id' => $seq_id,
-        'accession' => MgdbApi::text($row['genbank_acc']),
-        'sequence_type' => MgdbApi::text($row['seq_type']),
-        'length' => MgdbApi::int($row['seq_length']),
-        'title' => MgdbApi::text($row['seq_title']),
-        'html' => '/data_center/sequence?id=' . rawurlencode((string) $seq_id)
-      );
-    }
+    /* The sequences block is removed: it read mgdb.z_sequence, which has 0
+       rows, so it always produced an empty list and a link to
+       /data_center/sequence -- a record page that renders no sequence fields
+       and whose route now redirects to /genome. Two queries per record view
+       saved. Restore from git if z_sequence is ever repopulated. */
 
     // Probes and markers that detect the product, from probe_gene_product.
     // The legacy page did not show these; the table links 704 probes to 300
@@ -716,7 +699,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
                         'metabolic_pathways' => 'metabolic_pathways', 'motif_features' => 'motif_features'),
     'annotations' => array('comments' => 'comments', 'ontology_terms' => 'ontology_terms',
                            'user_annotations' => 'user_annotations'),
-    'related' => array('gene_products' => 'related_products', 'sequences' => 'sequences', 'probes' => 'probes')
+    'related' => array('gene_products' => 'related_products', 'probes' => 'probes')
   );
   foreach ($expected as $section => $keys) {
     if (!isset($sections[$section])) {
@@ -751,7 +734,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   $truncated = array();
   foreach (array('overview' => array('loci', 'uniprot', 'ec_numbers'),
                  'annotations' => array('comments', 'ontology_terms', 'user_annotations'),
-                 'related' => array('gene_products', 'sequences', 'probes'),
+                 'related' => array('gene_products', 'probes'),
                  'offsite' => null, 'references' => null) as $section => $keys) {
     if (!isset($sections[$section])) {
       continue;

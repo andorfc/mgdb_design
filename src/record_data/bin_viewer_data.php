@@ -429,7 +429,14 @@ function showGeneModels($tmpl, $DBConn) {
   
   
   function showAccession($tmpl, $DBConn) 
-  { 
+  {
+    /* Renders nothing, for the same reason as chromosome_data.php's: the query
+       below joins Z_SEQUENCE, which has 0 rows, so the template emitted five
+       anchors with an empty /data_center/sequence?id= and no link text, under
+       "the 1 sequences" from counting an empty loop. The page no longer
+       requests this section; this guards a direct call to the endpoint. */
+    return;
+ 
     $bin = getCGIParam("bin", 'G', false);
     $sub = getCGIParam("sub", 'G', false);
     

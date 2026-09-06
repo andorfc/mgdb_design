@@ -181,7 +181,15 @@ def parse_markers(content_bau):
                     "type": values[3],
                     "insert": values[4],
                     "enzyme": values[5],
-                    "sequence": values[6], "sequence_url": links[6],
+                    # sequence_url is deliberately dropped. The source table
+                    # links each accession to /data_center/sequence?id=, and
+                    # that record page reads mgdb.z_sequence, which has 0 rows
+                    # -- so the page renders no sequence fields for a real
+                    # accession any more than for a made-up one, and the route
+                    # now redirects to /genome. binViewerCell() renders the
+                    # accession as plain text when the url is None, so the
+                    # identifier is still there to search on.
+                    "sequence": values[6], "sequence_url": None,
                     "position": "" if note else values[7],
                 }
             else:
