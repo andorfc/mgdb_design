@@ -342,6 +342,13 @@
     typesEl.appendChild(list);
   }
 
+  /* The two refusals have different remedies, so they do not share a line. */
+  function noticeHint(notice) {
+    return /at least two/.test(notice)
+      ? 'One letter or digit matches most of the records in the database.'
+      : 'Add a second word, or open the data hub for the records you want.';
+  }
+
   function renderEmpty(message, hint) {
     clear(resultsEl);
     var box = el('div', 'mgdb-empty');
@@ -525,9 +532,19 @@
         return;
       }
 
-      /* A term the API refused to run says why, in both views. */
+      /* A term the API refused to run says why, in both views. The rail has to
+         be emptied with the results: it is drawn from the previous term until
+         something replaces it, and counts left over from the last search
+         standing beside "matches more of the database than this page can
+         summarize" read as though they belonged to it. */
       if (data.notice && !data.total) {
-        renderEmpty(data.notice, 'A term this broad matches most of the database.');
+        state.types = [];
+        state.total = 0;
+        /* Not renderRail([]), which would print "All results 0" — nothing was
+           counted, which is not the same as nothing matching. */
+        clear(typesEl);
+        typesEl.appendChild(el('p', 'mgdb-muted mgdb-small', 'Nothing counted yet.'));
+        renderEmpty(data.notice, noticeHint(data.notice));
         summaryEl.textContent = data.notice;
         setStatus(data.notice);
         return;
