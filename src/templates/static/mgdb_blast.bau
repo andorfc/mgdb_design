@@ -28,7 +28,7 @@ $$SYNTAX-LEVEL 2
     </div>
     <div class="mgdb-hero-body">
       <h1 id="blast-title">Search maize sequence.</h1>
-      <p class="mgdb-hero-description">Align a nucleotide or protein sequence against maize and other <i>Zea</i> assemblies, gene models, transcripts and predicted proteins. Choose the target datasets, and the right BLAST program is selected from your query and target types.</p>
+      <p class="mgdb-hero-description">Search sequence from all genome datasets hosted by MaizeGDB.</p>
     </div>
   </section>
 
@@ -44,9 +44,9 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="blast-search-title">Search</h2></div>
     </div>
 
-    <p class="blast-search-lead">Four steps. The current B73 assembly is already selected, so a sequence and a press of Run BLAST is a complete search.</p>
+    <p class="blast-search-lead">Three steps. The current B73 assembly is already selected, so a sequence and a press of Run BLAST is a complete search.</p>
 
-    ;; The form is four numbered steps built from the site's own controls. Every
+    ;; The form is three numbered steps built from the site's own controls. Every
     ;; control id, name and class in it is what controllers/BLAST/BLAST.js
     ;; already drives -- that script and the job submission path behind it are
     ;; untouched. The wrapper carries no styling of its own now that the form is
@@ -61,11 +61,15 @@ $$SYNTAX-LEVEL 2
       <p>You do not choose a program. The query sequence type and the target you pick decide it: a nucleotide query against a nucleotide target runs <code>blastn</code>, a protein query against a protein target <code>blastp</code>, and the mixed cases run <code>blastx</code> or <code>tblastn</code>. The parameter set defaults to values suited to that pairing, and every one of them can be overridden.</p>
       <p>Searches run as jobs. A job keeps its results under a job identifier, so a long search can be left and returned to, and a finished search can be reopened later from the same address.</p>
     </div>
+    <!-- The "Search by identifier" button went when this copy arrived: the Gene
+         Data Hub is a link in the second line now, and a button repeating it
+         under three sentences that each carry their own destination read as a
+         fourth option rather than a shortcut. -->
     <aside class="mgdb-aside-card">
       <h3>Choose the right tool</h3>
-      <p>Use BLAST when you have sequence and want to know what it matches.</p>
-      <p>If you already have an identifier &#8212; a gene model, a locus, a marker &#8212; the Gene Data Hub resolves it directly, and for structure similarity rather than sequence similarity, Foldseek on the protein structure hub searches folds instead.</p>
-      <a class="mgdb-button mgdb-button-secondary" href="/gene_center/gene">Search by identifier</a>
+      <p>Use BLAST to find sequences that match your sequence.</p>
+      <p>Already have a gene, locus, or marker ID? Use the <a href="/gene_center/gene">Gene Data Hub</a>.</p>
+      <p>Want to compare protein structures instead of sequences? Use <a href="/foldseek">Foldseek</a> in the <a href="/data_center/protein_structure">Protein Structure Hub</a>.</p>
     </aside>
   </section>
 

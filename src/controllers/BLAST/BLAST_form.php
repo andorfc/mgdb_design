@@ -29,22 +29,19 @@
   include_once('./include/references_lib.php');
   $blast_doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT']
                   ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';
+  /* Two, on Carson's call (2026-09-05): cite MaizeGDB, not the corpora behind
+     the target datasets. It listed five -- the 1990 BLAST algorithm paper, the
+     NAM genomes paper, the pan-gene paper and a multi-genome search paper
+     alongside these -- which read as a bibliography for maize sequence rather
+     than for this page.
+
+     Both are in data/cite_journal_articles.json, the curated bibliography, so
+     neither needs a fallback: title, authors, journal, volume, pages, PubMed ID
+     and abstract all come from the one record behind /cite. */
   $page->get('reference_cards')->replace(mgdb_render_references($blast_doc_root, array(
-      /* The algorithm. Not a MaizeGDB paper, so it is not in the curated
-         bibliography and its details are supplied inline. */
-      array('doi' => '10.1016/S0022-2836(05)80360-2',
-            'fallback' => array(
-                'title'   => 'Basic local alignment search tool',
-                'authors' => 'Altschul SF, Gish W, Miller W, Myers EW, Lipman DJ',
-                'journal' => 'Journal of Molecular Biology',
-                'year'    => 1990)),
-      // The assemblies and annotations most of these target datasets are.
-      array('doi' => '10.1126/science.abg5289'),
-      // The pan-genomic resources the newer targets come from.
-      array('doi' => '10.1093/genetics/iyae036'),
-      // Querying these collections together rather than one search at a time.
-      array('doi' => '10.3389/fpls.2020.592730'),
-      // The database of record.
+      // Tools and Resources at MaizeGDB. Cold Spring Harbor Protocols, 2025.
+      array('doi' => '10.1101/pdb.over108430'),
+      // MaizeGDB 2018: the maize multi-genome genetics and genomics database.
       array('doi' => '10.1093/nar/gky1046'),
   )));
   $tmpl->get('eutil_key')->replace($system['eutil_key']);
@@ -65,7 +62,10 @@
     $tmpl->get('BLAST_word_size11_selected')->replace('selected');
     $tmpl->get('BLAST_match_mismatch_scores1,-2_selected')->replace('selected');
     $tmpl->get('BLAST_max_evalue')->replace('1e-10');
-    $tmpl->get('output_format_enhanced_checked')->replace('checked');
+    /* No output_format_*_checked placeholder any more -- the result-format step
+       went on 2026-09-05 and its one remaining radio is hard-coded checked in
+       the template. Nary::get throws on an identifier the template does not
+       declare, so setting it here would fatal the page. */
     $tmpl->get('BLAST_perc_identity')->replace('0');
     $tmpl->get('BLAST_max_hsps')->replace('');
     setDefaultTargets($tmpl, $DBConn);
@@ -223,11 +223,12 @@ function restoreSettings($tmpl, $DBConn) {
     $tmpl->get($selected)->replace('selected');
   }
   
-  if ($output_format = getCGIParam('output_format', 'P', false)) {
-    $selected = "output_format_$output_format" . "_checked";
-    $tmpl->get($selected)->replace('checked');
-  }
-  
+  /* Reopening a job no longer restores a result format: there is one format,
+     and the template's single radio is already checked. A saved job from before
+     2026-09-05 may carry output_format=BLAST_table or BLAST_text in its .parms;
+     it is read and ignored, because the modern results page renders the table
+     and text views from the same JSON either way. */
+
   $targets = explode(',', getCGIParam('targets', 'P', ''));
   $html = '';
   foreach ($targets as $blast_id) {

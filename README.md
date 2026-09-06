@@ -5427,6 +5427,87 @@ by eye:
 `controllers/BLAST/BLAST_form.bau`, `templates/static/mgdb_blast.bau`,
 `css/mgdb-blast.css`, `js/mgdb-blast.js`. Originals in `legacy/blast/`.
 
+### Copy and layout revision, 2026-09-05
+
+Carson's pass over the finished page:
+
+- **The hero description is one sentence** — "Search sequence from all genome
+  datasets hosted by MaizeGDB." It was three sentences explaining query types,
+  target types and program selection, all of which the form's own step headings
+  say again a screen further down.
+- **Step 1 is two columns.** The GenBank fetch used to sit under a full-width
+  textarea, sharing a row with Load an example and Clear. Those two buttons are
+  ~260px of a ~1100px row, so the 26rem GenBank block was pushed to the right
+  edge with a band of empty space to its left at every width above the
+  breakpoint. It is a 20rem column beside the textarea now, with a left rule
+  instead of a full-width top border; below 860px the grid becomes one column
+  in source order. Measured at 1280: textarea 744px from x=118, GenBank 320px
+  from x=886.
+- **The run bar sits in flow.** It was `position: sticky; bottom: 0`, so it
+  floated over whatever the reader had scrolled to — including About and
+  References, where a Run BLAST button has nothing to run. The upward shadow
+  that sold it as a floating bar went with the stickiness.
+- **"Choose the right tool" is three sentences, each carrying its destination**:
+  BLAST for sequence, the Gene Data Hub for an identifier, Foldseek in the
+  Protein Structure Hub for structure. The "Search by identifier" button under
+  it went — it repeated the Gene Data Hub link that is now in the second line.
+- **Two references, not five.** `10.1101/pdb.over108430` and
+  `10.1093/nar/gky1046`, both MaizeGDB's own papers and both already in
+  `data/cite_journal_articles.json`, so neither needs a fallback. The page had
+  also cited the 1990 BLAST algorithm paper, the NAM genomes paper, the pan-gene
+  paper and a multi-genome search paper — a bibliography for maize sequence
+  rather than for this page.
+
+#### The result-format step is gone
+
+Carson: "I assume with the new output format I no longer need the Choose the
+result format section." Correct — it had been decorative since the results
+interface was rebuilt. Checked before removing it:
+
+| | |
+|---|---|
+| `blast_submit.php` | runs `-outfmt 15` **unconditionally**; reads `output_format` only to write it into `<job>.parms` |
+| the results page | renders every view from that one JSON — no reference to `output_format` in the API, the lib, the template or its script |
+| `BLAST_run.php` | *does* branch on it, in `getOutputFormatParam` — but it is only reached for pre-rebuild reports and `?ui=legacy`, never for a new job |
+
+So the radio decided nothing, and the form went from four steps to three.
+
+**The field itself had to stay, hidden.** `runBLAST` in
+`controllers/BLAST/BLAST.js` is not repo-owned and is the results page's engine
+too; it reads the checked `.output_format` radio and posts its value. With no
+checked radio in the DOM that is `undefined`, and the string "undefined" lands
+in `.parms` and in any legacy report reopened from it. One `checked` radio
+inside a `.blast-sr-only` wrapper keeps the contract. Verified end to end: a
+real search on the example sequence produced job `4cJeH1E5vqaE`, whose `.parms`
+records `output_format	enhanced`, and whose results page rendered all three
+views with 26 rows.
+
+**Two consequences in repo-owned files**, both of which would have been silent:
+
+- `BLAST_form.php` set `output_format_enhanced_checked` and, on a reopened job,
+  `output_format_<format>_checked`. Those placeholders no longer exist in the
+  template and **`Nary::get` throws on an identifier the template does not
+  declare**, so leaving them would have fatalled the page rather than doing
+  nothing. Both are gone.
+- `js/mgdb-blast.js` put the format in the run-bar summary line and listened for
+  changes on `.output_format`. The line now ends at the parameter preset.
+
+**A Bauplan comment cannot contain a dollar sign followed by an open bracket.**
+The first draft of the comment explaining all this quoted the jQuery selector
+`$('.output_format:checked')`, and Bauplan reads `$(` as a placeholder wherever
+it appears — including inside a `;;` comment. Caught by the paren balance check
+before deploying: 58 opens against 60 closes. The comment now says it in words.
+
+**The containers changed; the controls did not.** Every id in step 1 —
+`query_sequence`, `blast-seq-count`, `blast-seq-warning`, `genbank_accesion`,
+`blast-seq-limits` — is driven by id in `BLAST.js` and `js/mgdb-blast.js`, never
+by its wrapper, which is what made the restructure safe. Verified after:
+`BLAST_form.bau` opens 57 Bauplan constructs and carries 57 unescaped `)`,
+against 60 and 60 at `HEAD` — three fewer of each, one per removed
+`output_format_*_checked` placeholder, and still balanced. The 11 bare `(`
+are unchanged; they are the JavaScript in `onclick` attributes, whose closing
+bracket is escaped.
+
 **Only the front page.** Job submission, execution and results — `BLAST_run.php`,
 `BLAST_tasks.php`, `BLAST_visual_alignment.php`, `BLAST.js` and every
 `BLAST_results*.bau` — were not touched, and are deliberately absent from the

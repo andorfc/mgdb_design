@@ -38,12 +38,6 @@
     'short': 'For primers, probes and other short queries: e-value 10, so a short perfect match is not discarded.'
   };
 
-  var OUTPUT_HINTS = {
-    'enhanced': 'Alignment graphics, a map of where each hit falls, and links into MaizeGDB.',
-    'BLAST_table': 'One row per hit, sortable and ready to copy out.',
-    'BLAST_text': 'The raw BLAST report, as the command line prints it.'
-  };
-
   function byId(id) { return document.getElementById(id); }
 
   function on(el, type, fn) { if (el) { el.addEventListener(type, fn); } }
@@ -464,18 +458,15 @@
   function initSummary() {
     var summaryEl = byId('blast-run-summary');
     var presetHint = byId('blast-preset-hint');
-    var outputHint = byId('blast-output-hint');
 
     function update() {
       var type = checkedValue('.query_seq_type');
       var preset = checkedValue('.param_set');
-      var format = checkedValue('.output_format');
       var targets = document.querySelectorAll('.selected_BLAST_target').length;
       var box = byId('query_sequence');
       var hasSequence = box && box.value.trim() !== '';
 
       if (presetHint) { presetHint.textContent = PRESET_HINTS[preset] || ''; }
-      if (outputHint) { outputHint.textContent = OUTPUT_HINTS[format] || ''; }
 
       if (!summaryEl) { return; }
 
@@ -488,17 +479,19 @@
         return;
       }
 
+      /* No output format in the line any more: the step that chose one went on
+         2026-09-05, because the results page renders every view from one
+         `-outfmt 15` search. The hidden radio that survives is for
+         controllers/BLAST/BLAST.js, not for the reader. */
       var presetLabel = document.querySelector('.param_set:checked + label');
-      var formatLabel = document.querySelector('.output_format:checked + label');
       summaryEl.innerHTML =
         '<strong>' + (type === 'protein' ? 'Protein' : 'Nucleotide') + '</strong> query against <strong>'
         + targets + (targets === 1 ? '</strong> dataset' : '</strong> datasets')
-        + ' · ' + (presetLabel ? presetLabel.textContent : preset) + ' parameters'
-        + ' · ' + (formatLabel ? formatLabel.textContent.toLowerCase() : format) + ' output';
+        + ' · ' + (presetLabel ? presetLabel.textContent : preset) + ' parameters';
     }
 
     Array.prototype.forEach.call(
-      document.querySelectorAll('.query_seq_type, .param_set, .output_format'),
+      document.querySelectorAll('.query_seq_type, .param_set'),
       function (radio) { on(radio, 'change', update); });
 
     return update;

@@ -64,19 +64,26 @@ $$SYNTAX-LEVEL 2
           <p class="blast-seq-count" id="blast-seq-count" aria-live="polite"></p>
         </div>
 
-        <label class="mgdb-label blast-sr-only" for="query_sequence">Query sequence in FASTA format</label>
-        <textarea class="blast-textarea" id="query_sequence" rows="12" spellcheck="false"
-                  autocapitalize="off" autocorrect="off" wrap="off"
-                  data-max-queries="$(max_queries)" data-max-bp="$(max_query_size)"
-                  aria-describedby="blast-seq-count blast-seq-limits"
-                  placeholder="&gt;my_sequence&#10;ATGGCGACCAAGCTGGTGCTGGTG...">$(query_sequence)</textarea>
-        <p class="mgdb-hint" id="blast-seq-limits">Up to $(max_queries) sequences, $(max_query_size) bp in total. Def lines, digits and spaces are ignored.</p>
-        <p class="blast-seq-warning" id="blast-seq-warning" role="status" hidden></p>
-
-        <div class="blast-seq-tools">
-          <div class="blast-seq-tools-buttons">
-            <button type="button" class="mgdb-button mgdb-button-secondary" onclick="addExample(\)">Load an example</button>
-            <button type="button" class="mgdb-button mgdb-button-quiet" id="blast-clear-sequence">Clear</button>
+        ;; Two columns: the textarea and its own controls on the left, the
+        ;; GenBank fetch beside it on the right. It used to sit under the
+        ;; full-width textarea next to the Load/Clear buttons, which left a
+        ;; band of empty space to its left at every width above the breakpoint.
+        ;; Only the containers changed -- every id here is one BLAST.js or
+        ;; js/mgdb-blast.js drives by id, never by its wrapper.
+        <div class="blast-seq-layout">
+          <div class="blast-seq-main">
+            <label class="mgdb-label blast-sr-only" for="query_sequence">Query sequence in FASTA format</label>
+            <textarea class="blast-textarea" id="query_sequence" rows="12" spellcheck="false"
+                      autocapitalize="off" autocorrect="off" wrap="off"
+                      data-max-queries="$(max_queries)" data-max-bp="$(max_query_size)"
+                      aria-describedby="blast-seq-count blast-seq-limits"
+                      placeholder="&gt;my_sequence&#10;ATGGCGACCAAGCTGGTGCTGGTG...">$(query_sequence)</textarea>
+            <p class="mgdb-hint" id="blast-seq-limits">Up to $(max_queries) sequences, $(max_query_size) bp in total. Def lines, digits and spaces are ignored.</p>
+            <p class="blast-seq-warning" id="blast-seq-warning" role="status" hidden></p>
+            <div class="blast-seq-tools-buttons">
+              <button type="button" class="mgdb-button mgdb-button-secondary" onclick="addExample(\)">Load an example</button>
+              <button type="button" class="mgdb-button mgdb-button-quiet" id="blast-clear-sequence">Clear</button>
+            </div>
           </div>
           <div class="blast-genbank">
             <label class="mgdb-label" for="genbank_accesion">Or fetch from GenBank</label>
@@ -280,33 +287,30 @@ $$SYNTAX-LEVEL 2
       </div>
     </section>
 
-    <section class="blast-step" id="output_format" aria-labelledby="blast-step-output">
-      <div class="blast-step-head">
-        <span class="blast-step-number" aria-hidden="true">4</span>
-        <div>
-          <h3 id="blast-step-output">Choose the result format</h3>
-          <p>All three run the same search. The format decides how the hits are presented.</p>
-        </div>
-      </div>
-
-      <div class="blast-step-body">
-        <div class="blast-field pc-input_elem">
-          <span class="blast-sr-only" id="blast-output-label">Result format</span>
-          <div class="blast-segmented" role="radiogroup" aria-labelledby="blast-output-label">
-            <input type="radio" class="output_format" name="output_format" id="enhanced" value="enhanced"
-                   $(output_format_enhanced_checked)>
-            <label for="enhanced">Enhanced</label>
-            <input type="radio" class="output_format" name="output_format" id="BLAST_table" value="BLAST_table"
-                   $(output_format_BLAST_table_checked)>
-            <label for="BLAST_table">Table</label>
-            <input type="radio" class="output_format" name="output_format" id="BLAST_text" value="BLAST_text"
-                   $(output_format_BLAST_text_checked)>
-            <label for="BLAST_text">Text</label>
-          </div>
-          <p class="mgdb-hint" id="blast-output-hint"></p>
-        </div>
-      </div>
-    </section>
+    ;; Step 4, "Choose the result format", was removed on 2026-09-05. It offered
+    ;; Enhanced / Table / Text, and since the results interface was rebuilt in
+    ;; September all three are views of one search: blast_submit.php runs
+    ;; -outfmt 15 unconditionally and the results page renders every view from
+    ;; that JSON. The radio decided nothing. blast_submit.php read output_format
+    ;; only to write it into the job's .parms file, and nothing reads it back
+    ;; except this form's own prefill when a job is reopened.
+    ;;
+    ;; THE FIELD ITSELF HAS TO STAY, hidden. runBLAST in
+    ;; controllers/BLAST/BLAST.js is not repo-owned and is the results page's
+    ;; engine as well; it reads the checked .output_format radio and posts its
+    ;; value. With no checked radio in the DOM that value is undefined, and the
+    ;; string "undefined" lands in .parms and in any legacy report reopened from
+    ;; it. One checked radio keeps the contract and records the format the
+    ;; modern results page actually produces.
+    ;;
+    ;; No parentheses in this comment on purpose: Bauplan reads a dollar sign
+    ;; followed by an open bracket as a placeholder wherever it appears, and
+    ;; Nary::get throws on an identifier that does not exist.
+    <div class="blast-sr-only">
+      <input type="radio" class="output_format" name="output_format" id="enhanced"
+             value="enhanced" checked tabindex="-1" aria-hidden="true">
+      <label for="enhanced">Enhanced</label>
+    </div>
 
     <div class="blast-run-bar">
       <p class="blast-run-summary" id="blast-run-summary" aria-live="polite"></p>

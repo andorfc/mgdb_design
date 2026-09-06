@@ -84,7 +84,7 @@
   font-size: inherit;
 }
 
-/* ── The form: four numbered steps ───────────────────────────────────────── */
+/* ── The form: three numbered steps ──────────────────────────────────────── */
 
 .mgdb-blast-page .blast-form {
   display: grid;
@@ -307,14 +307,31 @@
   font-size: var(--mgdb-text-sm);
 }
 
-.mgdb-blast-page .blast-seq-tools {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-4);
+/* The sequence step is two columns: the textarea and its own controls on the
+   left, the GenBank fetch beside it.
+   -------------------------------------------------------------------------
+   GenBank used to sit under a full-width textarea, sharing a row with the
+   Load/Clear buttons. Those two buttons are 260px of a 1100px row, so the
+   remaining 26rem block was pushed to the right edge with a band of empty
+   space to its left at every width above the breakpoint. Beside the textarea
+   it fills a column instead, and the textarea narrows to the width a FASTA
+   line actually needs.
+
+   20rem is the GenBank column: the accession input plus its Fetch button, with
+   the hint under them wrapping to two lines at most. Below 860px there is not
+   room for both, and the grid becomes one column in source order -- textarea,
+   its buttons, then GenBank. */
+.mgdb-blast-page .blast-seq-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 20rem;
+  gap: var(--mgdb-space-5);
   align-items: start;
-  justify-content: space-between;
-  padding-top: var(--mgdb-space-2);
-  border-top: 1px solid var(--mgdb-line-soft);
+}
+
+.mgdb-blast-page .blast-seq-main {
+  display: grid;
+  gap: var(--mgdb-space-3);
+  min-width: 0;
 }
 
 .mgdb-blast-page .blast-seq-tools-buttons {
@@ -323,11 +340,24 @@
   gap: var(--mgdb-space-2);
 }
 
+/* The rule above the GenBank block is a left edge now rather than a full-width
+   top border, because the block sits beside the textarea rather than under it. */
 .mgdb-blast-page .blast-genbank {
   display: grid;
   gap: var(--mgdb-space-2);
   min-width: 0;
-  flex: 0 1 26rem;
+  padding-left: var(--mgdb-space-4);
+  border-left: 1px solid var(--mgdb-line-soft);
+}
+
+@media (max-width: 860px) {
+  .mgdb-blast-page .blast-seq-layout { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-blast-page .blast-genbank {
+    padding-left: 0;
+    padding-top: var(--mgdb-space-3);
+    border-left: 0;
+    border-top: 1px solid var(--mgdb-line-soft);
+  }
 }
 
 .mgdb-blast-page .blast-genbank > .mgdb-label {
@@ -707,22 +737,24 @@
 .mgdb-blast-page .blast-help-table { width: 100%; font-size: var(--mgdb-text-xs); }
 .mgdb-blast-page .blast-help-table code { font-size: 0.95em; }
 
-/* ── Step 4 and the run bar ──────────────────────────────────────────────── */
+/* ── The run bar ─────────────────────────────────────────────────────────── */
 
+/* In flow at the foot of the form, not stuck to the bottom of the viewport.
+   It was `position: sticky; bottom: 0`, so it floated over whatever section
+   the reader had scrolled to -- including the About and References sections,
+   where a Run BLAST button has nothing to run. The upward shadow that sold it
+   as a floating bar goes with the stickiness. */
 .mgdb-blast-page .blast-run-bar {
-  position: sticky;
-  bottom: 0;
-  z-index: 30;
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-3);
   align-items: center;
   justify-content: space-between;
-  padding: var(--mgdb-space-3) clamp(1rem, 2.4vw, 1.5rem);
+  margin-top: var(--mgdb-space-5);
+  padding: var(--mgdb-space-4) clamp(1rem, 2.4vw, 1.5rem);
   border: 1px solid var(--mgdb-green-dark);
   border-radius: var(--mgdb-radius-lg);
   background: var(--hub-surface);
-  box-shadow: 0 -2px 10px rgba(16, 30, 54, .10);
 }
 
 .mgdb-blast-page .blast-run-summary {
@@ -796,7 +828,6 @@
   .mgdb-blast-page .blast-seq-top > .blast-field { width: 100%; }
   .mgdb-blast-page .blast-segmented { width: 100%; }
   .mgdb-blast-page .blast-segmented label { flex: 1 1 auto; padding: 0 var(--mgdb-space-2); }
-  .mgdb-blast-page .blast-genbank { flex: 1 1 100%; }
   .mgdb-blast-page .blast-seq-tools-buttons .mgdb-button { flex: 1 1 auto; }
   .mgdb-blast-page .blast-run-bar { justify-content: stretch; }
   .mgdb-blast-page .blast-run-actions { flex: 1 1 100%; justify-content: flex-end; }
