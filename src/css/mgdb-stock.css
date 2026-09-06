@@ -102,8 +102,18 @@
 .mgdb-stock-page .stock-example-row,
 .mgdb-stock-page .stock-adv { grid-column: 1 / -1; }
 
+/* The hint sits on its own full-width row rather than inside the query field.
+   The form is `align-items: end`, so while the hint was a child of that field
+   the Search button bottom-aligned to the *hint* and sat 29px below the search
+   bar — exactly the hint's height plus the field's gap. Its own row lets the
+   button and the bar, both 44px, land on each other, and the hint is free to
+   wrap to two lines at narrow widths without moving the button again.
+
+   The negative top margin cancels most of the form's 16px row gap so the hint
+   keeps sitting 8px under the bar, where it was. */
 .mgdb-stock-page .stock-hint {
-  margin: var(--mgdb-space-1) 0 0;
+  grid-column: 1 / -1;
+  margin: calc(-1 * var(--mgdb-space-2)) 0 0;
   color: var(--mgdb-muted);
   font-size: var(--mgdb-text-xs);
 }
