@@ -605,6 +605,69 @@
   object-fit: none;
 }
 
+/* The upcoming pair leads with the destination -----------------------------
+
+   Both cards used to open on a green band: the 2027 meeting's own banner
+   artwork, and for 2028 -- which has none, `/images/MGC2028_img.png` answers
+   200 with the 404 page -- a plate carrying the year. Two green bands is what
+   the page already had everywhere else, so the band now carries a photograph
+   of where the meeting is going, which is the one thing about it a reader
+   cannot get from the text.
+
+   The band takes the images' own 1100x458 ratio rather than a rounder number,
+   so `cover` has nothing left to crop and the framing is the framing that was
+   checked. Sacramento's towers reach the top of the frame; a 3:1 band would
+   cut them off. */
+.mgdb-meeting-page .meeting-event-photo {
+  position: relative;
+  overflow: hidden;
+  /* The card is a column flex container that still carries `align-items:
+     center` from the base rule, so a child with no width is sized to its
+     content -- and a box whose only sizing is `aspect-ratio` has none, which
+     collapsed the band to 0x0. The band that this replaces set `width: 100%`
+     for the same reason. */
+  width: 100%;
+  align-self: stretch;
+  aspect-ratio: 1100 / 458;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-green-dark);
+}
+
+.mgdb-meeting-page .meeting-event-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The year, over the photograph. `p.` is not decoration: the card's own
+   `.meeting-event-card p` rule is (0,3,1) and carries a type selector, so a
+   bare class here would lose to it and the badge would come out muted, small
+   and pushed down by its margin. Same family as the timeline-modifier trap. */
+.mgdb-meeting-page .meeting-event-card p.meeting-event-year {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  padding: 2px var(--mgdb-space-3) 3px;
+  border-radius: 0 var(--mgdb-radius-sm) 0 0;
+  background: rgba(16, 45, 26, .88);
+  color: #f6d99a;
+  font-size: var(--mgdb-text-xl);
+  font-weight: 900;
+  letter-spacing: .03em;
+  line-height: 1.15;
+}
+
+/* One credit line for the pair rather than one per card: the page already
+   treats per-card credits as noise where a shared line will do. */
+.mgdb-meeting-page .meeting-upcoming-credit {
+  margin-top: var(--mgdb-space-3);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.5;
+}
+
 .mgdb-meeting-page .meeting-event-plate strong {
   position: static;
   padding: 0;

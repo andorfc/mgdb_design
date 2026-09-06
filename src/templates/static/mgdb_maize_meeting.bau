@@ -39,7 +39,13 @@ $$SYNTAX-LEVEL 2
     <div class="meeting-upcoming-grid">
 
       <article class="meeting-event-card">
-        <span class="meeting-event-visual"><img src="/images/MGC2027_img.png" alt="69th Annual Maize Genetics Meeting" /></span>
+        <div class="meeting-event-photo">
+          <!-- Eager, and high priority: this pair is the first thing on the page,
+               so these are the largest paint. A lazy hero image is a slower one. -->
+          <img src="/images/maize_meeting/chicago2027.jpg" width="1100" height="458"
+               alt="The Chicago skyline at dusk above the trees of Grant Park" fetchpriority="high" decoding="async" />
+          <p class="meeting-event-year" aria-hidden="true">2027</p>
+        </div>
         <div class="meeting-event-body">
           <small>69th annual meeting</small>
           <h3>Chicago, Illinois, USA</h3>
@@ -50,10 +56,13 @@ $$SYNTAX-LEVEL 2
       </article>
 
       <article class="meeting-event-card">
-        <!-- No MGC2028 artwork exists yet. Rather than stretch a 101px city
-             photograph, the plate carries the year in the same band the 2027
-             artwork occupies, so the two cards are the same shape. -->
-        <span class="meeting-event-visual meeting-event-plate" aria-hidden="true"><strong>2028</strong></span>
+        <div class="meeting-event-photo">
+          <!-- Eager, and high priority: this pair is the first thing on the page,
+               so these are the largest paint. A lazy hero image is a slower one. -->
+          <img src="/images/maize_meeting/sacramento2028.jpg" width="1100" height="458"
+               alt="The yellow towers of the Tower Bridge over the Sacramento River" fetchpriority="high" decoding="async" />
+          <p class="meeting-event-year" aria-hidden="true">2028</p>
+        </div>
         <div class="meeting-event-body">
           <small>70th annual meeting</small>
           <h3>Sacramento, California, USA</h3>
@@ -64,6 +73,12 @@ $$SYNTAX-LEVEL 2
       </article>
 
     </div>
+
+    <p class="meeting-upcoming-credit">Destination photographs:
+      <a href="https\://commons.wikimedia.org/wiki/File:Skyline_de_Chicago_desde_el_centro,_Illinois,_Estados_Unidos,_2012-10-20,_DD_09.jpg">Chicago skyline from Grant Park</a>
+      by Diego Delso, CC BY-SA 3.0;
+      <a href="https\://commons.wikimedia.org/wiki/File:Tower_Bridge_2021-06-22.jpg">Tower Bridge, Sacramento</a>
+      by Mackinacbridge, CC0. Both via Wikimedia Commons.</p>
 
     <details class="meeting-leadership">
       <summary>2027 steering committee, local host, and ex-officio members</summary>

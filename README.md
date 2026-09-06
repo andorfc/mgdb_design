@@ -128,6 +128,37 @@ plant with strap leaves. Source art is `icons/mono`, `icons/color` and
 site actually serves is inlined in `search-box-modern.bau`, so a change has to
 be written to both.
 
+## Photographs
+
+Every photograph on the site comes from Wikimedia Commons under a licence that
+permits reuse, and every one is recorded in a `CREDITS.json` beside the files —
+venue, licence, creator, work title, and a link to the source page. CC BY and
+CC BY-SA both *require* the credit, so the credit is part of shipping the
+image, not an optional nicety. `src/images/maize_meeting/CREDITS.json` is the
+worked example; the meeting page renders its archive credits from the same data
+in `js/mgdb-maize-meeting.js`.
+
+**Check that a free photograph of the subject actually exists before promising
+one.** The United States has freedom of panorama for *architectural works*
+only — 17 U.S.C. §120 — and not for sculpture. So a landmark that is a building
+or a bridge can be photographed and the photograph freely licensed, and a
+landmark that is a sculpture cannot:
+
+- **Chicago's Cloud Gate, "the Bean", is a sculpture** by Anish Kapoor, and
+  photographs of it are derivative works. Commons holds six files in
+  `Category:Cloud Gate` and they are the sculpture under construction, tented,
+  or behind a closure sign; the one general view that survives,
+  `File:The Bean and McCormick Tribune Plaza.jpg`, is tagged
+  `{{De minimis|Cloud Gate sculpture}}` — kept because the sculpture is
+  incidental, which is exactly what it would stop being if it were used *as* a
+  picture of the Bean. There is no free photograph of it to use. The 2027 card
+  shows the skyline from Grant Park instead, which is the same park.
+- **Sacramento's Tower Bridge is a bridge**, so it is unencumbered; the 2028
+  card uses a CC0 photograph of it.
+
+When the answer is "that landmark cannot be shown", say so and offer the
+nearest thing rather than shipping an image that cannot be licensed.
+
 ## Deploying
 
 ```bash
