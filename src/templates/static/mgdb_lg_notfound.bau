@@ -1,0 +1,65 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-lg-notfound
+<meta name="robots" content="noindex">
+<meta property="og:title" content="No linkage group found &mdash; MaizeGDB">
+<meta property="og:description" content="$(notfound_summary)">
+
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-record-notfound-page" id="lg-notfound-top">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/lg">Linkage Groups</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Not found</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-notfound-hero" aria-labelledby="lg-notfound-title">
+    <div class="mgdb-hero-body">
+      <h1 id="lg-notfound-title">No linkage group matches &ldquo;$(requested_display)&rdquo;</h1>
+      <p class="mgdb-rec-lead">No chromosome, plasmid, phage, or organellar genome in MaizeGDB carries that name, synonym, or MaizeGDB ID.</p>
+    </div>
+  </section>
+
+  <section id="lg-notfound-search" aria-labelledby="lg-notfound-search-title">
+    <div class="mgdb-section-heading"><div><h2 id="lg-notfound-search-title">Search</h2></div></div>
+    <form class="mgdb-rec-search" action="/data_center/lg" method="get" role="search">
+      <label class="mgdb-visually-hidden" for="lg-notfound-query">Linkage group name or MaizeGDB ID</label>
+      <input class="mgdb-input" id="lg-notfound-query" name="filter" type="search" autocomplete="off" value="$(requested_value)" placeholder="Linkage group name or MaizeGDB ID" />
+      <button class="mgdb-button mgdb-button-primary" type="submit">Search linkage groups</button>
+    </form>
+    <p class="mgdb-rec-examples">
+      <span>Try an example&#58;</span>
+      <a class="mgdb-rec-example" href="/data_center/lg/1">Chromosome 1</a>
+      <a class="mgdb-rec-example" href="/data_center/lg/plastid">plastid</a>
+      <a class="mgdb-rec-example" href="/data_center/lg/S.%20bicolor%20A">S. bicolor A</a>
+    </p>
+    <p class="mgdb-rec-hint">A linkage group is whatever a locus is placed on. Most are the ten maize chromosomes, but the collection also holds plasmids, phage, BACs, and the plastid genome. A gene symbol names a locus rather than a linkage group.</p>
+  </section>
+
+  $(suggestion_sections)
+
+  <section class="mgdb-hub-related" id="lg-notfound-resources" aria-labelledby="lg-notfound-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="lg-notfound-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/lg">
+          <strong>All linkage groups</strong>
+          <span>Every chromosome, plasmid, phage, and organellar genome loci are placed on</span>
+        </a>
+        <a href="/data_center/map">
+          <strong>Map Data Hub</strong>
+          <span>Search every genetic, cytogenetic, and physical chromosome map</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>Classical loci and the gene models that represent them</span>
+        </a>
+        <a href="/searchall">
+          <strong>Search all MaizeGDB data</strong>
+          <span>One search across genes, loci, stocks, references, and every other data type</span>
+        </a>
+        <a href="https\://jbrowse.maizegdb.org/" target="_blank" rel="noopener">
+          <strong>MaizeGDB JBrowse 2</strong>
+          <span>Explore maize features in their genomic context</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

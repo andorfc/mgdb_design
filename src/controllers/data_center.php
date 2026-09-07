@@ -307,6 +307,33 @@
     }
   }
 
+  /* Linkage group index and record pages, modernized 2026-09-06 (Carson).
+
+     The legacy route rendered four empty collapsible sections and shipped no
+     script that would fill them, so /data_center/lg/13579 answered 200 with
+     the chrome and not one fact -- not even the record's name -- while the
+     Locus advanced search, the stock and variation record pages and three v1
+     API record types all link into it. The bare route answered the generic
+     "page cannot be found" body, which is what 86 of the 92 requests in the
+     log sample asked for.
+
+     record_data/lg_data.php is left in place but is no longer reachable from
+     any page. Its type=loci branch returned 8,996 KB in 5.8 s for chromosome
+     1, a grid of 94,465 locus links with no cap.
+
+     Rollback: delete this block. */
+  if (PAGE == 'lg' && !getCGIParam('id', 'G', ID)) {
+    if (include('controllers/data_center/lg_index_modern.php')) {
+      return;
+    }
+  }
+
+  if (PAGE == 'lg' && getCGIParam('id', 'G', ID)) {
+    if (include('controllers/data_center/lg_record_modern.php')) {
+      return;
+    }
+  }
+
   if (PAGE == 'map' && !getCGIParam('id', 'G', ID)) {
     include('controllers/data_center/map_search_modern.php');
     return;

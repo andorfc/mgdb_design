@@ -89,6 +89,14 @@ PROBE_SKIP = re.compile(
     re.I,
 )
 
+# Machine endpoints, not pages. These answer JSON to a program, so the modern
+# interface markers can never appear in them and the scan classified /api as a
+# legacy page waiting to be converted -- which put the redesign's own API in the
+# migration queue, ranked above real pages, and would have had it retired. They
+# are given their own disposition and left out of both the queue and the
+# percentage: there is no page here to convert.
+ENDPOINT = re.compile(r"^/api(/|$)", re.I)
+
 # Categories, in the order they appear in the report.
 CATEGORY_ORDER = [
     "Data hubs",
@@ -842,6 +850,14 @@ class Scanner(object):
                     if "://" in target:
                         rest = target.split("//", 1)[1]
                         if rest.split("/", 1)[0].split(":")[0] != host_header:
+                            # A hop to another host is never one of the
+                            # normalising hops handled below -- it is a move off
+                            # the site, and the commonest kind of retirement
+                            # after the internal 301. Discarding it reported
+                            # /mapman and /mcclintockprize, which redirect to
+                            # download.maizegdb.org and maizegenetics.org, as
+                            # legacy pages still waiting to be converted.
+                            moved_to = target
                             target = None
                         else:
                             target = "/" + rest.split("/", 1)[1] if "/" in rest else "/"
@@ -962,7 +978,9 @@ class Scanner(object):
         site.
         """
         for row in rows:
-            if row["status"] in ("modern", "retired"):
+            if ENDPOINT.match(row["url"]):
+                row["disposition"] = "endpoint"
+            elif row["status"] in ("modern", "retired"):
                 row["disposition"] = row["status"]
             elif row["record_modern"]:
                 row["disposition"] = "record-modern"
@@ -1019,6 +1037,13 @@ class Scanner(object):
             else:
                 third_party.append(entry)
 
+        # An endpoint should never be classified modern -- the markers are HTML
+        # -- but subtract it from both halves rather than assume it.
+        endpoints = [row for row in rows if row["disposition"] == "endpoint"]
+        page_total = len(rows) - counts["retired"] - len(endpoints)
+        modern_pages = counts["modern"] - sum(1 for row in endpoints
+                                              if row["status"] == "modern")
+
         return {
             "generated": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "generator": "tools/redesign_status.py %s" % VERSION,
@@ -1028,8 +1053,10 @@ class Scanner(object):
             "total": len(rows),
             # Retired routes are excluded from the denominator: they are not
             # pages waiting to be modernized, so counting them drags the
-            # figure down for work that is done.
-            "percent_modern": round(100.0 * counts["modern"] / (len(rows) - counts["retired"]), 1) if (len(rows) - counts["retired"]) else 0.0,
+            # figure down for work that is done. Machine endpoints are excluded
+            # for the opposite reason -- they will never be converted, so
+            # counting them holds the figure below 100 for ever.
+            "percent_modern": round(100.0 * modern_pages / page_total, 1) if page_total else 0.0,
             "by_category": by_category,
             "category_order": [c for c in CATEGORY_ORDER if c in by_category],
             "rows": rows,
@@ -1102,6 +1129,7 @@ def write_markdown(data, path):
     add("| &nbsp;&nbsp;&mdash; record page already modern | %d |" % disp.get("record-modern", 0))
     add("| &nbsp;&nbsp;&mdash; not linked from the modern site | %d |" % disp.get("orphaned", 0))
     add("| Retired | %d |" % counts.get("retired", 0))
+    add("| Machine endpoints (no page to convert) | %d |" % disp.get("endpoint", 0))
     add("| Classified by live response | %s |" % ("yes" if data["probed"] else "no, source analysis only"))
     add("")
     add("```")

@@ -141,19 +141,17 @@ SECTIONS = [
         ("Research projects", "/projects", "Every maize research project with data, results, or documentation here."),
         ("Find researchers", "/person", "Search the MaizeGDB people directory."),
         ("Maize Genetics Conference", "/maize_meeting", "Past, present, and future annual meetings."),
-        ("Meeting cover art", "/maize_meeting_coverart", "Cover art from past meeting programs."),
         ("Maize Genetics Cooperation", "https://www.maizegenetics.org", "The organization coordinating maize research cooperation."),
         ("MGEC", "/mgec", "The Maize Genetics Executive Committee record, 2000-2019: origins, procedures, committees, activities, and documents."),
-        ("Steering committee", "/steering_committee", "Committee membership and role."),
+        ("Steering committee", "/working_group#wg-steering", "The ten-person committee that guided the MaizeDB to MaizeGDB transition, recorded on the Working Group page."),
         # Documentation rather than a live body, and the description says so:
         # the group is not currently active and the page is its record. Kept out
         # of the megamenu for the same reason (Carson, 2026-09-05).
-        ("MaizeGDB Working Group", "/working_group", "Documentation on the MaizeGDB Working Group, which is not currently active: membership, past members, and the status reports and guidance exchanged with the MaizeGDB team, 2006-2018."),
+        ("MaizeGDB Working Group", "/working_group", "Documentation on the MaizeGDB Working Group, which is not currently active: membership, past members, the transition Steering Committee that preceded it, and the status reports and guidance exchanged with the MaizeGDB team, 2006-2018."),
         ("Awards", "https://www.maizegenetics.org/awards/community-awards", "Maize Genetics Cooperation community awards."),
-        ("McClintock Prize", "/mcclintockprize", "The McClintock Prize for Plant Genetics and Genome Studies."),
+        ("McClintock Prize", "https://www.maizegenetics.org/awards/mcclintock-prize", "The McClintock Prize for Plant Genetics and Genome Studies, awarded by the Maize Genetics Cooperation."),
         ("Jobs", "/jobs", "Positions shared with MaizeGDB."),
         ("Order stocks from the Stock Center", "/ordering/coop_order", "Request seed from the Maize Genetics Cooperation Stock Center."),
-        ("Education", "/education", "Teaching and outreach materials about maize and genetics."),
     ]),
 
     ("literature", "community", "Publications, news, and media", "", [
@@ -218,8 +216,7 @@ SECTIONS = [
         ("SSR markers", "/data_center/ssr", "SSR marker archive."),
         ("QTL", "/data_center/qtl", "Quantitative trait loci, from the older mapping literature."),
         ("Recombination maps", "/data_center/RNmaps", "Recombination nodule maps."),
-        ("MapMan add-ons", "/mapman", "MaizeGDB mappings for the MapMan pathway visualization tool."),
-        ("MapMan two-tissue comparison", "/mapman_two_tissue_comp", "Compare expression between two tissues in MapMan."),
+        ("MapMan gene atlas files", "https://download.maizegdb.org/Archive/MapMan_GeneAtlas/", "MapMan-formatted expression files from the Sekhon et al. 2011 maize development atlas, single tissue and median."),
         ("SSR reports", "/ssrreports", "Every archived SSR record carrying a repeat motif, and the SSRs derived from mapped genes."),
         ("IBM map scores", "/mapscore_ibmlist", "Scored IBM mapping data."),
         ("IBM 302 list", "/mapscore_ibm302list", "IBM 302 line list."),
@@ -255,6 +252,8 @@ DATA_CENTERS = [
      "Alleles, polymorphisms, and the mutant collections behind them."),
     ("Maps", "/data_center/map",
      "Genetic, cytogenetic, physical, and bin maps across chromosomes 1-10."),
+    ("Linkage groups", "/data_center/lg",
+     "What a locus is placed on: the chromosomes, and the plasmids, phage, BACs, and organellar genomes used in maize genetics."),
     ("Phenotypes", "/data_center/phenotype",
      "Phenotype records and the mutant archives they come from."),
     ("Images", "/data_center/image",

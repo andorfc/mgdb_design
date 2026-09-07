@@ -38,6 +38,27 @@
     exit;
   }
 
+  /* /about/api retired 2026-09-06 (Carson).
+   *
+   * A 2012 page titled "MaizeGDB API" that is not an API: it is instructions for
+   * linking to MaizeGDB from your own site, and its instructions are now wrong.
+   * It tells readers to append a GenBank accession to
+   * http://claude.maizegdb.org/data_center/sequence/ -- a route retired on
+   * 2026-09-01 that now 301s to /genome. Retired to /contact, the same
+   * destination /faq took, so anyone who arrives wanting linking help can ask.
+   *
+   * The real API is controllers/api.php at /api, which is unrelated to this page
+   * and is not retired. The redesign status scan listed it in the page migration
+   * queue because it is JSON rather than HTML; tools/redesign_status.py now
+   * excludes it.
+   *
+   * Rollback: delete this block and /about/api serves the legacy page again.
+   */
+  if (PAGE == 'api') {
+    header('Location: /contact', true, 301);
+    exit;
+  }
+
   // The site map opts in to the shared responsive design-system shell.
   // All other About routes continue through the legacy controller unchanged.
   if (PAGE == 'sitemap') {

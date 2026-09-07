@@ -1,0 +1,99 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-lg-index
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:title" content="Linkage groups &mdash; MaizeGDB">
+<meta property="og:description" content="$(lg_summary)">
+
+<main class="mgdb-page mgdb-hub-page mgdb-lg-index-page" id="lg-index-top">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Linkage Groups</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero" aria-labelledby="lg-index-title">
+    <div class="mgdb-hero-body">
+      <h1 id="lg-index-title">Linkage groups</h1>
+      <p class="mgdb-hero-description">A linkage group is whatever a locus is placed on. Most are chromosomes, but the collection also holds the plasmids, phage, BACs, cosmids and organellar genomes used in maize genetics.</p>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" id="lg-index-tabs" aria-label="Sections on this page">
+    <a href="#lg-index-list">All linkage groups</a>
+    <a href="#lg-index-metrics">Metrics</a>
+    <a href="#lg-index-resources">Related resources</a>
+  </nav>
+
+  <section id="lg-index-list" aria-labelledby="lg-index-list-title">
+    <div class="mgdb-section-heading"><div><h2 id="lg-index-list-title">All linkage groups</h2></div></div>
+
+    <div class="mgdb-hub-field">
+      <label for="lg-index-filter">Filter by name, type, or species</label>
+      <input class="mgdb-input" id="lg-index-filter" type="search" autocomplete="off" placeholder="chromosome, plastid, Sorghum, pAD-GAL4&hellip;" />
+    </div>
+
+    <div class="mgdb-filters" role="group" aria-label="Filter linkage groups by type" id="lg-index-chips">$(lg_chips)</div>
+
+    <p class="mgdb-result-count" id="lg-index-count">$(lg_total) linkage groups</p>
+
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table mgdb-rec-table" id="lg-index-table">
+        <thead>
+          <tr>
+            <th scope="col" class="is-sortable" data-sort="text">
+              <button type="button">Linkage group <span class="sort-icon" aria-hidden="true">&updownarrow;</span></button>
+            </th>
+            <th scope="col" class="is-sortable" data-sort="text">
+              <button type="button">Type <span class="sort-icon" aria-hidden="true">&updownarrow;</span></button>
+            </th>
+            <th scope="col" class="is-sortable" data-sort="text">
+              <button type="button">Species <span class="sort-icon" aria-hidden="true">&updownarrow;</span></button>
+            </th>
+            <th scope="col" class="is-sortable" data-sort="number" aria-sort="descending">
+              <button type="button">Loci placed <span class="sort-icon" aria-hidden="true">&darr;</span></button>
+            </th>
+            <th scope="col" class="is-sortable" data-sort="number">
+              <button type="button">Maps <span class="sort-icon" aria-hidden="true">&updownarrow;</span></button>
+            </th>
+          </tr>
+        </thead>
+        <tbody id="lg-index-rows">$(lg_rows)</tbody>
+      </table>
+    </div>
+
+    <p class="mgdb-empty" id="lg-index-empty" hidden>No linkage group matches that filter.</p>
+  </section>
+
+  <section id="lg-index-metrics" aria-labelledby="lg-index-metrics-title">
+    <div class="mgdb-section-heading"><div><h2 id="lg-index-metrics-title">Metrics</h2></div></div>
+    <div class="mgdb-metric-grid">$(lg_metrics)</div>
+  </section>
+
+  <section class="mgdb-hub-related" id="lg-index-resources" aria-labelledby="lg-index-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="lg-index-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/map">
+          <strong>Map Data Hub</strong>
+          <span>Search every genetic, cytogenetic, and physical chromosome map</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>Classical loci and the gene models that represent them</span>
+        </a>
+        <a href="/tools/bin_viewer">
+          <strong>Bin Viewer</strong>
+          <span>Explore data in the regions defined by genetic bins</span>
+        </a>
+        <a href="/searchall">
+          <strong>Search all MaizeGDB data</strong>
+          <span>One search across genes, loci, stocks, references, and every other data type</span>
+        </a>
+        <a href="https\://jbrowse.maizegdb.org/" target="_blank" rel="noopener">
+          <strong>MaizeGDB JBrowse 2</strong>
+          <span>Explore maize features in their genomic context</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

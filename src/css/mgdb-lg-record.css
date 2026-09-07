@@ -1,0 +1,31 @@
+/* ==========================================================================
+   Linkage group record page — /data_center/lg/{id}
+   --------------------------------------------------------------------------
+   The record shell (css/mgdb-record.css) supplies everything this page draws.
+   The one thing it cannot supply is the scroll offset, because that depends on
+   how many rows this page's own tab labels take.
+
+   mgdb-record.css sets a single `scroll-margin-top: 6.5rem` (104px) for every
+   record page at every width. Measured on this page's bar, which is
+   Overview / Maps / Loci / External records / References / Metrics /
+   Related resources / API with their counts:
+
+     >= 960px   one row,  57px  -> 104px leaves 47px of dead space
+     768-959    two rows, 105px -> 104px lands every heading 1px BEHIND the bar
+     <= 767     one row,  57px  (mgdb-modern.css makes it a scrolling rail)
+
+   The wrap is between 945 and 960. So the band that needs the deeper offset is
+   768-959, and it needs 113px -- 105 plus the 8px clearance the hub shell uses
+   -- not 104.
+
+   The same 1px shortfall is on /data_center/map/{id}, whose longer labels wrap
+   at 1280 and land at -1px there. That is the shared sheet's flat value, not
+   this page, and fixing it for every record page means measuring every record
+   page's wrap point first.
+   -------------------------------------------------------------------------- */
+
+.mgdb-lg-record-page > section[id] { scroll-margin-top: 65px; }
+
+@media (min-width: 768px) and (max-width: 959px) {
+  .mgdb-lg-record-page > section[id] { scroll-margin-top: 113px; }
+}

@@ -224,6 +224,12 @@ function api_record_types() {
       'example' => $base . '/api/v1/records/map/64489'
     ),
     array(
+      'type' => 'linkage_group',
+      'description' => 'Linkage groups: the maize chromosomes, and the plasmids, phage, BACs and organellar genomes a locus can otherwise sit on.',
+      'href' => $base . '/api/v1/records/linkage_group/{id}',
+      'example' => $base . '/api/v1/records/linkage_group/1'
+    ),
+    array(
       'type' => 'primer',
       'description' => 'Primers and restriction enzymes: the sequence, melting temperature, and the probes each is the source DNA for.',
       'href' => $base . '/api/v1/records/primer/{id}',
