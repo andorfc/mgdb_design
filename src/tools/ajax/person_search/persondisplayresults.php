@@ -5,6 +5,7 @@
  */
   require_once("../../../include/gp_lib.php");
   require_once("../../../include/db-api.php");
+  require_once("../../../include/person_search_lib.php");
 
   header('Content-Type: text/html; charset=utf-8');
   header('Cache-Control: no-cache, no-store, must-revalidate');
@@ -50,7 +51,11 @@
     $stmt = make_query($DBConn, $query, 1, array($letter_clean . '%', $letter_clean . '%'));
     $search_label = "Last name beginning with '$letter_clean'";
   } else {
-    // Text search query
+    /* Text search. The clauses come from include/person_search_lib.php, shared
+       with person_suggest_api.php so the box and the results cannot disagree
+       about what a query means -- which they would have, since only one of the
+       two would otherwise have learned to read "Ed Buckler". */
+    $clauses = mgdbPersonSearchClauses($term, array('synonyms' => true));
     $query = "
       SELECT P.ID, P.NAME, P.NAME_FIRST, P.NAME_LAST, P.TYPE, ORG.NAME AS INSTITUTION, ORG.ID AS ORG_ID,
              P.CITY, P.STATE, P.COUNTRY, P.ORCID, S.SYNONYMS
@@ -58,23 +63,10 @@
       JOIN ID_NUM I ON P.ID = I.ID AND I.CURATION_LVL = 0
       LEFT JOIN PERSON ORG ON P.INSTITUTION = ORG.ID
       LEFT JOIN SYNONYMS S ON P.ID = S.ID
-      WHERE LOWER(COALESCE(P.NAME, '')) LIKE ?
-         OR LOWER(COALESCE(P.NAME_FIRST, '')) LIKE ?
-         OR LOWER(COALESCE(P.NAME_LAST, '')) LIKE ?
-         OR LOWER(COALESCE(ORG.NAME, '')) LIKE ?
-         OR LOWER(COALESCE(S.SYNONYMS, '')) LIKE ?
-      ORDER BY CASE
-        WHEN LOWER(P.NAME) = ? THEN 0
-        WHEN LOWER(COALESCE(P.NAME_LAST, '')) = ? THEN 1
-        WHEN LOWER(P.NAME) LIKE ? THEN 2
-        WHEN LOWER(COALESCE(P.NAME_LAST, '')) LIKE ? THEN 3
-        WHEN LOWER(COALESCE(P.NAME_FIRST, '')) LIKE ? THEN 4
-        WHEN LOWER(COALESCE(ORG.NAME, '')) LIKE ? THEN 5
-        ELSE 6 END,
-        LOWER(P.NAME)
+      WHERE " . $clauses['where'] . "
+      ORDER BY " . $clauses['order'] . "
       LIMIT 75";
-    $params = array($contains, $prefix, $prefix, $contains, $contains, $lower, $lower, $prefix, $prefix, $prefix, $prefix);
-    $stmt = make_query($DBConn, $query, 1, $params);
+    $stmt = make_query($DBConn, $query, 1, $clauses['params']);
     $search_label = "term '" . htmlspecialchars($term) . "'";
   }
 

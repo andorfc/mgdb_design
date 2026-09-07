@@ -5,6 +5,7 @@
  */
   require_once("../../../include/gp_lib.php");
   require_once("../../../include/db-api.php");
+  require_once("../../../include/person_search_lib.php");
 
   header('Content-Type: application/json; charset=utf-8');
   header('Cache-Control: private, max-age=30');
@@ -20,29 +21,22 @@
   $contains = '%' . $lower . '%';
   $prefix = $lower . '%';
 
+  /* Shared with persondisplayresults.php via include/person_search_lib.php, so
+     the suggestions under the box and the results the box produces cannot mean
+     different things by the same query. See the note there about why
+     "Ed Buckler" found nothing. */
+  $clauses = mgdbPersonSearchClauses($term, array('synonyms' => false));
   $query = "
     SELECT P.ID, P.NAME, P.NAME_FIRST, P.NAME_LAST, P.TYPE, ORG.NAME AS INSTITUTION,
            P.CITY, P.STATE, P.COUNTRY
     FROM PERSON P
     JOIN ID_NUM I ON P.ID = I.ID AND I.CURATION_LVL = 0
     LEFT JOIN PERSON ORG ON P.INSTITUTION = ORG.ID
-    WHERE LOWER(COALESCE(P.NAME, '')) LIKE ?
-       OR LOWER(COALESCE(P.NAME_FIRST, '')) LIKE ?
-       OR LOWER(COALESCE(P.NAME_LAST, '')) LIKE ?
-       OR LOWER(COALESCE(ORG.NAME, '')) LIKE ?
-    ORDER BY CASE
-      WHEN LOWER(P.NAME) = ? THEN 0
-      WHEN LOWER(COALESCE(P.NAME_LAST, '')) = ? THEN 1
-      WHEN LOWER(P.NAME) LIKE ? THEN 2
-      WHEN LOWER(COALESCE(P.NAME_LAST, '')) LIKE ? THEN 3
-      WHEN LOWER(COALESCE(P.NAME_FIRST, '')) LIKE ? THEN 4
-      WHEN LOWER(COALESCE(ORG.NAME, '')) LIKE ? THEN 5
-      ELSE 6 END,
-      LOWER(P.NAME)
+    WHERE " . $clauses['where'] . "
+    ORDER BY " . $clauses['order'] . "
     LIMIT 10";
 
-  $params = array($contains, $prefix, $prefix, $contains, $lower, $lower, $prefix, $prefix, $prefix, $prefix);
-  $stmt = make_query($DBConn, $query, 1, $params);
+  $stmt = make_query($DBConn, $query, 1, $clauses['params']);
   $results = array();
 
   while ($row = retrieve_row($stmt)) {
