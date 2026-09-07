@@ -1,0 +1,208 @@
+*(sequencing_project-content
+<div id='sitemap_content'>
+  <p id='big'>
+    <a href='#description' id='link_blue'>
+	  <img src='../../images/bulletpoint.png' border=0> Desciption
+	</a>
+  </p>
+  <p id='big'>
+    <a href='#stock' id='link_blue'>
+      <img src='../../images/bulletpoint.png' border=0> B73 Project Stock Information
+    </a>
+  </p>
+  <p id='big'>
+    <a href='#input' id='link_blue'>
+      <img src='../../images/bulletpoint.png' border=0> B73 Project Input Data Descriptions
+    </a>
+  </p>
+  <p id='big'>
+    <a href='#output' id='link_blue'>
+      <img src='../../images/bulletpoint.png' border=0> B73 Project Output Data Descriptions
+    </a>
+  </p>
+  <p id='big'>
+    <a href='#timeline' id='link_blue'>
+      <img src='../../images/bulletpoint.png' border=0> B73 Project Timeline
+    </a>
+  </p>
+  <br>
+   @(div-descriptions
+    <div id='3'>
+	  <br>
+	  <a name='description'/>
+	  <br>
+	  <p> 
+	    <span style='font-weight:bold'> B73 - A BAC by BAC approach	</span>
+        <br>
+        This effort utilized a minimal tiling path of approximately 19,000 
+        mapped BAC clones, and produced sequence coverage of all identifiable 
+        gene-containing regions of the maize genome. These regions were 
+        ordered, oriented, and along with all of the intergenic sequences, 
+        anchored to the extant physical and genetic maps of the B73 genome. 			
+      </p>
+	  <br>
+	</div>
+	<br>
+    )
+    @(div-stock	
+	 <div id='4'>
+	   <a name="stock"/>
+	   <p id='bold_title' style='font-style:italic'> 
+		 B73 Project Stock Information  
+	   </p>
+	   <br>
+	   <p>
+	     <a></a>
+	     The B73 source for the BAC libraries \(BACs with prefix "b" prepared
+		   in Rod Wing's lab; BACs with prefix "c" prepared in Peter deJong's lab\)
+		   was 
+		   <a href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail.aspx?accid=PI+550473">
+		     PI 550473.
+		   </a>
+       When requesting seed from the North Central Regional Plant 
+		   Introduction Station, ask for any lot descended from the Coe PI 550473 lines.
+	   </p>
+	   <br>
+	   <p>
+	     The stock was received directly by the North Central Regional Plant Intoduction
+		   Station from Arnel Hallauer and has been maintained by the quality-maintenance 
+		   procedures at the PI Station. Ed Coe reports that, "The results of QC lab checks
+		   for constancy in PI 550473 have been excellent." 
+	   </p>
+	   <br>
+	   <p>
+	     The same source was used for the IBM mapping population. Maps produced at
+		   Missouri used 302 lines of this population, providing unmatched precision
+		   \(resolution is at the intra-BAC level\). These maps anchor the 
+		   fingerprint-based contig assemblies to chromosome location. 
+	   </p>
+	   <br>
+	   <p>
+	     High-Molecular-Weight DNA was prepared by Jack Gardiner in the lab at 
+		   Missouri and shipped to Clemson \(Wing's lab at the time\) and to deJong's
+		   lab \(just at the time his lab was moving to California\) for BAC 
+		   preparation.
+       </p>
+       <p>
+         NSF grant reports have documented the details, and specifics for the
+		     materials, preparation, characterization, and final assembly of the 
+		     contig framework can be found in 
+		     <a href="$(root_url)/data_center/reference/9017907">
+		       Coe E, Schaeffer ML \(2005\) Genetic, physical, maps, and database resources for maize. Maydica 50:285-303.
+		     </a> 
+		     Ed Coe has made a copy of that paper available 
+		     <a href="$(root_url)/B73materials.pdf">
+		       here.
+		     </a>
+       </p>
+     </div>
+	 <br>
+    )
+    @(div-input
+     <div id='5'>
+       <br>
+	   <a name="input"/>
+	   <p id='bold_title' style='font-style:italic'> B73 Project Input Data Descriptions</p>
+	   <br>
+       <p>
+	     <span style='font-weight:bold'> The Physical Map </span> 
+         <br> &nbsp;&nbsp;Total Assembled Contigs: 721
+         <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Equal to 2,150 Mb; 93.5% coverage of 2300 Mb genome
+         <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Anchored: 421 ctgs; 86.1% the genome 
+         <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Average anchored contig size: 4.7 Mb
+         <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Unanchored: 300 ctgs, 7.4% coverage
+         <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Average unanchored contig size: 0.56 Mb
+         <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;189 of the 300 unanchored contigs are less than 10 clones
+         <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Largest anchored contig 22.9Mb in Chr9
+         <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Largest unanchored contig 6.7 Mb
+		     <br> &nbsp;&nbsp; Total FPC Markers:	25,000
+         <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; STS markers:		~9,000
+         <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Overgo Markers:	14,825
+         <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Anchored markers: 	 1,918
+       </p>
+	   <br>
+       <p>
+	     <span style='font-weight:bold'> The Tiling Path </span> 
+		   <br> 
+		   Using the physical map, ~1600 seed BACs were chosen with an average 
+		   spacing of 800 kb. These were required to have:
+         <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1\) at least one end sequenced, 
+         <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2\) both agarose and HICF fingerprints, 
+         <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3\) at least average insert size \(~150 kb\),
+         <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4\) at least one overgo match. 
+         <br> Subsequently, BAC end sequences and fingerprint data are being used to extend 
+		     the seed BACs into tiling path contigs for sequencing.
+       </p>
+     </div>
+	 <br>
+    )
+    @(div-output
+      <div id='6'>
+        <br>
+        <a name="output"/>
+        <p id='bold_title' style='font-style:italic'> B73 Project Output Data Descriptions</p>
+        <br>
+        <p>
+           <span style="font-weight:bold"> Sequence traces: </span>
+           <br> &nbsp;&nbsp;Automatically deposited to the Trace Archive \(includes fosmid ends\).
+        </p>
+        <br>
+        <p> 
+          <span style="font-weight:bold">BAC clone assemblies: </span>
+          <br> &nbsp;&nbsp; Phase 1 HTGS_FULLTOP
+          <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2 x 384 paired end attempts.
+          <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Completed shotgun phase.
+          <br> &nbsp;&nbsp; Phase 1 HTGS_PREFIN
+          <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Completed automated improvement phase.
+          <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\(Pending NCBI approval\)
+          <br> &nbsp;&nbsp; Phase 1 HTGS_ACTIVEFIN
+          <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Active work being done by a finisher.
+          <br>&nbsp;&nbsp; Phase 1 HTGS_IMPROVED
+          <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Finished sequence in gene regions.
+          <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Improved regions will be indicated.
+          <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Once order and orientation of improved segments are confirmed, a comment will be added to indicate this.
+          <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\(Pending NCBI approval\)
+	      </p>
+	      <br>
+	      <p>
+        <a></a>
+        <span style="font-weight:bold">Example NCBI nucleotide search:  </span>
+        <br> &nbsp;&nbsp;
+        <a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=nucleotide&cmd=search&term=Zea+mays%5BORGN%5D+AND+HTG%5BKYWD%5D+AND+Wilson%5BAuthor%5D">
+		      Zea mays[ORGN] AND HTG[KYWD] AND Wilson[Author] - pulls the clone assemblies currently available. 
+        </p>
+	  </div>
+	  <br>
+	)
+	@(div-timeline
+	 <div id='7'>
+	   <br>
+	   <a name="timeline"/>
+	   <p id='bold_title' style='font-style:italic'> B73 Project Timeline (for B73 RefGen_v1\)</p>
+	   <br>
+       <p>
+	     <span style="font-weight:bold">Year 1: </span>
+		 <br> &nbsp;&nbsp;Production sequencing for ~7,000 BAC clones \(GSC\).
+         <br> &nbsp;&nbsp;Sequence 0.55M \(0.3X coverage\) fosmid end pairs \(GSC\).
+         <br> &nbsp;&nbsp;Begin pre-finishing and finishing \(GSC, AGI, CSHL\).
+         <br> &nbsp;&nbsp;Finish ~4,500 BACs \(GSC, AGI, CSHL\)
+         <br> &nbsp;&nbsp;Begin genome assembly & annotation efforts \(CSHL, ISU\).
+	   </p>
+	   <br>
+	   <p>
+		 <span style="font-weight:bold">Year 2: </span>
+		 <br> &nbsp;&nbsp;Production sequencing for ~10,000 BAC clones \(GSC\).
+         <br>&nbsp;&nbsp;Finish ~10,000 BACs \(GSC, AGI, CSHL\).
+         <br> &nbsp;&nbsp;Continue genome assembly & annotation efforts \(CSHL, ISU\)
+	   </p>
+	   <br>
+	    <p>
+		 <span style="font-weight:bold">Year 3: </span>
+		 <br> &nbsp;&nbsp;Production sequencing for remaining BACs \(GSC\).
+         <br> &nbsp;&nbsp;Finish remaining \(~4,500\) BACs \(GSC, AGI, CSHL\).
+         <br> &nbsp;&nbsp;Continue genome assembly & annotation efforts \(CSHL, ISU\).
+	   </p>
+	 </div>
+	)
+ </div>
+)

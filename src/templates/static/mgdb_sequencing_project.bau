@@ -1,0 +1,227 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-sequencing-project
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https\://maizegdb.org/sequencing_project">
+<meta property="og:title" content="B73 reference genome sequencing project | MaizeGDB">
+<meta property="og:description" content="How the B73 reference genome was sequenced: the BAC-by-BAC approach, the stock behind it, the physical map and tiling path, and the project timeline.">
+
+<a class="mgdb-skip-link" href="#sp-main">Skip to main content</a>
+<main class="mgdb-page mgdb-sequencing-project-page" id="sp-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/community">Community</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">B73 sequencing project</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="sp-title">
+    <div class="mgdb-hero-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="Overlapping BAC clones along a chromosome">
+        <line x1="10" y1="48" x2="86" y2="48" stroke="#235c37" stroke-width="3"/>
+        <rect x="12" y="30" width="30" height="10" rx="5" fill="none" stroke="#235c37" stroke-width="3"/>
+        <rect x="32" y="56" width="30" height="10" rx="5" fill="none" stroke="#d99a0b" stroke-width="3"/>
+        <rect x="52" y="30" width="30" height="10" rx="5" fill="none" stroke="#235c37" stroke-width="3"/>
+        <circle cx="20" cy="48" r="3" fill="#d99a0b"/>
+        <circle cx="48" cy="48" r="3" fill="#d99a0b"/>
+        <circle cx="76" cy="48" r="3" fill="#d99a0b"/>
+      </svg>
+      <strong>B73<br />sequencing</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Historic record</p>
+      <h1 id="sp-title">How the B73 reference genome was sequenced.</h1>
+      <p class="mgdb-hero-description">The B73 reference was built clone by clone, from a minimal tiling path of about 19,000 mapped BAC clones. This page is the project's own record of that work &#8212; the stock the libraries were made from, the physical map and tiling path they were chosen with, what was deposited, and the schedule it ran to.</p>
+      <p class="mgdb-hero-actions">
+        <a class="mgdb-button mgdb-button-primary" href="/assembly">Current B73 assembly <span aria-hidden="true">&rarr;</span></a>
+        <a class="mgdb-button mgdb-button-quiet" href="/genome">Genomes <span aria-hidden="true">&rarr;</span></a>
+      </p>
+    </div>
+  </section>
+
+  ;; The legacy page carried this as a centred bold line above five JavaScript
+  ;; tabs. It is the single most useful thing on the page for anyone who
+  ;; arrives looking for current data, so it is a notice rather than a caption.
+  <div class="mgdb-message mgdb-message-info" role="note">
+    <div>
+      <strong>This describes B73 RefGen_v1, finished in 2009.</strong>
+      <span>The reference has been reassembled several times since. For the current assembly, its statistics and its downloads, see the <a href="/assembly">assembly records</a>.</span>
+    </div>
+  </div>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#sp-approach" class="is-current">Approach</a>
+    <a href="#sp-stock">Stock</a>
+    <a href="#sp-input">Input data</a>
+    <a href="#sp-output">Output data</a>
+    <a href="#sp-timeline">Timeline</a>
+  </nav>
+
+  <section class="mgdb-panel" id="sp-approach" aria-labelledby="sp-approach-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="sp-approach-title">Approach</h2>
+        <p>B73 &#8212; a BAC by BAC approach</p>
+      </div>
+    </div>
+    <div class="sp-prose">
+      <p>This effort utilized a minimal tiling path of approximately 19,000 mapped BAC clones, and produced sequence coverage of all identifiable gene-containing regions of the maize genome. These regions were ordered, oriented, and along with all of the intergenic sequences, anchored to the extant physical and genetic maps of the B73 genome.</p>
+    </div>
+  </section>
+
+  <section class="mgdb-panel" id="sp-stock" aria-labelledby="sp-stock-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="sp-stock-title">Stock</h2>
+        <p>Which B73 the libraries were made from</p>
+      </div>
+    </div>
+    <div class="sp-prose">
+      <p>The B73 source for the BAC libraries &#8212; BACs with prefix <code>b</code> prepared in Rod Wing's lab, BACs with prefix <code>c</code> prepared in Peter deJong's lab &#8212; was <a href="https://npgsweb.ars-grin.gov/gringlobal/accessiondetail.aspx?accid=PI+550473" rel="noopener">PI 550473</a>. When requesting seed from the North Central Regional Plant Introduction Station, ask for any lot descended from the Coe PI 550473 lines.</p>
+      <p>The stock was received directly by the North Central Regional Plant Introduction Station from Arnel Hallauer and has been maintained by the quality-maintenance procedures at the PI Station. Ed Coe reports that, &ldquo;The results of QC lab checks for constancy in PI 550473 have been excellent.&rdquo;</p>
+      <p>The same source was used for the IBM mapping population. Maps produced at Missouri used 302 lines of this population, providing unmatched precision &#8212; resolution is at the intra-BAC level. These maps anchor the fingerprint-based contig assemblies to chromosome location.</p>
+      <p>High-molecular-weight DNA was prepared by Jack Gardiner in the lab at Missouri and shipped to Clemson &#40;Wing's lab at the time&#41; and to deJong's lab &#40;just at the time his lab was moving to California&#41; for BAC preparation.</p>
+      <p>NSF grant reports have documented the details, and specifics for the materials, preparation, characterization, and final assembly of the contig framework can be found in <a href="/data_center/reference/9017907">Coe E, Schaeffer ML &#40;2005&#41; Genetic, physical, maps, and database resources for maize. <i>Maydica</i> 50:285&ndash;303</a>. Ed Coe has made a copy of that paper available as <a href="/docs/B73materials.pdf">a PDF</a>.</p>
+    </div>
+  </section>
+
+  <section class="mgdb-panel" id="sp-input" aria-labelledby="sp-input-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="sp-input-title">Input data</h2>
+        <p>What the clones were chosen from</p>
+      </div>
+    </div>
+
+    <div class="sp-block">
+      <h3>The physical map</h3>
+      <div class="mgdb-table-scroll">
+        <table class="mgdb-table sp-stats">
+          <caption class="mgdb-visually-hidden">Physical map assembly statistics</caption>
+          <tbody>
+            <tr><th scope="row">Total assembled contigs</th><td>721 &#8212; equal to 2,150 Mb, 93.5% coverage of a 2,300 Mb genome</td></tr>
+            <tr><th scope="row">Anchored</th><td>421 contigs, 86.1% of the genome; average size 4.7 Mb; largest 22.9 Mb, on chromosome 9</td></tr>
+            <tr><th scope="row">Unanchored</th><td>300 contigs, 7.4% coverage; average size 0.56 Mb; largest 6.7 Mb; 189 of the 300 are fewer than 10 clones</td></tr>
+            <tr><th scope="row">Total FPC markers</th><td>25,000 &#8212; about 9,000 STS markers, 14,825 overgo markers, 1,918 anchored markers</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="sp-block">
+      <h3>The tiling path</h3>
+      <div class="sp-prose">
+        <p>Using the physical map, about 1,600 seed BACs were chosen with an average spacing of 800 kb. These were required to have:</p>
+        <ol class="sp-list">
+          <li>at least one end sequenced,</li>
+          <li>both agarose and HICF fingerprints,</li>
+          <li>at least average insert size &#40;about 150 kb&#41;,</li>
+          <li>at least one overgo match.</li>
+        </ol>
+        <p>Subsequently, BAC end sequences and fingerprint data were used to extend the seed BACs into tiling path contigs for sequencing.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mgdb-panel" id="sp-output" aria-labelledby="sp-output-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="sp-output-title">Output data</h2>
+        <p>What the project deposited, and where</p>
+      </div>
+    </div>
+
+    <div class="sp-block">
+      <h3>Sequence traces</h3>
+      <div class="sp-prose">
+        <p>Automatically deposited to the Trace Archive, including fosmid ends.</p>
+      </div>
+    </div>
+
+    <div class="sp-block">
+      <h3>BAC clone assemblies</h3>
+      <div class="mgdb-table-scroll">
+        <table class="mgdb-table sp-stats">
+          <caption class="mgdb-visually-hidden">HTGS phases used for BAC clone assemblies</caption>
+          <thead><tr><th scope="col">Phase</th><th scope="col">What it means</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">HTGS_FULLTOP</th><td>Two by 384 paired-end attempts. Completed shotgun phase.</td></tr>
+            <tr><th scope="row">HTGS_PREFIN</th><td>Completed automated improvement phase. &#40;Pending NCBI approval&#41;</td></tr>
+            <tr><th scope="row">HTGS_ACTIVEFIN</th><td>Active work being done by a finisher.</td></tr>
+            <tr><th scope="row">HTGS_IMPROVED</th><td>Finished sequence in gene regions; improved regions indicated. Once order and orientation of improved segments are confirmed, a comment is added to say so. &#40;Pending NCBI approval&#41;</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="mgdb-hint">All four are Phase 1 as the project recorded them.</p>
+    </div>
+
+    <div class="sp-block">
+      <h3>Finding the clone assemblies</h3>
+      <div class="sp-prose">
+        <p>This NCBI nucleotide search pulls the clone assemblies that were available:</p>
+        <p><a class="mgdb-button mgdb-button-secondary" href="https://www.ncbi.nlm.nih.gov/nuccore/?term=Zea+mays%5BORGN%5D+AND+HTG%5BKYWD%5D+AND+Wilson%5BAuthor%5D" target="_blank" rel="noopener"><code>Zea mays[ORGN] AND HTG[KYWD] AND Wilson[Author]</code> <span aria-hidden="true">&nearr;</span></a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mgdb-panel" id="sp-timeline" aria-labelledby="sp-timeline-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="sp-timeline-title">Timeline</h2>
+        <p>The schedule for B73 RefGen_v1</p>
+      </div>
+    </div>
+    <ol class="sp-timeline">
+      <li>
+        <h3>Year 1</h3>
+        <ul>
+          <li>Production sequencing for about 7,000 BAC clones &#40;GSC&#41;.</li>
+          <li>Sequence 0.55 M &#40;0.3&#215; coverage&#41; fosmid end pairs &#40;GSC&#41;.</li>
+          <li>Begin pre-finishing and finishing &#40;GSC, AGI, CSHL&#41;.</li>
+          <li>Finish about 4,500 BACs &#40;GSC, AGI, CSHL&#41;.</li>
+          <li>Begin genome assembly and annotation efforts &#40;CSHL, ISU&#41;.</li>
+        </ul>
+      </li>
+      <li>
+        <h3>Year 2</h3>
+        <ul>
+          <li>Production sequencing for about 10,000 BAC clones &#40;GSC&#41;.</li>
+          <li>Finish about 10,000 BACs &#40;GSC, AGI, CSHL&#41;.</li>
+          <li>Continue genome assembly and annotation efforts &#40;CSHL, ISU&#41;.</li>
+        </ul>
+      </li>
+      <li>
+        <h3>Year 3</h3>
+        <ul>
+          <li>Production sequencing for the remaining BACs &#40;GSC&#41;.</li>
+          <li>Finish the remaining &#40;about 4,500&#41; BACs &#40;GSC, AGI, CSHL&#41;.</li>
+          <li>Continue genome assembly and annotation efforts &#40;CSHL, ISU&#41;.</li>
+        </ul>
+      </li>
+    </ol>
+    <p class="mgdb-hint">GSC &#8212; Genome Sequencing Center, Washington University. AGI &#8212; Arizona Genomics Institute. CSHL &#8212; Cold Spring Harbor Laboratory. ISU &#8212; Iowa State University.</p>
+  </section>
+
+  <section class="mgdb-hub-related" id="sp-resources" aria-labelledby="sp-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="sp-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/assembly">
+          <strong>Assemblies</strong>
+          <span>Every maize assembly MaizeGDB holds, with its statistics and downloads</span>
+        </a>
+        <a href="/data_center/bac">
+          <strong>BAC Data Hub</strong>
+          <span>The clones themselves, their libraries and their fingerprints</span>
+        </a>
+        <a href="/data_center/map">
+          <strong>Map Data Hub</strong>
+          <span>The physical and genetic maps the contigs were anchored to</span>
+        </a>
+        <a href="/maize_history">
+          <strong>Community history</strong>
+          <span>How maize genetics and MaizeGDB got here</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

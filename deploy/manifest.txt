@@ -819,6 +819,24 @@ src/tools/alphafill_models.py                             tools/alphafill_models
 src/tools/alphafill_ligand_extract.py                     tools/alphafill_ligand_extract.py
 
 
+# /ems-phenotype retired to /data_center/phenotype, 2026-09-07. The page was
+# one iframe onto cur.maizegdb.org/ems-phenotype.php, which answers HTTP 502,
+# so it rendered site chrome around an empty frame. The collection is not in
+# MaizeGDB's own data either. The modern Stock hub's card advertising it goes
+# in the same change. Originals archived in legacy/ems-phenotype/.
+src/controllers/ems-phenotype.php                         controllers/ems-phenotype.php
+
+# B73 reference genome sequencing project -- /sequencing_project. A historic
+# content page: the BAC-by-BAC approach, the stock, the physical map and tiling
+# path, the HTGS phases and the three-year timeline. Every figure is the legacy
+# page's. controller.php checks ./controllers/<CONTROLLER>.php before falling
+# through to redirect.php, so src/controllers/sequencing_project.php takes the
+# route from controllers/community/sequencing_project.php without touching it.
+# Originals archived in legacy/sequencing-project/.
+src/controllers/sequencing_project.php                    controllers/sequencing_project.php
+src/templates/static/mgdb_sequencing_project.bau          templates/static/mgdb_sequencing_project.bau
+src/css/mgdb-sequencing-project.css                       css/mgdb-sequencing-project.css
+
 # Associated genes -- /associated_genes. The correspondence between MaizeGDB
 # gene names and B73 RefGen_v5/v4/v3 gene models, in three lists. The legacy
 # page was a download endpoint that sent TSV as text/html with "<i>unknown</i>"

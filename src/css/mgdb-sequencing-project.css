@@ -1,0 +1,120 @@
+/* file: css/mgdb-sequencing-project.css
+ *
+ * /sequencing_project. A static historic page, so this file is mostly about
+ * measure and rhythm.
+ *
+ * The page it replaces was five <div>s toggled by JavaScript tabs, with the
+ * content set in nested tables and <font size="1">.
+ */
+
+/* ── Prose ───────────────────────────────────────────────────────────────── */
+
+.mgdb-sequencing-project-page .sp-prose {
+  max-width: 72ch;
+}
+
+.mgdb-sequencing-project-page .sp-prose p {
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-text);
+  line-height: 1.65;
+}
+
+.mgdb-sequencing-project-page .sp-prose p:last-child {
+  margin-bottom: 0;
+}
+
+.mgdb-sequencing-project-page .sp-list {
+  max-width: 72ch;
+  margin: 0 0 var(--mgdb-space-3);
+  padding-left: var(--mgdb-space-5);
+  line-height: 1.65;
+}
+
+.mgdb-sequencing-project-page .sp-list li {
+  margin-bottom: var(--mgdb-space-1);
+}
+
+/* ── Blocks within a section ─────────────────────────────────────────────── */
+
+/* Input and Output each hold two or three sub-headings. They are separated by
+   space rather than by another card, so the section reads as one thing. */
+.mgdb-sequencing-project-page .sp-block + .sp-block {
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-sequencing-project-page .sp-block h3 {
+  margin: 0 0 var(--mgdb-space-3);
+  font-size: var(--mgdb-text-base);
+}
+
+/* ── Statistics tables ───────────────────────────────────────────────────── */
+
+/* The label column is the question and the value column the answer, so the
+   labels keep a fixed width and the values wrap against them rather than the
+   two columns fighting for space. */
+.mgdb-sequencing-project-page .sp-stats th[scope="row"] {
+  width: 16rem;
+  vertical-align: top;
+  font-weight: 600;
+}
+
+.mgdb-sequencing-project-page .sp-stats td {
+  line-height: 1.6;
+}
+
+/* ── Timeline ────────────────────────────────────────────────────────────── */
+
+/* Three years, in order, marked as a sequence because the order is the point:
+   sequencing, then finishing, then assembly, each year feeding the next. */
+.mgdb-sequencing-project-page .sp-timeline {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--mgdb-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: sp-year;
+}
+
+.mgdb-sequencing-project-page .sp-timeline > li {
+  position: relative;
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--hub-surface);
+}
+
+/* A left edge rather than a number badge: the heading already says "Year 1". */
+.mgdb-sequencing-project-page .sp-timeline > li::before {
+  content: "";
+  position: absolute;
+  top: var(--mgdb-space-4);
+  bottom: var(--mgdb-space-4);
+  left: 0;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  background: var(--mgdb-green-dark);
+}
+
+.mgdb-sequencing-project-page .sp-timeline h3 {
+  margin: 0 0 var(--mgdb-space-2);
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-sequencing-project-page .sp-timeline ul {
+  margin: 0;
+  padding-left: var(--mgdb-space-4);
+  color: var(--mgdb-text);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.6;
+}
+
+.mgdb-sequencing-project-page .sp-timeline li li {
+  margin-bottom: var(--mgdb-space-1);
+}
+
+/* ── Narrow screens ──────────────────────────────────────────────────────── */
+
+@media (max-width: 720px) {
+  .mgdb-sequencing-project-page .sp-stats th[scope="row"] { width: auto; }
+}
