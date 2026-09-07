@@ -150,6 +150,11 @@
   line-height: var(--mgdb-leading);
 }
 
+/* A comment is one paragraph unless hnpTextBlock() found a blank line or a
+   numbered list in it, and then the parts need to read as parts. Only between
+   siblings, so the block still sits flush inside its own padding. */
+.mgdb-hnp-page .hnp-comment > p + p { margin-top: var(--mgdb-space-2); }
+
 .mgdb-hnp-page .hnp-comment > footer {
   margin-top: var(--mgdb-space-2);
   color: var(--mgdb-muted);
@@ -179,6 +184,10 @@
   font-size: var(--mgdb-text-base);
   line-height: var(--mgdb-leading);
 }
+
+/* Nine of the 871 abstracts are wrapped text that hnpTextBlock() splits into
+   more than one paragraph. */
+.mgdb-hnp-page .hnp-abstract > p + p { margin-top: var(--mgdb-space-2); }
 
 /* --------------------------------------------------------------------------
    Editorial Board

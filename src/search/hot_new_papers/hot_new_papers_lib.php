@@ -521,6 +521,116 @@ function hnpEsc($value) {
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 }
 
+/* Editorial comments and abstracts arrive with hard line wraps.
+
+   The text was pasted from something with a fixed column -- across the 2024
+   comments the runs between newlines are 84 to 95 characters, median 90, and
+   that tight a cluster is a machine's wrap and not anybody's choice. Rendering
+   it with nl2br() honoured every one, so a paragraph broke at the author's
+   column instead of the reader's and stayed broken at every screen width. 53
+   of the 882 comments carry it, overwhelmingly 2023-2025: 34 of 2024's 39.
+
+   Reflowing is not simply replacing newlines with spaces. Three things in the
+   real text break that:
+
+     A line ending in a hyphen is a compound, not a split word. All 18 of them
+     are -- non-, (BRK)-, Lex-, MADS-, in-season, ss-tubulin6 -- so the join
+     takes no space and keeps the hyphen. A space gives "non- dominant";
+     dropping the hyphen gives "nondominant".
+
+     A line that starts a numbered or bulleted item is a real line. One 2024
+     comment lists seven characteristics of lac1 inside wrapped prose, and
+     item 7 wraps onto an eighth line of its own.
+
+     A line that ends well short of the wrap column ended on purpose. That is
+     what separates the tail of a paragraph, or the "W22." that finishes item
+     7, from a line the wrapper broke.
+
+   And a block whose lines are long was written in paragraphs, so its newlines
+   mean what they say and it is left to nl2br(). The gate is the median line
+   length: the 53 wrapped comments sit at 40 to 118, and the 45 unwrapped ones
+   start at 195. The wrap column is taken from the lines in the wrapped cluster
+   rather than from the longest line, because an abstract is sometimes a
+   wrapped title followed by one 1,433-character paragraph, and the outlier
+   would put the threshold above every real line.
+
+   Measured over all eighteen years: 787 of 820 newlines in the comments
+   removed and 33 kept, plus 64 of 94 in the abstracts. */
+
+define('HNP_WRAP_MEDIAN_MAX', 120);   /* above this a block is paragraphs, not wraps */
+define('HNP_WRAP_SHORT', 0.60);       /* a line under this share of the column ended on purpose */
+
+function hnpLen($value) {
+    return function_exists('mb_strlen') ? mb_strlen((string) $value, 'UTF-8') : strlen((string) $value);
+}
+
+function hnpTextBlock($text) {
+    $text = trim(str_replace(array("\r\n", "\r"), "\n", (string) $text));
+    if ($text === '') {
+        return '';
+    }
+    if (strpos($text, "\n") === false) {
+        return '<p>' . hnpEsc($text) . '</p>';
+    }
+
+    $lines  = explode("\n", $text);
+    $widths = array();
+    foreach ($lines as $line) {
+        $line = trim($line);
+        if ($line !== '') { $widths[] = hnpLen($line); }
+    }
+    if (!$widths) {
+        return '';
+    }
+
+    sort($widths);
+    $median = $widths[(int) floor(count($widths) / 2)];
+    if ($median >= HNP_WRAP_MEDIAN_MAX) {
+        return '<p>' . nl2br(hnpEsc($text)) . '</p>';
+    }
+
+    $column = $widths[0];
+    foreach ($widths as $width) {
+        if ($width <= 2 * $median) { $column = $width; }
+    }
+
+    $blocks = array();
+    $buffer = '';
+    $count  = count($lines);
+    for ($i = 0; $i < $count; $i++) {
+        $line = trim($lines[$i]);
+        if ($line === '') {
+            if ($buffer !== '') { $blocks[] = $buffer; $buffer = ''; }
+            continue;
+        }
+
+        if ($buffer === '') {
+            $buffer = $line;
+        } elseif (substr($buffer, -1) === '-') {
+            /* Byte-wise on purpose: a multibyte character never ends in 0x2D. */
+            $buffer .= $line;
+        } else {
+            $buffer .= ' ' . $line;
+        }
+
+        $next = ($i + 1 < $count) ? trim($lines[$i + 1]) : '';
+        $starts_item = $next !== ''
+                    && preg_match('/^(\(?\d+[.)]|[-*\x{2022}])\s/u', $next) === 1;
+
+        if ($i === $count - 1 || $starts_item || hnpLen($line) < $column * HNP_WRAP_SHORT) {
+            $blocks[] = $buffer;
+            $buffer = '';
+        }
+    }
+    if ($buffer !== '') { $blocks[] = $buffer; }
+
+    $html = '';
+    foreach ($blocks as $paragraph) {
+        if (trim($paragraph) !== '') { $html .= '<p>' . hnpEsc($paragraph) . '</p>'; }
+    }
+    return $html;
+}
+
 function hnpLinkList($paper) {
     $links = array();
     if ($paper['abstract_link'] !== '') {
@@ -581,7 +691,7 @@ function hnpRenderPaper($paper) {
     }
 
     foreach ($paper['comments'] as $comment) {
-        $html .= '<blockquote class="hnp-comment"><p>' . nl2br(hnpEsc($comment['comment'])) . '</p>'
+        $html .= '<blockquote class="hnp-comment">' . hnpTextBlock($comment['comment'])
                . ($comment['author'] !== ''
                   ? '<footer><cite>' . hnpEsc($comment['author']) . '</cite></footer>'
                   : '')
@@ -590,7 +700,7 @@ function hnpRenderPaper($paper) {
 
     if ($paper['abstract'] !== '') {
         $html .= '<details class="hnp-abstract"><summary>Abstract</summary>'
-               . '<p>' . nl2br(hnpEsc($paper['abstract'])) . '</p></details>';
+               . hnpTextBlock($paper['abstract']) . '</details>';
     }
 
     $html .= '</div></article>';
