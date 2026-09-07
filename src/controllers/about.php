@@ -45,6 +45,28 @@
     return;
   }
 
+  /* The NCGA podcast series on the modern design system.
+   *
+   * Hooked here because the modern controller creates its own Bauplan and
+   * publishes it, so it has to run before the legacy shell below is built. The
+   * bare /podcast alias -- what the About megamenu and the site map link -- does
+   * not come through this file at all: it reaches redirect.php, and is taken by
+   * controllers/podcast.php. Same arrangement as /videos in
+   * controllers/community.php.
+   *
+   * The modern controller returns false without publishing if data/
+   * ncga_podcasts.json is missing, in which case this falls through to the
+   * legacy page below rather than serving an empty shell.
+   *
+   * Rollback: delete this block and controllers/podcast.php.
+   * controllers/about/podcast.php and its three templates are untouched.
+   */
+  if (PAGE == 'podcast') {
+    if (include('controllers/about/podcast_modern.php')) {
+      return;
+    }
+  }
+
   // Get system configuration
   $system = getSystemInfo('mgdb.conf');
 

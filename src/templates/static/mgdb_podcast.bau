@@ -1,0 +1,158 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-podcast
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https\://maizegdb.org/podcast">
+<meta property="og:title" content="NCGA podcasts | MaizeGDB">
+<meta property="og:description" content="Eight National Corn Growers Association podcasts recorded with MaizeGDB curator Jack Gardiner, 2012-2013. Every episode plays on the page.">
+
+<a class="mgdb-skip-link" href="#podcast-main">Skip to main content</a>
+
+<main class="mgdb-page mgdb-hub-page mgdb-podcast-page" id="podcast-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span>
+    <a href="/maize_history">Community</a><span aria-hidden="true">&rsaquo;</span>
+    <span aria-current="page">NCGA podcasts</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="podcast-title">
+    <div class="mgdb-hero-emblem podcast-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="A microphone between sound waves">
+        <rect x="38" y="16" width="20" height="38" rx="10" fill="#e8f4ec" stroke="#235c37" stroke-width="3" />
+        <path d="M30 44a18 18 0 0 0 36 0" fill="none" stroke="#235c37" stroke-width="3.5" stroke-linecap="round" />
+        <path d="M48 62v14" stroke="#235c37" stroke-width="3.5" stroke-linecap="round" />
+        <path d="M36 78h24" stroke="#235c37" stroke-width="3.5" stroke-linecap="round" />
+        <circle cx="48" cy="30" r="3.5" fill="#d99a0b" />
+        <path d="M18 32a26 26 0 0 0 0 26" fill="none" stroke="#7fae8c" stroke-width="3" stroke-linecap="round" />
+        <path d="M78 32a26 26 0 0 1 0 26" fill="none" stroke="#7fae8c" stroke-width="3" stroke-linecap="round" />
+      </svg>
+      <strong>NCGA podcasts</strong>
+      <span class="podcast-emblem-meta">$(series_years)</span>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="podcast-title">NCGA podcasts</h1>
+      <p class="mgdb-hero-description">$(episode_count) conversations recorded with MaizeGDB curator Jack Gardiner for the National Corn Growers Association, $(series_years) &mdash; $(total_runtime_spoken) in all. Every episode plays on this page, and nothing is downloaded until you press play.</p>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#podcast-episodes" class="is-current" aria-current="true">Episodes</a>
+    <a href="#podcast-about">About the series</a>
+    <a href="#podcast-metrics">Metrics</a>
+    <a href="#podcast-related">Related resources</a>
+  </nav>
+
+  <section id="podcast-episodes" aria-labelledby="podcast-episodes-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="podcast-episodes-title">Episodes</h2></div>
+    </div>
+
+    <p class="podcast-lead">In the order the series was published. Each card carries the running time and the file size before you commit to either, and a link to where its subject lives at MaizeGDB today.</p>
+
+    <div class="podcast-list">
+      $(episode_cards)
+    </div>
+  </section>
+
+  <section id="podcast-about" aria-labelledby="podcast-about-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="podcast-about-title">About the series</h2></div>
+    </div>
+
+    <div class="podcast-prose">
+      <p>Between $(series_years) the <a href="https\://www.ncga.com/" target="_blank" rel="noopener">National Corn Growers Association <span aria-hidden="true">&nearr;</span></a> recorded a short series of conversations with <a href="/person?id=12890">Jack Gardiner</a>, then a curator at MaizeGDB, on the data and the tools a maize researcher could reach through the database. They were made for growers and for researchers coming to the resource for the first time, and each runs between six and eleven minutes.</p>
+
+      <p>They are a record of what MaizeGDB offered at that moment, and some of it has since moved. Two of the eight episodes describe tools that are no longer the way to do the job&#58; GBrowse, now a legacy archive behind <a href="/genomebrowser">JBrowse 2</a>, and MapMan, retired in 2026 with its Gene Atlas files kept in the download archive. Those two cards say so above. The subjects of the other six &mdash; assemblies, expression, variation, phenotypes, protein data &mdash; are all still here, under newer tools.</p>
+
+      <p class="podcast-hosting">The audio is hosted by MaizeGDB at <span class="podcast-mono">ftp.maizegdb.org</span> and served over HTTPS. Playing an episode contacts no one but MaizeGDB, and nothing is fetched until you press play.</p>
+    </div>
+  </section>
+
+  <section id="podcast-metrics" aria-labelledby="podcast-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="podcast-metrics-title">Metrics</h2></div>
+    </div>
+
+    <p class="podcast-scope">$(measured_note) Last measured $(measured_on).</p>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric mgdb-tone-green">
+        <div class="mgdb-metric-top">
+          <h3>Episodes</h3>
+          <span class="mgdb-metric-badge">Series</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(metric_episodes)</strong>
+        </div>
+        <p class="mgdb-metric-description">Every episode MaizeGDB holds from the series, all of them playable here.</p>
+      </article>
+
+      <article class="mgdb-metric mgdb-tone-amber">
+        <div class="mgdb-metric-top">
+          <h3>Running time</h3>
+          <span class="mgdb-metric-badge">Total</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(metric_runtime)</strong>
+        </div>
+        <p class="mgdb-metric-description">Counted frame by frame from the audio, not estimated from file size.</p>
+      </article>
+
+      <article class="mgdb-metric mgdb-tone-blue">
+        <div class="mgdb-metric-top">
+          <h3>Recorded</h3>
+          <span class="mgdb-metric-badge">Span</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(metric_years)</strong>
+        </div>
+        <p class="mgdb-metric-description">The series ran for two years and was not continued after it.</p>
+      </article>
+
+      <article class="mgdb-metric mgdb-tone-burgundy">
+        <div class="mgdb-metric-top">
+          <h3>Audio</h3>
+          <span class="mgdb-metric-badge">Total</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(metric_bytes)</strong>
+        </div>
+        <p class="mgdb-metric-description">The eight files together. None of it is fetched until you press play.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="podcast-related" class="mgdb-hub-related" aria-labelledby="podcast-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="podcast-related-title">Related resources</h2></div>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/community/videos">
+          <strong>Community videos</strong>
+          <span>Recorded talks on the history of maize genetics, and demonstrations of controlled pollination</span>
+        </a>
+        <a href="/genomebrowser">
+          <strong>Genome Browser Data Hub</strong>
+          <span>JBrowse 2 across every assembly, with the legacy GBrowse instances archived behind it</span>
+        </a>
+        <a href="/expression">
+          <strong>Expression Data Hub</strong>
+          <span>The eFP Browser, qTeller and the RNA-seq atlases these episodes introduced</span>
+        </a>
+        <a href="/data_center/variation">
+          <strong>Variation Data Hub</strong>
+          <span>The SNP and allele data behind the variation episode, much expanded since</span>
+        </a>
+        <a href="/maize_history">
+          <strong>Community and history</strong>
+          <span>How the maize community and its database got here, and who does the work</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+)

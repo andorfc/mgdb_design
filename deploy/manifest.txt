@@ -1768,3 +1768,56 @@ src/controllers/coordinateDef.php                     controllers/coordinateDef.
 src/templates/static/mgdb_coordinate_definition.bau   templates/static/mgdb_coordinate_definition.bau
 src/css/mgdb-coordinate-definition.css                css/mgdb-coordinate-definition.css
 src/js/mgdb-coordinate-definition.js                  js/mgdb-coordinate-definition.js
+
+# Linkage Group index and record pages, modernized 2026-09-06. The legacy route
+# rendered four empty sections and no script to fill them; the bare route
+# answered the generic not-found body. record_data/lg_data.php is left on the
+# server but nothing reaches it any more -- its type=loci branch returned
+# 8,996 KB in 5.8 s for chromosome 1, uncapped.
+src/include/linkage_group_record_lib.php          include/linkage_group_record_lib.php
+src/include/api/v1/records/linkage_group.php      include/api/v1/records/linkage_group.php
+src/controllers/data_center/lg_index_modern.php   controllers/data_center/lg_index_modern.php
+src/controllers/data_center/lg_record_modern.php  controllers/data_center/lg_record_modern.php
+src/templates/static/mgdb_lg_index.bau            templates/static/mgdb_lg_index.bau
+src/templates/static/mgdb_lg_record.bau           templates/static/mgdb_lg_record.bau
+src/templates/static/mgdb_lg_notfound.bau         templates/static/mgdb_lg_notfound.bau
+src/js/mgdb-lg-index.js                           js/mgdb-lg-index.js
+src/js/mgdb-lg-record.js                          js/mgdb-lg-record.js
+src/css/mgdb-lg-record.css                        css/mgdb-lg-record.css
+
+# /podcast and /about/podcast -- the NCGA podcast series recorded with curator
+# Jack Gardiner, 2012-2013, on the design system, 2026-09-06. A top-level
+# controllers/podcast.php takes the bare alias (controller.php finds it before
+# redirect.php, so no legacy chrome leaks in) and a PAGE == 'podcast' block in
+# controllers/about.php takes /about/podcast. Same arrangement as /videos.
+# The legacy controller, its three templates and css/podcast.css are untouched
+# and archived in legacy/podcast/; rollback is deleting controllers/podcast.php
+# and that block.
+#
+# The eight MP3s stay on ftp.maizegdb.org and are now played in place by a
+# native <audio preload="none">, so none of the 13.6 MB is fetched until a
+# reader presses play and no third-party connection is opened. The catalog is
+# data/ncga_podcasts.json; every duration and byte size in it was read from the
+# MP3 itself (ID3v2 skipped, MPEG frames walked) rather than typed, and the page
+# sums its metrics from the same array it builds the cards from. The legacy
+# links were http:// and each cost a 301 to https://.
+src/controllers/podcast.php                      controllers/podcast.php
+src/controllers/about/podcast_modern.php         controllers/about/podcast_modern.php
+src/templates/static/mgdb_podcast.bau            templates/static/mgdb_podcast.bau
+src/css/mgdb-podcast.css                         css/mgdb-podcast.css
+src/js/mgdb-podcast.js                           js/mgdb-podcast.js
+src/data/ncga_podcasts.json                      data/ncga_podcasts.json
+
+# Curator login modernization + auth hardening (2026-09-06)
+# /login and /logout on the design system (top-level shadow controllers, same
+# pattern as /jobs), and the login mechanism moved off plaintext-password
+# cookies onto signed HttpOnly/Secure/SameSite session tokens. The token secret
+# lives server-only in conf/mgdb.conf (auth_secret); it is deliberately NOT here.
+src/controllers/login.php                                controllers/login.php
+src/controllers/logout.php                               controllers/logout.php
+src/controllers/static/login_functions.php               controllers/static/login_functions.php
+src/controllers/curation.php                             controllers/curation.php
+src/controllers/curation/login_curator.php               controllers/curation/login_curator.php
+src/templates/static/mgdb_login.bau                      templates/static/mgdb_login.bau
+src/templates/static/mgdb_logout.bau                     templates/static/mgdb_logout.bau
+src/css/mgdb-login.css                                   css/mgdb-login.css
