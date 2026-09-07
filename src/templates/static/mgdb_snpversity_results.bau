@@ -1,0 +1,192 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-snpversity-results
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta name="robots" content="noindex, follow">
+<meta property="og:title" content="SNPversity results | MaizeGDB">
+<meta property="og:description" content="Genotype calls for a SNPversity query: one row per SNP site, one column per stock.">
+
+<a class="mgdb-skip-link" href="#snpv-main">Skip to main content</a>
+
+<main class="mgdb-page mgdb-hub-page mgdb-snpversity-page mgdb-snpversity-results-page" id="snpv-main"
+      data-api="$(api_url)"
+      data-query="$(query_attr)"
+      data-found="$(found)">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span>
+    <a href="/snpversity">SNPversity</a><span aria-hidden="true">&rsaquo;</span>
+    <span aria-current="page">Results</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero" aria-labelledby="snpv-title">
+    <div class="mgdb-hero-body">
+      <h1 id="snpv-title">SNPversity results</h1>
+      <p class="mgdb-hero-description">Genotype calls for one query. Each row is a SNP site; each column after the site details is one stock. A call is colored green where it matches the major allele at that site, orange where it does not, and gray where the site was not called in that stock.</p>
+      <p class="snpv-queryid">Query <code>$(query_id)</code></p>
+      <div class="snpv-hero-links">
+        <a href="/snpversity">Run another query</a>
+        <a href="#snpv-query-detail">This query &darr;</a>
+        <a href="#snpv-legend">Reading the results &darr;</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="mgdb-metric-grid snpv-metrics">
+    <article class="mgdb-metric mgdb-tone-green">
+      <div class="mgdb-metric-top"><h3>Stocks</h3></div>
+      <div class="mgdb-metric-stat"><strong class="mgdb-metric-value">$(metric_stocks)</strong></div>
+      <p class="mgdb-metric-description">One column each, in the order the query asked for them.</p>
+    </article>
+    <article class="mgdb-metric mgdb-tone-blue">
+      <div class="mgdb-metric-top"><h3>Pages</h3></div>
+      <div class="mgdb-metric-stat"><strong class="mgdb-metric-value">$(metric_pages)</strong></div>
+      <p class="mgdb-metric-description">The sites per page you asked for decides how many.</p>
+    </article>
+    <article class="mgdb-metric mgdb-tone-amber">
+      <div class="mgdb-metric-top"><h3>Assembly</h3></div>
+      <div class="mgdb-metric-stat"><strong class="mgdb-metric-value mgdb-metric-value-compact">$(metric_assembly)</strong></div>
+      <p class="mgdb-metric-description">Every position below is on this assembly's coordinates.</p>
+    </article>
+    <article class="mgdb-metric mgdb-tone-burgundy snpv-metric-region">
+      <div class="mgdb-metric-top"><h3>Positions</h3></div>
+      <div class="mgdb-metric-stat"><strong class="mgdb-metric-value mgdb-metric-value-compact">$(metric_region)</strong></div>
+      <p class="mgdb-metric-description">$(region_unit)</p>
+    </article>
+  </div>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#snpv-grid" class="is-current" aria-current="true">Genotype calls</a>
+    <a href="#snpv-query-detail">This query</a>
+    <a href="#snpv-legend">Reading the results</a>
+    <a href="#snpv-references">References</a>
+    <a href="#snpv-related">Related resources</a>
+  </nav>
+
+  <!-- ============================================================ -->
+  <!-- 1. THE GRID                                                   -->
+  <!-- ============================================================ -->
+  <section id="snpv-grid" aria-labelledby="snpv-grid-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="snpv-grid-title">Genotype calls</h2></div>
+    </div>
+
+    <div class="mgdb-message mgdb-message-error snpv-error" id="snpv-error" role="alert" hidden></div>
+
+    <div class="snpv-grid-controls" id="snpv-grid-controls" hidden>
+      <div class="snpv-pager">
+        <button type="button" class="mgdb-button" id="snpv-prev">&larr; Previous</button>
+        <label class="mgdb-visually-hidden" for="snpv-page-select">Page of results</label>
+        <select class="mgdb-select snpv-page-select" id="snpv-page-select"></select>
+        <button type="button" class="mgdb-button" id="snpv-next">Next &rarr;</button>
+      </div>
+      <div class="snpv-grid-options">
+        <label class="snpv-switch"><input type="checkbox" id="snpv-hide-uncalled" /> <span>Hide sites called in no stock</span></label>
+        <label class="snpv-switch"><input type="checkbox" id="snpv-only-variable" /> <span>Only sites that vary</span></label>
+      </div>
+    </div>
+
+    <p class="snpv-grid-status mgdb-small mgdb-muted" id="snpv-grid-status" aria-live="polite">Loading&hellip;</p>
+
+    <div class="snpv-grid-wrap" id="snpv-grid-wrap">
+      <table class="snpv-grid" id="snpv-grid-table">
+        <caption class="mgdb-visually-hidden">Genotype calls, one row per SNP site and one column per stock</caption>
+        <thead id="snpv-grid-head"></thead>
+        <tbody id="snpv-grid-body"></tbody>
+      </table>
+    </div>
+
+    <noscript>
+      $(noscript_note)
+    </noscript>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- 2. THIS QUERY                                                 -->
+  <!-- ============================================================ -->
+  <section id="snpv-query-detail" aria-labelledby="snpv-query-detail-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="snpv-query-detail-title">This query</h2></div>
+    </div>
+
+    <h3 class="snpv-subhead">Stocks in this result</h3>
+    $(stock_chips)
+
+    $(query_actions)
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- 3. READING THE RESULTS                                        -->
+  <!-- ============================================================ -->
+  <section id="snpv-legend" aria-labelledby="snpv-legend-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="snpv-legend-title">Reading the results</h2></div>
+    </div>
+
+    <div class="snpv-reading-grid">
+      <div class="snpv-reading-block">
+        <h3>The call colors</h3>
+        <p>A call is colored against the major allele <em>at that site</em>, not against a fixed base, so green always means "the common allele here" whatever that allele is.</p>
+        $(nucleotide_legend)
+      </div>
+      <div class="snpv-reading-block">
+        <h3>The stock colors</h3>
+        <p>Each stock column is tinted by the project its stock came from.</p>
+        $(project_legend)
+      </div>
+    </div>
+
+    <div class="mgdb-note snpv-note">
+      <p><strong>Gene models are the annotation's <code>_T01</code> transcripts</strong> for the assembly this query ran against. A site with no model listed is intergenic, shown as <code>IGR</code>. The models named here come from SNPversity's own annotation, which is the one its coordinates are indexed on; MaizeGDB's record for the same gene may give a different transcript extent.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- 4. REFERENCES                                                 -->
+  <!-- ============================================================ -->
+  <section id="snpv-references" aria-labelledby="snpv-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="snpv-references-title">References</h2></div>
+    </div>
+
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- 5. RELATED RESOURCES                                          -->
+  <!-- ============================================================ -->
+  <section id="snpv-related" class="mgdb-hub-related" aria-labelledby="snpv-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="snpv-related-title">Related resources</h2></div>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/snpversity">
+          <strong>Run another query</strong>
+          <span>The SNPversity query form, with the datasets and the stock picker</span>
+        </a>
+        <a href="https\://wgs.maizegdb.org/" target="_blank" rel="noopener">
+          <strong>SNPversity 2.1 <span aria-hidden="true">&nearr;</span></strong>
+          <span>The same idea on B73 v5, building VCF files from nearly 1,500 accessions</span>
+        </a>
+        <a href="/data_center/variation">
+          <strong>Variation Data Hub</strong>
+          <span>The variants MaizeGDB curates as records, one page each</span>
+        </a>
+        <a href="/data_center/stock">
+          <strong>Stock Data Hub</strong>
+          <span>The MaizeGDB record for a stock: pedigree, sources, and how to order it</span>
+        </a>
+        <a href="/gene_center/gene">
+          <strong>Gene Data Hub</strong>
+          <span>The gene models these sites are annotated against</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+)

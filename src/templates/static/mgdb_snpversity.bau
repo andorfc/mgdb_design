@@ -1,0 +1,375 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-snpversity
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https\://www.maizegdb.org/snpversity">
+<meta property="og:title" content="SNPversity: query maize genotype data | MaizeGDB">
+<meta property="og:description" content="Query maize SNP genotypes for any region of B73 RefGen_v2 or v3 across four datasets, and read the calls as a colored grid.">
+
+<a class="mgdb-skip-link" href="#snpv-main">Skip to main content</a>
+
+<main class="mgdb-page mgdb-hub-page mgdb-snpversity-page" id="snpv-main"
+      data-api="$(api_url)"
+      data-stocks-gbs="$(stocks_gbs_url)"
+      data-stocks-hmp="$(stocks_hmp_url)"
+      data-bounds="$(bounds_json)"
+      data-datasets="$(datasets_json)">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span>
+    <a href="/data_center/variation">Genetic variation</a><span aria-hidden="true">&rsaquo;</span>
+    <span aria-current="page">SNPversity</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="snpv-title">
+    <div class="mgdb-hero-emblem snpv-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="A grid of genotype calls along a chromosome">
+        <rect x="10" y="18" width="76" height="8" rx="4" fill="#e3ecdf" stroke="#235c37" stroke-width="2" />
+        <circle cx="26" cy="22" r="2.5" fill="#235c37" />
+        <circle cx="45" cy="22" r="2.5" fill="#d99a0b" />
+        <circle cx="64" cy="22" r="2.5" fill="#235c37" />
+        <rect x="10" y="38" width="20" height="14" rx="2" fill="#9dca9d" />
+        <rect x="34" y="38" width="20" height="14" rx="2" fill="#9dca9d" />
+        <rect x="58" y="38" width="20" height="14" rx="2" fill="#e1974c" />
+        <rect x="10" y="56" width="20" height="14" rx="2" fill="#9dca9d" />
+        <rect x="34" y="56" width="20" height="14" rx="2" fill="#d3d6da" />
+        <rect x="58" y="56" width="20" height="14" rx="2" fill="#9dca9d" />
+        <rect x="10" y="74" width="20" height="14" rx="2" fill="#e1974c" />
+        <rect x="34" y="74" width="20" height="14" rx="2" fill="#9dca9d" />
+        <rect x="58" y="74" width="20" height="14" rx="2" fill="#9dca9d" />
+      </svg>
+      <strong>SNP<br />versity</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="snpv-title">SNPversity</h1>
+      <p class="mgdb-hero-description">Read the genotype calls for a region of the maize genome across as many stocks as you choose. Pick a dataset, a set of stocks and a region; SNPversity returns one row per SNP site and one column per stock, with each call colored by whether it matches the major allele at that site.</p>
+      <div class="snpv-hero-links">
+        <a href="https\://wgs.maizegdb.org/" target="_blank" rel="noopener">SNPversity 2.1 <span aria-hidden="true">&nearr;</span></a>
+        <a href="/data_center/variation">Variation Data Hub</a>
+        <a href="#snpv-datasets">Datasets <span aria-hidden="true">&darr;</span></a>
+      </div>
+    </div>
+  </section>
+
+  <div class="mgdb-message mgdb-message-info snpv-version-note" role="note">
+    <p><strong>This is SNPversity 1.0.</strong> It queries genotype data called against <strong>B73 RefGen_v2</strong> and <strong>RefGen_v3</strong>, which is where the AllZeaGBS and HapMap v3 genotypes were published and where they remain. For the current reference assembly, use <a href="https\://wgs.maizegdb.org/" target="_blank" rel="noopener">SNPversity 2.1</a>, which builds VCF files over <strong>B73 v5</strong> from a unified dataset of nearly 1,500 accessions. The two cover different data; neither is a replacement for the other's assembly.</p>
+  </div>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#snpv-query" class="is-current" aria-current="true">Build a query</a>
+    <a href="#snpv-datasets">Datasets</a>
+    <a href="#snpv-reading">Reading the results</a>
+    <a href="#snpv-files">Stock files</a>
+    <a href="#snpv-references">References</a>
+    <a href="#snpv-related">Related resources</a>
+  </nav>
+
+  <!-- ============================================================ -->
+  <!-- 1. THE CONSOLE                                                -->
+  <!-- ============================================================ -->
+  <section id="snpv-query" aria-labelledby="snpv-query-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="snpv-query-title">Build a query</h2></div>
+    </div>
+
+    <form id="snpv-form" class="snpv-console" novalidate enctype="multipart/form-data">
+
+      <!-- Step 1: dataset -->
+      <fieldset class="snpv-step" id="snpv-step-dataset">
+        <legend><span class="snpv-step-number" aria-hidden="true">1</span> Dataset</legend>
+        <p class="mgdb-hint">The dataset decides the assembly its coordinates are on, and which stocks exist. Genotyping by sequencing covers thousands of stocks at about a million sites; whole-genome resequencing covers 1,210 lines at 83 million.</p>
+        <div class="snpv-dataset-choices" role="radiogroup" aria-labelledby="snpv-dataset-label">
+          <span class="mgdb-visually-hidden" id="snpv-dataset-label">Genotype dataset</span>
+          $(dataset_cards)
+        </div>
+      </fieldset>
+
+      <!-- Step 2: stocks -->
+      <fieldset class="snpv-step" id="snpv-step-stocks">
+        <legend><span class="snpv-step-number" aria-hidden="true">2</span> Stocks</legend>
+        <p class="mgdb-hint" id="snpv-stocks-hint">Every stock you add becomes a column in the results. A wide query is slow to run and hard to read; ten to thirty columns is a comfortable grid.</p>
+
+        <div class="snpv-project-row" id="snpv-project-row">
+          <span class="mgdb-label" id="snpv-project-label">Narrow by project</span>
+          <div class="snpv-project-chips" role="group" aria-labelledby="snpv-project-label" id="snpv-project-chips"></div>
+        </div>
+
+        <div class="mgdb-field snpv-combobox" data-combobox="stock">
+          <label class="mgdb-label" for="snpv-stock-input">Find a stock</label>
+          <div class="snpv-combobox-shell">
+            <input class="mgdb-input snpv-combobox-input" id="snpv-stock-input" type="text"
+                   role="combobox" aria-expanded="false" aria-autocomplete="list"
+                   aria-controls="snpv-stock-listbox" aria-describedby="snpv-stocks-hint"
+                   autocomplete="off" spellcheck="false" placeholder="Type part of a stock name" />
+            <button type="button" class="mgdb-button snpv-combobox-toggle" id="snpv-stock-browse"
+                    aria-controls="snpv-stock-listbox" aria-expanded="false">Browse</button>
+          </div>
+          <ul class="snpv-combobox-list" id="snpv-stock-listbox" role="listbox" aria-label="Matching stocks" hidden></ul>
+          <p class="snpv-combobox-status mgdb-small mgdb-muted" id="snpv-stock-status" aria-live="polite">Loading the stock catalog&hellip;</p>
+        </div>
+
+        <div class="snpv-selected" id="snpv-selected-wrap">
+          <div class="snpv-selected-head">
+            <span class="mgdb-label" id="snpv-selected-label">Selected stocks <span class="snpv-count" id="snpv-selected-count">0</span></span>
+            <button type="button" class="mgdb-button mgdb-button-quiet" id="snpv-clear-stocks">Clear all</button>
+          </div>
+          <ul class="snpv-selected-list" id="snpv-selected-list" aria-labelledby="snpv-selected-label"></ul>
+          <p class="mgdb-empty" id="snpv-selected-empty">No stocks chosen yet.</p>
+        </div>
+
+        <details class="snpv-details" id="snpv-upload-details">
+          <summary>Upload a list of stocks instead</summary>
+          <div class="snpv-details-body">
+            <p>A file lets you rerun the same set of stocks later, and reach stocks by a name you already have on hand. Two lines of a CSV, one stock per line, project first&#58;</p>
+            <pre class="snpv-code"><code>NAM,B73xB97
+Ames282,B73
+Old Maize Diversity,All
+All,05-397</code></pre>
+            <p class="mgdb-small mgdb-muted">Writing <code>All</code> in the stock column takes every stock in that project; writing <code>All</code> in the project column matches that name in any project. A <code>.stockinfo</code> or <code>.taxainfo</code> file saved from an earlier result works too, and is the more exact route, since it carries the stock identifiers rather than names.</p>
+            <div class="mgdb-field">
+              <label class="mgdb-label" for="snpv-stockfile">Stock file</label>
+              <input class="mgdb-input" type="file" id="snpv-stockfile" name="stockFile"
+                     accept=".csv,.stockinfo,.taxainfo,.txt" />
+              <p class="mgdb-hint">.csv, .stockinfo, .taxainfo or .txt, up to 2 MB. A file and a selection can be used together.</p>
+            </div>
+          </div>
+        </details>
+      </fieldset>
+
+      <!-- Step 3: region -->
+      <fieldset class="snpv-step" id="snpv-step-region">
+        <legend><span class="snpv-step-number" aria-hidden="true">3</span> Region</legend>
+
+        <div class="snpv-region-mode" role="radiogroup" aria-labelledby="snpv-region-mode-label">
+          <span class="mgdb-label" id="snpv-region-mode-label">Choose the region by</span>
+          <label class="snpv-radio"><input type="radio" name="regionMode" value="site" checked /> <span>Position</span></label>
+          <label class="snpv-radio"><input type="radio" name="regionMode" value="model" /> <span>Gene model</span></label>
+        </div>
+
+        <div class="snpv-gene-block" id="snpv-gene-block" hidden>
+          <div class="mgdb-field snpv-combobox" data-combobox="gene">
+            <label class="mgdb-label" for="snpv-gene-input">Gene model</label>
+            <input class="mgdb-input snpv-combobox-input" id="snpv-gene-input" type="text"
+                   role="combobox" aria-expanded="false" aria-autocomplete="list"
+                   aria-controls="snpv-gene-listbox" autocomplete="off" spellcheck="false"
+                   placeholder="GRMZM2G017087" />
+            <ul class="snpv-combobox-list" id="snpv-gene-listbox" role="listbox" aria-label="Matching gene models" hidden></ul>
+            <p class="snpv-combobox-status mgdb-small mgdb-muted" id="snpv-gene-status" aria-live="polite"></p>
+          </div>
+          <div class="mgdb-field snpv-offset-field">
+            <label class="mgdb-label" for="snpv-offset">Flanking bases</label>
+            <input class="mgdb-input mgdb-numeric" id="snpv-offset" type="number" min="0" max="1000000" step="100" value="1000" />
+            <p class="mgdb-hint">Added to each end of the model's extent.</p>
+          </div>
+        </div>
+
+        <div class="snpv-region-grid">
+          <div class="mgdb-field">
+            <label class="mgdb-label" for="snpv-chromosome">Chromosome</label>
+            <select class="mgdb-select" id="snpv-chromosome"></select>
+          </div>
+          <div class="mgdb-field">
+            <label class="mgdb-label" for="snpv-positions">Extent</label>
+            <select class="mgdb-select" id="snpv-positions">
+              <option value="range" selected>A range of positions</option>
+              <option value="all">The whole chromosome</option>
+            </select>
+          </div>
+          <div class="mgdb-field" id="snpv-start-field">
+            <label class="mgdb-label" for="snpv-start">Start</label>
+            <input class="mgdb-input mgdb-numeric" id="snpv-start" type="number" min="1" step="1" inputmode="numeric" />
+          </div>
+          <div class="mgdb-field" id="snpv-end-field">
+            <label class="mgdb-label" for="snpv-end">End</label>
+            <input class="mgdb-input mgdb-numeric" id="snpv-end" type="number" min="1" step="1" inputmode="numeric" />
+          </div>
+        </div>
+
+        <p class="snpv-region-readout mgdb-small" id="snpv-region-readout" aria-live="polite"></p>
+        <div class="mgdb-message mgdb-message-info snpv-region-warning" id="snpv-region-warning" role="status" hidden></div>
+      </fieldset>
+
+      <!-- Step 4: output -->
+      <fieldset class="snpv-step" id="snpv-step-output">
+        <legend><span class="snpv-step-number" aria-hidden="true">4</span> Output</legend>
+        <div class="snpv-output-grid">
+          <div class="mgdb-field">
+            <label class="mgdb-label" for="snpv-format">Result format</label>
+            <select class="mgdb-select" id="snpv-format">
+              <option value="json" selected>A grid, read on this page</option>
+              <option value="hapmap">A HapMap file</option>
+              <option value="vcf">A VCF file</option>
+            </select>
+          </div>
+          <div class="mgdb-field" id="snpv-perpage-field">
+            <label class="mgdb-label" for="snpv-perpage">Sites per page</label>
+            <input class="mgdb-input mgdb-numeric" id="snpv-perpage" type="number" min="10" max="2000" step="10" value="50" />
+          </div>
+        </div>
+        <div class="mgdb-message mgdb-message-info snpv-format-note" id="snpv-format-note" role="status" hidden></div>
+      </fieldset>
+
+      <!-- Run bar -->
+      <div class="snpv-runbar" id="snpv-runbar">
+        <p class="snpv-runbar-summary" id="snpv-runbar-summary" aria-live="polite">Choose a dataset to begin.</p>
+        <div class="snpv-runbar-actions">
+          <button type="button" class="mgdb-button" id="snpv-estimate">Estimate the time</button>
+          <button type="submit" class="mgdb-button mgdb-button-primary" id="snpv-run">Run query</button>
+        </div>
+      </div>
+
+      <div class="mgdb-message mgdb-message-error snpv-error" id="snpv-error" role="alert" hidden></div>
+      <div class="snpv-progress" id="snpv-progress" role="status" aria-live="polite" hidden>
+        <span class="mgdb-spinner" aria-hidden="true"></span>
+        <span id="snpv-progress-text">Running the query&hellip;</span>
+      </div>
+    </form>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- 2. DATASETS                                                   -->
+  <!-- ============================================================ -->
+  <section id="snpv-datasets" aria-labelledby="snpv-datasets-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="snpv-datasets-title">Datasets</h2></div>
+    </div>
+
+    <p class="snpv-lead">Four genotype files, on two assemblies. Stock, SNP and file-size figures are SNPversity's own; the counts in the picker are smaller, because the projects enumerate fewer samples than the files hold.</p>
+
+    $(dataset_table)
+
+    <div class="mgdb-metric-grid snpv-metrics">
+      <article class="mgdb-metric mgdb-tone-green">
+        <div class="mgdb-metric-top"><h3>Stocks you can pick</h3></div>
+        <div class="mgdb-metric-stat"><strong class="mgdb-metric-value">$(metric_gbs_stocks)</strong></div>
+        <p class="mgdb-metric-description">Across the ten AllZeaGBS projects, on RefGen_v2.</p>
+      </article>
+      <article class="mgdb-metric mgdb-tone-blue">
+        <div class="mgdb-metric-top"><h3>HapMap v3 lines</h3></div>
+        <div class="mgdb-metric-stat"><strong class="mgdb-metric-value">$(metric_hmp_stocks)</strong></div>
+        <p class="mgdb-metric-description">One roster for both v3 datasets, on RefGen_v3.</p>
+      </article>
+      <article class="mgdb-metric mgdb-tone-amber">
+        <div class="mgdb-metric-top"><h3>GBS sites</h3></div>
+        <div class="mgdb-metric-stat"><strong class="mgdb-metric-value">$(metric_gbs_snps)</strong></div>
+        <p class="mgdb-metric-description">SNP sites in each AllZeaGBS v2.7 file.</p>
+      </article>
+      <article class="mgdb-metric mgdb-tone-burgundy">
+        <div class="mgdb-metric-top"><h3>HapMap v3 sites</h3></div>
+        <div class="mgdb-metric-stat"><strong class="mgdb-metric-value mgdb-metric-value-compact">$(metric_hmp_snps)</strong><span class="mgdb-metric-unit">million</span></div>
+        <p class="mgdb-metric-description">87 times the density, over a twelfth as many lines.</p>
+      </article>
+    </div>
+
+    <p class="mgdb-small mgdb-muted snpv-catalog-date">The stock picker was read from SNPversity on $(catalog_date). $(linked_stocks) of its stocks match a MaizeGDB stock record by name and carry a link to it.</p>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- 3. READING THE RESULTS                                        -->
+  <!-- ============================================================ -->
+  <section id="snpv-reading" aria-labelledby="snpv-reading-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="snpv-reading-title">Reading the results</h2></div>
+    </div>
+
+    <div class="snpv-reading-grid">
+      <div class="snpv-reading-block">
+        <h3>The call colors</h3>
+        <p>A call is colored against the major allele <em>at that site</em>, not against a fixed base, so green always means "the common allele here" whatever that allele is.</p>
+        $(nucleotide_legend)
+      </div>
+      <div class="snpv-reading-block">
+        <h3>The stock colors</h3>
+        <p>Each stock column is tinted by the project its stock came from, so a grid mixing NAM founders with Ames inbreds shows which is which without reading the names.</p>
+        $(project_legend)
+      </div>
+    </div>
+
+    <h3 class="snpv-subhead">Gene models and feature types</h3>
+    <p>Each site carries the gene model it falls in, if any, and where in that model it sits. The models are the <code>_T01</code> transcripts of the assembly's annotation; a site with no model is intergenic.</p>
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table">
+        <thead><tr><th scope="col">Type</th><th scope="col">What it means</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Exon</th><td>Inside an exon of the transcript.</td></tr>
+          <tr><th scope="row">Intron</th><td>Inside an intron of the transcript.</td></tr>
+          <tr><th scope="row">five_prime_UTR</th><td>In the transcript's 5&prime; untranslated region.</td></tr>
+          <tr><th scope="row">three_prime_UTR</th><td>In the transcript's 3&prime; untranslated region.</td></tr>
+          <tr><th scope="row">IGR</th><td>Intergenic &mdash; no gene model covers this site.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mgdb-note snpv-note">
+      <p><strong>A whole chromosome is slow.</strong> A range wider than about 10 Mbp takes minutes rather than seconds, and the whole-chromosome option on a wide stock set can take considerably longer. Estimate the time before running one, and keep the tab open while it runs. A finished result keeps its URL for six weeks, so it can be closed and reopened.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- 4. STOCK FILES                                                -->
+  <!-- ============================================================ -->
+  <section id="snpv-files" aria-labelledby="snpv-files-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="snpv-files-title">Stock files</h2></div>
+    </div>
+
+    <p class="snpv-lead">SNPversity publishes the roster of each project as a plain text file. Download one to see exactly which stocks a project holds, to build a custom list, or to hand the same set of stocks to a colleague.</p>
+
+    $(file_grid)
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- 5. REFERENCES                                                 -->
+  <!-- ============================================================ -->
+  <section id="snpv-references" aria-labelledby="snpv-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="snpv-references-title">References</h2></div>
+    </div>
+
+    <p class="snpv-lead">The first paper describes SNPversity itself and is the one to cite if you use it. The next two are the sources of the genotypes it serves. The last is the dataset behind SNPversity 2.1.</p>
+
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- 6. RELATED RESOURCES                                          -->
+  <!-- ============================================================ -->
+  <section id="snpv-related" class="mgdb-hub-related" aria-labelledby="snpv-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="snpv-related-title">Related resources</h2></div>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="https\://wgs.maizegdb.org/" target="_blank" rel="noopener">
+          <strong>SNPversity 2.1 <span aria-hidden="true">&nearr;</span></strong>
+          <span>The same idea on B73 v5, building VCF files from a unified dataset of nearly 1,500 accessions</span>
+        </a>
+        <a href="/data_center/variation">
+          <strong>Variation Data Hub</strong>
+          <span>The variants MaizeGDB curates as records, one page each</span>
+        </a>
+        <a href="/genetic_variation">
+          <strong>Genetic variation datasets</strong>
+          <span>What is available for maize diversity, by assembly and by project</span>
+        </a>
+        <a href="/data_center/stock">
+          <strong>Stock Data Hub</strong>
+          <span>The MaizeGDB record for a stock: pedigree, sources, and how to order it</span>
+        </a>
+        <a href="/gene_center/gene">
+          <strong>Gene Data Hub</strong>
+          <span>The gene models these sites are annotated against</span>
+        </a>
+        <a href="/genome">
+          <strong>Genome Data Hub</strong>
+          <span>B73 RefGen_v2, v3 and v5, and how their coordinates relate</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+)

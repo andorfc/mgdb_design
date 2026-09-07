@@ -223,6 +223,7 @@ immediately. Where a file was overwritten, restore it from
 | Homepage | `/` | `index.php` | `legacy/home/` |
 | Feedback | `/feedback` | `controllers/feedback.php` | `legacy/feedback/` |
 | BLAST front page | `/BLAST` | `controllers/BLAST.php` (form branch only) | `legacy/blast/` |
+| SNPversity | `/snpversity`, `/snpversity/send` | `controllers/snpversity.php` | `legacy/snpversity/` |
 
 `/cite` had no top-level controller, so `controller.php` fell through to
 `redirect.php`, which found `controllers/about/cite.php`. Because
@@ -5801,6 +5802,205 @@ by eye:
   that to 283px. This mattered more when the strip led the page — it pushed the
   quick links 1,466px down — and still keeps the foot of the page compact now
   that it sits last.
+
+## SNPversity
+
+`/snpversity` and `/snpversity/send/?query=<id>`. Tabs on the form: Build a
+query, Datasets, Reading the results, Stock files, References, Related
+resources. Tabs on the result: Genotype calls, This query, Reading the results,
+References, Related resources. Files:
+
+```
+controllers/snpversity.php                          both routes
+templates/static/mgdb_snpversity.bau                the query console
+templates/static/mgdb_snpversity_results.bau        the genotype grid
+css/mgdb-snpversity.css
+js/mgdb-snpversity.js                               the console
+js/mgdb-snpversity-results.js                       the grid
+search/snpversity/snpversity_search_api.php         the JSON endpoint
+search/snpversity/snpversity_search_lib.php         the client for the engine
+tools/snpversity_index.php                          builds data/snpversity/
+data/snpversity/{stocks_gbs,stocks_hmp,summary}.json
+```
+
+Originals in `legacy/snpversity/`. Nothing was overwritten: `controller.php`
+checks `controllers/<CONTROLLER>.php` before falling through to `redirect.php`,
+so deleting `controllers/snpversity.php` hands both routes straight back to
+`controllers/tools/snpversity.php`. That is the whole rollback.
+
+### The engine is not ours, and is untouched
+
+SNPversity's query engine is a TASSEL installation on
+`snpversity.maizegdb.org`, reading four HDF5 genotype files. It is not in this
+repository and nothing here writes to it. The legacy MaizeGDB page was a
+1050px-tall `<iframe>` around the engine's own two pages, with a script that
+reached out of the frame and set `#wrapper` to 1600px so it would fit.
+
+What changed is the *client*. Every engine endpoint is still the endpoint being
+called, with the same field names and values; the answers now come back to PHP,
+become JSON, and are rendered by MaizeGDB's own markup.
+
+A proxy rather than direct calls from the browser, for two reasons that are not
+preferences: `snpversity.maizegdb.org` sends **no CORS headers**, so a page on
+this origin cannot read one of its responses; and every URL the engine emits is
+`http://`, which on an https page is mixed content and is blocked.
+
+Measured against the engine, 2026-09-06:
+
+| Endpoint | Cold | Cached |
+| --- | --- | --- |
+| `get_gene_models.php` (the type-ahead, per keystroke) | 1290 ms | file read |
+| `get_table_body.php` (the gene annotation) | 140 ms | file read |
+| `send.php` GET (a query's shape) | 41 ms | file read |
+| a page's genotype JSON | 4 ms | file read |
+
+Only immutable things are cached, under `conf/mgdb.conf`'s existing
+`dashboard_cache` settings — same switch, same directory. Not `dashboardCache()`
+itself: that has one site-wide TTL fixed at 0 (never expire), and these entries
+*must* expire, because the engine deletes a result after six weeks and a cached
+copy outliving its files would offer a page whose every download 404s.
+
+Measured end to end: the results page is **163 ms cold, 47–56 ms warm**; a page
+of the grid is 145 ms cold and **1.8 ms cached**.
+
+### The stock picker is a file, not a request
+
+The legacy form POSTed to `get_taxa_allzeagbs.php` on every change to its
+project multi-select, and the answer was up to **640 KB of `<option>` markup** —
+15,532 of them for "All" — for a control whose job is to let you pick a name you
+already know.
+
+Those contents are constants: AllZeaGBS v2.7 was published in 2014 and 2015 and
+HapMap v3 in 2016, and the engine reads them out of fixed HDF5 files.
+`tools/snpversity_index.php` reads all eleven rosters once and writes
+`data/snpversity/`; the page fetches the file lazily on first interaction — 622
+KB, **125 KB gzipped** — and filters in the browser. **Rendering the page costs
+zero requests to the engine.**
+
+It also does one query here, once, that the page then never repeats: 6,763 of
+the 15,532 GBS stocks and 299 of the 1,210 HapMap lines resolve to a MaizeGDB
+stock record **by name**. The engine's own taxon id is not a MaizeGDB id — B73 is
+`250040827` to the engine and `47638` in `mgdb.stock` — so the join has to be on
+the name, and a name held by more than one stock is left unlinked rather than
+pointed at an arbitrary record. On a *result* page the same resolution is one
+indexed `IN` list against `idx_stock_name`: **1.0 ms for ten names** against
+87,397 rows, cached with the query's metadata so it runs once per query id.
+
+### Two parse traps, both of which fail silently
+
+- **`preg_match_all` over the roster returns `false`, not `0`.** The obvious
+  pattern for an optgroup body — `<optgroup …>(.*?)(?=</optgroup>|$)` — blows
+  PCRE's backtrack limit on a 640 KB subject whose `<optgroup>` the engine never
+  closes, and `false` read as "no groups" sent every option down the no-project
+  branch. That made the "All NAM" entry indistinguishable from a stock and put a
+  row called *NAM* in the stock list. Splitting on the opening tag has no
+  backtracking in it at all.
+- **The stock column headers have two shapes.** A narrow result writes
+  `<th class="Imputation"><div><span>B73</span>`; once a result is wide enough
+  for the engine to rotate its labels it writes
+  `<th class="rotate Imputation"><div><span title="B73">B73</span>`. Matching
+  only the first gave a 27-stock query **"0 stocks" and a six-column grid**. So
+  the span may carry attributes and the class is a list, not a name.
+
+A third, in the same family: **`get_table_body.php` must be handed an `http://`
+URL.** It does not read the page file from disk — it fetches the URL it is given,
+on a PHP 5.3 build with no SSL stream wrapper — so an `https://` URL returns
+200 with an empty body and every Gene model and Type column comes back blank.
+That one endpoint is the only place the engine's hostname is *not* rewritten to
+https.
+
+### The 60-second ceiling, and why the query id is minted in the browser
+
+Apache proxies PHP through `mod_proxy_fcgi` with no `Timeout` set anywhere under
+`/etc/httpd/`, so it uses the 60-second default. Measured: a deliberate
+75-second sleep through the stack returns **504 at 60.05 s**. SNPversity's own
+time estimator routinely answers four minutes for a wide region, so the submit
+response is *expected* to be lost on exactly the queries that matter most. The
+legacy page had the same ceiling and nothing to say about it — it blocked the
+screen with "This may take a few minutes" and left that overlay up forever when
+the gateway gave up.
+
+The engine accepts any query id it is given and uses it verbatim to name its
+files (verified). So the id is generated in the browser, and it is the id that
+makes the result findable: the page polls a cheap status endpoint for it
+alongside the submit request and goes to the result when the file appears,
+whatever happened to the request that started it. The submit's PHP calls
+`ignore_user_abort(true)` so it finishes and caches its parse rather than being
+killed halfway. See ADMIN_DEPENDENCIES.md AD-068 for the one-directive fix that
+would make the workaround unnecessary.
+
+### What else the rebuild fixed
+
+- **Two of the three output formats are broken, and the page says so.** A
+  `vcf` or `hapmap` run answers with a link to
+  `david1.usda.iastate.edu`, which **has no DNS record**, and the file is not at
+  the corresponding path on the public host either. The API rewrites the host,
+  `HEAD`s it, and only offers a download when that returns 200; the form warns
+  before the query is run rather than after several minutes of waiting. AD-067.
+- **The download is the whole result.** The legacy "export CSV" ran a jQuery
+  routine over the *rendered* table, so it exported the page on screen — one
+  page of five — and exported whatever the zoom slider had done to it. The TSV
+  and CSV here walk every page server-side, with the gene model and feature type
+  columns included.
+- **The results fragment is not well-formed.** `get_table_body.php` echoes a
+  bare, unwrapped GBrowse URL before every `<tr>`; dropped into a `<tbody>`
+  those text nodes are hoisted out of the table by the HTML parser and stack up
+  above it. The grid is built from the engine's genotype JSON instead, with only
+  the gene model and type read out of that fragment.
+- **A query that does not exist now says so, with the right status.** The engine
+  answers an unknown id with `<a href=deadbeef…,1,>View File</a>` — the id and
+  two commas. Matching that as a file link made "this result has expired" look
+  like "here is your file"; the href now has to actually be a URL. The page
+  answers **404** for a missing result and 503 when the engine is unreachable,
+  and offers the form instead of a download button that would 404.
+- **The dataset and the assembly are one control.** The legacy form had an
+  assembly select and a dataset select whose contents the assembly rewrote,
+  which is one control more than the question needs and let the pair be left
+  disagreeing — which the engine answers with its own error page.
+- **The Quick Select buttons chose a random region.** `onChromosomeChange()`
+  picked start and end with `Math.random()`, so pressing the same preset twice
+  ran two different queries. The two examples here are fixed regions that were
+  run before shipping: three inbreds over 307 kb of chromosome 1, and the 26 NAM
+  founders over the same region.
+- **The help left the modals.** Eight modal dialogs — the datasets, the two
+  color scales, the gene types, the custom file format, the caveat about large
+  regions, the sharing note — are sections on the page, where they can be
+  linked to. The `.stockinfo` rosters were three nested dialogs deep and are now
+  a flat grid with each project's count beside it.
+- **The call colors are re-set for contrast.** The scale is transcribed from the
+  engine's `nucleotide_colors.css` so a reader who has used SNPversity before
+  sees the same thing, but its `td.A { background: red }` and
+  `td.T { background: purple }` carry black text at about 3.9:1 and 2.1:1. Ink is
+  set per class here, and every cell prints its own base, so nothing rests on hue.
+
+### The retirement notice
+
+The legacy page carried, in crimson: *"On May 2nd, 2025 this SNPversity 1.0 tool
+will be retired and replaced with the new SNPversity 2.0."* That date is sixteen
+months past and the tool is still running, so the sentence is false in its tense
+and unreliable in its promise. The page states what is true instead — this is
+1.0, it covers B73 RefGen_v2 and v3, SNPversity 2.1 at `wgs.maizegdb.org` covers
+B73 v5, and neither is a replacement for the other's assembly — and links it.
+**Whether 1.0 should now be retired is a decision for the group, not for this
+page.**
+
+### Verified
+
+Both routes on the modern shell with no `index.css`, `background_static.css`,
+`ie6.css`, `sitemap.css` or `gbrowse.css`; no duplicate `id`; no unresolved
+replacement tokens; every tab label identical to its section's `<h2>`; the
+scrollspy tracking all six sections on the form and all five on the result; no
+document-level horizontal overflow at 1280 or at 375, with the grid and the
+dataset table scrolling inside their own containers.
+
+The tool itself was verified against the engine rather than by eye: the stock
+picker filters 15,532 names; the gene model type-ahead returns
+`GRMZM2G017087_T01` and selecting it sets chr1:271,345,869–271,349,507 from the
+engine's own coordinates plus the 1,000 bp offset; the time estimator returns 18
+seconds for two stocks over 307 kb; a three-stock run and a 27-stock run both
+completed through the live engine in about 10 seconds and rendered their grids;
+paging, deep-linking to `?p=2`, both filters, and the TSV and CSV exports
+(51 lines each, all pages) all work.
 
 ## The BLAST front page
 

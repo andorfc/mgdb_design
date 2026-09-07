@@ -244,6 +244,31 @@ src/controllers/ordering/stock_modern.php        controllers/ordering/stock_mode
 src/templates/ordering/mgdb_stock_order.bau      templates/ordering/mgdb_stock_order.bau
 src/css/mgdb-stock-order.css                     css/mgdb-stock-order.css
 
+# /ordering/coop_order -- the Maize Genetics Cooperation Stock Center request
+# form, on the design system. The guard in ordering.php (shared with the stock
+# basket above) sends page renders and the `completed` confirmation to
+# coop_order_modern.php; anything with an `action` field falls through to the
+# legacy controllers/ordering/coop_order.php, which still owns every AJAX
+# endpoint and the order email and is deliberately NOT deployed from here.
+# The modern JS calls those same endpoints. Rollback is removing the guard.
+src/controllers/ordering/coop_order_modern.php   controllers/ordering/coop_order_modern.php
+src/templates/ordering/mgdb_coop_order.bau       templates/ordering/mgdb_coop_order.bau
+src/templates/ordering/mgdb_coop_order_completed.bau templates/ordering/mgdb_coop_order_completed.bau
+src/css/mgdb-coop-order.css                      css/mgdb-coop-order.css
+src/js/mgdb-coop-order.js                        js/mgdb-coop-order.js
+
+# /jobs -- the maize community job board, on the design system. A top-level
+# controllers/jobs.php shadows the route (controller.php finds it before
+# redirect.php, so no legacy chrome leaks in); the legacy
+# controllers/community/jobs.php and its three templates are untouched and
+# archived in legacy/jobs/. Rollback is deleting controllers/jobs.php. The
+# curated listings live in data/jobs/jobs.php, which staff edit to post a job;
+# the submission form still e-mails the curators and drops a file in data/jobs/.
+src/controllers/jobs.php                         controllers/jobs.php
+src/templates/community/mgdb_jobs.bau            templates/community/mgdb_jobs.bau
+src/css/mgdb-jobs.css                            css/mgdb-jobs.css
+src/data/jobs/jobs.php                           data/jobs/jobs.php
+
 # Maize Newsletter archive — replaces /mnl in place. The legacy controller and
 # its community/ templates are untouched and archived in legacy/mnl/; rollback
 # is deleting controllers/mnl.php. The volume list is final and lives in the
@@ -1356,8 +1381,17 @@ src/controllers/ssrreports.php                controllers/ssrreports.php
 src/controllers/tools/ssrreports_modern.php   controllers/tools/ssrreports_modern.php
 src/templates/static/mgdb_ssr_reports.bau     templates/static/mgdb_ssr_reports.bau
 
-# /ssr_protocols. Tracked from 2026-09-05 for one line: its trail linked /doc,
-# retired, and archive.maizegdb.org, which does not resolve.
+# /ssr_protocols -- the Maize Mapping Project SSR PCR protocol, on the design
+# system (2026-09-06). A top-level controllers/ssr_protocols.php shadows the
+# route (controller.php finds it before redirect.php, so no legacy chrome
+# leaks in); the content is rebuilt as clean markup in mgdb_ssr_protocols.bau,
+# transformed from the escaped prose in the legacy ssr_protocols-content.bau.
+# The legacy controller and its two templates are untouched and archived in
+# legacy/ssr-protocols/; rollback is deleting controllers/ssr_protocols.php.
+# The content partial below stays tracked as the source of that prose.
+src/controllers/ssr_protocols.php                controllers/ssr_protocols.php
+src/templates/static/mgdb_ssr_protocols.bau      templates/static/mgdb_ssr_protocols.bau
+src/css/mgdb-ssr-protocols.css                   css/mgdb-ssr-protocols.css
 src/templates/static/ssr_protocols-content.bau   templates/static/ssr_protocols-content.bau
 src/css/mgdb-ssr-reports.css                  css/mgdb-ssr-reports.css
 src/js/mgdb-ssr-reports.js                    js/mgdb-ssr-reports.js
@@ -1850,6 +1884,36 @@ src/templates/static/mgdb_login.bau                      templates/static/mgdb_l
 src/templates/static/mgdb_logout.bau                     templates/static/mgdb_logout.bau
 src/css/mgdb-login.css                                   css/mgdb-login.css
 
+# /release_notes retired, 2026-09-06: 301 to /whatsnew, the News archive.
+#
+# It rendered data/release_notes/*.xml through an XSL stylesheet, one file per
+# release. There are 76 of them and the newest is release_notes_2021-09-02.xml,
+# so the "Release Notes (Updated ...)" heading has said September 2021 for five
+# years. What it printed was the last comment of each closed JIRA issue -- "Various
+# other minor bug fixes and improvements were made" is a representative entry.
+#
+# Nothing on the site linked to it: checked every template and controller on the
+# server and in the repo, and the only references are two tracking entries in
+# data/redesign_status.json. NO ALTERNATE ROUTE either -- /about/release_notes
+# and /community/release_notes answer 200 with the generic shell, not this page,
+# because there is no controllers/static.php to dispatch
+# controllers/static/release_notes.php. Nothing is deleted; the controller,
+# template, script and all 76 XML files stay on disk.
+src/controllers/release_notes.php                controllers/release_notes.php
+
+# /working_group2013 retired, 2026-09-06: 301 to /working_group#wg-documents.
+#
+# The agenda for one meeting, 6 August 2013. It listed eleven documents -- ten
+# decks and 2013WG_Report.pdf -- under /templates/about/wg2013/, a directory that
+# holds two templates and three images and nothing else. All eleven answer HTTP
+# 200 with the generic HTML shell, 38,937 bytes, identical for each, so a click
+# returns a web page instead of a file and nothing reports an error. Three Vimeo
+# recordings of the meeting DO survive and were linked here and nowhere else;
+# they are carried into the data note under the Documents table on
+# /working_group. The page is not deleted and still serves at
+# /about/working_group2013 -- verified to render the agenda, not the shell.
+src/controllers/working_group2013.php            controllers/working_group2013.php
+
 # /past -- PAST, the Pathway Association Study Tool, on the design system,
 # 2026-09-06. A top-level controllers/past.php takes the route (controller.php
 # finds it before redirect.php, so no legacy chrome leaks in). There is no
@@ -1875,6 +1939,41 @@ src/controllers/past.php                         controllers/past.php
 src/templates/static/mgdb_past.bau               templates/static/mgdb_past.bau
 src/css/mgdb-past.css                            css/mgdb-past.css
 src/js/mgdb-past.js                              js/mgdb-past.js
+
+# Genome-browser embed pages modernized (2026-09-06)
+# /jbrowse and /gbrowse: the embedded browser iframes moved onto the modern shell
+# via top-level shadow controllers (same pattern as /jobs, /login). Legacy files
+# untouched and archived in legacy/genome-browsers/.
+src/controllers/jbrowse.php                              controllers/jbrowse.php
+src/controllers/gbrowse.php                              controllers/gbrowse.php
+src/templates/tools/mgdb_jbrowse.bau                     templates/tools/mgdb_jbrowse.bau
+src/templates/tools/mgdb_gbrowse.bau                     templates/tools/mgdb_gbrowse.bau
+src/css/mgdb-genome-browser-embed.css                    css/mgdb-genome-browser-embed.css
+src/js/mgdb-genome-browser-embed.js                      js/mgdb-genome-browser-embed.js
+
+# /mapscore_ibmlist and /mapscore_ibm302list retired 2026-09-06 (Carson): the
+# maps are hardly used. Two static reference lists of line names (IBM-94 and the
+# IBM-302 subset) that helped read the IBM map scores. Each is a top-level 301 to
+# /data_center/map; controller.php finds these before redirect.php reaches the
+# untouched controllers/static/mapscore_ibm*list.php. Links removed from the Map
+# hub (mgdb_map.bau) and the site map (sitemap_data.py); the legacy
+# templates/data_center/map-left.bau also links them and is left to the 301, not
+# repo-owned. The sibling *score* pages were not named and still serve. Rollback
+# is deleting each redirect controller.
+src/controllers/mapscore_ibmlist.php             controllers/mapscore_ibmlist.php
+src/controllers/mapscore_ibm302list.php          controllers/mapscore_ibm302list.php
+#
+# The three IBM score pages retired the same way, 2026-09-06 (Carson): the maps
+# are hardly used. /mapscore_ibmscore (cIBM on-frame scores), /mapscore_ibm94genoscore
+# (IBM GNP 2004 set) and /mapscore_ibm302score (IBM-302 scores) each 301 to
+# /data_center/map. Their links were the last two score pills on the Map hub;
+# with the pills gone, the two thin "IBM Population Map Scores" cards were merged
+# into one "IBM population mapping files" card keeping the still-live MapMaker
+# infile download and the QTL Cartographer link. Legacy map-left.bau links left
+# to the 301.
+src/controllers/mapscore_ibmscore.php            controllers/mapscore_ibmscore.php
+src/controllers/mapscore_ibm94genoscore.php      controllers/mapscore_ibm94genoscore.php
+src/controllers/mapscore_ibm302score.php         controllers/mapscore_ibm302score.php
 
 # /controlled_pollination -- the field protocol for making a controlled cross,
 # on the design system, 2026-09-06. A top-level controllers/controlled_pollination.php
@@ -1902,6 +2001,27 @@ src/controllers/controlled_pollination.php       controllers/controlled_pollinat
 src/templates/static/mgdb_controlled_pollination.bau templates/static/mgdb_controlled_pollination.bau
 src/css/mgdb-controlled-pollination.css          css/mgdb-controlled-pollination.css
 
+# The site-wide 404, 2026-09-06.
+#
+# redirect.php is adopted here for one reason: its not-found branch called
+# $mgdb->get('body')->load('templates/error/error-404.bau'), and that call did
+# nothing. The block inside that template is named "error-404.bau" -- filename
+# suffix and all -- and Bauplan matches a block by name, so nothing was ever
+# substituted and the body kept the default it already had: the HOMEPAGE, served
+# with HTTP 200, for every unknown URL on the site.
+#
+# The status is the important half. While a miss answered 200, no dead link
+# anywhere on MaizeGDB could report itself -- /fakegene, /zzzz and eleven
+# missing documents on /working_group2013 all returned 200 and the same 38,937
+# bytes. redirect.php now decides whether a controller exists BEFORE it builds
+# the legacy shell, and hands a miss to controllers/not_found.php, which sets
+# 404 and renders the modern page. templates/error/error-404.bau is left on disk.
+src/redirect.php                                 redirect.php
+src/controllers/not_found.php                    controllers/not_found.php
+src/templates/static/mgdb_not_found.bau          templates/static/mgdb_not_found.bau
+src/css/mgdb-not-found.css                       css/mgdb-not-found.css
+src/js/mgdb-not-found.js                         js/mgdb-not-found.js
+
 # /stock_decryption -- how to read the handwriting on a Stock Center seed
 # packet, on the design system, 2026-09-06. A top-level
 # controllers/stock_decryption.php takes the route (controller.php finds it
@@ -1924,3 +2044,26 @@ src/controllers/stock_decryption.php             controllers/stock_decryption.ph
 src/templates/static/mgdb_stock_decryption.bau   templates/static/mgdb_stock_decryption.bau
 src/css/mgdb-stock-decryption.css                css/mgdb-stock-decryption.css
 src/js/mgdb-stock-decryption.js                  js/mgdb-stock-decryption.js
+
+# SNPversity (/snpversity, /snpversity/send) — 2026-09-06
+src/controllers/snpversity.php controllers/snpversity.php
+src/templates/static/mgdb_snpversity.bau templates/static/mgdb_snpversity.bau
+src/templates/static/mgdb_snpversity_results.bau templates/static/mgdb_snpversity_results.bau
+src/css/mgdb-snpversity.css css/mgdb-snpversity.css
+src/js/mgdb-snpversity.js js/mgdb-snpversity.js
+src/js/mgdb-snpversity-results.js js/mgdb-snpversity-results.js
+src/search/snpversity/snpversity_search_api.php search/snpversity/snpversity_search_api.php
+src/search/snpversity/snpversity_search_lib.php search/snpversity/snpversity_search_lib.php
+src/tools/snpversity_index.php tools/snpversity_index.php
+src/data/snpversity/stocks_gbs.json data/snpversity/stocks_gbs.json
+src/data/snpversity/stocks_hmp.json data/snpversity/stocks_hmp.json
+src/data/snpversity/summary.json data/snpversity/summary.json
+
+# Person record page modernized (2026-09-06)
+# /person?id={id} on the record shell, server-rendered. community.php carries the
+# routing guard (record vs search) and is already listed above.
+src/controllers/community/person_record_modern.php       controllers/community/person_record_modern.php
+src/include/person_record_lib.php                        include/person_record_lib.php
+src/templates/static/mgdb_person_record.bau              templates/static/mgdb_person_record.bau
+src/css/mgdb-person-record.css                           css/mgdb-person-record.css
+src/js/mgdb-person-record.js                             js/mgdb-person-record.js

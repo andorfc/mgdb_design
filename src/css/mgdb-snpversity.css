@@ -1,0 +1,949 @@
+/* SNPversity (/snpversity and /snpversity/send) — MaizeGDB modern design
+ * system.
+ *
+ * The ground, the white section cards and their colored top edges, the metric
+ * row, the shared table, the note, the buttons, the reference cards and the
+ * green Related resources wash all come from css/mgdb-hub.css and
+ * css/mgdb-modern.css, which load first. Only what is specific to these two
+ * pages lives here: the four-step query console, the stock picker, the
+ * genotype grid, and the two legends.
+ *
+ * This replaces nothing on the engine's side. snpversity.maizegdb.org still
+ * serves its own css/home.css, css/send.css, css/nucleotide_colors.css and
+ * css/taxa_colors.css to anyone who opens it directly; none of them is loaded
+ * here. The two color scales below are *transcribed* from those sheets rather
+ * than linked, because the meaning of a call color has to match what the
+ * engine's own viewer shows — but they are re-set on the site's tokens where
+ * the original values fail contrast on their own text.
+ */
+
+.mgdb-modern .mgdb-snpversity-page { padding-bottom: clamp(3rem, 6vw, 5.5rem); }
+
+/* ── Hero ────────────────────────────────────────────────────────────────── */
+
+.mgdb-snpversity-page .snpv-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-snpversity-page .snpv-emblem svg {
+  width: 5.5rem;
+  height: 5.5rem;
+}
+
+.mgdb-snpversity-page .snpv-hero-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-5);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-snpversity-page .snpv-hero-links a {
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+}
+
+.mgdb-snpversity-page .snpv-queryid {
+  margin: var(--mgdb-space-3) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-snpversity-page .snpv-queryid code {
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* The version note sits between the hero and the tab bar, so it is a message
+   on the ground rather than inside a section card. */
+.mgdb-snpversity-page .snpv-version-note {
+  margin: var(--mgdb-space-5) 0 0;
+}
+
+.mgdb-snpversity-page .snpv-version-note p { margin: 0; }
+
+/* ── Section tabs ────────────────────────────────────────────────────────── */
+
+.mgdb-snpversity-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.mgdb-snpversity-page .mgdb-section-tabs a:hover { border-color: var(--mgdb-green); }
+
+.mgdb-snpversity-page .mgdb-section-tabs a.is-current {
+  border-color: var(--mgdb-green);
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark) !important;
+}
+
+/* ── Shared bits ─────────────────────────────────────────────────────────── */
+
+.mgdb-snpversity-page .snpv-lead {
+  max-width: var(--mgdb-measure);
+  margin: 0 0 var(--mgdb-space-5);
+  color: var(--mgdb-ink-soft);
+}
+
+.mgdb-snpversity-page .snpv-subhead {
+  margin: var(--mgdb-space-6) 0 var(--mgdb-space-3);
+  font-size: var(--mgdb-text-lg);
+}
+
+.mgdb-snpversity-page .snpv-metrics { margin-top: var(--mgdb-space-5); }
+
+.mgdb-snpversity-page .snpv-note { margin-top: var(--mgdb-space-6); }
+
+.mgdb-snpversity-page .snpv-num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ==========================================================================
+   THE QUERY CONSOLE
+   ========================================================================== */
+
+.mgdb-snpversity-page .snpv-console {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-5);
+}
+
+.mgdb-snpversity-page .snpv-step {
+  margin: 0;
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--hub-surface);
+  box-shadow: var(--hub-shadow);
+  /* A fieldset is a grid item elsewhere on this page; without a floor, a long
+     unwrapped stock name inside it sets the min-content width and pushes the
+     console past the section. */
+  min-width: 0;
+}
+
+.mgdb-snpversity-page .snpv-step > legend {
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  padding: 0;
+  font-size: var(--mgdb-text-lg);
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-snpversity-page .snpv-step-number {
+  display: inline-flex;
+  width: 26px;
+  height: 26px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--mgdb-green);
+  color: #ffffff;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.mgdb-snpversity-page .snpv-step > .mgdb-hint {
+  max-width: var(--mgdb-measure);
+  margin: var(--mgdb-space-3) 0 var(--mgdb-space-4);
+}
+
+/* Every control in the console is one height, so a row of them does not step.
+   44px is the shared tap target. */
+.mgdb-snpversity-page .snpv-console .mgdb-input,
+.mgdb-snpversity-page .snpv-console .mgdb-select,
+.mgdb-snpversity-page .snpv-console .mgdb-button {
+  min-height: var(--mgdb-tap-target);
+}
+
+.mgdb-snpversity-page .snpv-console input[type="file"] { padding: 9px 12px; }
+
+/* ── Step 1: dataset cards ───────────────────────────────────────────────── */
+
+.mgdb-snpversity-page .snpv-dataset-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--mgdb-space-3);
+}
+
+.mgdb-snpversity-page .snpv-dataset-card {
+  position: relative;
+  display: flex;
+  gap: var(--mgdb-space-3);
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--hub-surface);
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease;
+}
+
+.mgdb-snpversity-page .snpv-dataset-card:hover { border-color: var(--mgdb-green); }
+
+.mgdb-snpversity-page .snpv-dataset-card:has(input:checked) {
+  border-color: var(--mgdb-green);
+  background: var(--mgdb-green-soft);
+}
+
+/* :has() is not everywhere; the script mirrors the state onto a class so the
+   selected card is still marked where it is missing. */
+.mgdb-snpversity-page .snpv-dataset-card.is-selected {
+  border-color: var(--mgdb-green);
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-snpversity-page .snpv-dataset-card input {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--mgdb-green);
+}
+
+.mgdb-snpversity-page .snpv-dataset-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.mgdb-snpversity-page .snpv-dataset-title { font-weight: 700; }
+
+.mgdb-snpversity-page .snpv-dataset-meta {
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.mgdb-snpversity-page .snpv-dataset-blurb {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+/* ── Step 2: project chips and the stock picker ──────────────────────────── */
+
+.mgdb-snpversity-page .snpv-project-row { margin-bottom: var(--mgdb-space-4); }
+
+.mgdb-snpversity-page .snpv-project-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-2);
+}
+
+.mgdb-snpversity-page .snpv-project-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--hub-line);
+  border-radius: 17px;
+  background: var(--hub-surface);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mgdb-snpversity-page .snpv-project-chip[aria-pressed="true"] {
+  border-color: var(--mgdb-green);
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-snpversity-page .snpv-project-chip .snpv-chip-count {
+  color: var(--mgdb-muted);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+.mgdb-snpversity-page .snpv-combobox { position: relative; }
+
+.mgdb-snpversity-page .snpv-combobox-shell {
+  display: flex;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-snpversity-page .snpv-combobox-shell .snpv-combobox-input { flex: 1 1 auto; min-width: 0; }
+.mgdb-snpversity-page .snpv-combobox-toggle { flex: none; }
+
+.mgdb-snpversity-page .snpv-combobox-list {
+  position: absolute;
+  z-index: 30;
+  left: 0;
+  right: 0;
+  max-height: 320px;
+  margin: 4px 0 0;
+  padding: 4px;
+  overflow-y: auto;
+  border: 1px solid var(--mgdb-green);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  box-shadow: var(--hub-shadow-hover);
+  list-style: none;
+}
+
+.mgdb-snpversity-page .snpv-combobox-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  padding: 8px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-snpversity-page .snpv-combobox-list li[aria-selected="true"],
+.mgdb-snpversity-page .snpv-combobox-list li:hover { background: var(--mgdb-green-soft); }
+
+.mgdb-snpversity-page .snpv-combobox-list li.is-disabled {
+  color: var(--mgdb-muted);
+  cursor: default;
+}
+
+.mgdb-snpversity-page .snpv-combobox-list li.is-disabled:hover { background: transparent; }
+
+.mgdb-snpversity-page .snpv-option-name { font-weight: 600; }
+.mgdb-snpversity-page .snpv-option-alias { color: var(--mgdb-muted); }
+.mgdb-snpversity-page .snpv-option-project {
+  margin-left: auto;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  white-space: nowrap;
+}
+
+.mgdb-snpversity-page .snpv-combobox-list mark {
+  background: var(--mgdb-gold-soft);
+  color: inherit;
+  font-weight: 700;
+}
+
+.mgdb-snpversity-page .snpv-combobox-status { margin: var(--mgdb-space-2) 0 0; }
+
+/* Selected stocks ---------------------------------------------------------- */
+
+.mgdb-snpversity-page .snpv-selected { margin-top: var(--mgdb-space-4); }
+
+.mgdb-snpversity-page .snpv-selected-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mgdb-space-3);
+}
+
+.mgdb-snpversity-page .snpv-count {
+  display: inline-block;
+  min-width: 24px;
+  padding: 1px 7px;
+  border-radius: 10px;
+  background: var(--mgdb-green);
+  color: #ffffff;
+  font-size: var(--mgdb-text-xs);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.mgdb-snpversity-page .snpv-selected-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin: var(--mgdb-space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mgdb-snpversity-page .snpv-selected-list li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 6px 0 10px;
+  border: 1px solid var(--hub-line);
+  border-left-width: 4px;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-snpversity-page .snpv-selected-list .snpv-remove {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--mgdb-muted);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mgdb-snpversity-page .snpv-selected-list .snpv-remove:hover {
+  background: var(--mgdb-red-soft);
+  color: var(--mgdb-red);
+}
+
+.mgdb-snpversity-page .snpv-selected-list .snpv-bulk { font-weight: 700; }
+
+.mgdb-snpversity-page .snpv-details {
+  margin-top: var(--mgdb-space-5);
+  border-top: 1px solid var(--hub-line);
+  padding-top: var(--mgdb-space-4);
+}
+
+.mgdb-snpversity-page .snpv-details > summary {
+  font-weight: 600;
+  color: var(--mgdb-green-dark);
+  cursor: pointer;
+}
+
+.mgdb-snpversity-page .snpv-details-body { margin-top: var(--mgdb-space-3); max-width: var(--mgdb-measure); }
+
+.mgdb-snpversity-page .snpv-code {
+  margin: var(--mgdb-space-3) 0;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  overflow-x: auto;
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-sunken);
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* ── Step 3: region ──────────────────────────────────────────────────────── */
+
+.mgdb-snpversity-page .snpv-region-mode {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-snpversity-page .snpv-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.mgdb-snpversity-page .snpv-radio input { width: 18px; height: 18px; accent-color: var(--mgdb-green); }
+
+.mgdb-snpversity-page .snpv-gene-block {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-4);
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-snpversity-page .snpv-region-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-snpversity-page .snpv-region-readout {
+  margin: var(--mgdb-space-3) 0 0;
+  color: var(--mgdb-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.mgdb-snpversity-page .snpv-region-warning { margin-top: var(--mgdb-space-3); }
+.mgdb-snpversity-page .snpv-region-warning p,
+.mgdb-snpversity-page .snpv-format-note p { margin: 0; }
+
+/* ── Step 4: output ──────────────────────────────────────────────────────── */
+
+.mgdb-snpversity-page .snpv-output-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-snpversity-page .snpv-format-note { margin-top: var(--mgdb-space-4); }
+
+/* ── The run bar ─────────────────────────────────────────────────────────── */
+
+/* In flow, not sticky. A sticky bar on this page would float a Run query
+   button over the Datasets and References sections, where there is nothing to
+   run. */
+.mgdb-snpversity-page .snpv-runbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mgdb-space-4);
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-green);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-snpversity-page .snpv-runbar-summary {
+  flex: 1 1 20rem;
+  min-width: 0;
+  margin: 0;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+}
+
+.mgdb-snpversity-page .snpv-runbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-snpversity-page .snpv-error { margin-top: var(--mgdb-space-4); }
+.mgdb-snpversity-page .snpv-error p { margin: 0; }
+
+.mgdb-snpversity-page .snpv-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-4);
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-alt);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   DATASETS, FILES AND LEGENDS
+   ========================================================================== */
+
+.mgdb-snpversity-page .snpv-dataset-table th[scope="row"] {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 15rem;
+}
+
+.mgdb-snpversity-page .snpv-dataset-name { font-weight: 700; }
+
+.mgdb-snpversity-page .snpv-dataset-key {
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+  font-weight: 400;
+}
+
+.mgdb-snpversity-page .snpv-dataset-note {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 400;
+  line-height: var(--mgdb-leading-snug);
+  white-space: normal;
+}
+
+.mgdb-snpversity-page .snpv-catalog-date { margin-top: var(--mgdb-space-4); }
+
+.mgdb-snpversity-page .snpv-file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--mgdb-space-5);
+}
+
+.mgdb-snpversity-page .snpv-file-group h3 {
+  margin: 0 0 var(--mgdb-space-3);
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-snpversity-page .snpv-file-list { margin: 0; padding: 0; list-style: none; }
+
+.mgdb-snpversity-page .snpv-file-list a {
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-3);
+  padding: 10px 12px;
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  margin-bottom: 6px;
+  background: var(--hub-surface);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+  text-decoration: none;
+}
+
+.mgdb-snpversity-page .snpv-file-list a:hover {
+  border-color: var(--mgdb-green);
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-snpversity-page .snpv-file-name { font-weight: 600; }
+
+.mgdb-snpversity-page .snpv-file-count {
+  margin-left: auto;
+  color: var(--mgdb-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.mgdb-snpversity-page .snpv-reading-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--mgdb-space-6);
+}
+
+.mgdb-snpversity-page .snpv-reading-block > h3 {
+  margin: 0 0 var(--mgdb-space-2);
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-snpversity-page .snpv-reading-block > p { max-width: var(--mgdb-measure); }
+
+.mgdb-snpversity-page .snpv-legend { margin: var(--mgdb-space-3) 0 0; padding: 0; list-style: none; }
+
+.mgdb-snpversity-page .snpv-legend li {
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-3);
+  padding: 5px 0;
+  font-size: var(--mgdb-text-sm);
+  border-bottom: 1px solid var(--hub-line-soft);
+}
+
+.mgdb-snpversity-page .snpv-legend li:last-child { border-bottom: 0; }
+
+.mgdb-snpversity-page .snpv-swatch {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid rgba(16, 30, 54, .15);
+}
+
+.mgdb-snpversity-page .snpv-swatch-all {
+  background: linear-gradient(135deg, #7293cb 0 25%, #84ba5b 25% 50%, #e1974c 50% 75%, #9067a7 75% 100%);
+}
+
+.mgdb-snpversity-page .snpv-legend-label { min-width: 0; }
+.mgdb-snpversity-page .snpv-legend-count {
+  margin-left: auto;
+  color: var(--mgdb-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.mgdb-snpversity-page .snpv-legend-calls .snpv-call {
+  flex: none;
+  min-width: 3.5rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-align: center;
+}
+
+/* ==========================================================================
+   CALL COLORS
+   --------------------------------------------------------------------------
+   Transcribed from the engine's css/nucleotide_colors.css so a reader who has
+   used SNPversity before sees the same scale. Two changes, both for contrast:
+   its `td.A { background: red }` and `td.T { background: purple }` carry black
+   text at about 3.9:1 and 2.1:1, so the ink is set per class here rather than
+   inherited. Nothing rests on hue alone — every cell prints its own base.
+   ========================================================================== */
+
+.mgdb-snpversity-page .snpv-call-j    { background: #9dca9d; color: #12331f; }
+.mgdb-snpversity-page .snpv-call-n    { background: #f0a04b; color: #40230a; }
+.mgdb-snpversity-page .snpv-call-N    { background: #d8dbdd; color: #3b4247; }
+.mgdb-snpversity-page .snpv-call-R    { background: #7f9fd6; color: #10203c; }
+.mgdb-snpversity-page .snpv-call-Y    { background: #c9a2dc; color: #2e1a3a; }
+.mgdb-snpversity-page .snpv-call-S    { background: #f2b8c6; color: #3d1420; }
+.mgdb-snpversity-page .snpv-call-W    { background: #d6b8e0; color: #331a3c; }
+.mgdb-snpversity-page .snpv-call-K    { background: #f5a58c; color: #40190c; }
+.mgdb-snpversity-page .snpv-call-M    { background: #93d68f; color: #123318; }
+.mgdb-snpversity-page .snpv-call-ins  { background: #b04a4a; color: #ffffff; }
+.mgdb-snpversity-page .snpv-call-del  { background: #6fbdb6; color: #0d312e; }
+.mgdb-snpversity-page .snpv-call-zero { background: #8fd9d3; color: #0d312e; }
+
+/* ==========================================================================
+   THE RESULTS GRID
+   ========================================================================== */
+
+.mgdb-snpversity-results-page .snpv-grid-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-4);
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-snpversity-results-page .snpv-pager {
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-snpversity-results-page .snpv-page-select { min-width: 14rem; max-width: 22rem; }
+
+.mgdb-snpversity-results-page .snpv-pager .mgdb-button,
+.mgdb-snpversity-results-page .snpv-pager .mgdb-select { min-height: var(--mgdb-tap-target); }
+
+.mgdb-snpversity-results-page .snpv-grid-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-snpversity-results-page .snpv-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--mgdb-text-sm);
+  cursor: pointer;
+}
+
+.mgdb-snpversity-results-page .snpv-switch input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--mgdb-green);
+}
+
+.mgdb-snpversity-results-page .snpv-grid-status { margin: 0 0 var(--mgdb-space-3); }
+
+/* The grid scrolls inside its own box. A result can be 30 stocks wide; the
+   page body must never scroll sideways because of it. */
+.mgdb-snpversity-results-page .snpv-grid-wrap {
+  max-height: 70vh;
+  overflow: auto;
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+}
+
+.mgdb-snpversity-results-page .snpv-grid {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-snpversity-results-page .snpv-grid th,
+.mgdb-snpversity-results-page .snpv-grid td {
+  padding: 5px 10px;
+  border-bottom: 1px solid var(--hub-line-soft);
+  white-space: nowrap;
+  text-align: left;
+}
+
+/* Both axes stay put while the grid is scrolled: the header row because a
+   30-column grid is unreadable once the stock names have scrolled off, and the
+   first four columns because a call is meaningless without its site. */
+.mgdb-snpversity-results-page .snpv-grid thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--mgdb-surface-sunken);
+  border-bottom: 1px solid var(--hub-line);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.mgdb-snpversity-results-page .snpv-grid .snpv-col-site {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--hub-surface);
+  border-right: 1px solid var(--hub-line);
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-snpversity-results-page .snpv-grid thead .snpv-col-site { z-index: 4; background: var(--mgdb-surface-sunken); }
+
+.mgdb-snpversity-results-page .snpv-grid tbody tr:hover td { background-color: var(--mgdb-gold-soft); }
+.mgdb-snpversity-results-page .snpv-grid tbody tr:hover .snpv-col-site { background-color: var(--mgdb-gold-soft); }
+
+.mgdb-snpversity-results-page .snpv-grid .snpv-num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.mgdb-snpversity-results-page .snpv-grid .snpv-gene { font-size: var(--mgdb-text-xs); }
+.mgdb-snpversity-results-page .snpv-grid .snpv-type {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-muted);
+}
+
+/* One call. The class carries the color; the cell carries the base, so the
+   grid is still readable printed in gray or by a reader who cannot separate
+   the two greens. */
+.mgdb-snpversity-results-page .snpv-grid td.snpv-cell {
+  width: 2.2rem;
+  padding: 5px 4px;
+  border-left: 1px solid rgba(255, 255, 255, .6);
+  font-family: var(--mgdb-font-mono);
+  font-weight: 700;
+  text-align: center;
+}
+
+.mgdb-snpversity-results-page .snpv-grid thead th.snpv-stock-head {
+  padding: 6px 4px;
+  text-align: center;
+  vertical-align: bottom;
+}
+
+.mgdb-snpversity-results-page .snpv-stock-head .snpv-stock-tag {
+  display: block;
+  max-width: 8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-bottom: 3px solid transparent;
+  padding-bottom: 2px;
+}
+
+.mgdb-snpversity-results-page .snpv-stock-head a { color: inherit; }
+
+/* Stock chips under "This query" ------------------------------------------ */
+
+.mgdb-snpversity-page .snpv-stock-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mgdb-snpversity-page .snpv-stock-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--hub-line);
+  border-radius: 16px;
+  background: var(--hub-surface);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-snpversity-page .snpv-stock-chip .snpv-swatch { width: 12px; height: 12px; border-radius: 50%; }
+.mgdb-snpversity-page .snpv-stock-name { font-weight: 600; }
+.mgdb-snpversity-page .snpv-stock-project { color: var(--mgdb-muted); font-size: var(--mgdb-text-xs); }
+
+.mgdb-snpversity-page .snpv-exports { margin-bottom: var(--mgdb-space-2); }
+
+.mgdb-snpversity-page .snpv-share {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin: var(--mgdb-space-3) 0;
+}
+
+.mgdb-snpversity-page .snpv-share-url {
+  flex: 1 1 24rem;
+  min-width: 0;
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* ── Narrow screens ──────────────────────────────────────────────────────── */
+
+@media (max-width: 720px) {
+  .mgdb-snpversity-page .snpv-gene-block { grid-template-columns: 1fr; }
+  .mgdb-snpversity-page .snpv-runbar { align-items: stretch; }
+  .mgdb-snpversity-page .snpv-runbar-actions .mgdb-button { flex: 1 1 auto; justify-content: center; }
+  .mgdb-snpversity-results-page .snpv-grid-wrap { max-height: 60vh; }
+  .mgdb-snpversity-results-page .snpv-page-select { min-width: 0; flex: 1 1 auto; }
+  .mgdb-snpversity-results-page .snpv-pager { width: 100%; }
+}
+
+/* ── Examples row ────────────────────────────────────────────────────────── */
+
+/* Inserted by js/mgdb-snpversity.js rather than written into the template:
+   the presets only work with that file loaded, and a button that does nothing
+   is worse than no button. */
+.mgdb-snpversity-page .snpv-examples {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 1px dashed var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-snpversity-page .snpv-examples .mgdb-label { margin: 0; }
+
+.mgdb-snpversity-page .snpv-examples .mgdb-button {
+  min-height: 36px;
+  border: 1px solid var(--hub-line);
+  background: var(--hub-surface);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-snpversity-page .snpv-examples .mgdb-button:hover {
+  border-color: var(--mgdb-green);
+  background: var(--mgdb-green-soft);
+}
+
+/* The Positions metric holds a coordinate range — "158,918,417 – 159,221,408"
+   — which at the shared 30px compact size measures 414px in a 294px card and
+   pushed the whole document to a 1399px scrollWidth at a 1280px viewport. The
+   shared metric value is a single line by design; this one is not. */
+.mgdb-snpversity-results-page .snpv-metric-region .mgdb-metric-value {
+  font-size: 1.3rem;
+  line-height: 1.3;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* "Next →" wrapped onto two lines and made the pager 56px tall against the
+   44px everything beside it. */
+.mgdb-snpversity-results-page .snpv-pager .mgdb-button { white-space: nowrap; }
+
+/* The "no stocks yet" panel is a placeholder, not a message: at the shared
+   .mgdb-empty size it was a 60px band of amber in the middle of the console. */
+.mgdb-snpversity-page #snpv-selected-empty {
+  margin: var(--mgdb-space-3) 0 0;
+  padding: var(--mgdb-space-3);
+  text-align: left;
+}
+
+@media (max-width: 560px) {
+  /* Browse beside a text field leaves the field about 140px wide, which is
+     narrower than most of the names being typed into it. */
+  .mgdb-snpversity-page .snpv-combobox-shell { flex-wrap: wrap; }
+  .mgdb-snpversity-page .snpv-combobox-shell .snpv-combobox-input { flex: 1 1 100%; }
+  .mgdb-snpversity-page .snpv-combobox-toggle { flex: 1 1 auto; justify-content: center; }
+  .mgdb-snpversity-page .snpv-selected-head { flex-wrap: wrap; }
+}
+
+/* What "This query" says when the query is gone. */
+.mgdb-snpversity-results-page .snpv-gone {
+  margin: var(--mgdb-space-4) 0 0;
+  color: var(--mgdb-ink-soft);
+}
+
+/* The flanking-bases field takes a number of at most seven digits; at the
+   grid's own 1fr it was as wide as the gene model input beside it. */
+.mgdb-snpversity-page .snpv-offset-field .mgdb-input { max-width: 12rem; }
+
+.mgdb-snpversity-results-page .snpv-chip-note { margin: var(--mgdb-space-3) 0 0; max-width: var(--mgdb-measure); }

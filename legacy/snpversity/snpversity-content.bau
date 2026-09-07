@@ -1,0 +1,43 @@
+$$SYNTAX-LEVEL 2
+*(snpversity-content {include-css: /css/gbrowse.css}
+   <b><a href="/snpversity">Return to SNPVersity home page.</a></b><br/>
+   <br>
+   <span style="color: crimson; font-weight: bold">
+     Notice:</span>  <b>On May 2nd, 2025 this SNPversity 1.0 tool will be retired and replaced with the new <a href='https://wgs.maizegdb.org/'>SNPversity 2.0</a>. If shutting down this 1.0 tool will be disruptive to your work, please let us know through the feedback button at the top-right menu.</b> 
+    
+    <br><br>
+   <span style="font-weight: bold">
+     For best results do not use your browser's 'Back' button and
+     disable popup blockers.
+    </span> 
+  <iframe id="geno_div_frame" name="geno_div_frame" src="https://snpversity.maizegdb.org/Diversity/$(source).php?$(params)&parent=true" height="1050px" width="100%" frameborder="0" >
+  
+  </iframe>
+
+ 
+ <script language="javascript">
+  \$("#menu_bar", document\).removeClass("menu"\);
+  \$("#menu_bar", document\).removeClass("menu_green"\);
+  \$("#menu_bar", document\).addClass("menu_gbrowse"\);
+  \$("#menu_bar", document\).addClass("menu_green_gbrowse"\);
+  document.getElementById("wrapper"\).setAttribute("style", "width:1600px"\); //2000    
+  document.getElementById("logo"\).setAttribute("style", "width:1324px"\); //1724
+  document.getElementById("centercolumn_record"\).setAttribute("style", "width:1300px"\);
+  document.getElementById("whitecurve"\).setAttribute("style", "width:1320px"\);
+  document.getElementById("content"\).setAttribute("style", "width:1300px"\);
+  document.getElementById("content_top"\).src = "/images/content_top_gbrowse.png";
+  document.getElementById("content_top"\).setAttribute("style", "width:1320px"\);
+  document.getElementById("menu_bar"\).setAttribute("style", "width:86.5%"\);
+  window.onload=function(\) {
+   //need to wait for these sections to load before changing them
+   \$("#footer_menu", document\).removeClass("menu"\);
+   \$("#footer_menu", document\).removeClass("menu_green"\);
+   \$("#footer_menu", document\).addClass("menu_gbrowse"\);
+   \$("#footer_menu", document\).addClass("menu_green_gbrowse"\);
+   document.getElementById("content_bottom"\).setAttribute("style", "width:1320px"\);
+   document.getElementById("footer"\).setAttribute("style", "width:1320px"\);
+   document.getElementById("content_bottom"\).src = "/images/content_bottom_gbrowse.png";
+ }
+ 
+ </script>
+)
