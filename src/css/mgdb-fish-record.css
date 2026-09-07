@@ -1,0 +1,62 @@
+/* file: css/mgdb-fish-record.css
+ *
+ * The FISH record page. Five records exist, so this is deliberately small.
+ */
+
+/* Label column fixed, value column takes the rest, the same shape the other
+   record pages use for a facts table. */
+.mgdb-fish-record-page .fr-table th[scope="row"] {
+  width: 14rem;
+  vertical-align: top;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* The chromosome spread. These are photographs of a single spread, about
+   345px wide at source on the legacy page; they are allowed to reach their
+   natural size and no further, centred, rather than being stretched to the
+   panel by `width: 100%`. */
+.mgdb-fish-record-page .fr-figure {
+  margin: 0;
+  text-align: center;
+}
+
+.mgdb-fish-record-page .fr-figure img {
+  max-width: min(100%, 480px);
+  height: auto;
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius-md, 6px);
+  background: #ffffff;
+}
+
+/* Four siblings at most, so they are a row of cards rather than a table. */
+.mgdb-fish-record-page .fr-siblings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--mgdb-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mgdb-fish-record-page .fr-siblings a {
+  display: block;
+  padding: var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--hub-surface);
+  text-decoration: none;
+}
+
+.mgdb-fish-record-page .fr-siblings a:hover,
+.mgdb-fish-record-page .fr-siblings a:focus-visible {
+  border-color: var(--mgdb-green-dark);
+}
+
+.mgdb-fish-record-page .fr-siblings strong {
+  display: block;
+}
+
+@media (max-width: 720px) {
+  .mgdb-fish-record-page .fr-table th[scope="row"] { width: auto; white-space: normal; }
+}

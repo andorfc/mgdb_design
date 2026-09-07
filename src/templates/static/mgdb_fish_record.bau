@@ -1,0 +1,91 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-fish-record
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:title" content="$(record_name) &mdash; MaizeGDB FISH probe">
+
+<a class="mgdb-skip-link" href="#fr-main">Skip to main content</a>
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-fish-record-page" id="fr-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/cytogenetic">Cytogenetics</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(record_name)</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-hero" aria-labelledby="fr-title">
+    <div class="mgdb-hero-body">
+      <h1 id="fr-title">$(record_name)</h1>
+      <p class="mgdb-rec-lead">A sorghum BAC hybridized to a maize pachytene chromosome, with its signal detected at $(record_position).</p>
+      <dl class="mgdb-record-facts mgdb-rec-headfacts">$(identity_facts)</dl>
+    </div>
+  </section>
+
+  <section class="mgdb-panel" id="fr-detail" aria-labelledby="fr-detail-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="fr-detail-title">The probe</h2>
+      </div>
+    </div>
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table fr-table">
+        <caption class="mgdb-visually-hidden">How this FISH probe was made and placed</caption>
+        <tbody>$(detail_rows)</tbody>
+      </table>
+    </div>
+  </section>
+
+  @(fish_image {display: off}
+  <section class="mgdb-panel" id="fr-image" aria-labelledby="fr-image-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="fr-image-title">FISH signal</h2>
+        <p>The chromosome spread this probe was scored on.</p>
+      </div>
+    </div>
+    <figure class="fr-figure">
+      ;; Not loading="lazy". There is one image, it is the section's whole
+      ;; content, and deferring it left the figure 2px tall with the image
+      ;; never requested. The source is 1073x1295; the sheet caps the
+      ;; rendered width at 480px, so width and height are given to reserve
+      ;; the right box before it arrives rather than reflowing the page.
+      <img src="$(image_url)" alt="$(image_alt)" width="1073" height="1295" />
+    </figure>
+  </section>
+  )
+
+  @(other_probes {display: off}
+  <section class="mgdb-panel" id="fr-others" aria-labelledby="fr-others-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="fr-others-title">The other probes</h2>
+        <p>MaizeGDB holds five FISH probes, all from the Cytogenetic Map of Maize project.</p>
+      </div>
+    </div>
+    <ul class="fr-siblings">$(sibling_items)</ul>
+  </section>
+  )
+
+  <section class="mgdb-hub-related" id="fr-resources" aria-labelledby="fr-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="fr-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/projects/cytogenetic_map">
+          <strong>Cytogenetic Map of Maize</strong>
+          <span>The probe nomenclature and the FISH methods these records follow</span>
+        </a>
+        <a href="/data_center/cytogenetic">
+          <strong>Cytogenetics Data Hub</strong>
+          <span>Cytological maps and positions across the ten chromosomes</span>
+        </a>
+        <a href="/data_center/map">
+          <strong>Map Data Hub</strong>
+          <span>The FISH map this probe is placed on, and every other map</span>
+        </a>
+        <a href="/data_center/bac">
+          <strong>BAC Data Hub</strong>
+          <span>The BAC clones the probes were made from</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

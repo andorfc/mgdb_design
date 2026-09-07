@@ -277,6 +277,26 @@
     }
   }
 
+  /* Species record page. mgdb.species is (id, species); the page is built
+     from what points at the species. Returns false for an unknown id so the
+     legacy page can say so. */
+  if (PAGE == 'species' && getCGIParam('id', 'G', ID)) {
+    if (include('controllers/data_center/species_record_modern.php')) {
+      return;
+    }
+  }
+
+  /* FISH record page. Addressed by the locus the probe marks plus the map it
+     is on -- ?id=<locus>&map=<map> -- because mgdb.map_fish has no id of its
+     own; its key is auto_num, 1 to 5. The map is optional: a locus has at most
+     one FISH record. Returns false when the locus has none, which lets the
+     legacy page say so. */
+  if (PAGE == 'fish' && getCGIParam('id', 'G', ID)) {
+    if (include('controllers/data_center/fish_record_modern.php')) {
+      return;
+    }
+  }
+
   /* Gel pattern record page. */
   if (PAGE == 'gel' && getCGIParam('id', 'G', ID)) {
     if (include('controllers/data_center/gel_record_modern.php')) {
@@ -531,13 +551,23 @@
         exit;
       }
       reportError("data_center.php: page is missing: $search_template_name or $search_filename");
-      $mgdb->get('body')->load('templates/error/error-404.bau');
+      http_response_code(404);
+      /* The modern 404 rather than error-404.bau: that template's block is
+         named with its .bau suffix, so Bauplan never matched it and this
+         branch rendered whatever body was already loaded, with a 200. */
+      include('controllers/not_found.php');
+      exit;
     }
   }
 
   else if (!file_exists($template_name) || !file_exists($page_filename)) {
     reportError("gene_center.php: page is missing: $template_name or $page_filename");
-    $mgdb->get('body')->load('templates/error/error-404.bau');
+    http_response_code(404);
+    /* The modern 404 rather than error-404.bau: that template's block is
+       named with its .bau suffix, so Bauplan never matched it and this
+       branch rendered whatever body was already loaded, with a 200. */
+    include('controllers/not_found.php');
+    exit;
   }
 
   else {

@@ -819,6 +819,24 @@ src/tools/alphafill_models.py                             tools/alphafill_models
 src/tools/alphafill_ligand_extract.py                     tools/alphafill_ligand_extract.py
 
 
+# Species record page -- /data_center/species?id=. mgdb.species is two columns,
+# so the page is built from what points at the species: its chromosomes, its
+# nuclear measurements and how much data is filed against it. The holdings are
+# counted with a LIMIT 501 cap -- exact counts for Zea mays ssp. mays cost about
+# a second each across seven tables. Dispatched from controllers/data_center.php.
+src/controllers/data_center/species_record_modern.php     controllers/data_center/species_record_modern.php
+src/templates/static/mgdb_species_record.bau              templates/static/mgdb_species_record.bau
+src/css/mgdb-species-record.css                           css/mgdb-species-record.css
+
+# FISH record page -- /data_center/fish?id=<locus>&map=<map>. Five records,
+# all from the Cytogenetic Map of Maize project. Addressed by locus because
+# mgdb.map_fish has no id of its own. The legacy page's image never displayed:
+# its template used one placeholder for both the server prefix and the file
+# name. Dispatched from controllers/data_center.php.
+src/controllers/data_center/fish_record_modern.php        controllers/data_center/fish_record_modern.php
+src/templates/static/mgdb_fish_record.bau                 templates/static/mgdb_fish_record.bau
+src/css/mgdb-fish-record.css                              css/mgdb-fish-record.css
+
 # Loci and accessions in a bin -- /bin_viewer_locus_accession. Rebuilt
 # 2026-09-07: the legacy page returned zero rows for every bin. Its query had no
 # bin condition, it loaded the sequence page's template, and the rows it wanted

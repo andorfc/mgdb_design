@@ -1,0 +1,102 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-species-record
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:title" content="$(record_name) &mdash; MaizeGDB species">
+
+<a class="mgdb-skip-link" href="#sr-main">Skip to main content</a>
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-species-record-page" id="sr-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/stock">Stocks</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(record_name)</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-hero" aria-labelledby="sr-title">
+    <div class="mgdb-hero-body">
+      <h1 id="sr-title"><i>$(record_name)</i></h1>
+      <dl class="mgdb-record-facts mgdb-rec-headfacts">$(identity_facts)</dl>
+    </div>
+  </section>
+
+  @(holdings {display: off}
+  <section class="mgdb-panel" id="sr-holdings" aria-labelledby="sr-holdings-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="sr-holdings-title">What MaizeGDB holds</h2>
+        <p>Records filed against this species. A figure shown as 500+ is not counted exactly &#8212; the hubs below have the precise number.</p>
+      </div>
+    </div>
+    <div class="sr-metrics">$(holding_cards)</div>
+  </section>
+  )
+
+  @(nuclear {display: off}
+  <section class="mgdb-panel" id="sr-nuclear" aria-labelledby="sr-nuclear-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="sr-nuclear-title">Nuclear details</h2>
+      </div>
+    </div>
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table">
+        <caption class="mgdb-visually-hidden">Haploid chromosome number and nuclear DNA content</caption>
+        <thead><tr><th scope="col">Haploid number</th><th scope="col">DNA content</th></tr></thead>
+        <tbody>$(nuclear_rows)</tbody>
+      </table>
+    </div>
+  </section>
+  )
+
+  @(linkage {display: off}
+  <section class="mgdb-panel" id="sr-linkage" aria-labelledby="sr-linkage-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="sr-linkage-title">Chromosomes and linkage groups</h2>
+      </div>
+    </div>
+    <ul class="sr-groups">$(linkage_items)</ul>
+  </section>
+  )
+
+  @(externals {display: off}
+  <section class="mgdb-panel" id="sr-external" aria-labelledby="sr-external-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="sr-external-title">External identifiers</h2>
+      </div>
+    </div>
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table">
+        <caption class="mgdb-visually-hidden">This species in other databases</caption>
+        <thead><tr><th scope="col">Source</th><th scope="col">Identifier</th></tr></thead>
+        <tbody>$(external_rows)</tbody>
+      </table>
+    </div>
+  </section>
+  )
+
+  <section class="mgdb-hub-related" id="sr-resources" aria-labelledby="sr-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="sr-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/stock">
+          <strong>Stock Data Hub</strong>
+          <span>Seed and germplasm, searchable by name, background and source</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>Loci across every species MaizeGDB records</span>
+        </a>
+        <a href="/data_center/variation">
+          <strong>Genetic Variation Data Hub</strong>
+          <span>Alleles and sequence variants</span>
+        </a>
+        <a href="/data_center/image_species">
+          <strong>Images by species</strong>
+          <span>Photographs filed against a species</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

@@ -1,0 +1,75 @@
+/* file: css/mgdb-species-record.css
+ *
+ * The species record page. mgdb.species is (id, species), so everything here
+ * is about presenting what points at the species rather than the species row.
+ */
+
+/* ── Holdings ────────────────────────────────────────────────────────────── */
+
+.mgdb-species-record-page .sr-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: var(--mgdb-space-3);
+}
+
+.mgdb-species-record-page .sr-metric {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-1);
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--hub-surface);
+}
+
+.mgdb-species-record-page .sr-metric-value {
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-xl, 1.5rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+/* ── Linkage groups ──────────────────────────────────────────────────────── */
+
+/* Maize has 23 of these, most of them a single character, so they sit as chips
+   rather than as a column of one-word rows. */
+.mgdb-species-record-page .sr-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mgdb-species-record-page .sr-groups a {
+  display: inline-block;
+  padding: var(--mgdb-space-1) var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: 999px;
+  background: var(--hub-surface);
+  font-size: var(--mgdb-text-sm);
+  text-decoration: none;
+}
+
+.mgdb-species-record-page .sr-groups a:hover,
+.mgdb-species-record-page .sr-groups a:focus-visible {
+  border-color: var(--mgdb-green-dark);
+}
+
+/* ── External identifiers ────────────────────────────────────────────────── */
+
+.mgdb-species-record-page #sr-external th[scope="row"] {
+  width: 20rem;
+  font-weight: 600;
+}
+
+.mgdb-species-record-page #sr-external code {
+  font-family: var(--mgdb-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: var(--mgdb-text-sm);
+}
+
+@media (max-width: 720px) {
+  .mgdb-species-record-page #sr-external th[scope="row"] { width: auto; }
+}
