@@ -1,0 +1,55 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-qtl-notfound
+<meta name="robots" content="noindex">
+<meta property="og:title" content="No QTL experiment found &mdash; MaizeGDB">
+<meta property="og:description" content="$(notfound_summary)">
+
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-record-notfound-page" id="qtl-notfound-top">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/qtl">QTL Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Not found</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-notfound-hero" aria-labelledby="qtl-notfound-title">
+    <div class="mgdb-hero-body">
+      <h1 id="qtl-notfound-title">No QTL experiment matches &ldquo;$(requested_display)&rdquo;</h1>
+      <p class="mgdb-rec-lead">MaizeGDB holds $(total_experiments) curated QTL experiments. None of them carries that name or MaizeGDB ID, and no trait analysis with that ID belongs to one.</p>
+    </div>
+  </section>
+
+  <section id="qtl-notfound-search" aria-labelledby="qtl-notfound-search-title">
+    <div class="mgdb-section-heading"><div><h2 id="qtl-notfound-search-title">Search</h2></div></div>
+    <form class="mgdb-rec-search" action="/data_center/qtl" method="get" role="search">
+      <label class="mgdb-visually-hidden" for="qtl-notfound-query">Trait, experiment or analysis name</label>
+      <input class="mgdb-input" id="qtl-notfound-query" name="term" type="search" autocomplete="off" value="$(requested_value)" placeholder="Trait, experiment or analysis name" />
+      <button class="mgdb-button mgdb-button-primary" type="submit">Search QTLs</button>
+    </form>
+    <p class="mgdb-rec-hint">An experiment is named for the first author and the year it was published &#8212; <em>Abler 1991f</em>, <em>Beavis 1994</em>. The hub searches the traits evaluated in each, so <em>plant height</em> or a parent line such as <em>B73</em> will reach them too.</p>
+  </section>
+
+  $(suggestion_sections)
+
+  <section class="mgdb-hub-related" id="qtl-notfound-resources" aria-labelledby="qtl-notfound-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="qtl-notfound-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/qtl">
+          <strong>QTL Data Hub</strong>
+          <span>Every trait evaluated in a maize mapping study</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>QTL loci and where they map</span>
+        </a>
+        <a href="/data_center/phenotype">
+          <strong>Traits and Phenotypes Data Hub</strong>
+          <span>The traits these studies score</span>
+        </a>
+        <a href="/searchall">
+          <strong>Search all MaizeGDB data</strong>
+          <span>One search across every data type</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

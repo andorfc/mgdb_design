@@ -199,16 +199,19 @@ function qtlSearch($DBConn, $filters = array(), $limit = 50, $offset = 0) {
     // Hydrate details
     $detailSql = "
         SELECT ta.id, ta.name, t.name AS trait_name, qe.id AS exp_id, qe.name AS experiment_name,
+               qi.curation_lvl AS exp_curation,
                ta.experimental_design, ta.method,
                ARRAY_REMOVE(ARRAY_AGG(DISTINCT s.name), NULL) AS parents,
                (SELECT COUNT(*) FROM mgdb.qtl_exp_detects qed WHERE qed.id = ta.qtl_exp) AS qtl_count
         FROM mgdb.trait_analysis ta
         LEFT JOIN mgdb.term t ON t.id = ta.trait
         LEFT JOIN mgdb.qtl_exp qe ON qe.id = ta.qtl_exp
+        LEFT JOIN mgdb.id_num qi ON qi.id = qe.id
         LEFT JOIN mgdb.trait_analysis_parent tap ON tap.id = ta.id
         LEFT JOIN mgdb.stock s ON s.id = tap.parent
         WHERE ta.id IN ({$idList})
-        GROUP BY ta.id, ta.name, t.name, qe.id, qe.name, ta.experimental_design, ta.method
+        GROUP BY ta.id, ta.name, t.name, qe.id, qe.name, qi.curation_lvl,
+                 ta.experimental_design, ta.method
         ORDER BY ta.name ASC";
 
     $detailRows = get_all_rows(make_query($DBConn, $detailSql));
@@ -216,12 +219,28 @@ function qtlSearch($DBConn, $filters = array(), $limit = 50, $offset = 0) {
 
     foreach ($detailRows as $row) {
         $parents = qtlParsePgArray($row['parents']);
+        /* The record page is the experiment's, so a row can only be linked when
+           it reaches a curated one. Three of the 243 analyses do not: two
+           record no experiment at all (anthsr1, maysin1) and one belongs to an
+           experiment held at curation level 10. Linking them anyway is how the
+           hub came to offer 404s; `buildNameCell` in js/mgdb-qtl.js renders the
+           name unlinked when there is no url, which is the honest result. */
+        $linkable = $row['exp_id'] !== null && (int) $row['exp_curation'] === 0;
+
         $results[] = array(
             'id'                  => (int) $row['id'],
             'name'                => $row['name'],
-            'url'                 => '/data_center/qtl?id=' . (int) $row['id'],
+            /* The row is a trait analysis, and this id is its own, not the
+               experiment's. /data_center/qtl reads mgdb.qtl_exp, so until
+               2026-09-06 every result here led to "Qtl record not found"
+               answered with HTTP 200. The modern record page resolves both id
+               spaces: an analysis id opens the experiment that owns it, with
+               this analysis named in a notice and its row marked. Keeping the
+               analysis id is what makes that possible -- sending the
+               experiment id instead would lose which trait was clicked. */
+            'url'                 => $linkable ? '/data_center/qtl?id=' . (int) $row['id'] : null,
             'trait_name'          => $row['trait_name'] ?? 'Unspecified',
-            'exp_id'              => (int) ($row['exp_id'] ?? 0),
+            'exp_id'              => $linkable ? (int) $row['exp_id'] : 0,
             'experiment_name'     => $row['experiment_name'] ?? '',
             'parents'             => $parents,
             'experimental_design' => $row['experimental_design'] ?? '',
