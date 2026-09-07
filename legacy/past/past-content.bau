@@ -1,0 +1,171 @@
+$$SYNTAX-LEVEL 2
+*(past-content {include-css: /css/gbrowse.css}
+
+  <style>
+  #content { min-height: 680px; }
+</style>
+
+
+<table width=100% cellpadding=0 cellspacing=0>
+  <tr>
+    <td>
+      <div id="centercolumn_record" style="width: 1050px;">
+        <div class='navarea'>
+          <font size="1">
+            <span class='underlinedlink' align=right>
+              <a href='/'>Home</a> > PAST
+            </span>
+          </font>
+        </div>
+        <br>
+        <table width='100%'  cellpadding=0 cellspacing=0>
+          <tr valign='center' class='green_curve_background'>
+            <td align='left'>
+              <img src='/images/header_left.gif'>
+            </td>
+            <td width='97%' valign='center' class='green_curve_background'>
+              PAST (Pathway Association Study Tool\) at MaizeGDB    
+            </td>
+            <td align='right'>
+              <img src='/images/header_right.gif'>
+            </td>
+          </tr>
+        </table>
+   
+        <div id='past_content' style="width: 1000px;">
+          <table summary="main content table" cellpadding=10 cellspacing=20>
+            <tr>
+              <td>
+                <table summary="information table">
+                  <tr>
+                    <td>
+                      <h3>About PAST</h3>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div style="font-size: 14px;">
+                        PAST: the Pathway Association Study Tool assigns your SNPs to genes and your genes to metabolic pathways. PAST transfers the attributes of your SNPs (R2, p\) to the genes and identifies pathways that are significantly associated with your trait of interest.
+<br><br>By running PAST, either through the Shiny application or through the R console, researchers can gain a deeper understanding of the biological meaning of their GWAS results by investigating the metabolic pathways involved.
+<br><br>
+					<figure>
+					  <img src="/images/past_ss.png" alt="PAST" style="width:100%">
+					  <figcaption>A screen capture of the PAST output.</figcaption>
+					</figure>
+                      </div>
+                    </td>
+                  </tr>
+				 
+				    <tr>
+						<td>
+							<br>
+							<h3>How to run PAST at MaizeGDB</h3>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div style="font-size: 14px;">
+								MaizeGDB has three instances of PAST installed on R Shiny servers. There is a limit to running one job per server.  If a link is unresponsive, please try a different server or check back later when the server becomes available.  An average job takes between 30 - 90 minutes to complete.
+								<br><br>
+								<a href="https://past1.maizegdb.org">MaizeGD PAST server #1</a><br>
+								 <a href="https://past2.maizegdb.org">MaizeGD PAST server #2</a><br>
+								 <a href="https://past3.maizegdb.org">MaizeGD PAST server #3</a><br>
+							</div>
+						</td>
+					</tr>
+                     <tr>
+                    <td>
+					<br>
+                      <h3>How to run PAST on a local machine</h3>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+					<div style="font-size: 14px;">
+					The best way to run past is to install it locally by either using Docker or running it through Bioconductor.<br><br>
+					
+                  
+                      <a href="https://www.bioconductor.org/packages/release/bioc/html/PAST.html">PAST on Bioconductor</a><br>
+					 <a href="https://github.com/IGBB/PAST/">GitHub repository</a><br>
+					 <a href="https://raw.githubusercontent.com/IGBB/PAST/shiny_app/app.R">app.R file</a><br>
+					 </div><br>
+                     <div id="green_background" style="font-size: 12px; width: 620px;">
+                      <h4><u>Docker Instructions</u></h4><br>
+                            <b>Pre-requisite step:</b> <br><br>
+                             1\) <a href ='https://docs.docker.com/get-docker/' target='_blank'>Install Docker on your computer</a>.<br><br>
+                            <b>Simple steps:</b> <br><br>
+                             1\) Open a terminal and type the command:<br><br>
+                             <div style="margin-left: 15px"><pre>$ docker run -it -d -p 80:3838 --name past maizegdb/past</pre></div> <br>
+                             2\) Open a web browser and navigate to <a href="http://localhost" target="_blank">http://localhost</a>. <br><br>
+                             
+                             <b>Helpful docker commands:</b><br><br>
+                             The docker container will continue to run on your local machine until you tell it to stop with this command:<br><br>
+                             <div style="margin-left: 15px"><pre>$ docker stop past</pre></div> <br><br>
+                             
+                             To check whether any containers are still running use this command: <br><br>
+                             <div style="margin-left: 15px"><pre>$ docker ps</pre></div> <br>
+
+                         </div>
+                    </td>
+
+                 </tr>
+				
+					<tr>
+						<td>
+							<br>
+							<h3>Documentation and sample data</h3>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div style="font-size: 14px;">
+								<br>
+								 <a href="https://github.com/IGBB/PAST/blob/master/README.md">PAST documentation</a><br>
+								 <a href="https://download.maizegdb.org/GeneFunction_and_Expression/PAST/Gene_model_files/">Gene Model GFFs (B73 RefGen_v2, v3,& v4\)</a><br>
+								 <a href="https://download.maizegdb.org/GeneFunction_and_Expression/PAST/Pathway_files/">Pathway files (B73 RefGen_v2, v3,& v4\)</a><br>
+								 <a href="https://download.maizegdb.org/GeneFunction_and_Expression/PAST/Kernel_Color_Example">Kernel color example  </a><br>
+							</div>
+						</td>
+					</tr>				
+					
+
+				</table>
+				</td>
+				<td valign='top'>
+					<img id="past_img" src="/images/past_view.png" align='center'>
+					<br><br><br>
+					<div id="rcorners" style ="font-size: 14px; margin-left: 20px; border-radius: 25px; border: 2px solid #73AD21; padding: 12px;">
+					If you use this tool in your research, please cite:<br><br>
+					<table>
+					<tr>
+						<td><span style ="font-size: 14px;"><a href="https://doi.org/10.3390/plants9010058">Thrash et al. 2020. PAST: The Pathway Association Studies Tool to infer biological meaning from GWAS datasets. Plants 9, 58.</a></span></td>
+						<td><a href='https://www.ncbi.nlm.nih.gov/pubmed/?term=31906457'> <img src='../icon/pubmed_24.png' style='border: none; display: inline'></a><br><br>
+							<a href='https://www.mdpi.com/2223-7747/9/1/58/pdf'><img src='../icon/pdf_24.png' style='border: none; display: inline'></a><br>
+						</td>
+					</tr>
+					</table>	
+					</div>
+					<br><br>
+					<h3>Citations using PAST methodology:</h3><br>
+					<div style="font-size: 14px; margin-left: 20px;">
+					<ul>
+					<li><a href="https://doi.org/10.1111/tpj.14282">Li et al. 2019.</a> Leveraging GWAS data to identify metabolic pathways and networks involved in maize lipid biosynthesis. Plant J, 98:853-863</li>
+					<li><a href="https://doi.org/10.3835/plantgenome2017.08.0069">Warburton et al. 2017.</a> Genome-wide association and metabolic pathway analysis of corn earworm resistance in maize. TPG: doi: 11:170069.</li>
+					<li><a href="https://doi.org/10.1186/s12864-015-1874-9">Tang et al. 2015.</a> Using genome-wide associations to identify metabolic pathways involved in maize aflatoxin accumulation resistance. BMC Genomics 16:673.</li>
+					</ul>
+					</div>
+				</td>
+            </tr>
+          </table>
+		  
+		  
+        </div>
+      </div>
+
+    </td>
+
+  </tr>
+</table>
+ 
+ 
+)

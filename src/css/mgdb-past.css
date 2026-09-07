@@ -1,0 +1,358 @@
+/* PAST, the Pathway Association Study Tool (/past) — MaizeGDB modern design
+ * system.
+ *
+ * The ground, the white section cards, their coloured top edges, the shared
+ * table, the note, the buttons, the reference cards and the green Related
+ * resources wash all come from css/mgdb-hub.css and css/mgdb-modern.css, which
+ * load first. Only what is specific to this page lives here: the pathway
+ * emblem, the three server launch cards, the prose-and-figure split, the
+ * install cards and their copyable commands, and the download tables.
+ *
+ * This replaces the legacy page's borrowed sheets. That page pulled in
+ * css/sitemap.css and css/gbrowse.css for a layout that was actually two fixed
+ * widths inline (1050px and 1000px) plus a 620px green box. Both sheets are
+ * still on the server and still loaded by the legacy page; nothing here touches
+ * them.
+ */
+
+.mgdb-modern .mgdb-past-page { padding-bottom: clamp(3rem, 6vw, 5.5rem); }
+
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
+
+.mgdb-past-page .past-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-past-page .past-emblem svg {
+  width: 5.5rem;
+  height: 5.5rem;
+}
+
+/* The shell uppercases the emblem, which is right for PAST and wrong for the
+   arrow line under it -- "SNPS" is not how the unit is written. */
+.mgdb-past-page .past-emblem-meta {
+  margin-top: 0.15rem;
+  color: var(--mgdb-green-dark);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+/* ── Sticky section tabs ─────────────────────────────────────────────────── */
+
+.mgdb-past-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.mgdb-past-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
+
+.mgdb-past-page .mgdb-section-tabs a.is-current,
+.mgdb-past-page .mgdb-section-tabs a[aria-current="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+/* Six tabs, scrolling rather than wrapping, so the bar is exactly one row at
+   every width and a single scroll offset is right everywhere. The shell's
+   ladder steps at 1170px on the assumption that a bar is one row above it and
+   two below, which is not where this one wraps. Same answer as /handyref,
+   /coordinateDef and /podcast. */
+.mgdb-past-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-5);
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Measured on the built page: the bar is 57px tall at 1280, 900 and 375. */
+.mgdb-hub-page.mgdb-past-page > section[id] { scroll-margin-top: 65px; }
+
+.mgdb-past-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+/* ── Prose ───────────────────────────────────────────────────────────────── */
+
+.mgdb-past-page .past-prose { max-width: 62rem; }
+
+.mgdb-past-page .past-prose p {
+  margin: 0 0 1.05rem;
+  color: var(--mgdb-ink);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.mgdb-past-page .past-prose p:last-child { margin-bottom: 0; }
+
+.mgdb-past-page .past-lead {
+  max-width: 62rem;
+  margin: 0 0 var(--mgdb-space-4);
+  color: var(--mgdb-ink);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.mgdb-past-page .past-steps { margin: 0 0 1.05rem; line-height: 1.6; }
+.mgdb-past-page .past-steps p { margin: 0 0 0.5rem; }
+.mgdb-past-page .past-steps p:last-child { margin-bottom: 0; }
+
+/* ── The three servers ───────────────────────────────────────────────────── */
+
+/* Three cards across, because they are interchangeable: the reader picks one,
+   and a column would suggest an order of preference that does not exist.
+   auto-fit rather than a fixed three, so the row does not shred at the widths
+   between one and three columns. */
+.mgdb-past-page .past-servers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--mgdb-space-3);
+  max-width: 62rem;
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-past-page .past-server {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--hub-line);
+  border-left: 4px solid var(--mgdb-green-dark);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface, #ffffff);
+  color: var(--mgdb-ink) !important;
+  text-decoration: none;
+  transition: background .15s ease, border-color .15s ease, transform .15s ease;
+}
+
+.mgdb-past-page .past-server:hover {
+  background: var(--mgdb-green-soft);
+  border-left-color: var(--mgdb-gold);
+}
+
+.mgdb-past-page .past-server:focus-visible {
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: 2px;
+}
+
+.mgdb-past-page .past-server-n {
+  flex: none;
+  display: inline-flex;
+  width: 2.1rem;
+  height: 2.1rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-family: var(--mgdb-font-mono);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.mgdb-past-page .past-server-body { min-width: 0; }
+
+.mgdb-past-page .past-server-body strong {
+  display: block;
+  color: var(--mgdb-burgundy);
+  font-size: 0.98rem;
+  line-height: 1.3;
+}
+
+.mgdb-past-page .past-server-host {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--mgdb-muted);
+  font-family: var(--mgdb-font-mono);
+  font-size: 0.78rem;
+}
+
+/* ── Prose beside the output screenshot ──────────────────────────────────── */
+
+.mgdb-past-page .past-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--mgdb-space-5);
+}
+
+.mgdb-past-page .past-figure {
+  width: 320px;
+  margin: 0;
+  padding: 0.85rem;
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: #ffffff;
+}
+
+/* The screenshot is 600x152. Height is left to the aspect ratio rather than
+   set, so it is never squashed the way the legacy page's other image was. */
+.mgdb-past-page .past-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--hub-line);
+  border-radius: 4px;
+}
+
+.mgdb-past-page .past-figure figcaption {
+  margin-top: 0.6rem;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .mgdb-past-page .past-split { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-past-page .past-figure { width: min(420px, 100%); }
+}
+
+/* ── Install cards ───────────────────────────────────────────────────────── */
+
+/* Two routes, side by side, because they are alternatives rather than steps. */
+.mgdb-past-page .past-install {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(21rem, 1fr));
+  gap: var(--mgdb-space-4);
+  max-width: 62rem;
+}
+
+.mgdb-past-page .past-install-card {
+  padding: 1rem 1.15rem 1.1rem;
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface, #ffffff);
+}
+
+.mgdb-past-page .past-install-card h3 {
+  margin: 0 0 0.5rem;
+  color: var(--mgdb-burgundy);
+  font-size: 1.05rem;
+}
+
+.mgdb-past-page .past-install-card p {
+  margin: 0 0 0.85rem;
+  font-size: 0.96rem;
+  line-height: 1.6;
+}
+
+.mgdb-past-page .past-links { margin: 0; font-size: 0.96rem; line-height: 1.55; }
+
+/* ── Commands ────────────────────────────────────────────────────────────── */
+
+/* A command with its Copy button in the corner of the box.
+ *
+ * The button reads the <code> beside it, so the command exists in exactly one
+ * place in the template and the printed and copied text cannot drift.
+ *
+ * The button sits *over* the box rather than beside it because beside it cost
+ * 70px of an already narrow column: in a two-card install grid at 1280 the
+ * code box was 330px against a `docker run` line of 460px, so the one command
+ * most readers came for was cut off mid-word and had to be scrolled. Padding
+ * on the right reserves the button its room, and the command wraps rather than
+ * scrolls -- copying still yields the single line, because the wrap is visual
+ * and textContent keeps the source. */
+.mgdb-past-page .past-code {
+  position: relative;
+  margin: 0 0 0.85rem;
+}
+
+.mgdb-past-page .past-code pre {
+  margin: 0;
+  padding: 0.6rem 5.2rem 0.6rem 0.75rem;
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-ground, #f4f7fb);
+}
+
+.mgdb-past-page .past-code code {
+  font-family: var(--mgdb-font-mono);
+  font-size: 0.82rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+.mgdb-past-page .past-code .past-copy {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  min-height: 30px;
+  padding: 0 0.7rem;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.mgdb-past-page .past-code-note {
+  margin: 0 0 0.5rem;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* ── Download tables ─────────────────────────────────────────────────────── */
+
+.mgdb-past-page .past-files-group { max-width: 62rem; margin-bottom: var(--mgdb-space-5); }
+.mgdb-past-page .past-files-group:last-child { margin-bottom: 0; }
+
+.mgdb-past-page .past-files-group h3 {
+  margin: 0 0 0.35rem;
+  color: var(--mgdb-burgundy);
+  font-size: 1.05rem;
+}
+
+.mgdb-past-page .past-files-blurb {
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-ink);
+  font-size: 0.96rem;
+  line-height: 1.55;
+}
+
+.mgdb-past-page .past-file-link {
+  font-family: var(--mgdb-font-mono);
+  font-size: 0.86rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* Sizes are compared down the column, so the digits line up. */
+.mgdb-past-page .past-files-table .past-num {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.mgdb-past-page .past-dash { color: var(--mgdb-muted); }
+
+.mgdb-past-page .past-files-dir,
+.mgdb-past-page .past-files-fallback {
+  margin: var(--mgdb-space-3) 0 0;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-past-page .past-files-fallback { color: var(--mgdb-muted); }
+
+@media (max-width: 640px) {
+  /* Four columns of file name, assembly, size and date do not fit a phone; the
+     shared scroll box takes it rather than the page body. */
+  .mgdb-past-page .past-files-table { min-width: 32rem; }
+}

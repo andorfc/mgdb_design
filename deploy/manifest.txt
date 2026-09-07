@@ -1834,3 +1834,29 @@ src/controllers/curation/login_curator.php               controllers/curation/lo
 src/templates/static/mgdb_login.bau                      templates/static/mgdb_login.bau
 src/templates/static/mgdb_logout.bau                     templates/static/mgdb_logout.bau
 src/css/mgdb-login.css                                   css/mgdb-login.css
+
+# /past -- PAST, the Pathway Association Study Tool, on the design system,
+# 2026-09-06. A top-level controllers/past.php takes the route (controller.php
+# finds it before redirect.php, so no legacy chrome leaks in). There is no
+# second route: /tools/past answers HTTP 200 with the generic not-found body,
+# because there is no controllers/tools.php dispatcher. The legacy controller
+# and its two templates are untouched and archived in legacy/past/; rollback is
+# deleting controllers/past.php.
+#
+# The page no longer types what is in the download directories. It reads the
+# three of them from download.maizegdb.org and builds the tables from what is
+# there -- the legacy page advertised "B73 RefGen_v2, v3, & v4" and there is a
+# v5 of both the gene model and the pathway file now. The note under the servers
+# is likewise built from the version list the running Shiny app on past1 offers,
+# which is still v2/v3/v4, so the page states that gap instead of hiding it.
+# Cached weekly (an ISO week in the dashboardCache key, since the usual key
+# never expires and this payload is a remote directory); a failed fetch returns
+# null, which dashboardCache does not write, so an outage is not cached.
+#
+# images/past_view.png is deliberately NOT carried over: a stock View-Master
+# illustration credited in-image to Vecteezy. The real output screenshot,
+# images/past_ss.png, is kept and already on the server.
+src/controllers/past.php                         controllers/past.php
+src/templates/static/mgdb_past.bau               templates/static/mgdb_past.bau
+src/css/mgdb-past.css                            css/mgdb-past.css
+src/js/mgdb-past.js                              js/mgdb-past.js

@@ -1,0 +1,200 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-past
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https\://maizegdb.org/past">
+<meta property="og:title" content="PAST, the Pathway Association Study Tool | MaizeGDB">
+<meta property="og:description" content="PAST assigns GWAS SNPs to genes and genes to metabolic pathways. Run it on one of three MaizeGDB servers, or install it locally with Bioconductor or Docker.">
+
+<a class="mgdb-skip-link" href="#past-main">Skip to main content</a>
+
+<main class="mgdb-page mgdb-hub-page mgdb-past-page" id="past-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span>
+    <a href="/metabolic_pathways">Pathways</a><span aria-hidden="true">&rsaquo;</span>
+    <span aria-current="page">PAST</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="past-title">
+    <div class="mgdb-hero-emblem past-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="Markers along a chromosome resolving into a pathway of connected nodes">
+        <path d="M12 26h72" stroke="#7fae8c" stroke-width="3" stroke-linecap="round" />
+        <circle cx="22" cy="26" r="3.5" fill="#235c37" />
+        <circle cx="38" cy="26" r="3.5" fill="#235c37" />
+        <circle cx="54" cy="26" r="3.5" fill="#d99a0b" />
+        <circle cx="70" cy="26" r="3.5" fill="#235c37" />
+        <path d="M30 36v10 M54 36v10" stroke="#7fae8c" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="3 4" />
+        <path d="M24 58h20 M52 58h20 M30 58l14 16 M66 58l-14 16" stroke="#235c37" stroke-width="3" stroke-linecap="round" />
+        <circle cx="20" cy="58" r="6" fill="#e8f4ec" stroke="#235c37" stroke-width="3" />
+        <circle cx="48" cy="58" r="6" fill="#d99a0b" stroke="#235c37" stroke-width="3" />
+        <circle cx="76" cy="58" r="6" fill="#e8f4ec" stroke="#235c37" stroke-width="3" />
+        <circle cx="48" cy="80" r="6" fill="#e8f4ec" stroke="#235c37" stroke-width="3" />
+      </svg>
+      <strong>PAST</strong>
+      <span class="past-emblem-meta">SNPs &rarr; genes &rarr; pathways</span>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="past-title">PAST, the Pathway Association Study Tool</h1>
+      <p class="mgdb-hero-description">PAST assigns your SNPs to genes and your genes to metabolic pathways, carrying each SNP's attributes &#40;R&sup2;, p&#41; across to the gene, and reports which pathways are significantly associated with your trait. It turns a GWAS result into a statement about biology rather than a list of markers.</p>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#past-run" class="is-current" aria-current="true">Run PAST</a>
+    <a href="#past-about">What PAST does</a>
+    <a href="#past-local">Run locally</a>
+    <a href="#past-files">Data files</a>
+    <a href="#past-references">References</a>
+    <a href="#past-related">Related resources</a>
+  </nav>
+
+  <section id="past-run" aria-labelledby="past-run-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="past-run-title">Run PAST at MaizeGDB</h2></div>
+    </div>
+
+    <p class="past-lead">MaizeGDB hosts three R Shiny instances of PAST. Each runs <strong>one job at a time</strong>, so if a server does not respond it is busy &mdash; try another, or come back later. A typical job takes 30 to 90 minutes, and the browser tab has to stay open for its result.</p>
+
+    <div class="past-servers">
+      $(server_cards)
+    </div>
+
+    $(app_versions_note)
+  </section>
+
+  <section id="past-about" aria-labelledby="past-about-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="past-about-title">What PAST does</h2></div>
+    </div>
+
+    <div class="past-split">
+      <div class="past-prose">
+        <p>A genome-wide association study returns markers. PAST takes that output &mdash; the association statistics and the allele effects &mdash; and does three things with it.</p>
+
+        <ol class="mgdb-list past-steps">
+          <li><strong>Assigns SNPs to genes.</strong> Each SNP is attached to the genes it falls in or near, using a gene model file for the B73 assembly your study was called against.</li>
+          <li><strong>Transfers the SNP's attributes to the gene.</strong> The R&sup2; and p-value of the SNP become properties of the gene, so genes can be ranked.</li>
+          <li><strong>Tests pathways for association.</strong> Genes are grouped into metabolic pathways and each pathway is tested, separately for an increase and for a decrease in the trait.</li>
+        </ol>
+
+        <p>The result is a table of pathways with a p-value and a q-value, and a running-enrichment plot for each one. Running PAST &mdash; through the Shiny application or from the R console &mdash; lets a researcher read a GWAS result as a set of metabolic pathways involved in the trait.</p>
+      </div>
+
+      <figure class="past-figure">
+        <img src="/images/past_ss.png" alt="Two panels of PAST output. On the left, an &#8216;increasing pathways&#8217; table listing pathway PWY-4302 with its p-value and q-value. On the right, an &#8216;increasing plots&#8217; panel showing the running enrichment score for PWY-4302 rising to a peak and then falling as gene rank increases." width="600" height="152" loading="lazy">
+        <figcaption>PAST output for one pathway&#58; the significance table on the left, and the running enrichment score against gene rank on the right.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="past-local" aria-labelledby="past-local-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="past-local-title">Run PAST locally</h2></div>
+    </div>
+
+    <p class="past-lead">A local install has no queue and no time limit, which for most studies is the better way to run it. There are two routes.</p>
+
+    <div class="past-install">
+      <article class="past-install-card">
+        <h3>Docker</h3>
+        <p>The quickest route. It needs <a href="https\://docs.docker.com/get-docker/" target="_blank" rel="noopener">Docker installed <span aria-hidden="true">&nearr;</span></a> and nothing else &mdash; the image carries R, Shiny and PAST.</p>
+
+        <ol class="mgdb-list past-steps">
+          <li>
+            <p>Start the container&#58;</p>
+            <div class="past-code">
+              <pre><code>docker run -it -d -p 80:3838 --name past maizegdb/past</code></pre>
+              <button type="button" class="mgdb-button mgdb-button-quiet past-copy">Copy</button>
+            </div>
+          </li>
+          <li><p>Open <a href="http\://localhost" target="_blank" rel="noopener">http&#58;//localhost</a> in a browser. That is the same application the MaizeGDB servers run.</p></li>
+        </ol>
+
+        <p class="past-code-note">It keeps running until you stop it&#58;</p>
+        <div class="past-code">
+          <pre><code>docker stop past</code></pre>
+          <button type="button" class="mgdb-button mgdb-button-quiet past-copy">Copy</button>
+        </div>
+        <p class="past-code-note">To see what is still running&#58;</p>
+        <div class="past-code">
+          <pre><code>docker ps</code></pre>
+          <button type="button" class="mgdb-button mgdb-button-quiet past-copy">Copy</button>
+        </div>
+      </article>
+
+      <article class="past-install-card">
+        <h3>R and Bioconductor</h3>
+        <p>PAST is a Bioconductor package, so it can be called from a script rather than a web form &mdash; which is what you want if PAST is one step in a longer analysis.</p>
+
+        <div class="past-code">
+          <pre><code>if &#40;!require&#40;"BiocManager"&#41;&#41; install.packages&#40;"BiocManager"&#41;
+BiocManager&#58;&#58;install&#40;"PAST"&#41;</code></pre>
+          <button type="button" class="mgdb-button mgdb-button-quiet past-copy">Copy</button>
+        </div>
+
+        <ul class="mgdb-list past-links">
+          <li><a href="https\://www.bioconductor.org/packages/release/bioc/html/PAST.html" target="_blank" rel="noopener">PAST on Bioconductor <span aria-hidden="true">&nearr;</span></a> &mdash; the release page, with the vignette and the reference manual</li>
+          <li><a href="https\://github.com/IGBB/PAST/" target="_blank" rel="noopener">IGBB/PAST on GitHub <span aria-hidden="true">&nearr;</span></a> &mdash; the source, issues and release history</li>
+          <li><a href="https\://github.com/IGBB/PAST/blob/R/README.md" target="_blank" rel="noopener">README <span aria-hidden="true">&nearr;</span></a> &mdash; installation and the arguments each function takes</li>
+          <li><a href="https\://raw.githubusercontent.com/IGBB/PAST/shiny_app/app.R" target="_blank" rel="noopener">app.R <span aria-hidden="true">&nearr;</span></a> &mdash; the Shiny front end, if you want to run the web interface yourself</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section id="past-files" aria-labelledby="past-files-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="past-files-title">Data files</h2></div>
+    </div>
+
+    <p class="past-lead">PAST needs a gene model file and a pathway file for the B73 assembly your GWAS was called against. MaizeGDB publishes both, and a worked example you can run to check an install. $(files_measured)</p>
+
+    $(file_groups)
+  </section>
+
+  <section id="past-references" aria-labelledby="past-references-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="past-references-title">References</h2></div>
+    </div>
+
+    <p class="past-lead">The first paper describes PAST itself and is the one to cite if you use the tool. The three below it are studies that applied the method &mdash; two of them before PAST was packaged, using the scripts it replaced.</p>
+
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+
+  <section id="past-related" class="mgdb-hub-related" aria-labelledby="past-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="past-related-title">Related resources</h2></div>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/metabolic_pathways">
+          <strong>Metabolic Pathways Data Hub</strong>
+          <span>The maize pathway collection these results are reported against</span>
+        </a>
+        <a href="/data_center/variation">
+          <strong>Variation Data Hub</strong>
+          <span>The SNP and allele data a GWAS is run over</span>
+        </a>
+        <a href="/data_center/qtl">
+          <strong>QTL Data Hub</strong>
+          <span>Mapping experiments and the intervals they report, the other route to a trait</span>
+        </a>
+        <a href="/gene_center/gene">
+          <strong>Gene Data Hub</strong>
+          <span>The gene models PAST assigns your SNPs to, one record each</span>
+        </a>
+        <a href="/genome">
+          <strong>Genome Data Hub</strong>
+          <span>The B73 assemblies these gene model and pathway files are built on</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+)
