@@ -573,6 +573,28 @@ function hnpTextBlock($text) {
         return '<p>' . hnpEsc($text) . '</p>';
     }
 
+    /* A blank line is a paragraph break in anybody's text, so the split happens
+       first and the wrap test is applied to each paragraph on its own. That
+       matters both ways: an abstract is sometimes a wrapped title followed by
+       one unwrapped paragraph, and once the curation tool stops wrapping, a
+       report arrives as paragraphs that should render as paragraphs rather
+       than as a run of <br>. */
+    $html = '';
+    foreach (preg_split('/\n[ \t]*\n+/', $text) as $paragraph) {
+        $html .= hnpParagraph($paragraph);
+    }
+    return $html;
+}
+
+function hnpParagraph($text) {
+    $text = trim($text);
+    if ($text === '') {
+        return '';
+    }
+    if (strpos($text, "\n") === false) {
+        return '<p>' . hnpEsc($text) . '</p>';
+    }
+
     $lines  = explode("\n", $text);
     $widths = array();
     foreach ($lines as $line) {
@@ -599,10 +621,7 @@ function hnpTextBlock($text) {
     $count  = count($lines);
     for ($i = 0; $i < $count; $i++) {
         $line = trim($lines[$i]);
-        if ($line === '') {
-            if ($buffer !== '') { $blocks[] = $buffer; $buffer = ''; }
-            continue;
-        }
+        if ($line === '') { continue; }
 
         if ($buffer === '') {
             $buffer = $line;
