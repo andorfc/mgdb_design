@@ -71,7 +71,7 @@ SECTIONS = [
         ("Bin Viewer", "/bin_viewer", "Explore data in regions defined by genetic bin boundaries."),
         ("FATCAT comparison tool", "/fatcat", "Structural alignments between a maize protein and its top structural hits."),
         ("FETA", "https://feta.maizegdb.org", "A suite of tools for exploring gene functional enrichment in Zea mays and relatives."),
-        ("Foldseek search", "/foldseek", "Fast comparisons against large protein structure sets."),
+        ("Foldseek search", "/foldseek", "Search a maize protein structure by shape, and find relatives that sequence search misses."),
         ("Fusarium Protein Toolkit", "https://fusarium.maizegdb.org", "Tools and datasets for the functions and structures of the Fusarium proteome."),
         ("GBrowse genome browsers", "/gbrowse", "Older browser hosting B73 v1-v4, NRGene W22, and other historic assemblies."),
         ("Genome Context Viewer", "https://gcv.maizegdb.org", "Explore gene families in genomic context across multiple assemblies."),
