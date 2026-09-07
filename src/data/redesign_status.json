@@ -21,10 +21,10 @@
    "total": 15
   },
   "Data hubs": {
-   "legacy": 35,
-   "modern": 39,
+   "legacy": 34,
+   "modern": 40,
    "orphaned": 26,
-   "outstanding": 1,
+   "outstanding": 0,
    "partial": 0,
    "record-modern": 8,
    "retired": 3,
@@ -67,8 +67,8 @@
    "outstanding": 0,
    "partial": 0,
    "record-modern": 0,
-   "retired": 22,
-   "total": 74
+   "retired": 27,
+   "total": 79
   },
   "Research projects": {
    "legacy": 0,
@@ -125,27 +125,27 @@
   "Curation and internal"
  ],
  "counts": {
-  "legacy": 124,
-  "modern": 149,
+  "legacy": 123,
+  "modern": 150,
   "partial": 0,
-  "retired": 48
+  "retired": 53
  },
  "dispositions": {
-  "modern": 149,
+  "modern": 150,
   "orphaned": 110,
-  "outstanding": 6,
+  "outstanding": 5,
   "record-modern": 8,
-  "retired": 48
+  "retired": 53
  },
- "generated": "2026-09-07T05:32:02Z",
+ "generated": "2026-09-07T16:39:15Z",
  "generator": "tools/redesign_status.py 1.0",
  "mgdb_hosts": [
   {
    "count": 661,
    "examples": [
-    "https://download.maizegdb.org/Insertions/UniformMu/UniformMu_Release-8_GeneModel_B73_RefGen_v3.xlsx",
+    "https://download.maizegdb.org/Insertions/UniformMu/UniformMu_W22_V4_lookup.xlsx",
     "https://download.maizegdb.org/Insertions/UniformMu/UniformMu_Release-9_B73v4_exons.xlsx",
-    "https://download.maizegdb.org/Insertions/UniformMu/"
+    "https://download.maizegdb.org/Insertions/UniformMu/UniformMu_Release-7_Insertions_in_RefGenv2_FGS.xlsx"
    ],
    "host": "download.maizegdb.org",
    "linked_from": [
@@ -159,9 +159,9 @@
   {
    "count": 284,
    "examples": [
-    "https://mnl.maizegdb.org/mnl/08/",
-    "https://mnl.maizegdb.org/mnl/04/",
-    "https://mnl.maizegdb.org/mnl/78/mnl78.pdf"
+    "https://mnl.maizegdb.org/mnl/12/00MNL12.pdf",
+    "https://mnl.maizegdb.org/mnl/79/",
+    "https://mnl.maizegdb.org/mnl/35/"
    ],
    "host": "mnl.maizegdb.org",
    "linked_from": [
@@ -176,8 +176,8 @@
    "count": 115,
    "examples": [
     "http://documents.maizegdb.org/",
-    "https://documents.maizegdb.org/working_group/2016WG_Report.pdf",
-    "https://documents.maizegdb.org/working_group/wgreport_response_2_15_FINAL.doc"
+    "https://documents.maizegdb.org/working_group/2008WGreport.pdf",
+    "https://documents.maizegdb.org/working_group/WGreport_2010.pdf"
    ],
    "host": "documents.maizegdb.org",
    "linked_from": [
@@ -208,8 +208,8 @@
    "count": 36,
    "examples": [
     "https://ftp.maizegdb.org/static_media/",
-    "http://ftp.maizegdb.org/static_media/NCGA_Podcast_Proteomics.mp3",
-    "http://ftp.maizegdb.org/static_media/NCGA_Podcast_eFPbrowser.mp3"
+    "http://ftp.maizegdb.org/static_media/NCGA_Podcast_eFPbrowser.mp3",
+    "http://ftp.maizegdb.org/static_media/NCGA_Podcast_GBrowse2.mp3"
    ],
    "host": "ftp.maizegdb.org",
    "linked_from": [
@@ -224,8 +224,8 @@
    "count": 21,
    "examples": [
     "https://qteller.maizegdb.org",
-    "http://qteller.maizegdb.org/",
-    "https://qteller.maizegdb.org/index_B73v4.php"
+    "https://qteller.maizegdb.org/index_B73v5.php",
+    "https://qteller.maizegdb.org/index_NAM.php"
    ],
    "host": "qteller.maizegdb.org",
    "linked_from": [
@@ -239,8 +239,8 @@
   {
    "count": 19,
    "examples": [
-    "https://sequence.maizegdb.org/getFASTA.php",
     "https://sequence.maizegdb.org/get_sequence.php",
+    "https://sequence.maizegdb.org/getFASTA.php",
     "http://sequence.maizegdb.org/getFASTA.php"
    ],
    "host": "sequence.maizegdb.org",
@@ -257,7 +257,7 @@
    "examples": [
     "https://images.maizegdb.org/db_images/Term/",
     "https://images.maizegdb.org/db_images/Map/FISH/",
-    "https://images.maizegdb.org/db_images/Variation/$(url)"
+    "https://images.maizegdb.org/db_images/Variation/$"
    ],
    "host": "images.maizegdb.org",
    "linked_from": [
@@ -350,7 +350,7 @@
    "examples": [
     "https://gbrowse.maizegdb.org/gb2/gbrowse/",
     "https://gbrowse.maizegdb.org/gb2",
-    "https://gbrowse.maizegdb.org/gb2/gbrowse/maize_f7"
+    "https://gbrowse.maizegdb.org/gb2/gbrowse/maize_ep1"
    ],
    "host": "gbrowse.maizegdb.org",
    "linked_from": [
@@ -359,22 +359,6 @@
     "templates/genome/european_flints.bau",
     "templates/tools/gbrowse-content.bau",
     "include/gene_center_lib.php"
-   ]
-  },
-  {
-   "count": 10,
-   "examples": [
-    "https://gcv.maizegdb.org",
-    "https://gcv.maizegdb.org/",
-    "https://gcv.maizegdb.org/gene;maize=$"
-   ],
-   "host": "gcv.maizegdb.org",
-   "linked_from": [
-    "templates/about/sitemap-content.bau",
-    "templates/home/megamenu/tools.bau",
-    "templates/home/megamenu_modern/genomes.bau",
-    "templates/home/megamenu_modern/tools.bau",
-    "templates/pan_gene_center/pan_gene_record-gcv.bau"
    ]
   },
   {
@@ -391,6 +375,22 @@
     "templates/home/megamenu/tools.bau",
     "templates/home/megamenu_modern/genomes.bau",
     "templates/home/megamenu_modern/tools.bau"
+   ]
+  },
+  {
+   "count": 10,
+   "examples": [
+    "https://gcv.maizegdb.org",
+    "https://gcv.maizegdb.org/",
+    "https://gcv.maizegdb.org/gene;maize=$(pan_gene-exemplar)"
+   ],
+   "host": "gcv.maizegdb.org",
+   "linked_from": [
+    "templates/about/sitemap-content.bau",
+    "templates/home/megamenu/tools.bau",
+    "templates/home/megamenu_modern/genomes.bau",
+    "templates/home/megamenu_modern/tools.bau",
+    "templates/pan_gene_center/pan_gene_record-gcv.bau"
    ]
   },
   {
@@ -413,7 +413,7 @@
    "examples": [
     "https://archive.maizegdb.org/documentation/maizemap/index.php",
     "http://archive.maizegdb.org/cgi-bin/personreports.cgi",
-    "http://archive.maizegdb.org/markerlocations.php"
+    "http://archive.maizegdb.org/markerlocations_refgenv1.php"
    ],
    "host": "archive.maizegdb.org",
    "linked_from": [
@@ -427,8 +427,8 @@
    "count": 8,
    "examples": [
     "https://phylostrata.maizegdb.org",
-    "https://phylostrata.maizegdb.org/gene_pages/index.html",
-    "https://phylostrata.maizegdb.org/"
+    "https://phylostrata.maizegdb.org/",
+    "https://phylostrata.maizegdb.org/gene_pages/index.html"
    ],
    "host": "phylostrata.maizegdb.org",
    "linked_from": [
@@ -485,7 +485,7 @@
   {
    "count": 6,
    "examples": [
-    "http://community.maizegdb.org/mgec-survey16/report2016.php",
+    "http://community.maizegdb.org/mgec-survey18/report2018.php",
     "http://community.maizegdb.org/mgec-survey17/report2017.php",
     "http://community.maizegdb.org/mgec-survey19/report2019.php"
    ],
@@ -513,7 +513,7 @@
    "examples": [
     "http://corncyc-b73-v4.maizegdb.org/CORN/substring-search",
     "https://corncyc-b73-v4.maizegdb.org/",
-    "http://corncyc-b73-v4.maizegdb.org"
+    "http://corncyc-b73-v4.maizegdb.org/"
    ],
    "host": "corncyc-b73-v4.maizegdb.org",
    "linked_from": [
@@ -525,9 +525,9 @@
   {
    "count": 4,
    "examples": [
-    "http://ateb.maizegdb.org/mapped_elements_sort",
     "http://ateb.maizegdb.org/data_center/ssr",
-    "http://ateb.maizegdb.org/data_center/est"
+    "http://ateb.maizegdb.org/mapped_elements_sort",
+    "http://ateb.maizegdb.org/mapped_elements"
    ],
    "host": "ateb.maizegdb.org",
    "linked_from": [
@@ -551,8 +551,8 @@
   {
    "count": 4,
    "examples": [
-    "https://snpversity.maizegdb.org/Diversity/$",
     "https://snpversity.maizegdb.org/Diversity/$(source).php",
+    "https://snpversity.maizegdb.org/Diversity/$",
     "https://snpversity.maizegdb.org/Diversity/"
    ],
    "host": "snpversity.maizegdb.org",
@@ -564,9 +564,9 @@
   {
    "count": 4,
    "examples": [
-    "http://popcorn.maizegdb.org",
+    "http://popcorn.maizegdb.org/",
     "http://popcorn.maizegdb.org/search/sequence_search/home.php",
-    "http://popcorn.maizegdb.org/"
+    "http://popcorn.maizegdb.org/main/index.php"
    ],
    "host": "popcorn.maizegdb.org",
    "linked_from": [
@@ -576,9 +576,9 @@
   {
    "count": 3,
    "examples": [
-    "https://past2.maizegdb.org"
+    "https://past3.maizegdb.org"
    ],
-   "host": "past2.maizegdb.org",
+   "host": "past3.maizegdb.org",
    "linked_from": [
     "controllers/past.php",
     "templates/tools/past-content.bau",
@@ -600,9 +600,9 @@
   {
    "count": 3,
    "examples": [
-    "https://past3.maizegdb.org"
+    "https://past2.maizegdb.org"
    ],
-   "host": "past3.maizegdb.org",
+   "host": "past2.maizegdb.org",
    "linked_from": [
     "controllers/past.php",
     "templates/tools/past-content.bau",
@@ -623,6 +623,18 @@
   {
    "count": 3,
    "examples": [
+    "https://fusarium.maizegdb.org"
+   ],
+   "host": "fusarium.maizegdb.org",
+   "linked_from": [
+    "templates/about/sitemap-content.bau",
+    "templates/about/sitemap-featured.bau",
+    "templates/home/megamenu/tools.bau"
+   ]
+  },
+  {
+   "count": 3,
+   "examples": [
     "https://genomeqc.maizegdb.org/",
     "https://genomeqc.maizegdb.org"
    ],
@@ -631,18 +643,6 @@
     "templates/about/sitemap-content.bau",
     "templates/home/megamenu/tools.bau",
     "templates/home/megamenu_modern/tools.bau"
-   ]
-  },
-  {
-   "count": 3,
-   "examples": [
-    "https://fusarium.maizegdb.org"
-   ],
-   "host": "fusarium.maizegdb.org",
-   "linked_from": [
-    "templates/about/sitemap-content.bau",
-    "templates/about/sitemap-featured.bau",
-    "templates/home/megamenu/tools.bau"
    ]
   },
   {
@@ -730,8 +730,8 @@
   {
    "count": 2,
    "examples": [
-    "http://faq.maizegdb.org/",
-    "http://faq.maizegdb.org"
+    "http://faq.maizegdb.org",
+    "http://faq.maizegdb.org/"
    ],
    "host": "faq.maizegdb.org",
    "linked_from": [
@@ -741,8 +741,8 @@
   {
    "count": 2,
    "examples": [
-    "http://outreach.maizegdb.org",
-    "http://outreach.maizegdb.org/"
+    "http://outreach.maizegdb.org/",
+    "http://outreach.maizegdb.org"
    ],
    "host": "outreach.maizegdb.org",
    "linked_from": [
@@ -832,9 +832,9 @@
   {
    "count": 1,
    "examples": [
-    "http://tutorial.maizegdb.org/"
+    "http://interface.maizegdb.org/maizegdb_news_feed.php"
    ],
-   "host": "tutorial.maizegdb.org",
+   "host": "interface.maizegdb.org",
    "linked_from": [
     "test3.html"
    ]
@@ -842,9 +842,9 @@
   {
    "count": 1,
    "examples": [
-    "http://interface.maizegdb.org/maizegdb_news_feed.php"
+    "http://tutorial.maizegdb.org/"
    ],
-   "host": "interface.maizegdb.org",
+   "host": "tutorial.maizegdb.org",
    "linked_from": [
     "test3.html"
    ]
@@ -872,7 +872,6 @@
  ],
  "next_up": [
   "/person/{id}",
-  "/data_center/qtl/{id}",
   "/bin_viewer_locus_sequence"
  ],
  "orphan_modern": [
@@ -983,15 +982,6 @@
     "modern_chrome"
    ],
    "referenced_anywhere": true
-  },
-  {
-   "file": "controllers/data_center/qtl_record_modern.php",
-   "markers": [
-    "modern_shell",
-    "design_system",
-    "modern_chrome"
-   ],
-   "referenced_anywhere": false
   },
   {
    "file": "controllers/data_center/recombination_record_modern.php",
@@ -1120,7 +1110,7 @@
    "referenced_anywhere": true
   }
  ],
- "percent_modern": 54.6,
+ "percent_modern": 54.9,
  "probed": true,
  "rows": [
   {
@@ -3709,7 +3699,7 @@
    ],
    "probe_error": null,
    "probed": true,
-   "record_modern": false,
+   "record_modern": true,
    "serves": "controllers/data_center/qtl_search_modern.php",
    "shell_owner": "controllers/data_center/qtl_search_modern.php",
    "static_markers": [
@@ -6165,7 +6155,7 @@
   {
    "also": [],
    "category": "Data hubs",
-   "disposition": "outstanding",
+   "disposition": "modern",
    "evidence": "source",
    "http": null,
    "in_menu": false,
@@ -6339,17 +6329,21 @@
     "templates/static/mgdb_term_record.bau"
    ],
    "moved_to": null,
-   "notes": [],
+   "notes": [
+    "modern page swapped in by a guard"
+   ],
    "probe_error": null,
    "probed": false,
    "record_modern": false,
-   "serves": "controllers/data_center/qtl.php",
-   "shell_owner": "controllers/data_center.php",
+   "serves": "controllers/data_center/qtl_record_modern.php",
+   "shell_owner": "controllers/data_center/qtl_record_modern.php",
    "static_markers": [
-    "legacy_shell"
+    "modern_shell",
+    "design_system",
+    "modern_chrome"
    ],
-   "static_status": "legacy",
-   "status": "legacy",
+   "static_status": "modern",
+   "status": "modern",
    "title": null,
    "url": "/data_center/qtl/{id}"
   },
@@ -15734,6 +15728,29 @@
    "kind": "controller",
    "links_in": 0,
    "modern_linkers": [],
+   "moved_to": "/data_center/map_scores",
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "record_modern": false,
+   "serves": "controllers/map_scores.php",
+   "shell_owner": "controllers/map_scores.php",
+   "static_markers": [],
+   "static_status": "legacy",
+   "status": "retired",
+   "title": null,
+   "url": "/map_scores"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "disposition": "retired",
+   "evidence": "probe",
+   "http": 301,
+   "in_menu": false,
+   "kind": "controller",
+   "links_in": 0,
+   "modern_linkers": [],
    "moved_to": "/handyref",
    "notes": [],
    "probe_error": null,
@@ -15827,6 +15844,29 @@
   {
    "also": [],
    "category": "Information pages",
+   "disposition": "retired",
+   "evidence": "probe",
+   "http": 301,
+   "in_menu": false,
+   "kind": "controller",
+   "links_in": 0,
+   "modern_linkers": [],
+   "moved_to": "/data_center/primer",
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "record_modern": false,
+   "serves": "controllers/primer.php",
+   "shell_owner": "controllers/primer.php",
+   "static_markers": [],
+   "static_status": "legacy",
+   "status": "retired",
+   "title": null,
+   "url": "/primer"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
    "disposition": "orphaned",
    "evidence": "probe",
    "http": 200,
@@ -15848,6 +15888,29 @@
    "status": "legacy",
    "title": "Welcome to MaizeGDB",
    "url": "/project_homepages"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "disposition": "retired",
+   "evidence": "probe",
+   "http": 301,
+   "in_menu": false,
+   "kind": "controller",
+   "links_in": 0,
+   "modern_linkers": [],
+   "moved_to": "/data_center/recombination",
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "record_modern": false,
+   "serves": "controllers/recombination.php",
+   "shell_owner": "controllers/recombination.php",
+   "static_markers": [],
+   "static_status": "legacy",
+   "status": "retired",
+   "title": null,
+   "url": "/recombination"
   },
   {
    "also": [],
@@ -15923,6 +15986,52 @@
    "status": "legacy",
    "title": "Welcome to MaizeGDB",
    "url": "/rhubarb_crisp"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "disposition": "retired",
+   "evidence": "probe",
+   "http": 301,
+   "in_menu": false,
+   "kind": "controller",
+   "links_in": 0,
+   "modern_linkers": [],
+   "moved_to": "/data_center/term",
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "record_modern": false,
+   "serves": "controllers/term.php",
+   "shell_owner": "controllers/term.php",
+   "static_markers": [],
+   "static_status": "legacy",
+   "status": "retired",
+   "title": null,
+   "url": "/term"
+  },
+  {
+   "also": [],
+   "category": "Information pages",
+   "disposition": "retired",
+   "evidence": "probe",
+   "http": 301,
+   "in_menu": false,
+   "kind": "controller",
+   "links_in": 0,
+   "modern_linkers": [],
+   "moved_to": "/data_center/trait",
+   "notes": [],
+   "probe_error": null,
+   "probed": true,
+   "record_modern": false,
+   "serves": "controllers/trait.php",
+   "shell_owner": "controllers/trait.php",
+   "static_markers": [],
+   "static_status": "legacy",
+   "status": "retired",
+   "title": null,
+   "url": "/trait"
   },
   {
    "also": [],
@@ -20911,8 +21020,8 @@
   {
    "count": 32,
    "examples": [
-    "http://www.plantgdb.org/ZmGDB/",
     "http://www.plantgdb.org",
+    "http://www.plantgdb.org/ZmGDB/",
     "http://www.plantgdb.org/search/misc/plantlistconstruction.php"
    ],
    "host": "www.plantgdb.org",
@@ -21003,7 +21112,7 @@
    "examples": [
     "http://bar.utoronto.ca/efp_maize/cgi-bin/efpWeb.cgi",
     "https://bar.utoronto.ca/api/efp_image/efp_maize/Maize_Root/Absolute/$id",
-    "https://bar.utoronto.ca/api/efp_image/efp_maize/Hoopes_et_al_Atlas/Absolute/$id"
+    "https://bar.utoronto.ca/api/efp_image/efp_maize/Early_Seed/Absolute/$id"
    ],
    "host": "bar.utoronto.ca",
    "linked_from": [
@@ -21081,8 +21190,8 @@
   {
    "count": 18,
    "examples": [
-    "http://player.vimeo.com/video/71891927",
     "http://player.vimeo.com/video/",
+    "http://player.vimeo.com/video/71891927",
     "https://player.vimeo.com/video/212310824"
    ],
    "host": "player.vimeo.com",
@@ -21115,7 +21224,7 @@
    "examples": [
     "https://pubmed.ncbi.nlm.nih.gov/",
     "https://pubmed.ncbi.nlm.nih.gov/34353948/",
-    "https://pubmed.ncbi.nlm.nih.gov/15064373/"
+    "https://pubmed.ncbi.nlm.nih.gov/17658955/"
    ],
    "host": "pubmed.ncbi.nlm.nih.gov",
    "linked_from": [
@@ -21129,8 +21238,8 @@
   {
    "count": 16,
    "examples": [
-    "http://ftp.maizesequence.org/release-3b.50/",
     "http://ftp.maizesequence.org/current/assembly//",
+    "http://ftp.maizesequence.org/release-3b.50/",
     "http://ftp.maizesequence.org/release-5b"
    ],
    "host": "ftp.maizesequence.org",
@@ -21145,9 +21254,9 @@
   {
    "count": 16,
    "examples": [
+    "https://commons.wikimedia.org/wiki/File:Asilomar_State_Beach_at_Sunset.jpg",
     "https://commons.wikimedia.org/w/index.php",
-    "https://commons.wikimedia.org/wiki/File:Reflecting_pond_at_Robert_Allerton_Park.jpg",
-    "https://commons.wikimedia.org/wiki/File:Lake_Geneva_April_2025_12_"
+    "https://commons.wikimedia.org/wiki/File:Reflecting_pond_at_Robert_Allerton_Park.jpg"
    ],
    "host": "commons.wikimedia.org",
    "linked_from": [
@@ -21156,5 +21265,5 @@
   }
  ],
  "third_party_total": 280,
- "total": 321
+ "total": 326
 }
