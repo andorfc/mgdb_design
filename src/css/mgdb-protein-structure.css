@@ -75,25 +75,6 @@
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
-/* The offset ladder, from the measured bar height. The search section used to
-   carry its own small scroll-margin, too little to clear a sticky bar; it takes
-   the section ladder now like every other section.
-
-   With nine labels (Variant effects added 2026-09-06) the bar wraps to two rows
-   (105px) at EVERY desktop width: the content rail caps at 1280px, so the bar is
-   at most ~1232px wide, and nine labels never fit one row in that space --
-   measured 105px at 1280, 900 and 800. So the two-row band is the whole desktop
-   range, 768px and up, not a sub-band of it; the earlier 1220px ceiling left
-   1221-1280 on the shell's 65px against a 105px bar. Below 767px mgdb-modern.css
-   turns the bar into one scrolling row (57px), which needs 65px. */
-@media (min-width: 768px) {
-  .mgdb-hub-page.mgdb-protein-structure-page > section[id] { scroll-margin-top: 113px; }
-}
-
-@media (max-width: 767px) {
-  .mgdb-hub-page.mgdb-protein-structure-page > section[id] { scroll-margin-top: 65px; }
-}
-
 .mgdb-protein-structure-page > section[id] { margin-bottom: var(--mgdb-space-5); }
 
 .mgdb-protein-structure-page .ps-section-lead {

@@ -25,24 +25,6 @@
    a per-page `flex-wrap` here would silently defeat.
    -------------------------------------------------------------------------- */
 
-/* The scroll offset ladder, measured on the live page at 1600/1280/1024/768/767
-   /375 rather than inferred from the tab count. Ten labels of this length wrap
-   to TWO rows at every width down to 768px -- 105px, unchanged even at 1600 --
-   and below 768 mgdb-modern.css turns the bar into a one-row scrolling rail at
-   57px. So the ladder is two steps at the shell's own 767/768 breakpoint, and
-   each step is the measured height plus 8px.
-
-   Note this is the inverse of the shell's own default, which steps 65px -> 113px
-   at 1170px on the assumption that a bar is one row above that width. This bar
-   never is, so the wide value has to apply all the way down to 768; taking the
-   shell's default would leave every heading 40px behind the bar between 768 and
-   1170. Re-measure if a tab is added, renamed, or removed. */
-.mgdb-hub-page.mgdb-uniformmu-page > section[id] { scroll-margin-top: 113px; }
-
-@media (max-width: 767px) {
-  .mgdb-hub-page.mgdb-uniformmu-page > section[id] { scroll-margin-top: 65px; }
-}
-
 /* --------------------------------------------------------------------------
    The lookup
 

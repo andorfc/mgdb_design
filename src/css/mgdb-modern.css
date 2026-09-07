@@ -1714,8 +1714,10 @@ body.mgdb-modern {
   color: #fff;
 }
 
-/* Scroll-margin so an anchored section is not hidden behind the sticky tabs. */
-.mgdb-page > section[id] { scroll-margin-top: 4.5rem; }
+/* Scroll-margin so an anchored section is not hidden behind the sticky tabs.
+   The measure comes from syncTabOffset() in js/mgdb-modern.js, which reads the
+   bar's own height; 4.5rem is the no-JS fallback. */
+.mgdb-page > section[id] { scroll-margin-top: var(--mgdb-tab-offset, 4.5rem); }
 
 /* --------------------------------------------------------------------------
    7c. Record page header

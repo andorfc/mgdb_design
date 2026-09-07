@@ -22,7 +22,7 @@
 
 /* Section anchors clear the sticky bar; the scrollspy reads this value back
    rather than carrying its own copy. */
-.mgdb-genomes-page > section[id] { scroll-margin-top: 6rem; }
+.mgdb-genomes-page > section[id] { scroll-margin-top: var(--mgdb-tab-offset, 6rem); }
 
 /* --------------------------------------------------------------------------
    Genome history chart

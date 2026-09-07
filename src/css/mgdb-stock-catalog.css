@@ -239,7 +239,7 @@
 .mgdb-stock-catalog-page .sc-groups.is-filtering .sc-list { columns: auto; }
 
 .mgdb-stock-catalog-page .sc-group-title {
-  scroll-margin-top: 8rem;
+  scroll-margin-top: var(--mgdb-tab-offset, 8rem);
   margin: 0 0 var(--mgdb-space-3);
   color: var(--mgdb-green-dark);
   font-size: var(--mgdb-text-lg);
@@ -331,7 +331,7 @@
 @media (max-width: 720px) {
   .mgdb-stock-catalog-page .sc-list { columns: 1; }
   .mgdb-stock-catalog-page .sc-search-wrap { max-width: 100%; }
-  .mgdb-stock-catalog-page .sc-group-title { scroll-margin-top: 9rem; }
+  .mgdb-stock-catalog-page .sc-group-title { scroll-margin-top: var(--mgdb-tab-offset, 9rem); }
 }
 
 @media print {

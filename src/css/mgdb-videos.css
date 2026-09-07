@@ -31,13 +31,6 @@
 
 /* ── Where a tab jump lands ──────────────────────────────────────────────── */
 
-/* The shell steps 65px -> 113px at 1170px on the assumption the bar has
-   wrapped by then. Four labels here; measured one row at every width, so the
-   offset is flat — the bar's height plus 8px so a heading is not against it.
-   The page script reads this value back, so the spy's trigger line and this
-   ladder agree by construction. */
-.mgdb-hub-page.mgdb-videos-page > section[id] { scroll-margin-top: 65px; }
-
 .mgdb-videos-page > section[id] { margin-bottom: var(--mgdb-space-5); }
 
 .mgdb-modern .videos-lead {

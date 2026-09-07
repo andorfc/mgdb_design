@@ -20,7 +20,8 @@
 .mgdb-contribute-page section[id],
 .mgdb-contribute-page .contribute-type,
 .mgdb-contribute-page .contribute-faq {
-  scroll-margin-top: 8rem;
+  /* The bar is one 57px row at every width; 8px of air under it. */
+  scroll-margin-top: var(--mgdb-tab-offset, 65px);
 }
 
 .mgdb-contribute-page .contribute-hero-icon {

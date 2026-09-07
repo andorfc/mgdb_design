@@ -64,21 +64,6 @@
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
-/* The offset ladder is per measured bar height, not per tab count: six tabs
-   here still wrap to three rows on a 375px screen -- a 153px bar -- because
-   the labels are long. Measured 57px / 105px / 153px. */
-@media (max-width: 1000px) and (min-width: 861px) {
-  .mgdb-hub-page.mgdb-est-page > section[id] { scroll-margin-top: 65px; }
-}
-
-@media (max-width: 860px) and (min-width: 521px) {
-  .mgdb-hub-page.mgdb-est-page > section[id] { scroll-margin-top: 113px; }
-}
-
-@media (max-width: 520px) {
-  .mgdb-hub-page.mgdb-est-page > section[id] { scroll-margin-top: 161px; }
-}
-
 .mgdb-est-page > section[id] { margin-bottom: var(--mgdb-space-5); }
 
 /* ── Records by prefix figure ────────────────────────────────────────────── */
@@ -94,7 +79,6 @@
 }
 
 .mgdb-est-page .est-figure-table { margin-top: var(--mgdb-space-4); }
-
 
 /* The control line. The buttons sit in the same flex row as the input rather
    than in a neighbouring grid column offset by a hand-measured margin, so they

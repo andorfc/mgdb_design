@@ -382,11 +382,11 @@
 /* --------------------------------------------------------------------------
    Anchor offset
 
-   The shared rule is scroll-margin-top: 4.5rem on .mgdb-page > section[id].
-   That clears a one-row tab bar. This page's bar carries six to ten tabs and
-   wraps to two rows at every width below about 1400px -- measured at 104px --
-   so an anchor jump left the section heading tucked under it and the scrollspy
-   marked the section above.
+   The measure is --mgdb-tab-offset, written from the bar's own height by
+   syncTabOffset() in js/mgdb-modern.js. The 8rem below is only the no-JS
+   fallback: this page's bar carries six to ten tabs and wraps to two rows at
+   every width below about 1400px, so the shared one-row default would leave a
+   section heading tucked under it and the scrollspy marking the section above.
    -------------------------------------------------------------------------- */
 
-.mgdb-bin-page > section[id] { scroll-margin-top: 8rem; }
+.mgdb-bin-page > section[id] { scroll-margin-top: var(--mgdb-tab-offset, 8rem); }

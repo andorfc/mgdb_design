@@ -65,12 +65,6 @@
 .mgdb-gene-symbols-page .gs-conflict-note { margin-top: var(--mgdb-space-4); }
 .mgdb-gene-symbols-page .gs-conflict-note code { font-weight: 600; }
 
-/* Three short tabs: one row at every width, so the shell's step to 113px below
-   1170px would put every section 48px behind the bar. Measured, not assumed. */
-@media (max-width: 1170px) {
-  .mgdb-hub-page.mgdb-gene-symbols-page > section[id] { scroll-margin-top: 65px; }
-}
-
 @media (max-width: 640px) {
   .mgdb-gene-symbols-page .gs-symbol { width: auto; }
   .mgdb-gene-symbols-page .mgdb-table-scroll { max-height: 26rem; }

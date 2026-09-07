@@ -63,20 +63,6 @@
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
-/* The offset ladder is set from the MEASURED bar height, not the tab count.
-   With four tabs the bar is one row (57px) all the way down to ~465px and two
-   rows (105px) below that; it used to wrap at ~860px, when there were five.
-   The 480px boundary sits just above the measured wrap so the band can only
-   ever be too generous, never too shallow -- an offset that is too small hides
-   the section heading behind the sticky bar, which is the failure that matters. */
-@media (max-width: 900px) and (min-width: 481px) {
-  .mgdb-hub-page.mgdb-reference-page > section[id] { scroll-margin-top: 65px; }
-}
-
-@media (max-width: 480px) {
-  .mgdb-hub-page.mgdb-reference-page > section[id] { scroll-margin-top: 113px; }
-}
-
 .mgdb-reference-page > section[id] { margin-bottom: var(--mgdb-space-5); }
 
 .mgdb-reference-page .reference-results-section[hidden] { display: none; }

@@ -51,14 +51,6 @@
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
-/* The offset ladder. Four short labels, so the bar is one 57px row at every
-   width measured -- 1280, 1000, 800, 600, 420 and 375 -- and it never wraps.
-   The shell steps to 113px below 1170px for bars that do, which is 56px too
-   much here, so this page keeps 65px the whole way down. */
-@media (max-width: 1170px) {
-  .mgdb-hub-page.mgdb-blast-page > section[id] { scroll-margin-top: 65px; }
-}
-
 .mgdb-blast-page > section[id] { margin-bottom: var(--mgdb-space-5); }
 
 /* ── Search panel ────────────────────────────────────────────────────────── */

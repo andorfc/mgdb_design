@@ -81,19 +81,6 @@
   .mgdb-modern .archive-hero-mark { width: 5.8rem; height: 5.1rem; }
 }
 
-/* The tab bar on this page never wraps. mgdb-modern.css makes it a scrolling
-   rail below 767px, and four short tabs fit one row above that, so it measures
-   57px at every width from 375 to 1920 -- checked, not assumed.
-
-   mgdb-hub.css steps the offset to 113px below 1170px because it assumes the
-   bar has gone to two rows there. On this page it has not, so every section
-   was landing about 48px below the sticky bar. Specificity (0,3,1) beats the
-   shell's (0,2,1). If a tab is ever added back, re-measure before deleting
-   this: the wrap point moves with the label text, not with the tab count. */
-@media (max-width: 1170px) {
-  .mgdb-hub-page.mgdb-archive-page > section[id] { scroll-margin-top: 65px; }
-}
-
 /* Named column counts, because there are five cards and `auto-fit` was giving
    four of them a row and stranding the fifth.
 

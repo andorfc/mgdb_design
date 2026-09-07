@@ -81,20 +81,6 @@
   }
 }
 
-/* The offset ladder is set from the measured bar height, not the tab count.
-   Measured by resizing the real page: one row (57px) down to somewhere in
-   1101-1200, two rows (105px) from there to 768, and one scrolling row (57px)
-   below that. Each band takes the larger of the two heights it could straddle,
-   so a boundary errs towards dead space and never towards a heading hidden
-   behind the bar. Above 1200 the shell's own 65px is already right. */
-@media (max-width: 1200px) and (min-width: 768px) {
-  .mgdb-hub-page.mgdb-gene-page > section[id] { scroll-margin-top: 113px; }
-}
-
-@media (max-width: 767px) {
-  .mgdb-hub-page.mgdb-gene-page > section[id] { scroll-margin-top: 65px; }
-}
-
 .mgdb-gene-page .gene-section-lead {
   max-width: 62rem;
   margin: 0 0 1.1rem;
@@ -631,20 +617,16 @@
 /* --------------------------------------------------------------------------
    Anchored sections under the sticky tab bar
 
-   scroll-margin-top in the shared stylesheet only matches direct children of
-   .mgdb-page. The download and cross-reference sub-headings are nested, so
-   they need their own rule or they land behind the bar.
+   The shared rule only matches direct children of .mgdb-page. The download and
+   cross-reference sub-headings are nested, so they need their own rule or they
+   land behind the bar. The measure is the same one every other anchor uses --
+   --mgdb-tab-offset, written from the bar's own height by syncTabOffset() in
+   js/mgdb-modern.js -- so the two-step ladder that used to be here is gone.
    -------------------------------------------------------------------------- */
 
 .mgdb-gene-page #gene-xref,
 .mgdb-gene-page #gene-insertions,
-.mgdb-gene-page #gene-older { scroll-margin-top: 65px; }
-
-@media (max-width: 1200px) and (min-width: 768px) {
-  .mgdb-gene-page #gene-xref,
-  .mgdb-gene-page #gene-insertions,
-  .mgdb-gene-page #gene-older { scroll-margin-top: 113px; }
-}
+.mgdb-gene-page #gene-older { scroll-margin-top: var(--mgdb-tab-offset, 65px); }
 
 /* --------------------------------------------------------------------------
    Chart height

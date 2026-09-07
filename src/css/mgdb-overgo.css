@@ -66,26 +66,6 @@
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
-/* The offset ladder is set from the measured bar height, not from the tab
-   count, and not from the shell's default -- which steps to 113px at 1170px
-   while this bar is still one row, and would then be 48px short once it
-   wraps. Measured by resizing the real page: the six labels sit on one row
-   (57px) down to somewhere in 681-700, on two rows (105px) down to somewhere
-   in 376-399, and on three (153px) below that. Each band is set from the
-   larger of the two heights it could straddle, so a boundary errs towards
-   dead space and never towards a heading hidden behind the bar. */
-@media (max-width: 1170px) and (min-width: 701px) {
-  .mgdb-hub-page.mgdb-overgo-page > section[id] { scroll-margin-top: 65px; }
-}
-
-@media (max-width: 700px) and (min-width: 400px) {
-  .mgdb-hub-page.mgdb-overgo-page > section[id] { scroll-margin-top: 113px; }
-}
-
-@media (max-width: 399px) {
-  .mgdb-hub-page.mgdb-overgo-page > section[id] { scroll-margin-top: 161px; }
-}
-
 .mgdb-overgo-page > section[id] { margin-bottom: var(--mgdb-space-5); }
 
 .mgdb-modern .overgo-archive-note { margin-top: 1.25rem; }

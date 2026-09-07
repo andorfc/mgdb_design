@@ -80,7 +80,7 @@
    Tabs
 
    Section anchors clear the sticky bar, and the measure comes from js/mgdb-record.js,
-   which sets --mgdb-rec-offset from the bar's own height every time that height
+   which sets --mgdb-tab-offset from the bar's own height every time that height
    changes. The value below is the no-JS fallback only.
 
    This was a flat 6.5rem (104px) at every width, which was wrong in both
@@ -99,7 +99,7 @@
    copy.
    -------------------------------------------------------------------------- */
 
-.mgdb-record-page > section[id] { scroll-margin-top: var(--mgdb-rec-offset, 65px); }
+.mgdb-record-page > section[id] { scroll-margin-top: var(--mgdb-tab-offset, 65px); }
 
 .mgdb-rec-tabs .mgdb-rec-tab-count { margin-left: var(--mgdb-space-2); }
 

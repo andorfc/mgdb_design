@@ -99,8 +99,7 @@
    every section 48px below the bar. Both selectors carry it, because the
    nested standard's 23 `a[name]` anchors are how this page navigates. */
 @media (max-width: 1170px) {
-  .mgdb-hub-page.mgdb-nomenclature-page > section[id] { scroll-margin-top: 65px; }
-  .mgdb-modern .nomenclature-standard-content a[name] { scroll-margin-top: 65px; }
+  .mgdb-modern .nomenclature-standard-content a[name] { scroll-margin-top: var(--mgdb-tab-offset, 65px); }
 }
 
 .mgdb-nomenclature-page > section[id] { margin-bottom: var(--mgdb-space-5); }
@@ -110,7 +109,6 @@
   margin: 0 0 1.1rem;
   color: var(--mgdb-muted);
 }
-
 
 .mgdb-modern .nomenclature-convention-grid {
   display: grid;
@@ -148,9 +146,6 @@
 .mgdb-modern .nomenclature-convention-card h3 { margin: 0.45rem 0 0.3rem; color: var(--mgdb-green-dark); font-size: 1rem; }
 .mgdb-modern .nomenclature-convention-card p { flex: 1; margin: 0; color: var(--mgdb-muted); font-size: 0.86rem; line-height: 1.55; }
 .mgdb-modern .nomenclature-convention-card a { margin-top: 0.7rem; color: var(--mgdb-burgundy); font-size: 0.82rem; font-weight: 750; }
-
-
-
 
 .mgdb-modern .nomenclature-id-card {
   max-width: 62rem;
@@ -217,7 +212,6 @@
 .mgdb-modern .nomenclature-before-naming p { max-width: 68ch; margin: 0; color: var(--mgdb-ink); font-size: var(--mgdb-text-base); line-height: 1.6; }
 .mgdb-modern .nomenclature-help-actions { display: flex; flex: 0 0 auto; flex-wrap: wrap; gap: 0.6rem; }
 
-
 /* The authoritative text is intentionally retained verbatim. These rules
    remove its table-era presentation and bring it into the modern page. */
 .mgdb-modern .nomenclature-standard-content {
@@ -245,7 +239,7 @@
    41px behind it -- measured -- which was correct while the jump nav above was
    an ordinary block and wrong the moment it became sticky. Same ladder as the
    sections. */
-.mgdb-modern .nomenclature-standard-content a[name] { scroll-margin-top: 65px; }
+.mgdb-modern .nomenclature-standard-content a[name] { scroll-margin-top: var(--mgdb-tab-offset, 65px); }
 .mgdb-modern .nomenclature-standard-content a[name] + b,
 .mgdb-modern .nomenclature-standard-content a[name] + b > b {
   color: var(--mgdb-green-dark);
@@ -327,14 +321,6 @@
 
 .mgdb-nomenclature-summary-page > section[id] { margin-bottom: var(--mgdb-space-5); }
 
-/* Four short labels keep this bar on one row at every width -- measured 57px
-   at 1280, 1100, 900, 768 and 375, where mgdb-modern.css has already turned it
-   into a scrolling rail. The shell's ladder steps to 113px below 1170 because
-   it assumes a bar that has wrapped to two rows by then, so on this page every
-   jump below that width would park its heading 48px lower than it needs to.
-   One row, one offset. */
-.mgdb-hub-page.mgdb-nomenclature-summary-page > section[id] { scroll-margin-top: 65px; }
-
 /* The shared reset zeroes every paragraph margin, so prose has to restate its
    own rhythm. Measured against the source page's <br>-separated paragraphs. */
 .mgdb-nomenclature-summary-page .nomenclature-summary-prose { max-width: 62rem; }
@@ -398,14 +384,6 @@
 .mgdb-modern .na-rules li { margin-bottom: 0.35rem; color: var(--mgdb-ink); line-height: 1.6; }
 
 .mgdb-modern .na-species-table { max-width: 30rem; }
-
-/* Measured on the live page: five short tabs keep the bar at 57px from 1920
-   down to 375, the last stretch because mgdb-modern.css makes it a scrolling
-   rail below 767. The shell steps to 113px below 1170px assuming a wrap that
-   does not happen here. (0,3,1) beats the shell's (0,2,1). */
-@media (max-width: 1170px) {
-  .mgdb-hub-page.mgdb-nomenclature-assembly-page > section[id] { scroll-margin-top: 65px; }
-}
 
 .mgdb-nomenclature-assembly-page > section[id] { margin-bottom: var(--mgdb-space-5); }
 

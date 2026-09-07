@@ -41,32 +41,6 @@
    The offset ladder below replaces a three-step one written for the old
    eight-tab wrapping bar. */
 
-/* Measured, not counted. Seven tabs need 773px on one row (72 + 111 + 113 + 82
-   + 101 + 87 + 159, plus six 8px gaps), and the bar is the page container,
-   48px narrower than the viewport. So:
-
-     >= 821px   one row,   57px  -- the container still fits 773
-     768-820px  two rows, 105px  -- the only width where this bar wraps
-     <= 767px   one row,   57px  -- mgdb-modern.css turns it into a scrolling
-                                    rail, which the page sheet used to defeat
-
-   mgdb-hub.css steps to 113px below 1170px on the assumption the bar has
-   wrapped there; on this page it has not, so 821-1170 has to be put back.
-   Specificity (0,3,1) beats the shell's (0,2,1). Re-measure if a tab is added
-   or a label changes -- the wrap point moves with the label text, and 773 is
-   only 48px below the 821 boundary. */
-@media (max-width: 1170px) and (min-width: 821px) {
-  .mgdb-hub-page.mgdb-cytogenetic-page > section[id] { scroll-margin-top: 65px; }
-}
-
-@media (max-width: 820px) and (min-width: 768px) {
-  .mgdb-hub-page.mgdb-cytogenetic-page > section[id] { scroll-margin-top: 113px; }
-}
-
-@media (max-width: 767px) {
-  .mgdb-hub-page.mgdb-cytogenetic-page > section[id] { scroll-margin-top: 65px; }
-}
-
 .mgdb-cytogenetic-page > section[id] { margin-bottom: var(--mgdb-space-5); }
 
 /* ── Stocks by variant type figure ───────────────────────────────────────── */
@@ -82,7 +56,6 @@
 }
 
 .mgdb-cytogenetic-page .cyt-figure-table { margin-top: var(--mgdb-space-4); }
-
 
 .mgdb-modern .cyt-chromosome-grid {
   display: grid;

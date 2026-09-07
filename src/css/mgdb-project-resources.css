@@ -22,19 +22,6 @@
 
 .mgdb-resource-page > section[id] { margin-bottom: var(--mgdb-space-5); }
 
-/* The offset ladder, from the measured bar.
-   -------------------------------------------------------------------------
-   Each of the three carries five short jump links, and the bar is one 57px row
-   at every width measured -- 1280, 1170, 1000, 900, 800, 700, 600, 500, 420
-   and 375 -- because css/mgdb-modern.css turns it into a scrolling rail rather
-   than letting it wrap. The shell steps its section offset to 113px under
-   1170px for bars that do wrap, which is 56px too much here: a jump link would
-   land the heading half a section below the bar. Flat 65px all the way down,
-   the same correction /projects makes. Re-measure if a sixth tab is added. */
-@media (max-width: 1170px) {
-  .mgdb-hub-page.mgdb-resource-page > section[id] { scroll-margin-top: 65px; }
-}
-
 /* The lead paragraph under a section heading. The shell hides anything inside
    .mgdb-section-heading, so the line that used to sit opposite the title moves
    out to its own paragraph -- the same move /projects made. */

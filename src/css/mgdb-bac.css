@@ -41,21 +41,6 @@
    The offset ladder below replaces a three-step one written for that wrapping
    bar. */
 
-/* Measured, not counted. Five tabs need 532px on one row (83 + 95 + 76 + 87 +
-   159 plus four 8px gaps) and the bar is the page container, 48px narrower than
-   the viewport -- so it would only wrap below a 580px viewport, and by then
-   mgdb-modern.css has already turned it into a scrolling rail. **This bar never
-   wraps**: 57px at 1280, 900, 780, 600 and 375, all measured on the live page.
-
-   So there is one step, not three: mgdb-hub.css moves to 113px below 1170px
-   assuming a wrap that does not happen here. Specificity (0,3,1) beats the
-   shell's (0,2,1). Re-measure if a tab is added or a label grows -- 532 has
-   208px of headroom before the rail takes over, but that is a property of these
-   five labels. */
-@media (max-width: 1170px) {
-  .mgdb-hub-page.mgdb-bac-page > section[id] { scroll-margin-top: 65px; }
-}
-
 .mgdb-bac-page > section[id] { margin-bottom: var(--mgdb-space-5); }
 
 /* ── Records by prefix figure ────────────────────────────────────────────── */
@@ -71,7 +56,6 @@
 }
 
 .mgdb-bac-page .bac-figure-table { margin-top: var(--mgdb-space-4); }
-
 
 .mgdb-modern .bac-archive-note {
   margin-top: 1.25rem;

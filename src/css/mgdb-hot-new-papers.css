@@ -241,12 +241,13 @@
 /* --------------------------------------------------------------------------
    Anchor offset
 
-   The shared rule is scroll-margin-top: 4.5rem, which clears a one-row tab
-   bar. Five tabs fit on one row at desktop width and wrap below it, so the
-   page sets its own and the scrollspy reads this value rather than guessing.
+   The measure is --mgdb-tab-offset, written from the bar's own height by
+   syncTabOffset() in js/mgdb-modern.js. The 8rem below is only the no-JS
+   fallback: five tabs fit on one row at desktop width and wrap below it, so a
+   one-row default would under-clear the bar.
    -------------------------------------------------------------------------- */
 
-.mgdb-hnp-page > section[id] { scroll-margin-top: 8rem; }
+.mgdb-hnp-page > section[id] { scroll-margin-top: var(--mgdb-tab-offset, 8rem); }
 
 /* --------------------------------------------------------------------------
    Chart height

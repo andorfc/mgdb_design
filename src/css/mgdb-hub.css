@@ -432,20 +432,19 @@
 /* --------------------------------------------------------------------------
    Where a tab jump lands
 
-   The shared rule is a flat 4.5rem. The sticky bar it is meant to clear is not
-   80px: it is about 57px with the tabs on one row and about 105px when they
-   wrap to two. So the single value is wrong in both directions -- dead space
-   on a wide screen, and on a narrow one the heading lands under the bar it was
-   supposed to clear. Matched to the bar, plus 8px so the heading is not flush
-   against it. The page script reads this value back, so the two agree by
-   construction.
+   Measured, not declared. syncTabOffset() in js/mgdb-modern.js reads the bar's
+   own height and writes --mgdb-tab-offset as that plus 8px, re-measuring
+   whenever the bar's box changes; the value here is only the no-JS fallback,
+   and it is one row (57) plus that clearance.
+
+   This used to be a two-step ladder from 65px to 113px at 1170px, and about
+   forty page stylesheets carried their own ladders on top of it because that
+   breakpoint is a guess about where a bar wraps -- which depends on the tab
+   labels, not on the viewport. Measuring removes the guess and all forty
+   copies of it.
    -------------------------------------------------------------------------- */
 
-.mgdb-hub-page > section[id] { scroll-margin-top: 65px; }
-
-@media (max-width: 1170px) {
-  .mgdb-hub-page > section[id] { scroll-margin-top: 113px; }
-}
+.mgdb-hub-page > section[id] { scroll-margin-top: var(--mgdb-tab-offset, 65px); }
 
 @media (max-width: 720px) {
   .mgdb-hub-page > section:not(.mgdb-hero) {

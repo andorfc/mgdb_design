@@ -41,16 +41,6 @@
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
-/* The offset ladder, from the measured bar. Three short labels totalling 333px
-   of chips, so the bar is one 57px row at every width measured -- 1280, 1170,
-   1000, 800, 600 and 420 -- and below that mgdb-modern.css turns it into a
-   scrolling rail rather than letting it wrap, so it is still one row at 375.
-   The shell steps to 113px under 1170px for bars that do wrap, which is 56px
-   too much here; this page keeps 65px the whole way down. */
-@media (max-width: 1170px) {
-  .mgdb-hub-page.mgdb-projects-page > section[id] { scroll-margin-top: 65px; }
-}
-
 .mgdb-projects-page > section[id] { margin-bottom: var(--mgdb-space-5); }
 
 /* The line that used to sit opposite the section heading. The shell hides

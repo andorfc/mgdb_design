@@ -85,17 +85,6 @@
    Values filled in from measurement. */
 .mgdb-genetic-variation-page > section[id] { margin-bottom: var(--mgdb-space-5); }
 
-/* The bar is held to one 57px row at every width by the rule above, so this
-   band needs only the flat value. Below 640 the bar stops being sticky, so a
-   section there has nothing to clear. */
-@media (max-width: 1170px) and (min-width: 641px) {
-  .mgdb-hub-page.mgdb-genetic-variation-page > section[id] { scroll-margin-top: 65px; }
-}
-
-@media (max-width: 640px) {
-  .mgdb-hub-page.mgdb-genetic-variation-page > section[id] { scroll-margin-top: 16px; }
-}
-
 /* --------------------------------------------------------------------------
    Featured workspace — SNPTools
    -------------------------------------------------------------------------- */

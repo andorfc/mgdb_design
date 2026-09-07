@@ -66,30 +66,6 @@
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
-/* Offset ladder, measured rather than derived from the tab count. With the
-   per-page flex-wrap removed above, the bar behaves in three bands:
-
-       >= 900px   one row   57px   (seven tabs fit)
-       767-899    two rows  105px  (wrapped)
-       <= 766     one row   57px   (mgdb-modern.css's scrolling rail)
-
-   so the deep offset belongs only to the middle band. The shell's own rule
-   steps to 113px everywhere below 1170px, which was 48px too deep at 1100 and
-   again below 767. The band boundary is set at 900 -- one row was measured at
-   900 and two at 860 -- so the band can only be too generous at its edge,
-   never too shallow, and a heading is never hidden behind the bar.
-
-   The rule this replaces was wrong twice over: it left 1081-1170 uncovered, so
-   the shell applied there, and it set 113px below 860 where the rail keeps the
-   bar to one row. */
-@media (max-width: 1170px) {
-  .mgdb-hub-page.mgdb-locus-page > section[id] { scroll-margin-top: 65px; }
-}
-
-@media (min-width: 767px) and (max-width: 900px) {
-  .mgdb-hub-page.mgdb-locus-page > section[id] { scroll-margin-top: 113px; }
-}
-
 .mgdb-locus-page > section[id] { margin-bottom: var(--mgdb-space-5); }
 
 /* --------------------------------------------------------------------------

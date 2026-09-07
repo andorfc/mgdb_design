@@ -639,6 +639,102 @@
      Automatic wiring
      ------------------------------------------------------------------------ */
 
+  /* ------------------------------------------------------------------------
+     Where a tab jump lands, measured rather than declared
+
+     A section anchored from the sticky tab bar has to clear it, and until now
+     every page said how tall that bar was in CSS. Forty-odd page stylesheets
+     carried a ladder of media queries for it, each measured once by hand, and
+     the shell carried its own two-step ladder underneath them. Every one of
+     those numbers is a claim that goes stale silently: the bar still looks
+     right, the page still scrolls, only the landing position is wrong -- and a
+     renamed tab, a longer label, a different font or a data-driven tab count
+     invalidates it with nothing to show.
+
+     So the bar is measured here and its height written to --mgdb-tab-offset,
+     which mgdb-modern.css, mgdb-hub.css and mgdb-record.css all read back. 8px
+     is the clearance those ladders already used (65 = 57 + 8, 113 = 105 + 8).
+
+     Re-measured whenever the bar's own box changes -- a wrap at a new width, a
+     web font arriving, page zoom, or a page script revealing another tab --
+     rather than on window resize alone, which misses all but the first.
+
+     A bar that is not sticky is not in the way, so those sections only want a
+     little air: /genetic_variation drops the sticky position below 640px and
+     had written that case into its ladder by hand as 16px.
+     ------------------------------------------------------------------------ */
+
+  var TAB_CLEARANCE = 8;
+
+  function pageRootOf(el) {
+    for (var node = el; node; node = node.parentElement) {
+      if (node.classList && node.classList.contains('mgdb-page')) { return node; }
+    }
+    return null;
+  }
+
+  function syncTabOffset(bar) {
+    bar = bar || document.querySelector('.mgdb-section-tabs');
+    if (!bar) { return; }
+    var page = pageRootOf(bar);
+    if (!page) { return; }
+
+    var sticky = window.getComputedStyle(bar).position === 'sticky';
+    var height = bar.hasAttribute('hidden') ? 0 : bar.getBoundingClientRect().height;
+    var offset = (sticky && height > 0) ? height + TAB_CLEARANCE : TAB_CLEARANCE * 2;
+    page.style.setProperty('--mgdb-tab-offset', Math.round(offset) + 'px');
+  }
+
+  /* Whether the reader has done anything yet, tracked from the moment this file
+     runs. Only their INPUT counts: the browser moves scrollY by itself for a
+     fragment and again as content above the viewport settles, so reading scroll
+     position would call that "the reader took over". */
+  var userMoved = false;
+  ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach(function (evt) {
+    window.addEventListener(evt, function () { userMoved = true; }, { passive: true, capture: true });
+  });
+
+  /* A page reached at #section -- /maize_history#history-classic-reads from the
+     Community menu, /contribute_data#genomic from other pages -- is scrolled by
+     the browser while it parses, using whatever scroll-margin is in force then.
+     That is the CSS fallback, because the bar has not been measured yet. So the
+     jump is re-applied once the real measure is in, and only while the reader
+     has not touched anything. */
+  function reapplyHash() {
+    if (userMoved) { return; }
+    var id = (window.location.hash || '').slice(1);
+    if (!id) { return; }
+    var target;
+    try { target = document.getElementById(id); } catch (e) { return; }
+    if (!target || target.hasAttribute('hidden') || !target.getBoundingClientRect().height) { return; }
+    try { target.scrollIntoView({ block: 'start', behavior: 'auto' }); }
+    catch (e) { target.scrollIntoView(true); }
+  }
+
+  function watchTabOffset(bar) {
+    bar = bar || document.querySelector('.mgdb-section-tabs');
+    if (!bar || bar.hasAttribute('data-offset-watched')) { syncTabOffset(bar); return; }
+    bar.setAttribute('data-offset-watched', '');
+
+    syncTabOffset(bar);
+    reapplyHash();
+    if (document.readyState !== 'complete') {
+      window.addEventListener('load', function () {
+        syncTabOffset(bar);
+        window.setTimeout(reapplyHash, 0);
+      });
+    }
+    if (window.ResizeObserver) {
+      new window.ResizeObserver(function () { syncTabOffset(bar); }).observe(bar);
+    }
+    /* Kept even with a ResizeObserver: a bar can keep its height across a
+       breakpoint that turns the sticky position off. */
+    window.addEventListener('resize', debounce(function () { syncTabOffset(bar); }, 100));
+    if (document.fonts && document.fonts.ready && document.fonts.ready.then) {
+      document.fonts.ready.then(function () { syncTabOffset(bar); });
+    }
+  }
+
   function init() {
     // Wide tables scroll in their own container; make that container reachable
     // by keyboard, as a scrollable region needs to be focusable.
@@ -654,6 +750,10 @@
     });
 
     Array.prototype.forEach.call(document.querySelectorAll('table[data-sortable]'), sortTable);
+
+    /* Not inside sectionTabs(): a page can carry the bar without opting into
+       the scrollspy, and the offset is the bar's business either way. */
+    watchTabOffset();
 
     initCopyButtons();
   }
@@ -844,6 +944,8 @@
   MGDB.filterList = filterList;
   MGDB.sortTable = sortTable;
   MGDB.sectionTabs = sectionTabs;
+  MGDB.watchTabOffset = watchTabOffset;
+  MGDB.syncTabOffset = syncTabOffset;
   MGDB.chart = chart;
   MGDB.mergeLayout = mergeLayout;
   MGDB.CHART_COLORS = CHART_COLORS;

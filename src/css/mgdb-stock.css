@@ -63,22 +63,6 @@
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
-/* Seven tabs wrap sooner than six, so the offset the scrollspy reads back
-   from here has its own breakpoints. */
-@media (max-width: 1245px) and (min-width: 861px) {
-  .mgdb-hub-page.mgdb-stock-page > section[id] { scroll-margin-top: 65px; }
-}
-
-@media (max-width: 860px) and (min-width: 521px) {
-  .mgdb-hub-page.mgdb-stock-page > section[id] { scroll-margin-top: 113px; }
-}
-
-/* The tab bar reaches 153px at 375px here, three rows. Measured with this
-   step: every tab jump lands the section 110px clear of the bar. */
-@media (max-width: 520px) {
-  .mgdb-hub-page.mgdb-stock-page > section[id] { scroll-margin-top: 161px; }
-}
-
 .mgdb-stock-page > section[id] { margin-bottom: var(--mgdb-space-5); }
 
 /* ── Search & Filter Panel ───────────────────────────────────────────────── */

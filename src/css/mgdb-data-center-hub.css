@@ -64,25 +64,6 @@
   box-shadow: inset 3px 0 0 var(--mgdb-gold);
 }
 
-/* The offset ladder is set from the measured bar height, not from the tab
-   count, and not from the shell's default -- which steps to 113px at 1170px
-   while this bar may still be one row. Measured by resizing the real page:
-   one row (57px) down to somewhere in 701-740, two rows (105px) down to
-   somewhere in 396-415, and three (153px) below that. Each band takes the
-   larger of the two heights it could straddle, so a boundary errs towards dead
-   space and never towards a heading hidden behind the bar. */
-@media (max-width: 1170px) and (min-width: 741px) {
-  .mgdb-hub-page.mgdb-data-center-hub > section[id] { scroll-margin-top: 65px; }
-}
-
-@media (max-width: 740px) and (min-width: 416px) {
-  .mgdb-hub-page.mgdb-data-center-hub > section[id] { scroll-margin-top: 113px; }
-}
-
-@media (max-width: 415px) {
-  .mgdb-hub-page.mgdb-data-center-hub > section[id] { scroll-margin-top: 161px; }
-}
-
 .mgdb-data-center-hub > section[id] { margin-bottom: var(--mgdb-space-5); }
 
 .mgdb-data-center-hub .data-hub-section-lead {

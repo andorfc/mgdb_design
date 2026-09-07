@@ -265,26 +265,3 @@
   line-height: 1.55;
 }
 
-/* Offset ladder, measured on the live page at 1600/1280/1240/1210/1205/1200/
-   1185/1170/1024/960/900/768/375 rather than inferred from the tab count. Eight
-   labels of this length are one row at 1200 and above (57px), TWO rows from 768
-   to 1199 (105px), and one row again below 768, where mgdb-modern.css turns the
-   bar into a scrolling rail (57px). Each step is the measured height plus 8px.
-
-   The two-row band is why this is written out rather than left to the shell.
-   mgdb-hub.css steps 65px -> 113px at 1170px, on the assumption that a bar is one
-   row above that width. This bar wraps at ~1186-1199, so at 1170-1199 the shell
-   would apply 65px against a 105px bar and land every heading 40px behind it --
-   measured at 1170 before this rule: bar 105px, scroll-margin 65px. Re-measure if
-   a tab is added, renamed or removed. */
-.mgdb-hub-page.mgdb-fair-page > section[id] { scroll-margin-top: 113px; }
-
-@media (min-width: 1200px) {
-  .mgdb-hub-page.mgdb-fair-page > section[id] { scroll-margin-top: 65px; }
-}
-
-@media (max-width: 767px) {
-  .mgdb-hub-page.mgdb-fair-page > section[id] { scroll-margin-top: 65px; }
-}
-
-.mgdb-fair-page > section[id] { margin-bottom: var(--mgdb-space-5); }
