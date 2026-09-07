@@ -576,14 +576,17 @@ function snpvBuildPage($system, $query, $pageUrl, $assembly) {
     $out = array('ok' => true, 'rows' => array(), 'annotated' => count($annot) > 0, 'cache' => 'miss');
     foreach ($rows as $i => $row) {
         $calls = isset($row['results']) && is_array($row['results']) ? $row['results'] : array();
+        $pair  = snpvSplitAlleles(isset($row['allele']) ? $row['allele'] : '');
         $out['rows'][] = array(
-            'site'  => isset($row['rs#']) ? $row['rs#'] : '',
-            'major' => isset($row['allele']) ? $row['allele'] : '',
-            'chr'   => isset($row['chrom_name']) ? $row['chrom_name'] : '',
-            'pos'   => isset($row['chrom_pos']) ? (string) $row['chrom_pos'] : '',
-            'genes' => isset($annot[$i]['genes']) ? $annot[$i]['genes'] : array(),
-            'types' => isset($annot[$i]['types']) ? $annot[$i]['types'] : array(),
-            'calls' => array_values($calls),
+            'site'    => isset($row['rs#']) ? $row['rs#'] : '',
+            'alleles' => isset($row['allele']) ? $row['allele'] : '',
+            'maj'     => $pair[0],
+            'min'     => $pair[1],
+            'chr'     => isset($row['chrom_name']) ? $row['chrom_name'] : '',
+            'pos'     => isset($row['chrom_pos']) ? (string) $row['chrom_pos'] : '',
+            'genes'   => isset($annot[$i]['genes']) ? $annot[$i]['genes'] : array(),
+            'types'   => isset($annot[$i]['types']) ? $annot[$i]['types'] : array(),
+            'calls'   => array_values($calls),
         );
     }
 
@@ -595,6 +598,30 @@ function snpvBuildPage($system, $query, $pageUrl, $assembly) {
         snpvCachePut($system, $key, $out);
     }
     return $out;
+}
+
+/*
+ * The engine's `allele` field is a *pair*, not a base.
+ *
+ * It writes "G" where only one allele was seen among the stocks in this
+ * result and "G/T" where two were — major first, minor second — so it also
+ * changes with the stock selection: the same site is "T" in a three-stock
+ * result and "T/C" in a twenty-seven-stock one.
+ *
+ * That matters because the whole point of the grid's color scale is major
+ * against minor, and comparing a call to the *string* "G/T" makes every call
+ * at a polymorphic site read as minor. It is silent, and it looks right,
+ * because monomorphic sites — the majority — still color correctly.
+ * Confirmed against the engine's own table: at S1_158926101, allele "G/T", it
+ * classes G as `j` and T as `n`.
+ *
+ * Returns array(major, minor); minor is '' at a monomorphic site.
+ */
+function snpvSplitAlleles($allele) {
+    $allele = trim((string) $allele);
+    if ($allele === '' || strtoupper($allele) === 'NA') { return array('', ''); }
+    $parts = explode('/', $allele);
+    return array(trim($parts[0]), isset($parts[1]) ? trim($parts[1]) : '');
 }
 
 /*
@@ -637,6 +664,57 @@ function snpvParseAnnotation($html) {
         $out[] = array('genes' => $genes, 'types' => $types);
     }
     return $out;
+}
+
+/*
+ * One page of calls, without the gene annotation.
+ *
+ * The HapMap and VCF exports carry no gene model or feature type column, so
+ * for them the second upstream request is 140 ms per page bought for nothing.
+ * On a whole-chromosome query that is the difference between an export that
+ * finishes and one that does not: the page JSON alone is 4 ms.
+ *
+ * Not cached. snpvBuildPage() caches the *complete* page; caching a second,
+ * partial copy of the same data under a second key would double the cache for
+ * no gain, and an export reads each page exactly once.
+ */
+function snpvPageCalls($pageUrl) {
+    $res = snpvHttp($pageUrl, null, 60);
+    if (!$res['ok']) { return null; }
+    $rows = json_decode($res['body'], true);
+    if (!is_array($rows)) { return null; }
+
+    $out = array();
+    foreach ($rows as $row) {
+        $pair = snpvSplitAlleles(isset($row['allele']) ? $row['allele'] : '');
+        $out[] = array(
+            'site'    => isset($row['rs#']) ? $row['rs#'] : '',
+            'alleles' => isset($row['allele']) ? $row['allele'] : '',
+            'maj'     => $pair[0],
+            'min'     => $pair[1],
+            'chr'     => isset($row['chrom_name']) ? $row['chrom_name'] : '',
+            'pos'     => isset($row['chrom_pos']) ? (string) $row['chrom_pos'] : '',
+            'calls'   => isset($row['results']) && is_array($row['results']) ? array_values($row['results']) : array(),
+        );
+    }
+    return $out;
+}
+
+/*
+ * The IUPAC codes the engine emits, expanded to the two bases each stands for.
+ * Shared by the VCF writer, which has to turn a call into a pair of allele
+ * indices, and by anything else that needs to know what a call contains.
+ */
+function snpvIupac($code) {
+    static $map = array(
+        'A' => array('A', 'A'), 'C' => array('C', 'C'),
+        'G' => array('G', 'G'), 'T' => array('T', 'T'),
+        'R' => array('A', 'G'), 'Y' => array('C', 'T'),
+        'S' => array('G', 'C'), 'W' => array('A', 'T'),
+        'K' => array('G', 'T'), 'M' => array('A', 'C'),
+    );
+    $code = strtoupper(trim((string) $code));
+    return isset($map[$code]) ? $map[$code] : null;
 }
 
 /*
@@ -874,8 +952,8 @@ function snpvParam($name, $default = '') {
    allele, n = the minor one; both are assigned per site, not per base. */
 function snpvNucleotideLegend() {
     return array(
-        array('code' => 'Major',   'cls' => 'j',    'meaning' => 'Matches the major allele at this site'),
-        array('code' => 'Minor',   'cls' => 'n',    'meaning' => 'Any other single base'),
+        array('code' => 'Major',   'cls' => 'j',    'meaning' => 'The more common of the two alleles seen at this site'),
+        array('code' => 'Minor',   'cls' => 'n',    'meaning' => 'The other allele seen at this site'),
         array('code' => 'R',       'cls' => 'R',    'meaning' => 'A or G'),
         array('code' => 'Y',       'cls' => 'Y',    'meaning' => 'C or T'),
         array('code' => 'S',       'cls' => 'S',    'meaning' => 'G or C'),

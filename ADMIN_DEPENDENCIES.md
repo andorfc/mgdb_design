@@ -2570,6 +2570,17 @@ killed halfway. The legacy page had the same 60-second ceiling and nothing to
 say about it: it covered the screen with "This may take a few minutes" and, when
 the gateway gave up, left that overlay on screen indefinitely.
 
+**Polling for the output file is not enough on its own, and that took a second
+pass to see.** A query that finishes and finds nothing writes no output file at
+all, and neither does one the engine refuses — so "no file yet" cannot tell
+*still running* apart from *finished, with nothing*. The submit therefore writes
+a small run record before it returns, whatever the outcome, and the status
+endpoint reads that first. Verified end to end with a stock that is not in the
+chosen dataset: the submit was killed by the gateway at 60 s exactly as
+expected, the PHP behind it kept running, and about forty-five seconds later the
+status endpoint returned `state: "failed"` with a sentence naming the two usual
+causes — instead of the page waiting twenty minutes and then giving up.
+
 So nothing is blocked on this. It is recorded because the polling workaround
 would be unnecessary — and every other long request on the site would stop
 failing — with one scoped directive, for example a `timeout=900` on the

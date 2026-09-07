@@ -73,15 +73,22 @@
   /* ----------------------------------------------------------------------
      Cell classes
      ---------------------------------------------------------------------- */
-  function callClass(call, major) {
+  /* major and minor arrive already separated — see snpvSplitAlleles() in the
+     PHP library for why the engine's `allele` field cannot be compared whole.
+     A call equal to the major allele is green and the minor one orange; a
+     third allele, which the engine's own two-class scheme has no color for,
+     is treated as minor rather than given an invented one. */
+  function callClass(call, major, minor) {
     if (call === undefined || call === null || call === '') { return 'N'; }
     var c = String(call).toUpperCase();
     if (SPECIAL[c]) { return SPECIAL[c]; }
     if (AMBIGUOUS[c]) { return AMBIGUOUS[c]; }
-    /* The engine writes "NA" for a site whose major allele it could not
-       determine; a call there is neither major nor minor. */
-    if (!major || major === 'NA') { return 'N'; }
-    return (c === String(major).toUpperCase()) ? 'j' : 'n';
+    /* The engine writes "NA" where it could determine no allele at all; a call
+       there is neither major nor minor. */
+    if (!major) { return 'N'; }
+    if (c === String(major).toUpperCase()) { return 'j'; }
+    if (minor && c === String(minor).toUpperCase()) { return 'n'; }
+    return 'n';
   }
 
   /* ----------------------------------------------------------------------
@@ -91,7 +98,7 @@
     var head = $('snpv-grid-head');
     var cells = ''
       + '<th scope="col" class="snpv-col-site">Site</th>'
-      + '<th scope="col">Allele</th>'
+      + '<th scope="col" title="The major allele, then the minor one where two were seen">Alleles</th>'
       + '<th scope="col">Chr</th>'
       + '<th scope="col" class="snpv-num">Position</th>'
       + '<th scope="col">Gene model</th>'
@@ -154,7 +161,7 @@
       body.innerHTML = shown.map(function (row) {
         var cells = ''
           + '<td class="snpv-col-site">' + esc(row.site) + '</td>'
-          + '<td>' + esc(row.major) + '</td>'
+          + '<td>' + esc(row.alleles) + '</td>'
           + '<td>' + esc(row.chr) + '</td>'
           + '<td class="snpv-num">' + num(row.pos) + '</td>'
           + '<td class="snpv-gene">' + geneLinks(row.genes) + '</td>'
@@ -163,7 +170,8 @@
         for (var i = 0; i < meta.stocks.length; i++) {
           var call = row.calls[i];
           var text = (call === undefined || call === null || call === '') ? 'N' : call;
-          cells += '<td class="snpv-cell snpv-call-' + callClass(call, row.major) + '">' + esc(text) + '</td>';
+          cells += '<td class="snpv-cell snpv-call-' + callClass(call, row.maj, row.min) + '">'
+                + esc(text) + '</td>';
         }
         return '<tr>' + cells + '</tr>';
       }).join('');

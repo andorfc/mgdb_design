@@ -189,24 +189,17 @@ All,05-397</code></pre>
         <div class="mgdb-message mgdb-message-info snpv-region-warning" id="snpv-region-warning" role="status" hidden></div>
       </fieldset>
 
-      <!-- Step 4: output -->
+      <!-- Step 4: results -->
       <fieldset class="snpv-step" id="snpv-step-output">
-        <legend><span class="snpv-step-number" aria-hidden="true">4</span> Output</legend>
+        <legend><span class="snpv-step-number" aria-hidden="true">4</span> Results</legend>
+        <p class="mgdb-hint">Results open as a grid you can read here, and download from that page as a tab-separated table, CSV, HapMap or VCF &mdash; each covering every page of the result, not the page on screen.</p>
         <div class="snpv-output-grid">
-          <div class="mgdb-field">
-            <label class="mgdb-label" for="snpv-format">Result format</label>
-            <select class="mgdb-select" id="snpv-format">
-              <option value="json" selected>A grid, read on this page</option>
-              <option value="hapmap">A HapMap file</option>
-              <option value="vcf">A VCF file</option>
-            </select>
-          </div>
           <div class="mgdb-field" id="snpv-perpage-field">
             <label class="mgdb-label" for="snpv-perpage">Sites per page</label>
             <input class="mgdb-input mgdb-numeric" id="snpv-perpage" type="number" min="10" max="2000" step="10" value="50" />
+            <p class="mgdb-hint">How many SNP sites each page of the grid holds. It does not change what the query returns, or what a download contains.</p>
           </div>
         </div>
-        <div class="mgdb-message mgdb-message-info snpv-format-note" id="snpv-format-note" role="status" hidden></div>
       </fieldset>
 
       <!-- Run bar -->

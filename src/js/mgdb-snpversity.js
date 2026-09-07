@@ -439,25 +439,6 @@
     updateRegionReadout();
   }
 
-  function toggleFormatFields() {
-    var format = $('snpv-format').value;
-    var note = $('snpv-format-note');
-    $('snpv-perpage-field').hidden = (format !== 'json');
-    if (format === 'json') {
-      note.hidden = true;
-    } else {
-      /* Measured 2026-09-06: a hapmap or vcf run answers with a link to
-         david1.usda.iastate.edu, which has no public DNS record, and the file
-         is not under the directory the public host serves. Saying so before
-         the run is better than a dead link after it. */
-      showWarning(note, 'SNPversity writes ' + format.toUpperCase() + ' files to a location that is not '
-                      + 'currently reachable from outside its own network, so this may come back with '
-                      + 'nothing to download. The grid option always works, and its results download as '
-                      + 'TSV or CSV. For VCF over B73 v5, use SNPversity 2.1.');
-    }
-    updateSummary();
-  }
-
   function updateSummary() {
     var chosen = document.querySelector('input[name="dataSet"]:checked');
     var parts = [];
@@ -480,9 +461,6 @@
       else { parts.push(num(span) + ' bp of chromosome ' + $('snpv-chromosome').value); }
     }
 
-    var format = $('snpv-format').value;
-    parts.push(format === 'json' ? 'as a grid' : 'as a ' + format.toUpperCase() + ' file');
-
     var summary = $('snpv-runbar-summary');
     if (missing.length) {
       summary.textContent = 'Still needed: ' + missing.join(', ') + '.';
@@ -503,7 +481,6 @@
     data.append('assembly', assembly());
     data.append('chromosome', $('snpv-chromosome').value);
     data.append('positions', $('snpv-positions').value);
-    data.append('outputFormat', $('snpv-format').value);
     data.append('resultsMax', $('snpv-perpage').value || '50');
     data.append('select-region-type',
       document.querySelector('input[name="regionMode"]:checked').value);
@@ -608,6 +585,17 @@
         .then(function (data) {
           if (data.ready) { goToResult(data.result_url); return; }
           if (settled) { return; }
+          /* A query that finished and found nothing writes no output file, so
+             waiting for one would wait forever. The run record is what tells
+             the difference, and it is the only thing that can when the submit
+             response was lost to the 60-second gateway. */
+          if (data.state === 'empty' || data.state === 'failed') {
+            settled = true;
+            stopPolling();
+            setBusy(false);
+            showError(data.message || 'The query did not produce a result.');
+            return;
+          }
           var mins = Math.round((Date.now() - pollStarted) / 60000);
           setBusy(true, 'Still running' + (mins >= 1 ? ' — ' + mins + ' minute' + (mins === 1 ? '' : 's')
                                                      + ' so far' : '')
@@ -644,22 +632,7 @@
     pollFor(id);
 
     apiPost(withAction(data, 'submit'))
-      .then(function (result) {
-        if (result.kind === 'file') {
-          settled = true;
-          stopPolling();
-          setBusy(false);
-          if (result.available) {
-            window.location.href = result.download;
-          } else {
-            showError('SNPversity ran the query but did not leave a downloadable file where it could '
-                    + 'be reached. Run it again as a grid, which downloads as TSV or CSV, or use '
-                    + 'SNPversity 2.1 for a VCF over B73 v5.');
-          }
-          return;
-        }
-        goToResult(result.result_url);
-      })
+      .then(function (result) { goToResult(result.result_url); })
       .catch(function (error) {
         /* A lost submit response is not a failed query. Only a refusal the
            server actually explained stops the wait. */
@@ -888,8 +861,7 @@
     $('snpv-start').addEventListener('input', updateRegionReadout);
     $('snpv-end').addEventListener('input', updateRegionReadout);
 
-    /* Output */
-    $('snpv-format').addEventListener('change', toggleFormatFields);
+    /* Results */
     $('snpv-perpage').addEventListener('input', updateSummary);
 
     /* Run */
@@ -898,7 +870,6 @@
 
     rebuildChromosomes();
     togglePositionFields();
-    toggleFormatFields();
     renderSelected();
     setStockStatus();
     updateSummary();

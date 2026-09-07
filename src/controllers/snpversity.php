@@ -504,13 +504,33 @@ function snpv_render_query_actions($found, $export_base, $share_url) {
          . 'will keep its own URL for six weeks.</p>';
   }
 
+  /* Four formats, all written by this site.
+   *
+   * HapMap and VCF are here rather than on the query form because the engine's
+   * own versions of them are not retrievable — they link to a hostname with no
+   * public DNS record (AD-067) — and every byte they need is in the JSON the
+   * grid is already built from. So they are generated on the way out, from a
+   * result that exists, instead of being offered up front and then failing. */
   $h  = '<h3 class="snpv-subhead">Take it away</h3>';
   $h .= '<div class="mgdb-export-buttons snpv-exports">'
-      . '<a class="mgdb-button" href="' . snpv_esc($export_base . 'tsv') . '">Download TSV</a>'
-      . '<a class="mgdb-button" href="' . snpv_esc($export_base . 'csv') . '">Download CSV</a>'
+      . '<a class="mgdb-button" href="' . snpv_esc($export_base . 'tsv') . '">Table, tab-separated</a>'
+      . '<a class="mgdb-button" href="' . snpv_esc($export_base . 'csv') . '">Table, CSV</a>'
+      . '<a class="mgdb-button" href="' . snpv_esc($export_base . 'hapmap') . '">HapMap</a>'
+      . '<a class="mgdb-button" href="' . snpv_esc($export_base . 'vcf') . '">VCF</a>'
       . '</div>';
-  $h .= '<p class="mgdb-small mgdb-muted">Both files carry every page of the result, not the page '
-      . 'on screen, with the gene model and feature type columns included.</p>';
+  $h .= '<dl class="snpv-format-notes">'
+      . '<dt>Table</dt><dd>Every column of the grid above, including the gene model and feature '
+      . 'type, one row per site.</dd>'
+      . '<dt>HapMap</dt><dd>TASSEL\'s column set, with the calls exactly as SNPversity returns '
+      . 'them &mdash; one IUPAC character per stock.</dd>'
+      . '<dt>VCF</dt><dd>VCFv4.2. <strong>REF is the major allele, not the reference base at that '
+      . 'position</strong> &mdash; SNPversity reports observed alleles and has no reference '
+      . 'sequence behind it, and the file says so in its own header. For a VCF whose REF is the '
+      . 'B73 base, use <a href="https://wgs.maizegdb.org/" target="_blank" rel="noopener">SNPversity '
+      . '2.1</a> on B73 v5.</dd>'
+      . '</dl>';
+  $h .= '<p class="mgdb-small mgdb-muted">All four carry every page of the result, not the page on '
+      . 'screen.</p>';
 
   $h .= '<h3 class="snpv-subhead">Keep this result</h3>';
   $h .= '<p>SNPversity stores a result for <strong>six weeks</strong>. Until then this URL brings '

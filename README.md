@@ -5902,8 +5902,18 @@ indexed `IN` list against `idx_stock_name`: **1.0 ms for ten names** against
   only the first gave a 27-stock query **"0 stocks" and a six-column grid**. So
   the span may carry attributes and the class is a list, not a name.
 
-A third, in the same family: **`get_table_body.php` must be handed an `http://`
-URL.** It does not read the page file from disk — it fetches the URL it is given,
+- **`allele` is a *pair*, not a base, and it moves with the stock selection.**
+  The engine writes `G` where only one allele was seen among the stocks in a
+  result and `G/T` where two were, major first. The grid's whole point is major
+  against minor, so comparing a call to the *string* `"G/T"` colored every call
+  at a polymorphic site as minor — 17 of the 50 sites on one test page, every
+  cell on them wrong. It looks right, because monomorphic sites still color
+  correctly, and it survived a screenshot review before a check against the
+  engine's own classes caught it. At S1_158926101, allele `G/T`, the engine
+  classes `G` as `j` and `T` as `n`; so does this page now.
+
+A third kind, in the same family: **`get_table_body.php` must be handed an
+`http://` URL.** It does not read the page file from disk — it fetches the URL it is given,
 on a PHP 5.3 build with no SSL stream wrapper — so an `https://` URL returns
 200 with an empty body and every Gene model and Type column comes back blank.
 That one endpoint is the only place the engine's hostname is *not* rewritten to
@@ -5931,17 +5941,33 @@ would make the workaround unnecessary.
 
 ### What else the rebuild fixed
 
-- **Two of the three output formats are broken, and the page says so.** A
-  `vcf` or `hapmap` run answers with a link to
+- **Two of the three output formats were broken, so MaizeGDB writes them
+  itself.** A `vcf` or `hapmap` run answers with a link to
   `david1.usda.iastate.edu`, which **has no DNS record**, and the file is not at
-  the corresponding path on the public host either. The API rewrites the host,
-  `HEAD`s it, and only offers a download when that returns 200; the form warns
-  before the query is run rather than after several minutes of waiting. AD-067.
+  the corresponding path on the public host either. Every byte those formats
+  need is already in the JSON the grid is built from, so the API generates both
+  on the way out and the engine is never asked for them. The form lost its
+  output-format control entirely — a query always runs as a grid, and the result
+  page offers four downloads. One code path instead of three, and it is the one
+  that works. AD-067.
 - **The download is the whole result.** The legacy "export CSV" ran a jQuery
   routine over the *rendered* table, so it exported the page on screen — one
-  page of five — and exported whatever the zoom slider had done to it. The TSV
-  and CSV here walk every page server-side, with the gene model and feature type
-  columns included.
+  page of five — and exported whatever the zoom slider had done to it. All four
+  formats here walk every page server-side, streamed and flushed per page so the
+  60-second gateway sees traffic.
+- **The VCF says what its REF column is.** Nothing here knows the reference
+  base — the engine reports observed alleles and no RefGen_v2 or v3 sequence is
+  queryable on this host — so REF is the major allele, stated in `##comment`
+  lines in the file itself and in the note beside the download button, with a
+  pointer to SNPversity 2.1 for a VCF whose REF really is the B73 base. The
+  HapMap export has no such problem: its `alleles` column *is* the major/minor
+  pair, and its genotypes are the engine's own IUPAC characters unchanged.
+- **A query that finishes with nothing used to be indistinguishable from one
+  still running.** Neither writes an output file, so the poll would have waited
+  out its full twenty minutes. The submit now writes a run record before it
+  returns, whatever happened, and the status endpoint reads that first.
+  Verified with a stock that is not in the chosen dataset: gateway 504 at 60 s,
+  and `state: "failed"` with a readable reason about forty-five seconds later.
 - **The results fragment is not well-formed.** `get_table_body.php` echoes a
   bare, unwrapped GBrowse URL before every `<tr>`; dropped into a `<tbody>`
   those text nodes are hoisted out of the table by the HTML parser and stack up
@@ -5999,8 +6025,15 @@ picker filters 15,532 names; the gene model type-ahead returns
 engine's own coordinates plus the 1,000 bp offset; the time estimator returns 18
 seconds for two stocks over 307 kb; a three-stock run and a 27-stock run both
 completed through the live engine in about 10 seconds and rendered their grids;
-paging, deep-linking to `?p=2`, both filters, and the TSV and CSV exports
-(51 lines each, all pages) all work.
+paging, deep-linking to `?p=2`, and both filters all work.
+
+The four exports were checked against the source JSON rather than by eye. On a
+27-stock, 50-site result: **0 problems** across field counts, REF equal to the
+major allele and ALT to the minor at every site, every VCF genotype re-encoded
+correctly — including the one heterozygous IUPAC call — `NS` equal to the number
+of called genotypes, `N` written as `./.`, and every HapMap call byte-identical
+to the engine's own. TSV and CSV are 51 lines each for a five-page result, which
+is every page rather than the one on screen.
 
 ## The BLAST front page
 
