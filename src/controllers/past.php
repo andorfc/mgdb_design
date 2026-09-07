@@ -229,7 +229,7 @@ function past_render_servers() {
     $h .= '<a class="past-server" href="' . past_esc($s['url']) . '" target="_blank" rel="noopener">'
         . '<span class="past-server-n" aria-hidden="true">' . (int) $s['n'] . '</span>'
         . '<span class="past-server-body">'
-        . '<strong>MaizeGDB PAST server ' . (int) $s['n'] . ' <span aria-hidden="true">&nearr;</span></strong>'
+        . '<strong>MaizeGDB PAST server ' . (int) $s['n'] . '</strong>'
         . '<span class="past-server-host">' . past_esc(preg_replace('#^https?://#', '', $s['url'])) . '</span>'
         . '</span></a>';
   }
@@ -293,8 +293,7 @@ function past_render_file_groups($data) {
 
     if (!$files) {
       $h .= '<p class="past-files-fallback">This listing could not be read just now. '
-          . '<a href="' . past_esc($dir_url) . '" target="_blank" rel="noopener">Open the directory '
-          . '<span aria-hidden="true">&nearr;</span></a></p>';
+          . '<a href="' . past_esc($dir_url) . '">Open the directory</a></p>';
       $h .= '</section>';
       continue;
     }
@@ -315,8 +314,8 @@ function past_render_file_groups($data) {
     }
 
     $h .= '</tbody></table></div>';
-    $h .= '<p class="past-files-dir"><a href="' . past_esc($dir_url) . '" target="_blank" rel="noopener">'
-        . 'Open this directory <span aria-hidden="true">&nearr;</span></a></p>';
+    $h .= '<p class="past-files-dir"><a href="' . past_esc($dir_url) . '">'
+        . 'Open this directory</a></p>';
     $h .= '</section>';
   }
   return $h;

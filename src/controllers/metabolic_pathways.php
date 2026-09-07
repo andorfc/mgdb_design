@@ -142,17 +142,49 @@ function mp_esc($value) {
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 }
 
-/* External is decided by the href carrying its own scheme, not by the domain:
-   one test drives the arrow, the target, the rel and the Internal/External
-   chip, so a link cannot be labelled one way and behave the other. */
+/* MaizeGDB's own tools live on subdomains, so "carries a scheme" is not the
+   same question as "leaves MaizeGDB". Both used to be answered by one scheme
+   test, deliberately: the argument was that snptools, feta and mfs are
+   separate applications a reader leaves the site to reach. The group's call is
+   the other way -- a maizegdb.org host is this site, whatever subdomain it is
+   on -- so those links lose the exit arrow and their chip reads Internal.
+
+   Opening in a new tab is a different question and keeps the old answer for
+   the tools, because losing the page behind you costs your place in it. Hence
+   two tests: the arrow and the chip follow mp_is_external, the target follows
+   mp_opens_new_tab, and they are allowed to disagree. */
 function mp_is_external($url) {
-    return (bool) preg_match('#^[a-z][a-z0-9+.-]*://#i', (string) $url);
+    if (!preg_match('#^[a-z][a-z0-9+.-]*://([^/?\#]+)#i', (string) $url, $m)) {
+        return false;
+    }
+    /* Matched, not counted: `substr($host, -14)` was the first version of this
+       and it is off by one -- '.maizegdb.org' is 13 characters -- so every
+       subdomain still tested as external and nothing on the page changed. */
+    return !preg_match('/(^|\.)maizegdb\.org$/i', $m[1]);
+}
+
+/* Interactive tools -- things you drive -- open in a new tab even though they
+   are MaizeGDB. A file, a document or another page here does not. */
+function mp_opens_new_tab($url) {
+    if (mp_is_external($url)) {
+        return true;
+    }
+    if (!preg_match('#^[a-z][a-z0-9+.-]*://([^/?\#]+)#i', (string) $url, $m)) {
+        return false;
+    }
+    $host = strtolower($m[1]);
+    $apps = array('jbrowse', 'jbrowse2', 'gbrowse', 'qteller', 'snptools', 'snpversity',
+                  'wgs', 'feta', 'gcv', 'phylostrata', 'pangenome-viewer', 'genomeqc',
+                  'mfs', 'reelgene', 'fusarium', 'maizemine', 'foldseek', 'nomenclature',
+                  'past1', 'past2', 'past3');
+    $sub = substr($host, 0, strpos($host . '.', '.'));
+    return in_array($sub, $apps, true);
 }
 
 function mp_link($label, $url, $class = '') {
     $external = mp_is_external($url);
     $arrow = $external ? '&nearr;' : '&rarr;';
-    $attrs = $external ? ' target="_blank" rel="noopener"' : '';
+    $attrs = mp_opens_new_tab($url) ? ' target="_blank" rel="noopener"' : '';
     $cls   = $class !== '' ? ' class="' . mp_esc($class) . '"' : '';
     return '<a' . $cls . ' href="' . mp_esc($url) . '"' . $attrs . '>'
          . mp_esc($label) . ' <span aria-hidden="true">' . $arrow . '</span></a>';

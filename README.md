@@ -6720,6 +6720,78 @@ deploy/deploy.sh src/templates/about/sitemap-content.bau
 The generator warns when two entries in the same section point at the same URL.
 Across sections is fine — BLAST is both a starting point and a research tool.
 
+## Internal links, and the arrow that said otherwise
+
+MaizeGDB's own tools live on subdomains — `jbrowse`, `jbrowse2`, `wgs`, `feta`,
+`snptools`, `qteller`, `gcv`, `mfs`, `download`, `documents`, `ftp` and more —
+so any test of the form "does this href carry a scheme" answers a different
+question from "does this leave MaizeGDB". Page after page marked those links
+with a ↗ and opened them in a new tab. Measured across all 150 modern routes:
+**738 links on 42 routes** claimed to leave a site they never left.
+
+The rule, applied everywhere:
+
+- **The arrow goes** on any `maizegdb.org` host. It asserted something false.
+- **`target="_blank"` stays only for an application** — something you drive,
+  where losing the page behind you costs your place: the browsers, qTeller,
+  SNPTools, SNPversity 2.1, FETA, GCV, Phylostrata, the Feature Store, PAST's
+  three servers, and the main site's own `/gbrowse` mounts. A file on
+  `download.maizegdb.org`, a PDF on `documents`, an MP3 on `ftp`, another page
+  here — those open in the same tab.
+
+`tools/fix_internal_links.py` does the mechanical part and is re-runnable, so a
+new page can be checked against the rule rather than reviewed by eye:
+
+```bash
+python3 tools/fix_internal_links.py          # report
+python3 tools/fix_internal_links.py --write  # apply
+```
+
+After the sweep: **0** maizegdb.org links marked as external anywhere in the
+150 routes, 350 application links correctly keeping their new tab, and 1,237
+genuinely external links keeping their arrow.
+
+### Five spellings of one marker, and why a regex alone was not enough
+
+The arrow is not written the same way twice. `&#8599;` (239), a
+`<span aria-hidden="true">&nearr;</span>` wrapper (18), a bare `&nearr;`, the
+sitemap's own `sitemap-item-ext` class, and — the one that hides from every
+text search for an arrow — `class="mgdb-external"`, whose `::after` draws it
+from CSS with the element left empty.
+
+Three things the tool could not do, and were done by hand afterwards:
+
+- **Hrefs built by concatenation.** `/genomebrowser` renders its launch buttons
+  from `'<a … href="' . $url . '">JBrowse 1 &#8599;</a>'`, so a regex looking
+  for a literal maizegdb.org href never sees them — 208 of the remaining
+  arrows were in that one shape. The tool now also *refuses* to rewrite
+  attributes on a concatenated opening tag: its first run stripped a `rel` out
+  of one in `js/mgdb-protein-structure.js`, on a link that had no
+  `target="_blank"` and nothing to fix.
+- **Pages that compute it themselves.** `/ai` and `/metabolic_pathways` each
+  had their own scheme test, and each drove not just the arrow but a visible
+  **Internal/External chip and a search filter** from it. Both files argued
+  for the old behaviour in a comment. They test the host now, and their chips
+  changed with them, which is the point: `feta.maizegdb.org` reads *Internal*.
+- **Pages served from the dashboard cache.** `/ai`, `/metabolic_pathways`,
+  `/genomebrowser` and `/pan_gene_center/pan_gene` kept serving the old markup
+  after a correct deploy. Purge before believing a scan.
+
+One bug worth remembering from that second pass: the first host test was
+`substr($host, -14) === '.maizegdb.org'`. That string is **13** characters, so
+every subdomain still tested as external and the deploy changed nothing
+visible. Match, do not count: `preg_match('/(^|\.)maizegdb\.org$/i', $host)`.
+
+### What was deliberately left
+
+Eleven links on `/whatsnew` still open in a new tab. They are inside
+`data/news.xml`, which is curator-maintained and whose bodies are emitted as
+written — not this repository's text to rewrite.
+
+`data/coming_soon.json` had five links hardcoded to
+`https://claude.maizegdb.org/…`, the development host, in a file that ships to
+every instance. They are root-relative now; that was a bug in its own right.
+
 ### A MaizeGDB subdomain is not an external link
 
 `is_external()` tested the *scheme* — `url.startswith('http')` — and MaizeGDB's

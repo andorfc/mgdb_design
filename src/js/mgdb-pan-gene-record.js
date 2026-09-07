@@ -342,7 +342,7 @@
       'models in each track, the color-coded pan-genes are displayed.</p>' +
       '<div class="mgdb-rec-linkrow">' +
       '<a class="mgdb-button mgdb-button-primary" href="' + R.escape(viewers.gcv_url) +
-      '" target="_blank" rel="noopener">Open in the Genomic Context Viewer <span aria-hidden="true">&nearr;</span></a>' +
+      '" target="_blank" rel="noopener">Open in the Genomic Context Viewer</a>' +
       '</div>' +
       '<iframe class="mgdb-pg-gcv" src="' + R.escape(viewers.gcv_url) +
       '" title="Genomic Context Viewer" loading="lazy"></iframe>' +

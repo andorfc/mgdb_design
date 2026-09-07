@@ -98,15 +98,15 @@ $page_data = dashboardCache($system, 'genomebrowser/page', function () use ($DBC
                     $gbrowse_count++;
                     $platform_html = '<span class="browser-pill badge-gbrowse">GBrowse</span>';
                     $data_types = 'gbrowse';
-                    $launch_html = '<a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="' . $url . '" target="_blank" rel="noopener">GBrowse &#8599;</a>';
+                    $launch_html = '<a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="' . $url . '" target="_blank" rel="noopener">GBrowse</a>';
                 } else {
                     $jbrowse2_count++;
                     $jbrowse1_count++;
                     $platform_html = '<span class="browser-pill badge-jbrowse2">JBrowse 2</span> <span class="browser-pill badge-jbrowse">JBrowse 1</span>';
                     $data_types = 'jbrowse 2 jbrowse 1 jbrowse';
                     $launch_html = '<div class="instance-launch-btns">'
-                                 . '<a class="mgdb-button mgdb-button-sm mgdb-button-primary" href="https://jbrowse2.maizegdb.org" target="_blank" rel="noopener">JBrowse 2 &#8599;</a>'
-                                 . '<a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="' . $url . '" target="_blank" rel="noopener">JBrowse 1 &#8599;</a>'
+                                 . '<a class="mgdb-button mgdb-button-sm mgdb-button-primary" href="https://jbrowse2.maizegdb.org" target="_blank" rel="noopener">JBrowse 2</a>'
+                                 . '<a class="mgdb-button mgdb-button-sm mgdb-button-secondary" href="' . $url . '" target="_blank" rel="noopener">JBrowse 1</a>'
                                  . '</div>';
                 }
 

@@ -234,10 +234,10 @@ function mgdbPodcastCard($ep, $series, $index) {
        saying "Download" would therefore have opened the browser's own audio
        page instead, so it says what it actually does and carries the size. */
     $h .= '<div class="podcast-card-actions">';
-    $h .= '<a class="mgdb-button mgdb-button-quiet" href="' . mgdbPodcastEsc($url) . '" target="_blank" rel="noopener">'
+    $h .= '<a class="mgdb-button mgdb-button-quiet" href="' . mgdbPodcastEsc($url) . '">'
         . 'MP3 file'
         . (!empty($ep['bytes']) ? ' <span class="podcast-action-size">' . mgdbPodcastBytes((int) $ep['bytes']) . '</span>' : '')
-        . ' <span aria-hidden="true">&nearr;</span></a>';
+        . '</a>';
 
     if (!empty($ep['related']['url']) && !empty($ep['related']['label'])) {
         $external = !empty($ep['related']['external']);

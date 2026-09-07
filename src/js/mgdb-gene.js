@@ -869,7 +869,7 @@
         .catch(function () {
           statusText('<span class="mgdb-message-error">Download failed. '
             + 'If you tried to upload a file larger than 50kb, you may want to download the full gene model '
-            + 'information file from the <a href="https://download.maizegdb.org" target="_blank" rel="noopener">downloads directory</a>. '
+            + 'information file from the <a href="https://download.maizegdb.org">downloads directory</a>. '
             + 'Look inside the directory for your genome assembly of interest.</span>');
         });
     });

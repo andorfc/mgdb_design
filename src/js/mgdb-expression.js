@@ -266,8 +266,15 @@
       { label: 'JBrowse', url: row.jbrowse_url },
       { label: 'eFP', url: row.efp_url }
     ].filter(function (link) { return link.url; }).map(function (link) {
-      var external = /^https?:\/\//i.test(link.url);
-      return '<a href="' + esc(link.url) + '"' + (external ? ' target="_blank" rel="noopener"' : '') + '>'
+      /* JBrowse and eFP are absolute URLs on MaizeGDB's own subdomains, so a
+         scheme test called them external and gave them an exit arrow. The
+         arrow follows the host; the new tab follows whether the link opens a
+         tool you drive, which is why these two do not have to agree. */
+      var host = (link.url.match(/^https?:\/\/([^/?#]+)/i) || [])[1];
+      var external = !!host && !/(^|\.)maizegdb\.org$/i.test(host);
+      var app = /^(jbrowse2?|gbrowse|qteller|efp|snptools|wgs|feta|gcv)\./i.test(host || '');
+      var newTab = external || app;
+      return '<a href="' + esc(link.url) + '"' + (newTab ? ' target="_blank" rel="noopener"' : '') + '>'
            + esc(link.label) + ' <span aria-hidden="true">' + (external ? '&nearr;' : '&rarr;') + '</span></a>';
     }).join('');
 
