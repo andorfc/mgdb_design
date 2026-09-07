@@ -819,6 +819,16 @@ src/tools/alphafill_models.py                             tools/alphafill_models
 src/tools/alphafill_ligand_extract.py                     tools/alphafill_ligand_extract.py
 
 
+# Loci and accessions in a bin -- /bin_viewer_locus_accession. Rebuilt
+# 2026-09-07: the legacy page returned zero rows for every bin. Its query had no
+# bin condition, it loaded the sequence page's template, and the rows it wanted
+# came from mgdb.z_sequence, which is empty. The accessions are in
+# mgdb.ext_db_key. The modern Bin Viewer links here from every bin page.
+# Original archived in legacy/bin-viewer-accession/.
+src/controllers/bin_viewer_locus_accession.php            controllers/bin_viewer_locus_accession.php
+src/templates/static/mgdb_bin_accession.bau               templates/static/mgdb_bin_accession.bau
+src/css/mgdb-bin-accession.css                            css/mgdb-bin-accession.css
+
 # /ems-phenotype retired to /data_center/phenotype, 2026-09-07. The page was
 # one iframe onto cur.maizegdb.org/ems-phenotype.php, which answers HTTP 502,
 # so it rendered site chrome around an empty frame. The collection is not in

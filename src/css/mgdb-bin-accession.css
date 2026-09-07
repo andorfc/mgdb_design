@@ -1,0 +1,57 @@
+/* file: css/mgdb-bin-accession.css
+ *
+ * /bin_viewer_locus_accession. One bin's loci and their sequence accessions.
+ */
+
+/* A locus can carry several accessions from several databases, so they stack
+   inside the cell rather than running together on one line. */
+.mgdb-bin-accession-page .bva-accessions {
+  display: grid;
+  gap: var(--mgdb-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mgdb-bin-accession-page .bva-accessions li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: baseline;
+}
+
+.mgdb-bin-accession-page .bva-accessions code {
+  font-family: var(--mgdb-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* Which database the accession is in. It is the difference between an
+   ambiguous number and a resolvable one -- 103631088 means nothing until it
+   says NCBI Gene -- so it travels with every key rather than being a column
+   heading the reader has to hold in mind. */
+.mgdb-bin-accession-page .bva-source {
+  padding: 1px var(--mgdb-space-2);
+  border-radius: 999px;
+  background: var(--mgdb-green-soft, #eef4ea);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  white-space: nowrap;
+}
+
+/* The locus column is the row's subject and stays on one line; the accessions
+   column takes whatever is left. */
+.mgdb-bin-accession-page .bva-table th[scope="row"] {
+  white-space: nowrap;
+}
+
+.mgdb-bin-accession-page .bva-table td:nth-child(2) {
+  white-space: nowrap;
+}
+
+.mgdb-bin-accession-page .bva-table td:last-child {
+  width: 55%;
+}
+
+@media (max-width: 720px) {
+  .mgdb-bin-accession-page .bva-table td:last-child { width: auto; }
+}

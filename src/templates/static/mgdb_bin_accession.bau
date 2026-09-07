@@ -1,0 +1,105 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-bin-accession
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:title" content="Loci and accessions by bin | MaizeGDB">
+
+<a class="mgdb-skip-link" href="#bva-main">Skip to main content</a>
+<main class="mgdb-page mgdb-bin-accession-page" id="bva-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Tools</a><span aria-hidden="true">&rsaquo;</span><a href="/bin_viewer">Bin Viewer</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Bin $(bin_label)</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="bva-title">
+    <div class="mgdb-hero-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="A highlighted region of a chromosome">
+        <rect x="38" y="10" width="20" height="76" rx="10" fill="none" stroke="#235c37" stroke-width="4"/>
+        <rect x="38" y="38" width="20" height="18" fill="#d99a0b" opacity="0.35"/>
+        <line x1="38" y1="24" x2="58" y2="24" stroke="#235c37" stroke-width="3"/>
+        <line x1="38" y1="38" x2="58" y2="38" stroke="#d99a0b" stroke-width="3"/>
+        <line x1="38" y1="56" x2="58" y2="56" stroke="#d99a0b" stroke-width="3"/>
+        <line x1="38" y1="70" x2="58" y2="70" stroke="#235c37" stroke-width="3"/>
+      </svg>
+      <strong>Bin<br />$(bin_label)</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="bva-title">Loci and accessions in bin $(bin_label)</h1>
+      <p class="mgdb-hero-description">Every curated locus mapped to this genetic bin, with the sequence accessions recorded against it &#8212; GenBank, EMBL, DDBJ, NCBI Gene, UniProt and EVA. A locus's other identifiers, its map positions and everything else known about it are on its own record.</p>
+      <p class="mgdb-hero-actions">
+        <a class="mgdb-button mgdb-button-quiet" href="/bin_viewer?bin=$(chromosome)&amp;sub=$(sub_padded)">Everything in this bin <span aria-hidden="true">&rarr;</span></a>
+        <a class="mgdb-button mgdb-button-quiet" href="/bin_viewer">Bin Viewer <span aria-hidden="true">&rarr;</span></a>
+      </p>
+    </div>
+  </section>
+
+  ;; No usable bin in the URL. The legacy page rendered "bin 0.00" and an empty
+  ;; table in this case rather than saying anything.
+  @(no_bin {display: off}
+  <div class="mgdb-message mgdb-message-info" role="status">
+    <div>
+      <strong>No bin was named.</strong>
+      <span>This page lists one bin at a time. Choose one from the <a href="/bin_viewer">Bin Viewer</a>, or add it to the address as <code>?bin=1&amp;sub=1</code> or <code>?bin=1.01</code>.</span>
+    </div>
+  </div>
+  )
+
+  @(empty_bin {display: off}
+  <div class="mgdb-message mgdb-message-info" role="status">
+    <div>
+      <strong>No curated locus is mapped to bin $(empty_bin_label).</strong>
+      <span>Bins run from 1.00 to 10.07, and not every one carries mapped loci. The <a href="/bin_viewer">Bin Viewer</a> shows which do.</span>
+    </div>
+  </div>
+  )
+
+  @(bin_table {display: off}
+  <section class="mgdb-panel" id="bva-loci" aria-labelledby="bva-loci-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="bva-loci-title">Loci in this bin</h2>
+        <p>$(locus_count) loci, of which $(with_accessions) carry a sequence accession &#8212; $(accession_count) accessions in all.</p>
+      </div>
+    </div>
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table mgdb-table-zebra bva-table">
+        <caption class="mgdb-visually-hidden">Loci mapped to this bin and their sequence accessions</caption>
+        <thead>
+          <tr>
+            <th scope="col">Locus</th>
+            <th scope="col">Type</th>
+            <th scope="col">Accessions</th>
+          </tr>
+        </thead>
+        <tbody>$(table_rows)</tbody>
+      </table>
+    </div>
+    <p class="mgdb-hint">Only sequence and protein database accessions are listed. MaizeGDB also records gene model identifiers, FPC contig numbers and ortholog identifiers in rice and <i>Arabidopsis</i> against many of these loci; those are on the locus record rather than here, because they are not accessions.</p>
+  </section>
+  )
+
+  <section class="mgdb-hub-related" id="bva-resources" aria-labelledby="bva-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="bva-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/bin_viewer">
+          <strong>Bin Viewer</strong>
+          <span>Genetic bin boundaries, and everything placed within each one</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>The loci themselves, with every identifier recorded against them</span>
+        </a>
+        <a href="/data_center/map">
+          <strong>Map Data Hub</strong>
+          <span>The maps these bins are defined on</span>
+        </a>
+        <a href="/compare_maps">
+          <strong>Compare maps</strong>
+          <span>Two or three maps of one chromosome, and the loci they share</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)
