@@ -1,0 +1,361 @@
+/* Reading a Stock Center seed packet (/stock_decryption) — MaizeGDB modern
+ * design system.
+ *
+ * The ground, the white section cards, their coloured top edges, the shared
+ * table and note, and the green Related resources wash come from
+ * css/mgdb-hub.css and css/mgdb-modern.css, which load first. Only what is
+ * specific to this page lives here: the packet emblem, the annotated photograph
+ * and its four clickable regions, the key beside it, the enlarged crops, and
+ * the lettered sub-parts.
+ *
+ * This replaces css/stock_decryption.css, which is still on the server and
+ * still loaded by the legacy page. Nothing from it is carried over — it was a
+ * float, two colours of link that both resolved to blue, and a bare
+ * `img { border: 0 }`, which on a modern page would have reached the megamenu
+ * and the hero as well as the packet.
+ */
+
+.mgdb-modern .mgdb-packet-page { padding-bottom: clamp(3rem, 6vw, 5.5rem); }
+
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
+
+.mgdb-packet-page .sd-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-packet-page .sd-emblem svg {
+  width: 5.5rem;
+  height: 5.5rem;
+}
+
+.mgdb-packet-page .sd-emblem-meta {
+  margin-top: 0.15rem;
+  color: var(--mgdb-green-dark);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+/* ── Sticky section tabs ─────────────────────────────────────────────────── */
+
+.mgdb-packet-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.mgdb-packet-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
+
+.mgdb-packet-page .mgdb-section-tabs a.is-current,
+.mgdb-packet-page .mgdb-section-tabs a[aria-current="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+/* Four tabs, scrolling rather than wrapping, so the bar is exactly one row at
+   every width and one scroll offset is right everywhere. Same answer as
+   /handyref, /coordinateDef, /podcast, /past and /controlled_pollination. */
+.mgdb-packet-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-5);
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* The shell reads this from --mgdb-tab-offset, default 65px: the 57px one-row
+   bar plus 8px of air. Measured on the built page at 1280, 900 and 375. */
+.mgdb-hub-page.mgdb-packet-page { --mgdb-tab-offset: 65px; }
+
+.mgdb-packet-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+/* ── Prose ───────────────────────────────────────────────────────────────── */
+
+.mgdb-packet-page .sd-prose { max-width: 52rem; }
+
+.mgdb-packet-page .sd-prose p {
+  margin: 0 0 1rem;
+  color: var(--mgdb-ink);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.mgdb-packet-page .sd-prose p:last-child { margin-bottom: 0; }
+
+.mgdb-packet-page .sd-lead {
+  max-width: 62rem;
+  margin: 0 0 var(--mgdb-space-4);
+  color: var(--mgdb-ink);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Handwriting transcribed. Mono, because case carries meaning here -- A/a is a
+   heterozygote and A alone is not -- and a proportional face makes 20k and l317
+   harder to read back against the photograph. */
+.mgdb-packet-page .sd-prose code,
+.mgdb-packet-page .sd-key-list code,
+.mgdb-packet-page .sd-notation-table code {
+  padding: 0.05rem 0.32rem;
+  border: 1px solid var(--hub-line);
+  border-radius: 4px;
+  background: var(--hub-ground, #f4f7fb);
+  font-family: var(--mgdb-font-mono);
+  font-size: 0.86em;
+  white-space: nowrap;
+}
+
+/* ── The packet and its key ──────────────────────────────────────────────── */
+
+.mgdb-packet-page .sd-packet-layout {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: var(--mgdb-space-5);
+}
+
+.mgdb-packet-page .sd-packet {
+  width: 402px;
+  max-width: 100%;
+  margin: 0;
+  padding: 0.85rem;
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: #ffffff;
+}
+
+/* The positioning context the four regions are placed in. It has to hug the
+   image exactly, so the percentages below land where they are meant to: any
+   padding or border here and every region drifts. */
+.mgdb-packet-page .sd-packet-media {
+  position: relative;
+  display: block;
+  line-height: 0;
+}
+
+/* The legacy page drew this 402x661 photograph at width=100 height=165 -- a
+   quarter-size thumbnail of the one thing the page is teaching you to read.
+   Full size, and no larger: it is a photograph of handwriting and scaling it up
+   only blurs it. */
+.mgdb-packet-page .sd-packet-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--hub-line);
+  border-radius: 4px;
+}
+
+/* Four regions, placed as percentages of the image rather than as an image map.
+ * A map's coords are absolute pixels and do not scale, so it would be wrong at
+ * every width but 402. These track the photograph however wide it is drawn.
+ *
+ * The photograph already carries a large printed A, B, C and D inside each
+ * region, so the overlay carries no visible letter of its own -- only the
+ * outline that says it can be pressed, and a name for a screen reader. */
+.mgdb-packet-page .sd-region {
+  position: absolute;
+  border: 2px dashed rgba(35, 92, 55, .55);
+  border-radius: 6px;
+  background: transparent;
+  transition: background .15s ease, border-color .15s ease;
+}
+
+.mgdb-packet-page .sd-region:hover,
+.mgdb-packet-page .sd-region:focus-visible {
+  border-style: solid;
+  border-color: var(--mgdb-gold);
+  background: rgba(217, 154, 11, .18);
+}
+
+.mgdb-packet-page .sd-region:focus-visible {
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: 2px;
+}
+
+/* Read off the photograph and then checked against it on the built page: the
+   first pass clipped the closing bracket of TB-3La-2S(6270) and the last 1 of
+   96-750-11, because a box drawn to where the ink looks like it ends is a
+   little short of where it does. */
+.mgdb-packet-page .sd-region-a { left: 4.5%; top: 2%;    width: 83%; height: 17.5%; }
+.mgdb-packet-page .sd-region-b { left: 4%;   top: 26.5%; width: 81%; height: 21.5%; }
+.mgdb-packet-page .sd-region-c { left: 4%;   top: 52.5%; width: 73%; height: 20%; }
+.mgdb-packet-page .sd-region-d { left: 3%;   top: 84%;   width: 44%; height: 9.5%; }
+
+.mgdb-packet-page .sd-packet figcaption {
+  margin-top: 0.7rem;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.45;
+}
+
+.mgdb-packet-page .sd-key h3 {
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-burgundy);
+  font-size: 1.05rem;
+}
+
+.mgdb-packet-page .sd-key-list { margin: 0; display: grid; gap: var(--mgdb-space-3); }
+
+.mgdb-packet-page .sd-key-list > div {
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface, #ffffff);
+}
+
+.mgdb-packet-page .sd-key-list dt {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.35rem;
+  color: var(--mgdb-burgundy);
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+
+.mgdb-packet-page .sd-key-list dd {
+  margin: 0;
+  color: var(--mgdb-ink);
+  font-size: 0.94rem;
+  line-height: 1.55;
+}
+
+/* The letter, as it is printed on the packet. */
+.mgdb-packet-page .sd-key-tag {
+  flex: none;
+  display: inline-flex;
+  width: 1.6rem;
+  height: 1.6rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  font-family: var(--mgdb-font-mono);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+@media (max-width: 860px) {
+  /* The photograph is 402px and the key needs a readable measure; below this
+     the two cannot both have one, so the packet goes above its key. */
+  .mgdb-packet-page .sd-packet-layout { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-packet-page .sd-packet { width: min(402px, 100%); }
+}
+
+/* ── The lettered parts ──────────────────────────────────────────────────── */
+
+.mgdb-packet-page .sd-part { scroll-margin-top: var(--mgdb-tab-offset, 65px); }
+.mgdb-packet-page .sd-part + .sd-part {
+  margin-top: var(--mgdb-space-5);
+  padding-top: var(--mgdb-space-5);
+  border-top: 1px solid var(--hub-line);
+}
+
+.mgdb-packet-page .sd-part h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-burgundy);
+  font-size: 1.08rem;
+  line-height: 1.3;
+}
+
+/* Arriving from a region on the packet or from the key, the part that was asked
+   for says so for a moment rather than leaving the reader to count headings. */
+.mgdb-packet-page .sd-part:target h3 .sd-key-tag {
+  background: var(--mgdb-gold);
+  color: #1c2b21;
+}
+
+.mgdb-packet-page .sd-part:target {
+  padding-left: 0.85rem;
+  border-left: 4px solid var(--mgdb-gold);
+}
+
+/* ── The enlarged crops ──────────────────────────────────────────────────── */
+
+.mgdb-packet-page .sd-crops {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-packet-page .sd-crop {
+  display: block;
+  padding: 0.7rem;
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface, #ffffff);
+  color: var(--mgdb-ink) !important;
+  text-decoration: none;
+  transition: border-color .15s ease, background .15s ease;
+}
+
+.mgdb-packet-page .sd-crop:hover {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-packet-page .sd-crop:focus-visible {
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: 2px;
+}
+
+/* These are crops of the same photograph, at their own pixel sizes: 136x67 and
+   307x69. Left alone rather than stretched to a common width, because the
+   second is a longer piece of writing and matching them would misrepresent how
+   large each is on the packet. */
+.mgdb-packet-page .sd-crop img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--hub-line);
+  border-radius: 4px;
+}
+
+.mgdb-packet-page .sd-crop > span {
+  display: block;
+  margin-top: 0.55rem;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-packet-page .sd-crop > span strong {
+  display: block;
+  color: var(--mgdb-burgundy);
+  font-family: var(--mgdb-font-mono);
+  font-size: 0.88rem;
+}
+
+/* ── Notation table ──────────────────────────────────────────────────────── */
+
+.mgdb-packet-page .sd-notation-table { font-size: 0.94rem; }
+.mgdb-packet-page .sd-notation-table th[scope="row"] { font-weight: 600; vertical-align: top; }
+.mgdb-packet-page .sd-notation-table td { vertical-align: top; line-height: 1.5; }
+.mgdb-packet-page .sd-notation-table td:last-child { text-align: center; font-weight: 700; }
+
+@media (max-width: 700px) {
+  .mgdb-packet-page .sd-notation-table { min-width: 34rem; }
+}

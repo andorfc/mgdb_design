@@ -1901,3 +1901,26 @@ src/include/videos_lib.php                       include/videos_lib.php
 src/controllers/controlled_pollination.php       controllers/controlled_pollination.php
 src/templates/static/mgdb_controlled_pollination.bau templates/static/mgdb_controlled_pollination.bau
 src/css/mgdb-controlled-pollination.css          css/mgdb-controlled-pollination.css
+
+# /stock_decryption -- how to read the handwriting on a Stock Center seed
+# packet, on the design system, 2026-09-06. A top-level
+# controllers/stock_decryption.php takes the route (controller.php finds it
+# before redirect.php, so no legacy chrome leaks in). There is no second route.
+# The legacy controller, its two templates and css/stock_decryption.css are
+# untouched and archived in legacy/stock-decryption/; rollback is deleting the
+# top-level controller.
+#
+# The point of the rebuild: images/SeedPacket.jpg is 402x661 and the legacy page
+# drew it at width=100 height=165, a quarter-size thumbnail of the one thing the
+# page exists to teach you to read. It is now full size with its four regions as
+# links into the paragraph explaining each -- placed as percentages, not an
+# image map, so they track the photograph at any width. The symbols also become
+# a table, since prose is a poor place to look one up twice.
+#
+# No data: the 222B stock record carries no pedigree text and no genotype
+# string, so nothing on this page could be read from it. The two record links
+# the legacy page had were checked and are right.
+src/controllers/stock_decryption.php             controllers/stock_decryption.php
+src/templates/static/mgdb_stock_decryption.bau   templates/static/mgdb_stock_decryption.bau
+src/css/mgdb-stock-decryption.css                css/mgdb-stock-decryption.css
+src/js/mgdb-stock-decryption.js                  js/mgdb-stock-decryption.js
