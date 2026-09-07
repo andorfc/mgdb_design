@@ -48,15 +48,21 @@ logMessage('Starting videos_modern.php');
 $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT']
   ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';
 
-$catalog_file = $doc_root . '/data/community_videos.json';
-$catalog = @json_decode(@file_get_contents($catalog_file), true);
+/* The catalog, and the pieces every page that shows one of these clips needs:
+   how it is read, how a group is picked, how a duration is spoken and printed,
+   and the poster-and-play-button markup js/mgdb-videos.js binds to. Shared with
+   /controlled_pollination, which places the six pollination clips inline at
+   their own numbered steps -- the two pages must not be able to build a Vimeo
+   player two different ways. See include/videos_lib.php. */
+include_once('./include/videos_lib.php');
+
+$videos = mgdbVideosCatalog($doc_root);
 /* No catalog, no page. Returning without publishing hands the request back to
    whichever route reached this file, which still has the legacy page. */
-if (!is_array($catalog) || empty($catalog['videos'])) {
-    logMessage('videos_modern.php: cannot read ' . $catalog_file);
+if (!$videos) {
+    logMessage('videos_modern.php: cannot read ' . $doc_root . '/data/community_videos.json');
     return false;
 }
-$videos = $catalog['videos'];
 
 $bauplan = new Bauplan('Community videos | MaizeGDB');
 $bauplan->modern();
@@ -110,50 +116,6 @@ return true;
 // HELPER FUNCTIONS
 /////////////////////////////////////////////////////////////////////////////////////////
 
-function mgdbVideosEsc($value) {
-    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
-}
-
-function mgdbVideosGroup($videos, $group) {
-    $out = array();
-    foreach ($videos as $video) {
-        if (isset($video['group']) && $video['group'] === $group) { $out[] = $video; }
-    }
-    return $out;
-}
-
-function mgdbVideosTotal($videos) {
-    $total = 0;
-    foreach ($videos as $video) { $total += (int) $video['duration']; }
-    return $total;
-}
-
-/* "1 hour 9 minutes", "3 minutes 22 seconds", "7 seconds" -- spelled out for
-   the visually hidden label a screen reader announces, so the play button does
-   not read "4168". */
-function mgdbVideosSpokenDuration($seconds) {
-    $seconds = (int) $seconds;
-    $parts = array();
-    $hours = intdiv($seconds, 3600);
-    $minutes = intdiv($seconds % 3600, 60);
-    $rest = $seconds % 60;
-    if ($hours) { $parts[] = $hours . ' hour' . ($hours === 1 ? '' : 's'); }
-    if ($minutes) { $parts[] = $minutes . ' minute' . ($minutes === 1 ? '' : 's'); }
-    if ($rest && !$hours) { $parts[] = $rest . ' second' . ($rest === 1 ? '' : 's'); }
-    return implode(' ', $parts);
-}
-
-/* "1:09:28", "3:22", "0:07" -- the form a video player uses, for the badge. */
-function mgdbVideosRuntime($seconds) {
-    $seconds = (int) $seconds;
-    $hours = intdiv($seconds, 3600);
-    $minutes = intdiv($seconds % 3600, 60);
-    $rest = $seconds % 60;
-    return $hours
-      ? sprintf('%d:%02d:%02d', $hours, $minutes, $rest)
-      : sprintf('%d:%02d', $minutes, $rest);
-}
-
 /* One card: a poster with a play button over it, the title, what the video
  * shows, and a way out to Vimeo.
  *
@@ -168,29 +130,12 @@ function mgdbVideosCards($videos) {
     foreach ($videos as $video) {
         $title = mgdbVideosEsc($video['title']);
         $badge = mgdbVideosRuntime($video['duration']);
-        $spoken = mgdbVideosSpokenDuration($video['duration']);
-        $ratio = ((float) $video['height']) > 0
-          ? rtrim(rtrim(sprintf('%.4f', $video['width'] / $video['height']), '0'), '.')
-          : '1.7778';
+        $ratio = mgdbVideosRatio($video);
         $step = isset($video['step']) && $video['step'] !== ''
           ? '<span class="videos-step">Step ' . mgdbVideosEsc($video['step']) . '</span>' : '';
 
         $html .= '<article class="videos-card" style="--videos-ratio: ' . $ratio . ';">'
-              . '<div class="videos-frame">'
-              . '<button class="videos-play" type="button"'
-              . ' data-video-id="' . mgdbVideosEsc($video['video_id']) . '"'
-              . ' data-video-title="' . $title . '">'
-              . '<img src="/images/videos/' . mgdbVideosEsc($video['poster']) . '" alt=""'
-              . ' width="' . (int) $video['width'] . '" height="' . (int) $video['height'] . '"'
-              . ' loading="lazy" decoding="async">'
-              . '<span class="videos-play-mark" aria-hidden="true">'
-              . '<svg viewBox="0 0 64 64" focusable="false">'
-              . '<circle class="videos-play-disc" cx="32" cy="32" r="30" />'
-              . '<path class="videos-play-tri" d="M26 20 L46 32 L26 44 Z" /></svg></span>'
-              . '<span class="videos-duration" aria-hidden="true">' . $badge . '</span>'
-              . '<span class="mgdb-visually-hidden">Play ' . $title . ', ' . $spoken . '</span>'
-              . '</button>'
-              . '</div>'
+              . mgdbVideosPoster($video)
               . '<div class="videos-body">'
               . $step
               . '<h3>' . $title . '</h3>';

@@ -1,0 +1,253 @@
+/* Controlled pollination of maize (/controlled_pollination) — MaizeGDB modern
+ * design system.
+ *
+ * The ground, the white section cards, their coloured top edges, the shared
+ * table and note, and the green Related resources wash come from
+ * css/mgdb-hub.css and css/mgdb-modern.css. The poster, the play mark and the
+ * duration badge come from css/mgdb-videos.css, whose .videos-* rules are
+ * scoped on .mgdb-modern and so already apply here — this sheet does not
+ * restate any of them, because a second copy of the play button is one more
+ * place for it to drift from the one on /community/videos.
+ *
+ * What lives here: the ear-shoot emblem, the reading measure for a page that is
+ * almost entirely prose, the numbered sub-steps, the inline clip strip, and the
+ * supplies table.
+ */
+
+.mgdb-modern .mgdb-pollination-page { padding-bottom: clamp(3rem, 6vw, 5.5rem); }
+
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
+
+.mgdb-pollination-page .cp-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-pollination-page .cp-emblem svg {
+  width: 5.5rem;
+  height: 5.5rem;
+}
+
+.mgdb-pollination-page .cp-emblem-meta {
+  margin-top: 0.15rem;
+  color: var(--mgdb-green-dark);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+/* ── Sticky section tabs ─────────────────────────────────────────────────── */
+
+.mgdb-pollination-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.mgdb-pollination-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
+
+.mgdb-pollination-page .mgdb-section-tabs a.is-current,
+.mgdb-pollination-page .mgdb-section-tabs a[aria-current="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+/* Nine tabs — the protocol's own seven numbered steps plus Overview and Related
+ * resources — so the bar scrolls rather than wraps. It is then exactly one row
+ * at every width and a single scroll offset is right everywhere, which the
+ * shell's 1170px ladder could not be for a bar this long. Same answer as
+ * /handyref, /coordinateDef, /podcast and /past. */
+.mgdb-pollination-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-5);
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* The shell sets this from --mgdb-tab-offset, default 65px, which is the 57px
+   one-row bar plus 8px of air. Measured on the built page at 1280, 900 and 375;
+   stated here so the value this page depends on is written down beside the bar
+   that produces it. */
+.mgdb-hub-page.mgdb-pollination-page { --mgdb-tab-offset: 65px; }
+
+.mgdb-pollination-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+/* ── Prose ───────────────────────────────────────────────────────────────── */
+
+/* This page is read start to finish in the order the work happens, not scanned,
+   so the measure is set for running text. */
+.mgdb-pollination-page .cp-prose { max-width: 62rem; }
+
+.mgdb-pollination-page .cp-prose p {
+  margin: 0 0 1.05rem;
+  color: var(--mgdb-ink);
+  font-size: 1rem;
+  line-height: 1.68;
+}
+
+.mgdb-pollination-page .cp-prose p:last-child { margin-bottom: 0; }
+
+.mgdb-pollination-page .cp-lead {
+  max-width: 62rem;
+  margin: 0 0 var(--mgdb-space-4);
+  color: var(--mgdb-ink);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Where the text comes from, set apart from the text itself. */
+.mgdb-pollination-page .cp-source {
+  max-width: 62rem;
+  margin-top: var(--mgdb-space-5);
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--hub-line);
+  border-left: 4px solid var(--mgdb-green-dark);
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-pollination-page .cp-source h3 {
+  margin: 0 0 0.6rem;
+  color: var(--mgdb-burgundy);
+  font-size: 1rem;
+}
+
+.mgdb-pollination-page .cp-source p {
+  margin: 0 0 0.7rem;
+  font-size: 0.96rem;
+  line-height: 1.6;
+}
+
+.mgdb-pollination-page .cp-source p:last-child { margin-bottom: 0; }
+
+.mgdb-pollination-page .cp-attribution {
+  max-width: 62rem;
+  margin: var(--mgdb-space-4) 0 0;
+  padding-left: 0.85rem;
+  border-left: 3px solid var(--mgdb-gold);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.55;
+}
+
+/* ── Numbered sub-steps ──────────────────────────────────────────────────── */
+
+/* 4.1, 4.2, 4.3 and 5.1, 5.2, 5.3 are steps of their parent, not sections of
+   their own: they get a rule and air rather than a card, so the section card
+   stays one thing. */
+.mgdb-pollination-page .cp-step { margin-top: var(--mgdb-space-5); }
+.mgdb-pollination-page .cp-step:first-of-type { margin-top: 0; }
+
+.mgdb-pollination-page .cp-step + .cp-step {
+  padding-top: var(--mgdb-space-5);
+  border-top: 1px solid var(--hub-line);
+}
+
+.mgdb-pollination-page .cp-step h3 {
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-burgundy);
+  font-size: 1.08rem;
+  line-height: 1.3;
+}
+
+/* ── Inline clips ────────────────────────────────────────────────────────── */
+
+/* A strip under the step the clip illustrates. A row rather than a column
+   because step 4.2 has two clips and they are two views of one operation; a row
+   reads as that, and wraps to a column on a phone on its own. */
+.mgdb-pollination-page .cp-clips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4);
+  max-width: 62rem;
+  margin-top: var(--mgdb-space-5);
+}
+
+/* These clips are portrait 480x640. At the page's full measure a portrait video
+   would be taller than the prose it illustrates, so the figure is capped and
+   the poster keeps the video's own ratio through --videos-ratio. */
+.mgdb-pollination-page .cp-clip {
+  flex: 0 1 15rem;
+  max-width: 15rem;
+  margin: 0;
+  padding: 0.7rem;
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface, #ffffff);
+}
+
+.mgdb-pollination-page .cp-clip figcaption {
+  margin-top: 0.6rem;
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.45;
+}
+
+.mgdb-pollination-page .cp-clip figcaption strong {
+  display: block;
+  color: var(--mgdb-burgundy);
+  font-size: 0.92rem;
+}
+
+.mgdb-pollination-page .cp-clip figcaption span {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--mgdb-muted);
+}
+
+@media (max-width: 480px) {
+  /* One per row rather than two half-width posters that are too small to see
+     what a pair of hands is doing. */
+  .mgdb-pollination-page .cp-clip { flex: 1 1 100%; max-width: 100%; }
+}
+
+/* ── Supplies table ──────────────────────────────────────────────────────── */
+
+.mgdb-pollination-page .cp-supplies-table { font-size: 0.94rem; }
+
+.mgdb-pollination-page .cp-supplies-table th[scope="row"] {
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+.mgdb-pollination-page .cp-supplies-table td { vertical-align: top; line-height: 1.5; }
+
+/* Three columns of prose do not fit a phone, and the page body must not scroll
+   sideways, so the table scrolls inside the shell's own box. */
+@media (max-width: 860px) {
+  .mgdb-pollination-page .cp-supplies-table { min-width: 44rem; }
+}
+
+/* ── References ──────────────────────────────────────────────────────────── */
+
+/* Six books and book chapters, none with a DOI, so a list rather than the
+   shared reference cards — a card with no DOI, no abstract and no link is an
+   empty frame. */
+.mgdb-pollination-page .cp-reflist {
+  max-width: 62rem;
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--mgdb-ink);
+  font-size: 0.96rem;
+  line-height: 1.6;
+}
+
+.mgdb-pollination-page .cp-reflist li + li { margin-top: var(--mgdb-space-3); }

@@ -1860,3 +1860,29 @@ src/controllers/past.php                         controllers/past.php
 src/templates/static/mgdb_past.bau               templates/static/mgdb_past.bau
 src/css/mgdb-past.css                            css/mgdb-past.css
 src/js/mgdb-past.js                              js/mgdb-past.js
+
+# /controlled_pollination -- the field protocol for making a controlled cross,
+# on the design system, 2026-09-06. A top-level controllers/controlled_pollination.php
+# takes the route (controller.php finds it before redirect.php, so no legacy
+# chrome leaks in). There is no second route. The legacy controller and template
+# are untouched and archived in legacy/controlled-pollination/; rollback is
+# deleting the top-level controller.
+#
+# The five raw Vimeo iframes are gone. The six pollination clips come from
+# data/community_videos.json and each is placed at the numbered step its own
+# catalog entry declares -- which fixes two placement bugs at once: the legacy
+# page embedded the 4.1 pollen-collection clip under 4.2, and never embedded the
+# second 4.2 clip at all. Nothing is fetched from Vimeo until a reader presses
+# play, as on /community/videos.
+#
+# include/videos_lib.php is new and shared: the catalog read, the group and step
+# filters, the duration helpers and the poster-and-play-button markup that
+# js/mgdb-videos.js binds to. controllers/community/videos_modern.php now uses
+# it instead of its own copies -- verified byte-identical output before and
+# after. Both pages also load css/mgdb-videos.css and js/mgdb-videos.js, whose
+# .videos-* rules are scoped on .mgdb-modern rather than .mgdb-videos-page and
+# so already work anywhere.
+src/include/videos_lib.php                       include/videos_lib.php
+src/controllers/controlled_pollination.php       controllers/controlled_pollination.php
+src/templates/static/mgdb_controlled_pollination.bau templates/static/mgdb_controlled_pollination.bau
+src/css/mgdb-controlled-pollination.css          css/mgdb-controlled-pollination.css
