@@ -18,6 +18,7 @@ error, which makes the line number useless -- hence doing it mechanically here.
 """
 import html
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -34,8 +35,26 @@ def esc(text):
     return bau(html.escape(text, quote=True))
 
 
+# MaizeGDB's own tools live on subdomains -- wgs, feta, snptools, jbrowse,
+# qteller, download and a dozen more -- so "starts with http" is not the same
+# question as "leaves MaizeGDB". Testing the scheme marked 26 of this page's 32
+# absolute links as off-site and opened each in a new tab, which is neither
+# true nor what a reader wants from a site's own directory.
+INTERNAL_HOST = 'maizegdb.org'
+
+
 def is_external(url):
-    return url.startswith('http')
+    """True only for a link that really leaves MaizeGDB.
+
+    A site-relative path is internal by definition. An absolute one is internal
+    when its host is maizegdb.org or any subdomain of it -- matched on a label
+    boundary, so a lookalike host like `notmaizegdb.org` is still external.
+    """
+    m = re.match(r'https?://([^/?#]+)', url, re.I)
+    if not m:
+        return False
+    host = m.group(1).lower().split('@')[-1].split(':')[0].rstrip('.')
+    return not (host == INTERNAL_HOST or host.endswith('.' + INTERNAL_HOST))
 
 
 def item(name, url, desc, indent='        '):

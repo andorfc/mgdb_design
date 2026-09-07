@@ -526,7 +526,7 @@ function snpv_render_query_actions($found, $export_base, $share_url) {
       . '<dt>VCF</dt><dd>VCFv4.2. <strong>REF is the major allele, not the reference base at that '
       . 'position</strong> &mdash; SNPversity reports observed alleles and has no reference '
       . 'sequence behind it, and the file says so in its own header. For a VCF whose REF is the '
-      . 'B73 base, use <a href="https://wgs.maizegdb.org/" target="_blank" rel="noopener">SNPversity '
+      . 'B73 base, use <a href="https://wgs.maizegdb.org/">SNPversity '
       . '2.1</a> on B73 v5.</dd>'
       . '</dl>';
   $h .= '<p class="mgdb-small mgdb-muted">All four carry every page of the result, not the page on '

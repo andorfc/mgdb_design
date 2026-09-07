@@ -6720,6 +6720,18 @@ deploy/deploy.sh src/templates/about/sitemap-content.bau
 The generator warns when two entries in the same section point at the same URL.
 Across sections is fine — BLAST is both a starting point and a research tool.
 
+### A MaizeGDB subdomain is not an external link
+
+`is_external()` tested the *scheme* — `url.startswith('http')` — and MaizeGDB's
+own tools live on subdomains: `wgs`, `feta`, `snptools`, `jbrowse`, `qteller`,
+`download`, `pangenome-viewer` and a dozen more. So **26 of this page's 32
+absolute links were marked as leaving the site**, each with a ↗ and a
+`target="_blank"`, on the one page whose job is to be the site's own directory.
+It now tests the host: `maizegdb.org` and any subdomain of it are internal,
+matched on a label boundary so `notmaizegdb.org` is still external. Six links
+carry the marker now, and all six really are off-site — readthedocs, UC Davis,
+AgBioData and maizegenetics.org.
+
 **Edit the content model, not the `.bau`.** Editing the generated file directly
 works right up until the next generator run, which silently reverts it: two
 Archives entries — *IBM map scores* and *IBM 302 list* — were added to
