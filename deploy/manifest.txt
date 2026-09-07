@@ -794,6 +794,21 @@ src/tools/alphafill_models.py                             tools/alphafill_models
 src/tools/alphafill_ligand_extract.py                     tools/alphafill_ligand_extract.py
 
 
+# Associated genes -- /associated_genes. The correspondence between MaizeGDB
+# gene names and B73 RefGen_v5/v4/v3 gene models, in three lists. The legacy
+# page was a download endpoint that sent TSV as text/html with "<i>unknown</i>"
+# in the data, plus a `style=table` mode that rendered 38,758 rows into a 22.8 MB
+# document. controller.php checks ./controllers/<CONTROLLER>.php before falling
+# through to redirect.php, so src/controllers/associated_genes.php takes the
+# route from controllers/tools/associated_genes.php without touching it;
+# rollback is deleting it. Originals archived in legacy/associated-genes/.
+src/controllers/associated_genes.php                      controllers/associated_genes.php
+src/include/associated_genes_lib.php                      include/associated_genes_lib.php
+src/search/associated_genes/associated_genes_api.php      search/associated_genes/associated_genes_api.php
+src/templates/static/mgdb_associated_genes.bau            templates/static/mgdb_associated_genes.bau
+src/css/mgdb-associated-genes.css                         css/mgdb-associated-genes.css
+src/js/mgdb-associated-genes.js                           js/mgdb-associated-genes.js
+
 # Compare maps -- /compare_maps. Two or three genetic maps and the loci placed
 # on all of them. controller.php checks ./controllers/<CONTROLLER>.php before
 # falling through to redirect.php, so src/controllers/compare_maps.php takes the

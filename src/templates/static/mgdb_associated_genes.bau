@@ -1,0 +1,136 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-associated-genes
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https\://maizegdb.org/associated_genes">
+<meta property="og:title" content="Gene model associations | MaizeGDB">
+<meta property="og:description" content="Which B73 RefGen_v5, v4 and v3 gene models correspond to each named maize gene. Three curated lists, searchable and downloadable.">
+
+<a class="mgdb-skip-link" href="#ag-main">Skip to main content</a>
+<main class="mgdb-page mgdb-associated-genes-page" id="ag-main" data-type="$(initial_type)">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Tools</a><span aria-hidden="true">&rsaquo;</span><a href="/gene_center/gene">Genes</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Gene model associations</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="ag-title">
+    <div class="mgdb-hero-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="Gene identifiers linked across assemblies">
+        <rect x="14" y="20" width="26" height="12" rx="6" fill="none" stroke="#235c37" stroke-width="4"/>
+        <rect x="56" y="20" width="26" height="12" rx="6" fill="none" stroke="#235c37" stroke-width="4"/>
+        <rect x="14" y="44" width="26" height="12" rx="6" fill="none" stroke="#235c37" stroke-width="4"/>
+        <rect x="56" y="44" width="26" height="12" rx="6" fill="none" stroke="#235c37" stroke-width="4"/>
+        <rect x="35" y="68" width="26" height="12" rx="6" fill="none" stroke="#235c37" stroke-width="4"/>
+        <line x1="40" y1="26" x2="56" y2="26" stroke="#d99a0b" stroke-width="3"/>
+        <line x1="40" y1="50" x2="56" y2="50" stroke="#d99a0b" stroke-width="3"/>
+        <line x1="27" y1="32" x2="27" y2="44" stroke="#d99a0b" stroke-width="3"/>
+        <line x1="69" y1="32" x2="69" y2="44" stroke="#d99a0b" stroke-width="3"/>
+        <line x1="48" y1="56" x2="48" y2="68" stroke="#d99a0b" stroke-width="3"/>
+      </svg>
+      <strong>Gene model<br />associations</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="ag-title">Which gene model is this gene?</h1>
+      <p class="mgdb-hero-description">A maize gene has a name, and each assembly gives it a different gene model identifier. These lists are the correspondence between them: a named gene, and the B73 RefGen_v5, v4 and v3 models it is the same gene as. Search any one of the four and the others come back with it.</p>
+      <p class="mgdb-hero-actions">
+        <a class="mgdb-button mgdb-button-quiet" href="/gene_center/gene">Gene Data Hub <span aria-hidden="true">&rarr;</span></a>
+        <a class="mgdb-button mgdb-button-quiet" href="/data_center/locus">Gene and Locus Data Hub <span aria-hidden="true">&rarr;</span></a>
+      </p>
+    </div>
+  </section>
+
+  <section class="mgdb-panel" id="ag-sets" aria-labelledby="ag-sets-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="ag-sets-title">The three lists</h2>
+        <p>Each is available whole as a tab-separated file, or browsable below.</p>
+      </div>
+    </div>
+    <div class="ag-sets">$(dataset_cards)</div>
+  </section>
+
+  <section class="mgdb-panel" id="ag-browse" aria-labelledby="ag-browse-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="ag-browse-title">Browse</h2>
+      </div>
+      <a class="mgdb-button mgdb-button-secondary" id="ag-export" href="#" download>Download this list</a>
+    </div>
+
+    <form class="ag-controls" id="ag-form" role="search">
+      <div class="mgdb-hub-field">
+        <label class="mgdb-label" for="ag-q">Gene name or model identifier</label>
+        <input class="mgdb-input" id="ag-q" type="search" autocomplete="off" placeholder="e.g. bz1, Zm00001eb000010, GRMZM2G060082" />
+      </div>
+      <div class="mgdb-hub-field">
+        <label class="mgdb-label" for="ag-type">List</label>
+        <select class="mgdb-select" id="ag-type">
+          <option value="all">All associations</option>
+          <option value="maizegdb">MaizeGDB gene models</option>
+          <option value="classical">Classical genes</option>
+        </select>
+      </div>
+    </form>
+
+    <div class="mgdb-loading" id="ag-loading"><span class="mgdb-spinner" aria-hidden="true"></span><span>Loading&hellip;</span></div>
+
+    <div class="mgdb-message mgdb-message-error" id="ag-error" role="alert" hidden>
+      <div>
+        <strong>The list could not be loaded.</strong>
+        <span>Reload to try again, or report it if it keeps happening.</span>
+        <button class="mgdb-button mgdb-button-secondary" id="ag-retry" type="button">Retry</button>
+      </div>
+    </div>
+
+    <p class="ag-count" id="ag-count" role="status"></p>
+    <div class="mgdb-table-scroll" id="ag-table-wrap" hidden>
+      <table class="mgdb-table mgdb-table-zebra" id="ag-table">
+        <thead id="ag-thead"></thead>
+        <tbody id="ag-tbody"></tbody>
+      </table>
+    </div>
+    <div class="ag-pager" id="ag-pager" hidden>
+      <button class="mgdb-button mgdb-button-quiet" type="button" id="ag-prev">&larr; Previous</button>
+      <span id="ag-page-label"></span>
+      <button class="mgdb-button mgdb-button-quiet" type="button" id="ag-next">Next &rarr;</button>
+    </div>
+  </section>
+
+  <section class="mgdb-panel" id="ag-about" aria-labelledby="ag-about-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="ag-about-title">Reading these lists</h2>
+      </div>
+    </div>
+    <div class="ag-prose">
+      <p>A blank cell means no model of that assembly version is associated with the gene &#8212; not that the gene is absent from the assembly. A gene may also appear on more than one row, once per model associated with it, which is why the row counts are larger than the number of genes.</p>
+      <p><strong>Source</strong>, on the all-associations list, names who made the association: MaizeGDB curators, a GenBank accession, Grassius, an Arabidopsis ortholog, and so on. <em>Unknown</em> means the association is recorded without one.</p>
+      <p>To look one gene up rather than browse, the <a href="/gene_center/gene">Gene Data Hub</a> resolves any of these identifiers directly and shows what else is known about the gene.</p>
+    </div>
+  </section>
+
+  <section class="mgdb-hub-related" id="ag-resources" aria-labelledby="ag-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="ag-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/gene_center/gene">
+          <strong>Gene Data Hub</strong>
+          <span>One gene at a time, with its models, its structure and its literature</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>The loci these genes are, and where they map</span>
+        </a>
+        <a href="/pan_gene_center/pan_gene">
+          <strong>Pan-gene Data Hub</strong>
+          <span>The same gene across the maize pan-genome, beyond B73</span>
+        </a>
+        <a href="https://download.maizegdb.org">
+          <strong>Downloads</strong>
+          <span>Assemblies, annotations and the bulk files behind these lists</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

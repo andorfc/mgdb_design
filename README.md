@@ -4478,6 +4478,85 @@ it Cloudflare serves a month-old copy of any file a rebuild corrects -- which it
 did, during this build, and origin and CDN disagreed for long enough to be
 confusing. `--release` overrides the stamp for a same-day rebuild.
 
+## Gene model associations
+
+`/associated_genes` came onto the design system on 2026-09-07. Carson's guess
+was right &mdash; it was a download endpoint, not a page &mdash; but it had a
+second mode nobody would guess at, and three defects in the file it published.
+
+### It was two things wearing one URL
+
+`/associated_genes` sent `Content-Disposition: attachment` and 3.2 MB of
+tab-separated text. `?style=table` instead rendered every row into a document:
+38,758 rows, **22.8 MB**, 1.7 s. Both came out of the same controller, which
+decided between them with `if ($style == 'table')` &mdash; so *anything* that
+was not exactly `table` downloaded.
+
+That rule matters, because `templates/gene_center/gene-left.bau` misspells the
+parameter. It offers each list as `style=tablee` and `style=tsve`. The `tsve`
+links downloaded, which is what they meant. The three `tablee` links downloaded
+too, which is not: their text says **table**. Here `table` and `tablee` show the
+page and `tab`, `tsv` and `tsve` download, so every existing link does what its
+text says.
+
+That template also offers each list at `&v=3`, `&v=4` and `&v=5`. **The legacy
+controller reads no `v` parameter at all** &mdash; the three links return
+byte-identical files. Nothing here reads it either; it belongs to that page's
+own retirement.
+
+### Three things wrong with the published file
+
+| | |
+|---|---|
+| **Content type** | `Content-type: text/html` on a `.txt` file of TSV |
+| **Markup in the data** | the missing-source fallback was written `<i>unknown</i>` &mdash; an HTML tag, in a tab-separated file, on **3,349 of 38,758 rows** |
+| **20 broken rows** | a stray tab inside a value split them across seven or eight fields instead of six, so anything reading by column index got the gene symbol, full name and source of those rows out of position |
+
+Several hundred cells also carried leading or trailing spaces &mdash; 563 rows
+in the all-associations list, 28 in the MaizeGDB one.
+
+**Nothing else about the data changed.** Verified by comparing every row of all
+three lists against the legacy downloads: taking each row as the sequence of
+values it actually carries, the multisets are identical &mdash; 38,758 / 23,961
+/ 429 rows, same counts, same values. The three lists also keep the order the
+legacy page published them in, so a held copy diffs cleanly.
+
+### The 22.8 MB table
+
+Rows come from `search/associated_genes/associated_genes_api.php` a page at a
+time. The bare URL is a page now &mdash; it lists the three sets with their row
+counts and a download each, and browses any of them with a search across all
+four identifier columns, which is how the table is actually used: you have one
+name and want the other three.
+
+The legacy table also wrapped **every** identifier cell in a link whether or not
+there was an identifier in it, which is where its **11,144** links to
+`/gene_center/gene/` &mdash; with nothing after the slash &mdash; came from. On
+the MaizeGDB list it was 20,632. A blank cell is not a link here.
+
+### The export must not page
+
+The first version of the export streamed in pages of 1,000. The inner query for
+the all-associations list costs about half a second, and `agRows()` runs it
+together with a `COUNT` on every call, so 38,758 rows meant 39 counts and 39
+scans: **22 seconds** for a file the legacy page produced in under one. It is
+one statement read row by row now &mdash; **0.77 s**, and unlike the legacy page
+it never holds the whole file in memory, because rows go to the client as they
+arrive.
+
+### A dead filter, not carried over
+
+The `maizegdb` branch looped its rows to "remove rows that have a v4 gene model
+but no v3 gene model". It never removed anything: it copied the row into `$r`
+and called `unset($r[$i])` on the copy, with a numeric key the row does not
+have, and tested `$r['v4_source']`, which that query does not select. It is also
+unnecessary &mdash; the `INNER JOIN` on `chado.gene_model` at
+`assembly_version = 'B73 RefGen_v3'` means every row already has a v3 model, so
+the condition matches 0 of 23,961 rows.
+
+The page was never in the site map, because there was no page to link to. It is
+now.
+
 ## Compare maps
 
 `/compare_maps` came onto the design system on 2026-09-07. It takes two genetic

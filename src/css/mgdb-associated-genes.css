@@ -1,0 +1,132 @@
+/* file: css/mgdb-associated-genes.css
+ *
+ * /associated_genes. The page it replaces had one stylesheet rule between the
+ * three of them -- `bgcolor="E8E8E8"` on alternate rows, written into every
+ * <tr> by PHP.
+ */
+
+/* ── The three lists ─────────────────────────────────────────────────────── */
+
+.mgdb-associated-genes-page .ag-sets {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-associated-genes-page .ag-set {
+  display: flex;
+  flex-direction: column;
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--hub-surface);
+}
+
+/* The list being browsed. A left edge rather than a fill, so the three cards
+   keep the same weight and only one carries a mark. */
+.mgdb-associated-genes-page .ag-set.is-current {
+  border-color: var(--mgdb-green-dark);
+  box-shadow: inset 3px 0 0 var(--mgdb-green-dark);
+}
+
+.mgdb-associated-genes-page .ag-set h3 {
+  margin: 0 0 var(--mgdb-space-2);
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-associated-genes-page .ag-set-count {
+  margin: 0 0 var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-associated-genes-page .ag-set-count strong {
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-lg);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The blurb takes the slack so the action rows of all three cards sit on one
+   line, whatever length the descriptions are. */
+.mgdb-associated-genes-page .ag-set-blurb {
+  flex: 1 1 auto;
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-text);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.5;
+}
+
+.mgdb-associated-genes-page .ag-set-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin: 0;
+}
+
+/* ── Browse ──────────────────────────────────────────────────────────────── */
+
+.mgdb-associated-genes-page .ag-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 18rem);
+  gap: var(--mgdb-space-4);
+  align-items: end;
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-associated-genes-page .ag-count {
+  margin: 0 0 var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* Identifiers are compared character by character down the column, so they are
+   set in the same face the rest of the site uses for sequence and accessions. */
+.mgdb-associated-genes-page #ag-table td.ag-id {
+  font-family: var(--mgdb-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: var(--mgdb-text-sm);
+  white-space: nowrap;
+}
+
+.mgdb-associated-genes-page #ag-table td .mgdb-muted {
+  font-family: inherit;
+}
+
+/* ── Paging ──────────────────────────────────────────────────────────────── */
+
+.mgdb-associated-genes-page .ag-pager {
+  display: flex;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-associated-genes-page .ag-pager span {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Prose ───────────────────────────────────────────────────────────────── */
+
+.mgdb-associated-genes-page .ag-prose {
+  max-width: 68ch;
+}
+
+.mgdb-associated-genes-page .ag-prose p {
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-text);
+  line-height: 1.65;
+}
+
+.mgdb-associated-genes-page .ag-prose p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Narrow screens ──────────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .mgdb-associated-genes-page .ag-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

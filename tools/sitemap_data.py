@@ -70,9 +70,13 @@ SECTIONS = [
     # answered "You must provide two map ids", and the modernized page carries
     # a map picker instead. Compare three maps stays out -- it is a 301 to
     # /compare_maps now.
+    # Gene model associations added 2026-09-07. It was never listed: the URL
+    # served a 3.2 MB download rather than a page, so there was nothing to link
+    # to. The modernized page is a page, with the three files on it.
     ("tools", "tools", "All research tools", "", [
         ("BLAST", "/BLAST", "Sequence search against the full set of genome datasets hosted at MaizeGDB."),
         ("Bin Viewer", "/bin_viewer", "Explore data in regions defined by genetic bin boundaries."),
+        ("Gene model associations", "/associated_genes", "Which B73 RefGen_v5, v4 and v3 gene models correspond to each named maize gene."),
         ("Compare maps", "/compare_maps", "Two or three genetic maps of one chromosome, and the loci placed on all of them."),
         ("FATCAT comparison tool", "/fatcat", "Structural alignments between a maize protein and its top structural hits."),
         ("FETA", "https://feta.maizegdb.org", "A suite of tools for exploring gene functional enrichment in Zea mays and relatives."),
