@@ -4478,6 +4478,82 @@ it Cloudflare serves a month-old copy of any file a rebuild corrects -- which it
 did, during this build, and origin and CDN disagreed for long enough to be
 confusing. `--release` overrides the stamp for a same-day rebuild.
 
+## Foldseek structure search
+
+`/foldseek` came onto the design system on 2026-09-06. Carson: "it mainly uses
+an iframe for the core function of the page, but everything else needs to use
+the new redesign format." That is exactly the split: the search still runs at
+`foldseek.maizegdb.org` in a frame, untouched, and everything around it is new.
+
+`controller.php` checks `./controllers/<CONTROLLER>.php` before falling through
+to `redirect.php`, so `controllers/foldseek.php` takes the route from
+`controllers/tools/foldseek.php` without modifying it &mdash; the same trick
+`/fatcat` uses, and the same rollback: delete the file and the original is found
+again on the next request. Originals archived in `legacy/foldseek/`.
+
+### What was on the page before
+
+Almost nothing. No `<h1>`, no meta description, the title "Welcome to
+MaizeGDB", one pill-shaped link, and a 1,050px frame. The only other content was
+twenty lines of JavaScript that widened the legacy shell to hold the frame:
+
+```js
+document.getElementById("wrapper").setAttribute("style", "width:1700px");
+document.getElementById("logo").setAttribute("style", "width:1424px");
+document.getElementById("content_top").src = "/images/content_top_gbrowse.png";
+```
+
+&mdash; and five more like it, plus a second batch in `window.onload` for the
+footer. All of it exists to make a fixed-width chrome hold a wide frame. The
+modern shell is fluid, so it is deleted rather than ported, and the frame simply
+takes the width it is given.
+
+### A reflected injection that was live
+
+The old page pasted `?uniprot=` into both the iframe `src` and the full-screen
+`href` with no escaping, inside double-quoted attributes:
+
+```
+/foldseek?uniprot=A0A1D6E9Y7"><b>INJECTED</b>
+```
+
+closed the attribute and the tag and rendered the markup, in both places, on the
+running site. The value is now matched against `^[A-Za-z0-9_.:-]{1,64}$` before
+it is used at all and escaped on the way out; anything else is dropped and the
+tool opens on its own search form. Verified after: that payload renders zero
+markup and the frame loads the bare app, while `?uniprot=Zm00001eb000010` still
+reaches the tool and names the structure in a notice.
+
+**The parameter is called `uniprot` and usually is not one.**
+`js/mgdb-protein-structure.js` passes a gene model id. The upstream app resolves
+either, and its bookmark URLs are built from the name upstream, so the name
+stays.
+
+### Two things kept deliberately
+
+- **`name="gframe"`.** The upstream application reads the window name when it
+  builds a bookmark URL. The legacy template says so in a comment, and renaming
+  the frame would break every bookmark the tool hands out.
+- **The sandbox list, minus one entry.** It carried both
+  `allow-top-navigation` and `allow-top-navigation-by-user-activation`. The
+  broader of the two lets the framed application navigate the reader off
+  MaizeGDB on its own, with no click. The narrower one is kept, so the app's own
+  links still work. Restoring it is adding the word back.
+
+### `/data_center/foldseek` was never a page
+
+It is the URL Carson reached for, and it answered **HTTP 200 with the legacy
+"Oops, Sorry!" body** &mdash; a page-shaped error that also tells a crawler
+everything is fine. It is a 301 to `/foldseek` now, carrying any identifier
+across and dropping anything that is not one. The Protein Structure Hub lives
+under `/data_center`, which is presumably why the form gets typed.
+
+The frame is `clamp(720px, 82vh, 1200px)` tall, and `clamp(480px, 70vh, 720px)`
+below 640px &mdash; a phone cannot show the tool's three-pane layout at any
+height, so there the full-screen button is the real way in. Checked at 1280 and
+375: no horizontal overflow at either, all four section tabs point at sections
+that exist, and both reference cards render.
+
 ## FATCAT structural ortholog comparison
 
 `/fatcat` compares a maize protein with its closest matches in sorghum, rice,

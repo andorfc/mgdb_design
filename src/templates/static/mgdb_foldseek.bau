@@ -1,0 +1,131 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-foldseek
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https\://maizegdb.org/foldseek">
+<meta property="og:title" content="MaizeGDB Foldseek | Search Maize Protein Structures by Shape">
+<meta property="og:description" content="Search a maize protein structure against millions of predicted and experimental structures. Fold is conserved long after sequence is not, so structure search finds relatives sequence search misses.">
+
+<a class="mgdb-skip-link" href="#fs-main">Skip to main content</a>
+<main class="mgdb-page mgdb-foldseek-page" id="fs-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Tools</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/protein_structure">Protein Structures</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Foldseek</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="fs-title">
+    <div class="mgdb-hero-emblem">
+      <img src="/images/data_center/protein_structure.png?v=20260822" alt="" class="fs-hero-icon" width="80" height="80" />
+      <strong>Structure<br />Search</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="fs-title">Search maize protein structures by shape.</h1>
+      <p class="mgdb-hero-description">Foldseek compares a protein's three-dimensional fold against millions of predicted and experimental structures, and returns the ones built the same way. Fold is conserved long after sequence is not, so a structure search reaches relatives that a sequence search cannot see.</p>
+      <p class="mgdb-hero-actions">
+        <a class="mgdb-button mgdb-button-quiet" href="/data_center/protein_structure">Protein Structure Hub <span aria-hidden="true">&rarr;</span></a>
+        <a class="mgdb-button mgdb-button-quiet" href="/fatcat">FATCAT <span aria-hidden="true">&rarr;</span></a>
+      </p>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#fs-search" class="is-current">Search</a>
+    <a href="#fs-reading">When to use it</a>
+    <a href="#fs-resources">Related resources</a>
+    <a href="#fs-references">References</a>
+  </nav>
+
+  ;; Only unmuted when the URL named a structure. Saying which one was loaded
+  ;; matters because the frame below is a separate application with its own
+  ;; chrome -- without this the reader has no confirmation from MaizeGDB that
+  ;; the identifier they followed is the one being searched.
+  @(loaded_notice {display: off}
+  <div class="mgdb-message mgdb-message-info" id="fs-loaded" role="status">
+    <div>
+      <strong>Searching with $(structure_id).</strong>
+      <span>The results below are for that structure. To search a different one, use the tool's own form, or open the <a href="/data_center/protein_structure">Protein Structure Hub</a> to find a structure first.</span>
+    </div>
+  </div>
+  )
+
+  <section class="mgdb-panel" id="fs-search" aria-labelledby="fs-search-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="fs-search-title">Search</h2>
+        <p>Foldseek runs at <code>foldseek.maizegdb.org</code> and is embedded here. Everything in the frame &#8212; the query form, the alignments, the 3D viewer and the downloads &#8212; belongs to that application.</p>
+      </div>
+      <a class="mgdb-button mgdb-button-secondary" href="$(app_url)" target="_blank" rel="noopener">Open full screen <span aria-hidden="true">&nearr;</span></a>
+    </div>
+
+    ;; name="gframe" is load-bearing: the upstream application reads the window
+    ;; name when it builds a bookmark URL, so renaming the frame breaks every
+    ;; bookmark the tool hands out. The id is kept with it.
+    ;;
+    ;; The sandbox is the legacy list with one entry removed. It carried both
+    ;; allow-top-navigation and allow-top-navigation-by-user-activation; the
+    ;; broader of the two lets the framed application navigate this page away on
+    ;; its own, without anyone clicking. The narrower one is kept, so the app's
+    ;; own links still work and a script inside the frame cannot move the reader
+    ;; off MaizeGDB by itself. Restoring it is adding the word back.
+    <div class="fs-frame-wrap">
+      <iframe class="fs-frame" id="gframe" name="gframe" title="Foldseek structure search"
+              src="$(app_url)" loading="lazy" allowfullscreen
+              sandbox="allow-forms allow-downloads allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation-by-user-activation"></iframe>
+    </div>
+    <p class="mgdb-hint">If the frame does not load, open it full screen &#8212; some browsers block third-party frames outright, and the tool is unaffected by that setting when it has a window of its own.</p>
+  </section>
+
+  <section class="mgdb-panel" id="fs-reading" aria-labelledby="fs-reading-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="fs-reading-title">When to use it</h2>
+      </div>
+    </div>
+    <div class="fs-prose">
+      <p>Reach for a structure search when the sequence search has run out. Two proteins that fold the same way can share almost no sequence identity, so a BLAST search returns nothing while the structures superpose closely. That is the case Foldseek is for: a maize protein of unknown function whose closest sequence matches are uninformative, and whose shape is not.</p>
+      <p>It is also the faster question to ask of a predicted structure. Every maize protein with a model in the AlphaFold database can be searched here directly, without first finding a sequence relative to borrow an annotation from.</p>
+      <p>Use <a href="/BLAST">BLAST</a> instead when you have sequence and want sequence matches, and <a href="/fatcat">FATCAT</a> when you already know which two proteins you want compared and want them superposed rather than ranked.</p>
+    </div>
+  </section>
+
+  <section class="mgdb-hub-related" id="fs-resources" aria-labelledby="fs-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="fs-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/protein_structure">
+          <strong>Protein Structure Hub</strong>
+          <span>Every maize structure MaizeGDB holds, with its models and confidence scores</span>
+        </a>
+        <a href="/fatcat">
+          <strong>FATCAT</strong>
+          <span>Compare one maize protein against its orthologs in four species, superposed in 3D</span>
+        </a>
+        <a href="/data_center/alphafill">
+          <strong>AlphaFill</strong>
+          <span>The ligands and cofactors a predicted structure is likely to bind</span>
+        </a>
+        <a href="/BLAST">
+          <strong>BLAST</strong>
+          <span>Sequence search, when the question is about sequence rather than shape</span>
+        </a>
+        <a href="/gene_center/gene">
+          <strong>Gene Data Hub</strong>
+          <span>Start from a gene and reach its protein, its domains and its structure</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="mgdb-panel" id="fs-references" aria-labelledby="fs-references-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="fs-references-title">References</h2>
+        <p>Cite Foldseek for the method, and the MaizeGDB structure paper for the models being searched.</p>
+      </div>
+    </div>
+    <div class="mgdb-ref-list">
+      $(reference_cards)
+    </div>
+  </section>
+</main>
+)

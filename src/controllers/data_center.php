@@ -46,6 +46,21 @@
     return;
   }
 
+  /* /data_center/foldseek has never been a page. It answers HTTP 200 with the
+     legacy "Oops, Sorry!" body, which is the worst of both: a reader gets a
+     page-shaped error and a crawler is told it is fine. The tool lives at
+     /foldseek, and the Protein Structure Hub sits under /data_center, so the
+     data-center form is the one people reach for -- Carson asked for the page
+     by that URL on 2026-09-06. Any identifier on it is carried across.
+     Rollback: delete this block. */
+  if (defined('PAGE') && PAGE == 'foldseek') {
+    $fs_id = (defined('ID') && ID) ? ID : getCGIParam('uniprot', 'G', '');
+    $fs_id = preg_match('/^[A-Za-z0-9_.:-]{1,64}$/', (string) $fs_id) ? (string) $fs_id : '';
+    header('Location: /foldseek' . ($fs_id !== '' ? '?uniprot=' . rawurlencode($fs_id) : ''),
+           true, 301);
+    exit;
+  }
+
   /* Retired 2026-09-06 (Carson): /data_center/qtl-data. Its content -- the QTL
      experiment listing -- is the QTL Data Hub's own search, which covers the
      same records with filters the old page did not have. 301 rather than a

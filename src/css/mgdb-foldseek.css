@@ -1,0 +1,92 @@
+/* file: css/mgdb-foldseek.css
+ *
+ * /foldseek. The page is a wrapper around an embedded application, so almost
+ * everything here is about giving that frame room without letting it dictate
+ * the page.
+ *
+ * The page it replaces had no stylesheet of its own. It sized the frame at a
+ * fixed 1050px and then widened the whole legacy shell to 1700px in JavaScript
+ * to fit it, which is why it needed to rewrite #wrapper, #logo, #content,
+ * #whitecurve and #footer inline on every load. The modern shell is fluid, so
+ * none of that is needed: the frame takes the width it is given.
+ */
+
+/* ── The embedded application ────────────────────────────────────────────── */
+
+/* Tall enough for the tool's own results table and 3D viewer without the reader
+   scrolling the frame inside the page, but bounded so it does not run past a
+   short laptop screen. The floor matters more than the ceiling: below about
+   700px the tool's own layout starts scrolling internally, which is the thing
+   a fixed 1050px was reaching for and overshooting. */
+.mgdb-foldseek-page .fs-frame-wrap {
+  margin-top: var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--hub-surface);
+  /* The frame's own corners are square; without this the page's rounded
+     corners show a sliver of the frame's white outside the border. */
+  overflow: hidden;
+}
+
+.mgdb-foldseek-page .fs-frame {
+  display: block;
+  width: 100%;
+  height: clamp(720px, 82vh, 1200px);
+  border: 0;
+}
+
+/* A phone cannot usefully show the tool's three-pane layout at any height, and
+   a tall frame there just buries the rest of the page under a region the
+   reader has to scroll past. It keeps a usable height and the full-screen
+   button above it becomes the real way in. */
+@media (max-width: 640px) {
+  .mgdb-foldseek-page .fs-frame { height: clamp(480px, 70vh, 720px); }
+}
+
+/* ── Hero ────────────────────────────────────────────────────────────────── */
+
+.mgdb-foldseek-page .fs-hero-icon {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+/* ── Prose ───────────────────────────────────────────────────────────────── */
+
+/* Running text is held near 70 characters. The panels are full page width for
+   the frame's sake, and prose set to that width is unreadable. */
+.mgdb-foldseek-page .fs-prose {
+  max-width: 70ch;
+}
+
+.mgdb-foldseek-page .fs-prose p {
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-text);
+  line-height: 1.65;
+}
+
+.mgdb-foldseek-page .fs-prose p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Section heading with an action ──────────────────────────────────────── */
+
+/* The Search heading carries the full-screen button on its right. The shared
+   heading is a two-column grid already; this keeps the button from stretching
+   to the row height and sits it against the first line of the heading. */
+.mgdb-foldseek-page #fs-search .mgdb-section-heading {
+  align-items: start;
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-foldseek-page #fs-search .mgdb-section-heading > .mgdb-button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .mgdb-foldseek-page #fs-search .mgdb-section-heading > .mgdb-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
