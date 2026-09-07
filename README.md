@@ -6720,6 +6720,20 @@ deploy/deploy.sh src/templates/about/sitemap-content.bau
 The generator warns when two entries in the same section point at the same URL.
 Across sections is fine — BLAST is both a starting point and a research tool.
 
+**Edit the content model, not the `.bau`.** Editing the generated file directly
+works right up until the next generator run, which silently reverts it: two
+Archives entries — *IBM map scores* and *IBM 302 list* — were added to
+`sitemap-content.bau` by hand in `40fea37`, never put in `tools/sitemap_data.py`,
+and were dropped by the first regeneration afterwards. They were caught by
+diffing the regenerated file against `HEAD` before deploying, and are in the
+model now. That diff is worth doing every time:
+
+```bash
+git diff src/templates/about/
+```
+
+A regeneration should change only what you changed.
+
 No section carries a blurb as of 2026-08-28; the Data hubs one was the last to
 go. The field, the generator branch and `.sitemap-section-blurb` in the CSS all
 still work, so putting a sentence back is a one-string edit in the content

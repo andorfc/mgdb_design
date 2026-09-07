@@ -19,8 +19,8 @@ FEATURED = [
      "Functions and structures of the Fusarium proteome.", "fpt"),
     ("Phylostrata", "https://phylostrata.maizegdb.org",
      "Evolutionary conservation level of a given protein.", "phylo"),
-    ("SNPversity 2.0", "https://wgs.maizegdb.org/",
-     "Build a VCF for a region of B73 across diverse accessions.", "snpv"),
+    ("SNPversity 2.1", "https://wgs.maizegdb.org/",
+     "Build a VCF for a region of B73 v5 across diverse accessions.", "snpv"),
     ("PanEffect", "/effect/maize_v2/",
      "Variant effects across the maize pan-genome.", "paneffect"),
     ("SNPTools", "https://snptools.maizegdb.org",
@@ -99,7 +99,8 @@ SECTIONS = [
         ("qTeller", "https://qteller.maizegdb.org", "Comparative RNA-seq expression across multiple data sources."),
         ("reelGene", "https://reelgene.maizegdb.org/", "Look up a gene model for its reelGene functionality score, conservation level, and pan-gene class."),
         ("SNPTools", "https://snptools.maizegdb.org", "Variant browsing and per-gene structure views."),
-        ("SNPversity 2.0", "https://wgs.maizegdb.org/", "Build a VCF for a region of B73 across a subset of diverse accessions."),
+        ("SNPversity 1.0", "/snpversity", "Genotype calls for a region of B73 RefGen_v2 or v3 across as many stocks as you choose, from the AllZeaGBS v2.7 and HapMap v3 datasets."),
+        ("SNPversity 2.1", "https://wgs.maizegdb.org/", "Build a VCF for a region of B73 v5 across a subset of nearly 1,500 diverse accessions."),
         ("Trait values for IBM and NAM", "/traits_ibm_nam", "Measured trait values, searchable by stock, trait, reference, or environment."),
         ("TYPSimSelector", "/TYPSimSelector", "Rank USDA Ames inbred lines by genetic similarity to a reference accession."),
     ]),
@@ -227,6 +228,13 @@ SECTIONS = [
         ("Recombination maps", "/data_center/RNmaps", "Recombination nodule maps."),
         ("MapMan gene atlas files", "https://download.maizegdb.org/Archive/MapMan_GeneAtlas/", "MapMan-formatted expression files from the Sekhon et al. 2011 maize development atlas, single tissue and median."),
         ("SSR reports", "/ssrreports", "Every archived SSR record carrying a repeat motif, and the SSRs derived from mapped genes."),
+        # Added to the generated .bau by hand in 40fea37 and never put here, so
+        # the next `python3 tools/gen_sitemap.py` silently dropped both --
+        # caught 2026-09-07 by diffing the regenerated file against HEAD before
+        # deploying it. Restored to the model, where they cannot be lost again.
+        # Both routes are 301s to /data_center/map; they are listed under their
+        # old URLs on purpose, so someone who has one written down lands
+        # somewhere useful.
         ("IBM map scores", "/mapscore_ibmlist", "Scored IBM mapping data."),
         ("IBM 302 list", "/mapscore_ibm302list", "IBM 302 line list."),
     ]),
