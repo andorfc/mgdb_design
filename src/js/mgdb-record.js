@@ -922,6 +922,58 @@
     }, 200);
   }
 
+  /* ------------------------------------------------------------------------
+     The offset that clears the sticky bar, measured rather than declared
+
+     mgdb-record.css used to carry one `scroll-margin-top: 6.5rem` (104px) for
+     every record page at every width, and it could not be right in both
+     directions at once: a one-row bar is 57px, so 104 left 47px of dead space
+     above every heading, and a two-row bar is 105px, so 104 landed every
+     heading 1px BEHIND the bar. /data_center/map/{id} had that at 1280 and
+     /data_center/lg/{id} at 900.
+
+     A CSS ladder cannot fix it either, because on a record page the bar's
+     height is not a property of the page. tabs() builds the bar from the
+     sections that came back with data, so one template is five tabs for one
+     record and eight for another, and the width at which it wraps moves with
+     the record. Nothing declared in a stylesheet knows that.
+
+     So it is measured here and written to a custom property the stylesheet
+     reads back; the value in the CSS is only the no-JS fallback. 8px is the
+     clearance the hub shell already uses (65 = 57 + 8, 113 = 105 + 8).
+
+     Re-measured whenever the bar's own box changes -- a wrap at a new width, a
+     web font arriving, page zoom -- rather than on window resize alone, which
+     misses the font case and fires for widths that change nothing.
+     ------------------------------------------------------------------------ */
+
+  var TAB_CLEARANCE = 8;
+
+  function syncSectionOffset(bar) {
+    var page = document.querySelector('.mgdb-record-page');
+    if (!page || !bar) { return; }
+    /* An offsetHeight of 0 means the bar is hidden -- tabs() hides it when a
+       record has only one section -- and then there is nothing to clear, so the
+       sections only want a little air above them. */
+    var height = bar.hidden ? 0 : bar.offsetHeight;
+    var offset = height > 0 ? height + TAB_CLEARANCE : TAB_CLEARANCE * 2;
+    page.style.setProperty('--mgdb-rec-offset', Math.round(offset) + 'px');
+  }
+
+  function watchSectionOffset(bar) {
+    syncSectionOffset(bar);
+    if (window.ResizeObserver) {
+      new window.ResizeObserver(function () { syncSectionOffset(bar); }).observe(bar);
+    } else {
+      window.addEventListener('resize', MGDB.debounce(function () { syncSectionOffset(bar); }, 100));
+    }
+    /* ResizeObserver reports the border box, which a font swap changes, but not
+       every browser has one and the first measurement can precede the swap. */
+    if (document.fonts && document.fonts.ready && document.fonts.ready.then) {
+      document.fonts.ready.then(function () { syncSectionOffset(bar); });
+    }
+  }
+
   function tabs(spec) {
     var bar = spec.el;
     if (!bar) { return; }
@@ -935,6 +987,10 @@
              (total > 0 ? '<span class="mgdb-rec-tab-count">' + number(total) + '</span>' : '') + '</a>';
     }).join('');
     show(bar, spec.order.length > 1);
+
+    /* Before the pairs are walked and before focusHash(), both of which read
+       scroll-margin-top back off a section. */
+    watchSectionOffset(bar);
 
     var pairs = [];
     Array.prototype.forEach.call(bar.querySelectorAll('a'), function (tab) {

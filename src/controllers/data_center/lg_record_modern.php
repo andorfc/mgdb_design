@@ -84,10 +84,6 @@ $bauplan->includeCss('/css/mgdb-modern.css');
 $bauplan->includeCss('/css/mgdb-megamenu.css');
 $bauplan->includeCss('/css/mgdb-hub.css?v=' . (int) @filemtime($hub_file));
 $bauplan->includeCss('/css/mgdb-record.css?v=' . (int) @filemtime($rec_css));
-/* After the record shell, and only for the scroll offset: the shell's flat
-   6.5rem is 1px short of this page's two-row bar between 768 and 959. Same
-   specificity, so source order decides. */
-$bauplan->includeCss('/css/mgdb-lg-record.css?v=' . (int) @filemtime($doc_root . '/css/mgdb-lg-record.css'));
 $bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');

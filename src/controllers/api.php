@@ -245,13 +245,13 @@ function api_record_types() {
       'type' => 'recombination',
       'description' => 'Recombination datasets: one mapping cross, with the loci scored, the parental alleles, the observed class frequencies, and pairwise recombination frequencies in Haldane and Kosambi centimorgans.',
       'href' => $base . '/api/v1/records/recombination/{id}',
-      'example' => $base . '/api/v1/records/recombination/24634'
+      'example' => $base . '/api/v1/records/recombination/9017518'
     ),
     array(
       'type' => 'map_scores',
       'description' => 'Map scores: one marker scored across a mapping panel, with the probe and probed site behind it and the maps that used it.',
       'href' => $base . '/api/v1/records/map_scores/{id}',
-      'example' => $base . '/api/v1/records/map_scores/1181'
+      'example' => $base . '/api/v1/records/map_scores/132439'
     ),
     array(
       'type' => 'term',

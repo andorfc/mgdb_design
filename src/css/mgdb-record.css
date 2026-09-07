@@ -79,12 +79,27 @@
 /* --------------------------------------------------------------------------
    Tabs
 
-   Section anchors clear the sticky bar. The bar wraps to two rows at narrow
-   widths, so the offset is larger than the shared 4.5rem; the scrollspy reads
-   this value back rather than carrying its own copy.
+   Section anchors clear the sticky bar, and the measure comes from js/mgdb-record.js,
+   which sets --mgdb-rec-offset from the bar's own height every time that height
+   changes. The value below is the no-JS fallback only.
+
+   This was a flat 6.5rem (104px) at every width, which was wrong in both
+   directions: a one-row bar is 57px, so it left 47px of dead space above every
+   heading, and a two-row bar is 105px, so it landed every heading 1px behind
+   the bar -- /data_center/map/{id} at 1280, /data_center/lg/{id} at 900. A
+   ladder of media queries cannot replace it, because tabs() builds the bar
+   from the sections that came back with data: the same template is five tabs
+   for one record and eight for another, and the wrap point moves with the
+   record rather than with the page.
+
+   The fallback is 65px, which is one row (57) plus the 8px clearance the hub
+   shell uses -- the bar the server sends carries a single placeholder tab.
+
+   The scrollspy in tabs() reads this value back rather than carrying its own
+   copy.
    -------------------------------------------------------------------------- */
 
-.mgdb-record-page > section[id] { scroll-margin-top: 6.5rem; }
+.mgdb-record-page > section[id] { scroll-margin-top: var(--mgdb-rec-offset, 65px); }
 
 .mgdb-rec-tabs .mgdb-rec-tab-count { margin-left: var(--mgdb-space-2); }
 
