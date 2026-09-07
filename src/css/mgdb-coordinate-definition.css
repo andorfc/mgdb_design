@@ -1,0 +1,279 @@
+/* Map coordinates (/coordinateDef) — MaizeGDB modern design system.
+ *
+ * The ground, the white section cards, their coloured top edges, the metric
+ * cards, the shared table, the reference cards and the green Related resources
+ * wash all come from css/mgdb-hub.css and css/mgdb-modern.css, which load
+ * first. Only what is specific to this page lives here: the units emblem, the
+ * reading measure for a page that is almost entirely prose, the unit table's
+ * abbreviation chip, the worked-example and quotation blocks, and the
+ * definition list of map types.
+ *
+ * Sibling page: /handyref. The two are read together — this one says what a
+ * coordinate means, that one says which maps carry them — so the tab bar, the
+ * prose measure and the quotation treatment are deliberately the same here.
+ */
+
+.mgdb-modern .mgdb-coorddef-page { padding-bottom: clamp(3rem, 6vw, 5.5rem); }
+
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
+
+.mgdb-coorddef-page .cd-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-coorddef-page .cd-emblem svg {
+  width: 5.5rem;
+  height: 5.5rem;
+}
+
+/* The shell uppercases everything in the emblem, which turns cM into CM, IcM
+   into ICM and bp into BP. Those are different units from the ones meant, so
+   this line opts out of the transform. Same fix as /handyref's scale tick. */
+.mgdb-coorddef-page .cd-emblem-units {
+  margin-top: 0.15rem;
+  color: var(--mgdb-green-dark);
+  font-family: var(--mgdb-font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+/* ── Sticky section tabs ─────────────────────────────────────────────────── */
+
+.mgdb-coorddef-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.mgdb-coorddef-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
+
+.mgdb-coorddef-page .mgdb-section-tabs a.is-current,
+.mgdb-coorddef-page .mgdb-section-tabs a[aria-current="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+/* This bar never wraps, at any width, and that is the point.
+ *
+ * The shell's scroll-offset ladder steps at 1170px on the assumption that a bar
+ * is one row above it and two rows below. That is true of a four-tab bar. This
+ * one has eight tabs and would wrap two or three times on the way down to
+ * 375px, and the shared scrollspy reads scroll-margin-top back from computed
+ * style, so every wrap that the ladder does not predict lands a section behind
+ * the bar and leaves the wrong tab lit.
+ *
+ * /handyref settled this for its seven-tab bar by scrolling instead of
+ * wrapping, and the same answer is right here: the bar is then exactly one row
+ * at every width, one offset is correct everywhere, and no measurement can go
+ * stale as labels change. Above the width where the tabs fit, no scrollbar
+ * appears and this looks like any other hub's bar.
+ */
+.mgdb-coorddef-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-5);
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Measured on the built page: the bar is 57px tall at 1280, 900 and 375. */
+.mgdb-hub-page.mgdb-coorddef-page > section[id] { scroll-margin-top: 65px; }
+
+.mgdb-coorddef-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+/* ── Prose ───────────────────────────────────────────────────────────────── */
+
+/* This page is read, not scanned, so the measure is set for running text. */
+.mgdb-coorddef-page .cd-prose { max-width: 62rem; }
+
+.mgdb-coorddef-page .cd-prose p {
+  margin: 0 0 1.05rem;
+  color: var(--mgdb-ink);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.mgdb-coorddef-page .cd-prose p:last-child { margin-bottom: 0; }
+
+.mgdb-coorddef-page .mgdb-spaced { max-width: 62rem; }
+
+/* ── Units table ─────────────────────────────────────────────────────────── */
+
+/* The unit symbol is the thing a reader scans for, so it is set apart from the
+   name rather than run on after it. Mono, because these are symbols with
+   meaningful case: cM and CM are not the same unit. */
+.mgdb-coorddef-page .cd-abbr {
+  display: inline-block;
+  margin-left: 0.45rem;
+  padding: 0.05rem 0.4rem;
+  border: 1px solid var(--hub-line);
+  border-radius: 999px;
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-family: var(--mgdb-font-mono);
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.mgdb-coorddef-page .cd-units-table th[scope="row"] { white-space: nowrap; }
+.mgdb-coorddef-page .cd-units-table td:last-child { white-space: nowrap; }
+
+/* Three columns fit a desktop, but the definition column is long and the page
+   body must not scroll sideways, so the table scrolls inside its own box. */
+@media (max-width: 720px) {
+  .mgdb-coorddef-page .cd-units-table { min-width: 34rem; }
+}
+
+/* ── Worked examples ─────────────────────────────────────────────────────── */
+
+/* An example is a different kind of reading from the definition above it, so it
+   gets its own surface rather than a heading and more prose. */
+.mgdb-coorddef-page .cd-example {
+  max-width: 62rem;
+  margin-top: var(--mgdb-space-5);
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--hub-line);
+  border-left: 4px solid var(--mgdb-gold);
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  background: var(--hub-ground, #f4f7fb);
+}
+
+.mgdb-coorddef-page .cd-example h3 {
+  margin: 0 0 0.7rem;
+  color: var(--mgdb-burgundy);
+  font-size: 1rem;
+}
+
+.mgdb-coorddef-page .cd-example .mgdb-list {
+  margin: 0;
+  font-size: 0.96rem;
+  line-height: 1.6;
+}
+
+/* Locus names and coordinates are compared down the list, so they are set in
+   the mono face and the digits do not change width. */
+.mgdb-coorddef-page .cd-locus {
+  font-family: var(--mgdb-font-mono);
+  font-size: 0.92em;
+  font-weight: 700;
+}
+
+.mgdb-coorddef-page .cd-value { font-variant-numeric: tabular-nums; }
+
+.mgdb-coorddef-page .cd-example-link {
+  margin: 0.85rem 0 0;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-coorddef-page .cd-example-note {
+  margin: 0.85rem 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.55;
+}
+
+/* ── Quotation ───────────────────────────────────────────────────────────── */
+
+/* Someone else's voice, so it is set apart rather than styled like an aside of
+   ours. Same treatment as /handyref's quoted passage. */
+.mgdb-coorddef-page .cd-quote {
+  max-width: 62rem;
+  margin: 0;
+  padding: 0.9rem 1.1rem;
+  border-left: 4px solid var(--mgdb-green-dark);
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-coorddef-page .cd-quote p {
+  margin: 0 0 0.7rem;
+  font-size: 0.96rem;
+  line-height: 1.62;
+}
+
+.mgdb-coorddef-page .cd-quote p:last-of-type { margin-bottom: 0.7rem; }
+
+.mgdb-coorddef-page .cd-quote footer {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+}
+
+/* ── Map types ───────────────────────────────────────────────────────────── */
+
+/* Five map types, each a term and its definition. A definition list says that
+   in the markup; the styling only has to keep the term findable and give the
+   entries air. */
+.mgdb-coorddef-page .cd-defs {
+  max-width: 62rem;
+  margin: 0;
+  display: grid;
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-coorddef-page .cd-defs > div {
+  padding: 0.9rem 1.05rem;
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface, #ffffff);
+}
+
+.mgdb-coorddef-page .cd-defs dt {
+  margin: 0 0 0.35rem;
+  color: var(--mgdb-burgundy);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.mgdb-coorddef-page .cd-defs dd {
+  margin: 0;
+  color: var(--mgdb-ink);
+  font-size: 0.96rem;
+  line-height: 1.62;
+}
+
+/* ── References and metrics ──────────────────────────────────────────────── */
+
+/* Haldane 1919 has no DOI and so no card. Saying that is the point of this
+   paragraph, so it reads as a note rather than as a sixth reference. */
+.mgdb-coorddef-page .cd-classic {
+  max-width: 62rem;
+  margin: var(--mgdb-space-5) 0 0;
+  padding-left: 0.85rem;
+  border-left: 3px solid var(--mgdb-gold);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.55;
+}
+
+/* What the four cards are counting, stated before they are read. */
+.mgdb-coorddef-page .cd-scope {
+  max-width: 62rem;
+  margin: 0 0 var(--mgdb-space-4);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.55;
+}

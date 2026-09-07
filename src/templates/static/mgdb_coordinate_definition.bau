@@ -17,8 +17,8 @@ $$SYNTAX-LEVEL 2
   </nav>
 
   <section class="mgdb-hero" aria-labelledby="cd-title">
-    <div class="mgdb-hero-emblem">
-      <svg viewBox="0 0 96 96" role="img" aria-label="Map ruler icon">
+    <div class="mgdb-hero-emblem cd-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="A map scale beside a chromosome with three placed loci">
         <rect x="20" y="14" width="20" height="68" rx="6" fill="#e8f4ec" stroke="#235c37" stroke-width="3" />
         <path d="M20 28h10 M20 40h14 M20 52h10 M20 64h14" stroke="#235c37" stroke-width="2.5" stroke-linecap="round" />
         <circle cx="30" cy="46" r="4.5" fill="#d99a0b" />
@@ -28,7 +28,8 @@ $$SYNTAX-LEVEL 2
         <circle cx="56" cy="70" r="5" fill="#e8f4ec" stroke="#235c37" stroke-width="3" />
         <path d="M66 30h12 M66 52h12 M66 70h12" stroke="#7fae8c" stroke-width="2.5" stroke-linecap="round" />
       </svg>
-      <strong>Map<br />Coordinates</strong>
+      <strong>Map coordinates</strong>
+      <span class="cd-emblem-units">cM &middot; IcM &middot; bp &middot; cMC &middot; CB</span>
     </div>
     <div class="mgdb-hero-body">
       <h1 id="cd-title">Map coordinates</h1>
@@ -37,12 +38,13 @@ $$SYNTAX-LEVEL 2
   </section>
 
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#cd-units" class="is-current">Units</a>
+    <a href="#cd-units" class="is-current" aria-current="true">Units</a>
     <a href="#cd-genetic">Genetic maps</a>
     <a href="#cd-physical">Physical maps</a>
     <a href="#cd-cytogenetic">Cytogenetic maps</a>
     <a href="#cd-maps">Map types</a>
     <a href="#cd-references">References</a>
+    <a href="#cd-metrics">Metrics</a>
     <a href="#cd-related">Related resources</a>
   </nav>
 
@@ -100,19 +102,13 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="cd-genetic-title">Genetic maps</h2></div>
     </div>
 
-    <p>Genetic map coordinates are in centiMorgans, based on recombination frequency between loci. Unlinked loci are 50 cM apart, so a locus is positioned using the coordinates of nearby loci. Over short intervals double crossovers are negligible; over longer ones they are accounted for by calculating the expected coincidental events in the interval &#40;Haldane 1919, Kosambi 1944&#41;.</p>
+    <div class="cd-prose">
+      <p>Genetic map coordinates are in centiMorgans, based on recombination frequency between loci. Unlinked loci are 50 cM apart, so a locus is positioned using the coordinates of nearby loci. Over short intervals double crossovers are negligible; over longer ones they are accounted for by calculating the expected coincidental events in the interval &#40;Haldane 1919, Kosambi 1943&#41;.</p>
 
-    <p><strong>The zero point is the tip of the short arm.</strong> The locus on the short arm most distal to the centromere lies at coordinate 0 by definition, and every other coordinate follows from it.</p>
-
-    <div class="cd-example">
-      <h3>Worked example&#58; the IBM 9 map</h3>
-      <ul class="mgdb-list">
-        <li><strong>umc1957</strong> is the most distal locus on the short arm, so its coordinate is 0.</li>
-        <li><strong>umc109</strong> is 5 cM from umc1957, so it sits at 5.</li>
-        <li><strong>bz1</strong> is at 88.1, which is more than 50 cM from umc109 and so cannot be measured against it directly. It is placed because lim343 is 41.2 cM from umc109 and bz1 is 46.9 cM from lim343, with umc1957 and bz1 behaving as unlinked loci.</li>
-      </ul>
-      <p class="cd-example-link"><a href="/data_center/map?id=652048">Open the IBM 9 map</a></p>
+      <p><strong>The zero point is the tip of the short arm.</strong> The locus on the short arm most distal to the centromere lies at coordinate 0 by definition, and every other coordinate follows from it.</p>
     </div>
+
+    $(worked_example)
 
     <h3 class="mgdb-spaced">How a genetic map is built</h3>
     <blockquote class="cd-quote">
@@ -123,8 +119,10 @@ $$SYNTAX-LEVEL 2
     </blockquote>
 
     <h3 class="mgdb-spaced">What a centiMorgan is</h3>
-    <p>One centiMorgan is one genetic map unit&#58; the distance between loci for which one product of meiosis out of 100 is recombinant. At 1 cM there is one crossover per 100 meioses &mdash; on an ear of 100 kernels, the crossover genotype appears in one kernel. The term is defined classically by Haldane &#40;1919&#41; and named in honor of Thomas Hunt Morgan.</p>
-    <p>High-resolution genetic maps such as the IBM maps are the contrast&#58; they represent enhanced meioses, and so carry inflated cM values. See the references below.</p>
+    <div class="cd-prose">
+      <p>One centiMorgan is one genetic map unit&#58; the distance between loci for which one product of meiosis out of 100 is recombinant. At 1 cM there is one crossover per 100 meioses &mdash; on an ear of 100 kernels, the crossover genotype appears in one kernel. The term is defined classically by Haldane &#40;1919&#41; and named in honor of Thomas Hunt Morgan.</p>
+      <p>High-resolution genetic maps such as the IBM maps are the contrast&#58; they represent enhanced meioses, and so carry inflated cM values. See the references below, and the <a href="/handyref">guide to the genetic maps held at MaizeGDB</a> for what each map set is and how the sets relate.</p>
+    </div>
   </section>
 
   <section id="cd-physical" aria-labelledby="cd-physical-title">
@@ -132,9 +130,10 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="cd-physical-title">Physical maps</h2></div>
     </div>
 
-    <p>Physical map coordinates are in base pairs.</p>
-
-    <p><strong>IBM2 FPC coordinates</strong> are written as the nearest upstream IBM2 coordinate in an anchored contig, then a decimal point, then a four-digit value giving the position within the contig in consensus band units. A consensus band is roughly 4,000 bp on the agarose maize FPC.</p>
+    <div class="cd-prose">
+      <p>Physical map coordinates are in base pairs.</p>
+      <p><strong>IBM2 FPC coordinates</strong> are written as the nearest upstream IBM2 coordinate in an anchored contig, then a decimal point, then a four-digit value giving the position within the contig in consensus band units. A consensus band is roughly 4,000 bp on the agarose maize FPC.</p>
+    </div>
   </section>
 
   <section id="cd-cytogenetic" aria-labelledby="cd-cytogenetic-title">
@@ -142,7 +141,9 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="cd-cytogenetic-title">Cytogenetic maps</h2></div>
     </div>
 
-    <p>Cytogenetic map coordinates are in centiMcClintocks, named in honor of Barbara McClintock. Each chromosome arm is one McClintock, which is 100 centiMcClintocks, so a whole chromosome spans 200 cMC.</p>
+    <div class="cd-prose">
+      <p>Cytogenetic map coordinates are in centiMcClintocks, named in honor of Barbara McClintock. Each chromosome arm is one McClintock, which is 100 centiMcClintocks, so a whole chromosome spans 200 cMC.</p>
+    </div>
 
     <div class="cd-example">
       <h3>Worked example&#58; chromosome 9</h3>
@@ -152,6 +153,7 @@ $$SYNTAX-LEVEL 2
         <li>The tip of the long arm is at <strong>9L1.00</strong>, or 1.00.</li>
         <li>The distance from 9L.95 to 9L.90 is 5 cMC.</li>
       </ul>
+      <p class="cd-example-link"><a href="/data_center/cytogenetic">Cytogenetic records at MaizeGDB</a></p>
     </div>
   </section>
 
@@ -163,7 +165,7 @@ $$SYNTAX-LEVEL 2
     <dl class="cd-defs">
       <div>
         <dt>Bin maps</dt>
-        <dd>Coordinates are the chromosome number, a decimal point, and a numeric identifier. 1.00 is the most distal bin on the short arm. Bin boundaries are set by a set of core markers, and every mapped locus is assigned a bin. <a href="/tools/bin_viewer">Browse the bins</a>.</dd>
+        <dd>Coordinates are the chromosome number, a decimal point, and a numeric identifier. 1.00 is the most distal bin on the short arm. Bin boundaries are set by a set of core markers, and every mapped locus is assigned a bin. <a href="/bin_viewer">Browse the bins</a>.</dd>
       </div>
       <div>
         <dt>IBM neighbors</dt>
@@ -179,7 +181,7 @@ $$SYNTAX-LEVEL 2
       </div>
       <div>
         <dt>IBM2 and IcM coordinates</dt>
-        <dd>The IBM2 maps were derived from an intermated &#40;syn 4&#41; recombinant inbred population from B73 &times; Mo17, in which meioses accumulated to about four times those of a typical recombination experiment. The MapMaker results were kept as produced &mdash; IBM centiMorgans, or IcM &mdash; rather than adjusted to typical centiMorgans. The neighbors maps build on the IBM2 framework with intercalations from other maps. Over short intervals &#40;10 IcM or less, as in a map as dense as IBM2&#41; the multiplier is 3.63 or more, approaching 4.00 at 0.00 IcM. Adjustments to typical centiMorgans were applied in the ISU IBM maps and the IBM GNP maps, and <a href="https\://doi.org/10.1093/bioinformatics/bti543" target="_blank" rel="noopener">IRILmap</a> converts between them.</dd>
+        <dd>The IBM2 maps were derived from an intermated &#40;syn 4&#41; recombinant inbred population from B73 &times; Mo17, in which meioses accumulated to about four times those of a typical recombination experiment. The MapMaker results were kept as produced &mdash; IBM centiMorgans, or IcM &mdash; rather than adjusted to typical centiMorgans. The neighbors maps build on the IBM2 framework with intercalations from other maps. Over short intervals &#40;10 IcM or less, as in a map as dense as IBM2&#41; the multiplier is 3.63 or more, approaching 4.00 at 0.00 IcM. Adjustments to typical centiMorgans were applied in the ISU IBM maps and the IBM GNP maps, and <a href="https\://doi.org/10.1093/bioinformatics/bti543" target="_blank" rel="noopener">IRILmap <span aria-hidden="true">&nearr;</span></a> converts between them.</dd>
       </div>
     </dl>
   </section>
@@ -193,7 +195,61 @@ $$SYNTAX-LEVEL 2
       $(reference_cards)
     </div>
 
-    <p class="cd-classic">Two classical papers this page cites predate digital indexing and have no DOI&#58; J. B. S. Haldane, &ldquo;The combination of linkage values, and the calculation of distance between the loci of linked factors,&rdquo; <em>Journal of Genetics</em> 1919;8&#58;299&ndash;309; and D. D. Kosambi, &ldquo;The estimation of map distance from recombination values,&rdquo; <em>Annals of Eugenics</em> 1944;12&#58;172&ndash;175.</p>
+    <p class="cd-classic">J. B. S. Haldane, &ldquo;The combination of linkage values, and the calculation of distance between the loci of linked factors,&rdquo; <em>Journal of Genetics</em> 1919;8&#58;299&ndash;309, predates digital indexing and has no DOI of its own, so it has no card above. Kosambi's paper is usually cited as 1944; the volume it appeared in is dated 1943, which is what its card carries.</p>
+  </section>
+
+  <section id="cd-metrics" aria-labelledby="cd-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="cd-metrics-title">Metrics</h2></div>
+    </div>
+
+    <p class="cd-scope">What these units position at MaizeGDB, counted over curated records only &mdash; the same filter the <a href="/data_center/map">Map Data Hub</a> counts with.</p>
+
+    <div class="mgdb-metric-grid">
+      <article class="mgdb-metric mgdb-tone-green">
+        <div class="mgdb-metric-top">
+          <h3>Maps</h3>
+          <span class="mgdb-metric-badge">Curated</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(metric_maps)</strong>
+        </div>
+        <p class="mgdb-metric-description">Genetic, physical, cytogenetic and bin maps, one record per chromosome.</p>
+      </article>
+
+      <article class="mgdb-metric mgdb-tone-amber">
+        <div class="mgdb-metric-top">
+          <h3>Coordinates</h3>
+          <span class="mgdb-metric-badge">Placements</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(metric_coords)</strong>
+        </div>
+        <p class="mgdb-metric-description">Individual placements of a locus on a map. A locus on ten maps is ten of these.</p>
+      </article>
+
+      <article class="mgdb-metric mgdb-tone-blue">
+        <div class="mgdb-metric-top">
+          <h3>Loci positioned</h3>
+          <span class="mgdb-metric-badge">Distinct</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(metric_loci)</strong>
+        </div>
+        <p class="mgdb-metric-description">Distinct loci that carry at least one coordinate on at least one map.</p>
+      </article>
+
+      <article class="mgdb-metric mgdb-tone-burgundy">
+        <div class="mgdb-metric-top">
+          <h3>Linkage groups</h3>
+          <span class="mgdb-metric-badge">Axes</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(metric_lgs)</strong>
+        </div>
+        <p class="mgdb-metric-description">Distinct axes these maps are drawn along, including the B chromosome.</p>
+      </article>
+    </div>
   </section>
 
   <section id="cd-related" class="mgdb-hub-related" aria-labelledby="cd-related-title">
@@ -207,21 +263,21 @@ $$SYNTAX-LEVEL 2
           <strong>Map Data Hub</strong>
           <span>Every genetic, physical and cytogenetic map, with the loci placed on each</span>
         </a>
+        <a href="/handyref">
+          <strong>Genetic maps in MaizeGDB</strong>
+          <span>What each map set is, how the IBM and Neighbors families relate, and how many maps each holds</span>
+        </a>
         <a href="/data_center/locus">
           <strong>Locus Data Hub</strong>
           <span>The loci these coordinates position, and every map each one appears on</span>
         </a>
-        <a href="/tools/bin_viewer">
+        <a href="/bin_viewer">
           <strong>Bin Viewer</strong>
           <span>Browse the genome by cytological bin, and what each bin holds</span>
         </a>
         <a href="/data_center/marker">
           <strong>Marker Data Hub</strong>
           <span>The markers that frame these maps, including the core marker set</span>
-        </a>
-        <a href="/nomenclature">
-          <strong>Nomenclature</strong>
-          <span>How maize genes, loci and map features are named</span>
         </a>
       </div>
     </div>

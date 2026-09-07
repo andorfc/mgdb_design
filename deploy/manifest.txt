@@ -1718,3 +1718,53 @@ src/controllers/community/contribute_data_modern.php      controllers/community/
 src/templates/static/mgdb_contribute_data.bau             templates/static/mgdb_contribute_data.bau
 src/css/mgdb-contribute-data.css                          css/mgdb-contribute-data.css
 src/js/mgdb-contribute-data.js                            js/mgdb-contribute-data.js
+
+# Two more retired routes, 2026-09-06. 301 only, nothing deleted.
+#   /mcclintockprize       -> https://www.maizegenetics.org/awards/mcclintock-prize
+#                             (still at /community/mcclintockprize; our copy still
+#                              named the 2020 winner, six award years behind)
+#   /maize_meeting_coverart -> /maize_meeting/#meeting-art
+#                             (NO alternate route -- /static/<page> answers 200
+#                              with the generic shell, same as /tools/<page>.
+#                              Nothing is lost: the modern meeting page carries
+#                              all eleven years 2009-2019 with artist credits.)
+src/controllers/mcclintockprize.php              controllers/mcclintockprize.php
+src/controllers/maize_meeting_coverart.php       controllers/maize_meeting_coverart.php
+
+# Three more retired routes, 2026-09-06 (plus /about/api, whose guard lives in
+# controllers/about.php above -- /about/<page> is dispatched by that controller,
+# so it cannot take a top-level file, and the top-level controllers/api.php is
+# the JSON API and unrelated).
+#   /mapman, /mapman_two_tissue_comp
+#                 -> https://download.maizegdb.org/Archive/MapMan_GeneAtlas/
+#                    (NO alternate route: /tools/<page> answers 200 with the
+#                     generic shell. The GABI widget both tools depended on is
+#                     decommissioned; the expression files they indexed are not,
+#                     and the site map now links that directory directly.)
+#   /education    -> /                (still at /community/education)
+#   /about/api    -> /contact         (guard in controllers/about.php)
+src/controllers/mapman.php                       controllers/mapman.php
+src/controllers/mapman_two_tissue_comp.php       controllers/mapman_two_tissue_comp.php
+src/controllers/education.php                    controllers/education.php
+
+# /coordinateDef -- what a map coordinate means, 2026-09-06. Same reason as
+# /handyref and /nomenclature_summary for the top-level controller: redirect.php
+# loads the LEGACY main template before it looks for a page, and the legacy page
+# was reached exactly that way (redirect.php -> controllers/static/coordinateDef
+# .php). That legacy controller and its two templates are untouched but have no
+# second route: redirect.php dispatches on the first path segment only, so
+# /static/coordinateDef finds nothing. Rollback is deleting the file below,
+# which hands /coordinateDef straight back to them.
+#
+# The definitions and Ed Coe's passage on how a genetic map is built are kept as
+# written. What is replaced is everything the page asserted about the data: the
+# worked example on map 652048 was hand-typed, disagreed with the map (bz1 at
+# 88.1 against the map's 88.7) and was not self-consistent (5 + 41.2 + 46.9 is
+# 93.1), so it is now read from mgdb.locus_coordinates; the map was called "IBM
+# 9" and is named IBM1 9; the bin link went to /tools/bin_viewer, which answers
+# HTTP 200 with the generic not-found body; and four references given as bare
+# PubMed URLs now render through include/references_lib.php.
+src/controllers/coordinateDef.php                     controllers/coordinateDef.php
+src/templates/static/mgdb_coordinate_definition.bau   templates/static/mgdb_coordinate_definition.bau
+src/css/mgdb-coordinate-definition.css                css/mgdb-coordinate-definition.css
+src/js/mgdb-coordinate-definition.js                  js/mgdb-coordinate-definition.js
