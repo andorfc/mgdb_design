@@ -794,6 +794,20 @@ src/tools/alphafill_models.py                             tools/alphafill_models
 src/tools/alphafill_ligand_extract.py                     tools/alphafill_ligand_extract.py
 
 
+# Compare maps -- /compare_maps. Two or three genetic maps and the loci placed
+# on all of them. controller.php checks ./controllers/<CONTROLLER>.php before
+# falling through to redirect.php, so src/controllers/compare_maps.php takes the
+# route from controllers/tools/compare_maps.php without touching it; rollback is
+# deleting it. /compare_three_maps was the same 176-line file with one more map
+# and is retired to a 301 here. Originals archived in legacy/compare-maps/.
+src/controllers/compare_maps.php                          controllers/compare_maps.php
+src/include/compare_maps_lib.php                          include/compare_maps_lib.php
+src/search/compare_maps/compare_maps_api.php              search/compare_maps/compare_maps_api.php
+src/templates/static/mgdb_compare_maps.bau                templates/static/mgdb_compare_maps.bau
+src/css/mgdb-compare-maps.css                             css/mgdb-compare-maps.css
+src/js/mgdb-compare-maps.js                               js/mgdb-compare-maps.js
+src/controllers/compare_three_maps.php                    controllers/compare_three_maps.php
+
 # Foldseek structure search -- /foldseek. The search itself is unchanged and
 # still runs in an iframe at foldseek.maizegdb.org; everything around it is new.
 # controller.php checks ./controllers/<CONTROLLER>.php before falling through to

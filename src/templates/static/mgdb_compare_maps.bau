@@ -1,0 +1,194 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-compare-maps
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https\://maizegdb.org/compare_maps">
+<meta property="og:title" content="Compare genetic maps | MaizeGDB">
+<meta property="og:description" content="Two or three maize genetic maps, and the loci placed on all of them, with each locus's coordinate on each map.">
+
+<a class="mgdb-skip-link" href="#cm-main">Skip to main content</a>
+<main class="mgdb-page mgdb-compare-maps-page" id="cm-main" data-state="$(page_state)">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Tools</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/map">Maps</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Compare maps</span>
+  </nav>
+
+  ;; .mgdb-hero is a two-column grid -- emblem, then body -- so a hero with no
+  ;; emblem puts its body in the 209px emblem column and sets the h1 one
+  ;; character to a line. The emblem is the Map hub's, which is already two
+  ;; chromosome bars side by side and so is the picture of this page.
+  <section class="mgdb-hero" aria-labelledby="cm-title">
+    <div class="mgdb-hero-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="Two chromosome maps side by side">
+        <rect x="28" y="16" width="16" height="64" rx="8" fill="none" stroke="#235c37" stroke-width="4"/>
+        <line x1="28" y1="32" x2="44" y2="32" stroke="#d99a0b" stroke-width="3"/>
+        <line x1="28" y1="44" x2="44" y2="44" stroke="#235c37" stroke-width="3"/>
+        <line x1="28" y1="52" x2="44" y2="52" stroke="#d99a0b" stroke-width="3"/>
+        <line x1="28" y1="68" x2="44" y2="68" stroke="#235c37" stroke-width="3"/>
+        <rect x="52" y="24" width="16" height="56" rx="8" fill="none" stroke="#235c37" stroke-width="4"/>
+        <line x1="52" y1="40" x2="68" y2="40" stroke="#d99a0b" stroke-width="3"/>
+        <line x1="52" y1="56" x2="68" y2="56" stroke="#235c37" stroke-width="3"/>
+        <line x1="52" y1="64" x2="68" y2="64" stroke="#d99a0b" stroke-width="3"/>
+      </svg>
+      <strong>Compare<br />maps</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="cm-title">Compare genetic maps.</h1>
+      <p class="mgdb-hero-description">Pick two maps of the same chromosome &#8212; or three &#8212; and see the loci placed on all of them, with each locus's coordinate on each map. Maps that share loci can be read against each other; the shared loci are what makes that possible.</p>
+      <p class="mgdb-hero-actions">
+        <a class="mgdb-button mgdb-button-quiet" href="/data_center/map">Map Data Hub <span aria-hidden="true">&rarr;</span></a>
+        <a class="mgdb-button mgdb-button-quiet" href="/data_center/locus">Gene and Locus Data Hub <span aria-hidden="true">&rarr;</span></a>
+      </p>
+    </div>
+  </section>
+
+  <section class="mgdb-panel" id="cm-pick" aria-labelledby="cm-pick-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="cm-pick-title">Choose the maps</h2>
+      </div>
+    </div>
+
+    ;; Only shown when the URL named one map rather than two -- which is what
+    ;; the Map hub's "Compare" link sends. The legacy page answered that with
+    ;; "You must provide two map ids" and stopped.
+    @(no_comparison {display: off}
+    <div class="cm-intro">
+      @(one_map_notice {display: off}
+      <div class="mgdb-message mgdb-message-info" role="status">
+        <div>
+          <strong>$(one_map_name) is chosen.</strong>
+          <span>Pick a second map of the same chromosome below to compare it against.</span>
+        </div>
+      </div>
+      )
+      @(missing_notice {display: off}
+      <div class="mgdb-message mgdb-message-error" role="alert">
+        <div>
+          <strong>No public map has the id $(missing_ids).</strong>
+          <span>It may have been withdrawn, or the link may be old. Choose a map below instead.</span>
+        </div>
+      </div>
+      )
+    </div>
+    )
+
+    <form class="cm-picker" id="cm-picker" role="search">
+      <div class="mgdb-hub-field">
+        <label class="mgdb-label" for="cm-chr">Chromosome</label>
+        <select class="mgdb-select" id="cm-chr" name="chr">$(chromosome_options)</select>
+      </div>
+      <div class="mgdb-hub-field">
+        <label class="mgdb-label" for="cm-map1">First map</label>
+        <select class="mgdb-select" id="cm-map1" name="map1" disabled><option value="">Choose a chromosome first</option></select>
+      </div>
+      <div class="mgdb-hub-field">
+        <label class="mgdb-label" for="cm-map2">Second map</label>
+        <select class="mgdb-select" id="cm-map2" name="map2" disabled><option value="">Choose a chromosome first</option></select>
+      </div>
+      <div class="mgdb-hub-field cm-third" hidden id="cm-third-field">
+        <label class="mgdb-label" for="cm-map3">Third map <span class="mgdb-muted">&#8212; optional</span></label>
+        <select class="mgdb-select" id="cm-map3" name="map3" disabled><option value="">None</option></select>
+      </div>
+      <div class="mgdb-hub-field mgdb-hub-field-action">
+        <button class="mgdb-button mgdb-button-primary" type="submit" id="cm-compare">Compare maps</button>
+      </div>
+      <p class="mgdb-hint cm-picker-hint">
+        <button type="button" class="cm-link-button" id="cm-add-third">Add a third map</button>
+        <span id="cm-picker-status" role="status"></span>
+      </p>
+    </form>
+  </section>
+
+  ;; Everything below is only rendered when two or more maps resolved. The
+  ;; script fills it from search/compare_maps/compare_maps_api.php.
+  @(has_comparison {display: off}
+  <section class="mgdb-panel" id="cm-summary" aria-labelledby="cm-summary-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="cm-summary-title">The maps</h2>
+      </div>
+    </div>
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table cm-summary-table" id="cm-summary-table">
+        <caption class="mgdb-visually-hidden">Summary of the maps being compared</caption>
+        <tbody id="cm-summary-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="mgdb-panel" id="cm-shared" aria-labelledby="cm-shared-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="cm-shared-title">Loci on all of these maps</h2>
+      </div>
+      <a class="mgdb-button mgdb-button-secondary" id="cm-export" href="#" download>Download TSV</a>
+    </div>
+
+    <div class="cm-controls">
+      <div class="mgdb-hub-field">
+        <label class="mgdb-label" for="cm-filter">Locus name</label>
+        <input class="mgdb-input" id="cm-filter" type="search" autocomplete="off" placeholder="e.g. bnlg149, umc" />
+      </div>
+      <div class="mgdb-hub-field">
+        <label class="mgdb-label" for="cm-kind">Type</label>
+        <select class="mgdb-select" id="cm-kind"><option value="">All types</option></select>
+      </div>
+    </div>
+
+    <div class="mgdb-loading" id="cm-loading"><span class="mgdb-spinner" aria-hidden="true"></span><span>Loading the shared loci&hellip;</span></div>
+
+    <div class="mgdb-message mgdb-message-error" id="cm-error" role="alert" hidden>
+      <div>
+        <strong>The shared loci could not be loaded.</strong>
+        <span>Reload to try again, or report it if it keeps happening.</span>
+        <button class="mgdb-button mgdb-button-secondary" id="cm-retry" type="button">Retry</button>
+      </div>
+    </div>
+
+    <p class="cm-count" id="cm-count" role="status"></p>
+    <div class="mgdb-table-scroll" id="cm-table-wrap" hidden>
+      <table class="mgdb-table mgdb-table-zebra" id="cm-table">
+        <thead id="cm-thead"></thead>
+        <tbody id="cm-tbody"></tbody>
+      </table>
+    </div>
+    <div class="cm-pager" id="cm-pager" hidden>
+      <button class="mgdb-button mgdb-button-quiet" type="button" id="cm-prev">&larr; Previous</button>
+      <span id="cm-page-label"></span>
+      <button class="mgdb-button mgdb-button-quiet" type="button" id="cm-next">Next &rarr;</button>
+    </div>
+
+    <div class="cm-legend">
+      <h3>What the colours mean</h3>
+      <p class="mgdb-hint">The legacy page carried this key in a pop-up window, and the colour was the only place a locus's type appeared. It is a column now; the colour is a second reading of the same fact.</p>
+      <ul class="cm-legend-list">$(legend_items)</ul>
+    </div>
+  </section>
+  )
+
+  <section class="mgdb-hub-related" id="cm-resources" aria-labelledby="cm-resources-title">
+    <div class="mgdb-section-heading"><div><h2 id="cm-resources-title">Related resources</h2></div></div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/map">
+          <strong>Map Data Hub</strong>
+          <span>Every genetic, cytogenetic and physical map, with the loci placed on each</span>
+        </a>
+        <a href="/data_center/locus">
+          <strong>Gene and Locus Data Hub</strong>
+          <span>The loci themselves, and everywhere else each one has been placed</span>
+        </a>
+        <a href="/data_center/cytogenetic">
+          <strong>Cytogenetics Data Hub</strong>
+          <span>FISH maps, and the cytological positions these comparisons reach</span>
+        </a>
+        <a href="/bin_viewer">
+          <strong>Bin Viewer</strong>
+          <span>Genetic bin boundaries, and the data placed within them</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

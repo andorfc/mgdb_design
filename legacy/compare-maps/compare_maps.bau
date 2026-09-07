@@ -1,0 +1,131 @@
+$$SYNTAX-LEVEL 2
+*(map_compare
+  @(no-inputs {display: off}
+    <br><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="error">You must provide two map ids</span>
+  )
+  
+  @(not-found {display: off}
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="error">$(error)</span>
+  )
+  
+  @(comparison {display: off}
+    <table width="100%" cellpadding=5 cellspacing=5>
+      <tr>
+        <td valign=top>
+          <p style="margin-bottom: 8px;">
+            <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+              Map Comparison: <a href="/data_center/map?id=$(map1)">$(map1_name)</a>
+              vs. <a href="/data_center/map?id=$(map2)">$(map2_name)</a>
+            </span>
+          </p>
+          <p>
+            Here is a comparison summary of the maps you selected. The first 
+            table compares summary info for the two maps; below that you can 
+            find details on loci that appear on both maps.
+          </p>
+          <form method="get" action="/compare_three_maps" class="tiny">
+            <input type="hidden" name="map1" value="$(map1)">
+            <input type="hidden" name="map2" value="$(map2)">
+            <label for="map3">Compare these maps with 
+            <select name="map3" id="map3" class="small">
+              @(compare_map_list
+                <option value="$(groupmap_id)">$(groupmap_name)</option>
+              )
+            </select>
+            <input type="submit" value="Compare ->" class="small">
+          </form>
+        </td>
+      </tr>
+    </table>
+    <table cellpadding=1 cellspacing=1 width="100%">
+      <tr>
+        <th align=left>
+          <u><b>Comparison Summary</b></u>:
+        </th>
+        <th align=left>
+          <b>
+            <a href=\"/data_center/map?id=$(map1)"><u>$(map1_name)</u>
+            </a>
+          </b>
+        </th>
+        <th align=left>
+          <b>
+            <a href="/data_center/map?id=$(map2)"><u>$(map2_name)</u>
+            </a>
+          </b>
+        </th>
+      </tr>
+      <tr>
+        <td><b>Source:</b></td>
+        <td>
+          @(source1-name {display: off}
+            <a href="person?id=$(source1_id)">$(source1_name)</a>
+          )
+          @(source1-not-known {display:off}
+            unknown
+          )
+        </td>
+        <td>
+          @(source2-name {display: off}
+            <a href="person?id=$(source2_id)">$(source2_name)</a>
+          )
+          @(source2-not-known {display:off}
+            unknown
+          )
+        </td>
+      </tr>
+      <tr>
+         <td><b>No. of Markers</b></td>
+         <td>$(marker_count1)</td>
+         <td>$(marker_count2)</td>
+      </tr>
+    </table>
+
+    <p>
+      Both maps include the following loci: 
+      <a href="#" 
+         onClick="javascript:window.open('/docs/help/map-notes.html','mapnotes','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,width=480,height=550,left=50,top=50'\);">
+        <img alt="Help popup" src="/images/question1.gif" height=15 width=15 border=0> (key\)
+      </a>
+    </p>
+    <table cellpadding=1 cellspacing=1 width="100%">
+      <tr>
+        <th align=left>Locus</th>
+        <th align=left>
+          <b><a href="/data_center/map?id=$(map1)">$(map1_name)</a></b> coordinate
+        </th>
+        <th align=left>
+          <a href="/data_center/map?id=$(map2)">$(map2_name)</a></b> coordinate
+        </th>
+      </tr>
+      @(common-locus-rows {display: off}
+        <tr>
+          <td>
+            <a href="data_center/locus?id=$(locus_id)">
+              <font color="#$(color)">$(locus_name) <i>$(locus_full_name)</i></font>
+            </a>
+          </td>
+          <td>
+            <a href="data_center/map?id=$(map1)&amp;reflocus=$(locus_id)#map_data">
+              <font color="#$(color)">$(map_1_value)</font>
+            </a>
+          </td>
+          <td>
+            <a href="data_center/map?id=$(map2)&amp;reflocus=$(locus_id)#map_data">
+              <font color="#$(color)">$(map_2_value)</font>
+            </a>
+          </td>
+        </tr>
+      )
+      @(no-common-rows {display: off}
+        <tr>
+          <td colspan=3>
+            <p>These two maps have no loci in common.</p>
+          </td>
+        </tr>
+      )
+    </table>
+  )
+  
+)

@@ -263,6 +263,15 @@
       links.push('<a class="mgdb-button mgdb-button-quiet" href="/data_center/alphafill?gene='
         + encodeURIComponent(identity.gene_ids[0]) + '">Predicted ligands</a>');
     }
+    /* PanEffect scores every possible amino-acid substitution against the
+       sequence and the AlphaFold model. It is keyed on RefGen_v5 gene models,
+       which is exactly identity.gene_ids[0]; the &amp; keeps the query string
+       intact once this string is written through innerHTML. */
+    if ((identity.gene_ids || []).length) {
+      links.push('<a class="mgdb-button mgdb-button-quiet" rel="noopener" '
+        + 'href="https://www.maizegdb.org/effect/maize_v2/index.html?id='
+        + encodeURIComponent(identity.gene_ids[0]) + '&amp;option=both&amp;esm=ESM2">PanEffect</a>');
+    }
 
     /* Saying which route answered is not trivia: "structure index" means the
        identifier was matched exactly, "MaizeGDB gene database" means it was

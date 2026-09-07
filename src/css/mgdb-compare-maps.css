@@ -1,0 +1,178 @@
+/* file: css/mgdb-compare-maps.css
+ *
+ * /compare_maps. The page it replaces had no stylesheet: it was nested
+ * <table width="100%" cellpadding=5> layout tables with inline font sizes, and
+ * every locus row carried a <font color="#CC0000"> on each of its three cells.
+ */
+
+/* ── The picker ──────────────────────────────────────────────────────────── */
+
+/* Chromosome, then the maps, then the button. The third map appears in the
+   same row when it is asked for, so the row goes from four columns to five
+   rather than reflowing. */
+.mgdb-compare-maps-page .cm-picker {
+  display: grid;
+  grid-template-columns: minmax(0, 12rem) minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-4);
+  align-items: end;
+}
+
+.mgdb-compare-maps-page .cm-picker.has-third {
+  grid-template-columns: minmax(0, 12rem) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) auto;
+}
+
+/* The hint sits on its own full-width row rather than inside a field. Inside
+   one, `align-items: end` would bottom-align the Compare button to the hint
+   instead of to the selects -- the fault fixed on the stock and QTL hubs. */
+.mgdb-compare-maps-page .cm-picker-hint {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: baseline;
+  margin: calc(-1 * var(--mgdb-space-2)) 0 0;
+}
+
+.mgdb-compare-maps-page .cm-link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mgdb-green-dark);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.mgdb-compare-maps-page .cm-intro {
+  display: grid;
+  gap: var(--mgdb-space-3);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+/* ── The summary table ───────────────────────────────────────────────────── */
+
+/* One row per fact, one column per map, so two maps and three read the same
+   way. The first column is the label. */
+.mgdb-compare-maps-page .cm-summary-table th[scope="row"] {
+  width: 12rem;
+  white-space: nowrap;
+}
+
+.mgdb-compare-maps-page .cm-summary-table td {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Filters ─────────────────────────────────────────────────────────────── */
+
+.mgdb-compare-maps-page .cm-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 18rem);
+  gap: var(--mgdb-space-4);
+  align-items: end;
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-compare-maps-page .cm-count {
+  margin: 0 0 var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* Coordinates are read down the column and compared across it, so the digits
+   have to line up on both axes. */
+.mgdb-compare-maps-page #cm-table td.cm-coord {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.mgdb-compare-maps-page #cm-table th.cm-coord-head {
+  text-align: right;
+}
+
+/* ── Paging ──────────────────────────────────────────────────────────────── */
+
+.mgdb-compare-maps-page .cm-pager {
+  display: flex;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-compare-maps-page .cm-pager span {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── The type chips and the legend ───────────────────────────────────────── */
+
+/* The colours are the legacy page's, kept so a reader who knew the old key
+   still recognises them. They are a second reading of the type column rather
+   than the only one, which is what they were: on a page whose key lived in a
+   pop-up window, a red row said nothing to anyone who had not opened it. */
+.mgdb-compare-maps-page .cm-chip {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  margin-right: var(--mgdb-space-2);
+  border-radius: 2px;
+  background: var(--cm-kind, #0000cc);
+}
+
+.mgdb-compare-maps-page .cm-kind-gene      { --cm-kind: #cc0000; }
+.mgdb-compare-maps-page .cm-kind-candidate { --cm-kind: #cc6600; }
+.mgdb-compare-maps-page .cm-kind-qtl       { --cm-kind: #0099a8; }
+.mgdb-compare-maps-page .cm-kind-rflp      { --cm-kind: #00a300; }
+.mgdb-compare-maps-page .cm-kind-ssr       { --cm-kind: #993300; }
+.mgdb-compare-maps-page .cm-kind-rapd      { --cm-kind: #666666; }
+.mgdb-compare-maps-page .cm-kind-aflp      { --cm-kind: #6600cc; }
+.mgdb-compare-maps-page .cm-kind-probed    { --cm-kind: #990099; }
+.mgdb-compare-maps-page .cm-kind-other     { --cm-kind: #0000cc; }
+
+.mgdb-compare-maps-page .cm-type {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.mgdb-compare-maps-page .cm-legend {
+  margin-top: var(--mgdb-space-5);
+  padding-top: var(--mgdb-space-4);
+  border-top: 1px solid var(--mgdb-line-soft);
+}
+
+.mgdb-compare-maps-page .cm-legend h3 {
+  margin: 0 0 var(--mgdb-space-2);
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-compare-maps-page .cm-legend-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  margin: var(--mgdb-space-3) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-compare-maps-page .cm-legend-list li {
+  display: flex;
+  align-items: center;
+}
+
+/* ── Narrow screens ──────────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .mgdb-compare-maps-page .cm-picker,
+  .mgdb-compare-maps-page .cm-picker.has-third,
+  .mgdb-compare-maps-page .cm-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .mgdb-compare-maps-page .cm-picker .mgdb-hub-field-action .mgdb-button { width: 100%; }
+  .mgdb-compare-maps-page .cm-summary-table th[scope="row"] { width: auto; }
+}

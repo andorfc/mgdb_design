@@ -29,6 +29,7 @@ $$SYNTAX-LEVEL 2
     <a href="#ps-find" class="is-current" aria-current="true">Search</a>
     <a href="#ps-esmfold">ESMFold isoforms</a>
     <a href="#ps-tools">Comparison tools</a>
+    <a href="#ps-variants">Variant effects</a>
     <a href="#ps-reading">Interpreting predictions</a>
     <a href="#ps-sources">Data sources</a>
     <a href="#ps-references">References</a>
@@ -167,7 +168,38 @@ $$SYNTAX-LEVEL 2
   </section>
 
   <!-- ====================================================================
-       4. How to read a predicted complex
+       4. Variant effects on structure \(PanEffect, SNPFold\)
+       ==================================================================== -->
+  <section id="ps-variants" aria-labelledby="ps-variants-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ps-variants-title">Variant effects on structure</h2></div>
+    </div>
+
+    <div class="mgdb-card-grid ps-tool-grid">
+      <article class="mgdb-card ps-tool-card">
+        <span class="mgdb-pill mgdb-pill-info">Variant Effects</span>
+        <h3>PanEffect</h3>
+        <p>See how every possible amino-acid substitution is predicted to affect a maize protein. PanEffect maps ESM language-model effect scores onto the sequence and the AlphaFold structure, with a heatmap across all positions and substitutions.</p>
+        <form class="ps-search-row" action="https\://www.maizegdb.org/effect/maize_v2/index.html" method="get" target="_blank" rel="noopener">
+          <label class="mgdb-visually-hidden" for="ps-paneffect">Gene model for PanEffect</label>
+          <input class="mgdb-input" id="ps-paneffect" name="id" type="search" placeholder="Zm00001eb260000" />
+          <input type="hidden" name="option" value="both" />
+          <input type="hidden" name="esm" value="ESM2" />
+          <button class="mgdb-button mgdb-button-secondary" type="submit">Open PanEffect</button>
+        </form>
+      </article>
+
+      <article class="mgdb-card ps-tool-card">
+        <span class="mgdb-pill mgdb-pill-ok">Variants on Structure</span>
+        <h3>SNPFold</h3>
+        <p>Maps coding variants onto predicted protein structure. A linear protein browser aligns variants with Pfam domains, secondary structure, and per-residue pLDDT confidence; an on-demand 3D viewer shows the fold colored by confidence, domain, or impact; and a per-variant readout interprets each change \(domain, local confidence, secondary structure, predicted &Delta;&Delta;G\).</p>
+        <p><a class="mgdb-button mgdb-button-secondary" href="https\://snptools.maizegdb.org/" target="_blank" rel="noopener">Open SNPFold <span aria-hidden="true">&rarr;</span></a></p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       5. How to read a predicted complex
        ==================================================================== -->
   <section id="ps-reading" aria-labelledby="ps-reading-title">
     <div class="mgdb-section-heading">

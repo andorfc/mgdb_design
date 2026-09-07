@@ -1,0 +1,142 @@
+$$SYNTAX-LEVEL 2
+*(compare_three_maps
+  @(show-maps {display: off}
+  <table width="100%" cellpadding=5 cellspacing=5>
+    <tr>
+      <td valign=top>\
+        <p style="margin-bottom: 8px;">
+          <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+            Map Comparison: <a href=/data_center/map/$(map1)">$(map1_name)</a> vs. 
+            <a href="/data_center/map/$(map2)">$(map2_name)</a> vs. 
+            <a href="/data_center/map/$(map3)">$(map3_name)</a>
+          </span>
+        </p>
+        <p>
+          Here is a comparison summary of the maps you selected. The first 
+          table compares summary info for the three maps; below that you can 
+          find details on loci that appear on both maps.
+        </p>
+        
+        <table cellpadding=1 cellspacing=1 width="100%">
+          <tr>
+            <th align=left class="nowrap"><u><b>Comparison Summary</b></u>:</th>
+            <th align=left class="nowrap">
+              &nbsp;&nbsp;&nbsp;
+              <b><a href="/data_center/map/$(map1)"><font color=\"black\"><u>$(map1_name)</u></font></a></b>
+            </th>
+            <th align=left class="nowrap">
+              &nbsp;&nbsp;&nbsp;
+              <b><a href="/data_center/map/$(map2)"><font color=\"black\"><u>$(map2_name)</u></font></a></b>
+            </th>
+            <th align=left class="nowrap" width="100%">
+              &nbsp;&nbsp;&nbsp;
+              <b><a href="/data_center/map/$(map3)"><font color=\"black\"><u>$(map3_name)</u></font></a></b>
+            </th>
+          </tr>
+          <tr>
+            <td><b>Source</b></td>
+            @(map-sources
+              <td>
+                &nbsp;&nbsp;&nbsp;
+                <a href="/data_center/map/$(source)">$(source_name)</a>
+              </td>
+            )
+          </tr>
+          <tr>
+            <td><b>No. of Markers</b></td>
+            @(marker-counts
+              <td>
+                &nbsp;&nbsp;&nbsp;&nbsp;$(marker_count)
+              </td>
+            )
+          </tr>
+        </table>
+        
+        @(matching-loci
+        <br><br>
+          <p>
+            All three maps include the following loci: 
+            <a href="#" 
+               onKeyPress="javascript:window.open('/docs/help/map-notes.html','mapnotes','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,width=480,height=550,left=50,top=50'\)" 
+               onClick="javascript:window.open('/docs/help/map-notes.html','mapnotes','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,width=480,height=550,left=50,top=50'\)">
+            <img alt="A popup window providing help understanding & utilizing this map data" 
+                 src="/images/question.png" height="15" width="15" border=0>(key\)</a>
+          </p>
+          <table cellpadding=1 cellspacing=1 width="100%">
+            <tr>
+              <th align="left">Locus</th>
+              <th align="left">
+                <b><a href="/data_center/map/$(map1)">$(map1_name)</a></b> coordinate
+              </th>
+              <th align="left">
+                <b><a href="/data_center/map/$(map2)">$(map2_name)</a></b> coordinate
+              </th>
+              <th align="left">
+                <b><a href="/data_center/map/$(map3)">$(map3_name)</a></b> coordinate
+              </th>
+            </tr>
+            @(locus-rows-hide
+              <tr>
+                <td>
+                  <a href="/data_center/locus/$(locus_id)">
+                    <font color="\#$(color)">$(locus_name) <i>$(locus_full_name)</i></font>
+                  </a>
+                </td>
+                <td>
+                  <a href="/data_center/map?id=$(map1)&amp;reflocus=$(locus_id)\#reflocus">$(map_1_value)</a>
+                </td>
+                <td>
+                  <a href="/data_center/map?id=$(map2)&amp;reflocus=$(locus_id)\#reflocus">$(map_2_value)</a>
+                </td>
+                <td>
+                  <a href="/data_center/map?id=$(map3)&amp;reflocus=$(locus_id)\#reflocus">$(map_3_value)</a>
+                </td>
+              </tr>
+            )
+            @(locus-rows
+              <tr>
+                <td>
+                  <a href="/data_center/locus/$(locus_id)">
+                    <font color="$(color)">$(locus_name) <i>$(locus_full_name)</i></font>
+                  </a>
+                </td>
+                <td>
+                  <a href="/data_center/map?id=$(map1)&amp;reflocus=$(locus_id)\#reflocus">$(map_1_value)</a>
+                </td>
+                <td>
+                  <a href="/data_center/map?id=$(map2)&amp;reflocus=$(locus_id)\#reflocus">$(map_2_value)</a>
+                </td>
+                <td>
+                  <a href="/data_center/map?id=$(map3)&amp;reflocus=$(locus_id)\#reflocus">$(map_3_value)</a>
+                </td>
+              </tr>
+            )
+          </table>
+        )
+          
+        @(no-matching-loci {display: off}
+           <p>These three maps have no loci in common.</p>
+        )
+      </td>
+    </tr>
+  </table>
+  )
+  
+  @(no-maps {display: off}
+  <table width="100%" cellpadding=5 cellspacing=5>
+    <tr>
+      <td valign=top>
+        <p style="margin-bottom: 8px;">
+          <span style="font-family: Verdana, Arial, sans-serif; font-size: 120%; font-weight: bold; margin-bottom: 6px;">
+            Record Not Found!
+          </span>
+        </p>
+        <p>
+          One or more of the maps you requested was not found in the database. Please 
+          revise your query and try again.
+        </p>
+      </td>
+    </tr>
+  </table>
+  )
+)

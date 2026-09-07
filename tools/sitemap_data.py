@@ -59,16 +59,21 @@ SECTIONS = [
         ("Downloads", "https://download.maizegdb.org", "Bulk files: assemblies, annotations, insertions, expression."),
     ]),
 
-    # Dropped per review: the three Bin Viewer parameter stubs, Compare maps,
+    # Dropped per review: the three Bin Viewer parameter stubs,
     # Compare three maps, Complete map view, Mapped elements, Mapped SSRs,
     # Single tissue comparison, Whole genome views (listed under Genomic data).
     # Moved to Archives: Incongruency, Locus lookup, Locus pair lookup, Locus
     # summary table, both MapMan entries, SSR reports.
     # Also dropped: Newly characterized genes -- /new_genes serves an empty
     # body on both dev and www.
+    # Compare maps is back, 2026-09-07: it was dropped because the bare URL
+    # answered "You must provide two map ids", and the modernized page carries
+    # a map picker instead. Compare three maps stays out -- it is a 301 to
+    # /compare_maps now.
     ("tools", "tools", "All research tools", "", [
         ("BLAST", "/BLAST", "Sequence search against the full set of genome datasets hosted at MaizeGDB."),
         ("Bin Viewer", "/bin_viewer", "Explore data in regions defined by genetic bin boundaries."),
+        ("Compare maps", "/compare_maps", "Two or three genetic maps of one chromosome, and the loci placed on all of them."),
         ("FATCAT comparison tool", "/fatcat", "Structural alignments between a maize protein and its top structural hits."),
         ("FETA", "https://feta.maizegdb.org", "A suite of tools for exploring gene functional enrichment in Zea mays and relatives."),
         ("Foldseek search", "/foldseek", "Search a maize protein structure by shape, and find relatives that sequence search misses."),

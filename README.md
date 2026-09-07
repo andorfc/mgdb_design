@@ -4478,6 +4478,102 @@ it Cloudflare serves a month-old copy of any file a rebuild corrects -- which it
 did, during this build, and origin and CDN disagreed for long enough to be
 confusing. `--release` overrides the stamp for a same-day rebuild.
 
+## Compare maps
+
+`/compare_maps` came onto the design system on 2026-09-07. It takes two genetic
+maps of one chromosome and lists the loci placed on both, with each locus's
+coordinate on each map. It takes three now as well, which is what
+`/compare_three_maps` was for.
+
+`controllers/compare_maps.php` takes the route from
+`controllers/tools/compare_maps.php` the way `/fatcat` and `/foldseek` do.
+Originals in `legacy/compare-maps/`.
+
+### The bare URL was a dead end, and it was linked 32 times
+
+`/compare_maps` with no parameters printed **"You must provide two map ids"**
+and stopped. That is exactly what the Map Data Hub's own **Compare** link
+produced: `js/mgdb-map.js` builds it as `/compare_maps?map1=<id>` &mdash; one
+map, because the hub has one map per row and no way to know the second.
+
+The page carries a picker now: chromosome, first map, second map, and a third
+if asked for. Arriving with one map is a starting point rather than an error
+&mdash; the picker opens on that map's chromosome with it already chosen and
+says so. Arriving with an id that is not a public map says which id, instead of
+"doesn't exist or is not public" in a red `<span>`.
+
+Because the bare URL works, the page is back in the site map. It had been
+dropped in the 2026-08-28 review for being a parameter stub.
+
+### 3.2 MB, and a query per row
+
+The worst pair in the database is Cornfed Dent Composite 1 against Cornfed
+Flint Composite 1: **5,505 shared loci**. The legacy page rendered every one
+into the document &mdash; 3.2 MB, 5,537 table rows, 1.9 s &mdash; and got there
+by running, per request:
+
+| | |
+|---|---|
+| two map lookups | plus a source lookup each |
+| two marker counts | `SELECT id FROM locus_coordinates WHERE map = ?`, rows counted in PHP |
+| the shared-locus join | one query |
+| **the colour of each row** | **one more query per probed-site locus**, for its detection method |
+
+That last one is the N+1: the row's colour depended on `locus_detected_by`, so
+a 5,000-row comparison asked the database several thousand questions.
+
+Here the detection method is a `LEFT JOIN LATERAL` on the same query, and the
+rows come from `search/compare_maps/compare_maps_api.php` a page at a time. All
+5,500 rows come back in **57 ms**; the page is **74 KB** instead of 3.2 MB. The
+whole set is a TSV download.
+
+### The colour was the only place the type appeared
+
+Each locus was printed in one of nine colours, and the key was a **pop-up
+window** at `/docs/help/map-notes.html`, opened by a `javascript:` link behind a
+15-pixel question-mark GIF. A reader who did not open it had no way to know that
+red meant gene. The type is a labelled column now, the colour rides along with
+it as a chip, and the legend is on the page. The palette is the legacy one, so
+anyone who knew the old key still recognises it.
+
+The filter over that column is computed in SQL rather than applied to the
+fetched page, so its count and its paging describe the same set. Filtering to
+Gene on the Cornfed pair gives 63 loci on one page; the nine kinds sum to 5,500,
+which is the unfiltered total.
+
+### Two defects in the legacy queries
+
+**`fix_map_name()` corrupted a map name.** It dropped the second-to-last
+character whenever it was a zero, meaning to turn a zero-padded chromosome
+number into a plain one. No curated map name has that shape any more. The only
+name it still changed is **"B73/H99 RI 2005"**, which it rendered
+**"B73/H99 RI 205"** &mdash; in the page title and three more places, live. The
+function is not carried over.
+
+**The "compare these maps with" list guessed the chromosome.** It matched
+`A.NAME LIKE '%<last character of map1's name>'` and excluded anything starting
+"Oryza", with a comment calling itself a hack. `map.linkage_group` is the column
+that says which chromosome a map is of. The guess disagrees with it for 27
+curated maps: 9 whose names do not end in their chromosome number, and 18 filed
+under a B chromosome or a mitochondrial linkage group, which it could never
+offer at all.
+
+### `/compare_three_maps` is retired
+
+It was `compare_maps.php` copied and given a third map &mdash; 176 near-identical
+lines, the same hack, the same comments. `map3` is an optional parameter here
+and the old route 301s across carrying all three ids. It was already an orphan:
+the only thing that linked to it was the form on `compare_maps` itself.
+
+Checked at 1280 and 375: no horizontal overflow at either, the table scrolls in
+its own container, the picker collapses to one column, and the Compare button
+sits on the selects rather than below them.
+
+**One thing the port changes in the data shown.** The shared-locus query now
+requires `id_num.curation_lvl = 0` on the locus, as the rest of the site does.
+On the worst pair that is 5,500 rows where the legacy page showed 5,505: five
+loci that are not public were being listed.
+
 ## Foldseek structure search
 
 `/foldseek` came onto the design system on 2026-09-06. Carson: "it mainly uses
