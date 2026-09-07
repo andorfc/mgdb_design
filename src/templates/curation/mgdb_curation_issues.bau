@@ -1,0 +1,96 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-curation-issues
+<a class="mgdb-skip-link" href="#ci-main">Skip to main content</a>
+
+<main class="mgdb-page mgdb-hub-page mgdb-curation-issues-page" id="ci-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span>
+    <a href="/genome">Genomes</a><span aria-hidden="true">&rsaquo;</span>
+    <span aria-current="page">$(page_title)</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="ci-title">
+    <div class="mgdb-hero-emblem ci-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="A magnifying glass over a strand of sequence">
+        <path d="M12 62h24 M60 62h24" stroke="#7fae8c" stroke-width="4" stroke-linecap="round" />
+        <path d="M20 54v16 M28 54v16 M68 54v16 M76 54v16" stroke="#7fae8c" stroke-width="3" stroke-linecap="round" />
+        <circle cx="48" cy="44" r="20" fill="#e8f4ec" stroke="#235c37" stroke-width="4" />
+        <path d="M62 58 L80 76" stroke="#235c37" stroke-width="5" stroke-linecap="round" />
+        <path d="M48 34v14" stroke="#d99a0b" stroke-width="4" stroke-linecap="round" />
+        <circle cx="48" cy="55" r="2.6" fill="#d99a0b" />
+      </svg>
+      <strong>Reported issues</strong>
+      <span class="ci-emblem-meta">Open now</span>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="ci-title">$(page_title)</h1>
+      <p class="mgdb-hero-description">$(page_blurb)</p>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#ci-open" class="is-current" aria-current="true">Open issues</a>
+    <a href="#ci-report">Report one</a>
+    <a href="#ci-related">Related resources</a>
+  </nav>
+
+  <section id="ci-open" aria-labelledby="ci-open-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ci-open-title">Open issues</h2></div>
+    </div>
+
+    <p class="ci-scope"><strong>$(issue_count)</strong> open $(issue_noun), read from MaizeGDB's issue tracker as this page loaded. Only open issues are listed; a resolved one drops off.</p>
+
+    $(issue_table)
+  </section>
+
+  <section id="ci-report" aria-labelledby="ci-report-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ci-report-title">Report one</h2></div>
+    </div>
+
+    <div class="ci-prose">
+      <p>If you have found a region of a reference assembly or a gene model that looks wrong, is missing, or represents variation poorly, tell us. The report form asks for the assembly, the location or the gene model identifier, and a description; an attachment is optional, and a screenshot of a browser view is often the fastest way to show what you mean.</p>
+      <p>Reports go to MaizeGDB's curators, who work them with the group that produced the annotation. What appears on this page is what is still open.</p>
+    </div>
+
+    <p class="ci-actions">
+      <a class="mgdb-button mgdb-button-primary" href="/curation/GenomeIssue">Report an issue <span aria-hidden="true">&rarr;</span></a>
+      <a class="mgdb-button mgdb-button-secondary" href="/feedback">Something else about MaizeGDB <span aria-hidden="true">&rarr;</span></a>
+    </p>
+  </section>
+
+  <section id="ci-related" class="mgdb-hub-related" aria-labelledby="ci-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ci-related-title">Related resources</h2></div>
+    </div>
+
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="$(other_url)">
+          <strong>$(other_label)</strong>
+          <span>$(other_blurb)</span>
+        </a>
+        <a href="/curation/GenomeIssue">
+          <strong>Report an issue</strong>
+          <span>The form these reports come in through</span>
+        </a>
+        <a href="/gene_center/gene">
+          <strong>Gene Data Hub</strong>
+          <span>The gene models these reports are about, one record each</span>
+        </a>
+        <a href="/genome">
+          <strong>Genome Data Hub</strong>
+          <span>Every assembly and annotation MaizeGDB holds, and how each was built</span>
+        </a>
+        <a href="/genomebrowser">
+          <strong>Genome Browser Data Hub</strong>
+          <span>Look at the region before you report it, and copy the coordinates</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+)

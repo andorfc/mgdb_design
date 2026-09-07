@@ -1,0 +1,89 @@
+$$SYNTAX-LEVEL 2
+*(genome-issue-submitted
+  {   
+   include-js: /js/GenomeIssue.js
+  }
+  
+  <div id="curation_div">
+    @(issue-submitted {display: on}
+      <div id="main">
+        <a name="main"></a>
+        <div id="contents">
+          <h1>Report a Gene Model or Genome Problem</h1>
+        
+          @(error {display: off}
+            <span class="error"><b>
+              $(error-msg)
+            </b></span>
+            <br>
+          )
+    
+          <p>
+            @(gene-model-section {display: off}
+              <b>Thank you for reporting a gene model issue</b>
+            )
+          
+            @(genome-location-section {display: off}
+              <b>Thank you for reporting a genome issue</b>
+            )
+            <br>
+            Your issue has been recorded and the MaizeGDB curators have been
+            notified. You may be contacted soon by a curator, but be aware that
+            it may take some time before this issue is addressed, depending on 
+            the state of the current assembly efforts.
+            <br>
+<!--            This issue has been assigned the identifier of <b>$(issue_key)</b>.
+            Please use this identifier when corresponding with the MaizeGDB
+            team about this issue. You will also receive an e-mail with this 
+            identifier.
+-->
+          </p>
+          
+          <br>
+          
+          <div style="margin:15px">
+            <p><b>Your issue report:</b></p><br>
+            <p>
+              <b>issue identifier</b>: $(issue_key)<br>
+<!--
+              <b>organism</b>: $(organism)<br>
+              <b>genotype</b>: $(genotype)<br>
+-->
+              <b>genome assembly</b>: $(genome_assembly)<br>
+              @(gene-model-fb {display: off}
+                <b>gene model</b>: $(gene_model)<br>
+                <b>gene model</b> version: $(gene_model_version)<br>
+              )
+              @(genome-fb {display: off}
+                <b>chromosome</b>: $(chromosome)<br>
+                @(genome-coords-fb {display: off}
+                  <b>chr start</b>: $(chr_start)<br>
+                  <b>chr end</b>: $(chr_end)<br>
+                )
+                @(genome-acc-fb {display: off}
+                  <b>first accession</b>: $(first_acc)<br>
+                  <b>last accession</b>: $(last_acc)<br>
+                )
+              )
+              <b>submitter's name</b>: $(sub_name)<br>
+              <b>submitter's e-mail</b>: $(email)<br>
+              <b>submitter's affiliation</b>: $(affiliation)<br>
+              <b>submitter's position</b>: $(position)<br>
+            </p>
+            <br>
+            @(attachment {display: off}
+              <p>
+                <b>attachment:</b> $(attachment-name)
+                <br><br>
+              </p>
+            )
+            <p>
+              <b>description:</b><br>
+              $(description)
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  </div>
+)

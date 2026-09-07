@@ -1,0 +1,295 @@
+$$SYNTAX-LEVEL 2
+*(genome-issue-form
+  {
+    include-css: /css/curation.css |
+    include-js: /js/GenomeIssue.js
+  }
+  
+  <div id="curation_div">
+    @(error {display: off}
+      <span class="error"><b>
+        $(error-msg)
+      </b></span>
+    )
+    
+    @(edit-form {display: on}
+      <div id="main">
+        <a name="main"></a>
+        <div id="contents">
+          @(genome-issue {display: off}
+          <h1>Report an assembly problem</h1>
+          <p>If you have found a region of the maize reference genome assembly 
+            or a gene model which seems to be in error or is missing from the
+            assembly, or you have found a region of variation that needs to be 
+            better represented, please let us know. Provide as much detail as 
+            possible in the form below and someone at MaizeGDB will get back 
+            to you.
+          </p>
+          )
+          @(gene-model-issue {display: off}
+          <h1>Report a gene model problem</h1>
+          <p>If you have discovered a problem with a gene model, please let us know. 
+            Provide as much detail as possible in the form below and someone at MaizeGDB 
+            will get back to you.
+          </p>
+          )
+          <p>All required fields are marked with an asterisk 
+          (<span style="color:red"><em>*</em></span>\)<p>
+          <form class="grc_form" onsubmit="return validateIssueForm(\);" name="problem" 
+                action="/curation/GenomeIssue/save" method="POST" 
+                enctype="multipart/form-data">
+            <input type="hidden" id="URL" name="URL">
+            <fieldset>
+              <legend>
+                Genome Information
+                <a href="#" onclick="popUpHelp('genome_issue', 'genome_info'\)"><img 
+                 src="/images/question.png"></a>
+              </legend>
+              <label for="genotype">Genome version: </label>
+              <select id="genome_assembly" name="genome_assembly">
+                <option value="Zm-B73-REFERENCE-NAM-5.0" $(Zm-B73-REFERENCE-NAM-5.0-selected)>Zm-B73-REFERENCE-NAM-5.0 (B73 RefGen_v5\)</option>
+                <option value="Zm-B73-REFERENCE-GRAMENE-4.0" $(Zm-B73-REFERENCE-GRAMENE-4.0-selected)>Zm-B73-REFERENCE-GRAMENE-4.0 (B73 RefGen_v4\)</option>
+                <option value="B73 RefGen_v3" $(B73_RefGen_v3-selected)>B73 RefGen_v3</option>
+                <option value="B73 RefGen_v2" $(B73_RefGen_v2-selected)>B73 RefGen_v2</option>
+                <option value="Zm-B97-REFERENCE-NAM-1.0" $(Zm-B97-REFERENCE-NAM-1.0-selected)>Zm-B97-REFERENCE-NAM-1.0</option>
+                <option value="Zm-B104-DRAFT-ISU_USDA-0.1" $(Zm-B104-DRAFT-ISU_USDA-0.1-selected)>Zm-B104-DRAFT-ISU_USDA-0.1 (B104 pre-release\)</option>
+                <option value="Zm-CML52-REFERENCE-NAM-1.0" $(Zm-CML52-REFERENCE-NAM-1.0-selected)>Zm-CML52-REFERENCE-NAM-1.0</option>
+                <option value="Zm-CML69-REFERENCE-NAM-1.0" $(Zm-CML69-REFERENCE-NAM-1.0-selected)>Zm-CML69-REFERENCE-NAM-1.0</option>
+                <option value="Zm-CML103-REFERENCE-NAM-1.0" $(Zm-CML103-REFERENCE-NAM-1.0-selected)>Zm-CML103-REFERENCE-NAM-1.0</option>
+                <option value="Zm-CML228-REFERENCE-NAM-1.0" $(Zm-CML228-REFERENCE-NAM-1.0-selected)>Zm-CML228-REFERENCE-NAM-1.0</option>
+                <option value="Zm-CML247-REFERENCE-NAM-1.0" $(Zm-CML247-REFERENCE-NAM-1.0-selected)>Zm-CML247-REFERENCE-NAM-1.0</option>
+                <option value="Zm-CML247-DRAFT-PANZEA-1.0" $(Zm-CML247-DRAFT-PANZEA-1.0-selected)>Zm-CML247-DRAFT-PANZEA-1.0</option>
+                <option value="Zm-CML277-REFERENCE-NAM-1.0" $(Zm-CML277-REFERENCE-NAM-1.0-selected)>Zm-CML277-REFERENCE-NAM-1.0</option>
+                <option value="Zm-CML322-REFERENCE-NAM-1.0" $(Zm-CML322-REFERENCE-NAM-1.0-selected)>Zm-CML322-REFERENCE-NAM-1.0</option>
+                <option value="Zm-CML333-REFERENCE-NAM-1.0" $(Zm-CML333-REFERENCE-NAM-1.0-selected)>Zm-CML333-REFERENCE-NAM-1.0</option>
+                <option value="Zm-EP1-REFERENCE-TUM-1.0" $(Zm-EP1-REFERENCE-TUM-1.0-selected)>Zm-EP1-REFERENCE-TUM-1.0</option>
+                <option value="Zm-F7-REFERENCE-TUM-1.0" $(Zm-F7-REFERENCE-TUM-1.0-selected)>Zm-F7-REFERENCE-TUM-1.0</option>
+                <option value="Zm-HP301-REFERENCE-NAM-1.0" $(Zm-HP301-REFERENCE-NAM-1.0-selected)>Zm-HP301-REFERENCE-NAM-1.0</option>
+                <option value="Zm-Il14H-REFERENCE-NAM-1.0" $(Zm-Il14H-REFERENCE-NAM-1.0-selected)>Zm-Il14H-REFERENCE-NAM-1.0</option>
+                <option value="Zm-Ki3-REFERENCE-NAM-1.0" $(Zm-Ki3-REFERENCE-NAM-1.0-selected)>Zm-Ki3-REFERENCE-NAM-1.0</option>
+                <option value="Zm-Ki11-REFERENCE-NAM-1.0" $(Zm-Ki11-REFERENCE-NAM-1.0-selected)>Zm-Ki11-REFERENCE-NAM-1.0</option>
+                <option value="Zm-Ky21-REFERENCE-NAM-1.0" $(Zm-Ky21-REFERENCE-NAM-1.0-selected)>Zm-Ky21-REFERENCE-NAM-1.0</option>
+                <option value="Zm-M37W-REFERENCE-NAM-1.0" $(Zm-M37W-REFERENCE-NAM-1.0-selected)>Zm-M37W-REFERENCE-NAM-1.0</option>
+                <option value="Zm-M162W-REFERENCE-NAM-1.0" $(Zm-M162W-REFERENCE-NAM-1.0-selected)>Zm-M162W-REFERENCE-NAM-1.0</option>
+                <option value="Zm-Mo17-REFERENCE-NRGENE-1.0" $(Zm-Mo17-REFERENCE-NRGENE-1.0-selected)>Zm-Mo17-REFERENCE-NRGENE-1.0</option>
+                <option value="Zm-Mo17-REFERENCE-YAN-1.0" $(Zm-Mo17-REFERENCE-YAN-1.0-selected)>Zm-Mo17-REFERENCE-YAN-1.0 (Mo17 - Yan lab\)</option>
+                <option value="Zm-Mo18-REFERENCE-NAM-1.0" $(Zm-Mo18-REFERENCE-NAM-1.0-selected)>Zm-Mo18-REFERENCE-NAM-1.0</option>
+                <option value="Zm-Ms71-REFERENCE-NAM-1.0" $(Zm-Ms71-REFERENCE-NAM-1.0-selected)>Zm-Ms71-REFERENCE-NAM-1.0</option>
+                <option value="Zm-NC350-REFERENCE-NAM-1.0" $(Zm-MoNC35018-REFERENCE-NAM-1.0-selected)>Zm-NC350-REFERENCE-NAM-1.0</option>
+                <option value="Zm-NC358-REFERENCE-NAM-1.0" $(Zm-NC358-REFERENCE-NAM-1.0-selected)>Zm-NC358-REFERENCE-NAM-1.0</option>
+                <option value="Zm-Oh7B-REFERENCE-NAM-1.0" $(Zm-Oh7B-REFERENCE-NAM-1.0-selected)>Zm-Oh7B-REFERENCE-NAM-1.0</option>
+                <option value="Zm-Oh43-REFERENCE-NAM-1.0" $(Zm-Oh43-REFERENCE-NAM-1.0-selected)>Zm-Oh43-REFERENCE-NAM-1.0</option>
+                <option value="Zm-P39-REFERENCE-NAM-1.0" $(Zm-P39-REFERENCE-NAM-1.0-selected)>Zm-P39-REFERENCE-NAM-1.0</option>
+                <option value="Zm-PH207-REFERENCE_NS-UIUC_UMN-1.0" $(Zm-PH207-REFERENCE_NS-UIUC_UMN-1.0-selected)>Zm-PH207-REFERENCE_NS-UIUC_UMN-1.0</option>
+                <option value="Zm-Tx303-REFERENCE-NAM-1.0" $(Zm-Tx303-REFERENCE-NAM-1.0-selected)>Zm-Tx303-REFERENCE-NAM-1.0</option>
+                <option value="Zm-Tzi8-REFERENCE-NAM-1.0" $(Zm-Tzi8-REFERENCE-NAM-1.0-selected)>Zm-Tzi8-REFERENCE-NAM-1.0</option>
+                <option value="Zm-W22-REFERENCE-NRGENE-2.0" $(Zm-W22-REFERENCE-NRGENE-2.0-selected)>Zm-W22-REFERENCE-NRGENE-2.0</option>
+                <option value="Zx-PI566673-REFERENCE-YAN-1.0" $(Zx-PI566673-REFERENCE-YAN-1.0-selected)>Zx-PI566673-REFERENCE-YAN-1.0</option>
+              </select>
+            </fieldset>
+            @(gene-model-section {display: off}
+            <fieldset>
+              <legend>
+                Gene Model Information
+                <a href="#" onclick="popUpHelp('genome_issue', 'gene_model'\)"><img 
+                 src="/images/question.png"></a>
+              </legend>
+              <label for="gene_model">Gene Model</label>
+              <input name="gene_model" id="gene_model" value="$(gene-model)">
+              <br>
+              <label for="gene_model_version">Gene Model Version</label>
+              <select name="gene_model_version" id="gene_model_version">
+                <option value="Zm00001eb.1" $(Zm00001eb-selected)$(default-selected)>Zm00001eb.1 (B73 RefGen_v5\)</option>
+                <option value="Zm00001d.2" $(Zm00001d-selected)$(default-selected)>Zm00001d.2 (B73 RefGen_v4\)</option>
+                <option value="B73 RefGen_v3" $(B73_RefGen_v3-selected)>B73 RefGen_v3</option>
+                <option value="B73 RefGen_v2" $(B73_RefGen_v2-selected)>B73 RefGen_v2</option>
+                <option value="Zm00004b.1" $(Zm00004b-selected)>Zm00004b.1 (W22 v2.0\)</option>
+                <option value="Zm00007a.1" $(Zm00007a-selected)>Zm00007a.1 (B104 v0.1\)</option>
+                <option value="Zm00008a.1" $(Zm00008a-selected)>Zm00008a.1 (PH207 v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00009a-selected)>Zm00009a.1 (Mo17 Yan lab v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00018ab-selected)>Zm00018ab.1 (B97 NAM v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00019ab-selected)>Zm00019ab.1 (CML52 NAM v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00020ab-selected)>Zm00020ab.1 (CML69 NAM v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00021ab-selected)>Zm00021ab.1 (CML103 NAM v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00022ab-selected)>Zm00022ab.1 (CML228 NAM v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00023ab-selected)>Zm00023ab.1 (CML247 NAM v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00024ab-selected)>Zm00024ab.1 (CML277 NAM v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00025ab-selected)>Zm00025ab.1 (CML322 NAM v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00026ab-selected)>Zm00026ab.1 (CML333 NAM v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00027ab-selected)>Zm00027ab.1 (HP301 NAM v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00028ab-selected)>Zm00028ab.1 (Il14H NAM v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00029ab-selected)>Zm00029ab.1 (Ki3 NAM v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00030ab-selected)>Zm00030ab.1 (Ki11 NAM v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00031ab-selected)>Zm00031ab.1 (Ky21 NAM v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00032ab-selected)>Zm00032ab.1 (M37W NAM v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00033ab-selected)>Zm00033ab.1 (M162W NAM v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00034ab-selected)>Zm00034ab.1 (Mo18 NAM v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00035ab-selected)>Zm00035ab.1 (Ms71 NAM v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00036ab-selected)>Zm00036ab.1 (NC350 NAM v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00037ab-selected)>Zm00037ab.1 (NC358 NAM v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00038ab-selected)>Zm00038ab.1 (Oh7B NAM v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00039ab-selected)>Zm00039ab.1 (Oh43 NAM v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00040ab-selected)>Zm00040ab.1 (P39 NAM v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00041ab-selected)>Zm00041ab.1 (Tx303 NAM v1.0\)</option>
+                <option value="Zm00009a.1" $(Zm00042ab-selected)>Zm00042ab.1 (Tzi8 NAM v1.0\)</option>
+                <option value="Zx00001a.1" $(Zx00001a-selected)>Zx00001a.1 (mexicana\)</option>
+              </select>
+            </fieldset>
+            )
+            @(genome-location-section {display: off}
+            <fieldset>
+              <legend>
+                Location Information
+                <a href="#" onclick="popUpHelp('genome_issue', 'genome_location'\)"><img 
+                 src="/images/question.png"></a>
+              </legend>
+              <p>Please provide information concerning the location of the issue. 
+                You can either provide information using the chromosome coordinates 
+                or the flanking accessions used to generate the genome build. If 
+                the location is unknown or you are reporting sequence not found on 
+                the assembly, then select 'None' from the chromosome pulldown menu.
+              </p>
+              <br>
+              <label for="chromosome">Chromosome</label>
+              <select name="chromosome" id="chromosome" onclick="resetField('chromosome'\)">
+                <option value = "0" selected="selected">Select one</option>
+                <option value="0">NONE</option>
+                <option name="chr1" value="1">chr1</option>
+                <option name="chr2" value="2">chr2</option>
+                <option name="chr3" value="3">chr3</option>
+                <option name="chr4" value="4">chr4</option>
+                <option name="chr5" value="5">chr5</option>
+                <option name="chr6" value="6">chr6</option>
+                <option name="chr7" value="7">chr7</option>
+                <option name="chr8" value="8">chr8</option>
+                <option name="chr9" value="9">chr9</option>
+                <option name="chr10 "value="10">chr10</option>
+                <option value="7955">chrUnknown</option>
+              </select>                     
+              <table>
+                <tr>
+                <tr>
+                  <td width="50%">
+                    <fieldset id="chr_position" class="minor">
+                      <legend>Specify by Chromosome coordinates</legend>
+                      <label for="range_type" id="range_type_label">Range Type</label>
+                      <input type="radio" name="range_type" id="range_id" value="loc" 
+                             checked="checked" onclick = "Check(\)">
+                      <br>
+                      <div id="chr_pos_els">
+                        <label for="chr_start" id="chr_start_label">Chromosome Start</label>
+                        <input name="chr_start" id="chr_start">
+                        <br>
+                        <span id="chr_start_errortext"></span>
+                        <label for="chr_end" id="chr_end_label">Chromosome End&nbsp;</label>
+                        <input name="chr_end" id="chr_end">
+                        <br>
+                        <span id="chr_end_errortext"></span>
+                      </div>
+                    </fieldset>
+                  </td>
+                  <td width="50%">
+                    <fieldset id="acc_list" class="minor">
+                      <legend>Specify by Flanking accessions</legend>
+                      <label for="range_acc" id="range_acc_label">Flanking Accessions</label> 
+                      <input type="radio" name="range_type" id="range_acc" value="acc" 
+                             onclick = "Check(\)">
+                      <br>
+                      <div id="acc_list_els" class="disabled">
+                        <label for="first_acc" id="first_acc_label">
+                          First Accession
+                        </label>
+                        <input name="first_acc" id="first_acc" disabled="disabled">
+                        <br>
+                        <label for="last_acc" id="last_acc_label">
+                          Last Accession
+                        </label>
+                        <input name="last_acc" id="last_acc" disabled="disabled">
+                      </div>
+                    </fieldset>
+                  </td>
+                </tr>
+              </table>
+            </fieldset>
+          )
+          <fieldset>
+            <legend>
+              Submitter Information
+              <a href="#" onclick="popUpHelp('genome_issue', 'submitter'\)"><img 
+                 src="/images/question.png"></a>
+            </legend>
+            <p>Please provide some information about yourself.</p>
+            <label for="last_name">Name: </label>
+            <span style="color:red"><em>*</em></span> </label>
+            <input type="text" name="sub_name" id="sub_name" value="$(cur_name)">
+            <br>
+            <label for="email">Submitter Email 
+            <span style="color:red"><em>*</em></span> </label>
+            <input name="email" id="email" value="$(cur_email)"
+                   onclick="resetField('email'\)">
+            <br>
+            <label for="affiliation">Affiliation 
+            <span style="color:red"><em>*</em></span></label>
+            <input name= "affiliation" id="affiliation" 
+                   onclick="resetField('affiliation'\)"/>
+            <br>
+            <label for="position">Position 
+            <span style="color:red"><em>*</em></span></label>
+            <select name="position" id="position" onclick="resetField('position'\)">
+              <option value = "" >select one</option>
+              <option value="grad student">grad student</option>
+              <option value="lab head">lab head</option>
+              <option value="post doc">post doc</option>
+              <option value="staff scientist">staff scientist</option>
+              <option value="programmer/bioinformatician">programmer/bioinformatician</option>
+              <option value="other">other</option>
+            </select>
+          </fieldset>
+          <fieldset>
+            <legend>
+              Issue Detail
+              <a href="#" onclick="popUpHelp('genome_issue', 'issue_detail'\)"><img 
+                 src="/images/question.png"></a>
+            </legend>
+            <p>Please provide detailed information about the genome issue you are 
+              reporting. List any sequence accessions used to define the issue.
+            </p>
+            <label style="text-align:top" for="description">
+              Description of issue <span style="color:red"><em>*</em></span>
+            </label>
+            <br>
+            <textarea style="text-align:middle" name="description" 
+                      id="description" cols="70" rows="10" 
+                      onclick="resetField('description'\)"></textarea>
+            <br>
+            <table>
+              <tr>
+                <td>
+                  <label for="sequence">Suporting sequence 
+                  <br>
+                  (Must be a GenBank accession\)</label>
+                </td>
+                <td>
+                  <input name="sequence" id="sequence" 
+                         onclick="resetField('sequence'\)">
+                </td>
+              </tr>
+            </table>
+            <br>
+            <input type="hidden" name="MAX_FILE_SIZE" value="50000000">
+            <label for="attachment">
+              Attach a figure describing the issue (no bigger than 5MB\):
+            </label>
+            <input type="file" name="attachment" id="attachment">
+          </fieldset>
+          <p><input class="submit_button" type="submit" value="Submit Issue"></p>
+        </form>
+        </div>
+      </div>
+    </div>
+    <br>
+    <script language="Javascript">
+      $\('#URL'\).val(document.referrer\);
+    </script>
+  )
+)

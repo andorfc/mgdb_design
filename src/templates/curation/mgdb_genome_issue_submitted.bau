@@ -1,0 +1,86 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-genome-issue-submitted
+<a class="mgdb-skip-link" href="#gs-main">Skip to main content</a>
+
+<main class="mgdb-page mgdb-hub-page mgdb-genome-issue-page" id="gs-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span>
+    <a href="/genome">Genomes</a><span aria-hidden="true">&rsaquo;</span>
+    <span aria-current="page">Report received</span>
+  </nav>
+
+    @(issue-submitted {display: on}
+  <section class="mgdb-hero" aria-labelledby="gs-title">
+    <div class="mgdb-hero-emblem gi-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="A tick inside a circle">
+        <circle cx="48" cy="48" r="32" fill="#e8f4ec" stroke="#235c37" stroke-width="4" />
+        <path d="M33 49l11 11 20-23" fill="none" stroke="#235c37" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      <strong>Received</strong>
+      <span class="gi-emblem-meta">Thank you</span>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="gs-title">
+            @(gene-model-section {display: off}
+              Thank you for reporting a gene model issue
+            )
+            @(genome-location-section {display: off}
+              Thank you for reporting a genome issue
+            )
+      </h1>
+      <p class="mgdb-hero-description">Your report has been recorded and the MaizeGDB curators have been notified. A curator may contact you, but it can take some time before the issue is addressed, depending on the state of the current assembly efforts.</p>
+    </div>
+  </section>
+
+  <section id="gs-report" aria-labelledby="gs-report-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="gs-report-title">What you sent</h2></div>
+    </div>
+
+          @(error {display: off}
+            <div class="mgdb-message mgdb-message-error" role="alert">
+              $(error-msg)
+            </div>
+          )
+    <dl class="gs-summary">
+      <div><dt>Genome assembly</dt><dd>$(genome_assembly)</dd></div>
+      @(gene-model-fb {display: off}
+      <div><dt>Gene model</dt><dd>$(gene_model)</dd></div>
+      <div><dt>Gene model version</dt><dd>$(gene_model_version)</dd></div>
+      )
+      @(genome-fb {display: off}
+      <div><dt>Chromosome</dt><dd>$(chromosome)</dd></div>
+        @(genome-coords-fb {display: off}
+      <div><dt>Chromosome start</dt><dd>$(chr_start)</dd></div>
+      <div><dt>Chromosome end</dt><dd>$(chr_end)</dd></div>
+        )
+        @(genome-acc-fb {display: off}
+      <div><dt>First accession</dt><dd>$(first_acc)</dd></div>
+      <div><dt>Last accession</dt><dd>$(last_acc)</dd></div>
+        )
+      )
+      <div><dt>Your name</dt><dd>$(sub_name)</dd></div>
+      <div><dt>Your e-mail</dt><dd>$(email)</dd></div>
+      <div><dt>Affiliation</dt><dd>$(affiliation)</dd></div>
+      <div><dt>Position</dt><dd>$(position)</dd></div>
+      @(attachment {display: off}
+      <div><dt>Attachment</dt><dd>$(attachment-name)</dd></div>
+      )
+    </dl>
+
+    <div class="gs-description">
+      <h3>Description</h3>
+      <p>$(description)</p>
+    </div>
+
+    <p class="gi-actions">
+      <a class="mgdb-button mgdb-button-secondary" href="/curation/GenomeIssue">Report another <span aria-hidden="true">&rarr;</span></a>
+      <a class="mgdb-button mgdb-button-quiet" href="/curation/assemblyIssues">Open assembly issues <span aria-hidden="true">&rarr;</span></a>
+      <a class="mgdb-button mgdb-button-quiet" href="/curation/geneModelIssues">Open gene model issues <span aria-hidden="true">&rarr;</span></a>
+    </p>
+  </section>
+    )
+
+</main>
+)

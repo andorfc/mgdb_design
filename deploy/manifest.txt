@@ -2095,3 +2095,79 @@ src/include/person_record_lib.php                        include/person_record_l
 src/templates/static/mgdb_person_record.bau              templates/static/mgdb_person_record.bau
 src/css/mgdb-person-record.css                           css/mgdb-person-record.css
 src/js/mgdb-person-record.js                             js/mgdb-person-record.js
+
+# /curation/assemblyIssues and /curation/geneModelIssues -- the open assembly
+# and gene model issues the community has reported -- on the design system,
+# 2026-09-07. Both are PUBLIC pages (they are in $public_pages in
+# controllers/curation.php); /curation is where the code lives, not who they are
+# for. geneModelIssues is linked from the home page and the Gene Data Hub,
+# assemblyIssues from the Gene Data Hub.
+#
+# Both were DEAD before this. getJiraIssues() answered an empty result set with
+# a bare `return` -- NULL -- and both controllers then called count() on it,
+# which is a TypeError in PHP 8, so each returned a 440-byte fatal error instead
+# of a page. That is the state whenever Jira has no open issue of the type,
+# which is the normal state and the state today. The four record-page callers of
+# the same function guard with `if ($issues)` and were unaffected, which is why
+# nobody noticed. include/jira_lib.php is now tracked and fixed: empty is an
+# empty array, hard failure is still false, every custom field is read
+# defensively (one issue filed with no version would have crashed every caller),
+# and the curl command is no longer logged -- it carried `--user
+# '<address>:<api key>'`, so every request was writing the Jira API key into
+# logs/mgdb.log in clear.
+#
+# One controller and one template for both routes: they are the same page with a
+# different issue type and one extra column, and keeping two copies is how the
+# legacy pair drifted. The hook is inside controllers/curation.php, above the
+# legacy Bauplan, because controller.php claims the whole /curation/* namespace
+# and no top-level shadow route is available. Rollback: delete that block.
+src/include/jira_lib.php                            include/jira_lib.php
+src/controllers/curation.php                        controllers/curation.php
+src/controllers/curation/issues_modern.php          controllers/curation/issues_modern.php
+src/templates/curation/mgdb_curation_issues.bau     templates/curation/mgdb_curation_issues.bau
+src/css/mgdb-curation-issues.css                    css/mgdb-curation-issues.css
+src/js/mgdb-curation-issues.js                      js/mgdb-curation-issues.js
+
+# /curation/GenomeIssue -- the public form for reporting a problem with a
+# reference assembly or a gene model -- on the design system, 2026-09-07. Linked
+# from the home page, the Genome Browser megamenu panel and hub, the Gene Data
+# Hub, the NAM and PanAnd project pages, assembly pages and BAC records. Public,
+# not curator-only.
+#
+# The form is NOT rewritten. controllers/curation/GenomeIssue.php keeps every
+# one of its three actions -- the save path writes the report, handles the
+# upload and sends the notification mail -- and genome_issue_modern.php is only
+# the document around it. Control parity was checked mechanically against the
+# original: 90 <option>s in and 90 out, 75 Bauplan tokens in and 75 out, six
+# muted regions still six, every name/id/onclick the same. What was dropped is
+# three wrapper divs, an <a name="main">, two layout tables inside fieldsets
+# (which is why the form could not reflow at all), and the five help icons.
+#
+# Those icons called popUpHelp() from js/api_js.js, opening
+# /help/genome_issue#<anchor> in a 440x200 window. That route throws `Undefined
+# constant "ANCHOR"` -- a PHP 8 fatal in controllers/help.php -- so all five have
+# been showing a stack trace. Their text is now inline under each legend, taken
+# verbatim from templates/help/genome_issue-help.bau; one of them says a report
+# needs supporting GenBank sequence from the right inbred or it will not be
+# considered, which a submitter could not see. This form is the only caller of
+# popUpHelp() on the site, so /help is now unreferenced: a retirement decision,
+# and broken either way.
+#
+# The confirmation page echoes back everything the submitter typed and did not
+# escape any of it -- Bauplan's replace() does not, which is why
+# login_curator.php has its own escaper. Escaped now, and its dead $(issue_key)
+# token (the controller's replace for it is commented out) is gone.
+#
+# css/curation.css is deliberately NOT loaded: bare `body,td,th`, `p`, `a`, `h1`,
+# `fieldset` and `legend` rules that would reach the megamenu and the hero.
+# css/mgdb-genome-issue.css styles the same controls scoped to the page.
+# js/GenomeIssue.js is unchanged and still loaded, with jQuery 3.7.1 in place of
+# the 1.3.2 the legacy curation shell used to supply.
+#
+# Legacy templates archived in legacy/curation-issues/.
+src/controllers/curation/genome_issue_modern.php    controllers/curation/genome_issue_modern.php
+src/controllers/curation/GenomeIssue.php            controllers/curation/GenomeIssue.php
+src/templates/curation/mgdb_genome_issue.bau        templates/curation/mgdb_genome_issue.bau
+src/templates/curation/mgdb_genome_issue_submitted.bau templates/curation/mgdb_genome_issue_submitted.bau
+src/css/mgdb-genome-issue.css                       css/mgdb-genome-issue.css
+src/js/mgdb-genome-issue.js                         js/mgdb-genome-issue.js

@@ -1,0 +1,193 @@
+/* Reported assembly and gene model issues (/curation/assemblyIssues and
+ * /curation/geneModelIssues) — MaizeGDB modern design system.
+ *
+ * The ground, the white section cards, their coloured top edges, the shared
+ * table, the message box, the buttons and the green Related resources wash come
+ * from css/mgdb-hub.css and css/mgdb-modern.css, which load first. Only what is
+ * specific to these two pages lives here: the emblem, the empty state, and the
+ * issue table's own columns.
+ *
+ * One sheet for both pages because they are one page with a different issue
+ * type; see controllers/curation/issues_modern.php.
+ */
+
+.mgdb-modern .mgdb-curation-issues-page { padding-bottom: clamp(3rem, 6vw, 5.5rem); }
+
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
+
+.mgdb-curation-issues-page .ci-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-curation-issues-page .ci-emblem svg { width: 5.5rem; height: 5.5rem; }
+
+.mgdb-curation-issues-page .ci-emblem-meta {
+  margin-top: 0.15rem;
+  color: var(--mgdb-green-dark);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+/* ── Sticky section tabs ─────────────────────────────────────────────────── */
+
+.mgdb-curation-issues-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.mgdb-curation-issues-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
+
+.mgdb-curation-issues-page .mgdb-section-tabs a.is-current,
+.mgdb-curation-issues-page .mgdb-section-tabs a[aria-current="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+/* Three tabs, scrolling rather than wrapping, so the bar is one row at every
+   width and one scroll offset is right everywhere. Same answer as the rest of
+   the family. */
+.mgdb-curation-issues-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-5);
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* The shell reads this from --mgdb-tab-offset, default 65px: the 57px one-row
+   bar plus 8px of air. Measured on the built page at 1280, 900 and 375. */
+.mgdb-hub-page.mgdb-curation-issues-page { --mgdb-tab-offset: 65px; }
+
+.mgdb-curation-issues-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+/* ── Prose ───────────────────────────────────────────────────────────────── */
+
+.mgdb-curation-issues-page .ci-prose { max-width: 62rem; }
+
+.mgdb-curation-issues-page .ci-prose p {
+  margin: 0 0 1.05rem;
+  color: var(--mgdb-ink);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.mgdb-curation-issues-page .ci-prose p:last-child { margin-bottom: 0; }
+
+.mgdb-curation-issues-page .ci-scope {
+  max-width: 62rem;
+  margin: 0 0 var(--mgdb-space-4);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.55;
+}
+
+.mgdb-curation-issues-page .ci-scope strong {
+  color: var(--mgdb-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.mgdb-curation-issues-page .ci-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin: var(--mgdb-space-4) 0 0;
+}
+
+@media (max-width: 520px) {
+  .mgdb-curation-issues-page .ci-actions { flex-direction: column; align-items: stretch; }
+  .mgdb-curation-issues-page .ci-actions .mgdb-button { justify-content: center; }
+}
+
+/* ── The empty state ─────────────────────────────────────────────────────── */
+
+/* This is the state the legacy pages died in, so it gets a real answer rather
+   than a blank table: nothing open is good news, and the page says so. */
+.mgdb-curation-issues-page .ci-empty {
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-4);
+  max-width: 62rem;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--hub-line);
+  border-left: 4px solid var(--mgdb-green-dark);
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-curation-issues-page .ci-empty-mark {
+  flex: none;
+  margin: 0;
+  color: var(--mgdb-green-dark);
+  font-family: var(--mgdb-font-mono);
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.mgdb-curation-issues-page .ci-empty strong {
+  display: block;
+  color: var(--mgdb-burgundy);
+  font-size: 1rem;
+}
+
+.mgdb-curation-issues-page .ci-empty p {
+  margin: 0.3rem 0 0;
+  color: var(--mgdb-ink);
+  font-size: 0.96rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 520px) {
+  .mgdb-curation-issues-page .ci-empty { flex-direction: column; align-items: flex-start; gap: var(--mgdb-space-2); }
+}
+
+/* ── The issue table ─────────────────────────────────────────────────────── */
+
+.mgdb-curation-issues-page .ci-table { font-size: 0.94rem; }
+
+.mgdb-curation-issues-page .ci-table th[scope="row"],
+.mgdb-curation-issues-page .ci-table td { vertical-align: top; line-height: 1.55; }
+
+/* A gene model identifier and an assembly name are both compared down their
+   column and neither should wrap mid-token. */
+.mgdb-curation-issues-page .ci-model,
+.mgdb-curation-issues-page .ci-version {
+  font-family: var(--mgdb-font-mono);
+  font-size: 0.86rem;
+  white-space: nowrap;
+}
+
+.mgdb-curation-issues-page .ci-none {
+  color: var(--mgdb-muted);
+  font-family: var(--mgdb-font-sans, inherit);
+  font-size: var(--mgdb-text-sm);
+  font-style: italic;
+  font-weight: 400;
+}
+
+@media (max-width: 760px) {
+  /* A description column plus two identifiers does not fit a phone; the shared
+     scroll box takes it rather than the page body. */
+  .mgdb-curation-issues-page .ci-table { min-width: 40rem; }
+}

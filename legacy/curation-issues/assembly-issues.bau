@@ -1,0 +1,23 @@
+$$SYNTAX-LEVEL 2
+*(assembly-issues
+  <h3>All $(issue_status) Assembly Issues</h3>
+  &nbsp;&nbsp;$(issue-count) issues
+<!--
+  <br>
+  &nbsp;&nbsp;<a href="/curation/downloadGeneModelIssues?status=$(issue_status)&version=$(version)">Download GFF3</a>
+-->
+  <br><br>
+  <table>
+    <tr>
+      <td width="10%"><b>Version</b></td>
+      <td width="75%"><b>Description</b></td>
+    </tr>
+    @(issue-list
+    <tr>
+      <td>$(version)</td>
+      <td>$(description)</td>
+    </tr>
+    <tr height="2px"></tr>
+    )
+  </table>
+)

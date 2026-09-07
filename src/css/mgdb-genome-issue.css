@@ -1,0 +1,344 @@
+/* Report a genome or gene model issue (/curation/GenomeIssue) — MaizeGDB modern
+ * design system.
+ *
+ * The ground, the white section cards, their coloured top edges, the message
+ * box, the buttons and the green Related resources wash come from
+ * css/mgdb-hub.css and css/mgdb-modern.css.
+ *
+ * This sheet exists because css/curation.css cannot be loaded here. That sheet
+ * styles the same form, but through bare `body,td,th`, `p`, `a`, `h1`,
+ * `fieldset` and `legend` selectors — on a modern page those reach the megamenu,
+ * the hero and every link on the page. Everything below is the same styling,
+ * scoped to this page, so the form markup could be kept exactly as it was.
+ */
+
+.mgdb-modern .mgdb-genome-issue-page { padding-bottom: clamp(3rem, 6vw, 5.5rem); }
+
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
+
+.mgdb-genome-issue-page .gi-emblem { background: #ffffff; border-color: var(--mgdb-line); }
+.mgdb-genome-issue-page .gi-emblem svg { width: 5.5rem; height: 5.5rem; }
+
+.mgdb-genome-issue-page .gi-emblem-meta {
+  margin-top: 0.15rem;
+  color: var(--mgdb-green-dark);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+/* ── Sticky section tabs ─────────────────────────────────────────────────── */
+
+.mgdb-genome-issue-page .mgdb-section-tabs a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink) !important;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.mgdb-genome-issue-page .mgdb-section-tabs a:hover { background: var(--mgdb-green-soft); }
+
+.mgdb-genome-issue-page .mgdb-section-tabs a.is-current,
+.mgdb-genome-issue-page .mgdb-section-tabs a[aria-current="true"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 var(--mgdb-gold);
+}
+
+.mgdb-genome-issue-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-5);
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* The shell reads this from --mgdb-tab-offset, default 65px: the 57px one-row
+   bar plus 8px of air. Measured on the built page at 1280, 900 and 375. */
+.mgdb-hub-page.mgdb-genome-issue-page { --mgdb-tab-offset: 65px; }
+
+.mgdb-genome-issue-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+/* ── Prose ───────────────────────────────────────────────────────────────── */
+
+.mgdb-genome-issue-page .gi-prose { max-width: 62rem; }
+
+.mgdb-genome-issue-page .gi-prose p {
+  margin: 0 0 1.05rem;
+  color: var(--mgdb-ink);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.mgdb-genome-issue-page .gi-prose p:last-child { margin-bottom: 0; }
+
+.mgdb-genome-issue-page .gi-required-note {
+  max-width: 62rem;
+  margin: 0 0 var(--mgdb-space-4);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* The legacy form marked required fields with a red asterisk inline in each
+   label; the markup is unchanged, so the asterisk is styled rather than moved.
+   Red alone is not a distinction anyone can rely on, so the note above says
+   what the mark means. */
+.mgdb-genome-issue-page .gi-req,
+.mgdb-genome-issue-page .grc_form span[style*="color:red"] {
+  color: var(--mgdb-burgundy) !important;
+  font-weight: 700;
+}
+
+.mgdb-genome-issue-page .grc_form span[style*="color:red"] em { font-style: normal; }
+
+.mgdb-genome-issue-page .gi-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin: var(--mgdb-space-4) 0 0;
+}
+
+@media (max-width: 620px) {
+  .mgdb-genome-issue-page .gi-actions { flex-direction: column; align-items: stretch; }
+  .mgdb-genome-issue-page .gi-actions .mgdb-button { justify-content: center; }
+}
+
+/* ── The form ────────────────────────────────────────────────────────────── */
+
+.mgdb-genome-issue-page .grc_form { max-width: 62rem; }
+
+/* `min-width: 0` is load-bearing. A fieldset's default min-width is
+   min-content, which is wider than a 375px column once it holds a select of
+   assembly names, so without this the nested fieldsets pushed the page 5px
+   sideways at that width and the body scrolled. */
+.mgdb-genome-issue-page .grc_form fieldset {
+  min-width: 0;
+  margin: 0 0 var(--mgdb-space-5);
+  padding: 1rem 1.15rem 1.15rem;
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface, #ffffff);
+}
+
+.mgdb-genome-issue-page .grc_form fieldset:last-of-type { margin-bottom: var(--mgdb-space-4); }
+
+.mgdb-genome-issue-page .grc_form legend {
+  padding: 0 0.4rem;
+  color: var(--mgdb-burgundy);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+/* The help text that used to be behind a "?" icon opening a 440x200 popup of a
+   page that throws a PHP fatal. */
+.mgdb-genome-issue-page .gi-hint {
+  margin: 0 0 var(--mgdb-space-4);
+  padding-left: 0.85rem;
+  border-left: 3px solid var(--mgdb-gold);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.55;
+}
+
+.mgdb-genome-issue-page .gi-hint strong { color: var(--mgdb-ink); }
+
+.mgdb-genome-issue-page .grc_form p {
+  margin: 0 0 var(--mgdb-space-4);
+  max-width: 52rem;
+  color: var(--mgdb-ink);
+  font-size: 0.96rem;
+  line-height: 1.6;
+}
+
+.mgdb-genome-issue-page .grc_form label {
+  display: inline-block;
+  min-width: 12rem;
+  margin: 0.55rem 0.6rem 0.2rem 0;
+  color: var(--mgdb-ink);
+  font-size: 0.95rem;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.mgdb-genome-issue-page .grc_form input[type="text"],
+.mgdb-genome-issue-page .grc_form input:not([type]),
+.mgdb-genome-issue-page .grc_form select,
+.mgdb-genome-issue-page .grc_form textarea {
+  max-width: 100%;
+  min-height: var(--mgdb-tap-target, 44px);
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: #ffffff;
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: 0.95rem;
+  vertical-align: middle;
+}
+
+.mgdb-genome-issue-page .grc_form select { width: min(34rem, 100%); max-width: 100%; }
+.mgdb-genome-issue-page .grc_form input[type="text"],
+.mgdb-genome-issue-page .grc_form input:not([type]) { width: min(24rem, 100%); }
+
+.mgdb-genome-issue-page .grc_form textarea {
+  display: block;
+  width: 100%;
+  min-height: 11rem;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.mgdb-genome-issue-page .grc_form input[type="radio"] {
+  width: auto;
+  min-height: 0;
+  margin: 0 0.4rem;
+  vertical-align: middle;
+}
+
+.mgdb-genome-issue-page .grc_form input[type="file"] {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.92rem;
+}
+
+.mgdb-genome-issue-page .grc_form input:focus-visible,
+.mgdb-genome-issue-page .grc_form select:focus-visible,
+.mgdb-genome-issue-page .grc_form textarea:focus-visible {
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: 2px;
+}
+
+/* The two "specify by" alternatives. In the legacy markup these sat in a
+   two-cell layout table with width="50%" on each cell, which is why the form
+   could not reflow at all; the table is gone and the fieldsets are a grid. */
+.mgdb-genome-issue-page .gi-split {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(17rem, 100%), 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-3);
+}
+
+.mgdb-genome-issue-page .gi-split > div { min-width: 0; }
+
+.mgdb-genome-issue-page .grc_form fieldset.minor {
+  margin: 0;
+  background: var(--hub-ground, #f4f7fb);
+}
+
+.mgdb-genome-issue-page .grc_form fieldset.minor legend { font-size: 0.95rem; }
+.mgdb-genome-issue-page .grc_form fieldset.minor label { min-width: 9.5rem; }
+
+/* GenomeIssue.js toggles this class on the block the radio button did not
+   select, and disables the inputs inside it. */
+.mgdb-genome-issue-page .grc_form .disabled { opacity: 0.55; }
+
+.mgdb-genome-issue-page .grc_form input[disabled] { background: var(--hub-ground, #f4f7fb); }
+
+.mgdb-genome-issue-page .gi-field { margin-top: var(--mgdb-space-3); }
+
+.mgdb-genome-issue-page .gi-field-hint {
+  display: block;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 400;
+}
+
+/* GenomeIssue.js writes its validation messages into these. */
+.mgdb-genome-issue-page .grc_form span[id$="_errortext"] {
+  display: block;
+  color: var(--mgdb-burgundy);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+}
+
+.mgdb-genome-issue-page .gi-submit { margin: 0; }
+
+.mgdb-genome-issue-page .submit_button {
+  min-height: var(--mgdb-tap-target, 44px);
+  padding: 0 1.35rem;
+  border: 1px solid var(--mgdb-green-dark);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.98rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-genome-issue-page .submit_button:hover { background: #1a4a2b; }
+
+.mgdb-genome-issue-page .submit_button:focus-visible {
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: 2px;
+}
+
+/* ── The confirmation page ───────────────────────────────────────────────── */
+
+.mgdb-genome-issue-page .gs-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--mgdb-space-3);
+  max-width: 62rem;
+  margin: 0 0 var(--mgdb-space-5);
+}
+
+.mgdb-genome-issue-page .gs-summary > div {
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface, #ffffff);
+}
+
+.mgdb-genome-issue-page .gs-summary dt {
+  margin: 0 0 0.2rem;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+}
+
+.mgdb-genome-issue-page .gs-summary dd {
+  margin: 0;
+  color: var(--mgdb-ink);
+  font-size: 0.96rem;
+  overflow-wrap: anywhere;
+}
+
+.mgdb-genome-issue-page .gs-description {
+  max-width: 62rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--hub-line);
+  border-left: 4px solid var(--mgdb-green-dark);
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  background: var(--hub-ground, #f4f7fb);
+}
+
+.mgdb-genome-issue-page .gs-description h3 {
+  margin: 0 0 0.5rem;
+  color: var(--mgdb-burgundy);
+  font-size: 1rem;
+}
+
+.mgdb-genome-issue-page .gs-description p {
+  margin: 0;
+  color: var(--mgdb-ink);
+  font-size: 0.96rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
