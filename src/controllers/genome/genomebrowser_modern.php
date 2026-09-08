@@ -12,6 +12,24 @@ logMessage('Starting genomebrowser_modern.php');
 
 $DBConn = connect_to_database(false);
 
+// Direct browser redirect when queried with specific assembly and browser view
+if (!empty($_GET['assembly']) && !empty($_GET['view'])) {
+    $view = strtolower($_GET['view']);
+    $asm = preg_replace('/[^A-Za-z0-9_.\-]/', '', (string)$_GET['assembly']);
+    if ($view === 'jbrowse1' && $DBConn) {
+        $st = $DBConn->prepare("SELECT browser FROM chado.genome_metadata WHERE assembly_name = ? AND browser IS NOT NULL LIMIT 1");
+        $st->execute(array($asm));
+        $browser_target = $st->fetchColumn();
+        if ($browser_target) {
+            header("Location: " . $browser_target, true, 302);
+            exit;
+        }
+    } else if ($view === 'jbrowse2') {
+        header("Location: https://jbrowse2.maizegdb.org", true, 302);
+        exit;
+    }
+}
+
 // Bypass edge and browser cache
 header("Cache-Control: no-cache, no-store, must-revalidate, max-age=0");
 header("Pragma: no-cache");

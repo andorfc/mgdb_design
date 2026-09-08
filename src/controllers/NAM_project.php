@@ -61,7 +61,6 @@
    pointing at unrelated papers. */
   include_once('./include/references_lib.php');
   $body->get('reference_cards')->replace(mgdb_render_references($doc_root, array(
-    array('doi' => '10.1126/science.abg5289'),
     // The genetic properties of the NAM population itself.
     array('doi' => '10.1126/science.1174320',
           'fallback' => array(
