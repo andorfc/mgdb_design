@@ -55,11 +55,13 @@
   $body->get('blast_url')->replace($blast_url);
 
 
-/* Publications: rendered by include/references_lib.php so these cards match
-   every other page. Crossref-verified metadata -- the hand-typed versions
-   these replaced carried a DOI that does not resolve and two PubMed IDs
-   pointing at unrelated papers. */
+/* Primary reference for the description section */
   include_once('./include/references_lib.php');
+  $body->get('primary_reference_card')->replace(mgdb_render_references($doc_root, array(
+    array('doi' => '10.1126/science.abg5289'),
+  )));
+
+/* Other publications: rendered by include/references_lib.php */
   $body->get('reference_cards')->replace(mgdb_render_references($doc_root, array(
     // The genetic properties of the NAM population itself.
     array('doi' => '10.1126/science.1174320',
