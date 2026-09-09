@@ -630,7 +630,7 @@
 
 .mgdb-panand-project-page .panand-faqs-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--mgdb-space-4);
   margin-top: var(--mgdb-space-4);
 }
@@ -652,5 +652,9 @@
 @media (max-width: 48rem) {
   .mgdb-panand-project-page .mgdb-section-tabs {
     position: static;
+  }
+
+  .mgdb-panand-project-page .panand-faqs-grid {
+    grid-template-columns: 1fr;
   }
 }
