@@ -38,13 +38,10 @@ $$SYNTAX-LEVEL 2
     <div class="mgdb-hero-body">
       <h1 id="caas-title">CAAS 12 Founder Inbred Lines Genomes Project \(FIL\)</h1>
       <p class="mgdb-hero-description">
-        De novo chromosome-scale genome assemblies, annotations, and heterotic group architecture across 12 foundational Chinese and international maize founder lines shaping modern hybrid breeding.
+        De novo chromosome-scale genome assemblies and annotations for 12 foundational Chinese and international maize founder lines
       </p>
 
       <div class="caas-hero-actions-row">
-        <a class="caas-hero-link" href="/genomebrowser">
-          <span class="caas-link-dot caas-dot-green" aria-hidden="true"></span> JBrowse 2
-        </a>
         <a class="caas-hero-link" href="/download#downloads-caas-fil">
           <span class="caas-link-dot caas-dot-blue" aria-hidden="true"></span> Downloads
         </a>
@@ -63,14 +60,28 @@ $$SYNTAX-LEVEL 2
 
   <!-- STICKY SECTION NAVIGATION TABS -->
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#caas-assemblies" class="is-current">Assemblies</a>
-    <a href="#caas-groups">Heterotic groups</a>
-    <a href="#caas-publications">Publications</a>
+    <a href="#caas-description" class="is-current">Description</a>
+    <a href="#caas-assemblies">Assemblies</a>
     <a href="#caas-data-hosted">Hosted data</a>
     <a href="#caas-faqs">FAQs</a>
     <a href="#caas-metrics">Metrics</a>
     <a href="#caas-related">Related resources</a>
   </nav>
+
+  <!-- SECTION: DESCRIPTION -->
+  <section id="caas-description" aria-labelledby="caas-description-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="caas-description-title">Description</h2></div>
+    </div>
+
+    <div class="caas-description-content">
+      <p>A key factor contributing to the success of hybrid maize is breeding of improved parental inbred lines and assigning them to female and male heterotic groups that allow maximum exploitation of heterosis. The three major heterotic groups, Stiff Stalk \(SS\), Lancaster Surecrop \(Lancaster or LSC, also called Nonstiff Stalk or NSS\) and Iodent \(IDT\), were developed in the United States. In China, both local germplasm \(such as Tang SiPingTou \(TSPT\) and LvDa Red Cob \(LRC\)\) along with germplasm from the US, were used to develop parental inbred lines, leading to the formation of additional heterotic groups, including the PA, TSPT, LRC, PB, X-group, and Suwan groups. 12 maize founder inbred lines \(FILs\) were selected as representatives of nine heterotic groups of maize \(SS1, SS2, PA, X-group, Lancaster1, Lancaster2, TSPT, IDT, PB\) for de novo assembly and annotation, providing a valuable genomic source for the maize research community.</p>
+    </div>
+
+    <div class="mgdb-ref-list caas-description-ref-wrap">
+      $(primary_reference_card)
+    </div>
+  </section>
 
   <!-- SECTION 1: INTERACTIVE ASSEMBLIES DIRECTORY TABLE -->
   <section id="caas-assemblies" aria-labelledby="caas-assemblies-title">
@@ -98,7 +109,7 @@ $$SYNTAX-LEVEL 2
 
     <div class="caas-table-status-bar">
       <span id="caas-row-count">Showing 12 of 12 assemblies</span>
-      <span class="caas-table-hint">Click column headers to sort &bull; Launch JBrowse 2 or download files directly</span>
+      <span class="caas-table-hint">Click column headers to sort &bull; View assemblies or download files directly</span>
     </div>
 
     <!-- MAIN INTERACTIVE TABLE -->
@@ -113,7 +124,7 @@ $$SYNTAX-LEVEL 2
               <button type="button">Heterotic Group <span class="sort-icon" aria-hidden="true">&updownarrow;</span></button>
             </th>
             <th scope="col" class="is-sortable" data-sort="assembly">
-              <button type="button">Assembly ID &amp; JBrowse <span class="sort-icon" aria-hidden="true">&updownarrow;</span></button>
+              <button type="button">Assembly ID <span class="sort-icon" aria-hidden="true">&updownarrow;</span></button>
             </th>
             <th scope="col" class="is-sortable" data-sort="annotation">
               <button type="button">Annotation &amp; Genes <span class="sort-icon" aria-hidden="true">&updownarrow;</span></button>
@@ -140,10 +151,7 @@ $$SYNTAX-LEVEL 2
                   <strong>Zm-A632-REFERENCE-CAAS_FIL-1.0</strong>
                 </a>
                 <div class="caas-sub-actions">
-                  <a href="/genomebrowser?assembly=Zm-A632-REFERENCE-CAAS_FIL-1.0" class="caas-jb2-btn" title="View A632 in JBrowse 2">
-                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
-                  </a>
-                  <a href="/genome/assembly/Zm-A632-REFERENCE-CAAS_FIL-1.0" class="caas-rec-btn">Assembly Page &rarr;</a>
+                  <a href="/genome/assembly/Zm-A632-REFERENCE-CAAS_FIL-1.0" class="caas-rec-btn">Assembly Page</a>
                 </div>
               </div>
             </td>
@@ -160,7 +168,7 @@ $$SYNTAX-LEVEL 2
             </td>
             <td class="text-right">
               <a href="https://download.maizegdb.org/Zm-A632-REFERENCE-CAAS_FIL-1.0/" class="caas-dl-btn">
-                Download
+                Download &#8595;
               </a>
             </td>
           </tr>
@@ -180,10 +188,7 @@ $$SYNTAX-LEVEL 2
                   <strong>Zm-Chang-7_2-REFERENCE-CAAS_FIL-1.0</strong>
                 </a>
                 <div class="caas-sub-actions">
-                  <a href="/genomebrowser?assembly=Zm-Chang-7_2-REFERENCE-CAAS_FIL-1.0" class="caas-jb2-btn" title="View Chang7-2 in JBrowse 2">
-                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
-                  </a>
-                  <a href="/genome/assembly/Zm-Chang-7_2-REFERENCE-CAAS_FIL-1.0" class="caas-rec-btn">Assembly Page &rarr;</a>
+                  <a href="/genome/assembly/Zm-Chang-7_2-REFERENCE-CAAS_FIL-1.0" class="caas-rec-btn">Assembly Page</a>
                 </div>
               </div>
             </td>
@@ -200,7 +205,7 @@ $$SYNTAX-LEVEL 2
             </td>
             <td class="text-right">
               <a href="https://download.maizegdb.org/Zm-Chang-7_2-REFERENCE-CAAS_FIL-1.0/" class="caas-dl-btn">
-                Download
+                Download &#8595;
               </a>
             </td>
           </tr>
@@ -220,10 +225,7 @@ $$SYNTAX-LEVEL 2
                   <strong>Zm-Dan340-REFERENCE-CAAS_FIL-1.0</strong>
                 </a>
                 <div class="caas-sub-actions">
-                  <a href="/genomebrowser?assembly=Zm-Dan340-REFERENCE-CAAS_FIL-1.0" class="caas-jb2-btn" title="View Dan340 in JBrowse 2">
-                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
-                  </a>
-                  <a href="/genome/assembly/Zm-Dan340-REFERENCE-CAAS_FIL-1.0" class="caas-rec-btn">Assembly Page &rarr;</a>
+                  <a href="/genome/assembly/Zm-Dan340-REFERENCE-CAAS_FIL-1.0" class="caas-rec-btn">Assembly Page</a>
                 </div>
               </div>
             </td>
@@ -240,7 +242,7 @@ $$SYNTAX-LEVEL 2
             </td>
             <td class="text-right">
               <a href="https://download.maizegdb.org/Zm-Dan340-REFERENCE-CAAS_FIL-1.0/" class="caas-dl-btn">
-                Download
+                Download &#8595;
               </a>
             </td>
           </tr>
@@ -260,10 +262,7 @@ $$SYNTAX-LEVEL 2
                   <strong>Zm-Huangzaosi-REFERENCE-CAAS_FIL-1.0</strong>
                 </a>
                 <div class="caas-sub-actions">
-                  <a href="/genomebrowser?assembly=Zm-Huangzaosi-REFERENCE-CAAS_FIL-1.0" class="caas-jb2-btn" title="View Huangzaosi in JBrowse 2">
-                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
-                  </a>
-                  <a href="/genome/assembly/Zm-Huangzaosi-REFERENCE-CAAS_FIL-1.0" class="caas-rec-btn">Assembly Page &rarr;</a>
+                  <a href="/genome/assembly/Zm-Huangzaosi-REFERENCE-CAAS_FIL-1.0" class="caas-rec-btn">Assembly Page</a>
                 </div>
               </div>
             </td>
@@ -280,7 +279,7 @@ $$SYNTAX-LEVEL 2
             </td>
             <td class="text-right">
               <a href="https://download.maizegdb.org/Zm-Huangzaosi-REFERENCE-CAAS_FIL-1.0/" class="caas-dl-btn">
-                Download
+                Download &#8595;
               </a>
             </td>
           </tr>
@@ -300,10 +299,7 @@ $$SYNTAX-LEVEL 2
                   <strong>Zm-Jing724-REFERENCE-CAAS_FIL-1.0</strong>
                 </a>
                 <div class="caas-sub-actions">
-                  <a href="/genomebrowser?assembly=Zm-Jing724-REFERENCE-CAAS_FIL-1.0" class="caas-jb2-btn" title="View Jing724 in JBrowse 2">
-                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
-                  </a>
-                  <a href="/genome/assembly/Zm-Jing724-REFERENCE-CAAS_FIL-1.0" class="caas-rec-btn">Assembly Page &rarr;</a>
+                  <a href="/genome/assembly/Zm-Jing724-REFERENCE-CAAS_FIL-1.0" class="caas-rec-btn">Assembly Page</a>
                 </div>
               </div>
             </td>
@@ -320,7 +316,7 @@ $$SYNTAX-LEVEL 2
             </td>
             <td class="text-right">
               <a href="https://download.maizegdb.org/Zm-Jing724-REFERENCE-CAAS_FIL-1.0/" class="caas-dl-btn">
-                Download
+                Download &#8595;
               </a>
             </td>
           </tr>
@@ -340,10 +336,7 @@ $$SYNTAX-LEVEL 2
                   <strong>Zm-Jing92-REFERENCE-CAAS_FIL-1.0</strong>
                 </a>
                 <div class="caas-sub-actions">
-                  <a href="/genomebrowser?assembly=Zm-Jing92-REFERENCE-CAAS_FIL-1.0" class="caas-jb2-btn" title="View Jing92 in JBrowse 2">
-                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
-                  </a>
-                  <a href="/genome/assembly/Zm-Jing92-REFERENCE-CAAS_FIL-1.0" class="caas-rec-btn">Assembly Page &rarr;</a>
+                  <a href="/genome/assembly/Zm-Jing92-REFERENCE-CAAS_FIL-1.0" class="caas-rec-btn">Assembly Page</a>
                 </div>
               </div>
             </td>
@@ -360,7 +353,7 @@ $$SYNTAX-LEVEL 2
             </td>
             <td class="text-right">
               <a href="https://download.maizegdb.org/Zm-Jing92-REFERENCE-CAAS_FIL-1.0/" class="caas-dl-btn">
-                Download
+                Download &#8595;
               </a>
             </td>
           </tr>
@@ -380,10 +373,7 @@ $$SYNTAX-LEVEL 2
                   <strong>Zm-Oh43-REFERENCE-CAAS_FIL-1.0</strong>
                 </a>
                 <div class="caas-sub-actions">
-                  <a href="/genomebrowser?assembly=Zm-Oh43-REFERENCE-CAAS_FIL-1.0" class="caas-jb2-btn" title="View Oh43 in JBrowse 2">
-                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
-                  </a>
-                  <a href="/genome/assembly/Zm-Oh43-REFERENCE-CAAS_FIL-1.0" class="caas-rec-btn">Assembly Page &rarr;</a>
+                  <a href="/genome/assembly/Zm-Oh43-REFERENCE-CAAS_FIL-1.0" class="caas-rec-btn">Assembly Page</a>
                 </div>
               </div>
             </td>
@@ -400,7 +390,7 @@ $$SYNTAX-LEVEL 2
             </td>
             <td class="text-right">
               <a href="https://download.maizegdb.org/Zm-Oh43-REFERENCE-CAAS_FIL-1.0/" class="caas-dl-btn">
-                Download
+                Download &#8595;
               </a>
             </td>
           </tr>
@@ -420,10 +410,7 @@ $$SYNTAX-LEVEL 2
                   <strong>Zm-PH207-REFERENCE-CAAS_FIL-1.0</strong>
                 </a>
                 <div class="caas-sub-actions">
-                  <a href="/genomebrowser?assembly=Zm-PH207-REFERENCE-CAAS_FIL-1.0" class="caas-jb2-btn" title="View PH207 in JBrowse 2">
-                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
-                  </a>
-                  <a href="/genome/assembly/Zm-PH207-REFERENCE-CAAS_FIL-1.0" class="caas-rec-btn">Assembly Page &rarr;</a>
+                  <a href="/genome/assembly/Zm-PH207-REFERENCE-CAAS_FIL-1.0" class="caas-rec-btn">Assembly Page</a>
                 </div>
               </div>
             </td>
@@ -440,7 +427,7 @@ $$SYNTAX-LEVEL 2
             </td>
             <td class="text-right">
               <a href="https://download.maizegdb.org/Zm-PH207-REFERENCE-CAAS_FIL-1.0/" class="caas-dl-btn">
-                Download
+                Download &#8595;
               </a>
             </td>
           </tr>
@@ -460,10 +447,7 @@ $$SYNTAX-LEVEL 2
                   <strong>Zm-S37-REFERENCE-CAAS_FIL-1.0</strong>
                 </a>
                 <div class="caas-sub-actions">
-                  <a href="/genomebrowser?assembly=Zm-S37-REFERENCE-CAAS_FIL-1.0" class="caas-jb2-btn" title="View S37 in JBrowse 2">
-                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
-                  </a>
-                  <a href="/genome/assembly/Zm-S37-REFERENCE-CAAS_FIL-1.0" class="caas-rec-btn">Assembly Page &rarr;</a>
+                  <a href="/genome/assembly/Zm-S37-REFERENCE-CAAS_FIL-1.0" class="caas-rec-btn">Assembly Page</a>
                 </div>
               </div>
             </td>
@@ -480,7 +464,7 @@ $$SYNTAX-LEVEL 2
             </td>
             <td class="text-right">
               <a href="https://download.maizegdb.org/Zm-S37-REFERENCE-CAAS_FIL-1.0/" class="caas-dl-btn">
-                Download
+                Download &#8595;
               </a>
             </td>
           </tr>
@@ -500,10 +484,7 @@ $$SYNTAX-LEVEL 2
                   <strong>Zm-Xu178-REFERENCE-CAAS_FIL-1.0</strong>
                 </a>
                 <div class="caas-sub-actions">
-                  <a href="/genomebrowser?assembly=Zm-Xu178-REFERENCE-CAAS_FIL-1.0" class="caas-jb2-btn" title="View Xu178 in JBrowse 2">
-                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
-                  </a>
-                  <a href="/genome/assembly/Zm-Xu178-REFERENCE-CAAS_FIL-1.0" class="caas-rec-btn">Assembly Page &rarr;</a>
+                  <a href="/genome/assembly/Zm-Xu178-REFERENCE-CAAS_FIL-1.0" class="caas-rec-btn">Assembly Page</a>
                 </div>
               </div>
             </td>
@@ -520,7 +501,7 @@ $$SYNTAX-LEVEL 2
             </td>
             <td class="text-right">
               <a href="https://download.maizegdb.org/Zm-Xu178-REFERENCE-CAAS_FIL-1.0/" class="caas-dl-btn">
-                Download
+                Download &#8595;
               </a>
             </td>
           </tr>
@@ -540,10 +521,7 @@ $$SYNTAX-LEVEL 2
                   <strong>Zm-Ye478-REFERENCE-CAAS_FIL-1.0</strong>
                 </a>
                 <div class="caas-sub-actions">
-                  <a href="/genomebrowser?assembly=Zm-Ye478-REFERENCE-CAAS_FIL-1.0" class="caas-jb2-btn" title="View Ye478 in JBrowse 2">
-                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
-                  </a>
-                  <a href="/genome/assembly/Zm-Ye478-REFERENCE-CAAS_FIL-1.0" class="caas-rec-btn">Assembly Page &rarr;</a>
+                  <a href="/genome/assembly/Zm-Ye478-REFERENCE-CAAS_FIL-1.0" class="caas-rec-btn">Assembly Page</a>
                 </div>
               </div>
             </td>
@@ -560,7 +538,7 @@ $$SYNTAX-LEVEL 2
             </td>
             <td class="text-right">
               <a href="https://download.maizegdb.org/Zm-Ye478-REFERENCE-CAAS_FIL-1.0/" class="caas-dl-btn">
-                Download
+                Download &#8595;
               </a>
             </td>
           </tr>
@@ -580,10 +558,7 @@ $$SYNTAX-LEVEL 2
                   <strong>Zm-Zheng58-REFERENCE-CAAS_FIL-1.0</strong>
                 </a>
                 <div class="caas-sub-actions">
-                  <a href="/genomebrowser?assembly=Zm-Zheng58-REFERENCE-CAAS_FIL-1.0" class="caas-jb2-btn" title="View Zheng58 in JBrowse 2">
-                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
-                  </a>
-                  <a href="/genome/assembly/Zm-Zheng58-REFERENCE-CAAS_FIL-1.0" class="caas-rec-btn">Assembly Page &rarr;</a>
+                  <a href="/genome/assembly/Zm-Zheng58-REFERENCE-CAAS_FIL-1.0" class="caas-rec-btn">Assembly Page</a>
                 </div>
               </div>
             </td>
@@ -600,7 +575,7 @@ $$SYNTAX-LEVEL 2
             </td>
             <td class="text-right">
               <a href="https://download.maizegdb.org/Zm-Zheng58-REFERENCE-CAAS_FIL-1.0/" class="caas-dl-btn">
-                Download
+                Download &#8595;
               </a>
             </td>
           </tr>
@@ -610,128 +585,71 @@ $$SYNTAX-LEVEL 2
 
   </section>
 
-  <!-- SECTION 2: HETEROTIC GROUPS & ARCHITECTURE -->
-  <section id="caas-groups" aria-labelledby="caas-groups-title">
-    <div class="mgdb-section-heading">
-      <div><h2 id="caas-groups-title">Heterotic groups</h2></div>
-    </div>
-
-<div class="caas-groups-grid">
-      <article class="caas-group-card">
-        <h3>Tang Sipingtou \(TSPT\) &amp; Landrace Heritage</h3>
-        <p>
-          Derived from the foundational Chinese landrace selection Huangzaosi, the TSPT group \(Huangzaosi, Chang7-2, Jing92\) provides critical adaptation to northern cropping systems, exceptional combining ability, and stress tolerance when crossed with Stiff Stalk and P-Group lines.
-        </p>
-      </article>
-
-      <article class="caas-group-card">
-        <h3>P-Group Lineages \(PA &amp; PB\) &amp; Pioneer Heritage</h3>
-        <p>
-          Formed through the introgression of international Pioneer germplasm into Chinese breeding programs, P-Group A \(Ye478, Zheng58\) and P-Group B \(Xu178\) serve as foundational female parents for high-yielding commercial mega-hybrids such as Zhengdan 958.
-        </p>
-      </article>
-
-      <article class="caas-group-card">
-        <h3>Lancaster, Stiff Stalk &amp; Iodent Complementation</h3>
-        <p>
-          The integration of classical US Corn Belt heterotic groups—including Lancaster Surecrop \(Dan340, Oh43\), Stiff Stalk \(A632\), and Iodent \(PH207\)—provides broad genetic diversity and complementary alleles driving hybrid performance and grain yield.
-        </p>
-      </article>
-    </div>
-
-  </section>
-
-  <!-- SECTION 3: KEY PUBLICATIONS & ABSTRACT PREVIEWS -->
-  <section id="caas-publications" aria-labelledby="caas-pub-title">
-    <div class="mgdb-section-heading">
-      <div><h2 id="caas-pub-title">Publications</h2></div>
-    </div>
-
-    <div class="mgdb-ref-list">
-      $(reference_cards)
-    </div>
-  </section>
-
-  <!-- SECTION 4: DATA HOSTED AT MAIZEGDB -->
+  <!-- SECTION 2: DATA HOSTED AT MAIZEGDB -->
   <section id="caas-data-hosted" aria-labelledby="caas-hosted-title">
     <div class="mgdb-section-heading">
       <div><h2 id="caas-hosted-title">Hosted data</h2></div>
     </div>
 
-<div class="caas-hosted-grid">
-      <!-- 1: JBrowse 2 -->
-      <article class="caas-hosted-card">
-        <h3>Genome Browsers \(JBrowse 2\)</h3>
-        <p>Interactive chromosome-scale browsers for all 12 CAAS founder lines with gene models, repeat elements, and comparative tracks.</p>
-        <a class="mgdb-button mgdb-button-secondary" href="/genomebrowser">Open Genome Browsers &#8599;</a>
-      </article>
-
-      <!-- 2: Gene Center -->
+    <div class="caas-hosted-grid">
+      <!-- 1: Gene Center -->
       <article class="caas-hosted-card">
         <h3>Gene Center &amp; Models</h3>
         <p>Over 530,000 high-confidence gene models across the 12 assemblies indexed in the Gene Center with functional annotations.</p>
-        <a class="mgdb-button mgdb-button-secondary" href="/gene_center/gene">Explore Gene Center &#8599;</a>
+        <a class="mgdb-button mgdb-button-secondary" href="/gene_center/gene">Explore Gene Center</a>
       </article>
 
-      <!-- 3: BLAST -->
+      <!-- 2: BLAST -->
       <article class="caas-hosted-card">
         <h3>Sequence BLAST Tool</h3>
         <p>Align nucleotide, CDS, transcript, and translated protein queries directly against CAAS-FIL assemblies and gene models.</p>
-        <a class="mgdb-button mgdb-button-secondary" href="$(blast_url)">Run BLAST Search &#8599;</a>
+        <a class="mgdb-button mgdb-button-secondary" href="$(blast_url)">Run BLAST Search</a>
       </article>
 
-      <!-- 4: Bulk Downloads -->
+      <!-- 3: Bulk Downloads -->
       <article class="caas-hosted-card">
         <h3>Bulk Downloads &amp; Globus</h3>
         <p>Download complete assembly FASTA files, GFF3 annotations, canonical CDS/PEP sequences, and pre-indexed tracks.</p>
-        <a class="mgdb-button mgdb-button-secondary" href="/download#downloads-caas-fil">Browse Downloads &#8599;</a>
+        <a class="mgdb-button mgdb-button-secondary" href="/download#downloads-caas-fil">Browse Downloads</a>
       </article>
     </div>
 
   </section>
 
-  <!-- SECTION 5: SCALE & GENOMIC METRICS DASHBOARD -->
+  <!-- SECTION 3: FAQS -->
   <section id="caas-faqs" aria-labelledby="caas-faqs-title">
     <div class="mgdb-section-heading">
       <div><h2 id="caas-faqs-title">FAQs</h2></div>
     </div>
 
-<div class="caas-faq-list">
-      <details class="caas-faq-item">
-        <summary><h3>Why are founder inbred lines \(FILs\) critical for maize genetics?</h3></summary>
-        <div class="caas-faq-body">
-          <p>
-            Founder inbred lines represent the foundational genetic pillars of modern hybrid breeding programs. Over 80% of modern Chinese commercial maize acreage traces to crosses between these founder lines \(for example, the mega-hybrid Zhengdan 958 derived from Zheng58 &times; Chang7-2\). Having high-quality reference genomes for all 12 founders illuminates the genetic combinations and structural alleles driving hybrid vigor.
-          </p>
-        </div>
-      </details>
+    <div class="mgdb-card-grid caas-faqs-grid">
+      <article class="mgdb-card">
+        <h3>Why are founder inbred lines \(FILs\) critical for maize genetics?</h3>
+        <p>
+          Founder inbred lines represent the foundational genetic pillars of modern hybrid breeding programs. Over 80% of modern Chinese commercial maize acreage traces to crosses between these founder lines \(for example, the mega-hybrid Zhengdan 958 derived from Zheng58 &times; Chang7-2\). Having high-quality reference genomes for all 12 founders illuminates the genetic combinations and structural alleles driving hybrid vigor.
+        </p>
+      </article>
 
-      <details class="caas-faq-item">
-        <summary><h3>Where can I download FASTA sequences and GFF3 gene annotations?</h3></summary>
-        <div class="caas-faq-body">
-          <p>
-            Full assembly FASTA files, GFF3 gene annotations, CDS/PEP files, and NCBI GenBank accessions are available on the <a href="/download#downloads-caas-fil">MaizeGDB Downloads Portal</a> or via individual assembly links in the table above.
-          </p>
-        </div>
-      </details>
+      <article class="mgdb-card">
+        <h3>Where can I download FASTA sequences and GFF3 gene annotations?</h3>
+        <p>
+          Full assembly FASTA files, GFF3 gene annotations, CDS/PEP files, and NCBI GenBank accessions are available on the <a href="/download#downloads-caas-fil">MaizeGDB Downloads Portal</a> or via individual assembly links in the table above.
+        </p>
+      </article>
 
-      <details class="caas-faq-item">
-        <summary><h3>How do CAAS-FIL gene models compare with B73 and Mo17?</h3></summary>
-        <div class="caas-faq-body">
-          <p>
-            While B73 and Mo17 represent classical US Stiff Stalk and Lancaster references, the CAAS-FIL assemblies uncover extensive novel gene models, structural rearrangements, and presence-absence variants specific to the Tang Sipingtou and P-Group lineages. Comparative synteny tracks are viewable directly in <a href="/genomebrowser">JBrowse 2</a>.
-          </p>
-        </div>
-      </details>
+      <article class="mgdb-card">
+        <h3>How do CAAS-FIL gene models compare with B73 and Mo17?</h3>
+        <p>
+          While B73 and Mo17 represent classical US Stiff Stalk and Lancaster references, the CAAS-FIL assemblies uncover extensive novel gene models, structural rearrangements, and presence-absence variants specific to the Tang Sipingtou and P-Group lineages.
+        </p>
+      </article>
 
-      <details class="caas-faq-item">
-        <summary><h3>Can I run BLAST against individual CAAS founder genomes?</h3></summary>
-        <div class="caas-faq-body">
-          <p>
-            Yes! MaizeGDB hosts dedicated BLAST databases for all 12 CAAS lines. Navigate to the <a href="$(blast_url)">BLAST Tool</a> and select the desired CAAS assembly or predicted peptide database.
-          </p>
-        </div>
-      </details>
+      <article class="mgdb-card">
+        <h3>Can I run BLAST against individual CAAS founder genomes?</h3>
+        <p>
+          Yes! MaizeGDB hosts dedicated BLAST databases for all 12 CAAS lines. Navigate to the <a href="$(blast_url)">BLAST Tool</a> and select the desired CAAS assembly or predicted peptide database.
+        </p>
+      </article>
     </div>
 
   </section>

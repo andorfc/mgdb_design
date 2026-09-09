@@ -56,12 +56,9 @@
   $body->get('blast_url')->replace($blast_url);
 
 
-/* Publications: rendered by include/references_lib.php so these cards match
-   every other page. Crossref-verified metadata -- the hand-typed versions
-   these replaced carried a DOI that does not resolve and two PubMed IDs
-   pointing at unrelated papers. */
+/* Primary reference for the description section */
   include_once('./include/references_lib.php');
-  $body->get('reference_cards')->replace(mgdb_render_references($doc_root, array(
+  $body->get('primary_reference_card')->replace(mgdb_render_references($doc_root, array(
     // The twelve founder inbred line assemblies and the heterosis analysis.
     array('doi' => '10.1038/s41588-022-01283-w',
           'fallback' => array(
