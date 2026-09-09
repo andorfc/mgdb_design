@@ -56,12 +56,9 @@
   $body->get('blast_url')->replace($blast_url);
 
 
-/* Publications: rendered by include/references_lib.php so these cards match
-   every other page. Crossref-verified metadata -- the hand-typed versions
-   these replaced carried a DOI that does not resolve and two PubMed IDs
-   pointing at unrelated papers. */
+/* Primary reference for the description section */
   include_once('./include/references_lib.php');
-  $body->get('reference_cards')->replace(mgdb_render_references($doc_root, array(
+  $body->get('primary_reference_card')->replace(mgdb_render_references($doc_root, array(
     // The four flint assemblies, their repeat content and their gene content.
     array('doi' => '10.1038/s41588-020-0671-9',
           'fallback' => array(
@@ -74,6 +71,10 @@
               'pubmed'   => '32719517',
               'abstract' => 'The diversity of maize (Zea mays) is the backbone of modern heterotic patterns and hybrid breeding. Historically, US farmers exploited this variability to establish today\'s highly productive Corn Belt inbred lines from blends of dent and flint germplasm pools. Here, we report de novo genome sequences of four European flint lines assembled to pseudomolecules with scaffold N50 ranging from 6.1 to 10.4 Mb. Comparative analyses with two US Corn Belt lines explains the pronounced differences between both germplasms. While overall syntenic order and consolidated gene annotations reveal only moderate pangenomic differences, whole-genome alignments delineating the core and dispensable genome, and the analysis of heterochromatic knobs and orthologous long terminal repeat retrotransposons unveil the dynamics of the maize genome. The high-quality genome sequences of the flint pool complement the maize pangenome and provide an important tool to study maize improvement at a genome scale and to enhance modern hybrid breeding.',
           )),
+  )));
+
+/* Other publications: rendered by include/references_lib.php */
+  $body->get('reference_cards')->replace(mgdb_render_references($doc_root, array(
     // The earlier preprint describing the same reference sequences.
     array('doi' => '10.1101/103747',
           'kind' => 'Preprint',

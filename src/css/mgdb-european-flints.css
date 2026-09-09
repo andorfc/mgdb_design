@@ -84,6 +84,21 @@
 .mgdb-european-flints-page .flints-dot-dark { background: #475569; }
 
 /* --------------------------------------------------------------------------
+ * Section: Description
+ * -------------------------------------------------------------------------- */
+
+.mgdb-european-flints-page .flints-description-content p {
+  font-size: var(--mgdb-text-base);
+  line-height: var(--mgdb-leading-relaxed);
+  color: var(--mgdb-ink);
+  margin-bottom: var(--mgdb-space-3);
+}
+
+.mgdb-european-flints-page .flints-description-ref-wrap {
+  margin-top: var(--mgdb-space-4);
+}
+
+/* --------------------------------------------------------------------------
  * Filter & Search Toolbar
  * -------------------------------------------------------------------------- */
 
@@ -252,49 +267,46 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  margin-top: 4px;
 }
 
-.mgdb-european-flints-page .flints-jb2-btn {
+.mgdb-european-flints-page .flints-gbrowse-btn,
+.mgdb-european-flints-page .flints-rec-btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
   padding: 1px 6px;
-  border: 1px solid #c8e6c9;
   border-radius: var(--mgdb-radius-sm);
-  background: #e8f5e9;
-  color: #1b5e20;
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 600;
   text-decoration: none;
   transition: all 0.12s ease;
+  line-height: 1.4;
 }
 
-.mgdb-european-flints-page .flints-jb2-btn:hover {
-  background: #1b5e20;
+.mgdb-european-flints-page .flints-gbrowse-btn {
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  border: 1px solid #bbf7d0;
+}
+
+.mgdb-european-flints-page .flints-gbrowse-btn:hover {
+  background: var(--mgdb-green);
   color: #ffffff;
-  border-color: #1b5e20;
-}
-
-.mgdb-european-flints-page .jb2-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #2e7d32;
-}
-
-.mgdb-european-flints-page .flints-jb2-btn:hover .jb2-dot {
-  background: #ffffff;
+  border-color: var(--mgdb-green);
+  text-decoration: none;
 }
 
 .mgdb-european-flints-page .flints-rec-btn {
-  font-size: 11px;
-  color: var(--mgdb-muted);
-  text-decoration: none;
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
 }
 
 .mgdb-european-flints-page .flints-rec-btn:hover {
-  color: var(--mgdb-green-dark);
-  text-decoration: underline;
+  background: #334155;
+  color: #ffffff;
+  border-color: #334155;
+  text-decoration: none;
 }
 
 .mgdb-european-flints-page .flints-taxon-cell {
@@ -449,40 +461,6 @@
   text-align: right;
 }
 
-/* --------------------------------------------------------------------------
- * Section 2: Flint vs. Dent Heterosis Cards (NO ICONS, LIKE NAM)
- * -------------------------------------------------------------------------- */
-
-.mgdb-european-flints-page .flints-heterosis-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--mgdb-space-4);
-  margin-top: var(--mgdb-space-4);
-}
-
-.mgdb-european-flints-page .flints-heterosis-card {
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  padding: var(--mgdb-space-4);
-  display: flex;
-  flex-direction: column;
-}
-
-.mgdb-european-flints-page .flints-heterosis-card h3 {
-  font-size: 1.05rem;
-  font-weight: 700;
-  margin: 0 0 var(--mgdb-space-2) 0;
-  color: var(--mgdb-ink);
-}
-
-.mgdb-european-flints-page .flints-heterosis-card p {
-  font-size: var(--mgdb-text-xs);
-  color: var(--mgdb-ink-soft);
-  line-height: 1.5;
-  margin: 0;
-  flex: 1;
-}
 
 /* --------------------------------------------------------------------------
  * Publications
@@ -577,52 +555,43 @@
 }
 
 /* --------------------------------------------------------------------------
- * Section 6: FAQ Accordions
+ * Section 5: FAQs Grid (matching NAM project style)
  * -------------------------------------------------------------------------- */
 
-.mgdb-european-flints-page .flints-faq-list {
+.mgdb-european-flints-page .flints-faqs-grid {
   display: grid;
-  gap: var(--mgdb-space-3);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
 }
 
-.mgdb-european-flints-page .flints-faq-item {
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: #ffffff;
-  overflow: hidden;
-}
-
-.mgdb-european-flints-page .flints-faq-item summary {
-  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+.mgdb-european-flints-page .flints-faqs-grid .mgdb-card h3 {
+  font-size: 1.05rem;
   font-weight: 700;
-  cursor: pointer;
-  user-select: none;
-  background: #ffffff;
-  transition: background 0.12s ease;
+  margin: 0 0 var(--mgdb-space-2) 0;
+  color: var(--mgdb-burgundy);
 }
 
-.mgdb-european-flints-page .flints-faq-item summary:hover {
-  background: #f8faf8;
-}
-
-.mgdb-european-flints-page .flints-faq-item summary h3 {
-  display: inline;
-  font-size: var(--mgdb-text-base);
-  color: var(--mgdb-green-dark);
-  margin: 0;
-}
-
-.mgdb-european-flints-page .flints-faq-body {
-  padding: 0 var(--mgdb-space-5) var(--mgdb-space-4);
-  border-top: 1px solid var(--mgdb-line-soft);
-  color: var(--mgdb-ink);
+.mgdb-european-flints-page .flints-faqs-grid .mgdb-card p {
   font-size: var(--mgdb-text-sm);
-  line-height: var(--mgdb-leading);
+  line-height: var(--mgdb-leading-relaxed);
+  color: var(--mgdb-ink);
+  margin: 0 0 var(--mgdb-space-2) 0;
 }
 
-.mgdb-european-flints-page .flints-faq-body a {
+.mgdb-european-flints-page .flints-faqs-grid .mgdb-card p:last-child {
+  margin-bottom: 0;
+}
+
+.mgdb-european-flints-page .flints-faqs-grid .mgdb-card a {
   color: var(--mgdb-green-dark);
   font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .mgdb-european-flints-page .flints-faqs-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 /* --------------------------------------------------------------------------
