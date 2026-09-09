@@ -458,7 +458,7 @@
 
 .mgdb-nam-project-page .nam-grin-link { color: #15803d; }
 .mgdb-nam-project-page .nam-stock-link { color: var(--mgdb-burgundy); }
-.mgdb-nam-project-page .nam-ncbi-link { color: #2563eb; }
+.mgdb-nam-project-page .nam-ncbi-link { color: #2563eb; white-space: nowrap; }
 
 .mgdb-nam-project-page .nam-grin-link:hover,
 .mgdb-nam-project-page .nam-stock-link:hover,
@@ -726,3 +726,10 @@
    still measures exactly its container at 1280px; below that .mgdb-table-scroll
    takes over. */
 .mgdb-nam-project-page .nam-assembly-link { white-space: nowrap; }
+
+/* With "Official Annotation & Xref" shortened to "Annotation", allocate more width
+   to the NCBI Accession column so headers and accession links sit comfortably on one line. */
+.mgdb-nam-project-page .nam-table th[data-sort="ncbi"] {
+  min-width: 145px;
+  white-space: nowrap;
+}
