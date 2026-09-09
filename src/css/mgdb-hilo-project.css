@@ -84,6 +84,32 @@
 .mgdb-hilo-project-page .hilo-dot-dark { background: #475569; }
 
 /* --------------------------------------------------------------------------
+ * Section: Description
+ * -------------------------------------------------------------------------- */
+.mgdb-hilo-project-page .hilo-description-content h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+  margin: 0 0 var(--mgdb-space-3) 0;
+}
+
+.mgdb-hilo-project-page .hilo-description-content p {
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-ink);
+  line-height: var(--mgdb-leading-relaxed);
+  margin: 0 0 var(--mgdb-space-3) 0;
+  max-width: none;
+}
+
+.mgdb-hilo-project-page .hilo-description-content p:last-child {
+  margin-bottom: 0;
+}
+
+.mgdb-hilo-project-page .hilo-description-ref-wrap {
+  margin-top: var(--mgdb-space-4);
+}
+
+/* --------------------------------------------------------------------------
  * Filter & Search Toolbar
  * -------------------------------------------------------------------------- */
 
@@ -286,15 +312,42 @@
   background: #ffffff;
 }
 
-.mgdb-hilo-project-page .hilo-rec-btn {
-  font-size: 11px;
-  color: var(--mgdb-muted);
+.mgdb-hilo-project-page .hilo-jb1-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: var(--mgdb-radius-sm);
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 10px;
+  font-weight: 700;
   text-decoration: none;
+  transition: all 0.12s ease;
+}
+
+.mgdb-hilo-project-page .hilo-jb1-btn:hover {
+  background: #e2e8f0;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-hilo-project-page .hilo-rec-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-muted);
+  font-size: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.12s ease;
 }
 
 .mgdb-hilo-project-page .hilo-rec-btn:hover {
   color: var(--mgdb-green-dark);
-  text-decoration: underline;
+  background: var(--mgdb-line);
 }
 
 .mgdb-hilo-project-page .hilo-taxon-cell {
@@ -423,40 +476,7 @@
   text-align: right;
 }
 
-/* --------------------------------------------------------------------------
- * Section 2: Adaptation & Traits Cards (NO ICONS, LIKE NAM)
- * -------------------------------------------------------------------------- */
 
-.mgdb-hilo-project-page .hilo-adaptation-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--mgdb-space-4);
-  margin-top: var(--mgdb-space-4);
-}
-
-.mgdb-hilo-project-page .hilo-adaptation-card {
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  padding: var(--mgdb-space-4);
-  display: flex;
-  flex-direction: column;
-}
-
-.mgdb-hilo-project-page .hilo-adaptation-card h3 {
-  font-size: 1.05rem;
-  font-weight: 700;
-  margin: 0 0 var(--mgdb-space-2) 0;
-  color: var(--mgdb-ink);
-}
-
-.mgdb-hilo-project-page .hilo-adaptation-card p {
-  font-size: var(--mgdb-text-xs);
-  color: var(--mgdb-ink-soft);
-  line-height: 1.5;
-  margin: 0;
-  flex: 1;
-}
 
 /* --------------------------------------------------------------------------
  * Publications
@@ -581,52 +601,44 @@
 }
 
 /* --------------------------------------------------------------------------
- * Section 7: FAQ Accordions
+ * Section: FAQs Grid (matching NAM project style)
  * -------------------------------------------------------------------------- */
 
-.mgdb-hilo-project-page .hilo-faq-list {
+.mgdb-hilo-project-page .hilo-faqs-grid {
   display: grid;
-  gap: var(--mgdb-space-3);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
 }
 
-.mgdb-hilo-project-page .hilo-faq-item {
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: #ffffff;
-  overflow: hidden;
-}
-
-.mgdb-hilo-project-page .hilo-faq-item summary {
-  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+.mgdb-hilo-project-page .hilo-faqs-grid .mgdb-card h3 {
+  font-size: 1.05rem;
   font-weight: 700;
-  cursor: pointer;
-  user-select: none;
-  background: #ffffff;
-  transition: background 0.12s ease;
+  margin: 0 0 var(--mgdb-space-2) 0;
+  color: var(--mgdb-burgundy);
 }
 
-.mgdb-hilo-project-page .hilo-faq-item summary:hover {
-  background: #f8faf8;
-}
-
-.mgdb-hilo-project-page .hilo-faq-item summary h3 {
-  display: inline;
-  font-size: var(--mgdb-text-base);
-  color: var(--mgdb-green-dark);
-  margin: 0;
-}
-
-.mgdb-hilo-project-page .hilo-faq-body {
-  padding: 0 var(--mgdb-space-5) var(--mgdb-space-4);
-  border-top: 1px solid var(--mgdb-line-soft);
-  color: var(--mgdb-ink);
+.mgdb-hilo-project-page .hilo-faqs-grid .mgdb-card p {
   font-size: var(--mgdb-text-sm);
-  line-height: var(--mgdb-leading);
+  line-height: var(--mgdb-leading-relaxed);
+  color: var(--mgdb-ink);
+  margin: 0 0 var(--mgdb-space-2) 0;
 }
 
-.mgdb-hilo-project-page .hilo-faq-body a {
-  color: var(--mgdb-green-dark);
+.mgdb-hilo-project-page .hilo-faqs-grid .mgdb-card p:last-child {
+  margin-bottom: 0;
+}
+
+.mgdb-hilo-project-page .hilo-faqs-grid .mgdb-card a {
+  color: var(--mgdb-burgundy);
   font-weight: 600;
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .mgdb-hilo-project-page .hilo-faqs-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* --------------------------------------------------------------------------

@@ -56,12 +56,9 @@
   $body->get('blast_url')->replace($blast_url);
 
 
-/* Publications: rendered by include/references_lib.php so these cards match
-   every other page. Crossref-verified metadata -- the hand-typed versions
-   these replaced carried a DOI that does not resolve and two PubMed IDs
-   pointing at unrelated papers. */
+/* Primary reference for the description section */
   include_once('./include/references_lib.php');
-  $body->get('reference_cards')->replace(mgdb_render_references($doc_root, array(
+  $body->get('primary_reference_card')->replace(mgdb_render_references($doc_root, array(
     // The B73 x Palomero Toluqueno population behind the adaptation mapping.
     array('doi' => '10.1093/g3journal/jkab447',
           'fallback' => array(
@@ -73,6 +70,10 @@
               'pubmed'   => '35100386',
               'abstract' => 'Generations of farmer selection in the central Mexican highlands have produced unique maize varieties adapted to the challenges of the local environment. In addition to possessing great agronomic and cultural value, Mexican highland maize represents a good system for the study of local adaptation and acquisition of adaptive phenotypes under cultivation. In this study, we characterize a recombinant inbred line population derived from the B73 reference line and the Mexican highland maize variety Palomero Toluqueño. B73 and Palomero Toluqueño showed classic rank-changing differences in performance between lowland and highland field sites, indicative of local adaptation. Quantitative trait mapping identified genomic regions linked to effects on yield components that were conditionally expressed depending on the environment. For the principal genomic regions associated with ear weight and total kernel number, the Palomero Toluqueño allele conferred an advantage specifically in the highland site, consistent with local adaptation. We identified Palomero Toluqueño alleles associated with expression of characteristic highland traits, including reduced tassel branching, increased sheath pigmentation and the presence of sheath macrohairs. The oligogenic architecture of these three morphological traits supports their role in adaptation, suggesting they have arisen from consistent directional selection acting at distinct points across the genome. We discuss these results in the context of the origin of phenotypic novelty during selection, commenting on the role of de novo mutation and the acquisition of adaptive variation by gene flow from endemic wild relatives.',
           )),
+  )));
+
+/* Other publications */
+  $body->get('reference_cards')->replace(mgdb_render_references($doc_root, array(
     // Where the highland germplasm came from, and how breeding has used it.
     array('doi' => '10.2135/cropsci1994.0011183X003400010002x',
           'fallback' => array(
