@@ -56,15 +56,9 @@
   $body->get('blast_url')->replace($blast_url);
 
 
-/* Publications: rendered by include/references_lib.php so this card matches
-   every other page. The assemblies paper covers 29 lines of European breeding
-   relevance, the AMAIZING seven among them; Charcosset, Nicolas and Praud
-   carry over from the programme. Carson confirmed it is the right citation on
-   2026-09-03. It replaced a card with no DOI whose title, author list and
-   abstract could not be verified anywhere. Metadata from Crossref, abstract
-   and PubMed ID from Europe PMC. */
+/* Primary reference for the description section */
   include_once('./include/references_lib.php');
-  $body->get('reference_cards')->replace(mgdb_render_references($doc_root, array(
+  $body->get('primary_reference_card')->replace(mgdb_render_references($doc_root, array(
     // The assemblies this page hosts, and the structural variation they reveal.
     array('doi' => '10.1038/s41597-026-07055-z',
           'fallback' => array(

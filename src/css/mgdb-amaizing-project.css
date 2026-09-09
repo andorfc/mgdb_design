@@ -83,6 +83,32 @@
 .mgdb-amaizing-project-page .amaizing-dot-dark { background: #475569; }
 
 /* --------------------------------------------------------------------------
+ * Section: Description
+ * -------------------------------------------------------------------------- */
+.mgdb-amaizing-project-page .amaizing-description-content h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--mgdb-green-dark);
+  margin: 0 0 var(--mgdb-space-3) 0;
+}
+
+.mgdb-amaizing-project-page .amaizing-description-content p {
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-ink);
+  line-height: var(--mgdb-leading-relaxed);
+  margin: 0 0 var(--mgdb-space-3) 0;
+  max-width: none;
+}
+
+.mgdb-amaizing-project-page .amaizing-description-content p:last-child {
+  margin-bottom: 0;
+}
+
+.mgdb-amaizing-project-page .amaizing-description-ref-wrap {
+  margin-top: var(--mgdb-space-4);
+}
+
+/* --------------------------------------------------------------------------
  * Filter & Search Toolbar
  * -------------------------------------------------------------------------- */
 
@@ -253,47 +279,23 @@
   gap: 6px;
 }
 
-.mgdb-amaizing-project-page .amaizing-jb2-btn {
+.mgdb-amaizing-project-page .amaizing-rec-btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
   padding: 1px 6px;
-  border: 1px solid #c8e6c9;
+  border: 1px solid var(--mgdb-line);
   border-radius: var(--mgdb-radius-sm);
-  background: #e8f5e9;
-  color: #1b5e20;
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-muted);
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
   transition: all 0.12s ease;
 }
 
-.mgdb-amaizing-project-page .amaizing-jb2-btn:hover {
-  background: #1b5e20;
-  color: #ffffff;
-  border-color: #1b5e20;
-}
-
-.mgdb-amaizing-project-page .jb2-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #2e7d32;
-}
-
-.mgdb-amaizing-project-page .amaizing-jb2-btn:hover .jb2-dot {
-  background: #ffffff;
-}
-
-.mgdb-amaizing-project-page .amaizing-rec-btn {
-  font-size: 11px;
-  color: var(--mgdb-muted);
-  text-decoration: none;
-}
-
 .mgdb-amaizing-project-page .amaizing-rec-btn:hover {
   color: var(--mgdb-green-dark);
-  text-decoration: underline;
+  background: var(--mgdb-line);
 }
 
 .mgdb-amaizing-project-page .amaizing-taxon-cell {
@@ -418,40 +420,7 @@
   text-align: right;
 }
 
-/* --------------------------------------------------------------------------
- * Section 2: Diversity & Heterotic Groups (NO ICONS, LIKE NAM)
- * -------------------------------------------------------------------------- */
 
-.mgdb-amaizing-project-page .amaizing-diversity-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--mgdb-space-4);
-  margin-top: var(--mgdb-space-4);
-}
-
-.mgdb-amaizing-project-page .amaizing-diversity-card {
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  padding: var(--mgdb-space-4);
-  display: flex;
-  flex-direction: column;
-}
-
-.mgdb-amaizing-project-page .amaizing-diversity-card h3 {
-  font-size: 1.05rem;
-  font-weight: 700;
-  margin: 0 0 var(--mgdb-space-2) 0;
-  color: var(--mgdb-ink);
-}
-
-.mgdb-amaizing-project-page .amaizing-diversity-card p {
-  font-size: var(--mgdb-text-xs);
-  color: var(--mgdb-ink-soft);
-  line-height: 1.5;
-  margin: 0;
-  flex: 1;
-}
 
 /* --------------------------------------------------------------------------
  * Publications
@@ -546,52 +515,44 @@
 }
 
 /* --------------------------------------------------------------------------
- * Section 6: FAQ Accordions
+ * Section: FAQs Grid (matching NAM project style)
  * -------------------------------------------------------------------------- */
 
-.mgdb-amaizing-project-page .amaizing-faq-list {
+.mgdb-amaizing-project-page .amaizing-faqs-grid {
   display: grid;
-  gap: var(--mgdb-space-3);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
 }
 
-.mgdb-amaizing-project-page .amaizing-faq-item {
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: #ffffff;
-  overflow: hidden;
-}
-
-.mgdb-amaizing-project-page .amaizing-faq-item summary {
-  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+.mgdb-amaizing-project-page .amaizing-faqs-grid .mgdb-card h3 {
+  font-size: 1.05rem;
   font-weight: 700;
-  cursor: pointer;
-  user-select: none;
-  background: #ffffff;
-  transition: background 0.12s ease;
+  margin: 0 0 var(--mgdb-space-2) 0;
+  color: var(--mgdb-burgundy);
 }
 
-.mgdb-amaizing-project-page .amaizing-faq-item summary:hover {
-  background: #f8faf8;
-}
-
-.mgdb-amaizing-project-page .amaizing-faq-item summary h3 {
-  display: inline;
-  font-size: var(--mgdb-text-base);
-  color: var(--mgdb-green-dark);
-  margin: 0;
-}
-
-.mgdb-amaizing-project-page .amaizing-faq-body {
-  padding: 0 var(--mgdb-space-5) var(--mgdb-space-4);
-  border-top: 1px solid var(--mgdb-line-soft);
-  color: var(--mgdb-ink);
+.mgdb-amaizing-project-page .amaizing-faqs-grid .mgdb-card p {
   font-size: var(--mgdb-text-sm);
-  line-height: var(--mgdb-leading);
+  line-height: var(--mgdb-leading-relaxed);
+  color: var(--mgdb-ink);
+  margin: 0 0 var(--mgdb-space-2) 0;
 }
 
-.mgdb-amaizing-project-page .amaizing-faq-body a {
-  color: var(--mgdb-green-dark);
+.mgdb-amaizing-project-page .amaizing-faqs-grid .mgdb-card p:last-child {
+  margin-bottom: 0;
+}
+
+.mgdb-amaizing-project-page .amaizing-faqs-grid .mgdb-card a {
+  color: var(--mgdb-burgundy);
   font-weight: 600;
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .mgdb-amaizing-project-page .amaizing-faqs-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* --------------------------------------------------------------------------

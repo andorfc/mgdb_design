@@ -29,13 +29,10 @@ $$SYNTAX-LEVEL 2
     <div class="mgdb-hero-body">
       <h1 id="amaizing-title">The AMAIZING European Maize Sequencing Project</h1>
       <p class="mgdb-hero-description">
-        De novo chromosome-scale genome assemblies, multi-tissue transcriptomics under watered and drought regimes, and panEDTA transposable element annotations for seven foundational inbred lines in European breeding.
+        De novo chromosome-scale genome assemblies and annotations for seven inbred lines in European breeding
       </p>
 
       <div class="amaizing-hero-actions-row">
-        <a class="amaizing-hero-link" href="/genomebrowser">
-          <span class="amaizing-link-dot amaizing-dot-green" aria-hidden="true"></span> JBrowse 2
-        </a>
         <a class="amaizing-hero-link" href="https://amaizing.fr/" target="_blank" rel="noopener">
           <span class="amaizing-link-dot amaizing-dot-gold" aria-hidden="true"></span> Project website &#8599;
         </a>
@@ -54,14 +51,31 @@ $$SYNTAX-LEVEL 2
 
   <!-- STICKY SECTION NAVIGATION TABS -->
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#amaizing-assemblies" class="is-current">Assemblies</a>
-    <a href="#amaizing-diversity">Heterotic groups</a>
-    <a href="#amaizing-publications">Publications</a>
+    <a href="#amaizing-description" class="is-current">Description</a>
+    <a href="#amaizing-assemblies">Assemblies</a>
     <a href="#amaizing-data-hosted">Hosted data</a>
     <a href="#amaizing-faqs">FAQs</a>
     <a href="#amaizing-metrics">Metrics</a>
     <a href="#amaizing-related">Related resources</a>
   </nav>
+
+  <!-- SECTION: DESCRIPTION -->
+  <section id="amaizing-description" aria-labelledby="amaizing-description-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="amaizing-description-title">Description</h2></div>
+    </div>
+
+    <div class="amaizing-description-content">
+      <h3>The AMAIZING sequencing project</h3>
+      <p>While whole genome sequence assemblies have been generated for several maize inbred lines, we still lack knowledge of the full diversity of maize, including for a number of key founders used in European breeding. To fill this knowledge gap, we de novo assembled genome sequences of seven inbred lines that are important for breeding programs in Central Europe.</p>
+      <p>The sequenced lines include a European flint line issued from the Lacaune population, that has been the major founder of the European Flint heterotic group \(F2, Lacaune, Southern France\), an early flowering European flint line from Northern Europe \(F4, &Eacute;toile de Normandie, Northern France\), a very early flowering northern flint line from Northern America \(GF111, derived in Italy from the Canadian landrace Gasp&eacute; Flint\), a dent line from the Iodent subgroup \(MBS847, derived from hybrid Pioneer3901, Iodent family\), an early flowering dent line derived from early North-American lines \(F252, CO125 family\), a line issued from the South-Spanish population Mollar Almeria that traces to first introductions of maize into Europe \(EA1197, Mollar Almeria, Tropical/Spanish family\), and a highland tropical line \(F331, derived in France from CIMMYT population 86 C2\). Gene models were annotated in each genome using mRNA-seq data in triplicate from 15 tissues including seven from plants grown in two water regimes \(well-watered and water-deficit conditions\). Transposable element sequences were annotated using a panEDTA approach.</p>
+      <p>More information about the project can be found at the <a href="https://amaizing.fr/" target="_blank" rel="noopener">project website &#8599;</a>.</p>
+    </div>
+
+    <div class="mgdb-ref-list amaizing-description-ref-wrap">
+      $(primary_reference_card)
+    </div>
+  </section>
 
   <!-- SECTION 1: INTERACTIVE ASSEMBLIES DIRECTORY TABLE -->
   <section id="amaizing-assemblies" aria-labelledby="amaizing-assemblies-title">
@@ -88,7 +102,7 @@ $$SYNTAX-LEVEL 2
 
     <div class="amaizing-table-status-bar">
       <span id="amaizing-row-count">Showing 7 of 7 assemblies</span>
-      <span class="amaizing-table-hint">Click column headers to sort &bull; Launch JBrowse 2 or download files directly</span>
+      <span class="amaizing-table-hint">Click column headers to sort &bull; View assembly records or download files directly</span>
     </div>
 
     <!-- MAIN INTERACTIVE TABLE -->
@@ -97,7 +111,7 @@ $$SYNTAX-LEVEL 2
         <thead>
           <tr>
             <th scope="col" class="is-sortable" data-sort="assembly" aria-sort="ascending">
-              <button type="button">Assembly ID &amp; JBrowse <span class="sort-icon" aria-hidden="true">&uarr;</span></button>
+              <button type="button">Assembly ID <span class="sort-icon" aria-hidden="true">&uarr;</span></button>
             </th>
             <th scope="col" class="is-sortable" data-sort="line">
               <button type="button">Inbred Line &amp; Origin <span class="sort-icon" aria-hidden="true">&updownarrow;</span></button>
@@ -120,10 +134,7 @@ $$SYNTAX-LEVEL 2
                   <strong>Zm-F2-REFERENCE-AMZ-1.0</strong>
                 </a>
                 <div class="amaizing-sub-actions">
-                  <a href="/genomebrowser?assembly=Zm-F2-REFERENCE-AMZ-1.0" class="amaizing-jb2-btn" title="View F2 in JBrowse 2">
-                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
-                  </a>
-                  <a href="/genome/assembly/Zm-F2-REFERENCE-AMZ-1.0" class="amaizing-rec-btn">Assembly Page &rarr;</a>
+                  <a href="/genome/assembly/Zm-F2-REFERENCE-AMZ-1.0" class="amaizing-rec-btn">Assembly Page</a>
                 </div>
               </div>
             </td>
@@ -148,7 +159,7 @@ $$SYNTAX-LEVEL 2
             </td>
             <td class="text-right">
               <a href="https://download.maizegdb.org/Zm-F2-REFERENCE-AMZ-1.0/" class="amaizing-dl-btn">
-                Download
+                Download &#8595;
               </a>
             </td>
           </tr>
@@ -161,10 +172,7 @@ $$SYNTAX-LEVEL 2
                   <strong>Zm-F4-REFERENCE-AMZ-1.0</strong>
                 </a>
                 <div class="amaizing-sub-actions">
-                  <a href="/genomebrowser?assembly=Zm-F4-REFERENCE-AMZ-1.0" class="amaizing-jb2-btn" title="View F4 in JBrowse 2">
-                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
-                  </a>
-                  <a href="/genome/assembly/Zm-F4-REFERENCE-AMZ-1.0" class="amaizing-rec-btn">Assembly Page &rarr;</a>
+                  <a href="/genome/assembly/Zm-F4-REFERENCE-AMZ-1.0" class="amaizing-rec-btn">Assembly Page</a>
                 </div>
               </div>
             </td>
@@ -189,7 +197,7 @@ $$SYNTAX-LEVEL 2
             </td>
             <td class="text-right">
               <a href="https://download.maizegdb.org/Zm-F4-REFERENCE-AMZ-1.0/" class="amaizing-dl-btn">
-                Download
+                Download &#8595;
               </a>
             </td>
           </tr>
@@ -202,10 +210,7 @@ $$SYNTAX-LEVEL 2
                   <strong>Zm-Gaspe1_1_1-REFERENCE-AMZ-1.0</strong>
                 </a>
                 <div class="amaizing-sub-actions">
-                  <a href="/genomebrowser?assembly=Zm-Gaspe1_1_1-REFERENCE-AMZ-1.0" class="amaizing-jb2-btn" title="View Gaspe1_1_1 in JBrowse 2">
-                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
-                  </a>
-                  <a href="/genome/assembly/Zm-Gaspe1_1_1-REFERENCE-AMZ-1.0" class="amaizing-rec-btn">Assembly Page &rarr;</a>
+                  <a href="/genome/assembly/Zm-Gaspe1_1_1-REFERENCE-AMZ-1.0" class="amaizing-rec-btn">Assembly Page</a>
                 </div>
               </div>
             </td>
@@ -230,7 +235,7 @@ $$SYNTAX-LEVEL 2
             </td>
             <td class="text-right">
               <a href="https://download.maizegdb.org/Zm-Gaspe1_1_1-REFERENCE-AMZ-1.0/" class="amaizing-dl-btn">
-                Download
+                Download &#8595;
               </a>
             </td>
           </tr>
@@ -243,10 +248,7 @@ $$SYNTAX-LEVEL 2
                   <strong>Zm-MBS847-REFERENCE-AMZ-1.0</strong>
                 </a>
                 <div class="amaizing-sub-actions">
-                  <a href="/genomebrowser?assembly=Zm-MBS847-REFERENCE-AMZ-1.0" class="amaizing-jb2-btn" title="View MBS847 in JBrowse 2">
-                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
-                  </a>
-                  <a href="/genome/assembly/Zm-MBS847-REFERENCE-AMZ-1.0" class="amaizing-rec-btn">Assembly Page &rarr;</a>
+                  <a href="/genome/assembly/Zm-MBS847-REFERENCE-AMZ-1.0" class="amaizing-rec-btn">Assembly Page</a>
                 </div>
               </div>
             </td>
@@ -271,7 +273,7 @@ $$SYNTAX-LEVEL 2
             </td>
             <td class="text-right">
               <a href="https://download.maizegdb.org/Zm-MBS847-REFERENCE-AMZ-1.0/" class="amaizing-dl-btn">
-                Download
+                Download &#8595;
               </a>
             </td>
           </tr>
@@ -284,10 +286,7 @@ $$SYNTAX-LEVEL 2
                   <strong>Zm-F252-REFERENCE-AMZ-1.0</strong>
                 </a>
                 <div class="amaizing-sub-actions">
-                  <a href="/genomebrowser?assembly=Zm-F252-REFERENCE-AMZ-1.0" class="amaizing-jb2-btn" title="View F252 in JBrowse 2">
-                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
-                  </a>
-                  <a href="/genome/assembly/Zm-F252-REFERENCE-AMZ-1.0" class="amaizing-rec-btn">Assembly Page &rarr;</a>
+                  <a href="/genome/assembly/Zm-F252-REFERENCE-AMZ-1.0" class="amaizing-rec-btn">Assembly Page</a>
                 </div>
               </div>
             </td>
@@ -312,7 +311,7 @@ $$SYNTAX-LEVEL 2
             </td>
             <td class="text-right">
               <a href="https://download.maizegdb.org/Zm-F252-REFERENCE-AMZ-1.0/" class="amaizing-dl-btn">
-                Download
+                Download &#8595;
               </a>
             </td>
           </tr>
@@ -325,10 +324,7 @@ $$SYNTAX-LEVEL 2
                   <strong>Zm-EA1197-REFERENCE-AMZ-1.0</strong>
                 </a>
                 <div class="amaizing-sub-actions">
-                  <a href="/genomebrowser?assembly=Zm-EA1197-REFERENCE-AMZ-1.0" class="amaizing-jb2-btn" title="View EA1197 in JBrowse 2">
-                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
-                  </a>
-                  <a href="/genome/assembly/Zm-EA1197-REFERENCE-AMZ-1.0" class="amaizing-rec-btn">Assembly Page &rarr;</a>
+                  <a href="/genome/assembly/Zm-EA1197-REFERENCE-AMZ-1.0" class="amaizing-rec-btn">Assembly Page</a>
                 </div>
               </div>
             </td>
@@ -353,7 +349,7 @@ $$SYNTAX-LEVEL 2
             </td>
             <td class="text-right">
               <a href="https://download.maizegdb.org/Zm-EA1197-REFERENCE-AMZ-1.0/" class="amaizing-dl-btn">
-                Download
+                Download &#8595;
               </a>
             </td>
           </tr>
@@ -366,10 +362,7 @@ $$SYNTAX-LEVEL 2
                   <strong>Zm-F331-REFERENCE-AMZ-1.0</strong>
                 </a>
                 <div class="amaizing-sub-actions">
-                  <a href="/genomebrowser?assembly=Zm-F331-REFERENCE-AMZ-1.0" class="amaizing-jb2-btn" title="View F331 in JBrowse 2">
-                    <span class="jb2-dot" aria-hidden="true"></span> JBrowse 2
-                  </a>
-                  <a href="/genome/assembly/Zm-F331-REFERENCE-AMZ-1.0" class="amaizing-rec-btn">Assembly Page &rarr;</a>
+                  <a href="/genome/assembly/Zm-F331-REFERENCE-AMZ-1.0" class="amaizing-rec-btn">Assembly Page</a>
                 </div>
               </div>
             </td>
@@ -394,7 +387,7 @@ $$SYNTAX-LEVEL 2
             </td>
             <td class="text-right">
               <a href="https://download.maizegdb.org/Zm-F331-REFERENCE-AMZ-1.0/" class="amaizing-dl-btn">
-                Download
+                Download &#8595;
               </a>
             </td>
           </tr>
@@ -404,47 +397,7 @@ $$SYNTAX-LEVEL 2
 
   </section>
 
-  <!-- SECTION 2: HETEROTIC GROUPS & DIVERSITY -->
-  <section id="amaizing-diversity" aria-labelledby="amaizing-diversity-title">
-    <div class="mgdb-section-heading">
-      <div><h2 id="amaizing-diversity-title">Heterotic groups</h2></div>
-    </div>
 
-<div class="amaizing-diversity-grid">
-      <article class="amaizing-diversity-card">
-        <h3>European Flint &amp; Dent Heterotic Complementarity</h3>
-        <p>
-          European hybrid maize production relies on the complementary heterotic grouping between European Flint \(represented by F2 and F4\) and Dent/Iodent lines \(MBS847, F252\). The AMAIZING reference genomes provide the first comprehensive, chromosome-scale pan-genomic atlas dissecting structural variants and non-shared gene content between these pools.
-        </p>
-      </article>
-
-      <article class="amaizing-diversity-card">
-        <h3>Early Flowering &amp; North American Introgression</h3>
-        <p>
-          Lines such as Gaspe1_1_1 \(GF111\) and F252 incorporate extremely early flowering alleles that enabled maize cultivation to expand northward into temperate Europe and Canada. High-continuity sequence assemblies resolve complex promoter rearrangements and copy number variants at major flowering time loci.
-        </p>
-      </article>
-
-      <article class="amaizing-diversity-card">
-        <h3>Multi-Tissue Transcriptomics &amp; Water-Deficit Response</h3>
-        <p>
-          Each genome assembly is accompanied by triplicate RNA-seq profiling across 15 distinct developmental tissues, including comparative physiological assays under well-watered and controlled water-deficit regimes, mapping gene regulatory networks governing drought resilience.
-        </p>
-      </article>
-    </div>
-
-  </section>
-
-  <!-- SECTION 3: KEY PUBLICATIONS & ABSTRACT PREVIEWS -->
-  <section id="amaizing-publications" aria-labelledby="amaizing-pub-title">
-    <div class="mgdb-section-heading">
-      <div><h2 id="amaizing-pub-title">Publications</h2></div>
-    </div>
-
-    <div class="mgdb-ref-list">
-      $(reference_cards)
-    </div>
-  </section>
 
   <!-- SECTION 4: DATA HOSTED AT MAIZEGDB -->
   <section id="amaizing-data-hosted" aria-labelledby="amaizing-hosted-title">
@@ -453,32 +406,25 @@ $$SYNTAX-LEVEL 2
     </div>
 
 <div class="amaizing-hosted-grid">
-      <!-- 1: JBrowse 2 -->
-      <article class="amaizing-hosted-card">
-        <h3>Genome Browsers \(JBrowse 2\)</h3>
-        <p>Interactive chromosome-scale browsers for all 7 AMAIZING assemblies featuring gene models, panEDTA repeat tracks, and synteny views.</p>
-        <a class="mgdb-button mgdb-button-secondary" href="/genomebrowser">Open Genome Browsers &#8599;</a>
-      </article>
-
       <!-- 2: Gene Center -->
       <article class="amaizing-hosted-card">
         <h3>Gene Center &amp; Models</h3>
         <p>High-confidence structural and functional gene annotations across all 7 lines indexed in the Gene Center with GO terms.</p>
-        <a class="mgdb-button mgdb-button-secondary" href="/gene_center/gene">Explore Gene Center &#8599;</a>
+        <a class="mgdb-button mgdb-button-secondary" href="/gene_center/gene">Explore Gene Center</a>
       </article>
 
       <!-- 3: BLAST -->
       <article class="amaizing-hosted-card">
         <h3>Sequence BLAST Tool</h3>
         <p>Align nucleotide, CDS, transcript, and translated protein queries directly against AMAIZING assemblies and gene models.</p>
-        <a class="mgdb-button mgdb-button-secondary" href="$(blast_url)">Run BLAST Search &#8599;</a>
+        <a class="mgdb-button mgdb-button-secondary" href="$(blast_url)">Run BLAST Search</a>
       </article>
 
       <!-- 4: Bulk Downloads -->
       <article class="amaizing-hosted-card">
         <h3>Bulk Downloads &amp; Globus</h3>
         <p>Download complete assembly FASTA files, GFF3 annotations, canonical CDS/PEP sequences, and panEDTA TE tracks.</p>
-        <a class="mgdb-button mgdb-button-secondary" href="/download#downloads-amaizing">Browse Downloads &#8599;</a>
+        <a class="mgdb-button mgdb-button-secondary" href="/download#downloads-amaizing">Browse Downloads</a>
       </article>
     </div>
 
@@ -490,42 +436,34 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="amaizing-faqs-title">FAQs</h2></div>
     </div>
 
-<div class="amaizing-faq-list">
-      <details class="amaizing-faq-item">
-        <summary><h3>What is the AMAIZING project and which institutions contributed?</h3></summary>
-        <div class="amaizing-faq-body">
-          <p>
-            The AMAIZING project is a major French national public-private collaborative program supported by the French National Research Agency \(ANR\), led by INRAE in partnership with CEA-Genoscope, Arvalis Institut du V&eacute;g&eacute;tal, CIRAD, CNRS, private plant breeding companies, and international databases including MaizeGDB. Learn more at <a href="https://amaizing.fr/" target="_blank" rel="noopener">amaizing.fr</a>.
-          </p>
-        </div>
-      </details>
+<div class="mgdb-card-grid amaizing-faqs-grid">
+      <article class="mgdb-card">
+        <h3>What is the AMAIZING project and which institutions contributed?</h3>
+        <p>
+          The AMAIZING project is a major French national public-private collaborative program supported by the French National Research Agency \(ANR\), led by INRAE in partnership with CEA-Genoscope, Arvalis Institut du V&eacute;g&eacute;tal, CIRAD, CNRS, private plant breeding companies, and international databases including MaizeGDB. Learn more at <a href="https://amaizing.fr/" target="_blank" rel="noopener">amaizing.fr &#8599;</a>.
+        </p>
+      </article>
 
-      <details class="amaizing-faq-item">
-        <summary><h3>Where can I download the complete FASTA and GFF3 files for AMAIZING lines?</h3></summary>
-        <div class="amaizing-faq-body">
-          <p>
-            Full-genome FASTA sequences, GFF3 gene annotations, CDS/PEP files, and panEDTA transposable element tracks can be downloaded directly from the <a href="/download#downloads-amaizing">MaizeGDB Downloads Portal</a> or via individual assembly download links in the table above.
-          </p>
-        </div>
-      </details>
+      <article class="mgdb-card">
+        <h3>Where can I download the complete FASTA and GFF3 files for AMAIZING lines?</h3>
+        <p>
+          Full-genome FASTA sequences, GFF3 gene annotations, CDS/PEP files, and panEDTA transposable element tracks can be downloaded directly from the <a href="/download#downloads-amaizing">MaizeGDB Downloads Portal</a> or via individual assembly download links in the table above.
+        </p>
+      </article>
 
-      <details class="amaizing-faq-item">
-        <summary><h3>How do AMAIZING gene models compare with B73 RefGen_v5?</h3></summary>
-        <div class="amaizing-faq-body">
-          <p>
-            The AMAIZING genomes capture significant pan-genomic structural variation, including thousands of non-syntenic genes, presence-absence variants, and TE insertions that are absent from B73. Comparative tracks and synteny views are viewable directly in <a href="/genomebrowser">JBrowse 2</a>.
-          </p>
-        </div>
-      </details>
+      <article class="mgdb-card">
+        <h3>How do AMAIZING gene models compare with B73 RefGen_v5?</h3>
+        <p>
+          The AMAIZING genomes capture significant pan-genomic structural variation, including thousands of non-syntenic genes, presence-absence variants, and TE insertions that are absent from B73.
+        </p>
+      </article>
 
-      <details class="amaizing-faq-item">
-        <summary><h3>Can I search these genomes using BLAST at MaizeGDB?</h3></summary>
-        <div class="amaizing-faq-body">
-          <p>
-            Yes! MaizeGDB maintains dedicated BLAST databases for all seven AMAIZING lines. Go to the <a href="$(blast_url)">BLAST Tool</a> and choose the desired AMAIZING assembly or predicted peptide database.
-          </p>
-        </div>
-      </details>
+      <article class="mgdb-card">
+        <h3>Can I search these genomes using BLAST at MaizeGDB?</h3>
+        <p>
+          Yes! MaizeGDB maintains dedicated BLAST databases for all seven AMAIZING lines. Go to the <a href="$(blast_url)">BLAST Tool</a> and choose the desired AMAIZING assembly or predicted peptide database.
+        </p>
+      </article>
     </div>
 
   </section>
