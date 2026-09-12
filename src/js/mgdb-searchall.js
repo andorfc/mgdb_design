@@ -138,7 +138,10 @@
       meta(body, [
         row.plant_wide ? 'Plant-wide name ' + row.plant_wide : row.plant_wide_gene_name
           ? 'Plant-wide name ' + row.plant_wide_gene_name : '',
-        row.chromosome ? 'Chromosome ' + row.chromosome : '',
+        /* Arm included, because the Loci section can list the same record and
+           prints it — "Chromosome 1" here beside "Chromosome 1L" there reads
+           as two different records. */
+        row.chromosome ? 'Chromosome ' + row.chromosome + (row.arm ? row.arm : '') : '',
         row.model_count ? plural(row.model_count, 'gene model', 'gene models') : '',
         row.assembly || ''
       ]);
@@ -163,7 +166,11 @@
       if (row.full_name) { body.appendChild(el('p', 'sa-row-sub', row.full_name)); }
       meta(body, [
         row.plant_wide ? 'Plant-wide name ' + row.plant_wide : '',
-        row.chromosome ? 'Chromosome ' + row.chromosome + (row.arm ? row.arm : '') : ''
+        row.chromosome ? 'Chromosome ' + row.chromosome + (row.arm ? row.arm : '') : '',
+        /* A locus that carries models is listed under Genes as well, and its
+           title link opens the gene page. Saying how many it carries is what
+           keeps the same name in two sections from reading as a duplicate. */
+        row.model_count ? plural(row.model_count, 'gene model', 'gene models') : ''
       ]);
     },
 

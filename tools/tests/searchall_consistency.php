@@ -17,6 +17,14 @@
  *              (only for sets small enough to walk: REACH_MAX)
  *   ORDER      no row is missing its display name
  *
+ * And once per term, across types:
+ *
+ *   BOTH       every locus resolved as a gene is also resolved as a locus.
+ *              Genes and Loci are one match set read two ways, not a
+ *              partition: "kn1" is a gene and it is still the locus record,
+ *              and the Loci hub lists it. Loci used to exclude it, which is
+ *              the regression this guards.
+ *
  * Running it — from the web root on the development server:
  *   php tools/tests/searchall_consistency.php            # the built-in term list
  *   php tools/tests/searchall_consistency.php b73 kn1    # specific terms
@@ -125,6 +133,22 @@ foreach ($terms as $term) {
     $counts['genome'] = (int) $genomes['total'];
     $elapsed = (microtime(true) - $t0) * 1000;
     if ($elapsed > 800) { $slow[$term] = round($elapsed); }
+
+    /* BOTH: the gene half of the locus set is contained in the locus half.
+       One read of the resolved table, so it costs nothing to check on every
+       term. */
+    if (saTypeReady('gene') && saTypeReady('locus')) {
+        $checked++;
+        $row = $DBConn->query("SELECT count(*) AS n FROM sa_type g
+                                WHERE g.type_key='gene'
+                                  AND NOT EXISTS (SELECT 1 FROM sa_type l
+                                                   WHERE l.type_key='locus' AND l.id=g.id)")
+                      ->fetch(PDO::FETCH_ASSOC);
+        if ($row && (int) $row['n'] > 0) {
+            fail($term, 'gene+locus', 'BOTH',
+                 $row['n'] . ' gene-bearing loci are missing from Loci');
+        }
+    }
 
     foreach ($counts as $key => $railCount) {
         if ($railCount <= 0) { continue; }

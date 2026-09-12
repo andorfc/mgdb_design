@@ -128,11 +128,19 @@ function saTruncate($value, $limit) {
 
 function saTypeRegistry() {
     return array(
-        /* Genes and Loci are one match set split in two: a locus that carries
-           gene models is a gene, a locus that carries none is a locus. They
-           therefore share their text sources, and saBuildTypeTable resolves
-           both in a single pass so a record cannot land in both or in
-           neither. Genes additionally answers model identifiers, which are in
+        /* Genes and Loci read one match set two ways; they are not a
+           partition of it. Every matched locus is a locus, and the ones that
+           carry gene models are also genes, so they appear in both sections.
+           "kn1" is the case that settled it: it is the gene everyone means by
+           that name and it is still the locus record it has always been, which
+           is how /data_center/locus lists it, and a reader who chose Loci and
+           typed a gene symbol is asking for that record rather than being told
+           it is filed elsewhere. Both sections reach the same page — the locus
+           route redirects to the gene page for a locus that has models.
+
+           The two share their text sources, and saBuildTypeTable resolves them
+           in a single pass, so they cannot disagree about which loci carry
+           models. Genes additionally answers model identifiers, which are in
            chado.gene_model and in no text source at all. */
         'gene' => array(
             'label' => 'Genes',
@@ -151,7 +159,7 @@ function saTypeRegistry() {
             'type_name' => 'Locus',
             'table' => 'mgdb.locus',
             'url' => '/data_center/locus/',
-            'blurb' => 'Mapped loci, including those with no gene model.',
+            'blurb' => 'Mapped loci, whether or not a gene model is annotated for them.',
         ),
         'reference' => array(
             'label' => 'References',
@@ -542,9 +550,11 @@ function saMatchOverflow() {
  * The count used to be a `GROUP BY term.name` over `id_num.type_term`, which
  * is a different definition and disagreed with the sections twice over:
  *
- *   - it counted loci that carry gene models, which the Loci section filters
- *     out because they are shown as Genes ("kn1": 2 counted, 1 listed;
- *     "protein": 11,784 counted, 280 listed);
+ *   - it counted loci that carry gene models, which the Loci section filtered
+ *     out at the time because they are shown as Genes ("kn1": 2 counted, 1
+ *     listed; "protein": 11,784 counted, 280 listed). Loci no longer excludes
+ *     them — see the registry — but the counting path is what made the two
+ *     numbers able to differ at all, and it is what this replaced;
  *   - it dropped the 221 references whose `id_num.type_term` is 0, which the
  *     section listed anyway ("maize": 17,392 counted, 17,613 listed).
  *
@@ -589,10 +599,17 @@ function saBuildTypeTable($DBConn, $term, $includeComments, $keys = null) {
         }
     }
 
-    /* Genes and Loci are one set split by a single test, so they are resolved
+    /* Genes and Loci read the same matched loci, so they are resolved
        together: `EXISTS (gene models)` is evaluated once per matched locus
        rather than once for each of the two arms. On "protein", which matches
-       11,784 loci, that is the difference between one pass and two. */
+       11,784 loci, that is the difference between one pass and two.
+
+       A locus that carries models resolves to two rows, one per type, because
+       it belongs in both sections. `unnest` over a two-element array is what
+       keeps that to one evaluation of the test; two UNION ALL arms would
+       evaluate it twice. When only one of the two types is wanted the second
+       row is not needed, and Loci alone needs no test at all — which makes a
+       deep link to that section cheaper than a deep link to Genes. */
     $wantsGene = in_array('gene', $wanted, true);
     $wantsLocus = in_array('locus', $wanted, true);
     if ($wantsGene || $wantsLocus) {
@@ -604,17 +621,26 @@ function saBuildTypeTable($DBConn, $term, $includeComments, $keys = null) {
         else {
             $locusIds = saLocusMatchIdsSql($term, $includeComments, $params, 'lo');
         }
-        $branch = "CASE WHEN EXISTS (SELECT 1 FROM chado.gene_model gm
-                                      WHERE gm.locus_id=l.id AND gm.is_obsolete IS NOT TRUE)
-                        THEN 'gene' ELSE 'locus' END";
-        $keep = ($wantsGene && $wantsLocus) ? ''
-              : ($wantsGene ? " WHERE EXISTS (SELECT 1 FROM chado.gene_model gm2
-                                               WHERE gm2.locus_id=l.id AND gm2.is_obsolete IS NOT TRUE)"
-                            : " WHERE NOT EXISTS (SELECT 1 FROM chado.gene_model gm2
-                                                   WHERE gm2.locus_id=l.id AND gm2.is_obsolete IS NOT TRUE)");
-        $arms[] = "SELECT ($branch)::text AS type_key, m.id
+        $hasModels = "EXISTS (SELECT 1 FROM chado.gene_model gm
+                               WHERE gm.locus_id=l.id AND gm.is_obsolete IS NOT TRUE)";
+        $join = '';
+        $where = '';
+        if ($wantsGene && $wantsLocus) {
+            $select = "t.type_key::text AS type_key, m.id";
+            $join = " CROSS JOIN LATERAL unnest(CASE WHEN $hasModels
+                                                     THEN ARRAY['gene', 'locus']
+                                                     ELSE ARRAY['locus'] END) AS t(type_key)";
+        }
+        elseif ($wantsGene) {
+            $select = "'gene'::text AS type_key, m.id";
+            $where = " WHERE $hasModels";
+        }
+        else {
+            $select = "'locus'::text AS type_key, m.id";
+        }
+        $arms[] = "SELECT $select
                    FROM (SELECT DISTINCT id FROM ($locusIds) ids) m
-                     INNER JOIN mgdb.locus l ON l.id=m.id" . $keep;
+                     INNER JOIN mgdb.locus l ON l.id=m.id" . $join . $where;
         if ($wantsGene) { $built[] = 'gene'; }
         if ($wantsLocus) { $built[] = 'locus'; }
     }
@@ -826,7 +852,7 @@ function saLocusMatchIdsSql($term, $includeComments, &$params, $tag) {
  *   record   the INNER JOIN that confirms the type and supplies the ordering
  *            columns. An id lives in exactly one record table, so this is what
  *            actually decides whether a match is of this type.
- *   filter   an extra predicate the type carries. Only Loci has one.
+ *   filter   an extra predicate the type carries. Only Genes has one.
  *   display  the LEFT JOINs that add columns for the card and nothing else.
  *
  * They are kept apart because the counts, the id page and the display query
@@ -868,35 +894,52 @@ function saTypeQuery($key, $type, $term) {
             );
 
         /*
-         * A locus that carries gene models is presented as a gene, so it is
-         * filtered out of this section rather than listed twice — its record
-         * page redirects to the gene page anyway. This predicate is the one
-         * place any type narrows its own set, and it is applied when the match
-         * is resolved to a type, so the count and the page cannot diverge.
+         * Every matched locus, including the ones that also appear under Genes
+         * — the section narrows nothing, which is why it carries no `filter`.
+         *
+         * `model_count` is read so the card can say that a locus carries gene
+         * models, which is both the interesting fact about it and the reason
+         * its title link lands on the gene page. It is a scalar subquery
+         * rather than a join because it is only ever evaluated for the
+         * twenty-five rows of one page: a locus can carry hundreds of models
+         * across assemblies, and joining them would multiply the page.
          */
         case 'locus':
             return array(
+                /* mgdb.locus.arm is a term id, not a letter: reading the column
+                   straight printed "Chromosome 132021" for kn1, whose arm is
+                   term 32021, "L". The term names are one or two characters
+                   (L, S, ctr, ?) and locus_record_lib.php reads them the same
+                   way; two ids in use have no term row and print nothing, as
+                   they do on the record page. */
                 'select' => "l.id, l.name, l.full_name, l.plant_wide_gene_name,
-                             lg.name AS chromosome, l.arm, 0 AS model_count",
+                             lg.name AS chromosome, arm.name AS arm,
+                             (SELECT count(DISTINCT gm.gene_name) FROM chado.gene_model gm
+                               WHERE gm.locus_id=l.id
+                                 AND gm.is_obsolete IS NOT TRUE) AS model_count",
                 'record' => "INNER JOIN mgdb.locus l ON l.id=m.id",
-                'filter' => "AND NOT EXISTS (SELECT 1 FROM chado.gene_model gm
-                                              WHERE gm.locus_id=l.id AND gm.is_obsolete IS NOT TRUE)",
-                'display' => "LEFT JOIN mgdb.linkage_group lg ON lg.id=l.linkage_group",
+                'display' => "LEFT JOIN mgdb.linkage_group lg ON lg.id=l.linkage_group
+                              LEFT JOIN mgdb.term arm ON arm.id=l.arm",
                 'order' => saLocusOrder(),
                 'params' => array(':exact' => $lower, ':prefix' => $lower . '%'),
             );
 
-        /* The other half of the same set. Model names and counts are read for
-           the twenty-five rows of the page afterwards, not joined here: a
-           locus can carry hundreds of models across assemblies. */
+        /* The loci of that same set that carry models. Model names and counts
+           are read for the twenty-five rows of the page afterwards, not joined
+           here: a locus can carry hundreds of models across assemblies. */
         case 'gene':
             return array(
+                /* arm through the term, as the Loci shape reads it: the column
+                   holds a term id. saGeneRows serves this view's rows, so this
+                   select is the counts path's shape, not the card's — the two
+                   agreeing is what keeps that from mattering. */
                 'select' => "l.id, l.name, l.full_name, l.plant_wide_gene_name,
-                             lg.name AS chromosome, l.arm",
+                             lg.name AS chromosome, arm.name AS arm",
                 'record' => "INNER JOIN mgdb.locus l ON l.id=m.id",
                 'filter' => "AND EXISTS (SELECT 1 FROM chado.gene_model gm
                                           WHERE gm.locus_id=l.id AND gm.is_obsolete IS NOT TRUE)",
-                'display' => "LEFT JOIN mgdb.linkage_group lg ON lg.id=l.linkage_group",
+                'display' => "LEFT JOIN mgdb.linkage_group lg ON lg.id=l.linkage_group
+                              LEFT JOIN mgdb.term arm ON arm.id=l.arm",
                 'order' => saLocusOrder(),
                 'params' => array(':exact' => $lower, ':prefix' => $lower . '%'),
             );
@@ -1219,7 +1262,8 @@ function saPrefixRanges($column, $prefix, &$params, $tag) {
  *     reported at most 60.
  *   - It also matched by name only, so the 11,504 genes that "protein" finds
  *     through a synonym or a full name appeared in neither section: Genes
- *     never looked for them and Loci excludes anything with a gene model.
+ *     never looked for them, and Loci excluded anything with a gene model at
+ *     the time.
  *   - The identifier half reported the size of its own LIMIT 200 fetch.
  *     "zm00001eb" matches 44,303 model identifiers and reported 250.
  *
@@ -1303,12 +1347,15 @@ function saGeneRows($DBConn, $term, $page, $pageSize) {
               LIMIT " . (int) $symbolWanted . " OFFSET " . (int) $offset . "
             )
             SELECT l.id, l.name, l.full_name, l.plant_wide_gene_name,
-                   lg.name AS chromosome,
+                   lg.name AS chromosome, arm.name AS arm,
                    CASE WHEN lower(l.name)=:exact OR lower(l.full_name)=:exact
                              OR lower(l.plant_wide_gene_name)=:exact THEN 1 ELSE 0 END AS is_exact
             FROM page m
               INNER JOIN mgdb.locus l ON l.id=m.id
               LEFT JOIN mgdb.linkage_group lg ON lg.id=l.linkage_group
+              -- The same record can be listed under Loci, which prints the arm;
+              -- mgdb.locus.arm is a term id, so both read the term.
+              LEFT JOIN mgdb.term arm ON arm.id=l.arm
             ORDER BY " . saLocusOrder());
         $sth->execute($params);
         $loci = $sth->fetchAll(PDO::FETCH_ASSOC);
@@ -1339,6 +1386,7 @@ function saGeneRows($DBConn, $term, $page, $pageSize) {
                 'full_name' => $locus['full_name'],
                 'plant_wide_gene_name' => $locus['plant_wide_gene_name'],
                 'chromosome' => $locus['chromosome'],
+                'arm' => $locus['arm'] !== null ? trim($locus['arm']) : '',
                 'model_count' => $model ? (int) $model['model_count'] : 0,
                 'models' => $model ? saParsePgArray($model['models']) : array(),
                 'url' => '/gene_center/gene/' . rawurlencode($locus['name']),
@@ -1370,6 +1418,7 @@ function saGeneRows($DBConn, $term, $page, $pageSize) {
                 'full_name' => $row['locus_name'] ? 'Locus ' . $row['locus_name'] : '',
                 'plant_wide_gene_name' => '',
                 'chromosome' => '',
+                'arm' => '',
                 'model_count' => 0,
                 'models' => array(),
                 'assembly' => $row['assembly_version'],

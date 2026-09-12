@@ -420,11 +420,13 @@ try {
         foreach ($groupCandidates as $candidate) {
           $id = (string)$candidate['id'];
           if (!isset($details[$id])) continue;
-          /* A locus that carries gene models is a gene: it leads the Genes
-             group and /data_center/locus/<id> redirects to the gene page. The
-             results page splits the two the same way, so a record listed here
-             under Loci has to be a record listed there under Loci. */
-          if ($group === 'locus' && !empty($details[$id]['has_models'])) continue;
+          /* A locus that carries gene models leads the Genes group and is
+             listed here under Loci as well: it is the gene everyone means by
+             that name and it is still the locus record, and someone who picked
+             the Loci category and typed a gene symbol is asking for it. The
+             results page lists it in both sections the same way. Both routes
+             reach one page — /data_center/locus/<id> redirects to the gene
+             page for a locus that has models. */
           $item = acRecordItem($group, $candidate, $details[$id], $groupMeta[$group]);
           if ($item) $items[] = $item;
         }
@@ -443,10 +445,10 @@ try {
   /*
    * Loci matched by name, full name, plant-wide name, or synonym. Shared by
    * the Genes group (a named locus is what a reader means by "the gene") and
-   * the Loci group (for loci that have no gene model to sit under).
+   * the Loci group, which lists every match — a locus with gene models appears
+   * in both, exactly as the results page lists it in both sections.
    */
   $locusMatches = array();
-  $symbolLocusIds = array();
   $searchesLoci = in_array($type, array('anything', 'gene_product', 'gene_model', 'locus'));
   if ($searchesLoci) $locusMatches = acLocusNameLookup($DBConn, $query);
 
@@ -528,21 +530,20 @@ try {
      * Gene symbols first. Someone typing "waxy" or "waxy1" wants wx1, not the
      * model identifiers filed under it, so each matched locus that actually has
      * gene models leads the group with its symbol and links to the gene record.
-     * Loci with no models are left for the Loci group below.
+     * The Loci group below lists every match, this one included.
      */
     $symbolItems = array();
     $seenSymbols = array();
     foreach ($locusMatches as $locus) {
-      /* mgdb.locus itself says whether the locus carries models. Reading it
-         off the gene-model query instead meant a locus whose models did not
-         make that query's LIMIT 12 was treated as having none, and it then
-         appeared under Loci — where the results page, which asks the same
-         question of every match, does not put it. */
+      /* mgdb.locus itself says whether the locus carries models, rather than
+         the gene-model query above: a locus whose models did not make that
+         query's LIMIT 12 was treated as having none and kept out of this
+         group, which is the one place the distinction still decides
+         something. */
       if (empty($locus['has_models']) && !isset($locusHasModels[(string)$locus['id']])) continue;
       $symbol = trim((string)$locus['name']);
       if ($symbol === '' || isset($seenSymbols[strtolower($symbol)])) continue;
       $seenSymbols[strtolower($symbol)] = true;
-      $symbolLocusIds[(string)$locus['id']] = true;
       $names = acJoinText(array($locus['full_name'], $locus['plant_wide_gene_name']));
       $symbolItems[] = array(
         'label' => acCleanText($symbol, 150),
@@ -595,23 +596,22 @@ try {
   }
 
   /*
-   * Named loci with no gene model behind them — "wx" (waxy endosperm) is one.
-   * Merged ahead of the all_text_search hits, which cannot find a locus by any
-   * of its own names.
+   * Every locus matched by one of its own names, whether or not it carries
+   * gene models — "wx" (waxy endosperm) has none, "kn1" has three and belongs
+   * here as well as under Genes. Merged ahead of the all_text_search hits,
+   * which cannot find a locus by any of its own names.
+   *
+   * The names are already in hand from acLocusNameLookup, which the Genes
+   * group ran, so listing a locus in both groups costs no further query.
    */
   if ($searchesLoci && $type !== 'gene_model') {
     $existing = isset($groupsByKey['locus']) ? $groupsByKey['locus'] : null;
 
-    /* A locus already leading the Genes group is the same record reached by a
-       different route — /data_center/locus/<id> redirects to the gene page —
-       so it is dropped here rather than listed twice under two labels. */
-    $shown = array();
-    foreach ($symbolLocusIds as $id => $unused) $shown['/data_center/locus/' . rawurlencode($id)] = true;
-
     $named = array();
-    $seenUrls = $shown;
+    /* Within the group, one item per record: the same locus can arrive both
+       from its own names and from the text index. */
+    $seenUrls = array();
     foreach ($locusMatches as $locus) {
-      if (!empty($locus['has_models'])) continue;     // filed under Genes
       $item = acRecordItem('locus', $locus, $locus, $groupMeta['locus']);
       if (!$item || isset($seenUrls[$item['url']])) continue;
       $seenUrls[$item['url']] = true;

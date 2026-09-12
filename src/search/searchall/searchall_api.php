@@ -70,7 +70,13 @@ function saRespond($payload, $status = 200) {
 
 /* The rail: every type that has records, in reading order, with the count its
    section will show. Both actions can need it — a link straight to one type
-   still has to draw the list of the others. */
+   still has to draw the list of the others.
+
+   The grand total is the sum of these counts, so a locus that carries gene
+   models — a record that belongs under both Genes and Loci — is counted once
+   in each. The total is what the sections between them hold, which is the only
+   thing it claims to be; making it a count of distinct records instead would
+   stop it agreeing with the numbers printed beside it. */
 function saRail($DBConn, $term, $includeComments, $registry, $genes = null, $genomes = null) {
     $counts = saCountsByType($DBConn, $term, $includeComments);
     if ($genes === null)   { $genes = saGeneRows($DBConn, $term, 1, 1); }
