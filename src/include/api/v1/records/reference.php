@@ -212,7 +212,15 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
 
   $counts_row = retrieve_row(make_query($DBConn, "
     SELECT
-      (SELECT COUNT(*) FROM mgdb.reference_authors WHERE id = :c1) AS authors,
+      /* Authors the section can list: it joins the person and requires the
+         person to be curated, so an author row naming a person who is absent
+         or withheld is not an author this page can print. Reference 1233776
+         counted 148 and listed 147. 163 such rows across 156 references, 116
+         of them naming a person id with no mgdb.person row at all -- AD-072. */
+      (SELECT COUNT(*) FROM mgdb.reference_authors ra
+         JOIN mgdb.person p ON p.id = ra.author
+         JOIN mgdb.id_num i ON i.id = p.id AND i.curation_lvl = 0
+       WHERE ra.id = :c1) AS authors,
       (SELECT COUNT(*) FROM mgdb.id_reference ir
          INNER JOIN mgdb.id_num i ON i.id = ir.id AND i.curation_lvl = 0
        WHERE ir.reference = :c2) AS describes,

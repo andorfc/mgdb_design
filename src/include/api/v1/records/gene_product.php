@@ -154,7 +154,14 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
       (SELECT COUNT(*) FROM mgdb.gene_prod_ec_num e WHERE e.id = :c2) AS ec_numbers,
       (SELECT COUNT(*) FROM mgdb.gene_prod_localization l WHERE l.id = :c3) AS localizations,
       (SELECT COUNT(*) FROM mgdb.gene_prod_expression_induce x WHERE x.id = :c4) AS induced_expression,
-      (SELECT COUNT(*) FROM mgdb.gene_prod_metabolic_constit x WHERE x.id = :c5) AS metabolic_constituents,
+      /* Only constituents whose term exists, which is what the section can
+         list: gene product 13795 has three rows and one names term 24612,
+         which has no row in mgdb.term. One such row in the table -- the data
+         defect is AD-072; counting it here only made the page say so in
+         developer language. */
+      (SELECT COUNT(*) FROM mgdb.gene_prod_metabolic_constit x
+         JOIN mgdb.term t ON t.id = x.metabolic_constituent::bigint
+       WHERE x.id = :c5) AS metabolic_constituents,
       (SELECT COUNT(*) FROM mgdb.gene_prod_metabolic_pathway x
          INNER JOIN mgdb.id_num i ON i.id = x.metabolic_pathway::bigint AND i.curation_lvl = 0
        WHERE x.id = :c6) AS metabolic_pathways,

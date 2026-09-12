@@ -1056,7 +1056,18 @@
       notices.push('Only the first ' + number(meta.max_items || 500) + ' ' + key.replace(/_/g, ' ') +
                    ' are shown; the record has ' + number((counts || {})[key] || 0) + '.');
     });
-    (meta.warnings || []).forEach(function (warning) { notices.push(warning.detail); });
+    /* Not every warning is for the reader. `count_mismatch` compares
+       meta.counts against the section bodies, which is how a resource notices
+       its own broken query — /gene_center/gene/wx1 printed "variation.alleles
+       returned 307 rows but meta.counts.alleles is 310." above the fold, in API
+       vocabulary, naming fields the reader cannot see. It stays in the JSON,
+       where it is addressed to us; tools/tests/api_warning_sweep.php is what
+       watches for it. Everything else — a service that did not answer, a fact
+       that is genuinely unavailable — is about the record and is shown. */
+    (meta.warnings || []).forEach(function (warning) {
+      if (warning.code === 'count_mismatch') { return; }
+      notices.push(warning.detail);
+    });
     if (!notices.length) { return; }
     el.innerHTML = '<div><strong>Note</strong><span>' + notices.map(escape).join(' ') + '</span></div>';
     show(el, true);

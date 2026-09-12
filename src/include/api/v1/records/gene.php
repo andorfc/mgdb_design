@@ -134,8 +134,21 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
       (SELECT count(*) FROM mgdb.ext_db_key WHERE id = :c_l4
          AND (obsolete IS NULL OR upper(obsolete) <> 'Y')) AS xrefs,
       (SELECT count(*) FROM mgdb.locus_gene_products WHERE id = :c_l5) AS gene_products,
-      (SELECT count(*) FROM mgdb.variation WHERE variationof = :c_l6) AS alleles,
-      (SELECT count(*) FROM mgdb.locus_coordinates WHERE id = :c_l7) AS map_positions,
+      /* Curated alleles only, which is what the section lists. Counting the
+         table raw claimed 310 alleles for wx1 where the section lists 307:
+         three are id_num.curation_lvl 10 and 99, withheld records whose own
+         pages 404. 502 such variations hang off 301 loci, 66 of them genes, so
+         every one of those pages printed a count_mismatch notice. */
+      (SELECT count(*) FROM mgdb.variation v
+         JOIN mgdb.id_num i ON i.id = v.id AND i.curation_lvl = 0
+       WHERE v.variationof = :c_l6) AS alleles,
+      /* Same for the maps: the section requires the map to exist and to be
+         curated, so a coordinate on a map that is neither is not a position
+         this page can show. r1 counted 43 and listed 42. */
+      (SELECT count(*) FROM mgdb.locus_coordinates a
+         JOIN mgdb.id_num b ON b.id = a.map::bigint AND b.curation_lvl = 0
+         JOIN mgdb.map c ON c.id = a.map::bigint
+       WHERE a.id = :c_l7) AS map_positions,
       (SELECT count(*) FROM mgdb.memo WHERE id = :c_l8) AS comments,
       (SELECT pan_gene_count FROM chado.pan_gene
          WHERE gene_model_name = :c_gm6 LIMIT 1) AS pan_gene_members,

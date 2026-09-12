@@ -117,7 +117,16 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
       (SELECT COUNT(*) FROM mgdb.locus_detected_by ldb
          INNER JOIN mgdb.id_num i ON i.id = ldb.id AND i.curation_lvl = 0
        WHERE ldb.probe_id = :c1) AS loci,
+      /* The positions the section can list: it joins the locus and the map and
+         requires the map to be curated. Counting the coordinates raw inflated
+         13 markers -- p-R5-4 frag2 said 43 and listed 42 -- because a few
+         coordinates name a map that is withheld or absent (AD-072). Unlike
+         every other count here this one had no section to contradict it in the
+         consistency check below, so it was silent; it is checked now. */
       (SELECT COUNT(*) FROM mgdb.locus_coordinates lc
+         INNER JOIN mgdb.locus l ON l.id = lc.id
+         INNER JOIN mgdb.map m ON m.id = lc.map::bigint
+         INNER JOIN mgdb.id_num mi ON mi.id = m.id AND mi.curation_lvl = 0
        WHERE lc.id IN (SELECT ldb.id FROM mgdb.locus_detected_by ldb WHERE ldb.probe_id = :c2)) AS positions,
       (SELECT COUNT(*) FROM mgdb.probe_copies x WHERE x.id = :c3) AS copies,
       (SELECT COUNT(*) FROM mgdb.gel_pattern g
@@ -547,6 +556,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
 
   $expected = array(
     'loci' => null,
+    'positions' => null,
     'offsite' => null,
     'references' => null,
     'related' => array('copies' => 'copies', 'gel_patterns' => 'gel_patterns',
