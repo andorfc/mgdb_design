@@ -125,6 +125,29 @@
                    . ' (' . count($items) . ')</option>';
   }
 
+  /* Anchor ids, made unique IN DOCUMENT ORDER.
+   *
+   * data/news.xml is curator-maintained and its <id> values are not unique:
+   * 11 ids are reused across genuinely different items (233 appears three
+   * times -- the 6th European Maize Meeting, a MaizeMine 1.6 release and an
+   * NPGS job posting, on three different dates). The curator simply did not
+   * increment the number. Duplicated ids made #news-233 ambiguous for
+   * permalinks, for :target (the page styles .news-item:target) and for the
+   * deep-link handler in mgdb-whatsnew.js, which resolves the hash with
+   * querySelector -- i.e. to whichever item happens to come first.
+   *
+   * The FIRST occurrence in document order keeps the bare news-<id>, so every
+   * permalink already out in the world still lands on exactly the item it
+   * landed on before this change. Later occurrences take -2, -3, ... The
+   * while-loop rather than a counter so a synthesized id can never collide
+   * with a real one that appears later in the file.
+   *
+   * This is a workaround, not the cure: the ids should be made unique in
+   * news.xml. That file is curator-maintained and lives only on the server,
+   * so it is not this repo's to edit -- recorded for the curators instead.
+   */
+  $seen_anchor_ids = array();
+
   $sections = '';
   foreach ($by_year as $year => $items) {
     $rows = '';
@@ -145,9 +168,21 @@
                 . ' loading="lazy" />';
       }
 
-      $anchor = $item['id'] !== '' ? ' id="news-' . wnEsc($item['id']) . '"' : '';
-      $permalink = $item['id'] !== ''
-        ? '<a class="news-item-link" href="#news-' . wnEsc($item['id'])
+      $anchor_id = '';
+      if ($item['id'] !== '') {
+        $base = 'news-' . $item['id'];
+        $anchor_id = $base;
+        $n = 1;
+        while (isset($seen_anchor_ids[$anchor_id])) {
+          $n++;
+          $anchor_id = $base . '-' . $n;
+        }
+        $seen_anchor_ids[$anchor_id] = true;
+      }
+
+      $anchor = $anchor_id !== '' ? ' id="' . wnEsc($anchor_id) . '"' : '';
+      $permalink = $anchor_id !== ''
+        ? '<a class="news-item-link" href="#' . wnEsc($anchor_id)
           . '">Link to this item</a>'
         : '';
 

@@ -17,7 +17,10 @@
     pageSize: 25,
     filter: '',
     searched: false,
-    lastData: null
+    lastData: null,
+    view: 'table',
+    sortKey: 'name',
+    sortDir: 'asc'
   };
 
   function readJson(id) {
@@ -46,18 +49,74 @@
     var form = byId('qtl-search-form');
     if (!form) return;
 
+    var termInput = byId('qtl-search-term');
+    var clearBtn = byId('qtl-query-clear');
+
+    if (termInput && clearBtn) {
+      termInput.addEventListener('input', function () {
+        clearBtn.hidden = !termInput.value.trim();
+      });
+
+      clearBtn.addEventListener('click', function () {
+        termInput.value = '';
+        clearBtn.hidden = true;
+        termInput.focus();
+        var trait = (byId('qtl-filter-trait') && byId('qtl-filter-trait').value) || '';
+        var parent = (byId('qtl-filter-parent') && byId('qtl-filter-parent').value) || '';
+        if (!trait && !parent) {
+          var section = byId('qtl-results-section');
+          if (section) section.hidden = true;
+          state.searched = false;
+          state.lastData = null;
+        } else {
+          state.page = 1;
+          runSearch();
+        }
+      });
+    }
+
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       state.page = 1;
       runSearch();
     });
 
-    var resetBtn = byId('qtl-reset-btn');
-    if (resetBtn) {
-      resetBtn.addEventListener('click', function () {
-        setTimeout(function () {
-          runSearch();
-        }, 10);
+    var advSubmit = byId('qtl-adv-submit');
+    if (advSubmit) {
+      advSubmit.addEventListener('click', function (e) {
+        e.preventDefault();
+        state.page = 1;
+        runSearch();
+      });
+    }
+
+    var advReset = byId('qtl-adv-reset');
+    if (advReset) {
+      advReset.addEventListener('click', function () {
+        var trait = byId('qtl-filter-trait');
+        var parent = byId('qtl-filter-parent');
+        if (trait) { trait.value = ''; }
+        if (parent) { parent.value = ''; }
+        syncAdvancedBadge();
+        state.page = 1;
+        if (state.searched) { runSearch(); }
+      });
+    }
+
+    var emptyReset = byId('qtl-empty-reset');
+    if (emptyReset) {
+      emptyReset.addEventListener('click', function () {
+        if (termInput) { termInput.value = ''; }
+        if (clearBtn) { clearBtn.hidden = true; }
+        var trait = byId('qtl-filter-trait');
+        var parent = byId('qtl-filter-parent');
+        if (trait) { trait.value = ''; }
+        if (parent) { parent.value = ''; }
+        syncAdvancedBadge();
+        var section = byId('qtl-results-section');
+        if (section) section.hidden = true;
+        state.searched = false;
+        state.lastData = null;
       });
     }
 
@@ -65,18 +124,40 @@
     var selects = form.querySelectorAll('select');
     selects.forEach(function (sel) {
       sel.addEventListener('change', function () {
+        syncAdvancedBadge();
+        state.page = 1;
         runSearch();
       });
     });
+  }
+
+  function syncAdvancedBadge() {
+    var badge = byId('qtl-advanced-count');
+    if (!badge) return;
+    var trait = (byId('qtl-filter-trait') && byId('qtl-filter-trait').value) || '';
+    var parent = (byId('qtl-filter-parent') && byId('qtl-filter-parent').value) || '';
+    var count = 0;
+    if (trait) count++;
+    if (parent) count++;
+    if (count > 0) {
+      badge.textContent = count;
+      badge.hidden = false;
+    } else {
+      badge.hidden = true;
+    }
   }
 
   function initExamples() {
     var exampleBtns = document.querySelectorAll('.qtl-example-btn');
     exampleBtns.forEach(function (btn) {
       btn.addEventListener('click', function () {
+        var term = btn.getAttribute('data-qtl-example') || btn.dataset.term || '';
         var termInput = byId('qtl-search-term');
+        var clearBtn = byId('qtl-query-clear');
         if (termInput) {
-          termInput.value = btn.dataset.term || '';
+          termInput.value = term;
+          if (clearBtn) { clearBtn.hidden = !term; }
+          state.page = 1;
           runSearch();
           termInput.focus();
         }
@@ -86,9 +167,13 @@
     var traitShortcuts = document.querySelectorAll('.qtl-trait-shortcut');
     traitShortcuts.forEach(function (btn) {
       btn.addEventListener('click', function () {
+        var term = btn.dataset.term || '';
         var termInput = byId('qtl-search-term');
+        var clearBtn = byId('qtl-query-clear');
         if (termInput) {
-          termInput.value = btn.dataset.term || '';
+          termInput.value = term;
+          if (clearBtn) { clearBtn.hidden = !term; }
+          state.page = 1;
           runSearch();
           var searchSection = byId('qtl-search-panel');
           if (searchSection) {
@@ -101,9 +186,13 @@
     var parentShortcuts = document.querySelectorAll('.qtl-parent-shortcut');
     parentShortcuts.forEach(function (btn) {
       btn.addEventListener('click', function () {
+        var term = btn.dataset.term || '';
         var termInput = byId('qtl-search-term');
+        var clearBtn = byId('qtl-query-clear');
         if (termInput) {
-          termInput.value = btn.dataset.term || '';
+          termInput.value = term;
+          if (clearBtn) { clearBtn.hidden = !term; }
+          state.page = 1;
           runSearch();
           var searchSection = byId('qtl-search-panel');
           if (searchSection) {
@@ -148,15 +237,15 @@
 
     var statusEl = byId('qtl-results-status');
     var notesEl = byId('qtl-notes');
-    var resultsEl = byId('qtl-results');
+    var tableView = byId('qtl-table-view');
+    var cardsView = byId('qtl-cards-view');
     var emptyEl = byId('qtl-empty');
     var exportLink = byId('qtl-export-tsv');
 
     notesEl.innerHTML = '';
     emptyEl.hidden = true;
-    exportLink.hidden = true;
+    if (exportLink) exportLink.hidden = true;
 
-    resultsEl.innerHTML = '<div class="mgdb-loading"><span class="mgdb-spinner" aria-hidden="true"></span>Searching QTL analyses&hellip;</div>';
     statusEl.textContent = 'Searching…';
 
     lastQuery = params.toString();
@@ -166,66 +255,21 @@
       .then(function (wrap) {
         if (!wrap.ok || !wrap.data.ok) {
           var msg = (wrap.data && (wrap.data.message || wrap.data.detail)) || 'The search could not be completed.';
-          resultsEl.innerHTML = '';
+          if (tableView) tableView.hidden = true;
+          if (cardsView) cardsView.hidden = true;
           notesEl.innerHTML = '<div class="mgdb-message mgdb-message-error" role="alert">' + esc(msg) + '</div>';
           statusEl.textContent = 'Search failed.';
           return;
         }
         renderResults(wrap.data);
       })
-      .catch(function () {
-        resultsEl.innerHTML = '';
+      .catch(function (err) {
+        console.error('QTL search error:', err);
+        if (tableView) tableView.hidden = true;
+        if (cardsView) cardsView.hidden = true;
         notesEl.innerHTML = '<div class="mgdb-message mgdb-message-error" role="alert">The search request failed. Please try again.</div>';
         statusEl.textContent = 'Search failed.';
       });
-  }
-
-  function renderResults(data) {
-    var statusEl = byId('qtl-results-status');
-    var resultsEl = byId('qtl-results');
-    var emptyEl = byId('qtl-empty');
-    var exportLink = byId('qtl-export-tsv');
-
-    var total = data.summary && data.summary.total ? data.summary.total : 0;
-    var returned = data.summary && data.summary.returned ? data.summary.returned : 0;
-    var elapsed = data.summary && data.summary.elapsed_ms != null ? data.summary.elapsed_ms : null;
-
-    if (!total || !data.results || !data.results.length) {
-      resultsEl.innerHTML = '';
-      emptyEl.hidden = false;
-      statusEl.textContent = 'No QTL analyses matched your query.';
-      return;
-    }
-
-    emptyEl.hidden = true;
-
-    var summary = data.summary || {};
-    var size = summary.page_size || returned;
-    var page = summary.page || 1;
-    var start = (page - 1) * size + 1;
-    var end = start + returned - 1;
-    var timing = elapsed != null ? ' (' + number(elapsed) + ' ms)' : '';
-
-    if (state.pageSize === 'all' && total > returned) {
-      /* "All results" is capped by the endpoint, and saying so is better than
-         a count that quietly stops short. */
-      statusEl.textContent = 'Showing the first ' + number(returned) + ' of ' + number(total)
-        + ' QTL analyses, which is as many as the search returns at once.' + timing;
-    } else {
-      statusEl.textContent = 'Showing ' + number(start) + '–' + number(end) + ' of '
-        + number(total) + ' QTL analys' + (total === 1 ? 'is' : 'es') + '.' + timing;
-    }
-
-    resultsEl.innerHTML = buildTableHtml(data.results);
-    exportLink.href = API_URL + '?' + exportQuery(buildParams()) + '&format=tsv';
-    exportLink.hidden = false;
-
-    renderPagination(page, summary.page_count || 0);
-
-    state.lastData = data;
-    /* Re-applied last so paging does not silently drop a filter the box still
-       shows. */
-    applyResultsFilter();
   }
 
   function renderPagination(page, pageCount) {
@@ -261,111 +305,322 @@
     });
   }
 
-  /* Narrows the page already rendered. The search pages server side, so this
-     filters what is on screen and the status line says so. */
-  function applyResultsFilter() {
-    var container = byId('qtl-results');
-    if (!container) { return; }
+  function renderResults(data) {
+    var statusEl = byId('qtl-results-status');
+    var tableView = byId('qtl-table-view');
+    var cardsView = byId('qtl-cards-view');
+    var emptyEl = byId('qtl-empty');
+    var exportLink = byId('qtl-export-tsv');
 
-    var rows = container.querySelectorAll('tbody tr');
-    var terms = state.filter.toLowerCase().split(/\s+/).filter(Boolean);
-    var shown = 0;
+    var total = data.summary && data.summary.total ? data.summary.total : 0;
+    var returned = data.summary && data.summary.returned ? data.summary.returned : 0;
+    var elapsed = data.summary && data.summary.elapsed_ms != null ? data.summary.elapsed_ms : null;
 
-    Array.prototype.forEach.call(rows, function (row) {
-      var match = true;
-      if (terms.length) {
-        var hay = (row.textContent || '').toLowerCase();
-        for (var i = 0; i < terms.length; i++) {
-          if (hay.indexOf(terms[i]) === -1) { match = false; break; }
-        }
-      }
-      row.hidden = !match;
-      if (match) { shown++; }
-    });
+    if (!total || !data.results || !data.results.length) {
+      if (tableView) tableView.hidden = true;
+      if (cardsView) cardsView.hidden = true;
+      if (emptyEl) emptyEl.hidden = false;
+      if (exportLink) exportLink.hidden = true;
+      if (statusEl) statusEl.textContent = 'No QTL analyses matched your query.';
+      return;
+    }
 
-    if (terms.length) {
-      var statusEl = byId('qtl-results-status');
-      var total = state.lastData && state.lastData.summary ? state.lastData.summary.total : 0;
-      if (statusEl) {
-        statusEl.textContent = shown === 0
-          ? 'Nothing on this page matches the filter “' + state.filter + '”. '
-            + number(total) + ' QTL analyses matched the search.'
-          : 'Showing ' + number(shown) + ' of the ' + number(rows.length)
-            + ' analyses on this page matching “' + state.filter + '”, out of '
-            + number(total) + ' matched by the search.';
+    if (emptyEl) emptyEl.hidden = true;
+
+    var summary = data.summary || {};
+    var size = summary.page_size || returned;
+    var page = summary.page || 1;
+    var start = (page - 1) * size + 1;
+    var end = start + returned - 1;
+    var timing = elapsed != null ? ' (' + number(elapsed) + ' ms)' : '';
+
+    if (statusEl) {
+      if (state.pageSize === 'all' && total > returned) {
+        statusEl.textContent = 'Showing the first ' + number(returned) + ' of ' + number(total)
+          + ' QTL analyses, which is as many as the search returns at once.' + timing;
+      } else {
+        statusEl.textContent = 'Showing ' + number(start) + '–' + number(end) + ' of '
+          + number(total) + ' QTL analys' + (total === 1 ? 'is' : 'es') + '.' + timing;
       }
     }
+
+    var sorted = sortQtlResults(data.results || []);
+
+    renderTableView(sorted);
+    renderCardView(sorted);
+
+    updateSortHeaders();
+    updateViewDisplay();
+    initCopyButtons();
+
+    if (exportLink) {
+      exportLink.href = API_URL + '?' + exportQuery(buildParams()) + '&format=tsv';
+      exportLink.hidden = false;
+    }
+
+    renderPagination(page, summary.page_count || 0);
+
+    state.lastData = data;
+    applyResultsFilter();
   }
 
-  function buildTableHtml(results) {
+  function sortQtlResults(results) {
+    if (!results || !results.length) return [];
+    var list = results.slice();
+    var key = state.sortKey;
+    var dir = state.sortDir === 'desc' ? -1 : 1;
+
+    list.sort(function (a, b) {
+      if (key === 'loci') {
+        var aCount = Number(a.qtl_count || 0);
+        var bCount = Number(b.qtl_count || 0);
+        return (aCount - bCount) * dir;
+      }
+      var aVal = '';
+      var bVal = '';
+      if (key === 'name') {
+        aVal = a.name || '';
+        bVal = b.name || '';
+      } else if (key === 'trait') {
+        aVal = a.trait_name || '';
+        bVal = b.trait_name || '';
+      } else if (key === 'parents') {
+        aVal = (Array.isArray(a.parents) ? a.parents : []).join(' ');
+        bVal = (Array.isArray(b.parents) ? b.parents : []).join(' ');
+      } else if (key === 'experiment') {
+        aVal = a.experiment_name || '';
+        bVal = b.experiment_name || '';
+      }
+      return String(aVal).localeCompare(String(bVal), undefined, { numeric: true, sensitivity: 'base' }) * dir;
+    });
+
+    return list;
+  }
+
+  function updateSortHeaders() {
+    var headers = document.querySelectorAll('#qtl-results-table thead th[aria-sort]');
+    Array.prototype.forEach.call(headers, function (th) {
+      var btn = th.querySelector('button[data-sort-key]');
+      if (!btn) return;
+      var key = btn.getAttribute('data-sort-key');
+      if (state.sortKey === key) {
+        th.setAttribute('aria-sort', state.sortDir === 'asc' ? 'ascending' : 'descending');
+      } else {
+        th.setAttribute('aria-sort', 'none');
+      }
+    });
+  }
+
+  function initSortButtons() {
+    var buttons = document.querySelectorAll('#qtl-results-table thead button[data-sort-key]');
+    Array.prototype.forEach.call(buttons, function (btn) {
+      btn.addEventListener('click', function () {
+        var key = btn.getAttribute('data-sort-key');
+        if (state.sortKey === key) {
+          state.sortDir = (state.sortDir === 'asc') ? 'desc' : 'asc';
+        } else {
+          state.sortKey = key;
+          state.sortDir = (key === 'loci') ? 'desc' : 'asc';
+        }
+        updateSortHeaders();
+        if (state.lastData) {
+          renderResults(state.lastData);
+        }
+      });
+    });
+  }
+
+  function updateViewDisplay() {
+    var tableView = byId('qtl-table-view');
+    var cardsView = byId('qtl-cards-view');
+    var isTable = state.view === 'table';
+
+    if (tableView) tableView.hidden = !isTable;
+    if (cardsView) cardsView.hidden = isTable;
+
+    var buttons = document.querySelectorAll('.qtl-view-btn[data-view], .mgdb-view-btn[data-view]');
+    Array.prototype.forEach.call(buttons, function (btn) {
+      var active = btn.getAttribute('data-view') === state.view;
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      btn.classList.toggle('is-active', active);
+    });
+  }
+
+  function initViewToggle() {
+    var buttons = document.querySelectorAll('.qtl-results-view .mgdb-view-btn');
+    Array.prototype.forEach.call(buttons, function (btn) {
+      btn.addEventListener('click', function () {
+        var view = btn.getAttribute('data-view');
+        if (!view || view === state.view) return;
+        state.view = view;
+        updateViewDisplay();
+      });
+    });
+  }
+
+  function initCopyButtons() {
+    var buttons = document.querySelectorAll('.qtl-copy-btn');
+    Array.prototype.forEach.call(buttons, function (btn) {
+      if (btn._copyBound) return;
+      btn._copyBound = true;
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        var val = btn.getAttribute('data-copy-value');
+        if (!val) return;
+        var originalText = btn.textContent;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(val).then(function () {
+            btn.textContent = 'Copied!';
+            btn.classList.add('is-copied');
+            setTimeout(function () {
+              btn.textContent = originalText;
+              btn.classList.remove('is-copied');
+            }, 1500);
+          });
+        }
+      });
+    });
+  }
+
+  function renderTableView(results) {
+    var tbody = byId('qtl-results-body');
+    if (!tbody) return;
+
     var rows = results.map(function (item) {
+      var name = item.name ? esc(item.name) : '(unnamed)';
+      var recordUrl = item.url ? esc(item.url) : '/data_center/qtl?id=' + encodeURIComponent(item.id);
+      var nameLink = '<a href="' + recordUrl + '"><strong>' + name + '</strong></a>';
+
+      var traitDisplay = item.trait_name ? '<span class="mgdb-pill mgdb-pill-ok">' + esc(item.trait_name) + '</span>' : '<span class="mgdb-muted">&mdash;</span>';
+
+      var parents = Array.isArray(item.parents) ? item.parents : [];
+      var parentsDisplay = parents.length ? '<span class="qtl-parents-badge">' + parents.map(function (p) { return esc(p); }).join(' &times; ') + '</span>' : '<span class="mgdb-muted">&mdash;</span>';
+
+      var expLink = item.experiment_name
+        ? (item.exp_id ? '<a href="/data_center/qtl?id=' + encodeURIComponent(item.exp_id) + '">' + esc(item.experiment_name) + '</a>' : esc(item.experiment_name))
+        : '<span class="mgdb-muted">&mdash;</span>';
+
+      var designParts = [];
+      if (item.qtl_count > 0) {
+        designParts.push('<strong>' + number(item.qtl_count) + ' QTL loci mapped</strong>');
+      }
+      if (item.method) {
+        var shortMethod = item.method.length > 80 ? item.method.slice(0, 80) + '…' : item.method;
+        designParts.push('<span class="qtl-desc">' + esc(shortMethod) + '</span>');
+      }
+      var designDisplay = designParts.length ? '<ul class="qtl-attr-list"><li>' + designParts.join('<br>') + '</li></ul>' : '<span class="mgdb-muted">&mdash;</span>';
+
+      var copyBtn = '<button class="qtl-copy-btn" type="button" data-copy-value="' + esc(item.name || '') + '">Copy Symbol</button>';
+
       return '<tr>'
-        + buildNameCell(item)
-        + buildTraitCell(item)
-        + buildParentsCell(item)
-        + buildExpCell(item)
-        + buildDesignCell(item)
+        + '<td class="qtl-name-cell">' + nameLink + '</td>'
+        + '<td>' + traitDisplay + '</td>'
+        + '<td>' + parentsDisplay + '</td>'
+        + '<td>' + expLink + '</td>'
+        + '<td>' + designDisplay + '</td>'
+        + '<td>' + copyBtn + '</td>'
         + '</tr>';
     }).join('');
 
-    return '<div class="mgdb-table-scroll" tabindex="0">'
-      + '<table class="mgdb-table qtl-table">'
-      + '<caption>Matching QTL analyses<span class="mgdb-muted">' + number(results.length) + ' shown</span></caption>'
-      + '<thead><tr>'
-      + '<th scope="col">Analysis Symbol</th>'
-      + '<th scope="col">Trait Evaluated</th>'
-      + '<th scope="col">Mapping Parents</th>'
-      + '<th scope="col">Experiment Study</th>'
-      + '<th scope="col">Design &amp; Detections</th>'
-      + '</tr></thead>'
-      + '<tbody>' + rows + '</tbody>'
-      + '</table></div>';
+    tbody.innerHTML = rows;
   }
 
-  function buildNameCell(item) {
-    var name = item.name ? esc(item.name) : '(unnamed)';
-    var link = item.url ? '<a href="' + esc(item.url) + '"><strong>' + name + '</strong></a>' : '<strong>' + name + '</strong>';
-    return '<td scope="row" class="qtl-name-cell">' + link + '</td>';
+  function renderCardView(results) {
+    var cardsView = byId('qtl-cards-view');
+    if (!cardsView) return;
+
+    var cards = results.map(function (item) {
+      var name = item.name ? esc(item.name) : '(unnamed)';
+      var recordUrl = item.url ? esc(item.url) : '/data_center/qtl?id=' + encodeURIComponent(item.id);
+
+      var traitBadge = item.trait_name ? '<span class="qtl-trait-badge">' + esc(item.trait_name) + '</span>' : '';
+      var lociBadge = item.qtl_count > 0 ? '<span class="qtl-loci-badge">' + number(item.qtl_count) + ' QTL loci mapped</span>' : '';
+
+      var parents = Array.isArray(item.parents) ? item.parents : [];
+      var parentsHtml = parents.length ? '<p><strong>Mapping Parents:</strong> <span class="qtl-parents-badge">' + parents.map(function (p) { return esc(p); }).join(' &times; ') + '</span></p>' : '';
+
+      var expHtml = item.experiment_name
+        ? '<p><strong>Experiment Study:</strong> ' + (item.exp_id ? '<a href="/data_center/qtl?id=' + encodeURIComponent(item.exp_id) + '">' + esc(item.experiment_name) + '</a>' : esc(item.experiment_name)) + '</p>'
+        : '';
+
+      var methodHtml = item.method
+        ? '<p class="qtl-desc"><strong>Method:</strong> ' + esc(item.method) + '</p>'
+        : '';
+
+      var designHtml = item.experimental_design
+        ? '<p class="qtl-desc"><strong>Design:</strong> ' + esc(item.experimental_design) + '</p>'
+        : '';
+
+      return '<article class="qtl-result-card" data-qtl-id="' + esc(item.id) + '">'
+        + '  <div>'
+        + '    <div class="qtl-card-meta">' + traitBadge + lociBadge + '</div>'
+        + '    <h3><a href="' + recordUrl + '">' + esc(name) + '</a></h3>'
+        + '    <div class="qtl-card-details">'
+        +        parentsHtml
+        +        expHtml
+        +        designHtml
+        +        methodHtml
+        + '    </div>'
+        + '  </div>'
+        + '  <div class="qtl-card-links">'
+        + '    <a href="' + recordUrl + '">View QTL &rarr;</a>'
+        + '    <button class="qtl-copy-btn" type="button" data-copy-value="' + esc(item.name || '') + '">Copy Symbol</button>'
+        + (item.trait_name ? '    <button class="qtl-copy-btn" type="button" data-copy-value="' + esc(item.trait_name) + '">Copy Trait</button>' : '')
+        + '  </div>'
+        + '</article>';
+    }).join('');
+
+    cardsView.innerHTML = cards;
   }
 
-  function buildTraitCell(item) {
-    var trait = item.trait_name ? esc(item.trait_name) : 'Unspecified';
-    return '<td><span class="mgdb-pill mgdb-pill-ok">' + trait + '</span></td>';
-  }
+  function applyResultsFilter() {
+    var filterTerm = (state.filter || '').toLowerCase().trim();
+    var filterCountEl = byId('qtl-filter-count');
+    var statusEl = byId('qtl-results-status');
 
-  function buildParentsCell(item) {
-    var parents = item.parents || [];
-    if (!parents.length) {
-      return '<td class="mgdb-muted">&mdash;</td>';
-    }
-    var cross = parents.map(esc).join(' &times; ');
-    return '<td><span class="qtl-parents-badge">' + cross + '</span></td>';
-  }
+    var tableRows = document.querySelectorAll('#qtl-results-body tr');
+    var cards = document.querySelectorAll('#qtl-cards-view .qtl-result-card');
+    var matchedCount = 0;
+    var totalCount = tableRows.length;
 
-  function buildExpCell(item) {
-    if (!item.experiment_name) {
-      return '<td class="mgdb-muted">&mdash;</td>';
-    }
-    /* The experiment goes to /data_center/qtl, which is the modern QTL
-       experiment record. /data_center/qtl_exp, which this used to link, is
-       the legacy page for the same row. */
-    var link = item.exp_id ? '<a href="/data_center/qtl?id=' + item.exp_id + '">' + esc(item.experiment_name) + '</a>' : esc(item.experiment_name);
-    return '<td>' + link + '</td>';
-  }
+    var terms = filterTerm.split(/\s+/).filter(Boolean);
 
-  function buildDesignCell(item) {
-    var parts = [];
-    if (item.qtl_count > 0) {
-      parts.push('<strong>' + number(item.qtl_count) + ' QTL loci mapped</strong>');
+    function matches(text) {
+      if (!terms.length) return true;
+      var lower = text.toLowerCase();
+      for (var i = 0; i < terms.length; i++) {
+        if (lower.indexOf(terms[i]) === -1) return false;
+      }
+      return true;
     }
-    if (item.method) {
-      var shortMethod = item.method.length > 80 ? item.method.slice(0, 80) + '…' : item.method;
-      parts.push('<span class="qtl-desc">' + esc(shortMethod) + '</span>');
+
+    Array.prototype.forEach.call(tableRows, function (row) {
+      var match = matches(row.textContent || '');
+      row.hidden = !match;
+      if (match) matchedCount++;
+    });
+
+    Array.prototype.forEach.call(cards, function (card) {
+      card.hidden = !matches(card.textContent || '');
+    });
+
+    if (filterCountEl) {
+      if (terms.length) {
+        filterCountEl.textContent = matchedCount + ' / ' + totalCount;
+      } else {
+        filterCountEl.textContent = '';
+      }
     }
-    if (!parts.length) {
-      return '<td class="mgdb-muted">&mdash;</td>';
+
+    if (statusEl && terms.length) {
+      var total = state.lastData && state.lastData.summary ? state.lastData.summary.total : 0;
+      statusEl.textContent = matchedCount === 0
+        ? 'Nothing on this page matches the filter “' + state.filter + '”. '
+          + number(total) + ' QTL analyses matched the search.'
+        : 'Showing ' + number(matchedCount) + ' of the ' + number(totalCount)
+          + ' analyses on this page matching “' + state.filter + '”, out of '
+          + number(total) + ' matched by the search.';
     }
-    return '<td><ul class="qtl-attr-list"><li>' + parts.join('<br>') + '</li></ul></td>';
   }
 
   /* ── Section Navigation Tabs & Scrollspy ────────────────────────────────── */
@@ -571,8 +826,11 @@
         if (traitSelect) { traitSelect.value = String(match.id); }
         var termInput = byId('qtl-search-term');
         if (termInput) { termInput.value = ''; }
-        var adv = document.querySelector('.qtl-adv');
+        var clearBtn = byId('qtl-query-clear');
+        if (clearBtn) { clearBtn.hidden = true; }
+        var adv = document.querySelector('.qtl-advanced') || document.querySelector('.qtl-adv');
         if (adv) { adv.open = true; }
+        syncAdvancedBadge();
         state.page = 1;
         runSearch();
         var section = byId('qtl-results-section');
@@ -605,18 +863,6 @@
         applyResultsFilter();
       });
     }
-
-    var advReset = byId('qtl-adv-reset');
-    if (advReset) {
-      advReset.addEventListener('click', function () {
-        var trait = byId('qtl-filter-trait');
-        var parent = byId('qtl-filter-parent');
-        if (trait) { trait.value = ''; }
-        if (parent) { parent.value = ''; }
-        state.page = 1;
-        if (state.searched) { runSearch(); }
-      });
-    }
   }
 
   function init() {
@@ -624,6 +870,9 @@
     initSearchForm();
     initExamples();
     initResultControls();
+    initSortButtons();
+    initViewToggle();
+    syncAdvancedBadge();
     initFigure();
 
     // Check URL parameters

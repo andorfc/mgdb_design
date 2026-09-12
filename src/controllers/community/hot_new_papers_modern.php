@@ -103,7 +103,6 @@ $papers = $result['papers'];
    Page furniture
    --------------------------------------------------------------------------- */
 
-$content->get('built_date')->replace(date('F j, Y'));
 $content->get('total_papers')->replace(number_format($totalPapers));
 $content->get('total_years')->replace(number_format(count($yearCounts)));
 $content->get('first_year')->replace($firstYear);

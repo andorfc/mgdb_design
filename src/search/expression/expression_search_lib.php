@@ -93,7 +93,12 @@ function expressionSearch($DBConn, $filters = array(), $limit = 50, $offset = 0)
 
     $term = isset($filters['term']) ? trim($filters['term']) : '';
     if ($term !== '') {
-        $like = '%' . strtolower($term) . '%';
+        $cleanTerm = strtolower($term);
+        if (strpos($cleanTerm, '*') !== false) {
+            $like = str_replace('*', '%', $cleanTerm);
+        } else {
+            $like = '%' . $cleanTerm . '%';
+        }
         $params[] = $like;
         $params[] = $like;
         $params[] = $like;
@@ -119,10 +124,26 @@ function expressionSearch($DBConn, $filters = array(), $limit = 50, $offset = 0)
 
     $whereSql = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
 
-    /* Exact matches first, then the reference assemblies, then by name. */
+    $sort = isset($filters['sort']) ? trim($filters['sort']) : '';
     $orderClause = "gm.gene_name ASC";
-    if ($term !== '') {
-        $exactEscaped = str_replace("'", "''", strtolower($term));
+    if ($sort === 'gene_name-asc') {
+        $orderClause = "gm.gene_name ASC";
+    } elseif ($sort === 'gene_name-desc') {
+        $orderClause = "gm.gene_name DESC";
+    } elseif ($sort === 'locus_name-asc') {
+        $orderClause = "gm.locus_name ASC NULLS LAST, gm.gene_name ASC";
+    } elseif ($sort === 'locus_name-desc') {
+        $orderClause = "gm.locus_name DESC NULLS LAST, gm.gene_name ASC";
+    } elseif ($sort === 'assembly_version-asc') {
+        $orderClause = "gm.assembly_version ASC, gm.gene_name ASC";
+    } elseif ($sort === 'assembly_version-desc') {
+        $orderClause = "gm.assembly_version DESC, gm.gene_name ASC";
+    } elseif ($sort === 'coordinates-asc') {
+        $orderClause = "gm.chr ASC, gm.gm_start ASC NULLS LAST";
+    } elseif ($sort === 'coordinates-desc') {
+        $orderClause = "gm.chr DESC, gm.gm_start DESC NULLS LAST";
+    } elseif ($term !== '') {
+        $exactEscaped = str_replace("'", "''", str_replace('*', '', strtolower($term)));
         $orderClause = "
             (LOWER(gm.gene_name) = '{$exactEscaped}') DESC,
             (LOWER(gm.locus_name) = '{$exactEscaped}') DESC,

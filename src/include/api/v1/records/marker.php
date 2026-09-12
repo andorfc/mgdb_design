@@ -127,7 +127,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
       (SELECT COUNT(*) FROM mgdb.relation r
          INNER JOIN mgdb.id_num ri ON ri.id = r.related_id AND ri.curation_lvl = 0
          INNER JOIN mgdb.probe rp ON rp.id = r.related_id
-       WHERE r.id = :c5b) AS related_probes,
+       WHERE r.id = :c6) AS related_probes,
       (SELECT COUNT(*) FROM mgdb.ext_db_key x WHERE x.id = :c7
          AND (x.obsolete IS NULL OR x.obsolete <> 'Y')) AS offsite,
       (SELECT COUNT(*) FROM mgdb.memo m WHERE m.id = :c8) AS comments,
@@ -137,7 +137,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
       (SELECT COUNT(*) FROM mgdb.id_reference ir
          INNER JOIN mgdb.id_num i ON i.id = ir.reference AND i.curation_lvl = 0
        WHERE ir.id = :c12) AS references_count",
-    1, array('c1' => $id, 'c2' => $id, 'c3' => $id, 'c4' => $id, 'c5' => $id, 'c5b' => $id, 'c6' => $id,
+    1, array('c1' => $id, 'c2' => $id, 'c3' => $id, 'c4' => $id, 'c5' => $id, 'c6' => $id,
              'c7' => $id, 'c8' => $id, 'c9' => $id, 'c10' => $id, 'c11' => $id, 'c12' => $id)));
   MgdbApi::countQuery();
 
@@ -159,7 +159,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   if (isset($want['overview'])) {
     $overview = array(
       'type' => MgdbApi::ref('term', $record['type_id'], $record['type_name']),
-      'type_description' => MgdbApi::text($record['type_description']),
+      'type_description' => MgdbApi::prose($record['type_description']),
       'species' => MgdbApi::ref('species', $record['species_id'], $record['species_name']),
       'insert_size' => $record['insert_size'] === null ? null : (float) $record['insert_size'],
       'mnemonic' => MgdbApi::text($record['mnemonic']),
@@ -531,7 +531,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
         'doi' => $doi,
         'pub_type' => MgdbApi::text($row['pub_type']) ?: 'Journal article',
         'relevance' => MgdbApi::text($row['contents']),
-        'abstract' => MgdbApi::text($row['abstract']),
+        'abstract' => MgdbApi::prose($row['abstract']),
         'html' => '/data_center/reference?id=' . (int) $row['id']
       );
     }

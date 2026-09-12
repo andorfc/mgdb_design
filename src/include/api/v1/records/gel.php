@@ -217,7 +217,7 @@ include_once($_SERVER['DOCUMENT_ROOT'] . '/include/gel_record_lib.php');
         'doi' => $doi,
         'pub_type' => MgdbApi::text($row['pub_type']) ?: 'Journal article',
         'relevance' => MgdbApi::text($row['contents']),
-        'abstract' => MgdbApi::text($row['abstract']),
+        'abstract' => MgdbApi::prose($row['abstract']),
         'html' => '/data_center/reference?id=' . (int) $row['id']
       );
     }

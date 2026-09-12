@@ -134,7 +134,7 @@ function bacRecordNotFound($DBConn, $system, $requested) {
   $other = bacOtherMarker($DBConn, $requested);
   $matches = bacSuggestions($DBConn, $requested);
   $summary = 'No MaizeGDB BAC matches ' . $display
-           . '. Search the BAC Data Center, or follow one of the suggested records.';
+           . '. Search the BAC Data Hub, or follow one of the suggested records.';
 
   /* The size of the collection, cached: the count filters 1.4M probe rows and
      changes when markers are loaded rather than per request. */

@@ -216,7 +216,7 @@ function mgdb_blast_lookup_genes($genes, $assembly, $DBConn) {
            gm.assembly_version,
            gm.locus_name, gm.locus_full_name, gm.locus_id,
            gm.canonical_transcript_name,
-           pg.pan_gene_name, pg.pan_gene_count
+           pg.pan_gene_name, pg.pan_gene_count, pg.exemplar_gene_model
       FROM chado.gene_model gm
       LEFT JOIN chado.pan_gene pg
              ON pg.gene_model_name = gm.gene_name
@@ -239,7 +239,8 @@ function mgdb_blast_lookup_genes($genes, $assembly, $DBConn) {
   if ($missing) {
     $ph2 = mgdb_blast_placeholders(count($missing));
     $sql2 = "
-      SELECT additional_gene_model_name AS gene_name, pan_gene_name, pan_gene_count
+      SELECT additional_gene_model_name AS gene_name, pan_gene_name, pan_gene_count,
+             exemplar_gene_model
         FROM chado.pan_gene
        WHERE pan_gene_analysis_id = ?
          AND additional_gene_model_name IN ($ph2)";
@@ -250,6 +251,7 @@ function mgdb_blast_lookup_genes($genes, $assembly, $DBConn) {
           'gene_name'      => $row['gene_name'],
           'pan_gene_name'  => $row['pan_gene_name'],
           'pan_gene_count' => $row['pan_gene_count'],
+          'exemplar_gene_model' => $row['exemplar_gene_model'],
         );
       }
     }
@@ -274,6 +276,13 @@ function mgdb_blast_lookup_genes($genes, $assembly, $DBConn) {
  * its links already built. `null` for an absent scalar, never an empty string —
  * the same convention the records API uses.
  */
+function mgdb_blast_exemplar_gene_model($row) {
+  if (empty($row['exemplar_gene_model'])) { return null; }
+  /* Zm00101aa042824_T001 -> Zm00101aa042824. Anchored, so a gene model whose
+     own name happens to contain _T### in the middle is left alone. */
+  return preg_replace('/_T\d+$/', '', $row['exemplar_gene_model']);
+}
+
 function mgdb_blast_shape_gene($row) {
   $gene = isset($row['gene_model']) ? $row['gene_model'] : $row['gene_name'];
   $rec = array(
@@ -287,13 +296,22 @@ function mgdb_blast_shape_gene($row) {
     'end'          => isset($row['gm_end']) ? (int) $row['gm_end'] : null,
     'pan_gene'     => !empty($row['pan_gene_name']) ? $row['pan_gene_name'] : null,
     'pan_gene_count' => isset($row['pan_gene_count']) ? (int) $row['pan_gene_count'] : null,
+    /* The pan-gene's exemplar gene model. `pan_gene_name` is an internal
+       identifier -- pan-zea.v4.pan02070 -- and means nothing to a reader, so
+       the interface shows this instead and only falls back to the internal
+       name when a pan-gene has no exemplar recorded. Stored as a TRANSCRIPT
+       (Zm00101aa042824_T001); the gene model is that without the _T suffix,
+       which is the same reduction controllers/pan_gene_center.php makes. */
+    'pan_gene_exemplar' => mgdb_blast_exemplar_gene_model($row),
     'links'        => array(),
   );
 
   $rec['links']['gene'] = '/gene_center/gene/' . rawurlencode($gene);
   if ($rec['pan_gene']) {
-    $rec['links']['pan_gene'] =
-      '/pan_gene_center/pan_gene/' . rawurlencode($rec['pan_gene']);
+    /* /pan_gene_center/pan_gene/{id} resolves a gene model id as well as a
+       pan-gene name, so the link can carry the identifier the page shows. */
+    $rec['links']['pan_gene'] = '/pan_gene_center/pan_gene/' .
+      rawurlencode($rec['pan_gene_exemplar'] ? $rec['pan_gene_exemplar'] : $rec['pan_gene']);
   }
   if ($rec['assembly'] && $rec['chr'] && $rec['start'] && $rec['end']) {
     if (mgdb_blast_has_jbrowse($rec['assembly'])) {
@@ -372,7 +390,7 @@ function mgdb_blast_enrich_loci($loci, $assembly, $DBConn) {
   $gene_list = array_keys($genes);
   $ph = mgdb_blast_placeholders(count($gene_list));
   $sql2 = "
-    SELECT gene_model_name, pan_gene_name, pan_gene_count
+    SELECT gene_model_name, pan_gene_name, pan_gene_count, exemplar_gene_model
       FROM chado.pan_gene
      WHERE pan_gene_analysis_id = ?
        AND gene_model_name IN ($ph)";
@@ -386,6 +404,7 @@ function mgdb_blast_enrich_loci($loci, $assembly, $DBConn) {
       if (isset($pan[$row['gene_name']])) {
         $row['pan_gene_name']  = $pan[$row['gene_name']]['pan_gene_name'];
         $row['pan_gene_count'] = $pan[$row['gene_name']]['pan_gene_count'];
+        $row['exemplar_gene_model'] = $pan[$row['gene_name']]['exemplar_gene_model'];
       }
       $shaped[] = mgdb_blast_shape_gene($row);
     }
@@ -413,13 +432,20 @@ function mgdb_blast_pangene_breadth($pan_genes, $DBConn) {
 
   $ph = mgdb_blast_placeholders(count($pan_genes));
   $sql = "
-    SELECT pan_gene_name, annotations, assemblies
-      FROM chado.pan_gene_assemblies
-     WHERE pan_gene_name IN ($ph)";
-  $sth = make_query($DBConn, $sql, 1, $pan_genes);
+    SELECT pa.pan_gene_name, pa.annotations, pa.assemblies,
+           MIN(pg.exemplar_gene_model) AS exemplar_gene_model
+      FROM chado.pan_gene_assemblies pa
+      LEFT JOIN chado.pan_gene pg
+             ON pg.pan_gene_name = pa.pan_gene_name
+            AND pg.pan_gene_analysis_id = ?
+     WHERE pa.pan_gene_name IN ($ph)
+     GROUP BY pa.pan_gene_name, pa.annotations, pa.assemblies";
+  $sth = make_query($DBConn, $sql, 1,
+                    array_merge(array(MGDB_PANGENE_ANALYSIS_ID), $pan_genes));
   while ($row = retrieve_row($sth)) {
     $out[$row['pan_gene_name']] = array(
       'pan_gene'    => $row['pan_gene_name'],
+      'exemplar'    => mgdb_blast_exemplar_gene_model($row),
       'assemblies'  => mgdb_blast_pg_array($row['assemblies']),
       'annotations' => mgdb_blast_pg_array($row['annotations']),
     );

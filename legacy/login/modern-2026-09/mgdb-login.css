@@ -1,0 +1,56 @@
+/* mgdb-login.css -- page styles for /login and /logout.
+ *
+ * Scoped under .mgdb-login-page. The form controls (.mgdb-field, .mgdb-input,
+ * .mgdb-select, .mgdb-form-actions, .mgdb-button*) and the two-column grid
+ * (.mgdb-prose-layout) come from mgdb-modern.css; this sheet only adds the
+ * panel framing and the login-specific spacing, mirroring /feedback so the two
+ * form pages read as one system.
+ */
+
+.mgdb-page.mgdb-login-page .mgdb-login-layout { margin-top: var(--mgdb-space-6); }
+
+/* The form column is a bordered card with a green top edge, like /feedback. */
+.mgdb-page.mgdb-login-page .mgdb-login-panel {
+  padding: var(--mgdb-space-5) var(--mgdb-space-6) var(--mgdb-space-6);
+  border: 1px solid var(--mgdb-line);
+  border-top: 4px solid var(--mgdb-green-dark);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-page.mgdb-login-page .mgdb-login-panel > .mgdb-section-heading {
+  margin-bottom: var(--mgdb-space-5);
+}
+
+/* A real login form is short; keep it from stretching to a hard-to-scan width. */
+.mgdb-page.mgdb-login-page .mgdb-login-form { max-width: 26rem; }
+
+.mgdb-page.mgdb-login-page .mgdb-login-form .mgdb-field {
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-page.mgdb-login-page .mgdb-login-form .mgdb-select { max-width: 14rem; }
+
+.mgdb-page.mgdb-login-page .mgdb-login-rail {
+  display: grid;
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-page.mgdb-login-page .mgdb-login-rail .mgdb-aside-card p { color: var(--mgdb-muted); }
+
+.mgdb-page.mgdb-login-page .mgdb-login-note { border-left: 4px solid var(--mgdb-gold); }
+
+/* Status states (logged in / logged out / error) sit below the hero. */
+.mgdb-page.mgdb-login-page .mgdb-login-state { margin-top: var(--mgdb-space-6); }
+.mgdb-page.mgdb-login-page .mgdb-login-panel > .mgdb-message { margin-bottom: var(--mgdb-space-5); }
+
+.mgdb-page.mgdb-login-page .mgdb-login-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-5);
+}
+
+@media (max-width: 900px) {
+  .mgdb-page.mgdb-login-page .mgdb-login-layout { grid-template-columns: minmax(0, 1fr); }
+}

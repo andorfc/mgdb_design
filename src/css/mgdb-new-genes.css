@@ -81,7 +81,35 @@
 
 /* ── Table ───────────────────────────────────────────────────────────────── */
 
-.mgdb-new-genes-page .ng-table { font-variant-numeric: tabular-nums; }
+/* position: relative here and on the cells is what stops the page scrolling
+   sideways on a phone -- it is not cosmetic, so do not fold it away.
+
+   .mgdb-visually-hidden is `position: absolute`. An absolutely positioned box is
+   clipped by an ancestor's overflow only when that ancestor is in its
+   CONTAINING-BLOCK chain, not merely its DOM ancestor. With nothing positioned
+   between these labels and <html>, they resolved against the initial containing
+   block, escaped .mgdb-table-scroll completely, and stretched the DOCUMENT to
+   the table's full width: 733px of horizontal page scroll at 375px, caused
+   entirely by text nobody can see.
+
+   The scroll wrapper was never at fault -- measured mid-bug it was scrolling its
+   1191px table inside 307px exactly as intended, while <html> scrolled to 1108.
+   Anything that "strengthens" the wrapper instead of this leaves the bug in place.
+
+   The cells carry it because all four hidden labels sit in <td>. `th` is
+   deliberately NOT included: `.mgdb-table thead th` is `position: sticky`, and
+   relative would silently kill the sticky header. The table itself carries it
+   for the <caption>, whose parent is the table rather than a cell.
+
+   Second occurrence of this trap after /genetic_variation, and it will recur on
+   any modern page that puts a hidden label inside a horizontally scrolling
+   table. */
+.mgdb-new-genes-page .ng-table {
+  font-variant-numeric: tabular-nums;
+  position: relative;
+}
+
+.mgdb-new-genes-page .ng-table td { position: relative; }
 
 .mgdb-new-genes-page .ng-table th[scope="row"] { white-space: nowrap; }
 

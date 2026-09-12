@@ -24,7 +24,6 @@ $$SYNTAX-LEVEL 2
       <strong>Reference<br />Data Hub</strong>
     </div>
     <div class="mgdb-hero-body">
-      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; August 2026</p>
       <h1 id="reference-title">Explore curated literature and publication trends</h1>
       <p class="mgdb-hero-description">Search over $(reference_count) curated maize references by topic, title, author, abstract, gene model, or locus, and explore publication patterns over time.</p>
     </div>
@@ -38,94 +37,187 @@ $$SYNTAX-LEVEL 2
   </nav>
 
   <section id="reference-search-panel" class="reference-search-panel" aria-labelledby="reference-search-title">
-    <div class="reference-section-heading">
-      <div><h2 id="reference-search-title">Search</h2></div>
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="reference-search-title">Search</h2>
+      </div>
       <p>Use Related gene, gene model, or locus to retrieve papers curated against a biological record rather than papers that merely mention its name.</p>
     </div>
 
-    <form id="reference-search-form" role="search">
-      <div class="reference-main-search">
-        <label for="reference-query">Search term</label>
-        <div class="reference-query-control"><span aria-hidden="true">⌕</span><input id="reference-query" name="q" type="search" placeholder="Try liguleless, Walbot, transposable elements, lg1, or a gene-model ID" autocomplete="off"><button id="reference-query-clear" type="button" hidden>Clear</button></div>
-      </div>
-      <div class="reference-scope-search">
-        <label for="reference-scope">Search within</label>
-        <select id="reference-scope" name="scope">
-          <option value="all">All searchable fields</option>
-          <option value="title">Title and citation</option>
-          <option value="author">Author</option>
-          <option value="abstract">Abstract</option>
-          <option value="entity">Related gene, gene model, or locus</option>
-        </select>
-      </div>
-      <button class="reference-search-submit" type="submit">Search papers</button>
+    <div class="reference-search-form-wrap">
+      <form id="reference-search-form" class="reference-search-form" role="search">
+        <div class="reference-query-row">
+          <div class="reference-query-control">
+            <label class="mgdb-visually-hidden" for="reference-query">Search curated references</label>
+            <svg class="reference-search-icon" viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="7" r="5"/><line x1="11" y1="11" x2="15" y2="15"/></svg>
+            <input id="reference-query" name="q" type="search" placeholder="Try liguleless, Walbot, transposable elements, lg1, or a gene-model ID" autocomplete="off" />
+            <button class="reference-query-clear" id="reference-query-clear" type="button" aria-label="Clear query" hidden>
+              <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true">
+                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+              </svg>
+            </button>
+          </div>
 
-      <div class="reference-example-row" aria-label="Example searches">
-        <span>Examples</span>
-        <button type="button" data-reference-example="liguleless">liguleless</button>
-        <button type="button" data-reference-example="transposable elements">transposable elements</button>
-        <button type="button" data-reference-example="Walbot" data-reference-scope="author">Walbot</button>
-        <button type="button" data-reference-example="lg1" data-reference-scope="entity">papers related to lg1</button>
-      </div>
+          <div class="reference-scope-control">
+            <label class="mgdb-visually-hidden" for="reference-scope">Search within</label>
+            <select class="mgdb-select reference-scope-select" id="reference-scope" name="scope">
+              <option value="all">All searchable fields</option>
+              <option value="title">Title and citation</option>
+              <option value="author">Author</option>
+              <option value="abstract">Abstract</option>
+              <option value="entity">Related gene, gene model, or locus</option>
+            </select>
+          </div>
 
-      <details class="reference-advanced">
-        <summary><strong>Refine the search</strong><small>Year, source collections, publication type, identifiers, and editorial picks</small></summary>
-        <div class="reference-filter-grid">
-          <label><span>From year</span><input id="reference-year-from" name="year_from" type="number" min="1800" max="2100" placeholder="e.g. 2015"></label>
-          <label><span>Through year</span><input id="reference-year-to" name="year_to" type="number" min="1800" max="2100" placeholder="e.g. 2026"></label>
-          <label><span>Journal</span><select id="reference-journal" name="journal"><option value="">All journals</option>$(journal_options)</select></label>
-          <label><span>Publication type</span><select id="reference-pub-type" name="pub_type"><option value="">All publication types</option>$(pub_type_options)</select></label>
-          <label><span>External identifier</span><select id="reference-identifier" name="identifier"><option value="all">Any record</option><option value="any">Has DOI or PubMed ID</option><option value="doi">Has DOI</option><option value="pubmed">Has PubMed ID</option></select></label>
-          <label><span>Sort results</span><select id="reference-sort" name="sort"><option value="relevance">Best match</option><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="title">Title A–Z</option></select></label>
-          <label class="reference-check"><input id="reference-editorial" name="editorial" type="checkbox" value="1"><span><strong>Editorial Board picks only</strong><small>Limit results to papers selected for community interest.</small></span></label>
-          <label class="reference-check"><input id="reference-include-meeting" name="include_meeting" type="checkbox" value="1" checked><span><strong>Include Maize Meeting abstracts</strong><small>Uncheck to focus on journal articles and other publications.</small></span></label>
-          <label class="reference-check"><input id="reference-include-mnl" name="include_mnl" type="checkbox" value="1" checked><span><strong>Include Maize Newsletter articles</strong><small>Uncheck to omit informal MNL notes from the results.</small></span></label>
-          <button id="reference-reset-filters" class="reference-reset" type="button">Reset filters</button>
+          <button class="mgdb-button mgdb-button-primary reference-query-submit" id="reference-search-submit" type="submit">
+            <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="7" r="5"/><line x1="11" y1="11" x2="15" y2="15"/></svg>
+            Search references
+          </button>
         </div>
-      </details>
-    </form>
+
+        <div class="reference-examples" aria-label="Example searches">
+          <span class="reference-example-label">EXAMPLES&#58;</span>
+          <button type="button" class="reference-example-btn" data-reference-example="liguleless">liguleless</button>
+          <button type="button" class="reference-example-btn" data-reference-example="transposable elements">transposable elements</button>
+          <button type="button" class="reference-example-btn" data-reference-example="Walbot" data-reference-scope="author">Walbot &#40;author&#41;</button>
+          <button type="button" class="reference-example-btn" data-reference-example="lg1" data-reference-scope="entity">papers related to lg1</button>
+        </div>
+
+        <details class="reference-advanced reference-adv" id="reference-adv">
+          <summary>
+            <span class="reference-advanced-label">Advanced search</span>
+            <span class="reference-advanced-count" id="reference-advanced-count" hidden>0</span>
+          </summary>
+          <div class="reference-advanced-body">
+            <div class="reference-advanced-grid">
+              <div class="mgdb-hub-field">
+                <label class="mgdb-label" for="reference-year-from">From year</label>
+                <input class="mgdb-input" id="reference-year-from" name="year_from" type="number" min="1800" max="2100" placeholder="e.g. 2015" />
+                <span class="mgdb-hint">Earliest publication year to include</span>
+              </div>
+
+              <div class="mgdb-hub-field">
+                <label class="mgdb-label" for="reference-year-to">Through year</label>
+                <input class="mgdb-input" id="reference-year-to" name="year_to" type="number" min="1800" max="2100" placeholder="e.g. 2026" />
+                <span class="mgdb-hint">Latest publication year to include</span>
+              </div>
+
+              <div class="mgdb-hub-field">
+                <label class="mgdb-label" for="reference-journal">Journal</label>
+                <select class="mgdb-select" id="reference-journal" name="journal">
+                  <option value="">All journals</option>
+                  $(journal_options)
+                </select>
+                <span class="mgdb-hint">Restrict to a specific peer-reviewed journal or source</span>
+              </div>
+
+              <div class="mgdb-hub-field">
+                <label class="mgdb-label" for="reference-pub-type">Publication type</label>
+                <select class="mgdb-select" id="reference-pub-type" name="pub_type">
+                  <option value="">All publication types</option>
+                  $(pub_type_options)
+                </select>
+                <span class="mgdb-hint">Filter by article, review, book chapter, or conference record</span>
+              </div>
+
+              <div class="mgdb-hub-field">
+                <label class="mgdb-label" for="reference-identifier">External identifier</label>
+                <select class="mgdb-select" id="reference-identifier" name="identifier">
+                  <option value="all">Any record</option>
+                  <option value="any">Has DOI or PubMed ID</option>
+                  <option value="doi">Has DOI</option>
+                  <option value="pubmed">Has PubMed ID</option>
+                </select>
+                <span class="mgdb-hint">Limit to records indexed with verified DOI or NCBI PubMed IDs</span>
+              </div>
+
+              <div class="mgdb-hub-field">
+                <label class="mgdb-label" for="reference-sort">Sort results</label>
+                <select class="mgdb-select" id="reference-sort" name="sort">
+                  <option value="relevance">Best match</option>
+                  <option value="newest">Newest first</option>
+                  <option value="oldest">Oldest first</option>
+                  <option value="title">Title A&ndash;Z</option>
+                </select>
+                <span class="mgdb-hint">Initial ordering for returned literature matches</span>
+              </div>
+            </div>
+
+            <div class="reference-advanced-checkboxes">
+              <label class="reference-check">
+                <input id="reference-editorial" name="editorial" type="checkbox" value="1" />
+                <span><strong>Editorial Board picks only</strong><span class="mgdb-hint">Limit results to papers selected for community interest</span></span>
+              </label>
+              <label class="reference-check">
+                <input id="reference-include-meeting" name="include_meeting" type="checkbox" value="1" checked />
+                <span><strong>Include Maize Meeting abstracts</strong><span class="mgdb-hint">Uncheck to focus on journal articles and other publications</span></span>
+              </label>
+              <label class="reference-check">
+                <input id="reference-include-mnl" name="include_mnl" type="checkbox" value="1" checked />
+                <span><strong>Include Maize Newsletter articles</strong><span class="mgdb-hint">Uncheck to omit informal MNL notes from the results</span></span>
+              </label>
+            </div>
+
+            <div class="reference-advanced-actions">
+              <button class="mgdb-button mgdb-button-primary" id="reference-adv-submit" type="submit">Apply filters</button>
+              <button class="reference-advanced-reset-btn" id="reference-reset-filters" type="button">Reset filters</button>
+            </div>
+          </div>
+        </details>
+      </form>
+    </div>
   </section>
 
   <section id="reference-results-section" class="reference-results-section" aria-labelledby="reference-results-title" hidden>
-    <div class="reference-results-heading">
+    <div class="mgdb-section-heading">
       <div>
         <h2 id="reference-results-title">Results</h2>
-        <p id="reference-results-status" aria-live="polite">Loading references…</p>
-      </div>
-      <div class="reference-results-controls">
-        <div class="mgdb-hub-field">
-          <label for="reference-results-filter">Filter results</label>
-          <input id="reference-results-filter" type="search" placeholder="Narrow this page" autocomplete="off" />
-        </div>
-        <div class="mgdb-hub-field">
-          <label for="reference-page-size">Results per page</label>
-          <select id="reference-page-size">
-            <option value="10">Top 10</option>
-            <option value="25" selected>Top 25</option>
-            <option value="50">Top 50</option>
-            <option value="all">All results</option>
-          </select>
-        </div>
-        <div class="mgdb-hub-field">
-          <label for="reference-sort-compact">Sort</label>
-          <select id="reference-sort-compact">
-            <option value="relevance">Best match</option>
-            <option value="newest">Newest first</option>
-            <option value="oldest">Oldest first</option>
-            <option value="title">Title A&ndash;Z</option>
-          </select>
-        </div>
       </div>
     </div>
 
-    <div class="reference-export-bar">
-      <div><strong>Download matches</strong></div>
-      <div>
-        <a href="#" data-reference-export="csv">CSV</a>
-        <a href="#" data-reference-export="doi">DOI list</a>
-        <a href="#" data-reference-export="pmid">PubMed IDs</a>
-        <a href="#" data-reference-export="ris">RIS</a>
-        <a href="#" data-reference-export="bibtex">BibTeX</a>
+    <p class="reference-results-status" id="reference-results-status" role="status" aria-live="polite">Loading references…</p>
+
+    <div class="reference-results-toolbar" id="reference-results-toolbar">
+      <div class="mgdb-hub-field reference-results-filter">
+        <label for="reference-results-filter">Filter these results</label>
+        <input id="reference-results-filter" type="search" placeholder="Narrow this page" autocomplete="off" />
+        <span class="mgdb-result-count" id="reference-filter-count" aria-live="polite"></span>
+      </div>
+
+      <div class="mgdb-hub-field">
+        <label for="reference-page-size">Results shown</label>
+        <select class="mgdb-select" id="reference-page-size">
+          <option value="10">Top 10</option>
+          <option value="25" selected>Top 25</option>
+          <option value="50">Top 50</option>
+          <option value="all">All results</option>
+        </select>
+      </div>
+
+      <div class="mgdb-hub-field mgdb-hub-field-action reference-results-export">
+        <a class="mgdb-button mgdb-button-quiet" id="reference-export-tsv" data-reference-export="tsv" href="#" download>Export TSV</a>
+      </div>
+
+      <div class="mgdb-hub-field mgdb-hub-field-action reference-results-formats">
+        <span class="reference-formats-label">Export:</span>
+        <div class="reference-formats-links">
+          <a href="#" class="reference-format-link" data-reference-export="csv">CSV</a>
+          <a href="#" class="reference-format-link" data-reference-export="doi">DOIs</a>
+          <a href="#" class="reference-format-link" data-reference-export="pmid">PMIDs</a>
+          <a href="#" class="reference-format-link" data-reference-export="ris">RIS</a>
+          <a href="#" class="reference-format-link" data-reference-export="bibtex">BibTeX</a>
+        </div>
+      </div>
+
+      <div class="mgdb-hub-field mgdb-hub-field-action reference-results-view">
+        <div class="mgdb-view-toggle" role="group" aria-label="Result view">
+          <button class="mgdb-view-btn is-active" id="reference-view-cards" type="button" data-view="card" aria-pressed="true">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>Cards
+          </button>
+          <button class="mgdb-view-btn" id="reference-view-table" type="button" data-view="table" aria-pressed="false">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true"><rect x="1" y="2" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="12" width="14" height="2" rx="1" fill="currentColor"/></svg>Table
+          </button>
+        </div>
       </div>
     </div>
 
@@ -136,10 +228,29 @@ $$SYNTAX-LEVEL 2
       <button type="button" data-selected-export="pmid">Copy selected PubMed IDs</button>
       <button id="reference-selection-clear" type="button">Clear selection</button>
     </div>
-    <label class="reference-select-page"><input id="reference-select-page" type="checkbox"> Select every result on this page</label>
+    <label class="reference-select-page" hidden><input id="reference-select-page" type="checkbox"> Select every result on this page</label>
 
     <div id="reference-loading" class="mgdb-loading" aria-hidden="true"><span></span><span>Searching curated literature…</span></div>
-    <div id="reference-results"></div>
+
+    <div class="mgdb-table-wrap reference-table-wrap" id="reference-table-view" hidden>
+      <table class="mgdb-table reference-table" id="reference-results-table">
+        <thead>
+          <tr>
+            <th scope="col" aria-sort="ascending"><button type="button" data-sort-key="title">Title / Citation</button></th>
+            <th scope="col" aria-sort="none"><button type="button" data-sort-key="authors">Authors</button></th>
+            <th scope="col" aria-sort="none"><button type="button" data-sort-key="year">Year</button></th>
+            <th scope="col" aria-sort="none"><button type="button" data-sort-key="journal">Journal / Source</button></th>
+            <th scope="col" aria-sort="none"><button type="button" data-sort-key="identifiers">Identifiers</button></th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody id="reference-results-body"></tbody>
+      </table>
+    </div>
+
+    <div class="reference-card-grid" id="reference-cards-view"></div>
+    <div id="reference-results" hidden></div>
+
     <div id="reference-resting" class="mgdb-empty reference-resting" hidden><strong>Search the curated maize literature.</strong><span>Enter a topic, title, author, gene model, or locus above &mdash; or use one of the examples. Collection-wide figures for all references are shown below.</span></div>
     <div id="reference-empty" class="mgdb-empty" hidden><strong>No matching references found.</strong><span>Try fewer words, a broader field, or clear one of the filters.</span></div>
     <div id="reference-error" class="reference-empty reference-error" hidden><strong>The search could not be completed.</strong><span>Please retry. If the problem continues, send the query to the MaizeGDB team.</span><button id="reference-retry" type="button">Retry search</button></div>

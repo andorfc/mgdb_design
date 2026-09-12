@@ -1,0 +1,446 @@
+/* file: mgdb-api.css
+ *
+ * Scoped styling for the API documentation page (/api, /api/docs).
+ * Scoped under .mgdb-api-page. Loads after css/mgdb-hub.css, which supplies
+ * the ground, the white section cards and their coloured top edges, and the
+ * green Related resources panel. Only what the shell does not have is here:
+ * code blocks with a copy control, the language tabs on the examples, the
+ * endpoint rows, and the Try it form and its result.
+ */
+
+/* Ten tabs are one row above 1200px, two rows from 768 to 1199, and one
+   scrolling row below 768 (the shell turns a long bar into a scroller
+   there). MGDB.sectionTabs() reads scroll-margin-top back for its own line. */
+.mgdb-api-page > section {
+  scroll-margin-top: 113px;
+}
+@media (min-width: 1200px), (max-width: 767px) {
+  .mgdb-api-page > section {
+    scroll-margin-top: 65px;
+  }
+}
+
+.mgdb-api-page .api-hero-icon {
+  width: min(100%, 72px);
+  height: auto;
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-api-page .api-hero-base {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-3);
+}
+.mgdb-api-page .api-hero-base > span {
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--mgdb-muted);
+}
+.mgdb-api-page .api-hero-base > code {
+  font-size: var(--mgdb-text-base);
+  /* A 40-character URL does not fit a phone's hero column; inline code keeps
+     the browser's nowrap and the card clips it. Let it break anywhere. */
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* --------------------------------------------------------------------------
+   Body copy. The shared sheet zeroes p/ul/dl margins, so spacing is restated
+   here, scoped with > where a shared component could otherwise be nested.
+   -------------------------------------------------------------------------- */
+
+.mgdb-api-page > section > p,
+.mgdb-api-page .api-two-col > div > p {
+  margin: 0 0 var(--mgdb-space-3);
+  max-width: 78ch;
+  line-height: 1.6;
+}
+.mgdb-api-page > section > p:last-child,
+.mgdb-api-page .api-two-col > div > p:last-child {
+  margin-bottom: 0;
+}
+
+.mgdb-api-page .api-two-col {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--mgdb-space-5) var(--mgdb-space-7);
+  align-items: start;
+}
+.mgdb-api-page .api-two-col-wide {
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+}
+.mgdb-api-page .api-two-col > div > h3,
+.mgdb-api-page .api-subhead {
+  margin: 0 0 var(--mgdb-space-2);
+  font-size: var(--mgdb-text-lg);
+  color: var(--mgdb-green-dark);
+}
+.mgdb-api-page .api-subhead {
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-api-page .api-facts {
+  margin: 0;
+  padding-left: 1.15em;
+  display: grid;
+  gap: var(--mgdb-space-2);
+  line-height: 1.55;
+}
+.mgdb-api-page .api-facts strong {
+  color: var(--mgdb-ink);
+}
+
+.mgdb-api-page .api-dl {
+  margin: 0 0 var(--mgdb-space-4);
+  display: grid;
+  gap: var(--mgdb-space-2);
+}
+.mgdb-api-page .api-dl > div {
+  display: grid;
+  grid-template-columns: 9rem minmax(0, 1fr);
+  gap: var(--mgdb-space-3);
+  padding: var(--mgdb-space-2) 0;
+  border-top: 1px solid var(--mgdb-line-soft);
+  line-height: 1.55;
+}
+.mgdb-api-page .api-dl > div:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.mgdb-api-page .api-dl dt,
+.mgdb-api-page .api-dl dd {
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Code blocks. The shell styles inline code only; a block here is a
+   positioned box so the copy control can sit in its corner without taking
+   a line of its own. pre keeps its own scroll, so a long URL never widens
+   the page.
+   -------------------------------------------------------------------------- */
+
+.mgdb-api-page .api-code {
+  position: relative;
+  margin: 0;
+}
+.mgdb-api-page .api-code > pre {
+  margin: 0;
+  padding: var(--mgdb-space-4);
+  padding-right: 5.5rem;
+  background: var(--mgdb-surface-sunken);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  font-family: var(--mgdb-font-mono);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--mgdb-ink);
+  overflow-x: auto;
+  white-space: pre;
+  tab-size: 2;
+}
+.mgdb-api-page .api-code > pre:focus-visible {
+  outline: 2px solid var(--mgdb-focus);
+  outline-offset: 2px;
+}
+.mgdb-api-page .api-copy {
+  position: absolute;
+  top: var(--mgdb-space-2);
+  right: var(--mgdb-space-2);
+  background: var(--mgdb-surface);
+}
+.mgdb-api-page .api-code-col > .api-code-caption {
+  margin: 0 0 var(--mgdb-space-2);
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-muted);
+  line-height: 1.5;
+}
+
+/* Examples: a title, a line of intent, the language tabs, then one panel per
+   language. Tabs are real buttons in a tablist; the selected one carries
+   aria-selected and the panel it controls is the only one not hidden. */
+.mgdb-api-page .api-example {
+  margin-top: var(--mgdb-space-5);
+}
+.mgdb-api-page .api-example > h3 {
+  margin: 0 0 var(--mgdb-space-1);
+  font-size: var(--mgdb-text-lg);
+  color: var(--mgdb-green-dark);
+}
+.mgdb-api-page .api-example > p {
+  margin: 0 0 var(--mgdb-space-3);
+  max-width: 78ch;
+  line-height: 1.55;
+}
+.mgdb-api-page .api-example-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1);
+  margin-bottom: var(--mgdb-space-2);
+}
+.mgdb-api-page .api-example-tabs > button {
+  min-height: 36px;
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink-soft);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+.mgdb-api-page .api-example-tabs > button:hover {
+  border-color: var(--mgdb-green);
+  color: var(--mgdb-green-dark);
+}
+.mgdb-api-page .api-example-tabs > button[aria-selected="true"] {
+  background: var(--mgdb-green-dark);
+  border-color: var(--mgdb-green-dark);
+  color: #fff;
+}
+.mgdb-api-page .api-example-tabs > button:focus-visible {
+  outline: 2px solid var(--mgdb-focus);
+  outline-offset: 2px;
+}
+@media (pointer: coarse) {
+  .mgdb-api-page .api-example-tabs > button {
+    min-height: var(--mgdb-tap-target);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Endpoints
+   -------------------------------------------------------------------------- */
+
+.mgdb-api-page .api-endpoints {
+  display: grid;
+  gap: var(--mgdb-space-3);
+}
+.mgdb-api-page .api-endpoint {
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-left: 4px solid var(--mgdb-green);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+}
+.mgdb-api-page .api-endpoint-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  margin-bottom: var(--mgdb-space-2);
+}
+.mgdb-api-page .api-endpoint-line > code {
+  font-size: var(--mgdb-text-base);
+  overflow-wrap: anywhere;
+}
+.mgdb-api-page .api-method {
+  display: inline-block;
+  padding: 0.1em 0.55em;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-green-dark);
+  color: #fff;
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.mgdb-api-page .api-endpoint > p {
+  margin: 0;
+  line-height: 1.55;
+  max-width: 88ch;
+}
+
+/* --------------------------------------------------------------------------
+   Tables
+   -------------------------------------------------------------------------- */
+
+.mgdb-api-page .api-table th[scope="row"] {
+  white-space: nowrap;
+  vertical-align: top;
+}
+.mgdb-api-page .api-table td {
+  vertical-align: top;
+  line-height: 1.5;
+}
+.mgdb-api-page .api-types-table th[scope="row"] {
+  white-space: normal;
+}
+.mgdb-api-page .api-type-label {
+  display: block;
+  font-weight: 400;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+.mgdb-api-page .api-nowrap {
+  white-space: nowrap;
+}
+.mgdb-api-page .api-sections {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3em;
+  max-width: 24rem;
+}
+.mgdb-api-page .api-sections > code {
+  font-size: var(--mgdb-text-xs);
+}
+.mgdb-api-page .api-note {
+  display: block;
+  margin-top: var(--mgdb-space-1);
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-muted);
+}
+.mgdb-api-page .api-plain-list {
+  margin: 0;
+  padding-left: 1.1em;
+}
+.mgdb-api-page .api-plain-list li + li {
+  margin-top: 0.2em;
+}
+
+/* --------------------------------------------------------------------------
+   Try it
+   -------------------------------------------------------------------------- */
+
+.mgdb-api-page .api-try-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+}
+/* The shell's `.mgdb-field + .mgdb-field { margin-top }` is for a stacked
+   form; inside this grid it gave every field after the first a 16px top
+   margin, so the first control sat 16px above the other three (measured:
+   15024 against 15040). The grid's gap does the spacing here. Each field is a
+   column with its control at the bottom, so a label that wraps to two lines
+   grows upward and every control in a row shares one top edge. */
+.mgdb-api-page .api-try-grid > .mgdb-field {
+  margin: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.mgdb-api-page .api-try-grid .mgdb-field > span {
+  display: block;
+  margin-bottom: var(--mgdb-space-1);
+  font-weight: 600;
+  font-size: var(--mgdb-text-sm);
+}
+.mgdb-api-page .api-try-sections {
+  margin: var(--mgdb-space-2) 0 0;
+  font-size: var(--mgdb-text-sm);
+  color: var(--mgdb-muted);
+  line-height: 1.6;
+}
+.mgdb-api-page .api-try-sections code {
+  cursor: pointer;
+}
+.mgdb-api-page .api-try-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-3);
+}
+.mgdb-api-page .api-try-url {
+  overflow-wrap: anywhere;
+  font-size: var(--mgdb-text-sm);
+}
+.mgdb-api-page .api-try-result {
+  margin-top: var(--mgdb-space-4);
+  display: grid;
+  gap: var(--mgdb-space-3);
+}
+.mgdb-api-page .api-try-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  font-weight: 600;
+}
+.mgdb-api-page .api-try-status .api-status-code {
+  display: inline-block;
+  padding: 0.15em 0.6em;
+  border-radius: 999px;
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-sm);
+  background: var(--mgdb-status-ok-soft);
+  color: var(--mgdb-status-ok);
+}
+.mgdb-api-page .api-try-status .api-status-code.is-error {
+  background: var(--mgdb-status-error-soft);
+  color: var(--mgdb-status-error);
+}
+.mgdb-api-page .api-try-status .api-status-code.is-info {
+  background: var(--mgdb-status-info-soft);
+  color: var(--mgdb-status-info);
+}
+.mgdb-api-page .api-try-status .api-status-note {
+  font-weight: 400;
+  color: var(--mgdb-muted);
+}
+.mgdb-api-page .api-try-headers {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--mgdb-space-1) var(--mgdb-space-4);
+  font-size: var(--mgdb-text-sm);
+}
+.mgdb-api-page .api-try-headers > div {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  min-width: 0;
+}
+.mgdb-api-page .api-try-headers dt {
+  flex: 0 0 auto;
+  font-weight: 600;
+  color: var(--mgdb-ink-soft);
+}
+.mgdb-api-page .api-try-headers dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-family: var(--mgdb-font-mono);
+}
+.mgdb-api-page .api-try-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+.mgdb-api-page .api-try-result .api-code > pre {
+  max-height: 32rem;
+  overflow: auto;
+  white-space: pre;
+}
+
+/* --------------------------------------------------------------------------
+   Narrow screens
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 1000px) {
+  .mgdb-api-page .api-two-col,
+  .mgdb-api-page .api-two-col-wide {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .mgdb-api-page .api-try-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  .mgdb-api-page .api-try-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .mgdb-api-page .api-dl > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--mgdb-space-1);
+  }
+  .mgdb-api-page .api-code > pre {
+    padding-right: var(--mgdb-space-4);
+    padding-top: calc(var(--mgdb-space-4) + 32px);
+  }
+}

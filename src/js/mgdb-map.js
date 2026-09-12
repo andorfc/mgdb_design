@@ -15,6 +15,8 @@
     panel: '0',
     has_loci: 0,
     sort: 'relevance',
+    sortKey: 'name',
+    sortDir: 'asc',
     view: 'table',
     page: 1,
     pageSize: 25,
@@ -133,7 +135,7 @@
   }
 
   function updateViewButtons() {
-    var viewBtns = document.querySelectorAll('.map-view-btn');
+    var viewBtns = document.querySelectorAll('.map-view-btn, .mgdb-view-btn');
     viewBtns.forEach(function (btn) {
       var isTarget = btn.getAttribute('data-view') === state.view;
       btn.classList.toggle('is-active', isTarget);
@@ -158,10 +160,6 @@
     qs.set('format', 'tsv');
     var exportTsv = byId('map-export-tsv');
     if (exportTsv) exportTsv.href = API_URL + '?' + qs.toString();
-
-    qs.set('format', 'csv');
-    var exportCsv = byId('map-export-csv');
-    if (exportCsv) exportCsv.href = API_URL + '?' + qs.toString();
   }
 
   function fetchMaps(scrollToResults) {
@@ -270,16 +268,28 @@
 
     var items = container.querySelectorAll('.map-card-item, tbody tr');
     var terms = state.filter.toLowerCase().split(/\s+/).filter(Boolean);
+    var shown = 0;
 
     Array.prototype.forEach.call(items, function (item) {
-      if (!terms.length) { item.hidden = false; return; }
-      var hay = (item.textContent || '').toLowerCase();
       var match = true;
-      for (var i = 0; i < terms.length; i++) {
-        if (hay.indexOf(terms[i]) === -1) { match = false; break; }
+      if (terms.length) {
+        var hay = (item.textContent || '').toLowerCase();
+        for (var i = 0; i < terms.length; i++) {
+          if (hay.indexOf(terms[i]) === -1) { match = false; break; }
+        }
       }
       item.hidden = !match;
+      if (match) { shown++; }
     });
+
+    var filterCount = byId('map-filter-count');
+    if (filterCount) {
+      if (terms.length) {
+        filterCount.textContent = shown + ' match' + (shown === 1 ? '' : 'es');
+      } else {
+        filterCount.textContent = '';
+      }
+    }
   }
 
   function showError(msg) {
@@ -307,26 +317,122 @@
 
     if (emptyEl) emptyEl.hidden = true;
 
+    var sorted = sortMapResults(results);
+
     if (state.view === 'table') {
-      renderTableView(results);
+      renderTableView(sorted);
     } else {
-      renderCardView(results);
+      renderCardView(sorted);
     }
+  }
+
+  var MAP_COLUMNS = [
+    { key: 'name', label: 'Map Name' },
+    { key: 'linkage', label: 'Linkage Group' },
+    { key: 'span', label: 'Units & Span' },
+    { key: 'loci', label: 'Mapped Loci', numeric: true },
+    { key: 'source', label: 'Source / Author' }
+  ];
+
+  function getMapHeaderAriaSort(colKey) {
+    if (state.sortKey === colKey) {
+      return state.sortDir === 'desc' ? 'descending' : 'ascending';
+    }
+    return 'none';
+  }
+
+  function sortMapResults(results) {
+    if (!results || !results.length) return [];
+    var key = state.sortKey || 'name';
+    var dir = state.sortDir === 'desc' ? -1 : 1;
+
+    return results.slice().sort(function (a, b) {
+      if (key === 'loci') {
+        var aLoci = Number(a.locus_count) || 0;
+        var bLoci = Number(b.locus_count) || 0;
+        if (aLoci !== bLoci) return (aLoci - bLoci) * dir;
+      } else if (key === 'linkage') {
+        var aLg = String(a.linkage_group !== null && a.linkage_group !== undefined ? a.linkage_group : '').trim();
+        var bLg = String(b.linkage_group !== null && b.linkage_group !== undefined ? b.linkage_group : '').trim();
+        if (aLg && !bLg) return -1 * dir;
+        if (!aLg && bLg) return 1 * dir;
+        var cmpLg = aLg.localeCompare(bLg, undefined, { numeric: true, sensitivity: 'base' });
+        if (cmpLg !== 0) return cmpLg * dir;
+      } else if (key === 'source') {
+        var aSrc = (a.author_name || '').trim().toLowerCase();
+        var bSrc = (b.author_name || '').trim().toLowerCase();
+        if (aSrc && !bSrc) return -1 * dir;
+        if (!aSrc && bSrc) return 1 * dir;
+        var cmpSrc = aSrc.localeCompare(bSrc, undefined, { numeric: true });
+        if (cmpSrc !== 0) return cmpSrc * dir;
+      } else if (key === 'span') {
+        var aHasSpan = (a.min_coord !== null && a.min_coord !== undefined && a.max_coord !== null && a.max_coord !== undefined);
+        var bHasSpan = (b.min_coord !== null && b.min_coord !== undefined && b.max_coord !== null && b.max_coord !== undefined);
+        if (aHasSpan && bHasSpan) {
+          var aSpan = Math.abs(Number(a.max_coord) - Number(a.min_coord));
+          var bSpan = Math.abs(Number(b.max_coord) - Number(b.min_coord));
+          if (aSpan !== bSpan) return (aSpan - bSpan) * dir;
+        } else if (aHasSpan && !bHasSpan) {
+          return -1 * dir;
+        } else if (!aHasSpan && bHasSpan) {
+          return 1 * dir;
+        }
+      }
+      var aName = (a.name || '').trim().toLowerCase();
+      var bName = (b.name || '').trim().toLowerCase();
+      return aName.localeCompare(bName, undefined, { numeric: true }) * dir;
+    });
+  }
+
+  function initMapSortButtons(container) {
+    if (!container) return;
+    Array.prototype.forEach.call(container.querySelectorAll('button[data-sort-key]'), function (btn) {
+      btn.addEventListener('click', function () {
+        var key = btn.getAttribute('data-sort-key');
+
+        if (state.sortKey === key) {
+          state.sortDir = (state.sortDir === 'asc') ? 'desc' : 'asc';
+        } else {
+          state.sortKey = key;
+          state.sortDir = (key === 'loci') ? 'desc' : 'asc';
+        }
+
+        // Map client sort keys to backend sort params for pagination/exports
+        if (key === 'name') {
+          state.sort = (state.sortDir === 'desc') ? 'name-desc' : 'name';
+        } else if (key === 'loci') {
+          state.sort = (state.sortDir === 'desc') ? 'loci-desc' : 'relevance';
+        } else if (key === 'linkage') {
+          state.sort = 'linkage';
+        }
+
+        updateExportLinks();
+
+        // Re-render currently loaded maps immediately with client sort
+        if (window._lastMapResults) {
+          renderResults(window._lastMapResults);
+          applyResultsFilter();
+        }
+      });
+    });
   }
 
   function renderTableView(results) {
     var resultsEl = byId('map-results');
     if (!resultsEl) return;
 
+    var ths = MAP_COLUMNS.map(function (col) {
+      var sortAttr = getMapHeaderAriaSort(col.key);
+      var cls = col.numeric ? ' class="mgdb-numeric"' : '';
+      return '<th scope="col" aria-sort="' + sortAttr + '"' + cls + '>' +
+        '<button type="button" data-sort-key="' + col.key + '">' + escapeHtml(col.label) + '</button></th>';
+    }).join('');
+
     var html = '<div class="map-table-wrap">' +
-      '<table class="map-results-table">' +
+      '<table class="mgdb-table map-results-table">' +
       '<thead><tr>' +
-      '  <th>Map Name</th>' +
-      '  <th>Linkage Group</th>' +
-      '  <th>Units &amp; Span</th>' +
-      '  <th>Mapped Loci</th>' +
-      '  <th>Source / Author</th>' +
-      '  <th>Actions</th>' +
+      ths +
+      '  <th scope="col">Actions</th>' +
       '</tr></thead><tbody>';
 
     results.forEach(function (r) {
@@ -349,7 +455,7 @@
         '  </td>' +
         '  <td><span class="map-chr-pill">Chr ' + escapeHtml(r.linkage_group) + '</span></td>' +
         '  <td>' + spanStr + '</td>' +
-        '  <td><span class="map-loci-badge">' + r.locus_count.toLocaleString() + ' loci</span></td>' +
+        '  <td class="mgdb-numeric"><span class="map-loci-badge">' + r.locus_count.toLocaleString() + ' loci</span></td>' +
         '  <td>' + (r.author_name ? escapeHtml(r.author_name) : '<span style="color:var(--mgdb-muted);">—</span>') + '</td>' +
         '  <td>' +
         '    <div class="map-row-actions">' +
@@ -362,6 +468,7 @@
 
     html += '</tbody></table></div>';
     resultsEl.innerHTML = html;
+    initMapSortButtons(resultsEl);
   }
 
   function renderCardView(results) {
@@ -516,6 +623,24 @@
 
   /* ── Initialization ─────────────────────────────────────────────────────── */
 
+  function syncAdvancedBadge() {
+    var badge = byId('map-advanced-count');
+    if (!badge) return;
+    var linkage = byId('map-linkage');
+    var hasLoci = byId('map-has-loci');
+    var locus = byId('map-locus-filter');
+    var source = byId('map-source-filter');
+    var panel = byId('map-panel-filter');
+    var active = 0;
+    if (linkage && linkage.value && linkage.value !== '0') active++;
+    if (hasLoci && hasLoci.value && hasLoci.value !== '0') active++;
+    if (locus && locus.value && locus.value.trim() !== '') active++;
+    if (source && source.value && source.value !== '0') active++;
+    if (panel && panel.value && panel.value !== '0') active++;
+    badge.textContent = active ? active + ' active' : '';
+    badge.hidden = !active;
+  }
+
   function init() {
     // Read URL search params
     var params = new URLSearchParams(window.location.search);
@@ -534,26 +659,28 @@
     var linkageSelect = byId('map-linkage');
     var sourceSelect = byId('map-source-filter');
     var panelSelect = byId('map-panel-filter');
-    var hasLociCheckbox = byId('map-has-loci');
+    var hasLociSelect = byId('map-has-loci');
     var sortSelect = byId('map-sort');
     var formEl = byId('map-search-form');
     var clearBtn = byId('map-query-clear');
     var resetBtn = byId('map-empty-reset');
-    var advResetBtn = byId('map-adv-reset-btn');
-    var advAccordion = byId('map-adv-accordion');
+    var advSubmit = byId('map-adv-submit');
+    var advResetBtn = byId('map-adv-reset');
+    var advAccordion = byId('map-adv');
 
     if (queryInput) queryInput.value = state.term;
     if (locusInput) locusInput.value = state.locus;
     if (linkageSelect) linkageSelect.value = state.linkage;
     if (sourceSelect) sourceSelect.value = state.source;
     if (panelSelect) panelSelect.value = state.panel;
-    if (hasLociCheckbox) hasLociCheckbox.checked = (state.has_loci === 1);
+    if (hasLociSelect) hasLociSelect.value = String(state.has_loci);
     if (sortSelect) sortSelect.value = state.sort;
 
-    if ((state.locus || state.source !== '0' || state.panel !== '0') && advAccordion) {
+    if ((state.locus || state.source !== '0' || state.panel !== '0' || state.linkage !== '0' || state.has_loci !== 0) && advAccordion) {
       advAccordion.open = true;
     }
 
+    syncAdvancedBadge();
     updateClearBtn();
     updateViewButtons();
 
@@ -566,9 +693,27 @@
         state.linkage = linkageSelect ? linkageSelect.value : '0';
         state.source = sourceSelect ? sourceSelect.value : '0';
         state.panel = panelSelect ? panelSelect.value : '0';
-        state.has_loci = hasLociCheckbox && hasLociCheckbox.checked ? 1 : 0;
+        state.has_loci = hasLociSelect ? parseInt(hasLociSelect.value, 10) || 0 : 0;
+        syncAdvancedBadge();
         state.page = 1;
         fetchMaps(true);
+      });
+    }
+
+    if (advSubmit) {
+      advSubmit.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (formEl) {
+          state.term = queryInput ? queryInput.value.trim() : '';
+          state.locus = locusInput ? locusInput.value.trim() : '';
+          state.linkage = linkageSelect ? linkageSelect.value : '0';
+          state.source = sourceSelect ? sourceSelect.value : '0';
+          state.panel = panelSelect ? panelSelect.value : '0';
+          state.has_loci = hasLociSelect ? parseInt(hasLociSelect.value, 10) || 0 : 0;
+          syncAdvancedBadge();
+          state.page = 1;
+          fetchMaps(true);
+        }
       });
     }
 
@@ -596,25 +741,31 @@
         }
         updateClearBtn();
         state.term = '';
-        state.page = 1;
-        fetchMaps(false);
+        if (state.searched) {
+          state.page = 1;
+          fetchMaps(false);
+        }
       });
     }
 
     // Dropdown filters
-    if (linkageSelect) {
-      linkageSelect.addEventListener('change', function () {
-        state.linkage = this.value;
-        state.page = 1;
-        fetchMaps(true);
-      });
-    }
+    [linkageSelect, hasLociSelect, sourceSelect, panelSelect].forEach(function (sel) {
+      if (sel) {
+        sel.addEventListener('change', function () {
+          syncAdvancedBadge();
+          state.linkage = linkageSelect ? linkageSelect.value : '0';
+          state.has_loci = hasLociSelect ? parseInt(hasLociSelect.value, 10) || 0 : 0;
+          state.source = sourceSelect ? sourceSelect.value : '0';
+          state.panel = panelSelect ? panelSelect.value : '0';
+          state.page = 1;
+          fetchMaps(true);
+        });
+      }
+    });
 
-    if (hasLociCheckbox) {
-      hasLociCheckbox.addEventListener('change', function () {
-        state.has_loci = this.checked ? 1 : 0;
-        state.page = 1;
-        fetchMaps(true);
+    if (locusInput) {
+      locusInput.addEventListener('input', function () {
+        syncAdvancedBadge();
       });
     }
 
@@ -629,14 +780,19 @@
     // Advanced search reset button
     if (advResetBtn) {
       advResetBtn.addEventListener('click', function () {
+        if (linkageSelect) linkageSelect.value = '0';
+        if (hasLociSelect) hasLociSelect.value = '0';
         if (locusInput) locusInput.value = '';
         if (sourceSelect) sourceSelect.value = '0';
         if (panelSelect) panelSelect.value = '0';
+        syncAdvancedBadge();
+        state.linkage = '0';
+        state.has_loci = 0;
         state.locus = '';
         state.source = '0';
         state.panel = '0';
         state.page = 1;
-        fetchMaps(true);
+        if (state.searched) { fetchMaps(true); }
       });
     }
 
@@ -654,10 +810,11 @@
         if (queryInput) queryInput.value = '';
         if (locusInput) locusInput.value = '';
         if (linkageSelect) linkageSelect.value = '0';
+        if (hasLociSelect) hasLociSelect.value = '0';
         if (sourceSelect) sourceSelect.value = '0';
         if (panelSelect) panelSelect.value = '0';
-        if (hasLociCheckbox) hasLociCheckbox.checked = false;
         if (sortSelect) sortSelect.value = 'relevance';
+        syncAdvancedBadge();
         updateClearBtn();
         fetchMaps(true);
       });
@@ -684,7 +841,7 @@
     }
 
     // View toggle buttons
-    var viewBtns = document.querySelectorAll('.map-view-btn');
+    var viewBtns = document.querySelectorAll('.map-view-btn, .mgdb-view-btn');
     viewBtns.forEach(function (btn) {
       btn.addEventListener('click', function () {
         var view = this.getAttribute('data-view');
@@ -702,7 +859,10 @@
     exampleBtns.forEach(function (btn) {
       btn.addEventListener('click', function () {
         var term = this.getAttribute('data-map-example') || '';
-        if (queryInput) queryInput.value = term;
+        if (queryInput) {
+          queryInput.value = term;
+          queryInput.dispatchEvent(new Event('input'));
+        }
         state.term = term;
         state.page = 1;
         updateClearBtn();

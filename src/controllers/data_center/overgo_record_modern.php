@@ -132,7 +132,7 @@ function overgoRecordNotFound($DBConn, $system, $requested) {
   $other = overgoOtherMarker($DBConn, $requested);
   $matches = overgoSuggestions($DBConn, $requested);
   $summary = 'No MaizeGDB overgo matches ' . $display
-           . '. Search the Overgo Data Center, or follow one of the suggested records.';
+           . '. Search the Overgo Data Hub, or follow one of the suggested records.';
 
   /* The size of the collection, cached: the count filters 1.4M probe rows and
      changes when markers are loaded rather than per request. */

@@ -225,16 +225,53 @@ function geneModelRow($row) {
 
 function geneLocusRow($row) {
     $id = isset($row['locus_id']) ? (int) $row['locus_id'] : 0;
+    $current = geneStr(isset($row['current_model']) ? $row['current_model'] : '');
     return array(
-        'kind'        => 'locus',
-        'locus_id'    => $id,
-        'locus_name'  => geneStr(isset($row['locus_name']) ? $row['locus_name'] : ''),
-        'full_name'   => geneStr(isset($row['locus_full_name']) ? $row['locus_full_name'] : ''),
-        'models'      => isset($row['models']) ? (int) $row['models'] : 0,
-        'annotations' => isset($row['annotations']) ? (int) $row['annotations'] : 0,
-        'example'     => geneStr(isset($row['example_model']) ? $row['example_model'] : ''),
-        'url'         => '/data_center/locus?id=' . $id
+        'kind'          => 'locus',
+        'locus_id'      => $id,
+        'locus_name'    => geneStr(isset($row['locus_name']) ? $row['locus_name'] : ''),
+        'full_name'     => geneStr(isset($row['locus_full_name']) ? $row['locus_full_name'] : ''),
+        'models'        => isset($row['models']) ? (int) $row['models'] : 0,
+        'annotations'   => isset($row['annotations']) ? (int) $row['annotations'] : 0,
+        'current_model' => $current,
+        'current_line'  => geneStr(isset($row['current_line']) ? $row['current_line'] : ''),
+        'current_url'   => $current === '' ? '' : '/gene_center/gene/' . rawurlencode($current),
+        'url'           => '/data_center/locus?id=' . $id
     );
+}
+
+/* Which of a locus's gene models to put in front of a reader.
+
+   A locus can carry a gene model in any of the 38 current annotations, and the
+   one worth showing is the one in the assembly most people work in. Carson's
+   order, 2026-09-11: the most current B73 model; failing that W22, Mo17, PH207,
+   then any NAM founder. mab31 has only a PH207 model, rf3 only a Ky21 one and
+   tps35 only a Mo18W one, and each of those is the answer for its locus.
+
+   The ranks are read from the data rather than from a list of line names that
+   would go stale:
+
+     is_reference_gene_model  marks exactly one annotation, Zm00001eb.1, the
+                              current B73 reference set
+     line                     names the inbred
+     assembly_version         carries -REFERENCE-NAM- for the 25 NAM founders
+
+   Within B73 the tie is broken by version descending, which is the annotations'
+   own order: Zm00001d.2, then 5b+, then 5b. Everything else has one current
+   annotation per line, so the line name orders the rest and the gene model name
+   settles anything left. */
+function geneCurrentModelOrder($alias = 'gm') {
+    return "
+        CASE WHEN $alias.is_reference_gene_model = 'yes'                 THEN 1
+             WHEN $alias.line = 'B73'                                    THEN 2
+             WHEN $alias.line = 'W22'                                    THEN 3
+             WHEN $alias.line = 'Mo17'                                   THEN 4
+             WHEN $alias.line = 'PH207'                                  THEN 5
+             WHEN $alias.assembly_version LIKE '%-REFERENCE-NAM-%'       THEN 6
+             ELSE 7 END,
+        CASE WHEN $alias.line = 'B73' THEN $alias.version END DESC NULLS LAST,
+        $alias.line,
+        $alias.gene_name";
 }
 
 /* The columns every gene model result needs. Selected explicitly so the scan
@@ -420,11 +457,13 @@ function geneLociByIds($DBConn, $ids, $parsed, $limit) {
     $ph = implode(',', array_fill(0, count($ids), '?'));
     $core = $parsed['core'];
 
+    $pick = geneCurrentModelOrder('gm');
     $sql = "
         SELECT gm.locus_id, gm.locus_name, gm.locus_full_name,
                count(DISTINCT gm.gene_name) AS models,
                count(DISTINCT gm.version)   AS annotations,
-               min(gm.gene_name)            AS example_model
+               (array_agg(gm.gene_name ORDER BY $pick))[1] AS current_model,
+               (array_agg(gm.line      ORDER BY $pick))[1] AS current_line
         FROM chado.gene_model gm
         WHERE gm.locus_id IN ($ph)
           AND gm.analysis_is_current = 'yes'

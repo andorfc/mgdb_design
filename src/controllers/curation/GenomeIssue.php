@@ -69,8 +69,6 @@ logMessage("in GenomeIssue.php ACTION=" . ACTION);
 
 
 function showEditForm($mgdb) {
-  global $username;
-    
   $gene_model = getCGIParam('gene_model_id', 'PG', false);
   $gene_model_version = getCGIParam('gene_model_version', 'PG', false);
   
@@ -122,10 +120,19 @@ function showEditForm($mgdb) {
     $tmpl->get('genome-location-section')->unmute();
   }
   
-  // Set community annotator's name and e-mail
-  $user_info = get_user_info($DBConn, $username);
-  $tmpl->get('cur_name')->replace($user_info['name']);
-  $tmpl->get('cur_email')->replace($user_info['email']);
+  /* The reporter's name and e-mail start empty (2026-09-10).
+     These two fields used to be pre-filled from the logged-in curator's
+     account -- get_user_info($DBConn, $username) against annotation_author.
+     This form has always been public (it is in $public_pages in
+     controllers/curation.php and submits through a Jira collector), so the
+     prefill only ever fired for the small number of visitors who happened to be
+     logged in; with community curation retired there is no login and no
+     $username, and the lookup could only ever have returned the empty strings
+     it falls back to. Removing it drops a per-render query against a retired
+     table. The reader types their own name and e-mail, as every anonymous
+     visitor already did. */
+  $tmpl->get('cur_name')->replace('');
+  $tmpl->get('cur_email')->replace('');
 }//showEditForm()
 
 

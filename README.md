@@ -29,6 +29,7 @@ ADMIN_DEPENDENCIES.md          Changes that need an administrator
 tools/admin_index.py           Rebuilds that file's index. Only the index
 backups/<timestamp>/           Automatic pre-deploy snapshot of every server file
 deploy/manifest.txt            local path -> webroot destination mapping
+deploy/check_bau.py            Pre-deploy Bauplan block-balance check
 ```
 
 ## Icons
@@ -170,6 +171,23 @@ Deploys every mapping in `deploy/manifest.txt`. Pass a single local path to
 deploy just that file. Each run first copies the current server version of every
 target into `backups/<timestamp>/`, so a rollback is always available.
 
+Every `.bau` in the deploy set is checked for balanced Bauplan blocks first, and
+nothing is copied if any of them fails. Bauplan treats `*( $( @( &( #(` as block
+opens and **any** `)` as a close -- including one inside an `<!-- -->` comment,
+which its tokenizer does not recognise as a comment. A single stray paren closes
+the outermost block, and the page then serves a one-line parse error with status
+**200**, so status-code monitoring cannot see it. That took `/gene_center/gene`
+down for a day on 2026-09-10, from an edit that changed nothing but a comment.
+
+Bauplan's own error names the *last* `)` in the file, not the offending one;
+`deploy/check_bau.py` names the line that closes the template early. It reads
+201 templates in about 0.1 s. Run it by hand on anything, and set
+`SKIP_BAU_CHECK=1` to deploy past it.
+
+```bash
+deploy/check_bau.py src/templates/static/mgdb_gene.bau
+```
+
 ```bash
 ./deploy/deploy.sh src/css/mgdb-modern.css
 ```
@@ -183,6 +201,33 @@ scp backups/<timestamp>/css/mgdb-modern.css development-server:<webroot>/css/mgd
 To roll back the shell entirely, restore `lib/Bauplan.php` from the earliest
 backup directory. Because the modernized shell is opt-in, restoring it only
 affects pages that call `modern()`.
+
+## JSON API documentation and linked data
+
+`/api` is the documentation page for the JSON API (a browser gets the page,
+a script gets the version list as JSON; `/api/docs` is the page for anyone).
+It is rendered by `src/include/api/v1/docs.php` from the record registry in
+`src/controllers/api.php` -- `api_record_registry()` -- which also feeds the
+service index at `/api/v1/` and the OpenAPI document. Adding a record type
+means one entry there plus a file under `include/api/v1/records/`; the page,
+the index and the OpenAPI pick it up together. The code samples are written in
+PHP rather than in the template because they carry the instance's base URL and
+because Bauplan parses parentheses in a `.bau`.
+
+Every record is also served as JSON-LD: `?format=jsonld` on any record URL, or
+`Accept: application/ld+json`. The mapping is `src/include/api/v1/lib/mgdb_jsonld.php`,
+one function per record type, built from the API envelope and never retyped.
+Every modern record page embeds the identity form of the same document in its
+head (`MgdbJsonLd::headMarkup()`), with `<link rel="alternate">` to the JSON,
+`<link rel="describedby">` to the JSON-LD, and the same two as an HTTP `Link`
+header (`MgdbJsonLd::signpost()`). The record controllers call both right
+after they write the page's `<meta name="description">`; the description is
+what the head block uses as its `description`, so the two cannot disagree.
+
+Types: schema.org where one exists (Gene, Protein, BioChemEntity, Taxon,
+ScholarlyArticle, DefinedTerm, Dataset, Thing) and the Bioschemas-only
+BioSample under a `bs:` prefix, with `dct:conformsTo` naming the Bioschemas
+profile. The page's Linked data section lists the mapping per type.
 
 ## Replacing a page (standing policy)
 
@@ -2872,9 +2917,11 @@ the whole declaration; it is literal durations now.
 ## The Gene Data Hub on the shell
 
 `/gene_center/gene`, the site's second most requested page and the largest of
-the hubs: nine forms, three figures, 195 KB of markup. Tabs: Search, Sequence
-and region, Gene model lists, Downloads, Nomenclature, About, References,
-Metrics, Related resources. Files:
+the hubs: nine forms, three figures, 195 KB of markup. Tabs: Search, BLAST,
+Genome regions, Gene model lists, Downloads, Nomenclature, About, References,
+Metrics, Related resources — ten since the sequence and region tools were split
+apart on 2026-09-11, when the BLAST section became the /BLAST form itself
+rather than a smaller form of its own. Files:
 `controllers/gene_center/gene_search_modern.php`,
 `include/gene_hub_lib.php`, `templates/static/mgdb_gene.bau`,
 `css/mgdb-gene.css`, `js/mgdb-gene.js`.
@@ -2952,6 +2999,72 @@ chips call `gene_search_api.php?term=…&limit=100`, the advanced form adds
 visible field group and the form's action between `gene_chr_position.php`,
 `gene_marker_position.php` and `gene_gm_position.php`, and all six tool forms
 still point at their own endpoints.
+
+### Review batch, 2026-09-11
+
+Two sessions of Carson's page-by-page review landed on this page. The parts
+worth knowing again:
+
+**The BLAST section is the /BLAST form, not a copy of it.** The panel used to be
+four fields posting to `search/gene/gene_seq_search.php`, which wrote a
+self-submitting form aimed at the retired popcorn BLAST. It now loads
+`controllers/BLAST/BLAST_form.bau` — the one template `/BLAST` itself loads —
+and calls `blastFormSetup()` from the new `include/blast_form_lib.php`, which
+was factored out of `BLAST_form.php` so both pages configure the form the same
+way. Three facts make that possible and all three were checked, not assumed:
+`runBLAST()` in the untouched `BLAST.js` builds its own form and posts it to
+`/BLAST/BLAST_form.php`, so a search runs identically wherever it starts; every
+rule in `css/mgdb-blast.css` is scoped to `.mgdb-blast-page`, so a **wrapper div
+carrying that class scopes the whole sheet to the form** while the page-level
+rules in it match nothing; and `BLAST.js` makes no jQuery call at load time, so
+its position in the script order does not matter. The page got *smaller* —
+201,999 → 195,684 bytes — because the old panel shipped 340 `<option>` elements
+for its dataset picker and the real form fetches those by Ajax.
+
+`js/mgdb-blast.js` had to stop claiming the section tab bar: its `init()` called
+`MGDB.sectionTabs()` unconditionally, which on this page would be a second
+scrollspy on a bar `js/mgdb-gene.js` already drives. It now requires
+`main.mgdb-blast-page` — the page, not the wrapper.
+
+**"Download all data for a list of gene models" was rebuilt.** It was not slow,
+it was built wrong four times over: `download_all.php` ran a Perl job through
+`shell_exec` *without* backgrounding it so the POST blocked for the whole job;
+`search/download/checkQuery.php` sleeps five seconds inside every poll; the file
+was delivered by clicking a synthetic `<a download target="_blank">` that a
+popup blocker refuses silently; and the query read `chado.all_gene_model_data`,
+a 995 MB materialized view with **no indexes**. `search/gene/gene_download_all.php`
+replaces all of it with two bound queries against the tables that view is built
+from — `chado.gene_model` and `perm_tables.id_ontology`, both index-served — and
+answers with `Content-Disposition`. Three gene models went from minutes to
+**0.2 s**, two thousand to **0.5 s**. Its output also fixes two defects the old
+one had: a header naming seventeen columns over rows carrying sixteen, and GO
+names that all read `nucleus:nucleus`.
+
+**The locus results table names one gene model per locus** — the most current
+B73 model, else W22, Mo17, PH207, then a NAM founder, which is Carson's order.
+The ranks are read from the data (`is_reference_gene_model` marks Zm00001eb.1;
+`assembly_version LIKE '%-REFERENCE-NAM-%'` marks the 25 founders) rather than
+from a list of line names that would go stale, and two `array_agg(… ORDER BY …)`
+columns on the existing GROUP BY cost 1 ms. The MaizeGDB ID column went with it.
+
+**Layout.** "Sequence and region" split into BLAST and Genome regions. The four
+tool cards went from two columns to one full-width card each, laid out
+horizontally inside — the list box on the left, what to do with it on the right
+— which took them from 778px tall to 601–652px. The advanced search panel was a
+card inside a card, and its 1px border plus 16px of padding put every control in
+it 17px right of the search box above; it is a rule across the form now.
+Headline counts round past a million (`geneHubCount()`), so 1,714,604 reads as
+"1.7 million".
+
+**External-link arrows are written against the href**, the way
+`.mgdb-resource-list` already does it in `css/mgdb-modern.css`: 57 external links
+on the page, 16 were marked, and a two-rule pattern marked the other 41 without
+touching the markup. `[href*=".maizegdb.org"]` covers every subdomain, relative
+links never match `^http`, and three things opt out — the Related resources
+cards (they mark themselves and would show two), the embedded BLAST form, and
+buttons. Watch for a literal `↗` in link text: the reference cards carry theirs
+that way, so an audit of `::after` alone reports them as unmarked.
+
 
 ## The Data Hub directory
 
@@ -7829,9 +7942,13 @@ On the redesign and verified on the development instance:
 | Genomes | `/genomes_modern/` |
 | Coming soon | `/coming_soon` |
 
-`REDESIGN_STATUS.md` counts the rest. As of the last run, 40 of the 268 URLs the
-site exposes are on the design system, and every one of them was re-checked over
-HTTP on the development instance on 2026-08-17.
+`REDESIGN_STATUS.md` counts the rest, and it is the authority rather than this
+list — it is generated by `tools/redesign_status.py`, which probes every URL
+over HTTP on the development instance. As of the run on 2026-09-11, **151 of
+the 328 URLs the site exposes are on the design system (64.3%)**, with 92
+retired, 69 legacy pages nothing modern links to any more, and **seven still
+waiting to be converted** — `/login`, `/logout`, `/forgot_password`, `/blast`
+and three curation routes.
 
 Foundations complete: the shared design system, the opt-in modern document
 shell, the responsive global chrome and mega menu, the blue page ground, and a

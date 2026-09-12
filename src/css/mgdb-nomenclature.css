@@ -97,9 +97,10 @@
    So one band, not three. The shell steps to 113px below 1170px assuming a
    wrap; the old middle band here repeated that step for 768-950 and parked
    every section 48px below the bar. Both selectors carry it, because the
-   nested standard's 23 `a[name]` anchors are how this page navigates. */
+   nested standard's 23 jump targets are how this page navigates. */
 @media (max-width: 1170px) {
-  .mgdb-modern .nomenclature-standard-content a[name] { scroll-margin-top: var(--mgdb-tab-offset, 65px); }
+  .mgdb-modern .nomenclature-standard-content b[id],
+  .mgdb-modern .nomenclature-standard-content h2[id] { scroll-margin-top: var(--mgdb-tab-offset, 65px); }
 }
 
 .mgdb-nomenclature-page > section[id] { margin-bottom: var(--mgdb-space-5); }
@@ -234,14 +235,27 @@
 .mgdb-modern .nomenclature-standard-content h2 { margin: 1.7rem 0 0.75rem; color: var(--mgdb-green-dark); font-size: 1.35rem; }
 .mgdb-modern .nomenclature-standard-content hr { height: 1px; margin: 2rem 0; border: 0; background: var(--mgdb-line); }
 .mgdb-modern .nomenclature-standard-content a { color: var(--mgdb-burgundy); font-weight: 650; text-underline-offset: 0.14em; }
-/* The 23 anchors inside the nested standard are what the whole page navigates
-   by, and they now have a sticky tab bar to clear. At the old 1rem they landed
-   41px behind it -- measured -- which was correct while the jump nav above was
-   an ordinary block and wrong the moment it became sticky. Same ladder as the
-   sections. */
-.mgdb-modern .nomenclature-standard-content a[name] { scroll-margin-top: var(--mgdb-tab-offset, 65px); }
-.mgdb-modern .nomenclature-standard-content a[name] + b,
-.mgdb-modern .nomenclature-standard-content a[name] + b > b {
+/* The 23 jump targets inside the nested standard are what the whole page
+   navigates by, and they have a sticky tab bar to clear. At the old 1rem they
+   landed 41px behind it -- measured -- which was correct while the jump nav
+   above was an ordinary block and wrong the moment it became sticky. Same
+   ladder as the sections.
+
+   These were `<a NAME="X"></a>` immediately before the heading they labelled,
+   and this file reached them as `a[name]` and styled the heading through the
+   sibling combinator `a[name] + b`. The ids now sit ON the heading (2026-09-09,
+   `name` on `<a>` is obsolete in HTML5 and the empty anchors were dead weight),
+   so both selectors move onto the element itself: `b[id]` picks out exactly the
+   22 `<b>` the sibling selector used to reach, and `h2[id]` is the Index, which
+   needs the offset but takes its own heading styling above.
+
+   If the anchors are ever restored, restore these selectors with them -- the
+   heading colour on this page is NOT decoration, it is what makes the standard's
+   section titles read as titles. */
+.mgdb-modern .nomenclature-standard-content b[id],
+.mgdb-modern .nomenclature-standard-content h2[id] { scroll-margin-top: var(--mgdb-tab-offset, 65px); }
+.mgdb-modern .nomenclature-standard-content b[id],
+.mgdb-modern .nomenclature-standard-content b[id] > b {
   color: var(--mgdb-green-dark);
   font-size: 1.08rem;
   letter-spacing: 0.01em;

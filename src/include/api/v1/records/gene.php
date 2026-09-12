@@ -1268,7 +1268,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
           'doi' => $doi,
           'pub_type' => MgdbApi::text($row['pub_type']) ?: 'Journal article',
           'relevance' => MgdbApi::text($row['relevance']),
-          'abstract' => MgdbApi::text($row['abstract']),
+          'abstract' => MgdbApi::prose($row['abstract']),
           'html' => '/data_center/reference?id=' . MgdbApi::int($row['ref_id'])
         );
       }

@@ -224,11 +224,14 @@ function getDataCenterHubCenters() {
             'category' => 'genomes-variation',
             'category_label' => 'Genomes & variation',
             'icon' => 'SNP',
-            'name' => 'SNPs and traits',
-            'description' => 'Access large-scale maize SNP resources, diversity panels, trait associations, and analysis tools for genomic variation.',
-            'best_for' => 'Population variation and trait-linked SNPs',
+            /* Named for what the hub itself says it holds -- its own heading is
+               "Explore maize SNPs, indels & genetic diversity". "SNPs and traits"
+               described a scope the page had moved on from. */
+            'name' => 'SNPs and Indels',
+            'description' => 'Access large-scale maize SNP and indel resources, diversity panels, resequencing projects, and analysis tools for genomic variation.',
+            'best_for' => 'Population variation and sequence variants',
             'url' => '/genetic_variation',
-            'search' => 'snps traits gwas genomic variation accessions diversity association'
+            'search' => 'snps indels traits gwas genomic variation accessions diversity association resequencing'
         ),
         array(
             'category' => 'genomes-variation',

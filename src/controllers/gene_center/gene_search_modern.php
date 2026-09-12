@@ -37,6 +37,9 @@ include_once('./include/gene_center_lib.php');
 include_once('./include/dashboard_cache.php');
 include_once('./include/references_lib.php');
 include_once('./include/gene_hub_lib.php');
+/* The BLAST search form, carried whole in the "Sequence and region" section
+   rather than reimplemented as a smaller form of its own. */
+include_once('./include/blast_form_lib.php');
 
 $system = getSystemInfo('mgdb.conf');
 logMessage('Starting gene_search_modern.php');
@@ -70,10 +73,20 @@ $bauplan->includeCss('/css/mgdb-megamenu.css');
    `mgdb-hub-page` on <main> opts in. */
 $bauplan->includeCss('/css/mgdb-hub.css?v=' . $v_hub);
 $bauplan->includeCss('/css/mgdb-gene.css?v=' . $v_css);
+/* The BLAST form's own sheet and scripts. Every rule in css/mgdb-blast.css is
+   scoped to .mgdb-blast-page, which the template puts on the wrapper around the
+   form, so nothing in it reaches the rest of this page.
+
+   controllers/BLAST/BLAST.js is the form's engine and is not repo-owned; it is
+   loaded, not copied. It declares functions and binds nothing at load time, so
+   it does not need to follow jQuery -- on /BLAST itself it is loaded first. */
+$bauplan->includeCss('/css/mgdb-blast.css?v=' . (int) @filemtime($doc_root . '/css/mgdb-blast.css'));
 $bauplan->includeScript('/js/lib/plotly/plotly-2.25.2.min.js');
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
 $bauplan->includeScript('/js/mgdb-gene.js?v=' . $v_js);
+$bauplan->includeScript('/js/mgdb-blast.js?v=' . (int) @filemtime($doc_root . '/js/mgdb-blast.js'));
+$bauplan->includeScript('/controllers/BLAST/BLAST.js');
 $bauplan->head('<meta name="description" content="Search maize genes and gene models by name, identifier, sequence or genome position. Translate identifiers between annotations, download gene model sets, and report gene model problems.">');
 
 $mgdb = $bauplan->template()->load('templates/maizegdb-main-modern.bau');
@@ -82,6 +95,12 @@ $mgdb->get('image-dir')->replace($system['image_url']);
 $mgdb->get('server-url')->replace($system['root_url']);
 
 $content = $mgdb->get('body')->load('templates/static/mgdb_gene.bau');
+
+/* The BLAST form, from the same template /BLAST loads and configured by the
+   same function. A search started here posts to /BLAST/BLAST_form.php like any
+   other, because runBLAST() in BLAST.js builds its own form to do it. */
+$blast_form = $content->get('blast-form')->load('controllers/BLAST/BLAST_form.bau');
+blastFormSetup($blast_form, $DBConn, $system);
 
 /* ---------------------------------------------------------------------------
    Cached page data
@@ -101,13 +120,27 @@ $page = dashboardCache($system,
 
 $totals = $page['totals'];
 
-$content->get('built_date')->replace($page['built']);
 $content->get('reference_annotation')->replace($page['reference']);
-$content->get('total_gene_models')->replace(number_format($totals['gene_models']));
-$content->get('total_annotations')->replace(number_format($totals['annotations']));
-$content->get('total_lines')->replace(number_format($totals['lines']));
-$content->get('reference_models')->replace(number_format($totals['reference_models']));
-$content->get('curated_loci')->replace(number_format($page['curated_loci']));
+/* Headline counts are rounded past a million, on Carson's call: 1,714,604 reads
+   as "1.7 million", because no reader of a hero sentence or a metric tile is
+   counting the last four digits, and the exact figure is still in the chart's
+   own data table below. Anything under a million keeps every digit -- 44,303
+   gene models is a number someone might actually use. */
+function geneHubCount($n) {
+    $n = (int) $n;
+    if ($n < 1000000) { return number_format($n); }
+    $millions = $n / 1000000;
+    /* One decimal, except where that decimal would be a zero -- "2 million",
+       not "2.0 million". */
+    $rounded = round($millions, 1);
+    return ($rounded == (int) $rounded ? number_format((int) $rounded) : number_format($rounded, 1)) . ' million';
+}
+
+$content->get('total_gene_models')->replace(geneHubCount($totals['gene_models']));
+$content->get('total_annotations')->replace(geneHubCount($totals['annotations']));
+$content->get('total_lines')->replace(geneHubCount($totals['lines']));
+$content->get('reference_models')->replace(geneHubCount($totals['reference_models']));
+$content->get('curated_loci')->replace(geneHubCount($page['curated_loci']));
 
 /* ---------------------------------------------------------------------------
    Form option lists
@@ -117,7 +150,9 @@ $content->get('annotation_options')->replace($page['annotation_options']);
 $content->get('assembly_options')->replace($page['assembly_options']);
 $content->get('position_options')->replace($page['position_options']);
 $content->get('model_type_options')->replace($page['model_type_options']);
-$content->get('blast_options')->replace($page['blast_options']);
+
+/* The ceiling gene_download_all.php enforces, said once in both places. */
+$content->get('downloadall_limit')->replace(number_format(2000));
 
 /* product_options, phenotype_options and trait_options are deliberately not
    rendered here. Together they are 2,810 <option> elements and 170 KB of
@@ -188,10 +223,14 @@ $chr_labels = array_keys($per_chr);
 $most = $chr_labels ? $chr_labels[0] : '';
 $fewest = $chr_labels ? $chr_labels[count($chr_labels) - 1] : '';
 
+/* The heading above this chart is "B73 gene models", which does not say which
+   B73 annotation, and the page carries four of them. The note names the set
+   before it says anything about it. */
 $content->get('chromosome_note')->replace(
-    number_format($placed) . ' of the ' . number_format($placed + $unplaced) . ' '
+    'The chart counts the ' . number_format($placed + $unplaced) . ' gene models of '
     . htmlspecialchars($page['reference'], ENT_QUOTES, 'UTF-8')
-    . ' gene models are placed on a chromosome and ' . number_format($unplaced)
+    . ', the current B73 reference annotation. ' . number_format($placed)
+    . ' are placed on a chromosome and ' . number_format($unplaced)
     . ' are on unplaced scaffolds. '
     . ($chr_labels
         ? htmlspecialchars($most, ENT_QUOTES, 'UTF-8') . ' carries the most at '

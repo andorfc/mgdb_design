@@ -196,3 +196,96 @@
   }
   .mgdb-assembly-record-page .ar-actions .mgdb-button { flex: 1 1 auto; text-align: center; }
 }
+
+/* --------------------------------------------------------------------------
+   The restored metadata, 2026-09-09
+
+   The old page's four sections carried sub-headings inside two of them --
+   "Stock information" and "Biosample information" under Stock and Biosample,
+   "Assembly statistics" under Sequencing and Assembly. They sit in the same
+   grid as the rows, so they span both of its columns rather than being a
+   heading in the label column.
+   -------------------------------------------------------------------------- */
+
+.mgdb-assembly-record-page .ar-subhead {
+  margin-top: var(--mgdb-space-5);
+  padding-top: var(--mgdb-space-3);
+  border-top: 2px solid var(--mgdb-line);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+}
+
+/* The first sub-heading opens its section, so it needs neither the rule above
+   it nor the space; and the row after any sub-heading must not draw its own
+   top border straight under one. */
+.mgdb-assembly-record-page .ar-subhead:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+.mgdb-assembly-record-page .ar-subhead + .ar-row { border-top: 0; }
+
+/* The contig/scaffold definitions the old page printed above the statistics.
+   No label, so the value spans the whole grid. */
+.mgdb-assembly-record-page .ar-row-note {
+  grid-template-columns: minmax(0, 1fr);
+  border-top: 0;
+}
+
+.mgdb-assembly-record-page .ar-row-note p {
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+}
+
+/* Each statistic carried its own one-line definition under it. */
+.mgdb-assembly-record-page .ar-gloss {
+  margin: var(--mgdb-space-1) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-style: italic;
+  line-height: var(--mgdb-leading-snug);
+}
+
+/* "Replaced by version" and "Withdrawn" were red on the old page. Red on the
+   label alone, not a whole banner: they are one fact in a list of facts. */
+.mgdb-assembly-record-page .ar-alert { color: var(--mgdb-status-error); }
+
+.mgdb-assembly-record-page .ar-identifier,
+.mgdb-assembly-record-page .ar-nomenclature {
+  margin: var(--mgdb-space-2) 0 0;
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-assembly-record-page .ar-identifier code {
+  padding: 1px 6px;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-green-soft);
+  font-family: var(--mgdb-font-mono);
+}
+
+.mgdb-assembly-record-page .ar-nomenclature { color: var(--mgdb-muted); }
+
+/* The reference's title and authors run as prose; the places it can be read
+   follow on their own line so they are not mistaken for more authors. */
+.mgdb-assembly-record-page .ar-ref-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-2);
+}
+
+/* One gene model set is one list of rows, so consecutive sets need a rule
+   between them or they read as a single record. */
+.mgdb-assembly-record-page .ar-annot + .ar-annot {
+  margin-top: var(--mgdb-space-5);
+  padding-top: var(--mgdb-space-4);
+  border-top: 2px solid var(--mgdb-line);
+}
+
+@media (max-width: 640px) {
+  .mgdb-assembly-record-page .ar-row { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}

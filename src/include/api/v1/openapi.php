@@ -27,7 +27,70 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
     )
   );
 
-  MgdbApi::sendDocument(array(
+  /* The nine record types below were added to the API after this document was
+     first written and never described in it: a client reading the OpenAPI saw
+     eight of seventeen. Their entries are generated from the registry in
+     controllers/api.php -- the same list the service index and the /api page
+     read -- so the three cannot disagree again. The eight hand-written
+     entries keep their fuller descriptions. */
+  $paths_hand_written = array('reference', 'gene_product', 'marker', 'pan_gene', 'phenotype',
+                              'variation', 'stock', 'gene');
+  $generated_paths = array();
+  foreach (api_record_registry() as $entry) {
+    if (in_array($entry['type'], $paths_hand_written, true)) { continue; }
+    $generated_paths['/records/' . $entry['type'] . '/{id}'] = array(
+      'get' => array(
+        'tags' => array('records'),
+        'summary' => 'One ' . strtolower($entry['label']) . ' record, fully assembled',
+        'description' => $entry['description'] . "\n\nAccepts: " . implode('; ', $entry['identifiers']) . '.'
+                       . ($entry['notes'] !== null ? "\n\n" . $entry['notes'] : ''),
+        'operationId' => 'get' . str_replace(' ', '', ucwords(str_replace('_', ' ', $entry['type']))),
+        'parameters' => array(
+          array(
+            'name' => 'id', 'in' => 'path', 'required' => true,
+            'description' => implode('; ', $entry['identifiers']) . '.',
+            'schema' => array('type' => 'string', 'maxLength' => 200),
+            'examples' => array('example' => array('value' => $entry['example']))
+          ),
+          array(
+            'name' => 'fields', 'in' => 'query', 'required' => false,
+            'description' => 'Comma-separated sections: ' . implode(', ', $entry['sections']) . '.',
+            'schema' => array('type' => 'string')
+          ),
+          array(
+            'name' => 'max_items', 'in' => 'query', 'required' => false,
+            'description' => 'Maximum embedded items per list, from 1 to 5000.',
+            'schema' => array('type' => 'integer', 'minimum' => 1, 'maximum' => 5000)
+          )
+        ),
+        'responses' => array(
+          '200' => array(
+            'description' => 'The complete ' . strtolower($entry['label']) . ' record.',
+            'content' => array('application/json' => array(
+              'schema' => array('$ref' => '#/components/schemas/Envelope')
+            ))
+          ),
+          '304' => array('description' => 'Unchanged since the supplied ETag.'),
+          '400' => array('description' => 'Malformed identifier, or an unknown value in fields.',
+                         'content' => array('application/problem+json' => array(
+                           'schema' => array('$ref' => '#/components/schemas/Problem')))),
+          '404' => array('description' => 'No ' . strtolower($entry['label']) . ' matches that identifier.',
+                         'content' => array('application/problem+json' => array(
+                           'schema' => array('$ref' => '#/components/schemas/Problem'))))
+        )
+      )
+    );
+  }
+
+  $format_parameter = array(
+    'name' => 'format', 'in' => 'query', 'required' => false,
+    'description' => 'json (the default) or jsonld. jsonld returns the same record as JSON-LD using '
+                   . 'schema.org and Bioschemas types, served as application/ld+json. Sending '
+                   . 'Accept: application/ld+json does the same.',
+    'schema' => array('type' => 'string', 'enum' => array('json', 'jsonld'))
+  );
+
+  $document = array(
     'openapi' => '3.1.0',
     'info' => array(
       'title' => 'MaizeGDB API',
@@ -44,6 +107,8 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
       'license' => array('name' => 'Public domain (U.S. Government work)')
     ),
     'servers' => array(array('url' => $base . '/api/v1', 'description' => 'This instance')),
+    'externalDocs' => array('description' => 'How to use this API, with examples in curl, Python, R and JavaScript.',
+                            'url' => $base . '/api/docs'),
     'tags' => array(
       array('name' => 'records', 'description' => 'Individual database records.'),
       array('name' => 'service', 'description' => 'Service description and schema.')
@@ -608,5 +673,23 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
         )
       )
     )
-  ), 86400);
+  );
+
+  $document['paths'] = array_merge($document['paths'], $generated_paths);
+
+  /* Every record path takes format and can answer as JSON-LD. Applied here so
+     the eight hand-written entries and the nine generated ones agree. */
+  foreach ($document['paths'] as $path => &$item) {
+    if (strpos($path, '/records/') !== 0) { continue; }
+    $item['get']['parameters'][] = $format_parameter;
+    if (isset($item['get']['responses']['200']['content'])) {
+      $item['get']['responses']['200']['content']['application/ld+json'] = array(
+        'schema' => array('type' => 'object',
+                          'description' => 'The record as JSON-LD. See ' . $base . '/api/docs#api-linked-data.')
+      );
+    }
+  }
+  unset($item);
+
+  MgdbApi::sendDocument($document, 86400);
 ?>

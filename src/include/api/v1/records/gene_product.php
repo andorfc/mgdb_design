@@ -183,15 +183,15 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
        ) rel) AS related_products,
       (SELECT COUNT(*) FROM mgdb.probe_gene_product pg
          INNER JOIN mgdb.id_num i ON i.id = pg.id AND i.curation_lvl = 0
-       WHERE pg.gene_product = :c16) AS probes,
+       WHERE pg.gene_product = :c15) AS probes,
       (SELECT COUNT(*) FROM mgdb.id_reference ir
          INNER JOIN mgdb.id_num i ON i.id = ir.reference AND i.curation_lvl = 0
-       WHERE ir.id = :c17) AS references_count",
+       WHERE ir.id = :c16) AS references_count",
     1, array(
       'c1' => $id, 'c2' => $id, 'c3' => $id, 'c4' => $id, 'c5' => $id, 'c6' => $id,
       'c7' => $id, 'c8' => $id, 'uni1' => $UNIPROT_NAME, 'c9' => $id, 'uni2' => $UNIPROT_NAME,
       'c10' => $id, 'c11' => $id, 'c12' => $id, 'c13' => $id, 'c14' => $id,
-      'c15' => $id, 'c16' => $id, 'c17' => $id
+      'c15' => $id, 'c16' => $id
     )));
   MgdbApi::countQuery();
 
@@ -215,7 +215,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   if (isset($want['overview'])) {
     $overview = array(
       'type' => MgdbApi::ref('term', $record['type_id'], $record['type_name']),
-      'type_description' => MgdbApi::text($record['type_description']),
+      'type_description' => MgdbApi::prose($record['type_description']),
       'species' => MgdbApi::ref('species', $record['species_id'], $record['species_name']),
       'holoenzyme_substructure' => MgdbApi::text($record['holoenzyme_substruct']),
       'description' => MgdbApi::text($record['comments']),
@@ -675,7 +675,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
         'doi' => $doi,
         'pub_type' => MgdbApi::text($row['pub_type']) ?: 'Journal article',
         'relevance' => MgdbApi::text($row['contents']),
-        'abstract' => MgdbApi::text($row['abstract']),
+        'abstract' => MgdbApi::prose($row['abstract']),
         'html' => '/data_center/reference?id=' . (int) $row['id']
       );
     }

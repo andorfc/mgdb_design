@@ -46,6 +46,16 @@ TAB_LABELS = {
     "about": "About",
 }
 
+# Sections whose order is meaningful, so gen_sitemap.py leaves them as written.
+# Everything else is emitted alphabetically by name -- sorting happens at
+# generation time rather than here so that the entries below can stay grouped
+# with the comments explaining them.
+#   start   - a deliberate path in for a new reader, easiest first.
+#   genomes - reference before browsers before projects; alphabetical would
+#             open on "A history of maize genome assemblies".
+# FEATURED is never sorted; it is ordered by prominence.
+UNSORTED_SECTIONS = {"start", "genomes"}
+
 # No section carries a blurb any more. The field is still honoured by the
 # generator -- a non-empty string emits a <p class="sitemap-section-blurb"> --
 # so one can come back without touching gen_sitemap.py or the CSS.
@@ -93,7 +103,7 @@ SECTIONS = [
         ("Pangenome graph", "https://pangenome-viewer.maizegdb.org/", "Structural and sequence variation across Zea genomes."),
         ("Pan-genome pathway explorer", "/projects/pathway_explorer", "E2P2 metabolic pathway annotation across the 26 NAM founder genomes, with gap analysis and gene-list enrichment."),
         ("Pathway Association Study Tool (PAST)", "/past", "Assigns SNPs to genes and genes to metabolic pathways."),
-        ("PedigreeNet", "/breeders_toolbox", "Pedigree relationships between maize varieties, drawn as a network."),
+        ("Pedigree Viewer", "/breeders_toolbox", "Pedigree relationships between maize varieties, drawn as a network."),
         ("Phylostrata", "https://phylostrata.maizegdb.org", "Phylostratigraphy: evolutionary conservation level of a protein."),
         ("Protein structures", "/data_center/protein_structure", "Predicted structures for gene model proteins, with Foldseek and FATCAT."),
         ("qTeller", "https://qteller.maizegdb.org", "Comparative RNA-seq expression across multiple data sources."),
@@ -118,19 +128,19 @@ SECTIONS = [
     # from the link text. /14InbredsFISH and /B73Mo17FISH now serve the same
     # page with two tabs, so they are one entry.
     ("genomes", "curated", "Genomic data", "", [
-        ("Genome Center", "/genome", "Search and filter every assembly hosted here by cultivar, species, accession, or status."),
-        ("Genome browsers", "/genomebrowser", "Which browser serves which assembly, plus prepared synteny and structural-variant sessions."),
-        ("JBrowse 2", "https://jbrowse.maizegdb.org", "Current browser: B73 v5 and most assemblies here, with multi-assembly synteny views."),
+        ("Genome Center", "/genome", "All genomic data sets hosted by MaizeGDB."),
+        ("Genome browsers", "/genomebrowser", "The full list of genome browsers."),
+        ("JBrowse 2", "https://jbrowse.maizegdb.org", "Newest browser, which includes multi-assembly synteny views."),
         ("GBrowse", "/gbrowse", "Older browser, still serving B73 v1-v4 and other retired assemblies."),
-        ("B73 assembly center", "/assembly", "The B73 reference across v1 to v5: sequencing technology, gene model sets, chromosome accessions, and downloads."),
+        ("B73 assembly center", "/assembly", "Information about the maize representative genome, B73."),
         ("B73 assembly history", "/historic", "What changed between B73 releases, including gene model migrations and coordinate transitions from RefGen_v1 to NAM-5.0."),
         ("B73 sequencing project", "/sequencing_project", "Historic record of the BAC-by-BAC project that produced the first B73 reference."),
-        ("Reference assembly information", "/assembly_manifesto", "How MaizeGDB chooses the representative maize assembly, and what a group planning a new assembly should know."),
+        ("A history of maize genome assemblies", "/assembly_manifesto", "A timeline of progress and instructions for sharing genomic and functional data with MaizeGDB."),
         ("Whole genome views", "/genome/whole_genome", "Chromosome ideograms, gene density, and repeat distributions for B73 v5 and the 25 NAM founders."),
         ("NAM founder genomes", "/NAM_project", "De novo assemblies, annotations, GRIN accessions, and stock records for the 26 NAM founder inbreds."),
         ("Pan-Andropogoneae genomes", "/PanAnd_project", "Chromosome-scale assemblies across 36 wild Zea, Tripsacum, and Andropogoneae grasses."),
         ("European flint genomes", "/european_flints", "Assemblies and structural variation for four European flint inbreds: DK105, EP1, F7, and PE0075."),
-        ("CAAS founder inbred genomes", "/CAAS_FIL_project", "Assemblies for the 12 Chinese and international founder lines behind modern hybrid breeding."),
+        ("CAAS founder inbred genomes", "/CAAS_FIL_project", "Assemblies for the 12 Chinese and inbred founder lines."),
         # Both of these were missing while their four siblings were listed,
         # found while adding the resource project pages on 2026-09-05.
         ("HiLo elevation genomes", "/HiLo_project", "Assemblies and gene models for Mexican landraces and CIMMYT inbreds sampled from 50 to 2,520 metres."),
@@ -178,6 +188,7 @@ SECTIONS = [
     ]),
 
     ("docs", "community", "Documentation and help", "", [
+        ("API documentation", "/api", "How to read any MaizeGDB record as JSON or JSON-LD, with examples in curl, Python, R and JavaScript."),
         # "Project documentation" pointed at /doc, retired 2026-09-05. Its
         # subject moved to "Research projects" under Community and people;
         # what is left here is documentation of the site itself, which is what
@@ -201,7 +212,7 @@ SECTIONS = [
         ("Cytogenetic Map of Maize project", "/projects/cytogenetic_map", "Probe nomenclature and FISH methods for the sorghum-BAC probes used to map maize markers cytogenetically."),
         ("Dooner and Du Ds-GFP insertions", "/projects/dooner_du_acds", "The sequence-indexed Ds-GFP collection: how it was made, where to search it, and what to expect from the seed."),
         ("Ds-GFP insertion verification", "/projects/fowler_insertion_validation", "PCR verification, male transmission rates and genotyping primers for 83 Ds-GFP lines."),
-        ("Coordinate definitions", "/coordinateDef", "How map coordinates are defined here."),
+        ("Map coordinate definitions", "/coordinateDef", "How map coordinates are defined here."),
         ("FAIR practices", "/FAIRpractices", "FAIR and AI-readiness at MaizeGDB."),
         ("Redesign status", "/redesign_status", "Which pages have moved to the current design."),
         # /doc was this file's only route. It is real, current documentation of
@@ -211,7 +222,7 @@ SECTIONS = [
 
     ("download", "curated", "Downloads", "", [
         ("Download server", "https://download.maizegdb.org", "Assemblies, annotations, insertions, expression, and more."),
-        ("Downloads page", "/download", "Guided index of what is downloadable, including Globus transfer."),
+        ("Downloads data hub", "/download", "Guided index of what is downloadable, including Globus transfer."),
         ("Maize Feature Store", "https://mfs.maizegdb.org/", "Assembled feature tables for modeling."),
     ]),
 
@@ -267,6 +278,9 @@ DATA_CENTERS = [
      "The curated maize literature, searchable by topic, author, gene, or locus."),
     ("Alleles and polymorphisms", "/data_center/variation",
      "Alleles, polymorphisms, and the mutant collections behind them."),
+    ("SNPs and Indels", "/genetic_variation",
+     "Sequence variants across diversity panels, resequencing projects, and the"
+     " builds on B73 RefGen_v5."),
     ("Maps", "/data_center/map",
      "Genetic, cytogenetic, physical, and bin maps across chromosomes 1-10."),
     ("Linkage groups", "/data_center/lg",
@@ -285,9 +299,10 @@ DATA_CENTERS = [
     ("Gene Center", "/gene_center/gene",
      "Gene records with models, symbols, and supporting evidence."),
     ("Loci", "/data_center/locus", "Classic genetic loci, cloned genes, and their alleles."),
-    ("QTL", "/data_center/qtl", "Quantitative trait analyses and the crosses behind them."),
     ("Expression", "/data_center/expression", "Expression datasets."),
     ("Gene products", "/data_center/gene_product", "Products assigned to gene models."),
     ("Metabolic pathways", "/data_center/metabolic_pathway", "Pathway records."),
     ("Cytogenetics", "/data_center/cytogenetic", "Cytogenetic stocks and maps."),
+    ("Downloads data hub", "/download",
+     "Guided index of what is downloadable, including Globus transfer."),
 ]

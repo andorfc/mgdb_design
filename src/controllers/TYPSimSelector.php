@@ -99,7 +99,6 @@
       );
   }
   $body->get('total-pairs')->replace($typ_total_pairs);
-  $body->get('data_date')->replace(date('F j, Y'));
 
   include_once('translation.php');
   $mgdb->get('blast_url')->replace($system['BLAST_URL']);

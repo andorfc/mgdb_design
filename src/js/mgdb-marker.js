@@ -21,6 +21,8 @@
     filter: '',
     searched: false,
     sort: 'relevance',
+    sortKey: 'name',
+    sortDir: 'asc',
     view: 'table',
     currentData: null,
     loading: false
@@ -186,6 +188,85 @@
     }
   }
 
+  /* ── Sorting ────────────────────────────────────────────────────────────── */
+
+  function getMarkerHeaderAriaSort(colKey) {
+    if (state.sortKey === colKey) {
+      return state.sortDir === 'desc' ? 'descending' : 'ascending';
+    }
+    return 'none';
+  }
+
+  function sortMarkerResults(results) {
+    if (!results || !results.length) return [];
+    var key = state.sortKey || 'name';
+    var dir = state.sortDir === 'desc' ? -1 : 1;
+
+    return results.slice().sort(function (a, b) {
+      if (key === 'type') {
+        var aType = (a.type_name || '').trim().toLowerCase();
+        var bType = (b.type_name || '').trim().toLowerCase();
+        if (aType && !bType) return -1 * dir;
+        if (!aType && bType) return 1 * dir;
+        var cmpType = aType.localeCompare(bType, undefined, { numeric: true });
+        if (cmpType !== 0) return cmpType * dir;
+      } else if (key === 'bin') {
+        var aBin = String(a.bin !== null && a.bin !== undefined ? a.bin : '').trim();
+        var bBin = String(b.bin !== null && b.bin !== undefined ? b.bin : '').trim();
+        if (aBin && !bBin) return -1 * dir;
+        if (!aBin && bBin) return 1 * dir;
+        var cmpBin = aBin.localeCompare(bBin, undefined, { numeric: true, sensitivity: 'base' });
+        if (cmpBin !== 0) return cmpBin * dir;
+      } else if (key === 'loci') {
+        var aLoci = (a.loci || '').trim().toLowerCase();
+        var bLoci = (b.loci || '').trim().toLowerCase();
+        if (aLoci && !bLoci) return -1 * dir;
+        if (!aLoci && bLoci) return 1 * dir;
+        var cmpLoci = aLoci.localeCompare(bLoci, undefined, { numeric: true });
+        if (cmpLoci !== 0) return cmpLoci * dir;
+      } else if (key === 'synonyms') {
+        var aSyn = (a.synonyms || '').trim().toLowerCase();
+        var bSyn = (b.synonyms || '').trim().toLowerCase();
+        if (aSyn && !bSyn) return -1 * dir;
+        if (!aSyn && bSyn) return 1 * dir;
+        var cmpSyn = aSyn.localeCompare(bSyn, undefined, { numeric: true });
+        if (cmpSyn !== 0) return cmpSyn * dir;
+      }
+      var aName = (a.name || '').trim().toLowerCase();
+      var bName = (b.name || '').trim().toLowerCase();
+      return aName.localeCompare(bName, undefined, { numeric: true }) * dir;
+    });
+  }
+
+  function updateSortHeaders() {
+    var headers = document.querySelectorAll('#marker-results-table thead th[aria-sort]');
+    Array.prototype.forEach.call(headers, function (th) {
+      var btn = th.querySelector('button[data-sort-key]');
+      if (!btn) return;
+      var key = btn.getAttribute('data-sort-key');
+      th.setAttribute('aria-sort', getMarkerHeaderAriaSort(key));
+    });
+  }
+
+  function initSortButtons() {
+    var buttons = document.querySelectorAll('#marker-results-table thead button[data-sort-key]');
+    Array.prototype.forEach.call(buttons, function (btn) {
+      btn.addEventListener('click', function () {
+        var key = btn.getAttribute('data-sort-key');
+        if (state.sortKey === key) {
+          state.sortDir = (state.sortDir === 'asc') ? 'desc' : 'asc';
+        } else {
+          state.sortKey = key;
+          state.sortDir = 'asc';
+        }
+        updateSortHeaders();
+        if (state.currentData) {
+          renderResults(state.currentData);
+        }
+      });
+    });
+  }
+
   /* ── Search Fetcher ─────────────────────────────────────────────────────── */
 
   function executeSearch(scrollToResults) {
@@ -197,7 +278,6 @@
     state.searched = true;
 
     var status = byId('marker-results-status');
-    var container = byId('marker-results');
     var empty = byId('marker-empty');
     var pagination = byId('marker-pagination');
 
@@ -215,6 +295,7 @@
 
     updateUrlParams();
     updateExportLinks();
+    syncAdvancedBadge();
 
     fetch(API_URL + '?' + params.toString())
       .then(function (res) { return res.json(); })
@@ -230,10 +311,9 @@
         renderResults(data);
         renderPagination(data.summary.page, data.summary.page_count);
 
-        if (scrollToResults && container) {
-          var target = byId('marker-results-section');
-          if (target && typeof target.scrollIntoView === 'function') {
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (scrollToResults && section) {
+          if (typeof section.scrollIntoView === 'function') {
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
         }
       })
@@ -246,13 +326,18 @@
   /* ── Render Results (Card or Table) ─────────────────────────────────────── */
 
   function renderResults(data) {
-    var container = byId('marker-results');
+    var tableView = byId('marker-table-view');
+    var cardsView = byId('marker-cards-view');
+    var tableBody = byId('marker-results-body');
     var empty = byId('marker-empty');
     var status = byId('marker-results-status');
     var summary = data.summary;
 
     if (!summary.total || summary.total === 0) {
-      if (container) container.innerHTML = '';
+      if (tableBody) tableBody.innerHTML = '';
+      if (cardsView) cardsView.innerHTML = '';
+      if (tableView) tableView.hidden = true;
+      if (cardsView) cardsView.hidden = true;
       if (empty) empty.hidden = false;
       if (status) {
         var qText = data.query.term ? ' for “' + esc(data.query.term) + '”' : '';
@@ -281,13 +366,11 @@
       }
     }
 
-    if (!container) return;
+    var sorted = sortMarkerResults(data.results || []);
 
-    if (state.view === 'table') {
-      renderTableView(container, data.results);
-    } else {
-      renderCardView(container, data.results);
-    }
+    renderTableView(tableBody, sorted);
+    renderCardView(cardsView, sorted);
+    updateViewDisplay();
 
     /* Every path that repaints the results comes through here -- a new page, a
        view toggle, a re-render after the filter is cleared -- so re-applying the
@@ -298,7 +381,7 @@
   }
 
   function renderCardView(container, results) {
-    container.className = 'marker-results-container marker-view-card';
+    if (!container) return;
     container.innerHTML = results.map(function (row) {
       var name = row.name || 'Untitled marker';
       var recordUrl = '/data_center/marker?id=' + encodeURIComponent(row.id);
@@ -336,9 +419,9 @@
     }).join('');
   }
 
-  function renderTableView(container, results) {
-    container.className = 'marker-results-container marker-view-table';
-    var rows = results.map(function (row) {
+  function renderTableView(body, results) {
+    if (!body) return;
+    body.innerHTML = results.map(function (row) {
       var name = row.name || 'Untitled marker';
       var recordUrl = '/data_center/marker?id=' + encodeURIComponent(row.id);
       var binDisplay = row.bin ? '<span class="marker-bin-badge">' + esc(row.bin) + '</span>' : '—';
@@ -354,20 +437,26 @@
         + '  <td><button class="marker-copy-btn" type="button" data-copy-value="' + esc(name) + '">Copy</button></td>'
         + '</tr>';
     }).join('');
+  }
 
-    container.innerHTML = '<table class="marker-table">'
-      + '  <thead>'
-      + '    <tr>'
-      + '      <th>Marker Name</th>'
-      + '      <th>Type</th>'
-      + '      <th>Bin Position</th>'
-      + '      <th>Linked Loci</th>'
-      + '      <th>Synonyms</th>'
-      + '      <th>Action</th>'
-      + '    </tr>'
-      + '  </thead>'
-      + '  <tbody>' + rows + '</tbody>'
-      + '</table>';
+  function updateViewDisplay() {
+    var isTable = (state.view === 'table');
+    var tableView = byId('marker-table-view');
+    var cardsView = byId('marker-cards-view');
+    var viewCardsBtn = byId('marker-view-cards');
+    var viewTableBtn = byId('marker-view-table');
+
+    if (tableView) tableView.hidden = !isTable;
+    if (cardsView) cardsView.hidden = isTable;
+
+    if (viewCardsBtn) {
+      viewCardsBtn.classList.toggle('is-active', !isTable);
+      viewCardsBtn.setAttribute('aria-pressed', !isTable ? 'true' : 'false');
+    }
+    if (viewTableBtn) {
+      viewTableBtn.classList.toggle('is-active', isTable);
+      viewTableBtn.setAttribute('aria-pressed', isTable ? 'true' : 'false');
+    }
   }
 
   /* ── Pagination ─────────────────────────────────────────────────────────── */
@@ -376,39 +465,69 @@
      search pages server side, so this filters what is on screen and the status
      line says so. */
   function applyResultsFilter() {
-    var container = byId('marker-results');
-    if (!container) { return { shown: 0, total: 0 }; }
+    var tableBody = byId('marker-results-body');
+    var cardsContainer = byId('marker-cards-view');
 
-    var items = container.querySelectorAll('.marker-result-card, tbody tr');
+    var tableRows = tableBody ? tableBody.querySelectorAll('tr') : [];
+    var cards = cardsContainer ? cardsContainer.querySelectorAll('.marker-result-card') : [];
     var terms = state.filter.toLowerCase().split(/\s+/).filter(Boolean);
     var shown = 0;
 
-    Array.prototype.forEach.call(items, function (item) {
-      var match = true;
-      if (terms.length) {
-        var hay = (item.textContent || '').toLowerCase();
-        for (var i = 0; i < terms.length; i++) {
-          if (hay.indexOf(terms[i]) === -1) { match = false; break; }
+    function checkItem(el) {
+      if (!terms.length) {
+        el.hidden = false;
+        return true;
+      }
+      var hay = (el.textContent || '').toLowerCase();
+      for (var i = 0; i < terms.length; i++) {
+        if (hay.indexOf(terms[i]) === -1) {
+          el.hidden = true;
+          return false;
         }
       }
-      item.hidden = !match;
-      if (match) { shown++; }
+      el.hidden = false;
+      return true;
+    }
+
+    Array.prototype.forEach.call(tableRows, function (row) {
+      if (checkItem(row)) shown++;
     });
+    Array.prototype.forEach.call(cards, function (card) {
+      checkItem(card);
+    });
+
+    var filterCount = byId('marker-filter-count');
+    if (filterCount) {
+      filterCount.textContent = terms.length ? shown + ' match' + (shown === 1 ? '' : 'es') : '';
+    }
 
     if (terms.length) {
       var status = byId('marker-results-status');
       var total = state.currentData && state.currentData.summary ? state.currentData.summary.total : 0;
+      var totalItems = tableRows.length;
       if (status) {
         status.textContent = shown === 0
           ? 'Nothing on this page matches the filter “' + state.filter + '”. '
             + number(total) + ' markers matched the search.'
-          : 'Showing ' + number(shown) + ' of the ' + number(items.length)
+          : 'Showing ' + number(shown) + ' of the ' + number(totalItems)
             + ' markers on this page matching “' + state.filter + '”, out of '
             + number(total) + ' matched by the search.';
       }
     }
 
-    return { shown: shown, total: items.length };
+    return { shown: shown, total: tableRows.length };
+  }
+
+  function syncAdvancedBadge() {
+    var countEl = byId('marker-advanced-count');
+    if (!countEl) return;
+    var count = 0;
+    var typeSelect = byId('marker-type');
+    var binInput = byId('marker-bin');
+    if (typeSelect && typeSelect.value && typeSelect.value !== '0') count++;
+    if (binInput && binInput.value && binInput.value.trim() !== '') count++;
+    countEl.textContent = count ? count + ' active' : '';
+    countEl.hidden = !count;
   }
 
   function initResultControls() {
@@ -425,9 +544,6 @@
     if (filterInput) {
       filterInput.addEventListener('input', function () {
         state.filter = this.value.trim();
-        if (state.filter === '' && state.currentData) {
-          renderResults(state.currentData);
-        }
         applyResultsFilter();
       });
     }
@@ -437,8 +553,23 @@
       binInput.value = state.bin || '';
       binInput.addEventListener('change', function () {
         state.bin = this.value.trim();
+        syncAdvancedBadge();
         state.page = 1;
         if (state.searched) { executeSearch(false); }
+      });
+    }
+
+    var advSubmit = byId('marker-adv-submit');
+    if (advSubmit) {
+      advSubmit.addEventListener('click', function (e) {
+        e.preventDefault();
+        var typeSelect = byId('marker-type');
+        var binField = byId('marker-bin');
+        state.type = typeSelect ? (parseInt(typeSelect.value, 10) || 0) : 0;
+        state.bin = binField ? binField.value.trim() : '';
+        syncAdvancedBadge();
+        state.page = 1;
+        executeSearch(true);
       });
     }
 
@@ -450,6 +581,7 @@
         if (binInput) { binInput.value = ''; }
         state.type = 0;
         state.bin = '';
+        syncAdvancedBadge();
         state.page = 1;
         if (state.searched) { executeSearch(false); }
       });
@@ -558,6 +690,7 @@
         state.type = typeSelect ? (parseInt(typeSelect.value, 10) || 0) : 0;
         var binField = byId('marker-bin');
         state.bin = binField ? binField.value.trim() : '';
+        syncAdvancedBadge();
         state.page = 1;
         executeSearch(true);
       });
@@ -566,6 +699,7 @@
     if (typeSelect) {
       typeSelect.addEventListener('change', function () {
         state.type = parseInt(typeSelect.value, 10) || 0;
+        syncAdvancedBadge();
         state.page = 1;
         executeSearch(true);
       });
@@ -580,6 +714,9 @@
         }
         state.term = ex;
         state.page = 1;
+        state.filter = '';
+        var filterField = byId('marker-results-filter');
+        if (filterField) { filterField.value = ''; }
         executeSearch(true);
       });
     });
@@ -589,8 +726,15 @@
       emptyReset.addEventListener('click', function () {
         if (input) { input.value = ''; if (clearBtn) clearBtn.hidden = true; }
         if (typeSelect) typeSelect.value = '0';
+        var binField = byId('marker-bin');
+        if (binField) binField.value = '';
+        var filterField = byId('marker-results-filter');
+        if (filterField) filterField.value = '';
         state.term = '';
         state.type = 0;
+        state.bin = '';
+        state.filter = '';
+        syncAdvancedBadge();
         state.page = 1;
         executeSearch(false);
       });
@@ -598,7 +742,7 @@
   }
 
   function initViewToggle() {
-    var buttons = document.querySelectorAll('.marker-view-btn[data-view]');
+    var buttons = document.querySelectorAll('.marker-view-btn[data-view], .mgdb-view-btn[data-view]');
     if (!buttons.length) return;
 
     var savedView = 'table';
@@ -607,13 +751,8 @@
 
     function applyView(view) {
       state.view = view;
-      Array.prototype.forEach.call(buttons, function (btn) {
-        btn.setAttribute('aria-pressed', btn.getAttribute('data-view') === view ? 'true' : 'false');
-      });
       try { localStorage.setItem(STORAGE_VIEW_KEY, view); } catch (e) {}
-      if (state.currentData) {
-        renderResults(state.currentData);
-      }
+      updateViewDisplay();
       updateUrlParams();
     }
 
@@ -782,7 +921,9 @@
     buildTabs();
     initForm();
     initViewToggle();
+    initSortButtons();
     initResultControls();
+    syncAdvancedBadge();
     initFigure();
     updateExportLinks();
 

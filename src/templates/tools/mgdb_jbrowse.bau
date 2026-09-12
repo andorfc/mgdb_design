@@ -1,0 +1,28 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-jbrowse
+<main class="mgdb-page mgdb-browser-embed-page mgdb-jbrowse-page" id="mgdb-jbrowse-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/genomebrowser">Genome browsers</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">JBrowse</span>
+  </nav>
+
+  <div class="mgdb-browser-bar">
+    <div class="mgdb-browser-bar-heading">
+      <h1>JBrowse</h1>
+      <span class="mgdb-browser-source">Assembly <code>$(source)</code></span>
+    </div>
+    <a class="mgdb-button mgdb-button-primary" href="$(browser-url)" target="_blank" rel="noopener">Open in full screen</a>
+  </div>
+
+  <div class="mgdb-browser-frame" data-browser-frame>
+    <div class="mgdb-browser-loading" data-browser-loading>
+      <span class="mgdb-browser-spinner" aria-hidden="true"></span>
+      <span>Loading the genome browser&hellip;</span>
+    </div>
+    <iframe class="mgdb-browser-iframe" title="JBrowse genome browser" src="$(browser-url)"
+            data-browser-iframe allow="fullscreen"
+            referrerpolicy="no-referrer-when-downgrade"></iframe>
+  </div>
+
+</main>
+)

@@ -252,80 +252,507 @@
 
   /* ------------------------------------------------------------------------
      Search: the query field, the example buttons, and the advanced filters
-     all drive the assembly collection. Query and species are mirrored into
-     the URL so a filtered list can be shared.
+     all drive the assembly collection. Results are presented in dual table/cards
+     view with live in-result filtering, pagination, and TSV export.
      ------------------------------------------------------------------------ */
 
   function buildSearch() {
-    var host = byId('genome-assembly-collection');
-    if (!host) { return; }
+    var collectionHost = byId('genome-assembly-collection');
+    var tableBody = byId('genome-table-body');
+    if (!collectionHost || !tableBody) { return; }
 
     var input = byId('genome-query');
-    var statusSel = byId('genome-filter-status');
+    var clearBtn = byId('genome-query-clear');
+    var form = byId('genome-search-form');
     var qualitySel = byId('genome-filter-quality');
+    var groupSel = byId('genome-filter-group');
+    var advSortSel = byId('genome-adv-sort');
+    var advCount = byId('genome-advanced-count');
+    var resetBtn = byId('genome-reset');
     var chips = document.querySelectorAll('.genome-species-filters .mgdb-chip[data-filter]');
+
+    var resultsSection = byId('genome-results-section');
+    var resultsStatus = byId('genome-results-status');
+    var resultsFilter = byId('genome-results-filter');
+    var filterCount = byId('genome-filter-count');
+    var pageSizeSel = byId('genome-page-size');
+    var exportTsvBtn = byId('genome-export-tsv');
+    var viewCardsBtn = byId('genome-view-cards');
+    var viewTableBtn = byId('genome-view-table');
+    var tableView = byId('genome-table-view');
+    var cardsView = byId('genome-cards-view');
+    var pagination = byId('genome-pagination');
     var empty = byId('genome-empty');
-    var advancedCount = byId('genome-advanced-count');
-    var filters = { group: 'all', status: 'all', quality: 'all' };
+    var emptyReset = byId('genome-empty-reset');
+
+    // Parse initial rows from table DOM
+    var allRows = Array.prototype.map.call(tableBody.querySelectorAll('tr'), function (tr, index) {
+      var cells = tr.children;
+      var aEl = cells[0] ? cells[0].querySelector('a') : null;
+      var assembly = aEl ? plainText(aEl.textContent) : plainText(cells[0] ? cells[0].textContent : '');
+      var assemblyHref = aEl ? aEl.getAttribute('href') : '';
+      var assemblyHtml = cells[0] ? cells[0].innerHTML : '';
+      var cultivar = cells[1] ? plainText(cells[1].textContent) : '';
+      var speciesHtml = cells[2] ? cells[2].innerHTML : '';
+      var species = cells[2] ? plainText(cells[2].textContent) : '';
+      var qualityHtml = cells[3] ? cells[3].innerHTML : '';
+      var quality = cells[3] ? plainText(cells[3].textContent) : '';
+      var accessionHtml = cells[4] ? cells[4].innerHTML : '';
+      var accession = cells[4] ? plainText(cells[4].textContent) : '';
+      /* The Status column was dropped 2026-09-10 -- it read "Current" on every
+         one of the 160 rows. See controllers/genome/genome_center_modern.php. */
+      var groupAttr = tr.getAttribute('data-group') || '';
+      var qualityAttr = tr.getAttribute('data-quality') || '';
+      var search = (tr.getAttribute('data-search') || (assembly + ' ' + cultivar + ' ' + species + ' ' + accession + ' ' + quality)).toLowerCase();
+
+      var qualityRank = 4;
+      if (qualityAttr === 'Representative') { qualityRank = 1; }
+      else if (qualityAttr === 'Reference') { qualityRank = 2; }
+      else if (qualityAttr === 'Draft') { qualityRank = 3; }
+
+      return {
+        index: index,
+        assembly: assembly,
+        assemblyHtml: assemblyHtml,
+        assemblyHref: assemblyHref,
+        cultivar: cultivar,
+        species: species,
+        speciesHtml: speciesHtml,
+        quality: quality,
+        qualityHtml: qualityHtml,
+        qualityRank: qualityRank,
+        accession: accession,
+        accessionHtml: accessionHtml,
+        groupAttr: groupAttr,
+        qualityAttr: qualityAttr,
+        search: search
+      };
+    });
+
+    var state = {
+      q: '',
+      group: 'all',
+      quality: 'all',
+      advSort: 'default',
+      resultsFilter: '',
+      pageSize: 25,
+      page: 1,
+      view: 'table',
+      sortKey: null,
+      sortDir: 'ascending'
+    };
 
     var params = new URLSearchParams(window.location.search);
-    if (params.get('q')) { input.value = params.get('q'); }
-    if (params.get('taxon')) { filters.group = params.get('taxon'); }
+    if (params.get('q')) { state.q = params.get('q'); if (input) { input.value = state.q; } }
+    if (params.get('taxon')) { state.group = params.get('taxon'); if (groupSel) { groupSel.value = state.group; } }
+    if (params.get('quality') && qualitySel) { state.quality = params.get('quality'); qualitySel.value = state.quality; }
+    if (params.get('sort') && advSortSel) { state.advSort = params.get('sort'); advSortSel.value = state.advSort; }
+    if (params.get('view') && (params.get('view') === 'cards' || params.get('view') === 'table')) { state.view = params.get('view'); }
 
     function syncUrl() {
       var next = new URLSearchParams(window.location.search);
-      if (input.value.trim()) { next.set('q', input.value.trim()); } else { next.delete('q'); }
-      if (filters.group !== 'all') { next.set('taxon', filters.group); } else { next.delete('taxon'); }
-      var query = next.toString();
-      window.history.replaceState(null, '', window.location.pathname + (query ? '?' + query : '') + window.location.hash);
+      if (state.q) { next.set('q', state.q); } else { next.delete('q'); }
+      if (state.group !== 'all') { next.set('taxon', state.group); } else { next.delete('taxon'); }
+      next.delete('status');   // the Status filter was removed 2026-09-10
+      if (state.quality !== 'all') { next.set('quality', state.quality); } else { next.delete('quality'); }
+      if (state.advSort !== 'default') { next.set('sort', state.advSort); } else { next.delete('sort'); }
+      if (state.view !== 'table') { next.set('view', state.view); } else { next.delete('view'); }
+      var qStr = next.toString();
+      window.history.replaceState(null, '', window.location.pathname + (qStr ? '?' + qStr : '') + window.location.hash);
     }
 
-    function syncChips() {
+    function syncControls() {
+      if (clearBtn && input) { clearBtn.hidden = !input.value.trim(); }
       Array.prototype.forEach.call(chips, function (chip) {
-        chip.setAttribute('aria-pressed', chip.getAttribute('data-filter') === filters.group ? 'true' : 'false');
+        chip.setAttribute('aria-pressed', chip.getAttribute('data-filter') === state.group ? 'true' : 'false');
       });
-      var active = (filters.group !== 'all') + (filters.status !== 'all') + (filters.quality !== 'all');
-      advancedCount.textContent = active ? active + ' active' : '';
-      advancedCount.hidden = !active;
+      if (groupSel) { groupSel.value = state.group; }
+      if (qualitySel) { qualitySel.value = state.quality; }
+      if (advSortSel) { advSortSel.value = state.advSort; }
+
+      var activeAdv = (state.group !== 'all' ? 1 : 0) +
+                      (state.quality !== 'all' ? 1 : 0) +
+                      (state.advSort !== 'default' ? 1 : 0);
+      if (advCount) {
+        advCount.textContent = activeAdv ? activeAdv + ' active' : '';
+        advCount.hidden = !activeAdv;
+      }
     }
 
-    var collection = collectionFromTable(host, {
-      noFilter: true,
-      predicate: function (item) {
-        if (filters.group !== 'all' && item.data.group !== filters.group) { return false; }
-        if (filters.status !== 'all' && item.data.status !== filters.status) { return false; }
-        if (filters.quality !== 'all' && item.data.quality !== filters.quality) { return false; }
-        return true;
-      },
-      onCount: function (shown) { empty.hidden = shown !== 0; host.hidden = shown === 0; }
-    });
-    if (!collection) { return; }
+    function getFiltered() {
+      var rows = allRows.slice();
 
-    function apply() { collection.setQuery(input.value); syncChips(); syncUrl(); }
+      if (state.q) {
+        var qTokens = state.q.toLowerCase().split(/\s+/).filter(Boolean);
+        rows = rows.filter(function (item) {
+          return qTokens.every(function (tok) { return item.search.indexOf(tok) !== -1; });
+        });
+      }
 
-    input.addEventListener('input', debounce(apply, 150));
-    byId('genome-search-form').addEventListener('submit', function (event) { event.preventDefault(); apply(); host.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+      if (state.group !== 'all') {
+        rows = rows.filter(function (item) { return item.groupAttr === state.group; });
+      }
+      if (state.quality !== 'all') {
+        rows = rows.filter(function (item) { return item.qualityAttr === state.quality; });
+      }
+
+      if (state.resultsFilter) {
+        var rfTokens = state.resultsFilter.toLowerCase().split(/\s+/).filter(Boolean);
+        rows = rows.filter(function (item) {
+          return rfTokens.every(function (tok) { return item.search.indexOf(tok) !== -1; });
+        });
+      }
+
+      if (state.sortKey) {
+        var dir = state.sortDir === 'ascending' ? 1 : -1;
+        var key = state.sortKey;
+        rows.sort(function (a, b) {
+          if (key === 'quality') {
+            return ((a.qualityRank - b.qualityRank) || a.assembly.localeCompare(b.assembly)) * dir;
+          }
+          var av = a[key] || '', bv = b[key] || '';
+          return av.localeCompare(bv, undefined, { numeric: true, sensitivity: 'base' }) * dir;
+        });
+      } else {
+        switch (state.advSort) {
+          case 'assembly-desc':
+            rows.sort(function (a, b) { return b.assembly.localeCompare(a.assembly); });
+            break;
+          case 'cultivar-asc':
+            rows.sort(function (a, b) { return a.cultivar.localeCompare(b.cultivar) || a.assembly.localeCompare(b.assembly); });
+            break;
+          case 'cultivar-desc':
+            rows.sort(function (a, b) { return b.cultivar.localeCompare(a.cultivar) || a.assembly.localeCompare(b.assembly); });
+            break;
+          case 'species-asc':
+            rows.sort(function (a, b) { return a.species.localeCompare(b.species) || a.assembly.localeCompare(b.assembly); });
+            break;
+          case 'quality-asc':
+            rows.sort(function (a, b) { return (a.qualityRank - b.qualityRank) || a.assembly.localeCompare(b.assembly); });
+            break;
+          case 'default':
+          default:
+            rows.sort(function (a, b) { return a.index - b.index; });
+            break;
+        }
+      }
+
+      return rows;
+    }
+
+    function renderTableRows(pageRows) {
+      tableBody.innerHTML = pageRows.map(function (item) {
+        return '<tr data-group="' + escape(item.groupAttr) + '" data-quality="' + escape(item.qualityAttr) + '">' +
+          '<th scope="row">' + item.assemblyHtml + '</th>' +
+          '<td>' + escape(item.cultivar) + '</td>' +
+          '<td>' + item.speciesHtml + '</td>' +
+          '<td>' + item.qualityHtml + '</td>' +
+          '<td>' + item.accessionHtml + '</td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    function renderCards(pageRows) {
+      if (!cardsView) { return; }
+      cardsView.innerHTML = pageRows.map(function (item) {
+        var badges = [];
+        if (item.qualityAttr !== 'none' && item.qualityHtml) { badges.push(item.qualityHtml); }
+        return '<article class="genome-result-card">' +
+          '<div>' +
+            '<div class="genome-card-header">' +
+              '<h3 class="genome-card-title"><a href="' + escape(item.assemblyHref) + '">' + escape(item.assembly) + '</a></h3>' +
+              '<div class="genome-card-badges">' + badges.join(' ') + '</div>' +
+            '</div>' +
+            '<dl class="genome-card-meta-list">' +
+              '<div><dt>Cultivar</dt><dd>' + escape(item.cultivar || 'Not reported') + '</dd></div>' +
+              '<div><dt>Species</dt><dd>' + (item.speciesHtml || 'Not reported') + '</dd></div>' +
+              '<div><dt>Accession</dt><dd>' + (item.accessionHtml || 'Not reported') + '</dd></div>' +
+              '<div><dt>Quality</dt><dd>' + (item.qualityHtml || 'Not reported') + '</dd></div>' +
+            '</dl>' +
+          '</div>' +
+          '<div class="genome-card-actions">' +
+            '<button class="genome-copy-btn" type="button" data-copy="' + escape(item.assembly) + '">Copy assembly</button>' +
+          '</div>' +
+        '</article>';
+      }).join('');
+
+      Array.prototype.forEach.call(cardsView.querySelectorAll('.genome-copy-btn'), function (btn) {
+        btn.addEventListener('click', function () {
+          var val = btn.getAttribute('data-copy');
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(val).then(function () {
+              var orig = btn.textContent;
+              btn.textContent = 'Copied!';
+              setTimeout(function () { btn.textContent = orig; }, 1500);
+            });
+          }
+        });
+      });
+    }
+
+    function updateSortHeaders() {
+      var table = byId('genome-table');
+      if (!table || !table.tHead) { return; }
+      Array.prototype.forEach.call(table.tHead.querySelectorAll('th'), function (th) {
+        var btn = th.querySelector('button[data-sort-key]');
+        if (!btn) { return; }
+        var key = btn.getAttribute('data-sort-key');
+        if (state.sortKey === key) {
+          th.setAttribute('aria-sort', state.sortDir);
+        } else {
+          th.setAttribute('aria-sort', 'none');
+        }
+      });
+    }
+
+    function render() {
+      syncControls();
+      syncUrl();
+
+      var rows = getFiltered();
+      var total = rows.length;
+
+      if (filterCount) {
+        if (state.resultsFilter) {
+          filterCount.textContent = total + ' match' + (total === 1 ? '' : 'es');
+        } else {
+          filterCount.textContent = '';
+        }
+      }
+
+      if (total === 0) {
+        if (collectionHost) { collectionHost.hidden = true; }
+        if (empty) { empty.hidden = false; }
+        if (resultsStatus) { resultsStatus.textContent = 'No matching assemblies found.'; }
+        if (pagination) { pagination.hidden = true; }
+        return;
+      }
+
+      if (collectionHost) { collectionHost.hidden = false; }
+      if (empty) { empty.hidden = true; }
+
+      var size = state.pageSize === 'all' ? Math.max(total, 1) : Number(state.pageSize);
+      var pages = Math.max(1, Math.ceil(total / size));
+      if (state.page > pages) { state.page = pages; }
+      var start = (state.page - 1) * size;
+      var pageRows = rows.slice(start, start + size);
+
+      var isFiltered = (total !== allRows.length);
+      if (resultsStatus) {
+        var rangeStr = 'Showing ' + (start + 1) + '–' + Math.min(start + size, total) + ' of ' + number(total);
+        if (isFiltered) {
+          resultsStatus.innerHTML = rangeStr + ' matching assemblies <span class="mgdb-muted">(filtered from ' + number(allRows.length) + ' total)</span>';
+        } else {
+          resultsStatus.textContent = rangeStr + ' assemblies';
+        }
+      }
+
+      // Views
+      if (state.view === 'cards') {
+        if (tableView) { tableView.hidden = true; }
+        if (cardsView) { cardsView.hidden = false; }
+        if (viewCardsBtn) { viewCardsBtn.setAttribute('aria-pressed', 'true'); viewCardsBtn.classList.add('is-active'); }
+        if (viewTableBtn) { viewTableBtn.setAttribute('aria-pressed', 'false'); viewTableBtn.classList.remove('is-active'); }
+        renderCards(pageRows);
+      } else {
+        if (tableView) { tableView.hidden = false; }
+        if (cardsView) { cardsView.hidden = true; }
+        if (viewTableBtn) { viewTableBtn.setAttribute('aria-pressed', 'true'); viewTableBtn.classList.add('is-active'); }
+        if (viewCardsBtn) { viewCardsBtn.setAttribute('aria-pressed', 'false'); viewCardsBtn.classList.remove('is-active'); }
+        renderTableRows(pageRows);
+        updateSortHeaders();
+      }
+
+      // Pagination
+      if (pagination) {
+        pagination.innerHTML = paginationHtml(state.page, pages, 'genome-page-btn');
+        pagination.hidden = pages <= 1;
+        Array.prototype.forEach.call(pagination.querySelectorAll('[data-page]'), function (btn) {
+          btn.addEventListener('click', function () {
+            var next = parseInt(btn.getAttribute('data-page'), 10);
+            if (isNaN(next) || next < 1 || next > pages || next === state.page) { return; }
+            state.page = next;
+            render();
+            if (resultsSection) {
+              resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          });
+        });
+      }
+    }
+
+    // Wiring event listeners
+
+    // Hero search input
+    if (input) {
+      input.addEventListener('input', debounce(function () {
+        state.q = input.value.trim();
+        state.page = 1;
+        render();
+      }, 150));
+    }
+
+    // Clear button
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function () {
+        if (input) {
+          input.value = '';
+          input.focus();
+        }
+        state.q = '';
+        state.page = 1;
+        render();
+      });
+    }
+
+    // Form submit
+    if (form) {
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        if (input) { state.q = input.value.trim(); }
+        state.page = 1;
+        render();
+        if (resultsSection) {
+          resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    }
+
+    // Examples
     Array.prototype.forEach.call(document.querySelectorAll('[data-genome-example]'), function (btn) {
-      btn.addEventListener('click', function () { input.value = btn.getAttribute('data-genome-example'); apply(); });
+      btn.addEventListener('click', function () {
+        var ex = btn.getAttribute('data-genome-example') || '';
+        if (input) { input.value = ex; }
+        state.q = ex;
+        state.page = 1;
+        render();
+        if (resultsSection) {
+          resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
     });
-    Array.prototype.forEach.call(chips, function (chip) {
-      chip.addEventListener('click', function () { filters.group = chip.getAttribute('data-filter') || 'all'; apply(); });
-    });
-    statusSel.addEventListener('change', function () { filters.status = statusSel.value; apply(); });
-    qualitySel.addEventListener('change', function () { filters.quality = qualitySel.value; apply(); });
 
-    function reset() {
-      input.value = '';
-      filters = { group: 'all', status: 'all', quality: 'all' };
-      statusSel.value = 'all';
-      qualitySel.value = 'all';
-      apply();
-      input.focus();
+    // Advanced search controls
+    if (qualitySel) {
+      qualitySel.addEventListener('change', function () {
+        state.quality = qualitySel.value;
+        state.page = 1;
+        render();
+      });
     }
-    byId('genome-reset').addEventListener('click', reset);
-    byId('genome-empty-reset').addEventListener('click', reset);
 
-    apply();
+    if (groupSel) {
+      groupSel.addEventListener('change', function () {
+        state.group = groupSel.value;
+        state.page = 1;
+        render();
+      });
+    }
+
+    if (advSortSel) {
+      advSortSel.addEventListener('change', function () {
+        state.advSort = advSortSel.value;
+        state.sortKey = null; // Clear manual table column sort
+        state.page = 1;
+        render();
+      });
+    }
+
+    // Quick filter chips
+    Array.prototype.forEach.call(chips, function (chip) {
+      chip.addEventListener('click', function () {
+        state.group = chip.getAttribute('data-filter') || 'all';
+        state.page = 1;
+        render();
+      });
+    });
+
+    // Reset button
+    function resetAll() {
+      if (input) { input.value = ''; }
+      if (resultsFilter) { resultsFilter.value = ''; }
+      state.q = '';
+      state.group = 'all';
+      state.quality = 'all';
+      state.advSort = 'default';
+      state.resultsFilter = '';
+      state.sortKey = null;
+      state.sortDir = 'ascending';
+      state.page = 1;
+      render();
+      if (input) { input.focus(); }
+    }
+
+    if (resetBtn) { resetBtn.addEventListener('click', resetAll); }
+    if (emptyReset) { emptyReset.addEventListener('click', resetAll); }
+
+    // Results toolbar live filter
+    if (resultsFilter) {
+      resultsFilter.addEventListener('input', debounce(function () {
+        state.resultsFilter = resultsFilter.value.trim();
+        state.page = 1;
+        render();
+      }, 150));
+    }
+
+    // Results shown
+    if (pageSizeSel) {
+      pageSizeSel.addEventListener('change', function () {
+        state.pageSize = pageSizeSel.value;
+        state.page = 1;
+        render();
+      });
+    }
+
+    // View switcher
+    if (viewCardsBtn) {
+      viewCardsBtn.addEventListener('click', function () {
+        state.view = 'cards';
+        render();
+      });
+    }
+
+    if (viewTableBtn) {
+      viewTableBtn.addEventListener('click', function () {
+        state.view = 'table';
+        render();
+      });
+    }
+
+    // Table header sort
+    var table = byId('genome-table');
+    if (table && table.tHead) {
+      Array.prototype.forEach.call(table.tHead.querySelectorAll('button[data-sort-key]'), function (btn) {
+        btn.addEventListener('click', function () {
+          var key = btn.getAttribute('data-sort-key');
+          if (state.sortKey === key) {
+            state.sortDir = state.sortDir === 'ascending' ? 'descending' : 'ascending';
+          } else {
+            state.sortKey = key;
+            state.sortDir = 'ascending';
+          }
+          state.page = 1;
+          render();
+        });
+      });
+    }
+
+    // TSV export
+    if (exportTsvBtn) {
+      exportTsvBtn.addEventListener('click', function () {
+        var rows = getFiltered();
+        var columns = [
+          { label: 'Assembly', get: function (r) { return r.assembly; } },
+          { label: 'Cultivar', get: function (r) { return r.cultivar; } },
+          { label: 'Species', get: function (r) { return r.species; } },
+          { label: 'Quality', get: function (r) { return r.quality; } },
+          { label: 'Accession', get: function (r) { return r.accession; } }
+        ];
+        downloadTsv('maizegdb_genome_assemblies.tsv', columns, rows);
+      });
+    }
+
+    render();
   }
 
   function buildProgress() {
@@ -659,6 +1086,142 @@
     return String(value);
   }
 
+  /* ------------------------------------------------------------------
+     Presentation of the statistics table, so it reads like the assembly
+     table above it (2026-09-10).
+
+     Three things were inconsistent between the two tables:
+
+       1. Headers. This table printed the raw dictionary key --
+          `species_as_stated`, `n_scaffolds`, `gc_pct_of_acgt` -- beside an
+          assembly table whose headers read "Assembly", "Species", "Quality".
+          statsColumnLabel() turns a key into a human label: an override when
+          the generic rule reads badly, otherwise split on underscores with a
+          token map so N50, GC, ACGT, BUSCO and the unit suffixes survive.
+
+       2. Vocabulary. `status` held REFERENCE / REFERENCE_NS / DRAFT, so B73 v5
+          read "Reference" here and "Representative" above. statsQuality() maps
+          it onto the assembly table's words, and the header is labelled
+          "Quality" to match that column's name. REFERENCE_NS folds into
+          Reference, which is what the assembly table already shows for PH207,
+          its only holder.
+
+       3. Species. `species_as_stated` held "Zea mays" with the subspecies in
+          its own column, against "Zea mays ssp. mays" above. statsSpecies()
+          joins the two -- both halves are as-stated, so the combined string is
+          still what the README said.
+
+     The underlying row data is untouched; this is display only, and the
+     dictionary definition still reaches the reader through the cell tooltip.
+     ------------------------------------------------------------------ */
+
+  /* The B73 reference series. These five are the assemblies the assembly table
+     calls Representative: four carry it in genome_information.quality, and v5
+     gets it from the exact-name rule in genome_center_modern.php. The ids here
+     are the statistics file's own (B73_RefGen_v1, underscored), which differ
+     from the database's ("B73 RefGen_v1", spaced). */
+  var STATS_REPRESENTATIVE = {
+    'B73_RefGen_v1': true, 'B73_RefGen_v2': true, 'B73_RefGen_v3': true,
+    'Zm-B73-REFERENCE-GRAMENE-4.0': true, 'Zm-B73-REFERENCE-NAM-5.0': true
+  };
+
+  function statsQuality(row) {
+    if (STATS_REPRESENTATIVE[row.assembly_id]) { return 'Representative'; }
+    var value = row.status;
+    if (value === null || value === undefined || value === '') { return null; }
+    value = String(value);
+    if (value.indexOf('REFERENCE') === 0) { return 'Reference'; }
+    if (value === 'DRAFT') { return 'Draft'; }
+    return value;
+  }
+
+  function statsSpecies(row) {
+    var name = row.species_as_stated;
+    if (name === null || name === undefined || name === '') { return null; }
+    return row.subspecies ? name + ' ssp. ' + row.subspecies : String(name);
+  }
+
+  /* The one value accessor the table, the grid, the detail list, the filters
+     and the CSV all go through, so none of them can drift from the others. */
+  function statsValue(row, column) {
+    if (column === 'status') { return statsQuality(row); }
+    if (column === 'species_as_stated') { return statsSpecies(row); }
+    return row[column];
+  }
+
+  var STATS_LABELS = {
+    assembly_id: 'Assembly',
+    species_as_stated: 'Species',
+    species_code: 'Species code',
+    genotype_label: 'Cultivar',
+    genotype_from_id: 'Cultivar (from ID)',
+    status: 'Quality',
+    n_annotation_versions: 'Annotation versions',
+    annotation_ids: 'Annotation IDs',
+    primary_annotation_id: 'Primary annotation ID',
+    assembly_size_Gb: 'Assembly size (Gb)',
+    gc_pct_of_acgt: 'GC % of ACGT',
+    /* These three are the nucleotide N, not a count -- the generic "n_" rule
+       would render them "Number of bases" and invert the meaning. */
+    n_bases: 'N bases',
+    n_pct_of_total: 'N % of total',
+    gap_min_n: 'Gap minimum N run',
+    other_iupac_bases: 'Other IUPAC bases',
+    pct_chr_anchored: 'Chromosome-anchored %',
+    chr_anchored_bp: 'Chromosome-anchored bp',
+    is_chromosome_scale: 'Chromosome scale',
+    n_unplaced: 'Unplaced sequences',
+    n_scaffolds_ge_1Mb: 'Scaffolds \u2265 1 Mb',
+    n_scaffolds_ge_10Mb: 'Scaffolds \u2265 10 Mb',
+    n_genes_coding: 'Coding genes',
+    n_genes_noncoding: 'Noncoding genes',
+    n_transcripts_coding: 'Coding transcripts',
+    n_genes_on_chromosomes: 'Genes on chromosomes',
+    pct_genes_on_chromosomes: 'Genes on chromosomes %',
+    pct_genome_exonic: 'Genome exonic %',
+    pct_genome_cds: 'Genome CDS %',
+    mono_exonic_transcript_pct: 'Mono-exonic transcript %',
+    mean_protein_length_aa: 'Mean protein length (aa)',
+    compleasm_n_markers: 'Compleasm markers',
+    compleasm_single_n: 'Compleasm single (count)',
+    compleasm_duplicated_n: 'Compleasm duplicated (count)',
+    compleasm_missing_n: 'Compleasm missing (count)',
+    busco_protein_n_markers: 'BUSCO protein markers',
+    bioproject: 'BioProject',
+    biosample: 'BioSample',
+    has_te_gff: 'Has TE GFF',
+    has_interproscan: 'Has InterProScan',
+    md5_status: 'MD5 status',
+    fai_validation: 'faidx validation',
+    dir_prefix: 'Directory prefix',
+    curation_flag: 'Curation flag',
+    genome_file_url: 'Genome file'
+  };
+
+  /* Tokens a plain capitalise would ruin. */
+  var STATS_TOKENS = {
+    id: 'ID', ids: 'IDs', gc: 'GC', at: 'AT', acgt: 'ACGT', iupac: 'IUPAC',
+    busco: 'BUSCO', compleasm: 'Compleasm', bp: 'bp', kb: 'kb', mb: 'Mb',
+    gb: 'Gb', pct: '%', url: 'URL', n50: 'N50', l50: 'L50', n75: 'N75',
+    n90: 'N90', l90: 'L90', aun: 'auN', cds: 'CDS', mrna: 'mRNA', utr: 'UTR',
+    te: 'TE', ltr: 'LTR', rrna: 'rRNA', trna: 'tRNA', ncrna: 'ncRNA'
+  };
+
+  function statsColumnLabel(column) {
+    if (STATS_LABELS[column]) { return STATS_LABELS[column]; }
+    var parts = String(column).split('_');
+    var words = [];
+    parts.forEach(function (part, index) {
+      var key = part.toLowerCase();
+      if (STATS_TOKENS[key]) { words.push(STATS_TOKENS[key]); return; }
+      // A leading "n_" is a count of the thing that follows.
+      if (index === 0 && key === 'n') { words.push('Number of'); return; }
+      words.push(index === 0 ? part.charAt(0).toUpperCase() + part.slice(1) : part);
+    });
+    var label = words.join(' ');
+    return label.replace(/^(\w)/, function (m) { return m.toUpperCase(); });
+  }
+
   function appendNull(cell) {
     cell.appendChild(make('span', 'genome-stats-null', '—'));
   }
@@ -689,7 +1252,7 @@
 
   /* Fills `cell` (a td or a dd) with the value of one column. */
   function fillCell(cell, row, column) {
-    var value = row[column];
+    var value = statsValue(row, column);
     if (column === 'compleasm_complete_pct') {
       completenessCell(cell, row, 'compleasm_');
     } else if (column === 'busco_protein_complete_pct') {
@@ -731,14 +1294,14 @@
     var producer = byId('genome-stats-producer').value;
 
     return state.rows.filter(function (row) {
-      if (species && row.species_as_stated !== species) { return false; }
-      if (status && row.status !== status) { return false; }
+      if (species && statsSpecies(row) !== species) { return false; }
+      if (status && statsQuality(row) !== status) { return false; }
       if (producer && row.producer !== producer) { return false; }
       if (state.filters.chromosome && !(row.is_chromosome_scale === true || row.pct_chr_anchored >= 90)) { return false; }
       if (state.filters.annotation && !(row.n_genes > 0)) { return false; }
       if (state.filters.flag && !row.curation_flag) { return false; }
       if (query) {
-        var haystack = [row.assembly_id, row.genotype_label, row.species_as_stated, row.producer, row.primary_annotation_id, row.annotation_ids]
+        var haystack = [row.assembly_id, row.genotype_label, statsSpecies(row), row.producer, row.primary_annotation_id, row.annotation_ids]
           .filter(function (value) { return value !== null && value !== undefined; }).join(' ').toLowerCase();
         if (haystack.indexOf(query) === -1) { return false; }
       }
@@ -773,9 +1336,9 @@
     cell.appendChild(record);
     var list = make('dl', 'genome-stats-detail-list');
     state.columns.forEach(function (column) {
-      var value = row[column];
+      var value = statsValue(row, column);
       if (column === 'assembly_id' || value === null || value === undefined || value === '') { return; }
-      list.appendChild(make('dt', '', column));
+      list.appendChild(make('dt', '', statsColumnLabel(column)));
       var definition = state.dictionary[column] && state.dictionary[column].definition;
       var valueBox = make('dd');
       valueBox.textContent = formatted(column, value);
@@ -819,7 +1382,7 @@
       th.title = meta.definition || '';
       th.setAttribute('aria-sort', state.sortColumn === column ? (state.sortDirection > 0 ? 'ascending' : 'descending') : 'none');
       th.appendChild(make('span', 'genome-stats-column-group', meta.group || 'Other'));
-      var button = make('button', '', column);
+      var button = make('button', '', statsColumnLabel(column));
       button.type = 'button';
       button.addEventListener('click', function () {
         if (state.sortColumn === column) { state.sortDirection *= -1; }
@@ -868,7 +1431,7 @@
         if (column === 'assembly_id') { return; }
         var item = make('div');
         var meta = state.dictionary[column] || {};
-        var dt = make('dt', '', column);
+        var dt = make('dt', '', statsColumnLabel(column));
         if (meta.definition) { dt.title = meta.definition; }
         item.appendChild(dt);
         item.appendChild(fillCell(make('dd'), row, column));
@@ -962,7 +1525,7 @@
     var seen = {};
     var values = [];
     state.rows.forEach(function (row) {
-      var value = row[column];
+      var value = statsValue(row, column);
       if (value === null || value === undefined || value === '' || seen[value]) { return; }
       seen[value] = true;
       values.push(value);
@@ -983,6 +1546,14 @@
     var host = byId('genome-stats-groups');
     clear(host);
     state.groups.forEach(function (group) {
+      /* Identity is not offered (2026-09-10). assembly_id lives in it and is
+         force-set visible on the line after this handler's loop, so `anyVisible`
+         was permanently true for this group: clicking it hid its columns and
+         clicking it again hid them a second time. The "show all" branch was
+         unreachable, and the button read as a toggle that had stopped working.
+         Its columns keep their default visibility and are still individually
+         controllable everywhere else. */
+      if (group === 'Identity') { return; }
       var button = make('button', 'genome-stats-group', group);
       button.type = 'button';
       button.setAttribute('data-group', group);
@@ -1037,9 +1608,11 @@
 
   function downloadCsv() {
     var columns = state.viewColumns;
-    var lines = [columns.join(',')];
+    /* Export what the reader is looking at: the same headers and the same
+       Representative/Reference/Draft and combined-species values. */
+    var lines = [columns.map(statsColumnLabel).map(csvCell).join(',')];
     state.view.forEach(function (row) {
-      lines.push(columns.map(function (column) { return csvCell(row[column]); }).join(','));
+      lines.push(columns.map(function (column) { return csvCell(statsValue(row, column)); }).join(','));
     });
     var url = window.URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' }));
     var link = document.createElement('a');
@@ -1138,7 +1711,7 @@
     setVisible(state.defaultColumns);
 
     optionList(byId('genome-stats-species'), 'species_as_stated', 'Species');
-    optionList(byId('genome-stats-status-filter'), 'status', 'Status');
+    optionList(byId('genome-stats-status-filter'), 'status', 'Quality');
     optionList(byId('genome-stats-producer'), 'producer', 'Producer');
     buildGroups();
     updateMeta(data.meta || {});

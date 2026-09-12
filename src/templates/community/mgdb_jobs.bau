@@ -1,0 +1,44 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-jobs
+<main class="mgdb-page mgdb-jobs-page" id="jobs-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/maize_history">Community</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Jobs</span>
+  </nav>
+
+  <section class="mgdb-hero-basic" aria-labelledby="jobs-title">
+    <span class="mgdb-hero-basic-icon" aria-hidden="true">
+      <svg viewBox="0 0 84 84" role="presentation" focusable="false">
+        <rect x="14" y="28" width="56" height="38" rx="5" fill="none" stroke="currentColor" stroke-width="5"/>
+        <path d="M32 28v-5a6 6 0 0 1 6-6h8a6 6 0 0 1 6 6v5" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+        <path d="M14 44h56" stroke="#2f5e2a" stroke-width="5"/>
+        <path d="M38 44h8" stroke="#2f5e2a" stroke-width="5" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <div>
+      <h1 id="jobs-title">Jobs in the maize community</h1>
+      <p>Positions of interest to maize geneticists and genomicists, posted by labs and institutions in the community. Openings are listed here until they are filled or expire.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="openings-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="openings-title">Current openings</h2></div>
+      <span class="mgdb-result-count">$(job_count)</span>
+    </div>
+
+    $(openings)
+  </section>
+
+  <section aria-labelledby="post-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="post-title">Post a job</h2></div>
+    </div>
+
+    <p class="jobs-post-intro">Have an opening of interest to the maize community? Submit it for the board. Our curators review each submission before it appears.</p>
+
+    $(post_form)
+  </section>
+
+</main>
+)

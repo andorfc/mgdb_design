@@ -1,0 +1,116 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-login
+<main class="mgdb-page mgdb-login-page" id="mgdb-login-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Curator login</span>
+  </nav>
+
+  <section class="mgdb-hero-basic" aria-labelledby="login-title">
+    <span class="mgdb-hero-basic-icon" aria-hidden="true">
+      <svg viewBox="0 0 84 84" role="presentation" focusable="false">
+        <rect x="18" y="38" width="48" height="34" rx="6" fill="none" stroke="currentColor" stroke-width="5"/>
+        <path d="M28 38V28a14 14 0 0 1 28 0v10" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+        <circle cx="42" cy="53" r="4.5" fill="#2f5e2a"/>
+        <path d="M42 57v7" fill="none" stroke="#2f5e2a" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <div>
+      <h1 id="login-title">Community curator login</h1>
+      <p>Log in to add and edit community annotations on MaizeGDB records. Accounts are held by approved curators.</p>
+    </div>
+  </section>
+
+  @(logged-in {display: off}
+    <section class="mgdb-login-state" aria-labelledby="login-state-title">
+      <h2 id="login-state-title" class="mgdb-visually-hidden">Login status</h2>
+      <div class="mgdb-message mgdb-message-ok">
+        <div>
+          <p><strong>You are logged in as $(login_name).</strong></p>
+          $(login_status)
+        </div>
+      </div>
+      <p class="mgdb-login-actions">
+        <a class="mgdb-button mgdb-button-primary" href="/">Go to the homepage</a>
+        <a class="mgdb-button mgdb-button-quiet" href="/logout">Log out</a>
+      </p>
+    </section>
+  )
+
+  @(logged-out {display: off}
+    <div class="mgdb-prose-layout mgdb-login-layout">
+
+      <section class="mgdb-login-panel" aria-labelledby="login-form-title">
+        <div class="mgdb-section-heading">
+          <div><h2 id="login-form-title">Log in</h2></div>
+        </div>
+
+        @(message {display: off}
+          <div class="mgdb-message mgdb-message-error" role="alert">
+            <div><p>$(message-text)</p></div>
+          </div>
+        )
+
+        @(not-approved {display: off}
+          <div class="mgdb-message mgdb-message-info">
+            <div>
+              <p>Your community-curator registration has not been approved yet. If more
+                 than 24 hours have passed since you registered, use the
+                 <a href="/feedback">feedback form</a> to let the MaizeGDB team know.</p>
+            </div>
+          </div>
+        )
+
+        <form class="mgdb-login-form" method="post" action="$(login-handler)" autocomplete="on">
+          <div class="mgdb-field">
+            <label class="mgdb-label" for="login-username">Username</label>
+            <input class="mgdb-input" type="text" id="login-username" name="username"
+                   maxlength="10" autocomplete="username" autocapitalize="none"
+                   spellcheck="false" required value="$(username)">
+          </div>
+
+          <div class="mgdb-field">
+            <label class="mgdb-label" for="login-password">Password</label>
+            <input class="mgdb-input" type="password" id="login-password" name="password"
+                   maxlength="50" autocomplete="current-password" required>
+          </div>
+
+          <div class="mgdb-field">
+            <label class="mgdb-label" for="login-length">Session length</label>
+            <select class="mgdb-input mgdb-select" id="login-length" name="length">
+              <option value="0">1 year</option>
+              <option value="43200">12 hours</option>
+              <option value="7200">2 hours</option>
+            </select>
+            <p class="mgdb-hint" id="login-length-hint">Choose <strong>1 year</strong> only on your own computer.</p>
+          </div>
+
+          <div class="mgdb-form-actions">
+            <button class="mgdb-button mgdb-button-primary" type="submit">Log in</button>
+          </div>
+        </form>
+      </section>
+
+      <aside class="mgdb-login-rail" aria-labelledby="login-about-title">
+        <div class="mgdb-aside-card">
+          <h2 id="login-about-title">About community annotation</h2>
+          <p>Community annotation lets curators attach notes to specific records &mdash;
+             a gene, a stock, a marker &mdash; and receive credit for them. Every public
+             annotation is shown on the record it describes.</p>
+          <p>Once you are logged in, a record page carries a link to add your own
+             annotation near the top, just below the record name. To change or withdraw
+             an annotation afterwards, write to the <a href="/contact">MaizeGDB team</a>
+             &mdash; there is no self-service page for it.</p>
+        </div>
+        <div class="mgdb-aside-card mgdb-login-note">
+          <h2>New accounts</h2>
+          <p>MaizeGDB is not issuing new annotation accounts at this time. To ask about
+             curator access, use the <a href="/feedback">feedback form</a>.</p>
+        </div>
+      </aside>
+
+    </div>
+  )
+
+</main>
+)

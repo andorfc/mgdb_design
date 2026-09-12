@@ -107,6 +107,15 @@
   $id = trim(urldecode(getCGIParam('id', 'G', ID)));
 
   if (!$id) {
+    /* No id means the hub -- but only at /pan_gene_center. A sub-path such as
+       /pan_gene_center/zzz has a PAGE and no ID, and used to render the hub
+       with a 200, so a mistyped address looked like a working page. */
+    if (defined('PAGE') && PAGE !== null && PAGE !== '' && PAGE !== 'pan_gene_center' && PAGE !== 'pan_gene') {
+      http_response_code(404);
+      include('controllers/not_found.php');
+      exit;
+    }
+
     // Display search page
     $search_template_name = "templates/pan_gene_center/pan_gene_search.bau";
     $search_filename = "controllers/pan_gene_center/pan_gene_search.php";
@@ -135,6 +144,12 @@
     $pan_gene = queryPanGene($id, $DBConn);
     
     if (!$pan_gene) {
+      /* A record page for an id that is not a pan-gene. The page it renders is
+         right and stays; the status was missing, so this answered 200 for a
+         record that does not exist -- the same silent 200 the section routers
+         had. Its own template rather than the site 404, because it can tell the
+         reader whether the id is a gene model instead. */
+      http_response_code(404);
       $template = "templates/pan_gene_center/notfound.bau";
       $notfound_tmpl = $mgdb->get('body')->load($template);
       $notfound_tmpl->get('id1')->replace($id);

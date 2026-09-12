@@ -17,8 +17,12 @@
      none of these elements exist yet -- and because every use below is guarded,
      reading them here failed silently rather than erroring: the figure and the
      search simply never appeared. */
-  var form, termInput, assembly, pageSize, results, table, scope, pager, tsvLink, hits;
+  var form, termInput, queryClear, assembly, pageSize, resultsSection, resultsContainer,
+      tableView, cardsView, table, statusEl, pager, tsvLink, hits, filterInput, filterCount,
+      advAccordion, advCount, advSubmit, advReset, emptyEl, emptyReset, viewCardsBtn, viewTableBtn;
   var index = null, resources = [], chartRows = [];
+  var lastResults = [];
+  var lastSummary = null;
 
   var esc = (window.MGDB && MGDB.escapeHtml) ? MGDB.escapeHtml : function (s) {
     return String(s === null || s === undefined ? '' : s)
@@ -49,36 +53,139 @@
   }
 
   /* ------------------------------------------------------------------ *
-   * Pathway search
+   * Pathway search state
    * ------------------------------------------------------------------ */
 
-  var state = { term: '', assembly: '', page: 1, pageSize: 25, total: 0, pages: 0 };
+  var state = {
+    term: '',
+    assembly: '',
+    page: 1,
+    pageSize: 25,
+    sortKey: 'name',
+    sortDir: 'asc',
+    view: 'table',
+    filter: '',
+    searched: false,
+    total: 0,
+    pages: 0
+  };
 
   function query(extra) {
     var p = new URLSearchParams();
     if (state.term) { p.set('term', state.term); }
     if (state.assembly) { p.set('assembly', state.assembly); }
-    p.set('page', String(state.page));
-    p.set('page_size', String(state.pageSize));
+    p.set('page', state.pageSize === 'all' ? '1' : String(state.page));
+    p.set('page_size', state.pageSize === 'all' ? '600' : String(state.pageSize));
     if (extra) { Object.keys(extra).forEach(function (k) { p.set(k, extra[k]); }); }
     return p.toString();
   }
 
-  function renderRows(rows) {
-    var body = table.tBodies[0];
-    if (!rows.length) {
-      body.innerHTML = '<tr><td colspan="5" class="mgdb-empty">No pathway matches that term.</td></tr>';
+  /* ------------------------------------------------------------------ *
+   * Sorting
+   * ------------------------------------------------------------------ */
+
+  function getHeaderAriaSort(colKey) {
+    if (state.sortKey === colKey) {
+      return state.sortDir === 'desc' ? 'descending' : 'ascending';
+    }
+    return 'none';
+  }
+
+  function sortPathwayResults(results) {
+    if (!results || !results.length) return [];
+    var key = state.sortKey || 'name';
+    var dir = state.sortDir === 'desc' ? -1 : 1;
+
+    return results.slice().sort(function (a, b) {
+      if (key === 'gene_models') {
+        var aG = Number(a.gene_models) || 0;
+        var bG = Number(b.gene_models) || 0;
+        if (aG !== bG) return (aG - bG) * dir;
+      } else if (key === 'proteins') {
+        var aP = Number(a.proteins) || 0;
+        var bP = Number(b.proteins) || 0;
+        if (aP !== bP) return (aP - bP) * dir;
+      } else if (key === 'id') {
+        var aId = String(a.id || '').trim().toLowerCase();
+        var bId = String(b.id || '').trim().toLowerCase();
+        var cmpId = aId.localeCompare(bId, undefined, { numeric: true });
+        if (cmpId !== 0) return cmpId * dir;
+      } else if (key === 'assemblies') {
+        var aAsm = (a.assemblies || []).join(', ').toLowerCase();
+        var bAsm = (b.assemblies || []).join(', ').toLowerCase();
+        var cmpAsm = aAsm.localeCompare(bAsm);
+        if (cmpAsm !== 0) return cmpAsm * dir;
+      }
+      var aName = String(a.name || '').trim().toLowerCase();
+      var bName = String(b.name || '').trim().toLowerCase();
+      return aName.localeCompare(bName, undefined, { numeric: true }) * dir;
+    });
+  }
+
+  function initSortButtons() {
+    if (!table) return;
+    Array.prototype.forEach.call(table.querySelectorAll('thead th button[data-sort-key]'), function (btn) {
+      btn.addEventListener('click', function () {
+        var key = btn.getAttribute('data-sort-key');
+        if (state.sortKey === key) {
+          state.sortDir = (state.sortDir === 'asc') ? 'desc' : 'asc';
+        } else {
+          state.sortKey = key;
+          state.sortDir = (key === 'gene_models' || key === 'proteins') ? 'desc' : 'asc';
+        }
+        updateSortHeaders();
+        renderResults();
+        applyResultsFilter();
+      });
+    });
+  }
+
+  function updateSortHeaders() {
+    if (!table) return;
+    Array.prototype.forEach.call(table.querySelectorAll('thead th[aria-sort]'), function (th) {
+      var btn = th.querySelector('button[data-sort-key]');
+      if (!btn) return;
+      var key = btn.getAttribute('data-sort-key');
+      th.setAttribute('aria-sort', getHeaderAriaSort(key));
+    });
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Results rendering
+   * ------------------------------------------------------------------ */
+
+  function renderResults() {
+    if (!lastResults || !lastResults.length) {
+      if (emptyEl) emptyEl.hidden = false;
+      if (tableView) tableView.hidden = true;
+      if (cardsView) cardsView.hidden = true;
       return;
     }
+    if (emptyEl) emptyEl.hidden = true;
+
+    var sorted = sortPathwayResults(lastResults);
+
+    renderTableView(sorted);
+    renderCardsView(sorted);
+    updateViewDisplay();
+  }
+
+  function renderTableView(rows) {
+    if (!table || !table.tBodies[0]) return;
+    var body = table.tBodies[0];
     var html = '';
     for (var i = 0; i < rows.length; i++) {
       var r = rows[i];
+      var asmPills = (r.assemblies || []).map(function (a) {
+        return '<span class="mgdb-pill mgdb-pill-sm">' + esc(a) + '</span>';
+      }).join(' ');
+
       html += '<tr>'
-            + '<th scope="row"><a href="' + esc(r.url) + '" target="_blank" rel="noopener">'
-            + richName(r.name_html || r.name) + ' <span aria-hidden="true">&nearr;</span></a></th>'
+            + '<th scope="row"><strong><a href="' + esc(r.url) + '" target="_blank" rel="noopener">'
+            + richName(r.name_html || r.name) + ' <span aria-hidden="true">&nearr;</span></a></strong></th>'
             + '<td class="mgdb-sequence"><a href="' + esc(r.metacyc_url) + '" target="_blank" rel="noopener">'
             + esc(r.id) + ' <span aria-hidden="true">&nearr;</span></a></td>'
-            + '<td>' + esc((r.assemblies || []).join(', ')) + '</td>'
+            + '<td>' + (asmPills || '<span class="mgdb-muted">—</span>') + '</td>'
             + '<td class="mgdb-numeric">' + num(r.gene_models) + '</td>'
             + '<td class="mgdb-numeric">' + num(r.proteins) + '</td>'
             + '</tr>';
@@ -86,8 +193,97 @@
     body.innerHTML = html;
   }
 
-  /* What the reader searched by, said plainly. A gene model that returns four
-     pathways otherwise looks like a name search that went strange. */
+  function renderCardsView(rows) {
+    if (!cardsView) return;
+    var html = '';
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      var asmPills = (r.assemblies || []).map(function (a) {
+        return '<span class="mgdb-pill mgdb-pill-sm">' + esc(a) + '</span>';
+      }).join(' ');
+
+      html += '<article class="mp-pathway-card">'
+            + '  <div>'
+            + '    <div class="mp-pathway-card-header">'
+            + '      <span class="mgdb-pill mgdb-pill-ok">' + esc(r.id) + '</span>'
+            +        asmPills
+            + '    </div>'
+            + '    <h3 class="mp-pathway-card-title"><a href="' + esc(r.url) + '" target="_blank" rel="noopener">'
+            +        richName(r.name_html || r.name) + ' <span aria-hidden="true">&nearr;</span></a></h3>'
+            + '    <div class="mp-pathway-card-meta">'
+            + '      <span><strong>' + num(r.gene_models) + '</strong> gene models</span> &bull; '
+            + '      <span><strong>' + num(r.proteins) + '</strong> enzymes</span>'
+            + '    </div>'
+            + '  </div>'
+            + '  <div class="mp-pathway-card-footer">'
+            + '    <a href="' + esc(r.metacyc_url) + '" target="_blank" rel="noopener">MetaCyc entry &nearr;</a>'
+            + '    <a class="mgdb-button mgdb-button-quiet" href="' + esc(r.url) + '" target="_blank" rel="noopener">PlantCyc &rarr;</a>'
+            + '  </div>'
+            + '</article>';
+    }
+    cardsView.innerHTML = html;
+  }
+
+  function updateViewDisplay() {
+    var isTable = (state.view === 'table');
+    if (tableView) tableView.hidden = !isTable;
+    if (cardsView) cardsView.hidden = isTable;
+    if (resultsContainer) {
+      resultsContainer.className = 'mp-results-container mp-view-' + state.view;
+    }
+    if (viewCardsBtn) {
+      viewCardsBtn.classList.toggle('is-active', !isTable);
+      viewCardsBtn.setAttribute('aria-pressed', !isTable ? 'true' : 'false');
+    }
+    if (viewTableBtn) {
+      viewTableBtn.classList.toggle('is-active', isTable);
+      viewTableBtn.setAttribute('aria-pressed', isTable ? 'true' : 'false');
+    }
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Filter within results
+   * ------------------------------------------------------------------ */
+
+  function applyResultsFilter() {
+    var terms = state.filter.toLowerCase().split(/\s+/).filter(Boolean);
+    var tableRows = table ? table.querySelectorAll('tbody tr') : [];
+    var cards = cardsView ? cardsView.querySelectorAll('.mp-pathway-card') : [];
+    var shown = 0;
+
+    function checkItem(el) {
+      if (!terms.length) {
+        el.hidden = false;
+        return true;
+      }
+      var text = (el.textContent || '').toLowerCase();
+      for (var i = 0; i < terms.length; i++) {
+        if (text.indexOf(terms[i]) === -1) {
+          el.hidden = true;
+          return false;
+        }
+      }
+      el.hidden = false;
+      return true;
+    }
+
+    Array.prototype.forEach.call(tableRows, function (row) {
+      if (checkItem(row)) shown++;
+    });
+    Array.prototype.forEach.call(cards, function (card) {
+      checkItem(card);
+    });
+
+    if (filterCount) {
+      filterCount.textContent = terms.length ? shown + ' match' + (shown === 1 ? '' : 'es') : '';
+    }
+    updateStatusText();
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Scope & Status
+   * ------------------------------------------------------------------ */
+
   var MATCHED = {
     pathway_id:          'matching that CornCyc pathway ID',
     pathway_id_and_name: 'matching that CornCyc pathway ID or name',
@@ -95,56 +291,122 @@
     pathway_name:        'whose name matches that term'
   };
 
-  function renderScope(summary) {
-    if (!summary) { scope.textContent = ''; return; }
-    var what = MATCHED[summary.matched_by] || 'in the collection';
-    var first = summary.total === 0 ? 0 : (summary.page - 1) * summary.page_size + 1;
-    var last = Math.min(summary.total, summary.page * summary.page_size);
-    scope.textContent = summary.total === 0
-      ? 'No pathways ' + what + '.'
-      : num(first) + '–' + num(last) + ' of ' + num(summary.total) + ' pathways ' + what + '.';
+  function updateStatusText() {
+    if (!statusEl) return;
+    if (!lastSummary || lastSummary.total === 0) {
+      statusEl.textContent = 'No matching pathways found.';
+      return;
+    }
+    var what = MATCHED[lastSummary.matched_by] || 'in the collection';
+    var first = state.pageSize === 'all' ? 1 : (lastSummary.page - 1) * lastSummary.page_size + 1;
+    var last = state.pageSize === 'all' ? lastSummary.total : Math.min(lastSummary.total, lastSummary.page * lastSummary.page_size);
+
+    if (state.filter) {
+      var count = filterCount && filterCount.textContent ? filterCount.textContent : '0 matches';
+      statusEl.innerHTML = 'Showing <strong>' + count + '</strong> on this page matching “' + esc(state.filter)
+        + '”, out of ' + num(lastSummary.total) + ' pathways ' + what + '.';
+    } else if (state.pageSize === 'all') {
+      statusEl.innerHTML = 'Showing all ' + num(lastSummary.total) + ' matching pathways ' + what + '. (' + num(lastSummary.elapsed_ms) + ' ms)';
+    } else {
+      statusEl.innerHTML = 'Showing ' + num(first) + '–' + num(last) + ' of ' + num(lastSummary.total)
+        + ' pathways ' + what + '. (' + num(lastSummary.elapsed_ms) + ' ms)';
+    }
   }
 
-  function renderPager(summary) {
-    if (!summary || summary.page_count <= 1) { pager.innerHTML = ''; return; }
-    pager.innerHTML =
-        '<button type="button" data-step="-1"' + (summary.page <= 1 ? ' disabled' : '') + '>Previous</button>'
-      + '<span class="mp-pager-status">Page ' + num(summary.page) + ' of ' + num(summary.page_count) + '</span>'
-      + '<button type="button" data-step="1"' + (summary.page >= summary.page_count ? ' disabled' : '') + '>Next</button>';
+  function renderPagination(summary) {
+    if (!pager) return;
+
+    if (state.pageSize === 'all' || !summary || summary.page_count <= 1) {
+      pager.innerHTML = '';
+      return;
+    }
+
+    var totalPages = summary.page_count;
+    var curPage = summary.page;
+    var html = '';
+
+    html += '<button class="mp-page-btn" type="button" data-page="' + (curPage - 1) + '" ' + (curPage === 1 ? 'disabled' : '') + '>&larr; Prev</button>';
+
+    var pages = [];
+    pages.push(1);
+    if (curPage > 3) pages.push('...');
+    for (var p = Math.max(2, curPage - 1); p <= Math.min(totalPages - 1, curPage + 1); p++) {
+      pages.push(p);
+    }
+    if (curPage < totalPages - 2) pages.push('...');
+    if (totalPages > 1) pages.push(totalPages);
+
+    pages.forEach(function (p) {
+      if (p === '...') {
+        html += '<span class="mp-page-ellipsis">&hellip;</span>';
+      } else {
+        html += '<button class="mp-page-btn ' + (p === curPage ? 'is-active' : '') + '" type="button" data-page="' + p + '">' + p + '</button>';
+      }
+    });
+
+    html += '<button class="mp-page-btn" type="button" data-page="' + (curPage + 1) + '" ' + (curPage === totalPages ? 'disabled' : '') + '>Next &rarr;</button>';
+
+    pager.innerHTML = html;
+
+    pager.querySelectorAll('button[data-page]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var page = parseInt(this.getAttribute('data-page'), 10);
+        if (page && page !== state.page && page >= 1 && page <= totalPages) {
+          state.page = page;
+          run(true);
+        }
+      });
+    });
   }
 
-  function run() {
-    results.hidden = false;
-    results.setAttribute('aria-busy', 'true');
+  function run(scrollToResults) {
+    if (resultsSection) {
+      resultsSection.hidden = false;
+      resultsSection.setAttribute('aria-busy', 'true');
+    }
 
     var url = ENDPOINT + '?' + query();
     fetch(url, { credentials: 'same-origin' })
       .then(function (r) { return r.json(); })
       .then(function (data) {
-        results.setAttribute('aria-busy', 'false');
+        if (resultsSection) resultsSection.setAttribute('aria-busy', 'false');
         if (!data || !data.ok) {
-          table.tBodies[0].innerHTML =
-            '<tr><td colspan="5" class="mgdb-empty">' + esc((data && data.message) || 'The search could not be completed.') + '</td></tr>';
-          scope.textContent = '';
-          pager.innerHTML = '';
+          lastResults = [];
+          lastSummary = null;
+          renderResults();
+          if (statusEl) statusEl.textContent = (data && data.message) || 'The search could not be completed.';
+          if (pager) pager.innerHTML = '';
           return;
         }
+        state.searched = true;
         state.total = data.summary.total;
         state.pages = data.summary.page_count;
-        renderRows(data.results || []);
-        renderScope(data.summary);
-        renderPager(data.summary);
-        /* The export carries the current filters and no pagination, so the
-           file is the whole matched set rather than the page on screen. */
-        tsvLink.href = ENDPOINT + '?' + query({ format: 'tsv' });
-        if (window.MGDB && MGDB.announce) {
-          MGDB.announce(scope.textContent);
+        lastResults = data.results || [];
+        lastSummary = data.summary;
+
+        renderResults();
+        applyResultsFilter();
+        renderPagination(data.summary);
+        updateStatusText();
+
+        if (tsvLink) {
+          tsvLink.href = ENDPOINT + '?' + query({ format: 'tsv' });
+        }
+        if (window.MGDB && MGDB.announce && statusEl) {
+          MGDB.announce(statusEl.textContent);
+        }
+        if (scrollToResults && resultsSection) {
+          resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       })
-      .catch(function () {
-        results.setAttribute('aria-busy', 'false');
-        table.tBodies[0].innerHTML =
-          '<tr><td colspan="5" class="mgdb-empty">The search could not be reached.</td></tr>';
+      .catch(function (err) {
+        console.error('Pathway search error', err);
+        if (resultsSection) resultsSection.setAttribute('aria-busy', 'false');
+        lastResults = [];
+        lastSummary = null;
+        renderResults();
+        if (statusEl) statusEl.textContent = 'The search could not be reached.';
+        if (pager) pager.innerHTML = '';
       });
   }
 
@@ -270,81 +532,189 @@
   }
 
   /* ------------------------------------------------------------------ *
-   * Wiring
+   * Form & Control Helpers
    * ------------------------------------------------------------------ */
 
-  function submit() {
-    /* Read from the DOM, not from cached state: the browser can restore an
-       input itself (autofill, bfcache) without firing `change`, and the form
-       would then show a filter the query omits. */
-    state.term = termInput ? termInput.value.trim() : '';
-    state.assembly = assembly ? assembly.value : '';
-    state.pageSize = pageSize ? parseInt(pageSize.value, 10) || 25 : 25;
-    state.page = 1;
-    renderResourceHits(state.term);
-    run();
+  function updateClearBtn() {
+    if (!queryClear || !termInput) return;
+    queryClear.hidden = (termInput.value.length === 0);
   }
 
+  function syncAdvancedBadge() {
+    if (!advCount) return;
+    var count = 0;
+    if (assembly && assembly.value && assembly.value !== '') count++;
+    advCount.textContent = count ? count + ' active' : '';
+    advCount.hidden = !count;
+  }
+
+  function submit(scroll) {
+    state.term = termInput ? termInput.value.trim() : '';
+    state.assembly = assembly ? assembly.value : '';
+    state.pageSize = pageSize ? pageSize.value : 25;
+    state.page = 1;
+    updateClearBtn();
+    syncAdvancedBadge();
+    renderResourceHits(state.term);
+    run(scroll !== false);
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Initialization
+   * ------------------------------------------------------------------ */
+
   function init() {
-    form      = document.getElementById('mp-search-form');
-    termInput = document.getElementById('mp-term');
-    assembly  = document.getElementById('mp-assembly');
-    pageSize  = document.getElementById('mp-page-size');
-    results   = document.getElementById('mp-results');
-    table     = document.getElementById('mp-results-table');
-    scope     = document.getElementById('mp-results-scope');
-    pager     = document.getElementById('mp-pager');
-    tsvLink   = document.getElementById('mp-results-tsv');
-    hits      = document.getElementById('mp-resource-hits');
+    form             = document.getElementById('mp-search-form');
+    termInput        = document.getElementById('mp-term');
+    queryClear       = document.getElementById('mp-query-clear');
+    assembly         = document.getElementById('mp-assembly');
+    pageSize         = document.getElementById('mp-page-size');
+    resultsSection   = document.getElementById('mp-results-section');
+    resultsContainer = document.getElementById('mp-results-container');
+    tableView        = document.getElementById('mp-table-view');
+    cardsView        = document.getElementById('mp-cards-view');
+    table            = document.getElementById('mp-results-table');
+    statusEl         = document.getElementById('mp-results-status');
+    pager            = document.getElementById('mp-pager');
+    tsvLink          = document.getElementById('mp-results-tsv');
+    hits             = document.getElementById('mp-resource-hits');
+    filterInput      = document.getElementById('mp-results-filter');
+    filterCount      = document.getElementById('mp-filter-count');
+    advAccordion     = document.getElementById('mp-adv');
+    advCount         = document.getElementById('mp-advanced-count');
+    advSubmit        = document.getElementById('mp-adv-submit');
+    advReset         = document.getElementById('mp-adv-reset');
+    emptyEl          = document.getElementById('mp-empty');
+    emptyReset       = document.getElementById('mp-empty-reset');
+    viewCardsBtn     = document.getElementById('mp-view-cards');
+    viewTableBtn     = document.getElementById('mp-view-table');
 
     index     = readJson('mp-search-index');
     resources = (index && index.resources) || [];
     chartRows = readJson('mp-chart-data') || [];
 
     if (form) {
-      form.addEventListener('submit', function (e) { e.preventDefault(); submit(); });
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        submit(true);
+      });
     }
 
-    Array.prototype.forEach.call(document.querySelectorAll('.mp-example'), function (btn) {
+    if (termInput) {
+      termInput.addEventListener('input', function () {
+        updateClearBtn();
+        renderResourceHits(this.value.trim());
+      });
+    }
+
+    if (queryClear) {
+      queryClear.addEventListener('click', function () {
+        if (termInput) {
+          termInput.value = '';
+          termInput.focus();
+        }
+        updateClearBtn();
+        state.term = '';
+        renderResourceHits('');
+        if (state.searched) {
+          state.page = 1;
+          run(false);
+        }
+      });
+    }
+
+    Array.prototype.forEach.call(document.querySelectorAll('.mp-example-btn'), function (btn) {
       btn.addEventListener('click', function () {
-        if (termInput) { termInput.value = btn.getAttribute('data-term') || ''; }
-        submit();
+        var t = btn.getAttribute('data-term') || '';
+        if (termInput) {
+          termInput.value = t;
+        }
+        submit(true);
       });
     });
 
-    if (pager) {
-      pager.addEventListener('click', function (e) {
-        var btn = e.target.closest('button[data-step]');
-        if (!btn || btn.disabled) { return; }
-        state.page = Math.min(Math.max(1, state.page + parseInt(btn.getAttribute('data-step'), 10)), state.pages || 1);
-        run();
-        results.scrollIntoView({ behavior: 'auto', block: 'start' });
+    if (assembly) {
+      assembly.addEventListener('change', function () {
+        syncAdvancedBadge();
+        submit(true);
       });
     }
 
-    if (assembly) { assembly.addEventListener('change', submit); }
-    if (pageSize) { pageSize.addEventListener('change', submit); }
+    if (pageSize) {
+      pageSize.addEventListener('change', function () {
+        state.pageSize = this.value;
+        state.page = 1;
+        run(false);
+      });
+    }
 
+    if (filterInput) {
+      filterInput.addEventListener('input', function () {
+        state.filter = this.value.trim();
+        applyResultsFilter();
+      });
+    }
+
+    if (viewCardsBtn) {
+      viewCardsBtn.addEventListener('click', function () {
+        state.view = 'card';
+        updateViewDisplay();
+      });
+    }
+
+    if (viewTableBtn) {
+      viewTableBtn.addEventListener('click', function () {
+        state.view = 'table';
+        updateViewDisplay();
+      });
+    }
+
+    if (advSubmit) {
+      advSubmit.addEventListener('click', function (e) {
+        e.preventDefault();
+        submit(true);
+      });
+    }
+
+    if (advReset) {
+      advReset.addEventListener('click', function () {
+        if (assembly) assembly.value = '';
+        syncAdvancedBadge();
+        state.assembly = '';
+        state.page = 1;
+        if (state.searched) {
+          run(false);
+        }
+      });
+    }
+
+    if (emptyReset) {
+      emptyReset.addEventListener('click', function () {
+        if (termInput) termInput.value = '';
+        if (assembly) assembly.value = '';
+        if (filterInput) filterInput.value = '';
+        state.term = '';
+        state.assembly = '';
+        state.filter = '';
+        state.page = 1;
+        updateClearBtn();
+        syncAdvancedBadge();
+        submit(false);
+      });
+    }
+
+    initSortButtons();
     fillAssemblyTable();
     drawChart();
 
-    /* The sticky section tabs. Shared, not a private copy: the bar is styled
-       by the shell and every page used to carry its own spy, which is how
-       eleven of them shipped without one. `watch` is the results section --
-       unhiding it moves every section below. */
     if (window.MGDB && MGDB.sectionTabs) {
-      MGDB.sectionTabs({ watch: '#mp-results' });
+      MGDB.sectionTabs({ watch: '#mp-results-section' });
     }
 
-    /* Sorting needs no call here: mgdb-modern.js wires every
-       table[data-sortable] on load, and re-reads the rows on each click, so the
-       results table stays sortable after the search replaces its body. */
-
-    /* A term in the URL runs the search on load, so a result page is linkable. */
     var initial = new URLSearchParams(window.location.search).get('term');
     if (initial && termInput) {
       termInput.value = initial;
-      submit();
+      submit(false);
     }
   }
 

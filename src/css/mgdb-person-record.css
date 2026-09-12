@@ -1,0 +1,124 @@
+/* mgdb-person-record.css -- /person?id={id}
+ *
+ * Page furniture only. The record shell (mgdb-record.css) and the Data Hub
+ * shell supply the hero, the facts grid, the section cards and the sticky tab
+ * offset; mgdb-modern.css supplies the links and lists. This sheet styles the
+ * roles list, the contact grid, and the publications/projects lists. Scoped
+ * under .mgdb-person-record-page.
+ */
+
+/* Roles & recognitions ---------------------------------------------------- */
+.mgdb-person-record-page .person-rec-roles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mgdb-person-record-page .person-rec-roles li {
+  padding-left: var(--mgdb-space-4);
+  position: relative;
+}
+.mgdb-person-record-page .person-rec-roles li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: .55em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--mgdb-gold);
+}
+.mgdb-person-record-page .person-rec-years { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
+
+/* Contact ----------------------------------------------------------------- */
+.mgdb-person-record-page .person-contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--mgdb-space-4);
+}
+.mgdb-person-record-page .person-contact-block h3 {
+  margin: 0 0 var(--mgdb-space-1);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.mgdb-person-record-page .person-contact-block p,
+.mgdb-person-record-page .person-address {
+  margin: 0;
+  font-style: normal;
+  overflow-wrap: anywhere;
+}
+
+/* Publications ------------------------------------------------------------ */
+.mgdb-person-record-page .person-pub-list {
+  max-height: 32rem;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0 var(--mgdb-space-2) 0 0;
+  list-style: none;
+}
+.mgdb-person-record-page .person-pub-list li {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  gap: var(--mgdb-space-2);
+  padding: var(--mgdb-space-2) 0;
+}
+.mgdb-person-record-page .person-pub-list li + li { border-top: 1px solid var(--hub-line-soft); }
+.mgdb-person-record-page .person-pub-year {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Projects ---------------------------------------------------------------- */
+.mgdb-person-record-page .person-project-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--mgdb-space-2);
+}
+.mgdb-person-record-page .person-project-list li {
+  padding-left: var(--mgdb-space-4);
+  position: relative;
+}
+.mgdb-person-record-page .person-project-list li::before {
+  content: "\2192";
+  position: absolute;
+  left: 0;
+  color: var(--mgdb-green);
+}
+
+/* Badges ------------------------------------------------------------------ */
+.mgdb-person-record-page .person-badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: var(--mgdb-space-4);
+}
+.mgdb-person-record-page .person-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  margin: 0;
+  padding: var(--mgdb-space-3);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  text-align: center;
+}
+.mgdb-person-record-page .person-badge img {
+  width: 110px;
+  height: 110px;
+  object-fit: contain;
+}
+.mgdb-person-record-page .person-badge figcaption {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  line-height: var(--mgdb-leading-snug);
+}

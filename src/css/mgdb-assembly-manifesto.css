@@ -1,0 +1,217 @@
+/* Maize genome assemblies and annotations (/assembly_manifesto)
+ * MaizeGDB modern design system.
+ *
+ * The ground, the white section cards, their colored top edges and the Related
+ * resources panel come from css/mgdb-hub.css, which is loaded first. Only what
+ * is specific to this page lives here: the hero mark, the reading measure for a
+ * page that is almost entirely prose, the assembly timeline, and the numbered
+ * guidelines.
+ */
+
+.mgdb-modern .mgdb-manifesto-page { padding-bottom: clamp(3rem, 6vw, 5.5rem); }
+
+/* ── Hero ────────────────────────────────────────────────────────────────── */
+
+.mgdb-manifesto-page .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+/* Four rows of blocks, each row fewer and longer than the one above it: the
+   assembly history is a story about contiguity, from BAC-guided fragments to
+   near end-to-end pseudomolecules. */
+.mgdb-manifesto-page .manifesto-hero-mark {
+  width: min(100%, 10rem);
+  height: auto;
+  margin-bottom: 0.6rem;
+}
+
+/* The one thing on the page a reader may have come specifically to find. It
+   sits in the hero rather than at the foot, and is marked so it reads as a
+   call to action instead of a third paragraph of description. */
+.mgdb-manifesto-page .manifesto-contact {
+  margin: var(--mgdb-space-4) 0 0;
+  padding: 0.7rem 1rem;
+  border-left: 3px solid var(--mgdb-gold);
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  background: var(--mgdb-green-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.55;
+}
+
+/* ── Tab bar ─────────────────────────────────────────────────────────────── */
+
+/* Eight tabs. The bar stays one row at every width and scrolls sideways rather
+   than wrapping, so the flat offset below is right everywhere -- a wrapped bar
+   is two heights, and MGDB.sectionTabs() reads the offset back from computed
+   style rather than measuring the bar. */
+.mgdb-manifesto-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-5);
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mgdb-manifesto-page .mgdb-section-tabs a { white-space: nowrap; }
+
+.mgdb-hub-page.mgdb-manifesto-page > section[id] { scroll-margin-top: 65px; }
+.mgdb-manifesto-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+/* ── Prose ───────────────────────────────────────────────────────────────── */
+
+/* This page is read rather than scanned, so the measure is set for running
+   text instead of letting paragraphs run the full section width. */
+.mgdb-manifesto-page .manifesto-prose { max-width: 62rem; }
+
+.mgdb-manifesto-page .manifesto-prose p {
+  margin: 0 0 1.05rem;
+  line-height: 1.65;
+}
+
+.mgdb-manifesto-page .manifesto-prose p:last-child { margin-bottom: 0; }
+
+.mgdb-manifesto-page .manifesto-cite {
+  padding-left: 0.85rem;
+  border-left: 3px solid var(--hub-line);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm) !important;
+}
+
+.mgdb-manifesto-page .manifesto-lead,
+.mgdb-manifesto-page .manifesto-note {
+  max-width: 62rem;
+  margin: 0 0 var(--mgdb-space-4);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.6;
+}
+
+.mgdb-manifesto-page .manifesto-note { margin: var(--mgdb-space-4) 0 0; }
+
+/* ── Assembly timeline ───────────────────────────────────────────────────── */
+
+/* Five dated releases in order. The date is a column of its own rather than a
+   run-in heading, so the years line up and the page can be read as a history at
+   a glance; the rule down the left is the thread between them. */
+.mgdb-manifesto-page .manifesto-timeline {
+  max-width: 68rem;
+  margin: var(--mgdb-space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mgdb-manifesto-page .manifesto-timeline > li {
+  display: grid;
+  grid-template-columns: minmax(8rem, 10rem) minmax(0, 1fr);
+  gap: var(--mgdb-space-4);
+  padding: 0 0 var(--mgdb-space-4) var(--mgdb-space-4);
+  border-left: 2px solid var(--hub-line);
+}
+
+.mgdb-manifesto-page .manifesto-timeline > li:last-child { padding-bottom: 0; }
+
+/* The marker sits on the rule, not beside it. */
+.mgdb-manifesto-page .manifesto-timeline > li { position: relative; }
+
+.mgdb-manifesto-page .manifesto-timeline > li::before {
+  content: "";
+  position: absolute;
+  top: 0.45rem;
+  left: -7px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  background: var(--mgdb-line);
+}
+
+.mgdb-manifesto-page .manifesto-timeline > li.manifesto-current::before { background: var(--mgdb-green-dark); }
+
+.mgdb-manifesto-page .manifesto-when {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.mgdb-manifesto-page .manifesto-what { min-width: 0; }
+
+.mgdb-manifesto-page .manifesto-what h3 {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 0.4rem;
+  font-size: 1rem;
+}
+
+.mgdb-manifesto-page .manifesto-what p {
+  margin: 0;
+  color: var(--mgdb-ink-soft);
+  line-height: 1.6;
+}
+
+@media (max-width: 720px) {
+  .mgdb-manifesto-page .manifesto-timeline > li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.3rem;
+  }
+}
+
+/* ── Guidelines ──────────────────────────────────────────────────────────── */
+
+/* Four numbered elements. They are a checklist rather than steps in sequence,
+   but they were published numbered and are referred to that way, so the numbers
+   stay. One column: each item is a full paragraph and would not survive being
+   set in a card grid. */
+.mgdb-manifesto-page .manifesto-guidelines {
+  max-width: 68rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: manifesto-guideline;
+  display: grid;
+  gap: var(--mgdb-space-3);
+}
+
+.mgdb-manifesto-page .manifesto-guidelines > li {
+  position: relative;
+  padding: var(--mgdb-space-4) var(--mgdb-space-4) var(--mgdb-space-4) 3.6rem;
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: #ffffff;
+  counter-increment: manifesto-guideline;
+}
+
+.mgdb-manifesto-page .manifesto-guidelines > li::before {
+  content: counter(manifesto-guideline);
+  position: absolute;
+  top: var(--mgdb-space-4);
+  left: var(--mgdb-space-4);
+  display: grid;
+  width: 1.9rem;
+  height: 1.9rem;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 800;
+}
+
+.mgdb-manifesto-page .manifesto-guidelines h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1rem;
+}
+
+.mgdb-manifesto-page .manifesto-guidelines p {
+  margin: 0;
+  max-width: 62rem;
+  color: var(--mgdb-ink-soft);
+  line-height: 1.6;
+}

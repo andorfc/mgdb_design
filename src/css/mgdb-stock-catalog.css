@@ -340,3 +340,169 @@
   .mgdb-stock-catalog-page .sc-order { display: none; }
   .mgdb-stock-catalog-page .sc-list { columns: 2; }
 }
+
+/* --------------------------------------------------------------------------
+   Category index (master-detail)
+
+   Categories on the left, the selected category's stocks on the right. Applied
+   only where there are enough categories to be worth a column -- the whole
+   catalog (25) and the phenotype catalog (195); see SC_RAIL_MIN_GROUPS in the
+   controller.
+
+   Three things this shape is answering, all measured on the first attempt at it:
+
+   1. It reuses NO pill styling. `.sc-jump` is a chip built for a horizontal row;
+      stacked full-width, 25 rounded capsules read as 25 buttons rather than as
+      an index. Here the CARD is the only rounded thing and the rows inside it
+      are flat, separated by hairlines, with the selected row marked by a solid
+      left edge -- a table of contents, which is what it is.
+   2. It does not scroll on its own. The first version was 803px tall against a
+      ~700px column and grew its own scrollbar, so the page had two scrolling
+      regions. Folding the ten chromosomes into a 5-across grid of numbers takes
+      eight rows out; the index now measures ~560px and fits. The max-height
+      below is a floor for very short windows, not the normal case.
+   3. It stays put. `position: sticky` under the shell's own sticky tab bar, so a
+      category can be changed from anywhere in a 4,000px list without scrolling
+      back up -- and the tab bar above it reaches Metrics and Related resources
+      from anywhere, which is the other way out of a long list.
+   -------------------------------------------------------------------------- */
+
+.mgdb-stock-catalog-page .sc-layout { display: block; }
+
+/* The index is a card at every width; only the two-column split is conditional. */
+.mgdb-stock-catalog-page .sc-layout-rail .sc-jumps {
+  display: block;
+  gap: 0;
+  margin-bottom: var(--mgdb-space-5);
+  padding: var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+
+.mgdb-stock-catalog-page .sc-index-heading {
+  margin: 0 0 6px;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.mgdb-stock-catalog-page .sc-chrom-grid + .sc-index-heading { margin-top: var(--mgdb-space-3); }
+
+/* Ten chromosomes as a numbered series, not ten sentences. */
+.mgdb-stock-catalog-page .sc-chrom-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.mgdb-stock-catalog-page .sc-layout-rail .sc-chrom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 4px 2px;
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-ink);
+  line-height: 1.15;
+  text-decoration: none;
+}
+.mgdb-stock-catalog-page .sc-layout-rail .sc-chrom b {
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+}
+.mgdb-stock-catalog-page .sc-layout-rail .sc-chrom span {
+  color: var(--mgdb-muted);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+.mgdb-stock-catalog-page .sc-layout-rail .sc-chrom:hover {
+  border-color: var(--mgdb-green);
+  background: #ffffff;
+}
+.mgdb-stock-catalog-page .sc-layout-rail .sc-chrom.is-current {
+  border-color: var(--mgdb-green);
+  background: var(--mgdb-green);
+  color: #ffffff;
+}
+.mgdb-stock-catalog-page .sc-layout-rail .sc-chrom.is-current span { color: rgba(255, 255, 255, 0.85); }
+
+/* Everything else: flat rows, hairline separators, no capsules. */
+.mgdb-stock-catalog-page .sc-index-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mgdb-stock-catalog-page .sc-index-list li + li { border-top: 1px solid var(--mgdb-line-soft); }
+
+.mgdb-stock-catalog-page .sc-layout-rail .sc-index-list .sc-jump {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--mgdb-space-2);
+  width: 100%;
+  padding: 4px var(--mgdb-space-2) 4px 9px;
+  border: 0;
+  border-left: 3px solid transparent;
+  border-radius: 0;
+  background: none;
+  color: var(--mgdb-ink);
+  font-size: 13px;
+  line-height: 1.35;
+  text-decoration: none;
+}
+.mgdb-stock-catalog-page .sc-layout-rail .sc-index-list .sc-jump span:last-child {
+  flex: none;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-variant-numeric: tabular-nums;
+}
+.mgdb-stock-catalog-page .sc-layout-rail .sc-index-list .sc-jump:hover {
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-green-dark);
+}
+.mgdb-stock-catalog-page .sc-layout-rail .sc-index-list .sc-jump.is-current {
+  border-left-color: var(--mgdb-green);
+  background: var(--mgdb-green-soft, var(--mgdb-surface-alt));
+  color: var(--mgdb-green-dark);
+  font-weight: 700;
+}
+.mgdb-stock-catalog-page .sc-layout-rail .sc-index-list .sc-jump.is-current span:last-child {
+  color: var(--mgdb-green-dark);
+}
+
+@media (min-width: 900px) {
+  .mgdb-stock-catalog-page .sc-layout-rail {
+    display: grid;
+    grid-template-columns: minmax(210px, 252px) minmax(0, 1fr);
+    gap: var(--mgdb-space-6);
+    align-items: start;
+  }
+
+  .mgdb-stock-catalog-page .sc-layout-rail .sc-jumps {
+    position: sticky;
+    top: calc(var(--mgdb-tab-offset, 8rem) + var(--mgdb-space-2));
+    margin-bottom: 0;
+    /* Only engages on a very short window; at ~560px the index fits and no
+       second scrollbar appears. */
+    max-height: calc(100vh - var(--mgdb-tab-offset, 8rem) - var(--mgdb-space-5));
+    overflow-y: auto;
+  }
+
+  /* Narrower columns than the full-width list, so a 449-stock category is three
+     columns and about a third shorter. */
+  .mgdb-stock-catalog-page .sc-layout-rail .sc-list { columns: 3 210px; }
+}
+
+/* Script-owned: one category at a time. */
+.mgdb-stock-catalog-page .sc-groups.is-rail-active > .sc-group { display: none; }
+.mgdb-stock-catalog-page .sc-groups.is-rail-active > .sc-group.is-selected { display: block; }
+.mgdb-stock-catalog-page .sc-groups.is-rail-active > .sc-group + .sc-group { margin-top: 0; border-top: 0; padding-top: 0; }
+
+/* A filter runs across every category, so while one is active the selection is
+   suspended and each category holding a match is shown. */
+.mgdb-stock-catalog-page .sc-groups.is-rail-active.is-filtering > .sc-group.has-match { display: block; }

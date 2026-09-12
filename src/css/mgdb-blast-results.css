@@ -203,8 +203,10 @@
   color: var(--blast-ink-soft);
 }
 
-.blast-table th[aria-sort="ascending"]::after { content: " \25B2"; }
-.blast-table th[aria-sort="descending"]::after { content: " \25BC"; }
+/* The sort indicator lives on the button only -- see the rule further down.
+   These two `th::after` rules used to draw a SECOND one: every sorted column
+   showed a 14px mark from the th and a 9.8px mark from the button, side by
+   side, pointing the same way. */
 
 .blast-table td {
   padding: 6px 10px;
@@ -749,10 +751,21 @@
   width: 12px; height: 12px; border-radius: 2px; display: inline-block;
   border: 1px solid var(--blast-rule);
 }
+
 .blast-swatch.q4 { background: var(--blast-q4); border-color: var(--blast-q4); }
 .blast-swatch.miss { background: #fbfdfd; }
-.blast-swatch.present { background: #fffdf7; border-color: #b07a12; }
 .blast-swatch.absent { background: #fff; }
+
+/* "Present, not searched" is drawn in the matrix as a circle -- the cell holds
+   a literal U+25CB -- so its legend key is a circle too. It also had to stop
+   being a square: it and "not yet annotated" were both amber-bordered squares
+   differing only in how much cream they carried, which is the pair that made
+   the legend hard to read. See renderMatrix() in js/mgdb-blast-results.js. */
+.blast-swatch.present {
+  background: #fffdf7;
+  border-color: #b07a12;
+  border-radius: 50%;
+}
 
 .blast-linkbtn {
   border: none; background: none; padding: 0;
@@ -767,6 +780,10 @@
    JBrowse for anything more. Genes are spans, not models: strand and exons are
    not in this annotation load and drawing either would be an invention.
    -------------------------------------------------------------------------- */
+
+/* The neighbourhood figure's own Export PNG sits with the figure rather than in
+   the drawer head, because the drawer's other tabs hold text, not a figure. */
+.blast-hood-actions { display: flex; justify-content: flex-end; margin-bottom: 6px; }
 
 .blast-hood { overflow-x: auto; margin-bottom: 12px; }
 .blast-hood svg { display: block; }
@@ -893,8 +910,11 @@
 
 /* The sort direction is on the button, not the header, so it is announced with
    the control a reader activates. */
-.blast-table th[aria-sort="ascending"] .blast-sortbtn::after { content: "\25B2"; font-size: 0.7em; }
-.blast-table th[aria-sort="descending"] .blast-sortbtn::after { content: "\25BC"; font-size: 0.7em; }
+/* Arrows (U+2191/U+2193), not the filled triangles the rest of the site uses --
+   Carson's call, 2026-09-11. One mark per sorted column; the `th::after` pair
+   that used to double it is gone from the top of this file. */
+.blast-table th[aria-sort="ascending"] .blast-sortbtn::after { content: "\2191"; font-size: 0.8em; }
+.blast-table th[aria-sort="descending"] .blast-sortbtn::after { content: "\2193"; font-size: 0.8em; }
 .blast-table th[aria-sort]:not([aria-sort="none"]) { color: #1f2723; }
 
 /* Only sortable headers look clickable. The one non-sortable header used to
@@ -1311,4 +1331,56 @@
 
 @media (max-width: 860px) {
   .blast-empty-grid { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+}
+
+/* --- the job's own URL ----------------------------------------------------
+
+   Replaces the "Permanent link" button, which linked to the page the reader
+   was already on. What they want from it is the address itself: visible, in a
+   field they can select, with one button that copies it and one line saying
+   how long it lasts. */
+.mgdb-blast-results .blast-permalink {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--blast-rule);
+}
+
+.mgdb-blast-results .blast-permalink > label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--mgdb-ink-soft);
+}
+
+/* The field takes the row and the button keeps its own width, so the link is
+   as long as the space allows at every width instead of being truncated to
+   make room for a control that does not need the space. */
+.mgdb-blast-results .blast-permalink-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.mgdb-blast-results .blast-permalink-row .mgdb-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--mgdb-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.8125rem;
+}
+
+.mgdb-blast-results .blast-permalink-row .mgdb-button { flex: 0 0 auto; }
+
+/* The Edit search control is a one-button POST form, because the search form
+   restores a job from POSTed settings. It must not introduce a block box into
+   a flex row of buttons. */
+.mgdb-blast-results .blast-edit-search { display: contents; }
+
+/* A section-level export sits at the right-hand end of the section heading,
+   the same place the figures' filters sit. */
+.mgdb-blast-results .mgdb-section-heading > .mgdb-button { margin-left: auto; }
+
+@media (max-width: 640px) {
+  .mgdb-blast-results .blast-permalink-row { flex-wrap: wrap; }
+  .mgdb-blast-results .blast-permalink-row .mgdb-input { flex: 1 1 100%; }
 }

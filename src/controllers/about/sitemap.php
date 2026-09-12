@@ -13,6 +13,7 @@ $bauplan->preHTML('<meta http-equiv="Content-Type" content="text/html; charset=u
 $bauplan->includeCss('/css/static.css');
 $bauplan->includeCss('/css/mgdb-modern.css');
 $bauplan->includeCss('/css/mgdb-megamenu.css');
+$bauplan->includeCss('/css/mgdb-hub.css?v=' . filemtime($system['root_dir'] . '/css/mgdb-hub.css'));
 $bauplan->includeCss('/css/sitemap.css?v=' . filemtime($system['root_dir'] . '/css/sitemap.css'));
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');

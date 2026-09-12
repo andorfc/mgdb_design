@@ -178,7 +178,19 @@ class Bauplan {
 		if ($this->modern) {
 			$html .= "\t\t<meta name='viewport' content='width=device-width, initial-scale=1'>\n";
 		}
-		$html .= "\t\t<title>" . $this->title . "</title>\n";
+		/* Escaped 2026-09-07. The title was written out raw, and several
+		   controllers build one by concatenating a record id straight from the
+		   URL -- controllers/community.php line 219, data_center.php 635 and
+		   637, gene_center.php 259, pan_gene_center.php 134, all of the form
+		   title('MaizeGDB ' . ucfirst(PAGE) . ' Record Page: ' . $id). That made
+		   /person?id=</title><script>alert(1)</script> a live reflected XSS,
+		   confirmed against the origin; Cloudflare's WAF hid it from the public
+		   hostname, which is not the same as it being fixed.
+		   Escaped here rather than at each call site so no future caller has to
+		   remember. No caller passes markup or entities in a title -- checked
+		   across every new Bauplan() and ->title() in controllers and lib --
+		   so nothing double-encodes. bodyClass below was already escaped. */
+		$html .= "\t\t<title>" . htmlspecialchars((string) $this->title, ENT_QUOTES, 'UTF-8') . "</title>\n";
 		$html .= "\t\t" . $this->scriptsToString();
 		$html .= "\t" . $this->head->value() . "\n";
 		$html .= "\t</head>\n";

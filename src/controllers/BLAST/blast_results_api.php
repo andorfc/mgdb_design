@@ -51,6 +51,19 @@ define('MGDB_BLAST_PAGE', 200);
 define('MGDB_BLAST_MAX_REPORT', 64 * 1024 * 1024);
 
 
+/* The distinct BLAST programs across a job's sub-searches, deduplicated but
+ * order-preserving so the label reads in the order the targets were searched.
+ */
+function blast_distinct_programs($models) {
+  $seen = array();
+  foreach ($models as $entry) {
+    $m = isset($entry['model']) ? $entry['model'] : $entry;
+    if (empty($m['program'])) { continue; }
+    $seen[$m['program']] = true;
+  }
+  return array_keys($seen);
+}
+
 function blast_api_fail($status, $code, $detail) {
   http_response_code($status);
   header('Content-Type: application/problem+json; charset=utf-8');
@@ -474,6 +487,12 @@ function blast_api_unit($model, $target = null) {
       'job'     => $job,
       'multi'   => $multi,
       'program' => $first['program'],
+      /* Every distinct program the job ran, in the order the targets were
+         searched. A job fans out one search per target and a mixed submission
+         -- a protein query against both a genome and a proteome -- runs
+         tblastn on one and blastp on the other, so reporting only $first's
+         program named half the search and silently dropped the other half. */
+      'programs' => blast_distinct_programs($models),
       'version' => $first['version'],
       'db'      => $multi ? (count($models) . ' targets') : $first['db'],
       'params'  => $first['params'],

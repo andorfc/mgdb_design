@@ -296,26 +296,6 @@ function geneHubTraitOptions($DBConn) {
     return $html;
 }
 
-/* BLAST targets in the Gene models category, value formatted source|db_name as
-   search/gene/gene_seq_search.php expects. */
-function geneHubBlastTargetOptions($DBConn) {
-    $sql = "
-        SELECT bc.name AS blast_name, bc.source AS blast_source, bc.db_name AS blast_db_name
-        FROM pc_blast_ctl bc
-          INNER JOIN id_num ON id_num.id = bc.id
-          INNER JOIN pc_assoc_category ac ON ac.id = bc.id
-          INNER JOIN pc_category cat ON ac.category_id = cat.id
-        WHERE cat.name = 'Gene models' AND id_num.curation_lvl = 0
-        ORDER BY bc.name";
-    $rows = get_all_rows(make_query($DBConn, $sql));
-
-    $html = '';
-    foreach ($rows as $row) {
-        $html .= geneHubOption($row['blast_source'] . '|' . $row['blast_db_name'], $row['blast_name']);
-    }
-    return $html;
-}
-
 /* Every figure and option list the page needs, in one payload. Called inside
    dashboardCache(). */
 function geneHubPageData($DBConn, $system) {
@@ -342,7 +322,6 @@ function geneHubPageData($DBConn, $system) {
         'product_options'    => geneHubGeneProductOptions($DBConn),
         'phenotype_options'  => geneHubPhenotypeOptions($DBConn),
         'trait_options'      => geneHubTraitOptions($DBConn),
-        'blast_options'      => geneHubBlastTargetOptions($DBConn),
         'built'              => date('F j, Y')
     );
 }

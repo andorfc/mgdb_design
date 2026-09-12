@@ -151,6 +151,69 @@ function gv_dataset_rows($datasets) {
     return $out;
 }
 
+function gv_dataset_cards($datasets) {
+    $out = '';
+    foreach ($datasets as $d) {
+        $name    = isset($d['name']) ? $d['name'] : '';
+        $build   = isset($d['build']) && $d['build'] !== null ? $d['build'] : '';
+        $ref     = isset($d['reference']) ? $d['reference'] : '';
+        $acc     = isset($d['accessions']) ? (int) $d['accessions'] : 0;
+        $sites   = isset($d['variant_sites']) ? $d['variant_sites'] : '';
+        $filters = isset($d['filters']) ? (array) $d['filters'] : array();
+
+        $tags = array();
+        if (stripos($name, 'MaizeGDB') === 0) { $tags[] = 'maizegdb'; }
+        if (!empty($d['indels']))             { $tags[] = 'indels'; }
+        if (!empty($d['imputed']))            { $tags[] = 'imputed'; }
+
+        $haystack = trim($name . ' ' . $build . ' ' . $ref . ' ' . implode(' ', $filters));
+
+        $badges = array();
+        if ($build !== '') {
+            $badges[] = '<span class="mgdb-pill mgdb-pill-ok">' . gv_esc($build) . '</span>';
+        }
+        $badges[] = '<span class="mgdb-pill">' . gv_esc($ref) . '</span>';
+        if (!empty($d['indels'])) {
+            $badges[] = '<span class="mgdb-pill mgdb-pill-info">Indels</span>';
+        }
+        if (!empty($d['imputed'])) {
+            $badges[] = '<span class="mgdb-pill mgdb-pill-warn">Imputed</span>';
+        }
+
+        $filter_str = !empty($filters) ? implode('; ', $filters) : 'None reported';
+
+        $papers = array();
+        foreach ((isset($d['papers']) ? $d['papers'] : array()) as $p) {
+            $papers[] = empty($p['url'])
+                      ? '<span class="mgdb-muted">' . gv_esc($p['label']) . '</span>'
+                      : '<a href="' . gv_esc($p['url']) . '" target="_blank" rel="noopener">'
+                        . gv_esc($p['label']) . ' <span aria-hidden="true">&nearr;</span></a>';
+        }
+        $papers_html = !empty($papers) ? implode(', ', $papers) : '<span class="mgdb-muted">&mdash;</span>';
+
+        $notes_html = !empty($d['notes']) ? '<p class="gv-card-notes">' . gv_esc($d['notes']) . '</p>' : '';
+
+        $out .= '<article class="gv-dataset-card" data-filter="' . gv_esc(implode(' ', $tags)) . '"'
+              . ' data-search="' . gv_esc($haystack) . '">'
+              . '<div class="gv-card-badges">' . implode(' ', $badges) . '</div>'
+              . '<h3 class="gv-card-title">' . gv_esc($name) . '</h3>'
+              . '<dl class="gv-card-meta">'
+              . '<div><dt>Variant sites</dt><dd><strong>' . gv_esc($sites) . '</strong></dd></div>'
+              . '<div><dt>Accessions</dt><dd>' . number_format($acc) . '</dd></div>'
+              . '<div><dt>Het. sites</dt><dd>' . (!empty($d['heterozygous']) ? 'Yes' : 'No') . '</dd></div>'
+              . '<div><dt>Filters</dt><dd>' . gv_esc($filter_str) . '</dd></div>'
+              . '<div><dt>Literature</dt><dd>' . $papers_html . '</dd></div>'
+              . '</dl>'
+              . $notes_html
+              . '<div class="gv-card-actions">'
+              . '<a class="mgdb-button mgdb-button-quiet" href="https://wgs.maizegdb.org/" target="_blank" rel="noopener">SNPVersity 2 &nearr;</a>'
+              . '<a class="mgdb-button mgdb-button-quiet" href="https://snptools.maizegdb.org/" target="_blank" rel="noopener">SNPTools &nearr;</a>'
+              . '</div>'
+              . '</article>' . "\n";
+    }
+    return $out;
+}
+
 function gv_project_rows($projects) {
     $out = '';
     foreach ($projects as $p) {
@@ -293,11 +356,11 @@ $page_data = dashboardCache($system,
         'snpv_release'       => gv_esc(isset($gv_snpv['release']) ? $gv_snpv['release'] : ''),
         'snpv_release_date'  => gv_esc(isset($gv_snpv['release_date']) ? $gv_snpv['release_date'] : ''),
         'dataset_rows'       => gv_dataset_rows($gv_datasets),
+        'dataset_cards'      => gv_dataset_cards($gv_datasets),
         'project_rows'       => gv_project_rows($gv_projects)
     );
 });
 
-$content->get('data-date')->replace($page_data['data_date']);
 $content->get('dataset-count')->replace($page_data['dataset_count']);
 $content->get('b73-dataset-count')->replace($page_data['b73_dataset_count']);
 $content->get('project-count')->replace($page_data['project_count']);
@@ -308,6 +371,7 @@ $content->get('prev-accessions')->replace($page_data['prev_accessions']);
 $content->get('snpv-release')->replace($page_data['snpv_release']);
 $content->get('snpv-release-date')->replace($page_data['snpv_release_date']);
 $content->get('dataset-rows')->replace($page_data['dataset_rows']);
+$content->get('dataset-cards')->replace($page_data['dataset_cards']);
 $content->get('project-rows')->replace($page_data['project_rows']);
 
 /* References: the variant collections and the tools that read them. Rendered by

@@ -354,6 +354,10 @@
        data attribute rather than assumed, since the page already knows it. */
     var curRef = quick.getAttribute('data-cur-ref') || '';
     var emptyTimer = null;
+    /* True once the reader has changed the species. Until then a blank
+       assembly field means "nothing picked yet", and the panel is showing the
+       server-rendered reference assembly; afterwards it means "cleared". */
+    var speciesChanged = false;
 
     function escapeAttr(s) { return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;'); }
     function escapeHtml(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
@@ -384,13 +388,28 @@
       summary();
     }
 
+    /* Empties the panel and says what to do next. fillAssemblies() blanks the
+       assembly field on a species change, so the chips still on screen belong
+       to an assembly of the species just left. */
+    function clearChips() {
+      window.clearTimeout(emptyTimer);
+      row.innerHTML = '';
+      if (emptyEl) { emptyEl.hidden = true; }
+      label.textContent = 'Choose an assembly to see its datasets';
+      summary();
+    }
+
     /* Rebuilds the label and the chip row from whatever #BLAST_target holds
-       right now. Never touches the panel while the assembly field is blank,
-       so the server-rendered default (the reference assembly) is what a
-       reader sees before they have picked anything at all. */
+       right now. Never touches the panel while the assembly field is blank
+       and no species has been chosen, so the server-rendered default (the
+       reference assembly) is what a reader sees before they have picked
+       anything at all. */
     function renderChips() {
       var assemblyName = assemblyInput.value.trim();
-      if (!assemblyName) { return; }
+      if (!assemblyName) {
+        if (speciesChanged) { clearChips(); }
+        return;
+      }
 
       label.textContent = assemblyName + (assemblyName === curRef ? ' — the current reference' : '');
 
@@ -443,6 +462,16 @@
       tr.querySelector('a').setAttribute('onclick', 'removeTarget(' + id + ')');
       table.appendChild(tr);
       targetsSync();
+    });
+
+    /* fillAssemblies() clears the assembly field and empties #BLAST_target,
+       but only after its POST resolves -- and renderChips() cannot tell that
+       blank field from the one the page loads with. Clearing here, on the
+       event itself, retires the old species' chips at once rather than
+       leaving them up until an assembly is picked. */
+    on(byId('target_species'), 'change', function () {
+      speciesChanged = true;
+      clearChips();
     });
 
     if (window.MutationObserver) {
@@ -498,7 +527,13 @@
   }
 
   function init() {
-    if (MGDB && MGDB.sectionTabs) {
+    if (!byId('blastform')) { return; }
+
+    /* Only on the page whose <main> is the BLAST page. The form is also carried
+       in a .mgdb-blast-page *wrapper* inside the Gene Data Hub, which has a tab
+       bar of its own that js/mgdb-gene.js already drives -- claiming it here
+       would give that bar two scrollspies fighting over aria-current. */
+    if (MGDB && MGDB.sectionTabs && document.querySelector('main.mgdb-blast-page')) {
       /* The tab bar is markup the shared shell styles; nothing in that
          stylesheet moves the active state. `watch` is the form, because a
          disclosure opening or a target chip appearing moves every section

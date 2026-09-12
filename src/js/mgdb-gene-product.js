@@ -29,6 +29,7 @@
   var state = {
     term: '', type: '', ec: '', localization: '', pathway: '',
     filter: '', sort: '', dir: 'asc',
+    view: window.innerWidth < 768 ? 'cards' : 'table',
     page: 1, pageSize: 25,
     rows: [], total: 0, searched: false
   };
@@ -150,6 +151,12 @@
     state.ec = ((byId('gp-filter-ec') || {}).value || '').trim();
     state.localization = (byId('gp-filter-loc') || {}).value || '';
     state.pathway = (byId('gp-filter-pathway') || {}).value || '';
+    var advSort = byId('gp-adv-sort');
+    if (advSort && advSort.value) {
+      var parts = advSort.value.split('-');
+      state.sort = parts[0];
+      state.dir = parts[1] || 'asc';
+    }
   }
 
   function hasCriteria() {
@@ -163,6 +170,7 @@
     if (state.ec) { qs.set('ec_num', state.ec); }
     if (state.localization) { qs.set('localization', state.localization); }
     if (state.pathway) { qs.set('pathway', state.pathway); }
+    if (state.sort) { qs.set('sort', state.sort + '-' + state.dir); }
     qs.set('limit', state.pageSize === 'all' ? MAX_PAGE : state.pageSize);
     qs.set('offset', state.pageSize === 'all' ? 0 : (state.page - 1) * state.pageSize);
     Object.keys(extra || {}).forEach(function (key) { qs.set(key, extra[key]); });
@@ -222,28 +230,6 @@
      Results
      ====================================================================== */
 
-  function rowHaystack(row) {
-    return [row.name, row.type,
-            (row.synonyms || []).join(' '),
-            (row.ec_numbers || []).join(' '),
-            (row.encoded_by || []).map(function (l) { return l.name; }).join(' '),
-            (row.gene_models || []).join(' '),
-            (row.pathways || []).join(' '),
-            (row.localizations || []).join(' ')].join(' ').toLowerCase();
-  }
-
-  function visibleRows() {
-    if (!state.filter) { return state.rows; }
-    var terms = state.filter.toLowerCase().split(/\s+/).filter(Boolean);
-    return state.rows.filter(function (row) {
-      var hay = rowHaystack(row);
-      for (var i = 0; i < terms.length; i++) {
-        if (hay.indexOf(terms[i]) === -1) { return false; }
-      }
-      return true;
-    });
-  }
-
   function sortValue(row) {
     switch (state.sort) {
       case 'type': return row.type || '';
@@ -256,19 +242,24 @@
   function compare(a, b) {
     if (!state.sort) { return 0; }
     var dir = state.dir === 'desc' ? -1 : 1;
-    return dir * String(sortValue(a)).localeCompare(String(sortValue(b)), undefined, { numeric: true });
+    return dir * String(sortValue(a)).localeCompare(String(sortValue(b)), undefined, { numeric: true, sensitivity: 'base' });
   }
 
   function render(summary) {
     var body = byId('gp-results-body');
     var empty = byId('gp-results-empty');
-    var scroll = document.querySelector('.mgdb-gene-product-page .gp-results-section .mgdb-table-scroll');
+    var cardsContainer = byId('gp-cards-view');
+    var scroll = byId('gp-table-scroll');
     if (!body) { return; }
 
-    var rows = visibleRows().slice();
+    var rows = state.rows.slice();
     if (state.sort) { rows.sort(compare); }
 
     body.innerHTML = rows.map(rowHtml).join('');
+    if (cardsContainer) {
+      cardsContainer.innerHTML = rows.map(renderCard).join('');
+    }
+
     /* The empty panel offers to reset the search, so it belongs to a search
        that found nothing. When the table filter is what emptied the page the
        search did match -- the status line says so and the filter can just be
@@ -276,10 +267,13 @@
     if (empty) { empty.hidden = state.rows.length !== 0; }
     if (scroll) { scroll.hidden = rows.length === 0; }
 
+    updateViewDisplay();
     updateStatus(summary, rows.length);
     renderPagination(summary);
     updateSortIndicators();
     updateExport();
+    applyResultFilter();
+    initCopyButtons();
   }
 
   function rowHtml(row) {
@@ -328,13 +322,183 @@
     }
     if (!meta) { meta = '<span class="mgdb-muted">&mdash;</span>'; }
 
-    return '<tr>'
+    var haystack = [row.name, row.type,
+                    (row.synonyms || []).join(' '),
+                    (row.ec_numbers || []).join(' '),
+                    (row.encoded_by || []).map(function (l) { return l.name; }).join(' '),
+                    (row.gene_models || []).join(' '),
+                    (row.pathways || []).join(' '),
+                    (row.localizations || []).join(' ')].join(' ').toLowerCase();
+
+    return '<tr data-search="' + esc(haystack) + '">'
       + '<td>' + name + synonyms + '</td>'
       + '<td>' + (row.type ? esc(row.type) : '<span class="mgdb-muted">Unclassified</span>') + '</td>'
       + '<td>' + ec + '</td>'
       + '<td>' + encodedCell + '</td>'
       + '<td>' + meta + '</td>'
       + '</tr>';
+  }
+
+  function renderCard(row) {
+    var productUrl = row.url || ('/data_center/gene_product?id=' + encodeURIComponent(row.id));
+    var typeBadge = row.type
+      ? '<span class="mgdb-pill">' + esc(row.type) + '</span>'
+      : '<span class="mgdb-pill">Unclassified</span>';
+
+    var ecBadges = '';
+    if (row.ec_numbers && row.ec_numbers.length) {
+      ecBadges = row.ec_numbers.map(function (n) {
+        return '<a class="gp-ec-badge" href="https://enzyme.expasy.org/EC/' + encodeURIComponent(n)
+             + '" target="_blank" rel="noopener">EC ' + esc(n) + '</a>';
+      }).join('');
+    }
+
+    var synonymsHtml = '';
+    if (row.synonyms && row.synonyms.length) {
+      var others = row.synonyms.filter(function (s) {
+        return s && s.toLowerCase() !== String(row.name || '').toLowerCase();
+      });
+      if (others.length) {
+        synonymsHtml = '<div class="gp-card-synonyms">Synonyms&#58; ' + esc(others.slice(0, 4).join(', '))
+                     + (others.length > 4 ? '…' : '') + '</div>';
+      }
+    }
+
+    var metaItems = [];
+    var encodedLinks = [];
+    (row.encoded_by || []).forEach(function (locus) {
+      encodedLinks.push('<a href="' + esc(locus.url) + '"><em>' + esc(locus.name) + '</em></a>');
+    });
+    (row.gene_models || []).slice(0, 3).forEach(function (gm) {
+      encodedLinks.push('<a href="/gene_center/gene/' + encodeURIComponent(gm) + '">' + esc(gm) + '</a>');
+    });
+    if ((row.gene_models || []).length > 3) {
+      encodedLinks.push('<span class="mgdb-muted">+' + ((row.gene_models || []).length - 3) + ' more</span>');
+    }
+    if (encodedLinks.length) {
+      metaItems.push('<dt>Encoded by</dt><dd>' + encodedLinks.join(', ') + '</dd>');
+    }
+
+    if (row.pathways && row.pathways.length) {
+      metaItems.push('<dt>Pathways</dt><dd>' + esc(row.pathways.join(', ')) + '</dd>');
+    }
+    if (row.localizations && row.localizations.length) {
+      metaItems.push('<dt>Localization</dt><dd>' + esc(row.localizations.join(', ')) + '</dd>');
+    }
+
+    var metaHtml = metaItems.length ? '<dl class="gp-card-meta-list">' + metaItems.join('') + '</dl>' : '';
+
+    var haystack = [row.name, row.type,
+                    (row.synonyms || []).join(' '),
+                    (row.ec_numbers || []).join(' '),
+                    (row.encoded_by || []).map(function (l) { return l.name; }).join(' '),
+                    (row.gene_models || []).join(' '),
+                    (row.pathways || []).join(' '),
+                    (row.localizations || []).join(' ')].join(' ').toLowerCase();
+
+    var copyButtons = '<button class="gp-copy-btn" type="button" data-copy-value="' + esc(row.name) + '">Copy Name</button>';
+    if (row.ec_numbers && row.ec_numbers.length) {
+      copyButtons += '<button class="gp-copy-btn" type="button" data-copy-value="' + esc(row.ec_numbers[0]) + '">Copy EC</button>';
+    } else {
+      copyButtons += '<button class="gp-copy-btn" type="button" data-copy-value="' + esc(row.id) + '">Copy ID</button>';
+    }
+
+    return '<article class="gp-result-card" data-search="' + esc(haystack) + '">' +
+      '<div>' +
+        '<div class="gp-card-header">' +
+          '<h3 class="gp-card-title"><a href="' + esc(productUrl) + '">' + esc(row.name || '(unnamed)') + '</a></h3>' +
+          '<div class="gp-card-badges">' + typeBadge + ecBadges + '</div>' +
+        '</div>' +
+        synonymsHtml +
+        metaHtml +
+      '</div>' +
+      '<div class="gp-card-actions">' +
+        '<a href="' + esc(productUrl) + '">View details &rarr;</a>' +
+        '<div class="gp-card-copy-btns">' + copyButtons + '</div>' +
+      '</div>' +
+    '</article>';
+  }
+
+  function updateViewDisplay() {
+    var tableView = byId('gp-table-scroll');
+    var cardsView = byId('gp-cards-view');
+    var btnCards = byId('gp-view-cards');
+    var btnTable = byId('gp-view-table');
+
+    var isCards = state.view === 'cards';
+    var hasResults = state.rows && state.rows.length > 0;
+
+    if (tableView) {
+      tableView.hidden = isCards || !hasResults;
+    }
+    if (cardsView) {
+      cardsView.hidden = !isCards || !hasResults;
+    }
+
+    if (btnCards) {
+      btnCards.setAttribute('aria-pressed', isCards ? 'true' : 'false');
+      btnCards.classList.toggle('is-active', isCards);
+    }
+    if (btnTable) {
+      btnTable.setAttribute('aria-pressed', !isCards ? 'true' : 'false');
+      btnTable.classList.toggle('is-active', !isCards);
+    }
+  }
+
+  function initCopyButtons() {
+    Array.prototype.forEach.call(document.querySelectorAll('.gp-copy-btn'), function (btn) {
+      btn.addEventListener('click', function () {
+        var val = btn.getAttribute('data-copy-value');
+        if (!val) return;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(val).then(function () {
+            var orig = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(function () { btn.textContent = orig; }, 1500);
+          });
+        }
+      });
+    });
+  }
+
+  function applyResultFilter() {
+    var query = (state.filter || '').toLowerCase().trim();
+    var terms = query.split(/\s+/).filter(Boolean);
+    var body = byId('gp-results-body');
+    var cardsContainer = byId('gp-cards-view');
+    var total = state.rows.length;
+    var visible = 0;
+
+    if (body) {
+      var rows = body.querySelectorAll('tr');
+      for (var i = 0; i < rows.length; i++) {
+        var hay = (rows[i].getAttribute('data-search') || '').toLowerCase();
+        var match = true;
+        for (var t = 0; t < terms.length; t++) {
+          if (hay.indexOf(terms[t]) === -1) { match = false; break; }
+        }
+        rows[i].hidden = !match;
+        rows[i].classList.toggle('is-alt', match && visible % 2 === 1);
+        if (match) { visible++; }
+      }
+    }
+
+    if (cardsContainer) {
+      var cards = cardsContainer.querySelectorAll('.gp-result-card');
+      for (var j = 0; j < cards.length; j++) {
+        var cHay = (cards[j].getAttribute('data-search') || '').toLowerCase();
+        var cMatch = true;
+        for (var ct = 0; ct < terms.length; ct++) {
+          if (cHay.indexOf(terms[ct]) === -1) { cMatch = false; break; }
+        }
+        cards[j].hidden = !cMatch;
+      }
+    }
+
+    var note = byId('gp-filter-count');
+    if (note) {
+      note.textContent = query === '' ? '' : visible + ' of ' + total + ' shown';
+    }
   }
 
   function updateStatus(summary, shown) {
@@ -436,9 +600,11 @@
 
   function updateSortIndicators() {
     Array.prototype.forEach.call(
-      document.querySelectorAll('#gp-results-table th[data-gp-sort]'),
-      function (th) {
-        var key = th.getAttribute('data-gp-sort');
+      document.querySelectorAll('#gp-results-table th button[data-sort-key]'),
+      function (btn) {
+        var th = btn.closest('th');
+        if (!th) { return; }
+        var key = btn.getAttribute('data-sort-key');
         th.setAttribute('aria-sort', state.sort === key
           ? (state.dir === 'desc' ? 'descending' : 'ascending')
           : 'none');
@@ -446,7 +612,7 @@
   }
 
   function updateExport() {
-    var link = byId('gp-export');
+    var link = byId('gp-export-tsv') || byId('gp-export');
     if (link) { link.setAttribute('href', API + '?' + queryString({ format: 'tsv', limit: MAX_PAGE, offset: 0 })); }
   }
 
@@ -467,6 +633,8 @@
     });
     var ec = byId('gp-filter-ec');
     if (ec) { ec.value = ''; }
+    var advSort = byId('gp-adv-sort');
+    if (advSort) { advSort.value = ''; }
   }
 
   function initSearch() {
@@ -549,13 +717,24 @@
       });
     }
 
+    var advSort = byId('gp-adv-sort');
+    if (advSort) {
+      advSort.addEventListener('change', function () {
+        readForm();
+        state.page = 1;
+        if (state.searched) { runSearch({}); }
+      });
+    }
+
     var advReset = byId('gp-adv-reset');
     if (advReset) {
       advReset.addEventListener('click', function () {
         resetAdvanced();
+        state.sort = '';
+        state.dir = 'asc';
         readForm();
         state.page = 1;
-        runSearch({});
+        if (state.searched) { runSearch({}); }
       });
     }
 
@@ -567,10 +746,12 @@
         var filter = byId('gp-results-filter');
         if (filter) { filter.value = ''; }
         state.filter = '';
+        state.sort = '';
+        state.dir = 'asc';
         state.page = 1;
         updateClearButton();
         readForm();
-        runSearch({});
+        runSearch({ scroll: true });
         if (query) { query.focus(); }
       });
     }
@@ -579,7 +760,7 @@
     if (filter) {
       filter.addEventListener('input', function () {
         state.filter = filter.value.trim();
-        render();
+        applyResultFilter();
       });
     }
 
@@ -592,13 +773,34 @@
       });
     }
 
+    var btnCards = byId('gp-view-cards');
+    var btnTable = byId('gp-view-table');
+
+    if (btnCards) {
+      btnCards.addEventListener('click', function () {
+        state.view = 'cards';
+        updateViewDisplay();
+      });
+    }
+
+    if (btnTable) {
+      btnTable.addEventListener('click', function () {
+        state.view = 'table';
+        updateViewDisplay();
+      });
+    }
+
     Array.prototype.forEach.call(
-      document.querySelectorAll('#gp-results-table th[data-gp-sort] button'),
+      document.querySelectorAll('#gp-results-table th button[data-sort-key]'),
       function (btn) {
         btn.addEventListener('click', function () {
-          var key = btn.parentNode.getAttribute('data-gp-sort');
-          if (state.sort === key) { state.dir = state.dir === 'asc' ? 'desc' : 'asc'; }
-          else { state.sort = key; state.dir = 'asc'; }
+          var key = btn.getAttribute('data-sort-key');
+          if (state.sort === key) {
+            state.dir = state.dir === 'asc' ? 'desc' : 'asc';
+          } else {
+            state.sort = key;
+            state.dir = 'asc';
+          }
           render();
         });
       });
@@ -609,6 +811,9 @@
        figure below or one of the class cards. */
     var params = new URLSearchParams(window.location.search);
     var linked = false;
+    if (params.get('view') === 'cards' || params.get('view') === 'table') {
+      state.view = params.get('view');
+    }
     if (params.get('term') && query) { query.value = params.get('term'); linked = true; }
     [['type', 'gp-filter-type'], ['ec_num', 'gp-filter-ec'],
      ['localization', 'gp-filter-loc'], ['pathway', 'gp-filter-pathway']].forEach(function (pair) {

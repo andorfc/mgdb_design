@@ -1,0 +1,132 @@
+/* mgdb-genome-browser-embed.css -- /jbrowse and /gbrowse.
+ *
+ * These pages are a full-width embedded genome browser on the modern shell. The
+ * chrome (header, megamenu, footer) is the shared shell; this sheet only styles
+ * the slim action bar above the browser and the iframe frame itself. Scoped
+ * under .mgdb-browser-embed-page.
+ */
+
+.mgdb-page.mgdb-browser-embed-page { padding-bottom: var(--mgdb-space-4); }
+
+/* Action bar: title + assembly on the left, the buttons on the right. */
+.mgdb-page.mgdb-browser-embed-page .mgdb-browser-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-page.mgdb-browser-embed-page .mgdb-browser-bar-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--mgdb-space-3);
+  min-width: 0;
+}
+
+.mgdb-page.mgdb-browser-embed-page .mgdb-browser-bar-heading h1 { margin: 0; }
+
+.mgdb-page.mgdb-browser-embed-page .mgdb-browser-source {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+.mgdb-page.mgdb-browser-embed-page .mgdb-browser-source code {
+  font-family: var(--mgdb-font-mono);
+  color: var(--mgdb-ink);
+}
+
+.mgdb-page.mgdb-browser-embed-page .mgdb-browser-bar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+}
+
+/* The frame. It reaches the full width of the page card by pulling back the
+   content gutter on both sides -- a genome browser earns the extra room, and it
+   stays inside #wrapper so the page never scrolls sideways. The height tracks
+   the viewport so the browser fills the screen without a fixed 1050px guess. */
+.mgdb-page.mgdb-browser-embed-page .mgdb-browser-frame {
+  position: relative;
+  margin-inline: calc(-1 * var(--mgdb-gutter));
+  height: clamp(560px, calc(100vh - 210px), 1400px);
+  border-top: 1px solid var(--mgdb-line);
+  border-bottom: 1px solid var(--mgdb-line);
+  background: var(--mgdb-surface-alt);
+  overflow: hidden;
+}
+
+.mgdb-page.mgdb-browser-embed-page .mgdb-browser-iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Loading overlay, removed once the iframe fires load. */
+.mgdb-page.mgdb-browser-embed-page .mgdb-browser-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mgdb-space-3);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  background: var(--mgdb-surface-alt);
+  pointer-events: none;
+}
+.mgdb-page.mgdb-browser-embed-page .mgdb-browser-frame.is-loaded .mgdb-browser-loading {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .2s ease, visibility 0s linear .2s;
+}
+
+.mgdb-page.mgdb-browser-embed-page .mgdb-browser-spinner {
+  width: 34px;
+  height: 34px;
+  border: 3px solid var(--mgdb-line);
+  border-top-color: var(--mgdb-green);
+  border-radius: 50%;
+  animation: mgdb-browser-spin .8s linear infinite;
+}
+
+@keyframes mgdb-browser-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .mgdb-page.mgdb-browser-embed-page .mgdb-browser-spinner { animation: none; }
+}
+
+/* Below 768px the shell stops using --mgdb-gutter for the page's own padding:
+   mgdb-modern.css has
+
+       @media (max-width: 767px) {
+         .mgdb-page { padding: var(--mgdb-space-3) var(--mgdb-space-4) ... }
+       }
+
+   so .mgdb-page pads 16px a side while --mgdb-gutter stays 1.5rem/24px. The
+   full-bleed above pulls out by the VARIABLE, so it reclaimed 24px where only
+   16px existed and hung 8px off each edge -- 8px of horizontal page scroll on
+   every phone, which is what the comment above ("it stays inside #wrapper so
+   the page never scrolls sideways") assumed could not happen. It held only
+   while the two numbers agreed.
+
+   Mirrored here rather than fixed by redefining --mgdb-gutter at this
+   breakpoint: six other rules in mgdb-modern.css read that variable (the page
+   header, the section nav, the megamenu bar), and changing it would move all of
+   them on every modern page to fix two. Keep this breakpoint and this value in
+   step with the shell rule quoted above. */
+@media (max-width: 767px) {
+  .mgdb-page.mgdb-browser-embed-page .mgdb-browser-frame {
+    margin-inline: calc(-1 * var(--mgdb-space-4));
+  }
+}
+
+@media (max-width: 640px) {
+  .mgdb-page.mgdb-browser-embed-page .mgdb-browser-bar-actions,
+  .mgdb-page.mgdb-browser-embed-page .mgdb-browser-bar-actions .mgdb-button { width: 100%; }
+  .mgdb-page.mgdb-browser-embed-page .mgdb-browser-frame { height: clamp(460px, calc(100vh - 260px), 1000px); }
+}

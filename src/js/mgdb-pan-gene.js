@@ -32,9 +32,12 @@
     mode: 'simple',
     term: '',
     sort: 'members',
+    sortKey: 'members',
+    sortDir: 'desc',
     page: 1,
     pageSize: 25,
     filter: '',
+    view: 'table',
     searched: false,
     lastPayload: null,
     filters: {}
@@ -271,6 +274,7 @@
     }
     if (state.sort !== 'members') { params.set('sort', state.sort); }
     if (state.page > 1) { params.set('page', String(state.page)); }
+    if (state.view && state.view !== 'table') { params.set('view', state.view); }
     var query = params.toString();
     window.history.replaceState(null, '',
       window.location.pathname + (query ? '?' + query : '') + window.location.hash);
@@ -288,6 +292,9 @@
     var page = parseInt(params.get('page'), 10);
     if (!isNaN(page) && page > 0) { state.page = page; }
 
+    var v = params.get('view');
+    if (v === 'card' || v === 'table') { state.view = v; }
+
     if (params.get('mode') === 'advanced') {
       state.mode = 'advanced';
       var filters = {};
@@ -298,16 +305,20 @@
       state.filters = filters;
       writeAdvancedForm(filters);
       if (els.advanced && Object.keys(filters).length) { els.advanced.open = true; }
+      syncAdvancedBadge();
       return Object.keys(filters).length > 0;
     }
 
     // pan_gene_term is the parameter the legacy search form used; honour it so
     // existing links keep working.
-    var term = params.get('term') || params.get('pan_gene_term') || '';
+    var term = params.get('term') || params.get('q') || params.get('pan_gene_term') || '';
     if (term) {
       state.mode = 'simple';
       state.term = term;
-      if (els.term) { els.term.value = term; }
+      if (els.term) {
+        els.term.value = term;
+        if (els.clear) { els.clear.hidden = false; }
+      }
       return true;
     }
     return false;
@@ -399,12 +410,268 @@
     els.rows.innerHTML = html;
   }
 
+  function renderCards(results) {
+    if (!els.cardsView) { return; }
+    var html = '';
+    results.forEach(function (row) {
+      var exemplar = row.exemplar || '';
+      var url = recordUrl(row);
+      var panGeneName = row.pan_gene_name || '';
+
+      var analysisBadge = row.analysis
+        ? '<span class="pan-gene-analysis-badge">' + escape(row.analysis) + '</span>'
+        : '';
+      var memberBadge = '<span class="pan-gene-member-badge">' + (row.member_count || 0).toLocaleString() + ' members</span>';
+      var annotBadge = '<span class="pan-gene-annot-badge">' + (row.annotation_count || 0) + (row.annotation_total ? ' / ' + row.annotation_total : '') + ' annots</span>';
+      var matchedBadges = matchedCell(row);
+
+      var subname = panGeneName
+        ? '<div class="pan-gene-card-subname">Pan-gene: ' + escape(panGeneName) + '</div>'
+        : '';
+
+      var lociHtml = '<p><strong>Loci:</strong> ' + locusCell(row) + '</p>';
+      var proteinsHtml = '<p><strong>Proteins:</strong> ' + valueList(row.proteins) + '</p>';
+      var traitsHtml = '<p><strong>Traits:</strong> ' + valueList(row.traits) + '</p>';
+
+      html += '<article class="pan-gene-result-card">' +
+        '<div>' +
+          '<div class="pan-gene-card-meta">' +
+            analysisBadge + memberBadge + annotBadge + matchedBadges +
+          '</div>' +
+          '<h3><a href="' + url + '">' + escape(exemplar) + '</a></h3>' +
+          subname +
+          '<div class="pan-gene-card-details">' +
+            lociHtml + proteinsHtml + traitsHtml +
+          '</div>' +
+        '</div>' +
+        '<div class="pan-gene-card-links">' +
+          '<a href="' + url + '">View Record &rarr;</a>' +
+          '<button class="mgdb-button mgdb-button-quiet pan-gene-copy-btn" type="button" data-copy-value="' + escape(exemplar) + '">Copy Exemplar</button>' +
+          (panGeneName ? '<button class="mgdb-button mgdb-button-quiet pan-gene-copy-btn" type="button" data-copy-value="' + escape(panGeneName) + '">Copy Pan-Gene ID</button>' : '') +
+        '</div>' +
+      '</article>';
+    });
+    els.cardsView.innerHTML = html;
+  }
+
+  function initCopyButtons() {
+    Array.prototype.forEach.call(document.querySelectorAll('.pan-gene-copy-btn'), function (btn) {
+      btn.addEventListener('click', function () {
+        var val = btn.getAttribute('data-copy-value');
+        if (!val) return;
+        var original = btn.textContent;
+        function finish(ok) {
+          btn.textContent = ok ? 'Copied!' : 'Press Cmd+C';
+          window.setTimeout(function () { btn.textContent = original; }, 1600);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(val).then(function () { finish(true); }).catch(function () { finish(false); });
+        } else {
+          finish(false);
+        }
+      });
+    });
+  }
+
+  var STORAGE_VIEW_KEY = 'mgdb_pan_gene_view';
+
+  function updateViewDisplay() {
+    var isCard = state.view === 'card';
+    if (els.cardsView) els.cardsView.hidden = !isCard;
+    if (els.tableWrap) els.tableWrap.hidden = isCard;
+
+    var btnCards = byId('pan-gene-view-cards');
+    var btnTable = byId('pan-gene-view-table');
+
+    if (btnCards) {
+      btnCards.classList.toggle('is-active', isCard);
+      btnCards.setAttribute('aria-pressed', isCard ? 'true' : 'false');
+    }
+    if (btnTable) {
+      btnTable.classList.toggle('is-active', !isCard);
+      btnTable.setAttribute('aria-pressed', !isCard ? 'true' : 'false');
+    }
+  }
+
+  function initViewToggle() {
+    var buttons = document.querySelectorAll('.pan-gene-results-view button[data-view]');
+    if (!buttons.length) return;
+
+    var savedView = 'table';
+    try { savedView = localStorage.getItem(STORAGE_VIEW_KEY) || 'table'; } catch (e) {}
+    if (state.view) savedView = state.view;
+
+    function applyView(view) {
+      state.view = view;
+      try { localStorage.setItem(STORAGE_VIEW_KEY, view); } catch (e) {}
+      updateViewDisplay();
+      syncUrl();
+    }
+
+    Array.prototype.forEach.call(buttons, function (btn) {
+      btn.addEventListener('click', function () {
+        applyView(btn.getAttribute('data-view'));
+      });
+    });
+
+    applyView(savedView);
+  }
+
+  function getPanGeneHeaderAriaSort(key) {
+    if (state.sortKey === key) {
+      return state.sortDir === 'asc' ? 'ascending' : 'descending';
+    }
+    return 'none';
+  }
+
+  function sortPanGeneResults(results) {
+    if (!results || !results.length) return [];
+    var key = state.sortKey || 'members';
+    var dir = state.sortDir === 'desc' ? -1 : 1;
+
+    return results.slice().sort(function (a, b) {
+      if (key === 'exemplar') {
+        var aEx = (a.exemplar || '').toLowerCase();
+        var bEx = (b.exemplar || '').toLowerCase();
+        return aEx.localeCompare(bEx, undefined, { numeric: true }) * dir;
+      } else if (key === 'locus') {
+        var aLoc = (a.loci && a.loci.length ? a.loci.join(', ') : '').toLowerCase();
+        var bLoc = (b.loci && b.loci.length ? b.loci.join(', ') : '').toLowerCase();
+        if (aLoc && !bLoc) return -1 * dir;
+        if (!aLoc && bLoc) return 1 * dir;
+        var cmpLoc = aLoc.localeCompare(bLoc, undefined, { numeric: true });
+        if (cmpLoc !== 0) return cmpLoc * dir;
+      } else if (key === 'protein') {
+        var aProt = (a.proteins && a.proteins.length ? a.proteins.join(', ') : '').toLowerCase();
+        var bProt = (b.proteins && b.proteins.length ? b.proteins.join(', ') : '').toLowerCase();
+        if (aProt && !bProt) return -1 * dir;
+        if (!aProt && bProt) return 1 * dir;
+        var cmpProt = aProt.localeCompare(bProt, undefined, { numeric: true });
+        if (cmpProt !== 0) return cmpProt * dir;
+      } else if (key === 'trait') {
+        var aTrait = (a.traits && a.traits.length ? a.traits.join(', ') : '').toLowerCase();
+        var bTrait = (b.traits && b.traits.length ? b.traits.join(', ') : '').toLowerCase();
+        if (aTrait && !bTrait) return -1 * dir;
+        if (!aTrait && bTrait) return 1 * dir;
+        var cmpTrait = aTrait.localeCompare(bTrait, undefined, { numeric: true });
+        if (cmpTrait !== 0) return cmpTrait * dir;
+      } else if (key === 'members') {
+        var aMem = parseInt(a.member_count, 10) || 0;
+        var bMem = parseInt(b.member_count, 10) || 0;
+        if (aMem !== bMem) return (aMem - bMem) * dir;
+      } else if (key === 'annotations') {
+        var aAnn = parseInt(a.annotation_count, 10) || 0;
+        var bAnn = parseInt(b.annotation_count, 10) || 0;
+        if (aAnn !== bAnn) return (aAnn - bAnn) * dir;
+      } else if (key === 'matched') {
+        var aMatch = (a.matched_as && a.matched_as.length ? a.matched_as.join(', ') : '').toLowerCase();
+        var bMatch = (b.matched_as && b.matched_as.length ? b.matched_as.join(', ') : '').toLowerCase();
+        if (aMatch && !bMatch) return -1 * dir;
+        if (!aMatch && bMatch) return 1 * dir;
+        var cmpMatch = aMatch.localeCompare(bMatch, undefined, { numeric: true });
+        if (cmpMatch !== 0) return cmpMatch * dir;
+      }
+      var aName = (a.exemplar || '').toLowerCase();
+      var bName = (b.exemplar || '').toLowerCase();
+      return aName.localeCompare(bName, undefined, { numeric: true }) * dir;
+    });
+  }
+
+  function updateSortHeaders() {
+    var headers = document.querySelectorAll('#pan-gene-table thead th[aria-sort]');
+    Array.prototype.forEach.call(headers, function (th) {
+      var btn = th.querySelector('button[data-sort-key]');
+      if (!btn) return;
+      var key = btn.getAttribute('data-sort-key');
+      th.setAttribute('aria-sort', getPanGeneHeaderAriaSort(key));
+    });
+  }
+
+  function initSortButtons() {
+    var buttons = document.querySelectorAll('#pan-gene-table thead button[data-sort-key]');
+    Array.prototype.forEach.call(buttons, function (btn) {
+      btn.addEventListener('click', function () {
+        var key = btn.getAttribute('data-sort-key');
+        if (state.sortKey === key) {
+          state.sortDir = (state.sortDir === 'asc') ? 'desc' : 'asc';
+        } else {
+          state.sortKey = key;
+          state.sortDir = (key === 'members' || key === 'annotations') ? 'desc' : 'asc';
+        }
+        updateSortHeaders();
+        if (state.lastPayload && state.lastPayload.results) {
+          var sorted = sortPanGeneResults(state.lastPayload.results);
+          renderRows(sorted);
+          renderCards(sorted);
+          initCopyButtons();
+          applyResultsFilter();
+        }
+      });
+    });
+  }
+
+  function updateExportTsv(results) {
+    var btn = byId('pan-gene-export-tsv');
+    if (!btn) return;
+    if (!results || !results.length) {
+      btn.href = '#';
+      return;
+    }
+    var headers = ['Exemplar', 'Pan-Gene ID', 'Analysis', 'Loci', 'Proteins', 'Traits', 'Member Count', 'Annotation Count', 'Annotation Total', 'Matched On'];
+    var lines = [headers.join('\t')];
+    results.forEach(function (row) {
+      var line = [
+        row.exemplar || '',
+        row.pan_gene_name || '',
+        row.analysis || '',
+        (row.loci || []).join('; '),
+        (row.proteins || []).join('; '),
+        (row.traits || []).join('; '),
+        row.member_count || 0,
+        row.annotation_count || 0,
+        row.annotation_total || '',
+        (row.matched_as || []).join(', ')
+      ].map(function (val) {
+        return String(val).replace(/[\t\r\n]+/g, ' ');
+      });
+      lines.push(line.join('\t'));
+    });
+    var blob = new Blob([lines.join('\n')], { type: 'text/tab-separated-values;charset=utf-8;' });
+    btn.href = URL.createObjectURL(blob);
+    btn.download = 'pan_genes.tsv';
+  }
+
+  function syncAdvancedBadge() {
+    var badge = byId('pan-gene-advanced-count');
+    if (!badge) return;
+    var count = 0;
+    ADVANCED_FIELDS.forEach(function (field) {
+      var el = byId(field.id);
+      if (!el) return;
+      if (field.type === 'flag') {
+        if (el.checked) count++;
+      } else if (field.type === 'multi') {
+        var selected = Array.prototype.filter.call(el.options, function (opt) { return opt.selected; });
+        if (selected.length > 0) count++;
+      } else {
+        if (el.value && el.value.trim().length > 0) count++;
+      }
+    });
+    if (count > 0) {
+      badge.textContent = count;
+      badge.hidden = false;
+    } else {
+      badge.textContent = '0';
+      badge.hidden = true;
+    }
+  }
+
   function renderSingle(row) {
     if (!els.single) { return; }
     els.single.innerHTML =
       '<div>' +
         '<span class="mgdb-eyebrow">Exactly one pan-gene matched</span>' +
-        '<h3>' + escape(row.exemplar) + '</h3>' +
+        '<h3><span class="pan-gene-single-label">Pan-gene exemplar</span>' + escape(row.exemplar) + '</h3>' +
         '<p>' + row.member_count.toLocaleString() + ' member gene models across ' +
           row.annotation_count + ' of ' + row.annotation_total + ' annotations' +
           (row.loci && row.loci.length ? ', associated with ' + escape(row.loci.join(', ')) : '') +
@@ -519,9 +786,12 @@
 
     if (total === 0) {
       els.rows.innerHTML = '';
+      if (els.cardsView) { els.cardsView.innerHTML = ''; }
       show(els.tableWrap, false);
+      show(els.cardsView, false);
       show(els.pagination, false);
-      show(els.sortWrap, false);
+      if (els.filterCount) { els.filterCount.textContent = ''; }
+      updateExportTsv([]);
       renderEmpty(payload);
       els.status.textContent = payload.reason === 'no-term' || payload.reason === 'no-filters'
         ? '' : 'No matching pan-genes.';
@@ -530,9 +800,13 @@
     }
 
     show(els.empty, false);
-    renderRows(payload.results);
-    show(els.tableWrap, true);
-    show(els.sortWrap, true);
+    var sorted = sortPanGeneResults(payload.results || []);
+    renderRows(sorted);
+    renderCards(sorted);
+    updateSortHeaders();
+    updateViewDisplay();
+    updateExportTsv(sorted);
+    initCopyButtons();
     renderPagination(summary);
 
     // Exactly one match: the legacy page jumped straight to the record. Offer
@@ -567,34 +841,51 @@
   /* Narrows the page already rendered. The search pages server side, so this
      filters what is on screen and the status line says so. */
   function applyResultsFilter() {
-    var body = els.rows;
-    if (!body) { return; }
+    var filterTerm = (state.filter || '').toLowerCase().trim();
+    var filterCountEl = els.filterCount || byId('pan-gene-filter-count');
 
-    var rows = body.querySelectorAll('tr');
-    var terms = state.filter.toLowerCase().split(/\s+/).filter(Boolean);
-    var shown = 0;
+    var rows = els.rows ? els.rows.querySelectorAll('tr') : [];
+    var cards = els.cardsView ? els.cardsView.querySelectorAll('.pan-gene-result-card') : [];
+    var terms = filterTerm.split(/\s+/).filter(Boolean);
+    var matched = 0;
+    var total = rows.length;
+
+    function matches(text) {
+      if (!terms.length) return true;
+      var lower = text.toLowerCase();
+      for (var i = 0; i < terms.length; i++) {
+        if (lower.indexOf(terms[i]) === -1) return false;
+      }
+      return true;
+    }
 
     Array.prototype.forEach.call(rows, function (row) {
-      var match = true;
-      if (terms.length) {
-        var hay = (row.textContent || '').toLowerCase();
-        for (var i = 0; i < terms.length; i++) {
-          if (hay.indexOf(terms[i]) === -1) { match = false; break; }
-        }
-      }
+      var match = matches(row.textContent || '');
       row.hidden = !match;
-      if (match) { shown++; }
+      if (match) matched++;
     });
 
+    Array.prototype.forEach.call(cards, function (card) {
+      card.hidden = !matches(card.textContent || '');
+    });
+
+    if (filterCountEl) {
+      if (terms.length) {
+        filterCountEl.textContent = matched + ' / ' + total;
+      } else {
+        filterCountEl.textContent = '';
+      }
+    }
+
     if (terms.length && els.status) {
-      var total = state.lastPayload && state.lastPayload.summary
+      var searchTotal = state.lastPayload && state.lastPayload.summary
         ? state.lastPayload.summary.total : 0;
-      els.status.innerHTML = shown === 0
+      els.status.innerHTML = matched === 0
         ? 'Nothing on this page matches the filter &ldquo;' + MGDB.escapeHtml(state.filter)
-          + '&rdquo;. ' + total.toLocaleString() + ' pan-genes matched the search.'
-        : 'Showing ' + shown.toLocaleString() + ' of the ' + rows.length.toLocaleString()
+          + '&rdquo;. ' + searchTotal.toLocaleString() + ' pan-genes matched the search.'
+        : 'Showing ' + matched.toLocaleString() + ' of the ' + total.toLocaleString()
           + ' pan-genes on this page matching &ldquo;' + MGDB.escapeHtml(state.filter)
-          + '&rdquo;, out of ' + total.toLocaleString() + ' matched by the search.';
+          + '&rdquo;, out of ' + searchTotal.toLocaleString() + ' matched by the search.';
     }
   }
 
@@ -626,6 +917,7 @@
         if (error && error.name === 'AbortError') { return; }
         show(els.loading, false);
         show(els.tableWrap, false);
+        show(els.cardsView, false);
         show(els.empty, false);
         show(els.error, true);
         els.status.textContent = 'The search could not be completed.';
@@ -658,16 +950,16 @@
       advanced: byId('pan-gene-advanced'),
       advancedForm: byId('pan-gene-advanced-form'),
       advancedClear: byId('pan-gene-advanced-clear'),
-      sort: byId('pan-gene-sort'),
-      sortWrap: byId('pan-gene-sort-wrap'),
       pageSize: byId('pan-gene-page-size'),
       resultsFilter: byId('pan-gene-results-filter'),
+      filterCount: byId('pan-gene-filter-count'),
       status: byId('pan-gene-status'),
       criteria: byId('pan-gene-criteria'),
       loading: byId('pan-gene-loading'),
       single: byId('pan-gene-single'),
       tableWrap: byId('pan-gene-table-wrap'),
       rows: byId('pan-gene-rows'),
+      cardsView: byId('pan-gene-cards-view'),
       empty: byId('pan-gene-empty'),
       emptyTitle: byId('pan-gene-empty-title'),
       emptyBody: byId('pan-gene-empty-body'),
@@ -678,27 +970,52 @@
 
     buildTabs();
     buildDistribution();
+    initViewToggle();
+    initSortButtons();
+    syncAdvancedBadge();
 
     if (!els.form || !els.rows) { return; }
 
+    if (els.term) {
+      if (els.clear) { els.clear.hidden = !els.term.value; }
+      els.term.addEventListener('input', function () {
+        if (els.clear) { els.clear.hidden = !els.term.value; }
+      });
+    }
+
     els.form.addEventListener('submit', function (event) {
       event.preventDefault();
-      searchSimple(els.term.value.trim());
+      var val = els.term ? els.term.value.trim() : '';
+      if (val) {
+        state.filter = '';
+        if (els.resultsFilter) { els.resultsFilter.value = ''; }
+        if (els.filterCount) { els.filterCount.textContent = ''; }
+        searchSimple(val);
+      }
     });
 
-    if (els.clear) {
+    if (els.clear && els.term) {
       els.clear.addEventListener('click', function () {
         els.term.value = '';
+        els.clear.hidden = true;
         els.term.focus();
         state.term = '';
         state.mode = 'simple';
+        state.filter = '';
+        if (els.resultsFilter) { els.resultsFilter.value = ''; }
+        if (els.filterCount) { els.filterCount.textContent = ''; }
         els.rows.innerHTML = '';
+        if (els.cardsView) { els.cardsView.innerHTML = ''; }
         show(els.tableWrap, false);
+        show(els.cardsView, false);
         show(els.pagination, false);
         show(els.single, false);
         show(els.empty, false);
-        show(els.sortWrap, false);
         show(els.criteria, false);
+        updateExportTsv([]);
+        var section = byId('pan-gene-results');
+        if (section) { section.hidden = true; }
+        state.searched = false;
         els.status.textContent = 'Enter an identifier above, or open the advanced search, to begin.';
         syncUrl();
       });
@@ -708,14 +1025,24 @@
       document.querySelectorAll('[data-pan-gene-example]'), function (button) {
         button.addEventListener('click', function () {
           var term = button.getAttribute('data-pan-gene-example');
-          els.term.value = term;
+          if (els.term) {
+            els.term.value = term;
+            if (els.clear) { els.clear.hidden = false; }
+          }
+          state.filter = '';
+          if (els.resultsFilter) { els.resultsFilter.value = ''; }
+          if (els.filterCount) { els.filterCount.textContent = ''; }
           searchSimple(term);
         });
       });
 
-    if (els.advancedForm) {
-      els.advancedForm.addEventListener('submit', function (event) {
-        event.preventDefault();
+    var advSubmit = byId('pan-gene-adv-submit');
+    if (advSubmit) {
+      advSubmit.addEventListener('click', function (e) {
+        e.preventDefault();
+        state.filter = '';
+        if (els.resultsFilter) { els.resultsFilter.value = ''; }
+        if (els.filterCount) { els.filterCount.textContent = ''; }
         searchAdvanced();
       });
     }
@@ -724,16 +1051,16 @@
       els.advancedClear.addEventListener('click', function () {
         clearAdvancedForm();
         state.filters = {};
+        syncAdvancedBadge();
       });
     }
 
-    if (els.sort) {
-      els.sort.addEventListener('change', function () {
-        state.sort = els.sort.value;
-        state.page = 1;
-        runSearch();
-      });
-    }
+    ADVANCED_FIELDS.forEach(function (field) {
+      var el = byId(field.id);
+      if (!el) return;
+      el.addEventListener('input', syncAdvancedBadge);
+      el.addEventListener('change', syncAdvancedBadge);
+    });
 
     if (els.pageSize) {
       els.pageSize.addEventListener('change', function () {

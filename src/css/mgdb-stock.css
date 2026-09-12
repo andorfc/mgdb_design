@@ -67,79 +67,47 @@
 
 /* ── Search & Filter Panel ───────────────────────────────────────────────── */
 
-/* The section is the white card, so the form sits directly on it: the query
-   takes the slack and the button takes what it needs, with the examples and
-   the accordion spanning underneath. Five selects and three checkboxes used to
-   share this row with the query; they are all advanced criteria and live in
-   the disclosure now. */
-.mgdb-stock-page .stock-search-form {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--mgdb-space-4);
-  align-items: end;
-}
+/* ── Search & Filter Panel ───────────────────────────────────────────────── */
 
-.mgdb-stock-page .stock-field-query { grid-column: 1; }
-/* Scoped with `>` to the search form: `.mgdb-hub-field-action` is a shared
-   class and the results controls use it too. */
-.mgdb-stock-page .stock-search-form > .mgdb-hub-field-action { grid-column: 2; }
-.mgdb-stock-page .stock-example-row,
-.mgdb-stock-page .stock-adv { grid-column: 1 / -1; }
-
-/* The hint sits on its own full-width row rather than inside the query field.
-   The form is `align-items: end`, so while the hint was a child of that field
-   the Search button bottom-aligned to the *hint* and sat 29px below the search
-   bar — exactly the hint's height plus the field's gap. Its own row lets the
-   button and the bar, both 44px, land on each other, and the hint is free to
-   wrap to two lines at narrow widths without moving the button again.
-
-   The negative top margin cancels most of the form's 16px row gap so the hint
-   keeps sitting 8px under the bar, where it was. */
-.mgdb-stock-page .stock-hint {
-  grid-column: 1 / -1;
-  margin: calc(-1 * var(--mgdb-space-2)) 0 0;
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-xs);
-}
-
-.mgdb-stock-page .stock-field,
-.mgdb-stock-page .stock-field-query {
+.mgdb-stock-page .stock-search {
   display: flex;
   flex-direction: column;
-  gap: var(--mgdb-space-1);
+  gap: var(--mgdb-space-3);
 }
 
-.mgdb-stock-page .stock-field label,
-.mgdb-stock-page .stock-field-query label {
-  color: var(--mgdb-ink-soft);
-  font-size: var(--mgdb-text-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .04em;
+.mgdb-stock-page .stock-query-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-3);
+  align-items: stretch;
+}
+
+.mgdb-stock-page .stock-query-field {
+  position: relative;
+  min-width: 0;
 }
 
 .mgdb-stock-page .stock-query-control {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: var(--mgdb-space-2);
+  gap: var(--mgdb-space-3);
   align-items: center;
-  min-height: var(--mgdb-tap-target);
-  padding: 0 var(--mgdb-space-3);
+  height: 52px;
+  padding: 0 var(--mgdb-space-4);
   border: 1px solid #b9b2a5;
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface, #fff);
+  color: var(--mgdb-muted);
 }
 
 .mgdb-stock-page .stock-query-control:focus-within {
   border-color: var(--mgdb-focus);
+  box-shadow: 0 0 0 2px rgba(11, 87, 164, .18);
 }
 
-.mgdb-stock-page .stock-search-icon {
-  color: var(--mgdb-muted);
-}
-
-.mgdb-stock-page .stock-query-control input {
-  min-height: 40px;
+.mgdb-stock-page .stock-query-control input[type="search"] {
+  min-width: 0;
+  height: 100%;
   padding: 0;
   border: 0;
   background: transparent;
@@ -148,103 +116,77 @@
   font-size: var(--mgdb-text-base);
 }
 
-.mgdb-stock-page .stock-query-control input:focus {
-  outline: none;
-}
+.mgdb-stock-page .stock-query-control input[type="search"]:focus { outline: none; }
 
-.mgdb-stock-page .stock-query-control button {
-  border: 0;
-  background: none;
-  color: var(--mgdb-burgundy);
-  font-family: inherit;
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.mgdb-stock-page .stock-field select {
-  min-height: var(--mgdb-tap-target);
-  padding: 0 var(--mgdb-space-3);
-  border: 1px solid #b9b2a5;
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink);
-  font-family: inherit;
-  font-size: var(--mgdb-text-sm);
-}
-
-.mgdb-stock-page .stock-field select:focus {
-  border-color: var(--mgdb-focus);
-  outline: none;
-}
-
-.mgdb-stock-page .stock-field-options {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-3) var(--mgdb-space-5);
-  margin-top: var(--mgdb-space-1);
-}
-
-.mgdb-stock-page .stock-checkbox-label {
+.mgdb-stock-page .stock-query-clear {
   display: inline-flex;
   align-items: center;
-  gap: var(--mgdb-space-2);
-  color: var(--mgdb-ink);
-  font-size: var(--mgdb-text-sm);
-  font-weight: 600;
+  justify-content: center;
+  width: 1.875rem;
+  height: 1.875rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--mgdb-ink-soft);
   cursor: pointer;
+  transition: background-color .15s ease, color .15s ease;
 }
 
-.mgdb-stock-page .stock-checkbox-label input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--mgdb-green-dark);
+.mgdb-stock-page .stock-query-clear[hidden] {
+  display: none !important;
 }
 
-.mgdb-stock-page .stock-search-submit {
-  grid-column: 1 / -1;
-  display: flex;
-  justify-content: flex-start;
-  margin-top: var(--mgdb-space-2);
+.mgdb-stock-page .stock-query-clear:hover {
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-green-dark);
 }
 
-.mgdb-stock-page .stock-example-row {
-  grid-column: 1 / -1;
+.mgdb-stock-page .stock-query-submit {
+  height: 52px;
+  padding-inline: var(--mgdb-space-6);
+  white-space: nowrap;
+}
+
+.mgdb-stock-page .mgdb-hint {
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-stock-page .stock-examples {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-2);
   align-items: center;
-  margin-top: var(--mgdb-space-3);
-  padding-top: var(--mgdb-space-3);
-  border-top: 1px solid var(--mgdb-line);
-}
-
-.mgdb-stock-page .stock-example-row span {
   color: var(--mgdb-muted);
   font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-stock-page .stock-examples > span {
   font-weight: 700;
-  text-transform: uppercase;
   letter-spacing: .04em;
+  text-transform: uppercase;
 }
 
-.mgdb-stock-page .stock-example-row button {
-  padding: 3px 10px;
-  border: 1px solid var(--mgdb-line);
+.mgdb-stock-page .stock-examples button {
+  padding: 5px 12px;
+  border: 1px solid var(--hub-line, #e3e9f2);
   border-radius: 999px;
-  background: var(--mgdb-surface);
-  color: var(--mgdb-burgundy);
-  font-family: inherit;
+  background: var(--hub-surface, #fff);
+  color: var(--mgdb-ink);
+  font-family: var(--mgdb-font-mono);
   font-size: var(--mgdb-text-xs);
-  font-weight: 600;
   cursor: pointer;
-  transition: background .12s, border-color .12s;
+  transition: background-color .15s ease, border-color .15s ease;
 }
 
-.mgdb-stock-page .stock-example-row button:hover {
-  background: var(--mgdb-green-soft);
-  border-color: #bcd9c6;
-  color: var(--mgdb-green-dark);
+.mgdb-stock-page .stock-examples button:hover {
+  border-color: var(--mgdb-gold);
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+  box-shadow: 0 0 0 1px var(--mgdb-gold);
 }
 
 /* ── Results Section ─────────────────────────────────────────────────────── */
@@ -253,84 +195,81 @@
   margin-top: var(--mgdb-space-6);
 }
 
-.mgdb-stock-page .stock-results-heading {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-4);
-  align-items: flex-end;
-  justify-content: space-between;
-  margin-bottom: var(--mgdb-space-4);
-}
-
-.mgdb-stock-page .stock-results-heading h2 {
-  color: var(--mgdb-green-dark);
-}
-
-.mgdb-stock-page #stock-results-status {
-  margin-top: var(--mgdb-space-1);
-  color: var(--mgdb-muted);
+.mgdb-stock-page .stock-results-status {
+  margin: 0 0 var(--mgdb-space-4);
+  color: var(--mgdb-ink-soft);
   font-size: var(--mgdb-text-sm);
 }
 
-/* Fixed tracks in a box sized to its own content: declared with minmax(0, ...)
-   the first tracks take everything the parent offers and the last resolves to
-   0px, which drops its control onto a second row. */
-.mgdb-stock-page .stock-results-controls {
-  display: grid;
-  width: max-content;
-  max-width: 100%;
-  flex: 0 0 auto;
-  grid-template-columns: 13rem 10rem 12rem auto auto;
+.mgdb-stock-page .stock-results-toolbar {
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--mgdb-space-3) var(--mgdb-space-4);
-  align-items: end;
+  align-items: flex-end;
+  margin-bottom: var(--mgdb-space-4);
 }
 
-@media (max-width: 1180px) {
-  .mgdb-stock-page .stock-results-controls {
-    width: 100%;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.mgdb-stock-page .stock-results-filter {
+  flex: 1 1 240px;
+  min-width: 200px;
+  position: relative;
 }
 
-@media (max-width: 560px) {
-  .mgdb-stock-page .stock-results-controls { grid-template-columns: minmax(0, 1fr); }
+.mgdb-stock-page .stock-results-filter > label {
+  padding-right: 7rem;
 }
 
-.mgdb-stock-page .stock-results-section[hidden] { display: none; }
+.mgdb-stock-page .stock-results-filter .mgdb-result-count {
+  position: absolute;
+  right: 0;
+  bottom: calc(var(--mgdb-tap-target) + 6px);
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
 
-.mgdb-stock-page .stock-view-toggle {
+.mgdb-stock-page .stock-results-export .mgdb-button {
+  height: var(--mgdb-tap-target);
+  min-height: var(--mgdb-tap-target);
   display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.mgdb-stock-page .stock-results-view .mgdb-view-toggle {
+  height: var(--mgdb-tap-target);
+  min-height: var(--mgdb-tap-target);
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  padding: 3px;
   border: 1px solid var(--mgdb-line);
   border-radius: var(--mgdb-radius-sm);
   background: var(--mgdb-surface);
-  overflow: hidden;
 }
 
-.mgdb-stock-page .stock-view-btn {
+.mgdb-stock-page .stock-results-view .mgdb-view-btn {
+  height: 100%;
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   gap: var(--mgdb-space-1);
-  min-height: 34px;
   padding: 0 var(--mgdb-space-3);
   border: 0;
+  border-radius: calc(var(--mgdb-radius-sm) - 2px);
   background: transparent;
   color: var(--mgdb-ink-soft);
   font-family: inherit;
   font-size: var(--mgdb-text-xs);
   font-weight: 700;
   cursor: pointer;
-  transition: background .12s, color .12s;
+  transition: background-color .15s ease, color .15s ease;
 }
 
-.mgdb-stock-page .stock-view-btn.is-active,
-.mgdb-stock-page .stock-view-btn[aria-pressed="true"] {
+.mgdb-stock-page .stock-results-view .mgdb-view-btn.is-active,
+.mgdb-stock-page .stock-results-view .mgdb-view-btn[aria-pressed="true"] {
   background: var(--mgdb-green-dark);
   color: #fff;
-}
-
-.mgdb-stock-page .stock-export-buttons {
-  display: flex;
-  gap: var(--mgdb-space-2);
 }
 
 .mgdb-stock-page .stock-sources {
@@ -354,6 +293,13 @@
   font-size: var(--mgdb-text-xs);
   font-weight: 700;
   cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.mgdb-stock-page .stock-sources .mgdb-chip:hover {
+  border-color: var(--mgdb-gold);
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
 }
 
 .mgdb-stock-page .stock-sources .mgdb-chip.is-active,
@@ -368,23 +314,25 @@
 .mgdb-stock-page .stock-results-container.stock-view-card {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: var(--mgdb-space-4);
+  gap: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-4);
 }
 
 .mgdb-stock-page .stock-card {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: var(--mgdb-space-4) var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--hub-line, #e3e9f2);
   border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface, #ffffff);
+  box-shadow: var(--mgdb-shadow-sm, 0 1px 2px rgba(0,0,0,.05));
   transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
 }
 
 .mgdb-stock-page .stock-card:hover {
-  border-color: var(--mgdb-gold-dark);
-  box-shadow: var(--mgdb-shadow-sm);
+  border-color: var(--mgdb-gold);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
   transform: translateY(-2px);
 }
 
@@ -488,6 +436,31 @@
   text-transform: uppercase;
   letter-spacing: .04em;
   white-space: nowrap;
+}
+
+.mgdb-stock-page .stock-table th button.stock-sort-th-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mgdb-space-1);
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  font-weight: inherit;
+  cursor: pointer;
+}
+
+.mgdb-stock-page .stock-table th[aria-sort="ascending"] button.stock-sort-th-btn::after {
+  content: " \2191";
+  font-size: 0.8em;
+}
+
+.mgdb-stock-page .stock-table th[aria-sort="descending"] button.stock-sort-th-btn::after {
+  content: " \2193";
+  font-size: 0.8em;
 }
 
 .mgdb-stock-page .stock-table td {
@@ -651,49 +624,113 @@
 
 /* ── Advanced search disclosure ──────────────────────────────────────────── */
 
-.mgdb-stock-page .stock-adv {
-  border: 1px solid var(--hub-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--hub-surface);
+/* ── Advanced search disclosure ──────────────────────────────────────────── */
+
+.mgdb-stock-page .stock-advanced {
+  border: 1px solid var(--hub-line, #e3e9f2);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface, #fff);
 }
 
-.mgdb-stock-page .stock-adv summary {
+.mgdb-stock-page .stock-advanced > summary {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-radius: var(--mgdb-radius-sm);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+
+.mgdb-stock-page .stock-advanced > summary::-webkit-details-marker { display: none; }
+
+.mgdb-stock-page .stock-advanced > summary::before {
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 7px solid currentColor;
+  content: "";
+  transition: transform .15s ease;
+}
+
+.mgdb-stock-page .stock-advanced[open] > summary::before { transform: rotate(90deg); }
+
+.mgdb-stock-page .stock-advanced > summary:focus-visible {
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: -3px;
+}
+
+.mgdb-stock-page .stock-advanced-count {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--mgdb-green-dark);
+  color: #fff;
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-stock-page .stock-advanced-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-4);
+  padding: var(--mgdb-space-4);
+  border-top: 1px solid var(--hub-line-soft, #eef2f8);
+}
+
+.mgdb-stock-page .stock-advanced-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: start;
+}
+
+.mgdb-stock-page .stock-advanced-toggles {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--mgdb-space-1) var(--mgdb-space-3);
-  align-items: baseline;
-  padding: var(--mgdb-space-3) var(--mgdb-space-4);
-  color: var(--mgdb-green-dark);
-  cursor: pointer;
-  list-style-position: inside;
+  gap: var(--mgdb-space-2) var(--mgdb-space-5);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px dashed var(--hub-line-soft, #eef2f8);
 }
 
-.mgdb-stock-page .stock-adv summary strong { font-size: var(--mgdb-text-base); }
-.mgdb-stock-page .stock-adv summary span { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
-.mgdb-stock-page .stock-adv[open] summary { border-bottom: 1px solid var(--hub-line-soft); }
-
-.mgdb-stock-page .stock-adv-body {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(0, 18rem));
-  gap: var(--mgdb-space-4);
-  align-items: start;
-  padding: var(--mgdb-space-4);
+.mgdb-stock-page .stock-advanced-toggles .mgdb-hub-check {
+  min-height: var(--mgdb-tap-target);
+  font-size: var(--mgdb-text-sm);
 }
 
-/* The three availability checkboxes are one field, not three columns. */
-.mgdb-stock-page .stock-field-options { grid-column: 1 / -1; }
-
-.mgdb-stock-page .stock-adv-actions {
+.mgdb-stock-page .stock-advanced-actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-3);
-  padding: 0 var(--mgdb-space-4) var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px dashed var(--hub-line-soft, #eef2f8);
 }
 
-@media (max-width: 640px) {
-  .mgdb-stock-page .stock-search-form { grid-template-columns: minmax(0, 1fr); }
-  .mgdb-stock-page .stock-search-form > .mgdb-hub-field-action { grid-column: 1; }
-  .mgdb-stock-page .stock-adv-body { grid-template-columns: minmax(0, 1fr); }
+.mgdb-stock-page .stock-advanced-reset-btn {
+  min-height: var(--mgdb-tap-target);
+  height: var(--mgdb-tap-target);
+  padding: var(--mgdb-space-2) var(--mgdb-space-5);
+  border: 1px solid #b9b2a5;
+  border-radius: var(--mgdb-radius-sm);
+  background: #ffffff;
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.mgdb-stock-page .stock-advanced-reset-btn:hover {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+}
+
+@media (max-width: 768px) {
+  .mgdb-stock-page .stock-advanced-grid { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* ── Stock category figure ───────────────────────────────────────────────── */

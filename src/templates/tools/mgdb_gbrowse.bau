@@ -1,0 +1,32 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-gbrowse
+<main class="mgdb-page mgdb-browser-embed-page mgdb-gbrowse-page" id="mgdb-gbrowse-main">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/genomebrowser">Genome browsers</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">GBrowse</span>
+  </nav>
+
+  <div class="mgdb-browser-bar">
+    <div class="mgdb-browser-bar-heading">
+      <h1>GBrowse</h1>
+      <span class="mgdb-browser-source">Assembly <code>$(source)</code></span>
+    </div>
+    <div class="mgdb-browser-bar-actions">
+      <a class="mgdb-button mgdb-button-quiet" href="/feedback?kind=gene_model">Report an assembly or gene model problem</a>
+      <a class="mgdb-button mgdb-button-primary" href="$(browser-url)" target="_blank" rel="noopener">Open in full screen</a>
+    </div>
+  </div>
+
+  <div class="mgdb-browser-frame" data-browser-frame>
+    <div class="mgdb-browser-loading" data-browser-loading>
+      <span class="mgdb-browser-spinner" aria-hidden="true"></span>
+      <span>Loading the genome browser&hellip;</span>
+    </div>
+    <iframe class="mgdb-browser-iframe" title="GBrowse genome browser" name="$(window-name)" src="$(browser-url)"
+            data-browser-iframe allow="fullscreen"
+            referrerpolicy="no-referrer-when-downgrade"
+            sandbox="allow-forms allow-downloads allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation-by-user-activation"></iframe>
+  </div>
+
+</main>
+)

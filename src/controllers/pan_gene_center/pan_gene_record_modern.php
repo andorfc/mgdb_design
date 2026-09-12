@@ -43,7 +43,23 @@ logMessage('Starting pan_gene_record_modern.php for ' . $pan_gene_name);
 
 $loci_text = implode(', ', $identity['loci']);
 
-$summary = $pan_gene_name . ' groups ' . number_format($identity['member_count'])
+/* What the reader sees this record called.
+   ---------------------------------------------------------------------------
+   NEVER `pan_gene_name`. `pan-zea.v4.pan02070` is an internal analysis id: it
+   is not searchable anywhere, it is not in any publication, and it cannot be
+   carried to another resource. The exemplar gene model is one-to-one with the
+   pan-gene, so it identifies the record exactly as precisely while also being
+   an identifier the reader can use. The internal name stays as the machine
+   identity -- `data-pan-gene`, the API path, the alignment file names -- so
+   nothing that resolves by it breaks.
+
+   Falls back to the internal name only if a pan-gene records no exemplar,
+   which would otherwise leave the page with no title at all. */
+$display_id = $identity['exemplar_gene_model'] !== ''
+  ? $identity['exemplar_gene_model']
+  : $pan_gene_name;
+
+$summary = $display_id . ' groups ' . number_format($identity['member_count'])
          . ' gene models across ' . number_format($identity['assembly_count'])
          . ' maize assemblies';
 if ($loci_text !== '') {
@@ -52,7 +68,7 @@ if ($loci_text !== '') {
 $summary .= '. Members, protein domains, ontology terms, insertions, SNPs and traits, '
           . 'expression, sequence alignments, and the phylogenetic tree.';
 
-$bauplan = new Bauplan('MaizeGDB Pan-gene: ' . $pan_gene_name);
+$bauplan = new Bauplan('MaizeGDB Pan-gene: ' . $display_id);
 $bauplan->modern();
 
 $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';
@@ -104,6 +120,17 @@ $bauplan->includeScript('/js/mgdb-chrome.js');
 $bauplan->includeScript('/js/mgdb-record.js?v=' . $v_rec_js);
 $bauplan->includeScript('/js/mgdb-pan-gene-record.js?v=' . $v_js);
 $bauplan->head('<meta name="description" content="' . htmlspecialchars($summary, ENT_QUOTES, 'UTF-8') . '">');
+/* Machine-readable identity: a JSON-LD block in the head built from the
+   facts above, link elements to the JSON and JSON-LD records, and the same
+   two as an HTTP Link header (FAIR Signposting). See /api#api-linked-data. */
+include_once('./include/api/v1/lib/mgdb_jsonld.php');
+/* The record's id stays the internal name -- that IS its identifier, and the
+   API path resolves by it -- but `name` is what a consumer displays, so it
+   takes the exemplar like everything else a reader sees. */
+$bauplan->head(MgdbJsonLd::headMarkup('pan_gene', $pan_gene_name, array(
+  'name' => $display_id, 'description' => $summary,
+  'attributes' => array('member_count' => $identity['member_count'], 'assembly_count' => $identity['assembly_count'], 'loci' => $identity['loci']))));
+MgdbJsonLd::signpost('pan_gene', $pan_gene_name);
 
 $mgdb = $bauplan->template()->load('templates/maizegdb-main-modern.bau');
 $mgdb->get('megamenu')->load('templates/home/maizegdb_header_modern.bau');
@@ -117,6 +144,7 @@ $esc = function ($value) { return htmlspecialchars((string) $value, ENT_QUOTES, 
 $content->get('requested_identifier')->replace($esc($requested_identifier));
 $content->get('requested_identifier_path')->replace($esc(rawurlencode($requested_identifier)));
 $content->get('pan_gene_name')->replace($esc($pan_gene_name));
+$content->get('pan_gene_display')->replace($esc($display_id));
 $content->get('pan_gene_summary')->replace($esc($summary));
 
 /* Only the facts that identify the record. The analysis and the exemplar say
@@ -195,14 +223,20 @@ function panGeneRecordNotFound($DBConn, $system, $requested) {
   if (count($suggestions['loci']) > 0) {
     $rows = '';
     foreach ($suggestions['loci'] as $item) {
+      /* Named by its exemplar, like the record page itself. The separate
+         Exemplar column went with the internal name: it was only ever there
+         because the first column could not be read, and with the exemplar in
+         the first column it would have printed the same value twice. The link
+         still resolves by the internal name -- the route takes either. */
+      $exemplar_gm = preg_replace('/_T\d+$/i', '', $item['exemplar']);
+      $shown = $exemplar_gm !== '' ? $exemplar_gm : $item['pan_gene_name'];
       $rows .= '<tr><th scope="row"><a href="/pan_gene_center/pan_gene/' . rawurlencode($item['pan_gene_name']) . '">'
-             . $esc($item['pan_gene_name']) . '</a></th>'
-             . '<td>' . $esc($item['locus']) . '</td>'
-             . '<td class="mgdb-sequence">' . $esc($item['exemplar']) . '</td></tr>';
+             . $esc($shown) . '</a></th>'
+             . '<td>' . $esc($item['locus']) . '</td></tr>';
     }
     $blocks .= panGeneNotFoundBlock('Pan-genes associated with the locus ' . $esc($display),
       count($suggestions['loci']),
-      array('Pan-gene', 'Locus', 'Exemplar'), $rows, '');
+      array('Pan-gene', 'Locus'), $rows, '');
   }
 
   $suggestion_sections = '';

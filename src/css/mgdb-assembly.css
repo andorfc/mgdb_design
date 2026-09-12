@@ -20,56 +20,6 @@
 }
 
 /* --------------------------------------------------------------------------
-   Sticky Section Tabs
-   -------------------------------------------------------------------------- */
-
-.mgdb-assembly-page .mgdb-section-tabs {
-  position: sticky;
-  z-index: 20;
-  top: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  margin-top: var(--mgdb-space-5);
-  margin-bottom: var(--mgdb-space-5);
-  padding: var(--mgdb-space-2) 0;
-  background: var(--mgdb-surface);
-  border-bottom: 1px solid var(--mgdb-line);
-}
-
-.mgdb-assembly-page .mgdb-section-tabs a {
-  display: inline-flex;
-  min-height: 40px;
-  align-items: center;
-  padding: 0 var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink) !important;
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-  text-decoration: none;
-  transition: background .12s, border-color .12s;
-}
-
-.mgdb-assembly-page .mgdb-section-tabs a:hover {
-  background: var(--mgdb-green-soft);
-}
-
-.mgdb-assembly-page .mgdb-section-tabs a.is-current,
-.mgdb-assembly-page .mgdb-section-tabs a[aria-current="true"] {
-  border-color: var(--mgdb-green-dark);
-  background: var(--mgdb-green-dark);
-  color: #ffffff !important;
-  box-shadow: inset 3px 0 0 var(--mgdb-gold);
-}
-
-.mgdb-assembly-page > section,
-.mgdb-assembly-page section[id] {
-  scroll-margin-top: var(--mgdb-tab-offset, 4.5rem);
-}
-
-/* --------------------------------------------------------------------------
    Quick Downloads Banner
    -------------------------------------------------------------------------- */
 
@@ -358,160 +308,6 @@
 }
 
 /* --------------------------------------------------------------------------
-   Publications List & Cards
-   -------------------------------------------------------------------------- */
-
-.mgdb-assembly-page .assembly-pubs-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--mgdb-space-4);
-  margin-top: var(--mgdb-space-4);
-}
-
-/* Reference card styles matching mgdb-cite / mgdb-reference */
-.mgdb-assembly-page .reference-result-card {
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  padding: var(--mgdb-space-4);
-  transition: border-color .12s ease;
-}
-
-.mgdb-assembly-page .reference-result-card:hover {
-  border-color: var(--mgdb-green);
-}
-
-.mgdb-assembly-page .reference-result-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  font-size: var(--mgdb-text-xs);
-  color: var(--mgdb-muted);
-  margin-bottom: var(--mgdb-space-2);
-}
-
-.mgdb-assembly-page .reference-result-meta span {
-  background: var(--mgdb-surface-alt);
-  padding: 2px 6px;
-  border-radius: var(--mgdb-radius-sm);
-}
-
-.mgdb-assembly-page .reference-result-card h3 {
-  font-size: var(--mgdb-text-base);
-  font-weight: 700;
-  margin: 0 0 var(--mgdb-space-1) 0;
-}
-
-.mgdb-assembly-page .reference-result-card h3 a {
-  color: var(--mgdb-green-dark);
-  text-decoration: none;
-}
-
-.mgdb-assembly-page .reference-result-card h3 a:hover {
-  text-decoration: underline;
-}
-
-.mgdb-assembly-page .reference-result-authors {
-  font-size: var(--mgdb-text-sm);
-  font-weight: 600;
-  color: var(--mgdb-ink);
-  margin: 0 0 var(--mgdb-space-1) 0;
-}
-
-.mgdb-assembly-page .reference-result-citation {
-  font-size: var(--mgdb-text-xs);
-  color: var(--mgdb-muted);
-  margin: 0 0 var(--mgdb-space-2) 0;
-}
-
-.mgdb-assembly-page .reference-result-abstract {
-  font-size: var(--mgdb-text-sm);
-  color: var(--mgdb-ink-soft);
-  line-height: 1.5;
-  margin: 0 0 var(--mgdb-space-3) 0;
-}
-
-.mgdb-assembly-page .reference-result-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-}
-
-.mgdb-assembly-page .reference-result-links a,
-.mgdb-assembly-page .reference-copy-id {
-  font-size: var(--mgdb-text-xs);
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: var(--mgdb-radius-sm);
-  border: 1px solid var(--mgdb-line);
-  background: var(--mgdb-surface-alt);
-  color: var(--mgdb-green-dark);
-  text-decoration: none;
-  cursor: pointer;
-  transition: all .12s ease;
-}
-
-.mgdb-assembly-page .reference-result-links a:hover,
-.mgdb-assembly-page .reference-copy-id:hover {
-  background: var(--mgdb-green-soft);
-  border-color: var(--mgdb-green);
-}
-
-/* --------------------------------------------------------------------------
-   FAQs Accordion
-   -------------------------------------------------------------------------- */
-
-.mgdb-assembly-page .assembly-faq-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--mgdb-space-3);
-  margin-top: var(--mgdb-space-4);
-}
-
-.mgdb-assembly-page .assembly-faq-item {
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
-  overflow: hidden;
-}
-
-.mgdb-assembly-page .assembly-faq-question {
-  padding: var(--mgdb-space-3) var(--mgdb-space-4);
-  font-weight: 700;
-  font-size: var(--mgdb-text-base);
-  color: var(--mgdb-ink);
-  cursor: pointer;
-  background: var(--mgdb-surface-alt);
-  list-style: none;
-}
-
-.mgdb-assembly-page .assembly-faq-question::-webkit-details-marker {
-  display: none;
-}
-
-.mgdb-assembly-page .assembly-faq-question::after {
-  content: '▾';
-  float: right;
-  font-size: 1.1em;
-  color: var(--mgdb-muted);
-}
-
-.mgdb-assembly-page .assembly-faq-item[open] .assembly-faq-question::after {
-  content: '▴';
-}
-
-.mgdb-assembly-page .assembly-faq-answer {
-  padding: var(--mgdb-space-4);
-  font-size: var(--mgdb-text-sm);
-  color: var(--mgdb-ink-soft);
-  line-height: 1.6;
-}
-
-.mgdb-assembly-page .assembly-faq-answer p {
-  margin: 0;
-}
-
-/* --------------------------------------------------------------------------
    Stock Content
    -------------------------------------------------------------------------- */
 
@@ -525,56 +321,8 @@
   margin-bottom: var(--mgdb-space-3);
 }
 
-/* --------------------------------------------------------------------------
-   Connected Resources Bottom Section
-   -------------------------------------------------------------------------- */
-
-.mgdb-assembly-page .assembly-bottom-section {
-  background: linear-gradient(180deg, var(--mgdb-surface) 0%, var(--mgdb-green-soft) 100%) !important;
-  border-color: #b8dbca !important;
-}
-
-.mgdb-assembly-page .assembly-related-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--mgdb-space-3);
-  margin-top: var(--mgdb-space-4);
-}
-
-.mgdb-assembly-page .assembly-related-card {
-  background: var(--mgdb-surface);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-sm);
-  padding: var(--mgdb-space-3);
-  text-decoration: none;
-  color: inherit;
-  transition: border-color .12s, box-shadow .12s;
-}
-
-.mgdb-assembly-page .assembly-related-card:hover {
-  border-color: var(--mgdb-green);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-
-.mgdb-assembly-page .assembly-related-title {
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
-  color: var(--mgdb-green-dark);
-  margin-bottom: 2px;
-}
-
-.mgdb-assembly-page .assembly-related-desc {
-  font-size: var(--mgdb-text-xs);
-  color: var(--mgdb-muted);
-  margin: 0;
-  line-height: 1.4;
-}
-
 @media (max-width: 768px) {
   .mgdb-assembly-page .assembly-cards-grid { grid-template-columns: minmax(0, 1fr); }
-  .mgdb-assembly-page .mgdb-section-tabs {
-    position: static;
-  }
 }
 
 /* --------------------------------------------------------------------------
@@ -587,7 +335,6 @@
  * of the panel empty.
  * -------------------------------------------------------------------------- */
 
-.mgdb-assembly-page .mgdb-hero h1 { padding-right: 0; }
 .mgdb-assembly-page .mgdb-hero-description { max-width: none; }
 
 /* Two of the five assembly identifiers were breaking mid-name
@@ -624,3 +371,115 @@
   white-space: nowrap;
 }
 
+
+/* --------------------------------------------------------------------------
+   External-link arrows
+
+   Written against each link's own href rather than placed by hand, which is
+   how mgdb-modern.css already marks resource cards. Sixteen hand-placed
+   arrows came out of the template for this: a literal arrow can drift out of
+   step with the destination beside it, and it was also missing from about as
+   many outbound links as it was on -- every doi.org link, the GRIN accessions,
+   the Gramene converter.
+
+   maizegdb.org and its subdomains -- download, documents, jbrowse, qteller,
+   images -- are the same site and carry none, and neither do the relative
+   links, which cannot leave.
+   -------------------------------------------------------------------------- */
+
+.mgdb-assembly-page a[href^="http"]::after,
+.mgdb-assembly-page a[href^="//"]::after,
+.mgdb-assembly-page a[href^="ftp"]::after {
+  content: " \2197";
+  font-size: .85em;
+  font-weight: 600;
+}
+
+/* Same site, plus the two shared components that write their own arrow --
+   reference cards from references_lib.php, resource cards from
+   mgdb-modern.css. These match the rule above exactly on specificity, so they
+   have to stay below it. */
+.mgdb-assembly-page a[href*="//maizegdb.org"]::after,
+.mgdb-assembly-page a[href*=".maizegdb.org"]::after,
+.mgdb-assembly-page .mgdb-ref a::after,
+.mgdb-assembly-page .mgdb-resource-list a::after {
+  content: none;
+}
+
+/* --------------------------------------------------------------------------
+   Assembly improvement figures
+
+   Three figures over the five B73 releases. The contiguity chart is the
+   headline -- three traces across 3.7 decades -- so it takes the whole row and
+   the two supporting figures share the row below.
+   -------------------------------------------------------------------------- */
+
+.mgdb-assembly-page .assembly-charts {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-assembly-page .assembly-chart-wide { grid-column: 1 / -1; }
+
+/* .mgdb-chart is a fixed 320px. The wide figure is taller, and its height is
+   written by sizeChart() in mgdb-assembly.js so the element and the Plotly
+   layout cannot disagree; this just takes the fixed height off. */
+.mgdb-assembly-page .assembly-chart-wide .mgdb-chart {
+  height: auto;
+  min-height: 320px;
+  overflow: visible;
+}
+
+@media (max-width: 900px) {
+  .mgdb-assembly-page .assembly-charts { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* The values behind the figures, rendered server side so the chart fallback's
+   promise of "the underlying values are listed in the data table below" is
+   true before any script runs. */
+.mgdb-assembly-page .assembly-stats-table { margin-top: var(--mgdb-space-4); }
+
+.mgdb-assembly-page .assembly-stats-year {
+  display: block;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 400;
+}
+
+/* --------------------------------------------------------------------------
+   FAQs
+
+   The project pages' card grid (/NAM_project#nam-faqs), not an accordion.
+   Explicit three-column, like the NAM page: the shared grid's auto-fit
+   minmax(280px, 1fr) makes four columns at this width, which leaves the six
+   cards as a row of four and an orphaned pair.
+   -------------------------------------------------------------------------- */
+
+.mgdb-assembly-page .assembly-faqs-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: var(--mgdb-space-4);
+}
+
+@media (max-width: 900px) and (min-width: 621px) {
+  .mgdb-assembly-page .assembly-faqs-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 620px) {
+  .mgdb-assembly-page .assembly-faqs-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* --------------------------------------------------------------------------
+   Downloads
+
+   Seven buttons whose labels run from "Download v4 DNA" to "Download v4
+   Annotations", so at intrinsic width the column read as ragged. Filling the
+   cell gives every one of them the same width, which is what the Actions
+   column in the Versions table already does.
+   -------------------------------------------------------------------------- */
+
+.mgdb-assembly-page .assembly-download-table td:last-child .mgdb-button {
+  display: inline-flex;
+  width: 100%;
+  justify-content: center;
+  white-space: nowrap;
+}

@@ -312,7 +312,15 @@ function translateToGeneSet($DBConn, $gms, $trans_to) {
   while (($row=retrieve_row($sth))) {
     $translation_list = $row['translation_list'];
     $translation_list = substr($translation_list, 1, strlen($translation_list)-2);
-    $translations[$row['name']] = explode(',', $translation_list);
+    /* Keyed by the annotation asked for, the way translateToGeneSets() keys by
+       gm.version. It used to assign the list itself, so the row was a plain
+       numeric array: printTranslations() read its keys as the column headings
+       and printed "0" -- and, for the first gene model with two translations,
+       "0" and "1", which then set the column count for every row after it. The
+       key also makes the cell an array, which is what the implode in
+       printTranslations() tests for, so several translations arrive as one
+       comma-separated cell instead of spilling into extra columns. */
+    $translations[$row['name']][$trans_to] = explode(',', $translation_list);
   }
 
   //-- check for hand-curated associations via shared locus

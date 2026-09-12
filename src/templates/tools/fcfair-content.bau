@@ -1,0 +1,56 @@
+$$SYNTAX-LEVEL 2
+*(fcfair-content {include-css: /css/gbrowse.css}
+
+  <!-- 2026-09-07: the FC-FAIR iframe was removed.
+       ============================================
+       This block embedded https://fc-fair.dill-picl.org directly in a MaizeGDB
+       page. That host is now NXDOMAIN, and dill-picl.org itself is no longer
+       the Dill-Picl lab's: it was re-registered on 2025-06-21 through
+       Gname.com and serves an Indonesian gambling site. An iframe is worse
+       than a link -- whatever the current owner points that subdomain at would
+       render inside MaizeGDB's own chrome, under MaizeGDB's name -- so the
+       embed is gone rather than merely broken.
+
+       Nothing reaches this template today: /fcfair answers 301 to
+       /FAIRpractices, retired 2026-09-04, and /tools/fcfair answers 404. This
+       edit is so that restoring either route cannot restore the embed.
+       Removed with it: the loading corn-cob gif, which existed only to be
+       hidden by the iframe's onload handler.
+
+       The gblade window-name note below the fold does not apply to this page;
+       it was copied from the genome browser embed.
+   -->
+  <p>
+    The FC-FAIR tool was hosted by the Dill-Picl lab and is no longer available.
+    MaizeGDB's guidance on FAIR data and AI-readiness is at
+    <a href="/FAIRpractices">FAIR practices</a>.
+  </p>
+
+ 
+ <script language="javascript">
+  /* Removed wide page width at Scott Zarecore's request
+  \$("#menu_bar", document\).removeClass("menu"\);
+  \$("#menu_bar", document\).removeClass("menu_green"\);
+  \$("#menu_bar", document\).addClass("menu_gbrowse"\);
+  \$("#menu_bar", document\).addClass("menu_green_gbrowse"\);
+  document.getElementById("wrapper"\).setAttribute("style", "width:1600px"\); //2000    
+  document.getElementById("logo"\).setAttribute("style", "width:1324px"\); //1724
+  document.getElementById("centercolumn_record"\).setAttribute("style", "width:1300px"\);
+  document.getElementById("whitecurve"\).setAttribute("style", "width:1320px"\);
+  document.getElementById("content"\).setAttribute("style", "width:1300px"\);
+  document.getElementById("content_top"\).src = "/images/content_top_gbrowse.png";
+  document.getElementById("content_top"\).setAttribute("style", "width:1320px"\);
+  document.getElementById("menu_bar"\).setAttribute("style", "width:86.5%"\);
+  window.onload=function(\) {
+   //need to wait for these sections to load before changing them
+   \$("#footer_menu", document\).removeClass("menu"\);
+   \$("#footer_menu", document\).removeClass("menu_green"\);
+   \$("#footer_menu", document\).addClass("menu_gbrowse"\);
+   \$("#footer_menu", document\).addClass("menu_green_gbrowse"\);
+   document.getElementById("content_bottom"\).setAttribute("style", "width:1320px"\);
+   document.getElementById("footer"\).setAttribute("style", "width:1320px"\);
+   document.getElementById("content_bottom"\).src = "/images/content_bottom_gbrowse.png";
+ }
+  */
+ </script>
+)

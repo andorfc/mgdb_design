@@ -50,6 +50,10 @@ class MgdbApi {
 
     header('X-Content-Type-Options: nosniff');
     header('X-Request-Id: ' . self::$requestId);
+    // Public, read-only, no credentials: a page on any other site may read a
+    // record from a browser. Without this a fetch() from elsewhere fails
+    // silently in the console while curl works, which reads like an outage.
+    header('Access-Control-Allow-Origin: *');
     // The response depends on both of these; without it a shared cache could
     // hand a JSON body to a client that asked for something else.
     header('Vary: Accept, Accept-Encoding, Origin');
@@ -57,6 +61,43 @@ class MgdbApi {
 
   public static function requestId() {
     return self::$requestId;
+  }
+
+  /* ---------------------------------------------------------------------
+     Output format
+
+     Two representations of a record: the API's own JSON (the default) and
+     JSON-LD built from it by MgdbJsonLd. Chosen by ?format=jsonld, or by an
+     Accept header that asks for application/ld+json and not for
+     application/json. A query parameter rather than a .jsonld extension,
+     because the sitewide rewrite skips any URI containing ".js" (AD-011) and
+     ".jsonld" contains it.
+     --------------------------------------------------------------------- */
+
+  private static $format = 'json';
+
+  public static function negotiateFormat() {
+    $raw = strtolower(self::query('format', ''));
+    if ($raw !== '') {
+      if ($raw === 'json') {
+        self::$format = 'json';
+      } elseif ($raw === 'jsonld' || $raw === 'json-ld' || $raw === 'ld+json') {
+        self::$format = 'jsonld';
+      } else {
+        self::problem(400, 'invalid-format', 'Invalid format',
+          'format must be json or jsonld.', array('available_formats' => array('json', 'jsonld')));
+      }
+      return self::$format;
+    }
+    $accept = isset($_SERVER['HTTP_ACCEPT']) ? strtolower($_SERVER['HTTP_ACCEPT']) : '';
+    if (strpos($accept, 'application/ld+json') !== false && strpos($accept, 'application/json') === false) {
+      self::$format = 'jsonld';
+    }
+    return self::$format;
+  }
+
+  public static function format() {
+    return self::$format;
   }
 
   /* Resources call this after each query so meta.query_count reports the real
@@ -113,11 +154,12 @@ class MgdbApi {
     $accept = strtolower($_SERVER['HTTP_ACCEPT']);
     if (trim($accept) === '' || strpos($accept, '*/*') !== false
         || strpos($accept, 'application/json') !== false
+        || strpos($accept, 'application/ld+json') !== false
         || strpos($accept, 'application/*') !== false) {
       return;
     }
     self::problem(406, 'not-acceptable', 'Not acceptable',
-      'This resource is only available as application/json.');
+      'This resource is available as application/json or application/ld+json.');
   }
 
   public static function query($name, $default = '') {
@@ -255,6 +297,53 @@ class MgdbApi {
       $payload['meta']['warnings'] = self::$warnings;
     }
 
+    /* A record built on a failed query must not be published as a success.
+     *
+     * make_query() returns its statement whether or not it executed, and an
+     * unexecuted statement fetches no rows -- so a failure arrives here
+     * indistinguishable from real emptiness. That is how a stray bind parameter
+     * published eight false zero counts on
+     * /api/v1/records/gene_product/ferritin: HTTP 200, every section populated,
+     * every count 0, and nothing in the response that a client could test.
+     *
+     * "0 loci" and "the loci query failed" mean opposite things to a consumer,
+     * so the second is now a 500 rather than a plausible zero. The problem body
+     * names the SQLSTATEs and the request_id but NOT the SQL or the driver
+     * message -- those are in mgdb.log, and the endpoint is public.
+     *
+     * Scope is deliberate: this makes the API strict without changing
+     * make_query() for the 2,279 legacy call sites that rely on its current
+     * return. See the note above mgdb_record_query_failure() in db-api.php.
+     */
+    if (function_exists('mgdb_query_failures')) {
+      $failures = mgdb_query_failures();
+      if (count($failures) > 0) {
+        $states = array();
+        foreach ($failures as $f) {
+          if ($f['sqlstate'] !== '' && !in_array($f['sqlstate'], $states, true)) {
+            $states[] = $f['sqlstate'];
+          }
+        }
+        self::problem(500, 'query_failed',
+          'A database query failed',
+          'One or more queries behind this record did not execute, so the '
+          . 'response would have understated its contents. No partial record is '
+          . 'served. The failure is logged against this request_id.',
+          array('failed_queries' => count($failures), 'sqlstates' => $states));
+      }
+    }
+
+    /* The same record as linked data. Built from the finished envelope so the
+       two representations cannot disagree; nothing below this line knows or
+       cares which one it is writing. */
+    if (self::$format === 'jsonld') {
+      include_once(dirname(__FILE__) . '/mgdb_jsonld.php');
+      self::emit(MgdbJsonLd::fromEnvelope($payload), $maxAge, 'application/ld+json');
+    }
+    include_once(dirname(__FILE__) . '/mgdb_jsonld.php');
+    $payload['links']['json_ld'] = MgdbJsonLd::jsonLdUrl($type, $id);
+    $payload['links']['documentation'] = self::baseUrl() . '/api';
+
     self::emit($payload, $maxAge);
   }
 
@@ -265,7 +354,7 @@ class MgdbApi {
     self::emit($payload, $maxAge);
   }
 
-  private static function emit($payload, $maxAge) {
+  private static function emit($payload, $maxAge, $contentType = 'application/json') {
     $body = json_encode($payload,
       JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
 
@@ -282,7 +371,7 @@ class MgdbApi {
           $stable['meta']['generated'], $stable['links']['self']);
     $etag = '"' . substr(hash('sha256', json_encode($stable)), 0, 32) . '"';
 
-    header('Content-Type: application/json; charset=utf-8');
+    header('Content-Type: ' . $contentType . '; charset=utf-8');
     header('Cache-Control: public, max-age=' . (int) $maxAge);
     header('ETag: ' . $etag);
 
@@ -372,11 +461,67 @@ class MgdbApi {
      value is null.
      --------------------------------------------------------------------- */
 
+  /* The tags that legacy MaizeGDB prose actually contains, measured over the
+     corpus rather than guessed: <p> 852 and <br> 656 across 1,048 reference
+     abstracts, <i> 4,332 / <a> 3,532 / <b> 960 across the memo table, plus
+     sup/sub/em/strong/font/u and the block tags.
+
+     An allowlist, NOT strip_tags(), and this is the whole point. The same scan
+     found "<mpolacco@maizegdb.org>", "<jul", "<or" and "<d" -- e-mail addresses
+     in angle brackets and less-than comparisons. strip_tags() deletes every one
+     of them and the data is gone with no way to notice. Anything whose name is
+     not a real tag below is left exactly as it was found. */
+  const MARKUP_BLOCK  = 'br|p|div|li|tr|ul|ol|table|blockquote|h[1-6]';
+  const MARKUP_INLINE = 'i|b|em|strong|sup|sub|u|font|span|small|big|center|tt|code';
+
+  /* Free text with its legacy markup turned into real line breaks.
+     Use for long-form prose -- abstracts, descriptions, curator memos -- where
+     the paragraph structure is part of the meaning. text() is the single-line
+     form. */
+  public static function prose($value) {
+    if ($value === null) {
+      return null;
+    }
+    $s = (string) $value;
+
+    /* An anchor keeps its text, and its href too when the text does not already
+       contain it -- a URL inside an abstract is content, not decoration, and
+       dropping the tag silently would drop the link. */
+    $s = preg_replace_callback('#<\s*a\b[^>]*href\s*=\s*["\']?([^"\'>\s]+)[^>]*>(.*?)<\s*/\s*a\s*>#is',
+      function ($m) {
+        $href = trim($m[1]);
+        $text = trim(preg_replace('/<[^>]*>/', '', $m[2]));
+        if ($text === '') { return $href; }
+        return (stripos($text, $href) !== false) ? $text : $text . ' (' . $href . ')';
+      }, $s);
+
+    $s = preg_replace('#<\s*(?:' . self::MARKUP_BLOCK . ')\b[^>]*>#i', "\n", $s);
+    $s = preg_replace('#<\s*/\s*(?:' . self::MARKUP_BLOCK . ')\s*>#i', "\n", $s);
+    $s = preg_replace('#<\s*/?\s*(?:' . self::MARKUP_INLINE . ')\b[^>]*>#i', '', $s);
+    $s = preg_replace('#<\s*/?\s*a\b[^>]*>#i', '', $s);
+
+    $s = html_entity_decode($s, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+    $s = preg_replace('/[ \t\x{00A0}]+/u', ' ', $s);
+    $s = preg_replace('/[ \t]*\n[ \t]*/', "\n", $s);
+    $s = preg_replace('/\n{3,}/', "\n\n", $s);
+    $s = trim($s);
+    return $s === '' ? null : $s;
+  }
+
+  /* Single-line text. Markup is normalized here too -- a value that reaches a
+     client must never carry tags, whichever helper produced it -- but the
+     result is collapsed onto one line, so a <br> becomes a space rather than a
+     break. Use prose() where the break matters. */
   public static function text($value) {
     if ($value === null) {
       return null;
     }
-    $value = trim(preg_replace('/\s+/u', ' ', (string) $value));
+    $value = self::prose($value);
+    if ($value === null) {
+      return null;
+    }
+    $value = trim(preg_replace('/\s+/u', ' ', $value));
     return $value === '' ? null : $value;
   }
 

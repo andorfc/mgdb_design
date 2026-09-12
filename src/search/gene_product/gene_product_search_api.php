@@ -63,7 +63,8 @@ try {
         'type'         => isset($_GET['type']) ? trim($_GET['type']) : '',
         'ec_num'       => isset($_GET['ec_num']) ? trim($_GET['ec_num']) : '',
         'localization' => isset($_GET['localization']) ? trim($_GET['localization']) : '',
-        'pathway'      => isset($_GET['pathway']) ? trim($_GET['pathway']) : ''
+        'pathway'      => isset($_GET['pathway']) ? trim($_GET['pathway']) : '',
+        'sort'         => isset($_GET['sort']) ? trim($_GET['sort']) : ''
     );
 
     $limit = isset($_GET['limit']) ? max(1, min(GP_MAX_RESULTS, (int) $_GET['limit'])) : 50;

@@ -311,7 +311,7 @@
     var container = byId('stock-results');
     if (!container) { return; }
 
-    var items = container.querySelectorAll('.stock-result-card, tbody tr');
+    var items = container.querySelectorAll('.stock-card, tbody tr');
     var terms = state.filter.toLowerCase().split(/\s+/).filter(Boolean);
     var shown = 0;
 
@@ -326,6 +326,11 @@
       item.hidden = !match;
       if (match) { shown++; }
     });
+
+    var countEl = byId('stock-filter-count');
+    if (countEl) {
+      countEl.textContent = terms.length ? shown + ' of ' + items.length + ' shown' : '';
+    }
 
     if (terms.length) {
       var statusEl = byId('stock-results-status');
@@ -393,13 +398,17 @@
   }
 
   function renderTable(rows) {
+    var nameAria = 'none';
+    if (state.sort === 'name') nameAria = 'ascending';
+    else if (state.sort === 'name-desc') nameAria = 'descending';
+
     var thead = '<thead><tr>' +
-      '<th>Stock Identifier</th>' +
-      '<th>Type</th>' +
-      '<th>Available From</th>' +
-      '<th>Focus Linkage</th>' +
-      '<th>Synonyms &amp; Description</th>' +
-      '<th>Actions</th>' +
+      '<th scope="col" aria-sort="' + nameAria + '"><button type="button" class="stock-sort-th-btn" data-sort-key="name">Stock Identifier</button></th>' +
+      '<th scope="col">Type</th>' +
+      '<th scope="col">Available From</th>' +
+      '<th scope="col">Focus Linkage</th>' +
+      '<th scope="col">Synonyms &amp; Description</th>' +
+      '<th scope="col">Actions</th>' +
     '</tr></thead>';
 
     var tbody = rows.map(function (row) {
@@ -421,7 +430,7 @@
       }
       var descCell = descText ? '<small>' + descText + '</small>' : '<span class="mgdb-muted">—</span>';
 
-      var actionCell = '<a href="' + linkUrl + '">Record &rarr;</a>';
+      var actionCell = '<a href="' + linkUrl + '">Record</a>';
       if (row.provider && row.provider.indexOf('Stock Center') !== -1) {
         actionCell += ' · <a href="https://maizecoopsc.org/" target="_blank" rel="noopener">Order &nearr;</a>';
       }
@@ -595,10 +604,49 @@
     if (sortSelect && state.sort) sortSelect.value = state.sort;
 
     updateViewButtons();
+    updateAdvancedCount();
+  }
+
+  function updateAdvancedCount() {
+    var badge = byId('stock-advanced-count');
+    if (!badge) return;
+    var count = 0;
+    if (state.type) count++;
+    if (state.available) count++;
+    if (state.linkage) count++;
+    if (state.phenotype) count++;
+    if (state.karyotype) count++;
+    if (state.f_mgsc) count++;
+    if (state.f_bank) count++;
+    if (state.f_expvp) count++;
+    badge.textContent = count + ' active';
+    badge.hidden = count === 0;
+  }
+
+  function hasSearchState() {
+    return !!(state.term || state.type || state.available || state.linkage
+      || state.phenotype || state.karyotype
+      || state.f_mgsc || state.f_bank || state.f_expvp);
+  }
+
+  function hideResults() {
+    var section = byId('stock-results-section');
+    if (section) section.hidden = true;
+    var container = byId('stock-results');
+    if (container) container.innerHTML = '';
+    var emptyEl = byId('stock-empty');
+    if (emptyEl) emptyEl.hidden = true;
+    var countEl = byId('stock-filter-count');
+    if (countEl) countEl.textContent = '';
+    state.searched = false;
+    state.lastData = null;
+    state.totalRecords = 0;
+    state.grinTotal = 0;
+    syncUrlParams();
   }
 
   function updateViewButtons() {
-    var buttons = document.querySelectorAll('.stock-view-btn');
+    var buttons = document.querySelectorAll('.mgdb-view-btn[data-view], .stock-view-btn[data-view]');
     Array.prototype.forEach.call(buttons, function (btn) {
       var isCurrent = btn.getAttribute('data-view') === state.view;
       btn.classList.toggle('is-active', isCurrent);
@@ -721,6 +769,7 @@
     buildTabs();
     readUrlParams();
     renderChart();
+    updateAdvancedCount();
 
     var form = byId('stock-search-form');
     var queryInput = byId('stock-query');
@@ -770,7 +819,12 @@
         state.phenotype = 0; state.karyotype = 0;
         state.f_mgsc = ''; state.f_bank = ''; state.f_expvp = '';
         state.page = 1;
-        if (state.searched) { fetchResults(false); }
+        updateAdvancedCount();
+        if (state.term) {
+          fetchResults(false);
+        } else {
+          hideResults();
+        }
       });
     }
 
@@ -780,11 +834,15 @@
     if (queryInput) {
       queryInput.addEventListener('input', function () {
         state.term = queryInput.value.trim();
-        if (clearBtn) clearBtn.hidden = !state.term;
+        if (clearBtn) clearBtn.hidden = !queryInput.value;
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(function () {
           state.page = 1;
-          fetchResults(false);
+          if (hasSearchState()) {
+            fetchResults(false);
+          } else {
+            hideResults();
+          }
         }, 300);
       });
       if (clearBtn) clearBtn.hidden = !queryInput.value;
@@ -796,7 +854,11 @@
         state.term = '';
         clearBtn.hidden = true;
         state.page = 1;
-        fetchResults(false);
+        if (hasSearchState()) {
+          fetchResults(false);
+        } else {
+          hideResults();
+        }
         queryInput.focus();
       });
     }
@@ -818,6 +880,7 @@
         state.f_bank = bankCheck && bankCheck.checked ? '1' : '';
         state.f_expvp = expvpCheck && expvpCheck.checked ? '1' : '';
         state.page = 1;
+        updateAdvancedCount();
         fetchResults(true);
       });
     }
@@ -826,6 +889,7 @@
       typeSelect.addEventListener('change', function () {
         state.type = parseInt(typeSelect.value, 10) || 0;
         state.page = 1;
+        updateAdvancedCount();
         fetchResults(false);
       });
     }
@@ -834,6 +898,7 @@
       availSelect.addEventListener('change', function () {
         state.available = parseInt(availSelect.value, 10) || 0;
         state.page = 1;
+        updateAdvancedCount();
         fetchResults(false);
       });
     }
@@ -842,6 +907,7 @@
       linkSelect.addEventListener('change', function () {
         state.linkage = parseInt(linkSelect.value, 10) || 0;
         state.page = 1;
+        updateAdvancedCount();
         fetchResults(false);
       });
     }
@@ -850,6 +916,7 @@
       phenoSelect.addEventListener('change', function () {
         state.phenotype = parseInt(phenoSelect.value, 10) || 0;
         state.page = 1;
+        updateAdvancedCount();
         fetchResults(false);
       });
     }
@@ -858,6 +925,7 @@
       karyoSelect.addEventListener('change', function () {
         state.karyotype = parseInt(karyoSelect.value, 10) || 0;
         state.page = 1;
+        updateAdvancedCount();
         fetchResults(false);
       });
     }
@@ -866,6 +934,7 @@
       mgscCheck.addEventListener('change', function () {
         state.f_mgsc = mgscCheck.checked ? '1' : '';
         state.page = 1;
+        updateAdvancedCount();
         fetchResults(false);
       });
     }
@@ -874,6 +943,7 @@
       bankCheck.addEventListener('change', function () {
         state.f_bank = bankCheck.checked ? '1' : '';
         state.page = 1;
+        updateAdvancedCount();
         fetchResults(false);
       });
     }
@@ -882,6 +952,7 @@
       expvpCheck.addEventListener('change', function () {
         state.f_expvp = expvpCheck.checked ? '1' : '';
         state.page = 1;
+        updateAdvancedCount();
         fetchResults(false);
       });
     }
@@ -914,16 +985,37 @@
       });
     }
 
-    Array.prototype.forEach.call(document.querySelectorAll('.stock-view-btn'), function (btn) {
+    Array.prototype.forEach.call(document.querySelectorAll('.mgdb-view-btn[data-view], .stock-view-btn[data-view]'), function (btn) {
       btn.addEventListener('click', function () {
         var view = btn.getAttribute('data-view');
         if (view && (view === 'card' || view === 'table')) {
           state.view = view;
           updateViewButtons();
-          fetchResults(false);
+          syncUrlParams();
+          if (state.lastData) {
+            renderResults(state.lastData);
+          } else {
+            fetchResults(false);
+          }
         }
       });
     });
+
+    var resultsContainer = byId('stock-results');
+    if (resultsContainer) {
+      resultsContainer.addEventListener('click', function (e) {
+        var sortBtn = e.target.closest('.stock-sort-th-btn');
+        if (!sortBtn) return;
+        var key = sortBtn.getAttribute('data-sort-key');
+        if (key === 'name') {
+          var nextSort = state.sort === 'name' ? 'name-desc' : 'name';
+          state.sort = nextSort;
+          if (sortSelect) sortSelect.value = nextSort;
+          state.page = 1;
+          fetchResults(false);
+        }
+      });
+    }
 
     Array.prototype.forEach.call(document.querySelectorAll('[data-stock-example]'), function (btn) {
       btn.addEventListener('click', function () {
@@ -962,7 +1054,8 @@
         state.f_expvp = '';
         state.source = 'mgdb';
         state.page = 1;
-        fetchResults(false);
+        updateAdvancedCount();
+        hideResults();
       });
     }
 

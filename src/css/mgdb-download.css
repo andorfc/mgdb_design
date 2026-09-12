@@ -1,6 +1,6 @@
 /* file: mgdb-download.css
  *
- * Scoped styling for Bulk Downloads & Globus Data Portal (/download, /downloads).
+ * Scoped styling for the Download Data Hub (/download, /downloads).
  * Scoped under .mgdb-download-page.
  */
 
@@ -374,7 +374,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   Section 2: Guided genome file finder
+   Section 2: Genomic data finder
    -------------------------------------------------------------------------- */
 
 .mgdb-download-page .finder-head {
@@ -668,15 +668,6 @@
   border-color: var(--mgdb-green-dark);
   background: var(--mgdb-green-dark);
   color: #fff;
-}
-
-.mgdb-download-page .finder-recommended {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--mgdb-ink-soft);
-  font-size: var(--mgdb-text-sm);
-  white-space: nowrap;
 }
 
 .mgdb-download-page .finder-file-summary {
@@ -1219,7 +1210,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   Connected Resources Section
+   Section 9: Related resources
    -------------------------------------------------------------------------- */
 
 .mgdb-download-page .download-bottom-section {
@@ -1227,9 +1218,26 @@
   border-color: #b8dbca !important;
 }
 
+/* --------------------------------------------------------------------------
+   Section 8: Metrics
+   -------------------------------------------------------------------------- */
+
+/* The shared .mgdb-metric-grid has no top margin — it sat against a
+   .mgdb-panel-lead on every other page that uses it. This section's lead was
+   removed, so without this the cards butt up under the h2 at the
+   `margin: 0 0 space-1` the title carries. space-4 matches .download-related-grid
+   below, so both lead-less sections open at the same distance from their
+   heading. */
+.mgdb-download-page #downloads-overview .mgdb-metric-grid {
+  margin-top: var(--mgdb-space-4);
+}
+
+/* Six cards on a fixed 3 x 2. Explicit tracks rather than auto-fit: auto-fit
+   packed five or six across at full width, and its track count is not something
+   the card count can pin down. Breakpoints follow .source-grid below. */
 .mgdb-download-page .download-related-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--mgdb-space-3);
   margin-top: var(--mgdb-space-4);
 }
@@ -1286,6 +1294,9 @@
   .mgdb-download-page .quick-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  .mgdb-download-page .download-related-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 560px) {
@@ -1296,7 +1307,8 @@
 
 @media (max-width: 780px) {
   .mgdb-download-page .source-grid,
-  .mgdb-download-page .finder-workflow {
+  .mgdb-download-page .finder-workflow,
+  .mgdb-download-page .download-related-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 }

@@ -12,7 +12,6 @@ $$SYNTAX-LEVEL 2
       <strong>Genome<br />Data Hub</strong>
     </div>
     <div class="mgdb-hero-body">
-      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; August 2026</p>
       <h1 id="genome-title">MaizeGDB genomic datasets</h1>
       <p class="mgdb-hero-description">MaizeGDB hosts $(total-assemblies) genome datasets from $(total-species) species, including five versions of the representative maize genome, B73.</p>
     </div>
@@ -20,6 +19,7 @@ $$SYNTAX-LEVEL 2
 
   <nav class="mgdb-section-tabs" id="genome-tabs" aria-label="Sections on this page">
     <a href="#genome-assemblies">Search</a>
+    <a href="#genome-results-section">Results</a>
     <a href="#genome-statistics">Assembly statistics</a>
     <a href="#genome-progress">In progress</a>
     <a href="#genome-references">References</a>
@@ -36,15 +36,22 @@ $$SYNTAX-LEVEL 2
     </div>
 
     <form class="genome-search" id="genome-search-form" role="search">
-      <div class="genome-search-row">
-        <label class="mgdb-visually-hidden" for="genome-query">Search assemblies</label>
-        <input class="mgdb-input" id="genome-query" name="q" type="search" autocomplete="off" placeholder="Assembly, cultivar, species, or accession" aria-describedby="genome-query-hint" />
-        <button class="mgdb-button mgdb-button-primary" id="genome-search-submit" type="submit">Search</button>
+      <div class="genome-query-row">
+        <div class="genome-query-field">
+          <label class="mgdb-visually-hidden" for="genome-query">Search assemblies</label>
+          <div class="genome-query-control">
+            <svg viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="7" r="5"/><line x1="11" y1="11" x2="15" y2="15"/></svg>
+            <input class="mgdb-input" id="genome-query" name="q" type="search" autocomplete="off" placeholder="Assembly, cultivar, species, or accession" aria-describedby="genome-query-hint" />
+            <button id="genome-query-clear" type="button" hidden>Clear</button>
+          </div>
+        </div>
+        <button class="mgdb-button mgdb-button-primary genome-query-submit" id="genome-search-submit" type="submit">Search genomes</button>
       </div>
-      <p class="mgdb-hint" id="genome-query-hint">Matches any part of an assembly name, cultivar, species, or BioProject accession. The list below filters as you type.</p>
+
+      <p class="mgdb-hint" id="genome-query-hint">Search terms are case-insensitive. Matches any part of an assembly name, cultivar, species, or BioProject accession. The list below filters as you type.</p>
 
       <div class="genome-examples" aria-label="Example searches">
-        <span>Examples&#58;</span>
+        <span>EXAMPLES&#58;</span>
         <button type="button" data-genome-example="B73">B73</button>
         <button type="button" data-genome-example="Mo17">Mo17</button>
         <button type="button" data-genome-example="W22">W22</button>
@@ -60,55 +67,110 @@ $$SYNTAX-LEVEL 2
         <div class="genome-advanced-body">
           <div class="genome-advanced-grid">
             <div class="mgdb-hub-field">
-              <label for="genome-filter-status">Status</label>
-              <select id="genome-filter-status" name="status">
-                <option value="all">All</option>
-                <option value="current">Current</option>
-                <option value="superseded">Superseded</option>
-              </select>
-            </div>
-            <div class="mgdb-hub-field">
               <label for="genome-filter-quality">Assembly quality</label>
-              <select id="genome-filter-quality" name="quality">
-                <option value="all">All</option>
+              <select class="mgdb-select" id="genome-filter-quality" name="quality">
+                <option value="all">All qualities</option>
                 <option value="Representative">Representative</option>
                 <option value="Reference">Reference</option>
                 <option value="Draft">Draft</option>
                 <option value="none">Not reported</option>
               </select>
             </div>
-            <div class="mgdb-hub-field genome-advanced-actions">
-              <label>&nbsp;</label>
-              <button class="mgdb-button mgdb-button-secondary" id="genome-reset" type="button">Clear search and filters</button>
+            <div class="mgdb-hub-field">
+              <label for="genome-filter-group">Species or group</label>
+              <select class="mgdb-select" id="genome-filter-group" name="taxon">
+                $(species-options)
+              </select>
+            </div>
+            <div class="mgdb-hub-field">
+              <label for="genome-adv-sort">Sort results by</label>
+              <select class="mgdb-select" id="genome-adv-sort" name="sort">
+                <option value="default">Representative first / Assembly A&ndash;Z</option>
+                <option value="assembly-desc">Assembly Z&ndash;A</option>
+                <option value="cultivar-asc">Cultivar A&ndash;Z</option>
+                <option value="cultivar-desc">Cultivar Z&ndash;A</option>
+                <option value="species-asc">Species A&ndash;Z</option>
+                <option value="quality-asc">Quality &#40;Representative &rarr; Reference &rarr; Draft&#41;</option>
+              </select>
             </div>
           </div>
           <div class="mgdb-filters genome-species-filters" aria-label="Filter by species">
-            <span aria-hidden="true" class="mgdb-small mgdb-muted">Species&#58;</span>
+            <span aria-hidden="true" class="mgdb-small mgdb-muted">Quick filter&#58;</span>
             $(group-chips)
+          </div>
+          <div class="genome-advanced-actions">
+            <button class="mgdb-button mgdb-button-primary" id="genome-adv-submit" type="submit">Apply filters</button>
+            <button class="genome-advanced-reset-btn" id="genome-reset" type="button">Reset filters</button>
           </div>
         </div>
       </details>
     </form>
+  </section>
+
+  <!-- ====================================================================
+       Results
+       ==================================================================== -->
+  <section id="genome-results-section" class="genome-results-section" aria-labelledby="genome-results-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="genome-results-title">Results</h2></div>
+    </div>
+
+    <p class="genome-results-status" id="genome-results-status" role="status" aria-live="polite">Showing 1&ndash;25 of $(total-assemblies) assemblies</p>
+
+    <div class="genome-results-toolbar">
+      <div class="mgdb-hub-field genome-results-filter">
+        <label for="genome-results-filter">Filter these results</label>
+        <input id="genome-results-filter" type="search" autocomplete="off" placeholder="Assembly, cultivar, species, quality, accession" />
+        <span class="mgdb-result-count" id="genome-filter-count" aria-live="polite"></span>
+      </div>
+
+      <div class="mgdb-hub-field">
+        <label for="genome-page-size">Results shown</label>
+        <select id="genome-page-size">
+          <option value="10">Top 10</option>
+          <option value="25" selected>Top 25</option>
+          <option value="50">Top 50</option>
+          <option value="all">All results</option>
+        </select>
+      </div>
+
+      <div class="mgdb-hub-field mgdb-hub-field-action genome-results-export">
+        <button class="mgdb-button mgdb-button-secondary" id="genome-export-tsv" type="button">Export TSV</button>
+      </div>
+
+      <div class="mgdb-hub-field mgdb-hub-field-action genome-results-view">
+        <div class="mgdb-view-toggle" role="group" aria-label="Result view">
+          <button class="mgdb-view-btn" id="genome-view-cards" type="button" data-view="cards" aria-pressed="false">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>Cards
+          </button>
+          <button class="mgdb-view-btn is-active" id="genome-view-table" type="button" data-view="table" aria-pressed="true">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true"><rect x="1" y="2" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="12" width="14" height="2" rx="1" fill="currentColor"/></svg>Table
+          </button>
+        </div>
+      </div>
+    </div>
 
     <div class="genome-collection" id="genome-assembly-collection" data-title="Genome assemblies hosted at MaizeGDB" data-filename="maizegdb_genome_assemblies.tsv" data-noun="assemblies">
-      <div class="mgdb-table-scroll">
+      <div class="mgdb-table-scroll" id="genome-table-view" tabindex="0" role="region" aria-labelledby="genome-results-title">
         <table class="mgdb-table" id="genome-table">
           <caption>
-            <span class="mgdb-muted">Read live from the assembly database, B73 reference first. Quality is taken from the assembly name, which carries the REFERENCE or DRAFT designation; blank fields are shown as &ldquo;Not reported&rdquo; rather than left empty.</span>
+            <span class="mgdb-muted">Read live from the assembly database, B73 representative genome first. Quality is the curated Representative, Reference or Draft designation where the database carries one, and is otherwise read from the REFERENCE or DRAFT token in the assembly name; blank fields are shown as &ldquo;Not reported&rdquo; rather than left empty.</span>
           </caption>
           <thead>
             <tr>
-              <th scope="col" data-sort="text">Assembly</th>
-              <th scope="col" data-sort="text">Cultivar</th>
-              <th scope="col" data-sort="text">Species</th>
-              <th scope="col" data-sort="text">Quality</th>
-              <th scope="col" data-sort="text">Accession</th>
-              <th scope="col" data-sort="text">Status</th>
+              <th scope="col" aria-sort="none"><button type="button" data-sort-key="assembly">Assembly</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-sort-key="cultivar">Cultivar</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-sort-key="species">Species</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-sort-key="quality">Quality</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-sort-key="accession">Accession</button></th>
             </tr>
           </thead>
-          <tbody>$(assembly-rows)</tbody>
+          <tbody id="genome-table-body">$(assembly-rows)</tbody>
         </table>
       </div>
+
+      <div id="genome-cards-view" class="genome-cards-view" hidden></div>
+      <nav class="genome-pagination" id="genome-pagination" aria-label="Assembly pages" hidden></nav>
     </div>
 
     <div class="mgdb-empty" id="genome-empty" hidden>
@@ -148,7 +210,7 @@ $$SYNTAX-LEVEL 2
             <select id="genome-stats-species"></select>
           </div>
           <div class="mgdb-hub-field">
-            <label for="genome-stats-status-filter">Status</label>
+            <label for="genome-stats-status-filter">Quality</label>
             <select id="genome-stats-status-filter"></select>
           </div>
           <div class="mgdb-hub-field">
@@ -165,7 +227,7 @@ $$SYNTAX-LEVEL 2
         </div>
 
         <details class="genome-stats-column-picker">
-          <summary>Choose metric groups</summary>
+          <summary>Select columns</summary>
           <p class="mgdb-hint">Highlighted groups have one or more columns visible. Select a highlighted group to hide its columns, or select an unhighlighted group to add all of its columns. Assembly ID always remains visible.</p>
           <div class="genome-stats-groups" id="genome-stats-groups" aria-label="Metric column groups"></div>
         </details>

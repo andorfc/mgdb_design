@@ -76,8 +76,24 @@ $$SYNTAX-LEVEL 2
         <button type="button" class="mgdb-button" id="blast-download-table">Download table</button>
         <a class="mgdb-button" href="/BLAST/blast_results_api.php?job=$(job_id)&amp;view=text"
            download="blast-$(job_id).txt">Download report</a>
-        <a class="mgdb-button" href="$(reload_url)">Permanent link</a>
+        <form class="blast-edit-search" method="post" action="/BLAST">$(edit_fields)<button
+              type="submit" class="mgdb-button">Edit search</button></form>
         <a class="mgdb-button" href="/BLAST">New search</a>
+      </div>
+    </div>
+
+    <!-- The job's own URL, spelled out rather than hidden behind a button.
+         "Permanent link" was a link to the page you were already on, which
+         told a reader nothing and copied nothing; what they actually want is
+         the address, visible, selectable, and with the one fact that matters
+         about it &#8212; that it expires. -->
+    <div class="blast-permalink">
+      <label for="blast-permalink-input">Direct link to these results &#40;lasts 7 days&#41;&#58;</label>
+      <div class="blast-permalink-row">
+        <input type="text" id="blast-permalink-input" class="mgdb-input"
+               value="$(reload_url)" readonly spellcheck="false">
+        <button type="button" class="mgdb-button mgdb-ref-copy" id="blast-copy-link"
+                data-copy-value="$(reload_url)">Copy link</button>
       </div>
     </div>
   </section>
@@ -88,10 +104,10 @@ $$SYNTAX-LEVEL 2
        ===================================================================== -->
   <div class="mgdb-section-tabs blast-views" id="blast-views" role="group"
        aria-label="Choose how to read these results">
-    <button type="button" class="blast-view-tab" data-view="discovery" aria-pressed="true">Discovery</button>
+    <button type="button" class="blast-view-tab" data-view="discovery" aria-pressed="true">Visual overview</button>
     <button type="button" class="blast-view-tab" data-view="table" aria-pressed="false">Table</button>
     <button type="button" class="blast-view-tab" data-view="alignments" aria-pressed="false">Alignments</button>
-    <button type="button" class="blast-view-tab" data-view="text" aria-pressed="false">Text report</button>
+    <button type="button" class="blast-view-tab" data-view="text" aria-pressed="false">BLAST report</button>
   </div>
   <p id="blast-view-announce" class="mgdb-visually-hidden" aria-live="polite"></p>
 
@@ -114,6 +130,8 @@ $$SYNTAX-LEVEL 2
   <section class="mgdb-hub-surface mgdb-hub-tone-blue" id="blast-coverage-section" aria-labelledby="blast-coverage-h">
     <div class="mgdb-section-heading">
       <h2 id="blast-coverage-h">Query coverage</h2>
+      <button type="button" class="mgdb-button mgdb-button-quiet blast-export-png"
+              data-figure="blast-coverage" data-figure-name="query-coverage">Export PNG</button>
       <label class="blast-filter" for="blast-coverage-top">
         <span>Show</span>
         <select id="blast-coverage-top">
@@ -135,6 +153,8 @@ $$SYNTAX-LEVEL 2
            aria-labelledby="blast-chr-h" hidden>
     <div class="mgdb-section-heading">
       <h2 id="blast-chr-h">Genomic location</h2>
+      <button type="button" class="mgdb-button mgdb-button-quiet blast-export-png"
+              data-figure="blast-chromosomes" data-figure-name="genomic-location">Export PNG</button>
     </div>
     <div class="blast-chr" id="blast-chromosomes" tabindex="0" role="region"
          aria-label="Genomic location figure, scrollable"></div>
@@ -144,6 +164,8 @@ $$SYNTAX-LEVEL 2
            aria-labelledby="blast-scatter-h" hidden>
     <div class="mgdb-section-heading">
       <h2 id="blast-scatter-h">Identity against coverage</h2>
+      <button type="button" class="mgdb-button mgdb-button-quiet blast-export-png"
+              data-figure="blast-scatter" data-figure-name="identity-vs-coverage">Export PNG</button>
     </div>
     <p class="mgdb-section-intro" id="blast-scatter-note"></p>
     <div class="mgdb-figure" id="blast-scatter"></div>
@@ -217,6 +239,7 @@ $$SYNTAX-LEVEL 2
   <section class="mgdb-hub-surface mgdb-hub-tone-gold" id="blast-table-section" aria-labelledby="blast-table-h">
     <div class="mgdb-section-heading">
       <h2 id="blast-table-h">All matches</h2>
+      <button type="button" class="mgdb-button mgdb-button-quiet" id="blast-export-tsv">Export TSV</button>
     </div>
 
     <div class="blast-filters" role="search">
@@ -284,7 +307,8 @@ $$SYNTAX-LEVEL 2
        ===================================================================== -->
   <section class="mgdb-hub-surface" id="blast-text-section" aria-labelledby="blast-text-h" hidden>
     <div class="mgdb-section-heading">
-      <h2 id="blast-text-h">Text report</h2>
+      <h2 id="blast-text-h">BLAST report</h2>
+      <button type="button" class="mgdb-button mgdb-button-quiet" id="blast-export-txt">Export TXT</button>
     </div>
     <pre class="blast-textview" id="blast-textview">Loading&hellip;</pre>
   </section>

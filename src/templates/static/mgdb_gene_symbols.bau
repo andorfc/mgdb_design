@@ -72,22 +72,49 @@ $$SYNTAX-LEVEL 2
     </div>
 
     <div class="mgdb-metric-grid">
-      <div class="mgdb-metric-card">
-        <span class="mgdb-metric-value">$(entry_count)</span>
-        <span class="mgdb-metric-label">Entries in the list</span>
-      </div>
-      <div class="mgdb-metric-card">
-        <span class="mgdb-metric-value">$(distinct_count)</span>
-        <span class="mgdb-metric-label">Distinct symbols</span>
-      </div>
-      <div class="mgdb-metric-card">
-        <span class="mgdb-metric-value">$(repeat_count)</span>
-        <span class="mgdb-metric-label">Symbols listed twice</span>
-      </div>
-      <div class="mgdb-metric-card">
-        <span class="mgdb-metric-value">$(conflict_count)</span>
-        <span class="mgdb-metric-label">With differing meanings</span>
-      </div>
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Symbol entries</h3>
+          <span class="mgdb-metric-badge">List</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(entry_count)</strong>
+        </div>
+        <p class="mgdb-metric-description">Rows in the community gene symbol list, a symbol recorded twice counted twice.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Distinct symbols</h3>
+          <span class="mgdb-metric-badge">Unique</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(distinct_count)</strong>
+        </div>
+        <p class="mgdb-metric-description">Different prefixes, once duplicate rows are collapsed.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Listed twice</h3>
+          <span class="mgdb-metric-badge">Duplicates</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(repeat_count)</strong>
+        </div>
+        <p class="mgdb-metric-description">Symbols appearing on more than one row of the original list.</p>
+      </article>
+
+      <article class="mgdb-metric">
+        <div class="mgdb-metric-top">
+          <h3>Differing meanings</h3>
+          <span class="mgdb-metric-badge">Curation</span>
+        </div>
+        <div class="mgdb-metric-stat">
+          <strong class="mgdb-metric-value">$(conflict_count)</strong>
+        </div>
+        <p class="mgdb-metric-description">Of those duplicates, the ones whose rows record different meanings.</p>
+      </article>
     </div>
 
     <p class="mgdb-note gs-conflict-note">The last two numbers are a curation note rather
@@ -101,13 +128,30 @@ $$SYNTAX-LEVEL 2
       <div><h2 id="gs-related-title">Related resources</h2></div>
     </div>
 
-    <ul class="mgdb-resource-list">
-      <li><a href="/data_center/locus"><strong>Locus Data Hub</strong><span>Search 781,395 curated genetic loci, including every characterized gene these symbols name.</span></a></li>
-      <li><a href="/gene_center/gene"><strong>Gene Center</strong><span>B73 and NAM reference gene models, with functional annotation and expression.</span></a></li>
-      <li><a href="/nomenclature"><strong>Maize nomenclature rules</strong><span>How maize genes, alleles and loci are named, and how to propose a new symbol.</span></a></li>
-      <li><a href="/data_center/gene_product"><strong>Gene products</strong><span>The proteins and RNAs these genes encode.</span></a></li>
-      <li><a href="/contact"><strong>Suggest a correction</strong><span>Tell the curators about a missing symbol, or one recorded two ways.</span></a></li>
-    </ul>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="/data_center/locus">
+          <strong>Locus Data Hub</strong>
+          <span>Every curated genetic locus, including the characterized genes these symbols name</span>
+        </a>
+        <a href="/gene_center/gene">
+          <strong>Gene Center</strong>
+          <span>B73 and NAM reference gene models, with functional annotation and expression</span>
+        </a>
+        <a href="/nomenclature">
+          <strong>Maize nomenclature rules</strong>
+          <span>How maize genes, alleles and loci are named, and how to propose a new symbol</span>
+        </a>
+        <a href="/data_center/gene_product">
+          <strong>Gene products</strong>
+          <span>The proteins and RNAs these genes encode</span>
+        </a>
+        <a href="/contact">
+          <strong>Suggest a correction</strong>
+          <span>Tell the curators about a missing symbol, or one recorded two ways</span>
+        </a>
+      </div>
+    </div>
   </section>
 </main>
 )

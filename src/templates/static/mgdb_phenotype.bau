@@ -18,7 +18,6 @@ $$SYNTAX-LEVEL 2
       <strong>Phenotype<br />Data Hub</strong>
     </div>
     <div class="mgdb-hero-body">
-      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; September 2026</p>
       <h1 id="pheno-title">Explore observable traits, mutant phenotypes and plant anatomy</h1>
       <p class="mgdb-hero-description">Search curated maize mutant phenotypes by name or synonym, narrow by trait category or affected plant structure, and follow each one to the seed stocks that carry it.</p>
     </div>
@@ -40,96 +39,124 @@ $$SYNTAX-LEVEL 2
       </div>
     </div>
 
-    <form id="pheno-search-form" role="search">
-      <div class="mgdb-hub-field pheno-field-query">
-        <label for="pheno-query">Phenotype name, synonym, or keyword</label>
-        <div class="pheno-query-control">
-          <svg class="pheno-search-icon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="7" r="5"/><line x1="11" y1="11" x2="15" y2="15"/></svg>
-          <input id="pheno-query" name="q" type="search" placeholder="Phenotype name, synonym, or a word from its description" autocomplete="off" />
-          <button id="pheno-query-clear" type="button" hidden>Clear</button>
-        </div>
-      </div>
-
-      <div class="mgdb-hub-field mgdb-hub-field-action">
-        <button class="mgdb-button mgdb-button-primary" type="submit">Search phenotypes</button>
-      </div>
-
-      <p class="pheno-hint">Wildcards work&#58; <code>shrunken%</code> matches every shrunken phenotype. Descriptions are searched too.</p>
-
-      <div class="pheno-example-row" aria-label="Example searches">
-        <span>Examples&#58;</span>
-        <button type="button" data-pheno-example="purple">purple</button>
-        <button type="button" data-pheno-example="shrunken">shrunken kernel</button>
-        <button type="button" data-pheno-example="dwarf">dwarf</button>
-        <button type="button" data-pheno-example="albescent">albescent</button>
-        <button type="button" data-pheno-example="brittle">brittle</button>
-        <button type="button" data-pheno-example="lesion">lesion</button>
-      </div>
-
-      <details class="pheno-adv" id="pheno-adv">
-        <summary>
-          <strong>Advanced search criteria</strong>
-          <span>Restrict to one trait category, or to an affected plant structure</span>
-        </summary>
-        <div class="pheno-adv-body">
-          <div class="mgdb-hub-field">
-            <label for="pheno-trait">Trait category</label>
-            <select id="pheno-trait" name="trait">
-              $(trait_options)
-            </select>
+    <div class="pheno-search-form-wrap">
+      <form id="pheno-search-form" role="search">
+        <div class="pheno-query-row">
+          <div class="pheno-query-control">
+            <label class="mgdb-visually-hidden" for="pheno-query">Search phenotypes</label>
+            <svg class="pheno-search-icon" viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="7" r="5"/><line x1="11" y1="11" x2="15" y2="15"/></svg>
+            <input id="pheno-query" name="q" type="search" placeholder="Phenotype name, synonym, or keyword" autocomplete="off" aria-describedby="pheno-query-hint" />
+            <button id="pheno-query-clear" type="button" hidden>Clear</button>
           </div>
-          <div class="mgdb-hub-field">
-            <label for="pheno-part">Plant structure affected</label>
-            <select id="pheno-part" name="part">
-              $(body_part_options)
-            </select>
-          </div>
+
+          <button class="mgdb-button mgdb-button-primary pheno-query-submit" id="pheno-search-submit" type="submit">
+            <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="7" r="5"/><line x1="11" y1="11" x2="15" y2="15"/></svg>
+            Search phenotypes
+          </button>
         </div>
 
-        <div class="pheno-adv-actions">
-          <button class="mgdb-button mgdb-button-primary" type="submit">Apply advanced filters</button>
-          <button class="mgdb-button mgdb-button-quiet" id="pheno-adv-reset" type="button">Reset advanced filters</button>
+        <p class="pheno-search-hint mgdb-muted mgdb-small" id="pheno-query-hint">Wildcards work&#58; <code>shrunken%</code> matches every shrunken phenotype. Descriptions are searched too.</p>
+
+        <div class="pheno-examples" aria-label="Example searches">
+          <span class="pheno-example-label">EXAMPLES&#58;</span>
+          <button type="button" class="pheno-example-btn" data-pheno-example="purple">purple</button>
+          <button type="button" class="pheno-example-btn" data-pheno-example="shrunken">shrunken kernel</button>
+          <button type="button" class="pheno-example-btn" data-pheno-example="dwarf">dwarf</button>
+          <button type="button" class="pheno-example-btn" data-pheno-example="albescent">albescent</button>
+          <button type="button" class="pheno-example-btn" data-pheno-example="brittle">brittle</button>
+          <button type="button" class="pheno-example-btn" data-pheno-example="lesion">lesion</button>
         </div>
-      </details>
-    </form>
+
+        <details class="pheno-advanced" id="pheno-adv">
+          <summary>
+            <span class="pheno-advanced-label">Advanced search</span>
+            <span class="pheno-advanced-count" id="pheno-advanced-count" hidden>0</span>
+          </summary>
+          <div class="pheno-advanced-body">
+            <div class="pheno-advanced-grid">
+              <div class="mgdb-hub-field">
+                <label class="mgdb-label" for="pheno-trait">Trait category</label>
+                <select class="mgdb-select" id="pheno-trait" name="trait">
+                  $(trait_options)
+                </select>
+              </div>
+              <div class="mgdb-hub-field">
+                <label class="mgdb-label" for="pheno-part">Plant structure affected</label>
+                <select class="mgdb-select" id="pheno-part" name="part">
+                  $(body_part_options)
+                </select>
+              </div>
+            </div>
+
+            <div class="pheno-advanced-actions">
+              <button class="mgdb-button mgdb-button-primary" id="pheno-adv-submit" type="submit">Apply filters</button>
+              <button class="pheno-advanced-reset-btn" id="pheno-adv-reset" type="button">Reset filters</button>
+            </div>
+          </div>
+        </details>
+      </form>
+    </div>
   </section>
 
   <section id="pheno-results-section" class="pheno-results-section" aria-labelledby="pheno-results-title" hidden>
-    <div class="pheno-results-heading">
+    <div class="mgdb-section-heading">
       <div>
-        <h2 id="pheno-results-title">Search results</h2>
-        <p id="pheno-results-status" aria-live="polite">Enter a search term above or select an example to view phenotypes.</p>
+        <h2 id="pheno-results-title">Results</h2>
       </div>
-      <div class="pheno-results-controls">
-        <div class="mgdb-hub-field">
-          <label for="pheno-results-filter">Filter results</label>
-          <input id="pheno-results-filter" type="search" placeholder="Narrow this page" autocomplete="off" />
-        </div>
-        <div class="mgdb-hub-field">
-          <label for="pheno-page-size">Results per page</label>
-          <select id="pheno-page-size">
-            <option value="10">Top 10</option>
-            <option value="25" selected>Top 25</option>
-            <option value="50">Top 50</option>
-            <option value="all">All results</option>
-          </select>
-        </div>
-        <div class="pheno-view-toggle" role="group" aria-label="View style">
-          <button class="pheno-view-btn" type="button" data-view="card" aria-pressed="false">
-            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>Cards
+    </div>
+
+    <p class="pheno-results-status" id="pheno-results-status" role="status" aria-live="polite">Enter a search term above or select an example to view phenotypes.</p>
+
+    <div class="pheno-results-toolbar" id="pheno-results-toolbar">
+      <div class="mgdb-hub-field pheno-results-filter">
+        <label for="pheno-results-filter">Filter these results</label>
+        <input id="pheno-results-filter" type="search" placeholder="Narrow this page" autocomplete="off" />
+        <span class="mgdb-result-count" id="pheno-filter-count" aria-live="polite"></span>
+      </div>
+
+      <div class="mgdb-hub-field">
+        <label for="pheno-page-size">Results shown</label>
+        <select class="mgdb-select" id="pheno-page-size">
+          <option value="10">Top 10</option>
+          <option value="25" selected>Top 25</option>
+          <option value="50">Top 50</option>
+          <option value="all">All results</option>
+        </select>
+      </div>
+
+      <div class="mgdb-hub-field mgdb-hub-field-action pheno-results-export">
+        <a class="mgdb-button mgdb-button-quiet" id="pheno-export-tsv" href="#" download>Export TSV</a>
+      </div>
+
+      <div class="mgdb-hub-field mgdb-hub-field-action pheno-results-view">
+        <div class="mgdb-view-toggle" role="group" aria-label="Result view">
+          <button class="mgdb-view-btn" id="pheno-view-cards" type="button" data-view="card" aria-pressed="false">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>Cards
           </button>
-          <button class="pheno-view-btn" type="button" data-view="table" aria-pressed="true">
-            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="2" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="12" width="14" height="2" rx="1" fill="currentColor"/></svg>Table
+          <button class="mgdb-view-btn is-active" id="pheno-view-table" type="button" data-view="table" aria-pressed="true">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true"><rect x="1" y="2" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="12" width="14" height="2" rx="1" fill="currentColor"/></svg>Table
           </button>
-        </div>
-        <div class="pheno-export-buttons">
-          <a class="mgdb-button mgdb-button-quiet" id="pheno-export-tsv" href="#" download>Export TSV</a>
-          <a class="mgdb-button mgdb-button-quiet" id="pheno-export-csv" href="#" download>Export CSV</a>
         </div>
       </div>
     </div>
 
-    <div id="pheno-results" class="pheno-results-container pheno-view-table"></div>
+    <div class="mgdb-table-wrap pheno-table-wrap" id="pheno-table-view">
+      <table class="mgdb-table pheno-table" id="pheno-results-table">
+        <thead>
+          <tr>
+            <th scope="col" aria-sort="ascending"><button type="button" data-sort-key="name">Phenotype Name</button></th>
+            <th scope="col" aria-sort="none"><button type="button" data-sort-key="trait">Trait Category</button></th>
+            <th scope="col" aria-sort="none"><button type="button" data-sort-key="parts">Body Parts Affected</button></th>
+            <th scope="col" aria-sort="none"><button type="button" data-sort-key="synonyms">Synonyms</button></th>
+            <th scope="col" aria-sort="none"><button type="button" data-sort-key="stocks">Stocks</button></th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody id="pheno-results-body"></tbody>
+      </table>
+    </div>
+
+    <div class="pheno-card-grid" id="pheno-cards-view" hidden></div>
 
     <div id="pheno-empty" class="mgdb-empty" hidden>
       <h3>No phenotypes matched your query</h3>
@@ -171,8 +198,8 @@ $$SYNTAX-LEVEL 2
 
       <article class="mgdb-card">
         <span class="mgdb-pill">Stock Repository</span>
-        <h3>Maize Genetics COOP Stocks</h3>
-        <p>Order curated seed stocks, mutant lines, and chromosome translocations from the COOP stock center.</p>
+        <h3>Stock Center stocks</h3>
+        <p>Order curated seed stocks, mutant lines, and chromosome translocations from the Maize Genetics Cooperation Stock Center.</p>
         <a href="/data_center/stock">Explore Stocks <span aria-hidden="true">&rarr;</span></a>
       </article>
 
@@ -283,7 +310,7 @@ $$SYNTAX-LEVEL 2
       <article class="mgdb-metric mgdb-tone-burgundy">
         <div class="mgdb-metric-top">
           <h3>Linked Stocks</h3>
-          <span class="mgdb-metric-badge">COOP Repository</span>
+          <span class="mgdb-metric-badge">Stock Center</span>
         </div>
         <div class="mgdb-metric-stat">
           <strong class="mgdb-metric-value">$(stock_count)</strong>

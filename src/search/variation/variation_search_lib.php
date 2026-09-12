@@ -276,7 +276,8 @@ function varLikePattern($term) {
    --------------------------------------------------------------------------- */
 
 function varSortOptions() {
-    return array('relevance', 'name-asc', 'name-desc', 'locus-asc', 'locus-desc', 'type-asc', 'type-desc');
+    return array('relevance', 'name-asc', 'name-desc', 'locus-asc', 'locus-desc', 'type-asc', 'type-desc',
+                 'dominance-asc', 'dominance-desc', 'viability-asc', 'viability-desc');
 }
 
 /* Sort keys are carried through the candidate CTE so the outer statement never
@@ -289,12 +290,16 @@ function varOrderClause($sort, $prefix, $hasTerm) {
     $p = $prefix === '' ? '' : $prefix . '.';
 
     switch ($sort) {
-        case 'name-desc':  return "{$p}sort_name DESC";
-        case 'locus-asc':  return "{$p}sort_locus ASC NULLS LAST, {$p}sort_name ASC";
-        case 'locus-desc': return "{$p}sort_locus DESC NULLS LAST, {$p}sort_name ASC";
-        case 'type-asc':   return "{$p}sort_type ASC NULLS LAST, {$p}sort_name ASC";
-        case 'type-desc':  return "{$p}sort_type DESC NULLS LAST, {$p}sort_name ASC";
-        case 'name-asc':   return "{$p}sort_name ASC";
+        case 'name-desc':       return "{$p}sort_name DESC";
+        case 'locus-asc':       return "{$p}sort_locus ASC NULLS LAST, {$p}sort_name ASC";
+        case 'locus-desc':      return "{$p}sort_locus DESC NULLS LAST, {$p}sort_name ASC";
+        case 'type-asc':        return "{$p}sort_type ASC NULLS LAST, {$p}sort_name ASC";
+        case 'type-desc':       return "{$p}sort_type DESC NULLS LAST, {$p}sort_name ASC";
+        case 'dominance-asc':   return "{$p}sort_dominance ASC NULLS LAST, {$p}sort_name ASC";
+        case 'dominance-desc':  return "{$p}sort_dominance DESC NULLS LAST, {$p}sort_name ASC";
+        case 'viability-asc':   return "{$p}sort_viability ASC NULLS LAST, {$p}sort_name ASC";
+        case 'viability-desc':  return "{$p}sort_viability DESC NULLS LAST, {$p}sort_name ASC";
+        case 'name-asc':        return "{$p}sort_name ASC";
         case 'relevance':
         default:
             return $hasTerm
@@ -414,17 +419,21 @@ function varTermQuery($filter, $scope, $page, $pageSize, $sort) {
                    v.name  AS sort_name,
                    l.name  AS sort_locus,
                    tt.name AS sort_type,
+                   td.name AS sort_dominance,
+                   tv.name AS sort_viability,
                    $rank AS sort_rank
               FROM hits h
               JOIN mgdb.variation v ON v.id = h.id
               JOIN mgdb.id_num i ON i.id = v.id AND i.curation_lvl = 0
               LEFT JOIN mgdb.locus l ON l.id = v.variationof
               LEFT JOIN mgdb.term tt ON tt.id = v.type
+              LEFT JOIN mgdb.term td ON td.id = v.dominance
+              LEFT JOIN mgdb.term tv ON tv.id = v.viability
              WHERE TRUE{$filter['facet_where']}
              LIMIT $cap
         ),
         page AS (
-            SELECT m.id, m.sort_name, m.sort_locus, m.sort_type, m.sort_rank
+            SELECT m.id, m.sort_name, m.sort_locus, m.sort_type, m.sort_dominance, m.sort_viability, m.sort_rank
               FROM matched m
              ORDER BY $order
              LIMIT $limit OFFSET $offset
@@ -468,11 +477,15 @@ function varFilterPageQuery($filter, $page, $pageSize, $sort) {
             SELECT v.id,
                    v.name  AS sort_name,
                    l.name  AS sort_locus,
-                   tt.name AS sort_type
+                   tt.name AS sort_type,
+                   td.name AS sort_dominance,
+                   tv.name AS sort_viability
               FROM mgdb.variation v
               JOIN mgdb.id_num i ON i.id = v.id AND i.curation_lvl = 0
               LEFT JOIN mgdb.locus l ON l.id = v.variationof
               LEFT JOIN mgdb.term tt ON tt.id = v.type
+              LEFT JOIN mgdb.term td ON td.id = v.dominance
+              LEFT JOIN mgdb.term tv ON tv.id = v.viability
              WHERE TRUE{$filter['facet_where']}
              ORDER BY $innerOrder
              LIMIT $limit OFFSET $offset

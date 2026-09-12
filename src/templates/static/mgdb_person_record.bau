@@ -1,0 +1,22 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-person-record
+<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-person-record-page" id="person-record-top" data-requested-id="$(requested_identifier)" data-person-id="$(person_id)">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/person">People &amp; Organizations</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(display_name)</span>
+  </nav>
+
+  <section class="mgdb-hero mgdb-hub-record-hero mgdb-rec-hero" aria-labelledby="person-record-title">
+    <div class="mgdb-hero-body">
+      <h1 id="person-record-title">$(display_name)</h1>
+      $(synonyms)
+      <dl class="mgdb-record-facts mgdb-rec-headfacts">$(identity_facts)</dl>
+    </div>
+  </section>
+
+  $(section_tabs)
+
+  $(sections)
+
+</main>
+)

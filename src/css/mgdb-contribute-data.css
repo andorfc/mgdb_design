@@ -268,17 +268,29 @@
   }
 }
 
-/* Five tabs cannot fit one row on a phone; the bar becomes a scrolling rail
-   rather than stacking to four rows, the same call the gene hub needed. */
+/* The bar scrolls rather than wraps, at every width.
+ *
+ * It used to do this only below 767px. Measured at the widths in between, five
+ * tabs wrap to two rows and 105px at 768 while sitting on one 57px row at 1280
+ * and at 375 -- so a single offset could not be right for all three, and 8rem
+ * was chosen high enough to clear the worst case. Held to one row instead, the
+ * bar is 57px everywhere and the offset is the shell's own bar-plus-8. */
+.mgdb-contribute-page .mgdb-section-tabs {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* An item that cannot wrap the row still shrinks, and a shrunk tab breaks its
+   label over two lines -- which makes the bar tall again for a different
+   reason. */
+.mgdb-contribute-page .mgdb-section-tabs a {
+  flex: none;
+  white-space: nowrap;
+}
+
 @media (max-width: 767px) {
-  .mgdb-contribute-page .mgdb-section-tabs {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    scrollbar-width: thin;
-  }
-  .mgdb-contribute-page .mgdb-section-tabs a {
-    flex: none;
-  }
   .mgdb-contribute-page .contribute-faq-body {
     padding-left: 0;
   }

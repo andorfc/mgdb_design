@@ -140,7 +140,12 @@
     } 
     else {
       reportError("Unable to find page $page_filename");
-      $mgdb->get('body')->load('templates/error/error-404.bau');
+      http_response_code(404);
+      /* The modern 404 rather than error-404.bau: that template's block is
+         named with its .bau suffix, so Bauplan never matched it and this
+         branch rendered whatever body was already loaded, with a 200. */
+      include('controllers/not_found.php');
+      exit;
     }
   }
   
@@ -152,7 +157,12 @@
       $page_filename = "controllers/" . CONTROLLER . "/" . PAGE . ".php";
       if (!file_exists($page_filename)) {
         reportError("Unable to find page $page_filename");
-        $mgdb->get('body')->load('templates/error/error-404.bau');
+        http_response_code(404);
+        /* The modern 404 rather than error-404.bau: that template's block is
+           named with its .bau suffix, so Bauplan never matched it and this
+           branch rendered whatever body was already loaded, with a 200. */
+        include('controllers/not_found.php');
+        exit;
       }
       else {
         require($page_filename);
@@ -167,7 +177,12 @@
       $page_filename = "record_data/assembly_data.php";
       if (!file_exists($page_filename)) {
         reportError("Unable to find page $page_filename");
-        $mgdb->get('body')->load('templates/error/error-404.bau');
+        http_response_code(404);
+        /* The modern 404 rather than error-404.bau: that template's block is
+           named with its .bau suffix, so Bauplan never matched it and this
+           branch rendered whatever body was already loaded, with a 200. */
+        include('controllers/not_found.php');
+        exit;
       }
       else {
         $template_filename = "templates/genome/assembly_sections.bau";

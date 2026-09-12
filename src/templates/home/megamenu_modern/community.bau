@@ -29,26 +29,44 @@ $$SYNTAX-LEVEL 2
              one, so a destination reads the same in both places, and are held
              to two lines at this panel's column width. -->
         <div class="mega-group">
-          <a href="https://www.maizegenetics.org" data-desc="The organization coordinating maize research cooperation." target="_blank" rel="noopener"><strong>Maize Genetics Cooperation</strong></a>
-          <a href="https://www.maizegenetics.org/mgac" data-desc="The Maize Genetics Advocacy Committee, at maizegenetics.org." target="_blank" rel="noopener"><strong>Advocacy</strong></a>
+          <a href="https://www.maizegenetics.org" data-desc="The organization responsible for coordinating maize research cooperation." target="_blank" rel="noopener"><strong>Maize Genetics Cooperation</strong></a>
+          <a href="https://www.maizegenetics.org/mgac" data-desc="The Maize Genetics Advocacy Committee." target="_blank" rel="noopener"><strong>Advocacy</strong></a>
           <a href="https://www.maizegenetics.org/awards/community-awards" data-desc="Maize Genetics Cooperation community awards." target="_blank" rel="noopener"><strong>Awards</strong></a>
           <a href="$(server-url)/person" data-desc="Search the MaizeGDB people directory." ><strong>Find researchers</strong></a>
-          <a href="$(server-url)/jobs" data-desc="Positions shared with MaizeGDB."><strong>Jobs</strong></a>
-          <a href="$(server-url)/maize_history" data-desc="A century of maize genetics, and the history of MaizeGDB."><strong>Maize research history</strong></a>
+          <a href="$(server-url)/jobs" data-desc="Job postings shared with MaizeGDB."><strong>Jobs</strong></a>
         </div>
         <div class="mega-group">
           <a href="$(server-url)/data_center/reference" data-desc="Search the curated maize literature."><strong>Find a paper</strong></a>
-          <a href="$(server-url)/hot_new_papers" data-desc="A recommended paper each month."><strong>Editorial picks</strong></a>
+          <a href="$(server-url)/hot_new_papers" data-desc="Papers recommended by a rotating editorial board external to MaizeGDB."><strong>Editorial picks</strong></a>
           <a href="$(server-url)/maize_history#history-classic-reads" data-desc="Influential papers in maize genetics."><strong>Classic reads</strong></a>
-          <a href="$(server-url)/mnl" data-desc="Every issue since 1929."><strong>Maize News Letter</strong></a>
+          <a href="$(server-url)/mnl" data-desc="Every MNL issue since 1929."><strong>Maize News Letter</strong></a>
           <a href="$(server-url)/community/videos" data-desc="Recorded talks, and demonstrations of controlled pollination."><strong>Videos</strong></a>
         </div>
         <div class="mega-group">
-          <a href="$(server-url)/contribute_data" data-desc="What we accept, in what formats, and how to send it."><strong>Contribute data</strong></a>
+          <a href="$(server-url)/contribute_data" data-desc="What data we accept, in what formats, and how to submit it."><strong>Contribute data</strong></a>
           <a href="$(server-url)/FAIRpractices" data-desc="FAIR and AI-readiness at MaizeGDB."><strong>FAIR practices</strong></a>
-          <a href="$(server-url)/nomenclature" data-desc="Maize genetics nomenclature rules."><strong>Nomenclature</strong></a>
-          <a href="https://download.maizegdb.org" data-desc="Assemblies, annotations, insertions, expression, and more."><strong>Bulk downloads</strong></a>
+          <a href="$(server-url)/nomenclature" data-desc="Maize genetics nomenclature rules and documentation."><strong>Nomenclature</strong></a>
+          <a href="https://download.maizegdb.org" data-desc="FTP like downloads for assemblies, annotations, insertions, expression, and more."><strong>Bulk downloads</strong></a>
         </div>
+        <!-- The three lists above stop 100-155px short of the panel floor, and
+             that band was empty. A band rather than a fourth column: neither of
+             these labels fits a 163px track, and the panel has no room for
+             another column beside the meeting card.
+
+             It is a <section> with a heading where the three lists above are
+             unheaded divs -- they are columns of one list and a heading would
+             re-introduce the group labels removed on 2026-09-05, whereas this
+             is a separate shelf under a rule and needs naming. The heading is
+             also what gives the section its accessible name.
+
+             No hand-written arrow on the UC Davis link: the panel writes one
+             from the href \(.mega-group > a[href^="http"] strong::after\), and a
+             second glyph would double it. -->
+        <section class="mega-group mega-history" aria-labelledby="mega-history-title">
+          <h3 id="mega-history-title">Maize history</h3>
+          <a href="https\://rilab.ucdavis.edu/maize_history.html" data-desc="Maize origins, domestication and cultural history, from the Ross-Ibarra lab." target="_blank" rel="noopener"><strong>Maize Origins, Domestication &amp; Cultural History</strong></a>
+          <a href="$(server-url)/maize_history" data-desc="A century of maize genetics, and the history of MaizeGDB."><strong>Maize Genetics &amp; Research Community History</strong></a>
+        </section>
         <aside class="mega-feature mega-feature-blue">
           <span class="mega-badge">Upcoming</span>
           <h3>69th Maize Genetics Meeting</h3>
@@ -56,7 +74,7 @@ $$SYNTAX-LEVEL 2
           <a class="mega-feature-art" href="https://www.maizegenetics.org/maize-meeting/2027" data-desc="The 69th Annual Maize Genetics Meeting, March 11-14 2027, Rosemont, Illinois." target="_blank" rel="noopener">
             <img src="/images/MGC2027_img.png" alt="69th Annual Maize Genetics Meeting, 2027" width="231" height="84" loading="lazy" decoding="async" />
           </a>
-          <a class="mega-secondary-link" href="$(server-url)/maize_meeting/" data-desc="Programmes and abstracts from past annual meetings.">Past meetings &amp; abstracts</a>
+          <a class="mega-secondary-link" href="$(server-url)/maize_meeting/" data-desc="Programs and abstracts from past annual meetings.">Past meetings &amp; abstracts</a>
         </aside>
       </div>
     </div>

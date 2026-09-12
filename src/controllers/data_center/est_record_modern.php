@@ -131,7 +131,7 @@ function estRecordNotFound($DBConn, $system, $requested) {
   $other = estOtherMarker($DBConn, $requested);
   $matches = estSuggestions($DBConn, $requested);
   $summary = 'No MaizeGDB EST matches ' . $display
-           . '. Search the EST Data Center, or follow one of the suggested records.';
+           . '. Search the EST Data Hub, or follow one of the suggested records.';
 
   /* The size of the collection, cached: the count filters 1.4M probe rows and
      changes when markers are loaded rather than per request. */

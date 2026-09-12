@@ -65,32 +65,111 @@
 
 .mgdb-pan-gene-page > section[id] { margin-bottom: var(--mgdb-space-5); }
 
-/* ── Results controls ────────────────────────────────────────────────────── */
+/* ── Results toolbar ─────────────────────────────────────────────────────── */
 
-/* Fixed tracks in a box sized to its own content: declared with minmax(0, ...)
-   the first tracks take everything the parent offers and the last resolves to
-   0px, which drops its control onto a second row. */
-.mgdb-pan-gene-page .pan-gene-results-controls {
-  display: grid;
-  width: max-content;
-  max-width: 100%;
-  flex: 0 0 auto;
-  grid-template-columns: 13rem 10rem 16rem;
+.mgdb-pan-gene-page .pan-gene-results-status {
+  margin: var(--mgdb-space-1) 0 var(--mgdb-space-4);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-pan-gene-page .pan-gene-results-status strong {
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-pan-gene-page .pan-gene-results-toolbar {
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--mgdb-space-3) var(--mgdb-space-4);
-  align-items: end;
+  align-items: flex-end;
+  margin-bottom: var(--mgdb-space-4);
 }
 
-.mgdb-pan-gene-page .pan-gene-results-controls[hidden] { display: none; }
-
-@media (max-width: 1000px) {
-  .mgdb-pan-gene-page .pan-gene-results-controls {
-    width: 100%;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.mgdb-pan-gene-page .pan-gene-results-filter {
+  flex: 1 1 240px;
+  min-width: 200px;
+  position: relative;
 }
 
-@media (max-width: 560px) {
-  .mgdb-pan-gene-page .pan-gene-results-controls { grid-template-columns: minmax(0, 1fr); }
+.mgdb-pan-gene-page .pan-gene-results-filter > label {
+  padding-right: 7rem;
+}
+
+.mgdb-pan-gene-page .pan-gene-results-filter input {
+  width: 100%;
+}
+
+.mgdb-pan-gene-page .pan-gene-results-filter .mgdb-result-count,
+.mgdb-pan-gene-page #pan-gene-filter-count {
+  position: absolute;
+  right: 0;
+  bottom: calc(var(--mgdb-tap-target) + 6px);
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.mgdb-pan-gene-page .pan-gene-results-toolbar .pan-gene-results-export .mgdb-button {
+  height: var(--mgdb-tap-target);
+  min-height: var(--mgdb-tap-target);
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+/* View Toggle */
+.mgdb-pan-gene-page .pan-gene-results-view {
+  display: inline-flex;
+  align-items: flex-end;
+}
+
+.mgdb-pan-gene-page .pan-gene-results-view .mgdb-view-toggle {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-alt);
+  height: var(--mgdb-tap-target);
+  box-sizing: border-box;
+  align-items: center;
+}
+
+.mgdb-pan-gene-page .pan-gene-results-view .mgdb-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+  padding: 0 10px;
+  border: none;
+  border-radius: calc(var(--mgdb-radius-sm) - 2px);
+  background: transparent;
+  color: var(--mgdb-muted);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+}
+
+.mgdb-pan-gene-page .pan-gene-results-view .mgdb-view-btn:hover:not(.is-active):not([aria-pressed="true"]) {
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+}
+
+.mgdb-pan-gene-page .pan-gene-results-view .mgdb-view-btn.is-active,
+.mgdb-pan-gene-page .pan-gene-results-view .mgdb-view-btn[aria-pressed="true"] {
+  background: var(--mgdb-green-dark) !important;
+  color: #ffffff !important;
+  box-shadow: var(--mgdb-shadow-xs);
+}
+
+.mgdb-pan-gene-page .pan-gene-results-view .mgdb-view-btn.is-active svg,
+.mgdb-pan-gene-page .pan-gene-results-view .mgdb-view-btn[aria-pressed="true"] svg {
+  fill: #ffffff;
+  color: #ffffff;
 }
 
 .mgdb-pan-gene-page #pan-gene-results[hidden] { display: none; }
@@ -111,67 +190,233 @@
    Search
    -------------------------------------------------------------------------- */
 
-/* .mgdb-hint is a block element in the shared sheet; inside a wrapping <label>
-   a <span> carries it instead, so it needs the block treatment restated. */
-.mgdb-pan-gene-page span.mgdb-hint,
-.mgdb-pan-gene-page span.mgdb-label { display: block; }
+.mgdb-pan-gene-page .pan-gene-search-form-wrap {
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-pan-gene-page .pan-gene-query-row {
+  display: flex;
+  gap: var(--mgdb-space-3);
+  align-items: stretch;
+}
+
+.mgdb-pan-gene-page .pan-gene-query-control {
+  position: relative;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+}
+
+.mgdb-pan-gene-page .pan-gene-search-icon {
+  position: absolute;
+  left: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mgdb-ink-soft);
+  pointer-events: none;
+}
+
+.mgdb-pan-gene-page .pan-gene-query-input {
+  width: 100%;
+  height: var(--mgdb-tap-target);
+  padding: 0 3rem 0 2.75rem;
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-base);
+  box-sizing: border-box;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.mgdb-pan-gene-page .pan-gene-query-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+
+.mgdb-pan-gene-page .pan-gene-query-input:focus {
+  border-color: var(--mgdb-focus);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(11, 87, 164, .18);
+}
+
+.mgdb-pan-gene-page .pan-gene-query-clear {
+  position: absolute;
+  right: 0.625rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.875rem;
+  height: 1.875rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--mgdb-ink-soft);
+  cursor: pointer;
+  transition: background-color .15s, color .15s;
+}
+
+.mgdb-pan-gene-page .pan-gene-query-clear[hidden] {
+  display: none !important;
+}
+
+.mgdb-pan-gene-page .pan-gene-query-clear:hover {
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-pan-gene-page .pan-gene-query-submit {
+  display: inline-flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  justify-content: center;
+  height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-5);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ── Examples ────────────────────────────────────────────────────────────── */
 
 .mgdb-pan-gene-page .pan-gene-examples {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-2);
   align-items: center;
-  margin-top: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-3);
 }
 
-/* Advanced search disclosure ---------------------------------------------- */
+.mgdb-pan-gene-page .pan-gene-example-label {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.mgdb-pan-gene-page .pan-gene-example-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 999px;
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+
+.mgdb-pan-gene-page .pan-gene-example-btn:hover {
+  border-color: var(--mgdb-gold);
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+  box-shadow: 0 0 0 1px var(--mgdb-gold);
+}
+
+/* ── Advanced search disclosure ──────────────────────────────────────────── */
 
 .mgdb-pan-gene-page .pan-gene-advanced {
   margin-top: var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface, #ffffff);
+  box-shadow: var(--mgdb-shadow-xs);
 }
 
 .mgdb-pan-gene-page .pan-gene-advanced > summary {
   display: flex;
-  gap: var(--mgdb-space-4);
+  gap: var(--mgdb-space-3);
   align-items: center;
-  justify-content: space-between;
   min-height: var(--mgdb-tap-target);
-  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  padding: var(--mgdb-space-3) var(--mgdb-space-5);
+  background: var(--hub-surface, #ffffff);
   color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
   cursor: pointer;
+  list-style: none;
+  border-radius: var(--mgdb-radius);
+  user-select: none;
 }
 
-.mgdb-pan-gene-page .pan-gene-advanced > summary:focus-visible {
-  outline: 3px solid var(--mgdb-focus);
-  outline-offset: -3px;
+.mgdb-pan-gene-page .pan-gene-advanced > summary::-webkit-details-marker {
+  display: none;
 }
 
-.mgdb-pan-gene-page .pan-gene-advanced > summary strong {
-  display: block;
-  font-size: var(--mgdb-text-lg);
+.mgdb-pan-gene-page .pan-gene-advanced > summary::before {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 7px solid currentColor;
+  content: "";
+  transition: transform .15s ease;
 }
 
-.mgdb-pan-gene-page .pan-gene-advanced > summary small {
-  display: block;
-  margin-top: var(--mgdb-space-1);
-  color: var(--mgdb-muted);
+.mgdb-pan-gene-page .pan-gene-advanced[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.mgdb-pan-gene-page .pan-gene-advanced-label {
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+}
+
+.mgdb-pan-gene-page .pan-gene-advanced-count {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.mgdb-pan-gene-page .pan-gene-advanced-body {
+  padding: 0 var(--mgdb-space-5) var(--mgdb-space-5);
+  border-top: 1px solid var(--hub-line-soft);
+}
+
+.mgdb-pan-gene-page .pan-gene-advanced-actions {
+  display: flex;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  margin-top: var(--mgdb-space-5);
+  padding-top: var(--mgdb-space-4);
+  border-top: 1px solid var(--hub-line-soft);
+}
+
+.mgdb-pan-gene-page .pan-gene-advanced-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink-soft);
+  font-family: inherit;
   font-size: var(--mgdb-text-sm);
-  font-weight: 400;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
 }
 
-.mgdb-pan-gene-page .pan-gene-advanced[open] > summary {
-  border-bottom: 1px solid var(--mgdb-line);
-  background: var(--mgdb-surface-alt);
+.mgdb-pan-gene-page .pan-gene-advanced-reset-btn:hover {
+  border-color: var(--mgdb-burgundy);
+  background: var(--mgdb-burgundy-soft, #fdf2f2);
+  color: var(--mgdb-burgundy);
 }
-
-.mgdb-pan-gene-page .pan-gene-advanced[open] > summary > span[aria-hidden] {
-  transform: rotate(180deg);
-}
-
-.mgdb-pan-gene-page .pan-gene-advanced > form { padding: var(--mgdb-space-5); }
 
 .mgdb-pan-gene-page .pan-gene-fieldset {
   padding: var(--mgdb-space-4) var(--mgdb-space-5) var(--mgdb-space-5);
@@ -194,18 +439,65 @@
   gap: var(--mgdb-space-4);
 }
 
+/* Two per row, always. auto-fit fitted three of the four size-and-coverage
+   fields on one line at this panel width, which split the pair that belongs
+   together: the two member counts read as one question, the two percentages as
+   another. Two fixed tracks keep each pair on its own line. */
+.mgdb-pan-gene-page .pan-gene-filter-grid-pairs {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 620px) {
+  .mgdb-pan-gene-page .pan-gene-filter-grid-pairs {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* The three association checkboxes now sit inside the size-and-coverage
+   fieldset rather than carrying a fieldset of their own, so they need the
+   separation the removed legend used to provide. */
+.mgdb-pan-gene-page .pan-gene-fieldset .pan-gene-check-grid {
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-pan-gene-page .pan-gene-filter-grid .mgdb-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.mgdb-pan-gene-page .pan-gene-filter-grid .mgdb-label {
+  min-height: 1.5rem;
+}
+
+.mgdb-pan-gene-page .pan-gene-advanced .mgdb-hint {
+  display: block;
+  margin-top: var(--mgdb-space-1);
+  margin-bottom: 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading-normal);
+}
+
 /* The grid already spaces the fields; the shared stacking margin would double it. */
 .mgdb-pan-gene-page .pan-gene-filter-grid > .mgdb-field + .mgdb-field { margin-top: 0; }
+
+.mgdb-pan-gene-page .pan-gene-check-grid {
+  align-items: stretch;
+}
 
 .mgdb-pan-gene-page .pan-gene-check {
   display: flex;
   gap: var(--mgdb-space-3);
   align-items: flex-start;
+  height: 100%;
+  margin: 0;
   padding: var(--mgdb-space-3) var(--mgdb-space-4);
   border: 1px solid var(--mgdb-line-soft);
   border-radius: var(--mgdb-radius-sm);
   background: var(--mgdb-surface-alt);
+  box-sizing: border-box;
   cursor: pointer;
+  transition: border-color .15s, box-shadow .15s;
 }
 
 .mgdb-pan-gene-page .pan-gene-check:hover { border-color: var(--mgdb-green-dark); }
@@ -216,11 +508,14 @@
   display: block;
   margin-top: var(--mgdb-space-1);
   color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
+  font-size: var(--mgdb-text-xs);
   line-height: var(--mgdb-leading-snug);
 }
 
-.mgdb-pan-gene-page .pan-gene-fieldset .pan-gene-check + .pan-gene-check { margin-top: var(--mgdb-space-3); }
+.mgdb-pan-gene-page .pan-gene-fieldset .pan-gene-check + .pan-gene-check,
+.mgdb-pan-gene-page .pan-gene-check-grid .pan-gene-check + .pan-gene-check {
+  margin-top: 0;
+}
 
 /* A multi-select is the one control here that cannot be a fixed height. */
 .mgdb-pan-gene-page .pan-gene-multi { height: auto; padding: var(--mgdb-space-2); }
@@ -328,6 +623,239 @@
   color: var(--mgdb-muted);
 }
 
+/* ── Interactive Table Sort Headers ──────────────────────────────────────── */
+
+.mgdb-pan-gene-page .pan-gene-table th button[data-sort-key] {
+  display: inline-flex;
+  gap: var(--mgdb-space-1);
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+.mgdb-pan-gene-page .pan-gene-table th.mgdb-numeric button[data-sort-key] {
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.mgdb-pan-gene-page .pan-gene-table th button[data-sort-key]:hover {
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-pan-gene-page .pan-gene-table th button[data-sort-key]::after {
+  font-size: .8em;
+  opacity: .5;
+}
+
+.mgdb-pan-gene-page .pan-gene-table th[aria-sort="none"] button[data-sort-key]::after {
+  content: " \21C5";
+  opacity: .35;
+}
+
+.mgdb-pan-gene-page .pan-gene-table th[aria-sort="ascending"] button[data-sort-key]::after {
+  content: " \2191";
+  opacity: 1;
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-pan-gene-page .pan-gene-table th[aria-sort="descending"] button[data-sort-key]::after {
+  content: " \2193";
+  opacity: 1;
+  color: var(--mgdb-green-dark);
+}
+
+/* ── Result Cards (Card View) ────────────────────────────────────────────── */
+
+.mgdb-pan-gene-page .pan-gene-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--mgdb-space-5);
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-pan-gene-page .pan-gene-card-grid[hidden],
+.mgdb-pan-gene-page .pan-gene-table-wrap[hidden] {
+  display: none !important;
+}
+
+.mgdb-pan-gene-page .pan-gene-result-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.mgdb-pan-gene-page .pan-gene-result-card:hover {
+  border-color: var(--mgdb-gold-dark);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-pan-gene-page .pan-gene-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: center;
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-pan-gene-page .pan-gene-analysis-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+}
+
+.mgdb-pan-gene-page .pan-gene-member-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.mgdb-pan-gene-page .pan-gene-annot-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.mgdb-pan-gene-page .pan-gene-result-card h3 {
+  color: var(--mgdb-green-dark);
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-lg);
+  line-height: var(--mgdb-leading-snug);
+  margin: 0;
+}
+
+.mgdb-pan-gene-page .pan-gene-result-card h3 a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.mgdb-pan-gene-page .pan-gene-result-card h3 a:hover {
+  color: var(--mgdb-leaf);
+}
+
+.mgdb-pan-gene-page .pan-gene-card-subname {
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-pan-gene-page .pan-gene-card-details {
+  margin-top: var(--mgdb-space-3);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-pan-gene-page .pan-gene-card-details p {
+  margin-top: var(--mgdb-space-2);
+  margin-bottom: 0;
+}
+
+.mgdb-pan-gene-page .pan-gene-card-details strong {
+  color: var(--mgdb-ink);
+}
+
+.mgdb-pan-gene-page .pan-gene-card-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: center;
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--mgdb-line);
+}
+
+.mgdb-pan-gene-page .pan-gene-card-links a {
+  color: var(--mgdb-burgundy);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.mgdb-pan-gene-page .pan-gene-card-links a:hover {
+  text-decoration: underline;
+}
+
+.mgdb-pan-gene-page .pan-gene-copy-btn {
+  font-size: var(--mgdb-text-xs);
+  padding: 2px 8px;
+  min-height: 28px;
+  height: 28px;
+}
+
+/* ── Pagination ──────────────────────────────────────────────────────────── */
+
+.mgdb-pan-gene-page .pan-gene-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-4);
+  border-top: 1px solid var(--hub-line-soft);
+}
+
+.mgdb-pan-gene-page .pan-gene-pagination:empty { display: none; }
+
+.mgdb-pan-gene-page .pan-gene-pagination a,
+.mgdb-pan-gene-page .pan-gene-pagination span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--mgdb-tap-target);
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.mgdb-pan-gene-page .pan-gene-pagination a:hover {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-pan-gene-page .pan-gene-pagination span[aria-current="page"] {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+}
+
+.mgdb-pan-gene-page .pan-gene-pagination .mgdb-pagination-status {
+  border: none;
+  background: transparent;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  min-width: auto;
+}
+
 /* --------------------------------------------------------------------------
    Downloads and figures
    -------------------------------------------------------------------------- */
@@ -401,6 +929,30 @@
   }
 
   .mgdb-pan-gene-page .mgdb-section-tabs a { white-space: nowrap; }
+  .mgdb-pan-gene-page .pan-gene-query-row { flex-direction: column; }
+  .mgdb-pan-gene-page .pan-gene-query-submit { width: 100%; }
+  .mgdb-pan-gene-page .pan-gene-card-grid { grid-template-columns: 1fr; }
   .mgdb-pan-gene-page .pan-gene-single { grid-template-columns: 1fr; }
   .mgdb-pan-gene-page .pan-gene-values { max-width: none; }
+}
+
+
+/* The page-level caveat, lifted out of Metrics to sit under the hero: a reader
+   meets it before the data rather than after it. Same note styling, with the
+   spacing the section tabs below it need. */
+.mgdb-pan-gene-page .pan-gene-accuracy-note {
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: 0;
+}
+
+/* An exact match names what the heading is before it says the name -- the
+   exemplar is an identifier, and identifiers read better labelled. */
+.mgdb-pan-gene-page .pan-gene-single-label {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
 }

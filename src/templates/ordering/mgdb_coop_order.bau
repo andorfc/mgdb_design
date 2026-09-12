@@ -1,0 +1,155 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-coop-order
+<main class="mgdb-page mgdb-coop-order-page" id="mgdb-coop-order-main" data-preadd="$(preadd)">
+
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/stock_catalog">Stocks</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Order stocks</span>
+  </nav>
+
+  <section class="mgdb-hero-basic" aria-labelledby="coop-order-title">
+    <span class="mgdb-hero-basic-icon" aria-hidden="true">
+      <svg viewBox="0 0 84 84" role="presentation" focusable="false">
+        <path d="M14 22h56l-6 44H20z" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/>
+        <path d="M31 32V20a11 11 0 0 1 22 0v12" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+        <path d="M33 46h18" stroke="#2f5e2a" stroke-width="5" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <div>
+      <h1 id="coop-order-title">Request stocks from the Stock Center</h1>
+      <p>Build a list of the maize genetic stocks you want, add your shipping details, and submit it to the Maize Genetics Cooperation Stock Center as one request. The seed is sent free of charge.</p>
+    </div>
+  </section>
+
+  <div class="mgdb-note mgdb-note-info coop-scope">
+    <p><strong>The MGCSC specializes in maize genetic stocks.</strong> For inbred lines and other germplasm, please request from <a class="mgdb-external" href="https://npgsweb.ars-grin.gov/gringlobal/search" target="_blank" rel="noopener">NCRPIS</a> or <a class="mgdb-external" href="https://www.cimmyt.org/" target="_blank" rel="noopener">CIMMYT</a> instead. Questions? Write to <a href="mailto:maize@uiuc.edu">maize@uiuc.edu</a>.</p>
+  </div>
+
+  <details class="mgdb-panel coop-guidelines">
+    <summary>What to know before you request</summary>
+    <ul class="mgdb-list">
+      <li>The Stock Center supplies a small amount &mdash; 10 to 20 kernels &mdash; of each stock, free of charge. It cannot supply larger quantities, or send the same stock repeatedly to one person or institute.</li>
+      <li>Large populations such as UFMu or RILs are sent only once per institute or location.</li>
+      <li>Requests are usually filled within two working days. A request for more than 25 stocks may take longer, and it may not be possible to fill a request for more than 60 stocks, or more than 25 from outside the USA. For a large request, contact the Stock Center to make special arrangements.</li>
+      <li>During planting preparation in April and May, and pollination season in July and August, requests may take a little longer. If it is urgent, say so in the special instructions.</li>
+    </ul>
+  </details>
+
+  <div id="coop-status" class="coop-status" role="status" aria-live="polite" hidden></div>
+
+  <!-- Step 1: choose stocks -->
+  <section class="coop-step" aria-labelledby="coop-step1-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="coop-step1-title"><span class="coop-step-num" aria-hidden="true">1</span> Choose stocks</h2>
+        <p>Enter a stock name and add it to your list, or find one through the <a href="/data_center/stock">stock search</a> or the <a href="/stock_catalog">stock catalog</a> and use its <strong>Order this stock</strong> link.</p>
+      </div>
+      <span class="mgdb-result-count" id="coop-count" hidden></span>
+    </div>
+
+    <div class="mgdb-search coop-add">
+      <div class="mgdb-search-row coop-add-row">
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="coop-stock-name">Stock name</label>
+          <p class="mgdb-hint" id="coop-stock-name-hint">Checked against the Stock Center catalog before it is added.</p>
+          <input class="mgdb-input" id="coop-stock-name" type="text" autocomplete="off" spellcheck="false" aria-describedby="coop-stock-name-hint">
+        </div>
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="coop-stock-comment">Comment <span class="coop-optional">optional</span></label>
+          <p class="mgdb-hint" id="coop-stock-comment-hint">For example, a desired genetic background.</p>
+          <input class="mgdb-input" id="coop-stock-comment" type="text" aria-describedby="coop-stock-comment-hint">
+        </div>
+        <button class="mgdb-button mgdb-button-secondary" id="coop-add-btn" type="button">Add to list</button>
+      </div>
+      <p class="mgdb-field-error coop-add-error" id="coop-add-error" role="alert" hidden></p>
+
+      <div id="coop-matches" class="coop-matches" hidden>
+        <p class="coop-matches-lead" id="coop-matches-lead"></p>
+        <ul class="coop-matches-list" id="coop-matches-list"></ul>
+      </div>
+    </div>
+
+    <div id="coop-list" class="coop-list" aria-live="polite">
+      <div class="mgdb-empty">
+        <h3>No stocks yet</h3>
+        <p>Add a stock above, or open a stock record and choose <strong>Order this stock</strong>. Everything you add collects here until you submit.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 2: shipping information -->
+  <section class="coop-step" aria-labelledby="coop-step2-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="coop-step2-title"><span class="coop-step-num" aria-hidden="true">2</span> Shipping information</h2>
+        <p>Where the seed should be sent. Fields marked <span class="mgdb-required">*</span> are required.</p>
+      </div>
+    </div>
+
+    <form id="coop-ship-form" class="coop-ship" novalidate>
+      <div class="coop-ship-grid">
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="coop-name">Name <span class="mgdb-required" aria-hidden="true">*</span></label>
+          <input class="mgdb-input" id="coop-name" name="name" type="text" autocomplete="name" required aria-required="true">
+          <p class="mgdb-field-error" id="coop-name-error" hidden></p>
+        </div>
+
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="coop-email">E-mail <span class="mgdb-required" aria-hidden="true">*</span></label>
+          <input class="mgdb-input" id="coop-email" name="email" type="email" autocomplete="email" required aria-required="true">
+          <p class="mgdb-field-error" id="coop-email-error" hidden></p>
+        </div>
+
+        <div class="mgdb-field coop-field-wide">
+          <label class="mgdb-label" for="coop-address">Address <span class="mgdb-required" aria-hidden="true">*</span></label>
+          <p class="mgdb-hint" id="coop-address-hint">Include the institute or company, department, street address, city, state or province, and postal code.</p>
+          <textarea class="mgdb-textarea" id="coop-address" name="address" rows="4" required aria-required="true" aria-describedby="coop-address-hint"></textarea>
+          <p class="mgdb-field-error" id="coop-address-error" hidden></p>
+        </div>
+
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="coop-country">Country <span class="mgdb-required" aria-hidden="true">*</span></label>
+          <input class="mgdb-input" id="coop-country" name="country" type="text" autocomplete="country-name" required aria-required="true">
+          <p class="mgdb-field-error" id="coop-country-error" hidden></p>
+        </div>
+
+        <div class="mgdb-field">
+          <label class="mgdb-label" for="coop-phone">Phone</label>
+          <p class="mgdb-hint" id="coop-phone-hint">Required for shipping outside the USA.</p>
+          <input class="mgdb-input" id="coop-phone" name="phone" type="tel" autocomplete="tel" aria-describedby="coop-phone-hint">
+          <p class="mgdb-field-error" id="coop-phone-error" hidden></p>
+        </div>
+
+        <div class="mgdb-field coop-field-wide">
+          <label class="mgdb-label" for="coop-instructions">Special instructions <span class="coop-optional">optional</span></label>
+          <p class="mgdb-hint" id="coop-instructions-hint">Anything the curators should know, or a stock not in the catalog that you would like the Stock Center to try to find.</p>
+          <textarea class="mgdb-textarea" id="coop-instructions" name="instructions" rows="4" aria-describedby="coop-instructions-hint"></textarea>
+        </div>
+
+        <div class="mgdb-field coop-field-wide">
+          <label class="coop-check">
+            <input type="checkbox" id="coop-genome" name="genome">
+            <span>This seed will be used in a genome sequencing project.</span>
+          </label>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <!-- Step 3: submit -->
+  <section class="coop-step" aria-labelledby="coop-step3-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="coop-step3-title"><span class="coop-step-num" aria-hidden="true">3</span> Submit your request</h2>
+        <p>Add every stock before you submit &mdash; the whole list is sent in one request. You will be asked to confirm.</p>
+      </div>
+    </div>
+
+    <div class="mgdb-form-actions coop-submit-row">
+      <button class="mgdb-button mgdb-button-primary" id="coop-submit-btn" type="button">Submit request to the Stock Center</button>
+    </div>
+  </section>
+
+  <p class="mgdb-note coop-multi-note">If you have more than one request form open, be sure you submit the most current one, with your full list of stocks.</p>
+
+</main>
+)

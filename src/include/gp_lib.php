@@ -458,4 +458,202 @@ function mgdb_safe_html($html) {
   return $out;
 }//mgdb_safe_html
 
+
+////////////////////////////////////////////////////////////////////////////////
+//                       Authenticated session support                        //
+//
+// Community-curator sessions used to be carried in three cookies: `username`,
+// `userid`, and `password` -- the last holding the visitor's *plaintext*
+// password, with no HttpOnly/Secure/SameSite flags and a one-year life. That
+// value rode along on every request to *.maizegdb.org and was readable by any
+// script on any of those pages.
+//
+// The `password` cookie now carries a signed, opaque **session token** instead
+// of the password. The token is an HMAC over the account id, username, and an
+// expiry, keyed with a server-only secret, so it cannot be forged or read back
+// into a password, and it is set HttpOnly + Secure + SameSite=Lax. Identity is
+// taken from the *verified* token (mgdbSessionUser), never from the raw
+// `username`/`userid` cookies, which a client can set to anything.
+////////////////////////////////////////////////////////////////////////////////
+
+// Domain the auth cookies are scoped to. The accounts span the whole
+// maizegdb.org space, so the cookies are shared across subdomains as before.
+if (!defined('MGDB_AUTH_COOKIE_DOMAIN')) {
+  define('MGDB_AUTH_COOKIE_DOMAIN', 'maizegdb.org');
+}
+
+/*
+ * The secret that signs session tokens. Prefer an explicit `auth_secret` line
+ * in conf/mgdb.conf (server-only, never in the repository, survives deploys).
+ * If it is missing, fall back to the database password -- already a server-only
+ * secret present in every instance's conf -- so token signing never hard-fails
+ * on an instance whose admin has not added the line yet. A deployment note in
+ * ADMIN_DEPENDENCIES.md asks for the explicit value.
+ */
+function mgdbAuthSecret() {
+  static $secret = null;
+  if ($secret !== null) {
+    return $secret;
+  }
+  $system = getSystemInfo('mgdb.conf');
+  if (!empty($system['auth_secret'])) {
+    $secret = (string) $system['auth_secret'];
+    return $secret;
+  }
+  $db = getSystemInfoFile('db.conf');
+  $fallback = '';
+  if ($db !== '') {
+    $conf = readConfFile($db);
+    if (!empty($conf['DB_PASS'])) {
+      // Namespaced so the raw DB password is never itself the HMAC key.
+      $fallback = 'mgdb-auth-v1:' . $conf['DB_PASS'];
+    }
+  }
+  $secret = $fallback;
+  return $secret;
+}
+
+// URL-safe base64 without padding, for the token's own bytes.
+function mgdbB64UrlEncode($raw) {
+  return rtrim(strtr(base64_encode($raw), '+/', '-_'), '=');
+}
+function mgdbB64UrlDecode($enc) {
+  $enc = strtr($enc, '-_', '+/');
+  $pad = strlen($enc) % 4;
+  if ($pad) {
+    $enc .= str_repeat('=', 4 - $pad);
+  }
+  return base64_decode($enc, true);
+}
+
+/*
+ * Mint a session token: base64url(payload) . '.' . base64url(hmac). The payload
+ * is a compact JSON object {u: userid, n: username, e: expiry}. $ttl is the
+ * token's lifetime in seconds.
+ */
+function mgdbMintSessionToken($userid, $username, $ttl) {
+  $secret = mgdbAuthSecret();
+  if ($secret === '') {
+    return '';
+  }
+  $ttl = (int) $ttl;
+  if ($ttl <= 0) {
+    $ttl = 31536000; // a year, matching the legacy default
+  }
+  $payload = json_encode(array(
+    'u' => (string) $userid,
+    'n' => (string) $username,
+    'e' => time() + $ttl,
+  ));
+  $body = mgdbB64UrlEncode($payload);
+  $sig  = mgdbB64UrlEncode(hash_hmac('sha256', $body, $secret, true));
+  return $body . '.' . $sig;
+}
+
+/*
+ * Verify a session token. Returns array('userid'=>, 'username'=>) when the
+ * signature matches and the token has not expired, or false otherwise. Uses a
+ * constant-time comparison so a forged token cannot be tuned by timing.
+ */
+function mgdbVerifySessionToken($token) {
+  if (!is_string($token) || strpos($token, '.') === false) {
+    return false;
+  }
+  $secret = mgdbAuthSecret();
+  if ($secret === '') {
+    return false;
+  }
+  list($body, $sig) = explode('.', $token, 2);
+  $expected = mgdbB64UrlEncode(hash_hmac('sha256', $body, $secret, true));
+  if (!hash_equals($expected, $sig)) {
+    return false;
+  }
+  $payload = mgdbB64UrlDecode($body);
+  if ($payload === false) {
+    return false;
+  }
+  $data = json_decode($payload, true);
+  if (!is_array($data) || !isset($data['u'], $data['n'], $data['e'])) {
+    return false;
+  }
+  if ((int) $data['e'] < time()) {
+    return false;
+  }
+  return array(
+    'userid'   => (string) $data['u'],
+    'username' => (string) $data['n'],
+  );
+}
+
+/*
+ * The one place the rest of the site should ask "who is logged in?". Reads the
+ * token from the `password` cookie, verifies it, and returns
+ * array('userid'=>, 'username'=>) or false. Identity comes from the signed
+ * token, so setting a `username`/`userid` cookie by hand grants nothing.
+ * Result is memoised for the request.
+ */
+function mgdbSessionUser() {
+  static $resolved = false;
+  static $user = false;
+  if ($resolved) {
+    return $user;
+  }
+  $resolved = true;
+  $token = getCookie('password', '');
+  $user  = $token === '' ? false : mgdbVerifySessionToken($token);
+  return $user;
+}
+
+// Shared cookie options so set and clear cannot drift apart. PHP >= 7.3.
+function mgdbAuthCookieOptions($expires) {
+  $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+         || (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])
+             && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
+         || (isset($_SERVER['HTTP_CF_VISITOR'])
+             && strpos($_SERVER['HTTP_CF_VISITOR'], 'https') !== false);
+  return array(
+    'expires'  => $expires,
+    'path'     => '/',
+    'domain'   => MGDB_AUTH_COOKIE_DOMAIN,
+    'secure'   => $secure,
+    'httponly' => true,
+    'samesite' => 'Lax',
+  );
+}
+
+/*
+ * Set the three auth cookies for a logged-in curator. `username` and `userid`
+ * stay for the legacy display checks that test them for non-emptiness; the
+ * secret material is only ever the signed token in `password`, never the
+ * password itself. $lifetime is in seconds.
+ */
+function mgdbSetAuthCookies($userid, $username, $lifetime) {
+  $lifetime = (int) $lifetime;
+  if ($lifetime <= 0) {
+    $lifetime = 31536000;
+  }
+  $expires = time() + $lifetime;
+  $token   = mgdbMintSessionToken($userid, $username, $lifetime);
+  $opts    = mgdbAuthCookieOptions($expires);
+  setcookie('username', (string) $username, $opts);
+  setcookie('userid',   (string) $userid,   $opts);
+  setcookie('password', $token,             $opts);
+  // Keep the current request's view consistent with what we just set.
+  $_COOKIE['username'] = (string) $username;
+  $_COOKIE['userid']   = (string) $userid;
+  $_COOKIE['password'] = $token;
+  return $token;
+}
+
+// Clear the three auth cookies. Same flags/domain/path so the browser matches
+// and actually drops them.
+function mgdbClearAuthCookies() {
+  $opts = mgdbAuthCookieOptions(time() - 315360000);
+  setcookie('username', '', $opts);
+  setcookie('userid',   '', $opts);
+  setcookie('password', '', $opts);
+  unset($_COOKIE['username'], $_COOKIE['userid'], $_COOKIE['password']);
+}
+
+
 ?>

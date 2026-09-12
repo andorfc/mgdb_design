@@ -1,0 +1,14 @@
+$$SYNTAX-LEVEL 2
+*(jobs-bottom
+  <div id='bottom_desc'>
+    @(jobs-text-bottom
+      <br><hr><br>
+      <a name=$(JobNo)></a>
+      <p style='display:none' id='job_title' name=$(JobNo) >$(JobTitle)</p>
+      <br>
+      @(jobs-text-bottom2
+        <p><strong>$(SubTitle):</strong> $(SubTitle_detail)</p><br>
+      )
+    )
+  </div>
+)

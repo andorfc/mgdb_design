@@ -33,7 +33,7 @@ $$SYNTAX-LEVEL 2
       <p class="mgdb-hero-description">$(page_description)</p>
       <div class="sc-hero-links">
         <a class="sc-hero-link" href="https\://maizecoopsc.org/" target="_blank" rel="noopener">
-          <span class="sc-dot sc-dot-green" aria-hidden="true"></span> Stock Center
+          <span class="sc-dot sc-dot-green" aria-hidden="true"></span> Maize Genetics Cooperation Stock Center
         </a>
         <a class="sc-hero-link" href="/data_center/stock">
           <span class="sc-dot sc-dot-blue" aria-hidden="true"></span> Stock Data Hub
@@ -45,10 +45,11 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
+  $(hero_notice)
+
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
     <a href="#sc-catalogs" class="is-current">Catalogs</a>
     <a href="#sc-stocks">Stocks</a>
-    <a href="#sc-references">References</a>
     <a href="#sc-metrics">Metrics</a>
     <a href="#sc-related">Related resources</a>
   </nav>
@@ -76,21 +77,12 @@ $$SYNTAX-LEVEL 2
       <p class="sc-status" id="sc-status" role="status" aria-live="polite">Showing all $(total_count) stocks</p>
     </div>
 
-    $(jump_links)
-
-    <div class="sc-groups" id="sc-groups">$(stock_sections)</div>
+    <div class="sc-layout$(layout_mode)" id="sc-layout">
+      $(jump_links)
+      <div class="sc-groups" id="sc-groups">$(stock_sections)</div>
+    </div>
 
     <p class="sc-none" id="sc-none" hidden>No stock matches that filter. Clear it to see the whole catalog again.</p>
-  </section>
-
-  <section id="sc-references" aria-labelledby="sc-references-title">
-    <div class="mgdb-section-heading">
-      <div><h2 id="sc-references-title">References</h2></div>
-    </div>
-
-    <div class="mgdb-ref-list">
-      $(reference_cards)
-    </div>
   </section>
 
   <section id="sc-metrics" aria-labelledby="sc-metrics-title">
@@ -121,7 +113,7 @@ $$SYNTAX-LEVEL 2
           <span>Alleles and insertions, and the stocks that carry each one</span>
         </a>
         <a href="https\://maizecoopsc.org/" target="_blank" rel="noopener">
-          <strong>Maize Genetics COOP Stock Center</strong>
+          <strong>Maize Genetics Cooperation Stock Center</strong>
           <span>Seed requests, growing notes, and the Stock Center's own catalog pages</span>
         </a>
         <a href="https\://npgsweb.ars-grin.gov/gringlobal/search" target="_blank" rel="noopener">

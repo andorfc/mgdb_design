@@ -85,15 +85,27 @@
         var key = button.getAttribute('data-ins-example');
         var form = button.closest('form');
 
-        if (key === 'genes') { byId('ins-gene-list').value = EXAMPLES.genes; }
-        else if (key === 'names') { byId('ins-stock-list').value = EXAMPLES.names; }
-        else if (key === 'region') {
+        if (key === 'genes') {
+          var geneEl = byId('ins-gene-list');
+          if (geneEl) {
+            geneEl.value = EXAMPLES.genes;
+            geneEl.dispatchEvent(new Event('input'));
+          }
+        } else if (key === 'names') {
+          var stockEl = byId('ins-stock-list');
+          if (stockEl) {
+            stockEl.value = EXAMPLES.names;
+            stockEl.dispatchEvent(new Event('input'));
+          }
+        } else if (key === 'region') {
           byId('ins-region-chromosome').value = 'chr1';
           byId('ins-region-start').value = '4897501';
           byId('ins-region-end').value = '5413000';
         } else if (byId('ins-gene-list')) {
           // Anything else is a single gene model typed into the example.
-          byId('ins-gene-list').value = key;
+          var singleGeneEl = byId('ins-gene-list');
+          singleGeneEl.value = key;
+          singleGeneEl.dispatchEvent(new Event('input'));
         }
 
         if (form) { form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })); }
@@ -249,18 +261,21 @@
     var withStock = currentData.summary && currentData.summary.with_stock ? currentData.summary.with_stock : 0;
 
     if (currentGroupBy === 'gene') {
-      var geneGroups = groupResultsByGene(currentData.results);
+      var geneGroups = sortGeneGroups(groupResultsByGene(currentData.results));
       statusEl.textContent = number(geneGroups.length) + ' gene model' + (geneGroups.length === 1 ? '' : 's')
         + ' with ' + number(total) + ' insertion' + (total === 1 ? '' : 's')
         + (withStock ? ', ' + number(withStock) + ' with a seed stock' : '')
         + (elapsed != null ? ' (' + elapsed + ' ms)' : '') + '.';
       resultsEl.innerHTML = buildGeneTableHtml(geneGroups);
+      initInsSortButtons(resultsEl);
       exportLink.href = API_URL + '?' + lastQuery + '&format=tsv&group_by=gene';
     } else {
+      var sortedIns = sortInsertionResults(currentData.results);
       statusEl.textContent = number(total) + ' insertion' + (total === 1 ? '' : 's') + ' found'
         + (withStock ? ', ' + number(withStock) + ' with a seed stock' : '')
         + (elapsed != null ? ' (' + elapsed + ' ms)' : '') + '.';
-      resultsEl.innerHTML = buildTableHtml(currentData.results);
+      resultsEl.innerHTML = buildTableHtml(sortedIns);
+      initInsSortButtons(resultsEl);
       exportLink.href = API_URL + '?' + lastQuery + '&format=tsv&group_by=insertion';
     }
 
@@ -274,7 +289,85 @@
      filter both work on the rendered rows. That keeps paging instant and means
      the export always covers the whole result rather than the visible page. */
 
-  var viewState = { page: 1, pageSize: 25, filter: '' };
+  var viewState = {
+    page: 1,
+    pageSize: 25,
+    filter: '',
+    insSortKey: 'name',
+    insSortDir: 'asc',
+    geneSortKey: 'gene',
+    geneSortDir: 'asc'
+  };
+
+  function sortInsertionResults(results) {
+    if (!results || !results.length) return [];
+    var key = viewState.insSortKey || 'name';
+    var dir = viewState.insSortDir === 'desc' ? -1 : 1;
+
+    return results.slice().sort(function (a, b) {
+      if (key === 'alignments') {
+        var aLen = (a.alignments && a.alignments.length) || 0;
+        var bLen = (b.alignments && b.alignments.length) || 0;
+        if (aLen !== bLen) return (aLen - bLen) * dir;
+      } else if (key === 'stocks') {
+        var aStocks = (a.stocks && a.stocks.length) || 0;
+        var bStocks = (b.stocks && b.stocks.length) || 0;
+        if (aStocks !== bStocks) return (aStocks - bStocks) * dir;
+      }
+      var aName = (a.name || '').toLowerCase();
+      var bName = (b.name || '').toLowerCase();
+      return aName.localeCompare(bName, undefined, { numeric: true }) * dir;
+    });
+  }
+
+  function sortGeneGroups(groups) {
+    if (!groups || !groups.length) return [];
+    var key = viewState.geneSortKey || 'gene';
+    var dir = viewState.geneSortDir === 'desc' ? -1 : 1;
+
+    return groups.slice().sort(function (a, b) {
+      if (key === 'insertions') {
+        var aLen = (a.alignments && a.alignments.length) || 0;
+        var bLen = (b.alignments && b.alignments.length) || 0;
+        if (aLen !== bLen) return (aLen - bLen) * dir;
+      } else if (key === 'stocks') {
+        var aStocks = (a.stocks && a.stocks.length) || 0;
+        var bStocks = (b.stocks && b.stocks.length) || 0;
+        if (aStocks !== bStocks) return (aStocks - bStocks) * dir;
+      }
+      if (a.key === '__intergenic__') return 1;
+      if (b.key === '__intergenic__') return -1;
+      var aGene = (a.gene || '').toLowerCase();
+      var bGene = (b.gene || '').toLowerCase();
+      return aGene.localeCompare(bGene, undefined, { numeric: true }) * dir;
+    });
+  }
+
+  function initInsSortButtons(container) {
+    if (!container) return;
+    Array.prototype.forEach.call(container.querySelectorAll('button[data-sort-key]'), function (btn) {
+      btn.addEventListener('click', function () {
+        var key = btn.getAttribute('data-sort-key');
+        if (currentGroupBy === 'gene') {
+          if (viewState.geneSortKey === key) {
+            viewState.geneSortDir = viewState.geneSortDir === 'asc' ? 'desc' : 'asc';
+          } else {
+            viewState.geneSortKey = key;
+            viewState.geneSortDir = (key === 'insertions' || key === 'stocks') ? 'desc' : 'asc';
+          }
+        } else {
+          if (viewState.insSortKey === key) {
+            viewState.insSortDir = viewState.insSortDir === 'asc' ? 'desc' : 'asc';
+          } else {
+            viewState.insSortKey = key;
+            viewState.insSortDir = (key === 'alignments' || key === 'stocks') ? 'desc' : 'asc';
+          }
+        }
+        viewState.page = 1;
+        updateView();
+      });
+    });
+  }
 
   function currentRows() {
     var resultsEl = byId('insertion-results');
@@ -283,7 +376,12 @@
 
   function applyResultView() {
     var rows = currentRows();
-    if (!rows.length) { renderPagination(0); return; }
+    var filterCount = byId('ins-filter-count');
+    if (!rows.length) {
+      if (filterCount) { filterCount.textContent = ''; }
+      renderPagination(0);
+      return;
+    }
 
     var terms = viewState.filter.toLowerCase().split(/\s+/).filter(Boolean);
     var matched = rows.filter(function (row) {
@@ -294,6 +392,14 @@
       }
       return true;
     });
+
+    if (filterCount) {
+      if (terms.length) {
+        filterCount.textContent = matched.length + ' match' + (matched.length === 1 ? '' : 'es');
+      } else {
+        filterCount.textContent = '';
+      }
+    }
 
     var size = viewState.pageSize === 'all' ? matched.length || 1 : viewState.pageSize;
     var pageCount = Math.max(1, Math.ceil(matched.length / size));
@@ -370,6 +476,90 @@
     });
   }
 
+  /* ── Clear Buttons ─────────────────────────────────────────────────────── */
+
+  function initClearButtons() {
+    [
+      { inputId: 'ins-gene-list', clearId: 'ins-gene-clear' },
+      { inputId: 'ins-stock-list', clearId: 'ins-stock-clear' }
+    ].forEach(function (item) {
+      var input = byId(item.inputId);
+      var clearBtn = byId(item.clearId);
+      if (!input || !clearBtn) { return; }
+
+      function updateClear() {
+        clearBtn.hidden = !input.value.trim();
+      }
+
+      input.addEventListener('input', updateClear);
+      input.addEventListener('change', updateClear);
+
+      clearBtn.addEventListener('click', function () {
+        input.value = '';
+        clearBtn.hidden = true;
+        input.focus();
+      });
+
+      updateClear();
+    });
+  }
+
+  /* ── Advanced Search Controls ───────────────────────────────────────────── */
+
+  function syncAdvancedBadge() {
+    var badge = byId('ins-advanced-count');
+    if (!badge) { return; }
+    var dataset = byId('ins-dataset');
+    var background = byId('ins-background');
+    var structure = byId('ins-structure');
+    var active = 0;
+    if (dataset && dataset.value && dataset.value !== 'all') { active++; }
+    if (background && background.value) { active++; }
+    if (structure && structure.value) { active++; }
+    badge.textContent = active ? active + ' active' : '';
+    badge.hidden = !active;
+  }
+
+  function initAdvancedControls() {
+    ['ins-dataset', 'ins-background', 'ins-structure'].forEach(function (id) {
+      var el = byId(id);
+      if (el) {
+        el.addEventListener('change', syncAdvancedBadge);
+      }
+    });
+
+    var advSubmit = byId('ins-adv-submit');
+    if (advSubmit) {
+      advSubmit.addEventListener('click', function (e) {
+        e.preventDefault();
+        var activeTab = document.querySelector('.ins-tab[aria-selected="true"]');
+        var mode = activeTab ? activeTab.dataset.mode : 'gene';
+        var form = byId('ins-panel-' + mode);
+        if (form) {
+          runSearch(form);
+        }
+      });
+    }
+
+    var advReset = byId('ins-adv-reset');
+    if (advReset) {
+      advReset.addEventListener('click', function () {
+        var dataset = byId('ins-dataset');
+        var background = byId('ins-background');
+        var structure = byId('ins-structure');
+        if (dataset) {
+          dataset.value = 'all';
+          dataset.dispatchEvent(new Event('change'));
+        }
+        if (background) { background.value = ''; }
+        if (structure) { structure.value = ''; }
+        syncAdvancedBadge();
+      });
+    }
+
+    syncAdvancedBadge();
+  }
+
   function initResultControls() {
     var sizeSelect = byId('ins-page-size');
     if (sizeSelect) {
@@ -389,24 +579,20 @@
       });
     }
 
-    var advReset = byId('ins-adv-reset');
-    if (advReset) {
-      advReset.addEventListener('click', function () {
-        ['ins-dataset', 'ins-background', 'ins-structure'].forEach(function (id) {
-          var el = byId(id);
-          if (el) { el.selectedIndex = 0; }
-        });
-      });
-    }
-
     var emptyReset = byId('insertion-empty-reset');
     if (emptyReset) {
       emptyReset.addEventListener('click', function () {
         ['ins-gene-list', 'ins-stock-list', 'ins-region-start', 'ins-region-end'].forEach(function (id) {
           var el = byId(id);
-          if (el) { el.value = ''; }
+          if (el) {
+            el.value = '';
+            el.dispatchEvent(new Event('input'));
+          }
         });
-        if (filterInput) { filterInput.value = ''; }
+        if (filterInput) {
+          filterInput.value = '';
+          filterInput.dispatchEvent(new Event('input'));
+        }
         viewState.filter = '';
         viewState.page = 1;
         var section = byId('insertion-results-section');
@@ -581,10 +767,18 @@
       return '<tr>' + buildGeneIdentityCell(group) + buildGeneInsertionsCell(group) + buildGeneStocksCell(group) + '</tr>';
     }).join('');
 
+    var geneAria = viewState.geneSortKey === 'gene' ? (viewState.geneSortDir === 'desc' ? 'descending' : 'ascending') : 'none';
+    var insAria = viewState.geneSortKey === 'insertions' ? (viewState.geneSortDir === 'desc' ? 'descending' : 'ascending') : 'none';
+    var stocksAria = viewState.geneSortKey === 'stocks' ? (viewState.geneSortDir === 'desc' ? 'descending' : 'ascending') : 'none';
+
     return '<div class="mgdb-table-scroll" tabindex="0">'
       + '<table class="mgdb-table ins-table">'
       + '<caption>Matching gene models<span class="mgdb-muted">' + number(geneGroups.length) + ' shown</span></caption>'
-      + '<thead><tr><th scope="col">Gene model</th><th scope="col">Insertions &amp; alignments</th><th scope="col">Seed stocks</th></tr></thead>'
+      + '<thead><tr>'
+      + '<th scope="col" aria-sort="' + geneAria + '"><button type="button" data-sort-key="gene">Gene model</button></th>'
+      + '<th scope="col" aria-sort="' + insAria + '"><button type="button" data-sort-key="insertions">Insertions &amp; alignments</button></th>'
+      + '<th scope="col" aria-sort="' + stocksAria + '"><button type="button" data-sort-key="stocks">Seed stocks</button></th>'
+      + '</tr></thead>'
       + '<tbody>' + rows + '</tbody>'
       + '</table></div>';
   }
@@ -646,10 +840,18 @@
       return '<tr>' + buildIdentityCell(result) + buildAlignmentsCell(result) + buildStocksCell(result) + '</tr>';
     }).join('');
 
+    var nameAria = viewState.insSortKey === 'name' ? (viewState.insSortDir === 'desc' ? 'descending' : 'ascending') : 'none';
+    var alignAria = viewState.insSortKey === 'alignments' ? (viewState.insSortDir === 'desc' ? 'descending' : 'ascending') : 'none';
+    var stocksAria = viewState.insSortKey === 'stocks' ? (viewState.insSortDir === 'desc' ? 'descending' : 'ascending') : 'none';
+
     return '<div class="mgdb-table-scroll" tabindex="0">'
       + '<table class="mgdb-table ins-table">'
       + '<caption>Matching insertions<span class="mgdb-muted">' + number(results.length) + ' shown</span></caption>'
-      + '<thead><tr><th scope="col">Insertion</th><th scope="col">Alignments</th><th scope="col">Seed stocks</th></tr></thead>'
+      + '<thead><tr>'
+      + '<th scope="col" aria-sort="' + nameAria + '"><button type="button" data-sort-key="name">Insertion</button></th>'
+      + '<th scope="col" aria-sort="' + alignAria + '"><button type="button" data-sort-key="alignments">Alignments</button></th>'
+      + '<th scope="col" aria-sort="' + stocksAria + '"><button type="button" data-sort-key="stocks">Seed stocks</button></th>'
+      + '</tr></thead>'
       + '<tbody>' + rows + '</tbody>'
       + '</table></div>';
   }
@@ -809,6 +1011,8 @@
     initBackgroundSync('ins-dataset', 'ins-background');
     initExamples();
     initForms();
+    initClearButtons();
+    initAdvancedControls();
     initResultControls();
     initFigure();
   }

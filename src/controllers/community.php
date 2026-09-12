@@ -100,6 +100,54 @@
     }
   }
 
+  /* The four /community/<page> aliases whose canonical route is a top-level
+   * controller: /maize_history, /timelines, /nomenclature and /FAIRpractices.
+   *
+   * Each alias reached this file and built the LEGACY shell below before the
+   * modern controller ran. Bauplan accumulates head assets across instances, so
+   * the modern page was published carrying the whole legacy payload the
+   * canonical route does not have -- index.css, background_static.css,
+   * /ie/ie6.css, shadowbox, jQuery UI, NGL from unpkg, google_analytics.js and
+   * **two Atlassian Jira issue collectors**. The two collectors each inject an
+   * #atlwdg-blanket and an #atlwdg-container at runtime, so the alias rendered
+   * duplicate DOM ids and made two extra third-party connections that the
+   * canonical route makes none of. ~1.5 KB of extra markup, and the maize_history
+   * guard was the cause for two of them: it sat AFTER the shell was built.
+   *
+   * Hooked here for the same reason as the three blocks above -- the modern
+   * controllers create their own Bauplan and publish it, so they have to run
+   * before the legacy shell is built.
+   *
+   * Each delegates to its own top-level controller rather than to the modern
+   * controller directly, so the alias inherits whatever the canonical route
+   * does. That is load-bearing for /nomenclature, whose top-level controller
+   * also sends no-store cache headers; including the modern controller straight
+   * from here would have silently dropped them on the alias only.
+   *
+   * Rollback: delete this block and restore the maize_history/timelines guard
+   * further down (it was:
+   *   if (PAGE == 'maize_history' || PAGE == 'timelines'
+   *       || CONTROLLER == 'maize_history' || CONTROLLER == 'timelines') {
+   *     include('controllers/community/maize_history_modern.php'); return; }
+   * ) -- the aliases then serve the legacy chrome again.
+   */
+  if (PAGE == 'maize_history' || PAGE == 'timelines'
+      || CONTROLLER == 'maize_history' || CONTROLLER == 'timelines') {
+    include('controllers/' . (PAGE == 'timelines' || CONTROLLER == 'timelines'
+                              ? 'timelines.php' : 'maize_history.php'));
+    return;
+  }
+
+  if (PAGE == 'nomenclature') {
+    include('controllers/nomenclature.php');
+    return;
+  }
+
+  if (PAGE == 'FAIRpractices') {
+    include('controllers/FAIRpractices.php');
+    return;
+  }
+
   $bauplan = new Bauplan('Welcome to MaizeGDB');
   $bauplan->includeCss('/css/static.css');
 
@@ -140,14 +188,28 @@
      present) and every other community page continue through the original code
      below, unchanged. Rollback: delete this block.
      Pre-redesign originals are archived in the redesign repo under legacy/person/. */
-  if (CONTROLLER == "person" && !getCGIParam('id', 'G', ID)) {
-    include('controllers/community/person_search_modern.php');
-    return;
-  }
-
-  if (PAGE == 'maize_history' || PAGE == 'timelines' || CONTROLLER == 'maize_history' || CONTROLLER == 'timelines') {
-    include('controllers/community/maize_history_modern.php');
-    return;
+  /* /person routing:
+     - a record id present  -> modern person record page (declines to legacy
+       for the special list ids cooperators/breeders/maizegdb, and for an id
+       that does not resolve);
+     - no id                -> modern person search page. */
+  /* controllers/person.php takes /person now, so it can render the modern pages
+     before this file builds the legacy main template. It hands the request back
+     here for the cases that are still legacy -- the special ids, and an id that
+     is not a person -- and sets MGDB_PERSON_LEGACY so this block does not try
+     the modern controllers a second time. */
+  if (CONTROLLER == "person" && !defined('MGDB_PERSON_LEGACY')) {
+    $person_id_req = getCGIParam('id', 'G', (PAGE !== null && PAGE !== '') ? PAGE : '');
+    $person_special = in_array((string) $person_id_req, array('cooperators', 'breeders', 'maizegdb'), true);
+    if ($person_id_req !== '' && !$person_special) {
+      if (include('controllers/community/person_record_modern.php')) {
+        return;
+      }
+      // id did not resolve: fall through to the legacy person handler below.
+    } else if ($person_id_req === '') {
+      include('controllers/community/person_search_modern.php');
+      return;
+    }
   }
 
   if (CONTROLLER == "person") {
@@ -184,7 +246,12 @@
     }
     else {
      reportError("community.php: failed to find: $page_filename or $page_filename_dyn");
-     $mgdb->get('body')->load('templates/error/error-404.bau');
+     http_response_code(404);
+     /* The modern 404 rather than error-404.bau: that template's block is
+        named with its .bau suffix, so Bauplan never matched it and this
+        branch rendered whatever body was already loaded, with a 200. */
+     include('controllers/not_found.php');
+     exit;
     }
   }
 

@@ -286,7 +286,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
     while ($row = retrieve_row($sth)) {
       $abstract .= (string) $row['abstract_1'] . (string) $row['abstract_2'];
     }
-    $sections['abstract'] = MgdbApi::text($abstract);
+    $sections['abstract'] = MgdbApi::prose($abstract);
   }
 
   /////

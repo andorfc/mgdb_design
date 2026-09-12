@@ -142,11 +142,61 @@
      when its fill is nearly the color of the track. */
   var RAMP_EDGE = ['#587a8c', '#4a7d9c', '#3f7fa3', '#2c6f96', '#005c8f'];
 
+  /* How a gene is named everywhere on this page.
+
+     The gene model id leads and the classical symbol follows in parentheses:
+     "Zm00001eb267920 (lg1)". It used to be the other way round -- the symbol
+     alone where there was one -- which meant the identifier a reader needs in
+     order to look the match up anywhere else was the one thing the figures did
+     not show. Falls back to the gene model alone, then to whatever the caller
+     has (usually the subject sequence name). */
+  function geneLabel(ann, fallback) {
+    if (!ann) { return fallback; }
+    if (!ann.gene_model) { return ann.locus || fallback; }
+    return ann.locus ? ann.gene_model + ' (' + ann.locus + ')' : ann.gene_model;
+  }
+
+  /* Pan-genes are shown by their exemplar gene model, never by pan_gene_name.
+     `pan-zea.v4.pan02070` is an internal identifier that means nothing to a
+     reader and cannot be looked up anywhere; the exemplar can. The internal
+     name is only used when a pan-gene has no exemplar recorded. */
+  function panGeneLabel(ann) {
+    if (!ann || !ann.pan_gene) { return null; }
+    return ann.pan_gene_exemplar || ann.pan_gene;
+  }
+
+  /* The same, for the grouped views. They key their groups on the internal
+     name -- which is correct, it is the identity -- so the exemplar has to be
+     resolved back from either the breadth payload or any annotation in the
+     group. Falls back to the internal name so a pan-gene with no exemplar
+     still renders something rather than "undefined". */
+  function panGeneDisplay(name, ann) {
+    var breadth = state.panGenes[name];
+    if (breadth && breadth.exemplar) { return breadth.exemplar; }
+    if (ann && ann.pan_gene === name && ann.pan_gene_exemplar) {
+      return ann.pan_gene_exemplar;
+    }
+    return name;
+  }
+
   function rowLabel(row) {
-    var ann = state.annotations[row.key];
-    if (ann && ann.locus) { return ann.locus; }
-    if (ann && ann.gene_model) { return ann.gene_model; }
-    return row.subject;
+    return geneLabel(state.annotations[row.key], row.subject);
+  }
+
+  /* Every program the job ran, as one label: "TBLASTN", or "TBLASTN and
+     BLASTP" for a mixed job. A protein query against both a genome and a
+     proteome runs two different programs, and naming only the first told a
+     reader the wrong thing about half their results. Falls back to the single
+     `program` field for a report parsed before `programs` existed. */
+  function programLabel(d) {
+    var list = (d && d.programs && d.programs.length)
+      ? d.programs
+      : (d && d.program ? [d.program] : []);
+    list = list.map(function (p) { return String(p).toUpperCase(); });
+    if (!list.length) { return 'BLAST'; }
+    if (list.length === 1) { return list[0]; }
+    if (list.length === 2) { return list[0] + ' and ' + list[1]; }
+    return list.slice(0, -1).join(', ') + ' and ' + list[list.length - 1];
   }
 
   function rowPosition(row) {
@@ -216,7 +266,7 @@
     var interp = d.interpretation || {};
 
     if (els.title) {
-      els.title.textContent = (d.program || 'BLAST').toUpperCase() + ' results';
+      els.title.textContent = programLabel(d) + ' results';
     }
     if (els.queryLine) {
       els.queryLine.innerHTML = '<strong>' + esc(q.title || q.id || 'Query') + '</strong>';
@@ -227,7 +277,7 @@
       var protQuery = (d.program === 'blastp' || d.program === 'tblastn');
       var facts = [
         ['Length', commas(q.len) + (protQuery ? ' aa' : ' bp')],
-        ['Program', (d.program || '').toUpperCase()],
+        ['Program', programLabel(d)],
         ['Searched', state.multi
           ? (d.targets || []).length + ' targets'
           : (d.db || '—')]
@@ -439,7 +489,7 @@
     var what = '<dl class="blast-stats blast-empty-facts">' +
       '<dt>Query</dt><dd>' + esc(q.title || q.id || '—') + '</dd>' +
       '<dt>Length</dt><dd>' + commas(q.len || 0) + (protQuery ? ' aa' : ' bp') + '</dd>' +
-      '<dt>Program</dt><dd>' + esc((d.program || '').toUpperCase()) + '</dd>' +
+      '<dt>Program</dt><dd>' + esc(programLabel(d)) + '</dd>' +
       '<dt>Searched</dt><dd>' +
         ((d.targets || []).map(function (t) { return esc(t.label_full || t.label); }).join(', ') || '—') +
       '</dd>' +
@@ -558,8 +608,7 @@
     var nameEl = document.getElementById('blast-best-gene');
     if (nameEl) {
       nameEl.innerHTML = '<a href="' + esc(ann.links.gene) + '">' +
-        esc(ann.locus || ann.gene_model) + '</a>' +
-        (ann.locus ? ' <span class="blast-drawer-sub">' + esc(ann.gene_model) + '</span>' : '');
+        esc(geneLabel(ann, ann.gene_model)) + '</a>';
     }
 
     var actions = [];
@@ -769,7 +818,8 @@
         var ann = state.annotations[r.key];
         var hay = (r.subject + ' ' + (r.title || '') + ' ' +
                    (ann ? (ann.gene_model || '') + ' ' + (ann.locus || '') + ' ' +
-                          (ann.pan_gene || '') : '')).toLowerCase();
+                          (ann.pan_gene || '') + ' ' +
+                          (ann.pan_gene_exemplar || '') : '')).toLowerCase();
         if (hay.indexOf(text) === -1) { return false; }
       }
       return true;
@@ -839,7 +889,22 @@
     if (!rows.length) { els.coverage.innerHTML = ''; return; }
 
     var qlen = state.queryLen || 1;
-    var labelW = 128, rowH = 18, padR = 16, padB = 26;
+    var rowH = 18, padR = 16, padB = 26;
+
+    /* The label gutter is measured from the labels, not fixed at the 128px
+       that suited bare symbols like "lg1". A label is now the gene model with
+       the symbol after it -- "Zm00001eb067740 (lg1)", 21 characters -- and
+       against a fixed gutter every one of them truncated at the parenthesis,
+       so the figure showed the gene model and then an ellipsis where the
+       symbol should be. Bounded at both ends: never narrower than the old
+       gutter, and never more than a third of a narrow figure, because the
+       plot is what the figure is for. */
+    var COV_LABEL_PAD = 14;               /* the 8px offset plus a little air */
+    var widest = 0;
+    rows.forEach(function (r) {
+      var w = measureText(rowLabel(r), 11, els.coverage);
+      if (w > widest) { widest = w; }
+    });
     /* A domain lane, when there is one, sits between the query axis and the
        hit bars: it belongs to the query coordinate system, and putting it
        directly under the ruler is what makes "this match covers only the
@@ -847,6 +912,9 @@
     var domainH = state.domains.length ? 22 : 0;
     var padT = 26 + domainH;
     var width = Math.max(520, (els.coverage.clientWidth || 760));
+    var labelW = Math.max(128, Math.min(Math.ceil(widest) + COV_LABEL_PAD,
+                                        Math.round(width / 3)));
+    var labelRoom = labelW - COV_LABEL_PAD;
     var plotW = width - labelW - padR;
     var height = padT + rows.length * rowH + padB;
 
@@ -942,8 +1010,17 @@
                    (barY + barH - 2) + '">' + (row.orientation === '-' ? '←' : '→') + '</text>');
       }
 
+      /* Shortened only when it genuinely does not fit the gutter -- which,
+         because the gutter was sized from the widest label, happens only when
+         the width cap bit. */
       var label = rowLabel(row);
-      if (label.length > 18) { label = label.slice(0, 17) + '…'; }
+      if (measureText(label, 11, els.coverage) > labelRoom) {
+        while (label.length > 2 &&
+               measureText(label + '…', 11, els.coverage) > labelRoom) {
+          label = label.slice(0, -1);
+        }
+        label += '…';
+      }
       parts.push('<text class="blast-cov-label" x="' + (labelW - 8) + '" y="' + (barY + barH - 2) +
                  '" text-anchor="end" data-key="' + esc(row.key) + '">' + esc(label) + '</text>');
       parts.push('</g>');
@@ -1233,15 +1310,15 @@
 
       var name;
       if (ann && ann.links) {
-        name = '<a href="' + esc(ann.links.gene) + '">' + esc(ann.locus || ann.gene_model) + '</a>';
-        if (ann.locus) { name += ' <span class="blast-pending">' + esc(ann.gene_model) + '</span>'; }
+        name = '<a href="' + esc(ann.links.gene) + '">' +
+               esc(geneLabel(ann, ann.gene_model)) + '</a>';
       } else {
         name = esc(row.subject);
         if (state.pendingAnnotation) { name += ' <span class="blast-pending">…</span>'; }
       }
 
       var pan = ann && ann.pan_gene
-        ? '<a href="' + esc(ann.links.pan_gene) + '">' + esc(ann.pan_gene) + '</a>'
+        ? '<a href="' + esc(ann.links.pan_gene) + '">' + esc(panGeneLabel(ann)) + '</a>'
         : '<span class="blast-pending">—</span>';
 
       /* tabindex + an explicit key handler: a <tr> is not focusable and a click
@@ -1319,8 +1396,8 @@
 
       return '<div class="blast-pangene-group">' +
         '<button class="blast-pangene-head" data-key="' + esc(best.key) + '">' +
-          '<span class="blast-pangene-name">' + esc(name) + '</span>' +
-          '<span>' + esc(g.ann.locus || g.ann.gene_model) + '</span>' +
+          '<span class="blast-pangene-name">' + esc(panGeneDisplay(name, g.ann)) + '</span>' +
+          '<span>' + esc(geneLabel(g.ann, g.ann.gene_model)) + '</span>' +
           '<span class="blast-pangene-breadth">' +
             '<span class="blast-breadth-bar"><span class="blast-breadth-fill" style="width:' +
               pct + '%"></span></span> present in ' + n + ' of ' + TOTAL_ASSEMBLIES + ' assemblies' +
@@ -1392,8 +1469,8 @@
       var head =
         '<button class="blast-pangene-head" data-key="' + esc(g.best.key) + '" ' +
                 'aria-expanded="false" data-group="' + esc(name) + '">' +
-          '<span class="blast-pangene-name">' + esc(g.symbol || ann.gene_model || name) + '</span>' +
-          '<span class="blast-group-id">' + esc(name) + '</span>' +
+          '<span class="blast-pangene-name">' + esc(geneLabel(ann, name)) + '</span>' +
+          '<span class="blast-group-id">' + esc(panGeneDisplay(name, ann)) + '</span>' +
           '<span class="blast-group-here">in <strong>' + here + ' of ' + searched +
             '</strong> searched assemblies</span>' +
           (wide !== null
@@ -1574,7 +1651,7 @@
 
   function alignmentItemName(r) {
     var ann = state.annotations[r.key];
-    return ann ? (ann.locus || ann.gene_model) : r.subject;
+    return geneLabel(ann, r.subject);
   }
 
   /* Row keys are generated (t0s1l0) so they never need escaping in practice,
@@ -1822,10 +1899,10 @@
 
       html += '<tr>';
       html += '<th scope="row" class="blast-matrix-row" data-key="' + esc(g.best.key) +
-                '" tabindex="0" aria-label="' + esc((g.symbol || g.ann.gene_model) + ', ' + name +
-                '. Open details.') + '">' +
-                '<span class="blast-matrix-symbol">' + esc(g.symbol || g.ann.gene_model) + '</span>' +
-                '<span class="blast-matrix-pg">' + esc(n) + '</span>' +
+                '" tabindex="0" aria-label="' + esc(geneLabel(g.ann, n) + ', ' +
+                panGeneDisplay(n, g.ann) + '. Open details.') + '">' +
+                '<span class="blast-matrix-symbol">' + esc(geneLabel(g.ann, n)) + '</span>' +
+                '<span class="blast-matrix-pg">' + esc(panGeneDisplay(n, g.ann)) + '</span>' +
               '</th>';
 
       columns.forEach(function (a) {
@@ -2018,7 +2095,7 @@
       if (ann.pan_gene) {
         var b = state.panGenes[ann.pan_gene];
         html += '<dt>Pan-gene</dt><dd><a href="' + esc(ann.links.pan_gene) + '">' +
-                esc(ann.pan_gene) + '</a>' +
+                esc(panGeneLabel(ann)) + '</a>' +
                 (b ? ' — ' + b.assemblies.length + ' assemblies' : '') + '</dd>';
       }
       if (ann.assembly) { html += '<dt>Assembly</dt><dd>' + esc(ann.assembly) + '</dd>'; }
@@ -2057,7 +2134,11 @@
 
     MGDB.request(url, { key: 'blast-alignment' }).then(function (data) {
       var a = data.alignment;
-      var html = diffStrip(a) + alignmentBlocks(a);
+      /* The legend runs above AND below in the drawer. A long alignment is
+         many screens of monospace, and a key that exists only past the end of
+         it is not a key -- the reader has to scroll away from the colours to
+         find out what they mean and then scroll back. */
+      var html = diffStrip(a) + alignmentLegend(a) + alignmentBlocks(a);
       html += alignmentLegend(a);
       if (row.n_hsps > 1) {
         html += '<p class="blast-pending">Showing the strongest of ' + row.n_hsps +
@@ -2258,6 +2339,36 @@
     return text.length * 5.6;
   }
 
+  /* Exact text width for the hand-drawn SVG figures.
+     -------------------------------------------------------------------------
+     These figures reserve a gutter and then draw text into it, so the gutter
+     has to be at least as wide as the text. A per-character estimate cannot do
+     that: measured against the real labels, "Zm00001eb067740 (lg1)" averages
+     6.20px per character and "Zm00001eb389360 (sbp4)" 6.53, so any single
+     constant is either too small for some labels -- which draws them off the
+     left edge of the figure -- or too large for the rest, which spends plot
+     width on air. A canvas measures the actual string in the actual font.
+
+     The context is built once and the font read from the figure's own
+     container, so it follows the stylesheet rather than restating it. Falls
+     back to the old estimate where canvas is unavailable. */
+  var textCanvas = null;
+  function measureText(text, px, sample) {
+    if (textCanvas === null) {
+      try {
+        textCanvas = document.createElement('canvas').getContext('2d');
+      } catch (e) { textCanvas = false; }
+    }
+    if (!textCanvas) { return text.length * (px * 0.6); }
+    var family = 'sans-serif';
+    if (sample) {
+      var cs = window.getComputedStyle(sample);
+      if (cs && cs.fontFamily) { family = cs.fontFamily; }
+    }
+    textCanvas.font = px + 'px ' + family;
+    return textCanvas.measureText(text).width;
+  }
+
   /* A JBrowse 1 URL that opens the region with this match drawn on it.
      -------------------------------------------------------------------------
      This is what the pre-redesign BLAST results linked to, and it is better
@@ -2298,7 +2409,11 @@
         type: 'JBrowse/View/Track/CanvasFeatures',
         store: 'url', glyph: 'JBrowse/View/FeatureGlyph/Segments'
       }]),
-      tracks: 'BLAST',
+      /* The hit alone on an empty browser answers "where" but not "what".
+         gene_models_official is the annotation track every other page on the
+         site opens by name, so the match lands beside the gene models it
+         falls in. */
+      tracks: 'BLAST,gene_models_official',
       highlight: ''
     };
 
@@ -2348,7 +2463,7 @@
     var placed = genes.map(function (g) {
       var gx = x(g.start);
       var gw = Math.max(2, x(g.end) - gx);
-      var label = g.locus || g.gene_model;
+      var label = g.gene_model || g.locus;
       if (label.length > 16) { label = label.slice(0, 15) + '\u2026'; }
       var lw = hoodLabelWidth(label);
 
@@ -2374,7 +2489,11 @@
     var laneCount = Math.max(1, lanes.length);
     var H = axisH + matchH + 8 + laneCount * laneH;
 
-    var parts = ['<div class="blast-hood"><svg viewBox="0 0 ' + W + ' ' + H +
+    var parts = ['<div class="blast-hood-actions">' +
+                 '<button type="button" class="mgdb-button mgdb-button-quiet blast-export-png" ' +
+                 'data-figure="blast-hood-figure" data-figure-name="gene-neighborhood">Export PNG</button>' +
+                 '</div>',
+                 '<div class="blast-hood" id="blast-hood-figure"><svg viewBox="0 0 ' + W + ' ' + H +
                  '" width="100%" height="' + H + '" role="img" aria-label="Gene neighborhood of this match on ' +
                  esc(w.chr) + '">'];
 
@@ -2434,7 +2553,7 @@
       html += '<h4>The match also overlaps</h4><ul>';
       ann.also.forEach(function (g) {
         html += '<li><a href="' + esc(g.links.gene) + '">' +
-                esc(g.locus || g.gene_model) + '</a></li>';
+                esc(geneLabel(g, g.gene_model)) + '</a></li>';
       });
       html += '</ul>';
     }
@@ -2466,6 +2585,19 @@
     return html;
   }
 
+  /* The report as a .txt file. The action bar's "Download report" is a plain
+     <a download> straight at the API; this is the button form of the same
+     thing, for the report view itself. */
+  function downloadTextReport() {
+    var url = API + '?job=' + encodeURIComponent(state.job) + '&view=text';
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'blast-' + state.job + '.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
   /* ------------------------------------------------------------------------
      Wiring
      ------------------------------------------------------------------------ */
@@ -2476,7 +2608,7 @@
      included where they have arrived and left empty where they have not, which
      the accompanying note on the page already explains. */
   function downloadTable() {
-    var cols = ['match', 'gene_model', 'locus', 'pan_gene', 'assembly', 'subject',
+    var cols = ['match', 'gene_model', 'locus', 'pan_gene_exemplar', 'assembly', 'subject',
                 'chr', 'start', 'end', 'orientation', 'percent_identity',
                 'query_coverage', 'alignment_length', 'mismatches', 'gaps',
                 'evalue', 'bit_score', 'aligned_segments'];
@@ -2486,7 +2618,7 @@
       var a = state.annotations[r.key] || {};
       lines.push([
         alignmentItemName(r),
-        a.gene_model || '', a.locus || '', a.pan_gene || '',
+        a.gene_model || '', a.locus || '', panGeneLabel(a) || '',
         r.assembly || '',
         r.subject,
         r.h_start != null ? r.subject : (a.chr || ''),
@@ -2524,6 +2656,162 @@
     /* Revoked on the next tick: revoking synchronously can cancel the download
        in some browsers before it has read the blob. */
     window.setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  /* ---------------------------------------------------------------------
+     Export a figure as a PNG.
+
+     Three figures carry an Export PNG button: query coverage and genomic
+     location, which are SVG this file draws by hand, and identity-against-
+     coverage, which is Plotly. The two paths are genuinely different and the
+     Plotly one is not worth reimplementing -- Plotly.downloadImage() already
+     rasterises its own scene at whatever scale it is asked for.
+
+     THE TRAP IN THE SVG PATH. Everything in these figures is styled from
+     css/mgdb-blast-results.css by class -- `.blast-axis line`, `.blast-domain`,
+     `.blast-domain-label` and so on. A serialized SVG loaded through an <img>
+     gets no stylesheets from the page it came from, so a straight
+     XMLSerializer -> canvas round trip produces the right geometry with none of
+     the colour or type: black fills, default serif text. Every computed
+     presentation property has to be written onto the clone inline first.
+
+     The PNG is rasterised from the viewBox rather than the on-screen size, so
+     the file is the same whatever width the reader's window happens to be, and
+     scaled up so it survives being dropped into a slide.
+     --------------------------------------------------------------------- */
+
+  var PNG_SCALE = 3;
+
+  /* Only the properties these figures actually use. Copying the whole computed
+     style of every node instead pushes the serialized markup past the length
+     some browsers accept in a data: URL. */
+  var SVG_STYLE_PROPS = [
+    'fill', 'fill-opacity', 'fill-rule',
+    'stroke', 'stroke-width', 'stroke-opacity', 'stroke-linecap',
+    'stroke-linejoin', 'stroke-dasharray',
+    'opacity', 'color', 'display', 'visibility',
+    'font-family', 'font-size', 'font-weight', 'font-style',
+    'text-anchor', 'dominant-baseline', 'letter-spacing'
+  ];
+
+  function inlineSvgStyles(source, clone) {
+    var computed = window.getComputedStyle(source);
+    var decl = '';
+    SVG_STYLE_PROPS.forEach(function (prop) {
+      var value = computed.getPropertyValue(prop);
+      if (value) { decl += prop + ':' + value + ';'; }
+    });
+    if (decl) { clone.setAttribute('style', decl); }
+
+    var kids = source.children || [];
+    var cloneKids = clone.children || [];
+    for (var i = 0; i < kids.length; i++) {
+      if (cloneKids[i]) { inlineSvgStyles(kids[i], cloneKids[i]); }
+    }
+  }
+
+  /* The ground the figure sits on. These sections are tinted
+     (.mgdb-hub-tone-blue and friends), so a transparent PNG would lose the
+     contrast the palette was chosen against. Walk up for the first element
+     that actually paints something. */
+  function figureBackground(el) {
+    var node = el;
+    while (node && node !== document.documentElement) {
+      var bg = window.getComputedStyle(node).backgroundColor;
+      if (bg && bg !== 'transparent' && bg.indexOf('rgba(0, 0, 0, 0)') === -1) { return bg; }
+      node = node.parentElement;
+    }
+    return '#ffffff';
+  }
+
+  function savePngBlob(blob, filename) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    // Same reasoning as downloadTable(): revoking synchronously can cancel the
+    // download before the browser has read the blob.
+    window.setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  function exportSvgPng(svg, filename, done) {
+    var box = (svg.getAttribute('viewBox') || '').split(/[\s,]+/).filter(function (n) { return n !== ''; });
+    var rect = svg.getBoundingClientRect();
+    var w = box.length === 4 && Number(box[2]) ? Number(box[2]) : rect.width;
+    var h = box.length === 4 && Number(box[3]) ? Number(box[3]) : rect.height;
+    if (!w || !h) { done('That figure has not been drawn yet.'); return; }
+
+    var clone = svg.cloneNode(true);
+    inlineSvgStyles(svg, clone);
+    clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    clone.setAttribute('width', w);
+    clone.setAttribute('height', h);
+
+    var markup = new XMLSerializer().serializeToString(clone);
+    var background = figureBackground(svg);
+    var image = new Image();
+
+    image.onload = function () {
+      var canvas = document.createElement('canvas');
+      canvas.width = Math.round(w * PNG_SCALE);
+      canvas.height = Math.round(h * PNG_SCALE);
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = background;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+      if (!canvas.toBlob) { done('This browser cannot save the figure as a PNG.'); return; }
+      canvas.toBlob(function (blob) {
+        if (!blob) { done('The figure could not be saved.'); return; }
+        savePngBlob(blob, filename);
+        done();
+      }, 'image/png');
+    };
+    image.onerror = function () { done('The figure could not be converted to an image.'); };
+    image.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(markup);
+  }
+
+  function exportPlotlyPng(target, filename, done) {
+    if (!window.Plotly || !window.Plotly.downloadImage) {
+      done('This figure cannot be saved until its chart library has loaded.');
+      return;
+    }
+    var rect = target.getBoundingClientRect();
+    window.Plotly.downloadImage(target, {
+      format: 'png',
+      // Plotly appends the extension itself.
+      filename: filename.replace(/\.png$/, ''),
+      width: Math.max(640, Math.round(rect.width)),
+      height: Math.max(360, Math.round(rect.height)),
+      scale: PNG_SCALE
+    }).then(function () { done(); }, function () { done('The figure could not be saved.'); });
+  }
+
+  function exportFigurePng(button) {
+    var host = document.getElementById(button.dataset.figure);
+    if (!host) { return; }
+
+    var name = 'blast-' + state.job + '-' + (button.dataset.figureName || 'figure') + '.png';
+    var original = button.textContent;
+    button.disabled = true;
+    button.textContent = 'Saving…';
+
+    function done(message) {
+      button.disabled = false;
+      button.textContent = message ? 'Could not save' : 'Saved';
+      if (message && MGDB && MGDB.announce) { MGDB.announce(message); }
+      window.setTimeout(function () { button.textContent = original; }, 2000);
+    }
+
+    // Plotly renders into the host itself; the hand-drawn figures put an <svg>
+    // inside it.
+    if (host.querySelector('.main-svg')) { exportPlotlyPng(host, name, done); return; }
+
+    var svg = host.querySelector('svg');
+    if (!svg) { done('That figure has not been drawn yet.'); return; }
+    exportSvgPng(svg, name, done);
   }
 
   function bind() {
@@ -2618,6 +2906,22 @@
     if (els.downloadTable) {
       els.downloadTable.addEventListener('click', downloadTable);
     }
+
+    /* Export TSV sits in the All matches section and Export TXT in the report
+       section, so each view carries its own export rather than making a reader
+       scroll back to the action bar to find one. Same two functions the action
+       bar uses -- there is one table and one report, not two of each. */
+    if (els.exportTsv) { els.exportTsv.addEventListener('click', downloadTable); }
+    if (els.exportTxt) { els.exportTxt.addEventListener('click', downloadTextReport); }
+
+    /* Export PNG on the three figures. Delegated, because a figure's section is
+       hidden until its data arrives and the coverage figure is redrawn whenever
+       its "Show top N" select changes -- the button survives both, but binding
+       per element would have to be redone after every redraw. */
+    document.addEventListener('click', function (ev) {
+      var button = ev.target.closest('.blast-export-png');
+      if (button) { exportFigurePng(button); }
+    });
 
     if (els.targetBar) {
       els.targetBar.addEventListener('click', function (ev) {
@@ -2740,6 +3044,10 @@
       matrixScope: document.getElementById('blast-matrix-scope'),
       queryFacts: document.getElementById('blast-query-facts'),
       downloadTable: document.getElementById('blast-download-table'),
+      exportTsv: document.getElementById('blast-export-tsv'),
+      exportTxt: document.getElementById('blast-export-txt'),
+      copyLink: document.getElementById('blast-copy-link'),
+      permalinkInput: document.getElementById('blast-permalink-input'),
       queryBar: document.getElementById('blast-querybar'),
       querySelect: document.getElementById('blast-query-select'),
       queryNote: document.getElementById('blast-query-note'),
@@ -2764,6 +3072,24 @@
       drawerTabs: document.querySelectorAll('.blast-drawer-tab'),
       scrim: document.getElementById('blast-scrim')
     };
+
+    /* The direct link is rendered server-side from $system['root_url'], which
+       include/gp_lib.php builds as 'http://' . HTTP_HOST unconditionally --
+       it overwrites the https value in mgdb.conf, and behind Cloudflare the
+       origin cannot see the real scheme anyway. That was invisible while this
+       was a button; it is not invisible in a field meant to be copied and
+       shared. The browser knows the scheme it loaded over, so use it, and
+       leave the server-rendered value as the no-JS fallback. */
+    if (els.permalinkInput && window.location && window.location.origin) {
+      var here = window.location.origin + '/BLAST?job_id=' + encodeURIComponent(state.job);
+      els.permalinkInput.value = here;
+      /* The button is a shared .mgdb-ref-copy, bound by js/mgdb-modern.js,
+         which reads data-copy-value at click time -- so correcting it here,
+         after that binding has already happened, is enough. Copying is not
+         reimplemented on this page: the shared handler already carries the
+         insecure-context and denied-permission fallbacks. */
+      if (els.copyLink) { els.copyLink.setAttribute('data-copy-value', here); }
+    }
 
     /* The drawer starts closed, so it starts inert. */
     if (els.drawer) { els.drawer.inert = true; }

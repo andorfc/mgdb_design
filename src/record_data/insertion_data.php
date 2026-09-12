@@ -41,6 +41,10 @@ function fillInsertionRecord($insertion_identifier, $data, $tmpl, $DBConn) {
   
   if (!$data) {
     $tmpl->get('record_name')->replace($insertion_identifier);
+    /* A record page for an insertion that does not exist. The page it renders
+       is right; the status was missing, so this answered 200 and a mistyped
+       identifier looked like a working record. */
+    http_response_code(404);
     $tmpl->get('insertion-not-found')->unmute();
     return;
   }

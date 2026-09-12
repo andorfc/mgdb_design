@@ -56,74 +56,122 @@ $$SYNTAX-LEVEL 2
     </div>
 
     <form class="mp-search-form" id="mp-search-form" role="search">
-      <div class="mgdb-hub-field mp-field-query">
-        <label for="mp-term">Search term</label>
-        <input class="mgdb-input" id="mp-term" name="term" type="search" autocomplete="off"
-               placeholder="Pathway name, CornCyc ID, or B73 gene model" />
+      <div class="mp-query-row">
+        <div class="mp-query-field">
+          <label class="mgdb-visually-hidden" for="mp-term">Search pathway name, CornCyc ID, or B73 gene model</label>
+          <div class="mp-query-control">
+            <svg class="mp-search-icon" viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="7" r="5"/><line x1="11" y1="11" x2="15" y2="15"/></svg>
+            <input class="mgdb-input" id="mp-term" name="term" type="search" autocomplete="off"
+                   placeholder="e.g. glycolysis, starch biosynthesis, PWY-3781, Zm00001d053174…" aria-describedby="mp-query-hint" />
+            <button id="mp-query-clear" type="button" hidden>Clear</button>
+          </div>
+        </div>
+
+        <button class="mgdb-button mgdb-button-primary mp-query-submit" id="mp-search-submit" type="submit">
+          <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="7" r="5"/><line x1="11" y1="11" x2="15" y2="15"/></svg>
+          Search pathways
+        </button>
       </div>
 
-      <div class="mgdb-hub-field mgdb-hub-field-action">
-        <button class="mgdb-button mgdb-button-primary" type="submit">Search pathways</button>
-      </div>
+      <p class="mp-search-hint mgdb-muted mgdb-small" id="mp-query-hint">A gene model returns the pathways it is assigned to. RefGen_v4 rows are gene IDs &#40;Zm00001d&hellip;&#41; and RefGen_v3 rows are protein IDs &#40;GRMZM&hellip;_P01&#41;, so a bare GRMZM accession is matched as a prefix.</p>
 
       <div class="mp-examples" aria-label="Example searches">
-        <span>Try an example&#58;</span>
-        <button type="button" class="mp-example" data-term="glycolysis">glycolysis</button>
-        <button type="button" class="mp-example" data-term="starch biosynthesis">starch biosynthesis</button>
-        <button type="button" class="mp-example" data-term="PWY-3781">PWY-3781</button>
-        <button type="button" class="mp-example" data-term="Zm00001d053174">Zm00001d053174</button>
-        <button type="button" class="mp-example" data-term="GRMZM2G345493">GRMZM2G345493</button>
+        <span class="mp-example-label">EXAMPLES&#58;</span>
+        <button type="button" class="mp-example-btn" data-term="glycolysis">glycolysis</button>
+        <button type="button" class="mp-example-btn" data-term="starch biosynthesis">starch biosynthesis</button>
+        <button type="button" class="mp-example-btn" data-term="PWY-3781">PWY-3781</button>
+        <button type="button" class="mp-example-btn" data-term="Zm00001d053174">Zm00001d053174</button>
+        <button type="button" class="mp-example-btn" data-term="GRMZM2G345493">GRMZM2G345493</button>
       </div>
 
-      <details class="mp-advanced">
-        <summary>Advanced criteria</summary>
+      <details class="mp-advanced" id="mp-adv">
+        <summary>
+          <span class="mp-advanced-label">Advanced search</span>
+          <span class="mp-advanced-count" id="mp-advanced-count" hidden></span>
+        </summary>
         <div class="mp-advanced-body">
-          <div class="mgdb-hub-field">
-            <label for="mp-assembly">Assembly</label>
-            <select class="mgdb-select" id="mp-assembly" name="assembly">$(assembly_options)</select>
+          <div class="mp-advanced-grid">
+            <div class="mgdb-hub-field">
+              <label class="mgdb-label" for="mp-assembly">Assembly</label>
+              <select class="mgdb-select" id="mp-assembly" name="assembly">$(assembly_options)</select>
+            </div>
           </div>
-          <div class="mgdb-hub-field">
-            <label for="mp-page-size">Results per page</label>
-            <select class="mgdb-select" id="mp-page-size" name="page_size">
-              <option value="10">10</option>
-              <option value="25" selected>25</option>
-              <option value="50">50</option>
-              <option value="600">All</option>
-            </select>
+          <div class="mp-advanced-actions">
+            <button class="mgdb-button mgdb-button-primary" id="mp-adv-submit" type="submit">Apply filters</button>
+            <button class="mp-advanced-reset-btn" id="mp-adv-reset" type="button">Reset filters</button>
           </div>
         </div>
       </details>
     </form>
 
-    <p class="mgdb-rec-hint">A gene model returns the pathways it is assigned to. RefGen_v4 rows are gene IDs &#40;Zm00001d&hellip;&#41; and RefGen_v3 rows are protein IDs &#40;GRMZM&hellip;_P01&#41;, so a bare GRMZM accession is matched as a prefix.</p>
-
     <div class="mp-resource-hits" id="mp-resource-hits" hidden></div>
   </section>
 
   <!-- Results ............................................................... -->
-  <section id="mp-results" class="mp-results" aria-labelledby="mp-results-title" hidden>
-    <div class="mgdb-section-heading mp-results-head">
-      <div><h2 id="mp-results-title">Search results</h2></div>
-      <div class="mp-results-tools">
-        <span class="mp-results-scope" id="mp-results-scope"></span>
-        <a class="mgdb-button mgdb-button-quiet" id="mp-results-tsv" href="#" download>Download TSV</a>
+  <section id="mp-results-section" class="mp-results-section" aria-labelledby="mp-results-title" hidden>
+    <div class="mgdb-section-heading">
+      <div><h2 id="mp-results-title">Results</h2></div>
+    </div>
+
+    <p class="mp-results-status" id="mp-results-status" role="status" aria-live="polite">Enter a search term above or choose an assembly to view pathways.</p>
+
+    <div class="mp-results-toolbar" id="mp-results-toolbar">
+      <div class="mgdb-hub-field mp-results-filter">
+        <label for="mp-results-filter">Filter these results</label>
+        <input id="mp-results-filter" type="search" placeholder="Narrow this page" autocomplete="off" />
+        <span class="mgdb-result-count" id="mp-filter-count" aria-live="polite"></span>
+      </div>
+
+      <div class="mgdb-hub-field">
+        <label for="mp-page-size">Results shown</label>
+        <select class="mgdb-select" id="mp-page-size">
+          <option value="10">Top 10</option>
+          <option value="25" selected>Top 25</option>
+          <option value="50">Top 50</option>
+          <option value="all">All results</option>
+        </select>
+      </div>
+
+      <div class="mgdb-hub-field mgdb-hub-field-action mp-results-export">
+        <a class="mgdb-button mgdb-button-quiet" id="mp-results-tsv" href="#" download>Export TSV</a>
+      </div>
+
+      <div class="mgdb-hub-field mgdb-hub-field-action mp-results-view">
+        <div class="mgdb-view-toggle" role="group" aria-label="Result view">
+          <button class="mgdb-view-btn" id="mp-view-cards" type="button" data-view="card" aria-pressed="false">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>Cards
+          </button>
+          <button class="mgdb-view-btn is-active" id="mp-view-table" type="button" data-view="table" aria-pressed="true">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true"><rect x="1" y="2" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="12" width="14" height="2" rx="1" fill="currentColor"/></svg>Table
+          </button>
+        </div>
       </div>
     </div>
 
-    <div class="mgdb-table-scroll">
-      <table class="mgdb-table mgdb-table-zebra" id="mp-results-table" data-sortable>
-        <caption class="mgdb-visually-hidden">CornCyc pathways matching the current search</caption>
-        <thead>
-          <tr>
-            <th scope="col" data-sort="text"><button type="button">Pathway</button></th>
-            <th scope="col" data-sort="text"><button type="button">CornCyc ID</button></th>
-            <th scope="col" data-sort="text"><button type="button">Assemblies</button></th>
-            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Gene models</button></th>
-            <th scope="col" class="mgdb-numeric" data-sort="number"><button type="button">Enzymes</button></th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+    <div id="mp-results-container" class="mp-results-container mp-view-table">
+      <div id="mp-table-view" class="mgdb-table-scroll">
+        <table class="mgdb-table mgdb-table-zebra mp-results-table" id="mp-results-table">
+          <caption class="mgdb-visually-hidden">CornCyc pathways matching the current search</caption>
+          <thead>
+            <tr>
+              <th scope="col" aria-sort="none"><button type="button" data-sort-key="name">Pathway</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-sort-key="id">CornCyc ID</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-sort-key="assemblies">Assemblies</button></th>
+              <th scope="col" class="mgdb-numeric" aria-sort="none"><button type="button" data-sort-key="gene_models">Gene models</button></th>
+              <th scope="col" class="mgdb-numeric" aria-sort="none"><button type="button" data-sort-key="proteins">Enzymes</button></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div id="mp-cards-view" class="mgdb-card-grid mp-results-cards" hidden></div>
+    </div>
+
+    <div id="mp-empty" class="mgdb-empty" hidden>
+      <h3>No pathways matched your query</h3>
+      <p>Try searching with a broader keyword, a different spelling, or resetting the assembly filter.</p>
+      <button class="mgdb-button mgdb-button-secondary" id="mp-empty-reset" type="button">Reset search</button>
     </div>
 
     <nav class="mp-pager" id="mp-pager" aria-label="Result pages"></nav>

@@ -271,7 +271,7 @@ include_once($_SERVER['DOCUMENT_ROOT'] . '/include/locus_record_lib.php');
          asks for one anyway should still be told which labelling applies. */
       'names_are_gene_symbols' => locusIsGeneType($identity),
       'type' => MgdbApi::ref('term', $identity['type_id'], $identity['type'], '/data_center/term?id='),
-      'type_description' => MgdbApi::text($identity['type_note']),
+      'type_description' => MgdbApi::prose($identity['type_note']),
       'species' => MgdbApi::ref('species', $identity['species_id'], $identity['species'], '/data_center/species?id='),
       'linkage_group' => MgdbApi::ref('linkage_group', $identity['linkage_group_id'],
                                       $identity['linkage_group'], '/data_center/lg?id='),
@@ -822,26 +822,44 @@ include_once($_SERVER['DOCUMENT_ROOT'] . '/include/locus_record_lib.php');
 
   if (isset($want['annotations'])) {
     $terms = array();
+    /* Ontology annotations live in perm_tables.id_ontology, keyed by the
+       record's own table_name -- the same source and shape the gene product
+       record uses.
+
+       This query previously read mgdb.annotation and joined mgdb.term on
+       a.term, a.evidence_code and a.reference. That table has none of those
+       columns: it holds id, auto_num, author_email, add/mod_date, curation_lvl,
+       memo, ann_author_id, curation_lvl_change, gene_model_id and
+       gene_model_version. So it raised SQLSTATE 42703 "column a.term does not
+       exist" on every request and the section has been empty since it was
+       written -- invisibly, because make_query returns the unexecuted statement
+       and an unexecuted statement simply fetches no rows. There are 4,730
+       validated ontology annotations across 958 loci behind it. */
     $sth = make_query($DBConn, "
-      SELECT a.id, t.name AS term_name, t.id AS term_id, o.name AS ontology,
-             ev.name AS evidence, r.id AS ref_id, r.name AS ref_name
-      FROM mgdb.annotation a
-        LEFT JOIN mgdb.term t ON t.id = a.term
-        LEFT JOIN mgdb.term o ON o.id = t.ontology
-        LEFT JOIN mgdb.term ev ON ev.id = a.evidence_code
-        LEFT JOIN mgdb.reference r ON r.id = a.reference
-      WHERE a.id = :id
-      ORDER BY o.name, t.name", 1, array('id' => $id));
+      SELECT DISTINCT o.obo_term, o.name, o.qualifier, o.with_from, o.evidence_code,
+             o.pmid, dt.name AS ontology_domain, p.id AS source_id, p.name AS source_name,
+             r.id AS reference_id, r.name AS reference_name
+      FROM perm_tables.id_ontology o
+        LEFT JOIN mgdb.term dt ON dt.id = o.ontology_domain
+        LEFT JOIN mgdb.person p ON p.id = o.source
+        LEFT JOIN mgdb.reference r ON r.id = o.reference
+      WHERE o.table_name = 'locus' AND o.id = :id AND o.validation_lvl = 0
+      ORDER BY o.obo_term", 1, array('id' => $id));
     MgdbApi::countQuery();
     while ($row = retrieve_row($sth)) {
-      $label = MgdbApi::text($row['term_name']);
-      if ($label === null) { continue; }
+      $term = MgdbApi::text($row['obo_term']);
+      if ($term === null) { continue; }
       $terms[] = array(
-        'term' => MgdbApi::ref('term', $row['term_id'], $label, '/data_center/term?id='),
-        'ontology' => MgdbApi::text($row['ontology']),
-        'evidence' => MgdbApi::text($row['evidence']),
-        'reference' => $row['ref_id'] === null ? null
-          : MgdbApi::ref('reference', $row['ref_id'], $row['ref_name'], '/data_center/reference?id=')
+        'term' => $term,
+        'name' => MgdbApi::text($row['name']),
+        'ontology' => MgdbApi::text($row['ontology_domain']),
+        'qualifier' => MgdbApi::text($row['qualifier']),
+        'with_from' => MgdbApi::text($row['with_from']),
+        'evidence_code' => MgdbApi::text($row['evidence_code']),
+        'pmid' => MgdbApi::int($row['pmid']),
+        'source' => MgdbApi::ref('person', $row['source_id'], $row['source_name'], '/person?id='),
+        'reference' => $row['reference_id'] === null ? null
+          : MgdbApi::ref('reference', $row['reference_id'], $row['reference_name'], '/data_center/reference?id=')
       );
     }
     list($terms, $cut) = MgdbApi::cap($terms, $max_items);
@@ -895,7 +913,7 @@ include_once($_SERVER['DOCUMENT_ROOT'] . '/include/locus_record_lib.php');
         'doi' => $doi,
         'pub_type' => MgdbApi::text($row['pub_type']) ?: 'Journal article',
         'relevance' => MgdbApi::text($row['contents']),
-        'abstract' => MgdbApi::text($row['abstract']),
+        'abstract' => MgdbApi::prose($row['abstract']),
         'html' => '/data_center/reference?id=' . (int) $row['id']
       );
     }

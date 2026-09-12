@@ -79,33 +79,137 @@
    in their own row above the buttons; all three are advanced criteria and live
    in the disclosure now. */
 .mgdb-locus-page .locus-search-form {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--mgdb-space-4);
-  align-items: end;
+  margin-bottom: var(--mgdb-space-3);
 }
 
-.mgdb-locus-page .locus-field-query { grid-column: 1; }
-/* Scoped with `>` to the search form: `.mgdb-hub-field-action` is a shared
-   class and the results controls use it too. */
-.mgdb-locus-page .locus-search-form > .mgdb-hub-field-action { grid-column: 2; }
-.mgdb-locus-page .locus-adv { grid-column: 1 / -1; }
+/* ── Query row ───────────────────────────────────────────────────────────── */
 
-.mgdb-locus-page .locus-example-btn {
-  display: inline-block;
-  margin: 0 var(--mgdb-space-1);
+.mgdb-locus-page .locus-query-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-3);
+  align-items: stretch;
+}
+
+.mgdb-locus-page .locus-query-field { min-width: 0; }
+
+.mgdb-locus-page .locus-query-control {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  box-sizing: border-box;
+  height: 52px;
+  min-height: 52px;
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid #b9b2a5;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface, #ffffff);
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.mgdb-locus-page .locus-query-control:focus-within {
+  border-color: var(--mgdb-focus);
+  box-shadow: 0 0 0 2px rgba(11, 87, 164, .18);
+}
+
+.mgdb-locus-page .locus-query-control svg {
+  color: var(--mgdb-muted);
+  flex-shrink: 0;
+}
+
+.mgdb-locus-page .locus-query-control input[type="search"] {
+  width: 100%;
+  min-width: 0;
   padding: 0;
   border: 0;
-  background: none;
-  color: var(--mgdb-green-dark);
-  font: inherit;
-  font-weight: 700;
-  text-decoration: underline;
+  background: transparent;
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-locus-page .locus-query-control input[type="search"]:focus { outline: none; }
+
+.mgdb-locus-page .locus-query-control input[type="search"]::-webkit-search-cancel-button,
+.mgdb-locus-page .locus-query-control input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+
+.mgdb-locus-page #locus-query-clear {
+  padding: 0 var(--mgdb-space-2);
+  border: 0;
+  background: transparent;
+  color: var(--mgdb-muted);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
   cursor: pointer;
 }
 
+.mgdb-locus-page #locus-query-clear:hover {
+  color: var(--mgdb-green-dark);
+  text-decoration: underline;
+}
+
+.mgdb-locus-page .locus-query-submit {
+  box-sizing: border-box;
+  height: 52px;
+  min-height: 52px;
+  padding: 0 var(--mgdb-space-5);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mgdb-space-2);
+  white-space: nowrap;
+}
+
+/* ── Hints & Examples ────────────────────────────────────────────────────── */
+
+.mgdb-locus-page .locus-search-hint {
+  margin: var(--mgdb-space-2) 0 var(--mgdb-space-3);
+}
+
+.mgdb-locus-page .locus-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-locus-page .locus-example-label {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.mgdb-locus-page .locus-examples button,
+.mgdb-locus-page .locus-example-btn {
+  padding: var(--mgdb-space-1) var(--mgdb-space-3);
+  border: 1px solid var(--hub-line, #e3e9f2);
+  border-radius: 999px;
+  background: var(--hub-surface, #ffffff);
+  color: var(--mgdb-green-dark);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+
+.mgdb-locus-page .locus-examples button:hover,
 .mgdb-locus-page .locus-example-btn:hover {
-  color: var(--mgdb-green);
+  border-color: var(--mgdb-gold);
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+  box-shadow: 0 0 0 1px var(--mgdb-gold);
 }
 
 /* --------------------------------------------------------------------------
@@ -118,42 +222,99 @@
 
 .mgdb-locus-page .locus-results-section[hidden] { display: none; }
 
-.mgdb-locus-page .locus-results-heading {
+.mgdb-locus-page .locus-results-status {
+  margin: 0 0 var(--mgdb-space-4);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-locus-page .locus-results-status strong { color: var(--mgdb-green-dark); }
+
+.mgdb-locus-page .locus-results-toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--mgdb-space-3) var(--mgdb-space-5);
-  align-items: end;
-  justify-content: space-between;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: flex-end;
   margin-bottom: var(--mgdb-space-4);
 }
 
-.mgdb-locus-page .locus-results-heading > div:first-child { min-width: 0; flex: 1 1 18rem; }
-
-/* Fixed tracks in a box sized to its own content: declared with minmax(0, ...)
-   the first tracks take everything the parent offers and the last resolves to
-   0px, which drops its control onto a second row. */
-.mgdb-locus-page .locus-results-controls {
-  display: grid;
-  width: max-content;
-  max-width: 100%;
-  flex: 0 0 auto;
-  grid-template-columns: 13rem 10rem auto;
-  gap: var(--mgdb-space-3) var(--mgdb-space-4);
-  align-items: end;
+.mgdb-locus-page .locus-results-filter {
+  flex: 1 1 240px;
+  min-width: 200px;
+  position: relative;
 }
 
-@media (max-width: 1000px) {
-  .mgdb-locus-page .locus-results-controls {
-    width: 100%;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.mgdb-locus-page .locus-results-filter > label {
+  padding-right: 7rem;
 }
 
-@media (max-width: 560px) {
-  .mgdb-locus-page .locus-results-controls { grid-template-columns: minmax(0, 1fr); }
+.mgdb-locus-page .locus-results-filter .mgdb-result-count {
+  position: absolute;
+  right: 0;
+  bottom: calc(var(--mgdb-tap-target) + 6px);
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
 }
 
-.mgdb-locus-page .locus-export-buttons { display: flex; gap: var(--mgdb-space-2); align-items: center; }
+.mgdb-locus-page .locus-results-toolbar .locus-results-export .mgdb-button {
+  height: var(--mgdb-tap-target);
+  min-height: var(--mgdb-tap-target);
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+/* View Toggle */
+.mgdb-locus-page .locus-results-view {
+  display: inline-flex;
+  align-items: flex-end;
+}
+
+.mgdb-locus-page .locus-results-view .mgdb-view-toggle {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-alt);
+  height: var(--mgdb-tap-target);
+  box-sizing: border-box;
+  align-items: center;
+}
+
+.mgdb-locus-page .locus-results-view .mgdb-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+  padding: 0 10px;
+  border: none;
+  border-radius: calc(var(--mgdb-radius-sm) - 2px);
+  background: transparent;
+  color: var(--mgdb-muted);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+}
+
+.mgdb-locus-page .locus-results-view .mgdb-view-btn:hover:not([aria-pressed="true"]):not(.is-active) {
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+}
+
+.mgdb-locus-page .locus-results-view .mgdb-view-btn.is-active,
+.mgdb-locus-page .locus-results-view .mgdb-view-btn[aria-pressed="true"] {
+  background: var(--mgdb-green-dark);
+  color: #ffffff !important;
+}
+
+.mgdb-locus-page .locus-results-view .mgdb-view-btn.is-active svg,
+.mgdb-locus-page .locus-results-view .mgdb-view-btn[aria-pressed="true"] svg {
+  fill: #ffffff;
+  color: #ffffff;
+}
 
 .mgdb-locus-page #locus-notes .mgdb-message {
   margin-bottom: var(--mgdb-space-4);
@@ -164,14 +325,231 @@
   vertical-align: top;
 }
 
+.mgdb-locus-page .locus-table th button[data-sort-key] {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mgdb-space-1);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.mgdb-locus-page .locus-table th button[data-sort-key]:hover {
+  color: var(--mgdb-green-dark);
+}
+
 .mgdb-locus-page .locus-name-cell strong {
   display: block;
   font-size: var(--mgdb-text-base);
 }
 
-.mgdb-locus-page .locus-fullname {
+.mgdb-locus-page .locus-full-name {
+  display: block;
   color: var(--mgdb-ink-soft);
-  font-size: var(--mgdb-text-sm);
+  font-size: var(--mgdb-text-xs);
+  margin-top: 2px;
+}
+
+.mgdb-locus-page .locus-synonyms {
+  display: block;
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.mgdb-locus-page .locus-coord-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mgdb-locus-page .locus-bin-val {
+  font-size: var(--mgdb-text-xs);
+  color: var(--mgdb-ink-soft);
+}
+
+.mgdb-locus-page .locus-gm-list {
+  font-family: var(--mgdb-font-mono, monospace);
+  font-size: var(--mgdb-text-xs);
+  max-width: 250px;
+}
+
+.mgdb-locus-page .locus-gm-link {
+  color: var(--mgdb-green-dark);
+  text-decoration: none;
+}
+
+.mgdb-locus-page .locus-gm-link:hover {
+  text-decoration: underline;
+}
+
+.mgdb-locus-page .locus-allele-link {
+  display: inline-block;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  color: var(--mgdb-green-dark);
+  margin-bottom: 2px;
+}
+
+.mgdb-locus-page .locus-pheno-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: var(--mgdb-text-xs);
+  margin-top: 2px;
+}
+
+.mgdb-locus-page .locus-pheno-tag {
+  display: inline-block;
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-ink-soft);
+  padding: 1px 6px;
+  border-radius: var(--mgdb-radius-sm);
+  font-size: 11px;
+}
+
+/* --------------------------------------------------------------------------
+   Search Result Cards View
+   -------------------------------------------------------------------------- */
+
+.mgdb-locus-page .locus-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--mgdb-space-4);
+  align-items: stretch;
+  margin-top: var(--mgdb-space-3);
+}
+
+.mgdb-locus-page .locus-result-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-md);
+  background: var(--mgdb-surface);
+  padding: var(--mgdb-space-4);
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.mgdb-locus-page .locus-result-card:hover {
+  border-color: var(--mgdb-gold);
+  box-shadow: 0 0 0 1px var(--mgdb-gold);
+}
+
+.mgdb-locus-page .locus-result-card .locus-card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+
+.mgdb-locus-page .locus-card-header {
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-locus-page .locus-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+}
+
+.mgdb-locus-page .locus-card-title {
+  margin: 0 0 var(--mgdb-space-2);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-locus-page .locus-card-title a {
+  color: var(--mgdb-ink);
+  text-decoration: none;
+}
+
+.mgdb-locus-page .locus-card-title a:hover {
+  color: var(--mgdb-green-dark);
+  text-decoration: underline;
+}
+
+.mgdb-locus-page .locus-card-meta-list {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+  margin: var(--mgdb-space-2) 0 0;
+  padding: 0;
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading-normal);
+}
+
+.mgdb-locus-page .locus-card-meta-list dt {
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mgdb-locus-page .locus-card-meta-list dd {
+  margin: 0;
+  color: var(--mgdb-ink-soft);
+  word-break: break-word;
+}
+
+.mgdb-locus-page .locus-card-meta-list dd a {
+  color: var(--mgdb-green-dark);
+  text-decoration: none;
+}
+
+.mgdb-locus-page .locus-card-meta-list dd a:hover {
+  text-decoration: underline;
+}
+
+.mgdb-locus-page .locus-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--mgdb-space-3);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px dashed var(--hub-line-soft, #eef2f8);
+}
+
+.mgdb-locus-page .locus-card-view-link {
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.mgdb-locus-page .locus-card-view-link:hover {
+  text-decoration: underline;
+}
+
+.mgdb-locus-page .locus-card-copy-btns {
+  display: inline-flex;
+  gap: var(--mgdb-space-1);
+}
+
+.mgdb-locus-page .locus-copy-btn {
+  padding: 2px 8px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-muted);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .12s ease;
+}
+
+.mgdb-locus-page .locus-copy-btn:hover {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
 }
 
 .mgdb-locus-page .locus-syn-list {
@@ -287,46 +665,149 @@
 
 /* ── Advanced search disclosure ──────────────────────────────────────────── */
 
-.mgdb-locus-page .locus-adv {
-  border: 1px solid var(--hub-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--hub-surface);
+.mgdb-locus-page .locus-advanced {
+  border: 1px solid var(--hub-line, #e3e9f2);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface, #ffffff);
+  margin-top: var(--mgdb-space-4);
 }
 
-.mgdb-locus-page .locus-adv summary {
+.mgdb-locus-page .locus-advanced > summary {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-1) var(--mgdb-space-3);
-  align-items: baseline;
+  align-items: center;
   padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-radius: var(--mgdb-radius-sm);
   color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
   cursor: pointer;
-  list-style-position: inside;
+  list-style: none;
 }
 
-.mgdb-locus-page .locus-adv summary strong { font-size: var(--mgdb-text-base); }
-.mgdb-locus-page .locus-adv summary span { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
-.mgdb-locus-page .locus-adv[open] summary { border-bottom: 1px solid var(--hub-line-soft); }
+.mgdb-locus-page .locus-advanced > summary::-webkit-details-marker { display: none; }
 
-.mgdb-locus-page .locus-adv-body {
+.mgdb-locus-page .locus-advanced > summary::before {
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 7px solid currentColor;
+  content: "";
+  transition: transform .15s ease;
+}
+
+.mgdb-locus-page .locus-advanced[open] > summary::before { transform: rotate(90deg); }
+
+.mgdb-locus-page .locus-advanced > summary:focus-visible {
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: -3px;
+}
+
+.mgdb-locus-page .locus-advanced-count {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.mgdb-locus-page .locus-advanced-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-4);
+  padding: var(--mgdb-space-4);
+  border-top: 1px solid var(--hub-line-soft, #eef2f8);
+}
+
+.mgdb-locus-page .locus-advanced-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 24rem));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--mgdb-space-4);
   align-items: start;
-  padding: var(--mgdb-space-4);
 }
 
-.mgdb-locus-page .locus-adv-actions {
+.mgdb-locus-page .locus-advanced-actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-3);
-  padding: 0 var(--mgdb-space-4) var(--mgdb-space-4);
+  align-items: center;
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px dashed var(--hub-line-soft, #eef2f8);
+}
+
+.mgdb-locus-page .locus-advanced-reset-btn {
+  min-height: var(--mgdb-tap-target);
+  height: var(--mgdb-tap-target);
+  padding: var(--mgdb-space-2) var(--mgdb-space-5);
+  border: 1px solid #b9b2a5;
+  border-radius: var(--mgdb-radius-sm);
+  background: #ffffff;
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.mgdb-locus-page .locus-advanced-reset-btn:hover {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+}
+
+@media (max-width: 900px) {
+  .mgdb-locus-page .locus-advanced-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 767px) {
+  .mgdb-locus-page .locus-results-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--mgdb-space-3);
+  }
+  .mgdb-locus-page .locus-results-toolbar .mgdb-hub-field {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+  .mgdb-locus-page .locus-results-toolbar .mgdb-hub-field > label:first-child {
+    min-height: 0;
+  }
+  .mgdb-locus-page .locus-results-filter {
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+  }
+  .mgdb-locus-page .locus-results-filter > label {
+    padding-right: 7rem;
+  }
+  .mgdb-locus-page .locus-results-toolbar .locus-results-export .mgdb-button {
+    width: 100%;
+    justify-content: center;
+  }
+  .mgdb-locus-page .locus-results-toolbar .locus-results-view {
+    width: 100%;
+  }
+  .mgdb-locus-page .locus-results-toolbar .locus-results-view .mgdb-view-toggle {
+    width: 100%;
+  }
+  .mgdb-locus-page .locus-results-toolbar .locus-results-view .mgdb-view-btn {
+    flex: 1 1 50%;
+    justify-content: center;
+  }
+  .mgdb-locus-page .locus-card-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 @media (max-width: 640px) {
-  .mgdb-locus-page .locus-search-form { grid-template-columns: minmax(0, 1fr); }
-  .mgdb-locus-page .locus-search-form > .mgdb-hub-field-action { grid-column: 1; }
-  .mgdb-locus-page .locus-adv-body { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-locus-page .locus-query-row { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-locus-page .locus-query-submit { width: 100%; }
+  .mgdb-locus-page .locus-advanced-grid { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-locus-page .mgdb-hub-field > label:first-child { min-height: 0; }
 }
 
 /* ── Pagination ──────────────────────────────────────────────────────────── */

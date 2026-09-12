@@ -119,8 +119,9 @@ $$SYNTAX-LEVEL 2
       <code id="map-record-api-endpoint">GET /api/v1/records/map/$(requested_identifier)</code>
       <div class="mgdb-rec-api-actions">
         <a class="mgdb-button mgdb-button-quiet" id="map-record-api-link" href="/api/v1/records/map/$(requested_identifier_path)" target="_blank" rel="noopener">Raw JSON <span aria-hidden="true">&nearr;</span></a>
+        <a class="mgdb-button mgdb-button-quiet" href="/api/v1/records/map/$(requested_identifier_path)?format=jsonld" target="_blank" rel="noopener">JSON-LD <span aria-hidden="true">&nearr;</span></a>
         <button class="mgdb-button mgdb-button-quiet" id="map-copy-json-btn" type="button">Copy JSON</button>
-        <a class="mgdb-button mgdb-button-quiet" href="/api/v1/openapi">API documentation</a>
+        <a class="mgdb-button mgdb-button-quiet" href="/api">API documentation</a>
       </div>
     </div>
     <p class="mgdb-rec-api-note">Every fact, mapped locus, related map, QTL experiment, and reference on this page is retrieved in one structured JSON response.</p>

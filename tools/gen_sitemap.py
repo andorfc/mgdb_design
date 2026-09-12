@@ -57,6 +57,26 @@ def is_external(url):
     return not (host == INTERNAL_HOST or host.endswith('.' + INTERNAL_HOST))
 
 
+def sort_key(name):
+    """Alphabetical, case-insensitively, ignoring spaces and punctuation.
+
+    Letter-by-letter rather than word-by-word, which is what the list was
+    already doing: it is the only reading under which "PanEffect",
+    "Pangenome graph" and "Pan-genome pathway explorer" sit in that order.
+    Case-insensitive, so "Bin Viewer" precedes "BLAST" and the lowercase
+    "qTeller" and "reelGene" land between "Protein structures" and "SNPTools".
+    """
+    return re.sub(r'[^a-z0-9]', '', name.lower())
+
+
+def entries_for(sid, items):
+    """The entries of one section, in the order they should be emitted."""
+    entries = D.DATA_CENTERS if sid == 'data_center' else items
+    if sid in D.UNSORTED_SECTIONS:
+        return entries
+    return sorted(entries, key=lambda e: sort_key(e[0]))
+
+
 def item(name, url, desc, indent='        '):
     ext = is_external(url)
     attrs = ' target="_blank" rel="noopener"' if ext else ''
@@ -117,7 +137,7 @@ tabs = '\n'.join(T) + '\n'
 L = ['*(doc-content', '<div id="sitemap_content" aria-label="MaizeGDB directory">', '']
 for sid, kind, title, blurb, items in D.SECTIONS:
     panel = f'sm-{sid}-panel'
-    entries = D.DATA_CENTERS if sid == 'data_center' else items
+    entries = entries_for(sid, items)
     L.append(f'  <section id="sm-{sid}" class="sitemap-section" data-section-kind="{kind}">')
     L.append('    <h2 class="sitemap-section-heading">')
     L.append(f'      <button type="button" class="sitemap-section-toggle" aria-controls="{panel}" aria-expanded="true">')
@@ -163,7 +183,7 @@ print(f'{len(D.SECTIONS)} sections, {n_items} directory entries, '
 # Duplicate URLs across sections are legitimate (BLAST is a tool and a starting
 # point) but duplicates *within* one section are always a mistake.
 for sid, _, title, _, items in D.SECTIONS:
-    entries = D.DATA_CENTERS if sid == 'data_center' else items
+    entries = entries_for(sid, items)
     seen = {}
     for name, url, _ in entries:
         if url in seen:

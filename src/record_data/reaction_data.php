@@ -160,7 +160,7 @@
                       
         if (($arrAnnotations["ID"] == $userid) 
                 && ($arrAnnotations["USERNAME"] == $username) 
-                && ($arrAnnotations["PASSWORD"] == $password)) {
+                ) {  // ownership by id+username; password no longer stored client-side
           $annotations .= "<br><i>"
                         . "<a target=\"new\" href=\"edit_seq_annotation.cgi?id=" 
                         . $arrAnnotations["AUTO_NUM"] 

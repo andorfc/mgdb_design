@@ -49,7 +49,11 @@ $DBConn = connect_to_database(false);
 $requested_locus = trim((string) getCGIParam('id', 'G', ID));
 $requested_map = trim((string) getCGIParam('map', 'G', ''));
 
-if (!ctype_digit($requested_locus)) { return false; }
+if (!ctype_digit($requested_locus)) {
+  logMessage('fish_record_modern.php: non-numeric locus -- serving 404');
+  include('controllers/not_found.php');
+  exit;
+}
 
 $params = array('locus' => (int) $requested_locus);
 $map_clause = '';
@@ -83,10 +87,19 @@ $record = retrieve_row(make_query($DBConn, "
     WHERE f.locus_id = :locus" . $map_clause . "
     LIMIT 1", 1, $params));
 
-/* No FISH record for that locus. The legacy page rendered its own not-found
-   body; falling through lets controllers/data_center.php serve the legacy
-   page, which is the one place that still knows how to say it. */
-if (!$record) { return false; }
+/* No record for that id.
+ *
+ * Corrected 2026-09-07. This used to `return false`, on the belief that
+ * controllers/data_center.php would then serve the legacy record page and that
+ * page would say so. It does not say so: it renders 39 KB of legacy chrome
+ * around a body reading "<type> record" and answers HTTP 200, and it builds its
+ * <title> by concatenating the raw id, which Bauplan writes out unescaped. The
+ * site 404 is the honest answer and it is on the modern shell. */
+if (!$record) {
+  logMessage('fish_record_modern.php: no FISH record for locus ' . $requested_locus);
+  include('controllers/not_found.php');
+  exit;
+}
 
 header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
 header('Pragma: no-cache');

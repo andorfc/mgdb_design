@@ -1,0 +1,100 @@
+/* Rhubarb crisp (/rhubarb_crisp) — MaizeGDB modern design system.
+ *
+ * The ground, the white section card and its colored top edge come from
+ * css/mgdb-hub.css. Only the recipe layout lives here. No section tab bar: one
+ * section, three steps, one photo.
+ */
+
+.mgdb-modern .mgdb-rhubarb-page { padding-bottom: clamp(3rem, 6vw, 5.5rem); }
+
+/* The photo sits beside the method on a desktop and above it on a phone. It is
+   250px square and stays that size — a recipe photo does not need to grow. */
+.mgdb-rhubarb-page .rhubarb-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--mgdb-space-6);
+}
+
+@media (max-width: 760px) {
+  .mgdb-rhubarb-page .rhubarb-layout { grid-template-columns: minmax(0, 1fr); }
+}
+
+.mgdb-rhubarb-page .rhubarb-steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-4);
+  min-width: 0;
+  max-width: 34rem;
+}
+
+.mgdb-rhubarb-page .rhubarb-step {
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: #ffffff;
+}
+
+.mgdb-rhubarb-page .rhubarb-step h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-3);
+  margin: 0 0 var(--mgdb-space-3);
+  font-size: 1.05rem;
+}
+
+/* The steps are ordered — filling, then topping over it, then bake — so they are
+   numbered rather than bulleted. */
+.mgdb-rhubarb-page .rhubarb-step-mark {
+  display: grid;
+  width: 1.8rem;
+  height: 1.8rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 800;
+}
+
+/* Quantities line up down the left so the list reads as a shopping list. */
+.mgdb-rhubarb-page .rhubarb-ingredients {
+  margin: 0 0 var(--mgdb-space-3);
+  padding: 0;
+  list-style: none;
+}
+
+.mgdb-rhubarb-page .rhubarb-ingredients li {
+  padding: 0.22rem 0;
+  border-bottom: 1px solid var(--mgdb-line-soft);
+  line-height: 1.5;
+}
+
+.mgdb-rhubarb-page .rhubarb-ingredients li:last-child { border-bottom: 0; }
+.mgdb-rhubarb-page .rhubarb-ingredients b { color: var(--mgdb-green-dark); }
+
+.mgdb-rhubarb-page .rhubarb-step > p { margin: 0; color: var(--mgdb-ink-soft); line-height: 1.6; }
+
+.mgdb-rhubarb-page .rhubarb-bake { font-size: 1.05rem; }
+.mgdb-rhubarb-page .rhubarb-bake b { color: var(--mgdb-green-dark); }
+
+.mgdb-rhubarb-page .rhubarb-figure {
+  width: 250px;
+  margin: 0;
+  padding: 0.6rem;
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: #ffffff;
+}
+
+.mgdb-rhubarb-page .rhubarb-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--mgdb-radius-sm);
+}
+
+@media (max-width: 760px) {
+  .mgdb-rhubarb-page .rhubarb-figure { width: min(250px, 100%); }
+}

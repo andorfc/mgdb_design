@@ -50,6 +50,41 @@ function blast_job_is_modern($job_id, $system) {
   return !empty($found);
 }
 
+/* The hidden inputs that reopen a finished job in the search form.
+ *
+ * Returns '' when the job's manifest is missing -- a job old enough to predate
+ * .parms, or one whose temp files have been reaped -- and the template then
+ * renders no Edit search button rather than one that silently loses the
+ * settings it claims to carry.
+ */
+function blast_edit_search_fields($job_id, $system) {
+  if (!preg_match('/^[A-Za-z0-9_]+$/', (string) $job_id)) { return ''; }
+  $dir = rtrim($system['temp_dir'], '/');
+  $parms_file = $dir . '/' . $job_id . '.parms';
+  if (!is_readable($parms_file)) { return ''; }
+
+  $fields = array();
+  foreach (file($parms_file, FILE_IGNORE_NEW_LINES) as $line) {
+    if ($line === '') { continue; }
+    /* tab-separated key/value, and a value may itself be empty */
+    $parts = explode("\t", $line, 2);
+    $fields[$parts[0]] = isset($parts[1]) ? $parts[1] : '';
+  }
+  if (empty($fields['saved_job_id'])) { $fields['saved_job_id'] = $job_id; }
+
+  $fasta_file = $dir . '/' . $job_id . '.fa';
+  if (is_readable($fasta_file)) {
+    $fields['query_sequence'] = file_get_contents($fasta_file);
+  }
+
+  $html = '';
+  foreach ($fields as $k => $v) {
+    $html .= '<input type="hidden" name="' . htmlspecialchars($k, ENT_QUOTES, 'UTF-8') .
+             '" value="' . htmlspecialchars($v, ENT_QUOTES, 'UTF-8') . '">';
+  }
+  return $html;
+}
+
   // Get system configuration
   $system = getSystemInfo('mgdb.conf');
 
@@ -206,6 +241,17 @@ function blast_job_is_modern($job_id, $system) {
     $body = $mgdb->get('body')->load('templates/static/mgdb_blast_results.bau');
     $body->get('job_id')->replace($blast_job_id);
     $body->get('reload_url')->replace($system['root_url'] . '/BLAST?job_id=' . rawurlencode($blast_job_id));
+    /* "Edit search" reopens the form with this job's settings in it. The form
+       already knows how to do that -- restoreSettings() in BLAST_form.php is
+       what the saved-jobs list uses -- but it reads the settings from POST, so
+       the way to reach it is to post them. <job>.parms holds exactly the keys
+       it reads, which is why they can be forwarded verbatim.
+
+       query_sequence is posted explicitly even though restoreSettings() also
+       reads <job>.fa: it sets the token from the file first and then AGAIN
+       from the posted value, so posting nothing would blank the sequence the
+       file had just supplied. */
+    $body->get('edit_fields')->replace(blast_edit_search_fields($blast_job_id, $system));
     /* No job-level assembly is passed. A job fans out to one search per target
        and each target has its own assembly, so the answer is per sub-job, not
        per job; blast_submit.php records it in <job>.targets and the API reads

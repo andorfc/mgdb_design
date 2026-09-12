@@ -1,0 +1,54 @@
+$$SYNTAX-LEVEL 2
+*(gbrowse-content
+<span style="display: none;" id="report_link">
+  <form action="javascript:popUpAnnotation('genome_issueform', '/curation/GenomeIssue/edit'\);" method="post" id="genome_issueform">
+     <input type="hidden" id="gene_model_id" value="">
+     <input type="hidden" id="gene_model_version" value="">
+     <input type="hidden" id="auto_num" name="auto_num" value="">
+     <a onclick="genome_issueform.submit(\)" href="#" style="color: crimson; text-decoration: underline; font-weight: bold;" >Report an assembly or gene model structure problem</a>.
+  </form>
+</span>
+<br>
+  <div id="loading_gbrowse" align="center">
+   <img src="/images/cornloading_trans.gif">
+   </div>
+   
+  <!-- Important: The code on gblade uses the window name when generating a bookmark url. Changing the name here will break it" -->
+  <iframe sandbox="allow-forms allow-downloads allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation allow-top-navigation-by-user-activation" id="gframe" name="$(root_url)" src="https://gbrowse.maizegdb.org/gb2/gbrowse/$(source)/?url=$(root_url);$(params)" height="1050px" width="100%" frameborder="0" onload="document.getElementById('loading_gbrowse'\).style.display = 'none'; document.getElementById('report_link'\).style.display = 'inline';" style="z-index: 999; display: block;">
+  
+  </iframe>
+
+ 
+ <script language="javascript">
+  \$("#menu_bar", document\).removeClass("menu"\);
+  \$("#menu_bar", document\).removeClass("menu_green"\);
+  \$("#menu_bar", document\).addClass("menu_gbrowse"\);
+  \$("#menu_bar", document\).addClass("menu_green_gbrowse"\);
+  document.getElementById("wrapper"\).setAttribute("style", "width:1600px"\); //2000    
+  document.getElementById("logo"\).setAttribute("style", "width:1324px"\); //1724
+  document.getElementById("centercolumn_record"\).setAttribute("style", "width:1300px"\);
+  document.getElementById("whitecurve"\).setAttribute("style", "width:1320px"\);
+  document.getElementById("content"\).setAttribute("style", "width:1300px"\);
+  document.getElementById("content_top"\).src = "/images/content_top_gbrowse.png";
+  document.getElementById("content_top"\).setAttribute("style", "width:1320px"\);
+  document.getElementById("menu_bar"\).setAttribute("style", "width:86.5%"\);
+  window.onload=function(\) {
+   //need to wait for these sections to load before changing them
+   \$("#footer_menu", document\).removeClass("menu"\);
+   \$("#footer_menu", document\).removeClass("menu_green"\);
+   \$("#footer_menu", document\).addClass("menu_gbrowse"\);
+   \$("#footer_menu", document\).addClass("menu_green_gbrowse"\);
+   document.getElementById("content_bottom"\).setAttribute("style", "width:1320px"\);
+   document.getElementById("footer"\).setAttribute("style", "width:1320px"\);
+   document.getElementById("content_bottom"\).src = "/images/content_bottom_gbrowse.png";
+   document.getElementById('gframe'\).style.webkitTransform = 'scale(1\)';
+   document.addEventListener("load", function(event\) {
+    var style = document.getElementById("gframe"\).style;
+    style.webkitTransform = style.webkitTransform ? "" : "scale(1\)";
+    document.getElementById('gframe'\).style.display = 'none';
+    document.getElementById('gframe'\).style.display = 'inline';
+}\);
+ }
+  
+ </script>
+)

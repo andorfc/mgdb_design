@@ -21,6 +21,9 @@
      whole collection" apart from "a search that happens to match everything". */
   var collectionTotal = null;
   var resultFilter = '';
+  var sortKey = 'title';
+  var sortDir = 'asc';
+  var viewMode = 'card';
 
   function byId(id) {
     return document.getElementById(id);
@@ -37,6 +40,35 @@
 
   function number(value) {
     return Number(value || 0).toLocaleString('en-US');
+  }
+
+  function syncAdvancedBadge() {
+    var count = 0;
+    var yFrom = byId('reference-year-from');
+    var yTo = byId('reference-year-to');
+    var journal = byId('reference-journal');
+    var pubType = byId('reference-pub-type');
+    var identifier = byId('reference-identifier');
+    var sort = byId('reference-sort');
+    var editorial = byId('reference-editorial');
+    var meeting = byId('reference-include-meeting');
+    var mnl = byId('reference-include-mnl');
+
+    if (yFrom && yFrom.value.trim() !== '') count++;
+    if (yTo && yTo.value.trim() !== '') count++;
+    if (journal && journal.value !== '') count++;
+    if (pubType && pubType.value !== '') count++;
+    if (identifier && identifier.value !== 'all' && identifier.value !== '') count++;
+    if (sort && sort.value !== 'relevance' && sort.value !== 'newest') count++;
+    if (editorial && editorial.checked) count++;
+    if (meeting && !meeting.checked) count++;
+    if (mnl && !mnl.checked) count++;
+
+    var badge = byId('reference-advanced-count');
+    if (badge) {
+      badge.textContent = count;
+      badge.hidden = (count === 0);
+    }
   }
 
   function formParams(page) {
@@ -58,13 +90,13 @@
         params.set(pair[0], element.value);
       }
     });
-    if (byId('reference-editorial').checked) {
+    if (byId('reference-editorial') && byId('reference-editorial').checked) {
       params.set('editorial', '1');
     }
-    if (!byId('reference-include-meeting').checked) {
+    if (byId('reference-include-meeting') && !byId('reference-include-meeting').checked) {
       params.set('include_meeting', '0');
     }
-    if (!byId('reference-include-mnl').checked) {
+    if (byId('reference-include-mnl') && !byId('reference-include-mnl').checked) {
       params.set('include_mnl', '0');
     }
     params.set('page', page || 1);
@@ -89,12 +121,16 @@
         byId(map[key]).value = params.get(key);
       }
     });
-    byId('reference-editorial').checked = params.get('editorial') === '1';
-    byId('reference-include-meeting').checked = params.get('include_meeting') !== '0';
-    byId('reference-include-mnl').checked = params.get('include_mnl') !== '0';
+    if (byId('reference-editorial')) byId('reference-editorial').checked = params.get('editorial') === '1';
+    if (byId('reference-include-meeting')) byId('reference-include-meeting').checked = params.get('include_meeting') !== '0';
+    if (byId('reference-include-mnl')) byId('reference-include-mnl').checked = params.get('include_mnl') !== '0';
     currentPage = Math.max(1, parseInt(params.get('page') || '1', 10));
-    byId('reference-sort-compact').value = byId('reference-sort').value;
-    byId('reference-query-clear').hidden = !byId('reference-query').value;
+    var clearBtn = byId('reference-query-clear');
+    var queryInput = byId('reference-query');
+    if (clearBtn && queryInput) {
+      clearBtn.hidden = !queryInput.value;
+    }
+    syncAdvancedBadge();
   }
 
   function updateUrl(params) {
@@ -364,54 +400,159 @@
       {displayModeBar: false, responsive: true});
   }
 
-  function renderResults(data) {
-    var results = byId('reference-results');
-    var summary = data.summary;
-    var start = summary.total ? (summary.page - 1) * summary.page_size + 1 : 0;
-    var end = Math.min(summary.total, summary.page * summary.page_size);
-    var queryText = data.query.term ? ' for “' + data.query.term + '”' : '';
-    byId('reference-results-status').textContent = summary.total
-      ? 'Showing ' + number(start) + '–' + number(end) + ' of ' + number(summary.total)
-        + ' matches' + queryText + ' · ' + number(summary.elapsed_ms) + ' ms'
-      : 'No curated references matched' + queryText + '.';
-    byId('reference-resting').hidden = true;
-    byId('reference-empty').hidden = summary.total !== 0;
-    results.hidden = summary.total === 0;
-    byId('reference-select-page').parentElement.hidden = summary.total === 0;
-    byId('reference-select-page').checked = false;
+  function sortReferenceResults(results) {
+    var list = (results || []).slice();
+    list.sort(function (a, b) {
+      var diff = 0;
+      if (sortKey === 'title') {
+        var tA = (a.title || a.name || '').toLowerCase();
+        var tB = (b.title || b.name || '').toLowerCase();
+        diff = tA.localeCompare(tB);
+      } else if (sortKey === 'authors') {
+        var auA = (a.authors || '').toLowerCase();
+        var auB = (b.authors || '').toLowerCase();
+        diff = auA.localeCompare(auB);
+      } else if (sortKey === 'year') {
+        var yA = parseInt(a.year, 10) || 0;
+        var yB = parseInt(b.year, 10) || 0;
+        diff = yA - yB;
+      } else if (sortKey === 'journal') {
+        var jA = (a.journal || '').toLowerCase();
+        var jB = (b.journal || '').toLowerCase();
+        diff = jA.localeCompare(jB);
+      } else if (sortKey === 'identifiers') {
+        var idA = (a.doi || a.pubmed || '').toLowerCase();
+        var idB = (b.doi || b.pubmed || '').toLowerCase();
+        diff = idA.localeCompare(idB);
+      }
+      return sortDir === 'desc' ? -diff : diff;
+    });
+    return list;
+  }
 
-    results.innerHTML = data.results.map(function (row) {
+  function updateSortHeaders() {
+    var ths = document.querySelectorAll('#reference-results-table thead th[aria-sort]');
+    Array.prototype.forEach.call(ths, function (th) {
+      var btn = th.querySelector('button[data-sort-key]');
+      if (!btn) return;
+      var key = btn.getAttribute('data-sort-key');
+      if (key === sortKey) {
+        th.setAttribute('aria-sort', sortDir === 'asc' ? 'ascending' : 'descending');
+      } else {
+        th.setAttribute('aria-sort', 'none');
+      }
+    });
+  }
+
+  function setView(mode) {
+    viewMode = mode;
+    var btnCards = byId('reference-view-cards');
+    var btnTable = byId('reference-view-table');
+    var cardsView = byId('reference-cards-view');
+    var tableView = byId('reference-table-view');
+
+    if (btnCards) {
+      btnCards.classList.toggle('is-active', mode === 'card');
+      btnCards.setAttribute('aria-pressed', mode === 'card' ? 'true' : 'false');
+    }
+    if (btnTable) {
+      btnTable.classList.toggle('is-active', mode === 'table');
+      btnTable.setAttribute('aria-pressed', mode === 'table' ? 'true' : 'false');
+    }
+    if (cardsView) cardsView.hidden = (mode !== 'card');
+    if (tableView) tableView.hidden = (mode !== 'table');
+  }
+
+  function renderTableView(results) {
+    var tbody = byId('reference-results-body');
+    if (!tbody) return;
+    tbody.innerHTML = results.map(function (row) {
       var title = row.title || row.name || 'Untitled reference';
-      var citation = [row.journal, row.volume, row.pages].filter(Boolean).join(' · ');
+      var citationParts = [row.journal, row.volume, row.pages].filter(Boolean);
+      var citation = citationParts.join(' · ');
+      var editorialPick = row.editorial_pick === true;
+      var citationText = [row.authors, row.year ? '(' + row.year + ')' : '', title, citation].filter(Boolean).join('. ');
+
+      var idParts = [];
+      if (row.doi) {
+        idParts.push('<a href="https://doi.org/' + encodeURIComponent(row.doi) + '" target="_blank" rel="noopener">DOI: ' + escapeHtml(row.doi) + ' ↗</a>');
+      }
+      if (row.pubmed) {
+        idParts.push('<a href="https://pubmed.ncbi.nlm.nih.gov/' + encodeURIComponent(row.pubmed) + '/" target="_blank" rel="noopener">PMID: ' + escapeHtml(row.pubmed) + ' ↗</a>');
+      }
+      var idsHtml = idParts.length ? idParts.join('') : '<span style="color:var(--mgdb-muted)">—</span>';
+
+      return '<tr data-reference-id="' + row.id + '">'
+        + '<td class="reference-title-cell">'
+        + '<strong><a href="/data_center/reference?id=' + row.id + '">' + escapeHtml(title) + '</a></strong>'
+        + (citation ? '<div class="reference-citation-text">' + escapeHtml(citation) + '</div>' : '')
+        + (editorialPick ? '<div style="margin-top:4px;"><span class="reference-editorial-badge">★ Editorial pick</span></div>' : '')
+        + '</td>'
+        + '<td>' + escapeHtml(row.authors || '—') + '</td>'
+        + '<td><span class="reference-badge reference-badge-green">' + escapeHtml(row.year || '—') + '</span></td>'
+        + '<td>'
+        + '<div><strong>' + escapeHtml(row.journal || '—') + '</strong></div>'
+        + (row.publication_type ? '<div style="margin-top:4px;"><span class="reference-badge">' + escapeHtml(row.publication_type) + '</span></div>' : '')
+        + '</td>'
+        + '<td><div class="reference-id-links">' + idsHtml + '</div></td>'
+        + '<td>'
+        + '<div style="display:flex; flex-direction:column; gap:4px; align-items:flex-start;">'
+        + '<button type="button" class="reference-copy-btn" data-copy-citation="' + escapeHtml(citationText) + '">Copy citation</button>'
+        + '<a href="/data_center/reference?id=' + row.id + '" style="font-size:var(--mgdb-text-xs); color:var(--mgdb-green-dark); text-decoration:none; font-weight:600;">Record &rarr;</a>'
+        + '</div>'
+        + '</td>'
+        + '</tr>';
+    }).join('');
+  }
+
+  function renderCardView(results) {
+    var container = byId('reference-cards-view');
+    if (!container) return;
+    container.innerHTML = results.map(function (row) {
+      var title = row.title || row.name || 'Untitled reference';
+      var citationParts = [row.journal, row.volume, row.pages].filter(Boolean);
+      var citation = citationParts.join(' · ');
+      var editorialPick = row.editorial_pick === true;
+      var citationText = [row.authors, row.year ? '(' + row.year + ')' : '', title, citation].filter(Boolean).join('. ');
+
       var links = '<a href="/data_center/reference?id=' + row.id + '">MaizeGDB record</a>';
       if (row.doi) {
         links += '<a href="https://doi.org/' + encodeURIComponent(row.doi) + '" target="_blank" rel="noopener">DOI ↗</a>';
-        links += '<button class="reference-copy-id" type="button" data-copy-value="' + escapeHtml(row.doi) + '">Copy DOI</button>';
       }
       if (row.pubmed) {
         links += '<a href="https://pubmed.ncbi.nlm.nih.gov/' + encodeURIComponent(row.pubmed) + '/" target="_blank" rel="noopener">PubMed ↗</a>';
-        links += '<button class="reference-copy-id" type="button" data-copy-value="' + escapeHtml(row.pubmed) + '">Copy PMID</button>';
       }
-      var editorialPick = row.editorial_pick === true;
+      links += '<button class="reference-copy-btn" type="button" data-copy-citation="' + escapeHtml(citationText) + '">Copy citation</button>';
+      if (row.doi) {
+        links += '<button class="reference-copy-btn" type="button" data-copy-value="' + escapeHtml(row.doi) + '">Copy DOI</button>';
+      }
+      if (row.pubmed) {
+        links += '<button class="reference-copy-btn" type="button" data-copy-value="' + escapeHtml(row.pubmed) + '">Copy PMID</button>';
+      }
+
       return '<article class="reference-result-card is-selectable' + (editorialPick ? ' is-editorial-pick' : '') + '" data-reference-id="' + row.id + '">'
         + '<label class="reference-result-select"><input type="checkbox" data-reference-select="' + row.id + '" aria-label="Select ' + escapeHtml(title) + '"></label>'
-        + '<div><div class="reference-result-meta">'
-        + (row.year ? '<span>' + row.year + '</span>' : '')
-        + (row.publication_type ? '<span>' + escapeHtml(row.publication_type) + '</span>' : '')
+        + '<div style="flex:1; min-width:0;">'
+        + '<div class="reference-result-meta">'
+        + (row.year ? '<span class="reference-badge reference-badge-green">' + row.year + '</span>' : '')
+        + (row.publication_type ? '<span class="reference-badge">' + escapeHtml(row.publication_type) + '</span>' : '')
         + (editorialPick ? '<span class="reference-editorial-badge">★ Editorial pick</span>' : '')
-        + (row.doi ? '<span>DOI</span>' : '') + (row.pubmed ? '<span>PubMed</span>' : '')
-        + '</div><h3><a href="/data_center/reference?id=' + row.id + '">' + escapeHtml(title) + '</a></h3>'
+        + (row.journal ? '<span class="reference-badge"><strong>' + escapeHtml(row.journal) + '</strong></span>' : '')
+        + '</div>'
+        + '<h3><a href="/data_center/reference?id=' + row.id + '">' + escapeHtml(title) + '</a></h3>'
         + (row.authors ? '<p class="reference-result-authors">' + escapeHtml(row.authors) + '</p>' : '')
         + (citation ? '<p class="reference-result-citation">' + escapeHtml(citation) + '</p>' : '')
         + (row.abstract ? '<p class="reference-result-abstract">' + escapeHtml(row.abstract) + (row.abstract.length >= 695 ? '…' : '') + '</p>' : '')
-        + '<div class="reference-result-links">' + links + '</div></div></article>';
+        + '<div class="reference-result-links">' + links + '</div>'
+        + '</div>'
+        + '</article>';
     }).join('');
+  }
 
-    Array.prototype.forEach.call(document.querySelectorAll('[data-reference-select]'), function (checkbox) {
-      checkbox.addEventListener('change', function () {
-        if (checkbox.checked) selectedIds[checkbox.getAttribute('data-reference-select')] = true;
-        else delete selectedIds[checkbox.getAttribute('data-reference-select')];
-        updateSelection();
+  function bindActions() {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-copy-citation]'), function (button) {
+      button.addEventListener('click', function () {
+        copyText(button.getAttribute('data-copy-citation'), button);
       });
     });
     Array.prototype.forEach.call(document.querySelectorAll('[data-copy-value]'), function (button) {
@@ -419,19 +560,69 @@
         copyText(button.getAttribute('data-copy-value'), button);
       });
     });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-reference-select]'), function (checkbox) {
+      checkbox.addEventListener('change', function () {
+        if (checkbox.checked) selectedIds[checkbox.getAttribute('data-reference-select')] = true;
+        else delete selectedIds[checkbox.getAttribute('data-reference-select')];
+        updateSelection();
+      });
+    });
   }
 
-  /* Narrows the page already rendered. The search pages server side, so this
-     filters what is on screen -- and, unlike every other hub, it deliberately
-     does NOT touch the figures below: those describe the matched set, and a
-     box that narrows one page should not appear to move them. */
-  function applyResultsFilter() {
-    var container = byId('reference-results');
-    if (!container) { return; }
+  function renderResults(data) {
+    var summary = data.summary;
+    var total = summary.total || 0;
+    var start = total ? (summary.page - 1) * summary.page_size + 1 : 0;
+    var end = Math.min(total, summary.page * summary.page_size);
+    var queryText = data.query.term ? ' for “' + data.query.term + '”' : '';
+    byId('reference-results-status').textContent = total
+      ? 'Showing ' + number(start) + '–' + number(end) + ' of ' + number(total)
+        + ' matches' + queryText + ' · ' + number(summary.elapsed_ms) + ' ms'
+      : 'No curated references matched' + queryText + '.';
+    byId('reference-resting').hidden = true;
+    byId('reference-empty').hidden = total !== 0;
 
-    var rows = container.querySelectorAll('.reference-result-card');
+    var selectPageBox = byId('reference-select-page');
+    if (selectPageBox && selectPageBox.parentElement) {
+      selectPageBox.parentElement.hidden = total === 0;
+      selectPageBox.checked = false;
+    }
+
+    if (total === 0) {
+      if (byId('reference-cards-view')) byId('reference-cards-view').hidden = true;
+      if (byId('reference-table-view')) byId('reference-table-view').hidden = true;
+      return;
+    }
+
+    var sorted = sortReferenceResults(data.results || []);
+    renderTableView(sorted);
+    renderCardView(sorted);
+    updateSortHeaders();
+    setView(viewMode);
+    bindActions();
+  }
+
+  /* Narrows the page already rendered across table and cards synchronously. */
+  function applyResultsFilter() {
+    var cardsContainer = byId('reference-cards-view');
+    var tableBody = byId('reference-results-body');
+    var cards = cardsContainer ? cardsContainer.querySelectorAll('.reference-result-card') : [];
+    var rows = tableBody ? tableBody.querySelectorAll('tr') : [];
     var terms = resultFilter.toLowerCase().split(/\s+/).filter(Boolean);
-    var shown = 0;
+    var shownCards = 0;
+    var shownRows = 0;
+
+    Array.prototype.forEach.call(cards, function (card) {
+      var match = true;
+      if (terms.length) {
+        var hay = (card.textContent || '').toLowerCase();
+        for (var i = 0; i < terms.length; i++) {
+          if (hay.indexOf(terms[i]) === -1) { match = false; break; }
+        }
+      }
+      card.hidden = !match;
+      if (match) shownCards++;
+    });
 
     Array.prototype.forEach.call(rows, function (row) {
       var match = true;
@@ -442,23 +633,24 @@
         }
       }
       row.hidden = !match;
-      if (match) { shown++; }
+      if (match) shownRows++;
     });
 
-    var status = byId('reference-results-status');
-    if (terms.length && status) {
-      var total = currentData && currentData.summary ? currentData.summary.total : 0;
-      status.textContent = shown === 0
-        ? 'Nothing on this page matches the filter \u201C' + resultFilter + '\u201D. '
-          + number(total) + ' references matched the search.'
-        : 'Showing ' + number(shown) + ' of the ' + number(rows.length)
-          + ' references on this page matching \u201C' + resultFilter + '\u201D, out of '
-          + number(total) + ' matched by the search.';
+    var filterCount = byId('reference-filter-count');
+    var totalOnPage = cards.length || rows.length;
+    if (filterCount) {
+      if (terms.length && totalOnPage) {
+        var shown = Math.max(shownCards, shownRows);
+        filterCount.textContent = shown + ' of ' + totalOnPage;
+      } else {
+        filterCount.textContent = '';
+      }
     }
   }
 
   function renderPagination(page, pageCount) {
     var nav = byId('reference-pagination');
+    if (!nav) return;
     if (pageCount <= 1) {
       nav.innerHTML = '';
       return;
@@ -552,17 +744,51 @@
   }
 
   function resetFilters() {
-    byId('reference-year-from').value = '';
-    byId('reference-year-to').value = '';
-    byId('reference-journal').value = '';
-    byId('reference-pub-type').value = '';
-    byId('reference-identifier').value = 'all';
-    byId('reference-sort').value = byId('reference-query').value ? 'relevance' : 'newest';
-    byId('reference-sort-compact').value = byId('reference-sort').value;
-    byId('reference-editorial').checked = false;
-    byId('reference-include-meeting').checked = true;
-    byId('reference-include-mnl').checked = true;
+    if (byId('reference-year-from')) byId('reference-year-from').value = '';
+    if (byId('reference-year-to')) byId('reference-year-to').value = '';
+    if (byId('reference-journal')) byId('reference-journal').value = '';
+    if (byId('reference-pub-type')) byId('reference-pub-type').value = '';
+    if (byId('reference-identifier')) byId('reference-identifier').value = 'all';
+    if (byId('reference-sort')) byId('reference-sort').value = byId('reference-query') && byId('reference-query').value ? 'relevance' : 'newest';
+    if (byId('reference-editorial')) byId('reference-editorial').checked = false;
+    if (byId('reference-include-meeting')) byId('reference-include-meeting').checked = true;
+    if (byId('reference-include-mnl')) byId('reference-include-mnl').checked = true;
+    syncAdvancedBadge();
     refresh(1, false);
+  }
+
+  function initSortButtons() {
+    var buttons = document.querySelectorAll('#reference-results-table thead th button[data-sort-key]');
+    Array.prototype.forEach.call(buttons, function (button) {
+      button.addEventListener('click', function () {
+        var key = button.getAttribute('data-sort-key');
+        if (sortKey === key) {
+          sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+          sortKey = key;
+          sortDir = (key === 'year' ? 'desc' : 'asc');
+        }
+        if (currentData && currentData.results) {
+          var sorted = sortReferenceResults(currentData.results);
+          renderTableView(sorted);
+          renderCardView(sorted);
+          updateSortHeaders();
+          bindActions();
+          applyResultsFilter();
+        }
+      });
+    });
+  }
+
+  function initViewToggle() {
+    var btnCards = byId('reference-view-cards');
+    var btnTable = byId('reference-view-table');
+    if (btnCards) {
+      btnCards.addEventListener('click', function () { setView('card'); });
+    }
+    if (btnTable) {
+      btnTable.addEventListener('click', function () { setView('table'); });
+    }
   }
 
   /* ── Section Tabs & Scrollspy ───────────────────────────────────────────── */
@@ -649,12 +875,23 @@
   function initialize() {
     if (!byId('reference-search-form')) return;
     buildTabs();
+    initSortButtons();
+    initViewToggle();
     applyUrlState();
 
     byId('reference-search-form').addEventListener('submit', function (event) {
       event.preventDefault();
       refresh(1, true);
     });
+
+    var advSubmit = byId('reference-adv-submit');
+    if (advSubmit) {
+      advSubmit.addEventListener('click', function (event) {
+        event.preventDefault();
+        refresh(1, true);
+      });
+    }
+
     byId('reference-query').addEventListener('input', function () {
       byId('reference-query-clear').hidden = !byId('reference-query').value;
       window.clearTimeout(searchTimer);
@@ -662,20 +899,28 @@
         searchTimer = window.setTimeout(function () { refresh(1, false); }, 500);
       }
     });
+
     byId('reference-query-clear').addEventListener('click', function () {
       byId('reference-query').value = '';
       byId('reference-query-clear').hidden = true;
       refresh(1, false);
       byId('reference-query').focus();
     });
+
     byId('reference-scope').addEventListener('change', function () { refresh(1, false); });
+
     ['reference-year-from', 'reference-year-to', 'reference-journal', 'reference-pub-type', 'reference-identifier',
-      'reference-editorial', 'reference-include-meeting', 'reference-include-mnl']
-      .forEach(function (id) { byId(id).addEventListener('change', function () { refresh(1, false); }); });
-    byId('reference-sort').addEventListener('change', function () {
-      byId('reference-sort-compact').value = byId('reference-sort').value;
-      refresh(1, false);
-    });
+      'reference-sort', 'reference-editorial', 'reference-include-meeting', 'reference-include-mnl']
+      .forEach(function (id) {
+        var el = byId(id);
+        if (el) {
+          el.addEventListener('change', function () {
+            syncAdvancedBadge();
+            refresh(1, false);
+          });
+        }
+      });
+
     byId('reference-page-size').addEventListener('change', function () {
       pageSize = this.value === 'all' ? 'all' : parseInt(this.value, 10) || 25;
       refresh(1, false);
@@ -686,11 +931,11 @@
       applyResultsFilter();
     });
 
-    byId('reference-sort-compact').addEventListener('change', function () {
-      byId('reference-sort').value = byId('reference-sort-compact').value;
-      refresh(1, false);
-    });
-    byId('reference-reset-filters').addEventListener('click', resetFilters);
+    var resetBtn = byId('reference-reset-filters');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', resetFilters);
+    }
+
     byId('reference-retry').addEventListener('click', function () { refresh(currentPage, false); });
 
     Array.prototype.forEach.call(document.querySelectorAll('[data-reference-example]'), function (button) {
@@ -698,6 +943,7 @@
         byId('reference-query').value = button.getAttribute('data-reference-example');
         byId('reference-scope').value = button.getAttribute('data-reference-scope') || 'all';
         byId('reference-query-clear').hidden = false;
+        syncAdvancedBadge();
         refresh(1, true);
       });
     });
@@ -710,14 +956,18 @@
       });
       updateSelection();
     });
+
     byId('reference-selection-clear').addEventListener('click', function () {
       selectedIds = {};
       Array.prototype.forEach.call(document.querySelectorAll('[data-reference-select]'), function (box) { box.checked = false; });
       updateSelection();
     });
+
     Array.prototype.forEach.call(document.querySelectorAll('[data-selected-export]'), function (button) {
       button.addEventListener('click', function () { selectedExport(button.getAttribute('data-selected-export'), button); });
     });
+
+    syncAdvancedBadge();
 
     /* Only run a search when the URL actually asks for one. A bare
        /data_center/reference now loads the dashboard and waits. */

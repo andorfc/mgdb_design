@@ -24,6 +24,12 @@
   };
 
   var archives = [
+    /* Cologne has been held; it belongs in the archive rather than only in the
+       attendance chart. The photograph is cologne_cathedral.jpg, not the legacy
+       cologne.png -- that one is 101x101 with no credit entry and no known
+       licence. This is the Rhine view from the Deutz bridge, 10000x5390 at
+       source, so it needs almost no cropping to fill the 122px band. */
+    {year:'2026', annual:68, location:'Cologne, Germany', url:'/mgc/maizemeeting/2026/', image:'/images/maize_meeting/cologne_cathedral.jpg', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2026Program.pdf'},
     {year:'2025', annual:67, location:'St. Louis, Missouri', url:'/mgc/maizemeeting/2025', image:'/images/maize_meeting/stlouis.png', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2025Program.pdf'},
     {year:'2024', annual:66, location:'Raleigh, North Carolina', url:'/mgc/maizemeeting/2024', image:'/images/maize_meeting/raleigh.png', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2024Program.pdf'},
     {year:'2023', annual:65, location:'St. Louis, Missouri', url:'/mgc/maizemeeting/2023', image:'/images/maize_meeting/stlouis.png', abstracts:'https://documents.maizegdb.org/maizemeeting/abstracts/2023Program.pdf'},
@@ -58,27 +64,93 @@
   ];
 
 
+  /* Steering committee, local host and ex-officio members, 2018-2026.
+
+     Restored 2026-09-09 from https://www.maizegdb.org/maize_meeting/, which is
+     still the only place this is recorded -- the first redesign dropped it, and
+     it is not in `legacy/`. Roles are the ones the source annotates in
+     parentheses; everyone else is a member with no role shown.
+
+     2027 is not here: its committee sits in the upcoming card's own expander in
+     templates/static/mgdb_maize_meeting.bau.
+
+     Person ids are kept so each name can link to its /person record. Two of the
+     source's ids are wrong and are corrected here rather than copied:
+     Frank Hochholdinger is 114023, not 1232861 (which is Jeffrey Ross-Ibarra's
+     record, and the source uses it for Frank in every year from 2022 on), and
+     Madelaine Bartlett is 974454, not 4974494 (which resolves to nothing --
+     it reads like 974454 with a digit in front). Both reported for the source
+     page; the names themselves were right. */
+  var leadership = {
+    '2026': {
+      committee: [{id:114023,name:"Frank Hochholdinger",role:"Chair"}, {id:1079330,name:"Anthony Studer",role:"Co-Chair"}, {id:134307,name:"Sherry Flint-Garcia",role:"Previous Chair"}, {id:2773322,name:"Oyenike Adeyemo"}, {id:15943,name:"Hank Bass"}, {id:1187651,name:"Sara Larsson"}, {id:9034294,name:"Penelope Lindsay"}, {id:9034269,name:"Katie Murphy"}, {id:1280767,name:"Cinta Romay"}, {id:40350,name:"Graziana Taramino"}, {id:1187774,name:"Feng Tian"}],
+      host: [{id:114023,name:"Frank Hochholdinger"}],
+      ex: [{id:1204262,name:"Carson Andorf"}, {id:882336,name:"Darwin Campbell"}, {id:3094837,name:"Sara Miller"}, {id:2772801,name:"John Portwood"}, {id:13016,name:"Marty Sachs"}, {id:3171877,name:"Erin Sparks"}]
+    },
+    '2025': {
+      committee: [{id:134307,name:"Sherry Flint-Garcia",role:"Chair"}, {id:114023,name:"Frank Hochholdinger",role:"Co-Chair"}, {id:3173153,name:"Rubén Rellán Álvarez",role:"Previous Chair"}, {id:2773322,name:"Oyenike Adeyemo"}, {id:15943,name:"Hank Bass"}, {id:10000404,name:"Melissa Draves"}, {id:3171591,name:"Keting Chen"}, {id:9034269,name:"Katie Murphy"}, {id:1280767,name:"Cinta Romay"}, {id:40350,name:"Graziana Taramino"}, {id:1187774,name:"Feng Tian"}, {id:953774,name:"Petra Wolters"}],
+      host: [{id:13016,name:"Marty Sachs"}],
+      ex: [{id:1204262,name:"Carson Andorf"}, {id:882336,name:"Darwin Campbell"}, {id:3094837,name:"Sara Miller"}, {id:2772801,name:"John Portwood"}, {id:13016,name:"Marty Sachs"}, {id:3171877,name:"Erin Sparks"}]
+    },
+    '2024': {
+      committee: [{id:3173153,name:"Rubén Rellán Álvarez",role:"Chair"}, {id:134307,name:"Sherry Flint-Garcia",role:"Co-Chair"}, {id:1280599,name:"Matthew Hufford",role:"Previous Chair"}, {id:2773322,name:"Oyenike Adeyemo"}, {id:974454,name:"Madelaine Bartlett"}, {id:15943,name:"Hank Bass"}, {id:3530965,name:"Lander Geadelmann"}, {id:114023,name:"Frank Hochholdinger"}, {id:3171657,name:"Stephanie Klein"}, {id:40350,name:"Graziana Taramino"}, {id:1187774,name:"Feng Tian"}, {id:953774,name:"Petra Wolters"}],
+      host: [{id:13016,name:"Marty Sachs"}],
+      ex: [{id:1204262,name:"Carson Andorf"}, {id:882336,name:"Darwin Campbell"}, {id:2772801,name:"John Portwood"}, {id:13016,name:"Marty Sachs"}, {id:3171877,name:"Erin Sparks"}]
+    },
+    '2023': {
+      committee: [{id:1280599,name:"Matthew Hufford",role:"Chair"}, {id:3173153,name:"Rubén Rellán Álvarez",role:"Co-Chair"}, {id:3171877,name:"Erin Sparks",role:"Previous Chair"}, {id:2773322,name:"Oyenike Adeyemo"}, {id:974454,name:"Madelaine Bartlett"}, {id:100066,name:"Mei Guo"}, {id:114023,name:"Frank Hochholdinger"}, {id:3171720,name:"Maria Angelica Sanclemente"}, {id:3218426,name:"Aimee Schulz"}, {id:953774,name:"Petra Wolters"}, {id:194162,name:"Marna Yandeau-Nelson"}],
+      host: [{id:13016,name:"Marty Sachs"}],
+      ex: [{id:1204262,name:"Carson Andorf"}, {id:99999,name:"David Braun"}, {id:882336,name:"Darwin Campbell"}, {id:2772801,name:"John Portwood"}, {id:13016,name:"Marty Sachs"}]
+    },
+    '2022': {
+      committee: [{id:3171877,name:"Erin Sparks",role:"Chair"}, {id:1280599,name:"Matthew Hufford",role:"Co-Chair"}, {id:194162,name:"Marna Yandeau-Nelson",role:"Previous Chair"}, {id:974454,name:"Madelaine Bartlett"}, {id:3171617,name:"Joe Gage"}, {id:100066,name:"Mei Guo"}, {id:114023,name:"Frank Hochholdinger"}, {id:17002,name:"Todd Jones"}, {id:3173153,name:"Rubén Rellán Álvarez"}, {id:3218434,name:"Samantha Snodgrass"}, {id:415500,name:"Maud Tenaillon"}, {id:953774,name:"Petra Wolters"}],
+      host: [{id:13016,name:"Marty Sachs"}],
+      ex: [{id:1204262,name:"Carson Andorf"}, {id:99999,name:"David Braun"}, {id:882336,name:"Darwin Campbell"}, {id:2772801,name:"John Portwood"}, {id:13016,name:"Marty Sachs"}]
+    },
+    '2021': {
+      committee: [{id:194162,name:"Marna Yandeau-Nelson",role:"Chair"}, {id:3171877,name:"Erin Sparks",role:"Co-Chair"}, {id:974454,name:"Madelaine Bartlett"}, {id:100066,name:"Mei Guo"}, {id:1280599,name:"Matthew Hufford"}, {id:17002,name:"Todd Jones"}, {id:952519,name:"Hilde Nelissen"}, {id:114023,name:"Jeff Ross-Ibarra"}, {id:415500,name:"Maud Tenaillon"}, {id:641776,name:"Clint Whipple"}, {id:1232807,name:"Yongrui Wu"}],
+      host: [{id:13016,name:"Marty Sachs"}],
+      ex: [{id:1204262,name:"Carson Andorf"}, {id:99999,name:"David Braun"}, {id:882336,name:"Darwin Campbell"}, {id:2772801,name:"John Portwood"}, {id:13016,name:"Marty Sachs"}]
+    },
+    '2020': {
+      committee: [{id:641776,name:"Clint Whipple",role:"Chair"}, {id:194162,name:"Marna Yandeau-Nelson",role:"Co-Chair"}, {id:16566,name:"Mike Muszynski"}, {id:487234,name:"Andrea Gallavotti"}, {id:952519,name:"Hilde Nelissen"}, {id:114023,name:"Jeff Ross-Ibarra"}, {id:1232807,name:"Yongrui Wu"}, {id:17002,name:"Todd Jones"}, {id:100066,name:"Mei Guo"}, {id:3171877,name:"Erin Sparks"}, {id:415500,name:"Maud Tenaillon"}],
+      host: [{id:16566,name:"Mike Muszynski"}],
+      ex: [{id:1204262,name:"Carson Andorf"}, {id:99999,name:"David Braun"}, {id:2772801,name:"John Portwood"}, {id:13016,name:"Marty Sachs"}]
+    },
+    '2019': {
+      committee: [{id:16566,name:"Mike Muszynski",role:"Chair"}, {id:641776,name:"Clint Whipple",role:"Co-Chair"}, {id:952519,name:"Hilde Nelissen"}, {id:487234,name:"Andrea Gallavotti"}, {id:917904,name:"Andrea Eveland"}, {id:144438,name:"Maike Stam"}, {id:1079323,name:"Thomas Slewinski"}, {id:1079127,name:"Sylvia Sousa"}, {id:172645,name:"Natalia de Leon"}, {id:114023,name:"Jeff Ross-Ibarra"}, {id:1232807,name:"Yongrui Wu"}, {id:17002,name:"Todd Jones"}],
+      host: [{id:13016,name:"Marty Sachs"}],
+      ex: [{id:1204262,name:"Carson Andorf"}, {id:99999,name:"David Braun"}, {id:17419,name:"Alain Charcosset"}, {id:2772801,name:"John Portwood"}, {id:13016,name:"Marty Sachs"}]
+    },
+    '2018': {
+      committee: [{id:17419,name:"Alain Charcosset",role:"Chair"}, {id:16566,name:"Mike Muszynski",role:"Co-Chair"}, {id:16249,name:"Erich Grotewold"}, {id:884558,name:"Karen McGinnis"}, {id:2714384,name:"Stephen Novak"}, {id:487234,name:"Andrea Gallavotti"}, {id:981183,name:"Jianbing Yan"}, {id:917904,name:"Andrea Eveland"}, {id:144438,name:"Maike Stam"}, {id:1079323,name:"Thomas Slewinski"}, {id:1079127,name:"Sylvia Sousa"}, {id:172645,name:"Natalia de Leon"}],
+      host: [{id:415500,name:"Maud Tenaillon"}],
+      ex: [{id:1204262,name:"Carson Andorf"}, {id:99999,name:"David Braun"}, {id:13016,name:"Marty Sachs"}]
+    }
+  };
+
   /* Photograph attribution. Every venue image is CC BY or CC BY-SA, which
      require credit, so each card carries the photographer's name and the licence
      and the archive section renders a full credits list underneath. Keyed by
      image path so a row without a photograph simply gets no credit. */
   var photoCredits = {
-    '/images/maize_meeting/allerton.jpg': {creator:"James Postema", license:"CC BY 4.0", title:"Reflecting pond at Robert Allerton Park.jpg", source:"https://commons.wikimedia.org/wiki/File:Reflecting_pond_at_Robert_Allerton_Park.jpg"},
+    '/images/maize_meeting/allerton.jpg': {creator:"D Finnigan", license:"CC BY-SA 3.0", title:"Allerton House and Pond at Allerton Park.jpg", source:"https://commons.wikimedia.org/wiki/File:Allerton_House_and_Pond_at_Allerton_Park.jpg"},
     '/images/maize_meeting/asilomar.jpg': {creator:"UnifiedFunctionality", license:"CC BY-SA 4.0", title:"Asilomar State Beach at Sunset.jpg", source:"https://commons.wikimedia.org/wiki/File:Asilomar_State_Beach_at_Sunset.jpg"},
-    '/images/maize_meeting/beijing.jpg': {creator:"\u00b7\u02d9\u00b7ChinaUli2010\u00b7.\u00b7", license:"CC BY 3.0", title:"\u00b7\u02d9\u00b7ChinaUli2010\u00b7.\u00b7 Beijing - Temple of Heaven Park - panoramio (7).jpg", source:"https://commons.wikimedia.org/w/index.php?curid=53373371"},
+    '/images/maize_meeting/beijing.jpg': {creator:"Peter23", license:"CC BY-SA 3.0", title:"Beijing national stadium.jpg", source:"https://commons.wikimedia.org/wiki/File:Beijing_national_stadium.jpg"},
     '/images/maize_meeting/chicago.jpg': {creator:"Aneekr at English Wikipedia", license:"CC BY-SA 3.0", title:"St. Charles Municipal Building (St. Charles, IL) 09", source:"https://commons.wikimedia.org/w/index.php?curid=6636572"},
+    '/images/maize_meeting/cologne_cathedral.jpg': {creator:"J\u00f6rg Braukmann", license:"CC BY-SA 4.0", title:"Dom (Deutzer Br\u00fccke).jpg", source:"https://commons.wikimedia.org/wiki/File:Dom_(Deutzer_Br%C3%BCcke).jpg"},
     '/images/maize_meeting/dc.jpg': {creator:"Sergiy Galyonkin from Raleigh, USA", license:"CC BY-SA 2.0", title:"Washington DC - United States Capitol at blue hour (51282289914)", source:"https://commons.wikimedia.org/w/index.php?curid=120353198"},
     '/images/maize_meeting/florida1.jpg': {creator:"TampaThings.com", license:"CC BY-SA 4.0", title:"Clearwater-beach-florida-pier-60", source:"https://commons.wikimedia.org/w/index.php?curid=107581285"},
     '/images/maize_meeting/florida2.jpg': {creator:"Visitor7", license:"CC BY-SA 3.0", title:"Kissimmee Lakefront Park-1.jpg", source:"https://commons.wikimedia.org/w/index.php?curid=32084736"},
-    '/images/maize_meeting/geneva.jpg': {creator:"Michael Barera", license:"CC BY-SA 4.0", title:"Lake Geneva April 2025 12 (Geneva Lake).jpg", source:"https://commons.wikimedia.org/wiki/File:Lake_Geneva_April_2025_12_(Geneva_Lake).jpg"},
+    '/images/maize_meeting/geneva.jpg': {creator:"Yinan Chen", license:"Public domain", title:"Gfp-wisconsin-lake-geneva-at-dusk.jpg", source:"https://commons.wikimedia.org/wiki/File:Gfp-wisconsin-lake-geneva-at-dusk.jpg"},
     '/images/maize_meeting/idaho.jpg': {creator:"Ken Lund from Reno, Nevada, USA", license:"CC BY-SA 2.0", title:"Lake Coeur d'Alene, Coeur d'Alene, Idaho (50083363521).jpg", source:"https://commons.wikimedia.org/wiki/File:Lake_Coeur_d%27Alene,_Coeur_d%27Alene,_Idaho_(50083363521).jpg"},
-    '/images/maize_meeting/italy.jpg': {creator:"Stefano Travasci", license:"CC BY 4.0", title:"Vista da nord su Riva del Garda (1)", source:"https://commons.wikimedia.org/w/index.php?curid=175677158"},
+    '/images/maize_meeting/italy.jpg': {creator:"High Contrast", license:"CC BY 3.0 DE", title:"Riva del Garda, Italy.jpg", source:"https://commons.wikimedia.org/wiki/File:Riva_del_Garda,_Italy.jpg"},
     '/images/maize_meeting/jacksonville.jpg': {creator:"Quintin Soloviev", license:"CC BY 4.0", title:"Jacksonville skyline", source:"https://commons.wikimedia.org/w/index.php?curid=182002489"},
     '/images/maize_meeting/mexico.jpg': {creator:"Carolina L\u00f3pez", license:"CC BY 2.0", title:"Palacio de Bellas Artes.jpg", source:"https://commons.wikimedia.org/w/index.php?curid=4269986"},
-    '/images/maize_meeting/portland.jpg': {creator:"King of Hearts", license:"CC BY-SA 4.0", title:"Portland from Pittock Mansion October 2019 panorama 2", source:"https://commons.wikimedia.org/w/index.php?curid=89570832"},
-    '/images/maize_meeting/raleigh.png': {creator:"Daderot", license:"Public domain", title:"Raleigh Convention Center - Raleigh, NC - DSC06102.JPG", source:"https://commons.wikimedia.org/wiki/File:Raleigh_Convention_Center_-_Raleigh,_NC_-_DSC06102.JPG"},
-    '/images/maize_meeting/stlouis.png': {creator:"Jaredgd", license:"CC BY-SA 4.0", title:"Gateway Arch & St. Louis Skyline 1", source:"https://commons.wikimedia.org/w/index.php?curid=176434724"},
-    '/images/maize_meeting/stmalo.png': {creator:"Gzen92", license:"CC BY-SA 4.0", title:"Fort National - maison (Saint-Malo).jpg", source:"https://commons.wikimedia.org/wiki/File:Fort_National_-_maison_(Saint-Malo).jpg"}
+    '/images/maize_meeting/portland.jpg': {creator:"S.Stults", license:"CC BY-SA 4.0", title:"Mount Hood overlooks Portland,Oregon.png", source:"https://commons.wikimedia.org/wiki/File:Mount_Hood_overlooks_Portland,Oregon.png"},
+    '/images/maize_meeting/raleigh.png': {creator:"Mark Turner", license:"Public domain", title:"Downtown-Raleigh-from-Western-Boulevard-Overpass-20081012.jpeg", source:"https://commons.wikimedia.org/wiki/File:Downtown-Raleigh-from-Western-Boulevard-Overpass-20081012.jpeg"},
+    '/images/maize_meeting/stlouis.png': {creator:"Daniel Schwen", license:"CC BY-SA 4.0", title:"St Louis night expblend.jpg", source:"https://commons.wikimedia.org/wiki/File:St_Louis_night_expblend.jpg"},
+    '/images/maize_meeting/stmalo.png': {creator:"Gzen92", license:"CC BY-SA 4.0", title:"Remparts (Saint-Malo) (2).jpg", source:"https://commons.wikimedia.org/wiki/File:Remparts_(Saint-Malo)_(2).jpg"},
   };
 
   function creditFor(image) { return image ? photoCredits[image] : null; }
@@ -86,7 +158,9 @@
   /* Archive photographs are referenced from this script, not from a resource
      tag, so Bauplan's automatic ?v= never reaches them and the CDN went on
      serving the pre-replacement images. Bump this when a photograph changes. */
-  var PHOTO_VERSION = '2';
+  /* Bumped when a venue photograph is replaced: the paths do not change, so
+     without this a returning reader keeps the cached old frame. */
+  var PHOTO_VERSION = '4';
 
   function photoUrl(path) {
     return path ? path + (path.indexOf('?') === -1 ? '?v=' + PHOTO_VERSION : '') : path;
@@ -113,6 +187,43 @@
     return Math.floor(year / 10) * 10 + 's';
   }
 
+  /* The steering committee, local host and ex-officio members for one meeting.
+
+     Closed by default and inside the card: 11-13 names on every card from 2018
+     on would push the rest of the archive off the screen, and the reason to
+     open one is to look up a particular year. <details> rather than scripted
+     state -- it is open/closed and nothing else, it works before the script
+     runs, and the browser's own find-in-page can reach inside it.
+
+     Names link to their /person record, which is what the source page did. */
+  function personList(people) {
+    return '<ul>' + people.map(function (p) {
+      return '<li><a href="/person?id=' + p.id + '">' + escapeHtml(p.name) + '</a>'
+           + (p.role ? ' <span>' + escapeHtml(p.role) + '</span>' : '') + '</li>';
+    }).join('') + '</ul>';
+  }
+
+  function leadershipFor(row) {
+    /* Both 2020 rows -- the canceled in-person meeting and the virtual one that
+       replaced it -- are the same meeting year and the same committee, and the
+       source records one "2020 Steering Committee". They share it, the way they
+       already share the abstract book. */
+    var l = leadership[row.year === 'v2020' ? '2020' : row.year];
+    if (!l) { return ''; }
+    var right = '';
+    if (l.host && l.host.length) {
+      right += '<h4>Local host</h4>' + personList(l.host);
+    }
+    if (l.ex && l.ex.length) {
+      right += '<h4>Ex-officio members</h4>' + personList(l.ex);
+    }
+    return '<details class="meeting-archive-more"><summary>More details</summary>'
+      + '<div class="meeting-event-people">'
+      + '<div><h4>Steering committee</h4>' + personList(l.committee) + '</div>'
+      + (right ? '<div>' + right + '</div>' : '')
+      + '</div></details>';
+  }
+
   function renderArchive() {
     var grid = byId('meeting-archive-grid');
     if (!grid) return;
@@ -128,7 +239,8 @@
       var note = row.note || ordinal(row.annual) + ' annual meeting';
       var media = row.image
         ? '<span class="meeting-archive-thumb"><img src="' + photoUrl(row.image) + '" alt="" loading="lazy" /></span>'
-        : '<span class="meeting-archive-thumb meeting-archive-placeholder" aria-hidden="true">Canceled</span>';
+        : '<span class="meeting-archive-thumb meeting-archive-placeholder" aria-hidden="true">'
+          + (row.canceled ? 'Canceled' : row.year) + '</span>';
       /* The card is no longer one big link: it carries two of its own -- the
          archived meeting website and the abstract book -- and a link inside a
          link is not markup a browser will honour. The photographer credit that
@@ -141,7 +253,8 @@
       return '<article class="meeting-archive-card' + (row.canceled ? ' is-canceled' : '') + '">' + media
         + '<span class="meeting-archive-copy"><span class="meeting-archive-year">' + row.year
         + '</span><strong>' + row.location + '</strong><small>' + note + '</small>'
-        + '<span class="meeting-archive-links">' + links + '</span></span></article>';
+        + '<span class="meeting-archive-links">' + links + '</span>'
+        + leadershipFor(row) + '</span></article>';
     }).join('');
     byId('meeting-archive-count').textContent = visible.length + (visible.length === 1 ? ' site shown' : ' sites shown');
     byId('meeting-archive-clear').hidden = !query;

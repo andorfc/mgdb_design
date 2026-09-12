@@ -20,13 +20,15 @@ if (!$DBConn) {
 
 $term     = isset($_GET['term']) ? trim($_GET['term']) : '';
 $assembly = isset($_GET['assembly']) ? trim($_GET['assembly']) : '';
+$sort     = isset($_GET['sort']) ? trim($_GET['sort']) : '';
 $format   = isset($_GET['format']) ? strtolower(trim($_GET['format'])) : 'json';
 $offset   = isset($_GET['offset']) ? max(0, (int) $_GET['offset']) : 0;
 $limit    = isset($_GET['limit']) ? min(200, max(1, (int) $_GET['limit'])) : 50;
 
 $filters = array(
     'term'     => $term,
-    'assembly' => $assembly
+    'assembly' => $assembly,
+    'sort'     => $sort
 );
 
 $res = expressionSearch($DBConn, $filters, $limit, $offset);
@@ -82,7 +84,8 @@ echo json_encode(array(
     ),
     'filters' => array(
         'term'     => $term,
-        'assembly' => $assembly
+        'assembly' => $assembly,
+        'sort'     => $sort
     ),
     'results' => $res['results']
 ));

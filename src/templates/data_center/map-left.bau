@@ -1,0 +1,348 @@
+*(map-left
+<div id="datacenter_left_col">
+  <p style="margin-bottom: 8px;">
+    <span id="datacenter_title">Simple Map Search</span>
+  </p>
+  <p>
+    <a href="../handyref">Handy reference</a> for determining what 
+    are the most current maps and for understanding the content of 
+    the various Neighbors maps. 
+  </p>
+  <p>
+    If you are looking for <span style="font-weight:bold">particular map markers</span>,
+    use the <span style="font-weight:bold"><a href="locus">locus search</a></span>.
+  </p>
+  <div id="datacenter_gray_background">
+    <p>
+      This search form allows you to just enter a name or partial name to quickly retrieve 
+      the desired map.
+      <br>
+      
+      *(simple-search-instructions #load: templates/data_center/simple_search_instructions.bau#)
+      
+    </p>
+    <div name="button_container" class="button_container">
+      <form  name="n1" method="get" action="javascript:getSearchData('map', 'simple_results', document.getElementById('term'\).value\);" class="tiny">
+        <input type="text" name="term" id="term" size="20" value="$(term)" class="quick_search">
+        <input type="submit" name="button"  value="Submit" class="button">
+        (see a <a href="#" onClick="document.getElementById('term'\).value = 'UMC 98';">sample map query</a>\)<br>
+        @(limits
+          *(adjust_limits #load: templates/data_center/set_search_limit.bau#)
+        )
+      </form>
+    </div>
+    <script type="text/javascript">
+        document.n1.term.focus(\);
+    </script>
+    <p>
+      Another interesting search is <span style="font-weight:bold;">SSR</span>
+      (finds maps assembled using SSRs\)
+    </p>
+    <br>
+    <div id='simple_results'></div>
+    
+    @(start-search #display:off#
+      <script language="javascript">
+        getSearchData('map', 'simple_results', '$(term)'\);
+      </script>
+    )
+  </div>
+  <br>
+  
+  <p style="margin-bottom: 8px;">
+    <span id="datacenter_title">Advanced Map Search</span>
+  </p>
+  <p>
+    Are you looking for <a href="../bin_viewer">core bin markers</a>?
+  </p>
+  <div id="datacenter_lite_green_background">
+    <table CELLPADDING=6 CELLSPACING=4 BORDER=0 WIDTH="100%" 
+      summary="A table within which you can review your search criteria.">
+      <tr>
+        <td WIDTH="100%"  VALIGN="TOP" CLASS="small">
+          <p style="margin-bottom: 8px;">
+            <span id="datacenter_title">Set Up Search Criteria</span>
+          </p>
+          <p>
+            Check the boxes next to the fields you want to search; by setting a
+            criterion, the box will be checked for you.  Only checked boxes will
+            have that criterion evaluated.
+          </p>
+          <form method="get" action="javascript: map_adv_search('adv_results'\);" 
+            style="margin-bottom: 0px; margin-top: 0px; padding-bottom: 0px;">
+            <input type="hidden" name="query" value="true">
+            <input type="checkbox" id="box1" name="use1" value="true"> 
+            <label for="box1">Show only maps</label> that contain 
+            <label for="locus1box">this locus</label> 
+            <input type="text" size="10" maxlength="20" name="locus1box" 
+              id="locus1box" class="small" onchange="document.getElementById(\'box1\'\).checked = true;">
+            (for example, you could find maps with 
+            <a href="#" onClick="document.getElementById(\'locus1box\'\).value = \'kn1\'; document.getElementById(\'box1\'\).checked = true;">kn1</a>\)&nbsp;(AND\)
+            <br>
+            <input type="checkbox" id="box2" name="use2" value="true"> 
+            <label for="box2">Show only maps</label> that contain 
+            <label for="locus2box">this locus</label> 
+            <input type="text" size="10" maxlength="20" name="locus2box"
+            id="locus2box" class="small" onchange="document.getElementById(\'box2\'\).checked = true;"> 
+            (for example, you could find maps with 
+            <a href="#" onClick="document.getElementById(\'locus2box\'\).value = \'tub1\'; document.getElementById(\'box2\'\).checked = true;">tub1</a>\)&nbsp;(AND\)
+            <br>
+            <input type="checkbox" id="box3" name="use3" value="true"> 
+            <label for="box3">Show only maps</label> that contain 
+            <label for="locus3box">this locus</label> 
+            <input type="text" size="10" maxlength="20" name="locus3box" 
+            id="locus3box" class="small" onchange="document.getElementById(\'box3\'\).checked = true;">
+            <br>
+            <input type="checkbox" id="box4" name="use4" value="true"> 
+            <label for="box4">Show only maps</label> of <label for="chrom">this chromosome</label>:
+            <select name="chrom" id="chrom" class="small" onchange="document.getElementById(\'box4\'\).checked = true;">
+              $(lg_options)
+            </select>
+            <br>
+            <input type="checkbox" id="box5" name="use5" value="true">
+            <label for="box5">Show only maps</label> from 
+            <label for="source">this source</label>: 
+            <select name="source" id="source" class="small" onchange="document.getElementById(\'box5\'\).checked = true;">
+              $(sources)
+            </select>
+            <br>
+            <input type="checkbox" id="box6" name="use6" value="true"> 
+            <label for="box6">Show only maps</label> from 
+            <label for="panel">this mapping panel</label>: 
+            <select name="panel" id="panel" class="small" onchange="document.getElementById(\'box6\'\).checked = true;">
+              $(panels)
+            </select>
+            <br><br>        
+            <input type="button" class="button" id="submit" value="Submit" onclick="javascript:map_adv_search('adv_results'\);">&nbsp;
+            <input type="button" class="button" id="clear" value="Clear" onclick="javascript:this.form.reset(\);">
+            @(adv_limits
+              *(adv_adjust_limits #load: templates/data_center/set_adv_search_limit.bau#)
+            )
+          </form>
+          
+          <div id="adv_results"></div>
+        </td>
+     </tr>
+    </table>
+  </div>
+  <br>
+  <p style="margin-bottom: 8px;">
+    <span id="datacenter_title">Map Reports & Tools</span>
+  </p>
+  <p>
+    <span style="font-weight:bold;"><a href="/snpversity">SNPversity</a></span>: 
+    This tool allows you to search for SNPs and compare them in thousands of inbred lines. 
+  </p>
+  <p> 
+    <span style="font-weight:bold;"><a href="../incongruency">Incongruencies between B73 RefGen_v2 and ISU Integrated IBM 2009 map </a></span>:
+    This tool lists loci that are placed on B73 RefGen_v2 by sequence similarity 
+    (via BLAST\),and compares that position to their predicted genomic position based on their
+    genetic position on the ISU Integrated IBM 2009 map.
+  </p><br>
+  <p> 
+    A list of all maps can be found here: 
+    (chromosome  
+    <a href="javascript:full_list_1(\);">1</a>
+    <a href="javascript:full_list_2(\);">2</a> 
+    <a href="javascript:full_list_3(\);">3</a> 
+    <a href="javascript:full_list_4(\);">4</a>
+    <a href="javascript:full_list_5(\);">5</a>
+    <a href="javascript:full_list_6(\);">6</a>
+    <a href="javascript:full_list_7(\);">7</a> 
+    <a href="javascript:full_list_8(\);">8</a>
+    <a href="javascript:full_list_9(\);">9</a>
+    <a href="javascript:full_list_10(\);">10</a> 
+    \)
+  </p><br>
+  <p>Here are some of the more popular complete maps.</p>
+  <p><b><u>Consensus maps</u></b></p>
+  <p style="margin-top:5px; margin-left:14px;">
+    <span style="font-weight:bold">Genetic</span> (lg. 
+    <a href="/data_center/map?id=1203637">1</a> 
+    <a href="/data_center/map?id=1203638">2</a> 
+    <a href="/data_center/map?id=1203639">3</a> 
+    <a href="/data_center/map?id=1203640">4</a> 
+    <a href="/data_center/map?id=1203641">5</a> 
+    <a href="/data_center/map?id=1203642">6</a> 
+    <a href="/data_center/map?id=1203643">7</a> 
+    <a href="/data_center/map?id=1203644">8</a> 
+    <a href="/data_center/map?id=1203645">9</a> 
+    <a href="/data_center/map?id=1203646">10</a>\)
+    <br>
+    <span style="font-weight:bold">IBM Neighbors</span> (lg. 
+    <a href="/data_center/map?id=754720">1</a> 
+    <a href="/data_center/map?id=754721">2</a> 
+    <a href="/data_center/map?id=754722">3</a> 
+    <a href="/data_center/map?id=754723">4</a> 
+    <a href="/data_center/map?id=754724">5</a> 
+    <a href="/data_center/map?id=754725">6</a> 
+    <a href="/data_center/map?id=754726">7</a> 
+    <a href="/data_center/map?id=754727">8</a> 
+    <a href="/data_center/map?id=754728">9</a> 
+    <a href="/data_center/map?id=754729">10</a>\): 
+    Genes placed by recombinational and physical data.
+  </p>
+  <br>
+  <p><b><u>High resolution maps</u></b></p>
+  <p style="margin-top:5px; margin-left:10px;">
+    <b>Mixed Markers (RFLP, SSR, SNP, INDEL\):</b>
+  </p>
+    <p style="margin-top:5px; margin-left:20px;">
+
+    <span style="font-weight:bold">IBM2</span> (chrom. 
+    <a href="/data_center/map?id=870745">1</a> 
+    <a href="/data_center/map?id=870746">2</a> 
+    <a href="/data_center/map?id=870747">3</a>
+    <a href="/data_center/map?id=870748">4</a> 
+    <a href="/data_center/map?id=870749">5</a> 
+    <a href="/data_center/map?id=870750">6</a> 
+    <a href="/data_center/map?id=870751">7</a> 
+    <a href="/data_center/map?id=870752">8</a> 
+    <a href="/data_center/map?id=870753">9</a> 
+    <a href="/data_center/map?id=870754">10</a>\):
+    Intermated B73/Mo17, a high resolution genetic map
+    <br>
+    <span style="font-weight:bold">IBM GNP2004</span> (chrom. 
+    <a href="/data_center/map?id=954207">1</a> 
+    <a href="/data_center/map?id=954208">2</a> 
+    <a href="/data_center/map?id=954209">3</a> 
+    <a href="/data_center/map?id=954210">4</a> 
+    <a href="/data_center/map?id=954211">5</a> 
+    <a href="/data_center/map?id=954212">6</a> 
+    <a href="/data_center/map?id=954213">7</a> 
+    <a href="/data_center/map?id=954214">8</a> 
+    <a href="/data_center/map?id=954215">9</a> 
+    <a href="/data_center/map?id=954216">10</a>\):
+    Genetic map from Genoplante.
+    <br>
+
+    <span style="font-weight:bold">ISU Integrated IBM 2009</span> (chrom. 
+    <a href="/data_center/map?id=1233730">1</a> 
+    <a href="/data_center/map?id=1233731">2</a> 
+    <a href="/data_center/map?id=1233732">3</a> 
+    <a href="/data_center/map?id=1233733">4</a> 
+    <a href="/data_center/map?id=1233734">5</a> 
+    <a href="/data_center/map?id=1233735">6</a> 
+    <a href="/data_center/map?id=1233736">7</a> 
+    <a href="/data_center/map?id=1233737">8</a> 
+    <a href="/data_center/map?id=1233738">9</a> 
+    <a href="/data_center/map?id=1233739">10</a>\)
+    <br>
+    <span style="font-weight:bold">LHRF Gnp2004</span> (chrom. 
+    <a href="/data_center/map?id=954374">1</a> 
+    <a href="/data_center/map?id=954375">2</a> 
+    <a href="/data_center/map?id=954376">3</a> 
+    <a href="/data_center/map?id=954377">4</a> 
+    <a href="/data_center/map?id=954378">5</a> 
+    <a href="/data_center/map?id=954379">6</a> 
+    <a href="/data_center/map?id=954380">7</a> 
+    <a href="/data_center/map?id=954381">8</a> 
+    <a href="/data_center/map?id=954382">9</a> 
+    <a href="/data_center/map?id=954383">10</a>\):
+    High-resolution genetic map from Genoplante.
+    <br>
+
+    <span style="font-weight:bold">NAM  </span> (chrom. 
+    <a href="/data_center/map?id=1160762">1</a> 
+    <a href="/data_center/map?id=1160763">2</a> 
+    <a href="/data_center/map?id=1160764">3</a> 
+    <a href="/data_center/map?id=1160765">4</a> 
+    <a href="/data_center/map?id=1160766">5</a>
+    <a href="/data_center/map?id=1160767">6</a>
+    <a href="/data_center/map?id=1160768">7</a> 
+    <a href="/data_center/map?id=1160769">8</a> 
+    <a href="/data_center/map?id=1160770">9</a> 
+    <a href="/data_center/map?id=1160771">10</a>\):
+    Nested Association Mapping (NAM\) for maize<br>
+    </p>
+    <p style="margin-top:5px; margin-left: 10px; font-weight: bold;">
+    SNP - MaizeSNP50 array based:
+    </p>
+    <p style="margin-top:5px; margin-left:20px;">
+        <span style="font-weight:bold">IBM MaizeSNP50</span> (chrom. 
+        <a href="/data_center/map?id=2776662">1</a> 
+        <a href="/data_center/map?id=2776663">2</a> 
+        <a href="/data_center/map?id=2776664">3</a> 
+        <a href="/data_center/map?id=2776665">4</a> 
+        <a href="/data_center/map?id=2776666">5</a> 
+        <a href="/data_center/map?id=2776667">6</a> 
+        <a href="/data_center/map?id=2776668">7</a> 
+        <a href="/data_center/map?id=2776669">8</a> 
+        <a href="/data_center/map?id=2776670">9</a> 
+        <a href="/data_center/map?id=2776671">10</a>\)
+        <br>
+        <span style="font-weight:bold">LHRF MaizeSNP50</span> (chrom. 
+        <a href="/data_center/map?id=2776672">1</a> 
+        <a href="/data_center/map?id=2776673">2</a> 
+        <a href="/data_center/map?id=2776674">3</a> 
+        <a href="/data_center/map?id=2776675">4</a> 
+        <a href="/data_center/map?id=2776676">5</a> 
+        <a href="/data_center/map?id=2776677">6</a> 
+        <a href="/data_center/map?id=2776678">7</a> 
+        <a href="/data_center/map?id=2776679">8</a> 
+        <a href="/data_center/map?id=2776680">9</a> 
+        <a href="/data_center/map?id=2776681">10</a>\)
+        <br>
+         <span style="font-weight:bold">Cornfed Dent Composite</span> (chrom. 
+        <a href="/data_center/map?id=3133142">1</a> 
+        <a href="/data_center/map?id=3133143">2</a> 
+        <a href="/data_center/map?id=3133144">3</a> 
+        <a href="/data_center/map?id=3133145">4</a> 
+        <a href="/data_center/map?id=3133146">5</a> 
+        <a href="/data_center/map?id=3133147">6</a> 
+        <a href="/data_center/map?id=3133148">7</a> 
+        <a href="/data_center/map?id=3133149">8</a> 
+        <a href="/data_center/map?id=3133150">9</a> 
+        <a href="/data_center/map?id=3133151">10</a>\)
+        <br>
+        <span style="font-weight:bold">Cornfed Flint Composite</span> (chrom. 
+        <a href="/data_center/map?id=3094852">1</a> 
+        <a href="/data_center/map?id=3133133">2</a> 
+        <a href="/data_center/map?id=3133134">3</a> 
+        <a href="/data_center/map?id=3133135">4</a> 
+        <a href="/data_center/map?id=3133136">5</a> 
+        <a href="/data_center/map?id=3133141">6</a> 
+        <a href="/data_center/map?id=3133137">7</a> 
+        <a href="/data_center/map?id=3133138">8</a> 
+        <a href="/data_center/map?id=3133139">9</a> 
+        <a href="/data_center/map?id=3133140">10</a>\)
+        <br>
+    </p>
+     
+  
+  <br>
+  <p>
+    <b>Physical Map</b>:
+    View information about the physical map from the 
+    <a href="https://archive.maizegdb.org/documentation/maizemap/index.php">Maize Mapping Project</a>.
+    <br>
+    <span style="font-weight:bold"><a href="/data_center/cytogenetic#rn-maps">Recombination Nodule Maps</a></span>:
+    Map containing data on the distribution of recombination nodules along 
+    pachytene synaptonemal complexes can be used to predict cytological locations
+    of genetically mapped loci and vice versa using the 
+    Morgan2McClintock Translator
+    <!-- 2026-09-07: the Morgan2McClintock link was removed. dill-picl.org was
+         re-registered 2025-06-21 and now serves a gambling site; the m2m
+         subdomain is NXDOMAIN. The tool is named but not linked. -->
+    <br>
+  </p>
+  <br>
+  <p>
+    <span id="datacenter_title">Map Score Downloads</span>
+    <br><br>
+    <span style="text-decoration:underline;">IBM 94 population</span> 
+    <a href="/mapscore_ibmlist">list of lines</a>, 
+    <a href="/mapscore_ibmscore"> cIBM map scores</a> (on-frame only\), 
+    <a href="/mapscore_ibm94genoscore">IBM GNP 2004 map scores</a> (complete set\),
+    and a <a href="$(root_link)/docs/ibm94mm.txt">MapMaker infile</a> (which includes all markers
+    in MaizeGDB that have been mapped using the IBM 94 population and also 
+    includes the ISU-IBM Map4 IDP markers\).
+    <br>
+    <span style="text-decoration:underline;">IBM 302 population</span> 
+    <a href="/mapscore_ibm302list">list of lines</a>, 
+    <a href="/mapscore_ibm302score">map scores</a>, and 
+    <a href="/data_center/qtl-data">QTL Cartographer files</a>.
+  </p>
+  <br>
+</div>
+)

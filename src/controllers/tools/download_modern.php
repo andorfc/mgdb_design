@@ -1,7 +1,7 @@
 <?php
 /* file: controllers/tools/download_modern.php
  *
- * purpose: Modernized controller for Bulk Downloads & Globus Data Portal (/download, /downloads)
+ * purpose: Modernized controller for the Download Data Hub (/download, /downloads)
  */
 
 include_once('./include/db-api.php');
@@ -17,7 +17,7 @@ header("Cache-Control: no-cache, no-store, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-$bauplan = new Bauplan('Bulk Downloads & Globus Data Portal | MaizeGDB');
+$bauplan = new Bauplan('Download Data Hub | MaizeGDB');
 $bauplan->modern();
 
 $doc_root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';
@@ -60,7 +60,6 @@ $page_data = dashboardCache($system, 'download/page', function () use ($DBConn) 
 });
 
 $content->get('total_assemblies')->replace(number_format($page_data['total_assemblies']));
-$content->get('data_date')->replace($page_data['data_date']);
 
 include_once('translation.php');
 echo $bauplan->publish();

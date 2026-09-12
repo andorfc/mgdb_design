@@ -1,0 +1,161 @@
+/* The site-wide 404 — MaizeGDB modern design system.
+ *
+ * The ground, the white section cards, their colored top edges, the card grid
+ * and the Related resources panel all come from css/mgdb-hub.css, which is
+ * loaded first. Only what is specific to this page lives here.
+ */
+
+.mgdb-modern .mgdb-not-found-page { padding-bottom: clamp(3rem, 6vw, 5.5rem); }
+
+/* ── Hero ────────────────────────────────────────────────────────────────── */
+
+.mgdb-not-found-page .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+/* The site's own 404 artwork: an aerial photograph of a corn maze cut into the
+   shape 404. It shipped as a 542x358 PNG weighing 338 KB, for a slot 200px
+   wide. It is a photograph, so PNG was the expensive part -- downscaling to
+   400px only reached 203 KB, while the same 400px as JPEG is 52 KB. Served as
+   JPEG here; /images/404err.png is downscaled in place for the legacy template
+   that still names it. Not lazy-loaded: it is the first thing above the fold. */
+.mgdb-not-found-page .not-found-emblem img {
+  width: min(100%, 200px);
+  height: auto;
+  aspect-ratio: 400 / 264;
+}
+
+/* The address the reader actually asked for. Long enough to wrap on a phone,
+   and it holds a path, so it breaks anywhere rather than pushing the page
+   sideways. */
+.mgdb-not-found-page .not-found-path {
+  margin: var(--mgdb-space-3) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-not-found-page .not-found-path code {
+  padding: 0.15em 0.45em;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-sunken);
+  overflow-wrap: anywhere;
+}
+
+/* ── Tab bar ─────────────────────────────────────────────────────────────── */
+
+/* One row at every width, so the flat offset below stays true however the
+   labels render. Same treatment as the other pages on this shell. */
+.mgdb-not-found-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-5);
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mgdb-not-found-page .mgdb-section-tabs a { white-space: nowrap; }
+
+.mgdb-hub-page.mgdb-not-found-page > section[id] { scroll-margin-top: 65px; }
+.mgdb-not-found-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+/* ── What to try ─────────────────────────────────────────────────────────── */
+
+/* A numbered list because the order is real: search first, because it answers
+   most of these; report last, because it costs someone else's time. */
+.mgdb-not-found-page .not-found-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  gap: var(--mgdb-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: not-found-step;
+}
+
+.mgdb-not-found-page .not-found-steps > li {
+  position: relative;
+  min-width: 0;
+  padding: var(--mgdb-space-4) var(--mgdb-space-4) var(--mgdb-space-4) 3.4rem;
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: #ffffff;
+  counter-increment: not-found-step;
+}
+
+.mgdb-not-found-page .not-found-steps > li::before {
+  content: counter(not-found-step);
+  position: absolute;
+  top: var(--mgdb-space-4);
+  left: var(--mgdb-space-4);
+  display: grid;
+  width: 1.9rem;
+  height: 1.9rem;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 800;
+}
+
+.mgdb-not-found-page .not-found-steps h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+}
+
+.mgdb-not-found-page .not-found-steps p {
+  margin: 0;
+  color: var(--mgdb-ink-soft);
+  line-height: 1.6;
+}
+
+.mgdb-not-found-page .not-found-lead {
+  max-width: 62rem;
+  margin: 0 0 var(--mgdb-space-4);
+  color: var(--mgdb-ink-soft);
+}
+
+/* ── Hub cards ───────────────────────────────────────────────────────────── */
+
+/* Six cards, so three and three -- the same count rule the Related panel
+   follows. Pinned rather than auto-fit because these are destinations of equal
+   weight and a stranded sixth would read as an afterthought. */
+.mgdb-not-found-page .not-found-hub-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+@media (max-width: 1000px) {
+  .mgdb-not-found-page .not-found-hub-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 620px) {
+  .mgdb-not-found-page .not-found-hub-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+.mgdb-not-found-page .not-found-hub {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.mgdb-not-found-page .not-found-hub strong { color: var(--mgdb-green-dark); }
+
+.mgdb-not-found-page .not-found-hub span {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.5;
+}
+
+.mgdb-not-found-page .not-found-hub:hover strong { text-decoration: underline; }

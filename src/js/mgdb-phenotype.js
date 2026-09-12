@@ -23,6 +23,8 @@
     filter: '',
     searched: false,
     sort: 'relevance',
+    sortKey: 'name',
+    sortDir: 'asc',
     view: 'table',
     currentData: null,
     loading: false
@@ -48,6 +50,112 @@
 
   function number(n) {
     return Number(n || 0).toLocaleString();
+  }
+
+  /* ── Sorting ────────────────────────────────────────────────────────────── */
+
+  function getPhenoHeaderAriaSort(colKey) {
+    if (state.sortKey === colKey) {
+      return state.sortDir === 'desc' ? 'descending' : 'ascending';
+    }
+    return 'none';
+  }
+
+  function sortPhenoResults(results) {
+    if (!results || !results.length) return [];
+    var key = state.sortKey || 'name';
+    var dir = state.sortDir === 'desc' ? -1 : 1;
+
+    return results.slice().sort(function (a, b) {
+      if (key === 'trait') {
+        var aTrait = (a.trait_name || '').trim().toLowerCase();
+        var bTrait = (b.trait_name || '').trim().toLowerCase();
+        if (aTrait && !bTrait) return -1 * dir;
+        if (!aTrait && bTrait) return 1 * dir;
+        var cmpTrait = aTrait.localeCompare(bTrait, undefined, { numeric: true });
+        if (cmpTrait !== 0) return cmpTrait * dir;
+      } else if (key === 'parts') {
+        var aParts = (a.body_parts || '').trim().toLowerCase();
+        var bParts = (b.body_parts || '').trim().toLowerCase();
+        if (aParts && !bParts) return -1 * dir;
+        if (!aParts && bParts) return 1 * dir;
+        var cmpParts = aParts.localeCompare(bParts, undefined, { numeric: true });
+        if (cmpParts !== 0) return cmpParts * dir;
+      } else if (key === 'synonyms') {
+        var aSyn = (a.synonyms || '').trim().toLowerCase();
+        var bSyn = (b.synonyms || '').trim().toLowerCase();
+        if (aSyn && !bSyn) return -1 * dir;
+        if (!aSyn && bSyn) return 1 * dir;
+        var cmpSyn = aSyn.localeCompare(bSyn, undefined, { numeric: true });
+        if (cmpSyn !== 0) return cmpSyn * dir;
+      } else if (key === 'stocks') {
+        var aStocks = parseInt(a.stock_count, 10) || 0;
+        var bStocks = parseInt(b.stock_count, 10) || 0;
+        if (aStocks !== bStocks) return (aStocks - bStocks) * dir;
+      }
+      var aName = (a.name || '').trim().toLowerCase();
+      var bName = (b.name || '').trim().toLowerCase();
+      return aName.localeCompare(bName, undefined, { numeric: true }) * dir;
+    });
+  }
+
+  function updateSortHeaders() {
+    var headers = document.querySelectorAll('#pheno-results-table thead th[aria-sort]');
+    Array.prototype.forEach.call(headers, function (th) {
+      var btn = th.querySelector('button[data-sort-key]');
+      if (!btn) return;
+      var key = btn.getAttribute('data-sort-key');
+      th.setAttribute('aria-sort', getPhenoHeaderAriaSort(key));
+    });
+  }
+
+  function initSortButtons() {
+    var buttons = document.querySelectorAll('#pheno-results-table thead button[data-sort-key]');
+    Array.prototype.forEach.call(buttons, function (btn) {
+      btn.addEventListener('click', function () {
+        var key = btn.getAttribute('data-sort-key');
+        if (state.sortKey === key) {
+          state.sortDir = (state.sortDir === 'asc') ? 'desc' : 'asc';
+        } else {
+          state.sortKey = key;
+          state.sortDir = (key === 'stocks') ? 'desc' : 'asc';
+        }
+        updateSortHeaders();
+        if (state.currentData) {
+          renderResults(state.currentData);
+        }
+      });
+    });
+  }
+
+  function syncAdvancedBadge() {
+    var badge = byId('pheno-advanced-count');
+    if (!badge) return;
+    var count = 0;
+    if (state.trait) count++;
+    if (state.part) count++;
+    if (count > 0) {
+      badge.textContent = count;
+      badge.hidden = false;
+    } else {
+      badge.hidden = true;
+    }
+  }
+
+  function updateViewDisplay() {
+    var tableView = byId('pheno-table-view');
+    var cardsView = byId('pheno-cards-view');
+    var isTable = state.view === 'table';
+
+    if (tableView) tableView.hidden = !isTable;
+    if (cardsView) cardsView.hidden = isTable;
+
+    var buttons = document.querySelectorAll('.pheno-view-btn[data-view], .mgdb-view-btn[data-view]');
+    Array.prototype.forEach.call(buttons, function (btn) {
+      var active = btn.getAttribute('data-view') === state.view;
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      btn.classList.toggle('is-active', active);
+    });
   }
 
   /* ── Section Tabs & Scrollspy ───────────────────────────────────────────── */
@@ -170,6 +278,8 @@
 
   /* ── Export Links Sync ──────────────────────────────────────────────────── */
 
+  /* ── Export Links Sync ──────────────────────────────────────────────────── */
+
   function updateExportLinks() {
     var params = new URLSearchParams();
     if (state.term) params.set('term', state.term);
@@ -177,18 +287,10 @@
     if (state.part) params.set('part', state.part);
 
     var tsvLink = byId('pheno-export-tsv');
-    var csvLink = byId('pheno-export-csv');
-
     if (tsvLink) {
       var tsvParams = new URLSearchParams(params.toString());
       tsvParams.set('format', 'tsv');
       tsvLink.href = API_URL + '?' + tsvParams.toString();
-    }
-
-    if (csvLink) {
-      var csvParams = new URLSearchParams(params.toString());
-      csvParams.set('format', 'csv');
-      csvLink.href = API_URL + '?' + csvParams.toString();
     }
   }
 
@@ -204,7 +306,6 @@
     state.searched = true;
 
     var status = byId('pheno-results-status');
-    var container = byId('pheno-results');
     var empty = byId('pheno-empty');
 
     if (status) {
@@ -221,6 +322,7 @@
 
     updateUrlParams();
     updateExportLinks();
+    syncAdvancedBadge();
 
     fetch(API_URL + '?' + params.toString())
       .then(function (res) { return res.json(); })
@@ -236,10 +338,9 @@
         renderResults(data);
         renderPagination(data.summary.page, data.summary.page_count);
 
-        if (scrollToResults && container) {
-          var target = byId('pheno-results-section');
-          if (target && typeof target.scrollIntoView === 'function') {
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (scrollToResults && section) {
+          if (typeof section.scrollIntoView === 'function') {
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
         }
       })
@@ -252,13 +353,16 @@
   /* ── Render Results (Card or Table) ─────────────────────────────────────── */
 
   function renderResults(data) {
-    var container = byId('pheno-results');
+    var tableView = byId('pheno-table-view');
+    var cardsView = byId('pheno-cards-view');
+    var tableBody = byId('pheno-results-body');
     var empty = byId('pheno-empty');
     var status = byId('pheno-results-status');
     var summary = data.summary;
 
     if (!summary.total || summary.total === 0) {
-      if (container) container.innerHTML = '';
+      if (tableView) tableView.hidden = true;
+      if (cardsView) cardsView.hidden = true;
       if (empty) empty.hidden = false;
       if (status) {
         var qText = data.query.term ? ' for “' + esc(data.query.term) + '”' : '';
@@ -276,8 +380,6 @@
 
     if (status) {
       if (state.pageSize === 'all' && summary.total > summary.page_size) {
-        /* "All results" is capped by the endpoint, and saying so is better
-           than a count that quietly stops short. */
         status.textContent = 'Showing the first ' + number(summary.page_size) + ' of '
           + number(summary.total) + ' phenotypes' + queryText
           + ', which is as many as the search returns at once.' + timing;
@@ -287,54 +389,65 @@
       }
     }
 
-    if (!container) return;
+    var sorted = sortPhenoResults(data.results || []);
 
-    if (state.view === 'table') {
-      renderTableView(container, data.results);
-    } else {
-      renderCardView(container, data.results);
-    }
+    if (tableBody) renderTableView(tableBody, sorted);
+    if (cardsView) renderCardView(cardsView, sorted);
 
+    updateSortHeaders();
+    updateViewDisplay();
     initCopyButtons();
-    /* Re-applied last so paging and the card/table toggle do not silently
-       drop a filter the box still shows. */
     applyResultsFilter();
   }
 
-  /* Narrows the page already rendered, in both the card and table view. The
-     search pages server side, so this filters what is on screen and the status
-     line says so. */
+  /* Narrows the page already rendered, in both the card and table view. */
   function applyResultsFilter() {
-    var container = byId('pheno-results');
-    if (!container) { return; }
+    var filterTerm = (state.filter || '').toLowerCase().trim();
+    var filterCountEl = byId('pheno-filter-count');
+    var statusEl = byId('pheno-results-status');
 
-    var items = container.querySelectorAll('.pheno-result-card, tbody tr');
-    var terms = state.filter.toLowerCase().split(/\s+/).filter(Boolean);
-    var shown = 0;
+    var tableRows = document.querySelectorAll('#pheno-results-body tr');
+    var cards = document.querySelectorAll('#pheno-cards-view .pheno-result-card');
+    var matchedCount = 0;
+    var totalCount = tableRows.length;
 
-    Array.prototype.forEach.call(items, function (item) {
-      var match = true;
-      if (terms.length) {
-        var hay = (item.textContent || '').toLowerCase();
-        for (var i = 0; i < terms.length; i++) {
-          if (hay.indexOf(terms[i]) === -1) { match = false; break; }
-        }
+    var terms = filterTerm.split(/\s+/).filter(Boolean);
+
+    function matches(text) {
+      if (!terms.length) return true;
+      var lower = text.toLowerCase();
+      for (var i = 0; i < terms.length; i++) {
+        if (lower.indexOf(terms[i]) === -1) return false;
       }
-      item.hidden = !match;
-      if (match) { shown++; }
+      return true;
+    }
+
+    Array.prototype.forEach.call(tableRows, function (row) {
+      var match = matches(row.textContent || '');
+      row.hidden = !match;
+      if (match) matchedCount++;
     });
 
-    if (terms.length) {
-      var status = byId('pheno-results-status');
-      var total = state.currentData && state.currentData.summary ? state.currentData.summary.total : 0;
-      if (status) {
-        status.textContent = shown === 0
-          ? 'Nothing on this page matches the filter “' + state.filter + '”. '
-            + number(total) + ' phenotypes matched the search.'
-          : 'Showing ' + number(shown) + ' of the ' + number(items.length)
-            + ' phenotypes on this page matching “' + state.filter + '”, out of '
-            + number(total) + ' matched by the search.';
+    Array.prototype.forEach.call(cards, function (card) {
+      card.hidden = !matches(card.textContent || '');
+    });
+
+    if (filterCountEl) {
+      if (terms.length) {
+        filterCountEl.textContent = matchedCount + ' / ' + totalCount;
+      } else {
+        filterCountEl.textContent = '';
       }
+    }
+
+    if (statusEl && terms.length) {
+      var total = state.currentData && state.currentData.summary ? state.currentData.summary.total : 0;
+      statusEl.textContent = matchedCount === 0
+        ? 'Nothing on this page matches the filter “' + state.filter + '”. '
+          + number(total) + ' phenotypes matched the search.'
+        : 'Showing ' + number(matchedCount) + ' of the ' + number(totalCount)
+          + ' phenotypes on this page matching “' + state.filter + '”, out of '
+          + number(total) + ' matched by the search.';
     }
   }
 
@@ -352,9 +465,6 @@
     if (filterInput) {
       filterInput.addEventListener('input', function () {
         state.filter = this.value.trim();
-        if (state.filter === '' && state.currentData) {
-          renderResults(state.currentData);
-        }
         applyResultsFilter();
       });
     }
@@ -368,15 +478,15 @@
         if (partSelect) { partSelect.value = '0'; }
         state.trait = '';
         state.part = '';
+        syncAdvancedBadge();
         state.page = 1;
         if (state.searched) { executeSearch(false); }
       });
     }
   }
 
-  function renderCardView(container, results) {
-    container.className = 'pheno-results-container pheno-view-card';
-    container.innerHTML = results.map(function (row) {
+  function renderCardView(cardsView, results) {
+    cardsView.innerHTML = results.map(function (row) {
       var name = row.name || 'Untitled phenotype';
       var recordUrl = '/data_center/phenotype?id=' + encodeURIComponent(row.id);
 
@@ -413,8 +523,7 @@
     }).join('');
   }
 
-  function renderTableView(container, results) {
-    container.className = 'pheno-results-container pheno-view-table';
+  function renderTableView(tableBody, results) {
     var rows = results.map(function (row) {
       var name = row.name || 'Untitled phenotype';
       var recordUrl = '/data_center/phenotype?id=' + encodeURIComponent(row.id);
@@ -433,19 +542,7 @@
         + '</tr>';
     }).join('');
 
-    container.innerHTML = '<table class="pheno-table">'
-      + '  <thead>'
-      + '    <tr>'
-      + '      <th>Phenotype Name</th>'
-      + '      <th>Trait Category</th>'
-      + '      <th>Body Parts Affected</th>'
-      + '      <th>Synonyms</th>'
-      + '      <th>Stocks</th>'
-      + '      <th>Action</th>'
-      + '    </tr>'
-      + '  </thead>'
-      + '  <tbody>' + rows + '</tbody>'
-      + '</table>';
+    tableBody.innerHTML = rows;
   }
 
   /* ── Pagination ─────────────────────────────────────────────────────────── */
@@ -534,22 +631,17 @@
       clearBtn.addEventListener('click', function () {
         input.value = '';
         clearBtn.hidden = true;
-        state.term = '';
-        state.page = 1;
-        executeSearch(false);
+        input.focus();
       });
     }
 
     if (form && input) {
       form.addEventListener('submit', function (e) {
         e.preventDefault();
-        /* Every field is read from the DOM here. The advanced selects also
-           update state on 'change', but that event never fires for a value the
-           browser restores itself (autofill, bfcache), and a filter shown in
-           the form must never be missing from the query it describes. */
         state.term = input.value.trim();
         state.trait = traitSelect && traitSelect.value !== '0' ? traitSelect.value : '';
         state.part = partSelect && partSelect.value !== '0' ? partSelect.value : '';
+        syncAdvancedBadge();
         state.page = 1;
         executeSearch(true);
       });
@@ -558,6 +650,7 @@
     if (traitSelect) {
       traitSelect.addEventListener('change', function () {
         state.trait = traitSelect.value !== '0' ? traitSelect.value : '';
+        syncAdvancedBadge();
         state.page = 1;
         executeSearch(true);
       });
@@ -566,6 +659,7 @@
     if (partSelect) {
       partSelect.addEventListener('change', function () {
         state.part = partSelect.value !== '0' ? partSelect.value : '';
+        syncAdvancedBadge();
         state.page = 1;
         executeSearch(true);
       });
@@ -580,6 +674,9 @@
         }
         state.term = ex;
         state.page = 1;
+        state.filter = '';
+        var filterInput = byId('pheno-results-filter');
+        if (filterInput) { filterInput.value = ''; }
         executeSearch(true);
       });
     });
@@ -590,9 +687,13 @@
         if (input) { input.value = ''; if (clearBtn) clearBtn.hidden = true; }
         if (traitSelect) traitSelect.value = '0';
         if (partSelect) partSelect.value = '0';
+        var filterInput = byId('pheno-results-filter');
+        if (filterInput) { filterInput.value = ''; }
         state.term = '';
         state.trait = '';
         state.part = '';
+        state.filter = '';
+        syncAdvancedBadge();
         state.page = 1;
         executeSearch(false);
       });
@@ -600,7 +701,7 @@
   }
 
   function initViewToggle() {
-    var buttons = document.querySelectorAll('.pheno-view-btn[data-view]');
+    var buttons = document.querySelectorAll('.pheno-view-btn[data-view], .mgdb-view-btn[data-view]');
     if (!buttons.length) return;
 
     var savedView = 'table';
@@ -609,13 +710,8 @@
 
     function applyView(view) {
       state.view = view;
-      Array.prototype.forEach.call(buttons, function (btn) {
-        btn.setAttribute('aria-pressed', btn.getAttribute('data-view') === view ? 'true' : 'false');
-      });
       try { localStorage.setItem(STORAGE_VIEW_KEY, view); } catch (e) {}
-      if (state.currentData) {
-        renderResults(state.currentData);
-      }
+      updateViewDisplay();
       updateUrlParams();
     }
 
@@ -747,9 +843,10 @@
 
         var partSelect = byId('pheno-part');
         if (partSelect) { partSelect.value = match.ids; }
-        var adv = document.querySelector('.pheno-adv');
+        var adv = document.querySelector('.pheno-adv, .pheno-advanced');
         if (adv) { adv.open = true; }
         state.part = match.ids;
+        syncAdvancedBadge();
         state.page = 1;
         executeSearch(true);
       });
@@ -761,9 +858,11 @@
     readUrlParams();
     buildTabs();
     initForm();
-    initResultControls();
-    initFigure();
     initViewToggle();
+    initSortButtons();
+    initResultControls();
+    syncAdvancedBadge();
+    initFigure();
     updateExportLinks();
 
     // If query term, trait, or body part in URL, search immediately

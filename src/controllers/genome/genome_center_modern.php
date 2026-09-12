@@ -118,24 +118,41 @@ function gcEsc($value) {
 /*
  * Assembly quality.
  *
- * The genome_information.quality column is blank for 145 of the 160 completed
- * assemblies, so it cannot drive this column. The assembly name does carry the
- * designation, following the community naming convention, and is populated for
- * every row: Zm-B73-REFERENCE-NAM-5.0, Ab-Traiperm_572-DRAFT-PanAnd-1.0.
+ * TWO SOURCES, IN THIS ORDER (corrected 2026-09-10).
  *
- * Derived here rather than read from the column:
- *   Zm-B73-REFERENCE-NAM-5.0  Representative — the B73 reference assembly
- *   name contains REFERENCE   Reference
- *   name contains DRAFT       Draft
- *   otherwise                 Not reported
+ * 1. genome_information.quality, when it is populated. It is blank for 145 of
+ *    the 160 completed assemblies, which is why this column was originally
+ *    derived from the name alone -- but where curators HAVE filled it in it is
+ *    authoritative, it uses exactly this vocabulary (Representative, Reference,
+ *    Draft), and ignoring it made the page contradict its own database. The 15
+ *    populated rows are 4 Representative, 9 Reference, 2 Draft.
  *
- * The Representative test is an exact match on purpose. A looser pattern would
- * also catch Zm-B73_AB10-REFERENCE-NAM-1.0, which is the abnormal-10 assembly
- * and belongs under Reference.
+ *    This is what put B73 RefGen_v1, v2, v3 and Zm-B73-REFERENCE-GRAMENE-4.0 --
+ *    the four the column calls Representative -- under "Not reported" and
+ *    "Reference" respectively.
+ *
+ * 2. The assembly name, for the 145 rows with nothing stored. It carries the
+ *    designation by community naming convention and is populated for every row:
+ *    Zm-B73-REFERENCE-NAM-5.0, Ab-Traiperm_572-DRAFT-PanAnd-1.0.
+ *
+ *      Zm-B73-REFERENCE-NAM-5.0  Representative -- the B73 reference assembly
+ *      name contains REFERENCE   Reference
+ *      name contains DRAFT       Draft
+ *      otherwise                 Not reported
+ *
+ *    The Representative test is an exact match on purpose. A looser pattern
+ *    would also catch Zm-B73_AB10-REFERENCE-NAM-1.0, which is the abnormal-10
+ *    assembly and belongs under Reference. B73 v5's own quality column is
+ *    blank, so v5 still reaches Representative through this rule -- which is
+ *    why the rule stays rather than being replaced by the column.
  */
 define('GC_REPRESENTATIVE_ASSEMBLY', 'Zm-B73-REFERENCE-NAM-5.0');
 
-function gcQualityLabel($assembly) {
+function gcQualityLabel($assembly, $stored = '') {
+    // A curated value wins over anything inferred from the name.
+    $stored = trim((string)$stored);
+    if ($stored !== '') { return $stored; }
+
     $name = trim((string)$assembly);
     if ($name === GC_REPRESENTATIVE_ASSEMBLY)   { return 'Representative'; }
     if (stripos($name, 'REFERENCE') !== false)  { return 'Reference'; }
@@ -143,8 +160,8 @@ function gcQualityLabel($assembly) {
     return '';
 }
 
-function gcQuality($assembly) {
-    $label = gcQualityLabel($assembly);
+function gcQuality($assembly, $stored = '') {
+    $label = gcQualityLabel($assembly, $stored);
     if ($label === '') {
         // Say so rather than leaving an empty cell, which in a scientific table
         // would read as a measured value of nothing.
@@ -173,7 +190,7 @@ $reference_count = 0;
 foreach ($rows as $row) {
     // Counted from the same derivation the table column uses, so the metric and
     // the rows below it can never disagree.
-    $label = gcQualityLabel($row['assembly']);
+    $label = gcQualityLabel($row['assembly'], isset($row['quality']) ? $row['quality'] : '');
     if ($label === 'Reference' || $label === 'Representative') { $reference_count++; }
 }
 
@@ -289,28 +306,32 @@ $table_rows = '';
 foreach ($rows as $row) {
     $group   = gcSpeciesGroup($row['species']);
     $species = trim((string)$row['species']);
-    $superseded = trim((string)$row['replaced_by']) !== '';
-
     $search = trim($row['assembly'] . ' ' . $row['cultivar'] . ' ' . $species . ' ' . $row['accession']);
 
     $assembly_link = '/genome/genome_assembly/' . rawurlencode($row['assembly']);
 
-    $quality_label = gcQualityLabel($row['assembly']);
+    $quality_label = gcQualityLabel($row['assembly'], $row['quality']);
+    /* The Status column was dropped 2026-09-10. It was derived entirely from
+       genome_information.replaced_by, which is empty for all 160 completed
+       assemblies, so every row read "Current" -- a column that asked a question
+       and gave one answer. The advanced-search Status filter went with it, for
+       the same reason: its "Superseded" option could never match a row.
+       To restore both when replaced_by is populated: re-add
+       $superseded = trim((string)$row['replaced_by']) !== '';
+       the data-status attribute below, the <td> pill after Accession, the
+       <th> in templates/static/mgdb_genome_center.bau, and the Status field in
+       the advanced panel. */
     $table_rows .=
         '<tr data-group="' . gcEsc($group) . '"'
-      . ' data-status="' . ($superseded ? 'superseded' : 'current') . '"'
       . ' data-quality="' . ($quality_label !== '' ? gcEsc($quality_label) : 'none') . '"'
       . ' data-search="' . gcEsc($search) . '">'
       . '<th scope="row"><a href="' . gcEsc($assembly_link) . '">' . gcEsc($row['assembly']) . '</a></th>'
       . '<td>' . gcEsc($row['cultivar']) . '</td>'
       . '<td><i>' . ($species !== '' ? gcEsc($species) : '<span class="mgdb-muted">Not reported</span>') . '</i></td>'
-      . '<td>' . gcQuality($row['assembly']) . '</td>'
+      . '<td>' . gcQuality($row['assembly'], $row['quality']) . '</td>'
       . '<td>' . ($row['accession'] !== '' && $row['accession'] !== null
                     ? '<a href="https://www.ncbi.nlm.nih.gov/bioproject/' . gcEsc($row['accession']) . '" target="_blank" rel="noopener">' . gcEsc($row['accession']) . '</a>'
                     : '<span class="mgdb-muted">Not reported</span>') . '</td>'
-      . '<td>' . ($superseded
-                    ? '<span class="mgdb-pill mgdb-pill-info">Superseded</span>'
-                    : '<span class="mgdb-pill mgdb-pill-ok">Current</span>') . '</td>'
       . '</tr>';
 }
 
@@ -342,11 +363,13 @@ $group_json = array();
    sake of a single row. The group stays on the row, so the assembly is still
    there under All and still findable by search -- only the chip is gone. */
 $GC_CHIP_SKIP = array('huehuetenangensis');
+$species_options = '<option value="all">All species and groups</option>';
 foreach ($group_counts as $key => $count) {
     if (in_array($key, $GC_CHIP_SKIP, true)) { continue; }
     $label = isset($GC_GROUPS[$key]) ? $GC_GROUPS[$key] : $key;
     $chips .= '<button class="mgdb-chip" type="button" data-filter="' . gcEsc($key) . '" aria-pressed="false">'
             . gcEsc($label) . '</button>';
+    $species_options .= '<option value="' . gcEsc($key) . '">' . gcEsc($label) . ' (' . number_format($count) . ')</option>';
     $group_json[] = array('label' => $label, 'count' => $count);
 }
 
@@ -388,6 +411,7 @@ $body->get('total-progress')->replace(number_format($total_progress));
 $body->get('reference-count')->replace(number_format($reference_count));
 $body->get('maize-count')->replace(number_format(isset($group_counts['mays']) ? $group_counts['mays'] : 0));
 $body->get('group-chips')->replace($chips);
+$body->get('species-options')->replace($species_options);
 $body->get('assembly-rows')->replace($table_rows);
 $body->get('progress-rows')->replace($progress_html);
 $body->get('group-data')->replace(json_encode($group_json));

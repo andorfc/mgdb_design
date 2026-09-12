@@ -207,6 +207,20 @@ src/pages/maize_meeting/index.php                maize_meeting/index.php
 src/images/maize_meeting/CREDITS.json            images/maize_meeting/CREDITS.json
 src/images/maize_meeting/chicago2027.jpg         images/maize_meeting/chicago2027.jpg
 src/images/maize_meeting/sacramento2028.jpg      images/maize_meeting/sacramento2028.jpg
+src/images/maize_meeting/cologne_cathedral.jpg   images/maize_meeting/cologne_cathedral.jpg
+# The five venue photographs replaced 2026-09-09 for brighter, more colourful
+# frames (Carson picked each from Commons). They had never been in the manifest --
+# they came with the original site -- so a full deploy would have put the old ones
+# back. NOTE: stlouis/raleigh/stmalo are named .png and hold JPEG data; that
+# predates the redesign and the names are kept so the archive rows do not move.
+src/images/maize_meeting/italy.jpg               images/maize_meeting/italy.jpg
+src/images/maize_meeting/stlouis.png             images/maize_meeting/stlouis.png
+src/images/maize_meeting/raleigh.png             images/maize_meeting/raleigh.png
+src/images/maize_meeting/stmalo.png              images/maize_meeting/stmalo.png
+src/images/maize_meeting/beijing.jpg             images/maize_meeting/beijing.jpg
+src/images/maize_meeting/portland.jpg            images/maize_meeting/portland.jpg
+src/images/maize_meeting/allerton.jpg            images/maize_meeting/allerton.jpg
+src/images/maize_meeting/geneva.jpg              images/maize_meeting/geneva.jpg
 
 # The 2020 virtual meeting's poster and video walls. Not a redesign: these four
 # files are here because their password gate redirected without stopping, so a
@@ -606,8 +620,10 @@ src/js/mgdb-nomenclature.js                            js/mgdb-nomenclature.js
 # /nomenclature above. It carries no stylesheet of its own: it reuses the
 # identifier diagram components in css/mgdb-nomenclature.css so the two pages
 # cannot draw the same diagram two different ways.
-# controllers/community/nomenclature_summary.php is deliberately NOT listed:
-# that is the legacy page, still reachable at /community/nomenclature_summary.
+# controllers/community/nomenclature_summary.php was deliberately NOT listed
+# here, because it was the legacy page still reachable at
+# /community/nomenclature_summary. That duplicate was retired 2026-09-07; the
+# file is listed with the rest of that batch at the foot of this manifest.
 src/controllers/nomenclature_summary.php               controllers/nomenclature_summary.php
 src/templates/community/mgdb_nomenclature_summary.bau  templates/community/mgdb_nomenclature_summary.bau
 src/js/mgdb-nomenclature-summary.js                    js/mgdb-nomenclature-summary.js
@@ -1141,6 +1157,9 @@ src/images/quicklinks/pathway.png              images/quicklinks/pathway.png
 src/images/quicklinks/phenotype.png            images/quicklinks/phenotype.png
 src/images/quicklinks/protein.png              images/quicklinks/protein.png
 src/images/quicklinks/qteller.png              images/quicklinks/qteller.png
+# upload.png is download.png with the arrow flipped in place -- same cloud,
+# pointing up -- for the /contribute_data hero. Not from prep_icons.py.
+src/images/quicklinks/upload.png               images/quicklinks/upload.png
 src/images/quicklinks/variation.png            images/quicklinks/variation.png
 src/controllers/download.php                   controllers/download.php
 src/controllers/downloads.php                  controllers/downloads.php
@@ -1835,10 +1854,18 @@ src/data/gene_symbols.json                                     data/gene_symbols
 # /contribute_data on the site's shell. The top-level controller has to exist or
 # controller.php falls through to redirect.php, which loads the legacy main
 # template and its chrome before any controller runs. Pre-redesign originals are
-# archived in the redesign repo under legacy/contribute-data/;
-# controllers/community/contribute_data.php is left in place so
-# /community/contribute_data still serves the original.
+# archived in the redesign repo under legacy/contribute-data/.
+#
+# UPDATED 2026-09-10: controllers/community/contribute_data.php used to be left
+# in place so /community/contribute_data still served the original. It is now a
+# 301 to /contribute_data, and is managed here rather than being server-only.
+# The community-curation retirement removed the "Become a community curator"
+# section from the modern page; the legacy page at the section route still
+# carried it three times over, with four login/register links, so leaving that
+# route serving would have left the retired content live on the site. The file
+# keeps its CRLF line endings, which is what the server copy had.
 src/controllers/contribute_data.php                       controllers/contribute_data.php
+src/controllers/community/contribute_data.php             controllers/community/contribute_data.php
 src/controllers/community/contribute_data_modern.php      controllers/community/contribute_data_modern.php
 src/templates/static/mgdb_contribute_data.bau             templates/static/mgdb_contribute_data.bau
 src/css/mgdb-contribute-data.css                          css/mgdb-contribute-data.css
@@ -2079,10 +2106,23 @@ src/css/mgdb-controlled-pollination.css          css/mgdb-controlled-pollination
 # the legacy shell, and hands a miss to controllers/not_found.php, which sets
 # 404 and renders the modern page. templates/error/error-404.bau is left on disk.
 src/redirect.php                                 redirect.php
+# plain.php was the one section router not already tracked here.
+src/controllers/plain.php                        controllers/plain.php
+# The insertion record page answered 200 for an identifier that does not exist,
+# while correctly rendering "The insertion <id> was not found."
+src/record_data/insertion_data.php               record_data/insertion_data.php
 src/controllers/not_found.php                    controllers/not_found.php
 src/templates/static/mgdb_not_found.bau          templates/static/mgdb_not_found.bau
 src/css/mgdb-not-found.css                       css/mgdb-not-found.css
 src/js/mgdb-not-found.js                         js/mgdb-not-found.js
+# The 404 artwork, an aerial photo of a corn maze cut into the shape 404. It was
+# a 542x358 PNG of 338 KB for a slot 200px wide. A photograph in PNG is the
+# expensive part: 400px as PNG is still 203 KB, the same 400px as JPEG is 52 KB.
+# The page uses the JPEG; the PNG is downscaled in place because
+# templates/error/error-404.bau still names it. The untouched 542px original is
+# kept at src/images/_source/ and is deliberately not deployed.
+src/images/404err.jpg                            images/404err.jpg
+src/images/404err.png                            images/404err.png
 
 # /stock_decryption -- how to read the handwriting on a Stock Center seed
 # packet, on the design system, 2026-09-06. A top-level
@@ -2205,3 +2245,390 @@ src/templates/curation/mgdb_genome_issue.bau        templates/curation/mgdb_geno
 src/templates/curation/mgdb_genome_issue_submitted.bau templates/curation/mgdb_genome_issue_submitted.bau
 src/css/mgdb-genome-issue.css                       css/mgdb-genome-issue.css
 src/js/mgdb-genome-issue.js                         js/mgdb-genome-issue.js
+
+# Short top-level aliases for five record routes, added 2026-09-07 (Carson).
+# The record pages are canonical at /data_center/<type>?id=<id> (which the whole
+# site links); these top-level names had no route and 404'd. Each is a 301 to
+# its /data_center/<type> form, preserving the id from ?id= or a /<id> path
+# segment. controller.php finds these before redirect.php. Rollback: delete the
+# file. Nothing links the bare top-level form -- these are only for external
+# bookmarks.
+src/controllers/primer.php                       controllers/primer.php
+src/controllers/trait.php                        controllers/trait.php
+src/controllers/term.php                         controllers/term.php
+src/controllers/recombination.php                controllers/recombination.php
+src/controllers/map_scores.php                   controllers/map_scores.php
+src/controllers/gel.php                          controllers/gel.php
+
+
+# /blast -> /BLAST, a case-normalising 301, added 2026-09-09 (Carson).
+# controller.php dispatches BLAST with a case-SENSITIVE
+# strstr($request, '/BLAST') before CONTROLLER is worked out, so the lowercase
+# form missed it and 404'd once the site-wide 404 landed. The Genome Center hub
+# (templates/static/mgdb_genome_center.bau) links the lowercase form.
+# NOTE: the destination controller is controllers/BLAST.php -- these two
+# filenames differ only by case and must never be merged. Rollback: delete.
+# LOCAL FILENAME DIFFERS ON PURPOSE: macOS/APFS is case-INSENSITIVE, so a local
+# src/controllers/blast.php would BE src/controllers/BLAST.php and silently
+# overwrite the real BLAST controller in the working tree (this happened once,
+# 2026-09-09). Keep the repo copy named blast_alias.php.
+src/controllers/blast_alias.php                  controllers/blast.php
+
+
+# Two top-level interceptors, 2026-09-07. Both pages were already modern and both
+# build their own Bauplan; they were arriving inside the old chrome because
+# nothing took their route before the legacy main template loaded.
+#   /person        -> controller.php hands /person to controllers/community.php,
+#                     which loads templates/maizegdb-main.bau at line 127 before
+#                     it dispatches. 701 requests from 639 distinct clients in six
+#                     days of production traffic -- more than every other
+#                     unmigrated page combined.
+#   /FAIRpractices -> no top-level controller, so redirect.php loaded the legacy
+#                     main before going looking for the page.
+# community.php gains an MGDB_PERSON_LEGACY guard so it does not retry the modern
+# person controllers when person.php hands a legacy case back to it.
+src/controllers/person.php                       controllers/person.php
+src/controllers/FAIRpractices.php                controllers/FAIRpractices.php
+
+
+# /forgot_password on the design system, 2026-09-07. Top-level shadow controller,
+# same pattern as /login. The lookup and mail are the hardened ones from
+# controllers/static/forgot_password.php, which is untouched.
+#
+# Two deliberate behaviour changes, both in the controller's header comment:
+# the page said "the password will be mailed to you" and never mailed a password
+# (it mails PASSWORD_REMINDER, the hint); and the reply is now the same whether
+# or not an account matched, because "No Matching Account" let anyone test an
+# address against the curator roster one submission at a time.
+src/controllers/forgot_password.php              controllers/forgot_password.php
+src/templates/static/mgdb_forgot_password.bau    templates/static/mgdb_forgot_password.bau
+src/css/mgdb-forgot-password.css                 css/mgdb-forgot-password.css
+
+# /preferences retired, 2026-09-07: 301 to /login.
+#
+# A placeholder since "03/27/13 eksc created placeholder page" and never
+# anything else -- logged in, the entire page read "This page is on our to-do
+# list! Soon this page will provide options to customize MaizeGDB to suit your
+# needs." Zero requests in six days of production traffic, nothing links to it
+# (the only link, templates/home/top-right-menu.bau line 35, has been commented
+# out for years), and NO ALTERNATE ROUTE -- /about, /community and /static
+# variants all 404. Nothing deleted.
+#
+# templates/static/mgdb_login.bau is corrected in the same change: it told
+# readers they could edit or remove an annotation "from the preferences link
+# shown while you are logged in". There is no such link, and this page carried no
+# such control.
+src/controllers/preferences.php                  controllers/preferences.php
+
+# /create_account retired, 2026-09-07: 301 to /login, 303 for a POST.
+#
+# It was already switched off in place -- a bare `exit;` at line 16 of
+# controllers/static/create_account.php, added when curation account creation was
+# disabled under federal MFA mandates -- so the URL answered HTTP 200 with a
+# ZERO-BYTE body. Two requests in six days, both POSTs from one client, both
+# given a blank page. /login is the destination because it carries the accurate
+# answer in context: not issuing new accounts, ask through the feedback form.
+#
+# Nothing deleted, and the exit stays: the ~290 lines after it still contain
+# unparameterised SQL. NO ALTERNATE ROUTE -- the /about, /community and /static
+# variants all 404.
+src/controllers/create_account.php               controllers/create_account.php
+
+
+# /rhubarb_crisp on the design system, 2026-09-07. Top-level shadow controller;
+# the legacy controller and templates/static/rhubarb-crisp.bau are untouched.
+# The recipe is unchanged. The legacy template's first line reads "If this page
+# goes away, the user backlash will be extreme. Best to keep it..."
+src/controllers/rhubarb_crisp.php                controllers/rhubarb_crisp.php
+src/templates/static/mgdb_rhubarb_crisp.bau      templates/static/mgdb_rhubarb_crisp.bau
+src/css/mgdb-rhubarb-crisp.css                   css/mgdb-rhubarb-crisp.css
+
+
+# /genome_browser_survey on the design system, 2026-09-07. Top-level shadow
+# controller; the legacy controller and its three templates are untouched.
+#
+# The findings and the conclusion are reproduced as written; the frame and the
+# links changed. The page reported a 2006 survey as though it were current and
+# now says what it is and what came of it. Its breadcrumb linked google.com
+# twice. blanksurvey.html and AllertonReport.doc are both 404 and are named
+# rather than linked. working_group.php and mgec.php are now /working_group and
+# /mgec. The three 430x200 chart PNGs stay at /images/chart1-3.png and are linked
+# as the published originals; the figures they plot are in the prose and are set
+# as text here -- the feature-ranking chart in particular drew the LEAST
+# important feature longest, because a lower score means a higher priority.
+src/controllers/genome_browser_survey.php        controllers/genome_browser_survey.php
+src/templates/static/mgdb_gb_survey.bau          templates/static/mgdb_gb_survey.bau
+src/css/mgdb-gb-survey.css                       css/mgdb-gb-survey.css
+src/js/mgdb-gb-survey.js                         js/mgdb-gb-survey.js
+
+
+# Low-use retirements, 2026-09-07. Nine pages; each is a 301 to the modern page
+# that holds the same subject. Nothing is deleted -- every legacy controller and
+# template stays on disk, and each new controller's header says what it retired,
+# what was carried across, and how to roll it back.
+#
+#   /project_homepages       -> /projects                       (empty placeholder)
+#   /blast_report            -> /BLAST                          (operator readout, already wrong)
+#   /reference_images        -> /data_center/image              (uncaught PHP fatal)
+#   /gene_family             -> /nomenclature                   (intro + an empty section)
+#   /diversity               -> /data_center/variation          (superseded by the hub)
+#   /genetic_ratio_exercise  -> /data_center/image              (orphaned; its 5 links 404)
+#   /phenotypeterms          -> /contribute_data#genopheno      (vocab block since removed; see controller)
+#   /data_center/RNmaps      -> /data_center/cytogenetic#rn-maps (full dataset carried across)
+#   /data_center/metabolic_pathway -> /metabolic_pathways       (superseded by the hub)
+#
+# The last two are sub-routes of data_center.php, so they are blocks in that
+# dispatcher rather than files of their own.
+src/controllers/project_homepages.php            controllers/project_homepages.php
+src/controllers/blast_report.php                 controllers/blast_report.php
+src/controllers/reference_images.php             controllers/reference_images.php
+src/controllers/gene_family.php                  controllers/gene_family.php
+src/controllers/diversity.php                    controllers/diversity.php
+src/controllers/genetic_ratio_exercise.php       controllers/genetic_ratio_exercise.php
+src/controllers/phenotypeterms.php               controllers/phenotypeterms.php
+
+
+# /assembly_manifesto on the design system, 2026-09-07. Top-level shadow
+# controller; the legacy controller and its templates are untouched.
+#
+# This page came up in the low-use batch and was kept rather than retired: it is
+# linked from the genome section nav, twice from the assembly record template,
+# and from the site map, and it is the only statement on the site of MaizeGDB's
+# assembly policy -- one shared coordinate system, no assembly version withdrawn
+# unless asked, and what a group planning a new genome is expected to do.
+#
+# The policy and the history are reproduced as written. Four corrections: the
+# NSF award for RefGen_v4 was printed as 1112127 while linking 1127112 (the
+# link was right, the digits in the text were transposed -- 1112127 has no
+# record); the GO evidence-code URL is now the current guide; the nomenclature
+# link leads with /nomenclature and the 2021 standard rather than the 2016
+# update; and the collaboration contact is a plain mailto rather than a raw
+# address that Cloudflare obfuscates on production and leaves plain on dev.
+src/controllers/assembly_manifesto.php           controllers/assembly_manifesto.php
+src/templates/static/mgdb_assembly_manifesto.bau templates/static/mgdb_assembly_manifesto.bau
+src/css/mgdb-assembly-manifesto.css              css/mgdb-assembly-manifesto.css
+src/js/mgdb-assembly-manifesto.js                js/mgdb-assembly-manifesto.js
+
+# /sitemap claimed at the top level, 2026-09-07. The page was already modern but
+# redirect.php reached it first and left /css/background_static.css and
+# /ie/ie6.css registered on top of the modern shell. Last page on the site still
+# doing this.
+src/controllers/sitemap.php                      controllers/sitemap.php
+
+
+# dill-picl.org removed from the legacy templates, 2026-09-07.
+#
+# dill-picl.org is no longer the Dill-Picl lab's domain -- it was re-registered
+# on 2025-06-21 through Gname.com and serves an Indonesian gambling site
+# ("JARI4D"). m2m.dill-picl.org and fc-fair.dill-picl.org are both NXDOMAIN. No
+# surviving copy of the Morgan2McClintock Translator was found; m2m.maizegdb.org
+# and maizegdb.org/m2m both answer 200 but serve the legacy homepage.
+#
+# None of these four templates is reachable today -- /data_center/cytogenetic and
+# /data_center/map are modern, /data_center/RNmaps is a 301, /fcfair is a 301 and
+# /tools/fcfair a 404 -- but each retirement is a one-file rollback by design, so
+# the links are removed at the source rather than left behind a redirect.
+#
+# fcfair-content.bau is the one that mattered: it did not link the domain, it
+# IFRAMED it, so anything the current owner pointed that subdomain at would have
+# rendered inside MaizeGDB's chrome.
+#
+# These four are server-only files pulled into the repo for this edit; they keep
+# their CRLF line endings, which is why the diff is small.
+src/templates/data_center/cytogenetic-left.bau   templates/data_center/cytogenetic-left.bau
+src/templates/data_center/map-left.bau           templates/data_center/map-left.bau
+src/templates/data_center/RNmaps-left.bau        templates/data_center/RNmaps-left.bau
+src/templates/tools/fcfair-content.bau           templates/tools/fcfair-content.bau
+
+
+# Half-finished retirements closed, 2026-09-07.
+#
+# Twelve pages were retired at their top-level URL and kept serving at their
+# section URL, because controller.php sends /<page> to controllers/<page>.php
+# while controllers/about.php and community.php dispatch /<section>/<page> to
+# controllers/<section>/<page>.php. Retiring one never touched the other, so
+# every one of these was a live legacy copy of a page already decided against --
+# /community/steering_committee still served the old committee page while
+# /steering_committee 301'd to the Working Group.
+#
+# controllers/about/doc.php (2026-09-05) is the pattern: replace the section
+# controller's one loader line with the same 301 the top-level route answers,
+# keep the original history block, and record the replaced line so rollback is
+# restoring one line.
+#
+# /community/site_tour was not just a duplicate: its template is not on the
+# server, so it answered 200 with a Bauplan error and a backtrace, 157 bytes.
+#
+# Server-only files pulled into the repo for this edit; they keep their CRLF
+# line endings.
+src/controllers/about/credit.php                 controllers/about/credit.php
+src/controllers/about/faq.php                    controllers/about/faq.php
+src/controllers/about/neighbors.php              controllers/about/neighbors.php
+src/controllers/about/site_tour.php              controllers/about/site_tour.php
+src/controllers/about/steering.php               controllers/about/steering.php
+src/controllers/about/working_group2013.php      controllers/about/working_group2013.php
+src/controllers/community/classic_reads.php      controllers/community/classic_reads.php
+src/controllers/community/cooperators.php        controllers/community/cooperators.php
+src/controllers/community/education.php          controllers/community/education.php
+src/controllers/community/mcclintockprize.php    controllers/community/mcclintockprize.php
+src/controllers/community/site_tour.php          controllers/community/site_tour.php
+src/controllers/community/steering_committee.php controllers/community/steering_committee.php
+
+
+# Duplicate legacy pages retired, 2026-09-07.
+#
+# Nine section routes were still serving the PRE-REDESIGN version of a page that
+# is modern at its top-level URL -- /about/cite against /cite, /community/jobs
+# against /jobs, and so on. Same two-route cause as the batch above, but these
+# duplicate a live page rather than a retired one, so each was compared against
+# its modern twin before the redirect went in rather than after.
+#
+# Only one was carrying something the modern page lacked: /community/mnl was the
+# only route to the newsletter's "Interested In Contributing?" section, and that
+# is now the Contributing section of /mnl, with the submission link pointed at
+# the live form instead of the legacy iframe wrapper and the fallback address
+# corrected to john.portwood@ars.usda.gov.
+#
+# These nine keep their original code -- the redirect is prepended, because
+# three of them (about/contact 10KB, community/jobs 15KB, community/mnl 9KB)
+# are real controllers rather than one-line template loaders. Rollback is
+# deleting the block at the top. Server-only files, CRLF line endings.
+src/controllers/about/cite.php                   controllers/about/cite.php
+src/controllers/about/contact.php                controllers/about/contact.php
+src/controllers/about/handyref.php               controllers/about/handyref.php
+src/controllers/about/whatsnew.php               controllers/about/whatsnew.php
+src/controllers/community/jobs.php               controllers/community/jobs.php
+src/controllers/community/mnl.php                controllers/community/mnl.php
+src/controllers/community/person.php             controllers/community/person.php
+src/controllers/community/sequencing_project.php controllers/community/sequencing_project.php
+src/controllers/community/nomenclature_summary.php   controllers/community/nomenclature_summary.php
+
+
+# Record-page not-found fixes, 2026-09-07.
+#
+# /person/123 was reported returning "unexpected results, in the old format".
+# Three faults behind it, all on the path an id takes when it does not resolve:
+#
+#  1. HTTP 200 for a record that does not exist.
+#  2. The legacy chrome, wrapped around a body reading "<type> record" -- the
+#     legacy record page renders no content for ANY id, including the three
+#     person ids (cooperators, breeders, maizegdb) that were deliberately routed
+#     to it. Measured: byte-identical to ?id=zzzznotanid.
+#  3. The <title> built by concatenating the raw id, written out by Bauplan
+#     unescaped -- a live reflected XSS, confirmed against the origin past
+#     Cloudflare's WAF.
+#
+# Swept every record route. Only three reached the legacy handler: /person,
+# /data_center/fish and /data_center/species. Every other type already answers a
+# real 404 from its modern record controller. All three now serve the site 404.
+#
+# lib/Bauplan.php escapes the title at the sink, which closes (3) for all five
+# call sites and for anything written later.
+
+# --------------------------------------------------------------------------
+# Three legacy routes that were serving a PHP 8 fatal at HTTP 200, found by the
+# 2026-09-09 hero-stamp sweep. None of the three was tracked here before, so
+# each is adopted with its fix; without a manifest entry the next full deploy
+# would put the broken version back.
+#
+#   /help    retired -- 301 to /contact. Unlike the 2026-09-04 batch above this
+#            one moves files: the original controller and templates/help/ are in
+#            /var/www/claude/retired/2026-09-09-help/, because the redirect takes
+#            the controller's own filename. There is no controllers/about/help.php
+#            or community/help.php, so this single route is the whole retirement.
+#   /map_text                   fixed -- a live download linked from the Map hub
+#                               (templates/data_center/map_sections.bau:226).
+#   /bin_viewer_locus_sequence  fixed -- linked from the modern bin viewer
+#                               (controllers/tools/bin_viewer_modern.php:250).
+#
+# Both fixes also close an unescaped parameter: getCGIParam() is trim() and
+# nothing else, so map_text's id reached the WHERE clause as a SQL injection and
+# the bin viewer's bin reached the page as reflected HTML. See each file's
+# history block.
+#
+# The two fixed files keep the CRLF line endings they have on the server.
+src/controllers/help.php                              controllers/help.php
+src/controllers/tools/map_text.php                    controllers/tools/map_text.php
+src/controllers/tools/bin_viewer_locus_sequence.php   controllers/tools/bin_viewer_locus_sequence.php
+
+# ---------------------------------------------------------------------------
+# Community curation retired (2026-09-10, Carson)
+#
+# The feature is being withdrawn, and with it every login on the site. There is
+# now no way to authenticate to MaizeGDB at all.
+#
+# Evidence it was already dormant: mgdb.annotation holds 60 annotations, the
+# most recent from April 2016, every one of them attached to a GRMZM* gene model
+# -- an identifier series two assembly generations old. 721 accounts sat behind
+# it (378 approved, 153 never processed); account creation had been switched off
+# since 2026-09-07.
+#
+# Routes retired, all 301 to /contribute_data (303 on POST where a form used to
+# submit to the same URL). /contribute_data is the destination because it is the
+# live answer to what each of these visitors wanted -- how to get data into
+# MaizeGDB -- and it needs no account:
+#
+#   /login            was the modern curator login (shadow controller, 2026-09-06)
+#   /logout           had nothing left to clear
+#   /forgot_password  recovered access to accounts that now grant none; this one
+#                     had real traffic (17 requests, 10 clients), which is why
+#                     the batch redirects rather than 404s
+#   /annotator        the curator's public profile -- and a PHP 8 fatal served at
+#                     HTTP 200 ("Undefined constant LAST_NAME"). A top-level file
+#                     shadows the by-name /annotator branch in controller.php and
+#                     leaves /person untouched.
+#   /create_account   repointed from /login (it pointed at a redirect)
+#   /preferences      repointed from /login, same reason
+#
+# /curation keeps only the four pages that never needed a login -- geneModelIssues,
+# assemblyIssues, GenomeIssue, downloadGeneModelIssues -- and redirects the rest
+# (FreeText, accounts, OBO, EC, getGeneSymbols, login_curator, and the /curation
+# home page, whose only content was the tool menu behind the gate). The auth block
+# in curation.php is gone with them, along with the branches that toggled a logout
+# link or rendered a "you must be logged in" panel.
+#
+# GenomeIssue.php no longer pre-fills the reporter's name and e-mail from the
+# logged-in curator: that was a per-render query against annotation_author on a
+# form that has always been public.
+#
+# NOT TOUCHED, DELIBERATELY:
+#   - $(topright_login) / $(topright_logout) / $(topright_preferences) in
+#     templates/maizegdb-main-modern.bau. They look like dead login chrome. They
+#     are declarations: translation.php calls get()->replace() on all three for
+#     every modern page render and Nary::get() throws on a missing identifier, so
+#     deleting them fatals the whole site. They render nothing -- the line is an
+#     HTML comment.
+#   - get_user_info() in include/db-api.php and its 25 callers in record_data/*.
+#     Those branches decided whether to show an "Edit this annotation" link. With
+#     no login they are unreachable; rewriting 25 legacy record pages to delete an
+#     unreachable branch is churn with a fault budget and no user-visible effect.
+#   - include/gp_lib.php session helpers and controllers/static/login_functions.php.
+#     Dead once nothing routes to them; left in place so the retirement is one
+#     revert rather than a reconstruction.
+#
+# Files replaced by these redirects are archived in legacy/login/modern-2026-09/
+# (the 2026-09-06 modern versions) and legacy/login/ (the pre-modernisation
+# originals). Rollback for any single route is restoring its archived file.
+src/controllers/annotator.php                         controllers/annotator.php
+
+# API documentation page, JSON-LD output and the record pages' linked-data head.
+# The record controllers and templates that carry the head block are already
+# listed above.
+src/include/api/v1/lib/mgdb_jsonld.php           include/api/v1/lib/mgdb_jsonld.php
+src/include/api/v1/docs.php                      include/api/v1/docs.php
+src/templates/static/mgdb_api.bau                templates/static/mgdb_api.bau
+src/css/mgdb-api.css                             css/mgdb-api.css
+src/js/mgdb-api.js                               js/mgdb-api.js
+
+
+# --------------------------------------------------------------------------
+# Four legacy templates adopted 2026-09-11 so the Stock Center naming sweep
+# could reach them. They serve on pages that have not been modernized and were
+# server-only, so without these entries the next full deploy would restore the
+# old wording. They keep the CRLF line endings they have on the server.
+src/templates/gene_center/locus_overview_gene_sections.bau  templates/gene_center/locus_overview_gene_sections.bau
+src/templates/documentation/dooner_du_acds_insertions.bau   templates/documentation/dooner_du_acds_insertions.bau
+src/templates/data_center/stock-left.bau                    templates/data_center/stock-left.bau
+src/templates/tools/breeders_toolbox-options.bau            templates/tools/breeders_toolbox-options.bau
+src/search/gene/gene_download_all.php               search/gene/gene_download_all.php
+src/include/blast_form_lib.php                      include/blast_form_lib.php

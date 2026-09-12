@@ -76,6 +76,14 @@ $bauplan->includeScript('/js/mgdb-chrome.js');
 $bauplan->includeScript('/js/mgdb-record.js?v=' . $v_rec_js);
 $bauplan->includeScript('/js/mgdb-variation-record.js?v=' . $v_js);
 $bauplan->head('<meta name="description" content="' . htmlspecialchars($summary, ENT_QUOTES, 'UTF-8') . '">');
+/* Machine-readable identity: a JSON-LD block in the head built from the
+   facts above, link elements to the JSON and JSON-LD records, and the same
+   two as an HTTP Link header (FAIR Signposting). See /api#api-linked-data. */
+include_once('./include/api/v1/lib/mgdb_jsonld.php');
+$bauplan->head(MgdbJsonLd::headMarkup('variation', $variation_id, array(
+  'name' => $variation_name, 'description' => $summary,
+  'attributes' => array('type' => $identity['type']))));
+MgdbJsonLd::signpost('variation', $variation_id);
 
 $mgdb = $bauplan->template()->load('templates/maizegdb-main-modern.bau');
 $mgdb->get('megamenu')->load('templates/home/maizegdb_header_modern.bau');

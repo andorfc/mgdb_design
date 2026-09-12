@@ -24,19 +24,39 @@ $$SYNTAX-LEVEL 2
         <a class="mgdb-site-brand" href="$(server-url)">
           <img src="$(image-dir)/logo.png" alt="MaizeGDB — Maize Genetics and Genomics Database" />
         </a>
-        <div class="mgdb-site-search">
-          *(search-box {load: templates/home/search-box-modern.bau}
-            &(lambda
-              $image_dir  = $this->reflect(\)->upstream('maizegdb-main-modern'\)->get('image-dir'\);
-              $server_url = $this->reflect(\)->upstream('maizegdb-main-modern'\)->get('server-url'\);
+        <!-- The search and the download box share one right-hand column so the
+             box can sit in the header's top-right corner without the search
+             losing width or the header growing taller: the two stack to about
+             100px inside the 120px the logo already sets.
 
-              $loaded = $this->reflect(\)->_parent(\);
-              if ($loaded->has('image-dir'\)\)
-                $loaded->get('image-dir'\)->replace($image_dir->value(\)\);
-              if ($loaded->has('server-url'\)\)
-                $loaded->get('server-url'\)->replace($server_url->value(\)\);
+             The download host is a separate site rather than a page of this
+             one, which is why it is here and not in the nav. This is also
+             where the legacy chrome kept it: the topright_download slot in
+             templates/top-right-menu.bau, an icon and the word "Download". -->
+        <div class="mgdb-site-header-right">
+          <a class="mgdb-bulk-download" href="https\://download.maizegdb.org/">
+            <svg class="mgdb-bulk-download-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <path d="M12 3.4v10.4"></path>
+              <path d="M7.9 9.7 12 13.8l4.1-4.1"></path>
+              <path d="M4.6 15.9v2.2c0 1.1.9 2 2 2h10.8c1.1 0 2-.9 2-2v-2.2"></path>
+            </svg>
+            <span class="mgdb-bulk-download-text">Bulk downloads</span>
+          </a>
+
+          <div class="mgdb-site-search">
+            *(search-box {load: templates/home/search-box-modern.bau}
+              &(lambda
+                $image_dir  = $this->reflect(\)->upstream('maizegdb-main-modern'\)->get('image-dir'\);
+                $server_url = $this->reflect(\)->upstream('maizegdb-main-modern'\)->get('server-url'\);
+
+                $loaded = $this->reflect(\)->_parent(\);
+                if ($loaded->has('image-dir'\)\)
+                  $loaded->get('image-dir'\)->replace($image_dir->value(\)\);
+                if ($loaded->has('server-url'\)\)
+                  $loaded->get('server-url'\)->replace($server_url->value(\)\);
+              )
             )
-          )
+          </div>
         </div>
       </div>
     </header>

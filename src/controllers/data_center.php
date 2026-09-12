@@ -36,6 +36,52 @@
   $password = getCookie('password', false);
   $userid =   getCookie('userid', false);
 
+  /* Retired 2026-09-07 (Carson).
+
+     /data_center/RNmaps -> /data_center/cytogenetic#rn-maps
+
+     Lorinda Anderson's recombination nodule data: RN frequency scored along the
+     pachytene synaptonemal complex of each of the ten maize bivalents, per
+     0.2 um interval. Two requests in the log window.
+
+     Everything the page held is now in the "Recombination nodule maps" section
+     of the Cytogenetics hub -- the source and coordinate note, the ten linkage
+     groups, the KYS and inversion stocks, the KYS SC karyotype table, both
+     Anderson references, and links to all ten data files. The files themselves
+     are untouched at /docs/RNmaps/SC1.txt .. SC10.txt.
+
+     Moving it also corrects the hub, whose Recombination card had asserted
+     "MaizeGDB holds no RN map records" while this page was serving them.
+
+     Note the hub's own link was already broken: templates/static/mgdb_map.bau
+     pointed at /docs/RNmaps, the directory, which Apache answers 403.
+
+     Rollback: delete this block; templates/data_center/RNmaps.bau and its
+     controller are untouched. */
+  if (defined('PAGE') && PAGE == 'RNmaps') {
+    header('Location: /data_center/cytogenetic#rn-maps', true, 301);
+    exit;
+  }
+
+  /* Retired 2026-09-07 (Carson).
+
+     /data_center/metabolic_pathway -> /metabolic_pathways
+
+     The legacy pathway search: one name field, wildcard with %, and a link to a
+     sample query. One request in the log window.
+
+     /metabolic_pathways is the modernized hub over the same corpus. It carries
+     the search this page offered, over 23,957 pathway rows, plus the pathway
+     comparison and omics views the legacy page had no equivalent for. Keeping
+     both leaves two searches over one corpus, which is how they drift apart.
+
+     Rollback: delete this block; templates/data_center/metabolic_pathway_search
+     .bau and its controller are untouched. */
+  if (defined('PAGE') && PAGE == 'metabolic_pathway') {
+    header('Location: /metabolic_pathways', true, 301);
+    exit;
+  }
+
   /* The gene symbol list (/data_center/gene-symbols) is modernized. The page
      was a 1,197-line hand-maintained table with no way to search it; the rows
      now come from data/gene_symbols.json and the page carries a filter.

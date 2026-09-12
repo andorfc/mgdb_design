@@ -118,17 +118,21 @@ function markerCombinedQuery($filter, $page, $pageSize, $sort) {
     // 2. Page query
     $pageParams = $whereParams;
 
+    $rankSql = '';
+    $rankParams = array();
     if ($term !== '') {
         $exactVal = $term;
         $pExactVal = 'p-' . ltrim($term, 'p-');
         $prefixVal = $term . '%';
 
-        $pageParams[] = $exactVal;
-        $pageParams[] = $pExactVal;
-        $pageParams[] = $prefixVal;
-        $pageParams[] = $exactVal;
-        $pageParams[] = $pExactVal;
-        $pageParams[] = $prefixVal;
+        $rankParams = array(
+            $exactVal,
+            $pExactVal,
+            $prefixVal,
+            $exactVal,
+            $pExactVal,
+            $prefixVal,
+        );
 
         $rankSql = "
             CASE
@@ -138,8 +142,6 @@ function markerCombinedQuery($filter, $page, $pageSize, $sort) {
                 WHEN EXISTS (SELECT 1 FROM synonyms s WHERE s.id=p.id AND s.synonyms ILIKE ?) THEN 50
                 ELSE 10
             END";
-    } else {
-        $rankSql = '1';
     }
 
     switch ($sort) {
@@ -157,7 +159,14 @@ function markerCombinedQuery($filter, $page, $pageSize, $sort) {
             break;
         case 'relevance':
         default:
-            $orderSql = ($term !== '' ? "($rankSql) DESC, " : '') . 'p.name ASC';
+            if ($term !== '') {
+                $orderSql = "($rankSql) DESC, p.name ASC";
+                foreach ($rankParams as $rp) {
+                    $pageParams[] = $rp;
+                }
+            } else {
+                $orderSql = 'p.name ASC';
+            }
             break;
     }
 

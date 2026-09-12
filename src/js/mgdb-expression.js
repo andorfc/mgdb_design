@@ -25,6 +25,13 @@
      than quietly truncated. */
   var MAX_PAGE = 200;
 
+  function defaultView() {
+    var params = new URLSearchParams(window.location.search);
+    var v = params.get('view');
+    if (v === 'cards' || v === 'table') { return v; }
+    return (window.innerWidth && window.innerWidth < 768) ? 'cards' : 'table';
+  }
+
   var state = {
     term: '',
     assembly: '',
@@ -33,6 +40,7 @@
     dir: 'asc',
     page: 1,
     pageSize: 25,
+    view: defaultView(),
     rows: [],
     total: 0,
     searched: false,
@@ -153,12 +161,19 @@
     var query = byId('expression-query');
     state.term = query ? query.value.trim() : '';
     state.assembly = (byId('expression-filter-assembly') || {}).value || '';
+    var advSort = byId('expression-adv-sort');
+    if (advSort && advSort.value) {
+      var parts = advSort.value.split('-');
+      state.sort = parts[0];
+      state.dir = parts[1] || 'asc';
+    }
   }
 
   function queryString(extra) {
     var qs = new URLSearchParams();
     if (state.term) { qs.set('term', state.term); }
     if (state.assembly) { qs.set('assembly', state.assembly); }
+    if (state.sort) { qs.set('sort', state.sort + '-' + state.dir); }
     qs.set('limit', state.pageSize === 'all' ? MAX_PAGE : state.pageSize);
     qs.set('offset', state.pageSize === 'all' ? 0 : (state.page - 1) * state.pageSize);
     Object.keys(extra || {}).forEach(function (key) { qs.set(key, extra[key]); });
@@ -233,19 +248,24 @@
     var dir = state.dir === 'desc' ? -1 : 1;
     var av = String(a[state.sort] || '');
     var bv = String(b[state.sort] || '');
-    return dir * av.localeCompare(bv, undefined, { numeric: true });
+    return dir * av.localeCompare(bv, undefined, { numeric: true, sensitivity: 'base' });
   }
 
   function render(summary) {
     var body = byId('expression-results-body');
     var empty = byId('expression-results-empty');
-    var scroll = document.querySelector('.mgdb-expression-page .expression-results-section .mgdb-table-scroll');
+    var cardsContainer = byId('expression-cards-view');
+    var scroll = byId('expression-table-scroll');
     if (!body) { return; }
 
-    var rows = visibleRows().slice();
+    var rows = state.rows.slice();
     if (state.sort) { rows.sort(compare); }
 
     body.innerHTML = rows.map(rowHtml).join('');
+    if (cardsContainer) {
+      cardsContainer.innerHTML = rows.map(renderCard).join('');
+    }
+
     /* The empty panel offers to reset the search, so it belongs to a search
        that found nothing. When the table filter is what emptied the page the
        search did match -- the status line says so and the filter can just be
@@ -253,10 +273,13 @@
     if (empty) { empty.hidden = state.rows.length !== 0; }
     if (scroll) { scroll.hidden = rows.length === 0; }
 
+    updateViewDisplay();
     updateStatus(summary, rows.length);
     renderPagination(summary);
     updateSortIndicators();
     updateExport();
+    applyResultFilter();
+    initCopyButtons();
   }
 
   function rowHtml(row) {
@@ -266,10 +289,6 @@
       { label: 'JBrowse', url: row.jbrowse_url },
       { label: 'eFP', url: row.efp_url }
     ].filter(function (link) { return link.url; }).map(function (link) {
-      /* JBrowse and eFP are absolute URLs on MaizeGDB's own subdomains, so a
-         scheme test called them external and gave them an exit arrow. The
-         arrow follows the host; the new tab follows whether the link opens a
-         tool you drive, which is why these two do not have to agree. */
       var host = (link.url.match(/^https?:\/\/([^/?#]+)/i) || [])[1];
       var external = !!host && !/(^|\.)maizegdb\.org$/i.test(host);
       var app = /^(jbrowse2?|gbrowse|qteller|efp|snptools|wgs|feta|gcv)\./i.test(host || '');
@@ -283,13 +302,167 @@
         + (row.locus_full_name ? '<span class="expression-locus-full">' + esc(row.locus_full_name) + '</span>' : '')
       : '<span class="mgdb-muted">&mdash;</span>';
 
-    return '<tr>'
+    var haystack = [row.gene_name, row.locus_name, row.locus_full_name,
+                    row.assembly_version, row.coordinates].filter(Boolean).join(' ').toLowerCase();
+
+    return '<tr data-search="' + esc(haystack) + '">'
       + '<td><span class="expression-gene-name">' + esc(row.gene_name) + '</span></td>'
       + '<td>' + locus + '</td>'
       + '<td>' + esc(row.assembly_version || '—') + '</td>'
       + '<td><span class="expression-coords">' + esc(row.coordinates || '—') + '</span></td>'
       + '<td class="expression-col-open"><span class="expression-row-links">' + links + '</span></td>'
       + '</tr>';
+  }
+
+  function renderCard(row) {
+    var geneUrl = row.gene_center_url || ('/gene_center/gene/' + encodeURIComponent(row.gene_name));
+    var asmBadge = row.assembly_version
+      ? '<span class="mgdb-pill">' + esc(row.assembly_version) + '</span>'
+      : '';
+
+    var locusUrl = row.locus_id
+      ? '/data_center/locus?id=' + encodeURIComponent(row.locus_id)
+      : '';
+
+    var locusHtml = '';
+    if (row.locus_name) {
+      var locusLinked = locusUrl
+        ? '<a href="' + locusUrl + '">' + esc(row.locus_name) + '</a>'
+        : esc(row.locus_name);
+      locusHtml = '<div class="expression-card-locus">' +
+        'Locus: <strong>' + locusLinked + '</strong>' +
+        (row.locus_full_name ? '<span class="expression-card-locus-desc">' + esc(row.locus_full_name) + '</span>' : '') +
+      '</div>';
+    }
+
+    var metaItems = [];
+    if (row.coordinates && row.coordinates !== '—') {
+      metaItems.push('<dt>Coordinates</dt><dd>' + esc(row.coordinates) + '</dd>');
+    }
+    if (row.assembly_version) {
+      metaItems.push('<dt>Assembly</dt><dd>' + esc(row.assembly_version) + '</dd>');
+    }
+    var metaHtml = metaItems.length ? '<dl class="expression-card-meta-list">' + metaItems.join('') + '</dl>' : '';
+
+    var toolLinks = [
+      { label: 'qTeller', url: row.qteller_url },
+      { label: 'Gene record', url: row.gene_center_url },
+      { label: 'JBrowse', url: row.jbrowse_url },
+      { label: 'eFP', url: row.efp_url }
+    ].filter(function (l) { return l.url; }).map(function (l) {
+      var host = (l.url.match(/^https?:\/\/([^/?#]+)/i) || [])[1];
+      var external = !!host && !/(^|\.)maizegdb\.org$/i.test(host);
+      var app = /^(jbrowse2?|gbrowse|qteller|efp|snptools|wgs|feta|gcv)\./i.test(host || '');
+      var newTab = external || app;
+      return '<a href="' + esc(l.url) + '"' + (newTab ? ' target="_blank" rel="noopener"' : '') + '>'
+           + esc(l.label) + ' <span aria-hidden="true">' + (external ? '&nearr;' : '&rarr;') + '</span></a>';
+    }).join('');
+
+    var haystack = [row.gene_name, row.locus_name, row.locus_full_name,
+                    row.assembly_version, row.coordinates].filter(Boolean).join(' ').toLowerCase();
+
+    return '<article class="expression-result-card" data-search="' + esc(haystack) + '">' +
+      '<div>' +
+        '<div class="expression-card-header">' +
+          '<h3 class="expression-card-title"><a href="' + esc(geneUrl) + '">' + esc(row.gene_name) + '</a></h3>' +
+          '<div class="expression-card-badges">' + asmBadge + '</div>' +
+        '</div>' +
+        locusHtml +
+        metaHtml +
+      '</div>' +
+      '<div class="expression-card-actions">' +
+        '<div class="expression-card-tools">' + toolLinks + '</div>' +
+        '<div class="expression-card-copy-btns">' +
+          '<button class="expression-copy-btn" type="button" data-copy-value="' + esc(row.gene_name) + '">Copy ID</button>' +
+          (row.coordinates && row.coordinates !== '—' ? '<button class="expression-copy-btn" type="button" data-copy-value="' + esc(row.coordinates) + '">Copy Coords</button>' : '') +
+        '</div>' +
+      '</div>' +
+    '</article>';
+  }
+
+  function updateViewDisplay() {
+    var tableView = byId('expression-table-scroll');
+    var cardsView = byId('expression-cards-view');
+    var btnCards = byId('expression-view-cards');
+    var btnTable = byId('expression-view-table');
+
+    var isCards = state.view === 'cards';
+    var hasResults = state.rows && state.rows.length > 0;
+
+    if (tableView) {
+      tableView.hidden = isCards || !hasResults;
+    }
+    if (cardsView) {
+      cardsView.hidden = !isCards || !hasResults;
+    }
+
+    if (btnCards) {
+      btnCards.setAttribute('aria-pressed', isCards ? 'true' : 'false');
+      btnCards.classList.toggle('is-active', isCards);
+    }
+    if (btnTable) {
+      btnTable.setAttribute('aria-pressed', !isCards ? 'true' : 'false');
+      btnTable.classList.toggle('is-active', !isCards);
+    }
+  }
+
+  function initCopyButtons() {
+    Array.prototype.forEach.call(document.querySelectorAll('.expression-copy-btn'), function (btn) {
+      btn.addEventListener('click', function () {
+        var val = btn.getAttribute('data-copy-value');
+        if (!val) return;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(val).then(function () {
+            var orig = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(function () { btn.textContent = orig; }, 1500);
+          });
+        }
+      });
+    });
+  }
+
+  function applyResultFilter() {
+    var input = byId('expression-results-filter');
+    var body = byId('expression-results-body');
+    var cardsContainer = byId('expression-cards-view');
+    if (!input) { return; }
+
+    var query = input.value.trim().toLowerCase();
+    var terms = query.split(/\s+/).filter(Boolean);
+    var visible = 0;
+    var total = state.rows.length;
+
+    if (body) {
+      var rows = body.rows;
+      for (var i = 0; i < rows.length; i++) {
+        var hay = (rows[i].getAttribute('data-search') || '').toLowerCase();
+        var match = true;
+        for (var t = 0; t < terms.length; t++) {
+          if (hay.indexOf(terms[t]) === -1) { match = false; break; }
+        }
+        rows[i].hidden = !match;
+        rows[i].classList.toggle('is-alt', match && visible % 2 === 1);
+        if (match) { visible++; }
+      }
+    }
+
+    if (cardsContainer) {
+      var cards = cardsContainer.querySelectorAll('.expression-result-card');
+      for (var j = 0; j < cards.length; j++) {
+        var cHay = (cards[j].getAttribute('data-search') || '').toLowerCase();
+        var cMatch = true;
+        for (var ct = 0; ct < terms.length; ct++) {
+          if (cHay.indexOf(terms[ct]) === -1) { cMatch = false; break; }
+        }
+        cards[j].hidden = !cMatch;
+      }
+    }
+
+    var note = byId('expression-filter-count');
+    if (note) {
+      note.textContent = query === '' ? '' : visible + ' of ' + total + ' shown';
+    }
   }
 
   function updateStatus(summary, shown) {
@@ -386,9 +559,11 @@
 
   function updateSortIndicators() {
     Array.prototype.forEach.call(
-      document.querySelectorAll('#expression-results-table th[data-expression-sort]'),
-      function (th) {
-        var key = th.getAttribute('data-expression-sort');
+      document.querySelectorAll('#expression-results-table th button[data-sort-key]'),
+      function (btn) {
+        var th = btn.closest('th');
+        if (!th) { return; }
+        var key = btn.getAttribute('data-sort-key');
         th.setAttribute('aria-sort', state.sort === key
           ? (state.dir === 'desc' ? 'descending' : 'ascending')
           : 'none');
@@ -396,7 +571,7 @@
   }
 
   function updateExport() {
-    var link = byId('expression-export');
+    var link = byId('expression-export-tsv') || byId('expression-export');
     if (!link) { return; }
     link.setAttribute('href', API + '?' + queryString({ format: 'tsv', limit: MAX_PAGE, offset: 0 }));
   }
@@ -467,10 +642,22 @@
       });
     }
 
+    var advSort = byId('expression-adv-sort');
+    if (advSort) {
+      advSort.addEventListener('change', function () {
+        readForm();
+        state.page = 1;
+        if (state.searched) { runSearch({}); }
+      });
+    }
+
     var advReset = byId('expression-adv-reset');
     if (advReset) {
       advReset.addEventListener('click', function () {
         if (assembly) { assembly.value = ''; }
+        if (advSort) { advSort.value = ''; }
+        state.sort = '';
+        state.dir = 'asc';
         readForm();
         state.page = 1;
         if (state.searched) { runSearch({}); }
@@ -482,9 +669,12 @@
       emptyReset.addEventListener('click', function () {
         if (query) { query.value = ''; }
         if (assembly) { assembly.value = ''; }
+        if (advSort) { advSort.value = ''; }
         var filter = byId('expression-results-filter');
         if (filter) { filter.value = ''; }
         state.filter = '';
+        state.sort = '';
+        state.dir = 'asc';
         state.page = 1;
         updateClearButton();
         readForm();
@@ -496,8 +686,7 @@
     var filter = byId('expression-results-filter');
     if (filter) {
       filter.addEventListener('input', function () {
-        state.filter = filter.value.trim();
-        render();
+        applyResultFilter();
       });
     }
 
@@ -510,13 +699,34 @@
       });
     }
 
+    var btnCards = byId('expression-view-cards');
+    var btnTable = byId('expression-view-table');
+
+    if (btnCards) {
+      btnCards.addEventListener('click', function () {
+        state.view = 'cards';
+        updateViewDisplay();
+      });
+    }
+
+    if (btnTable) {
+      btnTable.addEventListener('click', function () {
+        state.view = 'table';
+        updateViewDisplay();
+      });
+    }
+
     Array.prototype.forEach.call(
-      document.querySelectorAll('#expression-results-table th[data-expression-sort] button'),
+      document.querySelectorAll('#expression-results-table th button[data-sort-key]'),
       function (btn) {
         btn.addEventListener('click', function () {
-          var key = btn.parentNode.getAttribute('data-expression-sort');
-          if (state.sort === key) { state.dir = state.dir === 'asc' ? 'desc' : 'asc'; }
-          else { state.sort = key; state.dir = 'asc'; }
+          var key = btn.getAttribute('data-sort-key');
+          if (state.sort === key) {
+            state.dir = state.dir === 'asc' ? 'desc' : 'asc';
+          } else {
+            state.sort = key;
+            state.dir = 'asc';
+          }
           render();
         });
       });
@@ -527,6 +737,9 @@
        bar in the figure below. */
     var params = new URLSearchParams(window.location.search);
     var linked = false;
+    if (params.get('view') === 'cards' || params.get('view') === 'table') {
+      state.view = params.get('view');
+    }
     if (params.get('term') && query) { query.value = params.get('term'); linked = true; }
     if (params.get('assembly') && assembly) { assembly.value = params.get('assembly'); linked = true; }
     if (linked) {

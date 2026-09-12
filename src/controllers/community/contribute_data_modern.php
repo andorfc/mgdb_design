@@ -38,7 +38,7 @@ $bauplan->includeScript('/js/mgdb-chrome.js');
 /* Without this the section tab bar is styled but inert: its links scroll, and
    the active state never leaves the first tab. */
 $bauplan->includeScript('/js/mgdb-contribute-data.js?v=' . filemtime($system['root_dir'] . '/js/mgdb-contribute-data.js'));
-$bauplan->head('<meta name="description" content="How to contribute data to MaizeGDB: acceptance criteria, the repository to use for each data type, genome assembly hosting levels, community curation accounts, and frequently asked questions.">');
+$bauplan->head('<meta name="description" content="How to contribute data to MaizeGDB: acceptance criteria, the repository to use for each data type, genome assembly hosting levels, and frequently asked questions.">');
 
 $mgdb = $bauplan->template()->load('templates/maizegdb-main-modern.bau');
 $mgdb->get('megamenu')->load('templates/home/maizegdb_header_modern.bau');

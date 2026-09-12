@@ -37,13 +37,25 @@
   function renderHeader(data, requested) {
     var attributes = data.attributes || {};
     var parts = [];
-    if (requested && requested !== attributes.pan_gene_name) {
+    /* "Reached from" is for an identifier the page is NOT already showing --
+       a member gene model, a locus, an accession. The heading is now the
+       exemplar gene model, so a reader who arrived by the exemplar in either
+       of its forms is told nothing by being shown it again beside
+       "represented by the exemplar", which says the same string twice. */
+    var showsAlready = requested === attributes.pan_gene_name ||
+                       requested === attributes.exemplar ||
+                       requested === attributes.exemplar_gene_model;
+    if (requested && !showsAlready) {
       parts.push('Reached from <strong>' + R.escape(requested) + '</strong>');
     }
-    if (attributes.exemplar) {
-      parts.push('represented by the exemplar <strong>' + R.escape(attributes.exemplar) + '</strong>');
-    }
-    if (!parts.length) { return; }
+    /* The exemplar is no longer repeated here. It used to be the only place
+       the record named an identifier a reader could use, because the heading
+       was the internal pan-gene id; now the heading IS the exemplar and the
+       Exemplar fact below gives its transcript form, so saying it a third
+       time filled the hero with one string written three ways. What is left
+       is the one thing neither of those carries: which identifier the reader
+       actually arrived by. */
+    if (!parts.length) { R.show(els.synonyms, false); return; }
     els.synonyms.innerHTML = parts.join(', ') + '.';
     R.show(els.synonyms, true);
   }
@@ -80,7 +92,9 @@
     out.innerHTML = '';
 
     var factsHtml = R.facts([
-      ['Pan-gene', overview.pan_gene_name ? '<span class="mgdb-sequence">' + R.escape(overview.pan_gene_name) + '</span>' : ''],
+      /* No Pan-gene row. It carried `pan_gene_name` -- the internal analysis
+         id, pan-zea.v4.pan02070 -- which is not an identifier a reader can use
+         anywhere, and the Exemplar row below already names this record. */
       ['Analysis', overview.analysis ? R.escape(overview.analysis) : '', overview.analysis_type || ''],
       ['Chromosome', overview.chr ? R.escape(overview.chr) : ''],
       ['Exemplar', overview.exemplar ? '<span class="mgdb-sequence">' + R.escape(overview.exemplar) + '</span>' : ''],

@@ -1,0 +1,251 @@
+$$SYNTAX-LEVEL 2
+*(coop_order
+  <h2></h2>
+  <table cellpadding=0 cellspacing=0>
+    <tr>
+      <td>
+        <div id="centercolumn_record">
+          <table width='100%'  cellpadding=0 cellspacing=0>
+            <tr valign='center' class='green_curve_background'>
+              <td align='left'>
+                <img src='/images/header_left.gif'>
+              </td>
+              <td width='97%' valign='center' class='green_curve_background'>
+                Request form for the Maize Genetics Cooperation Stock Center (MGCSC\)
+              </td>
+              <td align='right'>
+                <img src='/images/header_right.gif'>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <form id="coop_stock_order_form" method='POST' action="/ordering/coop_order.php"
+                 accept-charset="utf-8">
+          <table id="coop_stock_order_table">
+            <tr>
+              <td></td>
+              <td colspan=2>
+                The MGCSC specializes in maize 
+                <a href="https://maizecoopsc.org/genstox">genetic stocks</a>. 
+                Please direct your requests for 
+                <a href="https://maizecoopsc.org/germplasm">inbred lines 
+                and other germplasm</a> to 
+                <a href="https://maizecoopsc.org/ncrpis">NCRPIS</a> or 
+                <a href="https://maizecoopsc.org/cimmyt">CIMMYT</a>.
+                <br><br>
+                If you have any problems making a request or using this form, please 
+                e-mail us at <a href="mailto:maize@uiuc.edu">maize@uiuc.edu</a> for assistance.
+                <br><br>
+                Note: The purpose of the MGCSC service is to provide cooperators with  
+                enough seeds so that they can grow up genetic stocks of interest. We are  
+                happy to supply a small amount (10 - 20 kernels\) for each stock requested, 
+                free of charge. Larger quantities of any stock cannot be supplied, nor 
+                will the same stock be sent repeatedly to the same individual or 
+                institute. Certain stocks such as UFMu, or RILs and other large 
+                populations will be sent only once per institute or location. 
+                <br><br>
+                The MGCSC tries to send the requested material out within two working 
+                days. If you require more than 25 different stocks, it may take some 
+                additional time to fulfill your request. It may not be possible for the 
+                MGCSC to handle a request for more than 60 stocks (or for 25 from outside 
+                of the USA\). If a large number of stocks is needed, special arrangements 
+                can be made; please contact the MGCSC.
+                <br><br>
+                During the height of planting preparation (April and May\) and pollination 
+                season (July and August\), it may take a bit longer to handle a request.
+                If it is an emergency, indicate this in the "Special instructions" field 
+                below.
+                <br><br>
+              </td>
+            </tr>
+            <tr>
+              <td colspan=3>
+                <span style="color:#1111bb"><b>STEP 1: Select stocks to request</b></span>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td colspan=2>
+                You can enter stock names directly below, add an optional comment 
+                (for example, indicate your desired background\) then click 'add', or 
+                <a href="/data_center/stock">search stock records</a>, or 
+                <a href="/stock_catalog">browse the stock catalog</a>.
+                <br><br>
+                Stock names are validated against the database of MGCSC stocks. If the 
+                stock is found, its descriptive name will be added to the box below.
+                <br><br>
+                If the stock(s\) you wish to order is not listed in the MGCSC catalog, 
+                enter the name(s\) in the "Special instructions" box below and MGCSC 
+                personnel will attempt to find the germplasm for you.
+                <br><br>
+                <span class="notice">
+                  If you have multiple stock request forms open, be sure you submit
+                  the most current form containing your full list of stocks.
+                </span>
+                <br><br>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td valign="top">*</td>
+              <td valign="top"><b>Stock request:</b></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td colspan=2></td>
+              <td>
+                <table>
+                  <tr>
+                    <td><b>Enter a stock name:</b></td>
+                    <td>
+                      <input type="text" id="coop_stock_order-stock_name" size=35>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>Comments on this stock:</b><br>
+                    </td>
+                    <td>
+                      <textarea id="coop_stock_order-stock_comment" rows=3 cols=40"></textarea>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td>
+                      <input id="coop_stock_order-edit_btn" 
+                             type="button" value="Add to list" 
+                             onclick="coop_stock_orderCheckStock(\)">
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td colspan=2></td>
+              <td>
+                Or select from the <a href="/stock_catalog">list of available stocks</a>
+                or <a href="/data_center/stock">search stocks</a>
+              </td>
+            </tr>
+            <tr>
+              <td colspan=2></td>
+              <td>
+                <div id="coop_stock_order-stocks_to_order" 
+                     style="border:1px black solid;width:500px">
+                  <span id="coop_stock_order-none"></span><br>
+                  <select id="coop_stock_order-select" size=8 style="width:500px"
+                          onchange="coop_stock_orderStockSelected(\)">
+                  </select>
+                </div>
+              </td>
+              <td width="100%">
+                <input type="button" id="coop_stock_order-view" 
+                       value="view selected stock" disabled
+                       onclick="coop_stock_orderViewStock(\)">
+                <br><br>
+                <input type="button" id="coop_stock_order-comment" 
+                       value="add/edit comment" disabled
+                       onclick="coop_stock_orderStockComment(\)">
+                <br><br>
+                <input type="button" id="coop_stock_order-remove" 
+                       value="remove selected stock" disabled
+                       onclick="coop_stock_orderRemoveStock(\)">
+                <br><br>
+                <input type="button" id="coop_stock_order-remove" value="clear list"
+                       onclick="coop_stock_orderClearList(\)">
+              </td>
+            </tr>
+            <tr height=10px></tr>
+          </table>
+        
+          <table>
+            <tr>
+              <td colspan=5 style="color:#1111bb"><b>STEP 2: Enter shipping information</b></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td width="5px" valign="top">*</td>
+              <th align="right">Name</th>
+              <td><input type="text" id="coop_stock_order-name" size="40"></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <th align="right">Phone</th>
+              <td><input type="text" id="coop_stock_order-phone" size="40"></td>
+              <td>Required if outside the US</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td valign="top">*</td>
+              <th align="right" valign="top">Address</th>
+              <td>
+                <textarea type="text" id="coop_stock_order-address" rows="4" cols="45"></textarea>
+              </td>
+              <td>
+                Note: Please be sure that you've entered your full<br>
+                mailing address (including university, institute or<br>
+                company name; department; building and/or street address;<br>
+                city; state or province; and postal code\). 
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td valign="top">*</td>
+              <th align="right">Country</th>
+              <td>
+                <input type="text" id="coop_stock_order-country" size="40">
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td valign="top">*</td>
+              <th align="right">E-mail</th>
+              <td><input type="text" id="coop_stock_order-email" size="40"></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td colspan=4>
+                <table>
+                  <tr>
+                    <td valign="top">
+                      <b>Special instructions<br>or information<br>regarding order</b>
+                    </td>
+                    <td>
+                      <textarea type="text" id="coop_stock_order-instructions" rows="6" cols="45"></textarea>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+              <td></td>
+            </tr>
+            <tr height=10px></tr>
+        
+            <tr>
+              <td colspan=5 style="color:#1111bb"><b>STEP 3: Submit your request to the MGCSC</b></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td colspan=2>
+                <input type="button" value="submit order" onclick="coop_stock_orderSubmit(\)">
+              </td>
+            </tr>
+          </table>
+          </form>
+          
+          <br>
+          <div class="coop_stock_popup">
+            <div class="coop_stock_popup_close">&times;</div>
+            <div id="coop_stock_popup_content"></div>
+          </div>
+        
+        </div>
+      </td>
+    </tr>
+  </table>
+)

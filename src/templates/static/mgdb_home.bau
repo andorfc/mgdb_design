@@ -268,23 +268,18 @@ $$SYNTAX-LEVEL 2
           </a>
           <a class="mgdb-index-row" role="listitem" href="$(server-url)/data_center/stock">
             <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-stocks-and-germplasm"></use></svg></span>
-            <strong>Order seed from the COOP</strong>
-            <span class="mgdb-index-desc">Request stocks from the Stock Center</span>
+            <strong>Order seed from the Stock Center</strong>
+            <span class="mgdb-index-desc">Seed requests from the Maize Genetics Cooperation Stock Center</span>
           </a>
           <a class="mgdb-index-row" role="listitem" href="https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0">
             <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-sequences"></use></svg></span>
-            <strong>Reference genome downloads</strong>
+            <strong class="mgdb-external">B73 genome downloads<span class="mgdb-visually-hidden"> &#40;opens download.maizegdb.org&#41;</span></strong>
             <span class="mgdb-index-desc">Assemblies, annotations, and supporting files</span>
           </a>
           <a class="mgdb-index-row" role="listitem" href="$(server-url)/nomenclature_summary">
             <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-references"></use></svg></span>
             <strong>Nomenclature summary</strong>
             <span class="mgdb-index-desc">How assemblies and annotations are named</span>
-          </a>
-          <a class="mgdb-index-row" role="listitem" href="$(server-url)/curation/GenomeIssue">
-            <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-variations-and-alleles"></use></svg></span>
-            <strong>Report a genome issue</strong>
-            <span class="mgdb-index-desc">Flag a problem with an assembly</span>
           </a>
           <a class="mgdb-index-row" role="listitem" href="$(server-url)/curation/geneModelIssues">
             <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-variations-and-alleles"></use></svg></span>
@@ -297,14 +292,20 @@ $$SYNTAX-LEVEL 2
 
         <h3 class="mgdb-index-band" id="home-band-tools">Tools</h3>
         <div role="list" aria-labelledby="home-band-tools">
-          <a class="mgdb-index-row" role="listitem" href="$(blast_url)">
+          <!-- The literal route, not $(blast_url), which is what this row used
+               to carry. index.php replaces that variable on the shell template,
+               where the megamenu's Tools panel reads it; this is a second
+               occurrence in the body template that nothing set, so the row
+               rendered href="" and reloaded the homepage. The Quick Links card
+               above has always written the route out for the same reason. -->
+          <a class="mgdb-index-row" role="listitem" href="$(server-url)/BLAST">
             <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-sequences"></use></svg></span>
             <strong>BLAST</strong>
             <span class="mgdb-index-desc">Align a sequence to maize databases</span>
           </a>
           <a class="mgdb-index-row" role="listitem" href="https://feta.maizegdb.org" target="_blank" rel="noopener">
             <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-gene-enrichment-feta"></use></svg></span>
-            <strong>Gene Enrichment</strong>
+            <strong class="mgdb-external">Gene Enrichment<span class="mgdb-visually-hidden"> &#40;opens feta.maizegdb.org&#41;</span></strong>
             <span class="mgdb-index-desc">GO and pathway enrichment testing</span>
           </a>
           <a class="mgdb-index-row" role="listitem" href="$(server-url)/genomebrowser">
@@ -314,27 +315,27 @@ $$SYNTAX-LEVEL 2
           </a>
           <a class="mgdb-index-row" role="listitem" href="https://maizemine.rnet.missouri.edu/maizemine/" target="_blank" rel="noopener">
             <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-maizemine"></use></svg></span>
-            <strong>MaizeMine</strong>
+            <strong class="mgdb-external">MaizeMine<span class="mgdb-visually-hidden"> &#40;opens maizemine.rnet.missouri.edu&#41;</span></strong>
             <span class="mgdb-index-desc">Build and export custom queries</span>
           </a>
           <a class="mgdb-index-row" role="listitem" href="https://pangenome-viewer.maizegdb.org" target="_blank" rel="noopener">
             <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-pan-genome-graphs"></use></svg></span>
-            <strong>Pan-genome viewer</strong>
+            <strong class="mgdb-external">Pan-genome viewer<span class="mgdb-visually-hidden"> &#40;opens pangenome-viewer.maizegdb.org&#41;</span></strong>
             <span class="mgdb-index-desc">Compare structure across genomes</span>
           </a>
           <a class="mgdb-index-row" role="listitem" href="https://phylostrata.maizegdb.org" target="_blank" rel="noopener">
             <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-gene-evolution"></use></svg></span>
-            <strong>Phylostrata</strong>
+            <strong class="mgdb-external">Phylostrata<span class="mgdb-visually-hidden"> &#40;opens phylostrata.maizegdb.org&#41;</span></strong>
             <span class="mgdb-index-desc">Evolutionary age of gene families</span>
           </a>
           <a class="mgdb-index-row" role="listitem" href="https://qteller.maizegdb.org" target="_blank" rel="noopener">
             <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-gene-expression-profile"></use></svg></span>
-            <strong>qTeller</strong>
+            <strong class="mgdb-external">qTeller<span class="mgdb-visually-hidden"> &#40;opens qteller.maizegdb.org&#41;</span></strong>
             <span class="mgdb-index-desc">Compare expression across experiments</span>
           </a>
           <a class="mgdb-index-row" role="listitem" href="https://snptools.maizegdb.org" target="_blank" rel="noopener">
             <span class="mgdb-search-icon" data-cat="gene_product" aria-hidden="true"><svg focusable="false"><use href="#mzg-variations-and-alleles"></use></svg></span>
-            <strong>SNPTools</strong>
+            <strong class="mgdb-external">SNPTools<span class="mgdb-visually-hidden"> &#40;opens snptools.maizegdb.org&#41;</span></strong>
             <span class="mgdb-index-desc">Variant browsing and AI score tracks</span>
           </a>
         </div>
@@ -391,7 +392,7 @@ $$SYNTAX-LEVEL 2
         <div role="list" aria-labelledby="home-band-community">
           <a class="mgdb-index-row" role="listitem" href="https://www.agbiodata.org" target="_blank" rel="noopener">
             <span class="mgdb-search-icon" data-cat="reference" aria-hidden="true"><svg focusable="false"><use href="#mzg-agbiodata"></use></svg></span>
-            <strong>AgBioData</strong>
+            <strong class="mgdb-external">AgBioData<span class="mgdb-visually-hidden"> &#40;opens agbiodata.org&#41;</span></strong>
             <span class="mgdb-index-desc">Cross-database FAIR data consortium</span>
           </a>
           <a class="mgdb-index-row" role="listitem" href="$(server-url)/hot_new_papers">
@@ -401,12 +402,12 @@ $$SYNTAX-LEVEL 2
           </a>
           <a class="mgdb-index-row" role="listitem" href="https://www.maizegenetics.org" target="_blank" rel="noopener">
             <span class="mgdb-search-icon" data-cat="reference" aria-hidden="true"><svg focusable="false"><use href="#mzg-maize-genetics-cooperation"></use></svg></span>
-            <strong>Maize Genetics Cooperation</strong>
+            <strong class="mgdb-external">Maize Genetics Cooperation<span class="mgdb-visually-hidden"> &#40;opens maizegenetics.org&#41;</span></strong>
             <span class="mgdb-index-desc">Stock center and newsletter</span>
           </a>
           <a class="mgdb-index-row" role="listitem" href="https://www.mgcmeeting.com" target="_blank" rel="noopener">
             <span class="mgdb-search-icon" data-cat="reference" aria-hidden="true"><svg focusable="false"><use href="#mzg-maize-genetics-meeting"></use></svg></span>
-            <strong>Maize Meeting</strong>
+            <strong class="mgdb-external">Maize Meeting<span class="mgdb-visually-hidden"> &#40;opens mgcmeeting.com&#41;</span></strong>
             <span class="mgdb-index-desc">Annual conference and archive</span>
           </a>
         </div>

@@ -16,42 +16,52 @@
   // Get system configuration
   $system = getSystemInfo('mgdb.conf');
 
-  /* Login status.
+  /* THERE IS NO LOGIN ON THIS SITE ANY MORE (2026-09-10, Carson).
    *
-   * SECURITY (2026-09-06): identity is taken from the *verified* signed session
-   * token, never from the raw `username`/`userid` cookies. The gate below is a
-   * bare `if ($username)`; when $username came straight from a cookie, anyone
-   * could set `username=<anything>` and reach the curator tools -- including the
-   * account roster, which lists every curator's name, username, and e-mail.
-   * mgdbSessionUser() returns identity only for a validly signed, unexpired
-   * token, so a hand-set cookie now proves nothing. $password is kept only for
-   * the legacy display checks further down that test it for non-emptiness.
+   * Community curation was retired as a feature, and with it every page in this
+   * namespace that sat behind a curator login. What is left under /curation is
+   * the set of pages that never needed one:
+   *
+   *     geneModelIssues          open gene-model issues (Jira-backed, read-only)
+   *     assemblyIssues           open assembly issues   (Jira-backed, read-only)
+   *     GenomeIssue              the public issue-report form
+   *     downloadGeneModelIssues  the TSV of the gene-model issue list
+   *
+   * Those four were already in $public_pages before this change; they are now
+   * the whole of it. Everything else -- FreeText, accounts, OBO, EC,
+   * getGeneSymbols, login_curator, and the /curation home page whose only
+   * content was the tool menu behind the gate -- is redirected out by the guard
+   * below. The controllers and templates stay on disk, unreachable.
+   *
+   * The auth block that used to stand here is gone with them: mgdbSessionUser(),
+   * the $username/$userid/$password trio, get_user_info() and the
+   * $super_curator level check. Nothing below reads them now, which is why the
+   * legacy branches that toggled a logout link or a "you must be logged in"
+   * panel have been removed rather than left to evaluate against false.
+   *
+   * NOTE FOR ANYONE RESTORING THIS: the gate this replaced had already had one
+   * broken-access-control bug (a bare `if ($username)` that trusted a raw
+   * cookie and exposed the full curator roster, fixed 2026-09-06). Do not
+   * reinstate an earlier revision of it; take the 2026-09-06 version, which
+   * verified a signed token, from git history or legacy/login/.
    */
-  $auth_session = mgdbSessionUser();
-  $username = $auth_session ? $auth_session['username'] : false;
-  $userid   = $auth_session ? $auth_session['userid']   : false;
-  $password = $auth_session ? getCookie('password', false) : false;
 
-  // Add public pages here (don't require curator login)
-  // Note that Jira issue submissions are now handled through Jira collectors. 
-  // See code in include/jira_lib.php
+  // The only pages left in this namespace. Anything not named here redirects.
+  // Jira issue submissions are handled through Jira collectors; see
+  // include/jira_lib.php.
   $public_pages = array('geneModelIssues', 'assemblyIssues', 'GenomeIssue', 'downloadGeneModelIssues');
   $download_pages = array('downloadGeneModelIssues');
-  
-  $DBConn = connect_to_database();
-  $user_info = get_user_info($DBConn, $username);
-  $super_curator = ($user_info['curation_lvl'] <= -5);
 
-  /* A validly-tokened account that is no longer an approved curator -- level
-     >= 1 means pending or retired -- is treated as logged out for access, so a
-     token minted before a demotion does not keep the tools open. Approved
-     curators are level < 1. */
-  if ($auth_session && $user_info['curation_lvl'] >= 1) {
-    $username = false;
-    $userid = false;
-    $password = false;
-    $super_curator = false;
+  /* Everything that is not one of the four public pages leaves the site here,
+     before any shell is built. /contribute_data is the destination for the same
+     reason it is /login's: it is the live answer to what someone reaching for a
+     curation tool wanted to do, and it needs no account. */
+  if (!in_array(PAGE, $public_pages, true)) {
+    header('Location: /contribute_data', true, 301);
+    exit;
   }
+
+  $DBConn = connect_to_database();
 
   // NOTE: CONTROLLER, PAGE, ID, and EXTRA are set in controller.php
   
@@ -153,12 +163,9 @@ logMessage("CONTROLLER: " . CONTROLLER . ", PAGE: " . PAGE . ", ACTION: " . ACTI
     // Bauplan variables in global templates
     $mgdb->get('gbrowse_url')->replace($system['GBROWSE_URL']);
     $mgdb->get('blast_url')->replace($system['BLAST_URL']);
-  
-    // Toggle log in/out section based on login status
-    if ($username && $password && $userid) {
-      $mgdb->get('logout')->toggle();
-      $mgdb->get('username')->replace($username);
-    }
+
+    /* The legacy chrome's log in / log out region stays muted: there is no
+       login on the site, so there is no state for it to show. */
   }
   else {
     // Load popup curation template and menus
@@ -166,64 +173,13 @@ logMessage("CONTROLLER: " . CONTROLLER . ", PAGE: " . PAGE . ", ACTION: " . ACTI
     $mgdb = $bauplan->template()->load('templates/curation/curation-popup-main.bau');
   }
   
-  // Check if curation home page should be displayed
-  if (!PAGE || PAGE == '') {
-    // Load main curation template and menus
-    $tmpl = $mgdb->get('body')->load('templates/curation/curation-home.bau');
-    
-    // User must be logged in as a curator unless requesting a public page
-    if (!$username) {
-      if (TARGET != 'w') {$mgdb->get('not-logged-in')->unmute();}
-      $tmpl->get('login-required')->unmute();
-    }
-    else {
-      if (TARGET != 'w') {$mgdb->get('curator-logged-in')->unmute();}
-      $mgdb->get('username')->replace($username);
-      $tmpl->get('home-page')->unmute();
-      if ($super_curator) {
-        $mgdb->get('super-curators-only')->unmute();
-      }
-    }
-  }//no page requested: show curation home page
-  
-  else if (PAGE == 'login_curator') {
-    // User is trying to log in, by-pass login check
-    $page_filename = "controllers/" . CONTROLLER . "/" . PAGE . ".php";
-    require($page_filename);
-  }
-    
-  else {
-    // User must be logged in as a curator
-    if (!in_array(PAGE, $public_pages) && !$username) {
-      if (TARGET != 'w') {$mgdb->get('not-logged-in')->unmute();}
-      $tmpl = $mgdb->get('body')->load('templates/curation/login-needed.bau');
-      
-      $tmpl->get('login-handler')->replace('/curation/login_curator');
-      $tmpl->get('nexturl')->replace($_SERVER['REQUEST_URI']);
-      $tmpl->get('forwarding-url')->unmute();
-      
-      $params = array();
-      foreach (array_keys($_POST) as $key) {
-        $pair = array('key' => $key, 'value' => $_POST[$key]);
-        array_push($params, $pair);
-      }
-      $tmpl->get('curation_params')->loop($params);
-      $tmpl->get('curation_params')->unmute();
-    }
-    
-    else {
-      if (TARGET != 'w') {$mgdb->get('curator-logged-in')->unmute();}
-      $mgdb->get('username')->replace($username);
-      
-      // Get script file name
-      $page_filename = "controllers/" . CONTROLLER . "/" . PAGE . ".php";
+  /* One of the four public pages, by definition: anything else was redirected
+     out at the top of this file, so there is no gate, no home page and no
+     login_curator branch left to dispatch. */
+  $page_filename = "controllers/" . CONTROLLER . "/" . PAGE . ".php";
 logMessage("Show curation page $page_filename");
-    
-      // Load script specific to PAGE
-      require($page_filename);
-    }
-  }
-  
+  require($page_filename);
+
   if (TARGET == 'w') {
     include_once('translation.php');
   } else {

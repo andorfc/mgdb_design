@@ -17,9 +17,8 @@ $$SYNTAX-LEVEL 2
       <strong>Pan-Gene<br />Data Hub</strong>
     </div>
     <div class="mgdb-hero-body">
-      <p class="mgdb-hero-stamp"><span aria-hidden="true">&#9679;</span> Updated&#58; $(analysis_stamp)</p>
       <h1 id="pan-gene-title">Pan-genome analysis</h1>
-      <p class="mgdb-hero-description">A MaizeGDB pan-gene connects gene models from 66 high-quality maize genome assemblies that are inferred to represent the same gene based on sequence similarity and synteny.</p>
+      <p class="mgdb-hero-description">The pan-gene and gene family datasets presented in this data center were calculated by MaizeGDB staff. The analysis from $(analysis_stamp) looked at $(annotation_count) high-quality gene model annotations to find sets of gene models grouped by sequence similarity and synteny.</p>
 <!-- Hero actions parked while the shorter header is evaluated. The section
            tabs immediately below already reach Search and Downloads.
       <div class="mgdb-hero-actions">
@@ -29,6 +28,8 @@ $$SYNTAX-LEVEL 2
       -->
     </div>
   </section>
+
+  <p class="mgdb-note pan-gene-accuracy-note"><strong>Accuracy note.</strong> Pan-gene assignments depend on the quality of each assembly and annotation, and on the analysis method. Treat a pan-gene as evidence, not as a final answer. Error reports and suggestions are welcome &mdash; <a href="/contact">contact the MaizeGDB team</a>.</p>
 
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
     <a href="#pan-gene-search" class="is-current" aria-current="true">Search</a>
@@ -47,157 +48,178 @@ $$SYNTAX-LEVEL 2
       </div>
     </div>
 
-    <form class="mgdb-search" id="pan-gene-form" role="search">
-      <div class="mgdb-search-row">
-        <div class="mgdb-field">
-          <label class="mgdb-label" for="pan-gene-term">Locus, gene model, transcript, or protein</label>
-          <p class="mgdb-hint" id="pan-gene-term-hint">Enter one identifier. Examples: <code>lg1</code>, <code>Zm00001eb067740</code>, <code>Zm00001eb067740_T001</code>, <code>LOC542528</code></p>
-          <input class="mgdb-input" id="pan-gene-term" name="term" type="search" autocomplete="off" placeholder="lg1" aria-describedby="pan-gene-term-hint">
+    <div class="pan-gene-search-form-wrap">
+      <form class="pan-gene-search-form" id="pan-gene-form" role="search">
+        <div class="pan-gene-query-row">
+          <div class="pan-gene-query-control">
+            <span class="pan-gene-search-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" width="20" height="20" fill="none">
+                <circle cx="8.5" cy="8.5" r="5.75" stroke="currentColor" stroke-width="1.75"/>
+                <path d="M13 13l4.5 4.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <input class="pan-gene-query-input" id="pan-gene-term" name="term" type="search" autocomplete="off" placeholder="Locus, gene model, transcript, or protein &mdash; e.g. lg1, Zm00001eb067740" aria-label="Search pan-genes" />
+            <button class="pan-gene-query-clear" id="pan-gene-clear" type="button" aria-label="Clear query" hidden>
+              <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true">
+                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+              </svg>
+            </button>
+          </div>
+          <button class="mgdb-button mgdb-button-primary pan-gene-query-submit" id="pan-gene-search-submit" type="submit">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+              <circle cx="8.5" cy="8.5" r="5.75" stroke="currentColor" stroke-width="2"/>
+              <path d="M13 13l4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Search pan-genes
+          </button>
         </div>
-        <button class="mgdb-button mgdb-button-primary" type="submit">Search</button>
-        <button class="mgdb-button mgdb-button-quiet" id="pan-gene-clear" type="button">Clear</button>
-      </div>
 
-      <div class="pan-gene-examples">
-        <span class="mgdb-small mgdb-muted">Try:</span>
-        <button class="mgdb-chip" type="button" data-pan-gene-example="lg1">lg1 &mdash; locus</button>
-        <button class="mgdb-chip" type="button" data-pan-gene-example="Zm00001eb067740">Zm00001eb067740 &mdash; gene model</button>
-        <button class="mgdb-chip" type="button" data-pan-gene-example="Zm00001eb269630">Zm00001eb269630 &mdash; gene model</button>
-      </div>
-    </form>
-
-    <details class="pan-gene-advanced" id="pan-gene-advanced">
-      <summary>
-        <span>
-          <strong>Advanced search</strong>
-          <small>Build a query over analysis membership, size, assembly coverage, and curated associations</small>
-        </span>
-        <span aria-hidden="true">&#8964;</span>
-      </summary>
-
-      <form id="pan-gene-advanced-form">
-        <p class="mgdb-section-intro">Leave a field empty to ignore it. Every field you fill in narrows the result set; they are combined with <em>and</em>.</p>
-
-        <fieldset class="pan-gene-fieldset">
-          <legend>Identity</legend>
-          <div class="pan-gene-filter-grid">
-            <label class="mgdb-field">
-              <span class="mgdb-label">Pan-gene analysis</span>
-              <select class="mgdb-select" id="pan-gene-analysis-filter" name="analysis">
-                <option value="">Any analysis</option>
-                $(analysis_options)
-              </select>
-            </label>
-            <label class="mgdb-field">
-              <span class="mgdb-label">Contains gene model</span>
-              <span class="mgdb-hint">One or more IDs, separated by commas. Each is matched as a prefix, so a gene model ID also matches its transcripts.</span>
-              <input class="mgdb-input" id="pan-gene-gene-models" name="gene_models" type="text" autocomplete="off" placeholder="Zm00001eb269630, Zm00001eb156130">
-            </label>
-            <label class="mgdb-field">
-              <span class="mgdb-label">Associated protein</span>
-              <span class="mgdb-hint">UniProt or EC accessions, separated by commas.</span>
-              <input class="mgdb-input" id="pan-gene-proteins" name="proteins" type="text" autocomplete="off" placeholder="A0A1D6DVJ6">
-            </label>
-          </div>
-        </fieldset>
-
-        <fieldset class="pan-gene-fieldset">
-          <legend>Size and coverage</legend>
-          <div class="pan-gene-filter-grid">
-            <label class="mgdb-field">
-              <span class="mgdb-label">At least this many members</span>
-              <input class="mgdb-input" id="pan-gene-min" name="min" type="number" min="0" max="100000" inputmode="numeric" placeholder="e.g. 60">
-            </label>
-            <label class="mgdb-field">
-              <span class="mgdb-label">At most this many members</span>
-              <input class="mgdb-input" id="pan-gene-max" name="max" type="number" min="0" max="100000" inputmode="numeric" placeholder="e.g. 80">
-            </label>
-            <label class="mgdb-field">
-              <span class="mgdb-label">Present in at least &#37; of annotations</span>
-              <input class="mgdb-input" id="pan-gene-min-annots" name="min_annots" type="number" min="0" max="100" inputmode="numeric" placeholder="e.g. 95">
-            </label>
-            <label class="mgdb-field">
-              <span class="mgdb-label">Present in at most &#37; of annotations</span>
-              <input class="mgdb-input" id="pan-gene-max-annots" name="max_annots" type="number" min="0" max="100" inputmode="numeric" placeholder="e.g. 20">
-            </label>
-          </div>
-          <p class="mgdb-hint">Core pan-genes are present in a high percentage of annotations; dispensable ones in a low percentage.</p>
-        </fieldset>
-
-        <fieldset class="pan-gene-fieldset">
-          <legend>Curated associations</legend>
-          <div class="pan-gene-check-grid">
-            <label class="pan-gene-check">
-              <input id="pan-gene-locus" name="locus" type="checkbox" value="1">
-              <span><strong>Associated with a gene locus</strong><small>Only pan-genes tied to a named, phenotype- or function-associated locus.</small></span>
-            </label>
-            <label class="pan-gene-check">
-              <input id="pan-gene-trait" name="trait" type="checkbox" value="1">
-              <span><strong>Associated with a trait</strong><small>Only pan-genes with a curated trait association.</small></span>
-            </label>
-            <label class="pan-gene-check">
-              <input id="pan-gene-protein-any" name="protein_any" type="checkbox" value="1">
-              <span><strong>Associated with any protein</strong><small>Only pan-genes with a UniProt or EC accession. Ignored when specific accessions are given above.</small></span>
-            </label>
-          </div>
-        </fieldset>
-
-        <fieldset class="pan-gene-fieldset">
-          <legend>Assembly membership</legend>
-          <div class="pan-gene-filter-grid">
-            <label class="mgdb-field">
-              <span class="mgdb-label" id="pan-gene-appear-label">Must have members from all of</span>
-              <span class="mgdb-hint">Hold Ctrl, or Command on a Mac, to select more than one.</span>
-              <select class="mgdb-select pan-gene-multi" id="pan-gene-appear" name="appear" multiple size="8" aria-labelledby="pan-gene-appear-label">
-                $(annotation_options)
-              </select>
-            </label>
-            <label class="mgdb-field">
-              <span class="mgdb-label" id="pan-gene-not-appear-label">Must have members from none of</span>
-              <span class="mgdb-hint">Useful for finding genes absent from a genotype of interest.</span>
-              <select class="mgdb-select pan-gene-multi" id="pan-gene-not-appear" name="not_appear" multiple size="8" aria-labelledby="pan-gene-not-appear-label">
-                $(annotation_options)
-              </select>
-            </label>
-          </div>
-        </fieldset>
-
-        <div class="mgdb-form-actions">
-          <button class="mgdb-button mgdb-button-primary" type="submit">Run advanced search</button>
-          <button class="mgdb-button mgdb-button-quiet" id="pan-gene-advanced-clear" type="button">Clear all filters</button>
+        <div class="pan-gene-examples" aria-label="Example searches">
+          <span class="pan-gene-example-label">EXAMPLES&#58;</span>
+          <button type="button" class="pan-gene-example-btn" data-pan-gene-example="lg1">lg1</button>
+          <button type="button" class="pan-gene-example-btn" data-pan-gene-example="Zm00001eb067740">Zm00001eb067740</button>
+          <button type="button" class="pan-gene-example-btn" data-pan-gene-example="Zm00001eb269630">Zm00001eb269630</button>
+          <button type="button" class="pan-gene-example-btn" data-pan-gene-example="LOC542528">LOC542528</button>
+          <button type="button" class="pan-gene-example-btn" data-pan-gene-example="A0A1D6DVJ6">A0A1D6DVJ6</button>
         </div>
+
+        <details class="pan-gene-advanced" id="pan-gene-advanced">
+          <summary>
+            <span class="pan-gene-advanced-label">Advanced search</span>
+            <span class="pan-gene-advanced-count" id="pan-gene-advanced-count" hidden>0</span>
+          </summary>
+          <div class="pan-gene-advanced-body">
+            <div id="pan-gene-advanced-form">
+              <fieldset class="pan-gene-fieldset">
+                <legend>Identity</legend>
+                <div class="pan-gene-filter-grid">
+                  <label class="mgdb-field">
+                    <span class="mgdb-label">Pan-gene analysis</span>
+                    <select class="mgdb-select" id="pan-gene-analysis-filter" name="analysis">
+                      <option value="">Any analysis</option>
+                      $(analysis_options)
+                    </select>
+                  </label>
+                  <label class="mgdb-field">
+                    <span class="mgdb-label">Contains gene model</span>
+                    <input class="mgdb-input" id="pan-gene-gene-models" name="gene_models" type="text" autocomplete="off" placeholder="Zm00001eb269630, Zm00001eb156130">
+                    <span class="mgdb-hint">One or more IDs, separated by commas. Each is matched as a prefix, so a gene model ID also matches its transcripts.</span>
+                  </label>
+                  <label class="mgdb-field">
+                    <span class="mgdb-label">Associated protein</span>
+                    <input class="mgdb-input" id="pan-gene-proteins" name="proteins" type="text" autocomplete="off" placeholder="A0A1D6DVJ6">
+                    <span class="mgdb-hint">UniProt or EC accessions, separated by commas.</span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <fieldset class="pan-gene-fieldset">
+                <legend>Size, coverage, and associations</legend>
+                <div class="pan-gene-filter-grid pan-gene-filter-grid-pairs">
+                  <label class="mgdb-field">
+                    <span class="mgdb-label">At least this many members</span>
+                    <input class="mgdb-input" id="pan-gene-min" name="min" type="number" min="0" max="100000" inputmode="numeric" placeholder="e.g. 60">
+                  </label>
+                  <label class="mgdb-field">
+                    <span class="mgdb-label">At most this many members</span>
+                    <input class="mgdb-input" id="pan-gene-max" name="max" type="number" min="0" max="100000" inputmode="numeric" placeholder="e.g. 80">
+                  </label>
+                  <label class="mgdb-field">
+                    <span class="mgdb-label">Present in at least &#37; of annotations</span>
+                    <input class="mgdb-input" id="pan-gene-min-annots" name="min_annots" type="number" min="0" max="100" inputmode="numeric" placeholder="e.g. 95">
+                  </label>
+                  <label class="mgdb-field">
+                    <span class="mgdb-label">Present in at most &#37; of annotations</span>
+                    <input class="mgdb-input" id="pan-gene-max-annots" name="max_annots" type="number" min="0" max="100" inputmode="numeric" placeholder="e.g. 20">
+                  </label>
+                </div>
+                <p class="mgdb-hint">Core pan-genes are present in a high percentage of annotations; dispensable ones in a low percentage.</p>
+
+                <div class="pan-gene-check-grid">
+                  <label class="pan-gene-check">
+                    <input id="pan-gene-locus" name="locus" type="checkbox" value="1">
+                    <span><strong>Associated with a gene locus</strong><small>Only pan-genes tied to a named, phenotype- or function-associated locus.</small></span>
+                  </label>
+                  <label class="pan-gene-check">
+                    <input id="pan-gene-trait" name="trait" type="checkbox" value="1">
+                    <span><strong>Associated with a trait</strong><small>Only pan-genes with a curated trait association.</small></span>
+                  </label>
+                  <label class="pan-gene-check">
+                    <input id="pan-gene-protein-any" name="protein_any" type="checkbox" value="1">
+                    <span><strong>Associated with any protein</strong><small>Only pan-genes with a UniProt or EC accession. Ignored when specific accessions are given above.</small></span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <fieldset class="pan-gene-fieldset">
+                <legend>Assembly membership</legend>
+                <div class="pan-gene-filter-grid">
+                  <label class="mgdb-field">
+                    <span class="mgdb-label" id="pan-gene-appear-label">Must have members from all of</span>
+                    <select class="mgdb-select pan-gene-multi" id="pan-gene-appear" name="appear" multiple size="8" aria-labelledby="pan-gene-appear-label">
+                      $(annotation_options)
+                    </select>
+                    <span class="mgdb-hint">Hold Ctrl, or Command on a Mac, to select more than one.</span>
+                  </label>
+                  <label class="mgdb-field">
+                    <span class="mgdb-label" id="pan-gene-not-appear-label">Must have members from none of</span>
+                    <select class="mgdb-select pan-gene-multi" id="pan-gene-not-appear" name="not_appear" multiple size="8" aria-labelledby="pan-gene-not-appear-label">
+                      $(annotation_options)
+                    </select>
+                    <span class="mgdb-hint">Useful for finding genes absent from a genotype of interest.</span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <div class="pan-gene-advanced-actions">
+                <button class="mgdb-button mgdb-button-primary" id="pan-gene-adv-submit" type="button">Apply filters</button>
+                <button class="pan-gene-advanced-reset-btn" id="pan-gene-advanced-clear" type="button">Reset filters</button>
+              </div>
+            </div>
+          </div>
+        </details>
       </form>
-    </details>
+    </div>
   </section>
 
-  <section id="pan-gene-results" aria-labelledby="pan-gene-results-title" hidden>
+  <section id="pan-gene-results" class="pan-gene-results-section" aria-labelledby="pan-gene-results-title" hidden>
     <div class="mgdb-section-heading">
       <div>
         <h2 id="pan-gene-results-title">Results</h2>
-        <p id="pan-gene-status" aria-live="polite">Enter an identifier above, or open the advanced search, to begin.</p>
       </div>
-      <div class="pan-gene-results-controls" id="pan-gene-sort-wrap" hidden>
-        <div class="mgdb-hub-field">
-          <label for="pan-gene-results-filter">Filter results</label>
-          <input id="pan-gene-results-filter" type="search" placeholder="Narrow this page" autocomplete="off" />
-        </div>
-        <div class="mgdb-hub-field">
-          <label for="pan-gene-page-size">Results per page</label>
-          <select id="pan-gene-page-size">
-            <option value="10">Top 10</option>
-            <option value="25" selected>Top 25</option>
-            <option value="50">Top 50</option>
-            <option value="all">All results</option>
-          </select>
-        </div>
-        <div class="mgdb-hub-field">
-          <label for="pan-gene-sort">Sort</label>
-          <select id="pan-gene-sort">
-            <option value="members">Most members first</option>
-            <option value="members-asc">Fewest members first</option>
-            <option value="annotations">Widest assembly coverage first</option>
-            <option value="exemplar">Exemplar A&ndash;Z</option>
-          </select>
+    </div>
+
+    <p class="pan-gene-results-status" id="pan-gene-status" role="status" aria-live="polite">Enter an identifier above, or open the advanced search, to begin.</p>
+
+    <div class="pan-gene-results-toolbar" id="pan-gene-results-toolbar">
+      <div class="mgdb-hub-field pan-gene-results-filter">
+        <label for="pan-gene-results-filter">Filter these results</label>
+        <input id="pan-gene-results-filter" type="search" placeholder="Narrow this page" autocomplete="off" />
+        <span class="mgdb-result-count" id="pan-gene-filter-count" aria-live="polite"></span>
+      </div>
+
+      <div class="mgdb-hub-field">
+        <label for="pan-gene-page-size">Results shown</label>
+        <select class="mgdb-select" id="pan-gene-page-size">
+          <option value="10">Top 10</option>
+          <option value="25" selected>Top 25</option>
+          <option value="50">Top 50</option>
+          <option value="all">All results</option>
+        </select>
+      </div>
+
+      <div class="mgdb-hub-field mgdb-hub-field-action pan-gene-results-export">
+        <a class="mgdb-button mgdb-button-quiet" id="pan-gene-export-tsv" href="#" download="pan_genes.tsv">Export TSV</a>
+      </div>
+
+      <div class="mgdb-hub-field mgdb-hub-field-action pan-gene-results-view">
+        <div class="mgdb-view-toggle" role="group" aria-label="Result view">
+          <button class="mgdb-view-btn" id="pan-gene-view-cards" type="button" data-view="card" aria-pressed="false">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>Cards
+          </button>
+          <button class="mgdb-view-btn is-active" id="pan-gene-view-table" type="button" data-view="table" aria-pressed="true">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true"><rect x="1" y="2" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="12" width="14" height="2" rx="1" fill="currentColor"/></svg>Table
+          </button>
         </div>
       </div>
     </div>
@@ -208,23 +230,25 @@ $$SYNTAX-LEVEL 2
 
     <div id="pan-gene-single" class="pan-gene-single" hidden></div>
 
-    <div class="mgdb-table-scroll" id="pan-gene-table-wrap" hidden>
-      <table class="mgdb-table" id="pan-gene-table">
-        <caption>Matching pan-genes<span class="mgdb-muted" id="pan-gene-caption-note">Each row is one pan-gene. Open the exemplar to see every member, its alignment, and its evidence.</span></caption>
+    <div class="mgdb-table-wrap pan-gene-table-wrap" id="pan-gene-table-view">
+      <table class="mgdb-table pan-gene-table" id="pan-gene-table">
+        <caption class="pan-gene-caption">Matching pan-genes<span class="mgdb-muted" id="pan-gene-caption-note">Each row is one pan-gene, identified by its exemplar. Click the exemplar name to explore the pan-gene.</span></caption>
         <thead>
           <tr>
-            <th scope="col">Exemplar</th>
-            <th scope="col">Locus</th>
-            <th scope="col">Protein</th>
-            <th scope="col">Trait</th>
-            <th scope="col" class="mgdb-numeric">Members</th>
-            <th scope="col" class="mgdb-numeric">Annotations</th>
-            <th scope="col">Matched on</th>
+            <th scope="col" aria-sort="none"><button type="button" data-sort-key="exemplar">Exemplar</button></th>
+            <th scope="col" aria-sort="none"><button type="button" data-sort-key="locus">Locus</button></th>
+            <th scope="col" aria-sort="none"><button type="button" data-sort-key="protein">Protein</button></th>
+            <th scope="col" aria-sort="none"><button type="button" data-sort-key="trait">Trait</button></th>
+            <th scope="col" class="mgdb-numeric" aria-sort="descending"><button type="button" data-sort-key="members">Members</button></th>
+            <th scope="col" class="mgdb-numeric" aria-sort="none"><button type="button" data-sort-key="annotations">Annotations</button></th>
+            <th scope="col" aria-sort="none"><button type="button" data-sort-key="matched">Matched on</button></th>
           </tr>
         </thead>
         <tbody id="pan-gene-rows"></tbody>
       </table>
     </div>
+
+    <div class="pan-gene-card-grid" id="pan-gene-cards-view" hidden></div>
 
     <div class="mgdb-empty" id="pan-gene-empty" hidden>
       <h3 id="pan-gene-empty-title">No pan-genes found</h3>
@@ -239,7 +263,7 @@ $$SYNTAX-LEVEL 2
       </div>
     </div>
 
-    <nav class="mgdb-pagination" id="pan-gene-pagination" aria-label="Result pages" hidden></nav>
+    <nav class="pan-gene-pagination" id="pan-gene-pagination" aria-label="Result pages" hidden></nav>
   </section>
 
   <section id="pan-gene-analysis" aria-labelledby="pan-gene-analysis-title">
@@ -249,7 +273,7 @@ $$SYNTAX-LEVEL 2
       </div>
     </div>
 
-    <p class="mgdb-section-intro">$(analysis_name) was calculated by MaizeGDB staff with $(analysis_pipeline) on $(analysis_date). The <a href="https://github.com/legumeinfo/pandagma" target="_blank" rel="noopener">Pandagma</a> pipeline <span aria-hidden="true">&nearr;</span> combines synteny with sequence similarity. Details specific to one pan-gene are on its record page.</p>
+    <p class="mgdb-section-intro">$(analysis_name) was calculated by MaizeGDB staff with $(analysis_pipeline) on $(analysis_date). The <a href="https://github.com/legumeinfo/pandagma" target="_blank" rel="noopener">Pandagma pipeline <span aria-hidden="true">&nearr;</span></a> combines synteny with sequence similarity. Details specific to one pan-gene are on its record page.</p>
 
     <div class="pan-gene-tree-figure">
 
@@ -263,7 +287,7 @@ $$SYNTAX-LEVEL 2
 
     <h3 class="mgdb-spaced">Annotations included</h3>
     <p class="mgdb-section-intro">$(annotation_coverage). &#37; placed is the share of each annotation&rsquo;s gene models that were assigned to a pan-gene &mdash; a low value can indicate a divergent genome or an annotation of a different character.</p>
-    <div class="mgdb-table-scroll">
+    <div class="mgdb-table-scroll mgdb-spaced">
       <table class="mgdb-table" data-sortable>
         <caption>Annotations in $(analysis_name)<span class="mgdb-muted">Select a column heading to sort.</span></caption>
         <thead>
@@ -303,8 +327,8 @@ $$SYNTAX-LEVEL 2
     </div>
 
     <div class="mgdb-panel mgdb-spaced">
-      <h3>Exemplar sequence for a list of gene models</h3>
-      <p class="mgdb-section-intro">One gene model from each pan-gene is chosen as its exemplar, rather than a consensus sequence being computed. Give a list of gene models and the exemplars of the pan-genes they belong to are returned.</p>
+      <h3>Download pan-gene exemplar sequence</h3>
+      <p class="mgdb-section-intro">One gene model from each pan-gene is chosen as its exemplar, rather than a consensus sequence being computed. Pan-genes are identified by their exemplars. Enter a list of gene models or transcripts and sequence for the exemplars in their pan-genes is returned.</p>
 
       <form id="pan-gene-exemplar-form" method="POST" target="_blank" action="/search/pan_gene/pan_gene_exemplar_seq.php">
         <div class="pan-gene-exemplar-grid">
@@ -312,7 +336,7 @@ $$SYNTAX-LEVEL 2
             <label class="mgdb-label" for="pan-gene-download-list">Gene models</label>
             <p class="mgdb-hint" id="pan-gene-download-hint">Up to 50, one per line or comma separated.</p>
             <textarea class="mgdb-textarea" id="pan-gene-download-list" name="pan_gene-download_list" rows="6" aria-describedby="pan-gene-download-hint"></textarea>
-            <button class="mgdb-button mgdb-button-quiet pan-gene-example-button" id="pan-gene-download-example" type="button">Fill in an example set</button>
+            <button class="mgdb-button mgdb-button-quiet pan-gene-example-button" id="pan-gene-download-example" type="button">Example list</button>
           </div>
           <div>
             <fieldset class="pan-gene-fieldset">
@@ -421,12 +445,11 @@ $$SYNTAX-LEVEL 2
         <div>
           <strong class="mgdb-metric-value">$(largest_pan_gene)</strong>
           <h3>Largest pan-gene</h3>
-          <p>Members in the biggest set. Large sets often indicate a gene family or a repeat.</p>
+          <p>Members in the biggest set.</p>
         </div>
       </article>
     </div>
 
-    <p class="mgdb-note mgdb-spaced"><strong>Accuracy note.</strong> Pan-gene assignments depend on the quality of each assembly and annotation, and on the analysis method. Treat a pan-gene as evidence, not as a final answer. Errors and suggestions are welcome &mdash; <a href="/contact">contact the MaizeGDB team</a>.</p>
     <figure class="mgdb-figure">
         <h3>Pan-gene size distribution</h3>
         <p>How many pan-genes contain a given number of member gene models.</p>

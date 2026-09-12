@@ -1,0 +1,187 @@
+/* /jobs -- the maize community job board. Scoped under .mgdb-jobs-page;
+   everything else on the page is a shared component from mgdb-modern.css. */
+
+/* ---- the listing --------------------------------------------------------- */
+
+/* A posting's "How to apply" carries whatever URL the employer gave us, and one
+   of them is a 130-character Workday link that renders 1041px wide with no
+   break opportunity in it. Without the two rules below that single URL set the
+   floor for the ONE shared grid track, so every card in the list became 470px
+   wide inside a 343px column and took the document 111px past a 375px viewport.
+   One long link in one posting widened all three cards.
+
+   `minmax(0, 1fr)` because an `auto`/`1fr` track takes an automatic MINIMUM of
+   min-content; `min-width: 0` because a grid item's `min-width` defaults to
+   `auto`, which is the same floor one level down. The form grid below already
+   does this -- the listing grid was written without it.
+
+   Wrapping the URL is handled on .jobs-card-body; either fix alone clears the
+   overflow, and both are kept because the track fix also protects against long
+   content that is not a link, and the wrap fix keeps the URL readable rather
+   than merely contained. */
+.mgdb-jobs-page .jobs-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--mgdb-space-5);
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-jobs-page .jobs-card {
+  min-width: 0;
+  border-left: 4px solid var(--mgdb-green);
+}
+
+.mgdb-jobs-page .jobs-card-head h3 {
+  margin: 0;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xl);
+  line-height: var(--mgdb-leading-snug);
+}
+
+/* Meta as one inline run, middot-separated, wrapping as needed. */
+.mgdb-jobs-page .jobs-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--mgdb-space-3);
+  margin: var(--mgdb-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+.mgdb-jobs-page .jobs-meta li { position: relative; }
+.mgdb-jobs-page .jobs-meta li + li::before {
+  content: "\00B7";
+  margin-right: var(--mgdb-space-3);
+  color: var(--mgdb-line);
+}
+.mgdb-jobs-page .jobs-meta-primary { color: var(--mgdb-ink); font-weight: 600; }
+.mgdb-jobs-page .jobs-meta-apply { color: var(--mgdb-gold-dark); font-weight: 600; }
+
+/* `anywhere`, not `break-word`: the two are identical for line breaking, but
+   only `anywhere` lets the break opportunities count toward MIN-CONTENT
+   intrinsic sizing, which is what the grid track above measures. The apply
+   links already computed to `break-word` and the track still blew out. Safe on
+   the curator-authored prose in here -- `anywhere` still breaks a word only
+   when it would otherwise overflow. */
+.mgdb-jobs-page .jobs-card-body {
+  margin-top: var(--mgdb-space-4);
+  overflow-wrap: anywhere;
+}
+.mgdb-jobs-page .jobs-card-body > * + * { margin-top: var(--mgdb-space-4); }
+
+/* Curator-authored HTML: keep list markers and sensible spacing. */
+.mgdb-jobs-page .jobs-card-body p { margin: 0 0 var(--mgdb-space-3); }
+.mgdb-jobs-page .jobs-card-body p:last-child { margin-bottom: 0; }
+.mgdb-jobs-page .jobs-card-body ul {
+  margin: 0 0 var(--mgdb-space-3);
+  padding-left: 1.35em;
+  list-style: disc;
+}
+.mgdb-jobs-page .jobs-card-body li + li { margin-top: var(--mgdb-space-2); }
+
+.mgdb-jobs-page .jobs-field h4 {
+  margin: 0 0 var(--mgdb-space-2);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+}
+
+/* Foldable qualifications block. */
+.mgdb-jobs-page .jobs-more {
+  border: 1px solid var(--mgdb-line-soft);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-alt);
+}
+.mgdb-jobs-page .jobs-more > summary {
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  color: var(--mgdb-green-dark);
+  font-weight: 700;
+  cursor: pointer;
+}
+.mgdb-jobs-page .jobs-more > summary:hover { color: var(--mgdb-green); }
+.mgdb-jobs-page .jobs-more[open] > summary { border-bottom: 1px solid var(--mgdb-line-soft); }
+.mgdb-jobs-page .jobs-more-body { padding: var(--mgdb-space-4); }
+.mgdb-jobs-page .jobs-more-body .jobs-field + .jobs-field { margin-top: var(--mgdb-space-4); }
+
+/* How to apply -- kept in view, marked as the actionable block. */
+.mgdb-jobs-page .jobs-apply {
+  padding: var(--mgdb-space-4);
+  border-left: 4px solid var(--mgdb-gold);
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  background: var(--mgdb-gold-soft);
+}
+.mgdb-jobs-page .jobs-apply h4 { color: var(--mgdb-burgundy); }
+.mgdb-jobs-page .jobs-apply :last-child { margin-bottom: 0; }
+
+.mgdb-jobs-page .jobs-contact {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* ---- post a job ---------------------------------------------------------- */
+
+.mgdb-jobs-page .jobs-post-intro { margin-top: var(--mgdb-space-4); color: var(--mgdb-ink-soft); }
+
+.mgdb-jobs-page .jobs-post {
+  margin-top: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+.mgdb-jobs-page .jobs-post-summary {
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+  font-weight: 700;
+  cursor: pointer;
+}
+.mgdb-jobs-page .jobs-post-summary:hover { color: var(--mgdb-green); }
+.mgdb-jobs-page .jobs-post[open] .jobs-post-summary { border-bottom: 1px solid var(--mgdb-line-soft); }
+.mgdb-jobs-page .jobs-post-body { padding: var(--mgdb-space-5); }
+.mgdb-jobs-page .jobs-post-lede { margin: 0 0 var(--mgdb-space-5); color: var(--mgdb-ink-soft); }
+
+.mgdb-jobs-page .jobs-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--mgdb-space-5);
+}
+.mgdb-jobs-page .jobs-form-grid .mgdb-field { margin-top: 0; }
+.mgdb-jobs-page .jobs-field-wide { grid-column: 1 / -1; }
+
+.mgdb-jobs-page .jobs-optional,
+.mgdb-jobs-page .jobs-post-lede + * .jobs-optional {
+  margin-left: .35em;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 400;
+}
+.mgdb-jobs-page .jobs-optional { font-weight: 400; }
+
+.mgdb-jobs-page .jobs-date-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+.mgdb-jobs-page .jobs-date-row .mgdb-select { flex: 1 1 8rem; min-width: 0; }
+
+.mgdb-jobs-page .jobs-error-list {
+  margin: var(--mgdb-space-2) 0 0;
+  padding-left: 1.2em;
+}
+.mgdb-jobs-page .jobs-submitted { margin-top: var(--mgdb-space-5); }
+
+/* Honeypot: off the canvas rather than display:none, since form fillers skip
+   hidden inputs. Not announced to assistive tech. */
+.mgdb-jobs-page .jobs-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+@media (max-width: 640px) {
+  .mgdb-jobs-page .jobs-form-grid { grid-template-columns: minmax(0, 1fr); }
+}

@@ -89,6 +89,8 @@
 
       if (q === '') {
         root.classList.remove('is-filtering');
+        /* Back to the one category the reader had chosen. */
+        if (typeof rail !== 'undefined' && rail && selected) { select(selected); }
         for (i = 0; i < groups.length; i++) {
           group = groups[i];
           if (group.count) {
@@ -161,6 +163,63 @@
     input.addEventListener('search', function () {
       apply(input.value);
     });
+
+    /* ---- Category rail -------------------------------------------------
+       The markup ships with every category visible, which is what a reader
+       without JavaScript keeps. Here, where the layout asked for a rail, the
+       list becomes master-detail: one category shown, chosen from the rail.
+
+       Selection is suspended while a filter is active -- a filter runs across
+       the whole catalog, and hiding the categories it matched would be the
+       opposite of what was asked. Restored on clear. */
+    var layout = document.getElementById('sc-layout');
+    var rail = layout && layout.classList.contains('sc-layout-rail');
+    var selected = null;
+
+    function select(id, focusList) {
+      var group = null;
+      for (var i = 0; i < groups.length; i++) {
+        var on = groups[i].el.id === id;
+        groups[i].el.classList.toggle('is-selected', on);
+        if (groups[i].jump) {
+          groups[i].jump.classList.toggle('is-current', on);
+          groups[i].jump.setAttribute('aria-current', on ? 'true' : 'false');
+        }
+        if (on) { group = groups[i]; }
+      }
+      if (group) {
+        selected = id;
+        if (focusList) {
+          var title = group.el.querySelector('.sc-group-title');
+          if (title && title.scrollIntoView) { title.scrollIntoView({ block: 'nearest' }); }
+        }
+      }
+      return !!group;
+    }
+
+    if (rail && groups.length) {
+      root.classList.add('is-rail-active');
+
+      /* A deep link to a category still lands on it. */
+      var wanted = (window.location.hash || '').replace(/^#/, '');
+      if (!wanted || !select(wanted)) { select(groups[0].el.id); }
+
+      Array.prototype.forEach.call(document.querySelectorAll('.sc-jump'), function (a) {
+        a.addEventListener('click', function (event) {
+          var id = (a.getAttribute('href') || '').replace(/^#/, '');
+          if (!id) { return; }
+          event.preventDefault();
+          if (select(id, true) && window.history && window.history.replaceState) {
+            window.history.replaceState(null, '', '#' + id);
+          }
+        });
+      });
+
+      window.addEventListener('hashchange', function () {
+        var id = (window.location.hash || '').replace(/^#/, '');
+        if (id) { select(id, true); }
+      });
+    }
 
     if (window.MGDB && typeof window.MGDB.sectionTabs === 'function') {
       window.MGDB.sectionTabs({ watch: '#sc-groups' });

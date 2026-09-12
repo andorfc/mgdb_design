@@ -547,7 +547,7 @@ function referenceCitationText($row) {
 }
 
 function referenceSendExport($DBConn, $filter, $format) {
-    $allowed = array('csv', 'doi', 'pmid', 'ris', 'bibtex');
+    $allowed = array('csv', 'tsv', 'doi', 'pmid', 'ris', 'bibtex');
     if (!in_array($format, $allowed, true)) {
         http_response_code(400);
         echo 'Unsupported export format.';
@@ -560,6 +560,7 @@ function referenceSendExport($DBConn, $filter, $format) {
     $extension = $format === 'pmid' || $format === 'doi' ? 'txt' : ($format === 'bibtex' ? 'bib' : $format);
     header('Content-Type: text/plain; charset=utf-8');
     if ($format === 'csv') header('Content-Type: text/csv; charset=utf-8');
+    if ($format === 'tsv') header('Content-Type: text/tab-separated-values; charset=utf-8');
     if ($format === 'ris') header('Content-Type: application/x-research-info-systems; charset=utf-8');
     if ($format === 'bibtex') header('Content-Type: application/x-bibtex; charset=utf-8');
     header('Content-Disposition: attachment; filename="maizegdb-references-' . $stamp . '.' . $extension . '"');
@@ -577,13 +578,14 @@ function referenceSendExport($DBConn, $filter, $format) {
         return;
     }
 
-    if ($format === 'csv') {
+    if ($format === 'csv' || $format === 'tsv') {
+        $delimiter = $format === 'tsv' ? "\t" : ",";
         $out = fopen('php://output', 'w');
-        fputcsv($out, array('MaizeGDB ID', 'Year', 'Publication type', 'Title', 'Authors', 'Journal', 'DOI', 'PubMed ID', 'MaizeGDB URL'));
+        fputcsv($out, array('MaizeGDB ID', 'Year', 'Publication type', 'Title', 'Authors', 'Journal', 'DOI', 'PubMed ID', 'MaizeGDB URL'), $delimiter);
         foreach ($rows as $row) {
             fputcsv($out, array($row['id'], $row['year'], $row['publication_type'], $row['title'],
                 $row['authors'], $row['journal'], $row['doi'], $row['pubmed'],
-                'https://maizegdb.org/data_center/reference?id=' . $row['id']));
+                'https://maizegdb.org/data_center/reference?id=' . $row['id']), $delimiter);
         }
         fclose($out);
         return;

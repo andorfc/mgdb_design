@@ -87,134 +87,497 @@
   color: var(--mgdb-muted);
 }
 
-/* ── The main search form ────────────────────────────────────────────────── */
+/* --------------------------------------------------------------------------
+   Search
+   -------------------------------------------------------------------------- */
 
-.mgdb-gene-page .gene-search-intro { margin-bottom: 1.2rem; }
-
-.mgdb-gene-page .gene-search-intro > div { max-width: 48rem; }
-
-.mgdb-gene-page .gene-search-intro h3 {
-  margin: 0.25rem 0 0.45rem;
-  color: var(--mgdb-green-dark);
-  font-size: clamp(1.35rem, 2.5vw, 1.8rem);
-}
-
-.mgdb-gene-page .gene-search-intro p {
-  margin: 0;
-  color: var(--mgdb-muted);
-}
-
-/* The control line. The buttons sit in the same flex row as the input rather
-   than in a form-actions block below it, so they share the input's baseline by
-   construction and the line ends flush with the form. */
-.mgdb-gene-page .gene-query-line {
+.mgdb-gene-page .gene-search {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: center;
+  flex-direction: column;
+  gap: var(--mgdb-space-5);
 }
 
-.mgdb-gene-page .gene-query-line .mgdb-input {
-  flex: 1 1 16rem;
-  min-width: 0;
+/* The wildcard line had 16px above it and read as part of the search box. The
+   form's own 24px gap is the space now, with nothing pulling it back up. */
+.mgdb-gene-page .gene-search > .mgdb-hint { margin: 0; }
+
+.mgdb-gene-page .gene-query-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-3);
+  align-items: center;
 }
 
 .mgdb-gene-page .gene-query-field { min-width: 0; }
 
-/* The wildcard hint was flush against the input it explains. */
-.mgdb-gene-page #gene-search-hint { margin-top: 0.55rem; }
-
-/* The query field and the Maximum records control on one row, so their labels
-   share a line and their controls share a baseline. Stacked -- which is what
-   they did -- the select read as a separate step below the search rather than
-   as one of its settings. Below this width they stack, because a 16rem select
-   beside a shrinking input leaves neither enough room. */
-@media (min-width: 900px) {
-  .mgdb-gene-page .mgdb-search {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 16rem;
-    align-items: start;
-    column-gap: var(--mgdb-space-4);
-  }
-
-  .mgdb-gene-page .mgdb-search > .gene-query-field { grid-column: 1; }
-  .mgdb-gene-page .mgdb-search > .gene-search-options { grid-column: 2; margin-top: 0; }
-  .mgdb-gene-page .mgdb-search > .gene-examples { grid-column: 1 / -1; }
+.mgdb-gene-page .gene-query-control {
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-3);
+  padding: 0 var(--mgdb-space-4);
+  border: 2px solid #b9b2a5;
+  border-radius: var(--mgdb-radius);
+  background: var(--hub-surface, #fff);
+  height: 52px;
+  box-sizing: border-box;
 }
 
-.mgdb-gene-page .gene-search-submit,
-.mgdb-gene-page .gene-search-reset {
-  min-height: var(--mgdb-tap-target);
-  margin-bottom: 0;
+.mgdb-gene-page .gene-query-control:focus-within {
+  border-color: var(--mgdb-green-dark);
+  box-shadow: 0 0 0 3px var(--mgdb-green-soft);
+}
+
+.mgdb-gene-page .gene-query-control svg {
+  flex: none;
+  color: var(--mgdb-ink-soft);
+}
+
+.mgdb-gene-page .gene-query-control input[type="search"] {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-base);
+}
+
+.mgdb-gene-page .gene-query-control input[type="search"]:focus { outline: none; }
+
+.mgdb-gene-page .gene-query-control input[type="search"]::-webkit-search-cancel-button,
+.mgdb-gene-page .gene-query-control input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+
+.mgdb-gene-page #gene-query-clear {
+  padding: 0 var(--mgdb-space-2);
+  border: 0;
+  background: transparent;
+  color: var(--mgdb-muted);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mgdb-gene-page #gene-query-clear:hover {
+  color: var(--mgdb-green-dark);
+  text-decoration: underline;
+}
+
+.mgdb-gene-page .gene-query-submit {
+  height: 52px;
+  padding: 0 var(--mgdb-space-6);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
   white-space: nowrap;
 }
 
-/* Plain fields on one grid, tops aligned. The stacking margin mgdb-modern.css
-   puts on a second .mgdb-field is zeroed: margins do not collapse between grid
-   items, so it would push a second column down and the labels would not line
-   up. */
-.mgdb-gene-page .gene-search-options {
-  display: grid;
-  grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
-  align-items: start;
-  gap: 0.9rem 0.8rem;
-  margin-top: 1.1rem;
-}
-
-.mgdb-gene-page .gene-search-options > .mgdb-field { margin: 0; }
-
-@media (max-width: 640px) {
-  /* One column, and both buttons full width. Left at their intrinsic sizes
-     they read as two stubs under a full-width input, and the options select
-     stopped 13px short of the query field's right edge. */
-  .mgdb-gene-page .gene-search-options { grid-template-columns: 1fr; }
-
-  .mgdb-gene-page .gene-search-submit,
-  .mgdb-gene-page .gene-search-reset { width: 100%; }
-}
-
-.mgdb-gene-page .gene-search-options .mgdb-select,
-.mgdb-gene-page .gene-search-options .mgdb-input { width: 100%; }
-
-.mgdb-gene-page .gene-field-narrow { max-width: 16rem; }
+/* ── Examples ────────────────────────────────────────────────────────────── */
 
 .mgdb-gene-page .gene-examples {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-2);
   align-items: center;
-  margin-top: var(--mgdb-space-3);
 }
 
-.mgdb-gene-page .gene-example {
-  padding: 2px 8px;
-  border: 1px solid #cfe3d6;
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-green-soft);
-  color: var(--mgdb-green-dark);
-  font-family: var(--mgdb-font-mono);
+.mgdb-gene-page .gene-examples > span {
+  color: var(--mgdb-ink-soft);
   font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.mgdb-gene-page .gene-examples button {
+  padding: var(--mgdb-space-1) var(--mgdb-space-3);
+  border: 1px solid var(--hub-line, #e3e9f2);
+  border-radius: 999px;
+  background: var(--hub-surface, #fff);
+  color: var(--mgdb-green-dark);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease;
 }
 
-.mgdb-gene-page .gene-example:hover {
-  border-color: var(--mgdb-green-dark);
-  background: #ffffff;
+.mgdb-gene-page .gene-examples button:hover {
+  border-color: var(--mgdb-gold);
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+  box-shadow: 0 0 0 1px var(--mgdb-gold);
 }
 
-.mgdb-gene-page .gene-results-head {
+/* ── Advanced search ─────────────────────────────────────────────────────── */
+
+/* A rule across the form, not a card inside a card.
+ *
+ * As a bordered panel its 1px border plus 16px of body padding put every
+ * control in it 17px to the right of the search box above -- so "Maximum
+ * records" and the search input started at different x. The disclosure keeps
+ * its summary and its top rule; the padding comes off the sides so its grid
+ * shares the form's left edge. */
+.mgdb-gene-page .gene-advanced {
+  border: 0;
+  border-top: 1px solid var(--hub-line, #e3e9f2);
+  border-radius: 0;
+  background: transparent;
+}
+
+.mgdb-gene-page .gene-advanced > summary {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--mgdb-space-3);
-  align-items: baseline;
-  justify-content: space-between;
-  margin-top: var(--mgdb-space-5);
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+  align-items: center;
+  padding: var(--mgdb-space-3) 0;
+  border-radius: var(--mgdb-radius-sm);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
 }
 
-.mgdb-gene-page #gene-results-status {
+.mgdb-gene-page .gene-advanced > summary::-webkit-details-marker { display: none; }
+
+.mgdb-gene-page .gene-advanced > summary::before {
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 7px solid currentColor;
+  content: "";
+  transition: transform .15s ease;
+}
+
+.mgdb-gene-page .gene-advanced[open] > summary::before { transform: rotate(90deg); }
+
+.mgdb-gene-page .gene-advanced > summary:focus-visible {
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: -3px;
+}
+
+.mgdb-gene-page .gene-advanced-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-4);
+  padding: var(--mgdb-space-2) 0 var(--mgdb-space-4);
+  border-top: 1px solid var(--hub-line-soft, #eef2f8);
+}
+
+.mgdb-gene-page .gene-advanced-intro {
   margin: 0;
   color: var(--mgdb-ink-soft);
   font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-gene-page .gene-advanced-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: start;
+}
+
+.mgdb-gene-page .gene-range-inputs {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  width: 100%;
+}
+
+.mgdb-gene-page .gene-range-inputs input {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: var(--mgdb-tap-target);
+  height: var(--mgdb-tap-target);
+  box-sizing: border-box;
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid #b9b2a5;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface, #fff);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-gene-page .gene-range-inputs input:focus {
+  border-color: var(--mgdb-focus);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(11, 87, 164, .18);
+}
+
+.mgdb-gene-page .gene-range-join {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  flex: none;
+}
+
+.mgdb-gene-page .gene-advanced-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-5);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px dashed var(--hub-line-soft, #eef2f8);
+}
+
+.mgdb-gene-page .gene-advanced-toggles .mgdb-hub-check {
+  min-height: var(--mgdb-tap-target);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-gene-page .gene-advanced-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px dashed var(--hub-line-soft, #eef2f8);
+}
+
+.mgdb-gene-page .gene-advanced-reset-btn {
+  min-height: var(--mgdb-tap-target);
+  height: var(--mgdb-tap-target);
+  padding: var(--mgdb-space-2) var(--mgdb-space-5);
+  border: 1px solid #b9b2a5;
+  border-radius: var(--mgdb-radius-sm);
+  background: #ffffff;
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.mgdb-gene-page .gene-advanced-reset-btn:hover {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+}
+
+/* --------------------------------------------------------------------------
+   Results
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-page .gene-results-section[hidden] { display: none; }
+
+.mgdb-gene-page .gene-results-status {
+  margin: 0 0 var(--mgdb-space-4);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-gene-page .gene-results-status strong { color: var(--mgdb-green-dark); }
+
+.mgdb-gene-page .gene-results-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: flex-end;
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-gene-page .gene-results-filter {
+  flex: 1 1 240px;
+  min-width: 200px;
+  position: relative;
+}
+
+.mgdb-gene-page .gene-results-filter > label {
+  padding-right: 7rem;
+}
+
+.mgdb-gene-page .gene-results-filter .mgdb-result-count {
+  position: absolute;
+  right: 0;
+  bottom: calc(var(--mgdb-tap-target) + 6px);
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-gene-page .gene-results-export .mgdb-button {
+  height: var(--mgdb-tap-target);
+  min-height: var(--mgdb-tap-target);
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.mgdb-gene-page .gene-results-view .mgdb-view-toggle {
+  height: var(--mgdb-tap-target);
+  min-height: var(--mgdb-tap-target);
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  padding: 3px;
+}
+
+.mgdb-gene-page .gene-results-view .mgdb-view-btn {
+  height: 100%;
+  box-sizing: border-box;
+  padding: 0 var(--mgdb-space-3);
+}
+
+/* ── Result table headers sortable buttons ───────────────────────────────── */
+
+.mgdb-gene-page .mgdb-table th button[data-sort-key] {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mgdb-space-1);
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 700;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.mgdb-gene-page .mgdb-table th button[data-sort-key]:hover {
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-gene-page .mgdb-table th[aria-sort="none"] button[data-sort-key]::after {
+  content: " \21C5";
+  opacity: .4;
+}
+
+.mgdb-gene-page .mgdb-table th[aria-sort="ascending"] button[data-sort-key]::after {
+  content: " \2191";
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-gene-page .mgdb-table th[aria-sort="descending"] button[data-sort-key]::after {
+  content: " \2193";
+  color: var(--mgdb-green-dark);
+}
+
+/* ── Card View ───────────────────────────────────────────────────────────── */
+
+.mgdb-gene-page .gene-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-gene-page .gene-result-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid var(--hub-line, #e3e9f2);
+  border-radius: var(--mgdb-radius);
+  background: #ffffff;
+  padding: var(--mgdb-space-4);
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.mgdb-gene-page .gene-result-card:hover {
+  border-color: var(--mgdb-gold);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+}
+
+.mgdb-gene-page .gene-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--mgdb-space-2);
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-gene-page .gene-card-title {
+  margin: 0;
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-gene-page .gene-card-title a {
+  color: var(--mgdb-green-dark);
+  text-decoration: none;
+  font-family: var(--mgdb-font-mono);
+}
+
+.mgdb-gene-page .gene-card-title a:hover {
+  text-decoration: underline;
+}
+
+.mgdb-gene-page .gene-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1);
+  align-items: center;
+}
+
+.mgdb-gene-page .gene-card-meta-list {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+  font-size: var(--mgdb-text-xs);
+  margin: var(--mgdb-space-2) 0 0;
+  padding: 0;
+}
+
+.mgdb-gene-page .gene-card-meta-list dt {
+  color: var(--mgdb-muted);
+  font-weight: 600;
+}
+
+.mgdb-gene-page .gene-card-meta-list dd {
+  margin: 0;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-gene-page .gene-card-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--hub-line-soft, #eef2f8);
+}
+
+.mgdb-gene-page .gene-card-actions a {
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  color: var(--mgdb-green-dark);
+  text-decoration: none;
+}
+
+.mgdb-gene-page .gene-card-actions a:hover {
+  text-decoration: underline;
+}
+
+.mgdb-gene-page .gene-card-copy-btns {
+  display: flex;
+  gap: var(--mgdb-space-1);
+}
+
+.mgdb-gene-page .gene-copy-btn {
+  padding: 2px var(--mgdb-space-2);
+  border: 1px solid var(--hub-line, #e3e9f2);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface, #fff);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.mgdb-gene-page .gene-copy-btn:hover {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
 }
 
 /* Result groups ----------------------------------------------------------- */
@@ -233,82 +596,77 @@
   white-space: nowrap;
 }
 
+/* The one gene model shown for a locus, with the inbred it belongs to beneath
+   it. The line matters most exactly where it is least expected: a locus with no
+   B73 model gets a PH207 or a NAM identifier, and nothing in the name says so. */
+.mgdb-gene-page .gene-locus-current {
+  white-space: nowrap;
+}
+
+.mgdb-gene-page .gene-locus-line {
+  display: block;
+  margin-top: 2px;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
 .mgdb-gene-page .gene-coords {
   color: var(--mgdb-muted);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-/* --------------------------------------------------------------------------
-   Advanced search
-   -------------------------------------------------------------------------- */
+/* Responsive --------------------------------------------------------------- */
 
-.mgdb-gene-page .gene-advanced {
-  margin-top: var(--mgdb-space-6);
-  padding: var(--mgdb-space-4) var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  /* White, like every other panel and card on this page. This block used to be
-     the only tinted surface here, which read as a different KIND of thing
-     rather than as one more panel. */
-  background: var(--mgdb-surface);
-  box-shadow: var(--mgdb-shadow-sm);
+@media (max-width: 767px) {
+  .mgdb-gene-page .gene-card-grid {
+    grid-template-columns: 1fr;
+  }
+  .mgdb-gene-page .gene-results-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--mgdb-space-3);
+  }
+  .mgdb-gene-page .gene-results-toolbar .mgdb-hub-field {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+  .mgdb-gene-page .gene-results-toolbar .mgdb-hub-field > label:first-child {
+    min-height: 0;
+  }
+  .mgdb-gene-page .gene-results-filter {
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+  }
+  .mgdb-gene-page .gene-results-filter > label {
+    padding-right: 7rem;
+  }
+  .mgdb-gene-page .gene-results-export,
+  .mgdb-gene-page .gene-results-view {
+    align-self: stretch;
+  }
+  .mgdb-gene-page .gene-results-export .mgdb-button,
+  .mgdb-gene-page .gene-results-view .mgdb-view-toggle {
+    width: 100%;
+    justify-content: center;
+  }
+  .mgdb-gene-page .gene-results-view .mgdb-view-btn {
+    flex: 1 1 50%;
+    justify-content: center;
+  }
 }
 
-.mgdb-gene-page .gene-advanced > summary {
-  cursor: pointer;
-  font-weight: 700;
+@media (max-width: 900px) {
+  .mgdb-gene-page .gene-advanced-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-.mgdb-gene-page .gene-advanced > summary .gene-advanced-title {
-  color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-lg);
+@media (max-width: 640px) {
+  .mgdb-gene-page .gene-query-row { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-gene-page .gene-query-submit { width: 100%; }
+  .mgdb-gene-page .gene-advanced-grid { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-gene-page .mgdb-hub-field > label:first-child { min-height: 0; }
 }
-
-.mgdb-gene-page .gene-advanced-intro,
-.mgdb-gene-page .gene-advanced-lead {
-  max-width: var(--mgdb-measure);
-  margin: var(--mgdb-space-3) 0 0;
-  color: var(--mgdb-ink-soft);
-}
-
-.mgdb-gene-page .gene-advanced-lead { font-weight: 700; }
-
-/* Three columns -- checkbox, label, control -- rather than a flex row. As a
-   flex row every control began wherever its label happened to end, so the ten
-   criteria started at nine different left edges (194, 262, 264, 295, 341, 350,
-   359, 585 ...). A fixed label column lines them all up, and it is wide enough
-   for the longest label so none of them wraps. */
-.mgdb-gene-page .gene-criterion {
-  display: grid;
-  grid-template-columns: auto minmax(0, 21rem) minmax(0, 1fr);
-  gap: 0 var(--mgdb-space-2);
-  align-items: center;
-  padding: var(--mgdb-space-2) 0;
-  border-bottom: 1px solid var(--mgdb-line-soft);
-}
-
-/* The two rows that carry more than one control keep them in one cell. */
-.mgdb-gene-page .gene-criterion-controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  align-items: center;
-}
-
-.mgdb-gene-page .gene-criterion:last-of-type { border-bottom: 0; }
-
-.mgdb-gene-page .gene-criterion > label { color: var(--mgdb-ink); }
-
-.mgdb-gene-page .gene-criterion > select,
-.mgdb-gene-page .gene-criterion > .gene-criterion-controls { width: 100%; }
-
-.mgdb-gene-page .gene-criterion > select { max-width: 26rem; }
-
-.mgdb-gene-page .gene-criterion-join { color: var(--mgdb-muted); }
-
-.mgdb-gene-page .gene-input-short { max-width: 9rem; }
-.mgdb-gene-page .gene-input-medium { max-width: 14rem; }
 
 /* --------------------------------------------------------------------------
    Tool panels
@@ -338,32 +696,100 @@
 
 .mgdb-gene-page .gene-panel .mgdb-field + .mgdb-field { margin-top: var(--mgdb-space-4); }
 
-/* A real grid, not CSS columns.
+/* One tool per row, laid out across rather than down.
  *
- * `columns: 2 28rem` flowed the panels like text, so two cards sitting side by
- * side had unrelated heights and their Submit buttons landed at different
- * points down the page -- the crammed, ragged look. The earlier objection to a
- * grid was dead space below the shorter form; that is answered by making each
- * panel a flex column and letting its action row sink to the bottom, so the
- * card grows to the row height instead of leaving a gap under its content and
- * every Submit sits on one line across the row. */
+ * Two narrow cards side by side made every tool tall: a full-width textarea
+ * with its options stacked under it, then the actions, and the pair of cards
+ * ending at different points. Each card is the full width of the section now,
+ * and inside it the list box sits beside what to do with the list -- which is
+ * what "more horizontal" means here, and it is also what makes the two cards
+ * in a row stop being two cards in a row. */
 .mgdb-gene-page .gene-tool-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 28rem), 1fr));
-  align-items: stretch;
-  gap: var(--mgdb-space-4);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--mgdb-space-5);
 }
 
 .mgdb-gene-page .gene-tool-grid > .gene-panel {
-  display: flex;
-  flex-direction: column;
   width: 100%;
   margin: 0;
 }
 
-/* Everything above the actions keeps its natural size; the actions take the
-   slack, which is what puts them on a common baseline. */
-.mgdb-gene-page .gene-tool-grid > .gene-panel > .mgdb-form-actions { margin-top: auto; }
+/* The two columns inside a tool: the list on the left, everything that decides
+   what happens to it on the right. 1.1fr keeps the textarea the wider of the
+   two without letting the explanation beside it become a narrow ribbon. */
+.mgdb-gene-page .gene-tool-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: var(--mgdb-space-5);
+  align-items: start;
+}
+
+.mgdb-gene-page .gene-tool-input,
+.mgdb-gene-page .gene-tool-side {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-gene-page .gene-tool-cols .mgdb-field + .mgdb-field { margin-top: 0; }
+
+.mgdb-gene-page .gene-tool-input .mgdb-textarea { min-height: 13rem; }
+
+/* What a tool accepts, or gives back: a list, not a paragraph of prose with
+   the formats buried in it. */
+.mgdb-gene-page .gene-accepts {
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--hub-line, #e3e9f2);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-alt);
+}
+
+.mgdb-gene-page .gene-accepts-title {
+  margin: 0 0 var(--mgdb-space-2);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.mgdb-gene-page .gene-accepts ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-gene-page .gene-accepts li { margin-bottom: var(--mgdb-space-2); }
+.mgdb-gene-page .gene-accepts li:last-child { margin-bottom: 0; }
+.mgdb-gene-page .gene-accepts code { font-size: .92em; }
+.mgdb-gene-page .gene-accepts .mgdb-hint { margin: var(--mgdb-space-3) 0 0; }
+
+/* The run/download row sits under both columns, with real air above it -- it
+   used to be flush against whichever control happened to end last. */
+.mgdb-gene-page .gene-tool-actions {
+  margin-top: var(--mgdb-space-5);
+  padding-top: var(--mgdb-space-4);
+  border-top: 1px solid var(--hub-line-soft, #eef2f8);
+}
+
+.mgdb-gene-page .gene-tool-actions + .mgdb-small { margin-top: var(--mgdb-space-4); }
+
+/* The example button is an offer beside the box, not a caption stuck to it. */
+.mgdb-gene-page .gene-example-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: center;
+  margin: var(--mgdb-space-3) 0 0;
+}
+
+.mgdb-gene-page .gene-example-line .mgdb-hint { margin: 0; }
+
+@media (max-width: 900px) {
+  .mgdb-gene-page .gene-tool-cols { grid-template-columns: minmax(0, 1fr); }
+}
 
 .mgdb-gene-page .gene-radio-row {
   display: flex;
@@ -448,6 +874,12 @@
 
 .mgdb-gene-page .gene-prose { max-width: var(--mgdb-measure); }
 
+/* 16px between paragraphs of 16px text reads as one block; the prose sections
+   are the long-form part of this page and were the ones called crammed. */
+.mgdb-gene-page .gene-prose > p { margin-bottom: var(--mgdb-space-5); }
+.mgdb-gene-page .gene-prose > p:last-child { margin-bottom: 0; }
+.mgdb-gene-page .gene-prose > .gene-indent { margin-bottom: var(--mgdb-space-4); }
+
 .mgdb-gene-page .gene-indent {
   margin-left: var(--mgdb-space-5);
   font-family: var(--mgdb-font-mono);
@@ -470,6 +902,18 @@
    gap in the widest row. Let them sit under their description and leave the
    slack at the bottom, where a card with less content is meant to carry it. */
 .mgdb-gene-page .gene-download-grid > .mgdb-card > p { flex: 0 0 auto; }
+
+/* Insertion data sets: four cards now that BonnMu and the Vollbrecht Ac/Ds
+   collection are here, and the shared auto-fit put all four across in 284px
+   columns -- narrower than the assembly names each card lists as sub-headings.
+   Two per row, which is the shape it had when there were two cards. */
+.mgdb-gene-page .gene-insertion-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 767px) {
+  .mgdb-gene-page .gene-insertion-grid { grid-template-columns: minmax(0, 1fr); }
+}
 
 /* Long definitions made seven unrelated card sizes. A compact disclosure
    list preserves the exact scientific wording while presenting every term as
@@ -537,25 +981,15 @@
 
 /* MaizeMine --------------------------------------------------------------- */
 
-.mgdb-gene-page .gene-maizemine {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 200px);
-  gap: var(--mgdb-space-5);
-  align-items: start;
-}
+/* Text only, running the panel's full width. It was a grid reserving 200px for
+   the MaizeMine mark AND capping every paragraph at 65ch, so the copy read in a
+   column half the width of everything around it; the mark has since gone too,
+   on Carson's call. Nothing here reserves space any more. */
+.mgdb-gene-page .gene-maizemine { display: block; }
 
-.mgdb-gene-page .gene-maizemine p { max-width: var(--mgdb-measure); }
+.mgdb-gene-page .gene-maizemine p { max-width: none; }
 
-.mgdb-gene-page .gene-maizemine-mark img {
-  width: 100%;
-  height: auto;
-  mix-blend-mode: multiply;
-}
-
-@media (max-width: 720px) {
-  .mgdb-gene-page .gene-maizemine { grid-template-columns: minmax(0, 1fr); }
-  .mgdb-gene-page .gene-maizemine-mark { max-width: 200px; }
-}
+.mgdb-gene-page .gene-maizemine > div > p:last-child { margin-bottom: 0; }
 
 /* --------------------------------------------------------------------------
    Other resources
@@ -592,20 +1026,6 @@
 
   .mgdb-gene-page .gene-region-fields {
     padding-left: var(--mgdb-space-3);
-  }
-
-  .mgdb-gene-page .gene-criterion {
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: start;
-  }
-
-  /* The control drops onto its own row under the label, spanning both columns
-     so it still starts at the row's left edge rather than under the label. */
-  .mgdb-gene-page .gene-criterion > select,
-  .mgdb-gene-page .gene-criterion > .gene-criterion-controls {
-    grid-column: 1 / -1;
-    max-width: none;
-    margin-top: var(--mgdb-space-2);
   }
 
   .mgdb-gene-page .gene-input-short,
@@ -706,6 +1126,15 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+/* Each card is titled "<set> - <assembly>" now, and Zm00001d.provisional -
+   Zm-B73-REFERENCE-GRAMENE-4.0 is longer than any column here. Assembly names
+   have no spaces to break at, so the heading needs leave to break inside one
+   rather than push its card wider than its track. */
+.mgdb-gene-page .gene-older-grid > .mgdb-card > h3 {
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
 @media (max-width: 1000px) {
   .mgdb-gene-page .gene-older-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
@@ -730,6 +1159,50 @@
    chips still work, they are simply closer to the field. */
 .mgdb-gene-page .gene-panel .mgdb-field > .mgdb-hint { margin-top: var(--mgdb-space-2); }
 
+/* A heading that opens a box needs no margin above it -- the box's padding is
+   that space. .gene-panel > h3 already says so for the tool cards, but the
+   MaizeMine and Maize Feature Store panels wrap their heading in a plain div,
+   so the child selector missed it and .mgdb-leaf-heading's own 22px stacked on
+   top of the panel's 24px of padding. */
+.mgdb-gene-page .mgdb-resource-panel > h3:first-child,
+.mgdb-gene-page .mgdb-resource-panel > div > h3:first-child { margin-top: 0; }
+
+/* --------------------------------------------------------------------------
+   External links
+
+   A link that leaves MaizeGDB says so. The rule is written against the href
+   rather than a hand-placed chip, the way .mgdb-resource-list already does it
+   in css/mgdb-modern.css -- so a link added later is marked the moment it is
+   written and can never drift out of step with its own destination. That
+   matters most in the nomenclature tables, where the Gramene Version column is
+   forty EnsemblGenomes links and every one of them had been left unmarked.
+
+   maizegdb.org and its subdomains -- download, documents, jbrowse, images,
+   wgs -- are the same site and carry none, and neither do relative links,
+   which cannot leave.
+
+   Three things opt out: the Related resources cards, which already mark
+   themselves on their own <strong> and would otherwise show two arrows; the
+   embedded BLAST form, which is controllers/BLAST/BLAST_form.bau and not this
+   page's markup to decorate; and buttons, where a glyph after the label
+   fights the padding.
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-page a[href^="http"]::after,
+.mgdb-gene-page a[href^="//"]::after {
+  content: " \2197";
+  font-size: .85em;
+  font-weight: 600;
+}
+
+.mgdb-gene-page a[href*="//maizegdb.org"]::after,
+.mgdb-gene-page a[href*=".maizegdb.org"]::after,
+.mgdb-gene-page .mgdb-resource-list a::after,
+.mgdb-gene-page .gene-blast-embed a::after,
+.mgdb-gene-page a.mgdb-button::after {
+  content: none;
+}
+
 /* --------------------------------------------------------------------------
    Maize Feature Store panel
    -------------------------------------------------------------------------- */
@@ -738,9 +1211,6 @@
 .mgdb-gene-page .gene-featurestore p { margin-bottom: var(--mgdb-space-3); }
 .mgdb-gene-page .gene-featurestore p:last-child { margin-bottom: 0; }
 
-/* MaizeMine's text was asked to run the full width of the page rather than sit
-   in a narrow column beside its mark. */
-.mgdb-gene-page .gene-maizemine > div:first-child { max-width: none; }
 
 /* --------------------------------------------------------------------------
    Tool run status

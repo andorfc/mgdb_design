@@ -24,7 +24,35 @@
   $assembly = validate_input($DBConn, getCGIParam('bulk_position_assembly', 'GP', false));
 //logMessage("Search within assembly $assembly");
 
-  header('Content-Type: text/plain');
+  /* Same rows, three ways out: the plain text this has always returned, and
+     the two file formats the card now offers beside Submit. The rows are
+     already tab separated below, so TSV is the shape it was built in. */
+  $format = strtolower(trim((string) getCGIParam('format', 'GP', '')));
+  if ($format !== 'tsv' && $format !== 'csv') { $format = 'view'; }
+
+  if ($format === 'view') {
+    header('Content-Type: text/plain; charset=utf-8');
+  }
+  else {
+    header('Content-Type: text/' . ($format === 'csv' ? 'csv' : 'tab-separated-values') . '; charset=utf-8');
+    header('Content-Disposition: attachment; filename="maizegdb_gene_models_by_position_'
+           . date('Ymd_His') . '.' . $format . '"');
+  }
+
+  /* A region cell holds "chr:start..end" and the gene model cell a
+     comma-separated list, so CSV without quoting would split one column into
+     several. */
+  function position_row($values, $format) {
+    if ($format === 'csv') {
+      return implode(',', array_map(function ($v) {
+        $v = (string) $v;
+        return preg_match('/[",\r\n]/', $v) ? '"' . str_replace('"', '""', $v) . '"' : $v;
+      }, $values)) . "\n";
+    }
+    return implode("\t", array_map(function ($v) {
+      return preg_replace('/[\t\r\n]+/', ' ', (string) $v);
+    }, $values)) . "\n";
+  }
 
   $errors = array();
   $gene_models = array();
@@ -54,7 +82,7 @@ logVarDump($rows, "All rows:\n");
       }
       else {
         if ($gms=findGeneModelInRange($assembly, $chr, $range, $DBConn)) {
-          $gene_models[] = "$r\t" . implode(',', $gms) . "\n";
+          $gene_models[] = position_row(array($r, implode(',', $gms)), $format);
         }
       }
     }#else
@@ -69,11 +97,13 @@ logVarDump($gene_models, "Found these gene models:\n");
     echo $resp;
   }
   else {
-    echo "Region\tGene models\n";
+    echo position_row(array('Region', 'Gene models'), $format);
     echo implode("", $gene_models);
   }
   
-  if (count($errors) > 0) {
+  /* Errors go in the plain-text view only. In a downloaded file they would be
+     extra rows that do not match the header. */
+  if (count($errors) > 0 && $format === 'view') {
     $resp = implode("\n\n", $errors);
     echo "\n\n$resp";
   }

@@ -34,7 +34,6 @@
  */
 
 include_once('./include/db-api.php');
-include_once('./include/references_lib.php');
 
 $system = getSystemInfo('mgdb.conf');
 logMessage('Starting stock_catalog_modern.php');
@@ -385,50 +384,47 @@ $VIEWS = array(
         'path'  => '/stock_catalog',
         'name'  => 'Whole catalog',
         'title' => 'Maize Genetics Cooperation Stock Center catalog',
-        'blurb' => 'Every genetic stock the Maize Genetics Cooperation Stock Center distributes, '
-                 . 'grouped by the chromosome its markers sit on and by the chromosomal or '
-                 . 'cytoplasmic feature it carries.',
+        'blurb' => 'A catalog of all genetic stocks the Maize Genetics Cooperation Stock Center '
+                 . 'distributes, grouped by the chromosome its markers sit on and by the '
+                 . 'chromosomal or cytoplasmic feature it carries.',
         'card'  => 'Marker stocks by chromosome, plus the trisomic, tetraploid, inversion, '
                  . 'B-A translocation and cytoplasmic categories',
     ),
     'new' => array(
         'path'  => '/stock_catalog/new',
         'name'  => 'New additions',
-        'title' => 'Stock Center catalog: new additions',
-        'blurb' => 'Stocks added to the catalog, or re-curated, during ' . $year . '.',
-        'card'  => 'What arrived or changed in the catalog this year',
+        'title' => 'Maize Genetics Cooperation Stock Center - new additions',
+        'blurb' => 'Stocks added to the catalog, or updated, during ' . $year . '.',
+        'card'  => 'New stock arrivals and changes in the past year.',
     ),
     'ril' => array(
         'path'  => '/stock_catalog/RIL',
         'name'  => 'IBM RILs',
         'title' => 'Intermated B73 x Mo17 recombinant inbred lines',
-        'blurb' => 'The IBM recombinant inbred populations: the main panel of 94 lines, the two '
-                 . 'inbred parents they were derived from, and the wider set.',
-        'card'  => 'The main panel of 94, the inbred parents, and the wider set',
+        'blurb' => 'IBM recombinant inbred lines: The inbred parents, the main panel of 94 RILs, '
+                 . 'and additional RILs.',
+        'card'  => 'The inbred parents, the main panel of 94 RILs, and additional RILs.',
     ),
     'translocations' => array(
         'path'  => '/stock_catalog/translocations',
         'name'  => 'Reciprocal translocations',
         'title' => 'Reciprocal translocation stocks',
-        'blurb' => 'The comprehensive list of reciprocal translocation stocks. The wx1 and Wx1 '
-                 . 'marked translocations have their own category in the whole catalog.',
-        'card'  => 'The comprehensive list, excluding the wx1-marked stocks',
+        'blurb' => 'Stocks with Wx1- and wx1-marked reciprocal translocations',
+        'card'  => 'Stocks with Wx1- and wx1-marked reciprocal translocations',
     ),
     'phenotype' => array(
         'path'  => '/stock_catalog/phenotype',
         'name'  => 'Phenotype only',
         'title' => 'Stocks characterized only by phenotype',
-        'blurb' => 'Stocks with no mapped variation on record, listed under the phenotype they '
-                 . 'were characterized by.',
-        'card'  => 'Stocks with no mapped variation, listed under their phenotype',
+        'blurb' => 'Stocks with no mapped variations, listed by phenotype.',
+        'card'  => 'Stocks with no mapped variations, listed by phenotype.',
     ),
     'chromdb' => array(
         'path'  => '/stock_catalog/chromdb',
         'name'  => 'ChromDB',
         'title' => 'ChromDB stocks',
-        'blurb' => 'Stocks from the chromatin gene collection ChromDB built, held and distributed '
-                 . 'by the Stock Center.',
-        'card'  => 'The chromatin gene collection held by the Stock Center',
+        'blurb' => 'Stocks produced by the Maize Chromatin Consortium.',
+        'card'  => 'Chromatin-associated proteins, including RNAi-associated proteins',
     ),
 );
 $current = $VIEWS[$view];
@@ -467,6 +463,30 @@ $content = $mgdb->get('body')->load('templates/static/mgdb_stock_catalog.bau');
 
 $content->get('page_title')->replace(sc_esc($current['title']));
 $content->get('page_description')->replace(sc_esc($current['blurb']));
+
+/* ChromDB's ordering conditions.
+   Kept out of the hero description on purpose: that slot is a single escaped
+   <p>, and this is ~90 words of regulatory text carrying a URL that has to be a
+   real link. It renders as the design system's own note callout directly under
+   the hero, where a requester meets it before the stock list. Escaped here and
+   NOT Bauplan-escaped -- a string that reaches the page from PHP is never parsed
+   by Bauplan, so a `\(` would ship as a literal backslash. */
+$hero_notice = '';
+if ($view === 'chromdb') {
+    $aphis = 'https://maizecoopsc.org/aphis-notification';
+    $hero_notice =
+        '<p class="mgdb-note mgdb-note-info sc-hero-notice">'
+      . '<strong>Ordering these stocks:</strong> Note that these stocks are '
+      . '&ldquo;transgenic&rdquo; and anyone in the USA requesting seed will have to first '
+      . 'send a notification to APHIS; see <a href="' . sc_esc($aphis) . '" target="_blank" '
+      . 'rel="noopener">' . sc_esc($aphis) . '</a> for an example. Each of these stocks '
+      . 'contains a different construct, so please request this information from us. The '
+      . 'Stock Center will not ship any of this material to you until you have received an '
+      . 'acknowledgement from APHIS. For requests from other countries, please check your '
+      . 'government&rsquo;s requirements.'
+      . '</p>';
+}
+$content->get('hero_notice')->replace($hero_notice);
 $content->get('breadcrumb_tail')->replace($view === 'catalog'
     ? '<span aria-current="page">Stock catalog</span>'
     : '<a href="/stock_catalog">Stock catalog</a><span aria-hidden="true">&rsaquo;</span>'
@@ -489,17 +509,86 @@ $content->get('list_title')->replace($view === 'phenotype' ? 'Stocks by phenotyp
 $content->get('total_count')->replace(number_format($total));
 
 /* A jump list, so 25 categories do not need 25 tabs. */
+/* The category index.
+ *
+ * Two shapes, because the 25 categories are two different kinds of thing. The
+ * ten chromosomes are a numbered series, so they are a compact 5-across grid of
+ * numbers rather than ten near-identical rows reading "Chromosome N markers" --
+ * that alone takes eight rows out of the column. Everything else is a named
+ * category and reads as a plain list.
+ *
+ * Both keep the `sc-jump` class: the script binds to it and reads the count out
+ * of the child <span>, so the index can be reshaped without touching the JS.
+ */
 $jump = '';
 if ($view === 'catalog' || $view === 'new') {
-    foreach ($SECTION_ORDER as $key) {
+    $chrom_cells = '';
+    foreach ($LINKAGE_GROUPS as $key => $unused_type) {
         if (!empty($counts[$key])) {
-            $jump .= '<a class="sc-jump" href="#sc-' . $key . '">' . sc_esc($SECTION_LABELS[$key])
-                   . ' <span>' . number_format($counts[$key]) . '</span></a>';
+            /* The label is the chromosome number; the full name is still the
+               accessible name, so a screen reader does not hear a bare digit. */
+            $n = substr($key, 3);
+            $chrom_cells .= '<a class="sc-jump sc-chrom" href="#sc-' . $key . '"'
+                          . ' aria-label="' . sc_esc($SECTION_LABELS[$key]) . '">'
+                          . '<b>' . sc_esc($n) . '</b>'
+                          . '<span>' . number_format($counts[$key]) . '</span></a>';
         }
+    }
+
+    $other_rows = '';
+    foreach ($SECTION_ORDER as $key) {
+        if (isset($LINKAGE_GROUPS[$key]) || empty($counts[$key])) {
+            continue;
+        }
+        $other_rows .= '<li><a class="sc-jump" href="#sc-' . $key . '">'
+                     . '<span class="sc-jump-name">' . sc_esc($SECTION_LABELS[$key]) . '</span>'
+                     . '<span>' . number_format($counts[$key]) . '</span></a></li>';
+    }
+
+    if ($chrom_cells !== '') {
+        $jump .= '<p class="sc-index-heading" id="sc-index-chrom">By chromosome</p>'
+               . '<div class="sc-chrom-grid" role="group" aria-labelledby="sc-index-chrom">'
+               . $chrom_cells . '</div>';
+    }
+    if ($other_rows !== '') {
+        $jump .= '<p class="sc-index-heading" id="sc-index-other">Other categories</p>'
+               . '<ul class="sc-index-list" aria-labelledby="sc-index-other">' . $other_rows . '</ul>';
     }
 }
 $content->get('jump_links')->replace($jump !== ''
-    ? '<nav class="sc-jumps" aria-label="Jump to a category">' . $jump . '</nav>' : '');
+    ? '<nav class="sc-jumps" aria-label="Stock categories">' . $jump . '</nav>' : '');
+
+/* Categories in a left rail, the selected category's stocks on the right
+   (Carson, 2026-09-09).
+ *
+ * Only worth a whole column when there are enough categories to navigate: the
+ * whole catalog has 25 and the phenotype catalog 195, while `new` and the IBM
+ * RILs have 3 and translocations and ChromDB have 1. Below the threshold the
+ * page keeps the stacked layout it already had, which is why /stock_catalog/RIL
+ * is unchanged. SC_RAIL_MIN_GROUPS is the one number to move if that call is
+ * wrong.
+ *
+ * The class only *enables* the two-column grid. Showing one category at a time
+ * is added by the script, so with JavaScript off every category is still on the
+ * page and every jump link still works. */
+define('SC_RAIL_MIN_GROUPS', 4);
+
+/* The rail needs BOTH conditions, and the second one is not optional.
+ *
+ * The script shows one category at a time, so the index is the ONLY way to
+ * reach the other 24. $jump is built for the catalog and new-additions views
+ * only; /stock_catalog/phenotype has 195 groups and no index, so a count-alone
+ * test switched it into master-detail with an empty left column and left 194 of
+ * its 195 phenotypes unreachable. Requiring the index closes that off by
+ * construction rather than by remembering.
+ *
+ * Counted off the rendered markup rather than a parallel variable: every branch
+ * above builds $sections_html its own way, and a count kept beside them would
+ * drift the first time one of them changed. */
+$has_index = ($jump !== '');
+$content->get('layout_mode')->replace(
+    ($has_index && substr_count($sections_html, 'class="sc-group"') >= SC_RAIL_MIN_GROUPS)
+        ? ' sc-layout-rail' : '');
 
 /* Metrics: four numbers this catalog can actually answer. */
 function sc_metric($label, $value, $note) {
@@ -542,6 +631,18 @@ if ($view === 'catalog' || $view === 'new') {
                   'The remaining IBM recombinant inbred lines held here')
              . sc_metric('Stocks listed', number_format($total),
                   'Every IBM line the Stock Center distributes');
+} else if ($view === 'chromdb') {
+    /* No "Held at" card here (Carson, 2026-09-09). The metric grid colours its
+       cards in fours, so the row is kept at four with a card that says something
+       about THIS catalog: these stocks are transgenic, which is the fact a
+       requester most needs before ordering. */
+    $metrics = sc_metric('Stocks listed', number_format($total),
+                  'Curated stocks the Stock Center distributes in this catalog')
+             . sc_metric('Catalogs', '6',
+                  'This one, the whole catalog, and four others')
+             . sc_metric('Ordering', 'Free',
+                  'The Stock Center distributes seed at no charge for research')
+             . sc_metric('Regulatory', 'APHIS', 'Transgenic stocks: US requesters must notify APHIS first');
 } else {
     $metrics = sc_metric('Stocks listed', number_format($total),
                   'Curated stocks the Stock Center distributes in this catalog')
@@ -554,12 +655,11 @@ if ($view === 'catalog' || $view === 'new') {
 }
 $content->get('metric_cards')->replace($metrics);
 
-/* References: the database of record, and the curation standard behind the
-   `curation_lvl = 0` filter every query on this page applies. */
-$content->get('reference_cards')->replace(mgdb_render_references($doc_root, array(
-    array('doi' => '10.1093/nar/gky1046'),
-    array('doi' => '10.1016/j.cpb.2017.11.001'),
-)));
+/* No References section on the stock catalog (Carson, 2026-09-09): there is no
+   Stock Center paper to cite, and the two that were here -- the MaizeGDB
+   database paper and the curation-standard paper -- describe MaizeGDB, not this
+   catalog. The section and its tab are gone from the template; nothing is
+   invented in their place. */
 
 /* The header's own labels -- Home, About, Community, Genomes, Tools, Data
    Hubs, Feedback -- are placeholders in templates/home/maizegdb_header_modern.bau

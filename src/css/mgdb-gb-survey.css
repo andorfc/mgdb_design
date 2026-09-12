@@ -1,0 +1,119 @@
+/* Genome browser survey, 2006 (/genome_browser_survey) — MaizeGDB modern design
+ * system.
+ *
+ * The ground, section cards, colored top edges, metric cards and tables come
+ * from css/mgdb-hub.css. Only what is specific to this page lives here.
+ */
+
+.mgdb-modern .mgdb-gbsurvey-page { padding-bottom: clamp(3rem, 6vw, 5.5rem); }
+
+.mgdb-gbsurvey-page .gbs-archive-note { margin-top: var(--mgdb-space-5); }
+
+/* ── Tab bar ─────────────────────────────────────────────────────────────── */
+
+/* One row at every width, so the flat offset below stays true whatever the
+   labels are. Same treatment as the other pages on this shell. */
+.mgdb-gbsurvey-page .mgdb-section-tabs {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--mgdb-space-2);
+  margin-top: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-5);
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mgdb-gbsurvey-page .mgdb-section-tabs a { white-space: nowrap; }
+
+.mgdb-hub-page.mgdb-gbsurvey-page > section[id] { scroll-margin-top: 65px; }
+.mgdb-gbsurvey-page > section[id] { margin-bottom: var(--mgdb-space-5); }
+
+/* ── Prose ───────────────────────────────────────────────────────────────── */
+
+/* A report is read rather than scanned, so the measure is set for running text. */
+.mgdb-gbsurvey-page .gbs-prose { max-width: 62rem; }
+
+.mgdb-gbsurvey-page .gbs-prose p {
+  margin: 0 0 1.05rem;
+  line-height: 1.65;
+}
+
+.mgdb-gbsurvey-page .gbs-prose p:last-child { margin-bottom: 0; }
+
+.mgdb-gbsurvey-page .gbs-lead {
+  max-width: 62rem;
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-ink-soft);
+}
+
+.mgdb-gbsurvey-page .gbs-aims,
+.mgdb-gbsurvey-page .gbs-reasons {
+  max-width: 62rem;
+  margin: 0 0 1.05rem;
+  padding-left: 1.4rem;
+}
+
+.mgdb-gbsurvey-page .gbs-aims li,
+.mgdb-gbsurvey-page .gbs-reasons li { margin-bottom: 0.55rem; line-height: 1.6; }
+
+.mgdb-gbsurvey-page .gbs-outcome {
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-left: 3px solid var(--mgdb-gold);
+  background: var(--mgdb-green-soft);
+}
+
+.mgdb-gbsurvey-page .gbs-metrics { margin-top: var(--mgdb-space-4); }
+
+/* ── Tables ──────────────────────────────────────────────────────────────── */
+
+.mgdb-gbsurvey-page .gbs-table { width: auto; min-width: min(100%, 34rem); }
+.mgdb-gbsurvey-page .gbs-table .mgdb-numeric { font-variant-numeric: tabular-nums; }
+
+/* ── Feature rankings ────────────────────────────────────────────────────── */
+
+/* An ordered list, not a bar chart. The 2006 chart plotted the scores as bars,
+   which drew the LEAST important feature longest — the scale runs the other way,
+   a lower score meaning a higher priority. Ranked rows say that plainly. */
+.mgdb-gbsurvey-page .gbs-ranking {
+  max-width: 34rem;
+  margin: 0 0 var(--mgdb-space-3);
+  padding: 0;
+  list-style: none;
+  counter-reset: gbs-rank;
+}
+
+.mgdb-gbsurvey-page .gbs-ranking > li {
+  display: flex;
+  align-items: baseline;
+  gap: var(--mgdb-space-3);
+  padding: 0.5rem 0.9rem;
+  border-bottom: 1px solid var(--hub-line);
+  counter-increment: gbs-rank;
+}
+
+.mgdb-gbsurvey-page .gbs-ranking > li:first-child {
+  border-top: 1px solid var(--hub-line);
+}
+
+.mgdb-gbsurvey-page .gbs-ranking > li::before {
+  content: counter(gbs-rank);
+  min-width: 1.4rem;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.mgdb-gbsurvey-page .gbs-rank-name { flex: 1 1 auto; }
+
+.mgdb-gbsurvey-page .gbs-rank-score {
+  color: var(--mgdb-green-dark);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.mgdb-gbsurvey-page .gbs-originals { margin-top: var(--mgdb-space-5); }

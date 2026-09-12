@@ -11,6 +11,8 @@
     term: '',
     category: 'all',
     sort: 'latest',
+    sortKey: 'title',
+    sortDir: 'asc',
     view: 'card',
     page: 1,
     pageSize: 25,
@@ -125,7 +127,7 @@
   }
 
   function readUrlParams() {
-    var main = byId('image-top');
+    var main = byId('image-main') || byId('image-top');
     if (main && main.getAttribute('data-initial-category')) {
       state.category = main.getAttribute('data-initial-category') || 'all';
     }
@@ -267,19 +269,24 @@
     var queryText = data.query.term ? ' for “' + esc(data.query.term) + '”' : '';
 
     if (status) {
-      status.textContent = state.pageSize === 'all'
-        ? 'Showing ' + number(Math.min(summary.total, MAX_PAGE)) + ' of ' + number(summary.total)
-          + ' images' + queryText + ', which is as many as the search returns at once.'
-          + ' (' + number(summary.elapsed_ms) + ' ms)'
-        : 'Showing ' + number(start) + '–' + number(end) + ' of ' + number(summary.total)
-          + ' images' + queryText + '. (' + number(summary.elapsed_ms) + ' ms)';
+      var isFiltered = !!(data.query.term || (data.query.category && data.query.category !== 'all'));
+      var rangeStr = state.pageSize === 'all'
+        ? ('Showing 1&ndash;' + number(Math.min(summary.total, MAX_PAGE)) + ' of ' + number(summary.total))
+        : ('Showing ' + number(start) + '&ndash;' + number(end) + ' of ' + number(summary.total));
+      if (isFiltered) {
+        status.innerHTML = rangeStr + ' matching images' + (data.query.term ? ' for <strong>“' + esc(data.query.term) + '”</strong>' : '') + ' <span class="mgdb-muted">(filtered from 113,904 total)</span> &middot; ' + number(summary.elapsed_ms) + ' ms';
+      } else {
+        status.innerHTML = rangeStr + ' images &middot; ' + number(summary.elapsed_ms) + ' ms';
+      }
     }
 
     if (!container) return;
     container.className = 'image-results-container image-view-' + state.view;
 
+    var sortedResults = sortImageResults(data.results);
+
     if (state.view === 'card') {
-      container.innerHTML = '<div class="image-results-grid">' + data.results.map(function (row, idx) {
+      container.innerHTML = '<div class="image-results-grid">' + sortedResults.map(function (row, idx) {
         var name = row.entity_name || ('Image #' + row.auto_num);
         var recordUrl = row.record_url || ('/data_center/variation?id=' + encodeURIComponent(row.id));
         var imgUrl = row.image_url;
@@ -307,7 +314,7 @@
           + '</article>';
       }).join('') + '</div>';
     } else {
-      var rows = data.results.map(function (row, idx) {
+      var rows = sortedResults.map(function (row, idx) {
         var name = row.entity_name || ('Image #' + row.auto_num);
         var recordUrl = row.record_url || ('/data_center/variation?id=' + encodeURIComponent(row.id));
         var imgUrl = row.image_url;
@@ -339,23 +346,70 @@
           + '</tr>';
       }).join('');
 
+      var titleAria = state.sortKey === 'title' ? (state.sortDir === 'desc' ? 'descending' : 'ascending') : 'none';
+      var catAria = state.sortKey === 'category' ? (state.sortDir === 'desc' ? 'descending' : 'ascending') : 'none';
+      var capAria = state.sortKey === 'caption' ? (state.sortDir === 'desc' ? 'descending' : 'ascending') : 'none';
+
       container.innerHTML = '<div class="mgdb-table-scroll">'
         + '<table class="mgdb-table image-table">'
         + '  <thead>'
         + '    <tr>'
         + '      <th scope="col" style="width: 72px;">Preview</th>'
-        + '      <th scope="col">Entity / Title</th>'
-        + '      <th scope="col">Category</th>'
-        + '      <th scope="col">Caption</th>'
+        + '      <th scope="col" aria-sort="' + titleAria + '"><button type="button" data-sort-key="title">Entity / Title</button></th>'
+        + '      <th scope="col" aria-sort="' + catAria + '"><button type="button" data-sort-key="category">Category</button></th>'
+        + '      <th scope="col" aria-sort="' + capAria + '"><button type="button" data-sort-key="caption">Caption</button></th>'
         + '      <th scope="col" style="text-align: right; width: 140px;">Actions</th>'
         + '    </tr>'
         + '  </thead>'
         + '  <tbody>' + rows + '</tbody>'
         + '</table>'
         + '</div>';
+
+      initImageSortButtons(container);
     }
 
     initGalleryCardEvents();
+  }
+
+  function sortImageResults(results) {
+    if (!results || !results.length) return [];
+    var key = state.sortKey || 'title';
+    var dir = state.sortDir === 'desc' ? -1 : 1;
+
+    return results.slice().sort(function (a, b) {
+      if (key === 'category') {
+        var aCat = (a.category_name || a.type_name || '').toLowerCase();
+        var bCat = (b.category_name || b.type_name || '').toLowerCase();
+        var cmpCat = aCat.localeCompare(bCat);
+        if (cmpCat !== 0) return cmpCat * dir;
+      } else if (key === 'caption') {
+        var aCap = (a.caption || '').toLowerCase();
+        var bCap = (b.caption || '').toLowerCase();
+        var cmpCap = aCap.localeCompare(bCap);
+        if (cmpCap !== 0) return cmpCap * dir;
+      }
+      var aTitle = (a.entity_name || ('Image #' + a.auto_num) || '').toLowerCase();
+      var bTitle = (b.entity_name || ('Image #' + b.auto_num) || '').toLowerCase();
+      return aTitle.localeCompare(bTitle, undefined, { numeric: true }) * dir;
+    });
+  }
+
+  function initImageSortButtons(container) {
+    if (!container) return;
+    Array.prototype.forEach.call(container.querySelectorAll('button[data-sort-key]'), function (btn) {
+      btn.addEventListener('click', function () {
+        var key = btn.getAttribute('data-sort-key');
+        if (state.sortKey === key) {
+          state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+          state.sortKey = key;
+          state.sortDir = 'asc';
+        }
+        if (state.currentData) {
+          renderResults(state.currentData);
+        }
+      });
+    });
   }
 
   /* ── Lightbox & Preview Events ──────────────────────────────────────────── */
@@ -502,8 +556,12 @@
   /* Narrows the page already rendered, in both the card and the table view.
      The gallery pages server side, so this filters what is on screen rather
      than the whole result set, and the status line says so. */
+  /* Narrows the page already rendered, in both the card and the table view.
+     The gallery pages server side, so this filters what is on screen rather
+     than the whole result set, and the status line says so. */
   function applyResultsFilter() {
     var container = byId('image-results');
+    var filterCount = byId('image-filter-count');
     if (!container) { return; }
 
     /* The card view renders `.mgdb-image-card`; the table view renders rows.
@@ -521,6 +579,14 @@
       item.hidden = !match;
       if (match) { shown++; }
     });
+
+    if (filterCount) {
+      if (terms.length) {
+        filterCount.textContent = shown + ' match' + (shown === 1 ? '' : 'es');
+      } else {
+        filterCount.textContent = '';
+      }
+    }
 
     if (!terms.length) { return; }
 
@@ -540,9 +606,10 @@
 
   function setView(view) {
     state.view = view || 'card';
-    Array.prototype.forEach.call(document.querySelectorAll('.image-view-btn'), function (btn) {
+    Array.prototype.forEach.call(document.querySelectorAll('.mgdb-view-btn, .image-view-btn'), function (btn) {
       var active = btn.getAttribute('data-view') === state.view;
       btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      btn.classList.toggle('is-active', active);
     });
     updateUrlParams();
     if (state.currentData) {
@@ -551,7 +618,7 @@
   }
 
   function initViewToggle() {
-    Array.prototype.forEach.call(document.querySelectorAll('.image-view-btn'), function (btn) {
+    Array.prototype.forEach.call(document.querySelectorAll('.mgdb-view-btn, .image-view-btn'), function (btn) {
       btn.addEventListener('click', function () {
         var targetView = btn.getAttribute('data-view');
         if (targetView && targetView !== state.view) {
@@ -561,22 +628,23 @@
     });
   }
 
-  /* ── Category Pill Bar & Form Controls ──────────────────────────────────── */
+  /* ── Category & Form Controls ───────────────────────────────────────────── */
+
+  function syncAdvancedBadge() {
+    var badge = byId('image-advanced-count');
+    if (!badge) { return; }
+    var active = (state.category !== 'all' ? 1 : 0) + (state.sort !== 'latest' ? 1 : 0);
+    badge.textContent = active ? active + ' active' : '';
+    badge.hidden = !active;
+  }
 
   function setCategory(cat, executeNow) {
     state.category = cat || 'all';
     state.page = 1;
 
-    /* The category pill bar was removed from the search panel: the Categories
-       section below is the browse affordance, and the advanced panel is where
-       the filter lives, the same as every other hub. Keeping the select in step
-       is what makes the category cards and the figure legible as searches. */
     var select = byId('image-filter-category');
     if (select) { select.value = state.category; }
-    if (state.category !== 'all') {
-      var adv = byId('image-adv');
-      if (adv) { adv.open = true; }
-    }
+    syncAdvancedBadge();
 
     if (executeNow) {
       executeSearch(true);
@@ -588,6 +656,12 @@
     var input = byId('image-query');
     var clearBtn = byId('image-query-clear');
     var sortSelect = byId('image-sort');
+    var catSelect = byId('image-filter-category');
+    var advSubmit = byId('image-adv-submit');
+    var advReset = byId('image-adv-reset');
+    var sizeSelect = byId('image-page-size');
+    var resultsFilter = byId('image-results-filter');
+    var emptyReset = byId('image-empty-reset');
 
     if (input) {
       input.value = state.term;
@@ -606,9 +680,12 @@
       clearBtn.addEventListener('click', function () {
         input.value = '';
         clearBtn.hidden = true;
+        input.focus();
         state.term = '';
         state.page = 1;
-        executeSearch(false);
+        if (state.searched) {
+          executeSearch(false);
+        }
       });
     }
 
@@ -625,21 +702,42 @@
     if (sortSelect) {
       sortSelect.addEventListener('change', function () {
         state.sort = sortSelect.value;
+        syncAdvancedBadge();
         state.page = 1;
-        executeSearch(true);
+        if (state.searched) {
+          executeSearch(true);
+        }
       });
     }
 
-    // Category select in the advanced panel
-    var catSelect = byId('image-filter-category');
     if (catSelect) {
       catSelect.addEventListener('change', function () {
         setCategory(catSelect.value, state.searched);
       });
     }
 
-    // Results-per-page
-    var sizeSelect = byId('image-page-size');
+    if (advSubmit) {
+      advSubmit.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (input) state.term = input.value.trim();
+        if (sortSelect) state.sort = sortSelect.value;
+        if (catSelect) state.category = catSelect.value;
+        syncAdvancedBadge();
+        state.page = 1;
+        executeSearch(true);
+      });
+    }
+
+    if (advReset) {
+      advReset.addEventListener('click', function () {
+        if (catSelect) { catSelect.value = 'all'; }
+        if (sortSelect) { sortSelect.value = 'latest'; }
+        state.sort = 'latest';
+        setCategory('all', state.searched);
+        syncAdvancedBadge();
+      });
+    }
+
     if (sizeSelect) {
       sizeSelect.addEventListener('change', function () {
         state.pageSize = sizeSelect.value === 'all' ? 'all' : parseInt(sizeSelect.value, 10) || 25;
@@ -648,8 +746,6 @@
       });
     }
 
-    // Filter within the rendered page
-    var resultsFilter = byId('image-results-filter');
     if (resultsFilter) {
       resultsFilter.addEventListener('input', function () {
         state.filter = resultsFilter.value.trim();
@@ -660,24 +756,12 @@
       });
     }
 
-    var advReset = byId('image-adv-reset');
-    if (advReset) {
-      advReset.addEventListener('click', function () {
-        if (catSelect) { catSelect.value = 'all'; }
-        if (sortSelect) { sortSelect.value = 'latest'; }
-        state.sort = 'latest';
-        setCategory('all', state.searched);
-      });
-    }
-
-    // Category jump buttons in category grid
     Array.prototype.forEach.call(document.querySelectorAll('[data-switch-cat]'), function (btn) {
       btn.addEventListener('click', function () {
         setCategory(btn.getAttribute('data-switch-cat'), true);
       });
     });
 
-    // Examples
     Array.prototype.forEach.call(document.querySelectorAll('[data-img-example]'), function (btn) {
       btn.addEventListener('click', function () {
         var ex = btn.getAttribute('data-img-example');
@@ -691,16 +775,21 @@
       });
     });
 
-    var emptyReset = byId('image-empty-reset');
     if (emptyReset) {
       emptyReset.addEventListener('click', function () {
         if (input) { input.value = ''; if (clearBtn) clearBtn.hidden = true; }
         if (sortSelect) sortSelect.value = 'latest';
+        if (catSelect) catSelect.value = 'all';
+        if (resultsFilter) resultsFilter.value = '';
         state.term = '';
+        state.filter = '';
         state.sort = 'latest';
         setCategory('all', true);
+        syncAdvancedBadge();
       });
     }
+
+    syncAdvancedBadge();
   }
 
   /* ── Bootstrap ──────────────────────────────────────────────────────────── */

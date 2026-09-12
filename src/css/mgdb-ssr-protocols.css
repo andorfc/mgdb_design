@@ -1,0 +1,128 @@
+/* /ssr_protocols -- the Maize Mapping Project SSR PCR protocol, a static
+   informational document. Scoped under .mgdb-ssr-protocols-page; everything
+   else is a shared component from mgdb-modern.css. */
+
+/* ---- on-this-page nav ---------------------------------------------------- */
+
+.mgdb-ssr-protocols-page .ssr-toc {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-5);
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-alt);
+}
+.mgdb-ssr-protocols-page .ssr-toc-label {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.mgdb-ssr-protocols-page .ssr-toc ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mgdb-ssr-protocols-page .ssr-toc a {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ---- the document -------------------------------------------------------- */
+
+.mgdb-ssr-protocols-page .ssr-doc {
+  max-width: 78ch;
+  margin-top: var(--mgdb-space-6);
+  padding: var(--mgdb-space-6) var(--mgdb-space-7);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-lg);
+  background: var(--mgdb-surface);
+  box-shadow: var(--mgdb-shadow-sm);
+  color: var(--mgdb-ink);
+}
+
+.mgdb-ssr-protocols-page .ssr-doc h2 {
+  margin: var(--mgdb-space-7) 0 var(--mgdb-space-3);
+  padding-top: var(--mgdb-space-5);
+  border-top: 1px solid var(--mgdb-line-soft);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xl);
+  scroll-margin-top: var(--mgdb-space-5);
+}
+/* The first heading opens the document -- no rule or big gap above it. */
+.mgdb-ssr-protocols-page .ssr-doc > h2:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.mgdb-ssr-protocols-page .ssr-doc p {
+  margin: 0 0 var(--mgdb-space-4);
+  line-height: var(--mgdb-leading);
+}
+.mgdb-ssr-protocols-page .ssr-doc p:last-child { margin-bottom: 0; }
+
+/* ---- reagent recipes and cycling profiles -------------------------------- */
+
+.mgdb-ssr-protocols-page .ssr-recipe {
+  margin: 0 0 var(--mgdb-space-4);
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border-left: 4px solid var(--mgdb-gold);
+  border-radius: 0 var(--mgdb-radius-sm) var(--mgdb-radius-sm) 0;
+  background: var(--mgdb-gold-soft);
+}
+.mgdb-ssr-protocols-page .ssr-recipe-title {
+  margin: 0 0 var(--mgdb-space-2) !important;
+  color: var(--mgdb-burgundy);
+  font-weight: 700;
+}
+.mgdb-ssr-protocols-page .ssr-recipe ul {
+  margin: 0;
+  padding-left: 1.25em;
+  list-style: disc;
+}
+.mgdb-ssr-protocols-page .ssr-recipe li {
+  margin: 0;
+  padding: 2px 0;
+  line-height: var(--mgdb-leading-snug);
+}
+
+/* Cycling profiles read as ordered steps: no bullets, tabular numerals. */
+.mgdb-ssr-protocols-page .ssr-cycle ul { list-style: none; padding-left: 0; }
+.mgdb-ssr-protocols-page .ssr-cycle li {
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- 96-well titer plate ------------------------------------------------- */
+
+.mgdb-ssr-protocols-page .ssr-plate {
+  min-width: 34rem;
+  font-size: var(--mgdb-text-sm);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.mgdb-ssr-protocols-page .ssr-plate td {
+  padding: 4px 6px;
+  text-align: center;
+  color: var(--mgdb-ink-soft);
+  white-space: nowrap;
+}
+/* Cells wrap each label in a <p>; strip its margins so rows stay compact. */
+.mgdb-ssr-protocols-page .ssr-plate td p { margin: 0; }
+/* The trailing empty column is spacing the legacy layout used; keep it quiet. */
+.mgdb-ssr-protocols-page .ssr-plate td:empty { background: var(--mgdb-surface-alt); }
+
+@media (max-width: 720px) {
+  .mgdb-ssr-protocols-page .ssr-doc {
+    padding: var(--mgdb-space-5) var(--mgdb-space-5);
+  }
+}

@@ -1,0 +1,34 @@
+$$SYNTAX-LEVEL 2
+*(jobs {include-css: css/jobs.css}
+<table width=100% cellpadding=0 cellspacing=0>
+  <tr>
+    <td>
+      <div id="centercolumn_record">
+        <div class='navarea'>
+          <font size="1"><span class='underlinedlink'><a href='/index.php'>Home</a> > <a href=''>Community</a></span> >
+          <span class='greylink' align='right'><a href='/jobs'>Jobs</a></span></font>
+        </div>
+        <br>
+        <table width='100%'  cellpadding=0 cellspacing=0>
+          <tr valign='center' class='green_curve_background'>
+            <td align='left'>
+              <img src='/images/header_left.gif'>
+            </td>
+            <td width='97%' valign='center' class='green_curve_background'>
+              Job Postings of Interest to the Maize Community				
+            </td>
+            <td align='right'>
+              <img src='/images/header_right.gif'>
+            </td>
+          </tr>
+        </table>
+        <br>
+      </div>
+      
+      *(jobs-top {load: templates/community/jobs-top.bau})
+      *(jobs-bottom {load: templates/community/jobs-bottom.bau})
+      
+    </td>
+  </tr>
+</table>
+)

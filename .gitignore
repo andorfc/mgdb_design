@@ -32,3 +32,9 @@ protein_data/
 # Neither is source; the audit's findings live in ADMIN_DEPENDENCIES.md.
 f.tmp
 *_www-error.log.gz
+
+# Throwaway Chrome user-data directory created by tools/overflow_sweep.py when
+# it drives a headless browser. 190 MB of caches, ML models and a WASM blob --
+# and Cookies, History and Login Data alongside them. Machine-local, recreated
+# on demand, and never something to publish.
+tools/chrome-profile/

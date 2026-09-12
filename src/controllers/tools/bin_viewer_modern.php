@@ -149,7 +149,6 @@ if ($mode === 'landing') {
                        . htmlspecialchars($gbrowse, ENT_QUOTES, 'UTF-8') . '"', $svg);
 
     $content->get('breadcrumb_tail')->replace('<span aria-current="page">Chromosome map</span>');
-    $content->get('built_date')->replace($page['built']);
     $content->get('page_title')->replace('Maize Bin Viewer');
     $content->get('page_description')->replace(
         'The ten maize chromosomes divided into ' . count($validLabels)
@@ -342,7 +341,6 @@ foreach ($sections as $section) {
 $sectionTabs .= '<a href="#bin-resources">Other resources</a>';
 
 $content->get('breadcrumb_tail')->replace($breadcrumb);
-$content->get('built_date')->replace($page['built']);
 $content->get('page_title')->replace($title);
 $content->get('page_description')->replace($description);
 $content->get('section_tabs')->replace('<a href="#bin-map" class="is-current">Chromosome map</a>' . $sectionTabs);

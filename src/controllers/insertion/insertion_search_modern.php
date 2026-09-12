@@ -120,7 +120,6 @@ $content->get('reference_cards')->replace(mgdb_render_references($doc_root, arra
     // The database of record.
     array('doi' => '10.1093/nar/gky1046'),
 )));
-$content->get('data_date')->replace($payload['data_date']);
 
 $content->get('dataset_options')->replace($payload['dataset_options']);
 $content->get('structure_options')->replace($payload['structure_options']);

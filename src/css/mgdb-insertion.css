@@ -107,39 +107,120 @@
 }
 
 .mgdb-insertion-page .ins-search-form {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--mgdb-space-4);
-  align-items: end;
+  margin-bottom: var(--mgdb-space-3);
 }
 
 .mgdb-insertion-page .ins-search-form[hidden] { display: none; }
 
-.mgdb-insertion-page .ins-field-query { grid-column: 1; }
-/* Scoped with `>` to the search forms: `.mgdb-hub-field-action` is a shared
-   class and the results controls use it too. */
-.mgdb-insertion-page .ins-search-form > .mgdb-hub-field-action { grid-column: 2; }
-.mgdb-insertion-page .ins-example-row,
-.mgdb-insertion-page .ins-region-row { grid-column: 1 / -1; }
+/* ── Query rows (Gene & Stock modes) ─────────────────────────────────────── */
 
-.mgdb-insertion-page .ins-search-form textarea {
+.mgdb-insertion-page .ins-query-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-3);
+  align-items: stretch;
+}
+
+.mgdb-insertion-page .ins-query-field { min-width: 0; }
+
+.mgdb-insertion-page .ins-query-control {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-2);
+  align-items: start;
   box-sizing: border-box;
-  width: 100%;
-  min-width: 0;
+  min-height: 84px;
   padding: var(--mgdb-space-2) var(--mgdb-space-3);
   border: 1px solid #b9b2a5;
   border-radius: var(--mgdb-radius-sm);
-  background: var(--hub-surface);
-  color: var(--mgdb-ink);
-  font-family: var(--mgdb-font-mono);
-  font-size: var(--mgdb-text-sm);
-  resize: vertical;
+  background: var(--hub-surface, #ffffff);
+  transition: border-color .15s ease, box-shadow .15s ease;
 }
 
-.mgdb-insertion-page .ins-search-form textarea:focus {
+.mgdb-insertion-page .ins-query-control:focus-within {
   border-color: var(--mgdb-focus);
-  outline: none;
   box-shadow: 0 0 0 2px rgba(11, 87, 164, .18);
+}
+
+.mgdb-insertion-page .ins-query-control .ins-search-icon {
+  color: var(--mgdb-muted);
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+.mgdb-insertion-page .ins-query-control textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 72px;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--mgdb-ink);
+  font-family: var(--mgdb-font-mono, monospace);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.45;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.mgdb-insertion-page .ins-query-control textarea:focus { outline: none; }
+
+.mgdb-insertion-page #ins-gene-clear,
+.mgdb-insertion-page #ins-stock-clear {
+  padding: 0 var(--mgdb-space-2);
+  border: 0;
+  background: transparent;
+  color: var(--mgdb-muted);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.mgdb-insertion-page #ins-gene-clear:hover,
+.mgdb-insertion-page #ins-stock-clear:hover {
+  color: var(--mgdb-green-dark);
+  text-decoration: underline;
+}
+
+.mgdb-insertion-page .ins-query-submit {
+  box-sizing: border-box;
+  min-height: 84px;
+  height: 100%;
+  padding: 0 var(--mgdb-space-5);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mgdb-space-2);
+  white-space: nowrap;
+}
+
+/* ── Region mode row ─────────────────────────────────────────────────────── */
+
+.mgdb-insertion-page .ins-region-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, .8fr) minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-3);
+  align-items: end;
+}
+
+.mgdb-insertion-page .ins-region-submit {
+  box-sizing: border-box;
+  height: var(--mgdb-tap-target);
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-5);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mgdb-space-2);
+  white-space: nowrap;
+}
+
+/* ── Hints & Examples ────────────────────────────────────────────────────── */
+
+.mgdb-insertion-page .ins-search-hint {
+  margin: var(--mgdb-space-2) 0 var(--mgdb-space-3);
 }
 
 .mgdb-insertion-page .ins-hint {
@@ -148,40 +229,15 @@
   font-size: var(--mgdb-text-xs);
 }
 
-/* The button has no label above it, so it bottom-aligns with the textarea
-   rather than reserving a label band of its own. */
-.mgdb-insertion-page .ins-search-form > .mgdb-hub-field-action { align-self: end; }
-
-/* Five controls on one line: four inputs and the submit. */
-.mgdb-insertion-page .ins-region-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1.6fr) minmax(0, .8fr) minmax(0, 1fr) minmax(0, 1fr) auto;
-  gap: var(--mgdb-space-3);
-  align-items: end;
-}
-
-@media (max-width: 1024px) {
-  .mgdb-insertion-page .ins-region-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-@media (max-width: 640px) {
-  .mgdb-insertion-page .ins-search-form { grid-template-columns: minmax(0, 1fr); }
-  .mgdb-insertion-page .ins-search-form > .mgdb-hub-field-action { grid-column: 1; }
-  .mgdb-insertion-page .ins-region-row { grid-template-columns: minmax(0, 1fr); }
-}
-
-/* ── Examples ────────────────────────────────────────────────────────────── */
-
-.mgdb-insertion-page .ins-example-row {
+.mgdb-insertion-page .ins-examples {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-2);
   align-items: center;
-  padding-top: var(--mgdb-space-3);
-  border-top: 1px solid var(--hub-line-soft);
+  margin-bottom: var(--mgdb-space-4);
 }
 
-.mgdb-insertion-page .ins-example-row > span:first-child {
+.mgdb-insertion-page .ins-example-label {
   color: var(--mgdb-ink-soft);
   font-size: var(--mgdb-text-xs);
   font-weight: 700;
@@ -189,66 +245,121 @@
   text-transform: uppercase;
 }
 
-.mgdb-insertion-page .ins-example-row button {
+.mgdb-insertion-page .ins-examples button {
   padding: var(--mgdb-space-1) var(--mgdb-space-3);
-  border: 1px solid var(--hub-line);
+  border: 1px solid var(--hub-line, #e3e9f2);
   border-radius: 999px;
-  background: var(--hub-surface);
+  background: var(--hub-surface, #ffffff);
   color: var(--mgdb-green-dark);
   font-family: inherit;
   font-size: var(--mgdb-text-sm);
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
+  transition: all .15s ease;
 }
 
-.mgdb-insertion-page .ins-example-row button:hover {
-  border-color: var(--mgdb-green-dark);
-  background: var(--mgdb-green-soft);
+.mgdb-insertion-page .ins-examples button:hover {
+  border-color: var(--mgdb-gold);
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+  box-shadow: 0 0 0 1px var(--mgdb-gold);
 }
 
 /* ── Advanced search ─────────────────────────────────────────────────────── */
 
-.mgdb-insertion-page .ins-adv {
+.mgdb-insertion-page .ins-advanced {
+  border: 1px solid var(--hub-line, #e3e9f2);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface, #ffffff);
   margin-top: var(--mgdb-space-4);
-  border: 1px solid var(--hub-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--hub-surface);
 }
 
-.mgdb-insertion-page .ins-adv summary {
+.mgdb-insertion-page .ins-advanced > summary {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-1) var(--mgdb-space-3);
-  align-items: baseline;
+  align-items: center;
   padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-radius: var(--mgdb-radius-sm);
   color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
   cursor: pointer;
-  list-style-position: inside;
+  list-style: none;
 }
 
-.mgdb-insertion-page .ins-adv summary strong { font-size: var(--mgdb-text-base); }
-.mgdb-insertion-page .ins-adv summary span { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
-.mgdb-insertion-page .ins-adv[open] summary { border-bottom: 1px solid var(--hub-line-soft); }
+.mgdb-insertion-page .ins-advanced > summary::-webkit-details-marker { display: none; }
 
-.mgdb-insertion-page .ins-adv-body {
+.mgdb-insertion-page .ins-advanced > summary::before {
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 7px solid currentColor;
+  content: "";
+  transition: transform .15s ease;
+}
+
+.mgdb-insertion-page .ins-advanced[open] > summary::before { transform: rotate(90deg); }
+
+.mgdb-insertion-page .ins-advanced > summary:focus-visible {
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: -3px;
+}
+
+.mgdb-insertion-page .ins-advanced-count {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.mgdb-insertion-page .ins-advanced-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-4);
+  padding: var(--mgdb-space-4);
+  border-top: 1px solid var(--hub-line-soft, #eef2f8);
+}
+
+.mgdb-insertion-page .ins-advanced-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--mgdb-space-4);
   align-items: start;
-  padding: var(--mgdb-space-4);
 }
 
-.mgdb-insertion-page .ins-adv-actions {
+.mgdb-insertion-page .ins-advanced-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  gap: var(--mgdb-space-3);
   align-items: center;
-  padding: 0 var(--mgdb-space-4) var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px dashed var(--hub-line-soft, #eef2f8);
 }
 
-@media (max-width: 800px) {
-  .mgdb-insertion-page .ins-adv-body { grid-template-columns: minmax(0, 1fr); }
+.mgdb-insertion-page .ins-advanced-reset-btn {
+  min-height: var(--mgdb-tap-target);
+  height: var(--mgdb-tap-target);
+  padding: var(--mgdb-space-2) var(--mgdb-space-5);
+  border: 1px solid #b9b2a5;
+  border-radius: var(--mgdb-radius-sm);
+  background: #ffffff;
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.mgdb-insertion-page .ins-advanced-reset-btn:hover {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
 }
 
 /* --------------------------------------------------------------------------
@@ -257,46 +368,47 @@
 
 .mgdb-insertion-page .insertion-results-section[hidden] { display: none; }
 
-.mgdb-insertion-page .insertion-results-heading {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-3) var(--mgdb-space-5);
-  align-items: end;
-  justify-content: space-between;
-  margin-bottom: var(--mgdb-space-4);
-}
-
-.mgdb-insertion-page .insertion-results-heading h2 { margin: 0; }
-.mgdb-insertion-page .insertion-results-heading > div:first-child { min-width: 0; flex: 1 1 18rem; }
-
-.mgdb-insertion-page #insertion-results-status {
-  margin: var(--mgdb-space-1) 0 0;
-  color: var(--mgdb-muted);
+.mgdb-insertion-page .ins-results-status {
+  margin: 0 0 var(--mgdb-space-4);
+  color: var(--mgdb-ink-soft);
   font-size: var(--mgdb-text-sm);
 }
 
-/* Fixed tracks in a box sized to its own content: declared with minmax(0, ...)
-   the first tracks take everything the parent offers and the last resolves to
-   0px, which drops its control onto a second row. */
-.mgdb-insertion-page .ins-results-controls {
-  display: grid;
-  width: max-content;
-  max-width: 100%;
-  flex: 0 0 auto;
-  grid-template-columns: 13rem 10rem auto auto;
+.mgdb-insertion-page .ins-results-status strong { color: var(--mgdb-green-dark); }
+
+.mgdb-insertion-page .ins-results-toolbar {
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--mgdb-space-3) var(--mgdb-space-4);
-  align-items: end;
+  align-items: flex-end;
+  margin-bottom: var(--mgdb-space-4);
 }
 
-@media (max-width: 900px) {
-  .mgdb-insertion-page .ins-results-controls {
-    width: 100%;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.mgdb-insertion-page .ins-results-filter {
+  flex: 1 1 240px;
+  min-width: 200px;
+  position: relative;
 }
 
-@media (max-width: 560px) {
-  .mgdb-insertion-page .ins-results-controls { grid-template-columns: minmax(0, 1fr); }
+.mgdb-insertion-page .ins-results-filter > label {
+  padding-right: 7rem;
+}
+
+.mgdb-insertion-page .ins-results-filter .mgdb-result-count {
+  position: absolute;
+  right: 0;
+  bottom: calc(var(--mgdb-tap-target) + 6px);
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-insertion-page .ins-results-toolbar .mgdb-hub-field-action .mgdb-button {
+  height: var(--mgdb-tap-target);
+  min-height: var(--mgdb-tap-target);
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
 }
 
 .mgdb-insertion-page .ins-view-toggle {
@@ -329,6 +441,53 @@
 .mgdb-insertion-page .ins-view-btn[aria-pressed="true"] {
   background: var(--mgdb-green-dark);
   color: #ffffff;
+}
+
+@media (max-width: 900px) {
+  .mgdb-insertion-page .ins-advanced-grid { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-insertion-page .ins-region-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 767px) {
+  .mgdb-insertion-page .ins-results-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--mgdb-space-3);
+  }
+  .mgdb-insertion-page .ins-results-toolbar .mgdb-hub-field {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+  .mgdb-insertion-page .ins-results-toolbar .mgdb-hub-field > label:first-child {
+    min-height: 0;
+  }
+  .mgdb-insertion-page .ins-results-filter {
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+  }
+  .mgdb-insertion-page .ins-results-filter > label {
+    padding-right: 7rem;
+  }
+  .mgdb-insertion-page .ins-results-toolbar .mgdb-hub-field-action,
+  .mgdb-insertion-page .ins-results-toolbar .mgdb-hub-field-action .mgdb-button,
+  .mgdb-insertion-page .ins-view-toggle {
+    width: 100%;
+    justify-content: center;
+  }
+  .mgdb-insertion-page .ins-view-btn {
+    flex: 1 1 50%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .mgdb-insertion-page .ins-query-row { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-insertion-page .ins-query-submit { width: 100%; min-height: var(--mgdb-tap-target); }
+  .mgdb-insertion-page .ins-region-row { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-insertion-page .ins-region-submit { width: 100%; }
+  .mgdb-insertion-page .ins-advanced-grid { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-insertion-page .mgdb-hub-field > label:first-child { min-height: 0; }
 }
 
 .mgdb-insertion-page #insertion-notes .mgdb-message { margin-bottom: var(--mgdb-space-4); }
@@ -424,6 +583,24 @@
 
 .mgdb-insertion-page .ins-table td,
 .mgdb-insertion-page .ins-table th { vertical-align: top; }
+
+.mgdb-insertion-page .ins-table th button[data-sort-key] {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mgdb-space-1);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.mgdb-insertion-page .ins-table th button[data-sort-key]:hover {
+  color: var(--mgdb-green-dark);
+}
 
 .mgdb-insertion-page .ins-gene-cell strong {
   display: block;

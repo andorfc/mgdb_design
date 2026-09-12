@@ -24,6 +24,22 @@
     }
   }
 
+  /* /ordering/coop_order -- the Maize Genetics Cooperation Stock Center request
+     form, on the design system. Only *page* renders go to the modern
+     controller: the confirmation screen (ID == 'completed') and the form
+     itself. Everything the form posts back carries an `action` field
+     (add-stock, check-stock, get-list, remove-stock, get-comment, clear-order,
+     force-add-stock, submit) and is left to controllers/ordering/coop_order.php
+     below, so the basket store and the order email are untouched.
+
+     Rollback: delete this block and templates/ordering/coop_order.bau serves the
+     route again; nothing under controllers/ordering/coop_order.php was modified. */
+  if (PAGE == 'coop_order' && !getCGIParam('action', 'GP', false)) {
+    if (include('controllers/ordering/coop_order_modern.php')) {
+      return;
+    }
+  }
+
   $username = getCookie('username', false);
   $password = getCookie('password', false);
   $userid =   getCookie('userid', false);
@@ -78,7 +94,12 @@
   }
   else{
     reportError("Unable to find page $page_filename");
-    $mgdb->get('body')->load('templates/error/error-404.bau');
+    http_response_code(404);
+    /* The modern 404 rather than error-404.bau: that template's block is
+       named with its .bau suffix, so Bauplan never matched it and this
+       branch rendered whatever body was already loaded, with a 200. */
+    include('controllers/not_found.php');
+    exit;
   }
 
   include_once('translation.php');

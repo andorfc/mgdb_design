@@ -461,3 +461,94 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Recombination nodule maps ───────────────────────────────────────────── */
+
+/* Carried here 2026-09-07 when /data_center/RNmaps was retired. The card above
+   used to say "MaizeGDB holds no RN map records", which was wrong: the site has
+   served Anderson's ten SC files at /docs/RNmaps/ all along, and this hub was
+   the page that should have said so.
+
+   Both Morgan2McClintock links went with it. m2m.dill-picl.org no longer
+   resolves, and dill-picl.org itself was re-registered on 2025-06-21 through
+   Gname.com and now serves an Indonesian gambling site -- so the surviving link
+   was worse than the dead one. The tool is named and cited in the prose
+   instead. */
+
+.mgdb-cytogenetic-page .cyt-rn-lead {
+  max-width: 62rem;
+  margin: 0 0 var(--mgdb-space-4);
+  line-height: 1.65;
+}
+
+/* Six labelled facts, read down rather than across: several of the values are a
+   sentence or a run of links, so a two-column grid would set the short ones
+   against a wall of white. */
+.mgdb-cytogenetic-page .cyt-rn-facts {
+  display: grid;
+  gap: 0;
+  margin: 0 0 var(--mgdb-space-5);
+  border: 1px solid var(--hub-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: #ffffff;
+}
+
+.mgdb-cytogenetic-page .cyt-rn-facts > div {
+  display: grid;
+  grid-template-columns: minmax(9rem, 12rem) minmax(0, 1fr);
+  gap: var(--mgdb-space-4);
+  padding: 0.65rem 0.95rem;
+  border-bottom: 1px solid var(--hub-line);
+}
+
+.mgdb-cytogenetic-page .cyt-rn-facts > div:last-child { border-bottom: 0; }
+
+.mgdb-cytogenetic-page .cyt-rn-facts dt {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.mgdb-cytogenetic-page .cyt-rn-facts dd {
+  margin: 0;
+  min-width: 0;
+  line-height: 1.55;
+}
+
+@media (max-width: 620px) {
+  .mgdb-cytogenetic-page .cyt-rn-facts > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.2rem;
+  }
+}
+
+.mgdb-cytogenetic-page .cyt-rn-note {
+  max-width: 62rem;
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-ink-soft);
+  line-height: 1.6;
+}
+
+/* Ten files, named for the complex they describe. They wrap rather than scroll:
+   nothing is lost by reading them on two rows. */
+.mgdb-cytogenetic-page .cyt-rn-downloads,
+.mgdb-cytogenetic-page .cyt-rn-lgs { flex-wrap: wrap; }
+
+.mgdb-cytogenetic-page .cyt-rn-table { width: auto; min-width: min(100%, 44rem); }
+
+/* ── Section tabs ────────────────────────────────────────────────────────── */
+
+/* Eight tabs now, and the bar is sticky, so it stays one row at every width and
+   scrolls sideways instead of wrapping. A wrapped bar is two heights, and the
+   sections below need one offset that is right at both. */
+.mgdb-cytogenetic-page .mgdb-section-tabs {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mgdb-cytogenetic-page .mgdb-section-tabs a { white-space: nowrap; }
+
+/* Without this the tab links landed each section underneath the sticky bar. */
+.mgdb-hub-page.mgdb-cytogenetic-page > section[id] { scroll-margin-top: 65px; }

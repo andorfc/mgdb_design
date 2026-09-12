@@ -1,0 +1,350 @@
+$$SYNTAX-LEVEL 2
+*(breeders_toolbox-options {
+    include-js: /js/stock.js
+  }
+  <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js'></script>
+<link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css'/>
+<div class="toolbox-options ctrl-panel cyto__container">
+  @(no-results { display: off }
+  <div class="center error">
+    <h2>Error: No pedigree results</h2>
+    <div>
+      Filter(s\) returned no pedigree results.
+      @(no-pedigree {display: off}
+        However <a href="/data_center/stock/$(stock_name)">$(stock_name)</a> still exists in our database without pedigree information.
+      )
+    </div>
+  </div>
+  )
+  <div class="description">
+    <p>
+      The MaizeGDB Pedigree Viewer is developed to display pedigree relationships between maize varieties in a network representation.
+      The Viewer is based on a pedigree network of 4706 maize varieties that are currently available in the MaizeGDB Stock Pages. The
+      tool allows the user to apply a number of filters, select or upload their own breeding relationships, center a pedigree network
+      on a maize variety, and display the shortest path(s\) between two maize varieties on the pedigree network.
+    </p>
+    <p>
+      Please use the feedback link on the right-hand corner for your comments and suggestions.
+    </p>
+    <br>
+    <p>
+    For your citations, please use the following reference:<br>
+    <strong>Braun BL, Schott DA, Portwood JL, Andorf, C.M., Sen, TZ. (2019\) PedigreeNet: A web-based pedigree viewer for biological databases. Bioinformatics. 2019 Mar 23. <a href="https://doi.org/10.1093/bioinformatics/btz208" target="_blank">doi: 10.1093/bioinformatics/btz208.</a></strong>
+    </p>
+  </div>
+  @(lambda { visible-if-defined: error-message }
+    <div class="center description description__error">
+      <h2>Error: $(error-message)</h2>
+    </div>
+  )
+  @(error-singleton
+    @(cytoscape-error { visible-if-defined: node-limit }
+      <div class="center description description__error" id="caveat-error">
+        <h2>Caveat: Too much data to load</h2>
+        <div>
+          Data must have a maximum of $(node-limit) nodes and $(edge-limit) edges (Got $(node-count) nodes and $(edge-count) edges\). Please filter your results.
+          Note that you can still download the network structure below.
+        </div>
+      </div>
+    )
+  )
+  <section class="progress">
+    <div class="cyto__container">
+      <div class="cyto__item">
+        <form action="/breeders_toolbox?reload&shortest-path" id="short-path-form">
+          <h3 class="cyto__h3">Find the shortest path between two varieties</h3>
+            <div class="examples">
+              <span class="subtitle">Example:</span>
+              <a id="example3" class="example" href="#">B73 - Mo17</a>
+            </div>
+          <div class="cyto__block">
+            <input class="cyto__input" placeholder="From" name="node-from" id="node-from" type="text" value="$(node-from)">
+            <input placeholder="To" class="cyto__input" name="node-to" id="node-to" type="text" value="$(node-to)">
+             <button class="cyto__button" type="submit" id="shortest-path-submit">Search</button>
+          </div>
+        </form>
+
+        <form name="text-upload" action="/breeders_toolbox" method="get" id="stock-form">
+          <h3 class="cyto__h3">Build a network around a variety</h3>
+          <div class="examples">
+            <span class="subtitle">Example:</span>
+            <a id="example4" class="example" href="#">B37</a>
+          </div>
+          <div class="cyto__block">
+            <input class="cyto__input" placeholder="Variety" type="text" name="data" id="data" value="$(node-center)"/>
+            <button class="cyto__button" type="submit" id="data-submit">Submit</button>
+          </div>
+        </form>
+
+        <form action="/breeders_toolbox?lca" method="get" id="ancestor-form">
+          <h3 class="cyto__h3">Build a network around the lowest common ancestor of two varieties</h3>
+            <div class="examples">
+              <span class="subtitle">Example:</span>
+              <a id="example5" class="example" href="#">B41, W17</a>
+            </div>
+          <div class="cyto__block">
+            <input type="hidden" name="lca" value="1"/>
+            <input class="cyto__input" placeholder="Variety A" type="text" name="node1" id="node1" value="$(lca-a)"/>
+            <input class="cyto__input" placeholder="Variety B" type="text" name="node2" id="node2" value="$(lca-b)"/>
+            <button class="cyto__button" type="submit" id="net-nodes-submit">Submit</button>
+          </div>
+        </form>
+
+      </div>
+      <div class="cyto__item">
+        <form id="filters" class="tabbed" action="/breeders_toolbox" method="post" id="filter-form">
+          <h3 class="cyto__h3">Filters</h3>
+          <div class="examples">
+            <span class="subtitle">Examples:</span>
+            <a id="example1" class="example" href="#">Illinois varieties</a>
+            <a id="example2" class="example" href="#">Georgia varieties generated by USDA-ARS</a>
+          </div>
+         
+          <input type="hidden" value="1" id="num-states" name="num-states"/>
+          @(pedigree-filters
+               <br><b>Filter to:</b>
+                <table cellspacing="10">
+                <tr>
+                <td> <input id="state-checkbox" type="checkbox" name="filter-state" @(state-checked {display: off} checked)></td>
+                <td valign="center" >
+                pedigrees <strong>from these state(s\)</strong>:
+                </td>
+                <td valign="bottom">
+                <select onchange="document.getElementById('state-checkbox'\).checked = 'true';" class="js-example-basic-multiple" style="width: 100%" multiple="multiple" id="states" name="states[]">
+                  <!--<option value="default">All States</option>-->
+                  @(lambda {display: off}
+                     $(checked-state)
+                  )
+                  @(state-list 
+                      <option value="$(state)" $(selected)>$(state)</option>
+                  )
+                  
+                </select>
+                
+                
+                <!--<input type="button" class="cyto__button-small" value="Add State" id="btn_add_state" onclick="insert_state(\);this.remove(\);"/>-->
+                
+                </td>
+               </tr>
+                <tr> <td><input id="developer-checkbox" type="checkbox" name="filter-developer" @(developer-checked {display: off} checked)></td>
+                <td valign="center">
+                varieties <strong>developed by</strong>:
+                </td>
+                <td valign="bottom" >
+                <select onchange="document.getElementById('developer-checkbox'\).checked = 'true';" style="width: 100%" class="js-example-basic-multiple" multiple="multiple" id="developers" name="developers[]">
+                  <!--<option value="default">All Developers</option>-->
+                  @(lambda {display: off}
+                    $(checked-developer)
+                  )
+                  @(developer-list 
+
+                      <option value="$(id)" $(selected)>$(name)</option>
+                    )
+                    
+                  
+
+                </select>
+                </td>
+               </tr>
+                <tr><td><input id="source-checkbox" type="checkbox" name="filter-source" @(source-checked {display: off} checked)></td>
+                <td valign="center">
+                varieties <strong>available from</strong>:
+                </td>
+                <td valign="bottom">
+                <select onchange="document.getElementById('source-checkbox'\).checked = 'true';"  style="width: 100%" class="js-example-basic-multiple" multiple="multiple" id="sources" name="sources[]"> <!--class="cyto__input"-->
+                  <!--<option value="default">All Sources</option>-->
+                  @(lambda {display: off}
+                    $(checked-source)
+                  )
+                  @(sources-list
+                    
+                      <option value="$(id)" $(selected)>$(name)</option>
+                   
+                  )
+                </select>
+                </td>
+               </tr>
+                <tr><td><input id="country-checkbox" type="checkbox" name="filter-country" @(country-checked {display: off} checked)></td>
+                <td valign="center">
+                varieties <strong>from these countries</strong>:
+                </td>
+                <td valign="bottom">
+                <select onchange="document.getElementById('country-checkbox'\).checked = 'true';" style="width: 100%" class="js-example-basic-multiple" multiple="multiple" id="countries" name="countries[]">
+                  <!--<option value="default">All Countries</option>-->
+                  @(lambda {display: off}
+                    $(checked-country)
+                  )
+                  @(country-list
+                      <option value="$(country)" $(selected)>$(country)</option>
+                    
+                  )
+                </select>
+                </td>
+               </tr>
+               </table>
+          )
+          @(stock-filters {display: off}
+            <ul class="option-list">
+              <li>
+                <input type="checkbox" name="stock_center">Filter to stocks available from the Stock Center
+              </li>
+              <li>
+                <input type="checkbox" name="filter-developer">Filter to stocks <strong>developed by</strong>:
+                <select class="cyto__input" id="developer" name="developer">
+                  <option value="0">All Developers</option>
+                  $(developer_options)
+                </select>
+              </li>
+              <li>
+                <input type="checkbox" name="filter-identifier">Filter to stocks with this <strong>identifier</strong>: <input name="name" type="text">
+              </li>
+              <li>
+                <input type="checkbox" name="filter-type">Filter to stocks with this <strong>type</strong>:
+                <select class="cyto__input" id="type" name="type">
+                  <option value=0>All types</option>
+                  $(type_options)
+                </select>
+              </li>
+              <li>
+                <input type="checkbox" name="filter-linkage_groups">Filter to stocks with this <strong>focus linkage group</strong>
+                <select class="cyto__input" id="linkage-groups" name="linkage_groups">
+                  <option name="linkage_groups" value=0>All focus linkage groups</option>
+                  $(linkage_options)
+                </select>
+              </li>
+              <li>
+                <input type="checkbox" name="filter-genotypic_variation1">Filter to stocks with this <strong>genotypic variation</strong>
+                <input class="cyto__input" type="text" name="genotypic_variation1">
+              </li>
+              <li>
+                <input type="checkbox" name="filter-karyotypic_variation">Filter to stocks with this <strong>karyotypic variation</strong>
+                <select class="cyto__input" id="karyotypic-variation" name="karyotypic_variation">
+                  <option value=0>All karyotypic variations</option>
+                  $(karyotype_options)
+                </select>
+              </li>
+            </ul>
+          )
+          <div>
+            <input class="cyto__button" id="filter-reset" type="button" value="Clear Filters"> <input class="cyto__button" id="filter-submit" type="button" value="Filter and Visualize"> 
+          </div>
+          <div id="filters-err" style="display: none; font-weight:bold; color: crimson">
+            Please make sure at least one filter checkbox is selected!
+          </div>
+        </form>
+      </div>
+
+      @(network-appearance-options
+        <div class="cyto__item">
+          <h3 class="cyto__h3">Adjust Network Appearance</h3>
+          <div class="center">
+            <div class="cyto__option">
+              <dl>
+                <dt>Network Layout:</dt>
+                <dd>
+                  <select id="cyto-layout" class="cyto__input">
+                    <option value="random" $(random_selected)>Random</option>
+                    <option value="circle" $(circle_selected)>Circle</option>
+                    <option value="grid" $(grid_selected)>Grid</option>
+                    <option value="concentric" $(concentric_selected)>Concentric</option>
+                    <option value="breadthfirst" $(breadthfirst_selected)>Breadthfirst</option>
+                    <option value="cose" $(cose_selected)>Cose</option>
+                  </select>
+                </dd>
+              </dl>
+            </div>
+            <div class="cyto__option">
+              <dl>
+                <dt>Node Color:</dt>
+                <dd>
+                  <select id="node-color" class="cyto__input">
+                    <option value="gray" selected>Gray</option>
+                    <option value="red">Red</option>
+                    <option value="blue">Blue</option>
+                    <option value="green">Green</option>
+                    <option value="yellow">Yellow</option>
+                  </select>
+                </dd>
+              </dl>
+            </div>
+            <div class="cyto__option">
+              <dl>
+                <dt>Line Color:</dt>
+                <dd>
+                  <select id="line-color" class="cyto__input">
+                    <option value="gray" selected>Gray</option>
+                    <option value="red">Red</option>
+                    <option value="blue">Blue</option>
+                    <option value="green">Green</option>
+                    <option value="yellow">Yellow</option>
+                  </select>
+                </dd>
+              </dl>
+            </div>
+            <div class="cyto__option">
+              <dl>
+                <dt>Node Size:</dt>
+                <dd>
+                  <select id="node-size" class="cyto__input">
+                    <option value="32px" selected>Small</option>
+                    <option value="52px">Medium</option>
+                    <option value="72px">Large</option>
+                  </select>
+                </dd>
+              </dl>
+            </div>
+            <div class="cyto__option">
+              <dl>
+                <dt>Node Shape:</dt>
+                <dd>
+                  <select id="node-shape" class="cyto__input">
+                    <option value="ellipse" selected>Circle</option>
+                    <option value="rectangle">Rectangle</option>
+                    <option value="roundrectangle">Round Rectangle</option>
+                    <option value="triangle">Triangle</option>
+                    <option value="pentagon">Pentagon</option>
+                    <option value="hexagon">Hexagon</option>
+                    <option value="heptagon">Heptagon</option>
+                    <option value="octagon">Octagon</option>
+                    <option value="star">Star</option>
+                    <option value="diamond">Diamond</option>
+                    <option value="vee">Vee</option>
+                    <option value="rhomboid">Rhomboid</option>
+                  </select>
+                </dd>
+              </dl>
+            </div>
+            <div class="cyto__option">
+              <dl>
+                <dt>Line Thickness:</dt>
+                <dd>
+                  <select id="line-thickness" class="cyto__input">
+                    <option value="1" selected>Thin</option>
+                    <option value="2">Medium</option>
+                    <option value="3">Thick</option>
+                  </select>
+                </dd>
+              </dl>
+            </div>
+          </div>
+
+          ;; network exports
+          <div class="cyto__export">
+          <form id="export-cytoscape" action="/breeders_toolbox" method="post" target="_blank" data-target="png-data">
+            <input id="png-data" name="png-data" type="hidden">
+            <input type="button" class="cyto__button" value="Download Network Image as PNG" id="png-download">
+          </form>
+            <form id="export-cytoscape" action="/breeders_toolbox" method="post" target="_blank" data-target="csv-data">
+              <input id="csv-data" name="csv-data" value="$(network-csv)" type="hidden">
+              <input class="cyto__button" type="submit" value="Download Network Structure as CSV">
+            </form>
+          </div>
+        <!--- <button class="cyto__button" type="button" id="disperse-btn">Disperse</button>
+        <button class="cyto__button" type="button" id="compress-btn">Compress</button>
+        --->
+        </div>
+      )
+    </div>
+  </section>
+</div>
+)

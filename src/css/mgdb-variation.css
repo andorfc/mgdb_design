@@ -63,18 +63,29 @@
 
 .mgdb-variation-page .variation-query-control input[type="search"]:focus { outline: none; }
 
-.mgdb-variation-page #variation-query-clear {
-  padding: 4px 8px;
+.mgdb-variation-page .variation-query-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.875rem;
+  height: 1.875rem;
+  padding: 0;
   border: 0;
+  border-radius: 999px;
   background: transparent;
-  color: var(--mgdb-muted);
-  font-family: inherit;
-  font-size: var(--mgdb-text-xs);
-  font-weight: 700;
+  color: var(--mgdb-ink-soft);
   cursor: pointer;
+  transition: background-color .15s ease, color .15s ease;
 }
 
-.mgdb-variation-page #variation-query-clear:hover { color: var(--mgdb-ink); }
+.mgdb-variation-page .variation-query-clear[hidden] {
+  display: none !important;
+}
+
+.mgdb-variation-page .variation-query-clear:hover {
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-green-dark);
+}
 
 .mgdb-variation-page .variation-query-submit {
   height: 52px;
@@ -117,8 +128,10 @@
 }
 
 .mgdb-variation-page .variation-examples button:hover {
-  border-color: var(--mgdb-gold-dark);
+  border-color: var(--mgdb-gold);
   background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+  box-shadow: 0 0 0 1px var(--mgdb-gold);
 }
 
 /* Advanced search ---------------------------------------------------------- */
@@ -204,9 +217,30 @@
 .mgdb-variation-page .variation-advanced-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
+  gap: var(--mgdb-space-3);
   padding-top: var(--mgdb-space-3);
   border-top: 1px dashed var(--hub-line-soft, #eef2f8);
+}
+
+.mgdb-variation-page .variation-advanced-reset-btn {
+  min-height: var(--mgdb-tap-target);
+  height: var(--mgdb-tap-target);
+  padding: var(--mgdb-space-2) var(--mgdb-space-5);
+  border: 1px solid #b9b2a5;
+  border-radius: var(--mgdb-radius-sm);
+  background: #ffffff;
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.mgdb-variation-page .variation-advanced-reset-btn:hover {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
 }
 
 /* --------------------------------------------------------------------------
@@ -236,28 +270,175 @@
 
 .mgdb-variation-page .variation-scope-button:hover { background: var(--mgdb-green-soft); }
 
-/* The three controls share the label band and the 44px control height that
-   css/mgdb-hub.css sets, so they line up along both edges. The export pair has
-   no label, so it bottom-aligns rather than reserving a band of its own. */
+/* The controls share the label band and the 44px control height that
+   css/mgdb-hub.css sets, so they line up along both edges. The export button and
+   view toggle have no label, so they bottom-align at the same baseline. */
 .mgdb-variation-page .variation-results-toolbar {
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto;
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--mgdb-space-3) var(--mgdb-space-4);
-  align-items: end;
+  align-items: flex-end;
   margin-bottom: var(--mgdb-space-4);
 }
 
-.mgdb-variation-page .variation-results-actions {
-  display: flex;
-  flex-direction: row;
-  gap: var(--mgdb-space-2);
+.mgdb-variation-page .variation-results-filter {
+  flex: 1 1 240px;
+  min-width: 200px;
+  position: relative;
 }
 
-.mgdb-variation-page .variation-results-actions .mgdb-button {
+.mgdb-variation-page .variation-results-export .mgdb-button {
   height: var(--mgdb-tap-target);
+  min-height: var(--mgdb-tap-target);
   display: inline-flex;
   align-items: center;
   white-space: nowrap;
+}
+
+.mgdb-variation-page .variation-results-view .mgdb-view-toggle {
+  height: var(--mgdb-tap-target);
+  min-height: var(--mgdb-tap-target);
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  padding: 3px;
+}
+
+.mgdb-variation-page .variation-results-view .mgdb-view-btn {
+  height: 100%;
+  box-sizing: border-box;
+  padding: 0 var(--mgdb-space-3);
+}
+
+/* Card View ---------------------------------------------------------------- */
+
+.mgdb-variation-page .variation-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-variation-page .variation-result-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--hub-line, #e3e9f2);
+  border-radius: var(--mgdb-radius);
+  background: var(--hub-surface, #ffffff);
+  box-shadow: var(--mgdb-shadow-sm, 0 1px 2px rgba(0,0,0,.05));
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.mgdb-variation-page .variation-result-card:hover {
+  border-color: var(--mgdb-gold);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+}
+
+.mgdb-variation-page .variation-card-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-variation-page .variation-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1);
+  align-items: center;
+}
+
+.mgdb-variation-page .variation-card-title {
+  margin: 0 0 var(--mgdb-space-1);
+  font-size: var(--mgdb-text-lg);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-variation-page .variation-card-title a {
+  color: var(--mgdb-green-dark);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.mgdb-variation-page .variation-card-title a:hover {
+  color: var(--mgdb-leaf);
+}
+
+.mgdb-variation-page .variation-card-synonyms {
+  display: block;
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-variation-page .variation-card-meta-list {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+  margin: 0 0 var(--mgdb-space-4);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-variation-page .variation-card-meta-list dt {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+
+.mgdb-variation-page .variation-card-meta-list dd {
+  margin: 0;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-variation-page .variation-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--hub-line-soft, #eef2f8);
+  margin-top: auto;
+}
+
+.mgdb-variation-page .variation-card-actions a {
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.mgdb-variation-page .variation-card-actions a:hover {
+  text-decoration: underline;
+}
+
+.mgdb-variation-page .variation-card-copy-btns {
+  display: flex;
+  gap: var(--mgdb-space-1);
+}
+
+.mgdb-variation-page .variation-copy-btn {
+  padding: 2px 8px;
+  border: 1px solid var(--hub-line, #e3e9f2);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface, #fff);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+}
+
+.mgdb-variation-page .variation-copy-btn:hover {
+  background: var(--mgdb-green-soft);
+  border-color: var(--mgdb-green-dark);
+  color: var(--mgdb-green-dark);
 }
 
 .mgdb-variation-page .variation-results-note {
@@ -287,6 +468,10 @@
    is sometimes empty and sometimes not stays exactly as tall as the two
    controls beside it and the toolbar's bottom edge holds. */
 .mgdb-variation-page .variation-results-filter { position: relative; }
+
+.mgdb-variation-page .variation-results-filter > label {
+  padding-right: 7rem;
+}
 
 .mgdb-variation-page .variation-results-filter .mgdb-result-count {
   position: absolute;
@@ -465,9 +650,40 @@
   .mgdb-variation-page .variation-download-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-@media (max-width: 900px) {
-  .mgdb-variation-page .variation-results-toolbar { grid-template-columns: minmax(0, 1fr); }
-  .mgdb-variation-page .variation-results-actions { justify-content: flex-start; }
+@media (max-width: 767px) {
+  .mgdb-variation-page .variation-card-grid {
+    grid-template-columns: 1fr;
+  }
+  .mgdb-variation-page .variation-results-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--mgdb-space-3);
+  }
+  .mgdb-variation-page .variation-results-toolbar .mgdb-hub-field {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+  .mgdb-variation-page .variation-results-toolbar .mgdb-hub-field > label:first-child {
+    min-height: 0;
+  }
+  .mgdb-variation-page .variation-results-filter {
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+  }
+  .mgdb-variation-page .variation-results-export,
+  .mgdb-variation-page .variation-results-view {
+    align-self: stretch;
+  }
+  .mgdb-variation-page .variation-results-export .mgdb-button,
+  .mgdb-variation-page .variation-results-view .mgdb-view-toggle {
+    width: 100%;
+    justify-content: center;
+  }
+  .mgdb-variation-page .variation-results-view .mgdb-view-btn {
+    flex: 1 1 50%;
+    justify-content: center;
+  }
 }
 
 @media (max-width: 640px) {

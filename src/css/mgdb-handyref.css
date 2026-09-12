@@ -67,7 +67,6 @@
 
 /* ── Sticky section tabs ─────────────────────────────────────────────────── */
 
-
 .mgdb-handyref-page .mgdb-section-tabs a {
   display: inline-flex;
   min-height: 40px;
@@ -272,19 +271,6 @@
 
 /* ── Related resources ───────────────────────────────────────────────────── */
 
-/* The shell lays this panel out with `repeat(auto-fit, minmax(220px, 1fr))`,
-   which gives five columns at full width. Six cards then leave one alone on a
-   second row with a thousand pixels of nothing beside it -- the ragged row that
-   /projects hit for the same reason. Six divides by three, two and one, so the
-   column count is pinned to those and every row is full at every width. */
-.mgdb-handyref-page .mgdb-resource-list {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-@media (max-width: 1000px) {
-  .mgdb-handyref-page .mgdb-resource-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-@media (max-width: 620px) {
-  .mgdb-handyref-page .mgdb-resource-list { grid-template-columns: minmax(0, 1fr); }
-}
+/* The three-column layout for a six-card panel now lives in css/mgdb-hub.css,
+   keyed on the card count itself, so this page no longer carries its own copy.
+   See the "Six cards are three and three" note there. */

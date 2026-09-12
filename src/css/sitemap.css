@@ -11,13 +11,15 @@
   margin: 0 auto 0.7rem;
 }
 
+/* On the Data Hub shell the enclosing <section> is already the white card with
+   the gold top edge, so the panel must not draw a second one -- it read as a
+   card inside a card with the accent doubled. It keeps only its own rhythm. */
 .mgdb-modern .sitemap-finder-panel {
-  padding: clamp(1.1rem, 2.6vw, 1.75rem);
-  border: 1px solid var(--mgdb-line);
-  border-top: 0.3rem solid var(--mgdb-gold);
-  border-radius: var(--mgdb-radius-lg);
-  background: var(--mgdb-surface);
-  box-shadow: var(--mgdb-shadow-sm);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .mgdb-modern .sitemap-finder-panel .mgdb-search {
@@ -92,9 +94,11 @@
 
 /* --- sticky section tabs -------------------------------------------------- */
 
-/* The shared component sets its own top and bottom margins; the directory
-   below it would otherwise add a second gap. */
-.mgdb-modern .sitemap-tabs + .sitemap-directory {
+/* The shared component sets its own top and bottom margins; the band below
+   it would otherwise add a second gap. The bar sits above "New tools" rather
+   than below it, so the neighbour to zero is the featured band -- the
+   directory further down keeps its normal between-sections gap. */
+.mgdb-modern .sitemap-tabs + .sitemap-featured {
   margin-top: 0;
 }
 
@@ -210,11 +214,12 @@
 
 /* --- featured strip ------------------------------------------------------- */
 
-.mgdb-modern .sitemap-featured {
-  margin: clamp(2rem, 5vw, 3.5rem) 0 0;
-  padding: var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-lg);
+/* The band is a highlight strip, not a record section, and the gold wash is
+   what says so -- the shell would otherwise paint it white like every other
+   card and the tiles inside it would go white on white. The shell keeps the
+   border, radius, shadow and padding, so only the wash is restated, and the
+   extra class beats `.mgdb-hub-page > section:not(.mgdb-hero)`. */
+.mgdb-modern .mgdb-sitemap-page > .sitemap-featured {
   background: var(--mgdb-gold-soft);
 }
 

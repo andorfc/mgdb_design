@@ -187,7 +187,6 @@ $content->get('mgec_terms')->replace(mgecHistoryCount($mgec_record, 'committees'
 $content->get('mgec_members')->replace($mgec_people ? number_format(count($mgec_people)) : '&#8212;');
 $content->get('mgec_activities')->replace(mgecHistoryCount($mgec_record, 'activities'));
 $content->get('mgec_documents')->replace(mgecHistoryCount($mgec_record, 'documents'));
-$content->get('data_date')->replace($page_data['data_date']);
 
 include_once('translation.php');
 echo $bauplan->publish();

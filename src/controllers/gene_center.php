@@ -184,6 +184,14 @@
 
   // Another hack: by-pass everything below if not a gene center or gene request
   if (PAGE != 'gene') {
+    /* require() with no existence check: /gene_center/zzz threw an uncaught
+       fatal and returned the PHP error -- file path, line number and stack
+       trace -- to the reader, with a 200. */
+    if (!file_exists($page_filename)) {
+      http_response_code(404);
+      include('controllers/not_found.php');
+      exit;
+    }
     require($page_filename);
     // Handle language translation (which fills in menu text)
     include_once('translation.php');
@@ -200,7 +208,12 @@
     }
     else {
       reportError("gene_center.php: page is missing: $template_name");
-      $mgdb->get('body')->load('templates/error/error-404.bau');
+      http_response_code(404);
+      /* The modern 404 rather than error-404.bau: that template's block is
+         named with its .bau suffix, so Bauplan never matched it and this
+         branch rendered whatever body was already loaded, with a 200. */
+      include('controllers/not_found.php');
+      exit;
     }
   }
   
@@ -220,13 +233,23 @@
         exit;
       }
       reportError("gene_center.php: page is missing: $search_template_name or $search_filename");
-      $mgdb->get('body')->load('templates/error/error-404.bau');
+      http_response_code(404);
+      /* The modern 404 rather than error-404.bau: that template's block is
+         named with its .bau suffix, so Bauplan never matched it and this
+         branch rendered whatever body was already loaded, with a 200. */
+      include('controllers/not_found.php');
+      exit;
     }
   }//no ID: show search page
 
   else if (!file_exists($template_name) || !file_exists($page_filename)) {
     reportError("gene_center.php: page is missing: $template_name or $page_filename");
-    $mgdb->get('body')->load('templates/error/error-404.bau');
+    http_response_code(404);
+    /* The modern 404 rather than error-404.bau: that template's block is
+       named with its .bau suffix, so Bauplan never matched it and this
+       branch rendered whatever body was already loaded, with a 200. */
+    include('controllers/not_found.php');
+    exit;
   }
 
   else {

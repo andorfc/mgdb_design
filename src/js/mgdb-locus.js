@@ -16,6 +16,9 @@
     pageSize: 25,
     filter: '',
     searched: false,
+    view: 'table',
+    sortKey: 'name',
+    sortDir: 'asc',
     lastData: null
   };
 
@@ -42,22 +45,85 @@
 
   /* ── Search Form & AJAX ─────────────────────────────────────────────────── */
 
+  function syncAdvancedBadge() {
+    var badge = byId('locus-advanced-count');
+    if (!badge) return;
+    var type = byId('locus-filter-type');
+    var chr = byId('locus-filter-chr');
+    var pheno = byId('locus-filter-pheno');
+    var active = 0;
+    if (type && type.value) active++;
+    if (chr && chr.value) active++;
+    if (pheno && pheno.value) active++;
+    badge.textContent = active ? active + ' active' : '';
+    badge.hidden = !active;
+  }
+
   function initSearchForm() {
     var form = byId('locus-search-form');
     if (!form) return;
 
+    var termInput = byId('locus-search-term');
+    var clearBtn = byId('locus-query-clear');
+
+    if (termInput && clearBtn) {
+      function updateClear() {
+        clearBtn.hidden = !termInput.value.trim();
+      }
+      termInput.addEventListener('input', updateClear);
+      termInput.addEventListener('change', updateClear);
+      clearBtn.addEventListener('click', function () {
+        termInput.value = '';
+        clearBtn.hidden = true;
+        termInput.focus();
+        if (state.searched) {
+          state.page = 1;
+          runSearch();
+        }
+      });
+      updateClear();
+    }
+
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       state.page = 1;
+      state.filter = '';
+      var filterInput = byId('locus-results-filter');
+      if (filterInput) { filterInput.value = ''; }
+      var filterCount = byId('locus-filter-count');
+      if (filterCount) { filterCount.textContent = ''; }
       runSearch();
     });
 
-    var resetBtn = byId('locus-reset-btn');
-    if (resetBtn) {
-      resetBtn.addEventListener('click', function () {
-        setTimeout(function () {
-          runSearch();
-        }, 10);
+    var advSubmit = byId('locus-adv-submit');
+    if (advSubmit) {
+      advSubmit.addEventListener('click', function (e) {
+        e.preventDefault();
+        state.page = 1;
+        state.filter = '';
+        var filterInput = byId('locus-results-filter');
+        if (filterInput) { filterInput.value = ''; }
+        var filterCount = byId('locus-filter-count');
+        if (filterCount) { filterCount.textContent = ''; }
+        runSearch();
+      });
+    }
+
+    var advReset = byId('locus-adv-reset');
+    if (advReset) {
+      advReset.addEventListener('click', function () {
+        ['locus-filter-type', 'locus-filter-chr', 'locus-filter-pheno'].forEach(function (id) {
+          var el = byId(id);
+          if (el) el.value = '';
+        });
+        syncAdvancedBadge();
+        state.page = 1;
+        state.filter = '';
+        var filterInput = byId('locus-results-filter');
+        if (filterInput) { filterInput.value = ''; }
+        var filterCount = byId('locus-filter-count');
+        if (filterCount) { filterCount.textContent = ''; }
+        if (state.searched) { runSearch(); }
       });
     }
 
@@ -65,9 +131,12 @@
     var selects = form.querySelectorAll('select');
     selects.forEach(function (sel) {
       sel.addEventListener('change', function () {
+        syncAdvancedBadge();
         runSearch();
       });
     });
+
+    syncAdvancedBadge();
   }
 
   function initExamples() {
@@ -77,6 +146,13 @@
         var termInput = byId('locus-search-term');
         if (termInput) {
           termInput.value = btn.dataset.term || '';
+          termInput.dispatchEvent(new Event('input'));
+          state.page = 1;
+          state.filter = '';
+          var filterInput = byId('locus-results-filter');
+          if (filterInput) { filterInput.value = ''; }
+          var filterCount = byId('locus-filter-count');
+          if (filterCount) { filterCount.textContent = ''; }
           runSearch();
           termInput.focus();
         }
@@ -121,14 +197,17 @@
     var statusEl = byId('locus-results-status');
     var notesEl = byId('locus-notes');
     var resultsEl = byId('locus-results');
+    var cardsEl = byId('locus-cards-view');
     var emptyEl = byId('locus-empty');
     var exportLink = byId('locus-export-tsv');
 
     notesEl.innerHTML = '';
     emptyEl.hidden = true;
     exportLink.hidden = true;
+    if (cardsEl) { cardsEl.innerHTML = ''; cardsEl.hidden = true; }
 
     resultsEl.innerHTML = '<div class="mgdb-loading"><span class="mgdb-spinner" aria-hidden="true"></span>Searching genetic loci&hellip;</div>';
+    resultsEl.hidden = false;
     statusEl.textContent = 'Searching…';
 
     lastQuery = params.toString();
@@ -139,6 +218,7 @@
         if (!wrap.ok || !wrap.data.ok) {
           var msg = (wrap.data && (wrap.data.message || wrap.data.detail)) || 'The search could not be completed.';
           resultsEl.innerHTML = '';
+          if (cardsEl) { cardsEl.innerHTML = ''; cardsEl.hidden = true; }
           notesEl.innerHTML = '<div class="mgdb-message mgdb-message-error" role="alert">' + esc(msg) + '</div>';
           statusEl.textContent = 'Search failed.';
           return;
@@ -147,14 +227,17 @@
       })
       .catch(function () {
         resultsEl.innerHTML = '';
+        if (cardsEl) { cardsEl.innerHTML = ''; cardsEl.hidden = true; }
         notesEl.innerHTML = '<div class="mgdb-message mgdb-message-error" role="alert">The search request failed. Please try again.</div>';
         statusEl.textContent = 'Search failed.';
       });
   }
 
   function renderResults(data) {
+    state.lastData = data;
     var statusEl = byId('locus-results-status');
     var resultsEl = byId('locus-results');
+    var cardsEl = byId('locus-cards-view');
     var emptyEl = byId('locus-empty');
     var exportLink = byId('locus-export-tsv');
 
@@ -164,6 +247,8 @@
 
     if (!total || !data.results || !data.results.length) {
       resultsEl.innerHTML = '';
+      resultsEl.hidden = true;
+      if (cardsEl) { cardsEl.innerHTML = ''; cardsEl.hidden = true; }
       emptyEl.hidden = false;
       statusEl.textContent = 'No genetic loci matched your query.';
       return;
@@ -186,7 +271,11 @@
         + number(total) + ' genetic loc' + (total === 1 ? 'us' : 'i') + '.' + timing;
     }
 
-    resultsEl.innerHTML = buildTableHtml(data.results);
+    var sorted = sortResults(data.results);
+    resultsEl.innerHTML = buildTableHtml(sorted);
+    renderCards(sorted);
+    initSortButtons(resultsEl);
+    updateViewDisplay();
     exportLink.href = API_URL + '?' + exportQuery(buildParams()) + '&format=tsv';
     exportLink.hidden = false;
 
@@ -204,7 +293,6 @@
 
     renderPagination(page, summary.page_count || 0);
 
-    state.lastData = data;
     /* Re-applied last so paging does not silently drop a filter the box still
        shows. */
     applyResultsFilter();
@@ -243,27 +331,79 @@
     });
   }
 
-  /* Narrows the page already rendered. The search pages server side, so this
-     filters what is on screen and the status line says so. */
+  function updateViewDisplay() {
+    var tableView = byId('locus-results');
+    var cardsView = byId('locus-cards-view');
+    var btnCards = byId('locus-view-cards');
+    var btnTable = byId('locus-view-table');
+
+    var isCards = state.view === 'cards';
+    var hasResults = state.lastData && state.lastData.results && state.lastData.results.length > 0;
+
+    if (tableView) {
+      tableView.hidden = isCards || !hasResults;
+    }
+    if (cardsView) {
+      cardsView.hidden = !isCards || !hasResults;
+    }
+
+    if (btnCards) {
+      btnCards.setAttribute('aria-pressed', isCards ? 'true' : 'false');
+      btnCards.classList.toggle('is-active', isCards);
+    }
+    if (btnTable) {
+      btnTable.setAttribute('aria-pressed', !isCards ? 'true' : 'false');
+      btnTable.classList.toggle('is-active', !isCards);
+    }
+  }
+
+  /* Narrows the page already rendered across both table and cards views. */
   function applyResultsFilter() {
     var container = byId('locus-results');
-    if (!container) { return; }
+    var cardsContainer = byId('locus-cards-view');
+    if (!container && !cardsContainer) { return; }
 
-    var rows = container.querySelectorAll('tbody tr');
     var terms = state.filter.toLowerCase().split(/\s+/).filter(Boolean);
     var shown = 0;
 
-    Array.prototype.forEach.call(rows, function (row) {
-      var match = true;
-      if (terms.length) {
-        var hay = (row.textContent || '').toLowerCase();
-        for (var i = 0; i < terms.length; i++) {
-          if (hay.indexOf(terms[i]) === -1) { match = false; break; }
+    if (container) {
+      var rows = container.querySelectorAll('tbody tr');
+      Array.prototype.forEach.call(rows, function (row) {
+        var match = true;
+        if (terms.length) {
+          var hay = (row.getAttribute('data-search') || row.textContent || '').toLowerCase();
+          for (var i = 0; i < terms.length; i++) {
+            if (hay.indexOf(terms[i]) === -1) { match = false; break; }
+          }
         }
+        row.hidden = !match;
+        if (match) { shown++; }
+      });
+    }
+
+    if (cardsContainer) {
+      var cards = cardsContainer.querySelectorAll('.locus-result-card');
+      Array.prototype.forEach.call(cards, function (card) {
+        var match = true;
+        if (terms.length) {
+          var hay = (card.getAttribute('data-search') || card.textContent || '').toLowerCase();
+          for (var i = 0; i < terms.length; i++) {
+            if (hay.indexOf(terms[i]) === -1) { match = false; break; }
+          }
+        }
+        card.hidden = !match;
+      });
+    }
+
+    var filterCount = byId('locus-filter-count');
+    var totalOnPage = (state.lastData && state.lastData.results) ? state.lastData.results.length : 0;
+    if (filterCount) {
+      if (terms.length) {
+        filterCount.textContent = shown + ' of ' + totalOnPage + ' shown';
+      } else {
+        filterCount.textContent = '';
       }
-      row.hidden = !match;
-      if (match) { shown++; }
-    });
+    }
 
     if (terms.length) {
       var statusEl = byId('locus-results-status');
@@ -272,82 +412,287 @@
         statusEl.textContent = shown === 0
           ? 'Nothing on this page matches the filter “' + state.filter + '”. '
             + number(total) + ' genetic loci matched the search.'
-          : 'Showing ' + number(shown) + ' of the ' + number(rows.length)
+          : 'Showing ' + number(shown) + ' of the ' + number(totalOnPage)
             + ' loci on this page matching “' + state.filter + '”, out of '
             + number(total) + ' matched by the search.';
       }
     }
   }
 
+  var LOCUS_COLUMNS = [
+    { key: 'name', label: 'Locus' },
+    { key: 'type', label: 'Type' },
+    { key: 'chromosome', label: 'Chromosome & Bin' },
+    { key: 'gene_models', label: 'Gene Models' },
+    { key: 'allele_count', label: 'Phenotypes & Alleles', numeric: true }
+  ];
+
+  function sortResults(results) {
+    if (!results || !results.length) return [];
+    var key = state.sortKey || 'name';
+    var dir = state.sortDir === 'desc' ? -1 : 1;
+
+    return results.slice().sort(function (a, b) {
+      if (key === 'allele_count') {
+        var aCount = a.allele_count || 0;
+        var bCount = b.allele_count || 0;
+        if (aCount !== bCount) return (aCount - bCount) * dir;
+      } else if (key === 'chromosome') {
+        var aChr = parseInt((a.chromosome || '').replace(/\D/g, ''), 10) || 999;
+        var bChr = parseInt((b.chromosome || '').replace(/\D/g, ''), 10) || 999;
+        if (aChr !== bChr) return (aChr - bChr) * dir;
+        var aBin = parseFloat(a.bin) || 999;
+        var bBin = parseFloat(b.bin) || 999;
+        if (aBin !== bBin) return (aBin - bBin) * dir;
+      } else if (key === 'type') {
+        var aType = (a.type || '').toLowerCase();
+        var bType = (b.type || '').toLowerCase();
+        var cmpType = aType.localeCompare(bType);
+        if (cmpType !== 0) return cmpType * dir;
+      } else if (key === 'gene_models') {
+        var aGm = (a.gene_models && a.gene_models[0]) ? a.gene_models[0].toLowerCase() : '';
+        var bGm = (b.gene_models && b.gene_models[0]) ? b.gene_models[0].toLowerCase() : '';
+        if (!aGm && bGm) return 1 * dir;
+        if (aGm && !bGm) return -1 * dir;
+        var cmpGm = aGm.localeCompare(bGm, undefined, { numeric: true });
+        if (cmpGm !== 0) return cmpGm * dir;
+      }
+      // Default to locus name
+      var aName = (a.name || '').toLowerCase();
+      var bName = (b.name || '').toLowerCase();
+      return aName.localeCompare(bName, undefined, { numeric: true }) * dir;
+    });
+  }
+
+  function initSortButtons(container) {
+    if (!container) return;
+    Array.prototype.forEach.call(container.querySelectorAll('button[data-sort-key]'), function (btn) {
+      btn.addEventListener('click', function () {
+        var key = btn.getAttribute('data-sort-key');
+        if (state.sortKey === key) {
+          state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+          state.sortKey = key;
+          state.sortDir = (key === 'allele_count') ? 'desc' : 'asc';
+        }
+        if (state.lastData) {
+          renderResults(state.lastData);
+        }
+      });
+    });
+  }
+
   function buildTableHtml(results) {
     var rows = results.map(function (item) {
-      return '<tr>'
-        + buildNameCell(item)
-        + buildTraitCell(item)
-        + buildParentsCell(item)
-        + buildExpCell(item)
-        + buildDesignCell(item)
+      var searchTerms = [
+        item.name,
+        item.full_name,
+        item.type,
+        item.chromosome,
+        item.bin,
+        (item.synonyms || []).join(' '),
+        (item.gene_models || []).join(' '),
+        (item.phenotypes || []).join(' ')
+      ].filter(Boolean).join(' ').toLowerCase();
+
+      return '<tr data-search="' + esc(searchTerms) + '">'
+        + buildSymbolCell(item)
+        + buildTypeCell(item)
+        + buildCoordCell(item)
+        + buildGeneModelCell(item)
+        + buildPhenoCell(item)
         + '</tr>';
+    }).join('');
+
+    var ths = LOCUS_COLUMNS.map(function (col) {
+      var sortAttr = 'none';
+      if (state.sortKey === col.key) {
+        sortAttr = state.sortDir === 'desc' ? 'descending' : 'ascending';
+      }
+      var cls = col.numeric ? ' class="mgdb-numeric"' : '';
+      return '<th scope="col" aria-sort="' + sortAttr + '"' + cls + '>'
+        + '<button type="button" data-sort-key="' + col.key + '">' + esc(col.label) + '</button></th>';
     }).join('');
 
     return '<div class="mgdb-table-scroll" tabindex="0">'
       + '<table class="mgdb-table locus-table">'
       + '<caption>Matching genetic loci<span class="mgdb-muted">' + number(results.length) + ' shown</span></caption>'
-      + '<thead><tr>'
-      + '<th scope="col">Analysis Symbol</th>'
-      + '<th scope="col">Trait Evaluated</th>'
-      + '<th scope="col">Mapping Parents</th>'
-      + '<th scope="col">Experiment Study</th>'
-      + '<th scope="col">Design &amp; Detections</th>'
-      + '</tr></thead>'
+      + '<thead><tr>' + ths + '</tr></thead>'
       + '<tbody>' + rows + '</tbody>'
       + '</table></div>';
   }
 
-  function buildNameCell(item) {
+  function buildSymbolCell(item) {
     var name = item.name ? esc(item.name) : '(unnamed)';
     var link = item.url ? '<a href="' + esc(item.url) + '"><strong>' + name + '</strong></a>' : '<strong>' + name + '</strong>';
-    return '<td scope="row" class="locus-name-cell">' + link + '</td>';
-  }
-
-  function buildTraitCell(item) {
-    var trait = item.trait_name ? esc(item.trait_name) : 'Unspecified';
-    return '<td><span class="mgdb-pill mgdb-pill-ok">' + trait + '</span></td>';
-  }
-
-  function buildParentsCell(item) {
-    var parents = item.parents || [];
-    if (!parents.length) {
-      return '<td class="mgdb-muted">&mdash;</td>';
+    var fullName = item.full_name ? '<span class="locus-full-name">' + esc(item.full_name) + '</span>' : '';
+    var syns = '';
+    if (item.synonyms && item.synonyms.length) {
+      var synList = item.synonyms.slice(0, 3).map(esc).join(', ');
+      if (item.synonyms.length > 3) { synList += ', +' + (item.synonyms.length - 3) + ' more'; }
+      syns = '<span class="locus-synonyms mgdb-muted">Syn: ' + synList + '</span>';
     }
-    var cross = parents.map(esc).join(' &times; ');
-    return '<td><span class="locus-parents-badge">' + cross + '</span></td>';
+    return '<td scope="row" class="locus-name-cell">' + link + fullName + syns + '</td>';
   }
 
-  function buildExpCell(item) {
-    if (!item.experiment_name) {
-      return '<td class="mgdb-muted">&mdash;</td>';
-    }
-    /* The experiment goes to /data_center/qtl, which is the modern QTL
-       experiment record. /data_center/qtl_exp, which this used to link, is
-       the legacy page for the same row. */
-    var link = item.exp_id ? '<a href="/data_center/qtl?id=' + item.exp_id + '">' + esc(item.experiment_name) + '</a>' : esc(item.experiment_name);
-    return '<td>' + link + '</td>';
+  function buildTypeCell(item) {
+    var type = item.type ? esc(item.type) : 'Unclassified';
+    var pillClass = type === 'Gene' ? 'mgdb-pill-info' : 'mgdb-pill';
+    return '<td><span class="mgdb-pill ' + pillClass + '">' + type + '</span></td>';
   }
 
-  function buildDesignCell(item) {
+  function buildCoordCell(item) {
     var parts = [];
-    if (item.qtl_count > 0) {
-      parts.push('<strong>' + number(item.qtl_count) + ' QTL loci mapped</strong>');
+    if (item.chromosome) {
+      var chrLabel = item.chromosome.replace(/^chr/i, 'Chr ');
+      parts.push('<span class="mgdb-pill mgdb-pill-ok">' + esc(chrLabel) + '</span>');
     }
-    if (item.method) {
-      var shortMethod = item.method.length > 80 ? item.method.slice(0, 80) + '…' : item.method;
-      parts.push('<span class="locus-desc">' + esc(shortMethod) + '</span>');
+    if (item.bin) {
+      parts.push('<span class="locus-bin-val">Bin ' + esc(item.bin) + '</span>');
     }
     if (!parts.length) {
       return '<td class="mgdb-muted">&mdash;</td>';
     }
-    return '<td><ul class="locus-attr-list"><li>' + parts.join('<br>') + '</li></ul></td>';
+    return '<td><div class="locus-coord-wrap">' + parts.join(' ') + '</div></td>';
+  }
+
+  function buildGeneModelCell(item) {
+    var gms = item.gene_models || [];
+    if (!gms.length) {
+      return '<td class="mgdb-muted">&mdash;</td>';
+    }
+    var links = gms.map(function (gm) {
+      return '<a class="locus-gm-link" href="/gene_center/gene/' + encodeURIComponent(gm) + '">' + esc(gm) + '</a>';
+    });
+    return '<td><div class="locus-gm-list">' + links.join(', ') + '</div></td>';
+  }
+
+  function buildPhenoCell(item) {
+    var parts = [];
+    if (item.allele_count > 0) {
+      var countLabel = number(item.allele_count) + ' allele' + (item.allele_count === 1 ? '' : 's');
+      parts.push('<a class="locus-allele-link" href="/data_center/variation?locus=' + encodeURIComponent(item.id) + '">' + countLabel + '</a>');
+    }
+    if (item.phenotypes && item.phenotypes.length) {
+      var phenoList = item.phenotypes.slice(0, 3).map(function (p) {
+        return '<span class="locus-pheno-tag">' + esc(p) + '</span>';
+      }).join(' ');
+      if (item.phenotypes.length > 3) {
+        phenoList += ' <span class="mgdb-muted">+' + (item.phenotypes.length - 3) + ' more</span>';
+      }
+      parts.push('<div class="locus-pheno-wrap">' + phenoList + '</div>');
+    }
+    if (!parts.length) {
+      return '<td class="mgdb-muted">&mdash;</td>';
+    }
+    return '<td>' + parts.join('') + '</td>';
+  }
+
+  function renderCards(results) {
+    var container = byId('locus-cards-view');
+    if (!container) return;
+    if (!results || !results.length) {
+      container.innerHTML = '';
+      return;
+    }
+    container.innerHTML = results.map(renderCard).join('');
+    initCopyButtons();
+  }
+
+  function renderCard(item) {
+    var searchTerms = [
+      item.name,
+      item.full_name,
+      item.type,
+      item.chromosome,
+      item.bin,
+      (item.synonyms || []).join(' '),
+      (item.gene_models || []).join(' '),
+      (item.phenotypes || []).join(' ')
+    ].filter(Boolean).join(' ').toLowerCase();
+
+    var recordUrl = item.url || ('/data_center/locus?id=' + encodeURIComponent(item.id));
+    var name = item.name ? esc(item.name) : '(unnamed)';
+    var fullName = item.full_name ? ' &mdash; ' + esc(item.full_name) : '';
+
+    var badges = [];
+    if (item.chromosome || item.bin) {
+      var chrText = '';
+      if (item.chromosome) { chrText = item.chromosome.replace(/^chr/i, 'Chr '); }
+      if (item.bin) { chrText += (chrText ? ' · Bin ' : 'Bin ') + item.bin; }
+      badges.push('<span class="mgdb-pill mgdb-pill-ok">' + esc(chrText) + '</span>');
+    }
+    if (item.type) {
+      var pillClass = item.type === 'Gene' ? 'mgdb-pill-info' : 'mgdb-pill';
+      badges.push('<span class="mgdb-pill ' + pillClass + '">' + esc(item.type) + '</span>');
+    }
+
+    var metaItems = [];
+    if (item.gene_models && item.gene_models.length) {
+      var gmLinks = item.gene_models.slice(0, 3).map(function (gm) {
+        return '<a href="/gene_center/gene/' + encodeURIComponent(gm) + '">' + esc(gm) + '</a>';
+      }).join(', ');
+      if (item.gene_models.length > 3) {
+        gmLinks += ', +' + (item.gene_models.length - 3) + ' more';
+      }
+      metaItems.push('<dt>Gene model</dt><dd>' + gmLinks + '</dd>');
+    }
+
+    if (item.allele_count > 0) {
+      var countStr = number(item.allele_count) + ' allele' + (item.allele_count === 1 ? '' : 's');
+      metaItems.push('<dt>Alleles</dt><dd><a href="/data_center/variation?locus=' + encodeURIComponent(item.id) + '">' + countStr + '</a></dd>');
+    }
+
+    if (item.phenotypes && item.phenotypes.length) {
+      var phenoText = item.phenotypes.slice(0, 3).map(esc).join(', ');
+      if (item.phenotypes.length > 3) {
+        phenoText += ', +' + (item.phenotypes.length - 3) + ' more';
+      }
+      metaItems.push('<dt>Phenotypes</dt><dd>' + phenoText + '</dd>');
+    }
+
+    if (item.synonyms && item.synonyms.length) {
+      var synText = item.synonyms.slice(0, 4).map(esc).join(', ');
+      if (item.synonyms.length > 4) {
+        synText += ', +' + (item.synonyms.length - 4) + ' more';
+      }
+      metaItems.push('<dt>Synonyms</dt><dd>' + synText + '</dd>');
+    }
+
+    var metaHtml = metaItems.length ? '<dl class="locus-card-meta-list">' + metaItems.join('') + '</dl>' : '';
+
+    return '<article class="locus-result-card" data-search="' + esc(searchTerms) + '">'
+      + '<div class="locus-card-body">'
+        + '<div class="locus-card-header">'
+          + '<div class="locus-card-badges">' + badges.join('') + '</div>'
+        + '</div>'
+        + '<h3 class="locus-card-title"><a href="' + esc(recordUrl) + '"><em>' + name + '</em>' + fullName + '</a></h3>'
+        + metaHtml
+      + '</div>'
+      + '<div class="locus-card-actions">'
+        + '<a class="locus-card-view-link" href="' + esc(recordUrl) + '">View locus details &rarr;</a>'
+        + '<div class="locus-card-copy-btns">'
+          + '<button class="locus-copy-btn" type="button" data-copy-value="' + esc(item.name || '') + '">Copy Symbol</button>'
+          + '<button class="locus-copy-btn" type="button" data-copy-value="' + esc(item.id || '') + '">Copy ID</button>'
+        + '</div>'
+      + '</div>'
+      + '</article>';
+  }
+
+  function initCopyButtons() {
+    Array.prototype.forEach.call(document.querySelectorAll('.locus-copy-btn'), function (btn) {
+      btn.addEventListener('click', function () {
+        var val = btn.getAttribute('data-copy-value');
+        if (!val) return;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(val).then(function () {
+            var orig = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(function () { btn.textContent = orig; }, 1500);
+          });
+        }
+      });
+    });
   }
 
   /* ── Section Navigation Tabs & Scrollspy ────────────────────────────────── */
@@ -581,6 +926,8 @@
       filterInput.addEventListener('input', function () {
         state.filter = this.value.trim();
         if (state.filter === '' && state.lastData) {
+          var filterCount = byId('locus-filter-count');
+          if (filterCount) { filterCount.textContent = ''; }
           /* Re-render rather than un-hiding: the status line has to go back to
              what the search said, not what the filter said. */
           renderResults(state.lastData);
@@ -590,13 +937,23 @@
       });
     }
 
-    var advReset = byId('locus-adv-reset');
-    if (advReset) {
-      advReset.addEventListener('click', function () {
-        ['locus-filter-type', 'locus-filter-chr', 'locus-filter-pheno']
-          .forEach(function (id) { var el = byId(id); if (el) { el.value = ''; } });
-        state.page = 1;
-        if (state.searched) { runSearch(); }
+    var btnCards = byId('locus-view-cards');
+    if (btnCards) {
+      btnCards.addEventListener('click', function () {
+        if (state.view !== 'cards') {
+          state.view = 'cards';
+          updateViewDisplay();
+        }
+      });
+    }
+
+    var btnTable = byId('locus-view-table');
+    if (btnTable) {
+      btnTable.addEventListener('click', function () {
+        if (state.view !== 'table') {
+          state.view = 'table';
+          updateViewDisplay();
+        }
       });
     }
   }
@@ -611,11 +968,21 @@
     // Check URL parameters
     var urlParams = new URLSearchParams(window.location.search);
     var hasQuery = false;
+    if (urlParams.has('view')) {
+      var v = urlParams.get('view');
+      if (v === 'cards' || v === 'table') {
+        state.view = v;
+      }
+    } else if (window.matchMedia && window.matchMedia('(max-width: 767px)').matches) {
+      state.view = 'cards';
+    }
+    updateViewDisplay();
     if (urlParams.has('term') || urlParams.has('locus_term')) {
       var termVal = urlParams.get('term') || urlParams.get('locus_term');
       var termInput = byId('locus-search-term');
       if (termInput && termVal) {
         termInput.value = termVal;
+        termInput.dispatchEvent(new Event('input'));
         hasQuery = true;
       }
     }
@@ -633,6 +1000,15 @@
         hasQuery = true;
       }
     }
+    if (urlParams.has('phenotype')) {
+      var phenoSelect = byId('locus-filter-pheno');
+      if (phenoSelect) {
+        phenoSelect.value = urlParams.get('phenotype');
+        hasQuery = true;
+      }
+    }
+
+    syncAdvancedBadge();
 
     if (hasQuery) {
       runSearch();

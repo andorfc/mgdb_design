@@ -14,6 +14,10 @@
 
   var API_URL = '/search/variation/variation_search_api.php';
 
+  function defaultView() {
+    return (window.innerWidth && window.innerWidth < 768) ? 'cards' : 'table';
+  }
+
   var state = {
     term: '',
     type: 0,
@@ -28,6 +32,7 @@
     page: 1,
     pageSize: '25',
     scope: 'auto',
+    view: defaultView(),
     total: 0,
     pageCount: 0,
     loading: false,
@@ -149,6 +154,7 @@
 
     if (params.get('scope') === 'broad') { state.scope = 'broad'; }
     if (params.has('page')) { state.page = parseInt(params.get('page'), 10) || 1; }
+    if (params.has('view')) { state.view = params.get('view') === 'cards' ? 'cards' : 'table'; }
 
     return touched;
   }
@@ -161,6 +167,7 @@
     if (state.sort === 'relevance') { params.delete('sort'); }
     if (state.page > 1) { params.set('page', state.page); }
     if (state.pageSize !== '25') { params.set('page_size', state.pageSize); }
+    if (state.view !== defaultView()) { params.set('view', state.view); }
     var query = params.toString();
     window.history.replaceState({}, '', window.location.pathname + (query ? '?' + query : ''));
   }
@@ -182,6 +189,8 @@
   function hideResults() {
     var section = byId('variation-results-section');
     if (section) { section.hidden = true; }
+    var cards = byId('variation-cards-view');
+    if (cards) { cards.innerHTML = ''; }
     state.searched = false;
     state.page = 1;
     lastRows = [];
@@ -237,18 +246,177 @@
     renderStatus(data);
     renderNote(summary);
     renderRows(lastRows);
+    renderCards(lastRows);
+    updateViewDisplay();
     renderPagination(summary);
     renderSortState();
     updateExports();
     updateAdvancedCount();
     applyResultFilter();
+    initCopyButtons();
     syncUrl();
   }
 
-  /* Three of the eight columns have a server-side sort behind them. Their
-     headings carry aria-sort so the state is announced, and the design system
-     draws the arrow from that attribute. The other five are plain, because a
-     heading that looks sortable and is not is worse than one that does not. */
+  function updateViewDisplay() {
+    var tableView = byId('variation-table-scroll');
+    var cardsView = byId('variation-cards-view');
+    var btnCards = byId('variation-view-cards');
+    var btnTable = byId('variation-view-table');
+
+    var isCards = state.view === 'cards';
+    var hasResults = lastRows && lastRows.length > 0;
+
+    if (tableView) {
+      tableView.hidden = isCards || !hasResults;
+    }
+    if (cardsView) {
+      cardsView.hidden = !isCards || !hasResults;
+    }
+
+    if (btnCards) {
+      btnCards.setAttribute('aria-pressed', isCards ? 'true' : 'false');
+      btnCards.classList.toggle('is-active', isCards);
+    }
+    if (btnTable) {
+      btnTable.setAttribute('aria-pressed', !isCards ? 'true' : 'false');
+      btnTable.classList.toggle('is-active', !isCards);
+    }
+  }
+
+  function renderCards(rows) {
+    var container = byId('variation-cards-view');
+    if (!container) { return; }
+
+    if (!rows.length) {
+      container.innerHTML = '';
+      return;
+    }
+
+    container.innerHTML = rows.map(renderCard).join('');
+  }
+
+  function renderCard(row) {
+    var recordUrl = '/data_center/variation?id=' + encodeURIComponent(row.id);
+    var locusUrl = row.locus_id || row.locus_name
+      ? '/data_center/locus?id=' + encodeURIComponent(row.locus_id || row.locus_name)
+      : '';
+
+    var typeBadge = row.type_name
+      ? '<span class="mgdb-pill">' + esc(row.type_name) + '</span>'
+      : '';
+
+    var stockBadge = '';
+    if (row.stock_count > 0) {
+      stockBadge = '<span class="mgdb-pill mgdb-pill-info"><a href="/data_center/stock?variation=' + row.id + '" style="color:inherit;text-decoration:none;">' + num(row.stock_count) + ' stock' + (row.stock_count === 1 ? '' : 's') + '</a></span>';
+    } else if (row.prog_stock_id) {
+      stockBadge = '<span class="mgdb-pill"><a href="/data_center/stock?id=' + row.prog_stock_id + '" style="color:inherit;text-decoration:none;">' + esc(row.prog_stock_name || 'Progenitor') + '</a></span>';
+    }
+
+    var synonymsHtml = row.synonyms
+      ? '<span class="variation-card-synonyms">Also known as ' + esc(row.synonyms) + '</span>'
+      : '';
+
+    var metaItems = [];
+    if (row.locus_name) {
+      metaItems.push('<dt>Gene</dt><dd><a href="' + locusUrl + '">' + esc(row.locus_name) + '</a>' + (row.locus_full_name ? ' (' + esc(row.locus_full_name) + ')' : '') + '</dd>');
+    }
+    if (row.dominance_name) {
+      metaItems.push('<dt>Dominance</dt><dd>' + esc(row.dominance_name) + '</dd>');
+    }
+    if (row.viability_name) {
+      metaItems.push('<dt>Viability</dt><dd>' + esc(row.viability_name) + '</dd>');
+    }
+    if (row.mutagens) {
+      metaItems.push('<dt>Origin / Mutagen</dt><dd>' + esc(row.mutagens) + '</dd>');
+    }
+    if (row.phenotypes) {
+      metaItems.push('<dt>Phenotypes</dt><dd>' + esc(row.phenotypes) + '</dd>');
+    }
+
+    var metaHtml = metaItems.length ? '<dl class="variation-card-meta-list">' + metaItems.join('') + '</dl>' : '';
+
+    var haystack = [row.name, row.synonyms, row.locus_name, row.locus_full_name, row.type_name,
+                    row.dominance_name, row.viability_name, row.mutagens, row.phenotypes,
+                    row.alleledescriptor].filter(Boolean).join(' ').toLowerCase();
+
+    return '<article class="variation-result-card" data-search="' + esc(haystack) + '">' +
+      '<div>' +
+        '<div class="variation-card-header">' +
+          '<div class="variation-card-badges">' + typeBadge + stockBadge + '</div>' +
+        '</div>' +
+        '<h3 class="variation-card-title"><a href="' + recordUrl + '">' + esc(row.name) + '</a></h3>' +
+        synonymsHtml +
+        metaHtml +
+      '</div>' +
+      '<div class="variation-card-actions">' +
+        '<a href="' + recordUrl + '">View record &rarr;</a>' +
+        '<div class="variation-card-copy-btns">' +
+          '<button class="variation-copy-btn" type="button" data-copy-value="' + esc(row.name) + '">Copy Name</button>' +
+          '<button class="variation-copy-btn" type="button" data-copy-value="' + esc(row.id) + '">Copy ID</button>' +
+        '</div>' +
+      '</div>' +
+    '</article>';
+  }
+
+  function initCopyButtons() {
+    Array.prototype.forEach.call(document.querySelectorAll('.variation-copy-btn'), function (btn) {
+      btn.addEventListener('click', function () {
+        var val = btn.getAttribute('data-copy-value');
+        if (!val) return;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(val).then(function () {
+            var orig = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(function () { btn.textContent = orig; }, 1500);
+          });
+        }
+      });
+    });
+  }
+
+  function clientSortRows(key, ascending) {
+    if (!lastRows || !lastRows.length) { return; }
+    lastRows.sort(function (a, b) {
+      var valA = '', valB = '';
+      if (key === 'stocks') {
+        var numA = Number(a.stock_count || 0);
+        var numB = Number(b.stock_count || 0);
+        return ascending ? numA - numB : numB - numA;
+      } else if (key === 'dominance') {
+        valA = a.dominance_name || '';
+        valB = b.dominance_name || '';
+      } else if (key === 'viability') {
+        valA = a.viability_name || '';
+        valB = b.viability_name || '';
+      } else if (key === 'mutagen') {
+        valA = a.mutagens || '';
+        valB = b.mutagens || '';
+      } else if (key === 'phenotypes') {
+        valA = a.phenotypes || '';
+        valB = b.phenotypes || '';
+      } else if (key === 'locus') {
+        valA = a.locus_name || '';
+        valB = b.locus_name || '';
+      } else if (key === 'type') {
+        valA = a.type_name || '';
+        valB = b.type_name || '';
+      } else {
+        valA = a.name || '';
+        valB = b.name || '';
+      }
+      return ascending
+        ? String(valA).localeCompare(String(valB), undefined, { numeric: true, sensitivity: 'base' })
+        : String(valB).localeCompare(String(valA), undefined, { numeric: true, sensitivity: 'base' });
+    });
+    renderRows(lastRows);
+    renderCards(lastRows);
+    updateViewDisplay();
+    applyResultFilter();
+    initCopyButtons();
+  }
+
+  /* All table columns carry aria-sort so their state is announced and the design
+     system renders the up/down sort arrows. */
   function renderSortState() {
     var table = byId('variation-table');
     if (!table) { return; }
@@ -348,18 +516,19 @@
     var body = byId('variation-results-body');
     var empty = byId('variation-empty');
     var scroll = byId('variation-table-scroll');
+    var cards = byId('variation-cards-view');
     if (!body) { return; }
 
     if (!rows.length) {
       body.innerHTML = '';
+      if (cards) { cards.innerHTML = ''; }
       if (empty) { empty.hidden = false; }
       if (scroll) { scroll.hidden = true; }
+      if (cards) { cards.hidden = true; }
       return;
     }
 
     if (empty) { empty.hidden = true; }
-    if (scroll) { scroll.hidden = false; }
-
     body.innerHTML = rows.map(renderRow).join('');
   }
 
@@ -473,15 +642,10 @@
   function updateExports() {
     var params = searchParams(false);
     var tsv = byId('variation-export-tsv');
-    var csv = byId('variation-export-csv');
 
     if (tsv) {
       params.set('format', 'tsv');
       tsv.href = API_URL + '?' + params.toString();
-    }
-    if (csv) {
-      params.set('format', 'csv');
-      csv.href = API_URL + '?' + params.toString();
     }
   }
 
@@ -514,25 +678,34 @@
   function applyResultFilter() {
     var input = byId('variation-results-filter');
     var body = byId('variation-results-body');
-    if (!input || !body) { return; }
+    var cardsContainer = byId('variation-cards-view');
+    if (!input) { return; }
 
     var query = input.value.trim().toLowerCase();
-    var rows = body.rows;
     var visible = 0;
+    var total = lastRows.length;
 
-    for (var i = 0; i < rows.length; i++) {
-      var match = query === '' || (rows[i].getAttribute('data-search') || '').indexOf(query) !== -1;
-      rows[i].hidden = !match;
-      /* Striping follows what is on screen, not what is in the DOM. A
-         :nth-child rule keeps counting the rows the filter just hid, so the
-         bands go ragged the moment anything is typed. */
-      rows[i].classList.toggle('is-alt', match && visible % 2 === 1);
-      if (match) { visible++; }
+    if (body) {
+      var rows = body.rows;
+      for (var i = 0; i < rows.length; i++) {
+        var match = query === '' || (rows[i].getAttribute('data-search') || '').indexOf(query) !== -1;
+        rows[i].hidden = !match;
+        rows[i].classList.toggle('is-alt', match && visible % 2 === 1);
+        if (match) { visible++; }
+      }
+    }
+
+    if (cardsContainer) {
+      var cards = cardsContainer.querySelectorAll('.variation-result-card');
+      for (var j = 0; j < cards.length; j++) {
+        var cardMatch = query === '' || (cards[j].getAttribute('data-search') || '').indexOf(query) !== -1;
+        cards[j].hidden = !cardMatch;
+      }
     }
 
     var note = byId('variation-filter-count');
     if (note) {
-      note.textContent = query === '' ? '' : visible + ' of ' + rows.length + ' shown';
+      note.textContent = query === '' ? '' : visible + ' of ' + total + ' shown';
     }
   }
 
@@ -827,20 +1000,47 @@
       });
     }
 
-    /* Column headings and the Sort control in the advanced panel drive the same
-       state, so clicking a heading moves the select too and the two can never
-       disagree about what the table is sorted by. */
+    /* Column headings: clicking toggles ascending / descending with up/down arrows.
+       Server-backed sorts update the select and query; other columns sort rows client-side. */
     Array.prototype.forEach.call(document.querySelectorAll('#variation-table th button[data-sort-key]'), function (button) {
       button.addEventListener('click', function () {
         var key = button.getAttribute('data-sort-key');
         var next = state.sort === key + '-asc' ? key + '-desc' : key + '-asc';
+        state.sort = next;
+
         var select = byId('variation-sort');
-        if (select) { select.value = next; }
-        readForm();
-        state.page = 1;
-        search(false);
+        if (select) {
+          var matching = select.querySelector('option[value="' + next + '"]');
+          if (matching) {
+            select.value = next;
+            readForm();
+            state.page = 1;
+            search(false);
+            return;
+          }
+        }
+
+        clientSortRows(key, next.endsWith('-asc'));
+        renderSortState();
       });
     });
+
+    var btnCards = byId('variation-view-cards');
+    var btnTable = byId('variation-view-table');
+    if (btnCards) {
+      btnCards.addEventListener('click', function () {
+        state.view = 'cards';
+        updateViewDisplay();
+        syncUrl();
+      });
+    }
+    if (btnTable) {
+      btnTable.addEventListener('click', function () {
+        state.view = 'table';
+        updateViewDisplay();
+        syncUrl();
+      });
+    }
 
     var filter = byId('variation-results-filter');
     if (filter) {
@@ -889,6 +1089,7 @@
     var fromUrl = readUrl();
     readForm();
     updateAdvancedCount();
+    updateViewDisplay();
     if (fromUrl) {
       search(false);
     }

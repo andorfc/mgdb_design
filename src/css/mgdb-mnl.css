@@ -198,3 +198,21 @@
   font-weight: 600;
   white-space: nowrap;
 }
+
+/* ── Section tabs ────────────────────────────────────────────────────────── */
+
+/* Five tabs since the Contributing section was carried over from the retired
+   /community/mnl on 2026-09-07, and the shared bar wraps by default. A wrapped
+   bar is two heights, but the offset that decides where a tab click lands --
+   .mgdb-page > section[id] in css/mgdb-modern.css -- is a flat 4.5rem, so a
+   second row would drop every section underneath the bar. One row at every
+   width, scrolling sideways instead, keeps that one offset true. The page's own
+   scrollspy measures the bar live and is unaffected either way. */
+.mgdb-mnl-page .mgdb-section-tabs {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mgdb-mnl-page .mgdb-section-tabs a { white-space: nowrap; }

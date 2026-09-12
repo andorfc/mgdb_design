@@ -27,7 +27,7 @@ $$SYNTAX-LEVEL 2
     </div>
     <div class="mgdb-hero-body">
       <h1 id="ar-title">$(assembly_name)</h1>
-      <p class="mgdb-hero-description ar-summary">$(assembly_summary)</p>
+      $(assembly_summary)
       <div class="ar-actions">$(header_buttons)</div>
     </div>
   </section>
@@ -35,42 +35,45 @@ $$SYNTAX-LEVEL 2
   $(notices)
 
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
-    <a href="#ar-assembly" class="is-current">Assembly</a>
-    <a href="#ar-sample">Sample</a>
-    <a href="#ar-project">Project</a>
-    <a href="#ar-annotations">Gene models</a>
+    <a href="#ar-project" class="is-current">Project</a>
+    <a href="#ar-sample">Stock &amp; biosample</a>
+    <a href="#ar-assembly">Sequencing &amp; assembly</a>
+    <a href="#ar-annotations">Annotation</a>
     <a href="#ar-browsers">Browsers</a>
     <a href="#ar-downloads">Downloads</a>
     <a href="#ar-related">Related resources</a>
   </nav>
 
-  <section id="ar-assembly" aria-labelledby="ar-assembly-title">
-    <div class="mgdb-section-heading">
-      <div><h2 id="ar-assembly-title">Assembly</h2></div>
-    </div>
-
-    <dl class="ar-rows">$(assembly_rows)</dl>
-  </section>
-
-  <section id="ar-sample" aria-labelledby="ar-sample-title">
-    <div class="mgdb-section-heading">
-      <div><h2 id="ar-sample-title">Sample</h2></div>
-    </div>
-
-    <dl class="ar-rows">$(sample_rows)</dl>
-  </section>
-
+  <!-- The old page's four sections, in its order and under its own headings:
+       Genome Sequencing Project Information, Stock and Biosample Information,
+       Sequencing and Assembly Information, Annotation. -->
   <section id="ar-project" aria-labelledby="ar-project-title">
     <div class="mgdb-section-heading">
-      <div><h2 id="ar-project-title">Project</h2></div>
+      <div><h2 id="ar-project-title">Genome Sequencing Project Information</h2></div>
     </div>
 
     <dl class="ar-rows">$(project_rows)</dl>
   </section>
 
+  <section id="ar-sample" aria-labelledby="ar-sample-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ar-sample-title">Stock and Biosample Information</h2></div>
+    </div>
+
+    <dl class="ar-rows">$(sample_rows)</dl>
+  </section>
+
+  <section id="ar-assembly" aria-labelledby="ar-assembly-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="ar-assembly-title">Sequencing and Assembly Information</h2></div>
+    </div>
+
+    <dl class="ar-rows">$(assembly_rows)</dl>
+  </section>
+
   <section id="ar-annotations" aria-labelledby="ar-annotations-title">
     <div class="mgdb-section-heading">
-      <div><h2 id="ar-annotations-title">Gene models $(annotation_count)</h2></div>
+      <div><h2 id="ar-annotations-title">Annotation $(annotation_count)</h2></div>
     </div>
 
     $(annotation_list)

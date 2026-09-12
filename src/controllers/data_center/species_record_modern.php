@@ -39,7 +39,11 @@ $system = getSystemInfo('mgdb.conf');
 $DBConn = connect_to_database(false);
 
 $requested = trim((string) getCGIParam('id', 'G', ID));
-if (!ctype_digit($requested)) { return false; }
+if (!ctype_digit($requested)) {
+  logMessage('species_record_modern.php: non-numeric id -- serving 404');
+  include('controllers/not_found.php');
+  exit;
+}
 $id = (int) $requested;
 
 $record = retrieve_row(make_query($DBConn, "
@@ -48,8 +52,19 @@ $record = retrieve_row(make_query($DBConn, "
       INNER JOIN mgdb.id_num i ON i.id = s.id AND i.curation_lvl = 0
     WHERE s.id = :id", 1, array('id' => $id)));
 
-/* Fall through to the legacy page, which owns the not-found body. */
-if (!$record) { return false; }
+/* No record for that id.
+ *
+ * Corrected 2026-09-07. This used to `return false`, on the belief that
+ * controllers/data_center.php would then serve the legacy record page and that
+ * page would say so. It does not say so: it renders 39 KB of legacy chrome
+ * around a body reading "<type> record" and answers HTTP 200, and it builds its
+ * <title> by concatenating the raw id, which Bauplan writes out unescaped. The
+ * site 404 is the honest answer and it is on the modern shell. */
+if (!$record) {
+  logMessage('species_record_modern.php: no species ' . $requested);
+  include('controllers/not_found.php');
+  exit;
+}
 
 header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
 header('Pragma: no-cache');

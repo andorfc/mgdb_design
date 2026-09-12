@@ -350,7 +350,7 @@
                  '" aria-pressed="' + (index === 0) + '">' + R.escape(atlas.label) + '</button>';
         }).join('') +
       '</div>' +
-      '<div class="gene-record-efp-stage is-loading" id="gene-record-efp-stage"><img src="" alt=""></div>' +
+      '<div class="gene-record-efp-stage is-loading" id="gene-record-efp-stage"><img alt=""></div>' +
       (efp.note ? '<p class="mgdb-rec-block-status">' + R.escape(efp.note) + '</p>' : '') +
       '<p class="mgdb-rec-block-status">' + R.escape(efp.source) + '. ' +
         R.link(efp.eplant, 'Explore this gene in ePlant', true) + '.</p>' +

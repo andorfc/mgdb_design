@@ -26,6 +26,8 @@
     models: 'Zm00001eb014280\nZm00001eb067740\nZm00001eb165610\n',
     positions: 'Chr3:1349161..1545106\nChr3:1851542..1980827\nChr3:7136721..7414401\nChr3:124200581..124666812',
     scores: 'Zm00001eb014280\nZm00001eb067740\nZm00001eb165610'
+    /* No sequence example here: the BLAST form carried in "Sequence and region"
+       is the one from /BLAST, and it has its own Load an example button. */
   };
 
   function byId(id) { return document.getElementById(id); }
@@ -49,10 +51,31 @@
   }
 
   /* ======================================================================
-     Simple search
+     Search state & handlers
      ====================================================================== */
 
   var lastQuery = '';
+
+  var isMobile = window.matchMedia && window.matchMedia('(max-width: 767px)').matches;
+  var initialView = isMobile ? 'cards' : 'table';
+  if (window.URLSearchParams) {
+    var viewParam = new window.URLSearchParams(window.location.search).get('view');
+    if (viewParam === 'cards' || viewParam === 'table') {
+      initialView = viewParam;
+    }
+  }
+
+  var state = {
+    term: '',
+    models: [],
+    loci: [],
+    pageSize: '25',
+    sort: '',
+    dir: 'asc',
+    filter: '',
+    view: initialView,
+    summary: {}
+  };
 
   function searchParams(extra) {
     var params = new URLSearchParams();
@@ -85,17 +108,26 @@
     }
 
     var params = searchParams(options);
+    var section = byId('gene-results-section');
     var results = byId('gene-results');
+    var cardsContainer = byId('gene-cards-view');
     var notes = byId('gene-notes');
     var empty = byId('gene-empty');
     var exportLink = byId('gene-export-tsv');
 
-    notes.innerHTML = '';
-    empty.hidden = true;
+    if (section) { section.hidden = false; }
+    if (notes) { notes.innerHTML = ''; }
+    if (empty) { empty.hidden = true; }
     if (exportLink) { exportLink.hidden = true; }
-    results.innerHTML = '<div class="mgdb-loading"><span class="mgdb-spinner" aria-hidden="true"></span>Searching gene models&hellip;</div>';
+    if (results) {
+      results.innerHTML = '<div class="mgdb-loading"><span class="mgdb-spinner" aria-hidden="true"></span>Searching gene models&hellip;</div>';
+    }
+    if (cardsContainer) {
+      cardsContainer.innerHTML = '';
+    }
     setStatus('Searching…');
 
+    state.term = term.value.trim();
     lastQuery = params.toString();
 
     fetch(API + '?' + lastQuery, { credentials: 'same-origin' })
@@ -105,38 +137,83 @@
       .then(function (wrap) {
         if (!wrap.ok || !wrap.data || !wrap.data.ok) {
           var message = (wrap.data && (wrap.data.message || wrap.data.detail)) || 'The search could not be completed.';
-          results.innerHTML = '';
+          if (results) { results.innerHTML = ''; }
           showError('gene-notes', message);
           setStatus('Search failed.');
           return;
         }
-        renderSearch(wrap.data);
+        var data = wrap.data;
+        state.models = data.models || [];
+        state.loci = data.loci || [];
+        state.summary = data.summary || {};
+        render();
+        if (options && options.scroll && section) {
+          section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       })
       .catch(function () {
-        results.innerHTML = '';
+        if (results) { results.innerHTML = ''; }
         showError('gene-notes', 'The search request failed. Please try again.');
         setStatus('Search failed.');
       });
   }
 
+  function sortValue(row, key) {
+    switch (key) {
+      case 'gene_model': return row.gene_model || '';
+      case 'annotation': return row.annotation || '';
+      case 'line': return row.line || '';
+      case 'locus_name': return row.locus_name || '';
+      case 'model_type': return row.model_type || '';
+      case 'position': return (row.chromosome || '') + ':' + String(row.start || 0).padStart(12, '0');
+      case 'transcripts': return Number(row.transcripts || 0);
+      default: return row.gene_model || '';
+    }
+  }
+
+  function compareModels(a, b) {
+    if (!state.sort) { return 0; }
+    var dir = state.dir === 'desc' ? -1 : 1;
+    var va = sortValue(a, state.sort);
+    var vb = sortValue(b, state.sort);
+    if (typeof va === 'number' && typeof vb === 'number') {
+      return dir * (va - vb);
+    }
+    return dir * String(va).localeCompare(String(vb), undefined, { numeric: true, sensitivity: 'base' });
+  }
+
   function modelTable(rows, caption) {
-    var html = '<div class="mgdb-table-scroll"><table class="mgdb-table" data-sortable>'
-      + '<caption>' + esc(caption) + '</caption><thead><tr>'
-      + '<th scope="col" data-sort="text"><button type="button">Gene model</button></th>'
-      + '<th scope="col" data-sort="text"><button type="button">Annotation</button></th>'
-      + '<th scope="col" data-sort="text"><button type="button">Line</button></th>'
-      + '<th scope="col" data-sort="text"><button type="button">Locus</button></th>'
-      + '<th scope="col" data-sort="text"><button type="button">Type</button></th>'
-      + '<th scope="col" data-sort="text"><button type="button">Position</button></th>'
-      + '<th scope="col" data-sort="number" class="mgdb-numeric"><button type="button">Transcripts</button></th>'
-      + '</tr></thead><tbody>';
+    var sortCols = [
+      { key: 'gene_model', label: 'Gene model' },
+      { key: 'annotation', label: 'Annotation' },
+      { key: 'line', label: 'Line' },
+      { key: 'locus_name', label: 'Locus' },
+      { key: 'model_type', label: 'Type' },
+      { key: 'position', label: 'Position' },
+      { key: 'transcripts', label: 'Transcripts', numeric: true }
+    ];
+
+    var ths = sortCols.map(function (col) {
+      var sortAttr = 'none';
+      if (state.sort === col.key) {
+        sortAttr = state.dir === 'desc' ? 'descending' : 'ascending';
+      }
+      var cls = col.numeric ? ' class="mgdb-numeric"' : '';
+      return '<th scope="col" aria-sort="' + sortAttr + '"' + cls + '>'
+        + '<button type="button" data-sort-key="' + col.key + '">' + esc(col.label) + '</button></th>';
+    }).join('');
+
+    var html = '<div class="mgdb-table-scroll"><table class="mgdb-table" id="gene-models-table">'
+      + '<caption>' + esc(caption) + '</caption><thead><tr>' + ths + '</tr></thead><tbody>';
 
     rows.forEach(function (row) {
       var position = row.chromosome
         ? esc(row.chromosome) + (row.start ? '&#58;' + num(row.start) + '&ndash;' + num(row.end) : '')
         : '';
 
-      html += '<tr>'
+      var haystack = [row.gene_model, row.annotation, row.line, row.locus_name, row.model_type, row.chromosome, row.start, row.end, row.transcripts, row.genbank].join(' ').toLowerCase();
+
+      html += '<tr data-search="' + esc(haystack) + '">'
         + '<th scope="row"><a class="gene-model-id" href="' + esc(row.url) + '">' + esc(row.gene_model) + '</a></th>'
         + '<td>' + esc(row.annotation) + '</td>'
         + '<td>' + esc(row.line) + '</td>'
@@ -153,72 +230,318 @@
     return html + '</tbody></table></div>';
   }
 
+  /* One gene model per locus, picked in the search library by annotation --
+     the current B73 set first, then W22, Mo17, PH207, then a NAM founder. The
+     line is carried beside it because for a locus with no B73 model (mab31,
+     rf3, tps35) the identifier alone does not say which assembly it is in.
+
+     The MaizeGDB ID column went with it: the number is in the locus link's
+     href, in the TSV export and on the locus page itself, and a bare internal
+     id was the least useful thing in a row about a named gene. */
   function locusTable(rows) {
-    var html = '<div class="mgdb-table-scroll"><table class="mgdb-table" data-sortable>'
+    var html = '<div class="mgdb-table-scroll"><table class="mgdb-table" id="gene-loci-table">'
       + '<caption>Gene loci</caption><thead><tr>'
-      + '<th scope="col" data-sort="text"><button type="button">Locus</button></th>'
-      + '<th scope="col" data-sort="text"><button type="button">Full name</button></th>'
-      + '<th scope="col" data-sort="number" class="mgdb-numeric"><button type="button">Gene models</button></th>'
-      + '<th scope="col" data-sort="number" class="mgdb-numeric"><button type="button">Annotations</button></th>'
-      + '<th scope="col" data-sort="text"><button type="button">MaizeGDB ID</button></th>'
+      + '<th scope="col">Locus</th>'
+      + '<th scope="col">Full name</th>'
+      + '<th scope="col">Current gene model</th>'
+      + '<th scope="col" class="mgdb-numeric">Gene models</th>'
+      + '<th scope="col" class="mgdb-numeric">Annotations</th>'
       + '</tr></thead><tbody>';
 
     rows.forEach(function (row) {
-      html += '<tr>'
+      var haystack = [row.locus_name, row.full_name, row.current_model, row.current_line,
+                      row.models, row.annotations].join(' ').toLowerCase();
+      var current = row.current_model
+        ? '<a class="gene-model-id" href="' + esc(row.current_url) + '">' + esc(row.current_model) + '</a>'
+          + (row.current_line
+              ? '<span class="gene-locus-line">' + esc(row.current_line) + '</span>'
+              : '')
+        : '<span class="mgdb-muted">&mdash;</span>';
+
+      html += '<tr data-search="' + esc(haystack) + '">'
         + '<th scope="row"><a href="' + esc(row.url) + '"><i>' + esc(row.locus_name) + '</i></a></th>'
         + '<td>' + esc(row.full_name) + '</td>'
+        + '<td class="gene-locus-current">' + current + '</td>'
         + '<td class="mgdb-numeric" data-value="' + row.models + '">' + num(row.models) + '</td>'
         + '<td class="mgdb-numeric" data-value="' + row.annotations + '">' + num(row.annotations) + '</td>'
-        + '<td class="gene-model-id">' + esc(row.locus_id) + '</td>'
         + '</tr>';
     });
 
     return html + '</tbody></table></div>';
   }
 
-  function activateTables(container) {
-    if (!window.MGDB || !window.MGDB.sortTable) { return; }
-    Array.prototype.forEach.call(container.querySelectorAll('table[data-sortable]'), window.MGDB.sortTable);
+  function renderModelCard(row) {
+    var position = row.chromosome
+      ? esc(row.chromosome) + (row.start ? '&#58;' + num(row.start) + '&ndash;' + num(row.end) : '')
+      : '';
+    var posRaw = row.chromosome && row.start ? row.chromosome + ':' + row.start + '-' + row.end : '';
+
+    var badges = '';
+    if (row.annotation) {
+      badges += '<span class="mgdb-pill mgdb-pill-accent">' + esc(row.annotation) + '</span>';
+    }
+    if (row.line) {
+      badges += '<span class="mgdb-pill">' + esc(row.line) + '</span>';
+    }
+    if (row.model_type) {
+      badges += '<span class="mgdb-pill">' + esc(row.model_type) + '</span>';
+    }
+
+    var metaItems = [];
+    if (row.locus_name) {
+      metaItems.push('<dt>Locus</dt><dd><a href="/data_center/locus?id=' + esc(row.locus_id) + '"><em>' + esc(row.locus_name) + '</em></a></dd>');
+    }
+    if (position) {
+      metaItems.push('<dt>Position</dt><dd>' + position + (posRaw ? ' <button class="gene-copy-btn" type="button" data-copy-value="' + esc(posRaw) + '">Copy Pos</button>' : '') + '</dd>');
+    }
+    if (row.transcripts) {
+      var txText = num(row.transcripts) + (row.canonical ? ' (canonical&#58; <span class="gene-model-id">' + esc(row.canonical) + '</span>)' : '');
+      metaItems.push('<dt>Transcripts</dt><dd>' + txText + '</dd>');
+    }
+    if (row.genbank) {
+      metaItems.push('<dt>GenBank</dt><dd>' + esc(row.genbank) + '</dd>');
+    }
+
+    var metaHtml = metaItems.length ? '<dl class="gene-card-meta-list">' + metaItems.join('') + '</dl>' : '';
+
+    var haystack = [row.gene_model, row.annotation, row.line, row.locus_name, row.model_type, row.chromosome, row.canonical, row.genbank].join(' ').toLowerCase();
+
+    var copyButtons = '<button class="gene-copy-btn" type="button" data-copy-value="' + esc(row.gene_model) + '">Copy ID</button>';
+
+    var modelUrl = row.url || ('/gene_center/gene/' + encodeURIComponent(row.gene_model));
+
+    return '<article class="gene-result-card" data-search="' + esc(haystack) + '">' +
+      '<div>' +
+        '<div class="gene-card-header">' +
+          '<h3 class="gene-card-title"><a href="' + esc(modelUrl) + '">' + esc(row.gene_model) + '</a></h3>' +
+          '<div class="gene-card-badges">' + badges + '</div>' +
+        '</div>' +
+        metaHtml +
+      '</div>' +
+      '<div class="gene-card-actions">' +
+        '<a href="' + esc(modelUrl) + '">View gene model &rarr;</a>' +
+        '<div class="gene-card-copy-btns">' + copyButtons + '</div>' +
+      '</div>' +
+    '</article>';
   }
 
-  function renderSearch(data) {
+  function renderLocusCard(row) {
+    var badges = '<span class="mgdb-pill">Gene Locus</span>';
+    var metaItems = [];
+    if (row.full_name) {
+      metaItems.push('<dt>Full name</dt><dd>' + esc(row.full_name) + '</dd>');
+    }
+    if (row.models) {
+      metaItems.push('<dt>Gene models</dt><dd>' + num(row.models) + '</dd>');
+    }
+    if (row.annotations) {
+      metaItems.push('<dt>Annotations</dt><dd>' + num(row.annotations) + '</dd>');
+    }
+    if (row.locus_id) {
+      metaItems.push('<dt>MaizeGDB ID</dt><dd>' + esc(row.locus_id) + '</dd>');
+    }
+
+    var metaHtml = metaItems.length ? '<dl class="gene-card-meta-list">' + metaItems.join('') + '</dl>' : '';
+
+    var haystack = [row.locus_name, row.full_name, row.locus_id].join(' ').toLowerCase();
+    var copyButtons = '<button class="gene-copy-btn" type="button" data-copy-value="' + esc(row.locus_name) + '">Copy Locus</button>';
+
+    var locusUrl = row.url || ('/data_center/locus?id=' + encodeURIComponent(row.locus_id));
+
+    return '<article class="gene-result-card" data-search="' + esc(haystack) + '">' +
+      '<div>' +
+        '<div class="gene-card-header">' +
+          '<h3 class="gene-card-title"><a href="' + esc(locusUrl) + '"><em>' + esc(row.locus_name) + '</em></a></h3>' +
+          '<div class="gene-card-badges">' + badges + '</div>' +
+        '</div>' +
+        metaHtml +
+      '</div>' +
+      '<div class="gene-card-actions">' +
+        '<a href="' + esc(locusUrl) + '">View locus details &rarr;</a>' +
+        '<div class="gene-card-copy-btns">' + copyButtons + '</div>' +
+      '</div>' +
+    '</article>';
+  }
+
+  function initSortButtons(container) {
+    Array.prototype.forEach.call(container.querySelectorAll('button[data-sort-key]'), function (btn) {
+      btn.addEventListener('click', function () {
+        var key = btn.getAttribute('data-sort-key');
+        if (state.sort === key) {
+          state.dir = state.dir === 'asc' ? 'desc' : 'asc';
+        } else {
+          state.sort = key;
+          state.dir = 'asc';
+        }
+        render();
+      });
+    });
+  }
+
+  function initCopyButtons() {
+    Array.prototype.forEach.call(document.querySelectorAll('.gene-copy-btn'), function (btn) {
+      btn.addEventListener('click', function () {
+        var val = btn.getAttribute('data-copy-value');
+        if (!val) return;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(val).then(function () {
+            var orig = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(function () { btn.textContent = orig; }, 1500);
+          });
+        }
+      });
+    });
+  }
+
+  function updateViewDisplay() {
+    var tableView = byId('gene-table-view');
+    var cardsView = byId('gene-cards-view');
+    var btnCards = byId('gene-view-cards');
+    var btnTable = byId('gene-view-table');
+
+    var isCards = state.view === 'cards';
+    var hasResults = (state.models && state.models.length > 0) || (state.loci && state.loci.length > 0);
+
+    if (tableView) {
+      tableView.hidden = isCards || !hasResults;
+    }
+    if (cardsView) {
+      cardsView.hidden = !isCards || !hasResults;
+    }
+
+    if (btnCards) {
+      btnCards.setAttribute('aria-pressed', isCards ? 'true' : 'false');
+      btnCards.classList.toggle('is-active', isCards);
+    }
+    if (btnTable) {
+      btnTable.setAttribute('aria-pressed', !isCards ? 'true' : 'false');
+      btnTable.classList.toggle('is-active', !isCards);
+    }
+  }
+
+  function updateUrlView() {
+    if (!window.history || !window.history.replaceState) { return; }
+    var params = new URLSearchParams(window.location.search);
+    params.set('view', state.view);
+    var newUrl = window.location.pathname + '?' + params.toString() + window.location.hash;
+    window.history.replaceState(null, '', newUrl);
+  }
+
+  function applyResultFilter() {
+    var query = (state.filter || '').toLowerCase().trim();
+    var terms = query.split(/\s+/).filter(Boolean);
+    var tableContainer = byId('gene-table-view');
+    var cardsContainer = byId('gene-cards-view');
+    var total = state.models.length + state.loci.length;
+    var visible = 0;
+
+    if (tableContainer) {
+      var rows = tableContainer.querySelectorAll('tbody tr');
+      for (var i = 0; i < rows.length; i++) {
+        var hay = (rows[i].getAttribute('data-search') || '').toLowerCase();
+        var match = true;
+        for (var t = 0; t < terms.length; t++) {
+          if (hay.indexOf(terms[t]) === -1) { match = false; break; }
+        }
+        rows[i].hidden = !match;
+        rows[i].classList.toggle('is-alt', match && visible % 2 === 1);
+        if (match) { visible++; }
+      }
+    }
+
+    if (cardsContainer) {
+      var cards = cardsContainer.querySelectorAll('.gene-result-card');
+      for (var j = 0; j < cards.length; j++) {
+        var cHay = (cards[j].getAttribute('data-search') || '').toLowerCase();
+        var cMatch = true;
+        for (var ct = 0; ct < terms.length; ct++) {
+          if (cHay.indexOf(terms[ct]) === -1) { cMatch = false; break; }
+        }
+        cards[j].hidden = !cMatch;
+      }
+    }
+
+    var note = byId('gene-filter-count');
+    if (note) {
+      note.textContent = query === '' ? '' : visible + ' of ' + total + ' shown';
+    }
+  }
+
+  function render() {
+    var section = byId('gene-results-section');
     var results = byId('gene-results');
+    var cardsContainer = byId('gene-cards-view');
     var notes = byId('gene-notes');
     var empty = byId('gene-empty');
     var exportLink = byId('gene-export-tsv');
-    var summary = data.summary || {};
+    var summary = state.summary || {};
 
-    var models = data.models || [];
-    var loci = data.loci || [];
+    if (section) { section.hidden = false; }
 
-    if (!models.length && !loci.length) {
-      results.innerHTML = '';
-      empty.hidden = false;
-      setStatus('No genes or gene models matched "' + summary.term + '".');
+    var models = state.models.slice();
+    var loci = state.loci.slice();
+
+    if (state.sort) {
+      models.sort(compareModels);
+    }
+
+    var totalModels = models.length;
+    var totalLoci = loci.length;
+
+    if (!totalModels && !totalLoci) {
+      if (results) { results.innerHTML = ''; }
+      if (cardsContainer) { cardsContainer.innerHTML = ''; }
+      if (empty) { empty.hidden = false; }
+      setStatus('No genes or gene models matched "' + esc(state.term) + '".');
+      updateViewDisplay();
       return;
     }
 
-    var html = '';
+    if (empty) { empty.hidden = true; }
+
+    var visibleModels = state.pageSize === 'all' ? models : models.slice(0, parseInt(state.pageSize, 10));
+
+    // Table view rendering
+    var tableHtml = '';
     if (loci.length) {
-      html += '<div class="gene-result-group"><h3>Gene loci <span class="mgdb-muted">('
+      tableHtml += '<div class="gene-result-group"><h3>Gene loci <span class="mgdb-muted">('
         + num(loci.length) + ')</span></h3>' + locusTable(loci) + '</div>';
     }
-    if (models.length) {
-      html += '<div class="gene-result-group"><h3>Gene models <span class="mgdb-muted">('
-        + num(models.length) + ')</span></h3>'
-        + modelTable(models, 'Gene models matching "' + summary.term + '"') + '</div>';
+    if (visibleModels.length) {
+      var caption = 'Gene models matching "' + esc(state.term) + '"';
+      tableHtml += '<div class="gene-result-group"><h3>Gene models <span class="mgdb-muted">('
+        + num(visibleModels.length) + (visibleModels.length < totalModels ? ' of ' + num(totalModels) : '')
+        + ')</span></h3>'
+        + modelTable(visibleModels, caption) + '</div>';
     }
-    results.innerHTML = html;
-    activateTables(results);
+    if (results) {
+      results.innerHTML = tableHtml;
+      initSortButtons(results);
+    }
 
-    setStatus(num(models.length) + ' gene model' + (models.length === 1 ? '' : 's')
-      + ' and ' + num(loci.length) + ' gene loc' + (loci.length === 1 ? 'us' : 'i')
-      + ' matched "' + summary.term + '" in ' + num(summary.elapsed_ms) + ' ms.');
+    // Cards view rendering
+    if (cardsContainer) {
+      var cardHtml = '';
+      if (loci.length) {
+        cardHtml += loci.map(renderLocusCard).join('');
+      }
+      if (visibleModels.length) {
+        cardHtml += visibleModels.map(renderModelCard).join('');
+      }
+      cardsContainer.innerHTML = cardHtml;
+    }
 
-    /* The scan is skipped when the reader typed a complete gene model
-       identifier, because for those the index lookup is the whole answer and
-       the scan costs about three quarters of a second to confirm it. Offer it
-       rather than deciding for them. */
+    // Status line
+    var statusText = 'Showing 1–' + Math.min(visibleModels.length, totalModels) + ' of ' + num(totalModels)
+      + ' gene model' + (totalModels === 1 ? '' : 's');
+    if (totalLoci > 0) {
+      statusText += ' and ' + num(totalLoci) + ' gene loc' + (totalLoci === 1 ? 'us' : 'i');
+    }
+    statusText += ' matching "' + esc(state.term) + '" · ' + num(summary.elapsed_ms || 0) + ' ms';
+    setStatus(statusText);
+
+    // Messages / notes
     var messages = '';
     if (summary.exact_only) {
       messages += '<div class="mgdb-message mgdb-message-info" role="note"><div>'
@@ -232,16 +555,58 @@
         + '. Raise the maximum, or narrow the term with <code>^</code> or <code>$</code>.'
         + '</div></div>';
     }
-    notes.innerHTML = messages;
-
-    var broaden = byId('gene-broaden');
-    if (broaden) {
-      broaden.addEventListener('click', function () { runSearch({ broad: true }); });
+    if (notes) {
+      notes.innerHTML = messages;
+      var broaden = byId('gene-broaden');
+      if (broaden) {
+        broaden.addEventListener('click', function () { runSearch({ broad: true }); });
+      }
     }
 
     if (exportLink) {
       exportLink.href = API + '?' + lastQuery + '&format=tsv';
       exportLink.hidden = false;
+    }
+
+    updateViewDisplay();
+    applyResultFilter();
+    initCopyButtons();
+  }
+
+  function initToolbar() {
+    var filterInput = byId('gene-results-filter');
+    if (filterInput) {
+      filterInput.addEventListener('input', function () {
+        state.filter = filterInput.value;
+        applyResultFilter();
+      });
+    }
+
+    var pageSizeSelect = byId('gene-page-size');
+    if (pageSizeSelect) {
+      pageSizeSelect.addEventListener('change', function () {
+        state.pageSize = pageSizeSelect.value;
+        render();
+      });
+    }
+
+    var btnCards = byId('gene-view-cards');
+    var btnTable = byId('gene-view-table');
+
+    if (btnCards) {
+      btnCards.addEventListener('click', function () {
+        state.view = 'cards';
+        updateUrlView();
+        updateViewDisplay();
+      });
+    }
+
+    if (btnTable) {
+      btnTable.addEventListener('click', function () {
+        state.view = 'table';
+        updateUrlView();
+        updateViewDisplay();
+      });
     }
   }
 
@@ -251,38 +616,46 @@
 
     form.addEventListener('submit', function (event) {
       event.preventDefault();
-      runSearch();
+      runSearch({ scroll: true });
     });
 
-    var reset = byId('gene-search-reset');
-    if (reset) {
-      reset.addEventListener('click', function () {
-        window.setTimeout(function () {
-          byId('gene-results').innerHTML = '';
-          byId('gene-notes').innerHTML = '';
-          byId('gene-empty').hidden = true;
-          var exportLink = byId('gene-export-tsv');
-          if (exportLink) { exportLink.hidden = true; }
-          setStatus('Enter a locus name or an identifier to search.');
-        }, 10);
+    var termInput = byId('gene-search-term');
+    var clearBtn = byId('gene-query-clear');
+    if (termInput && clearBtn) {
+      var updateClear = function () {
+        clearBtn.hidden = !(termInput.value || '').trim();
+      };
+      termInput.addEventListener('input', updateClear);
+      updateClear();
+      clearBtn.addEventListener('click', function () {
+        termInput.value = '';
+        clearBtn.hidden = true;
+        termInput.focus();
       });
     }
 
-    Array.prototype.forEach.call(document.querySelectorAll('.gene-example[data-term]'), function (button) {
+    Array.prototype.forEach.call(document.querySelectorAll('.gene-examples button[data-gene-example]'), function (button) {
       button.addEventListener('click', function () {
         var input = byId('gene-search-term');
-        input.value = button.getAttribute('data-term');
-        runSearch();
-        input.focus();
+        if (input) {
+          input.value = button.getAttribute('data-gene-example');
+          if (clearBtn) { clearBtn.hidden = false; }
+          runSearch({ scroll: true });
+          input.focus();
+        }
       });
     });
 
-    // ?term= in the address bar runs the search, as the previous page did with
-    // its start-search block.
+    initToolbar();
+
+    // ?term= in the address bar runs the search
     if (window.URLSearchParams) {
       var initial = new window.URLSearchParams(window.location.search).get('term');
       if (initial) {
-        byId('gene-search-term').value = initial;
+        if (termInput) {
+          termInput.value = initial;
+          if (clearBtn) { clearBtn.hidden = false; }
+        }
         runSearch();
       }
     }
@@ -292,22 +665,7 @@
      Advanced search
      ====================================================================== */
 
-  /* Checkbox, then the controls that belong to it. Changing a control checks
-     its box, which is what the previous page did with an inline onchange. */
-  var ADVANCED = [
-    { box: 'adv-annotation-box', key: 'annotation',   controls: { annotation: 'adv-annotation' } },
-    { box: 'adv-type-box',       key: 'model_type',   controls: { model_type: 'adv-type' } },
-    { box: 'adv-chr-box',        key: 'chromosome',   controls: { chromosome: 'adv-chr' } },
-    { box: 'adv-range-box',      key: 'range',        controls: { range_start: 'adv-range-start', range_end: 'adv-range-end' } },
-    { box: 'adv-locus-box',      key: 'locus_assoc',  controls: {} },
-    { box: 'adv-product-box',    key: 'gene_product', controls: { gene_product: 'adv-product' } },
-    { box: 'adv-pheno-box',      key: 'phenotype',    controls: { phenotype: 'adv-pheno' } },
-    { box: 'adv-trait-box',      key: 'trait',        controls: { trait: 'adv-trait' } },
-    { box: 'adv-tandem-box',     key: 'tandem',       controls: {} },
-    { box: 'adv-protein-box',    key: 'protein',      controls: { protein: 'adv-protein' } }
-  ];
-
-  function runAdvanced() {
+  function runAdvanced(options) {
     var params = new URLSearchParams();
     params.set('mode', 'advanced');
 
@@ -315,79 +673,149 @@
     if (limit && limit.value) { params.set('limit', limit.value); }
 
     var checked = 0;
-    ADVANCED.forEach(function (entry) {
-      var box = byId(entry.box);
-      if (!box || !box.checked) { return; }
-      checked += 1;
-      params.set('use_' + entry.key, '1');
-      Object.keys(entry.controls).forEach(function (field) {
-        var control = byId(entry.controls[field]);
-        if (control) { params.set(field, control.value); }
-      });
-    });
 
-    var notes = byId('gene-advanced-notes');
-    var results = byId('gene-advanced-results');
+    // Annotation
+    var annot = byId('adv-annotation');
+    if (annot && annot.value && annot.value !== 'all') {
+      params.set('use_annotation', '1');
+      params.set('annotation', annot.value);
+      checked++;
+    }
+
+    // Model type
+    var type = byId('adv-type');
+    if (type && type.value && type.value !== 'all') {
+      params.set('use_model_type', '1');
+      params.set('model_type', type.value);
+      checked++;
+    }
+
+    // Chromosome
+    var chr = byId('adv-chr');
+    if (chr && chr.value && chr.value !== 'all') {
+      params.set('use_chromosome', '1');
+      params.set('chromosome', chr.value);
+      checked++;
+    }
+
+    // Range
+    var rStart = byId('adv-range-start');
+    var rEnd = byId('adv-range-end');
+    var startVal = rStart ? rStart.value.trim() : '';
+    var endVal = rEnd ? rEnd.value.trim() : '';
+    if (startVal || endVal) {
+      params.set('use_range', '1');
+      params.set('range_start', startVal);
+      params.set('range_end', endVal);
+      checked++;
+    }
+
+    // Gene product
+    var prod = byId('adv-product');
+    if (prod && prod.value && prod.value !== 'all') {
+      params.set('use_gene_product', '1');
+      params.set('gene_product', prod.value);
+      checked++;
+    }
+
+    // Phenotype
+    var pheno = byId('adv-pheno');
+    if (pheno && pheno.value && pheno.value !== '0') {
+      params.set('use_phenotype', '1');
+      params.set('phenotype', pheno.value);
+      checked++;
+    }
+
+    // Trait
+    var trait = byId('adv-trait');
+    if (trait && trait.value && trait.value !== '0') {
+      params.set('use_trait', '1');
+      params.set('trait', trait.value);
+      checked++;
+    }
+
+    // Protein
+    var prot = byId('adv-protein');
+    var protVal = prot ? prot.value.trim() : '';
+    if (protVal) {
+      params.set('use_protein', '1');
+      params.set('protein', protVal);
+      checked++;
+    }
+
+    // Boolean toggles
+    var locusBox = byId('adv-locus-box');
+    if (locusBox && locusBox.checked) {
+      params.set('use_locus_assoc', '1');
+      checked++;
+    }
+
+    var tandemBox = byId('adv-tandem-box');
+    if (tandemBox && tandemBox.checked) {
+      params.set('use_tandem', '1');
+      checked++;
+    }
+
+    var section = byId('gene-results-section');
+    var results = byId('gene-results');
+    var cardsContainer = byId('gene-cards-view');
+    var notes = byId('gene-notes');
+    var empty = byId('gene-empty');
+    var status = byId('gene-results-status');
 
     if (checked === 0) {
-      results.innerHTML = '';
-      showError('gene-advanced-notes', 'Check at least one box to describe the gene models you are looking for.');
+      if (section) { section.hidden = false; }
+      if (results) { results.innerHTML = ''; }
+      if (cardsContainer) { cardsContainer.innerHTML = ''; }
+      showError('gene-notes', 'Please select or enter at least one filter criterion.');
+      if (status) { status.textContent = 'Advanced search criteria needed.'; }
       return;
     }
 
-    notes.innerHTML = '';
-    results.innerHTML = '<div class="mgdb-loading"><span class="mgdb-spinner" aria-hidden="true"></span>Searching gene models&hellip;</div>';
+    if (section) { section.hidden = false; }
+    if (notes) { notes.innerHTML = ''; }
+    if (empty) { empty.hidden = true; }
+    if (results) {
+      results.innerHTML = '<div class="mgdb-loading"><span class="mgdb-spinner" aria-hidden="true"></span>Searching gene models&hellip;</div>';
+    }
+    if (cardsContainer) {
+      cardsContainer.innerHTML = '';
+    }
+    if (status) { status.textContent = 'Searching gene models…'; }
 
-    var query = params.toString();
+    lastQuery = params.toString();
 
-    fetch(API + '?' + query, { credentials: 'same-origin' })
+    fetch(API + '?' + lastQuery, { credentials: 'same-origin' })
       .then(function (response) {
         return response.json().then(function (data) { return { ok: response.ok, data: data }; });
       })
       .then(function (wrap) {
         if (!wrap.ok || !wrap.data || !wrap.data.ok) {
           var message = (wrap.data && (wrap.data.message || wrap.data.detail)) || 'The search could not be completed.';
-          results.innerHTML = '';
-          showError('gene-advanced-notes', message);
+          if (results) { results.innerHTML = ''; }
+          showError('gene-notes', message);
+          setStatus('Search failed.');
           return;
         }
 
         var data = wrap.data;
-        var rows = data.models || [];
-        var summary = data.summary || {};
+        state.models = data.models || [];
+        state.loci = data.loci || [];
+        state.summary = data.summary || {};
+        state.term = (data.summary && data.summary.criteria) || 'Advanced criteria';
 
-        if (!rows.length) {
-          results.innerHTML = '';
-          notes.innerHTML = '<div class="mgdb-message mgdb-message-info" role="note"><div>'
-            + esc(summary.criteria) + ' No gene models matched.</div></div>';
-          return;
+        render();
+        if (options && options.scroll && section) {
+          section.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-
-        var head = '<div class="mgdb-message mgdb-message-info" role="note"><div>'
-          + esc(summary.criteria) + ' ' + num(rows.length) + ' gene model'
-          + (rows.length === 1 ? '' : 's') + ' found in ' + num(summary.elapsed_ms) + ' ms.';
-        if (summary.truncated) {
-          head += ' More matched than the limit of ' + num(summary.limit) + '.';
-        }
-        head += '</div></div>';
-        notes.innerHTML = head;
-
-        results.innerHTML = modelTable(rows, 'Advanced search results')
-          + '<p class="mgdb-form-actions"><a class="mgdb-button mgdb-button-quiet" download href="'
-          + esc(API + '?' + query + '&format=tsv') + '">Export TSV</a></p>';
-        activateTables(results);
       })
       .catch(function () {
-        results.innerHTML = '';
-        showError('gene-advanced-notes', 'The search request failed. Please try again.');
+        if (results) { results.innerHTML = ''; }
+        showError('gene-notes', 'The search request failed. Please try again.');
+        setStatus('Search failed.');
       });
   }
 
-  /* The gene product, phenotype and trait lists are 2,810 options between
-     them. Rendering them into the page was 170 KB of markup for a form that
-     starts collapsed, so they arrive on first open. Each select keeps its
-     "Any ..." option server side, so the control is never empty and a failed
-     request leaves the form usable with the any-value criterion. */
   var optionsLoaded = false;
 
   function loadAdvancedOptions() {
@@ -412,14 +840,11 @@
       .catch(function () {
         optionsLoaded = false;
         Array.prototype.forEach.call(selects, function (select) { select.disabled = false; });
-        showError('gene-advanced-notes', 'The filter lists could not be loaded. Reopen this section to try again.');
+        showError('gene-notes', 'The filter lists could not be loaded. Reopen this section to try again.');
       });
   }
 
   function initAdvanced() {
-    var form = byId('gene-advanced-form');
-    if (!form) { return; }
-
     var disclosure = byId('gene-advanced');
     if (disclosure) {
       disclosure.addEventListener('toggle', function () {
@@ -428,28 +853,36 @@
       if (disclosure.open) { loadAdvancedOptions(); }
     }
 
-    ADVANCED.forEach(function (entry) {
-      Object.keys(entry.controls).forEach(function (field) {
-        var control = byId(entry.controls[field]);
-        if (!control) { return; }
-        control.addEventListener('change', function () {
-          var box = byId(entry.box);
-          if (box) { box.checked = true; }
-        });
+    var advSubmit = byId('gene-adv-submit');
+    if (advSubmit) {
+      advSubmit.addEventListener('click', function (e) {
+        e.preventDefault();
+        runAdvanced({ scroll: true });
       });
-    });
+    }
 
-    form.addEventListener('submit', function (event) {
-      event.preventDefault();
-      runAdvanced();
-    });
-
-    form.addEventListener('reset', function () {
-      window.setTimeout(function () {
-        byId('gene-advanced-results').innerHTML = '';
-        byId('gene-advanced-notes').innerHTML = '';
-      }, 10);
-    });
+    var advReset = byId('gene-adv-reset');
+    if (advReset) {
+      advReset.addEventListener('click', function () {
+        var selects = ['adv-annotation', 'adv-type', 'adv-chr', 'adv-product', 'adv-pheno', 'adv-trait'];
+        selects.forEach(function (id) {
+          var sel = byId(id);
+          if (sel) { sel.selectedIndex = 0; }
+        });
+        var inputs = ['adv-range-start', 'adv-range-end', 'adv-protein'];
+        inputs.forEach(function (id) {
+          var inp = byId(id);
+          if (inp) { inp.value = ''; }
+        });
+        var checks = ['adv-locus-box', 'adv-tandem-box'];
+        checks.forEach(function (id) {
+          var chk = byId(id);
+          if (chk) { chk.checked = false; }
+        });
+        var limit = byId('gene-search-limit');
+        if (limit) { limit.value = '100'; }
+      });
+    }
   }
 
   /* ======================================================================
@@ -751,131 +1184,31 @@
   /* ======================================================================
      Download all data for a gene model list
 
-     Same two endpoints as before -- search/gene/download_all.php to start the
-     job and search/download/checkQuery.php to poll it. The previous
-     implementation re-entered its own poll with no delay, so a job that took
-     a minute made thousands of requests; this one waits two seconds between
-     checks and gives up after ten minutes.
+     Nothing here any more, deliberately. The form posts straight to
+     search/gene/gene_download_all.php, which answers with the file. What this
+     replaces: a POST that blocked until a Perl job finished, a poller that
+     slept five seconds inside every call, and a synthetic
+     <a download target="_blank"> click that a popup blocker can refuse in
+     silence. The only thing left worth doing in the browser is refusing an
+     empty submission before it becomes a round trip.
      ====================================================================== */
-
-  var POLL_INTERVAL = 2000;
-  var POLL_LIMIT = 300;
-
-  function jobId() {
-    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-  }
-
-  function statusText(html) {
-    var el = byId('downloadall_status_div');
-    if (el) { el.innerHTML = html; }
-  }
-
-  function pollDownload(id, filename, attempt) {
-    if (attempt > POLL_LIMIT) {
-      statusText('<b>Download did not complete.</b> The job is still running; try a shorter list of gene models.');
-      return;
-    }
-
-    var body = new URLSearchParams();
-    body.set('job_id', id);
-
-    fetch('/search/download/checkQuery.php', {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: body.toString()
-    })
-      .then(function (response) { return response.text(); })
-      .then(function (text) {
-        var state;
-        try { state = JSON.parse(text); }
-        catch (error) { state = null; }
-
-        if (!state) {
-          statusText('<b>Download did not complete.</b> No status was returned.');
-          return;
-        }
-
-        if (state.status === 'done') {
-          statusText('<b>Download completed.</b>');
-          var link = document.createElement('a');
-          link.href = '/temp/' + id + '.txt';
-          link.download = filename;
-          link.target = '_blank';
-          link.style.display = 'none';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          return;
-        }
-
-        if (state.status === 'error') {
-          statusText('<b>Download did not complete&#58;</b> ' + esc(state.msg || ''));
-          return;
-        }
-
-        statusText('Preparing download file ' + esc(filename) + '… (' + attempt + ')');
-        window.setTimeout(function () { pollDownload(id, filename, attempt + 1); }, POLL_INTERVAL);
-      })
-      .catch(function () {
-        statusText('<b>Download failed.</b>');
-      });
-  }
 
   function initDownloadAll() {
     var form = byId('gene-downloadall-form');
     if (!form) { return; }
 
     form.addEventListener('submit', function (event) {
-      event.preventDefault();
-
       var list = byId('downloadall_list');
-      var fileInput = byId('downloadall_file');
-      var files = fileInput ? fileInput.files : [];
-
-      if (list.value.trim() === '' && (!files || files.length === 0)) {
+      var file = byId('downloadall_file');
+      var hasList = list && list.value.trim() !== '';
+      var hasFile = file && file.files && file.files.length > 0;
+      if (!hasList && !hasFile) {
+        event.preventDefault();
         window.alert('No gene models entered. Paste a list of gene models into the box or upload a file.');
-        return;
       }
-
-      var filename = 'gene_list_download.txt';
-      var id = jobId();
-
-      var data = new FormData();
-      data.append('job_id', id);
-      if (list.value.trim() !== '') {
-        data.append('downloadall_list', list.value);
-      } else {
-        for (var i = 0; i < files.length; i += 1) {
-          data.append('files[]', files[i]);
-        }
-      }
-
-      statusText('Preparing download file ' + esc(filename) + '…');
-
-      fetch('/search/gene/download_all.php', {
-        method: 'POST',
-        credentials: 'same-origin',
-        body: data
-      })
-        .then(function (response) { return response.text(); })
-        .then(function (text) {
-          if (text.indexOf('Success') !== -1) {
-            pollDownload(id, filename, 1);
-          } else {
-            statusText('<b>File upload failed.</b>');
-          }
-        })
-        .catch(function () {
-          statusText('<span class="mgdb-message-error">Download failed. '
-            + 'If you tried to upload a file larger than 50kb, you may want to download the full gene model '
-            + 'information file from the <a href="https://download.maizegdb.org">downloads directory</a>. '
-            + 'Look inside the directory for your genome assembly of interest.</span>');
-        });
     });
-
-    form.addEventListener('reset', function () { statusText(''); });
   }
+
 
   /* ======================================================================
      Figures
@@ -1099,6 +1432,13 @@
       var observer = new window.IntersectionObserver(function () { update(); },
         { rootMargin: '-20% 0px -60% 0px' });
       pairs.forEach(function (pair) { observer.observe(pair.section); });
+    }
+
+    var resultsSec = byId('gene-results-section');
+    if (resultsSec && window.MutationObserver) {
+      new window.MutationObserver(update).observe(resultsSec, {
+        childList: true, subtree: true, attributes: true, attributeFilter: ['hidden']
+      });
     }
 
     update();

@@ -438,9 +438,38 @@
    table: the one place on the page where a section is not plain white.
    -------------------------------------------------------------------------- */
 
-.mgdb-rec-notes { display: grid; gap: var(--mgdb-space-3); }
+/* A note can hold a bare DNA sequence -- mgdb-record.js escapes the curator's
+   text into a <p> and cannot tell prose from bases -- and an unbroken 40-base
+   run is what this grid has to survive.
+
+   Three separate things were needed, and the page overflowed while two of them
+   were already true:
+
+   1. `minmax(0, 1fr)` on the track. A grid track sized `auto`/`1fr` takes an
+      automatic MINIMUM of min-content, so one long word sets the track's floor.
+      On /data_center/overgo/CL0_-2_ov the track computed to a hard 452px inside
+      a 309px grid.
+   2. `min-width: 0` on the item. A grid item's `min-width` defaults to `auto`,
+      which is its min-content size -- the same floor again, one level down.
+   3. `overflow-wrap: anywhere` on the text, NOT `break-word`. This is the part
+      that is easy to get wrong: the two behave identically when breaking lines,
+      but only `anywhere` lets the break opportunities count toward the
+      MIN-CONTENT size. The paragraph already computed to `break-word` and still
+      forced a 452px minimum, because `break-word` leaves intrinsic sizing
+      measuring the whole unbroken word.
+
+   Without these the card ran 110px past a 375px viewport and took the document
+   with it, cutting 10 of the 40 bases off-screen. Consistent with the eight
+   other `overflow-wrap: anywhere` rules in this file; the notes block was the
+   one that was missed. */
+.mgdb-rec-notes {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--mgdb-space-3);
+}
 
 .mgdb-rec-note {
+  min-width: 0;
   padding: var(--mgdb-space-3) var(--mgdb-space-4);
   border: 1px solid #e9dcb8;
   border-left: 4px solid var(--mgdb-gold);
@@ -448,7 +477,7 @@
   background: #fffaf0;
 }
 
-.mgdb-rec-note p { margin: 0; color: var(--mgdb-ink); }
+.mgdb-rec-note p { margin: 0; color: var(--mgdb-ink); overflow-wrap: anywhere; }
 
 .mgdb-rec-note small {
   display: block;
@@ -783,6 +812,15 @@
   background: #111;
 }
 
+/* The lightbox <img> ships with NO src attribute and must stay that way.
+   `src=""` is not "no image": the empty string resolves against the document,
+   so `img.src` reads back as the PAGE's own URL. That is truthy, which silently
+   defeats guards written as `if (!img.src) return;` -- mgdb-image.js's "copy
+   image URL" button has exactly that guard and would have copied the page URL.
+   Omitting the attribute makes `img.src` return "" as intended. Current Chrome
+   issues no extra request either way, so there is nothing visible to notice.
+   The JS assigns img.src when the lightbox opens; it never reads the attribute
+   to decide state. */
 .mgdb-rec-lightbox-image img { max-width: 100%; max-height: 60vh; object-fit: contain; }
 
 .mgdb-rec-lightbox-details { padding: var(--mgdb-space-5); background: var(--mgdb-surface); }

@@ -9,9 +9,26 @@
  */
 
   if (session_status() == PHP_SESSION_NONE) {
+      /* Harden the PHP session cookie before it is minted. HttpOnly keeps it out
+         of reach of page scripts, SameSite=Lax blunts cross-site use, and Secure
+         is set whenever the request arrived over HTTPS -- detected from the
+         proxy headers too, since the origin sits behind Cloudflare. Added
+         2026-09-06 alongside the curator-login hardening. */
+      $mgdb_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+                 || (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])
+                     && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
+                 || (isset($_SERVER['HTTP_CF_VISITOR'])
+                     && strpos($_SERVER['HTTP_CF_VISITOR'], 'https') !== false);
+      session_set_cookie_params(array(
+        'lifetime' => 0,
+        'path'     => '/',
+        'secure'   => $mgdb_https,
+        'httponly' => true,
+        'samesite' => 'Lax',
+      ));
       session_start();
   }
-  
+
   include_once($_SERVER['DOCUMENT_ROOT'] . "/include/gp_lib.php");
   
 // MONGODB
@@ -75,6 +92,44 @@
    * which would discard any bindParam() bindings; calling execute() bare keeps
    * behaviour byte-identical for the several hundred existing callers.
    */
+  /* ------------------------------------------------------------------------
+   * Query failures, recorded as well as logged.
+   *
+   * make_query() returns the statement whether or not it executed, and it has
+   * to keep doing so: 2,279 call sites on this server pass the result straight
+   * to retrieve_row(), and a statement that never executed simply fetches no
+   * rows. Changing that return would turn every one of the ~1,000 query
+   * failures already in mgdb.log into a fatal error on a page that is merely
+   * incomplete today.
+   *
+   * So the failure is recorded here instead, out of band, and callers that
+   * CAN act on it do. The v1 API does: MgdbApi::send() refuses to publish a
+   * record when this list is non-empty, because "0 loci" and "the loci query
+   * failed" are indistinguishable to a client and the first is a lie. That is
+   * how a stray bind parameter served eight false zero counts on
+   * /api/v1/records/gene_product/ferritin for as long as it did.
+   *
+   * Nothing here changes control flow. Legacy callers are unaffected.
+   * ------------------------------------------------------------------------ */
+  function mgdb_record_query_failure($sqlstate, $message, $query) {
+    if (!isset($GLOBALS['MGDB_QUERY_FAILURES'])) {
+      $GLOBALS['MGDB_QUERY_FAILURES'] = array();
+    }
+    /* Capped: one broken query in a loop must not exhaust memory. */
+    if (count($GLOBALS['MGDB_QUERY_FAILURES']) < 20) {
+      $GLOBALS['MGDB_QUERY_FAILURES'][] = array(
+        'sqlstate' => (string) $sqlstate,
+        'message'  => (string) $message,
+        'query'    => substr(preg_replace('/\s+/', ' ', (string) $query), 0, 300)
+      );
+    }
+  }
+
+  function mgdb_query_failures() {
+    return isset($GLOBALS['MGDB_QUERY_FAILURES'])
+      ? $GLOBALS['MGDB_QUERY_FAILURES'] : array();
+  }
+
   function make_query($DBConn, $query, $prefetch_count=1, $params=array()) {
     if (!$DBConn) {
       reportError("No connection provded for\n$query");
@@ -88,16 +143,28 @@
         // Try getting the results
         $result = empty($params) ? $stmt->execute() : $stmt->execute($params);
         if ($result === false) {
-          reportError(implode("\n", $stmt->errorInfo()) . "QUERY EXECUTION FAILED\n$query", true); // error executing
+          $info = $stmt->errorInfo();
+          reportError(implode("\n", $info) . "QUERY EXECUTION FAILED\n$query", true); // error executing
+          /* Rarely reached: PHP 8 defaults PDO to ERRMODE_EXCEPTION, so a failing
+             execute() throws and lands in the catch below instead. Kept because
+             the mode is not set explicitly and could change. */
+          mgdb_record_query_failure(isset($info[0]) ? $info[0] : '', implode(' ', $info), $query);
         }
       }
       else {
         // Unable to create statement
-        reportError(implode("\n", $DBConn->errorInfo()) . "FAILED TO CREATE STATEMENT\n$query", true);
+        $info = $DBConn->errorInfo();
+        reportError(implode("\n", $info) . "FAILED TO CREATE STATEMENT\n$query", true);
+        mgdb_record_query_failure(isset($info[0]) ? $info[0] : '', implode(' ', $info), $query);
       }
     }
     catch (PDOException $e) {
+      /* THIS is the live failure path. PHP 8 defaults PDO to ERRMODE_EXCEPTION,
+         so prepare()/execute() throw rather than returning false -- which is why
+         "QUERY EXECUTION FAILED" appears 0 times in a 2.6-million-line mgdb.log
+         while over a thousand SQLSTATE errors do. */
       logVarDump($e, "Exception thrown:\n");
+      mgdb_record_query_failure($e->getCode(), $e->getMessage(), $query);
     }
     
     $time_end = microtime(true);
@@ -265,11 +332,13 @@
    move them to data_center_functions.php. Maybe some day... -eksc */
    
   function get_user_info($DBConn, $username) {
+    // Parameterised: $username reaches here from the `username` cookie, which a
+    // client controls, so it must never be interpolated into the SQL.
     $sql = "
       SELECT first_name, last_name, email, id, curation_lvl
       FROM annotation_author
-      WHERE username = '$username'";
-    $sql_ret = make_query($DBConn, $sql, 1);
+      WHERE username = ?";
+    $sql_ret = make_query($DBConn, $sql, 1, array($username));
     $row = retrieve_row($sql_ret);
     if ($row) {
       return array(

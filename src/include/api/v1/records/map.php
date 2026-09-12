@@ -114,9 +114,9 @@ if (isset($want['overview'])) {
     'id' => $id,
     'name' => $name,
     'distribution' => $distribution,
-    'linkage_group' => $record['linkage_group_name'] ?: '—',
+    'linkage_group' => MgdbApi::text($record['linkage_group_name']),
     'linkage_group_id' => $record['linkage_group_id'] ? (int) $record['linkage_group_id'] : null,
-    'coordinate_type' => $record['coordinate_type_name'] ?: 'cM',
+    'coordinate_type' => MgdbApi::text($record['coordinate_type_name']) ?: 'cM',
     'locus_count' => (int) $record['locus_count'],
     'min_coord' => $record['min_coord'] !== null ? (float) $record['min_coord'] : null,
     'max_coord' => $record['max_coord'] !== null ? (float) $record['max_coord'] : null,
@@ -147,15 +147,31 @@ if (isset($want['coordinates'])) {
   $coord_sth = make_query($DBConn, $coord_sql, 1, array('id' => $id, 'limit' => $max_items));
   MgdbApi::countQuery();
 
+  /* MgdbApi::text(), not `?: ''`.
+
+     The API's contract is that an absent value is null -- that is what the value
+     helpers exist for, and every other resource keeps it. This file coalesced to
+     the empty string, putting **750 empty strings** into one
+     /api/v1/records/map/64489 response (394 bin, 356 full_name). "" is a value
+     where null is an absence, so a client testing `if (row.bin)` cannot tell
+     "this locus has no bin" from "we do not know its bin".
+
+     Two things `?:` got wrong beyond the empty string, both fixed here:
+       - a char-padded column is TRUTHY, so "  " passed straight through
+         `?: 'Locus'` and became the locus type. text() trims first, which is why
+         the sentinel defaults now sit outside it rather than beside it.
+       - the overview block used `?: '—'`, an EM DASH -- a display placeholder
+         in a JSON payload, which a consumer would have to know to strip.
+  */
   while ($c_row = retrieve_row($coord_sth)) {
     $loci[] = array(
       'id' => (int) $c_row['id'],
-      'name' => $c_row['locus_name'],
-      'full_name' => $c_row['full_name'] ?: '',
+      'name' => MgdbApi::text($c_row['locus_name']),
+      'full_name' => MgdbApi::text($c_row['full_name']),
       'coordinate' => $c_row['coordinate'] !== null ? (float) $c_row['coordinate'] : null,
-      'bin' => $c_row['bin'] ?: '',
+      'bin' => MgdbApi::text($c_row['bin']),
       'is_backbone' => ((int) $c_row['back_bone'] === 1),
-      'locus_type' => $c_row['locus_type'] ?: 'Locus',
+      'locus_type' => MgdbApi::text($c_row['locus_type']) ?: 'Locus',
       'html' => '/gene_center/gene/' . rawurlencode($c_row['locus_name'])
     );
   }
@@ -193,8 +209,8 @@ if (isset($want['related_maps'])) {
     while ($s_row = retrieve_row($sister_sth)) {
       $sister_maps[] = array(
         'id' => (int) $s_row['id'],
-        'name' => $s_row['name'],
-        'linkage_group' => $s_row['linkage_group'] ?: '—',
+        'name' => MgdbApi::text($s_row['name']),
+        'linkage_group' => MgdbApi::text($s_row['linkage_group']),
         'locus_count' => (int) $s_row['locus_count'],
         'html' => '/data_center/map/' . (int) $s_row['id']
       );
@@ -217,7 +233,7 @@ if (isset($want['related_maps'])) {
     while ($sc_row = retrieve_row($same_chr_sth)) {
       $same_chromosome_maps[] = array(
         'id' => (int) $sc_row['id'],
-        'name' => $sc_row['name'],
+        'name' => MgdbApi::text($sc_row['name']),
         'locus_count' => (int) $sc_row['locus_count'],
         'html' => '/data_center/map/' . (int) $sc_row['id'],
         'compare_html' => '/compare_maps?map1=' . $id . '&map2=' . (int) $sc_row['id']
@@ -308,8 +324,8 @@ if (isset($want['qtl_experiments'])) {
   while ($q_row = retrieve_row($qtl_sth)) {
     $qtls[] = array(
       'id' => (int) $q_row['id'],
-      'name' => $q_row['name'],
-      'trait' => $q_row['trait_name'] ?: '',
+      'name' => MgdbApi::text($q_row['name']),
+      'trait' => MgdbApi::text($q_row['trait_name']),
       'html' => '/data_center/qtl?id=' . (int) $q_row['id']
     );
   }
@@ -326,8 +342,8 @@ if (isset($want['qtl_experiments'])) {
 MgdbApi::send('map', $id,
   array(
     'name' => $name,
-    'linkage_group' => $record['linkage_group_name'] ?: '',
-    'coordinate_type' => $record['coordinate_type_name'] ?: 'cM',
+    'linkage_group' => MgdbApi::text($record['linkage_group_name']),
+    'coordinate_type' => MgdbApi::text($record['coordinate_type_name']) ?: 'cM',
     'locus_count' => (int) $record['locus_count'],
     'author' => $author
   ),

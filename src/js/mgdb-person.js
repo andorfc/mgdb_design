@@ -307,10 +307,9 @@
       executeSearch(initLetter.trim(), true);
     } else if (input.value && input.value.trim().length >= 2) {
       executeSearch(input.value.trim());
-    } else {
-      // Default landing: show prominent initial directory (e.g. Walbot or letter A)
-      executeSearch('Walbot');
     }
+    // No default search: opening /person with no term or letter shows the
+    // directory's static prompt, it does not run a search on its own.
   }
 
   /* The sticky section tabs. `.mgdb-section-tabs` is styled by the shell but

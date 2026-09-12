@@ -297,38 +297,450 @@
 }
 
 /* --------------------------------------------------------------------------
-   Table controls
+/* --------------------------------------------------------------------------
+   Search Form & Controls
 
-   Search box, filter chips and a live count, above each of the two tables.
-   Both tables are rendered server-side and complete; these only hide rows.
+   Matches the unified MaizeGDB Data Hub standards (52px query row, centered
+   SVG clear button, gold hover example pills, pure white card advanced search
+   with rotating triangle, and baseline-aligned toolbar).
    -------------------------------------------------------------------------- */
 
-.mgdb-genetic-variation-page .gv-table-controls {
-  display: grid;
-  grid-template-columns: minmax(220px, 20rem) minmax(0, 1fr);
-  gap: var(--mgdb-space-3) var(--mgdb-space-5);
-  align-items: end;
+.mgdb-genetic-variation-page .gv-search-form-wrap {
   margin-bottom: var(--mgdb-space-4);
 }
 
-.mgdb-genetic-variation-page .gv-filter-field { margin: 0; }
-
-.mgdb-genetic-variation-page .gv-table-controls .mgdb-filters { margin: 0; }
-
-/* The chips sit on the same line as the filter input, so they take the input's
-   height. At the shared 36px they were bottom-aligned to it and their tops sat
-   8px higher, which reads as two rows that not quite line up; the reset button
-   that appears beside them is 44px and made the mismatch worse. */
-.mgdb-genetic-variation-page .gv-table-controls .mgdb-chip {
-  min-height: var(--mgdb-tap-target);
+.mgdb-genetic-variation-page .gv-search-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-3);
 }
 
-.mgdb-genetic-variation-page .gv-table-controls .mgdb-result-count {
-  grid-column: 1 / -1;
+.mgdb-genetic-variation-page .gv-query-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--mgdb-space-3);
+  align-items: stretch;
+}
+
+.mgdb-genetic-variation-page .gv-query-control {
+  position: relative;
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  min-height: 52px;
+  height: 52px;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--hub-line, #e3e9f2);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface, #ffffff);
+  transition: border-color var(--mgdb-dur-fast), box-shadow var(--mgdb-dur-fast);
+}
+
+.mgdb-genetic-variation-page .gv-query-control:focus-within {
+  border-color: var(--mgdb-green-dark);
+  box-shadow: 0 0 0 3px var(--mgdb-green-soft);
+}
+
+.mgdb-genetic-variation-page .gv-search-icon {
+  color: var(--mgdb-muted);
+  flex-shrink: 0;
+  margin-right: var(--mgdb-space-3);
+}
+
+.mgdb-genetic-variation-page .gv-query-control input[type="search"] {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-base);
+  outline: none;
+  padding-right: 2.25rem;
+}
+
+.mgdb-genetic-variation-page .gv-query-control input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+
+.mgdb-genetic-variation-page .gv-query-clear {
+  position: absolute;
+  right: 0.625rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.875rem;
+  height: 1.875rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--mgdb-ink-soft);
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.mgdb-genetic-variation-page .gv-query-clear[hidden] {
+  display: none !important;
+}
+
+.mgdb-genetic-variation-page .gv-query-clear:hover {
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-green-dark);
+}
+
+/* Example pills with gold hover palette ----------------------------------- */
+
+.mgdb-genetic-variation-page .gv-examples {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-genetic-variation-page .gv-example-label {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.mgdb-genetic-variation-page .gv-example-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 2px var(--mgdb-space-3);
+  border: 1px solid var(--hub-line);
+  border-radius: 999px;
+  background: var(--hub-surface);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .12s ease, border-color .12s ease, color .12s ease, box-shadow .12s ease;
+}
+
+.mgdb-genetic-variation-page .gv-example-btn:hover {
+  border-color: var(--mgdb-gold);
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+  box-shadow: 0 0 0 1px var(--mgdb-gold);
+}
+
+/* Advanced Search Disclosure ---------------------------------------------- */
+
+.mgdb-genetic-variation-page .gv-advanced {
+  border: 1px solid var(--hub-line, #e3e9f2);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface, #ffffff);
+  box-shadow: var(--mgdb-shadow-xs);
+}
+
+.mgdb-genetic-variation-page .gv-advanced > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-2);
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.mgdb-genetic-variation-page .gv-advanced > summary::-webkit-details-marker {
+  display: none;
+}
+
+.mgdb-genetic-variation-page .gv-advanced > summary::before {
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 7px solid currentColor;
+  content: "";
+  transition: transform .15s ease;
+}
+
+.mgdb-genetic-variation-page .gv-advanced[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.mgdb-genetic-variation-page .gv-advanced-count {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.mgdb-genetic-variation-page .gv-advanced-body {
+  padding: var(--mgdb-space-4);
+  border-top: 1px solid var(--hub-line-soft, #eef2f8);
+}
+
+.mgdb-genetic-variation-page .gv-advanced-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-genetic-variation-page .gv-advanced-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--mgdb-space-3);
+  margin-top: var(--mgdb-space-4);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px dashed var(--hub-line-soft, #eef2f8);
+}
+
+.mgdb-genetic-variation-page .gv-advanced-reset-btn {
+  min-height: var(--mgdb-tap-target);
+  height: var(--mgdb-tap-target);
+  padding: var(--mgdb-space-2) var(--mgdb-space-4);
+  border: 1px solid #b9b2a5;
+  border-radius: var(--mgdb-radius-sm);
+  background: #ffffff;
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.mgdb-genetic-variation-page .gv-advanced-reset-btn:hover {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+}
+
+/* Results Toolbar --------------------------------------------------------- */
+
+.mgdb-genetic-variation-page .gv-results-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: flex-end;
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-genetic-variation-page .gv-results-filter {
+  position: relative;
+  flex: 1 1 240px;
+  min-width: 200px;
+}
+
+.mgdb-genetic-variation-page .gv-results-filter .mgdb-result-count {
+  position: absolute;
+  right: 0;
+  bottom: calc(var(--mgdb-tap-target) + 6px);
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+}
+
+.mgdb-genetic-variation-page .gv-results-export .mgdb-button {
+  height: var(--mgdb-tap-target);
+  min-height: var(--mgdb-tap-target);
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+/* View toggle with dark green active state -------------------------------- */
+
+.mgdb-genetic-variation-page .gv-results-view .mgdb-view-toggle {
+  display: inline-flex;
+  height: var(--mgdb-tap-target);
+  min-height: var(--mgdb-tap-target);
+  box-sizing: border-box;
+  align-items: center;
+  padding: 3px;
+  border: 1px solid #b9b2a5;
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface);
+}
+
+.mgdb-genetic-variation-page .gv-results-view .mgdb-view-btn {
+  display: inline-flex;
+  height: 100%;
+  box-sizing: border-box;
+  align-items: center;
+  gap: var(--mgdb-space-1);
+  padding: 0 var(--mgdb-space-3);
+  border: 0;
+  border-radius: calc(var(--mgdb-radius-sm) - 2px);
+  background: transparent;
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+
+.mgdb-genetic-variation-page .gv-results-view .mgdb-view-btn.is-active,
+.mgdb-genetic-variation-page .gv-results-view .mgdb-view-btn[aria-pressed="true"] {
+  background: var(--mgdb-green-dark) !important;
+  color: #ffffff !important;
+  box-shadow: var(--mgdb-shadow-xs);
+}
+
+.mgdb-genetic-variation-page .gv-results-view .mgdb-view-btn.is-active svg,
+.mgdb-genetic-variation-page .gv-results-view .mgdb-view-btn[aria-pressed="true"] svg {
+  fill: #ffffff;
+  color: #ffffff;
+}
+
+/* Responsive Dataset Cards (24px padding & 24px gap) ---------------------- */
+
+.mgdb-genetic-variation-page .gv-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--mgdb-space-5);
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-genetic-variation-page .gv-dataset-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--hub-line, #e3e9f2);
+  border-radius: var(--mgdb-radius);
+  background: var(--hub-surface, #ffffff);
+  box-shadow: var(--mgdb-shadow-sm, 0 1px 2px rgba(0,0,0,.05));
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.mgdb-genetic-variation-page .gv-dataset-card:hover {
+  border-color: var(--mgdb-gold);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+}
+
+.mgdb-genetic-variation-page .gv-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1);
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-genetic-variation-page .gv-card-title {
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-lg);
+  font-weight: 700;
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-genetic-variation-page .gv-card-meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  margin: 0 0 var(--mgdb-space-3);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-genetic-variation-page .gv-card-meta dt {
+  color: var(--mgdb-muted);
+  font-weight: 600;
+}
+
+.mgdb-genetic-variation-page .gv-card-meta dd {
+  margin: 0;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-genetic-variation-page .gv-card-notes {
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading-snug);
+}
+
+.mgdb-genetic-variation-page .gv-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  margin-top: auto;
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--hub-line-soft, #eef2f8);
+}
+
+/* Sortable table headers -------------------------------------------------- */
+
+.mgdb-genetic-variation-page .gv-dataset-table thead th button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mgdb-space-1);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-genetic-variation-page .gv-dataset-table thead th button::after {
+  content: "\21C5";
+  font-size: .8em;
+  opacity: .5;
+}
+
+.mgdb-genetic-variation-page .gv-dataset-table thead th[aria-sort="ascending"] button::after {
+  content: "\2191";
+  opacity: 1;
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-genetic-variation-page .gv-dataset-table thead th[aria-sort="descending"] button::after {
+  content: "\2193";
+  opacity: 1;
+  color: var(--mgdb-green-dark);
+}
+
+/* Resequencing Project Controls ------------------------------------------- */
+
+.mgdb-genetic-variation-page .gv-project-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: center;
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-genetic-variation-page .gv-project-query-wrap {
+  flex: 1 1 280px;
+}
+
+.mgdb-genetic-variation-page .gv-project-query-control {
+  min-height: 44px;
+  height: 44px;
+}
+
+.mgdb-genetic-variation-page .gv-project-controls .mgdb-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
   margin: 0;
 }
 
-.mgdb-genetic-variation-page .gv-reset { min-height: var(--mgdb-tap-target); padding-block: 0; }
+.mgdb-genetic-variation-page .gv-project-controls .mgdb-result-count {
+  flex: 1 1 100%;
+  margin: 0;
+}
 
 /* --------------------------------------------------------------------------
    Dataset table

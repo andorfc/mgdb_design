@@ -128,274 +128,348 @@
 
 /* ── Results controls ────────────────────────────────────────────────────── */
 
-/* Fixed tracks in a box sized to its own content: declared with minmax(0, ...)
-   the first tracks take everything the parent offers and the last resolves to
-   0px, which drops its control onto a second row. */
-.mgdb-reference-page .reference-results-controls {
-  display: grid;
-  width: max-content;
-  max-width: 100%;
-  flex: 0 0 auto;
-  grid-template-columns: 13rem 10rem 12rem;
-  gap: var(--mgdb-space-3) var(--mgdb-space-4);
-  align-items: end;
+/* --------------------------------------------------------------------------
+   Search Form
+   -------------------------------------------------------------------------- */
+
+.mgdb-reference-page .reference-search-form-wrap {
+  margin-bottom: var(--mgdb-space-4);
 }
 
-@media (max-width: 1000px) {
-  .mgdb-reference-page .reference-results-controls {
-    width: 100%;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 560px) {
-  .mgdb-reference-page .reference-results-controls { grid-template-columns: minmax(0, 1fr); }
-}
-
-/* The submit and reset controls are bare <button> elements in the template;
-   give them the shared button treatment rather than the browser default. */
-.mgdb-reference-page .reference-search-submit,
-.mgdb-reference-page .reference-reset {
-  display: inline-flex;
-  gap: var(--mgdb-space-2);
-  align-items: center;
-  justify-content: center;
-  min-height: var(--mgdb-tap-target);
-  padding: var(--mgdb-space-2) var(--mgdb-space-5);
-  border: 1px solid transparent;
-  border-radius: var(--mgdb-radius-sm);
-  font-family: inherit;
-  font-size: var(--mgdb-text-base);
-  font-weight: 700;
-  line-height: 1.2;
-  cursor: pointer;
-}
-
-.mgdb-reference-page .reference-search-submit {
-  background: var(--mgdb-green-dark);
-  color: #fff;
-}
-
-.mgdb-reference-page .reference-search-submit:hover { background: #0f3325; }
-
-.mgdb-reference-page .reference-reset {
-  border-color: var(--mgdb-line);
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink);
-}
-
-.mgdb-reference-page .reference-reset:hover { background: var(--mgdb-surface-alt); }
-
-/* Search panel ------------------------------------------------------------- */
-
-.mgdb-reference-page > section { margin-top: var(--mgdb-space-7); }
-
-.mgdb-reference-page .reference-section-heading { margin-bottom: var(--mgdb-space-4); }
-.mgdb-reference-page .reference-section-heading h2 { color: var(--mgdb-green-dark); }
-.mgdb-reference-page .reference-section-heading p { max-width: var(--mgdb-measure); margin-top: var(--mgdb-space-2); color: var(--mgdb-muted); }
-
-.mgdb-reference-page .reference-search-panel {
-  padding: var(--mgdb-space-5);
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--mgdb-surface-alt);
-}
-
-/* The form is the row: term field, scope select, and submit sit on one line and
-   wrap together. .reference-main-search and .reference-scope-search are each a
-   label plus its control, so they are the flex items rather than containers. */
-.mgdb-reference-page #reference-search-form {
+.mgdb-reference-page .reference-query-row {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--mgdb-space-3) var(--mgdb-space-4);
-  align-items: flex-end;
+  gap: var(--mgdb-space-3);
+  align-items: stretch;
+  margin-bottom: var(--mgdb-space-3);
 }
 
-.mgdb-reference-page .reference-main-search { flex: 3 1 22rem; min-width: 0; }
-.mgdb-reference-page .reference-scope-search { flex: 1 1 14rem; min-width: 0; }
-.mgdb-reference-page .reference-search-submit { flex: 0 0 auto; }
-
-/* Example row and advanced filters take their own full-width lines. */
-.mgdb-reference-page .reference-example-row,
-.mgdb-reference-page .reference-advanced { flex: 1 0 100%; }
-
-/* The term field wraps a search glyph, the input, and a clear button. */
 .mgdb-reference-page .reference-query-control {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: var(--mgdb-space-2);
+  position: relative;
+  display: flex;
+  box-sizing: border-box;
   align-items: center;
-  min-height: var(--mgdb-tap-target);
-  padding: 0 var(--mgdb-space-3);
-  border: 1px solid #b9b2a5;
+  min-height: 52px;
+  height: 52px;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--hub-line, #e3e9f2);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
+  background: var(--hub-surface, #ffffff);
+  transition: border-color var(--mgdb-dur-fast), box-shadow var(--mgdb-dur-fast);
+  flex: 2 1 340px;
 }
 
-.mgdb-reference-page .reference-query-control:focus-within { border-color: var(--mgdb-focus); }
-.mgdb-reference-page .reference-query-control > span:first-child { color: var(--mgdb-muted); }
+.mgdb-reference-page .reference-query-control:focus-within {
+  border-color: var(--mgdb-green-dark);
+  box-shadow: 0 0 0 3px var(--mgdb-green-soft);
+}
 
-.mgdb-reference-page .reference-query-control input,
+.mgdb-reference-page .reference-search-icon {
+  color: var(--mgdb-muted);
+  flex-shrink: 0;
+  margin-right: var(--mgdb-space-3);
+}
+
 .mgdb-reference-page .reference-query-control input[type="search"],
 .mgdb-reference-page .reference-query-control input[type="text"] {
-  width: 100%;
-  min-height: 40px;
-  padding: 0 !important;
+  flex: 1;
+  min-width: 0;
   border: 0 !important;
-  border-radius: 0 !important;
   background: transparent !important;
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-base);
+  outline: none;
+  padding: 0 !important;
+  padding-right: 2.25rem !important;
   box-shadow: none !important;
-  color: var(--mgdb-ink);
 }
 
-.mgdb-reference-page .reference-query-control input:focus { outline: none; }
+.mgdb-reference-page .reference-query-control input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
 
-.mgdb-reference-page .reference-query-control button {
+.mgdb-reference-page .reference-query-clear {
+  position: absolute;
+  right: 0.625rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.875rem;
+  height: 1.875rem;
+  padding: 0;
   border: 0;
-  background: none;
-  color: var(--mgdb-burgundy);
-  font-family: inherit;
-  font-size: var(--mgdb-text-sm);
-  font-weight: 700;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--mgdb-ink-soft);
   cursor: pointer;
+  transition: background-color .15s, color .15s;
 }
 
-.mgdb-reference-page label,
-.mgdb-reference-page .reference-search-panel label {
-  display: block;
-  margin-bottom: var(--mgdb-space-1);
+.mgdb-reference-page .reference-query-clear[hidden] {
+  display: none !important;
+}
+
+.mgdb-reference-page .reference-query-clear:hover {
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-green-dark);
+}
+
+/* "Search within" select retained alongside the search bar */
+.mgdb-reference-page .reference-scope-control {
+  display: flex;
+  flex: 1 1 220px;
+  min-width: 180px;
+  max-width: 280px;
+}
+
+.mgdb-reference-page .reference-scope-select {
+  width: 100%;
+  height: 52px;
+  min-height: 52px;
+  padding: 0 var(--mgdb-space-3);
+  border: 1px solid var(--hub-line, #e3e9f2);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface, #ffffff);
+  font-size: var(--mgdb-text-base);
+  font-weight: 600;
   color: var(--mgdb-ink);
+  cursor: pointer;
+  transition: border-color var(--mgdb-dur-fast), box-shadow var(--mgdb-dur-fast);
+}
+
+.mgdb-reference-page .reference-scope-select:focus {
+  border-color: var(--mgdb-green-dark);
+  box-shadow: 0 0 0 3px var(--mgdb-green-soft);
+  outline: none;
+}
+
+.mgdb-reference-page .reference-query-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mgdb-space-2);
+  min-height: 52px;
+  height: 52px;
+  padding: 0 var(--mgdb-space-5);
   font-size: var(--mgdb-text-base);
   font-weight: 700;
-}
-
-.mgdb-reference-page input[type="text"],
-.mgdb-reference-page input[type="search"],
-.mgdb-reference-page input[type="number"],
-.mgdb-reference-page select {
-  display: block;
-  width: 100%;
-  min-height: var(--mgdb-tap-target);
-  padding: var(--mgdb-space-2) var(--mgdb-space-3);
-  border: 1px solid #b9b2a5;
+  white-space: nowrap;
+  flex: 0 0 auto;
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  border: 0;
   border-radius: var(--mgdb-radius-sm);
-  background: var(--mgdb-surface);
-  color: var(--mgdb-ink);
-  font-family: inherit;
-  /* 16px also stops iOS zooming the page when a field takes focus. */
-  font-size: var(--mgdb-text-base);
+  cursor: pointer;
+  transition: background .15s ease;
 }
 
-.mgdb-reference-page input:focus,
-.mgdb-reference-page select:focus { border-color: var(--mgdb-focus); }
+.mgdb-reference-page .reference-query-submit:hover {
+  background: #0f3325;
+}
 
-.mgdb-reference-page .reference-search-submit { flex: 0 0 auto; }
+/* ── Examples ────────────────────────────────────────────────────────────── */
 
-/* Worked examples under the field. */
+.mgdb-reference-page .reference-examples,
 .mgdb-reference-page .reference-example-row {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-2);
   align-items: center;
-  margin-top: var(--mgdb-space-3);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--hub-line-soft, #eef2f8);
+  margin: 0;
 }
 
-.mgdb-reference-page .reference-example-row > span {
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
+.mgdb-reference-page .reference-example-label {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
   font-weight: 700;
-  letter-spacing: .05em;
+  letter-spacing: .04em;
   text-transform: uppercase;
 }
 
-.mgdb-reference-page .reference-example-row button {
-  min-height: 34px;
+.mgdb-reference-page .reference-example-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
   padding: var(--mgdb-space-1) var(--mgdb-space-3);
-  border: 1px solid var(--mgdb-line);
+  border: 1px solid var(--hub-line, #e3e9f2);
   border-radius: 999px;
-  background: var(--mgdb-surface);
-  color: var(--mgdb-burgundy);
+  background: var(--hub-surface, #ffffff);
+  color: var(--mgdb-green-dark);
   font-family: inherit;
   font-size: var(--mgdb-text-sm);
-  font-weight: 700;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
   cursor: pointer;
+  transition: all .15s ease;
 }
 
-.mgdb-reference-page .reference-example-row button:hover { border-color: var(--mgdb-gold-dark); background: var(--mgdb-gold-soft); }
+.mgdb-reference-page .reference-examples button:hover,
+.mgdb-reference-page .reference-example-btn:hover,
+.mgdb-reference-page .reference-example-row button:hover {
+  border-color: var(--mgdb-gold);
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+  box-shadow: 0 0 0 1px var(--mgdb-gold);
+  text-decoration: none;
+}
 
-/* Advanced filters live in a details element, so they collapse without script. */
-.mgdb-reference-page .reference-advanced {
+/* ── Advanced search disclosure ──────────────────────────────────────────── */
+
+.mgdb-reference-page .reference-advanced,
+.mgdb-reference-page .reference-adv {
+  border: 1px solid var(--hub-line, #e3e9f2);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface, #ffffff);
   margin-top: var(--mgdb-space-4);
-  border-top: 1px solid var(--mgdb-line);
-  padding-top: var(--mgdb-space-3);
 }
 
-.mgdb-reference-page .reference-advanced > summary {
+.mgdb-reference-page .reference-advanced > summary,
+.mgdb-reference-page .reference-adv > summary {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--mgdb-space-2);
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+  align-items: center;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-radius: var(--mgdb-radius-sm);
   color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-base);
+  font-size: var(--mgdb-text-sm);
   font-weight: 700;
   cursor: pointer;
+  list-style: none;
 }
 
-.mgdb-reference-page .reference-advanced > summary strong {
-  color: var(--mgdb-green-dark);
+.mgdb-reference-page .reference-advanced > summary::-webkit-details-marker,
+.mgdb-reference-page .reference-adv > summary::-webkit-details-marker { display: none; }
+
+.mgdb-reference-page .reference-advanced > summary::before,
+.mgdb-reference-page .reference-adv > summary::before {
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 7px solid currentColor;
+  content: "";
+  transition: transform .15s ease;
 }
 
-.mgdb-reference-page .reference-advanced > summary small {
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-  font-weight: 400;
+.mgdb-reference-page .reference-advanced[open] > summary::before,
+.mgdb-reference-page .reference-adv[open] > summary::before { transform: rotate(90deg); }
+
+.mgdb-reference-page .reference-advanced > summary:focus-visible,
+.mgdb-reference-page .reference-adv > summary:focus-visible {
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: -3px;
 }
 
-.mgdb-reference-page .reference-advanced > summary:focus-visible { outline: 3px solid var(--mgdb-focus); outline-offset: 2px; }
-.mgdb-reference-page .reference-advanced > summary + * { margin-top: var(--mgdb-space-4); }
-
-.mgdb-reference-page .reference-filter-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--mgdb-space-4);
-}
-
-/* Each filter is a label wrapping its own caption span and control. */
-.mgdb-reference-page .reference-filter-grid > label { margin: 0; }
-.mgdb-reference-page .reference-filter-grid > label > span {
-  display: block;
-  margin-bottom: var(--mgdb-space-1);
-  font-size: var(--mgdb-text-base);
+.mgdb-reference-page .reference-advanced-count {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
   font-weight: 700;
 }
 
-/* The advanced summary carries a heading and a hint on separate lines. */
-.mgdb-reference-page .reference-advanced > summary strong { display: block; }
-.mgdb-reference-page .reference-advanced > summary small {
-  display: block;
-  margin-top: 2px;
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
-  font-weight: 400;
+.mgdb-reference-page .reference-advanced-body,
+.mgdb-reference-page .reference-adv-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-4);
+  padding: var(--mgdb-space-4);
+  border-top: 1px solid var(--hub-line-soft, #eef2f8);
+  background: var(--hub-surface, #ffffff);
 }
 
-/* Checkbox rows: the control and its label sit on one line. */
+.mgdb-reference-page .reference-advanced-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--mgdb-space-4);
+  align-items: start;
+}
+
+.mgdb-reference-page .reference-advanced-grid .mgdb-hint {
+  display: block;
+  margin-top: var(--mgdb-space-1);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-reference-page .reference-advanced-checkboxes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--mgdb-space-3);
+  padding-top: var(--mgdb-space-2);
+  border-top: 1px solid var(--hub-line-soft, #eef2f8);
+}
+
 .mgdb-reference-page .reference-check {
   display: flex;
   gap: var(--mgdb-space-2);
-  align-items: center;
+  align-items: flex-start;
   margin: 0;
-  font-weight: 600;
+  font-size: var(--mgdb-text-sm);
+  cursor: pointer;
 }
 
 .mgdb-reference-page .reference-check input {
   width: auto;
   min-height: 0;
-  margin: 0;
+  margin-top: 3px;
   accent-color: var(--mgdb-green-dark);
 }
 
-.mgdb-reference-page .reference-reset { margin-top: var(--mgdb-space-4); }
+.mgdb-reference-page .reference-check span strong {
+  display: block;
+  color: var(--mgdb-ink);
+}
+
+.mgdb-reference-page .reference-check .mgdb-hint {
+  display: block;
+  margin-top: 2px;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 400;
+}
+
+.mgdb-reference-page .reference-advanced-actions,
+.mgdb-reference-page .reference-adv-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  padding-top: var(--mgdb-space-2);
+}
+
+.mgdb-reference-page .reference-advanced-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--hub-line, #e3e9f2);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface, #ffffff);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--mgdb-dur-fast), background var(--mgdb-dur-fast), color var(--mgdb-dur-fast);
+}
+
+.mgdb-reference-page .reference-advanced-reset-btn:hover {
+  border-color: var(--mgdb-line-strong);
+  background: var(--hub-surface-alt, #f7f9fc);
+  color: var(--mgdb-ink);
+}
 
 /* Dashboard ---------------------------------------------------------------- */
 
@@ -455,19 +529,381 @@
 
 /* Results ------------------------------------------------------------------ */
 
-.mgdb-reference-page .reference-results-heading {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-3) var(--mgdb-space-5);
-  align-items: end;
-  justify-content: space-between;
-  padding-bottom: var(--mgdb-space-3);
-  border-bottom: 1px solid var(--mgdb-line);
+.mgdb-reference-page .reference-results-section {
+  margin-top: var(--mgdb-space-5);
 }
 
-.mgdb-reference-page #reference-results-status {
+.mgdb-reference-page .reference-results-section[hidden] { display: none; }
+
+.mgdb-reference-page .reference-results-status {
+  margin: var(--mgdb-space-1) 0 var(--mgdb-space-4);
   color: var(--mgdb-ink-soft);
   font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-reference-page .reference-results-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: flex-end;
+  margin-bottom: var(--mgdb-space-4);
+}
+
+.mgdb-reference-page .reference-results-filter {
+  flex: 1 1 240px;
+  min-width: 200px;
+  position: relative;
+}
+
+.mgdb-reference-page .reference-results-filter > label {
+  padding-right: 7rem;
+}
+
+.mgdb-reference-page .reference-results-filter input {
+  width: 100%;
+}
+
+.mgdb-reference-page .reference-results-filter .mgdb-result-count,
+.mgdb-reference-page #reference-filter-count {
+  position: absolute;
+  right: 0;
+  bottom: calc(var(--mgdb-tap-target) + 6px);
+  margin: 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.mgdb-reference-page .reference-results-toolbar .reference-results-export .mgdb-button {
+  height: var(--mgdb-tap-target);
+  min-height: var(--mgdb-tap-target);
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.mgdb-reference-page .reference-results-formats {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mgdb-space-1);
+  height: var(--mgdb-tap-target);
+  box-sizing: border-box;
+}
+
+.mgdb-reference-page .reference-formats-label {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  margin-right: 2px;
+}
+
+.mgdb-reference-page .reference-formats-links {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.mgdb-reference-page .reference-format-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  border: 1px solid var(--hub-line, #e3e9f2);
+  border-radius: 4px;
+  background: var(--hub-surface, #ffffff);
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  text-decoration: none;
+  transition: all .15s ease;
+}
+
+.mgdb-reference-page .reference-format-link:hover {
+  border-color: var(--mgdb-gold);
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+  text-decoration: none;
+}
+
+/* View Toggle */
+.mgdb-reference-page .reference-results-view {
+  display: inline-flex;
+  align-items: flex-end;
+}
+
+.mgdb-reference-page .reference-results-view .mgdb-view-toggle {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-alt);
+  height: var(--mgdb-tap-target);
+  box-sizing: border-box;
+  align-items: center;
+}
+
+.mgdb-reference-page .reference-results-view .mgdb-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+  padding: 0 10px;
+  border: none;
+  border-radius: calc(var(--mgdb-radius-sm) - 2px);
+  background: transparent;
+  color: var(--mgdb-muted);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+}
+
+.mgdb-reference-page .reference-results-view .mgdb-view-btn:hover:not(.is-active):not([aria-pressed="true"]) {
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+}
+
+.mgdb-reference-page .reference-results-view .mgdb-view-btn.is-active,
+.mgdb-reference-page .reference-results-view .mgdb-view-btn[aria-pressed="true"] {
+  background: var(--mgdb-green-dark) !important;
+  color: #ffffff !important;
+  box-shadow: var(--mgdb-shadow-xs);
+}
+
+.mgdb-reference-page .reference-results-view .mgdb-view-btn.is-active svg,
+.mgdb-reference-page .reference-results-view .mgdb-view-btn[aria-pressed="true"] svg {
+  fill: #ffffff;
+  color: #ffffff;
+}
+
+/* ── Table View ──────────────────────────────────────────────────────────── */
+
+.mgdb-reference-page .reference-table-wrap {
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-reference-page .reference-table thead th button[data-sort-key] {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mgdb-space-1);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-reference-page .reference-table thead th button[data-sort-key]::after {
+  content: "\21C5";
+  font-size: .8em;
+  opacity: .5;
+}
+
+.mgdb-reference-page .reference-table thead th[aria-sort="ascending"] button[data-sort-key]::after {
+  content: "\2191";
+  opacity: 1;
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-reference-page .reference-table thead th[aria-sort="descending"] button[data-sort-key]::after {
+  content: "\2193";
+  opacity: 1;
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-reference-page .reference-title-cell strong {
+  display: block;
+  font-size: var(--mgdb-text-base);
+  line-height: 1.35;
+}
+
+.mgdb-reference-page .reference-title-cell a {
+  color: var(--mgdb-ink);
+  text-decoration: none;
+}
+
+.mgdb-reference-page .reference-title-cell a:hover {
+  color: var(--mgdb-green-dark);
+  text-decoration: underline;
+}
+
+.mgdb-reference-page .reference-citation-text {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  margin-top: 4px;
+}
+
+.mgdb-reference-page .reference-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  background: var(--mgdb-surface-alt);
+  color: var(--mgdb-ink);
+}
+
+.mgdb-reference-page .reference-badge-gold {
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+  border: 1px solid var(--mgdb-gold);
+}
+
+.mgdb-reference-page .reference-badge-green {
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-reference-page .reference-id-links {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-reference-page .reference-id-links a {
+  color: var(--mgdb-leaf);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.mgdb-reference-page .reference-id-links a:hover {
+  text-decoration: underline;
+}
+
+.mgdb-reference-page .reference-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .12s, border-color .12s, color .12s;
+  white-space: nowrap;
+}
+
+.mgdb-reference-page .reference-copy-btn:hover {
+  border-color: var(--mgdb-green-dark);
+  color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+}
+
+/* ── Result Cards (Card View) ────────────────────────────────────────────── */
+
+.mgdb-reference-page .reference-card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--mgdb-space-5);
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-reference-page .reference-card-grid[hidden],
+.mgdb-reference-page .reference-table-wrap[hidden] {
+  display: none !important;
+}
+
+.mgdb-reference-page .reference-result-card {
+  position: relative;
+  display: flex;
+  gap: var(--mgdb-space-3);
+  padding: var(--mgdb-space-5);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.mgdb-reference-page .reference-result-card:hover {
+  border-color: var(--mgdb-gold-dark);
+  box-shadow: var(--mgdb-shadow-sm);
+}
+
+.mgdb-reference-page .reference-result-card.is-editorial-pick {
+  border-left: 4px solid var(--mgdb-gold);
+}
+
+.mgdb-reference-page .reference-result-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: center;
+  margin-bottom: var(--mgdb-space-2);
+}
+
+.mgdb-reference-page .reference-result-card h3 {
+  margin: 0 0 var(--mgdb-space-2);
+  font-size: var(--mgdb-text-base);
+  line-height: 1.35;
+}
+
+.mgdb-reference-page .reference-result-card h3 a {
+  color: var(--mgdb-ink);
+  text-decoration: none;
+}
+
+.mgdb-reference-page .reference-result-card h3 a:hover {
+  color: var(--mgdb-green-dark);
+  text-decoration: underline;
+}
+
+.mgdb-reference-page .reference-result-authors {
+  margin: 0 0 var(--mgdb-space-1);
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-reference-page .reference-result-citation {
+  margin: 0 0 var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-style: italic;
+}
+
+.mgdb-reference-page .reference-result-abstract {
+  margin: var(--mgdb-space-2) 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: 1.5;
+}
+
+.mgdb-reference-page .reference-result-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: center;
+  margin-top: var(--mgdb-space-3);
+  padding-top: var(--mgdb-space-2);
+  border-top: 1px solid var(--hub-line-soft, #eef2f8);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-reference-page .reference-result-links a {
+  color: var(--mgdb-green-dark);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.mgdb-reference-page .reference-result-links a:hover {
+  text-decoration: underline;
+  color: var(--mgdb-leaf);
+}
+
+.mgdb-reference-page .reference-editorial-badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--mgdb-gold-soft);
+  border: 1px solid var(--mgdb-gold);
+  color: var(--mgdb-gold-dark);
+  font-size: var(--mgdb-text-xs);
   font-weight: 700;
 }
 
@@ -485,18 +921,26 @@
   font-weight: 700;
 }
 
-.mgdb-reference-page .reference-export-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-3);
-  align-items: center;
-  margin-top: var(--mgdb-space-4);
+.mgdb-reference-page .reference-selection-bar button {
+  padding: 4px 10px;
+  border: 1px solid var(--mgdb-green);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-green-dark);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .12s ease;
+}
+
+.mgdb-reference-page .reference-selection-bar button:hover {
+  background: var(--mgdb-green-dark);
+  color: #fff;
 }
 
 .mgdb-reference-page .reference-select-page { display: flex; gap: var(--mgdb-space-2); align-items: center; margin: 0; font-size: var(--mgdb-text-sm); }
 .mgdb-reference-page .reference-select-page input { width: auto; min-height: 0; margin: 0; accent-color: var(--mgdb-green-dark); }
-
-.mgdb-reference-page #reference-results { margin-top: var(--mgdb-space-4); }
 
 .mgdb-reference-page mark { background: #fdf0c4; color: inherit; font-weight: 700; }
 
@@ -537,7 +981,7 @@
 
 @media (max-width: 767px) {
   .mgdb-reference-page .reference-chart-grid { grid-template-columns: 1fr; }
-  .mgdb-reference-page .reference-search-submit,
-  .mgdb-reference-page .reference-search-submit .mgdb-button { width: 100%; }
+  .mgdb-reference-page .reference-query-submit { width: 100%; }
+  .mgdb-reference-page .reference-advanced-grid { grid-template-columns: 1fr; }
   .mgdb-reference-page .reference-result-card { padding: var(--mgdb-space-4); }
 }

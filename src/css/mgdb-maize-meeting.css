@@ -379,6 +379,13 @@
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: var(--mgdb-space-4);
   margin-top: var(--mgdb-space-4);
+  /* Cards size to their own content rather than stretching to the tallest in
+     the row. Grid's default is stretch, and once the cards carried a committee
+     expander that meant opening one 11-name list took its four neighbours from
+     329px to 867px each -- a whole row of mostly empty cards. The cost is that
+     the canceled 2020 card, whose note runs to two lines, sits 22px taller than
+     the rest of its row. */
+  align-items: start;
 }
 
 .mgdb-meeting-page .meeting-archive-card {
@@ -426,7 +433,20 @@
 }
 
 .mgdb-meeting-page .meeting-archive-year { color: var(--mgdb-red); font-size: var(--mgdb-text-xl); font-weight: 900; }
-.mgdb-meeting-page .meeting-archive-copy strong { margin-top: var(--mgdb-space-1); color: var(--mgdb-green-dark); font-size: var(--mgdb-text-base); }
+/* Two lines are reserved for the location whether it needs them or not. Card
+   heights are set by whether it wraps -- "Lake Geneva, Wisconsin" takes two
+   lines, "Allerton Park, Illinois" one -- so with align-items: start the 1959
+   card stood 25px shorter than the 1997-1999 cards beside it. Reserving the
+   second line levels every card in the archive rather than only that row, and
+   without going back to stretch, which is what made an open expander drag its
+   whole row to 867px. */
+.mgdb-meeting-page .meeting-archive-copy strong {
+  margin-top: var(--mgdb-space-1);
+  min-height: calc(2 * var(--mgdb-leading-snug) * var(--mgdb-text-base));
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-base);
+  line-height: var(--mgdb-leading-snug);
+}
 .mgdb-meeting-page .meeting-archive-copy small { margin-top: var(--mgdb-space-1); color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
 
 /* The closing panel is the shell's green Related resources block now
@@ -759,6 +779,73 @@
   color: var(--mgdb-green-dark);
   font-size: var(--mgdb-text-sm);
   font-weight: 700;
+}
+
+/* The per-card leadership expander -------------------------------------------
+
+   Same content and the same two-column list as the upcoming card's
+   .meeting-leadership, but inside an archive card, which is narrower and has a
+   hard edge to sit against. Closed, it is one line at the foot of the card. An
+   open one does not disturb its neighbours -- but only because the grid above
+   sets align-items: start; with grid's default stretch it dragged every card in
+   the row to its own height.
+   -------------------------------------------------------------------------- */
+
+.mgdb-meeting-page .meeting-archive-more {
+  margin-top: var(--mgdb-space-3);
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px dashed var(--hub-line);
+}
+
+/* The native disclosure triangle is a list marker, and a list marker is painted
+   OUTSIDE its box -- so it hung to the left of the card's 16px text column while
+   every other line in the card started inside it. Hidden, and replaced by a
+   caret written after the label, which leaves the words flush with the year,
+   the location and the Website link above them. */
+.mgdb-meeting-page .meeting-archive-more > summary {
+  cursor: pointer;
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  list-style: none;
+}
+
+.mgdb-meeting-page .meeting-archive-more > summary::-webkit-details-marker { display: none; }
+
+.mgdb-meeting-page .meeting-archive-more > summary::after {
+  content: " \203A";
+  display: inline-block;
+  margin-left: var(--mgdb-space-2);
+  transition: transform .15s ease;
+}
+
+.mgdb-meeting-page .meeting-archive-more[open] > summary::after { transform: rotate(90deg); }
+
+.mgdb-meeting-page .meeting-archive-more > summary:hover { color: var(--mgdb-gold-dark); }
+.mgdb-meeting-page .meeting-archive-more > summary:focus-visible {
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: 2px;
+}
+
+/* One column inside a card: the shared grid's 180px minimum would fit two
+   tracks in a wide card and one in a narrow one, so the committee and the host
+   would sit side by side on some cards and stacked on others in the same row. */
+.mgdb-meeting-page .meeting-archive-more .meeting-event-people {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--mgdb-space-3);
+}
+
+/* The names are links here, where the upcoming card's are plain text. They are
+   the card's third kind of link, so they are not given the link colour as well
+   -- the underline on hover is enough to separate them from the label. */
+.mgdb-meeting-page .meeting-archive-more li a {
+  color: var(--mgdb-ink);
+  text-decoration: none;
+}
+.mgdb-meeting-page .meeting-archive-more li a:hover,
+.mgdb-meeting-page .meeting-archive-more li a:focus-visible {
+  color: var(--mgdb-green-dark);
+  text-decoration: underline;
 }
 
 /* Cover art ----------------------------------------------------------------

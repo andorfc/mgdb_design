@@ -1,0 +1,17 @@
+$$SYNTAX-LEVEL 2
+*(login-passthrough
+    <form action="$(nexturl)" method="post" name="postform">
+      @(params
+        <input type="hidden" name="$(key)" id="$(key)" value="$(value)">
+      )
+    </form>
+    
+    <div align="center">
+       <br>
+       <i>loading form...</i>
+    </div>
+    
+    <script language="JavaScript">
+      document.postform.submit\(\);
+    </script>
+)

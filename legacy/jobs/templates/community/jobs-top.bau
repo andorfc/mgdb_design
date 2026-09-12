@@ -1,0 +1,160 @@
+$$SYNTAX-LEVEL 2
+*(jobs-top
+<div id='top_text'>
+  <b>Jobs available: Click on the name of the job to read more about it.</b>
+  <br><br>
+  <table width='866px'>
+    <tr>
+      <th>Date Posted</th>
+      <th>Apply by</th>
+      <th>Title</th>
+      <th>Location</th>
+      @(inits {display: off}
+        $(index {default: 1})
+      )
+    </tr>  
+    @(jobs-create-table-top
+      <tr &(color-row
+            $index = $this->reflect(\)->upstream('jobs-top'\)->get('index'\);
+            $idval = $index->value(\);
+            $idstr = "";
+            if ($idval % 2 == 0\) {
+              $idstr = "id='table-even'";
+            }
+            else {
+              $idstr = "id='table-odd'";
+            }
+            $index->replace($idval + 1\);
+            return $idstr;
+          )>
+        <td>$(DatePosted)</td>
+        <td>$(ApplyBy)</td>
+        <td><a href="#$(JobNum)">$(Title)</a></td>
+        <td>$(Location)
+      </tr>
+    )      
+  </table>
+  
+  <br>
+  <img src='/icon/add.gif'>
+  <a href="#" onclick="toggleItem('post_job'\)">Add your job posting here!</a>
+  <div id="post_job" 
+       style="display:$(addjobdisplay {default:none});margin:0 0 0 30px;background-color:#f0f0f0;width:550px">
+    <b style="font-size: 130%">Submit Job Information</b>
+    <p>
+      Would you like for your job posting to be listed at MaizeGDB? Just fill 
+      out this form, and our curation team will review your submission; provided 
+      that it is valid, it will be added to the MaizeGDB job board.
+    </p>
+    @(job-submit-error {display: off}
+      <span class="error">
+        <br>
+        There are one or more errors in your submission:
+        <br><br>
+        <b>$(error)</b>
+        <br><br>
+      </span>
+    )
+    <form method="post" action="">
+      <p>Name of Job Contact <font color="red">required</font><br>
+      <input type="text" name="ContactName" size=30 value=$(ContactName)><br>
+      Email Address of Job Contact <font color="red">required</font><br>
+      <input type="text" name="ContactEmail" size=30 value=$(ContactEmail)><br>
+      Position Title <font color="red">required</font><br>
+      <input type="text" name="JobTitle" size=40 value=$(JobTitle)><br>
+      Location (city, state/province, country\) <font color="red">required</font><br>
+      <input type="text" name="Location" size=40 value=$(Location)><br>
+      Minimum Degree Required: 
+      <select name="DegreeRequired">
+        <option value="">None</option>
+        <option value="Bachelors">Bachelors</option>
+        <option value="Masters">Masters</option>
+        <option value="Doctorate">Doctorate</option>
+      </select>
+      <br>
+      Area of Degree (e.g., developmental biology, etc.\)<br>
+      <input type="text" name="AreaOfStudy" size=30 value=$(AreaOfStudy)><br>
+      Apply By: 
+      <select name="ApplyBy_month">
+        <option value="">N/A</option>
+        <option value="January">January</option>
+        <option value="February">February</option>
+        <option value="March">March</option>
+        <option value="April">April</option>
+        <option value="May">May</option>
+        <option value="June">June</option>
+        <option value="July">July</option>
+        <option value="August">August</option>
+        <option value="September">September</option>
+        <option value="October">October</option>
+        <option value="October">November</option>
+        <option value="December">December</option>
+      </select>&nbsp;<select name="ApplyBy_day">
+        <option value="">N/A</option>
+        <option value=1>1</option>
+        <option value=2>2</option>
+        <option value=3>3</option>
+        <option value=4>4</option>
+        <option value=5>5</option>
+        <option value=6>6</option>
+        <option value=7>7</option>
+        <option value=8>8</option>
+        <option value=9>9</option>
+        <option value=10>10</option>
+        <option value=11>11</option>
+        <option value=12>12</option>
+        <option value=13>13</option>
+        <option value=14>14</option>
+        <option value=15>15</option>
+        <option value=16>16</option>
+        <option value=17>17</option>
+        <option value=18>18</option>
+        <option value=19>19</option>
+        <option value=20>20</option>
+        <option value=21>21</option>
+        <option value=22>22</option>
+        <option value=23>23</option>
+        <option value=24>24</option>
+        <option value=25>25</option>
+        <option value=26>26</option>
+        <option value=27>27</option>
+        <option value=28>28</option>
+        <option value=29>29</option>
+        <option value=30>30</option>
+        <option value=31>31</option>
+      </select>,&nbsp;<select name="ApplyBy_year">
+        <option value="">N/A</option>
+        <option value="$(cur_year)">$(cur_year)</option>
+        <option value="$(next_year)">$(next_year)</option>
+      </select>
+      <br>
+      Responsibilities: <font color="red">required</font><br>
+      <textarea id="Responsibilities" name="Responsibilities" rows=7 cols=62 
+                WRAP=virtual>$(Responsibilities)</textarea>
+      <br>
+      Other Requirements:<br>
+      <textarea id="OtherRequirements" name="OtherRequirements" rows=7 cols=62 
+                WRAP=virtual>$(OtherRequirements)</textarea>
+      <textarea id="OtherNotes" name="OtherNotes" rows=7 cols=62 
+                WRAP=virtual>$(OtherNotes)</textarea>
+      <br>
+      <input type=submit name="SubmitJob" id="SubmitJob" value="Submit Job Info">
+    </form>
+  </div>
+  
+  @(job-submitted {display: off}
+    <br><br>
+    <div id="post_job" 
+         style="margin:0 0 0 30px;background-color:#f0f0f0;width:550px">
+      <p><b style="font-size: 130%">Thanks for submitting your job position!</b></p>
+      <p>
+        Our curatorial staff will review the submission and add it to the  
+        MaizeGDB job board. If the position has not been posted by the next business day 
+        please contact John Portwood at <a href="mailto:john.portwood@ars.usda.gov">john.portwood@ars.usda.gov</a>
+      </p>
+    </div>
+  )
+  
+  <br><br>
+</div>
+)

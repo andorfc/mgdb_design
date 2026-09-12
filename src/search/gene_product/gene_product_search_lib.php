@@ -124,12 +124,15 @@ function gpSearch($DBConn, $filters = array(), $limit = 50, $offset = 0) {
 
     $term = isset($filters['term']) ? trim($filters['term']) : '';
     if ($term !== '') {
-        $like = '%' . strtolower($term) . '%';
-        $params[] = $like;
-        $params[] = $like;
-        $params[] = $like;
-        $params[] = $like;
-        $params[] = $like;
+        $termPattern = str_replace('*', '%', strtolower($term));
+        if (strpos($termPattern, '%') === false) {
+            $termPattern = '%' . $termPattern . '%';
+        }
+        $params[] = $termPattern;
+        $params[] = $termPattern;
+        $params[] = $termPattern;
+        $params[] = $termPattern;
+        $params[] = $termPattern;
         $where[] = "(
             LOWER(gp.name) LIKE ?
             OR EXISTS (SELECT 1 FROM mgdb.synonyms s WHERE s.id = gp.id AND LOWER(s.synonyms) LIKE ?)
@@ -169,6 +172,24 @@ function gpSearch($DBConn, $filters = array(), $limit = 50, $offset = 0) {
 
     $whereSql = implode(' AND ', $where);
 
+    $sort = isset($filters['sort']) ? trim($filters['sort']) : '';
+    $orderClause = "gp.name ASC";
+    if ($sort === 'name-desc') {
+        $orderClause = "gp.name DESC";
+    } elseif ($sort === 'type-asc') {
+        $orderClause = "(SELECT t.name FROM mgdb.term t WHERE t.id = gp.type) ASC NULLS LAST, gp.name ASC";
+    } elseif ($sort === 'type-desc') {
+        $orderClause = "(SELECT t.name FROM mgdb.term t WHERE t.id = gp.type) DESC NULLS LAST, gp.name ASC";
+    } elseif ($sort === 'ec-asc') {
+        $orderClause = "(SELECT MIN(ec.ec_num) FROM mgdb.gene_prod_ec_num ec WHERE ec.id = gp.id) ASC NULLS LAST, gp.name ASC";
+    } elseif ($sort === 'ec-desc') {
+        $orderClause = "(SELECT MIN(ec.ec_num) FROM mgdb.gene_prod_ec_num ec WHERE ec.id = gp.id) DESC NULLS LAST, gp.name ASC";
+    } elseif ($sort === 'encoded-asc') {
+        $orderClause = "(SELECT MIN(l.name) FROM mgdb.locus_gene_products lgp JOIN mgdb.locus l ON l.id = lgp.id WHERE lgp.gene_product = gp.id) ASC NULLS LAST, gp.name ASC";
+    } elseif ($sort === 'encoded-desc') {
+        $orderClause = "(SELECT MIN(l.name) FROM mgdb.locus_gene_products lgp JOIN mgdb.locus l ON l.id = lgp.id WHERE lgp.gene_product = gp.id) DESC NULLS LAST, gp.name ASC";
+    }
+
     /* The page is fetched one row long so a short page can report its own
        total, and the COUNT is paid for only when the page comes back full.
 
@@ -186,7 +207,7 @@ function gpSearch($DBConn, $filters = array(), $limit = 50, $offset = 0) {
        returned 18 products instead of 763, silently. */
     $probe = $limit + 1;
 
-    $idSql = "SELECT DISTINCT gp.id, gp.name FROM mgdb.gene_product gp JOIN mgdb.id_num i ON i.id = gp.id WHERE {$whereSql} ORDER BY gp.name ASC LIMIT {$probe} OFFSET {$offset}";
+    $idSql = "SELECT gp.id, gp.name FROM mgdb.gene_product gp JOIN mgdb.id_num i ON i.id = gp.id WHERE {$whereSql} ORDER BY {$orderClause} LIMIT {$probe} OFFSET {$offset}";
     $idRows = get_all_rows(make_query($DBConn, $idSql, 1, $params));
     $idRows = is_array($idRows) ? $idRows : array();
 
@@ -236,11 +257,10 @@ function gpSearch($DBConn, $filters = array(), $limit = 50, $offset = 0) {
         LEFT JOIN mgdb.gene_prod_metabolic_pathway gpmp ON gpmp.id = gp.id
         LEFT JOIN mgdb.description d_pw ON d_pw.id = gpmp.metabolic_pathway
         WHERE gp.id IN ({$idList})
-        GROUP BY gp.id, gp.name, t.name
-        ORDER BY gp.name ASC";
+        GROUP BY gp.id, gp.name, t.name";
 
     $detailRows = get_all_rows(make_query($DBConn, $detailSql));
-    $results = array();
+    $detailMap = array();
 
     foreach ($detailRows as $row) {
         $syns = gpParsePgArray($row['synonyms']);
@@ -262,7 +282,7 @@ function gpSearch($DBConn, $filters = array(), $limit = 50, $offset = 0) {
             }
         }
 
-        $results[] = array(
+        $detailMap[(int) $row['id']] = array(
             'id'            => (int) $row['id'],
             'name'          => $row['name'],
             'url'           => '/data_center/gene_product?id=' . (int) $row['id'],
@@ -274,6 +294,13 @@ function gpSearch($DBConn, $filters = array(), $limit = 50, $offset = 0) {
             'localizations' => $locs,
             'pathways'      => $pws
         );
+    }
+
+    $results = array();
+    foreach ($ids as $id) {
+        if (isset($detailMap[$id])) {
+            $results[] = $detailMap[$id];
+        }
     }
 
     return array(

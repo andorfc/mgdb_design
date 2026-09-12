@@ -1,0 +1,341 @@
+$$SYNTAX-LEVEL 2
+*(mgdb-api
+<main class="mgdb-page mgdb-hub-page mgdb-api-page" id="api-main">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/download">Data</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">API</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="api-title">
+    <div class="mgdb-hero-emblem">
+      <svg class="api-hero-icon" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+        <path d="M22 10c-6 0-9 3-9 9v7c0 3-2 5-5 6 3 1 5 3 5 6v7c0 6 3 9 9 9" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M42 10c6 0 9 3 9 9v7c0 3 2 5 5 6-3 1-5 3-5 6v7c0 6-3 9-9 9" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+        <circle cx="26" cy="32" r="2.6" fill="currentColor" /><circle cx="32" cy="32" r="2.6" fill="currentColor" /><circle cx="38" cy="32" r="2.6" fill="currentColor" />
+      </svg>
+      <strong>JSON<br />API v1</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="api-title">MaizeGDB API</h1>
+      <p class="mgdb-hero-description">Every curated MaizeGDB record as JSON, one request per record, and the same record as linked data. Read-only, no key, no account.</p>
+      <p class="api-hero-base"><span>Base URL</span> <code id="api-base-url">$(api_base)/api/v1</code> <button type="button" class="mgdb-button mgdb-button-quiet mgdb-button-sm mgdb-ref-copy" data-copy-target="api-base-url">Copy</button></p>
+    </div>
+  </section>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#api-overview" class="is-current" aria-current="true">Overview</a>
+    <a href="#api-quickstart">Quick start</a>
+    <a href="#api-endpoints">Endpoints</a>
+    <a href="#api-types">Record types</a>
+    <a href="#api-identifiers">Identifiers</a>
+    <a href="#api-response">Response</a>
+    <a href="#api-caching">Caching and errors</a>
+    <a href="#api-linked-data">Linked data</a>
+    <a href="#api-try">Try it</a>
+    <a href="#api-related">Related resources</a>
+  </nav>
+
+  <!-- ============ OVERVIEW ============ -->
+  <section id="api-overview" aria-labelledby="api-overview-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="api-overview-title">Overview</h2></div>
+    </div>
+
+    <div class="api-two-col">
+      <div>
+        <h3>What it is</h3>
+        <p>The API serves the same records the website shows, assembled server-side into one JSON document per record. A gene record carries its transcripts, ontology terms, insertions, pan-gene members, orthologs, map positions, references and sequence links in a single response; the page at <a href="/gene_center/gene/Zm00001eb067740">/gene_center/gene/Zm00001eb067740</a> is rendered from exactly that response.</p>
+        <ul class="api-facts">
+          <li><strong>Read-only.</strong> GET, HEAD and OPTIONS. Nothing here can change the database.</li>
+          <li><strong>No key and no account.</strong> Requests are anonymous. Responses carry <code>Access-Control-Allow-Origin: *</code>, so a browser on any site can call it.</li>
+          <li><strong>Seventeen record types.</strong> Genes, pan-genes, loci, gene products, variations, phenotypes, stocks, references, terms, markers, primers, maps, linkage groups, QTL experiments, gel patterns, recombination datasets and map scores.</li>
+          <li><strong>Two representations.</strong> The API&#39;s own JSON by default; JSON-LD with schema.org and Bioschemas types on request.</li>
+          <li><strong>Conditional requests.</strong> Every response has a strong <code>ETag</code>; an unchanged record answers <code>304</code> with no body.</li>
+          <li><strong>One error shape.</strong> RFC 9457 problem details, as <code>application/problem+json</code>.</li>
+          <li><strong>Public domain.</strong> MaizeGDB is a U.S. Government work; the data and this interface carry no license restriction. Please <a href="/cite">cite MaizeGDB</a> in work that uses it.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Using it well</h3>
+        <ul class="api-facts">
+          <li><strong>Ask for what you need.</strong> <code>fields=overview,pedigree</code> skips the queries behind every other section. A full gene record costs about 25 database queries; <code>fields=overview</code> costs 5.</li>
+          <li><strong>Send the ETag back.</strong> Records change on a monthly curation cycle. A client that stores the <code>ETag</code> and sends <code>If-None-Match</code> gets a <code>304</code> and moves on.</li>
+          <li><strong>Whole datasets come from the download site.</strong> Fetching every gene one record at a time is slower for you and heavier for the server than one file from <a href="/download">Downloads</a>. The API is for records, the download site is for collections.</li>
+          <li><strong>Say who you are.</strong> A <code>User-Agent</code> that names your project and a contact address lets the team reach you if a script misbehaves, instead of blocking it.</li>
+          <li><strong>Versioning.</strong> This is <code>v1</code>. Adding a key, a section or a record type does not change the version. Removing or renaming one would ship as <code>v2</code> at a new path, and <code>v1</code> would keep answering.</li>
+          <li><strong>Questions and problems</strong> go to the <a href="/feedback">feedback form</a>. Include the <code>X-Request-Id</code> from the response and the team can find the request in the log.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ QUICK START ============ -->
+  <section id="api-quickstart" aria-labelledby="api-quickstart-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="api-quickstart-title">Quick start</h2></div>
+    </div>
+    <p class="mgdb-section-intro">Each example is complete and runs as written against this instance. Pick a language once; the choice applies to every example on the page.</p>
+    $(examples)
+  </section>
+
+  <!-- ============ ENDPOINTS AND PARAMETERS ============ -->
+  <section id="api-endpoints" aria-labelledby="api-endpoints-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="api-endpoints-title">Endpoints and parameters</h2></div>
+    </div>
+
+    <div class="api-endpoints">
+      <div class="api-endpoint">
+        <div class="api-endpoint-line"><span class="api-method">GET</span><code>/api/v1/records/{type}/{id}</code></div>
+        <p>One record, fully assembled. <code>{type}</code> is one of the seventeen record types below; <code>{id}</code> is a name or a numeric id, see <a href="#api-identifiers">Identifiers</a>. Answers <code>200</code> with the envelope, <code>304</code> when the <code>ETag</code> matches, <code>404</code> when nothing resolves.</p>
+      </div>
+      <div class="api-endpoint">
+        <div class="api-endpoint-line"><span class="api-method">GET</span><code>/api/v1/</code></div>
+        <p>The service description: every record type with its sections, the identifiers it accepts, an example URL, and the conventions. A client can start from this document alone.</p>
+      </div>
+      <div class="api-endpoint">
+        <div class="api-endpoint-line"><span class="api-method">GET</span><code>/api/v1/openapi</code></div>
+        <p>The <a href="$(openapi_url)">OpenAPI 3.1 document</a>, generated for this instance so the server URL is right. Load it into any OpenAPI client to get typed calls. It is served without a <code>.json</code> extension on purpose.</p>
+      </div>
+      <div class="api-endpoint">
+        <div class="api-endpoint-line"><span class="api-method">GET</span><code>/api/docs</code></div>
+        <p>This page. <code>/api</code> also serves it to a browser, and the version list as JSON to anything else.</p>
+      </div>
+    </div>
+
+    <h3 class="api-subhead">Query parameters</h3>
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table api-table">
+        <thead><tr><th scope="col">Parameter</th><th scope="col">Applies to</th><th scope="col">What it does</th></tr></thead>
+        <tbody>
+          <tr><th scope="row"><code>fields</code></th><td>every record</td><td>Comma-separated sections to return. Omit it for all of them. An unknown name is a <code>400</code> that lists the sections the type has, rather than a silent no-op. The sections per type are in <a href="#api-types">Record types</a>.</td></tr>
+          <tr><th scope="row"><code>max_items</code></th><td>every record</td><td>Cap on any one embedded list, default 500, at most 5000. Some gene models carry over 2,000 insertions and some maps over 5,000 coordinates. <code>meta.counts</code> keeps the true totals and <code>meta.truncated</code> names every list that was cut, so a client can always tell a full list from a page.</td></tr>
+          <tr><th scope="row"><code>protein_length</code></th><td>gene</td><td>Set to <code>1</code> to include <code>structure.protein.length_aa</code>. Off by default because protein length is not held in this database and has to be read from the sequence service, which costs about 470 ms. On failure the field is null and <code>meta.warnings</code> says why.</td></tr>
+          <tr><th scope="row"><code>format</code></th><td>every record</td><td><code>json</code> &#40;default&#41; or <code>jsonld</code>. See <a href="#api-linked-data">Linked data</a>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="api-subhead">Request headers</h3>
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table api-table">
+        <thead><tr><th scope="col">Header</th><th scope="col">What it does</th></tr></thead>
+        <tbody>
+          <tr><th scope="row"><code>Accept</code></th><td><code>application/json</code>, <code>application/ld+json</code> or <code>*/*</code>. Asking only for something else answers <code>406</code>. An <code>Accept</code> that names <code>application/ld+json</code> and not <code>application/json</code> is the same as <code>format=jsonld</code>.</td></tr>
+          <tr><th scope="row"><code>If-None-Match</code></th><td>An <code>ETag</code> from an earlier response. Answers <code>304</code> while the record is unchanged. Weak validators &#40;<code>W/</code>&#41; and <code>*</code> are understood.</td></tr>
+          <tr><th scope="row"><code>Accept-Encoding</code></th><td><code>gzip</code> compresses the body. A full record can run to hundreds of kilobytes of repetitive JSON; compressed it is usually under a tenth of that.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ RECORD TYPES ============ -->
+  <section id="api-types" aria-labelledby="api-types-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="api-types-title">Record types</h2></div>
+    </div>
+    <p class="mgdb-section-intro">One resource per type at <code>/api/v1/records/{type}/{id}</code>. The sections column is the vocabulary <code>fields</code> accepts; every type returns all of them when <code>fields</code> is omitted.</p>
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table api-table api-types-table">
+        <thead><tr><th scope="col">Type</th><th scope="col">What it holds</th><th scope="col">Example</th><th scope="col">Sections</th></tr></thead>
+        <tbody>
+          $(type_rows)
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ IDENTIFIERS ============ -->
+  <section id="api-identifiers" aria-labelledby="api-identifiers-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="api-identifiers-title">Identifiers</h2></div>
+    </div>
+    <div class="api-two-col">
+      <div>
+        <p>A record can be asked for by the name a person would type or by its numeric MaizeGDB id, and each type resolves several forms. Whatever was supplied, the canonical identifier comes back in <code>data.id</code> and the supplied one in <code>meta.resolved_from</code>, so two spellings of one record share one cache entry.</p>
+        <p>The gene resource reports which form matched in <code>meta.id_type</code> and lists any other record the identifier could have meant in <code>meta.other_matches</code>. A withdrawn gene model answers <code>410</code> rather than <code>404</code>, with the replacement model in the body: the identifier was valid in an earlier annotation and a client should follow it, not drop it.</p>
+        <p>A DOI contains slashes. Give it unencoded as the rest of the path, exactly as written: <code>/api/v1/records/reference/10.1016/j.molp.2020.03.003</code>. Names with spaces are percent-encoded in the usual way; <code>+</code> is a literal character in record names, not a space.</p>
+        <p>Identifiers are limited to 200 characters. A longer one is a <code>400</code>.</p>
+      </div>
+      <div class="mgdb-table-scroll">
+        <table class="mgdb-table api-table">
+          <thead><tr><th scope="col">Type</th><th scope="col">Accepted identifiers</th></tr></thead>
+          <tbody>
+            $(identifier_rows)
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RESPONSE ============ -->
+  <section id="api-response" aria-labelledby="api-response-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="api-response-title">Response</h2></div>
+    </div>
+    <div class="api-two-col api-two-col-wide">
+      <div>
+        <p>Every record answers in one envelope, so a client that can read one type can read them all.</p>
+        <dl class="api-dl">
+          <div><dt><code>api_version</code></dt><dd>The contract version, <code>1.0</code>.</dd></div>
+          <div><dt><code>meta</code></dt><dd><code>request_id</code> to quote in a bug report; <code>generated</code> in UTC; <code>elapsed_ms</code> and <code>query_count</code>, the real cost of assembling the record; <code>resolved_from</code>; <code>sections_returned</code> and <code>sections_available</code>; <code>partial</code>, true when <code>fields</code> narrowed the record; <code>counts</code>, row counts per section so a client can label tabs without fetching them; <code>truncated</code>, the lists <code>max_items</code> cut; <code>warnings</code>, present only when part of the record could not be built.</dd></div>
+          <div><dt><code>links</code></dt><dd><code>self</code>, the human page as <code>html</code>, the hub search as <code>search</code>, the linked-data form as <code>json_ld</code>, and this page as <code>documentation</code>.</dd></div>
+          <div><dt><code>data</code></dt><dd><code>type</code> and the canonical <code>id</code>; <code>attributes</code>, the record&#39;s own scalar facts; <code>sections</code>, one key per section returned, each an object or a list.</dd></div>
+        </dl>
+        <h3 class="api-subhead">Conventions</h3>
+        <ul class="api-facts">
+          <li>An absent scalar is <code>null</code> and an absent list is <code>[]</code>. Never an empty string, never a placeholder.</li>
+          <li>A list is always a list, even with one item.</li>
+          <li>Keys are <code>snake_case</code>. No value contains HTML; legacy markup in curated prose is turned into plain text and line breaks.</li>
+          <li>A pointer to another record has one shape: <code>type</code>, <code>id</code>, <code>name</code>, and <code>html</code> when a page exists.</li>
+          <li>A record built on a failed query is not published as a success. <code>0 rows</code> and <code>the query failed</code> mean opposite things, so the second is a <code>500</code> naming the failure, not a plausible zero.</li>
+        </ul>
+      </div>
+      <div class="api-code-col">
+        <p class="api-code-caption">A gene record, shortened. The real response for <code>lg1</code> is <a href="$(api_base)/api/v1/records/gene/lg1">here</a>.</p>
+        <div class="api-code"><pre id="api-envelope-example">$(envelope_example)</pre><button type="button" class="mgdb-button mgdb-button-quiet mgdb-button-sm api-copy mgdb-ref-copy" data-copy-target="api-envelope-example">Copy</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CACHING AND ERRORS ============ -->
+  <section id="api-caching" aria-labelledby="api-caching-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="api-caching-title">Caching and errors</h2></div>
+    </div>
+    <div class="api-two-col">
+      <div>
+        <h3>Caching</h3>
+        <p>Every response carries a strong <code>ETag</code> computed over the record itself, not over the request, so two requests for one record from two clients get the same validator. Send it back as <code>If-None-Match</code> and an unchanged record answers <code>304</code> with no body.</p>
+        <p>Records are sent with <code>Cache-Control: public, max-age=300</code>; the service description and the OpenAPI document with <code>max-age=86400</code>. Errors are <code>no-store</code>. Every response carries <code>Vary: Accept, Accept-Encoding, Origin</code>, which is what lets one URL answer as JSON to a script and as this page to a browser.</p>
+        <p>The data behind the API is reloaded on a curation cycle, roughly monthly. Between reloads a record does not change, so a client that keeps records for a day and revalidates with the <code>ETag</code> is never stale by more than a request.</p>
+      </div>
+      <div>
+        <h3>Errors</h3>
+        <p>Every failure is an RFC 9457 problem document, <code>application/problem+json</code>, with a stable <code>type</code> URI a program can branch on and a <code>detail</code> a person can read. The <code>request_id</code> matches the server log.</p>
+        <div class="mgdb-table-scroll">
+          <table class="mgdb-table api-table">
+            <thead><tr><th scope="col">Status</th><th scope="col"><code>type</code> ends in</th><th scope="col">Meaning</th></tr></thead>
+            <tbody>
+              <tr><td>400</td><td><code>missing-identifier</code>, <code>invalid-identifier</code></td><td>No id, or one over 200 characters.</td></tr>
+              <tr><td>400</td><td><code>unknown-field</code>, <code>no-fields</code></td><td>A name in <code>fields</code> the type does not have; the body lists the ones it does.</td></tr>
+              <tr><td>400</td><td><code>invalid-max-items</code>, <code>invalid-format</code></td><td>A value outside 1 to 5000, or a format other than json and jsonld.</td></tr>
+              <tr><td>404</td><td><code>record-not-found</code></td><td>Nothing resolves. The body carries the identifier as received.</td></tr>
+              <tr><td>404</td><td><code>unknown-record-type</code>, <code>unknown-resource</code>, <code>unknown-version</code></td><td>The path names something this version does not serve; the body lists what it does.</td></tr>
+              <tr><td>405</td><td><code>method-not-allowed</code></td><td>Anything but GET, HEAD or OPTIONS. The <code>Allow</code> header says so.</td></tr>
+              <tr><td>406</td><td><code>not-acceptable</code></td><td>An <code>Accept</code> header that names neither JSON nor JSON-LD.</td></tr>
+              <tr><td>410</td><td><code>record-withdrawn</code></td><td>A gene model withdrawn from its annotation. <code>replacement</code> and <code>replacement_html</code> point at the current model when one exists.</td></tr>
+              <tr><td>500</td><td><code>query_failed</code>, <code>encoding-failed</code></td><td>A query behind the record failed, so no partial record is served; or the record could not be serialized.</td></tr>
+              <tr><td>503</td><td><code>database-unavailable</code></td><td>The record store did not answer. Retry.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="api-code"><pre id="api-error-example">$(error_example)</pre><button type="button" class="mgdb-button mgdb-button-quiet mgdb-button-sm api-copy mgdb-ref-copy" data-copy-target="api-error-example">Copy</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LINKED DATA ============ -->
+  <section id="api-linked-data" aria-labelledby="api-linked-data-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="api-linked-data-title">Linked data</h2></div>
+    </div>
+    <div class="api-two-col api-two-col-wide">
+      <div>
+        <p>Every record is also available as JSON-LD, using schema.org types and, where one exists, a Bioschemas profile. It is built from the same payload as the JSON, never retyped, so the two cannot disagree. Three ways to reach it&#58;</p>
+        <ul class="api-facts">
+          <li><strong>On the record page.</strong> Every record page carries a <code>script type="application/ld+json"</code> block in its head, built from the record&#39;s identity, plus <code>link rel="alternate"</code> to the JSON and <code>link rel="describedby"</code> to the JSON-LD. The same two pointers are sent as an HTTP <code>Link</code> header, following <a href="https://signposting.org/">FAIR Signposting</a>, so a client that only reads headers finds them too.</li>
+          <li><strong>From the API.</strong> Add <code>?format=jsonld</code> to any record URL, or send <code>Accept: application/ld+json</code>. The response is <code>application/ld+json</code> and carries the full record&#39;s properties, where the page&#39;s block carries only what is known before the sections load.</li>
+          <li><strong>In the JSON.</strong> <code>links.json_ld</code> on every record points at the linked-data form.</li>
+        </ul>
+        <p>The context is <code>https://schema.org/</code>, with <code>bs&#58;</code> for the one Bioschemas-only type &#40;<code>bs&#58;BioSample</code>&#41; and <code>dct&#58;conformsTo</code> naming the profile. Genes carry their GO terms as <code>hasMolecularFunction</code>, <code>isInvolvedInBiologicalProcess</code> and <code>isLocatedInSubcellularLocation</code>; terms from other ontologies stay in the JSON record. Datasets name MaizeGDB as their <code>DataCatalog</code> and carry the JSON record as a <code>distribution</code>. External database entries the record already resolves to URLs become <code>sameAs</code>.</p>
+        <p>Check a document with the <a href="https://validator.schema.org/">schema.org validator</a> or the <a href="https://www.bioschemas.org/">Bioschemas</a> tooling; paste a record page URL and the head block is read as-is.</p>
+        <div class="mgdb-table-scroll">
+          <table class="mgdb-table api-table">
+            <thead><tr><th scope="col">Record type</th><th scope="col"><code>@type</code></th><th scope="col">Profile</th><th scope="col">What is mapped</th></tr></thead>
+            <tbody>
+              $(ld_rows)
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="api-code-col">
+        <p class="api-code-caption">The block a gene page embeds, for <code>lg1</code>. The API&#39;s <a href="$(api_base)/api/v1/records/gene/lg1?format=jsonld">full document</a> adds the GO terms, protein, pan-gene and cross-references.</p>
+        <div class="api-code"><pre id="api-jsonld-example">$(jsonld_example)</pre><button type="button" class="mgdb-button mgdb-button-quiet mgdb-button-sm api-copy mgdb-ref-copy" data-copy-target="api-jsonld-example">Copy</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TRY IT ============ -->
+  <section id="api-try" aria-labelledby="api-try-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="api-try-title">Try it</h2></div>
+    </div>
+    <p class="mgdb-section-intro">A live request from this page to this instance. Pick a type, keep the example identifier or type your own, and the response arrives below with its headers and timing.</p>
+    <form class="api-try-form" id="api-try-form" novalidate>
+      <div class="api-try-grid">
+        <label class="mgdb-field"><span>Record type</span>
+          <select class="mgdb-select" id="api-try-type" name="type">$(try_options)</select>
+        </label>
+        <label class="mgdb-field"><span>Identifier</span>
+          <input class="mgdb-input" id="api-try-id" name="id" type="text" value="Zm00001eb067740" autocomplete="off" spellcheck="false">
+        </label>
+        <label class="mgdb-field"><span>Sections &#40;<code>fields</code>, optional&#41;</span>
+          <input class="mgdb-input" id="api-try-fields" name="fields" type="text" placeholder="overview,function" autocomplete="off" spellcheck="false">
+        </label>
+        <label class="mgdb-field"><span>Format</span>
+          <select class="mgdb-select" id="api-try-format" name="format">
+            <option value="json">JSON</option>
+            <option value="jsonld">JSON-LD</option>
+          </select>
+        </label>
+      </div>
+      <p class="api-try-sections" id="api-try-sections" aria-live="polite"></p>
+      <div class="mgdb-form-actions api-try-actions">
+        <button type="submit" class="mgdb-button mgdb-button-primary" id="api-try-submit">Send request</button>
+        <code class="api-try-url" id="api-try-url" aria-live="polite"></code>
+      </div>
+    </form>
+    <div class="api-try-result" id="api-try-result" hidden>
+      <div class="api-try-status" id="api-try-status" aria-live="polite"></div>
+      <dl class="api-try-headers" id="api-try-headers"></dl>
+      <div class="api-try-links" id="api-try-links"></div>
+      <div class="api-code"><pre id="api-try-body" tabindex="0"></pre><button type="button" class="mgdb-button mgdb-button-quiet mgdb-button-sm api-copy mgdb-ref-copy" data-copy-target="api-try-body">Copy</button></div>
+    </div>
+  </section>
+
+  <!-- ============ RELATED ============ -->
+  <section id="api-related" class="mgdb-hub-related" aria-labelledby="api-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="api-related-title">Related resources</h2></div>
+    </div>
+    <div class="mgdb-resource-panel">
+      <div class="mgdb-resource-list">
+        <a href="$(openapi_url)">
+          <strong>OpenAPI document</strong>
+          <span>The machine-readable description of every endpoint, for this instance</span>
+        </a>
+        <a href="/download">
+          <strong>Downloads</strong>
+          <span>Whole datasets as files, when one record at a time is the wrong shape</span>
+        </a>
+        <a href="/data_center/">
+          <strong>Data hubs</strong>
+          <span>The record types as people browse them</span>
+        </a>
+        <a href="/FAIRpractices">
+          <strong>FAIR practices</strong>
+          <span>How MaizeGDB approaches findable, accessible, interoperable and reusable data</span>
+        </a>
+        <a href="/cite">
+          <strong>Cite MaizeGDB</strong>
+          <span>The papers to cite for data used in a publication</span>
+        </a>
+        <a href="/feedback">
+          <strong>Feedback form</strong>
+          <span>Report a problem or ask for a record type the API does not yet serve</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+)

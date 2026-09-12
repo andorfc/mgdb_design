@@ -72,56 +72,57 @@
    takes the slack and the button takes what it needs, with the examples and
    the accordion spanning underneath. The trait and plant-structure filters
    used to sit beside the query, which made the first row of the page three
-   controls wide; both are advanced criteria and live in the disclosure now.
+/* --------------------------------------------------------------------------
+   Search
    -------------------------------------------------------------------------- */
 
-.mgdb-phenotype-page #pheno-search-form {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--mgdb-space-4);
-  align-items: end;
+.mgdb-phenotype-page .pheno-search-form-wrap {
+  margin-bottom: var(--mgdb-space-4);
 }
 
-.mgdb-phenotype-page .pheno-field-query { grid-column: 1; }
-/* Scoped with `>` to the search form: `.mgdb-hub-field-action` is a shared
-   class and the results controls use it too. */
-.mgdb-phenotype-page #pheno-search-form > .mgdb-hub-field-action { grid-column: 2; }
-.mgdb-phenotype-page .pheno-example-row,
-.mgdb-phenotype-page .pheno-adv { grid-column: 1 / -1; }
+.mgdb-phenotype-page .pheno-query-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--mgdb-space-3);
+  align-items: stretch;
+  margin-bottom: var(--mgdb-space-3);
+}
 
 .mgdb-phenotype-page .pheno-query-control {
-  display: grid;
+  position: relative;
+  display: flex;
   box-sizing: border-box;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: var(--mgdb-space-2);
   align-items: center;
-  min-height: var(--mgdb-tap-target);
-  height: var(--mgdb-tap-target);
-  padding: 0 var(--mgdb-space-3);
-  border: 1px solid #b9b2a5;
+  min-height: 52px;
+  height: 52px;
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--hub-line, #e3e9f2);
   border-radius: var(--mgdb-radius-sm);
-  background: var(--hub-surface);
+  background: var(--hub-surface, #ffffff);
+  transition: border-color var(--mgdb-dur-fast), box-shadow var(--mgdb-dur-fast);
 }
 
 .mgdb-phenotype-page .pheno-query-control:focus-within {
-  border-color: var(--mgdb-focus);
-  box-shadow: 0 0 0 2px rgba(11, 87, 164, .18);
+  border-color: var(--mgdb-green-dark);
+  box-shadow: 0 0 0 3px var(--mgdb-green-soft);
 }
 
-.mgdb-phenotype-page .pheno-search-icon { color: var(--mgdb-muted); }
+.mgdb-phenotype-page .pheno-search-icon {
+  color: var(--mgdb-muted);
+  flex-shrink: 0;
+  margin-right: var(--mgdb-space-3);
+}
 
 .mgdb-phenotype-page .pheno-query-control input[type="search"] {
-  width: 100%;
+  flex: 1;
   min-width: 0;
-  padding: 0;
   border: 0;
   background: transparent;
   color: var(--mgdb-ink);
   font-family: inherit;
   font-size: var(--mgdb-text-base);
+  outline: none;
 }
-
-.mgdb-phenotype-page .pheno-query-control input[type="search"]:focus { outline: none; }
 
 .mgdb-phenotype-page #pheno-query-clear {
   padding: 0 var(--mgdb-space-2);
@@ -132,27 +133,45 @@
   font-size: var(--mgdb-text-sm);
   font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
 }
 
-.mgdb-phenotype-page #pheno-query-clear:hover { color: var(--mgdb-green-dark); text-decoration: underline; }
+.mgdb-phenotype-page #pheno-query-clear:hover {
+  color: var(--mgdb-green-dark);
+  text-decoration: underline;
+}
 
-.mgdb-phenotype-page .pheno-hint {
-  margin: var(--mgdb-space-1) 0 0;
+.mgdb-phenotype-page .pheno-query-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mgdb-space-2);
+  min-height: 52px;
+  padding: 0 var(--mgdb-space-5);
+  font-size: var(--mgdb-text-base);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.mgdb-phenotype-page .pheno-search-hint {
+  margin: 0 0 var(--mgdb-space-3);
   color: var(--mgdb-muted);
   font-size: var(--mgdb-text-xs);
 }
 
 /* ── Examples ────────────────────────────────────────────────────────────── */
 
+.mgdb-phenotype-page .pheno-examples,
 .mgdb-phenotype-page .pheno-example-row {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-2);
   align-items: center;
   padding-top: var(--mgdb-space-3);
-  border-top: 1px solid var(--hub-line-soft);
+  border-top: 1px solid var(--hub-line-soft, #eef2f8);
 }
 
+.mgdb-phenotype-page .pheno-example-label,
 .mgdb-phenotype-page .pheno-example-row > span:first-child {
   color: var(--mgdb-ink-soft);
   font-size: var(--mgdb-text-xs);
@@ -161,147 +180,254 @@
   text-transform: uppercase;
 }
 
+.mgdb-phenotype-page .pheno-example-btn,
 .mgdb-phenotype-page .pheno-example-row button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
   padding: var(--mgdb-space-1) var(--mgdb-space-3);
-  border: 1px solid var(--hub-line);
+  border: 1px solid var(--hub-line, #e3e9f2);
   border-radius: 999px;
-  background: var(--hub-surface);
+  background: var(--hub-surface, #ffffff);
   color: var(--mgdb-green-dark);
   font-family: inherit;
   font-size: var(--mgdb-text-sm);
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
+  transition: all .15s ease;
 }
 
+.mgdb-phenotype-page .pheno-examples button:hover,
+.mgdb-phenotype-page .pheno-example-btn:hover,
 .mgdb-phenotype-page .pheno-example-row button:hover {
-  border-color: var(--mgdb-green-dark);
-  background: var(--mgdb-green-soft);
+  border-color: var(--mgdb-gold);
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+  box-shadow: 0 0 0 1px var(--mgdb-gold);
 }
 
-/* ── Advanced search ─────────────────────────────────────────────────────── */
+/* ── Advanced search disclosure ──────────────────────────────────────────── */
 
+.mgdb-phenotype-page .pheno-advanced,
 .mgdb-phenotype-page .pheno-adv {
-  border: 1px solid var(--hub-line);
-  border-radius: var(--mgdb-radius);
-  background: var(--hub-surface);
+  border: 1px solid var(--hub-line, #e3e9f2);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface, #ffffff);
+  margin-top: var(--mgdb-space-4);
 }
 
-.mgdb-phenotype-page .pheno-adv summary {
+.mgdb-phenotype-page .pheno-advanced > summary,
+.mgdb-phenotype-page .pheno-adv > summary {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-1) var(--mgdb-space-3);
-  align-items: baseline;
+  align-items: center;
   padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-radius: var(--mgdb-radius-sm);
   color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
   cursor: pointer;
-  list-style-position: inside;
+  list-style: none;
 }
 
-.mgdb-phenotype-page .pheno-adv summary strong { font-size: var(--mgdb-text-base); }
-.mgdb-phenotype-page .pheno-adv summary span { color: var(--mgdb-muted); font-size: var(--mgdb-text-sm); }
-.mgdb-phenotype-page .pheno-adv[open] summary { border-bottom: 1px solid var(--hub-line-soft); }
+.mgdb-phenotype-page .pheno-advanced > summary::-webkit-details-marker,
+.mgdb-phenotype-page .pheno-adv > summary::-webkit-details-marker { display: none; }
 
+.mgdb-phenotype-page .pheno-advanced > summary::before,
+.mgdb-phenotype-page .pheno-adv > summary::before {
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 7px solid currentColor;
+  content: "";
+  transition: transform .15s ease;
+}
+
+.mgdb-phenotype-page .pheno-advanced[open] > summary::before,
+.mgdb-phenotype-page .pheno-adv[open] > summary::before { transform: rotate(90deg); }
+
+.mgdb-phenotype-page .pheno-advanced > summary:focus-visible,
+.mgdb-phenotype-page .pheno-adv > summary:focus-visible {
+  outline: 3px solid var(--mgdb-focus);
+  outline-offset: -3px;
+}
+
+.mgdb-phenotype-page .pheno-adv-desc {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: normal;
+}
+
+.mgdb-phenotype-page .pheno-advanced-count {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+}
+
+.mgdb-phenotype-page .pheno-advanced-body,
 .mgdb-phenotype-page .pheno-adv-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mgdb-space-4);
+  padding: var(--mgdb-space-4);
+  border-top: 1px solid var(--hub-line-soft, #eef2f8);
+  background: var(--hub-surface, #ffffff);
+}
+
+.mgdb-phenotype-page .pheno-advanced-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 24rem));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--mgdb-space-4);
   align-items: start;
-  padding: var(--mgdb-space-4);
 }
 
+.mgdb-phenotype-page .pheno-advanced-actions,
 .mgdb-phenotype-page .pheno-adv-actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-3);
-  padding: 0 var(--mgdb-space-4) var(--mgdb-space-4);
+  align-items: center;
+}
+
+.mgdb-phenotype-page .pheno-advanced-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid var(--hub-line, #e3e9f2);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--hub-surface, #ffffff);
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--mgdb-dur-fast), background var(--mgdb-dur-fast), color var(--mgdb-dur-fast);
+}
+
+.mgdb-phenotype-page .pheno-advanced-reset-btn:hover {
+  border-color: var(--mgdb-line-strong);
+  background: var(--hub-surface-alt, #f7f9fc);
+  color: var(--mgdb-ink);
 }
 
 @media (max-width: 640px) {
-  .mgdb-phenotype-page #pheno-search-form { grid-template-columns: minmax(0, 1fr); }
-  .mgdb-phenotype-page #pheno-search-form > .mgdb-hub-field-action { grid-column: 1; }
-  .mgdb-phenotype-page .pheno-adv-body { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-phenotype-page .pheno-query-row { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-phenotype-page .pheno-advanced-grid { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* --------------------------------------------------------------------------
-   Results
+   Results Toolbar
    -------------------------------------------------------------------------- */
 
 .mgdb-phenotype-page .pheno-results-section[hidden] { display: none; }
 
-.mgdb-phenotype-page .pheno-results-heading {
+.mgdb-phenotype-page .pheno-results-status {
+  margin: var(--mgdb-space-1) 0 var(--mgdb-space-4);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-phenotype-page .pheno-results-toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--mgdb-space-3) var(--mgdb-space-5);
-  align-items: end;
-  justify-content: space-between;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: flex-end;
   margin-bottom: var(--mgdb-space-4);
 }
 
-.mgdb-phenotype-page .pheno-results-heading h2 { margin: 0; }
-.mgdb-phenotype-page .pheno-results-heading > div:first-child { min-width: 0; flex: 1 1 18rem; }
+.mgdb-phenotype-page .pheno-results-filter {
+  flex: 1 1 240px;
+  min-width: 200px;
+  position: relative;
+}
 
-.mgdb-phenotype-page #pheno-results-status {
-  margin: var(--mgdb-space-1) 0 0;
+.mgdb-phenotype-page .pheno-results-filter > label {
+  padding-right: 7rem;
+}
+
+.mgdb-phenotype-page .pheno-results-filter input {
+  width: 100%;
+}
+
+.mgdb-phenotype-page .pheno-results-filter .mgdb-result-count,
+.mgdb-phenotype-page #pheno-filter-count {
+  position: absolute;
+  right: 0;
+  bottom: calc(var(--mgdb-tap-target) + 6px);
+  margin: 0;
   color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-sm);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
 }
 
-/* Fixed tracks in a box sized to its own content: declared with minmax(0, ...)
-   the first tracks take everything the parent offers and the last resolves to
-   0px, which drops its control onto a second row. */
-.mgdb-phenotype-page .pheno-results-controls {
-  display: grid;
-  width: max-content;
-  max-width: 100%;
-  flex: 0 0 auto;
-  grid-template-columns: 13rem 10rem auto auto;
-  gap: var(--mgdb-space-3) var(--mgdb-space-4);
-  align-items: end;
-}
-
-@media (max-width: 1000px) {
-  .mgdb-phenotype-page .pheno-results-controls {
-    width: 100%;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 560px) {
-  .mgdb-phenotype-page .pheno-results-controls { grid-template-columns: minmax(0, 1fr); }
-}
-
-.mgdb-phenotype-page .pheno-view-toggle {
-  display: inline-flex;
-  overflow: hidden;
+.mgdb-phenotype-page .pheno-results-toolbar .pheno-results-export .mgdb-button,
+.mgdb-phenotype-page .pheno-results-toolbar .pheno-export-buttons .mgdb-button {
   height: var(--mgdb-tap-target);
-  border: 1px solid var(--hub-line);
-  border-radius: var(--mgdb-radius-sm);
-  background: var(--hub-surface);
+  min-height: var(--mgdb-tap-target);
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 
-.mgdb-phenotype-page .pheno-view-btn {
+/* View Toggle */
+.mgdb-phenotype-page .pheno-results-view {
   display: inline-flex;
-  min-height: 100%;
-  gap: var(--mgdb-space-2);
+  align-items: flex-end;
+}
+
+.mgdb-phenotype-page .pheno-results-view .mgdb-view-toggle {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface-alt);
+  height: var(--mgdb-tap-target);
+  box-sizing: border-box;
   align-items: center;
-  padding: 0 var(--mgdb-space-4);
-  border: 0;
+}
+
+.mgdb-phenotype-page .pheno-results-view .mgdb-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+  padding: 0 10px;
+  border: none;
+  border-radius: calc(var(--mgdb-radius-sm) - 2px);
   background: transparent;
-  color: var(--mgdb-ink-soft);
+  color: var(--mgdb-muted);
   font-family: inherit;
-  font-size: var(--mgdb-text-sm);
+  font-size: var(--mgdb-text-xs);
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
+  transition: background .12s, color .12s;
 }
 
-.mgdb-phenotype-page .pheno-view-btn + .pheno-view-btn { border-left: 1px solid var(--hub-line); }
-.mgdb-phenotype-page .pheno-view-btn svg { width: 16px; height: 16px; }
+.mgdb-phenotype-page .pheno-results-view .mgdb-view-btn:hover:not(.is-active):not([aria-pressed="true"]) {
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+}
 
-.mgdb-phenotype-page .pheno-view-btn.is-active,
-.mgdb-phenotype-page .pheno-view-btn[aria-pressed="true"] {
-  background: var(--mgdb-green-dark);
+.mgdb-phenotype-page .pheno-results-view .mgdb-view-btn.is-active,
+.mgdb-phenotype-page .pheno-results-view .mgdb-view-btn[aria-pressed="true"] {
+  background: var(--mgdb-green-dark) !important;
+  color: #ffffff !important;
+  box-shadow: var(--mgdb-shadow-xs);
+}
+
+.mgdb-phenotype-page .pheno-results-view .mgdb-view-btn.is-active svg,
+.mgdb-phenotype-page .pheno-results-view .mgdb-view-btn[aria-pressed="true"] svg {
+  fill: #ffffff;
   color: #ffffff;
 }
 
@@ -383,11 +509,17 @@
 
 /* ── Result Cards (Card View) ────────────────────────────────────────────── */
 
+.mgdb-phenotype-page .pheno-card-grid,
 .mgdb-phenotype-page .pheno-results-container.pheno-view-card {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: var(--mgdb-space-4);
-  margin-top: var(--mgdb-space-4);
+  gap: var(--mgdb-space-5);
+  margin-top: var(--mgdb-space-5);
+}
+
+.mgdb-phenotype-page .pheno-card-grid[hidden],
+.mgdb-phenotype-page .pheno-table-wrap[hidden] {
+  display: none !important;
 }
 
 .mgdb-phenotype-page .pheno-result-card {
@@ -395,7 +527,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  padding: var(--mgdb-space-5);
   border: 1px solid var(--mgdb-line);
   border-radius: var(--mgdb-radius);
   background: var(--mgdb-surface);
@@ -516,8 +648,10 @@
 
 /* ── Result Table (Table View) ───────────────────────────────────────────── */
 
+.mgdb-phenotype-page .pheno-table-wrap,
 .mgdb-phenotype-page .pheno-results-container.pheno-view-table {
   margin-top: var(--mgdb-space-4);
+  margin-bottom: var(--mgdb-space-4);
   overflow-x: auto;
   border: 1px solid var(--mgdb-line);
   border-radius: var(--mgdb-radius);
@@ -538,6 +672,40 @@
   color: var(--mgdb-green-dark);
   font-weight: 700;
   white-space: nowrap;
+}
+
+.mgdb-phenotype-page .pheno-table th button[data-sort-key] {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mgdb-space-1);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.mgdb-phenotype-page .pheno-table th button[data-sort-key]:hover {
+  color: var(--mgdb-leaf);
+}
+
+.mgdb-phenotype-page .pheno-table th[aria-sort="ascending"] button[data-sort-key]::after {
+  content: " \2191";
+  font-size: .7em;
+}
+
+.mgdb-phenotype-page .pheno-table th[aria-sort="descending"] button[data-sort-key]::after {
+  content: " \2193";
+  font-size: .7em;
+}
+
+.mgdb-phenotype-page .pheno-table th[aria-sort="none"] button[data-sort-key]::after {
+  content: " \21C5";
+  color: var(--mgdb-muted);
+  font-size: .8em;
 }
 
 .mgdb-phenotype-page .pheno-table td {
@@ -648,7 +816,8 @@
 /* Responsive */
 @media (max-width: 767px) {
   .mgdb-phenotype-page .pheno-search-panel { padding: var(--mgdb-space-4); }
-  .mgdb-phenotype-page .pheno-results-container.pheno-view-card { grid-template-columns: 1fr; }
+  .mgdb-phenotype-page .pheno-results-container.pheno-view-card,
+  .mgdb-phenotype-page .pheno-card-grid { grid-template-columns: 1fr; }
   .mgdb-phenotype-page .pheno-results-heading { flex-direction: column; align-items: flex-start; }
 }
 

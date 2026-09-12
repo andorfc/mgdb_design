@@ -1,0 +1,179 @@
+$$SYNTAX-LEVEL 2
+*(login-form
+  @(not-approved {display: off}
+    <div id='login_gray_background'>
+      <span class="error">
+        We are sorry! Your registration as a community curator has not yet been 
+        approved. If more than 24 hours have passed since you registered, please 
+        <a href="#" onclick="popUpFeedback\('portwood@iastate.edu', 'Account not approved', 'Be sure to include your e-mail and account name.'\)">let us know</a>.
+      </span>
+    </div>
+  )
+  
+  <form style="padding-top: 0px; padding-bottom: 0px;" class="tiny" 
+        action="$(login-handler)" method="post">
+    <input type="hidden" name="relaxed_login" value='$(relaxed_login)'>
+    @(forwarding-url {display: off}
+      <input type="hidden" id="nexturl" name="nexturl" value="$(nexturl)">
+    )
+    @(curation_params {display: off}
+      <input type="hidden" id="$(key)" name="$(key)" value="$(value)">
+    )
+
+    <div id='login_gray_background'>
+      <span class="error">$(message)</span>
+      <table>
+        <tr>
+          <td><b>Username:</b></td>
+          <td>
+            <input type="text" id="un" name="username" size=10 maxlength=10 
+                   class="small" value="$(username)">
+          </td>
+        </tr>
+        <tr>
+          <td><b>Password:</b></td>
+          <td>
+            <input type="password" id="pw" name="password" class="small" size=10 
+                   maxlength=50>
+          </td>
+        </tr>
+      </table>
+      <div style="margin: 0px; margin-top: 0px;">
+        <b>Session Length:</b>
+        <select id="le" name="length" class="small">
+          <option value="0">1 Year
+          <option value="43200">12 Hours
+          <option value="7200">2 Hours
+        </select>
+        <i>Choose '1 Year' if you are using your own workstation</i>
+        <br>
+      </div> 
+      <br>
+        <!--<a href="/forgot_password">Forgot your password?</a>-->
+      <br>
+    </div>
+    
+    <input type="image" src='/images/submit_button.png' class="small" 
+           value="Submit" 
+           style='display: block; width: 141px; height: 27px;margin: 0px auto;' disabled>
+  </form>
+  <br>
+
+  
+  <b><span style="color:crimson;">Note: We are not accepting new annotation accounts at this time and the form below has been disabled</span><br>Create An Annotation Account:</b>
+  <br>
+  <form method="post" action="create_account" class="tiny">
+    <table>
+      <tr>
+        <td>
+          <div id='login_green_background'>
+            <p>Fill out the information below to create an MaizeGDB annotation 
+              account. With this account, you can annotate the records presented 
+              here. <b>All fields are required.</b> After you fill out this form 
+              and click on the "Submit" button, an email will be sent to the email 
+              address you provided. In that email will be a link; simply click on 
+              the link in the email \(or paste that link into your web browser\) 
+              and your account will be activated.
+            </p>
+            <br>
+            <input type="hidden" name="create" value="1">
+            <table cellpadding=1 cellspacing=1>
+              <tr>
+                <td>
+                  <label for="un"><b>Username</b>:</label>
+                </td>
+                <td>
+                  <input onLoad="setFocus\(document.getElementById\('un'\)\);" 
+                         type="text" class="small" name="username" id="un" 
+                         size="10" maxlength="10">
+                </td>
+                <td style="padding-left:10px">
+                  <i>The <b>username</b> is the name you will use to log on so 
+                  that you can annotate.</i>
+                </td>
+              </tr>
+      
+              <tr>
+                <td>
+                  <label for="pw"><b>Password</b>:</label>
+                </td>
+                <td>
+                  <input type="password" name="password" class="small" id="pw" 
+                         size="10" maxlength="50">
+                </td>
+                <td style="padding-left:10px">
+                  <i>The <b>password</b> is used to identify you, along with your 
+                  username, when you log in.</i>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <label for="pw2"><b>Re-Type Password</b>:</label>
+                </td>
+                <td colspan=2>
+                  <input type="password" name="password2" class="small" id="pw2" 
+                         size="10" maxlength="50">
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <label for="pr"><b>Password Reminder</b>:</label>
+                </td>
+                <td>
+                  <input type="text" name="password_reminder" id="pr" 
+                         class="small" size="30" maxlength="100">
+                </td>
+                <td style="padding-left:10px">
+                  <i>A <b>password reminder</b> will be emailed to you if you 
+                  forget your password, to help you remember.</i>
+                </td>
+              </tr>
+      
+              <tr>
+                <td>
+                  <label for="fn"><b>First Name</b>:</label>
+                </td>
+                <td colspan=2><input type="text" name="first_name" id="fn" 
+                    class="small" size="20" maxlength="40">
+                    <input type="text" name="user" value="Do not change" style="display: none;"/>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <label for="ln"><b>Last Name</b>:</label>
+                </td>
+                <td colspan=2>
+                  <input type="text" name="last_name" id="ln" class="small" 
+                         size="20" maxlength="40">
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <label for="em"><b>Email Address</b>:</label>
+                </td>
+                <td>
+                  <input type="text" name="email" id="em" class="small" size="30" 
+                         maxlength="100">
+                </td>
+                <td style="padding-left:10px">
+                  <i>Remember, your <b>email address</b> must be a correct 
+                  address, or else you won't be able to create an account!</i>
+                </td>
+              </tr>
+
+              <tr>
+                <td colspan=3><input type="checkbox" name="curator" value="Y"> 
+                  <label for="cur">I am interested in being a MaizeGDB curator.</label>
+                </td>
+              </tr>
+
+            </table>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <input type="image" src='../../images/submit_button.png' class="small" 
+           value="Submit" 
+           style='display: block; width: 141px; height: 27px;margin: 0px auto;' disabled>
+  </form>
+)

@@ -327,7 +327,7 @@ function getMGSC($DBConn, $adv_results)
 {
  $adv_results['query'] .= " AND A.AVAILABLE_FROM = 25725";
  $adv_results['criteria'] .= "You want only stocks available from the
-                                <b>Maize Genetics Stock Center</b>.<br>";
+                                <b>Maize Genetics Cooperation Stock Center</b>.<br>";
 
  return $adv_results;
 }

@@ -517,6 +517,73 @@
 	padding-bottom:4px;
 }
 
+/* Maize history -------------------------------------------------------------
+
+   A band across the foot of Community's three lists, filling the 100-155px
+   they stopped short of. It spans the three link tracks; the meeting card
+   spans both rows so it stays a full-height column beside them.
+   -------------------------------------------------------------------------- */
+
+/* Both are placed in both axes, and that is not belt-and-braces. Grid places
+   items with a definite ROW before fully-auto ones, so a feature carrying only
+   `grid-row: 1 / 3` was placed in column 1 -- ahead of the three lists -- which
+   pushed the band that spans columns 1-3 down to a third row and left the card
+   260px tall in a 385px grid. Definite column and row for the card, definite
+   row for the band, and the three lists auto-place into row 1 around them. */
+.mgdb-modern #menu_bar .mega-grid-community .mega-history {
+	grid-column:1 / 4;
+	grid-row:2;
+}
+
+.mgdb-modern #menu_bar .mega-grid-community .mega-feature {
+	grid-column:4;
+	grid-row:1 / 3;
+}
+
+/* The two labels are long enough that they only sit on one line each if the
+   band gives back every pixel it can: a 16px gutter rather than 24, 4px of link
+   inset rather than 8, and a slightly wider first track because
+   "Maize Origins, Domestication & Cultural History" is the longer of the two
+   and is the one carrying the external arrow. That leaves 296px and 282px of
+   text width against measured labels of 289px (with arrow) and 273px. */
+.mgdb-modern #menu_bar .mega-history {
+	display:grid;
+	grid-template-columns:minmax(0, 1.05fr) minmax(0, 1fr);
+	gap:0 16px;
+	align-content:start;
+	margin-top:12px;
+}
+
+/* The panel's only group heading, so it is deliberately quieter than the
+   panel's own h2 -- it labels a shelf, it does not open a section. */
+.mgdb-modern #menu_bar .mega-history > h3 {
+	grid-column:1 / -1;
+	margin:0 0 3px;
+	padding:0 8px;
+	color:#4f6b45;
+	font-size:11px;
+	font-weight:700;
+	letter-spacing:.08em;
+	line-height:14px;
+	text-transform:uppercase;
+}
+
+.mgdb-modern #menu_bar .mega-history > a {
+	padding-left:4px;
+	padding-right:4px;
+}
+
+/* Smaller than the 14px the lists above use, which is what holds each label to
+   one line. They are two long destination names rather than list entries, and
+   the band's own heading carries the scope, so the step down reads as a caption
+   rather than as shrunken body text. Desktop only: stacked, these labels are
+   full-width rows and the panel's mobile rule takes every label to the 16px
+   floor, which is the right size there and wins on source order. */
+.mgdb-modern #menu_bar .mega-history > a strong {
+	font-size:11.5px;
+	line-height:16px;
+}
+
 .mgdb-modern #menu_bar .mega-feature {
 	box-sizing:border-box;
 	min-width:0;
@@ -659,31 +726,37 @@
    classes, 1 element\), which otherwise holds this at the 12px it sets for
    heading body copy.
 
-   TWO LINES ARE RESERVED, ALWAYS. The hint is the only thing in an open panel
+   ONE LINE IS RESERVED, ALWAYS. The hint is the only thing in an open panel
    whose height changes, and it sits above the link lists, so a description that
-   wraps to a second line grew the panel by 20px under the pointer -- a shake
-   as the reader moved down a column. 40px is two lines at the 20px
-   line-height, so a one-line and a two-line description occupy the same box
-   and the panel never moves.
+   wraps grows the panel by 20px under the pointer -- a shake as the reader
+   moves down a column. min-height pins the box so every description occupies
+   the same height and the panel never moves.
 
-   Two lines is the measured maximum, not a guess. Every description in all
-   five panels, at the hint width each panel actually gets:
+   It reserved two lines (40px) until 2026-09-11, when the whole set of
+   descriptions was rewritten shorter and every one of the 81 came inside a
+   single line. One line is now the reserve, which takes 20px off the top of
+   all five panels.
 
-     About        381px   3 of 5 wrap to two lines
-     Genomes      628px   all one line
-     Data hubs    684px   all one line
-     Community    686px   all one line
-     Tools        768px   all one line
+   Measured, not assumed -- with min-height neutralised, so the numbers are the
+   text's own height rather than the floor this rule sets:
 
-   Those widths do not vary with the viewport -- the dropdowns are fixed-width,
-   and below 1164px the drawer takes over and hides the hint entirely -- so the
-   measurement holds at every width the bar is shown at. **Keep new
-   descriptions inside two lines at 381px**, which is roughly 110 characters;
-   past that the jump comes back. */
+     About        381px   5 links    all one line
+     Genomes      628px   19 links   all one line  \(578px <=1254, 553px <=1204,
+                                       which is the tightest box on the bar\)
+     Data hubs    684px   22 links   all one line
+     Community    686px   18 links   all one line
+     Tools        768px   17 links   all one line
+
+   The widths are fixed per panel, and below 1164px the drawer takes over and
+   hides the hint entirely, so this holds at every width the bar is shown at.
+   **A new description must fit one line at its panel's width** -- about 80
+   characters at 686px, and fewer in About at 381px, which is the tight one.
+   Past that the jump comes back. Re-measure after any copy change: a
+   `scrollHeight` reading will NOT show it, because min-height floors that. */
 .mgdb-modern #menu_bar .mega-panel-heading p.mega-hint {
 	box-sizing:border-box;
 	max-width:none;
-	min-height:40px;
+	min-height:20px;
 	margin:5px 0 0;
 	color:#5b6a57;
 	font-size:14px;
@@ -1161,6 +1234,24 @@
      collapses to one column here. */
   .mgdb-modern #menu_bar .mega-hub-list { column-count: 1; }
 
+  /* Stacked, the history band is another section of the one column: its
+     three-track span and the meeting card's two-row placement both refer to a
+     grid that no longer exists at this width. */
+  .mgdb-modern #menu_bar .mega-grid-community .mega-history,
+  .mgdb-modern #menu_bar .mega-grid-community .mega-feature {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .mgdb-modern #menu_bar .mega-history {
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: 0;
+  }
+
+
+  .mgdb-modern #menu_bar .mega-history > h3 { padding: 0; }
+  .mgdb-modern #menu_bar .mega-history > a { padding-left: 0; padding-right: 0; }
+
   .mgdb-modern #menu_bar .mega-hint { display: none; }
 
   .mgdb-modern #menu_bar .mega-grid-hubs {
@@ -1381,7 +1472,9 @@
 }
 
 /* A top-level nav item that is a plain destination rather than a panel
-   trigger. Matches the triggers' metrics so the bar stays even. */
+   trigger. Matches the triggers' metrics so the bar stays even.
+   Unused since Downloads moved out of the bar \(the header's bulk-download box
+   replaced it\); kept because it is the shape the next plain item needs. */
 /* Metrics copied from the panel triggers rather than approximated: height:100%
    with no border left this one 36px tall against their 38px, so Downloads sat
    a pixel high in an otherwise even row. */

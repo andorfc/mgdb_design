@@ -235,8 +235,18 @@ include_once($_SERVER['DOCUMENT_ROOT'] . '/include/qtl_record_lib.php');
 
   if (isset($want['maps'])) {
     $maps = array();
+    /* LOWER(m.name) is in the select list because it is in the ORDER BY: under
+       SELECT DISTINCT, Postgres requires every ORDER BY expression to appear in
+       the select list, and rejected this query outright (42P10) -- so the maps
+       section was silently empty on every QTL record. It is functionally
+       dependent on m.name, so DISTINCT is unchanged.
+
+       This note lives outside the SQL string on purpose: make_query() logs the
+       query verbatim, so an explanation written inside it lands in mgdb.log on
+       every request and, if it names an error code, shows up in any grep of the
+       log for failures. */
     $sth = make_query($DBConn, "
-      SELECT DISTINCT m.id, m.name
+      SELECT DISTINCT m.id, m.name, LOWER(m.name) AS name_sort
       FROM mgdb.qtl_exp_map qm
         INNER JOIN mgdb.map m ON m.id = qm.map
         INNER JOIN mgdb.id_num mi ON mi.id = m.id AND mi.curation_lvl = 0

@@ -1,0 +1,203 @@
+/* /ordering/coop_order -- the Maize Genetics Cooperation Stock Center request
+   form. Scoped under .mgdb-coop-order-page; everything else is a shared
+   component from mgdb-modern.css. */
+
+.mgdb-coop-order-page .coop-scope {
+  margin-top: var(--mgdb-space-5);
+}
+.mgdb-coop-order-page .coop-scope p { margin: 0; }
+
+/* Collapsible guidelines -- the long list of Stock Center rules, folded away by
+   default so it does not push the form itself below the fold. */
+.mgdb-coop-order-page .coop-guidelines {
+  margin-top: var(--mgdb-space-4);
+  padding: 0;
+}
+.mgdb-coop-order-page .coop-guidelines summary {
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--mgdb-ink);
+}
+.mgdb-coop-order-page .coop-guidelines summary:hover { color: var(--mgdb-green); }
+.mgdb-coop-order-page .coop-guidelines[open] summary {
+  border-bottom: 1px solid var(--mgdb-line-soft);
+}
+.mgdb-coop-order-page .coop-guidelines .mgdb-list {
+  margin: 0;
+  padding: var(--mgdb-space-4) var(--mgdb-space-5) var(--mgdb-space-4) 2.6em;
+  color: var(--mgdb-ink-soft);
+}
+
+/* The status line the script writes into after an add, a remove, or a clear. */
+.mgdb-coop-order-page .coop-status { margin-top: var(--mgdb-space-5); }
+
+.mgdb-coop-order-page .coop-step { margin-top: var(--mgdb-space-8); }
+
+/* A numbered badge in front of each step heading, so the three steps read as a
+   sequence without a separate list. */
+.mgdb-coop-order-page .coop-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.7em;
+  height: 1.7em;
+  margin-right: .5em;
+  border-radius: 50%;
+  background: var(--mgdb-green);
+  color: #fff;
+  font-size: .72em;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.mgdb-coop-order-page .coop-optional {
+  margin-left: .35em;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 400;
+}
+
+/* The add row: name grows, comment grows, button holds its width and sits on
+   the baseline of the inputs. On a narrow screen the shared .mgdb-search-row
+   already stacks and stretches the button. */
+.mgdb-coop-order-page .coop-add { margin-top: var(--mgdb-space-5); }
+.mgdb-coop-order-page .coop-add-row .mgdb-field { flex: 1 1 16rem; }
+.mgdb-coop-order-page .coop-add-error { margin-top: var(--mgdb-space-3); }
+
+/* Multiple-match picker: an inline panel under the add row rather than a modal,
+   so the keyboard and the screen reader stay where they were. */
+.mgdb-coop-order-page .coop-matches {
+  margin-top: var(--mgdb-space-4);
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+.mgdb-coop-order-page .coop-matches-lead {
+  margin: 0 0 var(--mgdb-space-3);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+.mgdb-coop-order-page .coop-matches-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 18rem;
+  overflow-y: auto;
+}
+.mgdb-coop-order-page .coop-matches-list li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: center;
+  padding: var(--mgdb-space-2) 0;
+  border-top: 1px solid var(--mgdb-line-soft);
+}
+.mgdb-coop-order-page .coop-matches-list li:first-child { border-top: 0; }
+.mgdb-coop-order-page .coop-matches-name {
+  flex: 1 1 14rem;
+  min-width: 0;
+  font-weight: 600;
+}
+.mgdb-coop-order-page .coop-matches-actions {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  flex: 0 0 auto;
+}
+
+/* The order list itself. */
+.mgdb-coop-order-page .coop-list { margin-top: var(--mgdb-space-5); }
+
+.mgdb-coop-order-page .coop-list-table { margin: 0; }
+.mgdb-coop-order-page .coop-list-table td { vertical-align: top; }
+.mgdb-coop-order-page .coop-stock-name { font-weight: 600; }
+.mgdb-coop-order-page .coop-stock-comment {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+.mgdb-coop-order-page .coop-stock-comment:empty::before {
+  content: "\2014";
+  color: var(--mgdb-muted);
+}
+
+/* The per-row actions column is only as wide as its buttons. */
+.mgdb-coop-order-page .coop-row-actions {
+  width: 1%;
+  white-space: nowrap;
+  text-align: right;
+}
+.mgdb-coop-order-page .coop-row-actions .mgdb-button + .mgdb-button {
+  margin-left: var(--mgdb-space-2);
+}
+
+.mgdb-coop-order-page .coop-list-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  align-items: center;
+  margin-top: var(--mgdb-space-4);
+}
+.mgdb-coop-order-page .coop-list-footer .mgdb-button-quiet { margin-left: auto; }
+
+/* Shipping form: a two-column grid that a couple of fields span. */
+.mgdb-coop-order-page .coop-ship { margin-top: var(--mgdb-space-5); }
+.mgdb-coop-order-page .coop-ship-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--mgdb-space-5);
+}
+.mgdb-coop-order-page .coop-ship-grid .mgdb-field { margin-top: 0; }
+.mgdb-coop-order-page .coop-field-wide { grid-column: 1 / -1; }
+
+.mgdb-coop-order-page .coop-check {
+  display: flex;
+  gap: var(--mgdb-space-2);
+  align-items: flex-start;
+  font-weight: 400;
+  cursor: pointer;
+}
+.mgdb-coop-order-page .coop-check input {
+  margin-top: .2em;
+  width: 1.05rem;
+  height: 1.05rem;
+  flex: none;
+}
+
+.mgdb-coop-order-page .coop-submit-row { margin-top: var(--mgdb-space-5); }
+.mgdb-coop-order-page .coop-multi-note { margin-top: var(--mgdb-space-6); }
+
+/* The confirmation screen. */
+.mgdb-coop-order-page .coop-done {
+  max-width: 44rem;
+  margin: var(--mgdb-space-8) auto;
+  padding: var(--mgdb-space-8) var(--mgdb-space-6);
+  text-align: center;
+}
+.mgdb-coop-order-page .coop-done-check {
+  display: block;
+  width: 68px;
+  margin: 0 auto var(--mgdb-space-5);
+  color: var(--mgdb-green);
+}
+.mgdb-coop-order-page .coop-done-check svg { width: 100%; height: auto; }
+.mgdb-coop-order-page .coop-done h1 { margin: 0 0 var(--mgdb-space-3); }
+.mgdb-coop-order-page .coop-done p {
+  margin: 0 auto;
+  max-width: 34rem;
+  color: var(--mgdb-ink-soft);
+}
+.mgdb-coop-order-page .coop-done-actions {
+  justify-content: center;
+  margin-top: var(--mgdb-space-6);
+}
+
+@media (max-width: 640px) {
+  .mgdb-coop-order-page .coop-ship-grid { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-coop-order-page .coop-row-actions {
+    width: auto;
+    white-space: normal;
+    text-align: left;
+  }
+  .mgdb-coop-order-page .coop-list-footer .mgdb-button-quiet { margin-left: 0; }
+}

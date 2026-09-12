@@ -55,7 +55,7 @@ function geneExportTsv($models, $loci) {
                             $r['locus_name'], '', $r['locus_id']), "\t");
     }
     foreach ($loci as $r) {
-        fputcsv($out, array('gene locus', $r['example'], '', '', '', '', '', '', '', '', '',
+        fputcsv($out, array('gene locus', $r['current_model'], '', $r['current_line'], '', '', '', '', '', '', '',
                             $r['locus_name'], $r['full_name'], $r['locus_id']), "\t");
     }
 
@@ -135,32 +135,42 @@ try {
     }
 
     /* -------------------------------------------------------------- advanced */
+    $annotation   = geneSearchValue('annotation', 'all');
+    $model_type   = geneSearchValue('model_type', 'all');
+    $chromosome   = geneSearchValue('chromosome', 'all');
+    $range_start  = geneSearchValue('range_start', '');
+    $range_end    = geneSearchValue('range_end', '');
+    $gene_product = geneSearchValue('gene_product', 'all');
+    $phenotype    = geneSearchValue('phenotype', '0');
+    $trait        = geneSearchValue('trait', '0');
+    $protein      = geneSearchValue('protein', '');
+
     $criteria = array(
-        'use_annotation'   => geneSearchFlag('use_annotation'),
-        'annotation'       => geneSearchValue('annotation', 'all'),
-        'use_model_type'   => geneSearchFlag('use_model_type'),
-        'model_type'       => geneSearchValue('model_type', 'all'),
-        'use_chromosome'   => geneSearchFlag('use_chromosome'),
-        'chromosome'       => geneSearchValue('chromosome', 'all'),
-        'use_range'        => geneSearchFlag('use_range'),
-        'range_start'      => geneSearchValue('range_start', ''),
-        'range_end'        => geneSearchValue('range_end', ''),
+        'use_annotation'   => geneSearchFlag('use_annotation') || ($annotation !== '' && $annotation !== 'all'),
+        'annotation'       => $annotation,
+        'use_model_type'   => geneSearchFlag('use_model_type') || ($model_type !== '' && $model_type !== 'all'),
+        'model_type'       => $model_type,
+        'use_chromosome'   => geneSearchFlag('use_chromosome') || ($chromosome !== '' && $chromosome !== 'all'),
+        'chromosome'       => $chromosome,
+        'use_range'        => geneSearchFlag('use_range') || ($range_start !== '' || $range_end !== ''),
+        'range_start'      => $range_start,
+        'range_end'        => $range_end,
         'use_locus_assoc'  => geneSearchFlag('use_locus_assoc'),
-        'use_gene_product' => geneSearchFlag('use_gene_product'),
-        'gene_product'     => geneSearchValue('gene_product', 'all'),
-        'use_phenotype'    => geneSearchFlag('use_phenotype'),
-        'phenotype'        => geneSearchValue('phenotype', '0'),
-        'use_trait'        => geneSearchFlag('use_trait'),
-        'trait'            => geneSearchValue('trait', '0'),
+        'use_gene_product' => geneSearchFlag('use_gene_product') || ($gene_product !== '' && $gene_product !== 'all'),
+        'gene_product'     => $gene_product,
+        'use_phenotype'    => geneSearchFlag('use_phenotype') || ($phenotype !== '' && $phenotype !== '0'),
+        'phenotype'        => $phenotype,
+        'use_trait'        => geneSearchFlag('use_trait') || ($trait !== '' && $trait !== '0'),
+        'trait'            => $trait,
         'use_tandem'       => geneSearchFlag('use_tandem'),
-        'use_protein'      => geneSearchFlag('use_protein'),
-        'protein'          => geneSearchValue('protein', '')
+        'use_protein'      => geneSearchFlag('use_protein') || ($protein !== ''),
+        'protein'          => $protein
     );
 
     $advanced = geneAdvancedSearch($DBConn, $criteria, $limit);
 
     if ($advanced['checked'] === 0) {
-        geneFail(400, 'Check at least one box to describe the gene models you are looking for.');
+        geneFail(400, 'Please select or enter at least one filter criterion.');
     }
 
     if ($format === 'tsv') {

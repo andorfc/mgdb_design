@@ -171,7 +171,6 @@ $content->get('jbrowse1_count')->replace(number_format($page_data['jbrowse1_coun
 $content->get('gbrowse_count')->replace(number_format($page_data['gbrowse_count']));
 $content->get('nam_count')->replace(number_format($page_data['nam_count']));
 $content->get('panand_count')->replace(number_format($page_data['panand_count']));
-$content->get('data_date')->replace($page_data['data_date']);
 
 include_once('translation.php');
 echo $bauplan->publish(); exit;

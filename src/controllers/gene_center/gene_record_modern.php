@@ -129,6 +129,14 @@
   $bauplan->includeScript('/js/mgdb-gene-record.js?v=' . $v('/js/mgdb-gene-record.js'));
   $bauplan->head('<meta name="description" content="'
     . htmlspecialchars($gene_summary, ENT_QUOTES, 'UTF-8') . '">');
+  /* Machine-readable identity: a JSON-LD block in the head built from the
+     facts above, link elements to the JSON and JSON-LD records, and the same
+     two as an HTTP Link header (FAIR Signposting). See /api#api-linked-data. */
+  include_once('./include/api/v1/lib/mgdb_jsonld.php');
+  $bauplan->head(MgdbJsonLd::headMarkup('gene', $api_id, array(
+    'name' => $gene_display, 'description' => $gene_summary,
+    'attributes' => array('name' => $gene_name, 'symbol' => $gene_symbol, 'full_name' => $gene_full_name, 'assembly' => $gene_identity['assembly'], 'annotation' => $gene_identity['annotation'], 'kind' => $gene_identity['kind']))));
+  MgdbJsonLd::signpost('gene', $api_id);
 
   $mgdb = $bauplan->template()->load('templates/maizegdb-main-modern.bau');
   $mgdb->get('megamenu')->load('templates/home/maizegdb_header_modern.bau');

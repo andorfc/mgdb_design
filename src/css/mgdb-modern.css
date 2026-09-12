@@ -560,7 +560,62 @@ body.mgdb-modern {
 .mgdb-site-brand img { width: 275px; max-width: 100%; height: auto; }
 .mgdb-site-brand:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
 
-.mgdb-site-search { position: relative; flex: 1 1 30rem; min-width: 0; max-width: 40rem; }
+/* The right-hand column: the bulk-download box on top, the search below. The
+   column carries the flex sizing the search used to hold itself, so the search
+   still reaches its 40rem cap at desktop widths -- the box costs it nothing. */
+.mgdb-site-header-right {
+  display: flex;
+  flex: 1 1 30rem;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--mgdb-space-3);
+  min-width: 0;
+  max-width: 40rem;
+}
+
+.mgdb-site-search { position: relative; width: 100%; min-width: 0; }
+
+/* Bulk downloads ---------------------------------------------------------- */
+
+/* A white box on the header's green field, matching the search shell's ring and
+   radius so the two read as one column rather than two unrelated controls. It
+   leaves the site, so it is deliberately not styled like the nav items. */
+.mgdb-bulk-download {
+  /* The chrome sits outside .mgdb-page, so it does not inherit border-box
+     sizing -- the same reason .mgdb-search-category-button declares it. Without
+     this the mobile min-height below adds to the padding and the box is 60px. */
+  box-sizing: border-box;
+  display: inline-flex;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  padding: var(--mgdb-space-2) var(--mgdb-space-4);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, .85), 0 6px 16px rgba(9, 30, 14, .28);
+  color: var(--mgdb-green-dark);
+  font-family: var(--mgdb-font);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  line-height: var(--mgdb-leading-snug);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.mgdb-bulk-download:hover,
+.mgdb-bulk-download:focus-visible {
+  background: var(--mgdb-gold-soft);
+  color: var(--mgdb-gold-dark);
+  text-decoration: none;
+}
+
+.mgdb-bulk-download:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+/* The arrow carries the gold so the label can stay in the readable dark green:
+   --mgdb-gold is an accent fill, not a text colour on white. gold-dark is the
+   5.92:1 text-safe pairing, which is also what the hover state moves the whole
+   box to -- so the icon needs no hover rule of its own. */
+.mgdb-bulk-download-icon { flex: 0 0 auto; color: var(--mgdb-gold-dark); }
 
 /* Search shell ------------------------------------------------------------ */
 
@@ -1221,7 +1276,10 @@ body.mgdb-modern {
 
   .mgdb-site-header-inner { gap: var(--mgdb-space-3); }
   .mgdb-site-brand img { width: 180px; }
-  .mgdb-site-search { flex: 1 1 100%; max-width: none; }
+  .mgdb-site-header-right { flex: 1 1 100%; max-width: none; }
+  /* The same tap-target floor the nav rows take at this width; the box is 36px
+     on its own metrics, which is under it. */
+  .mgdb-bulk-download { min-height: var(--mgdb-tap-target); }
   /* Stack the shell so the category control and the field each get full width
      rather than squeezing to unusable widths. */
   .mgdb-search-shell {
@@ -1522,16 +1580,24 @@ body.mgdb-modern {
 
 .mgdb-hero .mgdb-eyebrow { color: var(--mgdb-leaf); }
 
-/* The padding reserves the band the absolutely positioned .mgdb-hero-stamp
-   sits in, since an absolute element cannot push the title. 11rem was 24px
-   short of the stamp's measured 200px, so a long h1 ran to within 18px of it
-   and a slightly longer one would have run under it. 13rem clears it by 8. */
 .mgdb-hero h1 {
   margin: 0 0 var(--mgdb-space-2);
   color: var(--mgdb-green-dark);
   font-size: clamp(1.5rem, 1.1rem + 1.3vw, 1.875rem);
-  padding-right: 13rem;
 }
+
+/* The padding reserves the band the absolutely positioned .mgdb-hero-stamp
+   sits in, since an absolute element cannot push the title. 11rem was 24px
+   short of the stamp's measured 200px, so a long h1 ran to within 18px of it
+   and a slightly longer one would have run under it. 13rem clears it by 8.
+
+   Opt-in rather than the default: the freshness stamps came off every hub and
+   record hero, and only three heroes still carry a stamp. As the default it
+   left 208px of dead gutter on ~30 pages and wrapped their titles early, which
+   is why eight per-page stylesheets each had to cancel it by hand. Add
+   mgdb-hero-has-stamp to the section, beside mgdb-hero, when a stamp is
+   present. */
+.mgdb-hero-has-stamp h1 { padding-right: 13rem; }
 
 .mgdb-hero-tagline {
   max-width: 60ch;
@@ -2237,6 +2303,39 @@ a.mgdb-card h3 { text-decoration: underline; }
   align-content: start;
 }
 
+/* Six cards are three and three.
+ *
+ * auto-fit resolves to five columns at a full page width. That is right for the
+ * five-card panel, which is what almost every page has -- 95 of them -- and it
+ * strands the sixth card of a six-card panel alone on a second row with four
+ * empty columns beside it.
+ *
+ * Six divides by three, two and one, so a panel of exactly six gets a column
+ * count it fills at every width. The count is read from the markup rather than
+ * from a class on each page, so a panel that gains or loses a card is laid out
+ * correctly without anyone remembering to edit a stylesheet too: an `a` that is
+ * both the sixth child and the last is true only of a list of exactly six.
+ *
+ * Here rather than in mgdb-hub.css because the component is not only used on
+ * hub pages -- /fatcat is `mgdb-page mgdb-fatcat-page` and has one. Panels with
+ * other counts are untouched, and without :has() support a panel keeps today's
+ * auto-fit behaviour rather than regressing. */
+.mgdb-resource-list:has(> a:nth-child(6):last-child) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 1000px) {
+  .mgdb-resource-list:has(> a:nth-child(6):last-child) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .mgdb-resource-list:has(> a:nth-child(6):last-child) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .mgdb-resource-list a {
   display: flex;
   flex-direction: column;
@@ -2704,8 +2803,12 @@ a.mgdb-card h3 { text-decoration: underline; }
   cursor: pointer;
 }
 
-.mgdb-table th[aria-sort="ascending"] button::after { content: "\25B2"; font-size: .7em; }
-.mgdb-table th[aria-sort="descending"] button::after { content: "\25BC"; font-size: .7em; }
+/* Arrows, not filled triangles (2026-09-11, Carson) -- matching the \21C5 the
+   unsorted state has always used, so the three states are one family. Slightly
+   larger than the .7em the triangles carried: an arrow has far less ink at the
+   same size. */
+.mgdb-table th[aria-sort="ascending"] button::after { content: "\2191"; font-size: .8em; }
+.mgdb-table th[aria-sort="descending"] button::after { content: "\2193"; font-size: .8em; }
 .mgdb-table th[aria-sort="none"] button::after { content: "\21C5"; color: var(--mgdb-muted); font-size: .8em; }
 
 /* --------------------------------------------------------------------------
@@ -3073,7 +3176,7 @@ a.mgdb-card h3 { text-decoration: underline; }
   .mgdb-hero-emblem svg { width: 44px; }
   .mgdb-hero-emblem strong { min-width: 0; flex: 1 1 auto; }
   .mgdb-hero-emblem > span { flex: 1 0 100%; }
-  .mgdb-hero h1 { padding-right: 0; }
+  .mgdb-hero-has-stamp h1 { padding-right: 0; }
   .mgdb-hero-stamp {
     position: static;
     margin-bottom: var(--mgdb-space-3);

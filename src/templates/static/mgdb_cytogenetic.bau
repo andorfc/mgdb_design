@@ -28,6 +28,7 @@ $$SYNTAX-LEVEL 2
 
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
     <a href="#chromosome-maps" class="is-current" aria-current="true">Maps</a>
+    <a href="#rn-maps">RN maps</a>
     <a href="#landmark-loci">Landmarks</a>
     <a href="#karyotype-images">Karyotypes</a>
     <a href="#cytogenetic-stocks">Stocks</a>
@@ -55,8 +56,58 @@ $$SYNTAX-LEVEL 2
 
     <div class="mgdb-card-grid cyt-map-tool-grid">
       <article class="mgdb-card"><span class="mgdb-pill mgdb-pill-info">FISH</span><h3>FSU Cytogenetic FISH maps</h3><p>Fluorescence in situ hybridization maps for seven maize chromosomes.</p><div class="cyt-inline-links"><a href="/data_center/map?id=2772804">1</a><a href="/data_center/map?id=2772806">3</a><a href="/data_center/map?id=2772807">4</a><a href="/data_center/map?id=2772808">5</a><a href="/data_center/map?id=2772809">6</a><a href="/data_center/map?id=2772810">8</a><a href="/data_center/map?id=892372">9</a></div></article>
-      <article class="mgdb-card"><span class="mgdb-pill mgdb-pill-ok">Recombination</span><h3>Recombination nodule maps</h3><p>Recombination nodule data relates genetic distance to physical chromosome position. MaizeGDB holds no RN map records; the Morgan2McClintock Translator is the tool built on them.</p><a href="https://m2m.dill-picl.org/v3/" target="_blank" rel="noopener">Morgan2McClintock Translator <span aria-hidden="true">&nearr;</span></a></article>
+      <article class="mgdb-card"><span class="mgdb-pill mgdb-pill-ok">Recombination</span><h3>Recombination nodule maps</h3><p>Recombination nodule data relates genetic distance to physical chromosome position. MaizeGDB holds Anderson's RN frequency data for all ten synaptonemal complexes.</p><div class="cyt-inline-links"><a href="#rn-maps">RN data</a></div></article>
       <article class="mgdb-card"><span class="mgdb-pill mgdb-pill-warn">B chromosome</span><h3>B chromosome maps</h3><p>Compare fraction, segment, and RAPD views of the supernumerary B chromosome.</p><div class="cyt-inline-links"><a href="/data_center/map?id=886059">Fractions</a><a href="/data_center/map?id=870727">Segments</a><a href="/data_center/map?id=870728">RAPDs</a></div></article>
+    </div>
+  </section>
+
+  <section id="rn-maps" aria-labelledby="rn-maps-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="rn-maps-title">Recombination nodule maps</h2></div>
+    </div>
+
+    <p class="cyt-rn-lead">Recombination nodules mark crossovers on the pachytene synaptonemal complex, so counting them along an SC gives a crossover map in physical units that can be set against the genetic map of the same chromosome. Lorinda Anderson scored them for all ten maize bivalents, and this is the data the Morgan2McClintock Translator was built on to convert genetic positions into cytological ones &#40;<a href="https://doi.org/10.1534/genetics.105.054155">Lawrence et al. 2006, <cite>Genetics</cite> 172&#58;2007&ndash;2009</a>&#41;. That tool is no longer running anywhere we can point you to; the data below is what it read.</p>
+
+    <dl class="cyt-rn-facts">
+      <div><dt>Source</dt><dd><a href="/person?id=125984">Lorinda Anderson</a></dd></div>
+      <div><dt>Coordinates</dt><dd>Recombination nodule frequency on pachytene synaptonemal complexes, per 0.2&nbsp;&micro;m SC length interval</dd></div>
+      <div><dt>Species</dt><dd><i>Zea mays</i> ssp. <i>mays</i></dd></div>
+      <div><dt>Linkage groups</dt><dd><span class="cyt-inline-links cyt-rn-lgs"><a href="/data_center/lg?id=13579">1</a><a href="/data_center/lg?id=13582">2</a><a href="/data_center/lg?id=13585">3</a><a href="/data_center/lg?id=13588">4</a><a href="/data_center/lg?id=13591">5</a><a href="/data_center/lg?id=13594">6</a><a href="/data_center/lg?id=13597">7</a><a href="/data_center/lg?id=13600">8</a><a href="/data_center/lg?id=13603">9</a><a href="/data_center/lg?id=13606">10</a></span></dd></div>
+      <div><dt>Stocks</dt><dd>Inbred <a href="/data_center/stock?id=68278">KYS</a>, and heterozygotes for <a href="/data_center/stock?id=14601">Inv1d</a>, Inv2i, <a href="/data_center/stock?id=14607">Inv3c</a>, Inv4c, Inv5d, Inv6b, <a href="/data_center/stock?id=173242">Inv7a</a>, Inv8c, Inv9b and Inv10a</dd></div>
+      <div><dt>References</dt><dd><a href="/data_center/reference/?id=894809">Anderson et al. 2003, <cite>Genetics</cite> 165&#58;849&ndash;865</a> for the map data; <a href="/data_center/reference/?id=934540">Anderson et al. 2004, <cite>Genetics</cite> 166&#58;1923&ndash;1933</a> for the genetic-to-cytological conversion</dd></div>
+    </dl>
+
+    <h3 class="mgdb-leaf-heading">Map data</h3>
+    <p class="cyt-rn-note">One tab-separated file per synaptonemal complex. Each begins with the short-arm, long-arm and total lengths in both &micro;m and cM, then gives one row per 0.2&nbsp;&micro;m interval&#58; position as a percentage of SC length, position in &micro;m, RN count, RN percentage, and cumulative cM.</p>
+    <div class="cyt-inline-links cyt-rn-downloads"><a href="/docs/RNmaps/SC1.txt" download>SC1</a><a href="/docs/RNmaps/SC2.txt" download>SC2</a><a href="/docs/RNmaps/SC3.txt" download>SC3</a><a href="/docs/RNmaps/SC4.txt" download>SC4</a><a href="/docs/RNmaps/SC5.txt" download>SC5</a><a href="/docs/RNmaps/SC6.txt" download>SC6</a><a href="/docs/RNmaps/SC7.txt" download>SC7</a><a href="/docs/RNmaps/SC8.txt" download>SC8</a><a href="/docs/RNmaps/SC9.txt" download>SC9</a><a href="/docs/RNmaps/SC10.txt" download>SC10</a></div>
+
+    <h3 class="mgdb-leaf-heading mgdb-spaced">KYS synaptonemal complex karyotype</h3>
+    <div class="mgdb-table-scroll">
+      <table class="mgdb-table cyt-rn-table">
+        <caption class="mgdb-visually-hidden">Arm ratio and length of each KYS synaptonemal complex</caption>
+        <thead>
+          <tr>
+            <th scope="col">Chromosome</th>
+            <th scope="col" class="mgdb-numeric">Arm ratio</th>
+            <th scope="col" class="mgdb-numeric">% total length</th>
+            <th scope="col" class="mgdb-numeric">Average length &#40;&micro;m&#41;</th>
+            <th scope="col" class="mgdb-numeric">Short arm &#40;&micro;m&#41;</th>
+            <th scope="col" class="mgdb-numeric">Long arm &#40;&micro;m&#41;</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">1</th><td class="mgdb-numeric">1.27</td><td class="mgdb-numeric">14.8</td><td class="mgdb-numeric">49.0</td><td class="mgdb-numeric">21.6</td><td class="mgdb-numeric">27.4</td></tr>
+          <tr><th scope="row">2</th><td class="mgdb-numeric">1.08</td><td class="mgdb-numeric">11.9</td><td class="mgdb-numeric">39.4</td><td class="mgdb-numeric">18.9</td><td class="mgdb-numeric">20.5</td></tr>
+          <tr><th scope="row">3</th><td class="mgdb-numeric">2.02</td><td class="mgdb-numeric">11.2</td><td class="mgdb-numeric">37.1</td><td class="mgdb-numeric">12.3</td><td class="mgdb-numeric">24.8</td></tr>
+          <tr><th scope="row">4</th><td class="mgdb-numeric">1.56</td><td class="mgdb-numeric">10.7</td><td class="mgdb-numeric">35.4</td><td class="mgdb-numeric">13.8</td><td class="mgdb-numeric">21.6</td></tr>
+          <tr><th scope="row">5</th><td class="mgdb-numeric">1.10</td><td class="mgdb-numeric">10.8</td><td class="mgdb-numeric">35.7</td><td class="mgdb-numeric">17.0</td><td class="mgdb-numeric">18.7</td></tr>
+          <tr><th scope="row">6</th><td class="mgdb-numeric">2.63</td><td class="mgdb-numeric">8.9</td><td class="mgdb-numeric">29.5</td><td class="mgdb-numeric">8.1</td><td class="mgdb-numeric">21.4</td></tr>
+          <tr><th scope="row">7</th><td class="mgdb-numeric">2.76</td><td class="mgdb-numeric">8.7</td><td class="mgdb-numeric">28.8</td><td class="mgdb-numeric">7.7</td><td class="mgdb-numeric">21.1</td></tr>
+          <tr><th scope="row">8</th><td class="mgdb-numeric">3.04</td><td class="mgdb-numeric">8.5</td><td class="mgdb-numeric">28.1</td><td class="mgdb-numeric">7.0</td><td class="mgdb-numeric">21.1</td></tr>
+          <tr><th scope="row">9</th><td class="mgdb-numeric">1.92</td><td class="mgdb-numeric">7.7</td><td class="mgdb-numeric">25.5</td><td class="mgdb-numeric">8.7</td><td class="mgdb-numeric">16.8</td></tr>
+          <tr><th scope="row">10</th><td class="mgdb-numeric">2.43</td><td class="mgdb-numeric">6.8</td><td class="mgdb-numeric">22.5</td><td class="mgdb-numeric">6.6</td><td class="mgdb-numeric">15.9</td></tr>
+        </tbody>
+      </table>
     </div>
   </section>
 
