@@ -1,87 +1,257 @@
 <?php
 /* file: search/expression/expression_search_lib.php
  *
- * purpose: database queries and search utilities for MaizeGDB Expression Data Hub
+ * purpose: database queries, release reader and link builders for the
+ *          MaizeGDB Expression Data Hub (/expression).
+ *
+ *          Two sources feed the hub. chado.gene_model answers the gene
+ *          lookup (every assembly, 1.9 M rows). The expression releases
+ *          under data/expression/<genome>/ -- one SQLite file per genome,
+ *          written by tools/expression_index.py from qTeller's own files --
+ *          say which of those assemblies have expression data, and feed the
+ *          metrics, the release table and the per-gene profile the page
+ *          draws through /api/v1/data/expression/{genome}/{id}.
+ *
+ *          The rule for every outbound link is: only emit a link when the
+ *          target has data for that gene. qTeller has three chart pages
+ *          (B73 v5, B73 v4, the NAM founders) and nothing for W22, Mo17 or
+ *          the older B73 releases; the BAR eFP browser resolves B73 gene
+ *          ids only; JBrowse has RNA-seq coverage for B73 v5 and the NAM
+ *          founders, and B73 v4 and older are on GBrowse.
  */
 
 include_once(__DIR__ . '/../../include/db-api.php');
 include_once(__DIR__ . '/../../include/gp_lib.php');
 
-/**
- * Returns corpus summary metrics for expression data.
- */
-function expressionSummaryStats($DBConn) {
-    // Count distinct gene models across key reference assemblies
-    $countSql = "
-        SELECT 
-            COUNT(DISTINCT gene_name) AS total_gene_models
-        FROM chado.gene_model
-        WHERE assembly_version IN (
-            'Zm-B73-REFERENCE-NAM-5.0',
-            'Zm-B73-REFERENCE-GRAMENE-4.0',
-            'B73 RefGen_v3',
-            'B73 RefGen_v2',
-            'Zm-W22-REFERENCE-NRGENE-2.0',
-            'Zm-Mo17-REFERENCE-CAU-1.0'
-        )";
-    $row = retrieve_row(make_query($DBConn, $countSql));
+/* ------------------------------------------------------------------------
+   Expression releases
+   ------------------------------------------------------------------------ */
 
-    return array(
-        'total_gene_models'    => (int) ($row['total_gene_models'] ?? 145000),
-        'total_assemblies'     => 29, // 26 NAM founder lines + B73v5 + B73v4 + B73v3
-        'nam_lines'            => 26, // 26 NAM pan-genome founder inbreds
-        'distinct_tissues'     => 60, // 60 developmental tissues in Sekhon et al. & qTeller atlases
-        'interactive_tools'    => 6   // FETA, qTeller, eFP Browser, JBrowse RNA-seq, MaizeMine, NCBI GEO/SRA
-    );
+function expressionReleaseDir() {
+    $root = (isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] !== '')
+          ? $_SERVER['DOCUMENT_ROOT'] : realpath(__DIR__ . '/../..');
+    return rtrim($root, '/') . '/data/expression';
 }
 
 /**
- * Gene models per assembly, reference genomes first and then by size.
- *
- * One query answers three things the hub needs -- the assembly filter's option
- * list, the "assemblies with expression data" metric, and the figure -- so it
- * runs once and the caller keeps the rows. The earlier version built the
- * options and discarded the counts, which meant the same GROUP BY would have
- * had to run again for the chart.
+ * Every genome with an expression release on disk: genome => manifest.
+ * The same rule MgdbData::genomes() applies -- a directory with a
+ * manifest.json, skipping the .previous and .building copies a rebuild
+ * leaves beside it -- so the hub and the API agree on what exists.
+ * Read once per request.
+ */
+function expressionReleases() {
+    static $releases = null;
+    if ($releases !== null) { return $releases; }
+    $releases = array();
+    $dir = expressionReleaseDir();
+    if (!is_dir($dir)) { return $releases; }
+    foreach (scandir($dir) as $name) {
+        if ($name === '' || $name[0] === '.') { continue; }
+        if (!preg_match('/^[A-Za-z0-9][A-Za-z0-9_.-]*$/', $name)) { continue; }
+        if (substr($name, -9) === '.previous' || substr($name, -9) === '.building') { continue; }
+        $file = $dir . '/' . $name . '/manifest.json';
+        if (!is_file($file)) { continue; }
+        $m = json_decode((string) @file_get_contents($file), true);
+        if (!is_array($m)) { continue; }
+        $releases[$name] = $m;
+    }
+    ksort($releases);
+    return $releases;
+}
+
+/** The newest manifest mtime, for cache keys. */
+function expressionReleaseStamp() {
+    $stamp = 0;
+    foreach (array_keys(expressionReleases()) as $name) {
+        $t = (int) @filemtime(expressionReleaseDir() . '/' . $name . '/manifest.json');
+        if ($t > $stamp) { $stamp = $t; }
+    }
+    return $stamp;
+}
+
+/** The release genome for an assembly name, or null. */
+function expressionReleaseFor($assembly) {
+    $releases = expressionReleases();
+    return ($assembly !== '' && isset($releases[$assembly])) ? $assembly : null;
+}
+
+function expressionIsNamFounder($assembly) {
+    return (bool) preg_match('/^Zm-[A-Za-z0-9]+-REFERENCE-NAM-1\.0$/', (string) $assembly);
+}
+
+/* ------------------------------------------------------------------------
+   Outbound links
+   ------------------------------------------------------------------------ */
+
+/**
+ * qTeller's chart page for a gene. The page differs by data set, not by
+ * gene id: bar_chart_B73v5.php holds the B73 v5 atlases, bar_chart_NAM.php
+ * the NAM Consortium tissues for every founder including B73, and
+ * bar_chart_B73v4.php the v4 sets. info=all asks for every data set on the
+ * chart. Null for an assembly qTeller does not carry.
+ */
+function expressionQtellerUrl($assembly, $gene, $set = null) {
+    if ($set === null) {
+        if ($assembly === 'Zm-B73-REFERENCE-NAM-5.0') { $set = 'B73v5'; }
+        elseif ($assembly === 'Zm-B73-REFERENCE-GRAMENE-4.0') { $set = 'B73v4'; }
+        elseif (expressionIsNamFounder($assembly)) { $set = 'NAM'; }
+        else { return null; }
+    }
+    if (expressionReleaseFor($assembly) === null) { return null; }
+    return 'https://qteller.maizegdb.org/bar_chart_' . $set . '.php?name=' . rawurlencode($gene) . '&info=all';
+}
+
+/**
+ * The BAR's eFP browser resolves B73 identifiers of any version to the
+ * same expression data (a v3, v4 and v5 id of one gene draw the same
+ * picture), and knows nothing about the other inbreds -- a NAM founder id
+ * returns an empty page. So the link is offered for B73 assemblies only,
+ * opened on the atlas built for that annotation with the gene preselected.
+ */
+function expressionEfpUrl($assembly, $gene) {
+    static $atlas = array(
+        'Zm-B73-REFERENCE-NAM-5.0'     => 'Hoopes_et_al_Atlas_V5',
+        'Zm-B73-REFERENCE-GRAMENE-4.0' => 'Hoopes_et_al_Atlas',
+        'B73 RefGen_v3'                => 'Sekhon_et_al_Atlas',
+        'B73 RefGen_v2'                => 'Sekhon_et_al_Atlas'
+    );
+    if (!isset($atlas[$assembly])) { return null; }
+    return 'https://bar.utoronto.ca/efp_maize/cgi-bin/efpWeb.cgi?dataSource=' . $atlas[$assembly]
+         . '&mode=Absolute&primaryGene=' . rawurlencode($gene);
+}
+
+/**
+ * JBrowse dataset id for an assembly, from jbrowse.conf's [datasets.*]
+ * blocks: B73 v5 is "B73", v4 is "B73v4", the NAM founders are their line
+ * names. Null for assemblies that instance does not carry.
+ */
+function expressionJbrowseDataset($assembly) {
+    if ($assembly === 'Zm-B73-REFERENCE-NAM-5.0') { return 'B73'; }
+    if ($assembly === 'Zm-B73-REFERENCE-GRAMENE-4.0') { return 'B73v4'; }
+    if (preg_match('/^Zm-([A-Za-z0-9]+)-REFERENCE-NAM-1\.0$/', (string) $assembly, $m)) { return $m[1]; }
+    return null;
+}
+
+/**
+ * The RNA-seq coverage tracks to open with a gene, by dataset. JBrowse 1
+ * takes track LABELS, silently ignores unknown ones, and parses loc and
+ * tracks unencoded. The B73 v5 labels are the NAM Consortium MultiBigWig
+ * tracks (checked against B73/trackList.json); every founder dataset
+ * includes the same ten tissues from include/nam_rnaseq/<tissue>/rep1.json,
+ * except that the embryo sample exists for B73 only.
+ */
+function expressionJbrowseTracks($dataset) {
+    if ($dataset === 'B73') {
+        return 'gene_models_official,16dap_embryo_mn01101,16dap_endosperm_mn01091,8das_root_mn01011,'
+             . '8das_shoot_mn01021,r1_anther_mn01081,v11_base_mn01031,v11_middle_mn01041,v11_tip_mn01051,'
+             . 'v18_ear_mn01071,v18_tassel_mn01061';
+    }
+    if ($dataset === 'B73v4' || $dataset === null) { return null; }
+    return 'gene_models_official,16dap_endosperm_rep1,8das_root_rep1,8das_shoot_rep1,r1_anther_rep1,'
+         . 'v11_base_rep1,v11_middle_rep1,v11_tip_rep1,v18_ear_rep1,v18_tassel_rep1';
+}
+
+/**
+ * JBrowse opened on the gene with the RNA-seq tracks, for B73 v5 and the
+ * NAM founders. loc takes the gene id: every dataset carries a names index
+ * (names/meta.json), so the browser lands on the model itself rather than
+ * on coordinates that may drift between annotation versions.
+ */
+function expressionJbrowseUrl($assembly, $gene) {
+    $dataset = expressionJbrowseDataset($assembly);
+    $tracks = expressionJbrowseTracks($dataset);
+    if ($dataset === null || $tracks === null) { return null; }
+    return 'https://jbrowse.maizegdb.org/?data=' . $dataset . '&loc=' . rawurlencode($gene)
+         . '&tracks=' . $tracks . '&highlight=';
+}
+
+/**
+ * GBrowse for the assemblies that instance still serves. The
+ * www.maizegdb.org/gbrowse/... form recorded in chado.genome_metadata
+ * answers the homepage now; gbrowse.maizegdb.org/gb2/gbrowse/<db>/ is
+ * the live host (checked for v2, v3 and v4).
+ */
+function expressionGbrowseUrl($assembly, $gene) {
+    static $db = array(
+        'Zm-B73-REFERENCE-GRAMENE-4.0' => 'maize_v4',
+        'B73 RefGen_v3' => 'maize_v3',
+        'B73 RefGen_v2' => 'maize_v2'
+    );
+    if (!isset($db[$assembly])) { return null; }
+    return 'https://gbrowse.maizegdb.org/gb2/gbrowse/' . $db[$assembly] . '/?name=' . rawurlencode($gene)
+         . ';h_feat=' . rawurlencode($gene);
+}
+
+/* ------------------------------------------------------------------------
+   Assemblies
+   ------------------------------------------------------------------------ */
+
+/**
+ * Every assembly carrying gene models, with the model count. One
+ * aggregate over the table, cached by the controller; it feeds the
+ * assembly filter's option list. (The earlier COUNT(DISTINCT gene_name)
+ * took 10.9 s; a plain COUNT(*) over the same GROUP BY is what the filter
+ * needs and is several times cheaper.)
  */
 function expressionAssemblyBreakdown($DBConn) {
     $sql = "
-        SELECT assembly_version, COUNT(DISTINCT gene_name) AS gene_count
+        SELECT assembly_version, COUNT(*) AS model_count
         FROM chado.gene_model
         WHERE assembly_version IS NOT NULL AND assembly_version != ''
         GROUP BY assembly_version
-        ORDER BY 
-            (assembly_version = 'Zm-B73-REFERENCE-NAM-5.0') DESC,
-            (assembly_version = 'Zm-B73-REFERENCE-GRAMENE-4.0') DESC,
-            (assembly_version = 'B73 RefGen_v3') DESC,
-            (assembly_version = 'B73 RefGen_v2') DESC,
-            gene_count DESC";
-
+        ORDER BY assembly_version";
     $rows = array();
     $stmt = make_query($DBConn, $sql);
     while ($row = retrieve_row($stmt)) {
-        $rows[] = array(
-            'assembly' => $row['assembly_version'],
-            'genes'    => (int) $row['gene_count']
-        );
+        $rows[] = array('assembly' => $row['assembly_version'], 'models' => (int) $row['model_count']);
     }
-
     return $rows;
 }
 
 /**
- * Returns HTML <option> list for assembly filter, from rows already fetched.
+ * The assembly filter: assemblies with an expression release first (the
+ * B73 references, then the founders), the rest after, in two optgroups.
  */
 function expressionAssemblyOptions($rows) {
-    $options = '<option value="">All assemblies and pan-genomes</option>' . "\n";
+    $releases = expressionReleases();
+    $withData = array();
+    $without = array();
     foreach ((array) $rows as $row) {
-        $options .= '<option value="' . htmlspecialchars($row['assembly'], ENT_QUOTES, 'UTF-8') . '">'
-                 . htmlspecialchars($row['assembly'], ENT_QUOTES, 'UTF-8')
-                 . ' &#40;' . number_format($row['genes']) . ' genes&#41;'
-                 . "</option>\n";
+        if (isset($releases[$row['assembly']])) { $withData[] = $row['assembly']; }
+        else { $without[] = $row['assembly']; }
     }
-    return $options;
+    $rank = function ($a) {
+        if ($a === 'Zm-B73-REFERENCE-NAM-5.0') { return '0'; }
+        if ($a === 'Zm-B73-REFERENCE-GRAMENE-4.0') { return '1'; }
+        return '2' . $a;
+    };
+    usort($withData, function ($a, $b) use ($rank) { return strcmp($rank($a), $rank($b)); });
+    usort($without, function ($a, $b) {
+        $order = array('B73 RefGen_v3' => 0, 'B73 RefGen_v2' => 1, 'B73 RefGen_v1' => 2);
+        $ra = isset($order[$a]) ? $order[$a] : 9;
+        $rb = isset($order[$b]) ? $order[$b] : 9;
+        return $ra === $rb ? strcmp($a, $b) : ($ra < $rb ? -1 : 1);
+    });
+
+    $esc = function ($s) { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8'); };
+    $html = '<option value="">All assemblies</option>' . "\n";
+    if ($withData) {
+        $html .= '<optgroup label="With expression profiles">' . "\n";
+        foreach ($withData as $a) { $html .= '<option value="' . $esc($a) . '">' . $esc($a) . '</option>' . "\n"; }
+        $html .= '</optgroup>' . "\n";
+    }
+    if ($without) {
+        $html .= '<optgroup label="Gene models only">' . "\n";
+        foreach ($without as $a) { $html .= '<option value="' . $esc($a) . '">' . $esc($a) . '</option>' . "\n"; }
+        $html .= '</optgroup>' . "\n";
+    }
+    return $html;
 }
+
+/* ------------------------------------------------------------------------
+   Gene lookup
+   ------------------------------------------------------------------------ */
 
 /**
  * Searches gene models and mapped loci for expression lookup.
@@ -120,6 +290,16 @@ function expressionSearch($DBConn, $filters = array(), $limit = 50, $offset = 0)
     if ($assembly !== '') {
         $params[] = $assembly;
         $where[] = "gm.assembly_version = ?";
+    } elseif (!empty($filters['expression_only'])) {
+        /* Only the assemblies with an expression release -- the list comes
+           from the release directory, so it follows a rebuild without an
+           edit here. An empty list matches nothing rather than everything. */
+        $names = array_keys(expressionReleases());
+        if (count($names) === 0) {
+            return array('total' => 0, 'results' => array());
+        }
+        foreach ($names as $n) { $params[] = $n; }
+        $where[] = "gm.assembly_version IN (" . implode(',', array_fill(0, count($names), '?')) . ")";
     }
 
     $whereSql = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
@@ -143,12 +323,16 @@ function expressionSearch($DBConn, $filters = array(), $limit = 50, $offset = 0)
     } elseif ($sort === 'coordinates-desc') {
         $orderClause = "gm.chr DESC, gm.gm_start DESC NULLS LAST";
     } elseif ($term !== '') {
+        /* Best match: exact hits first, then the current B73 reference, then
+           the assemblies that have expression data, so the rows a reader can
+           open a profile for come before the ones that only have a model. */
         $exactEscaped = str_replace("'", "''", str_replace('*', '', strtolower($term)));
         $orderClause = "
             (LOWER(gm.gene_name) = '{$exactEscaped}') DESC,
             (LOWER(gm.locus_name) = '{$exactEscaped}') DESC,
             (gm.assembly_version = 'Zm-B73-REFERENCE-NAM-5.0') DESC,
             (gm.assembly_version = 'Zm-B73-REFERENCE-GRAMENE-4.0') DESC,
+            (gm.assembly_version LIKE '%-REFERENCE-NAM-1.0') DESC,
             gm.gene_name ASC";
     }
 
@@ -157,7 +341,6 @@ function expressionSearch($DBConn, $filters = array(), $limit = 50, $offset = 0)
        and most lookups return fewer rows than fit on one page, so paying for it
        every time doubled the cost of the common case for nothing. */
     $probe = $limit + 1;
-
     $sql = "
         SELECT gm.gene_name, gm.version, gm.assembly_version, gm.chr, gm.gm_start, gm.gm_end,
                gm.locus_name, gm.locus_id, gm.locus_full_name
@@ -188,61 +371,53 @@ function expressionSearch($DBConn, $filters = array(), $limit = 50, $offset = 0)
     }
 
     $results = array();
-
-    if ($rows) {
-        foreach ($rows as $r) {
-            $gene = $r['gene_name'];
-            $asm = $r['assembly_version'] ?? '';
-            $chrRaw = trim((string)($r['chr'] ?? ''));
-            $chrNum = preg_replace('/^chr/i', '', $chrRaw);
-            $chr = ($chrNum !== '') ? 'chr' . $chrNum : $chrRaw;
-            $start = $r['gm_start'] ?? '';
-            $end = $r['gm_end'] ?? '';
-            $coordStr = ($chr !== '' && $start !== '' && $end !== '') ? "{$chr}:{$start}..{$end}" : $chr;
-
-            // Generate tool launch links
-            $qtellerUrl = 'https://qteller.maizegdb.org/';
-            if (stripos($asm, '5.0') !== false || stripos($asm, 'NAM-5') !== false || stripos($gene, 'eb') !== false) {
-                $qtellerUrl = 'https://qteller.maizegdb.org/index_B73v5.php?gene=' . urlencode($gene);
-            } elseif (stripos($asm, '4.0') !== false || stripos($gene, 'Zm00001d') !== false) {
-                $qtellerUrl = 'https://qteller.maizegdb.org/index_B73v4.php?gene=' . urlencode($gene);
-            } elseif (stripos($gene, 'Zm000') !== false && !stripos($gene, 'eb') && !stripos($gene, 'd')) {
-                $qtellerUrl = 'https://qteller.maizegdb.org/index_NAM.php?gene=' . urlencode($gene);
-            }
-
-            // eFP Pictograph Browser URL (uses v2/v3 or mapped locus)
-            $efpUrl = 'http://bar.utoronto.ca/efp_maize/cgi-bin/efpWeb.cgi?dataSource=Sekhon_et_al_Atlas';
-            if (stripos($gene, 'GRMZM') !== false) {
-                $efpUrl .= '&primaryGene=' . urlencode($gene);
-            }
-
-            // Gene Center profile URL
-            $geneCenterUrl = '/gene_center/gene/' . urlencode(!empty($r['locus_id']) ? $r['locus_id'] : $gene) . '#expression';
-
-            // JBrowse RNA-seq URL
-            $jbrowseUrl = 'https://jbrowse.maizegdb.org/?data=data%2F' . urlencode($asm !== '' ? $asm : 'Zm-B73-REFERENCE-NAM-5.0') . '&tracks=RNA-seq';
-            if ($coordStr !== '') {
-                $jbrowseUrl .= '&loc=' . urlencode($coordStr);
-            }
-
-            $results[] = array(
-                'gene_name'        => $gene,
-                'assembly_version' => $asm,
-                'locus_name'       => $r['locus_name'] ?? '',
-                'locus_full_name'  => $r['locus_full_name'] ?? '',
-                'locus_id'         => !empty($r['locus_id']) ? (int) $r['locus_id'] : null,
-                'chromosome'       => $chr,
-                'coordinates'      => $coordStr,
-                'qteller_url'      => $qtellerUrl,
-                'efp_url'          => $efpUrl,
-                'gene_center_url'  => $geneCenterUrl,
-                'jbrowse_url'      => $jbrowseUrl
-            );
-        }
+    foreach ($rows as $r) {
+        $results[] = expressionResultRow($r);
     }
 
     return array(
         'total'   => $total,
         'results' => $results
+    );
+}
+
+/**
+ * One result row with its links. Every link is null when the target has
+ * no data for that assembly; the client shows what it is given.
+ */
+function expressionResultRow($r) {
+    $gene = $r['gene_name'];
+    $asm = isset($r['assembly_version']) ? (string) $r['assembly_version'] : '';
+
+    $chrRaw = trim((string) ($r['chr'] ?? ''));
+    $chrNum = preg_replace('/^chr/i', '', $chrRaw);
+    $chr = ($chrNum !== '') ? 'chr' . $chrNum : $chrRaw;
+    $start = $r['gm_start'] ?? '';
+    $end = $r['gm_end'] ?? '';
+    $coordStr = ($chr !== '' && $start !== '' && $end !== '') ? "{$chr}:{$start}..{$end}" : $chr;
+
+    $release = expressionReleaseFor($asm);
+
+    return array(
+        'gene_name'         => $gene,
+        'assembly_version'  => $asm,
+        'locus_name'        => $r['locus_name'] ?? '',
+        'locus_full_name'   => $r['locus_full_name'] ?? '',
+        'locus_id'          => !empty($r['locus_id']) ? (int) $r['locus_id'] : null,
+        'chromosome'        => $chr,
+        'coordinates'       => $coordStr,
+        /* The expression release this model has a profile in, or null. The
+           page opens /api/v1/data/expression/{expression_genome}/{gene_name}. */
+        'expression_genome' => $release,
+        'api_url'           => $release === null ? null
+                               : '/api/v1/data/expression/' . $release . '/' . rawurlencode($gene),
+        'qteller_url'       => expressionQtellerUrl($asm, $gene),
+        /* B73 v5 genes are also in the NAM Consortium tissue set, which
+           qTeller shows on its own chart page. */
+        'qteller_nam_url'   => $asm === 'Zm-B73-REFERENCE-NAM-5.0' ? expressionQtellerUrl($asm, $gene, 'NAM') : null,
+        'efp_url'           => expressionEfpUrl($asm, $gene),
+        'gene_center_url'   => '/gene_center/gene/' . rawurlencode($gene) . '#gene-record-expression',
+        'jbrowse_url'       => expressionJbrowseUrl($asm, $gene),
+        'gbrowse_url'       => expressionGbrowseUrl($asm, $gene)
     );
 }

@@ -4423,6 +4423,77 @@ the arithmetic. The GROUP BY that builds the assembly filter already knows the
 answer — it is 36 — so the count comes from there now, and the same query feeds
 the filter, the metric and the figure instead of running twice.
 
+### Reworked around the expression API, 2026-09-13
+
+Once `/api/v1/data/expression/{genome}/{id}` existed the hub could show
+expression instead of only pointing at it. What changed, and the facts each
+change rests on:
+
+- **Every result row with a release gets a Profile button** that opens an
+  "Expression profile" section (hidden until used, like Results) and draws the
+  gene through `MGDB.geneExpression` — the same figure the gene record uses,
+  from the same payload — with the row's outbound buttons above it. Deep link:
+  `/expression?gene=Zm00026ab084980&genome=Zm-CML333-REFERENCE-NAM-1.0`.
+- **Outbound links are emitted only where the target has data.** The endpoint
+  sends `null` otherwise and the client draws what it is given:
+  - qTeller has three chart pages and the page differs by *data set*, not by
+    id: `bar_chart_B73v5.php` for B73 v5, `bar_chart_NAM.php` for every NAM
+    founder *and* for B73 v5 genes in the NAM Consortium tissues (so a v5 row
+    gets both), `bar_chart_B73v4.php` for v4; `&info=all` shows every set.
+    W22, Mo17 and RefGen_v1-v3 have no qTeller page and now get no link.
+  - The BAR eFP browser takes `&primaryGene=<id>` and resolves B73 ids of any
+    version; a NAM founder id returns a 133-byte empty page, so eFP is offered
+    for B73 assemblies only, on the atlas for that annotation
+    (`Hoopes_et_al_Atlas_V5` for v5, `Hoopes_et_al_Atlas` for v4,
+    `Sekhon_et_al_Atlas` for v2/v3).
+  - JBrowse: `?data=<dataset id>&loc=<gene id>&tracks=<labels>`. The dataset
+    ids come from `jbrowse.conf` (`B73`, `B73v4`, founders by line name); every
+    dataset has a names index so `loc=` takes the gene id; the B73 labels are
+    the NAM Consortium MultiBigWig tracks (`16dap_embryo_mn01101` …), the
+    founders' are `include/nam_rnaseq/<tissue>/rep1.json` (`8das_root_rep1` …,
+    no embryo). Verified in the pane: both land on the gene with the ten
+    tracks open. The old `?data=data%2F<assembly>&tracks=RNA-seq` form was
+    wrong twice over (no such dataset, no such label).
+  - GBrowse for v2/v3/v4: `gbrowse.maizegdb.org/gb2/gbrowse/maize_v4/?name=`.
+    The `www.maizegdb.org/gbrowse/maize_v4` form recorded in
+    `chado.genome_metadata.browser` answers the homepage at HTTP 200.
+- **The hero and the "Assemblies" metric count releases, not gene-model
+  assemblies.** 36 is the number of assemblies with gene models; 27 is the
+  number qTeller has expression for (B73 v5, v4 and 25 founders — B73 is the
+  26th), read from `data/expression/*/manifest.json`, so it follows a rebuild.
+  The other cards are the B73 v5 release's own counts (genes profiled, samples
+  by assay, studies) and the figure is its samples by tissue reading, RNA and
+  protein stacked, from one GROUP BY over the release's `samples` table. The
+  "gene models by assembly" figure and its 10.9 s `COUNT(DISTINCT gene_name)`
+  are gone; the assembly filter's option list keeps the GROUP BY with a plain
+  `COUNT(*)` and lists the 27 with data first, in an optgroup.
+- **The Genome atlases cards became an Expression releases table** — the 27
+  releases with genes, RNA/protein samples, studies, and qTeller / JBrowse /
+  API / samples-TSV links, plus a Search button that sets the assembly filter.
+- **Advanced search gained "Only assemblies with expression profiles"**, an
+  `IN (...)` over the release names.
+- **The Box folder ids were dead.** All four `iastate.app.box.com/v/maizegdb-public/folder/3234…`
+  links answered Box's "The requested page does not exist" (production has
+  the same four). The share root lists the current folders:
+  `qTeller_FPKM_MaizeGDB` 362581633349, `B73v5_JBROWSE_AND_ANALYSES/B73v5_RNA-seq`
+  362581614626 (2,025 files), `eFP_data_B73v5` 362582432633. No folder for the
+  NAM founder BAMs or the CAU series was found, so those two cards are gone; a
+  card for the atlas table on `download.maizegdb.org/GeneFunction_and_Expression/Sekon_expression_atlas/`
+  and one for the API's TSVs took their place. Box folder pages render their
+  listing lazily — `curl` sees a 26 KB shell either way — so a folder has to be
+  checked in a browser.
+
+Follow-up the same day: the Metrics figure and table split the RNA-seq
+samples by stress condition (abiotic, biotic, control, read inside stress
+studies only; the rest are "RNA-seq, other studies"), with a totals row. Link
+markers are decided from the href in `mgdb-expression.css`: a link off
+maizegdb.org carries the shell's ↗, and Box, `/download`, the download host
+and any `format=tsv` export carry ↓ — including the script-rendered result
+rows. And `css/mgdb-gene-expression.css` had the tissue classes setting only
+SVG `fill`, so the By tissue bars, the legend swatches and the top-sample dots
+were blank on the hub and on every gene record; they set `background-color`
+now, as the condition classes always did.
+
 ## The AI & Machine Learning Data Hub
 
 `/ai` is built on `css/mgdb-hub.css`, the generalised Data Hub shell: it puts
@@ -7991,3 +8062,317 @@ A useful opening prompt:
 > https://claude.maizegdb.org/pattern_library/ so you are using the existing
 > design system. Then modernize <page>, replacing the real route and archiving
 > the originals per the policy in the README.
+
+## The Data API: gene models and protein domains
+
+Built 2026-09-12. Two datasets answered from release files instead of from
+records, under the same envelope, ETag, problem-details and documentation as
+the record API:
+
+```
+GET /api/v1/data                                   the datasets
+GET /api/v1/data/gene-models                       genomes with a release
+GET /api/v1/data/gene-models/{genome}              the release manifest
+GET /api/v1/data/gene-models/{genome}/{id}         one gene: every transcript, exons, CDS with phase, UTRs
+GET /api/v1/data/gene-models/{genome}/region/{seq}:{start}-{end}   type=gene|transcript|mRNA|exon|CDS|UTR
+GET /api/v1/data/gene-models/{genome}/batch?ids=   up to 200
+GET /api/v1/data/domains/{genome}/{id}             one protein: matches, entries, sites, go, pathways, genomic, classes
+GET /api/v1/data/domains/{genome}/entry/{accession}   every protein carrying an entry or signature
+GET /api/v1/data/domains/{genome}/region/{seq}:{start}-{end}       canonical domains projected onto the genome
+GET /api/v1/data/domains/{genome}/batch?ids=
+```
+
+`{genome}` is the assembly name (`Zm-B73-REFERENCE-NAM-5.0`); an alias declared
+in the manifest (`B73v5`) or `current` answers with a 302 to it. `?format=`
+gives GFF3, BED12 or TSV where the route offers it -- a query parameter, not an
+extension, because the sitewide rewrite skips any URI containing `.js`
+(AD-011). Coordinates are 1-based inclusive; blocks are in transcript (rank)
+order, so exon 1 of a minus-strand gene has the highest coordinate.
+
+### Where the answers come from
+
+`src/include/api/v1/lib/mgdb_data.php` knows the layout every builder writes
+and nothing about what a dataset means; the two resource files under
+`src/include/api/v1/data/` know the datasets. Nothing here queries the
+database unless an identifier is not a gene, transcript, protein or previous
+id of the release -- then `geneResolveId()` (the gene record's own resolver)
+is asked once and `meta.resolved_from` says so. `meta.file_reads` counts the
+shard reads behind a response.
+
+```
+data/gene_models/<genome>/
+  manifest.json          counts recomputed from the shards, sources with md5, sequences, disagreements
+  index.json             the public copy (no disagreements)
+  genes/<xxx>.json       4,096 shards by sha1(lowercase gene id)[:3]; ~11 genes each
+  aliases/<xx>.json      transcript, protein and previous id -> gene id, 256 shards
+  bins/<seq>/<n>.json    1 Mb bins of gene summaries; a gene sits in every bin it overlaps
+  gff3/<seq>.gff3.gz     the published rows, split by sequence
+data/domains/<genome>/
+  proteins/<xxx>.json    one payload per protein with at least one match
+  entries/<key>.json     one file per InterPro entry and per member signature
+  bins/<seq>/<n>.json    canonical-protein domains projected onto the genome
+```
+
+Both directories carry an `.htaccess` that denies every `*.json` to the
+browser except `index.json`, as `data/alphafill/` does. The builder writes
+`<genome>.building`, then renames the live release to `<genome>.previous` and
+the new one into place, so a request never sees a half-written release and
+the previous one is a rename away.
+
+### Rebuilding a release
+
+Both builders are standard-library Python and run on the server against the
+published files. B73 v5, as first built:
+
+```bash
+cd /var/www/claude/html
+python3 tools/gene_models_index.py \
+    --genome Zm-B73-REFERENCE-NAM-5.0 --annotation Zm00001eb.1 \
+    --source-dir /tmp/mgdb-build/Zm-B73-REFERENCE-NAM-5.0 --fetch \
+    --dest data/gene_models --alias B73v5 --alias b73 --current --snptools
+
+python3 tools/domains_index.py \
+    --genome Zm-B73-REFERENCE-NAM-5.0 --annotation Zm00001eb.1 \
+    --gene-models data/gene_models \
+    --interproscan https://download.maizegdb.org/Zm-B73-REFERENCE-NAM-5.0/Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.interproscan.tsv.gz \
+    --sites https://snptools.maizegdb.org/data/results.sites.tsv \
+    --atlas-dir data/projects/interpro_domain_atlas \
+    --go-names /tmp/mgdb-build/Zm-B73-REFERENCE-NAM-5.0/Zm00001eb.1.fulldata.txt.gz \
+    --source-dir /tmp/mgdb-build/domains \
+    --dest data/domains --alias B73v5 --alias b73 --current --snptools
+```
+
+The gene-models builder reads the GFF3 and the non-coding GFF3, the canonical
+list, the protein FASTA index (lengths), the locus map, the full-data file
+(symbol, full name, description) and the xref file (previous ids). Rules it
+enforces rather than assumes: the protein id comes from the CDS rows, never
+from the transcript name; exon order is the GFF `rank`; exactly one canonical
+transcript per coding gene; UTRs from the UTR rows; three times the protein
+length plus three equals the CDS length. Every violation is written to
+`manifest.disagreements`, never repaired silently.
+
+The domains builder reads an InterProScan TSV, the sites TSV, and the domain
+atlas payload for the genome's functional classes, immunity calls and the
+pan-genome status of every InterPro entry. **The published B73 v5 file is Pfam
+only**; the 17-analysis output of the atlas run lives on Atlas and was not
+reachable when this was built. Rebuilding with that file as `--interproscan`
+widens every section without a code change, and the manifest's
+`coverage_note` says which was used.
+
+`tools/tests/data_api_verify.py --origin http://<lan ip> --host claude.maizegdb.org`
+exercises every route against the origin, including the SBP domain of lg1
+projecting onto two CDS blocks and the whole of chromosome 1 paging at 2,000
+of 5,892.
+
+### What did not change
+
+`/api/v1/records/*` is untouched: the data branch is taken only when the
+second path segment is `data`. `MgdbApi::send()` is unchanged; `sendData()`
+and `sendText()` were added beside it. The OpenAPI document and the `/api`
+page gained a `datasets` tag and a Datasets section from `api_data_registry()`
+in `controllers/api.php`, the same way the record registry feeds them.
+
+### The gene record page reads the datasets (2026-09-12)
+
+`include/api/v1/records/gene.php` looks the gene up in the gene-models
+release for its assembly once, right after the identity is resolved. When a
+release exists (B73 v5 today):
+
+- `overview.strand` is the strand from the GFF3 (it was always null);
+- `structure.protein.length_aa` comes from the FASTA index, so the 470 ms
+  opt-in call to sequence2 is no longer made for these genes;
+- `structure.protein_domains` is built from the domains release for every
+  protein of the gene, with `analysis` and `entry` added, instead of the
+  Pfam-only database query;
+- `structure.gene_model` carries every transcript with exons, CDS and UTRs,
+  `structure.domains` the canonical protein's full InterProScan payload with
+  its genomic projection, and `structure.model` an AlphaFold model when the
+  AlphaFill payload or the protein-structure index has one for the gene.
+
+For other assemblies every one of those is null and the notes say why, and the
+database path is unchanged. A gene record now costs three to five shard reads
+on top of its queries.
+
+`js/mgdb-gene-structure.js` (`MGDB.geneStructure`) draws the "Gene model and
+protein" figure at the top of the Structure section: every transcript on the
+genome with UTRs thin and CDS thick, introns carrying strand chevrons, the
+selected transcript's CDS blocks carried down as connectors to the residues
+they encode, the protein with its InterPro entries and residue-level sites,
+and each domain painted back onto the CDS that encodes it. Choosing another
+transcript fetches that protein's domains from `/api/v1/data/domains/...`.
+The 3D panel loads `js/lib/3dmol/3Dmol-min.js` and the model only when the
+reader asks, and colours the cartoon by the same domains or by pLDDT;
+clicking a domain in the figure zooms the model to it.
+
+For a minus-strand gene the toolbar offers a reading direction: *Genome, left
+to right* (the chromosome as published; the transcript reads right to left and
+the connectors cross) or *Transcript, 5′ to 3′* (the genome band mirrored so
+the transcript and the protein both read left to right and the connectors run
+straight). The choice is remembered per browser in `localStorage`; the star
+on a transcript chip marks the canonical transcript and the legend says so.
+
+## The expression dataset and the gene record's Expression section (2026-09-12)
+
+qTeller's five SQLite files were copied to `/var/www/claude/qteller/` on the
+dev host (outside the web root: on qteller.maizegdb.org they sit inside it and
+are downloadable by anyone). `tools/expression_index.py` reads them and writes
+one small SQLite per genome under `data/expression/<genome>/`:
+
+```
+qt5db                 Zm-B73-REFERENCE-NAM-5.0      RNA, 267 samples, 29 studies
+gene_protein_qt5db    Zm-B73-REFERENCE-NAM-5.0      Walley 2019 RNA + protein, 23 tissues
+qtnamdb               Zm-B73-REFERENCE-NAM-5.0      the NAM consortium's B73 rows, 23 samples
+                      Zm-<line>-REFERENCE-NAM-1.0   the other 25 founders
+qt4db, gene_protein_qt4db   Zm-B73-REFERENCE-GRAMENE-4.0
+```
+
+Two facts about the source shape the builder. qTeller's `exp_table` omits
+zero values (one row for `Zm00001eb000010` against 267 columns), so the wide
+`gene_table` is the only complete matrix and is what the builder reads. And
+qt5db's catalogue has 14 rows (one study, its columns shifted at load) with no
+data column; they are recorded under `disagreements`, not invented.
+
+```
+data/expression/<genome>/expression.sqlite
+  sources(id, name, assay, link, description, sample_count, stress)
+  samples(id, ord, assay, stub, label, source_id, tissue, condition)
+  profiles(gene, assay, n, n_present, n_detected, mean, median, max, max_sample, tau, values)
+```
+
+`values` is a JSON array aligned with the assay's samples, rounded to four
+significant digits; a gene is one primary-key read. `tissue` is a keyword
+reading of the sample label (root, leaf, stem, shoot apex, floral, seed,
+seedling / whole plant, other), kept beside the label and called a reading,
+never an ontology term. `condition` is the same kind of reading for stress:
+`abiotic stress` (drought, heat, cold, salt, UV, nutrient, waterlogging,
+ozone, cadmium, wounding), `biotic stress` (inoculation, infection, mites,
+virus), or `control` (control, mock, untreated, well-watered, normal or high
+nitrogen, 1000 µM phosphate). The biotic and abiotic rules run over every
+label; the control rule only inside a study that has a stressed sample or
+calls itself a stress study, so an atlas "wild type" is never a stress
+control. That label pass also flags studies whose names never say stress
+(v4's Waters 2017, Kakumanu 2012, Forestan 2016). On B73 v5 it reads 67
+abiotic, 17 biotic and 35 control RNA samples and leaves none unread. `tau`
+is Yanai's tissue-specificity index on log2(value + 1); "detected" means
+value ≥ 1 for RNA and > 0 for protein. The summary folds the samples by
+tissue, by study, and by condition (`by_condition`, in the fixed order
+abiotic, biotic, control).
+
+Rebuild:
+
+```bash
+cd /var/www/claude/html
+python3 tools/expression_index.py --qteller-dir /var/www/claude/qteller \
+    --dest data/expression --alias B73v5 --alias b73 --current
+```
+
+Routes: `/api/v1/data/expression/{genome}/{id}` (sections summary, samples,
+sources; `assay=rna|protein|all`, `source=` filter, `format=tsv`),
+`/api/v1/data/expression/{genome}/samples`, `/api/v1/data/expression/{genome}/batch?ids=`
+(summaries by default). `include/api/v1/lib/mgdb_expression.php` is the reader
+both the route and `records/gene.php` use: the record embeds
+`expression.profile` for genomes with a release, and keeps `expression.qteller`
+as the link out.
+
+`js/mgdb-gene-expression.js` (`MGDB.geneExpression`) draws the "Expression
+profile" block at the top of the Expression section: four tiles (detected,
+mean and median, highest sample, specificity), one bar per sample grouped by
+study and coloured by tissue with a linear or log₂ axis and by-study or
+by-value order, the tissue legend as filters (with the stress conditions as
+a second set of filters), the mean line and the highest sample marked, the
+figures folded by tissue and by stress condition beside the top samples (each
+row is a filter too), the studies with their links, the units caveat, and
+the qTeller button. The
+sample table below it is the shared collection with TSV download.
+`data/expression/.htaccess` denies every file except `index.json`.
+
+### The Function section: "Function at a glance"
+
+Three payloads feed one figure (`js/mgdb-gene-function.js`, `MGDB.geneFunction`),
+all read from files by `records/gene.php` (no query), and all optional:
+
+- **The GO reference index** `data/go/go.sqlite`, built by `tools/go_index.py`
+  from go-basic.obo and InterPro2GO fetched to `/var/www/claude/go/` (outside
+  the docroot; dev8 has outbound HTTP):
+
+  ```bash
+  cd /var/www/claude/html
+  python3 tools/go_index.py --obo /var/www/claude/go/go-basic.obo \
+      --ipr2go /var/www/claude/go/interpro2go --dest data/go
+  ```
+
+  term (name, aspect, definition, obsolete, replaced_by, plant-slim flag,
+  depth), parent (is_a and part_of only: the true-path relations), the full
+  ancestor closure (439,482 rows), ipr2go. 43 MB, two seconds to build.
+  `include/api/v1/lib/mgdb_go.php` (`MgdbGo::annotate`) answers a gene's term
+  list with each term's aspect and definition (the annotation load records
+  neither reliably: gdh1 has terms with no aspect), its plant-slim ancestors
+  (roots excluded: they are tagged goslim_plant but say nothing), and the
+  reduced ancestry graph over annotated terms + slim ancestors + roots. An
+  obsolete term is followed to `replaced_by` for ancestry and marked retired.
+  InterPro2GO adds the terms the canonical protein's entries imply, kept
+  apart as `implied` and never counted as annotation.
+- **The atlas class context** `data/domains/atlas_classes.json`, written by
+  `tools/atlas_classes.py` from the 11 MB atlas payload: each class's group,
+  InterPro set, gene count per maize reference genome and the atlas's maize
+  summary; the immunity labels the atlas page uses. Read only when the
+  protein carries a class. Entry gene counts and pan-genome status come
+  from the domains release's entry files.
+- **The pathway explorer's own shards** under `data/projects/pathway_explorer/`
+  through `include/api/v1/lib/mgdb_pathways.php`: the gene's shard
+  (`genes/<sha1[:3]>.json`), the 400 KB index (3 ms), and one file per
+  pathway (capped at 12). Each pathway comes back with its ordered reaction
+  steps, which step this gene fills, which steps the genome has any gene
+  for, how many NAM founders have a gene at each step, and which founders
+  have the pathway at all. The explorer now opens a pathway named in the
+  URL hash (`#pathway=<id>`), which is where the figure links.
+
+The figure: four tiles (GO terms by aspect, plant-slim footprint, protein
+class, pathways); three aspect columns each with the slim fingerprint (one
+square per slim category in a fixed order, so the pattern is comparable
+between genes), the lit categories, and the terms with evidence badges; the
+ancestry graph (layered by depth, barycentre-ordered, three columns);
+the architecture as pills, a card per atlas class with the gene count here
+and a NAM-founder strip with this genome in gold, the immunity call, and the
+entries with their counts and implied GO; and a card per pathway with the
+step strip (this gene's step in gold, filled steps green, empty steps
+dashed, a founder-coverage bar under each) and the founder presence dots.
+Squares, term rows and graph nodes highlight each other on hover and pin on
+click. The three tables below the figure are unchanged.
+
+### The header, Model quality, and the GO dataset route (2026-09-12)
+
+**Header.** The hero carried eight facts and repeated four of them in
+Overview. It now carries the record's kind as a pill beside the title, the
+full name as the subtitle, the one-line function summary, and three facts:
+gene model id, assembly with annotation, location. Record kind, full name,
+canonical transcript and the synonyms ("Also known as") moved to Overview,
+which already had line, position, strand, model type and transcripts.
+`$(gene_subtitle)` is a new template slot; the hero's synonyms element is
+kept but never shown.
+
+**Model quality.** The block lists every score (`pageSize: 'all'`) and opens
+on a third view, **Range**: one track per metric, all the same width, with
+the genome-wide minimum and maximum at the ends, the 5th-95th percentile
+band, the median tick, and a circle where this gene sits, coloured by which
+side of the median it falls on when the metric has a better direction.
+`tools/score_ranges.py` computes the ranges once (two aggregate queries
+through psql, about 75 s, pSAURON and reelGene scored 2.2 M and 1.8 M
+features) into `data/gene_scores/index.json`; `records/gene.php` attaches
+`scale`, `better` and `range` to every score. `R.collection` gained
+`views: [{key, label, icon, render}]` for a caller-drawn view beside Table
+and Grid.
+
+**`/api/v1/data/go`.** The GO reference index as a dataset with no genome
+segment (`'genomes' => false` in the registry, which the service index, the
+docs page and the OpenAPI generator all honour). `{term}` answers with the
+term, its lineage, parents, children, plant-slim categories, the InterPro
+entries InterPro2GO maps to it, the annotation versions carrying it and the
+gene models annotated with it (`annotation=`, default Zm00001eb.1; the one
+database contact, indexed on obo_term, ~50 ms in all). `search?q=` matches
+names (prefix first), `batch?ids=` up to 200, `slim` the plant slim.
+GO_0003677 and bare numbers are accepted; a merged id answers with its
+survivor and `meta.resolved_as`.
+
+Trap: `data/go/` is swapped whole on rebuild, so the builder writes the
+directory's `.htaccess` itself; a deployed one is lost at the next build.

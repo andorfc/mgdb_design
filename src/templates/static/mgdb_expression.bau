@@ -4,7 +4,7 @@ $$SYNTAX-LEVEL 2
 <meta name="twitter:site" content="@MaizeGDB">
 <meta property="og:url" content="https://maizegdb.org/expression">
 <meta property="og:title" content="MaizeGDB Expression Data Hub">
-<meta property="og:description" content="Search maize gene expression across reference assemblies and NAM founder lines, and reach qTeller, the eFP browser, JBrowse RNA-seq tracks, and bulk FPKM downloads.">
+<meta property="og:description" content="Search maize gene expression across the B73 reference assemblies and the NAM founder lines, open a per-gene expression profile, and reach qTeller, the eFP browser, JBrowse RNA-seq tracks and the bulk downloads.">
 
 <main class="mgdb-page mgdb-hub-page mgdb-expression-page" id="expression-main">
 
@@ -29,14 +29,14 @@ $$SYNTAX-LEVEL 2
     </div>
     <div class="mgdb-hero-body">
       <h1 id="expression-title">Maize gene expression and RNA-seq transcriptomics</h1>
-      <p class="mgdb-hero-description">Expression for $(total_gene_models) gene models across $(assembly_count) assemblies, including the $(nam_lines) NAM founder inbred lines and $(distinct_tissues) developmental tissues.</p>
+      <p class="mgdb-hero-description">Expression for gene models across $(release_count) assemblies, including the $(nam_count) NAM founder inbred lines.</p>
     </div>
   </section>
 
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
     <a href="#expression-search" class="is-current" aria-current="true">Search</a>
     <a href="#expression-tools">Tools</a>
-    <a href="#expression-atlases">Atlases</a>
+    <a href="#expression-releases">Releases</a>
     <a href="#expression-downloads">Downloads</a>
     <a href="#expression-references">References</a>
     <a href="#expression-metrics">Metrics</a>
@@ -62,7 +62,7 @@ $$SYNTAX-LEVEL 2
         <button class="mgdb-button mgdb-button-primary expression-query-submit" type="submit">Search expression</button>
       </div>
 
-      <p class="mgdb-hint" id="expression-query-hint">Enter a gene model ID \(e.g., <code>Zm00001eb056510</code>\) or locus symbol \(e.g., <code>adh1</code>\) to look up expression across assemblies. Wildcard <code>*</code> is supported \(e.g., <code>adh*</code>\).</p>
+      <p class="mgdb-hint" id="expression-query-hint">Enter a gene model ID \(e.g., <code>Zm00001eb056510</code>\) or locus symbol \(e.g., <code>adh1</code>\) to find its models across assemblies, then open a model&#8217;s expression profile from the results. Wildcard <code>*</code> is supported \(e.g., <code>adh*</code>\).</p>
 
       <div class="expression-examples" aria-label="Example searches">
         <span>EXAMPLES&#58;</span>
@@ -71,9 +71,9 @@ $$SYNTAX-LEVEL 2
         <button type="button" data-expression-example="kn1">kn1</button>
         <button type="button" data-expression-example="bz1">bz1</button>
         <button type="button" data-expression-example="o2">o2</button>
-        <button type="button" data-expression-example="y1">y1</button>
+        <button type="button" data-expression-example="mybr4">mybr4</button>
         <button type="button" data-expression-example="Zm00001eb056510">Zm00001eb056510</button>
-        <button type="button" data-expression-example="GRMZM2G442658">GRMZM2G442658</button>
+        <button type="button" data-expression-example="Zm00026ab084980">Zm00026ab084980</button>
         <button type="button" data-expression-example="adh*">adh*</button>
       </div>
 
@@ -84,7 +84,7 @@ $$SYNTAX-LEVEL 2
         <div class="expression-advanced-body">
           <div class="expression-advanced-grid">
             <div class="mgdb-hub-field">
-              <label for="expression-filter-assembly">Reference assembly or pan-genome</label>
+              <label for="expression-filter-assembly">Reference assembly</label>
               <select id="expression-filter-assembly" name="assembly">
                 $(assembly_options)
               </select>
@@ -101,6 +101,13 @@ $$SYNTAX-LEVEL 2
                 <option value="assembly_version-desc">Assembly version Z&ndash;A</option>
                 <option value="coordinates-asc">Coordinates \(Chr &amp; Position\)</option>
               </select>
+            </div>
+            <div class="mgdb-hub-field expression-check-field">
+              <label class="expression-check" for="expression-expression-only">
+                <input id="expression-expression-only" name="expression_only" type="checkbox" value="1" />
+                <span>Only assemblies with expression profiles</span>
+              </label>
+              <span class="mgdb-hint">The $(release_count) assemblies qTeller has data for; leave off to see every gene model.</span>
             </div>
           </div>
 
@@ -162,7 +169,7 @@ $$SYNTAX-LEVEL 2
             <th scope="col" aria-sort="none"><button type="button" data-sort-key="locus_name">Locus</button></th>
             <th scope="col" aria-sort="none"><button type="button" data-sort-key="assembly_version">Assembly</button></th>
             <th scope="col" aria-sort="none"><button type="button" data-sort-key="coordinates">Coordinates</button></th>
-            <th scope="col" class="expression-col-open">Open</th>
+            <th scope="col" class="expression-col-open">Expression</th>
           </tr>
         </thead>
         <tbody id="expression-results-body"></tbody>
@@ -178,6 +185,18 @@ $$SYNTAX-LEVEL 2
     </div>
 
     <nav class="expression-pagination" id="expression-pagination" aria-label="Search result pages"></nav>
+  </section>
+
+  <!-- ── Expression profile: hidden until a result is opened ─────────────── -->
+  <section id="expression-profile" aria-labelledby="expression-profile-title" hidden>
+    <div class="mgdb-section-heading">
+      <div><h2 id="expression-profile-title">Expression profile</h2></div>
+      <button class="expression-profile-close" id="expression-profile-close" type="button">Close</button>
+    </div>
+
+    <div class="expression-profile-head" id="expression-profile-head"></div>
+    <p class="expression-profile-status" id="expression-profile-status" role="status" aria-live="polite" hidden></p>
+    <div class="expression-profile-figure" id="expression-profile-figure"></div>
   </section>
 
   <!-- ── Tools ────────────────────────────────────────────────────────────── -->
@@ -199,7 +218,6 @@ $$SYNTAX-LEVEL 2
             <p class="expression-tool-desc">Functional Enrichment Term Analysis \(FETA\) is a one-stop web platform to perform multiple, simultaneous enrichments across GO terms, biological pathways \(KEGG, Reactome\), protein domains, subcellular and single-cell distributions, gene families, and agronomic traits in B73 and 26 NAM founder proteomes. Complements transcriptomics pipelines \(DESeq2, edgeR, limma\) for visualizing differentially expressed genes \(DEGs\) and performing direct functional enrichments with table, PNG, and SVG exports.</p>
             <div class="expression-tool-links">
               <a class="expression-link" href="https://feta.maizegdb.org/" target="_blank" rel="noopener">Launch FETA Platform</a>
-              <a class="expression-link" href="https://feta.maizegdb.org/" target="_blank" rel="noopener">DEG &amp; Enrichment Tools</a>
             </div>
           </article>
 
@@ -213,7 +231,7 @@ $$SYNTAX-LEVEL 2
                 <span class="expression-tool-badge">B73v5 &bull; B73v4 &bull; 26 NAM Lines</span>
               </div>
             </div>
-            <p class="expression-tool-desc">Compare normalized RNA-seq expression across maize developmental tissues, inbred lines, and abiotic stress treatments \(heat, drought, cold\). Provides interactive bar charts and FPKM matrices.</p>
+            <p class="expression-tool-desc">Compare and visualize normalized RNA-seq expression across maize developmental tissues, inbred lines, and abiotic and biotic stress treatments.</p>
             <div class="expression-tool-links">
               <a class="expression-link" href="https://qteller.maizegdb.org/index_B73v5.php" target="_blank" rel="noopener">qTeller B73v5</a>
               <a class="expression-link" href="https://qteller.maizegdb.org/index_B73v4.php" target="_blank" rel="noopener">qTeller B73v4</a>
@@ -228,13 +246,12 @@ $$SYNTAX-LEVEL 2
               </div>
               <div>
                 <h3 class="expression-tool-title">Maize eFP Pictograph Browser</h3>
-                <span class="expression-tool-badge">60 Developmental Tissues</span>
               </div>
             </div>
-            <p class="expression-tool-desc">The electronic Fluorescent Pictograph \(eFP\) Browser projects gene expression levels onto anatomically accurate plant pictographs across 60 developmental tissues as reported by Sekhon et al. \(2011\).</p>
+            <p class="expression-tool-desc">The electronic Fluorescent Pictograph \(eFP\) Browser projects gene expression levels onto anatomically accurate maize pictographs across developmental tissues and abiotic/biotic conditions.</p>
             <div class="expression-tool-links">
-              <a class="expression-link" href="http://bar.utoronto.ca/efp_maize/cgi-bin/efpWeb.cgi?dataSource=Sekhon_et_al_Atlas" target="_blank" rel="noopener">Launch eFP Browser</a>
-              <a class="expression-link" href="https://doi.org/10.1111/j.1365-313X.2011.04527.x" target="_blank" rel="noopener">Sekhon et al. Paper</a>
+              <a class="expression-link" href="https://bar.utoronto.ca/efp_maize/cgi-bin/efpWeb.cgi" target="_blank" rel="noopener">Launch eFP Browser</a>
+              <a class="expression-link" href="https://bar.utoronto.ca/eplant_maize/" target="_blank" rel="noopener">ePlant Maize</a>
             </div>
           </article>
 
@@ -245,13 +262,30 @@ $$SYNTAX-LEVEL 2
               </div>
               <div>
                 <h3 class="expression-tool-title">JBrowse &amp; GBrowse RNA-seq Tracks</h3>
-                <span class="expression-tool-badge">Read Depth &bull; Splice Junctions</span>
               </div>
             </div>
-            <p class="expression-tool-desc">Visualize aligned RNA-seq read depths, exon coverage, and novel transcript splice junctions directly mapped onto reference chromosomes in JBrowse and GBrowse.</p>
+            <p class="expression-tool-desc">Visualize aligned RNA-seq read bigwig files directly mapped onto genome coordinates in JBrowse and GBrowse.</p>
             <div class="expression-tool-links">
-              <a class="expression-link" href="https://jbrowse.maizegdb.org/?data=B73&tracks=RNA-seq" target="_blank" rel="noopener">JBrowse B73v5 RNA-seq</a>
-              <a class="expression-link" href="https://www.maizegdb.org/gbrowse/maize_v4" target="_blank" rel="noopener">GBrowse B73v4</a>
+              <a class="expression-link" href="https://jbrowse.maizegdb.org/?data=B73&tracks=gene_models_official,16dap_embryo_mn01101,16dap_endosperm_mn01091,8das_root_mn01011,8das_shoot_mn01021,r1_anther_mn01081,v11_base_mn01031,v11_middle_mn01041,v11_tip_mn01051,v18_ear_mn01071,v18_tassel_mn01061" target="_blank" rel="noopener">JBrowse B73v5 RNA-seq</a>
+              <a class="expression-link" href="https://gbrowse.maizegdb.org/gb2/gbrowse/maize_v4/" target="_blank" rel="noopener">GBrowse B73v4</a>
+            </div>
+          </article>
+
+          <article class="mgdb-card expression-tool-card">
+            <div class="expression-tool-header">
+              <div class="expression-tool-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4zM4 10h16M10 4v16"/></svg>
+              </div>
+              <div>
+                <h3 class="expression-tool-title">Expression API</h3>
+                <span class="expression-tool-badge">JSON &bull; TSV &bull; $(release_count) releases</span>
+              </div>
+            </div>
+            <p class="expression-tool-desc">The profiles behind this page, one request per gene or up to 200 genes at a time: every sample value with its study, tissue reading and stress condition, plus the mean, median, maximum and tissue specificity per assay.</p>
+            <div class="expression-tool-links">
+              <a class="expression-link" href="/api#api-datasets">API documentation</a>
+              <a class="expression-link" href="/api/v1/data/expression">Releases \(JSON\)</a>
+              <a class="expression-link" href="/api/v1/data/expression/Zm-B73-REFERENCE-NAM-5.0/Zm00001eb093920">Example gene</a>
             </div>
           </article>
 
@@ -265,7 +299,7 @@ $$SYNTAX-LEVEL 2
                 <span class="expression-tool-badge">NCBI GEO &bull; SRA</span>
               </div>
             </div>
-            <p class="expression-tool-desc">Query and retrieve primary raw sequencing read archives \(FASTQ/SRA\) and microarray series matrices for all published *Zea mays* transcriptomic studies at NCBI.</p>
+            <p class="expression-tool-desc">Query and retrieve primary raw sequencing read archives \(FASTQ/SRA\) and microarray series matrices for all published <em>Zea mays</em> transcriptomic studies at NCBI.</p>
             <div class="expression-tool-links">
               <a class="expression-link" href="https://www.ncbi.nlm.nih.gov/gds/?term=zea+mays[ORGN]" target="_blank" rel="noopener">NCBI GEO DataSets</a>
               <a class="expression-link" href="https://www.ncbi.nlm.nih.gov/sra/?term=zea+mays" target="_blank" rel="noopener">NCBI SRA Runs</a>
@@ -274,70 +308,37 @@ $$SYNTAX-LEVEL 2
         </div>
   </section>
 
-  <!-- ── Atlases ──────────────────────────────────────────────────────────── -->
-  <section id="expression-atlases" aria-labelledby="expression-atlases-title">
+  <!-- ── Releases ─────────────────────────────────────────────────────────── -->
+  <section id="expression-releases" aria-labelledby="expression-releases-title">
     <div class="mgdb-section-heading">
-      <div><h2 id="expression-atlases-title">Genome atlases</h2></div>
+      <div><h2 id="expression-releases-title">Expression releases</h2></div>
     </div>
-    <div class="mgdb-card-grid expression-atlas-list">
-          <article class="mgdb-card expression-atlas-card">
-            <div class="expression-atlas-header">
-              <h3 class="expression-atlas-title"><a href="/genome/assembly/Zm-B73-REFERENCE-NAM-5.0">Zm-B73-REFERENCE-NAM-5.0</a></h3>
-              <span class="mgdb-badge">Current Gold Standard</span>
-            </div>
-            <p class="expression-atlas-desc">Comprehensive RNA-seq tracks on JBrowse with normalized FPKM values available in qTeller and downloadable matrices. Associated pan-gene expression available on individual gene model records.</p>
-            <div class="expression-atlas-actions">
-              <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://qteller.maizegdb.org/index_B73v5.php" target="_blank" rel="noopener">Search qTeller v5</a>
-              <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://jbrowse.maizegdb.org/?data=B73&tracks=RNA-seq" target="_blank" rel="noopener">JBrowse RNA-seq</a>
-              <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://iastate.app.box.com/v/maizegdb-public/folder/323420910680" target="_blank" rel="noopener">Download FPKM</a>
-            </div>
-          </article>
-
-          <article class="mgdb-card expression-atlas-card">
-            <div class="expression-atlas-header">
-              <h3 class="expression-atlas-title"><a href="/genome/assembly/Zm-B73-REFERENCE-GRAMENE-4.0">Zm-B73-REFERENCE-GRAMENE-4.0</a></h3>
-              <span class="mgdb-badge">Reference Assembly v4</span>
-            </div>
-            <p class="expression-atlas-desc">Gene model expression searchable in qTeller B73v4 and GBrowse v4. Cross-referenced to RefGen_v5 and pan-genes in MaizeGDB Gene Center.</p>
-            <div class="expression-atlas-actions">
-              <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://qteller.maizegdb.org/index_B73v4.php" target="_blank" rel="noopener">Search qTeller v4</a>
-              <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://www.maizegdb.org/gbrowse/maize_v4" target="_blank" rel="noopener">GBrowse v4</a>
-              <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://iastate.app.box.com/v/maizegdb-public/folder/323420910680" target="_blank" rel="noopener">Download FPKM</a>
-            </div>
-          </article>
-
-          <article class="mgdb-card expression-atlas-card">
-            <div class="expression-atlas-header">
-              <h3 class="expression-atlas-title"><a href="https://www.maizegdb.org/NAM_project">26 NAM Pan-Genome Founder Inbred Lines</a></h3>
-              <span class="mgdb-badge">Pan-Genome Transcriptomics</span>
-            </div>
-            <p class="expression-atlas-desc">RNA-seq expression across the 26 Nested Association Mapping \(NAM\) founder inbred lines. Searchable in qTeller NAM and visualized across founder genomes in JBrowse.</p>
-            <div class="expression-atlas-actions">
-              <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://qteller.maizegdb.org/index_NAM.php" target="_blank" rel="noopener">Search qTeller NAM</a>
-              <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://jbrowse.maizegdb.org/" target="_blank" rel="noopener">JBrowse NAM Founder Genomes</a>
-              <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://iastate.app.box.com/v/maizegdb-public/folder/323420601134" target="_blank" rel="noopener">Download NAM BAMs</a>
-            </div>
-          </article>
-
-          <article class="mgdb-card expression-atlas-card">
-            <div class="expression-atlas-header">
-              <h3 class="expression-atlas-title"><a href="/genome/assembly/B73%20RefGen_v3">B73 RefGen_v3 &amp; RefGen_v2</a></h3>
-              <span class="mgdb-badge">Classic Gene Atlases</span>
-            </div>
-            <p class="expression-atlas-desc">Classic microarray and RNA-seq developmental atlases mapped to RefGen_v3/v2 gene models \(GRMZM... prefix\), integrated with the Maize eFP Pictograph Browser and GBrowse v3/v2.</p>
-            <div class="expression-atlas-actions">
-              <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="http://bar.utoronto.ca/efp_maize/cgi-bin/efpWeb.cgi?dataSource=Sekhon_et_al_Atlas" target="_blank" rel="noopener">eFP Pictograph Browser</a>
-              <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://www.maizegdb.org/gbrowse/maize_v3" target="_blank" rel="noopener">GBrowse v3</a>
-            </div>
-          </article>
-        </div>
+    <p class="expression-section-intro">One release per assembly, built from qTeller&#8217;s own data files \(release <code>$(b73_release)</code>\). Genes are the models with a profile; a sample is one tissue, stage or treatment with its replicates averaged. The B73 v5 release also carries the Walley 2019 proteomics samples. <strong>Search</strong> lists the assembly&#8217;s gene models above.</p>
+    <div class="mgdb-table-scroll" tabindex="0" role="region" aria-labelledby="expression-releases-title">
+      <table class="mgdb-table expression-releases-table">
+        <thead>
+          <tr>
+            <th scope="col">Assembly</th>
+            <th scope="col">Annotation</th>
+            <th scope="col" class="mgdb-num">Genes</th>
+            <th scope="col" class="mgdb-num">RNA samples</th>
+            <th scope="col" class="mgdb-num">Protein samples</th>
+            <th scope="col" class="mgdb-num">Studies</th>
+            <th scope="col">Open</th>
+          </tr>
+        </thead>
+        <tbody>
+          $(release_rows)
+        </tbody>
+      </table>
+    </div>
   </section>
 
   <!-- ── Downloads ────────────────────────────────────────────────────────── -->
   <section id="expression-downloads" aria-labelledby="expression-downloads-title">
     <div class="mgdb-section-heading">
       <div><h2 id="expression-downloads-title">Downloads</h2></div>
-      <a class="expression-section-link" href="https://iastate.app.box.com/v/maizegdb-public" target="_blank" rel="noopener">Browse all downloads <span aria-hidden="true">&nearr;</span></a>
+      <a class="expression-section-link" href="/download">All MaizeGDB downloads</a>
     </div>
     <div class="mgdb-card-grid expression-downloads-grid">
           <article class="mgdb-card expression-download-card">
@@ -345,9 +346,9 @@ $$SYNTAX-LEVEL 2
               <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
             </div>
             <div class="expression-dl-content">
-              <h3 class="expression-dl-title">Normalized FPKM Matrices</h3>
-              <p class="expression-dl-desc">Normalized FPKM expression tables for Zm-B73-REFERENCE-NAM-5.0, Zm-B73-REFERENCE-GRAMENE-4.0, and all 26 NAM founder lines \(qTeller input datasets\).</p>
-              <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://iastate.app.box.com/v/maizegdb-public/folder/323420910680" target="_blank" rel="noopener">Download FPKM Tables</a>
+              <h3 class="expression-dl-title">qTeller FPKM matrices</h3>
+              <p class="expression-dl-desc">The normalized expression tables qTeller is built from, for Zm-B73-REFERENCE-NAM-5.0, Zm-B73-REFERENCE-GRAMENE-4.0 and the NAM founder lines, in the MaizeGDB Box share.</p>
+              <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://iastate.app.box.com/v/maizegdb-public/folder/362581633349" target="_blank" rel="noopener">Open qTeller_FPKM_MaizeGDB</a>
             </div>
           </article>
 
@@ -356,9 +357,9 @@ $$SYNTAX-LEVEL 2
               <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
             </div>
             <div class="expression-dl-content">
-              <h3 class="expression-dl-title">B73 RefGen_v5 BAM &amp; BigWig Files</h3>
-              <p class="expression-dl-desc">Un-normalized BAM alignment files and BigWig continuous coverage tracks for Zm-B73-REFERENCE-NAM-5.0 developmental tissues.</p>
-              <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://iastate.app.box.com/v/maizegdb-public/folder/323417838073" target="_blank" rel="noopener">Download B73v5 BAMs</a>
+              <h3 class="expression-dl-title">B73 v5 RNA-seq alignments</h3>
+              <p class="expression-dl-desc">The RNA-seq files behind the Zm-B73-REFERENCE-NAM-5.0 JBrowse tracks, in the Box folder <code>B73v5_JBROWSE_AND_ANALYSES/B73v5_RNA-seq</code>.</p>
+              <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://iastate.app.box.com/v/maizegdb-public/folder/362581614626" target="_blank" rel="noopener">Open B73v5_RNA-seq</a>
             </div>
           </article>
 
@@ -367,9 +368,9 @@ $$SYNTAX-LEVEL 2
               <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
             </div>
             <div class="expression-dl-content">
-              <h3 class="expression-dl-title">26 NAM Founder Lines BAM &amp; BigWig Files</h3>
-              <p class="expression-dl-desc">Un-normalized aligned BAM files and BigWig tracks for all 26 Nested Association Mapping \(NAM\) founder inbreds.</p>
-              <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://iastate.app.box.com/v/maizegdb-public/folder/323420601134" target="_blank" rel="noopener">Download NAM BAMs</a>
+              <h3 class="expression-dl-title">eFP data for B73 v5</h3>
+              <p class="expression-dl-desc">The expression tables supplied to the BAR for the B73 v5 eFP pictographs.</p>
+              <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://iastate.app.box.com/v/maizegdb-public/folder/362582432633" target="_blank" rel="noopener">Open eFP_data_B73v5</a>
             </div>
           </article>
 
@@ -378,9 +379,24 @@ $$SYNTAX-LEVEL 2
               <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
             </div>
             <div class="expression-dl-content">
-              <h3 class="expression-dl-title">CAU B73v5 / Mo17 Developmental RNA-seq</h3>
-              <p class="expression-dl-desc">B73v5 and Mo17 CAU RNA-seq BAM alignments and BigWig continuous coverage files across developmental series.</p>
-              <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://iastate.app.box.com/v/maizegdb-public/folder/323421040011" target="_blank" rel="noopener">Download CAU Series</a>
+              <h3 class="expression-dl-title">Developmental atlas tables</h3>
+              <p class="expression-dl-desc">The Walley et al. developmental atlas FPKM table on the MaizeGDB download host, mapped to B73 RefGen_v3 and to Zm-B73-REFERENCE-GRAMENE-4.0, with a README beside each.</p>
+              <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="https://download.maizegdb.org/GeneFunction_and_Expression/Sekon_expression_atlas/" target="_blank" rel="noopener">Browse the directory</a>
+            </div>
+          </article>
+
+          <article class="mgdb-card expression-download-card">
+            <div class="expression-dl-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4zM4 10h16M10 4v16"/></svg>
+            </div>
+            <div class="expression-dl-content">
+              <h3 class="expression-dl-title">Per-gene tables from the API</h3>
+              <p class="expression-dl-desc">Every sample value for one gene as TSV, or for up to 200 genes in one request, and the sample catalogue of each release. No account and no rate key needed.</p>
+              <div class="expression-dl-links">
+                <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="/api/v1/data/expression/Zm-B73-REFERENCE-NAM-5.0/Zm00001eb093920?format=tsv">Example gene TSV</a>
+                <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="/api/v1/data/expression/Zm-B73-REFERENCE-NAM-5.0/batch?ids=Zm00001eb093920,Zm00001eb056510&amp;format=tsv">Example batch TSV</a>
+                <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="/api/v1/data/expression/Zm-B73-REFERENCE-NAM-5.0/samples?format=tsv">B73 v5 samples</a>
+              </div>
             </div>
           </article>
         </div>
@@ -406,58 +422,80 @@ $$SYNTAX-LEVEL 2
     <div class="mgdb-metric-grid">
       <article class="mgdb-metric mgdb-tone-green">
         <div class="mgdb-metric-top">
-          <h3>Gene models</h3>
-          <span class="mgdb-metric-badge">Indexed</span>
+          <h3>Assemblies with expression</h3>
+          <span class="mgdb-metric-badge">Releases</span>
         </div>
         <div class="mgdb-metric-stat">
-          <strong class="mgdb-metric-value">$(total_gene_models)</strong>
+          <strong class="mgdb-metric-value">$(release_count)</strong>
         </div>
-        <p class="mgdb-metric-description">Distinct annotated gene models across the B73, W22, and Mo17 reference assemblies.</p>
+        <p class="mgdb-metric-description">Genomes with a qTeller expression release&#58; the B73 v5 and v4 references and the NAM founder inbred lines.</p>
       </article>
 
       <article class="mgdb-metric mgdb-tone-amber">
         <div class="mgdb-metric-top">
-          <h3>Assemblies</h3>
-          <span class="mgdb-metric-badge">Searchable</span>
+          <h3>Genes profiled</h3>
+          <span class="mgdb-metric-badge">B73 v5</span>
         </div>
         <div class="mgdb-metric-stat">
-          <strong class="mgdb-metric-value">$(assembly_count)</strong>
+          <strong class="mgdb-metric-value">$(b73_genes)</strong>
         </div>
-        <p class="mgdb-metric-description">Assembly versions carrying gene models the lookup above can search.</p>
+        <p class="mgdb-metric-description">B73 v5 gene models with an expression profile; $(b73_detected) reach 1 FPKM or TPM in at least one RNA-seq sample.</p>
       </article>
 
       <article class="mgdb-metric mgdb-tone-blue">
         <div class="mgdb-metric-top">
-          <h3>NAM founders</h3>
-          <span class="mgdb-metric-badge">Pan-genome</span>
+          <h3>Samples</h3>
+          <span class="mgdb-metric-badge">B73 v5</span>
         </div>
         <div class="mgdb-metric-stat">
-          <strong class="mgdb-metric-value">$(nam_lines)</strong>
+          <strong class="mgdb-metric-value">$(b73_samples)</strong>
         </div>
-        <p class="mgdb-metric-description">Nested association mapping founder inbreds with their own RNA-seq atlas.</p>
+        <p class="mgdb-metric-description">$(b73_samples_rna) RNA-seq and $(b73_samples_protein) proteomics samples in the B73 v5 release, replicates averaged; $(total_samples) across all releases.</p>
       </article>
 
       <article class="mgdb-metric mgdb-tone-burgundy">
         <div class="mgdb-metric-top">
-          <h3>Developmental tissues</h3>
-          <span class="mgdb-metric-badge">Atlases</span>
+          <h3>Studies</h3>
+          <span class="mgdb-metric-badge">B73 v5</span>
         </div>
         <div class="mgdb-metric-stat">
-          <strong class="mgdb-metric-value">$(distinct_tissues)</strong>
+          <strong class="mgdb-metric-value">$(b73_sources)</strong>
         </div>
-        <p class="mgdb-metric-description">Anatomical tissues and stages in the Sekhon developmental atlas and qTeller.</p>
+        <p class="mgdb-metric-description">Published data sets behind the B73 v5 profiles; $(b73_stress) of them are stress-response studies with abiotic or biotic treatments.</p>
       </article>
     </div>
 
     <figure class="mgdb-figure expression-figure">
-      <h3>Gene models by assembly</h3>
-      <div class="mgdb-chart" id="expression-assembly-chart" role="img"
-           aria-label="Horizontal bar chart of the number of distinct gene models indexed for each maize assembly"
-           data-labels="$(chart_labels)" data-values="$(chart_values)">
-        <div class="mgdb-chart-fallback">Loading the assembly breakdown&hellip;</div>
+      <h3>B73 v5 samples by tissue reading</h3>
+      <div class="mgdb-chart" id="expression-tissue-chart" role="img"
+           aria-label="Horizontal stacked bar chart of the samples in the B73 v5 expression release for each tissue reading, split into RNA-seq samples from non-stress studies, abiotic stress, biotic stress and control samples from stress studies, and proteomics samples"
+           data-labels="$(tissue_labels)" data-other="$(tissue_other)" data-abiotic="$(tissue_abiotic)" data-biotic="$(tissue_biotic)" data-control="$(tissue_control)" data-protein="$(tissue_protein)">
+        <div class="mgdb-chart-fallback">Loading the sample breakdown&hellip;</div>
       </div>
-      <figcaption>Twelve of the $(assembly_count) assemblies&#58; the B73 reference genomes first, then the rest by gene model count. Select a bar to search that assembly.</figcaption>
+      <figcaption>The tissue is a keyword reading of each sample label, kept beside the label it was read from&#58; a convenience for summaries, not an ontology term. Samples that name a treatment rather than an organ read as &#8220;other&#8221;. The stress condition is read the same way, inside stress-response studies only&#58; abiotic stress, biotic stress, or that study&#8217;s untreated control. RNA-seq samples from the other studies carry no condition.</figcaption>
     </figure>
+    <div class="mgdb-table-scroll expression-figure-table">
+      <table class="mgdb-table" id="expression-tissue-table">
+        <caption class="mgdb-visually-hidden">Samples per tissue reading in the B73 v5 release, by assay and stress condition</caption>
+        <thead>
+          <tr>
+            <th scope="col">Tissue reading</th>
+            <th scope="col" class="mgdb-num">RNA-seq</th>
+            <th scope="col" class="mgdb-num">Abiotic stress</th>
+            <th scope="col" class="mgdb-num">Biotic stress</th>
+            <th scope="col" class="mgdb-num">Control</th>
+            <th scope="col" class="mgdb-num">Proteomics</th>
+            <th scope="col" class="mgdb-num">Samples</th>
+          </tr>
+        </thead>
+        <tbody>
+          $(tissue_rows)
+        </tbody>
+        <tfoot>
+          $(tissue_total)
+        </tfoot>
+      </table>
+    </div>
   </section>
 
   <!-- ── Related resources ────────────────────────────────────────────────── -->
@@ -470,7 +508,7 @@ $$SYNTAX-LEVEL 2
       <div class="mgdb-resource-list">
         <a href="/gene_center/gene">
           <strong>Gene Data Hub</strong>
-          <span>Reference gene models, functional descriptions, and the expression tab on every gene record</span>
+          <span>Reference gene models, functional descriptions, and the same expression profile on every gene record</span>
         </a>
         <a href="/pan_gene_center/pan_gene">
           <strong>Pan-Gene Data Hub</strong>
@@ -486,7 +524,7 @@ $$SYNTAX-LEVEL 2
         </a>
         <a href="https://qteller.maizegdb.org/" target="_blank" rel="noopener">
           <strong>qTeller</strong>
-          <span>Normalized RNA-seq comparison across tissues, inbred lines, and stress treatments</span>
+          <span>Compare and visualize normalized RNA-seq expression across tissues, inbred lines, and stress treatments</span>
         </a>
       </div>
     </div>

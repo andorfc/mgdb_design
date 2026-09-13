@@ -9,7 +9,7 @@
 
    Nothing above is repeated here. What is here is the page's own furniture:
    the query control, the examples, the advanced accordion, the results table
-   and its pagination, and the interiors of the tool, atlas and download cards.
+   and its pagination, and the profile section, the release table, and the interiors of the tool and download cards.
    ========================================================================== */
 
 /* ── Hero emblem ─────────────────────────────────────────────────────────── */
@@ -539,6 +539,15 @@
   font-weight: 700;
 }
 
+/* In the table the name is the link to the gene record; the profile
+   header repeats it as plain text. */
+.mgdb-expression-page a.expression-gene-name {
+  color: var(--mgdb-green-dark);
+  text-decoration: underline;
+}
+
+.mgdb-expression-page a.expression-gene-name:hover { color: var(--mgdb-leaf); }
+
 .mgdb-expression-page .expression-locus-full {
   display: block;
   max-width: 44ch;
@@ -627,18 +636,11 @@
   align-items: stretch;
 }
 
-.mgdb-expression-page .expression-atlas-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-  gap: var(--mgdb-space-4);
-  align-items: stretch;
-}
 
 @media (max-width: 900px) {
   .mgdb-expression-page .expression-tools-grid,
   .mgdb-expression-page .expression-downloads-grid,
-  .mgdb-expression-page .expression-atlas-list { grid-template-columns: minmax(0, 1fr); }
-}
+  }
 
 .mgdb-expression-page .expression-tool-header {
   display: flex;
@@ -659,7 +661,6 @@
 }
 
 .mgdb-expression-page .expression-tool-title,
-.mgdb-expression-page .expression-atlas-title,
 .mgdb-expression-page .expression-dl-title {
   margin: 0;
   color: var(--mgdb-green-dark);
@@ -667,7 +668,6 @@
   line-height: var(--mgdb-leading-snug);
 }
 
-.mgdb-expression-page .expression-atlas-title a,
 .mgdb-expression-page .expression-dl-title a { color: inherit; }
 
 .mgdb-expression-page .expression-tool-badge {
@@ -683,8 +683,7 @@
 /* The description absorbs the slack in a row of unequal cards, so the links
    below it land on the same line on every card. The shell does this for a
    direct `> p`; these two sit one level down. */
-.mgdb-expression-page .expression-tool-desc,
-.mgdb-expression-page .expression-atlas-desc {
+.mgdb-expression-page .expression-tool-desc {
   margin: 0;
   flex: 1 1 auto;
   color: var(--mgdb-ink-soft);
@@ -692,8 +691,7 @@
   line-height: var(--mgdb-leading);
 }
 
-.mgdb-expression-page .expression-tool-links,
-.mgdb-expression-page .expression-atlas-actions {
+.mgdb-expression-page .expression-tool-links {
   display: flex;
   flex-wrap: wrap;
   gap: var(--mgdb-space-2) var(--mgdb-space-4);
@@ -709,16 +707,7 @@
   white-space: nowrap;
 }
 
-.mgdb-expression-page .expression-atlas-header {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--mgdb-space-2);
-  align-items: baseline;
-  justify-content: space-between;
-}
 
-/* An assembly name is a single unbroken token and will push a card wide. */
-.mgdb-expression-page .expression-atlas-title { overflow-wrap: anywhere; }
 
 /* The download card puts its mark beside the text rather than above it. */
 .mgdb-expression-page .expression-download-card { flex-direction: row; }
@@ -757,9 +746,9 @@
    The figure
 
    The shared .mgdb-chart is a fixed 320px, which squashes a bar chart that
-   needs a row per assembly. mgdb-expression.js sets an explicit pixel height
+   needs a row per tissue. mgdb-expression.js sets an explicit pixel height
    from the row count and feeds the same number to Plotly; this lets that
-   height take effect.
+   height take effect. The values table under it carries the same numbers.
    -------------------------------------------------------------------------- */
 
 .mgdb-expression-page .expression-figure { margin-top: var(--mgdb-space-5); }
@@ -769,10 +758,259 @@
   min-height: 320px;
   overflow: visible;
 }
+.mgdb-expression-page .expression-figure-table { max-width: 560px; margin-top: var(--mgdb-space-3); }
+.mgdb-expression-page .expression-figure-table th[scope="row"] { font-weight: 600; text-transform: capitalize; }
+
+/* --------------------------------------------------------------------------
+   Expression profile
+   The figure itself (tiles, bars, legend, panels) is css/mgdb-gene-expression.css,
+   shared with the gene record. Here: the heading's close button, the gene
+   line above the figure, and its row of outbound buttons.
+   -------------------------------------------------------------------------- */
+
+.mgdb-expression-page #expression-profile .mgdb-section-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mgdb-expression-page .expression-profile-close {
+  min-height: var(--mgdb-tap-target);
+  padding: 0 var(--mgdb-space-4);
+  border: 1px solid #b9b2a5;
+  border-radius: var(--mgdb-radius-sm);
+  background: #ffffff;
+  color: var(--mgdb-ink);
+  font-family: inherit;
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-expression-page .expression-profile-close:hover {
+  border-color: var(--mgdb-green-dark);
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-expression-page .expression-profile-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mgdb-expression-page .expression-profile-head:empty { display: none; }
+
+.mgdb-expression-page .expression-profile-title {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+  align-items: baseline;
+  font-size: var(--mgdb-text-lg);
+}
+
+.mgdb-expression-page .expression-profile-title .expression-gene-name {
+  display: inline;
+  font-size: var(--mgdb-text-lg);
+}
+
+.mgdb-expression-page .expression-profile-title strong { color: var(--mgdb-green-dark); }
+
+.mgdb-expression-page .expression-profile-genome {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-expression-page .expression-profile-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-expression-page .expression-profile-status {
+  margin: var(--mgdb-space-3) 0 0;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* The figure's own panels assume the record page's column; give them the
+   hub's full width and let a wide sample strip scroll inside the stage. */
+.mgdb-expression-page .expression-profile-figure .ge-stage { overflow-x: auto; }
+
+/* The Profile control in a result row: a small solid button among text
+   links, so the one action that stays on this page reads differently from
+   the ones that leave it. */
+.mgdb-expression-page .expression-profile-btn {
+  min-height: 28px;
+  padding: 2px var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-green-dark);
+  border-radius: 999px;
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-expression-page .expression-profile-btn:hover {
+  background: var(--mgdb-green-soft);
+  color: var(--mgdb-green-dark);
+}
+
+.mgdb-expression-page .expression-no-profile {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.mgdb-expression-page .expression-row-links { align-items: center; }
+
+/* The expression-only checkbox shares the advanced grid with two selects. */
+.mgdb-expression-page .expression-check {
+  display: flex;
+  min-height: var(--mgdb-tap-target);
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mgdb-expression-page .expression-check input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--mgdb-green-dark);
+}
+
+.mgdb-expression-page .expression-check-field .mgdb-hint { margin: 0; }
+
+/* --------------------------------------------------------------------------
+   Releases
+   -------------------------------------------------------------------------- */
+
+.mgdb-expression-page .expression-section-intro {
+  max-width: 78ch;
+  margin: 0 0 var(--mgdb-space-4);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-expression-page .expression-releases-table td,
+.mgdb-expression-page .expression-releases-table th { vertical-align: middle; }
+
+.mgdb-expression-page .expression-releases-table .mgdb-num { text-align: right; white-space: nowrap; }
+
+.mgdb-expression-page .expression-release-name {
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.mgdb-expression-page .expression-release-stress {
+  display: inline-block;
+  margin-left: var(--mgdb-space-1);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  white-space: nowrap;
+}
+
+.mgdb-expression-page .expression-release-open {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+  align-items: center;
+}
+
+.mgdb-expression-page .expression-release-open a {
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mgdb-expression-page .expression-release-search {
+  min-height: 28px;
+  padding: 2px var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-green-dark);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--mgdb-green-dark);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mgdb-expression-page .expression-release-search:hover {
+  background: var(--mgdb-green-dark);
+  color: #ffffff;
+}
+
+/* The API download card carries three buttons rather than one. */
+.mgdb-expression-page .expression-dl-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+/* --------------------------------------------------------------------------
+   Link markers
+   A link that leaves maizegdb.org and its subdomains carries the shell's
+   north-east arrow; one that opens the Box share, the downloads page, a
+   directory on the download host, or a file (the TSV exports) carries a down
+   arrow instead. Decided from the href so the results rows, which the script
+   renders, get the same marks as the static cards. The Related resources
+   list and the reference cards are the shell's and mark themselves.
+   -------------------------------------------------------------------------- */
+
+.mgdb-expression-page .expression-tool-links a[href^="http"]:not([href*="maizegdb.org"]):not([href*="box.com"])::after,
+.mgdb-expression-page .expression-row-links a[href^="http"]:not([href*="maizegdb.org"]):not([href*="box.com"])::after,
+.mgdb-expression-page .expression-profile-links a[href^="http"]:not([href*="maizegdb.org"]):not([href*="box.com"])::after,
+.mgdb-expression-page .expression-release-open a[href^="http"]:not([href*="maizegdb.org"]):not([href*="box.com"])::after,
+.mgdb-expression-page .expression-dl-content a[href^="http"]:not([href*="maizegdb.org"]):not([href*="box.com"])::after {
+  content: " \2197";
+  font-size: .85em;
+  font-weight: 700;
+}
+
+.mgdb-expression-page .expression-tool-links a[href*="box.com"]::after,
+.mgdb-expression-page .expression-tool-links a[href*="format=tsv"]::after,
+.mgdb-expression-page .expression-release-open a[href*="format=tsv"]::after,
+.mgdb-expression-page .expression-dl-content a[href*="box.com"]::after,
+.mgdb-expression-page .expression-dl-content a[href*="download.maizegdb.org"]::after,
+.mgdb-expression-page .expression-dl-content a[href*="format=tsv"]::after,
+.mgdb-expression-page .expression-section-link[href="/download"]::after,
+.mgdb-expression-page #expression-export-tsv::after {
+  content: " \2193";
+  font-size: .85em;
+  font-weight: 700;
+}
 
 /* Responsive --------------------------------------------------------------- */
 
 @media (max-width: 767px) {
+  /* Below the shell's own breakpoint the bar is a scrolling rail, one row of
+     57px, so it stops taking 153px of a phone screen; the shell measures the
+     bar and writes the scroll offset, so nothing else moves. A tab that cannot
+     wrap the row must not shrink either, or its label breaks over two lines. */
+  .mgdb-expression-page .mgdb-section-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+  .mgdb-expression-page .mgdb-section-tabs a {
+    flex: none;
+    white-space: nowrap;
+  }
   .mgdb-expression-page .expression-card-grid {
     grid-template-columns: 1fr;
   }
@@ -813,10 +1051,12 @@
   .mgdb-expression-page .expression-query-submit { width: 100%; }
   .mgdb-expression-page .expression-advanced-grid { grid-template-columns: minmax(0, 1fr); }
   .mgdb-expression-page .mgdb-hub-field > label:first-child { min-height: 0; }
+  .mgdb-expression-page .expression-profile-links .mgdb-button { flex: 1 1 auto; justify-content: center; }
 }
 
 @media print {
   .mgdb-expression-page .mgdb-section-tabs,
   .mgdb-expression-page .expression-search,
+  .mgdb-expression-page .expression-profile-close,
   .mgdb-expression-page .expression-pagination { display: none; }
 }

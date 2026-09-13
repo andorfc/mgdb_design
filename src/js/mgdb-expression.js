@@ -4,7 +4,10 @@
  *
  *   - the gene lookup, its examples, and its assembly filter
  *   - the results table: sorting, filtering, page size, pagination, TSV export
- *   - the "gene models by assembly" figure
+ *   - the expression profile a reader opens from a result, drawn by
+ *     MGDB.geneExpression (js/mgdb-gene-expression.js, shared with the gene
+ *     record) from /api/v1/data/expression/{genome}/{gene}
+ *   - the "samples by tissue reading" figure
  *   - the sticky section tab scrollspy
  *
  * The lookup is answered by search/expression/expression_search_api.php, which
@@ -19,6 +22,7 @@
   'use strict';
 
   var API = '/search/expression/expression_search_api.php';
+  var PROFILE_API = '/api/v1/data/expression/';
 
   /* The API caps a page at 200. "All results" therefore means "as many as the
      endpoint will give at once", which is stated in the status line rather
@@ -35,6 +39,7 @@
   var state = {
     term: '',
     assembly: '',
+    expressionOnly: false,
     filter: '',
     sort: '',
     dir: 'asc',
@@ -48,6 +53,7 @@
   };
 
   var request = null;
+  var profileRequest = null;
 
   function byId(id) { return document.getElementById(id); }
 
@@ -66,8 +72,8 @@
      Sticky section tabs
 
      Driven by scroll, IntersectionObserver and resize together: no single
-     trigger fires in every case, and the results section appears and
-     disappears under the tabs as searches run.
+     trigger fires in every case, and the results and profile sections appear
+     and disappear under the tabs as the reader works.
      ====================================================================== */
 
   function initTabs() {
@@ -143,12 +149,14 @@
       pairs.forEach(function (pair) { observer.observe(pair.section); });
     }
 
-    var results = byId('expression-results-section');
-    if (results && window.MutationObserver) {
-      new window.MutationObserver(update).observe(results, {
-        childList: true, subtree: true, attributes: true, attributeFilter: ['hidden']
-      });
-    }
+    ['expression-results-section', 'expression-profile'].forEach(function (id) {
+      var el = byId(id);
+      if (el && window.MutationObserver) {
+        new window.MutationObserver(update).observe(el, {
+          childList: true, subtree: true, attributes: true, attributeFilter: ['hidden']
+        });
+      }
+    });
 
     update();
   }
@@ -161,6 +169,8 @@
     var query = byId('expression-query');
     state.term = query ? query.value.trim() : '';
     state.assembly = (byId('expression-filter-assembly') || {}).value || '';
+    var only = byId('expression-expression-only');
+    state.expressionOnly = !!(only && only.checked);
     var advSort = byId('expression-adv-sort');
     if (advSort && advSort.value) {
       var parts = advSort.value.split('-');
@@ -173,6 +183,7 @@
     var qs = new URLSearchParams();
     if (state.term) { qs.set('term', state.term); }
     if (state.assembly) { qs.set('assembly', state.assembly); }
+    if (state.expressionOnly) { qs.set('expression_only', '1'); }
     if (state.sort) { qs.set('sort', state.sort + '-' + state.dir); }
     qs.set('limit', state.pageSize === 'all' ? MAX_PAGE : state.pageSize);
     qs.set('offset', state.pageSize === 'all' ? 0 : (state.page - 1) * state.pageSize);
@@ -228,21 +239,6 @@
      Results
      ====================================================================== */
 
-  /* The within-results filter runs over the fields the table shows, so
-     "narrow this table" and what a reader can see agree. */
-  function visibleRows() {
-    if (!state.filter) { return state.rows; }
-    var terms = state.filter.toLowerCase().split(/\s+/).filter(Boolean);
-    return state.rows.filter(function (row) {
-      var hay = [row.gene_name, row.locus_name, row.locus_full_name,
-                 row.assembly_version, row.coordinates].join(' ').toLowerCase();
-      for (var i = 0; i < terms.length; i++) {
-        if (hay.indexOf(terms[i]) === -1) { return false; }
-      }
-      return true;
-    });
-  }
-
   function compare(a, b) {
     if (!state.sort) { return 0; }
     var dir = state.dir === 'desc' ? -1 : 1;
@@ -279,24 +275,36 @@
     updateSortIndicators();
     updateExport();
     applyResultFilter();
-    initCopyButtons();
+    initRowButtons();
   }
 
-  function rowHtml(row) {
+  /* The links a row carries. The endpoint sends null for every target that
+     has no data for that assembly -- qTeller for W22, eFP for a NAM founder --
+     and only what it sends is drawn. Apps on maizegdb.org subdomains and
+     external hosts open in a new tab; the gene record does not. */
+  function rowLinks(row) {
     var links = [
       { label: 'qTeller', url: row.qteller_url },
+      { label: 'qTeller NAM', url: row.qteller_nam_url },
       { label: 'Gene record', url: row.gene_center_url },
       { label: 'JBrowse', url: row.jbrowse_url },
+      { label: 'GBrowse', url: row.gbrowse_url },
       { label: 'eFP', url: row.efp_url }
     ].filter(function (link) { return link.url; }).map(function (link) {
       var host = (link.url.match(/^https?:\/\/([^/?#]+)/i) || [])[1];
-      var external = !!host && !/(^|\.)maizegdb\.org$/i.test(host);
-      var app = /^(jbrowse2?|gbrowse|qteller|efp|snptools|wgs|feta|gcv)\./i.test(host || '');
-      var newTab = external || app;
+      var newTab = !!host;
       return '<a href="' + esc(link.url) + '"' + (newTab ? ' target="_blank" rel="noopener"' : '') + '>'
-           + esc(link.label) + ' <span aria-hidden="true">' + (external ? '&nearr;' : '&rarr;') + '</span></a>';
-    }).join('');
+           + esc(link.label) + '</a>';
+    });
+    var profile = row.expression_genome
+      ? '<button type="button" class="expression-profile-btn" data-gene="' + esc(row.gene_name)
+        + '" data-genome="' + esc(row.expression_genome) + '" data-symbol="' + esc(row.locus_name || '')
+        + '">Profile</button>'
+      : '<span class="expression-no-profile" title="qTeller has no expression data for this assembly">No profile</span>';
+    return profile + links.join('');
+  }
 
+  function rowHtml(row) {
     var locus = row.locus_name
       ? '<strong>' + esc(row.locus_name) + '</strong>'
         + (row.locus_full_name ? '<span class="expression-locus-full">' + esc(row.locus_full_name) + '</span>' : '')
@@ -305,12 +313,12 @@
     var haystack = [row.gene_name, row.locus_name, row.locus_full_name,
                     row.assembly_version, row.coordinates].filter(Boolean).join(' ').toLowerCase();
 
-    return '<tr data-search="' + esc(haystack) + '">'
-      + '<td><span class="expression-gene-name">' + esc(row.gene_name) + '</span></td>'
+    return '<tr data-search="' + esc(haystack) + '"' + (row.expression_genome ? ' class="has-profile"' : '') + '>'
+      + '<td><a class="expression-gene-name" href="' + esc(row.gene_center_url.split('#')[0]) + '">' + esc(row.gene_name) + '</a></td>'
       + '<td>' + locus + '</td>'
       + '<td>' + esc(row.assembly_version || '—') + '</td>'
       + '<td><span class="expression-coords">' + esc(row.coordinates || '—') + '</span></td>'
-      + '<td class="expression-col-open"><span class="expression-row-links">' + links + '</span></td>'
+      + '<td class="expression-col-open"><span class="expression-row-links">' + rowLinks(row) + '</span></td>'
       + '</tr>';
   }
 
@@ -344,20 +352,6 @@
     }
     var metaHtml = metaItems.length ? '<dl class="expression-card-meta-list">' + metaItems.join('') + '</dl>' : '';
 
-    var toolLinks = [
-      { label: 'qTeller', url: row.qteller_url },
-      { label: 'Gene record', url: row.gene_center_url },
-      { label: 'JBrowse', url: row.jbrowse_url },
-      { label: 'eFP', url: row.efp_url }
-    ].filter(function (l) { return l.url; }).map(function (l) {
-      var host = (l.url.match(/^https?:\/\/([^/?#]+)/i) || [])[1];
-      var external = !!host && !/(^|\.)maizegdb\.org$/i.test(host);
-      var app = /^(jbrowse2?|gbrowse|qteller|efp|snptools|wgs|feta|gcv)\./i.test(host || '');
-      var newTab = external || app;
-      return '<a href="' + esc(l.url) + '"' + (newTab ? ' target="_blank" rel="noopener"' : '') + '>'
-           + esc(l.label) + ' <span aria-hidden="true">' + (external ? '&nearr;' : '&rarr;') + '</span></a>';
-    }).join('');
-
     var haystack = [row.gene_name, row.locus_name, row.locus_full_name,
                     row.assembly_version, row.coordinates].filter(Boolean).join(' ').toLowerCase();
 
@@ -371,7 +365,7 @@
         metaHtml +
       '</div>' +
       '<div class="expression-card-actions">' +
-        '<div class="expression-card-tools">' + toolLinks + '</div>' +
+        '<div class="expression-card-tools expression-row-links">' + rowLinks(row) + '</div>' +
         '<div class="expression-card-copy-btns">' +
           '<button class="expression-copy-btn" type="button" data-copy-value="' + esc(row.gene_name) + '">Copy ID</button>' +
           (row.coordinates && row.coordinates !== '—' ? '<button class="expression-copy-btn" type="button" data-copy-value="' + esc(row.coordinates) + '">Copy Coords</button>' : '') +
@@ -389,12 +383,8 @@
     var isCards = state.view === 'cards';
     var hasResults = state.rows && state.rows.length > 0;
 
-    if (tableView) {
-      tableView.hidden = isCards || !hasResults;
-    }
-    if (cardsView) {
-      cardsView.hidden = !isCards || !hasResults;
-    }
+    if (tableView) { tableView.hidden = isCards || !hasResults; }
+    if (cardsView) { cardsView.hidden = !isCards || !hasResults; }
 
     if (btnCards) {
       btnCards.setAttribute('aria-pressed', isCards ? 'true' : 'false');
@@ -406,11 +396,11 @@
     }
   }
 
-  function initCopyButtons() {
+  function initRowButtons() {
     Array.prototype.forEach.call(document.querySelectorAll('.expression-copy-btn'), function (btn) {
       btn.addEventListener('click', function () {
         var val = btn.getAttribute('data-copy-value');
-        if (!val) return;
+        if (!val) { return; }
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(val).then(function () {
             var orig = btn.textContent;
@@ -418,6 +408,12 @@
             setTimeout(function () { btn.textContent = orig; }, 1500);
           });
         }
+      });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.expression-profile-btn'), function (btn) {
+      btn.addEventListener('click', function () {
+        openProfile(btn.getAttribute('data-gene'), btn.getAttribute('data-genome'),
+                    btn.getAttribute('data-symbol'), { scroll: true });
       });
     });
   }
@@ -429,6 +425,7 @@
     if (!input) { return; }
 
     var query = input.value.trim().toLowerCase();
+    state.filter = query;
     var terms = query.split(/\s+/).filter(Boolean);
     var visible = 0;
     var total = state.rows.length;
@@ -483,10 +480,10 @@
        nothing on the page. */
     if (state.filter) {
       status.textContent = shown === 0
-        ? 'Nothing on this page matches the table filter \u201C' + state.filter + '\u201D. '
+        ? 'Nothing on this page matches the table filter “' + state.filter + '”. '
           + num(total) + ' ' + noun + ' matched the search.'
         : 'Showing ' + num(shown) + ' of the ' + num(state.rows.length)
-          + ' results on this page matching \u201C' + state.filter + '\u201D, out of '
+          + ' results on this page matching “' + state.filter + '”, out of '
           + num(total) + ' ' + noun + ' matched by the search.';
       return;
     }
@@ -505,8 +502,13 @@
     var filters = [];
     if (state.term) { filters.push('term “' + state.term + '”'); }
     if (state.assembly) { filters.push(state.assembly); }
-    if (state.filter) { filters.push('table filter “' + state.filter + '”'); }
+    else if (state.expressionOnly) { filters.push('assemblies with expression profiles only'); }
     if (filters.length) { text += ' Matching ' + filters.join(', ') + '.'; }
+
+    var withProfile = state.rows.filter(function (r) { return r.expression_genome; }).length;
+    if (state.rows.length && withProfile < state.rows.length) {
+      text += ' ' + withProfile + ' of the ' + state.rows.length + ' on this page have an expression profile.';
+    }
     if (summary && summary.elapsed_ms !== undefined) { text += ' (' + summary.elapsed_ms + ' ms)'; }
 
     status.textContent = text;
@@ -577,6 +579,98 @@
   }
 
   /* ======================================================================
+     Expression profile
+
+     One section for whichever result is open. The payload is the record
+     the API serves for the gene ({attributes, sections, links}); the figure
+     itself -- tiles, one bar per sample by study, the by-tissue and
+     stress-condition panels, the study list -- is MGDB.geneExpression,
+     shared with the gene record so the two pages draw the same thing.
+     ====================================================================== */
+
+  function profileLinks(gene, genome, data) {
+    var links = data.links || {};
+    var out = [];
+    function add(label, url, external) {
+      if (!url) { return; }
+      out.push('<a class="mgdb-button mgdb-button-secondary mgdb-button-sm" href="' + esc(url) + '"'
+        + (external ? ' target="_blank" rel="noopener"' : '') + '>' + esc(label) + '</a>');
+    }
+    add('Gene record', '/gene_center/gene/' + encodeURIComponent(gene) + '#gene-record-expression', false);
+    /* The row the profile came from knows which qTeller pages apply; the
+       API's own link is the release's chart page. */
+    var row = state.rows.filter(function (r) { return r.gene_name === gene && r.expression_genome === genome; })[0];
+    if (row) {
+      add('qTeller', row.qteller_url, true);
+      add('qTeller NAM founders', row.qteller_nam_url, true);
+      add('JBrowse RNA-seq', row.jbrowse_url, true);
+      add('GBrowse', row.gbrowse_url, true);
+      add('eFP browser', row.efp_url, true);
+    } else if (links.qteller) {
+      add('qTeller', links.qteller + '&info=all', true);
+    }
+    return out.join('');
+  }
+
+  function openProfile(gene, genome, symbol, options) {
+    var opts = options || {};
+    var section = byId('expression-profile');
+    var head = byId('expression-profile-head');
+    var status = byId('expression-profile-status');
+    var figure = byId('expression-profile-figure');
+    if (!section || !head || !figure || !gene || !genome) { return; }
+
+    section.hidden = false;
+    head.innerHTML = '<div class="expression-profile-title"><span class="expression-gene-name">' + esc(gene) + '</span>'
+      + (symbol ? ' <strong>' + esc(symbol) + '</strong>' : '')
+      + ' <span class="expression-profile-genome">' + esc(genome) + '</span></div>';
+    figure.innerHTML = '';
+    if (status) { status.hidden = false; status.textContent = 'Loading the expression profile for ' + gene + '…'; }
+    if (opts.scroll) { section.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+
+    if (profileRequest && profileRequest.abort) { profileRequest.abort(); }
+    var controller = window.AbortController ? new window.AbortController() : null;
+    profileRequest = controller;
+
+    var url = PROFILE_API + encodeURIComponent(genome) + '/' + encodeURIComponent(gene);
+    window.fetch(url, controller ? { signal: controller.signal, headers: { Accept: 'application/json' } } : undefined)
+      .then(function (res) { return res.json().then(function (json) { return { ok: res.ok, json: json }; }); })
+      .then(function (r) {
+        var data = r.json && r.json.data;
+        if (!r.ok || !data || !data.sections) {
+          var detail = r.json && r.json.detail ? ' ' + r.json.detail : '';
+          if (status) { status.textContent = 'No expression profile could be loaded for ' + gene + '.' + detail; }
+          return;
+        }
+        head.innerHTML += '<div class="expression-profile-links">' + profileLinks(gene, genome, r.json) + '</div>';
+        var drawn = window.MGDB && window.MGDB.geneExpression
+          ? window.MGDB.geneExpression(figure, {
+              gene: { name: gene, symbol: symbol || null },
+              profile: { attributes: data.attributes, sections: data.sections, links: r.json.links || {} },
+              qteller: null
+            })
+          : false;
+        if (status) {
+          status.hidden = drawn;
+          if (!drawn) { status.textContent = 'The profile for ' + gene + ' has no sample values to draw.'; }
+        }
+      })
+      .catch(function (error) {
+        if (error && error.name === 'AbortError') { return; }
+        if (status) { status.textContent = 'Network error while loading the expression profile.'; }
+      });
+  }
+
+  function closeProfile() {
+    var section = byId('expression-profile');
+    if (!section) { return; }
+    if (profileRequest && profileRequest.abort) { profileRequest.abort(); }
+    section.hidden = true;
+    byId('expression-profile-figure').innerHTML = '';
+    byId('expression-profile-head').innerHTML = '';
+  }
+
+  /* ======================================================================
      Form wiring
      ====================================================================== */
 
@@ -634,33 +728,40 @@
     });
 
     var assembly = byId('expression-filter-assembly');
-    if (assembly) {
-      assembly.addEventListener('change', function () {
-        readForm();
-        state.page = 1;
-        if (state.searched) { runSearch({}); }
-      });
-    }
-
+    var only = byId('expression-expression-only');
     var advSort = byId('expression-adv-sort');
-    if (advSort) {
-      advSort.addEventListener('change', function () {
+
+    function rerun() {
+      readForm();
+      state.page = 1;
+      if (state.searched) { runSearch({}); }
+    }
+    if (assembly) { assembly.addEventListener('change', rerun); }
+    if (only) { only.addEventListener('change', rerun); }
+    if (advSort) { advSort.addEventListener('change', rerun); }
+
+    /* "Search" in the release table: that assembly, with whatever term is in
+       the box. Without a term it lists the assembly's models, paged. */
+    Array.prototype.forEach.call(document.querySelectorAll('[data-expression-assembly]'), function (btn) {
+      btn.addEventListener('click', function () {
+        if (assembly) { assembly.value = btn.getAttribute('data-expression-assembly'); }
+        var adv = byId('expression-adv');
+        if (adv) { adv.open = true; }
         readForm();
         state.page = 1;
-        if (state.searched) { runSearch({}); }
+        runSearch({ scroll: true });
       });
-    }
+    });
 
     var advReset = byId('expression-adv-reset');
     if (advReset) {
       advReset.addEventListener('click', function () {
         if (assembly) { assembly.value = ''; }
+        if (only) { only.checked = false; }
         if (advSort) { advSort.value = ''; }
         state.sort = '';
         state.dir = 'asc';
-        readForm();
-        state.page = 1;
-        if (state.searched) { runSearch({}); }
+        rerun();
       });
     }
 
@@ -669,6 +770,7 @@
       emptyReset.addEventListener('click', function () {
         if (query) { query.value = ''; }
         if (assembly) { assembly.value = ''; }
+        if (only) { only.checked = false; }
         if (advSort) { advSort.value = ''; }
         var filter = byId('expression-results-filter');
         if (filter) { filter.value = ''; }
@@ -687,6 +789,10 @@
     if (filter) {
       filter.addEventListener('input', function () {
         applyResultFilter();
+        updateStatus(null, state.rows.filter(function (_, i) {
+          var body = byId('expression-results-body');
+          return body && body.rows[i] && !body.rows[i].hidden;
+        }).length);
       });
     }
 
@@ -701,19 +807,11 @@
 
     var btnCards = byId('expression-view-cards');
     var btnTable = byId('expression-view-table');
-
     if (btnCards) {
-      btnCards.addEventListener('click', function () {
-        state.view = 'cards';
-        updateViewDisplay();
-      });
+      btnCards.addEventListener('click', function () { state.view = 'cards'; updateViewDisplay(); });
     }
-
     if (btnTable) {
-      btnTable.addEventListener('click', function () {
-        state.view = 'table';
-        updateViewDisplay();
-      });
+      btnTable.addEventListener('click', function () { state.view = 'table'; updateViewDisplay(); });
     }
 
     Array.prototype.forEach.call(
@@ -731,10 +829,13 @@
         });
       });
 
+    var close = byId('expression-profile-close');
+    if (close) { close.addEventListener('click', closeProfile); }
+
     updateClearButton();
 
-    /* A lookup can be linked to: /expression?term=adh1, or ?assembly=… from a
-       bar in the figure below. */
+    /* A lookup can be linked to: /expression?term=adh1, ?assembly=…, and a
+       profile with ?gene=Zm00001eb056510&genome=Zm-B73-REFERENCE-NAM-5.0. */
     var params = new URLSearchParams(window.location.search);
     var linked = false;
     if (params.get('view') === 'cards' || params.get('view') === 'table') {
@@ -742,23 +843,30 @@
     }
     if (params.get('term') && query) { query.value = params.get('term'); linked = true; }
     if (params.get('assembly') && assembly) { assembly.value = params.get('assembly'); linked = true; }
+    if (params.get('expression_only') === '1' && only) { only.checked = true; linked = true; }
     if (linked) {
-      if (params.get('assembly')) {
+      if (params.get('assembly') || params.get('expression_only')) {
         var adv = byId('expression-adv');
         if (adv) { adv.open = true; }
       }
       updateClearButton();
       readForm();
-      runSearch({ scroll: true });
+      runSearch({ scroll: !params.get('gene') });
+    }
+    if (params.get('gene') && params.get('genome')) {
+      openProfile(params.get('gene'), params.get('genome'), '', { scroll: true });
     }
   }
 
   /* ======================================================================
-     Gene models by assembly
+     Samples by tissue reading
 
-     .mgdb-chart is a fixed 320px in the design system, so the height has to be
-     set on the element and handed to Plotly from the same variable or the bars
-     are drawn into a box too short for them.
+     RNA-seq and proteomics samples stacked per tissue. .mgdb-chart is a
+     fixed 320px in the design system, so the height is set on the element
+     and handed to Plotly from the same variable. Margins follow the
+     figure's width: MGDB.chart re-runs Plotly's resize on a window resize,
+     which keeps the margins the figure was drawn with, so a desktop gutter
+     would otherwise survive onto a phone.
      ====================================================================== */
 
   function sizeChart(id, height) {
@@ -774,62 +882,87 @@
   }
 
   function initFigure() {
-    var el = byId('expression-assembly-chart');
+    var el = byId('expression-tissue-chart');
     if (!el || !window.MGDB || !window.MGDB.chart) { return; }
 
     var labels = readAttrJson(el, 'data-labels');
-    var values = readAttrJson(el, 'data-values');
-    if (!labels || !values || !labels.length) { return; }
+    var series = {
+      other: readAttrJson(el, 'data-other'),
+      abiotic: readAttrJson(el, 'data-abiotic'),
+      biotic: readAttrJson(el, 'data-biotic'),
+      control: readAttrJson(el, 'data-control'),
+      protein: readAttrJson(el, 'data-protein')
+    };
+    if (!labels || !labels.length) { return; }
+    for (var k in series) { if (!series[k] || series[k].length !== labels.length) { return; } }
 
-    var height = sizeChart('expression-assembly-chart', Math.max(320, labels.length * 34 + 110));
+    /* Plotly draws a horizontal bar chart bottom-up; the catalogue's order
+       (root at the top) is what the table below shows, so reverse it. */
+    var y = labels.slice().reverse();
+    var rev = function (a) { return a.slice().reverse(); };
+    var display = y.map(function (t) { return t.charAt(0).toUpperCase() + t.slice(1); });
+    /* On a phone the full labels take 160px of a 259px figure through
+       automargin and leave the plot 92px. The narrow set shortens the
+       longest one ("seedling / whole plant") to its first word; the bars
+       stay keyed on the full labels and only the tick text is swapped, so
+       Plotly does not see new categories. */
+    var SHORT = { 'seedling / whole plant': 'Seedling' };
+    var displayNarrow = y.map(function (t) { return SHORT[t] || (t.charAt(0).toUpperCase() + t.slice(1)); });
+
+    function metrics() {
+      var w = el.getBoundingClientRect().width;
+      var narrow = w > 0 && w < 560;
+      return {
+        narrow: narrow,
+        margin: narrow ? { l: 8, r: 12, t: 8, b: 44 } : { l: 8, r: 24, t: 8, b: 48 },
+        nticks: narrow ? 4 : 0,
+        ticktext: narrow ? displayNarrow : display
+      };
+    }
+
+    /* The same colours the profile figure uses for these readings: green
+       for RNA-seq, the stress conditions' blue, red and grey, gold for
+       proteomics. Every colour is also a column in the table below. */
+    function trace(name, key, color, noun) {
+      return {
+        type: 'bar', orientation: 'h', name: name, x: rev(series[key]), y: y,
+        marker: { color: color },
+        hovertemplate: '%{y}<br>%{x:,} ' + noun + '<extra></extra>'
+      };
+    }
+
+    var m = metrics();
+    var height = sizeChart('expression-tissue-chart', Math.max(320, labels.length * 36 + 140));
 
     window.MGDB.chart({
-      target: 'expression-assembly-chart',
-      traces: [{
-        type: 'bar',
-        orientation: 'h',
-        x: values,
-        y: labels,
-        text: values.map(function (value) { return ' ' + Number(value).toLocaleString(); }),
-        textposition: 'outside',
-        textangle: 0,
-        cliponaxis: false,
-        marker: { color: '#285d46' },
-        hovertemplate: '%{y}<br>%{x:,} gene models<extra></extra>'
-      }],
+      target: 'expression-tissue-chart',
+      traces: [
+        trace('RNA-seq, other studies', 'other', '#285d46', 'RNA-seq samples from non-stress studies'),
+        trace('Abiotic stress', 'abiotic', '#0641a5', 'abiotic stress samples'),
+        trace('Biotic stress', 'biotic', '#b03a2e', 'biotic stress samples'),
+        trace('Control', 'control', '#8d978f', 'stress-study control samples'),
+        trace('Proteomics', 'protein', '#d99a0b', 'proteomics samples')
+      ],
       layout: {
         height: height,
-        /* Room on the right for the outside value labels, which sit past the
-           longest bar. The left margin is left to automargin plus the shared
-           tick standoff, because assembly names vary in length. */
-        margin: { l: 10, r: 96, t: 8, b: 48 },
-        bargap: 0.28,
-        xaxis: { title: { text: 'Distinct gene models' }, automargin: true },
-        yaxis: { type: 'category', automargin: true }
+        barmode: 'stack',
+        bargap: 0.3,
+        margin: m.margin,
+        xaxis: { title: { text: 'Samples in the B73 v5 release' }, automargin: true, nticks: m.nticks },
+        yaxis: { type: 'category', automargin: true, tickmode: 'array', tickvals: y, ticktext: m.ticktext }
       }
     });
 
-    /* Selecting a bar searches that assembly. Plotly only gains its event
-       emitter once it has drawn, so wait for the draw rather than guessing at
-       a delay. */
-    if (!window.MutationObserver) { return; }
-    var attached = false;
-    var observer = new window.MutationObserver(function () {
-      if (attached || typeof el.on !== 'function') { return; }
-      attached = true;
-      observer.disconnect();
-      el.on('plotly_click', function (event) {
-        if (!event || !event.points || !event.points.length) { return; }
-        var select = byId('expression-filter-assembly');
-        if (select) { select.value = event.points[0].y; }
-        var adv = byId('expression-adv');
-        if (adv) { adv.open = true; }
-        readForm();
-        state.page = 1;
-        runSearch({ scroll: true });
-      });
+    /* Relayout when the breakpoint is crossed: the margins, the tick
+       density and the tick text. */
+    var lastNarrow = m.narrow;
+    window.addEventListener('resize', function () {
+      if (!window.Plotly || typeof el.on !== 'function') { return; }
+      var now = metrics();
+      if (now.narrow === lastNarrow) { return; }
+      lastNarrow = now.narrow;
+      window.Plotly.relayout(el, { margin: now.margin, 'xaxis.nticks': now.nticks, 'yaxis.ticktext': now.ticktext });
     });
-    observer.observe(el, { childList: true, subtree: true });
   }
 
   /* ====================================================================== */
