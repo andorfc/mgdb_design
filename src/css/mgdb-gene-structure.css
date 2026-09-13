@@ -1,0 +1,335 @@
+/* ==========================================================================
+   Gene model and protein figure — /gene_center/gene/{id}, Structure section
+   --------------------------------------------------------------------------
+   Drawn by js/mgdb-gene-structure.js from the gene-models and domains
+   datasets of the API. Three bands in one SVG: the transcripts on the genome,
+   the connectors that carry each CDS block down to the residues it encodes,
+   and the protein with its InterPro entries and residue-level sites. A fourth,
+   optional panel is the 3D model, loaded only when asked for.
+
+   Every colour here is also a word somewhere: the legend names the domains,
+   the tables below carry every coordinate, and each drawn element has a
+   title. Colour is a reading aid, never the only signal.
+   ========================================================================== */
+
+.gs {
+  --gs-cds: var(--mgdb-green-dark, #174634);
+  --gs-cds-soft: #8fb8a3;
+  --gs-utr: #b9d1c4;
+  --gs-intron: #8a938d;
+  --gs-connector: rgba(40, 93, 70, .16);
+  --gs-connector-line: rgba(40, 93, 70, .45);
+  --gs-protein: #e6ebe7;
+  --gs-site: var(--mgdb-gold, #f2a515);
+  --gs-ink: var(--mgdb-ink, #1f2723);
+  --gs-muted: var(--mgdb-muted, #5b655e);
+  --gs-rule: var(--mgdb-line, #d7ddd8);
+  --gs-selected: var(--mgdb-surface-sunken, #f5f1e9);
+  --gs-dom-0: #1a5b7a;
+  --gs-dom-1: #8a5a0f;
+  --gs-dom-2: #7a2c43;
+  --gs-dom-3: #4c7038;
+  --gs-dom-4: #4a45ad;
+  --gs-dom-5: #a52a63;
+  --gs-dom-6: #0e6a5e;
+  --gs-dom-7: #9a4b12;
+  position: relative;
+  margin-top: var(--mgdb-space-3);
+}
+
+/* --------------------------------------------------------------------------
+   Toolbar: which transcript, and the ways out
+   -------------------------------------------------------------------------- */
+
+.gs-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  margin-bottom: var(--mgdb-space-3);
+}
+
+.gs-toolbar-label {
+  color: var(--gs-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.gs-chips { display: flex; flex-wrap: wrap; gap: var(--mgdb-space-1); }
+
+.gs-chip {
+  min-height: 30px;
+  padding: 2px var(--mgdb-space-3);
+  border: 1px solid var(--gs-rule);
+  border-radius: 999px;
+  background: var(--mgdb-surface, #fff);
+  color: var(--mgdb-ink-soft, #39423c);
+  font: inherit;
+  font-family: var(--mgdb-font-mono);
+  font-size: var(--mgdb-text-xs);
+  cursor: pointer;
+}
+
+.gs-chip:hover:not([aria-pressed="true"]) { background: var(--mgdb-surface-alt, #fbf9f5); }
+.gs-chip[aria-pressed="true"] { border-color: var(--gs-cds); background: var(--gs-cds); color: #fff; }
+.gs-chip:focus-visible { outline: 3px solid var(--mgdb-focus, #f2a515); outline-offset: 2px; }
+.gs-chip-canonical::after { content: " \2605"; font-size: .8em; }
+
+.gs-toolbar-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  margin-left: auto;
+  font-size: var(--mgdb-text-sm);
+}
+
+.gs-strand {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--gs-selected);
+  color: var(--gs-ink);
+  font-size: var(--mgdb-text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------------------
+   The figure
+   -------------------------------------------------------------------------- */
+
+.gs-stage {
+  position: relative;
+  overflow-x: auto;
+  border: 1px solid var(--gs-rule);
+  border-radius: var(--mgdb-radius, 8px);
+  background: var(--mgdb-surface, #fff);
+}
+
+.gs-stage svg {
+  display: block;
+  width: 100%;
+  min-width: 640px;
+  height: auto;
+  font-family: var(--mgdb-font, system-ui, sans-serif);
+  color: var(--gs-ink);
+}
+
+.gs-stage.is-busy::after {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, .6);
+  color: var(--gs-muted);
+  content: "Loading the protein\2026";
+  font-size: var(--mgdb-text-sm);
+}
+
+/* Band titles and rulers */
+/* Not uppercased: the title carries the protein id, and case is part of an identifier. */
+.gs-band-title { fill: var(--gs-muted); font-size: 11px; font-weight: 700; letter-spacing: .03em; }
+.gs-axis line { stroke: var(--gs-rule); stroke-width: 1; }
+.gs-axis text { fill: var(--gs-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.gs-axis .gs-axis-base { stroke: var(--gs-intron); }
+
+/* Transcript rows */
+.gs-row-bg { fill: transparent; }
+.gs-row.is-selected .gs-row-bg { fill: var(--gs-selected); }
+.gs-row-label { fill: var(--gs-ink); font-size: 12px; font-family: var(--mgdb-font-mono); cursor: pointer; }
+.gs-row-label.is-selected { font-weight: 700; }
+.gs-row-note { fill: var(--gs-muted); font-size: 10.5px; }
+.gs-intron { stroke: var(--gs-intron); stroke-width: 1.2; fill: none; }
+.gs-chevron { stroke: var(--gs-intron); stroke-width: 1.2; fill: none; }
+.gs-exon-utr { fill: var(--gs-utr); }
+.gs-exon-cds { fill: var(--gs-cds); }
+.gs-row:not(.is-selected) .gs-exon-cds { fill: var(--gs-cds-soft); }
+.gs-row:not(.is-selected) .gs-exon-utr { opacity: .7; }
+.gs-exon { cursor: pointer; }
+.gs-exon:hover .gs-exon-cds, .gs-exon:focus .gs-exon-cds { stroke: var(--gs-ink); stroke-width: 1.5; }
+.gs-exon:focus { outline: none; }
+.gs-exon-rank { fill: #fff; font-size: 10px; font-weight: 700; pointer-events: none; }
+
+/* Domains projected back onto the CDS of the selected transcript */
+.gs-dom-genomic { opacity: .82; pointer-events: none; }
+
+/* Connectors: one per CDS block, gene above to protein below */
+.gs-connector { fill: var(--gs-connector); stroke: var(--gs-connector-line); stroke-width: .6; }
+.gs-connector.is-hot { fill: rgba(242, 165, 21, .28); stroke: var(--gs-site); }
+
+/* Protein */
+.gs-protein-bar { fill: var(--gs-protein); stroke: var(--gs-rule); }
+.gs-domain { cursor: pointer; }
+.gs-domain rect { stroke: rgba(255, 255, 255, .8); stroke-width: 1; }
+.gs-domain:hover rect, .gs-domain:focus rect { stroke: var(--gs-ink); stroke-width: 1.5; }
+.gs-domain:focus { outline: none; }
+.gs-domain text { fill: #fff; font-size: 11px; font-weight: 700; pointer-events: none; }
+.gs-domain-outside text { fill: var(--gs-ink); }
+.gs-site { fill: var(--gs-site); stroke: #8a5a0f; stroke-width: .6; cursor: pointer; }
+.gs-site:hover, .gs-site:focus { stroke: var(--gs-ink); stroke-width: 1.2; outline: none; }
+.gs-site-lane-label { fill: var(--gs-muted); font-size: 10.5px; }
+
+.gs-dom-0 { fill: var(--gs-dom-0); }
+.gs-dom-1 { fill: var(--gs-dom-1); }
+.gs-dom-2 { fill: var(--gs-dom-2); }
+.gs-dom-3 { fill: var(--gs-dom-3); }
+.gs-dom-4 { fill: var(--gs-dom-4); }
+.gs-dom-5 { fill: var(--gs-dom-5); }
+.gs-dom-6 { fill: var(--gs-dom-6); }
+.gs-dom-7 { fill: var(--gs-dom-7); }
+
+/* --------------------------------------------------------------------------
+   Tooltip
+   -------------------------------------------------------------------------- */
+
+.gs-tip {
+  position: absolute;
+  z-index: 5;
+  max-width: 320px;
+  padding: 8px 10px;
+  border: 1px solid var(--gs-rule);
+  border-radius: var(--mgdb-radius-sm, 6px);
+  background: var(--mgdb-surface, #fff);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .12);
+  color: var(--gs-ink);
+  font-size: var(--mgdb-text-xs);
+  line-height: 1.4;
+  pointer-events: none;
+}
+
+.gs-tip strong { display: block; font-size: var(--mgdb-text-sm); }
+.gs-tip .gs-tip-mono { font-family: var(--mgdb-font-mono); }
+.gs-tip .gs-tip-muted { color: var(--gs-muted); }
+
+/* --------------------------------------------------------------------------
+   Legend and summary
+   -------------------------------------------------------------------------- */
+
+.gs-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-5);
+  margin: var(--mgdb-space-3) 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--mgdb-ink-soft, #39423c);
+  font-size: var(--mgdb-text-sm);
+}
+
+.gs-summary strong { font-variant-numeric: tabular-nums; }
+
+.gs-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  margin: var(--mgdb-space-3) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--mgdb-text-sm);
+}
+
+.gs-legend li { display: inline-flex; align-items: center; gap: 7px; }
+.gs-legend-star { color: var(--gs-cds); font-size: 13px; line-height: 1; }
+.gs-orientation .gs-chip { font-family: var(--mgdb-font); }
+
+.gs-swatch {
+  display: inline-block;
+  flex: none;
+  width: 16px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.gs-swatch-utr { background: var(--gs-utr); height: 6px; }
+.gs-swatch-cds { background: var(--gs-cds); }
+.gs-swatch-intron { height: 0; border-top: 1.5px solid var(--gs-intron); border-radius: 0; }
+.gs-swatch-site { width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 10px solid var(--gs-site); border-radius: 0; }
+.gs-swatch-dom-0 { background: var(--gs-dom-0); }
+.gs-swatch-dom-1 { background: var(--gs-dom-1); }
+.gs-swatch-dom-2 { background: var(--gs-dom-2); }
+.gs-swatch-dom-3 { background: var(--gs-dom-3); }
+.gs-swatch-dom-4 { background: var(--gs-dom-4); }
+.gs-swatch-dom-5 { background: var(--gs-dom-5); }
+.gs-swatch-dom-6 { background: var(--gs-dom-6); }
+.gs-swatch-dom-7 { background: var(--gs-dom-7); }
+
+.gs-legend .gs-muted, .gs-summary .gs-muted { color: var(--gs-muted); }
+
+/* --------------------------------------------------------------------------
+   3D model panel — opened on request; the library loads then
+   -------------------------------------------------------------------------- */
+
+.gs-model { margin-top: var(--mgdb-space-4); }
+
+.gs-model-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+}
+
+.gs-model-head p { margin: 0; color: var(--mgdb-ink-soft, #39423c); font-size: var(--mgdb-text-sm); }
+
+.gs-model-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+  align-items: center;
+  margin-top: var(--mgdb-space-3);
+}
+
+.gs-model-controls .gs-chip[aria-pressed="true"] { border-color: var(--gs-dom-0); background: var(--gs-dom-0); }
+
+.gs-model-stage {
+  position: relative;
+  height: 460px;
+  margin-top: var(--mgdb-space-3);
+  overflow: hidden;
+  border: 1px solid var(--gs-rule);
+  border-radius: var(--mgdb-radius, 8px);
+  background: #0b1210;
+}
+
+.gs-model-stage[hidden] { display: none; }
+
+.gs-model-viewport { position: absolute; inset: 0; }
+
+.gs-model-status {
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+  z-index: 2;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .88);
+  color: var(--gs-ink);
+  font-size: var(--mgdb-text-xs);
+}
+
+.gs-model-status:empty { display: none; }
+
+.gs-plddt-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3);
+  margin: var(--mgdb-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--mgdb-text-xs);
+  color: var(--gs-muted);
+}
+
+.gs-plddt-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.gs-plddt-legend .gs-swatch { width: 14px; height: 10px; }
+
+@media (max-width: 720px) {
+  .gs-model-stage { height: 340px; }
+  .gs-toolbar-links { margin-left: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gs-stage.is-busy::after { transition: none; }
+}

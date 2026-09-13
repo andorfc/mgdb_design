@@ -2632,3 +2632,48 @@ src/templates/data_center/stock-left.bau                    templates/data_cente
 src/templates/tools/breeders_toolbox-options.bau            templates/tools/breeders_toolbox-options.bau
 src/search/gene/gene_download_all.php               search/gene/gene_download_all.php
 src/include/blast_form_lib.php                      include/blast_form_lib.php
+
+# --------------------------------------------------------------------------
+# Data API (v1): gene models and protein domains answered from release files
+# under data/gene_models/<genome>/ and data/domains/<genome>/. The payloads
+# are built ON THE SERVER by the two tools (see README, "The Data API") and
+# are deliberately not in this manifest; only the code, the builders and the
+# access rules deploy. Additive: /api/v1/data is a new branch of the front
+# controller and nothing under /api/v1/records changes.
+src/include/api/v1/lib/mgdb_data.php             include/api/v1/lib/mgdb_data.php
+src/include/api/v1/data/gene_models.php          include/api/v1/data/gene_models.php
+src/include/api/v1/data/domains.php              include/api/v1/data/domains.php
+src/tools/gene_models_index.py                   tools/gene_models_index.py
+src/tools/domains_index.py                       tools/domains_index.py
+src/data/gene_models/.htaccess                   data/gene_models/.htaccess
+src/data/domains/.htaccess                       data/domains/.htaccess
+# The gene model and protein figure on the gene record page (2026-09-12),
+# drawn from the two datasets above. The 3D viewer library it loads on demand
+# (js/lib/3dmol/) is already on the server for the structure hubs.
+src/css/mgdb-gene-structure.css                  css/mgdb-gene-structure.css
+src/js/mgdb-gene-structure.js                    js/mgdb-gene-structure.js
+# Expression dataset (2026-09-12): qTeller's profiles served from
+# data/expression/<genome>/expression.sqlite, built on the server by
+# tools/expression_index.py from the qTeller files in /var/www/claude/qteller/
+# (outside the web root). The release files are not in this manifest.
+src/include/api/v1/lib/mgdb_expression.php       include/api/v1/lib/mgdb_expression.php
+src/include/api/v1/data/expression.php           include/api/v1/data/expression.php
+src/tools/expression_index.py                    tools/expression_index.py
+src/data/expression/.htaccess                    data/expression/.htaccess
+# tools/go_index.py builds data/go/ (GO terms, closure, InterPro2GO) from files
+# fetched to /var/www/claude/go/; tools/atlas_classes.py writes
+# data/domains/atlas_classes.json from the domain atlas payload. Both payloads
+# are built on the server and are not in this manifest.
+src/tools/go_index.py                            tools/go_index.py
+src/data/go/.htaccess                            data/go/.htaccess
+src/tools/atlas_classes.py                       tools/atlas_classes.py
+# tools/score_ranges.py writes data/gene_scores/index.json from the database (public aggregates).
+src/tools/score_ranges.py                        tools/score_ranges.py
+# Function section: GO reference library, pathway explorer reader, and the figure.
+src/include/api/v1/lib/mgdb_go.php               include/api/v1/lib/mgdb_go.php
+src/include/api/v1/lib/mgdb_pathways.php         include/api/v1/lib/mgdb_pathways.php
+src/include/api/v1/data/go.php                   include/api/v1/data/go.php
+src/js/mgdb-gene-function.js                     js/mgdb-gene-function.js
+src/css/mgdb-gene-function.css                   css/mgdb-gene-function.css
+src/css/mgdb-gene-expression.css                 css/mgdb-gene-expression.css
+src/js/mgdb-gene-expression.js                   js/mgdb-gene-expression.js

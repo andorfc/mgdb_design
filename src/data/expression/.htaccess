@@ -1,0 +1,13 @@
+Options -Indexes
+
+# The expression profiles are read by PHP on behalf of /api/v1/data/expression.
+# Everything here is denied to the browser -- the SQLite files above all, which
+# is the exposure the source host has -- except the public index of a release.
+<FilesMatch ".*">
+  Require all denied
+</FilesMatch>
+
+<Files "index.json">
+  Require all granted
+  Header set Cache-Control "public, max-age=3600"
+</Files>

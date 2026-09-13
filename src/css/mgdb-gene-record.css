@@ -278,3 +278,92 @@
 @media (max-width: 720px) {
   .mgdb-gene-record-page .gene-record-browser { height: 320px; }
 }
+
+
+/* --------------------------------------------------------------------------
+   Header: one subtitle (the full name) under the title, the record's kind as
+   a quiet pill beside it, and three facts. The rest moved to Overview.
+   -------------------------------------------------------------------------- */
+
+.mgdb-rec-subtitle {
+  margin: 2px 0 var(--mgdb-space-2);
+  color: var(--mgdb-ink-soft, #3b4540);
+  font-size: var(--mgdb-text-lg);
+  font-weight: 500;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.mgdb-rec-subtitle:empty { display: none; }
+
+.mgdb-record-page .mgdb-rec-hero h1 .mgdb-pill-kind {
+  border: 1px solid var(--mgdb-line, #d7ddd8);
+  background: var(--mgdb-surface, #fff);
+  color: var(--mgdb-green-dark, #174634);
+}
+
+.mgdb-rec-aka { margin: var(--mgdb-space-3) 0 0; }
+
+
+/* --------------------------------------------------------------------------
+   Model quality: the Range view. One track per metric, all the same width;
+   the genome-wide 5th-95th band, the median tick, and a circle for this gene.
+   -------------------------------------------------------------------------- */
+
+.gene-score-ranges {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(470px, 1fr));
+  gap: var(--mgdb-space-3) var(--mgdb-space-5);
+}
+
+@media (max-width: 560px) { .gene-score-ranges { grid-template-columns: 1fr; } }
+
+.gene-score-row {
+  min-width: 0;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line, #d7ddd8);
+  border-radius: var(--mgdb-radius-sm, 6px);
+  background: var(--mgdb-surface, #fff);
+}
+
+.gene-score-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-bottom: 8px; }
+.gene-score-label { font-weight: 700; }
+.gene-score-analysis { color: var(--mgdb-muted, #5b655e); font-size: var(--mgdb-text-xs); }
+.gene-score-value { margin-left: auto; font-size: var(--mgdb-text-lg); font-weight: 700; font-variant-numeric: tabular-nums; }
+.gene-score-value.is-good { color: var(--mgdb-green-dark, #174634); }
+.gene-score-value.is-poor { color: #7a2c43; }
+.gene-score-value.is-mid { color: #8a5a0f; }
+.gene-score-value.is-neutral { color: #1a5b7a; }
+
+.gene-score-track {
+  position: relative;
+  height: 14px;
+  margin: 10px 9px 4px;
+  border-radius: 7px;
+  background: #eef1ee;
+}
+
+.gene-score-band { position: absolute; top: 3px; bottom: 3px; border-radius: 4px; background: rgba(40, 93, 70, .18); }
+.gene-score-median { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; border-radius: 1px; background: var(--mgdb-muted, #5b655e); }
+
+.gene-score-dot {
+  position: absolute;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--mgdb-green, #285d46);
+  box-shadow: 0 0 0 2px var(--mgdb-gold, #f2a515), 0 2px 6px rgba(0, 0, 0, .18);
+}
+
+.gene-score-dot.is-poor { background: #7a2c43; }
+.gene-score-dot.is-mid { background: #8a5a0f; }
+.gene-score-dot.is-neutral { background: #1a5b7a; }
+
+.gene-score-ends { display: flex; justify-content: space-between; gap: 8px; color: var(--mgdb-muted, #5b655e); font-size: var(--mgdb-text-xs); font-variant-numeric: tabular-nums; }
+.gene-score-ends small { font-size: inherit; }
+.gene-score-note { margin: 8px 0 0; color: var(--mgdb-muted, #5b655e); font-size: var(--mgdb-text-xs); line-height: 1.4; }
+.gene-score-standing { display: inline-block; margin-left: 4px; padding: 0 7px; border-radius: 999px; background: var(--mgdb-surface-sunken, #f5f1e9); color: var(--mgdb-ink, #1f2723); }
+.gene-score-noscale { margin: 6px 0 0; font-size: var(--mgdb-text-xs); }

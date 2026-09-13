@@ -82,6 +82,192 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
     );
   }
 
+  /* The data family, generated from api_data_registry(). One path per route
+     pattern the registry declares, with the parameters every data route
+     shares; the dataset-specific ones (type, canonical, isoforms, analysis)
+     are described on the routes that take them. */
+  $problem_content = array('application/problem+json' => array('schema' => array('$ref' => '#/components/schemas/Problem')));
+  $genome_parameter = array(
+    'name' => 'genome', 'in' => 'path', 'required' => true,
+    'description' => 'The assembly name, e.g. Zm-B73-REFERENCE-NAM-5.0. An alias or "current" answers with a 302 to it.',
+    'schema' => array('type' => 'string', 'maxLength' => 120),
+    'examples' => array('example' => array('value' => 'Zm-B73-REFERENCE-NAM-5.0'))
+  );
+  $paging_parameters = array(
+    array('name' => 'limit', 'in' => 'query', 'required' => false, 'schema' => array('type' => 'integer', 'minimum' => 1, 'maximum' => 2000),
+          'description' => 'Items per page. Default 500, maximum 2000 (500 on the entry route).'),
+    array('name' => 'offset', 'in' => 'query', 'required' => false, 'schema' => array('type' => 'integer', 'minimum' => 0),
+          'description' => 'Items to skip. links.next carries the next page.')
+  );
+  $data_paths = array(
+    '/data' => array('get' => array(
+      'tags' => array('datasets'), 'summary' => 'The datasets', 'operationId' => 'getDatasets',
+      'responses' => array('200' => array('description' => 'Every dataset with its routes, sections and formats.'))
+    ))
+  );
+  foreach (api_data_registry() as $entry) {
+    $ds = $entry['dataset'];
+    $op = str_replace(' ', '', ucwords(str_replace('-', ' ', $ds)));
+    if (isset($entry['genomes']) && $entry['genomes'] === false) {
+      /* A reference index: no genome segment. Its routes are its own. */
+      $go_responses = array(
+        '200' => array('description' => 'The response envelope.', 'content' => array('application/json' => array('schema' => array('$ref' => '#/components/schemas/Envelope')))),
+        '304' => array('description' => 'Unchanged since the supplied ETag.'),
+        '400' => array('description' => 'Malformed identifier or parameter.', 'content' => $problem_content),
+        '404' => array('description' => 'Unknown term.', 'content' => $problem_content),
+        '503' => array('description' => 'The index is not built on this host.', 'content' => $problem_content)
+      );
+      $data_paths['/data/' . $ds] = array('get' => array(
+        'tags' => array('datasets'), 'summary' => $entry['label'] . ': the index', 'operationId' => 'get' . $op . 'Index',
+        'description' => $entry['description'],
+        'responses' => array('200' => array('description' => 'Release, counts, sources.'))
+      ));
+      $data_paths['/data/' . $ds . '/{term}'] = array('get' => array(
+        'tags' => array('datasets'), 'summary' => $entry['label'] . ': one term', 'operationId' => 'get' . $op . 'Term',
+        'description' => $entry['routes']['{term}'] . ' Accepts: ' . implode('; ', $entry['identifiers']) . '.' . ($entry['notes'] !== null ? "\n\n" . $entry['notes'] : ''),
+        'parameters' => array(
+          array('name' => 'term', 'in' => 'path', 'required' => true, 'schema' => array('type' => 'string', 'maxLength' => 20),
+                'description' => 'A GO id.', 'examples' => array('example' => array('value' => $entry['example']['id']))),
+          array('name' => 'fields', 'in' => 'query', 'required' => false, 'schema' => array('type' => 'string'),
+                'description' => 'Comma-separated sections: ' . implode(', ', $entry['sections']) . '.'),
+          array('name' => 'annotation', 'in' => 'query', 'required' => false, 'schema' => array('type' => 'string'),
+                'description' => 'The annotation version whose genes to list. Default Zm00001eb.1.'),
+          array('name' => 'limit', 'in' => 'query', 'required' => false, 'schema' => array('type' => 'integer', 'minimum' => 1, 'maximum' => 500),
+                'description' => 'Genes per page. Default 200.'),
+          array('name' => 'offset', 'in' => 'query', 'required' => false, 'schema' => array('type' => 'integer', 'minimum' => 0),
+                'description' => 'Genes to skip. links.next carries the next page.')
+        ),
+        'responses' => $go_responses
+      ));
+      $data_paths['/data/' . $ds . '/search'] = array('get' => array(
+        'tags' => array('datasets'), 'summary' => $entry['label'] . ': search by name', 'operationId' => 'get' . $op . 'Search',
+        'description' => $entry['routes']['search?q='],
+        'parameters' => array(
+          array('name' => 'q', 'in' => 'query', 'required' => true, 'schema' => array('type' => 'string', 'minLength' => 2),
+                'description' => 'A word or phrase from a term name, or a GO id.', 'examples' => array('example' => array('value' => 'stomatal'))),
+          array('name' => 'aspect', 'in' => 'query', 'required' => false, 'schema' => array('type' => 'string', 'enum' => array('bp', 'mf', 'cc')),
+                'description' => 'Restrict to one aspect.'),
+          array('name' => 'limit', 'in' => 'query', 'required' => false, 'schema' => array('type' => 'integer', 'minimum' => 1, 'maximum' => 100),
+                'description' => 'Default 25.')
+        ),
+        'responses' => $go_responses
+      ));
+      $data_paths['/data/' . $ds . '/batch'] = array('get' => array(
+        'tags' => array('datasets'), 'summary' => $entry['label'] . ': a batch', 'operationId' => 'get' . $op . 'Batch',
+        'description' => $entry['routes']['batch?ids='],
+        'parameters' => array(array('name' => 'ids', 'in' => 'query', 'required' => true, 'schema' => array('type' => 'string'),
+                                    'description' => 'Comma or whitespace separated GO ids, at most 200.')),
+        'responses' => $go_responses
+      ));
+      $data_paths['/data/' . $ds . '/slim'] = array('get' => array(
+        'tags' => array('datasets'), 'summary' => $entry['label'] . ': the plant slim', 'operationId' => 'get' . $op . 'Slim',
+        'description' => $entry['routes']['slim'],
+        'responses' => $go_responses
+      ));
+      continue;
+    }
+    $format_param = array(
+      'name' => 'format', 'in' => 'query', 'required' => false,
+      'description' => 'One of ' . implode(', ', $entry['formats']) . '. json is the default.',
+      'schema' => array('type' => 'string', 'enum' => $entry['formats'])
+    );
+    $fields_param = array(
+      'name' => 'fields', 'in' => 'query', 'required' => false,
+      'description' => 'Comma-separated sections: ' . implode(', ', $entry['sections']) . '.',
+      'schema' => array('type' => 'string')
+    );
+    $responses = array(
+      '200' => array('description' => 'The response envelope.', 'content' => array('application/json' => array('schema' => array('$ref' => '#/components/schemas/Envelope')))),
+      '304' => array('description' => 'Unchanged since the supplied ETag.'),
+      '400' => array('description' => 'Malformed identifier, region, or parameter.', 'content' => $problem_content),
+      '404' => array('description' => 'Unknown genome, identifier or entry.', 'content' => $problem_content)
+    );
+    $data_paths['/data/' . $ds] = array('get' => array(
+      'tags' => array('datasets'), 'summary' => $entry['label'] . ': the genomes with a release', 'operationId' => 'get' . $op . 'Genomes',
+      'description' => $entry['description'],
+      'responses' => array('200' => array('description' => 'One entry per genome: release, counts, caps.'))
+    ));
+    $data_paths['/data/' . $ds . '/{genome}'] = array('get' => array(
+      'tags' => array('datasets'), 'summary' => $entry['label'] . ': one release', 'operationId' => 'get' . $op . 'Release',
+      'parameters' => array($genome_parameter),
+      'responses' => array('200' => array('description' => 'The manifest: counts recomputed from the files, sources with checksums, sequences, disagreements.'),
+                           '404' => array('description' => 'No release for that genome.', 'content' => $problem_content))
+    ));
+    $data_paths['/data/' . $ds . '/{genome}/{id}'] = array('get' => array(
+      'tags' => array('datasets'), 'summary' => $entry['label'] . ': one ' . ($ds === 'domains' ? 'protein' : 'gene'), 'operationId' => 'get' . $op,
+      'description' => $entry['routes']['{genome}/{id}'] . ' Accepts: ' . implode('; ', $entry['identifiers']) . '.'
+                     . ($entry['notes'] !== null ? "\n\n" . $entry['notes'] : ''),
+      'parameters' => array_merge(array($genome_parameter, array(
+        'name' => 'id', 'in' => 'path', 'required' => true, 'schema' => array('type' => 'string', 'maxLength' => 200),
+        'description' => implode('; ', $entry['identifiers']) . '.',
+        'examples' => array('example' => array('value' => $entry['example']['id']))
+      ), $fields_param, $format_param), $ds === 'gene-models'
+        ? array(array('name' => 'transcripts', 'in' => 'query', 'required' => false, 'schema' => array('type' => 'string', 'enum' => array('all', 'canonical')),
+                      'description' => 'all (the default) or canonical.'))
+        : ($ds === 'expression'
+        ? array(array('name' => 'assay', 'in' => 'query', 'required' => false, 'schema' => array('type' => 'string', 'enum' => array('all', 'rna', 'protein')),
+                      'description' => 'all (the default), rna or protein.'),
+                array('name' => 'source', 'in' => 'query', 'required' => false, 'schema' => array('type' => 'string'),
+                      'description' => 'Comma-separated terms; a sample is kept when its study name contains one.'))
+        : array(array('name' => 'analysis', 'in' => 'query', 'required' => false, 'schema' => array('type' => 'string'),
+                      'description' => 'Comma-separated analyses to keep, e.g. pfam,panther. Case-insensitive.')))),
+      'responses' => array_merge($responses, $ds === 'gene-models'
+        ? array('410' => array('description' => 'The gene model was withdrawn; the body names its replacement.', 'content' => $problem_content))
+        : array())
+    ));
+    if (isset($entry['routes']['{genome}/region/{sequence}:{start}-{end}'])) $data_paths['/data/' . $ds . '/{genome}/region/{region}'] = array('get' => array(
+      'tags' => array('datasets'), 'summary' => $entry['label'] . ': a region', 'operationId' => 'get' . $op . 'Region',
+      'description' => $entry['routes']['{genome}/region/{sequence}:{start}-{end}'],
+      'parameters' => array_merge(array($genome_parameter, array(
+        'name' => 'region', 'in' => 'path', 'required' => true, 'schema' => array('type' => 'string'),
+        'description' => '{sequence}:{start}-{end}, 1-based inclusive.',
+        'examples' => array('example' => array('value' => 'chr2:4400000-4600000'))
+      )), $ds === 'gene-models'
+        ? array(array('name' => 'type', 'in' => 'query', 'required' => false, 'schema' => array('type' => 'string', 'enum' => array('gene', 'transcript', 'mRNA', 'exon', 'CDS', 'UTR')),
+                      'description' => 'The feature type to list. gene has no span cap; the others are capped at 10 Mb.'),
+                array('name' => 'canonical', 'in' => 'query', 'required' => false, 'schema' => array('type' => 'string', 'enum' => array('1')),
+                      'description' => 'Set to 1 to keep canonical transcripts only.'),
+                array('name' => 'biotype', 'in' => 'query', 'required' => false, 'schema' => array('type' => 'string'),
+                      'description' => 'Comma-separated biotypes to keep, e.g. protein_coding.'))
+        : array(array('name' => 'analysis', 'in' => 'query', 'required' => false, 'schema' => array('type' => 'string'),
+                      'description' => 'Comma-separated analyses to keep.')), $paging_parameters, array($format_param)),
+      'responses' => array_merge($responses, array('413' => array('description' => 'The interval is wider than a sub-gene type allows.', 'content' => $problem_content)))
+    ));
+    if (isset($entry['routes']['{genome}/samples'])) {
+      $data_paths['/data/' . $ds . '/{genome}/samples'] = array('get' => array(
+        'tags' => array('datasets'), 'summary' => $entry['label'] . ': the sample catalogue', 'operationId' => 'get' . $op . 'Samples',
+        'description' => $entry['routes']['{genome}/samples'],
+        'parameters' => array($genome_parameter,
+          array('name' => 'assay', 'in' => 'query', 'required' => false, 'schema' => array('type' => 'string'), 'description' => 'rna, protein or all.'),
+          $format_param),
+        'responses' => $responses
+      ));
+    }
+    if (isset($entry['routes']['{genome}/batch?ids='])) $data_paths['/data/' . $ds . '/{genome}/batch'] = array('get' => array(
+      'tags' => array('datasets'), 'summary' => $entry['label'] . ': a batch', 'operationId' => 'get' . $op . 'Batch',
+      'description' => $entry['routes']['{genome}/batch?ids='],
+      'parameters' => array($genome_parameter, array(
+        'name' => 'ids', 'in' => 'query', 'required' => true, 'schema' => array('type' => 'string'),
+        'description' => 'Comma or whitespace separated identifiers, at most 200.'
+      ), $fields_param, $format_param),
+      'responses' => $responses
+    ));
+    if ($ds === 'domains') {
+      $data_paths['/data/domains/{genome}/entry/{accession}'] = array('get' => array(
+        'tags' => array('datasets'), 'summary' => 'Protein domains: every protein carrying an entry', 'operationId' => 'getDomainsEntry',
+        'description' => $entry['routes']['{genome}/entry/{accession}'],
+        'parameters' => array_merge(array($genome_parameter, array(
+          'name' => 'accession', 'in' => 'path', 'required' => true, 'schema' => array('type' => 'string'),
+          'description' => 'An InterPro accession (IPR004333) or a member-database signature (PF03110).',
+          'examples' => array('Pfam' => array('value' => 'PF03110'), 'InterPro' => array('value' => 'IPR004333'))
+        ), array('name' => 'isoforms', 'in' => 'query', 'required' => false, 'schema' => array('type' => 'string', 'enum' => array('canonical', 'all')),
+                 'description' => 'canonical (the default) counts one protein per gene; all lists every isoform.')),
+          $paging_parameters, array($format_param)),
+        'responses' => $responses
+      ));
+    }
+  }
+
   $format_parameter = array(
     'name' => 'format', 'in' => 'query', 'required' => false,
     'description' => 'json (the default) or jsonld. jsonld returns the same record as JSON-LD using '
@@ -111,6 +297,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
                             'url' => $base . '/api/docs'),
     'tags' => array(
       array('name' => 'records', 'description' => 'Individual database records.'),
+      array('name' => 'datasets', 'description' => 'Datasets served from prebuilt release files: gene models and protein domains, keyed by genome.'),
       array('name' => 'service', 'description' => 'Service description and schema.')
     ),
     'paths' => array(
@@ -478,10 +665,13 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
             . "candidate the identifier could have meant is in `meta.other_matches`.\n\n"
             . "A withdrawn gene model answers `410` with its replacement rather "
             . "than `404`: the identifier was valid in an earlier annotation.\n\n"
-            . "Two values are absent by fact rather than omission and say so: "
-            . "`overview.strand` is always null because strand is not populated in "
-            . "this database, and `structure.exon_structure` is always null because "
-            . "no exon, CDS or UTR features exist in it.",
+            . "For an assembly with a gene-models release (B73 v5), `overview.strand`, "
+            . "`structure.gene_model` (every transcript with its exons, CDS and UTRs), "
+            . "`structure.domains` (the canonical protein's InterProScan result with its "
+            . "genomic projection) and `structure.model` (an AlphaFold model, when one is "
+            . "on file) come from the annotation files, not the database. For other "
+            . "assemblies `overview.strand` and `structure.exon_structure` are null and "
+            . "say so: neither is held in this database.",
           'operationId' => 'getGene',
           'parameters' => array(
             array(
@@ -675,7 +865,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
     )
   );
 
-  $document['paths'] = array_merge($document['paths'], $generated_paths);
+  $document['paths'] = array_merge($document['paths'], $generated_paths, $data_paths);
 
   /* Every record path takes format and can answer as JSON-LD. Applied here so
      the eight hand-written entries and the nine generated ones agree. */

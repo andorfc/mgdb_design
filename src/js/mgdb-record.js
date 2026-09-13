@@ -93,6 +93,9 @@
        gridClass  extra class on the grid container
        onRender   called with the body element after every render, for a view
                   that has to bind its own controls
+       views      extra views beside Table and Grid: [{ key, label, icon (an
+                  svg string), render(rows) -> markup }]. The toggle shows
+                  them in order; `view` may name one of them as the start.
 
      Returns true when it rendered rows, so a caller can decide whether its
      section has anything in it. */
@@ -141,6 +144,10 @@
               '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="2" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="12" width="14" height="2" rx="1" fill="currentColor"/></svg>Table</button>' +
             '<button class="mgdb-view-btn" type="button" data-view="grid" aria-pressed="' + (state.view === 'grid') + '">' +
               '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>Grid</button>' +
+            (spec.views || []).map(function (v) {
+              return '<button class="mgdb-view-btn" type="button" data-view="' + escape(v.key) + '" aria-pressed="' + (state.view === v.key) + '">' +
+                (v.icon || '') + escape(v.label) + '</button>';
+            }).join('') +
           '</div>' +
           '<label>Show <select data-role="size" aria-label="Rows per page">' + sizeOptions + '</select></label>' +
           '<button class="mgdb-rec-tsv" type="button" data-role="tsv">Download TSV</button>' +
@@ -235,9 +242,10 @@
       var start = (state.page - 1) * size;
       var pageRows = rows.slice(start, start + size);
 
+      var extraView = (spec.views || []).filter(function (v) { return v.key === state.view; })[0];
       body.innerHTML = total === 0
         ? '<p class="mgdb-rec-empty">Nothing in ' + escape(spec.title.toLowerCase()) + ' matches “' + escape(state.query) + '”.</p>'
-        : (state.view === 'grid' ? renderGrid(pageRows) : renderTable(pageRows));
+        : (extraView ? extraView.render(pageRows) : (state.view === 'grid' ? renderGrid(pageRows) : renderTable(pageRows)));
 
       status.textContent = total === 0 ? '' :
         (total === items.length

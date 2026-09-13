@@ -1,0 +1,7 @@
+# The GO reference index: read by PHP only. Its manifest is public.
+<FilesMatch "\.(sqlite|json)$">
+  Require all denied
+</FilesMatch>
+<Files "index.json">
+  Require all granted
+</Files>

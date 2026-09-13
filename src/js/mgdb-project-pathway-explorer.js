@@ -1960,6 +1960,16 @@
     wireGenes();
     wireEnrichment();
 
+    /* A pathway named in the URL hash opens on load and whenever the hash
+       changes: the gene record's Function section links here as
+       #pathway=<id>, so a reader lands on the pathway, not the page top. */
+    function openFromHash() {
+      var m = /[#&]pathway=([^&]+)/.exec(window.location.hash || '');
+      if (m) { openPathway(decodeURIComponent(m[1])); }
+    }
+    openFromHash();
+    window.addEventListener('hashchange', openFromHash);
+
     /* Warm the pathway index when the browser is otherwise idle, so the first
        filter, gap row or gene result does not wait on a 400 KB read. */
     window.addEventListener('load', settleCharts);

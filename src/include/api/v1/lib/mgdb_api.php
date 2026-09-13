@@ -600,4 +600,91 @@ class MgdbApi {
     }
     return $ref;
   }
+
+  /* ---------------------------------------------------------------------
+     The data family (/api/v1/data/...)
+
+     Two additional senders, added 2026-09-12 for the endpoints that answer
+     from prebuilt files rather than from records. send() above is unchanged.
+
+     sendData() takes the whole `data` member -- one object for a gene or a
+     protein, an array for a region, a batch or an entry listing -- and wraps
+     it in the same envelope as a record: request_id, generated, elapsed_ms,
+     query_count, warnings, links with self and documentation. It offers no
+     JSON-LD, because a dataset row is not a record and has no linked-data
+     mapping; the record it belongs to is in links.record.
+
+     sendText() is for GFF3, BED and TSV: the same strong ETag and 304, the
+     same gzip, over a text body.
+     --------------------------------------------------------------------- */
+
+  public static function sendData($data, $links = array(), $meta = array(), $maxAge = 86400) {
+    $payload = array(
+      'api_version' => self::VERSION,
+      'meta' => array_merge(array(
+        'request_id' => self::$requestId,
+        'generated' => gmdate('Y-m-d\TH:i:s\Z'),
+        'elapsed_ms' => (int) round((microtime(true) - self::$started) * 1000),
+        'query_count' => self::$queries
+      ), $meta),
+      'links' => array_merge(array('self' => self::selfUrl()), $links,
+                             array('documentation' => self::baseUrl() . '/api')),
+      'data' => $data
+    );
+    if (count(self::$warnings) > 0) {
+      $payload['meta']['warnings'] = self::$warnings;
+    }
+    self::refuseIfQueriesFailed();
+    self::emit($payload, $maxAge);
+  }
+
+  public static function sendText($body, $contentType, $maxAge = 86400, $filename = null) {
+    self::refuseIfQueriesFailed();
+    $etag = '"' . substr(hash('sha256', $body), 0, 32) . '"';
+    header('Content-Type: ' . $contentType);
+    header('Cache-Control: public, max-age=' . (int) $maxAge);
+    header('ETag: ' . $etag);
+    if ($filename !== null) {
+      header('Content-Disposition: inline; filename="' . preg_replace('/[^A-Za-z0-9._-]/', '_', $filename) . '"');
+    }
+    if (self::etagMatches($etag)) {
+      http_response_code(304);
+      exit;
+    }
+    if (self::acceptsGzip() && function_exists('gzencode')) {
+      $compressed = gzencode($body, 6);
+      if ($compressed !== false && strlen($compressed) < strlen($body)) {
+        $body = $compressed;
+        header('Content-Encoding: gzip');
+      }
+    }
+    header('Content-Length: ' . strlen($body));
+    if (self::method() === 'HEAD') {
+      exit;
+    }
+    echo $body;
+    exit;
+  }
+
+  /* The same rule send() applies inline: a response assembled on a failed
+     query is a 500, never a plausible empty answer. */
+  private static function refuseIfQueriesFailed() {
+    if (!function_exists('mgdb_query_failures')) {
+      return;
+    }
+    $failures = mgdb_query_failures();
+    if (count($failures) === 0) {
+      return;
+    }
+    $states = array();
+    foreach ($failures as $f) {
+      if ($f['sqlstate'] !== '' && !in_array($f['sqlstate'], $states, true)) {
+        $states[] = $f['sqlstate'];
+      }
+    }
+    self::problem(500, 'query_failed', 'A database query failed',
+      'A query behind this response did not execute, so the response would have understated its contents. '
+      . 'No partial answer is served. The failure is logged against this request_id.',
+      array('failed_queries' => count($failures), 'sqlstates' => $states));
+  }
 }

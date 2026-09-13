@@ -1,0 +1,23 @@
+Options -Indexes
+
+# The shards are read by PHP on behalf of /api/v1/data/gene-models. A browser
+# fetching them directly would get an unversioned, un-enveloped copy, so every
+# JSON file is denied except the public index of each release.
+<FilesMatch "\.json$">
+  Require all denied
+</FilesMatch>
+
+<Files "index.json">
+  Require all granted
+  Header set Cache-Control "public, max-age=3600"
+</Files>
+
+# The per-sequence GFF3 copies are the published rows, split by sequence.
+# Pre-compressed on disk; served as text with the encoding declared.
+<FilesMatch "\.gff3\.gz$">
+  Require all granted
+  ForceType text/plain
+  Header set Content-Encoding gzip
+  Header append Vary Accept-Encoding
+  Header set Cache-Control "public, max-age=86400"
+</FilesMatch>

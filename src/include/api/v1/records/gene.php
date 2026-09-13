@@ -88,6 +88,23 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   $canonical_transcript_id = $record ? MgdbApi::int($record['canonical_transcript_id']) : null;
   $canonical_protein = $record ? MgdbApi::text($record['protein']) : null;
 
+  /* The annotation release, when the data API has one for this assembly
+     (see include/api/v1/data/gene_models.php): strand, exons, CDS, UTRs and
+     protein length from the published GFF3, read from data/gene_models/ in
+     one shard read, and the canonical protein's InterProScan result from
+     data/domains/. Null for assemblies without a release, and every field
+     that depends on it says so rather than going quiet. */
+  include_once('./include/api/v1/lib/mgdb_data.php');
+  include_once('./include/api/v1/lib/mgdb_expression.php');
+  $gene_release = null;
+  $gene_shard = null;
+  if ($gene_name !== null && $assembly_version !== null && class_exists('MgdbData')) {
+    $gene_release = MgdbData::manifest('gene-models', $assembly_version);
+    if ($gene_release !== null) {
+      $gene_shard = MgdbData::shardEntry('gene-models', $assembly_version, 'genes', $gene_name, MgdbData::GENE_SHARD_DEPTH);
+    }
+  }
+
   $locus = $locus_id ? geneLocusRow($DBConn, $locus_id) : false;
   if ($locus_id) {
     MgdbApi::countQuery();
@@ -317,12 +334,13 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
       'start' => $start,
       'end' => $end,
       'span_bp' => ($start !== null && $end !== null) ? ($end - $start) : null,
-      /* Always null, and deliberately present rather than omitted so a client
-         can tell "not recorded" from "we forgot". chado.featureloc.strand is
-         NULL for all 4,701,925 rows and chado.transcript.strand is empty for
-         every B73 v5 transcript. See strand_note below. */
-      'strand' => null,
-      'strand_note' => 'Strand is not recorded in this annotation load.',
+      /* From the annotation release when this assembly has one; otherwise
+         null, and deliberately present rather than omitted so a client can
+         tell "not recorded" from "we forgot". chado.featureloc.strand is NULL
+         for all 4,701,925 rows and chado.transcript.strand is empty for every
+         B73 v5 transcript, so the database can never supply it. */
+      'strand' => $gene_shard !== null ? $gene_shard['strand'] : null,
+      'strand_note' => $gene_shard !== null ? null : 'Strand is not recorded in this annotation load.',
       'transcript_count' => $record ? MgdbApi::int($record['transcript_count']) : null,
       'canonical_transcript' => $canonical_transcript,
       'canonical_protein' => $canonical_protein,
@@ -397,8 +415,11 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
       }
     }
 
-    $domains = array();
-    if ($gene_name !== null) {
+    /* Domains: from the domains release when this assembly has one -- every
+       protein of the gene, all analyses the release carries, no query -- and
+       from perm_tables.protein_domain (Pfam only) otherwise. */
+    $domains = ($gene_shard !== null) ? gene_api_release_domains($assembly_version, $gene_shard) : null;
+    if ($domains === null && $gene_name !== null) {
       // protein_domain_gene_model_idx. No SELECT DISTINCT pd.* -- that sorts
       // every column of a 25.2 M-row, 5.6 GB table.
       $sth = make_query($DBConn, "
@@ -423,6 +444,8 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
         );
       }
     }
+
+    if ($domains === null) { $domains = array(); }
 
     /* Model quality and structure prediction, in one query. The legacy code ran
        four -- showAEDscore, showReelGeneScores, showpSAURONscores,
@@ -467,8 +490,9 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
         $metric = MgdbApi::text($row['metric']);
         $value = $row['rawscore'];
         if ($metric === null || $value === null) { continue; }
+        $analysis = MgdbApi::text($row['analysis']);
         $scores[] = array(
-          'analysis' => MgdbApi::text($row['analysis']),
+          'analysis' => $analysis,
           'program' => MgdbApi::text($row['program']),
           'version' => MgdbApi::text($row['programversion']),
           'source' => MgdbApi::text($row['sourcename']),
@@ -476,7 +500,13 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
           'metric' => $metric,
           'label' => gene_api_score_label($metric),
           'value' => (float) $value,
-          'interpretation' => gene_api_score_interpretation($metric, (float) $value)
+          'interpretation' => gene_api_score_interpretation($metric, (float) $value),
+          /* Where this value sits: the metric's own scale when it has one, and
+             the genome-wide range and percentiles from data/gene_scores
+             (tools/score_ranges.py) when that file is on this host. */
+          'scale' => gene_api_score_scale($metric),
+          'better' => gene_api_score_direction($metric),
+          'range' => gene_api_score_range($analysis, $metric)
         );
       }
     }
@@ -499,21 +529,44 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
        page fetches it in a second, parallel request: the page paints in around
        130 ms and the domain track fills in when the length arrives. */
     $protein = null;
-    if (MgdbApi::query('protein_length', '') !== ''
+    if ($gene_shard !== null && !empty($gene_shard['canonical_protein']) && !empty($gene_shard['protein_length_aa'])) {
+      /* The FASTA index in the release already has it: no sequence service,
+         no opt-in, no 470 ms. */
+      $protein = array(
+        'name' => $gene_shard['canonical_protein'],
+        'transcript' => $gene_shard['canonical_transcript'],
+        'length_aa' => (int) $gene_shard['protein_length_aa'],
+        'source' => 'gene-models release ' . (isset($gene_release['release']) ? $gene_release['release'] : '')
+      );
+    } elseif (MgdbApi::query('protein_length', '') !== ''
         && $canonical_protein !== null && $annotation_version !== null) {
       $protein = gene_api_protein_length($annotation_version, $canonical_protein);
     }
+
+    /* The figure's data: the gene model from the release, the canonical
+       protein's domains, and a 3D model when one is on file. Three to five
+       shard reads, no query. Absent for assemblies without a release, and
+       exon_structure_note says why. */
+    $gene_model = ($gene_shard !== null) ? gene_api_release_gene_model($assembly_version, $gene_release, $gene_shard) : null;
+    $protein_payload = ($gene_shard !== null) ? gene_api_release_protein($assembly_version, $gene_shard) : null;
+    $structure_model = ($gene_shard !== null && $gene_name !== null)
+                     ? gene_api_structure_model($gene_name, $gene_shard['canonical_protein']) : null;
 
     $sections['structure'] = array(
       'transcripts' => $transcripts,
       'protein' => $protein,
       'protein_domains' => $domains,
       'scores' => $scores,
-      /* Stated rather than left blank. There are no exon, CDS, or UTR features
-         anywhere in chado.feature, for any organism, so a transcript structure
-         diagram cannot be drawn from this database. */
-      'exon_structure' => null,
-      'exon_structure_note' => 'Exon and UTR coordinates are not held in this database.'
+      'gene_model' => $gene_model,
+      'domains' => $protein_payload,
+      'model' => $structure_model,
+      /* Kept for clients written against the earlier shape: the transcripts
+         with their blocks when a release exists, null otherwise. There are no
+         exon, CDS or UTR features anywhere in chado.feature, for any organism,
+         so without a release a structure diagram cannot be drawn. */
+      'exon_structure' => $gene_model !== null ? $gene_model['transcripts'] : null,
+      'exon_structure_note' => $gene_model !== null ? null
+        : 'Exon and UTR coordinates are not held in this database, and no annotation release is on file for this assembly.'
     );
   }
 
@@ -632,11 +685,25 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
     $summary_domains = isset($sections['structure'])
                      ? $sections['structure']['protein_domains'] : array();
 
+    /* The figure's data: the terms placed in the ontology (aspect, plant-slim
+       rollup, ancestry graph) and the GO the InterPro entries imply; the
+       protein's atlas classes with their pan-genome context; and the
+       pathways the explorer assigns the gene to, step by step. All from
+       files; no query. Each is null or 'available' => false when its
+       payload is not on this host. */
+    include_once('./include/api/v1/lib/mgdb_go.php');
+    include_once('./include/api/v1/lib/mgdb_pathways.php');
+    $fn_protein = isset($protein_payload) ? $protein_payload
+                : (($gene_shard !== null) ? gene_api_release_protein($assembly_version, $gene_shard) : null);
+
     $sections['function'] = array(
       'summary' => gene_api_function_line($summary_domains, $ontology, $full_name),
       'ontology' => $ontology,
       'gene_products' => $gene_products,
-      'protein_accessions' => $accessions
+      'protein_accessions' => $accessions,
+      'go' => gene_api_function_go($ontology, $fn_protein),
+      'classes' => gene_api_function_classes($assembly_version, $fn_protein),
+      'pathways' => gene_api_function_pathways($gene_name)
     );
   }
 
@@ -646,6 +713,20 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
 
   if (isset($want['expression'])) {
     $sections['expression'] = gene_api_expression($gene_name, $assembly_version);
+    /* The profile itself, from the expression release when this assembly has
+       one: one primary-key read of a precomputed row, so the section can show
+       the numbers rather than only a link out. qTeller stays linked. */
+    $sections['expression']['profile'] = null;
+    if ($gene_name !== null && class_exists('MgdbExpression') && MgdbExpression::available($assembly_version)) {
+      $ex_gene = MgdbExpression::exists($assembly_version, $gene_name) ? $gene_name : MgdbExpression::resolveCase($assembly_version, $gene_name);
+      if ($ex_gene !== null) {
+        $sections['expression']['profile'] = MgdbExpression::profile($assembly_version, $ex_gene, 'all');
+      } else {
+        $sections['expression']['profile_note'] = 'This gene model has no profile in the expression release for ' . $assembly_version . '.';
+      }
+    } elseif ($assembly_version !== null) {
+      $sections['expression']['profile_note'] = 'No expression release is on file for ' . $assembly_version . '.';
+    }
   }
 
   /////
@@ -1625,6 +1706,53 @@ function gene_api_score_label($metric) {
 }//gene_api_score_label
 
 
+/* The scale a metric is defined on, when it has one: pLDDT and the
+   disorder percentages run 0-100, the classifier scores and the Annotation
+   Edit Distance 0-1. Null for a metric with no fixed scale. */
+function gene_api_score_scale($metric) {
+  if (in_array($metric, array('ALPHAFOLD2_AVERAGE_pLDDT', 'ESMFOLD_AVERAGE_pLDDT',
+                              'IUPRED2_PERCENT_GREATER_EQUAL_TO_0.5', 'ANCHOR2_PERCENT_GREATER_EQUAL_TO_0.5'), true)) {
+    return array('min' => 0, 'max' => 100);
+  }
+  if (in_array($metric, array('ExonScore', 'ProteinScore', 'Average', 'is_protein', 'in_frame_score', 'mean_out_of_frame_score',
+                              'AED_score'), true) || preg_match('/^(forward|reverse)_frame\d_score$/', $metric)) {
+    return array('min' => 0, 'max' => 1);
+  }
+  return null;
+}//gene_api_score_scale
+
+/* Which end of the scale is the good end: 'high' (pLDDT, reelGene, in-frame,
+   is_protein), 'low' (AED, out-of-frame), or null when neither is better
+   (the disorder percentages describe the protein rather than judge the
+   model). */
+function gene_api_score_direction($metric) {
+  if (in_array($metric, array('ALPHAFOLD2_AVERAGE_pLDDT', 'ESMFOLD_AVERAGE_pLDDT', 'ExonScore', 'ProteinScore', 'Average',
+                              'is_protein', 'in_frame_score'), true)) { return 'high'; }
+  if ($metric === 'AED_score' || $metric === 'mean_out_of_frame_score' || preg_match('/^(forward|reverse)_frame\d_score$/', $metric)) { return 'low'; }
+  return null;
+}//gene_api_score_direction
+
+/* The genome-wide range of one metric from data/gene_scores/index.json,
+   read once per request; null when the file is not on this host or the
+   metric is not in it. */
+function gene_api_score_range($analysis, $metric) {
+  static $ranges = false;
+  if ($ranges === false) {
+    $ranges = array();
+    $root = (isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] !== '') ? rtrim($_SERVER['DOCUMENT_ROOT'], '/') : getcwd();
+    $path = $root . '/data/gene_scores/index.json';
+    if (is_file($path)) {
+      $doc = json_decode(file_get_contents($path), true);
+      if (is_array($doc) && isset($doc['ranges']) && is_array($doc['ranges'])) { $ranges = $doc['ranges']; }
+    }
+  }
+  $key = $analysis . '|' . $metric;
+  if (!isset($ranges[$key])) { return null; }
+  $r = $ranges[$key];
+  return array('n' => $r['n'], 'min' => $r['min'], 'max' => $r['max'],
+               'p5' => $r['p5'], 'p25' => $r['p25'], 'p50' => $r['p50'], 'p75' => $r['p75'], 'p95' => $r['p95']);
+}//gene_api_score_range
+
 /* Plain language for a score, because the number alone is not just unhelpful
    but misleading. A pLDDT of 57.72 reads to a non-specialist as "57%, fine",
    when it is below the threshold at which a predicted structure should be
@@ -1933,4 +2061,396 @@ function gene_api_sequences($gene_name, $annotation_version, $assembly_version,
                  : array('https://download.maizegdb.org/' . rawurlencode($assembly_version) . '/')
   );
 }//gene_api_sequences
-?>
+
+/* ---------------------------------------------------------------------------
+   The annotation release behind the structure figure
+   --------------------------------------------------------------------------- */
+
+/* The gene's transcripts with exons, CDS and UTRs, as the gene-models dataset
+   serves them, plus the links to that dataset's own routes. */
+function gene_api_release_gene_model($assembly, $release, $shard) {
+  $base = MgdbApi::baseUrl();
+  $self = $base . '/api/v1/data/gene-models/' . $assembly . '/' . rawurlencode($shard['id']);
+  $start = (int) $shard['start'];
+  $end = (int) $shard['end'];
+  return array(
+    'genome' => $assembly,
+    'release' => isset($release['release']) ? $release['release'] : null,
+    'source' => isset($release['primary_source']) ? $release['primary_source'] : null,
+    'chromosome' => $shard['seq'],
+    'start' => $start,
+    'end' => $end,
+    'strand' => $shard['strand'],
+    'length_bp' => $end - $start + 1,
+    'canonical_transcript' => isset($shard['canonical_transcript']) ? $shard['canonical_transcript'] : null,
+    'canonical_protein' => isset($shard['canonical_protein']) ? $shard['canonical_protein'] : null,
+    'protein_length_aa' => isset($shard['protein_length_aa']) ? $shard['protein_length_aa'] : null,
+    'transcripts' => $shard['transcripts'],
+    'links' => array(
+      'api' => $self,
+      'gff3' => $self . '?format=gff3',
+      'bed' => $self . '?format=bed',
+      'region' => $base . '/api/v1/data/gene-models/' . $assembly . '/region/' . $shard['seq'] . ':' . max(1, $start - 10000) . '-' . ($end + 10000),
+      'browser' => $assembly === 'Zm-B73-REFERENCE-NAM-5.0'
+        ? 'https://jbrowse.maizegdb.org?loc=' . $shard['seq'] . ':' . $start . '..' . $end . '&tracks=gene_models_official,gene_models_v4_json,gene_models_v3_json'
+        : null
+    )
+  );
+}//gene_api_release_gene_model
+
+/* Every protein of the gene through the domains release: the rows the domain
+   table already reads, with the analysis and InterPro entry added. Null when
+   this assembly has no domains release, so the caller falls back to the
+   database. */
+function gene_api_release_domains($assembly, $shard) {
+  if (MgdbData::manifest('domains', $assembly) === null) {
+    return null;
+  }
+  $rows = array();
+  foreach ((isset($shard['transcripts']) ? $shard['transcripts'] : array()) as $t) {
+    if (empty($t['protein']['id'])) { continue; }
+    $p = MgdbData::shardEntry('domains', $assembly, 'proteins', $t['protein']['id'], MgdbData::GENE_SHARD_DEPTH);
+    if ($p === null) { continue; }
+    foreach ((isset($p['matches']) ? $p['matches'] : array()) as $m) {
+      $rows[] = array(
+        'transcript' => $t['id'],
+        'is_canonical' => !empty($t['canonical']),
+        'accession' => $m['accession'],
+        'name' => $m['name'] !== null ? $m['name'] : $m['accession'],
+        'description' => isset($m['entry_name']) && $m['entry_name'] !== null ? $m['entry_name'] : $m['name'],
+        'start' => $m['start'],
+        'end' => $m['end'],
+        'url' => !empty($m['url']) ? $m['url'] : gene_api_domain_url($m['accession']),
+        'analysis' => $m['analysis'],
+        'entry' => $m['entry'],
+        'evalue' => $m['evalue']
+      );
+    }
+  }
+  return $rows;
+}//gene_api_release_domains
+
+/* The canonical protein's full InterProScan payload for the figure: entries,
+   matches, sites, GO terms, the genomic projection and the atlas classes. A
+   protein with no match is a real answer with empty lists. */
+function gene_api_release_protein($assembly, $shard) {
+  if (empty($shard['canonical_protein']) || MgdbData::manifest('domains', $assembly) === null) {
+    return null;
+  }
+  $pid = $shard['canonical_protein'];
+  $base = MgdbApi::baseUrl();
+  $api = $base . '/api/v1/data/domains/' . $assembly . '/' . rawurlencode($pid);
+  $p = MgdbData::shardEntry('domains', $assembly, 'proteins', $pid, MgdbData::GENE_SHARD_DEPTH);
+  if ($p === null) {
+    return array(
+      'id' => $pid, 'length_aa' => isset($shard['protein_length_aa']) ? $shard['protein_length_aa'] : null,
+      'no_matches' => true, 'architecture' => null,
+      'entries' => array(), 'matches' => array(), 'sites' => array(), 'go' => array(), 'pathways' => array(),
+      'genomic' => null, 'classes' => array(), 'immunity' => null,
+      'links' => array('api' => $api)
+    );
+  }
+  return array(
+    'id' => $p['id'], 'length_aa' => $p['length_aa'], 'no_matches' => false,
+    'architecture' => $p['architecture'],
+    'entries' => $p['entries'], 'matches' => $p['matches'], 'sites' => $p['sites'],
+    'go' => $p['go'], 'pathways' => isset($p['pathways']) ? $p['pathways'] : array(),
+    'genomic' => $p['genomic'], 'classes' => isset($p['classes']) ? $p['classes'] : array(),
+    'immunity' => isset($p['immunity']) ? $p['immunity'] : null,
+    'links' => array('api' => $api, 'tsv' => $api . '?format=tsv')
+  );
+}//gene_api_release_protein
+
+/* A 3D model of the canonical protein, if one is on file: the AlphaFill
+   payload's own AlphaFold model of the annotation protein first (residue
+   numbering identical to the protein), then the AlphaFold DB monomer the
+   protein-structure index maps the gene to (UniProt numbering, usually the
+   same sequence). Two to three shard reads; null when neither has one. The
+   page loads the model only when the reader asks for it. */
+function gene_api_structure_model($gene_name, $protein) {
+  $root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] !== '' ? rtrim($_SERVER['DOCUMENT_ROOT'], '/') : getcwd();
+  $key = strtolower($gene_name);
+
+  /* AlphaFill models the isoform its transplants landed on, which is not
+     always the canonical protein (3,216 of its 16,933 genes). A model of the
+     canonical protein is taken at once; a model of another isoform is kept
+     as the last resort, after AlphaFold DB, and labelled as such. */
+  $fallback = null;
+  $shard = MgdbData::readJson($root . '/data/alphafill/genes/' . substr(sha1($key), 0, 3) . '.json');
+  if ($shard !== null && isset($shard[$key]) && !empty($shard[$key]['m'])) {
+    $g = $shard[$key];
+    $candidate = array(
+      'source' => 'AlphaFill',
+      'label' => 'AlphaFold model of ' . $g['p'] . ', from the AlphaFill run',
+      'pdb' => $g['m'],
+      'protein' => $g['p'],
+      'plddt' => isset($g['pl']) ? $g['pl'] : null,
+      'numbering' => 'annotation',
+      'entry' => null,
+      'html' => '/data_center/alphafill?gene=' . rawurlencode($gene_name)
+    );
+    if ($protein !== null && $g['p'] === $protein) {
+      return $candidate;
+    }
+    $fallback = $candidate;
+  }
+
+  $shard = MgdbData::readJson($root . '/data/protein_structure/aliases/' . substr(sha1($key), 0, 2) . '.json');
+  $alias = ($shard !== null && isset($shard[$key])) ? $shard[$key] : null;
+  $ids = array();
+  if (is_array($alias)) {
+    if (isset($alias['monomer']) && is_array($alias['monomer'])) { $ids = $alias['monomer']; }
+    elseif (array_keys($alias) === range(0, count($alias) - 1)) { $ids = $alias; }
+  }
+  foreach ($ids as $mid) {
+    if (!is_string($mid)) { continue; }
+    $records = MgdbData::readJson($root . '/data/protein_structure/records/' . substr(sha1(strtolower($mid)), 0, 2) . '.json');
+    if ($records === null || !isset($records[$mid]) || empty($records[$mid]['pdb'])) { continue; }
+    $r = $records[$mid];
+    $plddt = isset($r['metrics']['plddt']) ? $r['metrics']['plddt']
+           : (isset($r['partners'][0]['plddt']) ? $r['partners'][0]['plddt'] : null);
+    $uniprot = isset($r['partners'][0]['uniprot']) ? $r['partners'][0]['uniprot'] : null;
+    return array(
+      'source' => 'AlphaFold DB',
+      'label' => 'AlphaFold DB model ' . $mid . ($uniprot ? ' (UniProt ' . $uniprot . ')' : ''),
+      'pdb' => $r['pdb'],
+      'protein' => $protein,
+      'plddt' => $plddt,
+      'numbering' => 'uniprot',
+      'entry' => isset($r['entry']) ? $r['entry'] : null,
+      'html' => '/data_center/protein_structure?term=' . rawurlencode($gene_name)
+    );
+  }
+  return $fallback;
+}//gene_api_structure_model
+
+/* ---------------------------------------------------------------------------
+   Function section: the GO terms placed in the ontology, the atlas classes
+   in their pan-genome context, and the explorer's pathways. Files only.
+   --------------------------------------------------------------------------- */
+
+/* The gene's GO terms through the reference index: aspect and definition
+   for each (the database records neither reliably), the plant-slim ancestors
+   that make the fingerprint, the reduced ancestry graph, and the terms the
+   protein's InterPro entries imply through InterPro2GO, kept apart from the
+   annotation and marked with the entry that implies them. */
+function gene_api_function_go($ontology, $protein) {
+  if (!class_exists('MgdbGo') || !MgdbGo::available()) {
+    return array('available' => false, 'note' => 'The GO reference index is not on file; terms are listed as the database records them.');
+  }
+  $byId = array();
+  foreach ($ontology as $t) {
+    if (!isset($t['term']) || !MgdbGo::validId($t['term'])) { continue; }
+    $id = $t['term'];
+    if (!isset($byId[$id])) {
+      $byId[$id] = array('term' => $id, 'db_name' => $t['name'], 'evidence' => array(), 'sources' => array(),
+                         'proteins' => array(), 'scopes' => array(), 'comments' => array(), 'url' => $t['url']);
+    }
+    foreach (array('evidence' => 'evidence_code', 'sources' => 'source', 'proteins' => 'protein', 'scopes' => 'scope', 'comments' => 'comments') as $k => $f) {
+      if (isset($t[$f]) && $t[$f] !== null && $t[$f] !== '' && !in_array($t[$f], $byId[$id][$k], true)) { $byId[$id][$k][] = $t[$f]; }
+    }
+  }
+
+  $entries = array();
+  if ($protein !== null && !empty($protein['entries'])) {
+    foreach ($protein['entries'] as $e) {
+      if (!empty($e['accession']) && !isset($entries[$e['accession']])) {
+        $entries[$e['accession']] = isset($e['name']) ? $e['name'] : $e['accession'];
+      }
+    }
+  }
+  $impliedBy = array();
+  foreach (MgdbGo::iprToGo(array_keys($entries)) as $ipr => $gos) {
+    foreach ($gos as $go) { $impliedBy[$go][] = array('accession' => $ipr, 'name' => $entries[$ipr]); }
+  }
+
+  $ann = MgdbGo::annotate(array_unique(array_merge(array_keys($byId), array_keys($impliedBy))));
+  $terms = array();
+  foreach ($byId as $id => $t) {
+    $g = isset($ann['terms'][$id]) ? $ann['terms'][$id] : null;
+    $terms[] = array(
+      'term' => $id,
+      'name' => ($g && $g['known'] && $g['name'] !== null) ? $g['name'] : $t['db_name'],
+      'db_name' => $t['db_name'],
+      'aspect' => $g ? $g['namespace'] : null,
+      'definition' => $g ? $g['definition'] : null,
+      'depth' => $g ? $g['depth'] : null,
+      'known' => $g ? $g['known'] : false,
+      'obsolete' => $g ? $g['obsolete'] : false,
+      'replaced_by' => $g ? $g['replaced_by'] : null,
+      'merged_into' => ($g && isset($g['merged_into'])) ? $g['merged_into'] : null,
+      'slim' => $g ? $g['slim'] : false,
+      'slim_ancestors' => $g ? $g['slim_ancestors'] : array(),
+      'evidence' => $t['evidence'],
+      'sources' => $t['sources'],
+      'proteins' => $t['proteins'],
+      'scopes' => $t['scopes'],
+      'comments' => $t['comments'],
+      'implied_by' => isset($impliedBy[$id]) ? $impliedBy[$id] : array(),
+      'url' => $t['url']
+    );
+  }
+  $implied = array();
+  foreach ($impliedBy as $id => $via) {
+    if (isset($byId[$id])) { continue; }
+    $g = isset($ann['terms'][$id]) ? $ann['terms'][$id] : null;
+    $implied[] = array(
+      'term' => $id,
+      'name' => $g ? $g['name'] : null,
+      'aspect' => $g ? $g['namespace'] : null,
+      'definition' => $g ? $g['definition'] : null,
+      'depth' => $g ? $g['depth'] : null,
+      'slim' => $g ? $g['slim'] : false,
+      'slim_ancestors' => $g ? $g['slim_ancestors'] : array(),
+      'implied_by' => $via,
+      'url' => gene_api_ontology_url($id)
+    );
+  }
+
+  /* The fingerprint: every plant-slim term, with the annotated terms (and,
+     separately, the implied ones) that roll up to it. Terms carried in
+     every record, in the same order, so the figure reads the same way from
+     gene to gene. */
+  $hits = array();
+  $impliedHits = array();
+  foreach ($terms as $t) {
+    foreach ($t['slim_ancestors'] as $s) { $hits[$s['id']][] = $t['term']; }
+  }
+  foreach ($implied as $t) {
+    foreach ($t['slim_ancestors'] as $s) { $impliedHits[$s['id']][] = $t['term']; }
+  }
+  $slim = array();
+  foreach (MgdbGo::slimTerms() as $s) {
+    $slim[] = array('id' => $s['id'], 'name' => $s['name'], 'aspect' => $s['namespace'], 'depth' => $s['depth'],
+                    'terms' => isset($hits[$s['id']]) ? array_values(array_unique($hits[$s['id']])) : array(),
+                    'implied' => isset($impliedHits[$s['id']]) ? array_values(array_unique($impliedHits[$s['id']])) : array());
+  }
+  $aspects = array();
+  foreach (MgdbGo::NAMESPACE_ORDER as $ns) { $aspects[$ns] = 0; }
+  $unplaced = 0;
+  foreach ($terms as $t) {
+    if ($t['aspect'] !== null && isset($aspects[$t['aspect']])) { $aspects[$t['aspect']]++; } else { $unplaced++; }
+  }
+  return array(
+    'available' => true,
+    'release' => $ann['release'],
+    'slim_name' => 'goslim_plant',
+    'terms' => $terms,
+    'implied' => $implied,
+    'slim' => $slim,
+    'graph' => $ann['graph'],
+    'aspects' => $aspects,
+    'unplaced' => $unplaced,
+    'notes' => array(
+      'Aspects, definitions and ancestry come from the GO release named here, not from the annotation load; a term the release has retired is followed to its replacement for ancestry and marked obsolete.',
+      'Implied terms are InterPro2GO mappings of the InterPro entries on the canonical protein. They are what the domain composition suggests, not an annotation of this gene.'
+    )
+  );
+}//gene_api_function_go
+
+/* The protein's atlas classes with the context the atlas page gives them:
+   the class group, the InterPro entries of the class this protein carries,
+   the gene count of the class in this genome and in each NAM founder, and
+   the atlas's maize summary; the exclusive immunity call; and each InterPro
+   entry's gene count and pan-genome status from the domains release. */
+function gene_api_function_classes($assembly, $protein) {
+  if ($protein === null) { return null; }
+  $dir = MgdbData::dir('domains');
+  $ctx = ($dir !== null && is_file($dir . '/atlas_classes.json')) ? MgdbData::readJson($dir . '/atlas_classes.json') : null;
+  $short = function ($g) { return preg_replace('/^Zm-(.+?)-REFERENCE-.*$/', '$1', (string) $g); };
+
+  $present = array();
+  foreach (isset($protein['entries']) ? $protein['entries'] : array() as $e) {
+    if (!empty($e['accession']) && !isset($present[$e['accession']])) {
+      $present[$e['accession']] = array('accession' => $e['accession'], 'name' => isset($e['name']) ? $e['name'] : $e['accession'],
+                                        'url' => isset($e['url']) ? $e['url'] : gene_api_domain_url($e['accession']));
+    }
+  }
+
+  $classes = array();
+  foreach (isset($protein['classes']) && is_array($protein['classes']) ? $protein['classes'] : array() as $name) {
+    if (!is_string($name)) { continue; }
+    $iprs = ($ctx && isset($ctx['iprs'][$name])) ? $ctx['iprs'][$name] : array();
+    $entriesHere = array();
+    foreach ($iprs as $acc) { if (isset($present[$acc])) { $entriesHere[] = $present[$acc]; } }
+    $counts = ($ctx && isset($ctx['counts'][$name])) ? $ctx['counts'][$name] : array();
+    $founders = array();
+    foreach (($ctx && isset($ctx['nam_founders'])) ? $ctx['nam_founders'] : array() as $g) {
+      $founders[] = array('genome' => $g, 'label' => $short($g), 'genes' => isset($counts[$g]) ? (int) $counts[$g] : null, 'here' => $g === $assembly);
+    }
+    $classes[] = array(
+      'name' => $name,
+      'group' => ($ctx && isset($ctx['groups'][$name])) ? $ctx['groups'][$name] : null,
+      'entries_here' => $entriesHere,
+      'entries_in_class' => count($iprs),
+      'genes_here' => isset($counts[$assembly]) ? (int) $counts[$assembly] : null,
+      'maize' => ($ctx && isset($ctx['stats'][$name])) ? $ctx['stats'][$name] : null,
+      'founders' => $founders
+    );
+  }
+
+  $immunity = null;
+  if (!empty($protein['immunity']) && is_array($protein['immunity']) && !empty($protein['immunity']['class'])) {
+    $im = $protein['immunity'];
+    $cls = $im['class'];
+    $labels = ($ctx && isset($ctx['immunity']['labels'])) ? $ctx['immunity']['labels'] : array();
+    $counts = ($ctx && isset($ctx['immunity']['counts'][$cls])) ? $ctx['immunity']['counts'][$cls] : array();
+    $sub = isset($im['subclass']) ? $im['subclass'] : null;
+    $subCounts = ($ctx && $sub !== null && isset($ctx['immunity']['subclass_counts'][$sub])) ? $ctx['immunity']['subclass_counts'][$sub] : array();
+    $founders = array();
+    foreach (($ctx && isset($ctx['nam_founders'])) ? $ctx['nam_founders'] : array() as $g) {
+      $founders[] = array('genome' => $g, 'label' => $short($g), 'genes' => isset($counts[$g]) ? (int) $counts[$g] : null, 'here' => $g === $assembly);
+    }
+    $immunity = array(
+      'class' => $cls,
+      'label' => isset($labels[$cls]) ? $labels[$cls] : $cls,
+      'subclass' => $sub,
+      'genes_here' => isset($counts[$assembly]) ? (int) $counts[$assembly] : null,
+      'subclass_genes_here' => isset($subCounts[$assembly]) ? (int) $subCounts[$assembly] : null,
+      'founders' => $founders,
+      'detail' => $im
+    );
+  }
+
+  /* Each entry's standing in this genome and across the atlas genomes: the
+     entry file the domains route serves, minus its protein list. */
+  $entries = array();
+  foreach ($present as $acc => $e) {
+    $doc = MgdbData::namedFile('domains', $assembly, 'entries', MgdbData::entryKey($acc));
+    $entries[] = array(
+      'accession' => $acc,
+      'name' => $e['name'],
+      'url' => $e['url'],
+      'gene_count' => ($doc && isset($doc['gene_count'])) ? (int) $doc['gene_count'] : null,
+      'protein_count' => ($doc && isset($doc['protein_count'])) ? (int) $doc['protein_count'] : null,
+      'members' => ($doc && isset($doc['members'])) ? $doc['members'] : array(),
+      'atlas' => ($doc && isset($doc['atlas'])) ? $doc['atlas'] : null,
+      'api' => MgdbApi::baseUrl() . '/api/v1/data/domains/' . $assembly . '/entry/' . rawurlencode($acc)
+    );
+  }
+
+  return array(
+    'available' => true,
+    'protein' => isset($protein['id']) ? $protein['id'] : null,
+    'architecture' => isset($protein['architecture']) ? $protein['architecture'] : null,
+    'no_matches' => !empty($protein['no_matches']),
+    'genome' => $assembly,
+    'genome_label' => $short($assembly),
+    'classes' => $classes,
+    'immunity' => $immunity,
+    'entries' => $entries,
+    'atlas' => array(
+      'page' => ($ctx && isset($ctx['page'])) ? $ctx['page'] : '/projects/interpro_domain_atlas',
+      'generated' => $ctx ? $ctx['atlas_generated'] : null,
+      'counting_unit' => ($ctx && isset($ctx['provenance']['counting_unit'])) ? $ctx['provenance']['counting_unit'] : null,
+      'note' => $ctx ? $ctx['note'] : null,
+      'available' => $ctx !== null
+    )
+  );
+}//gene_api_function_classes
+
+function gene_api_function_pathways($gene_name) {
+  if ($gene_name === null || !class_exists('MgdbPathways') || !MgdbPathways::available()) { return null; }
+  return MgdbPathways::forGene($gene_name);
+}//gene_api_function_pathways
+

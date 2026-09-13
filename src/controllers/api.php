@@ -107,6 +107,7 @@
       'documentation' => MgdbApi::baseUrl() . '/api/docs',
       'openapi' => MgdbApi::baseUrl() . '/api/v1/openapi',
       'record_types' => api_record_types(),
+      'datasets' => api_data_types(),
       'conventions' => array(
         'errors' => 'RFC 9457 problem details, sent as application/problem+json.',
         'caching' => 'Strong ETag on every response; send If-None-Match to get a 304.',
@@ -142,6 +143,48 @@
     }
     $cs_data = is_file($cs_file) ? json_decode(file_get_contents($cs_file), true) : array('items' => array());
     MgdbApi::sendDocument($cs_data, 3600);
+    return;
+  }
+
+  /////
+  // GET /api/v1/data/{dataset}/... -- datasets served from prebuilt files
+  //
+  // Gene models and protein domains, keyed by genome, answered from the
+  // release directories under data/ that tools/gene_models_index.py and
+  // tools/domains_index.py write. No database connection is opened unless
+  // an identifier misses the release and has to go through the gene
+  // resolver. Additive: nothing under /records is touched by this branch.
+  /////
+
+  if ($api_resource === 'data') {
+    include_once('./include/api/v1/lib/mgdb_data.php');
+    $api_dataset = isset($api_segments[2]) ? strtolower($api_segments[2]) : '';
+    if ($api_dataset === '') {
+      MgdbApi::sendDocument(array(
+        'service' => 'MaizeGDB API',
+        'version' => 'v1',
+        'description' => 'Datasets served from release files: one request answers from prebuilt shards, with no database query unless an identifier has to be resolved.',
+        'documentation' => MgdbApi::baseUrl() . '/api/docs#api-datasets',
+        'datasets' => api_data_types(),
+        'conventions' => array(
+          'genomes' => 'The genome segment is the assembly name, e.g. Zm-B73-REFERENCE-NAM-5.0. Aliases and "current" answer with a 302 to it.',
+          'coordinates' => '1-based, inclusive. Regions are {sequence}:{start}-{end}.',
+          'formats' => 'json by default; ?format=gff3, bed or tsv where the route offers it.',
+          'paging' => 'limit and offset; links.next carries the next page.',
+          'caching' => 'Releases are immutable. Strong ETag on every response; Cache-Control public for a day.',
+          'errors' => 'RFC 9457 problem details, as application/problem+json.'
+        )
+      ), 3600);
+    }
+    $api_entry = api_data_entry($api_dataset);
+    if ($api_entry === null) {
+      MgdbApi::problem(404, 'unknown-dataset', 'Unknown dataset',
+        'No such dataset in this API version.',
+        array('available_datasets' => array_map(function ($e) { return $e['dataset']; }, api_data_registry())));
+    }
+    $api_rest = array_slice($api_segments, 3);
+    $DBConn = null;   // connected only when an identifier has to be resolved
+    include('./include/api/v1/data/' . $api_entry['file'] . '.php');
     return;
   }
 
@@ -235,7 +278,7 @@ function api_record_registry() {
         'full gene name (liguleless1)', 'synonym (ZmSBP15)', 'GenBank or old GenBank name',
         'numeric locus id (12386)'
       ),
-      'notes' => 'A withdrawn gene model answers 410 with its replacement. overview.strand and structure.exon_structure are always null: neither is held in this database.'
+      'notes' => 'A withdrawn gene model answers 410 with its replacement. For an assembly with a gene-models release (B73 v5), overview.strand, structure.gene_model, structure.domains and structure.model come from the annotation files; for other assemblies overview.strand and structure.exon_structure are null, because neither is held in the database.'
     ),
     array(
       'type' => 'pan_gene',
@@ -425,4 +468,137 @@ function api_record_types() {
   }
   return $out;
 }//api_record_types
+
+/* The dataset registry: the datasets under /api/v1/data. Adding one means an
+   entry here, a resource file in include/api/v1/data/, and a builder in
+   tools/ that writes data/<dir>/<genome>/. The service index, the OpenAPI
+   document and the /api page all read this list. */
+function api_data_registry() {
+  return array(
+    array(
+      'dataset' => 'gene-models',
+      'file' => 'gene_models',
+      'label' => 'Gene models',
+      'description' => 'Gene, transcript, exon, CDS and UTR coordinates for an annotated genome, with strand, the canonical transcript, protein length, the classical locus and previous identifiers. Built from the published GFF3.',
+      'example' => array('genome' => 'Zm-B73-REFERENCE-NAM-5.0', 'id' => 'Zm00001eb067740'),
+      'routes' => array(
+        '{genome}/{id}' => 'One gene with every transcript. A transcript or protein id gives its gene.',
+        '{genome}/region/{sequence}:{start}-{end}' => 'Features overlapping an interval. type=gene (default), transcript, mRNA, exon, CDS or UTR; canonical=1; limit and offset.',
+        '{genome}/batch?ids=' => 'Up to 200 genes in one answer; meta.missing lists the identifiers that did not resolve.'
+      ),
+      'sections' => array('transcripts', 'locus', 'xrefs', 'neighbors'),
+      'identifiers' => array('gene model (Zm00001eb067740)', 'transcript (Zm00001eb067740_T001)', 'protein (Zm00001eb067740_P001)',
+                             'a previous identifier of the same assembly', 'anything the gene record resolves, such as lg1'),
+      'formats' => array('json', 'gff3', 'bed', 'tsv'),
+      'caps' => array('batch_ids' => 200, 'region_limit' => 2000, 'region_span_subgene_bp' => 10000000),
+      'html' => '/gene_center/gene/{id}',
+      'notes' => 'Coordinates are 1-based and inclusive. Blocks are listed in transcript order with their rank. There is no v4 to v5 correspondence; a v4 identifier answers 404 with a hint.'
+    ),
+    array(
+      'dataset' => 'domains',
+      'file' => 'domains',
+      'label' => 'Protein domains',
+      'description' => 'InterProScan results per protein: member-database matches, InterPro entries, residue-level sites, GO and pathway terms, the domain atlas classes, and every canonical domain projected onto the genome.',
+      'example' => array('genome' => 'Zm-B73-REFERENCE-NAM-5.0', 'id' => 'Zm00001eb067740_P001'),
+      'routes' => array(
+        '{genome}/{id}' => 'One protein. A transcript gives its protein; a gene gives its canonical protein.',
+        '{genome}/entry/{accession}' => 'Every protein carrying an InterPro entry or a member signature (PF, PTHR, cd, ...). isoforms=canonical (default) or all; limit up to 500 and offset.',
+        '{genome}/region/{sequence}:{start}-{end}' => 'Canonical-protein domains projected onto the genome, split at introns.',
+        '{genome}/batch?ids=' => 'Up to 200 proteins, transcripts or genes.'
+      ),
+      'sections' => array('matches', 'entries', 'sites', 'go', 'pathways', 'genomic', 'classes'),
+      'identifiers' => array('protein (Zm00001eb067740_P001)', 'transcript: its protein', 'gene: its canonical protein',
+                             'an InterPro or member-database accession on the entry route'),
+      'formats' => array('json', 'tsv', 'bed'),
+      'caps' => array('batch_ids' => 200, 'entry_limit' => 500, 'region_limit' => 2000),
+      'html' => '/gene_center/gene/{id}',
+      'notes' => 'Entries collapse member matches onto InterPro entries; draw entries, not matches. Which analyses a release carries is in its manifest; the published B73 v5 file is Pfam only.'
+    ),
+    array(
+      'dataset' => 'expression',
+      'file' => 'expression',
+      'label' => 'Expression',
+      'description' => 'RNA and protein abundance profiles from qTeller: every sample of every study for a gene, with the mean, median, maximum, detection count, tissue specificity, the top samples, and the same figures per tissue and per study.',
+      'example' => array('genome' => 'Zm-B73-REFERENCE-NAM-5.0', 'id' => 'Zm00001eb067740'),
+      'routes' => array(
+        '{genome}/{id}' => 'One gene\'s profile. assay=rna, protein or all; source= keeps studies whose name contains a term.',
+        '{genome}/samples' => 'The sample catalogue of a release: studies, samples, tissue and stress-condition readings.',
+        '{genome}/batch?ids=' => 'Up to 200 genes; summaries by default, fields=samples for the values, format=tsv for a table.'
+      ),
+      'sections' => array('summary', 'samples', 'sources'),
+      'identifiers' => array('gene model (Zm00001eb067740)', 'for a genome with a gene-models release: a transcript, a protein, or anything the gene record resolves'),
+      'formats' => array('json', 'tsv'),
+      'caps' => array('batch_ids' => 200),
+      'html' => '/gene_center/gene/{id}',
+      'notes' => 'Values are as each study published them (FPKM or TPM for RNA), replicates averaged by qTeller and rounded to four significant digits: compare within a study, not across. tissue is a keyword reading of the sample label; condition (abiotic stress, biotic stress, control) is the same kind of reading inside stress studies.'
+    ),
+    array(
+      'dataset' => 'go',
+      'file' => 'go',
+      'genomes' => false,   /* the ontology is one thing: no genome segment */
+      'label' => 'Gene Ontology',
+      'description' => 'The Gene Ontology as a reference index: one term with its aspect, definition, lineage to the root, parents and children, the plant GO-slim categories it falls under, the InterPro entries InterPro2GO maps to it, and the maize gene models annotated with it. Built from go-basic.obo and InterPro2GO; the same index places the terms on the gene record.',
+      'example' => array('genome' => null, 'id' => 'GO:0010119'),
+      'routes' => array(
+        '{term}' => 'One term. fields= picks sections; annotation= (default Zm00001eb.1), limit (up to 500) and offset page the genes.',
+        'search?q=' => 'Terms whose name contains a phrase, or one id. aspect=bp, mf or cc; limit up to 100.',
+        'batch?ids=' => 'Up to 200 terms, attributes only; meta.missing lists the ids the release does not know.',
+        'slim' => 'The plant GO slim by aspect, without the three roots.'
+      ),
+      'sections' => array('lineage', 'parents', 'children', 'slim', 'interpro', 'genes', 'annotations'),
+      'identifiers' => array('a GO id (GO:0003677); GO_0003677 and a bare number are accepted', 'a merged id answers with its survivor and meta.resolved_as'),
+      'formats' => array('json'),
+      'caps' => array('batch_ids' => 200, 'genes_limit' => 500, 'search_limit' => 100),
+      'html' => null,
+      'notes' => 'Only is_a and part_of relations propagate. A retired term is returned with obsolete=true and its replacement; a merged id with its survivor. genes and annotations are the two sections that query the database; the rest is read from the index.'
+    )
+  );
+}//api_data_registry
+
+function api_data_entry($slug) {
+  foreach (api_data_registry() as $entry) {
+    if ($entry['dataset'] === strtolower($slug)) { return $entry; }
+  }
+  return null;
+}//api_data_entry
+
+/* A registry entry as a response attribute block: no file name, absolute
+   route templates. */
+function api_data_summary($entry) {
+  $base = MgdbApi::baseUrl();
+  $routes = array();
+  foreach ($entry['routes'] as $pattern => $description) {
+    $routes[] = array('href' => $base . '/api/v1/data/' . $entry['dataset'] . '/' . $pattern, 'description' => $description);
+  }
+  return array(
+    'label' => $entry['label'],
+    'description' => $entry['description'],
+    'routes' => $routes,
+    'sections' => $entry['sections'],
+    'identifiers' => $entry['identifiers'],
+    'formats' => $entry['formats'],
+    'caps' => $entry['caps'],
+    'notes' => $entry['notes']
+  );
+}//api_data_summary
+
+/* The datasets as the service index publishes them. */
+function api_data_types() {
+  $base = MgdbApi::baseUrl();
+  $out = array();
+  foreach (api_data_registry() as $entry) {
+    $out[] = array(
+      'dataset' => $entry['dataset'],
+      'label' => $entry['label'],
+      'description' => $entry['description'],
+      'href' => $base . '/api/v1/data/' . $entry['dataset'],
+      'example' => $base . '/api/v1/data/' . $entry['dataset'] . '/'
+                   . ($entry['example']['genome'] !== null ? $entry['example']['genome'] . '/' : '') . rawurlencode($entry['example']['id']),
+      'genomes' => !(isset($entry['genomes']) && $entry['genomes'] === false),
+      'sections' => $entry['sections'],
+      'formats' => $entry['formats']
+    );
+  }
+  return $out;
+}//api_data_types
 ?>

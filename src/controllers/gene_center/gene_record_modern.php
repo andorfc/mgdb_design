@@ -122,10 +122,18 @@
   $bauplan->includeCss('/css/mgdb-hub.css?v=' . $v('/css/mgdb-hub.css'));
   $bauplan->includeCss('/css/mgdb-record.css?v=' . $v('/css/mgdb-record.css'));
   $bauplan->includeCss('/css/mgdb-gene-record.css?v=' . $v('/css/mgdb-gene-record.css'));
+  /* The gene model and protein figure in the Structure section. Its 3D
+     viewer library is not included here: the figure loads it on request. */
+  $bauplan->includeCss('/css/mgdb-gene-structure.css?v=' . $v('/css/mgdb-gene-structure.css'));
+  $bauplan->includeCss('/css/mgdb-gene-expression.css?v=' . $v('/css/mgdb-gene-expression.css'));
+  $bauplan->includeCss('/css/mgdb-gene-function.css?v=' . $v('/css/mgdb-gene-function.css'));
   $bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
   $bauplan->includeScript('/js/mgdb-modern.js');
   $bauplan->includeScript('/js/mgdb-chrome.js');
   $bauplan->includeScript('/js/mgdb-record.js?v=' . $v('/js/mgdb-record.js'));
+  $bauplan->includeScript('/js/mgdb-gene-structure.js?v=' . $v('/js/mgdb-gene-structure.js'));
+  $bauplan->includeScript('/js/mgdb-gene-expression.js?v=' . $v('/js/mgdb-gene-expression.js'));
+  $bauplan->includeScript('/js/mgdb-gene-function.js?v=' . $v('/js/mgdb-gene-function.js'));
   $bauplan->includeScript('/js/mgdb-gene-record.js?v=' . $v('/js/mgdb-gene-record.js'));
   $bauplan->head('<meta name="description" content="'
     . htmlspecialchars($gene_summary, ENT_QUOTES, 'UTF-8') . '">');
@@ -170,21 +178,15 @@
     'locus' => 'Classical gene',
     'withdrawn' => 'Withdrawn gene model'
   );
+  /* The hero carries only what places the record: the gene model id, the
+     assembly and annotation, the location. Everything else that used to sit
+     here (record kind, full name, line, model type, transcripts) belongs to
+     Overview, where the page was already repeating half of it. The kind is
+     a pill beside the title; the full name is the subtitle. */
   $identity_facts = '';
-  $identity_facts .= '<div><dt>Record</dt><dd>'
-    . (isset($kind_labels[$gene_identity['kind']]) ? $kind_labels[$gene_identity['kind']] : 'Gene')
-    . '</dd></div>';
   if ($gene_name !== '' && $gene_display !== $gene_name) {
     $identity_facts .= '<div><dt>Gene model</dt><dd class="mgdb-record-id">'
       . htmlspecialchars($gene_name, ENT_QUOTES, 'UTF-8') . '</dd></div>';
-  }
-  if ($gene_full_name !== '' && strcasecmp($gene_full_name, $gene_display) !== 0) {
-    $identity_facts .= '<div><dt>Full name</dt><dd>'
-      . htmlspecialchars($gene_full_name, ENT_QUOTES, 'UTF-8') . '</dd></div>';
-  }
-  if ($gene_identity['line'] !== '') {
-    $identity_facts .= '<div><dt>Line</dt><dd>'
-      . htmlspecialchars($gene_identity['line'], ENT_QUOTES, 'UTF-8') . '</dd></div>';
   }
   /* Assembly and annotation together, because a B73 gene has seven of them --
      RefGen_v1 through NAM-5.0 -- and which one a reader is looking at is the
@@ -197,6 +199,12 @@
          : '')
       . '</dd></div>';
   }
+  $kind_pill = '<span class="mgdb-pill mgdb-pill-kind">'
+    . (isset($kind_labels[$gene_identity['kind']]) ? $kind_labels[$gene_identity['kind']] : 'Gene')
+    . '</span>';
+  $content->get('gene_subtitle')->replace(
+    ($gene_full_name !== '' && strcasecmp($gene_full_name, $gene_display) !== 0)
+      ? htmlspecialchars($gene_full_name, ENT_QUOTES, 'UTF-8') : '');
 
   /* Status is server-rendered rather than left to the API call: a superseded or
      withdrawn model must say so in the first paint, not a moment later. Built
@@ -206,10 +214,10 @@
     'obsolete' => array('mgdb-pill-warn', 'Obsolete'),
     'withdrawn' => array('mgdb-pill-error', 'Withdrawn')
   );
-  $content->get('gene_badge')->replace(isset($badges[$gene_identity['status']])
+  $content->get('gene_badge')->replace(' ' . $kind_pill . (isset($badges[$gene_identity['status']])
     ? ' <span class="mgdb-pill ' . $badges[$gene_identity['status']][0] . '">'
       . $badges[$gene_identity['status']][1] . '</span>'
-    : '');
+    : ''));
 
   /* Server-rendered facts. These are the ones already in hand from resolution,
      so they paint with the document; the rest of the fact list is filled in from
@@ -222,18 +230,6 @@
       . number_format((int) $gene_identity['end'])
       . '<small>' . number_format((int) $gene_identity['end'] - (int) $gene_identity['start'])
       . ' bp on the genome</small></dd></div>';
-  }
-  if ($gene_identity['model_type'] !== '') {
-    $facts .= '<div><dt>Model type</dt><dd>'
-      . htmlspecialchars(str_replace('_', ' ', $gene_identity['model_type']), ENT_QUOTES, 'UTF-8')
-      . '</dd></div>';
-  }
-  if ($gene_identity['transcript_count'] !== null) {
-    $facts .= '<div><dt>Transcripts</dt><dd>' . (int) $gene_identity['transcript_count']
-      . ($gene_identity['canonical_transcript'] !== ''
-         ? '<small>canonical ' . htmlspecialchars($gene_identity['canonical_transcript'], ENT_QUOTES, 'UTF-8') . '</small>'
-         : '')
-      . '</dd></div>';
   }
   $content->get('gene_facts')->replace($facts);
 

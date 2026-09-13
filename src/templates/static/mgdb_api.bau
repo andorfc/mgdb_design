@@ -26,6 +26,7 @@ $$SYNTAX-LEVEL 2
     <a href="#api-quickstart">Quick start</a>
     <a href="#api-endpoints">Endpoints</a>
     <a href="#api-types">Record types</a>
+    <a href="#api-datasets">Datasets</a>
     <a href="#api-identifiers">Identifiers</a>
     <a href="#api-response">Response</a>
     <a href="#api-caching">Caching and errors</a>
@@ -48,6 +49,7 @@ $$SYNTAX-LEVEL 2
           <li><strong>Read-only.</strong> GET, HEAD and OPTIONS. Nothing here can change the database.</li>
           <li><strong>No key and no account.</strong> Requests are anonymous. Responses carry <code>Access-Control-Allow-Origin: *</code>, so a browser on any site can call it.</li>
           <li><strong>Seventeen record types.</strong> Genes, pan-genes, loci, gene products, variations, phenotypes, stocks, references, terms, markers, primers, maps, linkage groups, QTL experiments, gel patterns, recombination datasets and map scores.</li>
+          <li><strong>Four datasets.</strong> Gene models, protein domains, expression profiles and the Gene Ontology itself, answered from release files rather than from the database: every exon, CDS and UTR block of a gene, the InterProScan domains on a protein with their genome projection, every sample of every expression study, and any GO term with its lineage, slim categories and annotated maize genes. See <a href="#api-datasets">Datasets</a>.</li>
           <li><strong>Two representations.</strong> The API&#39;s own JSON by default; JSON-LD with schema.org and Bioschemas types on request.</li>
           <li><strong>Conditional requests.</strong> Every response has a strong <code>ETag</code>; an unchanged record answers <code>304</code> with no body.</li>
           <li><strong>One error shape.</strong> RFC 9457 problem details, as <code>application/problem+json</code>.</li>
@@ -145,6 +147,23 @@ $$SYNTAX-LEVEL 2
   </section>
 
   <!-- ============ IDENTIFIERS ============ -->
+  <!-- ============ DATASETS ============ -->
+  <section id="api-datasets" aria-labelledby="api-datasets-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="api-datasets-title">Datasets</h2></div>
+    </div>
+    <p class="mgdb-section-intro">Some data is not a record. Gene structure and protein domains are built once per annotation release from the published files and answered from those files, keyed by genome: <code>$(api_base)/api/v1/data/&#123;dataset&#125;/&#123;genome&#125;/&hellip;</code>. The genome segment is the assembly name; <code>current</code> and short aliases answer with a redirect to it. Coordinates are 1-based and inclusive. A region is <code>&#123;sequence&#125;:&#123;start&#125;-&#123;end&#125;</code>. Lists page with <code>limit</code> and <code>offset</code>, and <code>links.next</code> carries the next page. Every route offers <code>format=</code> for the text forms it supports, and a release is immutable, so responses are cacheable for a day.</p>
+    <div class="api-table-wrap">
+      <table class="mgdb-table api-types-table">
+        <thead><tr><th scope="col">Dataset</th><th scope="col">What it serves</th><th scope="col">Genomes and example</th><th scope="col">Sections and formats</th></tr></thead>
+        <tbody>
+          $(dataset_rows)
+        </tbody>
+      </table>
+    </div>
+    <p>An identifier the release does not know &mdash; a gene symbol, a synonym, a locus number &mdash; is passed to the gene record&#39;s resolver once, and <code>meta.resolved_from</code> says what happened. A withdrawn gene model answers <code>410</code> with its replacement; a v4 identifier answers <code>404</code> with a hint, because no v4 to v5 correspondence exists. A protein that InterProScan matched nothing on answers <code>200</code> with empty sections and <code>no_matches</code> true; only an identifier that is not in the annotation is a <code>404</code>.</p>
+  </section>
+
   <section id="api-identifiers" aria-labelledby="api-identifiers-title">
     <div class="mgdb-section-heading">
       <div><h2 id="api-identifiers-title">Identifiers</h2></div>

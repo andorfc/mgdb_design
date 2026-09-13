@@ -86,6 +86,71 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   }
 
   /////
+  // Datasets: the data family, with the genomes that have a release on
+  // this instance. File reads only, like everything else on the page.
+  /////
+
+  include_once('./include/api/v1/lib/mgdb_data.php');
+  $dataset_rows = '';
+  foreach (api_data_registry() as $entry) {
+    $ds = $entry['dataset'];
+    $genomeless = isset($entry['genomes']) && $entry['genomes'] === false;
+    $genomes = $genomeless ? array() : MgdbData::genomes($ds);
+    $genome_html = '';
+    if ($genomeless) {
+      include_once('./include/api/v1/lib/mgdb_go.php');
+      $go_m = ($ds === 'go' && class_exists('MgdbGo') && MgdbGo::available()) ? MgdbGo::manifest() : null;
+      $genome_html = $go_m
+        ? '<li>Reference index, release <code>' . $esc(isset($go_m['release']) ? str_replace('releases/', '', $go_m['release']) : '') . '</code>'
+          . (isset($go_m['counts']['live']) ? ' <span class="mgdb-muted">' . number_format((int) $go_m['counts']['live']) . ' live terms, '
+             . number_format((int) $go_m['counts']['ipr2go_pairs']) . ' InterPro2GO pairs</span>' : '')
+          . ' &middot; <a href="' . $esc($base . '/api/v1/data/' . $ds) . '">index</a></li>'
+        : '<li><span class="mgdb-muted">Not built on this instance yet.</span></li>';
+    }
+    foreach ($genomes as $name => $manifest) {
+      $counts = isset($manifest['counts']) ? $manifest['counts'] : array();
+      $figure = '';
+      if ($ds === 'gene-models' && isset($counts['genes'])) {
+        $figure = number_format((int) $counts['genes']) . ' genes';
+      } elseif ($ds === 'domains' && isset($counts['proteins_with_matches'])) {
+        $figure = number_format((int) $counts['proteins_with_matches']) . ' proteins';
+      } elseif ($ds === 'expression' && isset($counts['samples'])) {
+        $figure = number_format((int) $counts['samples']) . ' samples';
+      }
+      $genome_html .= '<li><code>' . $esc($name) . '</code>'
+        . ($figure !== '' ? ' <span class="mgdb-muted">' . $esc($figure) . '</span>' : '')
+        . ' &middot; <a href="' . $esc($base . '/api/v1/data/' . $ds . '/' . $name) . '">release</a></li>';
+    }
+    if ($genome_html === '') {
+      $genome_html = '<li><span class="mgdb-muted">No release on this instance yet.</span></li>';
+    }
+    $routes_html = '';
+    foreach ($entry['routes'] as $pattern => $description) {
+      $routes_html .= '<li><code>' . $esc('/api/v1/data/' . $ds . '/' . $pattern) . '</code><br>' . $esc($description) . '</li>';
+    }
+    $sections = '';
+    foreach ($entry['sections'] as $section) {
+      $sections .= '<code>' . $esc($section) . '</code> ';
+    }
+    $example_url = $base . '/api/v1/data/' . $ds . '/'
+                 . ($entry['example']['genome'] !== null ? $entry['example']['genome'] . '/' : '') . rawurlencode($entry['example']['id']);
+    $dataset_rows .= '<tr>'
+      . '<th scope="row"><code>' . $esc($ds) . '</code><span class="api-type-label">' . $esc($entry['label']) . '</span></th>'
+      . '<td>' . $esc($entry['description'])
+        . ($entry['notes'] !== null ? '<span class="api-note">' . $esc($entry['notes']) . '</span>' : '')
+        . '<ul class="api-plain-list">' . $routes_html . '</ul></td>'
+      . '<td><ul class="api-plain-list">' . $genome_html . '</ul>'
+        . '<code>' . $esc($entry['example']['id']) . '</code><br><a href="' . $esc($example_url) . '">JSON</a>'
+        . (in_array($ds === 'gene-models' ? 'gff3' : 'tsv', $entry['formats'], true)
+           ? ' &middot; <a href="' . $esc($example_url . '?format=' . ($ds === 'gene-models' ? 'gff3' : 'tsv')) . '">'
+             . ($ds === 'gene-models' ? 'GFF3' : 'TSV') . '</a>'
+           : '') . '</td>'
+      . '<td><span class="api-sections">' . trim($sections) . '</span><br><span class="mgdb-muted">'
+        . $esc(implode(', ', $entry['formats'])) . '</span></td>'
+      . '</tr>' . "\n";
+  }
+
+  /////
   // Code samples. {base} is this instance.
   /////
 
@@ -339,6 +404,62 @@ for (const gene of genes) {   // in turn: the server is shared
 EOT
     ), $base);
 
+  $examples .= api_docs_example('dataset', 'Gene structure and domains from the datasets',
+    'The datasets answer from release files rather than from records: a gene with every exon, CDS and UTR block, and the InterProScan domains on its canonical protein projected onto the genome. No database query is made for an exact identifier.',
+    array(
+      'curl' => <<<'EOT'
+# every transcript of lg1 with its exon, CDS and UTR blocks
+curl -s "{base}/api/v1/data/gene-models/Zm-B73-REFERENCE-NAM-5.0/Zm00001eb067740"
+
+# the same gene as GFF3, and the genes in a window as a table
+curl -s "{base}/api/v1/data/gene-models/Zm-B73-REFERENCE-NAM-5.0/Zm00001eb067740?format=gff3"
+curl -s "{base}/api/v1/data/gene-models/Zm-B73-REFERENCE-NAM-5.0/region/chr2:4400000-4600000?format=tsv"
+
+# the domains on its canonical protein, and every gene carrying the SBP domain
+curl -s "{base}/api/v1/data/domains/Zm-B73-REFERENCE-NAM-5.0/Zm00001eb067740_P001"
+curl -s "{base}/api/v1/data/domains/Zm-B73-REFERENCE-NAM-5.0/entry/PF03110"
+EOT
+      , 'python' => <<<'EOT'
+import requests
+
+genome = "Zm-B73-REFERENCE-NAM-5.0"
+gene = requests.get(f"{base}/api/v1/data/gene-models/{genome}/Zm00001eb067740", timeout=30).json()
+a = gene["data"]["attributes"]
+print(a["chromosome"], a["start"], a["end"], a["strand"], a["protein_length_aa"], "aa")
+for t in gene["data"]["sections"]["transcripts"]:
+    print(t["id"], "canonical" if t["canonical"] else "", [(e["start"], e["end"]) for e in t["exons"]])
+
+domains = requests.get(f"{base}/api/v1/data/domains/{genome}/{a['canonical_protein']}", timeout=30).json()
+for d in domains["data"]["sections"]["genomic"]["domains"]:
+    print(d["accession"], d["name"], d["residues"], [(b["start"], b["end"]) for b in d["blocks"]])
+EOT
+      , 'r' => <<<'EOT'
+library(httr2)
+
+genome <- "Zm-B73-REFERENCE-NAM-5.0"
+gene <- request(paste0("{base}/api/v1/data/gene-models/", genome, "/Zm00001eb067740")) |>
+  req_perform() |> resp_body_json()
+a <- gene$data$attributes
+cat(a$chromosome, a$start, a$end, a$strand, a$protein_length_aa, "aa\n")
+
+domains <- request(paste0("{base}/api/v1/data/domains/", genome, "/", a$canonical_protein)) |>
+  req_perform() |> resp_body_json()
+for (d in domains$data$sections$genomic$domains)
+  cat(d$accession, d$name, d$residues$start, "-", d$residues$end, "\n")
+EOT
+      , 'javascript' => <<<'EOT'
+const genome = "Zm-B73-REFERENCE-NAM-5.0";
+const gene = await (await fetch(`{base}/api/v1/data/gene-models/${genome}/Zm00001eb067740`)).json();
+const a = gene.data.attributes;
+console.log(a.chromosome, a.start, a.end, a.strand, a.protein_length_aa, "aa");
+
+const domains = await (await fetch(`{base}/api/v1/data/domains/${genome}/${a.canonical_protein}`)).json();
+for (const d of domains.data.sections.genomic.domains) {
+  console.log(d.accession, d.name, d.residues, d.blocks.map((b) => [b.start, b.end]));
+}
+EOT
+    ), $base);
+
   /////
   // The envelope and error examples. Real values from this instance on
   // 2026-09-11, with every list cut to its first item.
@@ -503,6 +624,7 @@ EOT;
   $content->get('openapi_url')->replace($esc($base . '/api/v1/openapi'));
   $content->get('examples')->replace($examples);
   $content->get('type_rows')->replace($type_rows);
+  $content->get('dataset_rows')->replace($dataset_rows);
   $content->get('identifier_rows')->replace($identifier_rows);
   $content->get('ld_rows')->replace($ld_rows);
   $content->get('try_options')->replace($try_options);
