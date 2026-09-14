@@ -3962,12 +3962,23 @@ row (3 + 3 of six tracks), the three ways into what they hold sit under them
 ones, so a spanning child leaves none empty and every track resolves to about
 half a pixel. That is the bug that shredded a row on /download.
 
-**A new Stock collections section** carries the NAM RILs, the Dooner-Du Ds-GFP
-insertions (18,428 alignments over 13,562 genes) and the Vollbrecht Ac/Ds
-insertions (5,423 over 2,768) -- counts verified against
-`perm_tables.marker_gene_model`, not copied from the /insertion header. It
-shares the Collections grid so its three cards line up with the row above.
-UniformMu keeps its single card in Collections rather than being repeated.
+**A new Stock collections section** carries the NAM RILs, UniformMu, the
+Dooner-Du Ds-GFP insertions (18,428 alignments over 13,562 genes) and the
+Vollbrecht Ac/Ds insertions (5,423 over 2,768) -- counts verified against
+`perm_tables.marker_gene_model`, not copied from the /insertion header.
+
+**Collections is down to the two repositories**, side by side and equal. The
+catalog and the packet-label key were cards of their own and are now links on
+the Stock Center's card, which is what they are: ways into what that one
+repository holds, not separate places to get seed. A `.stock-card-links` row
+keeps a card's ways out on one line and takes the slack above it, so a
+side-by-side pair lands its links on the same line whatever the descriptions do.
+
+**Explicit column counts, both grids.** Four cards through
+`repeat(auto-fit, minmax(250px, 1fr))` give 3 + 1 at 900px, and the card left
+alone on the second row reads as a mistake; Stock collections is 4 / 2 + 2 / 1
+at 1100 and 760. Collections is a plain two-track grid. Neither uses auto-fit,
+which is also what keeps the /download shredding bug away if a card ever spans.
 
 **Adding a tab made the phone bar worse**: eight labels wrapped to three rows
 at 375px, 201px of an 812px screen. The bar is a one-row scrolling rail below

@@ -221,45 +221,29 @@ $$SYNTAX-LEVEL 2
       </div>
     </div>
 
-    ;; Two rows by design: the two repositories a reader orders seed from span
-    ;; the top row, and the three ways into what they hold sit under them. The
-    ;; grid is an explicit six-column track rather than auto-fit -- auto-fit
-    ;; plus a spanning child generates a large number of tracks and collapses
-    ;; none of them, which shredded a row on /download.
+    ;; The two repositories a reader orders seed from, side by side. The
+    ;; catalog and the packet-label key are ways into what the Stock Center
+    ;; holds, so they sit on its card as links rather than claiming cards of
+    ;; their own; the named collections moved to Stock collections below.
     <div class="mgdb-card-grid stock-collection-grid">
       <article class="mgdb-card stock-collection-feature">
         <span class="mgdb-pill mgdb-pill-ok">USDA&#58; Genetic Stocks</span>
         <h3>Maize Genetics Cooperation Stock Center</h3>
-        <p>The primary source of maize genetic stocks, mutant alleles, and translocation lines.</p>
-        <a href="https\://maizecoopsc.org/" target="_blank" rel="noopener">Open Stock Center <span aria-hidden="true">&nearr;</span></a>
+        <p>Maintains and distributes maize genetic stocks with defined genetic variation, including mutant alleles, chromosome variants, and other stocks used for genetics research. The collection focuses on specific, characterized genetic traits rather than general maize germplasm.</p>
+        <div class="stock-card-links">
+          <a href="https\://maizecoopsc.org/" target="_blank" rel="noopener">Open Stock Center <span aria-hidden="true">&nearr;</span></a>
+          <a href="/stock_catalog">Browse Catalog</a>
+          <a href="/stock_decryption">Decrypt Packet</a>
+        </div>
       </article>
 
       <article class="mgdb-card stock-collection-feature">
         <span class="mgdb-pill">USDA&#58; Germplasm</span>
-        <h3>North Central Regional PI Station</h3>
-        <p>NCRPIS non-mutant germplasm.</p>
-        <a href="https\://maizecoopsc.org/ncrpis/" target="_blank" rel="noopener">Explore NCRPIS <span aria-hidden="true">&nearr;</span></a>
-      </article>
-
-      <article class="mgdb-card">
-        <span class="mgdb-pill mgdb-pill-info">Stock Catalog</span>
-        <h3>Stock Center Catalog</h3>
-        <p>The directory of stocks distributed by the Maize Genetics Cooperation Stock Center.</p>
-        <a href="/stock_catalog">Browse Catalog</a>
-      </article>
-
-      <article class="mgdb-card">
-        <span class="mgdb-pill mgdb-pill-warn">Packet Label</span>
-        <h3>Decrypt Seed Packet Labels</h3>
-        <p>A key for how to decrypt the Maize Genetics Cooperation Stock Center packet labels.</p>
-        <a href="/stock_decryption">Decrypt Packet</a>
-      </article>
-
-      <article class="mgdb-card">
-        <span class="mgdb-pill mgdb-pill-ok">Transposon Mutants</span>
-        <h3>UniformMu Insertion Lines</h3>
-        <p>Over 31,000 sequence-indexed Robertson&rsquo;s Mutator insertion alleles with cosegregating seedling and ear traits in uniform W22 background.</p>
-        <a href="/uniformmu">Explore UniformMu</a>
+        <h3>North Central Regional Plant Introduction Station &#40;NCRPIS&#41;</h3>
+        <p>Maintains and distributes diverse maize germplasm, including inbred lines, landraces, open-pollinated populations, and wild <em>Zea</em> accessions. The collection preserves broad genetic diversity for research, breeding, and crop improvement.</p>
+        <div class="stock-card-links">
+          <a href="https\://maizecoopsc.org/ncrpis/" target="_blank" rel="noopener">Explore NCRPIS <span aria-hidden="true">&nearr;</span></a>
+        </div>
       </article>
 
       ;; The "EMS Inflorescence Mutants" card was removed on 2026-09-07 with
@@ -272,8 +256,7 @@ $$SYNTAX-LEVEL 2
   </section>
 
   ;; The named collections a reader can order seed from, as distinct from the
-  ;; repositories above that distribute them. UniformMu keeps its card in
-  ;; Collections rather than being repeated here.
+  ;; two repositories above that distribute them.
   <section id="stock-stock-collections" aria-labelledby="stock-stock-collections-title">
     <div class="mgdb-section-heading">
       <div>
@@ -281,29 +264,45 @@ $$SYNTAX-LEVEL 2
       </div>
     </div>
 
-    <div class="mgdb-card-grid stock-collection-grid stock-named-grid">
+    <div class="mgdb-card-grid stock-named-grid">
       <article class="mgdb-card">
         <span class="mgdb-pill mgdb-pill-info">NAM RILs</span>
         <h3>NAM recombinant inbred lines</h3>
         <p>The recombinant inbred line populations bred from B73 and the 25 founder inbreds listed below, and the mapping resource the NAM reference genomes were built around.</p>
-        <a href="https\://maizecoopsc.org/nam-rils" target="_blank" rel="noopener">Order NAM RILs <span aria-hidden="true">&nearr;</span></a>
-        <a href="#stock-nam">The 26 founder lines</a>
+        <div class="stock-card-links">
+          <a href="https\://maizecoopsc.org/nam-rils" target="_blank" rel="noopener">Order NAM RILs <span aria-hidden="true">&nearr;</span></a>
+          <a href="#stock-nam">The 26 founder lines</a>
+        </div>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-ok">Transposon Mutants</span>
+        <h3>UniformMu Insertion Lines</h3>
+        <p>Over 31,000 sequence-indexed Robertson&rsquo;s Mutator insertion alleles with cosegregating seedling and ear traits in uniform W22 background.</p>
+        <div class="stock-card-links">
+          <a href="/uniformmu">Explore UniformMu</a>
+          <a href="/insertion">Search the insertions</a>
+        </div>
       </article>
 
       <article class="mgdb-card">
         <span class="mgdb-pill mgdb-pill-warn">Ac/Ds transposon</span>
         <h3>Dooner&ndash;Du Ds-GFP insertions</h3>
         <p>GFP-tagged Ds insertions in a polymorphic W22 background&#58; 18,428 sequence-indexed alignments across 13,562 genes, with a subset verified by the Maize Gametophyte project.</p>
-        <a href="/projects/dooner_du_acds">Project page</a>
-        <a href="/insertion">Search the insertions</a>
+        <div class="stock-card-links">
+          <a href="/projects/dooner_du_acds">Project page</a>
+          <a href="/insertion">Search the insertions</a>
+        </div>
       </article>
 
       <article class="mgdb-card">
         <span class="mgdb-pill mgdb-pill-warn">Ac/Ds transposon</span>
         <h3>Vollbrecht Ac/Ds insertions</h3>
         <p>Genome-wide Ac/Ds mutagenesis in W22 &#40;Vollbrecht et al., 2010&#41;&#58; 5,423 sequence-indexed alignments across 2,768 genes.</p>
-        <a href="/insertion">Search the insertions</a>
-        <a href="https\://doi.org/10.1105/tpc.109.070953" target="_blank" rel="noopener">Vollbrecht et al., 2010 <span aria-hidden="true">&nearr;</span></a>
+        <div class="stock-card-links">
+          <a href="/insertion">Search the insertions</a>
+          <a href="https\://doi.org/10.1105/tpc.109.070953" target="_blank" rel="noopener">Vollbrecht et al., 2010 <span aria-hidden="true">&nearr;</span></a>
+        </div>
       </article>
     </div>
   </section>

@@ -556,34 +556,67 @@
   margin-top: var(--mgdb-space-4);
 }
 
-/* Collections is two rows on purpose: the two repositories a reader orders
-   seed from span the top row, the three ways into what they hold sit under
-   them. Six explicit tracks, 3 + 3 then 2 + 2 + 2 -- NOT repeat(auto-fit,
-   minmax(0, 1fr)), which generates a large number of tracks and collapses
-   only the empty ones, so a spanning child leaves none empty and every track
-   resolves to about half a pixel. That is what shredded a row on /download.
-
-   Stock collections shares the grid and has three cards, so its row is the
-   same 2 + 2 + 2 as the second row above it and the two sections line up. */
+/* Collections is the two repositories a reader orders seed from, side by side
+   and equal. Explicit tracks, not repeat(auto-fit, minmax(0, 1fr)): auto-fit
+   generates a large number of tracks and collapses only the empty ones, which
+   shredded a row on /download the moment a child spanned more than one. */
 .mgdb-stock-page .stock-collection-grid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--mgdb-space-4);
   margin-top: var(--mgdb-space-4);
 }
 
-.mgdb-stock-page .stock-collection-grid > .mgdb-card { grid-column: span 2; }
-.mgdb-stock-page .stock-collection-grid > .stock-collection-feature { grid-column: span 3; }
-
-@media (max-width: 1000px) {
-  .mgdb-stock-page .stock-collection-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .mgdb-stock-page .stock-collection-grid > .mgdb-card,
-  .mgdb-stock-page .stock-collection-grid > .stock-collection-feature { grid-column: span 1; }
+/* Stock collections is four named collections, which want a narrower card than
+   a repository does. Explicit counts rather than auto-fit with a minimum: four
+   cards through a minmax(250px, 1fr) track list give 3 + 1 at 900px, and the
+   card left alone on the second row reads as a mistake. Four, then two and two,
+   then one -- no orphan at any width. */
+.mgdb-stock-page .stock-named-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
 }
 
-@media (max-width: 640px) {
-  .mgdb-stock-page .stock-collection-grid { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 1100px) {
+  .mgdb-stock-page .stock-named-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+@media (max-width: 760px) {
+  .mgdb-stock-page .stock-collection-grid,
+  .mgdb-stock-page .stock-named-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* A card's ways out, on one line until they run out of room. Bare anchors
+   stacked one per line made a three-link card as tall as its description. */
+.mgdb-stock-page .stock-card-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  align-items: center;
+  margin-top: auto;
+  padding-top: var(--mgdb-space-3);
+  border-top: 1px solid var(--hub-line-soft);
+}
+
+.mgdb-stock-page .stock-card-links a {
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* The description takes the slack so the link rows of a side-by-side pair land
+   on the same line. The shell does this for a direct `> p` on some grids; these
+   cards carry a pill and a heading above it, so it is set here. */
+.mgdb-stock-page .stock-collection-grid > .mgdb-card,
+.mgdb-stock-page .stock-named-grid > .mgdb-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.mgdb-stock-page .stock-collection-grid > .mgdb-card > p,
+.mgdb-stock-page .stock-named-grid > .mgdb-card > p { flex: 1 1 auto; }
 
 .mgdb-stock-page .stock-download-card {
   display: flex;
