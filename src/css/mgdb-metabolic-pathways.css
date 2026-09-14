@@ -659,6 +659,35 @@
   font-size: var(--mgdb-text-xs);
 }
 
+/* --------------------------------------------------------------------------
+   Download markers
+
+   A link that hands the reader a file, or opens a directory of them on the
+   download host, carries a down arrow -- the Downloads table, the results
+   TSV, and the MetabolicResources card in Related resources. Written against
+   the href rather than placed by hand, so a new row is marked the moment it
+   is written and cannot drift out of step with its own destination, which is
+   the rule mgdb-modern.css already follows for the exit arrow.
+
+   download.maizegdb.org is a maizegdb.org subdomain, so the shell's Related
+   resources rule correctly gives it no exit arrow; this adds the download
+   arrow the shell has no opinion about. Higher specificity than the shell's
+   rule and a later sheet, so the two cannot fight.
+   -------------------------------------------------------------------------- */
+
+.mgdb-metabolic-pathways-page #mp-downloads a[href^="http"]::after,
+.mgdb-metabolic-pathways-page a[download]::after {
+  content: " \2193";
+  font-size: .85em;
+  font-weight: 700;
+}
+
+.mgdb-metabolic-pathways-page .mgdb-resource-list a[href*="download.maizegdb.org"] > strong::after {
+  content: " \2193";
+  font-size: .85em;
+  font-weight: 600;
+}
+
 @media (max-width: 900px) {
   .mp-doc-figure-row { grid-template-columns: minmax(0, 1fr); }
   .mp-doc-figure { max-width: 320px; }

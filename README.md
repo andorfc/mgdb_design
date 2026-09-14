@@ -1044,6 +1044,24 @@ their tabs out of the template. Two consequences worth knowing:
 BioCyc still appears once, as a webinar link under Information and tutorials.
 That is a tutorial, not a duplicate database entry, and it stays.
 
+### Download arrows, 2026-09-14
+
+The Gramene tutorial row (`archive.gramene.org/tutorials/pathways_intro/`)
+came out of Information and tutorials. Gramene still appears as the provider
+of Plant Reactome and inside its abstract, which is the maize pathway database
+the page links, not a tutorial.
+
+Every link that hands the reader a file, or opens a directory of them on the
+download host, now carries a down arrow: the five Downloads rows, the results
+Export TSV button, and the MetabolicResources card in Related resources. The
+rule is written against the href in `css/mgdb-metabolic-pathways.css`, not
+placed by hand, so a new row is marked the moment it is written -- the same
+way `mgdb-modern.css` decides the exit arrow, and the same way `/expression`
+does it. Worth knowing for the Related resources case: `download.maizegdb.org`
+is a maizegdb.org subdomain, so the shell correctly gives it no exit arrow and
+has no opinion about downloads; the page rule has higher specificity and a
+later sheet, so the two cannot fight.
+
 ### The data was already here
 
 The page had no search and no metrics because nobody had looked for a corpus.
