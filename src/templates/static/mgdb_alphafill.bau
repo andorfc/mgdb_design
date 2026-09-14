@@ -1,13 +1,13 @@
 $$SYNTAX-LEVEL 2
 *(mgdb-alphafill
-<meta name="twitter:card" content="summary">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@MaizeGDB">
 <meta property="og:url" content="https\://maizegdb.org/data_center/alphafill">
 <meta property="og:title" content="MaizeGDB AlphaFill | Predicted Ligands, Cofactors &amp; Metal Sites">
 <meta property="og:description" content="Explore AlphaFill ligand hypotheses for B73 RefGen_v5 proteins, inspect predicted binding sites in 3D, and download the complete dataset.">
 
 <a class="mgdb-skip-link" href="#af-main">Skip to main content</a>
-<main class="mgdb-page mgdb-alphafill-page" id="af-main">
+<main class="mgdb-page mgdb-arrows-v2 mgdb-alphafill-page" id="af-main">
 
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
     <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/protein_structure">Protein Structures</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">AlphaFill</span>
@@ -25,7 +25,7 @@ $$SYNTAX-LEVEL 2
       <p class="mgdb-hero-actions">
         <a class="mgdb-button mgdb-button-primary" href="#af-gene">Search a gene</a>
         <a class="mgdb-button mgdb-button-secondary" href="/data_center/alphafill/faq">How to interpret results</a>
-        <a class="mgdb-button mgdb-button-quiet" href="/data_center/protein_structure">Protein structure hub <span aria-hidden="true">&rarr;</span></a>
+        <a class="mgdb-button mgdb-button-quiet" href="/data_center/protein_structure">Protein structure hub</a>
       </p>
     </div>
   </section>
@@ -134,25 +134,25 @@ $$SYNTAX-LEVEL 2
         <span class="mgdb-pill mgdb-pill-info">JSON &middot; ~0.6 MB</span>
         <h3>Browse-ready gene index</h3>
         <p>One row for each of the $(genes-with) genes with a transplant: chromosome, model pLDDT, ligand counts, best evidence class and confident-pocket count.</p>
-        <p class="af-card-action"><a class="mgdb-button mgdb-button-quiet" href="/search/alphafill/alphafill_download.php?file=index">Download gene index <span aria-hidden="true">&darr;</span></a></p>
+        <p class="af-card-action"><a class="mgdb-button mgdb-button-quiet" href="/search/alphafill/alphafill_download.php?file=index">Download gene index</a></p>
       </article>
       <article class="mgdb-card af-download-card">
         <span class="mgdb-pill mgdb-pill-warn">CSV &middot; ~3 MB</span>
         <h3>Predicted pockets with no donor</h3>
         <p>The $(target-count) well-modelled genes where P2Rank finds a confident pocket but AlphaFill finds no qualifying donor, with pLDDT and pocket probability.</p>
-        <p class="af-card-action"><a class="mgdb-button mgdb-button-quiet" href="/search/alphafill/alphafill_download.php?file=targets">Download target list <span aria-hidden="true">&darr;</span></a></p>
+        <p class="af-card-action"><a class="mgdb-button mgdb-button-quiet" href="/search/alphafill/alphafill_download.php?file=targets">Download target list</a></p>
       </article>
       <article class="mgdb-card af-download-card">
         <span class="mgdb-pill mgdb-pill-info">JSON &middot; ~15 MB</span>
         <h3>Gene &times; ligand table</h3>
         <p>All $(pairs) distinct gene&ndash;ligand pairs with the best donor, identity, local RMSD, TCS, donor count and evidence class.</p>
-        <p class="af-card-action"><a class="mgdb-button mgdb-button-quiet" href="/search/alphafill/alphafill_download.php?file=by_gene">Download pair table <span aria-hidden="true">&darr;</span></a></p>
+        <p class="af-card-action"><a class="mgdb-button mgdb-button-quiet" href="/search/alphafill/alphafill_download.php?file=by_gene">Download pair table</a></p>
       </article>
       <article class="mgdb-card af-download-card">
         <span class="mgdb-pill">TSV.GZ &middot; ~64 MB</span>
         <h3>Every raw transplant</h3>
         <p>All $(transplants) transplants before collapsing, including donor PDB entry, ligand and donor CCD codes, identity, alignment, RMSD, clashes, TCS and ligand class.</p>
-        <p class="af-card-action"><a class="mgdb-button mgdb-button-quiet" href="/search/alphafill/alphafill_download.php?file=transplants">Download transplants <span aria-hidden="true">&darr;</span></a></p>
+        <p class="af-card-action"><a class="mgdb-button mgdb-button-quiet" href="/search/alphafill/alphafill_download.php?file=transplants">Download transplants</a></p>
       </article>
     </div>
 

@@ -406,8 +406,68 @@
   color: var(--mgdb-green-dark);
 }
 
-.mgdb-home-page .mgdb-quicklink-ext {
+/* Two link components on this page put their mark on their LABEL rather than at
+   the end of the link, for the same reason the shared .mgdb-resource-list does:
+   the anchor is a multi-part row, so the shell's `a::after` becomes one more
+   item in the layout instead of a glyph after the text.
+
+   `.mgdb-index-row` is a three-column grid -- icon, label, description -- and
+   the arrow arrived as a fourth grid item, which wrapped onto a line of its own
+   under the row. `.mgdb-quicklink` wraps 128px of artwork and a description, and
+   dropped the glyph under the picture.
+
+   Each opt-out is written `a.<class>` rather than `.<class>`: the rule it has to
+   beat is `.mgdb-arrows-v2 a[href^="http"]::after`, two classes and two
+   elements, and a bare class selector has one element fewer and loses. This
+   sheet loads after mgdb-modern.css, so an equal score wins.
+   -------------------------------------------------------------------------- */
+
+.mgdb-home-page a.mgdb-index-row::after { content: none; }
+
+.mgdb-home-page a.mgdb-index-row[href^="http"]:not([href*="maizegdb.org"]) > strong::after,
+.mgdb-home-page a.mgdb-index-row[href^="//"]:not([href*="maizegdb.org"]) > strong::after {
+  content: " \2197";
   font-size: 0.85em;
+  font-weight: 600;
+  color: var(--mgdb-muted);
+}
+
+.mgdb-home-page a.mgdb-index-row[download] > strong::after,
+.mgdb-home-page a.mgdb-index-row[href*="//download.maizegdb.org"] > strong::after,
+.mgdb-home-page a.mgdb-index-row[href*="box.com"] > strong::after {
+  content: " \2193";
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--mgdb-muted);
+}
+
+/* The quicklink's mark goes on its label, not at the end of the card.
+
+   A quicklink wraps 128px of artwork and a description as well as its label, so
+   the shared `a::after` in mgdb-modern.css would drop the glyph under the
+   picture. Same exception .mgdb-resource-list already makes, and driven by the
+   same href test so a link cannot carry a mark that disagrees with where it
+   goes. The internal quicklinks resolve through $(server-url) to a
+   maizegdb.org URL and are correctly left unmarked. */
+/* `a.mgdb-quicklink`, not `.mgdb-quicklink`: the shared rule it overrides is
+   `.mgdb-arrows-v2 a[href^="http"]::after`, two classes and two elements, and a
+   bare class selector here has one element fewer and loses. */
+.mgdb-home-page a.mgdb-quicklink::after { content: none; }
+
+.mgdb-home-page a[href^="http"]:not([href*="maizegdb.org"]) .mgdb-quicklink-label::after,
+.mgdb-home-page a[href^="//"]:not([href*="maizegdb.org"]) .mgdb-quicklink-label::after {
+  content: " \2197";
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--mgdb-muted);
+}
+
+.mgdb-home-page a[download] .mgdb-quicklink-label::after,
+.mgdb-home-page a[href*="//download.maizegdb.org"] .mgdb-quicklink-label::after,
+.mgdb-home-page a[href*="box.com"] .mgdb-quicklink-label::after {
+  content: " \2193";
+  font-size: 0.85em;
+  font-weight: 600;
   color: var(--mgdb-muted);
 }
 

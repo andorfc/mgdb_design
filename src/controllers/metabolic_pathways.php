@@ -181,13 +181,16 @@ function mp_opens_new_tab($url) {
     return in_array($sub, $apps, true);
 }
 
+/* No arrow is pasted in here. The "Link arrows" rule in css/mgdb-modern.css
+   draws it from the href -- a down arrow for download.maizegdb.org and Box, an
+   exit arrow for anything off site, nothing for the rest -- so a link can never
+   carry a mark that disagrees with where it points. mp_is_external() still
+   decides the target and the rel. */
 function mp_link($label, $url, $class = '') {
-    $external = mp_is_external($url);
-    $arrow = $external ? '&nearr;' : '&rarr;';
     $attrs = mp_opens_new_tab($url) ? ' target="_blank" rel="noopener"' : '';
     $cls   = $class !== '' ? ' class="' . mp_esc($class) . '"' : '';
     return '<a' . $cls . ' href="' . mp_esc($url) . '"' . $attrs . '>'
-         . mp_esc($label) . ' <span aria-hidden="true">' . $arrow . '</span></a>';
+         . mp_esc($label) . '</a>';
 }
 
 function mp_render_resource($r) {
@@ -432,9 +435,9 @@ $rows = '';
 foreach ($page['top'] as $row) {
     $rows .= '<tr>'
            . '<th scope="row"><a href="' . mp_esc($row['url']) . '" target="_blank" rel="noopener">'
-           . $row['name_html'] . ' <span aria-hidden="true">&nearr;</span></a></th>'
+           . $row['name_html'] . '</a></th>'
            . '<td class="mgdb-sequence"><a href="' . mp_esc($row['metacyc_url']) . '" target="_blank" rel="noopener">'
-           . mp_esc($row['id']) . ' <span aria-hidden="true">&nearr;</span></a></td>'
+           . mp_esc($row['id']) . '</a></td>'
            . '<td>' . mp_esc(implode(', ', $row['assemblies'])) . '</td>'
            . '<td class="mgdb-numeric">' . number_format($row['gene_models']) . '</td>'
            . '<td class="mgdb-numeric">' . number_format($row['proteins']) . '</td>'

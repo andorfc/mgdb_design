@@ -248,7 +248,7 @@
          credits below, and this is space the links needed. */
       var links = '<a class="meeting-archive-link" href="' + row.url + '">Website</a>';
       if (row.abstracts) {
-        links += '<a class="meeting-archive-link" href="' + row.abstracts + '" target="_blank" rel="noopener">Abstract book <span aria-hidden="true">&nearr;</span></a>';
+        links += '<a class="meeting-archive-link" href="' + row.abstracts + '" target="_blank" rel="noopener">Abstract book</a>';
       }
       return '<article class="meeting-archive-card' + (row.canceled ? ' is-canceled' : '') + '">' + media
         + '<span class="meeting-archive-copy"><span class="meeting-archive-year">' + row.year

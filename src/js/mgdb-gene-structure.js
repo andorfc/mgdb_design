@@ -166,6 +166,11 @@
       hot: null,
       viewer: null,
       viewerModel: null,
+      /* The 3D panel opens with the section. It was behind a click because the
+         viewer library is half a megabyte; the library is still only fetched
+         when a model exists to show, and for a gene with no model the panel --
+         and this flag -- never come into play. */
+      modelOpen: true,
       colourBy: 'domains',
       /* 'genome': left to right along the chromosome, so a minus-strand
          transcript reads right to left and the connectors cross on their way
@@ -649,22 +654,39 @@
       modelPanel.appendChild(stageEl);
       modelPanel.appendChild(plddtLegend);
 
-      btn.addEventListener('click', function () {
+      function openViewer() {
         btn.disabled = true;
         btn.textContent = 'Loading the model…';
         stageEl.hidden = false;
         controls.hidden = false;
-        loadViewerLibrary().then(function () {
+        return loadViewerLibrary().then(function () {
           return openModel(viewport, status, model, canonicalOnly);
         }).then(function () {
           btn.hidden = true;
           renderModelControls(controls, plddtLegend, status);
         }).catch(function (err) {
+          /* The button comes back so the reader can retry; a failure here is
+             usually the half-megabyte library not arriving, not a missing
+             model. */
+          state.modelOpen = false;
           btn.disabled = false;
+          btn.hidden = false;
           btn.textContent = 'Show 3D model';
           status.textContent = 'The model could not be loaded' + (err && err.message ? ': ' + err.message : '') + '.';
         });
+      }
+
+      btn.addEventListener('click', function () {
+        state.modelOpen = true;
+        openViewer();
       });
+
+      /* Open by default. The viewer library and the coordinates are still
+         fetched on demand -- they are just demanded straight away now, rather
+         than waiting for a click most readers never made. Selecting another
+         transcript re-renders this panel and reopens it, because state.modelOpen
+         is still true. */
+      if (state.modelOpen) { openViewer(); }
     }
 
     function loadViewerLibrary() {

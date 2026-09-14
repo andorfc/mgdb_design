@@ -322,7 +322,9 @@
   }
 
   function rowHtml(resource) {
-    var arrow = resource.external ? '&nearr;' : '&rarr;';
+    /* No arrow built here: the "Link arrows" rule in css/mgdb-modern.css draws
+       it from the href, so a results row and its section card cannot disagree
+       about the same link. */
     var attrs = resource.external ? ' target="_blank" rel="noopener"' : '';
     var topics = resource.topics.length
       ? resource.topics.map(function (key) {
@@ -340,8 +342,7 @@
       + '<td><span class="ai-topic-chips">' + topics + '</span></td>'
       + '<td>' + (resource.external ? 'External' : 'Internal') + '</td>'
       + '<td class="ai-col-open">'
-      +   '<a href="' + esc(resource.url) + '"' + attrs + '>' + esc(resource.label)
-      +   ' <span aria-hidden="true">' + arrow + '</span></a>'
+      +   '<a href="' + esc(resource.url) + '"' + attrs + '>' + esc(resource.label) + '</a>'
       + '</td>'
       + '</tr>';
   }

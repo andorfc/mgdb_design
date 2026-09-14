@@ -115,21 +115,27 @@ function ai_opens_new_tab($url) {
     return in_array($sub, $apps, true);
 }
 
+/* No arrow is pasted in here. The "Link arrows" rule in css/mgdb-modern.css
+   draws every one from the href: a down arrow for download.maizegdb.org, Box
+   and any file, an exit arrow for anything off site, and nothing for the rest
+   -- which is why the Analysis tools cards carry none, every one of them being
+   a maizegdb.org subdomain. That replaces the per-category rule written here
+   yesterday, which said the same thing in a second place and could drift.
+
+   ai_is_external() still decides the target, the rel and the search filter. */
 function ai_link($label, $url, $class = '') {
-    $external = ai_is_external($url);
-    // &nearr; leaves the site, &rarr; stays on it.
-    $arrow = $external ? '&nearr;' : '&rarr;';
     $attrs = ai_opens_new_tab($url) ? ' target="_blank" rel="noopener"' : '';
     $cls   = $class !== '' ? ' class="' . ai_esc($class) . '"' : '';
     return '<a' . $cls . ' href="' . ai_esc($url) . '"' . $attrs . '>'
-         . ai_esc($label) . ' <span aria-hidden="true">' . $arrow . '</span></a>';
+         . ai_esc($label) . '</a>';
 }
 
 /* One card shape for tools, data, and code. The category drives the top border
    colour through a class, so the three grids read as three groups without any
    per-card styling in the catalog. */
-function ai_render_card($r) {
-    $html  = '<article class="mgdb-card ai-card ai-card-' . ai_esc($r['category']) . '"'
+function ai_render_card($r, $extra_class = '') {
+    $html  = '<article class="mgdb-card ai-card ai-card-' . ai_esc($r['category'])
+           . ($extra_class !== '' ? ' ' . ai_esc($extra_class) : '') . '"'
            . ' id="ai-card-' . ai_esc($r['id']) . '">';
     $html .= '<div class="ai-card-top">';
     if (!empty($r['badge'])) {
@@ -342,27 +348,13 @@ $page = dashboardCache($system, $cache_key, function () use ($catalog_file, $doc
  * -------------------------------------------------------------------------- */
 
 /* Featured tool: the one card that spans its grid. */
-$featured_html = '';
-if (!empty($page['featured_tool'])) {
-    $f = $page['featured_tool'];
-    $featured_html  = '<article class="mgdb-card ai-card ai-card-tool ai-card-featured" id="ai-card-' . ai_esc($f['id']) . '">';
-    $featured_html .= '<div class="ai-card-top">';
-    $featured_html .= '<span class="ai-card-badge">' . ai_esc($f['badge']) . '</span>';
-    $featured_html .= '</div>';
-    $featured_html .= '<h3>' . ai_esc($f['name']) . '</h3>';
-    $featured_html .= '<p>' . ai_esc($f['summary']) . '</p>';
-    $featured_html .= '<div class="ai-card-tags">';
-    foreach ($f['tags'] as $tag) {
-        $featured_html .= '<span>' . ai_esc($tag) . '</span>';
-    }
-    $featured_html .= '</div>';
-    $featured_html .= '<div class="ai-card-links">';
-    $featured_html .= ai_link($f['primary']['label'], $f['primary']['url'], 'ai-card-cta');
-    foreach ((array) (isset($f['links']) ? $f['links'] : array()) as $extra) {
-        $featured_html .= ai_link($extra['label'], $extra['url']);
-    }
-    $featured_html .= '</div></article>';
-}
+/* The featured tool is the same card with one more class on it. It used to be a
+   hand-written near-copy of ai_render_card() -- same markup, minus that
+   function's guards on badge and tags -- and the copy is how the arrow rule
+   above reached seven tool cards and not SNPTools. One renderer now. */
+$featured_html = !empty($page['featured_tool'])
+               ? ai_render_card($page['featured_tool'], 'ai-card-featured')
+               : '';
 
 $content->get('featured_tool')->replace($featured_html);
 $content->get('tool_cards')->replace($page['cards']['tool']);

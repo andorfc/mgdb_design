@@ -682,8 +682,10 @@
 .mgdb-genomes-page .genome-page-ellipsis { padding: 0 var(--mgdb-space-1); color: var(--mgdb-muted); }
 
 /* External links carry an arrow, wherever they appear. */
-.mgdb-genomes-page a[target="_blank"]:not(.mgdb-button)::after { content: " \2197"; font-size: .85em; }
-.mgdb-genomes-page .mgdb-resource-list a[target="_blank"]::after { content: none; }
+/* Rule and opt-out both retired: link arrows are the one href-driven block in
+   mgdb-modern.css ("Link arrows"). What was here keyed on target="_blank",
+   which marks an on-site browser that opens in a new tab as though it had left
+   the site -- JBrowse and GBrowse are exactly that on this page. */
 
 /* --------------------------------------------------------------------------
    Prototype assembly statistics

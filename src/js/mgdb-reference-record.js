@@ -83,11 +83,11 @@
     var actions = [];
     if (citation && citation.doi_url) {
       actions.push('<a class="mgdb-button mgdb-button-primary" href="' + R.escape(citation.doi_url) +
-        '" target="_blank" rel="noopener">Read the paper <span aria-hidden="true">&nearr;</span></a>');
+        '" target="_blank" rel="noopener">Read the paper</a>');
     }
     if (citation && citation.pubmed_url) {
       actions.push('<a class="mgdb-button mgdb-button-secondary" href="' + R.escape(citation.pubmed_url) +
-        '" target="_blank" rel="noopener">PubMed <span aria-hidden="true">&nearr;</span></a>');
+        '" target="_blank" rel="noopener">PubMed</a>');
     }
     actions.push('<a class="mgdb-button mgdb-button-quiet" href="#ref-record-citation">Cite this paper</a>');
     out.insertAdjacentHTML('beforeend', '<div class="mgdb-rec-linkrow">' + actions.join('') + '</div>');

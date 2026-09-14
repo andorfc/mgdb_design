@@ -196,7 +196,7 @@
         { key: 'compare', label: 'Compare', sort: false,
           get: function (m) { return R.absoluteUrl(m.compare_html); },
           html: function (m) { return m.compare_html
-            ? '<a href="' + R.escape(m.compare_html) + '">Compare with this map <span aria-hidden="true">&rarr;</span></a>'
+            ? '<a href="' + R.escape(m.compare_html) + '">Compare with this map</a>'
             : '—'; } },
         R.urlColumn(function (m) { return m.html; })
       ]

@@ -321,6 +321,27 @@
   text-decoration: underline;
 }
 
+/* A pointer from an event to the resource it produced -- the 1932 Maize News
+   Letter card to the archive of every issue, for one. Same box as the
+   publication line above it so a card carrying both reads as one stack, but in
+   the page's green rather than muted grey: this one goes somewhere on the
+   site, where a publication line is a citation that may not be a link at all. */
+.mgdb-history-page .timeline-event-link {
+  font-size: var(--mgdb-text-xs);
+  padding: 6px 10px;
+  border-radius: var(--mgdb-radius-sm);
+  margin-top: var(--mgdb-space-2);
+  background: var(--mgdb-green-soft, var(--mgdb-surface-alt));
+}
+
+.mgdb-history-page .timeline-event-link a {
+  color: var(--mgdb-green-dark);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.mgdb-history-page .timeline-event-link a:hover { text-decoration: underline; }
+
 .mgdb-history-page .timeline-event-media {
   margin-top: var(--mgdb-space-3);
   text-align: center;

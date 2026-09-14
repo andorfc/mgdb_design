@@ -45,8 +45,45 @@ $mgdb->get('server-url')->replace($system['root_url']);
 
 $content = $mgdb->get('body')->load('templates/static/mgdb_history.bau');
 
-// Cached corpus statistics and timeline events
-$page_data = dashboardCache($system, 'history/page', function () use ($DBConn) {
+/* Links the timeline should carry that mgdb.maize_history has no column for.
+   Keyed "<year>|<lowercased title>". The web user has SELECT only on that
+   table, so a curated pointer like this cannot live in the data. */
+$MGDB_HISTORY_LINKS = array(
+    '1932|maize news letter' => array(
+        'href'  => '/mnl',
+        'label' => 'Browse the Maize News Letter archive, every issue since 1929',
+    ),
+    '2000|maize genetics executive committee' => array(
+        'href'  => '/mgec',
+        'label' => 'Browse the MGEC archive, its record from 2000 to 2019',
+    ),
+    /* The Stock Center is a living collection, not a closed archive, so this
+       points at the hub that searches its holdings rather than at
+       /stock_catalog, which lists only recent additions. */
+    '1953|maize genetics stock center' => array(
+        'href'  => '/data_center/stock',
+        'label' => 'Browse the Stock Center collection, its stocks and germplasm',
+    ),
+    '2005|maizegdb editorial board' => array(
+        'href'  => '/hot_new_papers',
+        'label' => 'Browse the Editorial Board archive, its recommendations by year',
+    ),
+    /* Trailing slash deliberately: /maize_meeting is a 301 to /maize_meeting/,
+       and the megamenu already links the slashed form. */
+    '1959|first maize genetics conference' => array(
+        'href'  => '/maize_meeting/',
+        'label' => 'Browse the Maize Genetics Conference archive, its past meetings and abstracts',
+    ),
+);
+
+/* The cache key carries this file's mtime as well as the data's.
+   dashboardCache() keys on the string it is handed plus a global stamp, and
+   the whole events payload -- markup included -- is built in the closure
+   below, so without the mtime a warm server keeps serving HTML that predates
+   any edit to this renderer. That is exactly what happened to two other pages
+   before it was written down. */
+$page_data = dashboardCache($system, 'history/page_' . (int) @filemtime(__FILE__),
+                            function () use ($DBConn, $MGDB_HISTORY_LINKS) {
     $events = array();
     $breakthroughs = 0;
     $meetings = 0;
@@ -61,6 +98,30 @@ $page_data = dashboardCache($system, 'history/page', function () use ($DBConn) {
             $events = $sth->fetchAll(PDO::FETCH_ASSOC);
         }
     }
+
+    /* mgdb.maize_history carries a true duplicate: ids 13 and 29 are both
+       "MaizeDB" 1994, identical in every field a reader sees, differing only
+       in event_type -- "cooperative resource" against "cooperative_resource",
+       a spelling the renderer below normalises anyway, so the page drew the
+       same card twice. The web user has SELECT only on this table, so the row
+       cannot be removed from here; it is recorded in ADMIN_DEPENDENCIES.md for
+       whoever can. Meanwhile the page must not show it twice.
+
+       Year + title + description is the identity: three fields identical means
+       one event entered twice, and it leaves genuinely distinct events that
+       happen to share a year and a title alone. The first row wins, which
+       under the query's ORDER BY is the lowest id. */
+    $seen_events = array();
+    $unique_events = array();
+    foreach ($events as $e) {
+        $identity = strtolower(trim((string) (isset($e['year']) ? $e['year'] : '')) . '|' .
+                               trim((string) (isset($e['title']) ? $e['title'] : '')) . '|' .
+                               trim((string) (isset($e['description']) ? $e['description'] : '')));
+        if (isset($seen_events[$identity])) { continue; }
+        $seen_events[$identity] = true;
+        $unique_events[] = $e;
+    }
+    $events = $unique_events;
 
     $events_html = '';
     $count = 0;
@@ -98,10 +159,24 @@ $page_data = dashboardCache($system, 'history/page', function () use ($DBConn) {
         $caption = isset($e['image_caption']) ? trim($e['image_caption']) : '';
         $credit  = isset($e['image_credit']) ? trim($e['image_credit']) : '';
 
+        /* A resource this timeline should point at, which mgdb.maize_history
+           has no column for and which cannot be added to it from here. Keyed
+           on year and title rather than id, so it survives a reload of the
+           table. */
+        $link_key = $year . '|' . strtolower(trim(isset($e['title']) ? $e['title'] : ''));
+        $extra_html = '';
+        if (isset($MGDB_HISTORY_LINKS[$link_key])) {
+            $extra = $MGDB_HISTORY_LINKS[$link_key];
+            $extra_html = '<div class="timeline-event-link"><a href="' .
+                htmlspecialchars($extra['href'], ENT_QUOTES, 'UTF-8') . '">' .
+                htmlspecialchars($extra['label'], ENT_QUOTES, 'UTF-8') .
+                '</a></div>';
+        }
+
         $pub_html = '';
         if ($pub !== '') {
             if ($pub_link !== '') {
-                $pub_html = '<div class="timeline-event-pub"><strong>Publication:</strong> <a href="' . htmlspecialchars($pub_link) . '" target="_blank" rel="noopener">' . htmlspecialchars($pub) . ' &#8599;</a></div>';
+                $pub_html = '<div class="timeline-event-pub"><strong>Publication:</strong> <a href="' . htmlspecialchars($pub_link) . '" target="_blank" rel="noopener">' . htmlspecialchars($pub) . '</a></div>';
             } else {
                 $pub_html = '<div class="timeline-event-pub"><strong>Publication:</strong> ' . htmlspecialchars($pub) . '</div>';
             }
@@ -134,6 +209,7 @@ $page_data = dashboardCache($system, 'history/page', function () use ($DBConn) {
             $events_html .= '    <div class="timeline-card-desc">' . $desc . '</div>';
         }
         $events_html .= $pub_html;
+        $events_html .= $extra_html;
         $events_html .= $image_html;
         $events_html .= '  </div>';
         $events_html .= '</article>';

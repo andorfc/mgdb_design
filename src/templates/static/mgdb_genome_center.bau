@@ -1,6 +1,6 @@
 $$SYNTAX-LEVEL 2
 *(mgdb-genome-center
-<main class="mgdb-page mgdb-hub-page mgdb-genomes-page" id="mgdb-genome-main">
+<main class="mgdb-page mgdb-arrows-v2 mgdb-hub-page mgdb-genomes-page" id="mgdb-genome-main">
 
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
     <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Genome Data Hub</span>
@@ -13,7 +13,7 @@ $$SYNTAX-LEVEL 2
     </div>
     <div class="mgdb-hero-body">
       <h1 id="genome-title">MaizeGDB genomic datasets</h1>
-      <p class="mgdb-hero-description">MaizeGDB hosts $(total-assemblies) genome datasets from $(total-species) species, including five versions of the representative maize genome, B73.</p>
+      <p class="mgdb-hero-description">MaizeGDB hosts $(total-assemblies) genome datasets from $(total-species) species, including every released version of the representative maize genome, B73.</p>
     </div>
   </section>
 
@@ -154,7 +154,7 @@ $$SYNTAX-LEVEL 2
       <div class="mgdb-table-scroll" id="genome-table-view" tabindex="0" role="region" aria-labelledby="genome-results-title">
         <table class="mgdb-table" id="genome-table">
           <caption>
-            <span class="mgdb-muted">Read live from the assembly database, B73 representative genome first. Quality is the curated Representative, Reference or Draft designation where the database carries one, and is otherwise read from the REFERENCE or DRAFT token in the assembly name; blank fields are shown as &ldquo;Not reported&rdquo; rather than left empty.</span>
+            <span class="mgdb-muted">Genome quality is classified as Representative, Reference, or Draft. Representative denotes the high-quality, well-curated, historically important B73 maize genome, which serves as the representative genome for <i>Zea mays</i>. Reference denotes a high-quality genome assembly organized into chromosome-scale pseudomolecules. Draft denotes an assembly that is generally less complete and remains primarily at the contig or scaffold level. Genomes for which a quality designation has not been assigned are listed as &ldquo;Not reported.&rdquo; Where the database carries no designation, the one shown is read from the REFERENCE or DRAFT token in the assembly name.</span>
           </caption>
           <thead>
             <tr>

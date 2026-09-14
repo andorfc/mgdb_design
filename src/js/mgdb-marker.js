@@ -411,7 +411,7 @@
         +      commentsHtml
         + '  </div>'
         + '  <div class="marker-card-links">'
-        + '    <a href="' + recordUrl + '">View Record &rarr;</a>'
+        + '    <a href="' + recordUrl + '">View Record</a>'
         + '    <button class="marker-copy-btn" type="button" data-copy-value="' + esc(name) + '">Copy Name</button>'
         + '    <button class="marker-copy-btn" type="button" data-copy-value="' + esc(row.id) + '">Copy ID</button>'
         + '  </div>'

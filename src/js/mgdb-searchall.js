@@ -308,7 +308,7 @@
       var link = el('a', 'sa-see-all');
       link.href = urlFor(state.term, section.key, 1, state.comments);
       link.textContent = 'See all ' + count(section.count) + ' ' +
-        section.label.toLowerCase() + ' →';
+        section.label.toLowerCase();
       link.addEventListener('click', function (event) {
         event.preventDefault();
         go(section.key, 1);

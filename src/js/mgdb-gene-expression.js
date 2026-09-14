@@ -449,7 +449,7 @@
       footer.appendChild(note);
       var links = html('div', 'ge-footer-links');
       if (spec.qteller) {
-        links.innerHTML = '<a class="mgdb-button mgdb-button-primary mgdb-button-sm" href="' + esc(spec.qteller) + '" target="_blank" rel="noopener">Open in qTeller <span aria-hidden="true">&nearr;</span></a>';
+        links.innerHTML = '<a class="mgdb-button mgdb-button-primary mgdb-button-sm" href="' + esc(spec.qteller) + '" target="_blank" rel="noopener">Open in qTeller</a>';
       }
       footer.appendChild(links);
     }

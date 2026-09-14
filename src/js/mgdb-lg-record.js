@@ -174,7 +174,7 @@
           html: function (e) {
             return e.html
               ? '<a href="' + R.escape(e.html) + '" target="_blank" rel="noopener">' +
-                R.escape(e.accession) + ' <span aria-hidden="true">&nearr;</span></a>'
+                R.escape(e.accession) + '</a>'
               : R.escape(e.accession);
           } }
       ]

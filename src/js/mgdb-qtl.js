@@ -563,7 +563,7 @@
         + '    </div>'
         + '  </div>'
         + '  <div class="qtl-card-links">'
-        + '    <a href="' + recordUrl + '">View QTL &rarr;</a>'
+        + '    <a href="' + recordUrl + '">View QTL</a>'
         + '    <button class="qtl-copy-btn" type="button" data-copy-value="' + esc(item.name || '') + '">Copy Symbol</button>'
         + (item.trait_name ? '    <button class="qtl-copy-btn" type="button" data-copy-value="' + esc(item.trait_name) + '">Copy Trait</button>' : '')
         + '  </div>'

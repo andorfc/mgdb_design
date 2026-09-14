@@ -319,7 +319,7 @@
         metaHtml +
       '</div>' +
       '<div class="gene-card-actions">' +
-        '<a href="' + esc(modelUrl) + '">View gene model &rarr;</a>' +
+        '<a href="' + esc(modelUrl) + '">View gene model</a>' +
         '<div class="gene-card-copy-btns">' + copyButtons + '</div>' +
       '</div>' +
     '</article>';
@@ -357,7 +357,7 @@
         metaHtml +
       '</div>' +
       '<div class="gene-card-actions">' +
-        '<a href="' + esc(locusUrl) + '">View locus details &rarr;</a>' +
+        '<a href="' + esc(locusUrl) + '">View locus details</a>' +
         '<div class="gene-card-copy-btns">' + copyButtons + '</div>' +
       '</div>' +
     '</article>';

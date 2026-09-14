@@ -378,7 +378,7 @@
 
     var orderLink = '';
     if (row.provider && row.provider.indexOf('Stock Center') !== -1) {
-      orderLink = '<a href="https://maizecoopsc.org/" target="_blank" rel="noopener">Order seed &nearr;</a>';
+      orderLink = '<a href="https://maizecoopsc.org/" target="_blank" rel="noopener">Order seed</a>';
     }
 
     return '<article class="stock-card" data-stock-id="' + escapeHtml(row.id || row.grin_id || '') + '">' +
@@ -391,7 +391,7 @@
         descHtml +
       '</div>' +
       '<div class="stock-card-actions">' +
-        '<a href="' + linkUrl + '">Stock record &rarr;</a>' +
+        '<a href="' + linkUrl + '">Stock record</a>' +
         orderLink +
       '</div>' +
     '</article>';
@@ -432,7 +432,7 @@
 
       var actionCell = '<a href="' + linkUrl + '">Record</a>';
       if (row.provider && row.provider.indexOf('Stock Center') !== -1) {
-        actionCell += ' · <a href="https://maizecoopsc.org/" target="_blank" rel="noopener">Order &nearr;</a>';
+        actionCell += ' · <a href="https://maizecoopsc.org/" target="_blank" rel="noopener">Order</a>';
       }
 
       return '<tr>' +

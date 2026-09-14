@@ -1,6 +1,6 @@
 $$SYNTAX-LEVEL 2
 *(mgdb-cite
-<main class="mgdb-page mgdb-cite-page" id="mgdb-cite-main">
+<main class="mgdb-page mgdb-arrows-v2 mgdb-hub-page mgdb-cite-page" id="mgdb-cite-main">
 
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
     <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap#sm-about">About</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">Cite us</span>
@@ -20,7 +20,17 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
-  <section aria-labelledby="cite-primary-title">
+  <!-- The same sticky bar every other modern page carries. Labels are the
+       section headings shortened, never reworded, and js/mgdb-cite.js opts in
+       to the shared scrollspy. The page is 240 publications long, so this is
+       the only way back to the citation itself from the foot. -->
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#cite-primary">When citing MaizeGDB</a>
+    <a href="#cite-metrics">Metrics</a>
+    <a href="#cite-publications">Other publications</a>
+  </nav>
+
+  <section id="cite-primary" aria-labelledby="cite-primary-title">
     <div class="mgdb-section-heading">
       <div><h2 id="cite-primary-title">When citing MaizeGDB, please use</h2></div>
       <p>The current reference for the resource as a whole.</p>
@@ -35,13 +45,24 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
-  <section aria-labelledby="cite-metrics-title">
-    <h2 class="mgdb-visually-hidden" id="cite-metrics-title">Publication record at a glance</h2>
+  <!-- Metrics. A visible heading, like every other modern page: it was
+       .mgdb-visually-hidden, so the section the tab bar now points at had no
+       name on screen. The cards are the shared .mgdb-metric, which the hub
+       shell gives its four colours; .mgdb-metric-quiet took none of them.
+
+       "publication categories" is gone. It counted this page's own group
+       headings -- a measurement of the markup, not of the record. Distinct
+       journals is a fact about the publications themselves, and the controller
+       counts it, as it does the year span. -->
+  <section id="cite-metrics" aria-labelledby="cite-metrics-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="cite-metrics-title">Metrics</h2></div>
+    </div>
     <div class="mgdb-metric-grid">
-      <article class="mgdb-metric-quiet"><strong class="mgdb-metric-value">$(publication_count)</strong><p>MaizeGDB publications listed</p></article>
-      <article class="mgdb-metric-quiet"><strong class="mgdb-metric-value mgdb-metric-value-compact">2003&ndash;2026</strong><p>publication years covered</p></article>
-      <article class="mgdb-metric-quiet"><strong class="mgdb-metric-value">4</strong><p>publication categories</p></article>
-      <article class="mgdb-metric-quiet"><strong class="mgdb-metric-value">$(journal_count)</strong><p>refereed journal articles</p></article>
+      <article class="mgdb-metric"><strong class="mgdb-metric-value">$(publication_count)</strong><p>MaizeGDB publications listed</p></article>
+      <article class="mgdb-metric"><strong class="mgdb-metric-value">$(journal_count)</strong><p>refereed journal articles</p></article>
+      <article class="mgdb-metric"><strong class="mgdb-metric-value">$(journal_venues)</strong><p>journals represented</p></article>
+      <article class="mgdb-metric"><strong class="mgdb-metric-value mgdb-metric-value-compact">$(year_span)</strong><p>publication years covered</p></article>
     </div>
   </section>
 

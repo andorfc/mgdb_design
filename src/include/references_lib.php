@@ -194,7 +194,7 @@ function mgdb_render_reference($row, $seq) {
     $html .= '<h3 class="mgdb-ref-title">';
     $html .= $url !== ''
            ? '<a href="' . mgdb_ref_esc($url) . '" target="_blank" rel="noopener">' . mgdb_ref_esc($row['title'])
-             . ' <span aria-hidden="true">&nearr;</span></a>'
+             . '</a>'
            : mgdb_ref_esc($row['title']);
     $html .= '</h3>';
 
@@ -228,16 +228,16 @@ function mgdb_render_reference($row, $seq) {
     $html .= '<div class="mgdb-ref-actions">';
     if ($url !== '') {
         $html .= '<a class="mgdb-button mgdb-button-primary" href="' . mgdb_ref_esc($url)
-               . '" target="_blank" rel="noopener">Full text <span aria-hidden="true">&nearr;</span></a>';
+               . '" target="_blank" rel="noopener">Full text</a>';
     }
     if (!empty($row['pubmed'])) {
         $html .= '<a class="mgdb-button mgdb-button-secondary" href="https://pubmed.ncbi.nlm.nih.gov/'
                . mgdb_ref_esc($row['pubmed']) . '/" target="_blank" rel="noopener">PubMed '
-               . mgdb_ref_esc($row['pubmed']) . ' <span aria-hidden="true">&nearr;</span></a>';
+               . mgdb_ref_esc($row['pubmed']) . '</a>';
     }
     if (!empty($row['record'])) {
         $html .= '<a class="mgdb-button mgdb-button-quiet" href="' . mgdb_ref_esc($row['record'])
-               . '">MaizeGDB record <span aria-hidden="true">&rarr;</span></a>';
+               . '">MaizeGDB record</a>';
     }
     $html .= '<button class="mgdb-ref-copy" type="button" data-copy-target="' . $cite_id . '">Copy citation</button>';
     if ($doi !== '') {

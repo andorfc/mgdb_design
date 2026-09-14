@@ -155,7 +155,7 @@
     echo '          <td>' . $inst_html . '</td>';
     echo '          <td>' . $place_html . '</td>';
     echo '          <td class="text-right">';
-    echo '            <a href="/person?id=' . $id . '" class="person-view-btn">View Profile &rarr;</a>';
+    echo '            <a href="/person?id=' . $id . '" class="person-view-btn">View Profile</a>';
     echo '          </td>';
     echo '        </tr>';
   }

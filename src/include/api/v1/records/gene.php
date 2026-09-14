@@ -169,7 +169,23 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
       (SELECT count(*) FROM mgdb.memo WHERE id = :c_l8) AS comments,
       (SELECT pan_gene_count FROM chado.pan_gene
          WHERE gene_model_name = :c_gm6 LIMIT 1) AS pan_gene_members,
-      (SELECT count(*) FROM chado.gene_model WHERE locus_id = :c_l9) AS locus_gene_models";
+      (SELECT count(*) FROM chado.gene_model WHERE locus_id = :c_l9) AS locus_gene_models,
+      /* Mutant phenotype images and Stock Center stocks both hang off the
+         locus through its variations, which is why neither has a gene-model
+         form: an image is of an allele, not of an annotation. DISTINCT on
+         (url, caption) here because the same photograph is filed against
+         several alleles of one locus and the section lists it once. */
+      (SELECT count(*) FROM (
+         SELECT DISTINCT wi.url, wi.caption
+         FROM mgdb.web_image wi
+           JOIN mgdb.variation v ON v.id = wi.id
+           JOIN mgdb.id_num iv ON iv.id = v.id AND iv.curation_lvl = 0
+         WHERE v.variationof = :c_l10) im) AS images,
+      (SELECT count(DISTINCT s.id) FROM mgdb.stock s
+         JOIN mgdb.id_num istk ON istk.id = s.id AND istk.curation_lvl = 0
+         JOIN mgdb.stock_genotypic_var sgv ON sgv.id = s.id
+         JOIN mgdb.variation v2 ON v2.id = sgv.variation
+       WHERE v2.variationof = :c_l11) AS stocks";
 
   $counts_row = retrieve_row(make_query($DBConn, $counts_sql, 1, array(
     'c_gm1' => $gene_name, 'c_ver1' => $annotation_version,
@@ -180,7 +196,8 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
     'c_gm5' => $gene_name,
     'c_l2' => $locus_id, 'c_l3' => $locus_id, 'c_l4' => $locus_id, 'c_l5' => $locus_id,
     'c_l6' => $locus_id, 'c_l7' => $locus_id, 'c_l8' => $locus_id,
-    'c_gm6' => $gene_name, 'c_l9' => $locus_id
+    'c_gm6' => $gene_name, 'c_l9' => $locus_id,
+    'c_l10' => $locus_id, 'c_l11' => $locus_id
   )));
   MgdbApi::countQuery();
 
@@ -202,7 +219,9 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
     'map_positions' => (int) $counts_row['map_positions'],
     'comments' => (int) $counts_row['comments'],
     'pan_gene_members' => (int) $counts_row['pan_gene_members'],
-    'locus_gene_models' => (int) $counts_row['locus_gene_models']
+    'locus_gene_models' => (int) $counts_row['locus_gene_models'],
+    'images' => (int) $counts_row['images'],
+    'stocks' => (int) $counts_row['stocks']
   );
 
   $sections = array();
@@ -777,7 +796,8 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
       while ($row = retrieve_row($sth)) {
         $insertions[] = array(
           'name' => MgdbApi::text($row['insertion']),
-          'variations' => gene_api_json_refs($row['variations'], 'variation', null),
+          'variations' => gene_api_json_refs($row['variations'], 'variation',
+                                             '/data_center/variation?id='),
           'gene_structures' => MgdbApi::text($row['gene_structures']),
           'source' => MgdbApi::text($row['source']),
           'chromosome' => MgdbApi::text($row['chromosome']),
@@ -954,15 +974,53 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
     }
 
     $measured['pan_gene.members'] = count($members);
+
+    /* Read before the cap: a pan-gene with more members than max_items would
+       otherwise lose its B73 row and with it the figure. */
+    $b73_member = null;
+    foreach ($members as $member) {
+      if ($member['assembly'] === 'Zm-B73-REFERENCE-NAM-5.0') { $b73_member = $member['name']; break; }
+    }
+
     list($members, $cut) = MgdbApi::cap($members, $max_items);
     if ($cut) { $truncated[] = 'pan_gene.members'; }
+
+    /* The pangenome view.
+
+       Genomic sequence at the B73 gene model's location across the assemblies,
+       drawn by the cactus-Minigraph pangenome pipeline and published as one PNG
+       per B73 v5 gene model. Keyed on the B73 NAM-5.0 member of the pan-gene, so
+       a Mo17 or W22 record gets the picture of its own cluster rather than
+       nothing.
+
+       As with the phylostrata figure, availability is a naming convention and
+       the URL is emitted without checking it. The legacy page ran a blocking
+       get_headers() per record to decide. */
+    $pangenome_image = null;
+    if ($pan !== null) {
+      $b73 = $b73_member;
+      if ($b73 === null && $assembly_version === 'Zm-B73-REFERENCE-NAM-5.0') { $b73 = $gene_name; }
+      if ($b73 !== null) {
+        $pangenome_image = array(
+          'gene_model' => $b73,
+          'url' => 'https://images.maizegdb.org/pangenome/' . rawurlencode($b73) . '_sorted.png',
+          'pipeline' => 'cactus-Minigraph pangenome pipeline',
+          'pipeline_url' => 'https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md',
+          'produced' => 'MaizeGDB, 2026',
+          'description' => 'Genomic sequence at the B73 gene model location across '
+            . 'multiple assemblies. Where present, the merged CDSs (dark yellow) and '
+            . 'UTRs (aqua) in the subgraph space are also shown.'
+        );
+      }
+    }
 
     $sections['pan_gene'] = array(
       'pan_gene' => $pan,
       'members' => $members,
       'assemblies' => $assemblies,
       'assembly_count' => count($assemblies),
-      'species' => gene_api_species_groups($assemblies)
+      'species' => gene_api_species_groups($assemblies),
+      'pangenome_image' => $pangenome_image
     );
   }
 
@@ -998,17 +1056,62 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
         $key = $type . '|' . $value;
         if (isset($seen_ortho[$key])) { continue; }
         $seen_ortho[$key] = true;
+        $via = MgdbApi::text($row['member']);
         $orthologs[] = array(
-          'via' => MgdbApi::text($row['member']),
-          'is_direct' => (MgdbApi::text($row['member']) === $gene_name),
+          'via' => $via,
+          'via_html' => $via === null ? null : ('/gene_center/gene/' . rawurlencode($via)),
+          'is_direct' => ($via === $gene_name),
           'kind' => $type,
           'species' => gene_api_ortholog_species($type),
           'identifier' => $value,
+          /* The identifier alone is not usable: a reader wants the record at
+             the database that assigned it. Gramene's cross-species search
+             resolves every grass identifier here, and TAIR resolves the
+             Arabidopsis ones. Ported from getOrthologLink() in
+             record_data/gene_data_lib.php, which the modern page had dropped --
+             so the section listed bare accessions with nothing to click. */
+          'url' => gene_api_ortholog_url($type, $value),
           'analysis' => MgdbApi::text($row['analysis'])
         );
       }
     }
-    $sections['orthologs'] = array('orthologs' => $orthologs);
+
+    /* Phylostrata.
+
+       An image per gene model, rendered by the phylostratR analysis and served
+       from the image server. There is no row for it in the database -- the
+       analysis published a directory of PNGs keyed on the B73 v5 gene model
+       name -- so availability is a naming convention, not a query.
+
+       The legacy page settled that with a blocking get_headers() call per
+       record, which costs a network round trip inside the request. The URL is
+       emitted here for the assembly and model type the analysis covered and
+       the browser's own load failure hides the figure, which costs nothing and
+       cannot stall a page render. */
+    $phylostrata = null;
+    if ($gene_name !== null && $assembly_version === 'Zm-B73-REFERENCE-NAM-5.0'
+        && $record && trim((string) $record['model_type']) === 'protein_coding') {
+      $ps_base = 'https://images.maizegdb.org/phylostrata/B73_phylostrata_images/output_images/';
+      $phylostrata = array(
+        'gene_model' => $gene_name,
+        'image' => $ps_base . rawurlencode($gene_name) . '.png',
+        'thumbnail' => $ps_base . 'downsized/' . rawurlencode($gene_name) . '.jpg',
+        'details_url' => 'https://phylostrata.maizegdb.org/gene_pages/index.html?page='
+                       . rawurlencode($gene_name),
+        'about_url' => 'https://phylostrata.maizegdb.org/#about',
+        'scale' => array('min' => 1, 'max' => 14,
+                         'min_label' => 'cellular organisms', 'max_label' => 'Zea mays mays'),
+        'description' => 'Phylostratigraphy determines the level of evolutionary '
+          . 'conservation of a given protein, shown here on a scale from 1 '
+          . '(cellular organisms, most conserved) to 14 (Zea mays mays, least '
+          . 'conserved).'
+      );
+    }
+
+    $sections['orthologs'] = array(
+      'orthologs' => $orthologs,
+      'phylostrata' => $phylostrata
+    );
   }
 
   /////
@@ -1090,6 +1193,91 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
         'is_current' => (trim((string) $row['analysis_is_current']) === 'yes'),
         'is_current_record' => ($name === $gene_name),
         'html' => '/gene_center/gene/' . rawurlencode($name)
+      );
+    }
+
+    /* Mutant phenotype images.
+
+       The legacy page called these "Images of {name} expression" and drew them
+       in a jCarousel iframe -- tools/car/examples/locus_carousel.php -- with the
+       captions folded away behind a "Captions" toggle in a table underneath. The
+       photographs are of mutant kernels and plants, not of gene expression, so
+       the section is named for what they show; the caption is the point of the
+       picture and travels with it.
+
+       An image is filed against a VARIATION, not against the locus, so the same
+       photograph of an ear segregating for several genes is stored once per
+       allele it illustrates. DISTINCT ON (url, caption) is the legacy behaviour
+       and is right: the reader wants the picture once. The variation it is
+       carried on is kept so the card can link to that record. */
+    $images = array();
+    $sth = make_query($DBConn, "
+      SELECT DISTINCT ON (wi.url, wi.caption)
+             wi.url, wi.caption, v.id AS variation_id, v.name AS variation,
+             t.name AS variation_type
+      FROM mgdb.web_image wi
+        JOIN mgdb.variation v ON v.id = wi.id
+        JOIN mgdb.id_num iv ON iv.id = v.id AND iv.curation_lvl = 0
+        LEFT JOIN mgdb.term t ON t.id = v.type
+      WHERE v.variationof = :lid
+      ORDER BY wi.url, wi.caption", 1, array('lid' => $locus_id));
+    MgdbApi::countQuery();
+    while ($row = retrieve_row($sth)) {
+      $img_path = MgdbApi::text($row['url']);
+      if ($img_path === null) { continue; }
+      $images[] = array(
+        'url' => MgdbApi::imageUrl('Variation', $img_path),
+        /* The 100px-wide variant the image server generates. Carried for a
+           client that wants an icon; the card on this page uses the full image,
+           which is the only sharp source at card size. */
+        'thumbnail' => MgdbApi::imageUrl('Variation', $img_path, true),
+        'caption' => MgdbApi::text($row['caption']),
+        'variation' => MgdbApi::ref('variation', $row['variation_id'], $row['variation'],
+                                    '/data_center/variation?id='),
+        'variation_type' => MgdbApi::text($row['variation_type'])
+      );
+    }
+
+    /* Stocks.
+
+       Seed stocks carrying an allele of this locus. Reached the same way the
+       images are -- through the locus's variations -- so one stock appears once
+       however many of its alleles belong here, with the alleles listed in the
+       row. `available_from` is what makes a row actionable: a Maize Genetics
+       Cooperation Stock Center row can be ordered, and the rest cannot.
+
+       The legacy version of this ran on the locus record only and bolded the
+       Stock Center rows with an <b> tag inside the data. The flag is a field
+       here and the table styles it. */
+    $stocks = array();
+    $sth = make_query($DBConn, "
+      SELECT s.id, s.name, d.description AS full_name, t.name AS type,
+             p.name AS available_from, dev.name AS developer, s.coop_id,
+             string_agg(DISTINCT v.name, ', ') AS alleles
+      FROM mgdb.stock s
+        JOIN mgdb.id_num istk ON istk.id = s.id AND istk.curation_lvl = 0
+        JOIN mgdb.stock_genotypic_var sgv ON sgv.id = s.id
+        JOIN mgdb.variation v ON v.id = sgv.variation AND v.variationof = :lid
+        LEFT JOIN mgdb.description d ON d.id = s.id
+        LEFT JOIN mgdb.term t ON t.id = s.type
+        LEFT JOIN mgdb.person p ON p.id = s.available_from
+        LEFT JOIN mgdb.person dev ON dev.id = s.developer
+      GROUP BY s.id, s.name, d.description, t.name, p.name, dev.name, s.coop_id
+      ORDER BY lower(s.name)", 1, array('lid' => $locus_id));
+    MgdbApi::countQuery();
+    while ($row = retrieve_row($sth)) {
+      $stock_source = MgdbApi::text($row['available_from']);
+      $stocks[] = array(
+        'id' => MgdbApi::int($row['id']),
+        'name' => MgdbApi::text($row['name']),
+        'full_name' => MgdbApi::text($row['full_name']),
+        'type' => MgdbApi::text($row['type']),
+        'available_from' => $stock_source,
+        'from_stock_center' => ($stock_source === 'Maize Genetics Cooperation - Stock Center'),
+        'developer' => MgdbApi::text($row['developer']),
+        'coop_id' => MgdbApi::text($row['coop_id']),
+        'alleles' => MgdbApi::text($row['alleles']),
+        'html' => '/data_center/stock/' . (int) $row['id']
       );
     }
 
@@ -1283,11 +1471,17 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
 
     $measured['locus.map_positions'] = count($map_positions);
     $measured['locus.associated_gene_models'] = count($associated);
+    $measured['locus.images'] = count($images);
+    $measured['locus.stocks'] = count($stocks);
 
     list($map_positions, $cut) = MgdbApi::cap($map_positions, $max_items);
     if ($cut) { $truncated[] = 'locus.map_positions'; }
     list($associated, $cut) = MgdbApi::cap($associated, $max_items);
     if ($cut) { $truncated[] = 'locus.associated_gene_models'; }
+    list($images, $cut) = MgdbApi::cap($images, $max_items);
+    if ($cut) { $truncated[] = 'locus.images'; }
+    list($stocks, $cut) = MgdbApi::cap($stocks, $max_items);
+    if ($cut) { $truncated[] = 'locus.stocks'; }
 
     $sections['locus'] = array(
       'id' => $locus_id,
@@ -1300,6 +1494,11 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
       'synonyms' => $synonyms,
       'comments' => $comments,
       'associated_gene_models' => $associated,
+      /* Every annotation in `associated_gene_models` is a B73 release for all
+         but about fifty loci site-wide, so the page titles that block "B73 gene
+         models"; it checks the rows rather than trusting the pattern. */
+      'images' => $images,
+      'stocks' => $stocks,
       'map_positions' => $map_positions,
       'phenotypes' => $phenotypes,
       'related_loci' => $related_loci,
@@ -1451,6 +1650,8 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
     'pan_gene.members' => 'pan_gene_members',
     'locus.map_positions' => 'map_positions',
     'locus.associated_gene_models' => 'locus_gene_models',
+    'locus.images' => 'images',
+    'locus.stocks' => 'stocks',
     'xrefs' => 'xrefs'
   );
   foreach ($expected as $path => $count_key) {
@@ -1864,6 +2065,21 @@ function gene_api_ortholog_species($kind) {
   );
   return isset($species[$kind]) ? $species[$kind] : null;
 }//gene_api_ortholog_species
+
+
+/* Where an ortholog identifier resolves.
+
+   Ported from getOrthologLink() in record_data/gene_data_lib.php. Every grass
+   identifier here -- Ensembl Plants, Phytozome and MSU/RAP forms alike -- is
+   resolved by Gramene's cross-species search; Arabidopsis loci go to TAIR. */
+function gene_api_ortholog_url($kind, $identifier) {
+  if ($identifier === null || $identifier === '') { return null; }
+  if (strpos($kind, 'arabidopsis') === 0) {
+    return 'https://www.arabidopsis.org/locus?name=' . rawurlencode($identifier);
+  }
+  return 'https://ensembl.gramene.org/Multi/Search/Results'
+       . '?species=all;idx=;site=ensemblunit;q=' . rawurlencode($identifier);
+}//gene_api_ortholog_url
 
 
 /* Expression descriptors. No query and no server-side fetch.

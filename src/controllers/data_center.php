@@ -121,6 +121,27 @@
     exit;
   }
 
+  /* The two surviving locus reports are modernized (2026-09-13).
+
+     ?report=transgene and ?report=family only. `genes` and `candidate` were
+     retired on 2026-09-06 and their 301s live in the original controller
+     below, which still serves any other value of `report` -- and the bare
+     /data_center/locus-reports with no report at all.
+
+     The modern controller returns false for a report it does not handle, so
+     anything it does not recognize falls through to that original code rather
+     than erroring. Rollback: delete this block.
+     Pre-redesign originals are archived in the redesign repo under
+     legacy/locus-reports/. */
+  if (defined('PAGE') && PAGE == 'locus-reports') {
+    $lr_report = strtolower((string) getCGIParam('report', 'GP', ''));
+    if ($lr_report == 'transgene' || $lr_report == 'family') {
+      if (include('controllers/data_center/locus_reports_modern.php')) {
+        return;
+      }
+    }
+  }
+
   /* The Data Hub directory (/data_center/). The controller root is an
      interactive discovery hub and metrics dashboard across all active data hubs. */
   if (!defined('PAGE') || !PAGE || PAGE == 'data_center' || PAGE == 'index') {

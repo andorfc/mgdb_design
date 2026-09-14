@@ -1,0 +1,141 @@
+/* ==========================================================================
+   Locus reports — /data_center/locus-reports?report=transgene | family
+   --------------------------------------------------------------------------
+   Loaded after css/mgdb-modern.css and css/mgdb-hub.css. The hub shell settles
+   the pale ground, the white section cards, the hero, the tab bar and the
+   Related resources panel; only the record list is here.
+
+   Both reports are lists of curated records, each with four labelled fields.
+   The legacy page wrote them as bold labels, <br> and two non-breaking spaces
+   of indent; here they are a description list, which is what they are.
+   ========================================================================== */
+
+.mgdb-locus-reports-page .mgdb-hero-emblem strong { line-height: 1.25; }
+
+/* The historical note sits above the tab bar and qualifies the whole page, so
+   it is a little louder than a note inside a section. */
+.mgdb-locus-reports-page .lr-historical {
+  margin: var(--mgdb-space-5) 0 0;
+}
+
+/* ── Filter row ──────────────────────────────────────────────────────────── */
+
+.mgdb-locus-reports-page .lr-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-3) var(--mgdb-space-4);
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: var(--mgdb-space-5);
+}
+
+.mgdb-locus-reports-page .lr-filter-field {
+  flex: 1 1 22rem;
+  max-width: 30rem;
+}
+
+.mgdb-locus-reports-page .lr-count {
+  margin: 0 0 var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ── The records ─────────────────────────────────────────────────────────── */
+
+.mgdb-locus-reports-page .lr-records {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--mgdb-space-4);
+}
+
+.mgdb-locus-reports-page .lr-record {
+  min-width: 0;
+  padding: var(--mgdb-space-4) var(--mgdb-space-5);
+  border: 1px solid var(--hub-line, #e3e9f2);
+  border-radius: var(--mgdb-radius);
+  background: var(--hub-surface, #fff);
+  overflow-wrap: anywhere;
+}
+
+.mgdb-locus-reports-page .lr-record[hidden] { display: none; }
+
+.mgdb-locus-reports-page .lr-record-name {
+  margin: 0 0 var(--mgdb-space-3);
+  font-size: var(--mgdb-text-lg);
+}
+
+.mgdb-locus-reports-page .lr-record-name a { color: var(--mgdb-green-dark); }
+
+.mgdb-locus-reports-page .lr-record-full {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-base);
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* Label in a fixed column on the left, content beside it — the four fields
+   line up down the card and across every card in the list. */
+.mgdb-locus-reports-page .lr-record-fields {
+  display: grid;
+  grid-template-columns: 10rem minmax(0, 1fr);
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  margin: 0;
+}
+
+.mgdb-locus-reports-page .lr-record-fields dt {
+  color: var(--mgdb-green-dark);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.mgdb-locus-reports-page .lr-record-fields dd {
+  min-width: 0;
+  margin: 0;
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-locus-reports-page .lr-links {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.mgdb-locus-reports-page .lr-links li { margin-bottom: var(--mgdb-space-1); }
+.mgdb-locus-reports-page .lr-links li:last-child { margin-bottom: 0; }
+
+.mgdb-locus-reports-page .lr-none {
+  margin: 0;
+  color: var(--mgdb-muted);
+}
+
+/* The relationship, or the kind of reference: a qualifier on the link after
+   it, not part of the link. */
+.mgdb-locus-reports-page .lr-rel {
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+
+.mgdb-locus-reports-page .lr-ref-title {
+  display: block;
+  color: var(--mgdb-ink-soft);
+  font-style: italic;
+}
+
+.mgdb-locus-reports-page .lr-empty {
+  margin: var(--mgdb-space-5) 0 0;
+  color: var(--mgdb-ink-soft);
+}
+
+@media (max-width: 700px) {
+  .mgdb-locus-reports-page .lr-record-fields { grid-template-columns: minmax(0, 1fr); }
+  .mgdb-locus-reports-page .lr-record-fields dt { margin-top: var(--mgdb-space-2); }
+  .mgdb-locus-reports-page .lr-record-fields dt:first-child { margin-top: 0; }
+  .mgdb-locus-reports-page .lr-filter-field { max-width: none; }
+}

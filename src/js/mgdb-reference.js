@@ -475,10 +475,10 @@
 
       var idParts = [];
       if (row.doi) {
-        idParts.push('<a href="https://doi.org/' + encodeURIComponent(row.doi) + '" target="_blank" rel="noopener">DOI: ' + escapeHtml(row.doi) + ' ↗</a>');
+        idParts.push('<a href="https://doi.org/' + encodeURIComponent(row.doi) + '" target="_blank" rel="noopener">DOI: ' + escapeHtml(row.doi) + '</a>');
       }
       if (row.pubmed) {
-        idParts.push('<a href="https://pubmed.ncbi.nlm.nih.gov/' + encodeURIComponent(row.pubmed) + '/" target="_blank" rel="noopener">PMID: ' + escapeHtml(row.pubmed) + ' ↗</a>');
+        idParts.push('<a href="https://pubmed.ncbi.nlm.nih.gov/' + encodeURIComponent(row.pubmed) + '/" target="_blank" rel="noopener">PMID: ' + escapeHtml(row.pubmed) + '</a>');
       }
       var idsHtml = idParts.length ? idParts.join('') : '<span style="color:var(--mgdb-muted)">—</span>';
 
@@ -498,7 +498,7 @@
         + '<td>'
         + '<div style="display:flex; flex-direction:column; gap:4px; align-items:flex-start;">'
         + '<button type="button" class="reference-copy-btn" data-copy-citation="' + escapeHtml(citationText) + '">Copy citation</button>'
-        + '<a href="/data_center/reference?id=' + row.id + '" style="font-size:var(--mgdb-text-xs); color:var(--mgdb-green-dark); text-decoration:none; font-weight:600;">Record &rarr;</a>'
+        + '<a href="/data_center/reference?id=' + row.id + '" style="font-size:var(--mgdb-text-xs); color:var(--mgdb-green-dark); text-decoration:none; font-weight:600;">Record</a>'
         + '</div>'
         + '</td>'
         + '</tr>';
@@ -517,10 +517,10 @@
 
       var links = '<a href="/data_center/reference?id=' + row.id + '">MaizeGDB record</a>';
       if (row.doi) {
-        links += '<a href="https://doi.org/' + encodeURIComponent(row.doi) + '" target="_blank" rel="noopener">DOI ↗</a>';
+        links += '<a href="https://doi.org/' + encodeURIComponent(row.doi) + '" target="_blank" rel="noopener">DOI</a>';
       }
       if (row.pubmed) {
-        links += '<a href="https://pubmed.ncbi.nlm.nih.gov/' + encodeURIComponent(row.pubmed) + '/" target="_blank" rel="noopener">PubMed ↗</a>';
+        links += '<a href="https://pubmed.ncbi.nlm.nih.gov/' + encodeURIComponent(row.pubmed) + '/" target="_blank" rel="noopener">PubMed</a>';
       }
       links += '<button class="reference-copy-btn" type="button" data-copy-citation="' + escapeHtml(citationText) + '">Copy citation</button>';
       if (row.doi) {

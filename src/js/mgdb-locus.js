@@ -670,7 +670,7 @@
         + metaHtml
       + '</div>'
       + '<div class="locus-card-actions">'
-        + '<a class="locus-card-view-link" href="' + esc(recordUrl) + '">View locus details &rarr;</a>'
+        + '<a class="locus-card-view-link" href="' + esc(recordUrl) + '">View locus details</a>'
         + '<div class="locus-card-copy-btns">'
           + '<button class="locus-copy-btn" type="button" data-copy-value="' + esc(item.name || '') + '">Copy Symbol</button>'
           + '<button class="locus-copy-btn" type="button" data-copy-value="' + esc(item.id || '') + '">Copy ID</button>'

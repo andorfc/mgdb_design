@@ -971,22 +971,11 @@
    list and the reference cards are the shell's and mark themselves.
    -------------------------------------------------------------------------- */
 
-.mgdb-expression-page .expression-tool-links a[href^="http"]:not([href*="maizegdb.org"]):not([href*="box.com"])::after,
-.mgdb-expression-page .expression-row-links a[href^="http"]:not([href*="maizegdb.org"]):not([href*="box.com"])::after,
-.mgdb-expression-page .expression-profile-links a[href^="http"]:not([href*="maizegdb.org"]):not([href*="box.com"])::after,
-.mgdb-expression-page .expression-release-open a[href^="http"]:not([href*="maizegdb.org"]):not([href*="box.com"])::after,
-.mgdb-expression-page .expression-dl-content a[href^="http"]:not([href*="maizegdb.org"]):not([href*="box.com"])::after {
-  content: " \2197";
-  font-size: .85em;
-  font-weight: 700;
-}
-
-.mgdb-expression-page .expression-tool-links a[href*="box.com"]::after,
-.mgdb-expression-page .expression-tool-links a[href*="format=tsv"]::after,
-.mgdb-expression-page .expression-release-open a[href*="format=tsv"]::after,
-.mgdb-expression-page .expression-dl-content a[href*="box.com"]::after,
-.mgdb-expression-page .expression-dl-content a[href*="download.maizegdb.org"]::after,
-.mgdb-expression-page .expression-dl-content a[href*="format=tsv"]::after,
+/* The \2197 and \2193 rules that lived here are the one href-driven block in
+   mgdb-modern.css ("Link arrows"), which covers box.com, download.maizegdb.org
+   and format=tsv centrally. Two marks are this page's own: an export control
+   that is a <button> rather than a link, and the section link to /download,
+   which is a page about files rather than a file. */
 .mgdb-expression-page .expression-section-link[href="/download"]::after,
 .mgdb-expression-page #expression-export-tsv::after {
   content: " \2193";

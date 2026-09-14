@@ -462,8 +462,8 @@
         '</div>' +
         '<div class="mgdb-rec-image-links">' +
           '<button class="mgdb-rec-image-btn" type="button" data-image="' + escape(row.url) + '">Zoom</button>' +
-          (row.record ? '<a class="mgdb-rec-image-btn" href="' + escape(row.record) + '">Record &rarr;</a>' : '') +
-          '<a class="mgdb-rec-image-btn" href="' + escape(row.url) + '" target="_blank" rel="noopener">Open file <span aria-hidden="true">&nearr;</span></a>' +
+          (row.record ? '<a class="mgdb-rec-image-btn" href="' + escape(row.record) + '">Record</a>' : '') +
+          '<a class="mgdb-rec-image-btn" href="' + escape(row.url) + '" target="_blank" rel="noopener">Open file</a>' +
           '<button class="mgdb-rec-image-btn mgdb-ref-copy" type="button" data-copy-value="' + escape(row.url) + '">Copy URL</button>' +
         '</div>' +
       '</article>';
@@ -558,8 +558,8 @@
       html += '<div class="mgdb-ref-abstract"><h4>Abstract</h4><p>' + escape(ref.abstract) + (ref.abstract.length >= 695 ? '…' : '') + '</p></div>';
     }
     html += '<div class="mgdb-ref-actions">';
-    if (url) { html += '<a class="mgdb-button mgdb-button-primary" href="' + escape(url) + '" target="_blank" rel="noopener">Full text <span aria-hidden="true">&nearr;</span></a>'; }
-    html += '<a class="mgdb-button mgdb-button-quiet" href="' + escape(ref.html) + '">MaizeGDB record <span aria-hidden="true">&rarr;</span></a>';
+    if (url) { html += '<a class="mgdb-button mgdb-button-primary" href="' + escape(url) + '" target="_blank" rel="noopener">Full text</a>'; }
+    html += '<a class="mgdb-button mgdb-button-quiet" href="' + escape(ref.html) + '">MaizeGDB record</a>';
     html += '<button class="mgdb-ref-copy" type="button" data-copy-target="' + citeId + '">Copy citation</button>';
     if (ref.doi) { html += '<button class="mgdb-ref-copy" type="button" data-copy-value="' + escape(ref.doi) + '">Copy DOI</button>'; }
     html += '</div>';

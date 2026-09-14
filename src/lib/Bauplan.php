@@ -164,6 +164,16 @@ class Bauplan {
 	public function getHTML() {
 	    $html = "";
 		$this->defaultBlastUrl();
+
+		/* The page body has to be rendered before the head is written, because
+		   the templates put their Open Graph tags at the top of the template --
+		   which is inside <body>, where no crawler looks for them. See
+		   liftSocialMeta(). */
+		$body = $this->template->getHTML();
+		$lifted = '';
+		if ($this->modern) {
+			$body = $this->liftSocialMeta($body, $lifted);
+		}
 		if ($this->modern) {
 			$html .= "<!DOCTYPE html>\n";
 		}
@@ -191,6 +201,10 @@ class Bauplan {
 		   across every new Bauplan() and ->title() in controllers and lib --
 		   so nothing double-encodes. bodyClass below was already escaped. */
 		$html .= "\t\t<title>" . htmlspecialchars((string) $this->title, ENT_QUOTES, 'UTF-8') . "</title>\n";
+		if ($this->modern) {
+			$html .= $lifted;
+			$html .= $this->socialHead($lifted);
+		}
 		$html .= "\t\t" . $this->scriptsToString();
 		$html .= "\t" . $this->head->value() . "\n";
 		$html .= "\t</head>\n";
@@ -200,11 +214,135 @@ class Bauplan {
 		else {
 			$html .= "\t<body>\n";
 		}
-		$html .= $this->template->getHTML();
+		$html .= $body;
 		$html .= "\t</body>\n";
 		$html .= "</html>";
 
 		return $html;
+	}
+
+	//
+	// The tags every modern page needs and no page should have to remember.
+	//
+	// Link cards were blank everywhere because nothing on the site set
+	// og:image: 97 templates carry og:title and og:description, and not one of
+	// them named an image, so X, Bluesky, Discord and Slack had nothing to
+	// show. The card, the favicons and the site-level Open Graph fields are the
+	// same on every page, so they are written here rather than into a hundred
+	// templates -- the same reasoning as the title escaping above.
+	//
+	// What is NOT here: og:title, og:description and og:url. Those are
+	// per-page, the templates already set them, and a second copy would leave
+	// two of each in the document for a crawler to choose between.
+	//
+	//
+	// Move a template's Open Graph and Twitter tags out of the body and into
+	// the head, and report which keys it set.
+	//
+	// 97 templates open with a block of <meta property="og:..."> before their
+	// <main>. Bauplan renders a template into <body>, so every one of those
+	// tags was being emitted around byte 65,000 of the document -- inside the
+	// body, where X, Bluesky, Discord, Slack and Facebook do not read them.
+	// The tags have been written correctly for years and have never been used.
+	//
+	// Only the run before the first <main> is considered, because that is where
+	// the templates put them and because a <meta> inside the page's own prose
+	// or a code sample is content, not metadata.
+	//
+	private function liftSocialMeta($body, &$lifted) {
+		$split = stripos($body, '<main');
+		if ($split === false) { $split = min(strlen($body), 8192); }
+		$prefix = substr($body, 0, $split);
+		$rest   = substr($body, $split);
+
+		$pattern = '/[ \t]*<meta\s+(?:property|name)\s*=\s*["\'](?:og|twitter):[^"\']*["\'][^>]*>[ \t]*\r?\n?/i';
+		if (!preg_match_all($pattern, $prefix, $m)) {
+			$lifted = '';
+			return $body;
+		}
+
+		$out = '';
+		foreach ($m[0] as $tag) {
+			$out .= "\t\t" . trim($tag) . "\n";
+		}
+		$lifted = $out;
+
+		return preg_replace($pattern, '', $prefix) . $rest;
+	}
+
+	private function socialHead($lifted = '') {
+		$host = isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] ? $_SERVER['HTTP_HOST'] : 'www.maizegdb.org';
+		$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+		if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+			$scheme = strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https' ? 'https' : 'http';
+		}
+		$origin = $scheme . '://' . htmlspecialchars($host, ENT_QUOTES, 'UTF-8');
+
+		/* Cache-busted from the file's own mtime, because a social network that
+		   has cached a card will not fetch it again for a changed page -- only
+		   for a changed URL. */
+		$root = isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT']
+		      ? $_SERVER['DOCUMENT_ROOT'] : '/var/www/claude/html';
+		$card_v = (int) @filemtime($root . '/images/social/maizegdb-card.png');
+		$card = $origin . '/images/social/maizegdb-card.png' . ($card_v ? '?v=' . $card_v : '');
+
+		/* Never write a key the template already set -- two of any og tag
+		   leaves a crawler choosing between them. */
+		$has = array();
+		if ($lifted !== '' && preg_match_all('/(?:property|name)\s*=\s*["\']((?:og|twitter):[^"\']*)["\']/i', $lifted, $lm)) {
+			foreach ($lm[1] as $key) { $has[strtolower($key)] = true; }
+		}
+		$put = function ($attr, $key, $value) use (&$has) {
+			if (isset($has[strtolower($key)])) { return ''; }
+			return "\t\t<meta " . $attr . "='" . $key . "' content='" . $value . "'>\n";
+		};
+
+		$h  = "";
+		$h .= $put('property', 'og:image', $card);
+		$h .= $put('property', 'og:image:width', '1200');
+		$h .= $put('property', 'og:image:height', '630');
+		$h .= $put('property', 'og:image:alt', 'MaizeGDB, the Maize Genetics and Genomics Database');
+		$h .= $put('property', 'og:site_name', 'MaizeGDB');
+		$h .= $put('property', 'og:locale', 'en_US');
+		/* twitter:image is a fallback for readers that do not follow og:image;
+		   X itself reads the og tags. twitter:card is per-page, because a page
+		   that later wants a small card should be able to say so. */
+		/* Fallbacks for the 58 modern templates that declare no og:title of
+		   their own. Without them a card falls back to whatever the crawler can
+		   scrape, which is usually the <title> anyway -- but saying it
+		   explicitly is what stops a network inventing something worse, and it
+		   is free. */
+		$h .= $put('property', 'og:type', 'website');
+		$h .= $put('property', 'og:title',
+		           htmlspecialchars((string) $this->title, ENT_QUOTES, 'UTF-8'));
+
+		/* The controller's own <meta name="description"> if it set one; that is
+		   the sentence already written for search results. */
+		if (!isset($has['og:description'])) {
+			$headHtml = (string) $this->head->value();
+			if (preg_match('/<meta\s+name=["\']description["\']\s+content=["\']([^"\']*)["\']/i', $headHtml, $dm)) {
+				$h .= $put('property', 'og:description', $dm[1]);
+			}
+		}
+
+		$uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '/';
+		$canonical = $origin . htmlspecialchars($uri, ENT_QUOTES, 'UTF-8');
+		$h .= $put('property', 'og:url', $canonical);
+
+		$h .= $put('name', 'twitter:image', $card);
+		/* A card with a 1200x630 image should say so, or X renders the small
+		   square one. Templates that set it keep their own value. */
+		$h .= $put('name', 'twitter:card', 'summary_large_image');
+
+		/* The kernel, so a tab on this site is not the same icon as every other
+		   MaizeGDB instance. PNG rather than .ico: every browser in use reads
+		   it, and one source scales cleanly to all four sizes. */
+		$h .= "\t\t<link rel='icon' type='image/png' sizes='32x32' href='/images/icons/kernel-32.png'>\n";
+		$h .= "\t\t<link rel='icon' type='image/png' sizes='16x16' href='/images/icons/kernel-16.png'>\n";
+		$h .= "\t\t<link rel='apple-touch-icon' sizes='180x180' href='/images/icons/kernel-180.png'>\n";
+		$h .= "\t\t<meta name='theme-color' content='#235c37'>\n";
+
+		return $h;
 	}
 
 	//

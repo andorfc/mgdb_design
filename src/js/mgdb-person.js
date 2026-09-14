@@ -75,7 +75,6 @@
         '  <span class="person-suggestion-name">' + escapeHtml(item.name) + subName + '</span>' +
         (secondary ? '  <span class="person-suggestion-meta">' + escapeHtml(secondary) + '</span>' : '') +
         '</div>' +
-        '<span class="person-suggestion-arrow" aria-hidden="true">&rarr;</span>' +
         '</a>';
     }).join('');
 

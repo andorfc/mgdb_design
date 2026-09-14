@@ -1487,9 +1487,12 @@ body.mgdb-modern {
   padding-inline: var(--mgdb-space-2);
 }
 
-/* External-link marker; the markup pairs this with visually hidden text
-   so the meaning is not carried by the glyph alone. */
-.mgdb-external::after { content: " \2197"; font-weight: 700; }
+/* `.mgdb-external` no longer draws its own arrow. The href-driven rule below
+   ("Link arrows") marks every link in page content, and a hand-applied class
+   could disagree with its own destination -- it did: it sat on Box links, which
+   are downloads rather than off-site pages, and on feta.maizegdb.org and
+   download.maizegdb.org, which are this site. The class is kept for the markup
+   that carries it and for any page styling hanging off it. */
 
 /* --------------------------------------------------------------------------
    7. Page identity header
@@ -1824,10 +1827,20 @@ body.mgdb-modern {
 .mgdb-leaf-heading { color: var(--mgdb-leaf); }
 .mgdb-spaced { margin-top: var(--mgdb-space-6); }
 
-/* Inline key facts. A definition list so the pairing is programmatic. */
+/* Inline key facts. A definition list so the pairing is programmatic.
+
+   `align-items: baseline` on the ROW, not only on each pair. Each pair already
+   sits on its own shared baseline, but the default `stretch` then top-anchors
+   the pairs against each other -- so two pairs whose values are set at
+   different sizes put their LABELS on different lines. On the gene record the
+   accession is 14px mono (`.mgdb-record-id`) beside 16px proportional values,
+   and "Gene model" sat 2.5px above "Assembly" and "Location". Aligning the row
+   on baselines puts every label, and every value, on one line whatever sizes
+   the pairs mix. */
 .mgdb-record-facts {
   display: flex;
   flex-wrap: wrap;
+  align-items: baseline;
   gap: var(--mgdb-space-2) var(--mgdb-space-5);
   margin-top: var(--mgdb-space-3);
 }
@@ -2369,6 +2382,113 @@ a.mgdb-card h3 { text-decoration: underline; }
   text-decoration: underline;
 }
 
+/* --------------------------------------------------------------------------
+   Link arrows
+
+   One rule, written against the href, so a link is marked correctly the moment
+   it is written and can never drift out of step with its own destination:
+
+     \2193  a file. download.maizegdb.org, a Box folder, anything carrying the
+        download attribute, an export endpoint (format=tsv), or a URL whose path
+        ends in a data or document extension. A download wins over the off-site
+        mark, because a Box folder is both and "this hands you a file" is the
+        more useful of the two things to say.
+     \2197  off site. Any host that is not maizegdb.org.
+     none  everything else -- every relative link, and every maizegdb.org
+        subdomain: jbrowse, wgs, images, qteller, snptools, feta, documents.
+        Those are the same site and the reader is not leaving it.
+
+   The horizontal \2192 is not a link arrow anywhere on the site. It repeated the
+   verb the label already carried -- "Open SNPTools \2192", "View record \2192" --
+   and a grid of them read as clutter. It survives only where the arrow is the
+   content rather than an affordance: a mapping such as "Fgenesh \2192 GRMZM", the
+   step separators in the gene function figure, and the Next/Previous pagination
+   buttons, where it means direction and is not on a link at all.
+
+   Scoped to `.mgdb-page`, the class on all 155 modern templates, so a page
+   written tomorrow is marked without anyone remembering to opt it in. The site
+   chrome -- megamenu, header, footer -- sits outside it and marks its own links.
+
+   This shipped as a four-batch rollout gated on `.mgdb-arrows-v2`, a class added
+   to each template in the same deploy that removed its hand-placed arrows, so a
+   page was only ever in one state or the other and a mistake reached one batch
+   rather than the whole site. Every template now carries that class; it is inert
+   and can be swept out whenever something else touches those files.
+
+   Three components mark their LABEL rather than the end of the link, because
+   their anchor is a multi-part row and `a::after` would become one more item in
+   the layout: `.mgdb-resource-list` (below), and `.mgdb-quicklink` and
+   `.mgdb-index-row` on the home page. Each writes its opt-out as `a.<class>`,
+   not `.<class>` -- the rule being overridden is two classes and two elements,
+   and a bare class selector has one element fewer and silently loses.
+   -------------------------------------------------------------------------- */
+
+.mgdb-page a[href^="http"]::after,
+.mgdb-page a[href^="//"]::after,
+.mgdb-page a[href^="ftp"]::after {
+  content: " \2197";
+  font-size: .85em;
+}
+
+/* Same site, whatever the subdomain. Equal specificity to the rule above and
+   written after it, so it wins. */
+.mgdb-page a[href*="maizegdb.org"]::after { content: none; }
+
+/* A file. Last, so it beats both of the above -- a Box folder is off site and
+   a download, and the download is what matters. */
+.mgdb-page a[download]::after,
+.mgdb-page a[href*="//download.maizegdb.org"]::after,
+.mgdb-page a[href*="box.com"]::after,
+/* An export endpoint has no extension to match -- the format is a parameter.
+   Every hub's TSV and CSV export is built this way. */
+.mgdb-page a[href*="format=tsv"]::after,
+.mgdb-page a[href*="format=csv"]::after,
+.mgdb-page a[href$=".gz"]::after,
+.mgdb-page a[href$=".zip"]::after,
+.mgdb-page a[href$=".tar"]::after,
+.mgdb-page a[href$=".tgz"]::after,
+.mgdb-page a[href$=".bz2"]::after,
+.mgdb-page a[href$=".tsv"]::after,
+.mgdb-page a[href$=".csv"]::after,
+.mgdb-page a[href$=".txt"]::after,
+.mgdb-page a[href$=".fa"]::after,
+.mgdb-page a[href$=".fasta"]::after,
+.mgdb-page a[href$=".fna"]::after,
+.mgdb-page a[href$=".faa"]::after,
+.mgdb-page a[href$=".gff"]::after,
+.mgdb-page a[href$=".gff3"]::after,
+.mgdb-page a[href$=".gtf"]::after,
+.mgdb-page a[href$=".vcf"]::after,
+.mgdb-page a[href$=".bed"]::after,
+.mgdb-page a[href$=".bam"]::after,
+.mgdb-page a[href$=".h5"]::after,
+.mgdb-page a[href$=".hdf5"]::after,
+.mgdb-page a[href$=".nwk"]::after,
+.mgdb-page a[href$=".cif"]::after,
+.mgdb-page a[href$=".pdb"]::after,
+.mgdb-page a[href$=".pdf"]::after,
+.mgdb-page a[href$=".xlsx"]::after,
+.mgdb-page a[href$=".xls"]::after,
+.mgdb-page a[href$=".docx"]::after,
+.mgdb-page a[href$=".pptx"]::after,
+.mgdb-page a[href$=".png"]::after,
+.mgdb-page a[href$=".jpg"]::after,
+.mgdb-page a[href$=".jpeg"]::after,
+.mgdb-page a[href$=".gif"]::after,
+.mgdb-page a[href$=".svg"]::after,
+.mgdb-page a[href$=".webp"]::after {
+  content: " \2193";
+  font-size: .85em;
+}
+
+/* Three opt-outs. A link whose content is a picture gets no glyph: the arrow is
+   a text affordance and after an image it lands on its own line under the
+   figure. A resource card marks itself on its title instead, below. And a
+   pagination control spells its own arrow out in its text. */
+.mgdb-page a:has(> img)::after,
+.mgdb-page .mgdb-resource-list a::after,
+.mgdb-page .mgdb-pagination a::after { content: none; }
+
 /* A card whose link leaves MaizeGDB says so with an arrow after its title.
    maizegdb.org and its subdomains -- jbrowse, wgs, download, images, gcv,
    qteller, snptools, documents -- are the same site, so they carry none, and
@@ -2377,7 +2497,11 @@ a.mgdb-card h3 { text-decoration: underline; }
    the moment it is written, and can never drift out of step with its own
    destination. */
 .mgdb-resource-list a[href^="http"] > strong::after,
-.mgdb-resource-list a[href^="//"] > strong::after {
+.mgdb-resource-list a[href^="//"] > strong::after,
+/* ftp too. The B73 assembly record's GenBank card is an ftp:// URL and was the
+   one off-site card on the site with no mark, because this rule listed only the
+   two http forms. */
+.mgdb-resource-list a[href^="ftp"] > strong::after {
   content: " \2197";
   font-size: .85em;
   font-weight: 600;
@@ -2386,6 +2510,17 @@ a.mgdb-card h3 { text-decoration: underline; }
 .mgdb-resource-list a[href*="//maizegdb.org"] > strong::after,
 .mgdb-resource-list a[href*=".maizegdb.org"] > strong::after {
   content: none;
+}
+
+/* ...and a card pointing at files says that instead. download.maizegdb.org is
+   a maizegdb.org host, so this has to come after the rule above. Scoped to the
+   migrated pages while the rollout is in progress. */
+.mgdb-page .mgdb-resource-list a[download] > strong::after,
+.mgdb-page .mgdb-resource-list a[href*="//download.maizegdb.org"] > strong::after,
+.mgdb-page .mgdb-resource-list a[href*="box.com"] > strong::after {
+  content: " \2193";
+  font-size: .85em;
+  font-weight: 600;
 }
 
 .mgdb-resource-list span {
@@ -2412,9 +2547,9 @@ a.mgdb-card h3 { text-decoration: underline; }
   color: var(--mgdb-green-dark);
 }
 
-.mgdb-resource-list a.mgdb-external::after {
-  display: none;
-}
+/* `.mgdb-resource-list a.mgdb-external::after { display: none }` stood here to
+   stop the hand-applied marker doubling with the card's own mark. Both are gone
+   -- the href rule is the only thing that draws a link arrow now. */
 
 /* Data provenance / citation note. Pairs an icon-free label with the text so
    it reads correctly in a screen reader. */

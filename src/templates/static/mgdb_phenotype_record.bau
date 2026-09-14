@@ -1,11 +1,11 @@
 $$SYNTAX-LEVEL 2
 *(mgdb-phenotype-record
-<meta name="twitter:card" content="summary">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@MaizeGDB">
 <meta property="og:title" content="$(phenotype_name) &mdash; MaizeGDB phenotype record">
 <meta property="og:description" content="$(phenotype_summary)">
 
-<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-phenotype-record-page" id="pheno-record-top" data-requested-id="$(requested_identifier)" data-canonical-id="$(phenotype_id)">
+<main class="mgdb-page mgdb-arrows-v2 mgdb-hub-page mgdb-record-page mgdb-phenotype-record-page" id="pheno-record-top" data-requested-id="$(requested_identifier)" data-canonical-id="$(phenotype_id)">
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
     <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/phenotype">Phenotype Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(phenotype_name)</span>
   </nav>
@@ -128,8 +128,8 @@ $$SYNTAX-LEVEL 2
     <div class="mgdb-rec-api-row">
       <code id="pheno-record-api-endpoint">GET /api/v1/records/phenotype/$(requested_identifier)</code>
       <div class="mgdb-rec-api-actions">
-        <a class="mgdb-button mgdb-button-quiet" id="pheno-record-api-link" href="/api/v1/records/phenotype/$(requested_identifier_path)" target="_blank" rel="noopener">Raw JSON <span aria-hidden="true">&nearr;</span></a>
-        <a class="mgdb-button mgdb-button-quiet" href="/api/v1/records/phenotype/$(requested_identifier_path)?format=jsonld" target="_blank" rel="noopener">JSON-LD <span aria-hidden="true">&nearr;</span></a>
+        <a class="mgdb-button mgdb-button-quiet" id="pheno-record-api-link" href="/api/v1/records/phenotype/$(requested_identifier_path)" target="_blank" rel="noopener">Raw JSON</a>
+        <a class="mgdb-button mgdb-button-quiet" href="/api/v1/records/phenotype/$(requested_identifier_path)?format=jsonld" target="_blank" rel="noopener">JSON-LD</a>
         <button class="mgdb-button mgdb-button-quiet" id="pheno-copy-json-btn" type="button">Copy JSON</button>
         <a class="mgdb-button mgdb-button-quiet" href="/api">API documentation</a>
       </div>
@@ -148,8 +148,8 @@ $$SYNTAX-LEVEL 2
         </div>
         <p class="mgdb-rec-lightbox-caption"></p>
         <div class="mgdb-rec-lightbox-actions">
-          <a class="mgdb-button mgdb-button-primary" data-role="record" href="#" hidden>View database record <span aria-hidden="true">&rarr;</span></a>
-          <a class="mgdb-button mgdb-button-secondary" data-role="file" href="#" target="_blank" rel="noopener">Open original file <span aria-hidden="true">&nearr;</span></a>
+          <a class="mgdb-button mgdb-button-primary" data-role="record" href="#" hidden>View database record</a>
+          <a class="mgdb-button mgdb-button-secondary" data-role="file" href="#" target="_blank" rel="noopener">Open original file</a>
           <button class="mgdb-button mgdb-button-quiet mgdb-ref-copy" data-role="copy" type="button" data-copy-value="">Copy URL</button>
         </div>
       </div>

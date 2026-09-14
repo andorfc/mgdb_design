@@ -241,10 +241,11 @@ function mgdbPodcastCard($ep, $series, $index) {
 
     if (!empty($ep['related']['url']) && !empty($ep['related']['label'])) {
         $external = !empty($ep['related']['external']);
+        /* No arrow pasted in: the "Link arrows" rule in css/mgdb-modern.css
+           draws it from the href. $external still decides target and rel. */
         $h .= '<a class="mgdb-button mgdb-button-secondary" href="' . mgdbPodcastEsc($ep['related']['url']) . '"'
             . ($external ? ' target="_blank" rel="noopener"' : '') . '>'
-            . mgdbPodcastEsc($ep['related']['label'])
-            . ' <span aria-hidden="true">' . ($external ? '&nearr;' : '&rarr;') . '</span></a>';
+            . mgdbPodcastEsc($ep['related']['label']) . '</a>';
     }
     $h .= '</div>';
 

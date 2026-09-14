@@ -675,18 +675,9 @@
    rule and a later sheet, so the two cannot fight.
    -------------------------------------------------------------------------- */
 
-.mgdb-metabolic-pathways-page #mp-downloads a[href^="http"]::after,
-.mgdb-metabolic-pathways-page a[download]::after {
-  content: " \2193";
-  font-size: .85em;
-  font-weight: 700;
-}
-
-.mgdb-metabolic-pathways-page .mgdb-resource-list a[href*="download.maizegdb.org"] > strong::after {
-  content: " \2193";
-  font-size: .85em;
-  font-weight: 600;
-}
+/* Both of these are now the one href-driven rule in mgdb-modern.css
+   ("Link arrows"), which marks download.maizegdb.org, Box and [download] with
+   a down arrow in page content and on resource-card titles alike. */
 
 @media (max-width: 900px) {
   .mp-doc-figure-row { grid-template-columns: minmax(0, 1fr); }

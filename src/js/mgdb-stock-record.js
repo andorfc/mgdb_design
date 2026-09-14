@@ -393,7 +393,7 @@
         '</td>' +
         '<td><strong>' + percent + '%</strong></td>' +
         '<td><small class="mgdb-muted">' + (m.divergence * 100).toFixed(2) + '%</small></td>' +
-        '<td><a href="' + R.escape(m.html) + '">Stock record &rarr;</a></td>' +
+        '<td><a href="' + R.escape(m.html) + '">Stock record</a></td>' +
       '</tr>';
     }).join('');
 
@@ -419,7 +419,7 @@
           typsim.total_compared.toLocaleString() + ' panel accessions. Showing top closest relatives.</p>' +
         '</div>' +
         '<a class="mgdb-button mgdb-button-primary" href="' + R.escape(typsim.tool_url) + '" target="_blank" rel="noopener">' +
-          'Open in TYPSimSelector &nearr;' +
+          'Open in TYPSimSelector' +
         '</a>' +
       '</div>' +
       tableHtml +

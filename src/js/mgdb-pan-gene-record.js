@@ -439,7 +439,7 @@
       '&ldquo;tracks&rdquo; option on the browser&rsquo;s menu bar.</p>' +
       '<div class="mgdb-rec-linkrow"><a class="mgdb-button mgdb-button-primary" href="' +
       R.escape(ncbi.gdv_url) + '" target="_blank" rel="noopener">Open the Genome Data Viewer ' +
-      '<span aria-hidden="true">&nearr;</span></a></div></div>');
+      '</a></div></div>');
 
     R.collection(out, {
       title: 'Comparative Genome Viewer: compare B73 against',

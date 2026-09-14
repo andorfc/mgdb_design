@@ -1,0 +1,100 @@
+$$SYNTAX-LEVEL 2
+*(locus-reports
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@MaizeGDB">
+<meta property="og:url" content="https://maizegdb.org/data_center/locus-reports?report=$(report_key)">
+<meta property="og:title" content="$(og_title)">
+<meta property="og:description" content="$(og_description)">
+
+<main class="mgdb-page mgdb-arrows-v2 mgdb-hub-page mgdb-locus-reports-page" id="lr-main">
+  <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/data_center/locus">Loci</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(list_name)</span>
+  </nav>
+
+  <section class="mgdb-hero" aria-labelledby="lr-title">
+    <div class="mgdb-hero-emblem">
+      <svg viewBox="0 0 96 96" role="img" aria-label="A curated record kept for the record">
+        <rect x="18" y="14" width="60" height="68" rx="7" fill="#f4edd0" stroke="#7a4a10" stroke-width="4" />
+        <line x1="30" y1="32" x2="66" y2="32" stroke="#7a4a10" stroke-width="4" stroke-linecap="round" />
+        <line x1="30" y1="45" x2="66" y2="45" stroke="#a96919" stroke-width="3" stroke-linecap="round" opacity=".7" />
+        <line x1="30" y1="56" x2="58" y2="56" stroke="#a96919" stroke-width="3" stroke-linecap="round" opacity=".7" />
+        <line x1="30" y1="67" x2="62" y2="67" stroke="#a96919" stroke-width="3" stroke-linecap="round" opacity=".7" />
+      </svg>
+      <strong>$(emblem_label)</strong>
+    </div>
+    <div class="mgdb-hero-body">
+      <h1 id="lr-title">$(page_title)</h1>
+      <p class="mgdb-hero-description">$(page_description)</p>
+    </div>
+  </section>
+
+  ;; The historical note is the first thing on the page, above the tab bar,
+  ;; because it qualifies everything below it. Its figures are counted from the
+  ;; records' own add dates by the controller, not written by hand.
+  <p class="mgdb-note lr-historical"><strong>This is a historical list.</strong> $(historical_note) It is kept because the records it describes are still cited, not because it is being added to. For current work, search the <a href="/data_center/locus">Locus Data Hub</a>.</p>
+
+  <nav class="mgdb-section-tabs" aria-label="Sections on this page">
+    <a href="#lr-records" class="is-current" aria-current="true">Records</a>
+    <a href="#lr-about">About</a>
+    <a href="#lr-related">Related resources</a>
+  </nav>
+
+  <section id="lr-records" aria-labelledby="lr-records-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="lr-records-title">$(list_name)</h2></div>
+    </div>
+
+    <div class="lr-controls">
+      <div class="mgdb-hub-field lr-filter-field">
+        <label class="mgdb-label" for="lr-filter">Filter this list</label>
+        <input class="mgdb-input" id="lr-filter" type="search" autocomplete="off" placeholder="$(filter_placeholder)" aria-describedby="lr-count" />
+      </div>
+      <p class="lr-count" id="lr-count" aria-live="polite">$(record_count) records</p>
+    </div>
+
+    <div class="lr-records" id="lr-records-list">
+      @(record_list
+      <article class="lr-record" data-search="$(search_key)">
+        <h3 class="lr-record-name"><a href="/data_center/locus?id=$(id)">$(name)</a> <span class="lr-record-full">$(full_name)</span></h3>
+        <dl class="lr-record-fields">
+          <dt>Notes</dt>
+          <dd>$(comments)</dd>
+          <dt>$(members_label)</dt>
+          <dd>$(members)</dd>
+          <dt>Related loci</dt>
+          <dd>$(loci)</dd>
+          <dt>References</dt>
+          <dd>$(ref)</dd>
+        </dl>
+      </article>
+      )
+    </div>
+
+    <p class="lr-empty" id="lr-empty" hidden>Nothing in this list matches that.</p>
+  </section>
+
+  <section id="lr-about" class="mgdb-prose-layout" aria-labelledby="lr-about-title">
+    <div class="mgdb-prose">
+      <h2 id="lr-about-title" class="mgdb-leaf-heading">About</h2>
+      $(about_prose)
+    </div>
+    <aside class="mgdb-aside-card">
+      <h3>Where this list came from</h3>
+      <p>These records are maize loci of one curated type, held in the same table as every other locus. The list is a report over that table, so each entry's own record page carries the full, current picture &#8212; map positions, variations, stocks and everything else this report does not show.</p>
+      <p><a href="/data_center/locus">Search the Locus Data Hub</a></p>
+    </aside>
+  </section>
+
+  <section id="lr-related" class="mgdb-hub-related" aria-labelledby="lr-related-title">
+    <div class="mgdb-section-heading">
+      <div><h2 id="lr-related-title">Related resources</h2></div>
+    </div>
+    <div class="mgdb-resource-list">
+      <a href="/data_center/locus"><strong>Locus Data Hub</strong><span>Search every maize locus by name, type, map position or associated gene model.</span></a>
+      <a href="/data_center/locus-reports?report=$(other_report)"><strong>$(other_report_name)</strong><span>$(other_report_blurb)</span></a>
+      <a href="/gene_center/gene"><strong>Gene Data Hub</strong><span>Maize genes and gene models across every current annotation.</span></a>
+      <a href="/data_center/gene_product"><strong>Gene products</strong><span>The proteins and RNAs maize genes are recorded as producing.</span></a>
+    </div>
+  </section>
+</main>
+)

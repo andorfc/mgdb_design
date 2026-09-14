@@ -445,7 +445,7 @@
           '</div>' +
         '</div>' +
         '<div class="pan-gene-card-links">' +
-          '<a href="' + url + '">View Record &rarr;</a>' +
+          '<a href="' + url + '">View Record</a>' +
           '<button class="mgdb-button mgdb-button-quiet pan-gene-copy-btn" type="button" data-copy-value="' + escape(exemplar) + '">Copy Exemplar</button>' +
           (panGeneName ? '<button class="mgdb-button mgdb-button-quiet pan-gene-copy-btn" type="button" data-copy-value="' + escape(panGeneName) + '">Copy Pan-Gene ID</button>' : '') +
         '</div>' +

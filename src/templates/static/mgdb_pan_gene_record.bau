@@ -1,11 +1,11 @@
 $$SYNTAX-LEVEL 2
 *(mgdb-pan-gene-record
-<meta name="twitter:card" content="summary">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@MaizeGDB">
 <meta property="og:title" content="$(pan_gene_display) &mdash; MaizeGDB pan-gene record">
 <meta property="og:description" content="$(pan_gene_summary)">
 
-<main class="mgdb-page mgdb-hub-page mgdb-record-page mgdb-pan-gene-record-page" id="pg-record-top" data-requested-id="$(requested_identifier)" data-pan-gene="$(pan_gene_name)">
+<main class="mgdb-page mgdb-arrows-v2 mgdb-hub-page mgdb-record-page mgdb-pan-gene-record-page" id="pg-record-top" data-requested-id="$(requested_identifier)" data-pan-gene="$(pan_gene_name)">
   <nav class="mgdb-breadcrumb" aria-label="Breadcrumb">
     <a href="/">Home</a><span aria-hidden="true">&rsaquo;</span><a href="/sitemap">Data hubs</a><span aria-hidden="true">&rsaquo;</span><a href="/pan_gene_center/pan_gene">Pan-Gene Data Hub</a><span aria-hidden="true">&rsaquo;</span><span aria-current="page">$(pan_gene_display)</span>
   </nav>
@@ -114,7 +114,7 @@ $$SYNTAX-LEVEL 2
       ;; so the scroll container has to be a wrapper it never touches. Without
       ;; it the alignment is 3,892px wide and the whole document scrolls.
       <div class="mgdb-pg-msa"><div id="msa-div"></div></div>
-      <p class="mgdb-rec-block-status"><strong>Reference</strong>&#58; Guy Yachdav, Sebastian Wilzbach, Benedikt Rauscher, Robert Sheridan, Ian Sillitoe, James Procter, Suzanna Lewis, Burkhard Rost and Tatyana Goldberg. &ldquo;MSAViewer&#58; interactive JavaScript visualization of multiple sequence alignments.&rdquo; Bioinformatics &#40;2016&#41; <a href="http\://dx.doi.org/10.1093/bioinformatics/btw474" target="_blank" rel="noopener">http\://dx.doi.org/10.1093/bioinformatics/btw474 <span aria-hidden="true">&nearr;</span></a></p>
+      <p class="mgdb-rec-block-status"><strong>Reference</strong>&#58; Guy Yachdav, Sebastian Wilzbach, Benedikt Rauscher, Robert Sheridan, Ian Sillitoe, James Procter, Suzanna Lewis, Burkhard Rost and Tatyana Goldberg. &ldquo;MSAViewer&#58; interactive JavaScript visualization of multiple sequence alignments.&rdquo; Bioinformatics &#40;2016&#41; <a href="http\://dx.doi.org/10.1093/bioinformatics/btw474" target="_blank" rel="noopener">http\://dx.doi.org/10.1093/bioinformatics/btw474</a></p>
     </div>
   </section>
 
@@ -122,7 +122,7 @@ $$SYNTAX-LEVEL 2
     <div class="mgdb-section-heading"><div><h2 id="pg-record-tree-title">Phylogenetic tree</h2></div></div>
     <div id="pg-record-tree-body"></div>
     <div id="pan_gene_phylotree" class="mgdb-pg-tree"></div>
-    <p class="mgdb-rec-block-status" id="pg-record-tree-credit" hidden>Generated with <a href="https\://icytree.org" target="_blank" rel="noopener">IcyTree <span aria-hidden="true">&nearr;</span></a></p>
+    <p class="mgdb-rec-block-status" id="pg-record-tree-credit" hidden>Generated with <a href="https\://icytree.org" target="_blank" rel="noopener">IcyTree</a></p>
   </section>
 
   <section id="pg-record-pangenome" aria-labelledby="pg-record-pangenome-title" hidden>
@@ -204,8 +204,8 @@ $$SYNTAX-LEVEL 2
     <div class="mgdb-rec-api-row">
       <code id="pg-record-api-endpoint">GET /api/v1/records/pan_gene/$(requested_identifier)</code>
       <div class="mgdb-rec-api-actions">
-        <a class="mgdb-button mgdb-button-quiet" id="pg-record-api-link" href="/api/v1/records/pan_gene/$(requested_identifier_path)" target="_blank" rel="noopener">Raw JSON <span aria-hidden="true">&nearr;</span></a>
-        <a class="mgdb-button mgdb-button-quiet" href="/api/v1/records/pan_gene/$(requested_identifier_path)?format=jsonld" target="_blank" rel="noopener">JSON-LD <span aria-hidden="true">&nearr;</span></a>
+        <a class="mgdb-button mgdb-button-quiet" id="pg-record-api-link" href="/api/v1/records/pan_gene/$(requested_identifier_path)" target="_blank" rel="noopener">Raw JSON</a>
+        <a class="mgdb-button mgdb-button-quiet" href="/api/v1/records/pan_gene/$(requested_identifier_path)?format=jsonld" target="_blank" rel="noopener">JSON-LD</a>
         <button class="mgdb-button mgdb-button-quiet" id="pg-copy-json-btn" type="button">Copy JSON</button>
         <a class="mgdb-button mgdb-button-quiet" href="/api">API documentation</a>
       </div>
@@ -224,8 +224,8 @@ $$SYNTAX-LEVEL 2
         </div>
         <p class="mgdb-rec-lightbox-caption"></p>
         <div class="mgdb-rec-lightbox-actions">
-          <a class="mgdb-button mgdb-button-primary" data-role="record" href="#" hidden>View database record <span aria-hidden="true">&rarr;</span></a>
-          <a class="mgdb-button mgdb-button-secondary" data-role="file" href="#" target="_blank" rel="noopener">Open original file <span aria-hidden="true">&nearr;</span></a>
+          <a class="mgdb-button mgdb-button-primary" data-role="record" href="#" hidden>View database record</a>
+          <a class="mgdb-button mgdb-button-secondary" data-role="file" href="#" target="_blank" rel="noopener">Open original file</a>
           <button class="mgdb-button mgdb-button-quiet mgdb-ref-copy" data-role="copy" type="button" data-copy-value="">Copy URL</button>
         </div>
       </div>

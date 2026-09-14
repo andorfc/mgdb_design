@@ -127,6 +127,10 @@
   border: 1px solid var(--hub-line);
   border-radius: var(--mgdb-radius);
   padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  /* The lead above carries no bottom margin, so the synteny sentence sat flush
+     against this box's border -- every other band in the page has 16px between
+     the two. */
+  margin-top: var(--mgdb-space-4);
   margin-bottom: var(--mgdb-space-5);
   font-size: var(--mgdb-text-sm);
 }
@@ -664,6 +668,16 @@
   gap: 6px;
 }
 
+/* One width down the Launch column. The labels differ -- "JBrowse 2",
+   "JBrowse 1", "GBrowse" -- so the buttons came out at 88, 96 and 98px and the
+   column's right edge moved from row to row. A floor wide enough for the
+   longest label, with the text centred inside it, makes them one shape. */
+.mgdb-genomebrowser-page #browser-dir-table .mgdb-button {
+  min-width: 6.5rem;
+  justify-content: center;
+  text-align: center;
+}
+
 .mgdb-genomebrowser-page .instance-proj-text {
   color: var(--mgdb-muted);
   line-height: 1.4;
@@ -730,9 +744,19 @@
 
 .mgdb-genomebrowser-page .browser-related-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  /* Three across, two down, for the six cards that are left. The auto-fit that
+     was here put five in the first row and one alone in the second. */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--mgdb-space-3);
   margin-top: var(--mgdb-space-4);
+}
+
+@media (max-width: 900px) {
+  .mgdb-genomebrowser-page .browser-related-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 600px) {
+  .mgdb-genomebrowser-page .browser-related-grid { grid-template-columns: minmax(0, 1fr); }
 }
 
 .mgdb-genomebrowser-page .browser-related-card {

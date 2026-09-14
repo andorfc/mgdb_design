@@ -459,8 +459,8 @@
         '  <td>' + (r.author_name ? escapeHtml(r.author_name) : '<span style="color:var(--mgdb-muted);">—</span>') + '</td>' +
         '  <td>' +
         '    <div class="map-row-actions">' +
-        '      <a href="' + escapeHtml(r.html) + '">View Map &rarr;</a>' +
-        '      <a href="/compare_maps?map1=' + r.id + '">Compare &nearr;</a>' +
+        '      <a href="' + escapeHtml(r.html) + '">View Map</a>' +
+        '      <a href="/compare_maps?map1=' + r.id + '">Compare</a>' +
         '    </div>' +
         '  </td>' +
         '</tr>';
@@ -493,7 +493,7 @@
         '  </div>' +
         '  <div class="map-card-footer">' +
         '    <span style="font-size:var(--mgdb-text-xs);color:var(--mgdb-muted);">' + (r.author_name ? escapeHtml(r.author_name) : spanStr) + '</span>' +
-        '    <a class="mgdb-button mgdb-button-quiet" href="' + escapeHtml(r.html) + '">View Map &rarr;</a>' +
+        '    <a class="mgdb-button mgdb-button-quiet" href="' + escapeHtml(r.html) + '">View Map</a>' +
         '  </div>' +
         '</article>';
     });

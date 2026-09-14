@@ -115,7 +115,7 @@ function personIdentityFacts($identity) {
   if ($orcid !== '') {
     $facts[] = array('ORCID iD',
       '<a href="https://orcid.org/' . personRecEsc($orcid) . '" target="_blank" rel="noopener">'
-      . personRecEsc($orcid) . ' <span aria-hidden="true">&nearr;</span></a>');
+      . personRecEsc($orcid) . '</a>');
   }
 
   $facts[] = array('MaizeGDB ID', '<span class="mgdb-record-id">' . personRecEsc($identity['id']) . '</span>');

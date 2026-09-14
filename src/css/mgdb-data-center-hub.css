@@ -85,7 +85,9 @@
   margin-bottom: var(--mgdb-space-5);
 }
 
-.mgdb-data-center-hub .data-hub-search-intro > div { max-width: 48rem; }
+/* Full panel width (2026-09-12, Carson). This was capped at 48rem, which left
+   the heading and its paragraph ending well short of the panel's own edge. */
+.mgdb-data-center-hub .data-hub-search-intro > div { max-width: none; }
 
 .mgdb-data-center-hub .data-hub-search-intro h3 {
   margin: 0.25rem 0 0.45rem;
@@ -149,9 +151,13 @@
   margin-top: var(--mgdb-space-4);
 }
 
+/* One column, not `auto 1fr auto` (2026-09-12). The third column was for a
+   trailing arrow that has been removed; with it gone the remaining `auto`
+   sized the text to its own content and left the rest of the card empty --
+   measured 154px of copy in a 227px card. */
 .mgdb-data-center-hub .data-hub-task-grid a {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--mgdb-space-3);
   align-items: start;
   padding: var(--mgdb-space-4);
@@ -364,3 +370,27 @@
 
   .mgdb-data-center-hub .data-hub-search-panel { padding: 1.1rem; }
 }
+
+/* --------------------------------------------------------------------------
+   About
+   --------------------------------------------------------------------------
+   Two corrections to how .mgdb-prose lands here (2026-09-12, Carson).
+
+   WIDTH. .mgdb-prose caps itself at var(--mgdb-measure) -- 68ch, which resolved
+   to 685px inside a 1232px section. This section is asked to run the full page.
+
+   PARAGRAPH SPACING, and this one is a specificity collision worth knowing
+   about. The shared sheet intends .mgdb-prose to space its children:
+
+     .mgdb-page p, .mgdb-page ul, ...  { margin: 0; }      (0,1,1)
+     .mgdb-prose > * + *               { margin-top: … }   (0,1,0)
+
+   `*` contributes nothing to specificity, so `.mgdb-page p` outweighs the
+   prose rule and every paragraph inside a .mgdb-prose block sits at margin 0 --
+   measured gap between the two About paragraphs: 0px. The rule below is
+   id-qualified so it wins outright. NOTE this is a SITE-WIDE latent bug, not a
+   quirk of this page: 17 templates use .mgdb-prose and the ones with more than
+   one paragraph are all running them together. Fixing it in mgdb-modern.css
+   would reflow all of them at once, so it is left for a deliberate pass. */
+.mgdb-data-center-hub #hub-about .mgdb-prose { max-width: none; }
+.mgdb-data-center-hub #hub-about .mgdb-prose > * + * { margin-top: var(--mgdb-space-4); }

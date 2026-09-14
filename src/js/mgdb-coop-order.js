@@ -169,7 +169,7 @@
         '<th scope="col"><span class="mgdb-visually-hidden">Actions</span></th></tr></thead>' +
         '<tbody>' + rows + '</tbody></table></div>' +
         '<div class="coop-list-footer">' +
-          '<p class="mgdb-muted" style="margin:0">Add every stock before you submit &mdash; the list is sent as one request.</p>' +
+          '<p class="mgdb-muted" style="margin:0">Don&rsquo;t submit this request until you have added all your stocks. The list will be sent as one request.</p>' +
           '<button type="button" class="mgdb-button mgdb-button-quiet" id="coop-clear-btn">Clear the list</button>' +
         '</div>';
 

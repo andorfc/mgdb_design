@@ -470,7 +470,7 @@ function ar_subhead($text) {
 function ar_link($url, $text, $external = true) {
     return '<a href="' . ar_esc($url) . '"'
          . ($external ? ' target="_blank" rel="noopener"' : '') . '>' . ar_esc($text)
-         . ($external ? ' <span aria-hidden="true">&nearr;</span>' : '') . '</a>';
+         . ($external ? '' : '') . '</a>';
 }
 
 /* The dbxrefs, grouped: a project can carry two DOIs. */

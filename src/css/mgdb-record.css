@@ -545,19 +545,23 @@
   font-size: var(--mgdb-text-sm);
 }
 
-/* External links carry an arrow, wherever they appear. */
-.mgdb-record-page a[target="_blank"]:not(.mgdb-button)::after {
-  content: " \2197";
-  font-size: .85em;
-}
+/* Link arrows are the one href-driven rule in mgdb-modern.css ("Link arrows").
 
-.mgdb-record-page a[target="_blank"] > span[aria-hidden] { display: none; }
+   Four rules stood here and all four go together -- the rule and its opt-outs
+   are one edit, which is the lesson /assembly taught when its opt-outs outlived
+   its rule and suppressed 47 download marks.
 
-/* A resource card marks its own off-site links on the title, from the href --
-   see `.mgdb-resource-list a[href^="http"] > strong::after` in mgdb-modern.css
-   -- so the page-wide arrow stays off the card as a whole. */
-.mgdb-record-page .mgdb-resource-list a[target="_blank"]::after,
-.mgdb-record-page .mgdb-button[target="_blank"]::after { content: none; }
+   What was here keyed on target="_blank", which is not the same question: it
+   marked an on-site tool that opens in a new tab -- /BLAST, JBrowse, SNPTools --
+   as though the reader had left the site, and it could not tell a download from
+   a page. The shared `a:has(> img)` and `.mgdb-resource-list` opt-outs moved to
+   mgdb-modern.css with the rule; buttons are no longer excepted, because a
+   button's link goes where it goes.
+
+   `a[target="_blank"] > span[aria-hidden] { display: none }` went too. It was
+   hiding the hand-placed arrow spans inside external links so they would not
+   double, which made a stray literal invisible rather than removed; the spans
+   themselves are gone from the templates now. */
 
 /* --------------------------------------------------------------------------
    Narrow screens
@@ -748,8 +752,10 @@
   color: var(--mgdb-ink);
 }
 
-/* The arrow on an external link is already in the button's own label here. */
-.mgdb-record-page .mgdb-rec-image-btn[target="_blank"]::after { content: none; }
+/* No opt-out here any more. This existed because the button's label carried its
+   own arrow glyph; that glyph is gone, and the href-driven rule marks these
+   correctly -- "Open file" points at a .jpg on the image server, so it is a
+   file and takes the down arrow. */
 
 /* --------------------------------------------------------------------------
    The lightbox

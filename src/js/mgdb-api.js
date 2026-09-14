@@ -194,7 +194,7 @@
     }
 
     function link(href, label) {
-      return '<a class="mgdb-button mgdb-button-quiet mgdb-button-sm" href="' + escapeHtml(href) + '" target="_blank" rel="noopener">' + escapeHtml(label) + ' <span aria-hidden="true">&nearr;</span></a>';
+      return '<a class="mgdb-button mgdb-button-quiet mgdb-button-sm" href="' + escapeHtml(href) + '" target="_blank" rel="noopener">' + escapeHtml(label) + '</a>';
     }
 
     function run(event) {

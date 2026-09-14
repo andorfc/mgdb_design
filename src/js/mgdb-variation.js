@@ -349,7 +349,7 @@
         metaHtml +
       '</div>' +
       '<div class="variation-card-actions">' +
-        '<a href="' + recordUrl + '">View record &rarr;</a>' +
+        '<a href="' + recordUrl + '">View record</a>' +
         '<div class="variation-card-copy-btns">' +
           '<button class="variation-copy-btn" type="button" data-copy-value="' + esc(row.name) + '">Copy Name</button>' +
           '<button class="variation-copy-btn" type="button" data-copy-value="' + esc(row.id) + '">Copy ID</button>' +

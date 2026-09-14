@@ -161,6 +161,13 @@
   /* ── Bootstrap ──────────────────────────────────────────────────────────── */
 
   function init() {
+    /* The section tab bar is markup the shell styles; the scrollspy is opt-in,
+       so that a page carrying its own copy cannot end up running two over one
+       bar. See js/mgdb-modern.js. */
+    if (window.MGDB && typeof window.MGDB.sectionTabs === 'function') {
+      window.MGDB.sectionTabs();
+    }
+
     initCopy();
     initViewToggle();
     initFilters();

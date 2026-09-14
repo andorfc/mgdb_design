@@ -58,8 +58,13 @@
 
 .mgdb-modern .mgec-archive-note { margin-top: 1.25rem; }
 
+/* The measure caps are off across this page, on Carson's call 2026-09-12: a
+   section's text runs the width of the section it is in. They were hand-written
+   ch values rather than var(--mgdb-measure), and because ch is relative to the
+   element's own font size they resolved to four different widths -- 746px here,
+   653px on the minutes at --mgdb-text-sm, 688px on the note -- so the page had
+   four ragged right edges rather than one deliberate measure. */
 .mgdb-modern .mgec-lead {
-  max-width: 74ch;
   margin: 0 0 var(--mgdb-space-5);
   color: var(--mgdb-ink-soft);
 }
@@ -67,7 +72,6 @@
 /* ── Mission statement ───────────────────────────────────────────────────── */
 
 .mgdb-modern .mgec-mission {
-  max-width: 74ch;
   margin: 0 0 var(--mgdb-space-5);
   padding: var(--mgdb-space-4) var(--mgdb-space-5);
   border-left: 4px solid var(--mgdb-gold);
@@ -119,7 +123,6 @@
 
 /* ── Procedures prose ────────────────────────────────────────────────────── */
 
-.mgdb-modern .mgec-prose { max-width: 74ch; }
 .mgdb-modern .mgec-prose h3 {
   margin: var(--mgdb-space-5) 0 var(--mgdb-space-2);
   color: var(--mgdb-green-dark);
@@ -260,7 +263,6 @@
 }
 
 .mgdb-modern .mgec-minutes-body {
-  max-width: 74ch;
   padding: 0 var(--mgdb-space-3) var(--mgdb-space-3);
   font-size: var(--mgdb-text-sm);
 }
@@ -281,7 +283,7 @@
 }
 .mgdb-modern .mgec-minutes-signoff { color: var(--mgdb-muted) !important; font-style: italic; }
 
-.mgdb-modern .mgec-note { margin-top: var(--mgdb-space-4); max-width: 78ch; color: var(--mgdb-ink-soft); font-size: var(--mgdb-text-sm); }
+.mgdb-modern .mgec-note { margin-top: var(--mgdb-space-4); color: var(--mgdb-ink-soft); font-size: var(--mgdb-text-sm); }
 
 @media (max-width: 620px) {
   .mgdb-modern .mgec-timeline { grid-template-columns: minmax(0, 1fr); gap: var(--mgdb-space-1); }
@@ -289,3 +291,14 @@
   .mgdb-modern .mgec-year { display: block; text-align: left; }
   .mgdb-modern .mgec-role { min-width: 0; margin-right: .4rem; }
 }
+
+/* The hero description is the shared component and is capped at
+   var(--mgdb-measure) for every page that uses it. Released here only, so the
+   change stays on this page rather than becoming a site-wide decision made by
+   accident. */
+.mgdb-mgec-page .mgdb-hero-description { max-width: none; }
+
+/* .mgdb-prose carries var(--mgdb-measure) for the whole site, so dropping
+   .mgec-prose's own cap left the shared one winning at 685px. This restates it
+   rather than removing it there, which would be a site-wide change. */
+.mgdb-modern .mgec-prose { max-width: none; }

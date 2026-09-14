@@ -37,6 +37,10 @@
   $bauplan->includeCss('/css/static.css');
   $bauplan->includeCss('/css/mgdb-modern.css');
   $bauplan->includeCss('/css/mgdb-megamenu.css');
+  /* The Data Hub shell, before the page sheet: it supplies the pale blue
+     ground, the white section cards with their coloured top edges, the metric
+     row's four colours and the scroll offset the new tab bar needs. */
+  $bauplan->includeCss('/css/mgdb-hub.css?v=' . (file_exists($doc_root . '/css/mgdb-hub.css') ? filemtime($doc_root . '/css/mgdb-hub.css') : time()));
   $bauplan->includeCss('/css/mgdb-cite.css?v=' . $v_css);
   $bauplan->includeScript('/js/mgdb-modern.js');
   $bauplan->includeScript('/js/mgdb-chrome.js');
@@ -134,6 +138,39 @@
   $other_count   = 24 + 136 + 20;   // conference, extended abstracts, coordination
   $body->get('journal_count')->replace(number_format($journal_count));
   $body->get('publication_count')->replace(number_format($journal_count + $other_count));
+
+/* Two metric values that used to be written into the template.
+ *
+ * "4 publication categories" counted the page's own group headings, which is
+ * not a measurement of anything -- the same fault three archive hubs had. It
+ * is replaced by the number of distinct journals the refereed articles appear
+ * in, which is a fact about the record rather than about the markup.
+ *
+ * The year span was hard-coded "2003-2026". It is now the real range across
+ * both halves of the list: the bibliography supplies its own years, and the
+ * template's 180 remaining entries carry theirs in data-year, which is the
+ * only place those live. Neither can drift now.
+ */
+  $journals = array();
+  $years    = array();
+  foreach ($journal_rows as $row) {
+      $name = isset($row['journal']) ? trim(rtrim((string) $row['journal'], '.')) : '';
+      if ($name !== '') { $journals[strtolower($name)] = true; }
+      if (isset($row['year']) && ctype_digit((string) $row['year'])) {
+          $years[] = (int) $row['year'];
+      }
+  }
+  $template_years = array();
+  if (preg_match_all('/data-year="(\d{4})"/',
+        (string) @file_get_contents($doc_root . '/templates/static/mgdb_cite.bau'),
+        $m)) {
+      $template_years = array_map('intval', $m[1]);
+  }
+  $all_years = array_merge($years, $template_years);
+  $body->get('journal_venues')->replace(number_format(count($journals)));
+  $body->get('year_span')->replace($all_years
+      ? min($all_years) . '&ndash;' . max($all_years)
+      : '&mdash;');
 
   include_once('translation.php');
   $mgdb->get('blast_url')->replace($system['BLAST_URL']);

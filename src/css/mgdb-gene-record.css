@@ -367,3 +367,60 @@
 .gene-score-note { margin: 8px 0 0; color: var(--mgdb-muted, #5b655e); font-size: var(--mgdb-text-xs); line-height: 1.4; }
 .gene-score-standing { display: inline-block; margin-left: 4px; padding: 0 7px; border-radius: 999px; background: var(--mgdb-surface-sunken, #f5f1e9); color: var(--mgdb-ink, #1f2723); }
 .gene-score-noscale { margin: 6px 0 0; font-size: var(--mgdb-text-xs); }
+
+/* --------------------------------------------------------------------------
+   Phylostrata, and the pangenome view
+
+   Two published figures: one PNG per B73 v5 gene model from the phylostratR
+   analysis, and one from the cactus-Minigraph pangenome pipeline. Neither has
+   a row in the database — availability is a naming convention on the image
+   server — so both are rendered optimistically and removed by their own load
+   failure. The frame therefore has to be sized by its content rather than by
+   a fixed height, or a gene without a figure would leave a hole while the
+   request is in flight.
+   -------------------------------------------------------------------------- */
+
+.mgdb-gene-record-page .gene-record-phylostrata-figure,
+.mgdb-gene-record-page .gene-record-pangenome-figure {
+  margin: var(--mgdb-space-3) 0 0;
+  padding: var(--mgdb-space-4);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: #fff;
+}
+
+/* Both figures fill the column and neither is ever upscaled past its own
+   resolution: the phylostrata strip is published at 2400x580 and the pangenome
+   view at 1552px, so at the 1,148px column both are still being scaled *down*
+   — 2.1x and 1.4x — which is what keeps them sharp on a 2x display. */
+.mgdb-gene-record-page .gene-record-phylostrata-figure img,
+.mgdb-gene-record-page .gene-record-pangenome-figure img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+}
+
+
+
+/* No `max-width: var(--mgdb-measure)` here, unlike body prose: these two are
+   figure captions sitting directly under a figure that is as wide as the
+   column, and a 68ch line under a 1,148px picture reads as a ragged column
+   pinned to the left edge rather than as the picture's caption. */
+.mgdb-gene-record-page .gene-record-phylostrata-figure figcaption,
+.mgdb-gene-record-page .gene-record-pangenome-figure figcaption {
+  margin-top: var(--mgdb-space-3);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+
+.mgdb-gene-record-page .gene-record-phylostrata .mgdb-rec-linkrow {
+  margin-top: var(--mgdb-space-3);
+}
+
+@media (max-width: 720px) {
+  .mgdb-gene-record-page .gene-record-phylostrata-figure,
+  .mgdb-gene-record-page .gene-record-pangenome-figure {
+    padding: var(--mgdb-space-2);
+  }
+}

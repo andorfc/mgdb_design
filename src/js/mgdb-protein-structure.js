@@ -248,7 +248,7 @@
     }
     if ((identity.uniprots || []).length) {
       links.push('<a class="mgdb-button mgdb-button-quiet" rel="noopener" href="https://www.uniprot.org/uniprotkb/'
-        + encodeURIComponent(identity.uniprots[0]) + '">UniProt ↗</a>');
+        + encodeURIComponent(identity.uniprots[0]) + '">UniProt</a>');
     }
     if ((identity.gene_ids || []).length) {
       links.push('<a class="mgdb-button mgdb-button-quiet" href="/foldseek?uniprot='
@@ -770,7 +770,7 @@
       (partner.gene_ids || []).slice(0, 2).forEach(function (id) { links.push(geneLink(id)); });
       if (partner.uniprot) {
         links.push('<a rel="noopener" href="https://www.uniprot.org/uniprotkb/'
-          + encodeURIComponent(partner.uniprot) + '">' + escape(partner.uniprot) + ' ↗</a>');
+          + encodeURIComponent(partner.uniprot) + '">' + escape(partner.uniprot) + '</a>');
       }
       /* The export records why a chain was matched to a gene. When that reason
          is anything other than a clean cross-reference, the mapping is the
@@ -880,7 +880,7 @@
       +     '<button class="ps-viewer-button" type="button" data-ps-png>Save PNG</button>'
       +     '<a class="ps-viewer-button" href="' + escape(record.pdb) + '" download>Download PDB</a>'
       +     (record.cif ? '<a class="ps-viewer-button" href="' + escape(record.cif) + '" download>mmCIF</a>' : '')
-      +     (record.entry ? '<a class="ps-viewer-button" rel="noopener" href="' + escape(record.entry) + '">AlphaFold entry ↗</a>' : '')
+      +     (record.entry ? '<a class="ps-viewer-button" rel="noopener" href="' + escape(record.entry) + '">AlphaFold entry</a>' : '')
       +     '<button class="ps-viewer-button" type="button" data-ps-fullscreen>Fullscreen</button>'
       +   '</div>'
       + '</div>'

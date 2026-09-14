@@ -31,6 +31,17 @@
 
   function num(value) { return (value === null || value === undefined) ? '' : R.number(value); }
 
+  /* Withdraw a section after the tabs have been built -- used only where a
+     block can fail after render, which today is an image the server turns out
+     not to have. The tab goes with the section; a tab that scrolls to nothing
+     is worse than no tab. */
+  function hideSection(id) {
+    R.show(R.byId(id), false);
+    if (!els.tabs) { return; }
+    var tab = els.tabs.querySelector('a[href="#' + id + '"]');
+    if (tab && tab.parentNode) { tab.parentNode.removeChild(tab); }
+  }
+
   /* The B73 assembly a reader should normally be looking at. A B73 gene has
      seven annotations -- RefGen_v1, v2, v3, two GRAMENE-4.0 releases and
      NAM-5.0 -- and `is_current` is true within each of them, so it cannot tell
@@ -530,12 +541,16 @@
         '<div class="mgdb-rec-block"><div class="mgdb-rec-block-head"><h3>qTeller</h3></div>' +
         '<div class="mgdb-rec-linkrow"><a class="mgdb-button mgdb-button-primary" href="' +
         R.escape(expression.qteller.url) + '" target="_blank" rel="noopener">' +
-        'Open the expression atlas <span aria-hidden="true">&nearr;</span></a></div></div>');
+        'Open the expression atlas</a></div></div>');
       rendered = true;
     }
 
     rendered = renderEfp(out, expression.efp) || rendered;
 
+    /* Only reasons that say something. `{available: false}` with no `reason`
+       is what a locus-only record gets back, and pushing it unfiltered put a
+       "Not available for this gene" note on the page whose one line read
+       "undefined". */
     var gaps = [];
     if (expression.rnaseq_histogram && !expression.rnaseq_histogram.available) {
       gaps.push(expression.rnaseq_histogram.reason);
@@ -543,6 +558,7 @@
     if (expression.proteomics && !expression.proteomics.available) {
       gaps.push(expression.proteomics.reason);
     }
+    gaps = gaps.filter(Boolean);
     if (gaps.length) {
       R.notes(out, 'Not available for this gene', gaps.map(function (t) { return { text: t }; }));
       rendered = true;
@@ -559,12 +575,38 @@
      Variation
      ------------------------------------------------------------------------ */
 
+  /* chr4:43,430,007-43,438,753 from the three fields that carry it. */
+  function locationText(row) {
+    if (!row || row.start == null) { return ''; }
+    return (row.chromosome ? row.chromosome + ':' : '') + R.number(row.start) +
+      (row.end != null && row.end !== row.start ? '\u2013' + R.number(row.end) : '');
+  }
+
+  /* An array of {id, name, html} refs. Joined by name for the TSV and for
+     sorting; linked for the cell. Reading one of these as a string is what put
+     "[object Object]" in the Stock column. */
+  function refNames(refs) {
+    return (refs || []).map(function (r) { return r && r.name; }).filter(Boolean).join(', ');
+  }
+
+  function refLinks(refs) {
+    var list = (refs || []).filter(function (r) { return r && r.name; });
+    if (!list.length) { return '<span class="mgdb-muted">\u2014</span>'; }
+    return list.map(function (r) {
+      return r.html ? R.link(r.html, r.name) : R.escape(r.name);
+    }).join(', ');
+  }
+
   function renderVariation(variation) {
     if (!variation) { return false; }
     var out = els.variationBody;
     out.innerHTML = '';
     var rendered = false;
 
+    /* Four column keys here did not exist in the payload and every cell under
+       them was empty or "[object Object]": the resource returns
+       `gene_structures`, `chromosome`/`start`/`end` and arrays of refs, not
+       `structure`, `position`, `html` and strings. */
     rendered = R.collection(out, {
       title: 'Insertions',
       items: variation.insertions,
@@ -572,17 +614,30 @@
       pageSize: 25,
       columns: [
         { key: 'name', label: 'Insertion', tile: true,
-          html: function (i) { return i.html ? R.link(i.html, i.name) : R.escape(i.name); } },
+          html: function (i) {
+            var v = (i.variations || [])[0];
+            return v && v.html ? R.link(v.html, i.name) : R.escape(i.name);
+          } },
         { key: 'source', label: 'Source' },
-        { key: 'structure', label: 'Gene structure' },
+        { key: 'gene_structures', label: 'Gene structure',
+          get: function (i) { return i.gene_structures || ''; } },
         { key: 'position', label: 'Position',
-          html: function (i) { return i.position
-            ? '<span class="mgdb-sequence">' + R.escape(i.position) + '</span>'
-            : '<span class="mgdb-muted">Not recorded</span>'; } },
-        { key: 'stocks', label: 'Stock' }
+          get: locationText,
+          html: function (i) {
+            var text = locationText(i);
+            return text
+              ? '<span class="mgdb-sequence">' + R.escape(text) + '</span>'
+              : '<span class="mgdb-muted">Not recorded</span>';
+          } },
+        { key: 'stocks', label: 'Stock',
+          get: function (i) { return refNames(i.stocks); },
+          html: function (i) { return refLinks(i.stocks); } }
       ]
     }) || rendered;
 
+    /* `structure` for `gene_structure`: the column was blank on every row of
+       every gene. The Reference column is gone at the group's request; the
+       study is still in the API payload and in the TSV below. */
     rendered = R.collection(out, {
       title: 'SNPs and traits',
       items: variation.snp_traits,
@@ -591,12 +646,14 @@
       columns: [
         { key: 'snp', label: 'SNP', tile: true },
         { key: 'trait', label: 'Trait' },
-        { key: 'structure', label: 'Structure' },
+        { key: 'gene_structure', label: 'Structure',
+          get: function (t) { return t.gene_structure || ''; },
+          html: function (t) { return t.gene_structure
+            ? '<span title="' + R.escape(t.structure_description || '') + '">' +
+              R.escape(t.gene_structure) + '</span>'
+            : '<span class="mgdb-muted">\u2014</span>'; } },
         { key: 'position', label: 'Position', sort: 'number', numeric: true,
-          get: function (t) { return t.position == null ? '' : R.number(t.position); } },
-        { key: 'reference', label: 'Reference',
-          get: function (t) { return t.reference ? t.reference.name : ''; },
-          html: function (t) { return t.reference ? (R.refLink(t.reference) || R.escape(t.reference.name)) : '\u2014'; } }
+          get: function (t) { return t.position == null ? '' : R.number(t.position); } }
       ]
     }) || rendered;
 
@@ -654,6 +711,33 @@
         strip + '</div>');
     }
 
+    /* The pangenome view. Genomic sequence at the B73 gene model's location
+       across the assemblies, from the cactus-Minigraph pipeline. There is no
+       database row saying whether a given gene has one, so the figure removes
+       itself if the image does not load. */
+    if (pan.pangenome_image && pan.pangenome_image.url) {
+      var pv = pan.pangenome_image;
+      var pvBlock = document.createElement('div');
+      pvBlock.className = 'mgdb-rec-block gene-record-pangenome';
+      pvBlock.innerHTML =
+        '<div class="mgdb-rec-block-head"><h3>Pangenome view</h3>' +
+        '<span class="mgdb-rec-block-count">' + R.escape(pv.gene_model) + '</span></div>' +
+        '<figure class="gene-record-pangenome-figure">' +
+          '<a href="' + R.escape(pv.url) + '" target="_blank" rel="noopener">' +
+            '<img src="' + R.escape(pv.url) + '" loading="lazy" alt="Genomic sequence at ' +
+            R.escape(pv.gene_model) + ' across multiple maize assemblies, drawn as a ' +
+            'pangenome subgraph">' +
+          '</a>' +
+          '<figcaption>' + R.escape(pv.description) + ' Produced by the ' +
+            R.link(pv.pipeline_url, pv.pipeline, true) + ' at MaizeGDB in 2026.' +
+          '</figcaption>' +
+        '</figure>';
+      out.appendChild(pvBlock);
+      pvBlock.querySelector('img').addEventListener('error', function () {
+        if (pvBlock.parentNode) { pvBlock.parentNode.removeChild(pvBlock); }
+      });
+    }
+
     R.collection(out, {
       title: 'Related gene models in maize',
       items: pan.members,
@@ -672,22 +756,99 @@
     return true;
   }
 
+  /* Orthologs, and phylostrata beneath them.
+
+     Every column but Species was reading a key the payload does not have --
+     `name`, `source`, `relationship` and `url` against `identifier`,
+     `analysis`, `kind` and nothing -- so the table listed one italic species
+     name per row and three empty cells. The identifiers were there the whole
+     time.
+
+     The rows come from the whole pan-gene, not only from this gene model, which
+     is what the legacy page's Pan-genome tab added on top of its Overview tab's
+     four species. `via` says which member of the cluster carries the call, and
+     a direct call is marked so the two are not confused. */
   function renderOrthologs(orthologs) {
-    var list = (orthologs && orthologs.orthologs) || [];
-    return R.collection(els.orthologsBody, {
+    if (!orthologs) { return false; }
+    var out = els.orthologsBody;
+    out.innerHTML = '';
+    var rendered = false;
+
+    rendered = R.collection(out, {
       title: 'Orthologs in other species',
-      items: list,
+      items: orthologs.orthologs,
       filename: 'gene-orthologs.tsv',
       pageSize: 25,
       columns: [
-        { key: 'name', label: 'Gene', tile: true,
-          html: function (o) { return o.url ? R.link(o.url, o.name, true) : R.escape(o.name); } },
+        { key: 'identifier', label: 'Gene', tile: true,
+          html: function (o) { return o.url
+            ? R.link(o.url, o.identifier, true) : R.escape(o.identifier); } },
         { key: 'species', label: 'Species',
-          html: function (o) { return o.species ? '<em>' + R.escape(o.species) + '</em>' : '\u2014'; } },
-        { key: 'source', label: 'Source' },
-        { key: 'relationship', label: 'Relationship' }
+          html: function (o) { return o.species
+            ? '<em>' + R.escape(o.species) + '</em>'
+            : '<span class="mgdb-muted">\u2014</span>'; } },
+        { key: 'analysis', label: 'Analysis' },
+        { key: 'via', label: 'Called on',
+          get: function (o) { return o.is_direct ? 'This gene model' : (o.via || ''); },
+          html: function (o) {
+            if (o.is_direct) { return '<span class="mgdb-pill mgdb-pill-ok">This gene model</span>'; }
+            return o.via_html
+              ? R.link(o.via_html, o.via) + ' <span class="mgdb-muted">(pan-gene)</span>'
+              : R.escape(o.via || '');
+          } }
       ]
+    }) || rendered;
+
+    rendered = renderPhylostrata(out, orthologs.phylostrata) || rendered;
+    return rendered;
+  }
+
+  /* The phylostrata figure. One PNG per B73 v5 protein-coding gene model,
+     published by the phylostratR analysis; there is no database row for it, so
+     a gene the analysis did not cover is a load failure rather than an empty
+     result, and the block removes itself when the image does not arrive. */
+  function renderPhylostrata(out, ps) {
+    if (!ps || !ps.image) { return false; }
+    var block = document.createElement('div');
+    block.className = 'mgdb-rec-block gene-record-phylostrata';
+    block.innerHTML =
+      '<div class="mgdb-rec-block-head"><h3>Phylostrata</h3>' +
+      '<span class="mgdb-rec-block-count">1&ndash;' + ps.scale.max + '</span></div>' +
+      '<figure class="gene-record-phylostrata-figure">' +
+        /* The full 2400x580 PNG, not the 670px `downsized/` JPG. The figure
+           fills the column -- about 1,150px on a desktop -- so the thumbnail
+           was being scaled UP and read as out of focus, while the same picture
+           opened at full size looked fine. At 290 KB against 26 KB it is the
+           more expensive of the two, which is what `loading="lazy"` is for:
+           nothing is fetched until the section is scrolled to. */
+        '<a href="' + R.escape(ps.image) + '" target="_blank" rel="noopener">' +
+          '<img src="' + R.escape(ps.image) + '" alt="Phylostratigraphy of ' +
+          R.escape(ps.gene_model) + ', showing the level at which each part of the ' +
+          'protein is conserved" loading="lazy">' +
+        '</a>' +
+        '<figcaption>' + R.escape(ps.description) + '</figcaption>' +
+      '</figure>' +
+      '<div class="mgdb-rec-linkrow">' +
+        '<a class="mgdb-button mgdb-button-secondary" href="' + R.escape(ps.details_url) +
+          '" target="_blank" rel="noopener">Phylostrata details for ' +
+          R.escape(ps.gene_model) + '</a>' +
+        '<a class="mgdb-button mgdb-button-quiet" href="' + R.escape(ps.about_url) +
+          '" target="_blank" rel="noopener">About the Phylostrata tool</a>' +
+      '</div>';
+    out.appendChild(block);
+
+    /* The thumbnail is the only evidence the analysis covered this gene. If it
+       404s the figure goes, and the two links go with it -- they would lead to
+       a page with nothing on it. */
+    var img = block.querySelector('img');
+    img.addEventListener('error', function () {
+      if (block.parentNode) { block.parentNode.removeChild(block); }
+      /* A gene with no orthologs and no phylostrata image has nothing left in
+         this section. Leaving it visible gives the tab bar an entry that
+         scrolls to an empty heading. */
+      if (!out.children.length) { hideSection('gene-record-orthologs'); }
     });
+    return true;
   }
 
   /* ------------------------------------------------------------------------
@@ -722,10 +883,19 @@
     }));
 
     /* Every annotation of this gene, in every assembly. B73 alone has seven,
-       and this is where a reader compares them. */
+       and this is where a reader compares them.
+
+       The title names B73 because that is what the rows are: of the ~22,700
+       loci carrying a gene model, all but about fifty carry only B73
+       annotations. It is read off the rows rather than assumed, so the fifty
+       get an accurate heading instead of a wrong one. */
+    var models = locus.associated_gene_models || [];
+    var allB73 = models.length && models.every(function (m) {
+      return (m.assembly || '').indexOf('B73') !== -1;
+    });
     R.collection(out, {
-      title: 'Gene models for this classical gene',
-      items: locus.associated_gene_models,
+      title: (allB73 ? 'B73 gene models' : 'Gene models') + ' for this classical gene',
+      items: models,
       filename: 'gene-associated-models.tsv',
       pageSize: 25,
       columns: [
@@ -765,6 +935,55 @@
     });
 
     return true;
+  }
+
+  /* Mutant phenotype images.
+
+     The shared gallery every record page with pictures uses: a card per image
+     carrying the photograph, the allele it is filed against, and its caption --
+     which on this page is the whole point of the picture and is why the legacy
+     "Captions" toggle is gone. The same block offers the rows as a table and a
+     TSV; the gallery is its default view. */
+  function renderImages(locus) {
+    var items = (locus && locus.images) || [];
+    if (!items.length) { return false; }
+    return R.images(els.imagesBody, items.map(function (image) {
+      return {
+        url: image.url,
+        caption: image.caption || '',
+        title: (image.variation && image.variation.name) || 'Image',
+        category: image.variation_type || 'Image',
+        record: (image.variation && image.variation.html) || ''
+      };
+    }), 'gene-record-image-dialog', {
+      /* Title case, matching the section heading it sits under and the tab
+         that names it. */
+      title: 'Mutant Phenotype Images',
+      filename: 'gene-mutant-phenotype-images.tsv'
+    });
+  }
+
+  /* Seed stocks carrying an allele of this gene. A Stock Center row can be
+     ordered and the rest cannot, which is the one thing the table has to make
+     obvious -- the legacy page said it by bolding the name. */
+  function renderStocks(locus) {
+    return R.collection(els.stocksBody, {
+      title: 'Stocks',
+      items: (locus && locus.stocks) || [],
+      filename: 'gene-stocks.tsv',
+      pageSize: 25,
+      columns: [
+        { key: 'name', label: 'Stock', tile: true,
+          html: function (st) { return R.link(st.html, st.name) +
+            (st.from_stock_center
+              ? ' <span class="mgdb-pill mgdb-pill-ok">Stock Center</span>' : ''); } },
+        { key: 'full_name', label: 'Description' },
+        { key: 'type', label: 'Type' },
+        { key: 'alleles', label: 'Alleles' },
+        { key: 'available_from', label: 'Available from' },
+        R.urlColumn(function (st) { return st.html; })
+      ]
+    });
   }
 
   function renderMap(locus) {
@@ -948,7 +1167,7 @@
         '<div class="mgdb-rec-linkrow">' + downloads.map(function (url) {
           return '<a class="mgdb-button mgdb-button-secondary" href="' + R.escape(url) +
                  '" target="_blank" rel="noopener">Every sequence for this assembly ' +
-                 '<span aria-hidden="true">&nearr;</span></a>';
+                 '</a>';
         }).join('') + '</div></div>');
     }
 
@@ -1052,7 +1271,7 @@
   function renderProvenance(structure) {
     var scores = (structure && structure.scores) || [];
     return R.collection(els.provenanceBody, {
-      title: 'Model quality scores',
+      title: 'Gene model scores',
       items: scores,
       filename: 'gene-model-scores.tsv',
       pageSize: 'all',
@@ -1093,6 +1312,7 @@
       ['Ontology terms', counts.ontology], ['Insertions', counts.insertions],
       ['SNP associations', counts.snp_traits], ['Alleles', counts.alleles],
       ['Map positions', counts.map_positions], ['Gene products', counts.gene_products],
+      ['Stocks', counts.stocks], ['Images', counts.images],
       ['Cross-references', counts.xrefs], ['Pan-gene members', counts.pan_gene_members],
       ['Gene models of this gene', counts.locus_gene_models],
       ['Curator notes', counts.comments], ['References', counts.references]
@@ -1120,6 +1340,8 @@
     'gene-record-variation': ['insertions', 'snp_traits', 'alleles'],
     'gene-record-pan_gene': ['pan_gene_members'],
     'gene-record-locus': ['locus_gene_models', 'comments'],
+    'gene-record-images': ['images'],
+    'gene-record-stocks': ['stocks'],
     'gene-record-map': ['map_positions'],
     'gene-record-references': ['references'],
     'gene-record-xrefs': ['xrefs']
@@ -1134,13 +1356,15 @@
     'gene-record-pan_gene': 'Pan-gene',
     'gene-record-orthologs': 'Orthologs',
     'gene-record-locus': 'Classical gene',
+    'gene-record-images': 'Mutant Phenotype Images',
+    'gene-record-stocks': 'Stocks',
     'gene-record-map': 'Map coordinates',
     'gene-record-nearby': 'Nearby loci',
     'gene-record-genetic': 'Additional genetic information',
     'gene-record-references': 'References',
     'gene-record-sequences': 'Sequences and downloads',
     'gene-record-xrefs': 'Cross-references',
-    'gene-record-provenance': 'Model quality',
+    'gene-record-provenance': 'Gene model scores',
     'gene-record-metrics': 'Metrics',
     'gene-record-resources': 'Related resources',
     'gene-record-api': 'API'
@@ -1158,15 +1382,27 @@
 
     renderHeader(data, sections);
 
+    /* Half the classical genes in MaizeGDB have no gene model at all, and seven
+       of this page's sections are about a gene model rather than about the
+       gene: there is no structure to draw, no expression to read, no pan-gene,
+       no orthologs, no sequence to download and no model scores without one.
+       The resource returns those sections as empty shells rather than omitting
+       them -- a client should be able to tell "nothing here" from "not asked
+       for" -- so the page decides, and a section it does not render never
+       reaches the section tabs. */
+    var hasGeneModel = !!(data.attributes && data.attributes.name);
+
     var rendered = [];
     if (renderOverview(sections.overview)) { rendered.push('gene-record-overview'); }
-    if (renderStructure(sections.structure)) { rendered.push('gene-record-structure'); }
+    if (hasGeneModel && renderStructure(sections.structure)) { rendered.push('gene-record-structure'); }
     if (renderFunction(sections.function)) { rendered.push('gene-record-function'); }
-    if (renderExpression(sections.expression)) { rendered.push('gene-record-expression'); }
+    if (hasGeneModel && renderExpression(sections.expression)) { rendered.push('gene-record-expression'); }
     if (renderVariation(sections.variation)) { rendered.push('gene-record-variation'); }
-    if (renderPanGene(sections.pan_gene)) { rendered.push('gene-record-pan_gene'); }
-    if (renderOrthologs(sections.orthologs)) { rendered.push('gene-record-orthologs'); }
+    if (hasGeneModel && renderPanGene(sections.pan_gene)) { rendered.push('gene-record-pan_gene'); }
+    if (hasGeneModel && renderOrthologs(sections.orthologs)) { rendered.push('gene-record-orthologs'); }
     if (renderLocus(sections.locus)) { rendered.push('gene-record-locus'); }
+    if (renderImages(sections.locus)) { rendered.push('gene-record-images'); }
+    if (renderStocks(sections.locus)) { rendered.push('gene-record-stocks'); }
     if (renderMap(sections.locus)) { rendered.push('gene-record-map'); }
     if (renderNearby(sections.locus)) { rendered.push('gene-record-nearby'); }
     if (renderGenetic(sections.locus)) { rendered.push('gene-record-genetic'); }
@@ -1176,9 +1412,9 @@
       rendered.push('gene-record-references');
     }
 
-    if (renderSequences(sections.sequences)) { rendered.push('gene-record-sequences'); }
+    if (hasGeneModel && renderSequences(sections.sequences)) { rendered.push('gene-record-sequences'); }
     if (renderXrefs(sections.xrefs)) { rendered.push('gene-record-xrefs'); }
-    if (renderProvenance(sections.structure)) { rendered.push('gene-record-provenance'); }
+    if (hasGeneModel && renderProvenance(sections.structure)) { rendered.push('gene-record-provenance'); }
 
     rendered.forEach(function (id) { R.show(R.byId(id), true); });
 
@@ -1248,6 +1484,8 @@
       panGeneBody: R.byId('gene-record-pan_gene-body'),
       orthologsBody: R.byId('gene-record-orthologs-body'),
       locusBody: R.byId('gene-record-locus-body'),
+      imagesBody: R.byId('gene-record-images-body'),
+      stocksBody: R.byId('gene-record-stocks-body'),
       mapBody: R.byId('gene-record-map-body'),
       nearbyBody: R.byId('gene-record-nearby-body'),
       geneticBody: R.byId('gene-record-genetic-body'),

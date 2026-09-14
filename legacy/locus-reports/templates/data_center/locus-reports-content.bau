@@ -1,0 +1,44 @@
+*(locus-reports-content
+ <br><br>
+ <b>$(description)</b>
+ <br><br>
+ $(report_note)
+ <div id='datacenter_gray_background' style="width: 95%">
+    @(genes_sec #display: off#
+      @(genes_list
+       <br>
+       <a href="/data_center/locus?id=$(id)">$(name) <i>$(full_name)</i></a>
+      )
+    )
+    @(candidate_sec #display: off#
+      @(candidate_list
+       <br>
+       <a href="/data_center/locus?id=$(id)">$(name) <i>$(full_name)</i></a>
+      )
+    )
+    @(transgene_sec #display: off#
+      @(transgene_list
+       <b>$(name) <i>$(full_name)</i></b><br><br>
+       See the complete record for <a href="/data_center/locus?id=$(id)">$(name) <i>$(full_name)</i></a>.<br><br>
+       <b>Notes:</b><br>$(comments)<br>
+       <b>Gene Products:</b><br>$(gp)<br>
+       <b>Related Loci:</b><br>$(loci)<br>
+       <b>References:</b><br>$(ref)<br>
+       <hr><br>
+      )
+    )
+    @(family_sec #display: off#
+      @(family_list
+      <b>$(name) <i>$(full_name)</i></b><br><br>
+       See the complete record for <a href="/data_center/locus?id=$(id)">$(name) <i>$(full_name)</i></a>.<br><br>
+       <b>Notes:</b><br>$(comments)<br>
+       <b>Family Members:</b><br>$(fm)<br>
+       <b>Other Related Loci:</b><br>$(loci)<br>
+       <b>References:</b><br>$(ref)<br>
+       <hr><br>
+      )
+    )
+    
+  </div>
+   
+)

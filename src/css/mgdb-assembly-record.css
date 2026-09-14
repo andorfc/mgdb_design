@@ -30,22 +30,11 @@
   font-size: var(--mgdb-text-sm);
 }
 
-/* A header button that leaves MaizeGDB says so, from its href -- the same rule
-   the resource cards use. mgdb-record.css both hides hand-placed arrow spans
-   inside a button and suppresses its own page-wide arrow on `.mgdb-button`, so
-   without this every one of these buttons is unmarked, including the ones that
-   go to GenBank or figshare. This sheet loads after it and ties on
-   specificity, so it wins. */
-.mgdb-assembly-record-page .ar-actions a[href^="http"]::after {
-  content: " \2197";
-  font-size: .85em;
-  font-weight: 600;
-}
-
-.mgdb-assembly-record-page .ar-actions a[href*="//maizegdb.org"]::after,
-.mgdb-assembly-record-page .ar-actions a[href*=".maizegdb.org"]::after {
-  content: none;
-}
+/* The header-button arrow rule and its opt-out both go: the shared href-driven
+   rule in mgdb-modern.css ("Link arrows") now marks these buttons, and marks
+   the download ones with a down arrow, which this never did. The reason this
+   existed -- mgdb-record.css excepting `.mgdb-button` from its page-wide
+   arrow -- is gone with that exception. Rule and opt-out retired together. */
 
 .mgdb-assembly-record-page .ar-summary code {
   padding: 1px 6px;

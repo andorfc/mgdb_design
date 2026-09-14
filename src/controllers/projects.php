@@ -188,13 +188,13 @@
           $meta[] = 'hosted at ' . mgdb_project_esc($host ? preg_replace('~^www\.~', '', $host) : 'another site');
       }
 
-      /* An offsite destination says so before it is clicked, and opens in a new
-         tab, the same contract every other external link on the site keeps. */
+      /* An offsite destination opens in a new tab, the same contract every other
+         external link on the site keeps. The arrow that used to be pasted in
+         here is drawn from the href by the "Link arrows" rule in
+         css/mgdb-modern.css, so a card can no longer show a mark that disagrees
+         with where it actually points. */
       $link_attrs = !empty($project['external'])
           ? ' target="_blank" rel="noopener"'
-          : '';
-      $link_cue = !empty($project['external'])
-          ? ' <span aria-hidden="true">&nearr;</span>'
           : '';
 
       $cards .=
@@ -202,7 +202,7 @@
         . ' data-filter="' . mgdb_project_esc($category) . '"'
         . ' data-search="' . mgdb_project_esc($search) . '">'
         . '<h3>' . $mark_html . '<a href="' . mgdb_project_esc($project['url']) . '"' . $link_attrs . '>'
-        . mgdb_project_esc($entry['title']) . $link_cue . '</a></h3>'
+        . mgdb_project_esc($entry['title']) . '</a></h3>'
         /* The topic pills sit above the summary rather than below the facts
            strip. A card's paragraph is the one part of it that stretches to
            fill the card's height, so anything above the paragraph can be one

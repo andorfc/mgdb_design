@@ -201,3 +201,25 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* --- on the Data Hub shell --------------------------------------------------
+
+   The shell cards every direct-child <section> except `.mgdb-hero`, and this
+   page's hero is `.mgdb-hero-basic` -- a different class, so it was being
+   painted as a white panel with 24px of padding and a coloured top edge, which
+   is not what a hero is. Hand it back its own look.
+
+   `.mgdb-hub-page` is in the selector so this only applies where the shell is
+   loaded, and it beats the shell's one-class rule without !important. */
+.mgdb-hub-page.mgdb-cite-page > .mgdb-hero-basic {
+  padding: var(--mgdb-space-5) var(--mgdb-space-6);
+  border: 0;
+  border-left: 4px solid var(--mgdb-gold);
+  border-radius: var(--mgdb-radius-lg);
+  box-shadow: none;
+}
+
+/* The publications list is long and its own cards already carry edges, so the
+   section holding them keeps the shell's card but loses the inner crowding a
+   240-entry list would otherwise get. */
+.mgdb-hub-page.mgdb-cite-page .mgdb-cite-group { margin-top: var(--mgdb-space-5); }

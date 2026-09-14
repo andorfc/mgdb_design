@@ -308,7 +308,7 @@
           + '  </div>'
           + '  <div class="image-card-links">'
           + '    <button class="image-card-btn image-preview-btn" type="button" data-img-src="' + esc(imgUrl) + '" data-img-title="' + esc(name) + '" data-img-cat="' + esc(catName) + '" data-img-caption="' + esc(caption) + '" data-img-record="' + esc(recordUrl) + '">Zoom</button>'
-          + '    <a class="image-card-btn" href="' + recordUrl + '">Record &rarr;</a>'
+          + '    <a class="image-card-btn" href="' + recordUrl + '">Record</a>'
           + '    <button class="image-card-btn image-copy-btn" type="button" data-copy-value="' + esc(imgUrl) + '">Copy URL</button>'
           + '  </div>'
           + '</article>';

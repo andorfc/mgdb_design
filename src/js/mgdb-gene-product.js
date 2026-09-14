@@ -413,7 +413,7 @@
         metaHtml +
       '</div>' +
       '<div class="gp-card-actions">' +
-        '<a href="' + esc(productUrl) + '">View details &rarr;</a>' +
+        '<a href="' + esc(productUrl) + '">View details</a>' +
         '<div class="gp-card-copy-btns">' + copyButtons + '</div>' +
       '</div>' +
     '</article>';

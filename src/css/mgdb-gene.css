@@ -1170,38 +1170,19 @@
 /* --------------------------------------------------------------------------
    External links
 
-   A link that leaves MaizeGDB says so. The rule is written against the href
-   rather than a hand-placed chip, the way .mgdb-resource-list already does it
-   in css/mgdb-modern.css -- so a link added later is marked the moment it is
-   written and can never drift out of step with its own destination. That
-   matters most in the nomenclature tables, where the Gramene Version column is
-   forty EnsemblGenomes links and every one of them had been left unmarked.
+   The rule itself is the one href-driven block in css/mgdb-modern.css
+   ("Link arrows"), which marks every link in page content the same way and
+   adds the down arrow for downloads that this page's rule never had -- the
+   gene hub is full of them.
 
-   maizegdb.org and its subdomains -- download, documents, jbrowse, images,
-   wgs -- are the same site and carry none, and neither do relative links,
-   which cannot leave.
-
-   Three things opt out: the Related resources cards, which already mark
-   themselves on their own <strong> and would otherwise show two arrows; the
-   embedded BLAST form, which is controllers/BLAST/BLAST_form.bau and not this
-   page's markup to decorate; and buttons, where a glyph after the label
-   fights the padding.
+   One opt-out stays, and it is this page's own: the embedded BLAST form is
+   controllers/BLAST/BLAST_form.bau, not this page's markup to decorate. The
+   other three that lived here are gone -- maizegdb.org and the Related
+   resources cards are handled centrally, and the exception for buttons was
+   dropped, because a button's link goes where it goes.
    -------------------------------------------------------------------------- */
 
-.mgdb-gene-page a[href^="http"]::after,
-.mgdb-gene-page a[href^="//"]::after {
-  content: " \2197";
-  font-size: .85em;
-  font-weight: 600;
-}
-
-.mgdb-gene-page a[href*="//maizegdb.org"]::after,
-.mgdb-gene-page a[href*=".maizegdb.org"]::after,
-.mgdb-gene-page .mgdb-resource-list a::after,
-.mgdb-gene-page .gene-blast-embed a::after,
-.mgdb-gene-page a.mgdb-button::after {
-  content: none;
-}
+.mgdb-gene-page .gene-blast-embed a::after { content: none; }
 
 /* --------------------------------------------------------------------------
    Maize Feature Store panel

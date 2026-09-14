@@ -495,7 +495,7 @@
       var cb = html('div', 'gf-block gf-classes');
       cb.appendChild(html('div', 'gf-block-head',
         '<h4>Protein family and class <small>InterPro entries on ' + esc(classes.protein || 'the canonical protein') + ', classes from the domain atlas</small></h4>' +
-        '<a class="gf-out" href="' + esc(classes.atlas.page) + '">Domain atlas <span aria-hidden="true">&nearr;</span></a>'));
+        '<a class="gf-out" href="' + esc(classes.atlas.page) + '">Domain atlas</a>'));
 
       /* the architecture as pills, in order along the protein */
       if (classes.architecture) {
@@ -605,7 +605,7 @@
       pb.appendChild(html('div', 'gf-block-head',
         '<h4>Metabolic pathways <small>' + pathways.pathways.length + ' pathway' + (pathways.pathways.length === 1 ? '' : 's') +
         ' · E2P2 assignment on ' + esc(pathways.genome_label || pathways.genome) + ', compared across ' + founders + ' NAM founders</small></h4>' +
-        '<a class="gf-out" href="' + esc(pathways.explorer) + '">Pathway explorer <span aria-hidden="true">&nearr;</span></a>' +
+        '<a class="gf-out" href="' + esc(pathways.explorer) + '">Pathway explorer</a>' +
         '<div class="gf-legend">' +
           '<span><i class="gf-step-key is-this"></i> this gene’s step</span>' +
           '<span><i class="gf-step-key is-filled"></i> another ' + esc(pathways.genome_label || 'B73') + ' gene fills it</span>' +

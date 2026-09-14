@@ -182,9 +182,9 @@
 
       html += '<tr>'
             + '<th scope="row"><strong><a href="' + esc(r.url) + '" target="_blank" rel="noopener">'
-            + richName(r.name_html || r.name) + ' <span aria-hidden="true">&nearr;</span></a></strong></th>'
+            + richName(r.name_html || r.name) + '</a></strong></th>'
             + '<td class="mgdb-sequence"><a href="' + esc(r.metacyc_url) + '" target="_blank" rel="noopener">'
-            + esc(r.id) + ' <span aria-hidden="true">&nearr;</span></a></td>'
+            + esc(r.id) + '</a></td>'
             + '<td>' + (asmPills || '<span class="mgdb-muted">—</span>') + '</td>'
             + '<td class="mgdb-numeric">' + num(r.gene_models) + '</td>'
             + '<td class="mgdb-numeric">' + num(r.proteins) + '</td>'
@@ -209,15 +209,15 @@
             +        asmPills
             + '    </div>'
             + '    <h3 class="mp-pathway-card-title"><a href="' + esc(r.url) + '" target="_blank" rel="noopener">'
-            +        richName(r.name_html || r.name) + ' <span aria-hidden="true">&nearr;</span></a></h3>'
+            +        richName(r.name_html || r.name) + '</a></h3>'
             + '    <div class="mp-pathway-card-meta">'
             + '      <span><strong>' + num(r.gene_models) + '</strong> gene models</span> &bull; '
             + '      <span><strong>' + num(r.proteins) + '</strong> enzymes</span>'
             + '    </div>'
             + '  </div>'
             + '  <div class="mp-pathway-card-footer">'
-            + '    <a href="' + esc(r.metacyc_url) + '" target="_blank" rel="noopener">MetaCyc entry &nearr;</a>'
-            + '    <a class="mgdb-button mgdb-button-quiet" href="' + esc(r.url) + '" target="_blank" rel="noopener">PlantCyc &rarr;</a>'
+            + '    <a href="' + esc(r.metacyc_url) + '" target="_blank" rel="noopener">MetaCyc entry</a>'
+            + '    <a class="mgdb-button mgdb-button-quiet" href="' + esc(r.url) + '" target="_blank" rel="noopener">PlantCyc</a>'
             + '  </div>'
             + '</article>';
     }
@@ -435,7 +435,7 @@
              + ' &ldquo;' + esc(term) + '&rdquo;</strong><ul>';
     found.forEach(function (r) {
       html += '<li><a href="' + esc(r.url) + '" target="_blank" rel="noopener">'
-            + esc(r.name) + ' <span aria-hidden="true">&nearr;</span></a>'
+            + esc(r.name) + '</a>'
             + ' &mdash; ' + esc(r.section) + '</li>';
     });
     hits.innerHTML = html + '</ul>';

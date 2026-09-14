@@ -515,7 +515,7 @@
         +      commentsHtml
         + '  </div>'
         + '  <div class="pheno-card-links">'
-        + '    <a href="' + recordUrl + '">View Record &rarr;</a>'
+        + '    <a href="' + recordUrl + '">View Record</a>'
         + '    <button class="pheno-copy-btn" type="button" data-copy-value="' + esc(name) + '">Copy Name</button>'
         + '    <button class="pheno-copy-btn" type="button" data-copy-value="' + esc(row.id) + '">Copy ID</button>'
         + '  </div>'

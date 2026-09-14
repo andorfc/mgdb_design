@@ -488,7 +488,8 @@ EOT
     "truncated": [],
     "counts": { "transcripts": 1, "protein_domains": 1, "ontology": 7,
       "insertions": 6, "snp_traits": 36, "references": 111, "xrefs": 12,
-      "pan_gene_members": 65, "map_positions": 13, "alleles": 13 }
+      "pan_gene_members": 65, "map_positions": 13, "alleles": 13,
+      "images": 4, "stocks": 22 }
   },
   "links": {
     "self": "{base}/api/v1/records/gene/lg1",

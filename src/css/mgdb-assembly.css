@@ -387,24 +387,15 @@
    links, which cannot leave.
    -------------------------------------------------------------------------- */
 
-.mgdb-assembly-page a[href^="http"]::after,
-.mgdb-assembly-page a[href^="//"]::after,
-.mgdb-assembly-page a[href^="ftp"]::after {
-  content: " \2197";
-  font-size: .85em;
-  font-weight: 600;
-}
+/* The external/download link arrows that lived here are now the one href-driven
+   rule in mgdb-modern.css (search "Link arrows"). */
 
-/* Same site, plus the two shared components that write their own arrow --
-   reference cards from references_lib.php, resource cards from
-   mgdb-modern.css. These match the rule above exactly on specificity, so they
-   have to stay below it. */
-.mgdb-assembly-page a[href*="//maizegdb.org"]::after,
-.mgdb-assembly-page a[href*=".maizegdb.org"]::after,
-.mgdb-assembly-page .mgdb-ref a::after,
-.mgdb-assembly-page .mgdb-resource-list a::after {
-  content: none;
-}
+/* The opt-outs that stood here went with it. Removing the arrow rule and
+   leaving its companions behind is what suppressed the down arrow on all 47
+   download.maizegdb.org links on this page: this sheet loads after
+   mgdb-modern.css, so `a[href*=".maizegdb.org"] { content: none }` beat the
+   shared download rule at equal specificity. Whenever a page's arrow rule is
+   retired, its opt-outs go in the same edit. */
 
 /* --------------------------------------------------------------------------
    Assembly improvement figures

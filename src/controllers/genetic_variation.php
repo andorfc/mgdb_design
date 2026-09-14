@@ -121,7 +121,7 @@ function gv_dataset_rows($datasets) {
             $papers[] = empty($p['url'])
                       ? '<span class="mgdb-muted">' . gv_esc($p['label']) . '</span>'
                       : '<a href="' . gv_esc($p['url']) . '" target="_blank" rel="noopener">'
-                        . gv_esc($p['label']) . ' <span aria-hidden="true">&nearr;</span></a>';
+                        . gv_esc($p['label']) . '</a>';
         }
 
         $filter_items = '';
@@ -187,7 +187,7 @@ function gv_dataset_cards($datasets) {
             $papers[] = empty($p['url'])
                       ? '<span class="mgdb-muted">' . gv_esc($p['label']) . '</span>'
                       : '<a href="' . gv_esc($p['url']) . '" target="_blank" rel="noopener">'
-                        . gv_esc($p['label']) . ' <span aria-hidden="true">&nearr;</span></a>';
+                        . gv_esc($p['label']) . '</a>';
         }
         $papers_html = !empty($papers) ? implode(', ', $papers) : '<span class="mgdb-muted">&mdash;</span>';
 
@@ -206,8 +206,8 @@ function gv_dataset_cards($datasets) {
               . '</dl>'
               . $notes_html
               . '<div class="gv-card-actions">'
-              . '<a class="mgdb-button mgdb-button-quiet" href="https://wgs.maizegdb.org/" target="_blank" rel="noopener">SNPVersity 2 &nearr;</a>'
-              . '<a class="mgdb-button mgdb-button-quiet" href="https://snptools.maizegdb.org/" target="_blank" rel="noopener">SNPTools &nearr;</a>'
+              . '<a class="mgdb-button mgdb-button-quiet" href="https://wgs.maizegdb.org/" target="_blank" rel="noopener">SNPVersity 2</a>'
+              . '<a class="mgdb-button mgdb-button-quiet" href="https://snptools.maizegdb.org/" target="_blank" rel="noopener">SNPTools</a>'
               . '</div>'
               . '</article>' . "\n";
     }
