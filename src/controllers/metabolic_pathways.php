@@ -297,7 +297,12 @@ $page = dashboardCache($system, $cache_key, function () use ($DBConn, $catalog_f
 
     /* Two papers from the curated bibliography behind /cite, and two supplied
        here because they describe the resources this page now points at rather
-       than MaizeGDB itself. */
+       than MaizeGDB itself. Those two carry their own abstract, volume, pages
+       and PubMed id in the fallback -- everything the bibliography would have
+       given them -- so all four cards on the page read the same. The values
+       are the published records (Europe PMC, checked 2026-09-13), in the
+       bibliography's own style: NLM journal name, no trailing period on the
+       title, and the whole author list rather than "et al.". */
     $reference_cards = mgdb_render_references($doc_root, array(
         array('doi' => '10.1186/s12918-016-0369-x'),
         array('doi' => '10.3835/plantgenome2012.09.0025'),
@@ -305,14 +310,52 @@ $page = dashboardCache($system, $cache_key, function () use ($DBConn, $catalog_f
               'fallback' => array(
                   'title'   => 'Plant Metabolic Network 15: A resource of genome-wide metabolism databases for 126 plants and algae',
                   'authors' => 'Hawkins C, Ginzburg D, Zhao K, Dwyer W, Xue B, Xu A, Rice S, Cole B, Paley S, Karp P, Rhee SY',
-                  'journal' => 'Journal of Integrative Plant Biology',
-                  'year'    => 2021)),
+                  'journal' => 'Journal of integrative plant biology',
+                  'year'    => 2021,
+                  'volume'  => '63',
+                  'pages'   => '1888-1905',
+                  'pubmed'  => '34403192',
+                  'abstract' =>
+                      'To understand and engineer plant metabolism, we need a comprehensive and accurate '
+                      . 'annotation of all metabolic information across plant species. As a step towards this '
+                      . 'goal, we generated genome-scale metabolic pathway databases of 126 algal and plant '
+                      . 'genomes, ranging from model organisms to crops to medicinal plants '
+                      . '(https://plantcyc.org). Of these, 104 have not been reported before. We systematically '
+                      . 'evaluated the quality of the databases, which revealed that our semi-automated '
+                      . 'validation pipeline dramatically improves the quality. We then compared the metabolic '
+                      . 'content across the 126 organisms using multiple correspondence analysis and found that '
+                      . 'Brassicaceae, Poaceae, and Chlorophyta appeared as metabolically distinct groups. To '
+                      . 'demonstrate the utility of this resource, we used recently published sorghum '
+                      . 'transcriptomics data to discover previously unreported trends of metabolism underlying '
+                      . 'drought tolerance. We also used single-cell transcriptomics data from the Arabidopsis '
+                      . 'root to infer cell type-specific metabolic pathways. This work shows the quality and '
+                      . 'quantity of our resource and demonstrates its wide-ranging utility in integrating '
+                      . 'metabolism with other areas of plant biology.')),
+        /* The DOI was posted in November 2019 and the page said 2019; the
+           record is the 2020 Database issue, volume 48, D1093-D1103. */
         array('doi' => '10.1093/nar/gkz996',
               'fallback' => array(
                   'title'   => 'Plant Reactome: a knowledgebase and resource for comparative pathway analysis',
-                  'authors' => 'Naithani S, Gupta P, Preece J, D\'Eustachio P, Elser JL, Garg P, Dikeman DA, Kiff J, Cook J, Olson A, Wei S, Tello-Ruiz MK, et al.',
-                  'journal' => 'Nucleic Acids Research',
-                  'year'    => 2019))
+                  'authors' => 'Naithani S, Gupta P, Preece J, D\'Eustachio P, Elser JL, Garg P, Dikeman DA, Kiff J, Cook J, Olson A, Wei S, Tello-Ruiz MK, Mundo AF, Munoz-Pomer A, Mohammed S, Cheng T, Bolton E, Papatheodorou I, Stein L, Ware D, Jaiswal P',
+                  'journal' => 'Nucleic acids research',
+                  'year'    => 2020,
+                  'volume'  => '48',
+                  'pages'   => 'D1093-D1103',
+                  'pubmed'  => '31680153',
+                  'abstract' =>
+                      'Plant Reactome (https://plantreactome.gramene.org) is an open-source, comparative '
+                      . 'plant pathway knowledgebase of the Gramene project. It uses Oryza sativa (rice) as a '
+                      . 'reference species for manual curation of pathways and extends pathway knowledge to '
+                      . 'another 82 plant species via gene-orthology projection using the Reactome data model '
+                      . 'and framework. It currently hosts 298 reference pathways, including metabolic and '
+                      . 'transport pathways, transcriptional networks, hormone signaling pathways, and plant '
+                      . 'developmental processes. In addition to browsing plant pathways, users can upload and '
+                      . 'analyze their omics data, such as the gene-expression data, and overlay curated or '
+                      . 'experimental gene-gene interaction data to extend pathway knowledge. The curation team '
+                      . 'actively engages researchers and students on gene and pathway curation by offering '
+                      . 'workshops and online tutorials. The Plant Reactome supports, implements and '
+                      . 'collaborates with the wider community to make data and tools related to genes, '
+                      . 'genomes, and pathways Findable, Accessible, Interoperable and Re-usable (FAIR).'))
     ));
 
     return array(
