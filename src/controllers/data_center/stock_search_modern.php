@@ -114,7 +114,6 @@ $charted    = $stock_data['charted'];
 $grin_total = $stock_data['grin'];
 
 $content->get('metric_active')->replace(number_format($metrics['active']));
-$content->get('metric_with_provider')->replace(number_format($metrics['with_provider']));
 $content->get('metric_types')->replace(number_format($metrics['types']));
 $content->get('metric_providers')->replace(number_format($metrics['providers']));
 $content->get('metric_grin')->replace(number_format($grin_total));

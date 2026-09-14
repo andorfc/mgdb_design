@@ -3920,6 +3920,66 @@ container and the page does not scroll horizontally.
 
 ## The Stock Data Hub
 
+### Reworked 2026-09-14
+
+Wording and structure passed over on Carson's list, and one real defect
+underneath it.
+
+**The three download controls had never worked.** Both cards in Downloads and
+the Export button over a result set sent `format=tsv` / `format=csv`, and
+`stock_search_api.php` **never read `format` at all** -- `grep -c format` on
+that file returned 0. The two cards additionally sent no term, so the endpoint
+answered them with its empty `no-term` payload: HTTP 200, 154 bytes of JSON,
+under a button saying Download Full TSV. Nothing errored, which is why it
+survived. Now:
+
+- `format=tsv|csv` returns the whole matched set as a file, never a page.
+  `stockExportSql()` is the page query without `COUNT(*) OVER ()` (the
+  expensive half) and without `LIMIT` -- a capped export hands back a
+  truncated file under a button that says Download.
+- **An export with no term is the whole current catalog**, which is what the
+  Downloads cards ask for: `curation_lvl = 0`, the same definition the metric
+  cards count. 80,063 rows, 10.9 MB, **0.95 s** end to end.
+- The Export button over a search now returns every match: `wx1` gives 268
+  rows, matching its own "Showing 1-25 of 268".
+- **TSV is not fputcsv's job.** `fputcsv` quotes any field containing a space,
+  so every provider came out as `"The Maize TILLING Project"` in a format whose
+  only delimiter is the tab. CSV keeps `fputcsv`; TSV strips tab, CR and LF and
+  writes the rest bare, which is what `MgdbData::tsv()` does for the data API.
+
+**The flow cytometry file had moved.** `iastate.app.box.com/.../file/1876142430468`
+answers Box's "The requested page does not exist"; the file now lives at
+`ars-usda.box.com/s/lacm5envzr6x4gkg0f21aoz41rvfa8k6`
+(`maize_cytometry_c-value_genome_size_table_maizegdb.xlsx`). Fixed in the hub
+and in `templates/data_center/stock-left.bau`, which carried the same dead URL.
+Box renders its listing lazily, so a folder or file has to be checked in a
+browser -- `curl` gets a ~26 KB shell either way.
+
+**Collections is two rows by design now**: the two repositories span the top
+row (3 + 3 of six tracks), the three ways into what they hold sit under them
+(2 + 2 + 2). Explicit six-column tracks, *not* `repeat(auto-fit, minmax(0, 1fr))`
+-- auto-fit generates a large number of tracks and collapses only the empty
+ones, so a spanning child leaves none empty and every track resolves to about
+half a pixel. That is the bug that shredded a row on /download.
+
+**A new Stock collections section** carries the NAM RILs, the Dooner-Du Ds-GFP
+insertions (18,428 alignments over 13,562 genes) and the Vollbrecht Ac/Ds
+insertions (5,423 over 2,768) -- counts verified against
+`perm_tables.marker_gene_model`, not copied from the /insertion header. It
+shares the Collections grid so its three cards line up with the row above.
+UniformMu keeps its single card in Collections rather than being repeated.
+
+**Adding a tab made the phone bar worse**: eight labels wrapped to three rows
+at 375px, 201px of an 812px screen. The bar is a one-row scrolling rail below
+767px now, 57px, the same fix `/expression` and `/contribute_data` carry. The
+shell measures the bar and writes the scroll offset, so every tab still lands
+8px clear at 375, 900 and 1280.
+
+Also: the four metric cards lost their descriptions, so `metric_with_provider`
+lost its only use and its fill; pills renamed to `USDA: Genetic Stocks` and
+`USDA: Germplasm` (`.mgdb-pill` is already `white-space: nowrap`, and both fit
+on one line down to 375px); internal links in Collections lost their `->`.
+
 `/data_center/stock` joined the shell on 2026-09-02, finishing the partial
 conversion that was already in the working tree. Most of what this one turned
 up was not styling: **three separate places where the page and its endpoint did

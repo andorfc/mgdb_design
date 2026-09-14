@@ -25,6 +25,7 @@ $$SYNTAX-LEVEL 2
   <nav class="mgdb-section-tabs" aria-label="Sections on this page">
     <a href="#stock-search-section" class="is-current" aria-current="true">Search</a>
     <a href="#stock-collections">Collections</a>
+    <a href="#stock-stock-collections">Stock collections</a>
     <a href="#stock-nam">NAM founders</a>
     <a href="#stock-downloads">Downloads</a>
     <a href="#stock-references">References</a>
@@ -220,40 +221,45 @@ $$SYNTAX-LEVEL 2
       </div>
     </div>
 
+    ;; Two rows by design: the two repositories a reader orders seed from span
+    ;; the top row, and the three ways into what they hold sit under them. The
+    ;; grid is an explicit six-column track rather than auto-fit -- auto-fit
+    ;; plus a spanning child generates a large number of tracks and collapses
+    ;; none of them, which shredded a row on /download.
     <div class="mgdb-card-grid stock-collection-grid">
-      <article class="mgdb-card">
-        <span class="mgdb-pill mgdb-pill-ok">Primary Repository</span>
+      <article class="mgdb-card stock-collection-feature">
+        <span class="mgdb-pill mgdb-pill-ok">USDA&#58; Genetic Stocks</span>
         <h3>Maize Genetics Cooperation Stock Center</h3>
-        <p>The primary source of maize genetic stocks, mutant alleles, and translocation lines. Seed ordering and accession listings.</p>
+        <p>The primary source of maize genetic stocks, mutant alleles, and translocation lines.</p>
         <a href="https\://maizecoopsc.org/" target="_blank" rel="noopener">Open Stock Center <span aria-hidden="true">&nearr;</span></a>
+      </article>
+
+      <article class="mgdb-card stock-collection-feature">
+        <span class="mgdb-pill">USDA&#58; Germplasm</span>
+        <h3>North Central Regional PI Station</h3>
+        <p>NCRPIS non-mutant germplasm.</p>
+        <a href="https\://maizecoopsc.org/ncrpis/" target="_blank" rel="noopener">Explore NCRPIS <span aria-hidden="true">&nearr;</span></a>
       </article>
 
       <article class="mgdb-card">
         <span class="mgdb-pill mgdb-pill-info">Stock Catalog</span>
         <h3>Stock Center Catalog</h3>
-        <p>Categorized directory of stocks distributed by the Maize Genetics Cooperation Stock Center.</p>
-        <a href="/stock_catalog">Browse Catalog <span aria-hidden="true">&rarr;</span></a>
+        <p>The directory of stocks distributed by the Maize Genetics Cooperation Stock Center.</p>
+        <a href="/stock_catalog">Browse Catalog</a>
       </article>
 
       <article class="mgdb-card">
-        <span class="mgdb-pill mgdb-pill-warn">Nomenclature Guide</span>
+        <span class="mgdb-pill mgdb-pill-warn">Packet Label</span>
         <h3>Decrypt Seed Packet Labels</h3>
-        <p>Comprehensive guide to the Stock Center&rsquo;s pedigree and accession labeling conventions for deciphering seed packets.</p>
-        <a href="/stock_decryption">Decrypt Packet <span aria-hidden="true">&rarr;</span></a>
-      </article>
-
-      <article class="mgdb-card">
-        <span class="mgdb-pill">USDA Repository</span>
-        <h3>North Central Regional PI Station</h3>
-        <p>NCRPIS non-mutant germplasm, open-pollinated landraces, and lines with molecular or phenotype data held at Ames, Iowa.</p>
-        <a href="https\://maizecoopsc.org/ncrpis/" target="_blank" rel="noopener">Explore NCRPIS <span aria-hidden="true">&nearr;</span></a>
+        <p>A key for how to decrypt the Maize Genetics Cooperation Stock Center packet labels.</p>
+        <a href="/stock_decryption">Decrypt Packet</a>
       </article>
 
       <article class="mgdb-card">
         <span class="mgdb-pill mgdb-pill-ok">Transposon Mutants</span>
         <h3>UniformMu Insertion Lines</h3>
         <p>Over 31,000 sequence-indexed Robertson&rsquo;s Mutator insertion alleles with cosegregating seedling and ear traits in uniform W22 background.</p>
-        <a href="/uniformmu">Explore UniformMu <span aria-hidden="true">&rarr;</span></a>
+        <a href="/uniformmu">Explore UniformMu</a>
       </article>
 
       ;; The "EMS Inflorescence Mutants" card was removed on 2026-09-07 with
@@ -265,6 +271,43 @@ $$SYNTAX-LEVEL 2
     </div>
   </section>
 
+  ;; The named collections a reader can order seed from, as distinct from the
+  ;; repositories above that distribute them. UniformMu keeps its card in
+  ;; Collections rather than being repeated here.
+  <section id="stock-stock-collections" aria-labelledby="stock-stock-collections-title">
+    <div class="mgdb-section-heading">
+      <div>
+        <h2 id="stock-stock-collections-title">Stock collections</h2>
+      </div>
+    </div>
+
+    <div class="mgdb-card-grid stock-collection-grid stock-named-grid">
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-info">NAM RILs</span>
+        <h3>NAM recombinant inbred lines</h3>
+        <p>The recombinant inbred line populations bred from B73 and the 25 founder inbreds listed below, and the mapping resource the NAM reference genomes were built around.</p>
+        <a href="https\://maizecoopsc.org/nam-rils" target="_blank" rel="noopener">Order NAM RILs <span aria-hidden="true">&nearr;</span></a>
+        <a href="#stock-nam">The 26 founder lines</a>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-warn">Ac/Ds transposon</span>
+        <h3>Dooner&ndash;Du Ds-GFP insertions</h3>
+        <p>GFP-tagged Ds insertions in a polymorphic W22 background&#58; 18,428 sequence-indexed alignments across 13,562 genes, with a subset verified by the Maize Gametophyte project.</p>
+        <a href="/projects/dooner_du_acds">Project page</a>
+        <a href="/insertion">Search the insertions</a>
+      </article>
+
+      <article class="mgdb-card">
+        <span class="mgdb-pill mgdb-pill-warn">Ac/Ds transposon</span>
+        <h3>Vollbrecht Ac/Ds insertions</h3>
+        <p>Genome-wide Ac/Ds mutagenesis in W22 &#40;Vollbrecht et al., 2010&#41;&#58; 5,423 sequence-indexed alignments across 2,768 genes.</p>
+        <a href="/insertion">Search the insertions</a>
+        <a href="https\://doi.org/10.1105/tpc.109.070953" target="_blank" rel="noopener">Vollbrecht et al., 2010 <span aria-hidden="true">&nearr;</span></a>
+      </article>
+    </div>
+  </section>
+
   <section id="stock-nam" aria-labelledby="stock-nam-title">
     <div class="mgdb-section-heading">
       <div>
@@ -272,7 +315,7 @@ $$SYNTAX-LEVEL 2
       </div>
     </div>
 
-    <p class="stock-section-intro">Stocks may be ordered from the <a href="https\://maizecoopsc.org/nam-rils" target="_blank" rel="noopener">Maize Genetics Cooperation Stock Center <span aria-hidden="true">&nearr;</span></a>. Key reference&#58; <a href="https\://doi.org/10.1534/genetics.107.074245" target="_blank" rel="noopener">Yu et al., 2008 <span aria-hidden="true">&nearr;</span></a>.</p>
+    <p class="stock-section-intro">NAM RILs may be ordered from the <a href="https\://maizecoopsc.org/nam-rils" target="_blank" rel="noopener">Maize Genetics Cooperation Stock Center <span aria-hidden="true">&nearr;</span></a>. Key reference&#58; <a href="https\://doi.org/10.1534/genetics.107.074245" target="_blank" rel="noopener">Yu et al., 2008 <span aria-hidden="true">&nearr;</span></a>.</p>
 
     <div class="stock-nam-grid" aria-label="NAM founder lines">
       <a href="/data_center/stock/B97"><strong>B97</strong><span>Northern Flint</span></a>
@@ -317,7 +360,7 @@ $$SYNTAX-LEVEL 2
           <span class="mgdb-pill mgdb-pill-ok">Full TSV</span>
           <h3>Tabulated Stock Catalog</h3>
         </div>
-        <p>Complete curated stock catalog with stock identifiers, types, providers, variations, phenotypes, and pedigree links in TSV format.</p>
+        <p>Genetic stock catalog in TSV format.</p>
         <a class="mgdb-button mgdb-button-secondary" href="/search/stock/stock_search_api.php?format=tsv">Download Full TSV <span aria-hidden="true">&darr;</span></a>
       </article>
 
@@ -326,7 +369,7 @@ $$SYNTAX-LEVEL 2
           <span class="mgdb-pill mgdb-pill-info">CSV Export</span>
           <h3>Tabulated Stock CSV</h3>
         </div>
-        <p>Comma-separated export of curated stock records, providers, and annotations suitable for Excel, Python, and R workflows.</p>
+        <p>Genetic stock catalog in CSV format.</p>
         <a class="mgdb-button mgdb-button-secondary" href="/search/stock/stock_search_api.php?format=csv">Download Full CSV <span aria-hidden="true">&darr;</span></a>
       </article>
 
@@ -336,7 +379,7 @@ $$SYNTAX-LEVEL 2
           <h3>Genome Size Measurements</h3>
         </div>
         <p>Flow cytometry nuclear 2C DNA content and genome size measurements for selected maize inbred lines and landraces.</p>
-        <a class="mgdb-button mgdb-button-secondary" href="https\://iastate.app.box.com/v/maizegdb-public/file/1876142430468" target="_blank" rel="noopener">Download Flow Cytometry <span aria-hidden="true">&nearr;</span></a>
+        <a class="mgdb-button mgdb-button-secondary" href="https\://ars-usda.box.com/s/lacm5envzr6x4gkg0f21aoz41rvfa8k6" target="_blank" rel="noopener">Download Flow Cytometry <span aria-hidden="true">&darr;</span></a>
       </article>
     </div>
   </section>
@@ -367,7 +410,6 @@ $$SYNTAX-LEVEL 2
         <div class="mgdb-metric-stat">
           <strong class="mgdb-metric-value">$(metric_active)</strong>
         </div>
-        <p class="mgdb-metric-description">Active curated records; $(metric_with_provider) have an assigned provider.</p>
       </article>
 
       <article class="mgdb-metric mgdb-tone-amber">
@@ -378,7 +420,6 @@ $$SYNTAX-LEVEL 2
         <div class="mgdb-metric-stat">
           <strong class="mgdb-metric-value">$(metric_types)</strong>
         </div>
-        <p class="mgdb-metric-description">From inbred lines to TILLING and chromosome marker stocks.</p>
       </article>
 
       <article class="mgdb-metric mgdb-tone-blue">
@@ -389,7 +430,6 @@ $$SYNTAX-LEVEL 2
         <div class="mgdb-metric-stat">
           <strong class="mgdb-metric-value">$(metric_providers)</strong>
         </div>
-        <p class="mgdb-metric-description">Stock centers, germplasm banks, and research programs.</p>
       </article>
 
       <article class="mgdb-metric mgdb-tone-burgundy">
@@ -400,7 +440,6 @@ $$SYNTAX-LEVEL 2
         <div class="mgdb-metric-stat">
           <strong class="mgdb-metric-value">$(metric_grin)</strong>
         </div>
-        <p class="mgdb-metric-description">USDA germplasm records mirrored and searched at MaizeGDB.</p>
       </article>
     </div>
 

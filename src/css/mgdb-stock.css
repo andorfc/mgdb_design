@@ -65,6 +65,27 @@
 
 .mgdb-stock-page > section[id] { margin-bottom: var(--mgdb-space-5); }
 
+/* Below the shell's own breakpoint the bar is a one-row scrolling rail. This
+   page's eight labels wrapped to THREE rows at 375px -- 201px, a quarter of a
+   phone screen, and mgdb-modern.css already makes the bar a rail there; the
+   flex-wrap: wrap above defeats it at higher specificity. A tab that cannot
+   wrap the row must not shrink either, or its label breaks over two lines and
+   the bar is tall again for a different reason. The shell measures the bar and
+   writes the scroll offset, so nothing else has to move. */
+@media (max-width: 767px) {
+  .mgdb-stock-page .mgdb-section-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mgdb-stock-page .mgdb-section-tabs a {
+    flex: none;
+    white-space: nowrap;
+  }
+}
+
 /* ── Search & Filter Panel ───────────────────────────────────────────────── */
 
 /* ── Search & Filter Panel ───────────────────────────────────────────────── */
@@ -528,12 +549,40 @@
 
 /* ── Collections, Downloads & NAM Founders ───────────────────────────────── */
 
-.mgdb-stock-page .stock-collection-grid,
 .mgdb-stock-page .stock-download-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: var(--mgdb-space-4);
   margin-top: var(--mgdb-space-4);
+}
+
+/* Collections is two rows on purpose: the two repositories a reader orders
+   seed from span the top row, the three ways into what they hold sit under
+   them. Six explicit tracks, 3 + 3 then 2 + 2 + 2 -- NOT repeat(auto-fit,
+   minmax(0, 1fr)), which generates a large number of tracks and collapses
+   only the empty ones, so a spanning child leaves none empty and every track
+   resolves to about half a pixel. That is what shredded a row on /download.
+
+   Stock collections shares the grid and has three cards, so its row is the
+   same 2 + 2 + 2 as the second row above it and the two sections line up. */
+.mgdb-stock-page .stock-collection-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--mgdb-space-4);
+  margin-top: var(--mgdb-space-4);
+}
+
+.mgdb-stock-page .stock-collection-grid > .mgdb-card { grid-column: span 2; }
+.mgdb-stock-page .stock-collection-grid > .stock-collection-feature { grid-column: span 3; }
+
+@media (max-width: 1000px) {
+  .mgdb-stock-page .stock-collection-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mgdb-stock-page .stock-collection-grid > .mgdb-card,
+  .mgdb-stock-page .stock-collection-grid > .stock-collection-feature { grid-column: span 1; }
+}
+
+@media (max-width: 640px) {
+  .mgdb-stock-page .stock-collection-grid { grid-template-columns: minmax(0, 1fr); }
 }
 
 .mgdb-stock-page .stock-download-card {

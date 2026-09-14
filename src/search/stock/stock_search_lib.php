@@ -417,6 +417,34 @@ function stockPageSql($prefix, $matchedSql, $orderBy) {
       LIMIT :result_limit OFFSET :result_offset";
 }
 
+/* The same rows the page query returns, for the whole matched set rather than
+   one page: the TSV and CSV exports under Downloads and the Export button over
+   a result set. No COUNT(*) OVER () -- an export does not report a total, and
+   the window function is the expensive half of the page query -- and no LIMIT,
+   because a capped export hands back a truncated file under a button that says
+   Download. The whole current catalog is 80,063 rows and this shape returns it
+   in about 0.6 s, measured.
+
+   Deliberately narrower than the JSON: synonyms and curator memos are a second
+   and third query keyed on the ids of one page (stockDetails), which does not
+   scale to the whole catalog. The export is the catalog table, not the record. */
+function stockExportSql($prefix, $matchedSql, $orderBy) {
+    $head = ($prefix === null || $prefix === '') ? 'WITH' : rtrim($prefix) . ',';
+
+    return "
+      $head matched AS MATERIALIZED ($matchedSql)
+      SELECT m.id, m.name, m.curation_lvl,
+             t.name AS type,
+             lg.name AS linkage_group,
+             p.name AS provider
+      FROM matched m
+        INNER JOIN mgdb.stock s ON s.id = m.id
+        LEFT JOIN mgdb.term t ON t.id = s.type
+        LEFT JOIN mgdb.linkage_group lg ON lg.id = s.focus_linkage_group
+        LEFT JOIN mgdb.person p ON p.id = s.available_from
+      ORDER BY $orderBy";
+}
+
 function stockOrderBy($sort, $rankSql = null) {
     switch ($sort) {
         case 'name':      return 'LOWER(m.name), m.id';
