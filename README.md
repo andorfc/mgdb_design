@@ -1012,6 +1012,38 @@ inert bar, so it was reported rather than changed.
 its three documentation pages, which `redirect.php` had been serving as raw
 templates. It is also where the CornCyc instances MaizeGDB hosted were retired.
 
+### Two resource sections retired, 2026-09-13
+
+The page listed ten external resources in three groups. Carson's call, and
+both reasons are about what the page can actually do:
+
+- **Pathway and reaction databases** (Reactome, BioCyc, PlantCyc, the general
+  KEGG maps) said the same thing as **Maize pathway databases** directly above
+  it, which links the maize builds of the same three families.
+- **Enzyme nomenclature and kinetics** (IUBMB, BRENDA, Expasy ENZYME) is not
+  reachable from anything on the page: the search takes a pathway name, a
+  CornCyc ID or a B73 gene model, not an EC number, and no BRENDA or ENZYME
+  file is among the downloads.
+
+Seven resources and two `groups` entries came out of
+`data/metabolic_pathways/resources.json`, and the two `<section>` blocks and
+their tabs out of the template. Two consequences worth knowing:
+
+- **The Databases metric card had to be reworded, not just re-pointed.** It
+  read "*10* external pathway and enzyme resources listed above, *3* of them
+  carrying a maize build" — and with only maize builds left both numbers are
+  3, so the sentence would have been counting one thing twice. The card now
+  states the one number, and `maize_count` / `metric_maize` are gone.
+- **The card slots now follow the catalog's own groups.** The controller had
+  `foreach (array('maize', 'pathway', 'enzyme') as $group)` repeated beside
+  the file that already declares them; it loops over `$page['sections']`
+  instead, so the next group to go is an edit to the JSON and the template
+  alone. `$fill` skips a slot the template does not have, which is what makes
+  that safe.
+
+BioCyc still appears once, as a webinar link under Information and tutorials.
+That is a tutorial, not a duplicate database entry, and it stays.
+
 ### The data was already here
 
 The page had no search and no metrics because nobody had looked for a corpus.

@@ -247,12 +247,10 @@ $page = dashboardCache($system, $cache_key, function () use ($DBConn, $catalog_f
     }
 
     $resource_index = array();
-    $maize_count = 0;
     foreach ($catalog['resources'] as $r) {
         $key = isset($r['group']) ? $r['group'] : '';
         if (!isset($sections[$key])) { continue; }
         $sections[$key] .= mp_render_resource($r);
-        if (!empty($r['maize'])) { $maize_count++; }
         $resource_index[] = array(
             'name'     => $r['name'],
             'group'    => $key,
@@ -362,7 +360,6 @@ $page = dashboardCache($system, $cache_key, function () use ($DBConn, $catalog_f
         'sections'        => $sections,
         'resource_index'  => $resource_index,
         'resource_total'  => count($resource_index),
-        'maize_count'     => $maize_count,
         'stats'           => $stats,
         'assemblies'      => $assemblies,
         'chart'           => $chart,
@@ -374,7 +371,7 @@ $page = dashboardCache($system, $cache_key, function () use ($DBConn, $catalog_f
 
 if (!is_array($page)) {
     $page = array('sections' => array(), 'resource_index' => array(), 'resource_total' => 0,
-                  'maize_count' => 0, 'stats' => array('pathways' => 0, 'gene_models' => 0,
+                  'stats' => array('pathways' => 0, 'gene_models' => 0,
                   'gene_models_in_pathway' => 0, 'proteins' => 0, 'assignments' => 0),
                   'assemblies' => array(), 'chart' => array(), 'top' => array(),
                   'corpus' => 0, 'reference_cards' => '');
@@ -399,7 +396,6 @@ $fill('metric_pathways',    number_format($stats['pathways']));
 $fill('metric_gene_models', number_format($stats['gene_models']));
 $fill('metric_proteins',    number_format($stats['proteins']));
 $fill('metric_resources',   number_format($page['resource_total']));
-$fill('metric_maize',       number_format($page['maize_count']));
 $fill('metric_in_pathway',  number_format($stats['gene_models_in_pathway']));
 $fill('metric_assignments', number_format($stats['assignments']));
 
@@ -410,8 +406,13 @@ $fill('metric_assignments', number_format($stats['assignments']));
 $fill('metric_orphans',
     number_format(max(0, $stats['gene_models'] - $stats['gene_models_in_pathway'])));
 
-foreach (array('maize', 'pathway', 'enzyme') as $group) {
-    $fill($group . '_cards', isset($page['sections'][$group]) ? $page['sections'][$group] : '');
+/* One slot per group in the catalog, named <key>_cards. Driven by what the
+   catalog holds rather than by a list repeated here, so retiring a group is
+   an edit to data/metabolic_pathways/resources.json and the template alone --
+   which is how the general pathway and enzyme sections came out on
+   2026-09-13. $fill skips a slot the template does not have. */
+foreach ((array) $page['sections'] as $group => $cards) {
+    $fill($group . '_cards', $cards);
 }
 
 $fill('reference_cards', $page['reference_cards']);
