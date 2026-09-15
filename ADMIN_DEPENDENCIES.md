@@ -3038,6 +3038,39 @@ system and could be overwritten.
   - **Requested:** bgzip and index those files
     (`bgzip -r` / `samtools faidx`) and publish the `.fai` and `.gzi`
     alongside, as was done for `B73_RefGen_v3` and the NAM assemblies.
+  - **Worked around, 2026-09-15, for gene-model sequences only.** The mirror
+    does not need a published index — it downloads the whole file and builds
+    its own — so `B73_RefGen_v1` and `B73_RefGen_v2` protein, CDS, cDNA and
+    genomic sequences are served from local disk and work for the first time.
+    **Whole-assembly POSITION requests on v1 and v2 still do not**, because
+    those go to the service against the multi-gigabyte assembly FASTA, which
+    is not mirrored. The request above stands for that, and for any other
+    instance that has no mirror. (v1 also publishes no `working_cds`, only
+    `filtered_cds`, which is a different gene set; the sequence server's
+    filename table asks for the former and has always done so, and that is a
+    curation decision rather than a bug to fix here.)
+
+  **1c. One published FASTA has no identifiers in it.**
+  `Zm-LH244-REFERENCE-CAU-1.0_Zm00116aa.1.gene.fa.gz` is 50 MB and holds
+  43,854 records, and **every one of its headers is a bare `>`** with no
+  sequence name. No index-based reader can use it, the sequence service
+  included, so nothing can ever be retrieved from it by identifier. It is the
+  only file of the 437 mirrored that failed to build.
+  - **Requested:** republish it with the gene identifiers in the headers, as
+    that assembly's protein and CDS files have.
+
+  **2b. Eleven assemblies in `chado.genome_metadata` have no download
+  directory at all**, so nothing about them can be served:
+  `Zm-CG108`, `Zm-CG119`, `Zm-CG44`, `Zm-CGR01`, `Zm-LH195`, `Zm-Mo44`,
+  `Zm-MoG`, `Zm-PHN11`, `Zm-PHT69`, `Zm-PHW65`, `Zm-PHZ51` — all
+  `-DRAFT-G2F-1.0`. Six more have a directory but no gene-model FASTA
+  (`Td-FL_9056069_6` and `Td-KS_B6_1` PanAnd-2.0, `Zl-RIL003`,
+  `Zm-Mo17-REFERENCE-YAN-1.0`, `Zx-PI566673-REFERENCE-YAN-1.0`,
+  `Zm-CML247-REFERENCE-PANZEA-1.1`). None of them has gene models in
+  `chado.transcript`, so no record page is affected and nothing is visibly
+  broken — recorded because a genome listed in the database and absent from
+  the downloads is worth someone's attention either way. 134 of the 162
+  assemblies do publish gene-model FASTA, and all 134 are mirrored.
 
   **3. Two small things on dev8.** Neither is urgent; both remove a workaround.
   - `blastdbcmd` is not installed. `/usr/bin` has `blastn`, `blastp` and

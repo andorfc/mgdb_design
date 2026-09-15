@@ -51,17 +51,26 @@
  *  download.maizegdb.org in 0.6 s. Nothing here is slow but the round trip.
  *
  *  1. Sequences are read from local disk when they are mirrored there.
- *     tools/sequence/sequence_mirror.php downloads a published FASTA, writes
- *     it one record per line and builds a fixed-width sorted index beside it;
- *     a lookup is a binary search plus one seek. Mirrored: B73 v5, v4 and v3,
- *     and all 25 NAM founder lines -- protein, CDS, cDNA and the small
- *     non-coding sets, 7.0 GB and about six minutes to build. Same 25 cold
- *     identifiers as above: 25 answered, 0 failed, mean 139 ms, worst 940 ms.
- *     Across the NAM lines, 25 cold identifiers: 25 answered at a mean of
- *     41 ms and a worst of 74, against 12 of 25 answered at a mean of 1,258 ms.
- *     Four sequences in one request: 29 ms against 2,409 ms. A file that is
- *     not mirrored behaves exactly as before, so this is an optimisation and
- *     never a dependency.
+ *     tools/sequence/sequence_mirror.php downloads a published FASTA and
+ *     rewrites it as deflated 64 KB blocks with a fixed-width sorted index
+ *     beside it; a lookup is a binary search, one seek, one ~20 KB read and
+ *     one inflate. Mirrored: all 134 assemblies in chado.genome_metadata that
+ *     publish gene-model FASTA -- B73 v1 through v5, the 25 NAM founder lines,
+ *     the PanAnd species and the rest -- protein, CDS, cDNA, genomic and the
+ *     small non-coding sets. 437 files, 31.9 M sequences, 11.9 GB.
+ *
+ *     B73 v5, 25 identifiers nothing had requested: 25 answered, 0 failed,
+ *     mean 139 ms, worst 940 ms. Across the NAM lines: 25 answered, mean
+ *     64 ms, worst 129, against 24 of 25 at a mean of 2,578 ms and a worst of
+ *     19,671. Four sequences in one request: 29 ms against 2,409 ms. A file
+ *     that is not mirrored behaves exactly as before, so this is an
+ *     optimisation and never a dependency.
+ *
+ *     It also serves what the service cannot. B73 v1 and v2 publish no
+ *     .fai/.gzi, so fasta.maizegdb.org has never returned a single sequence
+ *     for either -- production still answers "sequence not found" for every
+ *     one. The mirror builds its own index from the file, so those two
+ *     assemblies work here for the first time.
  *
  *     The mirror also writes data/sequence/absent.json, the files it asked
  *     download.maizegdb.org for and was told do not exist -- 67 of them, and
@@ -861,10 +870,10 @@ function seqKnownAbsent($path) {
 }
 
 /* A published FASTA that has been mirrored onto this machine by
-   tools/sequence/sequence_mirror.php: the sequences in one file, one line per
-   record, and a fixed-width sorted index beside it. A lookup is a binary
-   search of the index -- about 17 reads of a few dozen bytes -- and one seek
-   into the FASTA.
+   tools/sequence/sequence_mirror.php: the sequences in deflated 64 KB blocks
+   and a fixed-width sorted index beside them. A lookup is a binary search of
+   the index -- about 17 reads of a few dozen bytes -- one seek, one read of
+   roughly 20 KB and one inflate, which takes 0.22 ms.
 
    Three answers, and the difference matters:
      a string  the sequence;
@@ -873,24 +882,25 @@ function seqKnownAbsent($path) {
      false     this file is not mirrored, so ask the service as before.
 
    $path is the download.maizegdb.org path of the .fa.gz, so the mirror is a
-   mirror: data/sequence/<assembly>/<file>.fa. */
+   mirror: data/sequence/<assembly>/<file>.faz. */
 function seqLocalRead($path, $id) {
   static $handles = array();
 
-  $fa = seqLocalPath($path);
-  if ($fa === null) { return false; }
+  $faz = seqLocalPath($path);
+  if ($faz === null) { return false; }
 
-  if (!isset($handles[$fa])) {
-    $ih = @fopen("$fa.idx", 'rb');
-    if (!$ih) { $handles[$fa] = null; return false; }
+  if (!isset($handles[$faz])) {
+    $ih = @fopen("$faz.idx", 'rb');
+    if (!$ih) { $handles[$faz] = null; return false; }
     $bits = explode(' ', trim((string) fgets($ih)));
-    if (count($bits) < 4 || $bits[0] !== 'MGDBSEQIDX1') { fclose($ih); $handles[$fa] = null; return false; }
-    $fh = @fopen($fa, 'rb');
-    if (!$fh) { fclose($ih); $handles[$fa] = null; return false; }
-    $handles[$fa] = array('idx' => $ih, 'fa' => $fh,
-                          'width' => (int) $bits[1], 'count' => (int) $bits[2], 'idlen' => (int) $bits[3]);
+    if (count($bits) < 5 || $bits[0] !== 'MGDBSEQIDX2') { fclose($ih); $handles[$faz] = null; return false; }
+    $fh = @fopen($faz, 'rb');
+    if (!$fh) { fclose($ih); $handles[$faz] = null; return false; }
+    $handles[$faz] = array('idx' => $ih, 'faz' => $fh, 'width' => (int) $bits[1],
+                           'count' => (int) $bits[2], 'idlen' => (int) $bits[3],
+                           'cached_at' => -1, 'cached' => '');
   }
-  $m = $handles[$fa];
+  $m =& $handles[$faz];
   if ($m === null) { return false; }
 
   $lo = 0;
@@ -907,8 +917,23 @@ function seqLocalRead($path, $id) {
   }
   if ($row === null) { return null; }
 
-  fseek($m['fa'], (int) substr($row, $m['idlen'] + 1, 12));
-  $seq = fread($m['fa'], (int) substr($row, $m['idlen'] + 14, 10));
+  $n = $m['idlen'];
+  $boff = (int) substr($row, $n + 1, 12);
+  $blen = (int) substr($row, $n + 14, 8);
+  $roff = (int) substr($row, $n + 23, 6);
+  $rlen = (int) substr($row, $n + 30, 8);
+
+  /* One block held back. The transcripts of a gene are adjacent in the file,
+     so a four-identifier request usually inflates once rather than four
+     times. */
+  if ($m['cached_at'] !== $boff) {
+    fseek($m['faz'], $boff);
+    $block = @gzinflate((string) fread($m['faz'], $blen));
+    if ($block === false) { return null; }
+    $m['cached_at'] = $boff;
+    $m['cached'] = $block;
+  }
+  $seq = substr($m['cached'], $roff, $rlen);
   return ($seq === false || $seq === '') ? null : $seq;
 }//seqLocalRead
 
@@ -922,8 +947,8 @@ function seqLocalPath($path) {
   }
   if ($root === '') { return null; }
   if (strpos($path, '..') !== false) { return null; }
-  $fa = $root . '/' . preg_replace('/\.gz$/', '', $path);
-  return is_file("$fa.idx") ? $fa : null;
+  $faz = $root . '/' . preg_replace('/\.(fa|fasta)\.gz$/', '.faz', $path);
+  return is_file("$faz.idx") ? $faz : null;
 }
 
 

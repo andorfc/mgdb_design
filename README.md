@@ -6113,26 +6113,56 @@ change, is in the header of the file itself.
 Two things to know when working near it.
 
 **It reads local disk when it can.** `tools/sequence/sequence_mirror.php`
-downloads a published FASTA from `download.maizegdb.org`, rewrites it one
-record per line and builds a fixed-width sorted index beside it under
-`data/sequence/`. A lookup is a binary search plus one seek, about a
-millisecond, and it cannot fail. A set that is not mirrored falls through to
-`fasta.maizegdb.org` exactly as before, so this is an optimisation and never a
-dependency.
+downloads a published FASTA from `download.maizegdb.org` and rewrites it under
+`data/sequence/` as **deflated 64 KB blocks** (`.faz`) with a fixed-width
+sorted index beside it. A lookup is a binary search of the index, one seek, one
+~20 KB read and one inflate -- 0.22 ms -- and it cannot fail. A set that is not
+mirrored falls through to `fasta.maizegdb.org` exactly as before, so this is an
+optimisation and never a dependency.
+
+Blocks rather than whole files because plain FASTA is 4.3x the published `.gz`
+and the whole corpus would not fit; blocks rather than per-record compression
+because neighbouring maize proteins share a great deal — 1.68x a record at a
+time against 3.16x in 64 KB blocks.
 
 ```
+cd <webroot> && php tools/sequence/sequence_mirror.php --discover
 cd <webroot> && php tools/sequence/sequence_mirror.php --all
 ```
 
-`--core` is B73 v5, v4 and v3 (1.1 GB, 20 seconds); `--nam` adds the 25 NAM
-founder lines (a further 5.9 GB and about six minutes); `--all` is both, 7.0 GB.
-Each set covers protein, CDS, cDNA and the small non-coding files. Genomic and
-whole-assembly FASTA are deliberately left on the service -- hundreds of
-megabytes to gigabytes each, and rarely asked for.
+`--discover` reads `chado.genome_metadata` and one directory listing per
+assembly and writes `data/sequence/sets.json`: which annotation and which
+sequence types each assembly actually publishes — **134 of the 162 assemblies
+in the database publish gene-model FASTA**. A genome added to the database is
+picked up by re-running `--discover`, not by editing the tool. `--all` then
+builds everything in that file; `--core` (B73 v5, v4, v3), `--nam` (the 25
+founder lines) and `--rest` (everything else, PanAnd included) are subsets.
+Each covers protein, CDS, cDNA and the small non-coding files. `--genomic` adds
+the whole-gene FASTA, which is the largest file per assembly and the least
+asked for, so it is a separate pass. Whole-assembly FASTA is deliberately left
+on the service.
+
+As built on 2026-09-15: **437 files, 31.9 M sequences, 11.9 GB**, covering 32
+of the 38 annotations a gene record page can resolve to. The other six are
+upstream limits, not ours: B104 publishes only protein, PH207, Mo17-CAU and
+A188 only protein and CDS, and `Zm00001d.1` and `Zm00001d.provisional` have no
+`chado.genome_metadata` row, which the sequence service needs before it can
+name a file at all.
+
+**Two things the mirror fixes that the service cannot.** B73 v1 and v2 publish
+no `.fai`/`.gzi`, so `fasta.maizegdb.org` has never returned a single sequence
+for either — production still answers "sequence not found" for every one — and
+the mirror builds its own index from the file, so they work here (AD-077). And
+`Zm-Il14H-REFERENCE-NAM-1.0` publishes no plain `cds.fa.gz`, only
+`canonical.cds`, which the fallback ladder now reaches.
+
+Deflate level 3, not the default 6: on protein they are identical (3.16x), but
+on DNA level 6 grinds — 5.12x at 8.5 MB/s against 4.62x at 39 MB/s — and the
+whole corpus is rebuilt after every annotation release.
 
 `--list` shows what is mirrored and when it was built. `--check <assembly>
 <file.fa.gz>` pulls ten records at random and compares them with the sequence
-service. `--probe` refreshes `data/sequence/absent.json` -- the files
+service. `--probe` refreshes `data/sequence/absent.json` — the files
 download.maizegdb.org does not publish, HEADed rather than downloaded, so the
 server can skip a candidate instead of retrying it. **Rebuild after an
 annotation release**, and nowhere else: the store is content, not code, so it
