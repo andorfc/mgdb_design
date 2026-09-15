@@ -177,6 +177,10 @@ $$SYNTAX-LEVEL 2
 
     <p class="reference-results-status" id="reference-results-status" role="status" aria-live="polite">Loading references…</p>
 
+    ;; Two lines. The first is the toolbar every other hub has -- narrow the
+    ;; page, choose how many, choose the view -- and nothing else, because six
+    ;; export formats beside it made the row unreadable. The downloads get a
+    ;; line of their own below it, with the note saying what each file holds.
     <div class="reference-results-toolbar" id="reference-results-toolbar">
       <div class="mgdb-hub-field reference-results-filter">
         <label for="reference-results-filter">Filter these results</label>
@@ -194,21 +198,6 @@ $$SYNTAX-LEVEL 2
         </select>
       </div>
 
-      <div class="mgdb-hub-field mgdb-hub-field-action reference-results-export">
-        <a class="mgdb-button mgdb-button-quiet" id="reference-export-tsv" data-reference-export="tsv" href="#" download>Export TSV</a>
-      </div>
-
-      <div class="mgdb-hub-field mgdb-hub-field-action reference-results-formats">
-        <span class="reference-formats-label">Export:</span>
-        <div class="reference-formats-links">
-          <a href="#" class="reference-format-link" data-reference-export="csv">CSV</a>
-          <a href="#" class="reference-format-link" data-reference-export="doi">DOIs</a>
-          <a href="#" class="reference-format-link" data-reference-export="pmid">PMIDs</a>
-          <a href="#" class="reference-format-link" data-reference-export="ris">RIS</a>
-          <a href="#" class="reference-format-link" data-reference-export="bibtex">BibTeX</a>
-        </div>
-      </div>
-
       <div class="mgdb-hub-field mgdb-hub-field-action reference-results-view">
         <div class="mgdb-view-toggle" role="group" aria-label="Result view">
           <button class="mgdb-view-btn" id="reference-view-cards" type="button" data-view="card" aria-pressed="false">
@@ -218,6 +207,22 @@ $$SYNTAX-LEVEL 2
             <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true"><rect x="1" y="2" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="12" width="14" height="2" rx="1" fill="currentColor"/></svg>Table
           </button>
         </div>
+      </div>
+    </div>
+
+    ;; The downloads, on their own line. Every one carries the `download`
+    ;; attribute, which is both true -- the endpoint sends them as attachments
+    ;; -- and what makes the shared "Link arrows" rule in mgdb-modern.css mark
+    ;; each with a down arrow, rather than this page drawing its own.
+    <div class="reference-export-bar" id="reference-export-bar">
+      <span class="reference-export-label" id="reference-export-label">Download these results&#58;</span>
+      <div class="reference-export-links">
+        <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" id="reference-export-tsv" data-reference-export="tsv" href="#" download>TSV</a>
+        <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" data-reference-export="csv" href="#" download>CSV</a>
+        <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" data-reference-export="ris" href="#" download>RIS</a>
+        <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" data-reference-export="bibtex" href="#" download>BibTeX</a>
+        <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" data-reference-export="doi" href="#" download>DOI list</a>
+        <a class="mgdb-button mgdb-button-secondary mgdb-button-sm" data-reference-export="pmid" href="#" download>PubMed ID list</a>
       </div>
     </div>
 
@@ -236,9 +241,17 @@ $$SYNTAX-LEVEL 2
     </div>
     <label class="reference-select-page" hidden><input id="reference-select-page" type="checkbox"> Select every result on this page</label>
 
+    ;; This hub's Metrics are the only ones on the site that follow the search
+    ;; rather than describing the whole collection, and a reader who stops at
+    ;; the table never learns that. The pointer sits directly above the rows.
+    <p class="reference-metrics-pointer">
+      Counts, the year distribution and the top journals <strong>for this search</strong> are in the
+      <a href="#reference-dashboard">Metrics section below</a>.
+    </p>
+
     <div id="reference-loading" class="mgdb-loading" aria-hidden="true"><span></span><span>Searching curated literature…</span></div>
 
-    <div class="mgdb-table-wrap reference-table-wrap" id="reference-table-view" hidden>
+    <div class="mgdb-table-scroll reference-table-wrap" id="reference-table-view" tabindex="0" role="region" aria-labelledby="reference-results-title" hidden>
       <table class="mgdb-table reference-table" id="reference-results-table">
         <thead>
           <tr>

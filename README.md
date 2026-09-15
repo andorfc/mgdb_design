@@ -3695,6 +3695,35 @@ kept reporting 490 from an entry built on 5 September. Both keys now carry
 `filemtime()` of `reference_search_lib.php`. **Any cache whose payload shape or
 arithmetic lives in another file needs that file's mtime in the key.**
 
+### The results header, tidied
+
+Six export formats sat in the toolbar beside the filter, the page size and the
+view toggle, and the row was unreadable. The toolbar is now the one every other
+hub has -- narrow the page, choose how many, choose the view -- and the
+downloads have a line of their own underneath it: TSV, CSV, RIS, BibTeX, DOI
+list, PubMed ID list, each carrying the `download` attribute, which is both
+true (the endpoint sends them as attachments) and what makes the shared "Link
+arrows" rule mark them with a down arrow rather than this page drawing its own.
+The note saying what each file contains sits below them.
+
+A line above the rows now points at the Metrics section, because this is the
+one hub whose figures follow the search and a reader who stops at the table
+never learns that.
+
+**Two bugs surfaced while doing it.** The table wrapper carried
+`.mgdb-table-wrap`, **a class defined in no stylesheet** -- the same silent
+failure as `.mgdb-table-wrapper` already noted in `mgdb-modern.css`. So the
+table had no scroller, and at 375px the 958px table pushed the whole document
+sideways. It was invisible until this week because the table view was behind
+the Cards default. It is `.mgdb-table-scroll` now, the shell's own scroller,
+and the page no longer overflows at any width.
+
+And the TSV export was `fputcsv` with a tab delimiter, which quotes any field
+containing a space -- so every title and journal came out in quotes and the
+file was byte-for-byte the size of the CSV. Same defect and same fix as the
+stock catalog export: CSV keeps `fputcsv`, TSV strips tab, CR and LF and writes
+the rest bare.
+
 ### The dip around 2010 is real
 
 Carson asked whether a chart showing 144 papers in 2010 against ~1,400 in 1995

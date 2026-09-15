@@ -628,13 +628,31 @@ function referenceSendExport($DBConn, $filter, $format) {
     }
 
     if ($format === 'csv' || $format === 'tsv') {
-        $delimiter = $format === 'tsv' ? "\t" : ",";
+        $columns = array('MaizeGDB ID', 'Year', 'Publication type', 'Title', 'Authors',
+                         'Journal', 'DOI', 'PubMed ID', 'MaizeGDB URL');
         $out = fopen('php://output', 'w');
-        fputcsv($out, array('MaizeGDB ID', 'Year', 'Publication type', 'Title', 'Authors', 'Journal', 'DOI', 'PubMed ID', 'MaizeGDB URL'), $delimiter);
+
+        /* CSV is fputcsv's job; TSV is not. fputcsv quotes any field holding a
+           space, so a tab-separated file came out with every title and journal
+           in quotes and was byte-for-byte the size of the CSV. A tab-separated
+           file strips the three characters that could break a row and writes
+           the rest bare, as include/api/v1/lib/mgdb_data.php does. Same defect
+           and same fix as the stock catalog export. */
+        $csv = ($format === 'csv');
+        $write = function ($cells) use ($out, $csv) {
+            if ($csv) { fputcsv($out, $cells); return; }
+            $clean = array();
+            foreach ($cells as $cell) {
+                $clean[] = preg_replace('/[\t\r\n]+/', ' ', (string) $cell);
+            }
+            fwrite($out, implode("\t", $clean) . "\n");
+        };
+
+        $write($columns);
         foreach ($rows as $row) {
-            fputcsv($out, array($row['id'], $row['year'], $row['publication_type'], $row['title'],
+            $write(array($row['id'], $row['year'], $row['publication_type'], $row['title'],
                 $row['authors'], $row['journal'], $row['doi'], $row['pubmed'],
-                'https://maizegdb.org/data_center/reference?id=' . $row['id']), $delimiter);
+                'https://maizegdb.org/data_center/reference?id=' . $row['id']));
         }
         fclose($out);
         return;

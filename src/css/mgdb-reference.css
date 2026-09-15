@@ -574,57 +574,6 @@
   font-weight: 700;
 }
 
-.mgdb-reference-page .reference-results-toolbar .reference-results-export .mgdb-button {
-  height: var(--mgdb-tap-target);
-  min-height: var(--mgdb-tap-target);
-  display: inline-flex;
-  align-items: center;
-  white-space: nowrap;
-  box-sizing: border-box;
-}
-
-.mgdb-reference-page .reference-results-formats {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--mgdb-space-1);
-  height: var(--mgdb-tap-target);
-  box-sizing: border-box;
-}
-
-.mgdb-reference-page .reference-formats-label {
-  color: var(--mgdb-muted);
-  font-size: var(--mgdb-text-xs);
-  font-weight: 700;
-  margin-right: 2px;
-}
-
-.mgdb-reference-page .reference-formats-links {
-  display: inline-flex;
-  gap: 4px;
-}
-
-.mgdb-reference-page .reference-format-link {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 6px;
-  border: 1px solid var(--hub-line, #e3e9f2);
-  border-radius: 4px;
-  background: var(--hub-surface, #ffffff);
-  color: var(--mgdb-green-dark);
-  font-size: var(--mgdb-text-xs);
-  font-weight: 600;
-  text-decoration: none;
-  transition: all .15s ease;
-}
-
-.mgdb-reference-page .reference-format-link:hover {
-  border-color: var(--mgdb-gold);
-  background: var(--mgdb-gold-soft);
-  color: var(--mgdb-gold-dark);
-  text-decoration: none;
-}
-
 /* View Toggle */
 .mgdb-reference-page .reference-results-view {
   display: inline-flex;
@@ -680,6 +629,13 @@
 
 /* ── Table View ──────────────────────────────────────────────────────────── */
 
+/* The wrapper carried `.mgdb-table-wrap`, which is defined in no stylesheet --
+   the same silent failure as .mgdb-table-wrapper noted in mgdb-modern.css. So
+   the table, 958px wide at its narrowest, had no scroller and simply pushed
+   the page sideways: 958px of document in a 375px viewport. It went unnoticed
+   because this view was behind the Cards default until 2026-09-14. It is
+   `.mgdb-table-scroll` now, the shell's own scroller, and this rule only adds
+   the gap above it. */
 .mgdb-reference-page .reference-table-wrap {
   margin-top: var(--mgdb-space-4);
 }
@@ -1028,3 +984,60 @@
 }
 
 .mgdb-reference-page .reference-export-note:empty { display: none; }
+
+/* --------------------------------------------------------------------------
+   The download line
+
+   Six export formats will not fit in the toolbar beside the filter, the page
+   size and the view toggle -- that row is the one every hub shares and it was
+   unreadable with them in it. They get a line of their own underneath, label
+   first, wrapping to as many rows as the width needs. The down arrow on each
+   comes from the `download` attribute through the shared "Link arrows" rule in
+   mgdb-modern.css, not from here.
+   -------------------------------------------------------------------------- */
+
+.mgdb-reference-page .reference-export-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: center;
+  margin-bottom: var(--mgdb-space-3);
+}
+
+.mgdb-reference-page .reference-export-label {
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  font-weight: 700;
+}
+
+.mgdb-reference-page .reference-export-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2);
+}
+
+.mgdb-reference-page .reference-export-links .mgdb-button { white-space: nowrap; }
+
+/* The pointer to the Metrics section, directly above the rows. This hub's
+   figures follow the search, which a reader who stops at the table would
+   otherwise never discover. */
+.mgdb-reference-page .reference-metrics-pointer {
+  margin: 0 0 var(--mgdb-space-3);
+  padding: var(--mgdb-space-2) var(--mgdb-space-3);
+  border-left: 3px solid var(--mgdb-green);
+  background: var(--mgdb-green-soft);
+  border-radius: var(--mgdb-radius-sm);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-reference-page .reference-metrics-pointer a { font-weight: 700; }
+
+/* On a phone the six buttons wrap at their own widths. Stretching them with
+   flex-grow made ragged rows of 3, 2 and 1 because the labels differ in
+   length; left alone they pack. */
+@media (max-width: 640px) {
+  .mgdb-reference-page .reference-export-bar { align-items: flex-start; }
+  .mgdb-reference-page .reference-export-links { width: 100%; }
+}
