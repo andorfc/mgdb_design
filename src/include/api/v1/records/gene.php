@@ -1729,7 +1729,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
    Confirmed against the live service: the gene-model-set parameter is
    chado.gene_model.version, not assembly_version. */
 function gene_api_protein_length($annotation_version, $protein_name) {
-  $url = 'https://sequence2.maizegdb.org/get_sequence.php?gene-model-set='
+  $url = gene_api_sequence_service() . '?gene-model-set='
        . rawurlencode($annotation_version) . '&dbtype=protein&id=' . rawurlencode($protein_name);
 
   $context = stream_context_create(array(
@@ -1770,7 +1770,7 @@ function gene_api_protein_length($annotation_version, $protein_name) {
   return array(
     'name' => $protein_name,
     'length_aa' => $length,
-    'source' => 'sequence2.maizegdb.org'
+    'source' => 'get_sequence.php'
   );
 }//gene_api_protein_length
 
@@ -2269,6 +2269,24 @@ function gene_api_transcript_protein($name, $model_type, $stored, $shard_map,
   return ($derived === $name) ? null : $derived;
 }//gene_api_transcript_protein
 
+/* Where sequence FASTA comes from.
+
+   This used to be sequence2.maizegdb.org, a vhost of its own whose document
+   root holds a separate copy of tools/sequence/get_sequence.php. That copy is
+   the unhardened one: it opened every request with a health probe that failed
+   about 3% of the time and reported "SEQUENCE SERVICE IS DOWN", it fetched one
+   identifier at a time with no timeout, and it reported a transient upstream
+   502 as "sequence not found". This instance's own copy is the hardened one,
+   and it reads the common annotations off local disk. Same script, same
+   parameters, same output -- one host nearer and without the probe.
+
+   Point this back at sequence2 by returning the old string if the hardened
+   script is ever rolled back. See ADMIN_DEPENDENCIES AD-077 for the request to
+   put it behind sequence2 as well, which is what production needs. */
+function gene_api_sequence_service() {
+  return MgdbApi::baseUrl() . '/tools/sequence/get_sequence.php';
+}//gene_api_sequence_service
+
 /* Sequence and BLAST descriptors.
 
    Confirmed against the live service: its gene-model-set parameter is
@@ -2287,7 +2305,7 @@ function gene_api_sequences($gene_name, $annotation_version, $assembly_version,
                  'downloads' => array());
   }
 
-  $base = 'https://sequence2.maizegdb.org/get_sequence.php?gene-model-set='
+  $base = gene_api_sequence_service() . '?gene-model-set='
         . rawurlencode($annotation_version);
 
   /* Four sequence types, each with the identifier shape the service expects.
@@ -2344,9 +2362,10 @@ function gene_api_sequences($gene_name, $annotation_version, $assembly_version,
        "SEQUENCE SERVICE IS DOWN", or with a not-found error on different
        attempts. Nothing here can fix that, and a reader who gets one of those
        should know to try again rather than conclude the sequence is missing. */
-    'note' => 'Sequences are served by sequence2.maizegdb.org. If a link returns '
-            . 'an error rather than FASTA, the sequence service is briefly '
-            . 'unavailable; the same link usually works on a retry.',
+    'note' => 'Sequences are read from the published FASTA files for this '
+            . 'annotation. If a link returns an error rather than FASTA, the '
+            . 'sequence service is briefly unavailable; the same link usually '
+            . 'works on a retry.',
     'downloads' => $assembly_version === null ? array()
                  : array('https://download.maizegdb.org/' . rawurlencode($assembly_version) . '/')
   );

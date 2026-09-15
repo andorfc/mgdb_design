@@ -857,6 +857,24 @@ a full `doi.org` URL, and sometimes only inside the citation string. One
 pattern pulls the bare DOI out of any of those, and the card's Copy DOI button
 depends on it.
 
+### Publications by year (`opts.timeline`)
+
+`R.references(target, items, section, idPrefix, opts)` takes a fifth
+argument; `{ timeline: true }` draws a publications-by-year figure at the
+head of the list and makes it the list's third filter (beside the text
+filter and the page size). One column per year from the first dated
+reference to the last, gaps kept, the peak year labelled, a tick and label
+at each decade; a bar keeps its year, a decade label keeps its decade, the
+same click again or the status line's "Show every year" releases, and the
+TSV follows whatever is showing. It is plain HTML — each column is a
+`<button>` the full height of the plot, its bar height a `--h` custom
+property, its tooltip `::after { content: attr(data-tip) }` on hover and
+focus-visible — so nothing depends on Plotly and it draws in a hidden
+section. The gene record is the only page that asks for it; the locus and
+gene-product records still draw `R.yearsChart` in Metrics, and the gene
+record's own Metrics copy of that chart was removed when the timeline
+arrived, since one page should not carry the same figure twice.
+
 ### The comparison caught a wrong route
 
 The first draft linked a QTL experiment as `/data_center/qtl_analysis?id=`.
@@ -6084,6 +6102,48 @@ Warming goes to the local Apache with an overridden `Host` header rather than
 through `root_url_private`. The site sits behind Cloudflare, which answers a
 server-side fetch of an HTML page with a bot challenge, so warming through the
 public hostname reports every page as failed while the cache stays empty.
+
+## The sequence server
+
+`tools/sequence/get_sequence.php` is the FASTA endpoint every page links to for
+a gene, transcript, CDS or protein sequence. It was hardened and made
+local-first on 2026-09-15; the reasoning, with the measurements behind each
+change, is in the header of the file itself.
+
+Two things to know when working near it.
+
+**It reads local disk when it can.** `tools/sequence/sequence_mirror.php`
+downloads a published FASTA from `download.maizegdb.org`, rewrites it one
+record per line and builds a fixed-width sorted index beside it under
+`data/sequence/`. A lookup is a binary search plus one seek, about a
+millisecond, and it cannot fail. A set that is not mirrored falls through to
+`fasta.maizegdb.org` exactly as before, so this is an optimisation and never a
+dependency.
+
+```
+cd <webroot> && php tools/sequence/sequence_mirror.php --defaults
+```
+
+builds the sets the record pages link to -- B73 v5, v4 and v3 protein, CDS and
+cDNA, plus the small non-coding sets -- in about 20 seconds for roughly 1.1 GB
+on disk. `--list` shows what is mirrored and when it was built; `--check
+<assembly> <file.fa.gz>` pulls ten records at random and compares them with the
+sequence service. **Rebuild after an annotation release**, and nowhere else:
+the store is content, not code, so it is not in the deploy manifest and a
+deploy never touches it.
+
+**The service it falls back to is reliable only for what it has served
+recently.** `fasta.maizegdb.org` answers a Cloudflare-cached identifier in
+~50 ms and never failed in 1,557 polls; a cold one takes 1 to 1.5 s, sometimes
+30, and returns 502 in bursts -- 5 of 25 cold identifiers unanswered in one
+run. Anything new that fetches sequences in bulk should mirror the file rather
+than loop over the service.
+
+`sequence2.maizegdb.org` is a separate vhost with its own copy of the script
+and is **not** updated by a deploy; it still runs the old one. AD-077 asks for
+that to change. Until it does, build sequence URLs with
+`gene_api_sequence_service()` rather than naming a host.
+
 
 ## The homepage
 

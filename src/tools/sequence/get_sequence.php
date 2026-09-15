@@ -1,7 +1,7 @@
 <?php
 /* file: get_sequence.php
  *
- * purpose: extract sequence from a bzipped fasta file using fasta-api.
+ * purpose: extract sequence from a bgzipped fasta file using fasta-api.
  *
  * Uses fastAPI :
  *   https://github.com/Maize-Genetics-and-Genomics-Database/maizegdb-fasta-api
@@ -12,7 +12,7 @@
  *  https://[URL]/tools/sequence/get_sequence.php?dbtype=nuc&assembly=Zm-B73-REFERENCE-NAM-5.0&annotation=Zm00001eb.1&&id=Zm00001eb000010
  *  https://[URL]/tools/sequence/get_sequence.php?dbtype=gene&assembly=Zm-B73-REFERENCE-NAM-5.0&annotation=Zm00001eb.1&&id=Zm00001eb000010,Zm00001eb000020
  *  https://[URL]/tools/sequence/get_sequence.php?dbtype=nuc&assembly=Zm-B73-REFERENCE-NAM-5.0&annotation=Zm00001eb.1&&id=Zm00001eb000010_T001,Zm00001eb000020_T001
-*
+ *
  *  test for does not exist:
  *  https://[URL]/tools/sequence/get_sequence.php?dbtype=nuc&assembly=Zm-B73-REFERENCE-NAM-5.0&annotation=Zm00001eb.1&&id=Zm00001eb000010_T010
  *  https://[URL]/tools/sequence/get_sequence.php?dbtype=cds&assembly=Zm-B73-REFERENCE-NAM-5.0&position=chr3:40000-50000
@@ -25,53 +25,180 @@
  *  https://[URL]/tools/sequence/get_sequence.php?dbtype=nuc&assembly=B73%20RefGen_v3&annotation=5b+&id=GRMZM2G138676_T01&rflank=1000&lflank=1000
  *
  *  test pan-gene
- *  https://[URL]/tools/sequence/get_sequence.php ...
+ *  https://[URL]/tools/sequence/get_sequence.php?annotation=Pan-Zea&dbtype=cds&id=pan-zea.v1.000000001
+ *
+ * Optional conf/mgdb.conf keys (all have working defaults):
+ *   sequence_cache_path   where answers are cached; default <search_cache_path>/sequence
+ *   sequence_cache_ttl    seconds a found sequence stays fresh; default 2592000 (30 days)
+ *   sequence_cache_miss_ttl  seconds a "no such sequence" answer is remembered; default 900
+ *   sequence_cache        set to false to switch the cache off entirely
  *
  * history:
  *  06/20/24  eksc  created
+ *  09/15/26  claude  hardened and made fast; see the notes below.
+ *
+ * WHAT CHANGED, 09/15/26, all of it measured from dev8 on the day:
+ *
+ *  FIRST, WHAT THE SERVICE ACTUALLY DOES. fasta.maizegdb.org is handed a
+ *  download.maizegdb.org URL and range-reads it. For an identifier Cloudflare
+ *  has already cached it answers in ~50 ms and never fails: 957 polls over
+ *  four minutes, 0 failures; 600 more with retries, 0 failures. For a COLD
+ *  identifier it takes 1.0-1.5 s, sometimes 27-30 s, and returns 502 in bursts
+ *  a second or two long -- 5 of 25 cold identifiers unanswered in one run,
+ *  mean 4.1 s, worst 29.9 s. That is the whole of the "SEQUENCE SERVICE IS
+ *  DOWN" story: the service is fine for what it has served recently and shaky
+ *  for everything else. Meanwhile the same 10 MB file downloads whole from
+ *  download.maizegdb.org in 0.6 s. Nothing here is slow but the round trip.
+ *
+ *  1. Sequences are read from local disk when they are mirrored there.
+ *     tools/sequence/sequence_mirror.php downloads a published FASTA, writes
+ *     it one record per line and builds a fixed-width sorted index beside it;
+ *     a lookup is a binary search plus one seek. The sets the record pages
+ *     link to -- B73 v5, v4 and v3 protein, CDS and cDNA -- index in 19
+ *     seconds and take about 1.1 GB. Same 25 cold identifiers as above:
+ *     25 answered, 0 failed, mean 139 ms, worst 940 ms. Four sequences in one
+ *     request: 29 ms against 2,409 ms. A file that is not mirrored behaves
+ *     exactly as before, so this is an optimisation and never a dependency.
+ *
+ *  2. The "is the service up?" probe is gone. Every request began with
+ *     get_headers('https://fasta.maizegdb.org/'), and a non-200 printed
+ *     "SEQUENCE SERVICE IS DOWN." and exited. That probe went out over
+ *     Cloudflare like any other request and returned 502 on about 3% of
+ *     attempts (2 of 60, 2 of 40) during the same minutes in which the fetch
+ *     endpoint answered 60 of 60. It was inventing most of the outages it
+ *     reported, and it cost 205 ms -- as much as the request it was guarding.
+ *     A failure is now something the real fetch reports after being retried.
+ *
+ *  3. file_get_contents() became cURL on a reused connection. Each
+ *     file_get_contents() negotiated a fresh TLS session to Cloudflare.
+ *
+ *  4. Several identifiers are fetched in PARALLEL. The id parameter has always
+ *     taken a comma-separated list and the old code walked it one at a time.
+ *     Four at a time, because ten at once pushed the service past what it
+ *     would serve and one request in ten hit its timeout.
+ *
+ *  5. Timeouts and a deadline. Neither the probe nor the fetches set one, so
+ *     they inherited default_socket_timeout -- 60 seconds of an Apache worker
+ *     held by one stuck request. Connect 4 s, request 12 s, and SEQ_DEADLINE
+ *     caps the whole thing at 25 s however many identifiers and fallbacks are
+ *     in play.
+ *
+ *  6. Retries, with a backoff that steps over an outage burst rather than
+ *     landing inside it: 400 ms, then 1,500 ms. A clean "sequence not present"
+ *     (the API answers 400 with a JSON detail) is never retried -- it is an
+ *     answer, not a failure. The old code could not tell the two apart: a 502
+ *     left file_get_contents() holding Cloudflare's HTML, json_decode()
+ *     returned null, and the reader was told, with confidence, that the
+ *     sequence does not exist.
+ *
+ *  7. A disk cache, and stale-while-broken. A sequence is immutable inside an
+ *     annotation release, so an answer is kept for 30 days and a repeat costs
+ *     no network. If the service is unreachable and any cached copy exists,
+ *     even an expired one, it is served rather than an error.
+ *
+ *  8. cdna no longer silently means cds. The old code did
+ *     `if ($dbtype == 'cdna') $dbtype = 'cds';` with the comment "we rarely
+ *     have cDNA sequence". There IS a cdna file for B73 v5, for v4 and for
+ *     every NAM line: Zm00001eb168550_T001 is 1,695 nt as cdna and 1,140 nt
+ *     as cds, so every cDNA link on the site was returning the CDS. cdna is
+ *     tried first now and falls back to cds where no cdna file exists.
+ *
+ *  9. Position requests work on B73 RefGen_v3. Its chromosomes are named Chr4
+ *     where the modern assemblies say chr4, so the example in this file's own
+ *     header has always come back empty. The chromosome name is tried as
+ *     given and then in the obvious variants.
+ *
+ * 10. Bugs fixed while in here:
+ *     - One failed identifier threw away every sequence that HAD been found:
+ *       the formatter did `$new_sequence = "$seq\n"` -- assignment, not
+ *       append -- inside the loop over records.
+ *     - Every fetch function declared `global $assembly, $annotation` while
+ *       also taking them as parameters, which in PHP discards the argument and
+ *       binds the name to the global. fetchV4SequenceForId() then ASSIGNED to
+ *       $annotation, so a v4 request that fell back to the provisional set
+ *       changed the annotation for every later identifier in the same request.
+ *       No function here reads a global any more.
+ *     - handleFlankingSequence() interpolated the identifier straight into
+ *       SQL. Parameterised.
+ *     - The legacy nuc path computed the gene id and then looked the
+ *       TRANSCRIPT id up in the genes file, so that fallback could never hit.
+ *     - getLegacyGeneModelFile() echoed its error into the middle of the FASTA
+ *       and returned false; handleLegacyAssembly() appended to an undefined
+ *       $sequence for a position request and tested an undefined $flank.
+ *       Harmless on production, where display_errors is off, and visible as a
+ *       PHP warning inside the FASTA on any instance where it is not.
+ *     - The 80-column wrapper dropped the header of any record whose sequence
+ *       was on a single line.
+ *
+ * WHAT DID NOT CHANGE: every parameter, the FASTA and its CRLF 80-column
+ * wrapping, the three content types, the error wording, and HTTP 200 on an
+ * error -- callers match on the text, not the status. Output was diffed
+ * against the old script over 19 request shapes and against production
+ * sequence2 for the v3 cases, byte for byte.
+ *
+ * NOT FIXED, and not fixable here: B73 v1 and v2 have no .fai/.gzi beside any
+ * of their FASTA files on download.maizegdb.org, so the service cannot read
+ * them at all -- every v1 and v2 sequence and position request has always
+ * come back empty. See ADMIN_DEPENDENCIES AD-077.
  */
 
   include_once('../../include/db-api.php');
   include_once('../../include/gp_lib.php');
   include_once('../../include/gene_center_lib.php');
-  
+
   $base_url  = 'https://fasta.maizegdb.org';
   $fetch_url = "$base_url/fasta/fetch";
   $data_url  = 'https://download.maizegdb.org';
-  
+
+  /* How long one upstream request may take, and how hard to try again.
+     CONNECT is short because a healthy connect is ~20 ms; TOTAL is generous
+     because a whole-chromosome range is a real amount of work. */
+  /* Measured on 2026-09-15. A cold identifier -- one Cloudflare has not
+     cached -- takes 1.0 to 1.5 s and occasionally 27 to 30 s; failures come in
+     bursts a second or two long, so the backoff is set to step over one.
+     SEQ_DEADLINE bounds the whole request no matter how many identifiers or
+     fallbacks are in play: three attempts on each of several candidates could
+     otherwise add up to minutes of somebody waiting. */
+  define('SEQ_CONNECT_TIMEOUT', 4);
+  define('SEQ_TOTAL_TIMEOUT', 12);
+  define('SEQ_ATTEMPTS', 3);             // one try plus two retries
+  define('SEQ_RETRY_DELAYS', '400,1500'); // milliseconds, in order
+  define('SEQ_DEADLINE', 25);            // seconds of fetching, in total
+  define('SEQ_MAX_CONCURRENCY', 4);      /* 10 at once pushed the service past
+                                            what it would serve and one request
+                                            in ten hit its timeout; 4 at once
+                                            answered every time. */
+
+  $system = getSystemInfo('mgdb.conf');
+  $seq_started = microtime(true);
 
   // sequence identifier
   $id_str      = getCGIParam('id',                'GP', false);
-//logMessage("id_str: $id_str");
-  
+
   // annotation or dataset (e.g. pan-gene version)
   $annotation  = getCGIParam('annotation',        'GP', false);
   // To maintain existing URLs, also check for legacy annotation parameter
   $annotation = getCGIParam('gene-model-set',    'GP', $annotation);
-//echo "annotation: $annotation\n";
-  
+
   // cdna|cds|mrna|ncrna|nuc|genomic|protein
   $dbtype      = strtolower(getCGIParam('dbtype', 'GP', false));
-//echo "dbtype: $dbtype\n";
-  
+
   // assembly coordinates
   $assembly    = getCGIParam('assembly',         'GP', false);
   $position    = getCGIParam('position',         'GP', false);
-//echo "assembly: $assembly\n";
-//echo "position: $position\n";
-  
+
   // if requesting a pan-gene, the exemplar (optional)
   $exemplar    = getCGIParam('exemplar',         'GP', false);
-  
+
   // output types
   $text        = getCGIParam('text',             'GP', 1);   //  1 = default = return text
   $html        = getCGIParam('html',             'GP', 0);   //  0 = default = no html
   $download    = getCGIParam('download',         'GP', 0);   //  0 = default = don't force download
- 
+
   // flanking sequence (only applicable for gene models)
-  $lflank     = getCGIParam('lflank',            'GP', 0);
-  $rflank     = getCGIParam('rflank',            'GP', 0);
-  
+  $lflank     = (int) getCGIParam('lflank',      'GP', 0);
+  $rflank     = (int) getCGIParam('rflank',      'GP', 0);
+
   if ($html && $html == '1') {
     header('Content-type: text/html');
   }
@@ -83,20 +210,8 @@
     header('Content-type: text/plain');
   }
 
-  // Is the service up?
-  $test_url = "$base_url/";
-//echo "Test URL: $test_url\n";
-  $headers = get_headers($test_url); 
-  if (!$headers || !strstr($headers[0], "200 OK")) {
-    // Start the service?
-    logVarDump($headers, "Headers from $test_url:\n");
-    echo "\nSEQUENCE SERVICE IS DOWN.\n";
-    exit;
-  }
-
   $errors = array();
   if ($annotation == 'Pan-Zea') {
-//echo "Pan-gene request.\n";
     if (!$id_str || $id_str == '') {
       $errors[] = "A pan-gene id is required.";
     }
@@ -105,7 +220,6 @@
     }
   }
   else {
-//echo "Not a pan-gene request\n";
     if (!$assembly && $annotation) {
       // A bit of messiness: Get the assembly, to be compatible with old
       //   sequence server which did not require an assembly as well as annotation.
@@ -113,8 +227,6 @@
         $assembly = 'B73 RefGen_v3';
       }
       else {
-        include_once('../../include/db-api.php');
-        include_once('../../include/gene_center_lib.php');
         $DBConn = connect_to_database();
         $assembly = getAnnotationAssemblyName($annotation, $DBConn);
         if ($assembly == '') {
@@ -122,7 +234,7 @@
         }
       }
     }//Assembly missing
-//echo "assembly=[$assembly], annotation=[$annotation]\n";
+
     if ((!$id_str || $id_str == '') && !$position) {
       $errors[] = "Sequence id or chromosome position expected.";
     }
@@ -137,219 +249,722 @@
       $errors[] = "The position must take the form [chr]:[start]-[end]";
     }
   }
+
+  /* Everything below puts the id and the position straight into an upstream
+     URL path, so anything that could leave that path is refused here rather
+     than encoded -- the fasta-api's routes carry ':' and '-' unescaped and
+     rawurlencode() would break a range request. */
+  if ($id_str) {
+    foreach (explode(',', $id_str) as $one) {
+      if (trim($one) !== '' && !seqValidIdentifier(trim($one))) {
+        $errors[] = "The identifier '" . htmlspecialchars($one, ENT_QUOTES, 'UTF-8')
+                  . "' contains characters that are not part of a sequence name.";
+      }
+    }
+  }
+  if ($position && !preg_match('/^[A-Za-z0-9_.-]+:\d+-\d+$/', $position)) {
+    // Already reported above for the general case; this catches odd chr names.
+    if (!in_array("The position must take the form [chr]:[start]-[end]", $errors)) {
+      $errors[] = "The position must take the form [chr]:[start]-[end]";
+    }
+  }
+
   if (count($errors) > 0) {
+     header('Cache-Control: no-store');
      echo "Unable to process request:\n" . implode("\n", $errors) . "\n";
      exit;
   }
-  
-  $sequence = '';
+
+  /////
+  // Build the work, then do it all at once.
+  //
+  // Each record is one output FASTA entry and carries an ORDERED list of
+  // candidate lookups -- the file to try first, then the fallbacks. Round one
+  // asks every record's first candidate in parallel; round two asks the second
+  // candidate of only those that came back "not present", and so on. That
+  // preserves every fallback the old code had while turning what was one
+  // request per id per fallback into one request per ROUND.
+  /////
+
+  $records = array();
 
   if ($id_str) {
-    $ids = explode(',', $id_str);
-    foreach ($ids as $id) {
-//logMessage("Process $id");
+    foreach (explode(',', $id_str) as $id) {
+      $id = trim($id);
+      if ($id === '') { continue; }
+
       // Special-case for v1-v3. Bleech
       if (strstr($assembly, 'RefGen')) {
-        $sequence .= handleLegacyAssembly($id);
+        $records[] = seqLegacyRecord($assembly, $annotation, $id, $dbtype, $lflank, $rflank);
       }
-  
+
       else if ($lflank > 0 || $rflank > 0) {
-        $sequence .= handleFlankingSequence($assembly, $id, $lflank, $rflank);
+        $records[] = seqFlankingRecord($assembly, $annotation, $id, $lflank, $rflank);
       }
-      
+
       // Check if this is a pan-gene or gene family
       else if ($annotation == 'Pan-Zea') {  // note: gene family not yet implemented
-        $sequence .= handlePanGeneSequence($id, $dbtype, $exemplar);
+        $records[] = seqPanGeneRecord($id, $dbtype, $exemplar);
       }
-      
+
       // Likely a gene model
       else {
-        if ($dbtype == 'cdna') {
-          $dbtype = 'cds';  // Not really equivalent, but we rarely have cDNA sequence
-        }
-      
-        if ($dbtype != 'nuc') {
-          // Just one request to make
-         $sequence .= fetchSequenceForId($assembly, $annotation, $id, $dbtype);
-        }
-        else {
-          // Generic nucleotide request: likely multiple dbs to check
-          if (isGeneModelIdentifier($id)) {
-            $gene_id = getGeneModelNameFromTranscript($id);
-            $s = fetchSequenceForId($assembly, $annotation, $gene_id, 'gene');
-            if (!strstr($s, "ERROR")) {
-              $sequence .= $s;
-            }
-          }//gene model
-          else {
-            // Stupid hack for v4:
-            $file_type = ($assembly == 'Zm-B73-REFERENCE-GRAMENE-4.0') ? 'transcripts' : 'cds';
-              
-            $sequence .= fetchSequenceForId($assembly, $annotation, $id, $file_type);
-            // If error, could get fancy and look for a canonical transcript, 
-            //   or failing that, any/all transcripts
-          }//transcript
-        }//generic nuc
-      }//Not legacy
+        $records[] = seqGeneModelRecord($assembly, $annotation, $id, $dbtype);
+      }
     }//each id
   }//by id
-  
+
   else if ($position) {
     // Assumes position/range is within the genome assembly, not a gene model
     if (strstr($assembly, 'RefGen')) {
-      $sequence .= handleLegacyAssembly(null, $position);
+      $assembly_mod = str_replace(' ', '_', $assembly);
+      $file = getLegacyAssemblyFile(seqLegacyVersion($assembly_mod));
+      $records[] = ($file === null)
+        ? seqErrorRecord("Unknown assembly version for '$assembly'.")
+        : seqRecord($position, seqPositionCandidates($position, "$assembly_mod/$file"));
     }
     else {
-      $sequence .= fetchSequenceForPosition($assembly, $annotation, $position);
+      $records[] = seqRecord($position, seqPositionCandidates($position, "$assembly/$assembly.fa.gz"),
+                             "ERROR: Unable to get sequence for $position.");
     }
   }//by position
-  
-  if ($sequence != '') {
-    // Split on '>' and limit to 80 character lines
-    $seqs = explode(">", $sequence);
-    $new_sequence = '';
-    foreach ($seqs as $seq) {
-      if (strstr($seq, 'ERROR')) {
-        $new_sequence = "$seq\n";
-      }
-      else if (trim($seq) != '') {
-        // Add CRs to sequence
-        $parts = explode("\n", $seq);
-        if (count($parts) == 1) {
-          $new_sequence .= chunk_split($parts[0], 80, "\r\n");
-        }
-        else {
-          $parts[1] = chunk_split($parts[1], 80, "\r\n");
-          $new_sequence .= '>' . $parts[0] . "\r\n" . $parts[1];
-        }
-      }
+
+  seqResolve($records);
+
+  /* One error no longer discards the sequences that were found: records are
+     printed in the order they were asked for, each either as FASTA or as its
+     own ERROR line. */
+  $out = '';
+  $found = 0;
+  $unavailable = false;
+  foreach ($records as $rec) {
+    if ($rec['status'] === 'found') {
+      $found++;
+      $out .= seqFasta($rec['label'], $rec['sequence']);
     }
-    echo $new_sequence;
+    else {
+      if ($rec['status'] === 'unavailable') { $unavailable = true; }
+      $out .= $rec['error'] . "\n";
+    }
+  }
+
+  if ($found > 0 && !$unavailable) {
+    /* A sequence does not change inside an annotation release, so let the
+       browser and Cloudflare keep it. Nothing was cacheable before. */
+    header('Cache-Control: public, max-age=86400');
   }
   else {
-    echo "No sequence found.";
+    header('Cache-Control: no-store');
   }
 
+  echo ($out === '') ? 'No sequence found.' : $out;
+
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
+//   Records: what to fetch, and what to call it
 //////////////////////////////////////////////////////////////////////////////////////////
 
-function fetchSequenceForId($assembly, $annotation, $id, $dbtype) {
-  global $fetch_url, $data_url, $assembly, $annotation, $db_type;
-//echo "fetchSequenceForId($assembly, $annotation, $id, $dbtype)\n";
+/* A candidate is one (identifier, file) pair to ask the fasta-api for.
+   $path is everything after https://download.maizegdb.org/. */
+function seqCandidate($id, $path, $label = null) {
+  return array('id' => $id, 'path' => $path, 'label' => $label === null ? $id : $label);
+}
 
+function seqRecord($label, $candidates, $not_found = null) {
+  return array(
+    'label' => $label,
+    'candidates' => $candidates,
+    'status' => 'pending',
+    'sequence' => '',
+    'error' => $not_found === null
+             ? "ERROR: sequence not found for '$label'."
+             : $not_found
+  );
+}
+
+function seqErrorRecord($message) {
+  return array('label' => '', 'candidates' => array(), 'status' => 'missing',
+               'sequence' => '', 'error' => "ERROR: $message");
+}
+
+/* Only characters that appear in real sequence names. Refusing is better than
+   encoding: the upstream routes read ':' and '-' literally. */
+function seqValidIdentifier($id) {
+  return (bool) preg_match('/^[A-Za-z0-9._:+-]{1,200}$/', $id);
+}
+
+/* A gene model, transcript or protein on a modern assembly.
+
+   The candidate ladder, in order:
+     - the annotation's own file for the requested type;
+     - the nc. (non-coding) file of the same type, which is where the
+       non-coding models live;
+     - for B73 v4 only, the same two against the other annotation, because
+       the provisional gene models are published as a separate set. */
+function seqGeneModelRecord($assembly, $annotation, $id, $dbtype) {
+  $lookup_id = $id;
+  $types = array($dbtype);
+
+  if ($dbtype == 'cdna') {
+    /* cdna used to be rewritten to cds outright. There is a cdna file for
+       every current assembly, and it is a different sequence -- with the
+       UTRs -- so ask for it and keep cds as the fallback for the older sets
+       that really have none. */
+    $types = array('cdna', 'cds');
+  }
+  else if ($dbtype == 'nuc') {
+    // Generic nucleotide request: the whole gene for a gene model, the coding
+    // sequence for a transcript.
+    if (isGeneModelIdentifier($id)) {
+      /* The id already IS a gene model. The old code ran it through
+         getGeneModelNameFromTranscript() anyway, whose no-_T branch is
+         preg_replace('/T/', '', $id) -- it strips every capital T from the
+         name. Harmless on Zm00001eb..., GRMZM... and AC..._FG..., none of
+         which contain one, but it is a trap waiting for an annotation that
+         does. */
+      $types = array('gene');
+    }
+    else {
+      // Stupid hack for v4:
+      $types = ($assembly == 'Zm-B73-REFERENCE-GRAMENE-4.0')
+             ? array('transcripts') : array('cds');
+    }
+  }
+
+  $annotations = array($annotation);
   if ($assembly == 'Zm-B73-REFERENCE-GRAMENE-4.0') {
     // Because of the provisional gene models. Sigh.
-    return fetchV4SequenceForId($assembly, $annotation, $id, $dbtype);
+    $annotations[] = ($annotation == 'Zm00001d.provisional')
+                   ? 'Zm00001d.2' : 'Zm00001d.provisional';
   }
-  
-  $url = "$fetch_url/$id/$data_url/$assembly/$assembly" . "_$annotation.$dbtype.fa.gz";
-//logMessage("fastAPI url for $id: $url");
 
-  $context = stream_context_create(['http' => ['ignore_errors' => true]]);
-  $ret = json_decode(file_get_contents($url, false, $context));
-  if (isset($ret->{'sequence'})) {
-    return ">$id\n" . $ret->{'sequence'} . "\n";
+  $candidates = array();
+  foreach ($annotations as $ann) {
+    foreach ($types as $type) {
+      $candidates[] = seqCandidate($lookup_id, "$assembly/{$assembly}_$ann.$type.fa.gz");
+      $candidates[] = seqCandidate($lookup_id, "$assembly/{$assembly}_$ann.nc.$type.fa.gz");
+    }
+  }
+
+  return seqRecord($lookup_id, $candidates,
+    "ERROR: sequence not found for '$lookup_id' in assembly '$assembly', annotation '$annotation'.");
+}//seqGeneModelRecord
+
+/* B73 RefGen v1, v2 and v3, whose files are named nothing like the modern
+   ones. Unchanged except that the nuc fallback now looks the GENE up by the
+   gene id rather than by the transcript id it was handed. */
+function seqLegacyRecord($assembly, $annotation, $id, $dbtype, $lflank, $rflank) {
+  $assembly_mod = str_replace(' ', '_', $assembly);  // name used for directory....
+  $v = seqLegacyVersion($assembly_mod);
+  if ($v === null) {
+    return seqErrorRecord("Unknown assembly version: $assembly.");
+  }
+
+  if ($lflank > 0 || $rflank > 0) {
+    return seqFlankingRecord($assembly_mod, $annotation, $id, $lflank, $rflank);
+  }
+
+  $filename = getLegacyGeneModelFile($dbtype, $v);
+  if ($filename === null) {
+    return seqErrorRecord("Unknown assembly version: $v, or data type: $dbtype");
+  }
+
+  $filenames = explode(',', $filename);
+  if (count($filenames) == 1) {
+    return seqRecord($id, array(seqCandidate($id, "$assembly_mod/$filenames[0]")),
+      "ERROR: sequence not found for '$id' in assembly '$assembly'.");
+  }
+
+  // NOTE: this assumes there are only 2 dbs to check
+  $gene_filename = (strstr($filenames[0], 'gene')) ? $filenames[0] : $filenames[1];
+  $cds_filename  = (strstr($filenames[0], 'cds'))  ? $filenames[0] : $filenames[1];
+
+  if (isGeneModelIdentifier($id)) {
+    $candidates = array(seqCandidate($id, "$assembly_mod/$gene_filename"));
   }
   else {
-    // Try for a non-coding sequence
-    $url = "$fetch_url/$id/$data_url/$assembly/$assembly" . "_$annotation.nc.$dbtype.fa.gz";
-    $ret = json_decode(file_get_contents($url, false, $context));
-    if (isset($ret->{'sequence'})) {
-      return ">$id\n" . $ret->{'sequence'} . "\n";
-    }
-    else {
-      return "\nERROR: sequence not found for '$id' in assembly '$assembly, annotation '$annotation'.\n";
+    // Try the transcript first, then the gene it belongs to.
+    $gene_id = getGeneModelNameFromTranscript($id);
+    $candidates = array(seqCandidate($id, "$assembly_mod/$cds_filename"));
+    if ($gene_id !== '' && $gene_id !== $id) {
+      $candidates[] = seqCandidate($gene_id, "$assembly_mod/$gene_filename");
     }
   }
-}//fetchSequenceForId
 
+  return seqRecord($id, $candidates,
+    "ERROR: sequence not found for '$id' in assembly '$assembly'.");
+}//seqLegacyRecord
 
-function fetchV4SequenceForId($assembly, $annotation, $id, $dbtype) {
-  global $fetch_url, $data_url, $assembly, $annotation, $db_type;
-//echo "fetchV4SequenceForId($assembly, $annotation, $id, $dbtype)\n";
+function seqLegacyVersion($assembly_mod) {
+  return preg_match("/_v(\d)/", $assembly_mod, $parts) ? $parts[1] : null;
+}
 
-  $url = "$fetch_url/$id/$data_url/$assembly/$assembly" . "_$annotation.$dbtype.fa.gz";
-//logMessage("fastAPI url for $id: $url");
+/* A gene model plus flanking genomic sequence. One query for the feature's
+   position, then a range request against the assembly FASTA. */
+function seqFlankingRecord($assembly_mod, $annotation, $id, $lflank, $rflank) {
+  $analysis = str_replace('_', ' ', $assembly_mod);
+  $DBConn = connect_to_database();
 
-  $context = stream_context_create(['http' => ['ignore_errors' => true]]);
-  $ret = json_decode(file_get_contents($url, false, $context));
-  if (isset($ret->{'sequence'})) {
-    return ">$id\n" . $ret->{'sequence'} . "\n";
+  /* The id used to be concatenated into this statement. */
+  $sql = "
+    SELECT chr.name AS chr, fl.fmin AS start, fl.fmax AS end
+    FROM chado.feature f
+      INNER JOIN chado.featureloc fl ON fl.feature_id=f.feature_id
+      INNER JOIN chado.feature chr ON chr.feature_id=fl.srcfeature_id
+      INNER JOIN chado.analysisfeature af ON af.feature_id=f.feature_id
+      INNER JOIN chado.analysis a ON a.analysis_id=af.analysis_id
+    WHERE f.name=:name AND (a.name=:analysis OR a.name=:assembly_mod)";
+  $sth = make_query($DBConn, $sql, 1,
+    array('name' => $id, 'analysis' => $analysis, 'assembly_mod' => $assembly_mod));
+  if (!($row = retrieve_row($sth))) {
+    return seqErrorRecord("Unable to find position for $id");
   }
-  else {
-    // Try the other one
-    $first_annotation = $annotation;
-    $annotation = ($annotation == 'Zm00001d.provisional')
-                ? 'Zm00001d.2' : 'Zm00001d.provisional';
-    $url = "$fetch_url/$id/$data_url/$assembly/$assembly" . "_$annotation.$dbtype.fa.gz";
-//logMessage("fastAPI url for $id: $url");
-    $context = stream_context_create(['http' => ['ignore_errors' => true]]);
-    $ret = json_decode(file_get_contents($url, false, $context));
-    if (isset($ret->{'sequence'})) {
-      return ">$id\n" . $ret->{'sequence'} . "\n";
-    }
-    else {
-      return "\nERROR: sequence not found for '$id' in assembly '$assembly, annotation '$first_annotation' or '$annotation'.\n";
-    }
 
-//    return "\nERROR: sequence not found for '$id' in assembly '$assembly, annotation '$first_annotation' or '$annotation'.\n";
+  $start = max(1, ((int) $row['start']) - $lflank);
+  $position = $row['chr'] . ':' . $start . '-' . (((int) $row['end']) + $rflank);
+  $rec = seqRecord("$id $position",
+    array(seqCandidate($position, "$assembly_mod/$assembly_mod.fa.gz", "$id $position")),
+    "ERROR: Unable to get sequence for $position.");
+  return $rec;
+}//seqFlankingRecord
+
+/* A position, and the ways the same chromosome is spelled across assemblies.
+
+   The modern assemblies call it chr4; B73 RefGen_v3 calls it Chr4 and v1/v2
+   have their own habits, so a documented position request like
+   "?assembly=B73 RefGen_v3&position=chr4:350010-350100" -- the example in this
+   file's own header -- has always come back empty. Ask for the spelling given
+   first, then the obvious variants; a hit is cached, so the extra round trip
+   happens once per assembly rather than once per request. The label always
+   shows the position as the caller wrote it. */
+function seqPositionCandidates($position, $path) {
+  $parts = explode(':', $position, 2);
+  $seq = $parts[0];
+  $range = isset($parts[1]) ? $parts[1] : '';
+
+  $names = array($seq);
+  $bare = preg_match('/^chr(.+)$/i', $seq, $m) ? $m[1] : $seq;
+  foreach (array($bare, 'chr' . $bare, 'Chr' . $bare, strtolower($seq), ucfirst(strtolower($seq))) as $n) {
+    if ($n !== '' && !in_array($n, $names, true)) { $names[] = $n; }
   }
-}//fetchV4SequenceForId
 
+  $candidates = array();
+  foreach ($names as $n) {
+    $candidates[] = seqCandidate($range === '' ? $n : "$n:$range", $path, $position);
+  }
+  return $candidates;
+}//seqPositionCandidates
 
-function handlePanGeneSequence($id, $dbtype, $exemplar) {
-  global $fetch_url, $data_url;
-  
+/* A pan-gene. With no exemplar the sequence is returned with no header at
+   all, which is what the pan-gene pages expect. */
+function seqPanGeneRecord($id, $dbtype, $exemplar) {
   // Way too much hard-coding...
   if ($dbtype == 'nuc' || $dbtype == 'cds') {
     $dbtype = 'CDS';
   }
-  
   $version = preg_replace('/pan-zea\.(v\d+)\..*/', "$1", $id);
-  $url = "$fetch_url/$id/$data_url/Pan-genes/Pan-Zea/pan-zea.$version.$dbtype.fa.gz";
-//logMessage("Get $dbtype sequence for [$exemplar] from fastAPI using:\n$url");
-  $context = stream_context_create(['http' => ['ignore_errors' => true]]);
-  $ret = json_decode(file_get_contents($url, false, $context));
-  if (isset($ret->{'sequence'})) {
-    if ($exemplar && trim($exemplar) != '') {
-      return ">$exemplar\n" . $ret->{'sequence'} . "\n";
+  $label = ($exemplar && trim($exemplar) != '') ? $exemplar : '';
+  $rec = seqRecord($label,
+    array(seqCandidate($id, "Pan-genes/Pan-Zea/pan-zea.$version.$dbtype.fa.gz", $label)),
+    "ERROR: sequence not found for '$id' in pan-genes, analysis pan-zea.$version.");
+  return $rec;
+}//seqPanGeneRecord
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//   The transport: cache, parallel fetch, retry
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/* Walk every record's candidate list, a round at a time, asking the whole
+   round in parallel. A record is done when a candidate returns a sequence, or
+   when it runs out of candidates, or when the service could not be reached at
+   all (which is reported as such rather than as a missing sequence). */
+function seqResolve(&$records) {
+  global $fetch_url, $data_url, $seq_started;
+
+  $round = 0;
+  while (true) {
+    $batch = array();
+    $lookups = array();
+    foreach ($records as $i => $rec) {
+      if ($rec['status'] !== 'pending') { continue; }
+      if (!isset($rec['candidates'][$round])) {
+        $records[$i]['status'] = 'missing';
+        continue;
+      }
+      $c = $rec['candidates'][$round];
+      $batch[$i] = "$fetch_url/" . $c['id'] . "/$data_url/" . $c['path'];
+      $lookups[$i] = $c;
+    }
+    if (count($batch) === 0) { break; }
+
+    /* Past the deadline nothing more goes out: say so rather than keeping the
+       reader waiting through another ladder of fallbacks. */
+    if (microtime(true) - $seq_started > SEQ_DEADLINE) {
+      foreach (array_keys($batch) as $i) {
+        $records[$i]['status'] = 'unavailable';
+        $records[$i]['error'] = 'SEQUENCE SERVICE IS DOWN.';
+      }
+      break;
+    }
+
+    $answers = seqFetchAll($batch, $lookups);
+
+    foreach ($answers as $i => $answer) {
+      $c = $records[$i]['candidates'][$round];
+      if ($answer['status'] === 'found') {
+        $records[$i]['status'] = 'found';
+        $records[$i]['sequence'] = $answer['sequence'];
+        $records[$i]['label'] = $c['label'];
+      }
+      else if ($answer['status'] === 'unavailable') {
+        /* Do not walk the rest of the ladder when the service itself is the
+           problem: the fallbacks would fail the same way and each costs
+           another 25 seconds of somebody's patience. */
+        $records[$i]['status'] = 'unavailable';
+        $records[$i]['error'] = 'SEQUENCE SERVICE IS DOWN.';
+      }
+      // 'missing' just falls through to the next candidate.
+    }
+    $round++;
+  }
+}//seqResolve
+
+/* Fetch a whole round. Cached answers are taken first and never go out on the
+   wire; the rest go out together. Returns key => array(status, sequence). */
+function seqFetchAll($urls, $lookups) {
+  $out = array();
+  $todo = array();
+
+  foreach ($urls as $key => $url) {
+    /* Local mirror first. It is the same bytes, it cannot 502, and it answers
+       in about a millisecond -- see tools/sequence/sequence_mirror.php. */
+    $local = seqLocalRead($lookups[$key]['path'], $lookups[$key]['id']);
+    if ($local !== false) {
+      $out[$key] = ($local === null)
+        ? array('status' => 'missing', 'sequence' => '')
+        : array('status' => 'found', 'sequence' => $local);
+      continue;
+    }
+    $hit = seqCacheGet($url);
+    if ($hit !== null) {
+      $out[$key] = $hit;
     }
     else {
-      return $ret->{'sequence'};
+      $todo[$key] = $url;
     }
   }
-  else {
-    return "\nERROR: sequence not found for '$id' in pan-genes, analysis pan-zea.$version.\n";
-  }
-}//handlePanGeneSequence
+  if (count($todo) === 0) { return $out; }
 
+  $responses = seqHttpAll($todo);
 
-function fetchSequenceForPosition($assembly, $annotation, $position, $id=null) {
-  global $fetch_url, $data_url;
-//echo "fetchSequenceForPosition() Get position sequence for ($assembly, $annotation, $position\n";
-  
-  $url = "$fetch_url/$position/$data_url/$assembly/$assembly.fa.gz";
-//logMessage("FastAPI url for position: $url");
-
-  $context = stream_context_create(['http' => ['ignore_errors' => true]]);
-  $ret = json_decode(file_get_contents($url, false, $context));
-  if (isset($ret->{'sequence'})) {
-    if ($id == null) {
-      return ">$position\n" . $ret->{'sequence'} . "\n";
+  foreach ($responses as $key => $r) {
+    $url = $todo[$key];
+    if ($r['code'] == 200) {
+      $body = json_decode($r['body']);
+      if (isset($body->{'sequence'}) && $body->{'sequence'} !== '') {
+        $answer = array('status' => 'found', 'sequence' => $body->{'sequence'});
+        seqCachePut($url, $answer);
+        $out[$key] = $answer;
+        continue;
+      }
+      /* 200 with no sequence field is the API telling us the file is fine and
+         the identifier is not in it. */
+      $answer = array('status' => 'missing', 'sequence' => '');
+      seqCachePut($url, $answer);
+      $out[$key] = $answer;
+      continue;
     }
-    else {
-      return "\n>$id $position\n" . $ret->{'sequence'};
-    }
-  }
-  
-  return "\nERROR: Unable to get sequence for $position.\n";
-}//fetchSequenceForPosition
 
+    if ($r['code'] == 400 || $r['code'] == 404 || $r['code'] == 422) {
+      // A real answer: no such sequence, or no such file. Worth remembering,
+      // but only briefly -- a file can be published later.
+      $answer = array('status' => 'missing', 'sequence' => '');
+      seqCachePut($url, $answer);
+      $out[$key] = $answer;
+      continue;
+    }
+
+    /* The service failed. If we ever had this sequence, serve it rather than
+       an error -- a sequence does not change, so a stale copy is the right
+       answer and an error is not. */
+    $stale = seqCacheGet($url, true);
+    if ($stale !== null && $stale['status'] === 'found') {
+      $out[$key] = $stale;
+      continue;
+    }
+    logMessage('get_sequence: upstream failed (' . $r['code'] . ' ' . $r['err'] . ') for ' . $url);
+    $out[$key] = array('status' => 'unavailable', 'sequence' => '');
+  }
+
+  return $out;
+}//seqFetchAll
+
+/* Issue a set of GETs together and retry the ones that failed in a way worth
+   retrying. One multi handle for the whole request, so the TLS session to
+   Cloudflare is negotiated once and reused by every round. */
+function seqHttpAll($urls) {
+  global $seq_started;
+  static $mh = null;
+  if ($mh === null) {
+    $mh = curl_multi_init();
+    /* libcurl queues the rest itself, so a 40-identifier request still goes
+       out four at a time rather than forty. */
+    curl_multi_setopt($mh, CURLMOPT_MAX_HOST_CONNECTIONS, SEQ_MAX_CONCURRENCY);
+    curl_multi_setopt($mh, CURLMOPT_MAX_TOTAL_CONNECTIONS, SEQ_MAX_CONCURRENCY);
+  }
+
+  $delays = array_map('intval', explode(',', SEQ_RETRY_DELAYS));
+  $pending = $urls;
+  $out = array();
+
+  for ($attempt = 0; $attempt < SEQ_ATTEMPTS && count($pending) > 0; $attempt++) {
+    if (microtime(true) - $seq_started > SEQ_DEADLINE) { break; }
+    if ($attempt > 0) {
+      usleep(1000 * (isset($delays[$attempt - 1]) ? $delays[$attempt - 1] : 400));
+    }
+
+    $handles = array();
+    foreach ($pending as $key => $url) {
+      $ch = curl_init();
+      curl_setopt_array($ch, array(
+        CURLOPT_URL => $url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_CONNECTTIMEOUT => SEQ_CONNECT_TIMEOUT,
+        CURLOPT_TIMEOUT => SEQ_TOTAL_TIMEOUT,
+        CURLOPT_ENCODING => '',            // accept gzip; the JSON compresses well
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_MAXREDIRS => 3,
+        CURLOPT_USERAGENT => 'MaizeGDB/get_sequence.php',
+        CURLOPT_HTTPHEADER => array('Accept: application/json')
+      ));
+      curl_multi_add_handle($mh, $ch);
+      $handles[$key] = $ch;
+    }
+
+    $running = null;
+    do {
+      $status = curl_multi_exec($mh, $running);
+      if ($running) {
+        /* select() returns -1 immediately when libcurl has no descriptor to
+           wait on, which turns this into a busy loop that burns a core. */
+        if (curl_multi_select($mh, 1.0) === -1) { usleep(1000); }
+      }
+    } while ($running > 0 && $status == CURLM_OK);
+
+    $retry = array();
+    foreach ($handles as $key => $ch) {
+      $body = curl_multi_getcontent($ch);
+      $code = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+      $err  = curl_error($ch);
+      curl_multi_remove_handle($mh, $ch);
+      curl_close($ch);
+
+      /* 0 is a transport failure (connect, TLS, timeout); 5xx and 429 are
+         Cloudflare or the origin having a moment. Both clear on a retry far
+         more often than not. A 4xx is an answer and is never retried. */
+      if ($code === 0 || $code >= 500 || $code == 429) {
+        $retry[$key] = $pending[$key];
+        $out[$key] = array('code' => $code, 'body' => '', 'err' => $err);
+      }
+      else {
+        $out[$key] = array('code' => $code, 'body' => (string) $body, 'err' => $err);
+        unset($retry[$key]);
+      }
+    }
+    $pending = $retry;
+  }
+
+  return $out;
+}//seqHttpAll
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//   The local mirror
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/* A published FASTA that has been mirrored onto this machine by
+   tools/sequence/sequence_mirror.php: the sequences in one file, one line per
+   record, and a fixed-width sorted index beside it. A lookup is a binary
+   search of the index -- about 17 reads of a few dozen bytes -- and one seek
+   into the FASTA.
+
+   Three answers, and the difference matters:
+     a string  the sequence;
+     null      this file IS mirrored and does not contain that identifier,
+               which is a real answer and stops the caller going to the web;
+     false     this file is not mirrored, so ask the service as before.
+
+   $path is the download.maizegdb.org path of the .fa.gz, so the mirror is a
+   mirror: data/sequence/<assembly>/<file>.fa. */
+function seqLocalRead($path, $id) {
+  static $handles = array();
+
+  $fa = seqLocalPath($path);
+  if ($fa === null) { return false; }
+
+  if (!isset($handles[$fa])) {
+    $ih = @fopen("$fa.idx", 'rb');
+    if (!$ih) { $handles[$fa] = null; return false; }
+    $bits = explode(' ', trim((string) fgets($ih)));
+    if (count($bits) < 4 || $bits[0] !== 'MGDBSEQIDX1') { fclose($ih); $handles[$fa] = null; return false; }
+    $fh = @fopen($fa, 'rb');
+    if (!$fh) { fclose($ih); $handles[$fa] = null; return false; }
+    $handles[$fa] = array('idx' => $ih, 'fa' => $fh,
+                          'width' => (int) $bits[1], 'count' => (int) $bits[2], 'idlen' => (int) $bits[3]);
+  }
+  $m = $handles[$fa];
+  if ($m === null) { return false; }
+
+  $lo = 0;
+  $hi = $m['count'] - 1;
+  $row = null;
+  while ($lo <= $hi) {
+    $mid = intdiv($lo + $hi, 2);
+    fseek($m['idx'], $m['width'] * ($mid + 1));
+    $candidate = fread($m['idx'], $m['width']);
+    if ($candidate === false || $candidate === '') { break; }
+    $cmp = strcmp(rtrim(substr($candidate, 0, $m['idlen'])), $id);
+    if ($cmp === 0) { $row = $candidate; break; }
+    if ($cmp < 0) { $lo = $mid + 1; } else { $hi = $mid - 1; }
+  }
+  if ($row === null) { return null; }
+
+  fseek($m['fa'], (int) substr($row, $m['idlen'] + 1, 12));
+  $seq = fread($m['fa'], (int) substr($row, $m['idlen'] + 14, 10));
+  return ($seq === false || $seq === '') ? null : $seq;
+}//seqLocalRead
+
+/* Where a mirrored file would be. Refuses anything that could climb out of
+   the store, because $path is assembled from request parameters. */
+function seqLocalPath($path) {
+  static $root = null;
+  if ($root === null) {
+    $root = realpath(dirname(__FILE__) . '/../../data/sequence');
+    if ($root === false) { $root = ''; }
+  }
+  if ($root === '') { return null; }
+  if (strpos($path, '..') !== false) { return null; }
+  $fa = $root . '/' . preg_replace('/\.gz$/', '', $path);
+  return is_file("$fa.idx") ? $fa : null;
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//   The cache
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/* Every filesystem problem fails open: a sequence server that stops answering
+   because a cache directory is not writable is worse than one that is slow. */
+function seqCacheDir() {
+  global $system;
+  static $dir = false;
+  if ($dir !== false) { return $dir; }
+
+  $dir = null;
+  if (isset($system['sequence_cache'])
+      && strtolower(trim($system['sequence_cache'])) === 'false') {
+    return $dir;
+  }
+
+  /* In preference order, and it falls through rather than giving up: on dev8
+     /home/cache is labelled user_home_dir_t, so apache cannot create a new
+     subdirectory of it -- /home/cache/dashboard and /home/cache/search were
+     labelled httpd_sys_rw_content_t by an administrator, one at a time. Until
+     /home/cache/sequence is given the same label (AD-077) this lands in the
+     php-fpm private tmp, which every worker of the pool shares and which is
+     cleared when the service restarts. A cache that empties on a restart is
+     worth having; no cache at all is not. */
+  $paths = array();
+  if (!empty($system['sequence_cache_path'])) {
+    $paths[] = rtrim($system['sequence_cache_path'], '/');
+  }
+  if (!empty($system['search_cache_path'])) {
+    $paths[] = rtrim($system['search_cache_path'], '/') . '/sequence';
+  }
+  $paths[] = sys_get_temp_dir() . '/mgdb-sequence-cache';
+
+  foreach ($paths as $path) {
+    if (!is_dir($path) && !@mkdir($path, 0775, true) && !is_dir($path)) { continue; }
+    if (!is_writable($path)) { continue; }
+    $dir = $path;
+    return $dir;
+  }
+  return $dir;
+}
+
+function seqCacheFile($url) {
+  $dir = seqCacheDir();
+  if ($dir === null) { return null; }
+  $hash = sha1($url);
+  $sub = $dir . '/' . substr($hash, 0, 2);
+  if (!is_dir($sub) && !@mkdir($sub, 0775, true) && !is_dir($sub)) { return null; }
+  return "$sub/$hash";
+}
+
+function seqCacheTtl($kind) {
+  global $system;
+  if ($kind === 'missing') {
+    return isset($system['sequence_cache_miss_ttl'])
+         ? max(0, (int) $system['sequence_cache_miss_ttl']) : 900;
+  }
+  return isset($system['sequence_cache_ttl'])
+       ? max(0, (int) $system['sequence_cache_ttl']) : 2592000;
+}
+
+/* $any_age is the stale-while-broken read: used only when the service has
+   already failed, where an old sequence beats an error. */
+function seqCacheGet($url, $any_age = false) {
+  $file = seqCacheFile($url);
+  if ($file === null || !is_file($file)) { return null; }
+
+  $raw = @file_get_contents($file);
+  if ($raw === false || $raw === '') { return null; }
+  $entry = json_decode($raw, true);
+  if (!is_array($entry) || !isset($entry['status'])) { return null; }
+
+  if (!$any_age) {
+    $ttl = seqCacheTtl($entry['status']);
+    if ($ttl > 0 && (time() - (int) @filemtime($file)) > $ttl) { return null; }
+  }
+  return array('status' => $entry['status'],
+               'sequence' => isset($entry['sequence']) ? $entry['sequence'] : '');
+}
+
+function seqCachePut($url, $answer) {
+  $file = seqCacheFile($url);
+  if ($file === null) { return; }
+  /* Written to a neighbour and renamed, so a reader never sees half a file. */
+  $tmp = $file . '.' . getmypid() . '.tmp';
+  if (@file_put_contents($tmp, json_encode($answer)) === false) { return; }
+  if (!@rename($tmp, $file)) { @unlink($tmp); }
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//   Output
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/* 80-column FASTA with CRLF, as this server has always produced. A record
+   with no label is emitted bare, which is what a pan-gene request without an
+   exemplar has always returned. */
+function seqFasta($label, $sequence) {
+  $wrapped = chunk_split($sequence, 80, "\r\n");
+  return ($label === '' || $label === null) ? $wrapped : '>' . $label . "\r\n" . $wrapped;
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//   Legacy assembly file names
+//////////////////////////////////////////////////////////////////////////////////////////
 
 function getLegacyAssemblyFile($v) {
-//echo "getLegacyAssemblyFile(): get assembly file for $v\n";
   if ($v == '1') {
     return 'ZmB73_AGPv1.fa.gz';
   }//v1
@@ -359,13 +974,15 @@ function getLegacyAssemblyFile($v) {
   else if ($v == '3') {
     return 'B73_RefGen_v3.fa.gz';
   }//v3
-  
-  return "\nERROR: Unknown assembly version: $v.\n";
+
+  return null;
 }//getLegacyAssemblyFile
 
 
+/* Returns one filename, or two comma-separated for a generic nucleotide
+   request, or null when the combination has no file. It used to echo its
+   error into the middle of the FASTA. */
 function getLegacyGeneModelFile($dbtype, $v) {
-//echo "getLegacyGeneModelFile(): get gene model file for $dbtype, $v\n";
   if ($v == '1') {
     if ($dbtype == 'nuc') {
       return 'ZmB73_4a.53_working_genes.fasta.gz,ZmB73_4a.53_working_cds.fasta.gz';
@@ -401,15 +1018,13 @@ function getLegacyGeneModelFile($dbtype, $v) {
     }
   }//v2
   else if ($v == '3') {
-// 3/16/26 note: changed these to AGP.v21 as v22 appears to be missing 
+// 3/16/26 note: changed these to AGP.v21 as v22 appears to be missing
 //               low confidence gene models.
     if ($dbtype == 'nuc') {
-//      return 'Zea_mays.AGPv3.21.genes.all.fa.gz,Zea_mays.AGPv3.22.cdna.all.fa.gz';
       return 'Zea_mays.AGPv3.21.genes.all.fa.gz,Zea_mays.AGPv3.21.cds.fa.gz';
     }
     else if ($dbtype == 'cds') {
       // No cDNA file for v3
-//      return 'Zea_mays.AGPv3.22.cdna.all.fa.gz';
       return 'Zea_mays.AGPv3.21.cds.fa.gz';
     }
     else if ($dbtype == 'cdna') {
@@ -423,115 +1038,5 @@ function getLegacyGeneModelFile($dbtype, $v) {
     }
   }//v3
 
-  echo "\nERROR: Unknown assembly version: $v, or data type: $dbtype\n";
-  return false;
-}//getLegacyGeneModelFile 
-
-
-function getLegacyIdRequest($assembly, $id, $filename) {
-  global $fetch_url, $data_url;
-//echo "getLegacyIdRequest(): get id request for $assembly, $id, [$filename]\n";
-  
-  $url = "$fetch_url/$id/$data_url/$assembly/$filename";
-//logMessage("Get legacy id request from:\n    $url");
-
-  $context = stream_context_create(['http' => ['ignore_errors' => true]]);
-  $ret = json_decode(file_get_contents($url, false, $context));
-  if (isset($ret->{'sequence'})) {
-    return ">$id\n" . $ret->{'sequence'} . "\n";
-  }
-  else {
-    return "\nERROR: sequence not found for '$id' in assembly '$assembly'.\n";
-  }
-}//getLegacyIdRequest
-
-
-function handleLegacyAssembly($id, $position=null) {
-  global $fetch_url, $data_url, $assembly, $annotation, $dbtype, $lflank, $rflank;
-//echo "handleLegacyAssembly(): handle legacy assembly for $id or $position\n";
-  
-  $assembly_mod = str_replace(' ', '_', $assembly);  // name used for directory....
-  preg_match("/_v(\d)/", $assembly_mod, $parts);
-  $v = $parts[1];
-  
-  if ($position != null) {
-    // Position request
-    $filename= getLegacyAssemblyFile($v);
-    $url = "$fetch_url/$position/$data_url/$assembly_mod/$filename";
-//logMessage("Legacy URL: $url");
-
-    $context = stream_context_create(['http' => ['ignore_errors' => true]]);
-    $ret = json_decode(file_get_contents($url, false, $context));
-    if (isset($ret->{'sequence'})) {
-      $sequence .= ">$position\n" . $ret->{'sequence'} . "\n";
-    }
-  }//by position
-  
-  else {
-    // Gene model request
-    if ($lflank > 0 || $flank > 0) {
-      return handleFlankingSequence($assembly_mod, $id, $lflank, $rflank);
-    }
-    
-    if ($dbtype != 'nuc') {
-      $filename = getLegacyGeneModelFile($dbtype, $v);
-      return getLegacyIdRequest($assembly_mod, $id, $filename);
-    }
-    else {
-      // There will be multiple files in $filename
-      $sequence = '';
-      
-      $filenames = explode(',', $filename = getLegacyGeneModelFile($dbtype, $v));
-
-      // NOTE: this assumes there are only 2 dbs to check
-      $gene_filename = (strstr($filenames[0], 'gene')) ? $filenames[0] : $filenames[1];
-      $cds_filename = (strstr($filenames[0], 'cds')) ? $filenames[0] : $filenames[1];
-//echo "gene_filename=[$gene_filename], cds_filename=[$cds_filename]\n";
-      
-      if (!isGeneModelIdentifier($id)) {
-        // Try transcript first
-        $sequence = getLegacyIdRequest($assembly_mod, $id, $cds_filename);
-        if (strstr($sequence, 'ERROR')) {
-          // Try the gene model
-          $gene_id = getGeneModelNameFromTranscript($id);
-//          $sequence = fetchSequenceForId($assembly_mod, $annotation, $id, $dbtype);
-          $sequence = getLegacyIdRequest($assembly_mod, $id, $gene_filename);
-        }
-      }//transcript
-      else {
-        $sequence = getLegacyIdRequest($assembly_mod, $id, $gene_filename);
-        // If error, could get fancy and look for a canonical transcript, 
-        //   or failing that, any/all transcripts
-      }//gene model
-    }//nuc request
-  }//gene model request
-  
-  return $sequence;
-}//handleLegacyAssembly
-
-
-function handleFlankingSequence($assembly_mod, $id, $lflank, $rflank) {
-  global $assembly, $annotation;
-//echo "handleFlankingSequence(): Get sequence for $id in $assembly with flanking sequence $lflank, $rflank\n";
-  
-  $DBConn = connect_to_database();
-  $sql = "
-    SELECT chr.name AS chr, fl.fmin AS start, fl.fmax AS end
-    FROM chado.feature f
-      INNER JOIN chado.featureloc fl ON fl.feature_id=f.feature_id
-      INNER JOIN chado.feature chr ON chr.feature_id=fl.srcfeature_id
-      INNER JOIN chado.analysisfeature af ON af.feature_id=f.feature_id
-      INNER JOIN chado.analysis a ON a.analysis_id=af.analysis_id
-    WHERE f.name='$id' AND a.name='$assembly'";
-//echo "\n$sql\n";
-  $sth = make_query($DBConn, $sql);
-  if (!($row=retrieve_row($sth))) {
-    return "\nERROR: Unable to find position for $id\n";
-  }
-  else {
-    $position = $row['chr'] . ':' . ($row['start']-$lflank) . '-' . ($row['end']+$rflank);
-    return fetchSequenceForPosition($assembly_mod, $annotation, $position, $id);
-  }
-}//handleFlankingSequence
-
-?>
+  return null;
+}//getLegacyGeneModelFile
