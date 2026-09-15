@@ -98,6 +98,34 @@ function referenceResolveEntities($DBConn, $term) {
     return $rows ?: array();
 }
 
+//
+// The DOI of a reference, from both places the database keeps one.
+//
+// `mgdb.reference.doi` carries a DOI for 490 of 54,900 references. The other
+// store is ext_db_key under db_person 2738676, "Digital Object Identifier
+// (DOI), -", which carries one for 8,493 -- and only 489 references are in
+// both. Reading the column alone, which every query on this page used to do,
+// reported DOI coverage of 0.9% when it is 15.5%.
+//
+// Both stores are free text and both hold junk: "none", "dup", "doi", "123",
+// "1", values wrapped as "doi: 10.x/y", "DOI 10.x/y" or
+// "https://doi.org/10.x/y", one with a stray leading slash, and a handful
+// mangled with invisible characters. Rather than print those as identifiers,
+// the DOI is extracted by pattern -- a 10.NNNN prefix and a suffix -- and
+// trailing sentence punctuation removed. Anything that does not match is not
+// a DOI and comes back NULL.
+//
+function referenceDoiSql($alias = 'r') {
+    return "NULLIF(regexp_replace(COALESCE(
+              substring(btrim($alias.doi) from '10[.][0-9]{4,9}/[^[:space:]]+'),
+              substring((
+                SELECT xd.key FROM mgdb.ext_db_key xd
+                WHERE xd.id=$alias.id AND xd.db_person=2738676
+                ORDER BY xd.auto_num LIMIT 1
+              ) from '10[.][0-9]{4,9}/[^[:space:]]+')
+            ), '[.,;]+$', ''), '')";
+}
+
 function referenceBuildFilters($DBConn) {
     $term = referenceSearchValue('q');
     $scope = referenceSearchValue('scope', 'all');
@@ -189,12 +217,13 @@ function referenceBuildFilters($DBConn) {
     }
 
     $identifier = referenceSearchValue('identifier', 'all');
+    $doiSql = referenceDoiSql('r');
     if ($identifier === 'doi') {
-        $where[] = "r.doi IS NOT NULL AND btrim(r.doi) <> ''";
+        $where[] = "$doiSql IS NOT NULL";
     } elseif ($identifier === 'pubmed') {
         $where[] = 'EXISTS (SELECT 1 FROM mgdb.ext_db_key px WHERE px.id=r.id AND px.db_person=134209)';
     } elseif ($identifier === 'any') {
-        $where[] = "((r.doi IS NOT NULL AND btrim(r.doi) <> '') OR EXISTS
+        $where[] = "($doiSql IS NOT NULL OR EXISTS
           (SELECT 1 FROM mgdb.ext_db_key px WHERE px.id=r.id AND px.db_person=134209))";
     }
 
@@ -221,6 +250,7 @@ function referenceBuildFilters($DBConn) {
 }
 
 function referenceResultQuery($filter, $page, $pageSize, $sort) {
+    $doiSelect = referenceDoiSql('r');
     $params = $filter['params'];
     $counter = count($params) + 1000;
     $rankSql = '0';
@@ -253,7 +283,7 @@ function referenceResultQuery($filter, $page, $pageSize, $sort) {
     $sql = "
       WITH matched AS MATERIALIZED (
         SELECT r.id, r.title, r.name, r.author_desc, r.year, r.volume, r.pages,
-               r.doi, r.type, r.in1, j.name AS journal, pt.name AS publication_type,
+               {$doiSelect} AS doi, r.type, r.in1, j.name AS journal, pt.name AS publication_type,
                px.pubmed,
                EXISTS (SELECT 1 FROM mgdb.ed_board_papers eb WHERE eb.reference_id=r.id) AS editorial_pick,
                $rankSql AS relevance
@@ -285,7 +315,7 @@ function referenceResultQuery($filter, $page, $pageSize, $sort) {
                WHERE rab.id=m.id
              ) AS abstract,
              COUNT(*) OVER () AS total_count,
-             SUM(CASE WHEN m.doi IS NOT NULL AND btrim(m.doi) <> '' THEN 1 ELSE 0 END) OVER () AS doi_count,
+             SUM(CASE WHEN m.doi IS NOT NULL THEN 1 ELSE 0 END) OVER () AS doi_count,
              SUM(CASE WHEN m.pubmed IS NOT NULL AND btrim(m.pubmed) <> '' THEN 1 ELSE 0 END) OVER () AS pubmed_count
       FROM matched m
       ORDER BY $orderSql
@@ -328,6 +358,7 @@ function referenceFacetQuery($filter) {
 }
 
 function referenceCombinedQuery($filter, $page, $pageSize, $sort) {
+    $doiSelect = referenceDoiSql('r');
     $params = $filter['params'];
     $counter = count($params) + 3000;
     $rankSql = '0';
@@ -355,7 +386,7 @@ function referenceCombinedQuery($filter, $page, $pageSize, $sort) {
     $sql = "
       WITH matched AS MATERIALIZED (
         SELECT r.id, r.title, r.name, r.author_desc, r.year, r.volume, r.pages,
-               r.doi, r.type, r.in1, j.name AS journal, pt.name AS publication_type,
+               {$doiSelect} AS doi, r.type, r.in1, j.name AS journal, pt.name AS publication_type,
                px.pubmed,
                EXISTS (SELECT 1 FROM mgdb.ed_board_papers eb WHERE eb.reference_id=r.id) AS editorial_pick,
                $rankSql AS relevance
@@ -418,8 +449,13 @@ function referenceCombinedQuery($filter, $page, $pageSize, $sort) {
       )
       SELECT
         (SELECT COUNT(*)::integer FROM matched) AS total_count,
-        (SELECT COUNT(*)::integer FROM matched WHERE doi IS NOT NULL AND btrim(doi) <> '') AS doi_count,
+        (SELECT COUNT(*)::integer FROM matched WHERE doi IS NOT NULL) AS doi_count,
         (SELECT COUNT(*)::integer FROM matched WHERE pubmed IS NOT NULL AND btrim(pubmed) <> '') AS pubmed_count,
+        /* What the DOI and PubMed exports will actually be: those lists are
+           de-duplicated, so they are shorter than the reference counts above
+           whenever two references share an identifier. */
+        (SELECT COUNT(DISTINCT doi)::integer FROM matched WHERE doi IS NOT NULL) AS doi_distinct,
+        (SELECT COUNT(DISTINCT btrim(pubmed))::integer FROM matched WHERE pubmed IS NOT NULL AND btrim(pubmed) <> '') AS pubmed_distinct,
         COALESCE((SELECT json_agg(row_to_json(p) ORDER BY p.row_order) FROM paged p), '[]'::json) AS results,
         COALESCE((SELECT json_agg(json_build_object('value', value::text, 'count', count) ORDER BY value) FROM year_counts), '[]'::json) AS year_facets,
         COALESCE((SELECT json_agg(json_build_object('value', value, 'count', count) ORDER BY count DESC, value) FROM type_counts), '[]'::json) AS type_facets,
@@ -441,16 +477,22 @@ function referenceCombinedQuery($filter, $page, $pageSize, $sort) {
 // references to render twenty.
 //
 function referenceFacetsOnlyQuery($filter) {
+    $doiSelect = referenceDoiSql('r');
     $params = $filter['params'];
 
     $sql = "
       WITH matched AS MATERIALIZED (
-        SELECT r.id, r.year, r.doi,
+        SELECT r.id, r.year, {$doiSelect} AS doi,
                j.name AS journal, pt.name AS publication_type,
                EXISTS (
                  SELECT 1 FROM mgdb.ext_db_key x
                  WHERE x.id=r.id AND x.db_person=134209
-               ) AS has_pubmed
+               ) AS has_pubmed,
+               /* The value as well as the flag: the PubMed export is a
+                  de-duplicated list, and its length is what the page promises. */
+               (SELECT x2.key FROM mgdb.ext_db_key x2
+                WHERE x2.id=r.id AND x2.db_person=134209
+                ORDER BY x2.auto_num LIMIT 1) AS pubmed_key
         FROM mgdb.reference r
           JOIN mgdb.id_num i ON i.id=r.id
           LEFT JOIN mgdb.journal j ON j.id=r.in1
@@ -487,8 +529,10 @@ function referenceFacetsOnlyQuery($filter) {
       )
       SELECT
         (SELECT COUNT(*)::integer FROM matched) AS total_count,
-        (SELECT COUNT(*)::integer FROM matched WHERE doi IS NOT NULL AND btrim(doi) <> '') AS doi_count,
+        (SELECT COUNT(*)::integer FROM matched WHERE doi IS NOT NULL) AS doi_count,
         (SELECT COUNT(*)::integer FROM matched WHERE has_pubmed) AS pubmed_count,
+        (SELECT COUNT(DISTINCT doi)::integer FROM matched WHERE doi IS NOT NULL) AS doi_distinct,
+        (SELECT COUNT(DISTINCT btrim(pubmed_key))::integer FROM matched WHERE pubmed_key IS NOT NULL AND btrim(pubmed_key) <> '') AS pubmed_distinct,
         '[]'::json AS results,
         COALESCE((SELECT json_agg(json_build_object('value', value::text, 'count', count) ORDER BY value) FROM year_counts), '[]'::json) AS year_facets,
         COALESCE((SELECT json_agg(json_build_object('value', value, 'count', count) ORDER BY count DESC, value) FROM type_counts), '[]'::json) AS type_facets,
@@ -501,9 +545,10 @@ function referenceFacetsOnlyQuery($filter) {
 
 function referenceExportQuery($filter, $identifierFormat = '') {
     $identifierOnly = $identifierFormat === 'doi' || $identifierFormat === 'pmid';
+    $doiSelect = referenceDoiSql('r');
     $select = $identifierOnly
-        ? "r.id, r.doi, px.pubmed"
-        : "r.id, r.year, r.title, r.name, r.author_desc, r.volume, r.pages, r.doi,
+        ? "r.id, {$doiSelect} AS doi, px.pubmed"
+        : "r.id, r.year, r.title, r.name, r.author_desc, r.volume, r.pages, {$doiSelect} AS doi,
            j.name AS journal, pt.name AS publication_type, px.pubmed,
            COALESCE(NULLIF(r.author_desc, ''), (
              SELECT string_agg(p.name, ', ' ORDER BY rsa.order1)
@@ -523,13 +568,17 @@ function referenceExportQuery($filter, $identifierFormat = '') {
         ) px ON true
       WHERE {$filter['where']}";
     if ($identifierFormat === 'doi') {
-        $sql .= " AND r.doi IS NOT NULL AND btrim(r.doi) <> ''";
+        $sql .= " AND {$doiSelect} IS NOT NULL";
     } elseif ($identifierFormat === 'pmid') {
         $sql .= " AND px.pubmed IS NOT NULL AND btrim(px.pubmed) <> ''";
     }
+    /* No LIMIT. This used to cap every export at 20,000 rows, so the CSV and
+       the BibTeX of an unfiltered search were exactly 20,000 of 54,900 and the
+       CSV held 7,706 PubMed IDs where the PubMed export held 8,881 -- it was
+       the 20,000 most recent, not the matched set. Measured uncapped over the
+       whole corpus with every column and the author rollup: 1.05 s. */
     $sql .= "
-      ORDER BY r.year DESC NULLS LAST, lower(r.title)
-      LIMIT 20000";
+      ORDER BY r.year DESC NULLS LAST, lower(r.title)";
     return array('sql' => $sql, 'params' => $filter['params']);
 }
 

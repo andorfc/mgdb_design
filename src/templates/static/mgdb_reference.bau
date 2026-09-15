@@ -41,7 +41,7 @@ $$SYNTAX-LEVEL 2
       <div>
         <h2 id="reference-search-title">Search</h2>
       </div>
-      <p>Use Related gene, gene model, or locus to retrieve papers curated against a biological record rather than papers that merely mention its name.</p>
+      <p>Search within &#8220;Related gene, gene model, or locus&#8221; to retrieve papers curated against a biological record rather than papers that merely mention its name.</p>
     </div>
 
     <div class="reference-search-form-wrap">
@@ -211,15 +211,21 @@ $$SYNTAX-LEVEL 2
 
       <div class="mgdb-hub-field mgdb-hub-field-action reference-results-view">
         <div class="mgdb-view-toggle" role="group" aria-label="Result view">
-          <button class="mgdb-view-btn is-active" id="reference-view-cards" type="button" data-view="card" aria-pressed="true">
+          <button class="mgdb-view-btn" id="reference-view-cards" type="button" data-view="card" aria-pressed="false">
             <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>Cards
           </button>
-          <button class="mgdb-view-btn" id="reference-view-table" type="button" data-view="table" aria-pressed="false">
+          <button class="mgdb-view-btn is-active" id="reference-view-table" type="button" data-view="table" aria-pressed="true">
             <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true"><rect x="1" y="2" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="7" width="14" height="2" rx="1" fill="currentColor"/><rect x="1" y="12" width="14" height="2" rx="1" fill="currentColor"/></svg>Table
           </button>
         </div>
       </div>
     </div>
+
+    ;; What each export actually contains, from the matched set rather than a
+    ;; guess. CSV, TSV, RIS and BibTeX carry every match; the DOI and PubMed
+    ;; lists carry only the matches that have that identifier, de-duplicated,
+    ;; so they are always shorter and the reader should be told by how much.
+    <p class="reference-export-note" id="reference-export-note"></p>
 
     <div id="reference-selection-bar" class="reference-selection-bar" hidden>
       <span><strong id="reference-selection-count">0</strong> selected on this page</span>

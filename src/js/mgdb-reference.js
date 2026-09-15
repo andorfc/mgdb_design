@@ -23,7 +23,9 @@
   var resultFilter = '';
   var sortKey = 'title';
   var sortDir = 'asc';
-  var viewMode = 'card';
+  /* Table first, as on /data_center/map and every other hub. Cards stay one
+     click away for reading abstracts. */
+  var viewMode = 'table';
 
   function byId(id) {
     return document.getElementById(id);
@@ -304,6 +306,43 @@
     applyResultsFilter();
   }
 
+  /* What each export will contain, from the matched set. The identifier lists
+     are de-duplicated lists of DOIs and PubMed IDs, so they are shorter than
+     the reference counts whenever two references share an identifier, and
+     shorter again because most references carry neither. Saying so here is
+     the difference between a short file and an apparently broken one. */
+  function renderExportNote(summary) {
+    var el = byId('reference-export-note');
+    if (!el) return;
+    var total = summary.total || 0;
+    if (!total) { el.textContent = ''; return; }
+
+    var parts = ['CSV, TSV, RIS and BibTeX carry all ' + number(total) + ' match'
+      + (total === 1 ? '' : 'es') + '.'];
+
+    function identifier(label, withCount, listSize) {
+      if (withCount === undefined || withCount === null) return null;
+      if (!withCount) return 'No match has a ' + label + ', so that list is empty.';
+      var sentence = 'The ' + label + ' list has '
+        + (listSize === null || listSize === undefined ? number(withCount) : number(listSize))
+        + ' entr' + ((listSize === null || listSize === undefined ? withCount : listSize) === 1 ? 'y' : 'ies')
+        + ': ' + number(withCount) + ' of the ' + number(total) + ' match'
+        + (total === 1 ? '' : 'es') + ' carry one';
+      if (listSize !== null && listSize !== undefined && listSize < withCount) {
+        var shared = withCount - listSize;
+        sentence += ', and ' + number(shared) + (shared === 1 ? ' shares' : ' share')
+          + ' one with another reference';
+      }
+      return sentence + '.';
+    }
+
+    var doi = identifier('DOI', summary.with_doi, summary.doi_list_size);
+    var pmid = identifier('PubMed ID', summary.with_pubmed, summary.pubmed_list_size);
+    if (doi) parts.push(doi);
+    if (pmid) parts.push(pmid);
+    el.textContent = parts.join(' ');
+  }
+
   function renderSummary(data) {
     var summary = data.summary;
     var years = data.facets.year.map(function (row) { return parseInt(row.value, 10); })
@@ -314,6 +353,8 @@
     byId('reference-year-span').textContent = years.length
       ? Math.min.apply(Math, years) + '–' + Math.max.apply(Math, years)
       : '—';
+
+    renderExportNote(summary);
 
     /* The whole point of this section on this hub: the four numbers and the
        four charts are computed over the *matched set*, not the corpus and not
@@ -353,7 +394,12 @@
       paper_bgcolor: 'rgba(0,0,0,0)',
       plot_bgcolor: 'rgba(0,0,0,0)',
       font: {family: 'Arial, sans-serif', size: 10, color: '#526157'},
-      hoverlabel: {bgcolor: '#ffffff', bordercolor: '#d8e1d6'},
+      /* The tooltip needs its own font. Without one it inherits the layout's
+         axis-label grey-green at 10px, which on the white hover background of
+         the Top journals chart was too faint to read; this is the page's ink
+         at a readable size. Shared by all four figures. */
+      hoverlabel: {bgcolor: '#ffffff', bordercolor: '#b9c5b6',
+                   font: {family: 'Arial, sans-serif', size: 12, color: '#1f2723'}},
       showlegend: false
     };
   }
@@ -463,6 +509,35 @@
     if (tableView) tableView.hidden = (mode !== 'table');
   }
 
+  /* The four actions a reference row offers, in the order the shared reference
+     card uses elsewhere on the site: Full text, PubMed, Copy citation, Copy
+     DOI. Each appears only when the record supports it -- Full text and Copy
+     DOI need a DOI, PubMed needs a PubMed ID -- so a row never offers a button
+     that would go nowhere. The title is the link to the MaizeGDB record, so
+     that is not repeated here. One builder for both views. */
+  function rowActions(row) {
+    var title = row.title || row.name || 'Untitled reference';
+    var citationParts = [row.journal, row.volume, row.pages].filter(Boolean);
+    var citationText = [row.authors, row.year ? '(' + row.year + ')' : '', title,
+      citationParts.join(' · ')].filter(Boolean).join('. ');
+    var out = [];
+    if (row.doi) {
+      out.push('<a class="reference-action" href="https://doi.org/' + encodeURIComponent(row.doi)
+        + '" target="_blank" rel="noopener">Full text</a>');
+    }
+    if (row.pubmed) {
+      out.push('<a class="reference-action" href="https://pubmed.ncbi.nlm.nih.gov/'
+        + encodeURIComponent(row.pubmed) + '/" target="_blank" rel="noopener">PubMed</a>');
+    }
+    out.push('<button class="reference-action reference-copy-btn" type="button" data-copy-citation="'
+      + escapeHtml(citationText) + '">Copy citation</button>');
+    if (row.doi) {
+      out.push('<button class="reference-action reference-copy-btn" type="button" data-copy-value="'
+        + escapeHtml(row.doi) + '">Copy DOI</button>');
+    }
+    return '<div class="reference-actions">' + out.join('') + '</div>';
+  }
+
   function renderTableView(results) {
     var tbody = byId('reference-results-body');
     if (!tbody) return;
@@ -495,12 +570,7 @@
         + (row.publication_type ? '<div style="margin-top:4px;"><span class="reference-badge">' + escapeHtml(row.publication_type) + '</span></div>' : '')
         + '</td>'
         + '<td><div class="reference-id-links">' + idsHtml + '</div></td>'
-        + '<td>'
-        + '<div style="display:flex; flex-direction:column; gap:4px; align-items:flex-start;">'
-        + '<button type="button" class="reference-copy-btn" data-copy-citation="' + escapeHtml(citationText) + '">Copy citation</button>'
-        + '<a href="/data_center/reference?id=' + row.id + '" style="font-size:var(--mgdb-text-xs); color:var(--mgdb-green-dark); text-decoration:none; font-weight:600;">Record</a>'
-        + '</div>'
-        + '</td>'
+        + '<td>' + rowActions(row) + '</td>'
         + '</tr>';
     }).join('');
   }
@@ -515,20 +585,7 @@
       var editorialPick = row.editorial_pick === true;
       var citationText = [row.authors, row.year ? '(' + row.year + ')' : '', title, citation].filter(Boolean).join('. ');
 
-      var links = '<a href="/data_center/reference?id=' + row.id + '">MaizeGDB record</a>';
-      if (row.doi) {
-        links += '<a href="https://doi.org/' + encodeURIComponent(row.doi) + '" target="_blank" rel="noopener">DOI</a>';
-      }
-      if (row.pubmed) {
-        links += '<a href="https://pubmed.ncbi.nlm.nih.gov/' + encodeURIComponent(row.pubmed) + '/" target="_blank" rel="noopener">PubMed</a>';
-      }
-      links += '<button class="reference-copy-btn" type="button" data-copy-citation="' + escapeHtml(citationText) + '">Copy citation</button>';
-      if (row.doi) {
-        links += '<button class="reference-copy-btn" type="button" data-copy-value="' + escapeHtml(row.doi) + '">Copy DOI</button>';
-      }
-      if (row.pubmed) {
-        links += '<button class="reference-copy-btn" type="button" data-copy-value="' + escapeHtml(row.pubmed) + '">Copy PMID</button>';
-      }
+      var links = rowActions(row);
 
       return '<article class="reference-result-card is-selectable' + (editorialPick ? ' is-editorial-pick' : '') + '" data-reference-id="' + row.id + '">'
         + '<label class="reference-result-select"><input type="checkbox" data-reference-select="' + row.id + '" aria-label="Select ' + escapeHtml(title) + '"></label>'
@@ -543,7 +600,7 @@
         + (row.authors ? '<p class="reference-result-authors">' + escapeHtml(row.authors) + '</p>' : '')
         + (citation ? '<p class="reference-result-citation">' + escapeHtml(citation) + '</p>' : '')
         + (row.abstract ? '<p class="reference-result-abstract">' + escapeHtml(row.abstract) + (row.abstract.length >= 695 ? '…' : '') + '</p>' : '')
-        + '<div class="reference-result-links">' + links + '</div>'
+        + links
         + '</div>'
         + '</article>';
     }).join('');

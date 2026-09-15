@@ -18,6 +18,9 @@
 
   include_once('./include/db-api.php');
   include_once('./include/dashboard_cache.php');
+  /* For referenceDoiSql(): the DOI lives in two places and this page's headline
+     count has to agree with the search, the exports and the figures. */
+  include_once('./search/reference/reference_search_lib.php');
 
   $system = getSystemInfo('mgdb.conf');
   logMessage('Starting reference_search_modern.php');
@@ -63,10 +66,17 @@
      change only when the database is reloaded, so they are cached as one entry.
      Measured cost of building it: 656 ms, against 804 ms for the whole page.
      See include/dashboard_cache.php. */
-  $page_data = dashboardCache($system, 'reference/page_' . (int) @filemtime(__FILE__), function () use ($DBConn) {
+  /* The key carries the search library's mtime as well as this file's: the
+     figures below are built by referenceFacetsOnlyQuery() over there, so a key
+     watching only this file kept serving the old DOI count after the query
+     learned to read both DOI stores. */
+  $ref_lib = __DIR__ . '/../../search/reference/reference_search_lib.php';
+  $page_data = dashboardCache($system, 'reference/page_' . (int) @filemtime(__FILE__)
+      . '_' . (int) @filemtime($ref_lib), function () use ($DBConn) {
+      $doiSelect = referenceDoiSql('r');
       $stats_sql = "
         SELECT COUNT(*) AS reference_count,
-               COUNT(*) FILTER (WHERE r.doi IS NOT NULL AND btrim(r.doi) <> '') AS doi_count,
+               COUNT(*) FILTER (WHERE {$doiSelect} IS NOT NULL) AS doi_count,
                COUNT(*) FILTER (WHERE EXISTS (
                  SELECT 1 FROM ext_db_key x WHERE x.id=r.id AND x.db_person=134209
                )) AS pubmed_count,

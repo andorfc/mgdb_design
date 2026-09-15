@@ -985,3 +985,46 @@
   .mgdb-reference-page .reference-advanced-grid { grid-template-columns: 1fr; }
   .mgdb-reference-page .reference-result-card { padding: var(--mgdb-space-4); }
 }
+
+/* --------------------------------------------------------------------------
+   Row actions
+
+   Full text, PubMed, Copy citation, Copy DOI -- the same four the shared
+   reference card offers, in the same order, in both the table and the card
+   view. Buttons and links are given one shape here so a row does not read as
+   two kinds of control; the arrow on Full text and PubMed comes from the
+   href rule in mgdb-modern.css.
+   -------------------------------------------------------------------------- */
+
+.mgdb-reference-page .reference-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+  align-items: center;
+}
+
+.mgdb-reference-page .reference-actions .reference-action {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mgdb-green-dark);
+  font-family: inherit;
+  font-size: var(--mgdb-text-xs);
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.mgdb-reference-page .reference-actions .reference-action:hover { text-decoration: underline; }
+
+/* The note under the export links: what each file will actually contain. */
+.mgdb-reference-page .reference-export-note {
+  max-width: 88ch;
+  margin: calc(-1 * var(--mgdb-space-2)) 0 var(--mgdb-space-4);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  line-height: var(--mgdb-leading);
+}
+
+.mgdb-reference-page .reference-export-note:empty { display: none; }

@@ -18,8 +18,8 @@
  *          Returns true when something was drawn.
  *
  *          Everything is inline SVG and HTML with the site's tokens. The
- *          three views of the ontology (squares, term rows, graph nodes)
- *          highlight each other on hover and pin on click. Every colour is
+ *          views of the ontology (squares, the names above them, term rows,
+ *          graph nodes) highlight each other on hover and pin on click. Every colour is
  *          also a word: squares and nodes carry titles, tooltips carry the
  *          definitions, and the tables below the figure keep every row.
  *
@@ -27,6 +27,8 @@
  *
  * history:
  *  09/12/26  claude  created
+ *  09/14/26  claude  one full-width row per aspect: its own ancestry graph, the
+ *                    categories named above the squares at 45 degrees, the terms
  */
 (function (window, document) {
   'use strict';
@@ -90,6 +92,58 @@
     return text.length > max ? text.slice(0, max - 1).replace(/\s+\S*$/, '') + '…' : text;
   }
   function pct(a, b) { return b ? Math.round(100 * a / b) : 0; }
+
+  /* ---- the label fan: measured, not guessed ----
+     A name rotated 45 degrees about the bottom-right corner of its box,
+     that corner pinned above the centre of its square, reaches
+     width / sqrt 2 to the left of the square and stands
+     (width + font size) / sqrt 2 tall. The strip's top padding takes the
+     tallest name; its left inset takes the furthest reach of the first
+     names past the left edge, which depends on the pitch the width
+     allows -- solved directly for the pitch the width gives, or for the
+     smallest pitch the strip accepts when it will scroll instead. One
+     inset for every strip keeps the three rows of squares on one left
+     edge. */
+  var MIN_PITCH = 22;
+  var measureCtx;
+  function textWidth(font, text) {
+    if (measureCtx === undefined) {
+      var canvas = document.createElement('canvas');
+      measureCtx = (canvas.getContext && canvas.getContext('2d')) || null;
+    }
+    if (!measureCtx) { return String(text).length * 7; }
+    measureCtx.font = font;
+    return measureCtx.measureText(text).width;
+  }
+  function fitStrips(strips) {
+    if (!strips.length) { return; }
+    var inset = 0;
+    var heights = strips.map(function (sp) {
+      var lbl = sp.grid.querySelector('.gf-lbl');
+      var cs = lbl ? window.getComputedStyle(lbl) : null;
+      var fontPx = (cs && parseFloat(cs.fontSize)) || 13;
+      var font = '700 ' + fontPx + 'px ' + ((cs && cs.fontFamily) || 'sans-serif');
+      var n = sp.names.length || 1;
+      var W = sp.scroll.clientWidth;
+      var maxW = 0, needAtWidth = 0, needAtMin = 0;
+      sp.names.forEach(function (name, i) {
+        var w = textWidth(font, name);
+        if (w > maxW) { maxW = w; }
+        var reach = Math.SQRT1_2 * w;
+        var frac = (i + 0.5) / n;
+        if (W > 0) { needAtWidth = Math.max(needAtWidth, (reach - W * frac) / (1 - frac)); }
+        needAtMin = Math.max(needAtMin, reach - MIN_PITCH * (i + 0.5));
+      });
+      var need = (W > 0 && (W - needAtWidth) / n >= MIN_PITCH) ? needAtWidth : needAtMin;
+      if (need > inset) { inset = need; }
+      return Math.ceil(Math.SQRT1_2 * (maxW + fontPx)) + 8;
+    });
+    inset = Math.ceil(inset);
+    strips.forEach(function (sp, i) {
+      sp.grid.style.setProperty('--gf-lbl-h', heights[i] + 'px');
+      sp.grid.style.setProperty('--gf-inset', inset + 'px');
+    });
+  }
 
   /* ======================================================================
      MGDB.geneFunction
@@ -228,102 +282,140 @@
 
       var block = html('div', 'gf-block gf-go');
       block.appendChild(html('div', 'gf-block-head',
-        '<h4>Gene Ontology <small>' + go.terms.length + ' term' + (go.terms.length === 1 ? '' : 's') + ' · release ' + esc((go.release || '').replace(/^releases\//, '')) + '</small></h4>' +
-        '<div class="gf-legend">' +
-          '<span><i class="gf-sq is-lit gf-sq-bp"></i> category with a term</span>' +
-          '<span><i class="gf-sq is-implied gf-sq-bp"></i> suggested by domains only</span>' +
-          '<span><i class="gf-sq gf-sq-bp"></i> not touched</span>' +
-        '</div>'));
+        '<h4>Gene Ontology <small>' + go.terms.length + ' term' + (go.terms.length === 1 ? '' : 's') + ' · release ' + esc((go.release || '').replace(/^releases\//, '')) + '</small></h4>'));
 
-      var cols = html('div', 'gf-aspects');
+      /* one chip shows or hides the three ancestry graphs together */
+      var graphs = [];
+      var hasGraph = !!(go.graph && go.graph.nodes && go.graph.nodes.length);
+      if (hasGraph) {
+        var toggle = html('button', 'gf-chip', 'Hide ancestry');
+        toggle.type = 'button';
+        toggle.setAttribute('aria-pressed', 'true');
+        block.firstChild.appendChild(toggle);
+        toggle.addEventListener('click', function () {
+          var open = !!(graphs.length && graphs[0].stage.hidden);
+          graphs.forEach(function (g) { g.stage.hidden = !open; if (open) { drawGraph(g.stage, go, g.aspect.key); } });
+          toggle.textContent = open ? 'Hide ancestry' : 'Show ancestry';
+          toggle.setAttribute('aria-pressed', open ? 'true' : 'false');
+        });
+      }
+
+      /* one full-width row per aspect: its ancestry graph, then the
+         plant-slim categories named above their squares at 45 degrees,
+         the squares in one unbroken strip across the width (a fixed order,
+         so the pattern is comparable between genes), and the terms
+         beneath */
+      var rows = html('div', 'gf-aspect-rows');
+      rows.appendChild(html('div', 'gf-legend',
+        '<span><i class="gf-sq is-lit gf-sq-bp"></i> category with a term</span>' +
+        '<span><i class="gf-sq is-implied gf-sq-bp"></i> suggested by domains only</span>' +
+        '<span><i class="gf-sq gf-sq-bp"></i> not touched</span>' +
+        '<span>ancestry: each term traced to its root through the plant-slim categories named beneath it</span>' +
+        '<span>hover a square, a name, a term or a node to see what belongs together; click to pin</span>'));
+      var strips = [];
       ASPECTS.forEach(function (a) {
         var terms = go.terms.filter(function (t) { return t.aspect === a.key; });
         var implied = go.implied.filter(function (t) { return t.aspect === a.key; });
         var slims = go.slim.filter(function (s) { return s.aspect === a.key; });
-        var col = html('div', 'gf-aspect gf-aspect-' + a.cls);
-        col.appendChild(html('h5', null, esc(a.label) + ' <small>' + terms.length + '</small>'));
+        var lit = slims.filter(function (s) { return s.terms.length; });
+        var row = html('section', 'gf-aspect gf-aspect-' + a.cls);
+        row.setAttribute('aria-label', a.label);
+        row.appendChild(html('h5', null, esc(a.label) + ' <small>' + terms.length + ' term' + (terms.length === 1 ? '' : 's') +
+          (implied.length ? ' · ' + implied.length + ' suggested by domains' : '') +
+          ' · ' + lit.length + ' of ' + slims.length + ' plant-slim categories</small>'));
 
-        /* the fingerprint: one square per slim category, in a fixed order */
-        var fp = html('div', 'gf-fp');
-        fp.setAttribute('role', 'group');
-        fp.setAttribute('aria-label', a.label + ' plant GO-slim categories');
+        /* this aspect's ancestry, drawn once the row is in the document */
+        if (hasGraph && go.graph.nodes.some(function (n) { return n.namespace === a.key; })) {
+          var stage = html('div', 'gf-graph gf-graph-' + a.cls);
+          stage.setAttribute('role', 'img');
+          stage.setAttribute('aria-label', a.label + ' ancestry of the terms of this gene');
+          row.appendChild(stage);
+          graphs.push({ stage: stage, aspect: a });
+        }
+
+        var scroll = html('div', 'gf-strip-scroll');
+        var grid = html('div', 'gf-fpx');
+        grid.setAttribute('role', 'group');
+        grid.setAttribute('aria-label', a.label + ' plant GO-slim categories');
+        grid.style.setProperty('--gf-n', String(slims.length || 1));
         slims.forEach(function (s, i) {
           var n = s.terms.length;
+          var cell = html('div', 'gf-cell');
+          var title = s.name + (n ? ': ' + n + ' term' + (n === 1 ? '' : 's') : (s.implied.length ? ': suggested by domains' : ''));
+          var tipFor = function () {
+            return '<strong>' + esc(s.name) + '</strong><span class="gf-tip-muted">' + esc(s.id) + ' · plant slim, ' + esc(a.label.toLowerCase()) + '</span>' +
+              (n ? '<ul>' + s.terms.map(function (id) { return '<li>' + esc(termById[id] ? termById[id].name : id) + '</li>'; }).join('') + '</ul>' : '') +
+              (s.implied.length ? '<div class="gf-tip-muted">suggested by domains: ' + s.implied.map(function (id) { return esc(termById[id] ? termById[id].name : id); }).join(', ') + '</div>' : '') +
+              (!n && !s.implied.length ? '<div class="gf-tip-muted">no term of this gene falls here</div>' : '');
+          };
+          /* the name, rotated above the square; the button is the control
+             and carries the same name for assistive technology */
+          var lbl = html('span', 'gf-lbl' + (n ? ' is-lit' : (s.implied.length ? ' is-implied' : '')), esc(s.name));
+          lbl.setAttribute('data-slim', s.id);
+          lbl.setAttribute('aria-hidden', 'true');
           var b = html('button', 'gf-sq gf-sq-' + a.cls + (n ? ' is-lit is-lit-' + Math.min(n, 3) : (s.implied.length ? ' is-implied' : '')));
           b.type = 'button';
           b.setAttribute('data-slim', s.id);
           b.setAttribute('data-hot-key', 'slim:' + s.id);
           b.setAttribute('aria-pressed', 'false');
           b.style.transitionDelay = (i * 18) + 'ms';
-          b.title = s.name + (n ? ': ' + n + ' term' + (n === 1 ? '' : 's') : (s.implied.length ? ': suggested by domains' : ''));
-          b.setAttribute('aria-label', b.title);
-          hotOn(b, 'slim:' + s.id, function () { return s.terms.concat(s.implied); }, function () { return [s.id]; });
-          attachTip(b, function () {
-            return '<strong>' + esc(s.name) + '</strong><span class="gf-tip-muted">' + esc(s.id) + ' · plant slim, ' + esc(a.label.toLowerCase()) + '</span>' +
-              (n ? '<ul>' + s.terms.map(function (id) { return '<li>' + esc(termById[id] ? termById[id].name : id) + '</li>'; }).join('') + '</ul>' : '') +
-              (s.implied.length ? '<div class="gf-tip-muted">suggested by domains: ' + s.implied.map(function (id) { return esc(termById[id] ? termById[id].name : id); }).join(', ') + '</div>' : '') +
-              (!n && !s.implied.length ? '<div class="gf-tip-muted">no term of this gene falls here</div>' : '');
+          b.title = title;
+          b.setAttribute('aria-label', title);
+          [lbl, b].forEach(function (node) {
+            hotOn(node, 'slim:' + s.id, function () { return s.terms.concat(s.implied); }, function () { return [s.id]; });
+            attachTip(node, tipFor);
           });
-          fp.appendChild(b);
+          cell.appendChild(lbl);
+          cell.appendChild(b);
+          grid.appendChild(cell);
         });
-        col.appendChild(fp);
+        scroll.appendChild(grid);
+        row.appendChild(scroll);
+        strips.push({ grid: grid, scroll: scroll, names: slims.map(function (s) { return s.name; }) });
 
-        var lit = slims.filter(function (s) { return s.terms.length; });
-        var litList = html('ul', 'gf-fp-lit');
-        if (lit.length) {
-          lit.forEach(function (s) {
-            var li = html('li', null, '<span class="gf-fp-dot gf-sq-' + a.cls + '"></span>' + esc(s.name) + (s.terms.length > 1 ? ' <small>×' + s.terms.length + '</small>' : ''));
-            li.setAttribute('data-slim', s.id);
-            hotOn(li, 'lit:' + s.id, function () { return s.terms; }, function () { return [s.id]; });
-            litList.appendChild(li);
-          });
+        /* the terms themselves, beneath the strip */
+        if (!terms.length && !implied.length) {
+          row.appendChild(html('p', 'gf-note', 'No term of this gene in this aspect.'));
         } else {
-          litList.appendChild(html('li', 'gf-muted', terms.length ? 'terms sit outside the plant slim' : 'no term in this aspect'));
+          if (terms.length && !lit.length) {
+            row.appendChild(html('p', 'gf-note', 'These terms sit outside the plant slim, so no category lights.'));
+          }
+          var list = html('ul', 'gf-terms');
+          terms.forEach(function (t) { list.appendChild(termRow(t, a, false)); });
+          implied.forEach(function (t) { list.appendChild(termRow(t, a, true)); });
+          row.appendChild(list);
         }
-        col.appendChild(litList);
-
-        /* the terms themselves */
-        var list = html('ul', 'gf-terms');
-        terms.forEach(function (t) { list.appendChild(termRow(t, a, false)); });
-        implied.forEach(function (t) { list.appendChild(termRow(t, a, true)); });
-        col.appendChild(list);
-        cols.appendChild(col);
+        rows.appendChild(row);
       });
-      block.appendChild(cols);
+      block.appendChild(rows);
 
       var unplaced = go.terms.filter(function (t) { return !t.aspect; });
       if (unplaced.length) {
         block.appendChild(html('p', 'gf-note', unplaced.length + ' term' + (unplaced.length === 1 ? '' : 's') +
           ' the GO release no longer carries (' + unplaced.map(function (t) { return esc(t.term); }).join(', ') + '): listed in the table below, not placed here.'));
       }
+      container.appendChild(block);
 
-      /* the ancestry graph */
-      if (go.graph && go.graph.nodes && go.graph.nodes.length) {
-        var graphWrap = html('div', 'gf-graph-wrap');
-        var head = html('div', 'gf-graph-head',
-          '<h5>Ancestry <small>each term traced to its root through the plant-slim categories it belongs to</small></h5>');
-        var toggle = html('button', 'gf-chip', 'Hide ancestry');
-        toggle.type = 'button';
-        toggle.setAttribute('aria-pressed', 'true');
-        head.appendChild(toggle);
-        graphWrap.appendChild(head);
-        var stage = html('div', 'gf-graph');
-        graphWrap.appendChild(stage);
-        block.appendChild(graphWrap);
-        toggle.addEventListener('click', function () {
-          var open = stage.hidden;
-          stage.hidden = !open;
-          toggle.textContent = open ? 'Hide ancestry' : 'Show ancestry';
-          toggle.setAttribute('aria-pressed', open ? 'true' : 'false');
-          if (open) { drawGraph(stage, go); }
-        });
-        container.appendChild(block);
-        drawGraph(stage, go);
-        if (window.MGDB && MGDB.debounce) {
-          window.addEventListener('resize', MGDB.debounce(function () { if (!stage.hidden) { drawGraph(stage, go); } }, 250));
-        }
+      /* The strips need two measurements the stylesheet cannot make: how
+         tall the longest name stands at 45 degrees, and how far the first
+         names of a strip reach past its left edge. Both come from the
+         text itself, so they are taken once the block is in the document
+         and again whenever the width changes -- including the change from
+         nothing to something when a hidden section is shown. */
+      fitStrips(strips);
+      graphs.forEach(function (g) { drawGraph(g.stage, go, g.aspect.key); });
+      var refit = function () {
+        fitStrips(strips);
+        graphs.forEach(function (g) { if (!g.stage.hidden) { drawGraph(g.stage, go, g.aspect.key); } });
+      };
+      var refitLater = MGDB.debounce ? MGDB.debounce(refit, 150) : refit;
+      if (typeof window.ResizeObserver === 'function') {
+        var lastWidth = rows.clientWidth;
+        new window.ResizeObserver(function () {
+          if (rows.clientWidth !== lastWidth) { lastWidth = rows.clientWidth; refitLater(); }
+        }).observe(rows);
       } else {
-        container.appendChild(block);
+        window.addEventListener('resize', refitLater);
       }
     }
 
@@ -368,19 +460,25 @@
       return li;
     }
 
-    /* ---- the ancestry graph: three columns (one per aspect), layered by
-       depth, ordered by barycentre, edges child -> parent ---- */
-    function drawGraph(stage, go) {
+    /* ---- the ancestry graph: one column per aspect (or the one aspect
+       asked for), layered by depth, ordered by barycentre, edges
+       child -> parent. A single column carries no title, since the card
+       it sits in is already named, and a sparse graph is drawn compact and
+       centred rather than flung to the corners of a wide card. ---- */
+    function drawGraph(stage, go, only) {
       stage.innerHTML = '';
       var nodes = go.graph.nodes;
       var edges = go.graph.edges;
       var byNs = {};
-      nodes.forEach(function (n) { if (n.namespace) { (byNs[n.namespace] = byNs[n.namespace] || []).push(n); } });
+      nodes.forEach(function (n) { if (n.namespace && (!only || n.namespace === only)) { (byNs[n.namespace] = byNs[n.namespace] || []).push(n); } });
       var colsPresent = ASPECTS.filter(function (a) { return byNs[a.key] && byNs[a.key].length; });
       if (!colsPresent.length) { return; }
-      var width = Math.max(320, stage.clientWidth || 900);
-      var narrow = width < 700;
+      var width = Math.max(320, (stage.clientWidth || 900) - 16);
+      var single = colsPresent.length === 1;
+      var narrow = !single && width < 700;
       var colW = narrow ? width : Math.floor(width / colsPresent.length);
+      var titleH = single ? 0 : 18;
+      var nodeMax = single ? 300 : 210;
       var rowH = 44, nodeH = 22, padX = 10, padY = 14;
 
       var parentsOf = {}, childrenOf = {};
@@ -424,8 +522,8 @@
         if (layers.length > maxRows) { maxRows = layers.length; }
       });
 
-      var height = narrow ? layouts.reduce(function (h, L) { return h + L.layers.length * rowH + padY * 2 + 18; }, 0)
-                          : maxRows * rowH + padY * 2 + 18;
+      var height = narrow ? layouts.reduce(function (h, L) { return h + L.layers.length * rowH + padY * 2 + titleH; }, 0)
+                          : maxRows * rowH + padY * 2 + titleH;
       var svg = el('svg', { viewBox: '0 0 ' + width + ' ' + height, width: '100%', height: height, 'class': 'gf-graph-svg', role: 'img',
                             'aria-label': 'Ancestry of the GO terms of this gene' });
       var coords = {};
@@ -433,20 +531,25 @@
       layouts.forEach(function (L, ci) {
         var x0 = narrow ? 0 : ci * colW;
         var y0 = narrow ? yOffset : 0;
-        svg.appendChild(el('text', { x: x0 + padX, y: y0 + 12, 'class': 'gf-graph-title gf-graph-title-' + L.aspect.cls }, L.aspect.label));
+        if (!single) {
+          svg.appendChild(el('text', { x: x0 + padX, y: y0 + 12, 'class': 'gf-graph-title gf-graph-title-' + L.aspect.cls }, L.aspect.label));
+        }
         if (!narrow && ci > 0) {
           svg.appendChild(el('line', { x1: x0, x2: x0, y1: 0, y2: height, 'class': 'gf-graph-divider' }));
         }
+        var widest = L.layers.reduce(function (m, layer) { return layer.length > m ? layer.length : m; }, 1);
+        var used = single ? Math.min(colW, Math.max(440, widest * 250)) : colW;
+        var xBase = x0 + Math.floor((colW - used) / 2);
         L.layers.forEach(function (layer, d) {
-          var slot = (colW - padX * 2) / layer.length;
-          var w = Math.min(210, Math.max(56, slot - 8));
+          var slot = (used - padX * 2) / layer.length;
+          var w = Math.min(nodeMax, Math.max(56, slot - 8));
           layer.forEach(function (n, i) {
-            var cx = x0 + padX + slot * (i + 0.5);
-            var cy = y0 + 18 + padY + d * rowH + rowH / 2;
+            var cx = xBase + padX + slot * (i + 0.5);
+            var cy = y0 + titleH + padY + d * rowH + rowH / 2;
             coords[n.id] = { x: cx, y: cy, w: w, h: nodeH };
           });
         });
-        yOffset += L.layers.length * rowH + padY * 2 + 18;
+        yOffset += L.layers.length * rowH + padY * 2 + titleH;
       });
 
       var gEdges = el('g', { 'class': 'gf-graph-edges' });

@@ -37,7 +37,12 @@ try {
     $cacheable = $facetsOnly && $filter['term'] === '' && count($filter['params']) === 0;
 
     if ($cacheable) {
-        $payload = dashboardCache($system, 'reference/facets', function () use ($DBConn, $filter) {
+        /* The key carries this library's mtime: the entry is the shape
+           referenceFacetsOnlyQuery() returns, so a key watching only the
+           string kept serving a payload built before the query learned to
+           read both DOI stores -- 490 DOIs and no export list sizes. */
+        $facetsKey = 'reference/facets_' . (int) @filemtime(__DIR__ . '/reference_search_lib.php');
+        $payload = dashboardCache($system, $facetsKey, function () use ($DBConn, $filter) {
             $built = referenceFacetsOnlyQuery($filter);
             return retrieve_row(make_query($DBConn, $built['sql'], 1, $built['params']));
         }, $cacheMeta);
@@ -60,6 +65,11 @@ try {
     $total = (int) $payload['total_count'];
     $doiCount = (int) $payload['doi_count'];
     $pubmedCount = (int) $payload['pubmed_count'];
+    /* The identifier exports are de-duplicated lists, so their length is not
+       the reference count. Absent on the paged combined query, which does not
+       compute them. */
+    $doiDistinct = isset($payload['doi_distinct']) ? (int) $payload['doi_distinct'] : null;
+    $pubmedDistinct = isset($payload['pubmed_distinct']) ? (int) $payload['pubmed_distinct'] : null;
     foreach ($results as &$row) {
         $row['id'] = (int) $row['id'];
         $row['year'] = $row['year'] === null ? null : (int) $row['year'];
@@ -76,6 +86,8 @@ try {
             'total' => $total,
             'with_doi' => $doiCount,
             'with_pubmed' => $pubmedCount,
+            'doi_list_size' => $doiDistinct,
+            'pubmed_list_size' => $pubmedDistinct,
             'page' => $page,
             'page_size' => $pageSize,
             'page_count' => ($facetsOnly || !$total) ? 0 : (int) ceil($total / $pageSize),

@@ -3650,6 +3650,79 @@ now say how large they are: 8&nbsp;MB, 40&nbsp;MB, and a 57&nbsp;MB slide deck.
 
 ## The Reference Data Hub, where Metrics are query-driven
 
+### The downloads were wrong in three ways, 2026-09-14
+
+Carson asked whether the download counts were bugs. Two were, and the third is
+arithmetic worth stating on the page.
+
+**Every export was capped at 20,000 rows.** `referenceExportQuery()` ended
+`LIMIT 20000`, so the CSV and the BibTeX of an unfiltered search were exactly
+20,000 of 54,900 -- the 20,000 most recent, silently. That is also why the CSV
+held 7,706 PubMed IDs where the PubMed export held 8,881: the older half of the
+corpus was never in the file. The cap is gone. Measured uncapped over the whole
+corpus with every column and the author rollup: **1.05 s**, 54,900 rows.
+
+**The DOI was being read from one of the two places the database keeps it.**
+`mgdb.reference.doi` carries a DOI for **490** references. `ext_db_key` under
+db_person 2738676, "Digital Object Identifier (DOI), -", carries one for
+**8,493**, and only 489 references are in both. Every query on this page read
+the column alone, so the page reported DOI coverage of 0.9% when it is 15.5%
+(8,479 after cleaning). `referenceDoiSql()` is now the single definition and
+the results, the exports, the identifier filter and the metric all use it.
+
+Both stores are free text and both hold junk: `none`, `dup`, `doi`, `123`, `1`,
+values wrapped as `doi: 10.x/y`, `DOI 10.x/y` and `https://doi.org/10.x/y`, one
+with a leading slash, and a few mangled with invisible characters. The DOI is
+extracted by pattern (`10.NNNN/` plus a suffix, trailing sentence punctuation
+removed) rather than printed raw, so `none` is no longer exported as a DOI.
+
+**The identifier lists are shorter than the reference counts, and always will
+be.** They are de-duplicated lists: 8,479 references carry a DOI but 4 share
+one, giving 8,475 lines; 8,949 carry a PubMed ID but 68 share one, giving
+8,881. Those 68 duplicate PMIDs are pairs of reference records for the same
+paper -- a curation matter, not a code one. The page now states what each file
+will contain, computed from the matched set, so a short file is explained
+before it is downloaded rather than after.
+
+`doi_list_size` and `pubmed_list_size` were added to the search payload for
+that note; they are `COUNT(DISTINCT ...)` over the already-materialised matched
+CTE and cost nothing measurable.
+
+**Two cache keys had to learn the library's mtime.** The controller's
+`dashboardCache` key watched only `__FILE__`, and the API's facets entry was
+the bare string `reference/facets` -- so after the DOI fix the headline metric
+kept reporting 490 from an entry built on 5 September. Both keys now carry
+`filemtime()` of `reference_search_lib.php`. **Any cache whose payload shape or
+arithmetic lives in another file needs that file's mtime in the key.**
+
+### The dip around 2010 is real
+
+Carson asked whether a chart showing 144 papers in 2010 against ~1,400 in 1995
+was a bug. It is not: 144 is exactly what the table holds for 2010 once meeting
+abstracts and MNL articles are excluded, which is the state the chart was in.
+Journal-article curation falls steadily from the mid-1990s and recovers:
+
+| year | 1995 | 2000 | 2005 | 2010 | 2015 | 2020 | 2025 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| journal articles | 1,417 | 803 | 409 | **144** | 263 | 580 | 1,211 |
+
+So the shape is a genuine trough in what MaizeGDB curated between about 2005
+and 2019, not a rendering fault. Two related gaps in the same table, worth
+knowing before anyone reads those charts: **Maize Genetics Conference abstracts
+stop after 2016** apart from 2020, and **MNL articles stop after 2016**.
+
+### Results now follow the hub pattern
+
+Table first, as on /data_center/map, with cards one click away. Both views
+offer the same four actions in the order the shared reference card uses --
+**Full text, PubMed, Copy citation, Copy DOI** -- each shown only when the
+record supports it, from one `rowActions()` builder.
+
+Also: the search hint reads "Search within "Related gene, gene model, or
+locus"", and the figures' hover label was inheriting the 10px axis-label grey
+on a white tooltip, which was unreadable on Top journals; it now has its own
+12px ink font.
+
 `/data_center/reference` joined the shell on 2026-09-02. Its back end needed
 nothing: one combined query already returns the results, the facets and the
 counts together, the unfiltered case is cached, and a search answers in
@@ -8449,17 +8522,27 @@ all read from files by `records/gene.php` (no query), and all optional:
   URL hash (`#pathway=<id>`), which is where the figure links.
 
 The figure: four tiles (GO terms by aspect, plant-slim footprint, protein
-class, pathways); three aspect columns each with the slim fingerprint (one
-square per slim category in a fixed order, so the pattern is comparable
-between genes), the lit categories, and the terms with evidence badges; the
-ancestry graph (layered by depth, barycentre-ordered, three columns);
+class, pathways); then one full-width row per aspect, opening with that
+aspect's own ancestry graph (layered by depth, barycentre-ordered, drawn
+compact and centred when sparse, one chip in the block head hides or shows
+all three), then the slim fingerprint as a single unbroken strip of squares
+across the width (one square per slim
+category in a fixed order, so the pattern is comparable between genes; a
+narrow screen scrolls it sideways rather than wrapping it), each category's
+name above its square at 45 degrees (lit categories in the aspect's colour),
+and the terms with evidence badges in a grid beneath. The strip's top padding
+and left inset are measured from the names in the script (`fitStrips`, a
+canvas `measureText` at the label's computed font) and refitted through a
+`ResizeObserver`, since a name rotated about its bottom-right corner reaches
+width/√2 past its square and the first names of a strip would otherwise be
+clipped at the left edge;
 the architecture as pills, a card per atlas class with the gene count here
 and a NAM-founder strip with this genome in gold, the immunity call, and the
 entries with their counts and implied GO; and a card per pathway with the
 step strip (this gene's step in gold, filled steps green, empty steps
 dashed, a founder-coverage bar under each) and the founder presence dots.
-Squares, term rows and graph nodes highlight each other on hover and pin on
-click. The three tables below the figure are unchanged.
+Squares, the names above them, term rows and graph nodes highlight each
+other on hover and pin on click. The three tables below the figure are unchanged.
 
 ### The header, Model quality, and the GO dataset route (2026-09-12)
 

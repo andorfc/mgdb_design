@@ -1,11 +1,11 @@
 /* ==========================================================================
    Function at a glance — /gene_center/gene/{id}, Function section
    --------------------------------------------------------------------------
-   Drawn by js/mgdb-gene-function.js: four tiles, the Gene Ontology in three
-   aspect columns (a plant-GO-slim fingerprint of small squares, the lit
-   categories, the terms with their evidence), the ancestry graph, the
-   protein's atlas class with a NAM-founder strip, and the explorer's
-   pathways as step strips. Aspect colours: BP green, MF blue, CC wine,
+   Drawn by js/mgdb-gene-function.js: four tiles, the Gene Ontology as one
+   full-width row per aspect (its own ancestry graph, the plant-GO-slim
+   categories named at 45 degrees above a single strip of squares, the terms
+   with their evidence beneath), the protein's atlas class with a NAM-founder
+   strip, and the explorer's pathways as step strips. Aspect colours: BP green, MF blue, CC wine,
    the site's own; the gold is the same accent the other figures use for
    "this one".
 
@@ -137,20 +137,19 @@
 .gf-chip:focus-visible { outline: 3px solid var(--mgdb-focus, #f2a515); outline-offset: 2px; }
 
 /* --------------------------------------------------------------------------
-   Gene Ontology: aspect columns, fingerprint, terms
+   Gene Ontology: one row per aspect, opening with that aspect's ancestry
+   graph. The plant-slim categories are named above their squares at 45 degrees, the squares run in one unbroken strip
+   across the width, and the terms sit beneath. The strip's top padding and
+   left inset are measured from the names by the script (--gf-lbl-h,
+   --gf-inset); the stylesheet only knows how to rotate.
    -------------------------------------------------------------------------- */
 
-.gf-aspects {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--mgdb-space-3);
-}
-
-@media (max-width: 900px) { .gf-aspects { grid-template-columns: 1fr; } }
+.gf-aspect-rows { display: grid; gap: var(--mgdb-space-3); margin-top: var(--mgdb-space-4); }
+.gf-aspect-rows > .gf-legend { flex-basis: auto; margin-bottom: var(--mgdb-space-1); }
 
 .gf-aspect {
   min-width: 0;
-  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  padding: var(--mgdb-space-3) var(--mgdb-space-4) var(--mgdb-space-2);
   border: 1px solid var(--gf-rule);
   border-top: 3px solid var(--gf-bp);
   border-radius: var(--mgdb-radius-sm, 6px);
@@ -161,13 +160,33 @@
 .gf-aspect-mf { border-top-color: var(--gf-mf); color: var(--gf-mf); }
 .gf-aspect-cc { border-top-color: var(--gf-cc); color: var(--gf-cc); }
 
-.gf-aspect h5 { margin: 0 0 var(--mgdb-space-2); color: var(--gf-ink); font-size: var(--mgdb-text-sm); font-weight: 700; }
-.gf-aspect h5 small { color: var(--gf-muted); font-weight: 400; }
+.gf-aspect h5 { margin: 0; color: var(--gf-ink); font-size: var(--mgdb-text-base); font-weight: 700; }
+.gf-aspect h5 small { color: var(--gf-muted); font-size: var(--mgdb-text-xs); font-weight: 400; }
 
-/* The fingerprint: one square per plant-slim category, fixed order. Colour
-   is the aspect's; a lit square lights up when the figure is ready. */
-.gf-fp { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: var(--mgdb-space-2); }
+/* The strip scrolls sideways rather than wrapping: the fingerprint is one
+   line by design, and a narrow screen gets a scrollbar, not a broken
+   pattern. The negative margin lets a pinned square's ring clear the edge. */
+.gf-strip-scroll {
+  margin: 0 calc(-1 * var(--mgdb-space-2));
+  padding: 0 var(--mgdb-space-2);
+  overflow-x: auto;
+  overflow-y: hidden;
+}
 
+.gf-fpx {
+  --gf-n: 1;
+  --gf-inset: 0px;
+  --gf-lbl-h: 160px;
+  display: grid;
+  grid-template-columns: repeat(var(--gf-n), minmax(0, 1fr));
+  min-width: calc(var(--gf-n) * 22px + var(--gf-inset));
+  padding: var(--gf-lbl-h) 0 6px var(--gf-inset);
+}
+
+.gf-cell { position: relative; display: flex; justify-content: center; min-width: 0; padding: 0 1.5px; }
+
+/* One square per plant-slim category, fixed order. Colour is the aspect's;
+   a lit square lights up when the figure is ready. */
 .gf-sq {
   display: inline-block;
   width: 15px;
@@ -181,6 +200,8 @@
   transition: background-color .4s ease, opacity .4s ease, transform .15s ease, box-shadow .15s ease;
 }
 
+.gf-cell .gf-sq { width: 100%; max-width: 30px; height: auto; aspect-ratio: 1 / 1; }
+
 .gf-sq-bp { color: var(--gf-bp); }
 .gf-sq-mf { color: var(--gf-mf); }
 .gf-sq-cc { color: var(--gf-cc); }
@@ -189,26 +210,42 @@
 .gf.is-ready .gf-sq.is-lit-1 { opacity: .6; }
 .gf.is-ready .gf-sq.is-lit-2 { opacity: .8; }
 .gf-sq.is-implied { background: transparent; border: 2px dashed currentColor; }
-.gf-sq.is-hot, .gf-sq[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--gf-gold); transform: scale(1.3); opacity: 1; z-index: 1; }
+.gf-sq.is-hot, .gf-sq[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--gf-gold); transform: scale(1.25); opacity: 1; z-index: 1; }
 .gf-sq:focus-visible { outline: 3px solid var(--mgdb-focus, #f2a515); outline-offset: 1px; }
 
-.gf-fp-lit {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 12px;
-  margin: 0 0 var(--mgdb-space-3);
-  padding: 0;
-  list-style: none;
-  color: var(--gf-ink);
+/* The category's name, rotated 45 degrees about the bottom-right corner of
+   its box, which is pinned just above the centre of its square: the name
+   reads down toward the square it names. Lit categories take the aspect's
+   colour; the rest stay quiet so the pattern reads first. */
+.gf-lbl {
+  position: absolute;
+  right: 50%;
+  bottom: calc(100% + 5px);
+  transform-origin: 100% 100%;
+  transform: rotate(45deg);
+  color: var(--gf-muted);
   font-size: var(--mgdb-text-xs);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color .15s ease;
 }
 
-.gf-fp-lit li { cursor: pointer; }
-.gf-fp-lit li small { color: var(--gf-muted); }
-.gf-fp-lit li.is-hot { font-weight: 700; text-decoration: underline; text-decoration-color: var(--gf-gold); text-decoration-thickness: 2px; }
-.gf-fp-dot { display: inline-block; width: 8px; height: 8px; margin-right: 5px; border-radius: 999px; background: currentColor; vertical-align: 1px; }
+.gf-lbl.is-lit { color: inherit; font-weight: 700; }
+.gf-lbl.is-implied { color: inherit; font-style: italic; }
+.gf-lbl.is-hot { color: var(--gf-ink); font-weight: 700; text-decoration: underline; text-decoration-color: var(--gf-gold); text-decoration-thickness: 2px; text-underline-offset: 2px; }
 
-.gf-terms { margin: 0; padding: 0; border-top: 1px solid var(--gf-rule); list-style: none; color: var(--gf-ink); }
+.gf-terms {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 0 var(--mgdb-space-4);
+  margin: var(--mgdb-space-2) 0 0;
+  padding: 0;
+  border-top: 1px solid var(--gf-rule);
+  list-style: none;
+  color: var(--gf-ink);
+}
 
 .gf-term {
   display: flex;
@@ -252,10 +289,9 @@
    Ancestry graph
    -------------------------------------------------------------------------- */
 
-.gf-graph-wrap { margin-top: var(--mgdb-space-4); }
-.gf-graph-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--mgdb-space-2) var(--mgdb-space-4); }
-.gf-graph-head h5 { flex: 1 1 24ch; margin: 0; font-size: var(--mgdb-text-sm); font-weight: 700; }
-.gf-graph-head h5 small { display: block; color: var(--gf-muted); font-size: var(--mgdb-text-xs); font-weight: 400; }
+/* One graph per aspect card, between the heading and the strip. */
+.gf-aspect .gf-graph { margin: var(--mgdb-space-2) 0 var(--mgdb-space-1); }
+.gf-block-head > .gf-chip { margin-left: auto; }
 
 .gf-graph {
   margin-top: var(--mgdb-space-2);
