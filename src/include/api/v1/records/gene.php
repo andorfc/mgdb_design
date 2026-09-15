@@ -400,8 +400,20 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   // Structure and protein
   /////
 
-  if (isset($want['structure'])) {
-    $transcripts = array();
+  /* The transcript list feeds both Structure and Sequences, so it is loaded
+     for either. Sequences used to fall back to the canonical pair alone when
+     Structure was not requested, which answered ?fields=sequences with one row
+     for a gene that has six. */
+  $transcripts = array();
+  if (isset($want['structure']) || isset($want['sequences'])) {
+    /* chado.transcript carries translation_name for the CANONICAL transcript
+       only: 32,783 of B73 v5's 72,539 protein-coding transcripts have none, and
+       every NAM annotation is short by about the same 32,000. The proteins are
+       real -- the sequence service answers for Zm00001eb168550_P002 as readily
+       as for _P001 -- so the blank Protein column and the missing protein FASTA
+       links were ours, not the data's. gene_api_transcript_protein() fills them
+       in from the annotation release, or from the gene's own canonical pair. */
+    $shard_protein = gene_api_shard_proteins($gene_shard);
     if ($gene_name !== null) {
       // transcript_i3 (gene_name). chado.transcript has no index on
       // transcript_name, so that column is never a predicate here.
@@ -410,17 +422,21 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
                chr, transcript_start, transcript_end, accession, accession_url
         FROM chado.transcript
         WHERE gene_name = :gm AND version = :ver
-        ORDER BY (canonical = 'yes') DESC, transcript_name", 1,
+        ORDER BY (COALESCE(canonical, '') = 'yes') DESC, transcript_name", 1,
         array('gm' => $gene_name, 'ver' => $annotation_version));
       MgdbApi::countQuery();
       while ($row = retrieve_row($sth)) {
         $t_start = MgdbApi::int($row['transcript_start']);
         $t_end = MgdbApi::int($row['transcript_end']);
+        $t_name = MgdbApi::text($row['transcript_name']);
+        $t_model = MgdbApi::text($row['model_type']);
         $transcripts[] = array(
-          'name' => MgdbApi::text($row['transcript_name']),
-          'protein' => MgdbApi::text($row['translation_name']),
+          'name' => $t_name,
+          'protein' => gene_api_transcript_protein($t_name, $t_model,
+                         MgdbApi::text($row['translation_name']), $shard_protein,
+                         $canonical_transcript, $canonical_protein),
           'canonical' => (trim((string) $row['canonical']) === 'yes'),
-          'model_type' => MgdbApi::text($row['model_type']),
+          'model_type' => $t_model,
           'chromosome' => MgdbApi::text($row['chr']),
           'start' => $t_start,
           'end' => $t_end,
@@ -433,7 +449,9 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
         );
       }
     }
+  }
 
+  if (isset($want['structure'])) {
     /* Domains: from the domains release when this assembly has one -- every
        protein of the gene, all analyses the release carries, no query -- and
        from perm_tables.protein_domain (Pfam only) otherwise. */
@@ -1629,8 +1647,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   if (isset($want['sequences'])) {
     $sections['sequences'] = gene_api_sequences(
       $gene_name, $annotation_version, $assembly_version,
-      isset($sections['structure']) ? $sections['structure']['transcripts'] : array(),
-      $canonical_transcript, $canonical_protein);
+      $transcripts, $canonical_transcript, $canonical_protein, $gene_shard);
   }
 
   /////
@@ -2206,6 +2223,52 @@ function gene_api_expression($gene_name, $assembly_version) {
 }//gene_api_expression
 
 
+/* transcript id -> protein id from the annotation release, which is the
+   published GFF3 and so the one authoritative answer. Empty for an assembly
+   with no release; only B73 v5 has one today. */
+function gene_api_shard_proteins($shard) {
+  $map = array();
+  if ($shard === null) { return $map; }
+  foreach ((isset($shard['transcripts']) ? $shard['transcripts'] : array()) as $t) {
+    if (!empty($t['id']) && !empty($t['protein']['id'])) {
+      $map[$t['id']] = $t['protein']['id'];
+    }
+  }
+  return $map;
+}//gene_api_shard_proteins
+
+/* The protein a transcript encodes, from the best source that can answer.
+
+   1. chado.transcript.translation_name, when it has one. It only ever does for
+      the canonical transcript.
+   2. The annotation release. Sampled whole: it names a protein for 72,539 of
+      B73 v5's 72,539 protein-coding transcripts, and every one of those names
+      is the transcript name with the T of the numeric suffix turned into a P.
+   3. The gene's own canonical pair, for the assemblies with no release. That
+      substitution holds for every one of the 1.3 M translation_name rows in
+      chado -- including v3, whose ids are _FGT001/_FGP001 -- so when THIS
+      gene's canonical pair demonstrates exactly it, the same substitution is
+      applied to the gene's other protein-coding transcripts and to nothing
+      else. Spot-checked against the sequence service for v4 and two NAM lines.
+
+   Nothing is derived for a transcript that is not protein-coding, and nothing
+   at all for B73 v1 and v2, whose canonical transcripts carry no protein name
+   either -- correctly, because the sequence service has no proteins for them
+   and a derived id there would be a link to an error page. */
+function gene_api_transcript_protein($name, $model_type, $stored, $shard_map,
+                                     $canonical_transcript, $canonical_protein) {
+  if ($stored !== null) { return $stored; }
+  if ($name === null) { return null; }
+  if (isset($shard_map[$name])) { return $shard_map[$name]; }
+  if ($model_type !== 'protein_coding') { return null; }
+  if ($canonical_transcript === null || $canonical_protein === null) { return null; }
+  if (preg_replace('/T([0-9]+)$/', 'P$1', $canonical_transcript) !== $canonical_protein) {
+    return null;
+  }
+  $derived = preg_replace('/T([0-9]+)$/', 'P$1', $name);
+  return ($derived === $name) ? null : $derived;
+}//gene_api_transcript_protein
+
 /* Sequence and BLAST descriptors.
 
    Confirmed against the live service: its gene-model-set parameter is
@@ -2217,7 +2280,8 @@ function gene_api_expression($gene_name, $assembly_version) {
    dbtype=mrna errors for v4 and v5, so it is not emitted. The protein keyword is
    'protein', not 'prot'. */
 function gene_api_sequences($gene_name, $annotation_version, $assembly_version,
-                            $transcripts, $canonical_transcript, $canonical_protein) {
+                            $transcripts, $canonical_transcript, $canonical_protein,
+                            $gene_shard = null) {
   if ($gene_name === null || $annotation_version === null) {
     return array('set' => null, 'genomic' => null, 'transcripts' => array(),
                  'downloads' => array());
@@ -2241,8 +2305,18 @@ function gene_api_sequences($gene_name, $annotation_version, $assembly_version,
 
   $entries = array();
   $rows = $transcripts;
-  // A record fetched with ?fields=sequences has no transcript list; fall back to
-  // the canonical pair so the section is never empty for lack of another section.
+  /* A record fetched with ?fields=sequences has not run the structure query, so
+     it has no transcript list. The annotation release carries one; only when
+     there is no release either does this fall back to the canonical pair, which
+     is a one-row section for a gene that may have four transcripts. */
+  if (count($rows) === 0 && $gene_shard !== null) {
+    foreach ((isset($gene_shard['transcripts']) ? $gene_shard['transcripts'] : array()) as $t) {
+      if (empty($t['id'])) { continue; }
+      $rows[] = array('name' => $t['id'],
+                      'protein' => empty($t['protein']['id']) ? null : $t['protein']['id'],
+                      'canonical' => !empty($t['canonical']));
+    }
+  }
   if (count($rows) === 0 && $canonical_transcript !== null) {
     $rows = array(array('name' => $canonical_transcript, 'protein' => $canonical_protein,
                         'canonical' => true));
