@@ -6121,23 +6121,35 @@ millisecond, and it cannot fail. A set that is not mirrored falls through to
 dependency.
 
 ```
-cd <webroot> && php tools/sequence/sequence_mirror.php --defaults
+cd <webroot> && php tools/sequence/sequence_mirror.php --all
 ```
 
-builds the sets the record pages link to -- B73 v5, v4 and v3 protein, CDS and
-cDNA, plus the small non-coding sets -- in about 20 seconds for roughly 1.1 GB
-on disk. `--list` shows what is mirrored and when it was built; `--check
-<assembly> <file.fa.gz>` pulls ten records at random and compares them with the
-sequence service. **Rebuild after an annotation release**, and nowhere else:
-the store is content, not code, so it is not in the deploy manifest and a
-deploy never touches it.
+`--core` is B73 v5, v4 and v3 (1.1 GB, 20 seconds); `--nam` adds the 25 NAM
+founder lines (a further 5.9 GB and about six minutes); `--all` is both, 7.0 GB.
+Each set covers protein, CDS, cDNA and the small non-coding files. Genomic and
+whole-assembly FASTA are deliberately left on the service -- hundreds of
+megabytes to gigabytes each, and rarely asked for.
+
+`--list` shows what is mirrored and when it was built. `--check <assembly>
+<file.fa.gz>` pulls ten records at random and compares them with the sequence
+service. `--probe` refreshes `data/sequence/absent.json` -- the files
+download.maizegdb.org does not publish, HEADed rather than downloaded, so the
+server can skip a candidate instead of retrying it. **Rebuild after an
+annotation release**, and nowhere else: the store is content, not code, so it
+is not in the deploy manifest and a deploy never touches it.
 
 **The service it falls back to is reliable only for what it has served
 recently.** `fasta.maizegdb.org` answers a Cloudflare-cached identifier in
 ~50 ms and never failed in 1,557 polls; a cold one takes 1 to 1.5 s, sometimes
-30, and returns 502 in bursts -- 5 of 25 cold identifiers unanswered in one
-run. Anything new that fetches sequences in bulk should mirror the file rather
-than loop over the service.
+30, and returns 502 in bursts -- 5 of 25 cold identifiers unanswered in one run
+on B73 v5, and 13 of 25 across the NAM lines. Anything new that fetches
+sequences in bulk should mirror the file rather than loop over the service.
+
+**A 502 from it does not mean the sequence is missing**, and the old client's
+habit of saying so is why AD-076 briefly recorded a protein as absent from a
+published file when it is sitting in it. `absent.json` is the only thing here
+that may state a file does not exist, and it says so on the strength of a 404
+from download.maizegdb.org.
 
 `sequence2.maizegdb.org` is a separate vhost with its own copy of the script
 and is **not** updated by a deploy; it still runs the old one. AD-077 asks for

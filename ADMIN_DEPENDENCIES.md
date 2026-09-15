@@ -2970,16 +2970,19 @@ system and could be overwritten.
   release (the published GFF3, so authoritative, B73 v5 only) when there is
   one, otherwise from the gene's own canonical pair, and only for
   protein-coding transcripts. Delete the fallback when the column is loaded.
-- **Also found, not worked around:**
-  - Some NAM protein FASTA files are missing a protein the annotation lists as
-    protein-coding — `Zm00038ab405920_T001` (Oh7B) is protein_coding in
-    `chado.transcript` and `Zm00038ab405920_P001` is "sequence not found" at
-    the sequence service. One in about twenty sampled derived ids.
-  - `chado.genome_metadata` has no row for annotation `Zm00001d.1` or `4a`, so
-    the sequence service answers **"Unable to find the assembly"** for every
-    request against them. No gene record resolves to either today (every
-    `Zm00001d.1` gene is also in `Zm00001d.2`, every `4a` gene in `5b+`), so
-    nothing is visibly broken, but a URL built by hand is.
+- **Also found, not worked around:** `chado.genome_metadata` has no row for
+  annotation `Zm00001d.1` or `4a`, so the sequence service answers **"Unable to
+  find the assembly"** for every request against them. No gene record resolves
+  to either today (every `Zm00001d.1` gene is also in `Zm00001d.2`, every `4a`
+  gene in `5b+`), so nothing is visibly broken, but a URL built by hand is.
+- **Corrected 2026-09-15.** This entry first said that some NAM protein FASTA
+  files are missing a protein the annotation calls protein-coding, on the
+  strength of `Zm00038ab405920_P001` (Oh7B) coming back "sequence not found".
+  It is not missing: it is in the published file, the local mirror returns it,
+  and the sequence service returns it on the third attempt after two 502s. The
+  "not found" was the old sequence client reporting a transient upstream
+  failure as a statement about the data — the defect fixed in AD-077, and a
+  reminder that a single "not found" from that service proved nothing.
 - **Status:** proposed
 
 ---
@@ -3007,6 +3010,24 @@ system and could be overwritten.
   - **Requested:** point the sequence2 document root at the site's
     `tools/sequence/` directory, or copy the hardened script into it. The
     script is unchanged in its parameters and output.
+
+  **1b. Nine NAM gene-model FASTA files are not published at all.** Checked
+  with a real request, not inferred: `Zm-Il14H-REFERENCE-NAM-1.0` has no plain
+  `…_Zm00028ab.1.cds.fa.gz` (only `canonical.cds`), so a CDS request on that
+  line could not be answered for any transcript; and CML247, CML277, Oh7B and
+  Oh43 publish neither `nc.protein` nor `nc.cds`. Every other NAM line
+  publishes all five. Worked around: the sequence server now falls back to the
+  canonical-only file, which covers Il14H's 40,301 canonical transcripts of
+  76,559, and `data/sequence/absent.json` records the checked 404s so the
+  server skips them rather than spending a retry ladder on a service that
+  answers "no such file" with the same 502 it uses for an outage.
+  - **Requested:** publish the missing files, or confirm they are deliberately
+    absent so the fallback can be documented as permanent.
+
+  Also noted, not requested: `Zm-B73_AB10-REFERENCE-NAM-1.0` names its
+  gene-model FASTA with an `evd.` infix (`…_Zm00043a.1.evd.protein.fa.gz`) that
+  no other assembly uses. Its models are not in `chado.transcript`, so no
+  record page can reach them and nothing is broken; it is simply not mirrored.
 
   **2. B73 v1 and v2 have no FASTA index published.** Every `.fa.gz` under
   `B73_RefGen_v1/` and `B73_RefGen_v2/` answers 200 but has no `.fai` and no

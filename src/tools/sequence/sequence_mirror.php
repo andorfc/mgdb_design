@@ -41,39 +41,125 @@
   define('SM_DATA_URL', 'https://download.maizegdb.org');
   define('SM_STORE', 'data/sequence');
 
-  /* The sets tools/sequence/get_sequence.php is asked for from the gene record
-     pages: protein, CDS and cDNA for the current B73 annotation and for v4.
-     Genomic (gene) and whole-assembly files are deliberately not here -- they
-     are hundreds of megabytes to gigabytes and are asked for rarely. */
-  $SM_DEFAULTS = array(
-    array('Zm-B73-REFERENCE-NAM-5.0', 'Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.protein.fa.gz'),
-    array('Zm-B73-REFERENCE-NAM-5.0', 'Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.cds.fa.gz'),
-    array('Zm-B73-REFERENCE-NAM-5.0', 'Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.cdna.fa.gz'),
-    /* The non-coding sets are small and are the first fallback for every
-       identifier the main file does not hold, so leaving them out sends a
-       non-coding gene to the web on every view. */
-    array('Zm-B73-REFERENCE-NAM-5.0', 'Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.nc.protein.fa.gz'),
-    array('Zm-B73-REFERENCE-NAM-5.0', 'Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.nc.cds.fa.gz'),
-    array('Zm-B73-REFERENCE-GRAMENE-4.0', 'Zm-B73-REFERENCE-GRAMENE-4.0_Zm00001d.2.protein.fa.gz'),
-    array('Zm-B73-REFERENCE-GRAMENE-4.0', 'Zm-B73-REFERENCE-GRAMENE-4.0_Zm00001d.2.cds.fa.gz'),
-    array('Zm-B73-REFERENCE-GRAMENE-4.0', 'Zm-B73-REFERENCE-GRAMENE-4.0_Zm00001d.2.cdna.fa.gz'),
-    array('B73_RefGen_v3', 'Zea_mays.AGPv3.21.protein.fa.gz'),
-    array('B73_RefGen_v3', 'Zea_mays.AGPv3.21.cds.fa.gz'),
-    array('B73_RefGen_v3', 'Zea_mays.AGPv3.21.transcripts.fa.gz')
+  /* The sequence types a gene record links to, in the order they are worth
+     having. "canonical" is the subset file: it is only ever a fallback, and it
+     is here because Il14H has no plain cds.fa.gz published at all. Genomic
+     (gene) and whole-assembly FASTA are deliberately absent -- hundreds of
+     megabytes to gigabytes each, and asked for rarely. */
+  $SM_TYPES = array('protein', 'cds', 'cdna', 'nc.protein', 'nc.cds', 'canonical.cds');
+
+  /* Shapes get_sequence.php's fallback ladder can ask for but which are not
+     worth mirroring. They are probed with a HEAD and the 404s written to
+     absent.json, so the server skips them instead of spending a retry ladder
+     on a service that reports a missing file as a 502. nc.cdna and
+     canonical.protein are published nowhere; canonical.cdna is published
+     everywhere and is a duplicate of cdna, so it is left on the service. */
+  $SM_PROBE_TYPES = array('nc.cdna', 'canonical.protein', 'canonical.cdna', 'canonical.cds');
+
+  /* assembly => annotation, grouped so a rebuild can be scoped.
+
+     B73 RefGen_v3's files are not named after the assembly, so it is listed as
+     explicit filenames instead. Zm-B73_AB10-REFERENCE-NAM-1.0 is deliberately
+     absent: its gene-model files carry an "evd." infix nothing else uses, and
+     its models are not in chado.transcript, so no record page can reach them. */
+  $SM_SETS = array(
+    'core' => array(
+      'Zm-B73-REFERENCE-NAM-5.0'     => 'Zm00001eb.1',
+      'Zm-B73-REFERENCE-GRAMENE-4.0' => 'Zm00001d.2'
+    ),
+    'nam' => array(
+      'Zm-B97-REFERENCE-NAM-1.0'   => 'Zm00018ab.1',
+      'Zm-CML52-REFERENCE-NAM-1.0' => 'Zm00019ab.1',
+      'Zm-CML69-REFERENCE-NAM-1.0' => 'Zm00020ab.1',
+      'Zm-CML103-REFERENCE-NAM-1.0' => 'Zm00021ab.1',
+      'Zm-CML228-REFERENCE-NAM-1.0' => 'Zm00022ab.1',
+      'Zm-CML247-REFERENCE-NAM-1.0' => 'Zm00023ab.1',
+      'Zm-CML277-REFERENCE-NAM-1.0' => 'Zm00024ab.1',
+      'Zm-CML322-REFERENCE-NAM-1.0' => 'Zm00025ab.1',
+      'Zm-CML333-REFERENCE-NAM-1.0' => 'Zm00026ab.1',
+      'Zm-HP301-REFERENCE-NAM-1.0' => 'Zm00027ab.1',
+      'Zm-Il14H-REFERENCE-NAM-1.0' => 'Zm00028ab.1',
+      'Zm-Ki3-REFERENCE-NAM-1.0'   => 'Zm00029ab.1',
+      'Zm-Ki11-REFERENCE-NAM-1.0'  => 'Zm00030ab.1',
+      'Zm-Ky21-REFERENCE-NAM-1.0'  => 'Zm00031ab.1',
+      'Zm-M37W-REFERENCE-NAM-1.0'  => 'Zm00032ab.1',
+      'Zm-M162W-REFERENCE-NAM-1.0' => 'Zm00033ab.1',
+      'Zm-Mo18W-REFERENCE-NAM-1.0' => 'Zm00034ab.1',
+      'Zm-Ms71-REFERENCE-NAM-1.0'  => 'Zm00035ab.1',
+      'Zm-NC350-REFERENCE-NAM-1.0' => 'Zm00036ab.1',
+      'Zm-NC358-REFERENCE-NAM-1.0' => 'Zm00037ab.1',
+      'Zm-Oh7B-REFERENCE-NAM-1.0'  => 'Zm00038ab.1',
+      'Zm-Oh43-REFERENCE-NAM-1.0'  => 'Zm00039ab.1',
+      'Zm-P39-REFERENCE-NAM-1.0'   => 'Zm00040ab.1',
+      'Zm-Tx303-REFERENCE-NAM-1.0' => 'Zm00041ab.1',
+      'Zm-Tzi8-REFERENCE-NAM-1.0'  => 'Zm00042ab.1'
+    )
+  );
+
+  $SM_FILES = array(
+    'core' => array(
+      array('B73_RefGen_v3', 'Zea_mays.AGPv3.21.protein.fa.gz'),
+      array('B73_RefGen_v3', 'Zea_mays.AGPv3.21.cds.fa.gz'),
+      array('B73_RefGen_v3', 'Zea_mays.AGPv3.21.transcripts.fa.gz')
+    )
   );
 
   $argv0 = array_shift($argv);
   $cmd = isset($argv[0]) ? $argv[0] : '--list';
 
-  if ($cmd === '--defaults') {
+  if ($cmd === '--defaults' || $cmd === '--core' || $cmd === '--nam' || $cmd === '--all') {
+    $groups = ($cmd === '--nam') ? array('nam')
+            : (($cmd === '--all') ? array('core', 'nam') : array('core'));
+    $built = 0;
+    $skipped = 0;
     $failed = 0;
-    foreach ($SM_DEFAULTS as $set) {
-      if (!smBuild($set[0], $set[1])) { $failed++; }
+    foreach ($groups as $group) {
+      foreach ((isset($SM_SETS[$group]) ? $SM_SETS[$group] : array()) as $assembly => $annotation) {
+        $have = array();
+        foreach ($SM_TYPES as $type) {
+          /* The canonical-only file duplicates the full one, so mirror it only
+             where the full one is not published -- Il14H and nowhere else. */
+          if (strpos($type, 'canonical.') === 0
+              && !empty($have[substr($type, strlen('canonical.'))])) {
+            continue;
+          }
+          $r = smBuild($assembly, "{$assembly}_$annotation.$type.fa.gz", true);
+          if ($r === true) { $built++; $have[$type] = true; }
+          else if ($r === null) { $skipped++; }
+          else { $failed++; }
+        }
+        foreach ($SM_PROBE_TYPES as $type) {
+          if (!empty($have[$type])) { continue; }
+          smProbe($assembly, "{$assembly}_$annotation.$type.fa.gz");
+        }
+      }
+      foreach ((isset($SM_FILES[$group]) ? $SM_FILES[$group] : array()) as $set) {
+        $r = smBuild($set[0], $set[1], true);
+        if ($r === true) { $built++; } else if ($r === null) { $skipped++; } else { $failed++; }
+      }
     }
+    printf("\n%d built, %d not published, %d failed\n", $built, $skipped, $failed);
     exit($failed === 0 ? 0 : 1);
   }
+  else if ($cmd === '--probe') {
+    /* Refresh absent.json without downloading anything: every shape the
+       fallback ladder can ask for, HEADed. Seconds, not minutes. */
+    $n = 0;
+    foreach ($SM_SETS as $group => $sets) {
+      foreach ($sets as $assembly => $annotation) {
+        foreach (array_merge($SM_TYPES, $SM_PROBE_TYPES) as $type) {
+          smProbe($assembly, "{$assembly}_$annotation.$type.fa.gz");
+          $n++;
+        }
+      }
+    }
+    $list = is_file(SM_STORE . '/absent.json')
+          ? json_decode((string) file_get_contents(SM_STORE . '/absent.json'), true) : array();
+    printf("%d files probed, %d not published\n", $n, is_array($list) ? count($list) : 0);
+    exit(0);
+  }
   else if ($cmd === '--build' && isset($argv[2])) {
-    exit(smBuild($argv[1], $argv[2]) ? 0 : 1);
+    exit(smBuild($argv[1], $argv[2]) === true ? 0 : 1);
   }
   else if ($cmd === '--check' && isset($argv[2])) {
     exit(smCheck($argv[1], $argv[2]) ? 0 : 1);
@@ -83,14 +169,20 @@
     exit(0);
   }
 
-  echo "usage: php tools/sequence/sequence_mirror.php [--defaults|--list|--build <assembly> <file.fa.gz>|--check <assembly> <file.fa.gz>]\n";
+  echo "usage: php tools/sequence/sequence_mirror.php [--core|--nam|--all|--list|--build <assembly> <file.fa.gz>|--check <assembly> <file.fa.gz>]\n"
+     . "  --core  B73 v5, v4 and v3          --nam  the 25 NAM founder lines\n"
+     . "  --all   both                       --defaults  same as --core\n"
+     . "  --probe refresh absent.json with HEAD requests, no downloads\n";
   exit(2);
 
 
 /* Download, decompress and index one published FASTA. Everything is written
    beside the target and renamed into place, so a half-built mirror is never
    visible to a request. */
-function smBuild($assembly, $file) {
+/* true built, null not published, false failed. $skip_missing is for the
+   group builds, where a set that simply has no file of that type is normal --
+   four NAM lines publish no nc.* and Il14H publishes no plain cds. */
+function smBuild($assembly, $file, $skip_missing = false) {
   $url = SM_DATA_URL . '/' . $assembly . '/' . $file;
   $dir = SM_STORE . '/' . $assembly;
   $base = preg_replace('/\.gz$/', '', $file);
@@ -107,9 +199,18 @@ function smBuild($assembly, $file) {
   $t0 = microtime(true);
 
   $tmp_gz = "$fa.download.tmp";
-  if (!smDownload($url, $tmp_gz)) {
-    echo "FAILED to download\n";
+  $code = smDownload($url, $tmp_gz);
+  if ($code !== 200) {
     @unlink($tmp_gz);
+    if ($code === 404) {
+      /* Write it down. get_sequence.php reads this list and skips the
+         candidate outright, because the service answers a request for a file
+         that does not exist with a 502 -- indistinguishable from an outage --
+         and would otherwise spend a retry ladder on it every single time. */
+      smNotePublished($assembly . '/' . $file, false);
+      if ($skip_missing) { echo "not published\n"; return null; }
+    }
+    echo "FAILED to download (HTTP $code)\n";
     return false;
   }
   $gz_bytes = filesize($tmp_gz);
@@ -178,6 +279,7 @@ function smBuild($assembly, $file) {
   }
   @chmod($fa, 0664);
   @chmod($idx, 0664);
+  smNotePublished($assembly . '/' . $file, true);
 
   printf("%7s records  %6.1f MB gz  %6.1f MB fa  %5.1f s\n",
          number_format(count($entries)), $gz_bytes / 1048576.0,
@@ -198,6 +300,46 @@ function smProtectStore() {
   . "<FilesMatch \"\\.(fa|idx|tmp)$\">\n"
   . "  Require all denied\n"
   . "</FilesMatch>\n");
+}
+
+/* Ask whether a file is published, without downloading it, and write the
+   answer down. A HEAD costs about 20 ms. */
+function smProbe($assembly, $file) {
+  $ch = curl_init();
+  curl_setopt_array($ch, array(
+    CURLOPT_URL => SM_DATA_URL . '/' . $assembly . '/' . $file,
+    CURLOPT_NOBODY => true,
+    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_CONNECTTIMEOUT => 10,
+    CURLOPT_TIMEOUT => 30,
+    CURLOPT_USERAGENT => 'MaizeGDB/sequence_mirror.php'
+  ));
+  curl_exec($ch);
+  $code = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+  curl_close($ch);
+  if ($code === 200 || $code === 404) {
+    smNotePublished($assembly . '/' . $file, $code === 200);
+  }
+}
+
+/* The record of which published files exist, at data/sequence/absent.json.
+   Only files this tool has actually asked for are in it, so its absence from
+   the list means nothing and its presence is a checked fact. */
+function smNotePublished($path, $exists) {
+  $file = SM_STORE . '/absent.json';
+  $list = is_file($file) ? json_decode((string) file_get_contents($file), true) : array();
+  if (!is_array($list)) { $list = array(); }
+  if ($exists) {
+    if (!isset($list[$path])) { return; }
+    unset($list[$path]);
+  }
+  else {
+    if (isset($list[$path])) { return; }
+    $list[$path] = date('c');
+  }
+  ksort($list);
+  @file_put_contents($file . '.tmp', json_encode($list, JSON_PRETTY_PRINT));
+  @rename($file . '.tmp', $file);
 }
 
 function smWriteRecord($out, $id, $seq, &$entries, $offset, &$maxid) {
@@ -226,7 +368,8 @@ function smDownload($url, $dest) {
   $code = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
   curl_close($ch);
   fclose($out);
-  return $ok !== false && $code === 200 && filesize($dest) > 0;
+  if ($ok === false || $code !== 200 || filesize($dest) === 0) { return $code === 0 ? -1 : $code; }
+  return 200;
 }
 
 /* Pull ten records at random out of the mirror and compare them with what the

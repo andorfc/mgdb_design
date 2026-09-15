@@ -53,12 +53,22 @@
  *  1. Sequences are read from local disk when they are mirrored there.
  *     tools/sequence/sequence_mirror.php downloads a published FASTA, writes
  *     it one record per line and builds a fixed-width sorted index beside it;
- *     a lookup is a binary search plus one seek. The sets the record pages
- *     link to -- B73 v5, v4 and v3 protein, CDS and cDNA -- index in 19
- *     seconds and take about 1.1 GB. Same 25 cold identifiers as above:
- *     25 answered, 0 failed, mean 139 ms, worst 940 ms. Four sequences in one
- *     request: 29 ms against 2,409 ms. A file that is not mirrored behaves
- *     exactly as before, so this is an optimisation and never a dependency.
+ *     a lookup is a binary search plus one seek. Mirrored: B73 v5, v4 and v3,
+ *     and all 25 NAM founder lines -- protein, CDS, cDNA and the small
+ *     non-coding sets, 7.0 GB and about six minutes to build. Same 25 cold
+ *     identifiers as above: 25 answered, 0 failed, mean 139 ms, worst 940 ms.
+ *     Across the NAM lines, 25 cold identifiers: 25 answered at a mean of
+ *     41 ms and a worst of 74, against 12 of 25 answered at a mean of 1,258 ms.
+ *     Four sequences in one request: 29 ms against 2,409 ms. A file that is
+ *     not mirrored behaves exactly as before, so this is an optimisation and
+ *     never a dependency.
+ *
+ *     The mirror also writes data/sequence/absent.json, the files it asked
+ *     download.maizegdb.org for and was told do not exist -- 67 of them, and
+ *     the whole nc./canonical. family for B73 v4. A candidate naming one is
+ *     skipped rather than retried, because the service answers a request for
+ *     a file that is not there with the same 502 it uses for an outage. That
+ *     one list took the worst NAM lookup from 3,788 ms to 74.
  *
  *  2. The "is the service up?" probe is gone. Every request began with
  *     get_headers('https://fasta.maizegdb.org/'), and a non-200 printed
@@ -103,12 +113,19 @@
  *     as cds, so every cDNA link on the site was returning the CDS. cdna is
  *     tried first now and falls back to cds where no cdna file exists.
  *
- *  9. Position requests work on B73 RefGen_v3. Its chromosomes are named Chr4
+ *  9. The canonical-only file is the last fallback.
+ *     Zm-Il14H-REFERENCE-NAM-1.0 publishes no plain cds.fa.gz -- only
+ *     canonical.cds -- so a CDS request on that line could not be answered for
+ *     any of its 76,559 transcripts. Its 40,301 canonical ones can be now.
+ *     Everything in a canonical file is also in the full file wherever the
+ *     full file exists, so this never changes an answer, only supplies one.
+ *
+ * 10. Position requests work on B73 RefGen_v3. Its chromosomes are named Chr4
  *     where the modern assemblies say chr4, so the example in this file's own
  *     header has always come back empty. The chromosome name is tried as
  *     given and then in the obvious variants.
  *
- * 10. Bugs fixed while in here:
+ * 11. Bugs fixed while in here:
  *     - One failed identifier threw away every sequence that HAD been found:
  *       the formatter did `$new_sequence = "$seq\n"` -- assignment, not
  *       append -- inside the loop over records.
@@ -171,6 +188,7 @@
 
   $system = getSystemInfo('mgdb.conf');
   $seq_started = microtime(true);
+  $seq_degraded = false;   // set once the service has failed in this request
 
   // sequence identifier
   $id_str      = getCGIParam('id',                'GP', false);
@@ -444,6 +462,13 @@ function seqGeneModelRecord($assembly, $annotation, $id, $dbtype) {
     foreach ($types as $type) {
       $candidates[] = seqCandidate($lookup_id, "$assembly/{$assembly}_$ann.$type.fa.gz");
       $candidates[] = seqCandidate($lookup_id, "$assembly/{$assembly}_$ann.nc.$type.fa.gz");
+      /* Last resort: the canonical-only file. Il14H has no
+         Zm-Il14H-REFERENCE-NAM-1.0_Zm00028ab.1.cds.fa.gz published at all --
+         only canonical.cds -- so without this a CDS request on that line
+         cannot be answered for any transcript. Everything in here is also in
+         the main file wherever the main file exists, so it never changes an
+         answer, only supplies one that was missing. */
+      $candidates[] = seqCandidate($lookup_id, "$assembly/{$assembly}_$ann.canonical.$type.fa.gz");
     }
   }
 
@@ -582,7 +607,7 @@ function seqPanGeneRecord($id, $dbtype, $exemplar) {
    when it runs out of candidates, or when the service could not be reached at
    all (which is reported as such rather than as a missing sequence). */
 function seqResolve(&$records) {
-  global $fetch_url, $data_url, $seq_started;
+  global $fetch_url, $data_url, $seq_started, $seq_degraded;
 
   $round = 0;
   while (true) {
@@ -591,14 +616,38 @@ function seqResolve(&$records) {
     foreach ($records as $i => $rec) {
       if ($rec['status'] !== 'pending') { continue; }
       if (!isset($rec['candidates'][$round])) {
-        $records[$i]['status'] = 'missing';
+        /* Out of candidates. Which answer this is depends on whether anything
+           along the way failed for service reasons: "not found" is a claim
+           about the data and must not be made on the strength of a 502. */
+        if (!empty($rec['unavailable'])) {
+          $records[$i]['status'] = 'unavailable';
+          $records[$i]['error'] = 'SEQUENCE SERVICE IS DOWN.';
+        }
+        else {
+          $records[$i]['status'] = 'missing';
+        }
         continue;
       }
       $c = $rec['candidates'][$round];
+      if (seqKnownAbsent($c['path'])) {
+        /* The mirror tool asked download.maizegdb.org for this file and got a
+           404. Skipping it saves a whole retry ladder against a service that
+           answers "no such file" with the same 502 it uses for "I am unwell". */
+        continue;
+      }
       $batch[$i] = "$fetch_url/" . $c['id'] . "/$data_url/" . $c['path'];
       $lookups[$i] = $c;
     }
-    if (count($batch) === 0) { break; }
+    /* An empty batch does not mean the work is done: every candidate this
+       round may have been skipped as not published. Only stop when nothing is
+       pending any more. */
+    if (count($batch) === 0) {
+      $pending = false;
+      foreach ($records as $rec) { if ($rec['status'] === 'pending') { $pending = true; break; } }
+      if (!$pending) { break; }
+      $round++;
+      continue;
+    }
 
     /* Past the deadline nothing more goes out: say so rather than keeping the
        reader waiting through another ladder of fallbacks. */
@@ -620,11 +669,20 @@ function seqResolve(&$records) {
         $records[$i]['label'] = $c['label'];
       }
       else if ($answer['status'] === 'unavailable') {
-        /* Do not walk the rest of the ladder when the service itself is the
-           problem: the fallbacks would fail the same way and each costs
-           another 25 seconds of somebody's patience. */
-        $records[$i]['status'] = 'unavailable';
-        $records[$i]['error'] = 'SEQUENCE SERVICE IS DOWN.';
+        /* Keep walking the ladder. The obvious thing is to stop -- if the
+           service is down the fallbacks will fail the same way -- but the
+           service answers a request for a file that does not EXIST with a 502
+           as well, so "down" and "no such file" look identical from here. That
+           is not hypothetical: Il14H publishes no plain cds.fa.gz, and stopping
+           at the first candidate meant its canonical.cds, sitting mirrored on
+           local disk, was never reached. Remember the failure instead and use
+           it only if nothing further answers.
+
+           $seq_degraded stops the retries for the rest of the request, so a
+           genuine outage costs one attempt per remaining candidate rather than
+           three. */
+        $records[$i]['unavailable'] = true;
+        $seq_degraded = true;
       }
       // 'missing' just falls through to the next candidate.
     }
@@ -706,7 +764,7 @@ function seqFetchAll($urls, $lookups) {
    retrying. One multi handle for the whole request, so the TLS session to
    Cloudflare is negotiated once and reused by every round. */
 function seqHttpAll($urls) {
-  global $seq_started;
+  global $seq_started, $seq_degraded;
   static $mh = null;
   if ($mh === null) {
     $mh = curl_multi_init();
@@ -720,7 +778,8 @@ function seqHttpAll($urls) {
   $pending = $urls;
   $out = array();
 
-  for ($attempt = 0; $attempt < SEQ_ATTEMPTS && count($pending) > 0; $attempt++) {
+  $attempts = $seq_degraded ? 1 : SEQ_ATTEMPTS;
+  for ($attempt = 0; $attempt < $attempts && count($pending) > 0; $attempt++) {
     if (microtime(true) - $seq_started > SEQ_DEADLINE) { break; }
     if ($attempt > 0) {
       usleep(1000 * (isset($delays[$attempt - 1]) ? $delays[$attempt - 1] : 400));
@@ -785,6 +844,21 @@ function seqHttpAll($urls) {
 //////////////////////////////////////////////////////////////////////////////////////////
 //   The local mirror
 //////////////////////////////////////////////////////////////////////////////////////////
+
+/* Files tools/sequence/sequence_mirror.php asked download.maizegdb.org for and
+   was told do not exist -- Il14H publishes no plain cds.fa.gz, four NAM lines
+   publish no nc.* -- so a candidate naming one can be skipped rather than
+   retried. Rebuilt whenever the mirror is. */
+function seqKnownAbsent($path) {
+  static $list = null;
+  if ($list === null) {
+    $file = dirname(__FILE__) . '/../../data/sequence/absent.json';
+    $raw = is_file($file) ? @file_get_contents($file) : false;
+    $list = ($raw === false) ? array() : json_decode($raw, true);
+    if (!is_array($list)) { $list = array(); }
+  }
+  return isset($list[$path]);
+}
 
 /* A published FASTA that has been mirrored onto this machine by
    tools/sequence/sequence_mirror.php: the sequences in one file, one line per
