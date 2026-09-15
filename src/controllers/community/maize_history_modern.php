@@ -76,6 +76,38 @@ $MGDB_HISTORY_LINKS = array(
     ),
 );
 
+/* One event the timeline should carry that mgdb.maize_history cannot hold.
+
+   The web user has SELECT only on that table -- the same reason
+   $MGDB_HISTORY_LINKS above lives here rather than in the data -- so a new row
+   cannot be inserted from the application. Recorded in ADMIN_DEPENDENCIES.md so
+   a curator with write access can promote it into the table; the array is
+   shaped exactly like a row from the query, so when that happens the entry can
+   be deleted from here and nothing else changes.
+
+   Appended rather than merge-sorted: the query orders by `year` ASC, `year` is
+   a 4-character varchar so that ordering is lexicographic, and 2027 is the
+   highest value in play -- so appending keeps the contract the renderer below
+   relies on without re-sorting rows that are already in the right order. */
+$MGDB_HISTORY_EXTRA_EVENTS = array(
+    array(
+        /* Above the table's range (its highest id is 40), so this can never
+           collide with a real row if the table is reloaded. */
+        'maize_history_id' => 1001,
+        /* The 2012 redesign is filed as cooperative_resource; this is the same
+           kind of event and belongs under the same filter chip. */
+        'event_type'       => 'cooperative_resource',
+        'year'             => '2027',
+        'title'            => 'MaizeGDB redesign',
+        'description'      => 'The MaizeGDB team launches a full redesign of the entire MaizeGDB website at 15 years.',
+        'publication'      => '',
+        'pub_link'         => '',
+        'image_name'       => 'MaizeGDBv3.png',
+        'image_caption'    => 'The MaizeGDB home page in 2027.',
+        'image_credit'     => '',
+    ),
+);
+
 /* The cache key carries this file's mtime as well as the data's.
    dashboardCache() keys on the string it is handed plus a global stamp, and
    the whole events payload -- markup included -- is built in the closure
@@ -83,7 +115,7 @@ $MGDB_HISTORY_LINKS = array(
    any edit to this renderer. That is exactly what happened to two other pages
    before it was written down. */
 $page_data = dashboardCache($system, 'history/page_' . (int) @filemtime(__FILE__),
-                            function () use ($DBConn, $MGDB_HISTORY_LINKS) {
+                            function () use ($DBConn, $MGDB_HISTORY_LINKS, $MGDB_HISTORY_EXTRA_EVENTS) {
     $events = array();
     $breakthroughs = 0;
     $meetings = 0;
@@ -97,6 +129,11 @@ $page_data = dashboardCache($system, 'history/page_' . (int) @filemtime(__FILE__
         if ($sth) {
             $events = $sth->fetchAll(PDO::FETCH_ASSOC);
         }
+    }
+
+    // Curated events the table cannot carry. See the note above.
+    foreach ($MGDB_HISTORY_EXTRA_EVENTS as $mgdb_extra_event) {
+        $events[] = $mgdb_extra_event;
     }
 
     /* mgdb.maize_history carries a true duplicate: ids 13 and 29 are both

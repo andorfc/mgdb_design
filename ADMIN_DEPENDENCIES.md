@@ -2898,3 +2898,40 @@ system and could be overwritten.
   coverage of it. A caption saying so would be honest, and is worth adding if
   the gap is going to persist.
 - **Status:** proposed
+
+## AD-075 — The 2027 MaizeGDB redesign timeline entry lives in the controller, not in `mgdb.maize_history`
+
+- **Date:** 2026-09-14
+- **Affected component:** `mgdb.maize_history`;
+  `controllers/community/maize_history_modern.php`; the timeline on
+  `/maize_history` and `/timelines`
+- **Current limitation:** The `mgdb` role has **SELECT only** on
+  `mgdb.maize_history` — confirmed with
+  `has_table_privilege('mgdb.maize_history','INSERT')`, which returns false —
+  so a new milestone cannot be inserted from the application. The 2027 entry
+  ("MaizeGDB redesign", the successor to the 2012 entry at id 33) is therefore
+  carried in `$MGDB_HISTORY_EXTRA_EVENTS` in the controller, shaped exactly like
+  a row from the table and appended to the query result before rendering. This
+  is the same constraint that put `$MGDB_HISTORY_LINKS` in that file.
+- **Requested:** INSERT on `mgdb.maize_history` for whoever maintains the
+  timeline, or a curator with write access adding the row directly:
+
+  | column | value |
+  |---|---|
+  | `event_type` | `cooperative_resource` |
+  | `year` | `2027` |
+  | `title` | `MaizeGDB redesign` |
+  | `description` | `The MaizeGDB team launches a full redesign of the entire MaizeGDB website at 15 years.` |
+  | `image_name` | `MaizeGDBv3.png` |
+  | `image_caption` | `The MaizeGDB home page in 2027.` |
+
+- **Once done:** delete the entry from `$MGDB_HISTORY_EXTRA_EVENTS`. The
+  renderer needs no other change — the array is merged into the same
+  `$events` list the query fills, so the card is already drawn by the shared
+  code path. The dedupe on year + title + description means leaving it in
+  place after the row exists would **not** double the card, but the array
+  should still be emptied so there is one source of truth.
+- **Related:** the image is at `images/maize_history/MaizeGDBv3.png` on the
+  server and `src/images/maize_history/MaizeGDBv3.png` in the repo; it is a
+  300x178 screenshot of the redesigned home page, matching `MaizeGDBv1.png`
+  (2003) and `MaizeGDBv2.png` (2012).

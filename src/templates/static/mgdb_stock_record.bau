@@ -15,10 +15,12 @@ $$SYNTAX-LEVEL 2
       <h1 id="stock-record-title">$(stock_name)$(status_badge)</h1>
       <p class="mgdb-rec-synonyms" id="stock-record-synonyms" hidden></p>
       <dl class="mgdb-record-facts mgdb-rec-headfacts" id="stock-record-facts">$(identity_facts)</dl>
-      ;; The ordering panel. Filled by the glue when the record has a
-      ;; distributor; the cart handoff itself is not built yet.
-      <div id="stock-cart-slot"></div>
     </div>
+    ;; The ordering panel, a sibling of the body rather than the last thing
+    ;; inside it: it is the one action on the record and belongs in its own
+    ;; column on the right, as tall as the header. Filled by the glue when the
+    ;; record has a distributor; the cart handoff itself is not built yet.
+    <div id="stock-cart-slot"></div>
   </section>
 
   <nav class="mgdb-section-tabs mgdb-rec-tabs" id="stock-record-tabs" aria-label="Sections on this record">

@@ -129,7 +129,10 @@ if ($identity['provider'] !== '') {
               : $esc($identity['provider']))
           . '</dd></div>';
 }
-$facts .= '<div><dt>MaizeGDB ID</dt><dd class="mgdb-record-id">' . (int) $stock_id . '</dd></div>';
+/* No MaizeGDB ID here. It is an internal key, it is already in the URL of any
+   record reached by id, and on a germplasm record the two facts a reader wants
+   on the title line are what the stock is and who ships it. The other record
+   pages still carry theirs. */
 $content->get('identity_facts')->replace($facts);
 
 include_once('translation.php');

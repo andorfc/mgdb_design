@@ -495,24 +495,45 @@
    this shell, so the panel is a row inside it rather than an aside beside it.
    -------------------------------------------------------------------------- */
 
-/* Logo beside the controls rather than above them: a third of the height for
-   the same information. */
+/* The ordering panel is the one action on the record, so it gets its own
+   column on the right of the header rather than sitting under the facts as a
+   full-width strip. The hero is a one-column grid in the shell; this page adds
+   the second track and lets the panel stretch to the header's height. */
+.mgdb-stock-record-page > section.mgdb-hero.mgdb-hub-record-hero {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+}
+
+/* No padding: the panel runs the full height of the header and flush to its
+   right edge. The hero is `overflow: hidden` with a 14px radius, so it clips
+   the panel's right corners itself and the panel needs no radius of its own. */
+.mgdb-stock-record-page #stock-cart-slot { display: flex; }
+
+.mgdb-stock-record-page #stock-cart-slot:empty { display: none; }
+
+/* Squarer than it was: the logo sits above the controls in a column about as
+   wide as the header is tall, instead of beside them in a 1,166 x 111 strip.
+   The gold rule moves to the left edge, where it separates the panel from the
+   facts rather than floating over the header's top edge. */
 .mgdb-stock-record-page .stock-cart {
   display: flex;
+  flex-direction: column;
   gap: var(--mgdb-space-3);
   align-items: center;
-  padding: var(--mgdb-space-3) var(--mgdb-space-4);
-  border: 1px solid var(--mgdb-line);
+  justify-content: center;
+  width: clamp(200px, 20vw, 248px);
+  height: 100%;
+  padding: var(--mgdb-space-4);
   border-left: 3px solid var(--mgdb-gold);
-  border-radius: var(--mgdb-radius);
   background: var(--mgdb-surface);
+  text-align: center;
 }
 
 .mgdb-stock-record-page .stock-cart-body {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .mgdb-stock-record-page .stock-cart-logo {
@@ -530,7 +551,6 @@
   font-size: var(--mgdb-text-sm);
   font-weight: 700;
   line-height: var(--mgdb-leading-snug);
-  white-space: nowrap;
 }
 
 .mgdb-stock-record-page .stock-cart-add {
@@ -551,8 +571,28 @@
 }
 
 @media (max-width: 767px) {
-  /* Nothing sits beside the panel at phone width, so it takes the full column
-     and the lead is allowed to wrap. */
-  .mgdb-stock-record-page .stock-cart { align-items: flex-start; }
-  .mgdb-stock-record-page .stock-cart-lead { white-space: normal; }
+  /* One column at phone width: the panel drops under the facts and takes the
+     full width, so the square shape and the fixed width both come off. */
+  .mgdb-stock-record-page > section.mgdb-hero.mgdb-hub-record-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mgdb-stock-record-page .stock-cart {
+    width: 100%;
+    height: auto;
+    border-left: 0;
+    border-top: 3px solid var(--mgdb-gold);
+  }
 }
+
+/* --------------------------------------------------------------------------
+   Header fact labels carry a colon
+
+   "Type inbred line" reads as two facts; "Type: inbred line" reads as one.
+   Written as a pseudo-element rather than into the two strings the controller
+   builds, so a third label added later is punctuated too and the text a reader
+   copies is still the label. Scoped to this page's header facts; the overview
+   facts below use the shared record layout and are left alone.
+   -------------------------------------------------------------------------- */
+
+.mgdb-stock-record-page .mgdb-rec-headfacts dt::after { content: ":"; }
