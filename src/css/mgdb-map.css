@@ -20,10 +20,13 @@
   border-color: var(--mgdb-line);
 }
 
-.mgdb-map-page .mgdb-hero-emblem svg {
-  width: min(100%, 64px);
+/* 168px, the same as the insertion hub's strip, because this emblem is the
+   ten chromosomes in a row with their numbers under them -- 2:1, and the
+   numbers are the point. At 64 they are three pixels tall and the mark says
+   nothing. It costs no height: the hero body already makes the panel 186. */
+.mgdb-map-page .mgdb-hero-emblem img {
+  width: min(100%, 168px);
   height: auto;
-  mix-blend-mode: normal;
 }
 
 /* ── Sticky section tabs ─────────────────────────────────────────────────── */
