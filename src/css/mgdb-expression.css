@@ -19,10 +19,18 @@
   border-color: var(--mgdb-line);
 }
 
-.mgdb-expression-page .mgdb-hero-emblem svg {
-  width: min(100%, 64px);
+/* 96px rather than the shared 64. The emblem is a clustered heat map, so it
+   is made of about 150 cells and a dendrogram rather than two or three bold
+   shapes: at 64 the cells are four pixels each and it reads as speckle, and
+   at 96 the map and its tree are both legible. It costs no height -- the
+   panel is as tall as the hero body either way.
+
+   The PNG keeps its real transparency instead of the white matte most emblems
+   ship with, so the shell's multiply blend leaves the panel showing through
+   the gaps in the dendrogram rather than a white box. */
+.mgdb-expression-page .mgdb-hero-emblem img {
+  width: min(100%, 96px);
   height: auto;
-  mix-blend-mode: normal;
 }
 
 /* ── Sticky section tabs ─────────────────────────────────────────────────── */
