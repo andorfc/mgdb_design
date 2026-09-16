@@ -14,6 +14,26 @@
 
 /* ── The Data Hub shell on a listing page ────────────────────────────────── */
 
+/* ── Hero emblem ─────────────────────────────────────────────────────────── */
+
+/* This page used the basic hero -- an icon span beside a title -- while every
+   other hub carries the emblem panel. Same shape as the rest now.
+
+   Sized by height, as on the locus and QTL hubs: the emblem is a poster on an
+   easel, a 0.72:1 portrait where the shell assumes a square, so a width of 64
+   would stand it 88 tall and a width large enough to read would stand it
+   taller than the panel. */
+.mgdb-projects-page .mgdb-hero-emblem {
+  background: #ffffff;
+  border-color: var(--mgdb-line);
+}
+
+.mgdb-projects-page .mgdb-hero-emblem img {
+  width: auto;
+  max-width: 100%;
+  height: 104px;
+}
+
 /* Loaded after css/mgdb-modern.css and css/mgdb-hub.css. The shell settles the
    pale ground, the white section cards and their coloured top edges, the
    absence of a rule under a section title and the green Related resources
