@@ -38,8 +38,13 @@
   border-color: var(--mgdb-line);
 }
 
+/* 120px, not the 76 the sibling structure pages use. This hero's body runs to
+   214px, so everything up to 120 is free -- the emblem panel is as tall as the
+   body either way -- and the ribbon is worth the room. The PNG was also
+   cropped to the model on 2026-09-15; it had about 11% of dead margin on each
+   side, so the same box now holds a mark a third larger again. */
 .mgdb-modern .ps-hero-icon {
-  width: min(100%, 76px);
+  width: min(100%, 120px);
   height: auto;
   object-fit: contain;
 }
