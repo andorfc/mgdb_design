@@ -45,10 +45,21 @@
   border-color: var(--mgdb-line);
 }
 
+/* 120px, matching the protein structure hub; this hero body is 321px tall so
+   the panel is that tall regardless and the width costs nothing. */
 .mgdb-modern .af-hero-icon {
-  width: min(100%, 76px);
+  width: min(100%, 120px);
   height: auto;
   object-fit: contain;
+}
+
+/* The FAQ uses the basic hero rather than the emblem panel, so its icon is
+   sized by the shared .mgdb-hero-basic-icon box -- 84px, and used by pages
+   well beyond this one. Widened here only, under the page's own class: its
+   hero is 239px tall and holds 120 without moving. */
+.af-faq-page .mgdb-hero-basic-icon {
+  width: 120px;
+  height: 120px;
 }
 
 /* AlphaFill's release string is longer than the generic freshness stamp. Keep

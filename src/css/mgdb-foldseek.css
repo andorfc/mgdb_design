@@ -45,9 +45,13 @@
 
 /* ── Hero ────────────────────────────────────────────────────────────────── */
 
+/* 120px, matching the protein structure hub. The hero body runs to 223px, so
+   the emblem panel is that tall whatever the icon does and everything up to
+   120 is free. Sized by width with height: auto now that the PNG is cropped
+   to the model and no longer square. */
 .mgdb-foldseek-page .fs-hero-icon {
-  width: 80px;
-  height: 80px;
+  width: min(100%, 120px);
+  height: auto;
   object-fit: contain;
 }
 
