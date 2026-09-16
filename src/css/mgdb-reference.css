@@ -20,9 +20,18 @@
   border-color: var(--mgdb-line);
 }
 
-.mgdb-reference-page .mgdb-hero-emblem svg {
-  width: min(100%, 64px);
+/* 120px rather than the shared 64. The emblem is four fanned journal covers,
+   so at 64 the spines are thirteen pixels each and it reads as a smear of
+   colour; at 120 the four are distinct. It costs the hero six pixels -- 100
+   would be free, and the difference is worth them.
+
+   The blend stays normal, as on the image hub: this is a photographic render
+   on white with a soft shadow, and that shadow is what separates the covers
+   from the panel. */
+.mgdb-reference-page .mgdb-hero-emblem img {
+  width: min(100%, 120px);
   height: auto;
+  mix-blend-mode: normal;
 }
 
 /* ── Sticky section tabs ─────────────────────────────────────────────────── */
