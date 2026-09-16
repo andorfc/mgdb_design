@@ -118,20 +118,5 @@ $$SYNTAX-LEVEL 2
       )
     </li>
 
-    <li class="mega-search-legacy" aria-hidden="true">
-      *(search-item {load: templates/home/megamenu_modern/search.bau}
-        &(lambda
-          $image_dir = $this->reflect(\)->upstream('maizegdb_header_modern'\)->get('image-dir'\);
-          $icon_dir  = $this->reflect(\)->upstream('maizegdb_header_modern'\)->get('icon-dir'\);
-
-          $loaded = $this->reflect(\)->_parent(\);
-          if ($loaded->has('image-dir'\)\)
-            $loaded->get('image-dir'\)->replace($image_dir->value(\)\);
-          if ($loaded->has('icon-dir'\)\)
-            $loaded->get('icon-dir'\)->replace($icon_dir->value(\)\);
-        )
-      )
-    </li>
-
   </ul>
 )

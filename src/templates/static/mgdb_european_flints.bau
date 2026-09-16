@@ -13,23 +13,20 @@ $$SYNTAX-LEVEL 2
 
   <!-- HERO SECTION -->
   <section class="mgdb-hero" aria-labelledby="flints-title">
-    <div class="mgdb-hero-emblem" aria-hidden="true" style="background:#ffffff; border:1px solid #e2e8f0;">
-      <svg width="56" height="56" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- Maize flint cob outline -->
-        <path d="M32 6C23 6 18 18 18 36C18 50 24 58 32 58C40 58 46 50 46 36C46 18 41 6 32 6Z" fill="#fef9c3" stroke="#854d0e" stroke-width="2.5"/>
-        <!-- Kernels grid -->
-        <circle cx="26" cy="20" r="3.2" fill="#ca8a04"/>
-        <circle cx="38" cy="20" r="3.2" fill="#eab308"/>
-        <circle cx="32" cy="27" r="3.2" fill="#b45309"/>
-        <circle cx="24" cy="34" r="3.2" fill="#d97706"/>
-        <circle cx="40" cy="34" r="3.2" fill="#ca8a04"/>
-        <circle cx="32" cy="41" r="3.2" fill="#eab308"/>
-        <circle cx="26" cy="48" r="3.2" fill="#b45309"/>
-        <circle cx="38" cy="48" r="3.2" fill="#d97706"/>
-        <!-- Husk leaves -->
-        <path d="M18 48C14 54 8 58 4 60C12 58 18 52 20 46" stroke="#15803d" stroke-width="2.5" stroke-linecap="round"/>
-        <path d="M46 48C50 54 56 58 60 60C52 58 46 52 44 46" stroke="#15803d" stroke-width="2.5" stroke-linecap="round"/>
-      </svg>
+    ;; The project's wordmark, hosted here like every other project mark in
+    ;; /images/quicklinks/. This one is a WORDMARK, 367x74 -- about 5:1 -- not a
+    ;; square badge like NAM, HiLo, PanAnd and CAAS, so it carries no
+    ;; width/height attributes \(they would stretch it\) and
+    ;; mgdb-european-flints.css sizes it; the shell's 64px width cap would leave
+    ;; it 13px tall.
+    ;;
+    ;; The caption stays: the wordmark reads "European Maize", which is not the
+    ;; name of this project. "European Flints" is.
+    ;;
+    ;; No inline white background here, unlike the drawn SVG this replaces. The
+    ;; file has a transparent ground, so it sits on the emblem's own panel.
+    <div class="mgdb-hero-emblem">
+      <img src="/images/quicklinks/european_maize.png" alt="" decoding="async" />
       <strong>European<br />Flints</strong>
     </div>
     <div class="mgdb-hero-body">

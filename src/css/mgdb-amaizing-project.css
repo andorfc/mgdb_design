@@ -590,3 +590,25 @@
 .mgdb-amaizing-project-page .amaizing-table thead th,
 .mgdb-amaizing-project-page .amaizing-table thead th button { white-space: normal; text-align: left; }
 .mgdb-amaizing-project-page .amaizing-assembly-link { white-space: nowrap; }
+
+/* --------------------------------------------------------------------------
+   Project mark
+
+   The AMAIZING logo is landscape -- 300x178 -- where the NAM, HiLo and PanAnd
+   marks the shell was written around are square 128x128 files. The shell caps
+   an emblem image at 64px WIDE, which on a 1.69:1 logo leaves it 38px tall:
+   visibly slighter than its siblings on the neighbouring project pages, and too
+   small to read the wordmark it carries.
+
+   Matched on height instead. 64px tall is 108px wide, well inside the emblem's
+   185px of inner width, and gives this page's mark the same vertical weight as
+   the square ones. `min(100%, …)` is kept from the shell so the mark still
+   shrinks rather than overflows on a narrow emblem.
+   -------------------------------------------------------------------------- */
+
+.mgdb-amaizing-project-page .mgdb-hero-emblem img { width: min(100%, 108px); }
+
+@media (max-width: 720px) {
+  /* The shell drops emblem art to 44px wide here; same reasoning, on height. */
+  .mgdb-amaizing-project-page .mgdb-hero-emblem img { width: min(100%, 74px); }
+}

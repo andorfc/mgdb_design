@@ -13,17 +13,19 @@ $$SYNTAX-LEVEL 2
 
   <!-- HERO SECTION -->
   <section class="mgdb-hero" aria-labelledby="amaizing-title">
-    <div class="mgdb-hero-emblem" aria-hidden="true" style="background:#ffffff; border:1px solid #e2e8f0;">
-      <svg width="56" height="56" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- European hex/star pattern with maize ear -->
-        <polygon points="32,8 54,20 54,44 32,56 10,44 10,20" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2.5"/>
-        <path d="M32 16C26 16 22 26 22 36C22 46 27 50 32 50C37 50 42 46 42 36C42 26 38 16 32 16Z" fill="#fef08a" stroke="#ca8a04" stroke-width="2"/>
-        <circle cx="28" cy="28" r="2" fill="#d97706"/>
-        <circle cx="36" cy="28" r="2" fill="#d97706"/>
-        <circle cx="32" cy="36" r="2" fill="#d97706"/>
-        <circle cx="28" cy="44" r="2" fill="#d97706"/>
-        <circle cx="36" cy="44" r="2" fill="#d97706"/>
-      </svg>
+    ;; The project's own logo, hosted here rather than hotlinked from
+    ;; cnrgv.toulouse.inrae.fr. Same arrangement as the NAM, HiLo and PanAnd
+    ;; project pages, which keep their marks in /images/quicklinks/. The inline
+    ;; white background and border that sat on this div went with the drawn SVG
+    ;; it was framing: the shell already gives the emblem its own ground, and
+    ;; `.mgdb-hero-emblem img` blends on multiply, which needs the logo's white
+    ;; to be the same white as the panel behind it.
+    ;;
+    ;; No width/height pair here, unlike the square 128x128 sibling marks: this
+    ;; one is 300x178, so the intrinsic size is what keeps it from being
+    ;; stretched to a square. The shell sizes it to 64px wide, 38px tall.
+    <div class="mgdb-hero-emblem">
+      <img src="/images/quicklinks/amaizing.png" alt="" decoding="async" />
       <strong>AMAIZING<br />Genomes</strong>
     </div>
     <div class="mgdb-hero-body">

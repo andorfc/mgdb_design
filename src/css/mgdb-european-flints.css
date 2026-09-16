@@ -629,3 +629,24 @@
 .mgdb-european-flints-page .flints-table thead th,
 .mgdb-european-flints-page .flints-table thead th button { white-space: normal; text-align: left; }
 .mgdb-european-flints-page .flints-assembly-link { white-space: nowrap; }
+
+/* --------------------------------------------------------------------------
+   Project mark
+
+   A wordmark, 367x74, where the shell's emblem rule was written for square
+   badges and caps an image at 64px WIDE (44px under 720px). At 5:1 that cap
+   would leave this one 13px tall and unreadable, and the trick used on
+   /amaizing_project -- size it by height instead -- does not transfer either:
+   64px tall would be 317px wide, far past the emblem's 185px of inner width.
+
+   So it is sized to the emblem's width rather than to its siblings' dimensions:
+   160px wide is 32px tall and sits inside the 185px with a little air either
+   side. `min(100%, …)` keeps the shell's behaviour of shrinking rather than
+   overflowing when the emblem is narrower than that.
+   -------------------------------------------------------------------------- */
+
+.mgdb-european-flints-page .mgdb-hero-emblem img { width: min(100%, 160px); }
+
+@media (max-width: 720px) {
+  .mgdb-european-flints-page .mgdb-hero-emblem img { width: min(100%, 118px); }
+}

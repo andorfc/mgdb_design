@@ -13,26 +13,20 @@ $$SYNTAX-LEVEL 2
 
   <!-- HERO SECTION -->
   <section class="mgdb-hero" aria-labelledby="caas-title">
-    <div class="mgdb-hero-emblem" aria-hidden="true" style="background:#ffffff; border:1px solid #e2e8f0;">
-      <svg width="56" height="56" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- Central network hub representing 12 founder lines -->
-        <circle cx="32" cy="32" r="22" stroke="#dc2626" stroke-width="2.5" fill="#fef2f2"/>
-        <circle cx="32" cy="32" r="6" fill="#b91c1c"/>
-        <!-- 6 radial nodes -->
-        <circle cx="32" cy="14" r="3" fill="#dc2626"/>
-        <circle cx="48" cy="23" r="3" fill="#dc2626"/>
-        <circle cx="48" cy="41" r="3" fill="#dc2626"/>
-        <circle cx="32" cy="50" r="3" fill="#dc2626"/>
-        <circle cx="16" cy="41" r="3" fill="#dc2626"/>
-        <circle cx="16" cy="23" r="3" fill="#dc2626"/>
-        <!-- Connecting spokes -->
-        <line x1="32" y1="26" x2="32" y2="17" stroke="#b91c1c" stroke-width="1.5"/>
-        <line x1="36" y1="29" x2="45" y2="24" stroke="#b91c1c" stroke-width="1.5"/>
-        <line x1="36" y1="35" x2="45" y2="40" stroke="#b91c1c" stroke-width="1.5"/>
-        <line x1="32" y1="38" x2="32" y2="47" stroke="#b91c1c" stroke-width="1.5"/>
-        <line x1="28" y1="35" x2="19" y2="40" stroke="#b91c1c" stroke-width="1.5"/>
-        <line x1="28" y1="29" x2="19" y2="24" stroke="#b91c1c" stroke-width="1.5"/>
-      </svg>
+    ;; The academy's own mark, hosted here rather than hotlinked -- the same
+    ;; arrangement as the NAM, HiLo, PanAnd and AMAIZING project pages, whose
+    ;; marks all live in /images/quicklinks/. Square, 128x128 like its three
+    ;; square siblings, so the shell's own 64px cap sizes it correctly and this
+    ;; page needs no rule of its own \(unlike /amaizing_project, whose mark is
+    ;; landscape\).
+    ;;
+    ;; The inline white background and border went with the drawn SVG they were
+    ;; framing: the shell gives the emblem its ground, and
+    ;; `.mgdb-hero-emblem img` blends on multiply, which needs the logo's white
+    ;; to be the same white as the panel behind it. This file has no alpha, so
+    ;; that blend is what removes its white square.
+    <div class="mgdb-hero-emblem">
+      <img src="/images/quicklinks/caas.png" alt="" width="128" height="128" decoding="async" />
       <strong>CAAS-FIL<br />Genomes</strong>
     </div>
     <div class="mgdb-hero-body">

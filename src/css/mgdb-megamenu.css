@@ -16,6 +16,43 @@
     Scoped to the main header so legacy footer menus keep their layout.
     _______________________________________  */
 
+/* Standalone foundation
+   --------------------------------------------------------------------------
+   The first version of this sheet restyled the old mega menu but still relied
+   on css/megamenu.css for its positioning reset. Modern pages no longer load
+   that legacy sheet, so keep the small set of structural rules here. These are
+   intentionally limited to the modern menu; the legacy shell continues to own
+   and load its original CSS unchanged. */
+
+.mgdb-modern #menu_bar {
+	position:relative;
+	margin:0 auto;
+	list-style:none;
+	z-index:9999;
+}
+
+.mgdb-modern #menu_bar > li {
+	position:relative;
+	list-style:none;
+	text-align:left;
+	z-index:9999;
+}
+
+.mgdb-modern #menu_bar > li > a {
+	display:block;
+	text-decoration:none;
+}
+
+.mgdb-modern #menu_bar [class*="dropdown_"] {
+	position:absolute;
+	left:-999em;
+	text-align:left;
+}
+
+.mgdb-modern #menu_bar .dropdown_fullwidth {
+	width:920px;
+}
+
 .mgdb-modern #menu_bar {
 	display:flex;
 	align-items:center;
