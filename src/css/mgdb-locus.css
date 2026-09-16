@@ -19,9 +19,16 @@
   border-color: var(--mgdb-line);
 }
 
-.mgdb-locus-page .mgdb-hero-emblem svg {
-  width: min(100%, 64px);
-  height: auto;
+/* Sized by HEIGHT, not width. The emblem is a chromosome with an arrow at one
+   band, so it is a 0.55:1 portrait where the shell assumes a square: at the
+   shared 64px wide it would stand 116 tall and drive the panel. 96 tall is 54
+   wide, matches the weight of a 64px square, and costs nothing -- the hero
+   body already makes the panel 186. The multiply the shell sets on an emblem
+   image drops the white matte. */
+.mgdb-locus-page .mgdb-hero-emblem img {
+  width: auto;
+  max-width: 100%;
+  height: 96px;
 }
 
 /* ── Sticky section tabs ─────────────────────────────────────────────────── */
