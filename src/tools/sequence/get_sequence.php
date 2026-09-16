@@ -115,12 +115,19 @@
  *     no network. If the service is unreachable and any cached copy exists,
  *     even an expired one, it is served rather than an error.
  *
- *  8. cdna no longer silently means cds. The old code did
+ *  8. cdna no longer silently means cds. The copy of this script on dev8 did
  *     `if ($dbtype == 'cdna') $dbtype = 'cds';` with the comment "we rarely
  *     have cDNA sequence". There IS a cdna file for B73 v5, for v4 and for
  *     every NAM line: Zm00001eb168550_T001 is 1,695 nt as cdna and 1,140 nt
- *     as cds, so every cDNA link on the site was returning the CDS. cdna is
- *     tried first now and falls back to cds where no cdna file exists.
+ *     as cds. cdna is tried first now and falls back to cds where no cdna
+ *     file exists.
+ *
+ *     NOT a live bug, and I said it was before checking: production does not
+ *     have that rewrite -- sequence2 returns 1,695 for cdna and 1,140 for cds,
+ *     probed both ways. The dev8 copy this repository took as its baseline is
+ *     an OLDER revision than production's, which also means production may
+ *     carry other changes that are not here. Diff before deploying over it;
+ *     the checklist in AD-077 starts with that step.
  *
  *  9. The canonical-only file is the last fallback.
  *     Zm-Il14H-REFERENCE-NAM-1.0 publishes no plain cds.fa.gz -- only

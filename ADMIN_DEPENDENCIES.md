@@ -3013,23 +3013,105 @@ system and could be overwritten.
     the normal release. Both are in `deploy/manifest.txt`; nothing else is
     needed and no Apache configuration changes. sequence2 picks the new script
     up the moment the file is replaced.
-  - **What production gains without doing anything else:** no health probe (so
-    no invented "SEQUENCE SERVICE IS DOWN"), timeouts, retries that tell a
-    transient 502 from a real miss, several identifiers fetched at once, a
-    response cache, and cDNA that is cDNA rather than CDS. The local mirror is
-    optional — with no `data/sequence/` directory every lookup takes the
-    service path exactly as it does today.
-  - **What production gains by also running the mirror:**
-    `php tools/sequence/sequence_mirror.php --discover` then `--all` and
-    `--genomic`, about 12 GB and an hour. Worth checking there is disk first.
+  - **What production gains:** no health probe, so no invented "SEQUENCE
+    SERVICE IS DOWN"; timeouts where there were none; retries that tell a
+    transient 502 from a real miss, instead of reporting an outage as
+    "sequence not found"; several identifiers fetched at once rather than one
+    at a time; a response cache; working position requests on B73 RefGen_v3.
+    The local mirror is optional — with no `data/sequence/` directory every
+    lookup takes the service path exactly as it does today.
   - Until the deploy happens the redesign's own pages link to this instance's
     copy (`gene_api_sequence_service()` in `include/api/v1/records/gene.php`),
-    which is a one-line revert when they are the same script.
-  - **Note for whoever deploys it:** the response cache wants a writable
-    directory. It prefers `sequence_cache_path` or
-    `<search_cache_path>/sequence` from `conf/mgdb.conf` and falls back to the
-    php-fpm private tmp, which is emptied when the service restarts. See
-    item 3 below for the same problem on dev8.
+    which is a one-line revert once they are the same script.
+
+  ### Deploy checklist
+
+  One file, optionally followed by a data build. Steps 1 and 5 are the ones
+  not to skip.
+
+  - [ ] **1. Diff production's copy against the repo baseline before
+        overwriting anything.** The baseline in this repository (commit
+        `28116b4`) is the copy that sits on dev8, and **production is not the
+        same revision**: probed on 2026-09-15 it has the health probe and the
+        old error wording, but it does *not* have the `cdna -> cds` rewrite
+        that dev8's copy has. Something has been fixed there and never came
+        back to dev8, so assume there may be more:
+
+        diff <(git show 28116b4:src/tools/sequence/get_sequence.php) \
+             <production-webroot>/tools/sequence/get_sequence.php
+
+        Anything that shows up is a production change the hardened version
+        does not know about. Carry it over before step 3. (The cDNA difference
+        itself is already handled — the hardened script asks for the cdna file
+        first and falls back to cds, which reproduces production's behaviour
+        on every assembly.)
+
+  - [ ] **2. Take a before reading.** Run the check in step 5 against
+        production now and keep the numbers. Retry anything that answers
+        `SEQUENCE SERVICE IS DOWN`; that is the bug being fixed and it fires
+        on roughly one request in thirty.
+
+  - [ ] **3. Deploy the two files** to the production web root, as part of a
+        normal release. Both are in `deploy/manifest.txt`:
+
+        tools/sequence/get_sequence.php
+        tools/sequence/sequence_mirror.php
+
+        No Apache configuration changes. sequence2 serves the new script the
+        moment the file lands, because its document root *is* that directory.
+
+  - [ ] **4. Confirm the script parses** before trusting the page:
+        `php -l <production-webroot>/tools/sequence/get_sequence.php`
+
+  - [ ] **5. Verify.** Every line should match the "expected" column; the
+        lengths are the sequence only, header and line breaks stripped.
+
+    | request (`?` … against sequence2.maizegdb.org) | expected |
+    |---|---|
+    | `gene-model-set=Zm00001eb.1&dbtype=protein&id=Zm00001eb168550_P001` | FASTA, 379 aa |
+    | `gene-model-set=Zm00001eb.1&dbtype=cds&id=Zm00001eb168550_T001` | 1,140 nt |
+    | `gene-model-set=Zm00001eb.1&dbtype=cdna&id=Zm00001eb168550_T001` | 1,695 nt — must stay 1,695, not 1,140 |
+    | `assembly=B73%20RefGen_v3&annotation=5b%2B&dbtype=cdna&id=GRMZM2G138676_T01` | 2,009 nt |
+    | `gene-model-set=Zm00001eb.1&dbtype=protein&id=Zm00001eb168550_P001,…_P002,…_P003,…_P004` | four records, and faster than four separate requests |
+    | `gene-model-set=Zm00001eb.1&dbtype=protein&id=NOPE_P999` | `ERROR: sequence not found for 'NOPE_P999' in assembly 'Zm-B73-REFERENCE-NAM-5.0', annotation 'Zm00001eb.1'.` |
+    | `dbtype=nuc&assembly=B73%20RefGen_v3&position=chr4:350010-350200` | FASTA — this returns nothing today |
+
+        And the negative check that matters: **run any one of them thirty
+        times and expect no `SEQUENCE SERVICE IS DOWN`.** Before the deploy
+        that appears on about one request in thirty; after it, only when the
+        service is genuinely unreachable after three tries.
+
+  - [ ] **6. Optional — build the local mirror.** Skip this and everything
+        still works, just over the network. Needs about **12 GB** of disk and
+        an hour; check `df -h` first.
+
+        cd <production-webroot>
+        php tools/sequence/sequence_mirror.php --discover
+        php tools/sequence/sequence_mirror.php --all
+        php tools/sequence/sequence_mirror.php --genomic
+        php tools/sequence/sequence_mirror.php --list
+
+        Then spot-check it against the service, which is what `--check` is
+        for:
+
+        php tools/sequence/sequence_mirror.php --check \
+          Zm-B73-REFERENCE-NAM-5.0 Zm-B73-REFERENCE-NAM-5.0_Zm00001eb.1.protein.fa.gz
+
+        It writes only under `data/sequence/`, which is not in the deploy
+        manifest, so a later deploy will not disturb it. **Rebuild it after an
+        annotation release**, and nowhere else.
+
+  - [ ] **7. Optional — give the response cache somewhere to live.** It
+        prefers `sequence_cache_path`, then `<search_cache_path>/sequence`
+        from `conf/mgdb.conf`, and falls back to the php-fpm private tmp,
+        which is emptied whenever the service restarts. A real directory owned
+        by the web user is better. See item 3 below for the SELinux version of
+        this problem on dev8.
+
+  - [ ] **8. Rolling back** is restoring the previous `get_sequence.php`; the
+        new one keeps no state that the old one would trip over.
+        `data/sequence/` can be left in place or deleted, and nothing else
+        reads it.
 
   **1b. Nine NAM gene-model FASTA files are not published at all.** Checked
   with a real request, not inferred: `Zm-Il14H-REFERENCE-NAM-1.0` has no plain
