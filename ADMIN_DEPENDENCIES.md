@@ -2998,18 +2998,38 @@ system and could be overwritten.
   on 2026-09-15 (see the header of `tools/sequence/get_sequence.php` for the
   measurements). Three things it cannot do for itself:
 
-  **1. Production still runs the old script.** `sequence2.maizegdb.org` is a
-  vhost with its own document root whose index *is* `get_sequence.php` — it is
-  not the main site's `tools/sequence/` path, so deploying the repository does
-  not update it. Until that copy is replaced, every page that links to
-  sequence2 keeps the health probe that reports "SEQUENCE SERVICE IS DOWN"
-  about 3% of the time, the one-identifier-at-a-time fetching, and the
-  transient 502 reported as "sequence not found". The redesign's own pages now
-  link to this instance's copy instead (`gene_api_sequence_service()` in
-  `include/api/v1/records/gene.php`).
-  - **Requested:** point the sequence2 document root at the site's
-    `tools/sequence/` directory, or copy the hardened script into it. The
-    script is unchanged in its parameters and output.
+  **1. Production still runs the old script — and this needs a deploy, not a
+  vhost change.** `sequence2.maizegdb.org` is a vhost of its own whose
+  DirectoryIndex is `get_sequence.php`, and **its document root is already the
+  production site's `tools/sequence/` directory**. Established from outside on
+  2026-09-15: `https://sequence2.maizegdb.org/test_fasta_api.pl` returns the
+  file that sits beside `get_sequence.php` in `tools/sequence/`, byte for byte
+  (md5 `73e250f0…`, identical to this instance's copy), and the script's own
+  `include_once('../../include/db-api.php')` resolves, so two levels above that
+  document root is a full site tree. An earlier version of this entry said the
+  document root had to be re-pointed; that was wrong.
+  - **Requested:** deploy `tools/sequence/get_sequence.php` and
+    `tools/sequence/sequence_mirror.php` to the production web root as part of
+    the normal release. Both are in `deploy/manifest.txt`; nothing else is
+    needed and no Apache configuration changes. sequence2 picks the new script
+    up the moment the file is replaced.
+  - **What production gains without doing anything else:** no health probe (so
+    no invented "SEQUENCE SERVICE IS DOWN"), timeouts, retries that tell a
+    transient 502 from a real miss, several identifiers fetched at once, a
+    response cache, and cDNA that is cDNA rather than CDS. The local mirror is
+    optional — with no `data/sequence/` directory every lookup takes the
+    service path exactly as it does today.
+  - **What production gains by also running the mirror:**
+    `php tools/sequence/sequence_mirror.php --discover` then `--all` and
+    `--genomic`, about 12 GB and an hour. Worth checking there is disk first.
+  - Until the deploy happens the redesign's own pages link to this instance's
+    copy (`gene_api_sequence_service()` in `include/api/v1/records/gene.php`),
+    which is a one-line revert when they are the same script.
+  - **Note for whoever deploys it:** the response cache wants a writable
+    directory. It prefers `sequence_cache_path` or
+    `<search_cache_path>/sequence` from `conf/mgdb.conf` and falls back to the
+    php-fpm private tmp, which is emptied when the service restarts. See
+    item 3 below for the same problem on dev8.
 
   **1b. Nine NAM gene-model FASTA files are not published at all.** Checked
   with a real request, not inferred: `Zm-Il14H-REFERENCE-NAM-1.0` has no plain

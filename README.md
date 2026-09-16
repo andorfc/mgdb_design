@@ -6181,10 +6181,13 @@ published file when it is sitting in it. `absent.json` is the only thing here
 that may state a file does not exist, and it says so on the strength of a 404
 from download.maizegdb.org.
 
-`sequence2.maizegdb.org` is a separate vhost with its own copy of the script
-and is **not** updated by a deploy; it still runs the old one. AD-077 asks for
-that to change. Until it does, build sequence URLs with
-`gene_api_sequence_service()` rather than naming a host.
+`sequence2.maizegdb.org` is a vhost of its own whose DirectoryIndex is
+`get_sequence.php`, and **its document root is the production site's
+`tools/sequence/` directory** — so a deploy of this repository to the
+production web root updates it, with no Apache change. It still runs the old
+script because that deploy has not happened; AD-077 has the details. Until it
+does, build sequence URLs with `gene_api_sequence_service()` rather than naming
+a host.
 
 
 ## The homepage

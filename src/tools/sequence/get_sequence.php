@@ -162,10 +162,21 @@
  * against the old script over 19 request shapes and against production
  * sequence2 for the v3 cases, byte for byte.
  *
- * NOT FIXED, and not fixable here: B73 v1 and v2 have no .fai/.gzi beside any
- * of their FASTA files on download.maizegdb.org, so the service cannot read
- * them at all -- every v1 and v2 sequence and position request has always
- * come back empty. See ADMIN_DEPENDENCIES AD-077.
+ * THIS FILE IS WHAT sequence2.maizegdb.org SERVES, once it is deployed there.
+ * That vhost's DirectoryIndex is get_sequence.php and its document root is the
+ * production site's tools/sequence/ directory -- confirmed from outside:
+ * https://sequence2.maizegdb.org/test_fasta_api.pl returns the file that sits
+ * beside this one, byte for byte. So there is no Apache change to make and no
+ * second copy to keep in step; deploying the web root is the whole of it. The
+ * local mirror is optional -- with no data/sequence/ directory every lookup
+ * takes the service path, as production does today.
+ *
+ * STILL NOT FIXABLE HERE: B73 v1 and v2 have no .fai/.gzi beside any of their
+ * FASTA files on download.maizegdb.org, so the service cannot read them at all
+ * and every v1 and v2 request through it comes back empty. Gene-model
+ * sequences for both are served from the mirror, which builds its own index;
+ * whole-assembly POSITION requests on v1 and v2 still cannot be answered.
+ * See ADMIN_DEPENDENCIES AD-077.
  */
 
   include_once('../../include/db-api.php');
