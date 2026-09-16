@@ -19,10 +19,14 @@
   border-color: var(--mgdb-line);
 }
 
-.mgdb-gene-product-page .mgdb-hero-emblem svg {
-  width: min(100%, 64px);
+/* The emblem is DNA to transcript to folded protein read left to right, so it
+   is a 1.8:1 landscape rather than the square mark most hubs carry. At the
+   shared 64px it is 36 tall and looks lighter than its neighbours; at 112 the
+   three stages are legible and it sits at about the weight of a 64px square.
+   The multiply the shell sets on an emblem image drops the white matte. */
+.mgdb-gene-product-page .mgdb-hero-emblem img {
+  width: min(100%, 112px);
   height: auto;
-  mix-blend-mode: normal;
 }
 
 /* Two words on the first line, so the emblem column needs a little more room
