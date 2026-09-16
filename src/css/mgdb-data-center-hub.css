@@ -19,9 +19,15 @@
   border-color: var(--mgdb-line);
 }
 
-.mgdb-data-center-hub .data-hub-hero-svg {
+/* 150px, well past the 64 the other hubs use, because this emblem is a whole
+   hub-and-spoke picture -- a database with eight satellites, several of them
+   the emblems of the hubs this page indexes -- rather than a single mark. At
+   64 it is a smudge; at 150 the satellites are legible and the panel is full.
+   With the label under it the hero comes to 211px against the 128 it was, and
+   this is the one page where a picture earns that: it is the directory. */
+.mgdb-data-center-hub .mgdb-hero-emblem img {
   display: block;
-  width: min(100%, 76px);
+  width: min(100%, 150px);
   height: auto;
   margin: 0;
 }
