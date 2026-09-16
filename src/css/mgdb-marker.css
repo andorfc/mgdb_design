@@ -19,8 +19,16 @@
   border-color: var(--mgdb-line);
 }
 
-.mgdb-marker-page .mgdb-hero-emblem svg {
-  width: min(100%, 64px);
+/* 100px rather than the shared 64. The emblem is a gel -- a ladder and three
+   lanes of bands -- so at 64 the bands are two pixels each and it reads as a
+   dark square. 100 is the most the hero gives away for nothing; past it the
+   panel starts to drive the hero taller.
+
+   The blend stays normal. The bands are pure white and they are the content,
+   so multiply would tint them the moment this panel is anything but #ffffff;
+   the dark gel needs no matte dropped. */
+.mgdb-marker-page .mgdb-hero-emblem img {
+  width: min(100%, 100px);
   height: auto;
   mix-blend-mode: normal;
 }
