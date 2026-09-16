@@ -25,10 +25,14 @@
   border-color: var(--mgdb-line);
 }
 
-.mgdb-insertion-page .mgdb-hero-emblem svg {
-  width: min(100%, 64px);
+/* The emblem is a gene model with insertions above it, so it is a 5.9:1 strip
+   rather than the square mark every other hub carries. At the shared 64px it
+   is eleven pixels tall and reads as a smudge; given the emblem panel's full
+   width it is 168 by 29 and reads as what it is. The multiply the shell sets
+   on an emblem image drops the white matte, as it does for the others. */
+.mgdb-insertion-page .mgdb-hero-emblem img {
+  width: min(100%, 168px);
   height: auto;
-  mix-blend-mode: normal;
 }
 
 /* ── Sticky section tabs ─────────────────────────────────────────────────── */
