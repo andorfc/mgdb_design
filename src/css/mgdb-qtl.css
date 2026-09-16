@@ -19,9 +19,16 @@
   border-color: var(--mgdb-line);
 }
 
-.mgdb-qtl-page .mgdb-hero-emblem svg {
-  width: min(100%, 64px);
-  height: auto;
+/* Sized by height, as on the locus hub, because the emblem is a 5x2 grid of
+   chromosomes with QTL intervals marked on them and this hero is short -- its
+   body sets a 161px floor and anything taller than about 72 starts driving
+   the panel. 96 tall is 89 wide, enough for the ten chromosomes and their
+   orange bands to read, and it costs the hero 20px. At 64 each chromosome is
+   ten pixels across and the bands disappear. */
+.mgdb-qtl-page .mgdb-hero-emblem img {
+  width: auto;
+  max-width: 100%;
+  height: 96px;
 }
 
 /* ── Sticky section tabs ─────────────────────────────────────────────────── */
