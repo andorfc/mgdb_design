@@ -23,8 +23,16 @@
   border-color: var(--mgdb-line);
 }
 
-.mgdb-image-page .mgdb-hero-emblem svg {
-  width: min(100%, 64px);
+/* mix-blend-mode: normal, and it matters here where it did not on the other
+   hubs. The emblem is a photograph in a Polaroid frame, and that frame is
+   white: multiply would blend it into the panel and leave the blue print
+   floating. Normal keeps the frame, and its soft drop shadow is what draws
+   the edge against the white panel.
+
+   110px rather than 64 so the ear in the print is a picture rather than a
+   speck. It costs the hero five pixels. */
+.mgdb-image-page .mgdb-hero-emblem img {
+  width: min(100%, 110px);
   height: auto;
   mix-blend-mode: normal;
 }
