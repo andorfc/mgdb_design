@@ -13,7 +13,7 @@ chr9 while the pan-gene is chr10).
 
 | # | Figure | State |
 | --- | --- | --- |
-| 1 | Presence / absence strip, top of Overview | **Built 2026-09-17, not yet deployed** |
+| 1 | Presence / absence strip, top of Overview | **Live on dev 2026-09-17** |
 | 2 | Domain architecture ribbons (collapse identical `domain_string`s) | planned |
 | 3 | Interactive SVG tree from the Newick, linked selection | planned |
 | 4 | Conservation profile + working MSA | planned |
@@ -85,6 +85,28 @@ stubbed API response at 1280 px and 390 px.
 - `members[].chr` is null for annotations without gene pages (most NAM,
   all PanAnd) until those releases exist; figure 7 needs a `positions`
   section read from the release shards.
-- Known issues: rp1 record answers in 10.5 s (65-member record: 0.55 s);
-  `sections.domains` labels PanAnd members Zd00003ab007527 and
-  Zh00001ab007867 as Zd-Gigi; the MSAViewer panel renders blank.
+- Known issues, re-measured 2026-09-17:
+  - rp1 answers in **0.70 s** now (65-member record: 0.56 s), with an
+    occasional 4 s outlier. The 10.5 s figure did not reproduce over five
+    runs; every section timed individually is under 0.4 s.
+  - `sections.domains` mislabelling **fixed** — the assembly now comes from
+    the member list. The underlying data defect stands: every `Zd00003ab` and
+    `Zh00001ab` row of `perm_tables.protein_domain` carries assembly_id 235
+    (Zd-Gigi) instead of 236 / 237. 1,080,559 rows, 75,274 gene models.
+    `include/gene_center_lib.php:970` (`getProteinDomains()`) still reads it
+    and is still wrong for those two annotations. The API user is SELECT-only.
+  - The MSAViewer panel **does** render: 65 labels and a 794x975 canvas on
+    the example record. The blank panel was the browser pane's own 0-width
+    viewport, not a page defect.
+- CORS on ftpprivate.maizegdb.org is allow-listed for
+  `https://claude.maizegdb.org` specifically (`access-control-allow-origin`
+  echoes that origin, `vary: Origin`), so figures 3 and 4 can fetch the tree
+  and the alignment from the browser with no proxy. Confirmed 2026-09-17.
+- The NAM Consortium tissues are sample ids 1, 3, 4, 5, 6, 7, 8, 9, 10, 17,
+  stable across founders: pre-pollination anther R1, vegetative base/middle/
+  tip 11, meiotic ear, meiotic tassel, root 8 DAS, shoot 8 DAS, endosperm 16
+  DAP, embryo 16 DAP. `batch?ids=...&fields=samples` returns them.
+- `tools/gene_models_index.py` is **server-only**, at
+  `/var/www/claude/html/tools/gene_models_index.py` — not in this repo.
+  B73v5 is the only release built; its payload is 151 MB, and the server has
+  13 GB free (72% used), so 25 NAM founders is roughly 3.8 GB.
