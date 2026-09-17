@@ -286,7 +286,7 @@ function api_record_registry() {
       'description' => 'Pan-genes: the gene models a pan-gene analysis grouped as the same gene across maize assemblies, and everything recorded about them.',
       'example' => 'Zm00023ab070050_T001',
       'html' => '/pan_gene_center/pan_gene/{id}',
-      'sections' => array('overview', 'members', 'analysis', 'function', 'domains', 'expression', 'insertions',
+      'sections' => array('overview', 'members', 'analysis', 'presence', 'function', 'domains', 'expression', 'insertions',
                           'traits', 'proteins', 'pathways', 'sequence', 'tree', 'pangenome', 'downloads', 'viewers'),
       'identifiers' => array(
         'any member gene model or transcript, from any supported annotation', 'pan-gene name (pan-zea.v4.pan02070)',

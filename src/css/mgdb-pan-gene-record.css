@@ -1,0 +1,171 @@
+/* ==========================================================================
+   Pan-gene record page — /pan_gene_center/pan_gene/{id}
+   --------------------------------------------------------------------------
+   Loaded after css/mgdb-modern.css, css/mgdb-hub.css and css/mgdb-record.css.
+   Those settle the page ground, the section cards, the record blocks, the
+   toolbars and the pills. What is here is the page's own figures, drawn by
+   js/mgdb-pan-gene-figures.js.
+   ========================================================================== */
+
+/* ── Presence / absence strip ────────────────────────────────────────────── */
+
+.mgdb-pg-presence-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  align-items: center;
+}
+
+.mgdb-pg-presence-tools .mgdb-rec-tsv {
+  padding: 0 var(--mgdb-space-3);
+  height: 32px;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink-soft);
+  font: inherit;
+  font-size: var(--mgdb-text-sm);
+  cursor: pointer;
+}
+.mgdb-pg-presence-tools .mgdb-rec-tsv:hover { background: var(--mgdb-surface-alt); color: var(--mgdb-ink); }
+
+.mgdb-pg-presence-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+.mgdb-pg-presence-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.mgdb-pg-presence-legend .mgdb-pg-cell { width: 14px; height: 14px; font-size: 9px; border-radius: 3px; }
+.mgdb-pg-presence-legend .mgdb-pg-cell.is-exemplar { box-shadow: 0 0 0 1.5px var(--mgdb-surface), 0 0 0 3px var(--mgdb-gold); }
+.mgdb-pg-presence-legend .mgdb-pg-cell.is-elsewhere::after { top: -3px; right: -3px; width: 7px; height: 7px; }
+
+/* Panels wrap as a row of groups; each group keeps its own cells together so
+   the NAM founders read as one run even when the strip breaks onto two lines. */
+.mgdb-pg-presence-panels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-4) var(--mgdb-space-5);
+  align-items: flex-start;
+  margin-top: var(--mgdb-space-2);
+}
+
+.mgdb-pg-presence-panel { min-width: 0; max-width: 100%; }
+
+.mgdb-pg-presence-panel-label {
+  margin-bottom: 6px;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+  font-weight: 600;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.mgdb-pg-presence-panel-label span {
+  margin-left: 4px;
+  color: var(--mgdb-muted);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.mgdb-pg-presence-cells {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 3px;
+  align-items: flex-start;
+}
+
+/* A cell and the line name under it, written upward so 25 names fit in the
+   width of 25 cells. */
+.mgdb-pg-presence-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 26px;
+}
+
+.mgdb-pg-presence-name {
+  height: 72px;
+  overflow: hidden;
+  color: var(--mgdb-muted);
+  font-size: 10.5px;
+  line-height: 1;
+  letter-spacing: .01em;
+  white-space: nowrap;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  text-overflow: ellipsis;
+}
+
+.mgdb-pg-cell {
+  --cell-fill: var(--mgdb-surface-sunken);
+  --cell-edge: var(--mgdb-line);
+  display: inline-flex;
+  box-sizing: border-box;
+  width: 26px;
+  height: 26px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--cell-edge);
+  border-radius: 5px;
+  background: var(--cell-fill);
+  color: #fff;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+}
+.mgdb-pg-cell.is-present { --cell-fill: var(--mgdb-green); --cell-edge: var(--mgdb-green); }
+.mgdb-pg-cell.is-multi { --cell-fill: var(--mgdb-green-dark); --cell-edge: var(--mgdb-green-dark); }
+.mgdb-pg-cell.is-exemplar { box-shadow: 0 0 0 2px var(--mgdb-surface), 0 0 0 4px var(--mgdb-gold); }
+.mgdb-pg-cell.is-dim { opacity: .28; }
+.mgdb-pg-cell.is-selected { box-shadow: 0 0 0 2px var(--mgdb-surface), 0 0 0 4px var(--mgdb-focus); }
+.mgdb-pg-cell.is-exemplar.is-selected { box-shadow: 0 0 0 2px var(--mgdb-surface), 0 0 0 4px var(--mgdb-focus), 0 0 0 6px var(--mgdb-gold); }
+
+button.mgdb-pg-cell:hover { transform: translateY(-1px); box-shadow: var(--mgdb-shadow-sm); }
+button.mgdb-pg-cell.is-exemplar:hover { box-shadow: 0 0 0 2px var(--mgdb-surface), 0 0 0 4px var(--mgdb-gold), var(--mgdb-shadow-sm); }
+button.mgdb-pg-cell:focus-visible { outline: none; box-shadow: var(--mgdb-focus-ring); }
+
+/* A member on another chromosome than the pan-gene: an orange corner. */
+.mgdb-pg-cell { position: relative; }
+.mgdb-pg-cell.is-elsewhere::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 8px;
+  height: 8px;
+  border: 1.5px solid var(--mgdb-surface);
+  border-radius: 50%;
+  background: var(--mgdb-orange);
+}
+
+.mgdb-pg-presence-detail {
+  min-height: 1.5em;
+  margin: var(--mgdb-space-3) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+.mgdb-pg-presence-detail strong { color: var(--mgdb-ink); }
+.mgdb-pg-presence-detail .mgdb-sequence { color: var(--mgdb-ink-soft); }
+
+@media (max-width: 640px) {
+  .mgdb-pg-presence-col { width: 22px; }
+  .mgdb-pg-cell { width: 22px; height: 22px; font-size: 10px; }
+  .mgdb-pg-presence-name { height: 54px; font-size: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mgdb-pg-cell { transition: none; }
+  button.mgdb-pg-cell:hover { transform: none; }
+}

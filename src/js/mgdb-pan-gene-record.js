@@ -20,6 +20,7 @@
   var els = {};
   var payload = null;
   var msaView = null;
+  var presenceStrip = null;   /* handle from MGDB.panGenePresence, for linked selection */
 
   function num(value) { return value === null || value === undefined ? '' : String(value); }
 
@@ -86,10 +87,37 @@
     'it has the highest similarity score, even if a different overlapping gene model may be a ' +
     'closer match.';
 
-  function renderOverview(overview) {
+  /* A cell of the presence strip was clicked: show its members in the
+     Members table, filtered to that annotation (or to the one gene model),
+     and bring the table into view. */
+  function selectPresenceCell(cell) {
+    var block = els.membersBody.querySelector('.mgdb-rec-block');
+    var filter = block ? block.querySelector('[data-role="filter"]') : null;
+    if (!filter) { return; }
+    var query = cell.members.length === 1 ? cell.members[0].name : (cell.annotation || cell.assembly || '');
+    filter.value = query;
+    filter.dispatchEvent(new Event('input', { bubbles: true }));
+    var section = R.byId('pg-record-members');
+    if (section) { section.scrollIntoView({ behavior: MGDB.prefersReducedMotion && MGDB.prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' }); }
+    MGDB.announce('Members table filtered to ' + query + '.');
+  }
+
+  function renderOverview(overview, presence) {
     if (!overview) { return false; }
     var out = els.overviewBody;
     out.innerHTML = '';
+
+    /* The strip first: which annotations carry a member is the first thing a
+       reader asks of a pan-gene, and it is drawn from the record alone. */
+    presenceStrip = null;
+    if (presence && MGDB.panGenePresence) {
+      presenceStrip = MGDB.panGenePresence(out, {
+        presence: presence,
+        chr: overview.chr,
+        filename: 'pan-gene-presence.tsv',
+        onSelect: selectPresenceCell
+      });
+    }
 
     var factsHtml = R.facts([
       /* No Pan-gene row. It carried `pan_gene_name` -- the internal analysis
@@ -579,7 +607,7 @@
     renderHeader(data, requested);
 
     var rendered = [];
-    if (renderOverview(sections.overview)) { rendered.push('pg-record-overview'); }
+    if (renderOverview(sections.overview, sections.presence)) { rendered.push('pg-record-overview'); }
 
     if (R.collection(els.membersBody, {
       title: 'Gene models in this pan-gene',

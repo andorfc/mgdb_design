@@ -1241,6 +1241,8 @@ src/include/api/v1/records/pan_gene.php                       include/api/v1/rec
 src/templates/static/mgdb_pan_gene_record.bau                 templates/static/mgdb_pan_gene_record.bau
 src/templates/static/mgdb_pan_gene_notfound.bau               templates/static/mgdb_pan_gene_notfound.bau
 src/js/mgdb-pan-gene-record.js                                js/mgdb-pan-gene-record.js
+src/js/mgdb-pan-gene-figures.js                               js/mgdb-pan-gene-figures.js
+src/css/mgdb-pan-gene-record.css                              css/mgdb-pan-gene-record.css
 src/controllers/pan_gene_center/pan_gene_record_modern.php    controllers/pan_gene_center/pan_gene_record_modern.php
 
 # SSR record page — replaces /data_center/ssr?id={id}. An SSR is a probe, so
@@ -2265,6 +2267,10 @@ src/js/mgdb-curation-issues.js                      js/mgdb-curation-issues.js
 #
 # Legacy templates archived in legacy/curation-issues/.
 src/controllers/curation/genome_issue_modern.php    controllers/curation/genome_issue_modern.php
+# 2026-09-16: one edit in showEditForm() -- a gene_model_id parameter that is
+# present but empty now opens the gene model form rather than the assembly
+# form, which is what the home page's "Report a gene model problem" task and
+# the issue list's "report it" link both ask for. The save path is untouched.
 src/controllers/curation/GenomeIssue.php            controllers/curation/GenomeIssue.php
 src/templates/curation/mgdb_genome_issue.bau        templates/curation/mgdb_genome_issue.bau
 src/templates/curation/mgdb_genome_issue_submitted.bau templates/curation/mgdb_genome_issue_submitted.bau
@@ -2728,3 +2734,8 @@ src/js/mgdb-gene-gemini-record.js                          js/mgdb-gene-gemini-r
 src/controllers/gene_center/gene_record_v4.php  controllers/gene_center/gene_record_v4.php
 src/templates/static/mgdb_gene_record_v4.bau  templates/static/mgdb_gene_record_v4.bau
 src/css/mgdb-gene-record-v4.css  css/mgdb-gene-record-v4.css
+src/include/gene_header_panel.php  include/gene_header_panel.php
+src/controllers/gene_center/gene_record_v5.php  controllers/gene_center/gene_record_v5.php
+src/templates/static/mgdb_gene_record_v5.bau  templates/static/mgdb_gene_record_v5.bau
+src/css/mgdb-gene-record-v5.css  css/mgdb-gene-record-v5.css
+src/js/mgdb-gene-record-v5.js  js/mgdb-gene-record-v5.js

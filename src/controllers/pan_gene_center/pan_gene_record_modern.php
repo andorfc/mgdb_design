@@ -76,10 +76,14 @@ $hub_file = $doc_root . '/css/mgdb-hub.css';
 $rec_css = $doc_root . '/css/mgdb-record.css';
 $rec_js  = $doc_root . '/js/mgdb-record.js';
 $js_file = $doc_root . '/js/mgdb-pan-gene-record.js';
+$fig_js  = $doc_root . '/js/mgdb-pan-gene-figures.js';
+$pg_css  = $doc_root . '/css/mgdb-pan-gene-record.css';
 $v_hub = file_exists($hub_file) ? filemtime($hub_file) : time();
 $v_rec_css = file_exists($rec_css) ? filemtime($rec_css) : time();
 $v_rec_js = file_exists($rec_js) ? filemtime($rec_js) : time();
 $v_js = file_exists($js_file) ? filemtime($js_file) : time();
+$v_fig = file_exists($fig_js) ? filemtime($fig_js) : time();
+$v_pg_css = file_exists($pg_css) ? filemtime($pg_css) : time();
 
 $bauplan->preHTML('<meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
 $bauplan->includeCss('/css/static.css');
@@ -87,6 +91,7 @@ $bauplan->includeCss('/css/mgdb-modern.css');
 $bauplan->includeCss('/css/mgdb-megamenu.css');
 $bauplan->includeCss('/css/mgdb-hub.css?v=' . $v_hub);
 $bauplan->includeCss('/css/mgdb-record.css?v=' . $v_rec_css);
+$bauplan->includeCss('/css/mgdb-pan-gene-record.css?v=' . $v_pg_css);
 
 /* The three viewers this page keeps from the legacy one, loaded the same way
    it loaded them: the MSA alignment viewer, IcyTree for the phylogenetic tree,
@@ -118,6 +123,7 @@ $bauplan->includeScript('/js/pan_gene.js');
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');
 $bauplan->includeScript('/js/mgdb-record.js?v=' . $v_rec_js);
+$bauplan->includeScript('/js/mgdb-pan-gene-figures.js?v=' . $v_fig);
 $bauplan->includeScript('/js/mgdb-pan-gene-record.js?v=' . $v_js);
 $bauplan->head('<meta name="description" content="' . htmlspecialchars($summary, ENT_QUOTES, 'UTF-8') . '">');
 /* Machine-readable identity: a JSON-LD block in the head built from the

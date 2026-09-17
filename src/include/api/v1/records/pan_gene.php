@@ -21,6 +21,8 @@
  *            members      the gene models the analysis grouped
  *            analysis     what the analysis was, what went into it, and the
  *                         size distribution it produced
+ *            presence     which annotations of the analysis carry a member,
+ *                         grouped by panel, for the presence/absence strip
  *            function     GO and other ontology terms on the members
  *            domains      PFam domains in order along each member
  *            expression   qTeller and eFP links per member
@@ -38,7 +40,7 @@
 // Reachable only through controllers/api.php.
 if (!defined('MGDB_API')) { http_response_code(404); exit; }
 
-  $SECTIONS = array('overview', 'members', 'analysis', 'function', 'domains',
+  $SECTIONS = array('overview', 'members', 'analysis', 'presence', 'function', 'domains',
                     'expression', 'insertions', 'traits', 'proteins', 'pathways',
                     'sequence', 'tree', 'pangenome', 'downloads', 'viewers');
   $wanted = MgdbApi::sections($SECTIONS);
@@ -226,26 +228,14 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   // Analysis: what it was, what went into it, and what came out
   /////
 
-  if (isset($want['analysis'])) {
-    /* The analysis row itself, plus the bulk download prefix, which is an
-       analysisprop rather than a column. */
-    $detail = retrieve_row(make_query($DBConn, "
-      SELECT a.name, a.description, a.program, a.programversion, a.sourcename,
-             a.sourceuri, a.timeexecuted, dap.value AS downloads
-      FROM chado.analysis a
-        LEFT JOIN chado.analysisprop dap ON dap.analysis_id = a.analysis_id
-          AND dap.type_id = (SELECT cvterm_id FROM chado.cvterm
-                             WHERE name = 'pan_gene_analysis_download')
-      WHERE a.name = :n
-      LIMIT 1", 1, array('n' => $analysis_name)));
-    MgdbApi::countQuery();
-    $download_url = $detail ? MgdbApi::text($detail['downloads']) : null;
-
+  /* The annotation list is what the analysis section tabulates and what the
+     presence section is measured against, so it is read once for either. */
+  $annotations = array();
+  if (isset($want['analysis']) || isset($want['presence'])) {
     /* One row per annotation that went into the analysis. Four of the five
        numbers are analysisprops on the annotation; the fifth, the percentage
        of that annotation's gene models the analysis placed, is the one fact
        that belongs to the pair and lives in pan_gene_analysis_stats. */
-    $annotations = array();
     $sth = make_query($DBConn, "
       SELECT asmbly.name AS assembly, annot.name AS annotation,
              gmc.value AS gene_models, mingm.value AS min_length,
@@ -281,6 +271,34 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
         'percent_placed' => $row['percent_placed'] === null ? null : (float) $row['percent_placed']
       );
     }
+    $counts['annotations'] = count($annotations);
+  }
+
+  /////
+  // Presence: one cell per annotation of the analysis, grouped by panel.
+  // No query -- it is the annotation list above measured against the member
+  // list, which is what the strip at the top of the record draws.
+  /////
+
+  if (isset($want['presence'])) {
+    $sections['presence'] = mgdbPanGenePresence($annotations, $members, $exemplar_gene_model);
+    $counts['presence'] = $sections['presence']['present_count'];
+  }
+
+  if (isset($want['analysis'])) {
+    /* The analysis row itself, plus the bulk download prefix, which is an
+       analysisprop rather than a column. */
+    $detail = retrieve_row(make_query($DBConn, "
+      SELECT a.name, a.description, a.program, a.programversion, a.sourcename,
+             a.sourceuri, a.timeexecuted, dap.value AS downloads
+      FROM chado.analysis a
+        LEFT JOIN chado.analysisprop dap ON dap.analysis_id = a.analysis_id
+          AND dap.type_id = (SELECT cvterm_id FROM chado.cvterm
+                             WHERE name = 'pan_gene_analysis_download')
+      WHERE a.name = :n
+      LIMIT 1", 1, array('n' => $analysis_name)));
+    MgdbApi::countQuery();
+    $download_url = $detail ? MgdbApi::text($detail['downloads']) : null;
 
     /* The size distribution of the whole analysis, with this pan-gene's own
        size marked on the figure. The legacy page truncated at four times the
@@ -314,7 +332,6 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
       'distribution' => $distribution,
       'distribution_cutoff' => (int) $cutoff
     );
-    $counts['annotations'] = count($annotations);
   }
 
   /////
@@ -850,6 +867,159 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
 /////
 // FUNCTIONS
 /////////////////////////////////////////////////////////////////////////////////////////
+
+/* The panel an assembly belongs to, read from its name. There is no column
+   for this: the NAM founders, the PanAnd relatives and the rest are told apart
+   by the naming convention of the assembly itself. */
+function mgdbPanGenePanel($assembly) {
+  $a = (string) $assembly;
+  if ($a === 'B73 RefGen_v3' || strpos($a, 'Zm-B73-') === 0) {
+    return array('key' => 'b73', 'label' => 'B73 references', 'order' => 0);
+  }
+  if (strpos($a, '-REFERENCE-NAM-') !== false) {
+    return array('key' => 'nam', 'label' => 'NAM founders', 'order' => 1);
+  }
+  if (strpos($a, '-TUM-') !== false) {
+    return array('key' => 'flint', 'label' => 'European flint', 'order' => 3);
+  }
+  if (strpos($a, 'CAAS_FIL') !== false) {
+    return array('key' => 'caas', 'label' => 'CAAS FIL', 'order' => 4);
+  }
+  if (strpos($a, '-HiLo-') !== false) {
+    return array('key' => 'hilo', 'label' => 'HiLo', 'order' => 5);
+  }
+  if (preg_match('/^Z[dhnvx]-/', $a)) {
+    return array('key' => 'relatives', 'label' => 'Zea relatives', 'order' => 6);
+  }
+  if (strpos($a, 'PanAnd') !== false) {
+    return array('key' => 'panand', 'label' => 'PanAnd', 'order' => 6);
+  }
+  return array('key' => 'other', 'label' => 'Other maize', 'order' => 2);
+}
+
+/* A label short enough to sit under a 26 px cell: the line name out of the
+   assembly name, with the three B73 references told apart by version. */
+function mgdbPanGeneShortLabel($assembly) {
+  $a = (string) $assembly;
+  if ($a === 'B73 RefGen_v3') { return 'B73 v3'; }
+  if ($a === 'Zm-B73-REFERENCE-GRAMENE-4.0') { return 'B73 v4'; }
+  if ($a === 'Zm-B73-REFERENCE-NAM-5.0') { return 'B73 v5'; }
+  if (preg_match('/^Z[a-z]-(.+?)-REFERENCE/', $a, $m)) {
+    $name = $m[1];
+    /* PH207 has two assemblies in the analysis; keep them apart. */
+    if ($name === 'PH207' && strpos($a, 'UIUC') !== false) { return 'PH207 NS'; }
+    return $name;
+  }
+  return $a;
+}
+
+/* The species behind the two-letter prefix of a PanAnd relative. */
+function mgdbPanGeneSpecies($assembly) {
+  static $species = array(
+    'Zd' => 'Zea diploperennis',
+    'Zh' => 'Zea mays subsp. huehuetenangensis',
+    'Zn' => 'Zea nicaraguensis',
+    'Zv' => 'Zea mays subsp. parviglumis',
+    'Zx' => 'Zea mays subsp. mexicana',
+    'Zm' => 'Zea mays subsp. mays'
+  );
+  $prefix = substr((string) $assembly, 0, 2);
+  return isset($species[$prefix]) ? $species[$prefix] : null;
+}
+
+/* The presence/absence strip: every annotation of the analysis, in panels,
+   with the members it carries. Members whose annotation is not in the
+   analysis list (or is not recorded at all) are returned separately rather
+   than dropped, so the strip's counts always add up to the member count. */
+function mgdbPanGenePresence($annotations, $members, $exemplar_gene_model) {
+  /* Members by annotation name, falling back to assembly name for the few
+     rows where only one of the two is recorded. */
+  $by_annotation = array();
+  $by_assembly = array();
+  $placed = array();
+  foreach ($members as $i => $member) {
+    if ($member['annotation'] !== null) { $by_annotation[$member['annotation']][] = $i; }
+    elseif ($member['assembly'] !== null) { $by_assembly[$member['assembly']][] = $i; }
+  }
+
+  $panels = array();
+  $present = 0;
+  foreach ($annotations as $annotation) {
+    $panel = mgdbPanGenePanel($annotation['assembly']);
+    $key = $panel['key'];
+    if (!isset($panels[$key])) {
+      $panels[$key] = array(
+        'key' => $key,
+        'label' => $panel['label'],
+        'order' => $panel['order'],
+        'annotation_count' => 0,
+        'present_count' => 0,
+        'annotations' => array()
+      );
+    }
+    $indexes = array();
+    if (isset($by_annotation[$annotation['annotation']])) {
+      $indexes = $by_annotation[$annotation['annotation']];
+    } elseif (isset($by_assembly[$annotation['assembly']])) {
+      $indexes = $by_assembly[$annotation['assembly']];
+    }
+    $cell_members = array();
+    foreach ($indexes as $i) {
+      $placed[$i] = true;
+      $m = $members[$i];
+      $cell_members[] = array(
+        'name' => $m['name'],
+        'transcript' => $m['transcript'],
+        'chr' => $m['chr'],
+        'is_exemplar' => $m['name'] === $exemplar_gene_model,
+        'html' => $m['html'],
+        'browser_url' => $m['browser_url']
+      );
+    }
+    $panels[$key]['annotation_count']++;
+    if (count($cell_members) > 0) { $panels[$key]['present_count']++; $present++; }
+    $panels[$key]['annotations'][] = array(
+      'assembly' => $annotation['assembly'],
+      'annotation' => $annotation['annotation'],
+      'label' => mgdbPanGeneShortLabel($annotation['assembly']),
+      'species' => mgdbPanGeneSpecies($annotation['assembly']),
+      'count' => count($cell_members),
+      'members' => $cell_members
+    );
+  }
+
+  /* Order panels as the strip reads them, and the cells within a panel by
+     label so the same line sits in the same place on every record. */
+  usort($panels, function ($a, $b) {
+    return $a['order'] === $b['order'] ? strcmp($a['label'], $b['label']) : $a['order'] - $b['order'];
+  });
+  foreach ($panels as &$panel) {
+    usort($panel['annotations'], function ($a, $b) { return strnatcasecmp($a['label'], $b['label']); });
+    unset($panel['order']);
+  }
+  unset($panel);
+
+  $unplaced = array();
+  foreach ($members as $i => $m) {
+    if (isset($placed[$i])) { continue; }
+    $unplaced[] = array(
+      'name' => $m['name'],
+      'annotation' => $m['annotation'],
+      'assembly' => $m['assembly'],
+      'html' => $m['html']
+    );
+  }
+
+  return array(
+    'annotation_count' => count($annotations),
+    'present_count' => $present,
+    'absent_count' => count($annotations) - $present,
+    'member_count' => count($members),
+    'exemplar_gene_model' => $exemplar_gene_model,
+    'panels' => array_values($panels),
+    'unplaced' => $unplaced
+  );
+}
 
 /* Ask several other hosts whether a file exists, all at once.
 

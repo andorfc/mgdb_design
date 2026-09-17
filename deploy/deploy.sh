@@ -94,12 +94,22 @@ while read -r local remote; do
     mkdir -p "${BACKUP_DIR}/$(dirname "$remote")"
     scp -q "${HOST}:${WEBROOT}/${remote}" "${BACKUP_DIR}/${remote}"
     echo "  backed up ${remote}"
+    is_new=0
   else
     echo "  no existing ${remote} on server (new file)"
+    is_new=1
   fi
 
   ssh -n "$HOST" "mkdir -p '${WEBROOT}/$(dirname "$remote")'"
   scp -q "$src" "${HOST}:${WEBROOT}/${remote}"
+  # scp gives a *new* file the local file's mode, so a source file that happens
+  # to be 0600 on the workstation lands unreadable by Apache and its URL answers
+  # a 199-byte 403 -- a deploy that reports success and serves nothing. An
+  # existing file keeps whatever mode the server already gave it, so only new
+  # files need this, which is also when it is hardest to spot.
+  if [ "$is_new" -eq 1 ]; then
+    ssh -n "$HOST" "chmod 644 '${WEBROOT}/${remote}'"
+  fi
   echo "deployed ${local} -> ${WEBROOT}/${remote}"
   deployed=$((deployed + 1))
 done < "$MANIFEST"
