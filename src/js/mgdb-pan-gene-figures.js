@@ -165,22 +165,46 @@
       detail.innerHTML = parts.join(' &middot; ');
     }
 
-    function clear() { detail.textContent = idle; }
+    /* The line under the panels shows, in order: the cell the pointer is over,
+       then the cell holding keyboard focus, then the idle sentence. Tracking
+       hover and focus separately is what makes moving the pointer away always
+       return to the default. The previous version kept the description up
+       whenever any cell held focus -- and a click focuses the cell it hit, so
+       after one click the line stayed on that cell wherever the pointer went.
+
+       Keyboard focus only, deliberately: a mouse click leaves the button
+       focused but not :focus-visible, so it does not hold the line. */
+    var hovered = null;
+    var focused = null;
+
+    function cellOf(event) {
+      var btn = event.target.closest ? event.target.closest('[data-cell]') : null;
+      return btn ? cells[+btn.getAttribute('data-cell')] : null;
+    }
+
+    function keyboardFocused(btn) {
+      /* No :focus-visible support -- keep the old behaviour and hold the line. */
+      try { return btn.matches(':focus-visible'); } catch (e) { return true; }
+    }
+
+    function refresh() {
+      var cell = hovered || focused;
+      if (cell) { describe(cell); } else { detail.textContent = idle; }
+    }
 
     block.addEventListener('mouseover', function (event) {
-      var btn = event.target.closest('[data-cell]');
-      if (btn) { describe(cells[+btn.getAttribute('data-cell')]); }
+      var cell = cellOf(event);
+      if (cell) { hovered = cell; refresh(); }
     });
     block.addEventListener('mouseout', function (event) {
-      var btn = event.target.closest('[data-cell]');
-      if (btn && !block.contains(document.activeElement && document.activeElement.closest('[data-cell]'))) { clear(); }
+      if (cellOf(event)) { hovered = null; refresh(); }
     });
     block.addEventListener('focusin', function (event) {
       var btn = event.target.closest('[data-cell]');
-      if (btn) { describe(cells[+btn.getAttribute('data-cell')]); }
+      if (btn && keyboardFocused(btn)) { focused = cells[+btn.getAttribute('data-cell')]; refresh(); }
     });
     block.addEventListener('focusout', function (event) {
-      if (event.target.closest('[data-cell]')) { clear(); }
+      if (event.target.closest('[data-cell]')) { focused = null; refresh(); }
     });
     /* Clicking the selected cell again clears the selection, so a reader who
        filtered the table by a cell can undo it from the same place. onSelect

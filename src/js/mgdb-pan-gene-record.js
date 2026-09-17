@@ -120,23 +120,10 @@
     var out = els.overviewBody;
     out.innerHTML = '';
 
-    /* The strip first: which annotations carry a member is the first thing a
-       reader asks of a pan-gene, and it is drawn from the record alone. */
-    presenceStrip = null;
-    if (presence && MGDB.panGenePresence) {
-      presenceStrip = MGDB.panGenePresence(out, {
-        presence: presence,
-        chr: overview.chr,
-        filename: 'pan-gene-presence.tsv',
-        onSelect: selectPresenceCell
-      });
-    }
-
-    /* The members table renders in here, immediately below the strip, so that
-       clicking a cell answers in place. render() fills it; there is no
-       separate Members section any more. */
-    out.insertAdjacentHTML('beforeend', '<div id="pg-overview-members"></div>');
-
+    /* Order: what this pan-gene IS, then anything wrong with it, then the
+       figure, then the members. The facts and the curation alert are short and
+       are what a reader checks first; the strip is tall enough that putting it
+       above them pushed both off the first screen. */
     var factsHtml = R.facts([
       /* No Pan-gene row. It carried `pan_gene_name` -- the internal analysis
          id, pan-zea.v4.pan02070 -- which is not an identifier a reader can use
@@ -163,6 +150,21 @@
       alertHtml += '</div></div>';
       out.insertAdjacentHTML('beforeend', alertHtml);
     }
+
+    presenceStrip = null;
+    if (presence && MGDB.panGenePresence) {
+      presenceStrip = MGDB.panGenePresence(out, {
+        presence: presence,
+        chr: overview.chr,
+        filename: 'pan-gene-presence.tsv',
+        onSelect: selectPresenceCell
+      });
+    }
+
+    /* The members table renders in here, immediately below the strip, so that
+       clicking a cell answers in place. render() fills it; there is no
+       separate Members section any more. */
+    out.insertAdjacentHTML('beforeend', '<div id="pg-overview-members"></div>');
 
     R.collection(out, {
       title: 'Overlapping gene models',

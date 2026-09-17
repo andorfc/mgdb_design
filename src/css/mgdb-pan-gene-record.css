@@ -167,12 +167,19 @@ button.mgdb-pg-cell:focus-visible { outline: none; box-shadow: var(--mgdb-focus-
   background: var(--mgdb-orange);
 }
 
-.mgdb-pg-presence-detail {
+/* Scoped to the block on purpose. `.mgdb-page p` in mgdb-modern.css sets
+   `margin: 0` and is (0,1,1) -- a class plus a type -- so a bare
+   `.mgdb-pg-presence-detail` at (0,1,0) loses to it and the top margin here
+   silently does nothing. Any margin this file sets on a p, ul, ol, dl, figure
+   or table needs the extra class. */
+.mgdb-pg-presence .mgdb-pg-presence-detail {
   /* Two lines reserved. The idle sentence is one line and a cell with several
      members is often two, so without a floor here the panels below jump every
      time the pointer crosses a cell. */
   min-height: calc(2 * var(--mgdb-leading-snug) * 1em);
-  margin: var(--mgdb-space-4) 0 0;
+  /* A clear break from the last row of panels: the hint is about the panels
+     but is not one of them. */
+  margin: var(--mgdb-space-5) 0 0;
   padding: var(--mgdb-space-3) var(--mgdb-space-4);
   border-radius: var(--mgdb-radius);
   background: var(--mgdb-surface-sunken);
@@ -188,7 +195,7 @@ button.mgdb-pg-cell:focus-visible { outline: none; box-shadow: var(--mgdb-focus-
      right edge when one panel holds three cells and the next holds 25. */
   .mgdb-pg-presence-panel { width: 100%; padding: var(--mgdb-space-2) var(--mgdb-space-3); }
   .mgdb-pg-presence-panels { gap: var(--mgdb-space-3); }
-  .mgdb-pg-presence-detail { padding: var(--mgdb-space-2) var(--mgdb-space-3); }
+  .mgdb-pg-presence .mgdb-pg-presence-detail { padding: var(--mgdb-space-2) var(--mgdb-space-3); }
   .mgdb-pg-presence-col { width: 22px; }
   .mgdb-pg-cell { width: 22px; height: 22px; font-size: 10px; }
   .mgdb-pg-presence-name { height: 54px; font-size: 10px; }
