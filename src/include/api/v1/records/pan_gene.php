@@ -387,17 +387,30 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   // One query for every member's domains, ordered, and the run-length encoding
   // the legacy page built ("SBP => AP2[2]") is done once over that result.
   // The legacy page ran getProteinDomains() once per member.
+  //
+  // The assembly is taken from the member list, NOT from
+  // perm_tables.protein_domain.assembly_id, which is wrong for two PanAnd
+  // annotations: every Zd00003ab and Zh00001ab row carries assembly_id 235
+  // (Zd-Gigi) instead of 236 (Zd-Momo) and 237 (Zh-RIMHU001). Their own `aa`
+  // annotations are correct, so it is those two loads that are mislabelled --
+  // 1,080,559 rows over 75,274 gene models, reported 2026-09-17. The API user
+  // is SELECT-only, so this is worked around rather than repaired; the member
+  // list resolves the assembly from genome_metadata and is right for all of
+  // them. Drop this when the table is reloaded.
   /////
 
   if (isset($want['domains'])) {
     $rows = array();
     $definitions = array();
+    $member_assembly = array();
+    foreach ($members as $member) {
+      if ($member['transcript'] !== null) { $member_assembly[$member['transcript']] = $member['assembly']; }
+    }
     $sth = make_query($DBConn, $MEMBERS_CTE . "
       SELECT pd.transcript, pd.gene_model, pd.accession, pd.name, pd.description,
-             a.name AS assembly, pd.start_pos, pd.end_pos
+             pd.start_pos, pd.end_pos
       FROM perm_tables.protein_domain pd
         INNER JOIN members m ON m.transcript = pd.transcript
-        LEFT JOIN chado.analysis a ON a.analysis_id = pd.assembly_id
       ORDER BY pd.transcript, pd.start_pos, pd.end_pos", 1, array('pg' => $pan_gene_name));
     MgdbApi::countQuery();
     $by_transcript = array();
@@ -408,7 +421,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
         $by_transcript[$transcript] = array(
           'transcript' => $transcript,
           'gene_model' => MgdbApi::text($row['gene_model']),
-          'assembly' => MgdbApi::text($row['assembly']),
+          'assembly' => isset($member_assembly[$transcript]) ? $member_assembly[$transcript] : null,
           'domains' => array()
         );
       }
