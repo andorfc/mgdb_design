@@ -93,32 +93,29 @@ $bauplan->includeCss('/css/mgdb-hub.css?v=' . $v_hub);
 $bauplan->includeCss('/css/mgdb-record.css?v=' . $v_rec_css);
 $bauplan->includeCss('/css/mgdb-pan-gene-record.css?v=' . $v_pg_css);
 
-/* The three viewers this page keeps from the legacy one, loaded the same way
-   it loaded them: the MSA alignment viewer, IcyTree for the phylogenetic tree,
-   and the pan-gene helper script that drives both plus the sequence
-   downloads. mgdb-pan-gene-record.js calls into them rather than
-   reimplementing them. */
-$bauplan->includeCss('/js/lib/icytree/css/treedrawing.css');
-$bauplan->includeCss('/js/lib/icytree/css/icytree.css');
-/* jQuery and jQuery UI come first, and only on this page. The modern shell
+/* What this page still keeps from the legacy one: the MSA alignment viewer and
+   js/pan_gene.js, which drives it and the sequence downloads.
+   mgdb-pan-gene-record.js calls into them rather than reimplementing them.
+
+   IcyTree and js/phylotree.js were dropped on 2026-09-17 when the record grew
+   its own tree (MGDB.panGeneTree, drawn from the same Newick with
+   d3-hierarchy). That is 10 files and about 195 KB of JavaScript and CSS this
+   page no longer loads, and the tree it draws instead is linked to the other
+   figures on the record, which IcyTree's canvas could not be.
+
+   jQuery and jQuery UI come first, and only on this page: the modern shell
    loads jQuery from its own header template, which is emitted after every
-   includeScript() the controller adds -- and js/phylotree.js touches
-   $.ui.dialog at load time, so without these two it throws before it can
-   define loadTree() and the tree section stays empty. Both are the versions
-   the legacy pan-gene page loaded. */
+   includeScript() a controller adds, and js/pan_gene.js needs it at load
+   time. Both are the versions the legacy pan-gene page loaded. */
 $bauplan->includeScript('https://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.0/jquery.min.js');
 $bauplan->includeScript('https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.9.0/jquery-ui.min.js');
 $bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
 $bauplan->includeScript('/tools/msa/msa.min.gz.js');
-$bauplan->includeScript('/js/lib/icytree/js/libs/papaparse.js');
-$bauplan->includeScript('/js/lib/icytree/js/tree.js');
-$bauplan->includeScript('/js/lib/icytree/js/treeparsing.js');
-$bauplan->includeScript('/js/lib/icytree/js/treewriting.js');
-$bauplan->includeScript('/js/lib/icytree/js/treelayouts.js');
-$bauplan->includeScript('/js/lib/icytree/js/treedrawing.js');
-$bauplan->includeScript('/js/lib/icytree/js/treeplots.js');
-$bauplan->includeScript('/js/lib/icytree/js/treestats.js');
-$bauplan->includeScript('/js/phylotree.js');
+/* d3-hierarchy 3.1.2, vendored rather than taken from a CDN: it is the leaf
+   ordering behind the record's own phylogenetic tree and the page should not
+   lose its tree when someone else's host is slow. It creates window.d3, which
+   nothing else on this page defines -- Plotly 2.x keeps its copy private. */
+$bauplan->includeScript('/js/lib/d3-hierarchy.min.js');
 $bauplan->includeScript('/js/pan_gene.js');
 $bauplan->includeScript('/js/mgdb-modern.js');
 $bauplan->includeScript('/js/mgdb-chrome.js');

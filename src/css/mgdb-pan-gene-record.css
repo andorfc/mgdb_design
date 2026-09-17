@@ -376,3 +376,131 @@ button.mgdb-pg-cell:focus-visible { outline: none; box-shadow: var(--mgdb-focus-
 @media (prefers-reduced-motion: reduce) {
   .mgdb-pg-arch-chevron { transition: none; }
 }
+
+/* ── Interactive phylogenetic tree ────────────────────────────────────────
+   Tips are coloured by species -- six of them, which a validated palette can
+   carry, where the seven assembly panels cannot. The label beside every tip
+   is the primary identity; colour is the grouping aid.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.mgdb-pg-tree-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  align-items: center;
+}
+.mgdb-pg-tree-buttons { display: flex; flex-wrap: wrap; gap: var(--mgdb-space-2); }
+
+.mgdb-pg-tree-block .mgdb-pg-tree-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+}
+.mgdb-pg-tree-block .mgdb-pg-tree-legend li { display: inline-flex; align-items: center; gap: 5px; }
+.mgdb-pg-tree-block .mgdb-pg-tree-legend em { font-style: italic; }
+
+.mgdb-pg-tree-swatch { display: inline-block; width: 11px; height: 11px; border-radius: 50%; }
+
+/* A 301-tip tree is about 4,200 px tall. It scrolls inside its own box rather
+   than pushing the rest of the record down -- and the box clips horizontally
+   so a wide label can never scroll the document sideways, which is what the
+   MSA viewer used to do on this page. */
+.mgdb-pg-tree-scroll {
+  max-height: 70vh;
+  margin-top: var(--mgdb-space-3);
+  /* Both axes scroll inside the box. The drawing is sized in pixels so its
+     labels stay legible, which means on a phone it is wider than the box --
+     contained here, so it can never scroll the document sideways, which is
+     what the MSA viewer used to do on this page. */
+  overflow: auto;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  overscroll-behavior: contain;
+}
+
+/* `.mgdb-page img, .mgdb-page svg { max-width: 100% }` in mgdb-modern.css is
+   (0,1,1) and beats a bare class, and it scaled this drawing down to the box
+   width -- which shrank the tip labels to 4 px on a phone, the one place they
+   had to stay readable. The drawing is sized in pixels; the box scrolls. */
+.mgdb-pg-tree-scroll .mgdb-pg-tree-svg { display: block; max-width: none; }
+
+.mgdb-pg-tree-link {
+  fill: none;
+  stroke: var(--mgdb-line);
+  stroke-width: 1.2;
+}
+
+.mgdb-pg-tree-label {
+  fill: var(--mgdb-ink-soft);
+  font-family: var(--mgdb-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 9.5px;
+}
+.mgdb-pg-tree-label.is-clade { fill: var(--mgdb-muted); font-style: italic; }
+
+.mgdb-pg-tree-support {
+  fill: var(--mgdb-muted);
+  font-size: 8px;
+  text-anchor: end;
+}
+
+.mgdb-pg-tree-dot { stroke: var(--mgdb-surface); stroke-width: 1.2; }
+.mgdb-pg-tree-off { fill: var(--mgdb-orange); stroke: var(--mgdb-surface); stroke-width: 1.2; }
+.mgdb-pg-tree-wedge { fill: var(--mgdb-surface-sunken); stroke: var(--mgdb-line); stroke-width: 1; }
+
+.mgdb-pg-tree-handle {
+  fill: var(--mgdb-surface);
+  stroke: var(--mgdb-muted);
+  stroke-width: 1.4;
+}
+.mgdb-pg-tree-node { cursor: pointer; }
+.mgdb-pg-tree-node:hover .mgdb-pg-tree-handle,
+.mgdb-pg-tree-node:focus-visible .mgdb-pg-tree-handle { fill: var(--mgdb-green); stroke: var(--mgdb-green); }
+.mgdb-pg-tree-node.is-collapsed:hover .mgdb-pg-tree-wedge { fill: var(--mgdb-line); }
+.mgdb-pg-tree-node:focus-visible, .mgdb-pg-tree-tip:focus-visible { outline: none; }
+.mgdb-pg-tree-node:focus-visible .mgdb-pg-tree-wedge { stroke: var(--mgdb-focus); stroke-width: 2; }
+
+.mgdb-pg-tree-tip { cursor: pointer; }
+.mgdb-pg-tree-tip:hover .mgdb-pg-tree-label { fill: var(--mgdb-ink); font-weight: 700; }
+.mgdb-pg-tree-tip.is-exemplar .mgdb-pg-tree-dot { stroke: var(--mgdb-gold); stroke-width: 2.4; }
+.mgdb-pg-tree-tip.is-exemplar .mgdb-pg-tree-label { fill: var(--mgdb-ink); font-weight: 700; }
+.mgdb-pg-tree-tip.is-dim { opacity: .25; }
+.mgdb-pg-tree-tip.is-picked .mgdb-pg-tree-label { fill: var(--mgdb-focus); font-weight: 700; }
+.mgdb-pg-tree-tip.is-picked .mgdb-pg-tree-dot { stroke: var(--mgdb-focus); stroke-width: 2.4; }
+.mgdb-pg-tree-tip:focus-visible .mgdb-pg-tree-dot { stroke: var(--mgdb-focus); stroke-width: 2.4; }
+
+.mgdb-pg-tree-scale path { stroke: var(--mgdb-ink-soft); stroke-width: 1; fill: none; }
+.mgdb-pg-tree-scale text { fill: var(--mgdb-muted); font-size: 9px; }
+
+.mgdb-pg-tree-block .mgdb-pg-tree-detail {
+  min-height: calc(2 * var(--mgdb-leading-snug) * 1em);
+  margin: var(--mgdb-space-3) 0 0;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+/* Figures step back the rows and cells a selection does not touch. */
+.mgdb-pg-arch .mgdb-pg-arch-row.is-dim { opacity: .35; }
+.mgdb-pg-arch .mgdb-pg-arch-row.is-picked { background: var(--mgdb-surface-sunken); }
+
+@media (max-width: 640px) {
+  .mgdb-pg-tree-scroll { max-height: 60vh; }
+  .mgdb-pg-tree-block .mgdb-pg-tree-detail { padding: var(--mgdb-space-2) var(--mgdb-space-3); }
+}
+
+/* A block whose section heading already names it. */
+.mgdb-rec-block-head.is-headless { justify-content: flex-start; }
+
+/* A folded clade that holds a member picked in another figure. */
+.mgdb-pg-tree-node.is-dim { opacity: .25; }
+.mgdb-pg-tree-node.is-picked .mgdb-pg-tree-wedge { fill: var(--mgdb-focus); stroke: var(--mgdb-focus); }
+.mgdb-pg-tree-node.is-picked + .mgdb-pg-tree-label.is-clade { fill: var(--mgdb-focus); font-weight: 700; }

@@ -135,6 +135,11 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
       'annotation' => MgdbApi::text($row['annotation']),
       'assembly' => $assembly,
       'chr' => MgdbApi::text($row['chr']),
+      /* Read from the assembly's two-letter prefix, the only place it is
+         recorded. The tree colours its tips by this: six species is a number
+         of categories a palette can carry, where the seven assembly panels
+         are not. */
+      'species' => mgdbPanGeneSpecies($assembly),
       'locus' => MgdbApi::ref('locus', $row['locus_id'], $row['locus_name'], '/data_center/locus?id='),
       'browser_url' => MgdbApi::text($row['browser']),
       'is_exemplar' => ($name === $exemplar_gene_model),

@@ -15,7 +15,7 @@ chr9 while the pan-gene is chr10).
 | --- | --- | --- |
 | 1 | Presence / absence strip, top of Overview | **Live on dev 2026-09-17** |
 | 2 | Domain architecture ribbons (collapse identical `domain_string`s) | **Live on dev 2026-09-17** |
-| 3 | Interactive SVG tree from the Newick, linked selection | planned |
+| 3 | Interactive SVG tree from the Newick, linked selection | **Live on dev 2026-09-17** |
 | 4 | Conservation profile + working MSA | planned |
 | 5 | NAM expression heatmap (26 genomes x 10 NAM Consortium tissues) | planned |
 | 6 | Homeolog / paralog comparison within a genome | planned |
@@ -164,3 +164,51 @@ Sizzle error from the legacy `js/pan_gene.js`, which builds selectors as
 `$('#'+var)` in eight places. The count is identical on a record with 1
 architecture and one with 164, and the figures module contains no jQuery at
 all. Worth fixing separately: 33 uncaught errors per load will mask a real one.
+
+## Figure 3, and the linked selection
+
+The record draws its own tree from the same Newick, with d3-hierarchy vendored
+locally at `src/js/lib/d3-hierarchy.min.js` (14.8 KB, creates `window.d3`,
+which nothing else on the page defines -- Plotly 2.x keeps its copy private).
+
+**IcyTree and `js/phylotree.js` are gone from this page** -- 10 files, about
+195 KB of JS and CSS. The tree they drew could not be linked to the other
+figures; this one is.
+
+`MGDB.panGeneSelection` is the bus: one set of **gene models**, published by
+whichever figure the reader picked in, subscribed to by all of them. The
+presence strip, the architecture ribbons, the tree and the members table all
+follow it. Gene models are the currency because the tree names its tips by
+transcript and everything else works in gene models -- translated by a lookup
+built from the members list, not by stripping a `_T\d+` suffix, which is a
+guess the member list makes unnecessary.
+
+What the data forced:
+
+- **Tips are coloured by species, not by assembly panel.** There are seven
+  panels and six species, and six is what a validated palette carries. Species
+  is also the more useful axis on a tree. `members[].species` was added to the
+  API for it.
+- **Both test trees exist**, contrary to the earlier note here: rp1's is
+  12,786 bytes with 301 tips. Parser cross-checked against the files -- 116
+  nodes / 115 links for lg1, 526 / 525 for rp1.
+- **Support values are internal node labels**, so a bare number after `)` is a
+  support value and not a taxon name. Polytomies are everywhere: the root has
+  three children and identical proteins sit in multifurcations of up to nine,
+  so the parser cannot assume a binary tree.
+- **146 of rp1's 525 branches are zero length.** A tree over 120 tips starts
+  with those near-identical clades folded, which takes rp1 from 4,214 px of
+  scrolling to 2,212. Small trees start expanded and the button offers the
+  other direction.
+- **A member picked elsewhere can be inside a folded clade**, where there is no
+  tip to light up. The fold is marked instead.
+
+Two CSS traps, both the same one as `.mgdb-page p`:
+
+- `.mgdb-page img, .mgdb-page svg { max-width: 100% }` is (0,1,1) and scaled
+  the drawing down to its box, **shrinking the tip labels to 4 px on a phone**
+  -- the one place they had to stay readable. The tree is now sized in real
+  pixels, measured from the box, and the box scrolls in both directions
+  (contained, so it can never scroll the document sideways).
+- Every `p`/`ul`/`ol` margin in this stylesheet is scoped through its block for
+  the same reason.

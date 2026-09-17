@@ -87,32 +87,30 @@
     'it has the highest similarity score, even if a different overlapping gene model may be a ' +
     'closer match.';
 
-  /* A cell of the presence strip was clicked: filter the members table that
-     sits directly beneath the strip, to that annotation or to the one gene
-     model. The table is adjacent on purpose -- the answer appears under the
-     cell rather than at another part of the page -- so this does not scroll
-     unless the table has fallen out of view entirely, and `nearest` then moves
-     the page as little as it can. A second click on the same cell clears the
-     filter again, so a reader is never left in a filtered state they have to
-     undo by hand.
-
-     cell is null when the strip is telling us the selection was cleared.
+  /* The members table follows whatever figure published the selection -- a
+     presence cell, a tree tip, a clade. The table sits directly beneath the
+     strip on purpose, so the answer appears where the reader already is.
 
      This deliberately does not scroll. `scrollIntoView` with `block: 'nearest'`
      looks harmless but still moved the page 771 px here, because the members
      block is taller than the viewport and `nearest` then aligns an edge of it
-     -- which is the jump the adjacency was meant to remove. The table's own
-     header sits just under the strip, so the filtered count is visible from
-     where the reader already is. */
-  function selectPresenceCell(cell) {
-    var container = R.byId('pg-overview-members');
-    var filter = container ? container.querySelector('[data-role="filter"]') : null;
-    if (!filter) { return; }
-    var query = !cell ? ''
-      : (cell.members.length === 1 ? cell.members[0].name : (cell.annotation || cell.assembly || ''));
-    filter.value = query;
-    filter.dispatchEvent(new Event('input', { bubbles: true }));
-    MGDB.announce(query ? ('Members table filtered to ' + query + '.') : 'Members table filter cleared.');
+     -- which is the jump the adjacency was meant to remove. */
+  function bindMembersToSelection() {
+    if (!MGDB.panGeneSelection) { return; }
+    MGDB.panGeneSelection.subscribe(function (sel) {
+      var container = R.byId('pg-overview-members');
+      var filter = container ? container.querySelector('[data-role="filter"]') : null;
+      if (!filter) { return; }
+      /* A selection with no filter hint -- a whole clade -- would need the
+         table to match a set rather than a string, which its filter cannot
+         do, so the table is left alone and the figures carry the highlight. */
+      if (sel && !sel.filter) { return; }
+      var query = sel ? sel.filter : '';
+      if (filter.value === query) { return; }
+      filter.value = query;
+      filter.dispatchEvent(new Event('input', { bubbles: true }));
+      MGDB.announce(query ? ('Members table filtered to ' + query + '.') : 'Members table filter cleared.');
+    });
   }
 
   function renderOverview(overview, presence) {
@@ -156,8 +154,7 @@
       presenceStrip = MGDB.panGenePresence(out, {
         presence: presence,
         chr: overview.chr,
-        filename: 'pan-gene-presence.tsv',
-        onSelect: selectPresenceCell
+        filename: 'pan-gene-presence.tsv'
       });
     }
 
@@ -350,7 +347,29 @@
     }
   }
 
-  function renderTree(tree) {
+  /* Everything the tree needs to say about a tip, keyed by transcript. The
+     tree file names tips by transcript and every other figure works in gene
+     models, so this is also what translates between them -- by lookup, not by
+     stripping a _T\d+ suffix, which is a guess the member list makes
+     unnecessary. */
+  function memberIndex(members) {
+    var byTranscript = {};
+    (members || []).forEach(function (m) {
+      if (!m.transcript) { return; }
+      byTranscript[m.transcript] = {
+        gene: m.name,
+        assembly: m.assembly,
+        species: m.species || null,
+        chr: m.chr
+      };
+    });
+    return function (transcript) {
+      return Object.prototype.hasOwnProperty.call(byTranscript, transcript)
+        ? byTranscript[transcript] : null;
+    };
+  }
+
+  function renderTree(tree, members, overview) {
     if (!tree) { return false; }
     var out = els.treeBody;
     out.innerHTML = '';
@@ -358,13 +377,21 @@
       out.innerHTML = '<p class="mgdb-rec-empty">No tree exists for this pan-gene.</p>';
       return true;
     }
-    out.insertAdjacentHTML('beforeend',
-      '<p class="mgdb-rec-block-status">The pan-gene exemplar is <strong class="mgdb-pg-exemplar">' +
-      R.escape(tree.exemplar) + '</strong>.</p>');
-    if (typeof window.loadTree === 'function') {
-      try { window.loadTree(tree.url, tree.exemplar); } catch (error) { /* viewer absent */ }
-      R.show(R.byId('pg-record-tree-credit'), true);
+    if (MGDB.panGeneTree) {
+      MGDB.panGeneTree(out, {
+        url: tree.url,
+        exemplar: tree.exemplar,
+        panChr: overview ? overview.chr : null,
+        resolve: memberIndex(members),
+        filename: 'pan-gene-tree.tsv'
+      });
+      return true;
     }
+    /* d3-hierarchy did not load, so there is no viewer at all now that IcyTree
+       has gone. Say so and hand over the file. */
+    out.insertAdjacentHTML('beforeend',
+      '<p class="mgdb-rec-empty">The tree viewer could not be loaded. ' +
+      R.link(tree.url, 'Open the Newick file', true) + '.</p>');
     return true;
   }
 
@@ -653,6 +680,8 @@
           html: function (m) { return m.browser_url ? R.link(m.browser_url, 'Genome browser', true) : '—'; } }
       ]
     });
+    /* The table exists now, so it can start following the shared selection. */
+    bindMembersToSelection();
 
     if (R.collection(els.functionBody, {
       title: 'Ontology terms on the members',
@@ -848,7 +877,7 @@
       rendered.push('pg-record-sequence');
       bindMsaControls(sections.sequence || {});
     }
-    if (renderTree(sections.tree)) { rendered.push('pg-record-tree'); }
+    if (renderTree(sections.tree, sections.members, sections.overview)) { rendered.push('pg-record-tree'); }
     if (renderPangenome(sections.pangenome)) { rendered.push('pg-record-pangenome'); }
     if (renderContext(sections.viewers)) { rendered.push('pg-record-context'); }
     if (renderAnalysis(sections.analysis)) { rendered.push('pg-record-analysis'); }
