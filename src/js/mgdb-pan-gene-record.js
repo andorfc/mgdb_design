@@ -87,19 +87,32 @@
     'it has the highest similarity score, even if a different overlapping gene model may be a ' +
     'closer match.';
 
-  /* A cell of the presence strip was clicked: show its members in the
-     Members table, filtered to that annotation (or to the one gene model),
-     and bring the table into view. */
+  /* A cell of the presence strip was clicked: filter the members table that
+     sits directly beneath the strip, to that annotation or to the one gene
+     model. The table is adjacent on purpose -- the answer appears under the
+     cell rather than at another part of the page -- so this does not scroll
+     unless the table has fallen out of view entirely, and `nearest` then moves
+     the page as little as it can. A second click on the same cell clears the
+     filter again, so a reader is never left in a filtered state they have to
+     undo by hand.
+
+     cell is null when the strip is telling us the selection was cleared.
+
+     This deliberately does not scroll. `scrollIntoView` with `block: 'nearest'`
+     looks harmless but still moved the page 771 px here, because the members
+     block is taller than the viewport and `nearest` then aligns an edge of it
+     -- which is the jump the adjacency was meant to remove. The table's own
+     header sits just under the strip, so the filtered count is visible from
+     where the reader already is. */
   function selectPresenceCell(cell) {
-    var block = els.membersBody.querySelector('.mgdb-rec-block');
-    var filter = block ? block.querySelector('[data-role="filter"]') : null;
+    var container = R.byId('pg-overview-members');
+    var filter = container ? container.querySelector('[data-role="filter"]') : null;
     if (!filter) { return; }
-    var query = cell.members.length === 1 ? cell.members[0].name : (cell.annotation || cell.assembly || '');
+    var query = !cell ? ''
+      : (cell.members.length === 1 ? cell.members[0].name : (cell.annotation || cell.assembly || ''));
     filter.value = query;
     filter.dispatchEvent(new Event('input', { bubbles: true }));
-    var section = R.byId('pg-record-members');
-    if (section) { section.scrollIntoView({ behavior: MGDB.prefersReducedMotion && MGDB.prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' }); }
-    MGDB.announce('Members table filtered to ' + query + '.');
+    MGDB.announce(query ? ('Members table filtered to ' + query + '.') : 'Members table filter cleared.');
   }
 
   function renderOverview(overview, presence) {
@@ -118,6 +131,11 @@
         onSelect: selectPresenceCell
       });
     }
+
+    /* The members table renders in here, immediately below the strip, so that
+       clicking a cell answers in place. render() fills it; there is no
+       separate Members section any more. */
+    out.insertAdjacentHTML('beforeend', '<div id="pg-overview-members"></div>');
 
     var factsHtml = R.facts([
       /* No Pan-gene row. It carried `pan_gene_name` -- the internal analysis
@@ -559,8 +577,7 @@
      ------------------------------------------------------------------------ */
 
   var TAB_COUNTS = {
-    'pg-record-overview': ['loci', 'overlaps'],
-    'pg-record-members': ['members'],
+    'pg-record-overview': ['members'],
     'pg-record-function': ['function'],
     'pg-record-domains': ['domains'],
     'pg-record-expression': ['expression'],
@@ -574,7 +591,6 @@
 
   var LABELS = {
     'pg-record-overview': 'Overview',
-    'pg-record-members': 'Members',
     'pg-record-function': 'Function',
     'pg-record-domains': 'Protein domains',
     'pg-record-expression': 'Expression',
@@ -609,7 +625,11 @@
     var rendered = [];
     if (renderOverview(sections.overview, sections.presence)) { rendered.push('pg-record-overview'); }
 
-    if (R.collection(els.membersBody, {
+    /* Members render inside Overview, under the presence strip, rather than as
+       a section of their own -- so selecting a cell of the strip filters a
+       table the reader can already see. The Overview tab therefore carries the
+       member count and there is no Members tab. */
+    R.collection(R.byId('pg-overview-members'), {
       title: 'Gene models in this pan-gene',
       items: sections.members,
       filename: 'pan-gene-members.tsv',
@@ -630,7 +650,7 @@
           get: function (m) { return m.browser_url || ''; },
           html: function (m) { return m.browser_url ? R.link(m.browser_url, 'Genome browser', true) : '—'; } }
       ]
-    })) { rendered.push('pg-record-members'); }
+    });
 
     if (R.collection(els.functionBody, {
       title: 'Ontology terms on the members',
@@ -868,7 +888,6 @@
       retry: R.byId('pg-record-retry'),
       notice: R.byId('pg-record-notice'),
       overviewBody: R.byId('pg-record-overview-body'),
-      membersBody: R.byId('pg-record-members-body'),
       functionBody: R.byId('pg-record-function-body'),
       domainsBody: R.byId('pg-record-domains-body'),
       expressionBody: R.byId('pg-record-expression-body'),

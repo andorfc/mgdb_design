@@ -130,7 +130,7 @@
 
     html += '</div>' +
       '<p class="mgdb-pg-presence-detail" data-role="detail" aria-live="polite">' +
-        'Hover or focus a cell for its members; click to find them in the Members table.</p>';
+        'Hover or focus a cell for its members; click one to filter the table below to it.</p>';
 
     var unplaced = presence.unplaced || [];
     if (unplaced.length) {
@@ -182,16 +182,19 @@
     block.addEventListener('focusout', function (event) {
       if (event.target.closest('[data-cell]')) { clear(); }
     });
+    /* Clicking the selected cell again clears the selection, so a reader who
+       filtered the table by a cell can undo it from the same place. onSelect
+       is called with null for that. */
     block.addEventListener('click', function (event) {
       var btn = event.target.closest('[data-cell]');
-      if (btn && spec.onSelect) {
-        var cell = cells[+btn.getAttribute('data-cell')];
-        Array.prototype.forEach.call(block.querySelectorAll('.mgdb-pg-cell.is-selected'), function (el) {
-          el.classList.remove('is-selected');
-        });
-        btn.classList.add('is-selected');
-        spec.onSelect(cell);
-      }
+      if (!btn || !spec.onSelect) { return; }
+      var was = btn.classList.contains('is-selected');
+      Array.prototype.forEach.call(block.querySelectorAll('.mgdb-pg-cell.is-selected'), function (el) {
+        el.classList.remove('is-selected');
+      });
+      if (was) { spec.onSelect(null); return; }
+      btn.classList.add('is-selected');
+      spec.onSelect(cells[+btn.getAttribute('data-cell')]);
     });
 
     block.querySelector('[data-role="tsv"]').addEventListener('click', function () {
