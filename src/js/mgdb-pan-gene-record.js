@@ -672,6 +672,15 @@
     })) { rendered.push('pg-record-function'); }
 
     var domains = sections.domains || {};
+    /* The ribbons first: the architectures are the shape of the section and
+       the table under them is the detail. */
+    if (MGDB.panGeneArchitectures) {
+      MGDB.panGeneArchitectures(els.domainsBody, {
+        domains: domains,
+        limit: 8,
+        filename: 'pan-gene-architectures.tsv'
+      });
+    }
     var domainsRendered = R.collection(els.domainsBody, {
       title: 'Domains in order across the gene models',
       items: domains.members,
@@ -689,9 +698,14 @@
       ]
     });
     if (domainsRendered) {
-      els.domainsBody.insertAdjacentHTML('afterbegin',
-        '<p class="mgdb-rec-block-status">Domains are calculated by HMMscan. If a domain is repeated ' +
-        'in order, the repeat number is shown in square brackets.</p>');
+      /* On the table, not `afterbegin` on the section: the ribbons are drawn
+         above it now and this note is about the Domain order column. */
+      var domainsTable = els.domainsBody.querySelector('.mgdb-rec-block:not(.mgdb-pg-arch)');
+      if (domainsTable) {
+        domainsTable.insertAdjacentHTML('beforeend',
+          '<p class="mgdb-rec-block-status">Domains are calculated by HMMscan. If a domain is repeated ' +
+          'in order, the repeat number is shown in square brackets.</p>');
+      }
       R.collection(els.domainsBody, {
         title: 'Domain definitions',
         items: domains.definitions,

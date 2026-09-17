@@ -402,6 +402,7 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
   if (isset($want['domains'])) {
     $rows = array();
     $definitions = array();
+    $axis_max = 0;
     $member_assembly = array();
     foreach ($members as $member) {
       if ($member['transcript'] !== null) { $member_assembly[$member['transcript']] = $member['assembly']; }
@@ -422,11 +423,23 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
           'transcript' => $transcript,
           'gene_model' => MgdbApi::text($row['gene_model']),
           'assembly' => isset($member_assembly[$transcript]) ? $member_assembly[$transcript] : null,
-          'domains' => array()
+          'domains' => array(),
+          'spans' => array()
         );
       }
       $name = MgdbApi::text($row['name']);
       $by_transcript[$transcript]['domains'][] = $name;
+      $start = MgdbApi::int($row['start_pos']);
+      $end = MgdbApi::int($row['end_pos']);
+      if ($start !== null && $end !== null) {
+        $by_transcript[$transcript]['spans'][] = array(
+          'name' => $name,
+          'accession' => MgdbApi::text($row['accession']),
+          'start' => $start,
+          'end' => $end
+        );
+        if ($end > $axis_max) { $axis_max = $end; }
+      }
       $accession = MgdbApi::text($row['accession']);
       if ($accession !== null && !isset($definitions[$accession])) {
         $definitions[$accession] = array(
@@ -455,16 +468,33 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
         'assembly' => $entry['assembly'],
         'domain_count' => count($entry['domains']),
         'domains' => $parts,
-        'domain_string' => implode(' => ', $parts)
+        'domain_string' => implode(' => ', $parts),
+        'spans' => $entry['spans']
       );
     }
     usort($rows, function ($a, $b) { return strcmp($a['transcript'], $b['transcript']); });
     $definitions = array_values($definitions);
     usort($definitions, function ($a, $b) { return strcmp((string) $a['name'], (string) $b['name']); });
 
-    $sections['domains'] = array('members' => $rows, 'definitions' => $definitions);
+    $architectures = mgdbPanGeneArchitectures($rows, $exemplar_gene_model);
+    $totals = mgdbPanGeneDomainTotals($rows);
+
+    /* The per-domain coordinates are what the ribbons draw; the table under
+       them does not use them, and on rp1 they are 287 rows' worth. They travel
+       once, inside the architectures, rather than twice. */
+    foreach ($rows as &$table_row) { unset($table_row['spans']); }
+    unset($table_row);
+
+    $sections['domains'] = array(
+      'members' => $rows,
+      'definitions' => $definitions,
+      'architectures' => $architectures,
+      'domain_totals' => $totals,
+      'axis_max' => $axis_max > 0 ? $axis_max : null
+    );
     $counts['domains'] = count($rows);
     $counts['domain_definitions'] = count($definitions);
+    $counts['architectures'] = count($architectures);
   }
 
   /////
@@ -880,6 +910,100 @@ if (!defined('MGDB_API')) { http_response_code(404); exit; }
 /////
 // FUNCTIONS
 /////////////////////////////////////////////////////////////////////////////////////////
+
+/* The distinct domain architectures of a pan-gene, ranked by how many members
+   carry each one.
+
+   "Identical" means an identical `domain_string` -- the same domains in the
+   same order with the same consecutive-repeat counts. That is the strict
+   reading, and how much it collapses depends entirely on the gene family: the
+   lg1 pan-gene's 65 members share ONE architecture, while rp1's 287 members
+   hold 164, because its LRR repeat counts differ member to member. Dropping
+   the repeat counts only takes rp1 to 151 and collapsing on the domain set
+   alone takes it to 71, so no grouping rule makes that record a short list --
+   it is a real NLR cluster, not a defect. The figure therefore ranks these and
+   summarises the tail rather than drawing all of them.
+
+   The ribbon draws ONE member's coordinates, not an average: members of a
+   group share an architecture but not their exact residue positions, and a
+   mean of them is a protein that does not exist. The exemplar is preferred so
+   the record's own representative is the one drawn. */
+function mgdbPanGeneArchitectures($rows, $exemplar_gene_model) {
+  $groups = array();
+  foreach ($rows as $row) {
+    $key = $row['domain_string'];
+    if (!isset($groups[$key])) {
+      $groups[$key] = array(
+        'domain_string' => $key,
+        'domains' => $row['domains'],
+        'member_count' => 0,
+        'representative' => null,
+        'blocks' => array(),
+        'extent' => null,
+        'members' => array()
+      );
+    }
+    $groups[$key]['member_count']++;
+    $groups[$key]['members'][] = array(
+      'transcript' => $row['transcript'],
+      'gene_model' => $row['gene_model'],
+      'assembly' => $row['assembly']
+    );
+    /* First member of the group wins, unless the exemplar turns up later. */
+    $is_exemplar = ($row['gene_model'] !== null && $row['gene_model'] === $exemplar_gene_model);
+    if ($groups[$key]['representative'] === null || $is_exemplar) {
+      if ($groups[$key]['representative'] === null || !$groups[$key]['representative']['is_exemplar']) {
+        $extent = 0;
+        foreach ($row['spans'] as $span) { if ($span['end'] > $extent) { $extent = $span['end']; } }
+        $groups[$key]['representative'] = array(
+          'transcript' => $row['transcript'],
+          'gene_model' => $row['gene_model'],
+          'assembly' => $row['assembly'],
+          'is_exemplar' => $is_exemplar
+        );
+        $groups[$key]['blocks'] = $row['spans'];
+        $groups[$key]['extent'] = $extent > 0 ? $extent : null;
+      }
+    }
+  }
+
+  $architectures = array_values($groups);
+  /* Commonest first; ties by the architecture string so the order is stable
+     between requests for the same record. */
+  usort($architectures, function ($a, $b) {
+    if ($a['member_count'] !== $b['member_count']) { return $b['member_count'] - $a['member_count']; }
+    return strcmp($a['domain_string'], $b['domain_string']);
+  });
+  return $architectures;
+}
+
+/* Every domain in the pan-gene, ranked by how many members carry it. The
+   figure colours the first few of these and leaves the rest neutral, so the
+   ranking has to come from the record rather than from the drawing order --
+   and it has to be the same list on every request. */
+function mgdbPanGeneDomainTotals($rows) {
+  $totals = array();
+  foreach ($rows as $row) {
+    $seen = array();
+    foreach ($row['spans'] as $span) {
+      $name = $span['name'];
+      if ($name === null) { continue; }
+      if (!isset($totals[$name])) {
+        $totals[$name] = array('name' => $name, 'accession' => $span['accession'],
+                               'member_count' => 0, 'occurrences' => 0);
+      }
+      $totals[$name]['occurrences']++;
+      if (!isset($seen[$name])) { $totals[$name]['member_count']++; $seen[$name] = true; }
+    }
+  }
+  $totals = array_values($totals);
+  usort($totals, function ($a, $b) {
+    if ($a['member_count'] !== $b['member_count']) { return $b['member_count'] - $a['member_count']; }
+    if ($a['occurrences'] !== $b['occurrences']) { return $b['occurrences'] - $a['occurrences']; }
+    return strcmp((string) $a['name'], (string) $b['name']);
+  });
+  return $totals;
+}
 
 /* The panel an assembly belongs to, read from its name. There is no column
    for this: the NAM founders, the PanAnd relatives and the rest are told apart

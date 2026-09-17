@@ -205,3 +205,174 @@ button.mgdb-pg-cell:focus-visible { outline: none; box-shadow: var(--mgdb-focus-
   .mgdb-pg-cell { transition: none; }
   button.mgdb-pg-cell:hover { transform: none; }
 }
+
+/* ── Domain architecture ribbons ──────────────────────────────────────────
+   Every margin below that lands on a p, ul, ol or li is scoped through
+   .mgdb-pg-arch on purpose: `.mgdb-page p, .mgdb-page ul, .mgdb-page ol …`
+   in mgdb-modern.css sets `margin: 0` at (0,1,1) and beats a bare class.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.mgdb-pg-arch-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-4);
+  align-items: center;
+}
+
+.mgdb-pg-arch .mgdb-pg-arch-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-1) var(--mgdb-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-xs);
+}
+.mgdb-pg-arch .mgdb-pg-arch-legend li { display: inline-flex; align-items: center; gap: 5px; }
+
+.mgdb-pg-arch-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+/* The residue axis, shared by every ribbon below it. The ticks are positioned
+   by their left edge as a percentage of the same scale the SVG uses, so they
+   stay over their own residue at any width. */
+.mgdb-pg-arch-axis {
+  position: relative;
+  height: 16px;
+  margin-top: var(--mgdb-space-3);
+  border-bottom: 1px solid var(--mgdb-line);
+  color: var(--mgdb-muted);
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+}
+.mgdb-pg-arch-tick {
+  position: absolute;
+  bottom: 2px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.mgdb-pg-arch-tick:first-child { transform: none; }
+
+.mgdb-pg-arch .mgdb-pg-arch-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mgdb-pg-arch .mgdb-pg-arch-row {
+  margin: 0;
+  padding: var(--mgdb-space-3) 0;
+  border-bottom: 1px solid var(--mgdb-line-soft, var(--mgdb-line));
+}
+.mgdb-pg-arch .mgdb-pg-arch-row:last-child { border-bottom: 0; }
+
+.mgdb-pg-arch-head {
+  display: flex;
+  width: 100%;
+  gap: var(--mgdb-space-3);
+  align-items: baseline;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.mgdb-pg-arch-head:focus-visible { outline: none; box-shadow: var(--mgdb-focus-ring); border-radius: var(--mgdb-radius-sm); }
+
+.mgdb-pg-arch-count {
+  flex: none;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+  white-space: nowrap;
+}
+.mgdb-pg-arch-count strong {
+  margin-right: 4px;
+  color: var(--mgdb-ink);
+  font-size: var(--mgdb-text-sm);
+}
+
+/* The architecture string can be very long on an NLR -- rp1's commonest runs
+   to 24 domains -- so it is one line until the row is opened. */
+.mgdb-pg-arch-string {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--mgdb-ink-soft);
+  font-family: var(--mgdb-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: var(--mgdb-text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mgdb-pg-arch-head[aria-expanded="true"] .mgdb-pg-arch-string { white-space: normal; overflow: visible; }
+
+.mgdb-pg-arch-chevron {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--mgdb-muted);
+  border-bottom: 2px solid var(--mgdb-muted);
+  transform: rotate(45deg);
+  transition: transform .15s ease;
+}
+.mgdb-pg-arch-head[aria-expanded="true"] .mgdb-pg-arch-chevron { transform: rotate(-135deg); }
+
+.mgdb-pg-arch-ribbon { position: relative; margin-top: var(--mgdb-space-2); }
+.mgdb-pg-arch-svg { display: block; width: 100%; height: 100%; }
+.mgdb-pg-arch-rail { fill: var(--mgdb-surface-sunken); }
+.mgdb-pg-arch-block rect { stroke: var(--mgdb-surface); stroke-width: 2; }
+
+/* Names ride over the SVG so they keep their own size while it stretches. */
+.mgdb-pg-arch-name {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0 3px;
+  color: #fff;
+  text-overflow: ellipsis;
+  font-size: 9.5px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: .01em;
+  white-space: nowrap;
+  pointer-events: none;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, .35);
+}
+
+.mgdb-pg-arch .mgdb-pg-arch-caption {
+  margin: var(--mgdb-space-2) 0 0;
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}
+
+.mgdb-pg-arch .mgdb-pg-arch-member-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px var(--mgdb-space-4);
+  margin: var(--mgdb-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--mgdb-text-xs);
+}
+.mgdb-pg-arch .mgdb-pg-arch-member-list li { margin: 0; }
+
+.mgdb-pg-arch .mgdb-pg-arch-more { margin: var(--mgdb-space-4) 0 0; }
+.mgdb-pg-arch .mgdb-pg-arch-note { margin: var(--mgdb-space-4) 0 0; }
+
+@media (max-width: 640px) {
+  .mgdb-pg-arch-head { flex-wrap: wrap; gap: var(--mgdb-space-1) var(--mgdb-space-2); }
+  .mgdb-pg-arch-string { flex-basis: 100%; }
+  .mgdb-pg-arch-name { font-size: 9px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mgdb-pg-arch-chevron { transition: none; }
+}

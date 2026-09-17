@@ -14,7 +14,7 @@ chr9 while the pan-gene is chr10).
 | # | Figure | State |
 | --- | --- | --- |
 | 1 | Presence / absence strip, top of Overview | **Live on dev 2026-09-17** |
-| 2 | Domain architecture ribbons (collapse identical `domain_string`s) | planned |
+| 2 | Domain architecture ribbons (collapse identical `domain_string`s) | **Live on dev 2026-09-17** |
 | 3 | Interactive SVG tree from the Newick, linked selection | planned |
 | 4 | Conservation profile + working MSA | planned |
 | 5 | NAM expression heatmap (26 genomes x 10 NAM Consortium tissues) | planned |
@@ -110,3 +110,57 @@ stubbed API response at 1280 px and 390 px.
   `/var/www/claude/html/tools/gene_models_index.py` — not in this repo.
   B73v5 is the only release built; its payload is 151 MB, and the server has
   13 GB free (72% used), so 25 NAM founders is roughly 3.8 GB.
+
+## Figure 2, and what the data forced
+
+Collapsing on an identical `domain_string` gives wildly different figures on
+the two test records, and that is the gene family rather than a defect:
+
+| Grouping | lg1 (65 members) | rp1 (287 members) |
+| --- | --- | --- |
+| exact `domain_string` | **1** architecture | **164** |
+| repeat counts dropped | 1 | 151 |
+| domain set only | 1 | 71 |
+
+So no grouping rule makes rp1 a short list. The figure ranks architectures by
+member count, draws the eight commonest and summarises the tail, with a
+"Show all 164" that redraws at the new scale.
+
+Other things the data forced:
+
+- **HMMscan reports overlapping models over one region** — 24 blocks over
+  1,237 aa on rp1's commonest architecture, many nested. One row per
+  architecture hid most of them, so blocks are packed into lanes.
+- **The axis is scaled to the architectures drawn, not to the record.** One
+  rp1 member carries a domain out to 2,277 aa while all eight commonest end
+  near 1,250; scaling to `axis_max` squeezed every ribbon into the left half.
+  The record-wide maximum is still stated in the note.
+- **It is rounded up to the next labelled tick.** Otherwise the longest
+  architecture's last domain ends exactly at the axis end — on lg1, which has
+  one architecture, that is the whole figure and reads as a protein that stops
+  there.
+- **There is no protein length anywhere in the database.** `chado.feature.seqlen`
+  is NULL on every `polypeptide` row; mRNA `seqlen` is the genomic span. So the
+  axis is "residue position to the last annotated domain", said plainly in the
+  note. Real protein ends arrive free with the NAM/PanAnd gene-model releases,
+  which carry `protein_length_aa` — that is the upgrade that turns this into a
+  true protein-scale figure.
+- **Six colours, not seven.** Any two domains can sit side by side here since
+  the order differs per architecture, so the all-pairs palette test applies.
+  The site's seven-slot Okabe-Ito palette FAILS it (slot 7 vs slot 2: dE 4.9
+  deutan, 13.7 normal, under the hard floor of 15); six slots pass. The six
+  commonest domains in the record take those slots and the rest are neutral.
+  Two slots are under 3:1 on white, which mandates the labels/table relief the
+  figure already has. Run with the data-viz skill's validator — there is a
+  Python twin, `scripts/validate_palette.py`, which matters because neither
+  this workstation nor the dev server has node.
+- Payload: rp1's full record went 427 KB -> 874 KB uncompressed, but **69 KB
+  over the wire** — the block and member arrays compress very well. Response
+  time 0.90 s -> 1.06 s.
+
+**Pre-existing defect, not from this work:** every pan-gene record load throws
+**33 uncaught** `Syntax error, unrecognized expression: #[object ]` — a jQuery
+Sizzle error from the legacy `js/pan_gene.js`, which builds selectors as
+`$('#'+var)` in eight places. The count is identical on a record with 1
+architecture and one with 164, and the figures module contains no jQuery at
+all. Worth fixing separately: 33 uncaught errors per load will mask a real one.
