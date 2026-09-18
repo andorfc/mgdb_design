@@ -299,8 +299,12 @@ class Bauplan {
 
 		$h  = "";
 		$h .= $put('property', 'og:image', $card);
-		$h .= $put('property', 'og:image:width', '1200');
-		$h .= $put('property', 'og:image:height', '630');
+		/* The card's real size. It is 1730x909 -- the 1.91:1 link-card shape --
+		   since the logo card of 2026-09-17; declaring a size the file does not
+		   have makes some networks crop or letterbox it. Change these with the
+		   file. */
+		$h .= $put('property', 'og:image:width', '1730');
+		$h .= $put('property', 'og:image:height', '909');
 		$h .= $put('property', 'og:image:alt', 'MaizeGDB, the Maize Genetics and Genomics Database');
 		$h .= $put('property', 'og:site_name', 'MaizeGDB');
 		$h .= $put('property', 'og:locale', 'en_US');
@@ -330,7 +334,7 @@ class Bauplan {
 		$h .= $put('property', 'og:url', $canonical);
 
 		$h .= $put('name', 'twitter:image', $card);
-		/* A card with a 1200x630 image should say so, or X renders the small
+		/* A card with a wide 1.91:1 image should say so, or X renders the small
 		   square one. Templates that set it keep their own value. */
 		$h .= $put('name', 'twitter:card', 'summary_large_image');
 
