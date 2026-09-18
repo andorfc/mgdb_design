@@ -16,7 +16,7 @@ chr9 while the pan-gene is chr10).
 | 1 | Presence / absence strip, top of Overview | **Live on dev 2026-09-17** |
 | 2 | Domain architecture ribbons (collapse identical `domain_string`s) | **Live on dev 2026-09-17** |
 | 3 | Interactive SVG tree from the Newick, linked selection | **Live on dev 2026-09-17** |
-| 4 | Conservation profile + working MSA | planned |
+| 4 | Conservation profile + working MSA (windowed canvas) | **Live on dev 2026-09-17** |
 | 5 | NAM expression heatmap (26 genomes x 10 NAM Consortium tissues) | planned |
 | 6 | Homeolog / paralog comparison within a genome | planned |
 | 7 | Chromosome placement map | needs gene-model releases for NAM + PanAnd |
@@ -212,3 +212,42 @@ Two CSS traps, both the same one as `.mgdb-page p`:
   (contained, so it can never scroll the document sideways).
 - Every `p`/`ul`/`ol` margin in this stylesheet is scoped through its block for
   the same reason.
+
+## Figure 4: conservation profile and windowed alignment
+
+`MGDB.panGeneMsa` draws the aligned FASTA the legacy BioJS MSAViewer read, and
+replaces it -- `tools/msa/msa.min.gz.js` (199 KB) is no longer loaded here.
+
+- **Windowed canvas.** One canvas the size of the box, `position: sticky` inside
+  a sizer as large as the whole alignment, so the browser supplies scrollbars,
+  touch and keyboard scrolling and each frame paints only what is in view.
+  rp1 is 301 x 3,564 (1.07 M residues; 3.2 M as CDS) behind a 35,776 x 4,591 px
+  virtual space; a full frame costs **2.4-3.2 ms median, 4.3 ms worst** at every
+  zoom step.
+- **Profile**: occupancy (grey) with conservation to consensus (green) drawn
+  inside it -- conservation cannot exceed occupancy, so the gap between them is
+  the variation among the sequences that have the column. The exemplar's
+  domains are walked onto alignment columns through its own gaps and drawn in
+  lanes, in the ribbons' colours.
+- **Opens at the shared core**, the first column at least half the sequences
+  occupy. rp1's members run 400-2,322 aa, so its first ~1,000 columns are nearly
+  all gap; opening at column 1 showed an empty box with the domains off to the
+  right. Protein opens at column 914, CDS at 2,792.
+- **Rows default to tree order**, so clades line up as blocks. Also by file,
+  gene model, or identity to consensus.
+- Linked: picking a member elsewhere scrolls the alignment's own box to its row
+  (never the page); clicking a row publishes it.
+
+**Data defect:** three rp1 rows are named `AC152495.1_FTGT00n_T00n` in the
+alignment file but `AC152495.1_FGTT00n_T00n` in the database -- two letters
+transposed. They are shown by the file's name and cannot be selected, and the
+figure says so rather than guessing a mapping.
+
+**Testing traps, both of which looked like page bugs:**
+- Re-inserting a scroll box into the DOM resets its scroll offsets to 0. Moving
+  a section to the top for a screenshot therefore made the alignment look as if
+  it opened at column 1. Save and restore `scrollLeft`/`scrollTop` around the
+  move.
+- `requestAnimationFrame` does not run while the browser pane is hidden
+  (`document.hidden`), so a test that awaits frames hangs. Swap in a
+  synchronous `requestAnimationFrame` for the duration of the measurement.

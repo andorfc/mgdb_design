@@ -1086,41 +1086,11 @@
 /* ==========================================================================
    Pan-gene record page
    --------------------------------------------------------------------------
-   Only the three embedded viewers. Everything else on the page is shell.
+   Only the embedded GCV is styled here. The record's own figures -- the
+   presence strip, domain ribbons, tree and alignment -- live in
+   css/mgdb-pan-gene-record.css. The rules that sized the BioJS MSAViewer and
+   IcyTree containers went with those libraries on 2026-09-17.
    ========================================================================== */
-
-/* The scroll container is a wrapper around #msa-div, not #msa-div itself: the
-   MSA library overwrites the class list of the element it renders into, so a
-   class put there is gone by the time the alignment arrives. The alignment is
-   about 3,900px wide, and without this the whole document scrolls sideways. */
-.mgdb-pan-gene-record-page .mgdb-pg-msa {
-  max-width: 100%;
-  margin-top: var(--mgdb-space-3);
-  overflow-x: auto;
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-sm, 6px);
-  background: #fff;
-}
-
-/* The alignment toolbar is the shell's own toolbar with the same controls at
-   the same 36px height, so it reads as a row rather than four loose buttons.
-   An <a> styled as a toolbar button needs the flex centring the <button> gets
-   for free. */
-.mgdb-pan-gene-record-page .mgdb-pg-msa-toolbar { margin: var(--mgdb-space-3) 0 0; }
-.mgdb-pan-gene-record-page .mgdb-pg-msa-toolbar a.mgdb-rec-tsv {
-  display: inline-flex;
-  align-items: center;
-  text-decoration: none;
-}
-
-.mgdb-pan-gene-record-page .mgdb-pg-tree {
-  min-height: 320px;
-  margin-top: var(--mgdb-space-3);
-  overflow-x: auto;
-  border: 1px solid var(--mgdb-line);
-  border-radius: var(--mgdb-radius-sm, 6px);
-  background: #fff;
-}
 
 .mgdb-pan-gene-record-page .mgdb-pg-gcv {
   display: block;

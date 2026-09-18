@@ -93,9 +93,13 @@ $bauplan->includeCss('/css/mgdb-hub.css?v=' . $v_hub);
 $bauplan->includeCss('/css/mgdb-record.css?v=' . $v_rec_css);
 $bauplan->includeCss('/css/mgdb-pan-gene-record.css?v=' . $v_pg_css);
 
-/* What this page still keeps from the legacy one: the MSA alignment viewer and
-   js/pan_gene.js, which drives it and the sequence downloads.
-   mgdb-pan-gene-record.js calls into them rather than reimplementing them.
+/* What this page still keeps from the legacy one: js/pan_gene.js, for the
+   sequence downloads.
+
+   The BioJS MSAViewer (tools/msa/msa.min.gz.js, 199 KB) was dropped on
+   2026-09-17 when the record grew its own alignment viewer
+   (MGDB.panGeneMsa), which draws the conservation profile and only the cells
+   in view, and follows the selection the other figures share.
 
    IcyTree and js/phylotree.js were dropped on 2026-09-17 when the record grew
    its own tree (MGDB.panGeneTree, drawn from the same Newick with
@@ -110,7 +114,6 @@ $bauplan->includeCss('/css/mgdb-pan-gene-record.css?v=' . $v_pg_css);
 $bauplan->includeScript('https://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.0/jquery.min.js');
 $bauplan->includeScript('https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.9.0/jquery-ui.min.js');
 $bauplan->includeScript('https://cdn.plot.ly/plotly-2.35.2.min.js');
-$bauplan->includeScript('/tools/msa/msa.min.gz.js');
 /* d3-hierarchy 3.1.2, vendored rather than taken from a CDN: it is the leaf
    ordering behind the record's own phylogenetic tree and the page should not
    lose its tree when someone else's host is slow. It creates window.d3, which

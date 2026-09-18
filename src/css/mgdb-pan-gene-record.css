@@ -570,3 +570,80 @@ section[id^="pg-record-"] .mgdb-rec-table td { overflow-wrap: normal; }
 /* Assembly names break at their hyphens even so, as in the Analysis table. The
    domains table has a long, wrappable Domain order column to take the width. */
 #pg-record-domains .mgdb-rec-table td:nth-child(2) { white-space: nowrap; }
+
+/* ── Conservation profile and windowed alignment ──────────────────────────
+   The alignment is one canvas the size of its box, pinned with position:
+   sticky inside a sizer as large as the whole alignment. So the browser
+   provides real scrollbars, touch and keyboard scrolling, and each frame
+   paints only the cells in view.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.mgdb-pg-msa-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mgdb-space-2) var(--mgdb-space-3);
+  align-items: center;
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+}
+.mgdb-pg-msa-tools label { display: inline-flex; gap: 6px; align-items: center; }
+.mgdb-pg-msa-tools select {
+  height: 32px;
+  padding: 0 var(--mgdb-space-2);
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius-sm);
+  background: var(--mgdb-surface);
+  color: var(--mgdb-ink);
+  font: inherit;
+}
+.mgdb-pg-msa-zoom { display: inline-flex; gap: 4px; }
+.mgdb-pg-msa-zoom .mgdb-rec-tsv { min-width: 32px; font-size: 16px; line-height: 1; }
+.mgdb-pg-msa-zoom .mgdb-rec-tsv:disabled { opacity: .4; cursor: default; }
+
+.mgdb-pg-msa-overview {
+  margin-top: var(--mgdb-space-3);
+  border: 1px solid var(--mgdb-line);
+  border-bottom: 0;
+  border-radius: var(--mgdb-radius) var(--mgdb-radius) 0 0;
+  background: var(--mgdb-surface);
+}
+.mgdb-pg-msa-overview canvas { display: block; cursor: ew-resize; touch-action: none; }
+
+.mgdb-pg-msa-scroll {
+  position: relative;
+  overflow: auto;
+  border: 1px solid var(--mgdb-line);
+  border-radius: 0 0 var(--mgdb-radius) var(--mgdb-radius);
+  background: var(--mgdb-surface);
+  overscroll-behavior: contain;
+}
+.mgdb-pg-msa-scroll:focus-visible { outline: none; box-shadow: var(--mgdb-focus-ring); }
+.mgdb-pg-msa-sizer { position: relative; }
+
+/* `.mgdb-page img, .mgdb-page svg { max-width: 100% }` does not reach a
+   canvas, but its width is set in pixels here and must not be scaled by
+   anything, so say so. */
+.mgdb-pg-msa-scroll .mgdb-pg-msa-canvas {
+  position: sticky;
+  top: 0;
+  left: 0;
+  display: block;
+  max-width: none;
+  cursor: crosshair;
+}
+
+.mgdb-pg-msa-block .mgdb-pg-msa-detail {
+  min-height: calc(2 * var(--mgdb-leading-snug) * 1em);
+  margin: var(--mgdb-space-3) 0 0;
+  padding: var(--mgdb-space-3) var(--mgdb-space-4);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface-sunken);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+.mgdb-pg-msa-detail strong { color: var(--mgdb-ink); }
+
+@media (max-width: 640px) {
+  .mgdb-pg-msa-block .mgdb-pg-msa-detail { padding: var(--mgdb-space-2) var(--mgdb-space-3); }
+}

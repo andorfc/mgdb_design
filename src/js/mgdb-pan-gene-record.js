@@ -5,9 +5,11 @@
    map, marker and phenotype record pages use. This file maps one call to
    /api/v1/records/pan_gene/{id} onto it.
 
-   Three viewers are the legacy page's own and are called, not reimplemented:
-   MSAviewerLoad and friends from js/pan_gene.js, loadTree from js/phylotree.js
-   over IcyTree, and the GCV in an iframe.
+   The figures -- presence strip, domain ribbons, tree, alignment -- are the
+   record's own, in js/mgdb-pan-gene-figures.js, linked through
+   MGDB.panGeneSelection. What is still the legacy page's is the GCV, in an
+   iframe, and the sequence downloads in js/pan_gene.js. The IcyTree and
+   BioJS MSAViewer libraries were retired from this page on 2026-09-17.
    ========================================================================== */
 
 (function (window, document) {
@@ -19,7 +21,6 @@
 
   var els = {};
   var payload = null;
-  var msaView = null;
   var presenceStrip = null;   /* handle from MGDB.panGenePresence, for linked selection */
 
   function num(value) { return value === null || value === undefined ? '' : String(value); }
@@ -255,7 +256,7 @@
      Sequence, alignment, tree, pangenome graph, genome context
      ------------------------------------------------------------------------ */
 
-  function renderSequence(sequence) {
+  function renderSequence(sequence, sections) {
     if (!sequence) { return false; }
     var out = els.sequenceBody;
     out.innerHTML = '';
@@ -288,18 +289,22 @@
       });
     }
 
-    /* The MSA viewer is the legacy page's, loaded from the same file with the
-       same options. It reads the alignment straight off the FTP host, so it is
-       only offered when the API found the file there. */
-    if (sequence.cds_alignment_url && typeof window.MSAviewerLoad === 'function') {
-      R.show(els.msaBlock, true);
-      try {
-        msaView = window.MSAviewerLoad('msa-div', sequence.pan_gene_name,
-          sequence.alignment_member_count || 20);
-      } catch (error) {
-        R.show(els.msaBlock, false);
-      }
-    } else if (!sequence.cds_alignment_url) {
+    /* The record's own alignment viewer, drawn from the same aligned FASTA the
+       legacy BioJS MSAViewer read. That library (199 KB) is no longer loaded:
+       this one is linked to the other figures, draws only the cells in view,
+       and carries the conservation profile and the exemplar's domains. */
+    if ((sequence.protein_alignment_url || sequence.cds_alignment_url) && MGDB.panGeneMsa) {
+      var sec = sections || {};
+      MGDB.panGeneMsa(out, {
+        proteinUrl: sequence.protein_alignment_url,
+        cdsUrl: sequence.cds_alignment_url,
+        exemplar: sequence.exemplar,
+        resolve: memberIndex(sec.members),
+        treeUrl: sec.tree ? sec.tree.url : null,
+        domains: sec.domains,
+        panGene: sequence.pan_gene_name
+      });
+    } else if (!sequence.cds_alignment_url && !sequence.protein_alignment_url) {
       out.insertAdjacentHTML('beforeend',
         '<p class="mgdb-rec-empty">No alignment files exist for this pan-gene.</p>');
     }
@@ -307,45 +312,6 @@
     return true;
   }
 
-  function bindMsaControls(sequence) {
-    /* The legacy MSAviewerChangeAlignment() reads which alignment to show from
-       a checked radio input, so it cannot drive a pair of buttons. The four
-       lines it would have run are here instead; everything else -- loading,
-       zooming, colouring -- is still the legacy viewer's own code. */
-    function pick(which) {
-      R.byId('pg-msa-cds').setAttribute('aria-pressed', which === 'cds' ? 'true' : 'false');
-      R.byId('pg-msa-protein').setAttribute('aria-pressed', which === 'protein' ? 'true' : 'false');
-      if (!msaView || !window.base_align_url) { return; }
-      var url = window.base_align_url +
-                (which === 'cds' ? 'cds-alignments/' : 'protein-alignments/') +
-                sequence.pan_gene_name;
-      var download = R.byId('msa_view-download');
-      if (download) { download.setAttribute('href', url); }
-      msaView.u.file.importURL(url, function () { msaView.render(); });
-    }
-    var cds = R.byId('pg-msa-cds');
-    var protein = R.byId('pg-msa-protein');
-    if (cds) { cds.addEventListener('click', function () { pick('cds'); }); }
-    if (protein) { protein.addEventListener('click', function () { pick('protein'); }); }
-    var expand = R.byId('pg-msa-expand');
-    if (expand) {
-      expand.addEventListener('click', function () {
-        if (msaView && typeof window.MSAviewerExpand === 'function') { window.MSAviewerExpand(msaView); }
-      });
-    }
-    var contract = R.byId('pg-msa-contract');
-    if (contract) {
-      contract.addEventListener('click', function () {
-        if (msaView && typeof window.MSAviewerContract === 'function') { window.MSAviewerContract(msaView); }
-      });
-    }
-    var colour = R.byId('msa_color_select');
-    if (colour) {
-      colour.addEventListener('change', function () {
-        if (msaView && typeof window.MSAviewerChangeColor === 'function') { window.MSAviewerChangeColor(msaView); }
-      });
-    }
-  }
 
   /* Everything the tree needs to say about a tip, keyed by transcript. The
      tree file names tips by transcript and every other figure works in gene
@@ -886,9 +852,8 @@
       rendered.push('pg-record-pathways');
     }
 
-    if (renderSequence(sections.sequence)) {
+    if (renderSequence(sections.sequence, sections)) {
       rendered.push('pg-record-sequence');
-      bindMsaControls(sections.sequence || {});
     }
     if (renderTree(sections.tree, sections.members, sections.overview)) { rendered.push('pg-record-tree'); }
     if (renderPangenome(sections.pangenome)) { rendered.push('pg-record-pangenome'); }
@@ -954,7 +919,6 @@
       proteinsBody: R.byId('pg-record-proteins-body'),
       pathwaysBody: R.byId('pg-record-pathways-body'),
       sequenceBody: R.byId('pg-record-sequence-body'),
-      msaBlock: R.byId('pg-record-msa-block'),
       treeBody: R.byId('pg-record-tree-body'),
       pangenomeBody: R.byId('pg-record-pangenome-body'),
       contextBody: R.byId('pg-record-context-body'),

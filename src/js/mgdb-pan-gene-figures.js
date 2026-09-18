@@ -1324,11 +1324,10 @@
       draw();
     }
     var debounced = MGDB.debounce ? MGDB.debounce(onBoxResize, 150) : onBoxResize;
-    if (window.ResizeObserver) {
-      new window.ResizeObserver(debounced).observe(scroller);
-    } else {
-      window.addEventListener('resize', debounced);
-    }
+    /* Both, as on the alignment: an observer alone missed a viewport change
+       and left the drawing at its old width. */
+    if (window.ResizeObserver) { new window.ResizeObserver(debounced).observe(scroller); }
+    window.addEventListener('resize', debounced);
 
     /* ---- events --------------------------------------------------------- */
 
@@ -1541,6 +1540,853 @@
   }
 
   MGDB.panGeneTree = panGeneTree;
+
+  /* ------------------------------------------------------------------------
+     Conservation profile and multiple sequence alignment
+
+     spec = {
+       proteinUrl, cdsUrl: the aligned FASTA files (CORS-readable from here)
+       exemplar:  the exemplar transcript
+       resolve:   function (transcript) -> {gene, assembly, species, chr, html}
+       treeUrl:   the Newick, for tree order
+       domains:   sections.domains, for the exemplar's domain track and the
+                  same domain colours the ribbons use
+       panGene:   the internal pan-gene name, for file names
+     }
+
+     A windowed canvas: the drawing is one canvas the size of the visible box,
+     pinned with position: sticky inside a sizer as large as the whole
+     alignment, so the browser supplies real scrollbars, touch scrolling and
+     keyboard scrolling, and each frame paints only the cells in view. rp1's
+     protein alignment is 301 x 3,564 = 1.07 million residues and its CDS
+     alignment 3.2 million; a frame costs the same few thousand cells either
+     way.
+     ------------------------------------------------------------------------ */
+
+  /* Six residue classes, in the six palette slots validated for this page,
+     assigned so the families land near their Clustal colours: hydrophobic
+     blue, positive red, negative magenta, polar green, H/Y cyan, G/P orange.
+     Every cell also carries its letter once the zoom allows. */
+  var RESIDUE_CLASS = {};
+  'AILMFWVC'.split('').forEach(function (c) { RESIDUE_CLASS[c] = '#0072B2'; });
+  'KR'.split('').forEach(function (c) { RESIDUE_CLASS[c] = '#D55E00'; });
+  'DE'.split('').forEach(function (c) { RESIDUE_CLASS[c] = '#CC79A7'; });
+  'NQST'.split('').forEach(function (c) { RESIDUE_CLASS[c] = '#009E73'; });
+  'HY'.split('').forEach(function (c) { RESIDUE_CLASS[c] = '#56B4E9'; });
+  'GP'.split('').forEach(function (c) { RESIDUE_CLASS[c] = '#E69F00'; });
+  var NUCLEOTIDE_CLASS = { A: '#009E73', C: '#0072B2', G: '#E69F00', T: '#D55E00', U: '#D55E00' };
+
+  var MSA_ZOOM = [
+    { cw: 1, rh: 4 }, { cw: 3, rh: 7 }, { cw: 6, rh: 11 }, { cw: 10, rh: 15 }, { cw: 14, rh: 18 }
+  ];
+
+  function parseFasta(text) {
+    var names = [], seqs = [], cur = null;
+    String(text).split(/\r?\n/).forEach(function (line) {
+      if (line.charAt(0) === '>') {
+        if (cur !== null) { seqs.push(cur.join('').toUpperCase()); }
+        names.push(line.slice(1).trim().split(/\s+/)[0]);
+        cur = [];
+      } else if (cur !== null) {
+        cur.push(line.replace(/\s+/g, ''));
+      }
+    });
+    if (cur !== null) { seqs.push(cur.join('').toUpperCase()); }
+    var width = 0;
+    seqs.forEach(function (s) { if (s.length > width) { width = s.length; } });
+    return { names: names, seqs: seqs, width: width };
+  }
+
+  /* Per column: occupancy (share of sequences with a residue there), the
+     consensus residue, and conservation (share of ALL sequences carrying that
+     consensus). Conservation can never exceed occupancy, which is why the
+     profile draws it inside the occupancy band: the gap between the two is
+     the variation among the sequences that have the column at all. */
+  function profile(aln) {
+    var W = aln.width, N = aln.seqs.length;
+    var counts = new Uint16Array(W * 27);   /* A..Z, and 26 for anything else */
+    aln.seqs.forEach(function (s) {
+      for (var c = 0; c < s.length; c++) {
+        var code = s.charCodeAt(c);
+        if (code === 45 || code === 46) { continue; }          /* '-' '.' */
+        var k = code >= 65 && code <= 90 ? code - 65 : 26;
+        counts[c * 27 + k]++;
+      }
+    });
+    var occ = new Float32Array(W), cons = new Float32Array(W), consensus = new Uint8Array(W);
+    for (var c = 0; c < W; c++) {
+      var best = 0, bestK = 26, total = 0;
+      for (var k = 0; k < 27; k++) {
+        var n = counts[c * 27 + k];
+        total += n;
+        if (n > best && k < 26) { best = n; bestK = k; }
+      }
+      occ[c] = N ? total / N : 0;
+      cons[c] = N ? best / N : 0;
+      consensus[c] = bestK < 26 ? 65 + bestK : 0;
+    }
+    return { occ: occ, cons: cons, consensus: consensus };
+  }
+
+  function panGeneMsa(container, spec) {
+    if (!container || !spec || !(spec.proteinUrl || spec.cdsUrl)) { return null; }
+
+    var resolve = spec.resolve || function () { return null; };
+    var cache = {};                 /* kind -> {aln, prof, text} */
+    var kind = spec.proteinUrl ? 'protein' : 'cds';
+    var zoom = 3;
+    var colourMode = 'conservation';
+    var sortMode = 'tree';
+    var treeOrder = null;           /* transcript -> leaf index */
+    var order = [];
+    var current = null;             /* cache[kind] */
+    var hover = null;               /* {row, col} */
+    var selected = {};
+    var raf = 0;
+
+    var HEADER_RULER = 18, LANE_H = 7, LANE_GAP = 2;
+    var GREEN = '#2f6b3f', INK = '#1f2723', MUTED = '#7c837e', LINE = '#d7d2c6';
+
+    container.insertAdjacentHTML('beforeend',
+      '<div class="mgdb-rec-block mgdb-pg-msa-block">' +
+        '<div class="mgdb-rec-block-head is-headless">' +
+          '<div class="mgdb-pg-msa-tools" data-role="tools" hidden>' +
+            '<div class="mgdb-view-toggle" role="group" aria-label="Alignment">' +
+              (spec.proteinUrl ? '<button class="mgdb-view-btn" type="button" data-kind="protein" aria-pressed="true">Protein</button>' : '') +
+              (spec.cdsUrl ? '<button class="mgdb-view-btn" type="button" data-kind="cds" aria-pressed="' +
+                (spec.proteinUrl ? 'false' : 'true') + '">CDS</button>' : '') +
+            '</div>' +
+            '<label>Colour <select data-role="colour" aria-label="Colour the alignment by">' +
+              '<option value="conservation">Conservation</option>' +
+              '<option value="residue">Residue class</option>' +
+              '<option value="plain">None</option>' +
+            '</select></label>' +
+            '<label>Order <select data-role="sort" aria-label="Order the sequences by">' +
+              '<option value="tree">Tree</option>' +
+              '<option value="file">Alignment file</option>' +
+              '<option value="name">Gene model</option>' +
+              '<option value="conservation">Identity to consensus</option>' +
+            '</select></label>' +
+            '<div class="mgdb-pg-msa-zoom" role="group" aria-label="Zoom">' +
+              '<button class="mgdb-rec-tsv" type="button" data-role="zoom-out" aria-label="Zoom out">&minus;</button>' +
+              '<button class="mgdb-rec-tsv" type="button" data-role="zoom-in" aria-label="Zoom in">+</button>' +
+            '</div>' +
+            '<button class="mgdb-rec-tsv" type="button" data-role="msa-png">Export PNG</button>' +
+            '<button class="mgdb-rec-tsv" type="button" data-role="msa-fasta">Download FASTA</button>' +
+          '</div>' +
+        '</div>' +
+        '<p class="mgdb-fig-desc">Conservation profile and multiple sequence alignment on a windowed canvas, ' +
+          'linked selection across figures.</p>' +
+        '<p class="mgdb-rec-block-status" data-role="msa-status">Loading the alignment&hellip;</p>' +
+        '<div class="mgdb-pg-msa-overview" data-role="overview" hidden>' +
+          '<canvas data-role="overview-canvas" role="img" aria-label="Conservation profile"></canvas>' +
+        '</div>' +
+        '<div class="mgdb-pg-msa-scroll" data-role="scroll" tabindex="0" hidden ' +
+          'aria-label="Multiple sequence alignment. Scroll to move through it.">' +
+          '<div class="mgdb-pg-msa-sizer" data-role="sizer">' +
+            '<canvas class="mgdb-pg-msa-canvas" data-role="canvas" role="img"></canvas>' +
+          '</div>' +
+        '</div>' +
+        '<p class="mgdb-pg-msa-detail" data-role="msa-detail" aria-live="polite"></p>' +
+      '</div>');
+
+    var block = container.lastElementChild;
+    var statusEl = block.querySelector('[data-role="msa-status"]');
+    var tools = block.querySelector('[data-role="tools"]');
+    var overviewWrap = block.querySelector('[data-role="overview"]');
+    var overview = block.querySelector('[data-role="overview-canvas"]');
+    var scroller = block.querySelector('[data-role="scroll"]');
+    var sizer = block.querySelector('[data-role="sizer"]');
+    var canvas = block.querySelector('[data-role="canvas"]');
+    var detail = block.querySelector('[data-role="msa-detail"]');
+    var idleDetail = 'Hover the alignment for a column’s consensus and conservation; click a row to select ' +
+      'that gene model in every figure. Click or drag the profile to move along the alignment.';
+    detail.textContent = idleDetail;
+
+    (function readTheme() {
+      var cs = window.getComputedStyle(block);
+      GREEN = (cs.getPropertyValue('--mgdb-green') || '').trim() || GREEN;
+      INK = (cs.getPropertyValue('--mgdb-ink') || '').trim() || INK;
+      MUTED = (cs.getPropertyValue('--mgdb-muted') || '').trim() || MUTED;
+      LINE = (cs.getPropertyValue('--mgdb-line') || '').trim() || LINE;
+    })();
+
+    /* ---- the exemplar's domains, in alignment columns ------------------ */
+
+    var domainColours = {};
+    (function () {
+      var totals = (spec.domains && spec.domains.domain_totals) || [];
+      var palette = (MGDB.CHART_COLORS || []).slice(0, COLOURED_DOMAINS);
+      totals.slice(0, palette.length).forEach(function (t, i) { domainColours[t.name] = palette[i]; });
+    })();
+
+    function exemplarBlocks() {
+      var archs = (spec.domains && spec.domains.architectures) || [];
+      for (var i = 0; i < archs.length; i++) {
+        var rep = archs[i].representative;
+        if (rep && rep.is_exemplar) { return archs[i].blocks || []; }
+      }
+      return [];
+    }
+
+    /* Domain coordinates are residue positions in the exemplar's own protein;
+       the alignment has gaps in it, so each one is walked across to the column
+       it sits in. Protein only -- on the CDS alignment a residue is three
+       columns and the track is not drawn. */
+    function domainLanes() {
+      if (kind !== 'protein' || !current) { return []; }
+      var ix = current.aln.names.indexOf(spec.exemplar);
+      if (ix === -1) { return []; }
+      var s = current.aln.seqs[ix];
+      var colOf = [], r = 0;
+      for (var c = 0; c < s.length; c++) {
+        var code = s.charCodeAt(c);
+        if (code !== 45 && code !== 46) { colOf[r++] = c; }
+      }
+      var mapped = exemplarBlocks().map(function (b) {
+        var a = colOf[b.start - 1], z = colOf[Math.min(b.end, r) - 1];
+        return a == null || z == null ? null : { name: b.name, start: a, end: z, rs: b.start, re: b.end };
+      }).filter(Boolean);
+      return packLanes(mapped, 2);
+    }
+
+    /* ---- load ------------------------------------------------------------ */
+
+    function load(which) {
+      if (cache[which]) { return Promise.resolve(cache[which]); }
+      var url = which === 'protein' ? spec.proteinUrl : spec.cdsUrl;
+      return fetch(url, { credentials: 'omit' })
+        .then(function (r) { if (!r.ok) { throw new Error('HTTP ' + r.status); } return r.text(); })
+        .then(function (text) {
+          var aln = parseFasta(text);
+          if (!aln.seqs.length) { throw new Error('empty alignment'); }
+          cache[which] = { aln: aln, prof: profile(aln), text: text };
+          return cache[which];
+        });
+    }
+
+    function loadTreeOrder() {
+      if (!spec.treeUrl || !MGDB.parseNewick) { return Promise.resolve(null); }
+      return fetch(spec.treeUrl, { credentials: 'omit' })
+        .then(function (r) { return r.ok ? r.text() : null; })
+        .then(function (text) {
+          if (!text) { return null; }
+          var idx = {}, n = 0;
+          (function walk(node) {
+            if (!node.children.length) { if (node.name) { idx[node.name] = n++; } return; }
+            node.children.forEach(walk);
+          })(MGDB.parseNewick(text));
+          return idx;
+        })
+        .catch(function () { return null; });
+    }
+
+    /* ---- ordering -------------------------------------------------------- */
+
+    function labelOf(i) {
+      var name = current.aln.names[i];
+      var info = resolve(name);
+      return info && info.gene ? info.gene : name;
+    }
+
+    function identityToConsensus(i) {
+      var s = current.aln.seqs[i], cons = current.prof.consensus, hit = 0, n = 0;
+      for (var c = 0; c < s.length; c++) {
+        var code = s.charCodeAt(c);
+        if (code === 45 || code === 46) { continue; }
+        n++;
+        if (code === cons[c]) { hit++; }
+      }
+      return n ? hit / n : 0;
+    }
+
+    function reorder() {
+      var n = current.aln.seqs.length;
+      order = [];
+      for (var i = 0; i < n; i++) { order.push(i); }
+      if (sortMode === 'tree' && treeOrder) {
+        order.sort(function (a, b) {
+          var x = treeOrder[current.aln.names[a]], y = treeOrder[current.aln.names[b]];
+          if (x == null && y == null) { return a - b; }
+          if (x == null) { return 1; }
+          if (y == null) { return -1; }
+          return x - y;
+        });
+      } else if (sortMode === 'name') {
+        order.sort(function (a, b) { return labelOf(a).localeCompare(labelOf(b)); });
+      } else if (sortMode === 'conservation') {
+        var score = {};
+        order.forEach(function (i) { score[i] = identityToConsensus(i); });
+        order.sort(function (a, b) { return score[b] - score[a]; });
+      }
+    }
+
+    /* ---- geometry -------------------------------------------------------- */
+
+    function gutter() { return scroller.clientWidth < 520 ? 104 : 136; }
+    function Z() { return MSA_ZOOM[zoom]; }
+
+    function headerHeight() {
+      var lanes = domainLanes().length;
+      return HEADER_RULER + (lanes ? lanes * (LANE_H + LANE_GAP) + 4 : 0);
+    }
+
+    function layout() {
+      var z = Z(), rows = current.aln.seqs.length, H = headerHeight();
+      var content = H + rows * z.rh;
+      var maxBox = Math.min(Math.round(window.innerHeight * 0.62), 560);
+      scroller.style.height = Math.min(content + 2, Math.max(maxBox, 160)) + 'px';
+      sizer.style.width = (gutter() + current.aln.width * z.cw) + 'px';
+      sizer.style.height = content + 'px';
+      sizeCanvas(canvas, scroller.clientWidth, scroller.clientHeight);
+      sizeCanvas(overview, overviewWrap.clientWidth, overviewHeight());
+    }
+
+    function overviewHeight() {
+      var lanes = domainLanes().length;
+      return 58 + (lanes ? lanes * (LANE_H + LANE_GAP) + 6 : 0);
+    }
+
+    function sizeCanvas(cv, w, h) {
+      var dpr = window.devicePixelRatio || 1;
+      cv.style.width = w + 'px';
+      cv.style.height = h + 'px';
+      cv.width = Math.max(1, Math.round(w * dpr));
+      cv.height = Math.max(1, Math.round(h * dpr));
+      cv.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function colourOfDomain(name) { return domainColours[name] || NEUTRAL_DOMAIN; }
+
+    /* ---- the conservation profile, across the whole alignment ------------ */
+
+    function drawOverview() {
+      var ctx = overview.getContext('2d');
+      var W = overviewWrap.clientWidth, H = overviewHeight();
+      var width = current.aln.width, prof = current.prof;
+      var plotH = 46, top = 4;
+      ctx.clearRect(0, 0, W, H);
+      /* One pixel column per slice of the alignment: the mean of each track
+         across the columns that pixel covers. */
+      for (var x = 0; x < W; x++) {
+        var c0 = Math.floor(x * width / W), c1 = Math.max(c0 + 1, Math.floor((x + 1) * width / W));
+        var o = 0, v = 0;
+        for (var c = c0; c < c1; c++) { o += prof.occ[c]; v += prof.cons[c]; }
+        o /= (c1 - c0); v /= (c1 - c0);
+        ctx.fillStyle = '#e8e4da';
+        ctx.fillRect(x, top + plotH * (1 - o), 1, plotH * o);
+        ctx.fillStyle = GREEN;
+        ctx.fillRect(x, top + plotH * (1 - v), 1, plotH * v);
+      }
+      ctx.fillStyle = LINE;
+      ctx.fillRect(0, top + plotH, W, 1);
+
+      var lanes = domainLanes();
+      lanes.forEach(function (lane, li) {
+        var y = top + plotH + 6 + li * (LANE_H + LANE_GAP);
+        lane.forEach(function (b) {
+          var x0 = b.start / width * W, x1 = (b.end + 1) / width * W;
+          ctx.fillStyle = colourOfDomain(b.name);
+          roundRect(ctx, x0, y, Math.max(x1 - x0, 2), LANE_H, 2);
+          ctx.fill();
+        });
+      });
+
+      /* Where the alignment box is looking. */
+      var z = Z(), dataW = scroller.clientWidth - gutter();
+      var vx0 = scroller.scrollLeft / z.cw / width * W;
+      var vw = Math.min(W, dataW / z.cw / width * W);
+      ctx.fillStyle = 'rgba(11, 87, 164, 0.10)';
+      ctx.fillRect(vx0, 0, Math.max(vw, 2), H);
+      ctx.strokeStyle = '#0b57a4';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(vx0 + 0.75, 0.75, Math.max(vw, 2) - 1.5, H - 1.5);
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+      r = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
+
+    /* ---- the alignment window -------------------------------------------- */
+
+    function cellFill(code, c) {
+      if (colourMode === 'plain') { return null; }
+      var ch = String.fromCharCode(code);
+      if (colourMode === 'residue') {
+        return (kind === 'protein' ? RESIDUE_CLASS : NUCLEOTIDE_CLASS)[ch] || null;
+      }
+      /* Conservation: a residue that matches its column's consensus, shaded
+         by how conserved the column is. A lone agreeing residue in a column
+         nobody else shares is not conservation, so the floor is 0.3. */
+      if (code === current.prof.consensus[c] && current.prof.cons[c] >= 0.3) { return GREEN; }
+      return null;
+    }
+
+    function draw() {
+      raf = 0;
+      if (!current) { return; }
+      var ctx = canvas.getContext('2d');
+      var z = Z(), G = gutter(), H = headerHeight();
+      var W = scroller.clientWidth, VH = scroller.clientHeight;
+      var sl = scroller.scrollLeft, st = scroller.scrollTop;
+      var aln = current.aln, prof = current.prof;
+      var rows = aln.seqs.length, width = aln.width;
+      var c0 = Math.max(0, Math.floor(sl / z.cw));
+      var c1 = Math.min(width, Math.ceil((sl + W - G) / z.cw));
+      var r0 = Math.max(0, Math.floor(st / z.rh));
+      var r1 = Math.min(rows, Math.ceil((st + VH - H) / z.rh));
+      var letters = z.cw >= 8;
+      var anySelected = Object.keys(selected).length > 0;
+
+      ctx.clearRect(0, 0, W, VH);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, W, VH);
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(G, H, W - G, VH - H);
+      ctx.clip();
+      ctx.font = (z.cw >= 12 ? 12 : 10) + 'px ' + EXPORT_MONO;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      for (var r = r0; r < r1; r++) {
+        var i = order[r];
+        var s = aln.seqs[i];
+        var y = H + r * z.rh - st;
+        var gene = labelOf(i);
+        var isSel = anySelected && selected[gene];
+        if (isSel) {
+          ctx.fillStyle = 'rgba(11, 87, 164, 0.10)';
+          ctx.fillRect(G, y, W - G, z.rh);
+        }
+        for (var c = c0; c < c1; c++) {
+          var code = s.charCodeAt(c);
+          var x = G + c * z.cw - sl;
+          if (code === 45 || code === 46 || isNaN(code)) {
+            if (z.cw >= 3) {
+              ctx.fillStyle = '#ece8df';
+              ctx.fillRect(x, y + z.rh / 2 - 0.5, z.cw, 1);
+            }
+            continue;
+          }
+          var fill = cellFill(code, c);
+          if (fill) {
+            /* With letters drawn the fill has to stay light enough for dark
+               ink to read on it. At 0.18 + 0.55 x conservation a column 97%
+               conserved -- nearly every column of lg1 -- came out dark green
+               under dark letters; capped near 0.45 the letters hold about 7:1.
+               Without letters the fill is the whole signal, so it runs full. */
+            ctx.globalAlpha = colourMode === 'conservation'
+              ? (letters ? 0.10 + 0.35 * prof.cons[c] : 0.35 + 0.65 * prof.cons[c])
+              : (letters ? 0.30 : 0.9);
+            ctx.fillStyle = fill;
+            ctx.fillRect(x, y + (z.rh > 6 ? 1 : 0), z.cw - (z.cw > 3 ? 1 : 0), z.rh - (z.rh > 6 ? 2 : 0));
+            ctx.globalAlpha = 1;
+          } else if (!letters) {
+            ctx.fillStyle = '#c9c4b8';
+            ctx.fillRect(x, y + (z.rh > 6 ? 1 : 0), z.cw, z.rh - (z.rh > 6 ? 2 : 0));
+          }
+          if (letters) {
+            ctx.fillStyle = fill || colourMode === 'plain' ? INK : MUTED;
+            ctx.fillText(String.fromCharCode(code), x + z.cw / 2, y + z.rh / 2 + 0.5);
+          }
+        }
+        if (anySelected && !isSel) {
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+          ctx.fillRect(G, y, W - G, z.rh);
+        }
+      }
+      /* The column under the pointer. */
+      if (hover && hover.col >= c0 && hover.col < c1) {
+        ctx.strokeStyle = 'rgba(11, 87, 164, 0.7)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(G + hover.col * z.cw - sl + 0.5, H, Math.max(z.cw - 1, 1), VH - H);
+      }
+      ctx.restore();
+
+      /* Header: ruler and the exemplar's domains, fixed to the top. */
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, W, H);
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(G, 0, W - G, H);
+      ctx.clip();
+      var step = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000].filter(function (t) {
+        return t * z.cw >= 48;
+      })[0] || 5000;
+      ctx.font = '10px ' + EXPORT_FONT;
+      ctx.fillStyle = MUTED;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
+      for (var t = Math.ceil((c0 + 1) / step) * step; t <= c1; t += step) {
+        var tx = G + (t - 0.5) * z.cw - sl;
+        ctx.fillText(number(t), tx, 11);
+        ctx.fillRect(tx, 13, 1, 4);
+      }
+      var lanes = domainLanes();
+      lanes.forEach(function (lane, li) {
+        var ly = HEADER_RULER + 2 + li * (LANE_H + LANE_GAP);
+        lane.forEach(function (b) {
+          var x0 = G + b.start * z.cw - sl, x1 = G + (b.end + 1) * z.cw - sl;
+          if (x1 < G || x0 > W) { return; }
+          ctx.fillStyle = colourOfDomain(b.name);
+          roundRect(ctx, x0, ly, Math.max(x1 - x0, 2), LANE_H, 2);
+          ctx.fill();
+          if (x1 - x0 > 46) {
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '600 8.5px ' + EXPORT_FONT;
+            ctx.textAlign = 'left';
+            ctx.fillText(b.name, Math.max(x0, G) + 4, ly + LANE_H - 1);
+          }
+        });
+      });
+      ctx.restore();
+      ctx.fillStyle = LINE;
+      ctx.fillRect(0, H - 1, W, 1);
+
+      /* Gutter: the gene model names, fixed to the left. */
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, G, VH);
+      ctx.fillStyle = MUTED;
+      ctx.font = '600 10px ' + EXPORT_FONT;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(kind === 'protein' ? 'Protein' : 'CDS', 8, 9);
+      if (lanes.length) { ctx.fillText('Domains', 8, HEADER_RULER + 2 + LANE_H / 2); }
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, H, G, VH - H);
+      ctx.clip();
+      /* A name is about 11 px tall. Rows shorter than that cannot each carry
+         one -- at 7 px rows they overprinted into a smear -- so the gutter
+         names every Nth row instead, enough to stay oriented; the line under
+         the figure always names the exact row under the pointer. */
+      var every = Math.max(1, Math.ceil(12 / z.rh));
+      if (z.rh >= 4) {
+        for (var rr = r0; rr < r1; rr++) {
+          if (every > 1 && rr % every !== 0) { continue; }
+          var ii = order[rr];
+          var label = labelOf(ii);
+          var yy = H + rr * z.rh - st + (every > 1 ? 6 : z.rh / 2 + 0.5);
+          var ex = aln.names[ii] === spec.exemplar;
+          var sel = anySelected && selected[label];
+          ctx.fillStyle = sel ? '#0b57a4' : (anySelected ? '#b8b3a8' : (ex ? INK : '#3d4a42'));
+          ctx.font = (ex || sel ? '700 ' : '') + (z.rh >= 14 ? 11 : 9) + 'px ' + EXPORT_MONO;
+          ctx.fillText(fitText(ctx, label, G - 14), 8, yy);
+        }
+      }
+      ctx.restore();
+      ctx.fillStyle = LINE;
+      ctx.fillRect(G - 1, 0, 1, VH);
+
+      drawOverview();
+    }
+
+    function fitText(ctx, text, max) {
+      if (ctx.measureText(text).width <= max) { return text; }
+      var t = text;
+      while (t.length > 3 && ctx.measureText(t + '…').width > max) { t = t.slice(0, -1); }
+      return t + '…';
+    }
+
+    function schedule() { if (!raf) { raf = window.requestAnimationFrame(draw); } }
+
+    /* ---- pointer --------------------------------------------------------- */
+
+    function cellAt(event) {
+      var rect = canvas.getBoundingClientRect();
+      var x = event.clientX - rect.left, y = event.clientY - rect.top;
+      var z = Z(), G = gutter(), H = headerHeight();
+      if (y < H) { return null; }
+      var row = Math.floor((y - H + scroller.scrollTop) / z.rh);
+      if (row < 0 || row >= order.length) { return null; }
+      var col = x < G ? -1 : Math.floor((x - G + scroller.scrollLeft) / z.cw);
+      if (col >= current.aln.width) { return null; }
+      return { row: row, col: col };
+    }
+
+    function describe(hit) {
+      if (!hit) { detail.textContent = idleDetail; return; }
+      var i = order[hit.row];
+      var name = current.aln.names[i];
+      var info = resolve(name) || {};
+      var label = info.gene || name;
+      var bits = [info.html
+        ? '<a href="' + esc(info.html) + '"><span class="mgdb-sequence">' + esc(label) + '</span></a>'
+        : '<span class="mgdb-sequence">' + esc(label) + '</span>'];
+      if (info.assembly) { bits.push('<span class="mgdb-muted">' + esc(info.assembly) + '</span>'); }
+      if (hit.col >= 0) {
+        var s = current.aln.seqs[i], code = s.charCodeAt(hit.col);
+        var gap = code === 45 || code === 46;
+        var pos = 0;
+        for (var c = 0; c <= hit.col; c++) {
+          var k = s.charCodeAt(c);
+          if (k !== 45 && k !== 46) { pos++; }
+        }
+        var p = current.prof;
+        var cons = p.consensus[hit.col] ? String.fromCharCode(p.consensus[hit.col]) : '–';
+        bits.push('column <strong>' + number(hit.col + 1) + '</strong>');
+        bits.push(gap ? 'gap' : (kind === 'protein' ? 'residue ' : 'base ') + '<strong>' + number(pos) +
+          '</strong> <span class="mgdb-sequence">' + String.fromCharCode(code) + '</span>');
+        bits.push('consensus <span class="mgdb-sequence">' + cons + '</span>, ' +
+          Math.round(p.cons[hit.col] * 100) + '% conserved, ' + Math.round(p.occ[hit.col] * 100) + '% occupied');
+      }
+      detail.innerHTML = bits.join(' &middot; ');
+    }
+
+    canvas.addEventListener('mousemove', function (event) {
+      if (!current) { return; }
+      var hit = cellAt(event);
+      var prev = hover;
+      hover = hit && hit.col >= 0 ? hit : null;
+      describe(hit);
+      if ((prev && (!hover || prev.col !== hover.col)) || (!prev && hover)) { schedule(); }
+    });
+    canvas.addEventListener('mouseleave', function () {
+      hover = null;
+      detail.textContent = idleDetail;
+      schedule();
+    });
+    canvas.addEventListener('click', function (event) {
+      if (!current) { return; }
+      var hit = cellAt(event);
+      if (!hit) { return; }
+      var gene = labelOf(order[hit.row]);
+      var info = resolve(current.aln.names[order[hit.row]]);
+      if (!info || !info.gene) { return; }   /* a row no member claims cannot be selected */
+      var sel = MGDB.panGeneSelection.get();
+      if (sel && sel.genes.length === 1 && sel.genes[0] === gene) { MGDB.panGeneSelection.clear(); return; }
+      MGDB.panGeneSelection.set({ genes: [gene], label: gene, source: 'msa', filter: gene });
+    });
+
+    scroller.addEventListener('scroll', schedule, { passive: true });
+
+    function seekOverview(event) {
+      var rect = overview.getBoundingClientRect();
+      var frac = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+      var z = Z(), dataW = scroller.clientWidth - gutter();
+      scroller.scrollLeft = frac * current.aln.width * z.cw - dataW / 2;
+      schedule();
+    }
+    var dragging = false;
+    overview.addEventListener('pointerdown', function (event) {
+      if (!current) { return; }
+      dragging = true;
+      if (overview.setPointerCapture) { overview.setPointerCapture(event.pointerId); }
+      seekOverview(event);
+    });
+    overview.addEventListener('pointermove', function (event) { if (dragging) { seekOverview(event); } });
+    overview.addEventListener('pointerup', function () { dragging = false; });
+    overview.addEventListener('pointercancel', function () { dragging = false; });
+
+    /* ---- selection from the other figures -------------------------------- */
+
+    MGDB.panGeneSelection.subscribe(function (sel) {
+      selected = {};
+      if (sel) { sel.genes.forEach(function (g) { selected[g] = true; }); }
+      if (!current) { return; }
+      /* Bring the first selected row into the box -- the box's own scroll,
+         never the page's. */
+      if (sel && sel.source !== 'msa') {
+        for (var r = 0; r < order.length; r++) {
+          if (selected[labelOf(order[r])]) {
+            var z = Z(), top = r * z.rh, H = headerHeight();
+            var inView = top >= scroller.scrollTop && top + z.rh <= scroller.scrollTop + scroller.clientHeight - H;
+            if (!inView) { scroller.scrollTop = Math.max(0, top - (scroller.clientHeight - H) / 3); }
+            break;
+          }
+        }
+      }
+      schedule();
+    });
+
+    /* ---- controls -------------------------------------------------------- */
+
+    function setZoom(next) {
+      if (!current || next < 0 || next >= MSA_ZOOM.length || next === zoom) { return; }
+      var old = Z(), G = gutter(), dataW = scroller.clientWidth - G;
+      var centreCol = (scroller.scrollLeft + dataW / 2) / old.cw;
+      var centreRow = scroller.scrollTop / old.rh;
+      zoom = next;
+      layout();
+      var z = Z();
+      scroller.scrollLeft = centreCol * z.cw - (scroller.clientWidth - G) / 2;
+      scroller.scrollTop = centreRow * z.rh;
+      block.querySelector('[data-role="zoom-out"]').disabled = zoom === 0;
+      block.querySelector('[data-role="zoom-in"]').disabled = zoom === MSA_ZOOM.length - 1;
+      schedule();
+    }
+    block.querySelector('[data-role="zoom-in"]').addEventListener('click', function () { setZoom(zoom + 1); });
+    block.querySelector('[data-role="zoom-out"]').addEventListener('click', function () { setZoom(zoom - 1); });
+
+    block.querySelector('[data-role="colour"]').addEventListener('change', function () {
+      colourMode = this.value;
+      schedule();
+    });
+    block.querySelector('[data-role="sort"]').addEventListener('change', function () {
+      sortMode = this.value;
+      if (current) { reorder(); schedule(); }
+    });
+
+    Array.prototype.forEach.call(block.querySelectorAll('[data-kind]'), function (btn) {
+      btn.addEventListener('click', function () {
+        var which = btn.getAttribute('data-kind');
+        if (which === kind) { return; }
+        Array.prototype.forEach.call(block.querySelectorAll('[data-kind]'), function (b) {
+          b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+        });
+        show(which);
+      });
+    });
+
+    block.querySelector('[data-role="msa-fasta"]').addEventListener('click', function () {
+      if (!current) { return; }
+      /* From the text already fetched, as a Blob. A download attribute on a
+         link to the FTP host does nothing: it is cross-origin. */
+      var blob = new Blob([current.text], { type: 'text/plain' });
+      var href = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = href;
+      a.download = (spec.panGene || 'pan-gene') + '.' + kind + '.aln.fasta';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(href); }, 1000);
+    });
+
+    /* The PNG is the profile and the window as they stand, stacked under a
+       title. Both are canvases this page drew itself from text it fetched
+       under CORS, so neither is tainted and toBlob() works. */
+    block.querySelector('[data-role="msa-png"]').addEventListener('click', function () {
+      if (!current) { return; }
+      var dpr = window.devicePixelRatio || 1, scale = 2;
+      var ow = overview.width / dpr, oh = overview.height / dpr;
+      var mw = canvas.width / dpr, mh = canvas.height / dpr;
+      var M = 20, TITLE = 44, W = Math.max(ow, mw) + 2 * M, H = TITLE + oh + 12 + mh + M + 16;
+      var out = document.createElement('canvas');
+      out.width = W * scale; out.height = H * scale;
+      var ctx = out.getContext('2d');
+      ctx.scale(scale, scale);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = INK;
+      ctx.font = '700 16px ' + EXPORT_FONT;
+      ctx.fillText((kind === 'protein' ? 'Protein' : 'CDS') + ' alignment and conservation', M, M + 12);
+      ctx.fillStyle = MUTED;
+      ctx.font = '11px ' + EXPORT_FONT;
+      var z = Z();
+      var c0 = Math.floor(scroller.scrollLeft / z.cw) + 1;
+      var c1 = Math.min(current.aln.width, Math.floor((scroller.scrollLeft + scroller.clientWidth - gutter()) / z.cw));
+      ctx.fillText(number(current.aln.seqs.length) + ' sequences · ' + number(current.aln.width) +
+        ' columns · window shows columns ' + number(c0) + '–' + number(c1), M, M + 28);
+      ctx.drawImage(overview, M, TITLE, ow, oh);
+      ctx.drawImage(canvas, M, TITLE + oh + 12, mw, mh);
+      ctx.fillStyle = MUTED;
+      ctx.font = '10px ' + EXPORT_FONT;
+      ctx.fillText('MaizeGDB · grey band: occupancy · green: conservation to consensus', M, H - 10);
+      out.toBlob(function (b) {
+        if (!b) { return; }
+        var href = URL.createObjectURL(b);
+        var a = document.createElement('a');
+        a.href = href;
+        a.download = (spec.panGene || 'pan-gene') + '.' + kind + '.alignment.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(href); }, 1000);
+      }, 'image/png');
+    });
+
+    /* ---- show ------------------------------------------------------------ */
+
+    /* The first column most sequences share, less a few for context. rp1's
+       members run from 400 to 2,322 residues, so its first ~1,000 columns are
+       nearly all gap and opening at column 1 showed an empty box with the
+       domains out of view to the right. */
+    function coreStart() {
+      var occ = current.prof.occ;
+      for (var c = 0; c < occ.length; c++) {
+        if (occ[c] >= 0.5) { return Math.max(0, c - 4); }
+      }
+      return 0;
+    }
+
+    function statusText() {
+      var aln = current.aln, prof = current.prof, n = 0, hi = 0;
+      for (var c = 0; c < aln.width; c++) {
+        if (prof.occ[c] >= 0.5) { n++; if (prof.cons[c] >= 0.9) { hi++; } }
+      }
+      var unmatched = aln.names.filter(function (nm) { return !resolve(nm); }).length;
+      return number(aln.seqs.length) + ' sequences over ' + number(aln.width) + ' columns. ' +
+        number(hi) + ' of the ' + number(n) + ' columns most sequences share are at least 90% conserved.' +
+        (unmatched ? ' ' + number(unmatched) + ' sequence' + (unmatched === 1 ? ' is' : 's are') +
+          ' named differently in the alignment file than in the member list and are shown by the file’s name.' : '');
+    }
+
+    function show(which) {
+      kind = which;
+      statusEl.innerHTML = 'Loading the ' + (which === 'protein' ? 'protein' : 'CDS') + ' alignment&hellip;';
+      return load(which).then(function (entry) {
+        current = entry;
+        reorder();
+        hover = null;
+        tools.hidden = false;
+        overviewWrap.hidden = false;
+        scroller.hidden = false;
+        layout();
+        lastW = scroller.clientWidth;
+        scroller.scrollLeft = coreStart() * Z().cw;
+        scroller.scrollTop = 0;
+        block.querySelector('[data-role="zoom-out"]').disabled = zoom === 0;
+        block.querySelector('[data-role="zoom-in"]').disabled = zoom === MSA_ZOOM.length - 1;
+        canvas.setAttribute('aria-label', (which === 'protein' ? 'Protein' : 'CDS') + ' alignment of ' +
+          entry.aln.seqs.length + ' sequences over ' + entry.aln.width + ' columns');
+        statusEl.innerHTML = statusText();
+        schedule();
+      }).catch(function (error) {
+        statusEl.innerHTML = 'The alignment could not be loaded. ' +
+          '<a href="' + esc(which === 'protein' ? spec.proteinUrl : spec.cdsUrl) +
+          '" target="_blank" rel="noopener">Open the file</a>.';
+        if (window.console && console.warn) { console.warn('pan-gene MSA:', error); }
+      });
+    }
+
+    var lastW = 0;
+    function onResize() {
+      if (!current || !scroller.clientWidth || Math.abs(scroller.clientWidth - lastW) < 4) { return; }
+      lastW = scroller.clientWidth;
+      layout();
+      schedule();
+    }
+    var debounced = MGDB.debounce ? MGDB.debounce(onResize, 120) : onResize;
+    /* Both, not either. The canvases are sized in pixels, so a missed resize
+       leaves them drawn at the old width inside a wider box -- which is what a
+       ResizeObserver alone did when the viewport changed under it. */
+    if (window.ResizeObserver) { new window.ResizeObserver(debounced).observe(block); }
+    window.addEventListener('resize', debounced);
+
+    loadTreeOrder().then(function (idx) {
+      treeOrder = idx;
+      if (!treeOrder) {
+        sortMode = 'file';
+        block.querySelector('[data-role="sort"]').value = 'file';
+        block.querySelector('[data-role="sort"] option[value="tree"]').disabled = true;
+      }
+      return show(kind);
+    });
+
+    return { element: block };
+  }
+
+  MGDB.panGeneMsa = panGeneMsa;
+
   MGDB.parseNewick = parseNewick;
 
 

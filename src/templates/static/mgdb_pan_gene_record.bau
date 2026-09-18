@@ -82,35 +82,6 @@ $$SYNTAX-LEVEL 2
   <section id="pg-record-sequence" aria-labelledby="pg-record-sequence-title" hidden>
     <div class="mgdb-section-heading"><div><h2 id="pg-record-sequence-title">Sequence and alignment</h2></div></div>
     <div id="pg-record-sequence-body"></div>
-    <div class="mgdb-rec-block" id="pg-record-msa-block" hidden>
-      <div class="mgdb-rec-block-head"><h3>MSA Viewer</h3></div>
-      <p class="mgdb-rec-block-status"><strong>Instructions&#58;</strong> Drag image or use top scroll bar to scroll.</p>
-      <div class="mgdb-rec-toolbar mgdb-pg-msa-toolbar">
-        <div class="mgdb-view-toggle" role="group" aria-label="Alignment to show">
-          <button class="mgdb-view-btn" type="button" id="pg-msa-cds" aria-pressed="true">CDS</button>
-          <button class="mgdb-view-btn" type="button" id="pg-msa-protein" aria-pressed="false">Protein</button>
-        </div>
-        <label>Colours <select id="msa_color_select" aria-label="Colour scheme">
-          <option value="clustal2">Clustal2 &#40;default&#41;</option>
-          <option value="clustal">Clustal</option>
-          <option value="zappo">Zappo</option>
-          <option value="taylor">Taylor</option>
-          <option value="hydro">Hydrophobicity</option>
-          <option value="cinema">Cinema</option>
-          <option value="mae">MAE</option>
-          <option value="buried">Buried</option>
-          <option value="helix">Helix</option>
-        </select></label>
-        <button class="mgdb-rec-tsv" type="button" id="pg-msa-expand">Expand</button>
-        <button class="mgdb-rec-tsv" type="button" id="pg-msa-contract">Contract</button>
-        <a class="mgdb-rec-tsv" id="msa_view-download" href="#" target="_blank" rel="noopener">Export alignment</a>
-      </div>
-      ;; The MSA library replaces the class list on the element it renders into,
-      ;; so the scroll container has to be a wrapper it never touches. Without
-      ;; it the alignment is 3,892px wide and the whole document scrolls.
-      <div class="mgdb-pg-msa"><div id="msa-div"></div></div>
-      <p class="mgdb-rec-block-status"><strong>Reference</strong>&#58; Guy Yachdav, Sebastian Wilzbach, Benedikt Rauscher, Robert Sheridan, Ian Sillitoe, James Procter, Suzanna Lewis, Burkhard Rost and Tatyana Goldberg. &ldquo;MSAViewer&#58; interactive JavaScript visualization of multiple sequence alignments.&rdquo; Bioinformatics &#40;2016&#41; <a href="http\://dx.doi.org/10.1093/bioinformatics/btw474" target="_blank" rel="noopener">http\://dx.doi.org/10.1093/bioinformatics/btw474</a></p>
-    </div>
   </section>
 
   <section id="pg-record-tree" aria-labelledby="pg-record-tree-title" hidden>
