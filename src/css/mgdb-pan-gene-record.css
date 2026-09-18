@@ -734,3 +734,15 @@ section[id^="pg-record-"] .mgdb-rec-table td { overflow-wrap: normal; }
   line-height: var(--mgdb-leading-snug);
 }
 .mgdb-pg-heat-detail strong { color: var(--mgdb-ink); }
+
+/* Numbers on the heatmap cells. No fill here on purpose: each label carries
+   its own ink as an attribute, chosen against its cell, and a CSS fill would
+   override it. pointer-events: none so hovering a number still reports the
+   cell under it. */
+.mgdb-pg-heat-value {
+  font-size: 9.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.mgdb-pg-heat-labelkey { margin-left: var(--mgdb-space-3); }

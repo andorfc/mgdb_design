@@ -125,9 +125,12 @@
      copies the computed value of the handful of properties that carry a
      drawing's appearance, which keeps the export in step with the stylesheet
      instead of duplicating it. */
+  /* paint-order and stroke-linejoin are here for the heatmap's haloed
+     numbers: without paint-order the export paints the halo over the glyph
+     instead of under it, and the number smears. */
   var PAINT_PROPS = ['fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity',
-                     'stroke-dasharray', 'opacity', 'font-family', 'font-size', 'font-weight',
-                     'font-style', 'text-anchor', 'letter-spacing'];
+                     'stroke-dasharray', 'stroke-linejoin', 'paint-order', 'opacity', 'font-family',
+                     'font-size', 'font-weight', 'font-style', 'text-anchor', 'letter-spacing'];
 
   function inlineSvgStyles(source) {
     var clone = source.cloneNode(true);
@@ -2472,6 +2475,12 @@
     var tissues = matrix.tissues || [];
     var rows = matrix.rows.slice();
     var mode = 'tree', scale = 'absolute';
+    /* Cell labels: none, all, or only cells above a log2 threshold. The label
+       is always log2(value + 1) -- the number the colour encodes in Absolute
+       -- and the threshold is on that same number, so neither changes meaning
+       when the scale is switched to "each row to its maximum". */
+    var labelMode = 'none';
+    var LABEL_MIN = { all: -Infinity, gt2: 2, gt4: 4 };
     var treeOrder = null, dendro = null;
     var selected = {};
 
@@ -2496,6 +2505,12 @@
             '<label>Scale <select data-role="heat-scale" aria-label="Colour scale">' +
               '<option value="absolute">Absolute</option>' +
               '<option value="row">Each row to its maximum</option>' +
+            '</select></label>' +
+            '<label>Labels <select data-role="heat-labels" aria-label="Show the log2 value on cells">' +
+              '<option value="none">None</option>' +
+              '<option value="all">All</option>' +
+              '<option value="gt2">&gt; 2</option>' +
+              '<option value="gt4">&gt; 4</option>' +
             '</select></label>' +
             '<button class="mgdb-rec-tsv" type="button" data-role="heat-png">Export PNG</button>' +
             '<button class="mgdb-rec-tsv" type="button" data-role="heat-tsv">Download TSV</button>' +
@@ -2646,6 +2661,17 @@
             : heatColour(scale === 'row' ? (rowMax > 0 ? l / rowMax : 0) : l / globalMax);
           out.push('<rect class="mgdb-pg-heat-cell" data-col="' + i + '" x="' + x[i] + '" y="' + (y + 1) +
             '" width="' + (cellW - 2) + '" height="' + (ROW - 2) + '" rx="2" fill="' + fill + '"></rect>');
+          /* A not-measured cell has nothing to print; the hatch says so. */
+          /* Compared as printed, to one decimal. Compared raw, 2.03 passed "> 2"
+             and printed as "2.0" -- a label that looks like the filter failing. */
+          var shown = l == null ? null : Math.round(l * 10) / 10;
+          if (labelMode !== 'none' && shown != null && shown > LABEL_MIN[labelMode]) {
+            var tone = labelInk(fill);
+            out.push('<text class="mgdb-pg-heat-value" x="' + (x[i] + (cellW - 2) / 2) + '" y="' +
+              (y + ROW / 2 + 3.4) + '" text-anchor="middle" fill="' + tone.ink + '" stroke="' + tone.halo +
+              '" stroke-width="2.2" stroke-linejoin="round" paint-order="stroke">' +
+              shown.toFixed(1) + '</text>');
+          }
         });
         if (r.tau != null) {
           out.push('<rect class="mgdb-pg-heat-taubar" x="' + tauX + '" y="' + (y + 4) + '" width="' +
@@ -2690,7 +2716,30 @@
         '<span class="mgdb-pg-heat-rampcap">' + (scale === 'row'
           ? '0 → each row’s highest tissue'
           : '0 → ' + globalMax.toFixed(1) + ' ' + esc(matrix.scale)) + '</span>' +
-        '<span class="mgdb-pg-heat-hatchkey" aria-hidden="true"></span><span>not measured</span>';
+        '<span class="mgdb-pg-heat-hatchkey" aria-hidden="true"></span><span>not measured</span>' +
+        (labelMode === 'none' ? '' : '<span class="mgdb-pg-heat-labelkey">Numbers are log2(value + 1)' +
+          (labelMode === 'all' ? '' : ', shown above ' + LABEL_MIN[labelMode]) + '</span>');
+    }
+
+    /* Ink for a number printed on a cell, decided from the cell's own colour
+       so it holds in both scale modes: white below WCAG relative luminance
+       0.2, dark above, each with a thin halo in the opposite tone.
+
+       The halo is not decoration. Measured across the whole ramp, mid-tone
+       green is poor for BOTH inks: the best split available (0.2) still left
+       the worst cell at 3.65:1, and the 0.4 split first written here left
+       white on rgb(131,180,150) at 2.35:1. With the halo every glyph sits on
+       its own local background of at least 9.78:1. */
+    function labelInk(fill) {
+      var m = /rgb\((\d+),(\d+),(\d+)\)/.exec(fill || '');
+      if (!m) { return { ink: '#1f2723', halo: 'rgba(255,255,255,0.65)' }; }
+      var c = [+m[1], +m[2], +m[3]].map(function (v) {
+        v /= 255;
+        return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+      });
+      var lum = 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+      return lum < 0.2 ? { ink: '#ffffff', halo: 'rgba(0,0,0,0.45)' }
+                       : { ink: '#1f2723', halo: 'rgba(255,255,255,0.65)' };
     }
 
     /* ---- interaction ----------------------------------------------------- */
@@ -2739,6 +2788,9 @@
     });
     block.querySelector('[data-role="heat-scale"]').addEventListener('change', function () {
       scale = this.value; draw();
+    });
+    block.querySelector('[data-role="heat-labels"]').addEventListener('change', function () {
+      labelMode = this.value; draw();
     });
 
     block.querySelector('[data-role="heat-tsv"]').addEventListener('click', function () {
