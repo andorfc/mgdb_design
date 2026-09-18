@@ -504,3 +504,38 @@ button.mgdb-pg-cell:focus-visible { outline: none; box-shadow: var(--mgdb-focus-
 .mgdb-pg-tree-node.is-dim { opacity: .25; }
 .mgdb-pg-tree-node.is-picked .mgdb-pg-tree-wedge { fill: var(--mgdb-focus); stroke: var(--mgdb-focus); }
 .mgdb-pg-tree-node.is-picked + .mgdb-pg-tree-label.is-clade { fill: var(--mgdb-focus); font-weight: 700; }
+
+/* ── A one-line description under a figure's heading ──────────────────────── */
+.mgdb-rec-block .mgdb-fig-desc {
+  margin: 0 0 var(--mgdb-space-2);
+  color: var(--mgdb-ink-soft);
+  font-size: var(--mgdb-text-sm);
+  line-height: var(--mgdb-leading-snug);
+}
+
+/* ── Pangenome graph ──────────────────────────────────────────────────────
+   Full width, not an image card: the graph carries a track per assembly and a
+   thumbnail in a dialog could not be read without opening it first.
+   ────────────────────────────────────────────────────────────────────────── */
+.mgdb-pg-graph-tools { display: flex; gap: var(--mgdb-space-2); }
+.mgdb-pg-graph-tools .mgdb-rec-tsv { text-decoration: none; display: inline-flex; align-items: center; }
+
+.mgdb-pg-graph .mgdb-pg-graph-figure {
+  margin: var(--mgdb-space-4) 0 0;
+}
+/* `.mgdb-page img { max-width: 100% }` is (0,1,1) and would otherwise win over
+   a bare class here, as it did on the tree. */
+.mgdb-pg-graph .mgdb-pg-graph-figure img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--mgdb-line);
+  border-radius: var(--mgdb-radius);
+  background: var(--mgdb-surface);
+}
+.mgdb-pg-graph .mgdb-pg-graph-figure figcaption {
+  margin-top: var(--mgdb-space-2);
+  color: var(--mgdb-muted);
+  font-size: var(--mgdb-text-xs);
+}

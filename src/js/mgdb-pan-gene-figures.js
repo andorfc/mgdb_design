@@ -58,6 +58,120 @@
     return (n == null || isNaN(n)) ? '' : Number(n).toLocaleString();
   }
 
+
+  /* ------------------------------------------------------------------------
+     PNG export
+
+     A figure hands over a finished, self-contained <svg> string and this turns
+     it into a PNG the reader can drop into a talk.
+
+     Self-contained matters: the rasteriser loads the SVG through an <img>,
+     and an <img> does not see the page's stylesheets or its web fonts. So a
+     figure that leaves its colours to CSS exports as black shapes on white.
+     Every export SVG here therefore carries presentation attributes rather
+     than classes, and names only fonts a machine already has.
+
+     Nothing is fetched and no canvas is tainted, so toBlob() works everywhere.
+     ------------------------------------------------------------------------ */
+
+  /* Single quotes inside the stack, deliberately. These go into a
+     double-quoted XML attribute built by hand, and the usual CSS spelling --
+     `"Segoe UI"` -- closes the attribute at the first inner quote. The SVG then
+     fails to parse, the <img> never loads, and the export silently produces
+     nothing at all: no error, no file. */
+  var EXPORT_FONT = "system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif";
+  var EXPORT_MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+
+  function exportSvgToPng(svgMarkup, width, height, filename, scale) {
+    var factor = scale || 2;   /* 2x, so it holds up in a slide */
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + height +
+              '" viewBox="0 0 ' + width + ' ' + height + '">' +
+              '<rect width="' + width + '" height="' + height + '" fill="#ffffff"></rect>' +
+              svgMarkup + '</svg>';
+    var url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    var image = new Image();
+    image.onload = function () {
+      var canvas = document.createElement('canvas');
+      canvas.width = Math.round(width * factor);
+      canvas.height = Math.round(height * factor);
+      var ctx = canvas.getContext('2d');
+      ctx.setTransform(factor, 0, 0, factor, 0, 0);
+      ctx.drawImage(image, 0, 0);
+      canvas.toBlob(function (blob) {
+        if (!blob) { return; }
+        var href = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = href;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(href); }, 1000);
+      }, 'image/png');
+    };
+    image.onerror = function () {
+      if (window.console && console.warn) { console.warn('PNG export failed for ' + filename); }
+      MGDB.announce('The figure could not be exported.');
+    };
+    image.src = url;
+  }
+  MGDB.exportSvgToPng = exportSvgToPng;
+
+
+  /* Clone an on-page <svg> with its styling written onto the elements.
+
+     The rasteriser loads the markup through an <img>, which sees no
+     stylesheet, so a figure whose colours live in CSS would export black. This
+     copies the computed value of the handful of properties that carry a
+     drawing's appearance, which keeps the export in step with the stylesheet
+     instead of duplicating it. */
+  var PAINT_PROPS = ['fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity',
+                     'stroke-dasharray', 'opacity', 'font-family', 'font-size', 'font-weight',
+                     'font-style', 'text-anchor', 'letter-spacing'];
+
+  function inlineSvgStyles(source) {
+    var clone = source.cloneNode(true);
+    var from = source.querySelectorAll('*');
+    var to = clone.querySelectorAll('*');
+    for (var i = 0; i < from.length; i++) {
+      var cs = window.getComputedStyle(from[i]);
+      if (cs.display === 'none') { to[i].setAttribute('display', 'none'); continue; }
+      var css = '';
+      for (var j = 0; j < PAINT_PROPS.length; j++) {
+        var v = cs.getPropertyValue(PAINT_PROPS[j]);
+        /* A computed font-family is spelled with double quotes
+           (`"Liberation Mono"`). XMLSerializer escapes them on the way out,
+           but the value is normalised here so the same string is safe whether
+           it is serialised or concatenated. */
+        if (v) { css += PAINT_PROPS[j] + ':' + v.replace(/"/g, "'") + ';'; }
+      }
+      to[i].setAttribute('style', css);
+      /* A class is meaningless once the stylesheet is gone, and dropping it
+         keeps the exported file small. */
+      to[i].removeAttribute('class');
+    }
+    clone.removeAttribute('class');
+    clone.removeAttribute('style');
+    return clone;
+  }
+  MGDB.inlineSvgStyles = inlineSvgStyles;
+
+  /* A <text> for an export SVG. Everything is a presentation attribute
+     because no stylesheet reaches the rasteriser. */
+  function attr(value) { return String(value).replace(/"/g, '&quot;'); }
+
+  function xText(x, y, text, opts) {
+    var o = opts || {};
+    return '<text x="' + x + '" y="' + y + '"' +
+      ' font-family="' + attr(o.mono ? EXPORT_MONO : EXPORT_FONT) + '"' +
+      ' font-size="' + (o.size || 11) + '"' +
+      (o.weight ? ' font-weight="' + o.weight + '"' : '') +
+      (o.style ? ' font-style="' + o.style + '"' : '') +
+      (o.anchor ? ' text-anchor="' + o.anchor + '"' : '') +
+      (o.transform ? ' transform="' + o.transform + '"' : '') +
+      ' fill="' + (o.fill || '#3d4a42') + '">' + esc(text) + '</text>';
+  }
+
   /* chr2, Chr2, chr02 and 2 are the same chromosome; the annotations do not
      agree on a spelling. */
   function chrKey(chr) {
@@ -104,9 +218,12 @@
             '<li><span class="mgdb-pg-cell is-present is-exemplar" aria-hidden="true"></span>Exemplar</li>' +
             (panChr ? '<li><span class="mgdb-pg-cell is-present is-elsewhere" aria-hidden="true"></span>Other chromosome</li>' : '') +
           '</ul>' +
+          '<button class="mgdb-rec-tsv" type="button" data-role="png">Export PNG</button>' +
           '<button class="mgdb-rec-tsv" type="button" data-role="tsv">Download TSV</button>' +
         '</div>' +
       '</div>' +
+      '<p class="mgdb-fig-desc">Presence and absence across every annotation in the analysis, ' +
+        'grouped by panel; selecting a cell links to the other figures.</p>' +
       '<p class="mgdb-rec-block-status">Present in <strong>' + number(presence.present_count) + ' of ' +
         number(presence.annotation_count) + '</strong> annotations' +
         (presence.absent_count > 0 ? ', absent from ' + number(presence.absent_count) : '') +
@@ -251,6 +368,97 @@
         btn.classList.toggle('is-dim', any && !hit);
         btn.classList.toggle('is-selected', !!hit);
       });
+    });
+
+    /* Drawn from the data rather than cloned from the page: the strip is HTML
+       -- boxes, rotated labels, a wrapping flex row -- and there is no <svg>
+       to take a copy of. Laying every panel out on its own row also reads
+       better as a still image than reproducing where the flex happened to
+       wrap at the reader's window width. */
+    block.querySelector('[data-role="png"]').addEventListener('click', function () {
+      var M = 24, CELL = 20, GAP = 5, NAME_H = 70, W = 1100;
+      var perRow = Math.floor((W - 2 * M) / (CELL + GAP));
+      var out = '';
+      var y = M;
+      out += xText(M, y + 6, 'Presence across the analysis', { size: 17, weight: 700, fill: '#1f2723' });
+      y += 26;
+      out += xText(M, y + 6, presence.present_count + ' of ' + presence.annotation_count +
+        ' annotations \u00b7 ' + presence.member_count + ' members' +
+        (spec.chr ? ' \u00b7 pan-gene on ' + spec.chr : ''), { size: 12, fill: '#5d6b62' });
+      y += 22;
+
+      /* A key, because an exported figure has to stand on its own in a talk:
+         nothing beside it explains a pale cell or a gold ring. */
+      var key = [
+        { fill: '#1d6b42', edge: '#1d6b42', text: 'Present' },
+        { fill: '#123524', edge: '#123524', text: 'More than one member', num: '2' },
+        { fill: '#f3f1ea', edge: '#d7d2c6', text: 'Absent' },
+        { fill: '#1d6b42', edge: '#1d6b42', text: 'Exemplar', ring: true },
+        { fill: '#1d6b42', edge: '#1d6b42', text: 'Other chromosome', off: true }
+      ];
+      var kx = M;
+      key.forEach(function (k) {
+        out += '<rect x="' + kx + '" y="' + (y - 9) + '" width="12" height="12" rx="3" fill="' +
+          k.fill + '" stroke="' + k.edge + '"></rect>';
+        if (k.num) {
+          out += xText(kx + 6, y + 0.5, k.num, { size: 8, weight: 700, fill: '#ffffff', anchor: 'middle' });
+        }
+        if (k.ring) {
+          out += '<rect x="' + (kx - 2) + '" y="' + (y - 11) + '" width="16" height="16" rx="5" fill="none" ' +
+            'stroke="#c8a227" stroke-width="1.6"></rect>';
+        }
+        if (k.off) {
+          out += '<circle cx="' + (kx + 12) + '" cy="' + (y - 9) + '" r="3" fill="#e95e22" ' +
+            'stroke="#ffffff" stroke-width="1"></circle>';
+        }
+        out += xText(kx + 18, y + 1, k.text, { size: 10, fill: '#3d4a42' });
+        kx += 18 + k.text.length * 5.3 + 18;
+      });
+      y += 26;
+
+      panels.forEach(function (panel) {
+        out += xText(M, y + 8, panel.label.toUpperCase() + '   ' + panel.present_count + '/' +
+          panel.annotation_count, { size: 10, weight: 700, fill: '#3d4a42' });
+        y += 16;
+        var list = panel.annotations || [];
+        for (var start = 0; start < list.length; start += perRow) {
+          var chunk = list.slice(start, start + perRow);
+          chunk.forEach(function (a, i) {
+            var cx = M + i * (CELL + GAP);
+            var present = (a.count || 0) > 0;
+            var multi = (a.count || 0) > 1;
+            var fill = multi ? '#123524' : (present ? '#1d6b42' : '#f3f1ea');
+            out += '<rect x="' + cx + '" y="' + y + '" width="' + CELL + '" height="' + CELL +
+              '" rx="4" fill="' + fill + '" stroke="' + (present ? fill : '#d7d2c6') + '"></rect>';
+            if (multi) {
+              out += xText(cx + CELL / 2, y + CELL / 2 + 3.5, String(a.count),
+                { size: 9, weight: 700, fill: '#ffffff', anchor: 'middle' });
+            }
+            if ((a.members || []).some(function (m) { return m.is_exemplar; })) {
+              out += '<rect x="' + (cx - 2.5) + '" y="' + (y - 2.5) + '" width="' + (CELL + 5) +
+                '" height="' + (CELL + 5) + '" rx="6" fill="none" stroke="#c8a227" stroke-width="2"></rect>';
+            }
+            if (panChr && (a.members || []).some(function (m) {
+              var k = chrKey(m.chr);
+              return k !== null && k !== panChr;
+            })) {
+              out += '<circle cx="' + (cx + CELL) + '" cy="' + y + '" r="3.4" fill="#e95e22" ' +
+                'stroke="#ffffff" stroke-width="1.2"></circle>';
+            }
+            out += xText(cx + CELL / 2 + 3.5, y + CELL + 6, a.label,
+              { size: 9, fill: '#5d6b62', anchor: 'end',
+                transform: 'rotate(-90 ' + (cx + CELL / 2 + 3.5) + ' ' + (y + CELL + 6) + ')' });
+          });
+          y += CELL + NAME_H;
+        }
+        y += 6;
+      });
+
+      y += 4;
+      out += xText(M, y, 'MaizeGDB \u00b7 ' + (spec.recordName || 'pan-gene') +
+        ' \u00b7 presence across the analysis', { size: 10, fill: '#7c837e' });
+      exportSvgToPng(out, W, y + 16,
+        (spec.filename || 'pan-gene-presence.tsv').replace(/\.tsv$/, '') + '.png');
     });
 
     block.querySelector('[data-role="tsv"]').addEventListener('click', function () {
@@ -507,9 +715,11 @@
       '<div class="mgdb-rec-block-head">' +
         '<h3>Domain architectures</h3>' +
         '<div class="mgdb-pg-arch-tools">' + legendHtml() +
+          '<button class="mgdb-rec-tsv" type="button" data-role="arch-png">Export PNG</button>' +
           '<button class="mgdb-rec-tsv" type="button" data-role="arch-tsv">Download TSV</button>' +
         '</div>' +
       '</div>' +
+      '<p class="mgdb-fig-desc">Domain architecture ribbons, identical architectures collapsed.</p>' +
       '<p class="mgdb-rec-block-status" data-role="arch-status"></p>' +
       '<div data-role="arch-axis"></div>' +
       '<ol class="mgdb-pg-arch-list"></ol>' +
@@ -590,6 +800,84 @@
         row.classList.toggle('is-dim', any && !hit);
         row.classList.toggle('is-picked', !!hit);
       });
+    });
+
+    /* Redrawn at export size from the same blocks and the same lane packing,
+       so what lands in the PNG is what is on screen rather than a screenshot
+       of it. */
+    block.querySelector('[data-role="arch-png"]').addEventListener('click', function () {
+      var M = 24, W = 1180, LANE = 16, LANE_GAP = 5, PLOT = W - 2 * M;
+      var shown = Array.prototype.map.call(list.querySelectorAll('[data-arch]'), function (row) {
+        return architectures[+row.getAttribute('data-arch')];
+      });
+      if (!shown.length) { return; }
+      function EX(residue) { return M + (residue / drawnMax) * PLOT; }
+      var out = '';
+      var y = M;
+      out += xText(M, y + 6, 'Domain architectures', { size: 17, weight: 700, fill: '#1f2723' });
+      y += 24;
+      out += xText(M, y + 6, number(memberTotal) + ' members, ' + number(architectures.length) +
+        ' distinct architectures; ' + number(shown.length) + ' shown',
+        { size: 12, fill: '#5d6b62' });
+      y += 24;
+
+      totals.slice(0, palette.length).forEach(function (t, i) {
+        var lx = M + i * 150;
+        out += '<rect x="' + lx + '" y="' + (y - 8) + '" width="11" height="11" rx="3" fill="' +
+          colourOf(t.name) + '"></rect>';
+        out += xText(lx + 16, y + 1, t.name, { size: 10, fill: '#3d4a42' });
+      });
+      if (totals.length > palette.length) {
+        var ox = M + palette.length * 150;
+        out += '<rect x="' + ox + '" y="' + (y - 8) + '" width="11" height="11" rx="3" fill="' +
+          NEUTRAL_DOMAIN + '"></rect>';
+        out += xText(ox + 16, y + 1, (totals.length - palette.length) + ' other', { size: 10, fill: '#3d4a42' });
+      }
+      y += 22;
+
+      /* Residue axis. */
+      var step = tickStep();
+      out += '<path d="M' + M + ' ' + (y + 4) + 'h' + PLOT + '" stroke="#d7d2c6" stroke-width="1" fill="none"></path>';
+      for (var r = 0; r <= drawnMax + 0.5; r += step) {
+        out += xText(EX(r), y, number(Math.round(r)), { size: 9, fill: '#7c837e', anchor: 'middle' });
+      }
+      y += 18;
+
+      shown.forEach(function (arch) {
+        var rep = arch.representative || {};
+        out += xText(M, y + 8, number(arch.member_count) + (arch.member_count === 1 ? ' member' : ' members'),
+          { size: 11, weight: 700, fill: '#1f2723' });
+        var head = arch.domain_string || 'No domains';
+        if (head.length > 120) { head = head.slice(0, 117) + '\u2026'; }
+        out += xText(M + 80, y + 8, head, { size: 9, mono: true, fill: '#3d4a42' });
+        y += 16;
+        var lanes = packLanes(arch.blocks || [], Math.max(2, Math.round(drawnMax * 0.004)));
+        lanes.forEach(function (lane, li) {
+          var ly = y + li * (LANE + LANE_GAP);
+          out += '<rect x="' + M + '" y="' + (ly + LANE / 2 - 1.5) + '" width="' + PLOT +
+            '" height="3" rx="1.5" fill="#f3f1ea"></rect>';
+          lane.forEach(function (b) {
+            var x0 = EX(b.start), w = Math.max(EX(b.end) - x0, 2);
+            out += '<rect x="' + x0.toFixed(2) + '" y="' + ly + '" width="' + w.toFixed(2) +
+              '" height="' + LANE + '" rx="4" fill="' + colourOf(b.name) +
+              '" stroke="#ffffff" stroke-width="1.5"></rect>';
+            if (w > 44) {
+              out += xText(x0 + w / 2, ly + LANE / 2 + 3.5, b.name,
+                { size: 9, weight: 700, fill: '#ffffff', anchor: 'middle' });
+            }
+          });
+        });
+        y += lanes.length * LANE + (lanes.length - 1) * LANE_GAP + 6;
+        out += xText(M, y + 6, 'Drawn from ' + (rep.transcript || '') +
+          (rep.is_exemplar ? ' (exemplar)' : '') + ' \u00b7 ' + (arch.blocks || []).length + ' domains',
+          { size: 9, fill: '#7c837e' });
+        y += 18;
+      });
+
+      out += xText(M, y + 6, 'MaizeGDB \u00b7 axis is residue position to ' + number(drawnMax) + ' aa',
+        { size: 10, fill: '#7c837e' });
+      exportSvgToPng(out, W, y + 22,
+        (spec.filename || 'pan-gene-architectures.tsv').replace(/\.tsv$/, '') + '.png');
     });
 
     block.querySelector('[data-role="arch-tsv"]').addEventListener('click', function () {
@@ -747,11 +1035,14 @@
   function panGeneTree(container, spec) {
     if (!container || !spec || !spec.url) { return null; }
 
-    var ROW = 14, PAD_TOP = 8, LABEL_W = 210, AXIS_H = 26;
+    /* PAD_LEFT keeps the root and the leftmost tips off the edge of the box;
+       without it the top of the tree sat flush against the container. */
+    var ROW = 14, PAD_TOP = 8, PAD_LEFT = 16, LABEL_W = 210, AXIS_H = 26;
     var resolve = spec.resolve || function () { return null; };
     var root = null, tree = null, mode = 'branch';
     var svgEl = null, scroller = null, detail = null;
     var tipsTotal = 0;
+    var speciesPresent = {};
 
     container.insertAdjacentHTML('beforeend',
       /* No heading of its own: the section this renders into is already
@@ -764,10 +1055,12 @@
             '<div class="mgdb-pg-tree-buttons">' +
               '<button class="mgdb-rec-tsv" type="button" data-role="mode" aria-pressed="true">Branch lengths</button>' +
               '<button class="mgdb-rec-tsv" type="button" data-role="expand">Expand all</button>' +
+              '<button class="mgdb-rec-tsv" type="button" data-role="tree-png">Export PNG</button>' +
               '<button class="mgdb-rec-tsv" type="button" data-role="tree-tsv">Download TSV</button>' +
             '</div>' +
           '</div>' +
         '</div>' +
+        '<p class="mgdb-fig-desc">Interactive SVG tree \u0028d3-hierarchy\u0029, linked selection across figures.</p>' +
         '<p class="mgdb-rec-block-status" data-role="status">Loading the tree&hellip;</p>' +
         '<div class="mgdb-pg-tree-scroll" data-role="scroll" hidden></div>' +
         '<p class="mgdb-pg-tree-detail" data-role="tree-detail" aria-live="polite"></p>' +
@@ -852,7 +1145,7 @@
          real size the text is always 9.5 px and the box scrolls instead. */
       var avail = (scroller.clientWidth || 900) - 2;
       var width = Math.max(avail, 560);
-      var plotW = width - LABEL_W;
+      var plotW = width - LABEL_W - PAD_LEFT;
       var height = L.height + AXIS_H;
       var parts = [];
 
@@ -860,7 +1153,7 @@
         '" viewBox="0 0 ' + width + ' ' + height +
         '" role="img" aria-label="Phylogenetic tree of ' + tipsTotal + ' members">');
 
-      function X(v) { return 2 + v * (plotW - 4); }
+      function X(v) { return PAD_LEFT + v * plotW; }
 
       /* Elbow links, parent to child. */
       L.nodes.each(function (d) {
@@ -897,17 +1190,24 @@
           var off = spec.panChr && info.chr && chrKey(info.chr) !== null &&
                     chrKey(info.chr) !== chrKey(spec.panChr);
           var isExemplar = n.name === spec.exemplar;
+          /* The tree file names its tips by transcript. A reader works in gene
+             models -- it is what the members table, the presence strip and
+             every link on the record use -- so Zm00001eb056510_T002 is shown
+             as Zm00001eb056510. The transcript stays on the element, since it
+             is still the key back into the tree's own data. */
+          var shown = info.gene || n.name;
           parts.push('<g class="mgdb-pg-tree-tip' + (isExemplar ? ' is-exemplar' : '') +
               '" data-id="' + n.id + '" data-gene="' + esc(info.gene || '') +
-              '" tabindex="0" role="button">' +
-            '<title>' + esc(n.name + (info.assembly ? '\n' + info.assembly : '') +
-              (info.species ? '\n' + info.species : '') + (info.chr ? '\nChromosome ' + info.chr : '')) + '</title>' +
+              '" data-transcript="' + esc(n.name) + '" tabindex="0" role="button">' +
+            '<title>' + esc(shown + (info.assembly ? '\n' + info.assembly : '') +
+              (info.species ? '\n' + info.species : '') + (info.chr ? '\nChromosome ' + info.chr : '') +
+              '\nTranscript ' + n.name) + '</title>' +
             '<circle class="mgdb-pg-tree-dot" cx="' + x.toFixed(2) + '" cy="' + y.toFixed(2) +
               '" r="' + (isExemplar ? 4.5 : 3.2) + '" fill="' + speciesColour(info.species) + '"></circle>' +
             (off ? '<circle class="mgdb-pg-tree-off" cx="' + (x + 5).toFixed(2) + '" cy="' + (y - 4).toFixed(2) +
               '" r="2.4"></circle>' : '') +
             '<text class="mgdb-pg-tree-label" x="' + (x + 9).toFixed(2) + '" y="' + (y + 3.5).toFixed(2) + '">' +
-              esc(n.name) + '</text>' +
+              esc(shown) + '</text>' +
             '</g>');
           return;
         }
@@ -928,13 +1228,13 @@
          much of the width is real distance. */
       if (mode === 'branch') {
         var barVal = niceStep(L.maxDepth / 4);
-        var barPx = (barVal / L.maxDepth) * (plotW - 4);
+        var barPx = (barVal / L.maxDepth) * plotW;
         var by = L.height + 14;
         parts.push('<g class="mgdb-pg-tree-scale">' +
-          '<path d="M2 ' + by + 'h' + barPx.toFixed(2) + '"></path>' +
-          '<path d="M2 ' + (by - 3) + 'v6"></path>' +
-          '<path d="M' + (2 + barPx).toFixed(2) + ' ' + (by - 3) + 'v6"></path>' +
-          '<text x="' + (barPx + 8).toFixed(2) + '" y="' + (by + 4) + '">' + barVal +
+          '<path d="M' + PAD_LEFT + ' ' + by + 'h' + barPx.toFixed(2) + '"></path>' +
+          '<path d="M' + PAD_LEFT + ' ' + (by - 3) + 'v6"></path>' +
+          '<path d="M' + (PAD_LEFT + barPx).toFixed(2) + ' ' + (by - 3) + 'v6"></path>' +
+          '<text x="' + (PAD_LEFT + barPx + 8).toFixed(2) + '" y="' + (by + 4) + '">' + barVal +
             ' substitutions per site</text>' +
           '</g>');
       }
@@ -1069,9 +1369,14 @@
     });
 
     function describeTip(g) {
-      var name = g.querySelector('.mgdb-pg-tree-label').textContent;
-      var info = resolve(name) || {};
-      var bits = ['<span class="mgdb-sequence">' + esc(name) + '</span>'];
+      var transcript = g.getAttribute('data-transcript');
+      var info = resolve(transcript) || {};
+      var shown = info.gene || transcript;
+      /* The gene model, linked to its own record where it has one. */
+      var head = info.html
+        ? '<a href="' + esc(info.html) + '"><span class="mgdb-sequence">' + esc(shown) + '</span></a>'
+        : '<span class="mgdb-sequence">' + esc(shown) + '</span>';
+      var bits = [head];
       if (info.assembly) { bits.push('<span class="mgdb-muted">' + esc(info.assembly) + '</span>'); }
       if (info.species) { bits.push('<em>' + esc(info.species) + '</em>'); }
       if (info.chr) {
@@ -1079,7 +1384,7 @@
         bits.push('<span class="' + (off ? 'mgdb-pill mgdb-pill-warn' : 'mgdb-muted') + '">' +
           esc(info.chr) + '</span>');
       }
-      if (name === spec.exemplar) { bits.push('<span class="mgdb-pill mgdb-pill-ok">Exemplar</span>'); }
+      if (transcript === spec.exemplar) { bits.push('<span class="mgdb-pill mgdb-pill-ok">Exemplar</span>'); }
       detail.innerHTML = bits.join(' &middot; ');
     }
 
@@ -1107,6 +1412,38 @@
         : 'Expand all';
       draw();
       refreshStatus();
+    });
+
+    /* The tree is already an <svg>, so the export takes a copy of the live one
+       with its styling written onto the elements, and adds a title and the
+       species key above it. Nothing here re-implements the drawing, so the
+       PNG cannot drift from the page. */
+    block.querySelector('[data-role="tree-png"]').addEventListener('click', function () {
+      if (!svgEl) { return; }
+      var M = 24, HEAD = 74;
+      var w = +svgEl.getAttribute('width');
+      var h = +svgEl.getAttribute('height');
+      var clone = inlineSvgStyles(svgEl);
+      clone.setAttribute('x', M);
+      clone.setAttribute('y', HEAD);
+      var out = xText(M, M + 6, 'Phylogenetic tree', { size: 17, weight: 700, fill: '#1f2723' });
+      out += xText(M, M + 26, tipsTotal + ' members' +
+        (spec.exemplar ? ' \u00b7 exemplar ' + spec.exemplar : ''), { size: 12, fill: '#5d6b62' });
+      var lx = M;
+      SPECIES_ORDER.forEach(function (sp) {
+        if (!speciesPresent[sp]) { return; }
+        out += '<circle cx="' + (lx + 5) + '" cy="' + (M + 44) + '" r="5" fill="' +
+          speciesColour(sp) + '"></circle>';
+        var label = (SPECIES_SHORT[sp] || sp) + ' ' + speciesPresent[sp];
+        out += xText(lx + 15, M + 48, label, { size: 10, fill: '#3d4a42' });
+        lx += 15 + label.length * 5.4 + 16;
+      });
+      out += new XMLSerializer().serializeToString(clone);
+      out += xText(M, HEAD + h + 18, 'MaizeGDB \u00b7 ' +
+        (mode === 'branch' ? 'branch lengths in substitutions per site' : 'equal branches'),
+        { size: 10, fill: '#7c837e' });
+      exportSvgToPng(out, w + 2 * M, HEAD + h + 30,
+        (spec.filename || 'pan-gene-tree.tsv').replace(/\.tsv$/, '') + '.png');
     });
 
     block.querySelector('[data-role="tree-tsv"]').addEventListener('click', function () {
@@ -1167,12 +1504,12 @@
         measure(root, 0);
         tipsTotal = root.tips;
 
-        var present = {};
+        speciesPresent = {};
         eachNode(root, function (n) {
           if (n.children.length || !n.name) { return; }
           var info = resolve(n.name);
           var sp = (info && info.species) || 'Unknown';
-          present[sp] = (present[sp] || 0) + 1;
+          speciesPresent[sp] = (speciesPresent[sp] || 0) + 1;
         });
 
         /* Only a big tree starts collapsed; a 65-tip one fits as it is. */
@@ -1187,7 +1524,7 @@
           block.querySelector('[data-role="expand"]').textContent = 'Collapse identical';
         }
 
-        block.querySelector('[data-role="legend"]').innerHTML = legendHtml(present);
+        block.querySelector('[data-role="legend"]').innerHTML = legendHtml(speciesPresent);
         tools.hidden = false;
         scroller.hidden = false;
         lastWidth = scroller.clientWidth;
