@@ -283,3 +283,32 @@ A new `expression_matrix` section on the record API, drawn by
   ligule forms -- and in the tassel, consistently across the founders. rp1's
   NLR copies (98 rows; B97 alone has eleven) sit in leaf and ear and are quiet
   in seed.
+
+### Figure 5, revised: FPKM, and a fold-change view (2026-09-17)
+
+The values are **FPKM** (Carson). Nothing records it -- the release says only
+"FPKM or TPM as published by each study" and qTeller's `qtnamdb` has no unit
+column -- but the data agree: one genome's genes sum to 0.42-0.66 million per
+sample, never the ~1,000,000 a TPM sample sums to. The section now carries
+`units: FPKM` and `scale: log2(FPKM + 1)`.
+
+The original labels were log2(FPKM + 1) with steps > 1..> 4, which read like
+fold change and are not: they map to FPKM > 1, 3, 7, 15. So there are now two
+views, each with the label steps that belong to what it shows:
+
+- **Expression (FPKM)** -- colour log2(FPKM + 1) as before; labels print FPKM
+  itself at the cutoffs people use: All, >= 1 (expressed), >= 10, >= 50,
+  >= 100.
+- **Fold change vs pan-gene average** -- log2 fold change against this
+  pan-gene's average in each tissue, the mean of log2(FPKM + 1) over every row
+  (a geometric mean, so one very highly expressed copy does not drag it up).
+  Labels at |log2 FC| > 1, 2, 3, 4 (2x, 4x, 8x, 16x). A cell where both it and
+  the average are under 1 FPKM is dotted and gets no fold change -- a ratio of
+  two noise-level numbers. That is 104 of lg1's 195 measured cells.
+- Diverging colour: the reference blue ramp for below, and a red arm derived
+  from it in OKLab with the same lightness and chroma at every step, through
+  the reference neutral #f0efec. Saturates at +/-4.
+- Each label step shows how many cells it numbers, and a step that numbers
+  none is disabled. Verified one cell independently: B73v5 Zm00001eb405860 in
+  leaf tip, 9.63 FPKM against an average of 5.05, log2 FC 0.812; the page
+  prints +0.8.

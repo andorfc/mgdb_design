@@ -746,3 +746,18 @@ section[id^="pg-record-"] .mgdb-rec-table td { overflow-wrap: normal; }
   pointer-events: none;
 }
 .mgdb-pg-heat-labelkey { margin-left: var(--mgdb-space-3); }
+
+/* Fold-change view: a dotted cell is one where both it and the pan-gene's
+   average are under 1 FPKM, so the ratio is noise. Distinct from the hatch,
+   which is "not measured". */
+.mgdb-pg-heat-dotkey {
+  display: inline-block;
+  width: 14px;
+  height: 10px;
+  margin-left: var(--mgdb-space-3);
+  border-radius: 2px;
+  background-color: #f7f6f3;
+  background-image: radial-gradient(#bdb8ad 0.9px, transparent 1.1px);
+  background-size: 5px 5px;
+}
+.mgdb-pg-heat-tools label.is-disabled { opacity: .45; }

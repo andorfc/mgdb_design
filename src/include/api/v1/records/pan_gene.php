@@ -1138,9 +1138,14 @@ function mgdbPanGeneExpressionMatrix($members) {
     'source' => $SOURCE,
     'source_link' => 'https://nam-genomes.github.io/',
     'release' => $release,
-    'scale' => 'log2(value + 1)',
-    'tau_rule' => 'Computed only where some tissue reaches 1, the expression release\'s detection rule for RNA.',
-    'units_note' => 'Values as published by the NAM Consortium and averaged over biological replicates by qTeller. ' .
+    /* FPKM, confirmed by Carson 2026-09-17. The release itself only says
+       "FPKM or TPM as published by each study"; the data agree -- one
+       genome's genes sum to 0.42-0.66 million per sample, never the 1,000,000
+       a TPM sample sums to. */
+    'units' => 'FPKM',
+    'scale' => 'log2(FPKM + 1)',
+    'tau_rule' => 'Computed only where some tissue reaches 1 FPKM, the expression release\'s detection rule for RNA.',
+    'units_note' => 'FPKM as published by the NAM Consortium, averaged over biological replicates by qTeller. ' .
                     'Compare tissues within a row freely; across genomes the samples were grown and sequenced together.',
     'tissues' => $tissues,
     'genome_count' => count($genomes),

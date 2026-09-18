@@ -2469,50 +2469,155 @@
     return active[0] || null;
   }
 
+  /* Log2 fold change, blue for below the pan-gene's average in a tissue and
+     red for above, through the reference palette's neutral midpoint. The blue
+     arm is the reference blue ramp; the red arm was derived from it step for
+     step in OKLab, same lightness and chroma at every step (L 0.857/0.717/
+     0.575/0.386), so +2 reads exactly as strong as -2. Saturates at +/-4, a
+     16-fold difference. */
+  var DIV_STOPS = [
+    [-4, [16, 66, 129]], [-3, [42, 120, 214]], [-2, [109, 167, 236]], [-1, [183, 211, 246]],
+    [0, [240, 239, 236]],
+    [1, [244, 195, 184]], [2, [228, 135, 115]], [3, [198, 75, 51]], [4, [118, 36, 20]]
+  ];
+  var FC_MAX = 4;
+
+  function divColour(fc) {
+    if (fc == null || isNaN(fc)) { return null; }
+    var v = Math.max(-FC_MAX, Math.min(FC_MAX, fc));
+    for (var i = 0; i < DIV_STOPS.length - 1; i++) {
+      var p = DIV_STOPS[i], q = DIV_STOPS[i + 1];
+      if (v >= p[0] && v <= q[0]) {
+        var f = (v - p[0]) / (q[0] - p[0]);
+        return 'rgb(' + Math.round(p[1][0] + (q[1][0] - p[1][0]) * f) + ',' +
+          Math.round(p[1][1] + (q[1][1] - p[1][1]) * f) + ',' + Math.round(p[1][2] + (q[1][2] - p[1][2]) * f) + ')';
+      }
+    }
+    return 'rgb(240,239,236)';
+  }
+
+  /* FPKM as a label: one decimal under 10, whole numbers to 999, then k. */
+  function fpkmText(v) {
+    if (v < 10) { return (Math.round(v * 10) / 10).toFixed(1); }
+    if (v < 1000) { return String(Math.round(v)); }
+    return (Math.round(v / 100) / 10).toFixed(1) + 'k';
+  }
+  function fpkmPrinted(v) {
+    if (v < 10) { return Math.round(v * 10) / 10; }
+    if (v < 1000) { return Math.round(v); }
+    return Math.round(v / 100) * 100;
+  }
+
   function panGeneHeatmap(container, spec) {
     var matrix = spec && spec.matrix;
     if (!container || !matrix || !matrix.rows || !matrix.rows.length) { return null; }
     var tissues = matrix.tissues || [];
     var rows = matrix.rows.slice();
-    var mode = 'tree', scale = 'absolute';
-    /* Cell labels: none, all, or only cells above a log2 threshold. The label
-       is always log2(value + 1) -- the number the colour encodes in Absolute
-       -- and the threshold is on that same number, so neither changes meaning
-       when the scale is switched to "each row to its maximum". */
-    var labelMode = 'none';
-    var LABEL_MIN = { all: -Infinity, gt1: 1, gt2: 2, gt3: 3, gt4: 4 };
+    var units = matrix.units || 'FPKM';
+    var mode = 'tree', scale = 'absolute', view = 'expression';
     var treeOrder = null, dendro = null;
     var selected = {};
+
+    /* Labels. The two views label different quantities, so each has its own
+       steps, and the threshold is always compared against the number as it is
+       printed -- compared raw, 2.03 passed "> 2" and printed as "2.0".
+         expression: FPKM, at the cutoffs people use (1 is "expressed")
+         fold:       |log2 fold change|, 1 = 2-fold, 2 = 4-fold, ... */
+    var labelMode = 'none';
+    var LABELS = {
+      expression: [['none', 'None'], ['all', 'All'], ['ge1', '≥ 1'], ['ge10', '≥ 10'],
+                   ['ge50', '≥ 50'], ['ge100', '≥ 100']],
+      fold: [['none', 'None'], ['all', 'All'], ['gt1', '> 1 (2×)'], ['gt2', '> 2 (4×)'],
+             ['gt3', '> 3 (8×)'], ['gt4', '> 4 (16×)']]
+    };
+    var LABEL_MIN = { all: -Infinity, ge1: 1, ge10: 10, ge50: 50, ge100: 100, gt1: 1, gt2: 2, gt3: 3, gt4: 4 };
 
     var globalMax = 0;
     rows.forEach(function (r) { r.values.forEach(function (v) { var l = log2p(v); if (l != null && l > globalMax) { globalMax = l; } }); });
     if (globalMax <= 0) { globalMax = 1; }
 
+    /* The reference each fold change is against: this pan-gene's average in
+       that tissue, taken as the mean of log2(FPKM + 1) over every row measured
+       there -- a geometric mean of FPKM + 1, so one very highly expressed copy
+       does not drag the average of 98 up to meet it. */
+    var refLog = tissues.map(function (t, j) {
+      var s = 0, n = 0;
+      rows.forEach(function (r) { var l = log2p(r.values[j]); if (l != null) { s += l; n++; } });
+      return n ? s / n : null;
+    });
+    var refFpkm = refLog.map(function (l) { return l == null ? null : Math.pow(2, l) - 1; });
+
+    function foldOf(r, j) {
+      var l = log2p(r.values[j]);
+      return l == null || refLog[j] == null ? null : l - refLog[j];
+    }
+    /* Both this cell and the pan-gene's average under 1 FPKM: a ratio of two
+       noise-level numbers, which can be large and means nothing. */
+    function belowDetection(r, j) {
+      var v = r.values[j];
+      return v != null && refFpkm[j] != null && v < 1 && refFpkm[j] < 1;
+    }
+
     var lines = {};
     rows.forEach(function (r) { lines[r.line] = true; });
+
+    /* How many cells each label step would number, in each view. Neither
+       depends on order or scale, so it is counted once. A step that numbers
+       nothing is disabled rather than offered: rp1's NLR copies never reach
+       50 FPKM and never sit 8-fold off the average, and choosing either and
+       getting a bare heatmap reads as the control being broken. */
+    function labelCounts(which) {
+      var counts = {};
+      LABELS[which].forEach(function (o) { counts[o[0]] = 0; });
+      rows.forEach(function (r) {
+        r.values.forEach(function (v, j) {
+          if (v == null) { return; }
+          if (which === 'fold') {
+            if (belowDetection(r, j)) { return; }
+            var shown = Math.abs(Math.round(foldOf(r, j) * 10) / 10);
+            counts.all++;
+            ['gt1', 'gt2', 'gt3', 'gt4'].forEach(function (k) { if (shown > LABEL_MIN[k]) { counts[k]++; } });
+          } else {
+            var printed = fpkmPrinted(v);
+            counts.all++;
+            ['ge1', 'ge10', 'ge50', 'ge100'].forEach(function (k) { if (printed >= LABEL_MIN[k]) { counts[k]++; } });
+          }
+        });
+      });
+      return counts;
+    }
+
+    function optionsHtml(which) {
+      var counts = labelCounts(which);
+      return LABELS[which].map(function (o) {
+        var n = counts[o[0]];
+        var empty = o[0] !== 'none' && n === 0;
+        return '<option value="' + o[0] + '"' + (empty ? ' disabled' : '') + '>' + o[1] +
+          (o[0] === 'none' ? '' : ' \u00b7 ' + number(n)) + '</option>';
+      }).join('');
+    }
 
     container.insertAdjacentHTML('afterbegin',
       '<div class="mgdb-rec-block mgdb-pg-heat-block">' +
         '<div class="mgdb-rec-block-head">' +
           '<h3>Expression across the NAM founders</h3>' +
           '<div class="mgdb-pg-heat-tools">' +
+            '<label>Show <select data-role="heat-view" aria-label="What the colour shows">' +
+              '<option value="expression">Expression (' + esc(units) + ')</option>' +
+              '<option value="fold">Fold change vs pan-gene average</option>' +
+            '</select></label>' +
             '<label>Order <select data-role="heat-order" aria-label="Order the rows by">' +
               '<option value="tree">Phylogenetic tree</option>' +
               '<option value="cluster">Cluster by pattern</option>' +
               '<option value="genome">Genome</option>' +
               '<option value="tau">Tissue specificity</option>' +
             '</select></label>' +
-            '<label>Scale <select data-role="heat-scale" aria-label="Colour scale">' +
+            '<label data-role="heat-scale-wrap">Scale <select data-role="heat-scale" aria-label="Colour scale">' +
               '<option value="absolute">Absolute</option>' +
               '<option value="row">Each row to its maximum</option>' +
             '</select></label>' +
-            '<label>Labels <select data-role="heat-labels" aria-label="Show the log2 value on cells">' +
-              '<option value="none">None</option>' +
-              '<option value="all">All</option>' +
-              '<option value="gt1">&gt; 1</option>' +
-              '<option value="gt2">&gt; 2</option>' +
-              '<option value="gt3">&gt; 3</option>' +
-              '<option value="gt4">&gt; 4</option>' +
+            '<label>Labels <select data-role="heat-labels" aria-label="Numbers on the cells">' +
+              optionsHtml('expression') +
             '</select></label>' +
             '<button class="mgdb-rec-tsv" type="button" data-role="heat-png">Export PNG</button>' +
             '<button class="mgdb-rec-tsv" type="button" data-role="heat-tsv">Download TSV</button>' +
@@ -2528,23 +2633,30 @@
     var block = container.firstElementChild;
     var scroller = block.querySelector('[data-role="heat-scroll"]');
     var detail = block.querySelector('[data-role="heat-detail"]');
+    var labelSel = block.querySelector('[data-role="heat-labels"]');
+    var scaleSel = block.querySelector('[data-role="heat-scale"]');
     var idle = 'Hover a cell for its value; click a row to select that gene model in every figure.';
     detail.textContent = idle;
 
     function statusText() {
       var missing = (matrix.members_without_profile || []).length;
       var noTau = rows.filter(function (r) { return r.tau == null; }).length;
-      var nulls = 0;
-      rows.forEach(function (r) { r.values.forEach(function (v) { if (v == null) { nulls++; } }); });
+      var nulls = 0, quiet = 0;
+      rows.forEach(function (r) {
+        r.values.forEach(function (v, j) { if (v == null) { nulls++; } else if (belowDetection(r, j)) { quiet++; } });
+      });
+      var what = view === 'fold'
+        ? 'colour is the log2 fold change against this pan-gene’s average in each tissue' +
+          (quiet ? ' · ' + number(quiet) + ' cell' + (quiet === 1 ? '' : 's') + ' dotted where both are under 1 ' + esc(units) : '')
+        : 'colour is log2(' + esc(units) + ' + 1), an absolute level, not a fold change';
       return number(rows.length) + ' gene model' + (rows.length === 1 ? '' : 's') + ' across ' +
         number(Object.keys(lines).length) + ' of the ' + number(matrix.genome_count) + ' genomes · ' +
-        esc(matrix.source) + ' RNA-seq, colour ' + esc(matrix.scale) +
+        esc(matrix.source) + ' RNA-seq in ' + esc(units) + ' · ' + what +
         (nulls ? ' · ' + number(nulls) + ' cell' + (nulls === 1 ? '' : 's') + ' not measured, hatched' : '') +
         (missing ? ' · ' + number(missing) + ' member' + (missing === 1 ? ' has' : 's have') + ' no profile' : '') +
-        (noTau ? ' · τ is left blank for ' + number(noTau) + ' where no tissue reaches 1, since it ' +
-          'is meaningless at noise level' : '') + '.';
+        (noTau ? ' · τ is left blank for ' + number(noTau) + ' where no tissue reaches 1 ' + esc(units) +
+          ', since it is meaningless at noise level' : '') + '.';
     }
-    block.querySelector('[data-role="heat-status"]').innerHTML = statusText();
 
     /* ---- ordering ------------------------------------------------------- */
 
@@ -2574,7 +2686,6 @@
         })(root);
         var before = rows.slice();
         rows = order.map(function (i) { return before[i]; });
-        /* Re-index the tree onto the new row order for drawing. */
         var pos = {};
         order.forEach(function (orig, k) { pos[orig] = k; });
         (function reindex(node) {
@@ -2591,6 +2702,26 @@
       } else {
         rows.sort(lineSort);
       }
+    }
+
+    /* ---- one cell ------------------------------------------------------- */
+
+    function cellPaint(r, j, rowMax) {
+      var v = r.values[j];
+      if (v == null) { return { fill: 'url(#mgdb-heat-hatch)', label: null }; }
+      var l = log2p(v);
+      if (view === 'fold') {
+        if (belowDetection(r, j)) { return { fill: 'url(#mgdb-heat-dots)', label: null }; }
+        var fc = foldOf(r, j);
+        var shown = Math.round(fc * 10) / 10;
+        var passes = labelMode === 'all' || (labelMode !== 'none' && Math.abs(shown) > LABEL_MIN[labelMode]);
+        return { fill: divColour(fc),
+                 label: passes ? (shown > 0 ? '+' : (shown < 0 ? '−' : '')) + Math.abs(shown).toFixed(1) : null };
+      }
+      var fill = heatColour(scale === 'row' ? (rowMax > 0 ? l / rowMax : 0) : l / globalMax);
+      var printed = fpkmPrinted(v);
+      var ok = labelMode === 'all' || (labelMode !== 'none' && printed >= LABEL_MIN[labelMode]);
+      return { fill: fill, label: ok ? fpkmText(v) : null };
     }
 
     /* ---- drawing -------------------------------------------------------- */
@@ -2620,13 +2751,17 @@
       var any = Object.keys(selected).length > 0;
       var out = [];
       out.push('<svg class="mgdb-pg-heat-svg" width="' + width + '" height="' + height + '" viewBox="0 0 ' +
-        width + ' ' + height + '" role="img" aria-label="Expression of ' + rows.length +
-        ' gene models across ' + tissues.length + ' tissues">');
-      out.push('<defs><pattern id="mgdb-heat-hatch" width="6" height="6" patternUnits="userSpaceOnUse" ' +
-        'patternTransform="rotate(45)"><rect width="6" height="6" fill="#ffffff"></rect>' +
-        '<line x1="0" y1="0" x2="0" y2="6" stroke="#cfcac0" stroke-width="2"></line></pattern></defs>');
+        width + ' ' + height + '" role="img" aria-label="' + (view === 'fold' ? 'Fold change' : 'Expression') +
+        ' of ' + rows.length + ' gene models across ' + tissues.length + ' tissues">');
+      out.push('<defs>' +
+        '<pattern id="mgdb-heat-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">' +
+          '<rect width="6" height="6" fill="#ffffff"></rect>' +
+          '<line x1="0" y1="0" x2="0" y2="6" stroke="#cfcac0" stroke-width="2"></line></pattern>' +
+        '<pattern id="mgdb-heat-dots" width="5" height="5" patternUnits="userSpaceOnUse">' +
+          '<rect width="5" height="5" fill="#f7f6f3"></rect>' +
+          '<circle cx="2.5" cy="2.5" r="0.9" fill="#bdb8ad"></circle></pattern>' +
+        '</defs>');
 
-      /* Column headers: the group over its tissues, then the tissue. */
       groups.forEach(function (g) {
         var gx0 = x[g.from], gx1 = x[g.to] + cellW;
         out.push('<text class="mgdb-pg-heat-group" x="' + ((gx0 + gx1) / 2) + '" y="14" text-anchor="middle">' +
@@ -2648,7 +2783,7 @@
           '" data-row="' + ri + '">');
         out.push('<rect class="mgdb-pg-heat-hit" x="' + dendroW + '" y="' + y + '" width="' + (width - dendroW) +
           '" height="' + ROW + '"></rect>');
-        var firstOfLine = ri === 0 || rows[ri - 1].line !== r.line || mode === 'tree' || mode === 'cluster' || mode === 'tau';
+        var firstOfLine = ri === 0 || rows[ri - 1].line !== r.line || mode !== 'genome';
         if (firstOfLine) {
           out.push('<text class="mgdb-pg-heat-line" x="' + (dendroW + 4) + '" y="' + (y + ROW - 4.5) + '">' +
             esc(r.line) + '</text>');
@@ -2658,21 +2793,14 @@
         var rowMax = 0;
         r.values.forEach(function (v) { var l = log2p(v); if (l != null && l > rowMax) { rowMax = l; } });
         r.values.forEach(function (v, i) {
-          var l = log2p(v);
-          var fill = l == null ? 'url(#mgdb-heat-hatch)'
-            : heatColour(scale === 'row' ? (rowMax > 0 ? l / rowMax : 0) : l / globalMax);
+          var p = cellPaint(r, i, rowMax);
           out.push('<rect class="mgdb-pg-heat-cell" data-col="' + i + '" x="' + x[i] + '" y="' + (y + 1) +
-            '" width="' + (cellW - 2) + '" height="' + (ROW - 2) + '" rx="2" fill="' + fill + '"></rect>');
-          /* A not-measured cell has nothing to print; the hatch says so. */
-          /* Compared as printed, to one decimal. Compared raw, 2.03 passed "> 2"
-             and printed as "2.0" -- a label that looks like the filter failing. */
-          var shown = l == null ? null : Math.round(l * 10) / 10;
-          if (labelMode !== 'none' && shown != null && shown > LABEL_MIN[labelMode]) {
-            var tone = labelInk(fill);
+            '" width="' + (cellW - 2) + '" height="' + (ROW - 2) + '" rx="2" fill="' + p.fill + '"></rect>');
+          if (p.label != null) {
+            var tone = labelInk(p.fill);
             out.push('<text class="mgdb-pg-heat-value" x="' + (x[i] + (cellW - 2) / 2) + '" y="' +
               (y + ROW / 2 + 3.4) + '" text-anchor="middle" fill="' + tone.ink + '" stroke="' + tone.halo +
-              '" stroke-width="2.2" stroke-linejoin="round" paint-order="stroke">' +
-              shown.toFixed(1) + '</text>');
+              '" stroke-width="2.2" stroke-linejoin="round" paint-order="stroke">' + p.label + '</text>');
           }
         });
         if (r.tau != null) {
@@ -2708,30 +2836,47 @@
       out.push('</svg>');
       scroller.innerHTML = out.join('');
       block.querySelector('[data-role="heat-legend"]').innerHTML = legendHtml();
+      block.querySelector('[data-role="heat-status"]').innerHTML = statusText();
     }
 
     function legendHtml() {
-      var stops = [];
-      for (var i = 0; i <= 10; i++) { stops.push(heatColour(i / 10) + ' ' + (i * 10) + '%'); }
+      var stops = [], i;
+      if (view === 'fold') {
+        for (i = 0; i <= 16; i++) {
+          var fc = -FC_MAX + i * (2 * FC_MAX / 16);
+          stops.push(divColour(fc) + ' ' + (i * 100 / 16).toFixed(1) + '%');
+        }
+        return '<span class="mgdb-pg-heat-rampcap">−' + FC_MAX + '</span>' +
+          '<span class="mgdb-pg-heat-ramp" style="background:linear-gradient(to right,' + stops.join(',') +
+          ')" aria-hidden="true"></span>' +
+          '<span class="mgdb-pg-heat-rampcap">+' + FC_MAX + ' log2 fold change against the pan-gene’s average ' +
+          'in that tissue (blue below, red above; ±' + FC_MAX + ' is 16×)</span>' +
+          '<span class="mgdb-pg-heat-dotkey" aria-hidden="true"></span><span>both under 1 ' + esc(units) + '</span>' +
+          '<span class="mgdb-pg-heat-hatchkey" aria-hidden="true"></span><span>not measured</span>' +
+          (labelMode === 'none' ? '' : '<span class="mgdb-pg-heat-labelkey">Numbers are log2 fold change' +
+            (labelMode === 'all' ? '' : ', shown beyond ±' + LABEL_MIN[labelMode]) + '</span>');
+      }
+      for (i = 0; i <= 10; i++) { stops.push(heatColour(i / 10) + ' ' + (i * 10) + '%'); }
+      var top = Math.pow(2, globalMax) - 1;
       return '<span class="mgdb-pg-heat-ramp" style="background:linear-gradient(to right,' + stops.join(',') +
         ')" aria-hidden="true"></span>' +
         '<span class="mgdb-pg-heat-rampcap">' + (scale === 'row'
           ? '0 → each row’s highest tissue'
-          : '0 → ' + globalMax.toFixed(1) + ' ' + esc(matrix.scale)) + '</span>' +
+          : '0 → ' + fpkmText(top) + ' ' + esc(units) + ', on a log scale') + '</span>' +
         '<span class="mgdb-pg-heat-hatchkey" aria-hidden="true"></span><span>not measured</span>' +
-        (labelMode === 'none' ? '' : '<span class="mgdb-pg-heat-labelkey">Numbers are log2(value + 1)' +
-          (labelMode === 'all' ? '' : ', shown above ' + LABEL_MIN[labelMode]) + '</span>');
+        (labelMode === 'none' ? '' : '<span class="mgdb-pg-heat-labelkey">Numbers are ' + esc(units) +
+          (labelMode === 'all' ? '' : ', shown at ' + LABEL_MIN[labelMode] + ' and above') + '</span>');
     }
 
     /* Ink for a number printed on a cell, decided from the cell's own colour
-       so it holds in both scale modes: white below WCAG relative luminance
-       0.2, dark above, each with a thin halo in the opposite tone.
+       so it holds in every view: white below WCAG relative luminance 0.2,
+       dark above, each with a thin halo in the opposite tone.
 
-       The halo is not decoration. Measured across the whole ramp, mid-tone
-       green is poor for BOTH inks: the best split available (0.2) still left
-       the worst cell at 3.65:1, and the 0.4 split first written here left
-       white on rgb(131,180,150) at 2.35:1. With the halo every glyph sits on
-       its own local background of at least 9.78:1. */
+       The halo is not decoration. Measured across the expression ramp,
+       mid-tone green is poor for BOTH inks: the best split available (0.2)
+       still left the worst cell at 3.65:1, and the 0.4 split first written
+       here left white on rgb(131,180,150) at 2.35:1. With the halo every glyph
+       sits on its own local background of at least 9.78:1. */
     function labelInk(fill) {
       var m = /rgb\((\d+),(\d+),(\d+)\)/.exec(fill || '');
       if (!m) { return { ink: '#1f2723', halo: 'rgba(255,255,255,0.65)' }; }
@@ -2746,6 +2891,8 @@
 
     /* ---- interaction ----------------------------------------------------- */
 
+    function fmt(v) { return v.toLocaleString(undefined, { maximumSignificantDigits: 4 }); }
+
     scroller.addEventListener('mousemove', function (event) {
       var g = event.target.closest ? event.target.closest('[data-row]') : null;
       if (!g) { detail.textContent = idle; return; }
@@ -2754,12 +2901,22 @@
       var bits = [(r.html ? '<a href="' + esc(r.html) + '">' : '') + '<span class="mgdb-sequence">' +
         esc(r.gene) + '</span>' + (r.html ? '</a>' : ''), '<strong>' + esc(r.line) + '</strong>'];
       if (cell != null) {
-        var t = tissues[+cell], v = r.values[+cell];
-        bits.push(esc(t.label) + ': ' + (v == null ? 'not measured'
-          : '<strong>' + v.toLocaleString(undefined, { maximumSignificantDigits: 4 }) + '</strong> (log2 ' +
-            log2p(v).toFixed(2) + ')'));
+        var j = +cell, t = tissues[j], v = r.values[j];
+        if (v == null) {
+          bits.push(esc(t.label) + ': not measured');
+        } else {
+          var txt = esc(t.label) + ': <strong>' + fmt(v) + ' ' + esc(units) + '</strong>';
+          if (view === 'fold') {
+            var fc = foldOf(r, j);
+            txt += ', pan-gene average ' + fmt(refFpkm[j]) + ' ' + esc(units) + ' · ' +
+              (belowDetection(r, j) ? 'both under 1 ' + esc(units) + ', no fold change shown'
+                : 'log2 fold change <strong>' + (fc >= 0 ? '+' : '−') + Math.abs(fc).toFixed(2) + '</strong> (' +
+                  (fc >= 0 ? fmt(Math.pow(2, fc)) + '× above' : fmt(Math.pow(2, -fc)) + '× below') + ')');
+          }
+          bits.push(txt);
+        }
       }
-      bits.push('τ ' + (r.tau == null ? 'not computed, no tissue reaches 1' : r.tau.toFixed(2)));
+      bits.push('τ ' + (r.tau == null ? 'not computed, no tissue reaches 1 ' + esc(units) : r.tau.toFixed(2)));
       if (r.is_exemplar) { bits.push('<span class="mgdb-pill mgdb-pill-ok">Exemplar</span>'); }
       detail.innerHTML = bits.join(' &middot; ');
     });
@@ -2785,15 +2942,24 @@
       });
     });
 
+    block.querySelector('[data-role="heat-view"]').addEventListener('change', function () {
+      view = this.value;
+      /* The label steps belong to the quantity shown: FPKM cutoffs in one
+         view, fold-change steps in the other. "None" and "All" carry over. */
+      var keep = labelMode === 'all' ? 'all' : 'none';
+      labelSel.innerHTML = optionsHtml(view);
+      labelSel.value = keep;
+      labelMode = keep;
+      /* Scale is a property of the expression view only. */
+      scaleSel.disabled = view === 'fold';
+      block.querySelector('[data-role="heat-scale-wrap"]').classList.toggle('is-disabled', view === 'fold');
+      draw();
+    });
     block.querySelector('[data-role="heat-order"]').addEventListener('change', function () {
       mode = this.value; applyOrder(); draw();
     });
-    block.querySelector('[data-role="heat-scale"]').addEventListener('change', function () {
-      scale = this.value; draw();
-    });
-    block.querySelector('[data-role="heat-labels"]').addEventListener('change', function () {
-      labelMode = this.value; draw();
-    });
+    scaleSel.addEventListener('change', function () { scale = this.value; draw(); });
+    labelSel.addEventListener('change', function () { labelMode = this.value; draw(); });
 
     block.querySelector('[data-role="heat-tsv"]').addEventListener('click', function () {
       var columns = [
@@ -2802,7 +2968,13 @@
         { label: 'Genome', get: function (r) { return r.genome; } }
       ];
       tissues.forEach(function (t, i) {
-        columns.push({ label: t.label, get: function (r) { return r.values[i] == null ? '' : r.values[i]; } });
+        columns.push({ label: t.label + ' (' + units + ')', get: function (r) { return r.values[i] == null ? '' : r.values[i]; } });
+      });
+      tissues.forEach(function (t, i) {
+        columns.push({ label: t.label + ' (log2 fold change vs pan-gene average)', get: function (r) {
+          var fc = foldOf(r, i);
+          return fc == null || belowDetection(r, i) ? '' : Math.round(fc * 1000) / 1000;
+        } });
       });
       columns.push({ label: 'Tau (these ten tissues)', get: function (r) { return r.tau == null ? '' : r.tau; } });
       if (window.MGDBRecord && window.MGDBRecord.downloadTsv) {
@@ -2818,22 +2990,29 @@
       var clone = inlineSvgStyles(svg);
       clone.setAttribute('x', M);
       clone.setAttribute('y', HEADER);
+      var sub = view === 'fold'
+        ? 'log2 fold change against the pan-gene’s average in each tissue, ±' + FC_MAX + ' saturates'
+        : (scale === 'row' ? 'each row scaled to its maximum' : 'log2(' + units + ' + 1), 0 to ' +
+          fpkmText(Math.pow(2, globalMax) - 1) + ' ' + units);
       var body = xText(M, M + 6, 'Expression across the NAM founders', { size: 17, weight: 700, fill: '#1f2723' });
-      body += xText(M, M + 26, rows.length + ' gene models · ' + matrix.source + ' · ' +
-        (scale === 'row' ? 'each row scaled to its maximum' : matrix.scale + ', 0 to ' + globalMax.toFixed(1)) +
+      body += xText(M, M + 26, rows.length + ' gene models · ' + matrix.source + ' (' + units + ') · ' + sub +
         ' · ordered by ' + block.querySelector('[data-role="heat-order"] option:checked').textContent.toLowerCase(),
         { size: 11, fill: '#5d6b62' });
       body += new XMLSerializer().serializeToString(clone);
       var lx = M, ly = HEADER + h + 16;
       for (var i = 0; i < 40; i++) {
-        body += '<rect x="' + (lx + i * 4) + '" y="' + ly + '" width="4" height="10" fill="' + heatColour(i / 39) + '"></rect>';
+        var f = view === 'fold' ? divColour(-FC_MAX + i * (2 * FC_MAX / 39)) : heatColour(i / 39);
+        body += '<rect x="' + (lx + i * 4) + '" y="' + ly + '" width="4" height="10" fill="' + f + '"></rect>';
       }
-      body += xText(lx + 168, ly + 9, scale === 'row' ? '0 → row maximum' : '0 → ' + globalMax.toFixed(1),
+      body += xText(lx + 168, ly + 9, view === 'fold' ? '−' + FC_MAX + ' → +' + FC_MAX + ' (blue below, red above)'
+        : (scale === 'row' ? '0 → row maximum' : '0 → ' + fpkmText(Math.pow(2, globalMax) - 1) + ' ' + units),
         { size: 10, fill: '#5d6b62' });
-      body += xText(M, ly + 30, 'MaizeGDB · hatched: not measured · τ over these ten tissues (Yanai 2005), blank where no tissue reaches 1',
+      body += xText(M, ly + 30, 'MaizeGDB · hatched: not measured' +
+        (view === 'fold' ? ' · dotted: both under 1 ' + units : '') +
+        ' · τ over these ten tissues (Yanai 2005), blank where no tissue reaches 1 ' + units,
         { size: 10, fill: '#7c837e' });
       exportSvgToPng(body, w + 2 * M, ly + 40,
-        (spec.filename || 'pan-gene-nam-expression.tsv').replace(/\.tsv$/, '') + '.png');
+        (spec.filename || 'pan-gene-nam-expression.tsv').replace(/\.tsv$/, '') + (view === 'fold' ? '-fold-change' : '') + '.png');
     });
 
     var lastW = 0;
@@ -2845,8 +3024,6 @@
     if (window.ResizeObserver) { new window.ResizeObserver(debounced).observe(scroller); }
     window.addEventListener('resize', debounced);
 
-    /* Tree order when the tree loads, genome order until then and if it
-       does not. */
     mode = 'genome';
     applyOrder();
     draw();
